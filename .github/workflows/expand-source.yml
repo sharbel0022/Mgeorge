@@ -3,8 +3,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'source/mgeorge-source.tar.xz'
-      - '.github/workflows/expand-source.yml'
+      - 'source/archive.ready'
   workflow_dispatch:
 permissions:
   contents: write
@@ -13,18 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify and expand code archive
+      - name: Restore and verify source bundle
         shell: bash
         run: |
           set -euo pipefail
-          test -f source/mgeorge-source.tar.xz
+          test -f source/archive.ready
+          cat source/part-* | base64 --decode > source/mgeorge-source.tar.xz
+          echo "b21bb82893c6518b5497be63a7b6024890c395fb8f43fa3e876278d4f5ac2368  source/mgeorge-source.tar.xz" | sha256sum --check -
           tar -tJf source/mgeorge-source.tar.xz | grep -q '^./src/server.js$'
           tar -tJf source/mgeorge-source.tar.xz | grep -q '^./public/app.js$'
           tar -xJf source/mgeorge-source.tar.xz -C . --no-same-owner
           node --version
           npm run check
           npm test
-      - name: Commit expanded source
+      - name: Commit expanded source files
         shell: bash
         run: |
           set -euo pipefail
