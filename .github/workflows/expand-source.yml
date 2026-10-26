@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Restore and verify source bundle
         shell: bash
         run: |
@@ -19,8 +22,9 @@ jobs:
           test -f source/archive.ready
           cat source/part-* | base64 --decode > source/mgeorge-source.tar.xz
           echo "b21bb82893c6518b5497be63a7b6024890c395fb8f43fa3e876278d4f5ac2368  source/mgeorge-source.tar.xz" | sha256sum --check -
-          tar -tJf source/mgeorge-source.tar.xz | grep -q '^./src/server.js$'
-          tar -tJf source/mgeorge-source.tar.xz | grep -q '^./public/app.js$'
+          tar -tJf source/mgeorge-source.tar.xz > /tmp/mgeorge-list.txt
+          grep -qx './src/server.js' /tmp/mgeorge-list.txt
+          grep -qx './public/app.js' /tmp/mgeorge-list.txt
           tar -xJf source/mgeorge-source.tar.xz -C . --no-same-owner
           node --version
           npm run check
