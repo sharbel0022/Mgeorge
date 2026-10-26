@@ -1,0 +1,37 @@
+name: Expand MG source archive
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'source/mgeorge-source.tar.xz'
+      - '.github/workflows/expand-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify and expand code archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f source/mgeorge-source.tar.xz
+          tar -tJf source/mgeorge-source.tar.xz | grep -q '^./src/server.js$'
+          tar -tJf source/mgeorge-source.tar.xz | grep -q '^./public/app.js$'
+          tar -xJf source/mgeorge-source.tar.xz -C . --no-same-owner
+          node --version
+          npm run check
+          npm test
+      - name: Commit expanded source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .env.example .gitignore README.md package.json public src docs test
+          if ! git diff --cached --quiet; then
+            git commit -m "feat: import tested MG Fakturakoll application sources"
+            git push
+          fi
