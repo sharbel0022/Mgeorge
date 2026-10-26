@@ -6,9 +6,10 @@
   "description": "Self-hostable M.George invoice and bank reconciliation system",
   "engines": { "node": ">=22.13.0" },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
+    "setup": "node scripts/setup.mjs",
+    "start": "node --env-file=.env src/server.js",
+    "dev": "node --env-file=.env --watch src/server.js",
     "test": "node --test test/*.test.js",
-    "check": "node --check src/server.js && node --check src/db.js && node --check src/bank.js && node --check src/importers.js && node --check public/app.js"
+    "check": "node --check src/server.js && node --check src/db.js && node --check src/bank.js && node --check src/importers.js && node --check src/gmail.js && node --check src/security.js && node --check public/app.js && node --check scripts/setup.mjs && node --check test/api.test.js && node --check test/db.test.js && node --check test/importers.test.js && node --check test/gmail.test.js"
   }
 }

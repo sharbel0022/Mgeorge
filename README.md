@@ -1,57 +1,86 @@
 # MG Fakturakoll – M.George Vitvaror AB
 
-**Körbar, fristående källkodsversion** av ett faktura- och bankavstämningssystem. Hanterar kund- och leverantörsfakturor, bankhändelser, CSV/camt-import, manuell betalningsmatchning samt läsanslutning till Swedbank via Enable Banking (AIS).
+Ett svenskt, självhostat system för kundfakturor, leverantörsfakturor, originalunderlag och bankavstämning. Gränssnittet följer de ljusa, blå designreferenserna och använder samma navigation på dator och mobil. Alla sammanställningar beräknas från den lokala databasen; en ny installation innehåller inga exempeltransaktioner.
 
-> **Viktig versionsinformation:** Det här är en **nyimplementerad källkodsversion** baserad på det tidigare arbetets funktioner, inte en byte-för-byte-export av den publicerade ChatGPT Sites-versionen. Den publicerade webbplatsen på [MG Fakturakoll](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/) kör fortfarande sin egen kod och databas. Ingen kund- eller bankdata har exporterats till GitHub, och ändringar i GitHub publiceras **inte automatiskt** på ChatGPT Sites.
+Det här är den fristående källkodsversionen i detta repository. Den tidigare publicerade [ChatGPT Sites-webbplatsen](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/) har separat kod och databas. Dessa ändringar publiceras inte automatiskt där och flyttar inga företagsuppgifter mellan systemen.
 
 ## Kom igång lokalt
 
-Kräver **Node.js 22.13+** (använder inbyggda `node:sqlite`). Inga externa npm-paket krävs.
+Kräver **Node.js 22.13 eller senare**, med inbyggda `node:sqlite`. Inga externa npm-paket eller byggsteg behövs.
 
 ```bash
 git clone https://github.com/sharbel0022/Mgeorge.git
 cd Mgeorge
-cp .env.example .env
-# Ändra .env och välj långt, unikt administratörslösenord samt slumpade nycklar.
-# Nycklar (64 hextecken vardera): node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-node --env-file=.env src/server.js
+npm run setup
+npm start
 ```
 
-Öppna `http://localhost:3000`. Logga in med `MG_ADMIN_PASSWORD` från `.env`.
+Öppna `http://localhost:3000`. Appen öppnas direkt utan lösenord eller inloggningssida. Kommandot skapar en Git-ignorerad `.env` med krypteringsnycklar för anslutningarna. En befintlig `.env` behålls. Om en databas finns men konfigurationen saknas avbryts skapandet för att skydda installationens ursprungliga krypteringsnyckel.
 
-`NODE_ENV=test npm test` kör automatiska tester med tillfällig databas. `npm run check` syntaxkontrollerar koden.
+`npm start` läser `.env` och kör `src/server.js`. `npm run dev` använder samma konfiguration och startar om servern vid kodändringar. Du kan också skapa `.env` manuellt från `.env.example` och starta med `node --env-file=.env src/server.js`.
 
-## Anslut Swedbank för att läsa bankhändelser
+Servern lyssnar endast på `127.0.0.1` och används lokalt utan appinloggning. En webbläsarsession skapas automatiskt för att skydda returflöden från Google och banken. Befintliga fakturor och underlag behålls. Bevara `BANK_DATA_KEY`: utan den kan befintliga bank- och Gmail-anslutningar inte dekrypteras.
 
-1. Skapa en app i [Enable Banking Control Panel](https://enablebanking.com/cp/applications), välj lästjänsten **AIS** och rätt miljö. För riktiga bankkonton krävs produktionsåtkomst och eventuella avtal.
-2. Registrera exakt din returadress i appen: `https://din-domän.se/api/bank/callback` utan queryparametrar. För localhost krävs en separat lokalt åtkomlig redirect som tillåts av leverantören.
-3. På **servern**: ange `ENABLEBANKING_APP_ID` och `ENABLEBANKING_PRIVATE_KEY_FILE` i `.env`. PEM-filen ska finnas **utanför projektets Git-katalog**. Ange även en riktig `https://`-adress i `APP_ORIGIN` vid publik drift.
-4. Starta om, öppna **Bankanslutning → Koppla Swedbank**, godkänn hos banken med BankID och hämta sedan bokförda händelser för ett valt konto och datumintervall.
+## Funktioner i denna version
 
-**Endast läsning:** Inga betalnings- eller överföringsfunktioner är implementerade. Banker kan begränsa datumintervall och åtkomst. Bankgiro som visas som en totalsumma behöver ibland en separat camt.054-/betalningsspecifikation för att kunna identifiera betalare.
+- Översikt med verkliga saldon, anslutningsstatus, bankhändelser och granskningsbehov.
+- Kund- och leverantörsfakturor med sökning, filter, förfallodatum, OCR/referens, moms, Bankgiro, originalunderlag och betalningshistorik.
+- Tydlig skillnad mellan **Ej avstämd**, verifierat **Obetald**, **Delvis betald**, **Betald** och **Förfallen**. Förfallodatumet kontrolleras också separat för fakturor som ännu inte är avstämda.
+- CSV-, camt.053- och camt.054-import med förhandsgranskning, bekräftelse, originalfil, dubblettkontroll och importhistorik.
+- Matchningsförslag utifrån riktning, OCR/fakturareferens, belopp och betalare. Användaren granskar och godkänner; ett förslag registrerar aldrig en betalning automatiskt.
+- Delbetalningar, fördelning av en bankhändelse på flera fakturor, undantag med motivering och spårbart återtagande av matchningar.
+- Kreditfakturor med omvänd förväntad betalningsriktning och avdrag i sammanställningar. Återbetalningar kan matchas; automatisk kvittning mellan kredit- och debetfakturor ingår inte.
+- Uppladdning och bevarande av PDF, PNG, JPEG och WebP, högst 15 MB per fil. Original hämtas direkt från den lokala arbetsytan.
+- Läsanslutning till Swedbank via Enable Banking och Gmail via Google OAuth, efter extern aktivering och godkända medgivanden.
+- Företagsinställningar, anslutningshantering, granskningshistorik och JSON-export av registerdata.
+- Valbar återkommande hämtning var 15, 30 eller 60 minut, var fjärde timme eller dagligen. Standard är manuell hämtning.
 
-## Viktiga säkerhetsregler
+## Anslut bank och Gmail
 
-- **Repositoryt är offentligt.** Committa aldrig `.env`, PEM/RSA-nycklar, åtkomsttoken, kundregister, fakturor, bankutdrag eller lokala SQLite-filer.
-- Koden använder scrypt-lösenordshash, serverstyrda HttpOnly-sessioner, origin-kontroll på skrivningar, CSP, AES-256-GCM för bankens sessionsuppgifter och revisionslogg.
-- Använd **HTTPS**, en säker miljö för hemligheter, skyddad databas, säkerhetskopior och åtkomstkontroll innan produktion. Kör säkerhetsgranskning och integritet-/GDPR-bedömning.
-- Bekräfta OCR/betalare manuellt. Beloppslikhet ensam innebär **inte** att en faktura är betald.
-- Testa mot Enable Banking Sandbox innan riktig bankåtkomst. Leverantörens API och bankens stöd behöver verifieras i just din konfiguration.
-- Automatisk Gmail-synk, OCR/PDF-extraktion, multi-user arbetsytor, schemalagd bankhämtning och produktionsdrift är **inte** färdigimplementerade här.
+**Swedbank:** Ange `ENABLEBANKING_APP_ID` och `ENABLEBANKING_PRIVATE_KEY_FILE` i serverns miljö. PEM-nyckeln ska ligga utanför Git-katalogen. Registrera exakt `APP_ORIGIN` följt av `/api/bank/callback` hos Enable Banking. Öppna **Bank → Koppla banken**, godkänn läsning hos banken och välj konto. Riktiga företagskonton kräver leverantörens produktionsåtkomst, tillämpliga avtal och ett verkligt bankmedgivande. BankID ersätter inte denna tekniska aktivering. Anslutningen utför inga betalningar.
+
+**Gmail:** Aktivera Gmail API i företagets Google Cloud-projekt, skapa en OAuth-webbklient och registrera `APP_ORIGIN` följt av `/api/gmail/callback`. Ange `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` och `GMAIL_ACCOUNT=mg.vitvaror@gmail.com`. Starta om servern och välj **Import → Koppla Gmail**. Se [Gmail-guiden](docs/GMAIL.md) för hela flödet.
+
+Gmail-hämtningen bevarar möjliga fakturabilagor från inkorgen och skickade mejl som underlag för granskning. Den skapar inte en verifierad skuld utifrån ett mejls ämnesrad. Kontrollera originalet och registrera fakturauppgifterna. **Automatisk OCR och fullständig PDF-fälttolkning ingår ännu inte.**
+
+Schemalagd hämtning kräver att **Node-servern är igång**, att integrationerna är konfigurerade och att medgivandena gäller. Jobb körs på servern utan att webbläsaren behöver vara öppen. Avstämningar och utskick av betalningspåminnelser godkänns inte automatiskt. Riktiga Google- och bankflöden behöver verifieras med företagets behöriga konton; automatiska tester använder kontrollerade API-svar.
+
+## Bankfiler och Bankgiro
+
+Bankimporten stöder SEK och högst 1 000 bokförda händelser per fil. Andra valutor stoppas så att belopp aldrig felaktigt etiketteras som kronor. CSV-format varierar mellan banker; kontrollera alltid förhandsgranskningen och verifiera ett verkligt, anonymiserat kontoutdrag före drift.
+
+En samlad Bankgiroinsättning utan fullständig betalningsspecifikation behålls **en gång** och kan inte matchas som om den gällde en enda faktura. Importera en camt.054-specifikation med betalarnas belopp och referenser. Om en komplett specifikation kan identifieras som samma samlingspost ersätts samlingsposten i avstämningen. Olika kontoalias eller saknade bankreferenser kan behöva manuell kontroll. Beloppslikhet ensam är inte betalningsbevis.
+
+## Tester
+
+```bash
+npm run check
+npm test
+```
+
+Syntaxkontrollen omfattar server, integrationer, gränssnitt, startskript och tester. Testerna skapar tillfälliga databaser och använder inte företagets `.env` eller riktiga externa konton. De verifierar bland annat direkt lokal åtkomst/origin-skydd, fakturastatus, riktning, delbetalningar, dubbletter, samlade Bankgiroposter, import, originalunderlag och Gmail-adaptern.
+
+## Data och drift
+
+Installationen är en **lokal arbetsyta för ett företag utan lösenordsinloggning**. Separata användarkonton, roller och isolering mellan flera företag ingår inte. Använd inte en gemensam databas för flera verksamheter.
+
+OAuth-token och bankens anslutningsuppgifter krypteras med AES-256-GCM på servern. Fakturor, bankfiler och registerdata ligger i en privat SQLite-databas och är inte separat krypterade på disk av applikationen. Skydda lagringsplatsen. Denna version är avsedd för lokal åtkomst och ska inte exponeras via publik proxy utan separat åtkomstskydd. `.env`, privata nycklar, SQLite-filer, originalfakturor, kundregister och bankutdrag får aldrig läggas i det offentliga repositoryt.
+
+JSON-exporten innehåller registerdata och dokumentmetadata; den är **inte en fullständig säkerhetskopia** av originalfiler eller anslutningshemligheter. För en enkel konsekvent backup: stoppa servern och säkerhetskopiera databasen samt `.env` och privata integrationsnycklar till en skyddad plats. Återställ och kontrollera kopian innan du förlitar dig på rutinen. Automatisk backup, retention och återställning måste ordnas i driftmiljön.
 
 ## Projektstruktur
 
-```
-public/             Webbgränssnitt (HTML, CSS, JavaScript)
-src/server.js       HTTP API, behörighet och fakturaflöden
-src/db.js           SQLite-schema, transaktioner och matchning
-src/importers.js    CSV och camt.053/.054-import
-src/bank.js         Enable Banking AIS-integrationsadapter
-src/security.js     Lösenord, cookies och kryptering
-test/               Automatiska enhetstester
-docs/               Systembeskrivning och överlämning
+```text
+public/               Svenskt webbgränssnitt
+src/server.js         HTTP API, sessioner, dokument, anslutningar och bakgrundshämtning
+src/db.js             SQLite, migreringar, status, matchningsförslag och historik
+src/importers.js      CSV och ISO 20022 camt.053/.054
+src/bank.js           Enable Banking AIS-adapter
+src/gmail.js          Google OAuth och Gmail-hämtning
+src/security.js       Lösenord, sessionscookies och kryptering
+scripts/setup.mjs     Lokal engångskonfiguration utan att skriva över befintliga filer
+test/                 Kontrollerade enhets- och API-tester
+docs/                 Arkitektur och integrationsguide
 ```
 
-## Föreslagen nästa fas
-
-Migrera den faktiska kodbasen från ChatGPT Sites med en auktoriserad export eller arkiv av källkoden och jämför skillnader med denna nyimplementering. Därefter konfigureras hosting, riktig bankintegration, medgivanden och datamigrering utan att exponera affärsdata i GitHub.
+Se [arkitekturen](docs/ARCHITECTURE.md) för datamodell, API och tekniska avgränsningar.
