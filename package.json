@@ -1,0 +1,14 @@
+{
+  "name": "mgeorge-fakturakoll",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Self-hostable M.George invoice and bank reconciliation system",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/*.test.js",
+    "check": "node --check src/server.js && node --check src/db.js && node --check src/bank.js && node --check src/importers.js && node --check public/app.js"
+  }
+}

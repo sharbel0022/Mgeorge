@@ -1,4 +1,4 @@
-# Local configuration and credentials
+node_modules/
 .env
 .env.*
 !.env.example
@@ -7,26 +7,14 @@
 *.p12
 *.pfx
 *.crt
-*credentials*.json
-*service-account*.json
-.secrets/
-secrets/
-
-# Financial and personal documents
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+data/
 private/
-bank-statements/
-invoices/
 uploads/
-*.csv
-*.camt
-*.xlsx
-
-# Runtime and generated files
-node_modules/
-dist/
-build/
-.next/
-coverage/
-.cache/
+secrets/
 *.log
 .DS_Store
+coverage/
+dist/
