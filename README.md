@@ -84,3 +84,7 @@ docs/                 Arkitektur och integrationsguide
 ```
 
 Se [arkitekturen](docs/ARCHITECTURE.md) för datamodell, API och tekniska avgränsningar.
+
+## Offentliga informationssidor
+
+[Integritetspolicy](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/integritetspolicy) och [användarvillkor](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/anvandarvillkor) är publicerade som läsbara utkast på den befintliga Siten. Dokumenten behöver fortfarande granskas och kompletteras för företagets verkliga drift. Se [publicerings- och synkroniseringsguiden](docs/SITES-LEGAL.md).

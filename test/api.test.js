@@ -163,4 +163,12 @@ test('bounded Gmail batches persist rejected originals and resume past poison at
     if(originalSecret===undefined)delete process.env.GOOGLE_CLIENT_SECRET;else process.env.GOOGLE_CLIENT_SECRET=originalSecret;
   }
 });
+test('public legal URLs return the actual Swedish drafts without a login or app shell',async()=>{
+  for(const slug of ['integritetspolicy','anvandarvillkor'])for(const suffix of ['','/','.html']){
+    const result=await fetch(base+'/'+slug+suffix);
+    assert.equal(result.status,200);assert.match(result.headers.get('content-type'),/text\/html/);
+    const html=await result.text();assert.match(html,/<html lang="sv">/);assert.match(html,/Utkast/);assert.match(html,/M.George Vitvaror AB/);assert.ok(!html.includes('id="app"'));
+  }
+  assert.equal((await fetch(base+'/saknad-informationssida')).status,404);
+});
 test('cleanup',async()=>{await new Promise(resolve=>server.close(resolve));db.close();rmSync(folder,{recursive:true,force:true});});

@@ -57,6 +57,12 @@ function checkOrigin(req){
   if(!String(req.headers['content-type']||'').startsWith('application/json'))throw bad(415,'Content-Type måste vara application/json');
 }
 function serveStatic(req,res,path){
+  const legalPages={'/integritetspolicy':'integritetspolicy.html','/integritetspolicy/':'integritetspolicy.html','/integritetspolicy.html':'integritetspolicy.html','/anvandarvillkor':'anvandarvillkor.html','/anvandarvillkor/':'anvandarvillkor.html','/anvandarvillkor.html':'anvandarvillkor.html'};
+  if(Object.hasOwn(legalPages,path)){
+    const contents=readFileSync(resolve('public',legalPages[path]));
+    // These standalone information documents contain their own fixed stylesheet.
+    res.writeHead(200,{...baseHeaders,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"});return res.end(contents);
+  }
   if(!['/','/index.html','/app.js','/style.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
   const actual=path==='/'?'/index.html':path;
   const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'}[extname(actual)];
