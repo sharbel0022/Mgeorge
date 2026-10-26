@@ -1,0 +1,32 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*credentials*.json
+*service-account*.json
+.secrets/
+secrets/
+
+# Financial and personal documents
+private/
+bank-statements/
+invoices/
+uploads/
+*.csv
+*.camt
+*.xlsx
+
+# Runtime and generated files
+node_modules/
+dist/
+build/
+.next/
+coverage/
+.cache/
+*.log
+.DS_Store
