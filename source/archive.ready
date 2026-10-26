@@ -1,0 +1,4 @@
+MG Fakturakoll reconstructed source archive ready
+sha256: b21bb82893c6518b5497be63a7b6024890c395fb8f43fa3e876278d4f5ac2368
+parts: part-aa .. part-ag
+code source: new self-hostable reconstruction (not a Sites byte-for-byte export)
