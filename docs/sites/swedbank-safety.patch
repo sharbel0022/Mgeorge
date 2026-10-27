@@ -1,0 +1,1294 @@
+diff --git a/README.md b/README.md
+index 578d01c..2f95422 100644
+--- a/README.md
++++ b/README.md
+@@ -31,12 +31,12 @@ Integrationen använder **Account Information (AIS)** för att läsa kontouppgif
+    https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback
+    ```
+ 
+-4. Behåll leverantörens alternativ att generera den privata nyckeln. Spara applikationens **Application ID** och den nedladdade privata **PKCS#8 PEM-filen**. Nyckeln ska ha formatet `-----BEGIN PRIVATE KEY-----`.
+-5. Följ engångsguiden under **Aktivera bankkopplingen** och välj PEM-filen. Application ID läses från filnamnet när det går; annars anges det manuellt. Uppgifterna skickas först när du själv sparar. Servern verifierar dem mot leverantören och lagrar nyckeln krypterad. Lägg aldrig nycklar i chatten, källkoden eller Git. Vyn visar inte nyckeln igen efter att den har sparats.
+-6. När produktionsapplikationen är aktiverad och returadressen är registrerad väljer du bank från den hämtade listan, exempelvis Swedbank om den är tillgänglig. Fortsätt till bankens godkännande och välj företagets konton. Behörighet till rätt företagskonto och bankens autentisering, exempelvis BankID, måste slutföras av kontots behöriga användare.
++4. Återkalla tidigare exponerade privata nycklar och generera en ny RSA-nyckel (PKCS#8, minst 2048 bitar). Registrera motsvarande publika certifikat hos Enable Banking. En tidigare uppladdad eller delad privat nyckel får inte återanvändas.
++5. Systemadministratören konfigurerar endast skyddade Sites-runtimehemligheter: `ENABLE_BANKING_APPLICATION_ID`, `ENABLE_BANKING_PRIVATE_KEY`, `ENABLE_BANKING_ENVIRONMENT` (`SANDBOX` eller `PRODUCTION`) och i produktion `ENABLE_BANKING_KEY_ROTATED=true` efter slutförd återkallelse och nyregistrering. Bevara befintlig `BANK_DATA_ENCRYPTION_KEY`. Inga nycklar tas emot från webbläsaren eller från äldre `bank_applications.encrypted_key` i D1. Lägg aldrig nycklar i chatt, källkod, Git, hostingmanifest eller frontend. `/api/bank/config` POST avvisas utan att kroppen läses.
++6. Öppna **Bankanslutning**, där Swedbank är förvald, och tryck **Koppla banken**. Servern verifierar registrerad miljö, aktiv AIS-åtkomst i Sverige, exakt returadress och Swedbanks företagsstöd före bankflödet. Behörighet till rätt företagskonto och bankens autentisering, exempelvis BankID, måste slutföras av kontots behöriga användare.
+ 7. Efter återkomsten till MG kontrollerar du vilka SEK-konton som ska användas. Om banken endast lämnar ett importbart SEK-konto föreslås det i vyn, men inget sparas eller hämtas automatiskt. En uttrycklig åtgärd sparar kontoval och period och hämtar sedan bankhändelser. Om sparandet misslyckas startas ingen hämtning. Om kontovalet sparas men hämtningen misslyckas visas felet och det sparade valet kan användas vid nästa försök. Granska därefter resultatet i **Bankhändelser**.
+ 
+-Den vanliga vyn visar en primär nästa åtgärd utifrån anslutningens status. Datum, kontobyte och tekniska anslutningsuppgifter ligger under utfällbara inställningar. Ingen anslutning utlovas på en bestämd tid: leverantörens aktivering och bankens godkännande återstår tills de verkligen har slutförts. Under aktiveringen finns en tydligt märkt filimport på `/?view=bank&import=1`; `/?view=bank` öppnar bankhändelser direkt.
++Den vanliga vyn visar bank, status, maskerade konton och nästa åtgärd. Datum och kontobyte finns under utfällbara inställningar. Om serveraktiveringen saknas visas ”Banktjänsten behöver aktiveras av systemadministratören.” Filimport finns på `/?view=bank&import=1`; `/?view=bank` öppnar bankhändelser direkt. Nyckelrotation gör äldre flöden och anslutningar ogiltiga. En äldre anslutning kan tas bort lokalt utan att den komprometterade nyckeln används; vyn berättar då att tidigare medgivande måste återkallas manuellt hos Swedbank eller Enable Banking.
+ 
+ Returadressen är fast i `lib/banking/service.ts`; ett domänbyte kräver en samordnad ändring i koden och i leverantörens applikation. En resultatparameter i sidans URL är inte i sig bevis för en anslutning: status och konton läses från den inloggade användarens serverdata.
+ 
+@@ -54,7 +54,7 @@ Returadressen är fast i `lib/banking/service.ts`; ett domänbyte kräver en sam
+ 
+ ### Skyddade anslutningsuppgifter
+ 
+-Den privata leverantörsnyckeln, banksessionen och leverantörens kontouppgifter krypteras med AES-GCM, bundet till användaren och uppgiftens användningsområde. API-svaren lämnar inte ut privata nycklar eller sessionshemligheter; konton visas maskerade i vyn. Medgivandeflödet använder ett kortlivat engångstillstånd tillsammans med en skyddad webbläsarkaka och kontrollerar att samma inloggade användare slutför flödet.
++Den privata leverantörsnyckeln kommer endast från Sites skyddade serverhemligheter. Banksessionen och leverantörens kontouppgifter krypteras med AES-GCM, bundet till användaren och uppgiftens användningsområde. Äldre D1-nycklar används aldrig; uppdatering av leverantörsmetadata tömmer den gamla nyckelkolumnen. API-svaren lämnar inte ut privata nycklar eller sessionshemligheter; konton visas maskerade i vyn. Medgivandeflödet använder ett kortlivat engångstillstånd tillsammans med en skyddad webbläsarkaka och kontrollerar att samma inloggade användare slutför flödet.
+ 
+ `BANK_DATA_ENCRYPTION_KEY` är redan konfigurerad som en **serverhemlighet i denna publicering**. Den är separat från leverantörens PEM-nyckel och ska inte läggas i frontend, källkod eller dokumentation. Byt eller rotera den inte utan en plan för att dekryptera och återkryptera befintliga uppgifter: en ersatt nyckel gör annars de sparade bankanslutningarna oläsbara. Det finns ingen automatisk nyckelrotationsfunktion.
+ 
+@@ -90,8 +90,8 @@ Bankmodulen finns i `lib/banking/`: leverantörsanrop, transaktionsnormalisering
+ | Rutt | Metod | Funktion |
+ | --- | --- | --- |
+ | `/api/bank/status` | GET | Ägarens anslutningsstatus, konton och senaste körning. |
+-| `/api/bank/config` | POST / DELETE | Verifiera och spara respektive ta bort applikationsuppgifter. |
+-| `/api/bank/banks` | GET | Tillgängliga svenska företagsbanker. |
++| `/api/bank/config` | POST / DELETE | POST avvisar klientnycklar (405); DELETE kan rensa äldre lokal metadata efter frånkoppling. Runtimehemligheter hanteras administrativt. |
++| `/api/bank/banks` | GET | Tillgängliga Swedbank-anslutningar för svenska företagskonton. |
+ | `/api/bank/connect` | POST | Starta bankens medgivandeflöde. |
+ | `/api/bank/callback` | GET | Slutföra och verifiera medgivandet. |
+ | `/api/bank/accounts` | POST | Spara godkända konton och hämtningsperiod. |
+diff --git a/cloudflare-env.d.ts b/cloudflare-env.d.ts
+index 0a0f731..ca45221 100644
+--- a/cloudflare-env.d.ts
++++ b/cloudflare-env.d.ts
+@@ -3,5 +3,9 @@ declare namespace Cloudflare {
+     DB?: D1Database;
+     BUCKET?: R2Bucket;
+     BANK_DATA_ENCRYPTION_KEY?: string;
++    ENABLE_BANKING_APPLICATION_ID?: string;
++    ENABLE_BANKING_PRIVATE_KEY?: string;
++    ENABLE_BANKING_ENVIRONMENT?: 'SANDBOX' | 'PRODUCTION';
++    ENABLE_BANKING_KEY_ROTATED?: string;
+   }
+ }
+diff --git a/components/bank-connection.tsx b/components/bank-connection.tsx
+index 93be296..c381ad5 100644
+--- a/components/bank-connection.tsx
++++ b/components/bank-connection.tsx
+@@ -1,437 +1,139 @@
+ "use client";
+ 
+ import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
+-import { AlertCircle, ArrowLeft, ArrowRight, Check, CheckCircle2, ChevronDown, Clock3, Copy, ExternalLink, FileKey2, FileText, Landmark, LockKeyhole, LogIn, RefreshCw, Settings, ShieldCheck, Unlink, Upload, Wallet } from "lucide-react";
++import { AlertCircle, ArrowRight, CheckCircle2, ChevronDown, FileText, Landmark, LogIn, RefreshCw, ShieldCheck, Unlink, Wallet } from "lucide-react";
++import { confirmedBankConsent } from "@/lib/banking/status-view";
+ 
+-type Environment = "SANDBOX" | "PRODUCTION";
+ type BankAccount = { uid: string; label: string; currency: string; selected: boolean; importable: boolean };
+-type BankConnectionStatus = {
+-  storageReady: boolean;
+-  configured: boolean;
+-  application: null | { name: string; environment: Environment; active: boolean; applicationId: string; redirectConfigured: boolean };
+-  redirectUrl: string;
+-  connection: null | {
+-    id: string;
+-    bankName: string;
+-    environment: Environment;
+-    status: string;
+-    validUntil: string;
+-    lastSyncedAt: string | null;
+-    lastError: string | null;
+-    accounts: BankAccount[];
+-    dateFrom: string;
+-  };
++type BankConnection = { id: string; bankName: string; environment: "SANDBOX" | "PRODUCTION"; status: string; validUntil: string; lastSyncedAt: string | null; lastError: string | null; accounts: BankAccount[]; dateFrom: string };
++type BankStatus = {
++  configured: boolean; storageReady: boolean;
++  activation?: { configured: boolean; message: string };
++  application: null | { environment: "SANDBOX" | "PRODUCTION"; active: boolean };
++  connection: BankConnection | null;
+   lastRun: null | { createdAt: string; imported: number; skipped: number; warnings: string[]; test: boolean };
+-  syncMode: "manual";
+ };
+-type AvailableBank = { name: string; country: string; maximumConsentSeconds: number };
+ type SyncResult = { message: string; imported: number; skipped: number; warnings: string[]; test: boolean };
+-type Action = "config" | "connect" | "sync" | "reconnect" | "disconnect" | "remove";
+-type CallbackResult = "" | "connected" | "cancelled" | "expired" | "failed" | "signin_required" | "wrong_user";
+-const CALLBACK_MESSAGES: Partial<Record<CallbackResult, string>> = {
+-  cancelled: "Bankanslutningen avbröts. Du kan försöka igen när du vill.",
+-  expired: "Anslutningsförsöket hann gå ut. Starta ett nytt försök nedan.",
+-  failed: "Bankanslutningen kunde inte slutföras. Din aktuella status visas nedan.",
+-  signin_required: "Logga in med det ChatGPT-konto som startade bankanslutningen.",
+-  wrong_user: "Byt till det ChatGPT-konto som startade bankanslutningen för att slutföra den.",
+-};
+-const PROVIDER_PORTAL = "https://enablebanking.com/cp/applications";
+-const PROVIDER_GUIDE = "https://enablebanking.com/docs/api/quick-start/";
+-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+-
+-class BankApiError extends Error {
+-  constructor(message: string, readonly signIn?: string) { super(message); }
+-}
+-
+-function safeSignIn(path: unknown) {
+-  return typeof path === "string" && /^\/signin-with-chatgpt(?:\?|$)/.test(path)
+-    ? path : "/signin-with-chatgpt?return_to=%2Fbank";
+-}
+-
++class BankApiError extends Error { constructor(message: string, readonly signIn?: string) { super(message); } }
+ async function bankRequest<T>(path: string, method = "GET", body?: unknown, signal?: AbortSignal): Promise<T> {
+-  const response = await fetch(path, {
+-    method, credentials: "same-origin", cache: "no-store",
+-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+-    body: body === undefined ? undefined : JSON.stringify(body), signal,
+-  });
++  const response = await fetch(path, { method, credentials: "same-origin", cache: "no-store", headers: body === undefined ? undefined : { "Content-Type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body), signal });
+   const payload: unknown = await response.json().catch(() => null);
+-  const data = payload && typeof payload === "object" ? payload as Record<string, unknown> : null;
+-  const message = typeof data?.error === "string" ? data.error : "";
+-  if (response.status === 401) throw new BankApiError(message || "Logga in för att fortsätta.", safeSignIn(data?.signIn));
+-  if (!response.ok || !data || data.error) throw new BankApiError(message || "Förfrågan kunde inte slutföras. Försök igen.");
++  const data = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload as Record<string, unknown> : null;
++  if (response.status === 401) throw new BankApiError("Logga in med ChatGPT för att fortsätta.", "/signin-with-chatgpt?return_to=%2Fbank");
++  if (!response.ok || !data || typeof data !== "object" || data.error) throw new BankApiError(typeof data?.error === "string" ? data.error : "Bankåtgärden kunde inte slutföras. Försök igen.");
+   return data as T;
+ }
+-
+-function localDate(value = new Date()) {
+-  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", year: "numeric", month: "2-digit", day: "2-digit" }).format(value);
+-}
+-function initialDate() {
+-  const date = new Date();
+-  date.setUTCDate(date.getUTCDate() - 30);
+-  return localDate(date);
+-}
+-function formatTimestamp(value?: string | null) {
+-  if (!value) return "Inte hämtat ännu";
+-  const date = new Date(value);
+-  if (Number.isNaN(date.getTime())) return "Uppgift saknas";
+-  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
+-}
+-function periodLabel(value: string) {
+-  if (value === initialDate()) return "Senaste 30 dagarna";
+-  const date = new Date(value + "T12:00:00Z");
+-  return Number.isNaN(date.getTime()) ? "Välj period" : "Från " + new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", day: "numeric", month: "short", year: "numeric" }).format(date);
+-}
+-function validateDate(value: string) {
+-  const parsed = new Date(value + "T12:00:00Z");
+-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value || value < "2000-01-01" || value > localDate()) {
+-    throw new BankApiError("Välj ett startdatum mellan 2000-01-01 och idag.");
+-  }
+-}
+-function followBankUrl(url: string) {
+-  const destination = new URL(url);
+-  if (destination.protocol !== "https:" || destination.username || destination.password) throw new BankApiError("Bankens inloggningsadress kunde inte verifieras.");
+-  window.location.assign(destination.href);
+-}
+-function statusLabel(value: string, expired: boolean) {
+-  if (expired) return "Medgivandet har gått ut";
+-  if (["connected", "active", "authorized"].includes(value.toLowerCase())) return "Ansluten";
+-  if (value === "revoked") return "Medgivandet har återkallats";
+-  if (value === "expired") return "Medgivandet har gått ut";
+-  return "Anslutningen behöver förnyas";
++function localDate(date = new Date()) { return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", year: "numeric", month: "2-digit", day: "2-digit" }).format(date); }
++function initialDate() { const date = new Date(localDate() + "T12:00:00Z"); date.setUTCDate(date.getUTCDate() - 29); return date.toISOString().slice(0, 10); }
++function dateLabel(value?: string | null) { return value && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "Inte hämtat ännu"; }
++function followBankUrl(value: string) {
++  const url = new URL(value);
++  if (url.origin !== "https://auth.enablebanking.com" || url.username || url.password || url.hash) throw new BankApiError("Bankens inloggningsadress kunde inte verifieras.");
++  window.location.assign(url.href);
+ }
++const resultMessages: Record<string, string> = {
++  connected: "Banken har bekräftat medgivandet. Välj företagets konto och hämta bankhändelser.",
++  cancelled: "Bankanslutningen avbröts. Du kan koppla igen när du vill.",
++  expired: "Anslutningsförsöket har gått ut. Börja med Koppla banken igen.",
++  failed: "Bankanslutningen kunde inte slutföras. Kontrollera status och försök igen.",
++  signin_required: "Logga in med det ChatGPT-konto som startade bankanslutningen.",
++  wrong_user: "Använd samma ChatGPT-konto och webbläsare som när anslutningen startades.",
++};
+ 
+ export default function BankConnection({ demo = false, onDataChanged }: { demo?: boolean; onDataChanged?: () => void }) {
+-  const [status, setStatus] = useState<BankConnectionStatus | null>(null);
+-  const [loading, setLoading] = useState(!demo);
+-  const [busy, setBusy] = useState<Action | null>(null);
+-  const [error, setError] = useState("");
+-  const [notice, setNotice] = useState("");
+-  const [signIn, setSignIn] = useState("");
+-  const [callbackResult, setCallbackResult] = useState<CallbackResult>("");
+-  const [setupStep, setSetupStep] = useState<0 | 1 | 2 | 3>(0);
+-  const [banks, setBanks] = useState<AvailableBank[]>([]);
+-  const [banksLoading, setBanksLoading] = useState(false);
+-  const [banksError, setBanksError] = useState("");
+-  const [bankName, setBankName] = useState("");
+-  const [dateFrom, setDateFrom] = useState(initialDate);
+-  const [applicationId, setApplicationId] = useState("");
+-  const [privateKeyPem, setPrivateKeyPem] = useState("");
+-  const [keyFilename, setKeyFilename] = useState("");
+-  const [inferredId, setInferredId] = useState("");
+-  const [keyReading, setKeyReading] = useState(false);
+-  const [accountUids, setAccountUids] = useState<string[]>([]);
+-  const [confirmAction, setConfirmAction] = useState<"disconnect" | "remove" | null>(null);
+-  const keyFileInput = useRef<HTMLInputElement>(null);
+-  const keyReadVersion = useRef(0);
+-  const statusVersion = useRef(0);
+-  const banksVersion = useRef(0);
+-  const statusController = useRef<AbortController | null>(null);
+-  const banksController = useRef<AbortController | null>(null);
+-  const operation = useRef(false);
+-  const mounted = useRef(true);
+-  const demoMode = useRef(demo);
+-  const authRequired = useRef(false);
+-  const formId = useId();
+-
+-  const clearKey = useCallback(() => {
+-    keyReadVersion.current++;
+-    setPrivateKeyPem(""); setKeyFilename(""); setInferredId(""); setApplicationId(""); setKeyReading(false);
+-    if (keyFileInput.current) keyFileInput.current.value = "";
+-  }, []);
++  const [status, setStatus] = useState<BankStatus | null>(null), [loading, setLoading] = useState(!demo), [busy, setBusy] = useState(false);
++  const [error, setError] = useState(""), [notice, setNotice] = useState(""), [signIn, setSignIn] = useState("");
++  const [accountUids, setAccountUids] = useState<string[]>([]), [dateFrom, setDateFrom] = useState(initialDate), [confirmDisconnect, setConfirmDisconnect] = useState(false);
++  const alive = useRef(true), operation = useRef(false), version = useRef(0), controller = useRef<AbortController | null>(null), demoMode = useRef(demo), formId = useId();
+   const handleError = useCallback((cause: unknown) => {
+     if (cause instanceof Error && cause.name === "AbortError") return;
+-    if (cause instanceof BankApiError && cause.signIn) {
+-      authRequired.current = true;
+-      statusVersion.current++; banksVersion.current++;
+-      statusController.current?.abort(); banksController.current?.abort();
+-      setLoading(false); setBanksLoading(false); setBanks([]); setBankName(""); setBanksError(""); setAccountUids([]);
+-      setSignIn(cause.signIn); setStatus(null); setError(""); clearKey();
+-      return;
+-    }
+-    if (!authRequired.current) setError(cause instanceof Error ? cause.message : "Något gick fel. Försök igen.");
+-  }, [clearKey]);
+-  const loadStatus = useCallback(async (refreshProvider = false, preserveError = false) => {
+-    if (demoMode.current || !mounted.current) return null;
+-    const version = ++statusVersion.current;
+-    statusController.current?.abort();
+-    const controller = new AbortController();
+-    statusController.current = controller;
+-    setLoading(true);
++    if (cause instanceof BankApiError && cause.signIn) { setStatus(null); setSignIn(cause.signIn); setError(""); return; }
++    setError(cause instanceof Error ? cause.message : "Bankåtgärden kunde inte slutföras.");
++  }, []);
++  const loadStatus = useCallback(async () => {
++    if (!alive.current || demoMode.current) return null;
++    const current = ++version.current; controller.current?.abort(); const next = new AbortController(); controller.current = next; setLoading(true);
+     try {
+-      const result = await bankRequest<BankConnectionStatus>(refreshProvider ? "/api/bank/status?refresh=1" : "/api/bank/status", "GET", undefined, controller.signal);
+-      if (version !== statusVersion.current || controller.signal.aborted || !mounted.current || demoMode.current) return null;
+-      if (typeof result.configured !== "boolean" || typeof result.storageReady !== "boolean" || typeof result.redirectUrl !== "string") throw new BankApiError("Bankens anslutningsstatus kunde inte läsas. Försök igen.");
+-      authRequired.current = false;
++      const result = await bankRequest<BankStatus>("/api/bank/status", "GET", undefined, next.signal);
++      if (!alive.current || demoMode.current || current !== version.current) return null;
+       setStatus(result); setSignIn("");
+-      const available = result.connection?.accounts.filter(account => account.importable && account.currency === "SEK") ?? [];
+-      const saved = available.filter(account => account.selected).map(account => account.uid);
+-      // A sole eligible account is only proposed in the UI; saving and fetching still require the button.
+-      setAccountUids(saved.length ? saved : available.length === 1 ? [available[0].uid] : []);
++      const eligible = result.connection?.accounts.filter(a => a.importable && a.currency === "SEK") || [], selected = eligible.filter(a => a.selected).map(a => a.uid);
++      setAccountUids(selected.length ? selected : eligible.length === 1 ? [eligible[0].uid] : []);
+       if (result.connection?.dateFrom) setDateFrom(result.connection.dateFrom);
+-      if (!preserveError) setError("");
+       return result;
+-    } catch (cause) {
+-      if (version === statusVersion.current && !controller.signal.aborted && mounted.current && !demoMode.current && (!preserveError || (cause instanceof BankApiError && cause.signIn))) handleError(cause);
+-      return null;
+-    } finally {
+-      if (version === statusVersion.current && mounted.current) setLoading(false);
+-    }
+-  }, [handleError]);
+-  const loadBanks = useCallback(async () => {
+-    if (demoMode.current || !mounted.current) return;
+-    const version = ++banksVersion.current;
+-    banksController.current?.abort();
+-    const controller = new AbortController();
+-    banksController.current = controller;
+-    setBanksLoading(true); setBanksError("");
+-    try {
+-      const result = await bankRequest<{ banks: AvailableBank[] }>("/api/bank/banks", "GET", undefined, controller.signal);
+-      if (version !== banksVersion.current || controller.signal.aborted || !mounted.current || demoMode.current) return;
+-      if (!Array.isArray(result.banks)) throw new BankApiError("Banklistan kunde inte läsas.");
+-      const available = result.banks.filter(bank => bank.country === "SE" && typeof bank.name === "string");
+-      setBanks(available);
+-      setBankName(current => {
+-        if (available.some(bank => bank.name === current)) return current;
+-        const matches = available.filter(bank => bank.name.toLowerCase() === "swedbank");
+-        return matches.length === 1 ? matches[0].name : "";
+-      });
+-    } catch (cause) {
+-      if (version === banksVersion.current && !controller.signal.aborted && mounted.current && !demoMode.current) {
+-        setBanks([]); setBankName(""); setBanksError(cause instanceof Error ? cause.message : "Kunde inte hämta bankerna.");
+-        if (cause instanceof BankApiError && cause.signIn) handleError(cause);
+-      }
+-    } finally {
+-      if (version === banksVersion.current && mounted.current) setBanksLoading(false);
+-    }
++    } catch (cause) { if (alive.current && current === version.current && !demoMode.current) handleError(cause); return null; }
++    finally { if (alive.current && current === version.current) setLoading(false); }
+   }, [handleError]);
+-
+-  useEffect(() => {
+-    mounted.current = true;
+-    demoMode.current = demo;
+-    if (demo) { setLoading(false); setStatus(null); setSignIn(""); setError(""); setNotice(""); clearKey(); }
+-    else void loadStatus();
+-    return () => {
+-      mounted.current = false;
+-      statusVersion.current++; banksVersion.current++; keyReadVersion.current++;
+-      statusController.current?.abort(); banksController.current?.abort();
+-    };
+-  }, [demo, clearKey, loadStatus]);
+-  useEffect(() => {
+-    if (demo) { setCallbackResult(""); return; }
+-    const result = new URLSearchParams(window.location.search).get("result");
+-    if (result && ["connected", "cancelled", "expired", "failed", "signin_required", "wrong_user"].includes(result)) setCallbackResult(result as CallbackResult);
+-  }, [demo]);
+   useEffect(() => {
+-    const noConnection = !status?.connection || status.connection.status.toLowerCase() === "disconnected";
+-    if (!demo && status?.storageReady && status.configured && status.application?.active && status.application.redirectConfigured && noConnection) void loadBanks();
+-    else { banksVersion.current++; banksController.current?.abort(); setBanks([]); setBankName(""); setBanksLoading(false); }
+-    return () => { banksVersion.current++; banksController.current?.abort(); };
+-  }, [demo, status?.storageReady, status?.configured, status?.application?.applicationId, status?.application?.active, status?.application?.redirectConfigured, status?.connection?.id, status?.connection?.status, loadBanks]);
+-
+-  const mayContinue = () => mounted.current && !demoMode.current;
+-  const runAction = async (action: Action, work: () => Promise<void>) => {
+-    if (demoMode.current || operation.current || !mounted.current) return;
+-    operation.current = true;
+-    // Older read responses must not replace state after a mutation.
+-    statusVersion.current++; statusController.current?.abort();
+-    banksVersion.current++; banksController.current?.abort();
+-    setLoading(false); setBanksLoading(false); setBusy(action); setError(""); setNotice(""); setCallbackResult("");
+-    try { await work(); }
+-    catch (cause) {
+-      if (mayContinue()) {
+-        if (!(cause instanceof BankApiError && cause.signIn)) await loadStatus(false, true);
+-        if (mayContinue()) handleError(cause);
+-      }
+-    } finally { operation.current = false; if (mounted.current) setBusy(null); }
++    let cancelled = false;
++    alive.current = true; demoMode.current = demo;
++    if (demo) { setStatus(null); setLoading(false); setSignIn(""); setError(""); setNotice(""); }
++    else void (async () => {
++      const result = new URLSearchParams(window.location.search).get("result");
++      const verified = await loadStatus();
++      if (cancelled || !alive.current || demoMode.current) return;
++      if (result === "connected") {
++        if (confirmedBankConsent(verified)) setNotice(resultMessages.connected);
++      } else if (result && resultMessages[result]) setNotice(resultMessages[result]);
++    })();
++    return () => { cancelled = true; alive.current = false; version.current++; controller.current?.abort(); };
++  }, [demo, loadStatus]);
++  const run = async (fn: () => Promise<void>) => {
++    if (demoMode.current || operation.current || !alive.current) return;
++    operation.current = true; version.current++; controller.current?.abort(); setLoading(false); setBusy(true); setError(""); setNotice("");
++    try { await fn(); }
++    catch (cause) { if (alive.current && !demoMode.current) { await loadStatus(); if (alive.current && !demoMode.current) handleError(cause); } }
++    finally { operation.current = false; if (alive.current) setBusy(false); }
+   };
+-
+-  async function readKey(file?: File) {
+-    clearKey();
+-    const version = keyReadVersion.current;
+-    setError("");
+-    if (!file || demoMode.current) return;
+-    setKeyReading(true);
+-    try {
+-      if (!file.name.toLowerCase().endsWith(".pem") || file.size > 16_000 || file.size === 0) throw new BankApiError("Välj PEM-filen från Enable Banking. Filen får vara högst 16 kB.");
+-      const pem = await file.text();
+-      if (version !== keyReadVersion.current || !mayContinue()) return;
+-      if (!/-----BEGIN PRIVATE KEY-----/.test(pem)) throw new BankApiError("Filen behöver vara den privata PKCS#8-nyckeln från Enable Banking.");
+-      setPrivateKeyPem(pem); setKeyFilename(file.name);
+-      const detected = file.name.replace(/\.pem$/i, "");
+-      if (UUID.test(detected)) { setApplicationId(detected); setInferredId(detected); }
+-    } catch (cause) {
+-      if (version === keyReadVersion.current && mayContinue()) handleError(cause);
+-    } finally {
+-      if (version === keyReadVersion.current && mounted.current) setKeyReading(false);
+-    }
+-  }
+-  function saveConfiguration(event: FormEvent) {
+-    event.preventDefault();
+-    if (!privateKeyPem || !UUID.test(applicationId.trim())) return;
+-    void runAction("config", async () => {
+-      const result = await bankRequest<{ message: string }>("/api/bank/config", "POST", { applicationId: applicationId.trim(), privateKeyPem });
+-      if (!mayContinue()) return;
+-      clearKey(); setSetupStep(0); setNotice(result.message);
+-      await loadStatus();
+-    });
+-  }
+-  function connect(event: FormEvent) {
+-    event.preventDefault();
+-    void runAction("connect", async () => {
+-      if (!banks.some(bank => bank.name === bankName && bank.country === "SE")) throw new BankApiError("Välj en bank i listan först.");
+-      validateDate(dateFrom);
+-      const result = await bankRequest<{ url: string }>("/api/bank/connect", "POST", { bankName, country: "SE", dateFrom });
+-      if (mayContinue()) followBankUrl(result.url);
+-    });
++  const connection = status?.connection?.status === "disconnected" ? null : status?.connection;
++  const connected = confirmedBankConsent(status);
++  const eligible = connection?.accounts.filter(a => a.importable && a.currency === "SEK") || [];
++  const selected = eligible.filter(a => a.selected).map(a => a.uid);
++  const configured = !!status?.configured && !!status.storageReady;
++  const sandbox = (connection?.environment || status?.application?.environment) === "SANDBOX";
++  const disabled = busy || loading;
++  async function startConnection() {
++    if (!alive.current || demoMode.current) return;
++    const available = await bankRequest<{ banks: { name: string; country: string }[] }>("/api/bank/banks");
++    if (!alive.current || demoMode.current) return;
++    const bank = available.banks.find(b => b.name === "Swedbank" && b.country === "SE") || available.banks.find(b => /^Swedbank\b/i.test(b.name) && b.country === "SE");
++    if (!bank) throw new BankApiError("Swedbanks företagsanslutning är inte tillgänglig. Kontakta systemadministratören.");
++    const result = await bankRequest<{ url: string }>("/api/bank/connect", "POST", { bankName: bank.name, country: "SE", dateFrom: initialDate() });
++    if (alive.current && !demoMode.current) followBankUrl(result.url);
+   }
+   function synchronize(event: FormEvent) {
+-    event.preventDefault();
+-    if (!connection || !connected) return;
+-    const connectionId = connection.id;
+-    void runAction("sync", async () => {
+-      validateDate(dateFrom);
+-      if (!accountUids.length) throw new BankApiError("Välj minst ett konto att hämta från.");
+-      let selectionSaved = false;
+-      if (accountsChanged || !selectedSaved.length) {
+-        await bankRequest("/api/bank/accounts", "POST", { connectionId, accountUids, dateFrom });
+-        selectionSaved = true;
+-      }
+-      if (!mayContinue()) return;
+-      let result: SyncResult;
+-      try { result = await bankRequest<SyncResult>("/api/bank/sync", "POST", {}); }
+-      catch (cause) {
+-        if (selectionSaved && !(cause instanceof BankApiError && cause.signIn)) throw new BankApiError("Kontovalet och perioden är sparade, men bankhändelserna kunde inte hämtas. " + (cause instanceof Error ? cause.message : "Försök igen."));
+-        if (selectionSaved && mayContinue()) setNotice("Kontovalet och perioden är sparade. Logga in igen för att hämta bankhändelserna.");
+-        throw cause;
+-      }
+-      if (!mayContinue()) return;
+-      setNotice(result.message);
+-      await loadStatus();
+-      if (!result.test && mayContinue()) onDataChanged?.();
+-    });
+-  }
+-  function reconnect() {
+-    if (!connection) return;
+-    const previousBank = connection.bankName;
+-    const previousDate = connection.dateFrom;
+-    void runAction("reconnect", async () => {
+-      validateDate(previousDate);
+-      await bankRequest("/api/bank/disconnect", "POST", {});
+-      if (!mayContinue()) return;
+-      // The old consent is confirmed disconnected even if starting a new one fails.
+-      setStatus(current => current ? { ...current, connection: current.connection ? { ...current.connection, status: "disconnected", accounts: [], lastError: null } : null } : current);
+-      setAccountUids([]); setConfirmAction(null);
+-      try {
+-        const result = await bankRequest<{ url: string }>("/api/bank/connect", "POST", { bankName: previousBank, country: "SE", dateFrom: previousDate });
+-        if (mayContinue()) followBankUrl(result.url);
+-      } catch (cause) {
+-        if (cause instanceof BankApiError && cause.signIn) throw cause;
+-        throw new BankApiError("Den gamla bankkopplingen är avslutad, men den nya kunde inte startas. " + (cause instanceof Error ? cause.message : "Försök igen."));
+-      }
+-    });
+-  }
+-  function confirmDisconnect() {
+-    void runAction("disconnect", async () => {
+-      const result = await bankRequest<{ message: string }>("/api/bank/disconnect", "POST", {});
+-      if (!mayContinue()) return;
+-      setStatus(current => current ? { ...current, connection: current.connection ? { ...current.connection, status: "disconnected", accounts: [], lastError: null } : null } : current);
+-      setAccountUids([]); setConfirmAction(null); setNotice(result.message);
+-      await loadStatus();
++    event.preventDefault(); if (!connected || !connection) return;
++    void run(async () => {
++      if (!accountUids.length) throw new BankApiError("Välj företagets konto först.");
++      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateFrom) || dateFrom > localDate()) throw new BankApiError("Välj ett giltigt startdatum.");
++      if (selected.length !== accountUids.length || accountUids.some(id => !selected.includes(id)) || dateFrom !== connection.dateFrom) await bankRequest("/api/bank/accounts", "POST", { connectionId: connection.id, accountUids, dateFrom });
++      if (!alive.current || demoMode.current) return;
++      const result = await bankRequest<SyncResult>("/api/bank/sync", "POST", {});
++      if (!alive.current || demoMode.current) return;
++      setNotice(result.message); await loadStatus(); if (!result.test && alive.current && !demoMode.current) onDataChanged?.();
+     });
+   }
+-  function removeConfiguration() {
+-    void runAction("remove", async () => {
+-      const result = await bankRequest<{ message: string }>("/api/bank/config", "DELETE");
+-      if (!mayContinue()) return;
+-      clearKey(); setConfirmAction(null); setSetupStep(0); setNotice(result.message);
+-      setStatus(current => current ? { ...current, configured: false, application: null } : current);
+-      await loadStatus();
+-    });
+-  }
+-  async function copyRedirect() {
+-    if (!status?.redirectUrl) return;
+-    try { await navigator.clipboard.writeText(status.redirectUrl); setNotice("Returadressen är kopierad."); }
+-    catch { setError("Markera returadressen och kopiera den manuellt. Automatisk kopiering fungerade inte."); }
+-  }
+-
+-  const connection = status?.connection?.status.toLowerCase() === "disconnected" ? null : status?.connection;
+-  const application = status?.application;
+-  const environment = connection?.environment ?? application?.environment;
+-  const expired = !!connection?.validUntil && new Date(connection.validUntil).getTime() <= Date.now();
+-  const connected = !!connection && !expired && ["active", "authorized", "connected"].includes(connection.status.toLowerCase());
+-  const eligibleAccounts = connection?.accounts.filter(account => account.importable && account.currency === "SEK") ?? [];
+-  const selectedSaved = eligibleAccounts.filter(account => account.selected).map(account => account.uid);
+-  const accountsChanged = selectedSaved.length !== accountUids.length || selectedSaved.some(uid => !accountUids.includes(uid)) || (!!connection && connection.dateFrom !== dateFrom);
+-  const disabled = !!busy || loading || demo;
+-  const validBank = banks.some(bank => bank.name === bankName && bank.country === "SE");
+-  const ready = !!status?.storageReady && status.configured && !!application?.active && application.redirectConfigured && !connection;
+-
+-  const providerLink = <a className="text-button" href={PROVIDER_PORTAL} target="_blank" rel="noopener noreferrer">Öppna Enable Banking <ExternalLink size={15} /></a>;
+-  const manualAlternative = <div className="bank-card-footer"><a className="text-button" href="/?view=bank&import=1"><FileText size={16} /> Använd bankfil under tiden</a><span>Manuell import av bankens fil.</span></div>;
+-  const callbackAddress = <div className="bank-callback"><code>{status?.redirectUrl || "Adressen kunde inte läsas."}</code><button className="btn bank-copy" type="button" onClick={() => void copyRedirect()} disabled={disabled || !status?.redirectUrl} aria-label="Kopiera returadressen"><Copy size={17} /><span>Kopiera</span></button></div>;
+-  const applicationIdField = <label className="bank-field" htmlFor={formId + "-application"}><span>Applikations-ID</span><input id={formId + "-application"} value={applicationId} onChange={event => setApplicationId(event.target.value)} autoComplete="off" spellCheck={false} maxLength={100} placeholder="ID från Enable Banking" required /><small>Du hittar det under applikationen i Enable Banking.</small></label>;
+-  const configurationForm = <form onSubmit={saveConfiguration} className="bank-config-form"><fieldset disabled={disabled || keyReading || !status?.storageReady || !!connection}>
+-    <label className={"bank-key-upload " + (keyFilename ? "bank-key-selected" : "")} htmlFor={formId + "-key"}>
+-      <FileKey2 size={25} /><span><strong>{keyReading ? "Läser filen…" : keyFilename || "Välj nyckelfilen (.pem)"}</strong><small>{keyFilename ? "Filen är vald. Inget har skickats ännu." : "Välj filen som du laddade ned från Enable Banking."}</small></span>{keyFilename ? <Check size={20} /> : <Upload size={20} />}
+-      <input ref={keyFileInput} id={formId + "-key"} type="file" accept=".pem" onChange={event => void readKey(event.target.files?.[0])} />
+-    </label>
+-    {inferredId ? <details className="bank-inline-details bank-id-details"><summary><span>{applicationId === inferredId ? "Applikations-ID hittades automatiskt" : "Applikations-ID · ändrat manuellt"}</span><ChevronDown size={16} /></summary><div className="bank-details-body">{applicationIdField}</div></details> : keyFilename ? applicationIdField : null}
+-    <button className="btn primary bank-primary" type="submit" disabled={!UUID.test(applicationId.trim()) || !privateKeyPem || keyReading}>{busy === "config" ? <RefreshCw size={18} className="spin" /> : <ShieldCheck size={18} />}{busy === "config" ? "Verifierar och sparar…" : "Verifiera och spara"}</button>
+-    <p className="bank-fine-print"><LockKeyhole size={14} /> Nyckeln sparas skyddat på MG:s server först när du trycker. Dela den inte i chatt.</p>
+-  </fieldset></form>;
+-  const dateField = <label className="bank-field" htmlFor={formId + "-date"}><span>Hämta bankhändelser från</span><input id={formId + "-date"} type="date" value={dateFrom} min="2000-01-01" max={localDate()} onChange={event => setDateFrom(event.target.value)} required /><small>Upp till 1 000 poster per hämtning. Välj en kortare period om banken lämnar för många.</small></label>;
+-  const periodControl = <details className="bank-inline-details"><summary><span><Clock3 size={16} />{periodLabel(dateFrom)}</span><span className="bank-summary-action">Ändra period <ChevronDown size={15} /></span></summary><div className="bank-details-body">{dateField}</div></details>;
+-  const accountChoices = <><div className="bank-accounts">{eligibleAccounts.map(account => <label className={"bank-account " + (accountUids.includes(account.uid) ? "bank-account-selected" : "")} key={account.uid}>
+-    <input type="checkbox" checked={accountUids.includes(account.uid)} onChange={event => setAccountUids(current => event.target.checked ? [...current, account.uid] : current.filter(uid => uid !== account.uid))} />
+-    <Wallet size={21} /><span>{account.label || "Bankkonto"}</span><strong>SEK</strong>
+-  </label>)}</div><p className="bank-help">Välj endast konton som hör till M.George Vitvaror. Endast SEK kan hämtas till registret.</p>{periodControl}</>;
+-
+-  function mainContent() {
+-    if (demo) return <div className="bank-card bank-welcome"><span className="bank-hero-icon"><Landmark size={28} /></span><h2>Bankkopplingen är avstängd i demo</h2><p>Avsluta demoläget för att ansluta företagets bank. Inga anrop eller hämtningar görs här.</p></div>;
+-    if (signIn) return <div className="bank-card bank-welcome"><span className="bank-hero-icon"><Landmark size={28} /></span><h2>Koppla företagets bank</h2><p>Logga in för att se din bankanslutning och hämta bankhändelser till fakturakollen.</p><a className="btn primary bank-primary" href={signIn} target="_top"><LogIn size={18} /> Logga in och fortsätt</a><p className="bank-fine-print"><LockKeyhole size={14} /> Dina bankuppgifter hör till din egen arbetsyta.</p></div>;
+-    if (!status) return <div className="bank-card bank-loading" role="status">{loading ? <><RefreshCw size={24} className="spin" /><p>Hämtar din bankanslutning…</p></> : <><Landmark size={28} /><p>Anslutningsstatusen kunde inte hämtas.</p><button className="btn primary" type="button" onClick={() => void loadStatus()} disabled={disabled}>Försök igen</button></>}</div>;
+-    if (!status.storageReady) return <div className="bank-card bank-welcome"><span className="bank-hero-icon"><LockKeyhole size={27} /></span><h2>Bankkopplingen behöver förberedas</h2><p>Den säkra lagringen behöver aktiveras av webbplatsens administratör innan du kan spara bankuppgifter.</p><button className="btn primary bank-primary" type="button" onClick={() => void loadStatus()} disabled={disabled}><RefreshCw size={18} /> Kontrollera igen</button>{manualAlternative}</div>;
+-    if (!status.configured) return <div className="bank-card">
+-      {setupStep === 0 ? <div className="bank-welcome"><span className="bank-hero-icon"><Landmark size={28} /></span><h2>Aktivera bankkopplingen</h2><p>Första gången behöver MG en applikation hos Enable Banking. Därefter godkänner du läsåtkomsten hos din bank.</p><button className="btn primary bank-primary" type="button" onClick={() => setSetupStep(1)} disabled={disabled}>Kom igång <ArrowRight size={18} /></button><button className="text-button bank-shortcut" type="button" onClick={() => setSetupStep(3)} disabled={disabled}>Jag har redan nyckelfilen</button><p className="bank-fine-print">Riktiga företagskonton kräver produktionsåtkomst. Enable Banking kan behöva godkänna företaget och ett avtal; kontrollera kostnaderna i portalen.</p></div> : <div className="bank-wizard">
+-        <div className="bank-wizard-top"><button className="text-button" type="button" onClick={() => setSetupStep(setupStep === 1 ? 0 : setupStep === 2 ? 1 : 2)} disabled={disabled}><ArrowLeft size={16} /> Tillbaka</button><span>Steg {setupStep} av 3</span></div>
+-        {setupStep === 1 && <><h2>Skapa MG:s applikation</h2><p>Öppna Enable Banking och börja registrera en applikation med namnet <strong>MG Fakturakoll</strong>. Välj kontoinformation (AIS) och <strong>Production</strong> för riktiga konton.</p><p className="bank-help">Du får rätt returadress i nästa steg. Sandbox är bara för test. Produktionsåtkomst kan kräva godkännande, företagskontroll och avtal.</p><a className="btn primary bank-primary" href={PROVIDER_PORTAL} target="_blank" rel="noopener noreferrer">Öppna Enable Banking <ExternalLink size={17} /></a><button className="btn bank-primary" type="button" onClick={() => setSetupStep(2)} disabled={disabled}>Nästa: returadress <ArrowRight size={17} /></button></>}
+-        {setupStep === 2 && <><h2>Lägg till returadressen</h2><p>Klistra in exakt den här adressen som <strong>Redirect URL</strong> i applikationen. Banken skickar dig tillbaka hit efter godkännandet.</p>{callbackAddress}<p className="bank-help">Behåll valet att generera en privat nyckel när du registrerar applikationen. Spara PEM-filen som laddas ned.</p><button className="btn primary bank-primary" type="button" onClick={() => setSetupStep(3)} disabled={disabled}>Nästa: välj nyckelfilen <ArrowRight size={17} /></button><div className="bank-secondary-link">{providerLink}</div></>}
+-        {setupStep === 3 && <><h2>Välj filen och spara</h2><p>Välj PEM-filen från Enable Banking. Vi fyller i applikationens ID om det finns i filnamnet.</p>{configurationForm}<details className="bank-inline-details bank-spaced"><summary><span>Behöver du hitta filen eller inställningarna?</span><ChevronDown size={16} /></summary><div className="bank-details-body"><p className="bank-help">Nyckelfilen laddas ned när applikationen registreras. Om den saknas behöver du följa Enable Bankings instruktioner för att skapa en ny nyckel.</p>{providerLink}<p className="bank-help">Returadressen för MG:</p>{callbackAddress}<a className="text-button bank-spaced" href={PROVIDER_GUIDE} target="_blank" rel="noopener noreferrer">Öppna anslutningsguiden <ExternalLink size={15} /></a></div></details></>}
+-      </div>}{manualAlternative}
+-    </div>;
+-    if (!connection && !application?.redirectConfigured) return <div className="bank-card bank-welcome"><span className="bank-hero-icon"><ArrowRight size={27} /></span><h2>Lägg till returadressen</h2><p>Nyckeln är sparad. Lägg till den här adressen som Redirect URL hos Enable Banking, så kan banken skicka dig tillbaka till MG.</p>{callbackAddress}<div className="bank-secondary-link">{providerLink}</div><button className="btn primary bank-primary" type="button" onClick={() => void loadStatus(true)} disabled={disabled}><RefreshCw size={18} className={loading ? "spin" : ""} />{loading ? "Kontrollerar…" : "Kontrollera returadressen"}</button>{!application?.active && <p className="bank-fine-print">Applikationen behöver också aktiveras av Enable Banking.</p>}{manualAlternative}</div>;
+-    if (!connection && !application?.active) return <div className="bank-card bank-welcome"><span className="bank-hero-icon"><Clock3 size={28} /></span><h2>Uppgifterna är sparade</h2><p>Enable Banking behöver aktivera applikationen innan banken kan kopplas. Kontrollera applikationen i portalen och slutför deras godkännande.</p><button className="btn primary bank-primary" type="button" onClick={() => void loadStatus(true)} disabled={disabled}><RefreshCw size={18} className={loading ? "spin" : ""} />{loading ? "Kontrollerar…" : "Kontrollera aktivering"}</button><div className="bank-secondary-link">{providerLink}</div><p className="bank-fine-print">Produktionsåtkomst för verksamheten kan kräva avtal, företagskontroll och en avgift.</p>{manualAlternative}</div>;
+-    if (ready) return <div className="bank-card bank-welcome"><span className="bank-hero-icon"><Landmark size={28} /></span><h2>{validBank ? "Koppla " + bankName : "Välj din bank"}</h2><p>Fortsätt till banken och godkänn läsåtkomst till MG:s företagskonto.</p><form onSubmit={connect}><fieldset disabled={disabled}>
+-      <details className="bank-inline-details" open={!validBank}><summary><span>{validBank ? bankName : "Bank i Sverige"}</span><span className="bank-summary-action">{validBank ? "Ändra bank" : "Välj bank"}<ChevronDown size={15} /></span></summary><div className="bank-details-body"><label className="bank-field" htmlFor={formId + "-bank"}><span>Bank</span><select id={formId + "-bank"} value={bankName} onChange={event => setBankName(event.target.value)} disabled={banksLoading || !banks.length} required><option value="">{banksLoading ? "Hämtar bankerna…" : "Välj bank"}</option>{banks.map(bank => <option key={bank.country + ":" + bank.name} value={bank.name}>{bank.name}</option>)}</select></label></div></details>
+-      {periodControl}<button className="btn primary bank-primary" type="submit" disabled={!validBank || banksLoading || !dateFrom}>{busy === "connect" ? <RefreshCw size={18} className="spin" /> : <Landmark size={18} />}{busy === "connect" ? "Öppnar banken…" : environment === "SANDBOX" ? "Koppla testbanken" : validBank ? "Koppla " + bankName : "Välj bank för att fortsätta"}<ArrowRight size={17} /></button>
+-    </fieldset></form><p className="bank-fine-print"><ShieldCheck size={15} /> Du godkänner hos banken. Anslutningen kan inte göra betalningar.</p>{banksError && <div className="bank-inline-error" role="alert"><p>{banksError}</p><button className="text-button" type="button" onClick={() => void loadBanks()} disabled={disabled || banksLoading}>Hämta banklistan igen <RefreshCw size={15} /></button></div>}{!banksLoading && !banksError && !banks.length && <p className="bank-help">Inga svenska banker är tillgängliga. Kontrollera applikationens åtkomst i Enable Banking.</p>}</div>;
+-    if (connection && (!connected || !eligibleAccounts.length)) return <div className="bank-card bank-welcome"><span className="bank-hero-icon bank-hero-warning"><Landmark size={28} /></span><span className="bank-eyebrow">{connection.bankName}</span><h2>{connected ? "Välj rätt konto hos banken" : "Anslut banken igen"}</h2><p>{connected ? "Banken lämnade inget konto som kan användas här. Anslut igen och välj företagets konto i SEK." : statusLabel(connection.status, expired) + ". Godkänn läsåtkomsten på nytt för att fortsätta hämta bankhändelser."}</p><button className="btn primary bank-primary" type="button" onClick={reconnect} disabled={disabled}><RefreshCw size={18} className={busy === "reconnect" ? "spin" : ""} />{busy === "reconnect" ? "Startar ny anslutning…" : "Anslut igen"}<ArrowRight size={17} /></button><p className="bank-fine-print">Knappen avslutar den gamla kopplingen först och öppnar sedan bankens godkännande. Redan hämtade bankhändelser behålls.</p></div>;
+-    if (connection && connected) return <div className="bank-card bank-connected"><div className="bank-connected-heading"><span className="bank-hero-icon"><Landmark size={27} /></span><div><h2>{connection.bankName}</h2><span className="bank-connected-label"><CheckCircle2 size={15} /> Ansluten{environment === "SANDBOX" ? " · test" : ""}</span></div></div>
+-      {connection.lastError && !error && <div className="bank-inline-error" role="alert">{connection.lastError}</div>}
+-      <form onSubmit={synchronize}><fieldset disabled={disabled}>
+-        {!selectedSaved.length ? <><h3>{eligibleAccounts.length === 1 ? "Använd det här kontot" : "Välj konto att hämta från"}</h3>{accountChoices}</> : <><div className="bank-saved-accounts">{eligibleAccounts.filter(account => account.selected).map(account => <div key={account.uid}><Wallet size={18} /><strong>{account.label || "Bankkonto"}</strong><span>SEK</span></div>)}</div><p className="bank-saved-period">{periodLabel(connection.dateFrom)} · {connection.lastSyncedAt ? "Senast hämtat " + formatTimestamp(connection.lastSyncedAt) : "Inte hämtat ännu"}</p><details className="bank-inline-details bank-account-settings"><summary><span>Ändra konto eller period</span><ChevronDown size={16} /></summary><div className="bank-details-body">{accountChoices}</div></details></>}
+-        <button className="btn primary bank-primary" type="submit" disabled={!accountUids.length || !dateFrom}>{busy === "sync" ? <RefreshCw size={18} className="spin" /> : <RefreshCw size={18} />}{busy === "sync" ? "Hämtar bankhändelser…" : environment === "SANDBOX" ? accountsChanged || !selectedSaved.length ? "Spara och testa hämtningen" : "Testa hämtningen" : !selectedSaved.length ? accountUids.length > 1 ? "Använd kontona och hämta" : "Använd kontot och hämta" : accountsChanged ? "Spara och hämta" : "Hämta bankhändelser"}</button>
+-      </fieldset></form><p className="bank-fine-print">{environment === "SANDBOX" ? "Testdata förs inte in i ditt fakturaregister." : "Hämtning sker när du trycker. Granska nya bankhändelser innan du matchar dem till fakturor."}</p>
+-    </div>;
+-    return null;
+-  }
+-
+-  return <section className="bank-connection" aria-labelledby={formId + "-title"} aria-busy={loading || !!busy}>
++  const manualAlternative = <a className="btn bank-primary" href="/?view=bank&import=1"><FileText size={18} />Importera bankfil istället<ArrowRight size={17} /></a>;
++  return <section className="bank-connection" aria-labelledby={formId + "-title"} aria-busy={loading || busy}>
+     <header className="bank-page-heading"><div className="bank-eyebrow">MG FAKTURAKOLL</div><h1 id={formId + "-title"}>Bankanslutning</h1><p>Företagets bankhändelser, samlade i fakturakollen.</p></header>
+-    {error && !demo && <div className="bank-message bank-message-error" role="alert"><AlertCircle size={19} /><div><p>{error}</p><button className="text-button" type="button" onClick={() => void loadStatus()} disabled={disabled}><RefreshCw size={15} /> Kontrollera status igen</button></div></div>}
+-    {notice && !demo && <div className="bank-message bank-message-success" role="status"><CheckCircle2 size={19} /><p>{notice}</p></div>}
+-    {callbackResult && callbackResult !== "connected" && !demo && <div className="bank-message bank-message-warning" role="status"><AlertCircle size={19} /><div><p>{CALLBACK_MESSAGES[callbackResult]}</p>{(callbackResult === "signin_required" || callbackResult === "wrong_user") && !signIn && <a className="text-button" href="/signin-with-chatgpt?return_to=%2Fbank" target="_top">Logga in med rätt konto <ArrowRight size={15} /></a>}</div></div>}
+-    {environment === "SANDBOX" && !demo && <div className="bank-sandbox" role="note"><AlertCircle size={19} /><div><strong>Sandbox · bara testdata</strong><p>Inga testhändelser sparas i ditt fakturaregister. Riktiga konton kräver en aktiverad produktionsapplikation.</p></div></div>}
+-    {mainContent()}
+-    {status?.lastRun && !demo && <section className="bank-last-run" aria-label="Senaste hämtningen"><div className="bank-result-line"><CheckCircle2 size={19} /><div><strong>{status.lastRun.test ? "Testhämtningen är klar" : status.lastRun.imported + " nya bankhändelser"}</strong><p>{status.lastRun.test ? "Testdata hämtades utan att ändra fakturaregistret." : status.lastRun.skipped + " poster hoppades över."} <span>{formatTimestamp(status.lastRun.createdAt)}</span></p></div></div>{!status.lastRun.test && <a className="text-button bank-result-link" href="/?view=bank">Öppna bankhändelser <ArrowRight size={16} /></a>}{status.lastRun.warnings.length > 0 && <details className="bank-inline-details bank-run-warnings"><summary><span><AlertCircle size={16} /> Att kontrollera ({status.lastRun.warnings.length})</span><ChevronDown size={16} /></summary><ul>{status.lastRun.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details>}</section>}
+-    {status && !demo && <details className="bank-help-details"><summary><span><FileText size={17} /> Bankgiro kan behöva kompletteras med en bankfil</span><ChevronDown size={16} /></summary><div className="bank-details-body"><p>En samlad Bankgiroinsättning visar inte alltid betalare och delbelopp. Komplettera vid behov med camt.054 eller bankens betalningsspecifikation.</p><a className="text-button" href="/?view=bank&import=1">Importera bankfil <ArrowRight size={15} /></a></div></details>}
+-    {status?.configured && !demo && <details className="bank-settings"><summary><span><Settings size={17} /> Hantera bankkopplingen</span><ChevronDown size={16} /></summary><div className="bank-settings-body">
+-      <dl className="bank-facts"><div><dt>Applikation</dt><dd>{application?.name || "MG Fakturakoll"}</dd></div><div><dt>Miljö</dt><dd>{environment === "SANDBOX" ? "Sandbox · test" : "Produktion"}</dd></div>{connection && <><div><dt>Medgivandet gäller till</dt><dd>{connection.validUntil ? formatTimestamp(connection.validUntil) : "Uppgift saknas"}</dd></div><div><dt>Senast hämtat</dt><dd>{formatTimestamp(connection.lastSyncedAt)}</dd></div></>}<div><dt>Hämtning</dt><dd>Manuellt när du trycker på knappen</dd></div></dl>
+-      <button className="text-button" type="button" onClick={() => void loadStatus(true)} disabled={disabled}><RefreshCw size={15} className={loading ? "spin" : ""} /> Kontrollera anslutningsstatus</button>
+-      <details className="bank-inline-details bank-spaced"><summary><span>Tekniska anslutningsuppgifter</span><ChevronDown size={16} /></summary><div className="bank-details-body"><label className="bank-field"><span>Applikations-ID</span><code className="bank-app-id">{application?.applicationId || "Uppgift saknas"}</code></label><p className="bank-help">Returadress hos Enable Banking</p>{callbackAddress}<div className="bank-secondary-link">{providerLink}</div></div></details>
+-      {!connection && <details className="bank-inline-details"><summary><span>Byt applikation eller nyckelfil</span><ChevronDown size={16} /></summary><div className="bank-details-body">{configurationForm}</div></details>}
+-      <div className="bank-danger-area">{confirmAction ? <div className="bank-confirm" role="group" aria-label="Bekräfta ändringen"><p><strong>{confirmAction === "disconnect" ? "Koppla från " + connection?.bankName + "?" : "Ta bort anslutningsuppgifterna?"}</strong>{confirmAction === "disconnect" ? "Nya hämtningar stoppas. Bankhändelser som redan finns i registret behålls." : "Du behöver spara applikationens ID och nyckelfil igen för att ansluta banken."}</p><div><button className="btn" type="button" onClick={() => setConfirmAction(null)} disabled={disabled}>Avbryt</button><button className="btn bank-danger-button" type="button" onClick={confirmAction === "disconnect" ? confirmDisconnect : removeConfiguration} disabled={disabled}>{busy ? "Arbetar…" : confirmAction === "disconnect" ? "Ja, koppla från" : "Ta bort uppgifterna"}</button></div></div> : <button className="text-button bank-danger-link" type="button" onClick={() => setConfirmAction(connection ? "disconnect" : "remove")} disabled={disabled}><Unlink size={16} />{connection ? "Koppla från banken" : "Ta bort sparade anslutningsuppgifter"}</button>}</div>
+-    </div></details>}
+-    {status && !demo && <p className="bank-bottom-note"><ShieldCheck size={14} /> Bara läsning av kontouppgifter. Inga betalningar kan göras.</p>}
++    {error && <div className="bank-message bank-message-error" role="alert"><AlertCircle size={19} /><p>{error}</p></div>}
++    {notice && <div className="bank-message bank-message-success" role="status"><CheckCircle2 size={19} /><p>{notice}</p></div>}
++    {demo ? <div className="bank-card bank-welcome"><h2>Bankkopplingen är avstängd i demo</h2><p>Avsluta demoläget för att ansluta företagets bank.</p></div> : signIn ? <div className="bank-card bank-welcome"><h2>Koppla företagets bank</h2><a className="btn primary bank-primary" href={signIn} target="_top"><LogIn size={18} />Logga in och fortsätt</a></div> : !status ? <div className="bank-card bank-welcome" role="status">{loading ? <><RefreshCw className="spin" /><p>Hämtar anslutningsstatus…</p></> : <button className="btn" onClick={() => void loadStatus()}>Försök igen</button>}</div> : <div className="bank-card bank-connected">
++      <div className="bank-connected-heading"><span className="bank-hero-icon"><Landmark size={27} /></span><div><h2>{connection?.bankName || "Swedbank"}</h2><p className="bank-connected-label">Status: {connected ? selected.length ? "Ansluten" : "Välj företagskonto" : connection ? "Behöver förnyas" : "Ej ansluten"}</p></div></div>
++      {sandbox && <div className="bank-sandbox" role="note"><AlertCircle size={18} /><p>Testmiljö – testhändelser sparas inte i företagets fakturaregister.</p></div>}
++      {!configured && <div className="bank-inline-error" role="status">Banktjänsten behöver aktiveras av systemadministratören.</div>}
++      {connection?.lastError && <p className="bank-inline-error" role="alert">{connection.lastError}</p>}
++      {!connection && <><button className="btn primary bank-primary" disabled={disabled || !configured} onClick={() => void run(startConnection)}><Landmark size={18} />{busy ? "Öppnar banken…" : "Koppla banken"}<ArrowRight size={17} /></button><p className="bank-help">Du skickas till bankens säkra inloggning för att godkänna att MG Fakturakoll får läsa dina bankhändelser.</p></>}
++      {connection && connected && <form onSubmit={synchronize} aria-label="Hämta bankhändelser"><fieldset disabled={disabled || !configured}><legend className="sr-only">Konto och hämtningsperiod</legend>
++        {selected.length > 0 && <div className="bank-saved-accounts">{eligible.filter(a => a.selected).map(a => <div key={a.uid}><Wallet size={18} /><strong>{a.label}</strong><span>{a.currency}</span></div>)}</div>}
++        <details className="bank-inline-details" open={selected.length === 0}><summary><span>{selected.length ? "Ändra konto eller period" : "Välj företagets konto"}</span><ChevronDown size={16} /></summary><div className="bank-details-body"><div className="bank-accounts">{eligible.map(a => <label className="bank-account" key={a.uid}><input type="checkbox" checked={accountUids.includes(a.uid)} onChange={event => setAccountUids(current => event.target.checked ? [...current, a.uid] : current.filter(id => id !== a.uid))} /><Wallet size={18} /><span>{a.label}</span><strong>SEK</strong></label>)}</div><p className="bank-help">Välj konton som hör till M.George Vitvaror AB. Kontonumret visas maskerat.</p><label className="bank-field" htmlFor={formId + "-date"}><span>Hämta bankhändelser från</span><input id={formId + "-date"} type="date" value={dateFrom} min="2000-01-01" max={localDate()} onChange={event => setDateFrom(event.target.value)} required /></label></div></details>
++        {!eligible.length && <p className="bank-inline-error">Banken lämnade inget företagskonto i SEK. Förnya medgivandet och välj rätt konto hos banken.</p>}
++        <button className="btn primary bank-primary" disabled={!accountUids.length} type="submit"><RefreshCw size={18} className={busy ? "spin" : ""} />{busy ? "Hämtar bankhändelser…" : selected.length ? "Uppdatera bankhändelser" : "Anslut valt konto och hämta"}</button>
++      </fieldset></form>}
++      {connection && <><dl className="bank-facts"><div><dt>Senast uppdaterad</dt><dd>{dateLabel(connection.lastSyncedAt)}</dd></div><div><dt>Medgivandet gäller till</dt><dd>{dateLabel(connection.validUntil)}</dd></div></dl><button className="btn bank-primary" disabled={disabled || !configured} onClick={() => void run(async () => { const result = await bankRequest<{ message: string; remoteRevoked?: boolean }>("/api/bank/disconnect", "POST", {}); if (!alive.current || demoMode.current) return; if (result.remoteRevoked === false) { setNotice(result.message); await loadStatus(); return; } await startConnection(); })}><RefreshCw size={17} />Förnya anslutningen</button>{confirmDisconnect ? <div className="bank-confirm"><p>Koppla från banken? Tidigare importerade bankhändelser behålls.</p><button className="btn" disabled={disabled} onClick={() => setConfirmDisconnect(false)}>Avbryt</button><button className="btn bank-danger-button" disabled={disabled} onClick={() => void run(async () => { const result = await bankRequest<{ message: string }>("/api/bank/disconnect", "POST", {}); if (!alive.current || demoMode.current) return; setConfirmDisconnect(false); setNotice(result.message); await loadStatus(); })}>Ja, koppla från</button></div> : <button className="text-button bank-danger-link" disabled={disabled} onClick={() => setConfirmDisconnect(true)}><Unlink size={16} />Koppla från banken</button>}</>}
++      <div className="bank-spaced">{manualAlternative}</div><p className="bank-fine-print"><ShieldCheck size={15} />Endast läsåtkomst. Inga betalningar utförs och inga BankID-koder eller banklösenord sparas.</p>
++    </div>}
++    {status?.lastRun && !demo && <section className="bank-last-run"><div className="bank-result-line"><CheckCircle2 size={19} /><div><strong>{status.lastRun.test ? "Testhämtningen är klar" : status.lastRun.imported + " nya bankhändelser"}</strong><p>{dateLabel(status.lastRun.createdAt)}</p></div></div>{!status.lastRun.test && <a className="text-button" href="/?view=bank">Visa bankhändelser<ArrowRight size={15} /></a>}{status.lastRun.warnings.length > 0 && <details className="bank-inline-details"><summary>Att kontrollera<ChevronDown size={16} /></summary><ul>{status.lastRun.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details>}</section>}
++    {!demo && <p className="bank-bottom-note">Betalardetaljer saknas – importera betalningsspecifikation. Bankgiro kan innehålla flera kundbetalningar; komplettera med camt.054 innan du matchar.</p>}
+   </section>;
+ }
+diff --git a/lib/banking/enable-banking.ts b/lib/banking/enable-banking.ts
+index 86d0cc6..2004938 100644
+--- a/lib/banking/enable-banking.ts
++++ b/lib/banking/enable-banking.ts
+@@ -100,7 +100,7 @@ function base64url(bytes: Uint8Array): string {
+ 
+ async function signedToken(config: ProviderConfig): Promise<string> {
+   if (!config || !UUID.test(config.applicationId) || typeof config.privateKeyPem !== 'string' || config.privateKeyPem.length > 16_384) {
+-    throw new ProviderError('INVALID_CONFIGURATION', 'Kontrollera applikations-ID och den privata PEM-nyckeln för bankkopplingen.', 400);
++    throw new ProviderError('INVALID_CONFIGURATION', 'Banktjänsten behöver aktiveras av systemadministratören.', 400);
+   }
+   try {
+     const match = /^\s*-----BEGIN PRIVATE KEY-----\s+([A-Za-z0-9+/=\s]+)\s+-----END PRIVATE KEY-----\s*$/.exec(config.privateKeyPem);
+@@ -116,7 +116,7 @@ async function signedToken(config: ProviderConfig): Promise<string> {
+     const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(input));
+     return `${input}.${base64url(new Uint8Array(signature))}`;
+   } catch {
+-    throw new ProviderError('INVALID_PRIVATE_KEY', 'PEM-filen kunde inte användas. Välj den privata nyckel som Enable Banking laddade ned till din dator (PKCS#8).', 400);
++    throw new ProviderError('INVALID_PRIVATE_KEY', 'Banktjänsten behöver aktiveras av systemadministratören. Serverns bankuppgifter kunde inte verifieras.', 400);
+   }
+ }
+ 
+@@ -156,7 +156,7 @@ function mappedError(status: number, payload: unknown): ProviderError {
+   if (status === 429 || code === 'ASPSP_RATE_LIMIT_EXCEEDED') return new ProviderError('BANK_RATE_LIMIT', 'Bankens gräns för hämtningar har nåtts. Vänta en stund innan du försöker igen.', 429, true);
+   if (status === 408 || code === 'ASPSP_TIMEOUT') return new ProviderError('BANK_TIMEOUT', 'Banktjänsten svarade inte i tid. Försök igen om en stund.', 504, true);
+   if (['PSU_HEADER_NOT_PROVIDED', 'PSU_HEADER_INVALID', 'PSUHEADERNOT_PROVIDED'].includes(code)) return new ProviderError('BANK_USER_CONTEXT_REQUIRED', 'Banken behöver en aktiv användarsession. Öppna sidan och försök hämta bankhändelser igen.', 409);
+-  if (status === 401 || ['AUTHORIZATION_NOT_PROVIDED', 'UNAUTHORIZED_ACCESS', 'WRONG_CREDENTIALS_PROVIDED'].includes(code)) return new ProviderError('PROVIDER_AUTHORIZATION_FAILED', 'Enable Banking kunde inte verifiera applikationen. Kontrollera applikations-ID och PEM-nyckel.', 400);
++  if (status === 401 || ['AUTHORIZATION_NOT_PROVIDED', 'UNAUTHORIZED_ACCESS', 'WRONG_CREDENTIALS_PROVIDED'].includes(code)) return new ProviderError('PROVIDER_AUTHORIZATION_FAILED', 'Banktjänsten behöver aktiveras av systemadministratören. Enable Banking kunde inte verifiera serverns åtkomst.', 400);
+   if (status === 403 || ['ACCESS_DENIED', 'UNAUTHORIZED_IP'].includes(code)) return new ProviderError('PROVIDER_ACCESS_DENIED', 'Enable Banking har inte aktiverat åtkomsten. Kontrollera applikationens status och avtal.', 403);
+   if (code === 'WRONG_ASPSP_PROVIDED') return new ProviderError('BANK_UNAVAILABLE', 'Bankalternativet är inte längre tillgängligt. Hämta banklistan igen.', 409);
+   if (code === 'WRONG_CONTINUATION_KEY') return new ProviderError('BANK_SYNC_RESTART_REQUIRED', 'Bankens sidnyckel har gått ut. Börja om hämtningen. Ingen import gjordes.', 409);
+diff --git a/lib/banking/runtime-config.ts b/lib/banking/runtime-config.ts
+new file mode 100644
+index 0000000..58178d9
+--- /dev/null
++++ b/lib/banking/runtime-config.ts
+@@ -0,0 +1,29 @@
++import type { ProviderConfig } from './enable-banking';
++
++export type BankEnvironment = 'SANDBOX' | 'PRODUCTION';
++export type RuntimeBankStatus = { configured: boolean; environment: BankEnvironment | null; code: string; message: string };
++export type RuntimeBankConfig = ProviderConfig & { environment: BankEnvironment };
++export class RuntimeBankError extends Error {
++  code: string;
++  constructor(code: string, message: string) { super(message); this.name = 'RuntimeBankError'; this.code = code; }
++}
++const activation = 'Banktjänsten behöver aktiveras av systemadministratören.';
++const value = (env: Record<string, unknown>, key: string) => typeof env[key] === 'string' ? env[key].trim() : '';
++
++// Credentials come exclusively from protected Worker runtime secrets. A legacy
++// encrypted_key in D1, a request body or browser storage is never a source.
++export function runtimeBankConfig(env: Record<string, unknown>): RuntimeBankConfig {
++  const environment = value(env, 'ENABLE_BANKING_ENVIRONMENT').toUpperCase();
++  if (environment !== 'SANDBOX' && environment !== 'PRODUCTION') throw new RuntimeBankError('BANK_ENVIRONMENT_REQUIRED', activation);
++  // Check the rotation attestation before accessing private key material.
++  if (environment === 'PRODUCTION' && value(env, 'ENABLE_BANKING_KEY_ROTATED') !== 'true') throw new RuntimeBankError('BANK_KEY_ROTATION_REQUIRED', activation);
++  const applicationId = value(env, 'ENABLE_BANKING_APPLICATION_ID');
++  const privateKeyPem = value(env, 'ENABLE_BANKING_PRIVATE_KEY').replace(/\\n/g, '\n');
++  if (!applicationId || !privateKeyPem) throw new RuntimeBankError('BANK_RUNTIME_NOT_CONFIGURED', activation);
++  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(applicationId) || privateKeyPem.length > 16_384 || !/^-----BEGIN PRIVATE KEY-----\s+[A-Za-z0-9+/=\s]+\s+-----END PRIVATE KEY-----$/.test(privateKeyPem)) throw new RuntimeBankError('BANK_RUNTIME_CONFIGURATION_INVALID', activation);
++  return { applicationId, privateKeyPem, environment };
++}
++export function runtimeBankStatus(env: Record<string, unknown>): RuntimeBankStatus {
++  try { const config = runtimeBankConfig(env); return { configured: true, environment: config.environment, code: 'configured', message: '' }; }
++  catch (error) { return { configured: false, environment: null, code: error instanceof RuntimeBankError ? error.code : 'BANK_RUNTIME_NOT_CONFIGURED', message: activation }; }
++}
+diff --git a/lib/banking/service.ts b/lib/banking/service.ts
+index 65c0adb..c4ca016 100644
+--- a/lib/banking/service.ts
++++ b/lib/banking/service.ts
+@@ -7,10 +7,11 @@ import {
+ } from './enable-banking';
+ import { normalizeTransactions, stableAccountKey } from './transactions';
+ import {
+-  accounts, application, connection, decrypt, encrypt, metadata, providerConfig,
++  accounts, application, connection, encrypt, metadata, providerConfig, configurationStatus, saveApplicationMetadata,
+   sessionId, storageReady, withBankLock, type BankConnectionRow, type BankFlowRow,
+ } from './store';
+ import { cookieValue, digest, randomToken, validFlowToken } from './security';
++import { RuntimeBankError } from './runtime-config';
+ 
+ export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
+ const COOKIE = '__Secure-mg-bank-flow';
+@@ -29,6 +30,7 @@ export function bankFailure(error: unknown): Response {
+   if (code === 'BANK_BUSY') return response({ error: 'En bankåtgärd pågår redan. Vänta tills den är klar innan du försöker igen.' }, 409);
+   if (code === 'BANK_STORAGE_UNAVAILABLE') return response({ error: 'Säker lagring för bankanslutningen är inte konfigurerad ännu.' }, 503);
+   if (code === 'BANK_SECRET_UNREADABLE') return response({ error: 'Bankanslutningens skyddade uppgifter kunde inte läsas. Kontakta administratören.' }, 503);
++  if (error instanceof RuntimeBankError || code === 'BANK_RUNTIME_CONFIGURATION_CHANGED') return response({ error: 'Banktjänsten behöver aktiveras av systemadministratören.' }, 409);
+   if (error instanceof BankError) return response({ error: error.message }, error.status);
+   if (error instanceof ProviderError) return response({ error: error.message, code: error.code }, error.status === 429 ? 429 : 502);
+   return response({ error: 'Bankåtgärden kunde inte slutföras. Försök igen. Dina tidigare fakturor och bankhändelser är kvar.' }, 500);
+@@ -73,7 +75,15 @@ function maskAccount(account: ProviderAccount, bank: {name: string; country: str
+ }
+ 
+ function safeApplication(app: ProviderApplication) {
+-  return { name: app.name, environment: app.environment, active: app.active, applicationId: app.kid, redirectConfigured: app.redirect_urls.includes(BANK_REDIRECT_URL) };
++  return { name: app.name, environment: app.environment, active: app.active, redirectConfigured: app.redirect_urls.includes(BANK_REDIRECT_URL) };
++}
++
++async function checkedApplication(row: NonNullable<Awaited<ReturnType<typeof application>>>, requireActive = true) {
++  const info = await getApplication(await providerConfig(row));
++  if (info.kid !== row.application_id || info.environment !== metadata(row).environment || !info.services.includes('AIS') || !info.countries.includes('SE') || !info.redirect_urls.includes(BANK_REDIRECT_URL)) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Kontrollera registrerad miljö, svensk läsåtkomst och returadress hos Enable Banking.', 409);
++  await saveApplicationMetadata(row, info);
++  if (requireActive && !info.active) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Enable Banking har ännu inte godkänt applikationen.', 409);
++  return info;
+ }
+ 
+ export async function status(request: Request): Promise<Response> {
+@@ -84,19 +94,18 @@ export async function status(request: Request): Promise<Response> {
+   ]);
+   let app = storedApp;
+   if (app && new URL(request.url).searchParams.get('refresh') === '1') {
+-    const info = await getApplication(await providerConfig(app));
++    const info = await checkedApplication(app, false);
+     const at = now(), updatedMetadata = JSON.stringify(info);
+-    await db().prepare('UPDATE bank_applications SET metadata=?,updated_at=? WHERE owner=? AND generation=?').bind(updatedMetadata, at, user.userId, app.generation).run();
+     app = { ...app, metadata: updatedMetadata, updated_at: at };
+   }
+   const selected: string[] = conn ? JSON.parse(conn.selected_accounts) : [];
+-  const bankAccounts = conn ? await accounts(conn) : [];
++  const bankAccounts = conn && storageReady() ? await accounts(conn) : [];
+   return response({
+-    storageReady: storageReady(), configured: Boolean(app),
++    storageReady: storageReady(), configured: Boolean(app), activation: configurationStatus(),
+     application: app ? safeApplication(metadata(app)) : null,
+     redirectUrl: BANK_REDIRECT_URL, syncMode: 'manual',
+     connection: conn ? {
+-      id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: storedStatus(conn),
++      id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: conn.encrypted_session && (!app || conn.app_generation !== app.generation) ? 'reauth_required' : storedStatus(conn),
+       validUntil: conn.valid_until, lastSyncedAt: conn.last_synced_at, lastError: conn.last_error,
+       dateFrom: conn.date_from,
+       accounts: bankAccounts.map(account => ({
+@@ -110,27 +119,9 @@ export async function status(request: Request): Promise<Response> {
+ }
+ 
+ export async function saveConfig(request: Request): Promise<Response> {
+-  const user = await identity(request), body = await jsonBody(request);
+-  if (typeof body.applicationId !== 'string' || !/^[0-9a-f-]{36}$/i.test(body.applicationId) || typeof body.privateKeyPem !== 'string' || body.privateKeyPem.length > 16_000) throw new BankError('Ange ett giltigt Application ID och välj den privata PEM-nyckeln från Enable Banking.');
+-  const applicationId = body.applicationId.trim();
+-  const privateKeyPem = body.privateKeyPem.trim();
+-  return withBankLock(user.userId, async () => {
+-    if (!storageReady()) throw new Error('BANK_STORAGE_UNAVAILABLE');
+-    const conn = await connection(user.userId);
+-    if (conn?.encrypted_session) throw new BankError('Koppla från den befintliga bankanslutningen innan du byter applikation eller nyckel.', 409);
+-    const info = await getApplication({ applicationId, privateKeyPem });
+-    if (info.kid.toLowerCase() !== applicationId.toLowerCase() || !['SANDBOX', 'PRODUCTION'].includes(info.environment)) throw new BankError('Nyckeln och applikationen kunde inte verifieras.');
+-    if (!info.services.includes('AIS')) throw new BankError('Applikationen behöver tjänsten Account Information (AIS) hos Enable Banking.');
+-    const generation = uid(), at = now();
+-    const encrypted = await encrypt(user.userId, `key:${generation}`, privateKeyPem);
+-    await db().batch([
+-      db().prepare(`INSERT INTO bank_applications (owner,application_id,encrypted_key,metadata,generation,created_at,updated_at) VALUES (?,?,?,?,?,?,?)
+-        ON CONFLICT(owner) DO UPDATE SET application_id=excluded.application_id,encrypted_key=excluded.encrypted_key,metadata=excluded.metadata,generation=excluded.generation,updated_at=excluded.updated_at`)
+-        .bind(user.userId, applicationId, encrypted, JSON.stringify(info), generation, at, at),
+-      db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
+-    ]);
+-    return response({ message: info.active ? 'Applikationsuppgifterna har verifierats och sparats säkert.' : 'Applikationen är sparad. Aktivera den hos Enable Banking innan du ansluter banken.' });
+-  });
++  await identity(request);
++  // Intentionally do not read or persist a browser-supplied private key.
++  throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Anslutningsuppgifter tas endast emot som skyddade serverhemligheter.', 405);
+ }
+ 
+ export async function removeConfig(request: Request): Promise<Response> {
+@@ -148,12 +139,11 @@ export async function removeConfig(request: Request): Promise<Response> {
+ 
+ export async function banks(request: Request): Promise<Response> {
+   const user = await identity(), row = await application(user.userId);
+-  if (!row) throw new BankError('Lägg först till applikationsuppgifterna för Enable Banking.');
+-  const config = await providerConfig(row), info = await getApplication(config);
+-  await db().prepare('UPDATE bank_applications SET metadata=?,updated_at=? WHERE owner=? AND generation=?').bind(JSON.stringify(info), now(), user.userId, row.generation).run();
+-  if (!info.active) throw new BankError('Applikationen är inte aktiverad hos Enable Banking ännu.');
++  if (!row || !storageReady()) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören.', 409);
++  const config = await providerConfig(row);
++  await checkedApplication(row);
+   const entries = await listBusinessBanks(config);
+-  return response({ banks: entries.filter(bank => bank.country === 'SE' && bank.psu_types.includes('business')).map(bank => ({ name: bank.name, country: bank.country, maximumConsentSeconds: bank.maximum_consent_validity })) });
++  return response({ banks: entries.filter(bank => bank.country === 'SE' && /^Swedbank\b/i.test(bank.name) && bank.psu_types.includes('business')).map(bank => ({ name: bank.name, country: bank.country, maximumConsentSeconds: bank.maximum_consent_validity })) });
+ }
+ 
+ export async function connect(request: Request): Promise<Response> {
+@@ -161,14 +151,12 @@ export async function connect(request: Request): Promise<Response> {
+   if (typeof body.bankName !== 'string' || body.bankName.length > 200 || body.country !== 'SE') throw new BankError('Välj en svensk företagsbank i listan.');
+   return withBankLock(user.userId, async () => {
+     const app = await application(user.userId);
+-    if (!app) throw new BankError('Lägg först till applikationsuppgifterna.');
++    if (!app || !storageReady()) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören.', 409);
+     const existing = await connection(user.userId);
+     if (existing?.encrypted_session) throw new BankError('Koppla först från den befintliga anslutningen. Därefter kan du ansluta banken igen.', 409);
+-    const config = await providerConfig(app), info = await getApplication(config);
+-    if (!info.active) throw new BankError('Applikationen behöver aktiveras hos Enable Banking först.');
+-    if (!info.redirect_urls.includes(BANK_REDIRECT_URL)) throw new BankError('Lägg till den visade returadressen i applikationen hos Enable Banking.');
++    const config = await providerConfig(app), info = await checkedApplication(app);
+     const available = await listBusinessBanks(config);
+-    const bank = available.find(item => item.name === body.bankName && item.country === 'SE' && item.psu_types.includes('business'));
++    const bank = available.find(item => item.name === body.bankName && /^Swedbank\b/i.test(item.name) && item.country === 'SE' && item.psu_types.includes('business'));
+     if (!bank) throw new BankError('Den valda banken är inte tillgänglig för företagskonton i din anslutning.');
+     if (!Number.isFinite(bank.maximum_consent_validity) || bank.maximum_consent_validity < 60) throw new BankError('Banken kunde inte ange en giltig period för anslutningen.');
+     const validUntil = new Date(Date.now() + Math.min(bank.maximum_consent_validity, 90 * 86400) * 1000 - 30_000).toISOString();
+@@ -177,7 +165,6 @@ export async function connect(request: Request): Promise<Response> {
+       db().prepare('DELETE FROM bank_auth_flows WHERE owner=? OR expires_at<?').bind(user.userId, at),
+       db().prepare(`INSERT INTO bank_auth_flows (state_hash,owner,cookie_hash,app_generation,bank_name,country,environment,redirect_uri,date_from,expires_at,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
+         .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, BANK_REDIRECT_URL, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at),
+-      db().prepare('UPDATE bank_applications SET metadata=?,updated_at=? WHERE owner=? AND generation=?').bind(JSON.stringify(info), at, user.userId, app.generation),
+     ]);
+     try {
+       const result = await startAuth(config, { bank: { name: bank.name, country: bank.country }, state, redirectUrl: BANK_REDIRECT_URL, validUntil });
+@@ -269,7 +256,16 @@ export async function disconnect(request: Request): Promise<Response> {
+   return withBankLock(user.userId, async () => {
+     const app = await application(user.userId), conn = await connection(user.userId);
+     if (!conn?.encrypted_session) return response({ message: 'Det finns ingen aktiv bankanslutning.' });
+-    if (!app || app.generation !== conn.app_generation) throw new BankError('Anslutningens applikationsuppgifter behöver återställas innan medgivandet kan återkallas.');
++    if (!app || app.generation !== conn.app_generation) {
++      // Previously browser-uploaded keys are compromised and must never be used,
++      // even to revoke a session. Detach locally and state the revocation limit.
++      await db().batch([
++        db().prepare("UPDATE bank_connections SET status='disconnected',encrypted_session='',encrypted_accounts='',selected_accounts='[]',last_error=NULL,updated_at=? WHERE owner=? AND id=?").bind(now(), user.userId, conn.id),
++        db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
++        db().prepare("UPDATE bank_applications SET encrypted_key='' WHERE owner=?").bind(user.userId),
++      ]);
++      return response({ message: 'Den lokala bankkopplingen är borttagen. Det tidigare medgivandet kunde inte återkallas med en betrodd servernyckel. Återkalla det hos Swedbank eller Enable Banking innan du ansluter igen.', remoteRevoked: false });
++    }
+     const config = await providerConfig(app), remote = await sessionId(conn);
+     // A failed revocation retains the credentials so the user can retry. Do not
+     // tell the user bank access was revoked when the provider did not confirm it.
+diff --git a/lib/banking/status-view.ts b/lib/banking/status-view.ts
+new file mode 100644
+index 0000000..b937f15
+--- /dev/null
++++ b/lib/banking/status-view.ts
+@@ -0,0 +1,13 @@
++type ConsentStatus = {
++  configured?: boolean;
++  storageReady?: boolean;
++  connection?: { status?: string; validUntil?: string } | null;
++};
++
++// URL result parameters are navigation hints. Only the authenticated server's
++// current connection record can support a successful consent notice.
++export function confirmedBankConsent(status: ConsentStatus | null | undefined, at = Date.now()): boolean {
++  const connection = status?.connection;
++  const expiry = Date.parse(connection?.validUntil || '');
++  return status?.configured === true && status.storageReady === true && connection?.status === 'connected' && Number.isFinite(expiry) && expiry > at;
++}
+diff --git a/lib/banking/store.ts b/lib/banking/store.ts
+index c6faf20..e8ed1bc 100644
+--- a/lib/banking/store.ts
++++ b/lib/banking/store.ts
+@@ -1,7 +1,8 @@
+ import { env } from 'cloudflare:workers';
+ import { db } from '@/lib/server';
+-import { randomToken, seal, unseal } from './security';
++import { randomToken, seal, unseal, digest } from './security';
+ import type { ProviderApplication, ProviderAccount, ProviderConfig } from './enable-banking';
++import { runtimeBankConfig, runtimeBankStatus } from './runtime-config';
+ 
+ export type BankApplicationRow = {
+   owner: string; application_id: string; encrypted_key: string; metadata: string;
+@@ -27,15 +28,31 @@ function secret(): string {
+ export function storageReady(): boolean { try { secret(); return true; } catch { return false; } }
+ export const encrypt = (owner: string, purpose: string, value: unknown) => seal(secret(), owner, purpose, value);
+ export const decrypt = <T>(owner: string, purpose: string, value: string) => unseal<T>(secret(), owner, purpose, value);
++export const configurationStatus = () => runtimeBankStatus(env as unknown as Record<string, unknown>);
+ 
+ export async function application(owner: string): Promise<BankApplicationRow | null> {
+-  return db().prepare('SELECT * FROM bank_applications WHERE owner=?').bind(owner).first<BankApplicationRow>();
++  if (!configurationStatus().configured) return null;
++  const config = runtimeBankConfig(env as unknown as Record<string, unknown>);
++  const generation = await digest(`runtime-v1:${config.applicationId}:${config.environment}:${config.privateKeyPem}`);
++  const stored = await db().prepare('SELECT * FROM bank_applications WHERE owner=?').bind(owner).first<BankApplicationRow>();
++  if (stored?.generation === generation && stored.application_id === config.applicationId) return { ...stored, encrypted_key: '' };
++  const at = new Date().toISOString();
++  return { owner, application_id: config.applicationId, encrypted_key: '', generation, created_at: at, updated_at: at,
++    metadata: JSON.stringify({ name: 'MG Fakturakoll', kid: config.applicationId, environment: config.environment, active: false, redirect_urls: [], countries: [], services: [] }) };
+ }
+ export async function connection(owner: string): Promise<BankConnectionRow | null> {
+   return db().prepare('SELECT * FROM bank_connections WHERE owner=?').bind(owner).first<BankConnectionRow>();
+ }
+ export async function providerConfig(row: BankApplicationRow): Promise<ProviderConfig> {
+-  return { applicationId: row.application_id, privateKeyPem: await decrypt<string>(row.owner, `key:${row.generation}`, row.encrypted_key) };
++  const config = runtimeBankConfig(env as unknown as Record<string, unknown>);
++  const generation = await digest(`runtime-v1:${config.applicationId}:${config.environment}:${config.privateKeyPem}`);
++  if (row.application_id !== config.applicationId || row.generation !== generation) throw new Error('BANK_RUNTIME_CONFIGURATION_CHANGED');
++  return { applicationId: config.applicationId, privateKeyPem: config.privateKeyPem };
++}
++export async function saveApplicationMetadata(row: BankApplicationRow, info: ProviderApplication): Promise<void> {
++  await db().prepare(`INSERT INTO bank_applications (owner,application_id,encrypted_key,metadata,generation,created_at,updated_at) VALUES (?,?,?, ?,?,?,?)
++    ON CONFLICT(owner) DO UPDATE SET application_id=excluded.application_id,encrypted_key='',metadata=excluded.metadata,generation=excluded.generation,updated_at=excluded.updated_at`)
++    .bind(row.owner, row.application_id, '', JSON.stringify(info), row.generation, row.created_at, new Date().toISOString()).run();
+ }
+ export function metadata(row: BankApplicationRow): ProviderApplication { return JSON.parse(row.metadata); }
+ export async function accounts(row: BankConnectionRow): Promise<ProviderAccount[]> {
+diff --git a/lib/banking/transactions.ts b/lib/banking/transactions.ts
+index 1fc2e4b..8d9b80d 100644
+--- a/lib/banking/transactions.ts
++++ b/lib/banking/transactions.ts
+@@ -1,4 +1,4 @@
+-import { parseMoney, validDate } from '../domain';
++import { parseMoney, validDate, suspectedBankCollection, PAYMENT_SPECIFICATION_REQUIRED } from '../domain';
+ import type { BankRow } from '../imports';
+ import type { ProviderAccount, ProviderBankIdentity } from './enable-banking';
+ 
+@@ -87,13 +87,14 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
+     const payerReference = reference.length <= 300 ? reference : '';
+     if (reference.length > 300) longReferences++;
+     const bankCode = object(raw.bank_transaction_code) ? cleanText(raw.bank_transaction_code.description) : '';
+-    const description = [bankCode, remittance, cleanText(raw.note), !booked ? 'Valutadatum används; banken saknar bokföringsdatum.' : ''].filter(Boolean).join(' · ').slice(0, 1_000);
++    const collective=suspectedBankCollection(magnitude*(incoming?1:-1),`${bankCode} ${remittance}`,party,!missingReference(structured)?structured:'');
++    const description = [collective?PAYMENT_SPECIFICATION_REQUIRED:'',bankCode, remittance, cleanText(raw.note), !booked ? 'Valutadatum används; banken saknar bokföringsdatum.' : ''].filter(Boolean).join(' · ').slice(0, 1_000);
+     if (/bankgiro|\bbatch\b|samlings|buntbetal|sammandrag/i.test(`${bankCode} ${remittance}`)) ambiguousBatches++;
+     rows.push({ date, amount: magnitude * (incoming ? 1 : -1), party, payerReference,
+       bankReference: cleanText(entry).slice(0, 300), description,
+       source: `Enable Banking · ${cleanText(options.bankName)} · ${cleanText(options.accountLabel)}`.slice(0, 300),
+       currency: 'SEK', externalId: entry ? await stableEntryId(options.accountKey, entry) : '',
+-      account: options.accountKey, kind: 'unknown', verified: false });
++      account: options.accountKey, kind: collective?'batch':'unknown', verified: false });
+   }
+   const warnings: string[] = [];
+   if (skipped.pending) warnings.push(`${skipped.pending} bankhändelser var inte bokförda och importerades inte.`);
+diff --git a/lib/domain.ts b/lib/domain.ts
+index 943eccc..f4b5453 100644
+--- a/lib/domain.ts
++++ b/lib/domain.ts
+@@ -47,12 +47,22 @@ export function invoiceStatus(s:State,i:Invoice,at=today()):{key:string;label:st
+ }
+ export const normalizeOCR=(s:string)=>s.replace(/[\s-]/g,"").toUpperCase();
+ const tokenMatch=(reference:string,n:string)=>{if(reference.trim().toUpperCase()===n.trim().toUpperCase())return true;const label=reference.match(/(?:faktura(?:nummer|\s*nr)?|invoice(?:\s*(?:no|number))?)\s*[:#]?\s*([^\s,;]+)/i);return !!label&&label[1].toUpperCase()===n.trim().toUpperCase();};
++export const PAYMENT_SPECIFICATION_REQUIRED='Betalardetaljer saknas – importera betalningsspecifikation.';
++export const usablePaymentReference=(value:string)=>!!value.trim()&&!/^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(value.trim());
++export const individualParty=(value:string)=>!!value.trim()&&!/^(bankgiro(?:t)?(?:\s+ab)?|swedbank(?:\s+ab)?|bg|okänd(?: betalare)?|unknown)$/i.test(value.trim());
++export function suspectedBankCollection(amount:number,description:string,party:string,structuredReference:string){
++ const collective=/\bbatch\b|samlings|samlad|buntbetal|sammandrag/i.test(description);
++ return collective||amount>0&&/bankgiro|bg\s*inbetalning/i.test(`${description} ${party}`)&&(!individualParty(party)||!usablePaymentReference(structuredReference));
++}
++export function needsPaymentSpecification(t:Transaction){return !t.parentId&&(t.kind==='batch'||suspectedBankCollection(t.amount,t.description,t.party,t.payerReference));}
++const sameParty=(a:string,b:string)=>individualParty(a)&&a.normalize('NFKC').trim().toLocaleLowerCase('sv-SE')===b.normalize('NFKC').trim().toLocaleLowerCase('sv-SE');
++const exactPaymentReference=(t:Transaction,i:Invoice)=>usablePaymentReference(t.payerReference)&&((!!i.ocr&&normalizeOCR(i.ocr)===normalizeOCR(t.payerReference))||tokenMatch(t.payerReference,i.number));
+ export function suggestions(s:State,t:Transaction){
+- if(t.ignored||t.duplicateOf||!t.verified||t.kind!=="payment"||available(s,t)<=0)return[];
+- const direction=t.amount>0?"receivable":"payable",all=s.invoices.filter(i=>i.reviewed&&!i.voided&&i.direction===direction);
+- const references=all.filter(i=>t.payerReference&&((i.ocr&&normalizeOCR(i.ocr)===normalizeOCR(t.payerReference))||tokenMatch(t.payerReference,i.number)));
++ if(t.ignored||t.duplicateOf||!t.verified||t.kind!=="payment"||needsPaymentSpecification(t)||available(s,t)<=0)return[];
++ const direction=t.amount>0?"receivable":"payable",all=s.invoices.filter(i=>i.reviewed&&!i.voided&&i.direction===direction&&(!i.issued||t.date>=i.issued));
++ const references=all.filter(i=>exactPaymentReference(t,i));
+  if(references.length)return references.map(i=>({invoice:i,amount:Math.min(Math.max(0,balance(s,i)),available(s,t)),strength:references.length===1?"strong":"ambiguous",reason:balance(s,i)<=0?"Referensen tillhör en reglerad faktura – möjlig dubbelbetalning":references.length>1?"Referensen stämmer med flera fakturor":i.ocr&&normalizeOCR(i.ocr)===normalizeOCR(t.payerReference)?"OCR stämmer":"Fakturanumret finns i betalningsreferensen"}));
+- return all.filter(i=>balance(s,i)>0&&(balance(s,i)===available(s,t)||(t.party&&i.party.toLowerCase()===t.party.toLowerCase()))).map(i=>({invoice:i,amount:Math.min(balance(s,i),available(s,t)),strength:"weak",reason:t.party&&i.party.toLowerCase()===t.party.toLowerCase()?"Namnet stämmer – kontrollera underlaget":"Endast beloppet stämmer – kontrollera betalaren"}));
++ return all.filter(i=>balance(s,i)>0&&balance(s,i)===available(s,t)&&sameParty(t.party,i.party)).map(i=>({invoice:i,amount:Math.min(balance(s,i),available(s,t)),strength:"weak",reason:"Betalare och belopp stämmer – kontrollera underlaget"}));
+ }
+ export function canonicalBankAccount(value:string){
+  const account=value.trim(),iban=account.replace(/^iban:/i,'').replace(/\s/g,'').toUpperCase();
+@@ -79,8 +89,10 @@ function cleanInvoice(raw:any,existing?:Invoice):Invoice{
+  if(!i.party||!i.number)throw new Error("Namn och fakturanummer behövs.");if(i.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.email))throw new Error("Kontrollera e-postadressen.");if(i.due&&i.due<i.issued)throw new Error("Förfallodatum får inte vara före fakturadatum.");return i;
+ }
+ function cleanTransaction(raw:any):Transaction{
+- if(!raw||raw.currency&&raw.currency!=="SEK")throw new Error("Endast bankhändelser i SEK stöds.");const kind=['payment','batch','unknown'].includes(raw.kind)?raw.kind:'unknown';
+- return{id:uid(),date:date(raw.date),amount:cents(raw.amount,false),currency:"SEK",party:str(raw.party??"",200),payerReference:str(raw.payerReference??"",300),bankReference:str(raw.bankReference??"",300),description:str(raw.description??"",1000),source:str(raw.source??"Manuellt registrerad",300),externalId:str(raw.externalId??"",300),account:canonicalBankAccount(str(raw.account??"Swedbank",100)),kind,verified:raw.verified===true&&kind==='payment',duplicateOf:"",ignored:false,parentId:"",importId:"",createdAt:now()};
++ if(!raw||raw.currency&&raw.currency!=="SEK")throw new Error("Endast bankhändelser i SEK stöds.");let kind=['payment','batch','unknown'].includes(raw.kind)?raw.kind:'unknown';
++ const amount=cents(raw.amount,false),party=str(raw.party??"",200),payerReference=str(raw.payerReference??"",300),description=str(raw.description??"",1000);
++ if(!raw.parentKey&&suspectedBankCollection(amount,description,party,payerReference))kind='batch';
++ return{id:uid(),date:date(raw.date),amount,currency:"SEK",party,payerReference,bankReference:str(raw.bankReference??"",300),description,source:str(raw.source??"Manuellt registrerad",300),externalId:str(raw.externalId??"",300),account:canonicalBankAccount(str(raw.account??"Swedbank",100)),kind,verified:raw.verified===true&&kind==='payment',duplicateOf:"",ignored:false,parentId:"",importId:"",createdAt:now()};
+ }
+ export function applyCommand(current:State,command:Command):{state:State;message:string}{
+  const s=structuredClone(current);let message="Sparat";
+@@ -105,7 +117,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
+   const record:ImportRecord={id:uid(),hash,account,name:str(command.name??"Manuell registrering",300),count:0,createdAt:now(),documentId:str(command.documentId??'',100)},keys=new Map<string,string>();let skipped=0;
+   for(const raw of command.rows){
+    const t=cleanTransaction({...raw,account:typeof raw.account==='string'&&raw.account.trim()?raw.account:account});t.importId=record.id;
+-   if(raw.parentKey){const parentId=keys.get(raw.parentKey);if(!parentId)throw new Error("Betalningsspecifikationen saknar sin samlingspost.");t.parentId=parentId;}
++   if(raw.parentKey){const parentId=keys.get(raw.parentKey);if(!parentId)throw new Error("Betalningsspecifikationen saknar sin samlingspost.");if(!individualParty(t.party)||!usablePaymentReference(t.payerReference))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);t.parentId=parentId;}
+    const stable=t.externalId?s.transactions.find(x=>sameAccount(x.account,t.account)&&x.externalId===t.externalId):undefined;
+    if(stable){
+     if(stable.ignored)throw new Error('Bankhändelsen finns redan som undantagen. Återställ den befintliga posten om den ska användas.');
+@@ -121,24 +133,26 @@ export function applyCommand(current:State,command:Command):{state:State;message
+   s.imports.push(record);message=`${record.count} bankhändelser importerade${skipped?`, ${skipped} kända bank-ID:n hoppades över`:''}`;break;
+  }
+  case'transaction.verify':{
+-  const t=getTx(s,command.id);if(t.ignored||t.kind==='batch')throw new Error("Den här posten kan inte bekräftas som en enskild betalning.");if(t.duplicateOf&&!command.confirmDistinct)throw new Error("Kontrollera först om raden är en dubblett.");
+-  t.party=str(command.party??t.party,200);t.payerReference=str(command.payerReference??t.payerReference,300);const note=str(command.note??"",1000);if(!note)throw new Error("Beskriv hur du har kontrollerat betalningsuppgifterna.");t.description=t.description+"\nKontrollerad: "+note;t.verified=true;t.kind='payment';t.duplicateOf='';message="Betalningsuppgifterna är bekräftade";break;
++  const t=getTx(s,command.id);if(t.ignored)throw new Error("Den här posten kan inte bekräftas som en enskild betalning.");if(needsPaymentSpecification(t))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);if(t.duplicateOf&&!command.confirmDistinct)throw new Error("Kontrollera först om raden är en dubblett.");
++  t.party=str(command.party??t.party,200);t.payerReference=str(command.payerReference??t.payerReference,300);if(!individualParty(t.party)&&!usablePaymentReference(t.payerReference))throw new Error('Betalare eller fakturareferens saknas. Komplettera från bankunderlaget före bekräftelse.');const note=str(command.note??"",1000);if(!note)throw new Error("Beskriv hur du har kontrollerat betalningsuppgifterna.");t.description=t.description+"\nKontrollerad: "+note;t.verified=true;t.kind='payment';t.duplicateOf='';message="Betalningsuppgifterna är bekräftade";break;
+  }
+  case'transaction.ignore':{const t=getTx(s,command.id);if(s.allocations.some(a=>a.transactionId===t.id&&a.active))throw new Error("Ångra matchningar först.");if(t.parentId||s.transactions.some(c=>c.parentId===t.id&&!c.ignored))throw new Error("Poster i en samlingsbetalning behöver hanteras tillsammans.");t.ignored=!t.ignored;message=t.ignored?"Bankhändelsen är undantagen":"Bankhändelsen är återställd";break;}
+  case'transaction.unverify':{const t=getTx(s,command.id);if(t.kind==='batch'||s.allocations.some(a=>a.active&&a.transactionId===t.id))throw new Error('Ångra matchningar innan du korrigerar betalningsuppgifterna.');t.verified=false;message='Bankhändelsen är öppnad för ny granskning';break;}
+  case'transaction.unsplit':{
+   const parent=getTx(s,command.id),children=s.transactions.filter(t=>t.parentId===parent.id&&!t.ignored);if(!children.length)throw new Error('Ingen aktiv uppdelning finns.');
+   if(children.some(t=>s.allocations.some(a=>a.active&&a.transactionId===t.id)))throw new Error('Ångra delbetalningarnas matchningar innan uppdelningen återtas.');
+-  for(const t of children)t.ignored=true;parent.kind='unknown';parent.verified=false;message='Uppdelningen är återtagen. Originalposten kan granskas igen.';break;
++  for(const t of children)t.ignored=true;parent.kind='batch';parent.verified=false;message='Uppdelningen är återtagen. Importera eller registrera en korrekt betalningsspecifikation.';break;
+  }
+  case'transaction.split':{
+   const parent=getTx(s,command.id);if(parent.ignored||parent.parentId||parent.duplicateOf||s.allocations.some(a=>a.transactionId===parent.id&&a.active)||s.transactions.some(t=>t.parentId===parent.id&&!t.ignored))throw new Error("Posten är redan matchad, uppdelad eller behöver dubblettkontroll.");if(!Array.isArray(command.rows)||command.rows.length<1||command.rows.length>100)throw new Error("Lägg till betalningsrader från specifikationen.");
+   const children=command.rows.map((raw:any)=>cleanTransaction({...raw,account:parent.account,date:parent.date,source:"Betalningsspecifikation: "+parent.bankReference,kind:"payment",verified:true}));
++  if(children.some((t:Transaction)=>!individualParty(t.party)||!usablePaymentReference(t.payerReference)))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);
+   if(children.some((t:Transaction)=>Math.sign(t.amount)!==Math.sign(parent.amount))||children.reduce((n:number,t:Transaction)=>n+t.amount,0)!==parent.amount)throw new Error("Summan av betalningsraderna måste stämma exakt med bankposten.");parent.kind='batch';parent.verified=false;for(const t of children){t.parentId=parent.id;const duplicate=s.transactions.find(x=>!x.ignored&&x.id!==parent.id&&possibleDuplicate(x,t));if(duplicate){t.duplicateOf=duplicate.id;t.verified=false;}s.transactions.push(t);}message="Samlingsbetalningen är uppdelad";break;
+  }
+  case'match.create':{
+   const i=getInvoice(s,command.invoiceId),t=getTx(s,command.transactionId),amount=cents(command.amount),effect=command.effect==='refund'?'refund':'payment';
+-  if(!i.reviewed||i.voided||!t.verified||t.kind!=='payment'||t.ignored||t.duplicateOf)throw new Error("Granska fakturan och bankhändelsen innan matchning.");const expected=(i.direction==='receivable'?1:-1)*(effect==='refund'?-1:1);if(Math.sign(t.amount)!==expected)throw new Error("Betalningens riktning stämmer inte med fakturan.");
++  if(!i.reviewed||i.voided||!t.verified||t.kind!=='payment'||t.ignored||t.duplicateOf)throw new Error("Granska fakturan och bankhändelsen innan matchning.");if(needsPaymentSpecification(t))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);const expected=(i.direction==='receivable'?1:-1)*(effect==='refund'?-1:1);if(Math.sign(t.amount)!==expected)throw new Error("Betalningens riktning stämmer inte med fakturan.");
++  if(!exactPaymentReference(t,i)&&!(sameParty(t.party,i.party)&&Math.abs(balance(s,i))===available(s,t)))throw new Error('Matchningen kräver exakt OCR/fakturareferens eller samma betalare och belopp. Beloppet ensamt styrker inte betalningen.');
+   if(amount>available(s,t)||amount>balance(s,i)*(effect==='refund'?-1:1))throw new Error("Beloppet överstiger det som återstår. Uppdatera sidan och kontrollera beloppen.");const note=str(command.note??"",1000);if(!note)throw new Error("Ange vilket underlag som bekräftar matchningen.");
+   s.allocations.push({id:uid(),invoiceId:i.id,transactionId:t.id,amount,effect,active:true,note,createdAt:now()});message=effect==='refund'?"Återbetalningen är avstämd":"Betalningen är matchad";break;
+  }
+diff --git a/lib/imports.ts b/lib/imports.ts
+index 88437c3..60c189a 100644
+--- a/lib/imports.ts
++++ b/lib/imports.ts
+@@ -1,4 +1,4 @@
+-import {parseMoney,validDate,today} from './domain';
++import {parseMoney,validDate,today,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED} from './domain';
+ export type BankRow={date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
+ export function parseCSV(text:string){
+  const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n'),lines=clean.split('\n');
+@@ -20,7 +20,7 @@ export function guessMapping(headers:string[]):Mapping{
+ export function mapCSV(parsed:ReturnType<typeof parseCSV>,mapping:Mapping,name:string):BankRow[]{
+  if(mapping.date<0||mapping.amount<0)throw new Error('Välj kolumner för datum och belopp.');
+  if(mapping.payerReference>=0&&mapping.payerReference===mapping.bankReference)throw new Error('Bankreferens och OCR ska ha olika kolumner.');
+- return parsed.rows.map((r,index)=>{const v=(k:keyof Mapping)=>mapping[k]>=0?(r[mapping[k]]??'').trim():'';try{const currency=v('currency')||'SEK';if(currency.toUpperCase()!=='SEK')throw new Error('Andra valutor än SEK stöds inte.');return{date:normalizeDate(v('date')),amount:parseMoney(v('amount')),party:v('party'),payerReference:v('payerReference'),bankReference:v('bankReference'),description:v('description'),externalId:v('externalId'),currency:'SEK',source:name,kind:'unknown',verified:false};}catch(e){throw new Error(`Rad ${index+2}: ${(e as Error).message}`);}});
++ return parsed.rows.map((r,index)=>{const v=(k:keyof Mapping)=>mapping[k]>=0?(r[mapping[k]]??'').trim():'';try{const currency=v('currency')||'SEK';if(currency.toUpperCase()!=='SEK')throw new Error('Andra valutor än SEK stöds inte.');const amount=parseMoney(v('amount')),party=v('party'),payerReference=v('payerReference'),description=v('description'),collective=suspectedBankCollection(amount,description,party,payerReference);return{date:normalizeDate(v('date')),amount,party,payerReference,bankReference:v('bankReference'),description:collective?`${PAYMENT_SPECIFICATION_REQUIRED} ${description}`:description,externalId:v('externalId'),currency:'SEK',source:name,kind:collective?'batch':'unknown',verified:false};}catch(e){throw new Error(`Rad ${index+2}: ${(e as Error).message}`);}});
+ }
+ export function parseCAMT(text:string,name:string):BankRow[]{
+  if(/<!DOCTYPE|<!ENTITY/i.test(text))throw new Error('XML med externa entiteter stöds inte.');
+@@ -42,7 +42,7 @@ export function parseCAMT(text:string,name:string):BankRow[]{
+    const stableRef=(s:string)=>s&&!/^(NOTPROVIDED|NONREF|N\/A|NONE)$/i.test(s)?s:'';
+    const date=normalizeDate((val(entry,'BookgDt','Dt')||val(entry,'BookgDt','DtTm')).slice(0,10)),reference=stableRef(val(entry,'AcctSvcrRef'))||stableRef(val(entry,'NtryRef'));
+    const txs=descendants(entry,'TxDtls'),key=`entry-${index}`;
+-   const base:BankRow={date,amount,party:'',payerReference:'',bankReference:reference,description:val(entry,'AddtlNtryInf'),currency:'SEK',account,source:name,externalId:reference&&reference!=='NOTPROVIDED'?`entry:${reference}`:'',kind:txs.length>1?'batch':'unknown',verified:false,key};
++   const base:BankRow={date,amount,party:'',payerReference:'',bankReference:reference,description:val(entry,'AddtlNtryInf'),currency:'SEK',account,source:name,externalId:reference&&reference!=='NOTPROVIDED'?`entry:${reference}`:'',kind:txs.length>1||suspectedBankCollection(amount,val(entry,'AddtlNtryInf'),'','')?'batch':'unknown',verified:false,key};
+    const detail=(tx:Element,n:number):BankRow=>{
+     const amountNode=path(tx,'AmtDtls','TxAmt','Amt')||path(tx,'Amt');
+     if(txs.length>1&&!amountNode)throw new Error('En delbetalning saknar eget belopp. Importera betalningsspecifikationen eller registrera uppdelningen manuellt.');
+diff --git a/tests/banking-provider.test.mjs b/tests/banking-provider.test.mjs
+index 58e6044..c1fee9b 100644
+--- a/tests/banking-provider.test.mjs
++++ b/tests/banking-provider.test.mjs
+@@ -240,9 +240,21 @@ test('Missing booking date uses only a valid documented value date with an expli
+   assert.ok(result.warnings.some(w => w.includes('valutadatum')));
+ });
+ 
+-test('Bankgiro totals remain unknown and cannot pay an invoice without verification', async () => {
++test('Bankgiro totals require payment specification and cannot become an ordinary verified payment', async () => {
+   const result = await normalizeTransactions([rawTx({ remittance_information: ['BANKGIRO SAMLINGSINBETALNING'], reference_number: null, debtor: null })], opts);
+-  assert.equal(result.rows[0].kind, 'unknown');
++  assert.equal(result.rows[0].kind, 'batch');
+   assert.equal(result.rows[0].verified, false);
++  assert.match(result.rows[0].description,/Betalardetaljer saknas – importera betalningsspecifikation/);
+   assert.ok(result.warnings.some(w => w.includes('betalningsspecifikation')));
+ });
++
++test('Bankgiro individual identity needs real payer and structured reference; explicit batches stay blocked', async()=>{
++ const rows=await normalizeTransactions([
++  rawTx({entry_reference:'real-individual',bank_transaction_code:{description:'Bankgiro inbetalning'}}),
++  rawTx({entry_reference:'only-free-text',reference_number:null,bank_transaction_code:{description:'Bankgiro inbetalning'}}),
++  rawTx({entry_reference:'generic-party',debtor:{name:'Bankgirot AB'},bank_transaction_code:{description:'Bankgiro inbetalning'}}),
++  rawTx({entry_reference:'explicit-batch',bank_transaction_code:{description:'Samlad Bankgiroinbetalning'}}),
++ ],opts);
++ assert.deepEqual(rows.rows.map(row=>row.kind),['unknown','batch','batch','batch']);
++ assert.ok(rows.rows.every(row=>!row.verified));
++});
+diff --git a/tests/banking-security.test.mjs b/tests/banking-security.test.mjs
+index df77dee..7f4c778 100644
+--- a/tests/banking-security.test.mjs
++++ b/tests/banking-security.test.mjs
+@@ -6,6 +6,8 @@ import ts from 'typescript';
+ import { emptyState, today } from '../lib/domain.ts';
+ import { ProviderError } from '../lib/banking/enable-banking.ts';
+ import { seal, unseal, randomToken, digest, validFlowToken, cookieValue } from '../lib/banking/security.ts';
++import { runtimeBankConfig, runtimeBankStatus } from '../lib/banking/runtime-config.ts';
++import { confirmedBankConsent } from '../lib/banking/status-view.ts';
+ 
+ // Exercise the real route services, encryption, domain and SQL. Only the identity
+ // provider and banking HTTP boundary are replaced. No test can call a live bank.
+@@ -61,7 +63,11 @@ async function fixture(t, environment = 'PRODUCTION') {
+   const sql = new DatabaseSync(':memory:');
+   sql.exec(source('../drizzle/0000_confused_umar.sql'));
+   sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));
+-  const f = { sql, owner: 'owner-alice', user: { userId: 'owner-alice' }, calls: [], provider: {}, env: { BANK_DATA_ENCRYPTION_KEY: randomToken() } };
++  const f = { sql, owner: 'owner-alice', user: { userId: 'owner-alice' }, calls: [], provider: {}, env: {
++    BANK_DATA_ENCRYPTION_KEY: randomToken(), ENABLE_BANKING_APPLICATION_ID: appId,
++    ENABLE_BANKING_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',
++    ENABLE_BANKING_ENVIRONMENT: environment, ENABLE_BANKING_KEY_ROTATED: 'true',
++  } };
+   f.d1 = new LocalD1(sql); f.env.DB = f.d1;
+   globalThis[key] = f;
+   t.after(() => { delete globalThis[key]; sql.close(); });
+@@ -71,11 +77,12 @@ async function fixture(t, environment = 'PRODUCTION') {
+   const domain = new URL('../lib/domain.ts', import.meta.url).href;
+   const security = new URL('../lib/banking/security.ts', import.meta.url).href;
+   const serverUrl = compiledModule('../lib/server.ts', { 'cloudflare:workers': cloudflare, '@/app/chatgpt-auth': auth, './domain': domain });
+-  const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security });
++  const runtimeConfig = new URL('../lib/banking/runtime-config.ts', import.meta.url).href;
++  const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig });
+   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain });
+   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
+   const providerUrl = jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
+-  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security });
++  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig });
+   f.store = await import(storeUrl); f.service = await import(serviceUrl);
+   f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
+   f.account = { uid: accountUid, name: 'Company account', currency: 'SEK', account_id: { iban: 'SE4550000000058398257466' } };
+@@ -91,14 +98,15 @@ async function fixture(t, environment = 'PRODUCTION') {
+     getTransactions: async () => ({ transactions: [rawTx()] }),
+   };
+   f.seedApp = async (owner = f.owner) => {
++    const current = await f.store.application(owner);
+     const encrypted = await f.store.encrypt(owner, 'key:generation-one', 'PRIVATE-TEST-KEY');
+-    sql.prepare('INSERT INTO bank_applications VALUES (?,?,?,?,?,?,?)').run(owner, appId, encrypted, JSON.stringify(f.info), 'generation-one', new Date().toISOString(), new Date().toISOString());
++    sql.prepare('INSERT INTO bank_applications VALUES (?,?,?,?,?,?,?)').run(owner, appId, encrypted, JSON.stringify(f.info), current.generation, new Date().toISOString(), new Date().toISOString());
+   };
+   f.seedConnection = async (owner = f.owner) => {
+     const id = `connection-${owner}`;
+     const encryptedSession = await f.store.encrypt(owner, `session:${id}`, remoteSession);
+     const encryptedAccounts = await f.store.encrypt(owner, `accounts:${id}`, [f.account]);
+-    sql.prepare('INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(id, owner, 'generation-one', environment, 'Swedbank', 'SE', encryptedSession, encryptedAccounts, JSON.stringify([accountUid]), future(), today(), 'connected', new Date().toISOString(), new Date().toISOString());
++    sql.prepare('INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(id, owner, (await f.store.application(owner)).generation, environment, 'Swedbank', 'SE', encryptedSession, encryptedAccounts, JSON.stringify([accountUid]), future(), today(), 'connected', new Date().toISOString(), new Date().toISOString());
+     return id;
+   };
+   f.start = async () => {
+@@ -185,17 +193,19 @@ test('A stale invocation cannot release a replacement lock acquired after lease
+   assert.equal(count(f, 'bank_locks'), 0);
+ });
+ 
+-test('Stored credentials and account lists are owner-bound and status never exposes private identifiers', async t => {
++test('Runtime credentials never use legacy D1 keys; account lists and connection status stay owner-bound', async t => {
+   const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+-  assert.equal(await f.store.application('owner-bob'), null); assert.equal(await f.store.connection('owner-bob'), null);
++  assert.ok(await f.store.application('owner-bob')); assert.equal(await f.store.connection('owner-bob'), null);
+   const app = await f.store.application(f.owner), conn = await f.store.connection(f.owner);
+-  await assert.rejects(f.store.providerConfig({ ...app, owner: 'owner-bob' }), /BANK_SECRET_UNREADABLE/);
++  const config = await f.store.providerConfig({ ...app, encrypted_key: 'tampered-legacy-key-never-read' });
++  assert.equal(config.privateKeyPem, f.env.ENABLE_BANKING_PRIVATE_KEY);
++  assert.equal(app.encrypted_key, '');
+   await assert.rejects(f.store.accounts({ ...conn, owner: 'owner-bob' }), /BANK_SECRET_UNREADABLE/);
+   const text = await (await f.service.status(new Request(`${origin}/api/bank/status`))).text();
+-  for (const secret of ['PRIVATE-TEST-KEY', remoteSession, 'SE4550000000058398257466', conn.encrypted_session, app.encrypted_key]) assert.ok(!text.includes(secret));
++  for (const secret of ['PRIVATE-TEST-KEY', f.env.ENABLE_BANKING_PRIVATE_KEY, remoteSession, 'SE4550000000058398257466', conn.encrypted_session]) assert.ok(!text.includes(secret));
+   f.user = { userId: 'owner-bob' };
+   const other = await (await f.service.status(new Request(`${origin}/api/bank/status`))).json();
+-  assert.equal(other.configured, false); assert.equal(other.connection, null);
++  assert.equal(other.configured, true); assert.equal(other.connection, null);
+ });
+ 
+ test('Explicit status refresh replaces stale activation and redirect metadata while ordinary reads stay local', async t => {
+@@ -248,7 +258,7 @@ test('Callback rejects missing or ambiguous state, wrong browser, owner, expired
+   f.user = { userId: 'owner-bob' };
+   assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=wrong_user');
+   f.user = { userId: f.owner };
+-  f.sql.prepare('UPDATE bank_applications SET generation=?').run('replaced-generation');
++  f.env.ENABLE_BANKING_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nUk9UQVRFRC1URVNULU9OTFk=\n-----END PRIVATE KEY-----';
+   assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=expired');
+   f.sql.prepare('UPDATE bank_auth_flows SET expires_at=?').run('2000-01-01T00:00:00Z');
+   assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=expired');
+@@ -371,3 +381,75 @@ test('Disconnect retains credentials on an unconfirmed failure and clears them w
+   assert.equal((await f.service.disconnect(post('disconnect'))).status, 200);
+   assert.equal(f.connection().status, 'disconnected'); assert.equal(f.connection().encrypted_session, ''); assert.equal(f.connection().encrypted_accounts, '');
+ });
++
++test('Production configuration requires an explicit environment and rotation before accessing the runtime key', () => {
++  assert.equal(runtimeBankStatus({}).configured, false);
++  const blocked = new Proxy({ ENABLE_BANKING_ENVIRONMENT: 'PRODUCTION', ENABLE_BANKING_KEY_ROTATED: 'false' }, {
++    get(target, name) { if (name === 'ENABLE_BANKING_PRIVATE_KEY') throw new Error('must not read an unrotated key'); return target[name]; },
++  });
++  assert.throws(() => runtimeBankConfig(blocked), error => error.code === 'BANK_KEY_ROTATION_REQUIRED');
++  const env = { ENABLE_BANKING_ENVIRONMENT: 'PRODUCTION', ENABLE_BANKING_KEY_ROTATED: 'true', ENABLE_BANKING_APPLICATION_ID: appId, ENABLE_BANKING_PRIVATE_KEY: 'not-a-key' };
++  assert.equal(runtimeBankStatus(env).configured, false);
++  assert.equal(runtimeBankStatus(env).code, 'BANK_RUNTIME_CONFIGURATION_INVALID');
++  assert.ok(!JSON.stringify(runtimeBankStatus(env)).includes('not-a-key'));
++});
++
++test('Browser credential uploads are rejected before the body is read, with no provider call or D1 key write', async t => {
++  const f = await fixture(t);
++  const request = post('config', { applicationId: appId, privateKeyPem: 'client-secret-that-must-never-be-saved' });
++  Object.defineProperty(request, 'body', { get() { throw new Error('request body must not be read'); } });
++  await assert.rejects(f.service.saveConfig(request), error => error.status === 405 && !error.message.includes('client-secret'));
++  assert.equal(count(f, 'bank_applications'), 0); assert.equal(f.calls.length, 0);
++  const component = source('../components/bank-connection.tsx');
++  for (const forbidden of ['privateKeyPem', 'readKey', 'keyFilename', 'FileKey2', 'saveConfiguration', '/api/bank/config']) assert.ok(!component.includes(forbidden));
++  assert.ok(component.includes('Koppla banken')); assert.ok(component.includes('Importera bankfil istället'));
++});
++
++test('Legacy D1 keys cannot authorize any provider call when runtime configuration or rotation is absent', async t => {
++  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
++  delete f.env.ENABLE_BANKING_PRIVATE_KEY;
++  assert.equal(await f.store.application(f.owner), null);
++  await assert.rejects(f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: today() })), /systemadministratören/);
++  await assert.rejects(f.service.sync(post('sync')), /giltig bankanslutning/);
++  const status = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
++  assert.equal(status.configured, false); assert.equal(status.connection.status, 'reauth_required');
++  assert.equal(f.calls.length, 0);
++  f.env.ENABLE_BANKING_KEY_ROTATED = 'false';
++  assert.equal(f.store.configurationStatus().code, 'BANK_KEY_ROTATION_REQUIRED');
++});
++
++test('Runtime app readiness checks provider environment, AIS, Swedish access, exact callback and activation', async t => {
++  const f = await fixture(t);
++  for (const patch of [{ environment: 'SANDBOX' }, { active: false }, { services: ['PIS'] }, { countries: ['FI'] }, { redirect_urls: [redirect + '/'] }, { kid: accountUid }]) {
++    const base = structuredClone(f.info); Object.assign(f.info, patch);
++    await assert.rejects(f.service.banks(new Request(origin + '/api/bank/banks')), /systemadministratören/);
++    Object.assign(f.info, base);
++  }
++  assert.equal(f.calls.filter(call => call.name === 'startAuth').length, 0);
++  assert.equal(f.calls.filter(call => call.name === 'listBusinessBanks').length, 0);
++  const ready = await (await f.service.banks(new Request(origin + '/api/bank/banks'))).json();
++  assert.equal(ready.banks[0].name, 'Swedbank');
++  assert.equal(f.sql.prepare('SELECT encrypted_key FROM bank_applications WHERE owner=?').get(f.owner).encrypted_key, '');
++});
++
++test('Explicit disconnect of a legacy connection never uses its key and reports the manual revocation requirement', async t => {
++  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
++  delete f.env.ENABLE_BANKING_PRIVATE_KEY;
++  const result = await (await f.service.disconnect(post('disconnect'))).json();
++  assert.equal(result.remoteRevoked, false); assert.match(result.message, /Återkalla det hos Swedbank/);
++  assert.equal(f.calls.length, 0); assert.equal(f.connection().status, 'disconnected');
++  assert.equal(f.connection().encrypted_session, ''); assert.equal(f.sql.prepare('SELECT encrypted_key FROM bank_applications').get().encrypted_key, '');
++});
++
++test('A forged connected query cannot claim bank consent without a current unexpired server connection', () => {
++  const at = Date.parse('2026-10-27T12:00:00Z');
++  const server = { configured: true, storageReady: true, connection: { status: 'connected', validUntil: '2026-10-28T12:00:00Z' } };
++  for (const status of [null, undefined, {}, { configured: true, storageReady: true, connection: null }, { ...server, configured: false }, { ...server, storageReady: false }, ...['disconnected', 'reauth_required', 'expired', 'pending'].map(status => ({ ...server, connection: { ...server.connection, status } })), ...['', 'not-a-date', '2026-10-27T12:00:00Z', '2026-10-26T12:00:00Z'].map(validUntil => ({ ...server, connection: { ...server.connection, validUntil } }))]) assert.equal(confirmedBankConsent(status, at), false);
++  assert.equal(confirmedBankConsent(server, at), true);
++  const component = source('../components/bank-connection.tsx');
++  assert.match(component, /const verified = await loadStatus\(\)/);
++  assert.match(component, /if \(cancelled \|\| !alive\.current \|\| demoMode\.current\) return/);
++  assert.match(component, /if \(confirmedBankConsent\(verified\)\) setNotice\(resultMessages\.connected\)/);
++  assert.match(component, /cancelled = true/);
++  assert.match(component, /date\.setUTCDate\(date\.getUTCDate\(\) - 29\)/);
++});
+diff --git a/tests/domain.test.mjs b/tests/domain.test.mjs
+index 83f488d..d26aec7 100644
+--- a/tests/domain.test.mjs
++++ b/tests/domain.test.mjs
+@@ -15,7 +15,7 @@ const match=(s,amount=s.invoices[0].total,extra={})=>applyCommand(s,{type:'match
+ test('Swedish money is exact integer öre and rejects ambiguous fractions',()=>{for(const v of ['7 179,16','7\u00a0179,16','7.179,16','7179.16'])assert.equal(parseMoney(v),717916);assert.equal(parseMoney('-98,50'),-9850);assert.throws(()=>parseMoney('1.875'));assert.throws(()=>parseMoney('foo'));assert.throws(()=>parseMoney('1,875.00'));});
+ test('Calendar dates are real and due today is not overdue',()=>{assert.equal(validDate('2026-02-30'),false);assert.equal(validDate('2028-02-29'),true);const s=addInvoice(emptyState());assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-26').key,'open');assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-27').key,'overdue');});
+ test('Exact OCR offers a proposal and only confirmation marks paid',()=>{let s=addTx(addInvoice(emptyState()));assert.equal(suggestions(s,s.transactions[0])[0].strength,'strong');assert.equal(balance(s,s.invoices[0]),187500);s=match(s);assert.equal(balance(s,s.invoices[0]),0);assert.equal(invoiceStatus(s,s.invoices[0]).key,'paid');});
+-test('Equal amounts never resolve identity, even when ambiguous',()=>{let s=addInvoice(addInvoice(emptyState()),{party:'Andra kunden',number:'1002',ocr:'002',total:187500});s=addTx(s,{party:'',payerReference:''});assert.equal(suggestions(s,s.transactions[0]).length,2);assert.ok(suggestions(s,s.transactions[0]).every(x=>x.strength==='weak'));assert.equal(s.allocations.length,0);});
++test('Equal amounts never resolve identity, even when ambiguous',()=>{let s=addInvoice(addInvoice(emptyState()),{party:'Andra kunden',number:'1002',ocr:'002',total:187500});s=addTx(s,{party:'',payerReference:''});assert.equal(suggestions(s,s.transactions[0]).length,0);assert.throws(()=>match(s),/Beloppet ensamt/);assert.equal(s.allocations.length,0);});
+ test('Bank reference cannot become invoice evidence or prefix-match',()=>{let s=addInvoice(emptyState(),{number:'123',ocr:'00123'});s=addTx(s,{payerReference:'1234',bankReference:'00123',party:''});assert.ok(suggestions(s,s.transactions[0]).every(x=>x.strength==='weak'));s=addTx(s,{payerReference:'order 1 leverans',party:'',externalId:'second'});assert.ok(suggestions(s,s.transactions[1]).every(x=>x.strength==='weak'));});
+ test('Closed invoice reference warns about double payment',()=>{let s=match(addTx(addInvoice(emptyState())));s=addTx(s,{externalId:'second',bankReference:'new',description:'Separat betalning'});assert.match(suggestions(s,s.transactions[1])[0].reason,/dubbelbetalning/);assert.equal(suggestions(s,s.transactions[1])[0].amount,0);});
+ test('Partial payments and overpayment preserve exact unallocated balance',()=>{let s=addTx(addInvoice(emptyState(),{total:200000}),{amount:75000});s=match(s,75000);assert.equal(paid(s,s.invoices[0].id),75000);s=addTx(s,{amount:130000,externalId:'last'});s=match(s,125000,{transactionId:s.transactions[1].id});assert.equal(balance(s,s.invoices[0]),0);assert.equal(available(s,s.transactions[1]),5000);assert.throws(()=>match(s,1));});
+@@ -25,10 +25,10 @@ test('Same file is rejected; repeated stable IDs skipped; changed IDs conflict',
+ test('Identical rows without strong IDs remain held for duplicate review',()=>{let s=addTx(emptyState());s=addTx(s);assert.equal(s.transactions.length,2);assert.equal(s.transactions[1].verified,false);assert.equal(s.transactions[1].duplicateOf,s.transactions[0].id);assert.equal(suggestions(s,s.transactions[1]).length,0);});
+ test('Ignored stable ID cannot be imported as fresh spendable money',()=>{let s=addTx(emptyState(),{externalId:'known'});s=applyCommand(s,{type:'transaction.ignore',id:s.transactions[0].id}).state;assert.throws(()=>addTx(s,{externalId:'known'}),/undantagen/);});
+ test('Duplicate aggregate cannot bypass protection through splitting',()=>{let s=addTx(emptyState(),{kind:'unknown',verified:false});s=addTx(s,{kind:'unknown',verified:false});assert.throws(()=>applyCommand(s,{type:'transaction.split',id:s.transactions[1].id,rows:[{amount:187500,party:'Testkund'}]}),/dubblettkontroll/);});
+-test('Batch total must equal details and parent is not allocatable',()=>{let s=addTx(addInvoice(emptyState()),{amount:717916,kind:'unknown',verified:false});const id=s.transactions[0].id;assert.throws(()=>applyCommand(s,{type:'transaction.split',id,rows:[{amount:187500},{amount:530000}]}));s=applyCommand(s,{type:'transaction.split',id,rows:[{amount:187500,party:'Testkund'},{amount:530416,party:'Annan'}]}).state;assert.equal(s.transactions[0].kind,'batch');assert.throws(()=>match(s));s=match(s,187500,{transactionId:s.transactions[1].id});assert.equal(balance(s,s.invoices[0]),0);});
++test('Batch total must equal details and parent is not allocatable',()=>{let s=addTx(addInvoice(emptyState()),{amount:717916,kind:'unknown',verified:false});const id=s.transactions[0].id;assert.throws(()=>applyCommand(s,{type:'transaction.split',id,rows:[{amount:187500},{amount:530000}]}));s=applyCommand(s,{type:'transaction.split',id,rows:[{amount:187500,party:'Testkund',payerReference:'001019'},{amount:530416,party:'Annan',payerReference:'2002'}]}).state;assert.equal(s.transactions[0].kind,'batch');assert.throws(()=>match(s));s=match(s,187500,{transactionId:s.transactions[1].id});assert.equal(balance(s,s.invoices[0]),0);});
+ test('Existing allocated payment cannot be reimported as batch plus details',()=>{let s=match(addTx(addInvoice(emptyState(),{total:10000}),{amount:10000,externalId:'entry:one'}),10000);assert.throws(()=>applyCommand(s,{type:'transactions.import',rows:[tx({key:'p',kind:'batch',amount:10000,externalId:'entry:one'}),tx({parentKey:'p',amount:4000,externalId:'a'}),tx({parentKey:'p',amount:6000,externalId:'b'})]}),/redan matchad/);});
+ test('Existing unallocated parent upgrades safely and total remains invariant',()=>{let s=addTx(emptyState(),{amount:10000,externalId:'entry:one',kind:'unknown',verified:false});s=applyCommand(s,{type:'transactions.import',rows:[tx({key:'p',kind:'batch',amount:10000,externalId:'entry:one'}),tx({parentKey:'p',amount:4000,externalId:'a'}),tx({parentKey:'p',amount:6000,externalId:'b'})]}).state;assert.equal(s.transactions[0].kind,'batch');assert.equal(s.transactions[0].verified,false);assert.throws(()=>applyCommand(s,{type:'transactions.import',rows:[tx({key:'p',kind:'batch',amount:10000,externalId:'entry:one'}),tx({parentKey:'p',amount:10000,externalId:'extra'})]}),/samlingsbelopp|Samlingspost/);});
+-test('Undo split preserves originals and supports a corrected split',()=>{let s=addTx(emptyState(),{amount:10000,kind:'unknown',verified:false});const id=s.transactions[0].id;s=applyCommand(s,{type:'transaction.split',id,rows:[{amount:6000},{amount:4000}]}).state;s=applyCommand(s,{type:'transaction.unsplit',id}).state;assert.equal(s.transactions.filter(t=>t.parentId===id&&t.ignored).length,2);s=applyCommand(s,{type:'transaction.split',id,rows:[{amount:5000,party:'A'},{amount:5000,party:'B'}]}).state;assert.equal(s.transactions.filter(t=>t.parentId===id&&!t.ignored).length,2);});
++test('Undo split preserves originals and supports a corrected split',()=>{let s=addTx(emptyState(),{amount:10000,kind:'unknown',verified:false});const id=s.transactions[0].id;s=applyCommand(s,{type:'transaction.split',id,rows:[{amount:6000,party:'A',payerReference:'A1'},{amount:4000,party:'B',payerReference:'B1'}]}).state;s=applyCommand(s,{type:'transaction.unsplit',id}).state;assert.equal(s.transactions.filter(t=>t.parentId===id&&t.ignored).length,2);assert.equal(s.transactions[0].kind,'batch');assert.throws(()=>applyCommand(s,{type:'transaction.verify',id,note:'Försök kringgå specifikationen'}),/betalningsspecifikation/);s=applyCommand(s,{type:'transaction.split',id,rows:[{amount:5000,party:'A',payerReference:'A1'},{amount:5000,party:'B',payerReference:'B1'}]}).state;assert.equal(s.transactions.filter(t=>t.parentId===id&&!t.ignored).length,2);});
+ test('Credit plus refund is correct and undo cannot orphan the refund',()=>{let s=match(addTx(addInvoice(emptyState(),{total:10000}),{amount:10000}),10000);const paymentId=s.allocations[0].id;s=applyCommand(s,{type:'credit.add',invoiceId:s.invoices[0].id,amount:2000,number:'K1',date:'2026-10-26',note:'Retur'}).state;assert.equal(balance(s,s.invoices[0]),-2000);s=addTx(s,{amount:-2000,externalId:'refund'});s=match(s,2000,{transactionId:s.transactions[1].id,effect:'refund'});assert.equal(balance(s,s.invoices[0]),0);assert.throws(()=>applyCommand(s,{type:'match.undo',id:paymentId,note:'Rättning'}),/återbetalningar/);});
+ test('Undo normal allocation restores invoice and transaction balances',()=>{let s=match(addTx(addInvoice(emptyState())));const id=s.allocations[0].id;s=applyCommand(s,{type:'match.undo',id,note:'Fel referens'}).state;assert.equal(balance(s,s.invoices[0]),187500);assert.equal(available(s,s.transactions[0]),187500);assert.equal(s.allocations[0].active,false);assert.ok(s.allocations[0].reversedAt);});
+ test('Parsed CSV preserves quoted separators and bank refs stay distinct',()=>{const p=imp.parseCSV('Rapport Swedbank\nDatum;Belopp;Betalare;Referens;OCR;Valuta\n2026-10-26;"1 875,00";"Andersson; AB";SWED1;001019;SEK');const m=imp.guessMapping(p.headers),r=imp.mapCSV(p,m,'test.csv')[0];assert.equal(r.amount,187500);assert.equal(r.party,'Andersson; AB');assert.equal(r.bankReference,'SWED1');assert.equal(r.payerReference,'001019');assert.equal(r.verified,false);});
+@@ -111,3 +111,35 @@ test('Duplicate quarantine respects direction, account and distinct stable provi
+  separate=addTx(separate,bankApi({account:'iban:SE1412000000000012345678',externalId:'',bankReference:''}));
+  assert.equal(separate.transactions[1].duplicateOf,'');
+ });
++
++test('API Bankgiro totals need a complete specification and cannot be verified with a note',()=>{
++ let s=addTx(addInvoice(emptyState()),bankApi({externalId:'enable-banking:batch',description:'Bankgiro inbetalning',party:'',payerReference:''}));
++ const parent=s.transactions[0];assert.equal(parent.kind,'batch');assert.equal(parent.verified,false);assert.deepEqual(suggestions(s,parent),[]);
++ assert.throws(()=>applyCommand(s,{type:'transaction.verify',id:parent.id,party:'Testkund',payerReference:'001019',note:'Beloppet är lika'}),/Betalardetaljer saknas – importera betalningsspecifikation/);
++ assert.throws(()=>match(s),/Granska/);assert.equal(balance(s,s.invoices[0]),187500);
++ // Older saved rows also need the source detail, even if previously marked verified.
++ s.transactions[0].kind='payment';s.transactions[0].verified=true;
++ assert.throws(()=>match(s),/betalningsspecifikation/);assert.deepEqual(suggestions(s,s.transactions[0]),[]);
++});
++test('Complete individual names, references and sum are required for a Bankgiro specification',()=>{
++ let s=addTx(addInvoice(emptyState()),bankApi({externalId:'enable-banking:batch',description:'Bankgiro samlingsinbetalning',party:'Bankgirot AB',payerReference:''}));const id=s.transactions[0].id;
++ for(const row of [{amount:187500,party:'Testkund'},{amount:187500,payerReference:'001019'},{amount:187500,party:'Bankgirot AB',payerReference:'001019'}])assert.throws(()=>applyCommand(s,{type:'transaction.split',id,rows:[row]}),/betalningsspecifikation/);
++ assert.throws(()=>applyCommand(s,{type:'transaction.split',id,rows:[{amount:187499,party:'Testkund',payerReference:'001019'}]}),/Summan/);
++ s=applyCommand(s,{type:'transaction.split',id,rows:[{amount:187500,party:'Testkund',payerReference:'001019'}]}).state;
++ assert.equal(s.transactions[0].kind,'batch');assert.equal(s.transactions[1].parentId,id);s=match(s,187500,{transactionId:s.transactions[1].id});assert.equal(balance(s,s.invoices[0]),0);
++});
++test('CSV Bankgiro totals are classified for specification rather than single-payment review',()=>{
++ const parsed=imp.parseCSV('Datum;Belopp;Betalare;OCR;Text\n2026-10-26;1875,00;Bankgirot AB;;Bankgiro inbetalning');
++ const [row]=imp.mapCSV(parsed,imp.guessMapping(parsed.headers),'bank.csv');assert.equal(row.kind,'batch');assert.match(row.description,/Betalardetaljer saknas – importera betalningsspecifikation/);
++ const complete=imp.parseCSV('Datum;Belopp;Betalare;OCR;Text\n2026-10-26;1875,00;Testkund;001019;Bankgiro inbetalning');assert.equal(imp.mapCSV(complete,imp.guessMapping(complete.headers),'bank.csv')[0].kind,'unknown');
++});
++test('Manual approval needs matching reference or matching named payer and amount',()=>{
++ let s=addTx(addInvoice(emptyState()),{payerReference:'',party:'Annan kund'});assert.deepEqual(suggestions(s,s.transactions[0]),[]);assert.throws(()=>match(s),/Beloppet ensamt/);
++ s=addTx(addInvoice(emptyState()),{payerReference:'',party:'Testkund'});assert.equal(suggestions(s,s.transactions[0])[0].strength,'weak');assert.equal(balance(match(s),s.invoices[0]),0);
++ const noIdentity=addTx(addInvoice(emptyState()),{kind:'unknown',verified:false,payerReference:'',party:'',description:'Banköverföring'});assert.throws(()=>applyCommand(noIdentity,{type:'transaction.verify',id:noIdentity.transactions[0].id,note:'Bara lika belopp'}),/saknas/);
++ const exact=addTx(addInvoice(emptyState()),{party:'',payerReference:'001019',amount:75000});assert.equal(suggestions(exact,exact.transactions[0])[0].strength,'strong');assert.equal(balance(match(exact,75000),exact.invoices[0]),112500);
++});
++test('Incoming customer and outgoing supplier evidence cannot cross directions',()=>{
++ let incoming=addTx(addInvoice(emptyState()),{payerReference:'001019',amount:187500});incoming=addInvoice(incoming,{direction:'payable',number:'SUP-1',party:'Testkund',ocr:'001019'});assert.equal(suggestions(incoming,incoming.transactions[0]).length,1);assert.throws(()=>match(incoming,187500,{invoiceId:incoming.invoices[1].id}),/riktning/);
++ let outgoing=addTx(addInvoice(emptyState(),{direction:'payable'}),{amount:-187500,payerReference:'001019'});outgoing=addInvoice(outgoing,{number:'CUST-2',party:'Testkund',ocr:'001019'});assert.equal(suggestions(outgoing,outgoing.transactions[0]).length,1);assert.throws(()=>match(outgoing,187500,{invoiceId:outgoing.invoices[1].id}),/riktning/);assert.equal(balance(match(outgoing),outgoing.invoices[0]),0);
++});

@@ -1,6 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtempSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {openDatabase,allocate,listInvoices,storeTransactions,listTransactions,matchingSuggestions,deleteAllocation,getSettings,saveSettings,listImports,storeDocument,listDocuments} from '../src/db.js';
+import {normalizeBankApiTransaction,parseCAMT} from '../src/importers.js';
 process.env.MG_ADMIN_PASSWORD='TEST-DO-NOT-USE-THIS-AS-A-REAL-PASSWORD';
 const fixture=()=>{
   const folder=mkdtempSync(join(tmpdir(),'mgeorge-'));const db=openDatabase(join(folder,'db.sqlite'));
@@ -95,5 +96,104 @@ test('attaching an existing pending original links it once and refuses another i
     assert.equal(storeDocument(db,{...payload,invoice_id:'i1'}).invoice_id,'i1');
     assert.throws(()=>storeDocument(db,{...payload,invoice_id:'i2'}),e=>e.status===409);
     assert.equal(db.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE action='document_attached'").get().n,1);
+  }finally{cleanup();}
+});
+
+test('renewed consent and unstable provider lookup IDs do not duplicate a booked payment',()=>{
+  const {db,cleanup}=fixture();try{
+    const raw={status:'BOOK',transaction_amount:{amount:'100.00',currency:'SEK'},credit_debit_indicator:'CRDT',booking_date:'2026-10-26',debtor:{name:'Kund AB'},reference_number:'0606',entry_reference:'ARCHIVE-1',transaction_id:'SESSION1-LOOKUP',creditor_account:{other:{scheme_name:'BGNR',identification:'1234-5678'}}};
+    const first=normalizeBankApiTransaction(raw,'Swedbank:identification-hash');
+    const renewed=normalizeBankApiTransaction({...raw,transaction_id:'SESSION2-LOOKUP'},'Swedbank:identification-hash');
+    assert.equal(storeTransactions(db,[first],'enablebanking').imported,1);assert.equal(storeTransactions(db,[renewed],'enablebanking').duplicate,1);
+    const [stored]=listTransactions(db);assert.equal(stored.bank_reference,'ARCHIVE-1');assert.equal(stored.reference,'0606');assert.equal(stored.bankgiro,'1234-5678');assert.equal(stored.provider_transaction_id,'SESSION1-LOOKUP');
+    assert.equal(storeTransactions(db,[{...renewed,account:'Swedbank:other-account'}],'enablebanking').imported,1);
+  }finally{cleanup();}
+});
+test('missing stable ID uses content and ignores changing provider detail lookup IDs',()=>{
+  const {db,cleanup}=fixture();try{
+    const raw={status:'BOOK',transaction_amount:{amount:'100.00',currency:'SEK'},credit_debit_indicator:'CRDT',booking_date:'2026-10-26',debtor:{name:'Kund AB'},reference_number:'0606',transaction_id:'LOOKUP-A'};
+    assert.equal(storeTransactions(db,[normalizeBankApiTransaction(raw,'MG')],'enablebanking').imported,1);
+    assert.equal(storeTransactions(db,[normalizeBankApiTransaction({...raw,transaction_id:'LOOKUP-B'},'MG')],'enablebanking').duplicate,1);
+  }finally{cleanup();}
+});
+test('successive partial payments reach paid only after explicit reviewed allocations',()=>{
+  const {db,cleanup}=fixture();try{
+    db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('i','customer','0606','Kund AB',10000);
+    const base={account:'MG',booked_at:'2026-10-26',currency:'SEK',payer:'Kund AB',reference:'0606'};
+    storeTransactions(db,[{...base,bank_reference:'PART-1',amount_cents:4000},{...base,bank_reference:'PART-2',amount_cents:6000}],'test');
+    assert.equal(listInvoices(db)[0].status,'unreconciled');assert.equal(matchingSuggestions(db).length,2);
+    const tx=listTransactions(db);allocate(db,'i',tx.find(t=>t.bank_reference==='PART-1').id,4000);assert.equal(listInvoices(db)[0].status,'partial');
+    allocate(db,'i',tx.find(t=>t.bank_reference==='PART-2').id,6000);assert.equal(listInvoices(db)[0].status,'paid');assert.equal(listInvoices(db)[0].remaining_cents,0);
+    assert.equal(db.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE action='manual_match'").get().n,2);
+  }finally{cleanup();}
+});
+test('wrong direction, substring references and payments before invoice date never become suggestions',()=>{
+  const {db,cleanup}=fixture();try{
+    db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,issued_at) VALUES(?,?,?,?,?,?)').run('i','customer','0606','Rätt Kund AB',10000,'2026-10-20');
+    const base={account:'MG',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Annan Kund',reference:'0606'};
+    storeTransactions(db,[{...base,bank_reference:'WRONG-DIRECTION',amount_cents:-10000},{...base,bank_reference:'SUBSTRING',reference:'106066'},{...base,bank_reference:'TOO-EARLY',booked_at:'2026-10-19'}],'test');
+    assert.deepEqual(matchingSuggestions(db),[]);assert.equal(listInvoices(db)[0].paid_cents,0);
+  }finally{cleanup();}
+});
+test('a conflicting bank identifier aborts the whole import and retains existing balances',()=>{
+  const {db,cleanup}=fixture();try{
+    const base={account:'MG',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Kund',reference:'0606',bank_reference:'ARCHIVE-1'};
+    storeTransactions(db,[base],'test');
+    assert.throws(()=>storeTransactions(db,[{...base,bank_reference:'NEW'},{...base,amount_cents:20000}],'test'),e=>e.code==='conflicting_bank_record');
+    assert.equal(listTransactions(db).length,1);assert.equal(listImports(db).length,1);
+  }finally{cleanup();}
+});
+
+const singleSpecification=(extra={})=>{
+  const values={amount:'100.00',date:'2026-10-26',reference:'0606',payer:'Kund AB',bankReference:'BG-ARCHIVE-1',...extra};
+  const xml=`<Document><BkToCstmrDbtCdtNtfct><Ntfct><Ntry><Amt Ccy="SEK">${values.amount}</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts><Cd>BOOK</Cd></Sts><BookgDt><Dt>${values.date}</Dt></BookgDt><AcctSvcrRef>${values.bankReference}</AcctSvcrRef><AddtlNtryInf>Bankgiro inbetalning</AddtlNtryInf><NtryDtls><TxDtls><AmtDtls><TxAmt><Amt Ccy="SEK">${values.amount}</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>${values.payer}</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>${values.reference}</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfct></BkToCstmrDbtCdtNtfct></Document>`;
+  return {items:parseCAMT(xml,'MG'),original:{content:Buffer.from(xml),mime_type:'application/xml'}};
+};
+const aggregatePayment=()=>({account:'MG',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'',reference:'',bank_reference:'BG-ARCHIVE-1',description:'Bankgiro inbetalning',is_aggregate:true,review_reason:'Betalardetaljer saknas – importera betalningsspecifikation.'});
+test('one-payment camt.054 completes an API aggregate with the same stable identity exactly once',()=>{
+  const {db,cleanup}=fixture();try{
+    db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('i','customer','0606','Kund AB',10000);
+    storeTransactions(db,[aggregatePayment()],'enablebanking');const before=listTransactions(db)[0];assert.equal(before.is_aggregate,1);assert.equal(matchingSuggestions(db).length,0);
+    const spec=singleSpecification();assert.equal(spec.items[0].bank_reference,before.bank_reference);
+    const result=storeTransactions(db,spec.items,'file:betalningsspecifikation.xml',spec.original);
+    assert.equal(result.imported,0);assert.equal(result.duplicate,1);assert.equal(result.enriched,1);
+    const [completed]=listTransactions(db);assert.equal(listTransactions(db).length,1);assert.equal(completed.id,before.id);assert.equal(completed.is_aggregate,0);assert.equal(completed.payer,'Kund AB');assert.equal(completed.reference,'0606');assert.equal(completed.import_id,result.import_id);assert.equal(completed.source,'enablebanking');assert.equal(completed.allocated_cents,0);
+    assert.equal(matchingSuggestions(db)[0].invoice_id,'i');assert.equal(listInvoices(db)[0].paid_cents,0);
+    const event=JSON.parse(db.prepare("SELECT details FROM audit_events WHERE action='aggregate_replaced'").get().details);assert.equal(event.before.is_aggregate,1);assert.equal(event.after.is_aggregate,0);assert.equal(event.specification_import_id,result.import_id);assert.equal(event.before.import_id,before.import_id);
+    assert.equal(db.prepare('SELECT content FROM import_jobs WHERE id=?').get(result.import_id).content.length,spec.original.content.length);
+    assert.equal(storeTransactions(db,spec.items,'file:betalningsspecifikation.xml',spec.original).enriched,0);
+    assert.equal(storeTransactions(db,[aggregatePayment()],'enablebanking').duplicate,1);assert.equal(listTransactions(db)[0].is_aggregate,0);
+    allocate(db,'i',completed.id,10000);assert.equal(listInvoices(db)[0].status,'paid');assert.equal(listTransactions(db).length,1);
+  }finally{cleanup();}
+});
+test('incomplete and non-XML descriptions never unblock a duplicate aggregate',()=>{
+  const {db,cleanup}=fixture();try{
+    storeTransactions(db,[aggregatePayment()],'enablebanking');
+    for(const extra of [{reference:''},{payer:''},{payer:'Bankgirot AB'}]){const spec=singleSpecification(extra);assert.equal(storeTransactions(db,spec.items,'file:incomplete.xml',spec.original).enriched,0);assert.equal(listTransactions(db)[0].is_aggregate,1);}
+    const spec=singleSpecification();assert.equal(storeTransactions(db,spec.items,'file:not-a-specification.csv',{...spec.original,mime_type:'text/csv'}).enriched,0);assert.equal(storeTransactions(db,spec.items,'enablebanking').enriched,0);assert.equal(listTransactions(db)[0].is_aggregate,1);assert.equal(matchingSuggestions(db).length,0);
+    assert.equal(db.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE action='aggregate_replaced'").get().n,0);
+  }finally{cleanup();}
+});
+test('single-payment specification needs matching date, sum, currency and account identity',()=>{
+  const {db,cleanup}=fixture();try{
+    storeTransactions(db,[aggregatePayment()],'enablebanking');
+    for(const extra of [{date:'2026-10-25'},{amount:'99.00'}]){const spec=singleSpecification(extra);assert.throws(()=>storeTransactions(db,spec.items,'file:conflict.xml',spec.original),e=>e.code==='conflicting_bank_record');}
+    const spec=singleSpecification();assert.throws(()=>storeTransactions(db,[{...spec.items[0],currency:'EUR'}],'file:conflict.xml',spec.original),e=>e.code==='conflicting_bank_record');
+    assert.equal(storeTransactions(db,[{...spec.items[0],account:'OTHER-ACCOUNT'}],'file:other-account.xml',spec.original).enriched,0);assert.equal(listTransactions(db).find(t=>t.account==='MG').is_aggregate,1);
+    assert.equal(db.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE action='aggregate_replaced'").get().n,0);
+  }finally{cleanup();}
+});
+test('single-payment completion preserves exclusions and refuses legacy allocations or existing children',()=>{
+  const {db,cleanup}=fixture();try{
+    db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('i','customer','0606','Kund AB',10000);
+    storeTransactions(db,[aggregatePayment()],'enablebanking');const parent=listTransactions(db)[0],spec=singleSpecification();
+    db.prepare("UPDATE bank_transactions SET excluded=1,exclusion_reason='Manuellt undantag' WHERE id=?").run(parent.id);
+    assert.equal(storeTransactions(db,spec.items,'file:spec.xml',spec.original).enriched,0);assert.equal(listTransactions(db)[0].excluded,1);assert.equal(listTransactions(db)[0].is_aggregate,1);
+    db.prepare('UPDATE bank_transactions SET excluded=0 WHERE id=?').run(parent.id);
+    db.prepare('INSERT INTO allocations(id,invoice_id,transaction_id,amount_cents) VALUES(?,?,?,?)').run('legacy','i',parent.id,1000);
+    assert.throws(()=>storeTransactions(db,spec.items,'file:spec.xml',spec.original),e=>e.code==='allocated_aggregate');assert.equal(listInvoices(db)[0].paid_cents,1000);assert.equal(listTransactions(db)[0].is_aggregate,1);
+    db.prepare("DELETE FROM allocations WHERE id='legacy'").run();
+    storeTransactions(db,[{...aggregatePayment(),bank_reference:'CHILD',parent_bank_reference:'BG-ARCHIVE-1',is_aggregate:false,amount_cents:1000,payer:'Kund AB',reference:'0606'}],'test');
+    assert.throws(()=>storeTransactions(db,spec.items,'file:spec.xml',spec.original),e=>e.code==='conflicting_payment_specification');assert.equal(listTransactions(db).find(t=>t.id===parent.id).is_aggregate,1);
   }finally{cleanup();}
 });

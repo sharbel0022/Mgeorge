@@ -19,7 +19,7 @@ npm start
 
 `npm start` läser `.env` och kör `src/server.js`. `npm run dev` använder samma konfiguration och startar om servern vid kodändringar. Du kan också skapa `.env` manuellt från `.env.example` och starta med `node --env-file=.env src/server.js`.
 
-Servern lyssnar endast på `127.0.0.1` och används lokalt utan appinloggning. En webbläsarsession skapas automatiskt för att skydda returflöden från Google och banken. Befintliga fakturor och underlag behålls. Bevara `BANK_DATA_KEY`: utan den kan befintliga bank- och Gmail-anslutningar inte dekrypteras.
+Servern lyssnar endast på `127.0.0.1`. Lokalt används den utan appinloggning. En webbläsarsession skyddar returflöden från Google och banken. För HTTPS-drift bakom en betrodd reverse proxy krävs `MG_ADMIN_PASSWORD` med minst 16 tecken; alla företags-API:er kräver då administratörsinloggning. Proxy ska bevara den konfigurerade domänens Host, terminera HTTPS och skydda den lokala anslutningen. Befintliga fakturor och underlag behålls. Bevara `BANK_DATA_KEY`: utan den kan befintliga bank- och Gmail-anslutningar inte dekrypteras.
 
 ## Funktioner i denna version
 
@@ -37,7 +37,9 @@ Servern lyssnar endast på `127.0.0.1` och används lokalt utan appinloggning. E
 
 ## Anslut bank och Gmail
 
-**Swedbank:** Ange `ENABLEBANKING_APP_ID` och `ENABLEBANKING_PRIVATE_KEY_FILE` i serverns miljö. PEM-nyckeln ska ligga utanför Git-katalogen. Registrera exakt `APP_ORIGIN` följt av `/api/bank/callback` hos Enable Banking. Öppna **Bank → Koppla banken**, godkänn läsning hos banken och välj konto. Riktiga företagskonton kräver leverantörens produktionsåtkomst, tillämpliga avtal och ett verkligt bankmedgivande. BankID ersätter inte denna tekniska aktivering. Anslutningen utför inga betalningar.
+**Swedbank:** En tidigare delad PEM betraktas som komprometterad och får inte användas. Återkalla den hos Enable Banking och registrera ett nytt certifikat först. Ange `ENABLE_BANKING_APPLICATION_ID`, `ENABLE_BANKING_ENVIRONMENT=SANDBOX` eller `PRODUCTION` och exakt en serverkälla för nyckeln: `ENABLE_BANKING_PRIVATE_KEY_FILE` utanför repositoryt eller `ENABLE_BANKING_PRIVATE_KEY` i skyddad miljö. Produktion kräver dessutom HTTPS och `ENABLE_BANKING_KEY_ROTATED=true`, vilket administratören endast får sätta efter genomförd rotation. Flaggan ersätter inte återkallningen hos leverantören.
+
+Registrera exakt `APP_ORIGIN` följt av `/api/bank/callback`. Backend kontrollerar den verkliga applikationens miljö, aktivering, AIS, Sverige och returadress innan bankflödet startas. Öppna **Bank → Koppla banken**, godkänn hos Swedbank och välj företagets SEK-konto. Medgivandet lagras krypterat; kontovalet startar hämtning av de senaste 30 kalenderdagarna. Hämtningen kan misslyckas separat utan att en lyckad import påstås. Du kan förnya, uppdatera och koppla från banken i samma vy. Riktiga konton kräver godkänd produktionsåtkomst, avtal och verkligt bankmedgivande. Se [bankguiden](docs/SWEDBANK.md) och [jämförelsen med Sites](docs/SWEDBANK-SITES-COMPARISON.md).
 
 **Gmail:** Aktivera Gmail API i företagets Google Cloud-projekt, skapa en OAuth-webbklient och registrera `APP_ORIGIN` följt av `/api/gmail/callback`. Ange `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` och `GMAIL_ACCOUNT=mg.vitvaror@gmail.com`. Starta om servern och välj **Import → Koppla Gmail**. Se [Gmail-guiden](docs/GMAIL.md) för hela flödet.
 
@@ -49,7 +51,7 @@ Schemalagd hämtning kräver att **Node-servern är igång**, att integrationern
 
 Bankimporten stöder SEK och högst 1 000 bokförda händelser per fil. Andra valutor stoppas så att belopp aldrig felaktigt etiketteras som kronor. CSV-format varierar mellan banker; kontrollera alltid förhandsgranskningen och verifiera ett verkligt, anonymiserat kontoutdrag före drift.
 
-En samlad Bankgiroinsättning utan fullständig betalningsspecifikation behålls **en gång** och kan inte matchas som om den gällde en enda faktura. Importera en camt.054-specifikation med betalarnas belopp och referenser. Om en komplett specifikation kan identifieras som samma samlingspost ersätts samlingsposten i avstämningen. Olika kontoalias eller saknade bankreferenser kan behöva manuell kontroll. Beloppslikhet ensam är inte betalningsbevis.
+En samlad Bankgiroinsättning utan fullständig betalningsspecifikation behålls **en gång** och kan inte matchas som om den gällde en enda faktura. Status är **Betalardetaljer saknas – importera betalningsspecifikation.** Importera en camt.054-specifikation med betalarnas belopp och referenser och välj det sparade maskerade bankkontot i importen. Om en komplett specifikation kan identifieras som samma samlingspost ersätts eller kompletteras den i avstämningen med revisionshistorik. Olika kontoalias eller saknade bankreferenser kräver manuell kontroll. Beloppslikhet ensam är inte betalningsbevis.
 
 ## Tester
 
@@ -62,9 +64,9 @@ Syntaxkontrollen omfattar server, integrationer, gränssnitt, startskript och te
 
 ## Data och drift
 
-Installationen är en **lokal arbetsyta för ett företag utan lösenordsinloggning**. Separata användarkonton, roller och isolering mellan flera företag ingår inte. Använd inte en gemensam databas för flera verksamheter.
+Installationen är en **arbetsyta för ett företag och en administratör**. Lokal åtkomst bygger på operativsystemets behörighet; HTTPS-drift kräver administratörslösenord och säkra sessionscookies. Separata användarkonton, roller och flera företag ingår inte. Använd inte en gemensam databas för flera verksamheter. Bankanslutningar har explicit ägare; oinloggade sessioner och andra huvudmän nekas företagsdata.
 
-OAuth-token och bankens anslutningsuppgifter krypteras med AES-256-GCM på servern. Fakturor, bankfiler och registerdata ligger i en privat SQLite-databas och är inte separat krypterade på disk av applikationen. Skydda lagringsplatsen. Denna version är avsedd för lokal åtkomst och ska inte exponeras via publik proxy utan separat åtkomstskydd. `.env`, privata nycklar, SQLite-filer, originalfakturor, kundregister och bankutdrag får aldrig läggas i det offentliga repositoryt.
+OAuth-token och bankens anslutningsuppgifter krypteras med AES-256-GCM på servern. Fakturor, bankfiler och registerdata ligger i en privat SQLite-databas och är inte separat krypterade på disk av applikationen. Skydda lagringsplatsen och ordna driftövervakning, HTTPS och backup före publik drift. `.env`, privata nycklar, SQLite-filer, originalfakturor, kundregister och bankutdrag får aldrig läggas i det offentliga repositoryt.
 
 JSON-exporten innehåller registerdata och dokumentmetadata; den är **inte en fullständig säkerhetskopia** av originalfiler eller anslutningshemligheter. För en enkel konsekvent backup: stoppa servern och säkerhetskopiera databasen samt `.env` och privata integrationsnycklar till en skyddad plats. Återställ och kontrollera kopian innan du förlitar dig på rutinen. Automatisk backup, retention och återställning måste ordnas i driftmiljön.
 

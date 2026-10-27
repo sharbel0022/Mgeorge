@@ -26,6 +26,11 @@ test('password-free local use preserves origin and OAuth browser-session protect
   const saved=cookie;cookie='mg_session=expired-browser';
   const renewed=await call('/api/me');assert.equal(renewed.res.status,200);assert.equal(renewed.json.login_required,false);assert.match(renewed.res.headers.get('set-cookie'),/mg_session=/);cookie=saved;
 });
+test('legacy local browser sessions acquire the administrator principal without losing their binding',async()=>{
+  db.prepare("UPDATE sessions SET principal=''").run();
+  const me=await call('/api/me');assert.equal(me.res.status,200);assert.equal(me.json.authenticated,true);assert.equal(me.res.headers.get('set-cookie'),null);
+  assert.ok(db.prepare("SELECT id_hash FROM sessions WHERE principal='local-admin'").get());
+});
 test('new invoice, payment and matching via API',async()=>{
   const inv=await call('/api/invoices','POST',{direction:'customer',invoice_number:'0604',party:'Kund AB',total_cents:187500,issued_at:'2026-10-20',due_at:'2026-11-02',reference:'0604'});
   assert.equal(inv.res.status,201);const invoiceId=inv.json.id;

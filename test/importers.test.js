@@ -14,8 +14,8 @@ test('camt.054 splits TxDtls and preserves credit direction',()=>{
 });
 test('XML containing a DOCTYPE is rejected',()=>assert.throws(()=>parseCAMT('<!DOCTYPE d [<!ENTITY x SYSTEM "file:///etc/passwd">]><Document></Document>')));
 test('normalizes Enable Banking transaction and direction',()=>{
-  const r=normalizeBankApiTransaction({transaction_amount:{amount:'35.50',currency:'SEK'},credit_debit_indicator:'DBIT',booking_date:'2026-10-24',creditor:{name:'Leverantör AB'},transaction_id:'ABC'},'SE123');
-  assert.equal(r.amount_cents,-3550);assert.equal(r.payer,'Leverantör AB');assert.equal(r.bank_reference,'ABC');
+  const r=normalizeBankApiTransaction({status:'BOOK',transaction_amount:{amount:'35.50',currency:'SEK'},credit_debit_indicator:'DBIT',booking_date:'2026-10-24',creditor:{name:'Leverantör AB'},transaction_id:'DETAIL-ABC',entry_reference:'ARCHIVE-ABC'},'SE123');
+  assert.equal(r.amount_cents,-3550);assert.equal(r.payer,'Leverantör AB');assert.equal(r.bank_reference,'ARCHIVE-ABC');assert.equal(r.provider_transaction_id,'DETAIL-ABC');
 });
 
 const camt=(details,{amount='300.00',currency='SEK',status='BOOK',extra='',prefix=''}={})=>{
@@ -58,7 +58,7 @@ test('shared child service reference never reuses a parent ID',()=>{
 test('foreign currency XML, CSV and API records are rejected instead of relabeled SEK',()=>{
   assert.throws(()=>parseCAMT(camt(detail('300.00','101'),{currency:'EUR'})),/Valutan EUR/);
   assert.throws(()=>parseCSV('Datum;Belopp;Valuta\n2026-10-26;300;EUR'),/Valutan EUR/);
-  assert.throws(()=>normalizeBankApiTransaction({credit_debit_indicator:'CRDT',booking_date:'2026-10-26',transaction_amount:{amount:'300',currency:'EUR'}},'MG'),/Valutan EUR/);
+  assert.throws(()=>normalizeBankApiTransaction({status:'BOOK',credit_debit_indicator:'CRDT',booking_date:'2026-10-26',transaction_amount:{amount:'300',currency:'EUR'}},'MG'),/Valutan EUR/);
 });
 test('CSV credit zero does not hide a real debit and mixed nonzero sides need review',()=>{
   const [row]=parseCSV('Datum;Debet;Kredit;Text\n2026-10-26;125,50;0,00;Uttag');assert.equal(row.amount_cents,-12550);
@@ -67,7 +67,7 @@ test('CSV credit zero does not hide a real debit and mixed nonzero sides need re
 test('invalid calendar dates are rejected by each import path',()=>{
   assert.throws(()=>parseCSV('Datum;Belopp\n2026-02-31;100'),/Ogiltigt datum/);
   assert.throws(()=>parseCAMT(camt(detail('300.00','101')).replace('2026-10-26','2026-02-31')),/Ogiltigt datum/);
-  assert.throws(()=>normalizeBankApiTransaction({credit_debit_indicator:'DBIT',booking_date:'2026-02-31',transaction_amount:{amount:'1',currency:'SEK'}},'MG'),/Ogiltigt datum/);
+  assert.throws(()=>normalizeBankApiTransaction({status:'BOOK',credit_debit_indicator:'DBIT',booking_date:'2026-02-31',transaction_amount:{amount:'1',currency:'SEK'}},'MG'),/Ogiltigt datum/);
 });
 test('missing data rows fail import instead of silently losing money',()=>{
   assert.throws(()=>parseCSV('Datum;Belopp\n2026-10-26;100\n;200'),/CSV-rad 3/);
@@ -82,4 +82,36 @@ test('CSV collective Bankgiro deposit requires a specification',()=>{
 test('file encoding rejects invalid base64 and oversized numeric values',()=>{
   assert.throws(()=>parseBankFile('bank.csv','invalid$='),/felaktig/);
   assert.throws(()=>parseMoney(Number.MAX_SAFE_INTEGER),/stort belopp/);
+});
+
+const apiTransaction=(extra={})=>({status:'BOOK',entry_reference:'ARCHIVE-1',transaction_id:'LOOKUP-1',booking_date:'2026-10-26',credit_debit_indicator:'CRDT',transaction_amount:{amount:'125.00',currency:'SEK'},debtor:{name:'Kund AB'},reference_number:'0001234',...extra});
+test('only explicitly booked API transactions are normalized',()=>{
+  for(const status of [undefined,'PDNG','CNCL','HOLD','OTHR','RJCT','SCHD'])assert.equal(normalizeBankApiTransaction(apiTransaction({status}),'MG'),null);
+  assert.equal(normalizeBankApiTransaction(null,'MG'),null);
+});
+test('stable entry reference has priority and transient detail IDs never become deduplication IDs',()=>{
+  const first=normalizeBankApiTransaction(apiTransaction(),'stable-account-hash');
+  const renewed=normalizeBankApiTransaction(apiTransaction({transaction_id:'DIFFERENT-LOOKUP-ID'}),'stable-account-hash');
+  assert.equal(first.bank_reference,renewed.bank_reference);assert.notEqual(first.provider_transaction_id,renewed.provider_transaction_id);
+  const without=normalizeBankApiTransaction(apiTransaction({entry_reference:undefined}),'MG');assert.equal(without.bank_reference,'');
+  assert.equal(normalizeBankApiTransaction(apiTransaction({entry_reference:'NOTPROVIDED'}),'MG').bank_reference,'');
+});
+test('bank reference, company Bankgiro, OCR and payer remain distinct',()=>{
+  const r=normalizeBankApiTransaction(apiTransaction({creditor_account:{other:{scheme_name:'BGNR',identification:'1234-5678'}},bank_transaction_code:{description:'Bankgiro inbetalning'},remittance_information:['Faktura 0001234'],note:'Verifierat underlag'}),'MG');
+  assert.equal(r.bankgiro,'1234-5678');assert.equal(r.reference,'0001234');assert.equal(r.bank_reference,'ARCHIVE-1');assert.equal(r.payer,'Kund AB');assert.ok(!r.is_aggregate);
+  assert.match(r.description,/Bankgiro inbetalning/);assert.match(r.description,/Faktura 0001234/);
+  const csv=parseCSV('Datum;Belopp;Bankgiro;OCR;Bankreferens;Betalare\n2026-10-26;125;1234-5678;0001234;ARCHIVE-1;Kund AB')[0];assert.equal(csv.bankgiro,'1234-5678');assert.equal(csv.reference,'0001234');
+});
+test('Bankgiro metadata cannot disguise a collective deposit as an individual payer',()=>{
+  const collective=normalizeBankApiTransaction(apiTransaction({debtor:{name:'Bankgirot AB'},reference_number:undefined,bank_transaction_code:{description:'Bankgiro inbetalning'},remittance_information:['Insättning 1234-5678']}),'MG');
+  assert.equal(collective.is_aggregate,true);assert.equal(collective.review_reason,'Betalardetaljer saknas – importera betalningsspecifikation.');
+  const batch=normalizeBankApiTransaction(apiTransaction({bank_transaction_code:{description:'Samlad bankgiroinsättning'}}),'MG');assert.equal(batch.is_aggregate,true);
+});
+test('API missing currency and invalid payment direction fail instead of being inferred',()=>{
+  assert.throws(()=>normalizeBankApiTransaction(apiTransaction({transaction_amount:{amount:'125'}}),'MG'),/utan valuta/);
+  assert.throws(()=>normalizeBankApiTransaction(apiTransaction({credit_debit_indicator:'OTHER'}),'MG'),/betalningsriktning/);
+});
+test('API purchase date is never substituted for a missing accounting date',()=>{
+  const fallback=normalizeBankApiTransaction(apiTransaction({booking_date:undefined,transaction_date:'2026-10-20',value_date:'2026-10-26'}),'MG');assert.equal(fallback.booked_at,'2026-10-26');
+  assert.throws(()=>normalizeBankApiTransaction(apiTransaction({booking_date:undefined,transaction_date:'2026-10-20',value_date:undefined}),'MG'),/Ogiltigt datum/);
 });

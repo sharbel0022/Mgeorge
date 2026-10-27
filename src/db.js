@@ -81,7 +81,17 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','parent_bank_reference',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','review_reason',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','import_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_transactions','bankgiro',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','session_hash',"TEXT NOT NULL DEFAULT ''");
+  addColumn('sessions','principal',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_connections','owner',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_connections','selected_account_uid',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_connections','last_error',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_connections','retry_after','INTEGER NOT NULL DEFAULT 0');
+  addColumn('bank_states','owner',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','renew_connection_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','bank_name',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','page_token',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','sync_started_at',"TEXT NOT NULL DEFAULT ''");
   addColumn('import_jobs','content','BLOB');
@@ -141,21 +151,36 @@ export function invoiceStatus(db) {
   };
 }
 export function storeTransactions(db,items,source,original=null) {
-  const insert=db.prepare(`INSERT OR IGNORE INTO bank_transactions(id,fingerprint,account,booked_at,amount_cents,currency,payer,reference,bank_reference,description,source,needs_review,is_aggregate,parent_bank_reference,review_reason) VALUES(?,?,?,?,?,?,?,?,?,?,?,1,?,?,?)`);
-  let imported=0,duplicate=0,import_id;const inserted=[];
+  const insert=db.prepare(`INSERT OR IGNORE INTO bank_transactions(id,fingerprint,account,booked_at,amount_cents,currency,payer,reference,bank_reference,description,source,needs_review,is_aggregate,parent_bank_reference,review_reason,bankgiro,provider_transaction_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,?)`);
+  let imported=0,duplicate=0,enriched=0,import_id;const inserted=[],completedSpecifications=[];
   db.exec('BEGIN IMMEDIATE');
   try {
     for(const x of items){
       // A bank's stable transaction ID survives enriched payer/text fields on later syncs.
       const bankId=String(x.bank_reference||'').trim();
-      const f=digest((bankId&&!/^(NOTPROVIDED|NONREF)$/i.test(bankId)?[x.account,bankId,Math.sign(x.amount_cents)]:[x.account,x.booked_at,x.amount_cents,x.currency,x.reference,x.payer,x.description]).join('\u001f'));
+      const stableId=bankId&&!/^(NOTPROVIDED|NONREF|N\/A)$/i.test(bankId);
+      const f=digest((stableId?[x.account,bankId,Math.sign(x.amount_cents)]:[x.account,x.booked_at,x.amount_cents,x.currency,x.reference,x.payer,x.description]).join('\u001f'));
       // Also catches records created with the old fingerprint algorithm before migration.
-      const existing=bankId&&!/^(NOTPROVIDED|NONREF)$/i.test(bankId)&&db.prepare('SELECT id,amount_cents,currency FROM bank_transactions WHERE account=? AND bank_reference=? AND (amount_cents>0)=?').get(x.account,bankId,x.amount_cents>0?1:0);
+      const existing=stableId&&db.prepare('SELECT * FROM bank_transactions WHERE account=? AND bank_reference=? AND (amount_cents>0)=?').get(x.account,bankId,x.amount_cents>0?1:0);
       if(existing){
         if(existing.amount_cents!==x.amount_cents||existing.currency!==x.currency)throw Object.assign(new Error('Samma bankreferens har motstridiga belopp eller valutor. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
+        // A camt.054/053 can contain exactly one individual payment with the
+        // same archive reference as a previously incomplete API collection.
+        // Complete it in place: retain its identity and history, count the sum
+        // once and keep later API refreshes/reimports as duplicates. Only a
+        // retained XML original with individual payer AND reference may do so.
+        const individualSpecification=source.startsWith('file:')&&/\.xml$/i.test(source)&&original?.mime_type==='application/xml'&&original?.content?.length&&!x.is_aggregate&&String(x.payer||'').trim()&&String(x.reference||'').trim()&&!/^(bankgiro(?:t)?(?:\s+ab)?|swedbank(?:\s+ab)?|bg)$/i.test(String(x.payer).trim());
+        if(existing.is_aggregate&&!existing.excluded&&individualSpecification){
+          if(existing.booked_at!==x.booked_at)throw Object.assign(new Error('Betalningsspecifikationens datum skiljer sig från bankposten med samma referens. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
+          if(db.prepare('SELECT id FROM allocations WHERE transaction_id=? LIMIT 1').get(existing.id))throw Object.assign(new Error('Samlingsposten har en tidigare matchning. Granska och återta den innan betalningsspecifikationen importeras.'),{status:409,code:'allocated_aggregate'});
+          if(db.prepare('SELECT id FROM bank_transactions WHERE account=? AND parent_bank_reference=? AND excluded=0 AND id<>? LIMIT 1').get(existing.account,bankId,existing.id))throw Object.assign(new Error('Samlingsposten har redan delbetalningar från en annan specifikation. Granska underlagen innan en specifikation med en enda betalning importeras.'),{status:409,code:'conflicting_payment_specification'});
+          db.prepare("UPDATE bank_transactions SET payer=?,reference=?,description=?,is_aggregate=0,parent_bank_reference=?,review_reason='',needs_review=1,bankgiro=? WHERE id=?")
+            .run(x.payer,x.reference,x.description||existing.description,x.parent_bank_reference||'',x.bankgiro||existing.bankgiro,existing.id);
+          completedSpecifications.push({id:existing.id,before:existing});enriched++;
+        }
         duplicate++;continue;
       }
-      const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'');
+      const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'');
       if(r.changes){imported++;inserted.push(id);}else duplicate++;
     }
     // A complete specification replaces its collective parent; never match the parent itself.
@@ -166,12 +191,16 @@ export function storeTransactions(db,items,source,original=null) {
         audit(db,'aggregate_replaced',{transaction_id:parent.id,children:children.count});
       }
     }
-    audit(db,'bank_import',{source,imported,duplicate});
-    import_id=recordImport(db,{source:source==='manual'?'manual':source.startsWith('file:')?'bank_file':source,name:source.startsWith('file:')?source.slice(5):'',found:items.length,imported,duplicate,review:imported,content:original?.content||null,mime_type:original?.mime_type||''});
+    audit(db,'bank_import',{source,imported,duplicate,enriched});
+    import_id=recordImport(db,{source:source==='manual'?'manual':source.startsWith('file:')?'bank_file':source,name:source.startsWith('file:')?source.slice(5):'',found:items.length,imported,duplicate,review:imported+enriched,content:original?.content||null,mime_type:original?.mime_type||''});
     for(const id of inserted)db.prepare('UPDATE bank_transactions SET import_id=? WHERE id=?').run(import_id,id);
+    for(const completed of completedSpecifications){
+      db.prepare('UPDATE bank_transactions SET import_id=? WHERE id=?').run(import_id,completed.id);
+      audit(db,'aggregate_replaced',{transaction_id:completed.id,children:1,specification_import_id:import_id,before:completed.before,after:db.prepare('SELECT * FROM bank_transactions WHERE id=?').get(completed.id)});
+    }
     db.exec('COMMIT');
   } catch(e) {db.exec('ROLLBACK');throw e;}
-  return {imported,duplicate,import_id};
+  return {imported,duplicate,enriched,import_id};
 }
 export function allocate(db,invoiceId,transactionId,amountCents) {
   if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');

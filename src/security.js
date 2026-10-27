@@ -16,7 +16,8 @@ export function verifyPassword(password, stored) {
   return secureEqual(scryptSync(password,salt,64).toString('hex'),hash);
 }
 export function cipherKey() {
-  const key=process.env.BANK_DATA_KEY;
+  if(process.env.BANK_DATA_KEY&&process.env.ENCRYPTION_KEY&&process.env.BANK_DATA_KEY!==process.env.ENCRYPTION_KEY)throw new Error('Motstridiga krypteringsnycklar');
+  const key=process.env.ENCRYPTION_KEY||process.env.BANK_DATA_KEY;
   if(!/^[a-f0-9]{64}$/i.test(key??'')) throw new Error('BANK_DATA_KEY must be 64 hex characters');
   return Buffer.from(key,'hex');
 }
