@@ -5,7 +5,7 @@ const apiBase='https://gmail.googleapis.com/gmail/v1/users/me';
 const maxFileBytes=15_000_000;
 const maxBatchBytes=50_000_000;
 const maxAttachmentAttempts=150;
-const defaultQuery='has:attachment {in:inbox in:sent} {faktura invoice kreditfaktura creditnote} -in:spam -in:trash';
+const defaultQuery='has:attachment -in:spam -in:trash -in:drafts';
 
 function fail(message,code='gmail_error',status=409){return Object.assign(new Error(message),{code,status});}
 export function gmailAccount(){return (process.env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();}
@@ -62,7 +62,12 @@ export async function refreshGmailTokens(tokens){
 async function apiRequest(path,tokens){
   if(typeof tokens?.access_token!=='string'||!tokens.access_token)throw fail('Gmail-anslutningen behöver förnyas.','renewal_required');
   if(!path.startsWith('/')||path.startsWith('//')||/[\r\n]/.test(path))throw fail('Ogiltig Gmail-sökväg.','invalid_path',400);
-  return requestJson(apiBase+path,{headers:{Authorization:`Bearer ${tokens.access_token}`,Accept:'application/json'}});
+  const request=()=>requestJson(apiBase+path,{headers:{Authorization:`Bearer ${tokens.access_token}`,Accept:'application/json'}});
+  try{return await request();}catch(e){
+    if(e.code!=='renewal_required'||!tokens.refresh_token)throw e;
+    Object.assign(tokens,await refreshGmailTokens(tokens));
+    return request();
+  }
 }
 export async function gmailProfile(tokens){
   const profile=await apiRequest('/profile',tokens);
@@ -109,6 +114,7 @@ function attachmentMime(part){
 }
 // This collects potential originals for human review, never records a debt or a payment.
 // It deliberately does not claim OCR: scans and PDF fields must be reviewed in the UI.
+/** @param {any} tokens @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string}} options */
 export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken=''}={}){
   requireConfig();
   if(!Number.isInteger(maxMessages)||maxMessages<1||maxMessages>100)throw fail('Välj mellan 1 och 100 mejl per hämtning.','invalid_limit',400);
@@ -122,7 +128,8 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
     if(!Number.isFinite(afterTime)||new Date(afterTime).toISOString().slice(0,10)!==after)throw fail('Ogiltigt startdatum för Gmail.','invalid_date',400);
   }
   let current=tokens;
-  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60_000)current=await refreshGmailTokens(tokens);
+  const deadline=Date.now()+120000;
+  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60_000)Object.assign(current,await refreshGmailTokens(tokens));
   await gmailProfile(current);
   let search=query.trim()||defaultQuery;
   // Gmail date-only search boundaries use PST. UTC seconds plus overlap prevent gaps
@@ -135,12 +142,13 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
     if(cursor)params.set('pageToken',cursor);
     const listing=await apiRequest(`/messages?${params}`,current);
     for(const item of listing.messages||[]){
+      if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
       if(received>=maxMessages){truncated=true;break;}
       if(!item.id||seenMessages.has(item.id))continue;
       seenMessages.add(item.id);received++;
       const message=await apiRequest(`/messages/${encodeURIComponent(item.id)}?format=full`,current);
       const labels=message.labelIds||[];
-      if(labels.includes('SPAM')||labels.includes('TRASH')||(!labels.includes('SENT')&&!labels.includes('INBOX'))){skipped++;continue;}
+      if(labels.some(l=>['SPAM','TRASH','DRAFT'].includes(l))){skipped++;continue;}
       const headers=Object.fromEntries((message.payload?.headers||[]).map(h=>[h.name.toLowerCase(),mimeText(h.value)]));
       const subject=(headers.subject||'').slice(0,500);
       if(/påminnelse|payment\s+reminder|orderbekräftelse|order\s+confirmation|beställningsbekräftelse|betalningsbekräftelse|payment\s+confirmation|\breceipt\b|\bkvitto\b/i.test(subject)){skipped++;continue;}
@@ -150,9 +158,10 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
       const supported=parts.filter(p=>p.filename&&attachmentMime(p));
       let found=false;
       for(const part of supported){
+        if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
         const original_filename=mimeText(part.filename).slice(0,240);
         let name=original_filename.replace(/[\\/]/g,'_');
-        if(!/faktur|invoice|credit\s*note/i.test(`${subject} ${name}`)||/påminnelse|reminder|orderbekräftelse|confirmation/i.test(name)){continue;}
+        if(/påminnelse|reminder|orderbekräftelse|confirmation/i.test(name)){continue;}
         found=true;
         const source_id=`gmail:${gmailAccount()}:${item.id}:${part._part}`;
         if(known.has(source_id)){duplicate++;continue;}
@@ -177,7 +186,7 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
         totalBytes+=content.length;known.add(source_id);
         const receivedDate=new Date(Number(message.internalDate));
         const received_at=Number.isNaN(receivedDate.getTime())?'':receivedDate.toISOString();
-        documents.push({source_id,name,mime_type,content_base64:content.toString('base64'),direction,...contact,subject,received_at,needs_review:true,metadata:{message_id:item.id,part_id:part._part,original_filename,direction_confident:!(labels.includes('SENT')&&labels.includes('INBOX')),note:'Kontrollera originalet och fyll i fakturauppgifterna. Ingen betalningsstatus har antagits.'}});
+        documents.push({source_id,name,mime_type,content_base64:content.toString('base64'),direction,...contact,subject,received_at,needs_review:true,metadata:{message_id:item.id,attachment_id:part.body?.attachmentId||null,part_id:part._part,from:headers.from||'',to:headers.to||'',original_filename,forwarded:/^(?:fw|fwd|vb):/i.test(subject),direction_confident:!(labels.includes('SENT')&&labels.includes('INBOX'))&&!/^(?:fw|fwd|vb):/i.test(subject),note:'Kontrollera originalet och de tolkade uppgifterna. Ingen betalningsstatus har antagits.'}});
       }
       if(!found)skipped++;
       if(truncated)break;

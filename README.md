@@ -6,11 +6,12 @@ Det här är den fristående källkodsversionen i detta repository. Den tidigare
 
 ## Kom igång lokalt
 
-Kräver **Node.js 22.13 eller senare**, med inbyggda `node:sqlite`. Inga externa npm-paket eller byggsteg behövs.
+Kräver **Node.js 22.13 eller senare**, med inbyggda `node:sqlite`. Installera låsta beroenden med `npm ci`. Node-gränssnittet kräver inget byggsteg. PDF.js, Canvas och Tesseract används för lokal dokumenttolkning.
 
 ```bash
 git clone https://github.com/sharbel0022/Mgeorge.git
 cd Mgeorge
+npm ci
 npm run setup
 npm start
 ```
@@ -33,7 +34,7 @@ Servern lyssnar endast på `127.0.0.1`. Lokalt används den utan appinloggning. 
 - Uppladdning och bevarande av PDF, PNG, JPEG och WebP, högst 15 MB per fil. Original hämtas direkt från den lokala arbetsytan.
 - Läsanslutning till Swedbank via Enable Banking och Gmail via Google OAuth, efter extern aktivering och godkända medgivanden.
 - Företagsinställningar, anslutningshantering, granskningshistorik och JSON-export av registerdata.
-- Valbar återkommande hämtning var 15, 30 eller 60 minut, var fjärde timme eller dagligen. Standard är manuell hämtning.
+- Valbar återkommande hämtning var 15, 30 eller 60 minut, var fjärde timme eller dagligen. Bankhämtning är manuell från början. Gmail har separat intervall på 15 minuter efter anslutning, vilket kan ändras eller stängas av i Inställningar.
 
 ## Anslut bank och Gmail
 
@@ -43,7 +44,7 @@ Registrera exakt `APP_ORIGIN` följt av `/api/bank/callback`. Backend kontroller
 
 **Gmail:** Aktivera Gmail API i företagets Google Cloud-projekt, skapa en OAuth-webbklient och registrera `APP_ORIGIN` följt av `/api/gmail/callback`. Ange `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` och `GMAIL_ACCOUNT=mg.vitvaror@gmail.com`. Starta om servern och välj **Import → Koppla Gmail**. Se [Gmail-guiden](docs/GMAIL.md) för hela flödet.
 
-Gmail-hämtningen bevarar möjliga fakturabilagor från inkorgen och skickade mejl som underlag för granskning. Den skapar inte en verifierad skuld utifrån ett mejls ämnesrad. Kontrollera originalet och registrera fakturauppgifterna. **Automatisk OCR och fullständig PDF-fälttolkning ingår ännu inte.**
+Gmail hämtar PDF- och bildbilagor från mottagna, arkiverade och skickade mejl. Dokumenten tolkas med PDF.js och lokal svensk OCR vid behov. Original, fältvärden, källbelägg och säkerhetsnivå bevaras. Granska originalet bredvid uppgifterna och godkänn eller avvisa. Okända motparter och OCR-resultat kräver granskning. Valbar automatisk registrering gäller endast gröna textfakturor från redan kända motparter; inga betalningar godkänns automatiskt. Se [tolkning och granskning](docs/INVOICE-EXTRACTION.md).
 
 Schemalagd hämtning kräver att **Node-servern är igång**, att integrationerna är konfigurerade och att medgivandena gäller. Jobb körs på servern utan att webbläsaren behöver vara öppen. Avstämningar och utskick av betalningspåminnelser godkänns inte automatiskt. Riktiga Google- och bankflöden behöver verifieras med företagets behöriga konton; automatiska tester använder kontrollerade API-svar.
 

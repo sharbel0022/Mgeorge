@@ -75,6 +75,12 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('invoices','bankgiro',"TEXT NOT NULL DEFAULT ''");
   addColumn('invoices','vat_cents','INTEGER');
   addColumn('invoices','kind',"TEXT NOT NULL DEFAULT 'invoice'");
+  addColumn('invoices','organization_number',"TEXT NOT NULL DEFAULT ''");
+  addColumn('invoices','net_cents','INTEGER');
+  addColumn('documents','extraction',"TEXT NOT NULL DEFAULT '{}'");
+  db.exec(`CREATE INDEX IF NOT EXISTS documents_fingerprint ON documents(fingerprint);
+    CREATE TABLE IF NOT EXISTS document_sources(source_id TEXT PRIMARY KEY,document_id TEXT NOT NULL REFERENCES documents(id),metadata TEXT NOT NULL DEFAULT '{}',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+    INSERT OR IGNORE INTO document_sources(source_id,document_id,metadata) SELECT source_id,id,metadata FROM documents WHERE source_id IS NOT NULL;`);
   addColumn('bank_transactions','excluded','INTEGER NOT NULL DEFAULT 0');
   addColumn('bank_transactions','exclusion_reason',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','is_aggregate','INTEGER NOT NULL DEFAULT 0');
@@ -241,19 +247,20 @@ export function deleteAllocation(db,id){
     audit(db,'undo_match',{...allocation});db.exec('COMMIT');return true;
   }catch(e){db.exec('ROLLBACK');throw e;}
 }
-export const defaultSettings={company_name:'M.George Vitvaror AB',organization_number:'',email:'mg.vitvaror@gmail.com',phone:'',address:'',bankgiro:'',notifications_due:true,notifications_review:true,reminders_enabled:false,sync_interval_minutes:0};
+export const defaultSettings={company_name:'M.George Vitvaror AB',organization_number:'',email:'mg.vitvaror@gmail.com',phone:'',address:'',bankgiro:'',notifications_due:true,notifications_review:true,reminders_enabled:false,sync_interval_minutes:0,gmail_sync_interval_minutes:15,auto_register_known:false};
 export function getSettings(db){return {...defaultSettings,...JSON.parse(db.prepare('SELECT data FROM app_settings WHERE id=1').get().data)};}
 export function saveSettings(db,settings){db.prepare('UPDATE app_settings SET data=? WHERE id=1').run(JSON.stringify(settings));audit(db,'settings_updated',{fields:Object.keys(settings)});return getSettings(db);}
 export function recordImport(db,{source,name='',found=0,imported=0,duplicate=0,review=0,status='completed',error='',content=null,mime_type=''}){
   const id=randomUUID();db.prepare('INSERT INTO import_jobs(id,source,name,found,imported,duplicate,review,status,error,content,mime_type) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(id,source,name,found,imported,duplicate,review,status,error,content,mime_type);return id;
 }
 export function listImports(db){return db.prepare('SELECT id,source,name,found,imported,duplicate,review,status,error,created_at,mime_type,(content IS NOT NULL) AS has_original FROM import_jobs ORDER BY created_at DESC,rowid DESC LIMIT 200').all();}
-export function documentMetadata(d){const {content,fingerprint,...metadata}=d;const details=typeof d.metadata==='string'?JSON.parse(d.metadata):d.metadata;return {...metadata,metadata:details,direction:details?.direction,party:details?.party,email:details?.email,subject:details?.subject,size_bytes:content?.length??d.size_bytes??0};}
-export function listDocuments(db){return db.prepare('SELECT id,invoice_id,name,mime_type,source,source_id,metadata,status,created_at,length(content) AS size_bytes FROM documents ORDER BY created_at DESC,rowid DESC').all().map(documentMetadata);}
+export function documentMetadata(d){const {content,fingerprint,...metadata}=d;const details=typeof d.metadata==='string'?JSON.parse(d.metadata):d.metadata;return {...metadata,content_hash:fingerprint,extraction:typeof d.extraction==='string'?JSON.parse(d.extraction):d.extraction,metadata:details,direction:details?.direction,party:details?.party,email:details?.email,subject:details?.subject,size_bytes:content?.length??d.size_bytes??0};}
+export function listDocuments(db){return db.prepare('SELECT id,invoice_id,name,mime_type,source,source_id,metadata,status,extraction,fingerprint,created_at,length(content) AS size_bytes FROM documents ORDER BY created_at DESC,rowid DESC').all().map(d=>({...documentMetadata(d),sources:db.prepare('SELECT source_id,metadata,created_at FROM document_sources WHERE document_id=?').all(d.id).map(s=>({...s,metadata:JSON.parse(s.metadata)}))}));}
 export function storeDocument(db,{name,mime_type,bytes,invoice_id=null,source='upload',source_id=null,metadata={}}){
   const fingerprint=digest(bytes);
-  const existing=source_id?db.prepare('SELECT * FROM documents WHERE source_id=?').get(source_id):db.prepare('SELECT * FROM documents WHERE fingerprint=?').get(fingerprint);
+  const existing=(source_id?db.prepare('SELECT d.* FROM documents d LEFT JOIN document_sources s ON s.document_id=d.id WHERE d.source_id=? OR s.source_id=? LIMIT 1').get(source_id,source_id):null)||db.prepare('SELECT * FROM documents WHERE fingerprint=?').get(fingerprint);
   if(existing){
+    if(source_id)db.prepare('INSERT OR IGNORE INTO document_sources(source_id,document_id,metadata) VALUES(?,?,?)').run(source_id,existing.id,JSON.stringify(metadata));
     if(invoice_id&&existing.invoice_id&&existing.invoice_id!==invoice_id)throw Object.assign(new Error('Originalunderlaget är redan kopplat till en annan faktura'),{status:409});
     if(invoice_id&&!existing.invoice_id){
       db.exec('SAVEPOINT attach_original');
@@ -264,5 +271,6 @@ export function storeDocument(db,{name,mime_type,bytes,invoice_id=null,source='u
     return {...documentMetadata(existing),duplicate:true};
   }
   const id=randomUUID();db.prepare('INSERT INTO documents(id,invoice_id,name,mime_type,content,fingerprint,source,source_id,metadata,status) VALUES(?,?,?,?,?,?,?,?,?,?)').run(id,invoice_id,name,mime_type,bytes,fingerprint,source,source_id,JSON.stringify(metadata),invoice_id?'registered':'needs_review');
+  if(source_id)db.prepare('INSERT INTO document_sources(source_id,document_id,metadata) VALUES(?,?,?)').run(source_id,id,JSON.stringify(metadata));
   audit(db,'document_uploaded',{id,invoice_id,name,source});return {...documentMetadata(db.prepare('SELECT * FROM documents WHERE id=?').get(id)),duplicate:false};
 }

@@ -1,34 +1,35 @@
-# Aktivera Gmail
+# Gmail: anslutning och drift
 
-Gmail-kopplingen använder Googles OAuth-flöde med enbart `gmail.readonly`. Inga Gmail-lösenord sparas. Systemet kan läsa mejl och originalbilagor men saknar funktioner för att skicka, radera eller ändra mejl.
+## Aktivering
 
-## Engångsaktivering av administratör
+1. Aktivera Gmail API i företagets Google Cloud-projekt.
+2. Konfigurera Google Auth Platform: branding, supportkontakt, domäner, integritetspolicy, användarvillkor och målgrupp. För ett vanligt Gmail-konto används extern målgrupp; lägg till `mg.vitvaror@gmail.com` som testanvändare under test.
+3. Skapa en OAuth-klient av typen Web application. Begär bara `https://www.googleapis.com/auth/gmail.readonly`.
+4. Registrera exakt callback för respektive installation:
+   - Node: `APP_ORIGIN` följt av `/api/gmail/callback`.
+   - Sites: `https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/gmail/callback`.
+5. Sätt `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` och vid behov `GMAIL_ACCOUNT=mg.vitvaror@gmail.com` i respektive miljös skyddade konfiguration. Node använder ignorerad `.env`; Sites använder Sites runtime secrets. GitHub-push överför inga sådana uppgifter.
+6. Bevara befintlig krypteringsnyckel: Node `BANK_DATA_KEY`; Sites `BANK_DATA_ENCRYPTION_KEY`. De har olika format och är inte utbytbara. Rotera eller ersätt inte fungerande banknycklar för att aktivera Gmail.
+7. Öppna Import eller Gmail-sidan och välj Koppla Gmail. Kontot verifieras mot Gmail-profilen. Endast företagskontot accepteras. Kontrollera sedan en känd faktura hela vägen till original, registrering och bankförslag.
 
-1. Välj företagets Google Cloud-projekt och aktivera **Gmail API**.
-2. Konfigurera OAuth-medgivandet. Under utveckling lägger du till `mg.vitvaror@gmail.com` som testanvändare. Kontrollera Googles aktuella verifieringskrav för produktionsanvändning av Gmail-behörigheten.
-3. Skapa en OAuth-klient av typen **Web application**. Registrera exakt serverns `APP_ORIGIN` följt av `/api/gmail/callback`, till exempel `http://localhost:3000/api/gmail/callback` lokalt eller `https://din-domän.se/api/gmail/callback` i drift.
-4. Lägg klient-ID och klienthemlighet i serverns miljövariabler `GOOGLE_CLIENT_ID` och `GOOGLE_CLIENT_SECRET`. `.env` är ignorerad av Git och får aldrig publiceras.
-5. Ange `GMAIL_ACCOUNT=mg.vitvaror@gmail.com` och starta om servern. Kontot kontrolleras mot Googles Gmail-profil efter medgivandet; ett annat Google-konto godtas inte.
-6. Öppna **Import → Koppla Gmail**. Välj företagskontot och godkänn läsåtkomst. Servern lagrar OAuth-uppgifter krypterade med `BANK_DATA_KEY`; den nyckeln måste bevaras säkert även vid återställning.
+Gmails läsbehörighet är en restricted scope. Kontrollera tillämplig verifiering och eventuell säkerhetsgranskning i Google Cloud innan extern produktionsanvändning. En extern OAuth-app med status Testing får normalt refresh tokens som löper ut efter sju dagar. Testanvändare och ett lyckat testmedgivande ersätter inte produktionsgodkännande. Källor: [Google scope verification](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification), [tokenlivslängd](https://developers.google.com/identity/protocols/oauth2).
 
-## Vad hämtningen gör
+## Hämtning och säkerhet
 
-Hämtningen söker efter möjliga fakturor med bilagor i inkorgen och skickade mejl. PDF, PNG, JPEG och WebP stöds. Filernas signaturer kontrolleras. Ett nedladdningsnamn får rätt filändelse för det bekräftade formatet; det ursprungliga namnet bevaras som metadata. En fil får vara högst 15 MB och en hämtning omfattar högst 50 MB bilagor. Ett begränsat antal mejl hämtas åt gången; när fler finns behålls sidmarkören till nästa hämtning. Redan hämtade bilagor identifieras med konto, mejl-ID och bilagedel och läggs inte in en gång till. Efter en tidigare hämtning används UTC-tidsgräns med en dags överlapp för att undvika luckor runt dygnsskiften; överlapp ger inga nya dubbletter.
+State är slumpmässigt, engångsanvänt och bundet till den inloggade webbläsaren. Callback med dubbla parametrar nekas. Token krypteras på servern; hemligheter visas aldrig i gränssnittet. Refresh sker före utgång eller en gång vid oväntat 401-svar. Rotationen bevaras även om ett senare Gmail-anrop misslyckas. Frånkoppling återkallar Google-åtkomsten först och behåller redan importerade original.
 
-Mejl med tydlig påminnelse, orderbekräftelse eller betalningsbekräftelse i ämnesraden hoppas över. En bilaga behandlas alltid som **underlag som behöver granskas**. Avsändare och riktning är förslag för att underlätta registreringen. Även ett fakturaliknande mejl kan vara felklassificerat; användaren granskar därför originalet och registrerar fakturans uppgifter innan en skuld skapas. Kreditfakturor och motsägelsefulla uppgifter måste bedömas manuellt.
+Sökningen omfattar mottagna, arkiverade och skickade mejl med bilagor; ämne och filnamn behöver inte innehålla ordet faktura. Spam, papperskorg, utkast och tydliga påminnelser/order-/betalningsbekräftelser undantas. Detta är kandidatupptäckt, inte ett bevis på en skuld. Enskilda fakturor som bara finns i mejltext eller ligger bakom nedladdningslänkar importeras inte. Flera bilagor blir separata underlag. Vidarebefordrade mejl kräver kontroll av riktning och motpart.
 
-Denna version gör ingen automatisk OCR eller fullständig PDF-tolkning. Den hittar och bevarar underlag men hittar inte säkert alla fakturor: exempelvis arkiverade mejl utan inkorgsetikett, andra filtyper, andra språk eller otydliga ämnen kan missas. Ladda upp sådana original manuellt. Fakturor får aldrig antas vara betalda utifrån text i ett mejl.
+Filformat kontrolleras mot bytesignaturen. Högst 15 MB per fil, 50 MB per körning, 150 bilagedelar och 20 sekunder per API-anrop. Efter två minuters arbete sparas fortsatt paginering vid nästa kontrollpunkt. Node läser högst 50 mejl per omgång; Sites läser 10. Sidmarkörer och en dags datumöverlapp gör omkörning säker. Käll-ID, Message ID, attachment-ID, avsändare, mottagare, originalfilnamn, datum och SHA-256 bevaras. Återsändning med samma innehåll kompletterar originalets källhistorik. Trasiga oföränderliga bilagedelar undantas utan att tillfälliga nätverksfel räknas som permanent avvisade.
 
-Högst 150 nya bilagedelar kontrolleras i en hämtning, även när de är felaktiga. Bekräftat ogiltiga eller för stora original identifieras och felorsaken sparas, så att samma felaktiga bilaga inte hämtas om vid varje försök. Nästa hämtning kan då fortsätta framåt. Ett tillfälligt anslutningsfel gör däremot aldrig en bilaga permanent undantagen. Varje API-begäran har 20 sekunders tidsgräns och inga automatiska nätverksomförsök görs inne i en hämtning.
+## Schemaläggning
 
-## Förnya eller koppla från
+Node har serverbaserad Gmail-hämtning var 15 minut efter anslutning, oberoende av bankens intervall. Ändra till manuellt, 15/30/60/240/1440 minuter i Inställningar. Håll Node-processen igång via driftens processhanterare. Ingen öppen webbläsare behövs. Senaste lyckade hämtning och nästa möjliga hämtning visas i Gmail-inställningarna.
 
-Om Google återkallar ett medgivande eller en refresh-token upphör att gälla visas att kopplingen behöver förnyas. **Koppla Gmail igen** startar ett nytt medgivande. **Koppla från** återkallar åtkomsten hos Google och tar bort den lokala kopplingen. Tidigare registrerade original och fakturor bevaras i systemet.
+Sites har separat drift. `gmail_auto_sync` är en autentiserad MCP-operation med ägarisolering, beständig låsning och 15 minuters spärr. Den är förberedd för en Sites-länkad molnautomation. Ingen ny Gmail-automation har aktiverats i denna leverans eftersom Google-konfiguration och ett verkligt medgivande saknas. Verifiera först hämtning via det anslutna Sites-verktyget från en ny molnkörning; anslut därefter ett återkommande Sites-schema. Produktionsschemat ska endast meddela vid meningsfull ändring, fel eller behov av användaråtgärd. Befintligt bankschema påverkas inte.
 
-Hämtningens adapter stöder återkommande körning med serverlagrade refresh-token. Schemaläggning och serverns drift måste vara aktiva för att nya mejl ska hämtas när ingen användare har sidan öppen; en öppen webbläsare är inte en driftlösning.
+Sites tolkar dokument lokalt i webbläsaren vid granskning. Serverbaserad obevakad OCR och automatisk fakturaregistrering ingår i Node-versionen, men är inte implementerade i Sites Worker. Detta är en kvarstående skillnad, inte en verifierad automatisk produktionskedja.
 
-## Verifiering
+## Tester
 
-`node --test test/gmail.test.js` verifierar OAuth-parametrar, kontokontroll, tokenförnyelse, riktning, dubblettskydd, originalbilagor, filgränser, påminnelser och återkallande med kontrollerade API-svar. Riktigt Google-medgivande och ett fullständigt flöde med företagets fakturor kräver de ovanstående externa inställningarna och är inte verifierade av dessa tester.
-
-Tekniska källor: [Googles OAuth-flöde för webbservrar](https://developers.google.com/identity/protocols/oauth2/web-server), [lista Gmail-mejl](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list), [hämta originalbilagor](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages.attachments/get), [kontrollera Gmail-profil](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users/getProfile).
+`npm run check` och `npm test` verifierar Node-koden. Google-svar är simulerade. PDF- och OCR-testerna läser riktiga syntetiska filer med de installerade motorerna. HTTPS-tester verifierar inloggning, state, fel konto, kryptering, arkiverad Gmail-import, återkommande hämtning och spårbara korrigeringar. Sites har en separat TypeScript-kontroll och testsvit med lokal SQLite som D1-adapter. Verkligt Google-medgivande kräver användarens konto och återstår att verifiera.

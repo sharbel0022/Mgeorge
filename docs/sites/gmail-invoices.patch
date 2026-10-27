@@ -1,0 +1,2261 @@
+diff --git a/GMAIL.md b/GMAIL.md
+new file mode 100644
+index 0000000..206d398
+--- /dev/null
++++ b/GMAIL.md
+@@ -0,0 +1,35 @@
++# Gmail: anslutning och drift
++
++## Aktivering
++
++1. Aktivera Gmail API i företagets Google Cloud-projekt.
++2. Konfigurera Google Auth Platform: branding, supportkontakt, domäner, integritetspolicy, användarvillkor och målgrupp. För ett vanligt Gmail-konto används extern målgrupp; lägg till `mg.vitvaror@gmail.com` som testanvändare under test.
++3. Skapa en OAuth-klient av typen Web application. Begär bara `https://www.googleapis.com/auth/gmail.readonly`.
++4. Registrera exakt callback för respektive installation:
++   - Node: `APP_ORIGIN` följt av `/api/gmail/callback`.
++   - Sites: `https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/gmail/callback`.
++5. Sätt `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` och vid behov `GMAIL_ACCOUNT=mg.vitvaror@gmail.com` i respektive miljös skyddade konfiguration. Node använder ignorerad `.env`; Sites använder Sites runtime secrets. GitHub-push överför inga sådana uppgifter.
++6. Bevara befintlig krypteringsnyckel: Node `BANK_DATA_KEY`; Sites `BANK_DATA_ENCRYPTION_KEY`. De har olika format och är inte utbytbara. Rotera eller ersätt inte fungerande banknycklar för att aktivera Gmail.
++7. Öppna Import eller Gmail-sidan och välj Koppla Gmail. Kontot verifieras mot Gmail-profilen. Endast företagskontot accepteras. Kontrollera sedan en känd faktura hela vägen till original, registrering och bankförslag.
++
++Gmails läsbehörighet är en restricted scope. Kontrollera tillämplig verifiering och eventuell säkerhetsgranskning i Google Cloud innan extern produktionsanvändning. En extern OAuth-app med status Testing får normalt refresh tokens som löper ut efter sju dagar. Testanvändare och ett lyckat testmedgivande ersätter inte produktionsgodkännande. Källor: [Google scope verification](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification), [tokenlivslängd](https://developers.google.com/identity/protocols/oauth2).
++
++## Hämtning och säkerhet
++
++State är slumpmässigt, engångsanvänt och bundet till den inloggade webbläsaren. Callback med dubbla parametrar nekas. Token krypteras på servern; hemligheter visas aldrig i gränssnittet. Refresh sker före utgång eller en gång vid oväntat 401-svar. Rotationen bevaras även om ett senare Gmail-anrop misslyckas. Frånkoppling återkallar Google-åtkomsten först och behåller redan importerade original.
++
++Sökningen omfattar mottagna, arkiverade och skickade mejl med bilagor; ämne och filnamn behöver inte innehålla ordet faktura. Spam, papperskorg, utkast och tydliga påminnelser/order-/betalningsbekräftelser undantas. Detta är kandidatupptäckt, inte ett bevis på en skuld. Enskilda fakturor som bara finns i mejltext eller ligger bakom nedladdningslänkar importeras inte. Flera bilagor blir separata underlag. Vidarebefordrade mejl kräver kontroll av riktning och motpart.
++
++Filformat kontrolleras mot bytesignaturen. Högst 15 MB per fil, 50 MB per körning, 150 bilagedelar och 20 sekunder per API-anrop. Efter två minuters arbete sparas fortsatt paginering vid nästa kontrollpunkt. Node läser högst 50 mejl per omgång; Sites läser 10. Sidmarkörer och en dags datumöverlapp gör omkörning säker. Käll-ID, Message ID, attachment-ID, avsändare, mottagare, originalfilnamn, datum och SHA-256 bevaras. Återsändning med samma innehåll kompletterar originalets källhistorik. Trasiga oföränderliga bilagedelar undantas utan att tillfälliga nätverksfel räknas som permanent avvisade.
++
++## Schemaläggning
++
++Node har serverbaserad Gmail-hämtning var 15 minut efter anslutning, oberoende av bankens intervall. Ändra till manuellt, 15/30/60/240/1440 minuter i Inställningar. Håll Node-processen igång via driftens processhanterare. Ingen öppen webbläsare behövs. Senaste lyckade hämtning och nästa möjliga hämtning visas i Gmail-inställningarna.
++
++Sites har separat drift. `gmail_auto_sync` är en autentiserad MCP-operation med ägarisolering, beständig låsning och 15 minuters spärr. Den är förberedd för en Sites-länkad molnautomation. Ingen ny Gmail-automation har aktiverats i denna leverans eftersom Google-konfiguration och ett verkligt medgivande saknas. Verifiera först hämtning via det anslutna Sites-verktyget från en ny molnkörning; anslut därefter ett återkommande Sites-schema. Produktionsschemat ska endast meddela vid meningsfull ändring, fel eller behov av användaråtgärd. Befintligt bankschema påverkas inte.
++
++Sites tolkar dokument lokalt i webbläsaren vid granskning. Serverbaserad obevakad OCR och automatisk fakturaregistrering ingår i Node-versionen, men är inte implementerade i Sites Worker. Detta är en kvarstående skillnad, inte en verifierad automatisk produktionskedja.
++
++## Tester
++
++`npm run check` och `npm test` verifierar Node-koden. Google-svar är simulerade. PDF- och OCR-testerna läser riktiga syntetiska filer med de installerade motorerna. HTTPS-tester verifierar inloggning, state, fel konto, kryptering, arkiverad Gmail-import, återkommande hämtning och spårbara korrigeringar. Sites har en separat TypeScript-kontroll och testsvit med lokal SQLite som D1-adapter. Verkligt Google-medgivande kräver användarens konto och återstår att verifiera.
+diff --git a/app/api/gmail/[action]/route.ts b/app/api/gmail/[action]/route.ts
+new file mode 100644
+index 0000000..eec35f4
+--- /dev/null
++++ b/app/api/gmail/[action]/route.ts
+@@ -0,0 +1,4 @@
++import {gmailStatus,gmailConnect,gmailCallback,gmailSync,gmailDisconnect,gmailReview,gmailFailure} from '@/lib/gmail-service';
++export const dynamic='force-dynamic';
++export async function GET(request:Request){try{const action=new URL(request.url).pathname.split('/').pop();if(action==='status')return await gmailStatus(new URL(request.url).searchParams.get('summary')==='1');if(action==='callback')return await gmailCallback(request);return new Response(null,{status:404});}catch(e){return gmailFailure(e);}}
++export async function POST(request:Request){try{const action=new URL(request.url).pathname.split('/').pop();if(action==='connect')return await gmailConnect(request);if(action==='sync')return await gmailSync(request);if(action==='disconnect')return await gmailDisconnect(request);if(action==='review')return await gmailReview(request);return new Response(null,{status:404});}catch(e){return gmailFailure(e);}}
+diff --git a/app/dashboard.tsx b/app/dashboard.tsx
+index 9c54d21..3e32939 100644
+--- a/app/dashboard.tsx
++++ b/app/dashboard.tsx
+@@ -1,4 +1,5 @@
+ "use client";
++import GmailSummary from '@/components/gmail-summary';
+ import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode,type FormEvent} from 'react';
+ import {LayoutDashboard,ArrowUpRight,ArrowDownLeft,Landmark,FileText,Upload,Plus,Search,ChevronRight,ChevronDown,Check,CheckCheck,CheckCircle2,Clock3,AlertCircle,ArrowRight,ArrowLeft,Download,Mail,Settings,History,Link2,Unlink,RefreshCw,X,ShieldCheck,HelpCircle,Users,Paperclip,FileUp,MoreHorizontal,Split,ExternalLink,Wallet,ReceiptText,Menu,Building2,LogIn,Copy,Undo2,Inbox,ChevronLeft} from 'lucide-react';
+ import {emptyState,demoState,applyCommand,balance,paid,credited,available,invoiceStatus,suggestions,money,parseMoney,today,uid,type State,type Invoice,type Transaction,type Command} from '@/lib/domain';
+@@ -76,7 +77,7 @@ export default function Dashboard({initialView='overview',openBankImport=false}:
+      {needsReview.length>0&&<button className="attention-row" onClick={()=>{navigate(needsReview[0].direction);setFilter('review');}}><span className="attention-icon blue"><FileText size={19}/></span><div><strong>{needsReview.length} fakturor behöver granskas</strong><p>Kontrollera belopp, fakturanummer och förfallodatum.</p></div><ChevronRight size={18}/></button>}
+      {!unmatched.length&&!overdue.length&&!needsReview.length&&<Empty icon={CheckCircle2} title={state.invoices.length?'Inget väntar på åtgärd':'Här ser du vad som behöver göras'}>{state.invoices.length?'Dina registrerade uppgifter är genomgångna. Importera nya bankhändelser för en aktuell bild.':'Obetalda fakturor, osäkra matchningar och kommande betalningar samlas här när du lägger in underlag.'}</Empty>}
+     </div></section>
+-    <section className="panel connections-panel"><div className="panel-heading"><h2>Dina underlag</h2><button className="text-button" onClick={()=>navigate('settings')}>Hantera <ArrowUpRight size={14}/></button></div><div className="source-row"><span className="source-logo bank">S</span><div><strong>Swedbank</strong><small>{state.imports.length?`${state.imports.length} importerade underlag`:'Koppla banken eller använd bankfil'}</small></div><a className="text-button" href="/bank">Bankkoppling <ArrowUpRight size={14}/></a></div><div className="source-row"><span className="source-logo gmail"><Mail size={23}/></span><div><strong>Gmail</strong><small>mg.vitvaror@gmail.com</small></div><Pill tone="amber">Ej ansluten</Pill></div><div className="source-note"><HelpCircle size={16}/><p>Bankens totalsumma visar inte alltid vem som har betalat. Lägg till betalningsspecifikationen när betalaruppgifter saknas.</p></div><button className="btn full" onClick={()=>navigate('imports')}>Lägg till underlag <ArrowRight size={15}/></button></section></div>
++    <section className="panel connections-panel"><div className="panel-heading"><h2>Dina underlag</h2><button className="text-button" onClick={()=>navigate('settings')}>Hantera <ArrowUpRight size={14}/></button></div><div className="source-row"><span className="source-logo bank">S</span><div><strong>Swedbank</strong><small>{state.imports.length?`${state.imports.length} importerade underlag`:'Koppla banken eller använd bankfil'}</small></div><a className="text-button" href="/bank">Bankkoppling <ArrowUpRight size={14}/></a></div><div className="source-row"><span className="source-logo gmail"><Mail size={23}/></span><div><strong>Gmail</strong><small>mg.vitvaror@gmail.com</small></div><GmailSummary/></div><div className="source-note"><HelpCircle size={16}/><p>Bankens totalsumma visar inte alltid vem som har betalat. Lägg till betalningsspecifikationen när betalaruppgifter saknas.</p></div><button className="btn full" onClick={()=>navigate('imports')}>Lägg till underlag <ArrowRight size={15}/></button></section></div>
+     <section className="panel"><div className="panel-heading"><div><h2>Närmast att betala</h2><p className="panel-description">Leverantörsfakturor som har ett belopp kvar.</p></div><button className="text-button" onClick={()=>navigate('payable')}>Visa alla <ArrowRight size={15}/></button></div>{payables.filter(i=>balance(state,i)>0).length?<InvoiceTable invoices={payables.filter(i=>balance(state,i)>0).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,5)} state={state} open={id=>setModal({kind:'detail',id})}/>:<Empty icon={ReceiptText} title="Inga registrerade fakturor att betala">Importera leverantörsfakturorna från din mejl för att få en betalningslista.</Empty>}</section>
+     {!demo&&<div className="demo-invite"><span>Vill du se hur det fungerar?</span><button className="text-button" onClick={toggleDemo}>Prova med exempeldata <ArrowRight size={15}/></button></div>}
+    </>}
+@@ -86,8 +87,8 @@ export default function Dashboard({initialView='overview',openBankImport=false}:
+     <section className="panel"><div className="table-toolbar"><div className="filter-tabs">{[['all','Alla'],['unmatched','Ej matchade'],['matched','Matchade'],['review','Att granska'],['ignored','Undantagna']].map(([id,label])=><button key={id} className={filter===id?'selected':''} onClick={()=>setFilter(id)}>{label}</button>)}</div><label className="search-field"><Search size={16}/><input placeholder="Sök betalare eller referens…" value={search} onChange={e=>setSearch(e.target.value)} aria-label="Sök bankhändelser"/></label></div>
+      {state.transactions.length?<div className="table-scroll"><table><thead><tr><th>Bankhändelse / betalare</th><th>Datum</th><th>Betalningsreferens</th><th className="numeric">Belopp</th><th>Status</th><th/></tr></thead><tbody>{state.transactions.filter(t=>filter==='ignored'?t.ignored:!t.ignored).filter(t=>filter==='unmatched'?t.kind!=='batch'&&available(state,t)>0:filter==='matched'?t.kind!=='batch'&&available(state,t)===0:filter==='review'?!!t.duplicateOf||!t.verified&&t.kind!=='batch':true).filter(t=>`${t.party} ${t.bankReference} ${t.payerReference} ${t.description}`.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>b.date.localeCompare(a.date)).map(t=><tr key={t.id} className="clickable" onClick={()=>setModal({kind:'tx',id:t.id})}><td><div className="party-cell"><span className={`table-icon ${t.amount>0?'green':'blue'}`}>{t.kind==='batch'?<Split size={17}/>:t.amount>0?<ArrowDownLeft size={17}/>:<ArrowUpRight size={17}/>}</span><div><strong>{t.party||'Bankgiro / okänd betalare'}</strong><small>{t.parentId?'Del av samlingsbetalning':t.description.split('\n')[0]||t.source}</small></div></div></td><td>{shortDate(t.date)}</td><td><span className="mono">{t.payerReference||'Saknas'}</span>{t.bankReference&&<small className="cell-note">Bankref: {t.bankReference}</small>}</td><td className={`numeric ${t.amount>0?'text-green':''}`}>{t.amount>0?'+':''}{money(t.amount)}</td><td><Pill tone={t.ignored?'neutral':t.duplicateOf?'red':t.kind==='batch'?'purple':!t.verified?'amber':available(state,t)===0?'green':'blue'}>{t.ignored?'Undantagen':t.duplicateOf?'Möjlig dubblett':t.kind==='batch'?'Samlingspost':!t.verified?'Kontrollera underlag':available(state,t)===0?'Matchad':available(state,t)<Math.abs(t.amount)?'Delvis matchad':'Ej matchad'}</Pill></td><td><button className="icon-button" aria-label={`Öppna bankhändelse ${t.date} ${money(t.amount)}`}><ChevronRight size={16}/></button></td></tr>)}</tbody></table></div>:<Empty icon={Landmark} title="Inga bankhändelser ännu" action={<button className="btn primary" onClick={()=>setModal({kind:'bankimport'})}><Upload size={16}/> Importera bankfil</button>}>Ladda upp ett kontoutdrag i CSV eller en betalningsspecifikation i ISO 20022 XML.</Empty>}
+     </section></>}
+-   {view==='imports'&&<><div className="import-grid"><section className="panel import-card"><span className="import-icon green"><Landmark size={27}/></span><h2>Bank & Bankgiro</h2><p>Importera kontohändelser från Swedbank. Lägg till betalningsspecifikationer för namn och OCR.</p><div className="format-chips"><span>CSV</span><span>camt.053</span><span>camt.054</span></div><button className="btn primary full" onClick={()=>setModal({kind:'bankimport'})}><Upload size={16}/> Importera bankunderlag</button><button className="text-button" onClick={()=>downloadFile('bankimport-mall.csv','\uFEFFDatum;Belopp;Betalare;OCR;Bankreferens;Beskrivning;Valuta\r\n2026-10-26;1875,00;Exempelkund;10019;BANK-EXEMPEL;Kundinbetalning;SEK\r\n','text/csv')}>Ladda ned CSV-mall <Download size={14}/></button></section><section className="panel import-card"><span className="import-icon blue"><Mail size={27}/></span><h2>Fakturor från mejlen</h2><p>Ladda upp en faktura eller ett nedladdat mejl. Granska de tolkade uppgifterna innan du sparar.</p><div className="format-chips"><span>PDF</span><span>EML</span><span>TXT</span><span>Bild</span></div><button className="btn primary full" onClick={()=>setModal({kind:'invoice',direction:'payable'})}><FileUp size={16}/> Importera faktura eller mejl</button><span className="footnote">Gmail är inte anslutet. Importen sker när du laddar upp filen.</span></section></div>
+-    <section className="panel instructions"><h2>Så hämtar du rätt uppgifter</h2><div className="instruction-grid"><div><span className="step-number">1</span><h3>Kontoutdrag från Swedbank</h3><p>Öppna <strong>Konto</strong>, välj konto och period, markera transaktionerna och välj <strong>Ladda ner rader → CSV</strong>.</p><a href="https://www.swedbank.se/foretag/digitala-tjanster/internetbanken-foretag/vanliga-fragor-och-svar.html" target="_blank" rel="noreferrer">Swedbanks instruktioner <ExternalLink size={13}/></a></div><div><span className="step-number">2</span><h3>Vem betalade?</h3><p>Öppna bankgiroinsättningen. Följ länken till betalningsdetaljer i <strong>Inbetalningar</strong> eller <strong>Bankgirot/ELIN</strong>. Hämta namn, OCR och delbelopp.</p><a href="https://www.swedbank.se/foretag/betala-och-ta-betalt/ny-standard-for-betalningar-i-sverige.html" target="_blank" rel="noreferrer">Om ändringen under 2026 <ExternalLink size={13}/></a></div><div><span className="step-number">3</span><h3>Fakturor från Gmail</h3><p>Öppna mejlet i rätt konto. Ladda ned PDF-bilagan eller välj mejlets meny <strong>⋮ → Ladda ned meddelandet</strong>. Importera filen här.</p><a href="https://mail.google.com/mail/?authuser=mg.vitvaror%40gmail.com" target="_blank" rel="noreferrer">Öppna Gmail <ExternalLink size={13}/></a></div></div></section>
++   {view==='imports'&&<><section className="panel"><h2>Gmail-fakturor</h2><p>Hämta mottagna, arkiverade och skickade bilagor. Läs PDF och skannade fakturor och granska före registrering.</p><a className="btn primary" href="/gmail">Koppla / uppdatera Gmail</a></section><div className="import-grid"><section className="panel import-card"><span className="import-icon green"><Landmark size={27}/></span><h2>Bank & Bankgiro</h2><p>Importera kontohändelser från Swedbank. Lägg till betalningsspecifikationer för namn och OCR.</p><div className="format-chips"><span>CSV</span><span>camt.053</span><span>camt.054</span></div><button className="btn primary full" onClick={()=>setModal({kind:'bankimport'})}><Upload size={16}/> Importera bankunderlag</button><button className="text-button" onClick={()=>downloadFile('bankimport-mall.csv','\uFEFFDatum;Belopp;Betalare;OCR;Bankreferens;Beskrivning;Valuta\r\n2026-10-26;1875,00;Exempelkund;10019;BANK-EXEMPEL;Kundinbetalning;SEK\r\n','text/csv')}>Ladda ned CSV-mall <Download size={14}/></button></section><section className="panel import-card"><span className="import-icon blue"><Mail size={27}/></span><h2>Fakturor från mejlen</h2><p>Ladda upp en faktura eller ett nedladdat mejl. Granska de tolkade uppgifterna innan du sparar.</p><div className="format-chips"><span>PDF</span><span>EML</span><span>TXT</span><span>Bild</span></div><button className="btn primary full" onClick={()=>setModal({kind:'invoice',direction:'payable'})}><FileUp size={16}/> Importera faktura eller mejl</button><span className="footnote">Gmail är inte anslutet. Importen sker när du laddar upp filen.</span></section></div>
++    <section className="panel instructions"><h2>Så hämtar du rätt uppgifter</h2><div className="instruction-grid"><div><span className="step-number">1</span><h3>Kontoutdrag från Swedbank</h3><p>Öppna <strong>Konto</strong>, välj konto och period, markera transaktionerna och välj <strong>Ladda ner rader → CSV</strong>.</p><a href="https://www.swedbank.se/foretag/digitala-tjanster/internetbanken-foretag/vanliga-fragor-och-svar.html" target="_blank" rel="noreferrer">Swedbanks instruktioner <ExternalLink size={13}/></a></div><div><span className="step-number">2</span><h3>Vem betalade?</h3><p>Öppna bankgiroinsättningen. Följ länken till betalningsdetaljer i <strong>Inbetalningar</strong> eller <strong>Bankgirot/ELIN</strong>. Hämta namn, OCR och delbelopp.</p><a href="https://www.swedbank.se/foretag/betala-och-ta-betalt/ny-standard-for-betalningar-i-sverige.html" target="_blank" rel="noreferrer">Om ändringen under 2026 <ExternalLink size={13}/></a></div><div><span className="step-number">3</span><h3>Fakturor från Gmail</h3><p>Öppna mejlet i rätt konto. Ladda ned PDF-bilagan eller välj mejlets meny <strong>⋮ → Ladda ned meddelandet</strong>. Importera filen här.</p><a href="/gmail" target="_blank" rel="noreferrer">Koppla / uppdatera Gmail <ExternalLink size={13}/></a></div></div></section>
+     {!state.imports.some(i=>i.hash==='user-screenshots-20261026-v1')&&<section className="screenshot-card"><div><div className="eyebrow">FRÅN DINA BILDER</div><h2>Två inbetalningar att börja med</h2><p>1 875,00 kr den 26 oktober och 7 179,16 kr den 14 oktober 2026. De läggs in som ogranskade bankhändelser, med okänd betalare.</p></div><button className="btn" disabled={busy} onClick={screenshotRows}>Lägg in de två bankhändelserna <Plus size={16}/></button></section>}
+     <section className="panel"><div className="panel-heading"><h2>Importerade bankunderlag</h2><span className="subtle">{state.imports.length} underlag</span></div>{state.imports.length?<div className="simple-list">{[...state.imports].reverse().map(i=><div key={i.id}><span className="table-icon"><FileText size={18}/></span><div><strong>{i.name}</strong><small>{i.account} · {i.count} nya bankhändelser</small></div><span className="subtle">{new Date(i.createdAt).toLocaleDateString('sv-SE')}</span><CheckCircle2 size={17} className="text-green"/>{i.documentId&&<a className="icon-button" href={`/api/files?id=${encodeURIComponent(i.documentId)}`} title="Ladda ned bankunderlaget"><Download size={15}/></a>}</div>)}</div>:<div className="panel-empty">Dina genomförda importer visas här.</div>}</section></>}
+    {view==='contacts'&&<section className="panel"><div className="panel-heading"><h2>Kunder & leverantörer</h2><label className="search-field"><Search size={16}/><input placeholder="Sök kontakt…" value={search} onChange={e=>setSearch(e.target.value)}/></label></div><Contacts state={state} search={search} open={i=>setModal({kind:'detail',id:i})}/></section>}
+@@ -201,5 +202,5 @@ function ConfirmDialog({modal,save,close,busy,error}:{modal:Modal;save:Save;clos
+ }
+ 
+ function SettingsView({state,save,busy,exportData,toggleDemo,demo}:{state:State;save:Save;busy:boolean;exportData:()=>void;toggleDemo:()=>void;demo:boolean}){
+- const[name,setName]=useState(state.company.name),[email,setEmail]=useState(state.company.email);return <div className="settings-grid"><section className="panel settings-panel"><div className="panel-heading"><h2>Företagsuppgifter</h2><Building2 size={20}/></div><form onSubmit={async e=>{e.preventDefault();await save({type:'settings.save',name,email});}}><Field label="Företagsnamn"><input required maxLength={200} value={name} onChange={e=>setName(e.target.value)}/></Field><Field label="Faktureringsmejl"><input type="email" required maxLength={200} value={email} onChange={e=>setEmail(e.target.value)}/></Field><p className="body-description">Adressen hjälper importen att skilja dina skickade fakturor från mottagna. Att spara en adress ansluter inte mejlkontot.</p><button className="btn primary" disabled={busy}><Check size={16}/> Spara företagsuppgifter</button></form></section><section className="panel settings-panel"><div className="panel-heading"><h2>Anslutningar</h2><Link2 size={20}/></div><div className="connection-setting"><div><strong>Swedbank / Bankgiro</strong><Pill>Bankanslutning & filimport</Pill></div><a className="btn primary small" href="/bank"><Landmark size={16}/> Öppna bankanslutning</a><p>Du kan importera bankens exporter eller ansluta kontot. Bankkopplingen kan hämta bokförda bankhändelser efter att du anslutit via Enable Banking och godkänt hos banken. Bankgiro kan behöva kompletteras med en betalningsspecifikation.</p></div><div className="connection-setting"><div><strong>Gmail</strong><Pill tone="amber">Ej ansluten</Pill></div><p>Automatisk mejlhämtning är inte aktiverad. Kontot <strong>{state.company.email}</strong> behöver anslutas och mejlsynkroniseringen konfigureras. PDF och EML fungerar redan via filimport.</p><a href="https://mail.google.com/mail/?authuser=mg.vitvaror%40gmail.com" target="_blank" rel="noreferrer" className="text-button">Öppna Gmail <ExternalLink size={14}/></a></div></section><section className="panel settings-panel"><div className="panel-heading"><h2>Export & underlag</h2><Download size={20}/></div><p className="body-description">Exportera fakturor, bankhändelser, matchningar och hela ändringshistoriken i JSON. Originalbilagorna laddas ned från respektive faktura. CSV-export finns i fakturalistorna.</p><button className="btn" onClick={exportData}><Download size={16}/> Exportera alla uppgifter</button><div className="inline-notice"><ShieldCheck size={17}/><span>Uppgifter sparas på ditt inloggade konto. Systemet har inga funktioner för att genomföra bankbetalningar.</span></div></section><section className="panel settings-panel"><div className="panel-heading"><h2>Prova arbetsflödet</h2><HelpCircle size={20}/></div><p className="body-description">Öppna ett avskilt demoläge med fiktiva fakturor, en delbetalning och en bankgiroinsättning som behöver utredas. Dina sparade uppgifter påverkas inte.</p><button className="btn" onClick={toggleDemo}>{demo?'Avsluta demo':'Öppna demoläge'} <ArrowRight size={16}/></button></section></div>;
++ const[name,setName]=useState(state.company.name),[email,setEmail]=useState(state.company.email);return <div className="settings-grid"><section className="panel settings-panel"><div className="panel-heading"><h2>Företagsuppgifter</h2><Building2 size={20}/></div><form onSubmit={async e=>{e.preventDefault();await save({type:'settings.save',name,email});}}><Field label="Företagsnamn"><input required maxLength={200} value={name} onChange={e=>setName(e.target.value)}/></Field><Field label="Faktureringsmejl"><input type="email" required maxLength={200} value={email} onChange={e=>setEmail(e.target.value)}/></Field><p className="body-description">Adressen hjälper importen att skilja dina skickade fakturor från mottagna. Att spara en adress ansluter inte mejlkontot.</p><button className="btn primary" disabled={busy}><Check size={16}/> Spara företagsuppgifter</button></form></section><section className="panel settings-panel"><div className="panel-heading"><h2>Anslutningar</h2><Link2 size={20}/></div><div className="connection-setting"><div><strong>Swedbank / Bankgiro</strong><Pill>Bankanslutning & filimport</Pill></div><a className="btn primary small" href="/bank"><Landmark size={16}/> Öppna bankanslutning</a><p>Du kan importera bankens exporter eller ansluta kontot. Bankkopplingen kan hämta bokförda bankhändelser efter att du anslutit via Enable Banking och godkänt hos banken. Bankgiro kan behöva kompletteras med en betalningsspecifikation.</p></div><div className="connection-setting"><div><strong>Gmail</strong><GmailSummary/></div><p>Öppna Gmail-anslutningen för status, Google-medgivande och hämtade fakturabilagor. PDF och EML fungerar redan via filimport.</p><a href="/gmail" target="_blank" rel="noreferrer" className="text-button">Koppla / uppdatera Gmail <ExternalLink size={14}/></a></div></section><section className="panel settings-panel"><div className="panel-heading"><h2>Export & underlag</h2><Download size={20}/></div><p className="body-description">Exportera fakturor, bankhändelser, matchningar och hela ändringshistoriken i JSON. Originalbilagorna laddas ned från respektive faktura. CSV-export finns i fakturalistorna.</p><button className="btn" onClick={exportData}><Download size={16}/> Exportera alla uppgifter</button><div className="inline-notice"><ShieldCheck size={17}/><span>Uppgifter sparas på ditt inloggade konto. Systemet har inga funktioner för att genomföra bankbetalningar.</span></div></section><section className="panel settings-panel"><div className="panel-heading"><h2>Prova arbetsflödet</h2><HelpCircle size={20}/></div><p className="body-description">Öppna ett avskilt demoläge med fiktiva fakturor, en delbetalning och en bankgiroinsättning som behöver utredas. Dina sparade uppgifter påverkas inte.</p><button className="btn" onClick={toggleDemo}>{demo?'Avsluta demo':'Öppna demoläge'} <ArrowRight size={16}/></button></section></div>;
+ }
+diff --git a/app/globals.css b/app/globals.css
+index 4f3e7a1..cf2402b 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -8,3 +8,5 @@
+ @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+ /* Keep working text readable at ordinary laptop sizes. */
+ @media(min-width:761px){.nav-item{font-size:13px}.workspace strong{font-size:12px}.page-heading>div>p{font-size:13px}.summary-meta{font-size:11px}.stat-card>div{font-size:12px}.stat-card p{font-size:10px}.panel-heading h2{font-size:14px}.onboarding-title p{font-size:11px}.setup-steps strong{font-size:12px}.setup-steps small{font-size:10px}.attention-row strong{font-size:12px}.attention-row p{font-size:11px}.source-row strong{font-size:12px}.source-row small{font-size:10px}.source-note p{font-size:10px}.empty h3{font-size:13px}.empty p{font-size:11px}.party-cell strong{font-size:12px}.party-cell small{font-size:10px}td{font-size:12px}th{font-size:10px}.pill{font-size:10px}.field>span{font-size:12px}.filter-tabs>button{font-size:11px}.btn{font-size:12px}.text-button{font-size:12px}}
++
++.gmail-workspace{max-width:1380px;margin:auto;padding:32px;display:grid;gap:22px}.gmail-workspace .panel{padding:24px}.gmail-workspace .button-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.gmail-review{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}.gmail-review section{min-width:0}.gmail-review iframe{width:100%;height:720px;border:1px solid #dbe3ec;border-radius:10px}.gmail-review img{width:100%;max-height:720px;object-fit:contain}.gmail-review .gmail-uncertain input{border-color:#c99633;background:#fff9ed}.gmail-error{background:#fee9e9;color:#8d2424;padding:16px;border-radius:10px}.gmail-workspace td small{display:block;font-size:11px}.gmail-review .check-field{margin:22px 0}.gmail-workspace details{margin-top:20px}.gmail-workspace details p{margin-top:14px}@media(max-width:850px){.gmail-review{grid-template-columns:1fr}.gmail-review iframe{height:380px}.gmail-workspace{padding:16px}}
+diff --git a/app/gmail/page.tsx b/app/gmail/page.tsx
+new file mode 100644
+index 0000000..62489d8
+--- /dev/null
++++ b/app/gmail/page.tsx
+@@ -0,0 +1,5 @@
++import GmailWorkspace from '@/components/gmail-workspace';
++import {requireChatGPTUser} from '@/app/chatgpt-auth';
++export const dynamic='force-dynamic';
++export const metadata={title:'Gmail | MG Fakturakoll',referrer:'no-referrer'};
++export default async function GmailPage(){await requireChatGPTUser('/gmail');return <GmailWorkspace/>;}
+diff --git a/components/gmail-summary.tsx b/components/gmail-summary.tsx
+new file mode 100644
+index 0000000..2e89302
+--- /dev/null
++++ b/components/gmail-summary.tsx
+@@ -0,0 +1,7 @@
++'use client';
++import {useEffect,useState} from 'react';
++export default function GmailSummary(){
++  const [status,setStatus]=useState('Kontrollera anslutningen');
++  useEffect(()=>{const controller=new AbortController();fetch('/api/gmail/status?summary=1',{cache:'no-store',signal:controller.signal}).then(r=>r.ok?r.json():null).then((data:any)=>{if(data)setStatus(data.connection?.status==='connected'?'Ansluten':data.connection?'Behöver kontrolleras':'Ej ansluten');}).catch(()=>{});return()=>controller.abort();},[]);
++  return <a className="text-button" href="/gmail">Gmail: {status} →</a>;
++}
+diff --git a/components/gmail-workspace.tsx b/components/gmail-workspace.tsx
+new file mode 100644
+index 0000000..288ee50
+--- /dev/null
++++ b/components/gmail-workspace.tsx
+@@ -0,0 +1,35 @@
++'use client';
++import {useEffect,useState} from 'react';
++import {pdfPreview} from '@/lib/local-ocr';
++import {readInvoiceFile} from '@/lib/imports';
++import {interpretInvoice} from '@/lib/invoice-fields.js';
++import {parseMoney} from '@/lib/domain';
++
++const labels:Record<string,string>={green:'Klar för registrering',yellow:'Behöver kontroll',red:'Kan inte behandlas automatiskt'};
++const fieldLabels:Record<string,string>={invoice_number:'Fakturanummer',party:'Kund / leverantör',organization_number:'Organisationsnummer',issued_at:'Fakturadatum',due_at:'Förfallodatum',total_cents:'Totalbelopp (kr)',vat_cents:'Moms (kr)',net_cents:'Exklusive moms (kr)',reference:'OCR / referens',bankgiro:'Bankgiro'};
++async function api(action:string,body?:unknown):Promise<any>{const r=await fetch('/api/gmail/'+action,{method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'});const data:any=await r.json();if(!r.ok)throw Error(data.error||'Gmail kunde inte uppdateras.');return data;}
++export default function GmailWorkspace(){
++  const [data,setData]=useState<any>(null),[error,setError]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[review,setReview]=useState<any>(null),[values,setValues]=useState<Record<string,string>>({}),[confirmed,setConfirmed]=useState(false);
++  async function load(){try{setData(await api('status'));}catch(e){setError((e as Error).message);}}
++  useEffect(()=>{void load();},[]);
++  useEffect(()=>()=>{if(review?.url)URL.revokeObjectURL(review.url);},[review]);
++  async function action(name:string){setBusy(true);setError('');try{const r=await api(name,{});if(r.url){location.assign(r.url);return;}setMessage(name==='sync'?`${r.imported} nya underlag · ${r.duplicates} dubbletter${r.more?' · Fler mejl finns att hämta':''}`:'Gmail har kopplats från.');await load();}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
++  async function open(doc:any){setBusy(true);setError('');try{
++    const response=await fetch('/api/files?id='+encodeURIComponent(doc.document_id));if(!response.ok)throw Error('Originalet kunde inte hämtas.');
++    const file=new File([await response.blob()],doc.filename,{type:doc.mime}),meta=JSON.parse(doc.metadata),parsed=await readInvoiceFile(file,data.email),stored=JSON.parse(doc.extraction);
++    const extraction=stored.fields?stored:interpretInvoice(parsed.text,{direction:meta.direction,direction_confident:meta.direction_confident,method:(parsed as any).ocr?'ocr':'pdf',ocrConfidence:(parsed as any).confidence||0});
++    await api('review',{document_id:doc.document_id,extraction});
++    const v:Record<string,string>={};for(const [key,field]of Object.entries(extraction.fields) as [string,any][]){v[key]=field.value==null?'':key.endsWith('_cents')?(field.value/100).toFixed(2):String(field.value);}
++    setValues(v);setConfirmed(false);setReview({doc,extraction,url:URL.createObjectURL(doc.mime==='application/pdf'?await pdfPreview(file):file),meta});
++  }catch(e){setError((e as Error).message);}finally{setBusy(false);}}
++  async function approve(e:React.FormEvent){e.preventDefault();if(!confirmed)return;setBusy(true);setError('');try{
++    const invoice={direction:values.direction==='customer'?'receivable':'payable',number:values.invoice_number,party:values.party,total:parseMoney(values.total_cents),issued:values.issued_at,due:values.due_at,ocr:values.reference,bankgiro:values.bankgiro,email:'',note:'',kind:values.kind,currency:values.currency};
++    await api('review',{document_id:review.doc.document_id,confirm:true,invoice,fields:values});setReview(null);setMessage('Fakturan är registrerad. Granska eventuella betalningsförslag under Bank.');await load();
++  }catch(e){setError((e as Error).message);}finally{setBusy(false);}}
++  const connected=data?.connection&&data.connection.status!=='renewal_required',docs=[...new Map((data?.candidates||[]).filter((d:any)=>d.status==='needs_review').map((d:any)=>[d.document_id,d])).values()] as any[];
++  return <main className="gmail-workspace"><a href="/" className="text-button">← MG Fakturakoll</a><div className="page-heading"><div><h1>Fakturor från Gmail</h1><p>Mottagna, arkiverade och skickade fakturabilagor. Granska originalet före registrering.</p></div></div>{error&&<p className="gmail-error" role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
++    <section className="panel gmail-status"><h2>Gmail – {connected?'Ansluten':'Ej ansluten'}</h2><p>{data?.email||'mg.vitvaror@gmail.com'}</p><p>Senaste lyckade hämtning: {data?.connection?.last_synced?new Date(data.connection.last_synced).toLocaleString('sv-SE'):'Ingen hämtning ännu'}</p><div className="button-row"><button className="btn primary" disabled={busy} onClick={()=>action(connected?'sync':'connect')}>{busy?'Arbetar…':connected?'Hämta fakturaunderlag':'Koppla Gmail'}</button>{data?.connection&&<button className="btn" disabled={busy} onClick={()=>action('disconnect')}>Koppla från Gmail</button>}</div>{data&&!data.configured&&<details><summary>Administratör: aktivera Google-anslutningen</summary><p>Aktivera Gmail API i Google Cloud. Skapa en OAuth-webbklient med Gmail-läsbehörighet och lägg till mg.vitvaror@gmail.com som testanvändare medan appen testas. Ange GOOGLE_CLIENT_ID och GOOGLE_CLIENT_SECRET som skyddade Sites-variabler. Bevara den befintliga krypteringsnyckeln.</p><p>Registrera exakt returadress: <code>{typeof location!=='undefined'?location.origin:''}/api/gmail/callback</code>. Extern produktion kan kräva Googles verifiering av den begränsade Gmail-behörigheten. En testapp med extern publik kan få tidsbegränsade refresh tokens.</p></details>}<p className="body-description">Automatisk hämtning kräver en aktiverad molnschemaläggning och ett giltigt Google-medgivande. Dokumenttolkning körs lokalt i webbläsaren när du öppnar ett underlag för granskning.</p></section>
++    {!review?<section className="panel"><h2>{docs.length} underlag att granska</h2>{docs.length?<div className="table-scroll"><table><thead><tr><th>Dokument</th><th>Mejl</th><th>Hämtat</th><th></th></tr></thead><tbody>{docs.map(doc=>{const meta=JSON.parse(doc.metadata);return <tr key={doc.document_id}><td>{doc.filename}</td><td>{meta.subject}<small>{meta.from} → {meta.to}</small></td><td>{new Date(doc.created_at).toLocaleString('sv-SE')}</td><td><button className="btn" disabled={busy} onClick={()=>open(doc)}>Granska</button></td></tr>;})}</tbody></table></div>:<p>Hämta fakturabilagor eller koppla Gmail för att börja.</p>}</section>:<form className="panel" onSubmit={approve}><div className="gmail-review"><section><h2>Originaldokument</h2><a className="text-button" href={"/api/files?id="+encodeURIComponent(review.doc.document_id)} target="_blank" rel="noopener">Ladda ned hela originalet</a><img alt="Originalfaktura, första sidan" src={review.url}/><p>{review.meta.from} → {review.meta.to}</p><p>{review.meta.subject}</p></section><section><h2>{labels[review.extraction.level]}</h2><ul>{review.extraction.issues.map((i:string)=><li key={i}>{i}</li>)}</ul><p>Kontrollera markerade fält och redigera vid behov. Saknade uppgifter är tomma.</p><div className="form-grid"><label className="field">Typ<select value={values.direction} required onChange={e=>setValues(v=>({...v,direction:e.target.value}))}><option value="">Välj typ</option><option value="customer">Kundfaktura</option><option value="supplier">Leverantörsfaktura</option></select></label><label className="field">Dokumenttyp<select value={values.kind} onChange={e=>setValues(v=>({...v,kind:e.target.value}))}><option value="invoice">Faktura</option><option value="credit">Kreditfaktura – använd kreditflödet</option><option value="receipt">Kvitto</option><option value="other">Annat</option></select></label>{Object.entries(fieldLabels).map(([key,label])=><label className={`field ${(review.extraction.fields[key]?.confidence||0)<.9?'gmail-uncertain':''}`} key={key}>{label}<input type={key.endsWith('_at')?'date':key.endsWith('_cents')?'number':'text'} step={key.endsWith('_cents')?'0.01':undefined} value={values[key]||''} required={['invoice_number','party','issued_at','due_at','total_cents'].includes(key)} onChange={e=>setValues(v=>({...v,[key]:e.target.value}))}/></label>)}</div><label className="field">Valuta<select value={values.currency||''} required onChange={e=>setValues(v=>({...v,currency:e.target.value}))}><option value="">Kontrollera valutan</option><option value="SEK">SEK</option></select></label><label className="check-field"><input type="checkbox" required checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>Jag har kontrollerat originalet och godkänner uppgifterna.</label><div className="button-row"><button className="btn primary" disabled={busy||values.kind!=='invoice'}>Godkänn faktura</button><button className="btn" type="button" onClick={()=>setReview(null)}>Stäng</button><button className="btn" disabled={busy} type="button" onClick={async()=>{try{await api('review',{document_id:review.doc.document_id,reject:true});setReview(null);await load();}catch(e){setError((e as Error).message);}}}>Avvisa</button></div></section></div></form>}
++    <section className="panel"><h2>Senaste hämtningar</h2>{(data?.runs||[]).map((r:any,i:number)=><p key={i}>{new Date(r.created_at).toLocaleString('sv-SE')} · {r.status==='error'?'Hämtningen misslyckades':`${r.imported} nya · ${r.duplicates} dubbletter`}</p>)}</section>
++  </main>;
++}
+diff --git a/db/schema.ts b/db/schema.ts
+index 26d58c0..223a7f0 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -1,4 +1,4 @@
+-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
++import { primaryKey, sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+ export const workspaces = sqliteTable("workspaces", {
+   owner: text("owner").primaryKey(), revision: integer("revision").notNull().default(0),
+   payload: text("payload").notNull(), updatedAt: text("updated_at").notNull(),
+@@ -41,3 +41,21 @@ export const bankSyncRuns = sqliteTable('bank_sync_runs', {
+ export const bankLocks = sqliteTable('bank_locks', {
+   owner: text('owner').primaryKey(), token: text('token').notNull(), expiresAt: text('expires_at').notNull(),
+ });
++
++// Gmail owns separate rows and never rewrites bank connections or keys.
++export const gmailConnections = sqliteTable('gmail_connections', {
++  owner:text('owner').primaryKey(),email:text('email').notNull(),tokens:text('tokens').notNull(),
++  lastSynced:text('last_synced').notNull().default(''),pageToken:text('page_token').notNull().default(''),startedAt:text('started_at').notNull().default(''),status:text('status').notNull().default('connected'),lastAttempt:text('last_attempt').notNull().default(''),
++});
++export const gmailFlows=sqliteTable('gmail_flows',{
++  stateHash:text('state_hash').primaryKey(),owner:text('owner').notNull(),cookieHash:text('cookie_hash').notNull(),expiresAt:text('expires_at').notNull(),consumed:integer('consumed').notNull().default(0),
++});
++export const gmailSources=sqliteTable('gmail_sources',{
++  owner:text('owner').notNull(),sourceId:text('source_id').notNull(),documentId:text('document_id').notNull(),metadata:text('metadata').notNull(),status:text('status').notNull().default('needs_review'),extraction:text('extraction').notNull().default('{}'),createdAt:text('created_at').notNull(),
++},t=>[primaryKey({columns:[t.owner,t.sourceId]})]);
++export const gmailRuns=sqliteTable('gmail_runs',{
++  id:text('id').primaryKey(),owner:text('owner').notNull(),found:integer('found'),imported:integer('imported'),duplicates:integer('duplicates'),status:text('status').notNull(),createdAt:text('created_at').notNull(),
++});
++export const gmailLocks=sqliteTable('gmail_locks',{
++  owner:text('owner').primaryKey(),token:text('token').notNull(),expiresAt:text('expires_at').notNull(),
++});
+diff --git a/drizzle/0003_needy_gravity.sql b/drizzle/0003_needy_gravity.sql
+new file mode 100644
+index 0000000..86d0e76
+--- /dev/null
++++ b/drizzle/0003_needy_gravity.sql
+@@ -0,0 +1,45 @@
++CREATE TABLE `gmail_connections` (
++	`owner` text PRIMARY KEY NOT NULL,
++	`email` text NOT NULL,
++	`tokens` text NOT NULL,
++	`last_synced` text DEFAULT '' NOT NULL,
++	`page_token` text DEFAULT '' NOT NULL,
++	`started_at` text DEFAULT '' NOT NULL,
++	`status` text DEFAULT 'connected' NOT NULL,
++	`last_attempt` text DEFAULT '' NOT NULL
++);
++--> statement-breakpoint
++CREATE TABLE `gmail_flows` (
++	`state_hash` text PRIMARY KEY NOT NULL,
++	`owner` text NOT NULL,
++	`cookie_hash` text NOT NULL,
++	`expires_at` text NOT NULL,
++	`consumed` integer DEFAULT 0 NOT NULL
++);
++--> statement-breakpoint
++CREATE TABLE `gmail_locks` (
++	`owner` text PRIMARY KEY NOT NULL,
++	`token` text NOT NULL,
++	`expires_at` text NOT NULL
++);
++--> statement-breakpoint
++CREATE TABLE `gmail_runs` (
++	`id` text PRIMARY KEY NOT NULL,
++	`owner` text NOT NULL,
++	`found` integer,
++	`imported` integer,
++	`duplicates` integer,
++	`status` text NOT NULL,
++	`created_at` text NOT NULL
++);
++--> statement-breakpoint
++CREATE TABLE `gmail_sources` (
++	`owner` text NOT NULL,
++	`source_id` text NOT NULL,
++	`document_id` text NOT NULL,
++	`metadata` text NOT NULL,
++	`status` text DEFAULT 'needs_review' NOT NULL,
++	`extraction` text DEFAULT '{}' NOT NULL,
++	`created_at` text NOT NULL,
++	PRIMARY KEY(`owner`, `source_id`)
++);
+diff --git a/drizzle/meta/0003_snapshot.json b/drizzle/meta/0003_snapshot.json
+new file mode 100644
+index 0000000..b9d1ebd
+--- /dev/null
++++ b/drizzle/meta/0003_snapshot.json
+@@ -0,0 +1,883 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "a40d5ac1-e089-41b7-bbaf-f2ae61038406",
++  "prevId": "88b23e5e-81c4-4086-8bad-a9ddb64b4eae",
++  "tables": {
++    "audit_events": {
++      "name": "audit_events",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "revision": {
++          "name": "revision",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "action": {
++          "name": "action",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "detail": {
++          "name": "detail",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "audit_owner_revision": {
++          "name": "audit_owner_revision",
++          "columns": [
++            "owner",
++            "revision"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_applications": {
++      "name": "bank_applications",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "application_id": {
++          "name": "application_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_key": {
++          "name": "encrypted_key",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "metadata": {
++          "name": "metadata",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "generation": {
++          "name": "generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_auth_flows": {
++      "name": "bank_auth_flows",
++      "columns": {
++        "state_hash": {
++          "name": "state_hash",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "cookie_hash": {
++          "name": "cookie_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "app_generation": {
++          "name": "app_generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "bank_name": {
++          "name": "bank_name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "country": {
++          "name": "country",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "environment": {
++          "name": "environment",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "redirect_uri": {
++          "name": "redirect_uri",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "date_from": {
++          "name": "date_from",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_flow_owner": {
++          "name": "bank_flow_owner",
++          "columns": [
++            "owner"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_connections": {
++      "name": "bank_connections",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "app_generation": {
++          "name": "app_generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "environment": {
++          "name": "environment",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "bank_name": {
++          "name": "bank_name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "country": {
++          "name": "country",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_session": {
++          "name": "encrypted_session",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_accounts": {
++          "name": "encrypted_accounts",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "selected_accounts": {
++          "name": "selected_accounts",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'[]'"
++        },
++        "valid_until": {
++          "name": "valid_until",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "date_from": {
++          "name": "date_from",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "last_synced_at": {
++          "name": "last_synced_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "last_error": {
++          "name": "last_error",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "auto_sync_enabled": {
++          "name": "auto_sync_enabled",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "auto_last_attempt_at": {
++          "name": "auto_last_attempt_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "auto_next_at": {
++          "name": "auto_next_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_connections_owner_unique": {
++          "name": "bank_connections_owner_unique",
++          "columns": [
++            "owner"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_locks": {
++      "name": "bank_locks",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_sync_runs": {
++      "name": "bank_sync_runs",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "connection_id": {
++          "name": "connection_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "imported": {
++          "name": "imported",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "skipped": {
++          "name": "skipped",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "warnings": {
++          "name": "warnings",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "test": {
++          "name": "test",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_run_owner_created": {
++          "name": "bank_run_owner_created",
++          "columns": [
++            "owner",
++            "created_at"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "documents": {
++      "name": "documents",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "filename": {
++          "name": "filename",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "mime": {
++          "name": "mime",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "size": {
++          "name": "size",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "sha256": {
++          "name": "sha256",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "documents_owner_hash": {
++          "name": "documents_owner_hash",
++          "columns": [
++            "owner",
++            "sha256"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_connections": {
++      "name": "gmail_connections",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "tokens": {
++          "name": "tokens",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "last_synced": {
++          "name": "last_synced",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        },
++        "page_token": {
++          "name": "page_token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        },
++        "started_at": {
++          "name": "started_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'connected'"
++        },
++        "last_attempt": {
++          "name": "last_attempt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_flows": {
++      "name": "gmail_flows",
++      "columns": {
++        "state_hash": {
++          "name": "state_hash",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "cookie_hash": {
++          "name": "cookie_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "consumed": {
++          "name": "consumed",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_locks": {
++      "name": "gmail_locks",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_runs": {
++      "name": "gmail_runs",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "found": {
++          "name": "found",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "imported": {
++          "name": "imported",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "duplicates": {
++          "name": "duplicates",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_sources": {
++      "name": "gmail_sources",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "source_id": {
++          "name": "source_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "document_id": {
++          "name": "document_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "metadata": {
++          "name": "metadata",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'needs_review'"
++        },
++        "extraction": {
++          "name": "extraction",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'{}'"
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {
++        "gmail_sources_owner_source_id_pk": {
++          "columns": [
++            "owner",
++            "source_id"
++          ],
++          "name": "gmail_sources_owner_source_id_pk"
++        }
++      },
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "workspaces": {
++      "name": "workspaces",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "revision": {
++          "name": "revision",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "payload": {
++          "name": "payload",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index 951f1ea..c32e0cf 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -22,6 +22,13 @@
+       "when": 1793130978301,
+       "tag": "0002_brief_chronomancer",
+       "breakpoints": true
++    },
++    {
++      "idx": 3,
++      "version": "6",
++      "when": 1793136009879,
++      "tag": "0003_needy_gravity",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/lib/banking/mcp.ts b/lib/banking/mcp.ts
+index 04e4001..2933dfb 100644
+--- a/lib/banking/mcp.ts
++++ b/lib/banking/mcp.ts
+@@ -1,6 +1,8 @@
+ import { automaticSync, automaticSyncStatus, bankFailure } from './service';
+ 
+ const tools = [
++  {name:'gmail_auto_sync',title:'Hämta fakturabilagor från Gmail',description:'Hämtar fakturaunderlag till den autentiserade användarens arbetsyta högst var 15 minut med befintligt Google-medgivande. Skapar inga skulder eller betalningsmatchningar.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true,openWorldHint:true}},
++  {name:'gmail_sync_status',title:'Status för Gmail',description:'Visar den autentiserade användarens Gmail-anslutning och sparade underlag. Ändrar ingenting.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true}},
+   { name: 'bank_auto_sync_status', title: 'Status för automatisk bankhämtning', description: 'Läser endast den autentiserade användarens anslutnings- och hämtningsstatus, utan transaktioner eller kontonummer.',
+     inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: true } },
+   { name: 'bank_auto_sync', title: 'Hämta nya bankhändelser', description: 'Hämtar bokförda bankhändelser till den autentiserade användarens privata fakturakoll när automatisk hämtning är aktiverad och förfallen. Använder endast redan valt företagskonto och befintligt bankmedgivande. Matchar inga fakturor och utför inga betalningar.',
+@@ -29,7 +31,12 @@ export async function bankRpc(body: unknown): Promise<Response> {
+   // credential, request-context or force-refresh argument is accepted.
+   if (!object(args) || Object.keys(args).length) return error(-32602, 'This tool accepts no arguments');
+   let response: Response;
+-  try { response = params.name === 'bank_auto_sync' ? await automaticSync() : await automaticSyncStatus(); }
++  try {
++    if(String(params.name).startsWith('gmail_')){
++      const gmail=await import('../gmail-service');
++      try{response=params.name==='gmail_auto_sync'?await gmail.gmailSync(undefined,true):await gmail.gmailStatus();}catch(e){response=gmail.gmailFailure(e);}
++    }else response=params.name === 'bank_auto_sync' ? await automaticSync() : await automaticSyncStatus();
++  }
+   catch (cause) { response = bankFailure(cause); }
+   const data = await response.json();
+   return result({ content: [{ type: 'text', text: JSON.stringify(data) }], structuredContent: data, ...(response.ok ? {} : { isError: true }) });
+diff --git a/lib/gmail-adapter.js b/lib/gmail-adapter.js
+new file mode 100644
+index 0000000..40e9c67
+--- /dev/null
++++ b/lib/gmail-adapter.js
+@@ -0,0 +1,204 @@
++import {env} from 'cloudflare:workers';
++import {Buffer} from 'node:buffer';
++// Read-only Gmail adapter. Mail bodies and files are untrusted data, never instructions.
++// OAuth state is generated, bound to the user's session and consumed by the HTTP layer.
++const scope='https://www.googleapis.com/auth/gmail.readonly';
++const apiBase='https://gmail.googleapis.com/gmail/v1/users/me';
++const maxFileBytes=15_000_000;
++const maxBatchBytes=50_000_000;
++const maxAttachmentAttempts=150;
++const defaultQuery='has:attachment -in:spam -in:trash -in:drafts';
++
++function fail(message,code='gmail_error',status=409){return Object.assign(new Error(message),{code,status});}
++export function gmailAccount(){return (env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();}
++export function isGmailConfigured(){return !!(env.GOOGLE_CLIENT_ID?.trim()&&env.GOOGLE_CLIENT_SECRET?.trim());}
++function requireConfig(){if(!isGmailConfigured())throw fail('En administratör behöver aktivera Gmail-kopplingen först.','not_configured');}
++function callback(origin){
++  const url=new URL(origin);
++  if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname))))throw fail('Ogiltig returadress för Gmail.','invalid_origin',400);
++  return `${url.origin}/api/gmail/callback`;
++}
++export function gmailAuthorizationUrl(state,origin){
++  requireConfig();
++  if(!/^[A-Za-z0-9_-]{32,200}$/.test(state||''))throw fail('Ogiltig OAuth-status.','invalid_state',400);
++  const search=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback(origin),response_type:'code',scope,access_type:'offline',prompt:'consent select_account',login_hint:gmailAccount(),state});
++  return `https://accounts.google.com/o/oauth2/v2/auth?${search}`;
++}
++async function requestJson(url,options={}){
++  let response;
++  try{response=await fetch(url,{...options,redirect:'error',signal:AbortSignal.timeout(20_000)});}
++  catch{throw fail('Det gick inte att nå Gmail. Försök igen.','connection_error',502);}
++  // A bounded read prevents a malformed response or huge attachment from exhausting memory.
++  let bytes=0;const chunks=[];
++  if(response.body){for await(const chunk of response.body){bytes+=chunk.length;if(bytes>22_000_000){await response.body.cancel?.().catch(()=>{});throw fail('Svaret från Gmail var för stort.','response_too_large',413);}chunks.push(chunk);}}
++  let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw fail('Gmail returnerade ett ogiltigt svar.','invalid_response',502);}
++  if(!response.ok){
++    if(response.status===401||body.error==='invalid_grant')throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
++    if(response.status===403)throw fail('Gmail gav inte läsåtkomst. Kontrollera behörigheten och Gmail API i Google Cloud.','access_denied');
++    if(response.status===429)throw fail('Gmail har begränsat hämtningen. Försök igen senare.','rate_limited',429);
++    // Do not reflect provider responses: these may include secrets or mailbox content.
++    throw fail('Gmail kunde inte slutföra begäran. Försök igen.','provider_error',502);
++  }
++  return body;
++}
++function normalizedTokens(body,previous={}){
++  if(typeof body.access_token!=='string'||!body.access_token||body.access_token.length>8192||!(Number(body.expires_in)>0)||Number(body.expires_in)>86400)throw fail('Google returnerade ofullständiga åtkomstuppgifter.','invalid_tokens',502);
++  const granted=String(body.scope||previous.scope||'').split(/\s+/);
++  if(!granted.includes(scope))throw fail('Godkänn läsåtkomst till Gmail för att fortsätta.','missing_scope');
++  if(body.token_type&&body.token_type.toLowerCase()!=='bearer')throw fail('Google returnerade en okänd tokentyp.','invalid_tokens',502);
++  return {access_token:body.access_token,refresh_token:body.refresh_token||previous.refresh_token||'',expires_at:Date.now()+Number(body.expires_in)*1000,scope:granted.join(' ')};
++}
++async function tokenRequest(params,previous){
++  requireConfig();
++  const body=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,...params});
++  return normalizedTokens(await requestJson('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}),previous);
++}
++export async function exchangeGmailCode(code,origin){
++  if(typeof code!=='string'||!code||code.length>4096)throw fail('Saknar Googles engångskod.','invalid_code',400);
++  return tokenRequest({grant_type:'authorization_code',code,redirect_uri:callback(origin)});
++}
++export async function refreshGmailTokens(tokens){
++  if(!tokens?.refresh_token)throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
++  return tokenRequest({grant_type:'refresh_token',refresh_token:tokens.refresh_token},tokens);
++}
++async function apiRequest(path,tokens){
++  if(typeof tokens?.access_token!=='string'||!tokens.access_token)throw fail('Gmail-anslutningen behöver förnyas.','renewal_required');
++  if(!path.startsWith('/')||path.startsWith('//')||/[\r\n]/.test(path))throw fail('Ogiltig Gmail-sökväg.','invalid_path',400);
++  const request=()=>requestJson(apiBase+path,{headers:{Authorization:`Bearer ${tokens.access_token}`,Accept:'application/json'}});
++  try{return await request();}catch(e){
++    if(e.code!=='renewal_required'||!tokens.refresh_token)throw e;
++    Object.assign(tokens,await refreshGmailTokens(tokens));
++    return request();
++  }
++}
++export async function gmailProfile(tokens){
++  const profile=await apiRequest('/profile',tokens);
++  if(typeof profile.emailAddress!=='string'||profile.emailAddress.toLowerCase()!==gmailAccount())throw fail(`Välj företagets Gmail-konto: ${gmailAccount()}.`,'account_mismatch');
++  return profile;
++}
++export async function revokeGmailTokens(tokens){
++  const credential=tokens?.refresh_token||tokens?.access_token;
++  if(!credential)return;
++  let response;
++  try{response=await fetch('https://oauth2.googleapis.com/revoke',{method:'POST',redirect:'error',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:credential}),signal:AbortSignal.timeout(20_000)});}
++  catch{throw fail('Det gick inte att återkalla åtkomsten hos Google. Försök igen.','revoke_failed',502);}
++  if(!response.ok&&response.status!==400)throw fail('Google kunde inte återkalla åtkomsten. Försök igen.','revoke_failed',502);
++}
++function mimeText(value){
++  return String(value||'').replace(/=\?([^?]+)\?([bq])\?([^?]*)\?=/gi,(whole,charset,encoding,text)=>{
++    try{const bytes=encoding.toLowerCase()==='b'?Buffer.from(text,'base64'):Buffer.from(text.replace(/_/g,' ').replace(/=([a-f0-9]{2})/gi,(_,h)=>String.fromCharCode(parseInt(h,16))),'latin1');return new TextDecoder(charset).decode(bytes);}catch{return whole;}
++  }).replace(/[\r\n\0]/g,' ').trim();
++}
++function mailbox(value){
++  const decoded=mimeText(value);const email=decoded.match(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}/i)?.[0]||'';
++  const party=(decoded.includes('<')?decoded.slice(0,decoded.indexOf('<')):email||decoded).replace(/^\s*["']|["']\s*$/g,'').trim();
++  return {email:email.slice(0,240),party:party.slice(0,240)};
++}
++function partsOf(payload,path='0',out=[]){
++  if(out.length>500)throw fail('Ett mejl har för många bilagor eller delar.','message_too_complex');
++  out.push({...payload,_part:payload.partId||path});
++  if(path.split('.').length>20)throw fail('Ett mejl har för många nästlade delar.','message_too_complex');
++  for(const [i,part]of(payload.parts||[]).entries())partsOf(part,`${path}.${i}`,out);
++  return out;
++}
++function detectedMime(buffer){
++  if(buffer.subarray(0,5).toString('ascii')==='%PDF-')return 'application/pdf';
++  if(buffer.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))return 'image/png';
++  if(buffer[0]===255&&buffer[1]===216&&buffer[2]===255)return 'image/jpeg';
++  if(buffer.subarray(0,4).toString()==='RIFF'&&buffer.subarray(8,12).toString()==='WEBP')return 'image/webp';
++  return '';
++}
++function attachmentMime(part){
++  const mime=String(part.mimeType||'').toLowerCase();
++  if(['application/pdf','image/png','image/jpeg','image/webp'].includes(mime))return mime;
++  if(/\.pdf$/i.test(part.filename||''))return 'application/pdf';
++  return '';
++}
++// This collects potential originals for human review, never records a debt or a payment.
++// It deliberately does not claim OCR: scans and PDF fields must be reviewed in the UI.
++/** @param {any} tokens @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string}} options */
++export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken=''}={}){
++  requireConfig();
++  if(!Number.isInteger(maxMessages)||maxMessages<1||maxMessages>100)throw fail('Välj mellan 1 och 100 mejl per hämtning.','invalid_limit',400);
++  if(typeof query!=='string'||query.length>1000)throw fail('Gmail-sökningen är för lång.','invalid_query',400);
++  if(typeof pageToken!=='string'||pageToken.length>4096)throw fail('Ogiltig sidmarkör för Gmail.','invalid_pagination',400);
++  if(!Array.isArray(knownIds)||!Array.isArray(rejectedIds))throw fail('Ogiltiga importreferenser.','invalid_sources',400);
++  let afterTime;
++  if(after){
++    if(!/^\d{4}-\d{2}-\d{2}$/.test(after))throw fail('Ogiltigt startdatum för Gmail.','invalid_date',400);
++    afterTime=Date.parse(`${after}T00:00:00Z`);
++    if(!Number.isFinite(afterTime)||new Date(afterTime).toISOString().slice(0,10)!==after)throw fail('Ogiltigt startdatum för Gmail.','invalid_date',400);
++  }
++  let current=tokens;
++  const deadline=Date.now()+120000;
++  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60_000)Object.assign(current,await refreshGmailTokens(tokens));
++  await gmailProfile(current);
++  let search=query.trim()||defaultQuery;
++  // Gmail date-only search boundaries use PST. UTC seconds plus overlap prevent gaps
++  // around midnight, delayed mail indexing and interrupted syncs; source IDs deduplicate.
++  if(after)search+=` after:${Math.floor(afterTime/1000)-86400}`;
++  const known=new Set(knownIds),rejected=new Set(rejectedIds),seenMessages=new Set(),seenPages=new Set(),documents=[],warnings=[];
++  let cursor=pageToken,next_page_token='',received=0,skipped=0,duplicate=0,totalBytes=0,attachmentAttempts=0,truncated=false;
++  for(let page=0;page<10;page++){
++    const params=new URLSearchParams({q:search,maxResults:String(Math.min(50,maxMessages-received)),includeSpamTrash:'false'});
++    if(cursor)params.set('pageToken',cursor);
++    const listing=await apiRequest(`/messages?${params}`,current);
++    for(const item of listing.messages||[]){
++      if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
++      if(received>=maxMessages){truncated=true;break;}
++      if(!item.id||seenMessages.has(item.id))continue;
++      seenMessages.add(item.id);received++;
++      const message=await apiRequest(`/messages/${encodeURIComponent(item.id)}?format=full`,current);
++      const labels=message.labelIds||[];
++      if(labels.some(l=>['SPAM','TRASH','DRAFT'].includes(l))){skipped++;continue;}
++      const headers=Object.fromEntries((message.payload?.headers||[]).map(h=>[h.name.toLowerCase(),mimeText(h.value)]));
++      const subject=(headers.subject||'').slice(0,500);
++      if(/påminnelse|payment\s+reminder|orderbekräftelse|order\s+confirmation|beställningsbekräftelse|betalningsbekräftelse|payment\s+confirmation|\breceipt\b|\bkvitto\b/i.test(subject)){skipped++;continue;}
++      const direction=labels.includes('SENT')&&!labels.includes('INBOX')?'customer':'supplier';
++      const contact=mailbox(direction==='customer'?headers.to:headers.from);
++      const parts=partsOf(message.payload||{});
++      const supported=parts.filter(p=>p.filename&&attachmentMime(p));
++      let found=false;
++      for(const part of supported){
++        if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
++        const original_filename=mimeText(part.filename).slice(0,240);
++        let name=original_filename.replace(/[\\/]/g,'_');
++        if(/påminnelse|reminder|orderbekräftelse|confirmation/i.test(name)){continue;}
++        found=true;
++        const source_id=`gmail:${gmailAccount()}:${item.id}:${part._part}`;
++        if(known.has(source_id)){duplicate++;continue;}
++        if(rejected.has(source_id)){skipped++;continue;}
++        // Invalid parts count toward the same work budget as valid files. Persisting
++        // immutable rejected source IDs lets the next batch pass them and make progress.
++        if(attachmentAttempts>=maxAttachmentAttempts){truncated=true;next_page_token=cursor;break;}
++        attachmentAttempts++;
++        if(Number(part.body?.size)>maxFileBytes){warnings.push({source_id,message:`${name}: filen är större än 15 MB.`});skipped++;continue;}
++        let body=part.body||{};
++        if(body.attachmentId)body=await apiRequest(`/messages/${encodeURIComponent(item.id)}/attachments/${encodeURIComponent(body.attachmentId)}`,current);
++        const encoded=body.data;
++        if(typeof encoded!=='string'||encoded.length>Math.ceil(maxFileBytes*4/3)+4||!/^[A-Za-z0-9_-]*={0,2}$/.test(encoded)){warnings.push({source_id,message:`${name}: bilagan kunde inte läsas.`});skipped++;continue;}
++        const content=Buffer.from(encoded,'base64url');const mime_type=detectedMime(content);
++        if(!content.length||content.length>maxFileBytes||mime_type!==attachmentMime(part)){warnings.push({source_id,message:`${name}: filformatet kunde inte bekräftas.`});skipped++;continue;}
++        // MIME attachments may have no extension, or a misleading one. Keep an inert,
++        // correctly typed download name so the server's same-format validation accepts it.
++        const extension={'application/pdf':'.pdf','image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp'}[mime_type];
++        const matchingExtension=mime_type==='image/jpeg'?/\.jpe?g$/i.test(name):name.toLowerCase().endsWith(extension);
++        if(!matchingExtension)name=`${(name||'faktura').slice(0,240-extension.length)}${extension}`;
++        if(totalBytes+content.length>maxBatchBytes||documents.length>=100){truncated=true;next_page_token=cursor;break;}
++        totalBytes+=content.length;known.add(source_id);
++        const receivedDate=new Date(Number(message.internalDate));
++        const received_at=Number.isNaN(receivedDate.getTime())?'':receivedDate.toISOString();
++        documents.push({source_id,name,mime_type,content_base64:content.toString('base64'),direction,...contact,subject,received_at,needs_review:true,metadata:{message_id:item.id,attachment_id:part.body?.attachmentId||null,part_id:part._part,from:headers.from||'',to:headers.to||'',original_filename,forwarded:/^(?:fw|fwd|vb):/i.test(subject),direction_confident:!(labels.includes('SENT')&&labels.includes('INBOX'))&&!/^(?:fw|fwd|vb):/i.test(subject),note:'Kontrollera originalet och de tolkade uppgifterna. Ingen betalningsstatus har antagits.'}});
++      }
++      if(!found)skipped++;
++      if(truncated)break;
++    }
++    if(truncated)break;
++    if(!listing.nextPageToken)break;
++    if(received>=maxMessages){truncated=true;next_page_token=listing.nextPageToken;break;}
++    if(seenPages.has(listing.nextPageToken))throw fail('Gmail upprepade en sidmarkör. Försök ett kortare datumintervall.','invalid_pagination',502);
++    cursor=listing.nextPageToken;seenPages.add(cursor);
++    if(page===9){truncated=true;next_page_token=cursor;}
++  }
++  return {tokens:current,documents,received,skipped,duplicate,truncated,next_page_token,warnings,rejected_source_ids:warnings.map(w=>w.source_id)};
++}
+diff --git a/lib/gmail-service.ts b/lib/gmail-service.ts
+new file mode 100644
+index 0000000..a0b4448
+--- /dev/null
++++ b/lib/gmail-service.ts
+@@ -0,0 +1,125 @@
++import {env} from 'cloudflare:workers';
++import {Buffer} from 'node:buffer';
++import {db,identity,response,readWorkspace} from './server';
++import {uid,now,emptyState,applyCommand} from './domain';
++import {parseMoney} from './domain';
++import {validateInvoiceValues} from './invoice-fields.js';
++import {encrypt,decrypt,storageReady} from './banking/store';
++import {digest,randomToken,cookieValue} from './banking/security';
++import {gmailAccount,isGmailConfigured,gmailAuthorizationUrl,exchangeGmailCode,gmailProfile,fetchGmailInvoiceDocuments,revokeGmailTokens} from './gmail-adapter.js';
++
++async function lock<T>(owner:string,fn:()=>Promise<T>){
++  const token=uid(),at=now(),until=new Date(Date.now()+300000).toISOString();
++  const r=await db().prepare('INSERT INTO gmail_locks(owner,token,expires_at) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET token=excluded.token,expires_at=excluded.expires_at WHERE gmail_locks.expires_at<?').bind(owner,token,until,at).run();
++  if(r.meta.changes!==1)throw Error('En Gmail-hämtning pågår redan. Försök igen om en stund.');
++  try{return await fn();}finally{await db().prepare('DELETE FROM gmail_locks WHERE owner=? AND token=?').bind(owner,token).run();}
++}
++export function gmailFailure(error?:unknown){
++  const cause=error as {message?:string,code?:string,safe?:boolean};
++  if(cause?.message==='AUTH_REQUIRED')return response({error:'Logga in med ChatGPT för att öppna Gmail-anslutningen.',signIn:'/signin-with-chatgpt?return_to=%2Fgmail'},401);
++  if(cause?.message==='ORIGIN_DENIED')return response({error:'Åtgärden måste startas från MG Fakturakoll.'},403);
++  if(cause?.safe||['account_mismatch','renewal_required','rate_limited','missing_scope','access_denied'].includes(cause?.code||''))return response({error:cause.message},409);
++  return response({error:'Gmail-åtgärden kunde inte slutföras. Kontrollera anslutningen och försök igen.'},409);
++}
++export async function gmailStatus(summary=false){
++  const user=await identity();
++  const connection=await db().prepare('SELECT email,last_synced,status,last_attempt FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();
++  if(summary)return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),connection});
++  const candidates=await db().prepare("SELECT s.document_id,s.metadata,s.status,s.extraction,s.created_at,d.filename,d.mime FROM gmail_sources s JOIN documents d ON d.id=s.document_id AND d.owner=s.owner WHERE s.owner=? AND s.status<>'rejected' ORDER BY s.created_at DESC LIMIT 200").bind(user.userId).all();
++  const runs=await db().prepare('SELECT found,imported,duplicates,status,created_at FROM gmail_runs WHERE owner=? ORDER BY created_at DESC LIMIT 10').bind(user.userId).all();
++  return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),connection,candidates:candidates.results,runs:runs.results,background_ready:false,scheduler_configured:false,next_eligible_sync:connection?new Date(Math.max(Date.now(),Date.parse(connection.last_attempt||'')+15*60000||0)).toISOString():null});
++}
++export async function gmailConnect(req:Request){
++  const user=await identity(req);
++  if(!isGmailConfigured()||!storageReady())return response({error:'Administratören behöver aktivera Gmail API, registrera Googles webbklient och ange Google Client ID och Client Secret i Sites skyddade driftinställningar. Den befintliga krypteringsnyckeln måste vara tillgänglig.'},409);
++  const state=randomToken(),cookie=randomToken();
++  await db().prepare('DELETE FROM gmail_flows WHERE expires_at<? OR (owner=? AND consumed=0)').bind(now(),user.userId).run();
++  await db().prepare('INSERT INTO gmail_flows(state_hash,owner,cookie_hash,expires_at) VALUES(?,?,?,?)').bind(await digest(state),user.userId,await digest(cookie),new Date(Date.now()+900000).toISOString()).run();
++  return Response.json({url:gmailAuthorizationUrl(state,new URL(req.url).origin)},{headers:{'Cache-Control':'no-store','Set-Cookie':`mg_gmail_flow=${cookie}; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=900`}});
++}
++export async function gmailCallback(req:Request){
++  const user=await identity();const url=new URL(req.url),state=url.searchParams.get('state')||'';
++  if(['state','code','error'].some(k=>url.searchParams.getAll(k).length>1))throw Error('Ogiltig retur');
++  const flow=await db().prepare('SELECT * FROM gmail_flows WHERE state_hash=? AND owner=? AND consumed=0 AND expires_at>?').bind(await digest(state),user.userId,now()).first<any>();
++  if(!flow||flow.cookie_hash!==await digest(cookieValue(req,'mg_gmail_flow')))throw Error('Ogiltig retur');
++  const taken=await db().prepare('UPDATE gmail_flows SET consumed=1 WHERE state_hash=? AND consumed=0').bind(flow.state_hash).run();if(taken.meta.changes!==1)throw Error('Använd retur');
++  let result='cancelled';
++  if(!url.searchParams.has('error'))await lock(user.userId,async()=>{
++    const tokens=await exchangeGmailCode(url.searchParams.get('code'),url.origin);
++    try{await gmailProfile(tokens);}catch(e){await revokeGmailTokens(tokens).catch(()=>{});throw e;}
++    if(!tokens.refresh_token)throw Error('Bestående läsåtkomst saknas');
++    const sealed=await encrypt(user.userId,'gmail-tokens',tokens);
++    await db().prepare("INSERT INTO gmail_connections(owner,email,tokens) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET tokens=excluded.tokens,status='connected'").bind(user.userId,gmailAccount(),sealed).run();result='connected';
++  });
++  return new Response(null,{status:302,headers:{Location:`/gmail?status=${result}`,'Cache-Control':'no-store','Set-Cookie':'mg_gmail_flow=; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=0'}});
++}
++export async function gmailSync(req?:Request,scheduled=false){
++  const user=await identity(req);
++  return lock(user.userId,async()=>{
++    const c=await db().prepare('SELECT * FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();if(!c)return response({error:'Koppla Gmail först.'},409);
++    if(scheduled&&Date.now()-Date.parse(c.last_attempt||'')<900000)return response({status:'not_due'});
++    await db().prepare('UPDATE gmail_connections SET last_attempt=? WHERE owner=?').bind(now(),user.userId).run();
++    const started=c.started_at||now();
++    const sources=await db().prepare('SELECT source_id FROM gmail_sources WHERE owner=?').bind(user.userId).all<{source_id:string}>();
++    let tokens:any;
++    try{
++      tokens=await decrypt<any>(user.userId,'gmail-tokens',c.tokens);
++      const result=await fetchGmailInvoiceDocuments(tokens,{maxMessages:10,knownIds:sources.results.map(s=>s.source_id),after:c.last_synced?.slice(0,10)||'',pageToken:c.page_token||''});
++      await db().prepare('UPDATE gmail_connections SET tokens=? WHERE owner=?').bind(await encrypt(user.userId,'gmail-tokens',result.tokens),user.userId).run();
++      let imported=0,duplicates=result.duplicate;
++      for(const doc of result.documents){
++        const bytes=Buffer.from(doc.content_base64,'base64'),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
++        const existing=await db().prepare('SELECT id FROM documents WHERE owner=? AND sha256=?').bind(user.userId,hash).first<{id:string}>();
++        const id=existing?.id||uid();
++        if(!existing){
++          if(!env.BUCKET)throw Error('storage');await env.BUCKET.put(`${user.userId}/${id}`,bytes,{httpMetadata:{contentType:doc.mime_type}});
++          await db().prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').bind(id,user.userId,doc.name,doc.mime_type,bytes.length,hash,now()).run();imported++;
++        }else duplicates++;
++        const meta={...doc.metadata,direction:doc.direction,subject:doc.subject,from:doc.metadata.from,to:doc.metadata.to,received_at:doc.received_at};
++        const prior=await db().prepare('SELECT status FROM gmail_sources WHERE owner=? AND document_id=? LIMIT 1').bind(user.userId,id).first<{status:string}>();
++        await db().prepare('INSERT OR IGNORE INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,?,?,?,?,?)').bind(user.userId,doc.source_id,id,JSON.stringify(meta),prior?.status||'needs_review',now()).run();
++      }
++      // Rejected immutable parts are retained, so a broken file cannot starve pagination.
++      for(const sourceId of result.rejected_source_ids||[])await db().prepare("INSERT OR IGNORE INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,?,'','{}','rejected',?)").bind(user.userId,sourceId,now()).run();
++      await db().prepare("UPDATE gmail_connections SET last_synced=?,page_token=?,started_at=?,status='connected' WHERE owner=?").bind(result.truncated?c.last_synced:started,result.next_page_token||'',result.truncated?started:'',user.userId).run();
++      await db().prepare('INSERT INTO gmail_runs(id,owner,found,imported,duplicates,status,created_at) VALUES(?,?,?,?,?,?,?)').bind(uid(),user.userId,result.received,imported,duplicates,'completed',now()).run();
++      return response({imported,duplicates,found:result.received,more:result.truncated});
++    }catch(e:any){
++      if(tokens)await db().prepare('UPDATE gmail_connections SET tokens=? WHERE owner=?').bind(await encrypt(user.userId,'gmail-tokens',tokens),user.userId).run();
++      await db().prepare('UPDATE gmail_connections SET status=? WHERE owner=?').bind(e.code==='renewal_required'?'renewal_required':'error',user.userId).run();
++      await db().prepare("INSERT INTO gmail_runs(id,owner,status,created_at) VALUES(?,?,'error',?)").bind(uid(),user.userId,now()).run();throw e;
++    }
++  });
++}
++export async function gmailDisconnect(req:Request){
++  const user=await identity(req);return lock(user.userId,async()=>{
++    const c=await db().prepare('SELECT tokens FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();
++    if(c)await revokeGmailTokens(await decrypt(user.userId,'gmail-tokens',c.tokens));
++    await db().prepare('DELETE FROM gmail_connections WHERE owner=?').bind(user.userId).run();return response({removed:true});
++  });
++}
++export async function gmailReview(req:Request){
++  const user=await identity(req);const raw=await req.text();if(raw.length>60000)throw Error('size');const body=JSON.parse(raw);
++  const source=await db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? LIMIT 1').bind(user.userId,body.document_id).first<any>();if(!source)throw Error('source');
++  if(body.reject===true){if(source.status==='registered')throw Error('Fakturan är redan registrerad.');await db().prepare("UPDATE gmail_sources SET status='rejected' WHERE owner=? AND document_id=?").bind(user.userId,body.document_id).run();return response({rejected:true});}
++  // Persist the original extracted values even when a human later corrects them.
++  if(body.extraction&&JSON.stringify(body.extraction).length<30000)await db().prepare("UPDATE gmail_sources SET extraction=? WHERE owner=? AND document_id=? AND extraction='{}'").bind(JSON.stringify(body.extraction),user.userId,body.document_id).run();
++  if(body.confirm!==true)return response({saved:true});
++  if(source.status==='registered')return response({registered:true,duplicate:true});
++  const old=await readWorkspace(user.userId),invoice={...body.invoice,documentId:body.document_id,reviewed:true,source:'Gmail: '+JSON.parse(source.metadata).subject};
++  // Never let the review endpoint edit an unrelated existing invoice.
++  delete invoice.id;
++  const fields=body.fields||{},checks={issued_at:invoice.issued,due_at:invoice.due,total_cents:invoice.total,organization_number:fields.organization_number||null,currency:fields.currency,vat_cents:fields.vat_cents?parseMoney(fields.vat_cents):null,net_cents:fields.net_cents?parseMoney(fields.net_cents):null};
++  const issues=validateInvoiceValues(checks);if(fields.currency!=='SEK')issues.push('Kontrollera att fakturan är i SEK.');if(issues.length)throw Object.assign(Error(issues.join(' ')),{safe:true});
++  if(invoice.kind&&invoice.kind!=='invoice')throw Error('Kreditfakturor och andra dokument behöver registreras via kreditflödet.');
++  const result=applyCommand(old.state,{type:'invoice.save',invoice});
++  const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(user.userId,JSON.stringify(emptyState()),at).run();
++  const payload=JSON.stringify(result.state);if(payload.length>1800000)throw Error('size');
++  const batch=await db().batch([
++    db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(uid(),user.userId,old.revision+1,'gmail.invoice.review',JSON.stringify({invoice,fields,extraction:JSON.parse(source.extraction),message:result.message}),at,user.userId,old.revision),
++    db().prepare("UPDATE gmail_sources SET status='registered' WHERE owner=? AND document_id=? AND EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)").bind(user.userId,body.document_id,user.userId,old.revision),
++    db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(payload,at,user.userId,old.revision)
++  ]);
++  if(batch[2].meta.changes!==1)return response({error:'En annan ändring sparades samtidigt. Uppdatera och försök igen.'},409);
++  return response({registered:true});
++}
+diff --git a/lib/imports.ts b/lib/imports.ts
+index 60c189a..8befc49 100644
+--- a/lib/imports.ts
++++ b/lib/imports.ts
+@@ -1,3 +1,4 @@
++import {imageText,pdfInvoiceText} from './local-ocr';
+ import {parseMoney,validDate,today,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED} from './domain';
+ export type BankRow={date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
+ export function parseCSV(text:string){
+@@ -59,11 +60,7 @@ export function parseCAMT(text:string,name:string):BankRow[]{
+  if(!rows.length)throw new Error('Inga bankposter hittades.');if(rows.length>1000)throw new Error('Välj en mindre rapport, högst 1 000 bankposter.');return rows;
+ }
+ export async function sha256(file:File){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await file.arrayBuffer()))).map(n=>n.toString(16).padStart(2,'0')).join('');}
+-export async function pdfText(bytes:ArrayBuffer){
+- const pdfjs=await import('pdfjs-dist');pdfjs.GlobalWorkerOptions.workerSrc='/pdf.worker.min.mjs';
+- const task=pdfjs.getDocument({data:new Uint8Array(bytes),useSystemFonts:true}),doc=await task.promise;
+- try{if(doc.numPages>30)throw new Error('PDF-filen har fler än 30 sidor. Dela upp den före import.');let text='';for(let p=1;p<=doc.numPages;p++){const page=await doc.getPage(p),content=await page.getTextContent();text+=content.items.map((i:any)=>'str'in i?i.str+(i.hasEOL?'\n':' '):'').join('')+'\n';}return text;}finally{await task.destroy();}
+-}
++export async function pdfText(bytes:ArrayBuffer){return (await pdfInvoiceText(bytes)).text;}
+ export function extractInvoiceText(text:string){
+  const find=(pattern:RegExp)=>text.match(pattern)?.[1]?.trim()??'';
+  const number=find(/(?:fakturanummer|faktura\s*nr|invoice\s*(?:number|no\.?))\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]*)/i);
+@@ -77,8 +74,8 @@ export function extractInvoiceText(text:string){
+  return{number,total,issued:issued?normalizeDate(issued):'',due:due?normalizeDate(due):'',ocr:ocr.trim(),bankgiro,reviewed:false,note:'',foreignCurrency};
+ }
+ export async function readInvoiceFile(file:File,ownEmail:string){
+- const ext=file.name.split('.').pop()?.toLowerCase();let text='',email='',party='',direction='payable',warning='',source=file.name;
+- if(ext==='pdf'){text=await pdfText(await file.arrayBuffer());if(!text.trim())warning='PDF-filen verkar vara skannad. Fyll i uppgifterna manuellt från originalet.';}
++ const ext=file.name.split('.').pop()?.toLowerCase();let text='',email='',party='',direction='payable',warning='',source=file.name,ocr=false,confidence=0;
++ if(ext==='pdf'){const result=await pdfInvoiceText(await file.arrayBuffer());text=result.text;ocr=result.ocr;confidence=result.confidence;if(!text.trim())warning='PDF-filen verkar vara skannad. Fyll i uppgifterna manuellt från originalet.';}
+  else if(ext==='eml'){
+   const PostalMime=(await import('postal-mime')).default,mail=await PostalMime.parse(await file.arrayBuffer(),{maxNestingDepth:30,maxRfc822NestingDepth:3});
+   const sender=(mail.from as any)?.address??'',outgoing=sender.toLowerCase()===ownEmail.toLowerCase();direction=outgoing?'receivable':'payable';
+@@ -89,9 +86,9 @@ export async function readInvoiceFile(file:File,ownEmail:string){
+   if(attachments.length>1)warning='Mejlet innehåller flera PDF-bilagor. Importera varje faktura separat så att beloppen inte blandas ihop.';
+   source=`Mejl: ${mail.subject??file.name}`;if(mail.messageId)source+=' · '+mail.messageId;
+   warning=[warning,'Avsändaren kan vara en vidarebefordrare. Kontrollera rätt kund eller leverantör.'].filter(Boolean).join(' ');
+- }else if(ext==='txt')text=await file.text();else warning='Bildfil: läs fakturan och fyll i uppgifterna manuellt.';
++ }else if(ext==='txt')text=await file.text();else if(['png','jpg','jpeg','webp'].includes(ext||'')){const result=await imageText(file);text=result.text;ocr=true;confidence=result.confidence;}else warning='Läs originalet och fyll i uppgifterna manuellt.';
+  const fields=extractInvoiceText(text);if(fields.foreignCurrency)warning='Underlaget innehåller en annan valuta än SEK. Beloppet har inte fyllts i. Den här versionen hanterar endast fakturor i SEK. '+warning;
+- return{fields:{...fields,email,party,direction,source:source.slice(0,300)},text:text.slice(0,50000),warning};
++ return{fields:{...fields,email,party,direction,source:source.slice(0,300)},text:text.slice(0,50000),warning,ocr,confidence};
+ }
+ export function downloadFile(filename:string,text:string,type='text/plain;charset=utf-8'){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}
+ export function csvCell(value:unknown){let s=String(value??'');if(/^[=+@\-\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
+diff --git a/lib/invoice-fields.js b/lib/invoice-fields.js
+new file mode 100644
+index 0000000..6732165
+--- /dev/null
++++ b/lib/invoice-fields.js
+@@ -0,0 +1,66 @@
++import {parseMoney} from './domain';
++export const fieldNames=['invoice_number','party','organization_number','issued_at','due_at','total_cents','vat_cents','net_cents','reference','bankgiro','direction','kind','currency'];
++const titles={invoice_number:'fakturanummer',party:'kund eller leverantör',organization_number:'organisationsnummer',issued_at:'fakturadatum',due_at:'förfallodatum',total_cents:'totalbelopp',vat_cents:'moms',net_cents:'belopp exklusive moms',reference:'OCR eller referens',bankgiro:'Bankgiro',direction:'fakturatyp',kind:'dokumenttyp',currency:'valuta'};
++export function validDate(value){
++  let s=String(value||'').trim();const m=s.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/);
++  if(m)s=`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
++  return /^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s+'T00:00:00Z'))&&new Date(s+'T00:00:00Z').toISOString().slice(0,10)===s?s:null;
++}
++export function validOrganization(value){
++  const s=String(value||'').replace(/[-\s]/g,'');if(!/^\d{10}$/.test(s)||Number(s[2])<2)return false;
++  return [...s].reduce((sum,c,i)=>{const n=Number(c)*(i%2?1:2);return sum+Math.floor(n/10)+n%10;},0)%10===0;
++}
++export function interpretInvoice(text,{direction=null,direction_confident=false,method='pdf',ocrConfidence=0}={}){
++  text=String(text||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
++  const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null}])),issues=[];
++  const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
++  const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null};};
++  const grab=(key,re,convert=s=>s.trim())=>{
++    const matches=[...text.matchAll(re)],values=matches.map(m=>convert(m[1])).filter(v=>v!=null);
++    const distinct=[...new Set(values)];
++    if(distinct.length===1)set(key,distinct[0],matches[0][0]);
++    else if(distinct.length>1)issues.push(`Motstridiga värden för ${titles[key]}; dokumentet kan innehålla flera fakturor.`);
++    else if(matches.length)issues.push(`Ogiltigt värde för ${titles[key]}.`);
++  };
++  grab('invoice_number',/(?:faktura\s*(?:nummer|nr|no)|invoice\s*(?:number|no)|fakturanr)\s*[.:#-]*\s*([\p{L}\p{N}][\p{L}\p{N}/_-]{0,79})/giu);
++  grab('issued_at',/(?:fakturadatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
++  grab('due_at',/(?:förfallodatum|förfaller|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
++  const amount='(-?\\d[\\d \\u00a0]*(?:[.,]\\d{1,2})?)(?:[ \\t]*(?:SEK|kr))?';
++  const money=s=>{try{return parseMoney(s);}catch{return null;}};
++  grab('total_cents',new RegExp('(?:att betala|summa att betala|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'gi'),money);
++  grab('vat_cents',new RegExp('(?:^|\\n)[ \\t]*(?:moms(?:belopp)?|VAT)(?!\\s*\\d+%)\\s*[:.]?\\s*'+amount,'gi'),money);
++  grab('net_cents',new RegExp('(?:belopp exklusive moms|summa exkl\\.? moms|netto(?:belopp)?|net amount)\\s*[:.]?\\s*'+amount,'gi'),money);
++  grab('reference',/(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)\s*[:.]?\s*([\p{L}\p{N}][\p{L}\p{N} /_-]{0,119})/giu);
++  grab('bankgiro',/(?:bankgiro|bankgirokonto|bg)\s*[:.]?\s*(\d{3,4}[ -]\d{4})/gi,s=>s.replace(/ /g,'-'));
++  grab('organization_number',/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)\s*[:.]?\s*(\d{6}[- ]?\d{4})/gi,s=>validOrganization(s)?s.replace(/[- ]/g,''):null);
++  const partyLabel=direction==='customer'?'kund|fakturamottagare|customer|bill to':'leverantör|utställare|supplier|seller';
++  grab('party',new RegExp('(?:^|\\n)[ \\t]*(?:'+partyLabel+')\\s*:[ \\t]*([^\\n]{2,240})','gi'));
++  if(['customer','supplier'].includes(direction))set('direction',direction,'Föreslagen från mejlets riktning',direction_confident?.94:.5);
++  const kind=/kreditfaktura|credit\s*(?:invoice|note)/i.test(text)?'credit':/\bkvitto\b|\breceipt\b/i.test(text)?'receipt':/\bfaktura\b|\binvoice\b|fakturanr/i.test(text)?'invoice':'other';
++  set('kind',kind,text.match(/kreditfaktura|credit\s*(?:invoice|note)|kvitto|receipt|faktura|invoice/i)?.[0]);
++  const currencies=[...new Set(text.match(/\b(?:SEK|EUR|USD|GBP|NOK|DKK)\b/g)||[])];
++  if(currencies.length===1)set('currency',currencies[0],currencies[0]);
++  else if(!currencies.length&&/\bkr\b/i.test(text))set('currency','SEK','kr',.7);
++  if(currencies.length>1)issues.push('Flera valutor finns i underlaget.');
++  if(kind==='credit')for(const k of ['total_cents','net_cents','vat_cents'])if(fields[k].value!==null)fields[k].value=Math.abs(fields[k].value);
++  const values=Object.fromEntries(fieldNames.map(k=>[k,fields[k].value]));
++  issues.push(...validateInvoiceValues(values));
++  if(text.trim().length<40)issues.push('Dokumentet saknar tillräcklig läsbar text.');
++  const required=['invoice_number','party','issued_at','due_at','total_cents','direction','currency','organization_number'];
++  const missing=required.filter(k=>values[k]==null);
++  if(missing.length)issues.push('Saknade uppgifter: '+missing.map(k=>titles[k]).join(', '));
++  const fatal=values.total_cents==null||values.invoice_number==null||!['invoice','credit'].includes(kind)||issues.some(s=>/Motstridiga|Momsberäkningen|flera fakturor|Flera valutor|läsbar text/.test(s));
++  const level=fatal?'red':issues.length||missing.length||required.some(k=>fields[k].confidence<.9)?'yellow':'green';
++  return {version:1,method,fields,level,issues:[...new Set(issues)],text_excerpt:text.slice(0,20000),extracted_at:new Date().toISOString()};
++}
++export function validateInvoiceValues(v){
++  const issues=[];
++  for(const k of ['issued_at','due_at'])if(v[k]!=null&&!validDate(v[k]))issues.push('Ogiltigt datum: '+titles[k]);
++  if(v.issued_at&&v.due_at&&v.due_at<v.issued_at)issues.push('Förfallodatum ligger före fakturadatum.');
++  if(v.total_cents!=null&&(!Number.isSafeInteger(v.total_cents)||v.total_cents<=0))issues.push('Totalbelopp måste vara ett positivt öresbelopp.');
++  for(const k of ['vat_cents','net_cents'])if(v[k]!=null&&(!Number.isSafeInteger(v[k])||v[k]<0||v[k]>v.total_cents))issues.push('Ogiltigt belopp: '+titles[k]);
++  if(v.net_cents!=null&&v.vat_cents!=null&&v.total_cents!=null&&Math.abs(v.net_cents+v.vat_cents-v.total_cents)>1)issues.push('Momsberäkningen stämmer inte med totalbeloppet.');
++  if(v.currency!=null&&v.currency!=='SEK')issues.push('Endast SEK stöds i registret.');
++  if(v.organization_number&&!validOrganization(v.organization_number))issues.push('Ogiltigt organisationsnummer.');
++  return issues;
++}
+diff --git a/lib/local-ocr.ts b/lib/local-ocr.ts
+new file mode 100644
+index 0000000..8f67aed
+--- /dev/null
++++ b/lib/local-ocr.ts
+@@ -0,0 +1,30 @@
++// Only same-origin language/core assets are loaded. Invoice bytes remain in the browser.
++export async function imageText(image:Blob|HTMLCanvasElement){
++  const {createWorker}=await import('tesseract.js');
++  const worker=await createWorker('swe',1,{workerPath:'/ocr/worker.min.js',corePath:'/ocr',langPath:'/ocr',cacheMethod:'none',logger:()=>{}});
++  try{const input=image instanceof HTMLCanvasElement?image.toDataURL('image/png'):image;const {data}=await worker.recognize(input);return {text:data.text,ocr:true,confidence:data.confidence};}finally{await worker.terminate();}
++}
++export async function pdfInvoiceText(bytes:ArrayBuffer){
++  const pdfjs=await import('pdfjs-dist');pdfjs.GlobalWorkerOptions.workerSrc='/pdf.worker.min.mjs';
++  const task=pdfjs.getDocument({data:new Uint8Array(bytes),useSystemFonts:true}),doc=await task.promise;
++  try{
++    if(doc.numPages>10)throw Error('Dela upp PDF-filer med fler än 10 sidor före tolkning.');
++    let text='',ocr=false,confidence=100;
++    for(let p=1;p<=doc.numPages;p++){
++      const page=await doc.getPage(p),content=await page.getTextContent();let part=content.items.map((i:any)=>'str' in i?i.str+(i.hasEOL?'\n':' '):'').join('');
++      if(part.replace(/\s/g,'').length<60){
++        const view=page.getViewport({scale:2});if(view.width*view.height>12000000)throw Error('PDF-sidan är för stor för OCR.');
++        const canvas=document.createElement('canvas');canvas.width=Math.ceil(view.width);canvas.height=Math.ceil(view.height);
++        await page.render({canvas,canvasContext:canvas.getContext('2d')!,viewport:view}).promise;
++        const result=await imageText(canvas);part=result.text;ocr=true;confidence=Math.min(confidence,result.confidence);canvas.width=0;canvas.height=0;
++      }
++      text+=part+'\n';if(text.length>150000)throw Error('PDF-filen innehåller för mycket text.');page.cleanup();
++    }
++    return {text,ocr,confidence};
++  }finally{await task.destroy();}
++}
++export async function pdfPreview(file:File){
++  const pdfjs=await import('pdfjs-dist');pdfjs.GlobalWorkerOptions.workerSrc='/pdf.worker.min.mjs';
++  const task=pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()),useSystemFonts:true}),doc=await task.promise;
++  try{const page=await doc.getPage(1),view=page.getViewport({scale:1.4});if(view.width*view.height>12000000)throw Error('För stor PDF-sida.');const canvas=document.createElement('canvas');canvas.width=Math.ceil(view.width);canvas.height=Math.ceil(view.height);await page.render({canvas,canvasContext:canvas.getContext('2d')!,viewport:view}).promise;return await new Promise<Blob>((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Förhandsvisningen misslyckades.')),'image/png'));}finally{await task.destroy();}
++}
+diff --git a/package-lock.json b/package-lock.json
+index 10e3b08..767886e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11,6 +11,7 @@
+         "@base-ui/react": "^1.7.0",
+         "@hookform/resolvers": "^5.7.1",
+         "@shadcn/react": "^0.3.0",
++        "@tesseract.js-data/swe": "1.0.0",
+         "class-variance-authority": "0.7.1",
+         "clsx": "2.1.1",
+         "cmdk": "^1.1.1",
+@@ -32,6 +33,7 @@
+         "recharts": "^3.8.0",
+         "sonner": "^2.0.8",
+         "tailwind-merge": "3.6.0",
++        "tesseract.js": "6.0.1",
+         "vaul": "^1.1.2",
+         "zod": "^3.25.76"
+       },
+@@ -1867,6 +1869,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1889,6 +1892,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1908,6 +1912,7 @@
+       "version": "0.35.4",
+       "resolved": "https://registry.npmjs.org/@img/sharp-freebsd-wasm32/-/sharp-freebsd-wasm32-0.35.4.tgz",
+       "integrity": "sha512-lIsKw/BU+kjB4eZjxrYrZmwOJYi3Ajrv66iAlBmUPyKc3HpnloevB1g3wxGD9P/5BbQ1brBGl65VRRrCvQDEqA==",
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1927,6 +1932,7 @@
+       "version": "1.11.3",
+       "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz",
+       "integrity": "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==",
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -1937,6 +1943,7 @@
+       "version": "0.35.4",
+       "resolved": "https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.35.4.tgz",
+       "integrity": "sha512-zQnl4Kwp7Q6NHsENtU2T/00Zi+w3AQNwz3+UaTyVBy2FpXrzXzGjndpK61onhZjRtRpQXxCTeqw19bVyXOh7jA==",
++      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+       "optional": true,
+       "dependencies": {
+@@ -1956,6 +1963,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1972,6 +1980,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1988,6 +1997,7 @@
+       "cpu": [
+         "arm"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2004,6 +2014,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2020,6 +2031,7 @@
+       "cpu": [
+         "ppc64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2036,6 +2048,7 @@
+       "cpu": [
+         "riscv64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2052,6 +2065,7 @@
+       "cpu": [
+         "s390x"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2068,6 +2082,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2084,6 +2099,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2100,6 +2116,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2116,6 +2133,7 @@
+       "cpu": [
+         "arm"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2138,6 +2156,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2160,6 +2179,7 @@
+       "cpu": [
+         "ppc64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2182,6 +2202,7 @@
+       "cpu": [
+         "riscv64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2204,6 +2225,7 @@
+       "cpu": [
+         "s390x"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2226,6 +2248,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2248,6 +2271,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2270,6 +2294,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -2292,6 +2317,7 @@
+       "cpu": [
+         "wasm32"
+       ],
++      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "dependencies": {
+@@ -2308,6 +2334,7 @@
+       "version": "1.11.3",
+       "resolved": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz",
+       "integrity": "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==",
++      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "dependencies": {
+@@ -2318,6 +2345,7 @@
+       "version": "0.35.4",
+       "resolved": "https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.35.4.tgz",
+       "integrity": "sha512-zQnl4Kwp7Q6NHsENtU2T/00Zi+w3AQNwz3+UaTyVBy2FpXrzXzGjndpK61onhZjRtRpQXxCTeqw19bVyXOh7jA==",
++      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+       "optional": true,
+       "dependencies": {
+@@ -2337,6 +2365,7 @@
+       "cpu": [
+         "arm64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2356,6 +2385,7 @@
+       "cpu": [
+         "ia32"
+       ],
++      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -2375,6 +2405,7 @@
+       "cpu": [
+         "x64"
+       ],
++      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -5713,6 +5744,12 @@
+         "tailwindcss": "4.2.1"
+       }
+     },
++    "node_modules/@tesseract.js-data/swe": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/@tesseract.js-data/swe/-/swe-1.0.0.tgz",
++      "integrity": "sha512-9BRWhTs8THTaBtFNvaTSZbL8gb14CH86TsdNjpDVBgm4kOS5RW8V6xfM91SEho4rlxyzAJPA909GRD1xsJbyJg==",
++      "license": "MIT"
++    },
+     "node_modules/@tybys/wasm-util": {
+       "version": "0.10.2",
+       "resolved": "https://registry.npmjs.org/@tybys/wasm-util/-/wasm-util-0.10.2.tgz",
+@@ -7120,6 +7157,12 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/bmp-js": {
++      "version": "0.1.0",
++      "resolved": "https://registry.npmjs.org/bmp-js/-/bmp-js-0.1.0.tgz",
++      "integrity": "sha512-vHdS19CnY3hwiNdkaqk93DvjVLfbEcI8mys4UjuWrlX1haDmroo8o4xCzh4wD6DGV6HxRCyauwhHRqMTfERtjw==",
++      "license": "MIT"
++    },
+     "node_modules/brace-expansion": {
+       "version": "1.1.14",
+       "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.14.tgz",
+@@ -9772,6 +9815,12 @@
+         "url": "https://opencollective.com/express"
+       }
+     },
++    "node_modules/idb-keyval": {
++      "version": "6.3.0",
++      "resolved": "https://registry.npmjs.org/idb-keyval/-/idb-keyval-6.3.0.tgz",
++      "integrity": "sha512-um+2dgAWmYsu615EXpWVwSmapJhON0G43t3Ka/EVaohzPQXSMqKEqeDK/oIW3Ow+BXaF2PvSc+oBTFp793A5Ow==",
++      "license": "Apache-2.0"
++    },
+     "node_modules/ignore": {
+       "version": "5.3.2",
+       "resolved": "https://registry.npmjs.org/ignore/-/ignore-5.3.2.tgz",
+@@ -10252,6 +10301,12 @@
+         "url": "https://github.com/sponsors/ljharb"
+       }
+     },
++    "node_modules/is-url": {
++      "version": "1.2.4",
++      "resolved": "https://registry.npmjs.org/is-url/-/is-url-1.2.4.tgz",
++      "integrity": "sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==",
++      "license": "MIT"
++    },
+     "node_modules/is-weakmap": {
+       "version": "2.0.2",
+       "resolved": "https://registry.npmjs.org/is-weakmap/-/is-weakmap-2.0.2.tgz",
+@@ -11104,6 +11159,26 @@
+         "url": "https://github.com/sponsors/ljharb"
+       }
+     },
++    "node_modules/node-fetch": {
++      "version": "2.7.0",
++      "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz",
++      "integrity": "sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==",
++      "license": "MIT",
++      "dependencies": {
++        "whatwg-url": "^5.0.0"
++      },
++      "engines": {
++        "node": "4.x || >=6.0.0"
++      },
++      "peerDependencies": {
++        "encoding": "^0.1.0"
++      },
++      "peerDependenciesMeta": {
++        "encoding": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/node-releases": {
+       "version": "2.0.44",
+       "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-2.0.44.tgz",
+@@ -11234,6 +11309,15 @@
+         "url": "https://github.com/sponsors/ljharb"
+       }
+     },
++    "node_modules/opencollective-postinstall": {
++      "version": "2.0.3",
++      "resolved": "https://registry.npmjs.org/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz",
++      "integrity": "sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==",
++      "license": "MIT",
++      "bin": {
++        "opencollective-postinstall": "index.js"
++      }
++    },
+     "node_modules/optionator": {
+       "version": "0.9.4",
+       "resolved": "https://registry.npmjs.org/optionator/-/optionator-0.9.4.tgz",
+@@ -11903,6 +11987,12 @@
+         "url": "https://github.com/sponsors/ljharb"
+       }
+     },
++    "node_modules/regenerator-runtime": {
++      "version": "0.13.11",
++      "resolved": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz",
++      "integrity": "sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==",
++      "license": "MIT"
++    },
+     "node_modules/regexp.prototype.flags": {
+       "version": "1.5.4",
+       "resolved": "https://registry.npmjs.org/regexp.prototype.flags/-/regexp.prototype.flags-1.5.4.tgz",
+@@ -12823,6 +12913,30 @@
+         }
+       }
+     },
++    "node_modules/tesseract.js": {
++      "version": "6.0.1",
++      "resolved": "https://registry.npmjs.org/tesseract.js/-/tesseract.js-6.0.1.tgz",
++      "integrity": "sha512-/sPvMvrCtgxnNRCjbTYbr7BRu0yfWDsMZQ2a/T5aN/L1t8wUQN6tTWv6p6FwzpoEBA0jrN2UD2SX4QQFRdoDbA==",
++      "hasInstallScript": true,
++      "license": "Apache-2.0",
++      "dependencies": {
++        "bmp-js": "^0.1.0",
++        "idb-keyval": "^6.2.0",
++        "is-url": "^1.2.4",
++        "node-fetch": "^2.6.9",
++        "opencollective-postinstall": "^2.0.3",
++        "regenerator-runtime": "^0.13.3",
++        "tesseract.js-core": "^6.0.0",
++        "wasm-feature-detect": "^1.2.11",
++        "zlibjs": "^0.3.1"
++      }
++    },
++    "node_modules/tesseract.js-core": {
++      "version": "6.1.2",
++      "resolved": "https://registry.npmjs.org/tesseract.js-core/-/tesseract.js-core-6.1.2.tgz",
++      "integrity": "sha512-pv4GjmramjdObhDyR1q85Td8X60Puu/lGQn7Kw2id05LLgHhAcWgnz6xSdMCSxBMWjQDmMyDXPTC2aqADdpiow==",
++      "license": "Apache-2.0"
++    },
+     "node_modules/tiny-inflate": {
+       "version": "1.0.3",
+       "resolved": "https://registry.npmjs.org/tiny-inflate/-/tiny-inflate-1.0.3.tgz",
+@@ -12907,6 +13021,12 @@
+         "node": ">=0.6"
+       }
+     },
++    "node_modules/tr46": {
++      "version": "0.0.3",
++      "resolved": "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz",
++      "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==",
++      "license": "MIT"
++    },
+     "node_modules/ts-api-utils": {
+       "version": "2.5.0",
+       "resolved": "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.5.0.tgz",
+@@ -13831,6 +13951,12 @@
+         }
+       }
+     },
++    "node_modules/wasm-feature-detect": {
++      "version": "1.9.0",
++      "resolved": "https://registry.npmjs.org/wasm-feature-detect/-/wasm-feature-detect-1.9.0.tgz",
++      "integrity": "sha512-zonE+xlIIYtxPy++L24ow0hAD8CICb4+FgPyROd3buyXIqsJvUEDkBgfCCoXOd1Hu3DUr0GOfnPIdcGV+YpNaA==",
++      "license": "Apache-2.0"
++    },
+     "node_modules/watchpack": {
+       "version": "2.5.1",
+       "resolved": "https://registry.npmjs.org/watchpack/-/watchpack-2.5.1.tgz",
+@@ -13853,6 +13979,12 @@
+       "dev": true,
+       "license": "Apache-2.0"
+     },
++    "node_modules/webidl-conversions": {
++      "version": "3.0.1",
++      "resolved": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz",
++      "integrity": "sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==",
++      "license": "BSD-2-Clause"
++    },
+     "node_modules/webpack": {
+       "version": "5.106.2",
+       "resolved": "https://registry.npmjs.org/webpack/-/webpack-5.106.2.tgz",
+@@ -13938,6 +14070,16 @@
+         "node": ">=4.0"
+       }
+     },
++    "node_modules/whatwg-url": {
++      "version": "5.0.0",
++      "resolved": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz",
++      "integrity": "sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==",
++      "license": "MIT",
++      "dependencies": {
++        "tr46": "~0.0.3",
++        "webidl-conversions": "^3.0.0"
++      }
++    },
+     "node_modules/which": {
+       "version": "2.0.2",
+       "resolved": "https://registry.npmjs.org/which/-/which-2.0.2.tgz",
+@@ -14667,6 +14809,15 @@
+         "error-stack-parser-es": "^1.0.5"
+       }
+     },
++    "node_modules/zlibjs": {
++      "version": "0.3.1",
++      "resolved": "https://registry.npmjs.org/zlibjs/-/zlibjs-0.3.1.tgz",
++      "integrity": "sha512-+J9RrgTKOmlxFSDHo0pI1xM6BLVUv+o0ZT9ANtCxGkjIVCCUdx9alUF8Gm+dGLKbkkkidWIHFDZHDMpfITt4+w==",
++      "license": "MIT",
++      "engines": {
++        "node": "*"
++      }
++    },
+     "node_modules/zod": {
+       "version": "3.25.76",
+       "resolved": "https://registry.npmjs.org/zod/-/zod-3.25.76.tgz",
+diff --git a/package.json b/package.json
+index 5c45d0d..b10fdd4 100644
+--- a/package.json
++++ b/package.json
+@@ -17,6 +17,7 @@
+     "@base-ui/react": "^1.7.0",
+     "@hookform/resolvers": "^5.7.1",
+     "@shadcn/react": "^0.3.0",
++    "@tesseract.js-data/swe": "1.0.0",
+     "class-variance-authority": "0.7.1",
+     "clsx": "2.1.1",
+     "cmdk": "^1.1.1",
+@@ -38,6 +39,7 @@
+     "recharts": "^3.8.0",
+     "sonner": "^2.0.8",
+     "tailwind-merge": "3.6.0",
++    "tesseract.js": "6.0.1",
+     "vaul": "^1.1.2",
+     "zod": "^3.25.76"
+   },
+diff --git a/tests/banking-security.test.mjs b/tests/banking-security.test.mjs
+index 2c15870..003d956 100644
+--- a/tests/banking-security.test.mjs
++++ b/tests/banking-security.test.mjs
+@@ -217,7 +217,8 @@ test('Automatic catch-up overlaps the last successful fetch while preserving the
+ test('MCP supports discovery but never accepts an owner override or unauthenticated bank operation', async t => {
+   const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+   const list = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 1, method: 'tools/list' })).json();
+-  assert.equal(list.result.tools.length, 2);
++  assert.equal(list.result.tools.length, 4);
++  assert.ok(list.result.tools.some(tool=>tool.name==='gmail_auto_sync'));
+   const override = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'bank_auto_sync', arguments: { owner: f.owner, force: true } } })).json();
+   assert.equal(override.error.code, -32602);
+   f.user = null;
+diff --git a/tests/domain.test.mjs b/tests/domain.test.mjs
+index d26aec7..bb67b9d 100644
+--- a/tests/domain.test.mjs
++++ b/tests/domain.test.mjs
+@@ -4,7 +4,7 @@ import {emptyState,applyCommand,parseMoney,paid,balance,available,invoiceStatus,
+ import {readFileSync} from 'node:fs';
+ import {pathToFileURL} from 'node:url';
+ import ts from 'typescript';
+-const compiled=ts.transpileModule(readFileSync(new URL('../lib/imports.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("from './domain'",`from '${new URL('../lib/domain.ts',import.meta.url).href}'`);
++const compiled=ts.transpileModule(readFileSync(new URL('../lib/imports.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("from './local-ocr'",`from '${new URL('../lib/local-ocr.ts',import.meta.url).href}'`).replace("from './domain'",`from '${new URL('../lib/domain.ts',import.meta.url).href}'`);
+ const imp=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
+ const invoice=(overrides={})=>({direction:'receivable',party:'Testkund',email:'',number:'1001',ocr:'001019',total:187500,issued:'2026-10-01',due:'2026-10-26',reviewed:true,...overrides});
+ const tx=(overrides={})=>({date:'2026-10-26',amount:187500,party:'Testkund',payerReference:'001019',kind:'payment',verified:true,...overrides});
+diff --git a/tests/gmail.test.mjs b/tests/gmail.test.mjs
+new file mode 100644
+index 0000000..3a15edf
+--- /dev/null
++++ b/tests/gmail.test.mjs
+@@ -0,0 +1,69 @@
++import test from 'node:test';import assert from 'node:assert/strict';
++import {readFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
++import * as domain from '../lib/domain.ts';
++import {seal,unseal,randomToken} from '../lib/banking/security.ts';
++const source=p=>readFileSync(new URL(p,import.meta.url),'utf8');
++const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
++function moduleUrl(path,imports){let code=ts.transpileModule(source(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
++class D1{
++  constructor(sql){this.sql=sql;}
++  prepare(query){const sql=this.sql;return{args:[],bind(...args){this.args=args;return this;},async first(){return sql.prepare(query).get(...this.args)||null;},async all(){return{results:sql.prepare(query).all(...this.args)};},async run(){return this.execute();},execute(){const r=sql.prepare(query).run(...this.args);return{meta:{changes:Number(r.changes)}};}};}
++  async batch(items){this.sql.exec('BEGIN');try{const results=items.map(x=>x.execute());this.sql.exec('COMMIT');return results;}catch(e){this.sql.exec('ROLLBACK');throw e;}}
++}
++async function fixture(t){
++  const key='__gmail_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');sql.exec(source('../drizzle/0000_confused_umar.sql'));sql.exec(source('../drizzle/0003_needy_gravity.sql'));
++  const f={sql,d1:new D1(sql),owner:'test-owner',key:randomToken(),wrongAccount:false,providerCalls:0,env:{GOOGLE_CLIENT_ID:'synthetic-client',GOOGLE_CLIENT_SECRET:'synthetic-secret'}};f.user={userId:f.owner};
++  f.env.BUCKET={put:async()=>{},get:async()=>null,delete:async()=>{}};globalThis[key]=f;
++  const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`);
++  const domainUrl=new URL('../lib/domain.ts',import.meta.url).href,securityUrl=new URL('../lib/banking/security.ts',import.meta.url).href;
++  const server=data(`import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(body,status=200)=>Response.json(body,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=await f.d1.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').bind(owner).first();return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
++  const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const storageReady=()=>true;export const encrypt=(owner,purpose,value)=>seal(f.key,owner,purpose,value);export const decrypt=(owner,purpose,value)=>unseal(f.key,owner,purpose,value);`);
++  const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf}),fields=moduleUrl('../lib/invoice-fields.js',{'./domain':domainUrl});
++  f.api=await import(moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields}));
++  t.mock.method(globalThis,'fetch',async url=>{
++    f.providerCalls++;const path=new URL(url).pathname;
++    if(path==='/token')return Response.json({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,scope:'https://www.googleapis.com/auth/gmail.readonly'});
++    if(path==='/revoke')return new Response('');
++    if(path.endsWith('/profile'))return Response.json({emailAddress:f.wrongAccount?'wrong@gmail.com':'mg.vitvaror@gmail.com'});
++    if(path.endsWith('/messages'))return Response.json({messages:[{id:'archived'}]});
++    if(path.includes('/attachments/'))return Response.json({data:Buffer.from('%PDF-test-original').toString('base64url')});
++    return Response.json({labelIds:[],internalDate:String(Date.now()),payload:{headers:[{name:'Subject',value:'Dokument'},{name:'From',value:'Supplier <supplier@example.com>'},{name:'To',value:'mg.vitvaror@gmail.com'}],parts:[{partId:'1',filename:'document.pdf',mimeType:'application/pdf',body:{attachmentId:'attachment-1'}}]}});
++  });
++  t.after(()=>{delete globalThis[key];sql.close();});return f;
++}
++const origin='https://invoice.example';
++const post=(action,body={})=>new Request(origin+'/api/gmail/'+action,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify(body)});
++async function connect(f){const r=await f.api.gmailConnect(post('connect')),cookie=r.headers.get('set-cookie').split(';')[0],body=await r.json(),state=new URL(body.url).searchParams.get('state');return{cookie,state,callback:()=>new Request(origin+'/api/gmail/callback?state='+state+'&code=synthetic-code',{headers:{Cookie:cookie}})};}
++
++test('Sites OAuth binds browser and user, rejects replay and wrong account, and encrypts tokens',async t=>{
++  const f=await fixture(t),flow=await connect(f);assert.match(flow.cookie,/mg_gmail_flow=/);
++  await assert.rejects(f.api.gmailCallback(new Request(origin+'/api/gmail/callback?state='+flow.state+'&code=code')),/retur/);
++  assert.equal((await f.api.gmailCallback(flow.callback())).status,302);
++  await assert.rejects(f.api.gmailCallback(flow.callback()),/retur/);
++  const c=f.sql.prepare('SELECT * FROM gmail_connections').get();assert.ok(!c.tokens.includes('synthetic-refresh'));assert.equal((await unseal(f.key,f.owner,'gmail-tokens',c.tokens)).refresh_token,'synthetic-refresh');
++  const other=await connect(f);f.wrongAccount=true;await assert.rejects(f.api.gmailCallback(other.callback()),e=>e.code==='account_mismatch');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_connections').get().n,1);
++});
++test('Sites Gmail originals are idempotent, scoped to owner and do not create debts before review',async t=>{
++  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
++  assert.equal((await (await f.api.gmailSync(post('sync'))).json()).imported,1);
++  assert.equal((await (await f.api.gmailSync(post('sync'))).json()).duplicates,1);
++  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
++  const status=await (await f.api.gmailStatus()).json(),id=status.candidates[0].document_id;
++  f.user={userId:'other-owner'};assert.equal((await (await f.api.gmailStatus()).json()).candidates.length,0);await assert.rejects(f.api.gmailReview(post('review',{document_id:id,confirm:true,invoice:{}})),/source/);
++  f.user={userId:f.owner};const invoice={direction:'payable',party:'Synthetic supplier AB',number:'0606',total:375000,issued:'2026-10-24',due:'2026-11-07',kind:'invoice'},fields={currency:'SEK',vat_cents:'750.00',net_cents:'3000.00'};
++  await f.api.gmailReview(post('review',{document_id:id,extraction:{fields:{party:{value:'Original supplier'}}}}));
++  assert.equal((await f.api.gmailReview(post('review',{document_id:id,confirm:true,invoice,fields}))).status,200);
++  const saved=JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload);assert.equal(saved.invoices.length,1);assert.equal(saved.allocations.length,0);
++  await f.api.gmailReview(post('review',{document_id:id,confirm:true,invoice,fields}));assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,1);
++  assert.equal(JSON.parse(f.sql.prepare('SELECT detail FROM audit_events').get().detail).extraction.fields.party.value,'Original supplier');
++  f.user=null;await assert.rejects(f.api.gmailStatus(),/AUTH_REQUIRED/);
++});
++test('Sites rejects foreign currency and conflicting VAT before creating an invoice; scheduled sync respects cooldown',async t=>{
++  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());await f.api.gmailSync(post('sync'));
++  assert.equal((await (await f.api.gmailSync(undefined,true)).json()).status,'not_due');
++  const id=f.sql.prepare('SELECT id FROM documents').get().id;
++  const invoice={direction:'payable',party:'Synthetic',number:'1',total:10000,issued:'2026-10-24',due:'2026-11-07'};
++  await assert.rejects(f.api.gmailReview(post('review',{document_id:id,confirm:true,invoice,fields:{currency:'EUR'}})),/SEK/);
++  await assert.rejects(f.api.gmailReview(post('review',{document_id:id,confirm:true,invoice,fields:{currency:'SEK',vat_cents:'50.00',net_cents:'90.00'}})),/Momsberäkningen/);
++  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
++});

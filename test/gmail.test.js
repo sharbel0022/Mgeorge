@@ -58,7 +58,7 @@ test('sync preserves original attachments, direction and source IDs, skips remin
     requests.push(url);assert.equal(options.headers.Authorization,'Bearer test-access');
     const parsed=new URL(url);
     if(parsed.pathname.endsWith('/profile'))return respond({emailAddress:'mg.vitvaror@gmail.com'});
-    if(parsed.pathname.endsWith('/messages')){assert.match(parsed.searchParams.get('q'),/in:inbox in:sent/);return respond({messages:Object.keys(messages).map(id=>({id}))});}
+    if(parsed.pathname.endsWith('/messages')){assert.match(parsed.searchParams.get('q'),/has:attachment/);assert.doesNotMatch(parsed.searchParams.get('q'),/in:inbox/);return respond({messages:Object.keys(messages).map(id=>({id}))});}
     const id=parsed.pathname.match(/\/messages\/([^/]+)/)?.[1];
     if(parsed.pathname.includes('/attachments/'))return respond({size:pdf.length,data:pdf.toString('base64url')});
     return respond(messages[id]);
