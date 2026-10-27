@@ -18,4 +18,3 @@ export function pdf(objects){
 }
 export function textPdf(){const stream='BT /F1 14 Tf 40 780 Td 22 TL\n'+text.split('\n').map((line,n)=>(n?'T* ':'')+'('+line.replace(/[()\\]/g,'\\$&')+') Tj').join('\n')+'\nET';return pdf(['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',`<< /Length ${Buffer.byteLength(stream,'latin1')} >>\nstream\n${stream}\nendstream`]);}
 export function image(){const canvas=createCanvas(1400,1400),ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,1400,1400);ctx.fillStyle='black';ctx.font='32px Arial';text.split('\n').forEach((line,n)=>ctx.fillText(line,60,70+n*68));return canvas;}
-

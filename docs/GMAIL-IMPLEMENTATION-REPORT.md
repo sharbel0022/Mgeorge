@@ -4,6 +4,8 @@
 
 Node-versionen har PDF-texttolkning, lokal svensk OCR för skannade PDF/PNG/JPG/WebP, källbelägg och säkerhetsnivå per fält, datum-/belopps-/momskontroll, tre granskningsnivåer, originalförhandsvisning, godkännande, korrigeringshistorik, dubblettkomplettering och valbar automatisk registrering av gröna fakturor från kända motparter. Gmail söker även arkiverade och otydligt namngivna fakturabilagor. Samma innehåll kan ha flera mejlkällor utan att skapa en ny skuld. Gmail har separat serverintervall på 15 minuter från början. Matchning återanvänder befintlig banklogik och kräver alltid användarens godkännande.
 
+Koden är pushad på `codex/gmail-invoice-review`. [Pull request #3 mot main](https://github.com/sharbel0022/Mgeorge/pull/3) är skapad och bifogad till chatten. Den är inte mergad.
+
 Sites har separat källkod, databas och produktionspublicering. Version **13** publicerades framgångsrikt på [MG Fakturakoll](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site). Sites-källcommit: `0793f2ab8c73f0d806a33f72cf70468533d9de62`. Deployment: `appgdep_6ae116d67944819198fd45e0a46ff3e8`. D1-migreringen skapar endast fem nya Gmail-tabeller och ändrar inga banktabeller. Banknycklar, miljöhemligheter, banksessioner och tidigare bankhändelser har inte ändrats av arbetet.
 
 ## Verifiering och kvarstående arbete
@@ -32,6 +34,8 @@ Slutmålet med en helt automatisk verklig produktionskedja är därför **inte u
 - Sites tester: **97/97 godkända**. Nya tester kör riktiga tjänstfunktioner och SQL mot lokal SQLite/D1-adapter och simulerar Google/R2. De testar callbackbindning, replay, fel konto, kryptering, kontoisolering, idempotens, granskning, moms/valuta och spärr för schemalagd körning.
 - Sites produktionsbygge: godkänt. Native deployment bekräftade `succeeded` för version 13.
 - Webbläsare: separat Node-testdatabas på port 3017; syntetisk PDF laddades upp, fält lästes automatiskt, original visades bredvid uppgifterna, fakturatyp valdes och fakturan godkändes. Gränssnittet visade att registreringen lyckades. Originaldatabasen användes inte för detta test.
+- Webbläsare, bankmatchning: den syntetiska fakturan på 3 750 kr matchades efter manuell bekräftelse mot en syntetisk utbetalning på 1 000 kr med referens 0606. Fakturadetaljen visade **Delvis betald**, 1 000 kr betalt och 2 750 kr kvar. Detta var ett test i separat databas, inte en verklig Swedbankbetalning.
+- Produktionskontroll efter Sites-publicering: `/api/gmail/status` returnerade 401 utan inloggning; `/gmail` omdirigerade till ChatGPT-inloggning; egenhostad OCR-worker returnerade 200.
 - Hemlighetskontroll: ändrade filer och Sites-källkod kontrollerades för typiska Google-, OpenAI-, GitHub- och privata PEM-nyckelmönster; inga träffar. Ignorerade miljöfiler/databaser/original har inte lagts till i Git.
 
 `npm start`-skriptets serverentrypoint verifierades med separata ignorerade testinställningar via `node --env-file=.env --env-file=.codex-work/preview.env src/server.js`. Den befintliga `.env` och dess krypteringsnycklar behölls. En tidigare startbegäran med PowerShell-miljötilldelningar avvisades automatiskt; start med en uttrycklig separat testkonfigurationsfil lyckades. Port 3001 var upptagen, så testservern använde 3017.
