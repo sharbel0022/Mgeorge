@@ -11,6 +11,7 @@ import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { digest } from './security.js';
 
+/** Öppnar SQLite och förbereder databasschemat. Här bevaras företagets fakturor och historik mellan serverstarter. */
 export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sqlite') {
   const path=resolve(filename); mkdirSync(dirname(path),{recursive:true,mode:0o700});
   const db=new DatabaseSync(path);
@@ -128,6 +129,7 @@ export function listTransactions(db) {
 }
 export function paymentSign(invoice){return (invoice.direction==='customer'?1:-1)*(invoice.kind==='credit'?-1:1);}
 function normalized(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]/gu,'');}
+/** Föreslår fakturamatchningar när betalningsriktning, referens eller betalare och belopp uppfyller reglerna; förslag är inte bekräftade betalningar. */
 export function matchingSuggestions(db){
   const invoices=listInvoices(db).filter(i=>i.remaining_cents>0),out=[];
   for(const t of listTransactions(db)){
@@ -144,6 +146,7 @@ export function matchingSuggestions(db){
   }
   return out.sort((a,b)=>(a.confidence==='high'?0:1)-(b.confidence==='high'?0:1));
 }
+/** Beräknar aktuell fakturastatus från godkända betalningsallokeringar och avstämningsinformation. */
 export function invoiceStatus(db) {
   const invoices=listInvoices(db);
   return {
@@ -163,6 +166,7 @@ export function invoiceStatus(db) {
 export function assertNoLegacyBankImports(db) {
   if(db.prepare("SELECT id FROM bank_transactions WHERE source='enablebanking' AND api_identity_version=0 LIMIT 1").get())throw Object.assign(new Error('Tidigare bankimport använder äldre konto- eller transaktions-ID:n. Granska och migrera de posterna innan nya bankhändelser hämtas. Inga nya bankhändelser har sparats.'),{status:409,code:'legacy_bank_identity'});
 }
+/** Lagrar importerade bankhändelser och använder identiteter/fingeravtryck för att minska risken för dubletter. */
 export function storeTransactions(db,items,source,original=null) {
   // Legacy lookup IDs and session account UIDs cannot safely be guessed into
   // stable identities. Block the whole API batch until a reviewed migration
@@ -220,6 +224,7 @@ export function storeTransactions(db,items,source,original=null) {
   } catch(e) {db.exec('ROLLBACK');throw e;}
   return {imported,duplicate,enriched,import_id};
 }
+/** Bekräftar kopplingen mellan bankhändelse och faktura, med belopps- och riktningskontroller inom en databastransaktion. */
 export function allocate(db,invoiceId,transactionId,amountCents) {
   if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');
   db.exec('BEGIN IMMEDIATE');
@@ -237,6 +242,7 @@ export function allocate(db,invoiceId,transactionId,amountCents) {
     audit(db,'manual_match',{invoiceId,transactionId,amountCents}); db.exec('COMMIT');
   }catch(e){db.exec('ROLLBACK');throw e;}
 }
+/** Ångrar en tidigare matchning och låter saldot beräknas om; åtgärden ska vara spårbar. */
 export function deleteAllocation(db,id){
   db.exec('BEGIN IMMEDIATE');
   try{
