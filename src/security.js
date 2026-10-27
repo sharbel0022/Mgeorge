@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – SÄKERHET / KRYPTERING
+ * ANSVAR: Innehåller hjälpmetoder för hashning, säkra token, sessioner och AES-256-GCM-kryptering av integrationsuppgifter.
+ * FLÖDE: server.js använder säkerhetsfunktionerna; privata nycklar och token får inte skickas till frontend.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import { createHash, createHmac, randomBytes, timingSafeEqual, scryptSync, createCipheriv, createDecipheriv } from 'node:crypto';
 
 export function digest(value) { return createHash('sha256').update(value).digest('hex'); }
