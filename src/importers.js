@@ -202,6 +202,7 @@ export function parseCAMT(xml,account='Swedbank'){
   }
   return validateItems(items);
 }
+/** Väljer parser för det uppladdade bankformatet och omvandlar resultatet till gemensamma transaktionsfält. */
 export function parseBankFile(name,base64,account='Swedbank'){
   if(!/^[\w\p{L}(). -]+\.(csv|xml)$/iu.test(String(name)))throw new Error('Välj CSV eller XML');
   if(typeof base64!=='string'||base64.length>20_000_000||!base64.length||base64.length%4!==0||!/^[A-Za-z0-9+/]*={0,2}$/.test(base64))throw new Error('Fil saknas eller är för stor eller felaktig');
