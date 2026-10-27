@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – BANKFILER / FORMAT
+ * ANSVAR: Tolkar CSV och ISO 20022 camt.053/camt.054 och normaliserar datum, belopp, riktning och referenser. Samlade Bankgiroposter kräver säkra detaljuppgifter.
+ * FLÖDE: Fil → importers.js → kontroll och förhandsgranskning i server.js → lagring i db.js.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 // Bank files are untrusted data. Never evaluate XML, resolve entities or infer
 // individual payments from a collective entry without individual amounts.
 export function parseMoney(value) {
