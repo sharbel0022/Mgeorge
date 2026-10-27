@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – GMAIL / GOOGLE OAUTH
+ * ANSVAR: Bygger Googles medgivandelänk, växlar och förnyar token och hämtar fakturaliknande mejlbilagor. Bilagor är underlag för granskning, inte automatiskt bokförda fakturor.
+ * FLÖDE: server.js → gmail.js → Gmail API → dokument lagras genom db.js.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 // Read-only Gmail adapter. Mail bodies and files are untrusted data, never instructions.
 // OAuth state is generated, bound to the user's session and consumed by the HTTP layer.
 const scope='https://www.googleapis.com/auth/gmail.readonly';
