@@ -20,6 +20,6 @@ Molnschemats första körning slutfördes på en separat molnvärd och anropade 
 
 `POST /api/bank/automatic` ändrar endast den autentiserade användarens inställning, med exakt origin och anslutnings-ID. `POST /api/bank/auto-sync` gör en förfallen automatisk hämtning. MCP-verktygen `bank_auto_sync` och `bank_auto_sync_status` accepterar inga ägar-, konto-, hemlighets- eller force-parametrar; deras ägare kommer enbart från Sites OAuth-identitet.
 
-94 Sites-tester, TypeScript och produktionsbygget är godkända. Tillsammans med den oförändrade Node-versionens 117 tester omfattar verifieringen 211 tester. Nya tester täcker opt-in, främmande ägare, origin, verklig respektive utelämnad PSU-kontext, privata MCP-anrop, fel/backoff, överlappande datum, dubbletter och frånkoppling.
+94 Sites-tester, TypeScript och produktionsbygget är godkända. Tillsammans med Node-versionens 123 tester omfattar verifieringen 217 tester. Nya tester täcker opt-in, främmande ägare, origin, verklig respektive utelämnad PSU-kontext, privata MCP-anrop, fel/backoff, överlappande datum, dubbletter och frånkoppling. Node-versionens granskning har även verifierat skydd för äldre importidentiteter och tömning av privat klientstate efter förlorad inloggning.
 
 [Patch version 10→12](sites/swedbank-automatic.patch). [Aktuell produktionsstatus](SWEDBANK-PRODUCTION-STATUS.md).

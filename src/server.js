@@ -2,7 +2,7 @@ import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { openDatabase, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
+import { openDatabase, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
 import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
 import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
@@ -204,6 +204,7 @@ async function syncBank(connection,{account_uid,date_from,date_to}={},operationL
   const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid);if(!selected)throw bad(400,'Välj ett godkänt konto');
   date_from||=new Date(Date.parse(today()+'T12:00:00Z')-29*86400000).toISOString().slice(0,10);date_to||=today();
   const from=validateDate(date_from,true),to=validateDate(date_to,true);if(from>to||Math.abs(Date.parse(to)-Date.parse(from))>91*86400000)throw bad(400,'Välj ett datumintervall på högst 91 dagar');
+  assertNoLegacyBankImports(db);
   if(!operationLocked)bankSyncing.add(connection.id);
   try{
     await verifyBankSession(connection);

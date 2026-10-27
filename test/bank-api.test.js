@@ -163,6 +163,20 @@ test('Bankgiro totals without payer details are review-only and cannot pay invoi
   assert.equal((await call('/api/allocations','POST',{invoice_id:invoice.json.id,transaction_id:t.id,amount_cents:20000,confirm:true})).res.status,400);
   assert.equal((await call('/api/invoices/'+invoice.json.id)).json.invoice.paid_cents,0);
 });
+test('legacy identity preflight blocks the complete sync before any provider read',async()=>{
+  const c=await current(),legacy=db.prepare("SELECT id FROM bank_transactions WHERE source='enablebanking' LIMIT 1").get();
+  db.prepare('UPDATE bank_transactions SET api_identity_version=0 WHERE id=?').run(legacy.id);
+  const calls=providerCalls,rows=db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n;
+  try{
+    const result=await call('/api/bank/sync','POST',{connection_id:c.id});
+    assert.equal(result.res.status,409);assert.match(result.json.error,/äldre konto- eller transaktions-ID/);
+    assert.equal(providerCalls,calls);assert.equal(db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,rows);
+  }finally{
+    db.prepare('UPDATE bank_transactions SET api_identity_version=1 WHERE id=?').run(legacy.id);
+    db.prepare("UPDATE bank_connections SET status='connected',last_error='' WHERE id=?").run(c.id);
+  }
+});
+
 test('scheduled synchronization only uses selected account and logout invalidates pending callback',async()=>{
   const c=await current();db.prepare("UPDATE bank_connections SET last_synced='' WHERE id=?").run(c.id);
   await call('/api/settings','PATCH',{sync_interval_minutes:15});const before=transactionCalls;await runScheduledSync();assert.equal(transactionCalls,before+2);

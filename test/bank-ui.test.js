@@ -20,11 +20,12 @@ function ui(){
   }
   const context=vm.createContext({
     document:{querySelector:element,getElementById:id=>element('#'+id),addEventListener(){},body:{classList:{add(){},remove(){}}}},
-    location:{search:'?tab=connections',assign(){}},window:{addEventListener(){},scrollTo(){}},history:{pushState(){},replaceState(){}},
+    location:{search:'?tab=connections',assign(){}},window:{addEventListener(name,handler){listeners.set('window:'+name,handler);},scrollTo(){}},history:{pushState(){},replaceState(){}},
     URLSearchParams,URL,Intl,Date,matchMedia:()=>({matches:false,addEventListener(){}}),fetch:()=>new Promise(()=>{}),setTimeout:()=>1,clearTimeout(){}
   });
   vm.runInContext(source,context,{filename:'public/app.js'});
-  return {context,element,run:code=>vm.runInContext(code,context),set:(name,value)=>{context[name]=value;},html:()=>element('#app').innerHTML};
+  vm.runInContext('state.me={authenticated:true,login_required:true}',context);
+  return {context,element,run:code=>vm.runInContext(code,context),set:(name,value)=>{context[name]=value;},dispatch:name=>listeners.get('window:'+name)?.(),html:()=>element('#app').innerHTML};
 }
 const plain=value=>JSON.parse(JSON.stringify(value));
 function bankFixture(view,connections=[],extra={}){view.set('fixture',{configured:true,connections,...extra});view.run('state.bank=fixture');}
@@ -79,6 +80,30 @@ test('public login replaces bank content and logout is offered only for authenti
   assert.doesNotMatch(view.html(),/•••• 1234|data-sync=|data-action="logout"/);
   view.run('state.me={authenticated:true,login_required:false};render()');
   assert.doesNotMatch(view.html(),/data-action="logout"/);
+});
+
+test('expired sessions erase private state and browser history cannot restore it',()=>{
+  const view=ui();
+  view.run("state.me={authenticated:true,login_required:true};state.settings={company_name:'PRIVATE COMPANY'};for(const key of ['invoices','transactions','allocations','suggestions','documents','imports','audit'])state[key]=[{secret:'PRIVATE RECORD'}];state.bank={configured:true,connections:[{secret:'PRIVATE BANK'}]};state.gmail={email:'PRIVATE EMAIL'};state.preview={secret:'PRIVATE PREVIEW'};state.filters.customers.q='PRIVATE SEARCH';state.loaded='2026-10-27T12:00:00Z';render()");
+  assert.match(view.html(),/PRIVATE COMPANY/);
+  view.run('showLogin("Sessionen har gått ut.")');
+  for(const key of ['invoices','transactions','allocations','suggestions','documents','imports','audit'])assert.equal(view.run(`state.${key}.length`),0);
+  assert.equal(view.run('state.bank.connections.length'),0);assert.equal(view.run('state.preview'),null);
+  assert.equal(view.run('state.filters.customers.q'),'');assert.deepEqual(plain(view.run('state.settings')),{});
+  view.dispatch('popstate');
+  assert.match(view.html(),/id="login-form"/);assert.doesNotMatch(view.html(),/PRIVATE/);
+  view.run("state.audit=[{secret:'PRIVATE LATE AUDIT'}];render()");
+  assert.equal(view.run('state.audit.length'),0);assert.doesNotMatch(view.html(),/PRIVATE/);
+});
+
+test('a refresh completed after authentication loss cannot restore company records',async()=>{
+  const view=ui();let release;const gate=new Promise(resolve=>{release=resolve;});
+  view.set('gate',gate);view.set('responses',{'/dashboard':{},'/invoices':{items:[{secret:'PRIVATE RESPONSE'}]},'/bank-transactions':{items:[]},'/allocations':{items:[]},'/bank/status':{configured:false,connections:[]},'/settings':{company_name:'PRIVATE COMPANY'},'/gmail/status':{},'/suggestions':{items:[]},'/imports':{items:[]},'/documents':{items:[]}});
+  view.run("api=async path=>path==='/me'?{authenticated:true,login_required:true}:gate.then(()=>responses[path])");
+  const pending=view.run('refresh()');await Promise.resolve();
+  view.run('showLogin()');release();await pending;
+  assert.equal(view.run('state.invoices.length'),0);assert.equal(view.run('state.me.authenticated'),false);
+  assert.match(view.html(),/id="login-form"/);assert.doesNotMatch(view.html(),/PRIVATE/);
 });
 
 for(const status of ['renewal_required','error','missing'])test(`account-selection result does not report success when refreshed status is ${status}`,async()=>{

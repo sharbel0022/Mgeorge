@@ -1,5 +1,7 @@
 # Verifierad produktionsstatus, 27 oktober 2026
 
+**Kontroll inför main:** De två granskningsfynden i Node-versionen är åtgärdade. Äldre API-identiteter stoppar nya importer tills en granskad migrering bevarar originalrader och matchningar. Förlorad inloggning tömmer privat klientstate och spärrar återvisning via webbläsarhistorik eller sena svar. 123 Node-tester och 94 Sites-tester är godkända, totalt 217. Den publicerade Siten och dess bankmedgivande är oförändrade av dessa Node-rättningar.
+
 **Senaste uppdatering:** Sites version 12 är publicerad med automatisk bankhämtning, ägarbunden inställning, privata molnverktyg och ett aktiverat molnschema fyra gånger per dygn. Se [automatisk bankhämtning](SWEDBANK-AUTOMATIC.md) för intervall, behörigheter och verifieringsgränser. Anslutningen och den tidigare verifierade importen nedan bevaras.
 
 ## Genomfört

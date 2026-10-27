@@ -4,8 +4,8 @@ import {openDatabase,allocate,listInvoices,storeTransactions,listTransactions,ma
 import {normalizeBankApiTransaction,parseCAMT} from '../src/importers.js';
 process.env.MG_ADMIN_PASSWORD='TEST-DO-NOT-USE-THIS-AS-A-REAL-PASSWORD';
 const fixture=()=>{
-  const folder=mkdtempSync(join(tmpdir(),'mgeorge-'));const db=openDatabase(join(folder,'db.sqlite'));
-  return {db,cleanup:()=>{db.close();rmSync(folder,{recursive:true,force:true});}};
+  const folder=mkdtempSync(join(tmpdir(),'mgeorge-'));let db=openDatabase(join(folder,'db.sqlite'));
+  return {db,reopen:()=>{db.close();db=openDatabase(join(folder,'db.sqlite'));return db;},cleanup:()=>{db.close();rmSync(folder,{recursive:true,force:true});}};
 };
 test('matching respects direction, balances and prevents double-match',()=>{
   const {db,cleanup}=fixture();
@@ -109,6 +109,41 @@ test('renewed consent and unstable provider lookup IDs do not duplicate a booked
     assert.equal(storeTransactions(db,[{...renewed,account:'Swedbank:other-account'}],'enablebanking').imported,1);
   }finally{cleanup();}
 });
+test('upgrading old API identities blocks reimports while retaining original allocations and row IDs',()=>{
+  const f=fixture();let db=f.db;try{
+    db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('legacy-invoice','customer','0606','Kund AB',10000);
+    const legacy={account:'SE4550000000058398257466',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Kund AB',reference:'0606',bank_reference:'OLD-LOOKUP-ID',description:''};
+    storeTransactions(db,[legacy],'enablebanking');const original=listTransactions(db)[0];
+    allocate(db,'legacy-invoice',original.id,10000);
+    db.exec('ALTER TABLE bank_transactions DROP COLUMN api_identity_version; ALTER TABLE bank_transactions DROP COLUMN provider_transaction_id;');
+    db=f.reopen();
+    assert.equal(db.prepare('SELECT api_identity_version FROM bank_transactions').get().api_identity_version,0);
+    const renewed=normalizeBankApiTransaction({status:'BOOK',entry_reference:'STABLE-ARCHIVE-ID',transaction_id:'NEW-LOOKUP-ID',booking_date:'2026-10-26',credit_debit_indicator:'CRDT',transaction_amount:{amount:'100.00',currency:'SEK'},debtor:{name:'Kund AB'},reference_number:'0606'},'iban:SE4550000000058398257466');
+    assert.throws(()=>storeTransactions(db,[{...renewed,bank_reference:'OTHER-PAYMENT'},renewed],'enablebanking'),error=>error.status===409&&error.code==='legacy_bank_identity');
+    const rows=listTransactions(db);assert.equal(rows.length,1);assert.equal(rows[0].id,original.id);
+    assert.equal(rows[0].allocated_cents,10000);assert.equal(rows[0].available_cents,0);
+    assert.equal(listInvoices(db)[0].remaining_cents,0);
+  }finally{f.cleanup();}
+});
+
+test('current identity versions allow stable-entry deduplication without a provider lookup ID',()=>{
+  const {db,cleanup}=fixture();try{
+    const payment={account:'iban:SE123',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Kund',reference:'0606',bank_reference:'STABLE-ENTRY'};
+    assert.equal(storeTransactions(db,[payment],'enablebanking').imported,1);
+    assert.equal(storeTransactions(db,[payment],'enablebanking').duplicate,1);
+    assert.equal(db.prepare('SELECT api_identity_version FROM bank_transactions').get().api_identity_version,1);
+  }finally{cleanup();}
+});
+
+test('an already modern API import stays usable when the identity marker is added',()=>{
+  const f=fixture();let db=f.db;try{
+    const payment={account:'iban:SE123',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Kund',reference:'0606',bank_reference:'STABLE-ENTRY',provider_transaction_id:'LOOKUP'};
+    storeTransactions(db,[payment],'enablebanking');db.exec('ALTER TABLE bank_transactions DROP COLUMN api_identity_version;');db=f.reopen();
+    assert.equal(storeTransactions(db,[payment],'enablebanking').duplicate,1);
+    assert.equal(listTransactions(db).length,1);
+  }finally{f.cleanup();}
+});
+
 test('missing stable ID uses content and ignores changing provider detail lookup IDs',()=>{
   const {db,cleanup}=fixture();try{
     const raw={status:'BOOK',transaction_amount:{amount:'100.00',currency:'SEK'},credit_debit_indicator:'CRDT',booking_date:'2026-10-26',debtor:{name:'Kund AB'},reference_number:'0606',transaction_id:'LOOKUP-A'};

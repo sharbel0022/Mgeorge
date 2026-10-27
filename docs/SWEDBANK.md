@@ -45,6 +45,8 @@ Bankreferens, företagets Bankgiro, kundens OCR, namn och individuellt belopp h�
 
 Äldre anslutningar utan verifierad ägare/kontoval används inte automatiskt. Förnya med en roterad leverantörsnyckel och återkalla gamla medgivanden hos banken/Enable Banking. Historiska API-importer kan ha använt ett instabilt transaktions-ID. De går inte säkert att migrera utifrån belopp. Säkerhetskopiera, jämför originalreferenser och gör en kontrollerad migrering innan samma historik hämtas på nytt. Byt inte `BANK_DATA_KEY` för att åtgärda leverantörsnyckeln: de är olika nycklar.
 
+Node-versionen markerar nya API-rader med `api_identity_version=1`. Äldre API-rader utan verifierad identitet stoppar en ny API-import med `legacy_bank_identity`, redan före bankanropet. Även undantagna eller redan matchade gamla poster räknas, så att samma pengar inte återkommer som en ny tillgänglig betalning. En granskad migrering ska bevara rad-ID:n, allokeringar och undantag, kontrollera kontokoppling samt beständig bankreferens mot originalunderlaget och först därefter markera identiteten som verifierad. Systemet gissar inte denna koppling från belopp, datum eller ett nytt sessions-ID.
+
 ## ChatGPT Sites och manuellt driftsättningsprov
 
 Sites använder separat Worker-kod, D1/R2 och ChatGPT-inloggning. Dess lagringshemlighet heter `BANK_DATA_ENCRYPTION_KEY` och är 32 byte som 43 base64url-tecken utan padding. Den ska bevaras. Se [jämförelsen och publiceringsresultatet](SWEDBANK-SITES-COMPARISON.md). En GitHub-push publicerar inte Siten.

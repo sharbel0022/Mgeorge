@@ -83,6 +83,9 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','import_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','bankgiro',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
+  const identityUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='api_identity_version');
+  addColumn('bank_transactions','api_identity_version','INTEGER NOT NULL DEFAULT 0');
+  if(identityUpgrade)db.prepare("UPDATE bank_transactions SET api_identity_version=1 WHERE source='enablebanking' AND provider_transaction_id<>''").run();
   addColumn('bank_states','session_hash',"TEXT NOT NULL DEFAULT ''");
   addColumn('sessions','principal',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_connections','owner',"TEXT NOT NULL DEFAULT ''");
@@ -150,8 +153,16 @@ export function invoiceStatus(db) {
     review_count:listTransactions(db).filter(t=>!t.excluded&&t.available_cents>0).length+invoices.filter(i=>i.status==='unreconciled').length+db.prepare("SELECT COUNT(*) AS n FROM documents WHERE invoice_id IS NULL AND status='needs_review'").get().n
   };
 }
+export function assertNoLegacyBankImports(db) {
+  if(db.prepare("SELECT id FROM bank_transactions WHERE source='enablebanking' AND api_identity_version=0 LIMIT 1").get())throw Object.assign(new Error('Tidigare bankimport använder äldre konto- eller transaktions-ID:n. Granska och migrera de posterna innan nya bankhändelser hämtas. Inga nya bankhändelser har sparats.'),{status:409,code:'legacy_bank_identity'});
+}
 export function storeTransactions(db,items,source,original=null) {
-  const insert=db.prepare(`INSERT OR IGNORE INTO bank_transactions(id,fingerprint,account,booked_at,amount_cents,currency,payer,reference,bank_reference,description,source,needs_review,is_aggregate,parent_bank_reference,review_reason,bankgiro,provider_transaction_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,?)`);
+  // Legacy lookup IDs and session account UIDs cannot safely be guessed into
+  // stable identities. Block the whole API batch until a reviewed migration
+  // preserves the old row IDs, exclusions and allocations. Never create a fresh
+  // spendable copy of an already allocated or excluded historical payment.
+  if(source==='enablebanking')assertNoLegacyBankImports(db);
+  const insert=db.prepare(`INSERT OR IGNORE INTO bank_transactions(id,fingerprint,account,booked_at,amount_cents,currency,payer,reference,bank_reference,description,source,needs_review,is_aggregate,parent_bank_reference,review_reason,bankgiro,provider_transaction_id,api_identity_version) VALUES(?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,?,?)`);
   let imported=0,duplicate=0,enriched=0,import_id;const inserted=[],completedSpecifications=[];
   db.exec('BEGIN IMMEDIATE');
   try {
@@ -180,7 +191,7 @@ export function storeTransactions(db,items,source,original=null) {
         }
         duplicate++;continue;
       }
-      const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'');
+      const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'',source==='enablebanking'?1:0);
       if(r.changes){imported++;inserted.push(id);}else duplicate++;
     }
     // A complete specification replaces its collective parent; never match the parent itself.
