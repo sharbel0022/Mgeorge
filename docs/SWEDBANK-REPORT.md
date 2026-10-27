@@ -1,6 +1,6 @@
 # Slutrapport: Swedbank-integrationen, 27 oktober 2026
 
-**Aktuell status:** Ny produktionsapplikation är aktiv, gammal registrering är borttagen efter uttryckligt godkännande och runtime-hemligheter är installerade. Sites version 10 öppnar det riktiga bankmedgivandet. Personlig signering för hemsidans AIS-session och verklig transaktionsimport återstår. 204 tester godkända. Se [verifierad produktionsstatus](SWEDBANK-PRODUCTION-STATUS.md) för aktuella detaljer. Avsnitten nedan bevarar kontrollhistoriken före registrering/aktivering och beskriver dåtidens hinder.
+**Aktuell status:** Swedbank är ansluten i Sites version 10 efter användarens personliga signering. Verkliga in- och utbetalningar visas i den privata arbetsytan; upprepad hämtning gav noll nya händelser. Ny produktionsapplikation är aktiv, gammal registrering är borttagen efter uttryckligt godkännande och runtime-hemligheter är installerade. 204 tester godkända. Se [verifierad produktionsstatus](SWEDBANK-PRODUCTION-STATUS.md) för aktuella detaljer. Avsnitten nedan bevarar kontrollhistoriken före registrering/aktivering och beskriver dåtidens hinder.
 
 ## Uppföljande kontroll före bankmedgivande
 
