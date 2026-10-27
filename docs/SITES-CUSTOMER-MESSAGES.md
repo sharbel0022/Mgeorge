@@ -1,5 +1,15 @@
 # Publicerad Sites-leverans: kundmeddelanden
 
+## Google-appens produktionsläge – 28 oktober 2026
+
+Google Cloud-projektet `celestial-feat-512922-e6` visar nu **In production** efter uttryckligt godkännande av bytet. Appens befintliga hemsida, integritetspolicy och användarvillkor är angivna i Branding. Sjudagarsgränsen i Googles testläge gäller inte nya produktionsmedgivanden; äldre testtoken bör ersättas genom en ny anslutning med samma `gmail.readonly` och `gmail.send`. Se [Googles tokenregler](https://developers.google.com/identity/protocols/oauth2#expiration).
+
+Gmail återanslöts därefter i produktionsläget med oförändrade behörigheter. Den nya callbacken lyckades (`302` till `/gmail?status=connected`) och Sites bekräftade `configured: true`, `send_enabled: true` och `connection.status: connected` för företagskontot. Sex tidigare hämtade underlag fanns kvar. Inga kundmejl skickades. Den faktiska tokenfunktionen efter mer än sju dagar har ännu inte kunnat observeras.
+
+Produktionsstatus är inte samma sak som godkänd Google-verifiering. Google visar fortfarande krav på verifiering och en gräns på 100 användare för overifierade behörigheter. För ett verktyg som bara används av ett fåtal personligen kända konton beskriver Google ett [undantag från verifieringskravet](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification#personal-use). Informationssidorna är fortfarande märkta som utkast och har inte ändrats eller juridiskt godkänts genom denna konfigurationsändring. Vid bredare distribution behöver verifierings- och domänkraven hanteras separat.
+
+Ingen Sites-kod, befintlig banknyckel, kunddata eller schemaläggning ändras av publiceringsstatusen hos Google. Google kan fortfarande kräva återanslutning vid återkallad åtkomst, lösenordsändringar och andra tokenhändelser.
+
 ## Gmail aktiverat och verifierat – version 16
 
 Den 28 oktober 2026 (svensk tid) verifierades den verkliga Google-anslutningen för `mg.vitvaror@gmail.com`: `configured: true`, `connection.status: connected` och `send_enabled: true`. Google-profilkontrollen lyckades och Sites visar **Gmail – Ansluten** samt **Utskicksbehörighet finns** på Kundmeddelanden. Granskningskön var tom. Inga verkliga mejl skickades; faktisk leverans till mottagare har därför inte testats.
@@ -10,7 +20,7 @@ Den 28 oktober 2026 (svensk tid) verifierades den verkliga Google-anslutningen f
 - Sites-källa: `ffa15b6b5ab7795076a0b1405fc2a25755adc845`. Version 16: `appgprj_6adf2f7f7e848191b64192161886b528~appgver_2abe9fcc0c4c81919004fe30fe91d2bc`. Deployment `appgdep_6ae12ca8a1008191b2ec07188080d294`: `succeeded`.
 - [Kompletterande patch mot version 14](sites/gmail-oauth-runtime.patch). 30 berörda Gmail-/kundmeddelandetester, TypeScript och produktionsbygget passerade. En verklig Workerd-kontroll reproducerade felet för `error` och bekräftade stöd för `manual`.
 - Godkännandeflödet verifierades med syntetiska data: verifierad kundadress, läst aktuell version, uttryckligt godkännande, spärr efter ändringar, engångsutskick och lås vid oklar leverans. Inga testposter lades i produktionsregistret.
-- Appen är i Googles **Testing**-läge. Gmail-medgivande/refresh token upphör efter sju dagar och behöver då förnyas. Se [Googles beskrivning av testläget](https://support.google.com/cloud/answer/15549945?hl=en). Molnschemat är fortsatt pausat och ingen automatisk mejlsändning är aktiverad.
+- Vid denna första verifiering var appen i Googles **Testing**-läge, med sjudagarsgräns för medgivande/refresh token. Den sattes senare i produktion, enligt avsnittet ovan. Molnschemat lämnades pausat och ingen automatisk mejlsändning aktiverades.
 
 ## Ursprunglig funktionsleverans – version 14
 
