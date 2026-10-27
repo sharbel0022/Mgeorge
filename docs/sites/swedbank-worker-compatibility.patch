@@ -1,0 +1,130 @@
+diff --git a/components/bank-connection.tsx b/components/bank-connection.tsx
+index c381ad5..de1ae5d 100644
+--- a/components/bank-connection.tsx
++++ b/components/bank-connection.tsx
+@@ -28,7 +28,7 @@ function initialDate() { const date = new Date(localDate() + "T12:00:00Z"); date
+ function dateLabel(value?: string | null) { return value && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "Inte hämtat ännu"; }
+ function followBankUrl(value: string) {
+   const url = new URL(value);
+-  if (url.origin !== "https://auth.enablebanking.com" || url.username || url.password || url.hash) throw new BankApiError("Bankens inloggningsadress kunde inte verifieras.");
++  if (!["https://auth.enablebanking.com", "https://tilisy.enablebanking.com"].includes(url.origin) || url.pathname !== "/ais/start" || url.username || url.password || url.hash) throw new BankApiError("Bankens inloggningsadress kunde inte verifieras.");
+   window.location.assign(url.href);
+ }
+ const resultMessages: Record<string, string> = {
+diff --git a/lib/banking/enable-banking.ts b/lib/banking/enable-banking.ts
+index dd218e8..863f295 100644
+--- a/lib/banking/enable-banking.ts
++++ b/lib/banking/enable-banking.ts
+@@ -186,7 +186,13 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
+   }
+   const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+   try {
+-    const response = await fetch(url.href, { method, headers, body, signal: controller.signal, redirect: 'error', cache: 'no-store' });
++    // Workers supports manual redirects, but rejects redirect: 'error'. Never
++    // follow a redirect with bank credentials or an authorization-code body.
++    const response = await fetch(url.href, { method, headers, body, signal: controller.signal, redirect: 'manual', cache: 'no-store' });
++    if (response.status >= 300 && response.status < 400) {
++      await response.body?.cancel();
++      throw new ProviderError('PROVIDER_REDIRECT_DENIED', 'Banktjänsten svarade med en oväntad omdirigering. Ingen import gjordes.');
++    }
+     const payload = await boundedJson(response);
+     if (!response.ok) throw mappedError(response.status, payload);
+     if (!record(payload)) throw invalidResponse();
+@@ -194,6 +200,14 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
+   } catch (error) {
+     if (error instanceof ProviderError) throw error;
+     if (controller.signal.aborted) throw new ProviderError('BANK_TIMEOUT', 'Banktjänsten svarade inte i tid. Försök igen om en stund.', 504, true);
++    // Keep deployment transport failures diagnosable without logging request
++    // headers, JWTs, authorization codes, account IDs or upstream response data.
++    const detail = error instanceof Error ? error.message : 'Unknown transport failure';
++    console.error('BANK_PROVIDER_TRANSPORT_ERROR', detail
++      .replace(/https?:\/\/\S+/gi, '[url]')
++      .replace(/Bearer\s+\S+/gi, '[authorization]')
++      .replace(/[A-Za-z0-9+/=_-]{24,}/g, '[redacted]')
++      .slice(0, 240));
+     throw new ProviderError('BANK_NETWORK_ERROR', 'Banktjänsten kunde inte nås. Ingen import gjordes.', 502, true);
+   } finally { clearTimeout(timeout); }
+ }
+@@ -226,7 +240,10 @@ export async function startAuth(config: ProviderConfig, input: { bank: ProviderB
+     state: input.state, redirect_url: callback.href, psu_type: 'business', language: 'sv',
+   } });
+   let redirect: URL; try { redirect = new URL(result.url); } catch { throw invalidResponse(); }
+-  if (redirect.protocol !== 'https:' || redirect.hostname !== 'auth.enablebanking.com' || redirect.port || redirect.username || redirect.password || result.url.length > 8_192) throw invalidResponse();
++  // Production Swedbank currently returns the provider's tilisy host, while
++  // the API reference also documents auth.enablebanking.com. Match exact
++  // origins and the AIS start path, never arbitrary subdomains or redirects.
++  if (!['https://auth.enablebanking.com', 'https://tilisy.enablebanking.com'].includes(redirect.origin) || redirect.pathname !== '/ais/start' || redirect.username || redirect.password || redirect.hash || result.url.length > 8_192) throw invalidResponse();
+   return result;
+ }
+ 
+diff --git a/tests/banking-provider.test.mjs b/tests/banking-provider.test.mjs
+index b3d7994..abe7243 100644
+--- a/tests/banking-provider.test.mjs
++++ b/tests/banking-provider.test.mjs
+@@ -30,7 +30,7 @@ test('Provider JWT is a verifiable short-lived RS256 token and uses fixed HTTPS
+   const result = await getApplication(config);
+   assert.equal(result.environment, 'PRODUCTION');
+   assert.equal(call.url, 'https://api.enablebanking.com/application');
+-  assert.equal(call.init.redirect, 'error');
++  assert.equal(call.init.redirect, 'manual');
+   assert.equal(call.init.cache, 'no-store');
+   const token = call.init.headers.get('Authorization').replace(/^Bearer /, '');
+   const [header, body, signature] = token.split('.');
+@@ -88,8 +88,27 @@ test('Start auth requests transaction reading only and refuses a provider URL on
+   assert.equal(sent.body.state, input.state);
+   assert.equal(sent.body.redirect_url, input.redirectUrl);
+   assert.equal(sent.body.language, 'sv');
+-  t.mock.method(globalThis, 'fetch', async () => json({ url: 'https://auth.enablebanking.com.evil.test/steal' }));
+-  await assert.rejects(startAuth(config, input), error => error.code === 'INVALID_PROVIDER_RESPONSE');
++  t.mock.method(globalThis, 'fetch', async () => json({ url: 'https://tilisy.enablebanking.com/ais/start?sessionid=example' }));
++  assert.match((await startAuth(config, input)).url, /^https:\/\/tilisy\.enablebanking\.com\/ais\/start\?/);
++  for (const url of ['https://auth.enablebanking.com.evil.test/ais/start', 'https://tilisy.enablebanking.com.evil.test/ais/start', 'http://tilisy.enablebanking.com/ais/start', 'https://tilisy.enablebanking.com:444/ais/start', 'https://user:password@tilisy.enablebanking.com/ais/start', 'https://tilisy.enablebanking.com/pis/start', 'https://tilisy.enablebanking.com/ais/start#fragment']) {
++    t.mock.method(globalThis, 'fetch', async () => json({ url }));
++    await assert.rejects(startAuth(config, input), error => error.code === 'INVALID_PROVIDER_RESPONSE');
++  }
++});
++
++test('The real browser navigation gate accepts both provider AIS hosts and rejects unrelated URLs', () => {
++  const component = readFileSync(new URL('../components/bank-connection.tsx', import.meta.url), 'utf8');
++  const implementation = component.match(/function followBankUrl\(value: string\) \{([\s\S]*?)\n\}/)[1];
++  const visits = [];
++  const follow = new Function('value', 'window', 'BankApiError', implementation);
++  const window = { location: { assign: url => visits.push(url) } };
++  for (const host of ['auth.enablebanking.com', 'tilisy.enablebanking.com']) {
++    const url = `https://${host}/ais/start?sessionid=test`;
++    follow(url, window, Error);
++    assert.equal(visits.at(-1), url);
++  }
++  for (const url of ['https://tilisy.enablebanking.com.evil.test/ais/start', 'http://tilisy.enablebanking.com/ais/start', 'https://tilisy.enablebanking.com/pis/start']) assert.throws(() => follow(url, window, Error));
++  assert.equal(visits.length, 2);
+ });
+ 
+ test('Create and inspect session preserve distinct POST and GET account shapes; deletion is limited to a session', async t => {
+@@ -168,6 +187,27 @@ test('Response bounds and malformed success data fail before caller can import',
+   await assert.rejects(getApplication(config), error => error.code === 'INVALID_PROVIDER_RESPONSE');
+ });
+ 
++test('Worker-compatible manual redirects never forward bank credentials or authorization codes', async t => {
++  let calls = 0;
++  t.mock.method(globalThis, 'fetch', async (_url, init) => {
++    calls++;
++    if (init.redirect === 'error') throw new TypeError('Invalid redirect value');
++    assert.equal(init.redirect, 'manual');
++    return new Response(null, { status: 307, headers: { Location: 'https://untrusted.invalid/' } });
++  });
++  await assert.rejects(providerRequest(config, '/sessions', { method: 'POST', body: { code: 'test-code' } }), error => error.code === 'PROVIDER_REDIRECT_DENIED');
++  assert.equal(calls, 1);
++});
++
++test('Transport diagnostics redact URLs and credentials while retaining the runtime failure', async t => {
++  const diagnostics = [];
++  t.mock.method(console, 'error', (...items) => diagnostics.push(items));
++  t.mock.method(globalThis, 'fetch', async () => { throw new Error('Network connection lost https://api.enablebanking.com/application?code=private-code Bearer abc.def.ghi secret-value-long-enough-to-redact'); });
++  await assert.rejects(getApplication(config), error => error.code === 'BANK_NETWORK_ERROR');
++  assert.match(JSON.stringify(diagnostics), /Network connection lost/);
++  for (const secret of ['api.enablebanking.com', 'private-code', 'abc.def.ghi', 'secret-value-long-enough-to-redact']) assert.ok(!JSON.stringify(diagnostics).includes(secret));
++});
++
+ test('A stalled bank request is aborted with a safe timeout', async t => {
+   t.mock.timers.enable({ apis: ['setTimeout'] });
+   let ready;

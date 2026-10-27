@@ -121,6 +121,8 @@ test('consent is business read-only with random state, registered origin and ban
 });
 test('bank authentication only redirects to the official HTTPS authorization origin',()=>{
   const allowed='https://auth.enablebanking.com/ais/start?sessionid=test';assert.equal(validateAuthorizationUrl(allowed),allowed);
+  const swedbank='https://tilisy.enablebanking.com/ais/start?sessionid=test';assert.equal(validateAuthorizationUrl(swedbank),swedbank);
+  for(const url of ['https://tilisy.enablebanking.com.evil.example/ais/start','https://tilisy.enablebanking.com/pis/start','https://auth.enablebanking.com/pis/start'])assert.throws(()=>validateAuthorizationUrl(url),e=>e.code==='invalid_authorization_url');
   for(const url of ['http://auth.enablebanking.com/ais/start','https://evil.enablebanking.com/','https://auth.enablebanking.com.evil.example/','https://user@auth.enablebanking.com/','https://auth.enablebanking.com:8443/','javascript:alert(1)','https://auth.enablebanking.com/#fragment'])assert.throws(()=>validateAuthorizationUrl(url),e=>e.code==='invalid_authorization_url');
 });
 test('session authorization and account retrieval use AIS POST/GET without accepting provider secrets in errors',async()=>{

@@ -1,5 +1,7 @@
 # Slutrapport: Swedbank-integrationen, 27 oktober 2026
 
+**Aktuell status:** Ny produktionsapplikation är aktiv, gammal registrering är borttagen efter uttryckligt godkännande och runtime-hemligheter är installerade. Sites version 10 öppnar det riktiga bankmedgivandet. Personlig signering för hemsidans AIS-session och verklig transaktionsimport återstår. 204 tester godkända. Se [verifierad produktionsstatus](SWEDBANK-PRODUCTION-STATUS.md) för aktuella detaljer. Avsnitten nedan bevarar kontrollhistoriken före registrering/aktivering och beskriver dåtidens hinder.
+
 ## Uppföljande kontroll före bankmedgivande
 
 Ändringarna i denna uppföljning är publicerade som **Sites version 6**, källcommit `109574c4255855dec79ddb21e4a7432649dfd859`, deployment `appgdep_6ae0f0c98f508191869401f18de400d8` med resultat `succeeded`. Befintliga runtime-hemligheter och företagsdata har inte ändrats.

@@ -61,7 +61,7 @@ function validatedOrigin(origin,environment){
 export function validateAuthorizationUrl(value){
   try{
     const url=new URL(value);
-    if(url.origin!=='https://auth.enablebanking.com'||url.username||url.password||url.hash)throw Error();
+    if(!['https://auth.enablebanking.com','https://tilisy.enablebanking.com'].includes(url.origin)||url.pathname!=='/ais/start'||url.username||url.password||url.hash)throw Error();
     return url.href;
   }catch{throw bankError('invalid_authorization_url','Bankleverantören returnerade en ogiltig autentiseringsadress.',502);}
 }
