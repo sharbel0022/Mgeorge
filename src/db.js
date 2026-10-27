@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – DATABAS / AFFÄRSREGLER
+ * ANSVAR: Lagrar fakturor, bankhändelser, dokument och kopplingar i SQLite. Beräknar fakturastatus från verifierade allokeringar och hindrar dubbel fördelning.
+ * FLÖDE: server.js → db.js → SQLite. matchingSuggestions föreslår; allocate registrerar först efter godkännande.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
