@@ -85,7 +85,19 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('invoices','kind',"TEXT NOT NULL DEFAULT 'invoice'");
   addColumn('invoices','organization_number',"TEXT NOT NULL DEFAULT ''");
   addColumn('invoices','net_cents','INTEGER');
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS verified_contacts(invoice_id TEXT PRIMARY KEY REFERENCES invoices(id),email TEXT NOT NULL,evidence TEXT NOT NULL,verified_by TEXT NOT NULL,verified_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS payer_links(id TEXT PRIMARY KEY,invoice_id TEXT NOT NULL REFERENCES invoices(id),payer TEXT NOT NULL,account TEXT NOT NULL,evidence TEXT NOT NULL,verified_by TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,UNIQUE(invoice_id,payer,account));
+    CREATE TABLE IF NOT EXISTS reconciliation_findings(id TEXT PRIMARY KEY,invoice_id TEXT NOT NULL REFERENCES invoices(id),transaction_id TEXT NOT NULL DEFAULT '',kind TEXT NOT NULL,details TEXT NOT NULL,active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS customer_messages(id TEXT PRIMARY KEY,invoice_id TEXT NOT NULL REFERENCES invoices(id),kind TEXT NOT NULL,recipient TEXT NOT NULL,subject TEXT NOT NULL,body TEXT NOT NULL,version INTEGER NOT NULL DEFAULT 1,snapshot TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'draft',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,UNIQUE(invoice_id,kind,snapshot));
+    CREATE TABLE IF NOT EXISTS message_reviews(id TEXT PRIMARY KEY,message_id TEXT NOT NULL REFERENCES customer_messages(id),version INTEGER NOT NULL,snapshot TEXT NOT NULL,principal TEXT NOT NULL,session_hash TEXT NOT NULL,expires_at INTEGER NOT NULL,consumed INTEGER NOT NULL DEFAULT 0);
+    CREATE TABLE IF NOT EXISTS message_approvals(id TEXT PRIMARY KEY,message_id TEXT NOT NULL REFERENCES customer_messages(id),review_id TEXT NOT NULL UNIQUE REFERENCES message_reviews(id),principal TEXT NOT NULL,version INTEGER NOT NULL,snapshot TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS message_deliveries(id TEXT PRIMARY KEY,message_id TEXT NOT NULL UNIQUE REFERENCES customer_messages(id),approval_id TEXT NOT NULL UNIQUE REFERENCES message_approvals(id),status TEXT NOT NULL,gmail_message_id TEXT NOT NULL DEFAULT '',rfc_message_id TEXT NOT NULL,sent_at TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+  `);
   addColumn('documents','extraction',"TEXT NOT NULL DEFAULT '{}'");
+  addColumn('verified_contacts','identity',"TEXT NOT NULL DEFAULT ''");
+  addColumn('payer_links','party',"TEXT NOT NULL DEFAULT ''");
+  addColumn('payer_links','organization_number',"TEXT NOT NULL DEFAULT ''");
   db.exec(`CREATE INDEX IF NOT EXISTS documents_fingerprint ON documents(fingerprint);
     CREATE TABLE IF NOT EXISTS document_sources(source_id TEXT PRIMARY KEY,document_id TEXT NOT NULL REFERENCES documents(id),metadata TEXT NOT NULL DEFAULT '{}',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
     INSERT OR IGNORE INTO document_sources(source_id,document_id,metadata) SELECT source_id,id,metadata FROM documents WHERE source_id IS NOT NULL;`);
@@ -96,6 +108,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','review_reason',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','import_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','bankgiro',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_transactions','payer_organization_number',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
   const identityUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='api_identity_version');
   addColumn('bank_transactions','api_identity_version','INTEGER NOT NULL DEFAULT 0');
@@ -110,6 +123,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_states','renew_connection_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','bank_name',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','page_token',"TEXT NOT NULL DEFAULT ''");
+  addColumn('gmail_states','request_send','INTEGER NOT NULL DEFAULT 0');
   addColumn('gmail_connections','sync_started_at',"TEXT NOT NULL DEFAULT ''");
   addColumn('import_jobs','content','BLOB');
   addColumn('import_jobs','mime_type',"TEXT NOT NULL DEFAULT ''");
@@ -209,7 +223,11 @@ export function storeTransactions(db,items,source,original=null) {
         duplicate++;continue;
       }
       const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'',source==='enablebanking'?1:0);
-      if(r.changes){imported++;inserted.push(id);}else duplicate++;
+      if(r.changes){
+        const organization=String(x.payer_organization_number||'').replace(/[- ]/g,'');
+        if(/^\d{10}$/.test(organization))db.prepare('UPDATE bank_transactions SET payer_organization_number=? WHERE id=?').run(organization,id);
+        imported++;inserted.push(id);
+      }else duplicate++;
     }
     // A complete specification replaces its collective parent; never match the parent itself.
     for(const parent of db.prepare('SELECT * FROM bank_transactions WHERE is_aggregate=1 AND excluded=0 AND bank_reference<>?').all('')){
@@ -226,12 +244,19 @@ export function storeTransactions(db,items,source,original=null) {
       db.prepare('UPDATE bank_transactions SET import_id=? WHERE id=?').run(import_id,completed.id);
       audit(db,'aggregate_replaced',{transaction_id:completed.id,children:1,specification_import_id:import_id,before:completed.before,after:db.prepare('SELECT * FROM bank_transactions WHERE id=?').get(completed.id)});
     }
+    if(imported||enriched){
+      const checks=db.prepare("SELECT id,reconciled_at,reconciliation_note FROM invoices WHERE reconciled_at<>'' AND NOT EXISTS(SELECT 1 FROM allocations a WHERE a.invoice_id=invoices.id)").all();
+      for(const check of checks){
+        db.prepare("UPDATE invoices SET reconciled_at='',reconciliation_note='' WHERE id=?").run(check.id);
+        audit(db,'absence_check_invalidated',{before:check,import_id,reason:'Nytt bankunderlag kräver ny kontroll av utebliven betalning'});
+      }
+    }
     db.exec('COMMIT');
   } catch(e) {db.exec('ROLLBACK');throw e;}
   return {imported,duplicate,enriched,import_id};
 }
 /** Bekräftar kopplingen mellan bankhändelse och faktura, med belopps- och riktningskontroller inom en databastransaktion. */
-export function allocate(db,invoiceId,transactionId,amountCents) {
+export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false}={}) {
   if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');
   db.exec('BEGIN IMMEDIATE');
   try {
@@ -240,12 +265,17 @@ export function allocate(db,invoiceId,transactionId,amountCents) {
     if(Math.sign(t.amount_cents)!==paymentSign(i))throw new Error('Fel betalningsriktning');
     if(t.excluded)throw new Error('Bankhändelsen är undantagen från avstämning');
     if(t.is_aggregate)throw new Error('Samlad Bankgiroinsättning kräver en betalningsspecifikation före matchning');
+    if(t.parent_bank_reference&&db.prepare('SELECT id FROM bank_transactions WHERE account=? AND bank_reference=? AND is_aggregate=1 AND excluded=0').get(t.account,t.parent_bank_reference))throw new Error('Bankgiro-specifikationen är ofullständig. Kontrollera samlingsposten före matchning.');
+    if(t.parent_bank_reference&&db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.account=? AND b.bank_reference=? LIMIT 1').get(t.account,t.parent_bank_reference))throw new Error('Samlingsposten har redan fördelats. Rätta den gamla kopplingen innan specifikationen används.');
+    if(t.bank_reference&&db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.id<>? AND b.bank_reference=? AND b.amount_cents=? AND b.currency=? AND b.booked_at=? LIMIT 1').get(t.id,t.bank_reference,t.amount_cents,t.currency,t.booked_at))throw new Error('Bankreferensen har redan fördelats genom ett annat underlag. Kontrollera möjlig dubblett.');
+    if(t.payer&&t.reference&&db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.id<>? AND b.account<>? AND b.payer=? AND b.reference=? AND b.amount_cents=? AND b.currency=? AND b.booked_at=? LIMIT 1').get(t.id,t.account,t.payer,t.reference,t.amount_cents,t.currency,t.booked_at))throw new Error('En motsvarande betalning från ett annat bankunderlag har redan fördelats. Kontrollera dubbletten.');
     if(i.currency!==t.currency)throw new Error('Valutorna skiljer sig');
     if(amountCents>i.remaining_cents||amountCents>t.available_cents)throw new Error('Beloppet överskrider återstående saldo');
     if(!t.payer&&!t.reference)throw new Error('Betalare/referens saknas. Komplettera bankunderlag före matchning.');
     db.prepare('INSERT INTO allocations(id,invoice_id,transaction_id,amount_cents) VALUES(?,?,?,?)').run(randomUUID(),invoiceId,transactionId,amountCents);
     db.prepare('UPDATE invoices SET reconciled_at=CURRENT_TIMESTAMP WHERE id=?').run(invoiceId);
-    audit(db,'manual_match',{invoiceId,transactionId,amountCents}); db.exec('COMMIT');
+    if(t.payer)db.prepare('INSERT OR IGNORE INTO payer_links(id,invoice_id,payer,account,evidence,verified_by,party,organization_number) VALUES(?,?,?,?,?,?,?,?)').run(randomUUID(),i.id,t.payer,t.account,`Verifierad betalningskoppling ${transactionId}`,'allocation',i.party,i.organization_number);
+    audit(db,automatic?'automatic_match':'manual_match',{invoiceId,transactionId,amountCents}); db.exec('COMMIT');
   }catch(e){db.exec('ROLLBACK');throw e;}
 }
 /** Ångrar en tidigare matchning och låter saldot beräknas om; åtgärden ska vara spårbar. */
@@ -255,6 +285,10 @@ export function deleteAllocation(db,id){
     const allocation=db.prepare('SELECT * FROM allocations WHERE id=?').get(id);
     if(!allocation){db.exec('COMMIT');return false;}
     db.prepare('DELETE FROM allocations WHERE id=?').run(id);
+    const transaction=db.prepare('SELECT * FROM bank_transactions WHERE id=?').get(allocation.transaction_id);
+    if(!db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions t ON t.id=a.transaction_id WHERE a.invoice_id=? AND t.payer=? AND t.account=? LIMIT 1').get(allocation.invoice_id,transaction.payer,transaction.account)){
+      db.prepare("DELETE FROM payer_links WHERE invoice_id=? AND payer=? AND account=? AND verified_by='allocation'").run(allocation.invoice_id,transaction.payer,transaction.account);
+    }
     // Reversing a match is a correction, not proof that the invoice is now unpaid.
     db.prepare("UPDATE invoices SET reconciled_at='',reconciliation_note='' WHERE id=?").run(allocation.invoice_id);
     audit(db,'undo_match',{...allocation});db.exec('COMMIT');return true;

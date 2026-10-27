@@ -11,7 +11,7 @@ Denna kodbas är en fristående Node.js-installation med en administratör för 
 | `src/db.js` | SQLite i WAL-läge, additiva schemamigreringar, fakturasaldon, matchningsförslag, importhistorik och revisionslogg. |
 | `src/importers.js` | Bunden CSV/XML-inläsning, riktning, faktiska datum, SEK-kontroll och försiktig hantering av samlade Bankgiroposter. |
 | `src/bank.js` | RS256-signerad Enable Banking AIS, medgivande och sidindelad hämtning av bokförda händelser. |
-| `src/gmail.js` | Google OAuth med `gmail.readonly`, tokenförnyelse, företagskontokontroll och hämtning av fakturaliknande originalbilagor. |
+| `src/gmail.js` | Google OAuth med `gmail.readonly` och valbar `gmail.send`, tokenförnyelse, företagskontokontroll, bilagehämtning och ett engångsanrop för godkänt utskick. |
 | `src/security.js` | scrypt-hash för lösenord, slumpade sessioner och AES-256-GCM för integrationshemligheter. |
 | `scripts/setup.mjs` | Skapar lokal `.env` med slumpade hemligheter utan att skriva över befintlig konfiguration eller databas. |
 
@@ -23,7 +23,7 @@ Denna kodbas är en fristående Node.js-installation med en administratör för 
 
 `sessions` lagrar en hash av sessionskakan, giltighet och `principal`. `bank_states` binder ett engångstillstånd till session, ägare, bank och eventuell anslutning som ska förnyas. `bank_connections` har ägare, krypterad banksession och kontolista, valt konto-UID, medgivandets giltighet, status, senaste synkronisering, säkert felmeddelande och en beständig återförsökstid efter anropsbegränsning. Äldre anslutningar utan säker ägarbindning eller kontoval kan inte användas som en ny behörig anslutning; de behöver förnyas.
 
-`allocations` kopplar fakturor till bankhändelser. Allokerade belopp får inte överstiga vare sig fakturans utestående saldo eller bankhändelsens tillgängliga saldo. Riktning och valuta måste stämma, även för återbetalningar av krediter. Undantagna händelser och samlingsposter får inte allokeras. En matchning kräver uttrycklig bekräftelse och skrivs tillsammans med saldokontrollerna i en databastransaktion. En faktura kan få flera delbetalningar och en bankhändelse kan fördelas på flera fakturor.
+`allocations` kopplar fakturor till bankhändelser. Allokerade belopp får inte överstiga vare sig fakturans utestående saldo eller bankhändelsens tillgängliga saldo. Riktning och valuta måste stämma, även för återbetalningar av krediter. Undantagna händelser och samlingsposter får inte allokeras. Osäkra matchningar kräver uttrycklig bekräftelse. Avvikelsemotorn får automatiskt skapa en entydig matchning när referens, kundidentitet och bokfört bankunderlag verifierats. Båda vägarna använder samma transaktionella saldokontroller. En faktura kan få flera delbetalningar och en bankhändelse kan fördelas på flera fakturor.
 
 Fakturans saldo beräknas från allokeringarna. **Betald** kräver att hela beloppet har fördelats; **Delvis betald** att ett positivt delbelopp har fördelats. Utan betalning visas **Ej avstämd** tills användaren uttryckligen bekräftat en kontroll och angett underlaget. Därefter visas **Obetald** eller **Förfallen**. `is_overdue` markerar passerat förfallodatum även om betalningsunderlaget ännu inte är avstämt. Dagens datum beräknas i `Europe/Stockholm`.
 
@@ -39,7 +39,7 @@ XML-läsaren hanterar elementstruktur, namnrymdsprefix och vanliga entiteter med
 
 Samlade bankposter delas bara upp när individuella belopp och totalbelopp stämmer. En ofullständig specifikation behåller totalen en gång med granskningskravet **Betalardetaljer saknas – importera betalningsspecifikation.** En komplett specifikation kan ersätta en tidigare samlingspost när konto, datum, valuta, bankreferens och summa kan kopplas ihop. Flera detaljer kopplas till samlingspostens referens och ersätter totalen först när summan stämmer.
 
-En sparad XML-specifikation med exakt en individuell betalning kan komplettera en befintlig samlingspost med samma beständiga referens på plats. Konto, bokföringsdatum, signerat belopp och valuta måste stämma och både individuell betalare och referens finnas. Transaktions-ID, ursprunglig importhistorik och leverantörsmetadata bevaras; den nya originalfilen kopplas till posten och före/efter-data revisionsloggas. Beloppet finns kvar en gång och fakturan kräver fortfarande manuell matchning. Ofullständiga uppgifter, vanliga API-uppdateringar, manuella undantag, befintliga allokeringar och motstridiga tidigare delbetalningar kan inte öppna samlingsposten för matchning.
+En sparad XML-specifikation med exakt en individuell betalning kan komplettera en befintlig samlingspost med samma beständiga referens på plats. Konto, bokföringsdatum, signerat belopp och valuta måste stämma och både individuell betalare och referens finnas. Transaktions-ID, ursprunglig importhistorik och leverantörsmetadata bevaras; den nya originalfilen kopplas till posten och före/efter-data revisionsloggas. Beloppet finns kvar en gång och går vidare till den konservativa avvikelsemotorn. Ofullständiga uppgifter, vanliga API-uppdateringar, manuella undantag, befintliga allokeringar och motstridiga tidigare delbetalningar kan inte öppna samlingsposten för matchning.
 
 Vid filimport kan användaren välja ett sparat maskerat bankkonto. Backend kontrollerar anslutningens ägare och kontoval och använder samma beständiga kontoidentitet som API-hämtningen. Vid saknade referenser eller manuella kontoalias kan systemet inte garantera koppling mellan fil och API; samma belopp ensamt används aldrig för att slå ihop betalningar.
 
@@ -51,7 +51,7 @@ Matchningsförslag kräver rätt riktning och valuta samt exakt OCR/fakturarefer
 
 OAuth-status är tidsbegränsad, kopplad till webbläsarsessionen och förbrukas en gång. Bankflödet binder dessutom tillståndet till behörig `principal` och anslutningens ägare, med atomisk engångsförbrukning. Avbrutet godkännande, upprepade parametrar, fel användare, utgången session och återspelning avvisas. En långsam bankåtgärd får inte spara en anslutning eller nya bankhändelser efter att den inloggade sessionen har avslutats. Google-kontot jämförs med `GMAIL_ACCOUNT` efter godkännande. Bank- och Gmail-hemligheter krypteras med AES-256-GCM på servern; API:t returnerar inte privata nycklar eller token. Frånkoppling återkallar först medgivandet hos leverantören; ett misslyckande visas och den lokala anslutningen behålls för nytt försök.
 
-Gmail hämtar möjliga fakturabilagor från inkorgen och skickade mejl, med dubblett-ID per konto, meddelande och bilagedel. Tydliga påminnelser och order-/betalningsbekräftelser hoppas över. Bilagor sparas som **Behöver granskning**; de blir inte automatiskt bokförda skulder. Filernas signaturer kontrolleras. Ingen automatisk OCR eller fullständig PDF-fälttolkning finns i denna version. Sökningen är heuristisk och kan missa exempelvis arkiverade mejl eller otydliga ämnesrader. Se [Gmail-guiden](GMAIL.md).
+Gmail hämtar möjliga fakturabilagor från inkorgen och skickade mejl, med dubblett-ID per konto, meddelande och bilagedel. Tydliga påminnelser och order-/betalningsbekräftelser hoppas över. Bilagor sparas som **Behöver granskning**; de blir inte automatiskt bokförda skulder. Filernas signaturer kontrolleras. PDF-text och lokal svensk OCR tolkas genom dokumentgranskningen. Sökningen omfattar även arkiverade mejl men kan missa fakturor utan stödda bilagor. Se [Gmail-guiden](GMAIL.md).
 
 Bankkopplingen använder enbart AIS för kontoinformation. Systemet initierar inga bankbetalningar. Både bank och Gmail kräver riktiga klientuppgifter, godkända returadresser och medgivanden. Mockade tester verifierar inte ett riktigt BankID-/Google-flöde eller leverantörens stöd för just företagets konto.
 
@@ -71,7 +71,7 @@ Hämtning kontrollerar medgivandet före varje körning, begär `BOOK`, granskar
 
 Jobben finns i den körande Node-processen. De körs inte medan servern är avstängd. Gmail har sidmarkör och checkpoint för begränsade batcher; bankhämtning överlappar datum för att fånga upp senare bokföring, med dubblettkontroll. Tidsintervall begränsas till leverantörsadapterns gränser. Det finns ingen separat distribuerad jobbkö, flerprocesslåsning eller driftövervakning.
 
-Inställningar för aviseringar gäller det lokala gränssnittet. Ingen e-post-/pushleverans eller automatisk betalningspåminnelse skickas. Utkast ska kontrolleras av användaren.
+Inställningar för aviseringar gäller det lokala gränssnittet. Kundmejl skickas endast via den separata administratörsgodkända utskicksvägen. Ingen schemalagd process skickar mejl. Utkast ska alltid läsas och godkännas i aktuell version.
 
 ## Åtkomst, filer och återställning
 
@@ -101,3 +101,13 @@ SQLite-filen innehåller kunduppgifter och original. De är inte separat krypter
 ## Verifiering
 
 `npm run check` syntaxkontrollerar JavaScript-koden. `npm test` kör isolerade tester med tillfälliga databaser och kontrollerade externa svar. Verifiera dessutom med anonymiserade verkliga bankfiler och behöriga externa konton innan systemet används för företagets ordinarie avstämning. Automatiska tester ersätter inte kontroll av driftmiljön, säkerhetskopiorna eller de verkliga medgivandena.
+
+## Avvikelser och kundmeddelanden
+
+`src/reconciliation.js` rangordnar förslag från referenser, normaliserade namn, organisationsnummer när det finns i bankunderlaget samt tidigare verifierade betalarkopplingar. Belopp ensamt är aldrig tillräckligt. Hela fakturaregistret kontrolleras vid OCR-konflikter, inklusive redan betalda fakturor. Endast bokförd API-data eller importerad bankfil med sparat original kan användas automatiskt. Saknad identitet, referenskonflikter, ofullständig Bankgiro-specifikation och möjliga dubletter kräver manuell kontroll. Fördelning på flera fakturor är ett granskningsförslag.
+
+`src/customer-messages.js` lagrar verifierade kundadresser, utkastversioner, granskningsposter, engångsgodkännanden och beständiga leveransreservationer. En hash av faktura, betalningar, kopplingar, kontakt och datum gör att ändrade betalningsunderlag stoppar gamla godkännanden. Hashen omfattar även ej allokerade bankhändelser; en ny insättning får inte förbises bara för att den ännu inte matchats. Nya bankimporter återställer äldre kontroller om utebliven betalning. Återtagna matchningar tar bort inlärda betalarkopplingar från det beslutet.
+
+API: `POST /api/reconciliation`, `GET /api/customer-messages`, `POST /api/customer-contacts`, `POST /api/payer-links` samt `POST /api/customer-messages/:id/review|edit|reject|send`. Alla omfattas av befintlig administratörs-, sessions- och origin-kontroll. `/review` ger en granskningspost som är bunden till aktuell version och webbläsarsession; `/send` kräver dessutom `approve: true`. Schemaläggaren anropar aldrig `/send` eller Gmail-sändaren.
+
+Se [leveransrapporten](RECONCILIATION-CUSTOMER-MESSAGES.md) för begränsningar och separat Sites-portning.

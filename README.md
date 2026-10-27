@@ -44,9 +44,9 @@ Registrera exakt `APP_ORIGIN` följt av `/api/bank/callback`. Backend kontroller
 
 **Gmail:** Aktivera Gmail API i företagets Google Cloud-projekt, skapa en OAuth-webbklient och registrera `APP_ORIGIN` följt av `/api/gmail/callback`. Ange `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` och `GMAIL_ACCOUNT=mg.vitvaror@gmail.com`. Starta om servern och välj **Import → Koppla Gmail**. Se [Gmail-guiden](docs/GMAIL.md) för hela flödet.
 
-Gmail hämtar PDF- och bildbilagor från mottagna, arkiverade och skickade mejl. Dokumenten tolkas med PDF.js och lokal svensk OCR vid behov. Original, fältvärden, källbelägg och säkerhetsnivå bevaras. Granska originalet bredvid uppgifterna och godkänn eller avvisa. Okända motparter och OCR-resultat kräver granskning. Valbar automatisk registrering gäller endast gröna textfakturor från redan kända motparter; inga betalningar godkänns automatiskt. Se [tolkning och granskning](docs/INVOICE-EXTRACTION.md).
+Gmail hämtar PDF- och bildbilagor från mottagna, arkiverade och skickade mejl. Dokumenten tolkas med PDF.js och lokal svensk OCR vid behov. Original, fältvärden, källbelägg och säkerhetsnivå bevaras. Granska originalet bredvid uppgifterna och godkänn eller avvisa. Okända motparter och OCR-resultat kräver granskning. Valbar automatisk registrering gäller endast gröna textfakturor från redan kända motparter; säkra betalningar kan därefter matchas automatiskt enligt den konservativa avvikelsemotorn. Se [tolkning och granskning](docs/INVOICE-EXTRACTION.md).
 
-Schemalagd hämtning kräver att **Node-servern är igång**, att integrationerna är konfigurerade och att medgivandena gäller. Jobb körs på servern utan att webbläsaren behöver vara öppen. Avstämningar och utskick av betalningspåminnelser godkänns inte automatiskt. Riktiga Google- och bankflöden behöver verifieras med företagets behöriga konton; automatiska tester använder kontrollerade API-svar.
+Schemalagd hämtning kräver att **Node-servern är igång**, att integrationerna är konfigurerade och att medgivandena gäller. Jobb körs på servern utan att webbläsaren behöver vara öppen. Endast entydiga betalningar med verifierat bankunderlag, kundidentitet och exakt referens avstäms automatiskt. Kundmejl kräver alltid uttryckligt administratörsgodkännande. Riktiga Google- och bankflöden behöver verifieras med företagets behöriga konton; automatiska tester använder kontrollerade API-svar.
 
 ## Bankfiler och Bankgiro
 
@@ -91,3 +91,11 @@ Se [arkitekturen](docs/ARCHITECTURE.md) för datamodell, API och tekniska avgrä
 ## Offentliga informationssidor
 
 [Integritetspolicy](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/integritetspolicy) och [användarvillkor](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/anvandarvillkor) är publicerade som läsbara utkast på den befintliga Siten. Dokumenten behöver fortfarande granskas och kompletteras för företagets verkliga drift. Se [publicerings- och synkroniseringsguiden](docs/SITES-LEGAL.md).
+
+## Betalningsavstämning och kundmeddelanden
+
+Fliken **Kundmeddelanden** visar verifierade betalningar, kvarstående saldo, avvikelse, originalfaktura och ett redigerbart svenskt mejlutkast. Verifiera kundadressen mot ett faktiskt underlag. Öppna och läs varje aktuell mejlversion; efter redigering måste den nya versionen granskas. **Avvisa** stoppar utkastet; **Godkänn och skicka** kräver ett uttryckligt godkännande och separat Gmail-medgivande för utskick.
+
+Saknad/fel OCR, annan betalare, möjliga dubletter och fördelning på flera fakturor kräver granskning. En ny betalning stoppar äldre utkast. Vid Gmail-timeout låses utskicket som oklart och skickas aldrig om automatiskt. Schemaläggaren hämtar, avstämmer och förbereder utkast men kan inte skicka mejl.
+
+Se [leveransrapport och exakt fillista](docs/RECONCILIATION-CUSTOMER-MESSAGES.md) för funktioner, testresultat, API, Google-/bankaktivering och separat arbete för ChatGPT Sites.

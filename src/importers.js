@@ -58,6 +58,7 @@ const aliases={
   credit:['kredit','in','credit','deposit','inbetalning'],
   currency:['valuta','currency','ccy'],
   payer:['avsändare','avsandare','betalare','mottagare','namn','motpart','counterparty','payer'],
+  payer_organization_number:['organisationsnummer','organisationsnr','orgnr','payer_organization_number'],
   reference:['ocr','referens','fakturareferens','meddelande','payment reference','referensnummer'],
   bank_reference:['bankreferens','bank reference','transaktionsid','transaktions-id','transaction id','id'],
   bankgiro:['bankgiro','bankgironummer','företagets bankgiro','foretagets bankgiro'],
@@ -87,7 +88,7 @@ export function parseCSV(text,account='Swedbank'){
     if(!cents)continue;
     const description=g('description'),payer=g('payer'),reference=g('reference');
     const collective=requiresPaymentSpecification(description,payer,reference);
-    items.push({account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),description,...(collective?aggregateFlags():{})});
+    items.push({account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),description,...(collective?aggregateFlags():{})});
   }
   return validateItems(items);
 }

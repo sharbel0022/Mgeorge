@@ -5,7 +5,7 @@
  * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
  */
 
-// Read-only Gmail adapter. Mail bodies and files are untrusted data, never instructions.
+// Import and explicitly approved send adapter. Mail/file contents are untrusted data.
 // OAuth state is generated, bound to the user's session and consumed by the HTTP layer.
 const scope='https://www.googleapis.com/auth/gmail.readonly';
 const apiBase='https://gmail.googleapis.com/gmail/v1/users/me';
@@ -24,10 +24,10 @@ function callback(origin){
   return `${url.origin}/api/gmail/callback`;
 }
 /** Bygger Googles OAuth-länk med läsbehörigheten gmail.readonly och säker state för att identifiera rätt medgivandeflöde. */
-export function gmailAuthorizationUrl(state,origin){
+export function gmailAuthorizationUrl(state,origin,{send=false}={}){
   requireConfig();
   if(!/^[A-Za-z0-9_-]{32,200}$/.test(state||''))throw fail('Ogiltig OAuth-status.','invalid_state',400);
-  const search=new URLSearchParams({client_id:process.env.GOOGLE_CLIENT_ID,redirect_uri:callback(origin),response_type:'code',scope,access_type:'offline',prompt:'consent select_account',login_hint:gmailAccount(),state});
+  const search=new URLSearchParams({client_id:process.env.GOOGLE_CLIENT_ID,redirect_uri:callback(origin),response_type:'code',scope:send?scope+' https://www.googleapis.com/auth/gmail.send':scope,access_type:'offline',prompt:'consent select_account',login_hint:gmailAccount(),state});
   return `https://accounts.google.com/o/oauth2/v2/auth?${search}`;
 }
 async function requestJson(url,options={}){
@@ -84,6 +84,23 @@ export async function gmailProfile(tokens){
   const profile=await apiRequest('/profile',tokens);
   if(typeof profile.emailAddress!=='string'||profile.emailAddress.toLowerCase()!==gmailAccount())throw fail(`Välj företagets Gmail-konto: ${gmailAccount()}.`,'account_mismatch');
   return profile;
+}
+export function hasGmailSendScope(tokens){return String(tokens?.scope||'').split(/\s+/).includes('https://www.googleapis.com/auth/gmail.send');}
+// Preflight may refresh/read. The returned sender performs exactly ONE POST, no retry.
+export async function prepareGmailSend(tokens){
+  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60000)Object.assign(tokens,await refreshGmailTokens(tokens));
+  if(!hasGmailSendScope(tokens))throw fail('Koppla Gmail igen och godkänn utskicksbehörigheten gmail.send.','missing_send_scope');
+  await gmailProfile(tokens);
+  if(!hasGmailSendScope(tokens))throw fail('Utskicksbehörigheten behöver förnyas.','missing_send_scope');
+  return message=>{
+    if(typeof message.recipient!=='string'||!/^[-A-Za-z0-9.!#$%&'*+/=?^_`{|}~]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(message.recipient)||message.recipient.length>240||/[\r\n\0]/.test(message.recipient)||typeof message.subject!=='string'||/[\r\n\0]/.test(message.subject)||!/^<[a-f0-9-]+@mg-fakturakoll\.local>$/.test(message.rfc_message_id))throw fail('Ogiltiga mejluppgifter.','invalid_message',400);
+    const words=[];let part='';
+    for(const char of message.subject){if(Buffer.byteLength(part+char)>42){words.push(part);part='';}part+=char;}if(part)words.push(part);
+    const subject=words.map(word=>'=?UTF-8?B?'+Buffer.from(word).toString('base64')+'?=').join('\r\n ');
+    const body=Buffer.from(message.body,'utf8').toString('base64').match(/.{1,76}/g)?.join('\r\n')||'';
+    const raw=Buffer.from(`From: ${gmailAccount()}\r\nTo: ${message.recipient}\r\nSubject: ${subject}\r\nMessage-ID: ${message.rfc_message_id}\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n${body}`).toString('base64url');
+    return requestJson(apiBase+'/messages/send',{method:'POST',headers:{Authorization:`Bearer ${tokens.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({raw})});
+  };
 }
 export async function revokeGmailTokens(tokens){
   const credential=tokens?.refresh_token||tokens?.access_token;

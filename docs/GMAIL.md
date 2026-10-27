@@ -4,7 +4,7 @@
 
 1. Aktivera Gmail API i företagets Google Cloud-projekt.
 2. Konfigurera Google Auth Platform: branding, supportkontakt, domäner, integritetspolicy, användarvillkor och målgrupp. För ett vanligt Gmail-konto används extern målgrupp; lägg till `mg.vitvaror@gmail.com` som testanvändare under test.
-3. Skapa en OAuth-klient av typen Web application. Begär bara `https://www.googleapis.com/auth/gmail.readonly`.
+3. Skapa en OAuth-klient av typen Web application. Fakturahämtning använder `https://www.googleapis.com/auth/gmail.readonly`. För kundmeddelanden läggs även `https://www.googleapis.com/auth/gmail.send` till i Google-projektets medgivandekonfiguration.
 4. Registrera exakt callback för respektive installation:
    - Node: `APP_ORIGIN` följt av `/api/gmail/callback`.
    - Sites: `https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/gmail/callback`.
@@ -33,3 +33,13 @@ Sites tolkar dokument lokalt i webbläsaren vid granskning. Serverbaserad obevak
 ## Tester
 
 `npm run check` och `npm test` verifierar Node-koden. Google-svar är simulerade. PDF- och OCR-testerna läser riktiga syntetiska filer med de installerade motorerna. HTTPS-tester verifierar inloggning, state, fel konto, kryptering, arkiverad Gmail-import, återkommande hämtning och spårbara korrigeringar. Sites har en separat TypeScript-kontroll och testsvit med lokal SQLite som D1-adapter. Verkligt Google-medgivande kräver användarens konto och återstår att verifiera.
+
+## Kundmeddelanden och utskick (Node)
+
+Öppna **Kundmeddelanden → Aktivera Gmail-utskick**. Det startar ett nytt interaktivt medgivande för både `gmail.readonly` och `gmail.send`; ett befintligt läsmedgivande uppgraderas inte utan Google-godkännande. Callbacken kontrollerar att den begärda utskicksbehörigheten faktiskt finns i svaret och att profilen är `GMAIL_ACCOUNT`. `/api/gmail/status` visar `send_enabled`, aldrig token.
+
+Innan utskick kontrolleras företagets profil och token förnyas vid behov. Därefter kontrolleras administratörssession, exakt utkastversion, verifierad mottagare och oförändrat betalningsunderlag igen. En tidsbegränsad granskningspost förbrukas och utskicket reserveras atomiskt i SQLite innan ett enda Gmail-POST görs. HTTP-fel, timeout eller ett ofullständigt Gmail-svar innebär `unknown` och ingen automatisk omsändning. Avbrott efter reservation lämnar `sending`; även detta kräver kontroll i Gmail. Godkännanden, exakt skickad text, Gmail-ID och tidpunkt revisionsloggas.
+
+Ett lyckat Gmail-API-svar bekräftar att Gmail accepterat meddelandet, inte att mottagarens e-postserver levererat eller läst det. Verkliga utskick är inte verifierade i denna leverans. Aktivera och kontrollera företagets riktiga Google-medgivande innan användning. Sites kräver separat implementation; Node-ändringarna publicerar inget till Siten.
+
+API och behörigheter följer [Google users.messages.send](https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/send) och [Gmail OAuth scopes](https://developers.google.com/workspace/gmail/api/auth/scopes).

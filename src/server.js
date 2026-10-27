@@ -16,6 +16,11 @@ import { isConfigured, configStatus, assertApplicationReady, validateAuthorizati
 import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 import {analyzeDocument,approveDocument} from './invoice-review.js';
 import {runDocumentProcess} from './invoice-extraction.js';
+import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
+import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from './customer-messages.js';
+import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
+
+function reconcileAndPrepare(){const suggestions=runReconciliation(db);prepareMessages(db);return suggestions;}
 
 function config(){
   const origin=(process.env.APP_ORIGIN||'http://localhost:3000').replace(/\/$/,'');
@@ -85,7 +90,7 @@ function serveStatic(req,res,path){
     // These standalone information documents contain their own fixed stylesheet.
     res.writeHead(200,{...baseHeaders,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"});return res.end(contents);
   }
-  if(!['/','/index.html','/app.js','/review.js','/style.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
+  if(!['/','/index.html','/app.js','/review.js','/messages.js','/style.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
   const actual=path==='/'?'/index.html':path;
   const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'}[extname(actual)];
   const contents=readFileSync(resolve('public'+actual));
@@ -149,9 +154,11 @@ function importBankFile(body,req){
 }
 function gmailStatus(){
   const connection=db.prepare('SELECT id,email,status,last_synced,last_error FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
+  const credentials=connection&&db.prepare('SELECT encrypted_tokens FROM gmail_connections WHERE id=?').get(connection.id);
+  const send_enabled=!!credentials&&hasGmailSendScope(decryptObject(credentials.encrypted_tokens));
   const interval=getSettings(db).gmail_sync_interval_minutes,lastAttempt=Math.max(connection?.last_synced?utcTimestamp(connection.last_synced):0,backgroundAttempts.get('gmail')||0);
   const imports=db.prepare("SELECT COALESCE(SUM(found),0) AS messages,COALESCE(SUM(imported),0) AS documents,COALESCE(SUM(duplicate),0) AS duplicates FROM import_jobs WHERE source='gmail'").get();
-  return {configured:isGmailConfigured(),email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&interval?new Date(Math.max(Date.now(),lastAttempt+interval*60000)).toISOString():null,syncing:gmailSyncing,counts:imports,connection};
+  return {configured:isGmailConfigured(),send_enabled,email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&interval?new Date(Math.max(Date.now(),lastAttempt+interval*60000)).toISOString():null,syncing:gmailSyncing,counts:imports,connection};
 }
 let gmailSyncing=false,bankSyncing=new Set();
 /** Förnyar Gmail-behörighet vid behov och laddar ned nya fakturaunderlag från företagets konto. */
@@ -191,7 +198,7 @@ async function syncGmail(req=null){
     // in the review queue and can be retried without downloading the mail again.
     for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{if(req)assertSessionStillAuthorized(req);}});
     const summary={received:result.received??result.documents.length+(result.skipped||0),imported,duplicate,review:imported,skipped:result.skipped||0,truncated:!!result.truncated,warnings:result.warnings||[]};
-    recordImport(db,{source:'gmail',name:connection.email,found:summary.received,imported,duplicate,review:imported});audit(db,'gmail_synced',summary);return summary;
+    recordImport(db,{source:'gmail',name:connection.email,found:summary.received,imported,duplicate,review:imported});audit(db,'gmail_synced',summary);reconcileAndPrepare();return summary;
   }catch(e){
     if(currentTokens)db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(currentTokens),connection.id);
     const renewal=e.code==='renewal_required'||/invalid_grant|förnya|återkall|401|expired|behöver.*koppla/i.test(e.message);
@@ -242,6 +249,7 @@ async function syncBank(connection,{account_uid,date_from,date_to}={},operationL
     const transactions=raw.map(x=>normalizeBankApiTransaction(x,account)).filter(x=>x&&x.booked_at>=from&&x.booked_at<=to);
     const result=storeTransactions(db,transactions,'enablebanking');db.prepare("UPDATE bank_connections SET last_synced=CURRENT_TIMESTAMP,status='connected',last_error='',retry_after=0 WHERE id=?").run(connection.id);
     audit(db,'bank_synced',{connection_id:connection.id,from,to,received:raw.length,imported:result.imported,duplicate:result.duplicate});
+    reconcileAndPrepare();
     return {...result,received:raw.length};
   }catch(e){
     if(e.status===401&&!e.providerStatus)throw e;
@@ -275,6 +283,7 @@ export async function runScheduledSync(){
       const from=new Date(Math.max(fromDate.getTime(),Date.now()-90*86400000)).toISOString().slice(0,10);
       try{await syncBank(connection,{date_from:from,date_to:today()});}catch{schedulerState.last_error='Bankhämtningen behöver kontrolleras';}
     }
+    reconcileAndPrepare();
     schedulerState.last_run=new Date().toISOString();
   }finally{schedulerState.running=false;}
 }
@@ -359,7 +368,39 @@ async function route(req,res){
     db.prepare('UPDATE bank_transactions SET excluded=?,exclusion_reason=? WHERE id=?').run(b.excluded===undefined?t.excluded:b.excluded?1:0,b.excluded===true?optionalString(b.reason,500):'',b.id);
     audit(db,b.excluded?'transaction_excluded':'transaction_restored',{id:b.id,reason:optionalString(b.reason,500)});return json(res,200,{updated:true});
   }
-  if(path==='/api/suggestions'&&req.method==='GET')return json(res,200,{items:matchingSuggestions(db)});
+  if(path==='/api/suggestions'&&req.method==='GET'){
+    const customers=new Set(listInvoices(db).filter(i=>i.direction==='customer'&&i.kind!=='credit').map(i=>i.id));
+    const items=analyzeReconciliation(reconciliationData(db)).filter(s=>s.invoice_id&&s.amount_cents>0).map(s=>({...s,confidence:s.safe?'high':'medium'}));
+    return json(res,200,{items:[...items,...matchingSuggestions(db).filter(s=>!customers.has(s.invoice_id))]});
+  }
+  if(path==='/api/reconciliation'&&req.method==='POST')return json(res,200,{items:reconcileAndPrepare()});
+  if(path==='/api/customer-messages'&&req.method==='GET')return json(res,200,{items:listMessages(db)});
+  if(path==='/api/customer-contacts'&&req.method==='POST'){
+    const body=await readBody(req);assertSessionStillAuthorized(req);
+    verifyContact(db,body,req.principal);reconcileAndPrepare();return json(res,200,{ok:true});
+  }
+  if(path==='/api/payer-links'&&req.method==='POST'){
+    const body=await readBody(req);assertSessionStillAuthorized(req);
+    verifyPayer(db,body,req.principal);reconcileAndPrepare();return json(res,200,{ok:true});
+  }
+  if(/^\/api\/customer-messages\/[^/]+\/(edit|reject|review|send)$/.test(path)&&req.method==='POST'){
+    const id=decodeURIComponent(path.split('/')[3]),action=path.split('/')[4],b=await readBody(req);
+    assertSessionStillAuthorized(req);
+    if(action==='edit'){editMessage(db,id,b,req.principal);return json(res,200,{ok:true});}
+    if(action==='reject'){rejectMessage(db,id,b.version,req.principal);return json(res,200,{ok:true});}
+    if(action==='review')return json(res,200,reviewMessage(db,id,b.version,req.principal,sessionHash(req)));
+    const result=await approveAndSend(db,id,b,req.principal,sessionHash(req),{authorize:()=>assertSessionStillAuthorized(req),prepare:async()=>{
+      const c=db.prepare("SELECT * FROM gmail_connections WHERE status='connected' ORDER BY created_at DESC LIMIT 1").get();
+      if(!c||c.email.toLowerCase()!==gmailAccount())throw bad(409,'Koppla företagets Gmail-konto först.');
+      const tokens=decryptObject(c.encrypted_tokens),deliver=await prepareGmailSend(tokens);
+      assertSessionStillAuthorized(req);
+      const current=db.prepare("SELECT * FROM gmail_connections WHERE id=? AND status='connected'").get(c.id);
+      if(!current||current.email!==c.email)throw bad(409,'Gmail-anslutningen har ändrats.');
+      db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(tokens),c.id);
+      return deliver;
+    }});
+    return json(res,200,result);
+  }
   if(path==='/api/imports'&&req.method==='GET')return json(res,200,{items:listImports(db)});
   if(/^\/api\/imports\/[^/]+\/original$/.test(path)&&req.method==='GET'){
     const item=db.prepare('SELECT name,content,mime_type FROM import_jobs WHERE id=?').get(decodeURIComponent(path.split('/')[3]));
@@ -422,7 +463,7 @@ async function route(req,res){
   if(path==='/api/audit'&&req.method==='GET')return json(res,200,{items:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC LIMIT 100').all()});
   if(path==='/api/export'&&req.method==='GET'){
     audit(db,'data_exported',{});
-    return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:listInvoices(db),transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
+    return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:listInvoices(db),transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),customer_messages:listMessages(db),message_approvals:db.prepare('SELECT * FROM message_approvals').all(),message_deliveries:db.prepare('SELECT * FROM message_deliveries').all(),verified_contacts:db.prepare('SELECT * FROM verified_contacts').all(),payer_links:db.prepare('SELECT * FROM payer_links').all(),reconciliation_findings:db.prepare('SELECT * FROM reconciliation_findings').all(),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
   }
   // AIS only: reads account data, never creates, approves or executes payments.
   if(path==='/api/bank/status'&&req.method==='GET'){
@@ -528,10 +569,12 @@ async function route(req,res){
   }
   if(path==='/api/gmail/status'&&req.method==='GET')return json(res,200,gmailStatus());
   if(path==='/api/gmail/connect'&&req.method==='POST'){
+    const options=await readBody(req);
     if(gmailSyncing)throw bad(409,'Vänta tills Gmail-hämtningen har avslutats');
     if(!isGmailConfigured())throw bad(409,'En administratör behöver först aktivera Google OAuth i serverns inställningar');
     const state=token();db.prepare('DELETE FROM gmail_states WHERE expires_at<=? OR (session_hash=? AND consumed=0)').run(Date.now(),sessionHash(req));db.prepare('INSERT INTO gmail_states(state_hash,expires_at,session_hash) VALUES(?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req));
-    return json(res,200,{url:gmailAuthorizationUrl(state,check.origin)});
+    db.prepare('UPDATE gmail_states SET request_send=? WHERE state_hash=?').run(options.send===true?1:0,digest(state));
+    return json(res,200,{url:gmailAuthorizationUrl(state,check.origin,{send:options.send===true})});
   }
   if(path==='/api/gmail/callback'&&req.method==='GET'){
     if(['state','code','error'].some(k=>url.searchParams.getAll(k).length>1))throw bad(403,'Ogiltig Gmail-retur');
@@ -543,6 +586,7 @@ async function route(req,res){
     let tokens;
     try{
       tokens=await exchangeGmailCode(code,check.origin);const profile=await gmailProfile(tokens);
+      if(record.request_send&&!hasGmailSendScope(tokens))throw bad(409,'Google gav inte utskicksbehörighet. Koppla igen och godkänn gmail.send.');
       assertSessionStillAuthorized(req);
       if(gmailSyncing)throw bad(409,'Vänta tills Gmail-hämtningen har avslutats och koppla igen');
       if(!tokens.refresh_token){
