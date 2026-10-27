@@ -842,7 +842,7 @@ index 0000000..04e4001
 +  return result({ content: [{ type: 'text', text: JSON.stringify(data) }], structuredContent: data, ...(response.ok ? {} : { isError: true }) });
 +}
 diff --git a/lib/banking/service.ts b/lib/banking/service.ts
-index ce9818b..d3b986f 100644
+index ce9818b..156ee9e 100644
 --- a/lib/banking/service.ts
 +++ b/lib/banking/service.ts
 @@ -3,7 +3,7 @@ import { applyCommand, canonicalBankAccount, emptyState, now, today, uid, validD
@@ -854,17 +854,45 @@ index ce9818b..d3b986f 100644
  } from './enable-banking';
  import { normalizeTransactions, stableAccountKey } from './transactions';
  import {
-@@ -104,7 +104,8 @@ export async function status(request: Request): Promise<Response> {
+@@ -18,6 +18,27 @@ const COOKIE = '__Secure-mg-bank-flow';
+ const FLOW_AGE_MS = 15 * 60_000;
+ const MAX_ROWS = 1000;
+ const MAX_PAGES = 25;
++const stockholmClock = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
++function clockParts(at: number) { return Object.fromEntries(stockholmClock.formatToParts(at).filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)])); }
++function stockholmOffset(at: number) {
++  const p = clockParts(at);
++  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(at / 1000) * 1000;
++}
++export function nextAutomaticAttempt(at = Date.now()): string {
++  const p = clockParts(at), midnight = Date.UTC(p.year, p.month - 1, p.day);
++  for (let day = 0; day < 2; day++) for (const hour of [3, 9, 15, 21]) {
++    const wallTime = midnight + day * 86400_000 + hour * 3600_000 + 6 * 60_000;
++    let instant = wallTime - stockholmOffset(at);
++    for (let pass = 0; pass < 3; pass++) instant = wallTime - stockholmOffset(instant);
++    if (instant > at) return new Date(instant).toISOString();
++  }
++  throw new Error('BANK_SCHEDULE_UNAVAILABLE');
++}
++function automaticDueAt(conn: BankConnectionRow): string | null {
++  // Re-anchor prior interval-based reservations to the fixed cloud schedule.
++  // Browser checks cannot shift the next cloud run several hours forward.
++  return conn.auto_next_at && conn.auto_last_attempt_at ? nextAutomaticAttempt(Date.parse(conn.auto_last_attempt_at)) : null;
++}
+ 
+ export class BankError extends Error {
+   constructor(message: string, public status = 400) { super(message); }
+@@ -104,7 +125,8 @@ export async function status(request: Request): Promise<Response> {
    return response({
      storageReady: storageReady(), configured: Boolean(app), activation: configurationStatus(),
      application: app ? safeApplication(metadata(app)) : null,
 -    redirectUrl: BANK_REDIRECT_URL, syncMode: 'manual',
 +    redirectUrl: BANK_REDIRECT_URL, syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',
-+    automatic: { enabled: conn?.auto_sync_enabled === 1, intervalHours: 6, lastAttemptAt: conn?.auto_last_attempt_at ?? null, nextAttemptAt: conn?.auto_next_at ?? null },
++    automatic: { enabled: conn?.auto_sync_enabled === 1, intervalHours: 6, lastAttemptAt: conn?.auto_last_attempt_at ?? null, nextAttemptAt: conn ? automaticDueAt(conn) : null },
      connection: conn ? {
        id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: conn.encrypted_session && (!app || conn.app_generation !== app.generation) ? 'reauth_required' : storedStatus(conn),
        validUntil: conn.valid_until, lastSyncedAt: conn.last_synced_at, lastError: conn.last_error,
-@@ -224,7 +225,7 @@ export async function callback(request: Request): Promise<Response> {
+@@ -224,7 +246,7 @@ export async function callback(request: Request): Promise<Response> {
          if (existing?.encrypted_session) throw new BankError('Det finns redan en aktiv bankanslutning.');
          await db().batch([
            db().prepare(`INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at)
@@ -873,7 +901,7 @@ index ce9818b..d3b986f 100644
              .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', new Date(expiry).toISOString(), flow.date_from, 'connected', at, at),
            db().prepare("UPDATE bank_auth_flows SET status='completed' WHERE state_hash=? AND owner=?").bind(stateHash, owner),
          ]);
-@@ -261,7 +262,7 @@ export async function disconnect(request: Request): Promise<Response> {
+@@ -261,7 +283,7 @@ export async function disconnect(request: Request): Promise<Response> {
        // Previously browser-uploaded keys are compromised and must never be used,
        // even to revoke a session. Detach locally and state the revocation limit.
        await db().batch([
@@ -882,7 +910,7 @@ index ce9818b..d3b986f 100644
          db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
          db().prepare("UPDATE bank_applications SET encrypted_key='' WHERE owner=?").bind(user.userId),
        ]);
-@@ -277,7 +278,7 @@ export async function disconnect(request: Request): Promise<Response> {
+@@ -277,7 +299,7 @@ export async function disconnect(request: Request): Promise<Response> {
        if (!(error instanceof ProviderError) || error.code !== 'BANK_RECONNECT_REQUIRED') throw error;
      }
      await db().batch([
@@ -891,7 +919,7 @@ index ce9818b..d3b986f 100644
        db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
      ]);
      return response({ message: 'Bankanslutningen är återkallad. Tidigare importerade bankhändelser finns kvar.' });
-@@ -293,12 +294,50 @@ function psuHeaders(request: Request) {
+@@ -293,12 +315,49 @@ function psuHeaders(request: Request) {
  
  export async function sync(request: Request): Promise<Response> {
    const user = await identity(request);
@@ -920,7 +948,7 @@ index ce9818b..d3b986f 100644
 +  const user = await identity(), conn = await connection(user.userId);
 +  return response({ enabled: conn?.auto_sync_enabled === 1, connected: !!conn && storedStatus(conn) === 'connected', intervalHours: 6,
 +    lastSyncedAt: conn?.last_synced_at ?? null, lastAttemptAt: conn?.auto_last_attempt_at ?? null,
-+    nextAttemptAt: conn?.auto_next_at ?? null, lastError: conn?.last_error ?? null });
++    nextAttemptAt: conn ? automaticDueAt(conn) : null, lastError: conn?.last_error ?? null });
 +}
 +
 +async function synchronizeOwner(owner: string, options: { automatic?: boolean; psu?: ProviderPsu }): Promise<Response> {
@@ -929,20 +957,19 @@ index ce9818b..d3b986f 100644
      const app = await application(user.userId), conn = await connection(user.userId);
 +    if (options.automatic && (!conn || conn.auto_sync_enabled !== 1)) return response({ automatic: true, due: false, reason: 'disabled', imported: 0 });
      if (!app || !conn || app.generation !== conn.app_generation || storedStatus(conn) !== 'connected') throw new BankError('En giltig bankanslutning behövs. Anslut banken igen.');
-+    // A small scheduling grace avoids missing a six-hour cloud run because
-+    // the preceding run started a few seconds later than its scheduled time.
-+    if (options.automatic && conn.auto_next_at && Date.parse(conn.auto_next_at) > Date.now() + 5 * 60_000) return response({ automatic: true, due: false, reason: 'not_due', nextAttemptAt: conn.auto_next_at, imported: 0 });
++    const nextAttempt = automaticDueAt(conn);
++    if (options.automatic && nextAttempt && Date.parse(nextAttempt) > Date.now()) return response({ automatic: true, due: false, reason: 'not_due', nextAttemptAt: nextAttempt, imported: 0 });
      if (conn.last_synced_at && Date.now() - Date.parse(conn.last_synced_at) < 60_000) throw new BankError('Uppgifterna hämtades nyss. Vänta en minut innan nästa hämtning.', 429);
      const selected: string[] = JSON.parse(conn.selected_accounts);
      if (!selected.length) throw new BankError('Välj vilka konton du vill hämta först.');
 +    // Reserve the next attempt before contacting the provider. Retries, multiple
 +    // tabs and scheduled task replays cannot create an unbounded polling loop.
 +    if (options.automatic) await db().prepare('UPDATE bank_connections SET auto_last_attempt_at=?,auto_next_at=? WHERE owner=? AND id=?')
-+      .bind(now(), new Date(Date.now() + 6 * 3600_000).toISOString(), user.userId, conn.id).run();
++      .bind(now(), nextAutomaticAttempt(), user.userId, conn.id).run();
      const config = await providerConfig(app), bankAccounts = await accounts(conn);
      let needsReauthorization = false;
      try {
-@@ -315,7 +354,9 @@ export async function sync(request: Request): Promise<Response> {
+@@ -315,7 +374,9 @@ export async function sync(request: Request): Promise<Response> {
        }
        const rows: Record<string, unknown>[] = [], warnings = new Set<string>();
        let skipped = 0, rawCount = 0, pageCount = 0;
@@ -953,7 +980,7 @@ index ce9818b..d3b986f 100644
        for (const id of selected) {
          const account = bankAccounts.find(item => item.uid === id);
          const canonicalKey = account && stableAccountKey(account, { name: conn.bank_name, country: conn.country });
-@@ -327,7 +368,7 @@ export async function sync(request: Request): Promise<Response> {
+@@ -327,7 +388,7 @@ export async function sync(request: Request): Promise<Response> {
          const seen = new Set<string>();
          do {
            if (++pageCount > MAX_PAGES) throw new BankError('Perioden innehåller för många sidor. Välj ett senare startdatum och hämta igen. Inga nya bankhändelser har sparats.');
@@ -975,7 +1002,7 @@ index e8ed1bc..43ed928 100644
  export type BankFlowRow = {
    state_hash: string; owner: string; cookie_hash: string; app_generation: string;
 diff --git a/tests/banking-security.test.mjs b/tests/banking-security.test.mjs
-index b5f2a16..fc73beb 100644
+index b5f2a16..2c15870 100644
 --- a/tests/banking-security.test.mjs
 +++ b/tests/banking-security.test.mjs
 @@ -63,6 +63,7 @@ async function fixture(t, environment = 'PRODUCTION') {
@@ -994,7 +1021,7 @@ index b5f2a16..fc73beb 100644
    f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
    f.account = { uid: accountUid, name: 'Company account', currency: 'SEK', account_id: { iban: 'SE4550000000058398257466' } };
    f.bank = { name: 'Swedbank', country: 'SE', psu_types: ['business'], maximum_consent_validity: 15552000 };
-@@ -146,6 +148,87 @@ test('hash-only company accounts can be selected and synchronized without duplic
+@@ -146,6 +148,97 @@ test('hash-only company accounts can be selected and synchronized without duplic
    assert.equal(f.workspace().state.transactions.length, 1);
  });
  
@@ -1020,10 +1047,20 @@ index b5f2a16..fc73beb 100644
 +  const second = await (await f.mcp.bankRpc(call)).json();
 +  assert.equal(second.result.structuredContent.reason, 'not_due'); assert.equal(f.calls.length, before);
 +  assert.equal(f.workspace().state.transactions.length, 1);
-+  assert.equal(Date.parse(f.connection().auto_next_at) - Date.parse(f.connection().auto_last_attempt_at), 6 * 3600000);
-+  f.sql.prepare('UPDATE bank_connections SET auto_next_at=?,last_synced_at=?').run('2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z');
++  assert.equal(f.connection().auto_next_at, f.service.nextAutomaticAttempt(Date.parse(f.connection().auto_last_attempt_at)));
++  f.sql.prepare('UPDATE bank_connections SET auto_next_at=?,auto_last_attempt_at=?,last_synced_at=?').run('2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z');
 +  assert.equal((await (await f.service.automaticSync()).json()).imported, 0);
 +  assert.equal(f.workspace().state.transactions.length, 1);
++});
++
++test('Automatic slots stay fixed in Stockholm time across jitter, browser checks and daylight-saving changes', async t => {
++  const f = await fixture(t);
++  const next = at => f.service.nextAutomaticAttempt(Date.parse(at));
++  assert.equal(next('2026-10-27T20:06:45Z'), '2026-10-28T02:06:00.000Z');
++  assert.equal(next('2026-10-27T22:59:00Z'), '2026-10-28T02:06:00.000Z');
++  assert.equal(next('2026-06-01T19:06:45Z'), '2026-06-02T01:06:00.000Z');
++  assert.equal(next('2026-03-28T20:06:45Z'), '2026-03-29T01:06:00.000Z');
++  assert.equal(next('2026-10-24T19:06:45Z'), '2026-10-25T02:06:00.000Z');
 +});
 +
 +test('Automatic failure reserves its retry time, preserves data, and can be paused or disconnected', async t => {

@@ -1,6 +1,6 @@
 # Slutrapport: Swedbank-integrationen, 27 oktober 2026
 
-**Automatisk uppdatering:** Sites version 11 tillför automatisk hämtning med ett aktiverat molnschema fyra gånger per dygn och automatisk uppdatering av öppna sidor. Se [driftbeskrivning och verifiering](SWEDBANK-AUTOMATIC.md). Bankanslutningen och de importerade uppgifterna är bevarade.
+**Automatisk uppdatering:** Sites version 12 tillför automatisk hämtning med ett aktiverat molnschema fyra gånger per dygn och automatisk uppdatering av öppna sidor. Se [driftbeskrivning och verifiering](SWEDBANK-AUTOMATIC.md). Bankanslutningen och de importerade uppgifterna är bevarade.
 
 **Aktuell status:** Swedbank är ansluten i Sites version 10 efter användarens personliga signering. Verkliga in- och utbetalningar visas i den privata arbetsytan; upprepad hämtning gav noll nya händelser. Ny produktionsapplikation är aktiv, gammal registrering är borttagen efter uttryckligt godkännande och runtime-hemligheter är installerade. 204 tester godkända. Se [verifierad produktionsstatus](SWEDBANK-PRODUCTION-STATUS.md) för aktuella detaljer. Avsnitten nedan bevarar kontrollhistoriken före registrering/aktivering och beskriver dåtidens hinder.
 

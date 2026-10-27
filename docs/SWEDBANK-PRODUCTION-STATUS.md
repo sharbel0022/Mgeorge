@@ -1,6 +1,6 @@
 # Verifierad produktionsstatus, 27 oktober 2026
 
-**Senaste uppdatering:** Sites version 11 är publicerad med automatisk bankhämtning, ägarbunden inställning, privata molnverktyg och ett aktiverat molnschema fyra gånger per dygn. Se [automatisk bankhämtning](SWEDBANK-AUTOMATIC.md) för intervall, behörigheter och verifieringsgränser. Anslutningen och den tidigare verifierade importen nedan bevaras.
+**Senaste uppdatering:** Sites version 12 är publicerad med automatisk bankhämtning, ägarbunden inställning, privata molnverktyg och ett aktiverat molnschema fyra gånger per dygn. Se [automatisk bankhämtning](SWEDBANK-AUTOMATIC.md) för intervall, behörigheter och verifieringsgränser. Anslutningen och den tidigare verifierade importen nedan bevaras.
 
 ## Genomfört
 
