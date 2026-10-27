@@ -4,12 +4,20 @@
   "private": true,
   "type": "module",
   "description": "Self-hostable M.George invoice and bank reconciliation system",
-  "engines": { "node": ">=22.13.0" },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "setup": "node scripts/setup.mjs",
     "start": "node --env-file=.env src/server.js",
     "dev": "node --env-file=.env --watch src/server.js",
     "test": "node --test test/*.test.js",
     "check": "node scripts/check.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.80",
+    "@tesseract.js-data/swe": "1.0.0",
+    "pdfjs-dist": "5.4.149",
+    "tesseract.js": "6.0.1"
   }
 }
