@@ -1,5 +1,7 @@
 # Leverans: betalningsavstämning och kundmeddelanden
 
+**Senare uppdatering:** motsvarande avstämning och godkända kundmeddelanden har nu publicerats separat i Sites version 14. Se [Sites-leveransen, verifiering och kvarstående OCR-/Google-krav](SITES-CUSTOMER-MESSAGES.md). Rapporten nedan beskriver den ursprungliga Node-leveransen.
+
 Utgångspunkt: senaste `origin/main`, hämtad med `git pull --ff-only origin main`. Arbetet ligger på `codex/reconciliation-customer-messages`. Ingen produktionsdatabas har öppnats eller ändrats för verifieringen. Inga verkliga kundmejl har skickats.
 
 ## Färdiga funktioner

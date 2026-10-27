@@ -99,3 +99,5 @@ Fliken **Kundmeddelanden** visar verifierade betalningar, kvarstående saldo, av
 Saknad/fel OCR, annan betalare, möjliga dubletter och fördelning på flera fakturor kräver granskning. En ny betalning stoppar äldre utkast. Vid Gmail-timeout låses utskicket som oklart och skickas aldrig om automatiskt. Schemaläggaren hämtar, avstämmer och förbereder utkast men kan inte skicka mejl.
 
 Se [leveransrapport och exakt fillista](docs/RECONCILIATION-CUSTOMER-MESSAGES.md) för funktioner, testresultat, API, Google-/bankaktivering och separat arbete för ChatGPT Sites.
+
+Samma avstämnings- och granskningsflöde är separat publicerat i **Sites version 14**. Se [Sites-rapporten](docs/SITES-CUSTOMER-MESSAGES.md) för patch, testresultat, Google-aktivering och skillnaden i OCR-körning.

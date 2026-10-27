@@ -1,0 +1,2518 @@
+diff --git a/README.md b/README.md
+index 2f95422..6050340 100644
+--- a/README.md
++++ b/README.md
+@@ -123,3 +123,9 @@ Banktesterna använder syntetiska uppgifter, mockade leverantörssvar och lokal
+ - https://www.swedbank.se/foretag/digitala-tjanster/internetbanken-foretag/vanliga-fragor-och-svar.html
+ - https://www.swedbank.se/foretag/betala-och-ta-betalt/ny-standard-for-betalningar-i-sverige.html
+ - https://www.swedbank.se/foretag/betala-och-ta-betalt/ta-betalt/bankgiro-inbetalningar.html
++
++## MG Fakturakoll: kundmeddelanden
++
++Öppna `/kundmeddelanden` från arbetsytans meny. Avstämningen matchar endast entydiga betalningar med verifierat bankunderlag och förbereder svenska kundmejl. Adressen verifieras separat; varje aktuell mejlversion måste läsas och uttryckligen godkännas före utskick. Schemalagda operationer skickar aldrig mejl. Vid timeout eller oklar leverans görs ingen automatisk omsändning.
++
++`npm run check` kontrollerar TypeScript och `npm test` kör tester med syntetiska SQLite-/D1-data och simulerad Gmail/bank. Se [leverans- och driftguiden](docs/CUSTOMER-MESSAGES.md) för D1-migrering, säkerhetsregler, Google-medgivande och avgränsningar.
+diff --git a/app/api/customer-messages/[action]/route.ts b/app/api/customer-messages/[action]/route.ts
+new file mode 100644
+index 0000000..d6f5493
+--- /dev/null
++++ b/app/api/customer-messages/[action]/route.ts
+@@ -0,0 +1,6 @@
++import {messagesAction} from '@/lib/customer-messages';
++import {failure,response} from '@/lib/server';
++export const dynamic='force-dynamic';
++async function handle(req:Request){try{return await messagesAction(req,new URL(req.url).pathname.split('/').pop()||'');}catch(e:any){if(e?.safe)return response({error:e.message},e.status||409);return failure(e);}}
++export const GET=handle;
++export const POST=handle;
+diff --git a/app/api/export/route.ts b/app/api/export/route.ts
+index de20fdd..6eebda4 100644
+--- a/app/api/export/route.ts
++++ b/app/api/export/route.ts
+@@ -1,3 +1,3 @@
+ import {db,identity,readWorkspace,response,failure} from '@/lib/server';
+ export const dynamic='force-dynamic';
+-export async function GET(){try{const user=await identity(),data=await readWorkspace(user.userId);const events=await db().prepare('SELECT revision, action, detail, created_at FROM audit_events WHERE owner=? ORDER BY revision').bind(user.userId).all();const files=await db().prepare('SELECT id,filename,mime,size,sha256,created_at FROM documents WHERE owner=?').bind(user.userId).all();return response({...data,audit:events.results,documents:files.results,exportedAt:new Date().toISOString(),format:'MG-Fakturakoll-1'});}catch(e){return failure(e);}}
++export async function GET(){try{const user=await identity(),data=await readWorkspace(user.userId);const events=await db().prepare('SELECT revision, action, detail, created_at FROM audit_events WHERE owner=? ORDER BY revision').bind(user.userId).all();const files=await db().prepare('SELECT id,filename,mime,size,sha256,created_at FROM documents WHERE owner=?').bind(user.userId).all();const messages=await db().prepare('SELECT * FROM customer_messages WHERE owner=?').bind(user.userId).all();const deliveries=await db().prepare('SELECT * FROM customer_deliveries WHERE owner=?').bind(user.userId).all();const contacts=await db().prepare('SELECT * FROM customer_contacts WHERE owner=?').bind(user.userId).all();const findings=await db().prepare('SELECT * FROM reconciliation_findings WHERE owner=?').bind(user.userId).all();return response({...data,customer_messages:messages.results,deliveries:deliveries.results,verified_contacts:contacts.results,reconciliation_findings:findings.results,audit:events.results,documents:files.results,exportedAt:new Date().toISOString(),format:'MG-Fakturakoll-1'});}catch(e){return failure(e);}}
+diff --git a/app/api/state/route.ts b/app/api/state/route.ts
+index 6f7ab7f..19a1cae 100644
+--- a/app/api/state/route.ts
++++ b/app/api/state/route.ts
+@@ -1,3 +1,5 @@
++import {reconcileState} from '@/lib/reconciliation';
++import {reconcileAndPrepare} from '@/lib/customer-messages';
+ import { db, identity, readWorkspace, response, failure } from "@/lib/server";
+ import { applyCommand, emptyState, now, uid } from "@/lib/domain";
+ export const dynamic='force-dynamic';
+@@ -7,15 +9,15 @@ export async function POST(req:Request){try{
+  const body=JSON.parse(text);if(!Number.isSafeInteger(body.revision)||typeof body.requestId!=='string'||!/^[a-zA-Z0-9-]{10,80}$/.test(body.requestId))return response({error:'Ogiltig förfrågan.'},400);
+  const old=await readWorkspace(user.userId);if(old.state.receipts.includes(body.requestId))return response({...old,message:'Åtgärden är redan sparad.'});
+  if(old.revision!==body.revision)return response({error:'Uppgifterna ändrades i ett annat fönster. Uppdatera sidan innan du försöker igen.'},409);
+- const command=body.command,documentId=command?.invoice?.documentId||command?.documentId;if(documentId){const doc=await db().prepare('SELECT id FROM documents WHERE id=? AND owner=?').bind(documentId,user.userId).first();if(!doc)throw new Error('Bilagan kunde inte hittas för ditt konto.');}
+- const result=applyCommand(old.state,command);result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];const payload=JSON.stringify(result.state);
++ const command=body.command;if(command&&typeof command==='object')delete command.trustedBankImport;const documentId=command?.invoice?.documentId||command?.documentId;if(documentId){const doc=await db().prepare('SELECT id FROM documents WHERE id=? AND owner=?').bind(documentId,user.userId).first();if(!doc)throw new Error('Bilagan kunde inte hittas för ditt konto.');}
++ const result=applyCommand(old.state,command);const automatic=reconcileState(result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];const payload=JSON.stringify(result.state);
+  if(new TextEncoder().encode(payload).length>1_800_000)throw new Error('Registret är för stort för den här versionen. Exportera dina uppgifter innan vidare import.');
+  const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces (owner, revision, payload, updated_at) VALUES (?, 0, ?, ?)').bind(user.userId,JSON.stringify(emptyState()),at).run();
+- const detail=JSON.stringify({message:result.message,command,requestId:body.requestId});
++ const detail=JSON.stringify({message:result.message,command,automatic:automatic.decisions,requestId:body.requestId});
+  const batch=await db().batch([
+   db().prepare('INSERT INTO audit_events (id, owner, revision, action, detail, created_at) SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(uid(),user.userId,old.revision+1,command.type,detail,at,user.userId,old.revision),
+   db().prepare('UPDATE workspaces SET payload=?, revision=revision+1, updated_at=? WHERE owner=? AND revision=?').bind(payload,at,user.userId,old.revision)
+  ]);
+  if(batch[1].meta.changes!==1)return response({error:'En annan ändring sparades samtidigt. Uppdatera sidan och försök igen.'},409);
+- return response({state:result.state,revision:old.revision+1,message:result.message});
++ await reconcileAndPrepare(user.userId);return response({state:result.state,revision:old.revision+1,message:result.message});
+  }catch(e){return failure(e);}}
+diff --git a/app/dashboard.tsx b/app/dashboard.tsx
+index 3e32939..0107b4d 100644
+--- a/app/dashboard.tsx
++++ b/app/dashboard.tsx
+@@ -54,7 +54,7 @@ export default function Dashboard({initialView='overview',openBankImport=false}:
+    <a className="brand" href="#" onClick={e=>{e.preventDefault();navigate('overview');}}><span className="brand-mark">m<span>g</span><i/></span><div>fakturakoll<span>EKONOMI MED ÖVERBLICK</span></div></a>
+    <div className="workspace"><span className="workspace-icon"><Building2 size={19}/></span><div><strong>M.George Vitvaror</strong><span>Företagsöversikt</span></div><ChevronDown size={15}/></div>
+    <div className="nav-label">ARBETSYTA</div><nav aria-label="Huvudmeny">{nav.map(({id,label,icon:Icon,count})=><button key={id} className={`nav-item ${view===id?'active':''}`} onClick={()=>navigate(id as View)}><Icon size={19}/><span>{label}</span>{!!count&&<b>{count}</b>}</button>)}</nav>
+-   <div className="sidebar-bottom"><div className="nav-label">VERKTYG</div><a className="nav-item" href="/bank"><Landmark size={19}/><span>Bankanslutning</span></a><button className={`nav-item ${view==='history'?'active':''}`} onClick={()=>navigate('history')}><History size={19}/><span>Historik</span></button><button className={`nav-item ${view==='settings'?'active':''}`} onClick={()=>navigate('settings')}><Settings size={19}/><span>Inställningar</span></button><div className="sidebar-help"><ShieldCheck size={21}/><strong>Din privata arbetsyta</strong><p>Fakturor, underlag och betalningar på samma ställe.</p><button onClick={()=>navigate('imports')}>Så kommer du igång <ArrowRight size={14}/></button></div><div className="user-chip"><div className="avatar">MG</div><div><strong>M.George Vitvaror AB</strong><span>mg.vitvaror@gmail.com</span></div></div></div>
++   <a className="nav-item" href="/kundmeddelanden"><Mail size={19}/><span>Kundmeddelanden</span></a><div className="sidebar-bottom"><div className="nav-label">VERKTYG</div><a className="nav-item" href="/bank"><Landmark size={19}/><span>Bankanslutning</span></a><button className={`nav-item ${view==='history'?'active':''}`} onClick={()=>navigate('history')}><History size={19}/><span>Historik</span></button><button className={`nav-item ${view==='settings'?'active':''}`} onClick={()=>navigate('settings')}><Settings size={19}/><span>Inställningar</span></button><div className="sidebar-help"><ShieldCheck size={21}/><strong>Din privata arbetsyta</strong><p>Fakturor, underlag och betalningar på samma ställe.</p><button onClick={()=>navigate('imports')}>Så kommer du igång <ArrowRight size={14}/></button></div><div className="user-chip"><div className="avatar">MG</div><div><strong>M.George Vitvaror AB</strong><span>mg.vitvaror@gmail.com</span></div></div></div>
+   </aside>{navOpen&&<button className="nav-scrim" aria-label="Stäng menyn" onClick={()=>setNavOpen(false)}/>}
+   <div className="main-shell"><header className="topbar"><div className="breadcrumb"><button className="icon-button mobile-menu" aria-label="Öppna menyn" onClick={()=>setNavOpen(!navOpen)}><Menu size={21}/></button><Building2 size={16}/><span>Min arbetsyta</span><ChevronRight size={14}/><strong>{viewLabels[view]}</strong></div><div className="topbar-right"><span className="private-badge"><ShieldCheck size={14}/> Privat</span><button className="icon-button" title="Hämta sparade uppgifter" aria-label="Uppdatera" onClick={()=>!demo&&load()} disabled={loading||demo||busy}><RefreshCw size={17} className={loading?'spin':''}/></button><div className="avatar small">MG</div></div></header>
+   <main>
+@@ -115,16 +115,16 @@ function Contacts({state,search,open}:{state:State;search:string;open:(id:string
+ 
+ function FormError({text}:{text:string}){return text?<div className="form-error" role="alert"><AlertCircle size={16}/>{text}</div>:null;}
+ function InvoiceEditor({invoice,direction,company,save,close,busy,demo,error,reportError}:{invoice?:Invoice;direction?:string;company:State['company'];save:Save;close:()=>void;busy:boolean;demo:boolean;error:string;reportError:(s:string)=>void}){
+- const [form,setForm]=useState<any>(invoice?{...invoice,total:inputMoney(invoice.total)}:{direction:direction??'receivable',party:'',email:'',number:'',ocr:'',total:'',issued:today(),due:'',bankgiro:'',note:'',source:'Manuellt registrerad',documentId:'',reviewed:false});
++ const [form,setForm]=useState<any>(invoice?{...invoice,total:inputMoney(invoice.total),vat:invoice.vat==null?'':inputMoney(invoice.vat),net:invoice.net==null?'':inputMoney(invoice.net)}:{direction:direction??'receivable',party:'',email:'',number:'',ocr:'',total:'',issued:today(),due:'',bankgiro:'',note:'',source:'Manuellt registrerad',documentId:'',reviewed:false});
+  const [file,setFile]=useState<File|null>(null),[reading,setReading]=useState(false),[warning,setWarning]=useState(''),[text,setText]=useState(''),[showText,setShowText]=useState(false),[localError,setLocalError]=useState('');
+  const set=(key:string,value:any)=>setForm((f:any)=>({...f,[key]:value}));
+  async function readFile(f?:File){if(!f)return;if(f.size>15_000_000){setLocalError('Filen får vara högst 15 MB.');return;}setFile(f);setReading(true);setLocalError('');try{const result=await readInvoiceFile(f,company.email);setForm((prev:any)=>({...prev,...result.fields,currencyConfirmed:false,direction:f.name.toLowerCase().endsWith('.eml')?result.fields.direction:prev.direction,party:result.fields.party||prev.party,email:result.fields.email||prev.email,documentId:''}));setText(result.text);setWarning(result.warning||'Uppgifterna är förslag. Kontrollera dem mot originalfakturan.');}catch(e){setWarning('Filen kan sparas som underlag. Fyll i fakturauppgifterna manuellt.');setLocalError(messageOf(e));}finally{setReading(false);}}
+- async function submit(e:FormEvent){e.preventDefault();setLocalError('');try{const values={...form,total:parseMoney(form.total)};if(form.foreignCurrency&&!form.currencyConfirmed)throw new Error('Underlaget anger en annan valuta. Endast fakturor som faktiskt är i SEK kan registreras.');if(!values.party||!values.number||!values.issued)throw new Error('Namn, fakturanummer och fakturadatum behövs.');if(file&&!demo){const data=new FormData();data.set('file',file);setReading(true);const res=await fetch('/api/files',{method:'POST',body:data}),out:any=await res.json();if(!res.ok)throw new Error(out.error??'Underlaget kunde inte sparas.');values.documentId=out.id;setForm((f:any)=>({...f,documentId:out.id}));}if(await save({type:'invoice.save',invoice:values}))close();}catch(e){setLocalError(messageOf(e));}finally{setReading(false);}}
++ async function submit(e:FormEvent){e.preventDefault();setLocalError('');try{const values={...form,total:parseMoney(form.total),vat:form.vat?parseMoney(form.vat):null,net:form.net?parseMoney(form.net):null};if(form.foreignCurrency&&!form.currencyConfirmed)throw new Error('Underlaget anger en annan valuta. Endast fakturor som faktiskt är i SEK kan registreras.');if(!values.party||!values.number||!values.issued)throw new Error('Namn, fakturanummer och fakturadatum behövs.');if(file&&!demo){const data=new FormData();data.set('file',file);setReading(true);const res=await fetch('/api/files',{method:'POST',body:data}),out:any=await res.json();if(!res.ok)throw new Error(out.error??'Underlaget kunde inte sparas.');values.documentId=out.id;setForm((f:any)=>({...f,documentId:out.id}));}if(await save({type:'invoice.save',invoice:values}))close();}catch(e){setLocalError(messageOf(e));}finally{setReading(false);}}
+  return <Dialog title={invoice?'Redigera faktura':'Lägg till en faktura'} subtitle="Registrera en kundfaktura eller en faktura du själv ska betala." close={close} wide busy={busy||reading}><form onSubmit={submit}><div className="modal-body"><div className="segmented"><button type="button" className={form.direction==='receivable'?'selected':''} onClick={()=>set('direction','receivable')}><ArrowDownLeft size={17}/> Kundfaktura · pengar in</button><button type="button" className={form.direction==='payable'?'selected':''} onClick={()=>set('direction','payable')}><ArrowUpRight size={17}/> Leverantörsfaktura · pengar ut</button></div>
+  <label className="upload-zone"><span className="upload-circle">{reading?<RefreshCw className="spin" size={23}/>:<FileUp size={23}/>}</span><strong>{reading?'Läser fakturauppgifter…':file?file.name:'Ladda upp faktura eller mejl'}</strong><span>PDF, EML, TXT, PNG eller JPG · högst 15 MB</span><input type="file" accept=".pdf,.eml,.txt,.png,.jpg,.jpeg" disabled={reading||busy} onChange={e=>readFile(e.target.files?.[0])}/></label>
+  {warning&&<div className="inline-notice"><AlertCircle size={17}/><span>{warning}</span></div>}
+  <button type="button" className="text-button text-toggle" onClick={()=>setShowText(!showText)}>{showText?'Dölj textunderlag':'Klistra in fakturatext / visa tolkad text'} <ChevronDown size={14}/></button>{showText&&<div className="paste-box"><textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Klistra in fakturans text här…" rows={5}/><button type="button" className="btn small" onClick={()=>{try{setForm((f:any)=>({...f,...extractInvoiceText(text),currencyConfirmed:false,source:'Inklistrad fakturatext'}));setWarning('Kontrollera de tolkade uppgifterna mot originalet.');}catch(e){setLocalError(messageOf(e));}}}>Läs uppgifter ur texten</button></div>}
+- <div className="form-grid"><Field label={form.direction==='receivable'?'Kundens namn *':'Leverantörens namn *'}><input required maxLength={200} value={form.party} onChange={e=>set('party',e.target.value)} placeholder={form.direction==='receivable'?'Person eller företag':'Företagsnamn'}/></Field><Field label="E-post"><input type="email" maxLength={200} value={form.email} onChange={e=>set('email',e.target.value)} placeholder="namn@exempel.se"/></Field><Field label="Fakturanummer *"><input required maxLength={100} value={form.number} onChange={e=>set('number',e.target.value)} placeholder="Till exempel 2026-104"/></Field><Field label="Totalbelopp inkl. moms (SEK) *"><input required inputMode="decimal" value={form.total} onChange={e=>set('total',e.target.value)} placeholder="0,00"/></Field><Field label="Fakturadatum *"><input type="date" required value={form.issued} onChange={e=>set('issued',e.target.value)}/></Field><Field label="Förfallodatum" hint="Lämna tomt om datumet inte framgår."><input type="date" value={form.due} onChange={e=>set('due',e.target.value)}/></Field><Field label="OCR / betalningsreferens"><input maxLength={100} value={form.ocr} onChange={e=>set('ocr',e.target.value)} placeholder="Referensen på fakturan"/></Field><Field label="Bankgiro / betalningskonto"><input maxLength={100} value={form.bankgiro} onChange={e=>set('bankgiro',e.target.value)} placeholder="Enligt fakturans betalningsuppgifter"/></Field></div><Field label="Anteckning"><textarea rows={2} maxLength={3000} value={form.note} onChange={e=>set('note',e.target.value)} placeholder="Till exempel beställning, underlag eller något att kontrollera"/></Field><label className="check-field review-check"><input type="checkbox" checked={form.reviewed} onChange={e=>set('reviewed',e.target.checked)}/><span><strong>Jag har kontrollerat fakturauppgifterna</strong><small>Kontrollera mottagare, SEK-belopp, fakturanummer, OCR och datum. Ogranskade fakturor räknas inte in i beloppen.</small></span></label>{form.foreignCurrency&&<label className="check-field"><input type="checkbox" required checked={!!form.currencyConfirmed} onChange={e=>set('currencyConfirmed',e.target.checked)}/><span>Jag har kontrollerat att just denna fakturas totalbelopp är i SEK. En faktura i utländsk valuta kan inte registreras här.</span></label>}<FormError text={localError||error}/></div><ActionFooter close={close} busy={busy||reading} label={form.reviewed?'Spara granskad faktura':'Spara för granskning'}/></form></Dialog>;
++ <div className="form-grid"><Field label={form.direction==='receivable'?'Kundens namn *':'Leverantörens namn *'}><input required maxLength={200} value={form.party} onChange={e=>set('party',e.target.value)} placeholder={form.direction==='receivable'?'Person eller företag':'Företagsnamn'}/></Field><Field label="E-post"><input type="email" maxLength={200} value={form.email} onChange={e=>set('email',e.target.value)} placeholder="namn@exempel.se"/></Field><Field label="Fakturanummer *"><input required maxLength={100} value={form.number} onChange={e=>set('number',e.target.value)} placeholder="Till exempel 2026-104"/></Field><Field label="Totalbelopp inkl. moms (SEK) *"><input required inputMode="decimal" value={form.total} onChange={e=>set('total',e.target.value)} placeholder="0,00"/></Field><Field label="Organisationsnummer"><input maxLength={40} value={form.organizationNumber||''} onChange={e=>set('organizationNumber',e.target.value)}/></Field><Field label="Moms (SEK)"><input inputMode="decimal" value={form.vat||''} onChange={e=>set('vat',e.target.value)}/></Field><Field label="Exklusive moms (SEK)"><input inputMode="decimal" value={form.net||''} onChange={e=>set('net',e.target.value)}/></Field><Field label="Fakturadatum *"><input type="date" required value={form.issued} onChange={e=>set('issued',e.target.value)}/></Field><Field label="Förfallodatum" hint="Lämna tomt om datumet inte framgår."><input type="date" value={form.due} onChange={e=>set('due',e.target.value)}/></Field><Field label="OCR / betalningsreferens"><input maxLength={100} value={form.ocr} onChange={e=>set('ocr',e.target.value)} placeholder="Referensen på fakturan"/></Field><Field label="Bankgiro / betalningskonto"><input maxLength={100} value={form.bankgiro} onChange={e=>set('bankgiro',e.target.value)} placeholder="Enligt fakturans betalningsuppgifter"/></Field></div><Field label="Anteckning"><textarea rows={2} maxLength={3000} value={form.note} onChange={e=>set('note',e.target.value)} placeholder="Till exempel beställning, underlag eller något att kontrollera"/></Field><label className="check-field review-check"><input type="checkbox" checked={form.reviewed} onChange={e=>set('reviewed',e.target.checked)}/><span><strong>Jag har kontrollerat fakturauppgifterna</strong><small>Kontrollera mottagare, SEK-belopp, fakturanummer, OCR och datum. Ogranskade fakturor räknas inte in i beloppen.</small></span></label>{form.foreignCurrency&&<label className="check-field"><input type="checkbox" required checked={!!form.currencyConfirmed} onChange={e=>set('currencyConfirmed',e.target.checked)}/><span>Jag har kontrollerat att just denna fakturas totalbelopp är i SEK. En faktura i utländsk valuta kan inte registreras här.</span></label>}<FormError text={localError||error}/></div><ActionFooter close={close} busy={busy||reading} label={form.reviewed?'Spara granskad faktura':'Spara för granskning'}/></form></Dialog>;
+ }
+ 
+ function InvoiceDetail({invoice:i,state,close,busy,open,toast}:{invoice:Invoice;state:State;close:()=>void;busy:boolean;open:(m:Modal)=>void;toast:(s:string)=>void}){
+@@ -172,16 +172,17 @@ function NewTransaction({save,close,busy,error}:{save:Save;close:()=>void;busy:b
+ }
+ 
+ function MatchDialog({state,invoiceId,transactionId,save,close,busy,error}:{state:State;invoiceId?:string;transactionId?:string;save:Save;close:()=>void;busy:boolean;error:string}){
++ const [referenceCorrection,setReferenceCorrection]=useState(false);
+  const [iid,setIid]=useState(invoiceId??''),[tid,setTid]=useState(transactionId??''),[amount,setAmount]=useState(''),[note,setNote]=useState(''),[checked,setChecked]=useState(false),[localError,setLocalError]=useState('');
+  const invoice=state.invoices.find(i=>i.id===iid),tx=state.transactions.find(t=>t.id===tid),refund=invoice?balance(state,invoice)<0:false;
+  const eligibleInvoices=state.invoices.filter(i=>i.reviewed&&!i.voided&&balance(state,i)!==0&&(!tx||Math.sign(tx.amount)===(i.direction==='receivable'?1:-1)*(balance(state,i)<0?-1:1)));
+  const eligibleTx=state.transactions.filter(t=>!t.ignored&&!t.duplicateOf&&t.verified&&t.kind==='payment'&&available(state,t)>0&&(!invoice||Math.sign(t.amount)===(invoice.direction==='receivable'?1:-1)*(refund?-1:1)));
+  useEffect(()=>{if(invoice&&tx){setAmount(inputMoney(Math.min(Math.abs(balance(state,invoice)),available(state,tx))));setChecked(false);}},[iid,tid]);
+- async function submit(e:FormEvent){e.preventDefault();try{if(!checked||!invoice||!tx)throw new Error('Välj faktura och bankhändelse och bekräfta kontrollen.');if(await save({type:'match.create',invoiceId:iid,transactionId:tid,amount:parseMoney(amount),effect:refund?'refund':'payment',note}))close();}catch(e){setLocalError(messageOf(e));}}
++ async function submit(e:FormEvent){e.preventDefault();try{if(!checked||!invoice||!tx)throw new Error('Välj faktura och bankhändelse och bekräfta kontrollen.');if(await save({type:'match.create',invoiceId:iid,transactionId:tid,amount:parseMoney(amount),effect:refund?'refund':'payment',note,referenceCorrection}))close();}catch(e){setLocalError(messageOf(e));}}
+  return <Dialog title={refund?'Matcha återbetalning':'Bekräfta betalningsmatchning'} subtitle="Koppla bankens betalning till rätt faktura." close={close} wide busy={busy}><form onSubmit={submit}><div className="modal-body"><Field label="Faktura *"><select required value={iid} onChange={e=>setIid(e.target.value)}><option value="">Välj faktura</option>{eligibleInvoices.map(i=><option key={i.id} value={i.id}>{i.party} · {i.number} · {money(Math.abs(balance(state,i)))} {balance(state,i)<0?'att återbetala':'kvar'}</option>)}</select></Field><Field label="Bokförd bankhändelse *"><select required value={tid} onChange={e=>setTid(e.target.value)}><option value="">Välj bankhändelse</option>{eligibleTx.map(t=><option key={t.id} value={t.id}>{t.date} · {t.party||t.bankReference||'Okänd betalare'} · {money(t.amount)} ({money(available(state,t))} kvar)</option>)}</select></Field>
+  {!eligibleTx.length&&<div className="inline-notice"><AlertCircle size={17}/><span>Det finns ingen granskad bankhändelse med rätt betalningsriktning och tillgängligt belopp. Importera och kontrollera bankunderlaget först.</span></div>}
+  {invoice&&tx&&<><div className="matching-comparison"><div><div className="eyebrow">FAKTURA</div><h3>{invoice.party}</h3><p>Nr {invoice.number}</p><dl><dt>OCR</dt><dd>{invoice.ocr||'Saknas'}</dd><dt>Kvar</dt><dd>{money(Math.abs(balance(state,invoice)))}</dd></dl></div><span><Link2 size={22}/></span><div><div className="eyebrow">BETALNING</div><h3>{tx.party||'Okänd betalare'}</h3><p>{tx.date}</p><dl><dt>Referens</dt><dd>{tx.payerReference||'Saknas'}</dd><dt>Tillgängligt</dt><dd>{money(available(state,tx))}</dd></dl></div></div><div className="inline-notice"><AlertCircle size={17}/><span>Kontrollera betalaren och referensen i underlaget. Ett lika stort belopp är inte tillräckligt för att fastställa vem som har betalat.</span></div></>}
+- <div className="form-grid"><Field label="Belopp att fördela (SEK) *"><input required inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)}/></Field><Field label="Bekräftande underlag *"><input required maxLength={1000} value={note} onChange={e=>setNote(e.target.value)} placeholder="Till exempel exakt OCR och rätt betalare"/></Field></div><label className="check-field review-check"><input required type="checkbox" checked={checked} onChange={e=>setChecked(e.target.checked)}/><span><strong>Jag har kontrollerat att betalningen hör till fakturan</strong><small>Delbetalningar lämnar ett belopp kvar på fakturan. Överskott blir kvar på bankhändelsen.</small></span></label><FormError text={localError||error}/></div><ActionFooter close={close} busy={busy} label={refund?'Bekräfta återbetalning':'Bekräfta matchning'}/></form></Dialog>;
++ <label className="check-field"><input type="checkbox" checked={referenceCorrection} onChange={e=>setReferenceCorrection(e.target.checked)}/>Jag har verifierat en avvikande betalare/referens mot underlaget och godkänner denna separata rättelse. Bankens originalreferens bevaras.</label><div className="form-grid"><Field label="Belopp att fördela (SEK) *"><input required inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)}/></Field><Field label="Bekräftande underlag *"><input required maxLength={1000} value={note} onChange={e=>setNote(e.target.value)} placeholder="Till exempel exakt OCR och rätt betalare"/></Field></div><label className="check-field review-check"><input required type="checkbox" checked={checked} onChange={e=>setChecked(e.target.checked)}/><span><strong>Jag har kontrollerat att betalningen hör till fakturan</strong><small>Delbetalningar lämnar ett belopp kvar på fakturan. Överskott blir kvar på bankhändelsen.</small></span></label><FormError text={localError||error}/></div><ActionFooter close={close} busy={busy} label={refund?'Bekräfta återbetalning':'Bekräfta matchning'}/></form></Dialog>;
+ }
+ 
+ function SplitTransaction({tx,save,busy,close,error}:{tx:Transaction;save:Save;busy:boolean;close:()=>void;error:string}){
+diff --git a/app/globals.css b/app/globals.css
+index cf2402b..6781f10 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -10,3 +10,8 @@
+ @media(min-width:761px){.nav-item{font-size:13px}.workspace strong{font-size:12px}.page-heading>div>p{font-size:13px}.summary-meta{font-size:11px}.stat-card>div{font-size:12px}.stat-card p{font-size:10px}.panel-heading h2{font-size:14px}.onboarding-title p{font-size:11px}.setup-steps strong{font-size:12px}.setup-steps small{font-size:10px}.attention-row strong{font-size:12px}.attention-row p{font-size:11px}.source-row strong{font-size:12px}.source-row small{font-size:10px}.source-note p{font-size:10px}.empty h3{font-size:13px}.empty p{font-size:11px}.party-cell strong{font-size:12px}.party-cell small{font-size:10px}td{font-size:12px}th{font-size:10px}.pill{font-size:10px}.field>span{font-size:12px}.filter-tabs>button{font-size:11px}.btn{font-size:12px}.text-button{font-size:12px}}
+ 
+ .gmail-workspace{max-width:1380px;margin:auto;padding:32px;display:grid;gap:22px}.gmail-workspace .panel{padding:24px}.gmail-workspace .button-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.gmail-review{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}.gmail-review section{min-width:0}.gmail-review iframe{width:100%;height:720px;border:1px solid #dbe3ec;border-radius:10px}.gmail-review img{width:100%;max-height:720px;object-fit:contain}.gmail-review .gmail-uncertain input{border-color:#c99633;background:#fff9ed}.gmail-error{background:#fee9e9;color:#8d2424;padding:16px;border-radius:10px}.gmail-workspace td small{display:block;font-size:11px}.gmail-review .check-field{margin:22px 0}.gmail-workspace details{margin-top:20px}.gmail-workspace details p{margin-top:14px}@media(max-width:850px){.gmail-review{grid-template-columns:1fr}.gmail-review iframe{height:380px}.gmail-workspace{padding:16px}}
++
++.customer-message-card{padding:22px 0;border-bottom:1px solid var(--border,#e3e8ef)}
++.customer-message-card:last-child{border-bottom:0}.message-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:20px 0}
++.message-facts dt{font-size:13px;color:#64748b}.message-facts dd{font-size:19px;font-weight:650;margin:6px 0}.message-input{width:100%;padding:12px;border:1px solid #d4dce8;border-radius:8px;margin:6px 0 18px;font:inherit}.message-body{min-height:260px;line-height:1.65;resize:vertical}.customer-messages-page pre{white-space:pre-wrap;overflow-wrap:anywhere}.customer-messages-page .button-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
++@media(max-width:600px){.message-facts{grid-template-columns:1fr}.customer-messages-page .button-row>.btn{width:100%}}
+diff --git a/app/kundmeddelanden/page.tsx b/app/kundmeddelanden/page.tsx
+new file mode 100644
+index 0000000..5e5e410
+--- /dev/null
++++ b/app/kundmeddelanden/page.tsx
+@@ -0,0 +1,5 @@
++import CustomerMessages from '@/components/customer-messages';
++import {requireChatGPTUser} from '@/app/chatgpt-auth';
++export const dynamic='force-dynamic';
++export const metadata={title:'Kundmeddelanden | MG Fakturakoll',referrer:'no-referrer'};
++export default async function CustomerMessagesPage(){await requireChatGPTUser('/kundmeddelanden');return <CustomerMessages/>;}
+diff --git a/components/customer-messages.tsx b/components/customer-messages.tsx
+new file mode 100644
+index 0000000..6c29998
+--- /dev/null
++++ b/components/customer-messages.tsx
+@@ -0,0 +1,34 @@
++'use client';
++import {useEffect,useRef,useState} from 'react';
++import {money} from '@/lib/domain';
++
++const kinds:Record<string,string>={partial:'Delbetalning',possible_vat:'Möjlig utebliven moms',wrong_reference:'Referens behöver kontrolleras',overdue:'Förfallen efter verifierad kontroll',overpayment:'Överbetalning',possible_duplicate:'Möjlig dubbelbetalning',confirmation:'Behov av betalningsbekräftelse'};
++const statuses:Record<string,string>={draft:'Utkast',stale:'Ny granskning krävs',rejected:'Avvisat',sending:'Utskick pågår / kontrollera Gmail',sent:'Skickat',unknown:'Oklar leverans – kontrollera Gmail'};
++async function request(action:string,body?:unknown){
++  const response=await fetch('/api/customer-messages/'+action,{method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'});
++  const data=await response.json() as any;
++  if(!response.ok)throw Object.assign(Error(data.error||'Åtgärden misslyckades.'),{status:response.status});return data;
++}
++export default function CustomerMessages(){
++  const [items,setItems]=useState<any[]>([]),[gmail,setGmail]=useState<any>({}),[review,setReview]=useState<any>(null),[subject,setSubject]=useState(''),[body,setBody]=useState(''),[approved,setApproved]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[contact,setContact]=useState<any>(null),[absence,setAbsence]=useState<any>(null);
++  const generation=useRef(0),operation=useRef(false);
++  async function load(){const token=++generation.current;await request('reconcile',{});const [queue,status]=await Promise.all([request('list'),fetch('/api/gmail/status?summary=1',{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Gmail-status kunde inte hämtas.');return r.json();})]);if(token!==generation.current)return;setItems(queue.items);setGmail(status);}
++  useEffect(()=>{void load().catch(e=>setError(e.message));return()=>{generation.current++;};},[]);
++  async function run(fn:()=>Promise<void>){if(operation.current)return;operation.current=true;setBusy(true);setError('');setNotice('');try{await fn();}catch(e:any){setError(e.message);if(e.status===401||e.status===403){setItems([]);setReview(null);setContact(null);setAbsence(null);}if(e.status===409||e.status===502){setReview(null);await load().catch(()=>{});}}finally{operation.current=false;setBusy(false);}}
++  async function open(item:any){const result=item.status==='draft'?await request('review',{id:item.id,version:item.version}):item;setReview({...item,...result});setSubject(result.subject);setBody(result.body);setApproved(false);}
++  const dirty=!!review&&(subject!==review.subject||body!==review.body),editable=review?.status==='draft';
++  return <main className="gmail-workspace customer-messages-page"><a href="/" className="text-button">← MG Fakturakoll</a><div className="page-heading"><div><h1>Kundmeddelanden</h1><p>Kontrollera underlaget, läs och godkänn varje aktuell mejlversion före utskick.</p></div></div>
++    {error&&<p role="alert" className="gmail-error">{error}</p>}{notice&&<p role="status">{notice}</p>}
++    <section className="panel"><h2>Kontroller först, utskick efter ditt beslut</h2><p>Automatiken avstämmer säkra betalningar och förbereder utkast. Osäker OCR, betalare och möjliga dubletter kräver manuell kontroll. Ingen schemalagd process skickar mejl.</p><p>Gmail: {gmail.send_enabled?'Utskicksbehörighet finns':'Nytt Google-medgivande behövs för utskick'}</p><div className="button-row"><button className="btn" disabled={busy} onClick={()=>run(load)}>Uppdatera avstämning och kö</button><button className="btn" disabled={busy} onClick={()=>run(async()=>{const r=await fetch('/api/gmail/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({send:true})});const d=await r.json() as any;if(!r.ok)throw Error(d.error);location.assign(d.url);})}>Aktivera Gmail-utskick</button><a className="btn" href="/gmail">Fakturor från Gmail</a></div></section>
++    {!review?<section className="panel"><h2>Granskningskö</h2>{!items.length?<p>Inga kundmeddelanden att granska. Utkast skapas när registrerade fakturor och bankunderlag visar ett uppföljningsbehov.</p>:items.map(m=><article key={m.id} className="customer-message-card"><h3>{m.invoice.party} · faktura {m.invoice.number}</h3><p><strong>{kinds[m.kind]}</strong> · {statuses[m.status]}</p><p>Verifierad mottagare: {m.recipient||'Behöver verifieras'}</p><dl className="message-facts"><div><dt>Fakturerat</dt><dd>{money(m.facts.total_cents)}</dd></div><div><dt>Verifierat fördelat</dt><dd>{money(m.facts.paid_cents)}</dd></div><div><dt>Återstående saldo</dt><dd>{money(m.facts.remaining_cents)}</dd></div></dl><div className="button-row"><button className="btn primary" disabled={busy} onClick={()=>run(()=>open(m))}>{m.status==='draft'?'Läs och granska':'Visa underlag och meddelande'}</button><button className="btn" disabled={busy} onClick={()=>setContact(m)}>Verifiera kundadress</button>{m.kind==='confirmation'&&m.status==='draft'&&<button className="btn" disabled={busy} onClick={()=>setAbsence(m)}>Kontrollera utebliven betalning</button>}</div></article>)}</section>:<section className="panel"><h2>{review.invoice.party} · faktura {review.invoice.number}</h2><p>{kinds[review.kind]} · {statuses[review.status]}</p><dl className="message-facts"><div><dt>Fakturabelopp</dt><dd>{money(review.facts.total_cents)}</dd></div><div><dt>Verifierat betalt</dt><dd>{money(review.facts.paid_cents)}</dd></div><div><dt>Saldo</dt><dd>{money(review.facts.remaining_cents)}</dd></div></dl><p>Mottagare: <strong>{review.recipient||'Verifiering saknas'}</strong></p>{review.contact&&<p>Adressens verifieringsunderlag: {review.contact.evidence}</p>}{review.invoice.documentId?<a className="text-button" href={'/api/files?id='+encodeURIComponent(review.invoice.documentId)} target="_blank" rel="noopener">Öppna originalfakturan</a>:<p>Originalfaktura saknas i registret.</p>}
++      <h3>Betalningsunderlag</h3>{!review.payments.length&&<p>Ingen verifierad betalning är kopplad. Detta bevisar inte att fakturan är obetald.</p>}<ul>{review.payments.map((t:any,n:number)=><li key={t.id+'-'+n}>{t.effect==='refund'?'Återbetalning':'Verifierad koppling'}: {t.date} · {money(t.amount)} (fördelat {money(t.allocated)}) · {t.party} · OCR {t.payerReference||'saknas'} · bankreferens {t.bankReference||'saknas'} · konto {t.account}{t.original&&<details><summary>Bankens originaluppgifter</summary><pre>{JSON.stringify(t.original,null,2)}</pre></details>}{t.documentId&&<a className="text-button" href={'/api/files?id='+encodeURIComponent(t.documentId)} target="_blank" rel="noopener">Öppna bankens originalfil</a>}{t.verification&&<p>Separat verifieringsbeslut: {t.verification.note}</p>}</li>)}</ul><ul>{review.findings.map((f:any,n:number)=><li key={f.transaction_id+'-'+n}><strong>Osäkert förslag:</strong> {f.reason} {f.transaction&&`${f.transaction.date} · ${money(f.transaction.amount)} · ${f.transaction.party} · OCR ${f.transaction.payerReference}`}</li>)}</ul>
++      <label className="field" htmlFor="customer-subject">Ämne</label><input id="customer-subject" className="message-input" maxLength={240} value={subject} readOnly={!editable} onChange={e=>{setSubject(e.target.value);setApproved(false);}}/>
++      <label className="field" htmlFor="customer-body">Mejlutkast</label><textarea id="customer-body" className="message-input message-body" maxLength={20000} rows={12} value={body} readOnly={!editable} onChange={e=>{setBody(e.target.value);setApproved(false);}}/>
++      {editable&&<><p>Ändrad text måste sparas och den nya versionen öppnas för granskning före godkännandet.</p><button className="btn" disabled={busy||!dirty} onClick={()=>run(async()=>{await request('edit',{id:review.id,version:review.version,subject,body});setReview(null);await load();setNotice('Ändringarna är sparade. Öppna den nya versionen och läs den före utskick.');})}>Redigera – spara ändringar</button><label className="check-field"><input type="checkbox" checked={approved} disabled={dirty||busy} onChange={e=>setApproved(e.target.checked)}/>Jag har läst denna version, kontrollerat mottagaren och godkänner att mejlet skickas.</label></>}
++      {review.delivery&&<p>Leverans: {statuses[review.delivery.status]} · Gmail-ID {review.delivery.gmail_message_id||'saknas'} · {review.delivery.sent_at||''} · Message-ID {review.delivery.rfc_message_id}</p>}
++      <div className="button-row">{editable&&<button className="btn primary" disabled={busy||dirty||!approved||!review.recipient||!gmail.send_enabled} onClick={()=>run(async()=>{await request('send',{id:review.id,version:review.version,review_id:review.review_id,approve:true});setReview(null);await load();setNotice('Gmail har bekräftat utskicket.');})}>Godkänn och skicka</button>}{['draft','stale'].includes(review.status)&&<button className="btn" disabled={busy} onClick={()=>run(async()=>{await request('reject',{id:review.id,version:review.version});setReview(null);await load();})}>Avvisa</button>}<button className="btn" disabled={busy} onClick={()=>setReview(null)}>Stäng granskning</button></div>
++    </section>}
++    {absence&&<section className="panel"><h2>Kontroll av utebliven betalning – faktura {absence.invoice.number}</h2><form onSubmit={e=>{e.preventDefault();const form=new FormData(e.currentTarget);void run(async()=>{await request('absence',{invoice_id:absence.invoice.id,note:form.get('note'),confirm:form.has('confirm')});setAbsence(null);await load();});}}><label className="field">Kontrollerat bankunderlag och period<textarea name="note" maxLength={1500} required/></label><label className="check-field"><input name="confirm" type="checkbox" required/>Jag har kontrollerat att ingen verifierbar betalning saknas i registrerat bankunderlag.</label><div className="button-row"><button className="btn primary" disabled={busy}>Bekräfta verifierad kontroll</button><button className="btn" type="button" onClick={()=>setAbsence(null)}>Avbryt</button></div></form></section>}
++    {contact&&<section className="panel"><h2>Verifiera kundadressen för {contact.invoice.party}</h2><form onSubmit={e=>{e.preventDefault();const form=new FormData(e.currentTarget);void run(async()=>{await request('contact',{invoice_id:contact.invoice.id,email:form.get('email'),evidence:form.get('evidence'),confirm:form.has('confirm')});setContact(null);setReview(null);await load();});}}><label className="field">Kundadress<input type="email" name="email" required maxLength={240} defaultValue={contact.contact?.email||contact.invoice.email||''}/></label><label className="field">Verifieringsunderlag<textarea name="evidence" required maxLength={1000} placeholder="Ange var adressen har bekräftats, exempelvis kundavtal."/></label><label className="check-field"><input type="checkbox" required name="confirm"/>Jag har kontrollerat att adressen tillhör kunden.</label><div className="button-row"><button className="btn primary" disabled={busy}>Verifiera adress</button><button className="btn" type="button" disabled={busy} onClick={()=>setContact(null)}>Avbryt</button></div></form></section>}
++  </main>;
++}
+diff --git a/db/schema.ts b/db/schema.ts
+index 223a7f0..a47944a 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -1,4 +1,4 @@
+-import { primaryKey, sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
++import { primaryKey, sqliteTable, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
+ export const workspaces = sqliteTable("workspaces", {
+   owner: text("owner").primaryKey(), revision: integer("revision").notNull().default(0),
+   payload: text("payload").notNull(), updatedAt: text("updated_at").notNull(),
+@@ -49,6 +49,22 @@ export const gmailConnections = sqliteTable('gmail_connections', {
+ });
+ export const gmailFlows=sqliteTable('gmail_flows',{
+   stateHash:text('state_hash').primaryKey(),owner:text('owner').notNull(),cookieHash:text('cookie_hash').notNull(),expiresAt:text('expires_at').notNull(),consumed:integer('consumed').notNull().default(0),
++  requestSend:integer('request_send').notNull().default(0),
++});
++export const customerContacts=sqliteTable('customer_contacts',{
++  owner:text('owner').notNull(),invoiceId:text('invoice_id').notNull(),email:text('email').notNull(),identity:text('identity').notNull(),evidence:text('evidence').notNull(),version:integer('version').notNull().default(1),updatedAt:text('updated_at').notNull(),
++},t=>[primaryKey({columns:[t.owner,t.invoiceId]})]);
++export const customerMessages=sqliteTable('customer_messages',{
++  id:text('id').primaryKey(),owner:text('owner').notNull(),invoiceId:text('invoice_id').notNull(),kind:text('kind').notNull(),recipient:text('recipient').notNull(),subject:text('subject').notNull(),body:text('body').notNull(),snapshot:text('snapshot').notNull(),version:integer('version').notNull().default(1),status:text('status').notNull().default('draft'),createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),
++},t=>[index('messages_owner_invoice').on(t.owner,t.invoiceId),uniqueIndex('messages_evidence_unique').on(t.owner,t.invoiceId,t.kind,t.snapshot)]);
++export const reconciliationFindings=sqliteTable('reconciliation_findings',{
++  id:text('id').primaryKey(),owner:text('owner').notNull(),invoiceId:text('invoice_id').notNull(),transactionId:text('transaction_id').notNull(),kind:text('kind').notNull(),details:text('details').notNull(),active:integer('active').notNull().default(1),createdAt:text('created_at').notNull(),
++},t=>[index('findings_owner').on(t.owner)]);
++export const customerReviews=sqliteTable('customer_reviews',{
++  id:text('id').primaryKey(),owner:text('owner').notNull(),messageId:text('message_id').notNull(),version:integer('version').notNull(),snapshot:text('snapshot').notNull(),cookieHash:text('cookie_hash').notNull(),expiresAt:text('expires_at').notNull(),consumed:integer('consumed').notNull().default(0),
++});
++export const customerDeliveries=sqliteTable('customer_deliveries',{
++  id:text('id').primaryKey(),owner:text('owner').notNull(),messageId:text('message_id').notNull().unique(),reviewId:text('review_id').notNull().unique(),version:integer('version').notNull(),snapshot:text('snapshot').notNull(),recipient:text('recipient').notNull(),subject:text('subject').notNull(),body:text('body').notNull(),status:text('status').notNull(),gmailMessageId:text('gmail_message_id').notNull().default(''),rfcMessageId:text('rfc_message_id').notNull(),approvedAt:text('approved_at').notNull(),sentAt:text('sent_at').notNull().default(''),
+ });
+ export const gmailSources=sqliteTable('gmail_sources',{
+   owner:text('owner').notNull(),sourceId:text('source_id').notNull(),documentId:text('document_id').notNull(),metadata:text('metadata').notNull(),status:text('status').notNull().default('needs_review'),extraction:text('extraction').notNull().default('{}'),createdAt:text('created_at').notNull(),
+diff --git a/docs/CUSTOMER-MESSAGES.md b/docs/CUSTOMER-MESSAGES.md
+new file mode 100644
+index 0000000..e476b09
+--- /dev/null
++++ b/docs/CUSTOMER-MESSAGES.md
+@@ -0,0 +1,61 @@
++# Sites: avstämning och godkända kundmeddelanden
++
++Denna uppdatering gäller den befintliga Siten `appgprj_6adf2f7f7e848191b64192161886b528`. GitHub-/Node-registret kopieras inte över Sites D1/R2. Befintligt projekt-ID, publik åtkomstpolicy, användarägda arbetsytor, bank-/Gmail-anslutningar, krypteringsnyckel och pausade scheman bevaras. Inga runtime-hemligheter har ändrats.
++
++## Funktioner
++
++- `/kundmeddelanden` öppnas från arbetsytans meny. Den visar kund, verifierad mottagare med belägg, originalfaktura när den finns, bankhändelser, osäkra förslag, fakturabelopp, verifierat betalt och saldo.
++- `lib/reconciliation-engine.js` porterar de konservativa reglerna från Node `main` d029679: unik exakt OCR/fakturanummer, kundidentitet, organisationsnummer när det finns, datum, valuta och tidigare verifierade betalarkopplingar. Belopp ensamt är aldrig ett betalningsbevis.
++- Bankgiro-specifikationers kompletta barn ersätter sin samlingspost ekonomiskt. Den ursprungliga samlingsposten finns kvar. Befintlig dubblettkarantän mellan bank-API och filimport bevaras. Osäkra kopplingar och ofullständiga specifikationer stannar för granskning.
++- Korrekt betalning kan matchas automatiskt. Delbetalning, möjlig utebliven moms, fel/saknad referens, annan betalare, överbetalning, möjlig dubbelbetalning och en betalning för flera fakturor hanteras med förslag och säkra saldon.
++- Betald, Delbetald, Ej avstämd och Obetald efter verifierad kontroll skiljs åt. Utebliven betalning behöver ett separat bekräftat kontrollunderlag. Ny bankimport upphäver en tidigare frånvarokontroll.
++- Fakturor bevarar netto, moms och organisationsnummer från granskningen. Manuella fakturor kan kompletteras med dessa fält. En skillnad som motsvarar momsen uttrycks som en möjlighet, aldrig som en anklagelse.
++- Bankens originaluppgifter sparas separat från nya verifieringsbeslut. En administratör kan bekräfta en avvikande referens/betalare med ett separat rättelseval och underlag. Ursprunglig OCR skrivs inte över i originalbilden av bankhändelsen.
++- Mejlen är svenska utkast för delbetalning, momsavvikelse, referensfel, förfallen faktura, överbetalning, möjlig dubbelbetalning och behov av betalningsbekräftelse. Adresser från fakturor/Gmail räknas inte automatiskt som verifierade kundadresser.
++- Redigering sparar en ny version. Avvisa stoppar ett utkast. Godkänn och skicka kräver att den aktuella versionen öppnats, att mottagaren verifierats och att administratören markerat det uttryckliga godkännandet. Ändrad text måste sparas och läsas igen.
++
++## Beständigt godkännande och leverans
++
++En granskningspost gäller 15 minuter och binds till Sites-identitet, mejlversion, underlagshash och en separat HttpOnly-/Secure-/SameSite-cookie i webbläsaren. Varje API-anrop kontrollerar ägare och origin. Ingen besökare kan läsa eller skicka från en annan användares arbetsyta.
++
++D1-reservationen görs atomiskt i en batch. Den kontrollerar version, aktuell workspace-revision, oförändrad kontaktverifiering, aktuell Gmail-anslutning och oanvänt granskningsbeslut innan en beständig leveransrad skapas. Det finns en unik leverans per meddelande och en unik användning per granskningsbeslut. Samtidiga anrop kan därmed inte skicka två mejl.
++
++Alla externa token-/profilkontroller görs före reservationen. Därefter sker ett Gmail-POST utan automatisk retry. Gmail-ID och tidpunkt registreras vid ett godkänt svar. Timeout, fel eller ett ofullständigt svar efter reservation låser leveransen som `unknown`. Avbrott kan lämna `sending`; även detta är en beständig spärr som kräver manuell kontroll i Gmail. Ett meddelande med oklar leverans genereras aldrig om automatiskt. Ingen automatisk återbetalning eller påminnelsekedja ingår.
++
++Förberedelse, granskning, adressverifiering, textens före/efter, avvisande, exakt godkänd text/mottagare, utskick och oklar status finns i revisionshistoriken. Exporten innehåller meddelanden, leveranser, verifierade adresser och avvikelser; token och granskningscookies exporteras inte.
++
++## Google och schemaläggning
++
++Fakturahämtning behåller `gmail.readonly`. Välj Aktivera Gmail-utskick på Kundmeddelanden för ett nytt interaktivt medgivande med både `gmail.readonly` och `gmail.send`. Google-profilen måste motsvara det konfigurerade företagskontot. Callbacken kontrollerar faktiskt beviljad utskicksscope. Befintliga lästoken uppgraderas inte genom en lokal inställning.
++
++Google Cloud behöver tillåta dessa scopes och Sites egen registrerade callback `/api/gmail/callback`. Företagets behöriga användare måste godkänna medgivandet. Inga verkliga mejl har skickats under implementation eller verifiering. Testerna bevisar inte att verklig Google-auktorisering, bankanslutning eller leverans till kund fungerar.
++
++Befintlig bank-/Gmail-synkning anropar nu avstämning och utkastberedning efter hämtning. Sites MCP har dessutom `reconcile_customer_payments` utan ägarparametrar. Det exponerar ingen utskicksoperation. Ett aktiverat molnschema kan använda dessa operationer när anslutningarna och medgivandena är giltiga. Ett befintligt pausat schema återaktiveras inte av denna kodändring.
++
++## Dokumenttolkning
++
++Sites befintliga PDF- och bildtolkning med svensk OCR körs i webbläsaren när ett Gmail-underlag öppnas för granskning. De verifierade fakturafälten bevaras nu för avstämning och momsutkast. Okända fakturor och skannade dokument kräver fortsatt granskning; denna Worker-uppdatering innehåller inte Node-versionens lokala serverprocesser för PDF-rendering/OCR eller obevakad server-OCR. Den begränsningen visas även på Gmail-sidan. Ingen osäker text eller AI-gissning används för att skapa en skuld eller betalningsstatus.
++
++## Databas
++
++Drizzle-migrering `0004_silky_lily_hollister.sql` lägger additivt till `customer_contacts`, `customer_messages`, `customer_reviews`, `customer_deliveries` och `reconciliation_findings`, samt flaggan för begärd utskicksscope i `gmail_flows`. Äldre migreringar och datarader ersätts inte. Nya fakturafält ligger i den befintliga versionskontrollerade workspace-payloaden och är valfria för äldre data. Sites publiceringsflöde applicerar migreringen före Worker-uppladdning.
++
++## Verifiering
++
++- `npm run check`: TypeScript utan fel.
++- `npm test`: 122 godkända tester med syntetiska data och simulerade externa svar.
++- Produktionsbygge via Sites byggverktyg.
++- Lokala D1-migreringar applicerade i ordning; inga produktionsrader användes för testerna.
++- Nya tester kör verklig tjänstelogik, kryptering, SQLite som D1-adapter och de faktiska SQL-reservationerna. De täcker betalningsscenarierna, OCR-konflikt, 2 500/3 125 kr, moms, Bankgiro-/bankdubletter, annan betalare, flera fakturor, saknad OCR, verifierad frånvaro, redigering utan nytt godkännande, fel/utgången granskningspost, annan webbläsare, ägarisolering, CSRF, dubbelklick, timeout, samtidiga konto-/adress-/betalningsändringar och OAuth-scope.
++- Webbläsargranskning med syntetiskt exempel: adressverifiering, 3 125 kr faktura, 2 500 kr betalt, 625 kr saldo och redigering som sparar en ny version utan utskick.
++
++## Centrala filer
++
++- `lib/reconciliation-engine.js`, `lib/reconciliation.ts`: regler och automatisk avstämning.
++- `lib/customer-message-text.js`, `lib/customer-messages.ts`: svenska utkast, kontaktkontroll, granskning och engångsutskick.
++- `components/customer-messages.tsx`, `app/kundmeddelanden/page.tsx`, `app/api/customer-messages/[action]/route.ts`: granskningssida och privata API-rutter.
++- `lib/domain.ts`, `app/dashboard.tsx`: verifierade statusar, fakturafält, bevarade bankoriginal och separata rättelsebeslut.
++- `lib/gmail-service.ts`, `lib/gmail-adapter.js`: valbart utskicksmedgivande, MIME och Gmail-kontroll.
++- `lib/banking/service.ts`, `lib/banking/mcp.ts`, `app/api/state/route.ts`: synk-/MCP-/mutationskoppling till avstämning.
++- `db/schema.ts`, `drizzle/0004_silky_lily_hollister.sql` med Drizzle-metadata: additiva tabeller och index.
++- `app/api/export/route.ts`, `app/globals.css`, `package.json`, `README.md`, denna guide och testerna kompletterar leveransen.
+diff --git a/drizzle/0004_silky_lily_hollister.sql b/drizzle/0004_silky_lily_hollister.sql
+new file mode 100644
+index 0000000..b768689
+--- /dev/null
++++ b/drizzle/0004_silky_lily_hollister.sql
+@@ -0,0 +1,71 @@
++CREATE TABLE `customer_contacts` (
++	`owner` text NOT NULL,
++	`invoice_id` text NOT NULL,
++	`email` text NOT NULL,
++	`identity` text NOT NULL,
++	`evidence` text NOT NULL,
++	`version` integer DEFAULT 1 NOT NULL,
++	`updated_at` text NOT NULL,
++	PRIMARY KEY(`owner`, `invoice_id`)
++);
++--> statement-breakpoint
++CREATE TABLE `customer_deliveries` (
++	`id` text PRIMARY KEY NOT NULL,
++	`owner` text NOT NULL,
++	`message_id` text NOT NULL,
++	`review_id` text NOT NULL,
++	`version` integer NOT NULL,
++	`snapshot` text NOT NULL,
++	`recipient` text NOT NULL,
++	`subject` text NOT NULL,
++	`body` text NOT NULL,
++	`status` text NOT NULL,
++	`gmail_message_id` text DEFAULT '' NOT NULL,
++	`rfc_message_id` text NOT NULL,
++	`approved_at` text NOT NULL,
++	`sent_at` text DEFAULT '' NOT NULL
++);
++--> statement-breakpoint
++CREATE UNIQUE INDEX `customer_deliveries_message_id_unique` ON `customer_deliveries` (`message_id`);--> statement-breakpoint
++CREATE UNIQUE INDEX `customer_deliveries_review_id_unique` ON `customer_deliveries` (`review_id`);--> statement-breakpoint
++CREATE TABLE `customer_messages` (
++	`id` text PRIMARY KEY NOT NULL,
++	`owner` text NOT NULL,
++	`invoice_id` text NOT NULL,
++	`kind` text NOT NULL,
++	`recipient` text NOT NULL,
++	`subject` text NOT NULL,
++	`body` text NOT NULL,
++	`snapshot` text NOT NULL,
++	`version` integer DEFAULT 1 NOT NULL,
++	`status` text DEFAULT 'draft' NOT NULL,
++	`created_at` text NOT NULL,
++	`updated_at` text NOT NULL
++);
++--> statement-breakpoint
++CREATE INDEX `messages_owner_invoice` ON `customer_messages` (`owner`,`invoice_id`);--> statement-breakpoint
++CREATE UNIQUE INDEX `messages_evidence_unique` ON `customer_messages` (`owner`,`invoice_id`,`kind`,`snapshot`);--> statement-breakpoint
++CREATE TABLE `customer_reviews` (
++	`id` text PRIMARY KEY NOT NULL,
++	`owner` text NOT NULL,
++	`message_id` text NOT NULL,
++	`version` integer NOT NULL,
++	`snapshot` text NOT NULL,
++	`cookie_hash` text NOT NULL,
++	`expires_at` text NOT NULL,
++	`consumed` integer DEFAULT 0 NOT NULL
++);
++--> statement-breakpoint
++CREATE TABLE `reconciliation_findings` (
++	`id` text PRIMARY KEY NOT NULL,
++	`owner` text NOT NULL,
++	`invoice_id` text NOT NULL,
++	`transaction_id` text NOT NULL,
++	`kind` text NOT NULL,
++	`details` text NOT NULL,
++	`active` integer DEFAULT 1 NOT NULL,
++	`created_at` text NOT NULL
++);
++--> statement-breakpoint
++CREATE INDEX `findings_owner` ON `reconciliation_findings` (`owner`);--> statement-breakpoint
++ALTER TABLE `gmail_flows` ADD `request_send` integer DEFAULT 0 NOT NULL;
+\ No newline at end of file
+diff --git a/drizzle/meta/0004_snapshot.json b/drizzle/meta/0004_snapshot.json
+new file mode 100644
+index 0000000..0ed7360
+--- /dev/null
++++ b/drizzle/meta/0004_snapshot.json
+@@ -0,0 +1,1341 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "6ea25836-e592-4dc5-ad35-dcdf8056cbbe",
++  "prevId": "a40d5ac1-e089-41b7-bbaf-f2ae61038406",
++  "tables": {
++    "audit_events": {
++      "name": "audit_events",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "revision": {
++          "name": "revision",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "action": {
++          "name": "action",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "detail": {
++          "name": "detail",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "audit_owner_revision": {
++          "name": "audit_owner_revision",
++          "columns": [
++            "owner",
++            "revision"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_applications": {
++      "name": "bank_applications",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "application_id": {
++          "name": "application_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_key": {
++          "name": "encrypted_key",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "metadata": {
++          "name": "metadata",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "generation": {
++          "name": "generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_auth_flows": {
++      "name": "bank_auth_flows",
++      "columns": {
++        "state_hash": {
++          "name": "state_hash",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "cookie_hash": {
++          "name": "cookie_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "app_generation": {
++          "name": "app_generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "bank_name": {
++          "name": "bank_name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "country": {
++          "name": "country",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "environment": {
++          "name": "environment",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "redirect_uri": {
++          "name": "redirect_uri",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "date_from": {
++          "name": "date_from",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_flow_owner": {
++          "name": "bank_flow_owner",
++          "columns": [
++            "owner"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_connections": {
++      "name": "bank_connections",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "app_generation": {
++          "name": "app_generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "environment": {
++          "name": "environment",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "bank_name": {
++          "name": "bank_name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "country": {
++          "name": "country",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_session": {
++          "name": "encrypted_session",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_accounts": {
++          "name": "encrypted_accounts",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "selected_accounts": {
++          "name": "selected_accounts",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'[]'"
++        },
++        "valid_until": {
++          "name": "valid_until",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "date_from": {
++          "name": "date_from",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "last_synced_at": {
++          "name": "last_synced_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "last_error": {
++          "name": "last_error",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "auto_sync_enabled": {
++          "name": "auto_sync_enabled",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "auto_last_attempt_at": {
++          "name": "auto_last_attempt_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "auto_next_at": {
++          "name": "auto_next_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_connections_owner_unique": {
++          "name": "bank_connections_owner_unique",
++          "columns": [
++            "owner"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_locks": {
++      "name": "bank_locks",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_sync_runs": {
++      "name": "bank_sync_runs",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "connection_id": {
++          "name": "connection_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "imported": {
++          "name": "imported",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "skipped": {
++          "name": "skipped",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "warnings": {
++          "name": "warnings",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "test": {
++          "name": "test",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_run_owner_created": {
++          "name": "bank_run_owner_created",
++          "columns": [
++            "owner",
++            "created_at"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "customer_contacts": {
++      "name": "customer_contacts",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "invoice_id": {
++          "name": "invoice_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "identity": {
++          "name": "identity",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "evidence": {
++          "name": "evidence",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "version": {
++          "name": "version",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 1
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {
++        "customer_contacts_owner_invoice_id_pk": {
++          "columns": [
++            "owner",
++            "invoice_id"
++          ],
++          "name": "customer_contacts_owner_invoice_id_pk"
++        }
++      },
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "customer_deliveries": {
++      "name": "customer_deliveries",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "message_id": {
++          "name": "message_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "review_id": {
++          "name": "review_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "version": {
++          "name": "version",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "snapshot": {
++          "name": "snapshot",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "recipient": {
++          "name": "recipient",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "subject": {
++          "name": "subject",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "gmail_message_id": {
++          "name": "gmail_message_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        },
++        "rfc_message_id": {
++          "name": "rfc_message_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "approved_at": {
++          "name": "approved_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "sent_at": {
++          "name": "sent_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        }
++      },
++      "indexes": {
++        "customer_deliveries_message_id_unique": {
++          "name": "customer_deliveries_message_id_unique",
++          "columns": [
++            "message_id"
++          ],
++          "isUnique": true
++        },
++        "customer_deliveries_review_id_unique": {
++          "name": "customer_deliveries_review_id_unique",
++          "columns": [
++            "review_id"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "customer_messages": {
++      "name": "customer_messages",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "invoice_id": {
++          "name": "invoice_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "kind": {
++          "name": "kind",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "recipient": {
++          "name": "recipient",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "subject": {
++          "name": "subject",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "body": {
++          "name": "body",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "snapshot": {
++          "name": "snapshot",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "version": {
++          "name": "version",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 1
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'draft'"
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "messages_owner_invoice": {
++          "name": "messages_owner_invoice",
++          "columns": [
++            "owner",
++            "invoice_id"
++          ],
++          "isUnique": false
++        },
++        "messages_evidence_unique": {
++          "name": "messages_evidence_unique",
++          "columns": [
++            "owner",
++            "invoice_id",
++            "kind",
++            "snapshot"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "customer_reviews": {
++      "name": "customer_reviews",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "message_id": {
++          "name": "message_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "version": {
++          "name": "version",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "snapshot": {
++          "name": "snapshot",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "cookie_hash": {
++          "name": "cookie_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "consumed": {
++          "name": "consumed",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "documents": {
++      "name": "documents",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "filename": {
++          "name": "filename",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "mime": {
++          "name": "mime",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "size": {
++          "name": "size",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "sha256": {
++          "name": "sha256",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "documents_owner_hash": {
++          "name": "documents_owner_hash",
++          "columns": [
++            "owner",
++            "sha256"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_connections": {
++      "name": "gmail_connections",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "email": {
++          "name": "email",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "tokens": {
++          "name": "tokens",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "last_synced": {
++          "name": "last_synced",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        },
++        "page_token": {
++          "name": "page_token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        },
++        "started_at": {
++          "name": "started_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'connected'"
++        },
++        "last_attempt": {
++          "name": "last_attempt",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "''"
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_flows": {
++      "name": "gmail_flows",
++      "columns": {
++        "state_hash": {
++          "name": "state_hash",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "cookie_hash": {
++          "name": "cookie_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "consumed": {
++          "name": "consumed",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "request_send": {
++          "name": "request_send",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_locks": {
++      "name": "gmail_locks",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_runs": {
++      "name": "gmail_runs",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "found": {
++          "name": "found",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "imported": {
++          "name": "imported",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "duplicates": {
++          "name": "duplicates",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "gmail_sources": {
++      "name": "gmail_sources",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "source_id": {
++          "name": "source_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "document_id": {
++          "name": "document_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "metadata": {
++          "name": "metadata",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'needs_review'"
++        },
++        "extraction": {
++          "name": "extraction",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'{}'"
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {
++        "gmail_sources_owner_source_id_pk": {
++          "columns": [
++            "owner",
++            "source_id"
++          ],
++          "name": "gmail_sources_owner_source_id_pk"
++        }
++      },
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "reconciliation_findings": {
++      "name": "reconciliation_findings",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "invoice_id": {
++          "name": "invoice_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "transaction_id": {
++          "name": "transaction_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "kind": {
++          "name": "kind",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "details": {
++          "name": "details",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "active": {
++          "name": "active",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 1
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "findings_owner": {
++          "name": "findings_owner",
++          "columns": [
++            "owner"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "workspaces": {
++      "name": "workspaces",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "revision": {
++          "name": "revision",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "payload": {
++          "name": "payload",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index c32e0cf..0343d73 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -29,6 +29,13 @@
+       "when": 1793136009879,
+       "tag": "0003_needy_gravity",
+       "breakpoints": true
++    },
++    {
++      "idx": 4,
++      "version": "6",
++      "when": 1793139003415,
++      "tag": "0004_silky_lily_hollister",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/lib/banking/mcp.ts b/lib/banking/mcp.ts
+index 2933dfb..87f6f96 100644
+--- a/lib/banking/mcp.ts
++++ b/lib/banking/mcp.ts
+@@ -1,11 +1,12 @@
+ import { automaticSync, automaticSyncStatus, bankFailure } from './service';
+ 
+ const tools = [
+-  {name:'gmail_auto_sync',title:'Hämta fakturabilagor från Gmail',description:'Hämtar fakturaunderlag till den autentiserade användarens arbetsyta högst var 15 minut med befintligt Google-medgivande. Skapar inga skulder eller betalningsmatchningar.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true,openWorldHint:true}},
++  {name:'reconcile_customer_payments',title:'Stäm av betalningar och förbered kundmeddelanden',description:'Kontrollerar den autentiserade användarens fakturor och verifierade bankunderlag, matchar endast säkra betalningar och förbereder utkast för granskning. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
++  {name:'gmail_auto_sync',title:'Hämta fakturabilagor från Gmail',description:'Hämtar fakturaunderlag till den autentiserade användarens arbetsyta högst var 15 minut med befintligt Google-medgivande. Förbereder underlag och avstämmer säkra betalningar mot registrerade fakturor. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true,openWorldHint:true}},
+   {name:'gmail_sync_status',title:'Status för Gmail',description:'Visar den autentiserade användarens Gmail-anslutning och sparade underlag. Ändrar ingenting.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true}},
+   { name: 'bank_auto_sync_status', title: 'Status för automatisk bankhämtning', description: 'Läser endast den autentiserade användarens anslutnings- och hämtningsstatus, utan transaktioner eller kontonummer.',
+     inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: true } },
+-  { name: 'bank_auto_sync', title: 'Hämta nya bankhändelser', description: 'Hämtar bokförda bankhändelser till den autentiserade användarens privata fakturakoll när automatisk hämtning är aktiverad och förfallen. Använder endast redan valt företagskonto och befintligt bankmedgivande. Matchar inga fakturor och utför inga betalningar.',
++  { name: 'bank_auto_sync', title: 'Hämta nya bankhändelser', description: 'Hämtar bokförda bankhändelser till den autentiserade användarens privata fakturakoll när automatisk hämtning är aktiverad och förfallen. Använder endast redan valt företagskonto och befintligt bankmedgivande. Avstämmer endast säkra betalningar och förbereder utkast. Skickar inga mejl och utför inga betalningar.',
+     inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true } },
+ ];
+ const versions = ['2026-07-28', '2025-03-26'];
+@@ -32,7 +33,10 @@ export async function bankRpc(body: unknown): Promise<Response> {
+   if (!object(args) || Object.keys(args).length) return error(-32602, 'This tool accepts no arguments');
+   let response: Response;
+   try {
+-    if(String(params.name).startsWith('gmail_')){
++    if(params.name==='reconcile_customer_payments'){
++      const {identity,response:json}=await import('../server');const user=await identity();
++      response=json(await (await import('../customer-messages')).reconcileAndPrepare(user.userId));
++    }else if(String(params.name).startsWith('gmail_')){
+       const gmail=await import('../gmail-service');
+       try{response=params.name==='gmail_auto_sync'?await gmail.gmailSync(undefined,true):await gmail.gmailStatus();}catch(e){response=gmail.gmailFailure(e);}
+     }else response=params.name === 'bank_auto_sync' ? await automaticSync() : await automaticSyncStatus();
+diff --git a/lib/banking/service.ts b/lib/banking/service.ts
+index 156ee9e..2c48f05 100644
+--- a/lib/banking/service.ts
++++ b/lib/banking/service.ts
+@@ -417,7 +417,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; p
+       });
+       if (!test && old && candidateRows.length) {
+         let result: ReturnType<typeof applyCommand>;
+-        const command = { type: 'transactions.import', rows: candidateRows, account: 'Enable Banking', name: `${conn.bank_name} · bankhämtning ${from}–${to}` };
++        const command = { type: 'transactions.import', trustedBankImport:true, rows: candidateRows, account: 'Enable Banking', name: `${conn.bank_name} · bankhämtning ${from}–${to}` };
+         try { result = applyCommand(old.state, command); }
+         catch (error) { throw new BankError(error instanceof Error ? error.message : 'Bankhändelserna kunde inte importeras.'); }
+         imported = result.state.transactions.length - old.state.transactions.length;
+@@ -449,6 +449,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; p
+       try {
+         await db().prepare('DELETE FROM bank_sync_runs WHERE owner=? AND id NOT IN (SELECT id FROM bank_sync_runs WHERE owner=? ORDER BY created_at DESC LIMIT 50)').bind(user.userId, user.userId).run();
+       } catch { /* A later successful run can prune older history. */ }
++      if(!test)await (await import('../customer-messages')).reconcileAndPrepare(user.userId);
+       return response({ message: test ? `Testhämtningen är klar. ${rows.length} testhändelser lästes utan att påverka ditt register.` : `${imported} nya bankhändelser hämtades. Kontrollera underlagen före matchning.`, imported, skipped, warnings: [...warnings], test });
+     } catch (error) {
+       const message = error instanceof BankError || error instanceof ProviderError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.';
+diff --git a/lib/customer-message-text.js b/lib/customer-message-text.js
+new file mode 100644
+index 0000000..17fab37
+--- /dev/null
++++ b/lib/customer-message-text.js
+@@ -0,0 +1,13 @@
++// Swedish templates use verified amounts only. No transport or approval logic.
++export function validRecipient(email){
++  if(typeof email!=='string'||email.length>240||!/^[-A-Za-z0-9.!#$%&'*+/=?^_`{|}~]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)||/[\r\n\0]/.test(email))return false;
++  const [local,domain]=email.split('@');
++  return local.length<=64&&!/^\.|\.$|\.\./.test(local)&&domain.split('.').every(label=>/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/.test(label));
++}
++const money=c=>new Intl.NumberFormat('sv-SE',{style:'currency',currency:'SEK'}).format(c/100);
++export function generateMessage(i,kind){
++  const intro=`Hej ${i.party},\n\nVi kontaktar er angående faktura ${i.invoice_number} på ${money(i.total_cents)}.`,paid=`Vi har verifierat betalningar på ${money(i.paid_cents)}. Återstående saldo är ${money(i.remaining_cents)}.`;
++  const text={partial:`${paid} Vänligen kontrollera resterande belopp och återkom om ni har frågor.`,possible_vat:`${paid} Skillnaden motsvarar fakturans momsbelopp på ${money(i.vat_cents)}. Kan betalningen ha avsett beloppet exklusive moms? Hjälp oss gärna att kontrollera detta.`,wrong_reference:'Betalningsreferensen behöver kontrolleras. Kan ni bekräfta vilken faktura betalningen avser och ange korrekt fakturanummer?',overdue:`${paid} Förfallodatum var ${i.due_at}. Våra betalningsunderlag har kontrollerats. Vänligen kontrollera betalningen och återkom med betalningsbekräftelse om beloppet redan har betalats.`,overpayment:'En verifierad betalning överstiger det belopp som fördelats till fakturan. Kan ni hjälpa oss att kontrollera vad det överskjutande beloppet avser?',possible_duplicate:'Vi har hittat betalningsunderlag som kan avse ytterligare en betalning för fakturan. Vi behöver er hjälp att kontrollera detta innan vi drar någon slutsats.',confirmation:'Vi behöver hjälp att stämma av betalningsunderlaget. Kan ni skicka betalningsdatum, belopp och betalningsreferens? Vi har ännu inte kunnat fastställa betalningsstatus.'}[kind];
++  const referenceNote=kind==='wrong_reference'&&i.payment_references?.length?`\n\nReferenser i underlaget: ${i.payment_references.join(', ')}. Fakturans referens: ${i.reference||i.invoice_number}.`:'';
++  return {subject:`Avstämning av faktura ${i.invoice_number}`.replace(/[\r\n\0]/g,' '),body:`${intro}\n\n${text}${referenceNote}\n\nTack för hjälpen!\nM.George Vitvaror AB`};
++}
+diff --git a/lib/customer-messages.ts b/lib/customer-messages.ts
+new file mode 100644
+index 0000000..bc939da
+--- /dev/null
++++ b/lib/customer-messages.ts
+@@ -0,0 +1,192 @@
++import {db,identity,readWorkspace,response} from './server';
++import {uid,now,today,applyCommand,balance,type State} from './domain';
++import {analyze,reconcileState,invoiceFacts,contactIdentity} from './reconciliation';
++import {generateMessage,validRecipient} from './customer-message-text.js';
++import {digest,randomToken,cookieValue} from './banking/security';
++import {encrypt,decrypt} from './banking/store';
++import {prepareGmailSend,gmailAccount,hasGmailSendScope} from './gmail-adapter.js';
++
++type Row=Record<string,any>;
++const error=(text:string,status=409)=>Object.assign(Error(text),{safe:true,status});
++async function audit(owner:string,action:string,detail:unknown){
++  const {revision}=await readWorkspace(owner);
++  await db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,?,?,?,?)').bind(uid(),owner,revision,action,JSON.stringify(detail),now()).run();
++}
++export async function evidenceSnapshot(state:State,contact:Row|null){return digest(JSON.stringify({state,contact,day:today()}));}
++async function contactFor(owner:string,id:string){return db().prepare('SELECT * FROM customer_contacts WHERE owner=? AND invoice_id=?').bind(owner,id).first<Row>();}
++async function getMessage(owner:string,id:string){const m=await db().prepare('SELECT * FROM customer_messages WHERE owner=? AND id=?').bind(owner,id).first<Row>();if(!m)throw error('Meddelandet saknas.',404);return m;}
++async function current(owner:string,id:string,version:number){
++  const m=await getMessage(owner,id),workspace=await readWorkspace(owner),contact=await contactFor(owner,m.invoice_id);
++  if(m.status!=='draft'||m.version!==version||m.snapshot!==await evidenceSnapshot(workspace.state,contact))throw error('Utkastet eller betalningsunderlaget har ändrats. Uppdatera och granska den nya versionen.');
++  const invoice=workspace.state.invoices.find(i=>i.id===m.invoice_id);
++  if(!invoice||invoice.voided||!invoice.reviewed)throw error('Fakturan behöver kontrolleras.');
++  return {m,workspace,contact,invoice};
++}
++export async function reconcileAndPrepare(owner:string){
++  let workspace=await readWorkspace(owner);const result=reconcileState(workspace.state);
++  if(result.decisions.length){
++    if(new TextEncoder().encode(JSON.stringify(result.state)).length>1800000)throw error('Registret behöver utökad lagring innan fler automatiska matchningar sparas.');
++    const at=now(),eventId=uid();
++    const batch=await db().batch([
++      db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(eventId,owner,workspace.revision+1,'automatic.reconciliation',JSON.stringify({decisions:result.decisions}),at,owner,workspace.revision),
++      db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(result.state),at,owner,workspace.revision),
++    ]);
++    if(batch[1].meta.changes!==1)throw error('Nya uppgifter sparades samtidigt. Kör kontrollen igen.');
++    workspace={state:result.state,revision:workspace.revision+1};
++  }
++  const findings=analyze(workspace.state);
++  const statements=[db().prepare('UPDATE reconciliation_findings SET active=0 WHERE owner=?').bind(owner)];
++  for(const f of findings.filter(f=>f.invoice_id))statements.push(db().prepare('INSERT INTO reconciliation_findings(id,owner,invoice_id,transaction_id,kind,details,created_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET active=1').bind(await digest(owner+JSON.stringify(f)),owner,f.invoice_id,f.transaction_id,f.kind,JSON.stringify(f),now()));
++  // D1 caps statements per batch. Findings are derived; financial CAS above is authoritative.
++  for(let n=0;n<statements.length;n+=50)await db().batch(statements.slice(n,n+50));
++  const existing=await db().prepare('SELECT * FROM customer_messages WHERE owner=?').bind(owner).all<Row>();
++  for(const m of existing.results.filter(m=>m.status==='draft')){
++    if(m.snapshot===await evidenceSnapshot(workspace.state,await contactFor(owner,m.invoice_id)))continue;
++    await db().batch([
++      db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?, 'message.invalidated',?,? WHERE EXISTS(SELECT 1 FROM customer_messages WHERE id=? AND owner=? AND status='draft')").bind(uid(),owner,workspace.revision,JSON.stringify({id:m.id,version:m.version}),now(),m.id,owner),
++      db().prepare("UPDATE customer_messages SET status='stale',updated_at=? WHERE owner=? AND id=? AND status='draft'").bind(now(),owner,m.id),
++    ]);m.status='stale';
++  }
++  for(const i of workspace.state.invoices.filter(i=>i.direction==='receivable'&&i.reviewed&&!i.voided)){
++    const contact=await contactFor(owner,i.id),snapshot=await evidenceSnapshot(workspace.state,contact),facts=invoiceFacts(workspace.state,i),related=findings.filter(f=>f.invoice_id===i.id);
++    for(const m of existing.results.filter(m=>m.invoice_id===i.id&&m.status==='draft'&&m.snapshot!==snapshot)){
++      await db().batch([
++        db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?, 'message.invalidated',?,? WHERE EXISTS(SELECT 1 FROM customer_messages WHERE id=? AND owner=? AND status='draft')").bind(uid(),owner,workspace.revision,JSON.stringify({id:m.id,version:m.version}),now(),m.id,owner),
++        db().prepare("UPDATE customer_messages SET status='stale',updated_at=? WHERE owner=? AND id=? AND status='draft'").bind(now(),owner,m.id),
++      ]);
++    }
++    const kinds=new Set<string>(),paymentReferences:string[]=[];
++    if(facts.paid_cents>0&&facts.remaining_cents>0)kinds.add(i.vat&&facts.remaining_cents===i.vat&&i.net===facts.paid_cents?'possible_vat':'partial');
++    if(!facts.paid_cents&&facts.remaining_cents>0&&i.due&&i.due<today())kinds.add(i.reconciledAt&&!related.length?'overdue':'confirmation');
++    if(related.some(f=>['wrong_reference','reference_conflict'].includes(f.kind)))kinds.add('wrong_reference');
++    if(related.some(f=>f.kind==='possible_duplicate'))kinds.add('possible_duplicate');
++    for(const a of workspace.state.allocations.filter(a=>a.active&&a.invoiceId===i.id&&a.effect==='payment')){
++      const t=workspace.state.transactions.find(t=>t.id===a.transactionId);if(!t)continue;
++      if(t.payerReference&&![i.ocr,i.number].some(r=>r.replace(/\W/g,'')===t.payerReference.replace(/\W/g,'')))paymentReferences.push(t.payerReference);
++      const used=workspace.state.allocations.filter(a=>a.active&&a.transactionId===t.id).reduce((n,a)=>n+a.amount,0);
++      if(balance(workspace.state,i)===0&&t.amount>used)kinds.add('overpayment');
++    }
++    if(paymentReferences.length)kinds.add('wrong_reference');
++    const recipient=contact?.identity===contactIdentity(i)?contact.email:'';
++    for(const kind of kinds){
++      if(existing.results.some(m=>m.invoice_id===i.id&&m.kind===kind&&['sent','sending','unknown'].includes(m.status)))continue;
++      const text=generateMessage({...facts,payment_references:paymentReferences},kind),id=uid(),at=now();
++      const r=await db().prepare('INSERT OR IGNORE INTO customer_messages(id,owner,invoice_id,kind,recipient,subject,body,snapshot,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)').bind(id,owner,i.id,kind,recipient,text.subject,text.body,snapshot,at,at).run();
++      if(r.meta.changes)await audit(owner,'message.prepared',{id,kind,snapshot});
++    }
++  }
++  return {findings,automatic:result.decisions.length};
++}
++export async function messageList(owner:string){
++  const workspace=await readWorkspace(owner),rows=await db().prepare('SELECT * FROM customer_messages WHERE owner=? ORDER BY created_at DESC').bind(owner).all<Row>();
++  const findings=analyze(workspace.state),items=[];
++  for(const m of rows.results){
++    const invoice=workspace.state.invoices.find(i=>i.id===m.invoice_id);if(!invoice)continue;
++    const contact=await contactFor(owner,m.invoice_id),snapshot=await evidenceSnapshot(workspace.state,contact);
++    const payments=workspace.state.allocations.filter(a=>a.active&&a.invoiceId===invoice.id).map(a=>{const t=workspace.state.transactions.find(t=>t.id===a.transactionId);return {...t,allocated:a.amount,effect:a.effect,documentId:workspace.state.imports.find(j=>j.id===t?.importId)?.documentId||''};});
++    const related=findings.filter(f=>f.invoice_id===invoice.id).map(f=>({...f,transaction:workspace.state.transactions.find(t=>t.id===f.transaction_id)}));
++    const delivery=await db().prepare('SELECT id,status,gmail_message_id,rfc_message_id,approved_at,sent_at FROM customer_deliveries WHERE owner=? AND message_id=?').bind(owner,m.id).first();
++    items.push({...m,status:m.status==='draft'&&m.snapshot!==snapshot?'stale':m.status,invoice,facts:invoiceFacts(workspace.state,invoice),contact,payments,findings:related,delivery});
++  }
++  return {items};
++}
++async function verifyContact(owner:string,body:Row){
++  const w=await readWorkspace(owner),i=w.state.invoices.find(i=>i.id===body.invoice_id&&i.direction==='receivable');
++  if(!i||!validRecipient(body.email)||typeof body.evidence!=='string'||!body.evidence.trim()||body.evidence.length>1000||body.confirm!==true)throw error('Kontrollera kundadress och ange verifieringsunderlaget.',400);
++  await db().batch([
++    db().prepare('INSERT INTO customer_contacts(owner,invoice_id,email,identity,evidence,updated_at) VALUES(?,?,?,?,?,?) ON CONFLICT(owner,invoice_id) DO UPDATE SET email=excluded.email,identity=excluded.identity,evidence=excluded.evidence,version=customer_contacts.version+1,updated_at=excluded.updated_at').bind(owner,i.id,body.email,contactIdentity(i),body.evidence,now()),
++    db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,?,?,?,?)').bind(uid(),owner,w.revision,'customer.address.verified',JSON.stringify(body),now()),
++  ]);
++  await reconcileAndPrepare(owner);return response({ok:true});
++}
++export async function messagesAction(req:Request,action:string){
++  const user=await identity(req),owner=user.userId;
++  if(req.method==='GET')return action==='list'?response(await messageList(owner)):response({error:'Metoden är inte tillåten.'},405);
++  if(req.method!=='POST')return response({error:'Metoden är inte tillåten.'},405);
++  const raw=await req.text();if(raw.length>30000)throw error('För stor förfrågan.',413);const body:Row=JSON.parse(raw||'{}');
++  if(action==='reconcile')return response(await reconcileAndPrepare(owner));
++  if(action==='contact')return verifyContact(owner,body);
++  if(action==='absence'){
++    const old=await readWorkspace(owner),result=applyCommand(old.state,{type:'invoice.reconcile',id:body.invoice_id,confirm:body.confirm,note:body.note}),at=now();
++    const batch=await db().batch([
++      db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,'invoice.absence.checked',?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)").bind(uid(),owner,old.revision+1,JSON.stringify(body),at,owner,old.revision),
++      db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(result.state),at,owner,old.revision),
++    ]);if(batch[1].meta.changes!==1)throw error('Bankunderlaget ändrades. Kontrollera igen.');
++    await reconcileAndPrepare(owner);return response({ok:true});
++  }
++  const id=typeof body.id==='string'?body.id:'',version=body.version;
++  if(action==='reject'){
++    const m=await getMessage(owner,id);if(m.version!==version||!['draft','stale'].includes(m.status))throw error('Meddelandet kan inte avvisas.');
++    await db().batch([
++      db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,0,'message.rejected',?,? WHERE EXISTS(SELECT 1 FROM customer_messages WHERE owner=? AND id=? AND version=? AND status IN ('draft','stale'))").bind(uid(),owner,JSON.stringify({id,version}),now(),owner,id,version),
++      db().prepare("UPDATE customer_messages SET status='rejected',updated_at=? WHERE owner=? AND id=? AND version=? AND status IN ('draft','stale')").bind(now(),owner,id,version),
++    ]);return response({ok:true});
++  }
++  if(action==='send'&&body.approve!==true)throw error('Uttryckligt administratörsgodkännande krävs.',403);
++  const c=await current(owner,id,version);
++  if(action==='edit'){
++    if(typeof body.subject!=='string'||!body.subject.trim()||body.subject.length>240||/[\r\n\0]/.test(body.subject)||typeof body.body!=='string'||!body.body.trim()||body.body.length>20000||body.body.includes('\0'))throw error('Ange giltigt ämne och mejltext.',400);
++    const filter="owner=? AND id=? AND version=? AND status='draft'";
++    const batch=await db().batch([
++      db().prepare(`INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?, 'message.edited',?,? WHERE EXISTS(SELECT 1 FROM customer_messages WHERE ${filter})`).bind(uid(),owner,c.workspace.revision,JSON.stringify({id,before:{subject:c.m.subject,body:c.m.body,version},after:{subject:body.subject,body:body.body,version:version+1}}),now(),owner,id,version),
++      db().prepare(`UPDATE customer_messages SET subject=?,body=?,version=version+1,updated_at=? WHERE ${filter}`).bind(body.subject,body.body,now(),owner,id,version),
++    ]);if(batch[1].meta.changes!==1)throw error('Texten har ändrats i ett annat fönster.');return response({ok:true});
++  }
++  if(action==='review'){
++    let cookie=cookieValue(req,'mg_message_review');if(!/^[A-Za-z0-9_-]{43}$/.test(cookie))cookie=randomToken();
++    const review=uid();
++    await db().prepare('INSERT INTO customer_reviews(id,owner,message_id,version,snapshot,cookie_hash,expires_at) VALUES(?,?,?,?,?,?,?)').bind(review,owner,id,version,c.m.snapshot,await digest(cookie),new Date(Date.now()+900000).toISOString()).run();
++    await audit(owner,'message.reviewed',{id,version,review});
++    return Response.json({...c.m,review_id:review},{headers:{'Cache-Control':'private, no-store','Set-Cookie':`mg_message_review=${cookie}; Path=/api/customer-messages; HttpOnly; Secure; SameSite=Strict; Max-Age=3600`}});
++  }
++  if(action==='send')return sendMessage(req,owner,body);
++  throw error('Okänd meddelandeåtgärd.',404);
++}
++async function sendMessage(req:Request,owner:string,body:Row){
++  const connection=await db().prepare("SELECT * FROM gmail_connections WHERE owner=? AND status='connected'").bind(owner).first<Row>();
++  if(!connection||connection.email.toLowerCase()!==gmailAccount())throw error('Koppla företagets Gmail-konto först.');
++  const tokens=await decrypt<any>(owner,'gmail-tokens',connection.tokens),deliver=await prepareGmailSend(tokens);
++  // Persist refresh only if the same connection still exists. Never resurrect a disconnect.
++  const sealed=await encrypt(owner,'gmail-tokens',tokens);
++  const updated=await db().prepare("UPDATE gmail_connections SET tokens=? WHERE owner=? AND tokens=? AND status='connected'").bind(sealed,owner,connection.tokens).run();
++  if(updated.meta.changes!==1)throw error('Gmail-anslutningen ändrades. Granska och försök igen.');
++  const user=await identity(req);if(user.userId!==owner)throw error('Administratörens identitet ändrades.',403);
++  const c=await current(owner,body.id,body.version);
++  if(!c.contact||!validRecipient(c.m.recipient)||c.contact.email!==c.m.recipient||c.contact.identity!==contactIdentity(c.invoice))throw error('Verifiera kundens mejladress före utskick.');
++  const cookie=cookieValue(req,'mg_message_review');if(!cookie)throw error('Öppna och läs aktuell mejlversion.',403);
++  const deliveryId=uid(),at=now(),messageId=`<${deliveryId}@mg-fakturakoll.local>`;
++  // All conditions are checked in the same transactional D1 batch. The unique
++  // delivery per message is a durable single-use approval across Worker isolates.
++  const reservation=db().prepare(`INSERT OR IGNORE INTO customer_deliveries(id,owner,message_id,review_id,version,snapshot,recipient,subject,body,status,rfc_message_id,approved_at)
++    SELECT ?,m.owner,m.id,r.id,m.version,m.snapshot,m.recipient,m.subject,m.body,'sending',?,?
++    FROM customer_messages m JOIN customer_reviews r ON r.message_id=m.id AND r.owner=m.owner
++    JOIN workspaces w ON w.owner=m.owner JOIN customer_contacts c ON c.owner=m.owner AND c.invoice_id=m.invoice_id
++    WHERE m.owner=? AND m.id=? AND m.version=? AND m.status='draft' AND m.snapshot=?
++      AND r.id=? AND r.version=m.version AND r.snapshot=m.snapshot AND r.consumed=0 AND r.expires_at>? AND r.cookie_hash=?
++      AND w.revision=? AND c.version=? AND c.email=m.recipient AND c.identity=?
++      AND EXISTS(SELECT 1 FROM gmail_connections g WHERE g.owner=m.owner AND g.tokens=? AND g.status='connected')
++      AND NOT EXISTS(SELECT 1 FROM customer_deliveries d JOIN customer_messages other ON other.id=d.message_id WHERE d.owner=m.owner AND other.invoice_id=m.invoice_id AND d.status IN ('sending','unknown'))`)
++    .bind(deliveryId,messageId,at,owner,c.m.id,c.m.version,c.m.snapshot,typeof body.review_id==='string'?body.review_id:'',at,await digest(cookie),c.workspace.revision,c.contact.version,contactIdentity(c.invoice),sealed);
++  const batch=await db().batch([
++    reservation,
++    db().prepare('UPDATE customer_reviews SET consumed=1 WHERE owner=? AND id=? AND EXISTS(SELECT 1 FROM customer_deliveries WHERE id=? AND owner=?)').bind(owner,body.review_id||'',deliveryId,owner),
++    db().prepare("UPDATE customer_messages SET status='sending',updated_at=? WHERE owner=? AND id=? AND EXISTS(SELECT 1 FROM customer_deliveries WHERE id=? AND owner=?)").bind(at,owner,c.m.id,deliveryId,owner),
++    db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,'message.approved',?,? WHERE EXISTS(SELECT 1 FROM customer_deliveries WHERE id=? AND owner=?)").bind(uid(),owner,c.workspace.revision,JSON.stringify({id:c.m.id,deliveryId,review:body.review_id,version:c.m.version,snapshot:c.m.snapshot,recipient:c.m.recipient,subject:c.m.subject,body:c.m.body}),at,deliveryId,owner),
++  ]);
++  if(batch[0].meta.changes!==1)throw error('Godkännandet är ogiltigt, redan använt eller underlaget har ändrats. Granska på nytt.',409);
++  try{
++    const result=await deliver({...c.m,rfc_message_id:messageId});
++    if(typeof result?.id!=='string'||!result.id)throw Error('Missing Gmail ID');
++    const sentAt=now();await db().batch([
++      db().prepare("UPDATE customer_deliveries SET status='sent',gmail_message_id=?,sent_at=? WHERE owner=? AND id=?").bind(result.id,sentAt,owner,deliveryId),
++      db().prepare("UPDATE customer_messages SET status='sent',updated_at=? WHERE owner=? AND id=?").bind(sentAt,owner,c.m.id),
++      db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,?,'message.sent',?,?)").bind(uid(),owner,c.workspace.revision,JSON.stringify({id:c.m.id,deliveryId,gmail_message_id:result.id,sentAt}),sentAt),
++    ]);return response({status:'sent',gmail_message_id:result.id});
++  }catch{
++    await db().batch([
++      db().prepare("UPDATE customer_deliveries SET status='unknown' WHERE owner=? AND id=?").bind(owner,deliveryId),
++      db().prepare("UPDATE customer_messages SET status='unknown',updated_at=? WHERE owner=? AND id=?").bind(now(),owner,c.m.id),
++      db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,?,'message.delivery.unknown',?,?)").bind(uid(),owner,c.workspace.revision,JSON.stringify({id:c.m.id,deliveryId}),now()),
++    ]);throw error('Utskicksstatus är oklar. Kontrollera Skickat i Gmail; systemet skickar inte om meddelandet.',502);
++  }
++}
+diff --git a/lib/domain.ts b/lib/domain.ts
+index f4b5453..b201552 100644
+--- a/lib/domain.ts
++++ b/lib/domain.ts
+@@ -1,12 +1,12 @@
+ export type Invoice = {
+  id: string; direction: "receivable" | "payable"; party: string; email: string; number: string; ocr: string;
+  total: number; currency: "SEK"; issued: string; due: string; reviewed: boolean; voided: boolean;
+- note: string; bankgiro: string; documentId: string; source: string; createdAt: string;
++ organizationNumber?:string;vat?:number|null;net?:number|null;reconciledAt?:string;reconciliationNote?:string;note: string; bankgiro: string; documentId: string; source: string; createdAt: string;
+ };
+ export type Transaction = {
+  id: string; date: string; amount: number; currency: "SEK"; party: string; payerReference: string; bankReference: string;
+  description: string; source: string; externalId: string; account: string; kind: "payment" | "batch" | "unknown";
+- verified: boolean; duplicateOf: string; ignored: boolean; parentId: string; importId: string; createdAt: string;
++ evidence?:string;organizationNumber?:string;original?:{party:string;payerReference:string;description:string;amount:number;date:string;account:string;bankReference:string};verification?:{party:string;payerReference:string;note:string;at:string};verified: boolean; duplicateOf: string; ignored: boolean; parentId: string; importId: string; createdAt: string;
+ };
+ export type Allocation = {id:string;invoiceId:string;transactionId:string;amount:number;effect:"payment"|"refund";active:boolean;note:string;createdAt:string;reversedAt?:string};
+ export type Credit = {id:string;invoiceId:string;amount:number;number:string;note:string;date:string;active:boolean};
+@@ -41,9 +41,11 @@ export function invoiceStatus(s:State,i:Invoice,at=today()):{key:string;label:st
+  if(i.voided)return{key:"voided",label:"Makulerad",tone:"neutral"};if(!i.reviewed)return{key:"review",label:"Granska faktura",tone:"amber"};
+  const b=balance(s,i);if(b<0)return{key:"refund",label:"Återbetalning",tone:"purple"};
+  if(b===0)return{key:"paid",label:credited(s,i.id)===i.total&&paid(s,i.id)===0?"Krediterad":"Betald",tone:"green"};
+- if(i.due&&i.due<at)return{key:"overdue",label:paid(s,i.id)>0?"Delbetald · förfallen":"Förfallen",tone:"red"};
++ if(paid(s,i.id)>0)return{key:"partial",label:i.due&&i.due<at?"Delbetald · förfallen":"Delbetald",tone:"blue"};
++ if(!i.reconciledAt)return{key:"unreconciled",label:"Ej avstämd",tone:"amber"};
++ if(i.due&&i.due<at)return{key:"overdue",label:paid(s,i.id)>0?"Delbetald · förfallen":"Obetald efter verifierad kontroll · förfallen",tone:"red"};
+  if(paid(s,i.id)>0)return{key:"partial",label:"Delbetald",tone:"blue"};
+- if(!i.due)return{key:"open",label:"Förfallodatum saknas",tone:"amber"};return{key:"open",label:i.due===at?"Förfaller idag":"Obetald",tone:"neutral"};
++ if(!i.due)return{key:"open",label:"Förfallodatum saknas",tone:"amber"};return{key:"open",label:i.due===at?"Förfaller idag":"Obetald efter verifierad kontroll",tone:"neutral"};
+ }
+ export const normalizeOCR=(s:string)=>s.replace(/[\s-]/g,"").toUpperCase();
+ const tokenMatch=(reference:string,n:string)=>{if(reference.trim().toUpperCase()===n.trim().toUpperCase())return true;const label=reference.match(/(?:faktura(?:nummer|\s*nr)?|invoice(?:\s*(?:no|number))?)\s*[:#]?\s*([^\s,;]+)/i);return !!label&&label[1].toUpperCase()===n.trim().toUpperCase();};
+@@ -86,6 +88,8 @@ function possibleDuplicate(a:Transaction,b:Transaction){
+ function cleanInvoice(raw:any,existing?:Invoice):Invoice{
+  if(!raw||!['receivable','payable'].includes(raw.direction))throw new Error("Välj fakturatyp.");if(raw.currency&&raw.currency!=="SEK"||raw.foreignCurrency&&!raw.currencyConfirmed)throw new Error("Endast SEK stöds. Importera inte andra valutor som kronor.");
+  const i:Invoice={id:existing?.id??uid(),direction:raw.direction,party:str(raw.party,200),email:str(raw.email??"",200),number:str(raw.number,100),ocr:str(raw.ocr??"",100),total:cents(raw.total),currency:"SEK",issued:date(raw.issued),due:date(raw.due??"",true),reviewed:raw.reviewed===true,voided:existing?.voided??false,note:str(raw.note??"",3000),bankgiro:str(raw.bankgiro??"",100),documentId:str(raw.documentId??"",100),source:str(raw.source??"Manuellt registrerad",300),createdAt:existing?.createdAt??now()};
++ i.organizationNumber=str(raw.organizationNumber??existing?.organizationNumber??'',40);i.vat=raw.vat??existing?.vat??null;i.net=raw.net??existing?.net??null;i.reconciledAt=existing?.reconciledAt||'';i.reconciliationNote=existing?.reconciliationNote||'';
++ if([i.vat,i.net].some(n=>n!=null&&(!Number.isSafeInteger(n)||n<0))||i.vat!=null&&i.net!=null&&i.vat+i.net!==i.total)throw new Error('Netto och moms måste stämma med fakturabeloppet.');
+  if(!i.party||!i.number)throw new Error("Namn och fakturanummer behövs.");if(i.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.email))throw new Error("Kontrollera e-postadressen.");if(i.due&&i.due<i.issued)throw new Error("Förfallodatum får inte vara före fakturadatum.");return i;
+ }
+ function cleanTransaction(raw:any):Transaction{
+@@ -104,6 +108,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
+   if(old&&(s.allocations.some(a=>a.active&&a.invoiceId===old.id)||credited(s,old.id)>0)&&(item.total!==old.total||item.direction!==old.direction||item.party!==old.party||item.number!==old.number||item.reviewed!==old.reviewed))throw new Error("Fakturan har betalningar eller krediter. Ångra dessa först, eller registrera en kreditfaktura.");
+   if(old)s.invoices[s.invoices.indexOf(old)]=item;else s.invoices.push(item);message=item.reviewed?"Fakturan är sparad och granskad":"Fakturan är sparad för granskning";break;
+  }
++ case'invoice.reconcile':{const i=getInvoice(s,command.id);const note=str(command.note??'',1500);if(command.confirm!==true||!note)throw new Error('Bekräfta kontrollen och ange bankunderlaget.');i.reconciledAt=now();i.reconciliationNote=note;message='Betalningsunderlaget är kontrollerat';break;}
+  case'invoice.void':{const i=getInvoice(s,command.id);if(s.allocations.some(a=>a.invoiceId===i.id&&a.active)||credited(s,i.id)>0)throw new Error("Ångra betalningar och krediter innan makulering.");i.voided=!i.voided;message=i.voided?"Fakturan är makulerad":"Fakturan är återställd";break;}
+  case'credit.add':{
+   const i=getInvoice(s,command.invoiceId);if(!i.reviewed||i.voided)throw new Error("Granska fakturan först.");const amount=cents(command.amount);
+@@ -116,7 +121,10 @@ export function applyCommand(current:State,command:Command):{state:State;message
+   if(hash&&s.imports.some(i=>i.hash===hash&&sameAccount(i.account,account)))throw new Error("Den här filen har redan importerats för kontot.");
+   const record:ImportRecord={id:uid(),hash,account,name:str(command.name??"Manuell registrering",300),count:0,createdAt:now(),documentId:str(command.documentId??'',100)},keys=new Map<string,string>();let skipped=0;
+   for(const raw of command.rows){
+-   const t=cleanTransaction({...raw,account:typeof raw.account==='string'&&raw.account.trim()?raw.account:account});t.importId=record.id;
++   const t=cleanTransaction({...raw,account:typeof raw.account==='string'&&raw.account.trim()?raw.account:account});t.importId=record.id;t.organizationNumber=str(raw.organizationNumber??'',40);
++   t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};
++   if(command.trustedBankImport===true){t.evidence='bank_api';if(t.externalId&&t.kind!=='batch'&&individualParty(t.party)&&usablePaymentReference(t.payerReference)){t.kind='payment';t.verified=true;}}
++   else if(record.documentId)t.evidence='bank_file';
+    if(raw.parentKey){const parentId=keys.get(raw.parentKey);if(!parentId)throw new Error("Betalningsspecifikationen saknar sin samlingspost.");if(!individualParty(t.party)||!usablePaymentReference(t.payerReference))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);t.parentId=parentId;}
+    const stable=t.externalId?s.transactions.find(x=>sameAccount(x.account,t.account)&&x.externalId===t.externalId):undefined;
+    if(stable){
+@@ -130,11 +138,13 @@ export function applyCommand(current:State,command:Command):{state:State;message
+    if(raw.key)keys.set(raw.key,t.id);s.transactions.push(t);record.count++;
+   }
+   for(const parent of s.transactions.filter(t=>t.kind==='batch'&&!t.ignored)){const children=s.transactions.filter(t=>t.parentId===parent.id&&!t.ignored);if(children.length&&(parent.duplicateOf||children.reduce((n,t)=>n+t.amount,0)!==parent.amount))throw new Error("Delbetalningarna stämmer inte med bankens samlingsbelopp eller samlingsposten är en möjlig dubblett. Ingen rad importerades.");}
++  for(const i of s.invoices)if(!paid(s,i.id)&&record.count){i.reconciledAt='';i.reconciliationNote='';}
+   s.imports.push(record);message=`${record.count} bankhändelser importerade${skipped?`, ${skipped} kända bank-ID:n hoppades över`:''}`;break;
+  }
+  case'transaction.verify':{
+   const t=getTx(s,command.id);if(t.ignored)throw new Error("Den här posten kan inte bekräftas som en enskild betalning.");if(needsPaymentSpecification(t))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);if(t.duplicateOf&&!command.confirmDistinct)throw new Error("Kontrollera först om raden är en dubblett.");
+-  t.party=str(command.party??t.party,200);t.payerReference=str(command.payerReference??t.payerReference,300);if(!individualParty(t.party)&&!usablePaymentReference(t.payerReference))throw new Error('Betalare eller fakturareferens saknas. Komplettera från bankunderlaget före bekräftelse.');const note=str(command.note??"",1000);if(!note)throw new Error("Beskriv hur du har kontrollerat betalningsuppgifterna.");t.description=t.description+"\nKontrollerad: "+note;t.verified=true;t.kind='payment';t.duplicateOf='';message="Betalningsuppgifterna är bekräftade";break;
++  t.original??={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};
++  t.party=str(command.party??t.party,200);t.payerReference=str(command.payerReference??t.payerReference,300);if(!individualParty(t.party)&&!usablePaymentReference(t.payerReference))throw new Error('Betalare eller fakturareferens saknas. Komplettera från bankunderlaget före bekräftelse.');const note=str(command.note??"",1000);if(!note)throw new Error("Beskriv hur du har kontrollerat betalningsuppgifterna.");t.verification={party:t.party,payerReference:t.payerReference,note,at:now()};t.evidence||='manual_verified';t.verified=true;t.kind='payment';t.duplicateOf='';message="Betalningsuppgifterna är bekräftade";break;
+  }
+  case'transaction.ignore':{const t=getTx(s,command.id);if(s.allocations.some(a=>a.transactionId===t.id&&a.active))throw new Error("Ångra matchningar först.");if(t.parentId||s.transactions.some(c=>c.parentId===t.id&&!c.ignored))throw new Error("Poster i en samlingsbetalning behöver hanteras tillsammans.");t.ignored=!t.ignored;message=t.ignored?"Bankhändelsen är undantagen":"Bankhändelsen är återställd";break;}
+  case'transaction.unverify':{const t=getTx(s,command.id);if(t.kind==='batch'||s.allocations.some(a=>a.active&&a.transactionId===t.id))throw new Error('Ångra matchningar innan du korrigerar betalningsuppgifterna.');t.verified=false;message='Bankhändelsen är öppnad för ny granskning';break;}
+@@ -147,16 +157,16 @@ export function applyCommand(current:State,command:Command):{state:State;message
+   const parent=getTx(s,command.id);if(parent.ignored||parent.parentId||parent.duplicateOf||s.allocations.some(a=>a.transactionId===parent.id&&a.active)||s.transactions.some(t=>t.parentId===parent.id&&!t.ignored))throw new Error("Posten är redan matchad, uppdelad eller behöver dubblettkontroll.");if(!Array.isArray(command.rows)||command.rows.length<1||command.rows.length>100)throw new Error("Lägg till betalningsrader från specifikationen.");
+   const children=command.rows.map((raw:any)=>cleanTransaction({...raw,account:parent.account,date:parent.date,source:"Betalningsspecifikation: "+parent.bankReference,kind:"payment",verified:true}));
+   if(children.some((t:Transaction)=>!individualParty(t.party)||!usablePaymentReference(t.payerReference)))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);
+-  if(children.some((t:Transaction)=>Math.sign(t.amount)!==Math.sign(parent.amount))||children.reduce((n:number,t:Transaction)=>n+t.amount,0)!==parent.amount)throw new Error("Summan av betalningsraderna måste stämma exakt med bankposten.");parent.kind='batch';parent.verified=false;for(const t of children){t.parentId=parent.id;const duplicate=s.transactions.find(x=>!x.ignored&&x.id!==parent.id&&possibleDuplicate(x,t));if(duplicate){t.duplicateOf=duplicate.id;t.verified=false;}s.transactions.push(t);}message="Samlingsbetalningen är uppdelad";break;
++  if(children.some((t:Transaction)=>Math.sign(t.amount)!==Math.sign(parent.amount))||children.reduce((n:number,t:Transaction)=>n+t.amount,0)!==parent.amount)throw new Error("Summan av betalningsraderna måste stämma exakt med bankposten.");parent.kind='batch';parent.verified=false;for(const t of children){t.parentId=parent.id;t.evidence='verified_specification';t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};const duplicate=s.transactions.find(x=>!x.ignored&&x.id!==parent.id&&possibleDuplicate(x,t));if(duplicate){t.duplicateOf=duplicate.id;t.verified=false;}s.transactions.push(t);}message="Samlingsbetalningen är uppdelad";break;
+  }
+  case'match.create':{
+   const i=getInvoice(s,command.invoiceId),t=getTx(s,command.transactionId),amount=cents(command.amount),effect=command.effect==='refund'?'refund':'payment';
+   if(!i.reviewed||i.voided||!t.verified||t.kind!=='payment'||t.ignored||t.duplicateOf)throw new Error("Granska fakturan och bankhändelsen innan matchning.");if(needsPaymentSpecification(t))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);const expected=(i.direction==='receivable'?1:-1)*(effect==='refund'?-1:1);if(Math.sign(t.amount)!==expected)throw new Error("Betalningens riktning stämmer inte med fakturan.");
+-  if(!exactPaymentReference(t,i)&&!(sameParty(t.party,i.party)&&Math.abs(balance(s,i))===available(s,t)))throw new Error('Matchningen kräver exakt OCR/fakturareferens eller samma betalare och belopp. Beloppet ensamt styrker inte betalningen.');
++  if(!exactPaymentReference(t,i)&&!(sameParty(t.party,i.party)&&Math.abs(balance(s,i))===available(s,t))&&command.referenceCorrection!==true)throw new Error('Matchningen kräver exakt OCR/fakturareferens eller samma betalare och belopp. Beloppet ensamt styrker inte betalningen.');
+   if(amount>available(s,t)||amount>balance(s,i)*(effect==='refund'?-1:1))throw new Error("Beloppet överstiger det som återstår. Uppdatera sidan och kontrollera beloppen.");const note=str(command.note??"",1000);if(!note)throw new Error("Ange vilket underlag som bekräftar matchningen.");
+-  s.allocations.push({id:uid(),invoiceId:i.id,transactionId:t.id,amount,effect,active:true,note,createdAt:now()});message=effect==='refund'?"Återbetalningen är avstämd":"Betalningen är matchad";break;
++  i.reconciledAt=now();s.allocations.push({id:uid(),invoiceId:i.id,transactionId:t.id,amount,effect,active:true,note,createdAt:now()});message=effect==='refund'?"Återbetalningen är avstämd":"Betalningen är matchad";break;
+  }
+- case'match.undo':{const a=s.allocations.find(a=>a.id===command.id&&a.active);if(!a)throw new Error("Matchningen finns inte längre.");if(!str(command.note??"",1000))throw new Error("Ange varför matchningen ångras.");a.active=false;a.reversedAt=now();message="Matchningen är ångrad";break;}
++ case'match.undo':{const a=s.allocations.find(a=>a.id===command.id&&a.active);if(!a)throw new Error("Matchningen finns inte längre.");if(!str(command.note??"",1000))throw new Error("Ange varför matchningen ångras.");a.active=false;a.reversedAt=now();const i=getInvoice(s,a.invoiceId);i.reconciledAt='';i.reconciliationNote='';message="Matchningen är ångrad";break;}
+  case'settings.save':{s.company={name:str(command.name,200),email:str(command.email,200)};if(!s.company.name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.company.email))throw new Error("Ange företagsnamn och en giltig e-postadress.");break;}
+  default:throw new Error("Okänd åtgärd.");
+  }
+diff --git a/lib/gmail-adapter.js b/lib/gmail-adapter.js
+index 40e9c67..9470c93 100644
+--- a/lib/gmail-adapter.js
++++ b/lib/gmail-adapter.js
+@@ -18,10 +18,10 @@ function callback(origin){
+   if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname))))throw fail('Ogiltig returadress för Gmail.','invalid_origin',400);
+   return `${url.origin}/api/gmail/callback`;
+ }
+-export function gmailAuthorizationUrl(state,origin){
++export function gmailAuthorizationUrl(state,origin,{send=false}={}){
+   requireConfig();
+   if(!/^[A-Za-z0-9_-]{32,200}$/.test(state||''))throw fail('Ogiltig OAuth-status.','invalid_state',400);
+-  const search=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback(origin),response_type:'code',scope,access_type:'offline',prompt:'consent select_account',login_hint:gmailAccount(),state});
++  const search=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback(origin),response_type:'code',scope:send?scope+' https://www.googleapis.com/auth/gmail.send':scope,access_type:'offline',prompt:'consent select_account',login_hint:gmailAccount(),state});
+   return `https://accounts.google.com/o/oauth2/v2/auth?${search}`;
+ }
+ async function requestJson(url,options={}){
+@@ -76,6 +76,23 @@ export async function gmailProfile(tokens){
+   if(typeof profile.emailAddress!=='string'||profile.emailAddress.toLowerCase()!==gmailAccount())throw fail(`Välj företagets Gmail-konto: ${gmailAccount()}.`,'account_mismatch');
+   return profile;
+ }
++export function hasGmailSendScope(tokens){return String(tokens?.scope||'').split(/\s+/).includes('https://www.googleapis.com/auth/gmail.send');}
++// Preflight may refresh/read. The returned sender performs exactly ONE POST, no retry.
++export async function prepareGmailSend(tokens){
++  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60000)Object.assign(tokens,await refreshGmailTokens(tokens));
++  if(!hasGmailSendScope(tokens))throw fail('Koppla Gmail igen och godkänn utskicksbehörigheten gmail.send.','missing_send_scope');
++  await gmailProfile(tokens);
++  if(!hasGmailSendScope(tokens))throw fail('Utskicksbehörigheten behöver förnyas.','missing_send_scope');
++  return message=>{
++    if(typeof message.recipient!=='string'||!/^[-A-Za-z0-9.!#$%&'*+/=?^_`{|}~]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(message.recipient)||message.recipient.length>240||/[\r\n\0]/.test(message.recipient)||typeof message.subject!=='string'||/[\r\n\0]/.test(message.subject)||!/^<[a-f0-9-]+@mg-fakturakoll\.local>$/.test(message.rfc_message_id))throw fail('Ogiltiga mejluppgifter.','invalid_message',400);
++    const words=[];let part='';
++    for(const char of message.subject){if(Buffer.byteLength(part+char)>42){words.push(part);part='';}part+=char;}if(part)words.push(part);
++    const subject=words.map(word=>'=?UTF-8?B?'+Buffer.from(word).toString('base64')+'?=').join('\r\n ');
++    const body=Buffer.from(message.body,'utf8').toString('base64').match(/.{1,76}/g)?.join('\r\n')||'';
++    const raw=Buffer.from(`From: ${gmailAccount()}\r\nTo: ${message.recipient}\r\nSubject: ${subject}\r\nMessage-ID: ${message.rfc_message_id}\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n${body}`).toString('base64url');
++    return requestJson(apiBase+'/messages/send',{method:'POST',headers:{Authorization:`Bearer ${tokens.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({raw})});
++  };
++}
+ export async function revokeGmailTokens(tokens){
+   const credential=tokens?.refresh_token||tokens?.access_token;
+   if(!credential)return;
+diff --git a/lib/gmail-service.ts b/lib/gmail-service.ts
+index a0b4448..0aecd3f 100644
+--- a/lib/gmail-service.ts
++++ b/lib/gmail-service.ts
+@@ -6,7 +6,7 @@ import {parseMoney} from './domain';
+ import {validateInvoiceValues} from './invoice-fields.js';
+ import {encrypt,decrypt,storageReady} from './banking/store';
+ import {digest,randomToken,cookieValue} from './banking/security';
+-import {gmailAccount,isGmailConfigured,gmailAuthorizationUrl,exchangeGmailCode,gmailProfile,fetchGmailInvoiceDocuments,revokeGmailTokens} from './gmail-adapter.js';
++import {hasGmailSendScope,gmailAccount,isGmailConfigured,gmailAuthorizationUrl,exchangeGmailCode,gmailProfile,fetchGmailInvoiceDocuments,revokeGmailTokens} from './gmail-adapter.js';
+ 
+ async function lock<T>(owner:string,fn:()=>Promise<T>){
+   const token=uid(),at=now(),until=new Date(Date.now()+300000).toISOString();
+@@ -23,19 +23,20 @@ export function gmailFailure(error?:unknown){
+ }
+ export async function gmailStatus(summary=false){
+   const user=await identity();
+-  const connection=await db().prepare('SELECT email,last_synced,status,last_attempt FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();
+-  if(summary)return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),connection});
++  const connection=await db().prepare('SELECT email,tokens,last_synced,status,last_attempt FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();
++  const send_enabled=connection?hasGmailSendScope(await decrypt<any>(user.userId,'gmail-tokens',connection.tokens)):false;if(connection)delete connection.tokens;
++  if(summary)return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),send_enabled,connection});
+   const candidates=await db().prepare("SELECT s.document_id,s.metadata,s.status,s.extraction,s.created_at,d.filename,d.mime FROM gmail_sources s JOIN documents d ON d.id=s.document_id AND d.owner=s.owner WHERE s.owner=? AND s.status<>'rejected' ORDER BY s.created_at DESC LIMIT 200").bind(user.userId).all();
+   const runs=await db().prepare('SELECT found,imported,duplicates,status,created_at FROM gmail_runs WHERE owner=? ORDER BY created_at DESC LIMIT 10').bind(user.userId).all();
+-  return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),connection,candidates:candidates.results,runs:runs.results,background_ready:false,scheduler_configured:false,next_eligible_sync:connection?new Date(Math.max(Date.now(),Date.parse(connection.last_attempt||'')+15*60000||0)).toISOString():null});
++  return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),send_enabled,connection,candidates:candidates.results,runs:runs.results,background_ready:false,scheduler_configured:false,next_eligible_sync:connection?new Date(Math.max(Date.now(),Date.parse(connection.last_attempt||'')+15*60000||0)).toISOString():null});
+ }
+ export async function gmailConnect(req:Request){
+-  const user=await identity(req);
++  const user=await identity(req);const options=await req.json() as {send?:boolean};
+   if(!isGmailConfigured()||!storageReady())return response({error:'Administratören behöver aktivera Gmail API, registrera Googles webbklient och ange Google Client ID och Client Secret i Sites skyddade driftinställningar. Den befintliga krypteringsnyckeln måste vara tillgänglig.'},409);
+   const state=randomToken(),cookie=randomToken();
+   await db().prepare('DELETE FROM gmail_flows WHERE expires_at<? OR (owner=? AND consumed=0)').bind(now(),user.userId).run();
+-  await db().prepare('INSERT INTO gmail_flows(state_hash,owner,cookie_hash,expires_at) VALUES(?,?,?,?)').bind(await digest(state),user.userId,await digest(cookie),new Date(Date.now()+900000).toISOString()).run();
+-  return Response.json({url:gmailAuthorizationUrl(state,new URL(req.url).origin)},{headers:{'Cache-Control':'no-store','Set-Cookie':`mg_gmail_flow=${cookie}; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=900`}});
++  await db().prepare('INSERT INTO gmail_flows(state_hash,owner,cookie_hash,expires_at,request_send) VALUES(?,?,?,?,?)').bind(await digest(state),user.userId,await digest(cookie),new Date(Date.now()+900000).toISOString(),options.send===true?1:0).run();
++  return Response.json({url:gmailAuthorizationUrl(state,new URL(req.url).origin,{send:options.send===true})},{headers:{'Cache-Control':'no-store','Set-Cookie':`mg_gmail_flow=${cookie}; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=900`}});
+ }
+ export async function gmailCallback(req:Request){
+   const user=await identity();const url=new URL(req.url),state=url.searchParams.get('state')||'';
+@@ -46,10 +47,10 @@ export async function gmailCallback(req:Request){
+   let result='cancelled';
+   if(!url.searchParams.has('error'))await lock(user.userId,async()=>{
+     const tokens=await exchangeGmailCode(url.searchParams.get('code'),url.origin);
+-    try{await gmailProfile(tokens);}catch(e){await revokeGmailTokens(tokens).catch(()=>{});throw e;}
++    try{await gmailProfile(tokens);if(flow.request_send&&!hasGmailSendScope(tokens))throw Object.assign(Error('Godkänn Gmail-utskick genom ett nytt Google-medgivande.'),{safe:true});}catch(e){await revokeGmailTokens(tokens).catch(()=>{});throw e;}
+     if(!tokens.refresh_token)throw Error('Bestående läsåtkomst saknas');
+     const sealed=await encrypt(user.userId,'gmail-tokens',tokens);
+-    await db().prepare("INSERT INTO gmail_connections(owner,email,tokens) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET tokens=excluded.tokens,status='connected'").bind(user.userId,gmailAccount(),sealed).run();result='connected';
++    await db().prepare("INSERT INTO gmail_connections(owner,email,tokens) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET email=excluded.email,tokens=excluded.tokens,status='connected'").bind(user.userId,gmailAccount(),sealed).run();result='connected';
+   });
+   return new Response(null,{status:302,headers:{Location:`/gmail?status=${result}`,'Cache-Control':'no-store','Set-Cookie':'mg_gmail_flow=; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=0'}});
+ }
+@@ -83,6 +84,7 @@ export async function gmailSync(req?:Request,scheduled=false){
+       for(const sourceId of result.rejected_source_ids||[])await db().prepare("INSERT OR IGNORE INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,?,'','{}','rejected',?)").bind(user.userId,sourceId,now()).run();
+       await db().prepare("UPDATE gmail_connections SET last_synced=?,page_token=?,started_at=?,status='connected' WHERE owner=?").bind(result.truncated?c.last_synced:started,result.next_page_token||'',result.truncated?started:'',user.userId).run();
+       await db().prepare('INSERT INTO gmail_runs(id,owner,found,imported,duplicates,status,created_at) VALUES(?,?,?,?,?,?,?)').bind(uid(),user.userId,result.received,imported,duplicates,'completed',now()).run();
++      await (await import('./customer-messages')).reconcileAndPrepare(user.userId);
+       return response({imported,duplicates,found:result.received,more:result.truncated});
+     }catch(e:any){
+       if(tokens)await db().prepare('UPDATE gmail_connections SET tokens=? WHERE owner=?').bind(await encrypt(user.userId,'gmail-tokens',tokens),user.userId).run();
+@@ -112,6 +114,7 @@ export async function gmailReview(req:Request){
+   const fields=body.fields||{},checks={issued_at:invoice.issued,due_at:invoice.due,total_cents:invoice.total,organization_number:fields.organization_number||null,currency:fields.currency,vat_cents:fields.vat_cents?parseMoney(fields.vat_cents):null,net_cents:fields.net_cents?parseMoney(fields.net_cents):null};
+   const issues=validateInvoiceValues(checks);if(fields.currency!=='SEK')issues.push('Kontrollera att fakturan är i SEK.');if(issues.length)throw Object.assign(Error(issues.join(' ')),{safe:true});
+   if(invoice.kind&&invoice.kind!=='invoice')throw Error('Kreditfakturor och andra dokument behöver registreras via kreditflödet.');
++  invoice.organizationNumber=fields.organization_number||'';invoice.vat=checks.vat_cents;invoice.net=checks.net_cents;
+   const result=applyCommand(old.state,{type:'invoice.save',invoice});
+   const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(user.userId,JSON.stringify(emptyState()),at).run();
+   const payload=JSON.stringify(result.state);if(payload.length>1800000)throw Error('size');
+@@ -121,5 +124,6 @@ export async function gmailReview(req:Request){
+     db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(payload,at,user.userId,old.revision)
+   ]);
+   if(batch[2].meta.changes!==1)return response({error:'En annan ändring sparades samtidigt. Uppdatera och försök igen.'},409);
++  await (await import('./customer-messages')).reconcileAndPrepare(user.userId);
+   return response({registered:true});
+ }
+diff --git a/lib/reconciliation-engine.js b/lib/reconciliation-engine.js
+new file mode 100644
+index 0000000..b46a9ab
+--- /dev/null
++++ b/lib/reconciliation-engine.js
+@@ -0,0 +1,51 @@
++const paymentSign=i=>(i.direction==='customer'?1:-1)*(i.kind==='credit'?-1:1);
++// Shared conservative rules ported from MG Node main d029679. No I/O.
++export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
++const ref=value=>String(value||'').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
++function samePayer(i,t,links){
++  const org=value=>String(value||'').replace(/[- ]/g,'');
++  const ownOrg=org(i.organization_number),payerOrg=org(t.payer_organization_number);
++  if(ownOrg&&payerOrg)return ownOrg===payerOrg;
++  const name=normalizeName(t.payer);
++  return !!name&&(name===normalizeName(i.party)||links.some(l=>{
++    const identity=i.organization_number&&l.organization_number?org(i.organization_number)===org(l.organization_number):normalizeName(l.party)===normalizeName(i.party);
++    return identity&&normalizeName(l.payer)===name&&l.account===t.account;
++  }));
++}
++/** @param {{invoices:any[],transactions:any[],links?:any[],allocations?:any[]}} data */
++export function analyzeReconciliation({invoices,transactions,links=[],allocations=[]}){
++  const out=[];
++  for(const t of transactions){
++    if(t.excluded||t.amount_cents<=0||t.available_cents<=0)continue;
++    if(t.is_aggregate){out.push({transaction_id:t.id,invoice_id:'',kind:'aggregate',safe:false,reason:'Samlad insättning kräver individuella betalningsspecifikationer.',score:0});continue;}
++    const reference=ref(t.reference);
++    // Include closed invoices: a mistyped OCR may belong to an already paid invoice.
++    const owners=reference?invoices.filter(i=>[i.reference,i.invoice_number].some(x=>ref(x)&&ref(x)===reference)):[];
++    const dateOK=i=>!i.issued_at||t.booked_at>=i.issued_at;
++    const eligible=invoices.filter(i=>i.direction==='customer'&&i.kind!=='credit'&&i.currency===t.currency&&paymentSign(i)===1&&dateOK(i));
++    const names=eligible.filter(i=>samePayer(i,t,links));
++    const tokens=String(t.reference||'').split(/[\s,;+/]+/).map(ref).filter(Boolean);
++    const grouped=eligible.filter(i=>i.remaining_cents>0&&samePayer(i,t,links)&&tokens.some(r=>[i.reference,i.invoice_number].some(x=>ref(x)===r)));
++    if(owners.length===0&&grouped.length>1&&grouped.reduce((s,i)=>s+i.remaining_cents,0)===t.available_cents){
++      for(const i of grouped)out.push({transaction_id:t.id,invoice_id:i.id,kind:'multiple_invoices',safe:false,score:85,amount_cents:i.remaining_cents,reason:'En överföring hänvisar till flera fakturor. Bekräfta fördelningen manuellt.'});
++      continue;
++    }
++    for(const i of eligible){
++      const exact=owners.some(x=>x.id===i.id),payer=samePayer(i,t,links);
++      if(!exact&&!payer&&t.available_cents!==i.remaining_cents)continue; // Amount alone may be shown, but never accepted.
++      const conflict=reference&&owners.some(x=>x.id!==i.id);
++      const duplicateEvidence=transactions.some(x=>x.id!==t.id&&!x.excluded&&!x.is_aggregate&&x.amount_cents===t.amount_cents&&x.currency===t.currency&&x.booked_at===t.booked_at&&(x.bank_reference&&x.bank_reference===t.bank_reference||x.account!==t.account&&ref(x.reference)===reference&&normalizeName(x.payer)===normalizeName(t.payer)));
++      const incomplete=t.parent_bank_reference&&transactions.some(x=>x.account===t.account&&x.bank_reference===t.parent_bank_reference&&x.is_aggregate&&!x.excluded);
++      const ambiguous=owners.length>1||names.filter(x=>x.remaining_cents>0).length>1&&!exact||exact&&t.available_cents!==i.remaining_cents&&names.some(x=>x.id!==i.id&&x.remaining_cents===t.available_cents);
++      const kind=i.remaining_cents===0?(allocations.some(a=>a.invoice_id===i.id&&a.transaction_id===t.id)?'overpayment':'possible_duplicate'):conflict?'reference_conflict':!exact&&!payer?'unknown_payer':!exact&&reference?'wrong_reference':!reference?'missing_reference':!payer?'different_payer':t.available_cents<i.remaining_cents?'partial':t.available_cents>i.remaining_cents?'overpayment':'correct';
++      const safe=!!t.verified&&exact&&payer&&!conflict&&!ambiguous&&!duplicateEvidence&&!incomplete&&i.remaining_cents>0;
++      out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':conflict?'Angiven OCR tillhör en annan faktura. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.'});
++    }
++  }
++  // Multiple payments for the same invoice must be reviewed together, never auto-consumed.
++  for(const s of out)if(out.some(x=>x.invoice_id===s.invoice_id&&x.transaction_id!==s.transaction_id)){
++    s.safe=false;s.reason='Flera betalningar kan avse fakturan; kontrollera möjlig dubbelbetalning.';
++    if(s.kind==='correct')s.kind='possible_duplicate';
++  }
++  return out.sort((a,b)=>b.score-a.score);
++}
+diff --git a/lib/reconciliation.ts b/lib/reconciliation.ts
+new file mode 100644
+index 0000000..561da56
+--- /dev/null
++++ b/lib/reconciliation.ts
+@@ -0,0 +1,24 @@
++import {applyCommand,available,balance,paid,uid,now,type State,type Invoice} from './domain';
++import {analyzeReconciliation,normalizeName} from './reconciliation-engine.js';
++
++export function invoiceFacts(state:State,i:Invoice){return {...i,invoice_number:i.number,reference:i.ocr,total_cents:i.total,paid_cents:paid(state,i.id),remaining_cents:balance(state,i),vat_cents:i.vat??null,net_cents:i.net??null,due_at:i.due};}
++export function analyze(state:State){
++  const links=state.allocations.filter(a=>a.active&&a.effect==='payment').flatMap(a=>{
++    const i=state.invoices.find(i=>i.id===a.invoiceId),t=state.transactions.find(t=>t.id===a.transactionId);
++    return i&&t&&i.direction==='receivable'&&t.amount>0?[{invoice_id:i.id,party:i.party,organization_number:i.organizationNumber||'',payer:t.party,account:t.account}]:[];
++  });
++  const data={invoices:state.invoices.map(i=>({...invoiceFacts(state,i),organization_number:i.organizationNumber||'',direction:i.reviewed&&!i.voided?(i.direction==='receivable'?'customer':'supplier'):'held',kind:'invoice',issued_at:i.issued})),transactions:state.transactions.map(t=>({id:t.id,account:t.account,booked_at:t.date,amount_cents:t.amount,currency:t.currency,payer:t.party,reference:t.payerReference,bank_reference:t.bankReference,payer_organization_number:t.organizationNumber||'',excluded:t.ignored||!!t.duplicateOf,is_aggregate:t.kind!=='payment'||!t.verified,available_cents:available(state,t),verified:t.verified&&!!t.evidence,parent_bank_reference:t.parentId?state.transactions.find(p=>p.id===t.parentId)?.bankReference||'':''})),links,allocations:state.allocations.filter(a=>a.active).map(a=>({invoice_id:a.invoiceId,transaction_id:a.transactionId}))};
++  // An actual specification's parent remains as immutable evidence, but its
++  // complete child set replaces it economically. Do not treat it as incomplete.
++  for(const t of data.transactions)if(t.is_aggregate){const children=state.transactions.filter(c=>c.parentId===t.id&&!c.ignored);if(children.length&&children.reduce((n,c)=>n+c.amount,0)===t.amount_cents)t.excluded=true;}
++  return analyzeReconciliation(data);
++}
++export function reconcileState(initial:State){
++  let state=initial;const decisions:any[]=[];
++  for(const suggestion of analyze(state).filter(s=>s.safe&&s.amount_cents>0)){
++    const result=applyCommand(state,{type:'match.create',invoiceId:suggestion.invoice_id,transactionId:suggestion.transaction_id,amount:suggestion.amount_cents,note:'Automatisk avstämning: '+suggestion.reason});
++    state=result.state;decisions.push({...suggestion,id:uid(),at:now()});
++  }
++  return {state,decisions,findings:analyze(state)};
++}
++export function contactIdentity(i:Invoice){return JSON.stringify([normalizeName(i.party),String(i.organizationNumber||'').replace(/[- ]/g,'')]);}
+diff --git a/package.json b/package.json
+index b10fdd4..4924127 100644
+--- a/package.json
++++ b/package.json
+@@ -11,7 +11,9 @@
+     "build": "node scripts/run-framework.mjs build",
+     "start": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
+     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+-    "db:generate": "drizzle-kit generate"
++    "db:generate": "drizzle-kit generate",
++    "check": "tsc --noEmit",
++    "test": "node --experimental-strip-types --test tests/*.test.mjs"
+   },
+   "dependencies": {
+     "@base-ui/react": "^1.7.0",
+diff --git a/tests/banking-security.test.mjs b/tests/banking-security.test.mjs
+index 003d956..2f63e48 100644
+--- a/tests/banking-security.test.mjs
++++ b/tests/banking-security.test.mjs
+@@ -83,7 +83,7 @@ async function fixture(t, environment = 'PRODUCTION') {
+   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain });
+   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
+   const providerUrl = jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
+-  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig });
++  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, '../customer-messages': jsUrl('export async function reconcileAndPrepare(){}') });
+   f.store = await import(storeUrl); f.service = await import(serviceUrl);
+   f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
+   f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
+@@ -217,7 +217,7 @@ test('Automatic catch-up overlaps the last successful fetch while preserving the
+ test('MCP supports discovery but never accepts an owner override or unauthenticated bank operation', async t => {
+   const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+   const list = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 1, method: 'tools/list' })).json();
+-  assert.equal(list.result.tools.length, 4);
++  assert.equal(list.result.tools.length, 5);assert.ok(!list.result.tools.some(t=>/send/.test(t.name)));
+   assert.ok(list.result.tools.some(tool=>tool.name==='gmail_auto_sync'));
+   const override = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'bank_auto_sync', arguments: { owner: f.owner, force: true } } })).json();
+   assert.equal(override.error.code, -32602);
+@@ -420,7 +420,7 @@ test('Production import and audit commit together; repeated stable references ar
+   assert.equal(result.imported, 1); assert.equal(result.test, false);
+   const first = f.workspace();
+   assert.equal(first.revision, 1); assert.equal(first.state.transactions.length, 1);
+-  assert.equal(first.state.transactions[0].verified, false); assert.equal(first.state.transactions[0].kind, 'unknown');
++  assert.equal(first.state.transactions[0].verified, true); assert.equal(first.state.transactions[0].kind, 'payment');assert.equal(first.state.transactions[0].evidence,'bank_api');
+   assert.equal(f.sql.prepare('SELECT revision FROM audit_events').get().revision, 1);
+   f.sql.prepare('UPDATE bank_connections SET last_synced_at=NULL').run();
+   result = await (await f.service.sync(post('sync'))).json();
+diff --git a/tests/customer-messages.test.mjs b/tests/customer-messages.test.mjs
+new file mode 100644
+index 0000000..835cd9b
+--- /dev/null
++++ b/tests/customer-messages.test.mjs
+@@ -0,0 +1,133 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readFileSync,readdirSync} from 'node:fs';
++import {DatabaseSync} from 'node:sqlite';
++import ts from 'typescript';
++import {emptyState,applyCommand,paid,balance,invoiceStatus} from '../lib/domain.ts';
++import {seal,unseal,randomToken,digest} from '../lib/banking/security.ts';
++import {analyzeReconciliation} from '../lib/reconciliation-engine.js';
++
++const read=p=>readFileSync(new URL(p,import.meta.url),'utf8'),data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
++function moduleUrl(path,imports){let s=ts.transpileModule(read(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [key,val]of Object.entries(imports))for(const q of ['"',"'"])s=s.replaceAll(q+key+q,JSON.stringify(val));return data(s);}
++class LocalD1{
++  constructor(sql){this.sql=sql;this.beforeBatch=null;}
++  prepare(query){const self=this;return {query,args:[],bind(...args){this.args=args;return this;},async first(){return self.sql.prepare(query).get(...this.args)||null;},async all(){return {results:self.sql.prepare(query).all(...this.args)};},async run(){return this.execute();},execute(){const r=self.sql.prepare(query).run(...this.args);return {meta:{changes:Number(r.changes)}};}};}
++  async batch(rows){if(this.beforeBatch)await this.beforeBatch(rows);this.sql.exec('BEGIN');try{const result=rows.map(r=>r.execute());this.sql.exec('COMMIT');return result;}catch(e){this.sql.exec('ROLLBACK');throw e;}}
++}
++const domainUrl=new URL('../lib/domain.ts',import.meta.url).href;
++const reconciliationUrl=moduleUrl('../lib/reconciliation.ts',{'./domain':domainUrl,'./reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href});
++const reconciliation=await import(reconciliationUrl);
++const origin='https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site';
++async function fixture(t){
++  const key='__messages_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
++  for(const file of readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())sql.exec(read('../drizzle/'+file));
++  const f={sql,owner:'owner-alice',user:{userId:'owner-alice'},key:randomToken(),posts:0,profileCalls:0,timeout:false,wrongAccount:false,cookie:'',env:{GOOGLE_CLIENT_ID:'synthetic',GOOGLE_CLIENT_SECRET:'synthetic',GMAIL_ACCOUNT:'mg.vitvaror@gmail.com'}};
++  f.d1=new LocalD1(sql);globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
++  const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`),securityUrl=new URL('../lib/banking/security.ts',import.meta.url).href;
++  const server=data(`import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(b,status=200)=>Response.json(b,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(owner);return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
++  const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const encrypt=(o,p,v)=>seal(f.key,o,p,v);export const decrypt=(o,p,v)=>unseal(f.key,o,p,v);`);
++  const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf});
++  f.api=await import(moduleUrl('../lib/customer-messages.ts',{'./server':server,'./domain':domainUrl,'./reconciliation':reconciliationUrl,'./customer-message-text.js':new URL('../lib/customer-message-text.js',import.meta.url).href,'./banking/security':securityUrl,'./banking/store':store,'./gmail-adapter.js':adapter}));
++  f.adapter=await import(adapter);
++  t.mock.method(globalThis,'fetch',async(url,options)=>{
++    if(url.endsWith('/profile')){f.profileCalls++;if(f.preflight)await f.preflight();return Response.json({emailAddress:f.wrongAccount?'wrong@example.com':f.env.GMAIL_ACCOUNT});}
++    if(url.endsWith('/messages/send')){f.posts++;f.raw=Buffer.from(JSON.parse(options.body).raw,'base64url').toString();if(f.timeout)throw Error('timeout');return Response.json({id:'gmail-test-'+f.posts});}
++    throw Error('No live network allowed');
++  });
++  let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0597',ocr:'0597',total:312500,vat:62500,net:250000,issued:'2026-01-01',due:'2026-01-02',reviewed:true}}).state;
++  // Due date cannot precede issue date in actual input.
++  return Object.assign(f,{
++    state:()=>JSON.parse(sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(f.owner).payload),
++    put(s){const old=sql.prepare('SELECT revision FROM workspaces WHERE owner=?').get(f.owner);sql.prepare('INSERT INTO workspaces(owner,revision,payload,updated_at) VALUES(?,?,?,?) ON CONFLICT(owner) DO UPDATE SET revision=workspaces.revision+1,payload=excluded.payload,updated_at=excluded.updated_at').run(f.owner,old?old.revision+1:1,JSON.stringify(s),new Date().toISOString());},
++    async call(action,body={},method='POST',requestOrigin=origin){const req=new Request(origin+'/api/customer-messages/'+action,{method,headers:{Origin:requestOrigin,'Content-Type':'application/json',...(f.cookie?{Cookie:f.cookie}:{})},body:method==='GET'?undefined:JSON.stringify(body)});const r=await f.api.messagesAction(req,action);if(r.headers.get('set-cookie'))f.cookie=r.headers.get('set-cookie').split(';')[0];return r.json();},
++    async connect(scope='https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send'){sql.prepare('INSERT OR REPLACE INTO gmail_connections(owner,email,tokens) VALUES(?,?,?)').run(f.owner,f.env.GMAIL_ACCOUNT,await seal(f.key,f.owner,'gmail-tokens',{access_token:'test',refresh_token:'refresh',expires_at:Date.now()+3600000,scope}));},
++    async queue(){await f.api.reconcileAndPrepare(f.owner);return (await f.api.messageList(f.owner)).items;},
++    async review(m){return f.call('review',{id:m.id,version:m.version});},
++    async send(m,r){return f.call('send',{id:m.id,version:m.version,review_id:r.review_id,approve:true});},
++    pay(amount=250000,extra={}){let s=f.state();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[{date:'2026-10-26',amount,party:'Kund AB',payerReference:'0597',bankReference:crypto.randomUUID(),externalId:crypto.randomUUID(),kind:'unknown',source:'Enable Banking',account:'MG',...extra}]}).state;f.put(s);},
++    init(){f.put(state);},
++  });
++}
++// Use a historical real date on both sides of the invoice validation boundary.
++// All records and keys in this file are synthetic.
++
++test('D1 migration preserves existing workspace and creates isolated message tables',async t=>{
++  const f=await fixture(t);f.init();const state=f.state();await f.queue();assert.deepEqual(f.state(),state);assert.ok(f.sql.prepare("SELECT name FROM sqlite_master WHERE name='customer_deliveries'").get());
++});
++test('partial payment leaves exactly 625 SEK and generates a cautious VAT draft',async t=>{
++  const f=await fixture(t);f.init();f.pay();const items=await f.queue(),m=items.find(m=>m.status==='draft');assert.equal(m.kind,'possible_vat');assert.equal(m.facts.paid_cents,250000);assert.equal(m.facts.remaining_cents,62500);assert.match(m.body,/Kan betalningen ha avsett/);assert.equal(f.posts,0);
++});
++test('unknown payer with right amount remains unallocated and amount alone is never safe',async t=>{
++  const f=await fixture(t);f.init();f.pay(312500,{party:'Okänd',payerReference:''});await f.queue();assert.equal(paid(f.state(),f.state().invoices[0].id),0);
++});
++test('wrong OCR belonging to another invoice is held, preserving original reference',async t=>{
++  const f=await fixture(t);f.init();let s=f.state();s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Annan AB',number:'0577',ocr:'0577',total:312500,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(250000,{payerReference:'0577'});const q=await f.queue();assert.ok(q.some(m=>m.kind==='wrong_reference'));assert.equal(paid(f.state(),f.state().invoices[0].id),0);assert.equal(f.state().transactions[0].original.payerReference,'0577');
++});
++test('correct payment, overpayment and two payments are distinguished',async t=>{
++  const f=await fixture(t);f.init();f.pay(350000);let q=await f.queue();assert.equal(balance(f.state(),f.state().invoices[0]),0);assert.ok(q.some(m=>m.kind==='overpayment'));f.pay(312500);q=await f.queue();assert.ok(q.some(m=>m.kind==='possible_duplicate'));
++});
++test('unverified absence cannot become a demand for an unpaid debt',async t=>{
++  const f=await fixture(t);f.init();const q=await f.queue();assert.equal(q[0].kind,'confirmation');assert.equal(invoiceStatus(f.state(),f.state().invoices[0]).key,'unreconciled');
++});
++async function verifiedDraft(f){f.init();await f.connect();const i=f.state().invoices[0];await f.call('contact',{invoice_id:i.id,email:'kund@example.com',evidence:'Testavtal',confirm:true});return (await f.queue()).find(m=>m.status==='draft');}
++test('address verification, review, explicit approval and Gmail receipt persist through real D1 SQL',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);const sent=await f.send(m,r);assert.equal(sent.status,'sent');assert.equal(f.posts,1);assert.match(f.raw,/To: kund@example.com/);const row=f.sql.prepare('SELECT * FROM customer_deliveries').get();assert.equal(row.gmail_message_id,'gmail-test-1');assert.ok(row.sent_at);assert.equal(f.sql.prepare('SELECT consumed FROM customer_reviews').get().consumed,1);
++});
++test('no approval, forged review, wrong browser and expired review cannot send',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);
++  await assert.rejects(f.call('send',{id:m.id,version:m.version,review_id:r.review_id}),/godkännande/);
++  await assert.rejects(f.send(m,{review_id:'forged'}),/Godkännandet/);
++  const cookie=f.cookie;f.cookie='mg_message_review='+randomToken();await assert.rejects(f.send(m,r),/Godkännandet/);f.cookie=cookie;
++  f.sql.prepare("UPDATE customer_reviews SET expires_at='2000-01-01'").run();await assert.rejects(f.send(m,r),/Godkännandet/);assert.equal(f.posts,0);
++});
++test('edited draft requires a fresh current-version review',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);await f.call('edit',{id:m.id,version:m.version,subject:'Nytt ämne',body:'Kontrollerad svensk text'});await assert.rejects(f.send(m,r),/ändrats/);const updated=(await f.queue()).find(x=>x.status==='draft');await assert.rejects(f.send(updated,r),/Godkännandet/);const fresh=await f.review(updated);await f.send(updated,fresh);assert.equal(f.posts,1);
++});
++test('payment after drafting prevents an old review from being sent',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);f.pay();await assert.rejects(f.send(m,r),/ändrats/);assert.equal(f.posts,0);assert.equal((await f.queue()).find(x=>x.id===m.id).status,'stale');
++});
++test('double click and two reviews reserve exactly one Gmail send',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m),other=await f.review(m);const outcomes=await Promise.allSettled([f.send(m,r),f.send(m,other)]);assert.equal(outcomes.filter(r=>r.status==='fulfilled').length,1);assert.equal(f.posts,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,1);
++});
++test('Gmail timeout locks unknown delivery and never generates or sends it again',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);f.timeout=true;await assert.rejects(f.send(m,r),/oklar/);await assert.rejects(f.send(m,r),/ändrats/);assert.equal(f.posts,1);f.pay();await f.queue();assert.equal(f.sql.prepare('SELECT status FROM customer_deliveries').get().status,'unknown');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_messages WHERE kind=?').get(m.kind).n,1);
++});
++test('a workspace change at the atomic reservation boundary stops send',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);f.d1.beforeBatch=async rows=>{if(rows[0].query.includes('INSERT OR IGNORE INTO customer_deliveries')){f.d1.beforeBatch=null;f.sql.prepare('UPDATE workspaces SET revision=revision+1').run();}};await assert.rejects(f.send(m,r),/Godkännandet/);assert.equal(f.posts,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,0);
++});
++test('missing send scope and wrong Gmail account stop before consuming approval',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);await f.connect('https://www.googleapis.com/auth/gmail.readonly');await assert.rejects(f.send(m,r),/gmail.send/);await f.connect();f.wrongAccount=true;await assert.rejects(f.send(m,r),/företagets Gmail/);assert.equal(f.posts,0);assert.equal(f.sql.prepare('SELECT consumed FROM customer_reviews').get().consumed,0);
++});
++test('owner isolation, CSRF and GET requests cannot approve or mutate messages',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f);f.user={userId:'owner-bob'};assert.deepEqual((await f.api.messageList('owner-bob')).items,[]);await assert.rejects(f.review(m),/saknas/);f.user={userId:f.owner};await assert.rejects(f.call('review',{id:m.id,version:m.version},'POST','https://attacker.example'),/ORIGIN_DENIED/);const response=await f.api.messagesAction(new Request(origin+'/api/customer-messages/reconcile'),'reconcile');assert.equal(response.status,405);assert.equal(f.posts,0);
++});
++test('reject is persistent and reconciliation never sends messages',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f);await f.call('reject',{id:m.id,version:m.version});await f.queue();await f.queue();assert.equal((await f.api.messageList(f.owner)).items[0].status,'rejected');assert.equal(f.posts,0);
++});
++test('a complete Bankgiro specification replaces its parent without double counting',async t=>{
++  const f=await fixture(t);f.init();let s=f.state();s=applyCommand(s,{type:'transactions.import',documentId:'synthetic-bank-file',rows:[{key:'parent',date:'2026-10-26',amount:312500,kind:'batch',bankReference:'PARENT',source:'bank.xml'}, {parentKey:'parent',date:'2026-10-26',amount:312500,kind:'payment',verified:true,party:'Kund AB',payerReference:'0597',bankReference:'CHILD',externalId:'child',source:'bank.xml'}]}).state;f.put(s);await f.queue();assert.equal(paid(f.state(),f.state().invoices[0].id),312500);assert.equal(f.state().allocations.length,1);assert.equal(f.state().transactions[0].kind,'batch');
++});
++test('API and bank file representations remain one economic payment',async t=>{
++  const f=await fixture(t);f.init();f.pay(312500);await f.queue();let s=f.state();s=applyCommand(s,{type:'transactions.import',documentId:'synthetic-copy',rows:[{date:'2026-10-26',amount:312500,kind:'payment',verified:true,party:'Kund AB',payerReference:'0597',bankReference:'FILE',source:'bank.xml',account:'File alias'}]}).state;f.put(s);await f.queue();assert.equal(paid(f.state(),f.state().invoices[0].id),312500);assert.ok(f.state().transactions[1].duplicateOf);assert.equal(f.state().allocations.length,1);
++});
++test('one transfer for several invoices stays a manual split proposal',async t=>{
++  const f=await fixture(t);f.init();let s=f.state();s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0598',ocr:'0598',total:50000,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(362500,{payerReference:'0597 0598'});await f.queue();assert.equal(f.state().allocations.length,0);assert.equal(reconciliation.analyze(f.state()).filter(f=>f.kind==='multiple_invoices').length,2);
++});
++test('a manually verified private payer can be reused for the same customer and account',async t=>{
++  const f=await fixture(t);f.init();f.pay(312500,{party:'Anna Andersson'});let s=f.state();s=applyCommand(s,{type:'match.create',invoiceId:s.invoices[0].id,transactionId:s.transactions[0].id,amount:312500,note:'Kunden bekräftade betalaren'}).state;s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0598',ocr:'0598',total:50000,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(50000,{party:'Anna Andersson',payerReference:'0598'});await f.queue();assert.equal(paid(f.state(),f.state().invoices[1].id),50000);
++});
++test('missing OCR remains manual after bank evidence has been verified',async t=>{
++  const f=await fixture(t);f.init();f.pay(312500,{payerReference:''});let s=f.state();s=applyCommand(s,{type:'transaction.verify',id:s.transactions[0].id,note:'Betalare och bokföring kontrollerade'}).state;f.put(s);await f.queue();assert.equal(f.state().allocations.length,0);assert.equal(reconciliation.analyze(f.state())[0].kind,'missing_reference');
++});
++test('verified absence can be recorded and new bank data invalidates it',async t=>{
++  const f=await fixture(t);f.init();await f.call('absence',{invoice_id:f.state().invoices[0].id,note:'Bankkonto och specifikationer kontrollerade för hela perioden',confirm:true});assert.ok((await f.queue()).some(m=>m.kind==='overdue'&&m.status==='draft'));f.pay(10000,{party:'Annan',payerReference:''});assert.equal(invoiceStatus(f.state(),f.state().invoices[0]).key,'unreconciled');
++});
++test('disconnect during provider preflight stops send and never restores old connection',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);f.preflight=async()=>{f.sql.prepare('DELETE FROM gmail_connections').run();};await assert.rejects(f.send(m,r),/anslutningen ändrades/);assert.equal(f.posts,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_connections').get().n,0);
++});
++test('recipient verification changes at reservation cannot use an old approval',async t=>{
++  const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);f.d1.beforeBatch=async rows=>{if(rows[0].query.includes('INSERT OR IGNORE INTO customer_deliveries')){f.d1.beforeBatch=null;f.sql.prepare("UPDATE customer_contacts SET email='new@example.com',version=version+1").run();}};await assert.rejects(f.send(m,r),/Godkännandet/);assert.equal(f.posts,0);
++});
++test('upgrading OAuth requires explicit send choice and preserves readonly import scope',async t=>{
++  const f=await fixture(t),state='s'.repeat(43);const url=new URL(f.adapter.gmailAuthorizationUrl(state,origin,{send:true}));assert.equal(url.searchParams.get('scope'),'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send');assert.equal(new URL(f.adapter.gmailAuthorizationUrl(state,origin)).searchParams.get('scope'),'https://www.googleapis.com/auth/gmail.readonly');
++});
+diff --git a/tests/domain.test.mjs b/tests/domain.test.mjs
+index bb67b9d..4689505 100644
+--- a/tests/domain.test.mjs
++++ b/tests/domain.test.mjs
+@@ -13,7 +13,7 @@ const addTx=(s,overrides,options={})=>applyCommand(s,{type:'transactions.import'
+ const match=(s,amount=s.invoices[0].total,extra={})=>applyCommand(s,{type:'match.create',invoiceId:s.invoices[0].id,transactionId:s.transactions[0].id,amount,note:'Kontrollerat originalunderlag',...extra}).state;
+ 
+ test('Swedish money is exact integer öre and rejects ambiguous fractions',()=>{for(const v of ['7 179,16','7\u00a0179,16','7.179,16','7179.16'])assert.equal(parseMoney(v),717916);assert.equal(parseMoney('-98,50'),-9850);assert.throws(()=>parseMoney('1.875'));assert.throws(()=>parseMoney('foo'));assert.throws(()=>parseMoney('1,875.00'));});
+-test('Calendar dates are real and due today is not overdue',()=>{assert.equal(validDate('2026-02-30'),false);assert.equal(validDate('2028-02-29'),true);const s=addInvoice(emptyState());assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-26').key,'open');assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-27').key,'overdue');});
++test('Calendar dates are real and due today is not overdue',()=>{assert.equal(validDate('2026-02-30'),false);assert.equal(validDate('2028-02-29'),true);const s=addInvoice(emptyState());assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-26').key,'unreconciled');assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-27').key,'unreconciled');const checked=applyCommand(s,{type:'invoice.reconcile',id:s.invoices[0].id,confirm:true,note:'Kontrollerat bankunderlag'}).state;assert.equal(invoiceStatus(checked,checked.invoices[0],'2026-10-26').key,'open');assert.equal(invoiceStatus(checked,checked.invoices[0],'2026-10-27').key,'overdue');});
+ test('Exact OCR offers a proposal and only confirmation marks paid',()=>{let s=addTx(addInvoice(emptyState()));assert.equal(suggestions(s,s.transactions[0])[0].strength,'strong');assert.equal(balance(s,s.invoices[0]),187500);s=match(s);assert.equal(balance(s,s.invoices[0]),0);assert.equal(invoiceStatus(s,s.invoices[0]).key,'paid');});
+ test('Equal amounts never resolve identity, even when ambiguous',()=>{let s=addInvoice(addInvoice(emptyState()),{party:'Andra kunden',number:'1002',ocr:'002',total:187500});s=addTx(s,{party:'',payerReference:''});assert.equal(suggestions(s,s.transactions[0]).length,0);assert.throws(()=>match(s),/Beloppet ensamt/);assert.equal(s.allocations.length,0);});
+ test('Bank reference cannot become invoice evidence or prefix-match',()=>{let s=addInvoice(emptyState(),{number:'123',ocr:'00123'});s=addTx(s,{payerReference:'1234',bankReference:'00123',party:''});assert.ok(suggestions(s,s.transactions[0]).every(x=>x.strength==='weak'));s=addTx(s,{payerReference:'order 1 leverans',party:'',externalId:'second'});assert.ok(suggestions(s,s.transactions[1]).every(x=>x.strength==='weak'));});
+diff --git a/tests/gmail.test.mjs b/tests/gmail.test.mjs
+index 3a15edf..d88f5b8 100644
+--- a/tests/gmail.test.mjs
++++ b/tests/gmail.test.mjs
+@@ -11,7 +11,7 @@ class D1{
+   async batch(items){this.sql.exec('BEGIN');try{const results=items.map(x=>x.execute());this.sql.exec('COMMIT');return results;}catch(e){this.sql.exec('ROLLBACK');throw e;}}
+ }
+ async function fixture(t){
+-  const key='__gmail_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');sql.exec(source('../drizzle/0000_confused_umar.sql'));sql.exec(source('../drizzle/0003_needy_gravity.sql'));
++  const key='__gmail_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');sql.exec(source('../drizzle/0000_confused_umar.sql'));sql.exec(source('../drizzle/0003_needy_gravity.sql'));for(const file of (await import('node:fs')).readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>/^000[4-9].*sql$/.test(f)))sql.exec(source('../drizzle/'+file));
+   const f={sql,d1:new D1(sql),owner:'test-owner',key:randomToken(),wrongAccount:false,providerCalls:0,env:{GOOGLE_CLIENT_ID:'synthetic-client',GOOGLE_CLIENT_SECRET:'synthetic-secret'}};f.user={userId:f.owner};
+   f.env.BUCKET={put:async()=>{},get:async()=>null,delete:async()=>{}};globalThis[key]=f;
+   const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`);
+@@ -19,7 +19,7 @@ async function fixture(t){
+   const server=data(`import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(body,status=200)=>Response.json(body,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=await f.d1.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').bind(owner).first();return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
+   const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const storageReady=()=>true;export const encrypt=(owner,purpose,value)=>seal(f.key,owner,purpose,value);export const decrypt=(owner,purpose,value)=>unseal(f.key,owner,purpose,value);`);
+   const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf}),fields=moduleUrl('../lib/invoice-fields.js',{'./domain':domainUrl});
+-  f.api=await import(moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields}));
++  f.api=await import(moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields,'./customer-messages':data('export async function reconcileAndPrepare(){}')}));
+   t.mock.method(globalThis,'fetch',async url=>{
+     f.providerCalls++;const path=new URL(url).pathname;
+     if(path==='/token')return Response.json({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,scope:'https://www.googleapis.com/auth/gmail.readonly'});
