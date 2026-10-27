@@ -1,0 +1,130 @@
+diff --git a/lib/gmail-adapter.js b/lib/gmail-adapter.js
+index 9470c93..d825eab 100644
+--- a/lib/gmail-adapter.js
++++ b/lib/gmail-adapter.js
+@@ -26,13 +26,17 @@ export function gmailAuthorizationUrl(state,origin,{send=false}={}){
+ }
+ async function requestJson(url,options={}){
+   let response;
+-  try{response=await fetch(url,{...options,redirect:'error',signal:AbortSignal.timeout(20_000)});}
++  // Workers rejects redirect:'error' before sending the request. Manual mode
++  // plus an explicit 3xx rejection keeps credentials on the original endpoint.
++  try{response=await fetch(url,{...options,redirect:'manual',signal:AbortSignal.timeout(20_000)});}
+   catch{throw fail('Det gick inte att nå Gmail. Försök igen.','connection_error',502);}
++  if(response.status>=300&&response.status<400)throw fail('Google returnerade en oväntad omdirigering. Inga uppgifter skickades vidare.','unexpected_redirect',502);
+   // A bounded read prevents a malformed response or huge attachment from exhausting memory.
+   let bytes=0;const chunks=[];
+   if(response.body){for await(const chunk of response.body){bytes+=chunk.length;if(bytes>22_000_000){await response.body.cancel?.().catch(()=>{});throw fail('Svaret från Gmail var för stort.','response_too_large',413);}chunks.push(chunk);}}
+   let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw fail('Gmail returnerade ett ogiltigt svar.','invalid_response',502);}
+   if(!response.ok){
++    if(body.error==='invalid_client'||body.error==='unauthorized_client')throw fail('Google avvisade webbklienten. Kontrollera klient-id och klienthemlighet i Sites.','invalid_client');
+     if(response.status===401||body.error==='invalid_grant')throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
+     if(response.status===403)throw fail('Gmail gav inte läsåtkomst. Kontrollera behörigheten och Gmail API i Google Cloud.','access_denied');
+     if(response.status===429)throw fail('Gmail har begränsat hämtningen. Försök igen senare.','rate_limited',429);
+@@ -97,7 +101,7 @@ export async function revokeGmailTokens(tokens){
+   const credential=tokens?.refresh_token||tokens?.access_token;
+   if(!credential)return;
+   let response;
+-  try{response=await fetch('https://oauth2.googleapis.com/revoke',{method:'POST',redirect:'error',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:credential}),signal:AbortSignal.timeout(20_000)});}
++  try{response=await fetch('https://oauth2.googleapis.com/revoke',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({token:credential}),signal:AbortSignal.timeout(20_000)});}
+   catch{throw fail('Det gick inte att återkalla åtkomsten hos Google. Försök igen.','revoke_failed',502);}
+   if(!response.ok&&response.status!==400)throw fail('Google kunde inte återkalla åtkomsten. Försök igen.','revoke_failed',502);
+ }
+diff --git a/lib/gmail-service.ts b/lib/gmail-service.ts
+index 0aecd3f..65c42b0 100644
+--- a/lib/gmail-service.ts
++++ b/lib/gmail-service.ts
+@@ -15,10 +15,14 @@ async function lock<T>(owner:string,fn:()=>Promise<T>){
+   try{return await fn();}finally{await db().prepare('DELETE FROM gmail_locks WHERE owner=? AND token=?').bind(owner,token).run();}
+ }
+ export function gmailFailure(error?:unknown){
+-  const cause=error as {message?:string,code?:string,safe?:boolean};
++  const cause=error as {message?:string,code?:string,safe?:boolean,gmailStage?:string};
++  // Never log provider responses, request URLs, cookies or credentials.
++  const codes=['account_mismatch','renewal_required','rate_limited','missing_scope','access_denied','invalid_client','provider_error','connection_error','invalid_response','invalid_tokens','unexpected_redirect','oauth_return_invalid','oauth_return_used','missing_refresh_token'];
++  const code=codes.includes(cause?.code||'')?cause.code:'unexpected';
++  if(cause?.gmailStage)console.warn('gmail_oauth_failure',JSON.stringify({stage:cause.gmailStage,code}));
+   if(cause?.message==='AUTH_REQUIRED')return response({error:'Logga in med ChatGPT för att öppna Gmail-anslutningen.',signIn:'/signin-with-chatgpt?return_to=%2Fgmail'},401);
+   if(cause?.message==='ORIGIN_DENIED')return response({error:'Åtgärden måste startas från MG Fakturakoll.'},403);
+-  if(cause?.safe||['account_mismatch','renewal_required','rate_limited','missing_scope','access_denied'].includes(cause?.code||''))return response({error:cause.message},409);
++  if(cause?.safe||codes.includes(cause?.code||''))return response({error:cause.message},409);
+   return response({error:'Gmail-åtgärden kunde inte slutföras. Kontrollera anslutningen och försök igen.'},409);
+ }
+ export async function gmailStatus(summary=false){
+@@ -39,20 +43,28 @@ export async function gmailConnect(req:Request){
+   return Response.json({url:gmailAuthorizationUrl(state,new URL(req.url).origin,{send:options.send===true})},{headers:{'Cache-Control':'no-store','Set-Cookie':`mg_gmail_flow=${cookie}; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=900`}});
+ }
+ export async function gmailCallback(req:Request){
++  let stage='validate_return';
++  try{
+   const user=await identity();const url=new URL(req.url),state=url.searchParams.get('state')||'';
+-  if(['state','code','error'].some(k=>url.searchParams.getAll(k).length>1))throw Error('Ogiltig retur');
++  const invalidReturn=()=>Object.assign(Error('Ogiltig retur från Google. Starta anslutningen igen i samma webbläsare och slutför den inom 15 minuter.'),{code:'oauth_return_invalid'});
++  if(['state','code','error'].some(k=>url.searchParams.getAll(k).length>1))throw invalidReturn();
+   const flow=await db().prepare('SELECT * FROM gmail_flows WHERE state_hash=? AND owner=? AND consumed=0 AND expires_at>?').bind(await digest(state),user.userId,now()).first<any>();
+-  if(!flow||flow.cookie_hash!==await digest(cookieValue(req,'mg_gmail_flow')))throw Error('Ogiltig retur');
+-  const taken=await db().prepare('UPDATE gmail_flows SET consumed=1 WHERE state_hash=? AND consumed=0').bind(flow.state_hash).run();if(taken.meta.changes!==1)throw Error('Använd retur');
++  if(!flow||flow.cookie_hash!==await digest(cookieValue(req,'mg_gmail_flow')))throw invalidReturn();
++  const taken=await db().prepare('UPDATE gmail_flows SET consumed=1 WHERE state_hash=? AND consumed=0').bind(flow.state_hash).run();if(taken.meta.changes!==1)throw Object.assign(Error('Returen från Google har redan använts. Starta anslutningen igen.'),{code:'oauth_return_used'});
+   let result='cancelled';
+   if(!url.searchParams.has('error'))await lock(user.userId,async()=>{
++    stage='exchange_code';
+     const tokens=await exchangeGmailCode(url.searchParams.get('code'),url.origin);
++    stage='verify_account';
+     try{await gmailProfile(tokens);if(flow.request_send&&!hasGmailSendScope(tokens))throw Object.assign(Error('Godkänn Gmail-utskick genom ett nytt Google-medgivande.'),{safe:true});}catch(e){await revokeGmailTokens(tokens).catch(()=>{});throw e;}
+-    if(!tokens.refresh_token)throw Error('Bestående läsåtkomst saknas');
++    if(!tokens.refresh_token)throw Object.assign(Error('Google gav ingen bestående åtkomst. Starta anslutningen igen och godkänn Gmail-behörigheterna.'),{code:'missing_refresh_token'});
++    stage='encrypt_tokens';
+     const sealed=await encrypt(user.userId,'gmail-tokens',tokens);
++    stage='save_connection';
+     await db().prepare("INSERT INTO gmail_connections(owner,email,tokens) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET email=excluded.email,tokens=excluded.tokens,status='connected'").bind(user.userId,gmailAccount(),sealed).run();result='connected';
+   });
+   return new Response(null,{status:302,headers:{Location:`/gmail?status=${result}`,'Cache-Control':'no-store','Set-Cookie':'mg_gmail_flow=; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=0'}});
++  }catch(error){if(error instanceof Error)Object.assign(error,{gmailStage:stage});throw error;}
+ }
+ export async function gmailSync(req?:Request,scheduled=false){
+   const user=await identity(req);
+diff --git a/tests/gmail.test.mjs b/tests/gmail.test.mjs
+index d88f5b8..48be509 100644
+--- a/tests/gmail.test.mjs
++++ b/tests/gmail.test.mjs
+@@ -20,9 +20,11 @@ async function fixture(t){
+   const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const storageReady=()=>true;export const encrypt=(owner,purpose,value)=>seal(f.key,owner,purpose,value);export const decrypt=(owner,purpose,value)=>unseal(f.key,owner,purpose,value);`);
+   const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf}),fields=moduleUrl('../lib/invoice-fields.js',{'./domain':domainUrl});
+   f.api=await import(moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields,'./customer-messages':data('export async function reconcileAndPrepare(){}')}));
+-  t.mock.method(globalThis,'fetch',async url=>{
++  t.mock.method(globalThis,'fetch',async (url,options)=>{
++    assert.equal(options.redirect,'manual','Workers-compatible fetch must never forward credentials through redirects');
+     f.providerCalls++;const path=new URL(url).pathname;
+-    if(path==='/token')return Response.json({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,scope:'https://www.googleapis.com/auth/gmail.readonly'});
++    if(f.redirectProvider)return new Response('private provider body',{status:302,headers:{Location:'https://untrusted.example/collect'}});
++    if(path==='/token')return f.tokenError?Response.json(f.tokenError,{status:400}):Response.json({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,scope:'https://www.googleapis.com/auth/gmail.readonly'});
+     if(path==='/revoke')return new Response('');
+     if(path.endsWith('/profile'))return Response.json({emailAddress:f.wrongAccount?'wrong@gmail.com':'mg.vitvaror@gmail.com'});
+     if(path.endsWith('/messages'))return Response.json({messages:[{id:'archived'}]});
+@@ -35,6 +37,25 @@ const origin='https://invoice.example';
+ const post=(action,body={})=>new Request(origin+'/api/gmail/'+action,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify(body)});
+ async function connect(f){const r=await f.api.gmailConnect(post('connect')),cookie=r.headers.get('set-cookie').split(';')[0],body=await r.json(),state=new URL(body.url).searchParams.get('state');return{cookie,state,callback:()=>new Request(origin+'/api/gmail/callback?state='+state+'&code=synthetic-code',{headers:{Cookie:cookie}})};}
+ 
++test('OAuth diagnostics identify the failed stage without reflecting codes, cookies or provider secrets',async t=>{
++  const f=await fixture(t),flow=await connect(f),logs=[];
++  t.mock.method(console,'warn',(...args)=>logs.push(args));
++  try{await f.api.gmailCallback(new Request(origin+'/api/gmail/callback?state='+flow.state+'&code=synthetic-private-code'));assert.fail('Missing cookie accepted');}
++  catch(error){const result=await f.api.gmailFailure(error).json();assert.match(result.error,/samma webbläsare/);}
++  assert.equal(f.providerCalls,0);
++  f.tokenError={error:'invalid_client',error_description:'synthetic-private-provider-secret'};
++  try{await f.api.gmailCallback(flow.callback());assert.fail('Invalid client accepted');}
++  catch(error){const result=await f.api.gmailFailure(error).json();assert.match(result.error,/klient-id och klienthemlighet/);assert.ok(!JSON.stringify(result).includes('synthetic-private'));}
++  assert.deepEqual(logs.map(args=>JSON.parse(args[1])),[{stage:'validate_return',code:'oauth_return_invalid'},{stage:'exchange_code',code:'invalid_client'}]);
++  assert.ok(!JSON.stringify(logs).includes(flow.cookie));assert.ok(!JSON.stringify(logs).includes(flow.state));assert.ok(!JSON.stringify(logs).includes('synthetic-private'));
++});
++
++test('Google redirects are rejected before parsing or following a credential-bearing request',async t=>{
++  const f=await fixture(t),flow=await connect(f);f.redirectProvider=true;
++  await assert.rejects(f.api.gmailCallback(flow.callback()),error=>error.code==='unexpected_redirect'&&error.gmailStage==='exchange_code');
++  assert.equal(f.providerCalls,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_connections').get().n,0);
++});
++
+ test('Sites OAuth binds browser and user, rejects replay and wrong account, and encrypts tokens',async t=>{
+   const f=await fixture(t),flow=await connect(f);assert.match(flow.cookie,/mg_gmail_flow=/);
+   await assert.rejects(f.api.gmailCallback(new Request(origin+'/api/gmail/callback?state='+flow.state+'&code=code')),/retur/);

@@ -100,4 +100,4 @@ Saknad/fel OCR, annan betalare, möjliga dubletter och fördelning på flera fak
 
 Se [leveransrapport och exakt fillista](docs/RECONCILIATION-CUSTOMER-MESSAGES.md) för funktioner, testresultat, API, Google-/bankaktivering och separat arbete för ChatGPT Sites.
 
-Samma avstämnings- och granskningsflöde är separat publicerat i **Sites version 14**. Se [Sites-rapporten](docs/SITES-CUSTOMER-MESSAGES.md) för patch, testresultat, Google-aktivering och skillnaden i OCR-körning.
+Samma avstämnings- och granskningsflöde är separat publicerat i **Sites version 16**, med verifierad Gmail-anslutning och utskicksbehörighet. Se [Sites-rapporten](docs/SITES-CUSTOMER-MESSAGES.md) för patch, testresultat, Google-aktivering och skillnaden i OCR-körning.

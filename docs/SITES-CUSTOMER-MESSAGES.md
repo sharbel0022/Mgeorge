@@ -1,5 +1,19 @@
 # Publicerad Sites-leverans: kundmeddelanden
 
+## Gmail aktiverat och verifierat – version 16
+
+Den 28 oktober 2026 (svensk tid) verifierades den verkliga Google-anslutningen för `mg.vitvaror@gmail.com`: `configured: true`, `connection.status: connected` och `send_enabled: true`. Google-profilkontrollen lyckades och Sites visar **Gmail – Ansluten** samt **Utskicksbehörighet finns** på Kundmeddelanden. Granskningskön var tom. Inga verkliga mejl skickades; faktisk leverans till mottagare har därför inte testats.
+
+- Google Cloud-projekt: `celestial-feat-512922-e6`. Gmail API aktiverat, webbklient skapad med Sites exakta `/api/gmail/callback`, företagskontot registrerat som testanvändare och `gmail.readonly` + `gmail.send` godkända.
+- Klientuppgifterna är skyddade runtime-hemligheter i Sites, miljörevision 4. Befintlig banknyckel och bankinställningar bevarades. Hemligheterna finns inte i repositoryt.
+- Ett verkligt callback-fel rättades: Workers avvisar `redirect: 'error'` innan nätverksanropet. Gmail använder nu `manual` och avvisar 3xx utan att följa dem. Detta gäller token-, profil-, utskicks- och återkallelseanrop. Säker diagnostik skiljer retur-, klient-, nätverks- och lagringsfel utan att logga hemligheter.
+- Sites-källa: `ffa15b6b5ab7795076a0b1405fc2a25755adc845`. Version 16: `appgprj_6adf2f7f7e848191b64192161886b528~appgver_2abe9fcc0c4c81919004fe30fe91d2bc`. Deployment `appgdep_6ae12ca8a1008191b2ec07188080d294`: `succeeded`.
+- [Kompletterande patch mot version 14](sites/gmail-oauth-runtime.patch). 30 berörda Gmail-/kundmeddelandetester, TypeScript och produktionsbygget passerade. En verklig Workerd-kontroll reproducerade felet för `error` och bekräftade stöd för `manual`.
+- Godkännandeflödet verifierades med syntetiska data: verifierad kundadress, läst aktuell version, uttryckligt godkännande, spärr efter ändringar, engångsutskick och lås vid oklar leverans. Inga testposter lades i produktionsregistret.
+- Appen är i Googles **Testing**-läge. Gmail-medgivande/refresh token upphör efter sju dagar och behöver då förnyas. Se [Googles beskrivning av testläget](https://support.google.com/cloud/answer/15549945?hl=en). Molnschemat är fortsatt pausat och ingen automatisk mejlsändning är aktiverad.
+
+## Ursprunglig funktionsleverans – version 14
+
 **Publicerat:** version 14 den 27 oktober 2026. Sites rapporterade `succeeded` för deployment `appgdep_6ae124c7bf808191bcb4f4690aca56e0`.
 
 - [Kundmeddelanden på den befintliga Siten](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/kundmeddelanden).
