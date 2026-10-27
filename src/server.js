@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – SERVER / API
+ * ANSVAR: Tar emot HTTP-anrop från gränssnittet, kontrollerar session och behörighet, skickar arbetet vidare till databas- och integrationsmodulerna samt svarar med JSON. Även schemalagd synkronisering startas här.
+ * FLÖDE: Webbläsare → server.js → db.js / gmail.js / bank.js → JSON till webbläsaren.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
