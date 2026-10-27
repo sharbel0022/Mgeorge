@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – LOKAL INSTALLATION
+ * ANSVAR: Förbereder den lokala miljön och säker konfiguration utan att skriva över befintliga hemligheter och data.
+ * FLÖDE: npm run setup → .env och lokala inställningar → npm start.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import { randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
