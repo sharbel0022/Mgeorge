@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – SWEDBANK / ENABLE BANKING
+ * ANSVAR: Bygger signerade API-anrop för läsning av konton och bokförda bankhändelser. Skapar medgivandeuppgifter och hanterar paginerade banksvar.
+ * FLÖDE: server.js initierar → bank.js anropar Enable Banking → server.js validerar och lagrar via db.js. Inga betalningar startas.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import { readFileSync, realpathSync } from 'node:fs';
 import { createPrivateKey, createSign } from 'node:crypto';
 import { isAbsolute, relative, sep } from 'node:path';
