@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – SÄKERHET / KRYPTERING
+ * ANSVAR: Innehåller hjälpmetoder för hashning, säkra token, sessioner och AES-256-GCM-kryptering av integrationsuppgifter.
+ * FLÖDE: server.js använder säkerhetsfunktionerna; privata nycklar och token får inte skickas till frontend.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import { createHash, createHmac, randomBytes, timingSafeEqual, scryptSync, createCipheriv, createDecipheriv } from 'node:crypto';
 
 export function digest(value) { return createHash('sha256').update(value).digest('hex'); }
@@ -21,11 +28,13 @@ export function cipherKey() {
   if(!/^[a-f0-9]{64}$/i.test(key??'')) throw new Error('BANK_DATA_KEY must be 64 hex characters');
   return Buffer.from(key,'hex');
 }
+/** Krypterar känsliga integrationsuppgifter med AES-256-GCM och ny slumpad IV. */
 export function encryptObject(value) {
   const iv=randomBytes(12), c=createCipheriv('aes-256-gcm',cipherKey(),iv);
   const payload=Buffer.concat([c.update(JSON.stringify(value),'utf8'),c.final()]);
   return Buffer.concat([iv,c.getAuthTag(),payload]).toString('base64');
 }
+/** Dekrypterar skyddade integrationstoken med serverns privata datanyckel. */
 export function decryptObject(value) {
   const bytes=Buffer.from(value,'base64');
   const d=createDecipheriv('aes-256-gcm',cipherKey(),bytes.subarray(0,12));
@@ -35,6 +44,7 @@ export function decryptObject(value) {
 export function sign(data, secret=process.env.SESSION_SECRET) {
   return createHmac('sha256',secret).update(data).digest('base64url');
 }
+/** Skapar HttpOnly-cookie så JavaScript i webbläsaren inte direkt kan läsa sessionsvärdet. */
 export function sessionCookie(sessionToken,secure) {
   return `mg_session=${encodeURIComponent(sessionToken)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=28800${secure?'; Secure':''}`;
 }

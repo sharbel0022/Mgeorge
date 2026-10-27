@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – SWEDBANK / ENABLE BANKING
+ * ANSVAR: Bygger signerade API-anrop för läsning av konton och bokförda bankhändelser. Skapar medgivandeuppgifter och hanterar paginerade banksvar.
+ * FLÖDE: server.js initierar → bank.js anropar Enable Banking → server.js validerar och lagrar via db.js. Inga betalningar startas.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import { readFileSync, realpathSync } from 'node:fs';
 import { createPrivateKey, createSign } from 'node:crypto';
 import { isAbsolute, relative, sep } from 'node:path';
@@ -42,6 +49,7 @@ export function configStatus(){
   catch(e){return {configured:false,environment:undefined,code:e.code||'not_configured',message:e.code?e.message:'Banktjänsten behöver aktiveras av systemadministratören.'};}
 }
 export function isConfigured(){return configStatus().configured;}
+/** Skapar RS256-signerad JWT för att autentisera serverns API-anrop mot Enable Banking. Privat RSA-nyckel stannar på servern. */
 export function jwt(){
   const {applicationId,key}=configuration(),now=Math.floor(Date.now()/1000);
   const header={typ:'JWT',alg:'RS256',kid:applicationId};
@@ -79,6 +87,7 @@ function retryAfterSeconds(value){
   const seconds=/^\d+$/.test(value||'')?Number(value):Math.ceil((Date.parse(value)-Date.now())/1000);
   return Number.isFinite(seconds)?Math.min(86400,Math.max(1,seconds)):60;
 }
+/** Skickar tidsbegränsade anrop till Enable Bankings fasta API-domän med signerad token; leverantörsfel hanteras centralt. */
 export async function bankingRequest(path,{method='GET',body}={}){
   const url=requestUrl(path,method),authorization=`Bearer ${jwt()}`;
   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),18000);
@@ -100,6 +109,7 @@ export async function bankingRequest(path,{method='GET',body}={}){
     return data;
   }finally{clearTimeout(timeout);}
 }
+/** Kontrollerar att applikationens miljö, behörighet, aktivering och callback är lämpliga innan riktig bankanslutning startar. */
 export async function assertApplicationReady(origin){
   const {applicationId,environment}=configuration(),callback=`${validatedOrigin(origin,environment)}/api/bank/callback`;
   const app=await bankingRequest('/application');
@@ -110,12 +120,14 @@ export async function assertApplicationReady(origin){
   if(!app.redirect_urls?.includes(callback))throw bankError('redirect_not_registered','Bankens exakta returadress måste registreras hos Enable Banking av systemadministratören.');
   return {environment,active:true,checked_at:new Date().toISOString()};
 }
+/** Hämtar banker i Sverige och identifierar Swedbank; använder inte ett påhittat institutions-ID. */
 export async function findSwedbank(){
   const result=await bankingRequest('/aspsps?country=SE');
   if(!Array.isArray(result.aspsps))throw bankError('invalid_response','Banktjänsten returnerade en ogiltig banklista.',502);
   return result.aspsps.filter(x=>x&&/^Swedbank(?:\b|\s)/i.test(x.name)&&x.country==='SE'&&Array.isArray(x.psu_types)&&x.psu_types.includes('business'))
     .sort((a,b)=>Number(b.name==='Swedbank')-Number(a.name==='Swedbank'));
 }
+/** Bygger begäran om bankmedgivande för läsåtkomst och anger vart banken ska returnera användaren. */
 export function startConsentBody(aspsp,state,origin){
   if(typeof state!=='string'||!/^[A-Za-z0-9_-]{32,256}$/.test(state))throw bankError('invalid_state','Ogiltig bankstatus.',400);
   if(!aspsp||aspsp.country!=='SE'||!/^Swedbank(?:\b|\s)/i.test(aspsp.name)||!aspsp.psu_types?.includes('business'))throw bankError('business_bank_unavailable','Swedbanks företagsanslutning är inte tillgänglig.');
@@ -127,6 +139,7 @@ export function startConsentBody(aspsp,state,origin){
   return {access:{valid_until,transactions:true,balances:false},aspsp:{name:aspsp.name,country:'SE'},state,redirect_url:`${validatedOrigin(origin,environment)}/api/bank/callback`,psu_type:'business',language:'sv'};
 }
 function validDate(date){return typeof date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date;}
+/** Hämtar bokförda transaktioner över flera API-sidor och förhindrar oändliga upprepningar av sidmarkörer. */
 export async function fetchBookedTransactions(accountId,{dateFrom,dateTo}){
   if(typeof accountId!=='string'||!accountId||accountId.length>200)throw bankError('invalid_account','Välj ett godkänt konto.',400);
   if(!validDate(dateFrom)||!validDate(dateTo)||dateFrom>dateTo||Date.parse(dateTo)-Date.parse(dateFrom)>91*86400000)throw bankError('invalid_date_range','Välj ett giltigt datumintervall på högst 91 dagar.',400);

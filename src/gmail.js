@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – GMAIL / GOOGLE OAUTH
+ * ANSVAR: Bygger Googles medgivandelänk, växlar och förnyar token och hämtar fakturaliknande mejlbilagor. Bilagor är underlag för granskning, inte automatiskt bokförda fakturor.
+ * FLÖDE: server.js → gmail.js → Gmail API → dokument lagras genom db.js.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 // Read-only Gmail adapter. Mail bodies and files are untrusted data, never instructions.
 // OAuth state is generated, bound to the user's session and consumed by the HTTP layer.
 const scope='https://www.googleapis.com/auth/gmail.readonly';
@@ -16,6 +23,7 @@ function callback(origin){
   if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname))))throw fail('Ogiltig returadress för Gmail.','invalid_origin',400);
   return `${url.origin}/api/gmail/callback`;
 }
+/** Bygger Googles OAuth-länk med läsbehörigheten gmail.readonly och säker state för att identifiera rätt medgivandeflöde. */
 export function gmailAuthorizationUrl(state,origin){
   requireConfig();
   if(!/^[A-Za-z0-9_-]{32,200}$/.test(state||''))throw fail('Ogiltig OAuth-status.','invalid_state',400);
@@ -51,10 +59,12 @@ async function tokenRequest(params,previous){
   const body=new URLSearchParams({client_id:process.env.GOOGLE_CLIENT_ID,client_secret:process.env.GOOGLE_CLIENT_SECRET,...params});
   return normalizedTokens(await requestJson('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}),previous);
 }
+/** Växlar Googles kortlivade auktoriseringskod mot token på servern. */
 export async function exchangeGmailCode(code,origin){
   if(typeof code!=='string'||!code||code.length>4096)throw fail('Saknar Googles engångskod.','invalid_code',400);
   return tokenRequest({grant_type:'authorization_code',code,redirect_uri:callback(origin)});
 }
+/** Begär en ny access token med lagrad refresh token när den tidigare har gått ut. */
 export async function refreshGmailTokens(tokens){
   if(!tokens?.refresh_token)throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
   return tokenRequest({grant_type:'refresh_token',refresh_token:tokens.refresh_token},tokens);
@@ -69,6 +79,7 @@ async function apiRequest(path,tokens){
     return request();
   }
 }
+/** Bekräftar att användaren verkligen godkänt företagets konfigurerade Gmail-konto. */
 export async function gmailProfile(tokens){
   const profile=await apiRequest('/profile',tokens);
   if(typeof profile.emailAddress!=='string'||profile.emailAddress.toLowerCase()!==gmailAccount())throw fail(`Välj företagets Gmail-konto: ${gmailAccount()}.`,'account_mismatch');
@@ -114,7 +125,11 @@ function attachmentMime(part){
 }
 // This collects potential originals for human review, never records a debt or a payment.
 // It deliberately does not claim OCR: scans and PDF fields must be reviewed in the UI.
-/** @param {any} tokens @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string}} options */
+/**
+ * Hämtar bilagor som originalunderlag för efterföljande tolkning och granskning.
+ * @param {any} tokens
+ * @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string}} options
+ */
 export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken=''}={}){
   requireConfig();
   if(!Number.isInteger(maxMessages)||maxMessages<1||maxMessages>100)throw fail('Välj mellan 1 och 100 mejl per hämtning.','invalid_limit',400);

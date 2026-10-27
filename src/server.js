@@ -1,3 +1,10 @@
+/**
+ * MG FAKTURAKOLL – SERVER / API
+ * ANSVAR: Tar emot HTTP-anrop från gränssnittet, kontrollerar session och behörighet, skickar arbetet vidare till databas- och integrationsmodulerna samt svarar med JSON. Även schemalagd synkronisering startas här.
+ * FLÖDE: Webbläsare → server.js → db.js / gmail.js / bank.js → JSON till webbläsaren.
+ * LÄS VIDARE: docs/KODGUIDE.md för genomgång av moduler och funktioner.
+ */
+
 import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
@@ -46,6 +53,7 @@ async function readBody(req){
 function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
 // Local OS access represents one company administrator. HTTPS requires login.
 // Anonymous sessions can bind a browser, but never authorize public bank data.
+/** Skapar eller återanvänder webbläsarsessionen som binder OAuth- och bankreturer till rätt användare. Detta är inte samma sak som bankens egen inloggning. */
 function ensureBrowserSession(req,res){
   const existing=cookies(req).mg_session;
   const found=existing&&db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(digest(existing),Date.now());
@@ -64,6 +72,7 @@ function ensureBrowserSession(req,res){
   res.setHeader('Set-Cookie',sessionCookie(session,check.secure));
 }
 const loginAttempts=new Map();
+/** Kontrollerar varifrån ändringsanropet kommer för att motverka CSRF och otillåtna webbplatser. */
 function checkOrigin(req){
   const origin=req.headers.origin;
   if(origin!==check.origin)throw bad(403,'Begäran måste komma från MG:s egen hemsida');
@@ -145,6 +154,7 @@ function gmailStatus(){
   return {configured:isGmailConfigured(),email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&interval?new Date(Math.max(Date.now(),lastAttempt+interval*60000)).toISOString():null,syncing:gmailSyncing,counts:imports,connection};
 }
 let gmailSyncing=false,bankSyncing=new Set();
+/** Förnyar Gmail-behörighet vid behov och laddar ned nya fakturaunderlag från företagets konto. */
 async function syncGmail(req=null){
   if(gmailSyncing)throw bad(409,'En Gmail-hämtning pågår redan');
   const connection=db.prepare('SELECT * FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
@@ -206,6 +216,7 @@ async function verifyBankSession(connection){
   const data=await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id));
   if(data.status!=='AUTHORIZED'||!Array.isArray(data.accounts)||!data.accounts.includes(connection.selected_account_uid))throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
 }
+/** Hämtar bankhändelser för vald anslutning, kontrollerar bankens svar och sparar endast giltiga poster med dubblettskydd. */
 async function syncBank(connection,{account_uid,date_from,date_to}={},operationLocked=false){
   if(!operationLocked&&bankSyncing.has(connection.id))throw bad(409,'En bankåtgärd pågår redan');
   if(!connection.owner||!connection.selected_account_uid)throw bad(409,'Välj först ett godkänt företagskonto');
@@ -245,6 +256,7 @@ async function syncBank(connection,{account_uid,date_from,date_to}={},operationL
 const schedulerState={running:false,last_run:'',last_error:''};
 const backgroundAttempts=new Map();
 function utcTimestamp(value){return Date.parse(value.includes('T')?value:value.replace(' ','T')+'Z')||0;}
+/** Kontrollerar om inställda synkroniseringsjobb är förfallna. Jobben körs bara medan denna Node-server kör. */
 export async function runScheduledSync(){
   const settings=getSettings(db),interval=settings.sync_interval_minutes,gmailInterval=settings.gmail_sync_interval_minutes;
   if((!interval&&!gmailInterval)||schedulerState.running)return;
@@ -266,6 +278,7 @@ export async function runScheduledSync(){
     schedulerState.last_run=new Date().toISOString();
   }finally{schedulerState.running=false;}
 }
+/** Huvudroutern: matchar HTTP-metod och URL, kontrollerar åtkomst och anropar rätt modul. */
 async function route(req,res){
   // The listener remains loopback-only; public HTTPS uses a secured reverse proxy.
   const hostname=new URL('http://'+req.headers.host).hostname;
