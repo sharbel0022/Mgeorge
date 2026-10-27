@@ -1,0 +1,1121 @@
+diff --git a/.openai/hosting.json b/.openai/hosting.json
+index afc8c59..ccd317b 100644
+--- a/.openai/hosting.json
++++ b/.openai/hosting.json
+@@ -1,5 +1,6 @@
+ {
+   "d1": "DB",
+   "r2": "BUCKET",
++  "capabilities": ["mcp"],
+   "project_id": "appgprj_6adf2f7f7e848191b64192161886b528"
+ }
+diff --git a/app/api/bank/auto-sync/route.ts b/app/api/bank/auto-sync/route.ts
+new file mode 100644
+index 0000000..21bf12b
+--- /dev/null
++++ b/app/api/bank/auto-sync/route.ts
+@@ -0,0 +1,5 @@
++import { automaticSync, bankFailure } from '@/lib/banking/service';
++export const dynamic = 'force-dynamic';
++export async function POST(request: Request) {
++  try { return await automaticSync(request); } catch (error) { return bankFailure(error); }
++}
+diff --git a/app/api/bank/automatic/route.ts b/app/api/bank/automatic/route.ts
+new file mode 100644
+index 0000000..f308e9f
+--- /dev/null
++++ b/app/api/bank/automatic/route.ts
+@@ -0,0 +1,5 @@
++import { setAutomaticSync, bankFailure } from '@/lib/banking/service';
++export const dynamic = 'force-dynamic';
++export async function POST(request: Request) {
++  try { return await setAutomaticSync(request); } catch (error) { return bankFailure(error); }
++}
+diff --git a/app/dashboard.tsx b/app/dashboard.tsx
+index 1ae7c65..9c54d21 100644
+--- a/app/dashboard.tsx
++++ b/app/dashboard.tsx
+@@ -3,6 +3,7 @@ import {useCallback,useEffect,useMemo,useRef,useState,type ReactNode,type FormEv
+ import {LayoutDashboard,ArrowUpRight,ArrowDownLeft,Landmark,FileText,Upload,Plus,Search,ChevronRight,ChevronDown,Check,CheckCheck,CheckCircle2,Clock3,AlertCircle,ArrowRight,ArrowLeft,Download,Mail,Settings,History,Link2,Unlink,RefreshCw,X,ShieldCheck,HelpCircle,Users,Paperclip,FileUp,MoreHorizontal,Split,ExternalLink,Wallet,ReceiptText,Menu,Building2,LogIn,Copy,Undo2,Inbox,ChevronLeft} from 'lucide-react';
+ import {emptyState,demoState,applyCommand,balance,paid,credited,available,invoiceStatus,suggestions,money,parseMoney,today,uid,type State,type Invoice,type Transaction,type Command} from '@/lib/domain';
+ import {parseCSV,guessMapping,mapCSV,parseCAMT,sha256,readInvoiceFile,extractInvoiceText,downloadFile,csvCell,type Mapping,type BankRow} from '@/lib/imports';
++import {useBankRefresh} from '@/components/use-bank-refresh';
+ 
+ type View='overview'|'receivable'|'payable'|'bank'|'imports'|'contacts'|'history'|'settings';
+ type Modal={kind:string;id?:string;invoiceId?:string;transactionId?:string;direction?:string;action?:Command;title?:string;text?:string};
+@@ -25,8 +26,9 @@ export default function Dashboard({initialView='overview',openBankImport=false}:
+  const [state,setState]=useState<State>(emptyState),[revision,setRevision]=useState(0),[view,setView]=useState<View>(initialView),[modal,setModal]=useState<Modal|null>(()=>openBankImport?{kind:'bankimport'}:null);
+  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[toast,setToast]=useState(''),[signedIn,setSignedIn]=useState(false),[demo,setDemo]=useState(false),[audit,setAudit]=useState<any[]>([]),[search,setSearch]=useState(''),[filter,setFilter]=useState('all'),[navOpen,setNavOpen]=useState(false),[loadedAt,setLoadedAt]=useState('');
+  const operation=useRef(false),loadVersion=useRef(0),real=useRef<{state:State;revision:number;audit:any[]}|null>(null);
+- const load=useCallback(async()=>{const version=++loadVersion.current;setLoading(true);try{const res=await fetch('/api/state',{cache:'no-store'}),data:any=await res.json();if(version!==loadVersion.current)return;if(!res.ok){if(res.status===401){setSignedIn(false);setError('');return;}throw new Error(data.error??'Kunde inte hämta dina uppgifter.');}setState(data.state);setRevision(data.revision);setAudit(data.audit??[]);setSignedIn(true);setError('');setLoadedAt(new Date().toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}));}catch(e){setError(messageOf(e));}finally{setLoading(false);}},[]);
++ const load=useCallback(async(silent=false)=>{const version=++loadVersion.current;if(!silent)setLoading(true);try{const res=await fetch('/api/state',{cache:'no-store'}),data:any=await res.json();if(version!==loadVersion.current)return;if(!res.ok){if(res.status===401){setSignedIn(false);setError('');return;}throw new Error(data.error??'Kunde inte hämta dina uppgifter.');}setState(data.state);setRevision(data.revision);setAudit(data.audit??[]);setSignedIn(true);setError('');setLoadedAt(new Date().toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}));}catch(e){setError(messageOf(e));}finally{if(!silent)setLoading(false);}},[]);
+  useEffect(()=>{void load();},[load]);useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(''),6000);return()=>clearTimeout(t);},[toast]);
++ useBankRefresh(signedIn&&!demo,busy||loading||!!modal,()=>{void load(true);});
+  function navigate(v:View){setView(v);setFilter('all');setSearch('');setNavOpen(false);}
+  const save:Save=async command=>{if(operation.current)return false;if(!signedIn&&!demo){setError('Logga in med ChatGPT för att spara dina uppgifter. Du kan också prova demoläget.');return false;}operation.current=true;setBusy(true);setError('');try{
+   if(demo){const result=applyCommand(state,command);setState(result.state);setAudit(a=>[{id:uid(),action:command.type,detail:JSON.stringify({message:result.message,command}),created_at:new Date().toISOString()},...a]);setToast(result.message+' · endast i demo');}
+diff --git a/app/mcp/route.ts b/app/mcp/route.ts
+new file mode 100644
+index 0000000..b4aa631
+--- /dev/null
++++ b/app/mcp/route.ts
+@@ -0,0 +1,18 @@
++import { bankRpc } from '@/lib/banking/mcp';
++export const dynamic = 'force-dynamic';
++export async function POST(request: Request) {
++  const reader = request.body?.getReader();
++  if (!reader) return new Response('JSON required', { status: 400 });
++  let text = '', bytes = 0; const decoder = new TextDecoder();
++  try {
++    while (true) {
++      const part = await reader.read(); if (part.done) break;
++      bytes += part.value.byteLength;
++      if (bytes > 16_384) { await reader.cancel(); return new Response('Request too large', { status: 413 }); }
++      text += decoder.decode(part.value, { stream: true });
++    }
++    text += decoder.decode();
++    let body: unknown; try { body = JSON.parse(text); } catch { return new Response('Invalid JSON', { status: 400 }); }
++    return await bankRpc(body);
++  } finally { reader.releaseLock(); }
++}
+diff --git a/components/bank-connection.tsx b/components/bank-connection.tsx
+index de1ae5d..5819079 100644
+--- a/components/bank-connection.tsx
++++ b/components/bank-connection.tsx
+@@ -3,11 +3,13 @@
+ import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
+ import { AlertCircle, ArrowRight, CheckCircle2, ChevronDown, FileText, Landmark, LogIn, RefreshCw, ShieldCheck, Unlink, Wallet } from "lucide-react";
+ import { confirmedBankConsent } from "@/lib/banking/status-view";
++import { useBankRefresh } from './use-bank-refresh';
+ 
+ type BankAccount = { uid: string; label: string; currency: string; selected: boolean; importable: boolean };
+ type BankConnection = { id: string; bankName: string; environment: "SANDBOX" | "PRODUCTION"; status: string; validUntil: string; lastSyncedAt: string | null; lastError: string | null; accounts: BankAccount[]; dateFrom: string };
+ type BankStatus = {
+   configured: boolean; storageReady: boolean;
++  automatic?: { enabled: boolean; intervalHours: number; lastAttemptAt: string | null; nextAttemptAt: string | null };
+   activation?: { configured: boolean; message: string };
+   application: null | { environment: "SANDBOX" | "PRODUCTION"; active: boolean };
+   connection: BankConnection | null;
+@@ -92,6 +94,7 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
+   const configured = !!status?.configured && !!status.storageReady;
+   const sandbox = (connection?.environment || status?.application?.environment) === "SANDBOX";
+   const disabled = busy || loading;
++  useBankRefresh(!demo && connected && selected.length > 0, busy || loading || accountUids.length !== selected.length || accountUids.some(id => !selected.includes(id)) || dateFrom !== connection?.dateFrom, () => { void loadStatus(); onDataChanged?.(); });
+   async function startConnection() {
+     if (!alive.current || demoMode.current) return;
+     const available = await bankRequest<{ banks: { name: string; country: string }[] }>("/api/bank/banks");
+@@ -131,6 +134,7 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
+         <button className="btn primary bank-primary" disabled={!accountUids.length} type="submit"><RefreshCw size={18} className={busy ? "spin" : ""} />{busy ? "Hämtar bankhändelser…" : selected.length ? "Uppdatera bankhändelser" : "Anslut valt konto och hämta"}</button>
+       </fieldset></form>}
+       {connection && <><dl className="bank-facts"><div><dt>Senast uppdaterad</dt><dd>{dateLabel(connection.lastSyncedAt)}</dd></div><div><dt>Medgivandet gäller till</dt><dd>{dateLabel(connection.validUntil)}</dd></div></dl><button className="btn bank-primary" disabled={disabled || !configured} onClick={() => void run(async () => { const result = await bankRequest<{ message: string; remoteRevoked?: boolean }>("/api/bank/disconnect", "POST", {}); if (!alive.current || demoMode.current) return; if (result.remoteRevoked === false) { setNotice(result.message); await loadStatus(); return; } await startConnection(); })}><RefreshCw size={17} />Förnya anslutningen</button>{confirmDisconnect ? <div className="bank-confirm"><p>Koppla från banken? Tidigare importerade bankhändelser behålls.</p><button className="btn" disabled={disabled} onClick={() => setConfirmDisconnect(false)}>Avbryt</button><button className="btn bank-danger-button" disabled={disabled} onClick={() => void run(async () => { const result = await bankRequest<{ message: string }>("/api/bank/disconnect", "POST", {}); if (!alive.current || demoMode.current) return; setConfirmDisconnect(false); setNotice(result.message); await loadStatus(); })}>Ja, koppla från</button></div> : <button className="text-button bank-danger-link" disabled={disabled} onClick={() => setConfirmDisconnect(true)}><Unlink size={16} />Koppla från banken</button>}</>}
++      {connection && connected && selected.length > 0 && <div className="bank-spaced"><label className="bank-account"><input type="checkbox" checked={!!status?.automatic?.enabled} disabled={disabled} onChange={event => { const enabled = event.target.checked; void run(async () => { await bankRequest('/api/bank/automatic', 'POST', { enabled, connectionId: connection.id }); await loadStatus(); }); }} /><span><strong>Automatisk bankhämtning</strong><br />Nya bankhändelser hämtas var sjätte timme när funktionen är aktiverad.</span></label>{status?.automatic?.enabled && <p className="bank-help">Nästa hämtning: {status.automatic.nextAttemptAt ? dateLabel(status.automatic.nextAttemptAt) : 'Vid nästa automatiska kontroll'}. Bankens medgivande behöver fortfarande förnyas när det går ut.</p>}</div>}
+       <div className="bank-spaced">{manualAlternative}</div><p className="bank-fine-print"><ShieldCheck size={15} />Endast läsåtkomst. Inga betalningar utförs och inga BankID-koder eller banklösenord sparas.</p>
+     </div>}
+     {status?.lastRun && !demo && <section className="bank-last-run"><div className="bank-result-line"><CheckCircle2 size={19} /><div><strong>{status.lastRun.test ? "Testhämtningen är klar" : status.lastRun.imported + " nya bankhändelser"}</strong><p>{dateLabel(status.lastRun.createdAt)}</p></div></div>{!status.lastRun.test && <a className="text-button" href="/?view=bank">Visa bankhändelser<ArrowRight size={15} /></a>}{status.lastRun.warnings.length > 0 && <details className="bank-inline-details"><summary>Att kontrollera<ChevronDown size={16} /></summary><ul>{status.lastRun.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details>}</section>}
+diff --git a/components/use-bank-refresh.ts b/components/use-bank-refresh.ts
+new file mode 100644
+index 0000000..442f4d8
+--- /dev/null
++++ b/components/use-bank-refresh.ts
+@@ -0,0 +1,25 @@
++"use client";
++import { useEffect, useRef } from 'react';
++
++// The stored, owner-specific opt-in and six-hour due time are enforced by the
++// server. This also refreshes data written by the cloud task while a page is open.
++export function useBankRefresh(enabled: boolean, blocked: boolean, onComplete: () => void) {
++  const latest = useRef({ blocked, onComplete }); latest.current = { blocked, onComplete };
++  useEffect(() => {
++    if (!enabled) return;
++    let stopped = false, pending = false, lastCheck = 0;
++    async function refresh() {
++      if (stopped || pending || latest.current.blocked || document.visibilityState !== 'visible' || Date.now() - lastCheck < 60_000) return;
++      pending = true; lastCheck = Date.now();
++      try {
++        await fetch('/api/bank/auto-sync', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}', cache: 'no-store' });
++        if (!stopped && !latest.current.blocked) latest.current.onComplete();
++      } catch { /* A later check retries; saved records remain visible. */ }
++      finally { pending = false; }
++    }
++    void refresh();
++    const timer = window.setInterval(refresh, 5 * 60_000);
++    window.addEventListener('focus', refresh); document.addEventListener('visibilitychange', refresh);
++    return () => { stopped = true; window.clearInterval(timer); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
++  }, [enabled]);
++}
+diff --git a/db/schema.ts b/db/schema.ts
+index c02f74c..26d58c0 100644
+--- a/db/schema.ts
++++ b/db/schema.ts
+@@ -24,6 +24,8 @@ export const bankConnections = sqliteTable('bank_connections', {
+   selectedAccounts: text('selected_accounts').notNull().default('[]'), validUntil: text('valid_until').notNull(),
+   dateFrom: text('date_from').notNull(), status: text('status').notNull(), lastSyncedAt: text('last_synced_at'),
+   lastError: text('last_error'), createdAt: text('created_at').notNull(), updatedAt: text('updated_at').notNull(),
++  autoSyncEnabled: integer('auto_sync_enabled').notNull().default(0),
++  autoLastAttemptAt: text('auto_last_attempt_at'), autoNextAt: text('auto_next_at'),
+ });
+ export const bankAuthFlows = sqliteTable('bank_auth_flows', {
+   stateHash: text('state_hash').primaryKey(), owner: text('owner').notNull(), cookieHash: text('cookie_hash').notNull(),
+diff --git a/drizzle/0002_brief_chronomancer.sql b/drizzle/0002_brief_chronomancer.sql
+new file mode 100644
+index 0000000..fc79698
+--- /dev/null
++++ b/drizzle/0002_brief_chronomancer.sql
+@@ -0,0 +1,3 @@
++ALTER TABLE `bank_connections` ADD `auto_sync_enabled` integer DEFAULT 0 NOT NULL;--> statement-breakpoint
++ALTER TABLE `bank_connections` ADD `auto_last_attempt_at` text;--> statement-breakpoint
++ALTER TABLE `bank_connections` ADD `auto_next_at` text;
+\ No newline at end of file
+diff --git a/drizzle/meta/0002_snapshot.json b/drizzle/meta/0002_snapshot.json
+new file mode 100644
+index 0000000..a114fd3
+--- /dev/null
++++ b/drizzle/meta/0002_snapshot.json
+@@ -0,0 +1,607 @@
++{
++  "version": "6",
++  "dialect": "sqlite",
++  "id": "88b23e5e-81c4-4086-8bad-a9ddb64b4eae",
++  "prevId": "b8fbb240-142e-4354-bda3-1bd83aa1d16b",
++  "tables": {
++    "audit_events": {
++      "name": "audit_events",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "revision": {
++          "name": "revision",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "action": {
++          "name": "action",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "detail": {
++          "name": "detail",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "audit_owner_revision": {
++          "name": "audit_owner_revision",
++          "columns": [
++            "owner",
++            "revision"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_applications": {
++      "name": "bank_applications",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "application_id": {
++          "name": "application_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_key": {
++          "name": "encrypted_key",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "metadata": {
++          "name": "metadata",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "generation": {
++          "name": "generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_auth_flows": {
++      "name": "bank_auth_flows",
++      "columns": {
++        "state_hash": {
++          "name": "state_hash",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "cookie_hash": {
++          "name": "cookie_hash",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "app_generation": {
++          "name": "app_generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "bank_name": {
++          "name": "bank_name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "country": {
++          "name": "country",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "environment": {
++          "name": "environment",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "redirect_uri": {
++          "name": "redirect_uri",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "date_from": {
++          "name": "date_from",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_flow_owner": {
++          "name": "bank_flow_owner",
++          "columns": [
++            "owner"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_connections": {
++      "name": "bank_connections",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "app_generation": {
++          "name": "app_generation",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "environment": {
++          "name": "environment",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "bank_name": {
++          "name": "bank_name",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "country": {
++          "name": "country",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_session": {
++          "name": "encrypted_session",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "encrypted_accounts": {
++          "name": "encrypted_accounts",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "selected_accounts": {
++          "name": "selected_accounts",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": "'[]'"
++        },
++        "valid_until": {
++          "name": "valid_until",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "date_from": {
++          "name": "date_from",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "status": {
++          "name": "status",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "last_synced_at": {
++          "name": "last_synced_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "last_error": {
++          "name": "last_error",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "auto_sync_enabled": {
++          "name": "auto_sync_enabled",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "auto_last_attempt_at": {
++          "name": "auto_last_attempt_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        },
++        "auto_next_at": {
++          "name": "auto_next_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": false,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_connections_owner_unique": {
++          "name": "bank_connections_owner_unique",
++          "columns": [
++            "owner"
++          ],
++          "isUnique": true
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_locks": {
++      "name": "bank_locks",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "token": {
++          "name": "token",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "expires_at": {
++          "name": "expires_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "bank_sync_runs": {
++      "name": "bank_sync_runs",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "connection_id": {
++          "name": "connection_id",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "imported": {
++          "name": "imported",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "skipped": {
++          "name": "skipped",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "warnings": {
++          "name": "warnings",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "test": {
++          "name": "test",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "bank_run_owner_created": {
++          "name": "bank_run_owner_created",
++          "columns": [
++            "owner",
++            "created_at"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "documents": {
++      "name": "documents",
++      "columns": {
++        "id": {
++          "name": "id",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "filename": {
++          "name": "filename",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "mime": {
++          "name": "mime",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "size": {
++          "name": "size",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "sha256": {
++          "name": "sha256",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "created_at": {
++          "name": "created_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {
++        "documents_owner_hash": {
++          "name": "documents_owner_hash",
++          "columns": [
++            "owner",
++            "sha256"
++          ],
++          "isUnique": false
++        }
++      },
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    },
++    "workspaces": {
++      "name": "workspaces",
++      "columns": {
++        "owner": {
++          "name": "owner",
++          "type": "text",
++          "primaryKey": true,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "revision": {
++          "name": "revision",
++          "type": "integer",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false,
++          "default": 0
++        },
++        "payload": {
++          "name": "payload",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        },
++        "updated_at": {
++          "name": "updated_at",
++          "type": "text",
++          "primaryKey": false,
++          "notNull": true,
++          "autoincrement": false
++        }
++      },
++      "indexes": {},
++      "foreignKeys": {},
++      "compositePrimaryKeys": {},
++      "uniqueConstraints": {},
++      "checkConstraints": {}
++    }
++  },
++  "views": {},
++  "enums": {},
++  "_meta": {
++    "schemas": {},
++    "tables": {},
++    "columns": {}
++  },
++  "internal": {
++    "indexes": {}
++  }
++}
+\ No newline at end of file
+diff --git a/drizzle/meta/_journal.json b/drizzle/meta/_journal.json
+index 0db6909..951f1ea 100644
+--- a/drizzle/meta/_journal.json
++++ b/drizzle/meta/_journal.json
+@@ -15,6 +15,13 @@
+       "when": 1793020915955,
+       "tag": "0001_sudden_whirlwind",
+       "breakpoints": true
++    },
++    {
++      "idx": 2,
++      "version": "6",
++      "when": 1793130978301,
++      "tag": "0002_brief_chronomancer",
++      "breakpoints": true
+     }
+   ]
+ }
+\ No newline at end of file
+diff --git a/lib/banking/mcp.ts b/lib/banking/mcp.ts
+new file mode 100644
+index 0000000..04e4001
+--- /dev/null
++++ b/lib/banking/mcp.ts
+@@ -0,0 +1,36 @@
++import { automaticSync, automaticSyncStatus, bankFailure } from './service';
++
++const tools = [
++  { name: 'bank_auto_sync_status', title: 'Status för automatisk bankhämtning', description: 'Läser endast den autentiserade användarens anslutnings- och hämtningsstatus, utan transaktioner eller kontonummer.',
++    inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: true } },
++  { name: 'bank_auto_sync', title: 'Hämta nya bankhändelser', description: 'Hämtar bokförda bankhändelser till den autentiserade användarens privata fakturakoll när automatisk hämtning är aktiverad och förfallen. Använder endast redan valt företagskonto och befintligt bankmedgivande. Matchar inga fakturor och utför inga betalningar.',
++    inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true } },
++];
++const versions = ['2026-07-28', '2025-03-26'];
++const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
++
++export async function bankRpc(body: unknown): Promise<Response> {
++  const input = object(body) ? body : {}, id = typeof input.id === 'string' || typeof input.id === 'number' ? input.id : null;
++  const result = (value: unknown) => Response.json({ jsonrpc: '2.0', id, result: value }, { headers: { 'Cache-Control': 'private, no-store' } });
++  const error = (code: number, message: string) => Response.json({ jsonrpc: '2.0', id, error: { code, message } }, { headers: { 'Cache-Control': 'private, no-store' } });
++  if (input.jsonrpc !== '2.0' || typeof input.method !== 'string') return error(-32600, 'Invalid request');
++  if (input.method === 'server/discover') return result({ supportedVersions: versions, capabilities: { tools: {} }, serverInfo: { name: 'mg-fakturakoll', version: '1.0.0' } });
++  if (input.method === 'initialize') {
++    const wanted = object(input.params) ? input.params.protocolVersion : null;
++    return result({ protocolVersion: typeof wanted === 'string' && versions.includes(wanted) ? wanted : versions[0], capabilities: { tools: {} }, serverInfo: { name: 'mg-fakturakoll', version: '1.0.0' } });
++  }
++  if (input.method === 'notifications/initialized') return new Response(null, { status: 202 });
++  if (input.method === 'tools/list') return result({ tools });
++  if (input.method !== 'tools/call') return error(-32601, 'Method not found');
++  const params = object(input.params) ? input.params : null;
++  if (!params || !tools.some(tool => tool.name === params.name)) return error(-32602, 'Unknown tool');
++  const args = params.arguments ?? {};
++  // Caller identity comes only from Sites OAuth headers. No owner, account,
++  // credential, request-context or force-refresh argument is accepted.
++  if (!object(args) || Object.keys(args).length) return error(-32602, 'This tool accepts no arguments');
++  let response: Response;
++  try { response = params.name === 'bank_auto_sync' ? await automaticSync() : await automaticSyncStatus(); }
++  catch (cause) { response = bankFailure(cause); }
++  const data = await response.json();
++  return result({ content: [{ type: 'text', text: JSON.stringify(data) }], structuredContent: data, ...(response.ok ? {} : { isError: true }) });
++}
+diff --git a/lib/banking/service.ts b/lib/banking/service.ts
+index ce9818b..156ee9e 100644
+--- a/lib/banking/service.ts
++++ b/lib/banking/service.ts
+@@ -3,7 +3,7 @@ import { applyCommand, canonicalBankAccount, emptyState, now, today, uid, validD
+ import {
+   ProviderError, getApplication, listBusinessBanks, startAuth, createSession,
+   getSession, deleteSession, getTransactions,
+-  type ProviderAccount, type ProviderApplication,
++  type ProviderAccount, type ProviderApplication, type ProviderPsu,
+ } from './enable-banking';
+ import { normalizeTransactions, stableAccountKey } from './transactions';
+ import {
+@@ -18,6 +18,27 @@ const COOKIE = '__Secure-mg-bank-flow';
+ const FLOW_AGE_MS = 15 * 60_000;
+ const MAX_ROWS = 1000;
+ const MAX_PAGES = 25;
++const stockholmClock = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
++function clockParts(at: number) { return Object.fromEntries(stockholmClock.formatToParts(at).filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)])); }
++function stockholmOffset(at: number) {
++  const p = clockParts(at);
++  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(at / 1000) * 1000;
++}
++export function nextAutomaticAttempt(at = Date.now()): string {
++  const p = clockParts(at), midnight = Date.UTC(p.year, p.month - 1, p.day);
++  for (let day = 0; day < 2; day++) for (const hour of [3, 9, 15, 21]) {
++    const wallTime = midnight + day * 86400_000 + hour * 3600_000 + 6 * 60_000;
++    let instant = wallTime - stockholmOffset(at);
++    for (let pass = 0; pass < 3; pass++) instant = wallTime - stockholmOffset(instant);
++    if (instant > at) return new Date(instant).toISOString();
++  }
++  throw new Error('BANK_SCHEDULE_UNAVAILABLE');
++}
++function automaticDueAt(conn: BankConnectionRow): string | null {
++  // Re-anchor prior interval-based reservations to the fixed cloud schedule.
++  // Browser checks cannot shift the next cloud run several hours forward.
++  return conn.auto_next_at && conn.auto_last_attempt_at ? nextAutomaticAttempt(Date.parse(conn.auto_last_attempt_at)) : null;
++}
+ 
+ export class BankError extends Error {
+   constructor(message: string, public status = 400) { super(message); }
+@@ -104,7 +125,8 @@ export async function status(request: Request): Promise<Response> {
+   return response({
+     storageReady: storageReady(), configured: Boolean(app), activation: configurationStatus(),
+     application: app ? safeApplication(metadata(app)) : null,
+-    redirectUrl: BANK_REDIRECT_URL, syncMode: 'manual',
++    redirectUrl: BANK_REDIRECT_URL, syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',
++    automatic: { enabled: conn?.auto_sync_enabled === 1, intervalHours: 6, lastAttemptAt: conn?.auto_last_attempt_at ?? null, nextAttemptAt: conn ? automaticDueAt(conn) : null },
+     connection: conn ? {
+       id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: conn.encrypted_session && (!app || conn.app_generation !== app.generation) ? 'reauth_required' : storedStatus(conn),
+       validUntil: conn.valid_until, lastSyncedAt: conn.last_synced_at, lastError: conn.last_error,
+@@ -224,7 +246,7 @@ export async function callback(request: Request): Promise<Response> {
+         if (existing?.encrypted_session) throw new BankError('Det finns redan en aktiv bankanslutning.');
+         await db().batch([
+           db().prepare(`INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at)
+-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,created_at=excluded.created_at,updated_at=excluded.updated_at`)
++            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,auto_next_at=NULL,auto_last_attempt_at=NULL,created_at=excluded.created_at,updated_at=excluded.updated_at`)
+             .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', new Date(expiry).toISOString(), flow.date_from, 'connected', at, at),
+           db().prepare("UPDATE bank_auth_flows SET status='completed' WHERE state_hash=? AND owner=?").bind(stateHash, owner),
+         ]);
+@@ -261,7 +283,7 @@ export async function disconnect(request: Request): Promise<Response> {
+       // Previously browser-uploaded keys are compromised and must never be used,
+       // even to revoke a session. Detach locally and state the revocation limit.
+       await db().batch([
+-        db().prepare("UPDATE bank_connections SET status='disconnected',encrypted_session='',encrypted_accounts='',selected_accounts='[]',last_error=NULL,updated_at=? WHERE owner=? AND id=?").bind(now(), user.userId, conn.id),
++        db().prepare("UPDATE bank_connections SET status='disconnected',auto_sync_enabled=0,auto_next_at=NULL,encrypted_session='',encrypted_accounts='',selected_accounts='[]',last_error=NULL,updated_at=? WHERE owner=? AND id=?").bind(now(), user.userId, conn.id),
+         db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
+         db().prepare("UPDATE bank_applications SET encrypted_key='' WHERE owner=?").bind(user.userId),
+       ]);
+@@ -277,7 +299,7 @@ export async function disconnect(request: Request): Promise<Response> {
+       if (!(error instanceof ProviderError) || error.code !== 'BANK_RECONNECT_REQUIRED') throw error;
+     }
+     await db().batch([
+-      db().prepare("UPDATE bank_connections SET status='disconnected',encrypted_session='',encrypted_accounts='',selected_accounts='[]',last_error=NULL,updated_at=? WHERE owner=? AND id=?").bind(now(), user.userId, conn.id),
++      db().prepare("UPDATE bank_connections SET status='disconnected',auto_sync_enabled=0,auto_next_at=NULL,encrypted_session='',encrypted_accounts='',selected_accounts='[]',last_error=NULL,updated_at=? WHERE owner=? AND id=?").bind(now(), user.userId, conn.id),
+       db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
+     ]);
+     return response({ message: 'Bankanslutningen är återkallad. Tidigare importerade bankhändelser finns kvar.' });
+@@ -293,12 +315,49 @@ function psuHeaders(request: Request) {
+ 
+ export async function sync(request: Request): Promise<Response> {
+   const user = await identity(request);
++  return synchronizeOwner(user.userId, { psu: psuHeaders(request) });
++}
++
++export async function setAutomaticSync(request: Request): Promise<Response> {
++  const user = await identity(request), body = await jsonBody(request);
++  if (typeof body.enabled !== 'boolean' || typeof body.connectionId !== 'string') throw new BankError('Välj om automatisk hämtning ska vara på eller av.');
++  return withBankLock(user.userId, async () => {
++    const conn = await connection(user.userId);
++    if (!conn || conn.id !== body.connectionId || (body.enabled && (storedStatus(conn) !== 'connected' || !JSON.parse(conn.selected_accounts).length))) throw new BankError('Anslut och välj företagets konto först.');
++    await db().prepare('UPDATE bank_connections SET auto_sync_enabled=?,auto_next_at=NULL,updated_at=? WHERE owner=? AND id=?').bind(body.enabled ? 1 : 0, now(), user.userId, conn.id).run();
++    return response({ enabled: body.enabled, message: body.enabled ? 'Automatisk bankhämtning är aktiverad.' : 'Automatisk bankhämtning är pausad.' });
++  });
++}
++
++// Browser calls retain their real PSU context. A hosted task has no active PSU:
++// never send the task runner's IP or browser identity to the bank as the user's.
++export async function automaticSync(request?: Request): Promise<Response> {
++  const user = await identity(request);
++  return synchronizeOwner(user.userId, { automatic: true, psu: request ? psuHeaders(request) : undefined });
++}
++
++export async function automaticSyncStatus(): Promise<Response> {
++  const user = await identity(), conn = await connection(user.userId);
++  return response({ enabled: conn?.auto_sync_enabled === 1, connected: !!conn && storedStatus(conn) === 'connected', intervalHours: 6,
++    lastSyncedAt: conn?.last_synced_at ?? null, lastAttemptAt: conn?.auto_last_attempt_at ?? null,
++    nextAttemptAt: conn ? automaticDueAt(conn) : null, lastError: conn?.last_error ?? null });
++}
++
++async function synchronizeOwner(owner: string, options: { automatic?: boolean; psu?: ProviderPsu }): Promise<Response> {
++  const user = { userId: owner };
+   return withBankLock(user.userId, async () => {
+     const app = await application(user.userId), conn = await connection(user.userId);
++    if (options.automatic && (!conn || conn.auto_sync_enabled !== 1)) return response({ automatic: true, due: false, reason: 'disabled', imported: 0 });
+     if (!app || !conn || app.generation !== conn.app_generation || storedStatus(conn) !== 'connected') throw new BankError('En giltig bankanslutning behövs. Anslut banken igen.');
++    const nextAttempt = automaticDueAt(conn);
++    if (options.automatic && nextAttempt && Date.parse(nextAttempt) > Date.now()) return response({ automatic: true, due: false, reason: 'not_due', nextAttemptAt: nextAttempt, imported: 0 });
+     if (conn.last_synced_at && Date.now() - Date.parse(conn.last_synced_at) < 60_000) throw new BankError('Uppgifterna hämtades nyss. Vänta en minut innan nästa hämtning.', 429);
+     const selected: string[] = JSON.parse(conn.selected_accounts);
+     if (!selected.length) throw new BankError('Välj vilka konton du vill hämta först.');
++    // Reserve the next attempt before contacting the provider. Retries, multiple
++    // tabs and scheduled task replays cannot create an unbounded polling loop.
++    if (options.automatic) await db().prepare('UPDATE bank_connections SET auto_last_attempt_at=?,auto_next_at=? WHERE owner=? AND id=?')
++      .bind(now(), nextAutomaticAttempt(), user.userId, conn.id).run();
+     const config = await providerConfig(app), bankAccounts = await accounts(conn);
+     let needsReauthorization = false;
+     try {
+@@ -315,7 +374,9 @@ export async function sync(request: Request): Promise<Response> {
+       }
+       const rows: Record<string, unknown>[] = [], warnings = new Set<string>();
+       let skipped = 0, rawCount = 0, pageCount = 0;
+-      const to = today(), from = conn.date_from;
++      const to = today();
++      const overlap = conn.last_synced_at ? new Date(Date.parse(conn.last_synced_at.slice(0, 10) + 'T12:00:00Z') - 3 * 86400_000).toISOString().slice(0, 10) : conn.date_from;
++      const from = options.automatic && overlap > conn.date_from ? overlap : conn.date_from;
+       for (const id of selected) {
+         const account = bankAccounts.find(item => item.uid === id);
+         const canonicalKey = account && stableAccountKey(account, { name: conn.bank_name, country: conn.country });
+@@ -327,7 +388,7 @@ export async function sync(request: Request): Promise<Response> {
+         const seen = new Set<string>();
+         do {
+           if (++pageCount > MAX_PAGES) throw new BankError('Perioden innehåller för många sidor. Välj ett senare startdatum och hämta igen. Inga nya bankhändelser har sparats.');
+-          const page = await getTransactions(config, id, { dateFrom: from, dateTo: to, continuationKey, psu: psuHeaders(request) });
++          const page = await getTransactions(config, id, { dateFrom: from, dateTo: to, continuationKey, psu: options.psu });
+           if (!Array.isArray(page.transactions)) throw new BankError('Banken lämnade ett oväntat svar. Inga nya bankhändelser har sparats.');
+           rawCount += page.transactions.length;
+           if (rawCount > MAX_ROWS) throw new BankError('Perioden innehåller fler än 1 000 bankhändelser. Välj ett senare startdatum och hämta igen. Inga nya bankhändelser har sparats.');
+diff --git a/lib/banking/store.ts b/lib/banking/store.ts
+index e8ed1bc..43ed928 100644
+--- a/lib/banking/store.ts
++++ b/lib/banking/store.ts
+@@ -13,6 +13,7 @@ export type BankConnectionRow = {
+   bank_name: string; country: string; encrypted_session: string; encrypted_accounts: string;
+   selected_accounts: string; valid_until: string; date_from: string; status: string;
+   last_synced_at: string | null; last_error: string | null; created_at: string; updated_at: string;
++  auto_sync_enabled: number; auto_last_attempt_at: string | null; auto_next_at: string | null;
+ };
+ export type BankFlowRow = {
+   state_hash: string; owner: string; cookie_hash: string; app_generation: string;
+diff --git a/tests/banking-security.test.mjs b/tests/banking-security.test.mjs
+index b5f2a16..2c15870 100644
+--- a/tests/banking-security.test.mjs
++++ b/tests/banking-security.test.mjs
+@@ -63,6 +63,7 @@ async function fixture(t, environment = 'PRODUCTION') {
+   const sql = new DatabaseSync(':memory:');
+   sql.exec(source('../drizzle/0000_confused_umar.sql'));
+   sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));
++  sql.exec(source('../drizzle/0002_brief_chronomancer.sql'));
+   const f = { sql, owner: 'owner-alice', user: { userId: 'owner-alice' }, calls: [], provider: {}, env: {
+     BANK_DATA_ENCRYPTION_KEY: randomToken(), ENABLE_BANKING_APPLICATION_ID: appId,
+     ENABLE_BANKING_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',
+@@ -84,6 +85,7 @@ async function fixture(t, environment = 'PRODUCTION') {
+   const providerUrl = jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
+   const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig });
+   f.store = await import(storeUrl); f.service = await import(serviceUrl);
++  f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
+   f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
+   f.account = { uid: accountUid, name: 'Company account', currency: 'SEK', account_id: { iban: 'SE4550000000058398257466' } };
+   f.bank = { name: 'Swedbank', country: 'SE', psu_types: ['business'], maximum_consent_validity: 15552000 };
+@@ -146,6 +148,97 @@ test('hash-only company accounts can be selected and synchronized without duplic
+   assert.equal(f.workspace().state.transactions.length, 1);
+ });
+ 
++test('Automatic fetching is opt-in and rejects foreign connection IDs and cross-origin changes', async t => {
++  const f = await fixture(t); await f.seedApp(); const id = await f.seedConnection();
++  assert.equal((await (await f.service.automaticSync()).json()).reason, 'disabled');
++  assert.equal(f.calls.length, 0);
++  await assert.rejects(f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: 'foreign' })), /företagets konto/);
++  await assert.rejects(f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }, 'https://untrusted.invalid')), /ORIGIN_DENIED/);
++  assert.equal(f.connection().auto_sync_enabled, 0);
++  await f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }));
++  assert.equal((await (await f.service.automaticSyncStatus()).json()).enabled, true);
++});
++
++test('Hosted automatic sync uses no fabricated PSU context and replays cannot duplicate or refetch', async t => {
++  const f = await fixture(t); await f.seedApp(); const id = await f.seedConnection();
++  await f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }));
++  const call = { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'bank_auto_sync', arguments: {} } };
++  const first = await (await f.mcp.bankRpc(call)).json();
++  assert.equal(first.result.structuredContent.imported, 1);
++  assert.equal(f.calls.find(call => call.name === 'getTransactions').args[2].psu, undefined);
++  const before = f.calls.length;
++  const second = await (await f.mcp.bankRpc(call)).json();
++  assert.equal(second.result.structuredContent.reason, 'not_due'); assert.equal(f.calls.length, before);
++  assert.equal(f.workspace().state.transactions.length, 1);
++  assert.equal(f.connection().auto_next_at, f.service.nextAutomaticAttempt(Date.parse(f.connection().auto_last_attempt_at)));
++  f.sql.prepare('UPDATE bank_connections SET auto_next_at=?,auto_last_attempt_at=?,last_synced_at=?').run('2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z');
++  assert.equal((await (await f.service.automaticSync()).json()).imported, 0);
++  assert.equal(f.workspace().state.transactions.length, 1);
++});
++
++test('Automatic slots stay fixed in Stockholm time across jitter, browser checks and daylight-saving changes', async t => {
++  const f = await fixture(t);
++  const next = at => f.service.nextAutomaticAttempt(Date.parse(at));
++  assert.equal(next('2026-10-27T20:06:45Z'), '2026-10-28T02:06:00.000Z');
++  assert.equal(next('2026-10-27T22:59:00Z'), '2026-10-28T02:06:00.000Z');
++  assert.equal(next('2026-06-01T19:06:45Z'), '2026-06-02T01:06:00.000Z');
++  assert.equal(next('2026-03-28T20:06:45Z'), '2026-03-29T01:06:00.000Z');
++  assert.equal(next('2026-10-24T19:06:45Z'), '2026-10-25T02:06:00.000Z');
++});
++
++test('Automatic failure reserves its retry time, preserves data, and can be paused or disconnected', async t => {
++  const f = await fixture(t); await f.seedApp(); const id = await f.seedConnection();
++  await f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }));
++  f.provider.getTransactions = async () => { throw new ProviderError('BANK_RATE_LIMIT', 'För många förfrågningar', 429, true); };
++  await assert.rejects(f.service.automaticSync(), error => error.code === 'BANK_RATE_LIMIT');
++  assert.equal(f.connection().last_synced_at, null); assert.match(f.connection().last_error, /förfrågningar/);
++  const before = f.calls.length;
++  assert.equal((await (await f.service.automaticSync()).json()).reason, 'not_due'); assert.equal(f.calls.length, before);
++  assert.equal(count(f, 'workspaces'), 0);
++  await f.service.setAutomaticSync(post('automatic', { enabled: false, connectionId: id }));
++  assert.equal((await (await f.service.automaticSync()).json()).reason, 'disabled');
++  await f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }));
++  await f.service.disconnect(post('disconnect'));
++  assert.equal(f.connection().auto_sync_enabled, 0);
++  assert.equal((await (await f.service.automaticSync()).json()).reason, 'disabled');
++});
++
++test('Automatic catch-up overlaps the last successful fetch while preserving the chosen start date', async t => {
++  const f = await fixture(t); await f.seedApp(); const id = await f.seedConnection();
++  const daysAgo = n => new Date(Date.parse(today() + 'T12:00:00Z') - n * 86400000).toISOString().slice(0, 10);
++  f.sql.prepare('UPDATE bank_connections SET date_from=?,last_synced_at=?').run(daysAgo(29), daysAgo(2) + 'T12:00:00Z');
++  await f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }));
++  await f.service.automaticSync();
++  const options = f.calls.find(call => call.name === 'getTransactions').args[2];
++  assert.equal(options.dateFrom, daysAgo(5)); assert.equal(options.dateTo, today());
++  assert.equal(f.connection().date_from, daysAgo(29));
++});
++
++test('MCP supports discovery but never accepts an owner override or unauthenticated bank operation', async t => {
++  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
++  const list = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 1, method: 'tools/list' })).json();
++  assert.equal(list.result.tools.length, 2);
++  const override = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'bank_auto_sync', arguments: { owner: f.owner, force: true } } })).json();
++  assert.equal(override.error.code, -32602);
++  f.user = null;
++  const denied = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'bank_auto_sync', arguments: {} } })).json();
++  assert.equal(denied.result.isError, true); assert.match(denied.result.content[0].text, /Logga in/);
++  assert.equal(f.calls.length, 0);
++});
++
++test('MCP authentication selects only its caller workspace and browser auto-sync keeps genuine PSU context', async t => {
++  const f = await fixture(t); await f.seedApp(); const id = await f.seedConnection();
++  await f.seedApp('owner-bob'); await f.seedConnection('owner-bob');
++  await f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }));
++  f.user = { userId: 'owner-bob' };
++  assert.equal((await (await f.service.automaticSync()).json()).reason, 'disabled');
++  assert.equal(f.calls.length, 0);
++  f.user = { userId: f.owner };
++  await f.service.automaticSync(post('auto-sync'));
++  assert.deepEqual(f.calls.find(call => call.name === 'getTransactions').args[2].psu, { ipAddress: '192.0.2.1', userAgent: 'MG local security tests' });
++  assert.equal(f.sql.prepare('SELECT count(*) AS n FROM workspaces WHERE owner=?').get('owner-bob').n, 0);
++});
++
+ test('AES-GCM envelopes bind private values to the owner and purpose with fresh nonces', async () => {
+   const key = randomToken(), value = { session: 'private-session', accounts: ['private-account'] };
+   const a = await seal(key, 'alice', 'session:one', value), b = await seal(key, 'alice', 'session:one', value);

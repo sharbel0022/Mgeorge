@@ -1,0 +1,153 @@
+diff --git a/lib/banking/enable-banking.ts b/lib/banking/enable-banking.ts
+index 2004938..dd218e8 100644
+--- a/lib/banking/enable-banking.ts
++++ b/lib/banking/enable-banking.ts
+@@ -236,8 +236,10 @@ export async function createSession(config: ProviderConfig, code: string): Promi
+   if (!UUID.test(result.session_id) || !Array.isArray(result.accounts) || result.accounts.length > 200 ||
+     !record(result.aspsp) || typeof result.aspsp.name !== 'string' || result.aspsp.country !== 'SE' || result.psu_type !== 'business' ||
+     !record(result.access) || typeof result.access.valid_until !== 'string' || !Number.isFinite(Date.parse(result.access.valid_until)) ||
+-    result.accounts.some(account => !record(account) || typeof account.uid !== 'string' || !UUID.test(account.uid))) throw invalidResponse();
+-  return result;
++    result.accounts.some(account => !record(account) || (account.uid != null && (typeof account.uid !== 'string' || !UUID.test(account.uid))))) throw invalidResponse();
++  // A closed/blocked account may legitimately omit uid. It cannot be fetched,
++  // but must not prevent another authorized account from being connected.
++  return { ...result, accounts: result.accounts.filter((account): account is ProviderAccount => typeof account.uid === 'string' && UUID.test(account.uid)) };
+ }
+ 
+ export async function getSession(config: ProviderConfig, sessionId: string): Promise<ProviderSessionStatusResponse> {
+diff --git a/lib/banking/service.ts b/lib/banking/service.ts
+index c4ca016..ce9818b 100644
+--- a/lib/banking/service.ts
++++ b/lib/banking/service.ts
+@@ -70,7 +70,8 @@ function storedStatus(row: BankConnectionRow): string {
+ 
+ function maskAccount(account: ProviderAccount, bank: {name: string; country: string}): string {
+   const key = stableAccountKey(account, bank);
+-  const ending = key?.replace(/\s/g, '').slice(-4);
++  // A primary identification hash is a stable identity, not an account number.
++  const ending = key && !key.startsWith('enable-account:') ? key.replace(/\s/g, '').slice(-4) : '';
+   return [account.name?.slice(0, 80) || 'Bankkonto', ending ? `•••• ${ending}` : 'kontonummer saknas'].join(' · ');
+ }
+ 
+diff --git a/lib/banking/transactions.ts b/lib/banking/transactions.ts
+index 8d9b80d..d212354 100644
+--- a/lib/banking/transactions.ts
++++ b/lib/banking/transactions.ts
+@@ -1,4 +1,5 @@
+ import { parseMoney, validDate, suspectedBankCollection, PAYMENT_SPECIFICATION_REQUIRED } from '../domain';
++import { createHash } from 'node:crypto';
+ import type { BankRow } from '../imports';
+ import type { ProviderAccount, ProviderBankIdentity } from './enable-banking';
+ 
+@@ -29,6 +30,13 @@ export function stableAccountKey(account: ProviderAccount, bank: ProviderBankIde
+     const key = `${bank.country}:${bankName}:${id.scheme_name.toUpperCase()}:${value}`;
+     if (key.length <= 100) return key;
+   }
++  // Account numbers are optional in AccountResource. The primary hash is the
++  // provider's stable cross-session identity; the plural hashes are fuzzy aliases
++  // and must never be substituted. Preserve all case-sensitive primary bytes.
++  const primaryHash = account.identification_hash;
++  if (typeof primaryHash === 'string' && primaryHash.length <= 4096 && !missingReference(primaryHash) && !/[\s\u0000-\u001f\u007f]/.test(primaryHash)) {
++    return 'enable-account:' + createHash('sha256').update(JSON.stringify([bank.country, bankName, primaryHash]), 'utf8').digest('hex');
++  }
+   return null;
+ }
+ 
+diff --git a/tests/banking-provider.test.mjs b/tests/banking-provider.test.mjs
+index c1fee9b..b3d7994 100644
+--- a/tests/banking-provider.test.mjs
++++ b/tests/banking-provider.test.mjs
+@@ -110,6 +110,20 @@ test('Create and inspect session preserve distinct POST and GET account shapes;
+   assert.equal(methods[2][0], `https://api.enablebanking.com/sessions/${sessionId}`);
+ });
+ 
++test('Closed accounts without a fetch uid do not block another accessible authorized account', async t => {
++  const accessible = { uid: accountUid, currency: 'SEK', account_id: { iban: 'SE4550000000058398257466' } };
++  const inactive = { currency: 'SEK', account_id: null, identification_hash: 'closed-account-primary-hash' };
++  const authorized = accounts => ({ session_id: sessionId, accounts, aspsp: { name: 'Swedbank', country: 'SE' }, psu_type: 'business', access: { valid_until: '2027-01-01T00:00:00Z' } });
++  t.mock.method(globalThis, 'fetch', async () => json(authorized([inactive, accessible, { ...inactive, uid: null }])));
++  assert.deepEqual((await createSession(config, 'authorization-code')).accounts, [accessible]);
++  t.mock.method(globalThis, 'fetch', async () => json(authorized([inactive])));
++  assert.deepEqual((await createSession(config, 'authorization-code')).accounts, []);
++  for (const uid of [42, '', 'not-a-valid-account-uid']) {
++    t.mock.method(globalThis, 'fetch', async () => json(authorized([accessible, { ...inactive, uid }])));
++    await assert.rejects(createSession(config, 'authorization-code'), error => error.code === 'INVALID_PROVIDER_RESPONSE');
++  }
++});
++
+ test('Transaction pagination encodes opaque keys, keeps dates and BOOK filter, and supplies real foreground headers only when present', async t => {
+   const calls = [];
+   t.mock.method(globalThis, 'fetch', async (url, init) => { calls.push({ url: new URL(url), headers: init.headers }); return json({ transactions: [], continuation_key: calls.length === 1 ? 'a+/=?&next' : null }); });
+@@ -176,6 +190,37 @@ test('Stable account identity uses account numbers and never the session uid', (
+   assert.notEqual(stableAccountKey({ uid: accountUid, account_id: { other: { identification: '1234-567890', scheme_name: 'BBAN' } } }, { name: 'Another Bank', country: 'SE' }), 'SE:swedbank:BBAN:1234567890');
+ });
+ 
++test('Accounts without numbers use the full exact primary identification hash, scoped to bank and country', async () => {
++  const prefix = 'WwpbCiJhY2NvdW50IiwKImFjY291bnRfaWQiLAoiaWJhbiIKXQpd.';
++  const primary = prefix + 'E8GzhnnsFC7K+4e3YMYYKpyM83Zx6toXrjgcvPP/Lqc=';
++  const bare = { uid: accountUid, currency: 'SEK', identification_hash: primary };
++  const expected = async hash => 'enable-account:' + Buffer.from(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(['SE', 'swedbank', hash])))).toString('hex');
++  const stable = stableAccountKey(bare, bank);
++  assert.equal(stable, await expected(primary)); assert.equal(stable.length, 79);
++  assert.equal(stableAccountKey({ ...bare, uid: sessionId }, bank), stable);
++  assert.equal(stableAccountKey(bare, { ...bank, name: ' SWEDBANK ' }), stable);
++  assert.notEqual(stableAccountKey(bare, { ...bank, country: 'FI' }), stable);
++  assert.notEqual(stableAccountKey(bare, { ...bank, name: 'Another Bank' }), stable);
++  for (const changed of [primary.toLowerCase(), primary.slice(0, -1), prefix + 'x'.repeat(1000), prefix + 'x'.repeat(1000) + 'A', prefix + 'x'.repeat(1000) + 'a']) {
++    const actual = stableAccountKey({ ...bare, identification_hash: changed }, bank);
++    assert.equal(actual, await expected(changed)); assert.notEqual(actual, stable); assert.ok(actual.length <= 100);
++  }
++  for (const identification_hash of ['', 'NOTPROVIDED', 'N/A', primary + ' ', primary + '\n', 'x'.repeat(4097)]) assert.equal(stableAccountKey({ ...bare, identification_hash }, bank), null);
++  assert.equal(stableAccountKey({ uid: accountUid, identification_hashes: [primary] }, bank), null);
++  assert.equal(stableAccountKey({ ...bare, account_id: { iban: 'SE4550000000058398257466' } }, bank), opts.accountKey);
++});
++
++test('Primary-hash account identity survives renewed session uids and deduplicates booked imports', async () => {
++  const account = { uid: accountUid, currency: 'SEK', identification_hash: 'primary/Account+Hash.With=Case' };
++  const firstKey = stableAccountKey(account, bank), nextKey = stableAccountKey({ ...account, uid: sessionId }, bank);
++  assert.equal(firstKey, nextKey);
++  const first = (await normalizeTransactions([rawTx()], { ...opts, accountKey: firstKey })).rows[0];
++  const next = (await normalizeTransactions([rawTx({ transaction_id: 'session-dependent-detail-id' })], { ...opts, accountKey: nextKey })).rows[0];
++  assert.equal(first.externalId, next.externalId);
++  const state = applyCommand(applyCommand(emptyState(), { type: 'transactions.import', rows: [first] }).state, { type: 'transactions.import', rows: [next] }).state;
++  assert.equal(state.transactions.length, 1); assert.equal(state.transactions[0].account, firstKey);
++});
++
+ test('Only booked SEK magnitudes become exact integer cash flows with the correct counterparty', async () => {
+   const result = await normalizeTransactions([rawTx(), rawTx({ entry_reference: 'debit', credit_debit_indicator: 'DBIT', creditor: { name: 'Leverantör AB' }, transaction_amount: { amount: '42.30', currency: 'SEK' } })], opts);
+   assert.equal(result.rows[0].amount, 187500);
+diff --git a/tests/banking-security.test.mjs b/tests/banking-security.test.mjs
+index 7f4c778..b5f2a16 100644
+--- a/tests/banking-security.test.mjs
++++ b/tests/banking-security.test.mjs
+@@ -122,6 +122,30 @@ async function fixture(t, environment = 'PRODUCTION') {
+   return f;
+ }
+ 
++test('hash-only company accounts can be selected and synchronized without duplicates after renewed account UIDs', async t => {
++  const f = await fixture(t);
++  f.account = { uid: accountUid, name: 'Company account', currency: 'SEK', identification_hash: 'opaque.primary+case/SensitiveHash=TEST' };
++  await f.seedApp(); await f.start();
++  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=connected');
++  let visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
++  assert.equal(visible.connection.accounts[0].importable, true);
++  assert.match(visible.connection.accounts[0].label, /kontonummer saknas/);
++  assert.ok(!JSON.stringify(visible).includes('SensitiveHash'));
++  const from = new Date(Date.parse(today() + 'T12:00:00Z') - 29 * 86400000).toISOString().slice(0, 10);
++  await f.service.selectAccounts(post('accounts', { connectionId: visible.connection.id, accountUids: [accountUid], dateFrom: from }));
++  assert.equal((await (await f.service.sync(post('sync'))).json()).imported, 1);
++  assert.equal(f.workspace().state.transactions.length, 1);
++  await f.service.disconnect(post('disconnect'));
++  const renewedUid = '44444444-4444-4444-8444-444444444444';
++  f.account.uid = renewedUid; f.live.accounts = [renewedUid]; f.live.accounts_data = [{ uid: renewedUid }];
++  await f.start();
++  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=connected');
++  visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
++  await f.service.selectAccounts(post('accounts', { connectionId: visible.connection.id, accountUids: [renewedUid], dateFrom: from }));
++  assert.equal((await (await f.service.sync(post('sync'))).json()).imported, 0);
++  assert.equal(f.workspace().state.transactions.length, 1);
++});
++
+ test('AES-GCM envelopes bind private values to the owner and purpose with fresh nonces', async () => {
+   const key = randomToken(), value = { session: 'private-session', accounts: ['private-account'] };
+   const a = await seal(key, 'alice', 'session:one', value), b = await seal(key, 'alice', 'session:one', value);

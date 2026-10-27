@@ -2,18 +2,21 @@ import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { openDatabase, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
-import { digest, token, secureEqual, sessionCookie, encryptObject, decryptObject } from './security.js';
+import { openDatabase, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
+import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
-import { isConfigured, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
+import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
 import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 
 function config(){
   const origin=(process.env.APP_ORIGIN||'http://localhost:3000').replace(/\/$/,'');
-  if(!/^https:\/\//.test(origin)&&!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin))throw Error('APP_ORIGIN måste vara HTTPS för publik drift');
+  const parsed=new URL(origin);
+  if(parsed.origin!==origin||(!origin.startsWith('https:')&&!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)))throw Error('APP_ORIGIN måste vara en HTTPS-origin (lokalt tillåts HTTP)');
   if(!/^[a-f0-9]{64}$/i.test(process.env.SESSION_SECRET||''))throw Error('SESSION_SECRET måste vara 64 hextecken');
-  if(!/^[a-f0-9]{64}$/i.test(process.env.BANK_DATA_KEY||''))throw Error('BANK_DATA_KEY måste vara 64 hextecken');
-  return {origin,secure:origin.startsWith('https:'),port:Number(process.env.PORT||3000)};
+  cipherKey();
+  const secure=parsed.protocol==='https:';
+  if(secure&&(process.env.MG_ADMIN_PASSWORD||'').length<16)throw Error('HTTPS-drift kräver MG_ADMIN_PASSWORD med minst 16 tecken');
+  return {origin,secure,adminHash:secure?passwordHash(process.env.MG_ADMIN_PASSWORD):'',port:Number(process.env.PORT||3000)};
 }
 const check=config();
 const db=openDatabase();
@@ -22,6 +25,7 @@ const baseHeaders={
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
   'X-Frame-Options':'DENY','Cache-Control':'no-store','Permissions-Policy':'camera=(), microphone=(), geolocation=()'
 };
+if(check.secure)baseHeaders['Strict-Transport-Security']='max-age=31536000';
 function json(res,status,data,headers={}){res.writeHead(status,{...baseHeaders,'Content-Type':'application/json; charset=utf-8',...headers});res.end(JSON.stringify(data));}
 function redirect(res,url,cookie){res.writeHead(302,{...baseHeaders,Location:url,...(cookie?{'Set-Cookie':cookie}:{})});res.end();}
 function bad(status,message){return Object.assign(new Error(message),{status});}
@@ -38,19 +42,26 @@ async function readBody(req){
   try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw bad(400,'Ogiltig JSON');}
 }
 function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
-// No password gate. A browser session is still needed to bind bank/Google consent
-// callbacks to the browser that started them; it is created without user interaction.
+// Local OS access represents one company administrator. HTTPS requires login.
+// Anonymous sessions can bind a browser, but never authorize public bank data.
 function ensureBrowserSession(req,res){
   const existing=cookies(req).mg_session;
-  if(existing&&db.prepare('SELECT id_hash FROM sessions WHERE id_hash=? AND expires_at>?').get(digest(existing),Date.now()))return;
+  const found=existing&&db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(digest(existing),Date.now());
+  if(found){
+    req.principal=check.secure?found.principal:'local-admin';
+    if(!check.secure&&found.principal==='')db.prepare('UPDATE sessions SET principal=? WHERE id_hash=?').run('local-admin',digest(existing));
+    return;
+  }
   const session=token();
   db.prepare('DELETE FROM sessions WHERE expires_at<=?').run(Date.now());
-  db.prepare('INSERT INTO sessions(id_hash,expires_at) VALUES(?,?)').run(digest(session),Date.now()+8*3600000);
+  req.principal=check.secure?'':'local-admin';
+  db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(session),Date.now()+8*3600000,req.principal);
   req.headers.cookie=(req.headers.cookie?req.headers.cookie+'; ':'')+'mg_session='+encodeURIComponent(session);
   // Replace an expired session cookie when computing the OAuth browser binding.
   req.browserSession=session;
   res.setHeader('Set-Cookie',sessionCookie(session,check.secure));
 }
+const loginAttempts=new Map();
 function checkOrigin(req){
   const origin=req.headers.origin;
   if(origin!==check.origin)throw bad(403,'Begäran måste komma från MG:s egen hemsida');
@@ -99,6 +110,10 @@ function addBankTransaction(body){
 }
 function maskAccount(s){return s?String(s).replace(/.(?=.{4})/g,'•'):'';}
 function sessionHash(req){return digest(req.browserSession||cookies(req).mg_session||'');}
+function assertSessionStillAuthorized(req){
+  const current=db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(sessionHash(req),Date.now());
+  if(!current||current.principal!==req.principal)throw bad(401,'Sessionen har avslutats. Logga in och försök igen.');
+}
 function filePayload(body){
   const name=requiredString(body.name,'Filnamn',240);
   if(typeof body.content_base64!=='string'||!body.content_base64||body.content_base64.length>20_000_000||!/^[A-Za-z0-9+/]*={0,2}$/.test(body.content_base64))throw bad(400,'Fil saknas eller är för stor');
@@ -111,7 +126,16 @@ function filePayload(body){
   if(!mime_type)throw bad(400,'Välj en giltig PDF-, PNG-, JPEG- eller WebP-fil');
   return {name,mime_type,bytes};
 }
-function importBankFile(body){try{return parseBankFile(body.name,body.content_base64,optionalString(body.account,120)||'Swedbank');}catch(e){throw bad(400,e.message);}}
+function importBankFile(body,req){
+  let account=optionalString(body.account,120)||'Swedbank';
+  if(body.connection_id){
+    const connection=ownedConnection(req,body.connection_id);
+    const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid);
+    if(!selected||(body.account_uid&&body.account_uid!==selected.uid))throw bad(400,'Välj bankanslutningens godkända konto');
+    account=stableAccountIdentity(selected,connection.bank_name);
+  }
+  try{return parseBankFile(body.name,body.content_base64,account);}catch(e){throw bad(400,e.message);}
+}
 function gmailStatus(){
   const connection=db.prepare('SELECT id,email,status,last_synced,last_error FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
   return {configured:isGmailConfigured(),email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',connection};
@@ -153,22 +177,57 @@ async function syncGmail(){
     if(e.status)throw e;throw bad(502,renewal?'Gmail-anslutningen behöver förnyas – koppla Gmail igen':'Det gick inte att hämta från Gmail. Kontrollera anslutningen och försök igen.');
   }finally{gmailSyncing=false;}
 }
-async function syncBank(connection,{account_uid,date_from,date_to}){
-  if(bankSyncing.has(connection.id))throw bad(409,'En bankhämtning pågår redan');
-  if(connection.valid_until&&new Date(connection.valid_until).getTime()<Date.now()){
+function ownedConnection(req,id){
+  const connection=db.prepare('SELECT * FROM bank_connections WHERE id=? AND owner=?').get(requiredString(id,'Anslutnings-ID'),req.principal);
+  if(!connection)throw bad(404,'Bankanslutningen saknas eller tillhör en annan användare');
+  return connection;
+}
+function stableAccountIdentity(account,bank){
+  const number=account.account_id?.iban?.replace(/\s/g,'').toUpperCase()||account.account_id?.other?.identification;
+  // Keep the canonical account number compatible with earlier file/API imports.
+  if(number)return number;
+  if(account.identification_hash)return `${bank}:SE:hash:${account.identification_hash}`;
+  throw bad(502,'Banken saknar beständig kontoidentitet. Kontakta systemadministratören.');
+}
+async function verifyBankSession(connection){
+  const data=await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id));
+  if(data.status!=='AUTHORIZED'||!Array.isArray(data.accounts)||!data.accounts.includes(connection.selected_account_uid))throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
+}
+async function syncBank(connection,{account_uid,date_from,date_to}={},operationLocked=false){
+  if(!operationLocked&&bankSyncing.has(connection.id))throw bad(409,'En bankåtgärd pågår redan');
+  if(!connection.owner||!connection.selected_account_uid)throw bad(409,'Välj först ett godkänt företagskonto');
+  if(!Number.isFinite(Date.parse(connection.valid_until))||Date.parse(connection.valid_until)<=Date.now()){
     db.prepare("UPDATE bank_connections SET status='renewal_required' WHERE id=?").run(connection.id);throw bad(409,'Bankanslutningen behöver förnyas – koppla igen');
   }
-  const selected=decryptObject(connection.accounts_json).find(a=>a.uid===account_uid);if(!selected)throw bad(400,'Välj ett godkänt konto');
+  if(connection.retry_after>Date.now())throw Object.assign(bad(429,'Bankens anropsgräns är nådd. Försök igen senare.'),{retryAfter:Math.ceil((connection.retry_after-Date.now())/1000)});
+  if(account_uid&&account_uid!==connection.selected_account_uid)throw bad(400,'Välj konto innan hämtningen');
+  const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid);if(!selected)throw bad(400,'Välj ett godkänt konto');
+  date_from||=new Date(Date.parse(today()+'T12:00:00Z')-29*86400000).toISOString().slice(0,10);date_to||=today();
   const from=validateDate(date_from,true),to=validateDate(date_to,true);if(from>to||Math.abs(Date.parse(to)-Date.parse(from))>91*86400000)throw bad(400,'Välj ett datumintervall på högst 91 dagar');
-  bankSyncing.add(connection.id);
+  assertNoLegacyBankImports(db);
+  if(!operationLocked)bankSyncing.add(connection.id);
   try{
+    await verifyBankSession(connection);
     const raw=await fetchBookedTransactions(selected.uid,{dateFrom:from,dateTo:to});
-    const account=selected.account_id?.iban||selected.account_id?.other?.identification||selected.uid;
-    const transactions=raw.map(x=>normalizeBankApiTransaction(x,account)).filter(Boolean);
-    const result=storeTransactions(db,transactions,'enablebanking');db.prepare("UPDATE bank_connections SET last_synced=CURRENT_TIMESTAMP,status='connected' WHERE id=?").run(connection.id);
+    // Login revocation during a slow provider request must not authorize a write.
+    if(connection.request_session_hash){
+      const active=db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(connection.request_session_hash,Date.now());
+      if(!active||active.principal!==connection.owner)throw bad(401,'Sessionen har avslutats. Logga in igen.');
+    }
+    const account=stableAccountIdentity(selected,connection.bank_name);
+    const transactions=raw.map(x=>normalizeBankApiTransaction(x,account)).filter(x=>x&&x.booked_at>=from&&x.booked_at<=to);
+    const result=storeTransactions(db,transactions,'enablebanking');db.prepare("UPDATE bank_connections SET last_synced=CURRENT_TIMESTAMP,status='connected',last_error='',retry_after=0 WHERE id=?").run(connection.id);
+    audit(db,'bank_synced',{connection_id:connection.id,from,to,received:raw.length,imported:result.imported,duplicate:result.duplicate});
     return {...result,received:raw.length};
-  }catch(e){db.prepare("UPDATE bank_connections SET status='error' WHERE id=?").run(connection.id);recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:'Bankhämtningen misslyckades'});if(e.status)throw e;throw bad(502,'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.');}
-  finally{bankSyncing.delete(connection.id);}
+  }catch(e){
+    if(e.status===401&&!e.providerStatus)throw e;
+    const renewal=e.code==='renewal_required'||[401,404,410].includes(e.providerStatus);
+    const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
+    db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,e.status===429?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
+    recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
+    throw Object.assign(bad(renewal?409:e.status===429?429:502,message),{safe:true,retryAfter:e.retryAfter});
+  }
+  finally{if(!operationLocked)bankSyncing.delete(connection.id);}
 }
 const schedulerState={running:false,last_run:'',last_error:''};
 const backgroundAttempts=new Map();
@@ -183,29 +242,47 @@ export async function runScheduledSync(){
     if(mail&&isGmailConfigured()&&due('gmail',mail.last_synced)){
       backgroundAttempts.set('gmail',Date.now());try{await syncGmail();}catch{schedulerState.last_error='Gmail-hämtningen behöver kontrolleras';}
     }
-    if(isConfigured())for(const connection of db.prepare("SELECT * FROM bank_connections WHERE status NOT IN ('renewal_required')").all()){
+    if(isConfigured())for(const connection of db.prepare("SELECT * FROM bank_connections WHERE status IN ('connected','error') AND owner<>'' AND selected_account_uid<>''").all()){
       if(!due(connection.id,connection.last_synced))continue;
       backgroundAttempts.set(connection.id,Date.now());
-      const fromDate=connection.last_synced?new Date(utcTimestamp(connection.last_synced)-86400000):new Date(Date.now()-30*86400000);
+      const fromDate=connection.last_synced?new Date(utcTimestamp(connection.last_synced)-86400000):new Date(Date.parse(today()+'T12:00:00Z')-29*86400000);
       // Clamp resumed jobs to the provider's supported maximum interval.
       const from=new Date(Math.max(fromDate.getTime(),Date.now()-90*86400000)).toISOString().slice(0,10);
-      for(const account of decryptObject(connection.accounts_json)){
-        try{await syncBank(connection,{account_uid:account.uid,date_from:from,date_to:today()});}catch{schedulerState.last_error='Bankhämtningen behöver kontrolleras';}
-      }
+      try{await syncBank(connection,{date_from:from,date_to:today()});}catch{schedulerState.last_error='Bankhämtningen behöver kontrolleras';}
     }
     schedulerState.last_run=new Date().toISOString();
   }finally{schedulerState.running=false;}
 }
 async function route(req,res){
-  // This password-free installation listens locally. Reject rebinding requests.
+  // The listener remains loopback-only; public HTTPS uses a secured reverse proxy.
   const hostname=new URL('http://'+req.headers.host).hostname;
-  if(!['localhost','127.0.0.1','[::1]'].includes(hostname))throw bad(403,'Öppna appen via localhost');
+  if(!(check.secure?[new URL(check.origin).hostname]:['localhost','127.0.0.1','[::1]']).includes(hostname))throw bad(403,'Ogiltig värd för MG Fakturakoll');
   const url=new URL(req.url,check.origin);const path=url.pathname;
   if(path==='/api/health'&&req.method==='GET')return json(res,200,{ok:true,app:'Mgeorge Fakturakoll'});
   if(!path.startsWith('/api/'))return serveStatic(req,res,path);
+  const callback=['/api/bank/callback','/api/gmail/callback'].includes(path)&&req.method==='GET';
+  if(!callback&&((req.headers.origin&&req.headers.origin!==check.origin)||req.headers['sec-fetch-site']==='cross-site'))throw bad(403,'Begäran måste komma från MG:s egen hemsida');
   ensureBrowserSession(req,res);
-  if(path==='/api/me'&&req.method==='GET')return json(res,200,{authenticated:true,login_required:false,company:getSettings(db).company_name,role:'local_user'});
+  if(path==='/api/me'&&req.method==='GET')return json(res,200,{authenticated:!!req.principal,login_required:check.secure,company:req.principal?getSettings(db).company_name:'MG Fakturakoll',role:req.principal?'administrator':null});
   if(req.method!=='GET')checkOrigin(req);
+  if(path==='/api/login'&&req.method==='POST'&&check.secure){
+    const now=Date.now(),address=req.socket.remoteAddress;
+    const attempt=loginAttempts.get(address);
+    if(attempt&&attempt.until>now&&attempt.count>=5)throw bad(429,'För många inloggningsförsök. Försök igen om 15 minuter.');
+    const b=await readBody(req);
+    if(typeof b.password!=='string'||b.password.length>1024||!verifyPassword(b.password,check.adminHash)){
+      loginAttempts.set(address,{count:attempt?.until>now?attempt.count+1:1,until:attempt?.until>now?attempt.until:now+900000});throw bad(401,'Felaktigt lösenord');
+    }
+    loginAttempts.delete(address);db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));
+    const value=token();db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
+    return json(res,200,{authenticated:true},{'Set-Cookie':sessionCookie(value,true)});
+  }
+  if(!req.principal)throw bad(401,'Logga in för att läsa företagets uppgifter');
+  if(req.principal!==(check.secure?'administrator':'local-admin'))throw bad(403,'Användaren saknar behörighet till företagets arbetsyta');
+  if(path==='/api/logout'&&req.method==='POST'){
+    db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
+    db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
+  }
   if(path==='/api/dashboard'&&req.method==='GET')return json(res,200,invoiceStatus(db));
   if(path==='/api/settings'&&req.method==='GET')return json(res,200,{...getSettings(db),scheduler_available:true,scheduler:schedulerState,user_mode:'single_administrator'});
   if(path==='/api/settings'&&req.method==='PATCH'){
@@ -263,13 +340,13 @@ async function route(req,res){
     res.writeHead(200,{...baseHeaders,'Content-Type':item.mime_type||'application/octet-stream','Content-Disposition':`attachment; filename="bankunderlag${item.mime_type==='application/xml'?'.xml':'.csv'}"`,'Content-Length':item.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(item.content));
   }
   if(path==='/api/import/preview'&&req.method==='POST'){
-    const b=await readBody(req);const items=importBankFile(b);
+    const b=await readBody(req);const items=importBankFile(b,req);
     const warnings=[...new Set(items.flatMap(x=>x.warnings||[]))];
     return json(res,200,{count:items.length,items,warnings,review:items.filter(i=>i.is_aggregate||!i.payer&&!i.reference).length});
   }
   if(path==='/api/import/commit'&&req.method==='POST'){
     const b=await readBody(req);if(b.confirm!==true)throw bad(400,'Bekräfta importen');
-    const items=importBankFile(b);
+    const items=importBankFile(b,req);
     return json(res,200,storeTransactions(db,items,'file:'+optionalString(b.name,120),{content:Buffer.from(b.content_base64,'base64'),mime_type:/\.xml$/i.test(b.name)?'application/xml':'text/csv; charset=utf-8'}));
   }
   if(path==='/api/documents'&&req.method==='GET')return json(res,200,{items:listDocuments(db)});
@@ -309,49 +386,105 @@ async function route(req,res){
   }
   // AIS only: reads account data, never creates, approves or executes payments.
   if(path==='/api/bank/status'&&req.method==='GET'){
-    const connections=db.prepare('SELECT id,bank_name,accounts_json,valid_until,last_synced,status FROM bank_connections ORDER BY created_at DESC').all();
-    return json(res,200,{configured:isConfigured(),connections:connections.map(x=>{
-      let accounts=[],status=x.valid_until&&new Date(x.valid_until).getTime()<Date.now()?'renewal_required':x.status;
+    const activation=configStatus();
+    const connections=db.prepare('SELECT id,bank_name,accounts_json,valid_until,last_synced,status,selected_account_uid,last_error,retry_after FROM bank_connections WHERE owner=? ORDER BY created_at DESC').all(req.principal);
+    return json(res,200,{configured:activation.configured,activation,environment:activation.environment,connections:connections.map(x=>{
+      let accounts=[],status=!Number.isFinite(Date.parse(x.valid_until))||Date.parse(x.valid_until)<=Date.now()?'renewal_required':x.status;
       try{accounts=decryptObject(x.accounts_json).map(a=>({uid:a.uid,name:a.name,currency:a.currency,account_hint:maskAccount(a.account_id?.iban||a.account_id?.other?.identification)}));}catch{status='error';}
       return {...x,status,accounts,accounts_json:undefined};
     })});
   }
   if(path==='/api/bank/connect'&&req.method==='POST'){
-    if(!isConfigured())throw bad(409,'Konfigurera Enable Banking i serverns miljövariabler först');
+    const b=await readBody(req),activation=configStatus();
+    if(!activation.configured)throw Object.assign(bad(409,activation.message),{code:activation.code});
+    const renewal=b.renew_connection_id?ownedConnection(req,b.renew_connection_id):null;
+    if(renewal&&bankSyncing.has(renewal.id))throw bad(409,'Vänta tills bankhämtningen har avslutats');
+    // A local flag cannot assert vendor approval: check the actual registered app.
+    await assertApplicationReady(check.origin);
     const banks=await findSwedbank();const bank=banks.find(x=>x.name==='Swedbank')||banks[0];
-    if(!bank)throw bad(404,'Swedbank hittades inte bland tillgängliga banker');
-    const state=token();db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash) VALUES(?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req));
-    const auth=await bankingRequest('/auth',{method:'POST',body:startConsentBody(bank,state,check.origin)});
-    const authUrl=new URL(auth.url);
-    if(authUrl.protocol!=='https:'||!/(^|\.)enablebanking\.com$/.test(authUrl.hostname))throw bad(502,'Ogiltig vidarekoppling från bankleverantören');
-    audit(db,'bank_consent_started',{bank:bank.name});return json(res,200,{url:auth.url});
+    if(!bank)throw bad(409,'Swedbank Företag är inte tillgänglig för denna applikation. Kontakta systemadministratören och Enable Banking.');
+    const state=token();db.prepare('DELETE FROM bank_states WHERE expires_at<=? OR (session_hash=? AND consumed=0)').run(Date.now(),sessionHash(req));
+    db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash,owner,renew_connection_id,bank_name) VALUES(?,?,?,?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req),req.principal,renewal?.id||'',bank.name);
+    try{
+      const auth=await bankingRequest('/auth',{method:'POST',body:startConsentBody(bank,state,check.origin)});
+      assertSessionStillAuthorized(req);
+      const authUrl=validateAuthorizationUrl(auth.url);
+      audit(db,'bank_consent_started',{bank:bank.name});return json(res,200,{url:String(authUrl),environment:activation.environment});
+    }catch(e){db.prepare('DELETE FROM bank_states WHERE state_hash=?').run(digest(state));throw e;}
   }
   // Callback intentionally uses GET and SameSite=Lax cookie from interactive browser navigation.
   if(path==='/api/bank/callback'&&req.method==='GET'){
+    if(['state','code','error'].some(key=>url.searchParams.getAll(key).length>1))throw bad(403,'Ogiltig bankretur');
     const state=url.searchParams.get('state')||'';
     const record=db.prepare('SELECT * FROM bank_states WHERE state_hash=?').get(digest(state));
-    if(!state||!record||record.consumed||record.expires_at<Date.now()||!secureEqual(record.session_hash,sessionHash(req)))throw bad(403,'Ogiltig eller för gammal bankretur');
-    db.prepare('UPDATE bank_states SET consumed=1 WHERE state_hash=?').run(digest(state));
-    if(url.searchParams.has('error'))return redirect(res,'/?tab=bank&status=cancelled');
-    const code=url.searchParams.get('code');if(!code)throw bad(400,'Saknar bankens engångskod');
+    if(!state||state.length>256||!record||record.consumed||record.expires_at<=Date.now()||record.owner!==req.principal||!secureEqual(record.session_hash,sessionHash(req)))throw bad(403,'Ogiltig eller för gammal bankretur');
+    const consumed=db.prepare('UPDATE bank_states SET consumed=1 WHERE state_hash=? AND consumed=0').run(digest(state));
+    if(!consumed.changes)throw bad(403,'Bankreturen har redan använts');
+    if(url.searchParams.has('error')){audit(db,'bank_consent_cancelled',{});return redirect(res,'/?tab=connections&status=cancelled');}
+    const code=url.searchParams.get('code');if(!code||code.length>4096)throw bad(400,'Saknar bankens engångskod');
     const session=await bankingRequest('/sessions',{method:'POST',body:{code}});
-    const accounts=session.accounts||[];
-    if(!session.session_id||!accounts.length)throw bad(502,'Banken returnerade inget tillgängligt konto');
-    db.prepare('INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until) VALUES(?,?,?,?,?,?)').run(randomUUID(),'enablebanking',session.aspsp?.name||'Swedbank',encryptObject({session_id:session.session_id}),encryptObject(accounts),session.access?.valid_until||'');
-    audit(db,'bank_connected',{bank:session.aspsp?.name,accounts:accounts.length});
-    return redirect(res,'/?tab=bank&status=connected');
+    let renewalLock='';
+    try{
+      assertSessionStillAuthorized(req);
+      const accounts=Array.isArray(session.accounts)?session.accounts.filter(a=>a&&typeof a.uid==='string'&&a.uid&&a.currency==='SEK'&&a.usage!=='PRIV'):[];
+      if(typeof session.session_id!=='string'||!session.session_id||!accounts.length||!Number.isFinite(Date.parse(session.access?.valid_until))||Date.parse(session.access.valid_until)<=Date.now())throw bad(502,'Banken returnerade inget tillgängligt företagskonto i SEK med giltigt medgivande');
+      if(session.aspsp?.name!==record.bank_name||session.aspsp?.country!=='SE'||session.psu_type!=='business')throw bad(502,'Bankens svar motsvarar inte det godkända företagsmedgivandet');
+      for(const a of accounts)stableAccountIdentity(a,record.bank_name);
+      const id=record.renew_connection_id||randomUUID();
+      if(record.renew_connection_id){
+        const old=ownedConnection(req,id);
+        if(bankSyncing.has(old.id))throw bad(409,'Vänta tills bankhämtningen har avslutats och förnya sedan igen');
+        bankSyncing.add(old.id);renewalLock=old.id;
+        const previous=decryptObject(old.encrypted_session).session_id;
+        if(previous!==session.session_id)try{await bankingRequest('/sessions/'+encodeURIComponent(previous),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Det tidigare medgivandet kunde inte återkallas. Förnya anslutningen igen.');}
+        assertSessionStillAuthorized(req);
+        db.prepare("UPDATE bank_connections SET encrypted_session=?,accounts_json=?,valid_until=?,selected_account_uid='',status='pending_account',last_error='',retry_after=0 WHERE id=? AND owner=?").run(encryptObject({session_id:session.session_id}),encryptObject(accounts),session.access.valid_until,id,req.principal);
+      }else{
+        db.prepare("INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status) VALUES(?,?,?,?,?,?,?,'pending_account')").run(id,'enablebanking',record.bank_name,encryptObject({session_id:session.session_id}),encryptObject(accounts),session.access.valid_until,req.principal);
+      }
+      audit(db,'bank_accounts_authorized',{bank:record.bank_name,accounts:accounts.length,connection_id:id});
+      return redirect(res,'/?tab=connections&status=select_account');
+    }catch(e){
+      if(typeof session.session_id==='string'&&session.session_id)try{await bankingRequest('/sessions/'+encodeURIComponent(session.session_id),{method:'DELETE'});}catch{}
+      throw e;
+    }finally{if(renewalLock)bankSyncing.delete(renewalLock);}
+  }
+  if(path==='/api/bank/accounts'&&req.method==='POST'){
+    const b=await readBody(req),connection=ownedConnection(req,b.connection_id);
+    if(bankSyncing.has(connection.id))throw bad(409,'Vänta tills bankåtgärden har avslutats');
+    bankSyncing.add(connection.id);
+    try{
+    if(connection.retry_after>Date.now())throw Object.assign(bad(429,'Bankens anropsgräns är nådd. Försök igen senare.'),{retryAfter:Math.ceil((connection.retry_after-Date.now())/1000)});
+    if(!Number.isFinite(Date.parse(connection.valid_until))||Date.parse(connection.valid_until)<=Date.now()||connection.status==='renewal_required')throw bad(409,'Bankanslutningen behöver förnyas – koppla igen');
+    const account=decryptObject(connection.accounts_json).find(a=>a.uid===b.account_uid);
+    if(!account)throw bad(400,'Välj ett godkänt företagskonto');
+    stableAccountIdentity(account,connection.bank_name);
+    await verifyBankSession({...connection,selected_account_uid:account.uid});
+    assertSessionStillAuthorized(req);
+    const changed=connection.selected_account_uid!==account.uid;
+    db.prepare("UPDATE bank_connections SET selected_account_uid=?,last_synced=?,status='connected',last_error='' WHERE id=? AND owner=?").run(account.uid,changed?'':connection.last_synced,connection.id,req.principal);
+    audit(db,'bank_account_selected',{connection_id:connection.id});
+    try{return json(res,200,await syncBank({...ownedConnection(req,connection.id),request_session_hash:sessionHash(req)},{},true));}
+    catch(e){return json(res,200,{imported:0,duplicate:0,initial_sync_error:e.message});}
+    }catch(e){
+      if(e.status===429)db.prepare('UPDATE bank_connections SET retry_after=?,last_error=? WHERE id=?').run(Date.now()+Math.max(60,e.retryAfter||60)*1000,'Bankens anropsgräns är nådd. Försök igen senare.',connection.id);
+      if(e.code==='renewal_required'||[401,404,410].includes(e.providerStatus))db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run('Bankanslutningen behöver förnyas – koppla igen',connection.id);
+      throw e;
+    }finally{bankSyncing.delete(connection.id);}
   }
   if(path==='/api/bank/sync'&&req.method==='POST'){
-    const b=await readBody(req),connection=db.prepare('SELECT * FROM bank_connections WHERE id=?').get(b.connection_id);
-    if(!connection)throw bad(404,'Aktiv bankanslutning saknas');
-    return json(res,200,await syncBank(connection,b));
+    const b=await readBody(req),connection=ownedConnection(req,b.connection_id);
+    return json(res,200,await syncBank({...connection,request_session_hash:sessionHash(req)},b));
   }
   if(path==='/api/bank/connections'&&req.method==='DELETE'){
-    const b=await readBody(req),connection=db.prepare('SELECT * FROM bank_connections WHERE id=?').get(b.id);if(!connection)throw bad(404,'Bankanslutningen saknas');
+    const b=await readBody(req),connection=ownedConnection(req,b.id);
     if(bankSyncing.has(connection.id))throw bad(409,'Vänta tills bankhämtningen har avslutats');
+    bankSyncing.add(connection.id);
+    try{
     // Revoke at the provider first. A failed revocation must not be reported as success.
-    try{await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{method:'DELETE'});}catch(e){if(!/\b(404|410)\b/.test(e.message))throw bad(502,'Banken kunde inte återkalla åtkomsten. Försök igen eller återkalla medgivandet hos banken.');}
+    try{await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Banken kunde inte återkalla åtkomsten. Försök igen eller återkalla medgivandet hos banken.');}
     db.prepare('DELETE FROM bank_connections WHERE id=?').run(connection.id);audit(db,'bank_disconnected',{id:connection.id});return json(res,200,{removed:true});
+    }finally{bankSyncing.delete(connection.id);}
   }
   if(path==='/api/gmail/status'&&req.method==='GET')return json(res,200,gmailStatus());
   if(path==='/api/gmail/connect'&&req.method==='POST'){
@@ -391,8 +524,8 @@ async function route(req,res){
 }
 const server=http.createServer((req,res)=>route(req,res).catch(err=>{
   const status=err.status||(err instanceof TypeError?400:500);
-  if(status>=500)console.error('Server error:',err.message); // Never log credentials, auth codes or request bodies.
-  if(!res.headersSent)json(res,status,{error:status>=500?'Ett serverfel inträffade':err.message});else res.end();
+  if(status>=500)console.error('Serverfel',status); // No provider payloads, request URLs, keys or tokens.
+  if(!res.headersSent)json(res,status,{error:status>=500&&!err.safe&&!err.code?'Ett serverfel inträffade':err.message,...(err.code?{code:err.code}:{})},err.retryAfter?{'Retry-After':String(err.retryAfter)}:{});else res.end();
 }));
 let schedulerTimer;
 if(process.env.NODE_ENV!=='test'){
