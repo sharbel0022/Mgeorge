@@ -1,5 +1,7 @@
 # Swedbank: GitHub och publicerad ChatGPT Site
 
+**Senaste uppföljning:** version 6 är publicerad, commit `109574c4255855dec79ddb21e4a7432649dfd859`. Den kompletterar version 5 med stöd för primär kontohash när kontonummer saknas samt korrekt filtrering av stängda/spärrade konton utan `uid`. Befintliga kontonumrens identiteter bevaras. 84 Sites-tester, TypeScript och produktionsbyggning är godkända. [Patchen version 5→6](sites/swedbank-readiness.patch) är separat från grundpatchen nedan. Se [uppdaterad rapport](SWEDBANK-REPORT.md).
+
 Kontrollerat 2026-10-27. Baslinjen nedan är Sites **version 4**, commit **`f8cdd8b1d06ac11058061da81e4d0e1d02d52364`**, för [MG Fakturakoll](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site). Säkerhetsändringarna har därefter publicerats separat som **version 5**, commit **`17f57738c1e1bc50a48741fab500771763d279a4`**. Publiceringen returnerade `succeeded`. Inga befintliga privata miljöfiler, nycklar eller banksessioner lästes. Inga riktiga bankanrop gjordes och inga runtime-hemligheter ändrades.
 
 ## Publicerat i version 5

@@ -1,8 +1,18 @@
 # Slutrapport: Swedbank-integrationen, 27 oktober 2026
 
+## Uppföljande kontroll före bankmedgivande
+
+Ändringarna i denna uppföljning är publicerade som **Sites version 6**, källcommit `109574c4255855dec79ddb21e4a7432649dfd859`, deployment `appgdep_6ae0f0c98f508191869401f18de400d8` med resultat `succeeded`. Befintliga runtime-hemligheter och företagsdata har inte ändrats.
+
+Efter grundimplementationen rättades två ytterligare fall i Sites-adaptern enligt Enable Bankings AccountResource-schema. Ett spärrat/stängt konto utan `uid` stoppar inte längre andra åtkomliga konton. Ett giltigt SEK-konto utan kontonummer kan identifieras med bankens primära `identification_hash`, omvandlad till ett bank-/landsspecifikt SHA-256-ID. Hashen visas aldrig som ett påhittat maskerat kontonummer. Befintliga IBAN-/BBAN-identiteter ändras inte.
+
+Sites-sviten omfattar nu **84 godkända tester**, inklusive callback, kontoval, synkronisering och dubblettkontroll över förnyade konto-UID:n när banken bara lämnar en primär kontohash. TypeScript och produktionsbyggning är godkända. Tillsammans med Node-versionens 117 tester är det **201 godkända automatiska tester**. [Readiness-patchen](sites/swedbank-readiness.patch) bygger ovanpå version 5; den första Sites-patchen återger fortfarande exakt version 4→5.
+
+Den nya RSA4096-nyckeln och det publika certifikatet har även verifierats lokalt mot samma PKCS#8/WebCrypto-import och signaturkontroll som appen använder. Privatnyckeln är skyddad utanför Git; den har inte skickats till webbläsaren, chatten eller leverantören. Nyckelparet är **genererat och verifierat, inte registrerat**. Den gamla registreringen är inte bekräftat återkallad. Kontrollpanelen visar fortfarande den gamla inaktiva applikationen; serverns bankhemligheter har inte installerats. Det återstår alltså registrering, återkallning, leverantörsaktivering och serverkonfiguration före det personliga bankmedgivandet. Ingen teknisk kontroll kan ge en garanti om ett ännu inte genomfört produktionsmedgivande eller verklig bankhämtning.
+
 ## Resultat
 
-Kodändringarna är implementerade och testade i både GitHub-versionen och den separata ChatGPT Siten. Sites **version 5** är publicerad på [bankanslutningssidan](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/bank), med källcommit `17f57738c1e1bc50a48741fab500771763d279a4`. Publiceringsverktyget bekräftade `succeeded`. En GitHub-push användes inte som ersättning för Sites-publicering.
+Kodändringarna är implementerade och testade i både GitHub-versionen och den separata ChatGPT Siten. Grundimplementationen publicerades som Sites version 5, källcommit `17f57738c1e1bc50a48741fab500771763d279a4`, och följdes av **version 6** ovan på [bankanslutningssidan](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/bank). Båda publiceringarna bekräftades som `succeeded`. En GitHub-push användes inte som ersättning för Sites-publicering.
 
 **Swedbank är inte ansluten. Inga verkliga transaktioner från de senaste 30 dagarna har hämtats.** Den publicerade, inloggade bankvyn visar ”Ej ansluten” och ”Banktjänsten behöver aktiveras av systemadministratören.” Den befintliga Enable Banking-applikationen visas som **Inactive / PRODUCTION / Account Information** i kontrollpanelen. Detta är ett verkligt produktionshinder, inte ett fel som kan lösas genom att ändra knappens status.
 
