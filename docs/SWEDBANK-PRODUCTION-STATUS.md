@@ -1,5 +1,7 @@
 # Verifierad produktionsstatus, 27 oktober 2026
 
+**Senaste uppdatering:** Sites version 11 är publicerad med automatisk bankhämtning, ägarbunden inställning, privata molnverktyg och ett aktiverat molnschema fyra gånger per dygn. Se [automatisk bankhämtning](SWEDBANK-AUTOMATIC.md) för intervall, behörigheter och verifieringsgränser. Anslutningen och den tidigare verifierade importen nedan bevaras.
+
 ## Genomfört
 
 - Ny Enable Banking-applikation `9650951b-9a61-43be-afc0-9982e5500912`, PRODUCTION/AIS, registrerad och aktiv. Kontrollpanelen visar begränsad åtkomst till två länkade egna Swedbank-konton. Detta är inte ett beviljat avtal om obegränsad löpande företagsdrift.
@@ -23,6 +25,6 @@ Enable Bankings riktiga Swedbank-svar använder `https://tilisy.enablebanking.co
 
 En ytterligare uppdatering genomfördes från hemsidan. Den slutfördes med noll nya bankhändelser, och de tidigare importerade raderna finns kvar. Det verifierar dubblettskyddet för denna faktiska hämtning. Ingen faktura har automatiskt markerats betald. Bankgiro och ofullständiga betalardetaljer kräver fortfarande betalningsunderlag och granskning.
 
-För fortsatt användning finns **Uppdatera bankhändelser** på bankanslutningssidan. Hämtning i Sites sker manuellt. Personlig förnyelse krävs när medgivandet går ut. Denna verifiering ersätter inte avstämning mot företagets originalunderlag eller leverantörens avtalsgodkännande.
+För fortsatt användning finns både automatisk hämtning och **Uppdatera bankhändelser** på bankanslutningssidan. Personlig förnyelse krävs när medgivandet går ut. Denna verifiering ersätter inte avstämning mot företagets originalunderlag eller leverantörens avtalsgodkännande.
 
 Källor: [Enable Banking API](https://enablebanking.com/docs/api/reference/), [aktivering av egna konton](https://enablebanking.com/docs/api/linked-accounts/). Begränsad kontoaktivering ersätter inte leverantörens avtals- och driftgodkännande.

@@ -1,5 +1,7 @@
 # Swedbank: GitHub och publicerad ChatGPT Site
 
+**Automatik i version 11:** Automatisk hämtning är tillagd separat i Sites, inklusive ägarbunden aktivering, privata MCP-verktyg, ett länkat molnschema och uppdatering av öppna sidor. Se [automatisk Swedbank-hämtning](SWEDBANK-AUTOMATIC.md) och [patch version 10→11](sites/swedbank-automatic.patch). Äldre noteringar om enbart manuell Sites-hämtning är historik.
+
 **Aktuell driftuppföljning:** Swedbank är ansluten och riktiga bankhändelser visas efter användarens signering. Upprepad hämtning utan nya dubbletter är verifierad. Version 10 är publicerad med runtime-revision 3. Ny produktionsapplikation är aktiv och den gamla borttagen efter uttryckligt godkännande. Workers-transport och Swedbanks faktiska Enable Banking-domän är rättade i server och klient. 204 tester godkända. [Verifierad produktionsstatus](SWEDBANK-PRODUCTION-STATUS.md), [patch version 6→10](sites/swedbank-worker-compatibility.patch). Jämförelsen nedan är historik från tidigare versioner.
 
 **Senaste uppföljning:** version 6 är publicerad, commit `109574c4255855dec79ddb21e4a7432649dfd859`. Den kompletterar version 5 med stöd för primär kontohash när kontonummer saknas samt korrekt filtrering av stängda/spärrade konton utan `uid`. Befintliga kontonumrens identiteter bevaras. 84 Sites-tester, TypeScript och produktionsbyggning är godkända. [Patchen version 5→6](sites/swedbank-readiness.patch) är separat från grundpatchen nedan. Se [uppdaterad rapport](SWEDBANK-REPORT.md).
