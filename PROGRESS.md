@@ -63,3 +63,7 @@ MG-pluginens rena statusanrop bekräftade bankanslutning med befintligt sex-timm
 - Ägda lokala previewprocesser och testfliken är avslutade. Webbläsarens tillfälliga viewport återställdes.
 - GitHub Actions verifierade **success** för både Node och Sites på revision `f43e2bc` i [PR-körning 40779971685](https://github.com/sharbel0022/Mgeorge/actions/runs/40779971685) och push-körning 40779965287. Denna avslutande uppdatering ändrar endast dokumentation. Befintliga plattformsnotiser är genomlästa; inga testfel eller säkerhetsfynd rapporterades.
 - Kvarvarande begränsningar är de uttryckliga externa bank-/rapportförutsättningarna i slutrapporten. Inga fler produktionsåtgärder ingår i uppdraget.
+
+## Efterföljande godkänd publicering
+
+Användaren begärde därefter uttryckligen main och Sites-publicering. PR #12 mergades och Sites-version 30 publicerades med status succeeded. Se [publiceringsbevis](docs/BANK-EVIDENCE-SAFETY-PUBLICATION.md). Tidigare avgränsningar ovan beskriver granskningsleveransen före detta godkännande.
