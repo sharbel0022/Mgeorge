@@ -66,8 +66,8 @@ Automatiska tester täcker bland annat idempotens, samtidiga klick, avbrott, lea
 
 Det nya UI:t har dessutom körts som en isolerad offline-demo i Chromium, med syntetiska data och simulerat nätverkslager. Översikt → kontrollstatus → granskningskö → fakturadetalj → bankfilter är kontrollerat, inklusive mobilbredd 390 px utan horisontell overflow. Detta är en UI-kontroll, inte ett verkligt Gmail-/BankID-/utskickstest eller en publicering till Sites.
 
-## Återstående Sites-publicering
+## Sites-publicering genomförd 2026-10-28
 
-Den här sessionen saknar en ansluten källa/publiceringsåtgärd för Sites. Använd inte GitHub-merge som bevis på livepublicering.
+Den separata Sites-implementationen är publicerad som version 21 med D1-körningar, beständiga idempotensalias, atomiska leases, stegvis återupptagning och bankreservationer. Befintlig dokumentkö, Windows-OCR, Gmail-/bankanslutningar, nycklar och pausade molnscheman bevarades. Ett verkligt knapptryck hämtade 17 nya Gmail-underlag; bankdata återanvändes inom väntetiden. Inga mejl skickades.
 
-I befintliga Sites-projektet behöver motsvarande UI kopplas till ägarbundna Gmail-, dokument-, bank- och avstämningstjänster. D1-körningsrad, atomiskt startlås och beständigt resumebeteende krävs; kör inte hela flödet som en lång odokumenterad browser-request. Återanvänd befintlig PDF-/lokal OCR-kö, respektera dess paus och visa när OCR-datorn saknas. Återaktivera inte pausade molnscheman. Behåll Sites aktuella begränsningar, medgivanden, D1/R2 och krypteringsnycklar. Porten måste testas med ägarisolering, samtidiga anrop och Workers-körning samt publiceras separat.
+Se [slutrapporten](MG-FAKTURAKOLL-2-LEVERANS.md) och [den fullständiga Sites-patchen](sites/payment-control-v2.patch). En GitHub-merge är fortfarande separat från Sites-publicering. Jobbstatus visar kontrollens omfattning, inte att alla fakturor är betalda. Ny bankhämtning och faktiska kundutskick har inte verifierats live i denna leverans.
