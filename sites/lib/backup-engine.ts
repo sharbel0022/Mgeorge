@@ -30,10 +30,18 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
  let row=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND day=?').bind(owner,day).first();
  if(!row)throw Error('backup_unavailable');if(row.state==='complete'||row.attempts>=3)return publicBackup(row);
  const lease=crypto.randomUUID(),until=new Date(Date.now()+180_000).toISOString();
- const locked=await database.prepare("UPDATE backup_runs SET lease=?,lease_until=?,updated_at=? WHERE owner=? AND id=? AND (lease='' OR lease_until<?)").bind(lease,until,clock(),owner,row.id,clock()).run();
- if(locked.meta.changes!==1)return{...publicBackup(row),busy:true};
- const prefix=`backups/${encodeURIComponent(owner)}/${day}/${row.id}`;
+ const locked=await database.prepare("UPDATE backup_runs SET lease=?,lease_until=?,updated_at=? WHERE owner=? AND id=? AND state<>'complete' AND attempts<3 AND (lease='' OR lease_until<?)").bind(lease,until,clock(),owner,row.id,clock()).run();
+ if(locked.meta.changes!==1){const current=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=?').bind(owner,row.id).first();return{...publicBackup(current),...(current?.state!=='complete'&&current?.attempts<3?{busy:true}:{})};}
+ // A previous worker may have checkpointed or finished after our first read.
+ // Only state read under the newly acquired lease can drive this step.
+ row=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=? AND lease=?').bind(owner,row.id,lease).first();
+ if(!row)throw Error('backup_lease_lost');
+ // An expired worker must not overwrite a newer worker's snapshot object.
+ // Existing snapshots retain their original paths for backward compatibility.
+ const prefix=row.snapshot_key?row.snapshot_key.slice(0,row.snapshot_key.lastIndexOf('/')):`backups/${encodeURIComponent(owner)}/${day}/${row.id}/${lease}`;
+ async function renew(){const saved=await database.prepare('UPDATE backup_runs SET lease_until=? WHERE owner=? AND id=? AND lease=? AND lease_until>?').bind(new Date(Date.now()+180_000).toISOString(),owner,row!.id,lease,clock()).run();if(saved.meta.changes!==1)throw Error('backup_lease_lost');}
  try{
+  await renew();
   if(!row.snapshot_key){
    // One D1 batch provides a consistent database snapshot across all durable owner tables.
    const results=await database.batch(BACKUP_TABLES.map(name=>database.prepare(`SELECT * FROM ${name} WHERE owner=? LIMIT 5001`).bind(owner)));
@@ -42,11 +50,13 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
    if(plain.length>12_000_000)throw Error('backup_snapshot_too_large');
    const snapshotKey=prefix+'/snapshot.bin',snapshotHash=await hash(plain);await bucket.put(snapshotKey,await sealBackup(plain,key,owner,row.id,'snapshot'),{httpMetadata:{contentType:'application/octet-stream'}});
    const total=snapshot.tables.find(t=>t.name==='documents')!.rows.length;
-   await database.prepare("UPDATE backup_runs SET snapshot_key=?,snapshot_hash=?,total_docs=?,state='running',last_error='',updated_at=? WHERE owner=? AND id=? AND lease=?").bind(snapshotKey,snapshotHash,total,clock(),owner,row.id,lease).run();
+   await renew();
+   const saved=await database.prepare("UPDATE backup_runs SET snapshot_key=?,snapshot_hash=?,total_docs=?,state='running',last_error='',updated_at=? WHERE owner=? AND id=? AND lease=?").bind(snapshotKey,snapshotHash,total,clock(),owner,row.id,lease).run();if(saved.meta.changes!==1)throw Error('backup_lease_lost');
    row={...row,snapshot_key:snapshotKey,snapshot_hash:snapshotHash,total_docs:total,state:'running'};
   }
   const snapshot=await readSnapshot(bucket,row,key,owner),files=snapshot.tables.find(t=>t.name==='documents')!.rows;
   for(const file of files.slice(row.cursor,row.cursor+Math.max(1,Math.min(5,limit)))){
+   await renew();
    const source=await bucket.get(`${owner}/${file.id}`);if(!source)throw Error('backup_original_missing');
    const bytes=new Uint8Array(await source.arrayBuffer());if(bytes.length!==file.size||await hash(bytes)!==file.sha256)throw Error('backup_original_hash_mismatch');
    const name=`document:${file.id}`,path=prefix+'/'+file.id+'.bin';await bucket.put(path,await sealBackup(bytes,key,owner,row.id,name),{httpMetadata:{contentType:'application/octet-stream'}});
@@ -55,7 +65,8 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
    const saved=await database.prepare("UPDATE backup_runs SET cursor=?,bytes=?,state='running',updated_at=? WHERE owner=? AND id=? AND lease=?").bind(row.cursor,row.bytes,clock(),owner,row.id,lease).run();if(saved.meta.changes!==1)throw Error('backup_lease_lost');
   }
   const complete=row.cursor===files.length;
-  await database.prepare('UPDATE backup_runs SET state=?,finished_at=?,last_error=?,lease=?,lease_until=?,updated_at=? WHERE owner=? AND id=? AND lease=?').bind(complete?'complete':'running',complete?clock():'','','','',clock(),owner,row.id,lease).run();
+  await renew();
+  const saved=await database.prepare('UPDATE backup_runs SET state=?,finished_at=?,last_error=?,lease=?,lease_until=?,updated_at=? WHERE owner=? AND id=? AND lease=?').bind(complete?'complete':'running',complete?clock():'','','','',clock(),owner,row.id,lease).run();if(saved.meta.changes!==1)throw Error('backup_lease_lost');
   return publicBackup(await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=?').bind(owner,row.id).first());
  }catch(error){
   const code=error instanceof Error&&/^backup_[a-z_]+$/.test(error.message)?error.message:'backup_failed';
