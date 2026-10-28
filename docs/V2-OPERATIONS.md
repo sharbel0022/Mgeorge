@@ -22,6 +22,8 @@ Gmail använder Google OAuth och befintlig läsbehörighet. Följ [Gmail-guiden]
 
 ## Automatik
 
+**Aktuellt från Sites version 28:** De två molnschemana är aktiverade och ett separat dagligt molnbackupjobb är tillagt. Se [gällande tider och driftbevis](AUTOMATION-BACKUP.md). Beskrivningen nedan av pausade scheman avser leveransen av version 27.
+
 Node kör schemalagda jobb när servern är igång och integrationernas intervall är aktiverade. Retry och sparad väntetid behålls vid bankfel. Sites kan använda befintliga schedulerfunktioner, men en publicering startar inte de två pausade molnschemana. Kontrollera giltigt medgivande, period, fullständig hämtning och tillgänglig OCR-dator före aktivering. En öppen webbsida är inte i sig ett bevis på obemannad drift.
 
 ## Krypterad backup av Node

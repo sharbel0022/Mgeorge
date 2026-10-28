@@ -1,6 +1,8 @@
 import { automaticSync, automaticSyncStatus, bankFailure } from './service';
 
 const tools = [
+  {name:'backup_step',title:'Säkerhetskopiera ekonomi och original',description:'Skapar eller återupptar dagens krypterade säkerhetskopia för den inloggade användaren. Kopierar högst fem original per anrop och kontrolläser varje kopia. Ändrar inga fakturor eller betalningar.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
+  {name:'backup_status',title:'Status för verifierad säkerhetskopia',description:'Visar datum, verifieringsstatus och filantal för den inloggade användarens säkerhetskopior. Inga nycklar eller ekonomiska uppgifter returneras.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true}},
   {name:'process_invoice_documents',title:'Tolka väntande fakturaunderlag',description:'Bearbetar en begränsad beständig dokumentkö för den inloggade användaren. PDF-text läses i Sites; skannade dokument köas till den anslutna lokala OCR-datorn. Registrerar endast gröna fakturor från uttryckligen verifierade motparter. Skickar inga mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
   {name:'reconcile_customer_payments',title:'Stäm av betalningar och förbered kundmeddelanden',description:'Kontrollerar den autentiserade användarens fakturor och verifierade bankunderlag, matchar endast säkra betalningar och förbereder utkast för granskning. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
   {name:'gmail_auto_sync',title:'Hämta fakturabilagor från Gmail',description:'Hämtar fakturaunderlag till den autentiserade användarens arbetsyta högst var 15 minut med befintligt Google-medgivande. Förbereder underlag och avstämmer säkra betalningar mot registrerade fakturor. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true,openWorldHint:true}},
@@ -34,8 +36,12 @@ export async function bankRpc(body: unknown): Promise<Response> {
   if (!object(args) || Object.keys(args).length) return error(-32602, 'This tool accepts no arguments');
   let response: Response;
   try {
-    if(params.name==='process_invoice_documents'){
-      const {identity,response:json}=await import('../server');const user=await identity();const processing=await import('../document-processing');const settings=await processing.processingSettings(user);response=json(settings?.enabled?await processing.processDocuments(user.userId):{skipped:'paused',...await processing.processingStatus(user.userId)});
+    if(params.name==='backup_step'||params.name==='backup_status'){
+      response=await(await import('../backups')).backupRpc(params.name==='backup_step');
+    }else if(params.name==='process_invoice_documents'){
+      const {identity,response:json}=await import('../server');const user=await identity();const processing=await import('../document-processing');const settings=await processing.processingSettings(user);
+      const backup=await(await import('../backups')).runOwnerBackup(user.userId);
+      response=json({...(settings?.enabled?await processing.processDocuments(user.userId):{skipped:'paused',...await processing.processingStatus(user.userId)}),backup});
     }else if(params.name==='reconcile_customer_payments'){
       const {identity,response:json}=await import('../server');const user=await identity();
       response=json(await (await import('../customer-messages')).reconcileAndPrepare(user.userId));

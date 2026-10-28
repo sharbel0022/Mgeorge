@@ -64,6 +64,13 @@
       "when": 1793183404845,
       "tag": "0008_minor_jazinda",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1793219391001,
+      "tag": "0009_clumsy_rattler",
+      "breakpoints": true
     }
   ]
 }
