@@ -128,6 +128,24 @@ const {emptyState:emptyEconomyState}=await import('../lib/domain.ts');
 const {economySummary}=await import('../lib/economy-summary.js');
 const noAction=()=>{throw Error('Rendering must not perform side effects');};
 const economyProps=()=>({state:emptyEconomyState(),data:null,loading:false,error:'',demo:false,signedIn:true,busy:false,start:noAction,open:noAction,task:noAction,invoice:noAction,demoToggle:noAction});
-test('economy cards render four unknown values until loaded and never show a false empty queue',()=>{const html=render(EconomyOverview,economyProps());assert.equal((html.match(/class="economy-card"/g)||[]).length,4);assert.equal((html.match(/<strong>—<\/strong>/g)||[]).length,4);assert.doesNotMatch(html,/Inget i den här kön|0,00/);assert.match(html,/Hämtar ekonomiöversikten/);});
+test('economy cards render four unknown values until loaded and never show a false empty queue',()=>{const html=render(EconomyOverview,{...economyProps(),loading:true});assert.equal((html.match(/class="economy-card"/g)||[]).length,4);assert.equal((html.match(/<strong>—<\/strong>/g)||[]).length,4);assert.doesNotMatch(html,/Inget i den här kön|0,00/);assert.match(html,/Hämtar ekonomiöversikten/);});
 test('economy error hides stale amounts instead of suggesting zero',()=>{const p=economyProps();p.data={economy:economySummary(p.state,'2026-10-28'),counts:{},queue:[],connections:{gmail:{},bank:{},ocr:{}}};p.error='network error';const html=render(EconomyOverview,p);assert.match(html,/role="alert"/);assert.match(html,/Beloppen visas inte som noll/);assert.doesNotMatch(html,/0,00/);assert.equal((html.match(/<strong>—<\/strong>/g)||[]).length,4);});
 test('economy displays incomplete bank evidence and distinguishes verified payer from customer',()=>{const p=economyProps();p.state.invoices.push({id:'i',number:'0594',party:'<script>customer</script>',direction:'receivable',reviewed:true,total:10000,currency:'SEK',due:'2026-11-30'});p.state.transactions.push({id:'t',date:'2026-10-28',amount:10000,currency:'SEK',verified:true,kind:'payment',party:'Actual payer',payerReference:'0594'},{id:'batch',amount:20000,currency:'SEK',kind:'batch'});p.state.allocations.push({id:'a',invoiceId:'i',transactionId:'t',amount:10000,effect:'payment',active:true});p.data={economy:economySummary(p.state,'2026-10-28'),counts:{review:1,processing:2},queue:[],connections:{gmail:{history_incomplete:true},bank:{},ocr:{}}};const html=render(EconomyOverview,p);assert.match(html,/Översikten är preliminär/);assert.match(html,/saknar komplett betalningsspecifikation/);assert.match(html,/Fler Gmail-underlag/);assert.match(html,/0594/);assert.match(html,/Actual payer/);assert.match(html,/&lt;script&gt;customer/);assert.doesNotMatch(html,/<script/);assert.match(html,/Inga kundmejl skickas/);});
+
+
+test('signed-out economy cards request sign-in instead of claiming an active fetch',()=>{
+ const html=render(EconomyOverview,{...economyProps(),signedIn:false});
+ assert.match(html,/Logga in för att se betalningar/);assert.match(html,/Logga in för att se fakturor/);assert.doesNotMatch(html,/Hämtar betalningar|Hämtar fakturor|Inga verifierade betalningskopplingar|Inga granskade öppna kundfakturor/);
+});
+
+test('failed or unavailable economy cards do not claim loading or loaded empty results',()=>{
+ for(const error of ['', 'synthetic failure']){
+  const html=render(EconomyOverview,{...economyProps(),error});
+  assert.match(html,error?/kunde inte hämtas/:/inte tillgängliga ännu/);assert.doesNotMatch(html,/Hämtar betalningar|Hämtar fakturor|Hämtar ekonomiöversikten|Inga verifierade betalningskopplingar|Inga granskade öppna kundfakturor/);
+ }
+});
+
+test('loaded empty economy cards explain absent records without claiming no money arrived',()=>{
+ const p=economyProps();p.data={economy:economySummary(p.state,'2026-10-28'),counts:{review:0,processing:0},queue:[],connections:{gmail:{},bank:{},ocr:{}}};
+ const html=render(EconomyOverview,p);assert.match(html,/Inga verifierade betalningskopplingar/);assert.match(html,/Det betyder inte att inga pengar har kommit in/);assert.match(html,/Inga granskade öppna kundfakturor/);assert.doesNotMatch(html,/Hämtar betalningar|Hämtar fakturor|Logga in för att se/);
+});

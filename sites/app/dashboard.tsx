@@ -1,6 +1,7 @@
 "use client";
 import EconomyOverview from '@/components/economy-overview';
 import BankPayments,{BankPaymentSummary} from '@/components/bank-payments';
+import PaymentHistory from '@/components/payment-history';
 import {bankPaymentView,bankVisibleTransactions,payerLabel} from '@/lib/payment-presentation';
 import {ControlButton,ControlConnections,ControlProgress,ControlQueue,ControlReview,usePaymentControl,controlDate,type ControlTask} from '@/components/payment-control';
 import GmailSummary from '@/components/gmail-summary';
@@ -89,7 +90,7 @@ export default function Dashboard({initialView='overview',openBankImport=false}:
      const invoice=state.invoices.find(i=>i.id===(task.invoice_id||task.entity_id));
      if(task.type==='document')return <GmailWorkspace key={task.id} embedded focusOnly initialDocumentId={task.entity_id} onChanged={()=>{void load(true);void control.refresh();}}/>;
      if(task.type==='message')return <CustomerMessages key={task.id} embedded focusOnly initialMessageId={task.entity_id} onChanged={()=>{void load(true);void control.refresh();}}/>;
-     if(tx)return <TransactionDetail invoiceCandidates={bankCandidates} onDetails={()=>void load(true)} key={tx.id} tx={tx} state={state} save={save} busy={busy} close={close} open={setModal} error={error} inline demo={demo}/>;
+     if(tx)return <TransactionDetail historyRevision={revision} invoiceCandidates={bankCandidates} onDetails={()=>void load(true)} key={tx.id} tx={tx} state={state} save={save} busy={busy} close={close} open={setModal} error={error} inline demo={demo}/>;
      if(invoice)return <InvoiceDetail key={invoice.id} invoice={invoice} state={state} close={close} busy={busy} open={setModal} toast={setToast} demo={demo} onMessage={openMessage} inline/>;
      return <div className="review-summary"><h2>{task.title}</h2><p>{task.reason}</p><button className="btn primary" onClick={()=>openTask(task)}>{task.action}</button></div>;
     }}/></>}
@@ -117,7 +118,7 @@ export default function Dashboard({initialView='overview',openBankImport=false}:
   {modal?.kind==='invoice'&&<InvoiceEditor invoice={selectedInvoice} direction={modal.direction} company={state.company} save={save} close={close} busy={busy} demo={demo} error={error} reportError={setError}/>}
   {modal?.kind==='detail'&&selectedInvoice&&<InvoiceDetail invoice={selectedInvoice} state={state} close={close} busy={busy} open={setModal} toast={setToast} demo={demo} onMessage={openMessage}/>}
   {modal?.kind==='bankimport'&&<BankImport state={state} targetId={modal.transactionId} demo={demo} save={save} busy={busy} close={close} error={error} reportError={setError}/>}
-  {modal?.kind==='tx'&&selectedTransaction&&<TransactionDetail invoiceCandidates={bankCandidates} onDetails={()=>void load(true)} key={selectedTransaction.id} demo={demo} tx={selectedTransaction} state={state} save={save} busy={busy} close={close} open={setModal} error={error}/>}
+  {modal?.kind==='tx'&&selectedTransaction&&<TransactionDetail historyRevision={revision} invoiceCandidates={bankCandidates} onDetails={()=>void load(true)} key={selectedTransaction.id} demo={demo} tx={selectedTransaction} state={state} save={save} busy={busy} close={close} open={setModal} error={error}/>}
   {modal?.kind==='missinginvoice'&&state.transactions.find(t=>t.id===modal.transactionId)&&<MissingInvoice tx={state.transactions.find(t=>t.id===modal.transactionId)!} close={close} open={setModal} demo={demo}/>}
  {modal?.kind==='newtx'&&<NewTransaction save={save} close={close} busy={busy} error={error}/>}
   {modal?.kind==='split'&&selectedTransaction&&<SplitTransaction tx={selectedTransaction} save={save} busy={busy} close={close} error={error}/>}
@@ -189,7 +190,7 @@ function BankImport({state,targetId,save,busy,close,error,demo}:{state:State;tar
  <FormError text={localError||error}/></div><footer className="modal-footer"><button type="button" className="btn" onClick={close} disabled={busy||reading}>Avbryt</button><button type="submit" className="btn primary" disabled={busy||reading||!checked||!rows.length}>{busy||reading?'Arbetar…':duplicate?'Stäng dubbelimport':'Bekräfta import'}</button></footer></form></Dialog>;
 }
 
-function TransactionDetail({tx:t,state,save,busy,close,open,error,inline=false,demo=false,onDetails,invoiceCandidates={}}:{invoiceCandidates?:Record<string,BankInvoiceCandidate[]>;onDetails?:()=>void;inline?:boolean;demo?:boolean;tx:Transaction;state:State;save:Save;busy:boolean;close:()=>void;open:(m:Modal)=>void;error:string}){
+function TransactionDetail({historyRevision=0,tx:t,state,save,busy,close,open,error,inline=false,demo=false,onDetails,invoiceCandidates={}}:{historyRevision?:number;invoiceCandidates?:Record<string,BankInvoiceCandidate[]>;onDetails?:()=>void;inline?:boolean;demo?:boolean;tx:Transaction;state:State;save:Save;busy:boolean;close:()=>void;open:(m:Modal)=>void;error:string}){
  const[party,setParty]=useState(t.party),[reference,setReference]=useState(t.payerReference),[note,setNote]=useState(''),[distinct,setDistinct]=useState(false),[checked,setChecked]=useState(false);
  const [detailStatus,setDetailStatus]=useState(''),[detailError,setDetailError]=useState('');
  const detailsAttempt=useRef('');
@@ -205,6 +206,8 @@ function TransactionDetail({tx:t,state,save,busy,close,open,error,inline=false,d
  <details className="bank-evidence"><summary>Varifrån kommer uppgifterna?</summary><dl className="details-grid"><div><dt>Bankkälla</dt><dd>{t.source||'Saknas'}</dd></div>{t.organizationNumber&&<div><dt>Betalarens identitet</dt><dd>{t.organizationNumber}</dd></div>}{t.payerAccount&&<div><dt>Betalarens konto</dt><dd>{t.payerAccount}</dd></div>}{t.remittanceMessage&&<div><dt>Bankens betalningsmeddelande</dt><dd>{t.remittanceMessage}</dd></div>}<div><dt>Fakturakoppling</dt><dd>{assessment.message}</dd></div><div><dt>Konto</dt><dd>{t.account.startsWith('iban:')?'Konto •••• '+t.account.slice(-4):t.account}</dd></div></dl>{presentation.manualPayer&&<p>Manuellt bekräftad betalare: <strong>{presentation.manualPayer}</strong>. Bekräftad av inloggad administratör {t.verification?.at?controlDate(t.verification.at):''}. {t.verification?.note}</p>}{presentation.manualReference&&<p>Manuellt bekräftad referens: <span className="mono">{presentation.manualReference}</span></p>}
  {(detailStatus||t.bankDetails?.reason)&&<div className="inline-notice"><span>{t.bankDetails?.reason||detailStatus}</span></div>}
  <FormError text={detailError}/>
+ <PaymentHistory key={t.id+":"+historyRevision} transactionId={t.id} demo={demo}/>
+ {t.reportEvidence&&<details className="original-bank-details"><summary>Bankrapportens uppgifter</summary><dl className="details-grid"><div><dt>Rapport-ID</dt><dd>{t.reportEvidence.reportId||'Saknas'}</dd></div><div><dt>Meddelande-ID</dt><dd>{t.reportEvidence.messageId||'Saknas'}</dd></div><div><dt>Kontoförande bank enligt rapporten</dt><dd>{t.reportEvidence.accountServicer||'Saknas'}</dd></div><div><dt>Valutadatum</dt><dd>{t.reportEvidence.valueDate||'Saknas'}</dd></div><div><dt>Rapportformat</dt><dd>{t.reportEvidence.namespace}</dd></div></dl><p>Uppgifterna kommer från originalfilen. Filens banknamn och kontrollsumma bekräftar inte ensamma avsändarens identitet.</p></details>}
  {t.bankDetails?.documentId&&<a className="text-button" href={'/api/files?id='+encodeURIComponent(t.bankDetails.documentId)} target="_blank" rel="noopener">Visa bankens sparade detaljsvar</a>}
  {t.bankDetails?.payerReference&&<section className="review-invoice-evidence"><h3>Bankens betalningsreferens {t.bankDetails.payerReference}</h3><p>{assessment.message}</p>{assessment.invoice&&<button className="text-button" onClick={()=>open({kind:'detail',id:assessment.invoice!.id})}>Granska faktura {assessment.invoice.number}</button>}</section>}
 
