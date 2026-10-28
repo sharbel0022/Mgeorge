@@ -1,0 +1,36 @@
+name: Payment control checks
+on:
+  push:
+    branches: [codex/one-click-payment-control]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: payment-control-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Package tracked source for review
+        run: |
+          mkdir -p /tmp/mgeorge-review
+          git archive --format=tar HEAD | gzip > /tmp/mgeorge-review/source.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-source
+          path: /tmp/mgeorge-review/source.tar.gz
+          retention-days: 3
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - name: Run tests with synthetic data
+        run: npm test
