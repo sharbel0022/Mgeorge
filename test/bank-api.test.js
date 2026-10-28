@@ -43,6 +43,7 @@ globalThis.fetch=async(url,options)=>{
   if(target.pathname.endsWith('/transactions')){
     transactionCalls++;lastQuery=target.searchParams;
     if(mode==='rate_limit')return Response.json({error:'ASPSP_RATE_LIMIT_EXCEEDED',message:'private-bank-data'},{status:429,headers:{'Retry-After':'120'}});
+    if(mode==='rate_limit_missing')return Response.json({error:'ASPSP_RATE_LIMIT_EXCEEDED'},{status:429});
     if(mode==='failure')throw Error('secret-provider-error');
     if(mode==='aggregate')return Response.json({transactions:[{...transaction('bg-aggregate','200.00'),debtor:{name:'Bankgirot'},reference_number:undefined,remittance_information:['Bankgiro insättning']} ]});
     if(!target.searchParams.has('continuation_key'))return Response.json({transactions:[transaction('entry-1')],continuation_key:'page-2'});
@@ -176,6 +177,21 @@ test('legacy identity preflight blocks the complete sync before any provider rea
     db.prepare('UPDATE bank_transactions SET api_identity_version=1 WHERE id=?').run(legacy.id);
     db.prepare("UPDATE bank_connections SET status='connected',last_error='' WHERE id=?").run(c.id);
   }
+});
+
+test('scheduled ASPSP rate limits without Retry-After retain six-hour cooldown across restart',async()=>{
+  const c=await current(),job='bank:'+c.id;
+  db.prepare("UPDATE bank_connections SET last_synced='',retry_after=0,status='connected' WHERE id=?").run(c.id);db.prepare('DELETE FROM integration_jobs WHERE name=?').run(job);
+  await call('/api/settings','PATCH',{sync_interval_minutes:15});mode='rate_limit_missing';const before=transactionCalls;
+  try{
+    await runScheduledSync();assert.equal(transactionCalls,before+1);
+    assert.ok(db.prepare('SELECT retry_after FROM bank_connections WHERE id=?').get(c.id).retry_after>=Date.now()+21599000);
+    assert.ok(db.prepare('SELECT next_attempt FROM integration_jobs WHERE name=?').get(job).next_attempt>=Date.now()+21599000);
+    // Even if the shorter configured interval elapsed, provider cooldown wins.
+    db.prepare('UPDATE integration_jobs SET last_attempt=0 WHERE name=?').run(job);
+    const restarted=await import('../src/server.js?aspsp-rate-fallback-restart');
+    try{await restarted.runScheduledSync();assert.equal(transactionCalls,before+1);}finally{restarted.db.close();}
+  }finally{mode='';db.prepare("UPDATE bank_connections SET retry_after=0,last_synced='',status='connected' WHERE id=?").run(c.id);db.prepare('DELETE FROM integration_jobs WHERE name=?').run(job);}
 });
 
 test('scheduled synchronization only uses selected account and logout invalidates pending callback',async()=>{

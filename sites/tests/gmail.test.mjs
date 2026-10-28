@@ -21,9 +21,9 @@ async function fixture(t){
   const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf}),fields=moduleUrl('../lib/invoice-fields.js',{'./domain':domainUrl});
   f.adapter=await import(adapter);
   const pdf=data(`export async function serverPdfText(){const f=${reference};if(f.pdfError)throw Error(f.pdfError);return f.pdfResult||{text:'',method:'pdf',confidence:100};}`);
-  const processing=moduleUrl('../lib/document-processing.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/security':securityUrl,'./invoice-fields.js':fields,'./server-pdf':pdf,'./customer-messages':data('export async function reconcileAndPrepare(){}')});
+  const processing=moduleUrl('../lib/document-processing.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/security':securityUrl,'./invoice-fields.js':fields,'./server-pdf':pdf,'./customer-messages':data(`export async function reconcileAndPrepare(){if(${reference}.reconcileError)throw Error('synthetic postprocessing failure');}`)});
   f.processing=await import(processing);f.fields=await import(fields);
-  f.api=await import(moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields,'./document-processing':processing,'./customer-messages':data('export async function reconcileAndPrepare(){}')}));
+  f.api=await import(moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields,'./document-processing':processing,'./customer-messages':data(`export async function reconcileAndPrepare(){if(${reference}.reconcileError)throw Error('synthetic postprocessing failure');}`)}));
   t.mock.method(globalThis,'fetch',async (url,options)=>{
     assert.equal(options.redirect,'manual','Workers-compatible fetch must never forward credentials through redirects');
     f.providerCalls++;const path=new URL(url).pathname;
@@ -218,4 +218,38 @@ test('rejecting a document cancels its lease and removes it from review counts w
 });
 test('scheduled Gmail cooldown still drains pending text jobs',async t=>{
   const f=await processingFixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.doc();f.sql.prepare('UPDATE gmail_connections SET last_attempt=?').run(new Date().toISOString());const r=await (await f.api.gmailSync(undefined,true)).json();assert.equal(r.status,'not_due');assert.equal(r.processing.processed,1);
+});
+
+
+test('Sites Gmail scheduled failures stop after three persisted attempts and a manual success recovers',async t=>{
+ const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.retryAfter='1';
+ for(let n=1;n<=3;n++){
+  f.sql.prepare("UPDATE gmail_connections SET last_attempt='',retry_after=''").run();
+  await assert.rejects(f.api.gmailSync(undefined,true),e=>e.code==='rate_limited');
+  assert.equal(f.sql.prepare('SELECT sync_failures FROM gmail_connections').get().sync_failures,n);
+ }
+ const calls=f.providerCalls;assert.equal((await(await f.api.gmailSync(undefined,true)).json()).status,'blocked');assert.equal(f.providerCalls,calls);
+ const status=await(await f.api.gmailStatus()).json();assert.equal(status.connection.blocked,true);assert.equal(status.next_eligible_sync,null);
+ f.retryAfter='';f.sql.prepare("UPDATE gmail_connections SET retry_after=''").run();await f.api.gmailSync(post('sync'));
+ assert.equal(f.sql.prepare('SELECT sync_failures FROM gmail_connections').get().sync_failures,0);assert.equal(f.sql.prepare('SELECT status FROM gmail_connections').get().status,'connected');
+});
+
+test('three interrupted Sites Gmail reservations cannot silently retry forever',async t=>{
+ const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+ f.messageReached=()=>f.sql.prepare("UPDATE gmail_locks SET token='replacement',expires_at=?").run(new Date(Date.now()+60000).toISOString());
+ for(let n=1;n<=3;n++){
+  f.sql.prepare('DELETE FROM gmail_locks').run();f.sql.prepare("UPDATE gmail_connections SET last_attempt=''").run();
+  await assert.rejects(f.api.gmailSync(undefined,true),e=>e.code==='gmail_lease_lost');
+  assert.equal(f.sql.prepare('SELECT sync_failures FROM gmail_connections').get().sync_failures,n);
+ }
+ f.sql.prepare('DELETE FROM gmail_locks').run();assert.equal((await(await f.api.gmailSync(undefined,true)).json()).status,'blocked');
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,0);
+});
+
+
+test('committed Gmail retrieval stays successful if document after-checks need retrying',async t=>{
+ const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.reconcileError=true;
+ const result=await(await f.api.gmailSync(undefined,true)).json();assert.equal(result.imported,1);assert.match(result.warning,/Efterkontrollen/);assert.equal(result.processing.status,'pending');assert.equal(f.sql.prepare('SELECT status FROM gmail_connections').get().status,'connected');assert.equal(f.sql.prepare('SELECT sync_failures FROM gmail_connections').get().sync_failures,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_runs').get().n,1);assert.equal(f.sql.prepare('SELECT status FROM gmail_runs').get().status,'completed_pending');
+ const status=await(await f.api.gmailStatus()).json();assert.equal(status.connection.status,'connected');assert.match(status.connection.postprocess_warning,/Efterkontrollen/);assert.ok(status.last_successful_fetch);assert.equal(status.connection.sync_failures,0);
+ f.reconcileError=false;await f.api.gmailSync(post('sync'));const recovered=await(await f.api.gmailStatus()).json();assert.equal(recovered.connection.postprocess_warning,null);
 });

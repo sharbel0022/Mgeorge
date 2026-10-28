@@ -83,9 +83,10 @@ function requestUrl(path,method){
   if(!allowed||(method!=='GET'&&url.search))throw bankError('read_only','Bankintegrationen tillåter endast läsåtkomst och hantering av medgivanden.',400);
   return url.href;
 }
-function retryAfterSeconds(value){
-  const seconds=/^\d+$/.test(value||'')?Number(value):Math.ceil((Date.parse(value)-Date.now())/1000);
-  return Number.isFinite(seconds)?Math.min(86400,Math.max(1,seconds)):60;
+function retryAfterSeconds(value,fallback=60){
+  const text=(value||'').trim(),seconds=/^\d+$/.test(text)?Number(text):Math.ceil((Date.parse(text)-Date.now())/1000);
+  const retryBlocked=/^\d{11,}$/.test(text)||Number.isFinite(seconds)&&seconds>365*86400;
+  return {retryAfter:retryBlocked?Math.ceil((Date.UTC(9999,11,31)-Date.now())/1000):Number.isFinite(seconds)&&seconds>=0?Math.max(1,seconds):fallback,retryBlocked};
 }
 /** Skickar tidsbegränsade anrop till Enable Bankings fasta API-domän med signerad token; leverantörsfel hanteras centralt. */
 export async function bankingRequest(path,{method='GET',body}={}){
@@ -98,7 +99,7 @@ export async function bankingRequest(path,{method='GET',body}={}){
     const data=result.status===204?{}:await result.json().catch(()=>null);
     if(!result.ok){
       const providerStatus=result.status,extra={providerStatus};
-      if(providerStatus===429||data?.error==='ASPSP_RATE_LIMIT_EXCEEDED')throw bankError('rate_limited','Bankens anropsgräns är nådd. Vänta innan du försöker igen.',429,{...extra,retryAfter:retryAfterSeconds(result.headers.get('retry-after'))});
+      if(providerStatus===429||data?.error==='ASPSP_RATE_LIMIT_EXCEEDED')throw bankError('rate_limited','Bankens anropsgräns är nådd. Vänta innan du försöker igen.',429,{...extra,...retryAfterSeconds(result.headers.get('retry-after'),data?.error==='ASPSP_RATE_LIMIT_EXCEEDED'?6*3600:60)});
       if(['CLOSED_SESSION','EXPIRED_SESSION','REVOKED_SESSION','SESSION_DOES_NOT_EXIST'].includes(data?.error))throw bankError('renewal_required','Bankmedgivandet har upphört. Förnya anslutningen.',409,extra);
       if(data?.error==='REDIRECT_URI_NOT_ALLOWED')throw bankError('redirect_not_registered','Bankens returadress måste registreras av systemadministratören.',409,extra);
       if(providerStatus===401||providerStatus===403)throw bankError('application_access_denied','Banktjänsten behöver aktiveras av systemadministratören. Kontrollera nyckel, produktionsgodkännande och AIS-behörighet.',409,extra);

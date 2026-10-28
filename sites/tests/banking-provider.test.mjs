@@ -383,3 +383,11 @@ test('Bankgiro individual identity needs real payer and structured reference; ex
  assert.deepEqual(rows.rows.map(row=>row.kind),['unknown','batch','batch','batch']);
  assert.ok(rows.rows.every(row=>!row.verified));
 });
+
+
+test('provider Retry-After keeps long waits and treats extreme values as blocked',async t=>{
+ for(const [header,minimum,blocked] of [['172800',172800,false],[new Date(Date.now()+172800000).toUTCString(),172799,false],['999999999999999999999999',60,true],['invalid',60,false]]){
+  t.mock.method(globalThis,'fetch',async()=>json({error:'ASPSP_RATE_LIMIT_EXCEEDED'},429,{'Retry-After':header}));
+  await assert.rejects(providerRequest(config,'/application'),e=>e.code==='BANK_RATE_LIMIT'&&e.retryAfter>=minimum&&e.retryBlocked===blocked);
+ }
+});

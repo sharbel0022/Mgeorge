@@ -30,16 +30,17 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
  let row=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND day=?').bind(owner,day).first();
  if(!row)throw Error('backup_unavailable');if(row.state==='complete'||row.attempts>=3)return publicBackup(row);
  const lease=crypto.randomUUID(),until=new Date(Date.now()+180_000).toISOString();
- const locked=await database.prepare("UPDATE backup_runs SET lease=?,lease_until=?,updated_at=? WHERE owner=? AND id=? AND state<>'complete' AND attempts<3 AND (lease='' OR lease_until<?)").bind(lease,until,clock(),owner,row.id,clock()).run();
+ const locked=await database.prepare("UPDATE backup_runs SET attempts=attempts+CASE WHEN lease<>'' THEN 1 ELSE 0 END,lease=?,lease_until=?,updated_at=? WHERE owner=? AND id=? AND state<>'complete' AND attempts<3 AND (lease='' OR lease_until<?)").bind(lease,until,clock(),owner,row.id,clock()).run();
  if(locked.meta.changes!==1){const current=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=?').bind(owner,row.id).first();return{...publicBackup(current),...(current?.state!=='complete'&&current?.attempts<3?{busy:true}:{})};}
  // A previous worker may have checkpointed or finished after our first read.
  // Only state read under the newly acquired lease can drive this step.
  row=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=? AND lease=?').bind(owner,row.id,lease).first();
  if(!row)throw Error('backup_lease_lost');
+ if(row.attempts>=3){await database.prepare("UPDATE backup_runs SET state='failed',last_error='backup_interrupted',lease='',lease_until='',updated_at=? WHERE owner=? AND id=? AND lease=?").bind(clock(),owner,row.id,lease).run();return publicBackup(await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=?').bind(owner,row.id).first());}
  // An expired worker must not overwrite a newer worker's snapshot object.
  // Existing snapshots retain their original paths for backward compatibility.
  const prefix=row.snapshot_key?row.snapshot_key.slice(0,row.snapshot_key.lastIndexOf('/')):`backups/${encodeURIComponent(owner)}/${day}/${row.id}/${lease}`;
- async function renew(){const saved=await database.prepare('UPDATE backup_runs SET lease_until=? WHERE owner=? AND id=? AND lease=? AND lease_until>?').bind(new Date(Date.now()+180_000).toISOString(),owner,row!.id,lease,clock()).run();if(saved.meta.changes!==1)throw Error('backup_lease_lost');}
+ async function renew(){const saved=await database.prepare("UPDATE backup_runs SET lease_until=? WHERE owner=? AND id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now')").bind(new Date(Date.now()+180_000).toISOString(),owner,row!.id,lease).run();if(saved.meta.changes!==1)throw Error('backup_lease_lost');}
  try{
   await renew();
   if(!row.snapshot_key){

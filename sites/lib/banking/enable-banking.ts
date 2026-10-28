@@ -60,6 +60,8 @@ export class ProviderError extends Error {
   code: string;
   status: number;
   retryable: boolean;
+  retryAfter?: number;
+  retryBlocked?: boolean;
   constructor(code: string, message: string, status = 502, retryable = false) {
     super(message); this.name = 'ProviderError'; this.code = code; this.status = status; this.retryable = retryable;
   }
@@ -145,7 +147,7 @@ async function boundedJson(response: Response): Promise<unknown> {
   try { return JSON.parse(text); } catch { if (!response.ok) return null; throw invalidResponse(); }
 }
 
-function mappedError(status: number, payload: unknown): ProviderError {
+function mappedError(status: number, payload: unknown, retryHeader: string | null): ProviderError {
   const code = record(payload) && typeof payload.error === 'string' ? payload.error : '';
   if (['EXPIRED_SESSION', 'REVOKED_SESSION', 'CLOSED_SESSION', 'SESSION_DOES_NOT_EXIST', 'EXPIREDSESSION'].includes(code)) {
     return new ProviderError('BANK_RECONNECT_REQUIRED', 'Bankmedgivandet har gått ut eller avslutats. Anslut banken igen.', 409);
@@ -158,7 +160,11 @@ function mappedError(status: number, payload: unknown): ProviderError {
   if (['WRONG_TRANSACTIONS_PERIOD', 'WRONG_DATE_INTERVAL', 'DATE_FROM_IN_FUTURE', 'DATE_TO_WITHOUT_DATE_FROM'].includes(code)) return new ProviderError('BANK_PERIOD_UNAVAILABLE', 'Banken kan inte lämna den valda perioden. Välj ett senare startdatum eller en kortare period.', 400);
   if (['ASPSP_ACCOUNT_NOT_ACCESSIBLE', 'ACCOUNT_DOES_NOT_EXIST'].includes(code)) return new ProviderError('BANK_ACCOUNT_UNAVAILABLE', 'Bankkontot är inte tillgängligt med det aktuella medgivandet. Anslut banken igen och välj företagets konto.', 409);
   if (code === 'ASPSP_PSU_ACTION_REQUIRED') return new ProviderError('BANK_ACTION_REQUIRED', 'Banken kräver en åtgärd från dig. Logga in hos banken och kontrollera meddelanden och behörigheter.', 409);
-  if (status === 429 || code === 'ASPSP_RATE_LIMIT_EXCEEDED') return new ProviderError('BANK_RATE_LIMIT', 'Bankens gräns för hämtningar har nåtts. Vänta en stund innan du försöker igen.', 429, true);
+  if (status === 429 || code === 'ASPSP_RATE_LIMIT_EXCEEDED') {
+    const value=(retryHeader||'').trim(),seconds=/^\d+$/.test(value)?Number(value):Math.ceil((Date.parse(value)-Date.now())/1000);
+    const blocked=/^\d{11,}$/.test(value)||Number.isFinite(seconds)&&seconds>365*86400;
+    return Object.assign(new ProviderError('BANK_RATE_LIMIT', blocked?'Bankens väntetid kräver manuell kontroll. Automatisk hämtning har stoppats.':'Bankens gräns för hämtningar har nåtts. Vänta till nästa tillåtna försök.', 429, true), {retryAfter:Number.isFinite(seconds)?Math.max(1,Math.min(365*86400,seconds)):60,retryBlocked:blocked});
+  }
   if (status === 408 || code === 'ASPSP_TIMEOUT') return new ProviderError('BANK_TIMEOUT', 'Banktjänsten svarade inte i tid. Försök igen om en stund.', 504, true);
   if (['PSU_HEADER_NOT_PROVIDED', 'PSU_HEADER_INVALID', 'PSUHEADERNOT_PROVIDED'].includes(code)) return new ProviderError('BANK_USER_CONTEXT_REQUIRED', 'Banken behöver en aktiv användarsession. Öppna sidan och försök hämta bankhändelser igen.', 409);
   if (status === 401 || ['AUTHORIZATION_NOT_PROVIDED', 'UNAUTHORIZED_ACCESS', 'WRONG_CREDENTIALS_PROVIDED'].includes(code)) return new ProviderError('PROVIDER_AUTHORIZATION_FAILED', 'Banktjänsten behöver aktiveras av systemadministratören. Enable Banking kunde inte verifiera serverns åtkomst.', 400);
@@ -200,7 +206,7 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
       throw new ProviderError('PROVIDER_REDIRECT_DENIED', 'Banktjänsten svarade med en oväntad omdirigering. Ingen import gjordes.');
     }
     const payload = await boundedJson(response);
-    if (!response.ok) throw mappedError(response.status, payload);
+    if (!response.ok) throw mappedError(response.status, payload, response.headers.get('retry-after'));
     if (!record(payload)) throw invalidResponse();
     return payload as T;
   } catch (error) {

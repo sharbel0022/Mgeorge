@@ -141,12 +141,12 @@ test('expired and revoked sessions explicitly require reconnection',async()=>{
     await assert.rejects(bankingRequest('/sessions/expired'),e=>e.code==='renewal_required'&&e.status===409&&e.providerStatus===404&&!e.message.includes('never reflect'));
   }
 });
-test('rate limits retain bounded retry delay and do not replay a failed POST',async()=>{
+test('rate limits retain the provider retry delay and do not replay a failed POST',async()=>{
   let calls=0;globalThis.fetch=async()=>{calls++;return respond({error:'ASPSP_RATE_LIMIT_EXCEEDED',message:'private'},429,{'Retry-After':'120'});};
   await assert.rejects(bankingRequest('/auth',{method:'POST',body:{}}),e=>e.code==='rate_limited'&&e.status===429&&e.retryAfter===120);
   assert.equal(calls,1);
   globalThis.fetch=async()=>respond({error:'ASPSP_RATE_LIMIT_EXCEEDED'},400,{'Retry-After':'999999'});
-  await assert.rejects(bankingRequest('/application'),e=>e.retryAfter===86400);
+  await assert.rejects(bankingRequest('/application'),e=>e.retryAfter===999999);
 });
 test('provider permission, invalid JSON and network errors are redacted',async()=>{
   globalThis.fetch=async()=>respond({message:pem,error:'ACCESS_DENIED'},403);
@@ -181,4 +181,23 @@ test('transactions never return a partial batch after page or transaction limits
   await assert.rejects(fetchBookedTransactions('a',dateRange),e=>e.code==='page_limit');assert.equal(pages,15);
   globalThis.fetch=async()=>respond({transactions:Array.from({length:5001},()=>({status:'BOOK'}))});
   await assert.rejects(fetchBookedTransactions('a',dateRange),e=>e.code==='transaction_limit');
+});
+
+
+test('bank Retry-After never truncates a multi-day wait into an early retry',async()=>{
+ for(const header of ['172800',new Date(Date.now()+172800000).toUTCString()]){
+  globalThis.fetch=async()=>respond({error:'ASPSP_RATE_LIMIT_EXCEEDED'},429,{'Retry-After':header});
+  await assert.rejects(bankingRequest('/application'),e=>e.code==='rate_limited'&&e.retryAfter>=172799&&!e.retryBlocked);
+ }
+ globalThis.fetch=async()=>respond({error:'ASPSP_RATE_LIMIT_EXCEEDED'},429,{'Retry-After':'999999999999999999999999'});
+ await assert.rejects(bankingRequest('/application'),e=>e.retryBlocked&&e.retryAfter>365*86400);
+});
+
+test('an ASPSP rate limit without a valid Retry-After persists the six-hour fallback',async()=>{
+ for(const header of ['', 'invalid']){
+  globalThis.fetch=async()=>respond({error:'ASPSP_RATE_LIMIT_EXCEEDED'},429,header?{'Retry-After':header}:{});
+  await assert.rejects(bankingRequest('/application'),e=>e.code==='rate_limited'&&e.retryAfter===21600);
+ }
+ globalThis.fetch=async()=>respond({error:'ASPSP_RATE_LIMIT_EXCEEDED'},429,{'Retry-After':'172800'});
+ await assert.rejects(bankingRequest('/application'),e=>e.retryAfter===172800);
 });

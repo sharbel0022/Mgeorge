@@ -74,3 +74,18 @@ test('a delayed reader respects a retry limit reached by another worker',async t
  const stats=f.stats();barrier.resume();const stopped=await late;
  assert.equal(stopped.attempts,3);assert.equal(stopped.status,'failed');assert.deepEqual(f.stats(),stats);
 });
+
+
+test('expired backup reservations count toward exhaustion before any further object access',async t=>{
+ const f=fixture(t,0),at=date.toISOString();
+ f.sql.prepare("INSERT INTO backup_runs(id,owner,day,state,lease,lease_until,attempts,created_at,updated_at) VALUES(?,?,?,'preparing','crashed','2000-01-01',2,?,?)").run(crypto.randomUUID(),owner,'2026-10-28',at,at);
+ const stats=f.stats(),stopped=await backupStep(f.db,f.bucket,owner,key,date);
+ assert.equal(stopped.attempts,3);assert.equal(stopped.status,'failed');assert.equal(stopped.error,'backup_interrupted');assert.deepEqual(f.stats(),stats);
+ assert.equal((await backupStep(f.db,f.bucket,owner,key,date)).attempts,3);assert.deepEqual(f.stats(),stats);
+});
+
+test('backup renewal checks the database clock after waiting for a write lock',async t=>{
+ const f=fixture(t,0),original=f.db.prepare.bind(f.db);let expired=false;
+ const db={...f.db,prepare(text){const statement=original(text);if(text.startsWith('UPDATE backup_runs SET lease_until=')){const run=statement.run;statement.run=async()=>{if(!expired){expired=true;f.sql.prepare("UPDATE backup_runs SET lease_until='2000-01-01'").run();}return run.call(statement);};}return statement;}};
+ const result=await backupStep(db,f.bucket,owner,key,date);assert.equal(result.error,'backup_lease_lost');assert.equal(result.status,'failed');assert.equal(f.stats().puts,0);
+});

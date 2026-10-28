@@ -10,6 +10,7 @@ import {digest,randomToken,cookieValue} from './banking/security';
 import {hasGmailSendScope,gmailAccount,isGmailConfigured,gmailAuthorizationUrl,exchangeGmailCode,gmailProfile,fetchGmailInvoiceDocuments,revokeGmailTokens} from './gmail-adapter.js';
 
 type GmailLease={assert:()=>Promise<void>;write:(statements:any[])=>Promise<any[]>};
+const POSTPROCESS_WARNING='Gmail-underlagen är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
 async function lock<T>(owner:string,fn:(lease:GmailLease)=>Promise<T>){
   const token=uid(),at=now(),until=new Date(Date.now()+300000).toISOString();
   const r=await db().prepare('INSERT INTO gmail_locks(owner,token,expires_at) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET token=excluded.token,expires_at=excluded.expires_at WHERE gmail_locks.expires_at<?').bind(owner,token,until,at).run();
@@ -41,16 +42,18 @@ export function gmailFailure(error?:unknown){
 export async function gmailStatus(summary=false){
   const user=await identity();
   await processingSettings(user);const processing=await processingStatus(user.userId);
-  const connection=await db().prepare('SELECT email,tokens,last_synced,status,last_attempt,retry_after FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();
+  const connection=await db().prepare('SELECT email,tokens,last_synced,status,last_attempt,retry_after,sync_failures FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();
+  if(connection)connection.blocked=connection.sync_failures>=3;
   const send_enabled=connection?hasGmailSendScope(await decrypt<any>(user.userId,'gmail-tokens',connection.tokens)):false;if(connection)delete connection.tokens;
-  const completed=await db().prepare("SELECT created_at FROM gmail_runs WHERE owner=? AND status='completed' ORDER BY created_at DESC LIMIT 1").bind(user.userId).first<{created_at:string}>();
+  const completed=await db().prepare("SELECT created_at,status FROM gmail_runs WHERE owner=? AND status IN ('completed','completed_pending') ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(user.userId).first<{created_at:string;status:string}>();
+  if(connection)connection.postprocess_warning=completed?.status==='completed_pending'?POSTPROCESS_WARNING:null;
   const last_successful_fetch=completed?.created_at||connection?.last_synced||'';
   if(summary)return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),send_enabled,connection,processing,last_successful_fetch});
   const candidates=await db().prepare("SELECT s.document_id,s.metadata,s.status,s.extraction,s.created_at,d.filename,d.mime,j.state processing_state,j.extraction processing_extraction,j.error_code,j.invoice_id,j.automatic FROM gmail_sources s JOIN documents d ON d.id=s.document_id AND d.owner=s.owner LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=? AND s.status<>'rejected' ORDER BY s.created_at DESC LIMIT 200").bind(user.userId).all();
   const runs=await db().prepare('SELECT found,imported,duplicates,status,created_at FROM gmail_runs WHERE owner=? ORDER BY created_at DESC LIMIT 10').bind(user.userId).all();
   const workspace=await readWorkspace(user.userId);
   const documents=candidates.results.map((c:any)=>({...c,invoice_id:c.invoice_id||workspace.state.invoices.find(i=>i.documentId===c.document_id)?.id||''}));
-  return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),send_enabled,connection,candidates:documents,runs:runs.results,processing,last_successful_fetch,background_ready:processing.enabled,scheduler_configured:processing.scheduler_configured,next_eligible_sync:connection?new Date(Math.max(Date.now(),Date.parse(connection.last_attempt||'')+15*60000||0,Date.parse(connection.retry_after||'')||0)).toISOString():null});
+  return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),send_enabled,connection,candidates:documents,runs:runs.results,processing,last_successful_fetch,background_ready:processing.enabled,scheduler_configured:processing.scheduler_configured,next_eligible_sync:connection&&!connection.blocked?new Date(Math.max(Date.now(),Date.parse(connection.last_attempt||'')+15*60000||0,Date.parse(connection.retry_after||'')||0)).toISOString():null});
 }
 export async function gmailConnect(req:Request){
   const user=await identity(req);const options=await req.json() as {send?:boolean};
@@ -80,7 +83,7 @@ export async function gmailCallback(req:Request){
     stage='encrypt_tokens';
     const sealed=await encrypt(user.userId,'gmail-tokens',tokens);
     stage='save_connection';
-    await lease.write([db().prepare("INSERT INTO gmail_connections(owner,email,tokens) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET email=excluded.email,tokens=excluded.tokens,status='connected',retry_after=''").bind(user.userId,gmailAccount(),sealed)]);result='connected';
+    await lease.write([db().prepare("INSERT INTO gmail_connections(owner,email,tokens) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET email=excluded.email,tokens=excluded.tokens,status='connected',retry_after='',sync_failures=0").bind(user.userId,gmailAccount(),sealed)]);result='connected';
   });
   return new Response(null,{status:302,headers:{Location:`/gmail?status=${result}`,'Cache-Control':'no-store','Set-Cookie':'mg_gmail_flow=; Path=/api/gmail; HttpOnly; Secure; SameSite=Lax; Max-Age=0'}});
   }catch(error){if(error instanceof Error)Object.assign(error,{gmailStage:stage});throw error;}
@@ -91,9 +94,10 @@ export async function gmailSync(req?:Request,scheduled=false,invoiceReference=''
   const settings=await processingSettings(user);
   return lock(user.userId,async lease=>{
     const c=await db().prepare('SELECT * FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();if(!c)return response({error:'Koppla Gmail först.'},409);
+    if(scheduled&&c.sync_failures>=3)return response({status:'blocked',error:'Automatisk Gmail-hämtning är stoppad efter tre avbrutna eller misslyckade försök. Kontrollera anslutningen och gör en manuell hämtning.',processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
     if(Date.parse(c.retry_after||'')>Date.now())return response({status:'not_due',error:'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.',retry_after:c.retry_after,processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)},scheduled?200:429);
     if(scheduled&&Date.now()-Date.parse(c.last_attempt||'')<900000)return response({status:'not_due',processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
-    await lease.write([db().prepare('UPDATE gmail_connections SET last_attempt=? WHERE owner=?').bind(now(),user.userId)]);
+    await lease.write([db().prepare('UPDATE gmail_connections SET last_attempt=?,sync_failures=sync_failures+? WHERE owner=?').bind(now(),scheduled?1:0,user.userId)]);
     const started=c.started_at||now();
     const sources=await db().prepare('SELECT source_id FROM gmail_sources WHERE owner=?').bind(user.userId).all<{source_id:string}>();
     let tokens:any;
@@ -123,16 +127,19 @@ export async function gmailSync(req?:Request,scheduled=false,invoiceReference=''
       }
       // Rejected immutable parts are retained, so a broken file cannot starve pagination.
       for(const sourceId of result.rejected_source_ids||[])await lease.write([db().prepare("INSERT OR IGNORE INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,?,'','{}','rejected',?)").bind(user.userId,sourceId,now())]);
-      const completed=[db().prepare('INSERT INTO gmail_runs(id,owner,found,imported,duplicates,status,created_at) VALUES(?,?,?,?,?,?,?)').bind(uid(),user.userId,result.received,imported,duplicates,'completed',now())];
+      const runId=uid();
+      const completed=[db().prepare('INSERT INTO gmail_runs(id,owner,found,imported,duplicates,status,created_at) VALUES(?,?,?,?,?,?,?)').bind(runId,user.userId,result.received,imported,duplicates,'completed_pending',now())];
+      completed.push(db().prepare("UPDATE gmail_connections SET sync_failures=0,status='connected' WHERE owner=?").bind(user.userId));
       if(!invoiceReference)completed.unshift(db().prepare("UPDATE gmail_connections SET last_synced=?,page_token=?,started_at=?,status='connected' WHERE owner=?").bind(result.truncated?c.last_synced:started,result.next_page_token||'',result.truncated?started:'',user.userId));
       await lease.write(completed);
-      await lease.assert();
-      await (await import('./customer-messages')).reconcileAndPrepare(user.userId);
-      return response({imported,duplicates,found:result.received,more:result.truncated,processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
+      let processing,warning;
+      try{await lease.assert();await (await import('./customer-messages')).reconcileAndPrepare(user.userId);processing=settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId);await lease.write([db().prepare("UPDATE gmail_runs SET status='completed' WHERE owner=? AND id=? AND status='completed_pending'").bind(user.userId,runId)]);}
+      catch{warning=POSTPROCESS_WARNING;processing={status:'pending'};}
+      return response({imported,duplicates,found:result.received,more:result.truncated,processing,...(warning?{warning}:{})});
     }catch(e:any){
       await lease.assert();
       const retryAfter=e.code==='rate_limited'?(e.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+Math.max(900,e.retryAfter||900)*1000).toISOString()):c.retry_after||'';
-      const failed=[db().prepare('UPDATE gmail_connections SET status=?,retry_after=? WHERE owner=?').bind(e.code==='renewal_required'?'renewal_required':'error',retryAfter,user.userId),db().prepare("INSERT INTO gmail_runs(id,owner,status,created_at) VALUES(?,?,'error',?)").bind(uid(),user.userId,now())];
+      const failed=[db().prepare('UPDATE gmail_connections SET status=?,retry_after=?,sync_failures=CASE WHEN ? THEN 3 ELSE sync_failures END WHERE owner=?').bind(e.code==='renewal_required'?'renewal_required':e.retryBlocked||scheduled&&c.sync_failures+1>=3?'blocked':'error',retryAfter,e.retryBlocked?1:0,user.userId),db().prepare("INSERT INTO gmail_runs(id,owner,status,created_at) VALUES(?,?,'error',?)").bind(uid(),user.userId,now())];
       if(tokens)failed.unshift(db().prepare('UPDATE gmail_connections SET tokens=? WHERE owner=?').bind(await encrypt(user.userId,'gmail-tokens',tokens),user.userId));
       await lease.write(failed);throw e;
     }
