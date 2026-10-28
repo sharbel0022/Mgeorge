@@ -23,7 +23,8 @@ jobs:
         run: |
           set -euo pipefail
           git diff --exit-code
-          cat .ci/one-click.part-* | base64 --decode > /tmp/mg-changes.gz
+          # Normalize one transport transcription; hash must still match exact reviewed bytes.
+          { cat .ci/one-click.part-a; sed 's#Pzs+fWo9Pnp5#Pzs+fWo9P/np5#g' .ci/one-click.part-b; } | base64 --decode > /tmp/mg-changes.gz
           echo '37abef19f4bb708fdc441cb3e24b9b6438128b4f75423d02b69c33d1796922b8  /tmp/mg-changes.gz' | sha256sum --check -
           python3 - <<'PY'
           import gzip, json, hashlib, pathlib, subprocess
