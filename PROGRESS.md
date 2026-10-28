@@ -94,3 +94,9 @@ Användaren begärde därefter uttryckligen main och Sites-publicering. PR #12 m
 - [Utkast-PR #13](https://github.com/sharbel0022/Mgeorge/pull/13) är öppnad mot main och bifogad till chatten. Ingen merge eller publicering.
 - GitHub Actions körning [40785435801](https://github.com/sharbel0022/Mgeorge/actions/runs/40785435801) bekräftade success för både Node och Sites på 597004d8fce2fa9548f360183b0347b6215bcd3b före PR:n. Efterföljande ändring kompletterar enbart leveransdokumentationen. Programkoden är fortsatt 04c45b8.
 - Den lokala previewprocessen och testfliken är avslutade; webbläsarens tillfälliga viewport återställd. Verklig bank-/produktionsverifiering kvarstår enligt den exakta blockeringsrapporten.
+
+## V4 — bekräftad extern blockering 2026-10-29
+
+- Fortsättningskontrollen bekräftade ren arbetskopia, PR #13 öppet som utkast och ingen merge. Båda CI-jobben är success på 05e8d8766074c07ddbb3f78a6cf34dc87685fb3d.
+- Användaren bekräftade att avtals- och rapportuppgifterna saknas ännu. Bank-/MIG-/originalverifieringen kan därmed inte slutföras med nuvarande underlag. Avsaknad av uppgifterna tolkas inte som bevis att inget bankavtal finns.
+- Ingen programkod ändras. Kvarstående verklig bank-/produktionsverifiering är fortsatt externt blockerad enligt uppdraget; målet markeras inte som uppnått.
