@@ -8,7 +8,7 @@ Bas: hämtad `origin/main` `f549293`, Sites 30 och mergad PR #12. Arbetsbranch: 
 4. **Återhämtning — implementerat och lokalt verifierat.** Fencade bankmutationer, beständiga bank/Gmail-försök och Retry-After, backupavbrott, giltigt detaljmedgivande och beständiga efterkontrollvarningar. Behåll befintliga scheman/köer.
 5. **UI och revisionshistorik — implementerat och lokalt verifierat.** Sex separata bankfält, mobilkort, öppna underlag, specifik betalningshistorik med sidindelning och rättelser. Fel/stopp får konkret åtgärd. Granska integritet, tangentbord och skärmbredder 320–1440.
 6. **Slutkontroll — godkänd lokalt.** Full Node/Sites, syntax, TypeScript, produktionsbygge, beroendegranskning, kryptering/återställning i separat syntetisk miljö, webbläsarflöde och oberoende kodgranskning. Alla regressionsfynd åtgärdas och berörda kontroller körs om.
-7. **Leverans — granskbara commits och rapporter färdiga; PR öppnas.** Små commits, granskbar PR, inventering, scenariomatris, säkerhet/rollback, testresultat och skärmbilder. Ingen merge/publicering eller produktionsmigration utan uttryckligt godkännande.
+7. **Leverans — färdig för granskning i [PR #13](https://github.com/sharbel0022/Mgeorge/pull/13).** Små commits, granskbar PR, inventering, scenariomatris, säkerhet/rollback, testresultat och skärmbilder. Ingen merge/publicering eller produktionsmigration utan uttryckligt godkännande.
 
 ## Oföränderliga krav
 

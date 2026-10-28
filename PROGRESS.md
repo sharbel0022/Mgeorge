@@ -88,3 +88,9 @@ Användaren begärde därefter uttryckligen main och Sites-publicering. PR #12 m
 - Sista UI-granskningen rättade felaktig text som kallade bankens OCR ett fakturanummer. Utloggad/misslyckad ekonomihämtning visar också ärlig status.
 - [V4-slutrapport](docs/V4-DELIVERY.md) innehåller aktuell inventering, 20 scenarier, säkerhet, återställningsprov, rollback, granskningsmatris och exakta externa hinder. Migration 0012–0013 är additiv och endast lokalt testad.
 - Ingen merge, publicering, produktionsmigration, ny bank/Gmail-hämtning, bankbetalning eller kundsändning utförd. **EXTERN BLOCKERING – INTE FULLSTÄNDIGT PRODUKTIONSVERIFIERAT** kvarstår för autentiskt Swedbankunderlag/avtalad kanal och kontrollerat produktionsflöde.
+
+## V4 — granskningsleverans
+
+- [Utkast-PR #13](https://github.com/sharbel0022/Mgeorge/pull/13) är öppnad mot main och bifogad till chatten. Ingen merge eller publicering.
+- GitHub Actions körning [40785435801](https://github.com/sharbel0022/Mgeorge/actions/runs/40785435801) bekräftade success för både Node och Sites på 597004d8fce2fa9548f360183b0347b6215bcd3b före PR:n. Efterföljande ändring kompletterar enbart leveransdokumentationen. Programkoden är fortsatt 04c45b8.
+- Den lokala previewprocessen och testfliken är avslutade; webbläsarens tillfälliga viewport återställd. Verklig bank-/produktionsverifiering kvarstår enligt den exakta blockeringsrapporten.
