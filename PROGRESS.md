@@ -57,4 +57,9 @@ MG-pluginens rena statusanrop bekräftade bankanslutning med befintligt sex-timm
 - Node UI kontrollerades vid 1440 och 390 px i separat syntetisk preview. Sex bankfält, explicit okänd betalare, bank-OCR, rätt delbetalningsstatus och utfällbara bankdetaljer fungerar. Ingen horisontell dokumentoverflow observerades.
 - [Slutrapport med acceptans A–J och exakta externa förutsättningar](docs/BANK-EVIDENCE-SAFETY-DELIVERY.md). Verklig individuell Swedbankfil/rapportkanal och företagets OCR-avtal kan inte verifieras lokalt och kvarstår som dokumenterade externa begränsningar. Ingen merge, produktionstillämpning eller aktivering ingår.
 
-Återstår i leveransfasen: spara sista bilderna, avsluta ägda lokala previewprocesser och öppna granskbar PR mot main. Ingen ytterligare produktionsåtgärd behövs eller är tillåten i detta uppdrag.
+## Granskbar leverans
+
+- [Utkast-PR #12](https://github.com/sharbel0022/Mgeorge/pull/12) är öppnad mot `main`, utan merge eller publicering. Samtliga nya bilder och den slutliga rapporten finns i branchen.
+- Ägda lokala previewprocesser och testfliken är avslutade. Webbläsarens tillfälliga viewport återställdes.
+- Lokala verifieringsfaser är färdiga. GitHub Actions följs separat; inget ännu pågående CI-resultat räknas som godkänt i den lokala testrapporten.
+- Kvarvarande begränsningar är de uttryckliga externa bank-/rapportförutsättningarna i slutrapporten. Inga fler produktionsåtgärder ingår i uppdraget.
