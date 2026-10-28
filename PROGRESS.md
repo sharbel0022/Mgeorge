@@ -100,3 +100,10 @@ Användaren begärde därefter uttryckligen main och Sites-publicering. PR #12 m
 - Fortsättningskontrollen bekräftade ren arbetskopia, PR #13 öppet som utkast och ingen merge. Båda CI-jobben är success på 05e8d8766074c07ddbb3f78a6cf34dc87685fb3d.
 - Användaren bekräftade att avtals- och rapportuppgifterna saknas ännu. Bank-/MIG-/originalverifieringen kan därmed inte slutföras med nuvarande underlag. Avsaknad av uppgifterna tolkas inte som bevis att inget bankavtal finns.
 - Ingen programkod ändras. Kvarstående verklig bank-/produktionsverifiering är fortsatt externt blockerad enligt uppdraget; målet markeras inte som uppnått.
+
+## V4 — efterföljande godkänd publicering 2026-10-29
+
+- Användaren begärde uttryckligen main och därefter publicering på den befintliga Sites-sidan. PR #13 mergades till `fdbfec48b8c14ea330f9fb66ac3911739c08b030`.
+- V4 publicerades som **Sites-version 31**, deployment `appgdep_6ae285148e748191a29d0f6134f44a93` med status **succeeded**. Samma projekt, URL, D1/R2, åtkomstläge, runtime-revision 9 och tre aktiva scheman bekräftades.
+- Typkontroll och produktionsbygge passerade även i den synkroniserade Sites-källan. Arkivet innehåller additiva migrationer 0012–0013. Läsande bank-/backupstatus passerade utan manuella synkroniseringar, avstämningar eller kundutskick.
+- [Publiceringsbevis, bevarande och rollback](docs/V4-PUBLICATION.md). Verkligt individuellt Swedbankunderlag/MIG/rapportavtal kvarstår som extern blockering; publiceringen innebär inte att dessa acceptanskriterier är uppnådda.

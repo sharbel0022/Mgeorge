@@ -22,3 +22,5 @@ Bas: hämtad `origin/main` `f549293`, Sites 30 och mergad PR #12. Arbetsbranch: 
 ## Beslutsstatus
 
 **EXTERN BLOCKERING – INTE FULLSTÄNDIGT PRODUKTIONSVERIFIERAT.** Tekniskt oberoende arbete fortsätter till granskbar leverans. Krav 12–13 behöver autentiskt godkänt bankunderlag, bekräftad företagskanal samt senare uttryckligt publiceringsgodkännande.
+
+Efterföljande uttryckligt godkännande: PR #13 är mergad och V4 publicerad som Sites-version 31. Se [publiceringsbevis](docs/V4-PUBLICATION.md). De externa bank-/rapportkraven kvarstår; kravet på separat publiceringsgodkännande är nu uppfyllt.
