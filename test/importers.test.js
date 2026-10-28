@@ -8,6 +8,15 @@ test('CSV handles quoted semicolon text and normalizes signed amounts',()=>{
   const csv='Datum;Belopp;Betalare;OCR;Text\n2026-10-26;"1 875,00";"A; B AB";0604;Kund\n2026-10-14;"-2 000,00";Kylma;8903;Faktura';
   const rows=parseCSV(csv,'MG');assert.equal(rows.length,2);assert.equal(rows[0].payer,'A; B AB');assert.equal(rows[1].amount_cents,-200000);assert.equal(rows[0].account,'MG');
 });
+test('Bankgiro CSV payment reference is kept distinct from the bank event reference',()=>{
+  const rows=parseCSV('Datum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp\\n2026-10-26;Café Gränden Bistro AB;0599;501-8296;625,00','SE2820000842447344810101');
+  assert.equal(rows.length,1);
+  assert.equal(rows[0].payer,'Café Gränden Bistro AB');
+  assert.equal(rows[0].reference,'0599');
+  assert.equal(rows[0].bank_reference,'');
+  assert.equal(rows[0].amount_cents,62500);
+  assert.equal(rows[0].booked_at,'2026-10-26');
+});
 test('camt.054 splits TxDtls and preserves credit direction',()=>{
   const xml=`<?xml version="1.0"?><Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08"><BkToCstmrDbtCdtNtfct><Ntfct><Ntry><Amt Ccy="SEK">1875.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><BookgDt><Dt>2026-10-26</Dt></BookgDt><NtryDtls><TxDtls><Refs><AcctSvcrRef>A12</AcctSvcrRef></Refs><AmtDtls><TxAmt><Amt Ccy="SEK">1875.00</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>Exempelkund AB</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>0604</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfct></BkToCstmrDbtCdtNtfct></Document>`;
   const x=parseCAMT(xml,'Bankgiro');assert.equal(x.length,1);assert.equal(x[0].payer,'Exempelkund AB');assert.equal(x[0].reference,'0604');assert.equal(x[0].amount_cents,187500);
