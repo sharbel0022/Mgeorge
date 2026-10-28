@@ -2,6 +2,7 @@
 import {randomUUID} from 'node:crypto';
 import {listInvoices,listTransactions,allocate,audit,paymentSign} from './db.js';
 import {digest} from './security.js';
+import {normalizeBankApiTransaction} from './importers.js';
 
 import {matchingReferenceValues} from './payment-references.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
@@ -18,9 +19,15 @@ export function exactReference(reference, candidate){
 }
 
 export function reconciliationData(db){
-  const originals=new Set(db.prepare('SELECT id FROM import_jobs WHERE content IS NOT NULL').all().map(x=>x.id));
+  const retained=db.prepare('SELECT id,content,content_sha256 FROM import_jobs WHERE content IS NOT NULL').all();
+  const originals=new Set(retained.filter(x=>x.content_sha256&&digest(x.content)===x.content_sha256).map(x=>x.id));
+  const alteredOriginals=new Set(retained.filter(x=>!originals.has(x.id)).map(x=>x.id));
   const links=db.prepare('SELECT * FROM payer_links').all();
-  return {invoices:listInvoices(db),transactions:listTransactions(db).map(t=>({...t,verified:t.source==='enablebanking'&&t.api_identity_version===1||t.source.startsWith('file:')&&originals.has(t.import_id)})),links,allocations:db.prepare('SELECT * FROM allocations').all()};
+  const verifiedApiOriginal=t=>{
+    if(!t.raw_bank_data_sha256||!t.raw_bank_data||typeof t.raw_bank_data!=='object'||Array.isArray(t.raw_bank_data)||digest(JSON.stringify(t.raw_bank_data))!==t.raw_bank_data_sha256)return false;
+    try{const original=normalizeBankApiTransaction(t.raw_bank_data,t.account);return !!original&&['amount_cents','currency','booked_at','payer','bank_reference'].every(key=>original[key]===t[key]);}catch{return false;}
+  };
+  return {invoices:listInvoices(db),transactions:listTransactions(db).map(t=>({...t,verified:!alteredOriginals.has(t.import_id)&&(t.source==='enablebanking'&&t.api_identity_version===1&&(verifiedApiOriginal(t)||originals.has(t.import_id))||t.source.startsWith('file:')&&originals.has(t.import_id))})),links,allocations:db.prepare('SELECT * FROM allocations').all()};
 }
 function samePayer(i,t,links){
   const org=value=>String(value||'').replace(/[- ]/g,'');
@@ -76,22 +83,24 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
   return out.map(f=>({...f,rule_version:RECONCILIATION_RULE_VERSION})).sort((a,b)=>b.score-a.score);
 }
 export function runReconciliation(db){
-  let suggestions=analyzeReconciliation(reconciliationData(db));
-  for(const s of suggestions.filter(s=>s.safe&&s.amount_cents>0)){
-    allocate(db,s.invoice_id,s.transaction_id,s.amount_cents,{automatic:true});
-    audit(db,'automatic_verified_match',s);
-  }
-  suggestions=analyzeReconciliation(reconciliationData(db));
+  // Acquire the writer lock before reading any evidence. Imports and other
+  // reconciliation processes cannot invalidate the decision before its commit.
   db.exec('BEGIN IMMEDIATE');
   try{
+    let suggestions=analyzeReconciliation(reconciliationData(db));
+    for(const s of suggestions.filter(s=>s.safe&&s.amount_cents>0)){
+      allocate(db,s.invoice_id,s.transaction_id,s.amount_cents,{automatic:true,transactionOpen:true});
+      audit(db,'automatic_verified_match',s);
+    }
+    suggestions=analyzeReconciliation(reconciliationData(db));
     db.prepare('UPDATE reconciliation_findings SET active=0').run();
     for(const s of suggestions.filter(s=>s.invoice_id)){
       const id=digest(JSON.stringify(s));
       db.prepare('INSERT INTO reconciliation_findings(id,invoice_id,transaction_id,kind,details) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET active=1').run(id,s.invoice_id,s.transaction_id,s.kind,JSON.stringify(s));
     }
     db.exec('COMMIT');
+    return suggestions;
   }catch(e){db.exec('ROLLBACK');throw e;}
-  return suggestions;
 }
 export function verifyPayer(db,{invoice_id,payer,account,evidence},principal){
   if(!principal||!payer?.trim()||!account?.trim()||!evidence?.trim()||!db.prepare('SELECT id FROM invoices WHERE id=?').get(invoice_id))throw Object.assign(new Error('Kund, betalare, konto och verifieringsunderlag krävs.'),{status:400});
