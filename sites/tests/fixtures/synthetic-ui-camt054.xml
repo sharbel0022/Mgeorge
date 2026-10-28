@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02">
+ <BkToCstmrDbtCdtNtfctn><Ntfctn>
+  <Acct><Id><Othr><Id>Swedbank</Id></Othr></Id></Acct>
+  <Ntry>
+   <Amt Ccy="SEK">7179.16</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts>
+   <BookgDt><Dt>2026-10-23</Dt></BookgDt><AcctSvcrRef>EXEMPEL-BG</AcctSvcrRef>
+   <NtryDtls><TxDtls>
+    <Refs><TxId>SYNTHETIC-UI-PAYMENT-1</TxId></Refs>
+    <AmtDtls><TxAmt><Amt Ccy="SEK">7179.16</Amt></TxAmt></AmtDtls>
+    <RltdPties><Dbtr><Nm>Syntetisk betalare AB</Nm></Dbtr></RltdPties>
+    <RmtInf><Strd><CdtrRefInf><Tp><CdOrPrtry><Prtry>OCR</Prtry></CdOrPrtry></Tp><Ref>000018</Ref></CdtrRefInf></Strd></RmtInf>
+   </TxDtls></NtryDtls>
+  </Ntry>
+ </Ntfctn></BkToCstmrDbtCdtNtfctn>
+</Document>

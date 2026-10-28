@@ -77,7 +77,7 @@ test('bank summary has exactly four facts and never invents a successful synchro
   const s=emptyState();s.transactions.push(tx());let html=render(ui.BankPaymentSummary,{state:s});assert.equal((html.match(/<dt>/g)||[]).length,4);assert.match(html,/Inte bekräftad/);html=render(ui.BankPaymentSummary,{state:s,lastSynced:'2026-10-28T10:06:00Z'});assert.doesNotMatch(html,/Inte bekräftad/);assert.match(html,/11:06/);
 });
 
-test('desktop has five semantic columns and mobile cards use native action buttons with escaped payer text',()=>{
+test('desktop exposes payer, invoice, OCR, amount, date and status; missing OCR stays explicit on mobile',()=>{
   const s=emptyState(),t=tx({kind:'payment',description:'',party:'<script>bank</script>'});s.transactions.push(t);const html=render(ui.default,{state:s,transactions:[t],open(){}});
-  assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,5);assert.match(html,/bank-mobile-list/);assert.match(html,/bank-payment-card/);assert.match(html,/aria-label="Visa betalning/);assert.match(html,/&lt;script&gt;bank/);assert.doesNotMatch(html,/<script>/);
+  assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,6);assert.match(html,/<th>OCR<\/th>/);assert.match(html,/OCR Saknas i bankunderlaget/);assert.match(html,/bank-mobile-list/);assert.match(html,/bank-payment-card/);assert.match(html,/aria-label="Visa betalning/);assert.match(html,/&lt;script&gt;bank/);assert.doesNotMatch(html,/<script>/);
 });
