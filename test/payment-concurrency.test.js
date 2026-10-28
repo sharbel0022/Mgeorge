@@ -7,8 +7,10 @@ import {join} from 'node:path';
 import {openDatabase,listInvoices,listTransactions,storeTransactions} from '../src/db.js';
 import {runReconciliation} from '../src/reconciliation.js';
 import {parseCSV} from '../src/importers.js';
+import {approveSyntheticBankAccount} from './bank-fixtures.js';
 
-const source='Datum;Belopp;Betalare;Betalningsreferens;Bankreferens\n2026-10-26;100;Syntetisk Kund AB;000018;CONCURRENT-BANK-1\n';
+const account='SE4280000890119146168423';
+const source=`Datum;Belopp;Betalare;Betalningsreferens;Bankreferens;IBAN\n2026-10-26;100;Syntetisk Kund AB;000018;CONCURRENT-BANK-1;${account}\n`;
 const childSource=`
 import {openDatabase,storeTransactions} from ${JSON.stringify(new URL('../src/db.js',import.meta.url).href)};
 import {runReconciliation} from ${JSON.stringify(new URL('../src/reconciliation.js',import.meta.url).href)};
@@ -18,7 +20,7 @@ process.on('message',message=>{
   if(message!=='go')return;
   try{
     const source=${JSON.stringify(source)},content=Buffer.from(source);
-    const imported=storeTransactions(db,parseCSV(source,'MG'),'file:concurrent.csv',{content,mime_type:'text/csv'});
+    const imported=storeTransactions(db,parseCSV(source,${JSON.stringify(account)}),'file:concurrent.csv',{content,mime_type:'text/csv'});
     runReconciliation(db);db.close();process.send({done:true,imported:imported.imported,duplicate:imported.duplicate});process.disconnect();
   }catch(error){db.close();process.send({error:error.message});process.disconnect();process.exitCode=1;}
 });
@@ -38,6 +40,7 @@ test('two real processes import and reconcile one bank payment once, then replay
   t.after(()=>rmSync(folder,{recursive:true,force:true}));
   const setup=openDatabase(path);
   setup.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('synthetic-invoice','customer','001','Syntetisk Kund AB',10000,'000018','2026-10-01');
+  approveSyntheticBankAccount(setup,account);
   setup.close();
   const workers=[worker(path,t),worker(path,t)];
   await Promise.all(workers.map(w=>w.ready));
@@ -50,7 +53,7 @@ test('two real processes import and reconcile one bank payment once, then replay
     assert.equal(listTransactions(db).length,1);assert.equal(listInvoices(db)[0].paid_cents,10000);
     assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,1);
     assert.equal(db.prepare("SELECT COUNT(*) n FROM audit_events WHERE action='automatic_verified_match'").get().n,1);
-    storeTransactions(db,parseCSV(source,'MG'),'file:restart.csv',{content:Buffer.from(source),mime_type:'text/csv'});runReconciliation(db);
+    storeTransactions(db,parseCSV(source,account),'file:restart.csv',{content:Buffer.from(source),mime_type:'text/csv'});runReconciliation(db);
     assert.equal(listInvoices(db)[0].paid_cents,10000);assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,1);
   }finally{db.close();}
 });

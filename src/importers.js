@@ -77,6 +77,10 @@ function verifyFileAccount(reported,selected){
   // Aliases and masked identifiers are not proof of account equivalence.
   if(actual&&/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(expected)&&actual!==expected)throw new Error('Bankfilens konto stämmer inte med det valda företagskontot.');
 }
+function fileAccountEvidence(reported,selected,format){
+  const actual=canonicalAccount(reported),chosen=canonicalAccount(selected);
+  return {version:'bank-file-account-2026-10-28.1',format,reported_account:actual,selected_account:String(selected||''),exact_match:/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(actual)&&actual===chosen};
+}
 export function parseCSV(text,account='Swedbank'){
   account=selectedAccount(account);
   const first=String(text).split(/\r?\n/).find(x=>x.trim())||'';
@@ -104,7 +108,7 @@ export function parseCSV(text,account='Swedbank'){
     const reference_evidence=extractPaymentReferences(rawColumns);
     const description=g('description'),payer=g('payer'),reference=g('reference')||reference_evidence.selected?.value||'';
     const collective=requiresPaymentSpecification(description,payer,reference);
-    items.push({reference_evidence,account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
+    items.push({reference_evidence,account_evidence:fileAccountEvidence(reported,account,'csv'),account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
   }
   return validateItems(items);
 }
@@ -198,7 +202,8 @@ export function parseCAMT(xml,account='Swedbank'){
     const details=children(entry,'NtryDtls').flatMap(x=>children(x,'TxDtls'));
     const parentReference=bankId(value(entry,'AcctSvcrRef'))||bankId(value(entry,'NtryRef'));
     const description=value(entry,'AddtlNtryInf');
-    const common={account,booked_at:date,amount_cents:total*sign,currency,payer:'',reference:'',bank_reference:parentReference,description};
+    const reportedAccount=value(statement,'Acct','Id','IBAN')||value(statement,'Acct','Id','Othr','Id');
+    const common={account_evidence:fileAccountEvidence(reportedAccount,account,'camt'),account,booked_at:date,amount_cents:total*sign,currency,payer:'',reference:'',bank_reference:parentReference,description};
     const batchCount=Number(value(entry,'NtryDtls','Btch','NbOfTxs')),knownBatch=batchCount>1;
     const amounts=details.map(amountNode);
     for(const amount of amounts)if(amount)sek(amount.attributes.Ccy||currency);

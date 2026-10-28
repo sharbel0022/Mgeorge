@@ -1,8 +1,8 @@
 // Suggestions never constitute payment evidence. All amounts are integer öre.
 import {randomUUID} from 'node:crypto';
 import {listInvoices,listTransactions,allocate,audit,paymentSign} from './db.js';
-import {digest} from './security.js';
-import {normalizeBankApiTransaction} from './importers.js';
+import {digest,decryptObject} from './security.js';
+import {normalizeBankApiTransaction,parseBankFile} from './importers.js';
 
 import {matchingReferenceValues} from './payment-references.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
@@ -19,15 +19,35 @@ export function exactReference(reference, candidate){
 }
 
 export function reconciliationData(db){
-  const retained=db.prepare('SELECT id,content,content_sha256 FROM import_jobs WHERE content IS NOT NULL').all();
+  const retained=db.prepare('SELECT id,name,mime_type,content,content_sha256 FROM import_jobs WHERE content IS NOT NULL').all();
   const originals=new Set(retained.filter(x=>x.content_sha256&&digest(x.content)===x.content_sha256).map(x=>x.id));
   const alteredOriginals=new Set(retained.filter(x=>!originals.has(x.id)).map(x=>x.id));
   const links=db.prepare('SELECT * FROM payer_links').all();
+  const canonical=value=>String(value||'').replace(/^iban:/i,'').replace(/\s/g,'').toUpperCase();
+  const approvedAccounts=new Set();
+  for(const connection of db.prepare("SELECT accounts_json,selected_account_uid,valid_until FROM bank_connections WHERE owner<>'' AND selected_account_uid<>'' AND status IN ('connected','error')").all()){
+    if(!(Date.parse(connection.valid_until)>Date.now()))continue;
+    try{const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid),account=canonical(selected?.account_id?.iban);if(selected?.currency==='SEK'&&/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(account))approvedAccounts.add(account);}catch{}
+  }
+  const retainedById=new Map(retained.map(original=>[original.id,original])),parsedFiles=new Map();
+  const verifiedFileOriginal=t=>{
+    if(!originals.has(t.import_id)||!approvedAccounts.has(canonical(t.account)))return false;
+    const original=retainedById.get(t.import_id),key=JSON.stringify([t.import_id,t.account]);
+    if(!parsedFiles.has(key)){
+      try{
+        if(!(/\.xml$/i.test(original.name)&&original.mime_type==='application/xml'||/\.csv$/i.test(original.name)&&original.mime_type==='text/csv'))throw new Error('Unsupported bank original');
+        parsedFiles.set(key,parseBankFile(original.name,Buffer.from(original.content).toString('base64'),t.account));
+      }catch{parsedFiles.set(key,[]);}
+    }
+    const facts=['amount_cents','currency','booked_at','payer','reference','bank_reference'];
+    const matching=parsedFiles.get(key).filter(record=>record.account_evidence?.exact_match&&canonical(record.account_evidence.reported_account)===canonical(t.account)&&facts.every(field=>record[field]===t[field])&&(record.parent_bank_reference||record.aggregate_parent_reference||'')===t.parent_bank_reference);
+    return matching.length===1;
+  };
   const verifiedApiOriginal=t=>{
     if(!t.raw_bank_data_sha256||!t.raw_bank_data||typeof t.raw_bank_data!=='object'||Array.isArray(t.raw_bank_data)||digest(JSON.stringify(t.raw_bank_data))!==t.raw_bank_data_sha256)return false;
     try{const original=normalizeBankApiTransaction(t.raw_bank_data,t.account);return !!original&&['amount_cents','currency','booked_at','payer','bank_reference'].every(key=>original[key]===t[key]);}catch{return false;}
   };
-  return {invoices:listInvoices(db),transactions:listTransactions(db).map(t=>({...t,verified:!alteredOriginals.has(t.import_id)&&(t.source==='enablebanking'&&t.api_identity_version===1&&(verifiedApiOriginal(t)||originals.has(t.import_id))||t.source.startsWith('file:')&&originals.has(t.import_id))})),links,allocations:db.prepare('SELECT * FROM allocations').all()};
+  return {invoices:listInvoices(db),transactions:listTransactions(db).map(t=>({...t,verified:!alteredOriginals.has(t.import_id)&&(t.source==='enablebanking'&&t.api_identity_version===1&&(verifiedApiOriginal(t)||verifiedFileOriginal(t))||t.source.startsWith('file:')&&verifiedFileOriginal(t))})),links,allocations:db.prepare('SELECT * FROM allocations').all()};
 }
 function samePayer(i,t,links){
   const org=value=>String(value||'').replace(/[- ]/g,'');

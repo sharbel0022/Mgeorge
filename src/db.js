@@ -111,6 +111,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','payer_bankgiro',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','payer_organization_number',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','reference_evidence',"TEXT NOT NULL DEFAULT '{}'");
+  addColumn('bank_transactions','account_evidence',"TEXT NOT NULL DEFAULT '{}'");
   addColumn('bank_transactions','raw_bank_data',"TEXT NOT NULL DEFAULT '{}'");
   const rawHashUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='raw_bank_data_sha256');
   if(rawHashUpgrade){
@@ -158,7 +159,7 @@ export function listInvoices(db) {
 export function listTransactions(db) {
   return db.prepare(`SELECT t.*, COALESCE((SELECT SUM(a.amount_cents) FROM allocations a WHERE a.transaction_id=t.id),0) AS allocated_cents FROM bank_transactions t ORDER BY t.booked_at DESC,t.created_at DESC`).all().map(t=>{
     const available_cents=Math.abs(t.amount_cents)-t.allocated_cents;
-    return {...t,reference_evidence:JSON.parse(t.reference_evidence),raw_bank_data:JSON.parse(t.raw_bank_data),available_cents,status:t.excluded?'excluded':available_cents===0?'matched':t.allocated_cents>0?'partial':t.is_aggregate||(!t.payer&&!t.reference)?'review':'unmatched'};
+    return {...t,reference_evidence:JSON.parse(t.reference_evidence),account_evidence:JSON.parse(t.account_evidence),raw_bank_data:JSON.parse(t.raw_bank_data),available_cents,status:t.excluded?'excluded':available_cents===0?'matched':t.allocated_cents>0?'partial':t.is_aggregate||(!t.payer&&!t.reference)?'review':'unmatched'};
   });
 }
 export function paymentSign(invoice){return (invoice.direction==='customer'?1:-1)*(invoice.kind==='credit'?-1:1);}
@@ -239,12 +240,14 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
           db.prepare("UPDATE bank_transactions SET payer=?,reference=?,description=?,is_aggregate=0,parent_bank_reference=?,review_reason='',needs_review=1,bankgiro=? WHERE id=?")
             .run(x.payer,x.reference,x.description||existing.description,x.parent_bank_reference||'',x.bankgiro||existing.bankgiro,existing.id);
           if(x.reference_evidence)db.prepare('UPDATE bank_transactions SET reference_evidence=? WHERE id=?').run(JSON.stringify(x.reference_evidence),existing.id);
+          if(x.account_evidence)db.prepare('UPDATE bank_transactions SET account_evidence=? WHERE id=?').run(JSON.stringify(x.account_evidence),existing.id);
           completedSpecifications.push({id:existing.id,before:existing});enriched++;
         }
         duplicate++;continue;
       }
       const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'',source==='enablebanking'?1:0);
       if(r.changes){
+        if(x.account_evidence)db.prepare('UPDATE bank_transactions SET account_evidence=? WHERE id=?').run(JSON.stringify(x.account_evidence),id);
         if(x.reference_evidence||x.raw_bank_data){const raw=JSON.stringify(x.raw_bank_data||{});db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=?,raw_bank_data_sha256=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),raw,x.raw_bank_data?digest(raw):'',id);}
         if(x.payer_bankgiro)db.prepare('UPDATE bank_transactions SET payer_bankgiro=? WHERE id=?').run(String(x.payer_bankgiro),id);
         const organization=String(x.payer_organization_number||'').replace(/[- ]/g,'');

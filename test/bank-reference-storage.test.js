@@ -7,6 +7,7 @@ import {openDatabase,storeTransactions,listTransactions} from '../src/db.js';
 import {normalizeBankApiTransaction,parseCSV,parseCAMT} from '../src/importers.js';
 import {digest} from '../src/security.js';
 import {reconciliationData} from '../src/reconciliation.js';
+import {approveSyntheticBankAccount} from './bank-fixtures.js';
 
 const raw=(more={})=>({status:'BOOK',entry_reference:'ARCHIVE-1',transaction_id:'temporary',booking_date:'2026-10-26',credit_debit_indicator:'CRDT',transaction_amount:{amount:'625.00',currency:'SEK'},debtor:{name:'Testkund AB'},reference_number:'0599',details:{invoice_number:'0600'},...more});
 function fixture(t){const folder=mkdtempSync(join(tmpdir(),'mg-ref-')),db=openDatabase(join(folder,'db.sqlite'));t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});return db;}
@@ -24,8 +25,9 @@ test('retained bank original stores a separate SHA-256 of its exact bytes',t=>{
 });
 
 test('tampered retained file cannot remain verified automatic payment evidence',t=>{
-  const db=fixture(t),content=Buffer.from('Datum;Belopp;Betalare;Referens\n2026-10-26;625;Testkund AB;0599\n');
-  const result=storeTransactions(db,parseCSV(content.toString(),'MG'),'file:bank.csv',{content,mime_type:'text/csv'});
+  const db=fixture(t),account='SE4280000890119146168423',content=Buffer.from(`Datum;Belopp;Betalare;Referens;IBAN\n2026-10-26;625;Testkund AB;0599;${account}\n`);
+  approveSyntheticBankAccount(db,account);
+  const result=storeTransactions(db,parseCSV(content.toString(),account),'file:bank.csv',{content,mime_type:'text/csv'});
   assert.equal(reconciliationData(db).transactions[0].verified,true);
   db.prepare('UPDATE import_jobs SET content=? WHERE id=?').run(Buffer.from('changed original'),result.import_id);
   assert.equal(reconciliationData(db).transactions[0].verified,false);
