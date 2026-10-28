@@ -19,6 +19,8 @@ import {runDocumentProcess} from './invoice-extraction.js';
 import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
 import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from './customer-messages.js';
 import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
+import {createPaymentControl} from './payment-control.js';
+import {buildPaymentOverview} from './payment-overview.js';
 
 function reconcileAndPrepare(){const suggestions=runReconciliation(db);prepareMessages(db);return suggestions;}
 
@@ -90,7 +92,7 @@ function serveStatic(req,res,path){
     // These standalone information documents contain their own fixed stylesheet.
     res.writeHead(200,{...baseHeaders,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"});return res.end(contents);
   }
-  if(!['/','/index.html','/app.js','/review.js','/messages.js','/style.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
+  if(!['/','/index.html','/app.js','/review.js','/messages.js','/style.css','/payment-control.js','/payment-control.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
   const actual=path==='/'?'/index.html':path;
   const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'}[extname(actual)];
   const contents=readFileSync(resolve('public'+actual));
@@ -162,7 +164,7 @@ function gmailStatus(){
 }
 let gmailSyncing=false,bankSyncing=new Set();
 /** Förnyar Gmail-behörighet vid behov och laddar ned nya fakturaunderlag från företagets konto. */
-async function syncGmail(req=null){
+async function syncGmail(req=null,{analyze=true,controlAuthorize=null}={}){
   if(gmailSyncing)throw bad(409,'En Gmail-hämtning pågår redan');
   const connection=db.prepare('SELECT * FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
   if(!connection)throw bad(409,'Koppla Gmail först');
@@ -175,6 +177,7 @@ async function syncGmail(req=null){
     currentTokens=decryptObject(connection.encrypted_tokens);
     const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||''});
     if(req)assertSessionStillAuthorized(req);
+    controlAuthorize?.();
     // Preserve a rotated refresh token before processing any slow document jobs.
     db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(result.tokens),connection.id);
     let imported=0,duplicate=result.duplicate||0;
@@ -196,7 +199,7 @@ async function syncGmail(req=null){
     }catch(e){db.exec('ROLLBACK');throw e;}
     // Originals/checkpoints are durable before interpretation; failed OCR stays
     // in the review queue and can be retried without downloading the mail again.
-    for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{if(req)assertSessionStillAuthorized(req);}});
+    if(analyze)for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{if(req)assertSessionStillAuthorized(req);}});
     const summary={received:result.received??result.documents.length+(result.skipped||0),imported,duplicate,review:imported,skipped:result.skipped||0,truncated:!!result.truncated,warnings:result.warnings||[]};
     recordImport(db,{source:'gmail',name:connection.email,found:summary.received,imported,duplicate,review:imported});audit(db,'gmail_synced',summary);reconcileAndPrepare();return summary;
   }catch(e){
@@ -245,6 +248,7 @@ async function syncBank(connection,{account_uid,date_from,date_to}={},operationL
       const active=db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(connection.request_session_hash,Date.now());
       if(!active||active.principal!==connection.owner)throw bad(401,'Sessionen har avslutats. Logga in igen.');
     }
+    connection.controlAuthorize?.();
     const account=stableAccountIdentity(selected,connection.bank_name);
     const transactions=raw.map(x=>normalizeBankApiTransaction(x,account)).filter(x=>x&&x.booked_at>=from&&x.booked_at<=to);
     const result=storeTransactions(db,transactions,'enablebanking');db.prepare("UPDATE bank_connections SET last_synced=CURRENT_TIMESTAMP,status='connected',last_error='',retry_after=0 WHERE id=?").run(connection.id);
@@ -287,6 +291,57 @@ export async function runScheduledSync(){
     schedulerState.last_run=new Date().toISOString();
   }finally{schedulerState.running=false;}
 }
+/** The overview only reads stored evidence. It never sends mail or creates matches. */
+function paymentOverview(){
+  const data=buildPaymentOverview({invoices:listInvoices(db),transactions:listTransactions(db),documents:listDocuments(db),messages:listMessages(db),suggestions:analyzeReconciliation(reconciliationData(db))});
+  return data;
+}
+// Only existing service functions are used. Paused schedules and registration
+// preferences are never changed by this manual, bounded control run.
+const paymentControl=createPaymentControl(db,{
+  summarize:()=>{const {counts,totals}=paymentOverview();return {counts,totals};},
+  adapters:{
+    gmail:async({authorize})=>{
+      const status=gmailStatus();
+      if(!status.configured||!status.connection)return {state:'blocked',note:'Anslut Gmail i Inställningar. Befintliga fakturor kontrolleras ändå.'};
+      if(status.status==='renewal_required')return {state:'blocked',note:'Gmail behöver förnyas. Befintliga underlag finns kvar.'};
+      const checkpoint=db.prepare('SELECT page_token FROM gmail_connections WHERE id=?').get(status.connection.id);
+      if(!checkpoint?.page_token&&status.last_synced&&Date.now()-utcTimestamp(status.last_synced)<15*60000)
+        return {state:'cached',note:'Gmail hämtades nyligen. Redan sparade underlag används.'};
+      // No new OAuth flow is started here. An existing consent is required.
+      const result=await syncGmail(null,{analyze:false,controlAuthorize:authorize});
+      return {state:result.truncated?'waiting':'done',count:result.imported,note:`${result.imported} nya underlag, ${result.duplicate} dubbletter.${result.truncated?' Fler mejl återstår; starta en ny kontroll senare.':''}`};
+    },
+    bank:async({owner,authorize})=>{
+      if(!isConfigured())return {state:'blocked',note:'Bankanslutningen behöver konfigureras. Importerade bankunderlag används tills vidare.'};
+      const all=db.prepare('SELECT * FROM bank_connections WHERE owner=?').all(owner);
+      const connections=all.filter(c=>['connected','error'].includes(c.status)&&c.selected_account_uid&&Date.parse(c.valid_until)>Date.now());
+      if(!connections.length)return {state:'blocked',note:'Anslut eller förnya banken och välj företagskonto. Sparade bankhändelser bevaras.'};
+      let imported=0,waiting=all.length!==connections.length||connections.length>3,cached=0;
+      for(const connection of connections.slice(0,3)){
+        authorize();
+        if(connection.retry_after>Date.now()){waiting=true;continue;}
+        if(connection.last_synced&&Date.now()-utcTimestamp(connection.last_synced)<60000){cached++;continue;}
+        try{const result=await syncBank({...connection,controlAuthorize:authorize});authorize();imported+=result.imported||0;}
+        catch(error){if([401,403].includes(error.status))throw error;waiting=true;}
+      }
+      return {state:waiting?'waiting':cached===connections.length?'cached':'done',count:imported,
+        note:waiting?'Någon bankhämtning väntar eller behöver åtgärdas. Kontrollera Bankanslutning; sparade händelser används.':
+          cached===connections.length?'Bankuppgifterna hämtades nyligen. Sparat underlag används.':`${imported} nya bankhändelser. Bankgirodetaljer kan fortfarande behöva kompletteras.`};
+    },
+    documents:async({authorize})=>{
+      // Bound a run; never re-run OCR on an already interpreted document by default.
+      const ids=db.prepare("SELECT id FROM documents WHERE invoice_id IS NULL AND status='needs_review' AND extraction='{}' ORDER BY created_at,id LIMIT 2").all();
+      for(const {id} of ids){authorize();await analyzeDocument(db,id,{authorize});}
+      const left=db.prepare("SELECT COUNT(*) AS n FROM documents WHERE invoice_id IS NULL AND status='needs_review' AND extraction='{}'").get().n;
+      return {state:left?'waiting':'done',count:ids.length,note:left?`${ids.length} underlag bearbetade. ${left} väntar till nästa kontroll.`:
+        ids.length?`${ids.length} underlag bearbetade. Osäkra uppgifter finns i Att granska.`:'Alla sparade underlag har passerat tolkningen. Osäkra fält kräver granskning.'};
+    },
+    reconcile:async({authorize})=>{authorize();const result=runReconciliation(db);return {state:'done',count:result.length,note:'Befintliga säkerhetsregler tillämpades. Osäkra betalningar och samlingsposter kräver granskning.'};},
+    messages:async({authorize})=>{authorize();prepareMessages(db);const count=listMessages(db).filter(m=>m.status==='draft').length;return {state:'done',count,note:`${count} utkast att läsa. Inga mejl har skickats.`};}
+  }
+});
+
 /** Huvudroutern: matchar HTTP-metod och URL, kontrollerar åtkomst och anropar rätt modul. */
 async function route(req,res){
   // The listener remains loopback-only; public HTTPS uses a secured reverse proxy.
@@ -317,6 +372,17 @@ async function route(req,res){
   if(path==='/api/logout'&&req.method==='POST'){
     db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
     db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
+  }
+  if(path==='/api/payment-control/overview'&&req.method==='GET')return json(res,200,{...paymentOverview(),run:paymentControl.latest(req.principal)});
+  if(path==='/api/payment-control/run'&&req.method==='POST'){
+    const body=await readBody(req);
+    if(Object.keys(body).some(key=>key!=='request_id'))throw bad(400,'Kontrollen accepterar bara en begäransidentifierare.');
+    const result=paymentControl.start(req.principal,body.request_id,()=>assertSessionStillAuthorized(req));
+    audit(db,'payment_control_requested',{id:result.job.id,reused:result.reused,principal:req.principal});
+    return json(res,result.job.status==='running'?202:200,result);
+  }
+  if(/^\/api\/payment-control\/runs\/[^/]+$/.test(path)&&req.method==='GET'){
+    return json(res,200,{job:paymentControl.get(req.principal,decodeURIComponent(path.split('/').pop()))});
   }
   if(path==='/api/dashboard'&&req.method==='GET')return json(res,200,invoiceStatus(db));
   if(path==='/api/settings'&&req.method==='GET')return json(res,200,{...getSettings(db),scheduler_available:true,scheduler:schedulerState,user_mode:'single_administrator'});
@@ -620,5 +686,5 @@ if(process.env.NODE_ENV!=='test'){
   server.listen(check.port,'127.0.0.1',()=>console.log(`MG Fakturakoll: ${check.origin}`));
   schedulerTimer=setInterval(()=>runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';}),60000);schedulerTimer.unref();
 }
-server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);});
+server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);paymentControl.stop();});
 export {server,db};

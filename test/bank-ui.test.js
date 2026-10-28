@@ -25,6 +25,7 @@ function ui(){
   });
   vm.runInContext(source,context,{filename:'public/app.js'});
   vm.runInContext(readFileSync(new URL('../public/messages.js',import.meta.url),'utf8'),context,{filename:'public/messages.js'});
+  vm.runInContext(readFileSync(new URL('../public/payment-control.js',import.meta.url),'utf8'),context,{filename:'public/payment-control.js'});
   vm.runInContext('state.me={authenticated:true,login_required:true}',context);
   return {context,element,run:code=>vm.runInContext(code,context),set:(name,value)=>{context[name]=value;},dispatch:name=>listeners.get('window:'+name)?.(),html:()=>element('#app').innerHTML};
 }
