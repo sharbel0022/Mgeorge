@@ -30,8 +30,16 @@ export function reconciliationData(db){
     try{const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid),account=canonical(selected?.account_id?.iban);if(selected?.currency==='SEK'&&/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(account))approvedAccounts.add(account);}catch{}
   }
   const retainedById=new Map(retained.map(original=>[original.id,original])),parsedFiles=new Map();
+  const sameDerivedFacts=(original,t)=>{
+    const organization=value=>String(value||'').replace(/[- ]/g,'');
+    return ['amount_cents','currency','booked_at','payer','reference','bank_reference'].every(field=>original[field]===t[field])
+      &&organization(original.payer_organization_number)===organization(t.payer_organization_number)
+      &&String(original.bankgiro||'')===String(t.bankgiro||'')&&String(original.payer_bankgiro||'')===String(t.payer_bankgiro||'')
+      &&(original.parent_bank_reference||original.aggregate_parent_reference||'')===t.parent_bank_reference
+      &&!!original.is_aggregate===!!t.is_aggregate&&JSON.stringify(original.reference_evidence||{})===JSON.stringify(t.reference_evidence||{});
+  };
   const verifiedFileOriginal=t=>{
-    if(!originals.has(t.import_id)||!approvedAccounts.has(canonical(t.account)))return false;
+    if(!t.bank_reference||!originals.has(t.import_id)||!approvedAccounts.has(canonical(t.account)))return false;
     const original=retainedById.get(t.import_id),key=JSON.stringify([t.import_id,t.account]);
     if(!parsedFiles.has(key)){
       try{
@@ -39,13 +47,12 @@ export function reconciliationData(db){
         parsedFiles.set(key,parseBankFile(original.name,Buffer.from(original.content).toString('base64'),t.account));
       }catch{parsedFiles.set(key,[]);}
     }
-    const facts=['amount_cents','currency','booked_at','payer','reference','bank_reference'];
-    const matching=parsedFiles.get(key).filter(record=>record.account_evidence?.exact_match&&canonical(record.account_evidence.reported_account)===canonical(t.account)&&facts.every(field=>record[field]===t[field])&&(record.parent_bank_reference||record.aggregate_parent_reference||'')===t.parent_bank_reference);
+    const matching=parsedFiles.get(key).filter(record=>record.account_evidence?.exact_match&&record.account_evidence.explicit_currency&&canonical(record.account_evidence.reported_account)===canonical(t.account)&&sameDerivedFacts(record,t));
     return matching.length===1;
   };
   const verifiedApiOriginal=t=>{
-    if(!t.raw_bank_data_sha256||!t.raw_bank_data||typeof t.raw_bank_data!=='object'||Array.isArray(t.raw_bank_data)||digest(JSON.stringify(t.raw_bank_data))!==t.raw_bank_data_sha256)return false;
-    try{const original=normalizeBankApiTransaction(t.raw_bank_data,t.account);return !!original&&['amount_cents','currency','booked_at','payer','bank_reference'].every(key=>original[key]===t[key]);}catch{return false;}
+    if(!t.bank_reference||!t.raw_bank_data_sha256||!t.raw_bank_data||typeof t.raw_bank_data!=='object'||Array.isArray(t.raw_bank_data)||digest(JSON.stringify(t.raw_bank_data))!==t.raw_bank_data_sha256)return false;
+    try{const original=normalizeBankApiTransaction(t.raw_bank_data,t.account);return !!original&&sameDerivedFacts(original,t);}catch{return false;}
   };
   return {invoices:listInvoices(db),transactions:listTransactions(db).map(t=>({...t,verified:!alteredOriginals.has(t.import_id)&&(t.source==='enablebanking'&&t.api_identity_version===1&&(verifiedApiOriginal(t)||verifiedFileOriginal(t))||t.source.startsWith('file:')&&verifiedFileOriginal(t))})),links,allocations:db.prepare('SELECT * FROM allocations').all()};
 }

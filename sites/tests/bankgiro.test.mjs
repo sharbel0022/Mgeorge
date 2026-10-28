@@ -43,7 +43,7 @@ test('V3 ISO namespace is resolved, not guessed from root attributes or foreign 
  assert.equal(parseBankgiroXML(prefixed)[0].payerReference,'0599');
  for(const input of [xml().replace('xmlns=','data-schema='),xml().replace('urn:iso:std:iso:20022:tech:xsd:camt.054.001.02','https://untrusted.example/camt.054.001.02'),xml().replace('<Amt Ccy="SEK">625.00</Amt>','<Amt xmlns="urn:foreign" Ccy="SEK">625.00</Amt>'),prefixed.replace('xmlns:iso=','xmlns:other=')])assert.throws(()=>parseBankgiroXML(input));
  const foreign=xml().replace('<NtryDtls>','<NtryDtls xmlns="urn:foreign">');
- assert.equal(parseBankgiroXML(foreign)[0].kind,'batch');
+ assert.throws(()=>parseBankgiroXML(foreign),/namnrymd/);
 });
 
 test('V3 mixed XML references retain independent evidence and free text without a false conflict',()=>{

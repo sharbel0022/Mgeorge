@@ -19,10 +19,10 @@ test('Bankgiro CSV payment reference is kept distinct from the bank event refere
   assert.equal(rows[0].booked_at,'2026-10-26');
 });
 test('camt.054 splits TxDtls and preserves credit direction',()=>{
-  const xml=`<?xml version="1.0"?><Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08"><BkToCstmrDbtCdtNtfct><Ntfct><Ntry><Amt Ccy="SEK">1875.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><BookgDt><Dt>2026-10-26</Dt></BookgDt><NtryDtls><TxDtls><Refs><AcctSvcrRef>A12</AcctSvcrRef></Refs><AmtDtls><TxAmt><Amt Ccy="SEK">1875.00</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>Exempelkund AB</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>0604</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfct></BkToCstmrDbtCdtNtfct></Document>`;
+  const xml=`<?xml version="1.0"?><Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08"><BkToCstmrDbtCdtNtfctn><Ntfctn><Ntry><Amt Ccy="SEK">1875.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><NtryDtls><TxDtls><Refs><AcctSvcrRef>A12</AcctSvcrRef></Refs><AmtDtls><TxAmt><Amt Ccy="SEK">1875.00</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>Exempelkund AB</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>0604</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>`;
   const x=parseCAMT(xml,'Bankgiro');assert.equal(x.length,1);assert.equal(x[0].payer,'Exempelkund AB');assert.equal(x[0].reference,'0604');assert.equal(x[0].amount_cents,187500);
 });
-test('XML containing a DOCTYPE is rejected',()=>assert.throws(()=>parseCAMT('<!DOCTYPE d [<!ENTITY x SYSTEM "file:///etc/passwd">]><Document></Document>')));
+test('XML containing a DOCTYPE is rejected',()=>assert.throws(()=>parseCAMT('<!DOCTYPE d [<!ENTITY x SYSTEM "file:///etc/passwd">]><Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08"></Document>')));
 test('official camt.054 notification element and Windows-1252 Bankgiro CSV are accepted',()=>{
  const xml='<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>';
  assert.equal(parseCAMT(xml)[0].amount_cents,62500);
@@ -36,8 +36,8 @@ test('normalizes Enable Banking transaction and direction',()=>{
 });
 
 const camt=(details,{amount='300.00',currency='SEK',status='BOOK',extra='',prefix=''}={})=>{
-  const raw=`<Document><BkToCstmrDbtCdtNtfct><Ntfct><Ntry><Amt Ccy="${currency}">${amount}</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts><Cd>${status}</Cd></Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AcctSvcrRef>PARENT</AcctSvcrRef>${extra}<NtryDtls>${details}</NtryDtls></Ntry></Ntfct></BkToCstmrDbtCdtNtfct></Document>`;
-  return prefix?raw.replace(/<(\/)?([A-Za-z]+)/g,`<$1${prefix}:$2`).replace(`<${prefix}:Document>`,`<${prefix}:Document xmlns:${prefix}="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08">`):raw;
+  const raw=`<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08"><BkToCstmrDbtCdtNtfctn><Ntfctn><Ntry><Amt Ccy="${currency}">${amount}</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts><Cd>${status}</Cd></Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AcctSvcrRef>PARENT</AcctSvcrRef>${extra}<NtryDtls>${details}</NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>`;
+  return prefix?raw.replace(/<(\/)?([A-Za-z]+)/g,`<$1${prefix}:$2`).replace(`<${prefix}:Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08">`,`<${prefix}:Document xmlns:${prefix}="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08">`):raw;
 };
 const detail=(amount,reference,name='Kund AB',id='')=>`<TxDtls>${id?`<Refs><AcctSvcrRef>${id}</AcctSvcrRef></Refs>`:''}${amount?`<AmtDtls><TxAmt><Amt Ccy="SEK">${amount}</Amt></TxAmt></AmtDtls>`:''}<RltdPties><Dbtr><Nm>${name}</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>${reference}</Ref></CdtrRefInf></Strd></RmtInf></TxDtls>`;
 
@@ -53,9 +53,13 @@ test('complete collective specification preserves child amounts and stable indep
   const rows=parseCAMT(camt(detail('100.00','101','A AB','CHILD1')+detail('200.00','102','B AB','CHILD2')));
   assert.equal(rows.length,2);assert.equal(rows.reduce((s,x)=>s+x.amount_cents,0),30000);assert.deepEqual(rows.map(x=>x.bank_reference),['CHILD1','CHILD2']);assert.ok(rows.every(x=>x.parent_bank_reference==='PARENT'));
 });
-test('split child references do not reuse the collective bank reference',()=>{
+
+test('one individual payment with its own identity retains the actual collective parent reference',()=>{
+  const [row]=parseCAMT(camt(detail('300.00','101','Kund AB','CHILD')));assert.equal(row.bank_reference,'CHILD');assert.equal(row.parent_bank_reference,'PARENT');assert.equal(row.amount_cents,30000);
+});
+test('missing child bank identities retain one review-only aggregate without generated IDs',()=>{
   const rows=parseCAMT(camt(detail('100.00','101')+detail('200.00','102')));
-  assert.notEqual(rows[0].bank_reference,rows[1].bank_reference);assert.notEqual(rows[0].bank_reference,'PARENT');
+  assert.equal(rows.length,1);assert.equal(rows[0].bank_reference,'PARENT');assert.equal(rows[0].is_aggregate,true);assert.equal(rows[0].payer,'');assert.equal(rows[0].amount_cents,30000);
 });
 test('namespace prefixes, current party nesting and XML numeric entities are supported',()=>{
   const xml=camt(detail('300.00','&#48;606','A &amp; B AB'));
@@ -66,11 +70,11 @@ test('namespace prefixes, current party nesting and XML numeric entities are sup
 });
 test('reported batch count must agree with complete per-payment details',()=>{
   const xml=camt(detail('100.00','101')+detail('200.00','102'),{extra:'<NtryDtls><Btch><NbOfTxs>3</NbOfTxs></Btch></NtryDtls>'});
-  const rows=parseCAMT(xml);assert.equal(rows.length,1);assert.equal(rows[0].is_aggregate,true);
+  assert.throws(()=>parseCAMT(xml),/antal/);
 });
-test('shared child service reference never reuses a parent ID',()=>{
+test('shared child service reference cannot manufacture independent bank identities',()=>{
   const rows=parseCAMT(camt(detail('100.00','101','A AB','PARENT')+detail('200.00','102','B AB','PARENT')));
-  assert.notEqual(rows[0].bank_reference,'PARENT');assert.notEqual(rows[1].bank_reference,'PARENT');assert.notEqual(rows[0].bank_reference,rows[1].bank_reference);
+  assert.equal(rows.length,1);assert.equal(rows[0].bank_reference,'PARENT');assert.equal(rows[0].is_aggregate,true);assert.equal(rows[0].amount_cents,30000);
 });
 test('foreign currency XML, CSV and API records are rejected instead of relabeled SEK',()=>{
   assert.throws(()=>parseCAMT(camt(detail('300.00','101'),{currency:'EUR'})),/Valutan EUR/);
@@ -134,7 +138,7 @@ test('API purchase date is never substituted for a missing accounting date',()=>
 });
 
 test('camt statement account cannot be relabelled as a different selected IBAN',()=>{
-  const xml=camt(detail('300.00','101')).replace('<Ntfct>','<Ntfct><Acct><Id><IBAN>SE4550000000058398257466</IBAN></Id></Acct>');
+  const xml=camt(detail('300.00','101')).replace('<Ntfctn>','<Ntfctn><Acct><Id><IBAN>SE4550000000058398257466</IBAN></Id></Acct>');
   assert.throws(()=>parseCAMT(xml,'SE3550000000054910000003'),/konto/i);
   assert.equal(parseCAMT(xml,'SE45 5000 0000 0583 9825 7466')[0].account,'SE4550000000058398257466');
 });
@@ -145,8 +149,8 @@ test('CSV explicit account cannot contradict the selected company account',()=>{
 });
 
 test('a mixed-account statement cannot collapse multiple company accounts under one alias',()=>{
-  const first=camt(detail('300.00','101')).match(/<Ntfct>([\s\S]*)<\/Ntfct>/)[1];
-  const xml=`<Document><BkToCstmrDbtCdtNtfct><Ntfct><Acct><Id><IBAN>SE4550000000058398257466</IBAN></Id></Acct>${first}</Ntfct><Ntfct><Acct><Id><IBAN>SE3550000000054910000003</IBAN></Id></Acct>${first}</Ntfct></BkToCstmrDbtCdtNtfct></Document>`;
+  const first=camt(detail('300.00','101')).match(/<Ntfctn>([\s\S]*)<\/Ntfctn>/)[1];
+  const xml=`<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><IBAN>SE4550000000058398257466</IBAN></Id></Acct>${first}</Ntfctn><Ntfctn><Acct><Id><IBAN>SE3550000000054910000003</IBAN></Id></Acct>${first}</Ntfctn></BkToCstmrDbtCdtNtfctn></Document>`;
   assert.throws(()=>parseCAMT(xml,'MG'),/flera konton/i);
 });
 

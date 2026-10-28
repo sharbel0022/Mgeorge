@@ -5,6 +5,7 @@ export type Invoice = {
  organizationNumber?:string;vat?:number|null;net?:number|null;reconciledAt?:string;reconciliationNote?:string;note: string; bankgiro: string; documentId: string; source: string; createdAt: string;
 };
 export type Transaction = {
+ reportEvidence?:Record<string,string>;
  bankFileProof?:{version:'bank-file-original-v1';documentId:string;sha256:string;reviewedAt?:string};
  bankDetails?:{referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;status:'identified'|'missing'|'unsupported';checkedAt:string;party:string;payerReference:string;referenceSchema:string;reason:string;documentId:string;bankReferenceText:string};
  referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;bankData?:Record<string,unknown>;referenceParts?:{value:string;source:string;kind:string}[];specification?:boolean;specificationStatus?:'linked'|'review';specificationGroup?:string;specificationCount?:number;specificationTotal?:number;parentBankReference?:string;recipientBankgiro?:string;payerBankgiro?:string;payerAccount?:string;remittanceMessage?:string;settlementDate?:string;format?:string;recipientAccount?:string;
@@ -99,6 +100,10 @@ function cleanInvoice(raw:any,existing?:Invoice):Invoice{
  if([i.vat,i.net].some(n=>n!=null&&(!Number.isSafeInteger(n)||n<0))||i.vat!=null&&i.net!=null&&i.vat+i.net!==i.total)throw new Error('Netto och moms måste stämma med fakturabeloppet.');
  if(!i.party||!i.number)throw new Error("Namn och fakturanummer behövs.");if(i.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.email))throw new Error("Kontrollera e-postadressen.");if(i.due&&i.due<i.issued)throw new Error("Förfallodatum får inte vara före fakturadatum.");return i;
 }
+function cleanReportEvidence(raw:any):Record<string,string>|undefined{
+ if(!raw||typeof raw!=='object'||Array.isArray(raw))return undefined;
+ return Object.fromEntries(['profile','namespace','messageId','reportId','createdAt','accountServicer','entryReference','valueDate'].map(key=>[key,str(raw[key]??'',300)]));
+}
 function cleanTransaction(raw:any):Transaction{
  if(!raw||raw.currency&&raw.currency!=="SEK")throw new Error("Endast bankhändelser i SEK stöds.");let kind=['payment','batch','unknown'].includes(raw.kind)?raw.kind:'unknown';
  const amount=cents(raw.amount,false),party=str(raw.party??"",200),payerReference=str(raw.payerReference??"",300),description=str(raw.description??"",1000);
@@ -146,7 +151,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
    for(const raw of plan.rows){
     const t=cleanTransaction({...raw,kind:'payment',verified:false});
     if(Array.isArray(raw.referenceParts))t.referenceParts=raw.referenceParts.slice(0,20).map((p:any)=>({value:str(p.value,300),source:str(p.source,200),kind:str(p.kind,60)}));t.specification=true;t.specificationStatus=plan.status as 'linked'|'review';t.parentBankReference=str(raw.parentBankReference||'',300);t.recipientBankgiro=str(raw.recipientBankgiro||'',100);t.payerBankgiro=str(raw.payerBankgiro||'',100);t.settlementDate=str(raw.settlementDate||'',10);t.format=str(raw.format||'',100);t.organizationNumber=str(raw.organizationNumber||'',40);
-    t.referenceEvidence=structuredClone(raw.referenceEvidence);t.payerAccount=str(raw.payerAccount||'',100);t.remittanceMessage=str(raw.remittanceMessage||'',1000);
+    t.referenceEvidence=structuredClone(raw.referenceEvidence);t.payerAccount=str(raw.payerAccount||'',100);t.remittanceMessage=str(raw.remittanceMessage||'',1000);t.reportEvidence=cleanReportEvidence(raw.reportEvidence);
     t.specificationGroup=str(plan.rows[0].parentKey||plan.rows[0].parentBankReference||plan.rows[0].bankReference||plan.rows[0].key||'csv',300);t.specificationCount=plan.rows.length;t.specificationTotal=plan.total;
     t.recipientAccount=str(raw.recipientAccount||raw.account||'',100);t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};
     t.parentId=plan.parentId||'';t.importId=record.id;t.evidence='bankgiro_file';t.kind='payment';t.verified=plan.status==='linked'&&individualParty(t.party);
@@ -191,7 +196,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
     matched.push(found[0]);if(command.rows[n].key)keys.set(command.rows[n].key,found[0].id);
    }
    if(matched.some((t,n)=>t.parentId!==(command.rows[n].parentKey?keys.get(command.rows[n].parentKey)||'missing':'')))throw Error('Originalets uppdelning stämmer inte med äldre bankrader. Granska originalet.');
-   for(let n=0;n<matched.length;n++){const t=matched[n];t.evidence='bank_file';t.referenceEvidence=structuredClone(command.rows[n].referenceEvidence);t.bankFileProof={version:'bank-file-original-v1',documentId:str(command.documentId,100),sha256:hash};}
+   for(let n=0;n<matched.length;n++){const t=matched[n];t.evidence='bank_file';t.referenceEvidence=structuredClone(command.rows[n].referenceEvidence);t.reportEvidence=cleanReportEvidence(command.rows[n].reportEvidence);t.bankFileProof={version:'bank-file-original-v1',documentId:str(command.documentId,100),sha256:hash};}
    message='Bankoriginalet är kontrolläst igen. Befintliga betalningar och belopp är bevarade.';break;
   }
   if(hash&&s.imports.some(i=>i.hash===hash&&sameAccount(i.account,account)))throw new Error("Den här filen har redan importerats för kontot.");
@@ -200,7 +205,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
    const t=cleanTransaction({...raw,account:typeof raw.account==='string'&&raw.account.trim()?raw.account:account});t.importId=record.id;if(Array.isArray(raw.referenceParts))t.referenceParts=raw.referenceParts.slice(0,20).map((p:any)=>({value:str(p.value,300),source:str(p.source,200),kind:str(p.kind,60)}));t.organizationNumber=str(raw.organizationNumber??'',40);t.payerAccount=str(raw.payerAccount||'',100);t.remittanceMessage=str(raw.remittanceMessage||'',1000);
    t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};
    if(command.trustedBankImport===true){t.referenceEvidence=structuredClone(raw.referenceEvidence);t.bankData=structuredClone(raw.bankData);t.evidence='bank_api';if(t.externalId&&t.kind!=='batch'&&individualParty(t.party)&&usablePaymentReference(t.payerReference)){t.kind='payment';t.verified=true;}}
-   else if(trustedFile){t.evidence='bank_file';t.referenceEvidence=structuredClone(raw.referenceEvidence);t.bankFileProof={version:'bank-file-original-v1',documentId:record.documentId!,sha256:hash};}
+   else if(trustedFile){t.evidence='bank_file';t.referenceEvidence=structuredClone(raw.referenceEvidence);t.reportEvidence=cleanReportEvidence(raw.reportEvidence);t.bankFileProof={version:'bank-file-original-v1',documentId:record.documentId!,sha256:hash};}
    if(raw.parentKey){const parentId=keys.get(raw.parentKey);if(!parentId)throw new Error("Betalningsspecifikationen saknar sin samlingspost.");if(!individualParty(t.party)||!usablePaymentReference(t.payerReference))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);t.parentId=parentId;}
    const stable=t.externalId?s.transactions.find(x=>sameAccount(x.account,t.account)&&x.externalId===t.externalId):undefined;
    if(stable){

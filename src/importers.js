@@ -1,4 +1,5 @@
 import {extractPaymentReferences} from './payment-references.js';
+import {readCamtDocument as xmlTree,xmlChildren as children,xmlPath as path,xmlValue as value,camtRemittanceNodes,camtAmount as amountNode,camtDate,camtReportEvidence,validateCamtBatches,decodeCamtBytes} from '../sites/lib/camt-xml.js';
 /**
  * MG FAKTURAKOLL – BANKFILER / FORMAT
  * ANSVAR: Tolkar CSV och ISO 20022 camt.053/camt.054 och normaliserar datum, belopp, riktning och referenser. Samlade Bankgiroposter kräver säkra detaljuppgifter.
@@ -77,9 +78,9 @@ function verifyFileAccount(reported,selected){
   // Aliases and masked identifiers are not proof of account equivalence.
   if(actual&&/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(expected)&&actual!==expected)throw new Error('Bankfilens konto stämmer inte med det valda företagskontot.');
 }
-function fileAccountEvidence(reported,selected,format){
+function fileAccountEvidence(reported,selected,format,currency=''){
   const actual=canonicalAccount(reported),chosen=canonicalAccount(selected);
-  return {version:'bank-file-account-2026-10-28.1',format,reported_account:actual,selected_account:String(selected||''),exact_match:/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(actual)&&actual===chosen};
+  return {version:'bank-file-account-2026-10-28.1',format,reported_account:actual,selected_account:String(selected||''),exact_match:/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(actual)&&actual===chosen,explicit_currency:currency.toUpperCase()==='SEK'};
 }
 export function parseCSV(text,account='Swedbank'){
   account=selectedAccount(account);
@@ -108,69 +109,20 @@ export function parseCSV(text,account='Swedbank'){
     const reference_evidence=extractPaymentReferences(rawColumns);
     const description=g('description'),payer=g('payer'),reference=g('reference')||reference_evidence.selected?.value||'';
     const collective=requiresPaymentSpecification(description,payer,reference);
-    items.push({reference_evidence,account_evidence:fileAccountEvidence(reported,account,'csv'),account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
+    items.push({reference_evidence,account_evidence:fileAccountEvidence(reported,account,'csv',g('currency')),account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:bankId(g('bank_reference')),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
   }
   return validateItems(items);
 }
-function decodeXML(s){
-  return s.replace(/&([^;]+);/g,(_,name)=>{
-    const known={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"};if(Object.hasOwn(known,name))return known[name];
-    const num=/^#x[\da-f]+$/i.test(name)?parseInt(name.slice(2),16):/^#\d+$/.test(name)?Number(name.slice(1)):NaN;
-    if(!Number.isInteger(num)||num<=0||num>0x10ffff||num>=0xd800&&num<=0xdfff)throw new Error('Ogiltig XML-entitet');
-    return String.fromCodePoint(num);
-  });
-}
-// A bounded, non-resolving XML reader. Local names support both default and
-// prefixed ISO 20022 namespaces; parent/child paths never match descendants by accident.
-function xmlTree(xml){
-  if(typeof xml!=='string'||xml.length>15*1024*1024)throw new Error('Bankfilen är för stor');
-  if(/<!DOCTYPE|<!ENTITY|<\?xml-stylesheet/i.test(xml))throw new Error('XML med DTD eller externa referenser tillåts inte');
-  const root={name:'#root',children:[],text:''},stack=[root];let pos=0,count=0;
-  while(pos<xml.length){
-    if(xml.startsWith('<!--',pos)){const end=xml.indexOf('-->',pos+4);if(end<0)throw new Error('Ofullständig XML-kommentar');pos=end+3;continue;}
-    if(xml.startsWith('<?',pos)){const end=xml.indexOf('?>',pos+2);if(end<0)throw new Error('Ofullständig XML-deklaration');pos=end+2;continue;}
-    if(xml.startsWith('<![CDATA[',pos)){const end=xml.indexOf(']]>',pos+9);if(end<0||stack.length===1)throw new Error('Ogiltig XML');stack.at(-1).text+=xml.slice(pos+9,end);pos=end+3;continue;}
-    if(xml[pos]!=='<'){
-      let end=xml.indexOf('<',pos);if(end<0)end=xml.length;const value=xml.slice(pos,end);
-      if(stack.length===1&&value.replace(/^\ufeff/,'').trim())throw new Error('Text utanför XML-dokumentet');
-      stack.at(-1).text+=decodeXML(value);pos=end;continue;
-    }
-    let end=pos+1,quote='';
-    for(;end<xml.length;end++){const c=xml[end];if(quote){if(c===quote)quote='';}else if(c==='"'||c==="'")quote=c;else if(c==='>')break;}
-    if(end===xml.length)throw new Error('Ofullständig XML-tagg');
-    const token=xml.slice(pos,end+1);pos=end+1;
-    const closing=token.match(/^<\/([A-Za-z_][\w.:-]*)\s*>$/);
-    if(closing){if(stack.length===1||stack.at(-1).qualified!==closing[1])throw new Error('Felaktig XML-struktur');stack.pop();continue;}
-    const opening=token.match(/^<([A-Za-z_][\w.:-]*)([\s\S]*?)(\/?)>$/);
-    if(!opening)throw new Error('Ogiltig XML-tagg');
-    const attributes={};let rest=opening[2];
-    while(rest.trim()){
-      const match=rest.match(/^\s+([A-Za-z_][\w.:-]*)\s*=\s*("[^"]*"|'[^']*')/);
-      if(!match||Object.hasOwn(attributes,match[1]))throw new Error('Ogiltiga XML-attribut');
-      attributes[match[1]]=decodeXML(match[2].slice(1,-1));rest=rest.slice(match[0].length);
-    }
-    const node={name:opening[1].split(':').at(-1),qualified:opening[1],attributes,children:[],text:''};
-    stack.at(-1).children.push(node);count++;
-    if(count>150000||stack.length>80)throw new Error('XML-strukturen är för stor eller för djup');
-    if(!opening[3])stack.push(node);
-  }
-  if(stack.length!==1||root.children.length!==1)throw new Error('Ofullständigt XML-dokument');
-  return root.children[0];
-}
-const children=(node,name)=>(node?.children||[]).filter(x=>x.name===name);
-function path(node,...names){for(const name of names){const matches=children(node,name);if(matches.length>1&&!['Strd','Ustrd','RfrdDocInf','NtryDtls'].includes(name))throw new Error('Upprepade XML-fält i bankunderlaget: '+name);node=matches[0];}return node;}
-const value=(node,...names)=>path(node,...names)?.text.trim()||'';
-function reversed(node){const flags=children(node,'RvslInd');if(!flags.length)return false;const flag=value(node,'RvslInd');if(!/^(true|false|0|1)$/i.test(flag))throw new Error('Ogiltig XML-flagga för återföring.');return /^(true|1)$/i.test(flag);}
+function reversed(node){const flags=children(node,'RvslInd');if(!flags.length)return false;const flag=value(node,'RvslInd');if(!/^(true|false|0|1)$/.test(flag))throw new Error('Ogiltig XML-flagga för återföring.');return /^(true|1)$/.test(flag);}
 function unsignedMoney(node){if(!/^\d+(?:\.\d{1,2})?$/.test(node.text.trim()))throw new Error('Bankpostens belopp måste vara ett osignerat decimaltal; riktningen anges separat.');return parseMoney(node.text);}
-function descendants(node,name){return node.children.flatMap(x=>x.name===name?[x]:descendants(x,name));}
 function referenceEvidence(node){
   const convert=n=>n.children.length?Object.fromEntries([...new Set(n.children.map(c=>c.name))].map(name=>[name,n.children.filter(c=>c.name===name).map(convert)])):n.text.trim();
-  return extractPaymentReferences({RmtInf:children(node,'RmtInf').map(convert),AddtlTxInf:value(node,'AddtlTxInf')});
+  const OCR=camtRemittanceNodes(node,'CdtrRefInf').filter(n=>/^(?:SE)?OCR$/i.test(value(n,'Tp','CdOrPrtry','Prtry')||value(n,'Tp','CdOrPrtry','Cd'))).map(n=>value(n,'Ref'));
+  return extractPaymentReferences({RmtInf:children(node,'RmtInf').map(convert),OCR,AddtlTxInf:value(node,'AddtlTxInf')});
 }
-function reference(node){return value(node,'RmtInf','Strd','CdtrRefInf','Ref')||children(path(node,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join(' ')||referenceEvidence(node).selected?.value||'';}
-function bankId(s){return /^(NOTPROVIDED|NONREF|N\/A)$/i.test(s)?'':s;}
-function detailId(node){return bankId(value(node,'Refs','AcctSvcrRef'))||bankId(value(node,'Refs','TxId'))||bankId(value(node,'Refs','EndToEndId'));}
-function amountNode(node){return path(node,'AmtDtls','TxAmt','Amt')||path(node,'AmtDtls','InstdAmt','Amt')||path(node,'Amt');}
+function reference(node){return referenceEvidence(node).selected?.value||children(path(node,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join(' ')||'';}
+function bankId(s){return /^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(s)?'':s;}
+function detailId(node){return bankId(value(node,'Refs','AcctSvcrRef'))||bankId(value(node,'Refs','TxId'));}
 function requiresPaymentSpecification(description,payer,ref){
   const collection=/samlad|batch|samlingspost/i.test(description);
   const bankgiro=/bankgiro|bg\s*inbetalning/i.test(`${description} ${payer}`);
@@ -184,29 +136,31 @@ function validateItems(items){if(items.length>1000)throw new Error('Högst 1 000
 export function parseCAMT(xml,account='Swedbank'){
   account=selectedAccount(account);
   const document=xmlTree(xml);
-  if(document.name!=='Document'||!document.children.some(x=>['BkToCstmrStmt','BkToCstmrDbtCdtNtfct','BkToCstmrDbtCdtNtfctn'].includes(x.name)))throw new Error('Endast ISO 20022 camt.053/054 stöds');
+
   const items=[];
-  const statements=['Stmt','Ntfct','Ntfctn'].flatMap(name=>descendants(document,name));
+  const statements=document.namespace.includes('camt.053.')?children(path(document,'BkToCstmrStmt'),'Stmt'):children(path(document,'BkToCstmrDbtCdtNtfctn'),'Ntfctn');
   const reportedAccounts=new Set(statements.map(statement=>canonicalAccount(value(statement,'Acct','Id','IBAN')||value(statement,'Acct','Id','Othr','Id'))).filter(Boolean));
   if(reportedAccounts.size>1)throw new Error('Bankfilen innehåller flera konton. Importera ett konto åt gången.');
   for(const reported of reportedAccounts)verifyFileAccount(reported,account);
   for(const statement of statements)for(const entry of children(statement,'Ntry')){
-    const status=value(entry,'Sts','Cd')||value(entry,'Sts');if(status&&status!=='BOOK')continue;
+    const status=value(entry,'Sts','Cd')||value(entry,'Sts');if(status!=='BOOK')throw new Error('Filen måste innehålla bokförda transaktioner (BOOK).');
     if(reversed(entry))throw new Error('Återförd bankpost kräver separat granskning och kan inte importeras som betalning.');
     const direction=value(entry,'CdtDbtInd');if(!['CRDT','DBIT'].includes(direction))throw new Error('Bokföringsriktning saknas i XML-filen');
     const sign=direction==='DBIT'?-1:1;
-    const date=normalizeDate(value(entry,'BookgDt','Dt')||value(entry,'BookgDt','DtTm')||value(entry,'ValDt','Dt')||value(entry,'ValDt','DtTm'));
+    const date=camtDate(entry,'BookgDt',true),reportEvidence=camtReportEvidence(document,statement,entry);
     const entryAmount=path(entry,'Amt');if(!entryAmount)throw new Error('Belopp saknas i bankpost');
+    if(!entryAmount.attributes.Ccy)throw new Error('Valuta saknas i bankposten.');
     const currency=sek(entryAmount.attributes.Ccy),total=unsignedMoney(entryAmount);
     if(!total)continue;
     const details=children(entry,'NtryDtls').flatMap(x=>children(x,'TxDtls'));
     const parentReference=bankId(value(entry,'AcctSvcrRef'))||bankId(value(entry,'NtryRef'));
     const description=value(entry,'AddtlNtryInf');
     const reportedAccount=value(statement,'Acct','Id','IBAN')||value(statement,'Acct','Id','Othr','Id');
-    const common={account_evidence:fileAccountEvidence(reportedAccount,account,'camt'),account,booked_at:date,amount_cents:total*sign,currency,payer:'',reference:'',bank_reference:parentReference,description};
-    const batchCount=Number(value(entry,'NtryDtls','Btch','NbOfTxs')),knownBatch=batchCount>1;
+    const common={account_evidence:{...fileAccountEvidence(reportedAccount,account,'camt',currency),report:reportEvidence},account,booked_at:date,amount_cents:total*sign,currency,payer:'',reference:'',bank_reference:parentReference,description};
+    const declaredCounts=validateCamtBatches(entry),batchCount=declaredCounts.reduce((n,c)=>n+c,0),knownBatch=batchCount>1;
     const amounts=details.map(amountNode);
-    for(const amount of amounts)if(amount)sek(amount.attributes.Ccy||currency);
+    for(const amount of amounts)if(amount){if(!amount.attributes.Ccy)throw new Error('Valuta saknas i betalningsdetaljen.');sek(amount.attributes.Ccy);}
+    for(const detail of details)if(reversed(detail))throw new Error('Återförd betalningsdetalj kräver separat granskning.');
     // Child amounts are mandatory for splitting a collective entry. Preserve the
     // collective amount once when the bank omitted them or provided inconsistent sums.
     const invalidSplit=details.length>1&&(amounts.some(x=>!x)||amounts.reduce((s,x)=>s+unsignedMoney(x),0)!==total);
@@ -217,7 +171,10 @@ export function parseCAMT(xml,account='Swedbank'){
       const collective=knownBatch||/bankgiro|bg\s*inbetalning|samlad|batch/i.test(description);
       items.push({...common,...(collective?{...aggregateFlags(),aggregate_parent_reference:parentReference}:{})});continue;
     }
-    const identifiers=new Set(),detailIds=details.map(detailId);
+    const detailIds=details.map(detailId);
+    if(details.length>1&&(detailIds.some(id=>!id)||new Set(detailIds).size!==detailIds.length)){
+      items.push({...common,...aggregateFlags('Individuell bankidentitet saknas eller upprepas. Samlingsbeloppet har behållits en gång.'),aggregate_parent_reference:parentReference});continue;
+    }
     for(const [index,detail] of details.entries()){
       if(reversed(detail))throw new Error('Återförd betalningsdetalj kräver separat granskning.');
       const amount=amounts[index];if(amount)sek(amount.attributes.Ccy||currency);
@@ -227,12 +184,8 @@ export function parseCAMT(xml,account='Swedbank'){
       const party=sign>0?'Dbtr':'Cdtr';
       const payer=value(detail,'RltdPties',party,'Nm')||value(detail,'RltdPties',party,'Pty','Nm');
       const ref=reference(detail),specific=detailIds[index];
-      const uniqueSpecific=specific&&detailIds.filter(x=>x===specific).length===1;
-      const groupReference=parentReference||specific;
-      let id=(uniqueSpecific?specific:'')||(details.length===1?parentReference:groupReference?`${groupReference}:${ref||'post'}:${sign*cents}`:'');
-      if(id&&identifiers.has(id))id+=`:del${index+1}`;
-      identifiers.add(id);
-      items.push({...common,reference_evidence:referenceEvidence(detail),amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(details.length>1?{parent_bank_reference:parentReference}:{})});
+      const id=specific||(details.length===1?parentReference:'');
+      items.push({...common,reference_evidence:referenceEvidence(detail),amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(parentReference&&id!==parentReference?{parent_bank_reference:parentReference}:{})});
     }
   }
   return validateItems(items);
@@ -242,8 +195,9 @@ export function parseBankFile(name,base64,account='Swedbank'){
   if(!/^[\w\p{L}(). -]+\.(csv|xml)$/iu.test(String(name)))throw new Error('Välj CSV eller XML');
   if(typeof base64!=='string'||base64.length>20_000_000||!base64.length||base64.length%4!==0||!/^[A-Za-z0-9+/]*={0,2}$/.test(base64))throw new Error('Fil saknas eller är för stor eller felaktig');
   const bytes=Buffer.from(base64,'base64');if(bytes.length>15_000_000)throw new Error('Max 15 MB');
+  if(name.toLowerCase().endsWith('.xml'))return parseCAMT(decodeCamtBytes(bytes),account);
   let text;try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{text=new TextDecoder('windows-1252').decode(bytes);}
-  return name.toLowerCase().endsWith('.xml')?parseCAMT(text,account):parseCSV(text,account);
+  return parseCSV(text,account);
 }
 export function normalizeBankApiTransaction(x,account){
   // Enable Banking requires a status. Never treat missing/unknown status as booked.

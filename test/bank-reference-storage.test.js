@@ -6,15 +6,16 @@ import {join} from 'node:path';
 import {openDatabase,storeTransactions,listTransactions} from '../src/db.js';
 import {normalizeBankApiTransaction,parseCSV,parseCAMT} from '../src/importers.js';
 import {digest} from '../src/security.js';
-import {reconciliationData} from '../src/reconciliation.js';
+import {reconciliationData,runReconciliation} from '../src/reconciliation.js';
 import {approveSyntheticBankAccount} from './bank-fixtures.js';
+import {syntheticCamt,account as syntheticAccount} from '../sites/tests/helpers/camt-integrity.mjs';
 
 const raw=(more={})=>({status:'BOOK',entry_reference:'ARCHIVE-1',transaction_id:'temporary',booking_date:'2026-10-26',credit_debit_indicator:'CRDT',transaction_amount:{amount:'625.00',currency:'SEK'},debtor:{name:'Testkund AB'},reference_number:'0599',details:{invoice_number:'0600'},...more});
 function fixture(t){const folder=mkdtempSync(join(tmpdir(),'mg-ref-')),db=openDatabase(join(folder,'db.sqlite'));t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});return db;}
 test('bank original and all reference candidates survive SQLite, duplicate sync and changed response',t=>{const db=fixture(t);const input=raw(),normalized=normalizeBankApiTransaction(input,'account');storeTransactions(db,[normalized],'enablebanking');const saved=listTransactions(db)[0];assert.deepEqual(saved.raw_bank_data,input);assert.equal(saved.reference_evidence.candidates.length,2);input.details.invoice_number='changed-after-normalization';assert.equal(normalized.raw_bank_data.details.invoice_number,'0600');const again=storeTransactions(db,[normalizeBankApiTransaction(raw({transaction_id:'new-lookup',reference_number:'changed'}),'account')],'enablebanking');assert.equal(again.duplicate,1);assert.deepEqual(listTransactions(db)[0].raw_bank_data,saved.raw_bank_data);assert.equal(listTransactions(db).length,1);});
 test('conflicting repeat bank amounts roll back the complete batch and preserved originals',t=>{const db=fixture(t);storeTransactions(db,[normalizeBankApiTransaction(raw(),'account')],'enablebanking');assert.throws(()=>storeTransactions(db,[normalizeBankApiTransaction(raw({entry_reference:'NEW'}),'account'),normalizeBankApiTransaction(raw({transaction_amount:{amount:'626.00',currency:'SEK'}}),'account')],'enablebanking'));assert.equal(listTransactions(db).length,1);assert.equal(listTransactions(db)[0].amount_cents,62500);});
 test('CSV retains OCR and invoice fields separately with original column names',()=>{const [x]=parseCSV('Datum;Belopp;OCR;Fakturanummer;Betalare\n2026-10-26;625,00;1234567897;0599;Testkund AB');assert.equal(x.reference,'1234567897');assert.ok(x.reference_evidence.candidates.some(c=>c.value==='0599'&&c.source.includes('Fakturanummer')));});
-test('camt keeps structured references and referred invoice numbers together',()=>{const [x]=parseCAMT('<Document><BkToCstmrStmt><Stmt><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><BookgDt><Dt>2026-10-26</Dt></BookgDt><NtryDtls><TxDtls><RmtInf><Strd><CdtrRefInf><Ref>1234567897</Ref></CdtrRefInf><RfrdDocInf><Nb>0599</Nb></RfrdDocInf></Strd><Ustrd>Faktura 0599</Ustrd></RmtInf></TxDtls></NtryDtls></Ntry></Stmt></BkToCstmrStmt></Document>');assert.ok(x.reference_evidence.candidates.some(c=>c.value==='0599'));assert.ok(x.reference_evidence.candidates.some(c=>c.source.includes('CdtrRefInf')));});
+test('camt keeps structured references and referred invoice numbers together',()=>{const [x]=parseCAMT('<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02"><BkToCstmrStmt><Stmt><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><NtryDtls><TxDtls><RmtInf><Strd><CdtrRefInf><Ref>1234567897</Ref></CdtrRefInf><RfrdDocInf><Nb>0599</Nb></RfrdDocInf></Strd><Ustrd>Faktura 0599</Ustrd></RmtInf></TxDtls></NtryDtls></Ntry></Stmt></BkToCstmrStmt></Document>');assert.ok(x.reference_evidence.candidates.some(c=>c.value==='0599'));assert.ok(x.reference_evidence.candidates.some(c=>c.source.includes('CdtrRefInf')));});
 test('a later verified API response attaches missing raw evidence without replacing existing financial fields',t=>{const db=fixture(t),first=normalizeBankApiTransaction(raw(),'account');delete first.raw_bank_data;delete first.reference_evidence;storeTransactions(db,[first],'enablebanking');const before=listTransactions(db)[0];storeTransactions(db,[normalizeBankApiTransaction(raw({reference_number:'0600'}),'account')],'enablebanking');const after=listTransactions(db)[0];assert.equal(after.id,before.id);assert.equal(after.reference,'0599');assert.equal(after.raw_bank_data.reference_number,'0600');assert.equal(after.amount_cents,before.amount_cents);assert.equal(listTransactions(db).length,1);});
 
 test('retained bank original stores a separate SHA-256 of its exact bytes',t=>{
@@ -25,7 +26,7 @@ test('retained bank original stores a separate SHA-256 of its exact bytes',t=>{
 });
 
 test('tampered retained file cannot remain verified automatic payment evidence',t=>{
-  const db=fixture(t),account='SE4280000890119146168423',content=Buffer.from(`Datum;Belopp;Betalare;Referens;IBAN\n2026-10-26;625;Testkund AB;0599;${account}\n`);
+  const db=fixture(t),account='SE4280000890119146168423',content=Buffer.from(`Datum;Belopp;Betalare;Referens;IBAN;Bankreferens;Valuta\n2026-10-26;625;Testkund AB;0599;${account};SYNTHETIC-ID;SEK\n`);
   approveSyntheticBankAccount(db,account);
   const result=storeTransactions(db,parseCSV(content.toString(),account),'file:bank.csv',{content,mime_type:'text/csv'});
   assert.equal(reconciliationData(db).transactions[0].verified,true);
@@ -70,4 +71,56 @@ test('API SHA migration hashes retained originals atomically while missing origi
   assert.equal(transactions.find(x=>x.bank_reference==='MISSING-ORIGINAL').verified,false);
   assert.deepEqual(new Set(transactions.map(x=>x.id)),new Set(before.map(x=>x.id)));
   assert.deepEqual(transactions.find(x=>x.bank_reference==='ARCHIVE-1').raw_bank_data,genuine.raw_bank_data);
+});
+
+test('V4 bank API original without stable entry identity cannot authorize automatic payment evidence',t=>{
+  const db=fixture(t),payment=normalizeBankApiTransaction(raw({entry_reference:undefined}),'MG');
+  storeTransactions(db,[payment],'enablebanking');
+  assert.equal(payment.bank_reference,'');assert.equal(reconciliationData(db).transactions[0].verified,false);
+});
+
+test('V4 missing or placeholder bank identity and inferred CSV currency remain review-only',t=>{
+  for(const [identity,currency]of [['','SEK'],['UNKNOWN','SEK'],['ACTUAL-ID','']]){
+    const db=fixture(t);approveSyntheticBankAccount(db,syntheticAccount);
+    const text=`Datum;Belopp;Betalare;OCR;Bankreferens;IBAN;Valuta\n2026-10-26;625;Syntetisk Kund AB;000018;${identity};${syntheticAccount};${currency}\n`,content=Buffer.from(text);
+    storeTransactions(db,parseCSV(text,syntheticAccount),'file:synthetic.csv',{content,mime_type:'text/csv'});
+    assert.equal(reconciliationData(db).transactions[0].verified,false);
+  }
+});
+
+test('V4 claimed bank, report, message, namespace and value date survive separately with exact original',t=>{
+  const db=fixture(t),content=Buffer.from(syntheticCamt);approveSyntheticBankAccount(db,syntheticAccount);
+  const parsed=parseCAMT(syntheticCamt,syntheticAccount),result=storeTransactions(db,parsed,'file:synthetic.xml',{content,mime_type:'application/xml'});
+  const payment=listTransactions(db)[0];assert.deepEqual(payment.account_evidence.report,parsed[0].account_evidence.report);assert.equal(payment.payer,'Syntetisk Kund AB');assert.equal(payment.reference,'000018');assert.equal(payment.account_evidence.report.reportId,'SYNTHETIC-REPORT');
+  assert.equal(reconciliationData(db).transactions[0].verified,true);assert.deepEqual(Buffer.from(db.prepare('SELECT content FROM import_jobs WHERE id=?').get(result.import_id).content),content);
+});
+
+test('V4 API references, candidates, party IDs and classification must match the hashed bank original',t=>{
+  for(const change of ['reference','candidates','aggregate','organization','bankgiro','payer_bankgiro','parent_bank_reference']){
+    const db=fixture(t),payment=normalizeBankApiTransaction(raw({reference_number:'000018',details:{invoice_number:'000019'}}),'MG');storeTransactions(db,[payment],'enablebanking');
+    const saved=listTransactions(db)[0];assert.equal(reconciliationData(db).transactions[0].verified,true);
+    if(change==='reference')db.prepare('UPDATE bank_transactions SET reference=? WHERE id=?').run('000020',saved.id);
+    if(change==='aggregate')db.prepare('UPDATE bank_transactions SET is_aggregate=1 WHERE id=?').run(saved.id);
+    if(change==='organization')db.prepare('UPDATE bank_transactions SET payer_organization_number=? WHERE id=?').run('5561234567',saved.id);
+    if(['bankgiro','payer_bankgiro','parent_bank_reference'].includes(change))db.prepare(`UPDATE bank_transactions SET ${change}=? WHERE id=?`).run('INJECTED',saved.id);
+    if(change==='candidates'){const evidence=structuredClone(saved.reference_evidence);evidence.candidates=evidence.candidates.filter(c=>c.value!=='000019');db.prepare('UPDATE bank_transactions SET reference_evidence=? WHERE id=?').run(JSON.stringify(evidence),saved.id);}
+    assert.equal(reconciliationData(db).transactions[0].verified,false,change);
+  }
+});
+
+test('V4 a forged payer organisation cannot override a different bank payer and pay an invoice',t=>{
+  const db=fixture(t);approveSyntheticBankAccount(db,syntheticAccount);
+  db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,organization_number,issued_at) VALUES(?,?,?,?,?,?,?,?)').run('synthetic','customer','001','Invoice Customer AB',62500,'000018','5561234567','2026-10-01');
+  const text=`Datum;Belopp;Betalare;OCR;Bankreferens;IBAN;Valuta\n2026-10-26;625;Different Bank Payer AB;000018;ACTUAL-ID;${syntheticAccount};SEK\n`,content=Buffer.from(text);
+  storeTransactions(db,parseCSV(text,syntheticAccount),'file:synthetic.csv',{content,mime_type:'text/csv'});const saved=listTransactions(db)[0];assert.equal(reconciliationData(db).transactions[0].verified,true);
+  db.prepare('UPDATE bank_transactions SET payer_organization_number=? WHERE id=?').run('5561234567',saved.id);
+  assert.equal(reconciliationData(db).transactions[0].verified,false);assert.equal(runReconciliation(db).some(f=>f.safe),false);assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
+});
+
+test('V4 removing a conflicting file reference cannot keep bank proof while the original SHA stays valid',t=>{
+  const db=fixture(t);approveSyntheticBankAccount(db,syntheticAccount);
+  const xml=syntheticCamt.replace('</Strd>','<RfrdDocInf><Nb>000019</Nb></RfrdDocInf></Strd>'),content=Buffer.from(xml);storeTransactions(db,parseCAMT(xml,syntheticAccount),'file:synthetic.xml',{content,mime_type:'application/xml'});
+  const saved=listTransactions(db)[0],evidence=structuredClone(saved.reference_evidence);assert.equal(reconciliationData(db).transactions[0].verified,true);assert.ok(evidence.candidates.some(c=>c.value==='000019'));
+  evidence.candidates=evidence.candidates.filter(c=>c.value!=='000019');db.prepare('UPDATE bank_transactions SET reference_evidence=? WHERE id=?').run(JSON.stringify(evidence),saved.id);
+  assert.equal(reconciliationData(db).transactions[0].verified,false);
 });
