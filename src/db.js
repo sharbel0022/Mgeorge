@@ -119,6 +119,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_connections','selected_account_uid',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_connections','last_error',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_connections','retry_after','INTEGER NOT NULL DEFAULT 0');
+  addColumn('bank_connections','control_attempt_at','INTEGER NOT NULL DEFAULT 0');
   addColumn('bank_states','owner',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','renew_connection_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','bank_name',"TEXT NOT NULL DEFAULT ''");

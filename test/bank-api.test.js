@@ -65,7 +65,8 @@ after(async()=>{globalThis.fetch=originalFetch;await new Promise(resolve=>server
 
 test('public HTTPS APIs require authenticated session; login rotates a Secure HttpOnly cookie',async()=>{
   assert.equal((await call('/api/me')).json.authenticated,false);
-  for(const path of ['/api/invoices','/api/bank/status','/api/bank-transactions','/api/export'])assert.equal((await call(path)).res.status,401);
+  for(const path of ['/api/invoices','/api/bank/status','/api/bank-transactions','/api/export','/api/payment-control/overview','/api/payment-control/runs/unowned'])assert.equal((await call(path)).res.status,401);
+  assert.equal((await call('/api/payment-control/run','POST',{request_id:'unauthorized_request_0001'})).res.status,401);
   assert.equal((await call('/api/login','POST',{password:'wrong'})).res.status,401);
   assert.equal((await call('/api/login','POST',{password:process.env.MG_ADMIN_PASSWORD},{origin:'https://attacker.test'})).res.status,403);
   const login=await call('/api/login','POST',{password:process.env.MG_ADMIN_PASSWORD});assert.equal(login.res.status,200);

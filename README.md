@@ -4,6 +4,16 @@ Ett svenskt, självhostat system för kundfakturor, leverantörsfakturor, origin
 
 Det här är den fristående källkodsversionen i detta repository. Den tidigare publicerade [ChatGPT Sites-webbplatsen](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/) har separat kod och databas. Dessa ändringar publiceras inte automatiskt där och flyttar inga företagsuppgifter mellan systemen.
 
+## MG Fakturakoll 2.0 – Sites som produktionssystem
+
+Sites version 21 är publicerad och kontrollerad på den befintliga adressen. Node-versionen och Sites använder samma fem huvudområden och betalningsflöde med separata databaser. Se [slutrapport, tester, migreringar och verklig produktionskontroll](docs/MG-FAKTURAKOLL-2-LEVERANS.md).
+
+## Ny arbetsyta: en betalningskontroll
+
+Översiktens **Kontrollera alla betalningar** samordnar Gmail, dokumenttolkning, bankhämtning, avstämning och mejlutkast. Sparad stegstatus visar även ofullständiga körningar. **Att granska** samlar beslut, och fakturadetaljen visar original, betalningar och mejl tillsammans. Kortköp och lön ligger separat från kundinbetalningar. Inga mejl skickas av huvudknappen.
+
+Funktionen gäller Node-versionen i detta repository, **inte en automatisk uppdatering av ChatGPT Sites**. Läs [genomförande, säkerhet och Sites-avgränsning](docs/ONE-CLICK-PAYMENT-CONTROL.md). Befintliga anslutningar, automatiseringsval och manuellt godkännande av kundmejl bevaras.
+
 ## Kom igång lokalt
 
 Kräver **Node.js 22.13 eller senare**, med inbyggda `node:sqlite`. Installera låsta beroenden med `npm ci`. Node-gränssnittet kräver inget byggsteg. PDF.js, Canvas och Tesseract används för lokal dokumenttolkning.
