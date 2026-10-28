@@ -12,6 +12,7 @@ import { randomUUID } from 'node:crypto';
 import { openDatabase, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
 import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
+import {dailyBackup} from './backup.js';
 import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
 import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 import {analyzeDocument,approveDocument} from './invoice-review.js';
@@ -266,6 +267,12 @@ async function syncBank(connection,{account_uid,date_from,date_to}={},operationL
   finally{if(!operationLocked)bankSyncing.delete(connection.id);}
 }
 const schedulerState={running:false,last_run:'',last_error:''};
+const backupStatus={enabled:!!process.env.MG_BACKUP_DIRECTORY,last_verified:'',day:'',error:'',retry_after:0};
+function scheduledBackup(){
+ if(!backupStatus.enabled||backupStatus.day===today()||Date.now()<backupStatus.retry_after)return;
+ try{const result=dailyBackup(process.env.DB_PATH||'./data/mgeorge.sqlite',process.env.MG_BACKUP_DIRECTORY,process.env.MG_BACKUP_KEY);backupStatus.day=result.day;backupStatus.last_verified=new Date().toISOString();backupStatus.error='';}
+ catch{backupStatus.retry_after=Date.now()+15*60_000;backupStatus.error='Säkerhetskopian kunde inte skapas eller återställningskontrolleras. Kontrollera backupkonfigurationen.';}
+}
 const backgroundAttempts=new Map();
 function utcTimestamp(value){return Date.parse(value.includes('T')?value:value.replace(' ','T')+'Z')||0;}
 /** Kontrollerar om inställda synkroniseringsjobb är förfallna. Jobben körs bara medan denna Node-server kör. */
@@ -384,7 +391,7 @@ async function route(req,res){
     return json(res,200,{job:paymentControl.get(req.principal,decodeURIComponent(path.split('/').pop()))});
   }
   if(path==='/api/dashboard'&&req.method==='GET')return json(res,200,invoiceStatus(db));
-  if(path==='/api/settings'&&req.method==='GET')return json(res,200,{...getSettings(db),scheduler_available:true,scheduler:schedulerState,user_mode:'single_administrator'});
+  if(path==='/api/settings'&&req.method==='GET')return json(res,200,{...getSettings(db),scheduler_available:true,scheduler:schedulerState,backup:backupStatus,user_mode:'single_administrator'});
   if(path==='/api/settings'&&req.method==='PATCH'){
     const b=await readBody(req),settings=getSettings(db);
     const limits={company_name:240,organization_number:40,email:240,phone:80,address:500,bankgiro:80};
@@ -683,7 +690,8 @@ const server=http.createServer((req,res)=>route(req,res).catch(err=>{
 let schedulerTimer;
 if(process.env.NODE_ENV!=='test'){
   server.listen(check.port,'127.0.0.1',()=>console.log(`MG Fakturakoll: ${check.origin}`));
-  schedulerTimer=setInterval(()=>runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';}),60000);schedulerTimer.unref();
+  scheduledBackup();
+  schedulerTimer=setInterval(()=>{scheduledBackup();runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';});},60000);schedulerTimer.unref();
 }
 server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);paymentControl.stop();});
 export {server,db};

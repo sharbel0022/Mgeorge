@@ -10,7 +10,7 @@ import {
 
 const compiled = ts.transpileModule(readFileSync(new URL('../lib/banking/transactions.ts', import.meta.url), 'utf8'), {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
-}).outputText.replace(/from ['"]\.\.\/domain['"]/, `from '${new URL('../lib/domain.ts', import.meta.url).href}'`);
+}).outputText.replace("'../payment-references.js'", JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href)).replace(/from ['"]\.\.\/domain['"]/, `from '${new URL('../lib/domain.ts', import.meta.url).href}'`);
 const { normalizeTransactions, stableAccountKey } = await import('data:text/javascript;base64,' + Buffer.from(compiled).toString('base64'));
 const applicationId = '11111111-1111-4111-8111-111111111111';
 const accountUid = '22222222-2222-4222-8222-222222222222';
@@ -23,6 +23,24 @@ const bank = { name: 'Swedbank', country: 'SE', psu_types: ['business', 'persona
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...headers } });
 const opts = { accountKey: 'iban:SE4550000000058398257466', accountLabel: 'Företagskonto', bankName: 'Swedbank', dateFrom: '2026-10-01', dateTo: '2026-10-26' };
 const rawTx = (patch = {}) => ({ entry_reference: 'BOOK-REF-001', transaction_id: 'not-stable', transaction_amount: { amount: '1875.00', currency: 'SEK' }, credit_debit_indicator: 'CRDT', status: 'BOOK', booking_date: '2026-10-20', debtor: { name: 'Exempelkund AB' }, creditor: { name: 'M.George Vitvaror AB' }, reference_number: '001019', remittance_information: ['Faktura 1001'], ...patch });
+
+test('trusted normalization preserves raw bank fields, candidate paths and immutable source on duplicate import',async()=>{
+ const input=rawTx({reference_number:'0599',details:{invoice_number:'0600'}}),before=structuredClone(input);
+ const {rows}=await normalizeTransactions([input],opts);
+ assert.deepEqual(rows[0].bankData,before);assert.ok(rows[0].referenceEvidence.candidates.some(c=>c.value==='0600'&&c.source==='$.details.invoice_number'));
+ input.details.invoice_number='mutated';assert.equal(rows[0].bankData.details.invoice_number,'0600');
+ let state=applyCommand(emptyState(),{type:'transactions.import',rows,trustedBankImport:true}).state;
+ assert.deepEqual(state.transactions[0].bankData,before);assert.ok(state.transactions[0].referenceEvidence.candidates.length>=2);
+ const next=await normalizeTransactions([rawTx({reference_number:'changed'})],opts);
+ state=applyCommand(state,{type:'transactions.import',rows:next.rows,trustedBankImport:true}).state;
+ assert.equal(state.transactions.length,1);assert.deepEqual(state.transactions[0].bankData,before);
+});
+
+test('client imports cannot claim to hold authenticated raw bank data',async()=>{
+ const {rows}=await normalizeTransactions([rawTx()],opts);
+ const state=applyCommand(emptyState(),{type:'transactions.import',rows}).state;
+ assert.equal(state.transactions[0].bankData,undefined);assert.equal(state.transactions[0].referenceEvidence,undefined);
+});
 test('transaction details use the documented scoped GET and retain the payer reference as text',async t=>{
  let call;t.mock.method(globalThis,'fetch',async(url,init)=>{call={url,init};return json(rawTx({reference_number:'0599',debtor:{name:'Café Gränden Bistro AB'}}));});
  const tx=await getTransactionDetails(config,accountUid,'fresh-lookup:id');assert.equal(tx.reference_number,'0599');assert.equal(call.url,`https://api.enablebanking.com/accounts/${accountUid}/transactions/fresh-lookup%3Aid`);assert.equal(call.init.method,'GET');

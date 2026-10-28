@@ -110,6 +110,8 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','bankgiro',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','payer_bankgiro',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','payer_organization_number',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_transactions','reference_evidence',"TEXT NOT NULL DEFAULT '{}'");
+  addColumn('bank_transactions','raw_bank_data',"TEXT NOT NULL DEFAULT '{}'");
   addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
   const identityUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='api_identity_version');
   addColumn('bank_transactions','api_identity_version','INTEGER NOT NULL DEFAULT 0');
@@ -146,7 +148,7 @@ export function listInvoices(db) {
 export function listTransactions(db) {
   return db.prepare(`SELECT t.*, COALESCE((SELECT SUM(a.amount_cents) FROM allocations a WHERE a.transaction_id=t.id),0) AS allocated_cents FROM bank_transactions t ORDER BY t.booked_at DESC,t.created_at DESC`).all().map(t=>{
     const available_cents=Math.abs(t.amount_cents)-t.allocated_cents;
-    return {...t,available_cents,status:t.excluded?'excluded':available_cents===0?'matched':t.allocated_cents>0?'partial':t.is_aggregate||(!t.payer&&!t.reference)?'review':'unmatched'};
+    return {...t,reference_evidence:JSON.parse(t.reference_evidence),raw_bank_data:JSON.parse(t.raw_bank_data),available_cents,status:t.excluded?'excluded':available_cents===0?'matched':t.allocated_cents>0?'partial':t.is_aggregate||(!t.payer&&!t.reference)?'review':'unmatched'};
   });
 }
 export function paymentSign(invoice){return (invoice.direction==='customer'?1:-1)*(invoice.kind==='credit'?-1:1);}
@@ -207,7 +209,11 @@ export function storeTransactions(db,items,source,original=null) {
       // Also catches records created with the old fingerprint algorithm before migration.
       const existing=stableId&&db.prepare('SELECT * FROM bank_transactions WHERE account=? AND bank_reference=? AND (amount_cents>0)=?').get(x.account,bankId,x.amount_cents>0?1:0);
       if(existing){
-        if(existing.amount_cents!==x.amount_cents||existing.currency!==x.currency)throw Object.assign(new Error('Samma bankreferens har motstridiga belopp eller valutor. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
+        if(existing.amount_cents!==x.amount_cents||existing.currency!==x.currency||existing.booked_at!==x.booked_at)throw Object.assign(new Error('Samma bankreferens har motstridiga belopp, datum eller valutor. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
+        if(source==='enablebanking'&&existing.raw_bank_data==='{}'&&x.raw_bank_data){
+          db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),JSON.stringify(x.raw_bank_data),existing.id);
+          audit(db,'bank_original_attached',{transaction_id:existing.id,reference_version:x.reference_evidence?.version||''});
+        }
         // A camt.054/053 can contain exactly one individual payment with the
         // same archive reference as a previously incomplete API collection.
         // Complete it in place: retain its identity and history, count the sum
@@ -220,12 +226,14 @@ export function storeTransactions(db,items,source,original=null) {
           if(db.prepare('SELECT id FROM bank_transactions WHERE account=? AND parent_bank_reference=? AND excluded=0 AND id<>? LIMIT 1').get(existing.account,bankId,existing.id))throw Object.assign(new Error('Samlingsposten har redan delbetalningar från en annan specifikation. Granska underlagen innan en specifikation med en enda betalning importeras.'),{status:409,code:'conflicting_payment_specification'});
           db.prepare("UPDATE bank_transactions SET payer=?,reference=?,description=?,is_aggregate=0,parent_bank_reference=?,review_reason='',needs_review=1,bankgiro=? WHERE id=?")
             .run(x.payer,x.reference,x.description||existing.description,x.parent_bank_reference||'',x.bankgiro||existing.bankgiro,existing.id);
+          if(x.reference_evidence)db.prepare('UPDATE bank_transactions SET reference_evidence=? WHERE id=?').run(JSON.stringify(x.reference_evidence),existing.id);
           completedSpecifications.push({id:existing.id,before:existing});enriched++;
         }
         duplicate++;continue;
       }
       const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'',source==='enablebanking'?1:0);
       if(r.changes){
+        if(x.reference_evidence||x.raw_bank_data)db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),JSON.stringify(x.raw_bank_data||{}),id);
         if(x.payer_bankgiro)db.prepare('UPDATE bank_transactions SET payer_bankgiro=? WHERE id=?').run(String(x.payer_bankgiro),id);
         const organization=String(x.payer_organization_number||'').replace(/[- ]/g,'');
         if(/^\d{10}$/.test(organization))db.prepare('UPDATE bank_transactions SET payer_organization_number=? WHERE id=?').run(organization,id);

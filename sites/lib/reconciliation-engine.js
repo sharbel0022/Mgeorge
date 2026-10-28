@@ -1,7 +1,8 @@
 const paymentSign=i=>(i.direction==='customer'?1:-1)*(i.kind==='credit'?-1:1);
 // Shared conservative rules ported from MG Node main d029679. No I/O.
+import {matchingReferenceValues} from './payment-references.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
-export const RECONCILIATION_RULE_VERSION='verified-reference-2026-10-28.1';
+export const RECONCILIATION_RULE_VERSION='verified-reference-2026-10-28.2';
 // Keep invoice-number punctuation: AB/12 and AB12 are not interchangeable IDs.
 const ref=value=>String(value||'').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g,' ');
 export function exactReference(reference, candidate){
@@ -31,8 +32,12 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     const direction=t.amount_cents>0?'customer':'supplier';
     if(t.is_aggregate){out.push({transaction_id:t.id,invoice_id:'',kind:'aggregate',safe:false,reason:'Samlad insättning kräver individuella betalningsspecifikationer.',score:0});continue;}
     const reference=ref(t.reference);
+    // Manual verification is separate evidence; preserved bank candidates still remain visible.
+    const evidence=t.reference_evidence;
+    const references=matchingReferenceValues(evidence,t.reference);
+    const invalidReference=!!evidence?.incomplete||!!evidence?.candidates?.some(c=>c.validity==='checksum_invalid');
     // Include closed invoices: a mistyped OCR may belong to an already paid invoice.
-    const owners=reference?invoices.filter(i=>[i.reference,i.invoice_number].some(x=>exactReference(t.reference,x))):[];
+    const owners=references.length?invoices.filter(i=>[i.reference,i.invoice_number].some(x=>references.some(r=>exactReference(r,x)))):[];
     const dateOK=i=>!i.issued_at||t.booked_at>=i.issued_at;
     const eligible=invoices.filter(i=>i.direction===direction&&i.kind!=='credit'&&i.currency===t.currency&&paymentSign(i)===Math.sign(t.amount_cents)&&dateOK(i));
     const names=eligible.filter(i=>samePayer(i,t,links));
@@ -45,13 +50,13 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     for(const i of eligible){
       const exact=owners.some(x=>x.id===i.id),payer=samePayer(i,t,links);
       if(!exact&&!payer&&t.available_cents!==i.remaining_cents)continue; // Amount alone may be shown, but never accepted.
-      const conflict=reference&&owners.some(x=>x.id!==i.id);
+      const conflict=invalidReference||references.some(r=>!([i.reference,i.invoice_number].some(x=>exactReference(r,x))))&&references.length>1||reference&&owners.some(x=>x.id!==i.id);
       const duplicateEvidence=transactions.some(x=>x.id!==t.id&&!x.excluded&&!x.is_aggregate&&x.amount_cents===t.amount_cents&&x.currency===t.currency&&x.booked_at===t.booked_at&&(x.bank_reference&&x.bank_reference===t.bank_reference||x.account!==t.account&&ref(x.reference)===reference&&normalizeName(x.payer)===normalizeName(t.payer)));
       const incomplete=t.parent_bank_reference&&transactions.some(x=>x.account===t.account&&x.bank_reference===t.parent_bank_reference&&x.is_aggregate&&!x.excluded);
       const ambiguous=owners.length>1||names.filter(x=>x.remaining_cents>0).length>1&&!exact||exact&&t.available_cents!==i.remaining_cents&&names.some(x=>x.id!==i.id&&x.remaining_cents===t.available_cents);
       const kind=i.remaining_cents===0?(allocations.some(a=>a.invoice_id===i.id&&a.transaction_id===t.id)?'overpayment':'possible_duplicate'):conflict?'reference_conflict':!exact&&!payer?'unknown_payer':!exact&&reference?'wrong_reference':!reference?'missing_reference':!payer?'different_payer':t.available_cents<i.remaining_cents?'partial':t.available_cents>i.remaining_cents?'overpayment':'correct';
       const safe=Number.isSafeInteger(i.remaining_cents)&&!!t.verified&&exact&&payer&&!conflict&&!ambiguous&&!duplicateEvidence&&!incomplete&&i.remaining_cents>0;
-      out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':conflict?'Angiven OCR tillhör en annan faktura. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.'});
+      out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,reference_values:references,reference_sources:evidence?.candidates||[],verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':invalidReference?'OCR-kontrollsiffran är felaktig eller referensanalysen ofullständig. Granska bankoriginalet.':conflict?'Betalningsreferenserna är motstridiga. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.'});
     }
   }
   // Multiple payments for the same invoice must be reviewed together, never auto-consumed.

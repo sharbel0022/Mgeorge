@@ -1,4 +1,5 @@
 import { parseMoney, validDate, suspectedBankCollection, PAYMENT_SPECIFICATION_REQUIRED } from '../domain';
+import { extractPaymentReferences } from '../payment-references.js';
 import { createHash } from 'node:crypto';
 import type { BankRow } from '../imports';
 import type { ProviderAccount, ProviderBankIdentity } from './enable-banking';
@@ -90,7 +91,9 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
     if (!entry) skipped.unstableId++;
     const structured = cleanText(raw.reference_number);
     const remittance = Array.isArray(raw.remittance_information) ? raw.remittance_information.filter(item => typeof item === 'string').map(cleanText).filter(Boolean).join(' · ') : '';
-    const reference = !missingReference(structured) ? structured : remittance;
+    const referenceEvidence = extractPaymentReferences(raw);
+    const reference = referenceEvidence.incomplete ? '' : referenceEvidence.selected?.value || '';
+    if(referenceEvidence.incomplete) longReferences++;
     // Never manufacture a partial invoice/OCR reference by cutting its trailing characters.
     const payerReference = reference.length <= 300 ? reference : '';
     if (reference.length > 300) longReferences++;
@@ -98,7 +101,7 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
     const collective=suspectedBankCollection(magnitude*(incoming?1:-1),`${bankCode} ${remittance}`,party,!missingReference(structured)?structured:'');
     const description = [collective?PAYMENT_SPECIFICATION_REQUIRED:'',bankCode, remittance, cleanText(raw.note), !booked ? 'Valutadatum används; banken saknar bokföringsdatum.' : ''].filter(Boolean).join(' · ').slice(0, 1_000);
     if (/bankgiro|\bbatch\b|samlings|buntbetal|sammandrag/i.test(`${bankCode} ${remittance}`)) ambiguousBatches++;
-    rows.push({ date, amount: magnitude * (incoming ? 1 : -1), party, payerReference,
+    rows.push({ referenceEvidence, bankData: structuredClone(raw), date, amount: magnitude * (incoming ? 1 : -1), party, payerReference,
       bankReference: cleanText(entry).slice(0, 300), description,
       source: `Enable Banking · ${cleanText(options.bankName)} · ${cleanText(options.accountLabel)}`.slice(0, 300),
       currency: 'SEK', externalId: entry ? await stableEntryId(options.accountKey, entry) : '',
