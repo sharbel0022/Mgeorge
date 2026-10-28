@@ -1,0 +1,1 @@
+ALTER TABLE `gmail_connections` ADD `sync_failures` integer DEFAULT 0 NOT NULL;

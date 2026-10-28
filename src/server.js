@@ -285,7 +285,7 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
     lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,e.status===429?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
     recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
-    lease.fail(message,e.status===429?Math.max(60,e.retryAfter||60)*1000:0);
+    lease.fail(message,e.status===429?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true);
     });
     throw Object.assign(bad(renewal?409:e.status===429?429:502,message),{safe:true,retryAfter:e.retryAfter});
   }

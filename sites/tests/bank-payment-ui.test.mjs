@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {emptyState} from '../lib/domain.ts';
+import {emptyState,paymentInvoiceAssessment} from '../lib/domain.ts';
 import {extractPaymentReferences} from '../lib/payment-references.js';
 
 const url=p=>new URL(p,import.meta.url).href;
@@ -80,4 +80,9 @@ test('bank summary has exactly four facts and never invents a successful synchro
 test('desktop exposes payer, invoice, OCR, amount, date and status; missing OCR stays explicit on mobile',()=>{
   const s=emptyState(),t=tx({kind:'payment',description:'',party:'<script>bank</script>'});s.transactions.push(t);const html=render(ui.default,{state:s,transactions:[t],open(){}});
   assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,6);assert.match(html,/<th>OCR<\/th>/);assert.match(html,/OCR Saknas i bankunderlaget/);assert.match(html,/bank-mobile-list/);assert.match(html,/bank-payment-card/);assert.match(html,/aria-label="Visa betalning/);assert.match(html,/&lt;script&gt;bank/);assert.doesNotMatch(html,/<script>/);
+});
+
+test('an unmatched bank OCR is never described as an invoice number',()=>{
+ const s=emptyState(),t=tx({kind:'payment',party:'Bankens betalare AB',description:'',payerReference:'000018',referenceEvidence:extractPaymentReferences({ocr:'000018'})});
+ const message=paymentInvoiceAssessment(s,t).message;assert.match(message,/betalningsreferensen 000018/);assert.doesNotMatch(message,/faktura 000018/);assert.equal(s.allocations.length,0);
 });

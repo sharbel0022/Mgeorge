@@ -5,7 +5,9 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {openDatabase,storeTransactions,listInvoices,allocate,deleteAllocation,listTransactions} from '../src/db.js';
 import {normalizeName,analyzeReconciliation,reconciliationData,runReconciliation,verifyPayer} from '../src/reconciliation.js';
-import {withSyntheticBankOriginal} from './bank-fixtures.js';
+import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixtures.js';
+import {parseCAMT,parseCSV} from '../src/importers.js';
+import {syntheticCamt,account as syntheticAccount} from '../sites/tests/helpers/camt-integrity.mjs';
 
 function fixture(t){const folder=mkdtempSync(join(tmpdir(),'mg-reconcile-')),db=openDatabase(join(folder,'db.sqlite'));t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});return db;}
 function invoice(db,id='i',extra={}){
@@ -53,8 +55,9 @@ test('one transfer referencing multiple invoices proposes an explicit split with
   const s=analyze(db);assert.equal(s.length,2);assert.ok(s.every(x=>x.kind==='multiple_invoices'&&!x.safe));assert.equal(s.reduce((a,x)=>a+x.amount_cents,0),312500);
 });
 test('bank collective deposit and complete Bankgiro specification are counted once',t=>{
-  const db=fixture(t);invoice(db);pay(db,{is_aggregate:true,bank_reference:'PARENT',payer:'Bankgiro',reference:''});
-  pay(db,{bank_reference:'CHILD',parent_bank_reference:'PARENT'});runReconciliation(db);
+  const db=fixture(t);invoice(db);approveSyntheticBankAccount(db,syntheticAccount);pay(db,{account:syntheticAccount,is_aggregate:true,bank_reference:'PARENT',payer:'Bankgiro',reference:''});
+  const xml=syntheticCamt.replaceAll('625.00','3125.00').replace('SYNTHETIC-ENTRY','PARENT').replace('SYNTHETIC-CHILD','CHILD').replace('Syntetisk Kund AB','Kund AB').replace('<Ref>000018</Ref>','<Ref>0597</Ref>').replace('<Tp><CdOrPrtry><Prtry>OCR</Prtry></CdOrPrtry></Tp>',''),content=Buffer.from(xml);
+  storeTransactions(db,parseCAMT(xml,syntheticAccount),'file:synthetic.xml',{content,mime_type:'application/xml'});runReconciliation(db);
   assert.equal(listInvoices(db)[0].paid_cents,312500);assert.equal(db.prepare("SELECT excluded FROM bank_transactions WHERE bank_reference='PARENT'").get().excluded,1);
 });
 test('incomplete Bankgiro specification and cross-account copies cannot be consumed',t=>{
@@ -70,7 +73,9 @@ test('reference for same customer with conflicting amount cannot consume a more 
 });
 test('organization number can confirm payer identity and conflicting numbers always stop auto match',t=>{
   for(const [number,safe] of [['5560160680',true],['5560000000',false]]){
-    const db=fixture(t);invoice(db);db.prepare("UPDATE invoices SET organization_number='556016-0680'").run();pay(db,{payer:'Kundens restaurang',payer_organization_number:number});assert.equal(analyze(db)[0].safe,safe);
+    const db=fixture(t);invoice(db);db.prepare("UPDATE invoices SET organization_number='556016-0680'").run();approveSyntheticBankAccount(db,syntheticAccount);
+    const csv=`Datum;Belopp;Valuta;Betalare;Referens;Bankreferens;IBAN;Organisationsnummer\n2026-10-26;3125.00;SEK;Kundens restaurang;0597;B1;${syntheticAccount};${number}\n`,content=Buffer.from(csv);
+    storeTransactions(db,parseCSV(csv,syntheticAccount),'file:synthetic.csv',{content,mime_type:'text/csv'});assert.equal(analyze(db)[0].safe,safe);
   }
 });
 test('verified private payer is reusable across invoices and undoing the decision removes learned identity',t=>{

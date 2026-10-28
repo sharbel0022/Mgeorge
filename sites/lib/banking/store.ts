@@ -15,6 +15,7 @@ export type BankConnectionRow = {
   last_synced_at: string | null; last_error: string | null; created_at: string; updated_at: string;
   auto_sync_enabled: number; auto_last_attempt_at: string | null; auto_next_at: string | null;
   control_last_attempt_at: string | null;
+  retry_after: string; sync_failures: number;
 };
 export type BankFlowRow = {
   state_hash: string; owner: string; cookie_hash: string; app_generation: string;
@@ -51,10 +52,11 @@ export async function providerConfig(row: BankApplicationRow): Promise<ProviderC
   if (row.application_id !== config.applicationId || row.generation !== generation) throw new Error('BANK_RUNTIME_CONFIGURATION_CHANGED');
   return { applicationId: config.applicationId, privateKeyPem: config.privateKeyPem };
 }
-export async function saveApplicationMetadata(row: BankApplicationRow, info: ProviderApplication): Promise<void> {
-  await db().prepare(`INSERT INTO bank_applications (owner,application_id,encrypted_key,metadata,generation,created_at,updated_at) VALUES (?,?,?, ?,?,?,?)
+export async function saveApplicationMetadata(row: BankApplicationRow, info: ProviderApplication, lease?: BankLease): Promise<void> {
+  const statement = db().prepare(`INSERT INTO bank_applications (owner,application_id,encrypted_key,metadata,generation,created_at,updated_at) VALUES (?,?,?, ?,?,?,?)
     ON CONFLICT(owner) DO UPDATE SET application_id=excluded.application_id,encrypted_key='',metadata=excluded.metadata,generation=excluded.generation,updated_at=excluded.updated_at`)
-    .bind(row.owner, row.application_id, '', JSON.stringify(info), row.generation, row.created_at, new Date().toISOString()).run();
+    .bind(row.owner, row.application_id, '', JSON.stringify(info), row.generation, row.created_at, new Date().toISOString());
+  if (lease) await lease.run(statement); else await statement.run();
 }
 export function metadata(row: BankApplicationRow): ProviderApplication { return JSON.parse(row.metadata); }
 export async function accounts(row: BankConnectionRow): Promise<ProviderAccount[]> {
@@ -67,13 +69,26 @@ export async function sessionId(row: BankConnectionRow): Promise<string> {
 
 // Serialize mutations for an owner, including callback, disconnect and sync.
 // A crashed invocation cannot lock out the account permanently.
-export async function withBankLock<T>(owner: string, fn: () => Promise<T>): Promise<T> {
+export type BankLease = { assert: () => Promise<void>; write: (statements: D1PreparedStatement[]) => Promise<D1Result[]>; run: (statement: D1PreparedStatement) => Promise<D1Result> };
+export async function withBankLock<T>(owner: string, fn: (lease: BankLease) => Promise<T>): Promise<T> {
   const token = randomToken(), at = new Date().toISOString();
   const until = new Date(Date.now() + 10 * 60_000).toISOString();
   const result = await db().prepare(`INSERT INTO bank_locks (owner,token,expires_at) VALUES (?,?,?)
     ON CONFLICT(owner) DO UPDATE SET token=excluded.token,expires_at=excluded.expires_at
     WHERE bank_locks.expires_at < ?`).bind(owner, token, until, at).run();
   if (result.meta.changes !== 1) throw new Error('BANK_BUSY');
-  try { return await fn(); }
+  const lost = () => new Error('BANK_LEASE_LOST');
+  const lease: BankLease = {
+    async assert() { if (!await db().prepare("SELECT owner FROM bank_locks WHERE owner=? AND token=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now')").bind(owner, token).first()) throw lost(); },
+    async write(statements) {
+      // The NOT NULL token constraint aborts this atomic batch before any write
+      // if the lease expired or changed while waiting for D1's write lock.
+      const fence = db().prepare("INSERT INTO bank_locks(owner,token,expires_at) VALUES(?,(SELECT token FROM bank_locks WHERE owner=? AND token=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now')),?) ON CONFLICT(owner) DO UPDATE SET token=excluded.token").bind(owner, owner, token, until);
+      try { return (await db().batch([fence, ...statements])).slice(1); }
+      catch (error) { await lease.assert(); throw error; }
+    },
+    async run(statement) { return (await lease.write([statement]))[0]; },
+  };
+  try { return await fn(lease); }
   finally { await db().prepare('DELETE FROM bank_locks WHERE owner=? AND token=?').bind(owner, token).run(); }
 }

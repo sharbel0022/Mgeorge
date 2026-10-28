@@ -64,6 +64,7 @@ async function fixture(t, environment = 'PRODUCTION') {
   sql.exec(source('../drizzle/0000_confused_umar.sql'));
   sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));
   sql.exec(source('../drizzle/0002_brief_chronomancer.sql'));
+  sql.exec(source('../drizzle/0012_minor_naoko.sql'));
   const f = { sql, owner: 'owner-alice', user: { userId: 'owner-alice' }, calls: [], provider: {}, env: {
     BANK_DATA_ENCRYPTION_KEY: randomToken(), ENABLE_BANKING_APPLICATION_ID: appId,
     ENABLE_BANKING_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',
@@ -83,7 +84,7 @@ async function fixture(t, environment = 'PRODUCTION') {
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
   const providerUrl = jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
-  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, '../customer-messages': jsUrl('export async function reconcileAndPrepare(){}') });
+  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, '../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
   f.store = await import(storeUrl); f.service = await import(serviceUrl);
   f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
   f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
@@ -165,7 +166,7 @@ test('main control reserves a six-hour retry inside the bank lock without enabli
   await assert.rejects(f.service.syncControl(post('sync')),e=>e.code==='BANK_RATE_LIMIT');
   const c=f.connection();assert.ok(c.control_last_attempt_at);assert.equal(c.auto_sync_enabled,0);assert.equal(c.auto_last_attempt_at,null);assert.equal(c.auto_next_at,null);assert.equal(c.last_synced_at,null);
   const calls=f.calls.length,again=await (await f.service.syncControl(post('sync'))).json();assert.equal(again.reason,'not_due');assert.equal(again.due,false);assert.equal(f.calls.length,calls);assert.equal(Date.parse(again.nextAttemptAt),Date.parse(c.control_last_attempt_at)+6*3600000);
-  f.sql.prepare("UPDATE bank_connections SET control_last_attempt_at='2000-01-01'").run();f.provider.getTransactions=async()=>({transactions:[rawTx()]});assert.equal((await (await f.service.syncControl(post('sync'))).json()).imported,1);assert.equal(f.connection().auto_sync_enabled,0);
+  f.sql.prepare("UPDATE bank_connections SET control_last_attempt_at='2000-01-01',retry_after=''").run();f.provider.getTransactions=async()=>({transactions:[rawTx()]});assert.equal((await (await f.service.syncControl(post('sync'))).json()).imported,1);assert.equal(f.connection().auto_sync_enabled,0);
 });
 
 test('main control honors an interrupted reservation and keeps real PSU headers',async t=>{
@@ -586,4 +587,63 @@ test('A forged connected query cannot claim bank consent without a current unexp
   assert.match(component, /if \(confirmedBankConsent\(verified\)\) setNotice\(resultMessages\.connected\)/);
   assert.match(component, /cancelled = true/);
   assert.match(component, /date\.setUTCDate\(date\.getUTCDate\(\) - 29\)/);
+});
+
+
+test('delayed bank responses cannot write or release a replacement lease',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.provider.getTransactions=async()=>{f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());return{transactions:[rawTx()]};};
+ await assert.rejects(f.service.sync(post('sync')),/BANK_LEASE_LOST/);
+ assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.connection().last_synced_at,null);assert.equal(f.connection().last_error,null);assert.equal(f.sql.prepare('SELECT token FROM bank_locks').get().token,'replacement');
+});
+
+test('D1 atomically fences bank writes even when a lease changes after a valid assertion',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.d1.beforeBatch=items=>{if(items.some(i=>i.sql.startsWith('INSERT OR IGNORE INTO workspaces'))){f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());}};
+ await assert.rejects(f.service.sync(post('sync')),/BANK_LEASE_LOST/);
+ assert.equal(f.workspace(),null);assert.equal(count(f,'audit_events'),0);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.connection().last_synced_at,null);
+});
+
+test('expired bank leases and delayed disconnects cannot overwrite a replacement connection',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.provider.getTransactions=async()=>{f.sql.prepare("UPDATE bank_locks SET expires_at='2000-01-01'").run();return{transactions:[rawTx()]};};
+ await assert.rejects(f.service.sync(post('sync')),/BANK_LEASE_LOST/);assert.equal(f.workspace(),null);
+ f.provider.deleteSession=async()=>{f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());f.sql.prepare("UPDATE bank_connections SET id='new-connection',last_error='new owner'").run();};
+ await assert.rejects(f.service.disconnect(post('disconnect')),/BANK_LEASE_LOST/);
+ assert.equal(f.connection().id,'new-connection');assert.equal(f.connection().last_error,'new owner');assert.ok(f.connection().encrypted_session);
+});
+
+test('delayed bank OAuth cannot overwrite a replacement flow or connection',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.start();
+ f.provider.createSession=async()=>{f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());f.sql.prepare("UPDATE bank_auth_flows SET status='pending'").run();return{session_id:remoteSession,accounts:[structuredClone(f.account)],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:future()}};};
+ assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'),'/bank?result=failed');
+ assert.equal(count(f,'bank_connections'),0);assert.equal(f.sql.prepare('SELECT status FROM bank_auth_flows').get().status,'pending');assert.equal(f.sql.prepare('SELECT token FROM bank_locks').get().token,'replacement');
+});
+
+test('bank Retry-After persists and blocks manual, control and automatic retries',async t=>{
+ const f=await fixture(t);f.sql.exec(source('../drizzle/0008_minor_jazinda.sql'));await f.seedApp();const id=await f.seedConnection();await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));
+ f.provider.getTransactions=async()=>{throw Object.assign(new ProviderError('BANK_RATE_LIMIT','Vänta',429,true),{retryAfter:172800});};
+ await assert.rejects(f.service.automaticSync(),e=>e.code==='BANK_RATE_LIMIT');
+ assert.ok(Date.parse(f.connection().retry_after)>Date.now()+172799000);const calls=f.calls.length;
+ await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_RATE_LIMIT'&&e.retryAfter>=172799);
+ assert.equal((await (await f.service.syncControl(post('sync'))).json()).reason,'not_due');
+ assert.equal((await (await f.service.automaticSync()).json()).reason,'not_due');assert.equal(f.calls.length,calls);
+ const status=await(await f.service.automaticSyncStatus()).json();assert.equal(status.nextAttemptAt,f.connection().retry_after);
+});
+
+test('three failed or interrupted automatic bank attempts remain blocked until a manual success',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));
+ f.provider.getTransactions=async()=>{throw new ProviderError('BANK_TIMEOUT','Tillfälligt fel',504,true);};
+ for(let n=1;n<=3;n++){f.sql.prepare('UPDATE bank_connections SET auto_last_attempt_at=NULL,auto_next_at=NULL').run();await assert.rejects(f.service.automaticSync());assert.equal(f.connection().sync_failures,n);}
+ assert.equal((await(await f.service.automaticSync()).json()).reason,'blocked');assert.equal((await(await f.service.automaticSyncStatus()).json()).blocked,true);assert.match(f.connection().last_error,/tre/);
+ const calls=f.calls.length;await f.service.automaticSync();assert.equal(f.calls.length,calls);
+ f.provider.getTransactions=async()=>({transactions:[rawTx()]});await f.service.sync(post('sync'));assert.equal(f.connection().sync_failures,0);assert.equal(f.connection().last_error,null);
+});
+
+
+test('committed bank imports stay successful if the independent after-check needs retrying',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));f.reconcileError=true;
+ const result=await(await f.service.automaticSync()).json();assert.equal(result.imported,1);assert.ok(result.warnings.some(w=>w.includes('Efterkontrollen')));assert.equal(f.connection().last_error,null);assert.equal(f.connection().sync_failures,0);assert.equal(count(f,'bank_sync_runs'),1);assert.equal(count(f,'audit_events'),1);
+ const visible=await(await f.service.status(new Request(origin+'/api/bank/status'))).json();assert.match(visible.connection.postprocessWarning,/Efterkontrollen/);assert.ok(visible.connection.lastSyncedAt);assert.equal(visible.automatic.failures,0);assert.match((await(await f.service.automaticSyncStatus()).json()).postprocessWarning,/Efterkontrollen/);
+ f.reconcileError=false;f.sql.prepare('UPDATE bank_connections SET last_synced_at=NULL').run();await f.service.sync(post('sync'));assert.equal((await(await f.service.status(new Request(origin+'/api/bank/status'))).json()).connection.postprocessWarning,null);
 });

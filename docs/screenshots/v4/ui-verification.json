@@ -1,0 +1,89 @@
+{
+  "environment": "local production build; wrangler --local, separate .wrangler/v4-qa; in-memory synthetic demo",
+  "sourceCommit": "04c45b8",
+  "date": "2026-10-29",
+  "file": "docs/screenshots/v4/synthetic-ui-camt054.xml",
+  "note": "Synthetic file booking date follows observed rolling demo batch on 2026-10-29; no company data.",
+  "individualPaymentLinked": true,
+  "payer": "Syntetisk betalare AB",
+  "ocr": "000018",
+  "invoice": "Saknas",
+  "status": "Behöver granskas",
+  "duplicateLabel": "Redan importerad",
+  "duplicateConfirmationEnabled": true,
+  "keyboardDisclosure": true,
+  "escapeClosesDialog": true,
+  "responsive": [
+    {
+      "cards": 3,
+      "columns": [
+        "Betalare",
+        "Faktura",
+        "OCR",
+        "Belopp",
+        "Datum",
+        "Status"
+      ],
+      "scrollWidth": 305,
+      "width": 320
+    },
+    {
+      "cards": 3,
+      "columns": [
+        "Betalare",
+        "Faktura",
+        "OCR",
+        "Belopp",
+        "Datum",
+        "Status"
+      ],
+      "scrollWidth": 375,
+      "width": 390
+    },
+    {
+      "cards": 3,
+      "columns": [
+        "Betalare",
+        "Faktura",
+        "OCR",
+        "Belopp",
+        "Datum",
+        "Status"
+      ],
+      "scrollWidth": 753,
+      "width": 768
+    },
+    {
+      "cards": 3,
+      "columns": [
+        "Betalare",
+        "Faktura",
+        "OCR",
+        "Belopp",
+        "Datum",
+        "Status"
+      ],
+      "scrollWidth": 1009,
+      "width": 1024
+    },
+    {
+      "cards": 3,
+      "columns": [
+        "Betalare",
+        "Faktura",
+        "OCR",
+        "Belopp",
+        "Datum",
+        "Status"
+      ],
+      "scrollWidth": 1425,
+      "width": 1440
+    }
+  ],
+  "mobileDialog": {
+    "dialogScroll": 353,
+    "dialogWidth": 370,
+    "scrollWidth": 390,
+    "width": 390
+  }
+}
