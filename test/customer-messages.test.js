@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {openDatabase,storeTransactions,allocate,listInvoices} from '../src/db.js';
 import {runReconciliation} from '../src/reconciliation.js';
 import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend,validRecipient} from '../src/customer-messages.js';
+import {withSyntheticBankOriginal} from './bank-fixtures.js';
 
 function fixture(t){
   const folder=mkdtempSync(join(tmpdir(),'mg-messages-')),db=openDatabase(join(folder,'db.sqlite'));t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
@@ -14,7 +15,7 @@ function fixture(t){
   return db;
 }
 function payment(db,amount=250000,reference='B1'){
-  storeTransactions(db,[{account:'MG',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:reference}],'enablebanking');runReconciliation(db);prepareMessages(db);
+  storeTransactions(db,[withSyntheticBankOriginal({account:'MG',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:reference})],'enablebanking');runReconciliation(db);prepareMessages(db);
 }
 function draft(db){prepareMessages(db);return listMessages(db).find(m=>m.status==='draft');}
 function review(db,m){return reviewMessage(db,m.id,m.version,'admin','session');}

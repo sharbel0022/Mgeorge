@@ -48,6 +48,7 @@ export const bankLocks = sqliteTable('bank_locks', {
 export const gmailConnections = sqliteTable('gmail_connections', {
   owner:text('owner').primaryKey(),email:text('email').notNull(),tokens:text('tokens').notNull(),
   lastSynced:text('last_synced').notNull().default(''),pageToken:text('page_token').notNull().default(''),startedAt:text('started_at').notNull().default(''),status:text('status').notNull().default('connected'),lastAttempt:text('last_attempt').notNull().default(''),
+  retryAfter:text('retry_after').notNull().default(''),
 });
 export const gmailFlows=sqliteTable('gmail_flows',{
   stateHash:text('state_hash').primaryKey(),owner:text('owner').notNull(),cookieHash:text('cookie_hash').notNull(),expiresAt:text('expires_at').notNull(),consumed:integer('consumed').notNull().default(0),

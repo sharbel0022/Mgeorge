@@ -22,3 +22,55 @@ test('missing original fails visibly, then resumes from the last copied file wit
 test('altered source hashes prevent a false successful backup and retries are bounded',async t=>{const f=fixture(t,1);f.objects.set(owner+'/00000000-0000-4000-8000-000000000000',new Uint8Array([1,2,3]));for(let n=0;n<3;n++)assert.equal((await backupStep(f.db,f.bucket,owner,key,date)).status,'failed');const gets=f.stats().gets;assert.equal((await backupStep(f.db,f.bucket,owner,key,date)).attempts,3);assert.equal(f.stats().gets,gets);assert.equal((await backupStatus(f.db,owner)).last_verified,null);});
 test('an active lease prevents duplicate work and new Stockholm dates create separate snapshots',async t=>{const f=fixture(t,0);let r=await backupStep(f.db,f.bucket,owner,key,date);assert.equal(r.status,'complete');r=await backupStep(f.db,f.bucket,owner,key,new Date('2026-10-28T23:00:00Z'));assert.equal(r.day,'2026-10-29');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM backup_runs').get().n,2);f.sql.prepare("UPDATE backup_runs SET state='running',lease='other',lease_until=? WHERE day='2026-10-29'").run(new Date(Date.now()+60000).toISOString());assert.equal((await backupStep(f.db,f.bucket,owner,key,new Date('2026-10-28T23:00:00Z'))).busy,true);});
 test('invalid key and owner-contaminated snapshots fail before producing a valid backup',async t=>{const f=fixture(t,0);await assert.rejects(()=>backupStep(f.db,f.bucket,owner,'bad',date));assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM backup_runs').get().n,0);const s={format:'MG-Sites-backup-1',owner,tables:BACKUP_TABLES.map(name=>({name,rows:[]}))};s.tables[0].rows.push({owner:'other'});assert.throws(()=>validateSnapshot(s,owner));});
+
+function pauseInitialRead(db){
+ let resume,reached,paused=false;
+ const ready=new Promise(resolve=>{reached=resolve;}),gate=new Promise(resolve=>{resume=resolve;});
+ return {ready,resume:()=>resume(),db:{...db,prepare(text){const statement=db.prepare(text);if(text==='SELECT * FROM backup_runs WHERE owner=? AND day=?'){
+  const first=statement.first;statement.first=async function(){const row=await first.call(this);if(!paused){paused=true;reached();await gate;}return row;};
+ }return statement;}}};
+}
+
+test('a delayed reader cannot overwrite an already verified snapshot after another worker completes',async t=>{
+ const f=fixture(t,0),barrier=pauseInitialRead(f.db),late=backupStep(barrier.db,f.bucket,owner,key,date);
+ await barrier.ready;
+ const completed=await backupStep(f.db,f.bucket,owner,key,date),row=f.sql.prepare('SELECT * FROM backup_runs').get();
+ const original=f.objects.get(row.snapshot_key).slice(),puts=f.stats().puts;
+ f.sql.prepare('UPDATE workspaces SET revision=99 WHERE owner=?').run(owner);
+ barrier.resume();const delayed=await late;
+ assert.equal(completed.status,'complete');assert.equal(delayed.status,'complete');assert.equal(delayed.id,completed.id);
+ assert.deepEqual(f.objects.get(row.snapshot_key),original,'a verified backup ID must retain its original encrypted snapshot');
+ assert.equal(f.stats().puts,puts);
+});
+
+test('a delayed reader resumes from the current checkpoint instead of copying an old cursor',async t=>{
+ const f=fixture(t,7),barrier=pauseInitialRead(f.db),late=backupStep(barrier.db,f.bucket,owner,key,date);
+ await barrier.ready;const first=await backupStep(f.db,f.bucket,owner,key,date);assert.equal(first.copied,5);
+ const original=f.objects.get(f.sql.prepare('SELECT snapshot_key FROM backup_runs').get().snapshot_key).slice();
+ barrier.resume();const completed=await late;
+ assert.equal(completed.status,'complete');assert.equal(completed.copied,7);assert.equal(completed.bytes,Array.from({length:7},(_,n)=>Buffer.byteLength('Syntetisk PDF '+n)).reduce((a,b)=>a+b,0));
+ assert.deepEqual(f.objects.get(f.sql.prepare('SELECT snapshot_key FROM backup_runs').get().snapshot_key),original);
+});
+
+test('an expired worker cannot overwrite the replacement snapshot or release its lease',async t=>{
+ const f=fixture(t,0);let resume,reached,paused=false;
+ const gate=new Promise(resolve=>{resume=resolve;}),ready=new Promise(resolve=>{reached=resolve;});
+ const bucket={...f.bucket,async put(path,bytes,options){if(path.endsWith('/snapshot.bin')&&!paused){paused=true;reached();await gate;}return f.bucket.put(path,bytes,options);}};
+ const expired=backupStep(f.db,bucket,owner,key,date);await ready;
+ f.sql.prepare("UPDATE backup_runs SET lease_until='2000-01-01T00:00:00Z'").run();
+ f.sql.prepare('UPDATE workspaces SET revision=99 WHERE owner=?').run(owner);
+ const replacement=await backupStep(f.db,bucket,owner,key,date),row=f.sql.prepare('SELECT * FROM backup_runs').get(),original=f.objects.get(row.snapshot_key).slice();
+ resume();await expired;
+ assert.equal(replacement.status,'complete');assert.deepEqual(f.objects.get(row.snapshot_key),original);
+ assert.equal(f.sql.prepare('SELECT snapshot_key FROM backup_runs').get().snapshot_key,row.snapshot_key);
+ const restored=JSON.parse(new TextDecoder().decode(await unsealBackup(original,key,owner,row.id,'snapshot')));
+ assert.equal(restored.tables.find(table=>table.name==='workspaces').rows[0].revision,99);
+});
+
+test('a delayed reader respects a retry limit reached by another worker',async t=>{
+ const f=fixture(t,1),barrier=pauseInitialRead(f.db);f.objects.delete(owner+'/00000000-0000-4000-8000-000000000000');
+ const late=backupStep(barrier.db,f.bucket,owner,key,date);await barrier.ready;
+ for(let n=0;n<3;n++)await backupStep(f.db,f.bucket,owner,key,date);
+ const stats=f.stats();barrier.resume();const stopped=await late;
+ assert.equal(stopped.attempts,3);assert.equal(stopped.status,'failed');assert.deepEqual(f.stats(),stats);
+});

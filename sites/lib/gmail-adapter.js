@@ -11,6 +11,13 @@ const maxAttachmentAttempts=150;
 const defaultQuery='has:attachment -in:spam -in:trash -in:drafts';
 
 function fail(message,code='gmail_error',status=409){return Object.assign(new Error(message),{code,status});}
+function retryDelay(response){
+  const value=(response.headers.get('retry-after')||'').trim(),max=365*86400;
+  let seconds=/^\d{1,10}$/.test(value)?Number(value):value.length<=64&&/GMT$/i.test(value)?Math.ceil((Date.parse(value)-Date.now())/1000):NaN;
+  const retryBlocked=/^\d{11,}$/.test(value)||Number.isFinite(seconds)&&seconds>max;
+  if(!Number.isFinite(seconds)||seconds<0)seconds=900;
+  return {retryAfter:Math.max(1,Math.min(max,seconds)),retryBlocked};
+}
 export function gmailAccount(){return (env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();}
 export function isGmailConfigured(){return !!(env.GOOGLE_CLIENT_ID?.trim()&&env.GOOGLE_CLIENT_SECRET?.trim());}
 function requireConfig(){if(!isGmailConfigured())throw fail('En administratör behöver aktivera Gmail-kopplingen först.','not_configured');}
@@ -32,6 +39,7 @@ async function requestJson(url,options={}){
   try{response=await fetch(url,{...options,redirect:'manual',signal:AbortSignal.timeout(20_000)});}
   catch{throw fail('Det gick inte att nå Gmail. Försök igen.','connection_error',502);}
   if(response.status>=300&&response.status<400)throw fail('Google returnerade en oväntad omdirigering. Inga uppgifter skickades vidare.','unexpected_redirect',502);
+  if(response.status===429){const wait=retryDelay(response);await response.body?.cancel().catch(()=>{});throw Object.assign(fail(wait.retryBlocked?'Gmail angav en väntetid som kräver manuell kontroll. Automatisk hämtning har stoppats.':'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.','rate_limited',429),wait);}
   // A bounded read prevents a malformed response or huge attachment from exhausting memory.
   let bytes=0;const chunks=[];
   if(response.body){for await(const chunk of response.body){bytes+=chunk.length;if(bytes>22_000_000){await response.body.cancel?.().catch(()=>{});throw fail('Svaret från Gmail var för stort.','response_too_large',413);}chunks.push(chunk);}}
@@ -40,7 +48,6 @@ async function requestJson(url,options={}){
     if(body.error==='invalid_client'||body.error==='unauthorized_client')throw fail('Google avvisade webbklienten. Kontrollera klient-id och klienthemlighet i Sites.','invalid_client');
     if(response.status===401||body.error==='invalid_grant')throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
     if(response.status===403)throw fail('Gmail gav inte läsåtkomst. Kontrollera behörigheten och Gmail API i Google Cloud.','access_denied');
-    if(response.status===429)throw fail('Gmail har begränsat hämtningen. Försök igen senare.','rate_limited',429);
     // Do not reflect provider responses: these may include secrets or mailbox content.
     throw fail('Gmail kunde inte slutföra begäran. Försök igen.','provider_error',502);
   }

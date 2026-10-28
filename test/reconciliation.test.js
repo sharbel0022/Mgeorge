@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {openDatabase,storeTransactions,listInvoices,allocate,deleteAllocation,listTransactions} from '../src/db.js';
 import {normalizeName,analyzeReconciliation,reconciliationData,runReconciliation,verifyPayer} from '../src/reconciliation.js';
+import {withSyntheticBankOriginal} from './bank-fixtures.js';
 
 function fixture(t){const folder=mkdtempSync(join(tmpdir(),'mg-reconcile-')),db=openDatabase(join(folder,'db.sqlite'));t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});return db;}
 function invoice(db,id='i',extra={}){
@@ -12,7 +13,7 @@ function invoice(db,id='i',extra={}){
   db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,vat_cents,net_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?,?,?)').run(x.id,'customer',x.number,x.party,x.total,62500,250000,x.number,'2026-01-01');return x.id;
 }
 function pay(db,extra={},source='enablebanking'){
-  storeTransactions(db,[{account:'MG',booked_at:'2026-10-26',amount_cents:312500,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:'B1',...extra}],source);
+  storeTransactions(db,[withSyntheticBankOriginal({account:'MG',booked_at:'2026-10-26',amount_cents:312500,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:'B1',...extra})],source);
   return db.prepare('SELECT id FROM bank_transactions WHERE bank_reference=?').get(extra.bank_reference||'B1').id;
 }
 const analyze=db=>analyzeReconciliation(reconciliationData(db));
@@ -81,4 +82,23 @@ test('verified private payer is reusable across invoices and undoing the decisio
 test('a new bank import invalidates an earlier absence check',t=>{
   const db=fixture(t);invoice(db);db.prepare("UPDATE invoices SET reconciled_at='2026-10-27',reconciliation_note='Kontrollerat bankutdrag'").run();
   pay(db,{payer:'Okänd betalare',reference:''});assert.equal(listInvoices(db)[0].status,'unreconciled');
+});
+
+test('automatic reconciliation reads its evidence only after acquiring the write lock',t=>{
+  const db=fixture(t);invoice(db);pay(db);let injected=false;
+  const guarded=new Proxy(db,{get(target,key){
+    if(key==='exec')return sql=>{if(sql==='BEGIN IMMEDIATE'&&!injected){injected=true;pay(db,{bank_reference:'ARRIVED-BEFORE-LOCK'});}return target.exec(sql);};
+    const item=Reflect.get(target,key);return typeof item==='function'?item.bind(target):item;
+  }});
+  runReconciliation(guarded);
+  assert.equal(injected,true);assert.equal(listInvoices(db)[0].paid_cents,0);
+  assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
+});
+
+test('automatic payment, findings and both audit events commit or roll back together',t=>{
+  const db=fixture(t);invoice(db);pay(db);
+  db.exec("CREATE TRIGGER fail_verified_audit BEFORE INSERT ON audit_events WHEN NEW.action='automatic_verified_match' BEGIN SELECT RAISE(ABORT,'audit disk failure'); END;");
+  assert.throws(()=>runReconciliation(db),/audit disk failure/);
+  assert.equal(listInvoices(db)[0].paid_cents,0);
+  assert.equal(db.prepare("SELECT COUNT(*) n FROM audit_events WHERE action='automatic_match'").get().n,0);
 });

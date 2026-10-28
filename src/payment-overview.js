@@ -14,10 +14,12 @@ export function paymentGroup(t) {
 }
 
 export function paymentTitle(t) {
-  if (t.payer?.trim()) return t.payer.trim();
-  if (t.is_aggregate) return 'Bankgiro – betalningsspecifikation saknas';
-  if (t.description?.trim()) return t.description.trim();
-  return t.amount_cents < 0 ? 'Utbetalning – mottagare saknas' : 'Inbetalning – betalare saknas';
+  const raw=t.source==='enablebanking'&&/^[a-f0-9]{64}$/i.test(t.raw_bank_data_sha256||'')&&t.raw_bank_data?.status==='BOOK'?
+    (t.amount_cents<0?t.raw_bank_data.creditor?.name:t.raw_bank_data.debtor?.name):String(t.source||'').startsWith('file:')&&t.import_id?t.payer:'';
+  const payer=typeof raw==='string'?raw.trim():'';
+  if(!t.is_aggregate&&payer&&payer.length<=240&&!/^(?:bankgirot?|swedbank|betalare okänd|betalardetaljer saknas)(?:\s|$)/iu.test(payer))return payer;
+  if(paymentGroup(t)==='other'&&t.description?.trim())return t.description.trim();
+  return t.amount_cents<0?'Mottagare okänd':'Betalare okänd';
 }
 
 /** Explain existing evidence without creating an allocation or inferring intent. */

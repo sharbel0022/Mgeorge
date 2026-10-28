@@ -135,9 +135,9 @@ test('Complete individual names, references and sum are required for a Bankgiro 
  assert.equal(s.transactions[0].kind,'batch');assert.equal(s.transactions[1].parentId,id);s=match(s,187500,{transactionId:s.transactions[1].id});assert.equal(balance(s,s.invoices[0]),0);
 });
 test('CSV Bankgiro totals are classified for specification rather than single-payment review',()=>{
- const parsed=imp.parseCSV('Datum;Belopp;Betalare;OCR;Text\n2026-10-26;1875,00;Bankgirot AB;;Bankgiro inbetalning');
+ const parsed=imp.parseCSV('Datum;Belopp;Betalare;OCR;Text;Valuta\n2026-10-26;1875,00;Bankgirot AB;;Bankgiro inbetalning;SEK');
  const [row]=imp.mapCSV(parsed,imp.guessMapping(parsed.headers),'bank.csv');assert.equal(row.kind,'batch');assert.match(row.description,/Betalardetaljer saknas – importera betalningsspecifikation/);
- const complete=imp.parseCSV('Datum;Belopp;Betalare;OCR;Text\n2026-10-26;1875,00;Testkund;001019;Bankgiro inbetalning');assert.equal(imp.mapCSV(complete,imp.guessMapping(complete.headers),'bank.csv')[0].kind,'unknown');
+ const complete=imp.parseCSV('Datum;Belopp;Betalare;OCR;Text;Valuta\n2026-10-26;1875,00;Testkund;001019;Bankgiro inbetalning;SEK');assert.equal(imp.mapCSV(complete,imp.guessMapping(complete.headers),'bank.csv')[0].kind,'unknown');
 });
 test('Manual approval needs matching reference or matching named payer and amount',()=>{
  let s=addTx(addInvoice(emptyState()),{payerReference:'',party:'Annan kund'});assert.deepEqual(suggestions(s,s.transactions[0]),[]);assert.throws(()=>match(s),/Beloppet ensamt/);

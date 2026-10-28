@@ -4,26 +4,50 @@ import {imageText,pdfInvoiceText} from './local-ocr';
 import {parseMoney,validDate,today,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED} from './domain';
 export type BankRow={referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;bankData?:Record<string,unknown>;date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
 export function parseCSV(text:string){
+ if(typeof text!=='string'||text.length>15_000_000)throw Error('CSV-filen får vara högst 15 MB.');
  const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n'),lines=clean.split('\n');
  const headerIndex=lines.findIndex(l=>/(datum|date)/i.test(l)&&/(belopp|amount|insättning|uttag)/i.test(l));
  const source=headerIndex>0?lines.slice(headerIndex).join('\n'):clean;
  const first=source.split('\n')[0],delimiter=[';','\t',','].sort((a,b)=>first.split(b).length-first.split(a).length)[0];
- const rows:string[][]=[];let row:string[]=[],cell='',quoted=false;
- for(let i=0;i<source.length;i++){const c=source[i];if(c==='"'){if(quoted&&source[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}else if(c===delimiter&&!quoted){row.push(cell.trim());cell='';}else if(c==='\n'&&!quoted){row.push(cell.trim());if(row.some(Boolean))rows.push(row);row=[];cell='';}else cell+=c;}
+ const rows:string[][]=[];let row:string[]=[],cell='',quoted=false,closedQuote=false;
+ for(let i=0;i<source.length;i++){
+  const c=source[i];if(c==='"'){
+   if(quoted){if(source[i+1]==='"'){cell+='"';i++;}else{quoted=false;closedQuote=true;}}
+   else{if(cell.trim()||closedQuote)throw Error('CSV-filen innehåller ett felplacerat citattecken.');quoted=true;cell='';}
+  }else if(c===delimiter&&!quoted){row.push(cell.trim());cell='';closedQuote=false;}
+  else if(c==='\n'&&!quoted){row.push(cell.trim());if(row.some(Boolean))rows.push(row);row=[];cell='';closedQuote=false;}
+  else{if(closedQuote&&!/[\t\r ]/.test(c))throw Error('CSV-filen innehåller text efter ett avslutat citattecken.');cell+=c;}
+ }
  if(quoted)throw new Error('CSV-filen innehåller ett ofullständigt citattecken.');row.push(cell.trim());if(row.some(Boolean))rows.push(row);
  if(rows.length<2)throw new Error('Ingen tabell med rubriker och bankhändelser hittades.');
- if(rows.length>1001)throw new Error('Välj högst 1 000 bankhändelser per import.');return{headers:rows[0],rows:rows.slice(1),delimiter};
+ if(rows.length>1001)throw new Error('Välj högst 1 000 bankhändelser per import.');
+ if(rows.some(r=>r.length!==rows[0].length))throw Error('CSV-radernas kolumnantal stämmer inte med rubrikerna.');
+ const names=rows[0].map(h=>h.normalize('NFKC').trim().toLocaleLowerCase('sv-SE'));if(new Set(names).size!==names.length)throw Error('CSV-filen innehåller tvetydiga kolumnrubriker.');
+ return{headers:rows[0],rows:rows.slice(1),delimiter};
 }
 export function normalizeDate(raw:string){const s=raw.trim();if(validDate(s))return s;const match=/^(\d{2})[/.\-](\d{2})[/.\-](\d{4})$/.exec(s);if(match){const iso=`${match[3]}-${match[2]}-${match[1]}`;if(validDate(iso))return iso;}throw new Error(`Datumet "${s}" kunde inte läsas. Använd ÅÅÅÅ-MM-DD.`);}
 export type Mapping={date:number;amount:number;party:number;payerReference:number;bankReference:number;description:number;currency:number;externalId:number};
+const CSV_HEADERS:Record<keyof Mapping,RegExp>={
+ date:/^(transaktionsdatum|betalningsdatum|bokföringsdatum|bokforingsdatum|datum|date|booking date)$/i,
+ amount:/^(belopp|inbetalningsbelopp|amount|summa)$/i,
+ party:/^(betalare|namn|avsändare|avsändarens namn|avsandare|mottagare|motpart|payer|name)$/i,
+ payerReference:/^(ocr|ocr[- .]?(?:nummer|number|referens)|betalningsreferens(?:\s*\/\s*ocr)?|fakturanummer|payer.?reference)$/i,
+ bankReference:/^(bankreferens|referens|reference|bank.?reference)$/i,
+ description:/^(text|beskrivning|transaktionstyp|meddelande|description|typ)$/i,
+ currency:/^(valuta|currency)$/i,
+ externalId:/^(transaktions.?id|transaction.?id|entry.?id)$/i
+};
 export function guessMapping(headers:string[]):Mapping{
- const find=(r:RegExp)=>headers.findIndex(h=>r.test(h.trim()));
- return{date:find(/^(transaktionsdatum|bokföringsdatum|bokforingsdatum|datum|date|booking date)$/i),amount:find(/^(belopp|amount|summa)$/i),party:find(/^(betalare|namn|avsändare|avsandare|mottagare|motpart|payer|name)$/i),payerReference:find(/^(ocr|ocr.nummer|betalningsreferens|fakturanummer|payer.?reference)$/i),bankReference:find(/^(bankreferens|referens|reference|bank.?reference)$/i),description:find(/^(text|beskrivning|transaktionstyp|meddelande|description|typ)$/i),currency:find(/^(valuta|currency)$/i),externalId:find(/^(transaktions.?id|transaction.?id|entry.?id)$/i)};
+ return Object.fromEntries(Object.entries(CSV_HEADERS).map(([key,pattern])=>{const found=headers.map((h,n)=>pattern.test(h.trim())?n:-1).filter(n=>n>=0);if(found.length>1)throw Error('CSV-filen har tvetydiga kolumner för '+key+'.');return[key,found[0]??-1];})) as Mapping;
 }
 export function mapCSV(parsed:ReturnType<typeof parseCSV>,mapping:Mapping,name:string):BankRow[]{
+ if(!mapping||typeof mapping!=='object'||Array.isArray(mapping)||Object.keys(mapping).some(k=>!Object.hasOwn(CSV_HEADERS,k)))throw Error('Ogiltig kolumnmappning.');
+ const used:number[]=[];for(const key of Object.keys(CSV_HEADERS) as (keyof Mapping)[]){const index=mapping[key];if(!Number.isInteger(index)||index< -1||index>=parsed.headers.length)throw Error('Kolumnmappningen ligger utanför bankfilen.');if(index>=0){if(used.includes(index))throw Error('Varje bankuppgift behöver en separat kolumn.');used.push(index);if(!CSV_HEADERS[key].test(parsed.headers[index].trim()))throw Error(`Kolumnen ”${parsed.headers[index]}” kan inte användas som ${key}. Kontrollera bankens rubriker.`);}}
  if(mapping.date<0||mapping.amount<0)throw new Error('Välj kolumner för datum och belopp.');
+ if(mapping.currency<0)throw Error('Bankfilen saknar valutakolumn. SEK måste framgå av originalunderlaget.');
+ const accountColumns=parsed.headers.map((h,n)=>/^(?:mottagarkonto|mottagarens konto|konto|bankkonto|iban)$/i.test(h.trim())?n:-1).filter(n=>n>=0);if(accountColumns.length>1)throw Error('Bankfilen har flera möjliga mottagarkonton. Granska originalet.');
  if(mapping.payerReference>=0&&mapping.payerReference===mapping.bankReference)throw new Error('Bankreferens och OCR ska ha olika kolumner.');
- return parsed.rows.map((r,index)=>{const v=(k:keyof Mapping)=>mapping[k]>=0?(r[mapping[k]]??'').trim():'';try{const currency=v('currency')||'SEK';if(currency.toUpperCase()!=='SEK')throw new Error('Andra valutor än SEK stöds inte.');const amount=parseMoney(v('amount')),party=v('party'),referenceEvidence=extractPaymentReferences({columns:parsed.headers.map((name,n)=>({[name]:r[n]??''}))}),payerReference=v('payerReference')||referenceEvidence.selected?.value||'',description=v('description'),collective=suspectedBankCollection(amount,description,party,payerReference);return{referenceEvidence,date:normalizeDate(v('date')),amount,party,payerReference,bankReference:v('bankReference'),description:collective?`${PAYMENT_SPECIFICATION_REQUIRED} ${description}`:description,externalId:v('externalId'),currency:'SEK',source:name,kind:collective?'batch':'unknown',verified:false};}catch(e){throw new Error(`Rad ${index+2}: ${(e as Error).message}`);}});
+ return parsed.rows.map((r,index)=>{const v=(k:keyof Mapping)=>mapping[k]>=0?(r[mapping[k]]??'').trim():'';try{const currency=v('currency');if(currency.toUpperCase()!=='SEK')throw new Error('Valutan måste uttryckligen vara SEK i bankoriginalet.');const amount=parseMoney(v('amount')),party=v('party'),referenceEvidence=extractPaymentReferences({columns:parsed.headers.map((name,n)=>({[name]:r[n]??''}))}),payerReference=v('payerReference')||referenceEvidence.selected?.value||'',description=v('description'),collective=suspectedBankCollection(amount,description,party,payerReference);return{referenceEvidence,date:normalizeDate(v('date')),amount,party,payerReference,bankReference:v('bankReference'),account:accountColumns.length?r[accountColumns[0]].trim():undefined,description:collective?`${PAYMENT_SPECIFICATION_REQUIRED} ${description}`:description,externalId:v('externalId'),currency:'SEK',source:name,kind:collective?'batch':'unknown',verified:false};}catch(e){throw new Error(`Rad ${index+2}: ${(e as Error).message}`);}});
 }
 // Use the same bounded, namespace-aware parser for preview and retained originals.
 export function parseCAMT(text:string,name:string):BankRow[]{return parseBankgiroXML(text,name).map(row=>row.specification===false?{...row,kind:suspectedBankCollection(row.amount,row.description,row.party,row.payerReference)?'batch':'unknown'}:row);}

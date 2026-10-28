@@ -1,0 +1,1 @@
+ALTER TABLE `gmail_connections` ADD `retry_after` text DEFAULT '' NOT NULL;

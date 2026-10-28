@@ -59,7 +59,7 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
   if (!Array.isArray(transactions) || !options.accountKey || options.accountKey.length > 100 ||
     !validDate(options.dateFrom) || !validDate(options.dateTo) || options.dateFrom > options.dateTo) throw new Error('Kontot eller perioden för bankimporten är ogiltig.');
   const rows: BankRow[] = [], skipped = { pending: 0, nonSek: 0, invalid: 0, unstableId: 0 };
-  let dateFallbacks = 0, longReferences = 0, ambiguousBatches = 0, negativeAmounts = 0;
+  let dateFallbacks = 0, longReferences = 0, ambiguousBatches = 0, negativeAmounts = 0, longParties = 0;
   for (const raw of transactions) {
     if (!object(raw)) { skipped.invalid++; continue; }
     if (raw.status !== 'BOOK') {
@@ -84,7 +84,11 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
     if (!booked) dateFallbacks++;
     const incoming = raw.credit_debit_indicator === 'CRDT';
     const counterparty = incoming ? raw.debtor : raw.creditor;
-    const party = object(counterparty) ? cleanText(counterparty.name).slice(0, 200) : '';
+    const bankParty = object(counterparty) ? cleanText(counterparty.name) : '';
+    // A truncated name may equal a different invoice customer's full name.
+    // Keep the bank's complete identity in bankData and hold it for review.
+    const party = bankParty.length <= 200 ? bankParty : '';
+    if(bankParty.length>200)longParties++;
     const originalEntry = typeof raw.entry_reference === 'string' ? raw.entry_reference : '';
     // Preserve exact provider ID bytes for hashing. Only test emptiness/placeholders with trim.
     const entry = missingReference(originalEntry.trim()) ? '' : originalEntry;
@@ -115,6 +119,7 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
   if (skipped.unstableId) warnings.push(`${skipped.unstableId} importerade bankhändelser saknar stabilt bank-ID. Kontrollera möjliga dubbletter vid återkommande hämtning.`);
   if (dateFallbacks) warnings.push(`${dateFallbacks} bankhändelser använder bankens valutadatum eftersom bokföringsdatum saknas.`);
   if (longReferences) warnings.push(`${longReferences} långa betalningsreferenser behöver kontrolleras i bankunderlaget. De har inte kortats till ett möjligt OCR-nummer.`);
+  if (longParties) warnings.push(`${longParties} långa betalaruppgifter behöver kontrolleras i bankoriginalet. Betalaren har inte förkortats till ett möjligt kundnamn.`);
   if (ambiguousBatches) warnings.push('Bankgiro- eller samlingsposter kan sakna uppgifter om enskilda betalare. Komplettera med betalningsspecifikation innan matchning.');
   return { rows, skipped, warnings };
 }

@@ -1,7 +1,8 @@
 // Suggestions never constitute payment evidence. All amounts are integer öre.
 import {randomUUID} from 'node:crypto';
 import {listInvoices,listTransactions,allocate,audit,paymentSign} from './db.js';
-import {digest} from './security.js';
+import {digest,decryptObject} from './security.js';
+import {normalizeBankApiTransaction,parseBankFile} from './importers.js';
 
 import {matchingReferenceValues} from './payment-references.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
@@ -18,9 +19,35 @@ export function exactReference(reference, candidate){
 }
 
 export function reconciliationData(db){
-  const originals=new Set(db.prepare('SELECT id FROM import_jobs WHERE content IS NOT NULL').all().map(x=>x.id));
+  const retained=db.prepare('SELECT id,name,mime_type,content,content_sha256 FROM import_jobs WHERE content IS NOT NULL').all();
+  const originals=new Set(retained.filter(x=>x.content_sha256&&digest(x.content)===x.content_sha256).map(x=>x.id));
+  const alteredOriginals=new Set(retained.filter(x=>!originals.has(x.id)).map(x=>x.id));
   const links=db.prepare('SELECT * FROM payer_links').all();
-  return {invoices:listInvoices(db),transactions:listTransactions(db).map(t=>({...t,verified:t.source==='enablebanking'&&t.api_identity_version===1||t.source.startsWith('file:')&&originals.has(t.import_id)})),links,allocations:db.prepare('SELECT * FROM allocations').all()};
+  const canonical=value=>String(value||'').replace(/^iban:/i,'').replace(/\s/g,'').toUpperCase();
+  const approvedAccounts=new Set();
+  for(const connection of db.prepare("SELECT accounts_json,selected_account_uid,valid_until FROM bank_connections WHERE owner<>'' AND selected_account_uid<>'' AND status IN ('connected','error')").all()){
+    if(!(Date.parse(connection.valid_until)>Date.now()))continue;
+    try{const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid),account=canonical(selected?.account_id?.iban);if(selected?.currency==='SEK'&&/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(account))approvedAccounts.add(account);}catch{}
+  }
+  const retainedById=new Map(retained.map(original=>[original.id,original])),parsedFiles=new Map();
+  const verifiedFileOriginal=t=>{
+    if(!originals.has(t.import_id)||!approvedAccounts.has(canonical(t.account)))return false;
+    const original=retainedById.get(t.import_id),key=JSON.stringify([t.import_id,t.account]);
+    if(!parsedFiles.has(key)){
+      try{
+        if(!(/\.xml$/i.test(original.name)&&original.mime_type==='application/xml'||/\.csv$/i.test(original.name)&&original.mime_type==='text/csv'))throw new Error('Unsupported bank original');
+        parsedFiles.set(key,parseBankFile(original.name,Buffer.from(original.content).toString('base64'),t.account));
+      }catch{parsedFiles.set(key,[]);}
+    }
+    const facts=['amount_cents','currency','booked_at','payer','reference','bank_reference'];
+    const matching=parsedFiles.get(key).filter(record=>record.account_evidence?.exact_match&&canonical(record.account_evidence.reported_account)===canonical(t.account)&&facts.every(field=>record[field]===t[field])&&(record.parent_bank_reference||record.aggregate_parent_reference||'')===t.parent_bank_reference);
+    return matching.length===1;
+  };
+  const verifiedApiOriginal=t=>{
+    if(!t.raw_bank_data_sha256||!t.raw_bank_data||typeof t.raw_bank_data!=='object'||Array.isArray(t.raw_bank_data)||digest(JSON.stringify(t.raw_bank_data))!==t.raw_bank_data_sha256)return false;
+    try{const original=normalizeBankApiTransaction(t.raw_bank_data,t.account);return !!original&&['amount_cents','currency','booked_at','payer','bank_reference'].every(key=>original[key]===t[key]);}catch{return false;}
+  };
+  return {invoices:listInvoices(db),transactions:listTransactions(db).map(t=>({...t,verified:!alteredOriginals.has(t.import_id)&&(t.source==='enablebanking'&&t.api_identity_version===1&&(verifiedApiOriginal(t)||verifiedFileOriginal(t))||t.source.startsWith('file:')&&verifiedFileOriginal(t))})),links,allocations:db.prepare('SELECT * FROM allocations').all()};
 }
 function samePayer(i,t,links){
   const org=value=>String(value||'').replace(/[- ]/g,'');
@@ -76,22 +103,24 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
   return out.map(f=>({...f,rule_version:RECONCILIATION_RULE_VERSION})).sort((a,b)=>b.score-a.score);
 }
 export function runReconciliation(db){
-  let suggestions=analyzeReconciliation(reconciliationData(db));
-  for(const s of suggestions.filter(s=>s.safe&&s.amount_cents>0)){
-    allocate(db,s.invoice_id,s.transaction_id,s.amount_cents,{automatic:true});
-    audit(db,'automatic_verified_match',s);
-  }
-  suggestions=analyzeReconciliation(reconciliationData(db));
+  // Acquire the writer lock before reading any evidence. Imports and other
+  // reconciliation processes cannot invalidate the decision before its commit.
   db.exec('BEGIN IMMEDIATE');
   try{
+    let suggestions=analyzeReconciliation(reconciliationData(db));
+    for(const s of suggestions.filter(s=>s.safe&&s.amount_cents>0)){
+      allocate(db,s.invoice_id,s.transaction_id,s.amount_cents,{automatic:true,transactionOpen:true});
+      audit(db,'automatic_verified_match',s);
+    }
+    suggestions=analyzeReconciliation(reconciliationData(db));
     db.prepare('UPDATE reconciliation_findings SET active=0').run();
     for(const s of suggestions.filter(s=>s.invoice_id)){
       const id=digest(JSON.stringify(s));
       db.prepare('INSERT INTO reconciliation_findings(id,invoice_id,transaction_id,kind,details) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET active=1').run(id,s.invoice_id,s.transaction_id,s.kind,JSON.stringify(s));
     }
     db.exec('COMMIT');
+    return suggestions;
   }catch(e){db.exec('ROLLBACK');throw e;}
-  return suggestions;
 }
 export function verifyPayer(db,{invoice_id,payer,account,evidence},principal){
   if(!principal||!payer?.trim()||!account?.trim()||!evidence?.trim()||!db.prepare('SELECT id FROM invoices WHERE id=?').get(invoice_id))throw Object.assign(new Error('Kund, betalare, konto och verifieringsunderlag krävs.'),{status:400});

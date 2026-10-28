@@ -52,6 +52,16 @@ test('verified Gmail profile prevents importing another Google account',async()=
     await assert.rejects(gmailProfile(currentTokens()),e=>e.code==='account_mismatch');
   });
 });
+test('Gmail preserves provider Retry-After seconds and HTTP dates without exposing provider content',async()=>{
+  for(const header of ['7200',new Date(Date.now()+7200_000).toUTCString()])await withFetch(async()=>new Response(JSON.stringify({error:{message:'private-provider-secret'}}),{status:429,headers:{'Retry-After':header}}),async()=>{
+    await assert.rejects(gmailProfile(currentTokens()),error=>error.code==='rate_limited'&&error.status===429&&error.retryAfter>=7199&&error.retryAfter<=7200&&!error.message.includes('private-provider-secret'));
+  });
+});
+test('Gmail retry parsing is bounded, handles a non-JSON 429 body and stops unreasonable waits',async()=>{
+  for(const [header,seconds,blocked] of [['not-a-delay',900,false],['-10',900,false],['999999999999999999999999999999',900,true],['63072000',31536000,true]])await withFetch(async()=>new Response('private non-JSON provider response',{status:429,headers:{'Retry-After':header}}),async()=>{
+    await assert.rejects(gmailProfile(currentTokens()),error=>error.status===429&&error.retryAfter===seconds&&error.retryBlocked===blocked&&!error.message.includes('private'));
+  });
+});
 test('sync preserves original attachments, direction and source IDs, skips reminders and confirms account',async()=>{
   const requests=[];const messages={one:invoiceMessage('one'),two:invoiceMessage('two','SENT'),three:invoiceMessage('three','INBOX','Betalningspåminnelse för faktura 0606')};
   const result=await withFetch(async(url,options)=>{

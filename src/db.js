@@ -111,7 +111,13 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','payer_bankgiro',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','payer_organization_number',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','reference_evidence',"TEXT NOT NULL DEFAULT '{}'");
+  addColumn('bank_transactions','account_evidence',"TEXT NOT NULL DEFAULT '{}'");
   addColumn('bank_transactions','raw_bank_data',"TEXT NOT NULL DEFAULT '{}'");
+  const rawHashUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='raw_bank_data_sha256');
+  if(rawHashUpgrade){
+    db.exec('BEGIN IMMEDIATE');
+    try{addColumn('bank_transactions','raw_bank_data_sha256',"TEXT NOT NULL DEFAULT ''");for(const original of db.prepare("SELECT id,raw_bank_data FROM bank_transactions WHERE raw_bank_data<>'{}'").all())db.prepare('UPDATE bank_transactions SET raw_bank_data_sha256=? WHERE id=?').run(digest(original.raw_bank_data),original.id);db.exec('COMMIT');}catch(error){db.exec('ROLLBACK');throw error;}
+  }
   addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
   const identityUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='api_identity_version');
   addColumn('bank_transactions','api_identity_version','INTEGER NOT NULL DEFAULT 0');
@@ -131,6 +137,11 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('gmail_connections','sync_started_at',"TEXT NOT NULL DEFAULT ''");
   addColumn('import_jobs','content','BLOB');
   addColumn('import_jobs','mime_type',"TEXT NOT NULL DEFAULT ''");
+  const originalHashUpgrade=!db.prepare('PRAGMA table_info(import_jobs)').all().some(column=>column.name==='content_sha256');
+  if(originalHashUpgrade){
+    db.exec('BEGIN IMMEDIATE');
+    try{addColumn('import_jobs','content_sha256',"TEXT NOT NULL DEFAULT ''");for(const original of db.prepare('SELECT id,content FROM import_jobs WHERE content IS NOT NULL').all())db.prepare('UPDATE import_jobs SET content_sha256=? WHERE id=?').run(digest(original.content),original.id);db.exec('COMMIT');}catch(error){db.exec('ROLLBACK');throw error;}
+  }
   db.prepare("INSERT OR IGNORE INTO app_settings(id,data) VALUES(1,'{}')").run();
   return db;
 }
@@ -148,7 +159,7 @@ export function listInvoices(db) {
 export function listTransactions(db) {
   return db.prepare(`SELECT t.*, COALESCE((SELECT SUM(a.amount_cents) FROM allocations a WHERE a.transaction_id=t.id),0) AS allocated_cents FROM bank_transactions t ORDER BY t.booked_at DESC,t.created_at DESC`).all().map(t=>{
     const available_cents=Math.abs(t.amount_cents)-t.allocated_cents;
-    return {...t,reference_evidence:JSON.parse(t.reference_evidence),raw_bank_data:JSON.parse(t.raw_bank_data),available_cents,status:t.excluded?'excluded':available_cents===0?'matched':t.allocated_cents>0?'partial':t.is_aggregate||(!t.payer&&!t.reference)?'review':'unmatched'};
+    return {...t,reference_evidence:JSON.parse(t.reference_evidence),account_evidence:JSON.parse(t.account_evidence),raw_bank_data:JSON.parse(t.raw_bank_data),available_cents,status:t.excluded?'excluded':available_cents===0?'matched':t.allocated_cents>0?'partial':t.is_aggregate||(!t.payer&&!t.reference)?'review':'unmatched'};
   });
 }
 export function paymentSign(invoice){return (invoice.direction==='customer'?1:-1)*(invoice.kind==='credit'?-1:1);}
@@ -191,7 +202,7 @@ export function assertNoLegacyBankImports(db) {
   if(db.prepare("SELECT id FROM bank_transactions WHERE source='enablebanking' AND api_identity_version=0 LIMIT 1").get())throw Object.assign(new Error('Tidigare bankimport använder äldre konto- eller transaktions-ID:n. Granska och migrera de posterna innan nya bankhändelser hämtas. Inga nya bankhändelser har sparats.'),{status:409,code:'legacy_bank_identity'});
 }
 /** Lagrar importerade bankhändelser och använder identiteter/fingeravtryck för att minska risken för dubletter. */
-export function storeTransactions(db,items,source,original=null) {
+export function storeTransactions(db,items,source,original=null,guard=null) {
   // Legacy lookup IDs and session account UIDs cannot safely be guessed into
   // stable identities. Block the whole API batch until a reviewed migration
   // preserves the old row IDs, exclusions and allocations. Never create a fresh
@@ -201,6 +212,7 @@ export function storeTransactions(db,items,source,original=null) {
   let imported=0,duplicate=0,enriched=0,import_id;const inserted=[],completedSpecifications=[];
   db.exec('BEGIN IMMEDIATE');
   try {
+    guard?.();
     for(const x of items){
       // A bank's stable transaction ID survives enriched payer/text fields on later syncs.
       const bankId=String(x.bank_reference||'').trim();
@@ -211,7 +223,8 @@ export function storeTransactions(db,items,source,original=null) {
       if(existing){
         if(existing.amount_cents!==x.amount_cents||existing.currency!==x.currency||existing.booked_at!==x.booked_at)throw Object.assign(new Error('Samma bankreferens har motstridiga belopp, datum eller valutor. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
         if(source==='enablebanking'&&existing.raw_bank_data==='{}'&&x.raw_bank_data){
-          db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),JSON.stringify(x.raw_bank_data),existing.id);
+          const raw=JSON.stringify(x.raw_bank_data);
+          db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=?,raw_bank_data_sha256=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),raw,digest(raw),existing.id);
           audit(db,'bank_original_attached',{transaction_id:existing.id,reference_version:x.reference_evidence?.version||''});
         }
         // A camt.054/053 can contain exactly one individual payment with the
@@ -227,13 +240,15 @@ export function storeTransactions(db,items,source,original=null) {
           db.prepare("UPDATE bank_transactions SET payer=?,reference=?,description=?,is_aggregate=0,parent_bank_reference=?,review_reason='',needs_review=1,bankgiro=? WHERE id=?")
             .run(x.payer,x.reference,x.description||existing.description,x.parent_bank_reference||'',x.bankgiro||existing.bankgiro,existing.id);
           if(x.reference_evidence)db.prepare('UPDATE bank_transactions SET reference_evidence=? WHERE id=?').run(JSON.stringify(x.reference_evidence),existing.id);
+          if(x.account_evidence)db.prepare('UPDATE bank_transactions SET account_evidence=? WHERE id=?').run(JSON.stringify(x.account_evidence),existing.id);
           completedSpecifications.push({id:existing.id,before:existing});enriched++;
         }
         duplicate++;continue;
       }
       const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'',source==='enablebanking'?1:0);
       if(r.changes){
-        if(x.reference_evidence||x.raw_bank_data)db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),JSON.stringify(x.raw_bank_data||{}),id);
+        if(x.account_evidence)db.prepare('UPDATE bank_transactions SET account_evidence=? WHERE id=?').run(JSON.stringify(x.account_evidence),id);
+        if(x.reference_evidence||x.raw_bank_data){const raw=JSON.stringify(x.raw_bank_data||{});db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=?,raw_bank_data_sha256=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),raw,x.raw_bank_data?digest(raw):'',id);}
         if(x.payer_bankgiro)db.prepare('UPDATE bank_transactions SET payer_bankgiro=? WHERE id=?').run(String(x.payer_bankgiro),id);
         const organization=String(x.payer_organization_number||'').replace(/[- ]/g,'');
         if(/^\d{10}$/.test(organization))db.prepare('UPDATE bank_transactions SET payer_organization_number=? WHERE id=?').run(organization,id);
@@ -267,9 +282,9 @@ export function storeTransactions(db,items,source,original=null) {
   return {imported,duplicate,enriched,import_id};
 }
 /** Bekräftar kopplingen mellan bankhändelse och faktura, med belopps- och riktningskontroller inom en databastransaktion. */
-export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false}={}) {
+export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false,transactionOpen=false}={}) {
   if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');
-  db.exec('BEGIN IMMEDIATE');
+  if(!transactionOpen)db.exec('BEGIN IMMEDIATE');
   try {
     const i=listInvoices(db).find(x=>x.id===invoiceId),t=listTransactions(db).find(x=>x.id===transactionId);
     if(!i||!t)throw new Error('Faktura eller bankhändelse saknas');
@@ -286,8 +301,8 @@ export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false
     db.prepare('INSERT INTO allocations(id,invoice_id,transaction_id,amount_cents) VALUES(?,?,?,?)').run(randomUUID(),invoiceId,transactionId,amountCents);
     db.prepare('UPDATE invoices SET reconciled_at=CURRENT_TIMESTAMP WHERE id=?').run(invoiceId);
     if(t.payer)db.prepare('INSERT OR IGNORE INTO payer_links(id,invoice_id,payer,account,evidence,verified_by,party,organization_number) VALUES(?,?,?,?,?,?,?,?)').run(randomUUID(),i.id,t.payer,t.account,`Verifierad betalningskoppling ${transactionId}`,'allocation',i.party,i.organization_number);
-    audit(db,automatic?'automatic_match':'manual_match',{invoiceId,transactionId,amountCents}); db.exec('COMMIT');
-  }catch(e){db.exec('ROLLBACK');throw e;}
+    audit(db,automatic?'automatic_match':'manual_match',{invoiceId,transactionId,amountCents});if(!transactionOpen)db.exec('COMMIT');
+  }catch(e){if(!transactionOpen)db.exec('ROLLBACK');throw e;}
 }
 /** Ångrar en tidigare matchning och låter saldot beräknas om; åtgärden ska vara spårbar. */
 export function deleteAllocation(db,id){
@@ -309,9 +324,9 @@ export const defaultSettings={company_name:'M.George Vitvaror AB',organization_n
 export function getSettings(db){return {...defaultSettings,...JSON.parse(db.prepare('SELECT data FROM app_settings WHERE id=1').get().data)};}
 export function saveSettings(db,settings){db.prepare('UPDATE app_settings SET data=? WHERE id=1').run(JSON.stringify(settings));audit(db,'settings_updated',{fields:Object.keys(settings)});return getSettings(db);}
 export function recordImport(db,{source,name='',found=0,imported=0,duplicate=0,review=0,status='completed',error='',content=null,mime_type=''}){
-  const id=randomUUID();db.prepare('INSERT INTO import_jobs(id,source,name,found,imported,duplicate,review,status,error,content,mime_type) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(id,source,name,found,imported,duplicate,review,status,error,content,mime_type);return id;
+  const id=randomUUID();db.prepare('INSERT INTO import_jobs(id,source,name,found,imported,duplicate,review,status,error,content,mime_type,content_sha256) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').run(id,source,name,found,imported,duplicate,review,status,error,content,mime_type,content===null?'':digest(content));return id;
 }
-export function listImports(db){return db.prepare('SELECT id,source,name,found,imported,duplicate,review,status,error,created_at,mime_type,(content IS NOT NULL) AS has_original FROM import_jobs ORDER BY created_at DESC,rowid DESC LIMIT 200').all();}
+export function listImports(db){return db.prepare('SELECT id,source,name,found,imported,duplicate,review,status,error,created_at,mime_type,content_sha256,(content IS NOT NULL) AS has_original FROM import_jobs ORDER BY created_at DESC,rowid DESC LIMIT 200').all();}
 export function documentMetadata(d){const {content,fingerprint,...metadata}=d;const details=typeof d.metadata==='string'?JSON.parse(d.metadata):d.metadata;return {...metadata,content_hash:fingerprint,extraction:typeof d.extraction==='string'?JSON.parse(d.extraction):d.extraction,metadata:details,direction:details?.direction,party:details?.party,email:details?.email,subject:details?.subject,size_bytes:content?.length??d.size_bytes??0};}
 export function listDocuments(db){return db.prepare('SELECT id,invoice_id,name,mime_type,source,source_id,metadata,status,extraction,fingerprint,created_at,length(content) AS size_bytes FROM documents ORDER BY created_at DESC,rowid DESC').all().map(d=>({...documentMetadata(d),sources:db.prepare('SELECT source_id,metadata,created_at FROM document_sources WHERE document_id=?').all(d.id).map(s=>({...s,metadata:JSON.parse(s.metadata)}))}));}
 export function storeDocument(db,{name,mime_type,bytes,invoice_id=null,source='upload',source_id=null,metadata={}}){

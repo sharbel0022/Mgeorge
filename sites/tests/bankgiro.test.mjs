@@ -130,3 +130,35 @@ test('V3 competing bare Ustrd values cannot silently pay only the first invoice'
  }
 });
 
+test('ISO reversal booleans and malformed reversal flags cannot become incoming payments',()=>{
+ for(const flag of ['true','1','TRUE','yes'])assert.throws(()=>parseBankgiroXML(xml(detail(),'625.00',`<RvslInd>${flag}</RvslInd>`)),/Återför|återför|Ogiltig/);
+ for(const flag of ['false','0'])assert.equal(parseBankgiroXML(xml(detail(),'625.00',`<RvslInd>${flag}</RvslInd>`))[0].amount,62500);
+});
+
+test('duplicate financial XML singletons never silently select the first bank fact',()=>{
+ for(const [before,after]of [
+  ['<Amt Ccy="SEK">625.00</Amt>','<Amt Ccy="SEK">625.00</Amt><Amt Ccy="SEK">999.00</Amt>'],
+  ['<CdtDbtInd>CRDT</CdtDbtInd>','<CdtDbtInd>CRDT</CdtDbtInd><CdtDbtInd>DBIT</CdtDbtInd>'],
+  ['<BookgDt><Dt>2026-10-26</Dt></BookgDt>','<BookgDt><Dt>2026-10-26</Dt><Dt>2026-10-25</Dt></BookgDt>'],
+  ['<Dbtr><Nm>Café Gränden Bistro AB</Nm></Dbtr>','<Dbtr><Nm>Café Gränden Bistro AB</Nm><Nm>Annan betalare AB</Nm></Dbtr>'],
+  ['<Refs><TxId>CHILD-1</TxId></Refs>','<Refs><TxId>CHILD-1</TxId><TxId>CHILD-2</TxId></Refs>'],
+ ])assert.throws(()=>parseBankgiroXML(xml().replace(before,after)),/XML|tvetyd|flera/);
+});
+
+test('CSV dates cannot discard trailing content and XML date-times remain explicit',()=>{
+ assert.throws(()=>parseBankgiroCSV(csv.replace('2026-10-26','2026-10-26fel')),/datum/);
+ assert.throws(()=>parseBankgiroXML(xml().replace('<Dt>2026-10-26</Dt>','<Dt>2026-10-26fel</Dt>')),/datum/);
+ assert.equal(parseBankgiroXML(xml().replace('<Dt>2026-10-26</Dt>','<DtTm>2026-10-26T12:30:00+01:00</DtTm>'))[0].date,'2026-10-26');
+});
+
+test('ambiguous CSV headers, column counts and malformed quoted payer names fail closed',()=>{
+ for(const input of [
+  csv.replace(';Belopp;',';Belopp;Inbetalningsbelopp;').replace(';625,00;',';625,00;999,00;'),
+  csv.replace(';Avsändare;',';Avsändare;Betalare;').replace(';Café Gränden Bistro AB;',';Café Gränden Bistro AB;Annan kund;'),
+  csv+';extra-column',
+  csv.replace('Café Gränden Bistro AB','Café "Gränden" Bistro AB'),
+  csv.replace('Café Gränden Bistro AB','"Café Gränden Bistro AB"annat'),
+ ])assert.throws(()=>parseBankgiroCSV(input),/CSV|kolumn|citat|tvetyd/i);
+ assert.equal(parseBankgiroCSV(csv.replace('Café Gränden Bistro AB','"Café ""Gränden""; Bistro AB"'))[0].party,'Café "Gränden"; Bistro AB');
+});
+

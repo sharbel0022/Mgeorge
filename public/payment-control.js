@@ -45,7 +45,29 @@ function paymentGroupUI(t){
   if(t.amount_cents<0||/kortköp|card purchase|card refund|återbetalning.*kort|löneutbetalning/iu.test(`${t.description||''} ${t.reference||''}`))return 'other';
   return t.amount_cents>0?'incoming':'other';
 }
-function paymentTitleUI(t){return t.payer?.trim()||(t.is_aggregate?'Bankgiro – betalningsspecifikation saknas':t.description?.trim()||(t.amount_cents<0?'Utbetalning – mottagare saknas':'Inbetalning – betalare saknas'));}
+function bankFileOriginalUI(t){return state.imports.find(j=>j.id===t.import_id&&j.source==='bank_file'&&/^[a-f0-9]{64}$/i.test(j.content_sha256||''));}
+function bankEvidenceUI(t){
+  if(t.is_aggregate)return false;
+  if(bankFileOriginalUI(t))return true;
+  if(t.source==='enablebanking')return /^[a-f0-9]{64}$/i.test(t.raw_bank_data_sha256||'')&&t.raw_bank_data?.status==='BOOK';
+  return false;
+}
+function bankPayerUI(t){
+  if(!bankEvidenceUI(t))return '';
+  const raw=bankFileOriginalUI(t)?t.payer:t.source==='enablebanking'?(t.amount_cents<0?t.raw_bank_data?.creditor?.name:t.raw_bank_data?.debtor?.name):'';
+  const value=typeof raw==='string'?raw.trim():'';
+  return value&&value.length<=240&&!/^(?:bankgirot?|swedbank|betalare okänd|betalardetaljer saknas)(?:\s|$)/iu.test(value)?value:'';
+}
+function bankOCRUI(t){return bankEvidenceUI(t)?(t.reference_evidence?.candidates||[]).find(c=>c.kind==='ocr'&&c.value===t.reference)?.value||'':'';}
+function bankStatusLabelUI(t){
+  if(t.excluded||t.status==='excluded')return 'Undantagen';
+  if(t.is_aggregate)return 'Specifikation saknas';
+  const allocations=state.allocations.filter(a=>a.transaction_id===t.id),invoices=allocations.map(a=>state.invoices.find(i=>i.id===a.invoice_id));
+  if(invoices.some(i=>i?.remaining_cents>0))return 'Delbetalning';
+  if(allocations.length&&invoices.every(i=>i&&i.remaining_cents===0)&&t.available_cents>0)return 'Överbetalning';
+  return t.status==='partial'?'Delvis fördelad':undefined;
+}
+function paymentTitleUI(t){return bankPayerUI(t)||(t.amount_cents<0?'Mottagare okänd':'Betalare okänd');}
 function paymentBankPage(){
   const f=state.filters.bank;
   const tabs=[['incoming','Kundinbetalningar'],['identify','Behöver identifieras'],['bankgiro','Bankgiro-underlag'],['other','Övrigt'],['matched','Matchade'],['all','Alla'],['excluded','Undantagna']];

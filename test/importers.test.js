@@ -132,3 +132,43 @@ test('API purchase date is never substituted for a missing accounting date',()=>
   const fallback=normalizeBankApiTransaction(apiTransaction({booking_date:undefined,transaction_date:'2026-10-20',value_date:'2026-10-26'}),'MG');assert.equal(fallback.booked_at,'2026-10-26');
   assert.throws(()=>normalizeBankApiTransaction(apiTransaction({booking_date:undefined,transaction_date:'2026-10-20',value_date:undefined}),'MG'),/Ogiltigt datum/);
 });
+
+test('camt statement account cannot be relabelled as a different selected IBAN',()=>{
+  const xml=camt(detail('300.00','101')).replace('<Ntfct>','<Ntfct><Acct><Id><IBAN>SE4550000000058398257466</IBAN></Id></Acct>');
+  assert.throws(()=>parseCAMT(xml,'SE3550000000054910000003'),/konto/i);
+  assert.equal(parseCAMT(xml,'SE45 5000 0000 0583 9825 7466')[0].account,'SE4550000000058398257466');
+});
+
+test('CSV explicit account cannot contradict the selected company account',()=>{
+  const csv='Datum;Belopp;IBAN;Betalare;Referens\n2026-10-26;300;SE4550000000058398257466;Kund AB;101';
+  assert.throws(()=>parseCSV(csv,'SE3550000000054910000003'),/konto/i);
+});
+
+test('a mixed-account statement cannot collapse multiple company accounts under one alias',()=>{
+  const first=camt(detail('300.00','101')).match(/<Ntfct>([\s\S]*)<\/Ntfct>/)[1];
+  const xml=`<Document><BkToCstmrDbtCdtNtfct><Ntfct><Acct><Id><IBAN>SE4550000000058398257466</IBAN></Id></Acct>${first}</Ntfct><Ntfct><Acct><Id><IBAN>SE3550000000054910000003</IBAN></Id></Acct>${first}</Ntfct></BkToCstmrDbtCdtNtfct></Document>`;
+  assert.throws(()=>parseCAMT(xml,'MG'),/flera konton/i);
+});
+
+test('reversed camt entries and details never become positive customer payments',()=>{
+  assert.throws(()=>parseCAMT(camt(detail('300.00','101'),{extra:'<RvslInd>true</RvslInd>'})),/återför/i);
+  assert.throws(()=>parseCAMT(camt(detail('300.00','101').replace('<TxDtls>','<TxDtls><RvslInd>true</RvslInd>'))),/återför/i);
+});
+
+test('malformed reversal flags, repeated bank facts, signed magnitudes and date suffixes fail closed',()=>{
+  for(const flag of ['<RvslInd/>','<RvslInd>maybe</RvslInd>','<RvslInd>false</RvslInd><RvslInd>true</RvslInd>'])assert.throws(()=>parseCAMT(camt(detail('300.00','101'),{extra:flag})),/XML|återför/i);
+  assert.throws(()=>parseCAMT(camt(detail('300.00','101'),{extra:'<CdtDbtInd>DBIT</CdtDbtInd>'})),/XML/i);
+  assert.throws(()=>parseCAMT(camt(detail('-300.00','101'),{amount:'-300.00'})),/belopp/i);
+  assert.throws(()=>parseCAMT(camt(detail('300.00','101')).replace('2026-10-26','2026-10-26T12:00garbage')),/datum/i);
+  assert.throws(()=>parseCSV('Datum;Belopp\n2026-10-26T12:00garbage;300'),/datum/i);
+});
+
+test('CSV ambiguous columns, inconsistent row width and malformed quotes cannot hide bank facts',()=>{
+  assert.throws(()=>parseCSV('Datum;Belopp;OCR;Referens\n2026-10-26;300;000018;OTHER'),/kolumn/i);
+  assert.throws(()=>parseCSV('Datum;Belopp;Betalare\n2026-10-26;300;Kund;EXTRA'),/kolumn|fält/i);
+  assert.throws(()=>parseCSV('Datum;Belopp;Betalare\n2026-10-26;300;"Kund"suffix'),/CSV/i);
+});
+
+test('API amount magnitude must be unsigned independently of credit and debit direction',()=>{
+  for(const credit_debit_indicator of ['CRDT','DBIT'])for(const amount of ['-625.00','+625.00','(625.00)','625,00'])assert.throws(()=>normalizeBankApiTransaction(apiTransaction({credit_debit_indicator,transaction_amount:{amount,currency:'SEK'}}),'MG'),/belopp/i);
+});

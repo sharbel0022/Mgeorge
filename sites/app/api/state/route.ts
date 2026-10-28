@@ -1,6 +1,6 @@
 import {reconcileState} from '@/lib/reconciliation';
 import {reconcileAndPrepare} from '@/lib/customer-messages';
-import { db, identity, readWorkspace, response, failure } from "@/lib/server";
+import { db, identity, readWorkspace, readBankFileOriginal, response, failure } from "@/lib/server";
 import { applyCommand, emptyState, now, uid } from "@/lib/domain";
 import {readBankgiroOriginal} from '@/lib/bankgiro-service';
 import {searchBankgiroInvoice} from '@/lib/bankgiro-invoice-search';
@@ -11,9 +11,12 @@ export async function POST(req:Request){try{
  const body=JSON.parse(text);if(!Number.isSafeInteger(body.revision)||typeof body.requestId!=='string'||!/^[a-zA-Z0-9-]{10,80}$/.test(body.requestId))return response({error:'Ogiltig förfrågan.'},400);
  const old=await readWorkspace(user.userId);if(old.state.receipts.includes(body.requestId))return response({...old,message:'Åtgärden är redan sparad.'});
  if(old.revision!==body.revision)return response({error:'Uppgifterna ändrades i ett annat fönster. Uppdatera sidan innan du försöker igen.'},409);
- const command=body.command;if(command&&typeof command==='object')delete command.trustedBankImport;const documentId=command?.invoice?.documentId||command?.documentId;if(documentId){const doc=await db().prepare('SELECT id FROM documents WHERE id=? AND owner=?').bind(documentId,user.userId).first();if(!doc)throw new Error('Bilagan kunde inte hittas för ditt konto.');}
+ const command=body.command;if(command&&typeof command==='object'){delete command.trustedBankImport;delete command.trustedBankFileImport;delete command.bankFileProof;}const documentId=command?.invoice?.documentId||command?.documentId;if(documentId){const doc=await db().prepare('SELECT id FROM documents WHERE id=? AND owner=?').bind(documentId,user.userId).first();if(!doc)throw new Error('Bilagan kunde inte hittas för ditt konto.');}
  if(command?.type==='bankgiro.import')Object.assign(command,await readBankgiroOriginal(user.userId,command));
- if(command?.type==='transactions.import'&&Array.isArray(command.rows))command.rows=command.rows.map((r:any)=>({...r,verified:false,specification:false,evidence:undefined}));
+ if(command?.type==='transactions.import'){
+  if(command.documentId)Object.assign(command,await readBankFileOriginal(user.userId,command));
+  else if(Array.isArray(command.rows))command.rows=command.rows.map((r:any)=>({...r,verified:false,specification:false,evidence:undefined}));
+ }
  const result=applyCommand(old.state,command);const automatic=reconcileState(result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];const payload=JSON.stringify(result.state);
  if(new TextEncoder().encode(payload).length>1_800_000)throw new Error('Registret är för stort för den här versionen. Exportera dina uppgifter innan vidare import.');
  const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces (owner, revision, payload, updated_at) VALUES (?, 0, ?, ?)').bind(user.userId,JSON.stringify(emptyState()),at).run();

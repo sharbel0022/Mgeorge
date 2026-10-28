@@ -41,6 +41,15 @@ test('client imports cannot claim to hold authenticated raw bank data',async()=>
  const state=applyCommand(emptyState(),{type:'transactions.import',rows}).state;
  assert.equal(state.transactions[0].bankData,undefined);assert.equal(state.transactions[0].referenceEvidence,undefined);
 });
+
+test('overlong bank payer identity is retained in original but never truncated into a matching name',async()=>{
+ const actualName='A'.repeat(200)+' Annan betalare AB',input=rawTx({debtor:{name:actualName}});
+ const result=await normalizeTransactions([input],opts);
+ assert.equal(result.rows[0].party,'');assert.equal(result.rows[0].bankData.debtor.name,actualName);
+ assert.ok(result.warnings.some(w=>/betalar.*för lång|långa betalar/i.test(w)));
+ const state=applyCommand(emptyState(),{type:'transactions.import',rows:result.rows,trustedBankImport:true}).state;
+ assert.equal(state.transactions[0].verified,false);assert.equal(state.transactions[0].party,'');
+});
 test('transaction details use the documented scoped GET and retain the payer reference as text',async t=>{
  let call;t.mock.method(globalThis,'fetch',async(url,init)=>{call={url,init};return json(rawTx({reference_number:'0599',debtor:{name:'Café Gränden Bistro AB'}}));});
  const tx=await getTransactionDetails(config,accountUid,'fresh-lookup:id');assert.equal(tx.reference_number,'0599');assert.equal(call.url,`https://api.enablebanking.com/accounts/${accountUid}/transactions/fresh-lookup%3Aid`);assert.equal(call.init.method,'GET');

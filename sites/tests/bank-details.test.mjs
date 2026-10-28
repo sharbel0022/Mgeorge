@@ -13,6 +13,15 @@ test('list remittance text never becomes OCR without individual structured evide
 test('detail responses expose nested OCR candidates and their source without modifying financial fields',()=>{const initial=state(),t=initial.transactions[0],r=raw({reference_number:null,details:{OCR:'1234567897'}}),e=transactionDetailEvidence(t,r,r);assert.equal(e.payerReference,'1234567897');assert.ok(e.referenceEvidence.candidates.some(c=>c.source==='$.detail.details.OCR'));const s=enrichBankDetails(initial,t.id,e,'doc');assert.equal(s.transactions[0].kind,'batch');assert.equal(s.allocations.length,0);});
 test('wrong bank ID, amount, currency, date, direction or pending status cannot enrich a transaction',()=>{const t=state().transactions[0];for(const patch of [{entry_reference:'other'},{transaction_amount:{amount:'624.99',currency:'SEK'}},{transaction_amount:{amount:'625',currency:'EUR'}},{booking_date:'2026-10-25'},{credit_debit_indicator:'DBIT'},{status:'PDNG'}])assert.throws(()=>transactionDetailEvidence(t,raw(),raw(patch)));});
 
+test('negative detail magnitude cannot cancel an opposite direction to counterfeit a matching payment',()=>{
+ const t=state().transactions[0];
+ for(const patch of [
+  {transaction_amount:{amount:'-625.00',currency:'SEK'},credit_debit_indicator:'DBIT'},
+  {transaction_amount:{amount:'625,00',currency:'SEK'}},
+  {transaction_amount:{amount:625,currency:'SEK'}},
+ ])assert.throws(()=>transactionDetailEvidence(t,raw(),raw(patch)));
+});
+
 const shared=codeUrl('export const env=new Proxy({}, {get:(_,k)=>globalThis.bankDetailsTest.env[k]});');
 const auth=codeUrl('export async function getChatGPTUser(){return globalThis.bankDetailsTest.user;}');
 const server=compiled('../lib/server.ts',{'cloudflare:workers':shared,'@/app/chatgpt-auth':auth,'./domain':domain});

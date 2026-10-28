@@ -180,6 +180,13 @@ test('a conflicting bank identifier aborts the whole import and retains existing
   }finally{cleanup();}
 });
 
+test('a revoked job guard aborts bank import inside the transaction before any writes',()=>{
+  const {db,cleanup}=fixture();try{
+    let called=false;assert.throws(()=>storeTransactions(db,[{account:'MG',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Kund',reference:'001',bank_reference:'LEASED'}],'enablebanking',null,()=>{called=true;throw new Error('lease revoked');}),/lease revoked/);
+    assert.equal(called,true);assert.equal(listTransactions(db).length,0);assert.equal(listImports(db).length,0);
+  }finally{cleanup();}
+});
+
 const singleSpecification=(extra={})=>{
   const values={amount:'100.00',date:'2026-10-26',reference:'0606',payer:'Kund AB',bankReference:'BG-ARCHIVE-1',...extra};
   const xml=`<Document><BkToCstmrDbtCdtNtfct><Ntfct><Ntry><Amt Ccy="SEK">${values.amount}</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts><Cd>BOOK</Cd></Sts><BookgDt><Dt>${values.date}</Dt></BookgDt><AcctSvcrRef>${values.bankReference}</AcctSvcrRef><AddtlNtryInf>Bankgiro inbetalning</AddtlNtryInf><NtryDtls><TxDtls><AmtDtls><TxAmt><Amt Ccy="SEK">${values.amount}</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>${values.payer}</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>${values.reference}</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfct></BkToCstmrDbtCdtNtfct></Document>`;

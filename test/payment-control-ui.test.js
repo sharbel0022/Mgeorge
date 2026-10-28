@@ -67,5 +67,41 @@ test('financial queue filter keeps one action per item and identification exclud
    {id:'aggregate',amount_cents:10000,available_cents:10000,is_aggregate:true},
    {id:'refund',amount_cents:10000,available_cents:10000,description:'Card refund'}]);
  v.run("state.transactions=transactions;state.filters.bank.status='identify'");const rows=v.run('paymentBankResults()');
- assert.match(rows,/Test customer/);assert.doesNotMatch(rows,/Card refund|data-transaction="aggregate"/);
+ assert.match(rows,/data-transaction="incoming"/);assert.doesNotMatch(rows,/Card refund|data-transaction="aggregate"/);
+});
+
+test('bank list exposes six facts and never promotes an invoice suggestion to bank OCR or payer',()=>{
+ const v=view();v.set('rows',[{id:'bank',amount_cents:62500,booked_at:'2026-10-28',description:'Bankgiro collection description',payer:'Bankgirot',is_aggregate:true,status:'review'}]);
+ v.run("state.suggestions=[{transaction_id:'bank',invoice_id:'i'}];state.invoices=[{id:'i',invoice_number:'0599',party:'Invoice customer'}]");
+ const html=v.run('bankTable(rows)');assert.equal((html.match(/<th(?: |\>)/g)||[]).length,6);
+ for(const label of ['Betalare','Faktura','OCR','Belopp','Datum','Status','Betalare okänd','Möjlig faktura: 0599','Saknas i bankunderlaget'])assert.ok(html.includes(label),label);
+ assert.doesNotMatch(html,/Bankgiro collection description|Invoice customer|<strong>Bankgirot<\/strong>/);
+});
+
+test('numeric invoice references stay separate from typed bank OCR and manual payer completion',()=>{
+ const v=view();v.set('rows',[{id:'bank',source:'manual',payer:'Typed customer',amount_cents:62500,booked_at:'2026-10-28',reference:'0599',status:'review',reference_evidence:{candidates:[{kind:'ocr',value:'0599'}]}}]);
+ const html=v.run('bankTable(rows)');assert.match(html,/Betalare okänd/);assert.match(html,/Manuellt angivet: Typed customer/);assert.match(html,/Saknas i bankunderlaget/);
+ v.set('rows',[{id:'bank',source:'enablebanking',payer:'Bank customer',raw_bank_data_sha256:'a'.repeat(64),raw_bank_data:{status:'BOOK',debtor:{name:'Bank customer'}},amount_cents:62500,booked_at:'2026-10-28',reference:'0599',status:'review',reference_evidence:{candidates:[{kind:'invoice',value:'0599'}]}}]);
+ assert.match(v.run('bankTable(rows)'),/Saknas i bankunderlaget/);
+});
+
+test('bank supplied payer and explicit OCR preserve leading zeros and escape untrusted text',()=>{
+ const v=view();v.set('rows',[{id:'bank',source:'enablebanking',payer:'Bank <customer>',raw_bank_data_sha256:'a'.repeat(64),raw_bank_data:{status:'BOOK',debtor:{name:'Bank <customer>'}},amount_cents:62500,booked_at:'2026-10-28',reference:'000018',status:'review',reference_evidence:{candidates:[{kind:'ocr',value:'000018'}]}}]);
+ const html=v.run('bankTable(rows)');assert.match(html,/Bank &lt;customer&gt;/);assert.match(html,/data-label="OCR">000018/);assert.doesNotMatch(html,/<customer>/);
+});
+
+test('a bank aggregate completed from a retained individual file displays that file identity',()=>{
+ const v=view();v.set('rows',[{id:'bank',source:'enablebanking',import_id:'file',payer:'Individual bank payer',raw_bank_data_sha256:'a'.repeat(64),raw_bank_data:{status:'BOOK',debtor:{name:'Bankgirot'}},amount_cents:62500,booked_at:'2026-10-28',reference:'000018',status:'unmatched',reference_evidence:{candidates:[{kind:'ocr',value:'000018'}]}}]);
+ v.run("state.imports=[{id:'file',source:'bank_file',content_sha256:'"+'b'.repeat(64)+"'}]");
+ const html=v.run('bankTable(rows)');assert.match(html,/Individual bank payer/);assert.match(html,/data-label="OCR">000018/);
+});
+
+test('bank status reflects the invoice remainder and excess even when the bank row is fully allocated',()=>{
+ const v=view();v.set('rows',[{id:'bank',source:'manual',amount_cents:25000,available_cents:0,booked_at:'2026-10-28',status:'matched'}]);
+ v.run("state.allocations=[{transaction_id:'bank',invoice_id:'i'}];state.invoices=[{id:'i',invoice_number:'0600',remaining_cents:75000}]");
+ assert.match(v.run('bankTable(rows)'),/data-label="Status">[^]*Delbetalning/);
+ v.run('state.invoices[0].remaining_cents=0;rows[0].available_cents=5000;rows[0].status="partial"');
+ assert.match(v.run('bankTable(rows)'),/data-label="Status">[^]*Överbetalning/);
+ v.run('rows[0].excluded=true;rows[0].status="excluded"');
+ assert.doesNotMatch(v.run('bankTable(rows)'),/Överbetalning/);
 });
