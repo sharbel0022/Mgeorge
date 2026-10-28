@@ -69,6 +69,34 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(set(schema["required"]), set(schema["properties"]))
         self.assertIn("done", schema["properties"])
 
+    def test_logged_subprocess_collects_logs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.object(runner, "ROOT", root):
+                result = runner.run_logged([sys.executable, "-c", "print('OK')"], root,
+                                           root / "logs" / "unit", timeout=5)
+            self.assertEqual(0, result["exit_code"])
+            self.assertFalse(result["timed_out"])
+            self.assertIn("OK", (root / result["stdout"]).read_text())
+
+    def test_logged_subprocess_is_stopped_at_timeout(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.object(runner, "ROOT", root):
+                result = runner.run_logged([sys.executable, "-c", "import time;time.sleep(5)"], root,
+                                           root / "logs" / "slow", timeout=0.2)
+            self.assertTrue(result["timed_out"])
+            self.assertNotEqual(0, result["exit_code"])
+
+    def test_protected_file_modification_aborts(self):
+        def fake_git(args, **kwargs):
+            if "--name-only" in args:
+                return "scripts/codex_24h.py"
+            return ""
+        with mock.patch.object(runner, "command", side_effect=fake_git):
+            with self.assertRaisesRegex(RuntimeError, "Protected files"):
+                runner.check_protected()
+
     def test_dry_run_makes_no_repo_mutation(self):
         import argparse
         status = runner.run(argparse.Namespace(hours=24, max_rounds=48, round_minutes=40,

@@ -286,6 +286,7 @@ def run(args: argparse.Namespace) -> int:
     baseline = state.get("baseline", {})
     clean_cycles = 0
     stalled = 0
+    codex_errors = 0
     previous_diff = command(["git", "status", "--porcelain"])
     try:
         for i in range(len(state["rounds"]) + 1, args.max_rounds + 1):
@@ -316,7 +317,8 @@ def run(args: argparse.Namespace) -> int:
                     report = json.loads(out_json.read_text(encoding="utf-8"))
                 except (ValueError, OSError):
                     pass
-            if execution["exit_code"] != 0 or execution["timed_out"]:
+            codex_errors = (codex_errors + 1) if (execution["exit_code"] != 0 or execution["timed_out"]) else 0
+            if codex_errors:
                 gates = {}
                 passed = False
             else:
@@ -338,8 +340,8 @@ def run(args: argparse.Namespace) -> int:
             if clean_cycles >= 2:
                 state["status"] = "automatic_checks_green_needs_human_review"
                 break
-            if execution["exit_code"] != 0 or execution["timed_out"]:
-                state["status"] = "codex_error_or_timeout"
+            if codex_errors >= 3:
+                state["status"] = "repeated_codex_errors_or_timeouts"
                 break
             if stalled >= 3:
                 state["status"] = "stalled_manual_review_needed"

@@ -44,7 +44,7 @@ python3 scripts/codex_24h.py --hours 24 --max-rounds 48 --round-minutes 40
 2. Baslinje: `git diff --check`; Node syntax/test/audit; Sites TypeScript/test/audit/build. Resultaten, även eventuella fel, sparas.
 3. En Codex-iteration får undersöka, förbättra och lägga till regressionstester i sin begränsade sandbox (`workspace-write`, ingen interaktiv höjning av rättigheter).
 4. Samma oberoende kontroller körs igen. Testräknaren får inte minska jämfört med baslinjen, och överhoppade test stoppar grönt resultat.
-5. Upprepa vid fel och kvarvarande arbete. Avbryt vid timeout, skyddsfel, ändrad Git HEAD, uteblivet framsteg, upprepat verifierat tekniskt grönt resultat eller max 24 timmar.
+5. Upprepa vid fel och kvarvarande arbete. Försök igen efter enstaka Codex-fel/timeout; avbryt vid upprepade fel, skyddsfel, ändrad Git HEAD, uteblivet framsteg, upprepat verifierat tekniskt grönt resultat eller max 24 timmar.
 
 Ingen del av körningen kontaktar med avsikt Swedbank, Bankgirot, Gmail eller ChatGPT Sites. Kör därför ändå i ett avskilt system med inga verkliga hemligheter, eftersom automatiskt genererad testkod inte kan garanteras vara sidoeffektsfri.
 
