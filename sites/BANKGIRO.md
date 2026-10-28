@@ -2,6 +2,12 @@
 
 Importen accepterar camt.054/camt.053 XML och Bankgiro CSV. Den läser om det sparade R2-originalet på servern före bekräftelse. Förhandsgranskningen skriver inga betalningar eller originalfiler.
 
+När en sparad samlingspost öppnas kontrolleras nu också Enable Bankings separata detalj-API: `GET /accounts/{account_id}/transactions/{transaction_id}`. En ny lista för exakt konto och bokföringsdag används för att hitta aktuellt tillfälligt lookup-ID. Stabil bankreferens, datum, belopp, valuta och riktning måste stämma i både lista och detaljsvar. Endast det redan valda företagskontot och befintligt medgivande används. Detaljsvaret sparas som ägarskyddat R2-original och OCR/betalare visas separat från bankens ursprungsfält. En samlingspost frigörs inte för bokning av denna visningskomplettering. Detaljkontrollen lagrar inga allokeringar och anropar ingen mejlsändning. Om banken saknar individuella uppgifter anges detta uttryckligen.
+
+Dokumentation: [Enable Banking – Get transaction details](https://enablebanking.com/docs/api/reference/#get-transaction-details).
+
+Om banken saknar OCR visas möjliga fakturanummer från redan registrerade fakturor och sparade Gmail-original. Tolkningens `fields.<fält>.value` läses korrekt och inledande nollor bevaras. Förslag kräver rätt betalningsriktning, samma belopp och ett fakturadatum som inte ligger efter betalningen. Avvisade, makulerade och redan betalda fakturor föreslås inte. Flera kandidater hålls isär. Numret märks uttryckligen som förslag och ersätter aldrig bankens saknade OCR. Kandidatsökningen är skrivskyddad och ändrar inga betalningar, fakturor eller mejl.
+
 För automatisk koppling till en befintlig Swedbank-samlingspost krävs samma fullständiga mottagarkonto, bokföringsdatum, valuta, insättningsidentifierare och exakt totalsumma. Konton kan översättas till bankanslutningens stabila identitet endast genom fullständiga identifierare från redan valda och krypterat sparade bankkonton. Ett maskerat kontos slutnummer räcker aldrig.
 
 Originalposten ändras inte. Individuella betalningar får parentId och ersätter föräldern ekonomiskt. Obundna specifikationer har specificationStatus=review, saknar verifiering och får inte matchas eller manuellt frigöras. Återimport jämför filhash, individuella bankidentifierare och redan kopplade betalningar. Konflikter hålls för granskning.

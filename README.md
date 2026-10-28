@@ -6,6 +6,8 @@ Repositoryt innehåller nu både den fristående Node-versionen i `src/` och den
 
 ## Bankgiro – Sites version 24
 
+**Uppdatering, Sites version 26:** Betalningsvyn visar nu fakturanummer som uttryckligen märkta förslag även när bankens OCR saknas. Sökningen läser korrekt de inbäddade värdena i hämtade Gmail-underlag. Bankens separata detalj-API kontrolleras när en samlingspost öppnas; svaret bevaras utan automatisk bokning. **228 Sites-tester** passerar. Se [uppföljningen om OCR och fakturanummer](docs/BANKGIRO-REFERENCE-FOLLOWUP.md).
+
 Bankgiroimport med förhandsgranskning, sparat original, kontroll av konto/datum/identifierare/totalsumma, spärr av osäkra specifikationer och automatisk avstämning när både fakturareferens och kund stämmer. 0599 behåller nollan; avsändarens Bankgiro/Avinummer hålls separat från bankreferens och OCR. Saknade fakturor söks i Gmail med befintliga medgivanden och begränsningar. Kundmejl skickas aldrig av importen.
 
 **209 Sites-tester** och **209 Node-tester** passerar, inklusive syntetiska betalningar, originalkontroll, ägaråtkomst och sessionsbortfall. TypeScript och produktionsbygge är godkända. Företagets verkliga Bankgiroexport återstår att verifiera. Se [leveransrapporten](docs/BANKGIRO-DELIVERY.md) och [format- och driftinformationen](sites/BANKGIRO.md).

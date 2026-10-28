@@ -54,6 +54,7 @@ const REQUEST_TIMEOUT_MS = 20_000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SESSION_PATH = /^\/sessions\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TRANSACTIONS_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/transactions$/i;
+const TRANSACTION_DETAIL_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/transactions\/[^/]+$/i;
 
 export class ProviderError extends Error {
   code: string;
@@ -79,6 +80,10 @@ function checkedUrl(path: string, method: string): URL {
   else if (method === 'POST' && (url.pathname === '/auth' || url.pathname === '/sessions')) { /* no query */ }
   else if ((method === 'GET' || method === 'DELETE') && SESSION_PATH.test(url.pathname)) { /* no query */ }
   else if (method === 'GET' && TRANSACTIONS_PATH.test(url.pathname)) allowedKeys = ['date_from', 'date_to', 'transaction_status', 'continuation_key'];
+  else if (method === 'GET' && TRANSACTION_DETAIL_PATH.test(url.pathname)) {
+    let id:string;try{id=decodeURIComponent(url.pathname.split('/').pop()||'');}catch{throw invalid();}
+    if(!id||id.length>4096||/[\/\\?#\u0000-\u001f\u007f]/.test(id)||['.','..'].includes(id))throw invalid();
+  }
   else throw invalid();
   for (const key of url.searchParams.keys()) if (!allowedKeys.includes(key) || url.searchParams.getAll(key).length !== 1) throw invalid();
   if (url.pathname === '/aspsps') {
@@ -160,6 +165,7 @@ function mappedError(status: number, payload: unknown): ProviderError {
   if (status === 403 || ['ACCESS_DENIED', 'UNAUTHORIZED_IP'].includes(code)) return new ProviderError('PROVIDER_ACCESS_DENIED', 'Enable Banking har inte aktiverat åtkomsten. Kontrollera applikationens status och avtal.', 403);
   if (code === 'WRONG_ASPSP_PROVIDED') return new ProviderError('BANK_UNAVAILABLE', 'Bankalternativet är inte längre tillgängligt. Hämta banklistan igen.', 409);
   if (code === 'WRONG_CONTINUATION_KEY') return new ProviderError('BANK_SYNC_RESTART_REQUIRED', 'Bankens sidnyckel har gått ut. Börja om hämtningen. Ingen import gjordes.', 409);
+  if(status===404)return new ProviderError('BANK_RESOURCE_UNAVAILABLE','Den begärda bankuppgiften finns inte tillgänglig.',404);
   return new ProviderError('BANK_SERVICE_ERROR', 'Banktjänsten kunde inte slutföra förfrågan. Ingen import gjordes.', 502, status >= 500);
 }
 
@@ -280,4 +286,11 @@ export async function getTransactions(config: ProviderConfig, accountUid: string
   const result = await providerRequest<ProviderTransactions>(config, `/accounts/${accountUid}/transactions?${query}`, { psu: input.psu });
   if (!Array.isArray(result.transactions) || (result.continuation_key != null && (typeof result.continuation_key !== 'string' || !result.continuation_key || result.continuation_key.length > 4_096))) throw invalidResponse();
   return result;
+}
+/** The transient lookup ID must come from a fresh, account-scoped list response. */
+export async function getTransactionDetails(config:ProviderConfig,accountUid:string,transactionId:string,psu?:ProviderPsu):Promise<ProviderTransaction>{
+ if(!UUID.test(accountUid)||typeof transactionId!=='string'||!transactionId||transactionId.length>4096||/[\/\\?#\u0000-\u001f\u007f]/.test(transactionId)||['.','..'].includes(transactionId))throw invalid();
+ const result=await providerRequest<ProviderTransaction>(config,`/accounts/${accountUid}/transactions/${encodeURIComponent(transactionId)}`,{psu});
+ if(!record(result)||!record(result.transaction_amount)||typeof result.transaction_amount.amount!=='string'||typeof result.transaction_amount.currency!=='string'||!['CRDT','DBIT'].includes(result.credit_debit_indicator)||typeof result.status!=='string')throw invalidResponse();
+ return result;
 }

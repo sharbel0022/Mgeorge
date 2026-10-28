@@ -4,6 +4,7 @@ export type Invoice = {
  organizationNumber?:string;vat?:number|null;net?:number|null;reconciledAt?:string;reconciliationNote?:string;note: string; bankgiro: string; documentId: string; source: string; createdAt: string;
 };
 export type Transaction = {
+ bankDetails?:{status:'identified'|'missing'|'unsupported';checkedAt:string;party:string;payerReference:string;referenceSchema:string;reason:string;documentId:string;bankReferenceText:string};
  specification?:boolean;specificationStatus?:'linked'|'review';parentBankReference?:string;recipientBankgiro?:string;payerBankgiro?:string;settlementDate?:string;format?:string;recipientAccount?:string;
  id: string; date: string; amount: number; currency: "SEK"; party: string; payerReference: string; bankReference: string;
  description: string; source: string; externalId: string; account: string; kind: "payment" | "batch" | "unknown";
@@ -121,9 +122,10 @@ export function specificationPreview(s:State,rows:any[],targetId=''){
  return {plans,payments:payments.length,total:payments.reduce((n,r)=>n+r.amount,0),linked:plans.filter(p=>p.status==='linked').length,review:plans.filter(p=>p.status==='review').length};
 }
 export function paymentInvoiceAssessment(s:State,t:Transaction){
- const exact=s.invoices.filter(i=>!i.voided&&i.direction===(t.amount>0?'receivable':'payable')&&exactPaymentReference(t,i));
+ const view={...t,party:t.bankDetails?.party||t.party,payerReference:t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'':t.payerReference)};
+ const exact=s.invoices.filter(i=>!i.voided&&i.direction===(t.amount>0?'receivable':'payable')&&exactPaymentReference(view,i));
  const allocated=s.allocations.find(a=>a.active&&a.transactionId===t.id),invoice=allocated?s.invoices.find(i=>i.id===allocated.invoiceId):exact.length===1?exact[0]:undefined;
- return {invoice,status:allocated?'verified':exact.length>1?'ambiguous':invoice?'possible':'missing',message:allocated?'Betalningen är verifierad mot fakturan.':exact.length>1?'Flera fakturor kan passa. Granska kundidentiteten.':invoice?'Referensen finns. Kund och betalningsunderlag behöver stämma.':individualParty(t.party)?`Betalare identifierad – faktura ${usablePaymentReference(t.payerReference)?t.payerReference+' ':''}saknas i registret.`:'Betalaren behöver identifieras.'};
+ return {invoice,status:allocated?'verified':exact.length>1?'ambiguous':invoice?'possible':'missing',message:allocated?'Betalningen är verifierad mot fakturan.':exact.length>1?'Flera fakturor kan passa. Granska kundidentiteten.':invoice?'Referensen finns. Kund och betalningsunderlag behöver stämma.':individualParty(view.party)?`Betalare identifierad – faktura ${usablePaymentReference(view.payerReference)?view.payerReference+' ':''}saknas i registret.`:'Betalaren behöver identifieras.'};
 }
 export function economicTransactions(s:State){return s.transactions.filter(t=>!t.ignored&&!t.duplicateOf&&t.specificationStatus!=='review'&&!s.transactions.some(c=>c.parentId===t.id&&!c.ignored));}
 export function applyCommand(current:State,command:Command):{state:State;message:string}{

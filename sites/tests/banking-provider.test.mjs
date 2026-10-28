@@ -5,7 +5,7 @@ import ts from 'typescript';
 import { emptyState, applyCommand } from '../lib/domain.ts';
 import {
   ProviderError, providerRequest, getApplication, listBusinessBanks, startAuth,
-  createSession, getSession, deleteSession, getTransactions,
+  createSession, getSession, deleteSession, getTransactions, getTransactionDetails,
 } from '../lib/banking/enable-banking.ts';
 
 const compiled = ts.transpileModule(readFileSync(new URL('../lib/banking/transactions.ts', import.meta.url), 'utf8'), {
@@ -23,6 +23,19 @@ const bank = { name: 'Swedbank', country: 'SE', psu_types: ['business', 'persona
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...headers } });
 const opts = { accountKey: 'iban:SE4550000000058398257466', accountLabel: 'Företagskonto', bankName: 'Swedbank', dateFrom: '2026-10-01', dateTo: '2026-10-26' };
 const rawTx = (patch = {}) => ({ entry_reference: 'BOOK-REF-001', transaction_id: 'not-stable', transaction_amount: { amount: '1875.00', currency: 'SEK' }, credit_debit_indicator: 'CRDT', status: 'BOOK', booking_date: '2026-10-20', debtor: { name: 'Exempelkund AB' }, creditor: { name: 'M.George Vitvaror AB' }, reference_number: '001019', remittance_information: ['Faktura 1001'], ...patch });
+test('transaction details use the documented scoped GET and retain the payer reference as text',async t=>{
+ let call;t.mock.method(globalThis,'fetch',async(url,init)=>{call={url,init};return json(rawTx({reference_number:'0599',debtor:{name:'Café Gränden Bistro AB'}}));});
+ const tx=await getTransactionDetails(config,accountUid,'fresh-lookup:id');assert.equal(tx.reference_number,'0599');assert.equal(call.url,`https://api.enablebanking.com/accounts/${accountUid}/transactions/fresh-lookup%3Aid`);assert.equal(call.init.method,'GET');
+});
+test('transaction detail paths reject traversal, unscoped IDs and arbitrary query strings before network',async t=>{
+ let called=false;t.mock.method(globalThis,'fetch',async()=>{called=true;return json({});});
+ for(const id of ['../other','..','https://attacker.test','id?force=true','id#x','id\\x',''])await assert.rejects(()=>getTransactionDetails(config,accountUid,id));
+ await assert.rejects(()=>providerRequest(config,`/accounts/${accountUid}/transactions/id?owner=other`));assert.equal(called,false);
+});
+test('malformed detail responses fail and a missing resource has an explicit safe code',async t=>{
+ t.mock.method(globalThis,'fetch',async()=>json({reference_number:'0599'}));await assert.rejects(()=>getTransactionDetails(config,accountUid,'id'),e=>e.code==='INVALID_PROVIDER_RESPONSE');
+ t.mock.method(globalThis,'fetch',async()=>json({error:'NOT_FOUND'},404));await assert.rejects(()=>getTransactionDetails(config,accountUid,'id'),e=>e.code==='BANK_RESOURCE_UNAVAILABLE');
+});
 
 test('Provider JWT is a verifiable short-lived RS256 token and uses fixed HTTPS without redirects', async t => {
   let call;

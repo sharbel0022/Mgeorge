@@ -12,9 +12,9 @@ export function paymentGroup(state:State,t:Transaction){
   if(t.amount<0||/kortköp|card purchase|card refund|återbetalning.*kort|löneutbetalning/iu.test(`${t.description} ${t.payerReference}`))return 'other';
   return 'incoming';
 }
-export const paymentTitle=(t:Transaction)=>t.party.trim()||(needsPaymentSpecification(t)?'Bankgiro – betalningsspecifikation saknas':t.description.trim()||(t.amount<0?'Utbetalning – mottagare saknas':'Inbetalning – betalare saknas'));
+export const paymentTitle=(t:Transaction)=>t.bankDetails?.party||t.party.trim()||(needsPaymentSpecification(t)?'Bankgiro – betalningsspecifikation saknas':t.description.trim()||(t.amount<0?'Utbetalning – mottagare saknas':'Inbetalning – betalare saknas'));
 // A collection's provider reference is not an individual payer's OCR.
-export const paymentPayerReference=(t:Transaction)=>needsPaymentSpecification(t)?'Saknas – individuell specifikation behövs':t.payerReference||'Saknas';
+export const paymentPayerReference=(t:Transaction)=>t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'Saknas – individuell specifikation behövs':t.payerReference||'Saknas');
 const messageKinds:Record<string,string>={partial:'Delbetalning',possible_vat:'Möjlig momsavvikelse',wrong_reference:'Avvikande OCR eller fakturareferens',missing_reference:'Betalningsreferens saknas',overdue:'Förfallen faktura efter verifierad kontroll',possible_duplicate:'Möjlig dubbelbetalning',overpayment:'Överbetalning att reda ut',confirmation:'Begäran om betalningsbekräftelse'};
 
 export function buildPaymentOverview(state:State,documents:Row[]=[],messages:Row[]=[]){
