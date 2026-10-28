@@ -1,0 +1,13 @@
+# V3 publicerad och moln-OCR aktiverad
+
+Den 28 oktober 2026 slogs PR #11 samman till main efter godkända GitHub-kontroller. Mergecommit: `0d77c4c3869481779e424f20722d2f5d99198dac`.
+
+Sites version **29** är publicerad på samma befintliga adress. Källcommit i Sites: `de7db3ec2d51c32d45fb0f55809f0ec93d026308`. Deployment `appgdep_6ae26b8a8c90819192a1dd84e803348e` avslutades med `succeeded`, runtime-revision **9**. Additiv migration och nya OCR-statusfält fungerar i produktion. Befintliga lagringsbindningar, åtkomst, bankanslutningar och krypteringsnycklar behölls.
+
+Moln-OCR har separat hemlighet i Sites och GitHub Actions. Inga hemligheter finns i Git eller rapporten. Workflow är aktiverad på main vid minuterna 7, 22, 37 och 52 varje timme. Första manuellt startade molnkörningen [40773838095](https://github.com/sharbel0022/Mgeorge/actions/runs/40773838095) avslutades med **success**, inklusive installation och autentiserad behandling mot produktionskön. Sites bekräftade separat molnkontakt och bearbetning. Inga skannade dokument väntade vid första körningen; därför finns ännu inget sparat skannat OCR-resultat från denna produktionskörning. Verklig svensk OCR på syntetiska bilder och det sammanhängande flödet verifierades av de godkända testerna i GitHub före merge. Den lokala OCR-reserven har inte stängts av.
+
+Det befintliga Gmail-schemat `Automation_6efa3aafab4081918c48001acc562f96` är återaktiverat med oförändrat timschema i Europe/Stockholm. Sites återläste status **enabled=true**. Bank- och backupschemat är fortsatt aktiva med sina ursprungliga identiteter och tider. En manuell Gmail-provimport med befintligt medgivande hämtade åtta nya underlag och bearbetade två dokument. Inga kundmejl skickades.
+
+Tidigare körningar av Gmail-uppgiften visar plugin-godkännanden som kräver användaråtgärd. Helt obevakad Gmail-hämtning är därför inte slutligt verifierad förrän användaren uttryckligen valt pluginets behörighetsläge och en ny schemakörning passerat. Ett aktivt schema och en lyckad manuell import är separata bevis och ersätter inte detta.
+
+GitHub kan fördröja schemakörningar. Nya bankrapporter kräver fortfarande rätt bankavtal och filkanal enligt V3-BANK-EVIDENCE.md. Appens regler för osäkra fakturor, betalningsbevis och uttryckligt godkännande av kundmejl gäller oförändrat.
