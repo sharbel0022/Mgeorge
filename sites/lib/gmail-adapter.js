@@ -1,3 +1,4 @@
+import {isInlineDecoration} from './document-triage.js';
 import {env} from 'cloudflare:workers';
 import {Buffer} from 'node:buffer';
 // Read-only Gmail adapter. Mail bodies and files are untrusted data, never instructions.
@@ -182,6 +183,7 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
       let found=false;
       for(const part of supported){
         if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
+        if(isInlineDecoration(part)){skipped++;continue;}
         const original_filename=mimeText(part.filename).slice(0,240);
         let name=original_filename.replace(/[\\/]/g,'_');
         // Signature and branding images are not invoice documents. Ambiguous scans
@@ -212,7 +214,7 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
         totalBytes+=content.length;known.add(source_id);
         const receivedDate=new Date(Number(message.internalDate));
         const received_at=Number.isNaN(receivedDate.getTime())?'':receivedDate.toISOString();
-        documents.push({source_id,name,mime_type,content_base64:content.toString('base64'),direction,...contact,subject,received_at,needs_review:true,metadata:{message_id:item.id,attachment_id:part.body?.attachmentId||null,part_id:part._part,from:headers.from||'',to:headers.to||'',original_filename,forwarded:/^(?:fw|fwd|vb):/i.test(subject),direction_confident:!(labels.includes('SENT')&&labels.includes('INBOX'))&&!/^(?:fw|fwd|vb):/i.test(subject),note:'Kontrollera originalet och de tolkade uppgifterna. Ingen betalningsstatus har antagits.'}});
+        documents.push({source_id,name,mime_type,content_base64:content.toString('base64'),direction,...contact,subject,received_at,needs_review:true,metadata:{message_id:item.id,attachment_id:part.body?.attachmentId||null,part_id:part._part,inline_decoration:false,from:headers.from||'',to:headers.to||'',original_filename,forwarded:/^(?:fw|fwd|vb):/i.test(subject),direction_confident:!(labels.includes('SENT')&&labels.includes('INBOX'))&&!/^(?:fw|fwd|vb):/i.test(subject),note:'Kontrollera originalet och de tolkade uppgifterna. Ingen betalningsstatus har antagits.'}});
       }
       if(!found)skipped++;
       if(truncated)break;

@@ -4,7 +4,7 @@ import * as domain from '../lib/domain.ts';
 import {seal,unseal,randomToken} from '../lib/banking/security.ts';
 const source=p=>readFileSync(new URL(p,import.meta.url),'utf8');
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
-function moduleUrl(path,imports){let code=ts.transpileModule(source(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
+function moduleUrl(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let code=ts.transpileModule(source(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
 class D1{
   constructor(sql){this.sql=sql;}
   prepare(query){const sql=this.sql;return{args:[],bind(...args){this.args=args;return this;},async first(){return sql.prepare(query).get(...this.args)||null;},async all(){return{results:sql.prepare(query).all(...this.args)};},async run(){return this.execute();},execute(){const r=sql.prepare(query).run(...this.args);return{meta:{changes:Number(r.changes)}};}};}
@@ -120,7 +120,7 @@ test('durable cloud queue processes once, preserves original extraction and hold
   const f=await processingFixture(t);f.doc();await f.processing.processDocuments(f.owner);
   const job=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(job.state,'needs_review');assert.equal(JSON.parse(job.extraction).fields.invoice_number.value,'0007');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
   await f.processing.processDocuments(f.owner);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
-  assert.equal(JSON.parse(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction).version,2);
+  assert.equal(JSON.parse(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction).version,3);
 });
 
 test('European supplier totals and invoice dates keep grouping without inventing VAT or due dates',async t=>{

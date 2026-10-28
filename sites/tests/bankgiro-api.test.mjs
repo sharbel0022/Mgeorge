@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import {emptyState,applyCommand} from '../lib/domain.ts';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
-function compiled(path,imports){let js=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])js=js.replaceAll(q+a+q,JSON.stringify(b));return data(js);}
+function compiled(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let js=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])js=js.replaceAll(q+a+q,JSON.stringify(b));return data(js);}
 const domain=new URL('../lib/domain.ts',import.meta.url).href,parser=new URL('../lib/bankgiro-parser.js',import.meta.url).href;
 const auth=data('export async function getChatGPTUser(){return globalThis.bankgiroFixture.user;}');
 const envModule=data('export const env=new Proxy({}, {get:(_,k)=>globalThis.bankgiroFixture.env[k]});');

@@ -4,6 +4,10 @@ Ett svenskt system för kundfakturor, leverantörsfakturor, originalunderlag och
 
 Repositoryt innehåller nu både den fristående Node-versionen i `src/` och den fullständiga publicerade Sites-källan i `sites/`. De har separata databaser. GitHub-push publicerar inte automatiskt till Sites; publicering sker i samma befintliga Sites-projekt och flyttar inga företagsuppgifter.
 
+## Enkel ekonomiöversikt – ny källkodsleverans
+
+Sites-källan innehåller nu fyra tydliga ekonomisammanfattningar, en renare undantagskö, dokumentklassificering, bevarad referensproveniens och ett skrivskyddat jämförelseläge för avstämning. Beloppslikhet ersätter aldrig bankunderlag. GitHub-ändringen är inte i sig en Sites-publicering eller aktivering av nya scheman. Läs [implementation, verifiering och återstående produktionssteg](docs/ECONOMY-OVERVIEW-IMPLEMENTATION.md).
+
 ## Bankgiro – Sites version 24
 
 **Uppdatering, Sites version 26:** Betalningsvyn visar nu fakturanummer som uttryckligen märkta förslag även när bankens OCR saknas. Sökningen läser korrekt de inbäddade värdena i hämtade Gmail-underlag. Bankens separata detalj-API kontrolleras när en samlingspost öppnas; svaret bevaras utan automatisk bokning. **228 Sites-tester** passerar. Se [uppföljningen om OCR och fakturanummer](docs/BANKGIRO-REFERENCE-FOLLOWUP.md).

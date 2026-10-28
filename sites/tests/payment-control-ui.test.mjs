@@ -5,7 +5,7 @@ import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 const url=path=>new URL(path,import.meta.url).href;
-function compiled(path,imports={}){let source=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;for(const [name,target] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'lucide-react':import.meta.resolve('lucide-react'),'@/lib/domain':url('../lib/domain.ts'),...imports}))for(const q of ['"',"'"])source=source.replaceAll(q+name+q,JSON.stringify(target));return 'data:text/javascript;base64,'+Buffer.from(source).toString('base64');}
+function compiled(path,imports={}){let source=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;for(const [name,target] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'lucide-react':import.meta.resolve('lucide-react'),'@/lib/domain':url('../lib/domain.ts'),'@/lib/economy-summary.js':url('../lib/economy-summary.js'),...imports}))for(const q of ['"',"'"])source=source.replaceAll(q+name+q,JSON.stringify(target));return 'data:text/javascript;base64,'+Buffer.from(source).toString('base64');}
 const ui=await import(compiled('../components/payment-control.tsx'));
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
 test('manual control button is disabled while running and has explicit busy semantics',()=>{
@@ -44,7 +44,7 @@ test('finished control reports persisted counts without inventing a checked invo
 });
 test('connection overview explains offline OCR and retains pending/error counters',()=>{
  const html=render(ui.ControlConnections,{data:{connections:{gmail:{connected:true,new_documents:4},bank:{connected:false},ocr:{connected:false,enabled:false,waiting:3,processed:9,failed:2}}},open(){}});
- assert.match(html,/4 nya underlag/);assert.match(html,/Frånkopplad/);assert.match(html,/underlag väntar säkert/);assert.match(html,/3 väntar/);assert.match(html,/9 bearbetade/);assert.match(html,/2 misslyckade/);assert.match(html,/Dokumentautomatik pausad/);
+ assert.match(html,/3 väntar/);assert.match(html,/2 misslyckade/);assert.match(html,/Pausad/);assert.match(html,/Automatisk hämtning inte verifierad eller pausad/);assert.match(html,/Text-PDF/);
 });
 test('customer-message mount only reads; reconciliation remains an explicit action',()=>{
  const source=readFileSync(new URL('../components/customer-messages.tsx',import.meta.url),'utf8');const load=source.slice(source.indexOf('async function load()'),source.indexOf('useEffect('));assert.doesNotMatch(load,/request\('reconcile'/);assert.match(source,/Uppdatera avstämning och kö/);
@@ -102,3 +102,12 @@ test('verified bank-source rows still need identification until their incoming a
  assert.equal(needsPaymentIdentification(transaction,40538,'other'),false);
  assert.equal(needsPaymentIdentification({...transaction,ignored:true},180000,'excluded'),false);
 });
+
+const {default:EconomyOverview}=await import(compiled('../components/economy-overview.tsx',{'./payment-control':compiled('../components/payment-control.tsx')}));
+const {emptyState:emptyEconomyState}=await import('../lib/domain.ts');
+const {economySummary}=await import('../lib/economy-summary.js');
+const noAction=()=>{throw Error('Rendering must not perform side effects');};
+const economyProps=()=>({state:emptyEconomyState(),data:null,loading:false,error:'',demo:false,signedIn:true,busy:false,start:noAction,open:noAction,task:noAction,invoice:noAction,demoToggle:noAction});
+test('economy cards render four unknown values until loaded and never show a false empty queue',()=>{const html=render(EconomyOverview,economyProps());assert.equal((html.match(/class="economy-card"/g)||[]).length,4);assert.equal((html.match(/<strong>—<\/strong>/g)||[]).length,4);assert.doesNotMatch(html,/Inget i den här kön|0,00/);assert.match(html,/Hämtar ekonomiöversikten/);});
+test('economy error hides stale amounts instead of suggesting zero',()=>{const p=economyProps();p.data={economy:economySummary(p.state,'2026-10-28'),counts:{},queue:[],connections:{gmail:{},bank:{},ocr:{}}};p.error='network error';const html=render(EconomyOverview,p);assert.match(html,/role="alert"/);assert.match(html,/Beloppen visas inte som noll/);assert.doesNotMatch(html,/0,00/);assert.equal((html.match(/<strong>—<\/strong>/g)||[]).length,4);});
+test('economy displays incomplete bank evidence and distinguishes verified payer from customer',()=>{const p=economyProps();p.state.invoices.push({id:'i',number:'0594',party:'<script>customer</script>',direction:'receivable',reviewed:true,total:10000,currency:'SEK',due:'2026-11-30'});p.state.transactions.push({id:'t',date:'2026-10-28',amount:10000,currency:'SEK',verified:true,kind:'payment',party:'Actual payer',payerReference:'0594'},{id:'batch',amount:20000,currency:'SEK',kind:'batch'});p.state.allocations.push({id:'a',invoiceId:'i',transactionId:'t',amount:10000,effect:'payment',active:true});p.data={economy:economySummary(p.state,'2026-10-28'),counts:{review:1,processing:2},queue:[],connections:{gmail:{history_incomplete:true},bank:{},ocr:{}}};const html=render(EconomyOverview,p);assert.match(html,/Översikten är preliminär/);assert.match(html,/saknar komplett betalningsspecifikation/);assert.match(html,/Fler Gmail-underlag/);assert.match(html,/0594/);assert.match(html,/Actual payer/);assert.match(html,/&lt;script&gt;customer/);assert.doesNotMatch(html,/<script/);assert.match(html,/Inga kundmejl skickas/);});

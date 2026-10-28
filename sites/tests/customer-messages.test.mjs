@@ -8,7 +8,7 @@ import {seal,unseal,randomToken,digest} from '../lib/banking/security.ts';
 import {analyzeReconciliation} from '../lib/reconciliation-engine.js';
 
 const read=p=>readFileSync(new URL(p,import.meta.url),'utf8'),data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
-function moduleUrl(path,imports){let s=ts.transpileModule(read(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [key,val]of Object.entries(imports))for(const q of ['"',"'"])s=s.replaceAll(q+key+q,JSON.stringify(val));return data(s);}
+function moduleUrl(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let s=ts.transpileModule(read(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [key,val]of Object.entries(imports))for(const q of ['"',"'"])s=s.replaceAll(q+key+q,JSON.stringify(val));return data(s);}
 class LocalD1{
   constructor(sql){this.sql=sql;this.beforeBatch=null;}
   prepare(query){const self=this;return {query,args:[],bind(...args){this.args=args;return this;},async first(){return self.sql.prepare(query).get(...this.args)||null;},async all(){return {results:self.sql.prepare(query).all(...this.args)};},async run(){return this.execute();},execute(){const r=self.sql.prepare(query).run(...this.args);return {meta:{changes:Number(r.changes)}};}};}

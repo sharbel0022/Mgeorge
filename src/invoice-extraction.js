@@ -1,3 +1,4 @@
+import {classifyDocument,documentConflicts} from './document-triage.js';
 import {fork} from 'node:child_process';
 import {parseMoney} from './importers.js';
 // Only explicitly labelled values are normalized. Original text remains evidence.
@@ -29,8 +30,9 @@ export function validOrganization(value){
   const s=String(value||'').replace(/[-\s]/g,'');if(!/^\d{10}$/.test(s)||Number(s[2])<2)return false;
   return [...s].reduce((sum,c,i)=>{const n=Number(c)*(i%2?1:2);return sum+Math.floor(n/10)+n%10;},0)%10===0;
 }
-export function interpretInvoice(text,{direction=null,direction_confident=false,method='pdf',ocrConfidence=0}={}){
+export function interpretInvoice(text,{direction=null,direction_confident=false,method='pdf',ocrConfidence=0,filename='',subject='',company_organization_number=''}={}){
   const layout=normalizeInvoiceLayout(text);text=layout.text;
+  text=text.replace(/Fakturadatum[ \t]+Fakturanummer[ \t]*\n[ \t]*(\d{4}-\d{2}-\d{2})[ \t]+([A-Za-z0-9/_-]+)/gi,(_,date,number)=>`Fakturadatum: ${date}\nFakturanummer: ${number}`);
   const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
   const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
@@ -43,7 +45,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   };
   grab('invoice_number',/(?:faktura\s*(?:nummer|nr|no)|invoice\s*(?:number|no)|fakturanr)\s*[.:#-]*\s*([\p{L}\p{N}][\p{L}\p{N}/_-]{0,79})/giu);
   grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
-  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
+  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
   const amount='(-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|\\d[\\d \\t\\u00a0]*(?:[.,]\\d{1,2})?))(?![\\d.,])(?:[ \\t]*(?:SEK|kr))?';
   const money=s=>{try{return parseMoney(s);}catch{return null;}};
   grab('total_cents',new RegExp('(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'gi'),money);
@@ -51,6 +53,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   grab('net_cents',new RegExp('(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?:^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount))\\s*[:.]?\\s*'+amount,'gi'),money);
   grab('reference',/(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)\s*[:.]?\s*([\p{L}\p{N}][\p{L}\p{N} /_-]{0,119})/giu);
   grab('bankgiro',/(?:bankgiro|bankgirokonto|bg)\s*[:.]?\s*(\d{3,4}[ -]\d{4})/gi,s=>s.replace(/ /g,'-'));
+  if(fields.invoice_number.value&&validDate(fields.invoice_number.value)){issues.push('Fakturanumret ser ut som ett datum. Kontrollera originalets kolumner.');set('invoice_number',null,fields.invoice_number.evidence,0);}
   const wholeText=text;
   if(direction==='customer'&&/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i.test(text))text=text.split(/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i).slice(1).join('\n').split(/Tilläggsinformation|Betalningsuppgifter/i)[0];
   grab('organization_number',/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)\s*[:.]?\s*(\d{6}[-– ]?\d{4})/gi,s=>validOrganization(s.replace(/–/g,'-'))?s.replace(/[-– ]/g,''):null);
@@ -72,8 +75,11 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const missing=required.filter(k=>values[k]==null);
   if(missing.length)issues.push('Saknade uppgifter: '+missing.map(k=>titles[k]).join(', '));
   const fatal=values.total_cents==null||values.invoice_number==null||!['invoice','credit'].includes(kind)||issues.some(s=>/Motstridiga|Momsberäkningen|Radpris|flera fakturor|Flera valutor|läsbar text/.test(s));
-  const level=fatal?'red':issues.length||missing.length||required.some(k=>fields[k].confidence<.9)?'yellow':'green';
-  return {version:2,method,fields,level,issues:[...new Set(issues)],text_excerpt:layout.original.slice(0,20000),extracted_at:new Date().toISOString()};
+  const metadataIssues=documentConflicts({fields},{filename,subject,direction,company_organization_number});
+  issues.push(...metadataIssues);
+  const classification=classifyDocument({filename,text:layout.original,extraction:{fields}});
+  const level=metadataIssues.length||classification.exclude_from_invoice_queue?'red':fatal?'red':issues.length||missing.length||required.some(k=>fields[k].confidence<.9)?'yellow':'green';
+  return {version:3,method,fields,level,classification,issues:[...new Set(issues)],text_excerpt:layout.original.slice(0,20000),extracted_at:new Date().toISOString()};
 }
 export function validateInvoiceValues(v){
   const issues=[];
@@ -105,7 +111,7 @@ export async function extractInvoice(bytes,mime_type,metadata={}){
   try{
     const result=await runDocumentProcess(bytes,mime_type);
     if(result.error)throw Error('unreadable');
-    return interpretInvoice(result.text,{...metadata,method:result.method,ocrConfidence:result.confidence});
+    return interpretInvoice(result.text,{...metadata,filename:metadata.original_filename||metadata.filename||'',method:result.method,ocrConfidence:result.confidence});
   }catch(e){
     if(e.status===429)throw e;
     return {...interpretInvoice('',metadata),level:'red',issues:['Dokumentet kunde inte läsas. Kontrollera originalet och fyll i uppgifterna manuellt.']};

@@ -5,7 +5,7 @@ import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
 import {emptyState,applyCommand} from '../lib/domain.ts';
 const read=p=>readFileSync(new URL(p,import.meta.url),'utf8'),data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
-function moduleUrl(path,imports){let s=ts.transpileModule(read(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [key,val]of Object.entries(imports))for(const q of [String.fromCharCode(34),String.fromCharCode(39)])s=s.replaceAll(q+key+q,JSON.stringify(val));return data(s);}
+function moduleUrl(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let s=ts.transpileModule(read(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [key,val]of Object.entries(imports))for(const q of [String.fromCharCode(34),String.fromCharCode(39)])s=s.replaceAll(q+key+q,JSON.stringify(val));return data(s);}
 class D1{
  constructor(sql){this.sql=sql;this.beforeClaim=null;}
  prepare(query){const self=this;return {args:[],bind(...args){this.args=args;return this;},async first(){return self.sql.prepare(query).get(...this.args)||null;},async all(){return {results:self.sql.prepare(query).all(...this.args)};},async run(){if(self.beforeClaim&&query.includes('SET lease=')){const cb=self.beforeClaim;self.beforeClaim=null;await cb();}return this.execute();},execute(){const r=self.sql.prepare(query).run(...this.args);return {meta:{changes:Number(r.changes)}};}};}
@@ -25,7 +25,7 @@ async function fixture(t){
  const docs=data(`const f=${ref};export async function processingSettings(){return {enabled:f.enabled};}export async function processingStatus(){return {counts:f.counts,worker_online:f.ocrOnline||false,enabled:f.enabled,registered:0,worker_last_seen:''};}export async function processDocuments(){f.calls.push('documents');return {processed:1,...await processingStatus()};}`);
  const bank=data(`const f=${ref};export async function syncControl(){f.calls.push('bank');if(f.bankError)throw f.bankError;return Response.json(f.bankResult);}`);
  const messages=data(`const f=${ref};export async function reconcileAndPrepare(){f.calls.push('reconcile');return {automatic:1};}export async function messageList(){return {items:f.messages};}`);
- f.api=await import(moduleUrl('../lib/payment-control.ts',{'./server':server,'./domain':domain,'./gmail-service':gmail,'./document-processing':docs,'./banking/service':bank,'./customer-messages':messages,'./payment-overview':moduleUrl('../lib/payment-overview.ts',{'./domain':domain,'./reconciliation':reconciliation})}));
+ f.api=await import(moduleUrl('../lib/payment-control.ts',{'./reconciliation':reconciliation,'./server':server,'./domain':domain,'./gmail-service':gmail,'./document-processing':docs,'./banking/service':bank,'./customer-messages':messages,'./payment-overview':moduleUrl('../lib/payment-overview.ts',{'./domain':domain,'./reconciliation':reconciliation})}));
  f.call=async(action,body={},method='POST',requestOrigin=origin)=>{try{return await f.api.paymentControlAction(request(action,body,method,requestOrigin),action.split('?')[0]);}catch(e){return f.api.controlFailure(e);}};
  f.start=async(id='request_000000000001')=>(await (await f.call('run',{request_id:id})).json()).job;
  f.advance=async id=>(await (await f.call('advance',{id})).json()).job;
@@ -71,3 +71,5 @@ test('collection provider reference is never presented as an individual payer OC
  assert.equal(overview.paymentPayerReference({...batch,kind:'payment',parentId:'parent',party:'Testkund AB',payerReference:'0594'}),'0594');
  assert.equal(batch.payerReference,'58197013');
 });
+
+test('comparison preview is read-only and does not create runs, drafts or allocations',async t=>{const f=await fixture(t);const before=f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n;const response=await f.call('preview',{},'GET'),out=await response.json();assert.equal(response.status,200);assert.equal(out.mode,'preview');assert.equal(out.changed,false);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,before);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM payment_control_runs').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,0);f.user=null;assert.equal((await f.call('preview',{},'GET')).status,401);});

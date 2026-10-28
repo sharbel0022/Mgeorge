@@ -73,11 +73,18 @@ export function parseBankgiroXML(text,name='Bankgiro.xml'){
     if(details.length>1&&!a)throw Error('Specifikationen är ofullständig: individuellt belopp saknas.');
     if(a&&a.attributes.Ccy!=='SEK'||value(tx,'CdtDbtInd')&&value(tx,'CdtDbtInd')!==direction)throw Error('Kontrollera valuta och riktning i betalningsspecifikationen.');
     const party=path(tx,'RltdPties',sign>0?'Dbtr':'Cdtr'),partyNode=path(party,'Pty')||party;
-    const payerReference=descendants(tx,'CdtrRefInf').map(x=>value(x,'Ref')).filter(Boolean).join(' ')||children(path(tx,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join(' ');
+    const referenceParts=[
+     ...descendants(tx,'CdtrRefInf').map(x=>({value:stable(value(x,'Ref')),source:'RmtInf/Strd/CdtrRefInf/Ref',kind:'structured'})),
+     ...children(path(tx,'RmtInf'),'Ustrd').map(x=>({value:stable(x.text.trim()),source:'RmtInf/Ustrd',kind:'message'})),
+     ...descendants(tx,'RfrdDocInf').map(x=>({value:stable(value(x,'Nb')),source:'RmtInf/Strd/RfrdDocInf/Nb',kind:'document'}))
+    ].filter(p=>p.value);
+    const references=[...new Set(referenceParts.map(p=>p.value))];
+    const payerReference=references.join('; ');
+    if(referenceParts.length>20||payerReference.length>300)throw Error('För många eller för långa betalningsreferenser. Granska bankoriginalet.');
     const id=stable(value(tx,'Refs','AcctSvcrRef'))||stable(value(tx,'Refs','TxId'));
     const own=path(tx,'RltdPties',sign>0?'CdtrAcct':'DbtrAcct'),other=path(tx,'RltdPties',sign>0?'DbtrAcct':'CdtrAcct');
     const bg=acct=>/BGNR|BANKGIRO/i.test(value(acct,'Id','Othr','SchmeNm','Prtry')||value(acct,'Id','Othr','SchmeNm','Cd'))?value(acct,'Id','Othr','Id'):'';
-    return {...base,key:`${key}-${n}`,parentKey:details.length>1?key:undefined,amount:a?cents(a.text.trim())*sign:amount,party:value(partyNode,'Nm'),payerReference:stable(payerReference),bankReference:id||parentReference,externalId:id?`transaction:${id}`:'',kind:'payment',recipientBankgiro:bg(own),payerBankgiro:bg(other),organizationNumber:value(partyNode,'Id','OrgId','Othr','Id'),specification:true};
+    return {...base,key:`${key}-${n}`,parentKey:details.length>1?key:undefined,amount:a?cents(a.text.trim())*sign:amount,party:value(partyNode,'Nm'),referenceParts,payerReference:stable(payerReference),bankReference:id||parentReference,externalId:id?`transaction:${id}`:'',kind:'payment',recipientBankgiro:bg(own),payerBankgiro:bg(other),organizationNumber:value(partyNode,'Id','OrgId','Othr','Id'),specification:true};
    });
    if(parsed.reduce((n,r)=>n+r.amount,0)!==amount)throw Error('Specifikationen är ofullständig: summan av betalningarna stämmer inte med insättningen.');
    if(details.length>1)rows.push(base);rows.push(...parsed);

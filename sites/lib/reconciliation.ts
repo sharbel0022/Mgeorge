@@ -10,16 +10,24 @@ export function analyze(state:State){
   const data={invoices:state.invoices.map(i=>({...invoiceFacts(state,i),organization_number:i.organizationNumber||'',direction:i.reviewed&&!i.voided?(i.direction==='receivable'?'customer':'supplier'):'held',kind:'invoice',issued_at:i.issued})),transactions:state.transactions.map(t=>({id:t.id,account:t.account,booked_at:t.date,amount_cents:t.amount,currency:t.currency,payer:t.party,reference:t.payerReference,bank_reference:t.bankReference,payer_organization_number:t.organizationNumber||'',excluded:t.ignored||!!t.duplicateOf,is_aggregate:needsPaymentSpecification(t),available_cents:available(state,t),verified:t.verified&&!!t.evidence,parent_bank_reference:t.parentId?state.transactions.find(p=>p.id===t.parentId)?.bankReference||'':''})),links,allocations:state.allocations.filter(a=>a.active).map(a=>({invoice_id:a.invoiceId,transaction_id:a.transactionId}))};
   // An actual specification's parent remains as immutable evidence, but its
   // complete child set replaces it economically. Do not treat it as incomplete.
-  for(const t of data.transactions)if(t.is_aggregate){const children=state.transactions.filter(c=>c.parentId===t.id&&!c.ignored);if(children.length&&children.reduce((n,c)=>n+c.amount,0)===t.amount_cents)t.excluded=true;}
+  for(const t of data.transactions)if(t.is_aggregate){const children=state.transactions.filter(c=>c.parentId===t.id&&!c.ignored);if(children.length&&children.every(c=>!c.duplicateOf&&c.specificationStatus!=='review'&&c.account===t.account)&&children.reduce((n,c)=>n+c.amount,0)===t.amount_cents)t.excluded=true;}
   for(const t of data.transactions)if(state.transactions.find(x=>x.id===t.id)?.specificationStatus==='review')t.excluded=true;
   return analyzeReconciliation(data);
 }
 export function reconcileState(initial:State){
   let state=initial;const decisions:any[]=[];
-  for(const suggestion of analyze(state).filter(s=>s.safe&&s.amount_cents>0)){
-    const result=applyCommand(state,{type:'match.create',invoiceId:suggestion.invoice_id,transactionId:suggestion.transaction_id,amount:suggestion.amount_cents,note:'Automatisk avstämning: '+suggestion.reason});
+  for(const proposed of analyze(initial).filter(s=>s.safe&&s.amount_cents>0)){
+    const suggestion=analyze(state).find(s=>s.safe&&s.invoice_id===proposed.invoice_id&&s.transaction_id===proposed.transaction_id&&s.amount_cents>0);
+    if(!suggestion)continue;
+    const result=applyCommand(state,{type:'match.create',invoiceId:suggestion.invoice_id,transactionId:suggestion.transaction_id,amount:suggestion.amount_cents,note:'Automatisk avstämning ['+suggestion.rule_version+']: '+suggestion.reason});
     state=result.state;decisions.push({...suggestion,id:uid(),at:now()});
   }
   return {state,decisions,findings:analyze(state)};
 }
 export function contactIdentity(i:Invoice){return JSON.stringify([normalizeName(i.party),String(i.organizationNumber||'').replace(/[- ]/g,'')]);}
+
+/** Read-only comparison mode: no allocations, drafts, imports, or audit writes. */
+export function reconciliationPreview(state:State){
+ const findings=analyze(state);
+ return {mode:'preview' as const,changed:false,automatic_candidates:findings.filter(f=>f.safe).length,review_candidates:findings.filter(f=>!f.safe).length,findings};
+}

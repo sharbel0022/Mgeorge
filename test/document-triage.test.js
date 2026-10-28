@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {classifyDocument,documentConflicts,isInlineDecoration} from '../src/document-triage.js';
+import {interpretInvoice} from '../src/invoice-extraction.js';
+test('Node and Sites document triage implement identical safety rules',()=>assert.equal(readFileSync(new URL('../src/document-triage.js',import.meta.url),'utf8'),readFileSync(new URL('../sites/lib/document-triage.js',import.meta.url),'utf8')));
+test('file-name disagreement cannot become green automatic registration',()=>{const e=interpretInvoice('Faktura\nFakturanummer: 0602\nAtt betala: 100 SEK',{filename:'Faktura 0603.pdf'});assert.equal(e.level,'red');assert.ok(e.issues.some(x=>x.includes('Motstridigt')));});
+test('payroll and terms are kept outside invoice queue',()=>{assert.equal(classifyDocument({text:'Avlöningskvitto\nNettolön 4000'}).exclude_from_invoice_queue,true);assert.equal(classifyDocument({text:'Terms and conditions\nThe invoice is sent later.'}).category,'terms');});
+test('generic image and scanned invoice remain reviewable',()=>{assert.equal(classifyDocument({filename:'image.jpg',mime:'image/jpeg'}).exclude_from_invoice_queue,false);assert.equal(isInlineDecoration({filename:'invoice.png',mimeType:'image/png',headers:[{name:'Content-ID',value:'a'}]}),false);});
+test('source comparison preserves zeros',()=>{assert.equal(documentConflicts({fields:{invoice_number:{value:'0594'}}},{filename:'Faktura 594.pdf'}).length,1);});

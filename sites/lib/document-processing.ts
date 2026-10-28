@@ -80,7 +80,7 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
 }
 async function finish(owner:string,job:Row,result:{text:string,method:string,confidence:number}){
   const source=await sourceFor(owner,job.document_id);if(source?.status!=='needs_review')return {ignored:true};
-  const meta=JSON.parse(source.metadata),extraction=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence});
+  const meta=JSON.parse(source.metadata),extraction=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||''});
   const v=Object.fromEntries(fieldNames.map((k:string)=>[k,(extraction.fields as any)[k].value]));
   const key=counterpartyKey(v.direction,v.party,v.organization_number),email=mailbox(v.direction==='customer'?meta.to:meta.from);
   const trust=await db().prepare('SELECT * FROM invoice_counterparties WHERE owner=? AND identity=? AND email=?').bind(owner,key,email).first<Row>();

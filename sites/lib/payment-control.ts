@@ -1,4 +1,5 @@
 import {db,identity,readWorkspace,response} from './server';
+import {reconciliationPreview} from './reconciliation';
 import {now,uid} from './domain';
 import {gmailSync} from './gmail-service';
 import {processDocuments,processingSettings,processingStatus} from './document-processing';
@@ -101,19 +102,20 @@ export async function advanceControl(owner:string,id:string,req:Request){
 export async function controlOverview(owner:string){
   const workspace=await readWorkspace(owner);
   const [documents,messages,gmail,bank,ocr,run,successful,gmailFetch]=await Promise.all([
-    db().prepare("SELECT DISTINCT s.document_id,s.status,d.filename,j.state,j.invoice_id FROM gmail_sources s JOIN documents d ON d.owner=s.owner AND d.id=s.document_id LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=? AND s.status<>'rejected'").bind(owner).all<Row>(),messageList(owner),
-    db().prepare('SELECT status,last_synced FROM gmail_connections WHERE owner=?').bind(owner).first<Row>(),
-    db().prepare('SELECT status,valid_until,last_synced_at FROM bank_connections WHERE owner=?').bind(owner).first<Row>(),processingStatus(owner),latest(owner),
+    db().prepare("SELECT DISTINCT s.document_id,s.status,s.metadata,s.extraction,d.filename,d.mime,j.extraction AS processing_extraction,j.state,j.invoice_id FROM gmail_sources s JOIN documents d ON d.owner=s.owner AND d.id=s.document_id LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=? AND s.status<>'rejected'").bind(owner).all<Row>(),messageList(owner),
+    db().prepare('SELECT status,last_synced,last_attempt,page_token FROM gmail_connections WHERE owner=?').bind(owner).first<Row>(),
+    db().prepare('SELECT status,valid_until,last_synced_at,auto_sync_enabled,auto_next_at,last_error FROM bank_connections WHERE owner=?').bind(owner).first<Row>(),processingStatus(owner),latest(owner),
     db().prepare("SELECT finished_at FROM payment_control_runs WHERE owner=? AND status='complete' ORDER BY finished_at DESC LIMIT 1").bind(owner).first<Row>(),
     db().prepare("SELECT created_at FROM gmail_runs WHERE owner=? AND status='completed' ORDER BY created_at DESC LIMIT 1").bind(owner).first<Row>(),
   ]);
-  return {...buildPaymentOverview(workspace.state,documents.results.map(d=>({...d,invoice_id:d.invoice_id||workspace.state.invoices.find(i=>i.documentId===d.document_id)?.id})),messages.items),run:publicJob(run),last_successful_control:successful?.finished_at||'',connections:{gmail:{connected:gmail?.status==='connected',status:gmail?.status||'disconnected',last_synced:gmailFetch?.created_at||gmail?.last_synced||'',full_sync_watermark:gmail?.last_synced||'',new_documents:new Set(documents.results.filter(d=>d.status==='needs_review'&&!d.invoice_id&&!workspace.state.invoices.some(i=>i.documentId===d.document_id)).map(d=>d.document_id)).size},bank:{connected:bank?.status==='connected'&&Date.parse(bank.valid_until)>Date.now(),status:bank?.status==='connected'&&(!Number.isFinite(Date.parse(bank.valid_until))||Date.parse(bank.valid_until)<=Date.now())?'expired':bank?.status||'disconnected',last_synced:bank?.last_synced_at||''},ocr:{connected:ocr.worker_online,enabled:ocr.enabled,waiting:Number(ocr.counts.waiting_ocr||0),processed:Math.max(ocr.registered,['registered','ready','needs_review','duplicate'].reduce((n,key)=>n+Number(ocr.counts[key]||0),0)),failed:Number(ocr.counts.failed||0),last_seen:ocr.worker_last_seen}}};
+  return {...buildPaymentOverview(workspace.state,documents.results.map(d=>({...d,invoice_id:d.invoice_id||workspace.state.invoices.find(i=>i.documentId===d.document_id)?.id})),messages.items),run:publicJob(run),last_successful_control:successful?.finished_at||'',connections:{gmail:{connected:gmail?.status==='connected',status:gmail?.status||'disconnected',last_synced:gmailFetch?.created_at||gmail?.last_synced||'',full_sync_watermark:gmail?.last_synced||'',history_incomplete:!!gmail?.page_token,scheduler_configured:ocr.scheduler_configured===true,processing_enabled:ocr.enabled===true,new_documents:new Set(documents.results.filter(d=>d.status==='needs_review'&&!d.invoice_id&&!workspace.state.invoices.some(i=>i.documentId===d.document_id)).map(d=>d.document_id)).size},bank:{connected:bank?.status==='connected'&&Date.parse(bank.valid_until)>Date.now(),status:bank?.status==='connected'&&(!Number.isFinite(Date.parse(bank.valid_until))||Date.parse(bank.valid_until)<=Date.now())?'expired':bank?.status||'disconnected',last_synced:bank?.last_synced_at||'',automatic_enabled:bank?.auto_sync_enabled===1,next_attempt:bank?.auto_next_at||'',has_error:!!bank?.last_error},ocr:{connected:ocr.worker_online,enabled:ocr.enabled,waiting:Number(ocr.counts.waiting_ocr||0),processed:Math.max(ocr.registered,['registered','ready','needs_review','duplicate'].reduce((n,key)=>n+Number(ocr.counts[key]||0),0)),failed:Number(ocr.counts.failed||0),last_seen:ocr.worker_last_seen}}};
 }
 
 export async function paymentControlAction(req:Request,action:string){
   const user=await identity(req),owner=user.userId;
   if(req.method==='GET'){
     if(action==='overview')return response(await controlOverview(owner));
+    if(action==='preview')return response(reconciliationPreview((await readWorkspace(owner)).state));
     if(action==='status')return response({job:publicJob(await ownRun(owner,new URL(req.url).searchParams.get('id')||''))});
     return response({error:'Okänd kontrollåtgärd.'},404);
   }

@@ -1,3 +1,4 @@
+import {classifyDocument} from './document-triage.js';
 /**
  * Read-only presentation model for the one-click workspace.
  * Classification helps navigation; it is never evidence that a bill is paid.
@@ -39,7 +40,7 @@ export function invoiceAnalysis(invoice, suggestions = []) {
 
 export function buildPaymentOverview({invoices = [], transactions = [], documents = [], messages = [], suggestions = []}) {
   const customer = invoices.filter(i => i.direction === 'customer' && i.kind !== 'credit');
-  const pending = documents.filter(d => !d.invoice_id && d.status === 'needs_review');
+  const pending = documents.filter(d => !d.invoice_id && d.status === 'needs_review' && !['queued','processing','waiting_ocr'].includes(d.processing_state) && !classifyDocument({...d,filename:d.name,mime:d.mime_type}).exclude_from_invoice_queue);
   const groups = {incoming: [], bankgiro: [], other: [], matched: [], excluded: []};
   for (const t of transactions) groups[paymentGroup(t)].push(t);
   const relevantMessages = messages.filter(m => ['draft', 'sending', 'unknown'].includes(m.status));
@@ -81,7 +82,7 @@ export function buildPaymentOverview({invoices = [], transactions = [], document
       action: 'Granska saldo och avvikelse', blocked: false, amount_cents: i.remaining_cents});
   }
   const anomalyIds = new Set(anomalies.map(i => i.id));
-  for (const i of customer.filter(i => i.status === 'unreconciled' && !anomalyIds.has(i.id) && !suggestedIds.has(i.id) && !messagedIds.has(i.id))) {
+  for (const i of customer.filter(i => i.status === 'unreconciled' && (!i.due_at || i.is_overdue) && !anomalyIds.has(i.id) && !suggestedIds.has(i.id) && !messagedIds.has(i.id))) {
     queue.push({id: `invoice:${i.id}`, type: 'invoice', entity_id: i.id, invoice_id: i.id,
       priority: 35, title: `${i.party} · ${i.invoice_number}`, reason:
         'Betalning är inte bekräftad. Det är inte samma sak som att fakturan är obetald.',
