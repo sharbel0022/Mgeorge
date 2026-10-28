@@ -1,6 +1,6 @@
 import {classifyDocument,jsonObject} from './document-triage.js';
 import {economySummary} from './economy-summary.js';
-import {available,balance,credited,individualParty,invoiceStatus,needsPaymentSpecification,paid,today,type State,type Transaction} from './domain';
+import {available,balance,credited,individualParty,invoiceStatus,needsBankFileValidation,needsPaymentSpecification,paid,today,type State,type Transaction} from './domain';
 import {analyze} from './reconciliation';
 
 type Row=Record<string,any>;
@@ -8,6 +8,7 @@ export type ReviewItem={id:string;type:'document'|'payment'|'specification'|'mes
 /** Presentation only. Never changes bank originals or accepts a proposed match. */
 export function paymentGroup(state:State,t:Transaction){
   if(t.ignored)return 'excluded';
+  if(needsBankFileValidation(t))return t.amount>0?'incoming':'other';
   const children=state.transactions.filter(c=>c.parentId===t.id&&!c.ignored&&!c.duplicateOf);
   if(!t.duplicateOf&&available(state,t)===0||children.length>0&&children.every(c=>c.specificationStatus!=='review'&&c.account===t.account&&c.currency===t.currency)&&children.reduce((n,c)=>n+c.amount,0)===t.amount)return 'matched';
   if(needsPaymentSpecification(t))return 'bankgiro';
@@ -15,12 +16,12 @@ export function paymentGroup(state:State,t:Transaction){
   return 'incoming';
 }
 export const paymentTitle=(t:Transaction)=>{
-  const trusted=['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'');
+  const trusted=['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'')&&!needsBankFileValidation(t);
   const bankName=t.bankDetails?.party||(needsPaymentSpecification(t)||!trusted?'':t.original?t.original.party:t.verification?'':t.party)||'';
   return individualParty(bankName)&&! /betalardetaljer|betalningsspecifikation|betalare\s+(?:saknas|okänd)|mottagare\s+okänd|^bankgiro\s+inbetalning/iu.test(bankName)?bankName:(t.amount<0?'Mottagare okänd':'Betalare okänd');
 };
 // A collection's provider reference is not an individual payer's OCR.
-export const paymentPayerReference=(t:Transaction)=>t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'Saknas – individuell specifikation behövs':t.payerReference||'Saknas');
+export const paymentPayerReference=(t:Transaction)=>t.bankDetails?.payerReference||(needsBankFileValidation(t)?'Saknas – bankoriginalet behöver verifieras':needsPaymentSpecification(t)?'Saknas – individuell specifikation behövs':t.payerReference||'Saknas');
 const messageKinds:Record<string,string>={partial:'Delbetalning',possible_vat:'Möjlig momsavvikelse',wrong_reference:'Avvikande OCR eller fakturareferens',missing_reference:'Betalningsreferens saknas',overdue:'Förfallen faktura efter verifierad kontroll',possible_duplicate:'Möjlig dubbelbetalning',overpayment:'Överbetalning att reda ut',confirmation:'Begäran om betalningsbekräftelse'};
 
 export function buildPaymentOverview(state:State,documents:Row[]=[],messages:Row[]=[]){

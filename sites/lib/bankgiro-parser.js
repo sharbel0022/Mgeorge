@@ -53,7 +53,12 @@ function xmlTree(xml){
   return root.children[0];
 }
 const children=(node,name)=>(node?.children||[]).filter(x=>x.name===name&&x.namespace===node.namespace);
-function path(node,...names){for(const name of names)node=children(node,name)[0];return node;}
+function path(node,...names){for(const name of names){const matches=children(node,name);if(matches.length>1){
+  // Organisations may have several legitimate identifiers. None is selected
+  // arbitrarily as the payer's organisation number.
+  if(name==='Othr'&&node?.name==='OrgId')return undefined;
+  throw Error(`Tvetydig XML: flera ${name}-fält i samma bankuppgift.`);
+ }node=matches[0];}return node;}
 const value=(node,...names)=>path(node,...names)?.text.trim()||'';
 function descendants(node,name){return (node?.children||[]).filter(x=>x.namespace===node.namespace).flatMap(x=>x.name===name?[x]:descendants(x,name));}
 function remittanceEvidence(node){
@@ -64,7 +69,10 @@ function remittanceEvidence(node){
 const maskedAccount=acct=>{const id=value(acct,'Id','IBAN')||value(acct,'Id','Othr','Id');return id?'•••• '+id.replace(/[\s-]/g,'').slice(-4):'';};
 const stable=s=>s&&!/^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(s)?s:'';
 function cents(s){if(!/^\d+(?:\.\d{1,2})?$/.test(s))throw Error('Bankfilen innehåller ett ogiltigt belopp.');const [a,b='']=s.split('.'),n=Number(a)*100+Number(b.padEnd(2,'0'));if(!Number.isSafeInteger(n)||n<=0||n>100_000_000_000)throw Error('Ogiltigt betalningsbelopp.');return n;}
-function day(s){s=s.slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s)||!Number.isFinite(Date.parse(s+'T12:00:00Z'))||new Date(s+'T12:00:00Z').toISOString().slice(0,10)!==s)throw Error('Betalningsdatum saknas eller är ogiltigt.');return s;}
+function day(input,dateTime=false){
+ const format=dateTime?/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-](?:0\d|1[0-3]):[0-5]\d|[+-]14:00)?$/:/^\d{4}-\d{2}-\d{2}$/;
+ const s=input.slice(0,10);if(!format.test(input)||!Number.isFinite(Date.parse(s+'T12:00:00Z'))||new Date(s+'T12:00:00Z').toISOString().slice(0,10)!==s)throw Error('Betalningsdatum saknas eller är ogiltigt.');return s;
+}
 /** Same bounded parser runs in preview and on the server against the retained original. */
 export function parseBankgiroXML(text,name='Bankgiro.xml'){
  const doc=xmlTree(text),namespace=doc.namespace;
@@ -75,10 +83,13 @@ export function parseBankgiroXML(text,name='Bankgiro.xml'){
   const account=value(report,'Acct','Id','IBAN')||value(report,'Acct','Id','Othr','Id');
   for(const entry of children(report,'Ntry')){
    if((value(entry,'Sts','Cd')||value(entry,'Sts'))!=='BOOK')throw Error('Filen måste innehålla bokförda transaktioner (BOOK).');
-   if(value(entry,'RvslInd')==='true')throw Error('Återföringar behöver granskas separat.');
+   const reversal=path(entry,'RvslInd');
+   if(reversal&&!['false','0'].includes(reversal.text.trim()))throw Error('Återföringar eller ogiltig återföringsflagga behöver granskas separat.');
    const amt=path(entry,'Amt'),direction=value(entry,'CdtDbtInd');
    if(amt?.attributes.Ccy!=='SEK'||!['CRDT','DBIT'].includes(direction))throw Error('Belopp, SEK-valuta eller betalningsriktning saknas.');
-   const sign=direction==='CRDT'?1:-1,amount=cents(amt.text.trim())*sign,date=day(value(entry,'BookgDt','Dt')||value(entry,'BookgDt','DtTm'));
+   const bookedDate=value(entry,'BookgDt','Dt'),bookedTime=value(entry,'BookgDt','DtTm');
+   if(bookedDate&&bookedTime)throw Error('Tvetydigt betalningsdatum i XML.');
+   const sign=direction==='CRDT'?1:-1,amount=cents(amt.text.trim())*sign,date=day(bookedDate||bookedTime,!bookedDate);
    const parentReference=stable(value(entry,'AcctSvcrRef'))||stable(value(entry,'NtryRef')),details=children(entry,'NtryDtls').flatMap(x=>children(x,'TxDtls')),key=`entry-${rows.length}`;
    const base={date,amount,party:'',payerReference:'',bankReference:parentReference,parentBankReference:parentReference,description:value(entry,'AddtlNtryInf'),currency:'SEK',account,source:name,externalId:parentReference?`entry:${parentReference}`:'',kind:'batch',verified:false,key,specification:true,format:String(namespace),settlementDate:value(entry,'ValDt','Dt'),recipientBankgiro:'',payerBankgiro:'',organizationNumber:''};
    const count=descendants(entry,'NbOfTxs').map(x=>Number(x.text.trim()));
@@ -112,13 +123,22 @@ export function parseBankgiroCSV(text,name='Bankgiro.csv'){
  const lines=text.replace(/^\ufeff/,'').split(/\r?\n/),start=lines.findIndex(l=>/datum/i.test(l)&&/belopp/i.test(l));
  if(start<0)throw Error('CSV-filen saknar datum- och beloppskolumner.');
  text=lines.slice(start).join('\n');const first=lines[start],sep=[';','\t',','].sort((a,b)=>first.split(b).length-first.split(a).length)[0];
- const rows=[];let row=[],cell='',quoted=false;
- for(let n=0;n<text.length;n++){const c=text[n];if(c==='"'){if(quoted&&text[n+1]==='"'){cell+='"';n++;}else quoted=!quoted;}else if(c===sep&&!quoted){row.push(cell.trim());cell='';}else if(c==='\n'&&!quoted){row.push(cell.trim());if(row.some(Boolean))rows.push(row);row=[];cell='';}else cell+=c;}
+ const rows=[];let row=[],cell='',quoted=false,closedQuote=false;
+ for(let n=0;n<text.length;n++){
+  const c=text[n];
+  if(c==='"'){
+   if(quoted){if(text[n+1]==='"'){cell+='"';n++;}else{quoted=false;closedQuote=true;}}
+   else{if(cell.trim()||closedQuote)throw Error('CSV-filen innehåller ett felplacerat citattecken.');quoted=true;cell='';}
+  }else if(c===sep&&!quoted){row.push(cell.trim());cell='';closedQuote=false;}
+  else if(c==='\n'&&!quoted){row.push(cell.trim());if(row.some(Boolean))rows.push(row);row=[];cell='';closedQuote=false;}
+  else{if(closedQuote&&!/[\t\r ]/.test(c))throw Error('CSV-filen innehåller text efter ett avslutat citattecken.');cell+=c;}
+ }
  if(quoted)throw Error('CSV-filen innehåller ett ofullständigt citattecken.');row.push(cell.trim());if(row.some(Boolean))rows.push(row);
  const headers=rows.shift()?.map(v=>v.toLocaleLowerCase('sv-SE').replace(/\s+/g,' ').trim())||[];
- const col=(...names)=>headers.findIndex(h=>names.includes(h)),idx={date:col('datum','betalningsdatum','bokföringsdatum','bokforingsdatum'),amount:col('belopp','inbetalningsbelopp'),party:col('avsändare','avsändarens namn','avsandare','betalare'),payerReference:col('betalningsreferens','betalningsreferens / ocr','ocr','ocr-nummer'),payerBankgiro:col('bankgironummer/avinummer','bankgironummer / avinummer','avsändarens bankgironummer','avinummer'),recipientBankgiro:col('mottagarens bankgiro','mottagarbankgiro'),account:col('mottagarkonto','mottagarens konto','konto','iban'),bankReference:col('bankreferens','insättningsreferens','insättnings-id'),externalId:col('betalnings-id','transaktions-id'),currency:col('valuta'),organizationNumber:col('organisationsnummer','organisationsnr')};
+ const col=(...names)=>{const found=headers.map((h,n)=>names.includes(h)?n:-1).filter(n=>n>=0);if(found.length>1)throw Error('CSV-filen har tvetydiga kolumner för '+names[0]+'.');return found[0]??-1;},idx={date:col('datum','betalningsdatum','bokföringsdatum','bokforingsdatum'),amount:col('belopp','inbetalningsbelopp'),party:col('avsändare','avsändarens namn','avsandare','betalare'),payerReference:col('betalningsreferens','betalningsreferens / ocr','ocr','ocr-nummer'),payerBankgiro:col('bankgironummer/avinummer','bankgironummer / avinummer','avsändarens bankgironummer','avinummer'),recipientBankgiro:col('mottagarens bankgiro','mottagarbankgiro'),account:col('mottagarkonto','mottagarens konto','konto','iban'),bankReference:col('bankreferens','insättningsreferens','insättnings-id'),externalId:col('betalnings-id','transaktions-id'),currency:col('valuta'),organizationNumber:col('organisationsnummer','organisationsnr')};
  if(idx.date<0||idx.amount<0||idx.party<0||idx.payerReference<0)throw Error('Bankgiro-CSV behöver kolumnerna datum, belopp, avsändare och betalningsreferens.');
  if(rows.length<1||rows.length>1000)throw Error('Välj 1–1 000 betalningar.');
+ if(rows.some(r=>r.length!==headers.length))throw Error('CSV-radernas kolumnantal stämmer inte med rubrikerna.');
  return rows.map((r,n)=>{const v=k=>idx[k]>=0?r[idx[k]]||'':'';const cur=v('currency').toUpperCase();if(cur!=='SEK')throw Error(`Rad ${n+2}: valuta saknas eller stöds inte. Ange SEK från originalunderlaget.`);let d=v('date');if(/^\d{2}[/.]\d{2}[/.]\d{4}$/.test(d))d=d.slice(6)+'-'+d.slice(3,5)+'-'+d.slice(0,2);const raw=v('amount').replace(/[\s\u00a0]/g,'').replace(',','.');return {date:day(d),amount:cents(raw),party:v('party'),payerReference:stable(v('payerReference')),payerBankgiro:v('payerBankgiro'),recipientBankgiro:v('recipientBankgiro'),account:v('account'),bankReference:v('bankReference'),parentBankReference:v('bankReference'),externalId:v('externalId'),organizationNumber:v('organizationNumber'),currency:'SEK',description:'Bankgiro betalningsspecifikation',source:name,kind:'payment',verified:false,specification:true,format:'Bankgiro CSV'};});
 }
 export function parseSpecificationBytes(bytes,name){

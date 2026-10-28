@@ -1,9 +1,9 @@
-import {available,balance,individualParty,needsPaymentSpecification,paymentInvoiceAssessment,usablePaymentReference,type State,type Transaction} from './domain';
+import {available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,usablePaymentReference,type State,type Transaction} from './domain';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 
 type Candidate={number:string;party?:string};
-const hasBankSource=(t:Transaction)=>['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'');
+const hasBankSource=(t:Transaction)=>['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'')&&!needsBankFileValidation(t);
 const cleanParty=(value?:string)=>{
   const name=String(value||'').trim();
   return individualParty(name)&&name.length<=200&&!/betalardetaljer|betalningsspecifikation|betalare\s+(?:saknas|okänd)|mottagare\s+okänd|inbetalning\s*[–-]|utbetalning\s*[–-]|^bankgiro\s+inbetalning/iu.test(name)?name:'';
@@ -42,9 +42,10 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   let status='Behöver granskas',verified=false;
   if(t.ignored)status='Undantagen';
   else if(t.duplicateOf)status='Möjlig dubblett';
+  else if(needsBankFileValidation(t))status='Original behöver verifieras';
   else if(requiresSpecification)status='Specifikation saknas';
   else if(conflict)status='Konflikt';
-  else if(t.specificationStatus==='review'||!t.verified)status='Behöver granskas';
+  else if(t.specificationStatus==='review'||!t.verified||needsBankFileReview(t))status='Behöver granskas';
   else if(allocations.length){
     verified=true;
     status=invoices.some(i=>balance(state,i)>0)?'Delbetalning':available(state,t)>0?'Överbetalning':'Verifierad';
