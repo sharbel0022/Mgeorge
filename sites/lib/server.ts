@@ -1,0 +1,8 @@
+import { env } from "cloudflare:workers";
+import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { emptyState, type State } from "./domain";
+export const response=(data:unknown,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"private, no-store","X-Content-Type-Options":"nosniff"}});
+export async function identity(req?:Request){const user=await getChatGPTUser();if(!user)throw new Error("AUTH_REQUIRED");if(req&&req.method!=='GET'){const origin=req.headers.get('origin');if(!origin||origin!==new URL(req.url).origin)throw new Error("ORIGIN_DENIED");}return user;}
+export function db(){if(!env.DB)throw new Error("Databasen är inte tillgänglig. Försök igen om en stund.");return env.DB;}
+export async function readWorkspace(owner:string){const row=await db().prepare('SELECT revision, payload FROM workspaces WHERE owner = ?').bind(owner).first<{revision:number,payload:string}>();return row?{revision:row.revision,state:JSON.parse(row.payload) as State}:{revision:0,state:emptyState()};}
+export function failure(error:unknown){const message=error instanceof Error?error.message:'Åtgärden misslyckades.';if(message==='AUTH_REQUIRED')return response({error:'Logga in med ChatGPT för att öppna dina sparade uppgifter.',signIn:'/signin-with-chatgpt?return_to=%2F'},401);if(message==='ORIGIN_DENIED')return response({error:'Åtgärden måste göras från systemets egen sida.'},403);if(/SQLITE|D1_|R2_|constraint|syntax error|no such table/i.test(message))return response({error:'Uppgifterna kunde inte sparas. Försök igen, eller kontakta administratören.'},500);return response({error:message},400);}

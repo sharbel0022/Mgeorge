@@ -1,8 +1,20 @@
 # MG Fakturakoll – M.George Vitvaror AB
 
-Ett svenskt, självhostat system för kundfakturor, leverantörsfakturor, originalunderlag och bankavstämning. Gränssnittet följer de ljusa, blå designreferenserna och använder samma navigation på dator och mobil. Alla sammanställningar beräknas från den lokala databasen; en ny installation innehåller inga exempeltransaktioner.
+Ett svenskt system för kundfakturor, leverantörsfakturor, originalunderlag och bankavstämning. Sites har ett svartvitt gränssnitt med samma navigation på dator och mobil. En ny installation innehåller inga exempeltransaktioner.
 
-Det här är den fristående källkodsversionen i detta repository. Den tidigare publicerade [ChatGPT Sites-webbplatsen](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/) har separat kod och databas. Dessa ändringar publiceras inte automatiskt där och flyttar inga företagsuppgifter mellan systemen.
+Repositoryt innehåller nu både den fristående Node-versionen i `src/` och den fullständiga publicerade Sites-källan i `sites/`. De har separata databaser. GitHub-push publicerar inte automatiskt till Sites; publicering sker i samma befintliga Sites-projekt och flyttar inga företagsuppgifter.
+
+## Bankgiro – Sites version 24
+
+Bankgiroimport med förhandsgranskning, sparat original, kontroll av konto/datum/identifierare/totalsumma, spärr av osäkra specifikationer och automatisk avstämning när både fakturareferens och kund stämmer. 0599 behåller nollan; avsändarens Bankgiro/Avinummer hålls separat från bankreferens och OCR. Saknade fakturor söks i Gmail med befintliga medgivanden och begränsningar. Kundmejl skickas aldrig av importen.
+
+**209 Sites-tester** och **209 Node-tester** passerar, inklusive syntetiska betalningar, originalkontroll, ägaråtkomst och sessionsbortfall. TypeScript och produktionsbygge är godkända. Företagets verkliga Bankgiroexport återstår att verifiera. Se [leveransrapporten](docs/BANKGIRO-DELIVERY.md) och [format- och driftinformationen](sites/BANKGIRO.md).
+
+Sites-källan utvecklas separat med `cd sites`, `npm run install:ci`, `npm run check`, `npm test` och `npm run build`. CI kontrollerar båda implementationerna. `.env`, lokala databaser, originalfiler och krypteringsnycklar ingår inte i Git.
+
+## Sites – aktuell svartvit granskningsyta
+
+**Version 23** är publicerad på den befintliga Sites-adressen med fem huvudområden, gemensam sökning och granskning med underlaget på samma sida. Samlingsposters bankreferenstext visas separat från kundens OCR. 181 syntetiska tester passerar; produktionsvyn är verifierad utan ändrade betalningar eller kundutskick. Se [leverans och verifiering](docs/SITES-MONOCHROME-REVIEW.md).
 
 ## MG Fakturakoll 2.0 – Sites som produktionssystem
 

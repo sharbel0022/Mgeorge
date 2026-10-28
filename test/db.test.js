@@ -12,8 +12,9 @@ test('matching respects direction, balances and prevents double-match',()=>{
   try{
     db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('i1','customer','0604','Kund AB',187500);
     db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('i2','supplier','123','Leverantör AB',25000);
-    const x={account:'MG',booked_at:'2026-10-26',amount_cents:187500,currency:'SEK',payer:'Kund AB',reference:'0604',bank_reference:'BANK123',description:''};
+    const x={account:'MG',booked_at:'2026-10-26',amount_cents:187500,currency:'SEK',payer:'Kund AB',reference:'0604',bank_reference:'BANK123',payer_bankgiro:'501-8296',description:''};
     assert.equal(storeTransactions(db,[x,x],'test').imported,1);
+    assert.equal(db.prepare('SELECT payer_bankgiro FROM bank_transactions').get().payer_bankgiro,'501-8296');
     const t=db.prepare('SELECT id FROM bank_transactions').get().id;
     assert.throws(()=>allocate(db,'i2',t,25000),/riktning/);
     allocate(db,'i1',t,125000);assert.equal(listInvoices(db)[0].paid_cents,125000);

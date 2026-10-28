@@ -108,6 +108,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','review_reason',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','import_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','bankgiro',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_transactions','payer_bankgiro',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','payer_organization_number',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
   const identityUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='api_identity_version');
@@ -225,6 +226,7 @@ export function storeTransactions(db,items,source,original=null) {
       }
       const id=randomUUID(),r=insert.run(id,f,x.account,x.booked_at,x.amount_cents,x.currency,x.payer||'',x.reference||'',bankId,x.description||'',source,x.is_aggregate?1:0,x.parent_bank_reference||x.aggregate_parent_reference||'',x.review_reason||'',x.bankgiro||'',x.provider_transaction_id||'',source==='enablebanking'?1:0);
       if(r.changes){
+        if(x.payer_bankgiro)db.prepare('UPDATE bank_transactions SET payer_bankgiro=? WHERE id=?').run(String(x.payer_bankgiro),id);
         const organization=String(x.payer_organization_number||'').replace(/[- ]/g,'');
         if(/^\d{10}$/.test(organization))db.prepare('UPDATE bank_transactions SET payer_organization_number=? WHERE id=?').run(organization,id);
         imported++;inserted.push(id);

@@ -52,7 +52,7 @@ function csvRows(text,delimiter){
   return rows;
 }
 const aliases={
-  date:['bokföringsdatum','bokforingsdatum','datum','date','booking date','transaction date','transaktionsdatum'],
+  date:['bokföringsdatum','bokforingsdatum','betalningsdatum','datum','date','booking date','transaction date','transaktionsdatum'],
   amount:['belopp','amount','transaktionsbelopp','summa','change'],
   debit:['debet','ut','debit','withdrawal','utbetalning'],
   credit:['kredit','in','credit','deposit','inbetalning'],
@@ -62,6 +62,7 @@ const aliases={
   reference:['ocr','referens','fakturareferens','betalningsreferens','betalningsreferens / ocr','meddelande','payment reference','referensnummer'],
   bank_reference:['bankreferens','bank reference','transaktionsid','transaktions-id','transaction id','id'],
   bankgiro:['bankgiro','bankgironummer','företagets bankgiro','foretagets bankgiro'],
+  payer_bankgiro:['bankgironummer/avinummer','bankgironummer / avinummer','avsändarens bankgironummer','avinummer'],
   description:['text','beskrivning','information','description','detaljer','typ','transaktionstext']
 };
 function norm(v){return String(v).toLowerCase().trim().replace(/[_-]+/g,' ').replace(/\s+/g,' ');}
@@ -88,7 +89,7 @@ export function parseCSV(text,account='Swedbank'){
     if(!cents)continue;
     const description=g('description'),payer=g('payer'),reference=g('reference');
     const collective=requiresPaymentSpecification(description,payer,reference);
-    items.push({account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),description,...(collective?aggregateFlags():{})});
+    items.push({account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
   }
   return validateItems(items);
 }
@@ -157,7 +158,7 @@ function aggregateFlags(reason='Betalardetaljer saknas – importera betalningss
 function validateItems(items){if(items.length>1000)throw new Error('Högst 1 000 bankhändelser per import');if(!items.length)throw new Error('Inga bokförda bankhändelser hittades');return items;}
 export function parseCAMT(xml,account='Swedbank'){
   const document=xmlTree(xml);
-  if(document.name!=='Document'||!document.children.some(x=>['BkToCstmrStmt','BkToCstmrDbtCdtNtfct'].includes(x.name)))throw new Error('Endast ISO 20022 camt.053/054 stöds');
+  if(document.name!=='Document'||!document.children.some(x=>['BkToCstmrStmt','BkToCstmrDbtCdtNtfct','BkToCstmrDbtCdtNtfctn'].includes(x.name)))throw new Error('Endast ISO 20022 camt.053/054 stöds');
   const items=[];
   for(const entry of descendants(document,'Ntry')){
     const status=value(entry,'Sts','Cd')||value(entry,'Sts');if(status&&status!=='BOOK')continue;
@@ -208,7 +209,7 @@ export function parseBankFile(name,base64,account='Swedbank'){
   if(!/^[\w\p{L}(). -]+\.(csv|xml)$/iu.test(String(name)))throw new Error('Välj CSV eller XML');
   if(typeof base64!=='string'||base64.length>20_000_000||!base64.length||base64.length%4!==0||!/^[A-Za-z0-9+/]*={0,2}$/.test(base64))throw new Error('Fil saknas eller är för stor eller felaktig');
   const bytes=Buffer.from(base64,'base64');if(bytes.length>15_000_000)throw new Error('Max 15 MB');
-  const text=bytes.toString('utf8');
+  let text;try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{text=new TextDecoder('windows-1252').decode(bytes);}
   return name.toLowerCase().endsWith('.xml')?parseCAMT(text,account):parseCSV(text,account);
 }
 export function normalizeBankApiTransaction(x,account){

@@ -25,3 +25,23 @@ jobs:
       - run: npm run check
       - name: Run tests with synthetic data
         run: npm test
+  sites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: sites
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: sites/package-lock.json
+      - run: npm run install:ci
+      - run: npm run check
+      - name: Run Sites tests with synthetic data
+        run: npm test
+      - run: npm run build

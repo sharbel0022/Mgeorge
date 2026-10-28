@@ -9,11 +9,12 @@ test('CSV handles quoted semicolon text and normalizes signed amounts',()=>{
   const rows=parseCSV(csv,'MG');assert.equal(rows.length,2);assert.equal(rows[0].payer,'A; B AB');assert.equal(rows[1].amount_cents,-200000);assert.equal(rows[0].account,'MG');
 });
 test('Bankgiro CSV payment reference is kept distinct from the bank event reference',()=>{
-  const rows=parseCSV('Datum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp\\n2026-10-26;Café Gränden Bistro AB;0599;501-8296;625,00','SE2820000842447344810101');
+  const rows=parseCSV('Datum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp\n2026-10-26;Café Gränden Bistro AB;0599;501-8296;625,00','SE2820000842447344810101');
   assert.equal(rows.length,1);
   assert.equal(rows[0].payer,'Café Gränden Bistro AB');
   assert.equal(rows[0].reference,'0599');
   assert.equal(rows[0].bank_reference,'');
+  assert.equal(rows[0].payer_bankgiro,'501-8296');
   assert.equal(rows[0].amount_cents,62500);
   assert.equal(rows[0].booked_at,'2026-10-26');
 });
@@ -22,6 +23,13 @@ test('camt.054 splits TxDtls and preserves credit direction',()=>{
   const x=parseCAMT(xml,'Bankgiro');assert.equal(x.length,1);assert.equal(x[0].payer,'Exempelkund AB');assert.equal(x[0].reference,'0604');assert.equal(x[0].amount_cents,187500);
 });
 test('XML containing a DOCTYPE is rejected',()=>assert.throws(()=>parseCAMT('<!DOCTYPE d [<!ENTITY x SYSTEM "file:///etc/passwd">]><Document></Document>')));
+test('official camt.054 notification element and Windows-1252 Bankgiro CSV are accepted',()=>{
+ const xml='<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>';
+ assert.equal(parseCAMT(xml)[0].amount_cents,62500);
+ const csv='Betalningsdatum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp\n2026-10-26;Café Gränden Bistro AB;0599;501-8296;625,00';
+ const [row]=parseBankFile('bankgiro.csv',Buffer.from(csv,'latin1').toString('base64'));
+ assert.equal(row.payer,'Café Gränden Bistro AB');assert.equal(row.reference,'0599');assert.equal(row.payer_bankgiro,'501-8296');
+});
 test('normalizes Enable Banking transaction and direction',()=>{
   const r=normalizeBankApiTransaction({status:'BOOK',transaction_amount:{amount:'35.50',currency:'SEK'},credit_debit_indicator:'DBIT',booking_date:'2026-10-24',creditor:{name:'Leverantör AB'},transaction_id:'DETAIL-ABC',entry_reference:'ARCHIVE-ABC'},'SE123');
   assert.equal(r.amount_cents,-3550);assert.equal(r.payer,'Leverantör AB');assert.equal(r.bank_reference,'ARCHIVE-ABC');assert.equal(r.provider_transaction_id,'DETAIL-ABC');

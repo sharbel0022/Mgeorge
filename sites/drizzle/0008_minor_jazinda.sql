@@ -1,0 +1,1 @@
+ALTER TABLE `bank_connections` ADD `control_last_attempt_at` text;
