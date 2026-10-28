@@ -68,6 +68,7 @@ export function readCamtDocument(xml){
  const container=doc.namespace.includes('camt.053.')?'BkToCstmrStmt':'BkToCstmrDbtCdtNtfctn',report=container==='BkToCstmrStmt'?'Stmt':'Ntfctn';
  const walk=(node,inRemittance=false)=>{
   inRemittance||=node.name==='RmtInf';
+  if(!inRemittance&&['CdtrRefInf','RfrdDocInf'].includes(node.name))throw Error('XML-referens ligger utanför den stödda betalningsstrukturen.');
   if(node.namespace!==doc.namespace)throw Error('Främmande eller saknad XML-namnrymd i bankunderlaget.');
   if(node.children.length&&node.text.trim())throw Error('Tvetydig XML: blandad text och struktur i '+node.name+'.');
   const accepted=inRemittance?remittanceFields[node.name]:node.name==='Document'?[container]:allowed[node.name];
@@ -91,7 +92,7 @@ export const xmlChildren=(node,name)=>(node?.children||[]).filter(x=>x.name===na
 export function xmlPath(node,...names){for(const name of names){const matches=xmlChildren(node,name);if(matches.length>1){if(name==='Othr'&&node?.name==='OrgId')return undefined;throw Error('Tvetydig XML: flera '+name+'-fält i samma bankuppgift.');}node=matches[0];}return node;}
 export const xmlValue=(node,...names)=>xmlPath(node,...names)?.text.trim()||'';
 export function xmlDescendants(node,name){return(node?.children||[]).flatMap(x=>x.name===name?[x]:xmlDescendants(x,name));}
-export function camtRemittanceNodes(node,name){return xmlChildren(node,'RmtInf').flatMap(rmt=>xmlChildren(rmt,'Strd').flatMap(strd=>xmlChildren(strd,name)));}
+export function camtRemittanceNodes(node,name){return xmlChildren(xmlPath(node,'RmtInf'),'Strd').flatMap(strd=>name==='CdtrRefInf'?[xmlPath(strd,name)].filter(Boolean):xmlChildren(strd,name));}
 export function camtAmount(node){
  const choices=[xmlPath(node,'AmtDtls','TxAmt','Amt'),xmlPath(node,'AmtDtls','InstdAmt','Amt'),xmlPath(node,'Amt')].filter(Boolean);
  if(choices.length>1)throw Error('Tvetydiga individuella XML-belopp. Granska bankoriginalet.');return choices[0];

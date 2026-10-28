@@ -27,7 +27,8 @@ export function camtIntegrityTests({parse,parseBytes,report}){
  });
  test('V4 references outside the supported remittance path cannot acquire a false field source',()=>{
   const without=syntheticCamt.replace(/<RmtInf>[\s\S]*?<\/RmtInf>/,'');
-  for(const field of ['<RltdRmtInf><Bogus><CdtrRefInf><Tp><CdOrPrtry><Prtry>OCR</Prtry></CdOrPrtry></Tp><Ref>000018</Ref></CdtrRefInf></Bogus></RltdRmtInf>','<RltdRmtInf><Bogus><RfrdDocInf><Nb>000018</Nb></RfrdDocInf></Bogus></RltdRmtInf>'])assert.throws(()=>parse(without.replace('</TxDtls>',field+'</TxDtls>')),/XML|struktur/i);
+  for(const field of ['<RltdRmtInf><Bogus><CdtrRefInf><Tp><CdOrPrtry><Prtry>OCR</Prtry></CdOrPrtry></Tp><Ref>000018</Ref></CdtrRefInf></Bogus></RltdRmtInf>','<RltdRmtInf><Bogus><RfrdDocInf><Nb>000018</Nb></RfrdDocInf></Bogus></RltdRmtInf>','<RltdRmtInf><RmtLctnPstlAdr><Bogus><CdtrRefInf><Ref>000018</Ref></CdtrRefInf></Bogus></RmtLctnPstlAdr></RltdRmtInf>'])assert.throws(()=>parse(without.replace('</TxDtls>',field+'</TxDtls>')),/XML|struktur/i);
+  const remittance=syntheticCamt.match(/<RmtInf>[\s\S]*?<\/RmtInf>/)[0];assert.throws(()=>parse(syntheticCamt.replace(remittance,remittance+remittance)),/tvetyd|flera/i);
   const row=parse(without.replace('</TxDtls>','<RltdRmtInf><RmtId>000018</RmtId></RltdRmtInf></TxDtls>'))[0];assert.equal(row.payerReference??row.reference,'');assert.equal((row.referenceEvidence??row.reference_evidence).candidates.length,0);
  });
  test('V4 detail reversals, corrections and unknown extensions require separate review',()=>{
