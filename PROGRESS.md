@@ -67,3 +67,24 @@ MG-pluginens rena statusanrop bekräftade bankanslutning med befintligt sex-timm
 ## Efterföljande godkänd publicering
 
 Användaren begärde därefter uttryckligen main och Sites-publicering. PR #12 mergades och Sites-version 30 publicerades med status succeeded. Se [publiceringsbevis](docs/BANK-EVIDENCE-SAFETY-PUBLICATION.md). Tidigare avgränsningar ovan beskriver granskningsleveransen före detta godkännande.
+
+## V4 — ny inventering och kvalitetsslinga
+
+- Bifogad V4-specifikation läst i sin helhet. Senaste main hämtad; ren bas `f549293`. Separat branch `codex/mgeorge-v4-bank-verification`. PR #12:s merge och Sites 30 bekräftade via rena metadataanrop.
+- Baslinjen körd på nytt: **291/291 Node**, **357/357 Sites**. Tidigare tester behandlas som historisk evidens.
+- Officiell bankresearch bekräftar att PSD2 kan sakna individuella Bankgirobetalare. camt.054.001.02 förekommer i flera Swedbank-MIG; namespace ensamt räcker inte för företagsformatverifiering. Exakta avtal/kanaler/kostnader och blockerare finns i `docs/V4-SWEDBANK-CHANNELS.md`.
+- Skrivskyddade MG-statusanrop bekräftar ansluten sex-timmarsbank, ansluten Gmail med fungerande bakgrund och verifierad molnbackup 37/37 original. Sites-metadata visar befintliga bank/Gmail/backupscheman aktiva. Inga sync-, avstämnings-, backup- eller schemamutationer anropades.
+- Granskning reproducerade för tillåtande XML-profil/namespace, påhittade Node-delpost-ID:n, bankskrivningar efter utgången lease, tappad/kortad Retry-After, obegränsade Sites-omförsök och backuplease-avbrott. Rättelser och regressioner införda i befintliga motorer.
+- Ny betalningshistorik visar äldre verifieringar, återtagna kopplingar och parent/child-underlag med ägaravgränsad sidindelning. Oberoende granskning hittade stale historik, borttappad lineage och ofullständig rättelseinformation; rättelser och negativa läckagetester införda.
+- Lokal Sites-preview körs utan produktionshemligheter; endast minnesbaserat demoläge för UI-ändringar. Verifierat sex fält, okänd betalare, saknad OCR, 320/390/768/1024/1440 utan dokumentoverflow, native dialog och tangentbordsöppnad källhistorik. Syntetisk camt.054 gav exakt syntetiskt namn/OCR och rätt samlingspost, med saknad faktura kvar för granskning.
+- Fullständiga slutkontroller, oberoende granskning och granskbar PR återstår. Verkligt bankoriginal och produktionsflöde är fortsatt externt blockerade. Ingen V4-merge eller publicering utförd.
+
+## V4 — slutkontroll 2026-10-29
+
+- Slutlig programkod 04c45b8: **312/312 Node**, **394/394 Sites**, 0 fel / 0 överhoppade. **60 JavaScript-filer** syntaxkontrollerade, TypeScript och produktionsbygge godkända. Båda npm audit har 0 kända sårbarheter inklusive utvecklingsberoenden.
+- Oberoende granskning åtgärdade okända OCR-strukturer utanför RmtInf, saknad samlingsreferens för ensamt detaljbarn, ändrade härledda referens-/organisationsfakta och efterkontrollvarningar som annars försvann efter schemakörning. Riktade och fullständiga tester passerar efter rättelser.
+- Ett verkligt processavslut mitt i SQLite-import rullar tillbaka hela skrivningen; tidigare original bevaras och återförsök/återimport ger en betalning/allokering. Bankens ASPSP-spärr utan giltig Retry-After får sex timmars väntetid som består efter serveromstart.
+- Färdigt Worker-bygge provkört med wrangler --local och separat .wrangler/v4-qa. UI-bilder från minnesdemo, riktig filväljare och syntetisk camt visar rätt samlingskoppling, namn och OCR 000018 utan påhittad faktura. Mobil/desktop och tangentbord kontrollerade. API-tester verifierar dubbelbekräftelse utan dubbla pengar. Inga produktionssaldon eller original används.
+- Sista UI-granskningen rättade felaktig text som kallade bankens OCR ett fakturanummer. Utloggad/misslyckad ekonomihämtning visar också ärlig status.
+- [V4-slutrapport](docs/V4-DELIVERY.md) innehåller aktuell inventering, 20 scenarier, säkerhet, återställningsprov, rollback, granskningsmatris och exakta externa hinder. Migration 0012–0013 är additiv och endast lokalt testad.
+- Ingen merge, publicering, produktionsmigration, ny bank/Gmail-hämtning, bankbetalning eller kundsändning utförd. **EXTERN BLOCKERING – INTE FULLSTÄNDIGT PRODUKTIONSVERIFIERAT** kvarstår för autentiskt Swedbankunderlag/avtalad kanal och kontrollerat produktionsflöde.
