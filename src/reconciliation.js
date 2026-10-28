@@ -50,7 +50,7 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     }
   }
   // Multiple payments for the same invoice must be reviewed together, never auto-consumed.
-  for(const s of out)if(out.some(x=>x.invoice_id===s.invoice_id&&x.transaction_id!==s.transaction_id)){
+  for(const s of out)if(s.invoice_id&&out.some(x=>x.invoice_id===s.invoice_id&&x.transaction_id!==s.transaction_id)){
     s.safe=false;s.reason='Flera betalningar kan avse fakturan; kontrollera möjlig dubbelbetalning.';
     if(s.kind==='correct')s.kind='possible_duplicate';
   }

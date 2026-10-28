@@ -1,7 +1,22 @@
-// Deterministic, evidence-based interpretation. Document text is never executed
-// or sent to a language model. Confidence is a review heuristic, not a probability.
 import {fork} from 'node:child_process';
 import {parseMoney} from './importers.js';
+// Only explicitly labelled values are normalized. Original text remains evidence.
+function normalizeInvoiceLayout(input){
+  const original=String(input||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
+  const warnings=[];
+  let text=original.replace(/(faktura\s*(?:nummer|nr)|invoice\s*(?:number|no))([ \t.:#-]*)([0-9][0-9 \t]*)(?=\n|$)/gi,(_,label,sep,value)=>label+sep+value.replace(/[ \t]/g,''));
+  text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.replace(/[ \t]/g,''));
+  text=text.replace(/([,.])[ \t]+(?=\d{2}\b)/g,'$1');
+  // An undiscounted unit price plus VAT must agree with its displayed line total.
+  for(const line of text.split('\n')){
+    const m=line.match(/\b(\d+)[ \t]+(?:st|styck|pcs)[ \t]+([\d \t]+[,.]\d{2})[ \t]*(?:kr|SEK)[ \t]+([\d \t]+)[ \t]*%[ \t]+([\d \t]+[,.]\d{2})[ \t]*(?:kr|SEK)[ \t]+([\d \t]+[,.]\d{2})/i);
+    if(m&&!/rabatt|discount/i.test(text)){
+      const n=s=>Math.round(Number(s.replace(/[ \t]/g,'').replace(',','.'))*100),qty=Number(m[1]),unit=n(m[2]),vat=n(m[4]),gross=n(m[5]);
+      if(Number.isSafeInteger(unit)&&Number.isSafeInteger(gross)&&Math.abs(qty*unit+vat-gross)>1)warnings.push('Radpris, moms och radbelopp stämmer inte överens. Kontrollera originalet.');
+    }
+  }
+  return {text,original,warnings};
+}
 
 export const fieldNames=['invoice_number','party','organization_number','issued_at','due_at','total_cents','vat_cents','net_cents','reference','bankgiro','direction','kind','currency'];
 const titles={invoice_number:'fakturanummer',party:'kund eller leverantör',organization_number:'organisationsnummer',issued_at:'fakturadatum',due_at:'förfallodatum',total_cents:'totalbelopp',vat_cents:'moms',net_cents:'belopp exklusive moms',reference:'OCR eller referens',bankgiro:'Bankgiro',direction:'fakturatyp',kind:'dokumenttyp',currency:'valuta'};
@@ -15,10 +30,10 @@ export function validOrganization(value){
   return [...s].reduce((sum,c,i)=>{const n=Number(c)*(i%2?1:2);return sum+Math.floor(n/10)+n%10;},0)%10===0;
 }
 export function interpretInvoice(text,{direction=null,direction_confident=false,method='pdf',ocrConfidence=0}={}){
-  text=String(text||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
-  const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null}])),issues=[];
+  const layout=normalizeInvoiceLayout(text);text=layout.text;
+  const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
-  const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null};};
+  const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
   const grab=(key,re,convert=s=>s.trim())=>{
     const matches=[...text.matchAll(re)],values=matches.map(m=>convert(m[1])).filter(v=>v!=null);
     const distinct=[...new Set(values)];
@@ -27,18 +42,21 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     else if(matches.length)issues.push(`Ogiltigt värde för ${titles[key]}.`);
   };
   grab('invoice_number',/(?:faktura\s*(?:nummer|nr|no)|invoice\s*(?:number|no)|fakturanr)\s*[.:#-]*\s*([\p{L}\p{N}][\p{L}\p{N}/_-]{0,79})/giu);
-  grab('issued_at',/(?:fakturadatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
-  grab('due_at',/(?:förfallodatum|förfaller|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
-  const amount='(-?\\d[\\d \\u00a0]*(?:[.,]\\d{1,2})?)(?:[ \\t]*(?:SEK|kr))?';
+  grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
+  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
+  const amount='(-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|\\d[\\d \\t\\u00a0]*(?:[.,]\\d{1,2})?))(?![\\d.,])(?:[ \\t]*(?:SEK|kr))?';
   const money=s=>{try{return parseMoney(s);}catch{return null;}};
-  grab('total_cents',new RegExp('(?:att betala|summa att betala|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'gi'),money);
-  grab('vat_cents',new RegExp('(?:^|\\n)[ \\t]*(?:moms(?:belopp)?|VAT)(?!\\s*\\d+%)\\s*[:.]?\\s*'+amount,'gi'),money);
-  grab('net_cents',new RegExp('(?:belopp exklusive moms|summa exkl\\.? moms|netto(?:belopp)?|net amount)\\s*[:.]?\\s*'+amount,'gi'),money);
+  grab('total_cents',new RegExp('(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'gi'),money);
+  grab('vat_cents',new RegExp('(?:^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)(?!\\s*\\d+%)\\s*[:.]?\\s*'+amount,'gi'),money);
+  grab('net_cents',new RegExp('(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?:^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount))\\s*[:.]?\\s*'+amount,'gi'),money);
   grab('reference',/(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)\s*[:.]?\s*([\p{L}\p{N}][\p{L}\p{N} /_-]{0,119})/giu);
   grab('bankgiro',/(?:bankgiro|bankgirokonto|bg)\s*[:.]?\s*(\d{3,4}[ -]\d{4})/gi,s=>s.replace(/ /g,'-'));
-  grab('organization_number',/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)\s*[:.]?\s*(\d{6}[- ]?\d{4})/gi,s=>validOrganization(s)?s.replace(/[- ]/g,''):null);
-  const partyLabel=direction==='customer'?'kund|fakturamottagare|customer|bill to':'leverantör|utställare|supplier|seller';
+  const wholeText=text;
+  if(direction==='customer'&&/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i.test(text))text=text.split(/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i).slice(1).join('\n').split(/Tilläggsinformation|Betalningsuppgifter/i)[0];
+  grab('organization_number',/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)\s*[:.]?\s*(\d{6}[-– ]?\d{4})/gi,s=>validOrganization(s.replace(/–/g,'-'))?s.replace(/[-– ]/g,''):null);
+  const partyLabel=direction==='customer'?'kund|fakturamottagare|företags\\s*namn|customer|bill to':'leverantör|utställare|säljare|supplier|seller';
   grab('party',new RegExp('(?:^|\\n)[ \\t]*(?:'+partyLabel+')\\s*:[ \\t]*([^\\n]{2,240})','gi'));
+  text=wholeText;
   if(['customer','supplier'].includes(direction))set('direction',direction,'Föreslagen från mejlets riktning',direction_confident?.94:.5);
   const kind=/kreditfaktura|credit\s*(?:invoice|note)/i.test(text)?'credit':/\bkvitto\b|\breceipt\b/i.test(text)?'receipt':/\bfaktura\b|\binvoice\b|fakturanr/i.test(text)?'invoice':'other';
   set('kind',kind,text.match(/kreditfaktura|credit\s*(?:invoice|note)|kvitto|receipt|faktura|invoice/i)?.[0]);
@@ -53,9 +71,9 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const required=['invoice_number','party','issued_at','due_at','total_cents','direction','currency','organization_number'];
   const missing=required.filter(k=>values[k]==null);
   if(missing.length)issues.push('Saknade uppgifter: '+missing.map(k=>titles[k]).join(', '));
-  const fatal=values.total_cents==null||values.invoice_number==null||!['invoice','credit'].includes(kind)||issues.some(s=>/Motstridiga|Momsberäkningen|flera fakturor|Flera valutor|läsbar text/.test(s));
+  const fatal=values.total_cents==null||values.invoice_number==null||!['invoice','credit'].includes(kind)||issues.some(s=>/Motstridiga|Momsberäkningen|Radpris|flera fakturor|Flera valutor|läsbar text/.test(s));
   const level=fatal?'red':issues.length||missing.length||required.some(k=>fields[k].confidence<.9)?'yellow':'green';
-  return {version:1,method,fields,level,issues:[...new Set(issues)],text_excerpt:text.slice(0,20000),extracted_at:new Date().toISOString()};
+  return {version:2,method,fields,level,issues:[...new Set(issues)],text_excerpt:layout.original.slice(0,20000),extracted_at:new Date().toISOString()};
 }
 export function validateInvoiceValues(v){
   const issues=[];

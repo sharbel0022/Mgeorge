@@ -1,0 +1,21 @@
+import {spawnSync} from 'node:child_process';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+if(process.platform!=='win32')throw Error('Windows krävs för denna installation.');
+const taskName='MGFakturakoll-LocalOCR',folder=fileURLToPath(new URL('../.codex-work/sites-ocr/',import.meta.url));
+console.log('Ready for OCR configuration on stdin (input is hidden).');
+const raw=await new Promise((resolve,reject)=>{
+  let value='';if(process.stdin.isTTY)process.stdin.setRawMode(true);
+  process.stdin.setEncoding('utf8');process.stdin.on('data',chunk=>{for(const c of chunk){if(c==='\u0003'){reject(Error('Avbrutet'));return;}if(c==='\n'||c==='\r'){process.stdin.pause();if(process.stdin.isTTY)process.stdin.setRawMode(false);resolve(value);return;}value+=c;if(value.length>8192){reject(Error('För stor konfiguration'));return;}}});
+});
+const config=JSON.parse(raw);const origin=new URL(config.origin);if(origin.protocol!=='https:'||origin.origin!==config.origin||!/^[A-Za-z0-9_-]{43}$/.test(config.token))throw Error('Ogiltig konfiguration.');
+config.node=process.execPath;
+const protect=spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',"Add-Type -AssemblyName System.Security; $taskPlain=[Text.Encoding]::UTF8.GetBytes([Console]::In.ReadToEnd()); [Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Protect($taskPlain,$null,[Security.Cryptography.DataProtectionScope]::CurrentUser))"],{input:JSON.stringify(config),encoding:'utf8',windowsHide:true});
+if(protect.status!==0||!protect.stdout.trim())throw Error('Kunde inte skydda OCR-konfigurationen.');
+mkdirSync(folder,{recursive:true});const file=join(folder,'ocr-config.dat');writeFileSync(file,protect.stdout.trim(),{mode:0o600});
+const script=fileURLToPath(new URL('./run-sites-ocr.ps1',import.meta.url)),quote=s=>"'"+s.replaceAll("'","''")+"'";
+const install=`$ErrorActionPreference='Stop';$taskScript=${quote(script)};$taskOld=Get-ScheduledTask -TaskName '${taskName}' -ErrorAction SilentlyContinue;if($taskOld -and $taskOld.Actions.Arguments -notlike ('*'+$taskScript+'*')){throw 'Task name already used'};$taskAction=New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-NoProfile -NonInteractive -WindowStyle Hidden -File "'+$taskScript+'"');$taskTriggers=@((New-ScheduledTaskTrigger -AtLogOn -User ([Security.Principal.WindowsIdentity]::GetCurrent().Name)),(New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 2) -RepetitionDuration (New-TimeSpan -Days 3650)));$taskSettings=New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Minutes 12) -RestartCount 2 -RestartInterval (New-TimeSpan -Minutes 1) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries;$taskPrincipal=New-ScheduledTaskPrincipal -UserId ([Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType Interactive -RunLevel Limited;Register-ScheduledTask -TaskName '${taskName}' -Action $taskAction -Trigger $taskTriggers -Settings $taskSettings -Principal $taskPrincipal -Force | Out-Null;Start-ScheduledTask -TaskName '${taskName}';Write-Output 'Installed and started local OCR task.'`;
+const result=spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',install],{encoding:'utf8',windowsHide:true});
+if(result.status!==0)throw Error('OCR-konfigurationen sparades säkert men Windows-jobbet kunde inte installeras.');
+console.log('Local OCR configured with DPAPI protection and a repeating Windows task.');

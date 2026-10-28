@@ -75,7 +75,7 @@ Befintlig bank-/Gmail-synkning anropar nu avstämning och utkastberedning efter 
 
 ## Dokumenttolkning
 
-Sites befintliga PDF- och bildtolkning med svensk OCR körs i webbläsaren när ett Gmail-underlag öppnas för granskning. De verifierade fakturafälten bevaras nu för avstämning och momsutkast. Okända fakturor och skannade dokument kräver fortsatt granskning; denna Worker-uppdatering innehåller inte Node-versionens lokala serverprocesser för PDF-rendering/OCR eller obevakad server-OCR. Den begränsningen visas även på Gmail-sidan. Ingen osäker text eller AI-gissning används för att skapa en skuld eller betalningsstatus.
+PDF-text tolkas nu i Sites utan en öppen webbläsare. Bilder och skannade PDF:er går till den här datorns autentiserade OCR-jobb. Grön tolkning och uttryckligen verifierad motpart krävs för automatisk registrering; osäkra fall går till granskningskön. Se [aktuell driftguide](SITES-DOCUMENT-AUTOMATION.md) för köer, schema, resursgränser och Windows-jobbet. Kundmejl kräver fortsatt ditt godkännande.
 
 ## Databas
 

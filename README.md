@@ -94,6 +94,8 @@ Se [arkitekturen](docs/ARCHITECTURE.md) för datamodell, API och tekniska avgrä
 
 ## Betalningsavstämning och kundmeddelanden
 
+Sites har nu en beständig dokumentkö för PDF-text och lokal Windows-OCR. Se [driftguiden för automatisk dokumenthantering](docs/SITES-DOCUMENT-AUTOMATION.md). OCR-datorn behöver vara på, vaken och inloggad; kundmejl kräver fortfarande ditt godkännande.
+
 Fliken **Kundmeddelanden** visar verifierade betalningar, kvarstående saldo, avvikelse, originalfaktura och ett redigerbart svenskt mejlutkast. Verifiera kundadressen mot ett faktiskt underlag. Öppna och läs varje aktuell mejlversion; efter redigering måste den nya versionen granskas. **Avvisa** stoppar utkastet; **Godkänn och skicka** kräver ett uttryckligt godkännande och separat Gmail-medgivande för utskick.
 
 Saknad/fel OCR, annan betalare, möjliga dubletter och fördelning på flera fakturor kräver granskning. En ny betalning stoppar äldre utkast. Vid Gmail-timeout låses utskicket som oklart och skickas aldrig om automatiskt. Schemaläggaren hämtar, avstämmer och förbereder utkast men kan inte skicka mejl.

@@ -2,6 +2,7 @@ import {createRequire} from 'node:module';
 import {dirname,join} from 'node:path';
 import {createCanvas,loadImage} from '@napi-rs/canvas';
 import {createWorker} from 'tesseract.js';
+import {imageDimensions} from './image-dimensions.js';
 import {getDocument} from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const require=createRequire(import.meta.url);
@@ -17,6 +18,7 @@ async function run(workerData){
   const bytes=new Uint8Array(workerData.bytes);
   if(bytes.length>15_000_000)throw Error('size');
   if(workerData.mime_type!=='application/pdf'){
+    imageDimensions(bytes,workerData.mime_type);
     const image=await loadImage(Buffer.from(bytes));
     if(image.width*image.height>12_000_000)throw Error('pixels');
     const canvas=createCanvas(image.width,image.height);canvas.getContext('2d').drawImage(image,0,0);
