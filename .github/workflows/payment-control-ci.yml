@@ -43,6 +43,9 @@ jobs:
           cache: npm
           cache-dependency-path: sites/package-lock.json
       - run: npm run install:ci
+      - name: Install shared OCR runtime for cloud integration test
+        working-directory: .
+        run: npm ci --ignore-scripts
       - run: npm run check
       - name: Audit Sites production dependencies
         run: npm audit --audit-level=high

@@ -60,6 +60,24 @@ test('partial payment leaves exactly 625 SEK and generates a cautious VAT draft'
 test('unknown payer with right amount remains unallocated and amount alone is never safe',async t=>{
   const f=await fixture(t);f.init();f.pay(312500,{party:'Okänd',payerReference:''});await f.queue();assert.equal(paid(f.state(),f.state().invoices[0].id),0);
 });
+
+test('late specification linking is audited but only new allocations count as verified payments',async t=>{
+ const f=await fixture(t);f.init();
+ let s=f.state();s=applyCommand(s,{type:'bankgiro.import',rows:[{date:'2026-10-26',amount:312500,party:'Kund AB',payerReference:'0597',bankReference:'LATE-CHILD',parentBankReference:'LATE-PARENT',externalId:'transaction:LATE-CHILD',account:'MG',currency:'SEK',description:'Individuell specifikation',source:'synthetic.xml',kind:'payment',specification:true}],documentId:'synthetic-original',hash:'synthetic-original-hash',name:'synthetic.xml'}).state;
+ assert.equal(s.transactions[0].specificationStatus,'review');f.put(s);f.pay(312500,{kind:'batch',party:'',payerReference:'',bankReference:'LATE-PARENT',description:'Bankgiro inbetalning'});
+ const result=await f.api.reconcileAndPrepare(f.owner);assert.equal(result.automatic,1);assert.equal(f.state().allocations.length,1);
+ const detail=JSON.parse(f.sql.prepare("SELECT detail FROM audit_events WHERE owner=? AND action='automatic.reconciliation'").get(f.owner).detail);
+ assert.equal(detail.decisions.length,2);assert.equal(detail.decisions.filter(d=>d.kind==='specification_linked').length,1);assert.equal(detail.decisions.filter(d=>d.invoice_id).length,1);
+ const repeat=await f.api.reconcileAndPrepare(f.owner);assert.equal(repeat.automatic,0);assert.equal(f.state().allocations.length,1);
+});
+
+test('linking a bank specification without a matching invoice reports zero verified payments',async t=>{
+ const f=await fixture(t);f.init();
+ let s=f.state();s=applyCommand(s,{type:'bankgiro.import',rows:[{date:'2026-10-26',amount:62500,party:'Annan verifierad betalare AB',payerReference:'0604',bankReference:'UNMATCHED-CHILD',parentBankReference:'UNMATCHED-PARENT',account:'MG',currency:'SEK',description:'Individuell specifikation',source:'synthetic.xml',kind:'payment',specification:true}],documentId:'synthetic-original',hash:'unmatched-original-hash',name:'synthetic.xml'}).state;
+ f.put(s);f.pay(62500,{kind:'batch',party:'',payerReference:'',bankReference:'UNMATCHED-PARENT',description:'Bankgiro inbetalning'});
+ const result=await f.api.reconcileAndPrepare(f.owner);assert.equal(result.automatic,0);assert.equal(f.state().allocations.length,0);assert.equal(f.state().transactions[0].specificationStatus,'linked');
+ const detail=JSON.parse(f.sql.prepare("SELECT detail FROM audit_events WHERE owner=? AND action='automatic.reconciliation'").get(f.owner).detail);assert.equal(detail.decisions.length,1);assert.equal(detail.decisions[0].kind,'specification_linked');
+});
 test('wrong OCR belonging to another invoice is held, preserving original reference',async t=>{
   const f=await fixture(t);f.init();let s=f.state();s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Annan AB',number:'0577',ocr:'0577',total:312500,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(250000,{payerReference:'0577'});const q=await f.queue();assert.ok(q.some(m=>m.kind==='wrong_reference'));assert.equal(paid(f.state(),f.state().invoices[0].id),0);assert.equal(f.state().transactions[0].original.payerReference,'0577');
 });

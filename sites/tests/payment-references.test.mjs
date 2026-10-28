@@ -8,6 +8,14 @@ const invoice=(id='i',number='0599',reference='1234567897')=>({id,invoice_number
 const transaction=raw=>({id:'t',account:'account',bank_reference:'ARCHIVE',booked_at:'2026-10-26',amount_cents:62500,available_cents:62500,currency:'SEK',payer:'Testkund AB',reference:extractPaymentReferences(raw).selected?.value||'',reference_evidence:extractPaymentReferences(raw),verified:true});
 const findings=(raw,invoices=[invoice()])=>analyzeReconciliation({invoices,transactions:[transaction(raw)]});
 
+test('all unstructured references remain available for conflict checks without inventing OCR types',()=>{
+ for(const raw of [{remittance_information:['0599','0600']},{reference_number:'0599',remittance_information:['0600','Tack för hjälpen']}]){
+  assert.ok(findings(raw,[invoice(),invoice('other','0600','000018')]).every(f=>!f.safe));
+  assert.deepEqual(new Set(matchingReferenceValues(extractPaymentReferences(raw))),new Set(['0599','0600']));
+ }
+ assert.ok(findings({reference_number:'0599',remittance_information:['000 018']},[invoice(),invoice('other','0600','000018')]).every(f=>!f.safe));
+});
+
 
 test('OCR uses modulus 10 and preserves leading zeros',()=>{assert.equal(ocrChecksum('000018'),true);assert.equal(ocrChecksum('1234567897'),true);assert.equal(ocrChecksum('1234567890'),false);assert.equal(ocrChecksum('0599'),false);assert.equal(ocrChecksum('AB/12'),false);assert.equal(extractPaymentReferences({OCR:'000018'}).selected.value,'000018');});
 test('structured, nested, array and ISO document fields retain every source',()=>{const x=extractPaymentReferences({reference_number:'0599',details:{OCR:{value:'1234567897'}},RmtInf:{Strd:[{CdtrRefInf:{Ref:'1234567897'}},{RfrdDocInf:{Nb:'0599'}}]},remittance_information:['Faktura: 0599']});assert.equal(x.selected.kind,'ocr');assert.equal(x.selected.value,'1234567897');assert.ok(x.candidates.some(c=>c.source==='$.details.OCR.value'));assert.ok(x.candidates.some(c=>c.source==='$.RmtInf.Strd[1].RfrdDocInf.Nb'));assert.deepEqual(new Set(matchingReferenceValues(x)),new Set(['1234567897','0599']));});
@@ -23,3 +31,8 @@ test('bounded extraction marks incomplete input and never truncates a reference 
 test('raw source object is immutable during extraction',()=>{const input={reference_number:'0599',nested:{invoice_number:'0600'}};const before=structuredClone(input);extractPaymentReferences(input);assert.deepEqual(input,before);});
 test('later candidates cannot silently replace a different original payment reference',()=>{const t=transaction({reference_number:'0599'});t.reference='0600';const f=analyzeReconciliation({invoices:[invoice()],transactions:[t]});assert.ok(f.every(x=>!x.safe));});
 test('OCR in a payer message preserves separators without taking a numeric prefix',()=>{const x=extractPaymentReferences({note:'OCR: 123 456 7897'});assert.equal(x.selected.value,'123 456 7897');assert.equal(x.selected.validity,'checksum_valid');});
+
+test('company Bankgiro in a payment reference is held even if invoice OCR was entered incorrectly',()=>{
+ const f=findings({reference_number:'58197013'},[{...invoice('i','0599','5819-7013'),bankgiro:'5819-7013'}]);
+ assert.equal(f[0].safe,false);assert.match(f[0].reason,/eget Bankgironummer/);
+});

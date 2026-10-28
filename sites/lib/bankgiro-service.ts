@@ -17,10 +17,13 @@ async function resolveAccounts(owner:string,rows:any[]){
 }
 
 export async function readBankgiroOriginal(owner:string,command:Command){
- const doc=await db().prepare('SELECT filename,mime,sha256 FROM documents WHERE id=? AND owner=?').bind(command.documentId,owner).first<{filename:string;mime:string;sha256:string}>();
+ const doc=await db().prepare('SELECT filename,mime,sha256,size FROM documents WHERE id=? AND owner=?').bind(command.documentId,owner).first<{filename:string;mime:string;sha256:string;size:number}>();
  if(!doc||!['application/xml','text/csv'].includes(doc.mime))throw Error('Bankgirooriginalet saknas för ditt konto.');
  const obj=await env.BUCKET?.get(`${owner}/${command.documentId}`);if(!obj)throw Error('Originalfilen kunde inte hämtas.');
- const rows=await resolveAccounts(owner,parseSpecificationBytes(await obj.arrayBuffer(),doc.filename));
+ if(obj.size!==doc.size||obj.size>15_000_000)throw Error('Originalfilens storlek stämmer inte med det sparade underlaget.');
+ const bytes=await obj.arrayBuffer(),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
+ if(hash!==doc.sha256)throw Error('Originalfilens kontrollsumma stämmer inte. Ingen betalning har importerats.');
+ const rows=await resolveAccounts(owner,parseSpecificationBytes(bytes,doc.filename));
  return {...command,rows,hash:doc.sha256,name:doc.filename};
 }
 export async function bankgiroPreview(owner:string,file:File,targetId:string){

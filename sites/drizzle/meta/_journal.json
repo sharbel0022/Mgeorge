@@ -71,6 +71,13 @@
       "when": 1793219391001,
       "tag": "0009_clumsy_rattler",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1793221557681,
+      "tag": "0010_silent_boomerang",
+      "breakpoints": true
     }
   ]
 }

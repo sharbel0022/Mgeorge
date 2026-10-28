@@ -1,4 +1,7 @@
+import {extractPaymentReferences} from './payment-references.js';
+
 function decodeXML(s){
+  if(/&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[\da-f]+;)/i.test(s))throw new Error('Ogiltig XML-entitet');
   return s.replace(/&([^;]+);/g,(_,name)=>{
     const known={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"};if(Object.hasOwn(known,name))return known[name];
     const num=/^#x[\da-f]+$/i.test(name)?parseInt(name.slice(2),16):/^#\d+$/.test(name)?Number(name.slice(1)):NaN;
@@ -35,7 +38,13 @@ function xmlTree(xml){
       if(!match||Object.hasOwn(attributes,match[1]))throw new Error('Ogiltiga XML-attribut');
       attributes[match[1]]=decodeXML(match[2].slice(1,-1));rest=rest.slice(match[0].length);
     }
-    const node={name:opening[1].split(':').at(-1),qualified:opening[1],attributes,children:[],text:''};
+    const qualified=opening[1],parts=qualified.split(':');
+    if(parts.length>2)throw new Error('Ogiltigt XML-namn');
+    const namespaces={...stack.at(-1).namespaces};
+    for(const [key,uri] of Object.entries(attributes))if(key==='xmlns'||key.startsWith('xmlns:'))namespaces[key==='xmlns'?'':key.slice(6)]=uri;
+    const prefix=parts.length===2?parts[0]:'';
+    if(prefix&&!namespaces[prefix])throw new Error('Odeklarerad XML-namnrymd');
+    const node={name:parts.at(-1),qualified,namespace:namespaces[prefix]||'',namespaces,attributes,children:[],text:''};
     stack.at(-1).children.push(node);count++;
     if(count>150000||stack.length>80)throw new Error('XML-strukturen är för stor eller för djup');
     if(!opening[3])stack.push(node);
@@ -43,19 +52,26 @@ function xmlTree(xml){
   if(stack.length!==1||root.children.length!==1)throw new Error('Ofullständigt XML-dokument');
   return root.children[0];
 }
-const children=(node,name)=>(node?.children||[]).filter(x=>x.name===name);
+const children=(node,name)=>(node?.children||[]).filter(x=>x.name===name&&x.namespace===node.namespace);
 function path(node,...names){for(const name of names)node=children(node,name)[0];return node;}
 const value=(node,...names)=>path(node,...names)?.text.trim()||'';
-function descendants(node,name){return node.children.flatMap(x=>x.name===name?[x]:descendants(x,name));}
+function descendants(node,name){return (node?.children||[]).filter(x=>x.namespace===node.namespace).flatMap(x=>x.name===name?[x]:descendants(x,name));}
+function remittanceEvidence(node){
+ const convert=n=>n.children.length?Object.fromEntries([...new Set(n.children.filter(c=>c.namespace===n.namespace).map(c=>c.name))].map(name=>[name,children(n,name).map(convert)])):n.text.trim();
+ const OCR=descendants(node,'CdtrRefInf').filter(n=>/^(?:SE)?OCR$/i.test(value(n,'Tp','CdOrPrtry','Prtry')||value(n,'Tp','CdOrPrtry','Cd'))).map(n=>value(n,'Ref'));
+ return extractPaymentReferences({RmtInf:children(node,'RmtInf').map(convert),OCR,AddtlTxInf:value(node,'AddtlTxInf')});
+}
+const maskedAccount=acct=>{const id=value(acct,'Id','IBAN')||value(acct,'Id','Othr','Id');return id?'•••• '+id.replace(/[\s-]/g,'').slice(-4):'';};
 const stable=s=>s&&!/^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(s)?s:'';
 function cents(s){if(!/^\d+(?:\.\d{1,2})?$/.test(s))throw Error('Bankfilen innehåller ett ogiltigt belopp.');const [a,b='']=s.split('.'),n=Number(a)*100+Number(b.padEnd(2,'0'));if(!Number.isSafeInteger(n)||n<=0||n>100_000_000_000)throw Error('Ogiltigt betalningsbelopp.');return n;}
 function day(s){s=s.slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(s)||!Number.isFinite(Date.parse(s+'T12:00:00Z'))||new Date(s+'T12:00:00Z').toISOString().slice(0,10)!==s)throw Error('Betalningsdatum saknas eller är ogiltigt.');return s;}
 /** Same bounded parser runs in preview and on the server against the retained original. */
 export function parseBankgiroXML(text,name='Bankgiro.xml'){
- const doc=xmlTree(text),namespace=Object.values(doc.attributes).find(v=>/camt\.(053|054)\./.test(v));
- if(doc.name!=='Document'||!namespace)throw Error('Välj en ISO 20022-fil av typen camt.053 eller camt.054.');
+ const doc=xmlTree(text),namespace=doc.namespace;
+ if(doc.name!=='Document'||!/^urn:iso:std:iso:20022:tech:xsd:camt\.(053|054)\.001\.\d{2}$/.test(namespace))throw Error('Välj en ISO 20022-fil av typen camt.053 eller camt.054 med korrekt namnrymd.');
  const rows=[];
- for(const report of [...descendants(doc,'Stmt'),...descendants(doc,'Ntfctn')]){
+ const reports=namespace.includes('camt.053.')?children(path(doc,'BkToCstmrStmt'),'Stmt'):children(path(doc,'BkToCstmrDbtCdtNtfctn'),'Ntfctn');
+ for(const report of reports){
   const account=value(report,'Acct','Id','IBAN')||value(report,'Acct','Id','Othr','Id');
   for(const entry of children(report,'Ntry')){
    if((value(entry,'Sts','Cd')||value(entry,'Sts'))!=='BOOK')throw Error('Filen måste innehålla bokförda transaktioner (BOOK).');
@@ -63,7 +79,7 @@ export function parseBankgiroXML(text,name='Bankgiro.xml'){
    const amt=path(entry,'Amt'),direction=value(entry,'CdtDbtInd');
    if(amt?.attributes.Ccy!=='SEK'||!['CRDT','DBIT'].includes(direction))throw Error('Belopp, SEK-valuta eller betalningsriktning saknas.');
    const sign=direction==='CRDT'?1:-1,amount=cents(amt.text.trim())*sign,date=day(value(entry,'BookgDt','Dt')||value(entry,'BookgDt','DtTm'));
-   const parentReference=stable(value(entry,'AcctSvcrRef'))||stable(value(entry,'NtryRef')),details=descendants(entry,'TxDtls'),key=`entry-${rows.length}`;
+   const parentReference=stable(value(entry,'AcctSvcrRef'))||stable(value(entry,'NtryRef')),details=children(entry,'NtryDtls').flatMap(x=>children(x,'TxDtls')),key=`entry-${rows.length}`;
    const base={date,amount,party:'',payerReference:'',bankReference:parentReference,parentBankReference:parentReference,description:value(entry,'AddtlNtryInf'),currency:'SEK',account,source:name,externalId:parentReference?`entry:${parentReference}`:'',kind:'batch',verified:false,key,specification:true,format:String(namespace),settlementDate:value(entry,'ValDt','Dt'),recipientBankgiro:'',payerBankgiro:'',organizationNumber:''};
    const count=descendants(entry,'NbOfTxs').map(x=>Number(x.text.trim()));
    if(count.some(n=>!Number.isInteger(n)||n<1)||count.length&&count.reduce((n,c)=>n+c,0)!==details.length)throw Error('Specifikationen är ofullständig: antal betalningar stämmer inte.');
@@ -78,13 +94,13 @@ export function parseBankgiroXML(text,name='Bankgiro.xml'){
      ...children(path(tx,'RmtInf'),'Ustrd').map(x=>({value:stable(x.text.trim()),source:'RmtInf/Ustrd',kind:'message'})),
      ...descendants(tx,'RfrdDocInf').map(x=>({value:stable(value(x,'Nb')),source:'RmtInf/Strd/RfrdDocInf/Nb',kind:'document'}))
     ].filter(p=>p.value);
-    const references=[...new Set(referenceParts.map(p=>p.value))];
-    const payerReference=references.join('; ');
-    if(referenceParts.length>20||payerReference.length>300)throw Error('För många eller för långa betalningsreferenser. Granska bankoriginalet.');
+    const references=[...new Set(referenceParts.map(p=>p.value))],referenceEvidence=remittanceEvidence(tx);
+    const payerReference=referenceEvidence.selected?.value||references.join('; ');
+    if(referenceParts.length>20||references.join('; ').length>300)throw Error('För många eller för långa betalningsreferenser. Granska bankoriginalet.');
     const id=stable(value(tx,'Refs','AcctSvcrRef'))||stable(value(tx,'Refs','TxId'));
     const own=path(tx,'RltdPties',sign>0?'CdtrAcct':'DbtrAcct'),other=path(tx,'RltdPties',sign>0?'DbtrAcct':'CdtrAcct');
     const bg=acct=>/BGNR|BANKGIRO/i.test(value(acct,'Id','Othr','SchmeNm','Prtry')||value(acct,'Id','Othr','SchmeNm','Cd'))?value(acct,'Id','Othr','Id'):'';
-    return {...base,key:`${key}-${n}`,parentKey:details.length>1?key:undefined,amount:a?cents(a.text.trim())*sign:amount,party:value(partyNode,'Nm'),referenceParts,payerReference:stable(payerReference),bankReference:id||parentReference,externalId:id?`transaction:${id}`:'',kind:'payment',recipientBankgiro:bg(own),payerBankgiro:bg(other),organizationNumber:value(partyNode,'Id','OrgId','Othr','Id'),specification:true};
+    return {...base,key:`${key}-${n}`,parentKey:details.length>1?key:undefined,amount:a?cents(a.text.trim())*sign:amount,party:value(partyNode,'Nm'),referenceParts,referenceEvidence,payerReference:stable(payerReference),bankReference:id||parentReference,externalId:id?`transaction:${id}`:'',kind:'payment',recipientBankgiro:bg(own),payerBankgiro:bg(other),payerAccount:maskedAccount(other),remittanceMessage:children(path(tx,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join('\n'),organizationNumber:value(partyNode,'Id','OrgId','Othr','Id')||value(partyNode,'Id','OrgId','AnyBIC'),specification:true};
    });
    if(parsed.reduce((n,r)=>n+r.amount,0)!==amount)throw Error('Specifikationen är ofullständig: summan av betalningarna stämmer inte med insättningen.');
    if(details.length>1)rows.push(base);rows.push(...parsed);

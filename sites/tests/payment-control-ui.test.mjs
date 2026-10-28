@@ -7,6 +7,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 const url=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports={}){let source=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;for(const [name,target] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'lucide-react':import.meta.resolve('lucide-react'),'@/lib/domain':url('../lib/domain.ts'),'@/lib/economy-summary.js':url('../lib/economy-summary.js'),...imports}))for(const q of ['"',"'"])source=source.replaceAll(q+name+q,JSON.stringify(target));return 'data:text/javascript;base64,'+Buffer.from(source).toString('base64');}
 const ui=await import(compiled('../components/payment-control.tsx'));
+const ocrUi=await import(compiled('../components/document-ocr-status.tsx'));
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
 test('manual control button is disabled while running and has explicit busy semantics',()=>{
  const html=render(ui.ControlButton,{busy:true,onClick(){throw Error('SSR must not run action');}});
@@ -45,6 +46,25 @@ test('finished control reports persisted counts without inventing a checked invo
 test('connection overview explains offline OCR and retains pending/error counters',()=>{
  const html=render(ui.ControlConnections,{data:{connections:{gmail:{connected:true,new_documents:4},bank:{connected:false},ocr:{connected:false,enabled:false,waiting:3,processed:9,failed:2}}},open(){}});
  assert.match(html,/3 väntar/);assert.match(html,/2 misslyckade/);assert.match(html,/Pausad/);assert.match(html,/Automatisk hämtning inte verifierad eller pausad/);assert.match(html,/Text-PDF/);
+});
+
+test('cloud OCR status separates configuration, contact and successful completion',()=>{
+ const state=ocr=>({connections:{gmail:{},bank:{},ocr:{cloud_configured:true,enabled:true,connected:false,waiting:2,failed:0,...ocr}}});
+ const waiting=render(ui.ControlConnections,{data:state({}),open(){}});
+ assert.match(waiting,/Moln-OCR · väntar på körning/);assert.match(waiting,/senaste körning behöver verifieras/);assert.match(waiting,/Senaste OCR-resultat Aldrig/);assert.doesNotMatch(waiting,/kan bearbeta dokument när datorn är avstängd/);
+ const recent=render(ui.ControlConnections,{data:state({connected:true,last_completed:'2026-10-28T12:00:00Z'}),open(){}});
+ assert.match(recent,/Moln-OCR · nyligen kontakt/);assert.match(recent,/kan bearbeta dokument när datorn är avstängd/);assert.doesNotMatch(recent,/OCR-dator frånkopplad|Senaste OCR-resultat Aldrig/);
+ const paused=render(ui.ControlConnections,{data:state({enabled:false,connected:true}),open(){}});
+ assert.match(paused,/Dokumentautomatiken är pausad/);assert.doesNotMatch(paused,/kan bearbeta dokument när datorn är avstängd/);
+});
+
+test('Gmail explains independent cloud OCR and never equates configured schedule with a successful run',()=>{
+ const html=render(ocrUi.DocumentOcrStatus,{processing:{enabled:true,cloud_ocr_configured:true,cloud_worker_recent:false,scheduler_configured:true}});
+ assert.match(html,/även när datorn är avstängd/);assert.match(html,/Moln-OCR: Väntar på körning/);assert.match(html,/Senaste sparade OCR-resultat: Ingen ännu/);assert.match(html,/kontrollera senaste hämtning/);assert.match(html,/Lokal OCR i reserv/);
+ const local=render(ocrUi.DocumentOcrStatus,{processing:{enabled:true,cloud_ocr_configured:false,worker_online:false}});
+ assert.match(local,/behöver vara på och inloggad/);assert.doesNotMatch(local,/även när datorn är avstängd/);
+ const paused=render(ocrUi.DocumentOcrStatus,{processing:{enabled:false,cloud_ocr_configured:true,cloud_worker_recent:true}});
+ assert.match(paused,/Moln-OCR: Pausad/);assert.doesNotMatch(paused,/Moln-OCR: Nyligen kontakt/);
 });
 test('customer-message mount only reads; reconciliation remains an explicit action',()=>{
  const source=readFileSync(new URL('../components/customer-messages.tsx',import.meta.url),'utf8');const load=source.slice(source.indexOf('async function load()'),source.indexOf('useEffect('));assert.doesNotMatch(load,/request\('reconcile'/);assert.match(source,/Uppdatera avstämning och kö/);

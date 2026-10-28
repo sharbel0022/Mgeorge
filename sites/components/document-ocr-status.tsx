@@ -1,0 +1,6 @@
+type Processing={enabled?:boolean;cloud_ocr_configured?:boolean;cloud_worker_recent?:boolean;cloud_last_completed?:string;worker_online?:boolean;scheduler_configured?:boolean};
+const date=(value?:string)=>value&&Number.isFinite(Date.parse(value))?new Intl.DateTimeFormat('sv-SE',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Stockholm'}).format(new Date(value)):'Ingen ännu';
+export function DocumentOcrStatus({processing}:{processing?:Processing}){
+ const cloud=processing?.cloud_ocr_configured;
+ return <><p>PDF-text tolkas i Sites. {cloud?'Bilder och skannade PDF:er kan bearbetas i molnet även när datorn är avstängd.':'Bilder och skannade PDF:er väntar på den anslutna OCR-datorn, som behöver vara på och inloggad.'} Svensk OCR används utan extern AI-tolkning.</p><p>Dokumentautomatik: {!processing?'Status inte hämtad':processing.enabled===false?'Pausad':processing.scheduler_configured?'Molnschema konfigurerat – kontrollera senaste hämtning':'Molnschema behöver konfigureras'}. {cloud?<>Moln-OCR: {processing?.enabled===false?'Pausad':processing?.cloud_worker_recent?'Nyligen kontakt':'Väntar på körning'}. Senaste sparade OCR-resultat: {date(processing?.cloud_last_completed)}. </>:null}Lokal OCR{cloud?' i reserv':''}: {processing?.worker_online?'Ansluten':'Ingen kontakt'}.</p></>;
+}

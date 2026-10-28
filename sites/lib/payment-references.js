@@ -1,5 +1,5 @@
 // Pure, bounded extraction. Bank IDs, account numbers and amounts are never payer references.
-export const REFERENCE_VERSION = 'payment-references-2026-10-28.1';
+export const REFERENCE_VERSION = 'payment-references-2026-10-28.2';
 const keyName = key => key.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 const missing = value => !value || /^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(value);
 
@@ -75,8 +75,11 @@ export function extractPaymentReferences(raw) {
   return {version: REFERENCE_VERSION, candidates, selected: selected || null, incomplete, warnings};
 }
 
-/** Explicit candidates drive conflicts; a free-form message cannot override a structured reference. */
+/** Keep competing unstructured identifiers visible; narrative cannot override a structured reference. */
 export function matchingReferenceValues(evidence, fallback = '') {
   const explicit = evidence?.candidates?.filter(c => c.kind !== 'message') || [];
-  return [...new Set([...(explicit.length ? explicit.map(c => c.value) : []),fallback].filter(Boolean))];
+  const messages=evidence?.candidates?.filter(c=>c.kind==='message')||[];
+  const bare=value=>/\d/.test(value)&&(/^[\p{L}\p{N}][\p{L}\p{N}/_-]*$/u.test(value)||/^\d[\d -]*$/.test(value))&&!/^\d{4}-\d{2}-\d{2}$/.test(value);
+  const relevant=explicit.length?messages.filter(c=>bare(c.value)):messages;
+  return [...new Set([...explicit.map(c=>c.value),...relevant.map(c=>c.value),fallback].filter(Boolean))];
 }

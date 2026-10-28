@@ -4,13 +4,19 @@ import {emptyState,applyCommand,parseMoney,paid,balance,available,invoiceStatus,
 import {readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import ts from 'typescript';
-const compiled=ts.transpileModule(readFileSync(new URL('../lib/imports.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("'./payment-references.js'",JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href)).replace("from './local-ocr'",`from '${new URL('../lib/local-ocr.ts',import.meta.url).href}'`).replace("from './domain'",`from '${new URL('../lib/domain.ts',import.meta.url).href}'`);
+const compiled=ts.transpileModule(readFileSync(new URL('../lib/imports.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("'./bankgiro-parser.js'",JSON.stringify(new URL('../lib/bankgiro-parser.js',import.meta.url).href)).replace("'./payment-references.js'",JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href)).replace("from './local-ocr'",`from '${new URL('../lib/local-ocr.ts',import.meta.url).href}'`).replace("from './domain'",`from '${new URL('../lib/domain.ts',import.meta.url).href}'`);
 const imp=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
 const invoice=(overrides={})=>({direction:'receivable',party:'Testkund',email:'',number:'1001',ocr:'001019',total:187500,issued:'2026-10-01',due:'2026-10-26',reviewed:true,...overrides});
 const tx=(overrides={})=>({date:'2026-10-26',amount:187500,party:'Testkund',payerReference:'001019',kind:'payment',verified:true,...overrides});
 const addInvoice=(s,overrides)=>applyCommand(s,{type:'invoice.save',invoice:invoice(overrides)}).state;
 const addTx=(s,overrides,options={})=>applyCommand(s,{type:'transactions.import',rows:[tx(overrides)],...options}).state;
 const match=(s,amount=s.invoices[0].total,extra={})=>applyCommand(s,{type:'match.create',invoiceId:s.invoices[0].id,transactionId:s.transactions[0].id,amount,note:'Kontrollerat originalunderlag',...extra}).state;
+
+test('ordinary camt statement entries without details retain non-collection classification',()=>{
+ const statement=(direction,description)=>`<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02"><BkToCstmrStmt><Stmt><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>${direction}</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AddtlNtryInf>${description}</AddtlNtryInf></Ntry></Stmt></BkToCstmrStmt></Document>`;
+ for(const description of ['KORTKÖP','LÖN','Vanlig kontoöverföring'])assert.equal(imp.parseCAMT(statement('DBIT',description),'test.xml')[0].kind,'unknown');
+ assert.equal(imp.parseCAMT(statement('CRDT','Bankgiro inbetalning'),'test.xml')[0].kind,'batch');
+});
 
 test('Swedish money is exact integer öre and rejects ambiguous fractions',()=>{for(const v of ['7 179,16','7\u00a0179,16','7.179,16','7179.16'])assert.equal(parseMoney(v),717916);assert.equal(parseMoney('-98,50'),-9850);assert.throws(()=>parseMoney('1.875'));assert.throws(()=>parseMoney('foo'));assert.throws(()=>parseMoney('1,875.00'));});
 test('Calendar dates are real and due today is not overdue',()=>{assert.equal(validDate('2026-02-30'),false);assert.equal(validDate('2028-02-29'),true);const s=addInvoice(emptyState());assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-26').key,'unreconciled');assert.equal(invoiceStatus(s,s.invoices[0],'2026-10-27').key,'unreconciled');const checked=applyCommand(s,{type:'invoice.reconcile',id:s.invoices[0].id,confirm:true,note:'Kontrollerat bankunderlag'}).state;assert.equal(invoiceStatus(checked,checked.invoices[0],'2026-10-26').key,'open');assert.equal(invoiceStatus(checked,checked.invoices[0],'2026-10-27').key,'overdue');});

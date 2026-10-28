@@ -76,7 +76,7 @@ export async function reconcileAndPrepare(owner:string){
       if(r.meta.changes)await audit(owner,'message.prepared',{id,kind,snapshot});
     }
   }
-  return {findings,automatic:result.decisions.length};
+  return {findings,automatic:result.decisions.filter(d=>d.safe===true&&d.invoice_id&&d.transaction_id&&d.amount_cents>0).length};
 }
 export async function messageList(owner:string){
   const workspace=await readWorkspace(owner),rows=await db().prepare('SELECT * FROM customer_messages WHERE owner=? ORDER BY created_at DESC').bind(owner).all<Row>();

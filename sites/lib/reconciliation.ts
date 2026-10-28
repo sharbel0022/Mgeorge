@@ -1,5 +1,5 @@
-import {applyCommand,available,balance,paid,uid,now,needsPaymentSpecification,type State,type Invoice} from './domain';
-import {analyzeReconciliation,normalizeName} from './reconciliation-engine.js';
+import {applyCommand,available,balance,paid,uid,now,needsPaymentSpecification,specificationPreview,individualParty,type State,type Invoice} from './domain';
+import {analyzeReconciliation,normalizeName,RECONCILIATION_RULE_VERSION} from './reconciliation-engine.js';
 
 export function invoiceFacts(state:State,i:Invoice){return {...i,invoice_number:i.number,reference:i.ocr,total_cents:i.total,paid_cents:paid(state,i.id),remaining_cents:balance(state,i),vat_cents:i.vat??null,net_cents:i.net??null,due_at:i.due};}
 export function analyze(state:State){
@@ -16,7 +16,26 @@ export function analyze(state:State){
 }
 export function reconcileState(initial:State){
   let state=initial;const decisions:any[]=[];
-  for(const proposed of analyze(initial).filter(s=>s.safe&&s.amount_cents>0)){
+  // A file may precede its booked aggregate. Reuse its retained original and
+  // exact linking controls when the bank subsequently supplies that aggregate.
+  for(const record of initial.imports.filter(r=>r.documentId&&r.hash)){
+    const original=state.transactions.filter(t=>t.importId===record.id&&t.specification&&t.evidence==='bankgiro_file');
+    // Never derive a new entry total from a filtered subset. Missing metadata
+    // on older imports requires re-reading the original through explicit import.
+    const groups=new Map<string,typeof original>();
+    for(const item of original)if(item.specificationGroup)groups.set(item.specificationGroup,[...(groups.get(item.specificationGroup)||[]),item]);
+    for(const group of groups.values()){
+    const first=group[0],count=first.specificationCount,total=first.specificationTotal;
+    if(!Number.isSafeInteger(count)||count!==group.length||!Number.isSafeInteger(total)||group.reduce((sum,t)=>sum+t.amount,0)!==total||group.some(t=>t.specificationCount!==count||t.specificationTotal!==total||t.specificationStatus!=='review'||t.ignored||t.duplicateOf||t.parentId))continue;
+    const preview=specificationPreview(state,group);
+    for(const plan of preview.plans.filter(p=>p.status==='linked'&&!p.duplicate&&p.parentId)){
+      if(state===initial)state=structuredClone(initial);
+      for(const row of plan.rows){const item=state.transactions.find(t=>t.id===row.id)!;item.parentId=plan.parentId!;item.specificationStatus='linked';item.verified=individualParty(item.party);}
+      decisions.push({id:uid(),at:now(),kind:'specification_linked',safe:true,transaction_id:plan.parentId,document_id:record.documentId,document_hash:record.hash,child_ids:plan.rows.map(r=>r.id),amount_cents:plan.total,rule_version:RECONCILIATION_RULE_VERSION,reason:plan.reason});
+    }
+    }
+  }
+  for(const proposed of analyze(state).filter(s=>s.safe&&s.amount_cents>0)){
     const suggestion=analyze(state).find(s=>s.safe&&s.invoice_id===proposed.invoice_id&&s.transaction_id===proposed.transaction_id&&s.amount_cents>0);
     if(!suggestion)continue;
     const result=applyCommand(state,{type:'match.create',invoiceId:suggestion.invoice_id,transactionId:suggestion.transaction_id,amount:suggestion.amount_cents,note:'Automatisk avstämning ['+suggestion.rule_version+']: '+suggestion.reason});
