@@ -1,0 +1,34 @@
+name: Sites cloud OCR
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+# Only reviewed default-branch code may receive the OCR credential. Activation
+# follows the production checklist; this PR does not turn the service on.
+permissions:
+  contents: read
+concurrency:
+  group: sites-cloud-ocr
+  cancel-in-progress: false
+
+jobs:
+  ocr:
+    if: github.ref == 'refs/heads/main' && vars.MG_CLOUD_OCR_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Install locked OCR dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Process at most six leased documents
+        run: node scripts/run-sites-cloud-ocr.mjs
+        env:
+          MG_SITES_ORIGIN: ${{ vars.MG_SITES_ORIGIN || secrets.MG_SITES_ORIGIN }}
+          MG_SITES_OCR_TOKEN: ${{ secrets.MG_SITES_OCR_TOKEN }}

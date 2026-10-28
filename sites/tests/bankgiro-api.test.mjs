@@ -19,7 +19,7 @@ const account='SE4280000890119146168423',xml=`<Document xmlns="urn:iso:std:iso:2
 function fixture(t){
  const sqlite=new DatabaseSync(':memory:');t.after(()=>sqlite.close());sqlite.exec('CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);');
  const objects=new Map(),DB={prepare(sql){return {bind(...args){return {async first(){return sqlite.prepare(sql).get(...args)||null;},async all(){return {results:sqlite.prepare(sql).all(...args)};},async run(){return {meta:{changes:sqlite.prepare(sql).run(...args).changes}};}};}};},async batch(stmts){sqlite.exec('BEGIN');try{const r=[];for(const s of stmts)r.push(await s.run());sqlite.exec('COMMIT');return r;}catch(e){sqlite.exec('ROLLBACK');throw e;}}};
- const BUCKET={async put(key,bytes){objects.set(key,bytes);},async get(key){const bytes=objects.get(key);return bytes?{body:bytes,arrayBuffer:async()=>bytes}:null;},async delete(key){objects.delete(key);}};
+ const BUCKET={async put(key,bytes){objects.set(key,bytes);},async get(key){const bytes=objects.get(key);return bytes?{size:bytes.byteLength,body:bytes,arrayBuffer:async()=>bytes}:null;},async delete(key){objects.delete(key);}};
  const f={user:{userId:'owner',displayName:'Test'},env:{DB,BUCKET},searches:0,sqlite,objects};globalThis.bankgiroFixture=f;
  const seed=applyCommand(emptyState(),{type:'transactions.import',rows:[{account,date:'2026-10-26',amount:62500,kind:'batch',description:'Bankgiro inbetalning',bankReference:'BANK-ID'}]}).state;
  sqlite.prepare('INSERT INTO workspaces VALUES(?,?,?,?)').run('owner',1,JSON.stringify(seed),'2026-10-28');return f;
@@ -35,3 +35,17 @@ test('duplicate confirmation keeps one child, original and allocation history',a
 test('malformed and renamed executable content cannot be imported as bank evidence',async t=>{const f=fixture(t);for(const [name,body]of [['scan.xml','%PDF-1.7'],['bank.csv','<script>alert(1)</script>'],['program.exe','MZ']])assert.equal((await preview.POST(uploadReq(name,body))).status,400);assert.equal(f.objects.size,0);});
 test('stale revision cannot save bank import after preview',async t=>{const f=fixture(t),up=await (await files.POST(uploadReq())).json();f.sqlite.prepare('UPDATE workspaces SET revision=2').run();assert.equal((await state.POST(saveReq({type:'bankgiro.import',documentId:up.id}))).status,409);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);});
 test('bank import path has no customer delivery or send operation',()=>{for(const path of ['../lib/bankgiro-service.ts','../lib/bankgiro-invoice-search.ts','../app/api/bankgiro/preview/route.ts'])assert.doesNotMatch(readFileSync(new URL(path,import.meta.url),'utf8'),/sendGmail|gmailSend|deliverMessage|approveAndSend/);});
+
+test('V3 changed stored original is rejected before any import or audit mutation',async t=>{
+ const f=fixture(t),up=await (await files.POST(uploadReq())).json();
+ const key='owner/'+up.id,bytes=f.objects.get(key),text=new TextDecoder().decode(bytes);
+ f.objects.set(key,new TextEncoder().encode(text.replace('0599','0600')).buffer);
+ const r=await state.POST(saveReq({type:'bankgiro.import',documentId:up.id}));assert.equal(r.status,400);
+ assert.match((await r.json()).error,/kontrollsumma/);assert.equal(f.sqlite.prepare('SELECT revision FROM workspaces').get().revision,1);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
+});
+
+test('V3 parallel confirmations commit one import with one audit event',async t=>{
+ const f=fixture(t),up=await (await files.POST(uploadReq())).json(),command={type:'bankgiro.import',documentId:up.id};
+ const responses=await Promise.all([state.POST(saveReq(command)),state.POST(saveReq(command))]);assert.deepEqual(responses.map(r=>r.status).sort(),[200,409]);
+ const saved=JSON.parse(f.sqlite.prepare('SELECT payload FROM workspaces').get().payload);assert.equal(saved.transactions.length,2);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,1);
+});

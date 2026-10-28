@@ -7,6 +7,7 @@ import {serverPdfText} from './server-pdf';
 
 type Row=Record<string,any>;
 const config=env as unknown as Record<string,string>;
+const cloudOcrConfigured=()=>config.DOCUMENT_CLOUD_OCR_ENABLED==='true'&&/^[A-Za-z0-9_-]{43}$/.test(config.DOCUMENT_CLOUD_WORKER_TOKEN||'')&&config.DOCUMENT_CLOUD_WORKER_TOKEN!==config.DOCUMENT_WORKER_TOKEN;
 const safe=(message:string)=>Object.assign(Error(message),{safe:true,status:409});
 const normalize=(s:unknown)=>String(s||'').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
 const mailbox=(s:unknown)=>String(s||'').match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0].toLowerCase()||'';
@@ -23,24 +24,25 @@ export async function processingSettings(user?:{userId:string,email:string}){
   return await db().prepare('SELECT * FROM document_automation WHERE owner=?').bind(user.userId).first<Row>();
 }
 export async function processingStatus(owner:string){
-  const settings=await db().prepare('SELECT enabled,auto_register,worker_seen,last_cloud_run FROM document_automation WHERE owner=?').bind(owner).first<Row>();
+  const settings=await db().prepare('SELECT enabled,auto_register,worker_seen,cloud_worker_seen,cloud_worker_completed,last_cloud_run FROM document_automation WHERE owner=?').bind(owner).first<Row>();
   const counts=await db().prepare("SELECT state,COUNT(*) count FROM document_jobs WHERE owner=? AND EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status<>'rejected') GROUP BY state").bind(owner).all<Row>();
   const registered=await db().prepare("SELECT COUNT(DISTINCT document_id) count FROM gmail_sources WHERE owner=? AND status='registered'").bind(owner).first<Row>();
   const messages=await db().prepare("SELECT COUNT(*) count FROM customer_messages WHERE owner=? AND status='draft'").bind(owner).first<Row>();
-  return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:!!settings?.worker_seen&&Date.now()-Date.parse(settings.worker_seen)<180000,last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1}};
+  const cloud=cloudOcrConfigured(),cloudSeen=settings?.cloud_worker_seen||'';
+  return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:!!settings?.worker_seen&&Date.now()-Date.parse(settings.worker_seen)<180000,cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&!!cloudSeen&&Date.now()-Date.parse(cloudSeen)<45*60000,cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
 }
 export async function enqueueDocuments(owner:string){
   const at=now();
   await db().prepare("UPDATE document_jobs SET state='failed',error_code='lease_expired',lease='',lease_until='',updated_at=? WHERE owner=? AND state='processing' AND attempts>=3 AND lease_until<?").bind(at,owner,at).run();
   await db().prepare(`INSERT OR IGNORE INTO document_jobs(owner,document_id,state,engine,available_at,updated_at) SELECT DISTINCT d.owner,d.id,CASE WHEN d.mime='application/pdf' AND d.size<=5000000 THEN 'queued' ELSE 'waiting_ocr' END,CASE WHEN d.mime='application/pdf' AND d.size<=5000000 THEN 'cloud' ELSE 'local' END,?,? FROM documents d JOIN gmail_sources s ON s.owner=d.owner AND s.document_id=d.id WHERE d.owner=? AND s.status='needs_review' AND NOT EXISTS(SELECT 1 FROM gmail_sources x WHERE x.owner=d.owner AND x.document_id=d.id AND x.status='registered')`).bind(at,at,owner).run();
 }
-async function claim(owner:string,engine:string):Promise<Row|null>{
+async function claim(owner:string,engine:string,runner='server'):Promise<Row|null>{
   const at=now(),wanted=engine==='cloud'?'queued':'waiting_ocr';
   const job=await db().prepare(`SELECT document_jobs.*,d.mime,d.size,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND engine=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} ORDER BY available_at,document_id LIMIT 1`).bind(owner,engine,at,wanted,at).first<Row>();
   if(!job)return null;
-  const lease=randomToken(),until=new Date(Date.now()+180000).toISOString();
-  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts<3 AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource}`).bind(lease,until,at,owner,job.document_id,engine,wanted,at).run();
-  return r.meta.changes===1?{...job,lease,lease_until:until,attempts:job.attempts+1}:null;
+  const lease=randomToken(),until=new Date(Date.now()+(runner==='cloud'?300000:180000)).toISOString();
+  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,lease_runner=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts<3 AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource}`).bind(lease,until,runner,at,owner,job.document_id,engine,wanted,at).run();
+  return r.meta.changes===1?{...job,lease,lease_until:until,lease_runner:runner,attempts:job.attempts+1}:null;
 }
 async function failJob(owner:string,job:Row,code:string){
   const retry=job.attempts<3;
@@ -81,6 +83,7 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
 async function finish(owner:string,job:Row,result:{text:string,method:string,confidence:number}){
   const source=await sourceFor(owner,job.document_id);if(source?.status!=='needs_review')return {ignored:true};
   const meta=JSON.parse(source.metadata),extraction=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||''});
+  Object.assign(extraction,{processing:{runner:job.lease_runner||'local',sha256:job.sha256,version:'document-worker-v3'}});
   const v=Object.fromEntries(fieldNames.map((k:string)=>[k,(extraction.fields as any)[k].value]));
   const key=counterpartyKey(v.direction,v.party,v.organization_number),email=mailbox(v.direction==='customer'?meta.to:meta.from);
   const trust=await db().prepare('SELECT * FROM invoice_counterparties WHERE owner=? AND identity=? AND email=?').bind(owner,key,email).first<Row>();
@@ -110,7 +113,9 @@ async function finish(owner:string,job:Row,result:{text:string,method:string,con
     catch(e){extraction.level='yellow';extraction.issues.push('Automatisk registrering stoppades. Kontrollera underlaget.');}
   }
   const finalState=duplicate?'duplicate':extraction.level==='green'?'ready':state;
-  await db().prepare("UPDATE document_jobs SET state=?,extraction=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=? AND state='processing'").bind(finalState,JSON.stringify(extraction),at,owner,job.document_id,job.lease).run();
+  const finalAt=now();
+  const finalized=await db().prepare(`UPDATE document_jobs SET state=?,extraction=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=? AND lease_until>? AND state='processing' AND ${activeSource}`).bind(finalState,JSON.stringify(extraction),finalAt,owner,job.document_id,job.lease,finalAt).run();
+  if(finalized.meta.changes!==1)return {ignored:true};
   return {state:finalState,level:extraction.level};
 }
 export async function processDocuments(owner:string,limit=2){
@@ -119,10 +124,10 @@ export async function processDocuments(owner:string,limit=2){
     const job=await claim(owner,'cloud');if(!job)break;
     try{
       const object=await env.BUCKET?.get(`${owner}/${job.document_id}`);if(!object||object.size>5000000)throw Error('local_ocr_required');
-      const result=await serverPdfText(new Uint8Array(await object.arrayBuffer()));await finish(owner,job,result);processed++;
+      const result=await serverPdfText(new Uint8Array(await object.arrayBuffer())),completed=await finish(owner,job,result);if(!('ignored' in completed))processed++;
     }catch(e){
       const code=e instanceof Error?e.message:'';
-      if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare("UPDATE document_jobs SET state='waiting_ocr',engine='local',lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=?").bind(now(),owner,job.document_id,job.lease).run();
+      if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare("UPDATE document_jobs SET state='waiting_ocr',engine='local',attempts=0,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=?").bind(now(),owner,job.document_id,job.lease).run();
       else await failJob(owner,job,['page_limit','text_limit'].includes(code)?code:'pdf_unreadable');
     }
   }
@@ -153,31 +158,41 @@ export async function processingAction(req:Request,action:string){
   throw safe('Okänd dokumentåtgärd.');
 }
 async function workerOwner(req:Request){
-  const token=req.headers.get('authorization')?.replace(/^Bearer /,'')||'',secret=config.DOCUMENT_WORKER_TOKEN||'';
-  if(!secret||secret.length<40||token.length!==secret.length||await digest(token)!==await digest(secret))throw Error('WORKER_AUTH');
-  const row=await db().prepare('SELECT owner FROM document_automation WHERE email=? AND enabled=1').bind(config.DOCUMENT_OWNER_EMAIL||'').first<Row>();if(!row)throw Error('WORKER_AUTH');
-  await db().prepare('UPDATE document_automation SET worker_seen=? WHERE owner=?').bind(now(),row.owner).run();return row.owner as string;
+  const mode=req.headers.get('x-mg-ocr-runner')||'local';
+  if(!['cloud','local'].includes(mode)||mode==='cloud'&&!cloudOcrConfigured())throw Error('WORKER_AUTH');
+  const token=req.headers.get('authorization')?.replace(/^Bearer /,'')||'',secret=(mode==='cloud'?config.DOCUMENT_CLOUD_WORKER_TOKEN:config.DOCUMENT_WORKER_TOKEN)||'';
+  if(!/^[A-Za-z0-9_-]{43}$/.test(secret)||token.length!==secret.length||await digest(token)!==await digest(secret))throw Error('WORKER_AUTH');
+  const rows=await db().prepare('SELECT owner FROM document_automation WHERE lower(email)=lower(?) AND enabled=1 LIMIT 2').bind(config.DOCUMENT_OWNER_EMAIL||'').all<Row>();
+  if(rows.results.length!==1)throw Error('WORKER_AUTH');
+  const owner=rows.results[0].owner as string;
+  await db().prepare(mode==='cloud'?'UPDATE document_automation SET cloud_worker_seen=? WHERE owner=?':'UPDATE document_automation SET worker_seen=? WHERE owner=?').bind(now(),owner).run();return {owner,mode};
 }
 export async function workerAction(req:Request,action:string){
-  const owner=await workerOwner(req);
+  const {owner,mode}=await workerOwner(req);
+  if(action==='process'&&req.method==='POST'&&mode==='cloud'){
+    const result=await processDocuments(owner,2);
+    return response({processed:result.processed,waiting:Number(result.counts.waiting_ocr||0),failed:Number(result.counts.failed||0)});
+  }
   if(action==='lease'&&req.method==='POST'){
-    await enqueueDocuments(owner);const job=await claim(owner,'local');if(!job)return response({job:null});
+    await enqueueDocuments(owner);const job=await claim(owner,'local',mode);if(!job)return response({job:null});
     return response({job:{id:job.document_id,lease:job.lease,mime:job.mime,size:job.size,sha256:job.sha256}});
   }
   if(action==='document'&&req.method==='GET'){
     const id=new URL(req.url).searchParams.get('id'),lease=req.headers.get('x-mg-ocr-lease');
-    const j=await db().prepare(`SELECT document_jobs.* FROM document_jobs WHERE owner=? AND document_id=? AND lease=? AND lease_until>? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,id,lease,now()).first<Row>();
+    const j=await db().prepare(`SELECT document_jobs.* FROM document_jobs WHERE owner=? AND document_id=? AND lease=? AND lease_until>? AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,id,lease,now(),mode).first<Row>();
     if(!j)return response({error:'Jobbet är inte längre tillgängligt.'},409);
     const file=await env.BUCKET?.get(`${owner}/${id}`);if(!file||file.size>15000000)return response({error:'Filen kan inte behandlas.'},413);
     return new Response(file.body,{headers:{'Content-Type':'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Length':String(file.size)}});
   }
   if(action==='complete'&&req.method==='POST'){
     const raw=await req.text();if(raw.length>350000)return response({error:'För stort resultat.'},413);const body=JSON.parse(raw);
-    const job=await db().prepare(`SELECT document_jobs.*,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND lease=? AND lease_until>? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,body.id,body.lease,now()).first<Row>();
+    const job=await db().prepare(`SELECT document_jobs.*,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND lease=? AND lease_until>? AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,body.id,body.lease,now(),mode).first<Row>();
     if(!job)return response({error:'Jobbet har ändrats eller gått ut.'},409);
     if(body.sha256!==job.sha256||typeof body.text!=='string'||body.text.length>150000||!['pdf','ocr'].includes(body.method)||!Number.isFinite(body.confidence)||body.confidence<0||body.confidence>100)return response({error:'Ogiltigt OCR-resultat.'},400);
-    if(body.error===true){await failJob(owner,job,'local_ocr_failed');return response({ok:true});}
-    return response(await finish(owner,job,body));
+    if(body.error===true){await failJob(owner,job,mode==='cloud'?'cloud_ocr_failed':'local_ocr_failed');return response({ok:true});}
+    const result=await finish(owner,job,body);
+    if(mode==='cloud'&&!('ignored' in result))await db().prepare('UPDATE document_automation SET cloud_worker_completed=? WHERE owner=?').bind(now(),owner).run();
+    return response(result);
   }
   return response({error:'Okänd åtgärd.'},404);
 }

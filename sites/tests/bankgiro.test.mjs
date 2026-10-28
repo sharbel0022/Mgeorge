@@ -38,3 +38,95 @@ test('selected parent is checked and previously allocated or conflicting batch c
 test('pending specification can be reevaluated when original bank parent arrives later',()=>{let s=importRows(emptyState());assert.equal(s.transactions[0].specificationStatus,'review');s=applyCommand(s,{type:'transactions.import',rows:[parent()]}).state;s=importRows(s);assert.equal(s.transactions.length,2);assert.equal(s.transactions[0].specificationStatus,'linked');assert.equal(economicTransactions(s).reduce((n,t)=>n+t.amount,0),62500);});
 test('same reference across two invoices remains ambiguous and keeps allocation empty',()=>{let s=invoice(invoice(setup()),{party:'En annan kund',number:'2222',ocr:'0599'});s=reconcileState(importRows(s)).state;assert.equal(s.allocations.length,0);assert.equal(paymentInvoiceAssessment(s,s.transactions[1]).status,'ambiguous');});
 
+test('V3 ISO namespace is resolved, not guessed from root attributes or foreign local names',()=>{
+ const prefixed=xml().replace(/<(\/)?([A-Za-z][\w]*)/g,'<$1iso:$2').replace('xmlns=','xmlns:iso=');
+ assert.equal(parseBankgiroXML(prefixed)[0].payerReference,'0599');
+ for(const input of [xml().replace('xmlns=','data-schema='),xml().replace('urn:iso:std:iso:20022:tech:xsd:camt.054.001.02','https://untrusted.example/camt.054.001.02'),xml().replace('<Amt Ccy="SEK">625.00</Amt>','<Amt xmlns="urn:foreign" Ccy="SEK">625.00</Amt>'),prefixed.replace('xmlns:iso=','xmlns:other=')])assert.throws(()=>parseBankgiroXML(input));
+ const foreign=xml().replace('<NtryDtls>','<NtryDtls xmlns="urn:foreign">');
+ assert.equal(parseBankgiroXML(foreign)[0].kind,'batch');
+});
+
+test('V3 mixed XML references retain independent evidence and free text without a false conflict',()=>{
+ const input=xml(detail({ref:'000018'}).replace('<RmtInf>','<RmtInf><Ustrd>Tack för hjälpen</Ustrd>').replace('</Strd>','<RfrdDocInf><Nb>0599</Nb></RfrdDocInf></Strd>'));
+ const [r]=parseBankgiroXML(input);assert.equal(r.payerReference,'000018');assert.equal(r.remittanceMessage,'Tack för hjälpen');
+ assert.deepEqual(new Set(r.referenceEvidence.candidates.filter(c=>c.kind!=='message').map(c=>c.value)),new Set(['000018','0599']));
+ const s=reconcileState(importRows(invoice(setup(),{ocr:'000018'}),[r])).state;assert.equal(s.allocations.length,1);assert.equal(s.transactions[1].referenceParts.length,3);
+});
+
+test('V3 explicit Swedish OCR type validates checksum while a numeric invoice number stays separate',()=>{
+ for(const ref of ['000018','000019']){
+  const [r]=parseBankgiroXML(xml(detail({ref}).replace('<CdtrRefInf>','<CdtrRefInf><Tp><CdOrPrtry><Prtry>OCR</Prtry></CdOrPrtry></Tp>')));
+  assert.equal(r.payerReference,ref);assert.equal(r.referenceEvidence.candidates.find(c=>c.kind==='ocr').validity,ref==='000018'?'checksum_valid':'checksum_invalid');
+  const s=reconcileState(importRows(invoice(setup(),{ocr:ref}),[r])).state;assert.equal(s.allocations.length,ref==='000018'?1:0);
+ }
+ const [r]=parseBankgiroXML(xml());assert.equal(r.referenceEvidence.candidates[0].kind,'structured');assert.equal(r.referenceEvidence.candidates[0].validity,'unchecked');
+});
+
+test('V3 payer organisation and masked account survive original import',()=>{
+ const input=xml(detail().replace('</Nm>','</Nm><Id><OrgId><Othr><Id>556123-4567</Id></Othr></OrgId></Id>'));
+ const [r]=parseBankgiroXML(input);assert.equal(r.organizationNumber,'556123-4567');assert.equal(r.payerAccount,'•••• 8296');
+ const s=importRows(setup(),[r]);assert.equal(s.transactions[1].payerAccount,'•••• 8296');assert.equal(s.transactions[1].organizationNumber,'556123-4567');
+});
+
+test('V3 conflicting individual references and a different payer never create allocations',()=>{
+ const conflict=xml(detail().replace('</Strd>','<RfrdDocInf><Nb>0600</Nb></RfrdDocInf></Strd>'));
+ const mismatch=xml(detail({payer:'Annan betalare AB'}));
+ for(const input of [conflict,mismatch]){const s=reconcileState(importRows(invoice(setup()),parseBankgiroXML(input))).state;assert.equal(s.allocations.length,0);}
+});
+
+test('V3 company Bankgiro mistaken for OCR blocks automation even if an invoice stores it',()=>{
+ const s=importRows(invoice(setup(),{ocr:'5819-7013',bankgiro:'5819-7013'}),parseBankgiroXML(xml(detail({ref:'58197013'}))));
+ assert.equal(reconcileState(s).state.allocations.length,0);assert.ok(analyze(s).some(f=>/eget Bankgironummer/.test(f.reason)));
+});
+
+test('V3 pending retained specification automatically links once the matching aggregate arrives',()=>{
+ let s=invoice(importRows(emptyState())),pending=s.transactions[0];assert.equal(pending.specificationStatus,'review');
+ s=applyCommand(s,{type:'transactions.import',rows:[parent()]}).state;
+ const before=structuredClone(s),result=reconcileState(s);assert.deepEqual(s,before);assert.equal(result.state.transactions.length,2);assert.equal(result.state.transactions[0].specificationStatus,'linked');assert.equal(result.state.allocations.length,1);
+ assert.equal(result.decisions[0].kind,'specification_linked');assert.equal(result.decisions[0].document_id,'retained-original');assert.equal(result.decisions[0].document_hash,'fixture-1');
+ const again=reconcileState(result.state);assert.equal(again.decisions.length,0);assert.equal(again.state.allocations.length,1);
+});
+
+test('V3 automatic reevaluation cannot release wrong-account or incomplete stored specifications',()=>{
+ for(const overrides of [{account:'other'},{amount:60000}]){
+  let s=invoice(importRows(emptyState()));s.transactions[0]={...s.transactions[0],...overrides};s=applyCommand(s,{type:'transactions.import',rows:[parent()]}).state;
+  const result=reconcileState(s);assert.equal(result.state.transactions[0].specificationStatus,'review');assert.equal(result.decisions.length,0);assert.equal(result.state.allocations.length,0);
+ }
+});
+
+test('V3 repeated individual identifiers cannot remove aggregate money through child deduplication',()=>{
+ for(const second of [detail({amount:'312.50'}),detail({amount:'312.50',ref:'0600',payer:'Annan kund'})]){
+  const rows=parseBankgiroXML(xml(detail({amount:'312.50'})+second)),s=importRows(setup(),rows);
+  assert.ok(s.transactions.filter(t=>t.specification).every(t=>t.specificationStatus==='review'));
+  assert.equal(economicTransactions(s).reduce((sum,t)=>sum+t.amount,0),62500);assert.equal(reconcileState(s).state.allocations.length,0);
+ }
+});
+
+test('V3 malformed bare XML entity cannot become a verified payer name',()=>{
+ assert.throws(()=>parseBankgiroXML(xml(detail({payer:'A & B AB'}))),/XML-entitet/);
+ assert.equal(parseBankgiroXML(xml(detail({payer:'A &amp; B AB'})))[0].party,'A & B AB');
+});
+
+test('V3 ignored, duplicate, missing or legacy siblings never relink a subset of the original entry',()=>{
+ const rows=parseBankgiroXML(xml(detail({amount:'625.00'})+detail({amount:'625.00',ref:'0600',payer:'Annan kund AB',id:'CHILD-2'}),'1250.00'));
+ for(const mode of ['ignored','duplicate','missing','legacy']){
+  let s=invoice(importRows(emptyState(),rows));assert.equal(s.transactions.length,2);
+  if(mode==='ignored')s=applyCommand(s,{type:'transaction.ignore',id:s.transactions[1].id}).state;
+  if(mode==='duplicate')s.transactions[1].duplicateOf='possible-original';
+  if(mode==='missing')s.transactions.pop();
+  if(mode==='legacy')for(const t of s.transactions){delete t.specificationGroup;delete t.specificationCount;delete t.specificationTotal;}
+  s=applyCommand(s,{type:'transactions.import',rows:[parent()]}).state;
+  const before=structuredClone(s),result=reconcileState(s);assert.deepEqual(s,before);assert.equal(result.decisions.length,0,mode);assert.equal(result.state.allocations.length,0,mode);assert.equal(result.state.transactions[0].specificationStatus,'review',mode);
+ }
+ let full=invoice(importRows(emptyState(),rows));full=applyCommand(full,{type:'transactions.import',rows:[parent({amount:125000})]}).state;
+ const valid=reconcileState(full);assert.equal(valid.state.transactions[0].specificationStatus,'linked');assert.equal(valid.state.transactions[1].specificationStatus,'linked');assert.equal(valid.state.allocations.length,0); // Equal-sized payments still require duplicate/identity review.
+});
+
+test('V3 competing bare Ustrd values cannot silently pay only the first invoice',()=>{
+ for(const structured of ['', '<Strd><CdtrRefInf><Ref>0599</Ref></CdtrRefInf></Strd>']){
+  const input=xml(detail().replace(/<RmtInf>[\s\S]*?<\/RmtInf>/,'<RmtInf>'+structured+'<Ustrd>0599</Ustrd><Ustrd>0600</Ustrd></RmtInf>'));
+  const [row]=parseBankgiroXML(input);let s=invoice(invoice(setup()),{number:'0600',ocr:'0600',total:100000});s=importRows(s,[row]);
+  assert.equal(reconcileState(s).state.allocations.length,0);assert.ok(analyze(s).every(f=>!f.safe));assert.equal(row.remittanceMessage,'0599\n0600');
+ }
+});
+

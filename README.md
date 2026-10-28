@@ -6,6 +6,8 @@ Repositoryt innehåller nu både den fristående Node-versionen i `src/` och den
 
 ## Mgeorge V2 aktuell leverans
 
+**V3 för granskning:** Ny banklista med separat bankbetalare, fakturakund och fakturaförslag, förstärkt ISO-import och en moln-OCR-körning för skannade fakturor. Moln-OCR använder den befintliga svenska motorn och kräver efter godkänd produktionssättning ingen påslagen dator. Ändringen aktiverar inga produktionsjobb. Läs [V3-leveransen och produktionsstegen](docs/V3-DELIVERY.md), [bankunderlag och avtal](docs/V3-BANK-EVIDENCE.md) och [moln-OCR](docs/V3-CLOUD-OCR-RUNNER.md).
+
 **Automatik och backup, version 28:** Bank- och Gmail-molnschemana är nu aktiverade. Daglig krypterad molnbackup körs 02:15 svensk tid; den första kopian med 37 original är kontrolläst och verifierad. Lokal Node-backup är också konfigurerad. Läs [schema, testbevis, nyckelhantering och återställning](docs/AUTOMATION-BACKUP.md).
 
 **Sites version 27** är publicerad. Referenskandidater från bankfält, detaljsvar, CSV och camt får källspårning, med bevarade original och spärr mot motstridiga referenser eller felaktig uttrycklig OCR. Fem huvudområden ger direkt åtkomst till kundfakturor, leverantörsfakturor, bank och granskning. Node har krypterad, återställningskontrollerad och valbar daglig backup. **238 Node-tester och 277 Sites-tester** passerar; båda beroendegranskningarna rapporterar noll kända sårbarheter.
