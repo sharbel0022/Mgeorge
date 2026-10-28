@@ -2,6 +2,8 @@
 
 Ett svenskt system för kundfakturor, leverantörsfakturor, originalunderlag och bankavstämning. Sites har ett svartvitt gränssnitt med samma navigation på dator och mobil. En ny installation innehåller inga exempeltransaktioner.
 
+**Ny kod för granskning — bankbevis och återhämtning:** Striktare CSV/camt/API-kontroller, serververifierad filproveniens, atomisk avstämning, beständiga Node-jobblås och Gmail-väntetider samt skydd mot fördröjda backupkörningar. Arbetet publicerar ingenting och ändrar inga produktionsscheman. Se [leverans, tester och exakt extern bankblockering](docs/BANK-EVIDENCE-SAFETY-DELIVERY.md), [plan](PLAN.md) och [verifierad progress](PROGRESS.md).
+
 Repositoryt innehåller nu både den fristående Node-versionen i `src/` och den fullständiga publicerade Sites-källan i `sites/`. De har separata databaser. GitHub-push publicerar inte automatiskt till Sites; publicering sker i samma befintliga Sites-projekt och flyttar inga företagsuppgifter.
 
 ## Mgeorge V2 aktuell leverans

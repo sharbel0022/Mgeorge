@@ -1,5 +1,7 @@
 # MG Fakturakoll
 
+**Aktuell granskningsbranch, 28 oktober 2026:** Bankfiler läses om från ägt, hashkontrollerat original på servern; klientens förslag kan inte bli bankfakta. Migration 0011 tillför beständig Gmail-väntetid. Ingen produktion har migrerats eller publicerats av denna leverans. Läs [samlad verifiering och externa bankkrav](../docs/BANK-EVIDENCE-SAFETY-DELIVERY.md). Äldre leveransavsnitt nedan beskriver historiska begränsningar; Gmail och moln-OCR finns nu i källan.
+
 Faktura- och betalningsöversikt för M.George Vitvaror AB, med uppgifter som är privata för varje inloggad ChatGPT-användare.
 
 ## Det som fungerar
