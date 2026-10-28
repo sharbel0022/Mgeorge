@@ -2,6 +2,8 @@
 
 28 oktober 2026. Bas: `origin/main` på `a024216`. Branch: `codex/bank-evidence-production-safety`. Detta är en lokal kodleverans för PR-granskning; den är inte publicerad och verifierar inte produktionens nya beteende.
 
+[Granskningsutkast PR #12](https://github.com/sharbel0022/Mgeorge/pull/12). GitHub Actions bekräftade lyckade Node- och Sites-jobb för källrevision `f43e2bc` i både push- och PR-körningen; följande dokumentationsuppdatering ändrar ingen programkod.
+
 ## Vad som ändrats
 
 Betalningsbeslut bygger på bankunderlag, kundrelation och exakt referens. Beloppslikhet eller fakturaförslag kan inte skapa en betalare eller bank-OCR. Hela bankfilen behålls; original, SHA-256, OCR/fakturareferenser, bankidentifierare och betalarnamn hålls separat.
@@ -74,8 +76,11 @@ Sites testades vid **320, 390, 768, 1024 och 1440 px**. Ingen horisontell dokume
 | Oberoende kodgranskning | Import/proveniens, bankmagnitud/hash, transaktionsracer, fördröjda jobb och backup granskade; funna blockerande fel åtgärdade |
 | Produktionsbygge | `npm run build`: **Build complete**, exit 0; färdigt Worker-bygge därefter provkört lokalt med D1/R2 i lokal miljö |
 | Sista bilder | Desktop/mobil och syntetisk camt-import kontrollerade även i färdigt bygge; en CSS-klasskrock rättad och verifierad som transparent mobilkort med flexlayout |
+| GitHub Actions | Både Node och Sites **success** på `f43e2bc`: [PR-körning 40779971685](https://github.com/sharbel0022/Mgeorge/actions/runs/40779971685), [push-körning 40779965287](https://github.com/sharbel0022/Mgeorge/actions/runs/40779965287) |
 
 Alla automatiserade tester använder syntetiska/tillfälliga databaser och kontrollerade leverantörssvar. Det verkliga OCR-integrationstestet använder en syntetisk skannad bild. Testsiffrorna verifierar ingen verklig bankrapportkanal.
+
+CI gav befintliga plattformsnotiser om actions som ursprungligen riktade sig mot Node 20 och om `ubuntu-latest`-övergången. Samtliga jobb lyckades; inga kod- eller testfel rapporterades. Workflow-versionerna ändras inte av denna leverans.
 
 ## PR #9 och #11
 
