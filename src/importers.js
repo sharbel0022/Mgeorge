@@ -59,7 +59,7 @@ const aliases={
   currency:['valuta','currency','ccy'],
   payer:['avsändare','avsandare','betalare','mottagare','namn','motpart','counterparty','payer'],
   payer_organization_number:['organisationsnummer','organisationsnr','orgnr','payer_organization_number'],
-  reference:['ocr','referens','fakturareferens','meddelande','payment reference','referensnummer'],
+  reference:['ocr','referens','fakturareferens','betalningsreferens','betalningsreferens / ocr','meddelande','payment reference','referensnummer'],
   bank_reference:['bankreferens','bank reference','transaktionsid','transaktions-id','transaction id','id'],
   bankgiro:['bankgiro','bankgironummer','företagets bankgiro','foretagets bankgiro'],
   description:['text','beskrivning','information','description','detaljer','typ','transaktionstext']
