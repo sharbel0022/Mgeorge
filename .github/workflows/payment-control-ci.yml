@@ -1,7 +1,7 @@
 name: Payment control checks
 on:
   push:
-    branches: [main, codex/one-click-payment-control]
+    branches: [main, 'codex/**', 'fix/**']
   pull_request:
     branches: [main]
 permissions:
@@ -23,6 +23,8 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run check
+      - name: Audit production dependencies
+        run: npm audit --audit-level=high
       - name: Run tests with synthetic data
         run: npm test
   sites:
@@ -42,6 +44,8 @@ jobs:
           cache-dependency-path: sites/package-lock.json
       - run: npm run install:ci
       - run: npm run check
+      - name: Audit Sites production dependencies
+        run: npm audit --audit-level=high
       - name: Run Sites tests with synthetic data
         run: npm test
       - run: npm run build

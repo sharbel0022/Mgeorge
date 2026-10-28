@@ -4,6 +4,12 @@ Ett svenskt system för kundfakturor, leverantörsfakturor, originalunderlag och
 
 Repositoryt innehåller nu både den fristående Node-versionen i `src/` och den fullständiga publicerade Sites-källan i `sites/`. De har separata databaser. GitHub-push publicerar inte automatiskt till Sites; publicering sker i samma befintliga Sites-projekt och flyttar inga företagsuppgifter.
 
+## Mgeorge V2 aktuell leverans
+
+**Sites version 27** är publicerad. Referenskandidater från bankfält, detaljsvar, CSV och camt får källspårning, med bevarade original och spärr mot motstridiga referenser eller felaktig uttrycklig OCR. Fem huvudområden ger direkt åtkomst till kundfakturor, leverantörsfakturor, bank och granskning. Node har krypterad, återställningskontrollerad och valbar daglig backup. **238 Node-tester och 277 Sites-tester** passerar; båda beroendegranskningarna rapporterar noll kända sårbarheter.
+
+Läs [felanalys och funktionsstatus](docs/V2-DELIVERY.md), [användning och konfiguration](docs/V2-OPERATIONS.md), [arkitektur och UI-bilder](docs/V2-ARCHITECTURE.md) och [publiceringsbevis](docs/V2-PUBLICATION.md). Äldre avsnitt nedan beskriver historiska leveranser. Saknad bank-OCR kräver fortfarande individuell betalningsspecifikation; publicering aktiverar inte pausade scheman.
+
 ## Enkel ekonomiöversikt – ny källkodsleverans
 
 Sites-källan innehåller nu fyra tydliga ekonomisammanfattningar, en renare undantagskö, dokumentklassificering, bevarad referensproveniens och ett skrivskyddat jämförelseläge för avstämning. Beloppslikhet ersätter aldrig bankunderlag. GitHub-ändringen är inte i sig en Sites-publicering eller aktivering av nya scheman. Läs [implementation, verifiering och återstående produktionssteg](docs/ECONOMY-OVERVIEW-IMPLEMENTATION.md).

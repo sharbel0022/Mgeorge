@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {build} from 'esbuild';
-import {Miniflare} from 'miniflare';
+import {Miniflare,convertV4MiniflareOptions} from 'miniflare';
 import {fileURLToPath} from 'node:url';
 function textPdf(){
   const text='Faktura\nFakturanummer: 0007\nLeverantor: Exempel AB\nFakturadatum: 2026-10-24\nNetto: 2500,00 SEK\nMoms: 625,00 SEK\nAtt betala: 3125,00 SEK';
@@ -11,7 +11,7 @@ function textPdf(){
 }
 test('actual Workerd extracts bounded PDF text without browser, child_process or outbound calls',async()=>{
   const bundled=await build({stdin:{contents:`import {serverPdfText} from './lib/server-pdf';export default {async fetch(req){try{return Response.json(await serverPdfText(new Uint8Array(await req.arrayBuffer())));}catch(e){return Response.json({error:e.message},{status:422});}}}`,resolveDir:fileURLToPath(new URL('../',import.meta.url)),loader:'ts'},bundle:true,format:'esm',platform:'neutral',mainFields:['module','main'],conditions:['import','browser','default'],external:['node:*'],write:false,logLevel:'silent'});
-  const mf=new Miniflare({modules:true,script:bundled.outputFiles[0].text,compatibilityDate:'2026-05-15',compatibilityFlags:['nodejs_compat'],outboundService:()=>{throw Error('No network in PDF parser');}});
+  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,script:bundled.outputFiles[0].text,compatibilityDate:'2026-05-15',compatibilityFlags:['nodejs_compat'],outboundService:()=>{throw Error('No network in PDF parser');}}));
   try{
     const r=await mf.dispatchFetch('https://test.example/',{method:'POST',body:textPdf()});const value=await r.json();assert.equal(r.status,200,JSON.stringify(value));assert.match(value.text,/0007/);assert.equal(value.method,'pdf');
     const large=await mf.dispatchFetch('https://test.example/',{method:'POST',body:new Uint8Array(5000001)});assert.equal((await large.json()).error,'local_ocr_required');

@@ -4,7 +4,7 @@ import {emptyState,applyCommand,parseMoney,paid,balance,available,invoiceStatus,
 import {readFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import ts from 'typescript';
-const compiled=ts.transpileModule(readFileSync(new URL('../lib/imports.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("from './local-ocr'",`from '${new URL('../lib/local-ocr.ts',import.meta.url).href}'`).replace("from './domain'",`from '${new URL('../lib/domain.ts',import.meta.url).href}'`);
+const compiled=ts.transpileModule(readFileSync(new URL('../lib/imports.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("'./payment-references.js'",JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href)).replace("from './local-ocr'",`from '${new URL('../lib/local-ocr.ts',import.meta.url).href}'`).replace("from './domain'",`from '${new URL('../lib/domain.ts',import.meta.url).href}'`);
 const imp=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
 const invoice=(overrides={})=>({direction:'receivable',party:'Testkund',email:'',number:'1001',ocr:'001019',total:187500,issued:'2026-10-01',due:'2026-10-26',reviewed:true,...overrides});
 const tx=(overrides={})=>({date:'2026-10-26',amount:187500,party:'Testkund',payerReference:'001019',kind:'payment',verified:true,...overrides});

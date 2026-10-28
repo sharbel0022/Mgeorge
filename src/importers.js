@@ -1,3 +1,4 @@
+import {extractPaymentReferences} from './payment-references.js';
 /**
  * MG FAKTURAKOLL – BANKFILER / FORMAT
  * ANSVAR: Tolkar CSV och ISO 20022 camt.053/camt.054 och normaliserar datum, belopp, riktning och referenser. Samlade Bankgiroposter kräver säkra detaljuppgifter.
@@ -87,9 +88,11 @@ export function parseCSV(text,account='Swedbank'){
       cents=credit-debit;
     }
     if(!cents)continue;
-    const description=g('description'),payer=g('payer'),reference=g('reference');
+    const rawColumns={columns:rows[0].map((name,n)=>({[name]:row[n]??''}))};
+    const reference_evidence=extractPaymentReferences(rawColumns);
+    const description=g('description'),payer=g('payer'),reference=g('reference')||reference_evidence.selected?.value||'';
     const collective=requiresPaymentSpecification(description,payer,reference);
-    items.push({account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
+    items.push({reference_evidence,account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:g('bank_reference'),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
   }
   return validateItems(items);
 }
@@ -142,7 +145,11 @@ const children=(node,name)=>(node?.children||[]).filter(x=>x.name===name);
 function path(node,...names){for(const name of names)node=children(node,name)[0];return node;}
 const value=(node,...names)=>path(node,...names)?.text.trim()||'';
 function descendants(node,name){return node.children.flatMap(x=>x.name===name?[x]:descendants(x,name));}
-function reference(node){return value(node,'RmtInf','Strd','CdtrRefInf','Ref')||children(path(node,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join(' ');}
+function referenceEvidence(node){
+  const convert=n=>n.children.length?Object.fromEntries([...new Set(n.children.map(c=>c.name))].map(name=>[name,n.children.filter(c=>c.name===name).map(convert)])):n.text.trim();
+  return extractPaymentReferences({RmtInf:children(node,'RmtInf').map(convert),AddtlTxInf:value(node,'AddtlTxInf')});
+}
+function reference(node){return value(node,'RmtInf','Strd','CdtrRefInf','Ref')||children(path(node,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join(' ')||referenceEvidence(node).selected?.value||'';}
 function bankId(s){return /^(NOTPROVIDED|NONREF|N\/A)$/i.test(s)?'':s;}
 function detailId(node){return bankId(value(node,'Refs','AcctSvcrRef'))||bankId(value(node,'Refs','TxId'))||bankId(value(node,'Refs','EndToEndId'));}
 function amountNode(node){return path(node,'AmtDtls','TxAmt','Amt')||path(node,'AmtDtls','InstdAmt','Amt')||path(node,'Amt');}
@@ -199,7 +206,7 @@ export function parseCAMT(xml,account='Swedbank'){
       let id=(uniqueSpecific?specific:'')||(details.length===1?parentReference:groupReference?`${groupReference}:${ref||'post'}:${sign*cents}`:'');
       if(id&&identifiers.has(id))id+=`:del${index+1}`;
       identifiers.add(id);
-      items.push({...common,amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(details.length>1?{parent_bank_reference:parentReference}:{})});
+      items.push({...common,reference_evidence:referenceEvidence(detail),amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(details.length>1?{parent_bank_reference:parentReference}:{})});
     }
   }
   return validateItems(items);
@@ -221,7 +228,8 @@ export function normalizeBankApiTransaction(x,account){
   const text=value=>typeof value==='string'?value.trim():'';
   const payer=text(sign>0?x.debtor?.name:x.creditor?.name);
   const remittance=Array.isArray(x.remittance_information)?x.remittance_information.map(text).filter(Boolean).join(' '):'';
-  const ref=text(x.reference_number)||remittance;
+  const reference_evidence=extractPaymentReferences(x);
+  const ref=reference_evidence.incomplete?'':reference_evidence.selected?.value||'';
   const description=[text(x.bank_transaction_code?.description),remittance,text(x.note)].filter((v,i,a)=>v&&a.indexOf(v)===i).join(' · ');
   const ownSide=sign>0?'creditor':'debtor',additional=x[`${ownSide}_account_additional_identification`];
   const identifiers=[x[`${ownSide}_account`]?.other,...(Array.isArray(additional)?additional:additional?[additional]:[])];
@@ -229,5 +237,5 @@ export function normalizeBankApiTransaction(x,account){
   if(!text(x.transaction_amount?.currency))throw new Error('Banken returnerade en transaktion utan valuta');
   // Per the official Transaction schema, transaction_id is a transient detail
   // lookup ID. Only entry_reference is immutable across renewed bank sessions.
-  return {account,booked_at:normalizeDate(x.booking_date||x.value_date),amount_cents:Math.abs(amount)*sign,currency:sek(x.transaction_amount.currency),payer,reference:ref,bank_reference:bankId(text(x.entry_reference)),provider_transaction_id:text(x.transaction_id),bankgiro,description,...(requiresPaymentSpecification(description,payer,text(x.reference_number))?aggregateFlags():{})};
+  return {reference_evidence,raw_bank_data:structuredClone(x),account,booked_at:normalizeDate(x.booking_date||x.value_date),amount_cents:Math.abs(amount)*sign,currency:sek(x.transaction_amount.currency),payer,reference:ref,bank_reference:bankId(text(x.entry_reference)),provider_transaction_id:text(x.transaction_id),bankgiro,description,...(requiresPaymentSpecification(description,payer,text(x.reference_number))?aggregateFlags():{})};
 }

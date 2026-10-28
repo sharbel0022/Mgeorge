@@ -1,6 +1,7 @@
+import {extractPaymentReferences} from './payment-references.js';
 import {imageText,pdfInvoiceText} from './local-ocr';
 import {parseMoney,validDate,today,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED} from './domain';
-export type BankRow={date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
+export type BankRow={referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;bankData?:Record<string,unknown>;date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
 export function parseCSV(text:string){
  const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n'),lines=clean.split('\n');
  const headerIndex=lines.findIndex(l=>/(datum|date)/i.test(l)&&/(belopp|amount|insättning|uttag)/i.test(l));
@@ -21,7 +22,7 @@ export function guessMapping(headers:string[]):Mapping{
 export function mapCSV(parsed:ReturnType<typeof parseCSV>,mapping:Mapping,name:string):BankRow[]{
  if(mapping.date<0||mapping.amount<0)throw new Error('Välj kolumner för datum och belopp.');
  if(mapping.payerReference>=0&&mapping.payerReference===mapping.bankReference)throw new Error('Bankreferens och OCR ska ha olika kolumner.');
- return parsed.rows.map((r,index)=>{const v=(k:keyof Mapping)=>mapping[k]>=0?(r[mapping[k]]??'').trim():'';try{const currency=v('currency')||'SEK';if(currency.toUpperCase()!=='SEK')throw new Error('Andra valutor än SEK stöds inte.');const amount=parseMoney(v('amount')),party=v('party'),payerReference=v('payerReference'),description=v('description'),collective=suspectedBankCollection(amount,description,party,payerReference);return{date:normalizeDate(v('date')),amount,party,payerReference,bankReference:v('bankReference'),description:collective?`${PAYMENT_SPECIFICATION_REQUIRED} ${description}`:description,externalId:v('externalId'),currency:'SEK',source:name,kind:collective?'batch':'unknown',verified:false};}catch(e){throw new Error(`Rad ${index+2}: ${(e as Error).message}`);}});
+ return parsed.rows.map((r,index)=>{const v=(k:keyof Mapping)=>mapping[k]>=0?(r[mapping[k]]??'').trim():'';try{const currency=v('currency')||'SEK';if(currency.toUpperCase()!=='SEK')throw new Error('Andra valutor än SEK stöds inte.');const amount=parseMoney(v('amount')),party=v('party'),referenceEvidence=extractPaymentReferences({columns:parsed.headers.map((name,n)=>({[name]:r[n]??''}))}),payerReference=v('payerReference')||referenceEvidence.selected?.value||'',description=v('description'),collective=suspectedBankCollection(amount,description,party,payerReference);return{referenceEvidence,date:normalizeDate(v('date')),amount,party,payerReference,bankReference:v('bankReference'),description:collective?`${PAYMENT_SPECIFICATION_REQUIRED} ${description}`:description,externalId:v('externalId'),currency:'SEK',source:name,kind:collective?'batch':'unknown',verified:false};}catch(e){throw new Error(`Rad ${index+2}: ${(e as Error).message}`);}});
 }
 export function parseCAMT(text:string,name:string):BankRow[]{
  if(/<!DOCTYPE|<!ENTITY/i.test(text))throw new Error('XML med externa entiteter stöds inte.');
