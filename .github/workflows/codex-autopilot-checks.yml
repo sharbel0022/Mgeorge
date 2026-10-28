@@ -1,0 +1,33 @@
+name: Codex autopilot runner checks
+on:
+  pull_request:
+    paths:
+      - 'scripts/codex_24h.py'
+      - 'test/test_codex_24h.py'
+      - 'docs/codex-autopilot/**'
+      - 'AGENTS.md'
+      - '.github/workflows/codex-autopilot-checks.yml'
+  push:
+    branches: ['codex/**']
+    paths:
+      - 'scripts/codex_24h.py'
+      - 'test/test_codex_24h.py'
+      - 'docs/codex-autopilot/**'
+      - 'AGENTS.md'
+      - '.github/workflows/codex-autopilot-checks.yml'
+permissions:
+  contents: read
+jobs:
+  runner-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m py_compile scripts/codex_24h.py
+      - run: python -m unittest discover -s test -p 'test_codex_24h.py' -v
+      - run: python scripts/codex_24h.py --dry-run

@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "summary": {"type": "string"},
+    "changed_files": {"type": "array", "items": {"type": "string"}},
+    "remaining_risks": {"type": "array", "items": {"type": "string"}},
+    "next_priority": {"type": "string"},
+    "done": {"type": "boolean"}
+  },
+  "required": ["summary", "changed_files", "remaining_risks", "next_priority", "done"]
+}
