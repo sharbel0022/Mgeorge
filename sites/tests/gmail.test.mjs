@@ -13,12 +13,13 @@ class D1{
 async function fixture(t){
   const key='__gmail_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');sql.exec(source('../drizzle/0000_confused_umar.sql'));sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));sql.exec(source('../drizzle/0002_brief_chronomancer.sql'));sql.exec(source('../drizzle/0003_needy_gravity.sql'));for(const file of (await import('node:fs')).readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>/^\d{4}.*sql$/.test(f)&&f.slice(0,4)>='0004'))sql.exec(source('../drizzle/'+file));
   const f={sql,d1:new D1(sql),owner:'test-owner',key:randomToken(),wrongAccount:false,providerCalls:0,env:{GOOGLE_CLIENT_ID:'synthetic-client',GOOGLE_CLIENT_SECRET:'synthetic-secret'}};f.user={userId:f.owner,email:"owner@example.test"};
-  f.env.BUCKET={put:async()=>{},get:async()=>null,delete:async()=>{}};globalThis[key]=f;
+  f.env.BUCKET={put:async()=>{f.bucketPuts=(f.bucketPuts||0)+1;},get:async()=>null,delete:async()=>{f.bucketDeletes=(f.bucketDeletes||0)+1;}};globalThis[key]=f;
   const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`);
   const domainUrl=new URL('../lib/domain.ts',import.meta.url).href,securityUrl=new URL('../lib/banking/security.ts',import.meta.url).href;
   const server=data(`import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(body,status=200)=>Response.json(body,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=await f.d1.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').bind(owner).first();return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
   const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const storageReady=()=>true;export const encrypt=(owner,purpose,value)=>seal(f.key,owner,purpose,value);export const decrypt=(owner,purpose,value)=>unseal(f.key,owner,purpose,value);`);
   const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf}),fields=moduleUrl('../lib/invoice-fields.js',{'./domain':domainUrl});
+  f.adapter=await import(adapter);
   const pdf=data(`export async function serverPdfText(){const f=${reference};if(f.pdfError)throw Error(f.pdfError);return f.pdfResult||{text:'',method:'pdf',confidence:100};}`);
   const processing=moduleUrl('../lib/document-processing.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/security':securityUrl,'./invoice-fields.js':fields,'./server-pdf':pdf,'./customer-messages':data('export async function reconcileAndPrepare(){}')});
   f.processing=await import(processing);f.fields=await import(fields);
@@ -26,11 +27,12 @@ async function fixture(t){
   t.mock.method(globalThis,'fetch',async (url,options)=>{
     assert.equal(options.redirect,'manual','Workers-compatible fetch must never forward credentials through redirects');
     f.providerCalls++;const path=new URL(url).pathname;
+    if(f.retryAfter)return Response.json({error:{message:'private-provider-secret'}},{status:429,headers:{'Retry-After':f.retryAfter}});
     if(f.redirectProvider)return new Response('private provider body',{status:302,headers:{Location:'https://untrusted.example/collect'}});
-    if(path==='/token')return f.tokenError?Response.json(f.tokenError,{status:400}):Response.json({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,scope:'https://www.googleapis.com/auth/gmail.readonly'});
-    if(path==='/revoke')return new Response('');
+    if(path==='/token'){if(f.tokenReached)f.tokenReached();if(f.pauseToken)await f.pauseToken;return f.tokenError?Response.json(f.tokenError,{status:400}):Response.json({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,scope:'https://www.googleapis.com/auth/gmail.readonly'});}
+    if(path==='/revoke'){if(f.revokeReached)f.revokeReached();if(f.pauseRevoke)await f.pauseRevoke;return new Response('');}
     if(path.endsWith('/profile'))return Response.json({emailAddress:f.wrongAccount?'wrong@gmail.com':'mg.vitvaror@gmail.com'});
-    if(path.endsWith('/messages'))return Response.json({messages:[{id:'archived'}]});
+    if(path.endsWith('/messages')){if(f.messageReached)f.messageReached();if(f.pauseMessages)await f.pauseMessages;return Response.json({messages:[{id:'archived'}]});}
     if(path.includes('/attachments/')){f.attachmentCalls=(f.attachmentCalls||0)+1;return Response.json({data:Buffer.from('%PDF-test-original').toString('base64url')});}
     return Response.json({labelIds:[],internalDate:String(Date.now()),payload:{headers:[{name:'Subject',value:f.subject||'Dokument'},{name:'From',value:'Supplier <supplier@example.com>'},{name:'To',value:'mg.vitvaror@gmail.com'}],parts:[{partId:'1',filename:f.filename||'document.pdf',mimeType:f.mime||'application/pdf',body:{attachmentId:'attachment-1'}}]}});
   });
@@ -82,6 +84,41 @@ test('Sites Gmail originals are idempotent, scoped to owner and do not create de
   assert.equal(JSON.parse(f.sql.prepare('SELECT detail FROM audit_events').get().detail).extraction.fields.party.value,'Original supplier');
   f.user=null;await assert.rejects(f.api.gmailStatus(),/AUTH_REQUIRED/);
 });
+test('a delayed Sites Gmail fetch cannot write after a replacement owns its lease',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());const before=f.sql.prepare('SELECT tokens,last_synced FROM gmail_connections').get();
+  let release;f.pauseMessages=new Promise(resolve=>{release=resolve;});const reached=new Promise(resolve=>{f.messageReached=resolve;});
+  const pending=f.api.gmailSync(post('sync'));await reached;
+  f.sql.prepare("UPDATE gmail_locks SET token='replacement',expires_at=? WHERE owner=?").run(new Date(Date.now()+60000).toISOString(),f.owner);
+  release();await assert.rejects(pending,error=>error.code==='gmail_lease_lost');
+  assert.equal(f.sql.prepare('SELECT tokens FROM gmail_connections').get().tokens,before.tokens);assert.equal(f.sql.prepare('SELECT last_synced FROM gmail_connections').get().last_synced,before.last_synced);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,0);assert.equal(f.bucketPuts||0,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_runs').get().n,0);assert.equal(f.sql.prepare('SELECT token FROM gmail_locks').get().token,'replacement');
+});
+test('D1 rechecks the Gmail token inside the mutation batch after an earlier valid assertion',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());const before=f.sql.prepare('SELECT tokens FROM gmail_connections').get().tokens;
+  let replace=false;f.messageReached=()=>{replace=true;};const original=f.d1.batch.bind(f.d1);
+  f.d1.batch=items=>{if(replace){replace=false;f.sql.prepare("UPDATE gmail_locks SET token='replacement',expires_at=?").run(new Date(Date.now()+60000).toISOString());}return original(items);};
+  await assert.rejects(f.api.gmailSync(post('sync')),error=>error.code==='gmail_lease_lost');
+  assert.equal(f.sql.prepare('SELECT tokens FROM gmail_connections').get().tokens,before);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_runs').get().n,0);assert.equal(f.sql.prepare('SELECT token FROM gmail_locks').get().token,'replacement');
+});
+test('an expired Sites Gmail lease cannot save a response even without a replacement process',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.messageReached=()=>f.sql.prepare("UPDATE gmail_locks SET expires_at='2000-01-01'").run();
+  await assert.rejects(f.api.gmailSync(post('sync')),error=>error.code==='gmail_lease_lost');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_runs').get().n,0);
+});
+test('delayed OAuth and disconnect callbacks cannot overwrite or remove a replacement Gmail connection',async t=>{
+  const f=await fixture(t),first=await connect(f);await f.api.gmailCallback(first.callback());const before=f.sql.prepare('SELECT tokens FROM gmail_connections').get().tokens;
+  const flow=await connect(f);let release;f.pauseToken=new Promise(resolve=>{release=resolve;});let reached=new Promise(resolve=>{f.tokenReached=resolve;});const connecting=f.api.gmailCallback(flow.callback());await reached;
+  f.sql.prepare("UPDATE gmail_locks SET token='replacement',expires_at=?").run(new Date(Date.now()+60000).toISOString());release();await assert.rejects(connecting,error=>error.code==='gmail_lease_lost');assert.equal(f.sql.prepare('SELECT tokens FROM gmail_connections').get().tokens,before);
+  f.sql.prepare('DELETE FROM gmail_locks').run();f.pauseToken=null;f.tokenReached=null;
+  f.pauseRevoke=new Promise(resolve=>{release=resolve;});reached=new Promise(resolve=>{f.revokeReached=resolve;});const disconnecting=f.api.gmailDisconnect(post('disconnect'));await reached;
+  f.sql.prepare("UPDATE gmail_locks SET token='replacement',expires_at=?").run(new Date(Date.now()+60000).toISOString());release();await assert.rejects(disconnecting,error=>error.code==='gmail_lease_lost');assert.equal(f.sql.prepare('SELECT tokens FROM gmail_connections').get().tokens,before);assert.equal(f.sql.prepare('SELECT token FROM gmail_locks').get().token,'replacement');
+});
+test('a lost response after document registration cannot delete its referenced original',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());const original=f.d1.batch.bind(f.d1);let interrupted=false;
+  f.d1.batch=async items=>{const result=await original(items);if(f.bucketPuts&&!interrupted){interrupted=true;throw Error('synthetic lost D1 reply');}return result;};
+  await assert.rejects(f.api.gmailSync(post('sync')),/synthetic lost D1 reply/);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);assert.equal(f.bucketPuts,1);assert.equal(f.bucketDeletes||0,0);
+  f.d1.batch=original;await f.api.gmailSync(post('sync'));assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);assert.equal(f.bucketPuts,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_sources').get().n,1);
+});
 test('Sites rejects foreign currency and conflicting VAT before creating an invoice; scheduled sync respects cooldown',async t=>{
   const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());await f.api.gmailSync(post('sync'));
   assert.equal((await (await f.api.gmailSync(undefined,true)).json()).status,'not_due');
@@ -90,6 +127,20 @@ test('Sites rejects foreign currency and conflicting VAT before creating an invo
   await assert.rejects(f.api.gmailReview(post('review',{document_id:id,confirm:true,invoice,fields:{currency:'EUR'}})),/SEK/);
   await assert.rejects(f.api.gmailReview(post('review',{document_id:id,confirm:true,invoice,fields:{currency:'SEK',vat_cents:'50.00',net_cents:'90.00'}})),/Momsberäkningen/);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+});
+test('Sites persists the Gmail provider wait across scheduled and manual retries',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.retryAfter='7200';
+  await assert.rejects(f.api.gmailSync(undefined,true),error=>error.code==='rate_limited'&&error.retryAfter===7200&&!error.message.includes('private-provider-secret'));
+  const row=f.sql.prepare('SELECT * FROM gmail_connections').get();assert.ok(Date.parse(row.retry_after)>=Date.now()+7199_000);
+  f.sql.prepare("UPDATE gmail_connections SET last_attempt='2000-01-01'").run();const calls=f.providerCalls;
+  assert.equal((await (await f.api.gmailSync(undefined,true)).json()).status,'not_due');
+  assert.equal((await f.api.gmailSync(post('sync'))).status,429);assert.equal(f.providerCalls,calls);
+  assert.ok(Date.parse((await (await f.api.gmailStatus()).json()).next_eligible_sync)>=Date.now()+7199_000);
+});
+test('Sites Gmail preserves HTTP dates and stops unreasonable provider delays',async t=>{
+  const f=await fixture(t);f.retryAfter=new Date(Date.now()+7200_000).toUTCString();
+  await assert.rejects(f.adapter.gmailProfile({access_token:'synthetic'}),error=>error.code==='rate_limited'&&error.retryAfter>=7199&&error.retryAfter<=7200);
+  f.retryAfter='99999999999999999999999999';await assert.rejects(f.adapter.gmailProfile({access_token:'synthetic'}),error=>error.retryBlocked===true&&error.retryAfter<=365*86400);
 });
 
 test('explicit payroll and branding are skipped before download while ambiguous scans remain candidates',async t=>{
