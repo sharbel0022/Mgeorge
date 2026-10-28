@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
-import {createPaymentControl,CONTROL_STEPS} from '../src/payment-control.js';
-import {buildPaymentOverview,paymentGroup,paymentTitle} from '../src/payment-overview.js';
+import {createPaymentControl,CONTROL_STEPS,planBankControl} from '../src/payment-control.js';
+import {buildPaymentOverview,paymentGroup,paymentTitle,invoiceAnalysis} from '../src/payment-overview.js';
 
 const request='request_000000000001';
 function fixture(overrides={},options={}){
@@ -40,13 +40,13 @@ test('missing connections and provider rate limits produce partial not false suc
   const f=fixture({gmail:async()=>({state:'blocked',note:'Gmail saknas'}),bank:async()=>{throw Object.assign(Error('secret provider payload'),{status:429,retryAfter:120});}});
   const {job}=f.control.start('owner',request,()=>{});await f.control.wait(job.id);
   const done=f.control.get('owner',job.id);assert.equal(done.status,'partial');
-  assert.equal(done.steps[0].state,'blocked');assert.equal(done.steps[1].state,'waiting');assert.ok(done.steps[1].next_at);
+  assert.equal(done.steps[0].state,'blocked');assert.equal(done.steps[2].state,'waiting');assert.ok(done.steps[2].next_at);
   assert.equal(done.steps[4].state,'done');assert.doesNotMatch(JSON.stringify(done),/secret provider payload/);f.close();
 });
 test('provider failure keeps existing processing available and stores no raw errors',async()=>{
   const f=fixture({bank:async()=>{throw Error('Bearer SECRET 1234');}}),{job}=f.control.start('owner',request,()=>{});
   await f.control.wait(job.id);const done=f.control.get('owner',job.id);
-  assert.equal(done.status,'partial');assert.equal(done.steps[1].state,'error');assert.equal(done.steps[4].state,'done');
+  assert.equal(done.status,'partial');assert.equal(done.steps[2].state,'error');assert.equal(done.steps[4].state,'done');
   assert.doesNotMatch(JSON.stringify(done),/Bearer|SECRET/);f.close();
 });
 test('revoked admin session stops every remaining step',async()=>{
@@ -96,10 +96,45 @@ test('unreconciled amounts are not presented as proven unpaid or counted twice',
     {id:'c',direction:'customer',kind:'credit',remaining_cents:10000,status:'unreconciled'}];
   const result=buildPaymentOverview({invoices});assert.equal(result.totals.remaining_cents,375000);assert.equal(result.totals.unreconciled_cents,312500);
   assert.equal(result.totals.partial_remaining_cents,62500);assert.equal(result.totals.partial_count,1);
-  assert.match(result.queue[0].reason,/inte samma sak/);
+  assert.match(result.queue.find(q=>q.entity_id==='a').reason,/inte samma sak/);
 });
 test('unknown mail delivery is first in review; sent and old stale messages do not clutter the queue',()=>{
   const result=buildPaymentOverview({messages:[{id:'x',status:'unknown',invoice_id:'a'}, {id:'y',status:'sent'}, {id:'z',status:'stale'}],documents:[{id:'doc',status:'needs_review'}],transactions:[tx({amount_cents:-10000}),tx({id:'aggregate',is_aggregate:true})]});
   assert.equal(result.queue[0].type,'message');assert.equal(result.queue[0].blocked,true);assert.equal(result.counts.messages,1);
   assert.equal(result.counts.other,1);assert.equal(result.counts.specifications,1);assert.equal(result.counts.review,3);
+});
+
+test('bank controls rotate ready connections, including failures, before the three-account limit',()=>{
+  const now=Date.parse('2026-10-28T12:00:00Z');
+  const connection=(id,extra={})=>({id,status:'connected',selected_account_uid:id,valid_until:'2026-11-30T00:00:00Z',last_synced:'2026-10-01 12:00:00',control_attempt_at:0,...extra});
+  const connections=['a','b','c','d','e'].map(id=>connection(id));
+  const first=planBankControl(connections,{now});assert.deepEqual(first.selected.map(c=>c.id),['a','b','c']);assert.equal(first.waiting,true);
+  // Failed attempts have no new last_synced; they still yield to accounts not tried.
+  first.selected.forEach(c=>{c.control_attempt_at=now;c.status='error';});
+  assert.deepEqual(planBankControl(connections,{now:now+61_000}).selected.map(c=>c.id),['d','e','a']);
+  const blocked=[connection('cool',{retry_after:now+120_000}),connection('cached',{last_synced:'2026-10-28T11:59:59Z'}),connection('expired',{valid_until:'2026-10-01'}),connection('ready')];
+  const plan=planBankControl(blocked,{now});assert.deepEqual(plan.selected.map(c=>c.id),['ready']);assert.equal(plan.cached,1);assert.equal(plan.waiting,true);
+  assert.deepEqual(blocked.map(c=>c.control_attempt_at),[0,0,0,0]);
+});
+
+test('dashboard separates checked outstanding from unconfirmed balances and counts credits once',()=>{
+  const result=buildPaymentOverview({invoices:[
+    {id:'unconfirmed',direction:'customer',total_cents:30000,remaining_cents:30000,paid_cents:0,status:'unreconciled',is_overdue:true},
+    {id:'checked',direction:'customer',total_cents:20000,remaining_cents:20000,paid_cents:0,status:'overdue',is_overdue:true,reconciled_at:'2026-10-28',reconciliation_note:'Kontoutdrag och period kontrollerade'},
+    {id:'partial',direction:'customer',total_cents:10000,remaining_cents:4000,paid_cents:6000,status:'partial',reconciled_at:'2026-10-28',reconciliation_note:''},
+    {id:'credit',direction:'customer',kind:'credit',total_cents:5000,remaining_cents:5000,status:'unreconciled'},
+    {id:'supplier',direction:'supplier',total_cents:7000,remaining_cents:7000,status:'unreconciled'}],documents:[{id:'gmail',source:'gmail',status:'needs_review'}]});
+  assert.equal(result.totals.billed_cents,55000);assert.equal(result.totals.remaining_cents,54000);
+  assert.equal(result.totals.verified_outstanding_cents,20000);assert.equal(result.totals.overdue_count,2);assert.equal(result.totals.overdue_cents,50000);
+  assert.equal(result.counts.gmail_documents,1);assert.equal(result.counts.anomalies,3);
+  assert.equal(result.queue.filter(q=>q.entity_id==='unconfirmed').length,1);
+  assert.match(result.queue.find(q=>q.entity_id==='unconfirmed').reason,/bevisar inte/);
+});
+
+test('VAT explanation requires consistent invoice fields and never invents a cause',()=>{
+  const invoice={id:'vat',direction:'customer',total_cents:312500,paid_cents:250000,remaining_cents:62500,net_cents:250000,vat_cents:62500};
+  const result=invoiceAnalysis(invoice);assert.equal(result[0].kind,'possible_vat');assert.match(result[0].reason,/orsaken.*inte fastställd/);
+  assert.equal(invoiceAnalysis({...invoice,total_cents:400000})[0].kind,'partial');
+  assert.equal(invoiceAnalysis({...invoice,net_cents:null})[0].kind,'partial');
+  assert.equal(invoice.paid_cents,250000);
 });

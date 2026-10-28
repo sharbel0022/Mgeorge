@@ -1,5 +1,5 @@
 // Uses the authenticated same-origin API and the shared modal's error handling.
-const messageKinds={partial:'Delbetalning',possible_vat:'Möjlig utebliven moms',wrong_reference:'Referens behöver kontrolleras',overdue:'Förfallen efter verifierad kontroll',overpayment:'Överbetalning',possible_duplicate:'Möjlig dubbelbetalning',confirmation:'Behov av betalningsbekräftelse'};
+const messageKinds={partial:'Delbetalning',possible_vat:'Möjlig momsavvikelse',missing_reference:'Betalningsreferens saknas',wrong_reference:'Referens behöver kontrolleras',overdue:'Förfallen efter verifierad kontroll',overpayment:'Överbetalning',possible_duplicate:'Möjlig dubbelbetalning',confirmation:'Behov av betalningsbekräftelse'};
 const messageStates={draft:'Utkast',stale:'Ny kontroll krävs',rejected:'Avvisat',sending:'Utskick pågår / kontrollera Gmail',sent:'Skickat',unknown:'Oklar leverans – kontrollera Gmail'};
 function messagesPage(){
   const items=state.messages||[];

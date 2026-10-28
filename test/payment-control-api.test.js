@@ -20,7 +20,7 @@ test('one authenticated click runs existing pipeline, preserves settings, and se
   const start=await call('/api/payment-control/run','POST',{request_id:'api_request_0000000001'});
   assert.equal(start.res.status,202);let job;
   for(let n=0;n<40;n++){job=(await call('/api/payment-control/runs/'+start.json.job.id)).json.job;if(job.status!=='running')break;await new Promise(r=>setTimeout(r,10));}
-  assert.equal(job.status,'partial');assert.equal(job.steps[0].state,'blocked');assert.equal(job.steps[1].state,'blocked');assert.equal(job.steps[4].state,'done');
+  assert.equal(job.status,'partial');assert.equal(job.steps[0].state,'blocked');assert.equal(job.steps[1].state,'done');assert.equal(job.steps[2].state,'blocked');assert.equal(job.steps[4].state,'done');
   const overview=(await call('/api/payment-control/overview')).json;
   assert.equal(overview.totals.unreconciled_cents,312500);assert.equal(overview.run.id,start.json.job.id);
   assert.equal(db.prepare('SELECT count(*) AS n FROM message_deliveries').get().n,0);
@@ -43,5 +43,17 @@ test('new UI assets are served with the existing restrictive content security po
     assert.equal(response.headers.get('x-content-type-options'),'nosniff');
     assert.ok((await response.text()).length>100);
   }
+});
+
+test('allocation timestamp alone does not prove the remaining balance unpaid',async()=>{
+  const invoice=(await call('/api/invoices','POST',{direction:'customer',invoice_number:'CHECKED-2',party:'Synthetic Partial',total_cents:10000,reference:'CHECKED-2'})).json;
+  await call('/api/bank-transactions','POST',{account:'Test',booked_at:'2026-10-28',amount_cents:2500,payer:'Synthetic Partial',reference:'CHECKED-2'});
+  const transaction=(await call('/api/bank-transactions')).json.items.find(t=>t.reference==='CHECKED-2');
+  assert.equal((await call('/api/allocations','POST',{invoice_id:invoice.id,transaction_id:transaction.id,amount_cents:2500,confirm:true})).res.status,201);
+  const stored=db.prepare('SELECT reconciled_at,reconciliation_note FROM invoices WHERE id=?').get(invoice.id);
+  assert.ok(stored.reconciled_at);assert.equal(stored.reconciliation_note,'');
+  assert.equal((await call('/api/payment-control/overview')).json.totals.verified_outstanding_cents,0);
+  await call('/api/invoices','PATCH',{id:invoice.id,reconciled:true,confirm:true,reconciliation_note:'Kontoutdrag och period kontrollerade separat'});
+  assert.equal((await call('/api/payment-control/overview')).json.totals.verified_outstanding_cents,7500);
 });
 test.after(()=>new Promise(r=>server.close(()=>{db.close();rmSync(dir,{recursive:true,force:true});r();})));

@@ -46,3 +46,26 @@ test('logout clears private job summary and ignores late start responses',async(
 test('review queue preserves import and full customer-message history navigation',()=>{
  const v=view();const html=v.run('paymentControlReview()');assert.match(html,/data-nav="messages"/);assert.match(html,/data-nav="import"/);assert.doesNotMatch(html,/data-save-message|\/send|approve:/);
 });
+
+test('overview exposes checked and unconfirmed totals and financial queue has invoice actions',()=>{
+ const v=view();v.run('render()');
+ for(const label of ['Totalt fakturerat','Verifierat utestående','Förfallodatum passerat','Senaste fullständiga kontroll','Dokumenttolkning'])assert.ok(v.html().includes(label),label);
+ v.set('tasks',[{id:'anomaly:i',type:'anomaly',entity_id:'i',title:'Test',reason:'Delbetalning',action:'Granska saldo',amount_cents:62500}]);
+ assert.match(v.run('controlQueue(tasks)'),/data-invoice="i"/);
+ assert.match(v.run('paymentControlReview()'),/Ekonomiska avvikelser/);
+ assert.match(v.run('paymentBankPage()'),/Behöver identifieras/);
+});
+
+test('financial queue filter keeps one action per item and identification excludes bank aggregates and card refunds',()=>{
+ const v=view();
+ v.set('tasks',[{id:'anomaly:i',type:'anomaly',category:'financial',entity_id:'i',title:'Invoice balance',reason:'Partial',action:'Open'},
+   {id:'payment:p',type:'payment',category:'financial',entity_id:'p',title:'Possible excess',reason:'Review',action:'Check'},
+   {id:'payment:u',type:'payment',category:'identification',entity_id:'u',title:'Unknown payer',reason:'Unknown',action:'Check'}]);
+ v.run("state.control.queue=tasks;controlReviewFilter='financial'");const html=v.run('paymentControlReview()');
+ assert.match(html,/Invoice balance/);assert.match(html,/Possible excess/);assert.doesNotMatch(html,/Unknown payer/);
+ v.set('transactions',[{id:'incoming',amount_cents:10000,available_cents:10000,payer:'Test customer'},
+   {id:'aggregate',amount_cents:10000,available_cents:10000,is_aggregate:true},
+   {id:'refund',amount_cents:10000,available_cents:10000,description:'Card refund'}]);
+ v.run("state.transactions=transactions;state.filters.bank.status='identify'");const rows=v.run('paymentBankResults()');
+ assert.match(rows,/Test customer/);assert.doesNotMatch(rows,/Card refund|data-transaction="aggregate"/);
+});

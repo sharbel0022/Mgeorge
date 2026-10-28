@@ -6,7 +6,7 @@ Det här är den fristående källkodsversionen i detta repository. Den tidigare
 
 ## Ny arbetsyta: en betalningskontroll
 
-Översiktens **Kontrollera alla betalningar** samordnar Gmail, bankhämtning, dokumenttolkning, avstämning och mejlutkast. Sparad stegstatus visar även ofullständiga körningar. **Att granska** samlar beslut, och fakturadetaljen visar original, betalningar och mejl tillsammans. Kortköp och lön ligger separat från kundinbetalningar. Inga mejl skickas av huvudknappen.
+Översiktens **Kontrollera alla betalningar** samordnar Gmail, dokumenttolkning, bankhämtning, avstämning och mejlutkast. Sparad stegstatus visar även ofullständiga körningar. **Att granska** samlar beslut, och fakturadetaljen visar original, betalningar och mejl tillsammans. Kortköp och lön ligger separat från kundinbetalningar. Inga mejl skickas av huvudknappen.
 
 Funktionen gäller Node-versionen i detta repository, **inte en automatisk uppdatering av ChatGPT Sites**. Läs [genomförande, säkerhet och Sites-avgränsning](docs/ONE-CLICK-PAYMENT-CONTROL.md). Befintliga anslutningar, automatiseringsval och manuellt godkännande av kundmejl bevaras.
 

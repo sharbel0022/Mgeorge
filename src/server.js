@@ -19,8 +19,8 @@ import {runDocumentProcess} from './invoice-extraction.js';
 import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
 import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from './customer-messages.js';
 import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
-import {createPaymentControl} from './payment-control.js';
-import {buildPaymentOverview} from './payment-overview.js';
+import {createPaymentControl,planBankControl} from './payment-control.js';
+import {buildPaymentOverview,invoiceAnalysis} from './payment-overview.js';
 
 function reconcileAndPrepare(){const suggestions=runReconciliation(db);prepareMessages(db);return suggestions;}
 
@@ -315,19 +315,18 @@ const paymentControl=createPaymentControl(db,{
     bank:async({owner,authorize})=>{
       if(!isConfigured())return {state:'blocked',note:'Bankanslutningen behöver konfigureras. Importerade bankunderlag används tills vidare.'};
       const all=db.prepare('SELECT * FROM bank_connections WHERE owner=?').all(owner);
-      const connections=all.filter(c=>['connected','error'].includes(c.status)&&c.selected_account_uid&&Date.parse(c.valid_until)>Date.now());
-      if(!connections.length)return {state:'blocked',note:'Anslut eller förnya banken och välj företagskonto. Sparade bankhändelser bevaras.'};
-      let imported=0,waiting=all.length!==connections.length||connections.length>3,cached=0;
-      for(const connection of connections.slice(0,3)){
+      const plan=planBankControl(all);
+      if(!all.some(c=>['connected','error'].includes(c.status)&&c.selected_account_uid&&Date.parse(c.valid_until)>Date.now()))return {state:'blocked',note:'Anslut eller förnya banken och välj företagskonto. Sparade bankhändelser bevaras.'};
+      let imported=0,waiting=plan.waiting;
+      for(const connection of plan.selected){
         authorize();
-        if(connection.retry_after>Date.now()){waiting=true;continue;}
-        if(connection.last_synced&&Date.now()-utcTimestamp(connection.last_synced)<60000){cached++;continue;}
+        db.prepare('UPDATE bank_connections SET control_attempt_at=? WHERE id=? AND owner=?').run(Date.now(),connection.id,owner);
         try{const result=await syncBank({...connection,controlAuthorize:authorize});authorize();imported+=result.imported||0;}
         catch(error){if([401,403].includes(error.status))throw error;waiting=true;}
       }
-      return {state:waiting?'waiting':cached===connections.length?'cached':'done',count:imported,
+      return {state:waiting?'waiting':!plan.selected.length?'cached':'done',count:imported,
         note:waiting?'Någon bankhämtning väntar eller behöver åtgärdas. Kontrollera Bankanslutning; sparade händelser används.':
-          cached===connections.length?'Bankuppgifterna hämtades nyligen. Sparat underlag används.':`${imported} nya bankhändelser. Bankgirodetaljer kan fortfarande behöva kompletteras.`};
+          !plan.selected.length?'Bankuppgifterna hämtades nyligen. Sparat underlag används.':`${imported} nya bankhändelser. Bankgirodetaljer kan fortfarande behöva kompletteras.`};
     },
     documents:async({authorize})=>{
       // Bound a run; never re-run OCR on an already interpreted document by default.
@@ -373,7 +372,7 @@ async function route(req,res){
     db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
     db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
   }
-  if(path==='/api/payment-control/overview'&&req.method==='GET')return json(res,200,{...paymentOverview(),run:paymentControl.latest(req.principal)});
+  if(path==='/api/payment-control/overview'&&req.method==='GET')return json(res,200,{...paymentOverview(),run:paymentControl.latest(req.principal),last_successful_control:db.prepare("SELECT finished_at FROM payment_control_runs WHERE owner=? AND status='complete' ORDER BY finished_at DESC LIMIT 1").get(req.principal)?.finished_at||''});
   if(path==='/api/payment-control/run'&&req.method==='POST'){
     const body=await readBody(req);
     if(Object.keys(body).some(key=>key!=='request_id'))throw bad(400,'Kontrollen accepterar bara en begäransidentifierare.');
@@ -401,7 +400,7 @@ async function route(req,res){
   if(/^\/api\/invoices\/[^/]+$/.test(path)&&req.method==='GET'){
     const id=decodeURIComponent(path.split('/').pop()),invoice=listInvoices(db).find(i=>i.id===id);if(!invoice)throw bad(404,'Fakturan saknas');
     const transactions=listTransactions(db),allocations=db.prepare('SELECT * FROM allocations WHERE invoice_id=? ORDER BY confirmed_at DESC').all(id).map(a=>({...a,transaction:transactions.find(t=>t.id===a.transaction_id)}));
-    return json(res,200,{invoice,allocations,documents:listDocuments(db).filter(d=>d.invoice_id===id)});
+    return json(res,200,{invoice,allocations,documents:listDocuments(db).filter(d=>d.invoice_id===id),analysis:invoiceAnalysis(invoice,analyzeReconciliation(reconciliationData(db)).filter(s=>s.invoice_id===id))});
   }
   if(path==='/api/invoices'&&req.method==='PATCH'){
     const b=await readBody(req);const prev=db.prepare('SELECT * FROM invoices WHERE id=?').get(b.id);

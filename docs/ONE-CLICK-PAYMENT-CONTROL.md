@@ -9,8 +9,8 @@ Denna ändring gäller **GitHub-versionen med Node.js/SQLite**. Den publicerar i
 Översikten har en huvudknapp: **Kontrollera alla betalningar**. Den startar en begränsad kontroll med fem sparade steg:
 
 1. Hämta Gmail-underlag med redan godkänt medgivande, eller använd nyligen hämtat underlag.
-2. Hämta bankhändelser från redan valda och giltiga konton, med respekt för bankens återförsökstid.
-3. Tolka ännu inte analyserade dokument med befintlig dokumentmotor.
+2. Tolka ännu inte analyserade dokument med befintlig dokumentmotor.
+3. Hämta bankhändelser från redan valda och giltiga konton, med respekt för bankens återförsökstid.
 4. Återanvänd den befintliga konservativa avstämningen.
 5. Förbered kundmeddelanden som utkast — **skicka aldrig**.
 

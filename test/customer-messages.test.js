@@ -24,6 +24,15 @@ function send(db,m,r,options){return approveAndSend(db,m.id,{version:m.version,r
 test('VAT message uses verified cents, states uncertainty and does not accuse the customer',t=>{
   const db=fixture(t);payment(db);const m=draft(db);assert.equal(m.kind,'possible_vat');assert.match(m.body,/Kan betalningen ha avsett/);assert.equal(m.invoice.remaining_cents,62500);assert.equal(m.payments.length,1);assert.doesNotMatch(m.body,/glömt/);
 });
+
+test('inconsistent VAT figures never produce a VAT claim and missing reference has its own draft',t=>{
+  const db=fixture(t);payment(db);db.prepare('UPDATE invoices SET net_cents=240000').run();
+  prepareMessages(db);assert.equal(draft(db).kind,'partial');
+  db.prepare("INSERT INTO reconciliation_findings(id,invoice_id,transaction_id,kind,details) VALUES('missing','i','test','missing_reference','{}')").run();
+  prepareMessages(db);const missing=listMessages(db).find(m=>m.status==='draft'&&m.kind==='missing_reference');
+  assert.ok(missing);assert.match(missing.body,/saknar fakturareferens/);assert.match(missing.body,/ännu inte säkert kopplad/);
+  assert.equal(db.prepare('SELECT count(*) n FROM message_deliveries').get().n,0);
+});
 test('unverified absence asks for confirmation; verified absence may produce overdue draft',t=>{
   const db=fixture(t);assert.equal(draft(db).kind,'confirmation');
   db.prepare("UPDATE invoices SET reconciled_at='2026-10-27',reconciliation_note='Bankutdrag kontrollerat'").run();prepareMessages(db);assert.equal(draft(db).kind,'overdue');

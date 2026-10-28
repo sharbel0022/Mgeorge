@@ -1,10 +1,22 @@
 import {randomUUID} from 'node:crypto';
 
 export const CONTROL_STEPS = [
-  ['gmail', 'Hämta fakturaunderlag'], ['bank', 'Hämta bankhändelser'],
-  ['documents', 'Tolka och kontrollera fakturor'], ['reconcile', 'Stäm av betalningar'],
+  ['gmail', 'Hämta fakturaunderlag'], ['documents', 'Tolka och kontrollera fakturor'],
+  ['bank', 'Hämta bankhändelser'], ['reconcile', 'Stäm av betalningar'],
   ['messages', 'Förbered mejlutkast']
 ];
+
+/** Select only ready connections before applying the bound. Persisted attempts
+ * rotate failing connections as well as successfully synchronized accounts. */
+export function planBankControl(connections, {now = Date.now(), limit = 3} = {}) {
+  const timestamp = value => value ? Date.parse(value.includes('T') ? value : value.replace(' ', 'T') + 'Z') || 0 : 0;
+  const eligible = connections.filter(c => ['connected', 'error'].includes(c.status) && c.selected_account_uid && Date.parse(c.valid_until) > now);
+  const cached = eligible.filter(c => !(c.retry_after > now) && c.last_synced && now - timestamp(c.last_synced) < 60_000);
+  const ready = eligible.filter(c => !(c.retry_after > now) && !cached.includes(c)).sort((a, b) =>
+    (a.control_attempt_at || 0) - (b.control_attempt_at || 0) || timestamp(a.last_synced) - timestamp(b.last_synced) || a.id.localeCompare(b.id));
+  return {selected: ready.slice(0, limit), cached: cached.length,
+    waiting: eligible.length !== connections.length || eligible.some(c => c.retry_after > now) || ready.length > limit};
+}
 const fail = (message, status) => Object.assign(new Error(message), {status});
 const stamp = now => new Date(now()).toISOString();
 const resultStates = new Set(['done', 'cached', 'waiting', 'blocked']);
