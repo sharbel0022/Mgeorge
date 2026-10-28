@@ -14,7 +14,7 @@ Moln-OCR använder samma svenska Tesseract, granskningsregler och beständiga do
 
 ## Verifiering
 
-**251 Node-tester och 325 Sites-tester passerar.** Node-syntaxkontroll (53 JavaScript-filer), TypeScript och produktionsbygge är godkända. Båda beroendegranskningarna rapporterar **0 kända sårbarheter**. Ramverkets bygge ger befintliga varningar om sourcemaps och dynamiska importer, men avslutas utan fel. Testdata är syntetiska; produktionsfakturor och bankbetalningar har inte använts som destruktiva testdata.
+**251 Node-tester och 326 Sites-tester passerar.** Node-syntaxkontroll (53 JavaScript-filer), TypeScript och produktionsbygge är godkända. Båda beroendegranskningarna rapporterar **0 kända sårbarheter**. Ramverkets bygge ger befintliga varningar om sourcemaps och dynamiska importer, men avslutas utan fel. Testdata är syntetiska; produktionsfakturor och bankbetalningar har inte använts som destruktiva testdata.
 
 - Node: syntaxkontroll, full testsvit och beroendegranskning.
 - Sites: TypeScript, full testsvit, produktionsbygge och beroendegranskning.

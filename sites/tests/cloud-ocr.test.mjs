@@ -67,6 +67,20 @@ test('parallel local and cloud claims have one winner and bind document access t
   const until=f.sql.prepare('SELECT lease_until FROM document_jobs').get().lease_until;assert.ok(Date.parse(until)-Date.now()>(mode==='cloud'?290000:170000));
 });
 
+test('a delayed claim cannot consume another workers retry cooldown',async t=>{
+ const f=await fixture(t);f.add();await f.api.enqueueDocuments(f.owner);
+ const prepare=f.db.prepare.bind(f.db);let delayed=false;
+ f.db.prepare=query=>{
+  const statement=prepare(query);
+  if(query.startsWith("UPDATE document_jobs SET state='processing'")){
+   const run=statement.run.bind(statement);
+   statement.run=async()=>{if(!delayed){delayed=true;f.sql.prepare("UPDATE document_jobs SET attempts=1,available_at=?").run(new Date(Date.now()+60000).toISOString());}return run();};
+  }
+  return statement;
+ };
+ assert.equal(await f.lease(),null);assert.equal(f.sql.prepare('SELECT attempts FROM document_jobs').get().attempts,1);
+});
+
 test('cloud runs text PDF discovery and scans without any local heartbeat',async t=>{
   const f=await fixture(t);f.add('scanned-pdf','application/pdf');
   const process=await (await f.call('process')).json();assert.equal(f.pdfCalls,1);assert.equal(process.waiting,1);

@@ -41,7 +41,7 @@ async function claim(owner:string,engine:string,runner='server'):Promise<Row|nul
   const job=await db().prepare(`SELECT document_jobs.*,d.mime,d.size,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND engine=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} ORDER BY available_at,document_id LIMIT 1`).bind(owner,engine,at,wanted,at).first<Row>();
   if(!job)return null;
   const lease=randomToken(),until=new Date(Date.now()+(runner==='cloud'?300000:180000)).toISOString();
-  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,lease_runner=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts<3 AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource}`).bind(lease,until,runner,at,owner,job.document_id,engine,wanted,at).run();
+  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,lease_runner=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource}`).bind(lease,until,runner,at,owner,job.document_id,engine,job.attempts,at,wanted,at).run();
   return r.meta.changes===1?{...job,lease,lease_until:until,lease_runner:runner,attempts:job.attempts+1}:null;
 }
 async function failJob(owner:string,job:Row,code:string){
