@@ -1,5 +1,5 @@
 import {db,identity,readWorkspace,response} from './server';
-import {uid,now,today,applyCommand,balance,type State} from './domain';
+import {uid,now,today,applyCommand,balance,hasValidAbsenceCheck,invoicePaymentEvidenceIssue,paymentEvidenceIssue,type State} from './domain';
 import {analyze,invoiceFacts,contactIdentity} from './reconciliation';
 import {reconcileWithOriginals} from './reconciliation-evidence';
 import {generateMessage,validRecipient} from './customer-message-text.js';
@@ -16,9 +16,14 @@ async function audit(owner:string,action:string,detail:unknown){
 export async function evidenceSnapshot(state:State,contact:Row|null){return digest(JSON.stringify({state,contact,day:today()}));}
 async function contactFor(owner:string,id:string){return db().prepare('SELECT * FROM customer_contacts WHERE owner=? AND invoice_id=?').bind(owner,id).first<Row>();}
 async function getMessage(owner:string,id:string){const m=await db().prepare('SELECT * FROM customer_messages WHERE owner=? AND id=?').bind(owner,id).first<Row>();if(!m)throw error('Meddelandet saknas.',404);return m;}
+function validMessageEvidence(state:State,m:Row){
+ const invoice=state.invoices.find(i=>i.id===m.invoice_id);if(!invoice)return false;
+ if(['partial','possible_vat','overpayment','overdue'].includes(m.kind)&&invoicePaymentEvidenceIssue(state,invoice.id))return false;
+ return m.kind!=='overdue'||hasValidAbsenceCheck(state,invoice);
+}
 async function current(owner:string,id:string,version:number){
   const m=await getMessage(owner,id),workspace=await readWorkspace(owner),contact=await contactFor(owner,m.invoice_id);
-  if(m.status!=='draft'||m.version!==version||m.snapshot!==await evidenceSnapshot(workspace.state,contact))throw error('Utkastet eller betalningsunderlaget har ändrats. Uppdatera och granska den nya versionen.');
+  if(m.status!=='draft'||m.version!==version||!validMessageEvidence(workspace.state,m)||m.snapshot!==await evidenceSnapshot(workspace.state,contact))throw error('Utkastet eller betalningsunderlaget har ändrats. Uppdatera och granska den nya versionen.');
   const invoice=workspace.state.invoices.find(i=>i.id===m.invoice_id);
   if(!invoice||invoice.voided||!invoice.reviewed)throw error('Fakturan behöver kontrolleras.');
   return {m,workspace,contact,invoice};
@@ -42,7 +47,7 @@ export async function reconcileAndPrepare(owner:string){
   for(let n=0;n<statements.length;n+=50)await db().batch(statements.slice(n,n+50));
   const existing=await db().prepare('SELECT * FROM customer_messages WHERE owner=?').bind(owner).all<Row>();
   for(const m of existing.results.filter(m=>m.status==='draft')){
-    if(m.snapshot===await evidenceSnapshot(workspace.state,await contactFor(owner,m.invoice_id)))continue;
+    if(validMessageEvidence(workspace.state,m)&&m.snapshot===await evidenceSnapshot(workspace.state,await contactFor(owner,m.invoice_id)))continue;
     await db().batch([
       db().prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?, 'message.invalidated',?,? WHERE EXISTS(SELECT 1 FROM customer_messages WHERE id=? AND owner=? AND status='draft')").bind(uid(),owner,workspace.revision,JSON.stringify({id:m.id,version:m.version}),now(),m.id,owner),
       db().prepare("UPDATE customer_messages SET status='stale',updated_at=? WHERE owner=? AND id=? AND status='draft'").bind(now(),owner,m.id),
@@ -57,8 +62,9 @@ export async function reconcileAndPrepare(owner:string){
       ]);
     }
     const kinds=new Set<string>(),paymentReferences:string[]=[];
+    if(facts.payment_evidence_issue)kinds.add('confirmation');
     if(facts.paid_cents>0&&facts.remaining_cents>0)kinds.add(i.vat&&i.net!=null&&i.net+i.vat===i.total&&facts.remaining_cents===i.vat&&i.net===facts.paid_cents?'possible_vat':'partial');
-    if(!facts.paid_cents&&facts.remaining_cents>0&&i.due&&i.due<today())kinds.add(i.reconciledAt&&!related.length?'overdue':'confirmation');
+    if(!facts.paid_cents&&facts.remaining_cents>0&&i.due&&i.due<today())kinds.add(hasValidAbsenceCheck(workspace.state,i)&&!related.length?'overdue':'confirmation');
     if(related.some(f=>['wrong_reference','reference_conflict'].includes(f.kind)))kinds.add('wrong_reference');
     if(related.some(f=>f.kind==='missing_reference'))kinds.add('missing_reference');
     if(related.some(f=>f.kind==='possible_duplicate'))kinds.add('possible_duplicate');
@@ -71,6 +77,7 @@ export async function reconcileAndPrepare(owner:string){
     if(paymentReferences.length)kinds.add('wrong_reference');
     const recipient=contact?.identity===contactIdentity(i)?contact.email:'';
     for(const kind of kinds){
+      if(!validMessageEvidence(workspace.state,{kind,invoice_id:i.id}))continue;
       if(existing.results.some(m=>m.invoice_id===i.id&&m.kind===kind&&['sent','sending','unknown'].includes(m.status)))continue;
       const text=generateMessage({...facts,payment_references:paymentReferences},kind),id=uid(),at=now();
       const r=await db().prepare('INSERT OR IGNORE INTO customer_messages(id,owner,invoice_id,kind,recipient,subject,body,snapshot,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)').bind(id,owner,i.id,kind,recipient,text.subject,text.body,snapshot,at,at).run();
@@ -85,10 +92,10 @@ export async function messageList(owner:string){
   for(const m of rows.results){
     const invoice=workspace.state.invoices.find(i=>i.id===m.invoice_id);if(!invoice)continue;
     const contact=await contactFor(owner,m.invoice_id),snapshot=await evidenceSnapshot(workspace.state,contact);
-    const payments=workspace.state.allocations.filter(a=>a.active&&a.invoiceId===invoice.id).map(a=>{const t=workspace.state.transactions.find(t=>t.id===a.transactionId);return {...t,allocated:a.amount,effect:a.effect,documentId:workspace.state.imports.find(j=>j.id===t?.importId)?.documentId||''};});
+    const payments=workspace.state.allocations.filter(a=>a.active&&a.invoiceId===invoice.id).map(a=>{const t=workspace.state.transactions.find(t=>t.id===a.transactionId);return {...t,allocated:a.amount,effect:a.effect,evidence_issue:t?paymentEvidenceIssue(workspace.state,t):'Betalningsunderlaget saknas.',documentId:workspace.state.imports.find(j=>j.id===t?.importId)?.documentId||''};});
     const related=findings.filter(f=>f.invoice_id===invoice.id).map(f=>({...f,transaction:workspace.state.transactions.find(t=>t.id===f.transaction_id)}));
     const delivery=await db().prepare('SELECT id,status,gmail_message_id,rfc_message_id,approved_at,sent_at FROM customer_deliveries WHERE owner=? AND message_id=?').bind(owner,m.id).first();
-    items.push({...m,status:m.status==='draft'&&m.snapshot!==snapshot?'stale':m.status,invoice,facts:invoiceFacts(workspace.state,invoice),contact,payments,findings:related,delivery});
+    items.push({...m,status:m.status==='draft'&&(!validMessageEvidence(workspace.state,m)||m.snapshot!==snapshot)?'stale':m.status,invoice,facts:invoiceFacts(workspace.state,invoice),contact,payments,findings:related,delivery});
   }
   return {items};
 }

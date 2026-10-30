@@ -161,3 +161,76 @@ Senaste main hämtad och ren: `c519eef47e5a084a35db7675a2553a554c55ec4c`. GitHub
 Fryst Node-kod och exakta regressioner har oberoende granskats. Separat checkout från startcommitten passerar407/407 Node,456/456 oförändrade Sites, syntax65, TypeScript, båda audits0 och produktionsbygge. [Rapport](docs/QUALITY-8H-NODE-CYCLE1.md), [källmanifest](docs/QUALITY-8H-NODE-CYCLE1.json). Ingen ny Sites-publicering ingår i denna delleverans; Site32 är fortsatt senaste verifierade. Exakt main-commit och CI registreras efter push.
 
 Alla33 har en ny deltaöversikt. Bekräftade öppna backup-/automationsfel sänker den aktuella bedömningen till242,5/330=7,35,0/33 på9,5. Dessa fel ska rättas i nästa cykel. Arbetet fortsätter inom samma budget; ingen bakgrundskörning antas. Nästa konkreta steg: pusha den verifierade Node-kandidaten, verifiera CI, slutför Sites-review och publicera samma befintliga projekt.
+
+## Åttatimmarsarbete – cykel 1B färdig för leverans
+
+Node-delleveransen finns på main och har grön Actions. Isolerad Sites-kandidat: **407/407 Node +531/531 Sites**, TypeScript och produktionsbygge godkända. Se `docs/QUALITY-8H-SITES-CYCLE1.md`. Produktionsversion32 är fortfarande återgångspunkt; inga scheman/behörigheter har ändrats. Nästa cykels rättningar pågår separat.
+
+```json
+{
+  "schema": 1,
+  "run": "quality-8h-2026-10-30",
+  "status": "in_progress",
+  "started_at": "2026-10-30T15:31:15Z",
+  "deadline": "2026-10-30T23:31:15Z",
+  "last_verified_main": "a82ffbca211b5651e662c759c761bda2aefbf0f0",
+  "pushed_commits": 1,
+  "actions_run": 41088814042,
+  "actions_conclusion": "success",
+  "ready_candidate": "docs/QUALITY-8H-SITES-CYCLE1.json",
+  "latest_tests": {
+    "node": 407,
+    "sites": 531,
+    "failed": 0
+  },
+  "latest_sites_version": 32,
+  "areas_at_least_9_5": [],
+  "remaining_areas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33
+  ],
+  "score_total": 242.5,
+  "score_mean": 7.348484848484849,
+  "external_blockers": [
+    "Authentic individual Swedbank report and company report profile",
+    "Paused external Gmail schedule; no new activation approval",
+    "Representative authentic OCR/invoice corpus and agreed expected results"
+  ],
+  "completed": [
+    "Node original/lineage/undo/import integrity delivered and CI green",
+    "Sites bank/document/navigation candidate independently reviewed and full gates green"
+  ],
+  "next_task": "Push exact Sites 1B tree, verify Actions, publish same existing Site and verify authenticated views; continue cycle2 backup/control/registration fixes."
+}
+```

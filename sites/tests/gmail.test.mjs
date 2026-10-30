@@ -13,7 +13,8 @@ class D1{
 async function fixture(t){
   const key='__gmail_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');sql.exec(source('../drizzle/0000_confused_umar.sql'));sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));sql.exec(source('../drizzle/0002_brief_chronomancer.sql'));sql.exec(source('../drizzle/0003_needy_gravity.sql'));for(const file of (await import('node:fs')).readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>/^\d{4}.*sql$/.test(f)&&f.slice(0,4)>='0004'))sql.exec(source('../drizzle/'+file));
   const f={sql,d1:new D1(sql),owner:'test-owner',key:randomToken(),wrongAccount:false,providerCalls:0,env:{GOOGLE_CLIENT_ID:'synthetic-client',GOOGLE_CLIENT_SECRET:'synthetic-secret'}};f.user={userId:f.owner,email:"owner@example.test"};
-  f.env.BUCKET={put:async()=>{f.bucketPuts=(f.bucketPuts||0)+1;},get:async()=>null,delete:async()=>{f.bucketDeletes=(f.bucketDeletes||0)+1;}};globalThis[key]=f;
+  const objects=new Map();
+  f.env.BUCKET={put:async(key,bytes)=>{f.bucketPuts=(f.bucketPuts||0)+1;objects.set(key,Buffer.from(bytes));},get:async key=>{const bytes=objects.get(key);return bytes?{size:bytes.length,body:bytes,arrayBuffer:async()=>Uint8Array.from(bytes).buffer}:null;},delete:async key=>{f.bucketDeletes=(f.bucketDeletes||0)+1;objects.delete(key);}};globalThis[key]=f;
   const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`);
   const domainUrl=new URL('../lib/domain.ts',import.meta.url).href,securityUrl=new URL('../lib/banking/security.ts',import.meta.url).href;
   const server=data(`import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(body,status=200)=>Response.json(body,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=await f.d1.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').bind(owner).first();return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
@@ -189,6 +190,21 @@ test('verified green invoices auto-register exactly once; copies and changed amo
   f.doc('copy');await f.processing.processDocuments(f.owner);assert.equal(f.sql.prepare("SELECT state FROM document_jobs WHERE document_id='copy'").get().state,'duplicate');
   f.pdfResult.text=syntheticText().replace('3 125,00','3 500,00');f.doc('conflict');await f.processing.processDocuments(f.owner);state=JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload);assert.equal(state.invoices.length,1);
 });
+
+for(const [first,second] of [['AB-0594','AB0594'],['AB/0594','AB_0594']])test(`document queue: ${second} is distinct from ${first} even with a legacy registration key`,async t=>{
+  const f=await processingFixture(t),key=f.processing.counterpartyKey('supplier','Exempelbolaget AB','5560160680');
+  f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,key,'supplier@example.test','123-4567','Synthetic verified supplier','2026-01-01');
+  f.pdfResult.text=syntheticText(first);f.doc('legacy');await f.processing.processDocuments(f.owner);
+  f.sql.prepare("UPDATE document_registrations SET identity=? WHERE document_id='legacy'").run('["payable","5560160680","ab0594"]');
+  f.pdfResult.text=syntheticText(second);f.doc('next');await f.processing.processDocuments(f.owner);
+  assert.equal(f.sql.prepare("SELECT state FROM document_jobs WHERE document_id='next'").get().state,'registered');
+  assert.deepEqual(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.map(invoice=>invoice.number),[first,second]);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,2);
+  assert.equal(f.sql.prepare("SELECT identity FROM document_registrations WHERE document_id='legacy'").get().identity,'["payable","5560160680","ab0594"]');
+  f.pdfResult.text=syntheticText(second.toLowerCase());f.doc('copy');await f.processing.processDocuments(f.owner);
+  assert.equal(f.sql.prepare("SELECT state FROM document_jobs WHERE document_id='copy'").get().state,'duplicate');
+  assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,2);
+});
 test('a changed Bankgiro and OCR uncertainty cannot use trusted-party automatic registration',async t=>{
   const f=await processingFixture(t),key=f.processing.counterpartyKey('supplier','Exempelbolaget AB','5560160680');f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,key,'supplier@example.test','999-9999','Synthetic trust','2026-01-01');f.doc();await f.processing.processDocuments(f.owner);assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'needs_review');
   f.doc('image','image/png');const leased=await (await f.worker('lease')).json();assert.ok(leased.job);const r=await f.worker('complete',{id:'image',lease:leased.job.lease,sha256:f.sha,text:syntheticText('0008'),method:'ocr',confidence:99});assert.equal(r.status,200);assert.equal(JSON.parse(f.sql.prepare("SELECT extraction FROM document_jobs WHERE document_id='image'").get().extraction).level,'yellow');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
@@ -208,6 +224,62 @@ test('manual registration during a local lease makes a delayed result harmless',
   const f=await processingFixture(t);f.doc('image','image/png');const one=await (await f.worker('lease')).json();
   await f.processing.registerProcessedInvoice(f.owner,'image',{direction:'payable',party:'Exempelbolaget AB',number:'0007',total:312500,issued:'2026-10-24',due:'2026-11-07',kind:'invoice'},{currency:'SEK',organization_number:'5560160680',vat_cents:62500,net_cents:250000});
   assert.equal((await f.worker('complete',{id:'image',lease:one.job.lease,sha256:f.sha,text:syntheticText(),method:'ocr',confidence:99})).status,409);assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,1);
+});
+
+for(const missing of [true,false])test('reviewed invoice registration requires the retained original to be '+(missing?'available':'unchanged'),async t=>{
+  const f=await processingFixture(t);f.doc();
+  if(missing)f.env.BUCKET.get=async()=>null;
+  else f.bytes=Buffer.alloc(f.bytes.length,88);
+  await assert.rejects(f.processing.registerProcessedInvoice(f.owner,'doc-1',{direction:'payable',party:'Exempelbolaget AB',number:'0007',total:312500,issued:'2026-10-24',due:'2026-11-07',kind:'invoice'},{currency:'SEK',organization_number:'5560160680',vat_cents:62500,net_cents:250000}),/Originalunderlaget/);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  assert.equal(f.sql.prepare('SELECT status FROM gmail_sources').get().status,'needs_review');
+  assert.equal(f.sql.prepare('SELECT sha256 FROM documents').get().sha256,f.sha);
+});
+
+test('automatic registration rechecks retained original after PDF interpretation',async t=>{
+  const f=await processingFixture(t),key=f.processing.counterpartyKey('supplier','Exempelbolaget AB','5560160680');
+  f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,key,'supplier@example.test','123-4567','Synthetic verified supplier','2026-01-01');f.doc();
+  const prepare=f.d1.prepare.bind(f.d1);let changed=false;
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query==='SELECT * FROM document_automation WHERE owner=?'){
+      const first=statement.first.bind(statement);
+      statement.first=async()=>{const result=await first();f.bytes=Buffer.alloc(f.bytes.length,88);changed=true;return result;};
+    }
+    return statement;
+  };
+  await f.processing.processDocuments(f.owner);
+  assert.equal(changed,true);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'needs_review');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1,'earlier interpretation remains in history');
+});
+
+test('document metadata changed at the registration write boundary cannot use an earlier original check',async t=>{
+  const f=await processingFixture(t);f.doc();
+  const batch=f.d1.batch.bind(f.d1);let changed=false;
+  f.d1.batch=async items=>{if(!changed){changed=true;f.sql.prepare("UPDATE documents SET sha256=? WHERE id='doc-1'").run('0'.repeat(64));}return batch(items);};
+  await assert.rejects(f.processing.registerProcessedInvoice(f.owner,'doc-1',{direction:'payable',party:'Exempelbolaget AB',number:'0007',total:312500,issued:'2026-10-24',due:'2026-11-07',kind:'invoice'},{currency:'SEK',organization_number:'5560160680',vat_cents:62500,net_cents:250000}),/Originalunderlaget/);
+  assert.equal(changed,true);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,0);
+  assert.equal(f.sql.prepare('SELECT status FROM gmail_sources').get().status,'needs_review');
+});
+
+test('automatic registration rechecks lease expiry under the database write clock',async t=>{
+  const f=await processingFixture(t),key=f.processing.counterpartyKey('supplier','Exempelbolaget AB','5560160680');
+  f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,key,'supplier@example.test','123-4567','Synthetic verified supplier','2026-01-01');f.doc('image','image/png');
+  const job=(await (await f.worker('lease')).json()).job,at=Date.now();
+  t.mock.timers.enable({apis:['Date'],now:at-60000});
+  const batch=f.d1.batch.bind(f.d1);let writes=0;
+  f.d1.batch=async items=>{writes++;if(writes===2)f.sql.prepare('UPDATE document_jobs SET lease_until=?').run(new Date(at-1000).toISOString());return batch(items);};
+  await f.worker('complete',{id:'image',lease:job.lease,sha256:f.sha,text:syntheticText(),method:'pdf',confidence:100});
+  assert.equal(writes,2);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,0);
+  assert.equal(f.sql.prepare('SELECT status FROM gmail_sources').get().status,'needs_review');
 });
 
 test('rejecting a document cancels its lease and removes it from review counts without removing its original',async t=>{

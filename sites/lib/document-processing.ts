@@ -12,9 +12,22 @@ const safe=(message:string)=>Object.assign(Error(message),{safe:true,status:409}
 const normalize=(s:unknown)=>String(s||'').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
 const mailbox=(s:unknown)=>String(s||'').match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0].toLowerCase()||'';
 export const counterpartyKey=(direction:string,party:string,org:string)=>JSON.stringify([direction,normalize(org),normalize(party)]);
-export const documentInvoiceKey=(i:Row)=>JSON.stringify([i.direction,normalize(i.organizationNumber||i.party),normalize(i.number)]);
+// Keep invoice-number separators. Versioned keys avoid collisions with earlier
+// persisted keys that removed separators; the current workspace still supplies
+// duplicate checks for those historical registrations.
+export const documentInvoiceKey=(i:Row)=>JSON.stringify(['invoice-v2',i.direction,normalize(i.organizationNumber||i.party),String(i.number||'').normalize('NFKC').trim().toUpperCase()]);
 const sourceFor=(owner:string,id:string)=>db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? ORDER BY created_at LIMIT 1').bind(owner,id).first<Row>();
 const activeSource="EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status='needs_review')";
+
+async function originalBytes(owner:string,job:Row,limit=15000000){
+  if(!Number.isSafeInteger(job.size)||job.size<1||job.size>limit||!/^[a-f0-9]{64}$/.test(job.sha256||''))throw Error('original_integrity');
+  const object=await env.BUCKET?.get(`${owner}/${job.document_id}`);
+  if(!object||object.size!==job.size)throw Error('original_integrity');
+  const bytes=new Uint8Array(await object.arrayBuffer());
+  const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(byte=>byte.toString(16).padStart(2,'0')).join('');
+  if(bytes.length!==job.size||sha256!==job.sha256)throw Error('original_integrity');
+  return bytes;
+}
 
 export async function processingSettings(user?:{userId:string,email:string}){
   user ||= await identity();
@@ -48,10 +61,15 @@ async function failJob(owner:string,job:Row,code:string){
   const retry=job.attempts<3;
   await db().prepare("UPDATE document_jobs SET state=?,error_code=?,available_at=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=? AND state='processing'").bind(retry?(job.engine==='local'?'waiting_ocr':'queued'):'failed',code,new Date(Date.now()+Math.min(job.attempts*60000,180000)).toISOString(),now(),owner,job.document_id,job.lease).run();
 }
-export async function registerProcessedInvoice(owner:string,documentId:string,raw:Row,fields:Row,options:{automatic?:boolean,lease?:string,trust?:Row}={}){
+export async function registerProcessedInvoice(owner:string,documentId:string,raw:Row,fields:Row,options:{automatic?:boolean,lease?:string,trust?:Row,sha256?:string}={}){
   for(let attempt=0;attempt<3;attempt++){
     const source=await sourceFor(owner,documentId);if(!source||!['needs_review','registered'].includes(source.status))throw safe('Underlaget kan inte registreras i detta läge.');
     if(source.status==='registered')return {registered:true,duplicate:true};
+    const document=await db().prepare('SELECT size,sha256 FROM documents WHERE owner=? AND id=?').bind(owner,documentId).first<Row>();
+    try{
+      if(!document||options.automatic&&options.sha256!==document.sha256)throw Error('original_integrity');
+      await originalBytes(owner,{...document,document_id:documentId});
+    }catch{throw safe('Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före registrering.');}
     const old=await readWorkspace(owner),invoice:Row={...raw,documentId,reviewed:true,source:'Gmail: '+JSON.parse(source.metadata).subject};delete invoice.id;
     const checks={issued_at:invoice.issued,due_at:invoice.due,total_cents:invoice.total,organization_number:fields.organization_number||null,currency:fields.currency,vat_cents:fields.vat_cents,net_cents:fields.net_cents};
     const issues=validateInvoiceValues(checks);if(fields.currency!=='SEK'||!invoice.due||!['receivable','payable'].includes(invoice.direction))issues.push('Kontrollera datum, valuta och fakturatyp.');
@@ -65,8 +83,8 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
     const saved=result.state.invoices.find(i=>i.documentId===documentId)!;
     const at=now(),receipt=uid();
     await db().prepare('INSERT OR IGNORE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(owner,JSON.stringify(emptyState()),at).run();
-    const guard=options.automatic?` AND EXISTS(SELECT 1 FROM document_jobs j WHERE j.owner=? AND j.document_id=? AND j.state='processing' AND j.lease=? AND j.lease_until>?) AND EXISTS(SELECT 1 FROM invoice_counterparties c WHERE c.owner=? AND c.identity=? AND c.version=?) AND EXISTS(SELECT 1 FROM document_automation a WHERE a.owner=? AND a.enabled=1 AND a.auto_register=1)`:'';
-    const binds=options.automatic?[owner,documentId,options.lease,at,owner,options.trust!.identity,options.trust!.version,owner]:[];
+    const guard=` AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=? AND d.id=? AND d.sha256=? AND d.size=?)`+(options.automatic?` AND EXISTS(SELECT 1 FROM document_jobs j WHERE j.owner=? AND j.document_id=? AND j.state='processing' AND j.lease=? AND j.lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now')) AND EXISTS(SELECT 1 FROM invoice_counterparties c WHERE c.owner=? AND c.identity=? AND c.version=?) AND EXISTS(SELECT 1 FROM document_automation a WHERE a.owner=? AND a.enabled=1 AND a.auto_register=1)`:'');
+    const binds=[owner,documentId,document!.sha256,document!.size,...(options.automatic?[owner,documentId,options.lease,owner,options.trust!.identity,options.trust!.version,owner]:[])];
     let batch;
     try{batch=await db().batch([
       db().prepare(`INSERT INTO document_registrations(owner,document_id,identity,invoice_id,attempt,total,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?) AND EXISTS(SELECT 1 FROM gmail_sources WHERE owner=? AND document_id=? AND status='needs_review')${guard}`).bind(owner,documentId,key,saved.id,receipt,invoice.total,at,owner,old.revision,owner,documentId,...binds),
@@ -100,21 +118,24 @@ async function finish(owner:string,job:Row,result:{text:string,method:string,con
   const w=await readWorkspace(owner),invoice={direction:v.direction==='customer'?'receivable':'payable',party:v.party,number:v.invoice_number,organizationNumber:v.organization_number,total:v.total_cents};
   const duplicate=w.state.invoices.some(i=>!i.voided&&documentInvoiceKey(i)===documentInvoiceKey(invoice));
   if(duplicate){extraction.issues.push('Fakturan verkar redan registrerad. Ingen ny skuld skapas.');extraction.level='yellow';}
-  const at=now(),state=duplicate?'duplicate':'needs_review',serialized=JSON.stringify(extraction);
+  const at=now(),state=duplicate?'duplicate':'needs_review',serialized=JSON.stringify(extraction),extractionId=uid();
+  // A unique history row is the receipt for this atomic save. Validate the
+  // lease and verified original snapshot under the write lock, then preserve
+  // accepted evidence even if the deadline passes before the batch finishes.
   const saved=await db().batch([
-    db().prepare(`UPDATE document_jobs SET extraction=?,error_code='',updated_at=? WHERE owner=? AND document_id=? AND state='processing' AND lease=? AND lease_until>? AND ${activeSource}`).bind(serialized,at,owner,job.document_id,job.lease,at),
-    db().prepare("INSERT INTO document_extractions(id,owner,document_id,result,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM document_jobs WHERE owner=? AND document_id=? AND lease=? AND updated_at=?)").bind(uid(),owner,job.document_id,serialized,at,owner,job.document_id,job.lease,at),
-    db().prepare("UPDATE gmail_sources SET extraction=? WHERE owner=? AND document_id=? AND extraction='{}' AND EXISTS(SELECT 1 FROM document_jobs WHERE owner=? AND document_id=? AND lease=? AND updated_at=?)").bind(serialized,owner,job.document_id,owner,job.document_id,job.lease,at),
+    db().prepare(`INSERT INTO document_extractions(id,owner,document_id,result,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM document_jobs WHERE owner=? AND document_id=? AND state='processing' AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${activeSource}) AND EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND size=?)`).bind(extractionId,owner,job.document_id,serialized,at,owner,job.document_id,job.lease,owner,job.document_id,job.sha256,job.size),
+    db().prepare("UPDATE document_jobs SET extraction=?,error_code='',updated_at=? WHERE owner=? AND document_id=? AND EXISTS(SELECT 1 FROM document_extractions WHERE owner=? AND document_id=? AND id=?)").bind(serialized,at,owner,job.document_id,owner,job.document_id,extractionId),
+    db().prepare("UPDATE gmail_sources SET extraction=? WHERE owner=? AND document_id=? AND extraction='{}' AND EXISTS(SELECT 1 FROM document_extractions WHERE owner=? AND document_id=? AND id=?)").bind(serialized,owner,job.document_id,owner,job.document_id,extractionId),
   ]);
   if(saved[0].meta.changes!==1)return {ignored:true};
   const settings=await db().prepare('SELECT * FROM document_automation WHERE owner=?').bind(owner).first<Row>();
   if(!duplicate&&trust&&extraction.level==='green'&&settings?.enabled&&settings.auto_register){
-    try{return await registerProcessedInvoice(owner,job.document_id,{...invoice,issued:v.issued_at,due:v.due_at,ocr:v.reference||'',bankgiro:v.bankgiro||'',email:'',kind:v.kind},{organization_number:v.organization_number,currency:v.currency,vat_cents:v.vat_cents,net_cents:v.net_cents},{automatic:true,lease:job.lease,trust});}
+    try{return await registerProcessedInvoice(owner,job.document_id,{...invoice,issued:v.issued_at,due:v.due_at,ocr:v.reference||'',bankgiro:v.bankgiro||'',email:'',kind:v.kind},{organization_number:v.organization_number,currency:v.currency,vat_cents:v.vat_cents,net_cents:v.net_cents},{automatic:true,lease:job.lease,trust,sha256:job.sha256});}
     catch(e){extraction.level='yellow';extraction.issues.push('Automatisk registrering stoppades. Kontrollera underlaget.');}
   }
   const finalState=duplicate?'duplicate':extraction.level==='green'?'ready':state;
   const finalAt=now();
-  const finalized=await db().prepare(`UPDATE document_jobs SET state=?,extraction=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=? AND lease_until>? AND state='processing' AND ${activeSource}`).bind(finalState,JSON.stringify(extraction),finalAt,owner,job.document_id,job.lease,finalAt).run();
+  const finalized=await db().prepare(`UPDATE document_jobs SET state=?,extraction=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND state='processing' AND ${activeSource}`).bind(finalState,JSON.stringify(extraction),finalAt,owner,job.document_id,job.lease).run();
   if(finalized.meta.changes!==1)return {ignored:true};
   return {state:finalState,level:extraction.level};
 }
@@ -123,10 +144,7 @@ export async function processDocuments(owner:string,limit=2){
   for(let n=0;n<limit;n++){
     const job=await claim(owner,'cloud');if(!job)break;
     try{
-      const object=await env.BUCKET?.get(`${owner}/${job.document_id}`);if(!object||object.size>5000000)throw Error('local_ocr_required');
-      const bytes=new Uint8Array(await object.arrayBuffer());
-      const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(byte=>byte.toString(16).padStart(2,'0')).join('');
-      if(!/^[a-f0-9]{64}$/.test(job.sha256||'')||sha256!==job.sha256||bytes.length!==job.size||object.size!==job.size)throw Error('original_integrity');
+      const bytes=await originalBytes(owner,job,5000000);
       const result=await serverPdfText(bytes),completed=await finish(owner,job,result);if(!('ignored' in completed))processed++;
     }catch(e){
       const code=e instanceof Error?e.message:'';
@@ -182,17 +200,23 @@ export async function workerAction(req:Request,action:string){
   }
   if(action==='document'&&req.method==='GET'){
     const id=new URL(req.url).searchParams.get('id'),lease=req.headers.get('x-mg-ocr-lease');
-    const j=await db().prepare(`SELECT document_jobs.* FROM document_jobs WHERE owner=? AND document_id=? AND lease=? AND lease_until>? AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,id,lease,now(),mode).first<Row>();
+    const j=await db().prepare(`SELECT document_jobs.* FROM document_jobs WHERE owner=? AND document_id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,id,lease,mode).first<Row>();
     if(!j)return response({error:'Jobbet är inte längre tillgängligt.'},409);
     const file=await env.BUCKET?.get(`${owner}/${id}`);if(!file||file.size>15000000)return response({error:'Filen kan inte behandlas.'},413);
     return new Response(file.body,{headers:{'Content-Type':'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Length':String(file.size)}});
   }
   if(action==='complete'&&req.method==='POST'){
     const raw=await req.text();if(raw.length>350000)return response({error:'För stort resultat.'},413);const body=JSON.parse(raw);
-    const job=await db().prepare(`SELECT document_jobs.*,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND lease=? AND lease_until>? AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,body.id,body.lease,now(),mode).first<Row>();
+    const job=await db().prepare(`SELECT document_jobs.*,d.sha256,d.size FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,body.id,body.lease,mode).first<Row>();
     if(!job)return response({error:'Jobbet har ändrats eller gått ut.'},409);
     if(body.sha256!==job.sha256||typeof body.text!=='string'||body.text.length>150000||!['pdf','ocr'].includes(body.method)||!Number.isFinite(body.confidence)||body.confidence<0||body.confidence>100)return response({error:'Ogiltigt OCR-resultat.'},400);
     if(body.error===true){await failJob(owner,job,mode==='cloud'?'cloud_ocr_failed':'local_ocr_failed');return response({ok:true});}
+    // The worker's digest describes the bytes it read earlier. Recheck the
+    // retained original before accepting its text or using it for registration.
+    try{await originalBytes(owner,job);}catch{
+      await failJob(owner,job,'original_integrity');
+      return response({error:'Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före ny tolkning.'},409);
+    }
     const result=await finish(owner,job,body);
     if(mode==='cloud'&&!('ignored' in result))await db().prepare('UPDATE document_automation SET cloud_worker_completed=? WHERE owner=?').bind(now(),owner).run();
     return response(result);

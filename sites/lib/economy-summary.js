@@ -1,4 +1,4 @@
-import {individualParty,needsBankFileReview,needsBankFileValidation,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference} from './domain.ts';
+import {hasValidAbsenceCheck,individualParty,needsBankFileReview,needsBankFileValidation,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference} from './domain.ts';
 
 /** Read-only projection of confirmed allocations. All values are integer öre. */
 export const ECONOMY_RULE_VERSION = 'economy-2026-10-30.1';
@@ -56,7 +56,7 @@ export function economySummary(state, at = new Intl.DateTimeFormat('sv-SE', {tim
     if (i.direction==='receivable') {
       remaining+=left;
       if (i.due&&i.due<at) overdue+=left;
-      if (left&&(!i.reconciledAt||!i.reconciliationNote?.trim())) unreconciled+=left;
+      if (left&&!hasValidAbsenceCheck(state,i)) unreconciled+=left;
     } else if (left && i.direction==='payable') {
       if (!i.due) payableMissingDue++;
       if (!i.due||i.due<=through) {payable+=left;payableCount++;if(i.due&&i.due<at)payableOverdue+=left;}

@@ -1,5 +1,5 @@
 import { db, identity, readWorkspace, response } from '@/lib/server';
-import { applyCommand, canonicalBankAccount, emptyState, now, today, uid, validDate } from '@/lib/domain';
+import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, today, uid, validDate } from '@/lib/domain';
 import {
   ProviderError, getApplication, listBusinessBanks, startAuth, createSession,
   getSession, deleteSession, getTransactions,
@@ -446,12 +446,26 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       if (!test && old && candidateRows.length) {
         let result: ReturnType<typeof applyCommand>;
         const command = { type: 'transactions.import', trustedBankImport:true, rows: candidateRows, account: 'Enable Banking', name: `${conn.bank_name} · bankhämtning ${from}–${to}` };
-        try { result = applyCommand(old.state, command); }
-        catch (error) { throw new BankError(error instanceof Error ? error.message : 'Bankhändelserna kunde inte importeras.'); }
+        try {
+          result = applyCommand(old.state, command);
+          if(new TextEncoder().encode(JSON.stringify(result.state)).length>1_800_000){const message='Registret har nått storleksgränsen. Inga nya bankhändelser sparades. Kontakta administratören för utökad lagring.';throw bankImportEvidenceError(old.state,result.state,message)||new BankError(message);}
+        }
+        catch (error) {
+          if(error instanceof BankImportEvidenceError){
+            const eventId=uid(),prepared=await prepareBankImportFailure(old.state,error.state,eventId);
+            if(!prepared.replayed){
+              const saved=await lease.write([
+                db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(eventId,user.userId,old.revision+1,'bank.sync_rejected',JSON.stringify({message:error.message,connectionId:conn.id,from,to,retained_conflicts:prepared.conflicts,compact_hold:prepared.compact}),at,user.userId,old.revision),
+                db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(prepared.payload,at,user.userId,old.revision)
+              ]);
+              if(saved[1].meta.changes!==1)throw new BankError('Registret ändrades under hämtningen. Uppdatera sidan och hämta igen. Inga bankhändelser skrevs över.',409);
+            }
+          }
+          throw new BankError(error instanceof Error ? error.message : 'Bankhändelserna kunde inte importeras.');
+        }
         imported = result.state.transactions.length - old.state.transactions.length;
         skipped += rows.length - imported;
         const payload = JSON.stringify(result.state);
-        if (new TextEncoder().encode(payload).length > 1_800_000) throw new BankError('Registret har nått storleksgränsen. Inga nya bankhändelser sparades. Kontakta administratören för utökad lagring.');
         await lease.run(db().prepare('INSERT OR IGNORE INTO workspaces (owner,revision,payload,updated_at) VALUES (?,0,?,?)').bind(user.userId, JSON.stringify(emptyState()), at));
         const auditId = uid();
         const committed = await lease.write([

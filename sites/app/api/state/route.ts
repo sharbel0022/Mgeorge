@@ -1,7 +1,7 @@
 import {reconcileWithOriginals,assertPaymentOriginal} from '@/lib/reconciliation-evidence';
 import {reconcileAndPrepare} from '@/lib/customer-messages';
 import { db, identity, readWorkspace, readBankFileOriginal, response, failure } from "@/lib/server";
-import { applyCommand, emptyState, now, uid } from "@/lib/domain";
+import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, emptyState, now, uid } from "@/lib/domain";
 import {readBankgiroOriginal} from '@/lib/bankgiro-service';
 import {searchBankgiroInvoice} from '@/lib/bankgiro-invoice-search';
 export const dynamic='force-dynamic';
@@ -18,8 +18,22 @@ export async function POST(req:Request){try{
   else if(Array.isArray(command.rows))command.rows=command.rows.map((r:any)=>({...r,verified:false,specification:false,evidence:undefined}));
  }
  const current=['match.create','transaction.verify','transaction.split'].includes(command?.type)?await assertPaymentOriginal(user.userId,old.state,command.transactionId||command.id):old.state;
- const result=applyCommand(current,command);const automatic=await reconcileWithOriginals(user.userId,result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];const payload=JSON.stringify(result.state);
- if(new TextEncoder().encode(payload).length>1_800_000)throw new Error('Registret är för stort för den här versionen. Exportera dina uppgifter innan vidare import.');
+ let result:ReturnType<typeof applyCommand>,automatic:Awaited<ReturnType<typeof reconcileWithOriginals>>,payload:string;
+ try{
+  result=applyCommand(current,command);automatic=await reconcileWithOriginals(user.userId,result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];payload=JSON.stringify(result.state);
+  if(new TextEncoder().encode(payload).length>1_800_000){const message='Registret är för stort för den här versionen. Exportera dina uppgifter innan vidare import.';throw bankImportEvidenceError(old.state,result.state,message)||new Error(message);}
+ }catch(error){
+  if(!(error instanceof BankImportEvidenceError))throw error;
+  const eventId=uid(),prepared=await prepareBankImportFailure(old.state,error.state,eventId),at=now();
+  if(prepared.replayed)return response({error:error.message,state:old.state,revision:old.revision,evidenceRetained:true},400);
+  const detail=JSON.stringify({message:error.message,requestId:body.requestId,command:{type:command.type,documentId:command.documentId,hash:command.hash,name:command.name},retained_conflicts:prepared.conflicts,compact_hold:prepared.compact});
+  const saved=await db().batch([
+   db().prepare('INSERT INTO audit_events (id, owner, revision, action, detail, created_at) SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(eventId,user.userId,old.revision+1,'bank.import_rejected',detail,at,user.userId,old.revision),
+   db().prepare('UPDATE workspaces SET payload=?, revision=revision+1, updated_at=? WHERE owner=? AND revision=?').bind(prepared.payload,at,user.userId,old.revision)
+  ]);
+  if(saved[1].meta.changes!==1)return response({error:'En annan ändring sparades samtidigt. Uppdatera sidan och försök igen.'},409);
+  return response({error:error.message,state:prepared.state,revision:old.revision+1,evidenceRetained:true},400);
+ }
  const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces (owner, revision, payload, updated_at) VALUES (?, 0, ?, ?)').bind(user.userId,JSON.stringify(emptyState()),at).run();
  const detail=JSON.stringify({message:result.message,command,automatic:automatic.decisions,requestId:body.requestId});
  const batch=await db().batch([

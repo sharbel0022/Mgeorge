@@ -1,6 +1,6 @@
 import {classifyDocument,jsonObject} from './document-triage.js';
 import {economySummary} from './economy-summary.js';
-import {available,balance,credited,individualParty,invoiceStatus,needsBankFileValidation,needsPaymentSpecification,paid,paymentEvidenceConflict,paymentOriginalIssue,BANK_EVIDENCE_CONFLICT,today,type State,type Transaction} from './domain';
+import {available,balance,credited,individualParty,invoiceStatus,hasValidAbsenceCheck,invoicePaymentEvidenceIssue,needsBankFileValidation,needsPaymentSpecification,paid,paymentEvidenceConflict,paymentOriginalIssue,BANK_EVIDENCE_CONFLICT,today,type State,type Transaction} from './domain';
 import {analyze} from './reconciliation';
 
 type Row=Record<string,any>;
@@ -37,19 +37,20 @@ export function buildPaymentOverview(state:State,documents:Row[]=[],messages:Row
   for(const t of groups.bankgiro)queue.push({id:'specification:'+t.id,type:'specification',entity_id:t.id,transaction_id:t.id,title:'Samlingsbetalning',reason:'Individuella betalningsuppgifter saknas eller är ofullständiga. Samlingsbeloppet får inte räknas en gång till.',action:'Lägg till underlag',amount_cents:available(state,t),priority:15,date:t.date});
   const messaged=new Set(currentMessages.map(m=>m.invoice_id)),suggested=new Set(findings.map(f=>f.invoice_id));
   for(const i of customers){
-    const p=paid(state,i.id),left=balance(state,i),overdue=left>0&&!!i.due&&i.due<today();
+    const p=paid(state,i.id),left=balance(state,i),overdue=left>0&&!!i.due&&i.due<today(),paymentIssue=invoicePaymentEvidenceIssue(state,i.id);
     const related=findings.filter(f=>f.invoice_id===i.id),economic=related.find(f=>['overpayment','possible_duplicate'].includes(f.kind));
     let type:ReviewItem['type']='invoice',reason='Betalning är inte bekräftad. Det är inte samma sak som att fakturan är obetald.',priority=35;
     if(!i.reviewed){reason='Fakturauppgifterna måste granskas mot originalet.';priority=10;}
+    else if(paymentIssue&&state.allocations.some(a=>a.active&&a.invoiceId===i.id)){type='anomaly';reason='En registrerad betalningskoppling behöver granskas. '+paymentIssue;priority=5;}
     else if(p>0&&left>0){type='anomaly';reason=`En verifierad delbetalning finns. ${i.vat!=null&&i.net!=null&&i.net+i.vat===i.total&&i.net===p&&left===i.vat?'Skillnaden motsvarar angiven moms. Orsaken behöver bekräftas.':'Kontrollera återstående belopp.'}`;priority=25;}
     else if(left<0||economic){if(economic&&paymentReview.some(t=>t.id===economic.transaction_id))continue;type='anomaly';reason=economic?.reason||'Verifierade betalningar överstiger fakturans saldo. Granska eventuell överbetalning.';priority=15;}
-    else if(overdue){type='anomaly';reason=i.reconciledAt?'Fakturan är förfallen med kvarvarande saldo efter verifierad kontroll.':'Förfallodatumet har passerat. Betalning är ännu inte bekräftad; kontrollera bankunderlaget.';priority=30;}
+    else if(overdue){type='anomaly';reason=hasValidAbsenceCheck(state,i)?'Fakturan är förfallen med kvarvarande saldo efter verifierad kontroll.':'Förfallodatumet har passerat. Betalning är ännu inte bekräftad; kontrollera bankunderlaget.';priority=30;}
     else if(left<=0||suggested.has(i.id)||messaged.has(i.id)||i.reviewed&&!!i.due&&i.due>=today())continue;
     queue.push({id:type+':'+i.id,type,entity_id:i.id,invoice_id:i.id,title:i.party+' · '+i.number,reason,action:'Visa faktura och underlag',amount_cents:Math.max(0,left),priority,date:i.due||i.issued});
   }
   queue.sort((a,b)=>a.priority-b.priority||a.id.localeCompare(b.id));
   const sum=(items:typeof customers,value:(i:typeof customers[number])=>number)=>items.reduce((n,i)=>n+value(i),0),open=reviewed.filter(i=>balance(state,i)>0),partial=open.filter(i=>paid(state,i.id)>0),overdue=open.filter(i=>i.due&&i.due<today());
-  const checked=(i:typeof customers[number])=>!!i.reconciledAt&&!!i.reconciliationNote?.trim();
+  const checked=(i:typeof customers[number])=>hasValidAbsenceCheck(state,i);
   const economy=economySummary(state);
   const processing=documents.filter(d=>!d.invoice_id&&d.status==='needs_review'&&['queued','waiting_ocr','processing'].includes(d.state||d.processing_state));
   return {economy,totals:{invoiced_cents:sum(reviewed,i=>i.total-credited(state,i.id)),paid_cents:sum(reviewed,i=>paid(state,i.id)),remaining_cents:sum(open,i=>balance(state,i)),unreconciled_cents:sum(open.filter(i=>!checked(i)),i=>balance(state,i)),verified_outstanding_cents:sum(open.filter(checked),i=>balance(state,i)),overdue_cents:sum(overdue,i=>balance(state,i)),partial_count:partial.length,partial_remaining_cents:sum(partial,i=>balance(state,i)),paid_count:reviewed.filter(i=>invoiceStatus(state,i).key==='paid').length,open_count:open.length,overdue_count:overdue.length},counts:{review:queue.length,documents:pending.length,processing:new Set(processing.map(d=>d.document_id)).size,other_documents:new Set(documents.filter(d=>classifyDocument(d).exclude_from_invoice_queue).map(d=>d.document_id)).size,payments:paymentReview.length,specifications:groups.bankgiro.length,messages:currentMessages.length,anomalies:queue.filter(q=>q.type==='anomaly').length,other:groups.other.length},queue};

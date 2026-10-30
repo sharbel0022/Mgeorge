@@ -1,0 +1,106 @@
+{
+  "cycle": 1,
+  "baseline_commit": "c519eef47e5a084a35db7675a2553a554c55ec4c",
+  "checked_at_utc": "2026-10-30T16:03:29Z",
+  "environment": "Managed Sites local preview, Chromium, isolated demo, CSS viewport in test iframe",
+  "viewports": [
+    {
+      "css_width": 320,
+      "summary_cards": 4,
+      "main_payment_control_buttons": 1,
+      "horizontal_document_overflow": false
+    },
+    {
+      "css_width": 390,
+      "summary_cards": 4,
+      "main_payment_control_buttons": 1,
+      "horizontal_document_overflow": false
+    },
+    {
+      "css_width": 768,
+      "summary_cards": 4,
+      "main_payment_control_buttons": 1,
+      "horizontal_document_overflow": false
+    },
+    {
+      "css_width": 1024,
+      "summary_cards": 4,
+      "main_payment_control_buttons": 1,
+      "horizontal_document_overflow": false
+    },
+    {
+      "css_width": 1440,
+      "summary_cards": 4,
+      "main_payment_control_buttons": 1,
+      "horizontal_document_overflow": false
+    }
+  ],
+  "baseline_mobile_defects": {
+    "escape_left_menu_open": true,
+    "no_modal_dialog": true,
+    "missing_expanded_state": true,
+    "missing_current_page_semantics": true
+  },
+  "final_mobile": {
+    "modal": true,
+    "initial_focus": "Stäng menyn",
+    "forward_tab_wrap": "Import & underlag -> Stäng menyn",
+    "reverse_tab_wrap": "Stäng menyn -> Import & underlag",
+    "escape_closes": true,
+    "escape_returns_focus": "Öppna menyn",
+    "desktop_resize_closes": true,
+    "desktop_resize_focus": "Översikt"
+  },
+  "navigation": [
+    {
+      "destination": "Översikt",
+      "main_and_focus": "Översikt",
+      "dialog_closed": true
+    },
+    {
+      "destination": "Kundfakturor",
+      "main_and_focus": "Kundfakturor",
+      "dialog_closed": true
+    },
+    {
+      "destination": "Leverantörsfakturor",
+      "main_and_focus": "Leverantörsfakturor",
+      "dialog_closed": true
+    },
+    {
+      "destination": "Bank",
+      "main_and_focus": "Bank",
+      "dialog_closed": true
+    },
+    {
+      "destination": "Behöver granskas",
+      "main_and_focus": "Behöver granskas",
+      "dialog_closed": true
+    },
+    {
+      "destination": "Inställningar",
+      "main_and_focus": "Inställningar",
+      "dialog_closed": true
+    }
+  ],
+  "tests": {
+    "navigation": 9,
+    "failed": 0,
+    "skipped": 0,
+    "typescript_exit": 0
+  },
+  "review": "Independent bounded document/navigation review: no remaining Critical/Important finding.",
+  "source_sha256": {
+    "sites/components/workspace-navigation.tsx": "d8b9f1ded2e53edcf5318f97ce723f1d7ba7c008e017204150f24bccbb2ab8b0",
+    "sites/app/dashboard.tsx": "4cda72eae266001d45b6d3295662a2be9d32e12cd5acfa4dd7ed238cf5b3e478",
+    "sites/app/globals.css": "78047755de911f7023e860a840dbea6126c5f366d5f4d5cfcb7a120adbf9fa3c",
+    "sites/tests/navigation-q8.test.mjs": "90c0380dbca869c43011ae7f130976270461b72b94eafeb19e0fc1e1921b0eb9"
+  },
+  "limits": [
+    "CSS viewport, not a physical device or multi-browser certification.",
+    "No full screen-reader certification.",
+    "No production financial mutation.",
+    "Browser history and every other dialog are outside this cycle.",
+    "Screenshot shows the top of the mobile menu; keyboard testing also reached its final import control."
+  ]
+}

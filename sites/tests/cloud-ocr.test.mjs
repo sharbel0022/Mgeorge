@@ -109,6 +109,121 @@ test('wrong digest, confidence, foreign document and expired lease cannot comple
   const replacement=await f.lease();assert.notEqual(replacement.lease,job.lease);assert.equal((await f.complete(job)).status,409);
 });
 
+for(const changed of ['missing','same-size corruption','changed size'])test('OCR completion rejects an original that became '+changed+' during its lease',async t=>{
+  const f=await fixture(t),doc=f.add(),job=await f.lease(),key=f.owner+'/'+doc.id;
+  const original=f.sql.prepare('SELECT * FROM documents WHERE owner=? AND id=?').get(f.owner,doc.id);
+  if(changed==='missing')f.objects.delete(key);
+  else f.objects.set(key,changed==='same-size corruption'?Buffer.alloc(doc.bytes.length,88):Buffer.concat([doc.bytes,Buffer.from('changed')]));
+  const result=await f.complete(job);
+  assert.equal(result.status,409);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,'{}');
+  assert.deepEqual(f.sql.prepare('SELECT * FROM documents WHERE owner=? AND id=?').get(f.owner,doc.id),original);
+  const failed=f.sql.prepare('SELECT state,error_code,lease,attempts FROM document_jobs').get();
+  assert.deepEqual({...failed},{state:'waiting_ocr',error_code:'original_integrity',lease:'',attempts:1});
+  assert.equal((await f.api.processingStatus(f.owner)).cloud_last_completed,'');
+  assert.equal(await f.lease(),null,'integrity failures obey the persistent retry cooldown');
+  f.objects.set(key,doc.bytes);
+  f.sql.prepare("UPDATE document_jobs SET available_at='2000-01-01T00:00:00.000Z'").run();
+  const retry=await f.lease();assert.ok(retry);assert.notEqual(retry.lease,job.lease);
+  assert.equal((await f.complete(job)).status,409,'a repaired original cannot revive the old lease');
+  const completed=await (await f.complete(retry)).json();assert.equal(completed.state,'needs_review');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
+  assert.deepEqual(f.objects.get(key),doc.bytes);
+});
+
+test('OCR completion rejects false stored size even when the worker repeats the recorded digest',async t=>{
+  const f=await fixture(t);f.add();const job=await f.lease();
+  f.sql.prepare('UPDATE documents SET size=size+1').run();
+  assert.equal((await f.complete(job)).status,409);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'original_integrity');
+});
+
+for(const change of ['hash','size','owner'])test('OCR receipt rejects a document '+change+' changed after original verification',async t=>{
+  const f=await fixture(t),doc=f.add(),job=await f.lease();
+  const batch=f.db.batch.bind(f.db);let changed=false;
+  f.db.batch=async items=>{
+    if(!changed){
+      changed=true;
+      if(change==='hash')f.sql.prepare('UPDATE documents SET sha256=? WHERE id=?').run('0'.repeat(64),doc.id);
+      if(change==='size')f.sql.prepare('UPDATE documents SET size=size+1 WHERE id=?').run(doc.id);
+      if(change==='owner')f.sql.prepare('UPDATE documents SET owner=? WHERE id=?').run('other-owner',doc.id);
+    }
+    return batch(items);
+  };
+  assert.equal((await (await f.complete(job)).json()).ignored,true);
+  assert.equal(changed,true);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction,'{}');
+  assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,'{}');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  assert.equal((await f.api.processingStatus(f.owner)).cloud_last_completed,'');
+  assert.deepEqual(f.objects.get(f.owner+'/'+doc.id),doc.bytes);
+});
+
+test('OCR completion uses the database clock when the application clock is behind',async t=>{
+  const f=await fixture(t);f.add();const job=await f.lease(),at=Date.now();
+  f.sql.prepare('UPDATE document_jobs SET lease_until=?').run(new Date(at-1000).toISOString());
+  t.mock.timers.enable({apis:['Date'],now:at-60000});
+  assert.equal((await f.complete(job)).status,409);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,'{}');
+});
+
+test('an OCR lease that expires at the write boundary cannot save extraction or history',async t=>{
+  const f=await fixture(t);f.add();const job=await f.lease(),at=Date.now();
+  t.mock.timers.enable({apis:['Date'],now:at-60000});
+  const batch=f.db.batch.bind(f.db);let delayed=false;
+  f.db.batch=async items=>{if(!delayed){delayed=true;f.sql.prepare('UPDATE document_jobs SET lease_until=?').run(new Date(at-1000).toISOString());}return batch(items);};
+  assert.equal((await (await f.complete(job)).json()).ignored,true);
+  assert.equal(delayed,true);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,'{}');
+  assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction,'{}');
+});
+
+test('an interpretation accepted within a lease retains its history when the deadline passes inside the batch',async t=>{
+  const f=await fixture(t);f.add();const job=await f.lease();
+  const batch=f.db.batch.bind(f.db);let delayed=false;
+  f.db.batch=async items=>{
+    if(!delayed){
+      delayed=true;const execute=items[0].execute.bind(items[0]);
+      items[0].execute=()=>{const result=execute();f.sql.prepare('UPDATE document_jobs SET lease_until=?').run(new Date(Date.now()-1000).toISOString());return result;};
+    }
+    return batch(items);
+  };
+  assert.equal((await (await f.complete(job)).json()).ignored,true);
+  const current=f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction;
+  assert.notEqual(current,'{}');
+  const history=f.sql.prepare('SELECT result FROM document_extractions').all();
+  assert.equal(history.length,1);
+  assert.equal(history[0].result,current);
+  assert.equal((await f.api.processingStatus(f.owner)).cloud_last_completed,'');
+});
+
+test('an OCR lease that expires after saving evidence cannot falsely complete the job',async t=>{
+  const f=await fixture(t);f.add();const job=await f.lease(),at=Date.now();
+  t.mock.timers.enable({apis:['Date'],now:at-60000});
+  const prepare=f.db.prepare.bind(f.db);let expired=false;
+  f.db.prepare=query=>{
+    const statement=prepare(query);
+    if(query==='SELECT * FROM document_automation WHERE owner=?'){
+      const first=statement.first.bind(statement);
+      statement.first=async()=>{const result=await first();expired=true;f.sql.prepare('UPDATE document_jobs SET lease_until=?').run(new Date(at-1000).toISOString());return result;};
+    }
+    return statement;
+  };
+  assert.equal((await (await f.complete(job)).json()).ignored,true);
+  assert.equal(expired,true);
+  assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'processing');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1,'valid earlier evidence remains in history');
+  assert.equal((await f.api.processingStatus(f.owner)).cloud_last_completed,'');
+});
+
 test('three failures exhaust bounded retries and preserve original, then explicit retry resets attempts',async t=>{
   const f=await fixture(t),doc=f.add();
   for(let n=0;n<3;n++){const job=await f.lease();assert.ok(job);assert.equal((await f.complete(job,{text:'',error:true})).status,200);f.sql.prepare("UPDATE document_jobs SET available_at='2000-01-01T00:00:00.000Z'").run();}

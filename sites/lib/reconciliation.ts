@@ -1,13 +1,13 @@
-import {applyCommand,available,balance,paid,uid,now,needsPaymentSpecification,needsBankFileReview,specificationPreview,individualParty,paymentEvidenceConflict,paymentOriginalIssue,bankPaymentReviewReason,BANK_EVIDENCE_CONFLICT,type State,type Invoice} from './domain';
+import {applyCommand,available,balance,paid,uid,now,needsPaymentSpecification,needsBankFileReview,specificationPreview,individualParty,paymentEvidenceConflict,paymentOriginalIssue,invoicePaymentEvidenceIssue,automaticMatchHoldReason,bankPaymentReviewReason,BANK_EVIDENCE_CONFLICT,type State,type Invoice} from './domain';
 import {analyzeReconciliation,normalizeName,RECONCILIATION_RULE_VERSION} from './reconciliation-engine.js';
 
-export function invoiceFacts(state:State,i:Invoice){return {...i,invoice_number:i.number,reference:i.ocr,total_cents:i.total,paid_cents:paid(state,i.id),remaining_cents:balance(state,i),vat_cents:i.vat??null,net_cents:i.net??null,due_at:i.due};}
+export function invoiceFacts(state:State,i:Invoice){return {...i,invoice_number:i.number,reference:i.ocr,total_cents:i.total,paid_cents:paid(state,i.id),remaining_cents:balance(state,i),payment_evidence_issue:invoicePaymentEvidenceIssue(state,i.id),vat_cents:i.vat??null,net_cents:i.net??null,due_at:i.due};}
 export function analyze(state:State){
   const links=state.allocations.filter(a=>a.active&&a.effect==='payment').flatMap(a=>{
     const i=state.invoices.find(i=>i.id===a.invoiceId),t=state.transactions.find(t=>t.id===a.transactionId);
-    return i&&t&&!needsBankFileReview(t)&&!paymentEvidenceConflict(state,t)&&!paymentOriginalIssue(state,t)&&!bankPaymentReviewReason(t)&&i.direction==='receivable'&&t.amount>0?[{invoice_id:i.id,party:i.party,organization_number:i.organizationNumber||'',payer:t.party,account:t.account}]:[];
+    return i&&t&&!needsBankFileReview(t)&&!paymentEvidenceConflict(state,t)&&!paymentOriginalIssue(state,t)&&!automaticMatchHoldReason(t)&&!bankPaymentReviewReason(t,state)&&i.direction==='receivable'&&t.amount>0?[{invoice_id:i.id,party:i.party,organization_number:i.organizationNumber||'',payer:t.party,account:t.account}]:[];
   });
-  const data={invoices:state.invoices.map(i=>({...invoiceFacts(state,i),organization_number:i.organizationNumber||'',direction:i.reviewed&&!i.voided?(i.direction==='receivable'?'customer':'supplier'):'held',kind:'invoice',issued_at:i.issued})),transactions:state.transactions.map(t=>({id:t.id,account:t.account,booked_at:t.date,amount_cents:t.amount,currency:t.currency,payer:t.party,reference:t.payerReference,reference_evidence:t.verification?undefined:t.referenceEvidence,bank_reference:t.bankReference,payer_organization_number:t.organizationNumber||'',excluded:t.ignored||!!t.duplicateOf,is_aggregate:needsPaymentSpecification(t),available_cents:available(state,t),verified:t.verified&&!!t.evidence&&!needsBankFileReview(t),evidence_conflict:paymentEvidenceConflict(state,t),original_issue:paymentOriginalIssue(state,t),review_reason:paymentEvidenceConflict(state,t)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(state,t)||bankPaymentReviewReason(t),parent_bank_reference:t.parentId?state.transactions.find(p=>p.id===t.parentId)?.bankReference||'':''})),links,allocations:state.allocations.filter(a=>a.active).map(a=>({invoice_id:a.invoiceId,transaction_id:a.transactionId}))};
+  const data={invoices:state.invoices.map(i=>({...invoiceFacts(state,i),organization_number:i.organizationNumber||'',direction:i.reviewed&&!i.voided?(i.direction==='receivable'?'customer':'supplier'):'held',kind:'invoice',issued_at:i.issued})),transactions:state.transactions.map(t=>({id:t.id,account:t.account,booked_at:t.date,amount_cents:t.amount,currency:t.currency,payer:t.party,reference:t.payerReference,reference_evidence:t.verification?undefined:t.referenceEvidence,bank_reference:t.bankReference,payer_organization_number:t.organizationNumber||'',excluded:t.ignored||!!t.duplicateOf,is_aggregate:needsPaymentSpecification(t),available_cents:available(state,t),verified:t.verified&&!!t.evidence&&!needsBankFileReview(t),evidence_conflict:paymentEvidenceConflict(state,t),original_issue:paymentOriginalIssue(state,t),review_reason:paymentEvidenceConflict(state,t)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(state,t)||automaticMatchHoldReason(t)||bankPaymentReviewReason(t,state),parent_bank_reference:t.parentId?state.transactions.find(p=>p.id===t.parentId)?.bankReference||'':''})),links,allocations:state.allocations.filter(a=>a.active).map(a=>({invoice_id:a.invoiceId,transaction_id:a.transactionId}))};
   // An actual specification's parent remains as immutable evidence, but its
   // complete child set replaces it economically. Do not treat it as incomplete.
   for(const t of data.transactions)if(t.is_aggregate){const children=state.transactions.filter(c=>c.parentId===t.id&&!c.ignored);if(children.length&&children.every(c=>!c.duplicateOf&&c.specificationStatus!=='review'&&c.account===t.account)&&children.reduce((n,c)=>n+c.amount,0)===t.amount_cents)t.excluded=true;}
@@ -16,6 +16,7 @@ export function analyze(state:State){
 }
 export function reconcileState(initial:State){
   let state=initial;const decisions:any[]=[];
+  if(initial.bankEvidenceHold)return {state,decisions,findings:analyze(state)};
   // A file may precede its booked aggregate. Reuse its retained original and
   // exact linking controls when the bank subsequently supplies that aggregate.
   for(const record of initial.imports.filter(r=>r.documentId&&r.hash)){
@@ -30,7 +31,8 @@ export function reconcileState(initial:State){
     const preview=specificationPreview(state,group);
     for(const plan of preview.plans.filter(p=>p.status==='linked'&&!p.duplicate&&p.parentId)){
       if(state===initial)state=structuredClone(initial);
-      for(const row of plan.rows){const item=state.transactions.find(t=>t.id===row.id)!;item.parentId=plan.parentId!;item.specificationStatus='linked';item.verified=individualParty(item.party);}
+      const parent=state.transactions.find(t=>t.id===plan.parentId)!;
+      for(const row of plan.rows){const item=state.transactions.find(t=>t.id===row.id)!;item.parentId=plan.parentId!;item.specificationStatus='linked';item.verified=individualParty(item.party);if(parent.automaticMatchHold)item.automaticMatchHold??=structuredClone(parent.automaticMatchHold);}
       decisions.push({id:uid(),at:now(),kind:'specification_linked',safe:true,transaction_id:plan.parentId,document_id:record.documentId,document_hash:record.hash,child_ids:plan.rows.map(r=>r.id),amount_cents:plan.total,rule_version:RECONCILIATION_RULE_VERSION,reason:plan.reason});
     }
     }

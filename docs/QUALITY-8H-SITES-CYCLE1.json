@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "cycle": "1B-sites",
+  "base_commit": "a82ffbca211b5651e662c759c761bda2aefbf0f0",
+  "base_actions": {
+    "id": 41088814042,
+    "conclusion": "success",
+    "jobs": [
+      "test",
+      "sites"
+    ]
+  },
+  "tests": {
+    "node": 407,
+    "sites": 531,
+    "failed": 0,
+    "skipped": 0
+  },
+  "syntax_files": 65,
+  "typescript": true,
+  "production_build": true,
+  "source_sha256": {
+    "sites/app/api/state/route.ts": "fc7979ef48779fae1d638ae01a66507428f8258dcef87022178266969423d233",
+    "sites/app/dashboard.tsx": "486f3f691c26a807c8bb214b14313c4e6e3d049d6befffbae4e1c016d3cd475b",
+    "sites/components/customer-messages.tsx": "f488812d919a7a6141cf1b885426daa05355c79461be5b9a7025f034f5bacdba",
+    "sites/components/invoice-evidence.tsx": "a220934cca6a6e11187d7f98c2c8dae2379f190e16a2bd083d9813128e73aa85",
+    "sites/lib/banking/service.ts": "cb0ce5c7199a590fcd4cb4fd99a4674342fabc8ace7caaf73711db63b3e329c8",
+    "sites/lib/customer-messages.ts": "843c3f21dd5e3a9e756d5bf5014955dec34d736ebbeae073a9b5a3ffc1560868",
+    "sites/lib/domain.ts": "c9ef91807df4d674f24d74c3d5f052b1c5260360cd5ed6ef87c34548d14b47ea",
+    "sites/lib/economy-summary.js": "e79c892f092164c479b6d9a8233386e7cc30f5ec244927a9a8ecad530afe690d",
+    "sites/lib/payment-overview.ts": "1026c0f0c20eeacd96228f18e21dc0609556c64ecb9c2b6df7e0d69eb6780d54",
+    "sites/lib/reconciliation-engine.js": "afcae459894ea3662abb54acfe22f169bb86db8bfaf73c5c8560e597b23650f2",
+    "sites/lib/reconciliation.ts": "96b05726a1a617300972d6a69b3a949b2b840a4e69a8d9b99c9c9fae6b9f5b20",
+    "sites/tests/bank-state-integrity-q8.test.mjs": "bf2e5147ea137267564688554f1b7ecce8dfb3e463b1d3006b0d762c54e7d5fc",
+    "sites/tests/bank-sync-integrity-q8.test.mjs": "c72de23a71ba56032adc571fdb93342af3e189231f10b72d41909985f8759f56",
+    "sites/tests/bank-absence-ui-q8.test.mjs": "0b0b65d7383c1e8ffe98e2629f1053c3d12f1e086894763aace58ac6c9ab98a4",
+    "sites/tests/customer-messages.test.mjs": "62a2075bfabf529829faef5ac05dbd192be45a3fe6a2f4f3816d9f89ad1d80d8",
+    "sites/lib/document-processing.ts": "0602a3e3c9aa6fb0a022dced3c2157eacea3db2179a78d4b3bcdb9feab49dac2",
+    "sites/tests/cloud-ocr.test.mjs": "e07fd6514862cdbb1cc5e24662be98c76edb048573d669ee247e61d6dd0f61f5",
+    "sites/tests/gmail.test.mjs": "32ab7d88f3a401a4a55e20e2192b50908ed6737de30dae4d9cba199e634944e4",
+    "sites/components/workspace-navigation.tsx": "d8b9f1ded2e53edcf5318f97ce723f1d7ba7c008e017204150f24bccbb2ab8b0",
+    "sites/app/globals.css": "78047755de911f7023e860a840dbea6126c5f366d5f4d5cfcb7a120adbf9fa3c",
+    "sites/tests/navigation-q8.test.mjs": "90c0380dbca869c43011ae7f130976270461b72b94eafeb19e0fc1e1921b0eb9"
+  },
+  "ui_evidence": "docs/screenshots/quality-8h/ui-verification-cycle1.json",
+  "sites_version_before": 32,
+  "publication": "pending actual deployment",
+  "migration_included": false,
+  "vulnerabilities": 0
+}

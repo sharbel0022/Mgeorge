@@ -2,7 +2,7 @@ const paymentSign=i=>(i.direction==='customer'?1:-1)*(i.kind==='credit'?-1:1);
 // Shared conservative rules ported from MG Node main d029679. No I/O.
 import {matchingReferenceValues} from './payment-references.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
-export const RECONCILIATION_RULE_VERSION='verified-reference-2026-10-30.1';
+export const RECONCILIATION_RULE_VERSION='verified-reference-2026-10-30.3';
 // Keep invoice-number punctuation: AB/12 and AB12 are not interchangeable IDs.
 const ref=value=>String(value||'').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g,' ');
 export function exactReference(reference, candidate){

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
-import {emptyState,applyCommand,paid,balance,invoiceStatus} from '../lib/domain.ts';
+import {emptyState,applyCommand,paid,balance,invoiceStatus,prepareBankImportFailure,uid} from '../lib/domain.ts';
 import {seal,unseal,randomToken,digest} from '../lib/banking/security.ts';
 import {analyzeReconciliation} from '../lib/reconciliation-engine.js';
 
@@ -147,6 +147,73 @@ test('missing OCR remains manual after bank evidence has been verified',async t=
 });
 test('verified absence can be recorded and new bank data invalidates it',async t=>{
   const f=await fixture(t);f.init();await f.call('absence',{invoice_id:f.state().invoices[0].id,note:'Bankkonto och specifikationer kontrollerade för hela perioden',confirm:true});assert.ok((await f.queue()).some(m=>m.kind==='overdue'&&m.status==='draft'));f.pay(10000,{party:'Annan',payerReference:''});assert.equal(invoiceStatus(f.state(),f.state().invoices[0]).key,'unreconciled');
+});
+function absenceConflict(state,compact){
+ if(compact){const copy=structuredClone(state);copy.bankEvidenceHold={at:new Date().toISOString(),auditEventId:'synthetic-conflict-audit',fingerprint:'a'.repeat(64)};return copy;}
+ return applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[{...state.transactions[0],party:'Contradictory synthetic sender',payerReference:'OTHER-CONFLICT'}]}).state;
+}
+for(const compact of [false,true])test(`Q8 absence: ${compact?'compact hold':'retained conflict'} permits only cautious confirmation drafts and blocks a new absence assertion`,async t=>{
+ const f=await fixture(t);f.init();f.pay(10000,{party:'Unrelated synthetic sender',payerReference:'OTHER-REF'});
+ const id=f.state().invoices[0].id;await f.call('absence',{invoice_id:id,note:'Synthetic account and full period checked.',confirm:true});
+ const before=f.state(),old=(await f.queue()).find(m=>m.kind==='overdue'&&m.status==='draft');assert.ok(old);
+ f.put(absenceConflict(before,compact));const held=f.state(),items=await f.queue();
+ assert.equal(items.find(m=>m.id===old.id).status,'stale');assert.equal(items.some(m=>m.kind==='overdue'&&m.status==='draft'),false);
+ const cautious=items.find(m=>m.kind==='confirmation'&&m.status==='draft');assert.ok(cautious);assert.doesNotMatch(cautious.body,/Våra betalningsunderlag har kontrollerats/);
+ assert.deepEqual(f.state().invoices,held.invoices);assert.deepEqual(f.state().allocations,held.allocations);
+ const revision=f.sql.prepare('SELECT revision FROM workspaces WHERE owner=?').get(f.owner).revision;
+ await assert.rejects(f.call('absence',{invoice_id:id,note:'A free-text note cannot resolve conflicting originals.',confirm:true}),/motstridiga/);
+ assert.equal(f.sql.prepare('SELECT revision FROM workspaces WHERE owner=?').get(f.owner).revision,revision);assert.deepEqual(f.state(),held);assert.equal(f.posts,0);
+});
+for(const compact of [false,true])test(`Q8 absence: a legacy overdue draft with the current ${compact?'compact hold':'conflict'} snapshot is stale and cannot be approved`,async t=>{
+ const f=await fixture(t);f.init();await f.connect();f.pay(10000,{party:'Unrelated synthetic sender',payerReference:'OTHER-REF'});
+ const id=f.state().invoices[0].id;await f.call('contact',{invoice_id:id,email:'synthetic@example.test',evidence:'Synthetic contact agreement.',confirm:true});await f.call('absence',{invoice_id:id,note:'Synthetic account and full period checked.',confirm:true});
+ const m=(await f.queue()).find(m=>m.kind==='overdue'&&m.status==='draft'),review=await f.review(m);
+ f.put(absenceConflict(f.state(),compact));const contact=f.sql.prepare('SELECT * FROM customer_contacts WHERE owner=? AND invoice_id=?').get(f.owner,id),snapshot=await f.api.evidenceSnapshot(f.state(),contact);
+ // A draft produced by the previous timestamp-only policy can have the current
+ // evidence hash. Content eligibility must be checked independently of that hash.
+ f.sql.prepare('UPDATE customer_messages SET snapshot=? WHERE id=?').run(snapshot,m.id);f.sql.prepare('UPDATE customer_reviews SET snapshot=? WHERE id=?').run(snapshot,review.review_id);
+ const prior=f.sql.prepare('SELECT * FROM customer_messages WHERE id=?').get(m.id),listed=(await f.api.messageList(f.owner)).items.find(item=>item.id===m.id);
+ const reviewAttempt=await f.review(m).then(()=>null,error=>error),sendAttempt=await f.send(m,review).then(()=>null,error=>error);
+ assert.equal(listed.status,'stale');assert.ok(reviewAttempt instanceof Error);assert.ok(sendAttempt instanceof Error);assert.equal(f.posts,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,0);assert.equal(f.sql.prepare('SELECT consumed FROM customer_reviews WHERE id=?').get(review.review_id).consumed,0);
+ assert.deepEqual(f.sql.prepare('SELECT * FROM customer_messages WHERE id=?').get(m.id),prior);
+ await f.queue();assert.equal(f.sql.prepare('SELECT status FROM customer_messages WHERE id=?').get(m.id).status,'stale');
+ const after=f.sql.prepare('SELECT subject,body,snapshot FROM customer_messages WHERE id=?').get(m.id);assert.deepEqual({...after},{subject:prior.subject,body:prior.body,snapshot:prior.snapshot});
+});
+async function conflictOnAllocatedPayment(state,compact){
+ const before=structuredClone(state);
+ if(compact){
+  for(let n=0;n<600;n++)before.invoices.push({...before.invoices[0],id:uid(),number:'SYN-FILL-'+n,ocr:'',party:'Synthetic filler '+n,total:1,net:null,vat:null,voided:true,reconciledAt:'',reconciliationNote:'',note:''});
+  let left=1799000-Buffer.byteLength(JSON.stringify(before));for(const item of before.invoices.slice(-600)){const count=Math.min(3000,left);item.note='x'.repeat(count);left-=count;if(!left)break;}assert.equal(left,0);
+ }
+ const row=before.transactions[0],attempted=applyCommand(before,{type:'transactions.import',trustedBankImport:true,rows:[{...row,amount:row.amount+10000,party:'Contradictory synthetic customer',payerReference:'OTHER-REF',description:'d'.repeat(1000)}]}).state;
+ const failure=await prepareBankImportFailure(before,attempted,uid());assert.equal(failure.compact,compact);assert.deepEqual(failure.state.allocations,before.allocations);return failure.state;
+}
+for(const compact of [false,true])test(`Q8 payment proof: ${compact?'compact hold':'retained conflict'} replaces fresh payment assertions with neutral confirmation`,async t=>{
+ for(const [amount,kind]of [[250000,'possible_vat'],[240000,'partial'],[350000,'overpayment']]){
+  const f=await fixture(t);f.init();f.pay(amount,{bankReference:'SYN-ALLOCATED',externalId:'SYN-ALLOCATED'});const prior=(await f.queue()).find(m=>m.kind===kind&&m.status==='draft');assert.ok(prior);
+  const before=f.state(),held=await conflictOnAllocatedPayment(before,compact);f.put(held);const items=await f.queue();
+  assert.equal(items.some(m=>['partial','possible_vat','overpayment'].includes(m.kind)&&m.status==='draft'),false);
+  const cautious=items.find(m=>m.kind==='confirmation'&&m.status==='draft');assert.ok(cautious);assert.match(cautious.facts.payment_evidence_issue,/motstridiga/);assert.doesNotMatch(cautious.body,/verifierat betalningar|verifierad betalning|Skillnaden motsvarar/);
+  assert.equal(cautious.facts.paid_cents,paid(before,before.invoices[0].id));assert.equal(cautious.facts.remaining_cents,balance(before,before.invoices[0]));assert.deepEqual(f.state().allocations,before.allocations);assert.deepEqual(f.state().invoices[0],before.invoices[0]);assert.equal(f.posts,0);
+ }
+});
+for(const compact of [false,true])test(`Q8 payment proof: current-snapshot payment drafts cannot be reviewed or sent under ${compact?'compact hold':'retained conflict'}`,async t=>{
+ for(const [amount,kind]of [[250000,'possible_vat'],[240000,'partial'],[350000,'overpayment']]){
+  const f=await fixture(t);f.init();await f.connect();f.pay(amount,{bankReference:'SYN-ALLOCATED',externalId:'SYN-ALLOCATED'});await f.queue();const id=f.state().invoices[0].id;
+  await f.call('contact',{invoice_id:id,email:'synthetic@example.test',evidence:'Synthetic contact agreement.',confirm:true});const m=(await f.queue()).find(m=>m.kind===kind&&m.status==='draft'),review=await f.review(m);
+  f.put(await conflictOnAllocatedPayment(f.state(),compact));const contact=f.sql.prepare('SELECT * FROM customer_contacts WHERE owner=? AND invoice_id=?').get(f.owner,id),snapshot=await f.api.evidenceSnapshot(f.state(),contact);
+  f.sql.prepare('UPDATE customer_messages SET snapshot=? WHERE id=?').run(snapshot,m.id);f.sql.prepare('UPDATE customer_reviews SET snapshot=? WHERE id=?').run(snapshot,review.review_id);
+  const prior=f.sql.prepare('SELECT * FROM customer_messages WHERE id=?').get(m.id),listed=(await f.api.messageList(f.owner)).items.find(item=>item.id===m.id);
+  const reviewAttempt=await f.review(m).then(()=>null,error=>error),sendAttempt=await f.send(m,review).then(()=>null,error=>error);
+  assert.equal(listed.status,'stale');assert.ok(reviewAttempt instanceof Error);assert.ok(sendAttempt instanceof Error);assert.equal(f.posts,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,0);assert.equal(f.sql.prepare('SELECT consumed FROM customer_reviews WHERE id=?').get(review.review_id).consumed,0);assert.deepEqual(f.sql.prepare('SELECT * FROM customer_messages WHERE id=?').get(m.id),prior);
+  await f.queue();assert.equal(f.sql.prepare('SELECT status FROM customer_messages WHERE id=?').get(m.id).status,'stale');
+ }
+});
+test('Q8 payment proof: an unrelated row conflict preserves a valid payment claim while absence stays blocked',async t=>{
+ const f=await fixture(t);f.init();f.pay(250000,{bankReference:'SYN-VALID',externalId:'SYN-VALID'});await f.queue();f.pay(10000,{party:'Unrelated synthetic sender',payerReference:'OTHER-REF',bankReference:'SYN-OTHER',externalId:'SYN-OTHER'});
+ let state=f.state();const other=state.transactions.find(row=>row.externalId==='SYN-OTHER');state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[{...other,party:'Contradictory unrelated sender'}]}).state;f.put(state);
+ const m=(await f.queue()).find(item=>item.kind==='possible_vat'&&item.status==='draft');assert.ok(m);assert.equal(m.facts.payment_evidence_issue,'');assert.equal(m.facts.paid_cents,250000);assert.equal(m.facts.remaining_cents,62500);assert.match(m.body,/Vi har verifierat betalningar/);assert.ok((await f.review(m)).review_id);
+ await assert.rejects(f.call('absence',{invoice_id:state.invoices[0].id,note:'An unrelated bank contradiction still prevents an account-wide absence conclusion.',confirm:true}),/motstridiga/);assert.equal(f.posts,0);
 });
 test('disconnect during provider preflight stops send and never restores old connection',async t=>{
   const f=await fixture(t),m=await verifiedDraft(f),r=await f.review(m);f.preflight=async()=>{f.sql.prepare('DELETE FROM gmail_connections').run();};await assert.rejects(f.send(m,r),/anslutningen ändrades/);assert.equal(f.posts,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_connections').get().n,0);

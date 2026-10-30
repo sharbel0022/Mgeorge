@@ -23,7 +23,17 @@
     "test/document-quality-cycle.test.js": "9866d692ea028d8e417b91a9acec5c5b1b56b09f14e84a4130e664f73c696aee"
   },
   "independent_review": "No remaining Critical/Important finding in bounded Node diff",
-  "github_actions": "pending push",
+  "github_actions": {
+    "id": 41088814042,
+    "head_sha": "a82ffbca211b5651e662c759c761bda2aefbf0f0",
+    "conclusion": "success",
+    "jobs": [
+      "test",
+      "sites"
+    ]
+  },
   "sites_version": 32,
-  "sites_published_in_this_cycle": false
+  "sites_published_in_this_cycle": false,
+  "delivered_commit": "a82ffbca211b5651e662c759c761bda2aefbf0f0",
+  "tested_tree": "f09cb08ee9f3a5394f1eecd2519c2b289bec7bd5"
 }

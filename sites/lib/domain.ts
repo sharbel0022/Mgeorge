@@ -6,8 +6,9 @@ export type Invoice = {
  organizationNumber?:string;vat?:number|null;net?:number|null;reconciledAt?:string;reconciliationNote?:string;note: string; bankgiro: string; documentId: string; source: string; createdAt: string;
 };
 export type Transaction = {
+ automaticMatchHold?:{at:string;reason:string};
  bankOriginalIssue?:string;
- bankEvidenceConflicts?:{at:string;fields:string[];incoming:Pick<Transaction,'date'|'amount'|'currency'|'party'|'payerReference'|'bankReference'|'description'|'account'|'externalId'|'referenceEvidence'|'bankData'|'organizationNumber'|'importId'|'source'|'reportEvidence'|'bankFileProof'|'payerAccount'|'remittanceMessage'>}[];
+ bankEvidenceConflicts?:{at:string;fields:string[];incoming:Pick<Transaction,'date'|'amount'|'currency'|'party'|'payerReference'|'bankReference'|'description'|'account'|'externalId'|'referenceEvidence'|'bankData'|'organizationNumber'|'importId'|'source'|'reportEvidence'|'bankFileProof'|'payerAccount'|'remittanceMessage'|'parentBankReference'>}[];
  reportEvidence?:Record<string,string>;
  bankFileProof?:{version:'bank-file-original-v1';documentId:string;sha256:string;reviewedAt?:string};
  bankDetails?:{referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;status:'identified'|'missing'|'unsupported';checkedAt:string;party:string;payerReference:string;referenceSchema:string;reason:string;documentId:string;bankReferenceText:string};
@@ -19,11 +20,43 @@ export type Transaction = {
 export type Allocation = {id:string;invoiceId:string;transactionId:string;amount:number;effect:"payment"|"refund";active:boolean;note:string;createdAt:string;reversedAt?:string};
 export type Credit = {id:string;invoiceId:string;amount:number;number:string;note:string;date:string;active:boolean};
 export type ImportRecord = {id:string;hash:string;account:string;name:string;count:number;createdAt:string;documentId?:string};
-export type State = {schemaVersion:1;company:{name:string;email:string};invoices:Invoice[];transactions:Transaction[];allocations:Allocation[];credits:Credit[];imports:ImportRecord[];receipts:string[]};
+export type State = {schemaVersion:1;company:{name:string;email:string};invoices:Invoice[];transactions:Transaction[];allocations:Allocation[];credits:Credit[];imports:ImportRecord[];receipts:string[];bankEvidenceHold?:{at:string;auditEventId:string;fingerprint:string}};
 export type Command = {type:string;[key:string]:any};
+/** A rejected import may add evidence holds, never any of its attempted money. */
+export class BankImportEvidenceError extends Error{
+ readonly state:State;
+ constructor(message:string,state:State){super(message);this.name='BankImportEvidenceError';this.state=state;}
+}
 export const emptyState=():State=>({schemaVersion:1,company:{name:"M.George Vitvaror AB",email:"mg.vitvaror@gmail.com"},invoices:[],transactions:[],allocations:[],credits:[],imports:[],receipts:[]});
 export const uid=()=>{if(typeof crypto.randomUUID==='function')return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=Array.from(b,v=>v.toString(16).padStart(2,'0')).join('');return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;};
 export const now=()=>new Date().toISOString();
+function bankConflictChanges(current:State,attempted:State){
+ return current.transactions.flatMap(previous=>{
+  const known=new Set((previous.bankEvidenceConflicts||[]).map(conflict=>JSON.stringify(conflict)));
+  const conflicts=(attempted.transactions.find(t=>t.id===previous.id)?.bankEvidenceConflicts||[]).filter(conflict=>!known.has(JSON.stringify(conflict)));
+  return conflicts.length?[{transactionId:previous.id,conflicts:structuredClone(conflicts)}]:[];
+ });
+}
+/** Copy only newly observed contradictions onto the previous financial state. */
+export function bankImportEvidenceError(current:State,attempted:State,message:string){
+ const changes=bankConflictChanges(current,attempted);if(!changes.length)return null;
+ const state=structuredClone(current);
+ for(const change of changes){const t=state.transactions.find(t=>t.id===change.transactionId)!;t.bankEvidenceConflicts=[...(t.bankEvidenceConflicts||[]),...change.conflicts];}
+ return new BankImportEvidenceError(message,state);
+}
+/** A fixed safety marker has a 256-byte reserve; arbitrary import data never does. */
+export async function prepareBankImportFailure(current:State,attempted:State,auditEventId:string){
+ const failure=bankImportEvidenceError(current,attempted,'Bankimporten har motstridiga underlag.');if(!failure)throw Error('Bankimporten saknar nytt konfliktunderlag.');
+ const conflicts=bankConflictChanges(current,failure.state);
+ const comparable=conflicts.map(entry=>({transactionId:entry.transactionId,conflicts:entry.conflicts.map(({fields,incoming})=>({fields,incoming:{...incoming,importId:undefined}}))}));
+ const fingerprint=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(comparable))))).map(n=>n.toString(16).padStart(2,'0')).join('');
+ let state=failure.state,payload=JSON.stringify(state),compact=false;
+ if(new TextEncoder().encode(payload).length>1_800_000){
+  state=structuredClone(current);state.bankEvidenceHold={at:now(),auditEventId,fingerprint};payload=JSON.stringify(state);compact=true;
+  if(new TextEncoder().encode(payload).length>1_800_256)throw Error('Registret överskrider säkerhetsreservens gräns. Konfliktunderlaget kräver administratörens granskning.');
+ }
+ return {state,payload,conflicts,compact,replayed:current.bankEvidenceHold?.fingerprint===fingerprint};
+}
 export function today(){return new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/Stockholm",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());}
 export function money(ore:number){return new Intl.NumberFormat("sv-SE",{style:"currency",currency:"SEK",minimumFractionDigits:2,maximumFractionDigits:2}).format(ore/100);}
 export function parseMoney(value:string|number):number{
@@ -47,10 +80,11 @@ export function balance(s:State,i:Invoice){return i.total-credited(s,i.id)-paid(
 export function available(s:State,t:Transaction){return Math.abs(t.amount)-s.allocations.filter(a=>a.transactionId===t.id&&a.active).reduce((n,a)=>n+a.amount,0);}
 export function invoiceStatus(s:State,i:Invoice,at=today()):{key:string;label:string;tone:string}{
  if(i.voided)return{key:"voided",label:"Makulerad",tone:"neutral"};if(!i.reviewed)return{key:"review",label:"Granska faktura",tone:"amber"};
+ if(s.allocations.some(a=>a.active&&a.invoiceId===i.id)&&invoicePaymentEvidenceIssue(s,i.id))return{key:"review",label:"Granska betalningsunderlag",tone:"amber"};
  const b=balance(s,i);if(b<0)return{key:"refund",label:"Återbetalning",tone:"purple"};
  if(b===0)return{key:"paid",label:credited(s,i.id)===i.total&&paid(s,i.id)===0?"Krediterad":"Betald",tone:"green"};
  if(paid(s,i.id)>0)return{key:"partial",label:i.due&&i.due<at?"Delbetald · förfallen":"Delbetald",tone:"blue"};
- if(!i.reconciledAt)return{key:"unreconciled",label:"Ej avstämd",tone:"amber"};
+ if(!hasValidAbsenceCheck(s,i))return{key:"unreconciled",label:"Ej avstämd",tone:"amber"};
  if(i.due&&i.due<at)return{key:"overdue",label:paid(s,i.id)>0?"Delbetald · förfallen":"Obetald efter verifierad kontroll · förfallen",tone:"red"};
  if(paid(s,i.id)>0)return{key:"partial",label:"Delbetald",tone:"blue"};
  if(!i.due)return{key:"open",label:"Förfallodatum saknas",tone:"amber"};return{key:"open",label:i.due===at?"Förfaller idag":"Obetald efter verifierad kontroll",tone:"neutral"};
@@ -64,11 +98,33 @@ export const hasBankFileProof=(t:Transaction)=>t.bankFileProof?.version==='bank-
 export const needsBankFileValidation=(t:Transaction)=>t.evidence==='bank_file'&&!hasBankFileProof(t);
 export const needsBankFileReview=(t:Transaction)=>t.evidence==='bank_file'&&(!hasBankFileProof(t)||!t.bankFileProof?.reviewedAt);
 export const hasBankEvidenceConflict=(t:Transaction)=>!!t.bankEvidenceConflicts?.length;
-export const paymentEvidenceConflict=(s:State,t:Transaction)=>hasBankEvidenceConflict(t)||!!t.parentId&&s.transactions.some(parent=>parent.id===t.parentId&&hasBankEvidenceConflict(parent));
-export const paymentOriginalIssue=(s:State,t:Transaction)=>t.bankOriginalIssue||(t.parentId?s.transactions.find(parent=>parent.id===t.parentId)?.bankOriginalIssue:'')||'';
+function paymentAncestors(s:State,t:Transaction){
+ const ancestors=[t],seen=new Set([t.id]);
+ while(t.parentId){const parent=s.transactions.find(candidate=>candidate.id===t.parentId);if(!parent||seen.has(parent.id))break;ancestors.push(parent);seen.add(parent.id);t=parent;}
+ return ancestors;
+}
+export const paymentEvidenceConflict=(s:State,t:Transaction)=>!!s.bankEvidenceHold||paymentAncestors(s,t).some(hasBankEvidenceConflict);
+export const paymentOriginalIssue=(s:State,t:Transaction)=>paymentAncestors(s,t).find(original=>!!original.bankOriginalIssue)?.bankOriginalIssue||'';
+export const automaticMatchHoldReason=(t:Transaction)=>t.automaticMatchHold?'En matchning har återtagits. Automatisk matchning väntar tills betalningsuppgifterna har granskats och bekräftats på nytt.':'';
 export const BANK_EVIDENCE_CONFLICT='Banken har lämnat motstridiga uppgifter för samma bank-ID. Granska bankoriginalen innan nya matchningar.';
+export const paymentEvidenceIssue=(s:State,t:Transaction)=>paymentEvidenceConflict(s,t)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(s,t);
+/** Recorded allocations still determine the balance; this is their current
+ * evidential status, not permission to rewrite the financial history. */
+export function invoicePaymentEvidenceIssue(s:State,invoiceId:string){
+ if(s.bankEvidenceHold)return BANK_EVIDENCE_CONFLICT;
+ for(const allocation of s.allocations.filter(a=>a.active&&a.invoiceId===invoiceId)){
+  const payment=s.transactions.find(t=>t.id===allocation.transactionId);if(!payment)return 'Betalningsunderlaget för en registrerad koppling saknas.';
+  const issue=paymentEvidenceIssue(s,payment);if(issue)return issue;
+ }
+ return '';
+}
+/** Contradictory bank facts can change the payer or period. Prior absence notes
+ * remain history, but cannot prove absence anywhere until the conflict is resolved. */
+export const absenceCheckIssue=(s:State)=>s.bankEvidenceHold||s.transactions.some(hasBankEvidenceConflict)?'Bankunderlagen innehåller motstridiga uppgifter. Utebliven betalning kan inte bekräftas innan bankoriginalen har retts ut.':'';
+export const hasValidAbsenceCheck=(s:State,i:Invoice)=>!!i.reconciledAt&&!!i.reconciliationNote?.trim()&&!absenceCheckIssue(s);
 /** Explicit transaction types are review evidence, even when name and OCR match. */
-export function bankPaymentReviewReason(t:Transaction){
+export function bankPaymentReviewReason(t:Transaction,state?:State):string{
+ if(state){for(const original of paymentAncestors(state,t)){const reason=bankPaymentReviewReason(original);if(reason)return reason;}return '';}
  const code=t.bankData?.bank_transaction_code;
  const description=code&&typeof code==='object'&&'description' in code?String(code.description||''):'';
  const text=[t.description,t.original?.description,t.payerReference,t.original?.payerReference,description,t.bankData?.note,...(Array.isArray(t.bankData?.remittance_information)?t.bankData.remittance_information:[])].filter(value=>typeof value==='string').join(' ').normalize('NFKC');
@@ -118,6 +174,7 @@ function conflictingBankFacts(previous:Transaction,incoming:Transaction){
  if(different(payer(previous),payer(incoming),(a,b)=>normalizeName(a)===normalizeName(b)))fields.push('party');
  if(different(original.payerReference,incoming.payerReference,equivalentReference))fields.push('payerReference');
  if(different(original.bankReference,incoming.bankReference))fields.push('bankReference');
+ if(different(previous.parentBankReference||'',incoming.parentBankReference||''))fields.push('parentBankReference');
  if(different(previous.organizationNumber||'',incoming.organizationNumber||'',(a,b)=>a.replace(/[ -]/g,'')===b.replace(/[ -]/g,'')))fields.push('organizationNumber');
  const oldReferences=matchingReferenceValues(previous.referenceEvidence,original.payerReference),newReferences=matchingReferenceValues(incoming.referenceEvidence,incoming.payerReference);
  if(oldReferences.length&&newReferences.some(value=>!oldReferences.some(old=>equivalentReference(value,old)))||incoming.referenceEvidence?.incomplete&&!previous.referenceEvidence?.incomplete||incoming.referenceEvidence?.candidates?.some(c=>c.validity==='checksum_invalid')&&!previous.referenceEvidence?.candidates?.some(c=>c.validity==='checksum_invalid'))fields.push('referenceEvidence');
@@ -125,8 +182,8 @@ function conflictingBankFacts(previous:Transaction,incoming:Transaction){
  return fields;
 }
 function retainBankConflict(previous:Transaction,incoming:Transaction,fields:string[]){
- const evidence:NonNullable<Transaction['bankEvidenceConflicts']>[number]['incoming']={date:incoming.date,amount:incoming.amount,currency:incoming.currency,party:incoming.party,payerReference:incoming.payerReference,bankReference:incoming.bankReference,description:incoming.description,account:incoming.account,externalId:incoming.externalId,referenceEvidence:incoming.referenceEvidence,bankData:incoming.bankData,organizationNumber:incoming.organizationNumber,importId:incoming.importId,source:incoming.source,reportEvidence:incoming.reportEvidence,bankFileProof:incoming.bankFileProof,payerAccount:incoming.payerAccount,remittanceMessage:incoming.remittanceMessage};
- const signature=(value:typeof evidence)=>JSON.stringify([value.date,value.amount,value.currency,value.party,value.payerReference,value.bankReference,value.description,value.organizationNumber,matchingReferenceValues(value.referenceEvidence,value.payerReference),!!value.referenceEvidence?.incomplete,value.referenceEvidence?.candidates?.filter(c=>c.validity==='checksum_invalid').map(c=>c.value)]);
+ const evidence:NonNullable<Transaction['bankEvidenceConflicts']>[number]['incoming']={date:incoming.date,amount:incoming.amount,currency:incoming.currency,party:incoming.party,payerReference:incoming.payerReference,bankReference:incoming.bankReference,description:incoming.description,account:incoming.account,externalId:incoming.externalId,referenceEvidence:incoming.referenceEvidence,bankData:incoming.bankData,organizationNumber:incoming.organizationNumber,importId:incoming.importId,source:incoming.source,reportEvidence:incoming.reportEvidence,bankFileProof:incoming.bankFileProof,payerAccount:incoming.payerAccount,remittanceMessage:incoming.remittanceMessage,parentBankReference:incoming.parentBankReference};
+ const signature=(value:typeof evidence)=>JSON.stringify([value.date,value.amount,value.currency,value.party,value.payerReference,value.bankReference,value.description,value.organizationNumber,matchingReferenceValues(value.referenceEvidence,value.payerReference),!!value.referenceEvidence?.incomplete,value.referenceEvidence?.candidates?.filter(c=>c.validity==='checksum_invalid').map(c=>c.value),value.bankData?.specification,value.parentBankReference]);
  previous.bankEvidenceConflicts??=[];
  if(!previous.bankEvidenceConflicts.some(conflict=>signature(conflict.incoming)===signature(evidence)))previous.bankEvidenceConflicts.push({at:now(),fields,incoming:structuredClone(evidence)});
 }
@@ -159,13 +216,20 @@ export function specificationPreview(s:State,rows:any[],targetId=''){
   let reason=!first.account?'Mottagarkonto saknas i filen.':!ref?'Insättningens bankidentifierare saknas.':!parent?'Konto, datum, bankidentifierare och totalsumma kan inte kopplas entydigt till en samlingspost.':targetId&&parent.id!==targetId?'Filen tillhör en annan bankhändelse.':hasBankEvidenceConflict(parent)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(s,parent)?paymentOriginalIssue(s,parent):parent.duplicateOf||s.allocations.some(a=>a.transactionId===parent.id&&a.active)?'Samlingsposten har en tidigare matchning eller dubblettspärr.':'';
   if(group.some(r=>!individualParty(r.party||'')))reason='En eller flera betalare saknas i specifikationen.';
   const existing=parent?s.transactions.filter(t=>t.parentId===parent.id&&!t.ignored):[];
-  const signature=(r:any)=>JSON.stringify([r.date,r.amount,r.currency,r.party,r.payerReference,r.bankReference]);
+  const signature=(raw:any)=>{const r={...raw,...raw.original};return JSON.stringify([r.date,r.amount,r.currency,r.party,r.payerReference,r.bankReference]);};
   if(new Set(group.map(signature)).size!==group.length||group.some((r,n)=>r.externalId&&group.some((other,m)=>m!==n&&other.externalId===r.externalId)))reason='Specifikationen innehåller möjliga dubbla betalningar. Granska bankoriginalets individuella identifierare.';
   const duplicate=existing.length===group.length&&existing.map(signature).sort().join('|')===group.map(signature).sort().join('|');
   if(existing.length&&!duplicate)reason='Samlingsposten har redan en annan betalningsspecifikation. Granska konflikten.';
+  // Whole retained reports can contradict each other before their booked
+  // aggregate arrives. Keep that knowledge when either source later disappears.
+  const previousGroups=new Map<string,Transaction[]>();
+  if(ref&&first.account)for(const row of s.transactions.filter(t=>t.specification&&t.parentBankReference===ref&&sameAccount(t.account,first.account))){const key=JSON.stringify([row.importId,row.specificationGroup]);previousGroups.set(key,[...(previousGroups.get(key)||[]),row]);}
+  const contradicted=[...previousGroups.values()].filter(previous=>previous[0].specificationCount===previous.length&&previous.every(row=>row.specificationCount===previous.length&&row.specificationTotal===previous[0].specificationTotal)&&previous.reduce((sum,row)=>sum+row.amount,0)===previous[0].specificationTotal&&JSON.stringify(previous.map(signature).sort())!==JSON.stringify(group.map(signature).sort()));
+  const conflictIds=[...new Set([...(existing.length&&!duplicate&&parent?[parent.id]:[]),...contradicted.flatMap(previous=>previous.flatMap(row=>[row.id,...(row.parentId?[row.parentId]:[])]))])];
+  if(conflictIds.length)reason='Bankoriginalen innehåller olika individuella betalningar för samma samlingspost. Granska originalen tillsammans.';
   const overlap=parent&&s.transactions.some(t=>t.id!==parent.id&&!t.ignored&&!t.duplicateOf&&t.specificationStatus!=='review'&&!existing.some(e=>e.id===t.id)&&group.some(r=>t.date===r.date&&t.amount===r.amount&&t.currency===r.currency&&(r.externalId&&t.externalId===r.externalId||r.bankReference&&r.bankReference!==ref&&t.bankReference===r.bankReference||t.party===r.party&&t.payerReference===r.payerReference)));
   if(overlap)reason='Betalningen kan redan finnas via ett annat bankunderlag. Granska dubbletten.';
-  return {rows:group,parentId:!reason?parent?.id:'',duplicate:!reason&&duplicate,total,status:reason?'review':'linked',reason:reason||'Konto, datum, bankidentifierare och totalsumma stämmer. Insättningen räknas en gång.'};
+  return {rows:group,parentId:!reason?parent?.id:'',conflictIds,duplicate:!reason&&duplicate,total,status:reason?'review':'linked',reason:reason||'Konto, datum, bankidentifierare och totalsumma stämmer. Insättningen räknas en gång.'};
  });
  return {plans,payments:payments.length,total:payments.reduce((n,r)=>n+r.amount,0),linked:plans.filter(p=>p.status==='linked').length,review:plans.filter(p=>p.status==='review').length};
 }
@@ -173,18 +237,25 @@ export function paymentInvoiceAssessment(s:State,t:Transaction){
  const view={...t,party:t.bankDetails?.party||t.party,payerReference:t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'':t.payerReference)};
  const exact=s.invoices.filter(i=>!i.voided&&i.direction===(t.amount>0?'receivable':'payable')&&exactPaymentReference(view,i));
  const allocated=s.allocations.find(a=>a.active&&a.transactionId===t.id),invoice=allocated?s.invoices.find(i=>i.id===allocated.invoiceId):exact.length===1?exact[0]:undefined;
- return {invoice,status:allocated?'verified':exact.length>1?'ambiguous':invoice?'possible':'missing',message:allocated?'Betalningen är verifierad mot fakturan.':exact.length>1?'Flera fakturor kan passa. Granska kundidentiteten.':invoice?'Referensen finns. Kund och betalningsunderlag behöver stämma.':individualParty(view.party)?usablePaymentReference(view.payerReference)?`Betalare identifierad – ingen faktura med betalningsreferensen ${view.payerReference} hittades i registret.`:'Betalare identifierad – fakturakoppling saknas.':'Betalaren behöver identifieras.'};
+ const issue=paymentEvidenceIssue(s,t);
+ return {invoice,status:issue?'review':allocated?'verified':exact.length>1?'ambiguous':invoice?'possible':'missing',message:issue|| (allocated?'Betalningen är verifierad mot fakturan.':exact.length>1?'Flera fakturor kan passa. Granska kundidentiteten.':invoice?'Referensen finns. Kund och betalningsunderlag behöver stämma.':individualParty(view.party)?usablePaymentReference(view.payerReference)?`Betalare identifierad – ingen faktura med betalningsreferensen ${view.payerReference} hittades i registret.`:'Betalare identifierad – fakturakoppling saknas.':'Betalaren behöver identifieras.')};
 }
 export function economicTransactions(s:State){return s.transactions.filter(t=>!t.ignored&&!t.duplicateOf&&t.specificationStatus!=='review'&&!s.transactions.some(c=>c.parentId===t.id&&!c.ignored));}
 export function applyCommand(current:State,command:Command):{state:State;message:string}{
  const s=structuredClone(current);let message="Sparat";
+ try{
  switch(command.type){
  case'bankgiro.import':{
   if(!command.documentId||!command.hash)throw Error('Originalfilen måste sparas före import.');
   if(s.imports.some(i=>i.hash===command.hash)&&!s.transactions.some(t=>t.specificationStatus==='review'&&s.imports.find(i=>i.id===t.importId)?.hash===command.hash)){message='Filen har redan importerats. Inga nya betalningar skapades.';break;}
   const preview=specificationPreview(s,command.rows,command.targetId),record:ImportRecord={id:uid(),hash:str(command.hash,128),account:'Bankgiro',name:str(command.name,300),count:0,createdAt:now(),documentId:str(command.documentId,100)};
   for(const plan of preview.plans){
-   if(plan.duplicate)continue;
+   if(plan.conflictIds.length){
+    const first=plan.rows[0],incoming=cleanTransaction({...first,amount:plan.total,party:'',payerReference:'',bankReference:first.parentBankReference||first.bankReference,externalId:'',kind:'batch',verified:false});
+    incoming.importId=record.id;incoming.bankFileProof={version:'bank-file-original-v1',documentId:record.documentId!,sha256:record.hash};
+    incoming.bankData={specification:plan.rows.map(row=>[row.date,row.amount,row.currency,row.account,row.externalId,row.bankReference,row.party,row.payerReference]).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))};
+    for(const id of plan.conflictIds)retainBankConflict(getTx(s,id),incoming,['specification']);
+   }
    for(const raw of plan.rows){
     const t=cleanTransaction({...raw,kind:'payment',verified:false});
     if(Array.isArray(raw.referenceParts))t.referenceParts=raw.referenceParts.slice(0,20).map((p:any)=>({value:str(p.value,300),source:str(p.source,200),kind:str(p.kind,60)}));t.specification=true;t.specificationStatus=plan.status as 'linked'|'review';t.parentBankReference=str(raw.parentBankReference||'',300);t.recipientBankgiro=str(raw.recipientBankgiro||'',100);t.payerBankgiro=str(raw.payerBankgiro||'',100);t.settlementDate=str(raw.settlementDate||'',10);t.format=str(raw.format||'',100);t.organizationNumber=str(raw.organizationNumber||'',40);
@@ -192,8 +263,20 @@ export function applyCommand(current:State,command:Command):{state:State;message
     t.specificationGroup=str(plan.rows[0].parentKey||plan.rows[0].parentBankReference||plan.rows[0].bankReference||plan.rows[0].key||'csv',300);t.specificationCount=plan.rows.length;t.specificationTotal=plan.total;
     t.recipientAccount=str(raw.recipientAccount||raw.account||'',100);t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};
     t.parentId=plan.parentId||'';t.importId=record.id;t.evidence='bankgiro_file';t.kind='payment';t.verified=plan.status==='linked'&&individualParty(t.party);
+    if(t.parentId&&getTx(s,t.parentId).automaticMatchHold)t.automaticMatchHold=structuredClone(getTx(s,t.parentId).automaticMatchHold);
+    t.bankFileProof={version:'bank-file-original-v1',documentId:record.documentId!,sha256:record.hash};
     const duplicate=s.transactions.find(x=>x.specification&&x.date===t.date&&x.amount===t.amount&&x.party===t.party&&x.payerReference===t.payerReference&&x.bankReference===t.bankReference&&sameAccount(x.account,t.account));
-    if(duplicate){if(duplicate.specificationStatus==='review'&&plan.status==='linked'){duplicate.parentId=t.parentId;duplicate.verified=t.verified;duplicate.specificationStatus='linked';duplicate.specificationGroup=t.specificationGroup;duplicate.specificationCount=t.specificationCount;duplicate.specificationTotal=t.specificationTotal;}continue;}
+    const previous=(t.externalId?s.transactions.find(x=>sameAccount(x.account,t.account)&&x.externalId===t.externalId):undefined)||duplicate;
+    if(previous){
+     const fields=conflictingBankFacts(previous,t);if(previous.amount!==t.amount||previous.date!==t.date||previous.currency!==t.currency)fields.push('amountDateCurrency');
+     if(fields.length){
+      retainBankConflict(previous,t,fields);retainBankConflict(t,{...previous,...previous.original},fields);
+      if(previous.parentId)retainBankConflict(getTx(s,previous.parentId),t,['specification',...fields]);
+      if(t.parentId)retainBankConflict(getTx(s,t.parentId),{...previous,...previous.original},['specification',...fields]);
+     }
+    }
+    if(plan.duplicate)continue;
+    if(duplicate){if(!paymentEvidenceConflict(s,duplicate)&&!hasBankEvidenceConflict(t)&&duplicate.specificationStatus==='review'&&plan.status==='linked'){duplicate.parentId=t.parentId;duplicate.verified=t.verified;duplicate.specificationStatus='linked';duplicate.specificationGroup=t.specificationGroup;duplicate.specificationCount=t.specificationCount;duplicate.specificationTotal=t.specificationTotal;if(t.automaticMatchHold)duplicate.automaticMatchHold??=structuredClone(t.automaticMatchHold);}continue;}
     s.transactions.push(t);record.count++;
    }
   }
@@ -210,7 +293,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
   if(old&&(s.allocations.some(a=>a.active&&a.invoiceId===old.id)||credited(s,old.id)>0)&&(item.total!==old.total||item.direction!==old.direction||item.party!==old.party||item.number!==old.number||item.reviewed!==old.reviewed))throw new Error("Fakturan har betalningar eller krediter. Ångra dessa först, eller registrera en kreditfaktura.");
   if(old)s.invoices[s.invoices.indexOf(old)]=item;else s.invoices.push(item);message=item.reviewed?"Fakturan är sparad och granskad":"Fakturan är sparad för granskning";break;
  }
- case'invoice.reconcile':{const i=getInvoice(s,command.id);const note=str(command.note??'',1500);if(command.confirm!==true||!note)throw new Error('Bekräfta kontrollen och ange bankunderlaget.');i.reconciledAt=now();i.reconciliationNote=note;message='Betalningsunderlaget är kontrollerat';break;}
+ case'invoice.reconcile':{const i=getInvoice(s,command.id);const note=str(command.note??'',1500);if(command.confirm!==true||!note)throw new Error('Bekräfta kontrollen och ange bankunderlaget.');const issue=absenceCheckIssue(s);if(issue)throw new Error(issue);i.reconciledAt=now();i.reconciliationNote=note;message='Betalningsunderlaget är kontrollerat';break;}
  case'invoice.void':{const i=getInvoice(s,command.id);if(s.allocations.some(a=>a.invoiceId===i.id&&a.active)||credited(s,i.id)>0)throw new Error("Ångra betalningar och krediter innan makulering.");i.voided=!i.voided;message=i.voided?"Fakturan är makulerad":"Fakturan är återställd";break;}
  case'credit.add':{
   const i=getInvoice(s,command.invoiceId);if(!i.reviewed||i.voided)throw new Error("Granska fakturan först.");const amount=cents(command.amount);
@@ -233,7 +316,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
     matched.push(found[0]);if(command.rows[n].key)keys.set(command.rows[n].key,found[0].id);
    }
    if(matched.some((t,n)=>t.parentId!==(command.rows[n].parentKey?keys.get(command.rows[n].parentKey)||'missing':'')))throw Error('Originalets uppdelning stämmer inte med äldre bankrader. Granska originalet.');
-   for(let n=0;n<matched.length;n++){const t=matched[n];t.evidence='bank_file';t.referenceEvidence=structuredClone(command.rows[n].referenceEvidence);t.reportEvidence=cleanReportEvidence(command.rows[n].reportEvidence);t.bankFileProof={version:'bank-file-original-v1',documentId:str(command.documentId,100),sha256:hash};}
+   for(let n=0;n<matched.length;n++){const t=matched[n],reviewedAt=hasBankFileProof(t)&&t.bankFileProof?.sha256===hash?t.bankFileProof.reviewedAt:undefined;t.evidence='bank_file';t.referenceEvidence=structuredClone(command.rows[n].referenceEvidence);t.reportEvidence=cleanReportEvidence(command.rows[n].reportEvidence);t.bankFileProof={version:'bank-file-original-v1',documentId:str(command.documentId,100),sha256:hash,...(reviewedAt?{reviewedAt}:{})};}
    message='Bankoriginalet är kontrolläst igen. Befintliga betalningar och belopp är bevarade.';break;
   }
   if(hash&&s.imports.some(i=>i.hash===hash&&sameAccount(i.account,account)))throw new Error("Den här filen har redan importerats för kontot.");
@@ -248,9 +331,11 @@ export function applyCommand(current:State,command:Command):{state:State;message
    if(stable){
     if(stable.ignored)throw new Error('Bankhändelsen finns redan som undantagen. Återställ den befintliga posten om den ska användas.');
     const financialConflict=stable.amount!==t.amount||stable.date!==t.date||stable.currency!==t.currency;
-    if(t.parentId&&stable.parentId!==t.parentId||financialConflict&&command.trustedBankImport!==true)throw new Error("Samma bank-ID har olika uppgifter eller tillhör en annan samlingspost. Kontrollera filerna före import.");
     const fields=conflictingBankFacts(stable,t);if(financialConflict)fields.push('amountDateCurrency');
-    if(fields.length){retainBankConflict(stable,t,fields);conflicts++;skipped++;if(raw.key)keys.set(raw.key,stable.id);continue;}
+    if(t.parentId&&stable.parentId!==t.parentId)fields.push('parentId');
+    if(fields.length)retainBankConflict(stable,t,fields);
+    if(t.parentId&&stable.parentId!==t.parentId||financialConflict&&command.trustedBankImport!==true)throw new Error("Samma bank-ID har olika uppgifter eller tillhör en annan samlingspost. Kontrollera filerna före import.");
+    if(fields.length){conflicts++;skipped++;if(raw.key)keys.set(raw.key,stable.id);continue;}
     if(command.trustedBankImport===true&&!stable.bankData){stable.bankData=t.bankData;stable.referenceEvidence=t.referenceEvidence;}
     if(t.kind==='batch'&&stable.kind!=='batch'){if(stable.parentId||stable.duplicateOf||s.allocations.some(a=>a.active&&a.transactionId===stable.id))throw new Error('Samlingsposten är redan matchad eller behöver dubblettkontroll. Ångra matchningen och kontrollera underlaget först.');stable.kind='batch';stable.verified=false;}
     skipped++;if(raw.key)keys.set(raw.key,stable.id);continue;
@@ -258,6 +343,11 @@ export function applyCommand(current:State,command:Command):{state:State;message
    const similar=s.transactions.find(x=>x.id!==t.parentId&&x.specificationStatus!=='review'&&possibleDuplicate(x,t));
    if(similar){if(t.kind==='batch')throw new Error('En samlingspost liknar en tidigare bankhändelse. Granska den befintliga posten och dela vid behov upp den där. Ingen ny import gjordes.');t.duplicateOf=similar.id;t.verified=false;}
    if(raw.key)keys.set(raw.key,t.id);s.transactions.push(t);record.count++;
+  }
+  for(const parent of s.transactions.filter(t=>!t.parentId&&t.bankReference&&needsPaymentSpecification(t))){
+   for(const specification of s.transactions.filter(t=>t.specification&&t.parentBankReference===parent.bankReference&&sameAccount(t.account,parent.account))){
+    for(const conflict of specification.bankEvidenceConflicts||[])retainBankConflict(parent,{...specification,...conflict.incoming},[...new Set(['specification',...conflict.fields])]);
+   }
   }
   for(const parent of s.transactions.filter(t=>t.kind==='batch'&&!t.ignored)){const children=s.transactions.filter(t=>t.parentId===parent.id&&!t.ignored);if(children.length&&(parent.duplicateOf||children.reduce((n,t)=>n+t.amount,0)!==parent.amount))throw new Error("Delbetalningarna stämmer inte med bankens samlingsbelopp eller samlingsposten är en möjlig dubblett. Ingen rad importerades.");}
   for(const i of s.invoices)if(!paid(s,i.id)&&record.count){i.reconciledAt='';i.reconciliationNote='';}
@@ -268,7 +358,9 @@ export function applyCommand(current:State,command:Command):{state:State;message
   if(paymentOriginalIssue(s,getTx(s,command.id)))throw Error(paymentOriginalIssue(s,getTx(s,command.id)));
   const t=getTx(s,command.id);if(needsBankFileValidation(t))throw Error('Bankoriginalet behöver kontrolläsas igen. Importera samma originalfil för verifiering.');if(t.specificationStatus==='review')throw Error('Specifikationen behöver kopplas till bankens insättning före verifiering.');if(t.ignored)throw new Error("Den här posten kan inte bekräftas som en enskild betalning.");if(needsPaymentSpecification(t))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);if(t.duplicateOf&&!command.confirmDistinct)throw new Error("Kontrollera först om raden är en dubblett.");
   t.original??={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};
-  t.party=str(command.party??t.party,200);t.payerReference=str(command.payerReference??t.payerReference,300);if(!individualParty(t.party)&&!usablePaymentReference(t.payerReference))throw new Error('Betalare eller fakturareferens saknas. Komplettera från bankunderlaget före bekräftelse.');const note=str(command.note??"",1000);if(!note)throw new Error("Beskriv hur du har kontrollerat betalningsuppgifterna.");t.verification={party:t.party,payerReference:t.payerReference,note,at:now()};if(t.evidence==='bank_file'&&t.bankFileProof)t.bankFileProof.reviewedAt=t.verification.at;t.evidence||='manual_verified';t.verified=true;t.kind='payment';t.duplicateOf='';message="Betalningsuppgifterna är bekräftade";break;
+  const party=str(command.party??t.party,200),payerReference=str(command.payerReference??t.payerReference,300);
+  if((party!==t.party||payerReference!==t.payerReference)&&s.allocations.some(a=>a.active&&a.transactionId===t.id))throw Error('Ångra matchningarna innan betalare eller betalningsreferens ändras.');
+  t.party=party;t.payerReference=payerReference;if(!individualParty(t.party)&&!usablePaymentReference(t.payerReference))throw new Error('Betalare eller fakturareferens saknas. Komplettera från bankunderlaget före bekräftelse.');const note=str(command.note??"",1000);if(!note)throw new Error("Beskriv hur du har kontrollerat betalningsuppgifterna.");t.verification={party:t.party,payerReference:t.payerReference,note,at:now()};if(t.evidence==='bank_file'&&t.bankFileProof)t.bankFileProof.reviewedAt=t.verification.at;t.evidence||='manual_verified';t.verified=true;t.kind='payment';t.duplicateOf='';delete t.automaticMatchHold;message="Betalningsuppgifterna är bekräftade";break;
  }
  case'transaction.ignore':{const t=getTx(s,command.id);if(s.allocations.some(a=>a.transactionId===t.id&&a.active))throw new Error("Ångra matchningar först.");if(t.parentId||s.transactions.some(c=>c.parentId===t.id&&!c.ignored))throw new Error("Poster i en samlingsbetalning behöver hanteras tillsammans.");t.ignored=!t.ignored;message=t.ignored?"Bankhändelsen är undantagen":"Bankhändelsen är återställd";break;}
  case'transaction.unverify':{const t=getTx(s,command.id);if(t.kind==='batch'||s.allocations.some(a=>a.active&&a.transactionId===t.id))throw new Error('Ångra matchningar innan du korrigerar betalningsuppgifterna.');t.verified=false;message='Bankhändelsen är öppnad för ny granskning';break;}
@@ -284,7 +376,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
   const parent=getTx(s,command.id);if(parent.ignored||parent.parentId||parent.duplicateOf||s.allocations.some(a=>a.transactionId===parent.id&&a.active)||s.transactions.some(t=>t.parentId===parent.id&&!t.ignored))throw new Error("Posten är redan matchad, uppdelad eller behöver dubblettkontroll.");if(!Array.isArray(command.rows)||command.rows.length<1||command.rows.length>100)throw new Error("Lägg till betalningsrader från specifikationen.");
   const children=command.rows.map((raw:any)=>cleanTransaction({...raw,account:parent.account,date:parent.date,source:"Betalningsspecifikation: "+parent.bankReference,kind:"payment",verified:true}));
   if(children.some((t:Transaction)=>!individualParty(t.party)||!usablePaymentReference(t.payerReference)))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);
-  if(children.some((t:Transaction)=>Math.sign(t.amount)!==Math.sign(parent.amount))||children.reduce((n:number,t:Transaction)=>n+t.amount,0)!==parent.amount)throw new Error("Summan av betalningsraderna måste stämma exakt med bankposten.");parent.kind='batch';parent.verified=false;for(const t of children){t.parentId=parent.id;t.evidence='verified_specification';t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};const duplicate=s.transactions.find(x=>!x.ignored&&x.id!==parent.id&&possibleDuplicate(x,t));if(duplicate){t.duplicateOf=duplicate.id;t.verified=false;}s.transactions.push(t);}message="Samlingsbetalningen är uppdelad";break;
+  if(children.some((t:Transaction)=>Math.sign(t.amount)!==Math.sign(parent.amount))||children.reduce((n:number,t:Transaction)=>n+t.amount,0)!==parent.amount)throw new Error("Summan av betalningsraderna måste stämma exakt med bankposten.");parent.kind='batch';parent.verified=false;for(const t of children){t.parentId=parent.id;t.evidence='verified_specification';if(parent.automaticMatchHold)t.automaticMatchHold=structuredClone(parent.automaticMatchHold);t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};const duplicate=s.transactions.find(x=>!x.ignored&&x.id!==parent.id&&possibleDuplicate(x,t));if(duplicate){t.duplicateOf=duplicate.id;t.verified=false;}s.transactions.push(t);}message="Samlingsbetalningen är uppdelad";break;
  }
  case'match.create':{
   const i=getInvoice(s,command.invoiceId),t=getTx(s,command.transactionId),amount=cents(command.amount),effect=command.effect==='refund'?'refund':'payment';
@@ -296,7 +388,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
   if(amount>available(s,t)||amount>balance(s,i)*(effect==='refund'?-1:1))throw new Error("Beloppet överstiger det som återstår. Uppdatera sidan och kontrollera beloppen.");const note=str(command.note??"",1000);if(!note)throw new Error("Ange vilket underlag som bekräftar matchningen.");
   i.reconciledAt=now();s.allocations.push({id:uid(),invoiceId:i.id,transactionId:t.id,amount,effect,active:true,note,createdAt:now()});message=effect==='refund'?"Återbetalningen är avstämd":"Betalningen är matchad";break;
  }
- case'match.undo':{const a=s.allocations.find(a=>a.id===command.id&&a.active);if(!a)throw new Error("Matchningen finns inte längre.");if(!str(command.note??"",1000))throw new Error("Ange varför matchningen ångras.");a.active=false;a.reversedAt=now();const i=getInvoice(s,a.invoiceId);i.reconciledAt='';i.reconciliationNote='';message="Matchningen är ångrad";break;}
+ case'match.undo':{const a=s.allocations.find(a=>a.id===command.id&&a.active);if(!a)throw new Error("Matchningen finns inte längre.");const note=str(command.note??"",1000);if(!note)throw new Error("Ange varför matchningen ångras.");a.active=false;a.reversedAt=now();getTx(s,a.transactionId).automaticMatchHold={at:a.reversedAt,reason:note};const i=getInvoice(s,a.invoiceId);i.reconciledAt='';i.reconciliationNote='';message="Matchningen är ångrad. Automatisk matchning väntar på en ny granskning av betalningsuppgifterna.";break;}
  case'settings.save':{s.company={name:str(command.name,200),email:str(command.email,200)};if(!s.company.name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.company.email))throw new Error("Ange företagsnamn och en giltig e-postadress.");break;}
  default:throw new Error("Okänd åtgärd.");
  }
@@ -304,6 +396,12 @@ export function applyCommand(current:State,command:Command):{state:State;message
  for(const a of s.allocations.filter(a=>a.active)){const i=getInvoice(s,a.invoiceId),t=getTx(s,a.transactionId);if(i.voided||!i.reviewed||t.ignored||t.duplicateOf||!t.verified||t.kind!=='payment'||s.transactions.some(c=>c.parentId===t.id&&!c.ignored))throw new Error('En betalningsmatchning saknar giltigt underlag. Ångra matchningen först.');}
  for(const t of s.transactions){if(available(s,t)<0)throw new Error('Bankhändelsen skulle bli överfördelad.');const children=s.transactions.filter(c=>c.parentId===t.id&&!c.ignored);if(children.length&&(t.kind!=='batch'||t.ignored||t.duplicateOf||available(s,t)!==Math.abs(t.amount)||children.reduce((n,c)=>n+c.amount,0)!==t.amount||children.some(c=>Math.sign(c.amount)!==Math.sign(t.amount))))throw new Error('Samlingspostens underlag och delbetalningar är inte avstämda.');}
  if(s.invoices.length>5000||s.transactions.length>15000)throw new Error("Registret är fullt. Exportera underlaget och kontakta systemadministratören.");return{state:s,message};
+ }catch(error){
+  if(['transactions.import','bankgiro.import'].includes(command.type)){
+   const retained=bankImportEvidenceError(current,s,error instanceof Error?error.message:'Bankimporten avbröts.');if(retained)throw retained;
+  }
+  throw error;
+ }
 }
 export function demoState():State{
  let s=emptyState();s.company.name="M.George Vitvaror AB · demo";const day=today(),offset=(n:number)=>{let d=new Date(day+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);};
