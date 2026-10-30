@@ -97,11 +97,11 @@ Interfaces: `gmailStatus(summary)` keeps the document-review API available. The 
 
 ## Task 7 — Main and existing-Site delivery
 
-- [ ] Refresh main, reconcile concurrent work, commit and push without force.
-- [ ] Verify exact GitHub SHA and Actions checks.
-- [ ] Sync only the tested Sites changes into the existing source checkout, preserving configuration and runtime binding identity.
-- [ ] Package and publish using the supported Sites workflow; verify returned version/deployment.
-- [ ] Perform bounded read-only production checks and save the exact continuation state.
+- [x] Refresh main, reconcile concurrent work, commit and push without force.
+- [x] Verify exact GitHub SHA and Actions checks.
+- [x] Sync only the tested Sites changes into the existing source checkout, preserving configuration and runtime binding identity.
+- [x] Package and publish using the supported Sites workflow; verify returned version/deployment.
+- [x] Perform bounded read-only production checks and save the exact continuation state.
 
 ## Execution rulings
 
@@ -116,3 +116,10 @@ Interfaces: `gmailStatus(summary)` keeps the document-review API available. The 
 - Independent review raised and closed persistent conflict, inherited hold, rollback retention, original-validation fixed-point, truthful overview and blocked-status issues. Final code verdict: no outstanding Critical/Important finding in the bounded diff.
 - Browser evidence and limitations: `docs/screenshots/quality-33/ui-verification.json`; actual dialog focus restoration reproduced and fixed. Temporary QA HTML removed.
 - Full change/evidence/continuation report: `docs/QUALITY-33-DELIVERY.md`. All33scores are in `QUALITY-SCORECARD.md`; no complete-goal certification.
+
+## Publication outcome
+
+- Program main 791bfae7fea426eabf277948b4be4be4b445711d; both Actions jobs success in 41077406198.
+- Sites source df99151555015dd5cb3e99247f6baef094847577, version 32, deployment appgdep_6ae4b30ac7b08191a538a3bf9eb0877a succeeded; runtime 9 unchanged.
+- Read-only production status passed; public signed-out browser view checked. Authenticated browser workflow remains explicitly unverified because the separate browser requires OpenAI sign-in.
+- Full evidence and continuation: QUALITY-33-DELIVERY.md and QUALITY-33-PUBLICATION.json. All implementation-plan tasks are accounted for; this does not close all 33 quality criteria.

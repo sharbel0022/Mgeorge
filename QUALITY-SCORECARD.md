@@ -79,10 +79,10 @@ Följande statusvärden har rapporterats från samordnarens aktuella läsande pr
 
 Äldre rapporter kan beskriva andra antal original eller aktiva scheman. Dessa historiska värden ersätter inte observationerna ovan.
 
-### G-D / G-P — leveransgrindar att uppdatera
+### G-D / G-P — verifierade leveransgrindar
 
-- **G-D:** Båda projektens senaste `npm audit` rapporterar **0 sårbarheter i samtliga allvarlighetsklasser**, enligt samordnarens slutkontroll. **G-D är godkänd lokalt:** Node 377/377, Sites 456/456, syntax 63 filer, TypeScript, produktionsbygge och oberoende slutreview passerade. Exakta kommandon och omfattning finns i `docs/QUALITY-33-DELIVERY.md`. GitHub Actions för publicerad SHA verifieras i G-P.
-- **G-P:** Samordnaren fyller i slutlig `main`-SHA, verifierat GitHub Actions-resultat, Sites-källrevision, version/deployment-ID, publiceringsutfall och läsande efterkontroll. Dessa fält är **inte verifierade av denna scorecardversion**.
+- **G-D:** Båda projektens senaste `npm audit` rapporterar **0 sårbarheter i samtliga allvarlighetsklasser**, enligt samordnarens slutkontroll. **G-D är godkänd lokalt:** Node 377/377, Sites 456/456, syntax 63 filer, TypeScript, produktionsbygge och oberoende slutreview passerade. Exakta kommandon och omfattning finns i `docs/QUALITY-33-DELIVERY.md`. GitHub Actions för exakt programcommit är också godkänd enligt G-P.
+- **G-P: GODKÄND för kod/publicering.** Programcommit `791bfae7fea426eabf277948b4be4be4b445711d` finns på main; [Actions 41077406198](https://github.com/sharbel0022/Mgeorge/actions/runs/41077406198) godkände både Node och Sites. Sites-källa `df99151555015dd5cb3e99247f6baef094847577` publicerades som **version 32**, deployment `appgdep_6ae4b30ac7b08191a538a3bf9eb0877a`, **succeeded**, runtime-revision 9. Identitet, policy, DB/R2 och schema-ID/lägen är bevarade. Läsande status och utloggad webbsida verifierade. Fullständigt inloggat webbflöde är fortfarande B2, inte godkänt genom publiceringen. Se `docs/QUALITY-33-PUBLICATION.json` och `docs/QUALITY-33-DELIVERY.md`.
 - Historiskt bevis: `docs/V4-PUBLICATION.md` dokumenterar Sites **version 31** och tidigare publicering. Detta verifierar inte denna körnings ändringar.
 - Produktionsdatabas, dokumentlagring, projekt/domän, användaridentitet, runtimehemligheter och anslutningar ska bevaras. Ingen destruktiv återställning, automatisk bankbetalning eller riktig kundsändning ingår i verifieringen.
 
@@ -134,10 +134,12 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 | 29 | Säkerhetskopiering | 2 | 2 | 2 | 1,5 | 1 | **8,5** | P0 |
 | 30 | Säkerhet och åtkomstkontroll | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
 | 31 | Katastrofåterställning | 1,5 | 2 | 2 | 1 | 0 | **6,5** | P0 |
-| 32 | Kodkvalitet och tester | 2 | 2 | 1,5 | 1,5 | 0,5 | **7,5** | P4 |
-| 33 | Verifiering i verklig produktion | 1,5 | 1 | 1,5 | 1 | 0,5 | **5,5** | P4 |
+| 32 | Kodkvalitet och tester | 2 | 2 | 2 | 1,5 | 1 | **8,5** | P4 |
+| 33 | Verifiering i verklig produktion | 1,5 | 1 | 1,5 | 1 | 1 | **6** | P4 |
 
-**Aritmetisk summa:** 243,5 av 330. **Likaviktat medelbetyg:** 7,38/10 (243,5 ÷ 33). **Områden på minst 9,5:** 0 av 33. Lägsta områdespoäng: 5; högsta: 8,5. Medelvärdet är inte ett godkännande av betalningsidentifiering, automatisering eller produktion.
+**Aritmetisk summa:** 245 av 330. **Likaviktat medelbetyg:** 7,42/10 (245 ÷ 33). **Områden på minst 9,5:** 0 av 33. Lägsta områdespoäng: 5; högsta: 8,5. Medelvärdet är inte ett godkännande av betalningsidentifiering, automatisering eller produktion.
+
+**Ny evidens efter publicering:** område 32 får K=2 och P=1 genom fulla slutgrindar, godkänd Actions på exakt programcommit och verifierad motsvarande Sites-källa/bygge; poängen går från 7,5 till 8,5. Område 33 får P=1 för den nya lyckade publiceringen och läsande efterkontrollen; 5,5 blir 6. Ingen annan poäng höjs. Detta är en dokumenterad förändring från samma körnings före-publicering-bedömning, inte en påhittad äldre produktbaslinje.
 
 ## Bedömning område för område
 
@@ -438,7 +440,7 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 - **Exakta tester och resultat:** `test/api.test.js`, `test/bank-api.test.js`, `test/gmail-api.test.js`, `test/customer-messages-api.test.js`; `sites/tests/banking-security.test.mjs`, `sites/tests/gmail.test.mjs`, `sites/tests/customer-messages.test.mjs`. E-N/E-S. Beroendegranskning av slutlig revision registreras separat i G-D.
 - **Kod-, API- eller UI-evidens:** `src/security.js`, `src/server.js`, `sites/lib/banking/security.ts`, `sites/lib/server.ts`, `sites/lib/banking/mcp.ts`.
 - **Återstående problem:** Ingen full aktuell säkerhetsgranskning av autentiserad produktionsruntime, alla åtkomstroller och slutlig deployment. Hash bevisar integritet, inte bankens avsändarautenticitet.
-- **Prioritet och nästa åtgärd:** P0. Slutför båda audits och CI på leveransrevisionen; kontrollera publicerad åtkomstisolering och känsliga statusytor utan att exportera företagsdata.
+- **Prioritet och nästa åtgärd:** P0. Behåll de godkända audit-/CI-bevisen enligt G-P; kontrollera återstående publicerad åtkomstisolering och känsliga statusytor utan att exportera företagsdata.
 - **Produktionsverifiering / extern blockerare:** Ja. B2; G-D är intern leveransgrind.
 
 ### 31. Katastrofåterställning — 6,5/10
@@ -451,29 +453,29 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 - **Prioritet och nästa åtgärd:** P0. Planera och genomför isolerat katastrofprov från en godkänd kopia med separata resurser; mät tid, fullständighet och nyckeltillgänglighet.
 - **Produktionsverifiering / extern blockerare:** Ja. B6 och överenskomna RPO/RTO; destruktiv produktionsåterställning kräver separat godkännande.
 
-### 32. Kodkvalitet och tester — 7,5/10
+### 32. Kodkvalitet och tester — 8,5/10
 
 - **Acceptanskriterier:** Reproducerade fel ska ha regressioner; båda implementationer ska följa samma beviskrav; fulla tester, syntax/typer, audit, build och CI ska vara gröna för samma revision.
 - **Verifierat:** Flera konkreta fel har reproducerats före fix. Senaste rapporterade fulla Node-svit är 377/377 och Sites 456/456. Oberoende review har identifierat och fått original-/konfliktfall rättade. Båda slutliga audits har 0 sårbarheter; den sista fokusfixen ingår i den slutliga godkända Sites-sviten och bygget.
 - **Exakta tester och resultat:** `test/node-payments-quality-cycle.test.js`, båda `document-quality-cycle`-filerna, `sites/tests/sites-payments-quality-cycle.test.mjs`, `sites/tests/economy-quality-cycle.test.mjs`, `sites/tests/bank-original-quality-cycle.test.mjs`. Exakta slutkommandon och grindstatus finns i evidensregistret.
 - **Kod-, API- eller UI-evidens:** Befintlig Node/SQLite- och Sites/Workers/D1/R2-struktur samt `.github/workflows/payment-control-ci.yml` bevaras; arbetsplan `docs/QUALITY-33-PLAN.md`.
-- **Återstående problem:** Lokala slutgrindar och bygge är godkända. CI för leverans-SHA ska ännu registreras. Audits är gröna; detta ersätter inte exakt revisionskoppling.
+- **Återstående problem:** Lokala slutgrindar, produktionsbygge och CI är gröna och kopplade till programcommit enligt G-P. Fortsatt underhåll av parallella regelmotorer, mätning av verklig kvalitet och verifiering av återstående driftkrav behövs; koden är inte formellt verifierad.
 - **Prioritet och nästa åtgärd:** P4. Kör alla grindar på exakt leveransrevision, verifiera Actions och uppdatera resultat/SHA här och i PROGRESS.md; ändra inte poäng utan ny evidens.
-- **Produktionsverifiering / extern blockerare:** Produktionsverifiering krävs för systembeteende; kodgrindarna kan avslutas utan företagsdata. G-S/G-D/G-P är interna kvarstående grindar.
+- **Produktionsverifiering / extern blockerare:** Produktionsverifiering krävs för systembeteende; kodgrindarna kan avslutas utan företagsdata. G-S/G-D/G-P är godkända för denna kod/publicering; återstående verksamhets- och produktionsbevis är separata.
 
-### 33. Verifiering i verklig produktion — 5,5/10
+### 33. Verifiering i verklig produktion — 6/10
 
 - **Acceptanskriterier:** Rätt main-SHA och Sites-version ska vara publicerade i samma projekt; bevarade resurser/identitet; inloggade flöden och autentiskt bank-/dokumentunderlag ska verifiera målet.
-- **Verifierat:** Tidigare publicering av version 31 finns dokumenterad. Aktuella läsande statusvärden finns för bank, Gmail, OCR och backup. Chromium-demo har kontrollerats med syntetiska data.
+- **Verifierat:** Version 32 är publicerad med succeeded och samma projekt/resurser/policy/scheman. Main och båda Actions-jobben är verifierade. Bank, den nya begränsade Gmail-statusen och backup svarade; utloggad produktionsvy laddade. Chromium-demo har kontrollerats med syntetiska data.
 - **Exakta tester och resultat:** E-N/E-S är lokala tester; E-UI är lokal/hanterad förhandsvisning. E-PROD är läsande status. Ingen av dessa ersätter ett aktuellt inloggat produktionsflöde. `docs/V4-PUBLICATION.md` är historiskt versionsbevis.
-- **Kod-, API- eller UI-evidens:** `docs/V4-PUBLICATION.md`, `docs/V4-SWEDBANK-CHANNELS.md`, E-PROD och kommande G-P. Befintligt projekt och domän ska behållas.
-- **Återstående problem:** Ny leverans-SHA/deployment och slutlig efterkontroll saknas i denna bedömning. Autentisk individuell bankrapport, full dokumentkedja, avstängd dator och produktionsåterställningsprov saknas.
+- **Kod-, API- eller UI-evidens:** `docs/V4-PUBLICATION.md`, `docs/V4-SWEDBANK-CHANNELS.md`, E-PROD, godkänd G-P och `docs/QUALITY-33-PUBLICATION.json`. Befintligt projekt och domän ska behållas.
+- **Återstående problem:** Kodens leverans-SHA, deployment och läsande efterkontroll finns enligt G-P. Den separata webbläsaren nådde OpenAI:s inloggningsformulär och saknar autentiserad session. Full inloggad kedja, autentisk individuell bankrapport, full dokumentkedja, avstängd dator och produktionsåterställningsprov saknas.
 - **Prioritet och nästa åtgärd:** P4. Avsluta kod-/publiceringsgrindarna och verifiera tillåtna aktuella flöden. Fortsätt dokumentera externa blockerare; rapportera inte 9,5 i alla områden.
-- **Produktionsverifiering / extern blockerare:** Ja, detta är själva områdets kärna. B1–B6 samt interna G-S/G-D/G-P.
+- **Produktionsverifiering / extern blockerare:** Ja, detta är själva områdets kärna. B1–B6. De interna kod-/publiceringsgrindarna är godkända men ersätter inte dessa krav.
 
 ## Fortsättning och ändringsregel
 
-1. G-S och G-D är avslutade för den lokala slutkoden. G-P avslutas först med verifierad GitHub-/Sites-publicering. Rätta nya konkreta integritetsfel med en reproduktion.
+1. G-S, G-D och G-P för kod/publicering är avslutade. Nästa körning hämtar main, läser aktuellt publiceringsbevis och fortsätter med öppna krav. Rätta nya konkreta integritetsfel med en reproduktion.
 2. Bevara separata bevis för GitHub och Sites. Fyll i slutliga counts/SHA/deployment-resultat utan att omtolka gamla körningar som nya.
 3. Bankdialogens Enter/Escape/fokusretur är avslutad. Utöka tangentbords-, fokus- och navigationsmatrisen till återstående vyer och mobilmeny; behandla iframe-begränsningen uttryckligen.
 4. Hantera Gmail-pausen och verifiera faktiskt moln-OCR-utfall. Respektera befintliga scheman och behörigheter.

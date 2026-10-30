@@ -1,0 +1,92 @@
+{
+  "observed_at_utc": "2026-10-30 15:13:08 UTC",
+  "program_commit": "791bfae7fea426eabf277948b4be4be4b445711d",
+  "ci": {
+    "run_id": 41077406198,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41077406198",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": {
+      "test": "success",
+      "sites": "success"
+    }
+  },
+  "tests": {
+    "node": 377,
+    "sites": 456,
+    "failed": 0,
+    "skipped": 0,
+    "javascript_files_checked": 63,
+    "typecheck": "passed",
+    "production_build": "passed",
+    "audit_node_total": 0,
+    "audit_sites_total": 0
+  },
+  "site": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version_number": 32,
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_56a5eb74cd2c8191b688c1f017b44fda",
+    "source_commit": "df99151555015dd5cb3e99247f6baef094847577",
+    "deployment_id": "appgdep_6ae4b30ac7b08191a538a3bf9eb0877a",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/",
+    "env_set_revision": 9,
+    "source_files_compared": 268,
+    "local_archive_sha256": "c68bbc0a994afacbb1b9bca75e07105602ce6d4ac514452b98e42c2b506a548a",
+    "normalized_archive_hash": "sha256:d470db8d816e97aa72a6d17b9491d63ab60b1462085f3a7988cee90053f2167e"
+  },
+  "preserved": {
+    "manifest": true,
+    "d1_binding": "DB",
+    "r2_binding": "BUCKET",
+    "auth_client": true,
+    "access_policy": true,
+    "schedules": true
+  },
+  "production_checks": {
+    "bank": {
+      "enabled": true,
+      "connected": true,
+      "intervalHours": 6,
+      "lastSyncedAt": "2026-10-30T14:09:57.164Z",
+      "blocked": false,
+      "failures": 0,
+      "hasError": false,
+      "hasPostprocessWarning": false
+    },
+    "gmail": {
+      "state": "stale",
+      "last_successful_fetch": "2026-10-29T15:00:48.512Z",
+      "background_ready": false,
+      "schedule_verified": false,
+      "external_schedule_enabled": false,
+      "has_documents": false,
+      "has_tokens": false,
+      "tool_response_characters": 2614,
+      "cloud_worker_last_seen": "2026-10-30T09:54:51.601Z"
+    },
+    "backup": {
+      "day": "2026-10-30",
+      "status": "complete",
+      "files": 191,
+      "copied": 191,
+      "bytes": 63448066,
+      "verified_at": "2026-10-30T01:27:38.129Z"
+    },
+    "browser_signed_out": "loaded, four unknown amount cards, sign-in required",
+    "browser_authenticated_flow": false
+  },
+  "limits": [
+    "Authentic individual Swedbank report and contracted MIG/XSD/channel unavailable",
+    "Separate browser session requires OpenAI sign-in; authenticated UI chain not completed",
+    "External Gmail schedule preserved disabled",
+    "Production OCR completion with the user computer off unverified",
+    "Independent recovery of the current production backup unverified"
+  ],
+  "rollback": {
+    "version_number": 31,
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_b454b3b7ac20819192cc260b714f858b",
+    "source_commit": "de8f49f924b8afde4772cba814b300e4dc41399d",
+    "caution": "Retain data and keys; previous code lacks new evidence holds."
+  }
+}

@@ -120,3 +120,14 @@ Användaren begärde därefter uttryckligen main och Sites-publicering. PR #12 m
 - Läsande förkontroll: dagens backup 191/191 original verifierad; bankanslutning aktiv med sex timmars hämtning. Gmail-timschemat är **inaktiverat** och senaste lyckade hämtning är 29 oktober. Detta körläge behålls. Moln-OCR kräver fortsatt faktisk driftevidens.
 - [Full rapport och fortsättningsplan](docs/QUALITY-33-DELIVERY.md), [33-områdesbedömning](QUALITY-SCORECARD.md), [UI-evidens](docs/screenshots/quality-33/ui-verification.json). Ny `AGENTS.md` gör läsningen av dessa dokument till nästa körnings startpunkt.
 - Main-/Actions-/Sites-publiceringsbevis läggs till efter faktiskt slutförd integration. **Målet 9,5 i alla 33 är inte uppnått**; extern Swedbankrapport/MIG/kanal, pausat Gmail-schema, verklig OCR-precision och oberoende katastrofåterställning återstår. Ingen bakgrundsutveckling är konfigurerad.
+
+
+## 33 kvalitetsområden — main och Sites 32 publicerade
+
+- Programcommit **791bfae7fea426eabf277948b4be4be4b445711d** verifierad på main med exakt samma träd som den testade koden. Framåtriktad uppdatering med förväntad bas, inget force-push. [Actions 41077406198](https://github.com/sharbel0022/Mgeorge/actions/runs/41077406198): **success** för både Node och Sites.
+- Befintligt Sites-projekt uppdaterat till **version 32**, källa **df99151555015dd5cb3e99247f6baef094847577**, deployment **appgdep_6ae4b30ac7b08191a538a3bf9eb0877a**, status **succeeded** 30 oktober 15:09:19 UTC. 268 spårade Sites-filer bytejämförda; separat installation, typkontroll och produktionsbygge godkända.
+- Samma projekt/domän, DB/R2, autentiseringsklient, åtkomstpolicy, runtime-revision 9 och tre scheman bevarade. Bank/backup aktiva, Gmail fortsatt pausat.
+- Läsande efterkontroll: bank ansluten med noll fel, dagens backup 191/191 verifierad, nya Gmail-statusen korrekt **stale** och begränsad till 2 614 tecken utan dokument eller tokens. Den publika utloggade webbvyn visar okända belopp. Kontrollwebbläsaren kräver en separat OpenAI-inloggning; full inloggad användarkedja är därför inte verifierad.
+- [Maskinläsbara publiceringsbevis](docs/QUALITY-33-PUBLICATION.json) och [slutrapport](docs/QUALITY-33-DELIVERY.md). Efter konkret CI-/publiceringsevidens är den dokumenterade summan 245/330 = **7,42/10**. **0/33** områden är verifierade till minst 9,5; 33 återstår. Detta är verifieringsgraden i den redovisade bedömningen, inte en uppmätt felfrihetsprocent.
+- Kvalitetsmålet är fortsatt öppet. Nästa steg: autentiskt bankunderlag/MIG/kanal, kontrollerad konfliktlösning, pausad Gmail-automatik och moln-OCR, återstående mobil/tillgänglighetskontroller, autentiserad produktionskedja och isolerat katastrofprov. Följ den exakta planen i slutrapporten.
+- Lokala previewprocessen stoppad, temporär QA-sida borttagen. Ingen kundsändning, bankbetalning, produktionsåterställning eller bakgrundsutveckling utförd/konfigurerad.

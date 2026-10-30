@@ -2,7 +2,7 @@
 
 ## Leveransens omfattning
 
-Denna körning genomför flera analys-, reproduktions-, rättnings- och granskningscykler mot användarens 33 kvalitetsområden. Ekonomisk korrekthet, bevarade original och ärlig driftstatus prioriteras. Slutliga publiceringsidentiteter och läsande efterkontroller kompletteras nedan efter faktisk publicering.
+Denna körning genomför flera analys-, reproduktions-, rättnings- och granskningscykler mot användarens 33 kvalitetsområden. Ekonomisk korrekthet, bevarade original och ärlig driftstatus prioriteras. Slutliga publiceringsidentiteter och läsande efterkontroller finns nedan och i `QUALITY-33-PUBLICATION.json`.
 
 **Kodkontrollerna godkänner den här avgränsade leveransen. Hela målet om 9,5/10 i alla 33 områden är inte uppnått.** Den fullständiga bedömningen finns i [QUALITY-SCORECARD.md](../QUALITY-SCORECARD.md). Saknat bankoriginal, företagsavtal och faktisk driftverifiering ersätts inte med syntetiska tester.
 
@@ -66,7 +66,7 @@ Browserkontrollen använde den stödda lokala Sites-förhandsvisningen och en ve
 
 Enter öppnade betalningsdialogen och Escape stängde den. Ett faktiskt fokusfel reproducerades även utanför iframen: stängning lämnade fokus på BODY. Rättningen återför fokus till den öppnande knappen. Efterkontrollen visade rätt knapp och en synlig solid fokusram på 3 px. Den lilla React-effekten granskades separat.
 
-Bevis: [UI-mätningar](screenshots/quality-33/ui-verification.json), [översikt](screenshots/quality-33/overview-desktop.jpg), [mobil dialog](screenshots/quality-33/payment-detail-mobile.jpg) och [tangentbordsfokus](screenshots/quality-33/bank-keyboard-desktop.jpg). Skärmbilderna innehåller bara demodata. Den tillfälliga testinramningen ingår inte i leveransen.
+Bevis: [UI-mätningar](screenshots/quality-33/ui-verification.json), [översikt](screenshots/quality-33/overview-desktop.jpg), [mobil dialog](screenshots/quality-33/payment-detail-mobile.jpg) och [tangentbordsfokus](screenshots/quality-33/bank-keyboard-desktop.jpg). De tre lokala skärmbilderna innehåller bara demodata; den separata produktionsbilden visar utloggat läge utan företagsbelopp. Den tillfälliga testinramningen ingår inte i leveransen.
 
 Begränsningar: dessa är CSS-vyer i Chromium, inte fysiska enheter eller fullständig skärmläsar-/flerwebbläsarcertifiering. Mobilmenyns pekarsekvens blev inte slutligt verifierad. Shift+Tab kunde lämna testiframen; ett fullständigt fokusprov för alla dialogvarianter återstår. Dessa delar markeras inte som godkända enbart på grund av breddmätningen.
 
@@ -119,4 +119,31 @@ Föregående verifierade Sites-version **31** finns kvar som `appgprj_6adf2f7f7e
 
 Publicera i samma projekt `appgprj_6adf2f7f7e848191b64192161886b528` med befintliga D1-bindningen `DB`, R2-bindningen `BUCKET`, autentiseringsklient och domän. Sites-ändringen kräver ingen ny SQL-migration. Node använder en additiv konfliktkolumn. En eventuell kodrollback ska behålla data och nycklar; äldre kod saknar de nya spärrarna och bör därför bedömas innan återaktivering av automatiska flöden. Ingen destruktiv databasåterställning ingår i återgången.
 
-Slutliga main-/Actions-/Sites-identiteter och efterkontroller läggs till här när de finns som faktiska resultat.
+### Verifierad publicering 2026-10-30
+
+| Bevis | Slutligt resultat |
+|---|---|
+| Programkod på main | `791bfae7fea426eabf277948b4be4be4b445711d` |
+| GitHub Actions | [41077406198](https://github.com/sharbel0022/Mgeorge/actions/runs/41077406198), **success**, både `test` och `sites` på exakt programcommit |
+| Sites-källcommit | `df99151555015dd5cb3e99247f6baef094847577` |
+| Källjämförelse | Samtliga **268** spårade Sites-filer byteidentiska med main:s testade källa; ny installation, typkontroll och bygge passerade även i Sites-källcheckouten |
+| Publicerad version | **32** |
+| Versions-ID | `appgprj_6adf2f7f7e848191b64192161886b528~appgver_56a5eb74cd2c8191b688c1f017b44fda` |
+| Deployment-ID | `appgdep_6ae4b30ac7b08191a538a3bf9eb0877a` |
+| Utfall | **succeeded**, 2026-10-30 15:09:19 UTC, runtime-revision **9** |
+| Publicerad adress | [MG Fakturakoll](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/) |
+| Lokalt gzip-arkiv, SHA-256 | `c68bbc0a994afacbb1b9bca75e07105602ce6d4ac514452b98e42c2b506a548a` |
+| Plattformens normaliserade arkivhash | `sha256:d470db8d816e97aa72a6d17b9491d63ab60b1462085f3a7988cee90053f2167e`, 325 filer |
+
+GitHub-integrationen använde en vanlig framåtriktad referensuppdatering med förväntad tidigare SHA; inget force-push. Det skapade trädet jämfördes exakt med det testade och staged trädet, och main hämtades tillbaka för kontroll. Efterföljande dokumentationscommit kompletterar bevisen utan att ändra programkod eller Sites-källa.
+
+Sites publicerades med det ordinarie käll-/bygg-/arkivflödet. Efterkontrollen bekräftade samma projekt/domän, autentiseringsklient, åtkomstpolicy och samtliga schema-ID:n och aktiveringslägen. `DB`/`BUCKET` och manifestet är oförändrade. Inga runtimehemligheter, medgivanden, anslutningar eller nya SQL-migrationer ändrades.
+
+Läsande efterkontroller svarade utan fel:
+
+- Bank: ansluten och aktiverad, sex timmar, fortfarande senaste lyckade hämtning `2026-10-30T14:09:57.164Z`, noll fel och inga efterkontrollvarningar.
+- Gmail: den nya publicerade statusen är **stale**, `background_ready: false`, `schedule_verified: false`. Senaste lyckade hämtningen är `2026-10-29T15:00:48.512Z`. Det externa schemat förblir avstängt. Det serialiserade statusverktygssvaret var **2 614 tecken**, utan dokumentlista, dokumenttext eller tokens. Detta verifierar att det nya begränsade statusflödet faktiskt körs i produktion.
+- Backup: fortfarande dagens kompletta **191/191 original**, 63 448 066 byte, verifiering `2026-10-30T01:27:38.129Z`, utan fel.
+- Webb: den publicerade sidan laddade och visade fyra okända belopp samt krav på ChatGPT-inloggning. [Produktionsbild i utloggat läge](screenshots/quality-33/production-signed-out.jpg). Inloggningslänken ledde till OpenAI:s vanliga inloggningsformulär; den separata kontrollwebbläsaren saknade en autentiserad ChatGPT-session. Därför är **det fullständiga inloggade webbflödet fortfarande inte verifierat**. Autentiserade anslutna statusanrop ersätter inte det användarflödet.
+
+Detaljerad maskinläsbar leveransevidens: [QUALITY-33-PUBLICATION.json](QUALITY-33-PUBLICATION.json). Den lokala previewprocessen är stoppad. Kod- och publiceringscykeln är avslutad; verksamhetsmålet och de uttryckliga fortsättningspunkterna är kvar. Ingen fortsatt bakgrundskörning har skapats.
