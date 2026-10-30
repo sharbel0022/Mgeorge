@@ -83,7 +83,7 @@ Begränsningar: dessa är CSS-vyer i Chromium, inte fysiska enheter eller fullst
 | `git diff --check` | Rent | Godkänt |
 | Sites produktionsbygge | Befintligt bygge | **Godkänt, exit 0, Build complete** |
 
-Totalt **833 godkända tester**, jämfört med 706 i den separat körda rena basen. Lokal Node-version: 24.22.1; GitHub Actions använder Node 22 och verifieras separat efter push. Installationerna `npm ci` och Sites `npm run install:ci` genomfördes. Inga paketversioner eller låsfiler ändrades.
+Totalt **833 godkända tester**, jämfört med 706 i den separat körda rena basen. Lokal Node-version: 24.22.1; GitHub Actions använder Node 22 och verifierades separat efter push med godkänt resultat. Installationerna `npm ci` och Sites `npm run install:ci` genomfördes. Inga paketversioner eller låsfiler ändrades.
 
 Den hanterade miljön krävde tillåtelse för lokala testsockets och nätverk. De initialt nekade miljökörningarna räknas inte som godkända tester. I samma miljö reproducerades att två shellskript försökte exekvera varandra trots filmode 100644. De använder nu uttryckligen `bash`, och produktionsbygget körs med den stödda Sites-profilen.
 
@@ -117,7 +117,7 @@ Nästa körning läser `AGENTS.md`, `PROGRESS.md`, `QUALITY-SCORECARD.md` och de
 
 Föregående verifierade Sites-version **31** finns kvar som `appgprj_6adf2f7f7e848191b64192161886b528~appgver_b454b3b7ac20819192cc260b714f858b`, källcommit `de8f49f924b8afde4772cba814b300e4dc41399d`. Dess deploymentstatus kontrollerades som `succeeded` med runtime-revision **9** inför denna leverans.
 
-Publicera i samma projekt `appgprj_6adf2f7f7e848191b64192161886b528` med befintliga D1-bindningen `DB`, R2-bindningen `BUCKET`, autentiseringsklient och domän. Sites-ändringen kräver ingen ny SQL-migration. Node använder en additiv konfliktkolumn. En eventuell kodrollback ska behålla data och nycklar; äldre kod saknar de nya spärrarna och bör därför bedömas innan återaktivering av automatiska flöden. Ingen destruktiv databasåterställning ingår i återgången.
+Publiceringen gjordes i samma projekt `appgprj_6adf2f7f7e848191b64192161886b528` med befintliga D1-bindningen `DB`, R2-bindningen `BUCKET`, autentiseringsklient och domän. Sites-ändringen kräver ingen ny SQL-migration. Node använder en additiv konfliktkolumn. En eventuell kodrollback ska behålla data och nycklar; äldre kod saknar de nya spärrarna och bör därför bedömas innan återaktivering av automatiska flöden. Ingen destruktiv databasåterställning ingår i återgången.
 
 ### Verifierad publicering 2026-10-30
 

@@ -337,11 +337,11 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 
 - **Acceptanskriterier:** Bokförd betalning, rätt riktning/valuta/konto, entydig referens och faktura, verifierad motpart, tillgängligt original och korrekt återstående saldo krävs.
 - **Verifierat:** Återbetalningar, egna överföringar, löner och kortuttag kan inte reglera vanliga fakturor automatiskt. Stabilt bank-ID med motstridiga fakta spärras, gamla original och allokeringar bevaras för granskning.
-- **Exakta tester och resultat:** `test/reconciliation.test.js`, `test/node-payments-quality-cycle.test.js`, `test/payment-concurrency.test.js`; `sites/tests/sites-payments-quality-cycle.test.mjs`, `sites/tests/customer-messages.test.mjs`. E-N/E-S. `sites/tests/bank-original-quality-cycle.test.mjs` prövar saknat original, föräldraoriginal och borttagna motpartsbevis; fasta-punkt-fallet ingår i det godkända 456-resultatet. G-S avser återkörning efter sista fokusfixen.
+- **Exakta tester och resultat:** `test/reconciliation.test.js`, `test/node-payments-quality-cycle.test.js`, `test/payment-concurrency.test.js`; `sites/tests/sites-payments-quality-cycle.test.mjs`, `sites/tests/customer-messages.test.mjs`. E-N/E-S. `sites/tests/bank-original-quality-cycle.test.mjs` prövar saknat original, föräldraoriginal och borttagna motpartsbevis; fasta-punkt-fallet ingår i det godkända 456-resultatet. G-S omfattar den godkända återkörningen efter sista fokusfixen.
 - **Kod-, API- eller UI-evidens:** `src/reconciliation.js`, `src/db.js`, `sites/lib/reconciliation.ts`, `sites/lib/reconciliation-engine.js`, `sites/lib/reconciliation-evidence.ts`.
-- **Återstående problem:** Ingen fullständig jämförelse mot autentiska individuella företagsbetalningar. Originalvalideringen är grön och oberoende granskad; slutlig G-S efter fokusfix och publiceringsgrindarna återstår.
-- **Prioritet och nästa åtgärd:** P0. Slutför G-S, därefter läsande jämförelsekörning mot godkända autentiska data; verifiera att inga förslag ändrar saldo.
-- **Produktionsverifiering / extern blockerare:** Ja. B1 och B2; G-S är intern leveransgrind, inte extern blockerare.
+- **Återstående problem:** Ingen fullständig jämförelse mot autentiska individuella företagsbetalningar. Originalvalideringen, den slutliga G-S-körningen och publiceringsgrindarna är godkända. Jämförelse mot autentiska bankunderlag och fullständig inloggad produktionsverifiering återstår.
+- **Prioritet och nästa åtgärd:** P0. Genomför en läsande jämförelsekörning mot godkända autentiska data och ett tillåtet inloggat produktionsflöde; verifiera att inga förslag ändrar saldo.
+- **Produktionsverifiering / extern blockerare:** Ja. B1 och B2. G-S är en avslutad intern leveransgrind, inte en extern blockerare.
 
 ### 21. Delbetalningar — 8/10
 
