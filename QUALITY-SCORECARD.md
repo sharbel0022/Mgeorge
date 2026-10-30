@@ -6,6 +6,14 @@ Detta är den första samlade, dokumenterade bedömningen mot användarens 33 om
 
 Bedömningen är konservativ och avser **verifierad kvalitet inom den redovisade omfattningen**, inte en statistiskt uppmätt felfrihetsgrad. En godkänd kodleverans är inte bevis för bankens rapporttäckning, avslutad moln-OCR eller fullständig företagsavstämning. Alla lokala testdata är syntetiska. Inga autentiserade produktionsflöden i webbläsaren har verifierats i denna bedömning.
 
+## Aktivt åttatimmarsarbete: cykel 1A
+
+Start 2026-10-30 15:31:15 UTC från `c519eef47e5a084a35db7675a2553a554c55ec4c`: **245/330 = 7,42**, 0/33 på 9,5. Node-delleveransen har nu **407/407 Node +456/456 oförändrade Sites-tester**, syntax65, TypeScript, två nollfyndsaudits och godkänt produktionsbygge i en isolerad checkout. Se [cykelrapport](docs/QUALITY-8H-NODE-CYCLE1.md) och [källmanifest](docs/QUALITY-8H-NODE-CYCLE1.json). Main/CI-bevis kompletteras efter push; Sites är fortfarande32.
+
+Nya reproduktioner visar öppna fel i kontroll-idempotens/lease och backupens originalverifiering. Därför sänks S för områden26,28,29,31, totalt **2,5 poäng**. Aktuell summa **242,5/330 = 7,35**, fortfarande0/33. Detta är en mer fullständig bedömning av befintliga fel, inte en påstådd regression skapad av Node-rättningen. Kritiska bankerfarenheter och extern verksamhetsevidens får inte vägas bort av ett medelvärde. Samtliga öppna lokala fynd fortsätter i nästa cykel.
+
+De äldre evidensavsnitten nedan beskriver leveransen före detta uppdrag om inte cykel1A uttryckligen anges. Den aktuella deltaöversikten längst ned kompletterar alla33 områden och är styrande för nästa arbete.
+
 ## Reproducerbar bedömningsmodell
 
 Varje område får fem delpoäng om 0–2, i steg om 0,5. Områdespoängen är exakt **F + S + K + U + P**. Översiktstabellen redovisar varje delpoäng; motiveringen och granskningsbara källorna står under respektive område. En annan granskare kan sänka en delpoäng om angivet bevis inte stödjer den.
@@ -128,16 +136,16 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 | 23 | Flera fakturor i en betalning | 1,5 | 2 | 2 | 1,5 | 0,5 | **7,5** | P0 |
 | 24 | Betalningshistorik | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
 | 25 | Betalningsstatus | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
-| 26 | Kontrollera alla betalningar | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P2 |
+| 26 | Kontrollera alla betalningar | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P2 |
 | 27 | Automatiska mejlutkast | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P2 |
-| 28 | Schemalagd automatisering | 1,5 | 2 | 2 | 1 | 0 | **6,5** | P2 |
-| 29 | Säkerhetskopiering | 2 | 2 | 2 | 1,5 | 1 | **8,5** | P0 |
+| 28 | Schemalagd automatisering | 1,5 | 1,5 | 2 | 1 | 0 | **6** | P2 |
+| 29 | Säkerhetskopiering | 2 | 1 | 2 | 1,5 | 1 | **7,5** | P0 |
 | 30 | Säkerhet och åtkomstkontroll | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
-| 31 | Katastrofåterställning | 1,5 | 2 | 2 | 1 | 0 | **6,5** | P0 |
+| 31 | Katastrofåterställning | 1,5 | 1,5 | 2 | 1 | 0 | **6** | P0 |
 | 32 | Kodkvalitet och tester | 2 | 2 | 2 | 1,5 | 1 | **8,5** | P4 |
 | 33 | Verifiering i verklig produktion | 1,5 | 1 | 1,5 | 1 | 1 | **6** | P4 |
 
-**Aritmetisk summa:** 245 av 330. **Likaviktat medelbetyg:** 7,42/10 (245 ÷ 33). **Områden på minst 9,5:** 0 av 33. Lägsta områdespoäng: 5; högsta: 8,5. Medelvärdet är inte ett godkännande av betalningsidentifiering, automatisering eller produktion.
+**Aritmetisk summa:** 242,5 av 330. **Likaviktat medelbetyg:** 7,35/10 (242,5 ÷ 33). **Områden på minst 9,5:** 0 av 33. Lägsta områdespoäng: 5; högsta: 8,5. Medelvärdet är inte ett godkännande av betalningsidentifiering, automatisering eller produktion.
 
 **Ny evidens efter publicering:** område 32 får K=2 och P=1 genom fulla slutgrindar, godkänd Actions på exakt programcommit och verifierad motsvarande Sites-källa/bygge; poängen går från 7,5 till 8,5. Område 33 får P=1 för den nya lyckade publiceringen och läsande efterkontrollen; 5,5 blir 6. Ingen annan poäng höjs. Detta är en dokumenterad förändring från samma körnings före-publicering-bedömning, inte en påhittad äldre produktbaslinje.
 
@@ -393,7 +401,7 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 - **Prioritet och nästa åtgärd:** P0. Verifiera en tabell av faktiska godkända statusfall och tillhörande beviskedjor efter publicering.
 - **Produktionsverifiering / extern blockerare:** Ja. B1 och B2.
 
-### 26. Kontrollera alla betalningar — 8/10
+### 26. Kontrollera alla betalningar — 7,5/10
 
 - **Acceptanskriterier:** En tydlig huvudåtgärd ska samordna befintlig hämtning, tolkning, kontroll och kö; vara återupptagbar/idempotent och aldrig skicka mejl eller genomföra betalning.
 - **Verifierat:** Beständiga körningar, ägarbundna anrop, idempotensnyckel, samtidighet och väntetider finns. Förlorat svar återanvänder samma begäran. Delvis resultat visas som delvis.
@@ -413,7 +421,7 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 - **Prioritet och nästa åtgärd:** P2. Verifiera läsande ett kontrollerat utkast och dess källor; faktisk sändning kräver uttryckligt godkännande av den aktuella versionen.
 - **Produktionsverifiering / extern blockerare:** Ja för produktionsflödet. B2; testgrönt sändningsflöde är inte sändningsgodkännande.
 
-### 28. Schemalagd automatisering — 6,5/10
+### 28. Schemalagd automatisering — 6/10
 
 - **Acceptanskriterier:** Bank, Gmail, OCR och backup ska köras inom godkända intervall; faktisk körning, paus, väntetid, fel och senaste lyckade utfall ska skiljas åt.
 - **Verifierat:** Beständiga lås/backoff, tre-försöksgränser, leasebyte och begränsade statusanrop är testade. Bank och backup har aktuella drifttecken, men Gmail-timschemat är avstängt.
@@ -423,7 +431,7 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 - **Prioritet och nästa åtgärd:** P2. Fastställ avsikten med pausen och följ befintliga scheman under en driftperiod, inklusive ett kontrollerat avbrott och återhämtning.
 - **Produktionsverifiering / extern blockerare:** Ja. B3 och B4; ingen ny betaltjänst eller ändrat bankmedgivande behövs för kodtesterna.
 
-### 29. Säkerhetskopiering — 8,5/10
+### 29. Säkerhetskopiering — 7,5/10
 
 - **Acceptanskriterier:** Krypterad komplett snapshot och alla original; integritetsbevis, ägarbindning, beständig återupptagning och ingen falsk framgång vid saknat original/nyckel.
 - **Verifierat:** Aktuell läsande produktionsstatus anger komplett backup 191/191 filer, 63 448 066 byte, verifierad 2026-10-30T01:27:38Z. Isolerade återläsningar, manipulering och låskonkurrens är testade.
@@ -443,7 +451,7 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 - **Prioritet och nästa åtgärd:** P0. Behåll de godkända audit-/CI-bevisen enligt G-P; kontrollera återstående publicerad åtkomstisolering och känsliga statusytor utan att exportera företagsdata.
 - **Produktionsverifiering / extern blockerare:** Ja. B2; G-D är intern leveransgrind.
 
-### 31. Katastrofåterställning — 6,5/10
+### 31. Katastrofåterställning — 6/10
 
 - **Acceptanskriterier:** Återställ databas och samtliga original i separat miljö med rätt nyckel; saknade delar ska ge fel; återställningstid, dataförlustfönster och extern kopia ska vara fastställda.
 - **Verifierat:** Isolerade syntetiska återställningar för Node och Sites samt fel nyckel/ägare/original är testade. Avbrott och konkurrerande backupägare kan inte skapa falskt komplett resultat.
@@ -484,3 +492,43 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 7. Uppdatera en områdespoäng endast när en viss delpoäng kan kopplas till ett nytt godkänt bevis. Spara tidigare bedömning i versionshistoriken och ange vilken acceptanslucka som stängts. Avsaknad av nya fel är inte i sig skäl att höja betyget.
 
 **Slutvillkoret kvarstår:** formuleringen `KLART – 9,5/10 I ALLA 33 OMRÅDEN` får inte användas utifrån denna scorecard. Ingen aktuell extern blockerare, ofärdig leveransgrind eller ej verifierad kritisk produktionsfunktion får döljas av godkända enhetstester.
+
+## Cykel 1A – delta för samtliga 33 områden
+
+Poäng före avser starten av åttatimmarsuppdraget. Nya delpoäng för områden26/28/31: S=1,5; område29: S=1. Övriga komponenter är oförändrade. Nya källor: **N1** = cykelrapportens407 Node-tester; **S0** = omkörda456 tester i oförändrad Sites-källa; **P0** = oförändrad Sites32 och begränsade läsande statusvärden. En lokal förbättring räknas inte som produktionsevidens.
+
+| Nr | Område | Före | Nu | Förbättring/fynd | Testbevis | Produktionsbevis | Kvarstående brist | Nästa åtgärd |
+| --- | --- | ---: | ---: | --- | --- | --- | --- | --- |
+| 1 | Design och färger | 6,5 | 6,5 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Slutför kontrast och formulärfokus. |
+| 2 | Startsida | 7,5 | 7,5 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Verifiera publicerade kort och fullständigt bankunderlag. |
+| 3 | Navigering | 5 | 5 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Leverera mobilmeny; implementera webbläsarhistorik. |
+| 4 | Mobilanpassning | 7 | 7 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Leverera menyfokus; kontrollera övriga dialoger. |
+| 5 | Sökning och filtrering | 7 | 7 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Testa större köer, filterkombinationer och nollprefix. |
+| 6 | Minimal manuell hantering | 6,5 | 6,5 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Mät genomströmning utan sänkta granskningskrav. |
+| 7 | Kundfakturor | 8 | 8 | Saldo och historiska kopplingar bevaras vid nya spärrar. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 8 | Leverantörsfakturor | 8 | 8 | Samma integritetsregler skyddar utbetalningsmatchning. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 9 | PDF-tolkning | 8 | 8 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Representativ tillåten PDF-korpus med facit. |
+| 10 | Bild-OCR | 7 | 7 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Verifiera aktuell moln-OCR och originalkedja. |
+| 11 | Gmail-anslutning | 7 | 7 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Bevara paus; verifiera hämtning först med rätt mandat. |
+| 12 | Automatisk fakturaregistrering | 7,5 | 7,5 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Rätta felbesked efter redan slutförd registrering. |
+| 13 | Dubblettkontroll | 8 | 8 | Skiljetecken/nollor bevaras; kontoavgränsade bank-ID:n. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 14 | Dokumentgranskning | 7,5 | 7,5 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Visa sammanfattade orsaker och säker efterkontroll. |
+| 15 | Swedbank-anslutning | 8,5 | 8,5 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Autentisk individuell rapport och avtalad profil/kanal. |
+| 16 | Automatisk bankhämtning | 8 | 8 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Publicera och verifiera nästa verkliga bankhämtning. |
+| 17 | Bankgiroimport | 8 | 8 | Avvisade original behålls; verklig CSV-rout verifieras. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 18 | Identifiera verklig betalare | 6,5 | 6,5 | Inlärd betalare kräver aktuellt godkänt stödoriginal. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Jämför verklig betalare mot tillåtet bankoriginal. |
+| 19 | Verklig OCR/fakturareferens | 6,5 | 6,5 | Återspelning får inte undertrycka ny referenskonflikt. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Verifiera verklig OCR-regel och referens i bankoriginal. |
+| 20 | Automatisk betalningsmatchning | 7,5 | 7,5 | Undo, saknade original och återföringar stoppar automatik. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Publicera Sites-spärrar; verifiera representativt utfall. |
+| 21 | Delbetalningar | 8 | 8 | Delbetalningar bevaras när frånvarokontroll blir inaktuell. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 22 | Överbetalningar | 8 | 8 | Tidigare allokeringar bevaras; nya ekonomiska dubbletter hålls. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 23 | Flera fakturor i en betalning | 7,5 | 7,5 | Alla föräldraoriginal och tidigare kompletteringsfakta följs. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Verifiera samlingsbetalning mot autentiskt individfacit. |
+| 24 | Betalningshistorik | 8 | 8 | Avvisad import och tidigare kontrollbeslut finns kvar i audit. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 25 | Betalningsstatus | 8 | 8 | Föråldrade slutsatser om utebliven betalning tas bort. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsätt Sites-paritet och verifiera mot behörigt original. |
+| 26 | Kontrollera alla betalningar | 8 | 7,5 | Ny kontroll-idempotens/leasebrist reproducerad; ej rättad här. | N1/S0; öppna negativa auditfall. | P0; inget nytt verksamhetsutfall. | Bekräftat lokalt fel kvarstår. | Spara alla accepterade request-ID:n; SQL-klocka vid skrivning. |
+| 27 | Automatiska mejlutkast | 8 | 8 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Verifiera utkast och aktuellt godkännande utan sändning. |
+| 28 | Schemalagd automatisering | 6,5 | 6 | För gammal lease kan fortfarande publicera kontrollsteg. | N1/S0; öppna negativa auditfall. | P0; inget nytt verksamhetsutfall. | Bekräftat lokalt fel kvarstår. | Rätta kontroll-lease och bevara pausat externt Gmail-schema. |
+| 29 | Säkerhetskopiering | 8,5 | 7,5 | Återupptagen backup kan felaktigt bli komplett. | N1/S0; öppna negativa auditfall. | P0; inget nytt verksamhetsutfall. | Bekräftat lokalt fel kvarstår. | Verifiera alla kopierade original före fullständighetsbesked. |
+| 30 | Säkerhet och åtkomstkontroll | 8 | 8 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Fortsatt owner/CSRF/lease-granskning och behörig driftkontroll. |
+| 31 | Katastrofåterställning | 6,5 | 6 | Node-återställning kan godta hashstridiga original. | N1/S0; öppna negativa auditfall. | P0; inget nytt verksamhetsutfall. | Bekräftat lokalt fel kvarstår. | Originalhashkontroll vid skapa/verifiera/återställ; isolerat prov. |
+| 32 | Kodkvalitet och tester | 8,5 | 8,5 | 30 nya Node-fall; exakt isolerad leveranskandidat verifierad. | N1; nya bank-/dokumentregressioner. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Granska nästa Sites-diff och kör CI på exakt commit. |
+| 33 | Verifiering i verklig produktion | 6 | 6 | Ingen ny kod i denna Node-delleverans. | N1/S0, oförändrat relevant område. | P0; inget nytt verksamhetsutfall. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Publicera Sites separat och kontrollera behöriga användarvyer. |

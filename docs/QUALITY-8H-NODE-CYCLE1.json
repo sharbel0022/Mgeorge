@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "cycle": "1A-node",
+  "base_commit": "c519eef47e5a084a35db7675a2553a554c55ec4c",
+  "tests": {
+    "node": 407,
+    "sites": 456,
+    "failed": 0,
+    "skipped": 0
+  },
+  "syntax_files": 65,
+  "typescript": true,
+  "production_build": true,
+  "vulnerabilities": 0,
+  "sites_source": "unchanged from base_commit",
+  "source_sha256": {
+    "src/bank-evidence.js": "7697c1f467ae2bff5f3a50ae3071e979721f4ac80090c565dac9443157cb9672",
+    "src/db.js": "202897ab69ca780eaf8f3eb804843264a1634c402b7ad160cfe53f4cc1221381",
+    "src/invoice-review.js": "550e0dcc1ee6359172b550ca4edace635f38946c3a6c3ded052f095d1b30bf19",
+    "src/reconciliation.js": "d25b1048b267524102f98e45c7647e6662cec36855001436383285dbef1fc290",
+    "test/bank-evidence-q8.test.js": "08a866cfa6e78cf4da48cf954efa0195656de70ec1ccfa120b5810a79fd1e00f",
+    "test/bank-import-api-q8.test.js": "424ccfb0b7be6268f480f6d556b4414afaec21e220af0b6b68f9a4d19dc96e50",
+    "test/document-quality-cycle.test.js": "9866d692ea028d8e417b91a9acec5c5b1b56b09f14e84a4130e664f73c696aee"
+  },
+  "independent_review": "No remaining Critical/Important finding in bounded Node diff",
+  "github_actions": "pending push",
+  "sites_version": 32,
+  "sites_published_in_this_cycle": false
+}

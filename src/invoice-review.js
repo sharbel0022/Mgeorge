@@ -5,6 +5,7 @@ import {digest} from './security.js';
 
 const failure=(message,status=409)=>Object.assign(new Error(message),{status});
 const identity=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
+const invoiceNumber=s=>String(s||'').normalize('NFKC').trim().toUpperCase();
 const intactOriginal=doc=>!!doc?.content&&/^[a-f0-9]{64}$/.test(doc.fingerprint||'')&&digest(doc.content)===doc.fingerprint;
 function automaticRegistrationIssues(db,v){
   const issues=[],candidates=v.organization_number?db.prepare('SELECT * FROM invoices WHERE direction=? AND organization_number=? AND party=?').all(v.direction,v.organization_number,v.party):[];
@@ -25,7 +26,7 @@ function automaticRegistrationIssues(db,v){
   return issues;
 }
 export function duplicateCandidates(db,v){
-  return db.prepare('SELECT * FROM invoices WHERE direction=? AND kind=?').all(v.direction,v.kind).filter(i=>identity(v.invoice_number)===identity(i.invoice_number)&&(v.organization_number&&i.organization_number?identity(v.organization_number)===identity(i.organization_number):identity(v.party)===identity(i.party)));
+  return db.prepare('SELECT * FROM invoices WHERE direction=? AND kind=?').all(v.direction,v.kind).filter(i=>invoiceNumber(v.invoice_number)===invoiceNumber(i.invoice_number)&&(v.organization_number&&i.organization_number?identity(v.organization_number)===identity(i.organization_number):identity(v.party)===identity(i.party)));
 }
 export async function analyzeDocument(db,id,{extract=extractInvoice,authorize=()=>{}}={}){
   const doc=db.prepare('SELECT * FROM documents WHERE id=?').get(id);

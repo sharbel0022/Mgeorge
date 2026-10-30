@@ -1,4 +1,10 @@
-# Mgeorge V4 – plan och verifieringsgräns
+# Mgeorge – aktuell kvalitetsplan
+
+Aktivt uppdrag 2026-10-30: **maximalt åtta timmars självständigt kvalitetsarbete** från main `c519eef`, Sites 32 och dokumenterad bedömning 7,42/10. Se [aktuell arbetsplan](docs/QUALITY-8H-PLAN.md), `QUALITY-SCORECARD.md` och den senaste checkpointen i `PROGRESS.md`.
+
+Main-integration och publicering i det befintliga Sites-projektet ingår i användarens aktuella uttryckliga godkännande. Äldre avgränsningar nedan är historik.
+
+# Historisk V4-plan och verifieringsgräns
 
 Bas: hämtad `origin/main` `f549293`, Sites 30 och mergad PR #12. Arbetsbranch: `codex/mgeorge-v4-bank-verification`. Uppdragets datum: 2026-10-28.
 

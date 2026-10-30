@@ -138,6 +138,22 @@ test('document quality: an unaudited invoice identity cannot authorize automatic
   assert.notEqual(result.level,'green');
 });
 
+for(const [first,second] of [['AB-0594','AB0594'],['AB/0594','AB_0594']])test(`document queue: invoice number ${second} stays distinct from reviewed ${first}`,async t=>{
+  const f=registrationFixture(t),seed=f.document();
+  await f.analyze(seed,invoice.replace('Fakturanummer: 0594','Fakturanummer: '+first));
+  approveDocument(f.db,seed.id,{confirm:true});
+  const next=f.document(),text=invoice.replace('Fakturanummer: 0594','Fakturanummer: '+second);
+  const result=await f.analyze(next,text);
+  assert.equal(result.level,'green');
+  assert.deepEqual(f.db.prepare('SELECT invoice_number FROM invoices ORDER BY rowid').all().map(row=>row.invoice_number),[first,second]);
+  assert.equal(f.db.prepare('SELECT status FROM documents WHERE id=?').get(next.id).status,'registered');
+  const retransmission=f.document(),copy=await f.analyze(retransmission,text.replace('Fakturanummer: '+second,'Fakturanummer: '+second.toLowerCase()));
+  assert.equal(copy.duplicate_invoice_ids.length,1);
+  assert.throws(()=>approveDocument(f.db,retransmission.id,{confirm:true}),/finns redan/);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM invoices').get().n,2);
+  assert.equal(f.db.prepare('SELECT status FROM documents WHERE id=?').get(retransmission.id).status,'needs_review');
+});
+
 test('document quality: original corruption blocks extraction and retains the original row',async t=>{
   const f=registrationFixture(t),next=f.document();
   f.db.prepare('UPDATE documents SET content=? WHERE id=?').run(Buffer.from('changed-original'),next.id);

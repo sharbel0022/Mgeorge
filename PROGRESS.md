@@ -131,3 +131,33 @@ Användaren begärde därefter uttryckligen main och Sites-publicering. PR #12 m
 - [Maskinläsbara publiceringsbevis](docs/QUALITY-33-PUBLICATION.json) och [slutrapport](docs/QUALITY-33-DELIVERY.md). Efter konkret CI-/publiceringsevidens är den dokumenterade summan 245/330 = **7,42/10**. **0/33** områden är verifierade till minst 9,5; 33 återstår. Detta är verifieringsgraden i den redovisade bedömningen, inte en uppmätt felfrihetsprocent.
 - Kvalitetsmålet är fortsatt öppet. Nästa steg: autentiskt bankunderlag/MIG/kanal, kontrollerad konfliktlösning, pausad Gmail-automatik och moln-OCR, återstående mobil/tillgänglighetskontroller, autentiserad produktionskedja och isolerat katastrofprov. Följ den exakta planen i slutrapporten.
 - Lokala previewprocessen stoppad, temporär QA-sida borttagen. Ingen kundsändning, bankbetalning, produktionsåterställning eller bakgrundsutveckling utförd/konfigurerad.
+
+## Åttatimmarsuppdrag — start 2026-10-30 15:31:15 UTC
+
+Senaste main hämtad och ren: `c519eef47e5a084a35db7675a2553a554c55ec4c`. GitHub-anslutningen bekräftar rätt repository och pushbehörighet. Actions 41079705471 är success. Ny baslinje körd: Node 377/377, Sites 456/456, syntax och TypeScript godkända. Tidigare scorecard 245/330 (7,42), 0/33 på 9,5 används som startvärde. [Aktuell arbetsplan](docs/QUALITY-8H-PLAN.md).
+
+```json
+{
+  "checkpoint_schema": 1,
+  "run": "mgeorge-quality-8h-2026-10-30",
+  "status": "in_progress",
+  "started_at_utc": "2026-10-30T15:31:15Z",
+  "deadline_utc": "2026-10-30T23:31:15Z",
+  "maximum_wall_clock_hours": 8,
+  "start_commit": "c519eef47e5a084a35db7675a2553a554c55ec4c",
+  "latest_verified_commit": "c519eef47e5a084a35db7675a2553a554c55ec4c",
+  "sites_version": 32,
+  "tests": {"node_passed":377,"sites_passed":456,"failed":0,"skipped":0},
+  "quality": {"sum":245,"mean":7.4242424242,"at_least_9_5":[],"remaining":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33]},
+  "completed": ["latest main and CI verified","fresh Node and Sites baselines passed","prioritized work plan saved"],
+  "external_blockers": ["authentic individual Swedbank report and contracted profile/channel","authenticated production browser flow","external Gmail schedule paused","representative approved invoice corpus","cloud OCR completion proof","isolated production-backup recovery proof"],
+  "next_task": "Reproduce and fix stale bank verification, lost supporting originals, asynchronous OCR integrity, and mobile navigation defects; integrate only after independent review and full gates.",
+  "background_continuation_configured": false
+}
+```
+
+## Åttatimmarsarbete – cykel 1A redo för main
+
+Fryst Node-kod och exakta regressioner har oberoende granskats. Separat checkout från startcommitten passerar407/407 Node,456/456 oförändrade Sites, syntax65, TypeScript, båda audits0 och produktionsbygge. [Rapport](docs/QUALITY-8H-NODE-CYCLE1.md), [källmanifest](docs/QUALITY-8H-NODE-CYCLE1.json). Ingen ny Sites-publicering ingår i denna delleverans; Site32 är fortsatt senaste verifierade. Exakt main-commit och CI registreras efter push.
+
+Alla33 har en ny deltaöversikt. Bekräftade öppna backup-/automationsfel sänker den aktuella bedömningen till242,5/330=7,35,0/33 på9,5. Dessa fel ska rättas i nästa cykel. Arbetet fortsätter inom samma budget; ingen bakgrundskörning antas. Nästa konkreta steg: pusha den verifierade Node-kandidaten, verifiera CI, slutför Sites-review och publicera samma befintliga projekt.

@@ -1,6 +1,7 @@
 import {matchingReferenceValues} from './payment-references.js';
 
 export const BANK_EVIDENCE_CONFLICT_REASON = 'Bankunderlag med samma bankreferens innehåller motstridiga uppgifter. Granska båda originalen innan betalningen används.';
+export const AUTOMATIC_MATCH_HOLD_REASON = 'En tidigare betalningskoppling har återtagits. Granska underlaget och bekräfta en ny koppling manuellt.';
 const ANCESTOR_BANK_EVIDENCE_CONFLICT_REASON = 'En samlingspost som betalningen bygger på innehåller motstridiga bankuppgifter. Granska samlingspostens original innan betalningen används.';
 
 export const hasBankEvidenceConflict = transaction => !!(transaction.bank_evidence_conflicts?.length || transaction.ancestor_bank_evidence_conflicts?.length);
@@ -8,18 +9,21 @@ export const bankEvidenceReviewReason = transaction => transaction.bank_evidence
   : transaction.ancestor_bank_evidence_conflicts?.length ? ANCESTOR_BANK_EVIDENCE_CONFLICT_REASON : '';
 
 /** Explicit bank descriptions of a refund or reversal never prove invoice payment. */
-export function bankFinancialReview(transaction) {
+export function bankFinancialReview(transaction,{ancestors=true}={}) {
   const raw = transaction.raw_bank_data || {};
+  const inherited=ancestors?transaction.ancestor_bank_financial_reviews||[]:[];
   const text = [transaction.description, raw.bank_transaction_code?.description, raw.note,
     ...(Array.isArray(raw.remittance_information) ? raw.remittance_information : [])]
     .filter(value => typeof value === 'string').join(' ');
+  if(inherited.some(review=>review.kind==='reversal'))return inherited.find(review=>review.kind==='reversal');
   if (/\breversal\b|\breversed\b|\bchargeback\b|återför|returbetal|\breturned\s+(?:payment|transfer)\b/iu.test(text))
     return {kind:'reversal', reason:'Bankunderlaget anger en återföring. Granska ursprungsbetalningen och rättelsen; händelsen får inte automatiskt reglera en faktura.'};
+  if(inherited.some(review=>review.kind==='refund'))return inherited.find(review=>review.kind==='refund');
   if (/\brefund(?:ed|s)?\b|återbetal/iu.test(text))
     return {kind:'refund', reason:'Bankunderlaget anger en återbetalning. Granska kreditfaktura och ursprungsbetalning innan beloppet fördelas.'};
   if (/kortköp|kortuttag|\bcard\s+(?:purchase|withdrawal)\b|löneutbetal|\b(?:salary|payroll)\b|överföring\s+(?:(?:till|från|mellan)\s+)?(?:eget|egna)\s+kont|egen\s+överföring|\b(?:own|internal)\s+transfer\b/iu.test(text))
     return {kind:'other', reason:'Bankunderlaget anger kortköp, lön eller överföring mellan egna konton. Granska händelsetypen innan en faktura kopplas manuellt.'};
-  return null;
+  return inherited.find(review=>review.kind==='other')||null;
 }
 
 const identity = value => String(value || '').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
@@ -27,6 +31,11 @@ const reference = value => {
   const normalized = String(value || '').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g, ' ');
   return /^\d[\d -]*$/.test(normalized) ? normalized.replace(/[ -]/g, '') : normalized;
 };
+
+export function sameBankPaymentIdentity(a,b) {
+  const payer=identity(a.payer),paymentReference=reference(a.reference);
+  return !!payer&&!!paymentReference&&payer===identity(b.payer)&&paymentReference===reference(b.reference);
+}
 
 /** Empty fields can be enriched; contradictory nonempty bank facts need a durable hold. */
 export function bankEvidenceConflictFields(previous, incoming) {
