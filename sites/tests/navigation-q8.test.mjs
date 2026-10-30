@@ -8,6 +8,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 function componentModule(){
  let code=ts.transpileModule(readFileSync(new URL('../components/workspace-navigation.tsx',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  for(const name of ['react','react/jsx-runtime','lucide-react'])for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(import.meta.resolve(name)));
+ for(const q of ['"',"'"])code=code.replaceAll(q+'@/lib/workspace-location'+q,JSON.stringify(new URL('../lib/workspace-location.ts',import.meta.url).href));
  return import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
 }
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
@@ -16,7 +17,7 @@ const base={view:'bank',reviewCount:4,company:{name:'Syntetiskt Företag AB',ema
 test('desktop navigation identifies the current area without relying on color',async()=>{
  const ui=await componentModule(),html=render(ui.default,base);
  assert.equal((html.match(/aria-current="page"/g)||[]).length,1);
- assert.match(html,/<button[^>]*aria-current="page"[^>]*>[\s\S]*?<span>Bank<\/span>/);
+ assert.match(html,/<a[^>]*aria-current="page"[^>]*>[\s\S]*?<span>Bank<\/span>/);
  assert.match(html,/<nav aria-label="Huvudmeny">/);
  assert.doesNotMatch(html,/<dialog/);
 });
@@ -24,7 +25,7 @@ test('nested document and history views retain their parent navigation context',
  const ui=await componentModule();
  for(const [view,label]of [['documents','Behöver granskas'],['messages','Behöver granskas'],['history','Inställningar'],['contacts','Kundfakturor']]){
   const html=render(ui.default,{...base,view});
-  const current=html.match(/<button[^>]*aria-current="page"[^>]*>([\s\S]*?)<\/button>/g)||[];
+  const current=html.match(/<a[^>]*aria-current="location"[^>]*>([\s\S]*?)<\/a>/g)||[];
   assert.equal(current.length,1);assert.ok(current[0].includes(label),view);
  }
 });

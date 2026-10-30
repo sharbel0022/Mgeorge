@@ -90,3 +90,20 @@ Cykel1A/1B är levererade; Sites33 och inloggad mobilmeny är verifierade. Cykel
 ## Checkpoint efter version34, före cykel3-push
 
 Tre maincommits och Sites34 är verifierade. Den26fils API-kandidaten har469Node/692Sites,TS,bygge,audits0 och oberoende klartecken. Nu normal main-push/CI och samma Sites35. UI-kandidaten rättar originaletiketter,okända tillstånd,kontrast,historik och mobilfokus; verklig Chromium har verifierat URL/back/forward/reload/filter/utkast. En separat syntetisk fakturakorpus söker konkreta parserfel. Ingen tid används till att enbart upprepa analys; externa bank-/Gmail-/OCR-/restorekrav hålls öppna.
+
+## Aktuell checkpoint cykel4 – 2026-10-30T20:31:30+00:00
+
+**Senaste faktiska leverans:** main `6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9`, exakt Actions41102309328 success och Sites35 succeeded. Käll-/arkiv-/deploybevis finns i [publiceringsrapporten](QUALITY-8H-SITES-CYCLE3-PUBLICATION.md). Observerad bank-/Gmail-/backupstatus är läsande; ingen autentiserad produktionsbrowser efter35 eftersom ursprungskontexten saknas. Gmail-schemat förblir pausat.
+
+**Klar lokal kandidat:**28 frysta filer med519/519 Node +831/831 Sites =1350, syntax70, TypeScript/build och fulla audits0/0. Navigation/UUID/UI/fokus/laddning/parser är avgränsat granskade. Faktisk lokal Chromium verifierar historik, filter, dirty-länk/Back och mobilfokus; utloggade slutvyer visar inloggning i stället för falsk noll. [Cykel4rapport](QUALITY-8H-CYCLE4.md), [hashar/alla33 områden](QUALITY-8H-CYCLE4.json).
+
+**Bedömning:**250 +4,5 −1,0 = **253,5/330 (7,68/10)**;0/33 når9,5. Det är inte254. Backup/restore sänks efter reproducerad förlust mellan verifieringssteg. Alla övriga delpoäng följer de uttryckliga ändringarna i rapporten.
+
+Nästa sekvens:
+
+1. Root integrerar endast fryst cykel4, verifierar normal main-push och exakt-SHA CI, därefter separat publicering i samma Sites-projekt. Fyll inga framtida commit-/CI-/Site36-fält före faktiska kvitton.
+2. Separata Important-kandidater för401-raderat modalutkast respektive backup false complete är på review. Slutför review och nya integrerade grindar innan de räknas som åtgärdade eller levererade.
+3. Verifiera den faktiskt publicerade UI-revisionen när browserkontext finns. Native beforeunload är fortfarande miljömässigt overifierad; fristående positiv kontroll visade inte heller dialog. Managed-länk/Back-bekräftelse är observerad fungerande.
+4. Fortsätt B1–B6: autentiskt bankunderlag/kanal, produktionskedja, Gmail-paus, verklig moln-OCR, verksamhetskorpus och isolerat katastrofprov. Bevara nuvarande schema-/identitets-/lagringsinställningar.
+
+Budgeten är samma15:31:15–23:31:15UTC; inga extra agenttimmar läggs till. Arbetet är pågående, ingen bakgrundsfortsättning antas. De äldre checklistorna/checkpointerna ovan är historiska; denna sekvens är aktuell.

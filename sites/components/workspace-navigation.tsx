@@ -1,9 +1,10 @@
 "use client";
 
-import {useEffect,useRef,type KeyboardEvent} from 'react';
+import {useEffect,useRef,type KeyboardEvent,type MouseEvent,type ReactNode} from 'react';
 import {ArrowRight,Building2,CheckCheck,ChevronDown,FileText,Landmark,LayoutDashboard,Menu,ReceiptText,Settings,ShieldCheck,X} from 'lucide-react';
+import {workspaceHref,isWorkspaceLinkClick,type WorkspaceView} from '@/lib/workspace-location';
 
-export type WorkspaceView='review'|'messages'|'documents'|'connections'|'overview'|'receivable'|'payable'|'bank'|'imports'|'contacts'|'history'|'settings';
+export type {WorkspaceView} from '@/lib/workspace-location';
 type Props={view:WorkspaceView;reviewCount:number;company:{name:string;email:string};open:boolean;onNavigate:(view:WorkspaceView)=>void;onClose:()=>void};
 const items=[
  {id:'overview',label:'Översikt',icon:LayoutDashboard},
@@ -13,6 +14,13 @@ const items=[
  {id:'review',label:'Behöver granskas',icon:CheckCheck},
 ] as const;
 const area=(view:WorkspaceView)=>view==='contacts'?'receivable':['messages','documents','imports'].includes(view)?'review':['connections','history'].includes(view)?'settings':view;
+
+function followLink(event:MouseEvent<HTMLAnchorElement>,view:WorkspaceView,onNavigate:Props['onNavigate']){
+ if(isWorkspaceLinkClick(event)){event.preventDefault();onNavigate(view);}
+}
+export function WorkspaceLink({view,onNavigate,children,className,current}:{view:WorkspaceView;onNavigate:Props['onNavigate'];children:ReactNode;className?:string;current?:'page'|'location'}){
+ return <a href={workspaceHref(view)} className={className} aria-current={current} onClick={event=>followLink(event,view,onNavigate)}>{children}</a>;
+}
 
 export function retainMobileNavigationFocus(event:KeyboardEvent<HTMLDialogElement>){
  if(event.key!=='Tab'||event.ctrlKey||event.altKey||event.metaKey)return;
@@ -25,13 +33,13 @@ export function retainMobileNavigationFocus(event:KeyboardEvent<HTMLDialogElemen
 function NavigationContents({view,reviewCount,company,onNavigate}:Omit<Props,'open'|'onClose'>){
  const active=area(view);
  return <>
-  <a className="brand" href="/" onClick={event=>{event.preventDefault();onNavigate('overview');}}><strong>MG</strong><span>Fakturakoll</span></a>
+  <a className="brand" href="/" onClick={event=>followLink(event,'overview',onNavigate)}><strong>MG</strong><span>Fakturakoll</span></a>
   <div className="workspace"><span className="workspace-icon"><Building2 size={19}/></span><div><strong>M.George Vitvaror</strong><span>Företagsöversikt</span></div><ChevronDown size={15}/></div>
   <div className="nav-label">ARBETSYTA</div>
-  <nav aria-label="Huvudmeny">{items.map(({id,label,icon:Icon})=><button key={id} type="button" className={`nav-item ${active===id?'active':''}`} aria-current={active===id?'page':undefined} onClick={()=>onNavigate(id)}><Icon size={19} aria-hidden="true"/><span>{label}</span>{id==='review'&&reviewCount>0&&<b aria-label={`${reviewCount} ärenden att granska`}>{reviewCount}</b>}</button>)}</nav>
+  <nav aria-label="Huvudmeny">{items.map(({id,label,icon:Icon})=><WorkspaceLink key={id} view={id} className={`nav-item ${active===id?'active':''}`} current={view===id?'page':active===id?'location':undefined} onNavigate={onNavigate}><Icon size={19} aria-hidden="true"/><span>{label}</span>{id==='review'&&reviewCount>0&&<b aria-label={`${reviewCount} ärenden att granska`}>{reviewCount}</b>}</WorkspaceLink>)}</nav>
   <div className="sidebar-bottom">
-   <button type="button" className={`nav-item ${active==='settings'?'active':''}`} aria-current={active==='settings'?'page':undefined} onClick={()=>onNavigate('settings')}><Settings size={18} aria-hidden="true"/><span>Inställningar</span></button>
-   <div className="sidebar-help"><ShieldCheck size={21} aria-hidden="true"/><strong>Din privata arbetsyta</strong><p>Fakturor, betalningar och beslut samlade. Varje kundmejl godkänns separat.</p><button type="button" onClick={()=>onNavigate('imports')}>Import & underlag <ArrowRight size={14} aria-hidden="true"/></button></div>
+   <WorkspaceLink view="settings" className={`nav-item ${active==='settings'?'active':''}`} current={view==='settings'?'page':active==='settings'?'location':undefined} onNavigate={onNavigate}><Settings size={18} aria-hidden="true"/><span>Inställningar</span></WorkspaceLink>
+   <div className="sidebar-help"><ShieldCheck size={21} aria-hidden="true"/><strong>Din privata arbetsyta</strong><p>Fakturor, betalningar och beslut samlade. Varje kundmejl godkänns separat.</p><WorkspaceLink view="imports" onNavigate={onNavigate}>Import & underlag <ArrowRight size={14} aria-hidden="true"/></WorkspaceLink></div>
    <div className="user-chip"><div className="avatar" aria-hidden="true">MG</div><div><strong>{company.name}</strong><span>{company.email}</span></div></div>
   </div>
  </>;

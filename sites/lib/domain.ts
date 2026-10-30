@@ -2,6 +2,7 @@ import {bankApiOriginalIssue as apiOriginalIssue,hasBankApiOrigin,bankFileRefere
 export const bankApiOriginalIssue=(t:Transaction)=>apiOriginalIssue(t,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED);
 import {exactReference,normalizeName} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
+import {randomUuid} from './uuid.js';
 export type Invoice = {
  id: string; direction: "receivable" | "payable"; party: string; email: string; number: string; ocr: string;
  total: number; currency: "SEK"; issued: string; due: string; reviewed: boolean; voided: boolean;
@@ -31,7 +32,7 @@ export class BankImportEvidenceError extends Error{
  constructor(message:string,state:State){super(message);this.name='BankImportEvidenceError';this.state=state;}
 }
 export const emptyState=():State=>({schemaVersion:1,company:{name:"M.George Vitvaror AB",email:"mg.vitvaror@gmail.com"},invoices:[],transactions:[],allocations:[],credits:[],imports:[],receipts:[]});
-export const uid=()=>{if(typeof crypto.randomUUID==='function')return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=Array.from(b,v=>v.toString(16).padStart(2,'0')).join('');return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;};
+export const uid=randomUuid;
 export const now=()=>new Date().toISOString();
 function bankConflictChanges(current:State,attempted:State){
  return current.transactions.flatMap(previous=>{

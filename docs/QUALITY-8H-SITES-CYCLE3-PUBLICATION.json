@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "cycle": "3",
+  "verified_at": "2026-10-30T20:24:00Z",
+  "github": {
+    "commit": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+    "tree": "ed6d1e9461e179bbf31b76e869b5eb25ea1dde8a",
+    "actions_run": 41102309328,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 124221471837,
+        "name": "sites",
+        "head_sha": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+        "conclusion": "success",
+        "started_at": "2026-10-30T17:54:21Z",
+        "completed_at": "2026-10-30T17:56:26Z"
+      },
+      {
+        "id": 124221472099,
+        "name": "test",
+        "head_sha": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+        "conclusion": "success",
+        "started_at": "2026-10-30T17:54:21Z",
+        "completed_at": "2026-10-30T17:54:54Z"
+      }
+    ]
+  },
+  "sites": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 35,
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_8aaab7263bf08191aa810f4cfaaa4c21",
+    "source_commit": "3366846830144e66b933b53be16d38ef8e0fd5d1",
+    "deployment_id": "appgdep_6ae4dbf0ce608191b17b71c52970ec2a",
+    "status": "succeeded",
+    "deployed_at": "2026-10-30T18:04:29.900273+00:00",
+    "runtime_revision": 9,
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "local_archive_sha256": "89acbcf9dca1be0ed695fdcf85d1f10afd867fe2643c6550e923b638a3c7ce21",
+    "local_archive_bytes": 16316453,
+    "server_tar_sha256": "749be76c10a1f9a310c6313a1fdadb461d0a998f53de35e0f6c1432d58ddbada",
+    "server_tar_bytes": 39321600,
+    "server_tar_files": 329,
+    "source_files_compared": 284,
+    "source_files_equal": true,
+    "auth_client_unchanged": true,
+    "access_policy_unchanged": true,
+    "automations_unchanged": true,
+    "gmail_schedule_enabled": false,
+    "rollback_version": 34,
+    "rollback_source_commit": "927a2cb666705e0ccfa2d88318bdcb443c3f0b08"
+  },
+  "tests": {
+    "node": 469,
+    "sites": 692,
+    "total": 1161,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "syntax_files": 69,
+    "typescript": "passed",
+    "build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0
+  },
+  "production_read_checks": {
+    "backup": {
+      "day": "2026-10-30",
+      "status": "complete",
+      "files": 191,
+      "copied": 191,
+      "bytes": 63448066,
+      "verified_at": "2026-10-30T01:27:38.129Z",
+      "verified_files": 0,
+      "verification_scope": "copy_readback",
+      "api_evidence": {
+        "scope": "unassessed"
+      }
+    },
+    "bank": {
+      "observed_after_site35": true,
+      "connected": true,
+      "interval_hours": 6,
+      "last_synced": "2026-10-30T14:09:57.164Z",
+      "last_error": null
+    },
+    "gmail": {
+      "observed_after_site35": true,
+      "connected": true,
+      "last_successful_fetch": "2026-10-29T15:00:48.512Z",
+      "sync_health": "stale",
+      "review_documents": 183,
+      "aftercheck_pending": 0
+    }
+  },
+  "authenticated_browser": {
+    "status": "unavailable_after_deployment",
+    "reason": "originating browser context unavailable",
+    "last_verified_production_browser_version": 34
+  },
+  "production_mutations_tested": false,
+  "real_emails_sent": 0,
+  "real_payments_performed": 0,
+  "limitations": [
+    "The preexisting backup is copy_readback only and API evidence is explicitly unassessed; no new production verification pass or restore.",
+    "API original receipts checksum retained parsed JSON, not bank-signed wire bytes.",
+    "Actual authenticated Site35 browser flow was not verified; local synthetic UI results are separate.",
+    "The bank and Gmail business timestamps are observations, not new completed business workflows."
+  ]
+}

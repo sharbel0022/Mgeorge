@@ -1,6 +1,8 @@
 import {classifyDocument,documentConflicts} from './document-triage.js';
 import {fork} from 'node:child_process';
 import {parseMoney} from './importers.js';
+const invoiceNumberLabel='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))(?=[\\s.:#-]|\\d|$)';
+const validInvoiceIdentifier=value=>/^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,79}$/u.test(value)&&!/^(?:ocr(?:[- /]?(?:nummer|referens))?|faktura(?:nummer|nr)?|fakturadatum|förfallo(?:datum|dag)|förfaller|invoice|date|leverantör|utställare|säljare|supplier|seller|kund|customer|netto|moms|vat|bankgiro|bg|totalbelopp|att)$/iu.test(value);
 // Only explicitly labelled values are normalized. Original text remains evidence.
 function normalizeInvoiceLayout(input){
   const original=String(input||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
@@ -8,6 +10,19 @@ function normalizeInvoiceLayout(input){
   let text=original.replace(/(faktura\s*(?:nummer|nr)|invoice\s*(?:number|no))([ \t.:#-]*)([0-9][0-9 \t]*)(?=\n|$)/gi,(_,label,sep,value)=>label+sep+value.replace(/[ \t]/g,''));
   text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.replace(/[ \t]/g,''));
   text=text.replace(/([,.])[ \t]+(?=\d{2}\b)/g,'$1');
+  // PDF drawing order can differ from the visible column order. Text alone
+  // cannot assign two numeric values to invoice/OCR headings with certainty.
+  const numberColumn='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))',ocrColumn='OCR(?:[- /]?(?:nummer|referens))?';
+  const otherColumn='(?:kund[ \\t]*(?:nummer|nr)|customer[ \\t]*(?:number|no)|sida|page|fakturadatum|invoice[ \\t]*date|förfallo(?:datum|dag)|due[ \\t]*date)';
+  const header=new RegExp('(?<![\\p{L}\\p{N}_-])(?:('+numberColumn+')|('+ocrColumn+')|'+otherColumn+')(?=[^\\p{L}\\p{N}_-]|-(?:\\s|$)|$)','giu');
+  let ambiguousInvoiceColumns=false,previousEnd=-1,hasNumber=false,hasOcr=false;
+  for(const label of text.matchAll(header)){
+    // Punctuation, wrapped headings and intervening known headings do not
+    // establish value order. An actual value ends this run of headings.
+    if(previousEnd<0||!/^[\s\p{P}\p{S}]*$/u.test(text.slice(previousEnd,label.index))){hasNumber=false;hasOcr=false;}
+    hasNumber ||= Boolean(label[1]);hasOcr ||= Boolean(label[2]);previousEnd=label.index+label[0].length;
+    if(hasNumber&&hasOcr){ambiguousInvoiceColumns=true;warnings.push('Fakturanummer och OCR i kolumner kan inte skiljas åt entydigt. Kontrollera originalets kolumner.');break;}
+  }
   // An undiscounted unit price plus VAT must agree with its displayed line total.
   for(const line of text.split('\n')){
     const m=line.match(/\b(\d+)[ \t]+(?:st|styck|pcs)[ \t]+([\d \t]+[,.]\d{2})[ \t]*(?:kr|SEK)[ \t]+([\d \t]+)[ \t]*%[ \t]+([\d \t]+[,.]\d{2})[ \t]*(?:kr|SEK)[ \t]+([\d \t]+[,.]\d{2})/i);
@@ -16,7 +31,7 @@ function normalizeInvoiceLayout(input){
       if(Number.isSafeInteger(unit)&&Number.isSafeInteger(gross)&&Math.abs(qty*unit+vat-gross)>1)warnings.push('Radpris, moms och radbelopp stämmer inte överens. Kontrollera originalet.');
     }
   }
-  return {text,original,warnings};
+  return {text,original,warnings,ambiguousInvoiceColumns};
 }
 
 export const fieldNames=['invoice_number','party','organization_number','issued_at','due_at','total_cents','vat_cents','net_cents','reference','bankgiro','direction','kind','currency'];
@@ -25,6 +40,12 @@ export function validDate(value){
   let s=String(value||'').trim();const m=s.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/);
   if(m)s=`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
   return /^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s+'T00:00:00Z'))&&new Date(s+'T00:00:00Z').toISOString().slice(0,10)===s?s:null;
+}
+function invoiceDate(value){
+  // A labelled Swedish D-M-YYYY date is normalized before the existing calendar
+  // validation. This does not change the manual-registration validator.
+  const match=String(value).match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  return validDate(match?`${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`:value);
 }
 export function validOrganization(value){
   const s=String(value||'').replace(/[-\s]/g,'');if(!/^\d{10}$/.test(s)||Number(s[2])<2)return false;
@@ -50,18 +71,22 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     else if(distinct.length>1)issues.push(`Motstridiga värden för ${titles[key]}; dokumentet kan innehålla flera fakturor.`);
     else if(matches.length)issues.push(`Ogiltigt värde för ${titles[key]}.`);
   };
-  grab('invoice_number',/(?:faktura\s*(?:nummer|nr|no)|invoice\s*(?:number|no)|fakturanr)\s*[.:#-]*\s*([\p{L}\p{N}][\p{L}\p{N}/_-]{0,79})/giu);
-  grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})(?![\p{L}\p{N}./_-])/giu,validDate,/(?:fakturadatum|faktureringsdatum|invoice\s*date)/gi);
-  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})(?![\p{L}\p{N}./_-])/giu,validDate,/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)/gi);
-  const amount='(-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|\\d[\\d \\t\\u00a0]*(?:[.,]\\d{1,2})?))(?![\\p{L}\\p{N}.,/_-])(?:[ \\t]*(?:SEK|kr))?';
+  // Validate the entire token, including every labelled occurrence. Never
+  // silently truncate an identifier or ignore an unreadable second value.
+  grab('invoice_number',new RegExp(invoiceNumberLabel+'\\s*[.:#-]*\\s*(\\S+)','giu'),value=>validInvoiceIdentifier(value)?value:null,new RegExp(invoiceNumberLabel,'gi'));
+  grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{4})(?![\p{L}\p{N}./_-])/giu,invoiceDate,/(?:fakturadatum|faktureringsdatum|invoice\s*date)/gi);
+  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{4})(?![\p{L}\p{N}./_-])/giu,invoiceDate,/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)/gi);
+  // A percentage is a rate, never an explicitly stated monetary amount.
+  const amount='(-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|\\d[\\d \\t\\u00a0]*(?:[.,]\\d{1,2})?))(?![\\p{L}\\p{N}.,/_-]|\\s*%)(?:[ \\t]*(?:SEK|kr))?';
   const money=s=>{try{return parseMoney(s);}catch{return null;}};
   const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)';
-  const vatLabel='(?:^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)(?!\\s*\\d+%)';
+  const vatLabel='(?:^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)';
   const netLabel='(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?:^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount))';
   grab('total_cents',new RegExp(totalLabel+'\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'giu'),money,new RegExp(totalLabel,'gi'));
   grab('vat_cents',new RegExp(vatLabel+'\\s*[:.]?\\s*'+amount,'giu'),money,new RegExp(vatLabel,'gi'));
   grab('net_cents',new RegExp(netLabel+'\\s*[:.]?\\s*'+amount,'giu'),money,new RegExp(netLabel,'gi'));
   grab('reference',/(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)\s*[:.]?\s*([\p{L}\p{N}][\p{L}\p{N} /_-]{0,119})/giu);
+  if(layout.ambiguousInvoiceColumns){set('invoice_number',null,null,0);set('reference',null,null,0);}
   grab('bankgiro',/\b(?:bankgirokonto|bankgiro|bg)\s*[:.]?\s*(\d{3,4}[ -]\d{4})(?![\p{L}\p{N}/_-])/giu,s=>s.replace(/ /g,'-'),/\b(?:bankgirokonto|bankgiro|bg)\b/gi);
   if(fields.invoice_number.value&&validDate(fields.invoice_number.value)){issues.push('Fakturanumret ser ut som ett datum. Kontrollera originalets kolumner.');set('invoice_number',null,fields.invoice_number.evidence,0);}
   const wholeText=text;

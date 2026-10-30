@@ -18,19 +18,31 @@ export function bankPayer(t:Transaction){
   return t.verification?'':cleanParty(t.party);
 }
 export const payerLabel=(t:Transaction)=>bankPayer(t)||(t.amount<0?'Mottagare okänd':'Betalare okänd');
+function referenceView(value:string,evidence:Transaction['referenceEvidence'],parts:Transaction['referenceParts']){
+  if(!usablePaymentReference(value))return {value:'',kind:'missing' as const,ocr:''};
+  const exact=evidence?.candidates.filter(c=>c.kind!=='message'&&c.value===value)||[];
+  const matchingParts=parts?.filter(p=>p.value===value)||[];
+  const ocr=exact.some(c=>c.kind==='ocr')||matchingParts.some(p=>p.kind==='ocr');
+  const invoice=exact.some(c=>c.kind==='invoice')||matchingParts.some(p=>p.kind==='invoice');
+  return {value,kind:ocr?'ocr' as const:invoice?'invoice' as const:'reference' as const,ocr:ocr?value:''};
+}
 export function bankPaymentReference(t:Transaction){
   const evidence=t.bankDetails?.referenceEvidence||t.referenceEvidence;
   if(!hasBankSource(t)&&!t.bankDetails?.payerReference)return {value:'',kind:'missing' as const,ocr:''};
   const value=t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'':t.original?t.original.payerReference:t.verification?'':t.payerReference)||'';
-  if(!usablePaymentReference(value))return {value:'',kind:'missing' as const,ocr:''};
-  const exact=evidence?.candidates.filter(c=>c.kind!=='message'&&c.value===value)||[];
-  const parts=t.referenceParts?.filter(p=>p.value===value)||[];
-  const ocr=exact.some(c=>c.kind==='ocr')||parts.some(p=>p.kind==='ocr');
-  const invoice=exact.some(c=>c.kind==='invoice')||parts.some(p=>p.kind==='invoice');
-  return {value,kind:ocr?'ocr' as const:invoice?'invoice' as const:'reference' as const,ocr:ocr?value:''};
+  return referenceView(value,evidence,t.referenceParts);
+}
+const referenceLabel=(kind:string)=>kind==='ocr'?'OCR':kind==='invoice'?'Fakturareferens':'Betalningsreferens';
+export function paymentEvidenceView(t:Transaction){
+  // A later manual verification says nothing about the earlier snapshot's
+  // origin. Only explicit manual entry/split provenance supports that label.
+  const manual=t.evidence==='verified_specification'||(!t.evidence||t.evidence==='manual_verified')&&t.source==='Manuellt registrerad';
+  const source=hasBankSource(t)?'bank':manual?'manual':'unknown';
+  const reference=bankPaymentReference(t),originalReference=source==='bank'?referenceView(t.original?.payerReference||'',t.referenceEvidence,t.referenceParts):{kind:'reference'};
+  return {payer:payerLabel(t),payerKnown:!!bankPayer(t),reference,referenceLabel:referenceLabel(reference.kind),manualPayer:t.verification?.party||(t.evidence==='verified_specification'?t.party:''),manualReference:t.verification?.payerReference||(t.evidence==='verified_specification'?t.payerReference:''),original:{source,label:source==='bank'?'Bankens ursprungliga uppgifter':source==='manual'?'Manuellt registrerade ursprungsuppgifter':'Sparade ursprungsuppgifter · källan är inte verifierad',referenceLabel:referenceLabel(originalReference.kind)}};
 }
 export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]=[]){
-  const assessment=paymentInvoiceAssessment(state,t),reference=bankPaymentReference(t),requiresSpecification=needsPaymentSpecification(t);
+  const assessment=paymentInvoiceAssessment(state,t),evidenceView=paymentEvidenceView(t),requiresSpecification=needsPaymentSpecification(t);
   const allocations=state.allocations.filter(a=>a.active&&a.transactionId===t.id),invoices=allocations.map(a=>state.invoices.find(i=>i.id===a.invoiceId)).filter(i=>!!i);
   const invoiceNumbers=[...new Set(invoices.map(i=>i.number))];
   const possible=[...new Set([...candidates.map(c=>c.number),...(assessment.status!=='verified'&&assessment.invoice?[assessment.invoice.number]:[])])];
@@ -52,8 +64,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
     verified=true;
     status=invoices.some(i=>balance(state,i)>0)?'Delbetalning':available(state,t)>0?'Överbetalning':'Verifierad';
   }else if(possible.length)status='Möjlig matchning';
-  const manualPayer=t.verification?.party||(t.evidence==='verified_specification'?t.party:''),manualReference=t.verification?.payerReference||(t.evidence==='verified_specification'?t.payerReference:'');
-  return {payer:payerLabel(t),payerKnown:!!bankPayer(t),reference,invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification,manualPayer,manualReference};
+  return {...evidenceView,invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
 }
 export function bankVisibleTransactions(state:State){
   return state.transactions.filter(t=>{

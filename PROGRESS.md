@@ -424,3 +424,155 @@ Main9d och Sites34 är verifierade. Nästa API-originalkandidat har1161 gröna t
   "background_continuation_configured": false
 }
 ```
+
+## Åttatimmarsarbete – cykel4 lokal kandidat och verifierad Sites35
+
+**2026-10-30T20:31:30+00:00: arbetet är fortfarande pågående.** Senaste leverans är main `6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9`, Actions41102309328 success och Sites35 (`3366846830144e66b933b53be16d38ef8e0fd5d1`). [Exakta publiceringskvitton](docs/QUALITY-8H-SITES-CYCLE3-PUBLICATION.md) skiljer lokal GZip från server-TAR, och beskriver läsande bank/Gmail/backupstatus samt saknad autentiserad browserkontext efter35.
+
+Ny cykel4 är **ännu inte pushad/publicerad**:28 hashbundna filer, **519/519 Node +831/831 Sites =1350**, syntax70, TypeScript/build och fulla audits0/0. Avgränsade oberoende reviews samt faktisk lokal Chromium täcker navigation, utkast vid vanlig historik, mobilfokus och ärliga utloggade listvyer. Rapporten redovisar även parserkorpusens verkliga PDF-/OCR-gränser. [Cykel4](docs/QUALITY-8H-CYCLE4.md), [33 områden/hashmanifest](docs/QUALITY-8H-CYCLE4.json).
+
+Poängen är exakt **253,5/330 = 7,68/10**,0/33 på9,5:250 +4,5 lokala förbättringar −1,0 backupsänkningar.401-raderat modalutkast och backupens delete-between-pass false complete är öppna; separata kandidater är på review. Native beforeunload förblir en miljömässig verifieringsgräns efter misslyckad fristående positiv kontroll. B1–B6 och pausat Gmail-schema kvarstår. Nästa main-/CI-/Sites-kvitton fylls endast efter verifierad leverans av root.
+
+```json
+{
+  "schema": 2,
+  "run": "quality-8h-2026-10-30",
+  "status": "in_progress",
+  "checkpoint_at": "2026-10-30T20:31:30+00:00",
+  "started_at": "2026-10-30T15:31:15Z",
+  "deadline": "2026-10-30T23:31:15Z",
+  "elapsed_seconds_at_checkpoint": 18015,
+  "remaining_seconds_at_checkpoint": 10785,
+  "last_verified_main": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+  "pushed_program_commits": 4,
+  "actions_run": 41102309328,
+  "actions_conclusion": "success",
+  "latest_sites_version": 35,
+  "sites_source_commit": "3366846830144e66b933b53be16d38ef8e0fd5d1",
+  "sites_deployment": "appgdep_6ae4dbf0ce608191b17b71c52970ec2a",
+  "publication_receipt": "docs/QUALITY-8H-SITES-CYCLE3-PUBLICATION.json",
+  "ready_candidate": "docs/QUALITY-8H-CYCLE4.json",
+  "candidate_source_paths": 28,
+  "candidate_delivery": {
+    "status": "not_pushed_or_published",
+    "owner": "root",
+    "main_commit": null,
+    "actions_run": null,
+    "actions_conclusion": null,
+    "sites_version": null,
+    "sites_source_commit": null,
+    "sites_deployment": null,
+    "instruction": "Fyll endast efter faktiskt verifierad normal main-leverans, exakt-SHA CI och separat Sites-publicering. Ingen förhandsutfyllnad av Site36."
+  },
+  "latest_local_tests": {
+    "node": 519,
+    "sites": 831,
+    "total": 1350,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "syntax_files": 70,
+    "typescript": "passed",
+    "production_build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0,
+    "audit_includes_development_dependencies": true
+  },
+  "production_browser": {
+    "status": "unavailable_after_deployment",
+    "reason": "originating browser context unavailable",
+    "last_verified_production_browser_version": 34
+  },
+  "quality": {
+    "previous_total": 250,
+    "sum": 253.5,
+    "mean": 7.681818181818182,
+    "delta": 3.5,
+    "at_least_9_5": [],
+    "remaining": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ]
+  },
+  "completed": [
+    "Main6660 exact-SHA CI and Sites35 publication verified; receipt preserved without alteration.",
+    "Cycle4 28-path UI/navigation/UUID/focus/loading/parser candidate passed1350 full tests, syntax70, TS/build and full audits0/0.",
+    "Actual local Chromium verified history/filter/draft navigation and mobile focus; final signed-out three-view readiness observed.",
+    "All33 areas recalculated with explicit evidence and two conservative backup reductions."
+  ],
+  "open_internal_findings": [
+    "401/control auth-loss still removes modal invoice draft; isolated candidate under review, not included.",
+    "Backup delete-between-verification-steps false complete; separate candidate under review, not included."
+  ],
+  "verification_limits": [
+    "Native beforeunload not verified: independent plain-HTML positive control also showed no warning; unit-handler tested.",
+    "Authenticated production browser unavailable after Site35; last verified version34.",
+    "Synthetic parser corpus does not establish production invoice/OCR accuracy."
+  ],
+  "active_external_blockers": [
+    {
+      "id": "B1",
+      "gap": "Autentisk individuell Swedbankrapport, rätt avtalad MIG/XSD, OCR-regel och behörig rapportkanal saknas.",
+      "required": "Bank-/avtalsbekräftad profil och läsande kanal samt uttryckligen tillåtet anonymiserat original med kända konto-, datum-, belopps- och individuppgifter. Se `docs/V4-SWEDBANK-CHANNELS.md`. BankID och bankens skydd får inte kringgås."
+    },
+    {
+      "id": "B2",
+      "gap": "Aktuellt autentiserat produktionsflöde för den nya leveransen är inte verifierat.",
+      "required": "Verifiera rätt publicerad revision i befintligt projekt och tillåtna inloggade användarflöden; håll produktionsdata privata."
+    },
+    {
+      "id": "B3",
+      "gap": "Befintligt externt Gmail-timschema är avstängt.",
+      "required": "Fastställ om pausen är avsiktlig, hantera befintlig schemastyrning inom mandatet och verifiera verkliga efterföljande körningar/checkpoints. Ett runtimefält räcker inte."
+    },
+    {
+      "id": "B4",
+      "gap": "Moln-OCR med avstängd användardator och aktuell lyckad slutföring är inte bevisad.",
+      "required": "Kör godkänt syntetiskt original genom befintlig molnkanal när lokal OCR är stoppad; dokumentera originalhash, lease, sparat resultat och tider."
+    },
+    {
+      "id": "B5",
+      "gap": "Representativ godkänd fakturakorpus och verksamhetens fullständiga acceptanspolicy saknas.",
+      "required": "Tillåtna anonymiserade PDF-/bildoriginal med facit och dokumenterade regler för motparter, kontoändringar, krediter och undantag."
+    },
+    {
+      "id": "B6",
+      "gap": "Produktionsbackupens isolerade katastrofprov, oberoende kopia/nyckeltillgång samt RPO/RTO saknar aktuellt bevis.",
+      "required": "Separat tillåten återställningsmiljö, godkänd kopia och nyckelhantering; mät fullständighet och tid utan destruktiv produktionsåterställning."
+    }
+  ],
+  "next_task": "Root: deliver only frozen cycle4 with exact main/CI/Sites receipts; finish independent auth-draft and backup reviews before separate integration and new gates. Continue actual production/B1–B6 evidence within deadline.",
+  "background_continuation_configured": false
+}
+```

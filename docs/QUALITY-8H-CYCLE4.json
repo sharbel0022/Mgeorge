@@ -1,0 +1,1612 @@
+{
+  "schema": 2,
+  "cycle": "4-ui-navigation-parser",
+  "created_at": "2026-10-30T20:31:30+00:00",
+  "status": "local_verified_not_pushed_or_published",
+  "run": {
+    "started_at": "2026-10-30T15:31:15+00:00",
+    "deadline": "2026-10-30T23:31:15+00:00",
+    "maximum_wall_clock_hours": 8,
+    "elapsed_seconds_at_checkpoint": 18015,
+    "remaining_seconds_at_checkpoint": 10785,
+    "status": "in_progress",
+    "background_continuation_configured": false
+  },
+  "parent_commit": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+  "source_paths": 28,
+  "source_files": {
+    "sites/app/dashboard.tsx": "a18df4da045af9b9346da223ee5a468856f405a9013379aa503d7a015fefac5a",
+    "sites/app/page.tsx": "ec65c3430052a4a3be0824a177c1d9f56729348b97c1e48b99436f55a3167852",
+    "sites/app/globals.css": "738b0a946b92f9105a49124bb95d66caeda2eaef4ce5f6343b601227107a4f2d",
+    "sites/components/workspace-navigation.tsx": "df74aa67388aab54c60a4a88e433dde37e717b15a4485e859ca7c6a7acaa0698",
+    "sites/components/customer-messages.tsx": "6d041c8632d671e392601ce13cb176ff57a843c89350dda2643b167d368a7f86",
+    "sites/components/use-workspace-navigation.ts": "1439f561ea5898e2b32d91a1244f10cd0174f7cd28d5527e6f8fa2c6168079e7",
+    "sites/lib/workspace-location.ts": "98ae3f322ca7f7c6ec114a40fb309a17c88ba2473853d49ced8f6a8bc407bb13",
+    "sites/lib/workspace-drafts.ts": "40d6d68fe42e72efc7f8f439e730d97565f127b9b9e365cee2e5d4530f4f8fb9",
+    "sites/tests/navigation-q8.test.mjs": "92a6798114653877d5a94a80acb1d1d80b350182d27e2c2cd2b9c17e50ccdb84",
+    "sites/tests/navigation-history-q8.test.mjs": "66d67c21a26a721caec3863d05c841dc774ffea434765d121ec27e18551a598b",
+    "sites/tests/workspace-location-q8.test.mjs": "d89b449253271ec426a581c61f6f627e033b9d4b4cc20c04f025f316f5a86cd0",
+    "sites/tests/workspace-navigation-dashboard-q8.test.mjs": "672adec619cf8469343cd79f44114dd98ffd6fd7ca03c117ab6a6cefcaadb490",
+    "sites/components/gmail-workspace.tsx": "ee91e9ba67487e1d28b15640249a44850f38d42da05dbd32ca558b0b1c8694a0",
+    "sites/lib/payment-presentation.ts": "0614391a73911331788e9ba17cdcc0d05fb4dfb28348f8abfb1309dd88839b0d",
+    "sites/tests/payment-evidence-ui-q8.test.mjs": "34a3f2fea4ef53d905de9e5999839aafeb0365d0396d6477b9f597965a34db71",
+    "sites/tests/gmail-loading-ui-q8.test.mjs": "ef898a006838c8ac3a7017e0f9811a6b8e2f2d6356235dcfd4765ab089dcd691",
+    "sites/tests/ui-contrast-q8.test.mjs": "3417a49252732407a276638f33c241e2bded4eeaa6525d839c8b250d6bde23ff",
+    "sites/lib/uuid.js": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4",
+    "sites/lib/domain.ts": "10bf413e52eecc17a6114f7c4c1706764654475d99d298b279d5c1e4a2a473fe",
+    "sites/tests/uuid-q8.test.mjs": "71165dca493d6a2bd334c58e421d1a11870f2062f9a183b1010d565a874d584c",
+    "sites/components/payment-control.tsx": "cbf9f9d8e770dc7ea7c646d519dc33c8ba18b0ebb2da8d178aa8caa9a9f07155",
+    "sites/tests/control-review-focus-q8.test.mjs": "2a4d095b59e9e2c26ddd919e7dae6dfee008032322973e99addd3ea5e38a6239",
+    "sites/tests/dashboard-loading-ui-q8.test.mjs": "17e7f99978633286c103931f2b91395d21d0fdb8b07d72c705af845678648428",
+    "src/invoice-extraction.js": "6d789498d7c6ecee1f3589b11eb8dd15253d26f1dc73992d4a0c90804187331e",
+    "sites/lib/invoice-fields.js": "90dd9f1eb2646d0173d294c63b70adacb225ce4a1c8ddd821b1c2edea0dc5b9a",
+    "test/invoice-parser-corpus-q8.test.js": "59a19f5049f80105b48299b8f4728519938c2d55bda6b96bf4b88cc921fb7ec8",
+    "sites/tests/invoice-parser-corpus-q8.test.mjs": "bf5496dd5660d0c6dd9bd15bca5cff5f3f6cf1dc96a284ef22e671712c57601a",
+    "test/helpers/invoice-parser-corpus.mjs": "d31438e29d860b481e7a0424ebfdfde159645a0ec99fe468476218125368812f"
+  },
+  "tests": {
+    "node": 519,
+    "sites": 831,
+    "total": 1350,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "syntax_files": 70,
+    "typescript": "passed",
+    "production_build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0,
+    "audit_includes_development_dependencies": true
+  },
+  "gates": {
+    "node": [
+      {
+        "name": "check",
+        "exit_code": 0,
+        "started": "2026-10-30T19:30:43.393133+00:00",
+        "finished": "2026-10-30T19:30:45.653520+00:00",
+        "log": "/tmp/mgeorge-q8-cycle4-final-node-check.log"
+      },
+      {
+        "name": "test",
+        "exit_code": 0,
+        "started": "2026-10-30T19:30:45.653832+00:00",
+        "finished": "2026-10-30T19:31:10.676460+00:00",
+        "log": "/tmp/mgeorge-q8-cycle4-final-node-test.log"
+      },
+      {
+        "name": "audit",
+        "exit_code": 0,
+        "started": "2026-10-30T19:31:10.676803+00:00",
+        "finished": "2026-10-30T19:31:11.177736+00:00",
+        "log": "/tmp/mgeorge-q8-cycle4-final-node-audit.log"
+      }
+    ],
+    "sites": [
+      {
+        "name": "check",
+        "exit_code": 0,
+        "started": "2026-10-30T19:30:44.873440+00:00",
+        "finished": "2026-10-30T19:30:52.612880+00:00",
+        "log": "/tmp/mgeorge-q8-cycle4-final-sites-check.log"
+      },
+      {
+        "name": "test",
+        "exit_code": 0,
+        "started": "2026-10-30T19:30:52.613270+00:00",
+        "finished": "2026-10-30T19:31:11.949735+00:00",
+        "log": "/tmp/mgeorge-q8-cycle4-final-sites-test.log"
+      },
+      {
+        "name": "build",
+        "exit_code": 0,
+        "started": "2026-10-30T19:31:11.950156+00:00",
+        "finished": "2026-10-30T19:31:26.818549+00:00",
+        "log": "/tmp/mgeorge-q8-cycle4-final-sites-build.log"
+      },
+      {
+        "name": "audit",
+        "exit_code": 0,
+        "started": "2026-10-30T19:31:26.818995+00:00",
+        "finished": "2026-10-30T19:31:27.478592+00:00",
+        "log": "/tmp/mgeorge-q8-cycle4-final-sites-audit.log"
+      }
+    ]
+  },
+  "full_audits": {
+    "node": {
+      "auditReportVersion": 2,
+      "vulnerabilities": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 17,
+          "dev": 0,
+          "optional": 10,
+          "peer": 0,
+          "peerOptional": 0,
+          "total": 26
+        }
+      }
+    },
+    "sites": {
+      "auditReportVersion": 2,
+      "vulnerabilities": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 215,
+          "dev": 635,
+          "optional": 210,
+          "peer": 44,
+          "peerOptional": 0,
+          "total": 901
+        }
+      }
+    }
+  },
+  "independent_review": {
+    "result": "bounded reviews complete per final source freeze",
+    "scope": "UI/navigation/UUID/mobile focus/loading/parser",
+    "statement": "UI/nav/UUID/focus/loading/parser independently reviewed; auth-loss draft preservation remains a known preexisting limitation",
+    "known_open": [
+      "I4-AUTH-DRAFT",
+      "I4-BACKUP-COMPLETE"
+    ]
+  },
+  "evidence": {
+    "E4-GATES": {
+      "summary": "Isolerad integrerad kandidat på main6660; samtliga 28 hashvärden matchar. Fulla grindar 519/831, syntax70, TS/build och fulla audits0.",
+      "sources": [
+        "/tmp/mgeorge-q8-cycle4-source-freeze.json",
+        "/tmp/mgeorge-q8-cycle4-node-gates.json",
+        "/tmp/mgeorge-q8-cycle4-sites-gates.json",
+        "/tmp/mgeorge-q8-cycle4-node-full-audit.json",
+        "/tmp/mgeorge-q8-cycle4-sites-full-audit.json"
+      ]
+    },
+    "E4-REVIEW": {
+      "summary": "UI/nav/UUID/focus/loading/parser independently reviewed; auth-loss draft preservation remains a known preexisting limitation",
+      "sources": [
+        "/tmp/mgeorge-q8-cycle4-source-freeze.json"
+      ],
+      "limit": "Avgränsade oberoende granskningar; känt auth-utkastfel och separat backupfel hålls öppna."
+    },
+    "E4-UI": {
+      "summary": "15 nya evidens-/Gmail-/kontrastfall; fokuserat93/93. Tre relevanta textfärger ger minst5,090:1 på prövade bakgrunder.",
+      "sources": [
+        "/tmp/mgeorge-q8-ui-fixes-handoff.md",
+        "/tmp/mgeorge-q8-ui-focused.log"
+      ]
+    },
+    "E4-NAV": {
+      "summary": "Gemensam allowlist för12 vyer, äkta länkar, historik, RAM-filter, utkast och svarsgeneration. Tidiga45/45 efter rättade reviewfynd; slutgrindarna gäller slutkandidaten.",
+      "sources": [
+        "/tmp/mgeorge-q8-navigation-cycle3-handoff.md",
+        "/tmp/mgeorge-q8-navigation-cycle3-review-green.log"
+      ]
+    },
+    "E4-UUID": {
+      "summary": "Faktisk createWorkspaceHistory gav TypeError utan randomUUID före rättning. Delad getRandomValues-fallback;5/5 nya och86/86 fokuserade.",
+      "sources": [
+        "/tmp/mgeorge-q8-uuid-handoff.md",
+        "/tmp/mgeorge-q8-uuid-green.log",
+        "/tmp/mgeorge-q8-uuid-focused.log"
+      ]
+    },
+    "E4-FOCUS": {
+      "summary": "Före rättning3pass/6fail; efter9/9. Relaterat41/41. Riktig komponent/hook/DOM-modell följd av faktisk Chromium.",
+      "sources": [
+        "/tmp/mgeorge-q8-review-focus-handoff.md",
+        "/tmp/mgeorge-q8-review-focus-red.log",
+        "/tmp/mgeorge-q8-review-focus-focused.log"
+      ]
+    },
+    "E4-LOADING": {
+      "summary": "23 nya Dashboard-fall;17 initiala beteendefel plus två senare rött/grönt-racefall. Slutligt fokuserat122/122.",
+      "sources": [
+        "/tmp/mgeorge-q8-dashboard-loading-handoff.md",
+        "/tmp/mgeorge-q8-dashboard-loading-focused.log"
+      ]
+    },
+    "E4-PARSER": {
+      "summary": "50 permanenta fall per motor; riktig PDF/registrering, Node offline-OCR och originalbytekontroller. Oberoende v2: fyra oförändrade Sites-separatorfall, Node-ritordningsrepro och14 positiva identitetsfall godkända.",
+      "sources": [
+        "/tmp/mgeorge-q8-corpus-handoff.md",
+        "/tmp/mgeorge-q8-corpus-v2-review-handoff.md",
+        "/tmp/mgeorge-q8-corpus-v2-review-final-hashes.json"
+      ],
+      "limits": [
+        "Syntetisk korpus, inte representativ autentisk verksamhetskorpus.",
+        "Ingen generell PDF-geometrirekonstruktion; okända layouter och procent-plus-belopp hålls för granskning."
+      ]
+    },
+    "E4-NAV-BROWSER": {
+      "summary": "Faktisk lokal Chromium18:01 UTC: URL, Back/Forward/reload, filter, utkast och HTTP-hydrering passerade.",
+      "sources": [
+        "/tmp/mgeorge-q8-navigation-browser-evidence.json"
+      ]
+    },
+    "E4-MOBILE": {
+      "summary": "Faktisk lokal Chromium18:17/18:23 UTC:390/1440/320 px, fokusretur, resize, mobilmenyns Tab/ShiftTab/Escape och ingen dokumentoverflow.",
+      "sources": [
+        "/tmp/mgeorge-q8-cycle4-mobile-browser-evidence.json"
+      ]
+    },
+    "E4-BROWSER-READINESS": {
+      "summary": "Root observerade slutliga28-filerskandidaten: utloggad Bank/kund-/leverantörsvy visar inloggning, inga0kr/tomma laddade tabeller; CSV inaktiverad.",
+      "reported_by": "root",
+      "recorded_at": "2026-10-30T20:31:30+00:00",
+      "observed_date": "2026-10-30",
+      "exact_execution_time_known": false,
+      "environment": "actual local Chromium; final28-source candidate; no production-flow claim",
+      "dashboard_sha256": "a18df4da045af9b9346da223ee5a468856f405a9013379aa503d7a015fefac5a"
+    },
+    "E4-OPEN-AUTH": {
+      "summary": "GET401/control authorization loss kan avmontera InvoiceEditor och radera osparade fält. Separat isolerad kandidat på oberoende review; ingår inte i28 filer eller1350.",
+      "sources": [
+        "/tmp/mgeorge-q8-auth-draft-handoff.md"
+      ]
+    },
+    "E4-OPEN-BACKUP": {
+      "summary": "Borttagen redan verifierad kopia mellan steg kan ge false complete. Separat kandidat på review; ingår inte i28 filer eller1350.",
+      "sources": [
+        "/tmp/mgeorge-q8-backup-scale-handoff.md"
+      ]
+    },
+    "E35": {
+      "summary": "Verifierat kvitto för main6660/Actions41102309328/Sites35; exakt kopia bevarad i publiceringsrapporten.",
+      "sources": [
+        "QUALITY-8H-SITES-CYCLE3-PUBLICATION.json",
+        "/tmp/mgeorge-q8-site35-safe-publication.json"
+      ]
+    }
+  },
+  "browser_evidence": {
+    "navigation": {
+      "at": "2026-10-30T18:01:40.118617+00:00",
+      "browser": "Cloud Chromium through supported CUA",
+      "candidate_hashes": "/tmp/mgeorge-q8-browser-candidate-hashes.json",
+      "data": "Isolated in-memory synthetic demo;no production credentials",
+      "verified": {
+        "http_hydration_without_crypto_randomUUID": true,
+        "main_links_update_allowlisted_url": true,
+        "back_restores_payable": true,
+        "forward_and_reload_restore_bank": true,
+        "main_focus_after_workspace_navigation": true,
+        "search_1003_and_partial_filter_retained_after_back": true,
+        "dirty_settings_link_confirm_cancel_preserves_text": true,
+        "two_rapid_native_back_requests_one_visible_confirm_cancel_restores_settings": true,
+        "accepted_back_leaves_dirty_settings_and_retains_receivable_filter": true,
+        "modal_invoice_draft_text_and_focus_survive_back": true,
+        "closing_modal_after_back_focuses_main": true,
+        "saved_demo_settings_can_leave_without_spurious_confirm": true
+      },
+      "native_beforeunload": {
+        "status": "not verified in this browser environment",
+        "observation": "App reload/raw-link navigation produced no visible warning;independent plain-HTML positive control with native typing and standard beforeunload listener also produced no warning. Not classified as demonstrated app-only failure.",
+        "unit_handler_tested": true
+      },
+      "open": [
+        "Independent final mobile focus check",
+        "Merged UI error/loading/browser matrix",
+        "Native warning behavior on a browser surface that exposes beforeunload dialogs"
+      ]
+    },
+    "mobile": {
+      "observed_at": "2026-10-30T18:17:00Z/2026-10-30T18:23:00Z",
+      "environment": "isolated local HTTP Chromium; actual application in same-origin iframe widths set by QA-only native buttons; synthetic demo only",
+      "base_commit": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+      "source_hashes": {
+        "sites/components/payment-control.tsx": "cbf9f9d8e770dc7ea7c646d519dc33c8ba18b0ebb2da8d178aa8caa9a9f07155",
+        "sites/app/globals.css": "738b0a946b92f9105a49124bb95d66caeda2eaef4ce5f6343b601227107a4f2d",
+        "sites/components/workspace-navigation.tsx": "df74aa67388aab54c60a4a88e433dde37e717b15a4485e859ca7c6a7acaa0698"
+      },
+      "checks": [
+        {
+          "name": "390px keyboard-open grouped bank review",
+          "passed": true,
+          "focus": "region labelled Granskning: Samlingsbetalning",
+          "document_client_width": 375,
+          "document_scroll_width": 375
+        },
+        {
+          "name": "390px keyboard Back returns origin row",
+          "passed": true,
+          "focus": "button labelled Granska Samlingsbetalning"
+        },
+        {
+          "name": "1440px keyboard-open invoice review retains row focus",
+          "passed": true,
+          "focus": "button Granska Exempelkund Lind · 1003",
+          "document_client_width": 1425,
+          "document_scroll_width": 1425
+        },
+        {
+          "name": "resize desktop to320px restores visible detail focus",
+          "passed": true,
+          "focus": "region Granskning: Exempelkund Lind · 1003",
+          "document_client_width": 305,
+          "document_scroll_width": 305
+        },
+        {
+          "name": "320px mobile menu Shift+Tab wraps to final Import & underlag link; Tab wraps to close button; Escape restores opener",
+          "passed": true,
+          "final_focus": "button Öppna menyn"
+        },
+        {
+          "name": "visual320px monochrome review layout",
+          "passed": true,
+          "limitation": "horizontal filter strip scrolls intentionally; whole document does not overflow"
+        }
+      ],
+      "limits": [
+        "Iframe viewport tests exercise responsive CSS and actual DOM focus; no claim of physical-device touch testing.",
+        "Production Site35 UI was unavailable through the originating Browser context; these are synthetic local results.",
+        "Native beforeunload prompt remains unverified because an independent browser positive control also did not show it."
+      ]
+    },
+    "final_candidate_readiness": {
+      "summary": "Root observerade slutliga28-filerskandidaten: utloggad Bank/kund-/leverantörsvy visar inloggning, inga0kr/tomma laddade tabeller; CSV inaktiverad.",
+      "reported_by": "root",
+      "recorded_at": "2026-10-30T20:31:30+00:00",
+      "observed_date": "2026-10-30",
+      "exact_execution_time_known": false,
+      "environment": "actual local Chromium; final28-source candidate; no production-flow claim",
+      "dashboard_sha256": "a18df4da045af9b9346da223ee5a468856f405a9013379aa503d7a015fefac5a"
+    },
+    "later_resolution_of_navigation_artifact_open_items": {
+      "Independent final mobile focus check": "covered by mobile evidence and final source review",
+      "Merged UI error/loading/browser matrix": "23-case Dashboard coverage and final signed-out three-view observation; no claim of complete browser error matrix",
+      "Native warning behavior on a browser surface that exposes beforeunload dialogs": "still unverified"
+    }
+  },
+  "latest_verified_publication": {
+    "schema": 1,
+    "cycle": "3",
+    "verified_at": "2026-10-30T20:24:00Z",
+    "github": {
+      "commit": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+      "tree": "ed6d1e9461e179bbf31b76e869b5eb25ea1dde8a",
+      "actions_run": 41102309328,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 124221471837,
+          "name": "sites",
+          "head_sha": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+          "conclusion": "success",
+          "started_at": "2026-10-30T17:54:21Z",
+          "completed_at": "2026-10-30T17:56:26Z"
+        },
+        {
+          "id": 124221472099,
+          "name": "test",
+          "head_sha": "6660bd712ba523b0cdbcb619e30c3bf43d9bc9b9",
+          "conclusion": "success",
+          "started_at": "2026-10-30T17:54:21Z",
+          "completed_at": "2026-10-30T17:54:54Z"
+        }
+      ]
+    },
+    "sites": {
+      "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+      "version": 35,
+      "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_8aaab7263bf08191aa810f4cfaaa4c21",
+      "source_commit": "3366846830144e66b933b53be16d38ef8e0fd5d1",
+      "deployment_id": "appgdep_6ae4dbf0ce608191b17b71c52970ec2a",
+      "status": "succeeded",
+      "deployed_at": "2026-10-30T18:04:29.900273+00:00",
+      "runtime_revision": 9,
+      "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+      "local_archive_sha256": "89acbcf9dca1be0ed695fdcf85d1f10afd867fe2643c6550e923b638a3c7ce21",
+      "local_archive_bytes": 16316453,
+      "server_tar_sha256": "749be76c10a1f9a310c6313a1fdadb461d0a998f53de35e0f6c1432d58ddbada",
+      "server_tar_bytes": 39321600,
+      "server_tar_files": 329,
+      "source_files_compared": 284,
+      "source_files_equal": true,
+      "auth_client_unchanged": true,
+      "access_policy_unchanged": true,
+      "automations_unchanged": true,
+      "gmail_schedule_enabled": false,
+      "rollback_version": 34,
+      "rollback_source_commit": "927a2cb666705e0ccfa2d88318bdcb443c3f0b08"
+    },
+    "tests": {
+      "node": 469,
+      "sites": 692,
+      "total": 1161,
+      "failed": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "syntax_files": 69,
+      "typescript": "passed",
+      "build": "passed",
+      "node_audit_total": 0,
+      "sites_audit_total": 0
+    },
+    "production_read_checks": {
+      "backup": {
+        "day": "2026-10-30",
+        "status": "complete",
+        "files": 191,
+        "copied": 191,
+        "bytes": 63448066,
+        "verified_at": "2026-10-30T01:27:38.129Z",
+        "verified_files": 0,
+        "verification_scope": "copy_readback",
+        "api_evidence": {
+          "scope": "unassessed"
+        }
+      },
+      "bank": {
+        "observed_after_site35": true,
+        "connected": true,
+        "interval_hours": 6,
+        "last_synced": "2026-10-30T14:09:57.164Z",
+        "last_error": null
+      },
+      "gmail": {
+        "observed_after_site35": true,
+        "connected": true,
+        "last_successful_fetch": "2026-10-29T15:00:48.512Z",
+        "sync_health": "stale",
+        "review_documents": 183,
+        "aftercheck_pending": 0
+      }
+    },
+    "authenticated_browser": {
+      "status": "unavailable_after_deployment",
+      "reason": "originating browser context unavailable",
+      "last_verified_production_browser_version": 34
+    },
+    "production_mutations_tested": false,
+    "real_emails_sent": 0,
+    "real_payments_performed": 0,
+    "limitations": [
+      "The preexisting backup is copy_readback only and API evidence is explicitly unassessed; no new production verification pass or restore.",
+      "API original receipts checksum retained parsed JSON, not bank-signed wire bytes.",
+      "Actual authenticated Site35 browser flow was not verified; local synthetic UI results are separate.",
+      "The bank and Gmail business timestamps are observations, not new completed business workflows."
+    ]
+  },
+  "delivery": {
+    "status": "not_pushed_or_published",
+    "owner": "root",
+    "main_commit": null,
+    "actions_run": null,
+    "actions_conclusion": null,
+    "sites_version": null,
+    "sites_source_commit": null,
+    "sites_deployment": null,
+    "instruction": "Fyll endast efter faktiskt verifierad normal main-leverans, exakt-SHA CI och separat Sites-publicering. Ingen förhandsutfyllnad av Site36."
+  },
+  "score_previous_total": 250,
+  "score_total": 253.5,
+  "score_change": 3.5,
+  "score_mean": 7.681818181818182,
+  "score_method": "F+S+K+U+P, each0..2 in0.5 steps; only explicitly approved deltas applied; no automatic production-point increase.",
+  "score_arithmetic_note": "250 +4.5 improvements -1.0 backup/restore reductions =253.5. The planning estimate254 does not equal the specified deltas.",
+  "areas": [
+    {
+      "number": 1,
+      "area": "Design och färger",
+      "previous": 7.5,
+      "new": 8.0,
+      "delta": 0.5,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 1.0,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "improvement": "Tre svaga textfärger har rättats inom den svartvita designen.",
+      "test": "Tre regressioner beräknar kontrast från faktisk CSS: minst 5,090:1 i de berörda lägena; lokal mobilvy kontrollerad.",
+      "prod": "Sites35 är tidigare UI. Cykel4 är ännu inte publicerad.",
+      "gap": "Full tillgänglighetsmatris, hjälpmedel och aktuell produktionsvy återstår.",
+      "next": "Publicera och kontrollera berörda texter, fokus och hjälpmedel i rätt revision.",
+      "evidence": [
+        "E4-UI",
+        "E4-MOBILE"
+      ]
+    },
+    {
+      "number": 2,
+      "area": "Startsida",
+      "previous": 8.5,
+      "new": 8.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "improvement": "Översikten får relevanta läsfel; listor visar inloggning eller okänd status tills data finns.",
+      "test": "Slutlig lokal Chromium-kontroll och 23 nya Dashboard-fall ingår i 831 Sites-tester.",
+      "prod": "Läsande driftstatus efter Sites35; ingen autentiserad Site35-webbkedja.",
+      "gap": "Komplett ekonomiskt underlag och B1/B2; cykel4s nya UI ännu lokalt.",
+      "next": "Verifiera samma publicerade översikt med tillåten inloggning och känt underlag.",
+      "evidence": [
+        "E4-LOADING",
+        "E4-BROWSER-READINESS",
+        "E35"
+      ]
+    },
+    {
+      "number": 3,
+      "area": "Navigering",
+      "previous": 7.5,
+      "new": 8.5,
+      "delta": 1.0,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "subscores": {
+        "F": 2,
+        "S": 1.5,
+        "K": 2,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "improvement": "Tillåtna vy-URL:er, direktlänkar, omladdning, Back/Forward och riktiga länkar införda; HTTP-hydrering rättad.",
+      "test": "SSR-/hookfall och riktig Chromium verifierar historik, filter, utkast, fokus samt två snabba Back med en synlig bekräftelse.",
+      "prod": "Sites35 saknar denna nya navigation; senaste verifierade produktionswebbläsare är version34.",
+      "gap": "Native beforeunload är miljömässigt overifierad; 401 kan fortfarande förstöra modalutkast.",
+      "next": "Leverera den granskade navigationen; slutför separat 401-rättning och verifiera riktig publicerad vy.",
+      "evidence": [
+        "E4-NAV",
+        "E4-UUID",
+        "E4-NAV-BROWSER"
+      ]
+    },
+    {
+      "number": 4,
+      "area": "Mobilanpassning",
+      "previous": 8.0,
+      "new": 8.5,
+      "delta": 0.5,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      },
+      "improvement": "Mobil detalj får märkt fokus; Tillbaka återför fokus till ursprungsraden eller synlig reserv. Desktop behåller radfokus.",
+      "test": "9 nya fokusfall; Chromium 390/1440/320 px verifierar fram/tillbaka, resize och mobilmenyns Tab/Escape.",
+      "prod": "Reproducerat fokusfel i version34; rättningen är ännu endast lokalt verifierad.",
+      "gap": "Fysisk pekskärm, fler webbläsare och autentiserad ny produktionsrevision återstår.",
+      "next": "Verifiera samma mobilsekvenser efter publicering och utöka hjälpmedelsmatrisen.",
+      "evidence": [
+        "E4-FOCUS",
+        "E4-MOBILE"
+      ]
+    },
+    {
+      "number": 5,
+      "area": "Sökning och filtrering",
+      "previous": 7.0,
+      "new": 7.5,
+      "delta": 0.5,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Sökning och filter bevaras per vy i RAM genom historik; sena lässvar återställer inte nyligen sparat arbete.",
+      "test": "Chromium behåller sökning 1003 och delbetalningsfilter efter Back; hookfall täcker sena svar och samma-vy-länkar.",
+      "prod": "Nya filter-/historikbeteendet är inte verifierat på Sites35.",
+      "gap": "Volym, fler sökfall och B2; inga filter eller kundvärden sparas i URL.",
+      "next": "Verifiera större syntetiska listor och den publicerade historikkedjan.",
+      "evidence": [
+        "E4-NAV",
+        "E4-NAV-BROWSER",
+        "E4-LOADING"
+      ]
+    },
+    {
+      "number": 6,
+      "area": "Minimal manuell hantering",
+      "previous": 6.5,
+      "new": 6.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 0.5
+      },
+      "improvement": "Svenska bindestrecksdatum stöds; tvetydiga identiteter och belopp hålls kvar för granskning.",
+      "test": "100 parserfall över båda motorerna; riktiga PDF-flöden och ett Node-OCR-fall, utan sänkt motpartskrav.",
+      "prod": "183 granskningsdokument observerade efter Sites35; inget nytt automatiskt verksamhetsutfall.",
+      "gap": "B3–B5: pausad Gmail-automatik, moln-OCR och representativ verksamhetskorpus.",
+      "next": "Fortsätt med godkända original/facit och faktiska driftutfall; behåll säkerhetskraven.",
+      "evidence": [
+        "E4-PARSER",
+        "E35"
+      ]
+    },
+    {
+      "number": 7,
+      "area": "Kundfakturor",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Kundfakturalistan visar ärlig laddning/fel/inloggning; CSV är spärrad när data saknas.",
+      "test": "Fördröjt GET, fel, 401, verklig noll, refresh/retry och sena svar testade; lokal utloggad Chromium-vy kontrollerad.",
+      "prod": "Cykel3s bankintegritet finns i Sites35; nya listgränser är ännu opublicerade.",
+      "gap": "401 kan radera öppet fakturautkast; B1/B2/B5 och verklig fakturakedja återstår.",
+      "next": "Omgranska separat 401-kandidat, integrera med nya grindar och verifiera fakturakedjan.",
+      "evidence": [
+        "E4-LOADING",
+        "E4-BROWSER-READINESS",
+        "E35"
+      ]
+    },
+    {
+      "number": 8,
+      "area": "Leverantörsfakturor",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Leverantörslistan skiljer okänd data från verklig noll; parsern behåller osäkra original för granskning.",
+      "test": "Samma listmatris som kundfakturor samt riktiga syntetiska PDF-/registreringsfall och dubblettkontroll.",
+      "prod": "Ingen ny produktionsregistrering eller verifierad leverantörskedja i denna cykel.",
+      "gap": "401-utkastfelet samt B2/B5; verksamhetspolicy för undantag kvarstår.",
+      "next": "Slutför 401-rättningen och verifiera tillåtna leverantörsoriginal med facit.",
+      "evidence": [
+        "E4-LOADING",
+        "E4-PARSER",
+        "E4-BROWSER-READINESS"
+      ]
+    },
+    {
+      "number": 9,
+      "area": "PDF-tolkning",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Rubriker/kolumner kan inte bli fakturaidentitet; VAT-procent behandlas inte som kronor. Svenska bindestrecksdatum stöds.",
+      "test": "50 fall per motor; visuellt identiska PDF:er med omvänd ritordning hålls utan registrering; oberoende v2-omgranskning.",
+      "prod": "Ingen omtolkning eller automatregistrering av produktionsoriginal utförd.",
+      "gap": "B5; okända layouter, månadsnamn och procent-plus-belopp kräver fortsatt granskning.",
+      "next": "Utöka endast mot godkänd representativ korpus och facit utan att gissa kolumnroller.",
+      "evidence": [
+        "E4-PARSER"
+      ]
+    },
+    {
+      "number": 10,
+      "area": "Bild-OCR",
+      "previous": 7.0,
+      "new": 7.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.5
+      },
+      "improvement": "Den syntetiska bildkorpusen ger exakt identitet, OCR, datum och total med bevarat bildoriginal; låg säkerhet hålls kvar.",
+      "test": "Faktisk offline-Tesseract i Node; originalbytes/hash och icke-grön status verifierade.",
+      "prod": "Ingen ny verifierad moln-OCR-slutföring med användardatorn avstängd.",
+      "gap": "B4/B5; detta bevisar inte Sites OCR-worker eller verklig OCR-precision.",
+      "next": "Kör tillåtet original genom molnkanalen med lokal OCR stoppad och mät mot facit.",
+      "evidence": [
+        "E4-PARSER"
+      ]
+    },
+    {
+      "number": 11,
+      "area": "Gmail-anslutning",
+      "previous": 7.0,
+      "new": 7.5,
+      "delta": 0.5,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.0
+      },
+      "improvement": "Gmail skiljer laddning/fel/okänt från verkliga nollor; statusberoende åtgärder spärras tills status är laddad.",
+      "test": "Fyra nya statusfall med riktig laddad-noll-kontroll; felaktigt svar och read-only retry ingår i fokuserad UI-svit.",
+      "prod": "Ansluten men stale; senaste lyckade hämtning 2026-10-29T15:00:48.512Z. Timschemat fortsatt avstängt.",
+      "gap": "B3/B2; tydligare UI är inget bevis för aktuell hämtning eller körande schema.",
+      "next": "Verifiera publicerad fel-/laddningsvy och klarlägg pausen inom användarens mandat.",
+      "evidence": [
+        "E4-UI",
+        "E35"
+      ]
+    },
+    {
+      "number": 12,
+      "area": "Automatisk fakturaregistrering",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Parsern stoppar falska identiteter och motstridiga skattebelopp före faktisk registrering.",
+      "test": "Riktig Node-/Sites-PDF och registrering; okänd motpart, kredit och motsägande total stannar i granskning.",
+      "prod": "Ingen ny automatisk produktionsregistrering prövad.",
+      "gap": "B2/B3/B5; faktiska motparter och verksamhetsfacit återstår.",
+      "next": "Verifiera tillåtna original genom hela kedjan och behåll motpartsspärren.",
+      "evidence": [
+        "E4-PARSER"
+      ]
+    },
+    {
+      "number": 13,
+      "area": "Dubblettkontroll",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Exakt hel fakturaidentitet bevaras; rubrikord, trunkerade och motstridiga identiteter accepteras inte.",
+      "test": "Andra PDF-kopian med olika bytes blir dubblett; visuellt lika men olikt ritordnade original ger inga dubbla registreringar.",
+      "prod": "Inga riktiga poster ändrade för att testa dubbletter.",
+      "gap": "B2/B5 och fler verksamhetslayouter; syntetisk korpus är avgränsad.",
+      "next": "Verifiera anonymiserade dubblettfall med godkänt facit och oförändrade original.",
+      "evidence": [
+        "E4-PARSER"
+      ]
+    },
+    {
+      "number": 14,
+      "area": "Dokumentgranskning",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Mobilens inline-granskning får synlig fokuspunkt och säker retur; osäker parserdata förblir synlig som granskningsbehov.",
+      "test": "Fokusfall täcker borttaget ärende/editor, filter, viewport och unmount; faktisk Chromium-fram/tillbaka godkänd.",
+      "prod": "Version34s fokusfel reproducerat; ingen ny publicerad rättning än.",
+      "gap": "401 kan fortfarande radera modalutkast; B2/B5 och större granskningskedja.",
+      "next": "Slutför separat auth-utkastreview och kontrollera granskningen i publicerad revision.",
+      "evidence": [
+        "E4-FOCUS",
+        "E4-MOBILE",
+        "E4-PARSER"
+      ]
+    },
+    {
+      "number": 15,
+      "area": "Swedbank-anslutning",
+      "previous": 8.5,
+      "new": 8.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      },
+      "improvement": "Befintlig bankanslutning och den tidigare levererade API-originalkontrollen bevaras.",
+      "test": "Båda fulla sviterna gröna; ingen ändring av bankanslutningens affärslogik i denna cykel.",
+      "prod": "Efter Sites35: ansluten, sex timmars intervall, senaste synk 2026-10-30T14:09:57.164Z, inget rapporterat fel.",
+      "gap": "B1: individuell rapport, rätt profil och behörig kanal; aktuell synk är inte komplett bankfacit.",
+      "next": "Behåll anslutningen och inhämta tillåtet bank-/avtalsunderlag.",
+      "evidence": [
+        "E4-GATES",
+        "E35"
+      ]
+    },
+    {
+      "number": 16,
+      "area": "Automatisk bankhämtning",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Banklistan döljer gamla eller påhittade nollor efter misslyckad läsning; ingen ny automatisk hämtning startas.",
+      "test": "Bankens laddnings-/401-/refresh-/retryfall och fulla bankregressioner ingår i 831 Sites.",
+      "prod": "Sites35 innehåller API-originalrättningen; observerad bankstatus är inte en ny hämtning.",
+      "gap": "B1/B2 och verklig aktuell hämtning med kända utfall.",
+      "next": "Verifiera nästa tillåtna riktiga synk och dess original utan att förväxla statusläsning med utfört arbete.",
+      "evidence": [
+        "E4-LOADING",
+        "E4-GATES",
+        "E35"
+      ]
+    },
+    {
+      "number": 17,
+      "area": "Bankgiroimport",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Importerade original och referenser visas med tydlig källtyp; inga import-/allokeringsregler ändras här.",
+      "test": "Presentationsfall skiljer bankbevis, manuell registrering och overifierad historik; befintliga importfall fortsatt gröna.",
+      "prod": "Sites35s API-/filintegritet levererad; autentiskt individuellt Swedbankunderlag saknas.",
+      "gap": "B1 och relevant produktionsimport; visningsetiketter bevisar inte filens bankursprung.",
+      "next": "Verifiera avtalad rapportprofil och tillåtet original genom publicerad importkedja.",
+      "evidence": [
+        "E4-UI",
+        "E4-GATES",
+        "E35"
+      ]
+    },
+    {
+      "number": 18,
+      "area": "Identifiera verklig betalare",
+      "previous": 6.0,
+      "new": 6.5,
+      "delta": 0.5,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 2,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      },
+      "improvement": "Manuellt angiven betalare och okänt historiskt ursprung presenteras inte som bankens ursprungsuppgifter.",
+      "test": "Åtta nya evidensrenderingsfall med positiva bankkontroller; senare manuell bekräftelse ändrar inte originalets ursprung.",
+      "prod": "Nya etiketter är ännu opublicerade; autentisk individuell betalarverifiering saknas.",
+      "gap": "B1/B2. Lokal säker visning ger inte verklig betalaridentitet.",
+      "next": "Publicera etiketter och jämför tillåtna autentiska individer mot bankfacit.",
+      "evidence": [
+        "E4-UI"
+      ]
+    },
+    {
+      "number": 19,
+      "area": "Verklig OCR/fakturareferens",
+      "previous": 6.0,
+      "new": 6.5,
+      "delta": 0.5,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 2,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      },
+      "improvement": "Fakturareferens, OCR och generell referens har separata etiketter; ledande nollor och originalets egen evidens bevaras.",
+      "test": "Riktiga renderfall för typad OCR/fakturareferens, manuell komplettering och original; parserns positiva 000018-kontroller.",
+      "prod": "Ingen ny verifierad verklig OCR-/fakturareferens efter Sites35.",
+      "gap": "B1/B2; generisk referens eller syntetiskt korrekt OCR är inte bankens facit.",
+      "next": "Verifiera uttrycklig banktyp och exakta referensbytes på tillåten individuell rapport.",
+      "evidence": [
+        "E4-UI",
+        "E4-PARSER"
+      ]
+    },
+    {
+      "number": 20,
+      "area": "Automatisk betalningsmatchning",
+      "previous": 7.5,
+      "new": 7.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.0
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.0
+      },
+      "improvement": "Ingen matchningsregel ändras; visningsrättningen behåller gränsen mellan bankfakta, manuell bekräftelse och förslag.",
+      "test": "519 Node + 831 Sites inkluderar tidigare matchnings-/integritetsfall.",
+      "prod": "API-originalgränsen finns i Sites35; inga riktiga allokeringar utförda som cykel4-test.",
+      "gap": "B1/B2 och full faktisk avstämningskedja.",
+      "next": "Verifiera tillåtet autentiskt underlag och förväntade saldon läsande före nästa godkända verksamhetsåtgärd.",
+      "evidence": [
+        "E4-GATES",
+        "E35"
+      ]
+    },
+    {
+      "number": 21,
+      "area": "Delbetalningar",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Delbetalningsfilter överlever historik; ekonomiska delbetalningsregler är oförändrade.",
+      "test": "Chromium behåller delbetalningsfilter och sökning efter Back; full ekonomisvit grön.",
+      "prod": "Inga nya verkliga delbetalningar testade i denna cykel.",
+      "gap": "B1/B2 och behörigt jämförelseunderlag.",
+      "next": "Kontrollera exakt återstående belopp och historik mot tillåtet produktionsfacit.",
+      "evidence": [
+        "E4-NAV-BROWSER",
+        "E4-GATES"
+      ]
+    },
+    {
+      "number": 22,
+      "area": "Överbetalningar",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Ingen överbetalningslogik ändras; ärliga liststatusar förhindrar att okända belopp visas som noll.",
+      "test": "Fulla regressionssviter och Dashboard-laddningsmatris gröna.",
+      "prod": "Inga nya verkliga överbetalningar eller återbetalningar utförda.",
+      "gap": "B1/B2 och riktiga belopps-/historikbevis.",
+      "next": "Verifiera tillåtet överbetalningsfall utan automatisk återbetalning.",
+      "evidence": [
+        "E4-LOADING",
+        "E4-GATES"
+      ]
+    },
+    {
+      "number": 23,
+      "area": "Flera fakturor i en betalning",
+      "previous": 7.5,
+      "new": 7.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Samlingsbetalningens mobila detalj kan öppnas och lämnas med synligt fokus; ekonomiska fördelningsregler bevaras.",
+      "test": "Chromium 390 px: märkt Samlingsbetalning-region och retur till samma rad; fulla fördelningsfall gröna.",
+      "prod": "Ingen ny verklig samlingsbetalning/allokering prövad.",
+      "gap": "B1/B2, kompletta individdetaljer och verksamhetspolicy.",
+      "next": "Verifiera verklig tillåten samlingsrapport och oförändrade totaler.",
+      "evidence": [
+        "E4-MOBILE",
+        "E4-GATES"
+      ]
+    },
+    {
+      "number": 24,
+      "area": "Betalningshistorik",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Betalningshistorikens innehåll ändras inte; vyhistorik skiljs från ekonomisk historik.",
+      "test": "Fulla befintliga historik-/replayfall gröna; navigation kör inga finansiella kommandon.",
+      "prod": "Ingen ny produktionshistorik skapad för test.",
+      "gap": "B2 och behörigt historiskt jämförelseunderlag.",
+      "next": "Verifiera läsande tidslinje och källspårning på rätt publicerade revision.",
+      "evidence": [
+        "E4-NAV",
+        "E4-GATES"
+      ]
+    },
+    {
+      "number": 25,
+      "area": "Betalningsstatus",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Okänd/felaktigt hämtad status visas inte som laddad noll; original- och manuella uppgifter är tydligare separerade.",
+      "test": "23 Dashboard-fall, åtta evidensfall och fulla statusregressioner ingår i slutgrindarna.",
+      "prod": "Sites35 har tidigare aktuella API-bevisgränser; inget nytt riktigt betalningsutfall.",
+      "gap": "B1/B2; visningen ensam bevisar inte full betalning.",
+      "next": "Kontrollera rätt publicerad status mot tillåten faktura och komplett bankunderlag.",
+      "evidence": [
+        "E4-LOADING",
+        "E4-UI",
+        "E4-GATES",
+        "E35"
+      ]
+    },
+    {
+      "number": 26,
+      "area": "Kontrollera alla betalningar",
+      "previous": 8.0,
+      "new": 8.0,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Granskningskön får robust mobilfokus och ärligare omgivande felstatus; kontrollern startas fortsatt uttryckligen.",
+      "test": "Fokus-/kontrollsvit 41/41 och fulla grindar; modal/render/resize utlöser inga extra åtgärder.",
+      "prod": "Ingen ny produktionskontroll körd i cykel4.",
+      "gap": "B1–B4 och faktiskt fullständigt kontrollutfall; 401-utkastfelet kvarstår.",
+      "next": "Verifiera kontrollerat driftutfall när rätt underlag och mandat finns; avsluta separat auth-fix.",
+      "evidence": [
+        "E4-FOCUS",
+        "E4-GATES"
+      ]
+    },
+    {
+      "number": 27,
+      "area": "Automatiska mejlutkast",
+      "previous": 7.5,
+      "new": 8.0,
+      "delta": 0.5,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "improvement": "Utkastens granskningsunderlag skiljer bankens original, fakturareferens och separat manuell bekräftelse.",
+      "test": "Evidensrendering plus utkast-/samma-vy-/spargränser testade; faktiskt dirty-länk/Back-beteende verifierat lokalt.",
+      "prod": "Noll riktiga mejl skickade; ny presentation ännu opublicerad.",
+      "gap": "B2; sändningsgranskning i rätt revision samt native beforeunload återstår.",
+      "next": "Verifiera ett tillåtet utkast utan sändning; bevara uttrycklig separat sändningsåtgärd.",
+      "evidence": [
+        "E4-UI",
+        "E4-NAV",
+        "E4-NAV-BROWSER"
+      ]
+    },
+    {
+      "number": 28,
+      "area": "Schemalagd automatisering",
+      "previous": 6.5,
+      "new": 6.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      },
+      "improvement": "Gmail visar tydligare okänd/stale status; inget schema aktiveras eller ändras.",
+      "test": "Laddnings-/fel-/nollfall och tidigare automationsregressioner ingår i 1350.",
+      "prod": "Bank/backup-lägen bevarade; Gmail-timschemat fortsatt avstängt.",
+      "gap": "B3/B4; konfiguration och worker-kontakt är inte slutfört schemalagt arbete.",
+      "next": "Klarlägg befintlig paus och samla faktiska körnings-/OCR-kvitton inom mandatet.",
+      "evidence": [
+        "E4-UI",
+        "E4-GATES",
+        "E35"
+      ]
+    },
+    {
+      "number": 29,
+      "area": "Säkerhetskopiering",
+      "previous": 8.0,
+      "new": 7.5,
+      "delta": -0.5,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 1,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      },
+      "improvement": "Ny reproduktion sänker säkerhetsbedömningen: backup kan märkas complete trots borttagen tidigare verifierad kopia.",
+      "test": "Sexfilsrepro: verifiera fem, radera kopia0, verifiera sista; main6660 gav complete/6 med bara fem kopior. Separat rättning på review.",
+      "prod": "Äldre backup: 191 kopierade; copy_readback, verified_files=0, API-bedömning unassessed. Inget nytt manifest-/restoreprov.",
+      "gap": "Öppet internt false-complete-fel, storleks-/radgränser, tidsmässig tvärlagringskonsistens och B6.",
+      "next": "Omgranska separat backupfix, integrera med nya grindar; utför tillåtet isolerat återställningsprov.",
+      "evidence": [
+        "E4-OPEN-BACKUP",
+        "E35"
+      ]
+    },
+    {
+      "number": 30,
+      "area": "Säkerhet och åtkomstkontroll",
+      "previous": 8.5,
+      "new": 8.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1
+      },
+      "improvement": "Kryptografisk UUID fungerar även när HTTP saknar randomUUID; ingen svag slumpfallback införs.",
+      "test": "Exakta UUID-version/variantbitar, 1024 unika stickprov, verklig historikinitiering och fail-closed utan kryptografisk källa.",
+      "prod": "Exakt main/Sites35 verifierade; autentiserade läsningar men ingen ny webbläsarkedja efter version35.",
+      "gap": "Auth-förlust kan radera modalutkast; separat ägarbunden rättning är ännu på review. B2 kvarstår.",
+      "next": "Omgranska identitets-/utkastkandidaten, håll den skild från cykel4 och verifiera nästa revision.",
+      "evidence": [
+        "E4-UUID",
+        "E4-OPEN-AUTH",
+        "E35"
+      ]
+    },
+    {
+      "number": 31,
+      "area": "Katastrofåterställning",
+      "previous": 6.0,
+      "new": 5.5,
+      "delta": -0.5,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 1,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      },
+      "improvement": "Säkerhetsdelen sänks eftersom falskt complete även undergräver påståendet om återställbarhet.",
+      "test": "Borttagning mellan verifieringssteg reproducerad; cykel4 innehåller ingen backupfix eller ny katastrofövning.",
+      "prod": "Inget isolerat återställningsprov av aktuell produktionsbackup; copy_readback är begränsad äldre evidens.",
+      "gap": "Öppet internt backupfel samt B6: oberoende kopia/nycklar, RPO/RTO och faktisk full återställning.",
+      "next": "Slutför granskad backupfix och mät ett separat godkänt katastrofprov.",
+      "evidence": [
+        "E4-OPEN-BACKUP",
+        "E35"
+      ]
+    },
+    {
+      "number": 32,
+      "area": "Kodkvalitet och tester",
+      "previous": 8.5,
+      "new": 8.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      },
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      },
+      "improvement": "28 hashbundna ändringar integrerade; parser, UI, navigation, UUID, fokus och laddning granskade inom sina avgränsningar.",
+      "test": "519/519 Node + 831/831 Sites, syntax70, TypeScript/build godkända; båda fulla audits har noll i alla allvarlighetsklasser.",
+      "prod": "Senaste exakta main6660 har Actions41102309328 success och Site35. Cykel4 saknar ännu eget CI-/publiceringskvitto.",
+      "gap": "Kända auth-/backupfel och slutlig leveranskontroll kvarstår; fler tester ensamt ger ingen poänghöjning.",
+      "next": "Pusha endast fryst kandidat, verifiera exakt Actions-SHA och separat publicering; fortsätt reproducerade fel.",
+      "evidence": [
+        "E4-GATES",
+        "E4-REVIEW",
+        "E35"
+      ]
+    },
+    {
+      "number": 33,
+      "area": "Verifiering i verklig produktion",
+      "previous": 6.5,
+      "new": 6.5,
+      "delta": 0.0,
+      "previous_subscores": {
+        "F": 1.5,
+        "S": 1.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 1.5
+      },
+      "subscores": {
+        "F": 1.5,
+        "S": 1.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 1.5
+      },
+      "improvement": "Cykel3 är nu faktiskt levererad som Sites35 med exakta GitHub-/arkiv-/deploykvitton; cykel4 hålls separat.",
+      "test": "Cykel4 lokala grindar 1350 och syntetiska Chromium-kontroller; tidigare cykel3 1161 och exakt CI.",
+      "prod": "Site35 succeeded 18:04:29.900273 UTC; läsande bank/Gmail/backupstatus. Originating browser context saknas efter deployment.",
+      "gap": "B1–B6; ingen autentiserad Site35-webbkedja, nytt bankutfall, moln-OCR eller produktionsrestore.",
+      "next": "Verifiera nästa exakta leverans och tillåtna produktionsflöden när rätt browserkontext finns.",
+      "evidence": [
+        "E4-GATES",
+        "E4-MOBILE",
+        "E4-BROWSER-READINESS",
+        "E35"
+      ]
+    }
+  ],
+  "at_least_9_5": [],
+  "remaining_areas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33
+  ],
+  "known_open": [
+    {
+      "id": "I4-AUTH-DRAFT",
+      "status": "open_in_cycle4",
+      "severity": "Important",
+      "finding": "401/control authorization loss kan radera osparat modalutkast.",
+      "next": "Separat isolerad ägarbunden rättning på review; integrera först efter klartecken och nya grindar.",
+      "included_in_candidate": false
+    },
+    {
+      "id": "I4-BACKUP-COMPLETE",
+      "status": "open_in_cycle4",
+      "severity": "Important",
+      "finding": "Backup kan bli complete om en tidigare verifierad krypterad kopia raderas mellan verifieringsstegen.",
+      "next": "Separat backupkandidat på review; verifiera förlust/ersättning, återförsök och slutlig bevisomfattning.",
+      "included_in_candidate": false
+    },
+    {
+      "id": "V4-BEFOREUNLOAD",
+      "status": "environment_verification_limit",
+      "finding": "Appens reload/raw-link gav ingen synlig varning; fristående standard-HTML med positiv kontroll gav inte heller varning.",
+      "next": "Verifiera native beforeunload i en browseryta som visar dialogen; unit-handler är testad. Inte klassat som bekräftat appfel."
+    },
+    {
+      "id": "V35-BROWSER",
+      "status": "production_verification_limit",
+      "finding": "Originating browser context unavailable efter Site35. Senaste verifierade autentiserade produktionsbrowser är version34.",
+      "next": "Återfå tillåten browserkontext och verifiera rätt publicerad revision; ersätt inte med lokal syntetisk QA."
+    }
+  ],
+  "external_blockers": [
+    {
+      "id": "B1",
+      "gap": "Autentisk individuell Swedbankrapport, rätt avtalad MIG/XSD, OCR-regel och behörig rapportkanal saknas.",
+      "required": "Bank-/avtalsbekräftad profil och läsande kanal samt uttryckligen tillåtet anonymiserat original med kända konto-, datum-, belopps- och individuppgifter. Se `docs/V4-SWEDBANK-CHANNELS.md`. BankID och bankens skydd får inte kringgås."
+    },
+    {
+      "id": "B2",
+      "gap": "Aktuellt autentiserat produktionsflöde för den nya leveransen är inte verifierat.",
+      "required": "Verifiera rätt publicerad revision i befintligt projekt och tillåtna inloggade användarflöden; håll produktionsdata privata."
+    },
+    {
+      "id": "B3",
+      "gap": "Befintligt externt Gmail-timschema är avstängt.",
+      "required": "Fastställ om pausen är avsiktlig, hantera befintlig schemastyrning inom mandatet och verifiera verkliga efterföljande körningar/checkpoints. Ett runtimefält räcker inte."
+    },
+    {
+      "id": "B4",
+      "gap": "Moln-OCR med avstängd användardator och aktuell lyckad slutföring är inte bevisad.",
+      "required": "Kör godkänt syntetiskt original genom befintlig molnkanal när lokal OCR är stoppad; dokumentera originalhash, lease, sparat resultat och tider."
+    },
+    {
+      "id": "B5",
+      "gap": "Representativ godkänd fakturakorpus och verksamhetens fullständiga acceptanspolicy saknas.",
+      "required": "Tillåtna anonymiserade PDF-/bildoriginal med facit och dokumenterade regler för motparter, kontoändringar, krediter och undantag."
+    },
+    {
+      "id": "B6",
+      "gap": "Produktionsbackupens isolerade katastrofprov, oberoende kopia/nyckeltillgång samt RPO/RTO saknar aktuellt bevis.",
+      "required": "Separat tillåten återställningsmiljö, godkänd kopia och nyckelhantering; mät fullständighet och tid utan destruktiv produktionsåterställning."
+    }
+  ],
+  "next": [
+    "Root: verify normal main push and exact CI for this frozen candidate, then independently verify same-project Sites publication.",
+    "Keep auth-draft and backup candidates isolated until independent review completes; run fresh integrated gates for any subsequent merge.",
+    "Verify actual published UI when browser origin context is available; native beforeunload remains unverified.",
+    "Continue B1–B6 evidence work without changing the paused Gmail schedule or claiming unperformed business flows."
+  ]
+}
