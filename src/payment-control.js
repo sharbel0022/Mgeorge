@@ -29,7 +29,13 @@ export function createPaymentControl(db, {adapters, summarize, now = Date.now, c
     finished_at TEXT NOT NULL DEFAULT '', lease_until INTEGER NOT NULL,
     steps TEXT NOT NULL, summary TEXT NOT NULL DEFAULT '{}', UNIQUE(owner,request_id));
     CREATE UNIQUE INDEX IF NOT EXISTS payment_control_one_active
-    ON payment_control_runs(owner) WHERE status='running';`);
+    ON payment_control_runs(owner) WHERE status='running';
+    CREATE TABLE IF NOT EXISTS payment_control_requests (
+      owner TEXT NOT NULL, request_id TEXT NOT NULL,
+      run_id TEXT NOT NULL REFERENCES payment_control_runs(id), created_at TEXT NOT NULL,
+      PRIMARY KEY(owner,request_id));
+    INSERT OR IGNORE INTO payment_control_requests(owner,request_id,run_id,created_at)
+      SELECT owner,request_id,id,started_at FROM payment_control_runs;`);
   const pending = new Map();
   let stopping = false;
   const unpack = row => row ? {id: row.id, status: row.status, started_at: row.started_at,
@@ -115,7 +121,10 @@ export function createPaymentControl(db, {adapters, summarize, now = Date.now, c
     let job, reused = false;
     try {
       recover(owner);
-      const same = db.prepare('SELECT * FROM payment_control_runs WHERE owner=? AND request_id=?').get(owner, requestId);
+      const receipt = db.prepare('SELECT run_id FROM payment_control_requests WHERE owner=? AND request_id=?').get(owner, requestId);
+      const same = receipt ? db.prepare('SELECT * FROM payment_control_runs WHERE owner=? AND id=?').get(owner, receipt.run_id) :
+        db.prepare('SELECT * FROM payment_control_runs WHERE owner=? AND request_id=?').get(owner, requestId);
+      if (receipt && !same) throw fail('Kontrollens tidigare kvitto kunde inte verifieras. Starta inte samma begäran igen innan historiken har kontrollerats.', 409);
       const running = db.prepare("SELECT * FROM payment_control_runs WHERE owner=? AND status='running'").get(owner);
       const recent = db.prepare('SELECT * FROM payment_control_runs WHERE owner=? ORDER BY rowid DESC LIMIT 1').get(owner);
       const useRecent = recent && now() - Date.parse(recent.started_at) < cooldownMs;
@@ -126,6 +135,10 @@ export function createPaymentControl(db, {adapters, summarize, now = Date.now, c
           .run(id, owner, requestId, time, time, now()+leaseMs, JSON.stringify(CONTROL_STEPS.map(([key,title]) => ({id:key,title,state:'queued',note:''}))));
         job = unpack(db.prepare('SELECT * FROM payment_control_runs WHERE id=?').get(id));
       }
+      // Every accepted ID is a durable receipt, including aliases to an active
+      // or recently finished run. Commit it with the run before scheduling work.
+      db.prepare('INSERT OR IGNORE INTO payment_control_requests(owner,request_id,run_id,created_at) VALUES(?,?,?,?)')
+        .run(owner, requestId, job.id, stamp(now));
       db.exec('COMMIT');
     } catch (error) {db.exec('ROLLBACK');throw error;}
     if (!reused) {

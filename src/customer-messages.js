@@ -1,8 +1,18 @@
 import {randomUUID} from 'node:crypto';
 import {listInvoices,listTransactions,audit,today} from './db.js';
 import {digest} from './security.js';
+import {reconciliationData} from './reconciliation.js';
+import {invoiceAbsenceVerified} from './bank-evidence.js';
 
 const fail=(message,status=409)=>Object.assign(new Error(message),{status});
+const paymentAssertions=new Set(['partial','possible_vat','overpayment']);
+function messageEvidenceIssue(evidence,message){
+  const invoice=evidence.invoices.find(i=>i.id===message.invoice_id);
+  if(!invoice)return 'Fakturan saknas.';
+  if(paymentAssertions.has(message.kind)&&invoice.payment_evidence_issue)return invoice.payment_evidence_issue;
+  if(message.kind==='overdue'&&!invoiceAbsenceVerified(invoice))return 'Utebliven betalning är inte verifierad mot aktuella bankunderlag.';
+  return '';
+}
 const contactIdentity=i=>digest(JSON.stringify([i.party,i.organization_number]));
 export function validRecipient(email){
   if(typeof email!=='string'||email.length>240||!/^[-A-Za-z0-9.!#$%&'*+/=?^_`{|}~]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)||/[\r\n\0]/.test(email))return false;
@@ -22,20 +32,23 @@ export function paymentSnapshot(db,id){
 }
 const money=c=>new Intl.NumberFormat('sv-SE',{style:'currency',currency:'SEK'}).format(c/100);
 export function generateMessage(i,kind){
+  if(paymentAssertions.has(kind)&&i.payment_evidence_issue)throw fail(i.payment_evidence_issue);
   const intro=`Hej ${i.party},\n\nVi kontaktar er angående faktura ${i.invoice_number} på ${money(i.total_cents)}.`,paid=`Vi har verifierat betalningar på ${money(i.paid_cents)}. Återstående saldo är ${money(i.remaining_cents)}.`;
   const text={partial:`${paid} Vänligen kontrollera resterande belopp och återkom om ni har frågor.`,possible_vat:`${paid} Skillnaden motsvarar fakturans momsbelopp på ${money(i.vat_cents)}. Kan betalningen ha avsett beloppet exklusive moms? Hjälp oss gärna att kontrollera detta.`,missing_reference:'Betalningsunderlaget saknar fakturareferens. Kan ni bekräfta betalningsdatum, belopp och vilken faktura betalningen avser? Betalningen är ännu inte säkert kopplad.',wrong_reference:'Betalningsreferensen behöver kontrolleras. Kan ni bekräfta vilken faktura betalningen avser och ange korrekt fakturanummer?',overdue:`${paid} Förfallodatum var ${i.due_at}. Våra betalningsunderlag har kontrollerats. Vänligen kontrollera betalningen och återkom med betalningsbekräftelse om beloppet redan har betalats.`,overpayment:'En verifierad betalning överstiger det belopp som fördelats till fakturan. Kan ni hjälpa oss att kontrollera vad det överskjutande beloppet avser?',possible_duplicate:'Vi har hittat betalningsunderlag som kan avse ytterligare en betalning för fakturan. Vi behöver er hjälp att kontrollera detta innan vi drar någon slutsats.',confirmation:'Vi behöver hjälp att stämma av betalningsunderlaget. Kan ni skicka betalningsdatum, belopp och betalningsreferens? Vi har ännu inte kunnat fastställa betalningsstatus.'}[kind];
   const referenceNote=kind==='wrong_reference'&&i.payment_references?.length?`\n\nReferenser i underlaget: ${i.payment_references.join(', ')}. Fakturans referens: ${i.reference||i.invoice_number}.`:'';
   return {subject:`Avstämning av faktura ${i.invoice_number}`.replace(/[\r\n\0]/g,' '),body:`${intro}\n\n${text}${referenceNote}\n\nTack för hjälpen!\nM.George Vitvaror AB`};
 }
 export function prepareMessages(db){
-  for(const m of db.prepare("SELECT * FROM customer_messages WHERE status='draft'").all())if(m.snapshot!==paymentSnapshot(db,m.invoice_id)){
+  const evidence=reconciliationData(db);
+  for(const m of db.prepare("SELECT * FROM customer_messages WHERE status='draft'").all())if(m.snapshot!==paymentSnapshot(db,m.invoice_id)||messageEvidenceIssue(evidence,m)){
     db.prepare("UPDATE customer_messages SET status='stale',updated_at=CURRENT_TIMESTAMP WHERE id=?").run(m.id);audit(db,'message_invalidated',{id:m.id,version:m.version});
   }
-  for(const i of listInvoices(db).filter(i=>i.direction==='customer'&&i.kind!=='credit'&&i.currency==='SEK')){
+  for(const i of evidence.invoices.filter(i=>i.direction==='customer'&&i.kind!=='credit'&&i.currency==='SEK')){
     const findings=db.prepare('SELECT * FROM reconciliation_findings WHERE invoice_id=? AND active=1').all(i.id);
     const kinds=new Set();
-    if(i.paid_cents>0&&i.remaining_cents>0)kinds.add(i.vat_cents>0&&i.net_cents+i.vat_cents===i.total_cents&&i.remaining_cents===i.vat_cents&&i.net_cents===i.paid_cents?'possible_vat':'partial');
-    if(!i.paid_cents&&i.is_overdue)kinds.add(i.reconciled_at&&!findings.length?'overdue':'confirmation');
+    if(i.paid_cents>0&&i.payment_evidence_issue)kinds.add('confirmation');
+    if(i.paid_cents>0&&i.remaining_cents>0&&!i.payment_evidence_issue)kinds.add(i.vat_cents>0&&i.net_cents+i.vat_cents===i.total_cents&&i.remaining_cents===i.vat_cents&&i.net_cents===i.paid_cents?'possible_vat':'partial');
+    if(!i.paid_cents&&i.is_overdue)kinds.add(invoiceAbsenceVerified(i)&&!findings.length?'overdue':'confirmation');
     if(findings.some(f=>['reference_conflict','wrong_reference'].includes(f.kind)))kinds.add('wrong_reference');
     const identity=value=>String(value||'').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
     if(findings.some(f=>f.kind==='missing_reference'))kinds.add('missing_reference');
@@ -43,7 +56,7 @@ export function prepareMessages(db){
     if(allocatedReferences.length)kinds.add('wrong_reference');
     if(findings.some(f=>f.kind==='possible_duplicate'))kinds.add('possible_duplicate');
     const excess=db.prepare('SELECT t.amount_cents,(SELECT COALESCE(SUM(amount_cents),0) FROM allocations WHERE transaction_id=t.id) AS used FROM bank_transactions t JOIN allocations a ON a.transaction_id=t.id WHERE a.invoice_id=? AND t.excluded=0 AND t.is_aggregate=0').all(i.id).filter(t=>t.amount_cents>t.used);
-    if(i.remaining_cents===0&&excess.length)kinds.add('overpayment');
+    if(i.remaining_cents===0&&excess.length&&!i.payment_evidence_issue)kinds.add('overpayment');
     const storedContact=db.prepare('SELECT * FROM verified_contacts WHERE invoice_id=?').get(i.id),contact=storedContact?.identity===contactIdentity(i)?storedContact:null,snapshot=paymentSnapshot(db,i.id);
     for(const kind of kinds){
       if(db.prepare("SELECT id FROM customer_messages WHERE invoice_id=? AND kind=? AND status IN ('sending','sent','unknown') LIMIT 1").get(i.id,kind))continue;
@@ -54,12 +67,14 @@ export function prepareMessages(db){
   }
 }
 export function listMessages(db){
-  return db.prepare('SELECT * FROM customer_messages ORDER BY created_at DESC,rowid DESC').all().map(m=>({...m,status:m.status==='draft'&&m.snapshot!==paymentSnapshot(db,m.invoice_id)?'stale':m.status,invoice:listInvoices(db).find(i=>i.id===m.invoice_id),contact:db.prepare('SELECT * FROM verified_contacts WHERE invoice_id=?').get(m.invoice_id),findings:db.prepare('SELECT * FROM reconciliation_findings WHERE invoice_id=? AND active=1').all(m.invoice_id).map(f=>({...f,details:JSON.parse(f.details)})),payments:db.prepare('SELECT t.*,a.amount_cents AS verified_cents,(SELECT content IS NOT NULL FROM import_jobs j WHERE j.id=t.import_id) AS has_original FROM allocations a JOIN bank_transactions t ON t.id=a.transaction_id WHERE a.invoice_id=?').all(m.invoice_id),delivery:db.prepare('SELECT * FROM message_deliveries WHERE message_id=?').get(m.id)}));
+  const evidence=reconciliationData(db);
+  return db.prepare('SELECT * FROM customer_messages ORDER BY created_at DESC,rowid DESC').all().map(m=>({...m,status:m.status==='draft'&&(m.snapshot!==paymentSnapshot(db,m.invoice_id)||messageEvidenceIssue(evidence,m))?'stale':m.status,invoice:evidence.invoices.find(i=>i.id===m.invoice_id),contact:db.prepare('SELECT * FROM verified_contacts WHERE invoice_id=?').get(m.invoice_id),findings:db.prepare('SELECT * FROM reconciliation_findings WHERE invoice_id=? AND active=1').all(m.invoice_id).map(f=>({...f,details:JSON.parse(f.details)})),payments:db.prepare('SELECT t.*,a.amount_cents AS verified_cents,(SELECT content IS NOT NULL FROM import_jobs j WHERE j.id=t.import_id) AS has_original FROM allocations a JOIN bank_transactions t ON t.id=a.transaction_id WHERE a.invoice_id=?').all(m.invoice_id),delivery:db.prepare('SELECT * FROM message_deliveries WHERE message_id=?').get(m.id)}));
 }
 function currentMessage(db,id,version){
   const m=db.prepare('SELECT * FROM customer_messages WHERE id=?').get(id);
   if(!m)throw fail('Meddelandet saknas.',404);
   if(m.status!=='draft'||m.version!==version||m.snapshot!==paymentSnapshot(db,m.invoice_id))throw fail('Utkastet eller betalningsunderlaget har ändrats. Hämta och granska den aktuella versionen.');
+  const issue=messageEvidenceIssue(reconciliationData(db),m);if(issue)throw fail('Betalningsunderlaget behöver granskas. '+issue);
   return m;
 }
 export function editMessage(db,id,{version,subject,body},principal){

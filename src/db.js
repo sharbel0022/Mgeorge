@@ -153,11 +153,18 @@ export function audit(db,action,details={}) {
   db.prepare('INSERT INTO audit_events(id,action,details) VALUES(?,?,?)').run(randomUUID(),action,JSON.stringify(details));
 }
 export function today(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Stockholm',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+export function bankEvidenceBlocksAbsence(db){
+  return !!db.prepare("SELECT 1 FROM bank_transactions WHERE CASE WHEN json_valid(bank_evidence_conflicts) THEN json_type(bank_evidence_conflicts)<>'array' OR json_array_length(bank_evidence_conflicts)>0 ELSE 1 END LIMIT 1").get();
+}
 export function listInvoices(db) {
+  const blocked=bankEvidenceBlocksAbsence(db),transactions=new Map(listTransactions(db).map(t=>[t.id,t])),allocations=new Map();
+  for(const a of db.prepare('SELECT invoice_id,transaction_id FROM allocations').all())allocations.set(a.invoice_id,[...(allocations.get(a.invoice_id)||[]),a.transaction_id]);
   return db.prepare(`SELECT i.*, COALESCE((SELECT SUM(a.amount_cents) FROM allocations a WHERE a.invoice_id=i.id),0) AS paid_cents,(SELECT d.id FROM documents d WHERE d.invoice_id=i.id ORDER BY d.created_at DESC LIMIT 1) AS document_id FROM invoices i ORDER BY i.due_at ASC, i.created_at DESC`).all().map(i=>{
     const remaining_cents=i.total_cents-i.paid_cents,is_overdue=remaining_cents>0&&!!i.due_at&&i.due_at<today();
-    const reconciliation_state=i.reconciled_at?'verified':'unreconciled';
-    return {...i,remaining_cents,is_overdue,reconciliation_state,status:remaining_cents===0?'paid':i.paid_cents>0?'partial':!i.reconciled_at?'unreconciled':is_overdue?'overdue':'unpaid'};
+    const payment_evidence_issue=(allocations.get(i.id)||[]).map(id=>{const t=transactions.get(id);if(!t)return 'Underlag för en registrerad betalningskoppling saknas.';const financial=bankFinancialReview(t);return bankEvidenceReviewReason(t)||(financial&&(financial.kind==='reversal'||financial.kind==='refund'&&i.kind!=='credit')?financial.reason:'');}).find(Boolean)||'';
+    const absence_verified=!!i.reconciled_at&&!!i.reconciliation_note?.trim()&&!blocked&&!payment_evidence_issue;
+    const reconciliation_state=i.reconciled_at&&!payment_evidence_issue&&(i.paid_cents>0||absence_verified)?'verified':'unreconciled';
+    return {...i,remaining_cents,is_overdue,absence_verified,payment_evidence_issue,reconciliation_state,status:remaining_cents===0?'paid':i.paid_cents>0?'partial':!absence_verified?'unreconciled':is_overdue?'overdue':'unpaid'};
   });
 }
 export function listTransactions(db) {

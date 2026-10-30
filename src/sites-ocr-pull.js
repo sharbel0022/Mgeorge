@@ -23,28 +23,47 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
   // The server first tries text PDFs, moving scans into the same durable OCR
   // queue. No browser, Windows task or active Gmail sync is needed to drain it.
   // Two server PDF attempts may each use their 15-second parse budget.
-  if(cloud)await json('/api/ocr-worker/process',{},16384,60000);
-  for(let n=0;n<Math.min(maxJobs,6);n++){
-    const lease=await json('/api/ocr-worker/lease',{},8192);
-    if(lease.job===null)break;const job=lease.job;
-    if(!job||typeof job!=='object')throw Error('invalid_job');
-    if(!/^[a-zA-Z0-9_-]{1,100}$/.test(job.id)||!/^[A-Za-z0-9_-]{43}$/.test(job.lease)||!['application/pdf','image/png','image/jpeg','image/webp'].includes(job.mime)||!Number.isInteger(job.size)||job.size>MAX_BYTES||job.size<1||!/^[a-f0-9]{64}$/.test(job.sha256))throw Error('invalid_job');
-    let result;
-    try{
-      const bytes=await boundedBody(await request('/api/ocr-worker/document?id='+encodeURIComponent(job.id),undefined,{'X-MG-OCR-Lease':job.lease}),MAX_BYTES);
-      if(bytes.length!==job.size||createHash('sha256').update(bytes).digest('hex')!==job.sha256)throw Error('hash');
-      const value=await extract(bytes,job.mime);
-      if(!value||value.error||typeof value.text!=='string'||value.text.length>150000||!['pdf','ocr'].includes(value.method)||!Number.isFinite(value.confidence)||value.confidence<0||value.confidence>100)throw Error('ocr');
-      // Do not let an extractor overwrite the authenticated lease identifiers.
-      result={text:value.text,method:value.method,confidence:value.confidence};
-    }catch{result={text:'',method:'ocr',confidence:0,error:true};failed++;}
-    const completion=await json('/api/ocr-worker/complete',{id:job.id,lease:job.lease,sha256:job.sha256,...result},16384);
-    if(completion.ignored||!(result.error?completion.ok===true:completion.registered===true||['ready','needs_review','duplicate'].includes(completion.state)))throw Error('completion_rejected');
-    if(!result.error)processed++;
+  if(cloud){
+    const server=await json('/api/ocr-worker/process',{},16384,60000);
+    // Older Sites responses may omit this field. Only the current server's
+    // bounded, accepted text-PDF count can contribute to completed work.
+    if(Object.hasOwn(server,'processed')){
+      if(!Number.isSafeInteger(server.processed)||server.processed<0||server.processed>2)throw Error('invalid_response');
+      processed=server.processed;
+    }
+    if(server.status_unknown===true){
+      if(processed===0)throw Error('invalid_response');
+      return {processed,failed,status_unknown:true};
+    }
+  }
+  try{
+    for(let n=0;n<Math.min(maxJobs,6);n++){
+      const lease=await json('/api/ocr-worker/lease',{},8192);
+      if(lease.job===null)break;const job=lease.job;
+      if(!job||typeof job!=='object')throw Error('invalid_job');
+      if(!/^[a-zA-Z0-9_-]{1,100}$/.test(job.id)||!/^[A-Za-z0-9_-]{43}$/.test(job.lease)||!['application/pdf','image/png','image/jpeg','image/webp'].includes(job.mime)||!Number.isInteger(job.size)||job.size>MAX_BYTES||job.size<1||!/^[a-f0-9]{64}$/.test(job.sha256))throw Error('invalid_job');
+      let result;
+      try{
+        const bytes=await boundedBody(await request('/api/ocr-worker/document?id='+encodeURIComponent(job.id),undefined,{'X-MG-OCR-Lease':job.lease}),MAX_BYTES);
+        if(bytes.length!==job.size||createHash('sha256').update(bytes).digest('hex')!==job.sha256)throw Error('hash');
+        const value=await extract(bytes,job.mime);
+        if(!value||value.error||typeof value.text!=='string'||value.text.length>150000||!['pdf','ocr'].includes(value.method)||!Number.isFinite(value.confidence)||value.confidence<0||value.confidence>100)throw Error('ocr');
+        // Do not let an extractor overwrite the authenticated lease identifiers.
+        result={text:value.text,method:value.method,confidence:value.confidence};
+      }catch{result={text:'',method:'ocr',confidence:0,error:true};failed++;}
+      const completion=await json('/api/ocr-worker/complete',{id:job.id,lease:job.lease,sha256:job.sha256,...result},16384);
+      if(completion.ignored||!(result.error?completion.ok===true:completion.registered===true||['ready','needs_review','duplicate'].includes(completion.state)))throw Error('completion_rejected');
+      if(!result.error)processed++;
+    }
+  }catch(error){
+    // Preserve only server-accepted work. A later lease, body, or completion
+    // failure stops this run without counting an uncertain job or retrying it.
+    if(processed===0)throw error;
+    return {processed,failed,status_unknown:true};
   }
   return {processed,failed};
 }
 if(process.argv.includes('--config-stdin')){
   let raw='';for await(const chunk of process.stdin){raw+=chunk;if(raw.length>8192)throw Error('configuration');}
-  try{console.log(JSON.stringify(await runSitesOcr(JSON.parse(raw))));}catch{console.log(JSON.stringify({status:'retry_later'}));process.exitCode=1;}
+  try{const result=await runSitesOcr(JSON.parse(raw));console.log(JSON.stringify(result));if(result.status_unknown)process.exitCode=1;}catch{console.log(JSON.stringify({status:'retry_later'}));process.exitCode=1;}
 }

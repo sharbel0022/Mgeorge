@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "cycle": "1B-sites",
+  "verified_at": "2026-10-30T16:59:34.429045+00:00",
+  "github": {
+    "commit": "02d1f84a18c1113f9e68641c384e1cef766f9558",
+    "tree": "a624df8ebf9591fb15e77c27f7b00db849ca2cb8",
+    "actions_run": 41092098871,
+    "conclusion": "success",
+    "jobs": [
+      "test",
+      "sites"
+    ]
+  },
+  "sites": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 33,
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_754dee3b1f548191acb450cbfc95d8d8",
+    "source_commit": "bcb916e570d88abaadf836af0e7a1c5c200e6b0e",
+    "deployment_id": "appgdep_6ae4c95241748191ae2f727fdc73261e",
+    "status": "succeeded",
+    "deployed_at": "2026-10-30T16:44:31.387719Z",
+    "runtime_revision": 9,
+    "archive_sha256": "a8e084f3eaf26761d8efdb87da6718d6828bce734dd626de986b32d4bf0d0d4f",
+    "source_files_compared": 273,
+    "source_files_equal": true,
+    "auth_client_unchanged": true,
+    "access_policy_unchanged": true,
+    "automations_unchanged": true,
+    "gmail_schedule_enabled": false,
+    "rollback_version": 32
+  },
+  "tests": {
+    "node": 407,
+    "sites": 531,
+    "failed": 0,
+    "skipped": 0
+  },
+  "authenticated_browser": {
+    "browser": "Chrome extension",
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "dialog_label": "Huvudmeny",
+      "initial_focus": "Stäng menyn",
+      "shift_tab_wrap": "Import & underlag",
+      "tab_wrap": "Stäng menyn",
+      "escape_closes": true,
+      "escape_focus": "Öppna menyn",
+      "tested_destinations": [
+        "Kundfakturor",
+        "Leverantörsfakturor",
+        "Bank",
+        "Inställningar"
+      ],
+      "destination_focus": true,
+      "horizontal_overflow": false
+    },
+    "desktop_resize": {
+      "width": 1440,
+      "height": 900,
+      "closes_menu": true,
+      "focus": "Inställningar",
+      "mobile_trigger_hidden": true,
+      "horizontal_overflow": false
+    },
+    "overview_cards": [
+      "Inbetalt denna månad",
+      "Kvar att få",
+      "Att betala",
+      "Behöver granskas"
+    ],
+    "primary_control_count": 1,
+    "new_console_errors": 0,
+    "temporary_viewport_reset": true,
+    "remaining_navigation_defect": "View changes leave URL unchanged; browser history and reload do not restore view."
+  },
+  "backup_before_publish": {
+    "day": "2026-10-30",
+    "status": "complete",
+    "files": 191,
+    "copied": 191,
+    "bytes": 63448066,
+    "verified_at": "2026-10-30T01:27:38.129Z",
+    "scope": "legacy copy_readback; not cycle2 manifest pass"
+  },
+  "production_mutations_tested": false,
+  "real_emails_sent": 0,
+  "real_payments_performed": 0,
+  "ocr_followup": {
+    "workflow_run": 41092027444,
+    "job_id": 124188084434,
+    "conclusion": "success",
+    "created_at": "2026-10-30T16:40:30Z",
+    "processed": 0,
+    "failed": 0,
+    "cloud_worker_last_seen": "2026-10-30T16:40:41.937Z",
+    "last_completed": "2026-10-29T07:16:18.997Z",
+    "needs_review": 183,
+    "waiting_ocr": 0,
+    "gmail_last_success": "2026-10-29T15:00:48.512Z",
+    "gmail_external_schedule_enabled": false
+  }
+}

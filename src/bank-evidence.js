@@ -8,6 +8,9 @@ export const hasBankEvidenceConflict = transaction => !!(transaction.bank_eviden
 export const bankEvidenceReviewReason = transaction => transaction.bank_evidence_conflicts?.length ? BANK_EVIDENCE_CONFLICT_REASON
   : transaction.ancestor_bank_evidence_conflicts?.length ? ANCESTOR_BANK_EVIDENCE_CONFLICT_REASON : '';
 
+export const invoiceAbsenceVerified = invoice => invoice.absence_verified !== false &&
+  !!invoice.reconciled_at && !!invoice.reconciliation_note?.trim() && !invoice.payment_evidence_issue;
+
 /** Explicit bank descriptions of a refund or reversal never prove invoice payment. */
 export function bankFinancialReview(transaction,{ancestors=true}={}) {
   const raw = transaction.raw_bank_data || {};

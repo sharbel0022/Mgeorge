@@ -27,21 +27,21 @@ test('oversized images are rejected before native canvas decoding',()=>{
   const png=Buffer.alloc(24);Buffer.from([137,80,78,71,13,10,26,10]).copy(png);png.writeUInt32BE(50000,16);png.writeUInt32BE(50000,20);assert.throws(()=>imageDimensions(png,'image/png'),/image_dimensions/);png.writeUInt32BE(100,16);png.writeUInt32BE(50,20);assert.deepEqual(imageDimensions(png,'image/png'),{width:100,height:50});
 });
 
-function cloudFixture({extract=async()=>({text:'Synthetic OCR',method:'ocr',confidence:90}),complete={state:'needs_review'},bytes=Buffer.from('synthetic document'),downloadBytes=bytes,jobs=1}={}){
+function cloudFixture({extract=async()=>({text:'Synthetic OCR',method:'ocr',confidence:90}),complete={state:'needs_review'},bytes=Buffer.from('synthetic document'),downloadBytes=bytes,jobs=1,server={processed:0},mode='cloud',fail=''}={}){
   const token=randomBytes(32).toString('base64url'),lease=randomBytes(32).toString('base64url');
   const calls=[],bodies=[];let claimed=0,extractCalls=0;
   const job={id:'synthetic-document',lease,mime:'image/png',size:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')};
   const fetchImpl=async(url,options)=>{
     calls.push(new URL(url).pathname);
     assert.equal(new URL(url).origin,'https://site.example');
-    assert.equal(options.redirect,'manual');assert.equal(options.headers.Authorization,'Bearer '+token);assert.equal(options.headers['X-MG-OCR-Runner'],'cloud');
-    if(url.endsWith('/process'))return Response.json({processed:0});
-    if(url.endsWith('/lease'))return Response.json({job:claimed++<jobs?job:null});
+    assert.equal(options.redirect,'manual');assert.equal(options.headers.Authorization,'Bearer '+token);assert.equal(options.headers['X-MG-OCR-Runner'],mode==='cloud'?'cloud':undefined);
+    if(url.endsWith('/process'))return Response.json(server);
+    if(url.endsWith('/lease')){if(fail==='lease'||fail==='second lease'&&claimed===1)return Response.json({error:'private synthetic lease failure'},{status:503});return Response.json({job:claimed++<jobs?job:null});}
     if(url.includes('/document?')){assert.equal(options.headers['X-MG-OCR-Lease'],lease);return new Response(downloadBytes);}
-    if(url.endsWith('/complete')){bodies.push(JSON.parse(options.body));return typeof complete==='function'?complete(bodies.at(-1)):Response.json(complete);}
+    if(url.endsWith('/complete')){bodies.push(JSON.parse(options.body));if(fail==='complete')return Response.json({error:'private synthetic completion uncertainty'},{status:503});return typeof complete==='function'?complete(bodies.at(-1)):Response.json(complete);}
     throw Error('unexpected_request');
   };
-  return {token,lease,job,calls,bodies,run:options=>runSitesOcr({origin:'https://site.example',token,mode:'cloud'},{fetchImpl,extract:async(...args)=>{extractCalls++;return extract(...args);},...options}),get extractCalls(){return extractCalls;}};
+  return {token,lease,job,calls,bodies,run:options=>runSitesOcr({origin:'https://site.example',token,mode},{fetchImpl,extract:async(...args)=>{extractCalls++;return extract(...args);},...options}),get extractCalls(){return extractCalls;}};
 }
 
 test('cloud worker processes the text queue before OCR and counts only saved completions',async t=>{
@@ -49,6 +49,50 @@ test('cloud worker processes the text queue before OCR and counts only saved com
   const f=cloudFixture();assert.deepEqual(await f.run(),{processed:1,failed:0});
   assert.deepEqual(f.calls,['/api/ocr-worker/process','/api/ocr-worker/lease','/api/ocr-worker/document','/api/ocr-worker/complete','/api/ocr-worker/lease']);
   assert.deepEqual(timeouts,[60000,25000,25000,25000,25000]);
+});
+test('Q8 finalizer: cloud pull preserves a bounded accepted server count and stops before leasing when status is unknown',async()=>{
+  const f=cloudFixture({server:{processed:2,status_unknown:true,metadata_warning:'private server message'}});
+  assert.deepEqual(await f.run(),{processed:2,failed:0,status_unknown:true});assert.deepEqual(f.calls,['/api/ocr-worker/process']);assert.equal(f.extractCalls,0);
+});
+test('Q8 finalizer: validated server text work is counted together with saved OCR work',async()=>{
+  const f=cloudFixture({server:{processed:2}});assert.deepEqual(await f.run(),{processed:3,failed:0});assert.equal(f.bodies.length,1);
+});
+test('Q8 finalizer: an older process response without a count remains compatible without adding unverified work',async()=>{
+  const f=cloudFixture({server:{}});assert.deepEqual(await f.run(),{processed:1,failed:0});assert.equal(f.bodies.length,1);
+});
+for(const processed of [-1,3,1.5,'1',null,true])test('Q8 finalizer: cloud pull rejects an invalid server accepted count '+JSON.stringify(processed),async()=>{
+  const f=cloudFixture({server:{processed}});await assert.rejects(f.run(),/invalid_response/);assert.deepEqual(f.calls,['/api/ocr-worker/process']);
+});
+for(const server of [{status_unknown:true},{processed:0,status_unknown:true}])test('Q8 finalizer: unknown status without any confirmed server work remains an error '+JSON.stringify(server),async()=>{
+  const f=cloudFixture({server});await assert.rejects(f.run(),/invalid_response/);assert.deepEqual(f.calls,['/api/ocr-worker/process']);
+});
+test('Q8 finalizer: cloud CLI reports accepted partial work without a false complete status or private warning',()=>{
+  const script=readFileSync(new URL('../scripts/run-sites-cloud-ocr.mjs',import.meta.url),'utf8');
+  const fake='data:text/javascript;base64,'+Buffer.from("export async function runSitesOcr(){return {processed:2,failed:0,status_unknown:true,metadata_warning:'private warning'};}").toString('base64');
+  const result=spawnSync(process.execPath,['--input-type=module'],{input:script.replace("'../src/sites-ocr-pull.js'",JSON.stringify(fake)),encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot}});
+  assert.ifError(result.error);assert.equal(result.status,1);assert.deepEqual(JSON.parse(result.stdout),{status:'needs_attention',processed:2,failed:0,status_unknown:true});assert.doesNotMatch(result.stdout,/private/);assert.equal(result.stderr,'');
+});
+for(const fail of ['lease','complete'])test('Q8 finalizer: accepted server work survives a later '+fail+' failure without counting uncertain work',async()=>{
+  const f=cloudFixture({server:{processed:1},fail});assert.deepEqual(await f.run(),{processed:1,failed:0,status_unknown:true});assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,1);assert.equal(f.bodies.length,fail==='complete'?1:0);
+});
+test('Q8 finalizer: acknowledged local OCR survives the next lease failure and stops',async()=>{
+  const f=cloudFixture({mode:'local',jobs:2,fail:'second lease'});assert.deepEqual(await f.run(),{processed:1,failed:0,status_unknown:true});assert.equal(f.bodies.length,1);assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,2);assert.equal(f.extractCalls,1);
+});
+test('Q8 finalizer: a failed failure-acknowledgment retains only prior accepted work and the known local failure',async()=>{
+  const f=cloudFixture({server:{processed:1},fail:'complete',extract:async()=>{throw Error('private extraction error');}});assert.deepEqual(await f.run(),{processed:1,failed:1,status_unknown:true});assert.equal(f.bodies.length,1);assert.equal(f.bodies[0].error,true);assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,1);
+});
+for(const fail of ['lease','complete'])test('Q8 finalizer: a '+fail+' failure before any accepted work still rejects',async()=>{
+  const f=cloudFixture({fail});await assert.rejects(f.run(),/site_unavailable/);assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,1);
+});
+test('Q8 finalizer: real cloud CLI keeps the accepted count after a later lease failure',()=>{
+  const script=new URL('../scripts/run-sites-cloud-ocr.mjs',import.meta.url).href;
+  const setup=`process.env.MG_SITES_ORIGIN='https://synthetic.example';process.env.MG_SITES_OCR_TOKEN='C'.repeat(43);globalThis.fetch=async url=>new URL(url).pathname.endsWith('/process')?Response.json({processed:1}):Response.json({error:'private synthetic lease failure'},{status:503});await import(${JSON.stringify(script)});`;
+  const result=spawnSync(process.execPath,['--input-type=module'],{input:setup,encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot}});assert.ifError(result.error);assert.equal(result.status,1);assert.deepEqual(JSON.parse(result.stdout),{status:'needs_attention',processed:1,failed:0,status_unknown:true});assert.equal(result.stderr,'');assert.doesNotMatch(result.stdout,/private|CCCC/);
+});
+test('Q8 finalizer: stdin runner returns known partial work with a nonzero exit instead of claiming success',()=>{
+  const script=new URL('../src/sites-ocr-pull.js',import.meta.url).href;
+  const setup=`process.argv.push('--config-stdin');globalThis.fetch=async url=>new URL(url).pathname.endsWith('/process')?Response.json({processed:1}):Response.json({error:'private synthetic lease failure'},{status:503});await import(${JSON.stringify(script)});`;
+  const result=spawnSync(process.execPath,['--input-type=module','--eval',setup],{input:JSON.stringify({origin:'https://synthetic.example',token:'C'.repeat(43),mode:'cloud'}),encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot}});assert.ifError(result.error);assert.equal(result.status,1);assert.deepEqual(JSON.parse(result.stdout),{processed:1,failed:0,status_unknown:true});assert.equal(result.stderr,'');assert.doesNotMatch(result.stdout,/private|CCCC/);
 });
 
 test('cloud pull path OCRs a real synthetic scan without the local Windows task',async()=>{

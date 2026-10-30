@@ -29,6 +29,10 @@ async function current(owner:string,id:string,version:number){
   return {m,workspace,contact,invoice};
 }
 export async function reconcileAndPrepare(owner:string){
+  // Capture receipts before reading the workspace. A later registration is
+  // left pending for a later bounded control step, never acknowledged by an
+  // older check. The marker is created atomically with the original invoice.
+  const pendingDocuments=await db().prepare("SELECT j.document_id,j.invoice_id,r.attempt FROM document_jobs j JOIN document_registrations r ON r.owner=j.owner AND r.document_id=j.document_id AND r.invoice_id=j.invoice_id WHERE j.owner=? AND j.state='registered' AND j.error_code='registration_aftercheck_pending' ORDER BY j.updated_at,j.document_id LIMIT 100").bind(owner).all<Row>();
   let workspace=await readWorkspace(owner);const result=await reconcileWithOriginals(owner,workspace.state);
   if(result.decisions.length){
     if(new TextEncoder().encode(JSON.stringify(result.state)).length>1800000)throw error('Registret behöver utökad lagring innan fler automatiska matchningar sparas.');
@@ -84,6 +88,8 @@ export async function reconcileAndPrepare(owner:string){
       if(r.meta.changes)await audit(owner,'message.prepared',{id,kind,snapshot});
     }
   }
+  const covered=pendingDocuments.results.filter(r=>workspace.state.invoices.some(i=>i.id===r.invoice_id&&i.documentId===r.document_id&&i.reviewed));
+  for(let n=0;n<covered.length;n+=50)await db().batch(covered.slice(n,n+50).map(r=>db().prepare("UPDATE document_jobs SET error_code='',updated_at=? WHERE owner=? AND document_id=? AND invoice_id=? AND state='registered' AND error_code='registration_aftercheck_pending' AND EXISTS(SELECT 1 FROM document_registrations WHERE owner=? AND document_id=? AND invoice_id=? AND attempt=?) AND EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)").bind(now(),owner,r.document_id,r.invoice_id,owner,r.document_id,r.invoice_id,r.attempt,owner,workspace.revision)));
   return {findings,automatic:result.decisions.filter(d=>d.safe===true&&d.invoice_id&&d.transaction_id&&d.amount_cents>0).length};
 }
 export async function messageList(owner:string){

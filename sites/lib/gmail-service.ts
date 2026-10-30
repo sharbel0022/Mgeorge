@@ -11,6 +11,7 @@ import {hasGmailSendScope,gmailAccount,isGmailConfigured,gmailAuthorizationUrl,e
 
 type GmailLease={assert:()=>Promise<void>;write:(statements:any[])=>Promise<any[]>};
 const POSTPROCESS_WARNING='Gmail-underlagen är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
+const SYNC_METADATA_WARNING='Bearbetningsresultatet är sparat. Gmail-körningens slutstatus kunde inte bekräftas; kontrollera status igen.';
 async function lock<T>(owner:string,fn:(lease:GmailLease)=>Promise<T>){
   const token=uid(),at=now(),until=new Date(Date.now()+300000).toISOString();
   const r=await db().prepare('INSERT INTO gmail_locks(owner,token,expires_at) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET token=excluded.token,expires_at=excluded.expires_at WHERE gmail_locks.expires_at<?').bind(owner,token,until,at).run();
@@ -110,11 +111,21 @@ export async function gmailSync(req?:Request,scheduled=false,invoiceReference=''
   if(invoiceReference&&!/^[\p{L}\p{N} /-]{1,100}$/u.test(invoiceReference))throw Error('Ogiltig fakturareferens.');
   const user=await identity(req);
   const settings=await processingSettings(user);
-  return lock(user.userId,async lease=>{
+  const accepted=(processing:any)=>Number.isSafeInteger(processing?.processed)&&processing.processed>0;
+  let cleanupFallback:Response|undefined;
+  const syncResponse=(body:Record<string,any>,status=200)=>{
+    const result=response(body,status);
+    // Capture only a successfully constructed return with a locally confirmed
+    // processDocuments count. The sole later await is lock cleanup; no earlier
+    // fetch, lease or processing failure may be disguised by this fallback.
+    if(accepted(body.processing))cleanupFallback=response({...body,status_unknown:true,metadata_warning:SYNC_METADATA_WARNING},status);
+    return result;
+  };
+  try{return await lock(user.userId,async lease=>{
     const c=await db().prepare('SELECT * FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();if(!c)return response({error:'Koppla Gmail först.'},409);
-    if(scheduled&&c.sync_failures>=3)return response({status:'blocked',error:'Automatisk Gmail-hämtning är stoppad efter tre avbrutna eller misslyckade försök. Kontrollera anslutningen och gör en manuell hämtning.',processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
-    if(Date.parse(c.retry_after||'')>Date.now())return response({status:'not_due',error:'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.',retry_after:c.retry_after,processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)},scheduled?200:429);
-    if(scheduled&&Date.now()-Date.parse(c.last_attempt||'')<900000)return response({status:'not_due',processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
+    if(scheduled&&c.sync_failures>=3)return syncResponse({status:'blocked',error:'Automatisk Gmail-hämtning är stoppad efter tre avbrutna eller misslyckade försök. Kontrollera anslutningen och gör en manuell hämtning.',processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
+    if(Date.parse(c.retry_after||'')>Date.now())return syncResponse({status:'not_due',error:'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.',retry_after:c.retry_after,processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)},scheduled?200:429);
+    if(scheduled&&Date.now()-Date.parse(c.last_attempt||'')<900000)return syncResponse({status:'not_due',processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
     await lease.write([db().prepare('UPDATE gmail_connections SET last_attempt=?,sync_failures=sync_failures+? WHERE owner=?').bind(now(),scheduled?1:0,user.userId)]);
     const started=c.started_at||now();
     const sources=await db().prepare('SELECT source_id FROM gmail_sources WHERE owner=?').bind(user.userId).all<{source_id:string}>();
@@ -150,10 +161,10 @@ export async function gmailSync(req?:Request,scheduled=false,invoiceReference=''
       completed.push(db().prepare("UPDATE gmail_connections SET sync_failures=0,status='connected' WHERE owner=?").bind(user.userId));
       if(!invoiceReference)completed.unshift(db().prepare("UPDATE gmail_connections SET last_synced=?,page_token=?,started_at=?,status='connected' WHERE owner=?").bind(result.truncated?c.last_synced:started,result.next_page_token||'',result.truncated?started:'',user.userId));
       await lease.write(completed);
-      let processing,warning;
+      let processing,warning,metadataWarning;
       try{await lease.assert();await (await import('./customer-messages')).reconcileAndPrepare(user.userId);processing=settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId);await lease.write([db().prepare("UPDATE gmail_runs SET status='completed' WHERE owner=? AND id=? AND status='completed_pending'").bind(user.userId,runId)]);}
-      catch{warning=POSTPROCESS_WARNING;processing={status:'pending'};}
-      return response({imported,duplicates,found:result.received,more:result.truncated,processing,...(warning?{warning}:{})});
+      catch{warning=POSTPROCESS_WARNING;if(accepted(processing))metadataWarning=SYNC_METADATA_WARNING;else processing={status:'pending'};}
+      return syncResponse({imported,duplicates,found:result.received,more:result.truncated,processing,...(warning?{warning}:{}),...(metadataWarning?{status_unknown:true,metadata_warning:metadataWarning}:{})});
     }catch(e:any){
       await lease.assert();
       const retryAfter=e.code==='rate_limited'?(e.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+Math.max(900,e.retryAfter||900)*1000).toISOString()):c.retry_after||'';
@@ -161,7 +172,7 @@ export async function gmailSync(req?:Request,scheduled=false,invoiceReference=''
       if(tokens)failed.unshift(db().prepare('UPDATE gmail_connections SET tokens=? WHERE owner=?').bind(await encrypt(user.userId,'gmail-tokens',tokens),user.userId));
       await lease.write(failed);throw e;
     }
-  });
+  });}catch(error){if(cleanupFallback)return cleanupFallback;throw error;}
 }
 export async function gmailDisconnect(req:Request){
   const user=await identity(req);return lock(user.userId,async lease=>{
@@ -173,6 +184,16 @@ export async function gmailDisconnect(req:Request){
 export async function gmailReview(req:Request){
   const user=await identity(req);const raw=await req.text();if(raw.length>60000)throw Error('size');const body=JSON.parse(raw);
   const source=await db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? LIMIT 1').bind(user.userId,body.document_id).first<any>();if(!source)throw Error('source');
+  // Opening a preview is a read, including older clients that still submit
+  // their local parse. Retain new evidence only with an explicit decision.
+  if(body.confirm!==true&&body.reject!==true)return response({saved:false});
+  if(source.status==='needs_review'&&body.extraction&&JSON.stringify(body.extraction).length<30000){
+    const extractionId=uid(),extraction=JSON.stringify(body.extraction);
+    await db().batch([
+      db().prepare("INSERT INTO document_extractions(id,owner,document_id,result,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM gmail_sources WHERE owner=? AND document_id=? AND status='needs_review') AND NOT EXISTS(SELECT 1 FROM gmail_sources WHERE owner=? AND document_id=? AND (extraction<>'{}' OR status='registered'))").bind(extractionId,user.userId,body.document_id,extraction,now(),user.userId,body.document_id,user.userId,body.document_id),
+      db().prepare("UPDATE gmail_sources SET extraction=? WHERE owner=? AND document_id=? AND extraction='{}' AND EXISTS(SELECT 1 FROM document_extractions WHERE owner=? AND document_id=? AND id=?)").bind(extraction,user.userId,body.document_id,user.userId,body.document_id,extractionId),
+    ]);
+  }
   if(body.reject===true){
     if(source.status==='registered')throw Error('Fakturan är redan registrerad.');
     const changed=await db().batch([
@@ -181,10 +202,6 @@ export async function gmailReview(req:Request){
     ]);
     return response({rejected:changed[0].meta.changes>0||source.status==='rejected'});
   }
-  // Persist the original extracted values even when a human later corrects them.
-  if(body.extraction&&JSON.stringify(body.extraction).length<30000)await db().prepare("UPDATE gmail_sources SET extraction=? WHERE owner=? AND document_id=? AND extraction='{}'").bind(JSON.stringify(body.extraction),user.userId,body.document_id).run();
-  if(body.confirm!==true)return response({saved:true});
-  if(source.status==='registered')return response({registered:true,duplicate:true});
   const invoice={...body.invoice};
   const fields=body.fields||{};
   return response(await registerProcessedInvoice(user.userId,body.document_id,invoice,{...fields,vat_cents:fields.vat_cents?parseMoney(fields.vat_cents):null,net_cents:fields.net_cents?parseMoney(fields.net_cents):null}));

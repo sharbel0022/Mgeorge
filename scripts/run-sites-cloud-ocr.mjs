@@ -4,8 +4,9 @@ import {runSitesOcr} from '../src/sites-ocr-pull.js';
 // command-line arguments. The extraction child receives no credential variables.
 try{
   const result=await runSitesOcr({origin:process.env.MG_SITES_ORIGIN,token:process.env.MG_SITES_OCR_TOKEN,mode:'cloud'});
-  console.log(JSON.stringify({status:result.failed?'needs_attention':'complete',processed:result.processed,failed:result.failed}));
-  if(result.failed)process.exitCode=1;
+  const needsAttention=result.failed||result.status_unknown;
+  console.log(JSON.stringify({status:needsAttention?'needs_attention':'complete',processed:result.processed,failed:result.failed,...(result.status_unknown?{status_unknown:true}:{})}));
+  if(needsAttention)process.exitCode=1;
 }catch{
   console.log(JSON.stringify({status:'failed',reason:'Kontrollera moln-OCR-konfigurationen och Sites jobbstatus.'}));
   process.exitCode=1;

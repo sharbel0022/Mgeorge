@@ -82,3 +82,7 @@ Filer: `sites/app/dashboard.tsx`, navigationkomponent/hjälpare vid behov, `site
 Node: `npm ci`, `npm run check`, `npm test`, `npm audit`. Sites: `npm run install:ci`, `npm run check`, `npm test`, `npm audit`, `npm run build`. Läs faktisk output; knyt slutresultat till exakt källträd/commit. Produktionskontroller är läsande och får inte förväxlas med ett fullständigt autentiserat verksamhetsflöde.
 
 Stopp endast vid uppnått mål, förbrukad budget, faktisk teknisk körgräns eller när allt återstående arbete kräver otillgängliga externa förutsättningar. Inga påståenden om automatisk fortsättning utan en konfigurerad körning.
+
+## Checkpoint cykel2
+
+Cykel1A/1B är levererade; Sites33 och inloggad mobilmeny är verifierade. Cykel2:469Node/624Sites plus fulla grindar passerade för40 frysta källfiler. Nu normal main-leverans och separat Sites-publicering. Därefter prioriteras det nya API-originalfyndet, webbhistorik/utkast med riktig Chromium, produktionsködiagnostik och backupens återstående verifierings-/kapacitetsgränser. Gmail-schemat förblir pausat. Ingen slutstatus eller automatisk fortsatt körning påstås.

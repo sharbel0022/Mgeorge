@@ -41,12 +41,15 @@ async function executeStep(owner:string,key:string,req:Request):Promise<StepResu
     if(Number.isFinite(next)&&next>Date.now()){const cached=c.status==='connected'&&!!success&&Date.parse(success.created_at)>=Date.parse(c.last_attempt)&&!c.page_token;return {state:cached?'cached':'waiting',note:cached?'Nyligen hämtat Gmail-underlag används. Ingen ny extern hämtning gjordes.':c.page_token?'Fler Gmail-underlag väntar på nästa tillåtna hämtning.':'Senaste Gmail-hämtningen är inte bekräftad som lyckad. Vänta på nästa tillåtna försök.',next_at:new Date(next).toISOString()};}
     const r=await gmailSync(req),body=await r.json() as Row;
     if(!r.ok)return {state:'blocked',note:'Gmail-hämtningen kunde inte slutföras. Kontrollera anslutningen i Inställningar.'};
+    if(body.status_unknown===true||body.processing?.status_unknown===true){const processed=body.processing?.processed;return {state:'blocked',...(Number.isSafeInteger(body.imported)&&body.imported>=0?{count:body.imported}:{}),note:(Number.isSafeInteger(processed)&&processed>0?`${processed} underlag är bearbetade och sparade. `:'')+'Gmail-körningens slutstatus kunde inte bekräftas; kontrollera status igen. Avstämning och utkast kan fortsätta.'};}
     return {state:body.more?'waiting':'done',count:Number(body.imported)||0,note:body.more?'En begränsad omgång hämtades. Fler underlag väntar på nästa tillåtna hämtning.':'Nya Gmail-underlag hämtades med befintligt medgivande.'};
   }
   if(key==='documents'){
     const user=await identity(req),settings=await processingSettings(user);
     if(!settings?.enabled)return {state:'blocked',note:'Dokumentautomatiken är pausad. Kö och original bevaras; ändra inställningen först om bearbetning önskas.'};
-    const result=await processDocuments(owner,2),counts=result.counts;
+    const result=await processDocuments(owner,2);
+    if(result.status_unknown)return {state:'blocked',count:result.processed,note:'Bearbetade underlag är sparade. Aktuell köstatus kunde inte fastställas; kontrollera status igen. Avstämning och utkast kan fortsätta.'};
+    const counts=result.counts;
     const waiting=Number(counts.queued||0)+Number(counts.waiting_ocr||0)+Number(counts.processing||0);
     return {state:waiting?'waiting':Number(counts.failed||0)>0?'blocked':'done',count:result.processed,note:waiting?`Sparad dokumentkö återstår. ${counts.waiting_ocr||0} väntar på ${result.cloud_ocr_configured?'moln-OCR':'lokal OCR'}${result.cloud_ocr_configured?(result.cloud_worker_recent?'':'; ingen molnkörning nyligen'):(result.worker_online?'':'; OCR-datorn är frånkopplad')}. Osäkra fält kräver granskning.`:Number(counts.failed||0)>0?'Dokument kunde inte tolkas. Originalen finns kvar för granskning.':'Sparade underlag har behandlats. Osäkra fält och dubbletter kräver fortfarande granskning.'};
   }
@@ -77,7 +80,9 @@ export async function advanceControl(owner:string,id:string,req:Request){
   const claimedRow=await ownRun(owner,id),steps=JSON.parse(claimedRow.steps) as Step[],step=steps.find(s=>['queued','running'].includes(s.state));
   if(step){
     step.state='running';step.attempts++;step.started_at=at;step.note='Kontrollsteget pågår.';
-    const running=await db().prepare('UPDATE payment_control_runs SET steps=? WHERE owner=? AND id=? AND lease=? AND lease_until>?').bind(JSON.stringify(steps),owner,id,lease,now()).run();
+    // Lease expiry must be checked after D1 acquires its write lock, not at
+    // the earlier time when this worker prepared the statement.
+    const running=await db().prepare("UPDATE payment_control_runs SET steps=? WHERE owner=? AND id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND status='running'").bind(JSON.stringify(steps),owner,id,lease).run();
     if(running.meta.changes!==1)return {job:publicJob(await ownRun(owner,id))};
     let result:StepResult;
     try{
@@ -94,7 +99,7 @@ export async function advanceControl(owner:string,id:string,req:Request){
     if(result.next_at)step.next_at=result.next_at;
   }
   const remaining=steps.some(s=>['queued','running'].includes(s.state)),status=remaining?'running':steps.every(s=>['done','cached'].includes(s.state))?'complete':'partial';
-  const saved=await db().prepare("UPDATE payment_control_runs SET steps=?,status=?,finished_at=?,lease='',lease_until='',updated_at=? WHERE owner=? AND id=? AND lease=? AND lease_until>? AND status='running'").bind(JSON.stringify(steps),status,remaining?'':now(),now(),owner,id,lease,now()).run();
+  const saved=await db().prepare("UPDATE payment_control_runs SET steps=?,status=?,finished_at=?,lease='',lease_until='',updated_at=? WHERE owner=? AND id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND status='running'").bind(JSON.stringify(steps),status,remaining?'':now(),now(),owner,id,lease).run();
   if(saved.meta.changes===1&&!remaining)await audit(owner,id,'payment_control.'+status);
   return {job:publicJob(await ownRun(owner,id))};
 }

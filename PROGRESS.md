@@ -234,3 +234,97 @@ Node-delleveransen finns på main och har grön Actions. Isolerad Sites-kandidat
   "next_task": "Push exact Sites 1B tree, verify Actions, publish same existing Site and verify authenticated views; continue cycle2 backup/control/registration fixes."
 }
 ```
+
+## Åttatimmarsarbete – cykel2 verifierad kandidat
+
+Sites33 är faktiskt publicerad och autentiserade menykontroller godkända. Cykel2 har469/469 Node,624/624 Sites, syntax69, TypeScript, bygge och två nollfyndsaudits i isolerad checkout. Alla40 ändrade källfiler är hashbundna och respektive kritisk del oberoende granskad. Se `docs/QUALITY-8H-CYCLE2.md`. Arbetet är fortfarande pågående inom samma budget.
+
+```json
+{
+  "schema": 1,
+  "run": "quality-8h-2026-10-30",
+  "status": "in_progress",
+  "checkpoint_at": "2026-10-30T17:28:27.193952+00:00",
+  "started_at": "2026-10-30T15:31:15Z",
+  "deadline": "2026-10-30T23:31:15Z",
+  "last_verified_main": "02d1f84a18c1113f9e68641c384e1cef766f9558",
+  "pushed_commits": 2,
+  "actions_run": 41092098871,
+  "actions_conclusion": "success",
+  "latest_sites_version": 33,
+  "sites_source_commit": "bcb916e570d88abaadf836af0e7a1c5c200e6b0e",
+  "sites_deployment": "appgdep_6ae4c95241748191ae2f727fdc73261e",
+  "ready_candidate": "docs/QUALITY-8H-CYCLE2.json",
+  "latest_tests": {
+    "node": 469,
+    "sites": 624,
+    "failed": 0,
+    "skipped": 0,
+    "syntax_files": 69,
+    "typescript": "passed",
+    "production_build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0
+  },
+  "areas_at_least_9_5": [],
+  "remaining_areas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33
+  ],
+  "score_total": 245.5,
+  "score_mean": 7.4393939393939394,
+  "completed": [
+    "Sites33 published and authenticated mobile/desktop menu verification completed",
+    "Cycle2 Node current proof and export/draft gates independently clear",
+    "Control receipt/database-clock corrections independently clear",
+    "Document/Gmail/Node OCR accepted-result chain independently clear",
+    "Node original-integrity restore and Sites full manifest pass independently clear",
+    "MCP origin/media-type boundary independently clear",
+    "Isolated40-source candidate passed469Node/624Sites/TS/build/audits0"
+  ],
+  "active_external_blockers": [
+    "Authentic individual Swedbank report and company report profile/channel",
+    "External Gmail schedule paused; unchanged",
+    "Representative authorized invoice/OCR corpus and expected results",
+    "Isolated restore of actual production backup and independent disaster copy"
+  ],
+  "open_internal_findings": [
+    "Sites API-original receipt and projection integrity candidate under review",
+    "Navigation/history and in-flight draft-save corrections under review",
+    "Backup row/size capacity and cross-store temporal scope"
+  ],
+  "next_task": "Push exact frozen cycle2 tree, verify Actions, publish same existing Site; read bounded production review diagnostics. Continue API-original and navigation candidates with actual Chromium verification.",
+  "background_continuation_configured": false
+}
+```

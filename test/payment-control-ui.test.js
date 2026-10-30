@@ -105,3 +105,24 @@ test('bank status reflects the invoice remainder and excess even when the bank r
  v.run('rows[0].excluded=true;rows[0].status="excluded"');
  assert.doesNotMatch(v.run('bankTable(rows)'),/Överbetalning/);
 });
+
+test('q8 cycle2: verified-outstanding filter respects the current absence predicate',()=>{
+ const v=view();v.set('invoices',[
+  {id:'held',direction:'customer',invoice_number:'HOLD',party:'Synthetic',reference:'HOLD',reconciled_at:'2026-10-27',reconciliation_note:'Old check',absence_verified:false,remaining_cents:10000,status:'unreconciled',due_at:'2026-10-28'},
+  {id:'valid',direction:'customer',invoice_number:'VALID',party:'Synthetic',reference:'VALID',reconciled_at:'2026-10-27',reconciliation_note:'Current check',absence_verified:true,remaining_cents:10000,status:'overdue',due_at:'2026-10-28'}]);
+ v.run("state.invoices=invoices;state.tab='customers';state.filters.customers.status='verified_outstanding'");
+ assert.deepEqual(JSON.parse(v.run('JSON.stringify(filteredInvoices().map(i=>i.id))')),['valid']);
+});
+test('q8 cycle2: customer-message evidence labels held allocations as recorded and explains the hold',()=>{
+ const v=view();v.set('message',{invoice:{id:'i',party:'Synthetic customer',invoice_number:'000018',total_cents:312500,paid_cents:250000,remaining_cents:62500,payment_evidence_issue:'Bankunderlaget är motstridigt <unsafe>'},kind:'confirmation',recipient:'synthetic@example.test',payments:[{booked_at:'2026-10-26',amount_cents:250000,verified_cents:250000,payer:'Synthetic customer',reference:'000018',account:'SYNTHETIC',bank_reference:'SYNTHETIC-ID',source:'enablebanking'}],findings:[]});
+ const html=v.run('messageEvidence(message)');
+ assert.match(html,/Registrerat betalt/);assert.match(html,/Registrerad koppling/);assert.match(html,/Bankunderlaget är motstridigt &lt;unsafe&gt;/);
+ assert.doesNotMatch(html,/Verifierat betalt|Verifierad koppling|<unsafe>/);
+});
+test('q8 cycle2: invoice detail retains recorded amounts without asserting held proof',async()=>{
+ const v=view();v.set('payload',{invoice:{id:'i',direction:'customer',invoice_number:'000018',party:'Synthetic customer',total_cents:312500,paid_cents:250000,remaining_cents:62500,due_at:'2026-10-28',status:'partial',payment_evidence_issue:'Bankunderlaget behöver granskas'},allocations:[{id:'a',transaction_id:'t',amount_cents:250000,transaction:{booked_at:'2026-10-26',payer:'Synthetic customer',reference:'000018'}}],documents:[],analysis:[{reason:'Registrerade kopplingar är bevarade.'}]});
+ v.run("api=async(path)=>path==='/customer-messages'?{items:[]}:payload;globalThis.detailHtml='';modal=(title,html)=>{detailHtml=html;};handleError=(error)=>{throw error;}");
+ await v.run("paymentInvoiceDetail('i')");const html=v.run('detailHtml');
+ assert.match(html,/Registrerat betalt/);assert.match(html,/Bankunderlaget behöver granskas/);assert.match(html,/Registrerad koppling/);
+ assert.doesNotMatch(html,/Verifierat betalt|Verifierad koppling|procent verifierat betalt/);
+});

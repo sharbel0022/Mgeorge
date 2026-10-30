@@ -66,7 +66,12 @@ export function reconciliationData(db){
     return transaction?.verified&&!transaction.automatic_match_hold?.reason&&!bankFinancialReview(transaction)?[JSON.stringify([allocation.invoice_id,transaction.payer,transaction.account])]:[];
   }));
   const links=db.prepare('SELECT * FROM payer_links').all().filter(link=>link.verified_by!=='allocation'||usablePayerEvidence.has(JSON.stringify([link.invoice_id,link.payer,link.account])));
-  return {invoices:listInvoices(db),transactions:verifiedTransactions,links,allocations};
+  const invoices=listInvoices(db).map(invoice=>{
+    const missingOriginal=allocations.some(a=>a.invoice_id===invoice.id&&!transactionsById.get(a.transaction_id)?.verified);
+    const payment_evidence_issue=invoice.payment_evidence_issue||(missingOriginal?'Originalet för en registrerad betalningskoppling kan inte verifieras.':'');
+    return {...invoice,payment_evidence_issue,absence_verified:invoice.absence_verified&&!payment_evidence_issue,reconciliation_state:payment_evidence_issue?'unreconciled':invoice.reconciliation_state};
+  });
+  return {invoices,transactions:verifiedTransactions,links,allocations};
 }
 function samePayer(i,t,links){
   const org=value=>String(value||'').replace(/[- ]/g,'');

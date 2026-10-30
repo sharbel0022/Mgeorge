@@ -55,6 +55,52 @@ async function fixture(t){
 // Use a historical real date on both sides of the invoice validation boundary.
 // All records and keys in this file are synthetic.
 
+function pendingRegistration(f,documentId,invoiceId,{owner=f.owner,receipt='receipt-'+documentId}={}){
+  const at='2026-10-30T10:00:00.000Z';
+  f.sql.prepare("INSERT INTO gmail_sources(owner,source_id,document_id,metadata,status,extraction,created_at) VALUES(?,?,?,'{}','registered',?,?)").run(owner,'source-'+documentId,documentId,JSON.stringify({original:'unchanged'}),at);
+  f.sql.prepare("INSERT INTO document_jobs(owner,document_id,state,available_at,extraction,error_code,invoice_id,updated_at) VALUES(?,?,'registered',?,?,'registration_aftercheck_pending',?,?)").run(owner,documentId,at,JSON.stringify({original:'unchanged'}),invoiceId,at);
+  f.sql.prepare('INSERT INTO document_registrations(owner,document_id,identity,invoice_id,attempt,total,created_at) VALUES(?,?,?,?,?,312500,?)').run(owner,documentId,'identity-'+documentId,invoiceId,receipt,at);
+}
+test('Q8: successful reconciliation clears only the current owner registered after-check receipts',async t=>{
+  const f=await fixture(t);f.init();const state=f.state(),invoice=state.invoices[0];invoice.documentId='registered-doc';f.put(state);
+  pendingRegistration(f,'registered-doc',invoice.id);pendingRegistration(f,'foreign-doc','foreign-invoice',{owner:'other-owner'});
+  f.sql.prepare('INSERT INTO document_extractions(id,owner,document_id,result,created_at) VALUES(?,?,?,?,?)').run('history',f.owner,'registered-doc','{"original":"history"}','2026-10-30');
+  await f.api.reconcileAndPrepare(f.owner);
+  assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs WHERE owner=?').get(f.owner).error_code,'');
+  assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs WHERE owner=?').get('other-owner').error_code,'registration_aftercheck_pending');
+  assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs WHERE owner=?').get(f.owner).extraction,'{"original":"unchanged"}');
+  assert.equal(f.sql.prepare('SELECT result FROM document_extractions').get().result,'{"original":"history"}');
+  assert.deepEqual(f.state(),state);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,2);assert.equal(f.posts,0);
+});
+test('Q8: failed after-check remains durable and a later explicit reconciliation recovers it without registration or OCR',async t=>{
+  const f=await fixture(t);f.init();const state=f.state();state.invoices[0].documentId='registered-doc';f.put(state);pendingRegistration(f,'registered-doc',state.invoices[0].id);
+  f.d1.beforeBatch=()=>{throw Error('synthetic failed derived check');};
+  await assert.rejects(f.api.reconcileAndPrepare(f.owner),/synthetic failed/);
+  assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'registration_aftercheck_pending');
+  f.d1.beforeBatch=null;await f.call('reconcile');
+  assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,1);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);assert.deepEqual(f.state(),state);assert.equal(f.posts,0);
+});
+test('Q8: after-check completion cannot clear a replaced registration receipt',async t=>{
+  const f=await fixture(t);f.init();const state=f.state();state.invoices[0].documentId='registered-doc';f.put(state);pendingRegistration(f,'registered-doc',state.invoices[0].id);
+  let changed=false;f.d1.beforeBatch=rows=>{if(!changed&&rows.some(r=>/UPDATE document_jobs SET error_code/.test(r.query))){changed=true;f.sql.prepare('UPDATE document_registrations SET attempt=? WHERE owner=?').run('new-receipt',f.owner);}};
+  await f.api.reconcileAndPrepare(f.owner);assert.equal(changed,true);assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'registration_aftercheck_pending');
+  f.d1.beforeBatch=null;await f.api.reconcileAndPrepare(f.owner);assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'');
+});
+test('Q8: a registration added during an after-check is left for a later bounded recovery',async t=>{
+  const f=await fixture(t);f.init();const state=f.state();state.invoices[0].documentId='late-doc';f.put(state);
+  let added=false;f.d1.beforeBatch=()=>{if(!added){added=true;pendingRegistration(f,'late-doc',state.invoices[0].id);}};
+  await f.api.reconcileAndPrepare(f.owner);assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'registration_aftercheck_pending');
+  f.d1.beforeBatch=null;await f.api.reconcileAndPrepare(f.owner);assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'');
+});
+test('Q8: one successful after-check acknowledges at most 100 captured registrations',async t=>{
+  const f=await fixture(t);f.init();const state=f.state(),template=state.invoices[0];state.invoices=[];
+  for(let n=0;n<102;n++){const id='doc-'+String(n).padStart(3,'0'),invoice={...template,id:'invoice-'+id,documentId:id,number:String(n),direction:'payable'};state.invoices.push(invoice);pendingRegistration(f,id,invoice.id);}
+  f.put(state);await f.api.reconcileAndPrepare(f.owner);
+  assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM document_jobs WHERE error_code='registration_aftercheck_pending'").get().n,2);
+  await f.api.reconcileAndPrepare(f.owner);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM document_jobs WHERE error_code='registration_aftercheck_pending'").get().n,0);assert.deepEqual(f.state(),state);
+});
+
 test('D1 migration preserves existing workspace and creates isolated message tables',async t=>{
   const f=await fixture(t);f.init();const state=f.state();await f.queue();assert.deepEqual(f.state(),state);assert.ok(f.sql.prepare("SELECT name FROM sqlite_master WHERE name='customer_deliveries'").get());
 });

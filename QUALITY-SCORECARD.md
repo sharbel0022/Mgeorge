@@ -2,17 +2,19 @@
 
 **Bedömningsdatum: 2026-10-30. Status: MÅLET ÄR INTE UPPNÅTT.**
 
-Detta är den första samlade, dokumenterade bedömningen mot användarens 33 områden. Det är **inte** en uppfunnen historisk baslinje och visar ingen påstådd poängförbättring jämfört med tidigare körningar. Befintlig grund är `origin/main` på `b5a25e7`; denna körnings kodändringar, tester och begränsade observationer bedöms separat från äldre leveranser. Ingen poäng på 9,5 eller högre delas ut i denna version.
+Baslinjen nedan är den första samlade, dokumenterade bedömningen mot användarens33 områden; aktuella cykelresultat anges separat. Det är **inte** en uppfunnen historisk baslinje och visar ingen påstådd poängförbättring jämfört med tidigare körningar. Befintlig grund är `origin/main` på `b5a25e7`; denna körnings kodändringar, tester och begränsade observationer bedöms separat från äldre leveranser. Ingen poäng på 9,5 eller högre delas ut i denna version.
 
-Bedömningen är konservativ och avser **verifierad kvalitet inom den redovisade omfattningen**, inte en statistiskt uppmätt felfrihetsgrad. En godkänd kodleverans är inte bevis för bankens rapporttäckning, avslutad moln-OCR eller fullständig företagsavstämning. Alla lokala testdata är syntetiska. Inga autentiserade produktionsflöden i webbläsaren har verifierats i denna bedömning.
+Bedömningen är konservativ och avser **verifierad kvalitet inom den redovisade omfattningen**, inte en statistiskt uppmätt felfrihetsgrad. En godkänd kodleverans är inte bevis för bankens rapporttäckning, avslutad moln-OCR eller fullständig företagsavstämning. Alla lokala testdata är syntetiska. Baslinjen saknade autentiserade produktionsflöden. Cykel1B har därefter verifierat de avgränsade vy-/menyflöden som redovisas i publiceringsrapporten.
 
-## Aktivt åttatimmarsarbete: cykel 1B
+## Aktivt åttatimmarsarbete: cykel 2
 
-Start 2026-10-30 15:31:15 UTC från `c519eef47e5a084a35db7675a2553a554c55ec4c`: **245/330 = 7,42**, 0/33 på 9,5. Node-delleveransen har nu **407/407 Node +456/456 oförändrade Sites-tester**, syntax65, TypeScript, två nollfyndsaudits och godkänt produktionsbygge i en isolerad checkout. Se [cykelrapport](docs/QUALITY-8H-NODE-CYCLE1.md) och [källmanifest](docs/QUALITY-8H-NODE-CYCLE1.json). Node-main är `a82ffbca211b5651e662c759c761bda2aefbf0f0`, Actions41088814042 lyckades i båda jobben. Nästa isolerade Sites-kandidat har 407/407 Node +531/531 Sites samt gröna typ-/bygggrindar. Se [Sites-rapport](docs/QUALITY-8H-SITES-CYCLE1.md). Sites är fortfarande32 före denna publicering.
+Start **2026-10-30 15:31:15 UTC**, sista budgettid **23:31:15 UTC**, från `c519eef47e5a084a35db7675a2553a554c55ec4c`: **245/330 = 7,42**, 0/33 på9,5. Två programcommits har levererats på main; senaste verifierade är `02d1f84a18c1113f9e68641c384e1cef766f9558`, Actions41092098871 success. Den är faktiskt publicerad som **Sites33** i samma projekt. Autentiserad mobilmeny, fokus, Escape, vybyten, desktop-resize och startsidans fyra kort har verifierats. Se [publiceringsbevis](docs/QUALITY-8H-SITES-CYCLE1-PUBLICATION.md).
 
-Nya reproduktioner visar öppna fel i kontroll-idempotens/lease och backupens originalverifiering. Därför sänks S för områden26,28,29,31, totalt **2,5 poäng**. Aktuell summa **242,5/330 = 7,35**, fortfarande0/33. Detta är en mer fullständig bedömning av befintliga fel, inte en påstådd regression skapad av Node-rättningen. Kritiska bankerfarenheter och extern verksamhetsevidens får inte vägas bort av ett medelvärde. Samtliga öppna lokala fynd fortsätter i nästa cykel.
+Cykel2 är en isolerad, oberoende granskad kandidat med **469/469 Node +624/624 Sites =1093 godkända tester**, syntax69, TypeScript, produktionsbygge och båda beroendegranskningarna med0 sårbarheter. Exakta källhashar och grindar finns i [cykelrapport](docs/QUALITY-8H-CYCLE2.md) och [manifest](docs/QUALITY-8H-CYCLE2.json). Push, CI och Sites34 registreras först när de faktiskt är verifierade.
 
-De äldre evidensavsnitten nedan beskriver leveransen före detta uppdrag om inte cykel1A uttryckligen anges. Den aktuella deltaöversikten längst ned kompletterar alla33 områden och är styrande för nästa arbete.
+Aktuell bedömning är **245,5/330 = 7,44**, fortfarande **0/33** på minst9,5. Mobil-/navigationsbevis och rättade kö-/backupfel höjer berörda delpoäng. Ett nytt reproducerat fel i Sites kontroll av sparade API-original sänker S i berörda bankområden tills den separata rättningen är levererad. Kända ekonomiska fel får inte döljas av testsumman. Gmail-schemat är fortfarande pausat. Den senaste moln-OCR-körningen lyckades men behandlade0 dokument; den bevisar inte ny OCR-registrering.
+
+Poängöversikten och senaste33-raders delta nedan är aktuella. Äldre evidensavsnitt och områdesmotiv är historiska baslinjer om inte senare cykelbevis uttryckligen anges. Arbetet fortsätter inom samma budget.
 
 ## Reproducerbar bedömningsmodell
 
@@ -111,10 +113,10 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 
 | Nr | Område | F | S | K | U | P | Poäng / 10 | Prioritet |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 1 | Design och färger | 2 | 1 | 1,5 | 1,5 | 0,5 | **6,5** | P3 |
-| 2 | Startsida | 2 | 2 | 1,5 | 1,5 | 0,5 | **7,5** | P3 |
-| 3 | Navigering | 1,5 | 1 | 1 | 1 | 0,5 | **5** | P3 |
-| 4 | Mobilanpassning | 2 | 1,5 | 1,5 | 1,5 | 0,5 | **7** | P3 |
+| 1 | Design och färger | 2 | 1 | 1,5 | 1,5 | 1,5 | **7,5** | P3 |
+| 2 | Startsida | 2 | 2 | 1,5 | 1,5 | 1,5 | **8,5** | P3 |
+| 3 | Navigering | 1,5 | 1,5 | 1,5 | 1,5 | 1,5 | **7,5** | P3 |
+| 4 | Mobilanpassning | 2 | 1,5 | 1,5 | 1,5 | 1,5 | **8** | P3 |
 | 5 | Sökning och filtrering | 2 | 1,5 | 1,5 | 1,5 | 0,5 | **7** | P3 |
 | 6 | Minimal manuell hantering | 1,5 | 2 | 1,5 | 1 | 0,5 | **6,5** | P2 |
 | 7 | Kundfakturor | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
@@ -122,34 +124,34 @@ G-S, G-D och G-P är **interna leveransgrindar**, inte externa blockerare. Brist
 | 9 | PDF-tolkning | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
 | 10 | Bild-OCR | 1,5 | 2 | 2 | 1 | 0,5 | **7** | P2 |
 | 11 | Gmail-anslutning | 2 | 2 | 2 | 1 | 0 | **7** | P2 |
-| 12 | Automatisk fakturaregistrering | 2 | 2 | 2 | 1 | 0,5 | **7,5** | P2 |
+| 12 | Automatisk fakturaregistrering | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P2 |
 | 13 | Dubblettkontroll | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
-| 14 | Dokumentgranskning | 2 | 2 | 2 | 1 | 0,5 | **7,5** | P2 |
+| 14 | Dokumentgranskning | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P2 |
 | 15 | Swedbank-anslutning | 2 | 2 | 2 | 1,5 | 1 | **8,5** | P1 |
-| 16 | Automatisk bankhämtning | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P1 |
-| 17 | Bankgiroimport | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P1 |
-| 18 | Identifiera verklig betalare | 1,5 | 2 | 1,5 | 1,5 | 0 | **6,5** | P1 |
-| 19 | Verklig OCR/fakturareferens | 1,5 | 2 | 1,5 | 1,5 | 0 | **6,5** | P1 |
-| 20 | Automatisk betalningsmatchning | 2 | 2 | 2 | 1,5 | 0 | **7,5** | P0 |
-| 21 | Delbetalningar | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
-| 22 | Överbetalningar | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
-| 23 | Flera fakturor i en betalning | 1,5 | 2 | 2 | 1,5 | 0,5 | **7,5** | P0 |
+| 16 | Automatisk bankhämtning | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P1 |
+| 17 | Bankgiroimport | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P1 |
+| 18 | Identifiera verklig betalare | 1,5 | 1,5 | 1,5 | 1,5 | 0 | **6** | P1 |
+| 19 | Verklig OCR/fakturareferens | 1,5 | 1,5 | 1,5 | 1,5 | 0 | **6** | P1 |
+| 20 | Automatisk betalningsmatchning | 2 | 1,5 | 2 | 1,5 | 0 | **7** | P0 |
+| 21 | Delbetalningar | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P0 |
+| 22 | Överbetalningar | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P0 |
+| 23 | Flera fakturor i en betalning | 1,5 | 1,5 | 2 | 1,5 | 0,5 | **7** | P0 |
 | 24 | Betalningshistorik | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
-| 25 | Betalningsstatus | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
+| 25 | Betalningsstatus | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P0 |
 | 26 | Kontrollera alla betalningar | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P2 |
-| 27 | Automatiska mejlutkast | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P2 |
-| 28 | Schemalagd automatisering | 1,5 | 1,5 | 2 | 1 | 0 | **6** | P2 |
-| 29 | Säkerhetskopiering | 2 | 1 | 2 | 1,5 | 1 | **7,5** | P0 |
+| 27 | Automatiska mejlutkast | 2 | 1,5 | 2 | 1,5 | 0,5 | **7,5** | P2 |
+| 28 | Schemalagd automatisering | 1,5 | 2 | 2 | 1 | 0 | **6,5** | P2 |
+| 29 | Säkerhetskopiering | 2 | 1,5 | 2 | 1,5 | 1 | **8** | P0 |
 | 30 | Säkerhet och åtkomstkontroll | 2 | 2 | 2 | 1,5 | 0,5 | **8** | P0 |
 | 31 | Katastrofåterställning | 1,5 | 1,5 | 2 | 1 | 0 | **6** | P0 |
 | 32 | Kodkvalitet och tester | 2 | 2 | 2 | 1,5 | 1 | **8,5** | P4 |
-| 33 | Verifiering i verklig produktion | 1,5 | 1 | 1,5 | 1 | 1 | **6** | P4 |
+| 33 | Verifiering i verklig produktion | 1,5 | 1 | 1,5 | 1 | 1,5 | **6,5** | P4 |
 
 **Aritmetisk summa:** 242,5 av 330. **Likaviktat medelbetyg:** 7,35/10 (242,5 ÷ 33). **Områden på minst 9,5:** 0 av 33. Lägsta områdespoäng: 5; högsta: 8,5. Medelvärdet är inte ett godkännande av betalningsidentifiering, automatisering eller produktion.
 
 **Ny evidens efter publicering:** område 32 får K=2 och P=1 genom fulla slutgrindar, godkänd Actions på exakt programcommit och verifierad motsvarande Sites-källa/bygge; poängen går från 7,5 till 8,5. Område 33 får P=1 för den nya lyckade publiceringen och läsande efterkontrollen; 5,5 blir 6. Ingen annan poäng höjs. Detta är en dokumenterad förändring från samma körnings före-publicering-bedömning, inte en påhittad äldre produktbaslinje.
 
-## Bedömning område för område
+## Baslinjens acceptanskriterier och områdesmotiv
 
 ### 1. Design och färger — 6,5/10
 
@@ -572,3 +574,43 @@ Poäng före avser cykel1A. Poängen är oförändrade tills aktuell publicering
 | 31 | Katastrofåterställning | 6 | 6 | Ingen kodändring i denna Sites-delleverans; känt nästa-cykelfynd kvarstår. | Oförändrad grund; inga nya bevis för området. | P1B; ny deployment ännu ej verifierad. | Bekräftat lokalt fel kvarstår. | Originalhashkontroll vid skapa/verifiera/återställ; isolerat prov. |
 | 32 | Kodkvalitet och tester | 8,5 | 8,5 | 75 nya Sites-fall; isolerad slutkandidat och oberoende review. | 938 godkända tester; TS/bygge | P1B; ny deployment ännu ej verifierad. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Granska nästa Sites-diff och kör CI på exakt commit. |
 | 33 | Verifiering i verklig produktion | 6 | 6 | Publicering förberedd för samma projekt, backup och rollbackpunkt. | Lokala grindar; deployment återstår | P1B; ny deployment ännu ej verifierad. | Kritiska acceptanskrav och aktuell produktionskedja återstår. | Publicera Sites separat och kontrollera behöriga användarvyer. |
+
+## Cykel 2 – delta för samtliga33 områden
+
+**N2**=469 Node-tester, **S2**=624 Sites-tester, på exakt40-filsmaterial i cykelmanifestet. **P33**=verifierad publicerad Sites33 och avgränsade autentiserade vy-/statuskontroller. Cykel2 är ännu inte publicerad vid denna bedömning. **API RED** är en separat syntetisk reproduktion mot den ännu levererade kodgränsen, inte verklig produktionsdatakorruption. Sänkt S avser nyupptäckta befintliga luckor.
+
+| Nr | Område | Före | Nu | Genomförd förbättring/fynd | Testbevis | Produktionsbevis | Kvarstående brist | Nästa åtgärd |
+| --- | --- | ---: | ---: | --- | --- | --- | --- | --- |
+| 1 | Design och färger | 6,5 | 7,5 | Publicerad svartvit meny och synligt tangentbordsfokus. | P33, tidigare UI1 | P33 autentiserat vyflöde. | Systematisk kontrast-/formulärmatris återstår. | Mät kontrast och fokus i samtliga huvudflöden. |
+| 2 | Startsida | 7,5 | 8,5 | Fyra kort och exakt en huvudåtgärd verifierade inloggat. | P33, S2 | P33 autentiserat vyflöde. | Kortens hela banktäckning saknar autentiskt facit. | Behåll enkla kort; verifiera ekonomiska underlag separat. |
+| 3 | Navigering | 5 | 7,5 | Mobilmenyns fokusloop, Escape och fokusretur verifierade i produktion. | P33, UI1 | P33 autentiserat vyflöde. | URL/Back/Forward rättas i separat ännu ej publicerad kandidat. | Slutför verklig Chromium-kontroll av historik och utkast. |
+| 4 | Mobilanpassning | 7 | 8 | 390px mobil och resize1440px saknar overflow; menyn stängs och fokus följer. | P33, UI1 | P33 autentiserat vyflöde. | Övriga dialoger och bredder behöver fullare matris. | Verifiera formulär, dokument och meddelanden på mobil. |
+| 5 | Sökning och filtrering | 7 | 7 | Ingen ny filterlogik i denna kandidat. | S2, tidigare filterfall | P33; inget nytt produktionsutfall för cykel2. | Större kombinationer och vybevarande återstår. | Verifiera filter och sökning med syntetiska köer. |
+| 6 | Minimal manuell hantering | 6,5 | 6,5 | Efterkontroll kan återupptas utan ny OCR eller dubbel registrering. | N2/S2, dokumentrace | P33; inget nytt produktionsutfall för cykel2. | Verklig andel säker automatregistrering ej mätt. | Läs nya aggregerade granskningsorsaker efter publicering. |
+| 7 | Kundfakturor | 8 | 8 | Aktuellt Node-betalningsbevis skyddar API, export och status utan saldoändring. | N2 API/export/ledger | P33; inget nytt produktionsutfall för cykel2. | Sites API-original är ett separat öppet integritetsfynd. | Leverera API-kvitto och verifiera representativ fakturakedja. |
+| 8 | Leverantörsfakturor | 8 | 8 | Registreringens accepterade resultat överlever sena metadatafel. | N2/S2 dokumentkedja | P33; inget nytt produktionsutfall för cykel2. | Representativa leverantörsoriginal med facit saknas. | Verifiera tillåten leverantörskorpus. |
+| 9 | PDF-tolkning | 8 | 8 | Originalkontroll och redan accepterad registrering hålls åtskilda från statusfel. | S2 PDF/registrering | P33; inget nytt produktionsutfall för cykel2. | Autentisk variationskorpus saknas. | Testa korpus med förhandsbestämt facit. |
+| 10 | Bild-OCR | 7 | 7 | Node OCR/CLI bevarar accepterat antal vid senare fel och stoppar nya leases. | N2 OCR34; S2; P33 OCR0 | P33; inget nytt produktionsutfall för cykel2. | Senaste lyckade worker behandlade0 dokument. | Verifiera ett tillåtet nytt OCR-jobb utan osäkra köuppgraderingar. |
+| 11 | Gmail-anslutning | 7 | 7 | Gmail bevarar accepterat processresultat vid slutstämpel-/cleanupfel. | S2 Gmail; P33 | P33; inget nytt produktionsutfall för cykel2. | Timvis externt schema är pausat; senaste hämtning29okt. | Bevara pausen och visa korrekt aktuell driftstatus. |
+| 12 | Automatisk fakturaregistrering | 7,5 | 8 | En registrering/ett kvitto; sena fel ger känt antal och okänd status. | S2 race/finalizer, N2 klient | P33; inget nytt produktionsutfall för cykel2. | Verklig produktionsregistrering i nya revisionen återstår. | Verifiera kontrollerad tillåten kedja och återförsök. |
+| 13 | Dubblettkontroll | 8 | 8 | Kvitton vid samtidiga bekräftelser och kontroll-request-ID:n är beständiga. | N2/S2 replay/race | P33; inget nytt produktionsutfall för cykel2. | Full produktionskedja och autentisk dubblettkorpus återstår. | Verifiera återimport mot oförändrat original. |
+| 14 | Dokumentgranskning | 7,5 | 8 | Förhandsvisning är läsande; ursprunglig tolkning bevaras; aggregerade orsaker visas. | S2 preview/diagnostik | P33; inget nytt produktionsutfall för cykel2. | 183 verkliga granskningsorsaker har ännu inte lästs efter ny kod. | Publicera och läs begränsad orsaksstatistik. |
+| 15 | Swedbank-anslutning | 8,5 | 8,5 | Befintlig anslutning och sex-timmarsintervall bevarade. | S2 bank; P33 status | P33; inget nytt produktionsutfall för cykel2. | Individrapport, avtalad rapportprofil och kanal saknas. | Begär exakt tillåtet Swedbank-underlag enligt blockeraren. |
+| 16 | Automatisk bankhämtning | 8 | 7,5 | Nytt fynd: sparat API-original kan ändras utan ett tidigare mottagningskvitto. | Separat API-original RED; S2 grund | P33; inget nytt produktionsutfall för cykel2. | Mottagningshash/projektion ingår i nästa kandidat. | Slutför review och leverera kvittobunden bankhämtning. |
+| 17 | Bankgiroimport | 8 | 7,5 | Filbevis är skyddat; API-förälder visar nytt separat integritetsbehov. | N2/S2 Bankgiro; API RED | P33; inget nytt produktionsutfall för cykel2. | Autentisk individrapport och API-originalrättning återstår. | Verifiera både filoriginal och API-förälderns mottagningskvitto. |
+| 18 | Identifiera verklig betalare | 6,5 | 6 | Node stoppar betalningspåståenden med skadat råoriginal. | N2; separat Sites API RED | P33; inget nytt produktionsutfall för cykel2. | Sites råoriginal/projektion måste bindas och verklig betalare verifieras. | Leverera API-rättningen; jämför med bankens autentiska original. |
+| 19 | Verklig OCR/fakturareferens | 6,5 | 6 | Referenskonflikter och historiskt bevis hålls separata. | N2/S2; separat API RED | P33; inget nytt produktionsutfall för cykel2. | Sites API-referens saknar ännu levererat mottagningskvitto. | Leverera kvitto/projektionskontroll och verifiera OCR-regel. |
+| 20 | Automatisk betalningsmatchning | 7,5 | 7 | Node originalspärr gäller nya/allokerade betalningar och lärda relationer. | N2; Sites API RED | P33; inget nytt produktionsutfall för cykel2. | Separat API-originalfynd är fortfarande öppet på main. | Leverera och testa samtliga ursprungliga bankkällor. |
+| 21 | Delbetalningar | 8 | 7,5 | Registrerade delbelopp finns kvar medan osäkra verifieringspåståenden hålls. | N2/S2 partial/draft | P33; inget nytt produktionsutfall för cykel2. | API-originalgräns och autentiskt delbetalningsfacit återstår. | Slutför API-kedja utan att ändra bokförda allokeringar. |
+| 22 | Överbetalningar | 8 | 7,5 | Överbetalningsutkast kräver aktuellt bevis i Node-kedjan. | N2/S2 överbetalning | P33; inget nytt produktionsutfall för cykel2. | API-originalgräns och verkligt utfall återstår. | Verifiera kvitto, överbelopp och bevarad rest. |
+| 23 | Flera fakturor i en betalning | 7,5 | 7 | Föräldraoriginal och tidigare begränsningar följer delposter. | N2/S2 ancestorfall | P33; inget nytt produktionsutfall för cykel2. | API-förälderns nya integritetsfynd; autentisk samlingsrapport saknas. | Leverera API-gräns och matcha till autentiskt individfacit. |
+| 24 | Betalningshistorik | 8 | 8 | Tidigare saldo, allokeringar, original och kontrollnoter bevaras. | N2/S2 audit/export | P33; inget nytt produktionsutfall för cykel2. | Full autentisk historikavstämning återstår. | Verifiera en tillåten historikkedja i publicerad revision. |
+| 25 | Betalningsstatus | 8 | 7,5 | Aktuellt Node-bevis styr status och export; historiska saldon skrivs inte om. | N2 API/export/UI; API RED | P33; inget nytt produktionsutfall för cykel2. | Sites API-originalspärr är ännu inte levererad. | Leverera och verifiera aktuell status i alla konsumenter. |
+| 26 | Kontrollera alla betalningar | 7,5 | 7,5 | Request-kvitton sparas vid sammanslagning; SQL-klocka gäller efter väntad låsning. | N2 kontroll22; S2 kontroll | P33; inget nytt produktionsutfall för cykel2. | Full huvudåtgärd omfattar fortfarande öppet API-originalfynd. | Leverera API-kontroll; verifiera kontrollerad slutkedja. |
+| 27 | Automatiska mejlutkast | 8 | 7,5 | Node utkast/review/send kräver aktuellt bevis; efterkontrollkvitton kan återupptas. | N2/S2 draft/review | P33; inget nytt produktionsutfall för cykel2. | Sites API-originalgräns återstår; inga riktiga mejl skickade. | Testa aktuella kvitton och granska utkast utan sändning. |
+| 28 | Schemalagd automatisering | 6 | 6,5 | Leases och delresultat är säkra vid avbrott; CLI markerar okänd status som avvikelse. | N2/S2; P33 worker0 | P33; inget nytt produktionsutfall för cykel2. | Gmail pausat och faktisk cron-täckning ej bevisad. | Verifiera nästa tillåtna driftutfall; ändra inte scheman. |
+| 29 | Säkerhetskopiering | 7,5 | 8 | Node originalhashar och Sites separat manifestpass skyddar återupptagen kopia. | N2 backup26; S2 backup22 | P33; inget nytt produktionsutfall för cykel2. | API-original i Sites-backup ingår i nästa kandidat; driftpass ej kört. | Leverera utökad bevisomfattning och verifiera ny backup. |
+| 30 | Säkerhet och åtkomstkontroll | 8 | 8 | MCP stoppar främmande Origin och enkla medietyper före bodyläsning/skrivning. | S2 MCP24 + oberoende authmatris | P33; inget nytt produktionsutfall för cykel2. | Driftsgräns och komplett behörighetsmatris återstår. | Verifiera oförändrad OAuth och nekad obehörig åtkomst efter publicering. |
+| 31 | Katastrofåterställning | 6 | 6 | Node verifierar samma avkrypterade snapshot före exklusiv återställning. | N2 backup26; isolerad S2 återställning | P33; inget nytt produktionsutfall för cykel2. | Ingen återställning av verklig produktionsbackup eller oberoende katastrofkopia. | Planera/verifiera tillåten isolerad produktionskopia. |
+| 32 | Kodkvalitet och tester | 8,5 | 8,5 | 155 fler tester än cykel1B;40 frysta källfiler, oberoende review och fulla grindar. | N2=469; S2=624; TS/build/audits0 | P33; inget nytt produktionsutfall för cykel2. | Ny commit-CI och Sites-publicering väntar. | Verifiera exakt main-träd och båda Actions-jobb. |
+| 33 | Verifiering i verklig produktion | 6 | 6,5 | Sites33 och autentiserade mobil-/desktopvyer verifierade; inget riktigt affärsflöde skrivs. | P33 publiceringsmanifest | P33 autentiserat vyflöde. | Autentiska bank-/OCR-/återställningsutfall återstår. | Publicera cykel2, kontrollera diagnostik och fortsätt nästa kandidat. |

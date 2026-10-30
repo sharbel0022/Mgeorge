@@ -1,5 +1,5 @@
 import {classifyDocument} from './document-triage.js';
-import {bankFinancialReview,hasBankEvidenceConflict,bankEvidenceReviewReason} from './bank-evidence.js';
+import {bankFinancialReview,hasBankEvidenceConflict,bankEvidenceReviewReason,invoiceAbsenceVerified} from './bank-evidence.js';
 /**
  * Read-only presentation model for the one-click workspace.
  * Classification helps navigation; it is never evidence that a bill is paid.
@@ -26,7 +26,8 @@ export function paymentTitle(t) {
 /** Explain existing evidence without creating an allocation or inferring intent. */
 export function invoiceAnalysis(invoice, suggestions = []) {
   const items = [];
-  if (invoice.paid_cents > 0 && invoice.remaining_cents > 0) {
+  if(invoice.payment_evidence_issue)items.push({kind:'payment_evidence_review',reason:`Registrerade kopplingar och saldo är bevarade. ${invoice.payment_evidence_issue}`});
+  if (invoice.paid_cents > 0 && invoice.remaining_cents > 0 && !invoice.payment_evidence_issue) {
     const possibleVat = invoice.vat_cents > 0 && invoice.net_cents + invoice.vat_cents === invoice.total_cents &&
       invoice.remaining_cents === invoice.vat_cents && invoice.paid_cents === invoice.net_cents;
     items.push({kind: possibleVat ? 'possible_vat' : 'partial', reason: possibleVat ?
@@ -34,7 +35,7 @@ export function invoiceAnalysis(invoice, suggestions = []) {
       'En delbetalning är verifierad. Kontrollera återstående saldo mot bankunderlaget innan kunden kontaktas.'});
   }
   if (invoice.is_overdue && invoice.remaining_cents > 0) items.push({kind: 'overdue', reason:
-    invoice.reconciled_at && invoice.reconciliation_note?.trim() ? 'Förfallodatumet har passerat. En kontroll av betalningsunderlaget är registrerad; granska också nya bankhändelser.' :
+    invoiceAbsenceVerified(invoice) ? 'Förfallodatumet har passerat. En kontroll av betalningsunderlaget är registrerad; granska också nya bankhändelser.' :
       'Förfallodatumet har passerat men fakturan är inte fullständigt avstämd. Detta bevisar inte att fakturan är obetald.'});
   for (const suggestion of suggestions) if (!items.some(i => i.kind === suggestion.kind))
     items.push({kind: suggestion.kind, reason: suggestion.reason, transaction_id: suggestion.transaction_id});
@@ -42,6 +43,7 @@ export function invoiceAnalysis(invoice, suggestions = []) {
 }
 
 export function buildPaymentOverview({invoices = [], transactions = [], documents = [], messages = [], suggestions = []}) {
+  const absenceBlocked=transactions.some(hasBankEvidenceConflict);
   const customer = invoices.filter(i => i.direction === 'customer' && i.kind !== 'credit');
   const pending = documents.filter(d => !d.invoice_id && d.status === 'needs_review' && !['queued','processing','waiting_ocr'].includes(d.processing_state) && !classifyDocument({...d,filename:d.name,mime:d.mime_type}).exclude_from_invoice_queue);
   const groups = {incoming: [], bankgiro: [], other: [], matched: [], excluded: []};
@@ -102,7 +104,9 @@ export function buildPaymentOverview({invoices = [], transactions = [], document
       anomalies: queue.filter(q => q.category === 'financial').length,
       other: groups.other.length, matched: groups.matched.length, review: queue.length},
     totals: {billed_cents: invoices.filter(i => i.direction === 'customer').reduce((sum, i) => sum + (i.kind === 'credit' ? -1 : 1) * Number(i.total_cents || 0), 0),
-      verified_outstanding_cents: total(customer.filter(i => i.reconciled_at && i.reconciliation_note?.trim() && i.remaining_cents > 0), 'remaining_cents'),
+      verified_outstanding_cents: total(customer.filter(i => !absenceBlocked&&invoiceAbsenceVerified(i)&&i.remaining_cents > 0), 'remaining_cents'),
+      verified_paid_cents:total(customer.filter(i=>!i.payment_evidence_issue),'paid_cents'),
+      verified_paid_count:customer.filter(i=>i.status==='paid'&&!i.payment_evidence_issue).length,
       overdue_count: customer.filter(i => i.is_overdue).length,
       overdue_cents: total(customer.filter(i => i.is_overdue), 'remaining_cents'),
       paid_cents: total(customer, 'paid_cents'), paid_count: customer.filter(i => i.status === 'paid').length,

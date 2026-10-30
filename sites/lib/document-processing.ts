@@ -18,6 +18,19 @@ export const counterpartyKey=(direction:string,party:string,org:string)=>JSON.st
 export const documentInvoiceKey=(i:Row)=>JSON.stringify(['invoice-v2',i.direction,normalize(i.organizationNumber||i.party),String(i.number||'').normalize('NFKC').trim().toUpperCase()]);
 const sourceFor=(owner:string,id:string)=>db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? ORDER BY created_at LIMIT 1').bind(owner,id).first<Row>();
 const activeSource="EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status='needs_review')";
+const AFTERCHECK_WARNING='Fakturan är registrerad. Efterkontrollen behöver köras igen via betalningskontrollen.';
+const METADATA_WARNING='Bearbetningsresultatet är sparat. Körningens tidsstämpel kunde inte uppdateras.';
+const PROCESSING_STATUS_WARNING='Bearbetningsresultatet är sparat. Aktuell köstatus kunde inte fastställas; kontrollera status igen.';
+
+async function registeredOutcome(owner:string,documentId:string,details:Row={}){
+  // Registration has already committed. A failed status read must not turn it
+  // back into a failed registration or invite a second invoice/OCR attempt.
+  try{
+    const receipt=await db().prepare('SELECT r.invoice_id,j.error_code FROM document_registrations r LEFT JOIN document_jobs j ON j.owner=r.owner AND j.document_id=r.document_id AND j.invoice_id=r.invoice_id WHERE r.owner=? AND r.document_id=?').bind(owner,documentId).first<Row>();
+    const pending=receipt?.error_code==='registration_aftercheck_pending';
+    return {registered:true,...details,...(receipt?.invoice_id?{invoice_id:receipt.invoice_id}:{}),aftercheck_pending:pending,...(pending?{warning:AFTERCHECK_WARNING}:{})};
+  }catch{return {registered:true,...details,aftercheck_pending:true,warning:AFTERCHECK_WARNING};}
+}
 
 async function originalBytes(owner:string,job:Row,limit=15000000){
   if(!Number.isSafeInteger(job.size)||job.size<1||job.size>limit||!/^[a-f0-9]{64}$/.test(job.sha256||''))throw Error('original_integrity');
@@ -36,13 +49,44 @@ export async function processingSettings(user?:{userId:string,email:string}){
   await db().prepare('INSERT OR IGNORE INTO document_automation(owner,email,enabled,updated_at) VALUES(?,?,?,?)').bind(user.userId,email,permitted?1:0,now()).run();
   return await db().prepare('SELECT * FROM document_automation WHERE owner=?').bind(user.userId).first<Row>();
 }
+async function reviewReasons(owner:string,total:number){
+  // Aggregate inside D1: callers receive neither document IDs nor extracted
+  // values. These are overlapping observations from the saved interpretation,
+  // not a new original/identity check or permission to register an invoice.
+  const limit=500,hasFields="json_type(extraction,'$.fields')='object'";
+  const value=(key:string)=>`json_extract(extraction,'$.fields.${key}.value')`;
+  const missing=(key:string)=>`NULLIF(TRIM(CAST(${value(key)} AS TEXT)),'') IS NULL`;
+  const issue=(text:string)=>`EXISTS(SELECT 1 FROM json_each(extraction,'$.issues') WHERE value='${text}')`;
+  const conditions:Record<string,string>={
+    uninterpreted:`NOT COALESCE(${hasFields},0)`,
+    missing_invoice_number:`${hasFields} AND ${missing('invoice_number')}`,
+    missing_party:`${hasFields} AND ${missing('party')}`,
+    missing_dates:`${hasFields} AND (${missing('issued_at')} OR ${missing('due_at')})`,
+    missing_organization:`${hasFields} AND ${missing('organization_number')}`,
+    missing_amount:`${hasFields} AND (${missing('total_cents')} OR json_type(extraction,'$.fields.total_cents.value')<>'integer' OR ${value('total_cents')}<=0)`,
+    missing_vat_or_net:`${hasFields} AND (${missing('vat_cents')} OR ${missing('net_cents')})`,
+    unverified_counterparty:issue('Motparten behöver verifieras för automatisk registrering.'),
+    possible_duplicate:`state='duplicate' OR ${issue('Fakturan verkar redan registrerad. Ingen ny skuld skapas.')}`,
+    low_confidence:`${hasFields} AND (`+['invoice_number','party','organization_number','issued_at','due_at','total_cents','direction','currency'].map(key=>`${value(key)} IS NOT NULL AND COALESCE(json_extract(extraction,'$.fields.${key}.confidence'),0)<0.9`).map(term=>`(${term})`).join(' OR ')+')',
+  };
+  const keys=Object.keys(conditions);
+  const row=await db().prepare(`WITH scoped AS (
+    SELECT state,CASE WHEN length(extraction)<=50000 AND json_valid(extraction) THEN extraction ELSE '{}' END extraction
+    FROM document_jobs WHERE owner=? AND state IN ('needs_review','duplicate','failed') AND EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status<>'rejected') ORDER BY document_id LIMIT ?
+  ), flags AS (SELECT ${keys.map(key=>`CASE WHEN ${conditions[key]} THEN 1 ELSE 0 END ${key}`).join(',')} FROM scoped)
+  SELECT COUNT(*) analyzed,${keys.map(key=>`COALESCE(SUM(${key}),0) ${key}`).join(',')},COALESCE(SUM(CASE WHEN ${keys.join('+')}=0 THEN 1 ELSE 0 END),0) other_review FROM flags`).bind(owner,limit).first<Row>();
+  return {basis:'stored_extraction',total,analyzed:Number(row?.analyzed||0),limit,truncated:total>Number(row?.analyzed||0),counts:Object.fromEntries([...keys,'other_review'].map(key=>[key,Number(row?.[key]||0)]))};
+}
 export async function processingStatus(owner:string){
   const settings=await db().prepare('SELECT enabled,auto_register,worker_seen,cloud_worker_seen,cloud_worker_completed,last_cloud_run FROM document_automation WHERE owner=?').bind(owner).first<Row>();
   const counts=await db().prepare("SELECT state,COUNT(*) count FROM document_jobs WHERE owner=? AND EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status<>'rejected') GROUP BY state").bind(owner).all<Row>();
   const registered=await db().prepare("SELECT COUNT(DISTINCT document_id) count FROM gmail_sources WHERE owner=? AND status='registered'").bind(owner).first<Row>();
+  const pending=await db().prepare("SELECT COUNT(*) count FROM document_jobs j JOIN document_registrations r ON r.owner=j.owner AND r.document_id=j.document_id AND r.invoice_id=j.invoice_id WHERE j.owner=? AND j.state='registered' AND j.error_code='registration_aftercheck_pending'").bind(owner).first<Row>();
   const messages=await db().prepare("SELECT COUNT(*) count FROM customer_messages WHERE owner=? AND status='draft'").bind(owner).first<Row>();
-  const cloud=cloudOcrConfigured(),cloudSeen=settings?.cloud_worker_seen||'';
-  return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:!!settings?.worker_seen&&Date.now()-Date.parse(settings.worker_seen)<180000,cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&!!cloudSeen&&Date.now()-Date.parse(cloudSeen)<45*60000,cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
+  const cloud=cloudOcrConfigured(),cloudSeen=settings?.cloud_worker_seen||'',at=Date.now();
+  const recent=(seen:string,window:number)=>{const age=at-Date.parse(seen);return Number.isFinite(age)&&age>=0&&age<window;};
+  const review=await reviewReasons(owner,counts.results.filter(r=>['needs_review','duplicate','failed'].includes(r.state)).reduce((sum,r)=>sum+Number(r.count),0));
+  return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:recent(settings?.worker_seen||'',180000),cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&recent(cloudSeen,45*60000),cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,aftercheck_pending:pending?.count||0,review_reasons:review,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
 }
 export async function enqueueDocuments(owner:string){
   const at=now();
@@ -64,7 +108,7 @@ async function failJob(owner:string,job:Row,code:string){
 export async function registerProcessedInvoice(owner:string,documentId:string,raw:Row,fields:Row,options:{automatic?:boolean,lease?:string,trust?:Row,sha256?:string}={}){
   for(let attempt=0;attempt<3;attempt++){
     const source=await sourceFor(owner,documentId);if(!source||!['needs_review','registered'].includes(source.status))throw safe('Underlaget kan inte registreras i detta läge.');
-    if(source.status==='registered')return {registered:true,duplicate:true};
+    if(source.status==='registered')return registeredOutcome(owner,documentId,{duplicate:true});
     const document=await db().prepare('SELECT size,sha256 FROM documents WHERE owner=? AND id=?').bind(owner,documentId).first<Row>();
     try{
       if(!document||options.automatic&&options.sha256!==document.sha256)throw Error('original_integrity');
@@ -77,7 +121,13 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
     if(invoice.kind&&invoice.kind!=='invoice')throw safe('Dokumentet är inte en vanlig faktura.');
     invoice.organizationNumber=fields.organization_number||'';invoice.vat=checks.vat_cents??null;invoice.net=checks.net_cents??null;
     const key=documentInvoiceKey(invoice),same=old.state.invoices.filter(i=>!i.voided&&documentInvoiceKey(i)===key);
-    if(same.length)throw safe(same.some(i=>i.total!==invoice.total)?'Samma faktura finns med ett annat belopp. Kontrollera originalposten.':'Fakturan finns redan registrerad. Ingen ny skuld har skapats.');
+    if(same.length){
+      // Another confirmation can commit while this request verifies the
+      // original. Only that same document's committed receipt is a replay.
+      const receipt=await db().prepare("SELECT r.invoice_id FROM document_registrations r WHERE r.owner=? AND r.document_id=? AND EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=r.owner AND s.document_id=r.document_id AND s.status='registered')").bind(owner,documentId).first<Row>();
+      if(receipt&&same.some(i=>i.id===receipt.invoice_id&&i.documentId===documentId))return registeredOutcome(owner,documentId,{duplicate:true,invoice_id:receipt.invoice_id});
+      throw safe(same.some(i=>i.total!==invoice.total)?'Samma faktura finns med ett annat belopp. Kontrollera originalposten.':'Fakturan finns redan registrerad. Ingen ny skuld har skapats.');
+    }
     const result=applyCommand(old.state,{type:'invoice.save',invoice});
     if(JSON.stringify(result.state).length>1800000)throw safe('Registret behöver utökad lagring.');
     const saved=result.state.invoices.find(i=>i.documentId===documentId)!;
@@ -90,10 +140,17 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
       db().prepare(`INSERT INTO document_registrations(owner,document_id,identity,invoice_id,attempt,total,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?) AND EXISTS(SELECT 1 FROM gmail_sources WHERE owner=? AND document_id=? AND status='needs_review')${guard}`).bind(owner,documentId,key,saved.id,receipt,invoice.total,at,owner,old.revision,owner,documentId,...binds),
       db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=? AND EXISTS(SELECT 1 FROM document_registrations WHERE owner=? AND document_id=? AND attempt=?)').bind(JSON.stringify(result.state),at,owner,old.revision,owner,documentId,receipt),
       db().prepare("UPDATE gmail_sources SET status='registered' WHERE owner=? AND document_id=? AND EXISTS(SELECT 1 FROM document_registrations WHERE owner=? AND document_id=? AND attempt=?)").bind(owner,documentId,owner,documentId,receipt),
-      db().prepare("UPDATE document_jobs SET state='registered',invoice_id=?,automatic=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND EXISTS(SELECT 1 FROM document_registrations WHERE owner=? AND document_id=? AND attempt=?)").bind(saved.id,options.automatic?1:0,at,owner,documentId,owner,documentId,receipt),
+      // Persist after-check recovery in the same transaction as the invoice,
+      // including a manual registration made before any OCR job was enqueued.
+      db().prepare("INSERT INTO document_jobs(owner,document_id,state,available_at,extraction,error_code,invoice_id,automatic,updated_at) SELECT ?,?,'registered',?,?,'registration_aftercheck_pending',?,?,? WHERE EXISTS(SELECT 1 FROM document_registrations WHERE owner=? AND document_id=? AND attempt=?) ON CONFLICT(owner,document_id) DO UPDATE SET state='registered',invoice_id=excluded.invoice_id,automatic=excluded.automatic,error_code=excluded.error_code,lease='',lease_until='',updated_at=excluded.updated_at").bind(owner,documentId,at,source.extraction,saved.id,options.automatic?1:0,at,owner,documentId,receipt),
       db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM document_registrations WHERE owner=? AND document_id=? AND attempt=?)').bind(uid(),owner,old.revision+1,options.automatic?'gmail.invoice.automatic':'gmail.invoice.review',JSON.stringify({invoice,fields,extraction:JSON.parse(source.extraction),message:result.message}),at,owner,documentId,receipt),
-    ]);}catch(e){if((await sourceFor(owner,documentId))?.status==='registered')return {registered:true,duplicate:true};throw e;}
-    if(batch[1].meta.changes===1){await (await import('./customer-messages')).reconcileAndPrepare(owner);return {registered:true,invoice_id:saved.id,automatic:!!options.automatic};}
+    ]);}catch(e){if((await sourceFor(owner,documentId))?.status==='registered')return registeredOutcome(owner,documentId,{duplicate:true});throw e;}
+    if(batch[1].meta.changes===1){
+      const committed={invoice_id:saved.id,automatic:!!options.automatic};
+      try{await (await import('./customer-messages')).reconcileAndPrepare(owner);}
+      catch{return {registered:true,...committed,aftercheck_pending:true,warning:AFTERCHECK_WARNING};}
+      return registeredOutcome(owner,documentId,committed);
+    }
     if(options.automatic)throw safe('Underlaget ändrades under bearbetningen. Ny kontroll behövs.');
   }
   throw safe('Uppgifterna ändrades samtidigt. Försök igen.');
@@ -139,21 +196,35 @@ async function finish(owner:string,job:Row,result:{text:string,method:string,con
   if(finalized.meta.changes!==1)return {ignored:true};
   return {state:finalState,level:extraction.level};
 }
+async function finalizeProcessing(owner:string,processed:number,interruption?:{error:unknown}){
+  // The count records only finish() outcomes already accepted by the database.
+  // Every later failure converges here. Unknown status has no synthetic queue
+  // totals or timestamps, and no more awaits can erase the accepted outcome.
+  const unknown=()=>({processed,status_unknown:true as const,metadata_warning:PROCESSING_STATUS_WARNING});
+  if(interruption){if(processed===0)throw interruption.error;return unknown();}
+  let metadataWarning='';
+  try{await db().prepare('UPDATE document_automation SET last_cloud_run=?,updated_at=? WHERE owner=?').bind(now(),now(),owner).run();}
+  catch(error){if(processed===0)throw error;metadataWarning=METADATA_WARNING;}
+  try{return {processed,...await processingStatus(owner),status_unknown:false as const,...(metadataWarning?{metadata_warning:metadataWarning}:{})};}
+  catch(error){if(processed===0)throw error;return unknown();}
+}
 export async function processDocuments(owner:string,limit=2){
-  await enqueueDocuments(owner);let processed=0;
-  for(let n=0;n<limit;n++){
-    const job=await claim(owner,'cloud');if(!job)break;
-    try{
-      const bytes=await originalBytes(owner,job,5000000);
-      const result=await serverPdfText(bytes),completed=await finish(owner,job,result);if(!('ignored' in completed))processed++;
-    }catch(e){
-      const code=e instanceof Error?e.message:'';
-      if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare("UPDATE document_jobs SET state='waiting_ocr',engine='local',attempts=0,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=?").bind(now(),owner,job.document_id,job.lease).run();
-      else await failJob(owner,job,['page_limit','text_limit','original_integrity'].includes(code)?code:'pdf_unreadable');
+  let processed=0;
+  try{
+    await enqueueDocuments(owner);
+    for(let n=0;n<limit;n++){
+      const job=await claim(owner,'cloud');if(!job)break;
+      try{
+        const bytes=await originalBytes(owner,job,5000000);
+        const result=await serverPdfText(bytes),completed=await finish(owner,job,result);if(!('ignored' in completed))processed++;
+      }catch(e){
+        const code=e instanceof Error?e.message:'';
+        if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare("UPDATE document_jobs SET state='waiting_ocr',engine='local',attempts=0,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=?").bind(now(),owner,job.document_id,job.lease).run();
+        else await failJob(owner,job,['page_limit','text_limit','original_integrity'].includes(code)?code:'pdf_unreadable');
+      }
     }
-  }
-  await db().prepare('UPDATE document_automation SET last_cloud_run=?,updated_at=? WHERE owner=?').bind(now(),now(),owner).run();
-  return {processed,...await processingStatus(owner)};
+  }catch(error){return finalizeProcessing(owner,processed,{error});}
+  return finalizeProcessing(owner,processed);
 }
 export async function processingAction(req:Request,action:string){
   const user=await identity(req);await processingSettings(user);
@@ -192,7 +263,8 @@ export async function workerAction(req:Request,action:string){
   const {owner,mode}=await workerOwner(req);
   if(action==='process'&&req.method==='POST'&&mode==='cloud'){
     const result=await processDocuments(owner,2);
-    return response({processed:result.processed,waiting:Number(result.counts.waiting_ocr||0),failed:Number(result.counts.failed||0)});
+    if(result.status_unknown)return response(result);
+    return response({processed:result.processed,waiting:Number(result.counts.waiting_ocr||0),failed:Number(result.counts.failed||0),...(result.metadata_warning?{metadata_warning:result.metadata_warning}:{})});
   }
   if(action==='lease'&&req.method==='POST'){
     await enqueueDocuments(owner);const job=await claim(owner,'local',mode);if(!job)return response({job:null});
@@ -218,7 +290,10 @@ export async function workerAction(req:Request,action:string){
       return response({error:'Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före ny tolkning.'},409);
     }
     const result=await finish(owner,job,body);
-    if(mode==='cloud'&&!('ignored' in result))await db().prepare('UPDATE document_automation SET cloud_worker_completed=? WHERE owner=?').bind(now(),owner).run();
+    if(mode==='cloud'&&!('ignored' in result)){
+      try{await db().prepare('UPDATE document_automation SET cloud_worker_completed=? WHERE owner=?').bind(now(),owner).run();}
+      catch{return response({...result,metadata_warning:METADATA_WARNING});}
+    }
     return response(result);
   }
   return response({error:'Okänd åtgärd.'},404);

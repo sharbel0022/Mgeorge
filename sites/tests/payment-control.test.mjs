@@ -22,7 +22,7 @@ async function fixture(t){
  const ref=`globalThis[${JSON.stringify(key)}]`;
  const server=data(`import {emptyState} from ${JSON.stringify(domain)};const f=${ref};export const db=()=>f.d1;export const response=(b,status=200)=>Response.json(b,{status});export async function readBankOriginalBytes(){throw Error('No retained bank files in this fixture');}export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(owner);return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
  const gmail=data(`const f=${ref};export async function gmailSync(){f.calls.push('gmail');if(f.gmailGate)await f.gmailGate;if(f.gmailError)throw f.gmailError;return Response.json(f.gmailResult);}`);
- const docs=data(`const f=${ref};export async function processingSettings(){return {enabled:f.enabled};}export async function processingStatus(){return {counts:f.counts,worker_online:f.ocrOnline||false,enabled:f.enabled,registered:0,worker_last_seen:''};}export async function processDocuments(){f.calls.push('documents');return {processed:1,...await processingStatus()};}`);
+ const docs=data(`const f=${ref};export async function processingSettings(){return {enabled:f.enabled};}export async function processingStatus(){return {counts:f.counts,worker_online:f.ocrOnline||false,enabled:f.enabled,registered:0,worker_last_seen:''};}export async function processDocuments(){f.calls.push('documents');return f.documentResult||{processed:1,...await processingStatus()};}`);
  const bank=data(`const f=${ref};export async function syncControl(){f.calls.push('bank');if(f.bankError)throw f.bankError;return Response.json(f.bankResult);}`);
  const messages=data(`const f=${ref};export async function reconcileAndPrepare(){f.calls.push('reconcile');return {automatic:1};}export async function messageList(){return {items:f.messages};}`);
  const evidence=moduleUrl('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href});
@@ -40,6 +40,17 @@ test('idempotency aliases survive completion and cooldown',async t=>{const f=awa
 test('each advance executes one persisted step and resumes without in-memory state',async t=>{const f=await fixture(t);f.connect();const a=await f.start();assert.deepEqual(f.calls,[]);let j=await f.advance(a.id);assert.equal(j.steps[0].state,'done');assert.deepEqual(f.calls,['gmail']);j=await f.finish(a.id);assert.equal(j.status,'complete');assert.deepEqual(f.calls,['gmail','documents','bank','reconcile','reconcile']);assert.ok(j.finished_at);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_automation').get().n,0);});
 test('missing Gmail and bank remain partial while saved-data steps continue',async t=>{const f=await fixture(t),a=await f.start(),j=await f.finish(a.id);assert.equal(j.status,'partial');assert.equal(j.steps[0].state,'blocked');assert.equal(j.steps[2].state,'blocked');assert.equal(j.steps[4].state,'done');assert.deepEqual(f.calls,['documents','reconcile','reconcile']);});
 test('paused processing and offline OCR are visible and never claim completion',async t=>{const f=await fixture(t);f.connect();f.enabled=false;let j=await f.finish((await f.start()).id);assert.equal(j.status,'partial');assert.equal(j.steps[1].state,'blocked');assert.equal(f.calls.includes('documents'),false);f.sql.prepare("UPDATE payment_control_runs SET started_at='2000-01-01'").run();f.enabled=true;f.counts={waiting_ocr:3};j=await f.finish((await f.start('request_000000000002')).id);assert.equal(j.steps[1].state,'waiting');assert.match(j.steps[1].note,/frånkopplad/);});
+test('Q8 finalizer: unknown document queue status preserves accepted count and lets reconciliation recovery continue',async t=>{
+ const f=await fixture(t);f.connect();f.documentResult={processed:2,status_unknown:true,metadata_warning:'private adapter metadata'};
+ const job=await f.finish((await f.start()).id),documents=job.steps.find(step=>step.key==='documents');
+ assert.equal(job.status,'partial');assert.equal(documents.state,'blocked');assert.equal(documents.count,2);assert.match(documents.note,/sparade.*status/s);assert.doesNotMatch(documents.note,/private|0 väntar|Inga underlag/);
+ assert.equal(job.steps.find(step=>step.key==='reconcile').state,'done');assert.equal(job.steps.find(step=>step.key==='drafts').state,'done');assert.equal(f.calls.filter(call=>call==='reconcile').length,2);
+});
+test('Q8 finalizer: unknown Gmail final status keeps import and processing counts while later recovery continues',async t=>{
+ const f=await fixture(t);f.connect();f.gmailResult={imported:2,processing:{processed:1,status_unknown:true},status_unknown:true,metadata_warning:'private adapter metadata'};
+ const job=await f.finish((await f.start()).id),gmail=job.steps.find(step=>step.key==='gmail');
+ assert.equal(job.status,'partial');assert.equal(gmail.state,'blocked');assert.equal(gmail.count,2);assert.match(gmail.note,/1 underlag.*sparade.*slutstatus/s);assert.doesNotMatch(gmail.note,/private/);assert.equal(job.steps.find(step=>step.key==='reconcile').state,'done');assert.equal(job.steps.find(step=>step.key==='drafts').state,'done');
+});
 test('Gmail cooldown with pagination and bank cadence avoid external fetch',async t=>{const f=await fixture(t);f.connect();const at=new Date().toISOString();f.sql.prepare('UPDATE gmail_connections SET last_attempt=?,last_synced=?,page_token=?').run(at,at,'private-page-token');f.sql.prepare('UPDATE bank_connections SET last_synced_at=?').run(at);f.sql.prepare("INSERT INTO bank_sync_runs(id,owner,connection_id,imported,skipped,warnings,test,created_at) VALUES('success',?,'bank',0,0,'[]',0,?)").run(f.owner,at);const j=await f.finish((await f.start()).id);assert.equal(j.status,'partial');assert.equal(j.steps[0].state,'waiting');assert.equal(j.steps[2].state,'cached');assert.ok(j.steps[0].next_at);assert.equal(f.calls.includes('gmail'),false);assert.equal(f.calls.includes('bank'),false);assert.doesNotMatch(JSON.stringify(j),/private-page-token|encrypted|sealed/);});
 test('provider error payloads never appear in durable progress and other steps run',async t=>{const f=await fixture(t);f.connect();f.gmailError=Error('Bearer PRIVATE secret');f.bankError=Object.assign(Error('raw private bank payload'),{status:429});const j=await f.finish((await f.start()).id);assert.equal(j.status,'partial');assert.equal(j.steps[0].state,'error');assert.equal(j.steps[2].state,'waiting');assert.equal(j.steps[4].state,'done');assert.doesNotMatch(JSON.stringify(j),/PRIVATE|Bearer|raw private/);});
 test('a live lease prevents overlapping advances; expired lease is reclaimed safely',async t=>{const f=await fixture(t);f.connect();const a=await f.start();let release;f.gmailGate=new Promise(r=>release=r);const pending=f.advance(a.id);while(!f.calls.length)await new Promise(r=>setImmediate(r));const second=await f.advance(a.id);assert.equal(second.steps[0].state,'running');assert.deepEqual(f.calls,['gmail']);release();await pending;f.sql.prepare("UPDATE payment_control_runs SET lease='lost-worker',lease_until='2000-01-01'").run();const resumed=await f.advance(a.id);assert.equal(resumed.steps[1].state,'done');assert.equal(f.calls.filter(x=>x==='gmail').length,1);});
@@ -74,3 +85,49 @@ test('collection provider reference is never presented as an individual payer OC
 });
 
 test('comparison preview is read-only and does not create runs, drafts or allocations',async t=>{const f=await fixture(t);const before=f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n;const response=await f.call('preview',{},'GET'),out=await response.json();assert.equal(response.status,200);assert.equal(out.mode,'preview');assert.equal(out.changed,false);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,before);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM payment_control_runs').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,0);f.user=null;assert.equal((await f.call('preview',{},'GET')).status,401);});
+
+function beforeControlWrite(f,phase,before){
+ const prepare=f.d1.prepare.bind(f.d1);let used=false;
+ const prefix=phase==='running'?'UPDATE payment_control_runs SET steps=? WHERE':'UPDATE payment_control_runs SET steps=?,status=';
+ f.d1.prepare=query=>{const statement=prepare(query);if(query.startsWith(prefix)){const run=statement.run;statement.run=async function(){if(!used){used=true;await before();}return run.call(this);};}return statement;};
+}
+async function expireDuringWriteWait(f){
+ // Model the last milliseconds of a ten-minute lease without a long test sleep.
+ const expiry=new Date(Date.now()+10).toISOString();
+ f.sql.prepare('UPDATE payment_control_runs SET lease_until=? WHERE owner=?').run(expiry,f.owner);
+ await new Promise(resolve=>setTimeout(resolve,30));
+ assert.ok(Date.now()>Date.parse(expiry));return expiry;
+}
+
+test('database clock prevents adapter execution when the running write waits past lease expiry',async t=>{
+ const f=await fixture(t);f.connect();const job=await f.start();let expiry;
+ beforeControlWrite(f,'running',async()=>expiry=await expireDuringWriteWait(f));
+ const result=await f.advance(job.id),row=f.sql.prepare('SELECT * FROM payment_control_runs').get();
+ assert.deepEqual(f.calls,[],'an expired reservation must not begin an adapter');
+ assert.equal(result.steps[0].state,'queued');assert.equal(result.steps[0].attempts,0);assert.equal(result.status,'running');
+ assert.ok(row.lease);assert.equal(row.lease_until,expiry);assert.equal(row.finished_at,'');
+ const retried=await f.advance(job.id);assert.equal(retried.steps[0].state,'done');assert.equal(retried.steps[0].attempts,1);assert.deepEqual(f.calls,['gmail']);
+});
+
+test('database clock prevents final success and lease clearing after the completion write waits past expiry',async t=>{
+ const f=await fixture(t);f.connect();const job=await f.start();for(let step=0;step<4;step++)await f.advance(job.id);
+ let expiry;beforeControlWrite(f,'final',async()=>expiry=await expireDuringWriteWait(f));
+ const result=await f.advance(job.id),row=f.sql.prepare('SELECT * FROM payment_control_runs').get();
+ assert.equal(result.status,'running');assert.equal(result.steps[4].state,'running');assert.equal(result.finished_at,'');
+ assert.ok(row.lease,'expired worker must preserve the durable reservation for recovery');assert.equal(row.lease_until,expiry);
+ assert.equal(f.sql.prepare("SELECT COUNT(*) count FROM audit_events WHERE action='payment_control.complete'").get().count,0);
+ const retried=await f.advance(job.id);assert.equal(retried.status,'complete');assert.equal(retried.steps[4].attempts,2);
+ assert.equal(f.calls.filter(step=>step==='gmail').length,1);assert.equal(f.calls.filter(step=>step==='bank').length,1);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) count FROM customer_deliveries').get().count,0);
+});
+
+for(const phase of ['running','final'])test(`a replacement control lease survives the old worker's ${phase} write`,async t=>{
+ const f=await fixture(t);f.connect();const job=await f.start();let replacement;
+ beforeControlWrite(f,phase,async()=>{
+  f.sql.prepare("UPDATE payment_control_runs SET lease='synthetic-replacement',lease_until=? WHERE owner=?").run(new Date(Date.now()+60000).toISOString(),f.owner);
+  replacement=f.sql.prepare('SELECT * FROM payment_control_runs').get();
+ });
+ await f.advance(job.id);
+ assert.deepEqual(f.sql.prepare('SELECT * FROM payment_control_runs').get(),replacement);
+ assert.deepEqual(f.calls,phase==='running'?[]:['gmail']);
+});

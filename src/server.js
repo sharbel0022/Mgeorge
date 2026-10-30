@@ -9,7 +9,7 @@ import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { openDatabase, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
+import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
 import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
 import {dailyBackup} from './backup.js';
@@ -323,7 +323,8 @@ export async function runScheduledSync(){
 }
 /** The overview only reads stored evidence. It never sends mail or creates matches. */
 function paymentOverview(){
-  const data=buildPaymentOverview({invoices:listInvoices(db),transactions:listTransactions(db),documents:listDocuments(db),messages:listMessages(db),suggestions:analyzeReconciliation(reconciliationData(db))});
+  const evidence=reconciliationData(db);
+  const data=buildPaymentOverview({invoices:evidence.invoices,transactions:evidence.transactions,documents:listDocuments(db),messages:listMessages(db),suggestions:analyzeReconciliation(evidence)});
   return data;
 }
 // Only existing service functions are used. Paused schedules and registration
@@ -428,12 +429,12 @@ async function route(req,res){
     if(b.gmail_sync_interval_minutes!==undefined){if(![0,15,30,60,240,1440].includes(b.gmail_sync_interval_minutes))throw bad(400,'Välj ett giltigt Gmail-intervall');settings.gmail_sync_interval_minutes=b.gmail_sync_interval_minutes;}
     return json(res,200,{...saveSettings(db,settings),scheduler_available:true,user_mode:'single_administrator'});
   }
-  if(path==='/api/invoices'&&req.method==='GET')return json(res,200,{items:listInvoices(db)});
+  if(path==='/api/invoices'&&req.method==='GET')return json(res,200,{items:reconciliationData(db).invoices});
   if(path==='/api/invoices'&&req.method==='POST')return json(res,201,addInvoice(await readBody(req)));
   if(/^\/api\/invoices\/[^/]+$/.test(path)&&req.method==='GET'){
-    const id=decodeURIComponent(path.split('/').pop()),invoice=listInvoices(db).find(i=>i.id===id);if(!invoice)throw bad(404,'Fakturan saknas');
+    const evidence=reconciliationData(db),id=decodeURIComponent(path.split('/').pop()),invoice=evidence.invoices.find(i=>i.id===id);if(!invoice)throw bad(404,'Fakturan saknas');
     const transactions=listTransactions(db),allocations=db.prepare('SELECT * FROM allocations WHERE invoice_id=? ORDER BY confirmed_at DESC').all(id).map(a=>({...a,transaction:transactions.find(t=>t.id===a.transaction_id)}));
-    return json(res,200,{invoice,allocations,documents:listDocuments(db).filter(d=>d.invoice_id===id),analysis:invoiceAnalysis(invoice,analyzeReconciliation(reconciliationData(db)).filter(s=>s.invoice_id===id))});
+    return json(res,200,{invoice,allocations,documents:listDocuments(db).filter(d=>d.invoice_id===id),analysis:invoiceAnalysis(invoice,analyzeReconciliation(evidence).filter(s=>s.invoice_id===id))});
   }
   if(path==='/api/invoices'&&req.method==='PATCH'){
     const b=await readBody(req);const prev=db.prepare('SELECT * FROM invoices WHERE id=?').get(b.id);
@@ -446,6 +447,7 @@ async function route(req,res){
     const due_at=validateDate(b.due_at??prev.due_at),issued_at=validateDate(b.issued_at??prev.issued_at);
     db.exec('BEGIN IMMEDIATE');
     try{
+      if(b.reconciled===true&&bankEvidenceBlocksAbsence(db))throw bad(409,'Motstridiga bankunderlag måste granskas innan utebliven betalning kan bekräftas.');
       const info=db.prepare('UPDATE invoices SET party=?,email=?,issued_at=?,due_at=?,note=?,reference=?,bankgiro=?,reconciled_at=?,reconciliation_note=? WHERE id=?').run(requiredString(b.party??prev.party,'Företag/person'),optionalString(b.email??prev.email,240),issued_at,due_at,optionalString(b.note??prev.note,1500),optionalString(b.reference??prev.reference,120),optionalString(b.bankgiro??prev.bankgiro,80),b.reconciled===true?new Date().toISOString():b.reconciled===false?'':prev.reconciled_at,b.reconciled===true?optionalString(b.reconciliation_note,1500):prev.reconciliation_note,b.id);
       if(document)db.prepare("UPDATE documents SET invoice_id=?,status='registered' WHERE id=?").run(b.id,document.id);
       const updated=db.prepare('SELECT * FROM invoices WHERE id=?').get(b.id),changes={};
@@ -560,8 +562,9 @@ async function route(req,res){
   }
   if(path==='/api/audit'&&req.method==='GET')return json(res,200,{items:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC LIMIT 100').all()});
   if(path==='/api/export'&&req.method==='GET'){
+    const evidence=reconciliationData(db);
     audit(db,'data_exported',{});
-    return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:listInvoices(db),transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),customer_messages:listMessages(db),message_approvals:db.prepare('SELECT * FROM message_approvals').all(),message_deliveries:db.prepare('SELECT * FROM message_deliveries').all(),verified_contacts:db.prepare('SELECT * FROM verified_contacts').all(),payer_links:db.prepare('SELECT * FROM payer_links').all(),reconciliation_findings:db.prepare('SELECT * FROM reconciliation_findings').all(),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
+    return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:evidence.invoices,transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),customer_messages:listMessages(db),message_approvals:db.prepare('SELECT * FROM message_approvals').all(),message_deliveries:db.prepare('SELECT * FROM message_deliveries').all(),verified_contacts:db.prepare('SELECT * FROM verified_contacts').all(),payer_links:db.prepare('SELECT * FROM payer_links').all(),reconciliation_findings:db.prepare('SELECT * FROM reconciliation_findings').all(),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
   }
   // AIS only: reads account data, never creates, approves or executes payments.
   if(path==='/api/bank/status'&&req.method==='GET'){

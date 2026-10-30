@@ -47,6 +47,19 @@ async function fixture(t){
   return f;
 }
 
+for(const [label,offset,local,cloud] of [
+  ['future by a millisecond',1,false,false],['future by a day',86400000,false,false],['future by ten years',315360000000,false,false],
+  ['now',0,true,true],['inside local contact window',-179999,true,true],['at local expiry',-180000,false,true],
+  ['inside cloud contact window',-2699999,false,true],['at cloud expiry',-2700000,false,false],
+  ['missing',null,false,false],['invalid','not-a-date',false,false],
+])test('Q8: OCR contact status rejects invalid ages and keeps exact windows: '+label,async t=>{
+  const f=await fixture(t),at=Date.parse('2026-10-30T12:00:00.000Z');t.mock.method(Date,'now',()=>at);
+  const seen=typeof offset==='number'?new Date(at+offset).toISOString():offset||'';
+  f.sql.prepare('UPDATE document_automation SET worker_seen=?,cloud_worker_seen=?').run(seen,seen);
+  const status=await f.api.processingStatus(f.owner);
+  assert.equal(status.worker_online,local);assert.equal(status.cloud_worker_recent,cloud);assert.equal(status.worker_last_seen,seen);assert.equal(status.cloud_worker_last_seen,seen);assert.equal(status.cloud_last_completed,'');
+});
+
 test('cloud OCR requires its own enabled credential, and never authorizes ambiguous owners',async t=>{
   const f=await fixture(t);f.add();
   await assert.rejects(f.call('lease',{},'cloud',f.env.DOCUMENT_WORKER_TOKEN),/WORKER_AUTH/);

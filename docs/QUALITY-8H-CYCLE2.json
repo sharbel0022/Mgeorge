@@ -1,0 +1,502 @@
+{
+  "schema": 1,
+  "cycle": "2",
+  "created_at": "2026-10-30T17:28:27.193952+00:00",
+  "parent_commit": "02d1f84a18c1113f9e68641c384e1cef766f9558",
+  "source_files": {
+    "src/backup.js": "ebccfeed35cd7fb9d3abe7450d317ac6dac304a22faff6b1d1c087853ffb89a8",
+    "test/backup-integrity-q8.test.js": "9cfc7b720d617a3cc5583c7f133d1a9a559431cabe456b93b3b8589fb438f8dd",
+    "sites/lib/backup-engine.ts": "16a071a3737891054a7814bd55ef57c350095a1e2ab0b791389e5742215f317f",
+    "sites/db/schema.ts": "879dab609866573c09e7cffd779d71f10b8ac540e935f360d45837c9b5642da9",
+    "sites/drizzle/0014_backup_verification.sql": "a4ce3ab9299ba701137734ac06bcef23e247d57dacd979bdfaec305a24f44e6f",
+    "sites/drizzle/meta/0014_snapshot.json": "4f6691bf85d411f6354657f8b67e37bacb372478539a346a75f13fe7f0b5738c",
+    "sites/drizzle/meta/_journal.json": "0899502e7f9471a5b1b66625a5a7f44b757fe361bc12813be78ee1cebe2cc145",
+    "sites/tests/backup.test.mjs": "2cfbfe80ac0f8d6068d09988e026ec2921f49eb189ecd5866b2e7f05d20bd2b0",
+    "sites/tests/backup-integrity-q8.test.mjs": "b2cfd1f58b3d7c70d09a8d27d5d8f3db7b9b179e45fb968c995db364e404603f",
+    "src/payment-control.js": "7ca00cc874d3290f4a9c64ac717bcd3c626e19158b3ec7a6f4b1c9aaf50dbe4e",
+    "test/payment-control-receipts-q8.test.js": "4e27d9d9ec3035cb11d64a610aa10c8481d7108237f5b080cca237ba78c5259c",
+    "sites/lib/payment-control.ts": "9c49143cc988e2c68433212b0eae1b0e799762c37c17130a80769af0122555c9",
+    "sites/tests/payment-control.test.mjs": "015a622f2c2a030e74e145a3e96c63f9ffb8107315a8536330092e663f3fe348",
+    "src/bank-evidence.js": "abd01f63f8f292b91a07739b6eca7aab2437f88d055324b6d1345efa64f7bed7",
+    "src/db.js": "3ea032faa9e49c737c4fc36f9213594587c6ca238fdea0de953bd8e24e2aac0b",
+    "src/reconciliation.js": "fd11b53285e38daae77e150f8aab8978c9fcab808389f3d506ce454a9ddac464",
+    "src/payment-overview.js": "a31a841c1ed667ccc93f6922d1e65be29c2545034be058e8ef2d7c35d198b580",
+    "src/server.js": "b168551ab79d0cdd0e3e526c6710dd13eac51be0e605d547099ef2b7c34dece2",
+    "src/customer-messages.js": "e071b3b2c1e9299b258a40635ae4391bca42e275e2a1bd1f1e7fb50761a8a435",
+    "public/app.js": "ae0c4c7f8f0edabb717447d26dcf023343041d2e8b6b0d79e4046c97676bd425",
+    "public/messages.js": "cae8f1375ac93bc3e6348273f3492186a5b47d440791a3526ff2e8fe1d09f826",
+    "public/payment-control.js": "abfa7787fc9217a2402b73ac2222cd2306f505fcb07608ec77abdc8987fce5d8",
+    "test/absence-integrity-q8.test.js": "782dfd7c37d339fb695c5d58f9d76511ae68c49ac6399ace5072bd5dd4f54343",
+    "test/absence-api-q8.test.js": "faf1282542833c78ba84521573f27893c2b48d809a5270de1f98c1d15f147654",
+    "test/payment-control-api.test.js": "9d9a152d13f65bb859b33d6e423c71fc5f5e443663e40806ced3ec7e851f1bd6",
+    "test/payment-control-ui.test.js": "43fd1eebe5522bc59ef761c35133cf1f2f10a2e3f5ff8cdcefed531e1d42132c",
+    "sites/lib/document-processing.ts": "457c81c5458b32467593ce63c27a8cc849641865da621381d08fa5161d8bfa75",
+    "sites/lib/gmail-service.ts": "c2ddf28e0faadcac0ca0ae092ac2e31403cbc2a541049bdb69bd409d7a8e03f4",
+    "sites/lib/customer-messages.ts": "2b715a86975f55872c2a5ac49c57b5986c0c3b7cda30cb2c5b2d5dab14550820",
+    "sites/components/gmail-workspace.tsx": "6cbdf34edfab85d8b91f0e6a036c03aace98b66fedb63cb3f29e5fcb8922b3c4",
+    "sites/components/document-ocr-status.tsx": "f328f75edcd12c82bde0b99832e8227202ec7030e28d1c595ec96de3a72634d5",
+    "sites/tests/gmail.test.mjs": "c76d43c456b907dfdc89449c74922fecaa63cdae61c2d75b5c54d2fbc7ba0d1b",
+    "sites/tests/cloud-ocr.test.mjs": "c7dbe37ecc4a50fefb2ce52f45a255235bb32ea3360f236f6e943d2a82f02ef9",
+    "sites/tests/customer-messages.test.mjs": "067095a76702ca2a24b8a411cfc9a75f4fb52ec074b40c0780bd0594c67a2a88",
+    "sites/tests/gmail-preview-q8.test.mjs": "84ff8663045679aaf54acac9b0eaadfceb6c480d461ded41b71571dbb155880a",
+    "sites/app/mcp/route.ts": "690725ac7de950cd991acbab81f4512977411778b3b4a65a4709e400087acea8",
+    "sites/tests/mcp-security-q8.test.mjs": "584397b7c0b3f04661e22ee565886e5aaca591b32176c029419155a5956174a3",
+    "src/sites-ocr-pull.js": "b835fe873549267210c4baa797ee5c9db3975628cac90480c76a2acfaed39c63",
+    "test/sites-ocr-pull.test.js": "b0c019629be6c788175e152eb71f65d4dbdbb4a601d589afb82ce578c9b04ec2",
+    "scripts/run-sites-cloud-ocr.mjs": "85a514d09fe962adbba9138d795fcc931898a6b16b7b18418dc1d36d928dea67"
+  },
+  "tests": {
+    "node": 469,
+    "sites": 624,
+    "failed": 0,
+    "skipped": 0,
+    "syntax_files": 69,
+    "typescript": "passed",
+    "production_build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0
+  },
+  "independent_review": "clear for the frozen cycle2 scopes; API-original and navigation candidates excluded",
+  "production_version_at_assessment": 33,
+  "source_commit_at_assessment": "bcb916e570d88abaadf836af0e7a1c5c200e6b0e",
+  "score_total": 245.5,
+  "score_mean": 7.4393939393939394,
+  "areas": [
+    {
+      "number": 1,
+      "area": "Design och färger",
+      "previous": 6.5,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.0,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 2,
+      "area": "Startsida",
+      "previous": 7.5,
+      "score": 8.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 3,
+      "area": "Navigering",
+      "previous": 5.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 4,
+      "area": "Mobilanpassning",
+      "previous": 7.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 5,
+      "area": "Sökning och filtrering",
+      "previous": 7.0,
+      "score": 7.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 6,
+      "area": "Minimal manuell hantering",
+      "previous": 6.5,
+      "score": 6.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 7,
+      "area": "Kundfakturor",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 8,
+      "area": "Leverantörsfakturor",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 9,
+      "area": "PDF-tolkning",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 10,
+      "area": "Bild-OCR",
+      "previous": 7.0,
+      "score": 7.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 11,
+      "area": "Gmail-anslutning",
+      "previous": 7.0,
+      "score": 7.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 12,
+      "area": "Automatisk fakturaregistrering",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 13,
+      "area": "Dubblettkontroll",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 14,
+      "area": "Dokumentgranskning",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 15,
+      "area": "Swedbank-anslutning",
+      "previous": 8.5,
+      "score": 8.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      }
+    },
+    {
+      "number": 16,
+      "area": "Automatisk bankhämtning",
+      "previous": 8.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 17,
+      "area": "Bankgiroimport",
+      "previous": 8.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 18,
+      "area": "Identifiera verklig betalare",
+      "previous": 6.5,
+      "score": 6.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 19,
+      "area": "Verklig OCR/fakturareferens",
+      "previous": 6.5,
+      "score": 6.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 20,
+      "area": "Automatisk betalningsmatchning",
+      "previous": 7.5,
+      "score": 7.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 21,
+      "area": "Delbetalningar",
+      "previous": 8.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 22,
+      "area": "Överbetalningar",
+      "previous": 8.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 23,
+      "area": "Flera fakturor i en betalning",
+      "previous": 7.5,
+      "score": 7.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 24,
+      "area": "Betalningshistorik",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 25,
+      "area": "Betalningsstatus",
+      "previous": 8.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 26,
+      "area": "Kontrollera alla betalningar",
+      "previous": 7.5,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 27,
+      "area": "Automatiska mejlutkast",
+      "previous": 8.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 28,
+      "area": "Schemalagd automatisering",
+      "previous": 6.0,
+      "score": 6.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 29,
+      "area": "Säkerhetskopiering",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      }
+    },
+    {
+      "number": 30,
+      "area": "Säkerhet och åtkomstkontroll",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 31,
+      "area": "Katastrofåterställning",
+      "previous": 6.0,
+      "score": 6.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 32,
+      "area": "Kodkvalitet och tester",
+      "previous": 8.5,
+      "score": 8.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      }
+    },
+    {
+      "number": 33,
+      "area": "Verifiering i verklig produktion",
+      "previous": 6.0,
+      "score": 6.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 1.5
+      }
+    }
+  ],
+  "at_least_9_5": [],
+  "pending": [
+    "push exact tree to main and verify CI",
+    "publish same existing Sites project",
+    "verify new read-only production diagnostics",
+    "deliver separately reviewed API-original and navigation candidates"
+  ]
+}
