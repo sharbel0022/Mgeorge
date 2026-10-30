@@ -23,7 +23,8 @@ async function fixture(t){
   const pdf=data(`export async function serverPdfText(){const f=${reference};if(f.pdfError)throw Error(f.pdfError);return f.pdfResult||{text:'',method:'pdf',confidence:100};}`);
   const processing=moduleUrl('../lib/document-processing.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/security':securityUrl,'./invoice-fields.js':fields,'./server-pdf':pdf,'./customer-messages':data(`export async function reconcileAndPrepare(){if(${reference}.reconcileError)throw Error('synthetic postprocessing failure');}`)});
   f.processing=await import(processing);f.fields=await import(fields);
-  f.api=await import(moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields,'./document-processing':processing,'./customer-messages':data(`export async function reconcileAndPrepare(){if(${reference}.reconcileError)throw Error('synthetic postprocessing failure');}`)}));
+  f.apiUrl=moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields,'./document-processing':processing,'./customer-messages':data(`export async function reconcileAndPrepare(){if(${reference}.reconcileError)throw Error('synthetic postprocessing failure');}`)});
+  f.api=await import(f.apiUrl);
   t.mock.method(globalThis,'fetch',async (url,options)=>{
     assert.equal(options.redirect,'manual','Workers-compatible fetch must never forward credentials through redirects');
     f.providerCalls++;const path=new URL(url).pathname;
@@ -143,11 +144,10 @@ test('Sites Gmail preserves HTTP dates and stops unreasonable provider delays',a
   f.retryAfter='99999999999999999999999999';await assert.rejects(f.adapter.gmailProfile({access_token:'synthetic'}),error=>error.retryBlocked===true&&error.retryAfter<=365*86400);
 });
 
-test('explicit payroll and branding are skipped before download while ambiguous scans remain candidates',async t=>{
+test('an ambiguous payroll subject retains its original without creating a debt',async t=>{
   const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
-  f.subject='Lön oktober';assert.equal((await (await f.api.gmailSync(post('sync'))).json()).imported,0);assert.equal(f.attachmentCalls||0,0);
-  f.subject='Faktura';f.filename='main-logo.png';f.mime='image/png';assert.equal((await (await f.api.gmailSync(post('sync'))).json()).imported,0);assert.equal(f.attachmentCalls||0,0);
-  f.filename='image.png';await f.api.gmailSync(post('sync'));assert.equal(f.attachmentCalls,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  f.subject='Lön oktober';assert.equal((await (await f.api.gmailSync(post('sync'))).json()).imported,1);assert.equal(f.attachmentCalls,1);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
   assert.ok((await (await f.api.gmailStatus()).json()).last_successful_fetch);
 });
 
@@ -252,4 +252,61 @@ test('committed Gmail retrieval stays successful if document after-checks need r
  const result=await(await f.api.gmailSync(undefined,true)).json();assert.equal(result.imported,1);assert.match(result.warning,/Efterkontrollen/);assert.equal(result.processing.status,'pending');assert.equal(f.sql.prepare('SELECT status FROM gmail_connections').get().status,'connected');assert.equal(f.sql.prepare('SELECT sync_failures FROM gmail_connections').get().sync_failures,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_runs').get().n,1);assert.equal(f.sql.prepare('SELECT status FROM gmail_runs').get().status,'completed_pending');
  const status=await(await f.api.gmailStatus()).json();assert.equal(status.connection.status,'connected');assert.match(status.connection.postprocess_warning,/Efterkontrollen/);assert.ok(status.last_successful_fetch);assert.equal(status.connection.sync_failures,0);
  f.reconcileError=false;await f.api.gmailSync(post('sync'));const recovered=await(await f.api.gmailStatus()).json();assert.equal(recovered.connection.postprocess_warning,null);
+});
+
+test('read-only Gmail status does not initialize automation or expose sealed credentials',async t=>{
+ const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_automation').get().n,0);
+ const status=await(await f.api.gmailStatus(true)).json();
+ assert.equal(status.connection.status,'connected');
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_automation').get().n,0);
+ assert.equal(status.connection.tokens,undefined);
+ assert.doesNotMatch(JSON.stringify(status),/synthetic-refresh|synthetic-access/);
+});
+
+test('Gmail MCP status is bounded and excludes invoice bodies and document workspace reads',async t=>{
+ const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+ f.sql.prepare("INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES('private-document',?,'invoice.pdf','application/pdf',10,'synthetic-hash','2026-10-30')").run(f.owner);
+ f.sql.prepare("INSERT INTO gmail_sources(owner,source_id,document_id,metadata,status,extraction,created_at) VALUES(?,'source','private-document','{}','needs_review',?,'2026-10-30')").run(f.owner,JSON.stringify({text_excerpt:'synthetic-private-document '.repeat(2000)}));
+ const service=data(`export async function automaticSync(){throw Error('unexpected mutation');}export async function automaticSyncStatus(){return Response.json({});}export function bankFailure(){return Response.json({error:'unexpected'},{status:409});}`);
+ const rpc=await import(moduleUrl('../lib/banking/mcp.ts',{'./service':service,'../gmail-service':f.apiUrl}));
+ let documentReads=0;const prepare=f.d1.prepare.bind(f.d1);
+ f.d1.prepare=query=>{if(/SELECT s\.document_id|SELECT revision,payload/.test(query))documentReads++;return prepare(query);};
+ const body=await(await rpc.bankRpc({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'gmail_sync_status',arguments:{}}})).json();
+ assert.equal(body.result.isError,undefined);
+ assert.equal(body.result.structuredContent.connection.status,'connected');
+ assert.equal(body.result.structuredContent.candidates,undefined);
+ assert.equal(documentReads,0);
+ assert.doesNotMatch(JSON.stringify(body),/synthetic-private-document/);
+ assert.ok(JSON.stringify(body).length<12000);
+ f.user=null;
+ const denied=await(await rpc.bankRpc({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'gmail_sync_status',arguments:{}}})).json();
+ assert.equal(denied.result.isError,true);
+});
+
+test('Gmail status distinguishes configured scheduling from observed successful execution',async t=>{
+ const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+ f.env.DOCUMENT_SCHEDULER_CONFIGURED='true';f.env.DOCUMENT_SCHEDULE_MINUTES='60';
+ f.sql.prepare('INSERT INTO document_automation(owner,email,enabled,updated_at) VALUES(?,?,1,?)').run(f.owner,f.user.email,new Date().toISOString());
+ const inspect=async()=>await(await f.api.gmailStatus(true)).json();
+ let result=await inspect();assert.equal(result.sync_health.state,'not_verified');assert.equal(result.background_ready,false);assert.equal(result.sync_health.schedule_verified,false);
+ const insert=f.sql.prepare("INSERT INTO gmail_runs(id,owner,found,imported,duplicates,status,created_at) VALUES('health-run',?,0,0,0,'completed',?)");
+ insert.run(f.owner,new Date(Date.now()-24*3600000).toISOString());
+ result=await inspect();assert.equal(result.sync_health.state,'stale');assert.equal(result.background_ready,false);
+ f.sql.prepare('UPDATE gmail_runs SET created_at=?').run(new Date().toISOString());
+ result=await inspect();assert.equal(result.sync_health.state,'recent');assert.equal(result.background_ready,true);assert.equal(result.sync_health.schedule_verified,false);
+ f.sql.prepare('UPDATE gmail_runs SET created_at=?').run(new Date(Date.now()+3600000).toISOString());
+ result=await inspect();assert.equal(result.sync_health.state,'not_verified');assert.equal(result.background_ready,false);
+ f.sql.prepare('UPDATE gmail_runs SET created_at=?').run(new Date().toISOString());
+ f.sql.prepare("UPDATE gmail_connections SET sync_failures=3,status='blocked'").run();
+ result=await inspect();assert.equal(result.sync_health.state,'blocked');assert.equal(result.next_eligible_sync,null);
+ f.sql.prepare("UPDATE gmail_connections SET sync_failures=0,status='connected',retry_after=?").run(new Date(Date.now()+3600000).toISOString());
+ result=await inspect();assert.equal(result.sync_health.state,'waiting');assert.equal(result.background_ready,false);
+ f.sql.prepare("UPDATE gmail_connections SET retry_after='' ").run();
+ f.sql.prepare('UPDATE document_automation SET enabled=0').run();
+ result=await inspect();assert.equal(result.sync_health.state,'paused');assert.equal(result.background_ready,false);
+ f.sql.prepare('UPDATE document_automation SET enabled=1').run();f.env.DOCUMENT_SCHEDULER_CONFIGURED='false';
+ result=await inspect();assert.equal(result.sync_health.state,'not_configured');assert.equal(result.background_ready,false);
+ f.sql.prepare('DELETE FROM gmail_connections').run();
+ result=await inspect();assert.equal(result.sync_health.state,'disconnected');assert.equal(result.background_ready,false);
 });

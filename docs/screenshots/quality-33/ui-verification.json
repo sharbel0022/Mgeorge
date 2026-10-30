@@ -1,0 +1,125 @@
+{
+  "checkedAt": "2026-10-30T14:52:10.686Z",
+  "environment": "Local Sites preview, synthetic demo data, real Chromium CSS viewports in a same-origin iframe",
+  "overview": [
+    {
+      "requestedWidth": 320,
+      "cards": 4,
+      "clientWidth": 305,
+      "scrollWidth": 305,
+      "viewportWidth": 320,
+      "primaryButtons": 1
+    },
+    {
+      "requestedWidth": 390,
+      "cards": 4,
+      "clientWidth": 375,
+      "scrollWidth": 375,
+      "viewportWidth": 390,
+      "primaryButtons": 1
+    },
+    {
+      "requestedWidth": 768,
+      "cards": 4,
+      "clientWidth": 753,
+      "scrollWidth": 753,
+      "viewportWidth": 768,
+      "primaryButtons": 1
+    },
+    {
+      "requestedWidth": 1024,
+      "cards": 4,
+      "clientWidth": 1009,
+      "scrollWidth": 1009,
+      "viewportWidth": 1024,
+      "primaryButtons": 1
+    },
+    {
+      "requestedWidth": 1440,
+      "cards": 4,
+      "clientWidth": 1425,
+      "scrollWidth": 1425,
+      "viewportWidth": 1440,
+      "primaryButtons": 1
+    }
+  ],
+  "bank": [
+    {
+      "requestedWidth": 320,
+      "clientWidth": 305,
+      "heading": "Bank",
+      "scrollWidth": 305,
+      "viewportWidth": 320
+    },
+    {
+      "requestedWidth": 390,
+      "clientWidth": 375,
+      "heading": "Bank",
+      "scrollWidth": 375,
+      "viewportWidth": 390
+    },
+    {
+      "requestedWidth": 768,
+      "clientWidth": 753,
+      "heading": "Bank",
+      "scrollWidth": 753,
+      "viewportWidth": 768
+    },
+    {
+      "requestedWidth": 1024,
+      "clientWidth": 1024,
+      "heading": "Bank",
+      "scrollWidth": 1024,
+      "viewportWidth": 1024
+    },
+    {
+      "requestedWidth": 1440,
+      "clientWidth": 1440,
+      "heading": "Bank",
+      "scrollWidth": 1440,
+      "viewportWidth": 1440
+    }
+  ],
+  "keyboard": {
+    "openedByEnter": true,
+    "initialFocus": {
+      "ariaLabel": "Stäng dialog",
+      "outline": "solid",
+      "text": ""
+    },
+    "iframeShiftTabStayedInside": false,
+    "mobileDialog": {
+      "viewport": 390,
+      "width": 370,
+      "scrollWidth": 368,
+      "clientWidth": 368,
+      "openedByEnter": true
+    },
+    "escapeClosed": true,
+    "topLevelInitial": {
+      "focusLabel": "Stäng dialog",
+      "modal": true
+    },
+    "topLevelAfterFix": {
+      "focusLabel": "Visa betalning: Betalare okänd, 7 179,16 kr, 25 okt.",
+      "outlineStyle": "solid",
+      "outlineWidth": "3px",
+      "tag": "BUTTON"
+    },
+    "topLevelBeforeFix": {
+      "tag": "BODY",
+      "focusLabel": null
+    },
+    "finalFocusRestored": true,
+    "focusVisible": "solid 3px"
+  },
+  "search": {
+    "invoiceNumber": 1,
+    "missingSpecification": 1
+  },
+  "limitations": [
+    "CSS viewports in Chromium; not physical devices or cross-browser certification",
+    "Native dialog in same-origin iframe lets Shift+Tab leave the test iframe; top-level Enter/Escape and focus restoration separately verified",
+    "Mobile menu pointer sequence not conclusively verified; no pass claimed"
+  ]
+}

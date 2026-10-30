@@ -1,4 +1,4 @@
-import {available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,usablePaymentReference,type State,type Transaction} from './domain';
+import {available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,type State,type Transaction} from './domain';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 
@@ -38,10 +38,12 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   const references=matchingReferenceValues(evidence,t.payerReference);
   const owners=new Set(state.invoices.filter(i=>!i.voided&&references.some(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual)))).map(i=>i.id));
   const contradictory=references.length>1&&!state.invoices.some(i=>references.every(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual))));
-  const conflict=!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
+  const bankConflict=paymentEvidenceConflict(state,t),conflict=bankConflict||!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
   let status='Behöver granskas',verified=false;
   if(t.ignored)status='Undantagen';
   else if(t.duplicateOf)status='Möjlig dubblett';
+  else if(bankConflict)status='Motstridigt bankunderlag';
+  else if(paymentOriginalIssue(state,t))status='Original behöver verifieras';
   else if(needsBankFileValidation(t))status='Original behöver verifieras';
   else if(requiresSpecification)status='Specifikation saknas';
   else if(conflict)status='Konflikt';
@@ -51,7 +53,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
     status=invoices.some(i=>balance(state,i)>0)?'Delbetalning':available(state,t)>0?'Överbetalning':'Verifierad';
   }else if(possible.length)status='Möjlig matchning';
   const manualPayer=t.verification?.party||(t.evidence==='verified_specification'?t.party:''),manualReference=t.verification?.payerReference||(t.evidence==='verified_specification'?t.payerReference:'');
-  return {payer:payerLabel(t),payerKnown:!!bankPayer(t),reference,invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0,invoiceNumbers,possible,status,verified,requiresSpecification,manualPayer,manualReference};
+  return {payer:payerLabel(t),payerKnown:!!bankPayer(t),reference,invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification,manualPayer,manualReference};
 }
 export function bankVisibleTransactions(state:State){
   return state.transactions.filter(t=>{

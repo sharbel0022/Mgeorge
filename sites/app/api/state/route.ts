@@ -1,4 +1,4 @@
-import {reconcileState} from '@/lib/reconciliation';
+import {reconcileWithOriginals,assertPaymentOriginal} from '@/lib/reconciliation-evidence';
 import {reconcileAndPrepare} from '@/lib/customer-messages';
 import { db, identity, readWorkspace, readBankFileOriginal, response, failure } from "@/lib/server";
 import { applyCommand, emptyState, now, uid } from "@/lib/domain";
@@ -17,7 +17,8 @@ export async function POST(req:Request){try{
   if(command.documentId)Object.assign(command,await readBankFileOriginal(user.userId,command));
   else if(Array.isArray(command.rows))command.rows=command.rows.map((r:any)=>({...r,verified:false,specification:false,evidence:undefined}));
  }
- const result=applyCommand(old.state,command);const automatic=reconcileState(result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];const payload=JSON.stringify(result.state);
+ const current=['match.create','transaction.verify','transaction.split'].includes(command?.type)?await assertPaymentOriginal(user.userId,old.state,command.transactionId||command.id):old.state;
+ const result=applyCommand(current,command);const automatic=await reconcileWithOriginals(user.userId,result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];const payload=JSON.stringify(result.state);
  if(new TextEncoder().encode(payload).length>1_800_000)throw new Error('Registret är för stort för den här versionen. Exportera dina uppgifter innan vidare import.');
  const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces (owner, revision, payload, updated_at) VALUES (?, 0, ?, ?)').bind(user.userId,JSON.stringify(emptyState()),at).run();
  const detail=JSON.stringify({message:result.message,command,automatic:automatic.decisions,requestId:body.requestId});

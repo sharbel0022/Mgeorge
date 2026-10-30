@@ -32,6 +32,24 @@ function ui(){
 const plain=value=>JSON.parse(JSON.stringify(value));
 function bankFixture(view,connections=[],extra={}){view.set('fixture',{configured:true,connections,...extra});view.run('state.bank=fixture');}
 
+for(const field of ['bank_evidence_conflicts','ancestor_bank_evidence_conflicts'])test(`payment dialog blocks approval for ${field} and explains the actual review reason`,()=>{
+  const view=ui();
+  view.set('payment',{id:'synthetic-payment',account:'SYNTHETIC',booked_at:'2026-10-26',amount_cents:10000,available_cents:10000,payer:'Synthetic Customer AB',reference:'0604',status:'review',review_reason:'Samlingspostens bankuppgifter är motstridiga.',[field]:[{transaction_id:'synthetic-parent'}]});
+  view.run("state.transactions=[payment];state.invoices=[{id:'synthetic-invoice',direction:'customer',kind:'invoice',invoice_number:'0604',party:'Synthetic Customer AB',remaining_cents:10000}];transactionDialog('synthetic-payment')");
+  const html=view.element('#modal-layer').innerHTML;
+  assert.doesNotMatch(html,/Godkänn matchning|name="invoice_id"|type="submit"/);
+  assert.match(html,/Samlingspostens bankuppgifter är motstridiga\./);
+  assert.doesNotMatch(html,/Betalaruppgifter eller referens saknas/);
+});
+
+test('payment dialog keeps explicit approval available for an ordinary unheld payment',()=>{
+  const view=ui();
+  view.set('payment',{id:'synthetic-payment',account:'SYNTHETIC',booked_at:'2026-10-26',amount_cents:10000,available_cents:10000,payer:'Synthetic Customer AB',reference:'0604',status:'unmatched',bank_evidence_conflicts:[],ancestor_bank_evidence_conflicts:[]});
+  view.run("state.transactions=[payment];state.invoices=[{id:'synthetic-invoice',direction:'customer',kind:'invoice',invoice_number:'0604',party:'Synthetic Customer AB',remaining_cents:10000}];transactionDialog('synthetic-payment')");
+  const html=view.element('#modal-layer').innerHTML;
+  assert.match(html,/Godkänn matchning/);assert.match(html,/name="invoice_id"/);assert.match(html,/type="submit"/);
+});
+
 test('missing activation is shown once on the page and modal, with file fallback and no technical configuration',()=>{
   const view=ui();bankFixture(view,[],{configured:false,activation:{message:activationMessage}});
   const html=view.run('connectionPage()');

@@ -10,6 +10,8 @@ import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { digest } from './security.js';
+import { bankFinancialReview, bankEvidenceConflictFields, hasBankEvidenceConflict, bankEvidenceReviewReason, BANK_EVIDENCE_CONFLICT_REASON } from './bank-evidence.js';
+import { parseBankFile } from './importers.js';
 
 /** Öppnar SQLite och förbereder databasschemat. Här bevaras företagets fakturor och historik mellan serverstarter. */
 export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sqlite') {
@@ -113,6 +115,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_transactions','reference_evidence',"TEXT NOT NULL DEFAULT '{}'");
   addColumn('bank_transactions','account_evidence',"TEXT NOT NULL DEFAULT '{}'");
   addColumn('bank_transactions','raw_bank_data',"TEXT NOT NULL DEFAULT '{}'");
+  addColumn('bank_transactions','bank_evidence_conflicts',"TEXT NOT NULL DEFAULT '[]'");
   const rawHashUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='raw_bank_data_sha256');
   if(rawHashUpgrade){
     db.exec('BEGIN IMMEDIATE');
@@ -157,9 +160,29 @@ export function listInvoices(db) {
   });
 }
 export function listTransactions(db) {
-  return db.prepare(`SELECT t.*, COALESCE((SELECT SUM(a.amount_cents) FROM allocations a WHERE a.transaction_id=t.id),0) AS allocated_cents FROM bank_transactions t ORDER BY t.booked_at DESC,t.created_at DESC`).all().map(t=>{
+  const records=db.prepare(`SELECT t.*, COALESCE((SELECT SUM(a.amount_cents) FROM allocations a WHERE a.transaction_id=t.id),0) AS allocated_cents FROM bank_transactions t ORDER BY t.booked_at DESC,t.created_at DESC`).all().map(t=>{
     const available_cents=Math.abs(t.amount_cents)-t.allocated_cents;
-    return {...t,reference_evidence:JSON.parse(t.reference_evidence),account_evidence:JSON.parse(t.account_evidence),raw_bank_data:JSON.parse(t.raw_bank_data),available_cents,status:t.excluded?'excluded':available_cents===0?'matched':t.allocated_cents>0?'partial':t.is_aggregate||(!t.payer&&!t.reference)?'review':'unmatched'};
+    return {...t,reference_evidence:JSON.parse(t.reference_evidence),account_evidence:JSON.parse(t.account_evidence),raw_bank_data:JSON.parse(t.raw_bank_data),bank_evidence_conflicts:JSON.parse(t.bank_evidence_conflicts),available_cents};
+  });
+  const byReference=new Map();
+  for(const record of records){
+    const key=JSON.stringify([record.account,record.bank_reference]);
+    if(record.bank_reference)byReference.set(key,[...(byReference.get(key)||[]),record]);
+  }
+  return records.map(record=>{
+    // A replaced/excluded parent remains part of the child's evidence chain.
+    // Project its hold without changing either bank original or any allocation.
+    const ancestors=[],visited=new Set([record.id]),pending=[];
+    const addParents=child=>{if(child.parent_bank_reference)pending.push(...(byReference.get(JSON.stringify([child.account,child.parent_bank_reference]))||[]));};
+    addParents(record);
+    while(pending.length){
+      const parent=pending.pop();if(visited.has(parent.id))continue;visited.add(parent.id);
+      if(parent.bank_evidence_conflicts.length)ancestors.push({transaction_id:parent.id,bank_reference:parent.bank_reference});
+      addParents(parent);
+    }
+    const transaction={...record,ancestor_bank_evidence_conflicts:ancestors};
+    const financialReview=bankFinancialReview(transaction),conflict=hasBankEvidenceConflict(transaction);
+    return {...transaction,review_reason:bankEvidenceReviewReason(transaction)||financialReview?.reason||record.review_reason,status:record.excluded?'excluded':conflict?'review':record.available_cents===0?'matched':financialReview?'review':record.allocated_cents>0?'partial':record.is_aggregate||(!record.payer&&!record.reference)?'review':'unmatched'};
   });
 }
 export function paymentSign(invoice){return (invoice.direction==='customer'?1:-1)*(invoice.kind==='credit'?-1:1);}
@@ -171,6 +194,7 @@ export function matchingSuggestions(db){
     if(t.excluded||t.is_aggregate||t.available_cents<=0)continue;
     const ref=normalized(t.reference),party=normalized(t.payer);
     for(const i of invoices){
+      if(hasBankEvidenceConflict(t)||bankFinancialReview(t)&&(i.kind!=='credit'||bankFinancialReview(t).kind==='reversal'))continue;
       if(Math.sign(t.amount_cents)!==paymentSign(i)||i.currency!==t.currency)continue;
       if(i.issued_at&&t.booked_at<i.issued_at)continue;
       const exactReference=!!ref&&[i.reference,i.invoice_number].some(r=>normalized(r)&&normalized(r)===ref);
@@ -201,6 +225,61 @@ export function invoiceStatus(db) {
 export function assertNoLegacyBankImports(db) {
   if(db.prepare("SELECT id FROM bank_transactions WHERE source='enablebanking' AND api_identity_version=0 LIMIT 1").get())throw Object.assign(new Error('Tidigare bankimport använder äldre konto- eller transaktions-ID:n. Granska och migrera de posterna innan nya bankhändelser hämtas. Inga nya bankhändelser har sparats.'),{status:409,code:'legacy_bank_identity'});
 }
+
+/** A replaced/excluded collection still bounds all of its individual payments. */
+function validatePaymentSpecifications(db,items,source,original) {
+  const groups=new Map(),parsed=new Map();
+  const add=(account,parent)=>{if(parent)groups.set(JSON.stringify([account,parent]),{account,parent});};
+  for(const item of items){
+    add(item.account,item.parent_bank_reference||item.aggregate_parent_reference);
+    if(item.bank_reference&&db.prepare('SELECT id FROM bank_transactions WHERE account=? AND parent_bank_reference=? AND is_aggregate=0 LIMIT 1').get(item.account,item.bank_reference))add(item.account,item.bank_reference);
+  }
+  const reject=()=>{throw Object.assign(new Error('Betalningsspecifikationen strider mot samlingsposten eller en tidigare specifikation. Inga nya betalningar har sparats; granska originalunderlagen.'),{status:409,code:'conflicting_payment_specification'});};
+  const originalRows=(key,name,mime,content,hash,account)=>{
+    if(!/\.xml$/i.test(name)||mime!=='application/xml'||!content)return [];
+    if(hash&&digest(content)!==hash)reject();
+    const cache=JSON.stringify([key,account]);
+    if(!parsed.has(cache)){
+      try{parsed.set(cache,parseBankFile(name,Buffer.from(content).toString('base64'),account));}catch{reject();}
+    }
+    return parsed.get(cache);
+  };
+  for(const {account,parent} of groups.values()){
+    const children=db.prepare('SELECT * FROM bank_transactions WHERE account=? AND parent_bank_reference=? AND is_aggregate=0 AND bank_reference<>?').all(account,parent,parent);
+    if(!children.length)continue;
+    const expected=[];
+    for(const collection of db.prepare('SELECT * FROM bank_transactions WHERE account=? AND bank_reference=?').all(account,parent)){
+      // A formerly completed single-payment row is already the whole deposit.
+      if(!collection.is_aggregate)reject();
+      expected.push(collection);
+    }
+    const collect=rows=>{
+      const members=rows.filter(row=>row.account===account&&row.parent_bank_reference===parent&&!row.is_aggregate&&row.bank_reference!==parent);
+      if(members.length)expected.push({...members[0],amount_cents:members.reduce((sum,row)=>sum+row.amount_cents,0)});
+    };
+    if(source.startsWith('file:'))collect(originalRows('incoming',source.slice(5),original?.mime_type,original?.content,'',account));
+    for(const id of new Set(children.map(child=>child.import_id).filter(Boolean))){
+      const retained=db.prepare('SELECT name,mime_type,content,content_sha256 FROM import_jobs WHERE id=?').get(id);
+      if(retained)collect(originalRows(id,retained.name,retained.mime_type,retained.content,retained.content_sha256,account));
+    }
+    const anchor=expected[0]||children[0];
+    if(children.some(child=>child.booked_at!==anchor.booked_at||child.currency!==anchor.currency||Math.sign(child.amount_cents)!==Math.sign(anchor.amount_cents)))reject();
+    const total=children.reduce((sum,child)=>sum+Math.abs(child.amount_cents),0);
+    if(!Number.isSafeInteger(total)||expected.some(bound=>bound.booked_at!==anchor.booked_at||bound.currency!==anchor.currency||bound.amount_cents!==anchor.amount_cents||total>Math.abs(bound.amount_cents)))reject();
+  }
+}
+
+function recordBankEvidenceConflict(db,transactionId,source,incoming,fields) {
+  const saved=db.prepare('SELECT bank_evidence_conflicts FROM bank_transactions WHERE id=?').get(transactionId);
+  if(!saved)return; // A contradictory row from the same rolled-back import never existed.
+  const evidence=JSON.parse(saved.bank_evidence_conflicts);
+  const key=digest(JSON.stringify([fields,incoming.amount_cents,incoming.currency,incoming.booked_at,incoming.payer,incoming.reference,incoming.reference_evidence,incoming.payer_organization_number,incoming.bankgiro,incoming.payer_bankgiro,incoming.parent_bank_reference,bankFinancialReview(incoming)?.kind]));
+  if(evidence.some(item=>item.id===key))return;
+  const conflict={id:key,source,recorded_at:new Date().toISOString(),fields,incoming};
+  evidence.push(conflict);
+  db.prepare('UPDATE bank_transactions SET bank_evidence_conflicts=?,review_reason=?,needs_review=1 WHERE id=?').run(JSON.stringify(evidence),BANK_EVIDENCE_CONFLICT_REASON,transactionId);
+  audit(db,'bank_evidence_conflict',{transaction_id:transactionId,...conflict});
+}
 /** Lagrar importerade bankhändelser och använder identiteter/fingeravtryck för att minska risken för dubletter. */
 export function storeTransactions(db,items,source,original=null,guard=null) {
   // Legacy lookup IDs and session account UIDs cannot safely be guessed into
@@ -209,7 +288,7 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
   // spendable copy of an already allocated or excluded historical payment.
   if(source==='enablebanking')assertNoLegacyBankImports(db);
   const insert=db.prepare(`INSERT OR IGNORE INTO bank_transactions(id,fingerprint,account,booked_at,amount_cents,currency,payer,reference,bank_reference,description,source,needs_review,is_aggregate,parent_bank_reference,review_reason,bankgiro,provider_transaction_id,api_identity_version) VALUES(?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,?,?)`);
-  let imported=0,duplicate=0,enriched=0,import_id;const inserted=[],completedSpecifications=[];
+  let imported=0,duplicate=0,enriched=0,conflicts=0,import_id;const inserted=[],completedSpecifications=[],pendingConflicts=[];
   db.exec('BEGIN IMMEDIATE');
   try {
     guard?.();
@@ -219,12 +298,17 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
       const stableId=bankId&&!/^(NOTPROVIDED|NONREF|N\/A)$/i.test(bankId);
       const f=digest((stableId?[x.account,bankId,Math.sign(x.amount_cents)]:[x.account,x.booked_at,x.amount_cents,x.currency,x.reference,x.payer,x.description]).join('\u001f'));
       // Also catches records created with the old fingerprint algorithm before migration.
-      const existing=stableId&&db.prepare('SELECT * FROM bank_transactions WHERE account=? AND bank_reference=? AND (amount_cents>0)=?').get(x.account,bankId,x.amount_cents>0?1:0);
+      const existing=stableId&&db.prepare('SELECT * FROM bank_transactions WHERE account=? AND bank_reference=?').get(x.account,bankId);
       if(existing){
-        if(existing.amount_cents!==x.amount_cents||existing.currency!==x.currency||existing.booked_at!==x.booked_at)throw Object.assign(new Error('Samma bankreferens har motstridiga belopp, datum eller valutor. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
+        const financialConflicts=['amount_cents','currency','booked_at'].filter(field=>existing[field]!==x[field]);
+        if(financialConflicts.length){
+          pendingConflicts.push({transactionId:existing.id,incoming:x,fields:financialConflicts});
+          throw Object.assign(new Error('Samma bankreferens har motstridiga belopp, datum eller valutor. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
+        }
         if(source==='enablebanking'&&existing.raw_bank_data==='{}'&&x.raw_bank_data){
           const raw=JSON.stringify(x.raw_bank_data);
-          db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=?,raw_bank_data_sha256=? WHERE id=?').run(JSON.stringify(x.reference_evidence||{}),raw,digest(raw),existing.id);
+          const references=existing.reference_evidence==='{}'?JSON.stringify(x.reference_evidence||{}):existing.reference_evidence;
+          db.prepare('UPDATE bank_transactions SET reference_evidence=?,raw_bank_data=?,raw_bank_data_sha256=? WHERE id=?').run(references,raw,digest(raw),existing.id);
           audit(db,'bank_original_attached',{transaction_id:existing.id,reference_version:x.reference_evidence?.version||''});
         }
         // A camt.054/053 can contain exactly one individual payment with the
@@ -233,6 +317,14 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
         // once and keep later API refreshes/reimports as duplicates. Only a
         // retained XML original with individual payer AND reference may do so.
         const individualSpecification=source.startsWith('file:')&&/\.xml$/i.test(source)&&original?.mime_type==='application/xml'&&original?.content?.length&&!x.is_aggregate&&String(x.payer||'').trim()&&String(x.reference||'').trim()&&!/^(bankgiro(?:t)?(?:\s+ab)?|swedbank(?:\s+ab)?|bg)$/i.test(String(x.payer).trim());
+        const before={...existing,reference_evidence:JSON.parse(existing.reference_evidence),raw_bank_data:JSON.parse(existing.raw_bank_data)};
+        const completedCollectionReplay=x.is_aggregate&&!existing.is_aggregate&&db.prepare("SELECT id FROM import_jobs WHERE id=? AND mime_type='application/xml' AND content IS NOT NULL").get(existing.import_id);
+        const conflictFields=existing.is_aggregate&&individualSpecification?[]:bankEvidenceConflictFields(before,x).filter(field=>!completedCollectionReplay||!['payer','reference','reference_evidence','is_aggregate'].includes(field));
+        if(conflictFields.length){
+          pendingConflicts.push({transactionId:existing.id,incoming:x,fields:conflictFields});
+          recordBankEvidenceConflict(db,existing.id,source,x,conflictFields);
+          conflicts++;duplicate++;continue;
+        }
         if(existing.is_aggregate&&!existing.excluded&&individualSpecification){
           if(existing.booked_at!==x.booked_at)throw Object.assign(new Error('Betalningsspecifikationens datum skiljer sig från bankposten med samma referens. Kontrollera originalunderlaget.'),{status:409,code:'conflicting_bank_record'});
           if(db.prepare('SELECT id FROM allocations WHERE transaction_id=? LIMIT 1').get(existing.id))throw Object.assign(new Error('Samlingsposten har en tidigare matchning. Granska och återta den innan betalningsspecifikationen importeras.'),{status:409,code:'allocated_aggregate'});
@@ -255,6 +347,7 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
         imported++;inserted.push(id);
       }else duplicate++;
     }
+    validatePaymentSpecifications(db,items,source,original);
     // A complete specification replaces its collective parent; never match the parent itself.
     for(const parent of db.prepare('SELECT * FROM bank_transactions WHERE is_aggregate=1 AND excluded=0 AND bank_reference<>?').all('')){
       const children=db.prepare('SELECT COALESCE(SUM(amount_cents),0) AS total,COUNT(*) AS count FROM bank_transactions WHERE account=? AND parent_bank_reference=? AND is_aggregate=0 AND excluded=0 AND currency=? AND booked_at=?').get(parent.account,parent.bank_reference,parent.currency,parent.booked_at);
@@ -263,8 +356,8 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
         audit(db,'aggregate_replaced',{transaction_id:parent.id,children:children.count});
       }
     }
-    audit(db,'bank_import',{source,imported,duplicate,enriched});
-    import_id=recordImport(db,{source:source==='manual'?'manual':source.startsWith('file:')?'bank_file':source,name:source.startsWith('file:')?source.slice(5):'',found:items.length,imported,duplicate,review:imported+enriched,content:original?.content||null,mime_type:original?.mime_type||''});
+    audit(db,'bank_import',{source,imported,duplicate,enriched,conflicts});
+    import_id=recordImport(db,{source:source==='manual'?'manual':source.startsWith('file:')?'bank_file':source,name:source.startsWith('file:')?source.slice(5):'',found:items.length,imported,duplicate,review:imported+enriched+conflicts,content:original?.content||null,mime_type:original?.mime_type||''});
     for(const id of inserted)db.prepare('UPDATE bank_transactions SET import_id=? WHERE id=?').run(import_id,id);
     for(const completed of completedSpecifications){
       db.prepare('UPDATE bank_transactions SET import_id=? WHERE id=?').run(import_id,completed.id);
@@ -278,8 +371,18 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
       }
     }
     db.exec('COMMIT');
-  } catch(e) {db.exec('ROLLBACK');throw e;}
-  return {imported,duplicate,enriched,import_id};
+  } catch(e) {
+    db.exec('ROLLBACK');
+    // Reject the financial batch while retaining every conflict already seen,
+    // including earlier identity warnings when a later row/specification fails.
+    if(pendingConflicts.length){
+      db.exec('BEGIN IMMEDIATE');
+      try{guard?.();for(const conflict of pendingConflicts)recordBankEvidenceConflict(db,conflict.transactionId,source,conflict.incoming,conflict.fields);db.exec('COMMIT');}
+      catch(error){db.exec('ROLLBACK');throw error;}
+    }
+    throw e;
+  }
+  return {imported,duplicate,enriched,conflicts,import_id};
 }
 /** Bekräftar kopplingen mellan bankhändelse och faktura, med belopps- och riktningskontroller inom en databastransaktion. */
 export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false,transactionOpen=false}={}) {
@@ -288,6 +391,9 @@ export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false
   try {
     const i=listInvoices(db).find(x=>x.id===invoiceId),t=listTransactions(db).find(x=>x.id===transactionId);
     if(!i||!t)throw new Error('Faktura eller bankhändelse saknas');
+    if(hasBankEvidenceConflict(t))throw new Error(bankEvidenceReviewReason(t));
+    const financialReview=bankFinancialReview(t);
+    if(financialReview&&(automatic||financialReview.kind==='reversal'||financialReview.kind==='refund'&&i.kind!=='credit'))throw new Error(financialReview.reason);
     if(Math.sign(t.amount_cents)!==paymentSign(i))throw new Error('Fel betalningsriktning');
     if(t.excluded)throw new Error('Bankhändelsen är undantagen från avstämning');
     if(t.is_aggregate)throw new Error('Samlad Bankgiroinsättning kräver en betalningsspecifikation före matchning');

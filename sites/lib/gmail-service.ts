@@ -41,19 +41,37 @@ export function gmailFailure(error?:unknown){
 }
 export async function gmailStatus(summary=false){
   const user=await identity();
-  await processingSettings(user);const processing=await processingStatus(user.userId);
+  const processing=await processingStatus(user.userId);
   const connection=await db().prepare('SELECT email,tokens,last_synced,status,last_attempt,retry_after,sync_failures FROM gmail_connections WHERE owner=?').bind(user.userId).first<any>();
-  if(connection)connection.blocked=connection.sync_failures>=3;
+  if(connection)connection.blocked=connection.status==='blocked'||connection.sync_failures>=3;
   const send_enabled=connection?hasGmailSendScope(await decrypt<any>(user.userId,'gmail-tokens',connection.tokens)):false;if(connection)delete connection.tokens;
   const completed=await db().prepare("SELECT created_at,status FROM gmail_runs WHERE owner=? AND status IN ('completed','completed_pending') ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(user.userId).first<{created_at:string;status:string}>();
   if(connection)connection.postprocess_warning=completed?.status==='completed_pending'?POSTPROCESS_WARNING:null;
   const last_successful_fetch=completed?.created_at||connection?.last_synced||'';
-  if(summary)return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),send_enabled,connection,processing,last_successful_fetch});
+  const configured=isGmailConfigured()&&storageReady(),at=Date.now(),successAt=Date.parse(last_successful_fetch);
+  const scheduleMinutes=Number(processing.schedule_minutes);
+  const intervalMinutes=Number.isFinite(scheduleMinutes)&&scheduleMinutes>0?Math.min(1440,Math.max(15,scheduleMinutes)):60;
+  const staleAfterMinutes=intervalMinutes*2;
+  let state='recent',reason='En lyckad Gmail-hämtning har verifierats nyligen.';
+  if(connection?.blocked){state='blocked';reason='Hämtningen är stoppad efter upprepade avbrott eller fel. Kontrollera anslutningen.';}
+  else if(!connection||connection.status!=='connected'){state='disconnected';reason='Gmail behöver anslutas igen.';}
+  else if(!processing.enabled){state='paused';reason='Automatisk dokumenthantering är pausad.';}
+  else if(!configured||!processing.scheduler_configured){state='not_configured';reason='Schemalagd hämtning är inte konfigurerad.';}
+  else if(Date.parse(connection.retry_after||'')>at){state='waiting';reason='Gmail kräver väntetid före nästa försök.';}
+  else if(!Number.isFinite(successAt)||successAt>at){state='not_verified';reason='Det finns ännu ingen verifierad lyckad hämtning.';}
+  else if(at-successAt>staleAfterMinutes*60000){state='stale';reason='Ingen färsk lyckad hämtning. Kontrollera det externa schemat och anslutningen.';}
+  else if(Date.parse(connection.last_attempt||'')>successAt){state='pending';reason='Det senaste försöket har ännu ingen verifierad slutförd hämtning.';}
+  // A configured interval is not evidence that the external schedule is active.
+  // Only the scheduling platform can verify that; this endpoint reports observed fetches.
+  const sync_health={state,reason,interval_minutes:intervalMinutes,stale_after_minutes:staleAfterMinutes,schedule_verified:false};
+  const next_eligible_sync=connection&&!connection.blocked?new Date(Math.max(at,Date.parse(connection.last_attempt||'')+15*60000||0,Date.parse(connection.retry_after||'')||0)).toISOString():null;
+  const status={configured,email:gmailAccount(),send_enabled,connection,processing,last_successful_fetch,sync_health,background_ready:state==='recent',scheduler_configured:processing.scheduler_configured,next_eligible_sync};
+  if(summary)return response(status);
   const candidates=await db().prepare("SELECT s.document_id,s.metadata,s.status,s.extraction,s.created_at,d.filename,d.mime,j.state processing_state,j.extraction processing_extraction,j.error_code,j.invoice_id,j.automatic FROM gmail_sources s JOIN documents d ON d.id=s.document_id AND d.owner=s.owner LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=? AND s.status<>'rejected' ORDER BY s.created_at DESC LIMIT 200").bind(user.userId).all();
   const runs=await db().prepare('SELECT found,imported,duplicates,status,created_at FROM gmail_runs WHERE owner=? ORDER BY created_at DESC LIMIT 10').bind(user.userId).all();
   const workspace=await readWorkspace(user.userId);
   const documents=candidates.results.map((c:any)=>({...c,invoice_id:c.invoice_id||workspace.state.invoices.find(i=>i.documentId===c.document_id)?.id||''}));
-  return response({configured:isGmailConfigured()&&storageReady(),email:gmailAccount(),send_enabled,connection,candidates:documents,runs:runs.results,processing,last_successful_fetch,background_ready:processing.enabled,scheduler_configured:processing.scheduler_configured,next_eligible_sync:connection&&!connection.blocked?new Date(Math.max(Date.now(),Date.parse(connection.last_attempt||'')+15*60000||0,Date.parse(connection.retry_after||'')||0)).toISOString():null});
+  return response({...status,candidates:documents,runs:runs.results});
 }
 export async function gmailConnect(req:Request){
   const user=await identity(req);const options=await req.json() as {send?:boolean};

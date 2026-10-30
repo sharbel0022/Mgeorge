@@ -1,6 +1,7 @@
 import {db,identity,readWorkspace,response} from './server';
 import {uid,now,today,applyCommand,balance,type State} from './domain';
-import {analyze,reconcileState,invoiceFacts,contactIdentity} from './reconciliation';
+import {analyze,invoiceFacts,contactIdentity} from './reconciliation';
+import {reconcileWithOriginals} from './reconciliation-evidence';
 import {generateMessage,validRecipient} from './customer-message-text.js';
 import {digest,randomToken,cookieValue} from './banking/security';
 import {encrypt,decrypt} from './banking/store';
@@ -23,7 +24,7 @@ async function current(owner:string,id:string,version:number){
   return {m,workspace,contact,invoice};
 }
 export async function reconcileAndPrepare(owner:string){
-  let workspace=await readWorkspace(owner);const result=reconcileState(workspace.state);
+  let workspace=await readWorkspace(owner);const result=await reconcileWithOriginals(owner,workspace.state);
   if(result.decisions.length){
     if(new TextEncoder().encode(JSON.stringify(result.state)).length>1800000)throw error('Registret behöver utökad lagring innan fler automatiska matchningar sparas.');
     const at=now(),eventId=uid();

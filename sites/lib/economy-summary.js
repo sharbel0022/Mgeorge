@@ -1,5 +1,7 @@
+import {individualParty,needsBankFileReview,needsBankFileValidation,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference} from './domain.ts';
+
 /** Read-only projection of confirmed allocations. All values are integer öre. */
-export const ECONOMY_RULE_VERSION = 'economy-2026-10-28.1';
+export const ECONOMY_RULE_VERSION = 'economy-2026-10-30.1';
 export function economySummary(state, at = new Intl.DateTimeFormat('sv-SE', {timeZone:'Europe/Stockholm',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(at) || !Number.isFinite(Date.parse(at+'T12:00:00Z')) || new Date(at+'T12:00:00Z').toISOString().slice(0,10)!==at) throw Error('Ogiltigt sammanställningsdatum.');
   const end = new Date(at+'T12:00:00Z'); end.setUTCDate(end.getUTCDate()+7);
@@ -12,6 +14,14 @@ export function economySummary(state, at = new Intl.DateTimeFormat('sv-SE', {tim
   if (byInvoice.size!==invoices.length || byTransaction.size!==transactions.length || invoices.some(i=>!i.id) || transactions.some(t=>!t.id)) issues.push('Registret innehåller saknade eller dubbla identifierare.');
   const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value||'') && Number.isFinite(Date.parse(value+'T12:00:00Z')) && new Date(value+'T12:00:00Z').toISOString().slice(0,10)===value;
   const needsSpecification = t => !t.parentId && (t.kind==='batch' || /\bbatch\b|samlings|samlad|buntbetal|sammandrag/i.test(t.description||'') || t.amount>0 && /bankgiro|bg\s*inbetalning/i.test(`${t.description} ${t.party}`) && (!String(t.party||'').trim() || /^(?:bankgiro(?:t)?(?:\s+ab)?|swedbank(?:\s+ab)?|bg|okänd(?: betalare)?|unknown)$/i.test(String(t.party).trim()) || !String(t.payerReference||'').trim() || /^(?:NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(String(t.payerReference).trim())));
+  const originalBankFacts = t => {
+    // A legacy snapshot may contain typed values. Its name alone proves no bank origin.
+    const bankSource=['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'')&&!needsBankFileValidation(t);
+    const original=bankSource&&!needsSpecification(t)?t.original||(t.verification?{}:t):{};
+    const party=String(t.bankDetails?.party||original.party||'').trim(),reference=String(t.bankDetails?.payerReference||original.payerReference||'').trim();
+    const payer=individualParty(party)&&party.length<=200&&!/betalardetaljer|betalningsspecifikation|betalare\s+(?:saknas|okänd)|mottagare\s+okänd|inbetalning\s*[–-]|utbetalning\s*[–-]|^bankgiro\s+inbetalning/iu.test(party)?party:'';
+    return {payer,reference:usablePaymentReference(reference)?reference:''};
+  };
 
   for (const a of allocations.filter(a=>a.active)) {
     const i = byInvoice.get(a.invoiceId), t = byTransaction.get(a.transactionId);
@@ -21,13 +31,15 @@ export function economySummary(state, at = new Intl.DateTimeFormat('sv-SE', {tim
     settled.set(i.id, (settled.get(i.id)||0)+a.amount*(a.effect==='refund'?-1:1));
     const sign = (i.direction==='receivable'?1:-1)*(a.effect==='refund'?-1:1);
     if (!validDate(t.date) || !Number.isSafeInteger(t.amount) || t.currency!=='SEK' || i.currency!=='SEK') {issues.push('En betalningskoppling har ogiltigt datum, belopp eller valuta.');continue;}
-    const verified = !needsSpecification(t) && t.verified && t.kind==='payment' && !t.ignored && !t.duplicateOf && t.specificationStatus!=='review' && Math.sign(t.amount)===sign;
+    const evidence=t.bankDetails?.referenceEvidence||t.referenceEvidence;
+    const referenceConflict=!!evidence?.incomplete||!!evidence?.candidates?.some(c=>c.validity==='checksum_invalid');
+    const verified = !needsSpecification(t) && t.verified && t.kind==='payment' && !t.ignored && !t.duplicateOf && t.specificationStatus!=='review' && !needsBankFileReview(t) && !paymentEvidenceConflict(state,t) && !paymentOriginalIssue(state,t) && !referenceConflict && Math.sign(t.amount)===sign;
     if (!verified) { unverifiedAllocations++; continue; }
     if (i.direction!=='receivable' || !i.reviewed || i.voided || !/^\d{4}-\d{2}-\d{2}$/.test(t.date) || t.date>at) continue;
     if (t.date.slice(0,7)===month) { if (a.effect==='refund') refunded+=a.amount; else received+=a.amount; }
     if (a.effect==='payment') {
       const key=t.id+'|'+i.id, old=recentMap.get(key);
-      recentMap.set(key,{invoice_id:i.id,transaction_id:t.id,number:i.number,customer:i.party,payer:t.bankDetails?.party||(t.original?t.original.party:t.verification?'':t.party)||'',reference:t.bankDetails?.payerReference||(t.original?t.original.payerReference:t.verification?'':t.payerReference)||'',manually_completed:!!t.verification,date:t.date,amount_cents:(old?.amount_cents||0)+a.amount});
+      recentMap.set(key,{invoice_id:i.id,transaction_id:t.id,number:i.number,customer:i.party,...originalBankFacts(t),manually_completed:!!t.verification,date:t.date,amount_cents:(old?.amount_cents||0)+a.amount});
     }
   }
   for (const [id,n] of used) if (n>Math.abs(byTransaction.get(id)?.amount||0)) issues.push('En bankhändelse har fördelats med ett för stort belopp.');

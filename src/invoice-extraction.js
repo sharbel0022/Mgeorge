@@ -36,27 +36,37 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
   const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
-  const grab=(key,re,convert=s=>s.trim())=>{
-    const matches=[...text.matchAll(re)],values=matches.map(m=>convert(m[1])).filter(v=>v!=null);
+  const grab=(key,re,convert=s=>s.trim(),labels=null)=>{
+    const matches=[...text.matchAll(re)],converted=matches.map(m=>convert(m[1]));
+    // A valid occurrence cannot erase another labelled but unreadable value.
+    const matchedPositions=new Set(matches.map(m=>m.index));
+    if(converted.some(v=>v==null)||labels&&[...text.matchAll(labels)].some(m=>!matchedPositions.has(m.index))){
+      issues.push(`Ogiltigt värde för ${titles[key]}. Kontrollera samtliga märkta värden i originalet.`);
+      return;
+    }
+    const values=converted.filter(v=>v!=null);
     const distinct=[...new Set(values)];
     if(distinct.length===1)set(key,distinct[0],matches[0][0]);
     else if(distinct.length>1)issues.push(`Motstridiga värden för ${titles[key]}; dokumentet kan innehålla flera fakturor.`);
     else if(matches.length)issues.push(`Ogiltigt värde för ${titles[key]}.`);
   };
   grab('invoice_number',/(?:faktura\s*(?:nummer|nr|no)|invoice\s*(?:number|no)|fakturanr)\s*[.:#-]*\s*([\p{L}\p{N}][\p{L}\p{N}/_-]{0,79})/giu);
-  grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
-  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})/gi,validDate);
-  const amount='(-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|\\d[\\d \\t\\u00a0]*(?:[.,]\\d{1,2})?))(?![\\d.,])(?:[ \\t]*(?:SEK|kr))?';
+  grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})(?![\p{L}\p{N}./_-])/giu,validDate,/(?:fakturadatum|faktureringsdatum|invoice\s*date)/gi);
+  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./]\d{1,2}[./]\d{4})(?![\p{L}\p{N}./_-])/giu,validDate,/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)/gi);
+  const amount='(-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|\\d[\\d \\t\\u00a0]*(?:[.,]\\d{1,2})?))(?![\\p{L}\\p{N}.,/_-])(?:[ \\t]*(?:SEK|kr))?';
   const money=s=>{try{return parseMoney(s);}catch{return null;}};
-  grab('total_cents',new RegExp('(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'gi'),money);
-  grab('vat_cents',new RegExp('(?:^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)(?!\\s*\\d+%)\\s*[:.]?\\s*'+amount,'gi'),money);
-  grab('net_cents',new RegExp('(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?:^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount))\\s*[:.]?\\s*'+amount,'gi'),money);
+  const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)';
+  const vatLabel='(?:^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)(?!\\s*\\d+%)';
+  const netLabel='(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?:^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount))';
+  grab('total_cents',new RegExp(totalLabel+'\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'giu'),money,new RegExp(totalLabel,'gi'));
+  grab('vat_cents',new RegExp(vatLabel+'\\s*[:.]?\\s*'+amount,'giu'),money,new RegExp(vatLabel,'gi'));
+  grab('net_cents',new RegExp(netLabel+'\\s*[:.]?\\s*'+amount,'giu'),money,new RegExp(netLabel,'gi'));
   grab('reference',/(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)\s*[:.]?\s*([\p{L}\p{N}][\p{L}\p{N} /_-]{0,119})/giu);
-  grab('bankgiro',/(?:bankgiro|bankgirokonto|bg)\s*[:.]?\s*(\d{3,4}[ -]\d{4})/gi,s=>s.replace(/ /g,'-'));
+  grab('bankgiro',/\b(?:bankgirokonto|bankgiro|bg)\s*[:.]?\s*(\d{3,4}[ -]\d{4})(?![\p{L}\p{N}/_-])/giu,s=>s.replace(/ /g,'-'),/\b(?:bankgirokonto|bankgiro|bg)\b/gi);
   if(fields.invoice_number.value&&validDate(fields.invoice_number.value)){issues.push('Fakturanumret ser ut som ett datum. Kontrollera originalets kolumner.');set('invoice_number',null,fields.invoice_number.evidence,0);}
   const wholeText=text;
   if(direction==='customer'&&/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i.test(text))text=text.split(/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i).slice(1).join('\n').split(/Tilläggsinformation|Betalningsuppgifter/i)[0];
-  grab('organization_number',/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)\s*[:.]?\s*(\d{6}[-– ]?\d{4})/gi,s=>validOrganization(s.replace(/–/g,'-'))?s.replace(/[-– ]/g,''):null);
+  grab('organization_number',/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)\s*[:.]?\s*(\d{6}[-– ]?\d{4})(?![\p{L}\p{N}/_-])/giu,s=>validOrganization(s.replace(/–/g,'-'))?s.replace(/[-– ]/g,''):null,/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)/gi);
   const partyLabel=direction==='customer'?'kund|fakturamottagare|företags\\s*namn|customer|bill to':'leverantör|utställare|säljare|supplier|seller';
   grab('party',new RegExp('(?:^|\\n)[ \\t]*(?:'+partyLabel+')\\s*:[ \\t]*([^\\n]{2,240})','gi'));
   text=wholeText;

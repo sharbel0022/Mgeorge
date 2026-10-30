@@ -31,7 +31,11 @@ function Pill({children,tone='neutral'}:{children:ReactNode;tone?:string}){retur
 function Empty({icon:Icon=Inbox,title,children,action}:{icon?:any;title:string;children:ReactNode;action?:ReactNode}){return <div className="empty"><div className="empty-icon"><Icon size={25}/></div><h3>{title}</h3><p>{children}</p>{action}</div>;}
 function Field({label,children,hint}:{label:string;children:ReactNode;hint?:string}){return <label className="field"><span>{label}</span>{children}{hint&&<small>{hint}</small>}</label>;}
 function Dialog({title,subtitle,close,children,wide=false,busy=false}:{title:string;subtitle?:string;close:()=>void;children:ReactNode;wide?:boolean;busy?:boolean}){
- const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{ref.current?.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=overflow;};},[]);
+ const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{
+  const dialog=ref.current,opener=document.activeElement instanceof HTMLElement?document.activeElement:null;
+  dialog?.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';
+  return()=>{dialog?.close();document.body.style.overflow=overflow;if(opener?.isConnected)opener.focus({preventScroll:true});};
+ },[]);
  return <dialog ref={ref} className={`modal ${wide?'wide':''}`} onCancel={e=>{e.preventDefault();if(!busy)close();}} onClick={e=>{if(e.target===e.currentTarget&&!busy)close();}} aria-labelledby="modal-title"><div className="modal-shell"><header><div><h2 id="modal-title">{title}</h2>{subtitle&&<p>{subtitle}</p>}</div><button className="icon-button" onClick={close} disabled={busy} aria-label="Stäng dialog"><X size={20}/></button></header>{children}</div></dialog>;
 }
 function ActionFooter({busy,close,label='Spara'}:{busy:boolean;close:()=>void;label?:string}){return <footer className="modal-footer"><button className="btn" type="button" onClick={close} disabled={busy}>Avbryt</button><button className="btn primary" type="submit" disabled={busy}>{busy?<RefreshCw size={16} className="spin"/>:<Check size={16}/>} {busy?'Sparar…':label}</button></footer>;}

@@ -1,5 +1,5 @@
 import {db,identity,readWorkspace,response} from './server';
-import {reconciliationPreview} from './reconciliation';
+import {reconciliationPreviewWithOriginals} from './reconciliation-evidence';
 import {now,uid} from './domain';
 import {gmailSync} from './gmail-service';
 import {processDocuments,processingSettings,processingStatus} from './document-processing';
@@ -115,7 +115,7 @@ export async function paymentControlAction(req:Request,action:string){
   const user=await identity(req),owner=user.userId;
   if(req.method==='GET'){
     if(action==='overview')return response(await controlOverview(owner));
-    if(action==='preview')return response(reconciliationPreview((await readWorkspace(owner)).state));
+    if(action==='preview')return response(await reconciliationPreviewWithOriginals(owner,(await readWorkspace(owner)).state));
     if(action==='status')return response({job:publicJob(await ownRun(owner,new URL(req.url).searchParams.get('id')||''))});
     return response({error:'Okänd kontrollåtgärd.'},404);
   }

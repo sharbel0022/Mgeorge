@@ -1,4 +1,5 @@
 import {classifyDocument} from './document-triage.js';
+import {bankFinancialReview,hasBankEvidenceConflict,bankEvidenceReviewReason} from './bank-evidence.js';
 /**
  * Read-only presentation model for the one-click workspace.
  * Classification helps navigation; it is never evidence that a bill is paid.
@@ -9,7 +10,7 @@ export function paymentGroup(t) {
   if (t.amount_cents > 0 && t.is_aggregate) return 'bankgiro';
   // A positive card refund is not a customer payment merely because it is positive.
   const text = `${t.description || ''} ${t.reference || ''}`;
-  if (t.amount_cents < 0 || /kortköp|card purchase|card refund|återbetalning.*kort|löneutbetalning/iu.test(text)) return 'other';
+  if (t.amount_cents < 0 || bankFinancialReview(t) || /kortköp|card purchase|card refund|återbetalning.*kort|löneutbetalning/iu.test(text)) return 'other';
   return t.amount_cents > 0 ? 'incoming' : 'other';
 }
 
@@ -60,14 +61,16 @@ export function buildPaymentOverview({invoices = [], transactions = [], document
     priority: 10, title: d.name || 'Fakturaunderlag', reason: d.extraction?.issues?.[0] ||
       (d.extraction?.fields ? 'Kontrollera de tolkade uppgifterna mot originalet.' : 'Dokumentet behöver tolkas innan en faktura kan registreras.'),
     action: 'Granska faktura', blocked: false, amount_cents: null});
-  for (const t of groups.incoming) {
+  const extraReviews=transactions.filter(t=>!t.excluded&&!groups.incoming.includes(t)&&(hasBankEvidenceConflict(t)||bankFinancialReview(t)&&t.available_cents>0));
+  for (const t of [...groups.incoming,...extraReviews]) {
     const candidates = suggestions.filter(s => s.transaction_id === t.id);
     const one = candidates.length === 1 ? invoices.find(i => i.id === candidates[0].invoice_id) : null;
-    const financial = candidates.some(s => ['partial','overpayment','possible_duplicate'].includes(s.kind));
+    const reviewReason=bankEvidenceReviewReason(t)||bankFinancialReview(t)?.reason;
+    const financial = !!reviewReason||candidates.some(s => ['partial','overpayment','possible_duplicate'].includes(s.kind));
     queue.push({id: `payment:${t.id}`, type: 'payment', category: financial ? 'financial' : 'identification', entity_id: t.id, invoice_id: one?.id || '',
-      priority: 20, title: paymentTitle(t), reason: candidates.length > 1 ?
+      priority: 20, title: paymentTitle(t), reason: reviewReason|| (candidates.length > 1 ?
         `${candidates.length} fakturor kan passa. Kontrollera underlaget innan du väljer.` :
-        candidates[0]?.reason || 'Ingen säker fakturakoppling hittad. Beloppet ensamt räcker inte.',
+        candidates[0]?.reason || 'Ingen säker fakturakoppling hittad. Beloppet ensamt räcker inte.'),
       action: 'Granska betalning', blocked: false, amount_cents: t.available_cents ?? Math.abs(t.amount_cents)});
   }
   for (const t of groups.bankgiro) queue.push({id: `spec:${t.id}`, type: 'specification', entity_id: t.id,

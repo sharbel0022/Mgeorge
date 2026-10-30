@@ -124,11 +124,14 @@ export async function processDocuments(owner:string,limit=2){
     const job=await claim(owner,'cloud');if(!job)break;
     try{
       const object=await env.BUCKET?.get(`${owner}/${job.document_id}`);if(!object||object.size>5000000)throw Error('local_ocr_required');
-      const result=await serverPdfText(new Uint8Array(await object.arrayBuffer())),completed=await finish(owner,job,result);if(!('ignored' in completed))processed++;
+      const bytes=new Uint8Array(await object.arrayBuffer());
+      const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(byte=>byte.toString(16).padStart(2,'0')).join('');
+      if(!/^[a-f0-9]{64}$/.test(job.sha256||'')||sha256!==job.sha256||bytes.length!==job.size||object.size!==job.size)throw Error('original_integrity');
+      const result=await serverPdfText(bytes),completed=await finish(owner,job,result);if(!('ignored' in completed))processed++;
     }catch(e){
       const code=e instanceof Error?e.message:'';
       if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare("UPDATE document_jobs SET state='waiting_ocr',engine='local',attempts=0,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=?").bind(now(),owner,job.document_id,job.lease).run();
-      else await failJob(owner,job,['page_limit','text_limit'].includes(code)?code:'pdf_unreadable');
+      else await failJob(owner,job,['page_limit','text_limit','original_integrity'].includes(code)?code:'pdf_unreadable');
     }
   }
   await db().prepare('UPDATE document_automation SET last_cloud_run=?,updated_at=? WHERE owner=?').bind(now(),now(),owner).run();

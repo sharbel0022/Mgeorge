@@ -191,7 +191,8 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
       if(labels.some(l=>['SPAM','TRASH','DRAFT'].includes(l))){skipped++;continue;}
       const headers=Object.fromEntries((message.payload?.headers||[]).map(h=>[h.name.toLowerCase(),mimeText(h.value)]));
       const subject=(headers.subject||'').slice(0,500);
-      if(/påminnelse|payment\s+reminder|orderbekräftelse|order\s+confirmation|beställningsbekräftelse|betalningsbekräftelse|payment\s+confirmation|\breceipt\b|\bkvitto\b/i.test(subject)||(!/faktura|invoice/i.test(subject)&&/\b(?:lön|lönebesked|lönespecifikation|payslip|payroll)\b/i.test(subject))){skipped++;continue;}
+      // Subjects cannot establish the contents of an attachment. Retain
+      // uncertain originals; document interpretation decides what needs review.
       const direction=labels.includes('SENT')&&!labels.includes('INBOX')?'customer':'supplier';
       const contact=mailbox(direction==='customer'?headers.to:headers.from);
       const parts=partsOf(message.payload||{});
@@ -202,8 +203,6 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
         if(isInlineDecoration(part)){skipped++;continue;}
         const original_filename=mimeText(part.filename).slice(0,240);
         let name=original_filename.replace(/[\\/]/g,'_');
-        if(attachmentMime(part)!=='application/pdf'&&/^(?:(?:main[-_])?logo|signature|signatur|facebook|instagram|linkedin)(?:[._-]|$)/i.test(name)){skipped++;continue;}
-        if(/påminnelse|reminder|orderbekräftelse|confirmation/i.test(name)){continue;}
         found=true;
         const source_id=`gmail:${gmailAccount()}:${item.id}:${part._part}`;
         if(known.has(source_id)){duplicate++;continue;}

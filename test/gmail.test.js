@@ -62,7 +62,7 @@ test('Gmail retry parsing is bounded, handles a non-JSON 429 body and stops unre
     await assert.rejects(gmailProfile(currentTokens()),error=>error.status===429&&error.retryAfter===seconds&&error.retryBlocked===blocked&&!error.message.includes('private'));
   });
 });
-test('sync preserves original attachments, direction and source IDs, skips reminders and confirms account',async()=>{
+test('sync preserves original attachments, direction and source IDs, including uncertain reminders',async()=>{
   const requests=[];const messages={one:invoiceMessage('one'),two:invoiceMessage('two','SENT'),three:invoiceMessage('three','INBOX','Betalningspåminnelse för faktura 0606')};
   const result=await withFetch(async(url,options)=>{
     requests.push(url);assert.equal(options.headers.Authorization,'Bearer test-access');
@@ -73,12 +73,13 @@ test('sync preserves original attachments, direction and source IDs, skips remin
     if(parsed.pathname.includes('/attachments/'))return respond({size:pdf.length,data:pdf.toString('base64url')});
     return respond(messages[id]);
   },()=>fetchGmailInvoiceDocuments(currentTokens()));
-  assert.equal(result.received,3);assert.equal(result.skipped,1);assert.equal(result.documents.length,2);
+  assert.equal(result.received,3);assert.equal(result.skipped,0);assert.equal(result.documents.length,3);
   assert.equal(result.documents[0].source_id,'gmail:mg.vitvaror@gmail.com:one:1');
   assert.equal(result.documents[0].content_base64,pdf.toString('base64'));assert.equal(result.documents[0].direction,'supplier');
   assert.equal(result.documents[0].email,'supplier@example.com');assert.equal(result.documents[1].direction,'customer');
   assert.equal(result.documents[1].party,'Kund AB');assert.equal(result.documents[0].needs_review,true);
-  assert.equal(result.documents[0].total_cents,undefined);assert.equal(requests.filter(x=>x.includes('/attachments/')).length,2);
+  assert.equal(result.documents[0].total_cents,undefined);assert.equal(requests.filter(x=>x.includes('/attachments/')).length,3);
+  assert.equal(result.documents[2].needs_review,true);
 });
 test('known source IDs skip the attachment download and same message cannot duplicate a document',async()=>{
   let attachments=0;

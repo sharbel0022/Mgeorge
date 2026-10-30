@@ -6,7 +6,7 @@ const tools = [
   {name:'process_invoice_documents',title:'Tolka väntande fakturaunderlag',description:'Bearbetar en begränsad beständig dokumentkö för den inloggade användaren. PDF-text läses i Sites; skannade dokument sparas i en beständig kö för OCR i molnet, med ansluten lokal dator som reserv. Registrerar endast gröna fakturor från uttryckligen verifierade motparter. Skickar inga mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
   {name:'reconcile_customer_payments',title:'Stäm av betalningar och förbered kundmeddelanden',description:'Kontrollerar den autentiserade användarens fakturor och verifierade bankunderlag, matchar endast säkra betalningar och förbereder utkast för granskning. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
   {name:'gmail_auto_sync',title:'Hämta fakturabilagor från Gmail',description:'Hämtar fakturaunderlag till den autentiserade användarens arbetsyta högst var 15 minut med befintligt Google-medgivande. Förbereder underlag och avstämmer säkra betalningar mot registrerade fakturor. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true,openWorldHint:true}},
-  {name:'gmail_sync_status',title:'Status för Gmail',description:'Visar den autentiserade användarens Gmail-anslutning och sparade underlag. Ändrar ingenting.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true}},
+  {name:'gmail_sync_status',title:'Status för Gmail',description:'Visar anslutning, senaste lyckade hämtning och sammanräknad dokumentstatus. Returnerar inga fakturor, mejltexter eller original och ändrar ingenting.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true}},
   { name: 'bank_auto_sync_status', title: 'Status för automatisk bankhämtning', description: 'Läser endast den autentiserade användarens anslutnings- och hämtningsstatus, utan transaktioner eller kontonummer.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: true } },
   { name: 'bank_auto_sync', title: 'Hämta nya bankhändelser', description: 'Hämtar bokförda bankhändelser till den autentiserade användarens privata fakturakoll när automatisk hämtning är aktiverad och förfallen. Använder endast redan valt företagskonto och befintligt bankmedgivande. Avstämmer endast säkra betalningar och förbereder utkast. Skickar inga mejl och utför inga betalningar.',
@@ -47,7 +47,7 @@ export async function bankRpc(body: unknown): Promise<Response> {
       response=json(await (await import('../customer-messages')).reconcileAndPrepare(user.userId));
     }else if(String(params.name).startsWith('gmail_')){
       const gmail=await import('../gmail-service');
-      try{response=params.name==='gmail_auto_sync'?await gmail.gmailSync(undefined,true):await gmail.gmailStatus();}catch(e){response=gmail.gmailFailure(e);}
+      try{response=params.name==='gmail_auto_sync'?await gmail.gmailSync(undefined,true):await gmail.gmailStatus(true);}catch(e){response=gmail.gmailFailure(e);}
     }else response=params.name === 'bank_auto_sync' ? await automaticSync() : await automaticSyncStatus();
   }
   catch (cause) { response = bankFailure(cause); }
