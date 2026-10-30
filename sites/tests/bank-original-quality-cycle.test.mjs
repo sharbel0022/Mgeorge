@@ -1,3 +1,4 @@
+import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -64,7 +65,7 @@ test('quality cycle: a child cannot allocate while its parent original is missin
 test('quality cycle: removing an unavailable payer link cannot release another unchecked original',async t=>{
  const f=await fixture(t,'missing');let state=structuredClone(f.state);state.invoices[0].total=100000;
  state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Other synthetic company AB',number:'0600',ocr:'000026',total:125000,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;
- state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[{date:'2026-10-25',amount:62500,party:'Synthetic customer AB',payerReference:'000026',bankReference:'LINK-SOURCE',externalId:'LINK-SOURCE',account:state.transactions[1].account,kind:'payment',verified:true}]}).state;
+ state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-25',amount:62500,party:'Synthetic customer AB',payerReference:'000026',bankReference:'LINK-SOURCE',externalId:'LINK-SOURCE',account:state.transactions[1].account,kind:'payment',verified:true})]}).state;
  const source=state.transactions.at(-1);state=applyCommand(state,{type:'match.create',invoiceId:state.invoices[1].id,transactionId:source.id,amount:62500,note:'Tidigare manuellt styrkt relation'}).state;
  const savedSource=state.transactions.find(row=>row.id===source.id);savedSource.evidence='bank_file';savedSource.bankFileProof={version:'bank-file-original-v1',documentId:'missing-link-original',sha256:'b'.repeat(64),reviewedAt:'2026-10-30'};savedSource.bankOriginalIssue='Bankoriginalet saknas';
  const result=await f.evidence.reconcileWithOriginals('synthetic-owner',state);assert.equal(result.state.allocations.length,1);assert.equal(balance(result.state,result.state.invoices[0]),100000);assert.ok(result.state.transactions[1].bankOriginalIssue);

@@ -1,7 +1,7 @@
 import {readBankOriginalBytes} from './server';
 import {analyze,reconcileState,reconciliationPreview} from './reconciliation';
 import {normalizeName} from './reconciliation-engine.js';
-import {now,uid,type State,type Transaction} from './domain';
+import {now,uid,bankApiOriginalIssue,paymentLineage,paymentOriginalIssue,type State,type Transaction} from './domain';
 
 const MAX_ORIGINALS=32,MAX_BYTES=64_000_000;
 const missing='Bankoriginalet saknas eller kan inte verifieras. Nya matchningar väntar på ett tillgängligt, oförändrat original.';
@@ -14,6 +14,7 @@ function originalReference(state:State,t:Transaction){
 function originalReader(owner:string){
  const files=new Map<string,Promise<{sha256:string}>>();let bytes=0;
  return async(state:State,t:Transaction)=>{
+  const apiIssue=paymentLineage(state,t).issue||bankApiOriginalIssue(t);if(apiIssue)return apiIssue;
   const source=originalReference(state,t);if(!source)return '';
   if(!source.documentId||!/^[a-f0-9]{64}$/.test(source.hash))return missing;
   try{
@@ -28,7 +29,7 @@ function originalReader(owner:string){
 }
 function relatedTransactions(state:State,ids:Iterable<string>){
  const result=new Set<string>();
- for(const id of ids){let t=state.transactions.find(t=>t.id===id);while(t&&!result.has(t.id)){result.add(t.id);t=t.parentId?state.transactions.find(parent=>parent.id===t!.parentId):undefined;}}
+ for(const id of ids){const t=state.transactions.find(t=>t.id===id);if(t)for(const ancestor of paymentLineage(state,t).ancestors)result.add(ancestor.id);}
  return result;
 }
 function requiredEvidence(state:State){
@@ -53,7 +54,7 @@ async function checkedState(owner:string,initial:State){
  const state=structuredClone(initial),read=originalReader(owner),decisions:any[]=[],checked=new Set<string>();
  for(let pass=0;pass<=state.transactions.length;pass++){
   const ids=requiredEvidence(pass===0?probe:state);
-  if(pass===0)for(const t of initial.transactions)if(t.bankOriginalIssue)ids.add(t.id);
+  if(pass===0)for(const t of initial.transactions)if(paymentOriginalIssue(initial,t))ids.add(t.id);
   const pending=[...relatedTransactions(state,ids)].filter(id=>!checked.has(id));
   if(!pending.length)return {state,decisions};
   for(const id of pending){
@@ -76,6 +77,7 @@ export async function reconciliationPreviewWithOriginals(owner:string,initial:St
 }
 export async function assertPaymentOriginal(owner:string,initial:State,id:string){
  const state=structuredClone(initial),read=originalReader(owner);
+ if(!state.transactions.some(t=>t.id===id))throw Error(missing);
  for(const relatedId of relatedTransactions(state,[id])){
   const t=state.transactions.find(t=>t.id===relatedId)!;const issue=await read(state,t);if(issue)throw Error(issue);delete t.bankOriginalIssue;
  }

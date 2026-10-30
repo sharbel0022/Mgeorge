@@ -2,7 +2,7 @@ import {extractPaymentReferences} from './payment-references.js';
 import {parseBankgiroXML} from './bankgiro-parser.js';
 import {imageText,pdfInvoiceText} from './local-ocr';
 import {parseMoney,validDate,today,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED} from './domain';
-export type BankRow={referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;bankData?:Record<string,unknown>;date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
+export type BankRow={bankDataSha256?:string;bankDataVersion?:string;referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;bankData?:Record<string,unknown>;date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
 export function parseCSV(text:string){
  if(typeof text!=='string'||text.length>15_000_000)throw Error('CSV-filen får vara högst 15 MB.');
  const clean=text.replace(/^\uFEFF/,'').replace(/\r\n/g,'\n'),lines=clean.split('\n');

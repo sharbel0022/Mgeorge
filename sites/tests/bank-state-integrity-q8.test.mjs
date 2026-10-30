@@ -1,3 +1,4 @@
+import {syntheticBankRow,syntheticBankId} from './helpers/bank-api-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -20,7 +21,7 @@ const {buildPaymentOverview}=await import(compiled('../lib/payment-overview.ts',
 const parsers=compiled('../lib/imports.ts',{'./domain':domain,'./local-ocr':data('export async function imageText(){} export async function pdfInvoiceText(){}'),'./payment-references.js':url('../lib/payment-references.js'),'./bankgiro-parser.js':url('../lib/bankgiro-parser.js')});
 const account='iban:SE4280000890119146168423';
 const invoice=(s=emptyState(),extra={})=>applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'000018',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true,...extra}}).state;
-const bank=(s,extra={})=>applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[{date:'2026-10-26',amount:62500,currency:'SEK',account,party:'Synthetic customer AB',payerReference:'000018',bankReference:'Q8-BANK-1',externalId:'Q8-BANK-1',source:'Enable Banking · Synthetic',kind:'payment',verified:true,...extra}]}).state;
+const bank=(s,extra={})=>applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount:62500,currency:'SEK',account,party:'Synthetic customer AB',payerReference:'000018',bankReference:'Q8-BANK-1',externalId:'Q8-BANK-1',source:'Enable Banking · Synthetic',kind:'payment',verified:true,...extra})]}).state;
 
 async function fixture(t,state){
  const key='__q8_bank_state_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
@@ -111,8 +112,8 @@ test('Q8: a rejected file import retains observed conflicts without its partial 
  initial=applyCommand(initial,{type:'transaction.ignore',id:initial.transactions[1].id}).state;
  const f=await fixture(t,initial),before=f.read(),content=bankCsv([
   ['2026-10-28','10,00','Fresh synthetic customer','000034','Q8-FRESH','SEK','Q8-FRESH'],
-  ['2026-10-26','625,00','Contradictory synthetic payer','000018','Q8-BANK-1','SEK','Q8-BANK-1'],
-  ['2026-10-27','100,00','Other synthetic customer','000026','Q8-IGNORED','SEK','Q8-IGNORED']
+  ['2026-10-26','625,00','Contradictory synthetic payer','000018','Q8-BANK-1','SEK',syntheticBankId(account,'Q8-BANK-1')],
+  ['2026-10-27','100,00','Other synthetic customer','000026','Q8-IGNORED','SEK',syntheticBankId(account,'Q8-IGNORED')]
  ]),original=await f.original('rejected-conflict',content);
  const result=await f.post({type:'transactions.import',documentId:'rejected-conflict'});
  assert.equal(result.response.status,400);assert.match(result.body.error,/undantagen/i);
@@ -127,7 +128,7 @@ test('Q8: a rejected file import retains observed conflicts without its partial 
 });
 
 test('Q8: a contradictory amount in a rejected original remains a durable hold',async t=>{
- const initial=bank(invoice()),f=await fixture(t,initial),content=bankCsv([['2026-10-26','700,00','Synthetic customer AB','000018','Q8-BANK-1','SEK','Q8-BANK-1']]);
+ const initial=bank(invoice()),f=await fixture(t,initial),content=bankCsv([['2026-10-26','700,00','Synthetic customer AB','000018','Q8-BANK-1','SEK',syntheticBankId(account,'Q8-BANK-1')]]);
  const original=await f.original('changed-amount',content);
  const result=await f.post({type:'transactions.import',documentId:'changed-amount'});assert.equal(result.response.status,400);
  const retained=f.read();assert.equal(retained.state.transactions[0].amount,62500);assert.equal(retained.state.transactions[0].bankEvidenceConflicts?.[0].incoming.amount,70000);assert.equal(retained.state.transactions[0].bankEvidenceConflicts[0].incoming.bankFileProof.sha256,original.hash);
@@ -180,8 +181,8 @@ test('Q8: a contradiction on any ancestor blocks both automatic and manual alloc
   {key:'inner',parentKey:'outer',date:'2026-10-26',amount:62500,account,party:'Inner synthetic collection',payerReference:'inner-reference',bankReference:'Q8-INNER',externalId:'Q8-INNER',kind:'batch'},
   {parentKey:'inner',date:'2026-10-26',amount:62500,account,party:'Synthetic customer AB',payerReference:'000018',bankReference:'Q8-CHILD',externalId:'Q8-CHILD',kind:'payment',verified:true}
  ];
- let initial=applyCommand(invoice(emptyState(),{total:100000}),{type:'transactions.import',trustedBankImport:true,rows}).state;
- initial=applyCommand(initial,{type:'transactions.import',trustedBankImport:true,rows:[{...rows[0],party:'Contradictory outer collection'}]}).state;
+ let initial=applyCommand(invoice(emptyState(),{total:100000}),{type:'transactions.import',trustedBankImport:true,rows:rows.map(row=>syntheticBankRow(row))}).state;
+ initial=applyCommand(initial,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({...rows[0],party:'Contradictory outer collection'})]}).state;
  const f=await fixture(t,initial),automatic=await f.post();assert.equal(automatic.response.status,200);assert.equal(automatic.body.state.allocations.length,0);
  const manual=await f.post({type:'match.create',invoiceId:initial.invoices[0].id,transactionId:initial.transactions[2].id,amount:62500,note:'A manual note cannot resolve inherited original conflicts.'});
  assert.equal(manual.response.status,400);assert.equal(f.read().state.allocations.length,0);assert.equal(balance(f.read().state,f.read().state.invoices[0]),100000);
@@ -276,7 +277,7 @@ function nearCapacity(state,size=1799000){
  for(const item of state.invoices.slice(-600)){const count=Math.min(3000,remaining);item.note='x'.repeat(count);remaining-=count;if(!remaining)break;}
  assert.equal(remaining,0);assert.equal(Buffer.byteLength(JSON.stringify(state)),size);return state;
 }
-const oversizedConflictCsv=amount=>bankCsv([['2026-10-26',amount,'Contradictory synthetic payer','000018','Q8-BANK-1','SEK','Q8-BANK-1']]).replace(';Konto',';Konto;Beskrivning')+';'+'d'.repeat(1000);
+const oversizedConflictCsv=amount=>bankCsv([['2026-10-26',amount,'Contradictory synthetic payer','000018','Q8-BANK-1','SEK',syntheticBankId(account,'Q8-BANK-1')]]).replace(';Konto',';Konto;Beskrivning')+';'+'d'.repeat(1000);
 
 test('Q8 review: both rejected and otherwise-valid imports retain a compact conflict hold at the workspace cap',async t=>{
  for(const amount of ['700,00','625,00']){
@@ -309,7 +310,7 @@ test('Q8 review: a cap hold and its full conflict audit cannot overwrite a concu
 });
 
 test('Q8 replay: rereading the exact verified file preserves its explicit review and allocation',async t=>{
- const f=await fixture(t,invoice()),content=bankCsv([['2026-10-26','625,00','Synthetic customer AB','000018','Q8-BANK-1','SEK','Q8-BANK-1']]);
+ const f=await fixture(t,invoice()),content=bankCsv([['2026-10-26','625,00','Synthetic customer AB','000018','Q8-BANK-1','SEK',syntheticBankId(account,'Q8-BANK-1')]]);
  await f.original('verified-file',content);await f.original('identical-file-copy',content);
  const imported=await f.post({type:'transactions.import',documentId:'verified-file'});assert.equal(imported.response.status,200);assert.equal(imported.body.state.allocations.length,0);
  const verified=await f.post({type:'transaction.verify',id:imported.body.state.transactions[0].id,note:'Checked the original account, payer, direction, amount and reference.'});assert.equal(verified.response.status,200);assert.equal(verified.body.state.allocations.length,1);

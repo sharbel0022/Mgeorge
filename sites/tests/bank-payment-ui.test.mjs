@@ -1,3 +1,4 @@
+import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -16,7 +17,11 @@ function compiled(path,imports={}){
 const presentation=compiled('../lib/payment-presentation.ts'),view=await import(presentation);
 const ui=await import(compiled('../components/bank-payments.tsx',{'@/lib/payment-presentation':presentation}));
 const render=(Component,props)=>renderToStaticMarkup(React.createElement(Component,props));
-const tx=extra=>({id:'t',date:'2026-10-26',amount:62500,currency:'SEK',party:'',payerReference:'',bankReference:'BANK-625',description:'Bankgiro inbetalning',source:'Enable Banking',evidence:'bank_api',externalId:'BANK-625',account:'konto',kind:'batch',verified:false,duplicateOf:'',ignored:false,parentId:'',importId:'',createdAt:'',...extra});
+const tx=(extra={},rawFields={})=>{
+  const values={id:'t',date:'2026-10-26',amount:62500,currency:'SEK',party:'',payerReference:'',bankReference:'BANK-625',description:'Bankgiro inbetalning',source:'Enable Banking',evidence:'bank_api',externalId:'BANK-625',account:'konto',kind:'batch',verified:false,duplicateOf:'',ignored:false,parentId:'',importId:'',createdAt:'',...extra};
+  // Unsourced legacy rows and typed specifications intentionally have no API receipt.
+  return Object.hasOwn(extra,'evidence')&&extra.evidence!=='bank_api'?values:syntheticBankTransaction(values,rawFields);
+};
 const invoice=extra=>({id:'i',number:'0599',ocr:'',party:'Fakturakund AB',direction:'receivable',total:62500,reviewed:true,voided:false,currency:'SEK',issued:'2026-10-01',due:'2026-11-01',...extra});
 
 test('625 SEK collection never presents invoice customer, bank description or proposed 0599 as payer or OCR',()=>{
@@ -28,12 +33,12 @@ test('625 SEK collection never presents invoice customer, bank description or pr
 });
 
 test('bank-supplied payer and labelled OCR keep leading zeros, separately from invoice identity',()=>{
-  const s=emptyState(),t=tx({kind:'payment',party:'Verklig betalare AB',description:'',payerReference:'0001230',verified:true,referenceEvidence:extractPaymentReferences({ocr:'0001230'})});s.transactions.push(t);s.invoices.push(invoice({ocr:'0001230'}));
+  const s=emptyState(),t=tx({kind:'payment',party:'Verklig betalare AB',description:'',payerReference:'0001230',verified:true},{reference_number:undefined,ocr:'0001230'});s.transactions.push(t);s.invoices.push(invoice({ocr:'0001230'}));
   const x=view.bankPaymentView(s,t);assert.equal(x.payer,'Verklig betalare AB');assert.equal(x.reference.ocr,'0001230');assert.equal(x.invoice,'Möjlig: 0599');assert.equal(x.status,'Möjlig matchning');assert.equal(x.verified,false);
 });
 
 test('numeric invoice reference is never labelled OCR without OCR evidence',()=>{
-  const t=tx({kind:'payment',party:'Kund AB',description:'',payerReference:'0599',referenceEvidence:extractPaymentReferences({invoice_number:'0599'})});
+  const t=tx({kind:'payment',party:'Kund AB',description:'',payerReference:'0599'},{reference_number:undefined,invoice_number:'0599'});
   assert.deepEqual(view.bankPaymentReference(t),{value:'0599',kind:'invoice',ocr:''});
 });
 
@@ -48,7 +53,7 @@ test('identified detail response enriches payer while aggregate remains unverifi
 });
 
 test('typed split details remain manual even when the split stores an original snapshot',()=>{
-  const t=tx({kind:'payment',parentId:'parent',party:'Manuellt kontrollerad AB',payerReference:'0599',evidence:'verified_specification',description:'',original:{party:'Manuellt kontrollerad AB',payerReference:'0599'}});
+  const t=tx({kind:'payment',parentId:'parent',party:'Manuellt kontrollerad AB',payerReference:'0599',source:'Betalningsspecifikation: manuellt kontrollerad',evidence:'verified_specification',description:'',original:{party:'Manuellt kontrollerad AB',payerReference:'0599'}});
   const s=emptyState();s.transactions.push(t);const x=view.bankPaymentView(s,t);assert.equal(x.payer,'Betalare okänd');assert.equal(x.reference.value,'');assert.equal(x.manualPayer,'Manuellt kontrollerad AB');assert.equal(x.manualReference,'0599');
 });
 
@@ -58,19 +63,22 @@ test('unsourced legacy and manual names cannot masquerade as a bank-verified pay
 });
 
 test('active allocations distinguish partial payment, overpayment and verification',()=>{
-  const s=emptyState(),t=tx({kind:'payment',description:'',party:'Kund AB',payerReference:'0599',verified:true});s.transactions.push(t);s.invoices.push(invoice({total:100000}));s.allocations.push({id:'a',transactionId:'t',invoiceId:'i',active:true,amount:62500,effect:'payment'});
-  assert.equal(view.bankPaymentView(s,t).status,'Delbetalning');s.invoices[0].total=62500;assert.equal(view.bankPaymentView(s,t).status,'Verifierad');t.amount=70000;assert.equal(view.bankPaymentView(s,t).status,'Överbetalning');t.verified=false;assert.equal(view.bankPaymentView(s,t).verified,false);
+  const s=emptyState();let t=tx({kind:'payment',description:'',party:'Kund AB',payerReference:'0599',verified:true});s.transactions.push(t);s.invoices.push(invoice({total:100000}));s.allocations.push({id:'a',transactionId:'t',invoiceId:'i',active:true,amount:62500,effect:'payment'});
+  assert.equal(view.bankPaymentView(s,t).status,'Delbetalning');s.invoices[0].total=62500;assert.equal(view.bankPaymentView(s,t).status,'Verifierad');
+  // The overpayment is a separate valid provider scenario, not an altered stored amount.
+  t=tx({kind:'payment',description:'',party:'Kund AB',payerReference:'0599',verified:true,amount:70000});s.transactions[0]=t;assert.equal(view.bankPaymentView(s,t).status,'Överbetalning');t.verified=false;assert.equal(view.bankPaymentView(s,t).verified,false);
 });
 
 test('conflicting references, duplicate flags and invalid OCR remain visibly unresolved',()=>{
-  const s=emptyState(),t=tx({kind:'payment',description:'',party:'Kund AB',payerReference:'0599',verified:true,referenceEvidence:extractPaymentReferences({invoice_number:'0599',payment_reference:'0604'})});s.transactions.push(t);s.invoices.push(invoice(),invoice({id:'two',number:'0604'}));
-  assert.equal(view.bankPaymentView(s,t).status,'Konflikt');t.duplicateOf='other';assert.equal(view.bankPaymentView(s,t).status,'Möjlig dubblett');t.duplicateOf='';t.referenceEvidence=extractPaymentReferences({ocr:'12345'});assert.equal(view.bankPaymentView(s,t).status,'Konflikt');
-  t.referenceEvidence=extractPaymentReferences({remittance_information:['0599','0604']});assert.equal(view.bankPaymentView(s,t).status,'Konflikt');
+  const s=emptyState();let t=tx({kind:'payment',description:'',party:'Kund AB',payerReference:'0599',verified:true},{reference_number:undefined,invoice_number:'0599',payment_reference:'0604'});s.transactions.push(t);s.invoices.push(invoice(),invoice({id:'two',number:'0604'}));
+  assert.equal(view.bankPaymentView(s,t).status,'Konflikt');t.duplicateOf='other';assert.equal(view.bankPaymentView(s,t).status,'Möjlig dubblett');
+  t=tx({kind:'payment',description:'',party:'Kund AB',verified:true},{reference_number:undefined,ocr:'12345'});s.transactions[0]=t;assert.equal(view.bankPaymentView(s,t).status,'Konflikt');
+  t=tx({kind:'payment',description:'',party:'Kund AB',verified:true},{reference_number:undefined,remittance_information:['0599','0604']});s.transactions[0]=t;assert.equal(view.bankPaymentView(s,t).status,'Konflikt');
 });
 
 test('incomplete child specifications retain the original collection in the list',()=>{
   const s=emptyState(),parent=tx();s.transactions.push(parent,tx({id:'child',parentId:'t',kind:'payment',description:'',amount:50000,specificationStatus:'linked'}));
-  assert.equal(view.bankVisibleTransactions(s).length,2);s.transactions[1].amount=62500;assert.equal(view.bankVisibleTransactions(s).length,1);s.transactions[1].specificationStatus='review';assert.equal(view.bankVisibleTransactions(s).length,2);
+  assert.equal(view.bankVisibleTransactions(s).length,2);s.transactions[1]=tx({id:'child',parentId:'t',kind:'payment',description:'',amount:62500,specificationStatus:'linked'});assert.equal(view.bankVisibleTransactions(s).length,1);s.transactions[1].specificationStatus='review';assert.equal(view.bankVisibleTransactions(s).length,2);
 });
 
 test('bank summary has exactly four facts and never invents a successful synchronization',()=>{
@@ -83,6 +91,6 @@ test('desktop exposes payer, invoice, OCR, amount, date and status; missing OCR 
 });
 
 test('an unmatched bank OCR is never described as an invoice number',()=>{
- const s=emptyState(),t=tx({kind:'payment',party:'Bankens betalare AB',description:'',payerReference:'000018',referenceEvidence:extractPaymentReferences({ocr:'000018'})});
+ const s=emptyState(),t=tx({kind:'payment',party:'Bankens betalare AB',description:'',payerReference:'000018'},{reference_number:undefined,ocr:'000018'});
  const message=paymentInvoiceAssessment(s,t).message;assert.match(message,/betalningsreferensen 000018/);assert.doesNotMatch(message,/faktura 000018/);assert.equal(s.allocations.length,0);
 });

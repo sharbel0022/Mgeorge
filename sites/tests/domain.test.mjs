@@ -1,3 +1,4 @@
+import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {emptyState,applyCommand,parseMoney,paid,balance,available,invoiceStatus,suggestions,validDate} from '../lib/domain.ts';
@@ -9,7 +10,10 @@ const imp=await import('data:text/javascript;base64,'+Buffer.from(compiled).toSt
 const invoice=(overrides={})=>({direction:'receivable',party:'Testkund',email:'',number:'1001',ocr:'001019',total:187500,issued:'2026-10-01',due:'2026-10-26',reviewed:true,...overrides});
 const tx=(overrides={})=>({date:'2026-10-26',amount:187500,party:'Testkund',payerReference:'001019',kind:'payment',verified:true,...overrides});
 const addInvoice=(s,overrides)=>applyCommand(s,{type:'invoice.save',invoice:invoice(overrides)}).state;
-const addTx=(s,overrides,options={})=>applyCommand(s,{type:'transactions.import',rows:[tx(overrides)],...options}).state;
+const addTx=(s,overrides,options={})=>{
+ const row=tx(overrides),isApi=String(row.source||'').startsWith('Enable Banking');
+ return applyCommand(s,{type:'transactions.import',rows:[isApi?syntheticBankRow(row):row],...(isApi?{trustedBankImport:true}:{}),...options}).state;
+};
 const match=(s,amount=s.invoices[0].total,extra={})=>applyCommand(s,{type:'match.create',invoiceId:s.invoices[0].id,transactionId:s.transactions[0].id,amount,note:'Kontrollerat originalunderlag',...extra}).state;
 
 test('ordinary camt statement entries without details retain non-collection classification',()=>{
@@ -90,7 +94,7 @@ test('An API payment without a stable ID stays duplicate-held after review chang
 
 test('Matching API/file totals cannot turn a duplicate aggregate into spendable details',()=>{
  const fileBatch=tx({account:'SE45 5000 0000 0583 9825 7466',source:'camt.054.xml',externalId:'entry:batch',kind:'batch',verified:false,key:'batch'});
- const s=addTx(emptyState(),bankApi({externalId:'enable-banking:aggregate',bankReference:'BANK-AGGREGATE'}));
+ const s=addTx(emptyState(),bankApi({externalId:'enable-banking:aggregate',bankReference:'BANK-AGGREGATE',party:'',payerReference:''}));
  assert.throws(()=>applyCommand(s,{type:'transactions.import',rows:[fileBatch,tx({account:fileBatch.account,source:fileBatch.source,parentKey:'batch',amount:87500,externalId:'entry:child-a'}),tx({account:fileBatch.account,source:fileBatch.source,parentKey:'batch',amount:100000,externalId:'entry:child-b'})]}),/samlingspost|samlingsbetalning|befintliga posten/i);
  assert.equal(s.transactions.length,1);
  assert.equal(s.transactions[0].kind,'unknown');
@@ -123,9 +127,9 @@ test('API Bankgiro totals need a complete specification and cannot be verified w
  const parent=s.transactions[0];assert.equal(parent.kind,'batch');assert.equal(parent.verified,false);assert.deepEqual(suggestions(s,parent),[]);
  assert.throws(()=>applyCommand(s,{type:'transaction.verify',id:parent.id,party:'Testkund',payerReference:'001019',note:'Beloppet är lika'}),/Betalardetaljer saknas – importera betalningsspecifikation/);
  assert.throws(()=>match(s),/Granska/);assert.equal(balance(s,s.invoices[0]),187500);
- // Older saved rows also need the source detail, even if previously marked verified.
+ // A saved row reclassified as verified still contradicts the retained API collection.
  s.transactions[0].kind='payment';s.transactions[0].verified=true;
- assert.throws(()=>match(s),/betalningsspecifikation/);assert.deepEqual(suggestions(s,s.transactions[0]),[]);
+ assert.throws(()=>match(s),/bevarade API-originalet/);assert.deepEqual(suggestions(s,s.transactions[0]),[]);
 });
 test('Complete individual names, references and sum are required for a Bankgiro specification',()=>{
  let s=addTx(addInvoice(emptyState()),bankApi({externalId:'enable-banking:batch',description:'Bankgiro samlingsinbetalning',party:'Bankgirot AB',payerReference:''}));const id=s.transactions[0].id;

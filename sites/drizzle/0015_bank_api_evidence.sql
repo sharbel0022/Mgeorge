@@ -1,0 +1,1 @@
+ALTER TABLE `backup_runs` ADD `api_evidence` text DEFAULT '' NOT NULL;

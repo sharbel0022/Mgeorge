@@ -1,4 +1,5 @@
 // Owner-scoped, resumable encrypted snapshots. No payments or live restore writes.
+import {bankApiReceiptState} from './bank-api-original.js';
 type Database={prepare:(sql:string)=>any;batch:(statements:any[])=>Promise<any[]>};
 type Bucket={get:(key:string)=>Promise<any>;put:(key:string,value:Uint8Array,options?:any)=>Promise<any>};
 type Row=Record<string,any>;
@@ -11,6 +12,21 @@ function baseKey(key:string){if(!/^[a-f0-9]{64}$/i.test(key))throw Error('backup
 async function encryptionKey(key:string,salt:Uint8Array){const input=await crypto.subtle.importKey('raw',baseKey(key),'HKDF',false,['deriveKey']);return crypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt:salt as BufferSource,info:encoder.encode('MG Sites encrypted backup v1')},input,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
 export async function sealBackup(bytes:Uint8Array,key:string,owner:string,id:string,name:string){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),derived=await encryptionKey(key,salt);const cipher=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:scope(owner,id,name)},derived,bytes as BufferSource));const out=new Uint8Array(36+cipher.length);out.set(magic);out.set(salt,8);out.set(iv,24);out.set(cipher,36);return out;}
 export async function unsealBackup(bytes:Uint8Array,key:string,owner:string,id:string,name:string){if(bytes.length<52||!magic.every((b,n)=>bytes[n]===b))throw Error('backup_format_invalid');return new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes.slice(24,36),additionalData:scope(owner,id,name)},await encryptionKey(key,bytes.slice(8,24)),bytes.slice(36)));}
+type ApiEvidence={version:'retained-api-receipts-v1';scope:'retained_json_checksums';records_checked:number;records_without_receipt:number};
+function snapshotApiEvidence(tables:{name:string;rows:Row[]}[]):ApiEvidence{
+ const evidence:ApiEvidence={version:'retained-api-receipts-v1',scope:'retained_json_checksums',records_checked:0,records_without_receipt:0};
+ const inspect=(record:Row)=>{const status=bankApiReceiptState(record);if(status==='invalid')throw Error('backup_api_original_invalid');if(status==='checked')evidence.records_checked++;if(status==='without_receipt')evidence.records_without_receipt++;};
+ const conflicts=(rows:any)=>{if(rows===undefined)return;if(!Array.isArray(rows))throw Error('backup_api_evidence_invalid');for(const conflict of rows){if(!conflict?.incoming||typeof conflict.incoming!=='object')throw Error('backup_api_evidence_invalid');inspect(conflict.incoming);}};
+ for(const row of tables.find(table=>table.name==='workspaces')!.rows){const state=JSON.parse(row.payload);for(const transaction of state.transactions){inspect(transaction);conflicts(transaction.bankEvidenceConflicts);}}
+ // Large rejected imports may retain their originals only in the audit row.
+ for(const row of tables.find(table=>table.name==='audit_events')!.rows.filter(row=>row.action==='bank.import_rejected'||row.action==='bank.sync_rejected')){
+  let detail;try{detail=JSON.parse(row.detail);}catch{throw Error('backup_api_evidence_invalid');}
+  if(detail?.retained_conflicts!==undefined){if(!Array.isArray(detail.retained_conflicts))throw Error('backup_api_evidence_invalid');for(const entry of detail.retained_conflicts)conflicts(entry?.conflicts);}
+ }
+ return evidence;
+}
+function validApiEvidence(value:any):value is ApiEvidence{return !!value&&value.version==='retained-api-receipts-v1'&&value.scope==='retained_json_checksums'&&Object.keys(value).length===4&&['records_checked','records_without_receipt'].every(key=>Number.isSafeInteger(value[key])&&value[key]>=0&&value[key]<=1_000_000);}
+function publicApiEvidence(serialized:unknown){try{const value=typeof serialized==='string'?JSON.parse(serialized):null;return validApiEvidence(value)?value:{scope:'unassessed'};}catch{return {scope:'unassessed'};}}
 export function validateSnapshot(value:any,owner:string){
  if(value?.format!=='MG-Sites-backup-1'||value.owner!==owner||!Array.isArray(value.tables)||value.tables.length!==BACKUP_TABLES.length)throw Error('backup_snapshot_invalid');
  for(const table of value.tables){if(!BACKUP_TABLES.includes(table.name)||!Array.isArray(table.rows)||table.rows.some((r:Row)=>r.owner!==owner))throw Error('backup_owner_mismatch');}
@@ -19,9 +35,11 @@ export function validateSnapshot(value:any,owner:string){
  for(const row of workspace){const state=JSON.parse(row.payload);if(!Array.isArray(state.invoices)||!Array.isArray(state.transactions)||!Array.isArray(state.allocations))throw Error('backup_snapshot_invalid');}
  const files=value.tables.find((t:Row)=>t.name==='documents').rows;
  if(files.some((f:Row)=>!/^[a-f0-9-]{36}$/i.test(f.id)||!Number.isSafeInteger(f.size)||f.size<0||f.size>15_000_000||!/^[a-f0-9]{64}$/i.test(f.sha256)))throw Error('backup_document_invalid');
- return value as {format:string;owner:string;createdAt:string;tables:{name:string;rows:Row[]}[]};
+ const apiEvidence=snapshotApiEvidence(value.tables);
+ if(value.apiEvidence!==undefined&&(!validApiEvidence(value.apiEvidence)||value.apiEvidence.records_checked!==apiEvidence.records_checked||value.apiEvidence.records_without_receipt!==apiEvidence.records_without_receipt))throw Error('backup_api_evidence_invalid');
+ return {...value,apiEvidence} as {format:string;owner:string;createdAt:string;apiEvidence:ApiEvidence;tables:{name:string;rows:Row[]}[]};
 }
-export function publicBackup(row:Row|null){return row?{id:row.id,day:row.day,status:row.state,files:row.total_docs,copied:row.cursor,bytes:row.bytes,created_at:row.created_at,verified_at:row.finished_at,verified_files:row.verification_cursor||0,verified_bytes:row.verified_bytes||0,verification_started_at:row.verification_started_at||'',verification_scope:row.verification_started_at?'manifest_pass':row.state==='complete'?'copy_readback':'pending',error:row.last_error||null,attempts:row.attempts}:null;}
+export function publicBackup(row:Row|null){return row?{id:row.id,day:row.day,status:row.state,files:row.total_docs,copied:row.cursor,bytes:row.bytes,created_at:row.created_at,verified_at:row.finished_at,verified_files:row.verification_cursor||0,verified_bytes:row.verified_bytes||0,verification_started_at:row.verification_started_at||'',verification_scope:row.verification_started_at?'manifest_pass':row.state==='complete'?'copy_readback':'pending',api_evidence:publicApiEvidence(row.api_evidence),error:row.last_error||null,attempts:row.attempts}:null;}
 export async function backupStatus(database:Database,owner:string){const latest=await database.prepare('SELECT * FROM backup_runs WHERE owner=? ORDER BY created_at DESC LIMIT 1').bind(owner).first();const complete=await database.prepare("SELECT * FROM backup_runs WHERE owner=? AND state='complete' ORDER BY finished_at DESC LIMIT 1").bind(owner).first();return{latest:publicBackup(latest),last_verified:publicBackup(complete)};}
 async function readSnapshot(bucket:Bucket,row:Row,key:string,owner:string){const object=await bucket.get(row.snapshot_key);if(!object)throw Error('backup_snapshot_missing');const bytes=await unsealBackup(new Uint8Array(await object.arrayBuffer()),key,owner,row.id,'snapshot');if(await hash(bytes)!==row.snapshot_hash)throw Error('backup_snapshot_hash');return validateSnapshot(JSON.parse(new TextDecoder().decode(bytes)),owner);}
 export async function backupStep(database:Database,bucket:Bucket,owner:string,key:string,at=new Date(),limit=5){
@@ -63,6 +81,9 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
    row={...row,snapshot_key:snapshotKey,snapshot_hash:snapshotHash,total_docs:total,state:'running'};
   }
   const snapshot=await readSnapshot(bucket,row,key,owner),files=snapshot.tables.find(t=>t.name==='documents')!.rows;
+  const apiEvidence=JSON.stringify(snapshot.apiEvidence);
+  if(row.api_evidence&&row.api_evidence!==apiEvidence)throw Error('backup_api_evidence_invalid');
+  if(!row.api_evidence){await checkpoint('api_evidence=?',apiEvidence);row.api_evidence=apiEvidence;}
   const bytesThrough=(cursor:number)=>files.slice(0,cursor).reduce((total,file)=>total+file.size,0);
   if(!Number.isSafeInteger(row.cursor)||row.cursor<0||row.cursor>files.length||row.total_docs!==files.length||row.bytes!==bytesThrough(row.cursor)||!Number.isSafeInteger(row.verification_cursor)||row.verification_cursor<0||row.verification_cursor>files.length||row.verified_bytes!==bytesThrough(row.verification_cursor)||(row.verification_cursor>0&&(!row.verification_started_at||row.cursor!==files.length)))throw Error('backup_checkpoint_invalid');
   const stepLimit=Number.isInteger(limit)?Math.max(1,Math.min(5,limit)):5;

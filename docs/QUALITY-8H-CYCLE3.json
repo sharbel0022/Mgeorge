@@ -1,0 +1,498 @@
+{
+  "schema": 1,
+  "cycle": "3-api-original",
+  "created_at": "2026-10-30T17:53:28.930607+00:00",
+  "parent_commit": "9d9a10c48e4725ec22e188f946da3c03cdfa5814",
+  "source_files": {
+    "sites/package.json": "86bd4c1b171db2a6ca73b7aa372733b60d85e4e169be5c30fc4fed8684cbd5a0",
+    "sites/package-lock.json": "8f6ae78a693d967943b9c003b52299e0e8b59c2c9ad69737ae23ce105eab778a",
+    "sites/lib/bank-api-original.js": "5d3e38885b5d631ef86e31d6c4ecfa55ddc74da14a51d8d590369a40cc00e9ef",
+    "sites/lib/domain.ts": "5f0a59e1b39867d781382ec1facc6c8dc5d30c6044de90e905b00d838814373c",
+    "sites/lib/imports.ts": "ee450ff1baab0985cef7538aff6653211fd36e305849ce282fb943d1e21a7d72",
+    "sites/lib/banking/transactions.ts": "918e9fd2d3d8272f7d9ec9a5caee7c0282aa5f8c3d5b903799f70f7f49f4a05e",
+    "sites/lib/reconciliation-evidence.ts": "9c85d600925441f8556640fe26858977f1f8d2b02f0e0342d0d5b397a5fe8c8b",
+    "sites/lib/backup-engine.ts": "b086c782727f0e5c79ce3b7abb6acb24af123a0ba711c2dea2b2e188325af7ec",
+    "sites/db/schema.ts": "1016199dde2e8a9e8dda362de558a68d23bd656802a874495ff429b08e30ea69",
+    "sites/drizzle/0015_bank_api_evidence.sql": "99fb870d97c0845bc79b77a9f5297c8f0fafb239bce340ed7501766d9f90aeec",
+    "sites/drizzle/meta/0015_snapshot.json": "c1e089bd0fa3ad8cb3b2fedf4a569ebeb726e957972318e2cbe142f788daeb41",
+    "sites/drizzle/meta/_journal.json": "5bec8d69cf30eb35795446ade65e8a4911bd584ddb81727279b47fb2c0b46360",
+    "sites/tests/bank-api-original-q8.test.mjs": "568b34722d32d9fa9c0101cc494312271962b581cb5c5d74beac171d4784be52",
+    "sites/tests/bank-api-backup-q8.test.mjs": "688276ddd875d7daa106df081bdc7a8abedcae681ee50b7771a116744e7562fa",
+    "sites/tests/bank-absence-ui-q8.test.mjs": "ac7392f5577eafa164bfe9358f36e2e602474842b3a010e4a2c223bbfb8a66e3",
+    "sites/tests/bank-details.test.mjs": "365fca8d99dbdc7326af4483b2949de36d8ab2be82399b3975b8462f0a190bc3",
+    "sites/tests/bank-original-quality-cycle.test.mjs": "323a6f4299036908fca550f261a5d8214e131b61a2ae739aa356f385313030d4",
+    "sites/tests/bank-payment-ui.test.mjs": "57f3a2ff71d909c03258b7fc96949f9180c0a2494427c5851b853f2ca9be0cb7",
+    "sites/tests/bank-state-integrity-q8.test.mjs": "88b427b1bab3863c209c322f8526bd0a84feb531480f866422494039d9b8bc8b",
+    "sites/tests/bankgiro.test.mjs": "5f6ec5223a624e5b031f91f299c2373145dabe52535e2949c556240f8870aad8",
+    "sites/tests/customer-messages.test.mjs": "cc044683054feaf04cdad34f3571b335fcb4bfd2f12231575d1d7edb51b429bf",
+    "sites/tests/domain.test.mjs": "57b6887729154133b4fdac3536519976bca5d3977a0c6a052695bbf68e63d3c3",
+    "sites/tests/economy-quality-cycle.test.mjs": "552bc0459ed1e73d33935df715bec0bd1f2bae3dd08f692860aa12ee414f66d7",
+    "sites/tests/payment-control-ui.test.mjs": "142bf9858d8ce88c93f2d47711f5e1c6ee94ac696be90b75eeba35456b1c48b4",
+    "sites/tests/sites-payments-quality-cycle.test.mjs": "84ff9f7e993fc2800be35f6f34d664cfc948570a65ec502575ebe2379347613a",
+    "sites/tests/helpers/bank-api-fixture.mjs": "520815af14c53be00e4c887fc8bf7fbda1cee9cf92a72c2fbaf8a3aff8533414"
+  },
+  "tests": {
+    "node": 469,
+    "sites": 692,
+    "total": 1161,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "syntax_files": 69,
+    "typescript": "passed",
+    "production_build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0
+  },
+  "independent_review": {
+    "result": "clear within frozen API scope",
+    "unchanged_review_probes": 29,
+    "core_and_backup_cases": 90,
+    "additional_file_and_lineage_cases": 7,
+    "files_preserved": 26,
+    "uuid_and_ui_excluded": true
+  },
+  "production_version_at_assessment": 34,
+  "source_commit_at_assessment": "927a2cb666705e0ccfa2d88318bdcb443c3f0b08",
+  "score_total": 250.0,
+  "score_mean": 7.575757575757576,
+  "areas": [
+    {
+      "number": 1,
+      "area": "Design och färger",
+      "previous": 7.5,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.0,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 2,
+      "area": "Startsida",
+      "previous": 8.5,
+      "score": 8.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 3,
+      "area": "Navigering",
+      "previous": 7.5,
+      "score": 7.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 4,
+      "area": "Mobilanpassning",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 1.5
+      }
+    },
+    {
+      "number": 5,
+      "area": "Sökning och filtrering",
+      "previous": 7.0,
+      "score": 7.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 6,
+      "area": "Minimal manuell hantering",
+      "previous": 6.5,
+      "score": 6.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 7,
+      "area": "Kundfakturor",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 8,
+      "area": "Leverantörsfakturor",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 9,
+      "area": "PDF-tolkning",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 10,
+      "area": "Bild-OCR",
+      "previous": 7.0,
+      "score": 7.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 11,
+      "area": "Gmail-anslutning",
+      "previous": 7.0,
+      "score": 7.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 12,
+      "area": "Automatisk fakturaregistrering",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 13,
+      "area": "Dubblettkontroll",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 14,
+      "area": "Dokumentgranskning",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 15,
+      "area": "Swedbank-anslutning",
+      "previous": 8.5,
+      "score": 8.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      }
+    },
+    {
+      "number": 16,
+      "area": "Automatisk bankhämtning",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 17,
+      "area": "Bankgiroimport",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 18,
+      "area": "Identifiera verklig betalare",
+      "previous": 6.0,
+      "score": 6.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 19,
+      "area": "Verklig OCR/fakturareferens",
+      "previous": 6.0,
+      "score": 6.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 20,
+      "area": "Automatisk betalningsmatchning",
+      "previous": 7.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 21,
+      "area": "Delbetalningar",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 22,
+      "area": "Överbetalningar",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 23,
+      "area": "Flera fakturor i en betalning",
+      "previous": 7.0,
+      "score": 7.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 24,
+      "area": "Betalningshistorik",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 25,
+      "area": "Betalningsstatus",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 26,
+      "area": "Kontrollera alla betalningar",
+      "previous": 7.5,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 2,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 27,
+      "area": "Automatiska mejlutkast",
+      "previous": 7.5,
+      "score": 7.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 0.5
+      }
+    },
+    {
+      "number": 28,
+      "area": "Schemalagd automatisering",
+      "previous": 6.5,
+      "score": 6.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 29,
+      "area": "Säkerhetskopiering",
+      "previous": 8.0,
+      "score": 8.0,
+      "subscores": {
+        "F": 2.0,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      }
+    },
+    {
+      "number": 30,
+      "area": "Säkerhet och åtkomstkontroll",
+      "previous": 8.0,
+      "score": 8.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1
+      }
+    },
+    {
+      "number": 31,
+      "area": "Katastrofåterställning",
+      "previous": 6.0,
+      "score": 6.0,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.5,
+        "K": 2.0,
+        "U": 1.0,
+        "P": 0.0
+      }
+    },
+    {
+      "number": 32,
+      "area": "Kodkvalitet och tester",
+      "previous": 8.5,
+      "score": 8.5,
+      "subscores": {
+        "F": 2.0,
+        "S": 2.0,
+        "K": 2.0,
+        "U": 1.5,
+        "P": 1.0
+      }
+    },
+    {
+      "number": 33,
+      "area": "Verifiering i verklig produktion",
+      "previous": 6.5,
+      "score": 6.5,
+      "subscores": {
+        "F": 1.5,
+        "S": 1.0,
+        "K": 1.5,
+        "U": 1.0,
+        "P": 1.5
+      }
+    }
+  ],
+  "at_least_9_5": [],
+  "pending": [
+    "Normal fast-forward main push and exact-SHA Actions",
+    "Same-project Sites35 publication and controlled production verification",
+    "UI original labels, unknown state, contrast, history, draft and mobile-focus candidate",
+    "Synthetic invoice parsing corpus follow-up",
+    "Authentic Swedbank, business OCR corpus and isolated production restore evidence"
+  ]
+}

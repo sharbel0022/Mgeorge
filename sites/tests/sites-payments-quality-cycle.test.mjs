@@ -113,9 +113,9 @@ test('quality cycle: repeating original bank evidence after a manual correction 
 const specification=(payer,reference,id)=>`<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><IBAN>SE4280000890119146168423</IBAN></Id></Acct><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AcctSvcrRef>QUALITY-AGGREGATE</AcctSvcrRef><NtryDtls><TxDtls><Refs><TxId>${id}</TxId></Refs><RltdPties><Dbtr><Nm>${payer}</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>${reference}</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>`;
 const importSpecification=(state,text,hash)=>applyCommand(state,{type:'bankgiro.import',documentId:'synthetic-original-'+hash,hash,name:'Synthetic.xml',rows:parseBankgiroXML(text)}).state;
 
-test('quality cycle: a second report cannot spend an already replaced aggregate again',()=>{
+test('quality cycle: a second report cannot spend an already replaced aggregate again',async()=>{
  let state=invoice(invoice(emptyState()),{party:'Andra syntetiska kunden AB',number:'0600',ocr:'000026'});
- state=applyCommand(state,{type:'transactions.import',rows:[{date:'2026-10-26',amount:62500,account,source:'Enable Banking',bankReference:'QUALITY-AGGREGATE',externalId:'quality-aggregate',kind:'batch',description:'Bankgiro inbetalning'}]}).state;
+ state=await importBank(state,bankRow({entry_reference:'QUALITY-AGGREGATE',debtor:{name:''},reference_number:'',remittance_information:[],bank_transaction_code:{description:'Bankgiro inbetalning'}}));
  state=reconcileState(importSpecification(state,specification('Syntetisk kund AB','000018','QUALITY-CHILD-A'),'a')).state;
  assert.equal(state.allocations.length,1);
  state=reconcileState(importSpecification(state,specification('Andra syntetiska kunden AB','000026','QUALITY-CHILD-B'),'b')).state;

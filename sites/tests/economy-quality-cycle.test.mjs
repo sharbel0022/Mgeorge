@@ -1,3 +1,4 @@
+import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {economySummary} from '../lib/economy-summary.js';
@@ -6,7 +7,7 @@ const at='2026-10-30';
 function fixture(){
  return {
   invoices:[{id:'invoice',direction:'receivable',number:'0604',party:'Synthetic customer AB',reviewed:true,total:10000,currency:'SEK',due:'2026-10-01'}],
-  transactions:[{id:'payment',date:'2026-10-29',amount:10000,currency:'SEK',kind:'payment',verified:true,evidence:'bank_api',party:'Bank payer AB',payerReference:'0604',account:'synthetic-account',original:{party:'Bank payer AB',payerReference:'0604'}}],
+  transactions:[syntheticBankTransaction({id:'payment',date:'2026-10-29',amount:10000,currency:'SEK',kind:'payment',verified:true,evidence:'bank_api',party:'Bank payer AB',payerReference:'0604',account:'synthetic-account'})],
   allocations:[{id:'allocation',invoiceId:'invoice',transactionId:'payment',amount:10000,effect:'payment',active:true}],credits:[]
  };
 }
@@ -19,7 +20,7 @@ function expectHeld(s){
  assert.equal(JSON.stringify(s),before,'the overview is a read-only projection');
 }
 test('overview does not label a manually entered original snapshot as bank-supplied identity',()=>{
- const s=fixture(),t=s.transactions[0];t.evidence='manual';t.verification={party:t.party,payerReference:t.payerReference,note:'Synthetic review'};
+ const s=fixture();s.transactions[0]={id:'payment',date:'2026-10-29',amount:10000,currency:'SEK',kind:'payment',verified:true,evidence:'manual',source:'Manuell registrering',party:'Bank payer AB',payerReference:'0604',account:'synthetic-account',original:{party:'Bank payer AB',payerReference:'0604'},verification:{party:'Bank payer AB',payerReference:'0604',note:'Synthetic review'}};
  const row=economySummary(s,at).recent_payments[0];
  assert.equal(row.payer,'');assert.equal(row.reference,'');assert.equal(row.manually_completed,true);
  assert.equal(row.customer,'Synthetic customer AB');

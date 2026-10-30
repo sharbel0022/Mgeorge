@@ -86,3 +86,7 @@ Stopp endast vid uppnått mål, förbrukad budget, faktisk teknisk körgräns el
 ## Checkpoint cykel2
 
 Cykel1A/1B är levererade; Sites33 och inloggad mobilmeny är verifierade. Cykel2:469Node/624Sites plus fulla grindar passerade för40 frysta källfiler. Nu normal main-leverans och separat Sites-publicering. Därefter prioriteras det nya API-originalfyndet, webbhistorik/utkast med riktig Chromium, produktionsködiagnostik och backupens återstående verifierings-/kapacitetsgränser. Gmail-schemat förblir pausat. Ingen slutstatus eller automatisk fortsatt körning påstås.
+
+## Checkpoint efter version34, före cykel3-push
+
+Tre maincommits och Sites34 är verifierade. Den26fils API-kandidaten har469Node/692Sites,TS,bygge,audits0 och oberoende klartecken. Nu normal main-push/CI och samma Sites35. UI-kandidaten rättar originaletiketter,okända tillstånd,kontrast,historik och mobilfokus; verklig Chromium har verifierat URL/back/forward/reload/filter/utkast. En separat syntetisk fakturakorpus söker konkreta parserfel. Ingen tid används till att enbart upprepa analys; externa bank-/Gmail-/OCR-/restorekrav hålls öppna.

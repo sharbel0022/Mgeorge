@@ -1,3 +1,4 @@
+import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
@@ -48,7 +49,7 @@ async function fixture(t){
     async queue(){await f.api.reconcileAndPrepare(f.owner);return (await f.api.messageList(f.owner)).items;},
     async review(m){return f.call('review',{id:m.id,version:m.version});},
     async send(m,r){return f.call('send',{id:m.id,version:m.version,review_id:r.review_id,approve:true});},
-    pay(amount=250000,extra={}){let s=f.state();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[{date:'2026-10-26',amount,party:'Kund AB',payerReference:'0597',bankReference:crypto.randomUUID(),externalId:crypto.randomUUID(),kind:'unknown',source:'Enable Banking',account:'MG',...extra}]}).state;f.put(s);},
+    pay(amount=250000,extra={}){let s=f.state();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount,party:'Kund AB',payerReference:'0597',bankReference:crypto.randomUUID(),kind:'unknown',source:'Enable Banking',account:'MG',...extra})]}).state;f.put(s);},
     init(){f.put(state);},
   });
 }
@@ -196,7 +197,7 @@ test('verified absence can be recorded and new bank data invalidates it',async t
 });
 function absenceConflict(state,compact){
  if(compact){const copy=structuredClone(state);copy.bankEvidenceHold={at:new Date().toISOString(),auditEventId:'synthetic-conflict-audit',fingerprint:'a'.repeat(64)};return copy;}
- return applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[{...state.transactions[0],party:'Contradictory synthetic sender',payerReference:'OTHER-CONFLICT'}]}).state;
+ return applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({...state.transactions[0],party:'Contradictory synthetic sender',payerReference:'OTHER-CONFLICT'})]}).state;
 }
 for(const compact of [false,true])test(`Q8 absence: ${compact?'compact hold':'retained conflict'} permits only cautious confirmation drafts and blocks a new absence assertion`,async t=>{
  const f=await fixture(t);f.init();f.pay(10000,{party:'Unrelated synthetic sender',payerReference:'OTHER-REF'});
@@ -231,7 +232,7 @@ async function conflictOnAllocatedPayment(state,compact){
   for(let n=0;n<600;n++)before.invoices.push({...before.invoices[0],id:uid(),number:'SYN-FILL-'+n,ocr:'',party:'Synthetic filler '+n,total:1,net:null,vat:null,voided:true,reconciledAt:'',reconciliationNote:'',note:''});
   let left=1799000-Buffer.byteLength(JSON.stringify(before));for(const item of before.invoices.slice(-600)){const count=Math.min(3000,left);item.note='x'.repeat(count);left-=count;if(!left)break;}assert.equal(left,0);
  }
- const row=before.transactions[0],attempted=applyCommand(before,{type:'transactions.import',trustedBankImport:true,rows:[{...row,amount:row.amount+10000,party:'Contradictory synthetic customer',payerReference:'OTHER-REF',description:'d'.repeat(1000)}]}).state;
+ const row=before.transactions[0],attempted=applyCommand(before,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({...row,amount:row.amount+10000,party:'Contradictory synthetic customer',payerReference:'OTHER-REF',description:'d'.repeat(1000)})]}).state;
  const failure=await prepareBankImportFailure(before,attempted,uid());assert.equal(failure.compact,compact);assert.deepEqual(failure.state.allocations,before.allocations);return failure.state;
 }
 for(const compact of [false,true])test(`Q8 payment proof: ${compact?'compact hold':'retained conflict'} replaces fresh payment assertions with neutral confirmation`,async t=>{
@@ -257,7 +258,7 @@ for(const compact of [false,true])test(`Q8 payment proof: current-snapshot payme
 });
 test('Q8 payment proof: an unrelated row conflict preserves a valid payment claim while absence stays blocked',async t=>{
  const f=await fixture(t);f.init();f.pay(250000,{bankReference:'SYN-VALID',externalId:'SYN-VALID'});await f.queue();f.pay(10000,{party:'Unrelated synthetic sender',payerReference:'OTHER-REF',bankReference:'SYN-OTHER',externalId:'SYN-OTHER'});
- let state=f.state();const other=state.transactions.find(row=>row.externalId==='SYN-OTHER');state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[{...other,party:'Contradictory unrelated sender'}]}).state;f.put(state);
+ let state=f.state();const other=state.transactions.find(row=>row.bankReference==='SYN-OTHER');state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({...other,party:'Contradictory unrelated sender'})]}).state;f.put(state);
  const m=(await f.queue()).find(item=>item.kind==='possible_vat'&&item.status==='draft');assert.ok(m);assert.equal(m.facts.payment_evidence_issue,'');assert.equal(m.facts.paid_cents,250000);assert.equal(m.facts.remaining_cents,62500);assert.match(m.body,/Vi har verifierat betalningar/);assert.ok((await f.review(m)).review_id);
  await assert.rejects(f.call('absence',{invoice_id:state.invoices[0].id,note:'An unrelated bank contradiction still prevents an account-wide absence conclusion.',confirm:true}),/motstridiga/);assert.equal(f.posts,0);
 });

@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "cycle": "2",
+  "verified_at": "2026-10-30T17:45:41Z",
+  "github": {
+    "commit": "9d9a10c48e4725ec22e188f946da3c03cdfa5814",
+    "tree": "ad434247b7f3d978c4b0d7571bc2dea7374c6f6b",
+    "actions_run": 41099298812,
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "test",
+        "id": 124213175538,
+        "conclusion": "success"
+      },
+      {
+        "name": "sites",
+        "id": 124213176075,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "sites": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 34,
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_7a534a7e7c5c819198cd4ac5fbe959af",
+    "source_commit": "927a2cb666705e0ccfa2d88318bdcb443c3f0b08",
+    "deployment_id": "appgdep_6ae4d50bb3fc8191b48c6f93dc624e3f",
+    "status": "succeeded",
+    "deployed_at": "2026-10-30T17:35:18.311306+00:00",
+    "runtime_revision": 9,
+    "archive_sha256": "31b192ee9eb37411b49a96fb248deb0b9ebfa5bb498110522bfe93f921bcd316",
+    "archive_bytes": 39055360,
+    "archive_files": 327,
+    "source_files_compared": 278,
+    "source_files_equal": true,
+    "auth_client_unchanged": true,
+    "access_policy_unchanged": true,
+    "automations_unchanged": true,
+    "gmail_schedule_enabled": false,
+    "rollback_version": 33,
+    "rollback_source_commit": "bcb916e570d88abaadf836af0e7a1c5c200e6b0e"
+  },
+  "tests": {
+    "node": 469,
+    "sites": 624,
+    "total": 1093,
+    "failed": 0,
+    "skipped": 0,
+    "syntax_files": 69,
+    "typescript": "passed",
+    "build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0
+  },
+  "production_read_checks": {
+    "gmail": {
+      "connected": true,
+      "last_successful_fetch": "2026-10-29T15:00:48.512Z",
+      "sync_health": "stale",
+      "background_ready": false,
+      "review_reasons": {
+        "basis": "stored_extraction",
+        "total": 183,
+        "analyzed": 183,
+        "limit": 500,
+        "truncated": false,
+        "counts": {
+          "uninterpreted": 0,
+          "missing_invoice_number": 21,
+          "missing_party": 58,
+          "missing_dates": 104,
+          "missing_organization": 101,
+          "missing_amount": 50,
+          "missing_vat_or_net": 55,
+          "unverified_counterparty": 182,
+          "possible_duplicate": 0,
+          "low_confidence": 138,
+          "other_review": 0
+        }
+      },
+      "cloud_worker_last_seen": "2026-10-30T16:40:41.937Z",
+      "cloud_last_completed": "2026-10-29T07:16:18.997Z",
+      "waiting_ocr": 0
+    },
+    "bank": {
+      "connected": true,
+      "interval_hours": 6,
+      "last_synced": "2026-10-30T14:09:57.164Z",
+      "last_error": null
+    },
+    "backup": {
+      "day": "2026-10-30",
+      "status": "complete",
+      "files": 191,
+      "copied": 191,
+      "bytes": 63448066,
+      "verified_at": "2026-10-30T01:27:38.129Z",
+      "verification_scope": "copy_readback",
+      "verified_files": 0
+    }
+  },
+  "authenticated_browser": {
+    "browser": "Chrome extension",
+    "overview_primary_control_count": 1,
+    "overview_cards": 4,
+    "new_console_errors": 0,
+    "desktop_horizontal_overflow": false,
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "menu_initial_focus": "Stäng menyn",
+      "review_entry_focus": "main Behöver granskas",
+      "review_horizontal_overflow": false,
+      "keyboard_opened_document_moves_focus_to": "BODY",
+      "keyboard_return_to_list_moves_focus_to": "BODY",
+      "focus_defect_confirmed": true
+    },
+    "temporary_viewport_reset": true,
+    "final_view": "Översikt"
+  },
+  "production_mutations_tested": false,
+  "real_emails_sent": 0,
+  "real_payments_performed": 0,
+  "limitations": [
+    "Legacy backup exposes copy_readback honestly; no new production manifest pass or restore performed.",
+    "Review reason counts overlap and do not authorize mass registration.",
+    "Cloud heartbeat and a successful zero-document worker run do not prove new OCR results.",
+    "New API-original and navigation/UI corrections remain separate, unpublished candidates."
+  ]
+}

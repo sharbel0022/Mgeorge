@@ -328,3 +328,99 @@ Sites33 är faktiskt publicerad och autentiserade menykontroller godkända. Cyke
   "background_continuation_configured": false
 }
 ```
+
+## Åttatimmarsarbete – cykel3 fryst bankkandidat
+
+Main9d och Sites34 är verifierade. Nästa API-originalkandidat har1161 gröna tester och oberoende klartecken. Inga UI-/parserkandidater räknas som publicerade.
+
+```json
+{
+  "schema": 1,
+  "run": "quality-8h-2026-10-30",
+  "status": "in_progress",
+  "checkpoint_at": "2026-10-30T17:53:28.930607+00:00",
+  "started_at": "2026-10-30T15:31:15Z",
+  "deadline": "2026-10-30T23:31:15Z",
+  "last_verified_main": "9d9a10c48e4725ec22e188f946da3c03cdfa5814",
+  "pushed_commits": 3,
+  "actions_run": 41099298812,
+  "actions_conclusion": "success",
+  "latest_sites_version": 34,
+  "sites_source_commit": "927a2cb666705e0ccfa2d88318bdcb443c3f0b08",
+  "sites_deployment": "appgdep_6ae4d50bb3fc8191b48c6f93dc624e3f",
+  "ready_candidate": "docs/QUALITY-8H-CYCLE3.json",
+  "latest_tests": {
+    "node": 469,
+    "sites": 692,
+    "total": 1161,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "syntax_files": 69,
+    "typescript": "passed",
+    "production_build": "passed",
+    "node_audit_total": 0,
+    "sites_audit_total": 0
+  },
+  "areas_at_least_9_5": [],
+  "remaining_areas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33
+  ],
+  "score_total": 250.0,
+  "score_mean": 7.575757575757576,
+  "completed": [
+    "Three normal main pushes;Sites33 and34 published",
+    "Cycle2 original/current claims,controller,documents,backup,MCP delivered",
+    "Production review diagnostics read;old backup scope honestly exposed",
+    "API-original26path candidate:four independent findings corrected, full1161 green",
+    "Actual Chromium URL/back/forward/reload/filter/draft tests completed for separate UI candidate"
+  ],
+  "active_external_blockers": [
+    "Authentic individual Swedbank report and company report profile/channel",
+    "External Gmail schedule paused;unchanged",
+    "Representative authorized invoice/OCR corpus and expected results",
+    "Isolated production-backup restore and independent disaster copy/key access"
+  ],
+  "open_internal_findings": [
+    "Unpublished API-original candidate awaiting exact main/Sites verification",
+    "Separate UI original/reference labels,unknown status,contrast,history,draft and mobile review focus",
+    "Bank/invoice initial loading or signed-out lists can imply empty0",
+    "Synthetic invoice parser defects/corpus investigation",
+    "Backup row/size capacity and cross-store temporal scope"
+  ],
+  "next_task": "Push26path API candidate plus reports;verify exact CI;publish same Site35. Independently review and browser-test UI candidate,continue parser/backup improvements.",
+  "background_continuation_configured": false
+}
+```

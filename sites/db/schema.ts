@@ -110,6 +110,7 @@ export const backupRuns=sqliteTable('backup_runs',{
  id:text('id').primaryKey(),owner:text('owner').notNull(),day:text('day').notNull(),state:text('state').notNull(),
  snapshotKey:text('snapshot_key').notNull().default(''),snapshotHash:text('snapshot_hash').notNull().default(''),
  cursor:integer('cursor').notNull().default(0),totalDocs:integer('total_docs').notNull().default(0),bytes:integer('bytes').notNull().default(0),attempts:integer('attempts').notNull().default(0),
+ apiEvidence:text('api_evidence').notNull().default(''),
  verificationCursor:integer('verification_cursor').notNull().default(0),verifiedBytes:integer('verified_bytes').notNull().default(0),verificationStartedAt:text('verification_started_at').notNull().default(''),
  lease:text('lease').notNull().default(''),leaseUntil:text('lease_until').notNull().default(''),lastError:text('last_error').notNull().default(''),
  createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),finishedAt:text('finished_at').notNull().default(''),
