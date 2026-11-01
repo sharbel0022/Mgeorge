@@ -42,9 +42,10 @@
 - [x] Read request, AGENTS, progress, scorecard and latest linked delivery evidence.
 - [x] Fetch origin/main and compare previous verified code; clean start, dedicated codex branch.
 - [x] Parallel Node/Sites/test inventory; allocation without current consent reproduced in both engines.
-- [ ] Implement and review tasks 1–3.
-- [ ] Complete architecture, measurements and real-case read-only assessment.
-- [ ] Pass mandatory checks and independent final review.
-- [ ] Deliver main and exact Sites version; record verified results and remaining external requirements.
+- [x] Implement and review tasks 1–3.
+- [x] Complete architecture, measurements and real-case read-only assessment.
+- [x] Pass mandatory checks and independent final review: 625 Node, 1111 Sites, syntax92, TS/build/audit.
+- [x] Deliver main a8453a1 with exact green CI and Sites46; record unchanged revision40 and external requirements.
+- [ ] External completion: authoritative receiving-account/report identity, ordinary invoice registration/counterparty review and separate administrator allocation decision. No test allocation in production.
 
 Ruling: Continue directly under the user's detailed execution instruction. Existing engines and explicit administrative manual-allocation semantics are retained; new automatic consent bypasses are closed. Production case remains review-only until actual external evidence and separate administrator authorization exist.

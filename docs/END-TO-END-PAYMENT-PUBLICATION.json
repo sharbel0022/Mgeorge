@@ -1,0 +1,212 @@
+{
+  "schema": "mgeorge-end-to-end-payment-verification-v1",
+  "date": "2026-11-01",
+  "baseline": "fa524c2b3d06530d1b75b48df45ae14b28ab1182",
+  "github": {
+    "repository": "https://github.com/sharbel0022/Mgeorge",
+    "codeCommit": "a8453a151113f7cb5b47d155b4905f8fca02c3f6",
+    "ci": {
+      "id": 41351500449,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41351500449",
+      "headSha": "a8453a151113f7cb5b47d155b4905f8fca02c3f6",
+      "jobs": {
+        "test": "success",
+        "sites": "success"
+      }
+    },
+    "initialCodeCommit": "893fa421ded8a60ed8f8fe271badaadd503c213a",
+    "initialCi": 41350966723
+  },
+  "validation": {
+    "node": 625,
+    "sites": 1111,
+    "total": 1736,
+    "newTests": 108,
+    "syntaxFiles": 92,
+    "typescript": "passed",
+    "build": "passed",
+    "rootAudit": 0,
+    "sitesProductionAudit": 0,
+    "sitesDevelopmentModerate": 16,
+    "highCritical": 0,
+    "independentReview": "No remaining Critical/Important or concrete panel findings after fixes; synthetic review scope.",
+    "commitIntegrationTests": 24,
+    "currentAccountTests": 20,
+    "panelTests": 45,
+    "extraReviewerRaceCases": 18,
+    "browser": {
+      "widths": [
+        1440,
+        390
+      ],
+      "steps": 11,
+      "overflow": false,
+      "keyboardExpandCollapse": true,
+      "scope": "Actual component and CSS with synthetic in-memory report, no production financial command."
+    }
+  },
+  "metrics": {
+    "consent": {
+      "casesPerEngine": 11,
+      "nodeCorrectBefore": 2,
+      "nodeCorrectAfter": 11,
+      "sitesCorrectBefore": 2,
+      "sitesCorrectAfter": 11,
+      "falseAllocationsBeforePerEngine": 9,
+      "falseAllocationsAfterPerEngine": 0,
+      "positiveMatches": 1,
+      "negativeBalancesUnchangedAfterPerEngine": 10
+    },
+    "matching": {
+      "cases": 23,
+      "correctBefore": 23,
+      "correctAfter": 23,
+      "truePositiveBefore": 5,
+      "truePositiveAfter": 5,
+      "falsePositiveBefore": 0,
+      "falsePositiveAfter": 0
+    },
+    "sourceRelations": {
+      "cases": 15,
+      "correctManualBefore": 10,
+      "correctManualAfter": 10,
+      "falseRelations": 0,
+      "falseAllocations": 0,
+      "economicDuplicateScenarios": 0,
+      "unchangedBalances": 15
+    },
+    "scope": "Synthetic regression measurements; no production accuracy or real-world bank-identity rate inferred."
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "sourceCommit": "2869f0ac51946b5fb31cb25de79872bb92557ecd",
+    "sourceTree": "b5799183ae5fca8b9101c4c73f27e287106c4b77",
+    "githubSitesSubtree": "b5799183ae5fca8b9101c4c73f27e287106c4b77",
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_367a2fed94ec8191b9349dbdd88bbb6b",
+    "versionNumber": 46,
+    "archiveStorage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_00000000708881f4bc9af5fda3cb5df8",
+      "content_hash": "sha256:480a330ca2661788bc625e9e532174c020ab0cf7d946417563ddd5528f9ccc64",
+      "size_bytes": 44513280,
+      "file_count": 335
+    },
+    "localArchiveSha256": "b493a4e652d233960450ba471235eec19fc012eea76344dfe7e4e552953f2332",
+    "deploymentId": "appgdep_6ae7ada3ad60819181707aa09247c344",
+    "status": "succeeded",
+    "envSetRevision": 9,
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site"
+  },
+  "intermediate": {
+    "versionNumber": 45,
+    "deploymentId": "appgdep_6ae7ac446214819194de8307ebce47c9",
+    "status": "succeeded",
+    "sourceCommit": "c312bc13ac59f5f5e0feadbfb147f17cb3cb65aa",
+    "knownIssue": "Read-only production QA found an overly strict presentation-source classification for a receipted legacy AIS row. Corrected in final code; no financial write.",
+    "workspaceRevision": 40,
+    "allocations": 0
+  },
+  "rollback": {
+    "previousStableVersion": 44,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_6e59ff882ed08191bff0c92ecc42f945",
+    "sourceCommit": "e0c9b8cbb510ddd267e31bbcd250143a61c31987",
+    "scope": "Existing saved code version. No schema, secrets or data migration in this delivery. Data reversals remain separate audited business decisions."
+  },
+  "backup": {
+    "manifestFiles": 191,
+    "verifiedFiles": 191,
+    "scope": "manifest_pass",
+    "olderApiRecordsWithoutReceipt": 113,
+    "fullDisasterRecoveryExercise": false
+  },
+  "externalRequirements": [
+    "Provider-backed receiving-account alias or equally authoritative account-specific relation for the report format.",
+    "Explicit bank report/deposit relationship; amount and date are insufficient.",
+    "Review/register intact invoice 0599 through original/counterparty/duplicate controls, then separate customer or third-party payer verification.",
+    "Fresh read-only reconciliation proposal and separate administrator approval before any real allocation."
+  ],
+  "objectiveApproved": false,
+  "scoresRaised": false,
+  "privacy": "All authentic originals, raw account/customer data and original checksums retained privately outside Git.",
+  "preservation": {
+    "latestVersion": 46,
+    "accessPolicyUnchanged": true,
+    "authClientUnchanged": true,
+    "schedulesUnchanged": true,
+    "runtimeRevisionBefore": 9,
+    "runtimeRevisionAfter": 9,
+    "runtimeEntryMetadataUnchanged": true,
+    "databaseTablesUnchanged": true,
+    "bindingsUnchanged": true
+  },
+  "production": {
+    "revisionBefore": 40,
+    "revisionAfter": 40,
+    "stateUnchanged": true,
+    "financialProjectionUnchanged": true,
+    "invoices": 5,
+    "allocations": 0,
+    "registered0599": false,
+    "sourceLinkConfirmed": false,
+    "automaticEligible": false,
+    "mode": "preview",
+    "bankSyncTriggered": false,
+    "gmailSyncTriggered": false,
+    "mailSent": false,
+    "bankPaymentPerformed": false,
+    "desktop": {
+      "width": 1920,
+      "documentWidth": 1920,
+      "steps": 11
+    },
+    "mobileEvidence": "390px verified with actual component/CSS and synthetic report; attempted production override retained 1920px, so no 390px production claim.",
+    "checks": [
+      {
+        "id": "received",
+        "status": "passed"
+      },
+      {
+        "id": "report",
+        "status": "review"
+      },
+      {
+        "id": "original",
+        "status": "passed"
+      },
+      {
+        "id": "account",
+        "status": "blocked"
+      },
+      {
+        "id": "deposit",
+        "status": "missing"
+      },
+      {
+        "id": "payer",
+        "status": "missing"
+      },
+      {
+        "id": "reference",
+        "status": "missing"
+      },
+      {
+        "id": "invoice",
+        "status": "review",
+        "label": "Original found, not registered"
+      },
+      {
+        "id": "customer",
+        "status": "review"
+      },
+      {
+        "id": "amount",
+        "status": "missing"
+      },
+      {
+        "id": "reconciliation",
+        "status": "blocked"
+      }
+    ],
+    "financialWritesPerformed": 0
+  }
+}

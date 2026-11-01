@@ -1,6 +1,11 @@
 # Verifierad progress
 
-## Hela betalningskedjan — pågående leverans 2026-11-01
+## Hela betalningskedjan — verifierad kodleverans 2026-11-01
+
+- **Slutleverans:** main-kod `a8453a151113f7cb5b47d155b4905f8fca02c3f6`, båda [Actions 41351500449](https://github.com/sharbel0022/Mgeorge/actions/runs/41351500449) success på exakt SHA. **Sites 46 succeeded**, source `2869f0ac51946b5fb31cb25de79872bb92557ecd`, identiskt GitHub/Sites-träd `b5799183ae5fca8b9101c4c73f27e287106c4b77`, runtime 9. Fullt kvitto: `docs/END-TO-END-PAYMENT-PUBLICATION.json`.
+- Efterkontroll i publicerad autentiserad betalningsdialog och skrivfri GET: 11 steg, giltigt AIS-original passerar, kontoalias/rapportidentitet fortsatt blockerade och fakturaoriginal hittat men ej registrerat. Hela tillståndet och ekonomiska projektionen oförändrade, **revision 40 → 40, fem fakturor och noll allokeringar**. Ingen verklig registrering, originalrelation, allokering, bank-/Gmail-synk, kundmejl eller betalning utförd.
+- Policy, autentisering, schema-ID/lägen, miljörevision 9 och metadata, DB-bindning/tabellista, R2-deklaration och befintliga scheman bevarade. Produktion 1920 px verifierad; mobilbevis gäller faktisk syntetisk komponent vid 390 px. Privata produktionsbilder/original och exakta före-/efterbevis ligger utanför Git. Lokalt **625 + 1111 = 1736 tester**, syntax 92, TypeScript/bygge, oberoende granskning och auditgrindar godkända; inga poäng höjda.
+- **Exakt fortsättningspunkt:** bankstyrkt mottagarkontoalias/Bankgirorelation och uttrycklig rapport-/AIS-koppling; därefter ordinarie granskning/registrering av original 0599, separat kund-/tredjepartsrelation och nytt skrivfritt förslag före administratörens faktiska allokeringsbeslut. Slutmålet är inte produktionsgodkänt och 625 kronor får inte markeras betalda som prov.
 
 - Första kodleveransen `893fa421ded8a60ed8f8fe271badaadd503c213a` har båda Actions-jobben gröna i körning `41350966723` och publicerades som Sites 45. Den läsande kontrollen behöll revision 40 och noll allokeringar men upptäckte en felaktigt blockerad originalstatus för äldre AIS-rad utan presentationsetikett. Minimal källklassificering via befintlig `hasBankApiOrigin` är rättad med sex röda/gröna regressioner; ingen kvitto-/kontospärr ändrades. Slutlig lokal svit **625 Node + 1111 Sites**, syntax 92, TypeScript och produktionsbygge passerar. Oberoende re-review är ren. Korrigerad main-/Sites-identitet fylls i efter verklig publicering.
 

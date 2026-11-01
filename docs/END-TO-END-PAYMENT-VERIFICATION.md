@@ -125,7 +125,11 @@ Backupstatus gav komplett **manifestpass 191/191 original**. Det finns fortfaran
 
 Gmail är anslutet men senaste lyckade hämtning är gammal och det bifogade timschemat är pausat. Ansluten integration redovisas därför inte som verifierad aktiv automatisk hämtning. Bankens sex-timmarsschema och backupschemat finns aktiva. Inga scheman ändras i uppdraget.
 
-Exakt GitHub-kod, båda Actions-jobben, Sites-källträd/version/deployment, audit, bygg-/browserbevis, oförändrad policy/DB/R2/runtime/scheman och läsande efterkontroll ska redovisas i `docs/END-TO-END-PAYMENT-PUBLICATION.json`. Tills ett sådant faktiskt kvitto finns är ny push/publicering inte verifierad.
+**Leverans verifierad:** kodcommit [`a8453a151113f7cb5b47d155b4905f8fca02c3f6`](https://github.com/sharbel0022/Mgeorge/commit/a8453a151113f7cb5b47d155b4905f8fca02c3f6) på main, båda jobben i [Actions 41351500449](https://github.com/sharbel0022/Mgeorge/actions/runs/41351500449) är success på exakt SHA. Befintligt projekt är publicerat som **Sites 46 succeeded**, source `2869f0ac51946b5fb31cb25de79872bb92557ecd`, identiskt GitHub/Sites-källträd `b5799183ae5fca8b9101c4c73f27e287106c4b77`, runtime 9. [Fullständigt leveranskvitto](END-TO-END-PAYMENT-PUBLICATION.json) skiljer den första mellanleveransen, slutlig kod, lokalt arkiv och Sites-normaliserat arkiv åt.
+
+Ägarautentiserad GET och faktisk betalningsdialog verifierades i Sites 46. Alla elva steg visas: AIS mottagen och originalintegritet passerar; rapporten är mottagen men sambandet saknas; kontoalias och gemensam insättningsidentitet förblir blockerade/saknade; betalare/referens är inte överförda från den separata rapporten; fakturaoriginal hittat men ej registrerat; kundrelation och saldo återstår. `automaticEligible:false`, preview och inga skrivningar. Hela arbetsytans tillstånd och den jämförda ekonomiska projektionen är oförändrade, **revision 40 → 40, fem fakturor, noll allokeringar**.
+
+Åtkomstpolicy, auth-klient, schema-ID/lägen, runtime 9, miljövariablernas redovisade metadata, DB-bindning/tabellista och källkodens DB/R2-deklarationer är oförändrade. Ingen hemlighet uppdaterades. Faktisk produktionsdesktop var 1920 px utan dokumentoverflow. Produktionsförsöket att ändra viewport behöll 1920 px och räknas därför inte som mobilbevis; det separata faktiska komponentprovet vid 390 px passerade. Privata produktionsbilder och fullständiga före-/efterunderlag ligger utanför Git.
 
 ## Kvalitet och exakt fortsättningspunkt
 

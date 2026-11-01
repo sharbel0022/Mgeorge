@@ -2,6 +2,8 @@
 
 ## Hela betalningskedjan — 2026-11-01
 
+Leverans verifierad: main `a8453a1`, [exakt Actions success](https://github.com/sharbel0022/Mgeorge/actions/runs/41351500449), Sites **46 succeeded**, samma Sites-träd och runtime 9. Läsande verklig elvastegskontroll och faktisk dialog: revision **40 → 40**, hela tillståndet/ekonomiska projektionen oförändrade, fem fakturor och noll allokeringar. Kontoalias/rapportidentitet och registrering/kundrelation återstår. Policy, auth, DB/R2-deklarationer, tabellista och scheman bevarade. [Exakta bevis](docs/END-TO-END-PAYMENT-PUBLICATION.json). Poängen är fortsatt oförändrade; leveransframgång är ingen färdig verksamhetsavstämning.
+
 [Arkitektur](docs/PAYMENT-VERIFICATION-ARCHITECTURE.md) och [före-/efterrapport](docs/END-TO-END-PAYMENT-VERIFICATION.md). Samtliga berörda poäng behålls; ingen produktionsberoende poäng höjs till9,5. Nytt faktiskt fel reproducerades och rättades i båda motorerna: intakt AIS-original kunde allokeras utan aktuellt kontomedgivande. Samma11-fallskorpus per motor ger2/11→11/11 korrekta beslut och9→0 felaktigt tillåtna allokeringar, med positivfallet kvar1/1. Det är syntetisk regressionsprecision, inte ett produktionsestimat.
 
 | Berört område | Före → efter | Ny verifierbar evidens | Kvarstående gräns |
