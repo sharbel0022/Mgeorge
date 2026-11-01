@@ -1,5 +1,26 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Hela betalningskedjan — 2026-11-01
+
+[Arkitektur](docs/PAYMENT-VERIFICATION-ARCHITECTURE.md) och [före-/efterrapport](docs/END-TO-END-PAYMENT-VERIFICATION.md). Samtliga berörda poäng behålls; ingen produktionsberoende poäng höjs till9,5. Nytt faktiskt fel reproducerades och rättades i båda motorerna: intakt AIS-original kunde allokeras utan aktuellt kontomedgivande. Samma11-fallskorpus per motor ger2/11→11/11 korrekta beslut och9→0 felaktigt tillåtna allokeringar, med positivfallet kvar1/1. Det är syntetisk regressionsprecision, inte ett produktionsestimat.
+
+| Berört område | Före → efter | Ny verifierbar evidens | Kvarstående gräns |
+| --- | --- | --- | --- |
+| Startsida, kundfakturor och fakturasaldon | Behåll senaste poäng | Blockerade fall lämnar bokat saldo; Node skiljer verifieringsstatus från redan bokade belopp | Verklig0599 är inte registrerad eller allokerad |
+| Swedbank/bankhämtning | Behåll senaste poäng | Aktuellt ägt valt entydigt SEK-konto krävs även efter AIS-import | Ansluten bank är inte generell individuell rapportbehörighet |
+| Bankgiroimport | 8,5 → 8,5 | Rapportpromotion och allokering får commit-tida kontomedgivandefence;15/15 korrekta och oförändrade saldon i relationskorpusen | Autentiskt kontoalias och gemensam rapport-/AIS-identitet saknas |
+| Verklig betalare / referens | 7 / 7 → oförändrat | Bankfakta, generell0599, manuellt beslut och kund hålls isär;8/8 namn/ref kvar i syntetisk relationskorpus | Formellt OCR-avtal och färdig kund-/tredjepartsrelation inte verifierade |
+| Automatisk betalningsmatchning | 7,5 → 7,5 |18 falska allokeringar i riktade negativa fall→0 över två motorer; befintlig Node23-fallskorpus fortsatt23/23,TP5/5,FP0 | Ingen automatisk produktionsmatchning styrkt genom syntetiska data |
+| Dubbletter, del-/överbetalning, historik och status | Behåll senaste poäng | Återimport/avbrott/återtag bibehålls; nya kontogränser bevarar gamla pengar och lärda relationskällors evidens | Full autentisk saldo-/historikavstämning återstår |
+| Säkerhet och åtkomstkontroll | 8,5 → 8,5 | Node manuell HTTP-original-/ägarkontroll under skrivlås; Sites atomisk snapshot+SQL-fence,24 nya commitfall och18 oberoende extra racefall | Node är fortsatt ett företagsgemensamt administratörsregister |
+| Mobil och betalningsvyns användbarhet | Behåll senaste poäng | Ny läsande elvastegspanel med källor/regler/nästa steg; Chromium1440/390px, tangentbordsutfällning och ingen dokumentoverflow | Browserbeviset använder faktisk komponent med syntetiskt tillstånd; produktion verifieras separat |
+| Gmail och schemalagd automatisering | Behåll senaste poäng | Läsande driftstatus skiljer anslutet Gmail från pausat timschema och gammal lyckad hämtning | Ingen ny Gmail-körning eller schemaändring gjord |
+| Säkerhetskopiering / katastrofåterställning | Behåll senaste poäng | Aktuellt komplett manifestpass191/191 läst |113 äldre API-kvitton saknas i backupomfattningen; ingen full katastrofövning |
+| Kodkvalitet och tester | 8,5 → 8,5 | Röda/gröna regressioner, oberoende granskningar och obligatoriska slutgrindar redovisas i leveranskvittot | Sites fullaudit har16 moderate utvecklingsfynd; produktion0, high/critical0 |
+| Verifiering i verklig produktion | 6,5 → 6,5 | Privata original omgranskade läsande, revision40/fem fakturor/noll allokeringar; exakt leverans redovisas separat | Kontoalias, rapportidentitet, registrering, kundrelation och separat allokeringsgodkännande återstår |
+
+Övriga områden och äldre bedömningar behålls som historik. För slutliga testantal, exakt GitHub-/CI-/Sites-identitet och läsande efterkontroll gäller denna cykels leveranskvittto, inte äldre publiceringsuppgifter.
+
 ## Färskt AIS-kvitto i drift — 2026-11-01
 
 Poäng oförändrade för bankhämtning, Bankgiroimport, betalare/referens, matchning, saldon, åtkomst, tester och produktionsverifiering. Nödvändig kvittoevidens har förbättrats: riktad färsk bankhämtning adopterade ett giltigt kvitto till äldre rad i Sites44, revision37→38, utan ändrade ekonomiska fält/fakturor/krediter/allokeringar. Noll allokeringar; ingen originalrelation eller fakturakoppling bekräftad. Privat bank-PDF kompletterar konto-/rapportkontrollen, men aktivt kontoalias och gemensam stabil rapport-/AIS-identitet saknas fortsatt. Sådant underlag kan inte ersättas av syntetiska tester eller fri text.

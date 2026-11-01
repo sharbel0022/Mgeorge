@@ -7,7 +7,7 @@ import {openDatabase, storeTransactions, listTransactions, listInvoices, allocat
 import {normalizeBankApiTransaction, parseCAMT, parseCSV} from '../src/importers.js';
 import {analyzeReconciliation, reconciliationData, runReconciliation} from '../src/reconciliation.js';
 import {buildPaymentOverview} from '../src/payment-overview.js';
-import {approveSyntheticBankAccount, withSyntheticBankOriginal} from './bank-fixtures.js';
+import {approveSyntheticBankAccount,ensureSyntheticBankAccount,withSyntheticBankOriginal} from './bank-fixtures.js';
 import {syntheticCamt, account} from '../sites/tests/helpers/camt-integrity.mjs';
 
 function fixture(t) {
@@ -30,7 +30,7 @@ const apiOriginal = (extra={}) => ({
   debtor:{name:'Synthetic Customer AB'}, creditor:{name:'Synthetic Customer AB'},
   reference_number:'0604', ...extra,
 });
-const importApi = (db, original) => storeTransactions(db, [normalizeBankApiTransaction(original, account)], 'enablebanking');
+const importApi = (db, original) => {ensureSyntheticBankAccount(db,account);return storeTransactions(db, [normalizeBankApiTransaction(original, account)], 'enablebanking');};
 const findings = db => analyzeReconciliation(reconciliationData(db));
 
 function specification({child='SYNTHETIC-CHILD-A', party='Synthetic Customer A AB', reference='0604', amount='625.00'}={}) {

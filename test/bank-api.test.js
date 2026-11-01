@@ -20,7 +20,8 @@ const base=await new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve(`h
 const originalFetch=globalThis.fetch;
 let cookie='',authBody,sessionIndex=0,providerCalls=0,transactionCalls=0,active=true,mode='',lastQuery;
 let releaseProvider,providerReached,providerWait;
-const account=(uid='account-1')=>({uid,name:'Test företagskonto',currency:'SEK',usage:'ORGA',account_id:{iban:'TEST-ACCOUNT-0001'},identification_hash:'stable-test-account'});
+const syntheticIban='SE4280000890119146168423';
+const account=(uid='account-1')=>({uid,name:'Test företagskonto',currency:'SEK',usage:'ORGA',account_id:{iban:syntheticIban},identification_hash:'stable-test-account'});
 const transaction=(entry,amount='100.00',direction='CRDT')=>({status:'BOOK',entry_reference:entry,transaction_id:'temporary-'+sessionIndex+'-'+entry,booking_date:'2026-10-26',transaction_amount:{amount,currency:'SEK'},credit_debit_indicator:direction,debtor:{name:'Testkund AB'},reference_number:'12345'});
 globalThis.fetch=async(url,options)=>{
   if(String(url).startsWith(base))return originalFetch(url,options);
@@ -94,8 +95,8 @@ test('state is bound to authenticated initiating browser and cannot be forged or
   const connection=await current();assert.equal(connection.status,'pending_account');assert.equal(connection.selected_account_uid,'');
   assert.equal((await call('/api/bank/sync','POST',{connection_id:connection.id})).res.status,409);
   const stored=db.prepare('SELECT * FROM bank_connections WHERE id=?').get(connection.id);
-  assert.ok(!stored.encrypted_session.includes('private-session'));assert.ok(!stored.accounts_json.includes('TEST-ACCOUNT'));assert.ok(decryptObject(stored.encrypted_session).session_id);
-  const serialized=JSON.stringify((await call('/api/bank/status')).json);assert.ok(!serialized.includes('private-session'));assert.ok(!serialized.includes('TEST-ACCOUNT'));assert.ok(!serialized.includes('PRIVATE KEY'));
+  assert.ok(!stored.encrypted_session.includes('private-session'));assert.ok(!stored.accounts_json.includes(syntheticIban));assert.ok(decryptObject(stored.encrypted_session).session_id);
+  const serialized=JSON.stringify((await call('/api/bank/status')).json);assert.ok(!serialized.includes('private-session'));assert.ok(!serialized.includes(syntheticIban));assert.ok(!serialized.includes('PRIVATE KEY'));
 });
 test('explicit account selection verifies accounts and initially imports 30 days with pagination',async()=>{
   const c=await current();

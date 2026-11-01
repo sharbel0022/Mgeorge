@@ -1,4 +1,4 @@
-import {reconcileWithOriginals,assertPaymentOriginal} from '@/lib/reconciliation-evidence';
+import {reconcileWithOriginals,assertPaymentOriginal,writePaymentState} from '@/lib/reconciliation-evidence';
 import {reconcileAndPrepare} from '@/lib/customer-messages';
 import { db, identity, readWorkspace, readBankFileOriginal, response, failure } from "@/lib/server";
 import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, emptyState, now, uid } from "@/lib/domain";
@@ -38,7 +38,7 @@ export async function POST(req:Request){try{
  }
  const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces (owner, revision, payload, updated_at) VALUES (?, 0, ?, ?)').bind(user.userId,JSON.stringify(emptyState()),at).run();
  const detail=JSON.stringify({message:result.message,command,automatic:automatic.decisions,requestId:body.requestId});
- const batch=await db().batch([
+ const batch=await writePaymentState(user.userId,old.revision,old.state,result.state,db(),[
   db().prepare('INSERT INTO audit_events (id, owner, revision, action, detail, created_at) SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(uid(),user.userId,old.revision+1,command.type,detail,at,user.userId,old.revision),
   db().prepare('UPDATE workspaces SET payload=?, revision=revision+1, updated_at=? WHERE owner=? AND revision=?').bind(payload,at,user.userId,old.revision)
  ]);
@@ -50,4 +50,4 @@ export async function POST(req:Request){try{
   const latest=await readWorkspace(user.userId);return response({...latest,message:result.message});
  }
  return response({state:result.state,revision:old.revision+1,message:result.message});
- }catch(e){return failure(e);}}
+ }catch(e){if(e&&typeof e==='object'&&'code' in e&&e.code==='BANK_CONSENT_CHANGED')return response({error:e instanceof Error?e.message:'Bankmedgivandet ändrades. Kör kontrollen igen.'},409);return failure(e);}}

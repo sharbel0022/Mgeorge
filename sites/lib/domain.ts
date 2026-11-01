@@ -1,4 +1,5 @@
 import {bankApiOriginalIssue as apiOriginalIssue,bankApiDataHash,hasBankApiOrigin,bankFileReferenceHash,BANK_API_ORIGINAL_VERSION} from './bank-api-original.js';
+export {hasBankApiOrigin} from './bank-api-original.js';
 export const bankApiOriginalIssue=(t:Transaction)=>apiOriginalIssue(t,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED);
 import {exactReference,normalizeName} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
@@ -11,6 +12,7 @@ export type Invoice = {
 };
 export type Transaction = {
  bankgiroAccountIssue?:string;
+ bankAccountIssue?:string;
  payerEvidence?:ReturnType<typeof import('./payer-evidence.js').normalizePayerEvidence>;
  automaticMatchHold?:{at:string;reason:string};
  bankOriginalIssue?:string;

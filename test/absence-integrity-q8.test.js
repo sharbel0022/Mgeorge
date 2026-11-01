@@ -4,22 +4,23 @@ import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {openDatabase,storeTransactions,listInvoices,listTransactions,allocate} from '../src/db.js';
-import {withSyntheticBankOriginal} from './bank-fixtures.js';
+import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixtures.js';
 import {buildPaymentOverview,invoiceAnalysis} from '../src/payment-overview.js';
 import {prepareMessages,listMessages,reviewMessage,paymentSnapshot} from '../src/customer-messages.js';
 import {reconciliationData} from '../src/reconciliation.js';
 
 function fixture(t,total=62500){
  const directory=mkdtempSync(join(tmpdir(),'mgeorge-q8-absence-')),db=openDatabase(join(directory,'synthetic.sqlite'));t.after(()=>{db.close();rmSync(directory,{recursive:true,force:true});});
+ approveSyntheticBankAccount(db,'SE4280000890119146168423');
  db.prepare("INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,due_at,vat_cents,net_cents) VALUES('invoice','customer','000018','Synthetic customer AB',?,'000018','2000-01-01',?,?)").run(total,total===312500?62500:12500,total===312500?250000:50000);
  return db;
 }
 function original(db,amount=62500){
- storeTransactions(db,[withSyntheticBankOriginal({account:'MG',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Synthetic customer AB',reference:'000018',bank_reference:'SYNTHETIC-ABSENCE-Q8'})],'enablebanking');
+ storeTransactions(db,[withSyntheticBankOriginal({account:'SE4280000890119146168423',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Synthetic customer AB',reference:'000018',bank_reference:'SYNTHETIC-ABSENCE-Q8'})],'enablebanking');
  return listTransactions(db)[0];
 }
 function contradict(db,amount=70000){
- assert.throws(()=>storeTransactions(db,[withSyntheticBankOriginal({account:'MG',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Another synthetic payer',reference:'000026',bank_reference:'SYNTHETIC-ABSENCE-Q8'})],'enablebanking'),error=>error.code==='conflicting_bank_record');
+ assert.throws(()=>storeTransactions(db,[withSyntheticBankOriginal({account:'SE4280000890119146168423',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Another synthetic payer',reference:'000026',bank_reference:'SYNTHETIC-ABSENCE-Q8'})],'enablebanking'),error=>error.code==='conflicting_bank_record');
 }
 function historicalCheck(db){
  db.prepare("UPDATE invoices SET reconciled_at='2026-10-27T00:00:00Z',reconciliation_note='Original and period checked before this upgrade' WHERE id='invoice'").run();

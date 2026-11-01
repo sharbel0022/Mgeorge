@@ -6,7 +6,7 @@ import {join} from 'node:path';
 import {openDatabase, storeTransactions, listTransactions, listInvoices, allocate, deleteAllocation} from '../src/db.js';
 import {normalizeBankApiTransaction, parseCAMT, parseCSV} from '../src/importers.js';
 import {reconciliationData, runReconciliation} from '../src/reconciliation.js';
-import {approveSyntheticBankAccount} from './bank-fixtures.js';
+import {approveSyntheticBankAccount,ensureSyntheticBankAccount} from './bank-fixtures.js';
 import {digest} from '../src/security.js';
 import {syntheticCamt, account} from '../sites/tests/helpers/camt-integrity.mjs';
 
@@ -29,7 +29,7 @@ const apiOriginal = (extra={}) => ({
   transaction_amount:{amount:'625.00', currency:'SEK'},
   debtor:{name:'Synthetic Private Payer'}, reference_number:'0604', ...extra,
 });
-const importApi = (db, original, bankAccount=account) => storeTransactions(db, [normalizeBankApiTransaction(original, bankAccount)], 'enablebanking');
+const importApi = (db, original, bankAccount=account) => {ensureSyntheticBankAccount(db,bankAccount);return storeTransactions(db, [normalizeBankApiTransaction(original, bankAccount)], 'enablebanking');};
 const importXml = (db, xml, name='synthetic-q8.xml') => storeTransactions(db, parseCAMT(xml, account), `file:${name}`, {content:Buffer.from(xml), mime_type:'application/xml'});
 
 for (const failure of ['missing API hash', 'altered API original', 'missing file original']) {

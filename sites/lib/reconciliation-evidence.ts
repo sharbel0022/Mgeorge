@@ -1,10 +1,21 @@
 import {readBankOriginalBytes} from './server';
 import {analyze,reconcileState,reconciliationPreview} from './reconciliation';
 import {normalizeName} from './reconciliation-engine.js';
-import {now,uid,bankApiOriginalIssue,paymentLineage,paymentOriginalIssue,type State,type Transaction} from './domain';
+import {now,uid,bankApiOriginalIssue,canonicalBankAccount,hasBankApiOrigin,paymentLineage,paymentOriginalIssue,type State,type Transaction} from './domain';
 
 const MAX_ORIGINALS=32,MAX_BYTES=64_000_000;
 const missing='Bankoriginalet saknas eller kan inte verifieras. Nya matchningar väntar på ett tillgängligt, oförändrat original.';
+const missingAccount='En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före nya betalningskopplingar.';
+/** Consent is current access evidence, never an assertion of original integrity. */
+function accountReader(owner:string){
+ const accounts=new Map<string,Promise<string>>();
+ return (account:string)=>{
+  const key=canonicalBankAccount(account);
+  if(!accounts.has(key))accounts.set(key,(async()=>{try{const {bankgiroAutomaticAccountIssue}=await import('./bankgiro-service');return await bankgiroAutomaticAccountIssue(owner,key);}catch{return missingAccount;}})());
+  return accounts.get(key)!;
+ };
+}
+const needsAccount=(t:Transaction)=>hasBankApiOrigin(t)||['bank_file','bankgiro_file'].includes(t.evidence||'');
 function originalReference(state:State,t:Transaction){
  if(!['bank_file','bankgiro_file'].includes(t.evidence||''))return null;
  const record=state.imports.find(record=>record.id===t.importId);
@@ -51,32 +62,30 @@ function requiredEvidence(state:State){
 async function checkedState(owner:string,initial:State){
  // Every pending report, including legacy rows, needs current account consent
  // before its stable bank identifiers can promote it into economic child rows.
- const pending=initial.transactions.filter(row=>row.specification&&row.specificationStatus==='review'),accountDecisions:any[]=[];
+ const pending=initial.transactions.filter(row=>row.specification&&row.specificationStatus==='review'),accountDecisions:any[]=[],account=accountReader(owner);
  if(pending.length){
-  initial=structuredClone(initial);const issues=new Map<string,string>();
+  initial=structuredClone(initial);
   for(const row of pending){
-   if(!issues.has(row.account)){
-    let issue='En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.';
-    try{const {bankgiroAutomaticAccountIssue}=await import('./bankgiro-service');issue=await bankgiroAutomaticAccountIssue(owner,row.account);}catch{/* Unavailable consent evidence fails closed. */}
-    issues.set(row.account,issue);
-   }
-   const current=initial.transactions.find(item=>item.id===row.id)!,issue=issues.get(row.account)!;
+   const current=initial.transactions.find(item=>item.id===row.id)!,issue=await account(row.account);
    if((current.bankgiroAccountIssue||'')!==issue)accountDecisions.push({id:uid(),at:now(),kind:issue?'bankgiro_account_held':'bankgiro_account_restored',safe:false,transaction_id:row.id,reason:issue||'Det valda mottagarkontot ingår i ägarens aktiva bankmedgivande.'});
    current.bankgiroAccountIssue=issue;
   }
  }
  // A pure hypothetical pass discovers recovery candidates; none of its allocations escape.
- const probe=structuredClone(initial);for(const t of probe.transactions)delete t.bankOriginalIssue;
+ const probe=structuredClone(initial);for(const t of probe.transactions){delete t.bankOriginalIssue;delete t.bankAccountIssue;}
  const state=structuredClone(initial),read=originalReader(owner),decisions:any[]=[...accountDecisions],checked=new Set<string>();
  for(let pass=0;pass<=state.transactions.length;pass++){
   const ids=requiredEvidence(pass===0?probe:state);
-  if(pass===0)for(const t of initial.transactions)if(paymentOriginalIssue(initial,t))ids.add(t.id);
+  if(pass===0)for(const t of initial.transactions)if(paymentOriginalIssue(initial,t)||t.bankAccountIssue)ids.add(t.id);
   const pending=[...relatedTransactions(state,ids)].filter(id=>!checked.has(id));
   if(!pending.length)return {state,decisions};
   for(const id of pending){
    const t=state.transactions.find(t=>t.id===id)!;const issue=await read(state,t),old=t.bankOriginalIssue||'';checked.add(id);
    if(issue)t.bankOriginalIssue=issue;else delete t.bankOriginalIssue;
    if(issue!==old)decisions.push({id:uid(),at:now(),kind:issue?'bank_original_unavailable':'bank_original_restored',safe:false,transaction_id:t.id,reason:issue||'Det bevarade bankoriginalet är tillgängligt och kontrollsumman stämmer.'});
+   const accountIssue=needsAccount(t)?await account(t.account):'',previousAccountIssue=t.bankAccountIssue||'';
+   if(accountIssue)t.bankAccountIssue=accountIssue;else delete t.bankAccountIssue;
+   if(accountIssue!==previousAccountIssue)decisions.push({id:uid(),at:now(),kind:accountIssue?'bank_account_held':'bank_account_restored',safe:false,transaction_id:t.id,reason:accountIssue||'Det valda mottagarkontot ingår i ägarens aktiva bankmedgivande.'});
   }
   // Withholding a learned relation can remove an ambiguity and reveal a new candidate.
   // Discover again until every final candidate and source link has been checked.
@@ -91,11 +100,55 @@ export async function reconcileWithOriginals(owner:string,initial:State){
 export async function reconciliationPreviewWithOriginals(owner:string,initial:State){
  const checked=await checkedState(owner,initial);return reconciliationPreview(checked.state);
 }
+/** Original availability only, for read-only explanations independent of consent. */
+export async function paymentOriginalAvailabilityIssue(owner:string,initial:State,id:string){
+ if(!initial.transactions.some(t=>t.id===id))return missing;
+ const read=originalReader(owner);
+ for(const relatedId of relatedTransactions(initial,[id])){
+  const issue=await read(initial,initial.transactions.find(t=>t.id===relatedId)!);if(issue)return issue;
+ }
+ return '';
+}
 export async function assertPaymentOriginal(owner:string,initial:State,id:string){
- const state=structuredClone(initial),read=originalReader(owner);
+ const state=structuredClone(initial),read=originalReader(owner),account=accountReader(owner);
  if(!state.transactions.some(t=>t.id===id))throw Error(missing);
  for(const relatedId of relatedTransactions(state,[id])){
   const t=state.transactions.find(t=>t.id===relatedId)!;const issue=await read(state,t);if(issue)throw Error(issue);delete t.bankOriginalIssue;
+  if(needsAccount(t)){const issue=await account(t.account);if(issue)throw Error(issue);}
+  delete t.bankAccountIssue;
  }
  return state;
+}
+const consentFields=['id','owner','status','environment','app_generation','valid_until','selected_accounts','encrypted_accounts','encrypted_session','bank_name','country'] as const;
+const changedConsent=()=>Object.assign(Error('Bankmedgivandet eller kontovalet ändrades under kontrollen. Inga nya betalningskopplingar sparades. Kör kontrollen igen.'),{code:'BANK_CONSENT_CHANGED',status:409,safe:true});
+/** New money and report promotion need a commit-time consent fence. Historical
+ * allocations and unrelated metadata remain writable without current consent. */
+function financialSourceIds(before:State,after:State){
+ const allocations=after.allocations.filter(a=>a.active&&!before.allocations.some(old=>old.active&&old.id===a.id&&old.transactionId===a.transactionId&&old.invoiceId===a.invoiceId&&old.amount===a.amount&&old.effect===a.effect));
+ const promoted=after.transactions.filter(row=>row.specification&&row.specificationStatus==='linked'&&!before.transactions.some(old=>old.id===row.id&&old.specificationStatus==='linked'&&old.parentId===row.parentId));
+ const ids=new Set([...allocations.map(a=>a.transactionId),...promoted.map(row=>row.id)]);
+ for(const allocation of allocations){
+  const invoice=after.invoices.find(i=>i.id===allocation.invoiceId),payment=after.transactions.find(t=>t.id===allocation.transactionId);if(!invoice||!payment)continue;
+  for(const previous of before.allocations.filter(a=>a.active&&a.effect==='payment')){
+   const target=after.invoices.find(i=>i.id===previous.invoiceId),source=after.transactions.find(t=>t.id===previous.transactionId);
+   if(target&&source&&source.account===payment.account&&normalizeName(source.party)===normalizeName(payment.party)&&(normalizeName(target.party)===normalizeName(invoice.party)||!!invoice.organizationNumber&&invoice.organizationNumber===target.organizationNumber))ids.add(source.id);
+  }
+ }
+ return relatedTransactions(after,ids);
+}
+/** Caller supplies its audit and workspace CAS statements. The NOT NULL fence
+ * executes under the SAME D1 write transaction, so a concurrent disconnect,
+ * deselection, account replacement or expiry cannot leave partial finances. */
+export async function writePaymentState(owner:string,revision:number,before:State,after:State,database:D1Database,statements:D1PreparedStatement[]){
+ const accounts=new Set([...financialSourceIds(before,after)].map(id=>after.transactions.find(t=>t.id===id)!).filter(needsAccount).map(t=>canonicalBankAccount(t.account)));
+ if(!accounts.size)return database.batch(statements);
+ const snapshots=new Map<string,unknown[]>();
+ try{
+  const {bankAccountConsentSnapshot}=await import('./bankgiro-service');
+  for(const account of accounts){const current=await bankAccountConsentSnapshot(owner,account),values=consentFields.map(field=>current[field]);if(values.some(value=>typeof value!=='string'||!value))throw changedConsent();snapshots.set(JSON.stringify(values),values);}
+ }catch{throw changedConsent();}
+ const match=[...snapshots].map(()=>`EXISTS(SELECT 1 FROM bank_connections WHERE ${consentFields.map(field=>field+'=?').join(' AND ')} AND julianday(valid_until)>julianday('now'))`).join(' AND ');
+ const fence=database.prepare(`UPDATE workspaces SET payload=NULL WHERE owner=? AND revision=? AND NOT (${match})`).bind(owner,revision,...[...snapshots.values()].flat());
+ try{return (await database.batch([fence,...statements])).slice(1);}
+ catch(error){if(/NOT NULL constraint failed:\s*workspaces\.payload/i.test(String(error)))throw changedConsent();throw error;}
 }

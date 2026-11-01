@@ -5,7 +5,7 @@ import {connection,accounts} from './banking/store';
 import {stableAccountKey} from './banking/transactions';
 
 async function activeAccounts(owner:string){
- const conn=await connection(owner);if(!conn)throw Error('En aktiv ägarbunden bankanslutning behövs för att kontrollera mottagarkontot.');
+ const current=await connection(owner),conn=current?{...current}:null;if(!conn)throw Error('En aktiv ägarbunden bankanslutning behövs för att kontrollera mottagarkontot.');
  const {application}=await import('./banking/store'),app=await application(owner);
  if(!app||conn.owner!==owner||app.owner!==owner||conn.status!=='connected'||conn.environment!=='PRODUCTION'||app.generation!==conn.app_generation||!(Date.parse(conn.valid_until)>Date.now()))throw Error('En aktiv ägarbunden bankanslutning behövs för att kontrollera mottagarkontot.');
  const selected=JSON.parse(conn.selected_accounts);if(!Array.isArray(selected))throw Error('Bankens valda mottagarkonto behöver granskas.');
@@ -13,7 +13,14 @@ async function activeAccounts(owner:string){
 }
 /** Stored consent/account resources only. This never contacts the bank provider. */
 export async function bankgiroAutomaticAccountIssue(owner:string,account:string){
- try{const {conn,selected,available}=await activeAccounts(owner);return available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account)).length===1?'':'Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.';}catch{return 'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.';}
+ try{const {conn,selected,available}=await activeAccounts(owner);return available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account)).length===1?'':'Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.';}catch{return 'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före nya betalningskopplingar.';}
+}
+/** Capture exactly the stored consent whose decoded account resource was checked.
+ * The financial writer compares it again inside its atomic D1 batch. */
+export async function bankAccountConsentSnapshot(owner:string,account:string){
+ const {conn,selected,available}=await activeAccounts(owner);
+ if(available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account)).length!==1)throw Error('Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.');
+ return conn;
 }
 async function resolveAccounts(owner:string,rows:any[]){
  let context:Awaited<ReturnType<typeof activeAccounts>>;try{context=await activeAccounts(owner);}catch{return rows.map(row=>({...row,bankgiroAccountIssue:'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.'}));}

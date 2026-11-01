@@ -4,9 +4,10 @@ import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
+import {syntheticAccountService} from './helpers/bank-account-fixture.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const url=p=>pathToFileURL(root+p).href,data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
-function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(root+path,'utf8'),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(value));return data(code);}
+function compiled(path,imports){if(path==='lib/reconciliation-evidence.ts')imports={'./bankgiro-service':syntheticAccountService(),...imports};let code=stripTypeScriptTypes(readFileSync(root+path,'utf8'),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(value));return data(code);}
 const domain=url('lib/domain.ts'),engine=url('lib/reconciliation-engine.js');
 const {emptyState,applyCommand,balance,invoicePaymentEvidenceIssue,hasValidAbsenceCheck,paymentOriginalIssue}=await import(domain);
 const reconciliation=compiled('lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});

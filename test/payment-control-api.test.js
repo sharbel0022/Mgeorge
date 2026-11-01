@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {storeTransactions,listTransactions} from '../src/db.js';
-import {withSyntheticBankOriginal} from './bank-fixtures.js';
+import {storeTransactions,listTransactions,allocate} from '../src/db.js';
+import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixtures.js';
 const dir=mkdtempSync(join(tmpdir(),'mg-payment-control-'));
 Object.assign(process.env,{NODE_ENV:'test',APP_ORIGIN:'http://localhost:3000',DB_PATH:join(dir,'test.sqlite'),SESSION_SECRET:'1'.repeat(64),BANK_DATA_KEY:'2'.repeat(64)});
 for(const key of Object.keys(process.env))if(/^(GOOGLE_|ENABLE_BANKING_|ENABLEBANKING_|MG_ADMIN_PASSWORD)/.test(key))delete process.env[key];
@@ -47,11 +47,14 @@ test('new UI assets are served with the existing restrictive content security po
   }
 });
 
-test('allocation timestamp or a free note does not verify a payment without its original',async()=>{
+test('missing original blocks new API allocation while legacy booking and free note remain unverified',async()=>{
   const invoice=(await call('/api/invoices','POST',{direction:'customer',invoice_number:'CHECKED-2',party:'Synthetic Partial',total_cents:10000,reference:'CHECKED-2'})).json;
   await call('/api/bank-transactions','POST',{account:'Test',booked_at:'2026-10-28',amount_cents:2500,payer:'Synthetic Partial',reference:'CHECKED-2'});
   const transaction=(await call('/api/bank-transactions')).json.items.find(t=>t.reference==='CHECKED-2');
-  assert.equal((await call('/api/allocations','POST',{invoice_id:invoice.id,transaction_id:transaction.id,amount_cents:2500,confirm:true})).res.status,201);
+  assert.equal((await call('/api/allocations','POST',{invoice_id:invoice.id,transaction_id:transaction.id,amount_cents:2500,confirm:true})).res.status,409);
+  assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations WHERE invoice_id=?').get(invoice.id).n,0);
+  // Seed an already booked legacy decision to exercise preservation, not the new HTTP gate.
+  allocate(db,invoice.id,transaction.id,2500);
   const stored=db.prepare('SELECT reconciled_at,reconciliation_note FROM invoices WHERE id=?').get(invoice.id);
   assert.ok(stored.reconciled_at);assert.equal(stored.reconciliation_note,'');
   assert.equal((await call('/api/payment-control/overview')).json.totals.verified_outstanding_cents,0);
@@ -65,7 +68,9 @@ test('allocation timestamp or a free note does not verify a payment without its 
 });
 test('current bank original and separate absence review support a verified remaining balance',async()=>{
   const invoice=(await call('/api/invoices','POST',{direction:'customer',invoice_number:'CHECKED-ORIGINAL',party:'Synthetic Original',total_cents:10000,reference:'CHECKED-ORIGINAL'})).json;
-  storeTransactions(db,[withSyntheticBankOriginal({account:'MG',booked_at:'2026-10-28',amount_cents:2500,currency:'SEK',payer:'Synthetic Original',reference:'CHECKED-ORIGINAL',bank_reference:'SYNTHETIC-CONTROL-ORIGINAL'})],'enablebanking');
+  approveSyntheticBankAccount(db,'SE4280000890119146168423');
+  db.prepare("UPDATE bank_connections SET owner='local-admin'").run();
+  storeTransactions(db,[withSyntheticBankOriginal({account:'SE4280000890119146168423',booked_at:'2026-10-28',amount_cents:2500,currency:'SEK',payer:'Synthetic Original',reference:'CHECKED-ORIGINAL',bank_reference:'SYNTHETIC-CONTROL-ORIGINAL'})],'enablebanking');
   const transaction=listTransactions(db).find(t=>t.reference==='CHECKED-ORIGINAL');
   assert.equal((await call('/api/allocations','POST',{invoice_id:invoice.id,transaction_id:transaction.id,amount_cents:2500,confirm:true})).res.status,201);
   assert.equal((await call('/api/invoices','PATCH',{id:invoice.id,reconciled:true,confirm:true,reconciliation_note:'Synthetic original and period independently checked'})).res.status,200);

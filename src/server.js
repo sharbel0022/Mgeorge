@@ -577,7 +577,15 @@ async function route(req,res){
   if(path==='/api/allocations'&&req.method==='GET')return json(res,200,{items:db.prepare('SELECT * FROM allocations ORDER BY confirmed_at DESC').all()});
   if(path==='/api/allocations'&&req.method==='POST'){
     const b=await readBody(req);if(b.confirm!==true)throw bad(400,'Matchning måste bekräftas manuellt');
-    try{allocate(db,requiredString(b.invoice_id,'Faktura-ID'),requiredString(b.transaction_id,'Bankhändelse-ID'),Number(b.amount_cents));}catch(e){if(e.status)throw e;throw bad(400,/UNIQUE/.test(e.message)?'Den här matchningen finns redan':e.message);}
+    const invoiceId=requiredString(b.invoice_id,'Faktura-ID'),transactionId=requiredString(b.transaction_id,'Bankhändelse-ID');
+    db.exec('BEGIN IMMEDIATE');
+    try{
+      assertSessionStillAuthorized(req);
+      const transaction=reconciliationData(db,{owner:req.principal}).transactions.find(t=>t.id===transactionId);
+      if(!transaction?.original_verified)throw bad(409,'Ett bevarat och verifierbart bankoriginal krävs före en ny fakturaallokering.');
+      if(transaction.account_consent_issue)throw bad(409,transaction.account_consent_issue);
+      allocate(db,invoiceId,transactionId,Number(b.amount_cents),{transactionOpen:true});db.exec('COMMIT');
+    }catch(e){db.exec('ROLLBACK');if(e.status)throw e;throw bad(400,/UNIQUE/.test(e.message)?'Den här matchningen finns redan':e.message);}
     return json(res,201,{ok:true});
   }
   if(path==='/api/allocations'&&req.method==='DELETE'){

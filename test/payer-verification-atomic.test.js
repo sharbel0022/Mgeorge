@@ -5,16 +5,17 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {openDatabase,storeTransactions,listInvoices} from '../src/db.js';
 import {verifyPayer,runReconciliation} from '../src/reconciliation.js';
-import {withSyntheticBankOriginal} from './bank-fixtures.js';
+import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixtures.js';
 
 function fixture(t){
   const folder=mkdtempSync(join(tmpdir(),'mg-payer-atomic-')),db=openDatabase(join(folder,'synthetic.sqlite'));
   t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
+  approveSyntheticBankAccount(db,'SE4280000890119146168423');
   db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('invoice','customer','SYN-1','Synthetic customer AB',10000,'000018','2026-10-01');
-  storeTransactions(db,[withSyntheticBankOriginal({account:'synthetic-account',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Synthetic private payer',reference:'000018',bank_reference:'SYNTHETIC-BANK-1'})],'enablebanking');
+  storeTransactions(db,[withSyntheticBankOriginal({account:'SE4280000890119146168423',booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer:'Synthetic private payer',reference:'000018',bank_reference:'SYNTHETIC-BANK-1'})],'enablebanking');
   return db;
 }
-const evidence={invoice_id:'invoice',payer:'Synthetic private payer',account:'synthetic-account',evidence:'Customer confirmed the synthetic payer relationship'};
+const evidence={invoice_id:'invoice',payer:'Synthetic private payer',account:'SE4280000890119146168423',evidence:'Customer confirmed the synthetic payer relationship'};
 
 for(const existing of [false,true])test(`payer verification audit failure rolls back ${existing?'an existing relationship update':'a new relationship'}`,t=>{
   const db=fixture(t);

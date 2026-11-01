@@ -15,7 +15,8 @@ function invoice(db,id='i',extra={}){
   db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,vat_cents,net_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?,?,?)').run(x.id,'customer',x.number,x.party,x.total,62500,250000,x.number,'2026-01-01');return x.id;
 }
 function pay(db,extra={},source='enablebanking'){
-  storeTransactions(db,[withSyntheticBankOriginal({account:'MG',booked_at:'2026-10-26',amount_cents:312500,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:'B1',...extra})],source);
+  if(!db.prepare('SELECT id FROM bank_connections LIMIT 1').get())approveSyntheticBankAccount(db,syntheticAccount);
+  storeTransactions(db,[withSyntheticBankOriginal({account:syntheticAccount,booked_at:'2026-10-26',amount_cents:312500,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:'B1',...extra})],source);
   return db.prepare('SELECT id FROM bank_transactions WHERE bank_reference=?').get(extra.bank_reference||'B1').id;
 }
 const analyze=db=>analyzeReconciliation(reconciliationData(db));
@@ -44,7 +45,7 @@ test('wrong and missing references, unknown payer and ambiguous invoices remain 
 });
 test('explicitly verified private payer linkage supports future matching',t=>{
   const db=fixture(t);invoice(db);pay(db,{payer:'Anna Andersson'});assert.equal(analyze(db)[0].safe,false);
-  verifyPayer(db,{invoice_id:'i',payer:'Anna Andersson',account:'MG',evidence:'Kunden bekräftade betalaren'},'admin');runReconciliation(db);assert.equal(listInvoices(db)[0].status,'paid');
+  verifyPayer(db,{invoice_id:'i',payer:'Anna Andersson',account:syntheticAccount,evidence:'Kunden bekräftade betalaren'},'admin');runReconciliation(db);assert.equal(listInvoices(db)[0].status,'paid');
 });
 test('overpayment leaves traceable excess and two separate payments require duplicate review',t=>{
   const db=fixture(t);invoice(db);pay(db,{amount_cents:350000});runReconciliation(db);assert.equal(listTransactions(db)[0].available_cents,37500);assert.equal(listInvoices(db)[0].paid_cents,312500);

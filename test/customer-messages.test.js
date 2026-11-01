@@ -6,16 +6,17 @@ import {join} from 'node:path';
 import {openDatabase,storeTransactions,allocate,listInvoices} from '../src/db.js';
 import {runReconciliation} from '../src/reconciliation.js';
 import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend,validRecipient} from '../src/customer-messages.js';
-import {withSyntheticBankOriginal} from './bank-fixtures.js';
+import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixtures.js';
 
 function fixture(t){
   const folder=mkdtempSync(join(tmpdir(),'mg-messages-')),db=openDatabase(join(folder,'db.sqlite'));t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
+  approveSyntheticBankAccount(db,'SE4280000890119146168423');
   db.prepare("INSERT INTO invoices(id,direction,invoice_number,party,total_cents,vat_cents,net_cents,reference,due_at) VALUES('i','customer','0597','Kund AB',312500,62500,250000,'0597','2000-01-01')").run();
   verifyContact(db,{invoice_id:'i',email:'kund@example.com',evidence:'Bekräftat i kundavtal'},'admin');
   return db;
 }
 function payment(db,amount=250000,reference='B1'){
-  storeTransactions(db,[withSyntheticBankOriginal({account:'MG',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:reference})],'enablebanking');runReconciliation(db);prepareMessages(db);
+  storeTransactions(db,[withSyntheticBankOriginal({account:'SE4280000890119146168423',booked_at:'2026-10-26',amount_cents:amount,currency:'SEK',payer:'Kund AB',reference:'0597',bank_reference:reference})],'enablebanking');runReconciliation(db);prepareMessages(db);
 }
 function draft(db){prepareMessages(db);return listMessages(db).find(m=>m.status==='draft');}
 function review(db,m){return reviewMessage(db,m.id,m.version,'admin','session');}

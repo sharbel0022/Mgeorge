@@ -1,4 +1,5 @@
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
+import {syntheticAccountService,retainSyntheticConsent} from './helpers/bank-account-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -12,7 +13,7 @@ const domain=url('../lib/domain.ts'),reconciliation=compiled('../lib/reconciliat
 const xml='<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><IBAN>SE4280000890119146168423</IBAN></Id></Acct><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AcctSvcrRef>QUALITY-ORIGINAL-BATCH</AcctSvcrRef><NtryDtls><TxDtls><Refs><TxId>QUALITY-ORIGINAL-CHILD</TxId></Refs><RltdPties><Dbtr><Nm>Synthetic customer AB</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>000018</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>';
 async function fixture(t,mode='valid'){
  const key='__quality_original_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
- sql.exec('CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);');
+ sql.exec('CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT NOT NULL,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);');retainSyntheticConsent(sql);
  t.after(()=>{sql.close();delete globalThis[key];});
  const DB={prepare(statement){return{bind(...args){return{async first(){return sql.prepare(statement).get(...args)||null;},async all(){return{results:sql.prepare(statement).all(...args)};},async run(){return{meta:{changes:sql.prepare(statement).run(...args).changes}};}};}};},async batch(statements){sql.exec('BEGIN');try{const rows=[];for(const statement of statements)rows.push(await statement.run());sql.exec('COMMIT');return rows;}catch(error){sql.exec('ROLLBACK');throw error;}}};
  const bytes=new TextEncoder().encode(xml),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex'),objects=new Map([['synthetic-owner/original',bytes]]),f={sql,objects,reads:0,env:{DB,BUCKET:{async get(id){f.reads++;const bytes=objects.get(id);return bytes?{size:bytes.length,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)}:null;}}}};
@@ -24,7 +25,7 @@ async function fixture(t,mode='valid'){
  state=applyCommand(state,{type:'bankgiro.import',documentId:'original',hash,name:'Synthetic.xml',rows:parseBankgiroXML(xml)}).state;
  sql.prepare('INSERT INTO workspaces VALUES(?,?,?,?)').run('synthetic-owner',1,JSON.stringify(state),'2026-10-30');
  const server=compiled('../lib/server.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/app/chatgpt-auth':data('export async function getChatGPTUser(){return {userId:"synthetic-owner"};}'),'./domain':domain});
- const evidence=compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')});
+ const evidence=compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':url('../lib/reconciliation-engine.js'),'./bankgiro-service':syntheticAccountService()});
  const route=await import(compiled('../app/api/state/route.ts',{'@/lib/server':server,'@/lib/domain':domain,'@/lib/reconciliation-evidence':evidence,'@/lib/bankgiro-service':data('export async function readBankgiroOriginal(){throw Error("Unused");}'),'@/lib/customer-messages':data('export async function reconcileAndPrepare(){}'),'@/lib/bankgiro-invoice-search':data('export async function searchBankgiroInvoice(){}')}));
  return {...f,state,evidence:await import(evidence),bytes,async post(command={type:'settings.save',name:'Synthetic company',email:'synthetic@example.test'},revision=1){const response=await route.POST(new Request('https://mg.test/api/state',{method:'POST',headers:{Origin:'https://mg.test','Content-Type':'application/json'},body:JSON.stringify({revision,requestId:crypto.randomUUID(),command})}));return {response,body:await response.json()};},readCount:()=>f.reads};
 }

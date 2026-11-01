@@ -18,7 +18,7 @@ function apiOriginal(db,t){
   // Use the same complete fact, reference, parent and conflict verification as
   // reconciliation. A source relation must never introduce a weaker receipt.
   const verified=reconciliationData(db).transactions.find(row=>row.id===t.id);
-  if(!parsed||!verified?.verified||bankFinancialReview(verified)||parsed.description!==t.description||JSON.stringify(parsed.payer_evidence)!==JSON.stringify(JSON.parse(t.payer_evidence))||JSON.stringify(parsed.reference_evidence)!==JSON.stringify(JSON.parse(t.reference_evidence)))throw Error();
+  if(!parsed||!verified?.original_verified||bankFinancialReview(verified)||parsed.description!==t.description||JSON.stringify(parsed.payer_evidence)!==JSON.stringify(JSON.parse(t.payer_evidence))||JSON.stringify(parsed.reference_evidence)!==JSON.stringify(JSON.parse(t.reference_evidence)))throw Error();
   if(t.parent_bank_reference||t.bank_reference&&db.prepare('SELECT id FROM bank_transactions WHERE id<>? AND account=? AND parent_bank_reference=? AND excluded=0 LIMIT 1').get(t.id,t.account,t.bank_reference))throw Error();
   return raw;
  }catch{throw fail('Bankoriginalet eller dess härledda uppgifter kan inte verifieras.');}

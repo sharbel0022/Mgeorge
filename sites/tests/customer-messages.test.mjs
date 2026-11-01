@@ -1,4 +1,5 @@
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
+import {syntheticConnection,retainSyntheticConsent} from './helpers/bank-account-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
@@ -23,12 +24,13 @@ async function fixture(t){
   const key='__messages_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
   for(const file of readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())sql.exec(read('../drizzle/'+file));
   const f={sql,objects:new Map(),owner:'owner-alice',user:{userId:'owner-alice'},key:randomToken(),posts:0,profileCalls:0,timeout:false,wrongAccount:false,cookie:'',env:{GOOGLE_CLIENT_ID:'synthetic',GOOGLE_CLIENT_SECRET:'synthetic',GMAIL_ACCOUNT:'mg.vitvaror@gmail.com'}};
+  f.bankConnection=retainSyntheticConsent(sql,syntheticConnection(f.owner));
   f.d1=new LocalD1(sql);globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
   f.env.DB=f.d1;f.env.BUCKET={async get(id){const bytes=f.objects.get(id);return bytes?{size:bytes.length,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)}:null;}};
   const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`),securityUrl=new URL('../lib/banking/security.ts',import.meta.url).href;
   const originalServer=moduleUrl('../lib/server.ts',{'cloudflare:workers':cf,'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return ${reference}.user;}`),'./domain':domainUrl});
   const server=data(`export {readBankOriginalBytes} from ${JSON.stringify(originalServer)};import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(b,status=200)=>Response.json(b,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(owner);return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
-  const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const encrypt=(o,p,v)=>seal(f.key,o,p,v);export const decrypt=(o,p,v)=>unseal(f.key,o,p,v);export async function application(owner){return {owner,generation:'synthetic-generation'};}export async function connection(owner){return {owner,status:'connected',environment:'PRODUCTION',app_generation:'synthetic-generation',valid_until:'2099-01-01T00:00:00Z',selected_accounts:'["selected"]',bank_name:'Swedbank',country:'SE'};}export async function accounts(){return [{uid:'selected',currency:'SEK',account_id:{iban:'SE4280000890119146168423'}}];}`);
+  const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const encrypt=(o,p,v)=>seal(f.key,o,p,v);export const decrypt=(o,p,v)=>unseal(f.key,o,p,v);export async function application(owner){return {owner,generation:'synthetic-generation'};}export async function connection(){return {...f.bankConnection};}export async function accounts(){return JSON.parse(f.bankConnection.encrypted_accounts);}`);
   const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf});
   const bankgiro=moduleUrl('../lib/bankgiro-service.ts',{'./server':server,'./domain':domainUrl,'./bankgiro-parser.js':new URL('../lib/bankgiro-parser.js',import.meta.url).href,'./banking/store':store,'./banking/transactions':data('export function stableAccountKey(account){return "iban:"+account.account_id.iban;}')});
   const evidence=moduleUrl('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domainUrl,'./reconciliation':reconciliationUrl,'./reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href,'./bankgiro-service':bankgiro});
@@ -50,7 +52,7 @@ async function fixture(t){
     async queue(){await f.api.reconcileAndPrepare(f.owner);return (await f.api.messageList(f.owner)).items;},
     async review(m){return f.call('review',{id:m.id,version:m.version});},
     async send(m,r){return f.call('send',{id:m.id,version:m.version,review_id:r.review_id,approve:true});},
-    pay(amount=250000,extra={}){let s=f.state();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount,party:'Kund AB',payerReference:'0597',bankReference:crypto.randomUUID(),kind:'unknown',source:'Enable Banking',account:'MG',...extra})]}).state;f.put(s);},
+    pay(amount=250000,extra={}){let s=f.state();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount,party:'Kund AB',payerReference:'0597',bankReference:crypto.randomUUID(),kind:'unknown',source:'Enable Banking',account:'iban:SE4280000890119146168423',...extra})]}).state;f.put(s);},
     init(){f.put(state);},
   });
 }
@@ -178,7 +180,7 @@ test('reject is persistent and reconciliation never sends messages',async t=>{
 });
 test('a complete Bankgiro specification replaces its parent without double counting',async t=>{
   // Model an internally reparsed synthetic bank original, not an arbitrary browser document ID.
-  const f=await fixture(t);f.init();const hash=await f.retainOriginal('synthetic-bank-file',{amount:312500,party:'Kund AB',payerReference:'0597',bankReference:'CHILD',parentBankReference:'PARENT',account:'Swedbank'});let s=f.state();s=applyCommand(s,{type:'transactions.import',documentId:'synthetic-bank-file',trustedBankFileImport:true,hash,rows:[{key:'parent',date:'2026-10-26',amount:312500,kind:'batch',bankReference:'PARENT',source:'bank.xml'}, {parentKey:'parent',date:'2026-10-26',amount:312500,kind:'payment',verified:true,party:'Kund AB',payerReference:'0597',bankReference:'CHILD',externalId:'child',source:'bank.xml'}]}).state;
+  const f=await fixture(t);f.init();const hash=await f.retainOriginal('synthetic-bank-file',{amount:312500,party:'Kund AB',payerReference:'0597',bankReference:'CHILD',parentBankReference:'PARENT',account:'iban:SE4280000890119146168423'});let s=f.state();s=applyCommand(s,{type:'transactions.import',documentId:'synthetic-bank-file',trustedBankFileImport:true,hash,rows:[{key:'parent',account:'iban:SE4280000890119146168423',date:'2026-10-26',amount:312500,kind:'batch',bankReference:'PARENT',source:'bank.xml'}, {parentKey:'parent',account:'iban:SE4280000890119146168423',date:'2026-10-26',amount:312500,kind:'payment',verified:true,party:'Kund AB',payerReference:'0597',bankReference:'CHILD',externalId:'child',source:'bank.xml'}]}).state;
   s=applyCommand(s,{type:'transaction.verify',id:s.transactions.find(t=>t.parentId).id,note:'Syntetiskt bankoriginal: konto, datum, riktning och kund kontrollerade'}).state;f.put(s);await f.queue();assert.equal(paid(f.state(),f.state().invoices[0].id),312500);assert.equal(f.state().allocations.length,1);assert.equal(f.state().transactions[0].kind,'batch');
 });
 test('API and bank file representations remain one economic payment',async t=>{

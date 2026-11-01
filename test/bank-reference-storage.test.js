@@ -63,7 +63,8 @@ test('additive original hash migration retains historical bytes and import ident
 test('API SHA migration hashes retained originals atomically while missing originals stay unverified',t=>{
   const folder=mkdtempSync(join(tmpdir(),'mg-api-hash-upgrade-')),path=join(folder,'db.sqlite');let db=openDatabase(path);
   t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
-  const genuine=normalizeBankApiTransaction(raw(),'MG'),missing=normalizeBankApiTransaction(raw({entry_reference:'MISSING-ORIGINAL'}),'MG');delete missing.raw_bank_data;
+  approveSyntheticBankAccount(db,syntheticAccount);
+  const genuine=normalizeBankApiTransaction(raw(),syntheticAccount),missing=normalizeBankApiTransaction(raw({entry_reference:'MISSING-ORIGINAL'}),syntheticAccount);delete missing.raw_bank_data;
   storeTransactions(db,[genuine,missing],'enablebanking');const before=listTransactions(db);
   db.exec('ALTER TABLE bank_transactions DROP COLUMN raw_bank_data_sha256;');db.close();db=openDatabase(path);
   const transactions=reconciliationData(db).transactions;
@@ -97,7 +98,7 @@ test('V4 claimed bank, report, message, namespace and value date survive separat
 
 test('V4 API references, candidates, party IDs and classification must match the hashed bank original',t=>{
   for(const change of ['reference','candidates','aggregate','organization','bankgiro','payer_bankgiro','parent_bank_reference']){
-    const db=fixture(t),payment=normalizeBankApiTransaction(raw({reference_number:'000018',details:{invoice_number:'000019'}}),'MG');storeTransactions(db,[payment],'enablebanking');
+    const db=fixture(t);approveSyntheticBankAccount(db,syntheticAccount);const payment=normalizeBankApiTransaction(raw({reference_number:'000018',details:{invoice_number:'000019'}}),syntheticAccount);storeTransactions(db,[payment],'enablebanking');
     const saved=listTransactions(db)[0];assert.equal(reconciliationData(db).transactions[0].verified,true);
     if(change==='reference')db.prepare('UPDATE bank_transactions SET reference=? WHERE id=?').run('000020',saved.id);
     if(change==='aggregate')db.prepare('UPDATE bank_transactions SET is_aggregate=1 WHERE id=?').run(saved.id);

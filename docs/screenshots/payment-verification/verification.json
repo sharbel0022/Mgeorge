@@ -1,0 +1,18 @@
+{
+  "scope": "Actual PaymentVerificationReport component and global CSS in temporary synthetic server page; no production calls or authentication in this browser test.",
+  "desktop": {
+    "accountOpen": true,
+    "documentWidth": 1425,
+    "steps": 11,
+    "width": 1440
+  },
+  "mobile": {
+    "detailsCount": 11,
+    "documentWidth": 375,
+    "openAccount": true,
+    "steps": 11,
+    "width": 390
+  },
+  "keyboardOpen": true,
+  "keyboardClose": true
+}

@@ -1,6 +1,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtempSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {request} from 'node:http';
+import {storeTransactions,listTransactions} from '../src/db.js';
+import {approveSyntheticBankAccount,withSyntheticBankOriginal} from './bank-fixtures.js';
 const folder=mkdtempSync(join(tmpdir(),'mgeorge-api-'));
 process.env.NODE_ENV='test';process.env.APP_ORIGIN='http://localhost:3000';process.env.DB_PATH=join(folder,'db.sqlite');
 delete process.env.MG_ADMIN_PASSWORD;
@@ -38,8 +40,14 @@ test('new invoice, payment and matching via API',async()=>{
   assert.equal(tx.json.imported,1);
   const id=(await call('/api/bank-transactions')).json.items[0].id;
   assert.equal((await call('/api/allocations','POST',{invoice_id:invoiceId,transaction_id:id,amount_cents:187500,confirm:false})).res.status,400);
-  assert.equal((await call('/api/allocations','POST',{invoice_id:invoiceId,transaction_id:id,amount_cents:187500,confirm:true})).res.status,201);
-  assert.equal((await call('/api/invoices')).json.items[0].status,'paid');
+  assert.equal((await call('/api/allocations','POST',{invoice_id:invoiceId,transaction_id:id,amount_cents:187500,confirm:true})).res.status,409,'Manual confirmation does not replace a bank original.');
+  const account='SE4280000890119146168423';approveSyntheticBankAccount(db,account);db.prepare("UPDATE bank_connections SET owner='local-admin'").run();
+  storeTransactions(db,[withSyntheticBankOriginal({account,booked_at:'2026-10-26',amount_cents:187500,currency:'SEK',payer:'Kund AB',reference:'0604',bank_reference:'SYNTHETIC-API-ORIGINAL'})],'enablebanking');
+  const original=listTransactions(db).find(t=>t.bank_reference==='SYNTHETIC-API-ORIGINAL');
+  assert.equal((await call('/api/allocations','POST',{invoice_id:invoiceId,transaction_id:original.id,amount_cents:187500,confirm:true})).res.status,201);
+  const recorded=(await call('/api/invoices')).json.items[0];
+  assert.equal(recorded.status,'paid');assert.equal(recorded.payment_evidence_issue,'');
+  assert.equal(recorded.paid_cents,187500);assert.equal(recorded.remaining_cents,0);
   assert.equal((await call('/api/dashboard')).json.customer_paid_cents,187500);
 });
 test('preview and import are separate and deduplicate repeated bank files',async()=>{

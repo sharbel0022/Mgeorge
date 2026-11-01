@@ -1,0 +1,651 @@
+{
+  "schema": "synthetic-bank-matching-benchmark-v2",
+  "generated_at": "2026-11-01T20:57:41.845Z",
+  "source": {
+    "root": "C:\\Users\\sharbel\\Downloads\\Mgeorge\\.codex-work\\payment-verification\\baseline",
+    "revision": "fa524c2b3d06530d1b75b48df45ae14b28ab1182",
+    "dirty": true,
+    "stable_during_run": true,
+    "file_sha256": {
+      "src/db.js": "344d5cb629f48ba403ade05ad96817f057503506cdd86b47d3edcea0d70f71cf",
+      "src/importers.js": "f9962a43f7bec134231f437499978d5429beffe454272d8aa9684052e38f18dd",
+      "src/reconciliation.js": "7353ae245f35b7c6f4a497442d40a8b328f2e31f175aad13a0de15dca7bfa120",
+      "src/security.js": "8cc5b24c53016832e4c2bc272622da90dc33c0029b5ae3fc4f4e12eb37806423",
+      "src/bank-evidence.js": "67cc2899d24baf7edbc84cae12e980c8bb9cf55ad984d5018b4200a33310e1a9",
+      "src/payment-references.js": "57b6aabe5fbd8c6389e15d1391eb691c36949241c77270254bb3bff9f399a258",
+      "sites/lib/payment-references.js": "57b6aabe5fbd8c6389e15d1391eb691c36949241c77270254bb3bff9f399a258",
+      "sites/lib/payer-evidence.js": "9031830addf7abc16128ae31cf34b8be4a0eeb6971a936a57be2da1df0862c0b",
+      "sites/lib/camt-payer.js": "b7e20238eb628276bd98787237a2f5b9bb5234cc0ca20208d5030281fe06ff39",
+      "sites/lib/camt-xml.js": "93f72a958981645adf5e6bab24989f98c770eec75e0ab446f9b47bd0f83ec6cf",
+      "sites/lib/reference-evidence-compat.js": "3206b3ad9e120c2fb61074736227a21a5750879e79ca6c0937b76f30558203a7"
+    }
+  },
+  "runner_sha256": "aef1d9afc35b1163ffd3a5768108ee323f485b579c7d77eba98d1f74cc957085",
+  "corpus_sha256": "93776304aa2c152b4c291b2ccca9ac96d40a1b7fc4174876c17a620e7f5f45c5",
+  "scope": "Synthetic Node reconciliationData -> pure analyzeReconciliation -> atomic runReconciliation with real temporary SQLite and preserved synthetic bank originals. No live API or production evidence.",
+  "definitions": {
+    "false_verified_payer_acceptance": "An actual automatic allocation despite independently labelled unsafe payer evidence. This measures a false acceptance at the reconciliation boundary, not real-world bank identity verification.",
+    "false_verified_ocr_acceptance": "An actual automatic allocation despite independently labelled invalid or own-account OCR evidence. Company agreement validity is not inferred.",
+    "processing_time": "Measured parse/normalise/store plus retained-original verification, analysis and atomic reconciliation per input bank payment attempt. DB creation, invoice/history fixture setup, network, and rejected-original cases are excluded. Small local single-pass sample; not a production SLA.",
+    "automatic": "At least one new allocation at the real reconciliation boundary.",
+    "manual_rate": "Cases without automatic allocation divided by evaluated persisted-payment cases; rejected originals and setup errors are reported separately.",
+    "truth": "Fixed case outcomes in bank-matching-corpus.js; this is a bounded regression benchmark, not a production error-rate estimate."
+  },
+  "metrics": {
+    "unsafe_payer_cases": 6,
+    "false_verified_payer_acceptances": 0,
+    "unsafe_ocr_cases": 3,
+    "false_verified_ocr_acceptances": 0,
+    "processing_samples": 22,
+    "input_payment_attempts": 27,
+    "processing_total_ms": 96.60109999999963,
+    "processing_mean_ms_per_payment": 3.5778185185185047,
+    "cases": 23,
+    "evaluated_payment_cases": 22,
+    "expected_automatic": 5,
+    "automatic_true_positives": 5,
+    "automatic_false_positives": 0,
+    "automatic_false_negatives": 0,
+    "automatic_precision": 1,
+    "automatic_recall": 1,
+    "manual_review_cases": 17,
+    "manual_rate": 0.7727272727272727,
+    "blocked_original_cases": 1,
+    "errors": 0,
+    "correct_cases": 23
+  },
+  "import_replay": {
+    "attempts": 2,
+    "first_imported": 1,
+    "repeated_imported": 0,
+    "repeated_duplicates": 1,
+    "stored_transactions": 1,
+    "allocations": 1,
+    "paid_cents": 10000
+  },
+  "aborted_import": {
+    "attempts": 1,
+    "rejected_imports": 1,
+    "rejection": "conflicting_bank_record",
+    "new_payment_rows": 0,
+    "stored_transactions": 1,
+    "conflict_records": 1
+  },
+  "cases": [
+    {
+      "id": "exact-api",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 10000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "correct"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 4.4033000000000015,
+        "evaluation_ms": 6.6363999999999805,
+        "total_ms": 11.039699999999982
+      }
+    },
+    {
+      "id": "exact-retained-file",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 10000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "correct"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 1.7487000000000137,
+        "evaluation_ms": 4.127399999999994,
+        "total_ms": 5.876100000000008
+      }
+    },
+    {
+      "id": "missing-payer",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": true,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "different_payer"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 1.115700000000004,
+        "evaluation_ms": 2.286699999999996,
+        "total_ms": 3.4024
+      }
+    },
+    {
+      "id": "missing-reference",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "missing_reference"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.9875000000000114,
+        "evaluation_ms": 2.4488000000000056,
+        "total_ms": 3.436300000000017
+      }
+    },
+    {
+      "id": "amount-only",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": true,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "unknown_payer"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.9177999999999997,
+        "evaluation_ms": 1.7904999999999518,
+        "total_ms": 2.7082999999999515
+      }
+    },
+    {
+      "id": "two-equal-open-invoices",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "missing_reference"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 1.165300000000002,
+        "evaluation_ms": 2.7321000000000026,
+        "total_ms": 3.8974000000000046
+      }
+    },
+    {
+      "id": "multiple-reference-owners",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 1.0255999999999972,
+        "evaluation_ms": 3.1464000000000283,
+        "total_ms": 4.1720000000000255
+      }
+    },
+    {
+      "id": "explicit-invalid-ocr",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": true
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 7.854600000000005,
+        "evaluation_ms": 2.1073000000000093,
+        "total_ms": 9.961900000000014
+      }
+    },
+    {
+      "id": "sebg-invalid-ocr",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": true
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.9583999999999833,
+        "evaluation_ms": 1.9321999999999662,
+        "total_ms": 2.8905999999999494
+      }
+    },
+    {
+      "id": "partial-payment",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 6000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "partial"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.8691000000000031,
+        "evaluation_ms": 2.7293999999999414,
+        "total_ms": 3.5984999999999445
+      }
+    },
+    {
+      "id": "overpayment",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 10000,
+      "available_cents": 2000,
+      "finding_kinds": [
+        "overpayment"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.9420999999999822,
+        "evaluation_ms": 3.21429999999998,
+        "total_ms": 4.156399999999962
+      }
+    },
+    {
+      "id": "explicit-refund",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "financial_review"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 2.2492999999999483,
+        "evaluation_ms": 2.7607000000000426,
+        "total_ms": 5.009999999999991
+      }
+    },
+    {
+      "id": "explicit-reversal",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "financial_review"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.9542000000000144,
+        "evaluation_ms": 2.012899999999945,
+        "total_ms": 2.9670999999999594
+      }
+    },
+    {
+      "id": "file-for-another-account",
+      "expected": "blocked",
+      "actual": "blocked",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 0,
+      "paid_cents": 0,
+      "available_cents": 0,
+      "finding_kinds": [],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.23419999999998709,
+        "evaluation_ms": 0.8206000000000131,
+        "total_ms": 1.0548000000000002
+      },
+      "rejection": "Bankfilens konto stämmer inte med det valda företagskontot."
+    },
+    {
+      "id": "unavailable-original",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "correct"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.8157999999999674,
+        "evaluation_ms": 1.5340000000001055,
+        "total_ms": 2.349800000000073
+      }
+    },
+    {
+      "id": "verified-historical-payer-link",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 2,
+      "paid_cents": 10000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "correct",
+        "possible_duplicate"
+      ],
+      "processing": {
+        "input_payments": 2,
+        "import_ms": 1.7089999999999463,
+        "evaluation_ms": 3.074299999999994,
+        "total_ms": 4.78329999999994
+      }
+    },
+    {
+      "id": "unverified-historical-payer-link",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": true,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 2,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "different_payer"
+      ],
+      "processing": {
+        "input_payments": 2,
+        "import_ms": 1.786600000000135,
+        "evaluation_ms": 2.317700000000059,
+        "total_ms": 4.104300000000194
+      }
+    },
+    {
+      "id": "duplicate-source-accounts",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 2,
+      "paid_cents": 0,
+      "available_cents": 20000,
+      "finding_kinds": [
+        "possible_duplicate"
+      ],
+      "processing": {
+        "input_payments": 2,
+        "import_ms": 1.695399999999836,
+        "evaluation_ms": 2.4944000000000415,
+        "total_ms": 4.189799999999877
+      }
+    },
+    {
+      "id": "two-payments-one-invoice",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 2,
+      "paid_cents": 0,
+      "available_cents": 20000,
+      "finding_kinds": [
+        "possible_duplicate"
+      ],
+      "processing": {
+        "input_payments": 2,
+        "import_ms": 1.6718000000000757,
+        "evaluation_ms": 2.262499999999818,
+        "total_ms": 3.9342999999998938
+      }
+    },
+    {
+      "id": "conflicting-payer-organization-identifiers",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": true,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "financial_review"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 1.2870000000000346,
+        "evaluation_ms": 2.230600000000095,
+        "total_ms": 3.5176000000001295
+      }
+    },
+    {
+      "id": "changed-typed-payer-identifier-on-replay",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": true,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "bank_evidence_conflict"
+      ],
+      "processing": {
+        "input_payments": 2,
+        "import_ms": 2.2885999999998603,
+        "evaluation_ms": 1.8432999999999993,
+        "total_ms": 4.13189999999986
+      }
+    },
+    {
+      "id": "customer-identifier-is-not-organization",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": true,
+        "unsafe_ocr_evidence": false
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "different_payer"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 1.0826999999999316,
+        "evaluation_ms": 2.302500000000009,
+        "total_ms": 3.3851999999999407
+      }
+    },
+    {
+      "id": "company-bankgiro-is-not-invoice-ocr",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "truth": {
+        "unsafe_payer_evidence": false,
+        "unsafe_ocr_evidence": true
+      },
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ],
+      "processing": {
+        "input_payments": 1,
+        "import_ms": 0.9067000000000007,
+        "evaluation_ms": 2.1814999999999145,
+        "total_ms": 3.0881999999999152
+      }
+    }
+  ]
+}

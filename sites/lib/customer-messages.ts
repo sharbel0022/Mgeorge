@@ -1,7 +1,7 @@
 import {db,identity,readWorkspace,response} from './server';
 import {uid,now,today,applyCommand,balance,hasValidAbsenceCheck,invoicePaymentEvidenceIssue,paymentEvidenceIssue,type State} from './domain';
 import {analyze,invoiceFacts,contactIdentity} from './reconciliation';
-import {reconcileWithOriginals} from './reconciliation-evidence';
+import {reconcileWithOriginals,writePaymentState} from './reconciliation-evidence';
 import {generateMessage,validRecipient} from './customer-message-text.js';
 import {digest,randomToken,cookieValue} from './banking/security';
 import {encrypt,decrypt} from './banking/store';
@@ -37,7 +37,7 @@ export async function reconcileAndPrepare(owner:string){
   if(result.decisions.length){
     if(new TextEncoder().encode(JSON.stringify(result.state)).length>1800000)throw error('Registret behöver utökad lagring innan fler automatiska matchningar sparas.');
     const at=now(),eventId=uid();
-    const batch=await db().batch([
+    const batch=await writePaymentState(owner,workspace.revision,workspace.state,result.state,db(),[
       db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(eventId,owner,workspace.revision+1,'automatic.reconciliation',JSON.stringify({decisions:result.decisions}),at,owner,workspace.revision),
       db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(result.state),at,owner,workspace.revision),
     ]);
