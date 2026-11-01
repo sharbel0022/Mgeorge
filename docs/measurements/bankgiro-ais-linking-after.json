@@ -1,9 +1,9 @@
 {
   "schema": "mgeorge-bankgiro-ais-linking-domain-v1",
   "phase": "after",
-  "measuredAt": "2026-11-01T14:41:17.264Z",
+  "measuredAt": "2026-11-01T14:45:12.307Z",
   "baselineCommit": "1b017c0a34821bdc04aa9ca3002765f78b2888b6",
-  "candidateCommit": "e01108bdc2c7c588e2e51d2fd04e2ffc617f70da",
+  "candidateCommit": "fda982e7f67749f7db8f4a79b8584fa2484bf4f6",
   "candidateWorktreeDirty": true,
   "corpusSha256": "b12046a67374a354b48b1f9262e31a1beec78f7e709c7bb122cbaeb11525f6d1",
   "facitSha256": "25816c22eddfc0ed6d911cff09b9eed9b0b4a230a49593b2172fe3c4f225c09b",
@@ -35,8 +35,8 @@
     "rejectedInvalidFiles": 2,
     "inputFileAttempts": 16,
     "successfulImportAttempts": 14,
-    "processingMs": 137.5171,
-    "msPerInputFileAttempt": 8.5948
+    "processingMs": 131.7871,
+    "msPerInputFileAttempt": 8.2367
   },
   "outcomes": [
     {

@@ -14,8 +14,8 @@
 | Dubblettkontroll / delbetalningar / historik / status | 8 → 8 | Samtidighet, återtag, avbrott, oförändrade allokeringar, separat ägarfiltrerad audit | Ingen ekonomisk dubblering reproducerades i startrevisionen; noll sådana rättningar påstås |
 | Säkerhet och åtkomstkontroll | 8,5 → 8,5 | Ägargränser, originalhash/version/omtolkning, CAS/SQLite-transaktion och reviderbart återtag | Bankmedgivandet läses ur bevarad konfiguration; ingen ny providerauktorisering görs |
 | Mobil / användbarhet | 8,5 / 8 → oförändrat | Verklig Chromium-komponentkontroll 1440/390 px, bekräftelse/återtag, ingen dokumentoverflow | Isolerade syntetiska minnesdata; full driftkedja separat |
-| Kodkvalitet och tester | 8,5 → 8,5 | 593/593 Node + 951/951 Sites, syntax89, TS/build; oberoende fynd reproducerade och rättade | Produktionsaudit0; full Sites16 moderate utvecklingsfynd, 0 high/critical |
-| Verifiering i verklig produktion | 6,5 → 6,5 | Behörig läsning fann ingen exakt faktura0599; inga betalnings-/kundrelationer ändrades | Kvitto/Sites-version kompletteras efter faktisk leverans |
+| Kodkvalitet och tester | 8,5 → 8,5 | 595/595 Node + 951/951 Sites, syntax89, TS/build; oberoende fynd reproducerade och rättade | Produktionsaudit0; full Sites16 moderate utvecklingsfynd, 0 high/critical |
+| Verifiering i verklig produktion | 6,5 → 6,5 | Sites41 succeeded, exakt kod-Actions green; autentiserad kandidat-/spärrkontroll och mobil390px, revision35 oförändrad | Ingen faktisk produktionskoppling; AIS-kvitto och faktura0599 saknas. [Leveranskvittot](docs/BANKGIRO-AIS-LINKING-PUBLICATION.json) |
 
 Övriga områden oförändrade. Ingen 9,5-poäng ges för syntetiska tester eller enbart ansluten integration.
 

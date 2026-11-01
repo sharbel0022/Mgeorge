@@ -39,9 +39,9 @@
 - [x] Root UI: failing presentation/detail regressions; show one linked main row, separate originals, candidates, explicit confirmation/revoke and source labels. Replace implicit provider fetch on detail open with explicit action.
 - [x] Measurement owner: run identical synthetic before/after corpus, counts and timings, map all 25 scenarios and honest limits in BANKGIRO-AIS-LINKING-IMPROVEMENT.md.
 - [x] Independent review and correction of significant findings, full Node/Sites CI commands including audits and build, browser desktop/mobile verification.
-- [ ] Refresh origin/main and integrate without overwriting concurrent work; commit/push main without force; verify Actions exact SHA.
-- [ ] Check backup/rollback and original deployment/policy/DB/R2/schedules; publish exact Sites source in existing project; verify version/deployment and authenticated read-only UI.
-- [ ] Update progress/scorecard and delivery receipt with actual results and remaining authentic-bank-evidence blockers.
+- [x] Refresh origin/main and integrate without overwriting concurrent work; commit/push main without force; verify Actions exact SHA.
+- [x] Check backup/rollback and original deployment/policy/DB/R2/schedules; publish exact Sites source in existing project; verify version/deployment and authenticated read-only UI.
+- [x] Update progress/scorecard and delivery receipt with actual results and remaining authentic-bank-evidence blockers.
 
 ## Execution record
 

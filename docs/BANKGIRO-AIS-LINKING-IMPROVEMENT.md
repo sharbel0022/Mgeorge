@@ -51,8 +51,8 @@ Korpus-SHA-256: `b12046a67374a354b48b1f9262e31a1beec78f7e709c7bb122cbaeb11525f6d
 | Korrekt oförändrad ekonomisk totalsumma / 15 | 15 | 15 | Rapportens reviewbelopp summeras inte som insättning |
 | Manuella bekräftelsebeslut | 0 | 10 | Bekräftelsekapacitet i syntetisk domän, ingen produktionsgranskning |
 | Lyckade återtag / 1 planerat | 0 | 1 | Historik och original bevarade |
-| Total behandlingstid, 16 filförsök | 136,4359 ms | 137,5171 ms | Engångsmätning utan SLA; ingen hastighetsförbättring sluts av skillnaden |
-| Tid per inkommande filförsök / 16 | 8,5272 ms | 8,5948 ms | Inklusive negativa filer, import, länk/återtag och domänavstämning |
+| Total behandlingstid, 16 filförsök | 124,3778 ms | 131,7871 ms | Engångsmätning utan SLA; ingen hastighetsförbättring sluts av skillnaden |
+| Tid per inkommande filförsök / 16 | 7,7736 ms | 8,2367 ms | Inklusive negativa filer, import, länk/återtag och domänavstämning |
 
 Mätningen använder faktisk XLSX-parser, Sites domänimport, relationskommandon, presentationsfunktioner och befintlig avstämningsmotor. Den omfattar **inte** autentiserad API-kontroll, aktivt bankmedgivande, live R2/D1, SQLite-lås, originaluppladdning, nätverk eller produktionssaldo. Startregister och fixturer skapas före tidtagningen. Node och backendgränser kräver separata integrationsprov. En syntetisk korrekt avsändare är inte verklig bankverifiering.
 
@@ -90,7 +90,7 @@ Tabellen pekar ut täckningen. Slutligt körkvitto och browser-/produktionsgrän
 
 ## Slutgrindar och drift
 
-Den ursprungliga rena baslinjen kördes: **578/578 Node och 912/912 Sites**. Fryst slutkod: **593/593 Node och 951/951 Sites**, inga fel eller hoppade tester, **89** syntaxkontrollerade filer, TypeScript och produktionsbygge godkända. Rena installationer gjordes i denna cykel; package-/lockfiler är oförändrade därefter. Rotens audit och Sites produktionsaudit har noll fynd; full Sites-audit behåller16 moderate utvecklingsfynd och0 high/critical. Obligatorisk high-grind passerar. Två kompletterade äldre testharnessar behövde realistiskt aktivt syntetiskt medgivande när den nya kontospärren infördes; befintliga affärsassertioner ändrades inte.
+Den ursprungliga rena baslinjen kördes: **578/578 Node och 912/912 Sites**. Fryst slutkod: **595/595 Node och 951/951 Sites**, inga fel eller hoppade tester, **89** syntaxkontrollerade filer, TypeScript och produktionsbygge godkända. Rena installationer gjordes i denna cykel; package-/lockfiler är oförändrade därefter. Rotens audit och Sites produktionsaudit har noll fynd; full Sites-audit behåller16 moderate utvecklingsfynd och0 high/critical. Obligatorisk high-grind passerar. Två kompletterade äldre testharnessar behövde realistiskt aktivt syntetiskt medgivande när den nya kontospärren infördes; befintliga affärsassertioner ändrades inte.
 
 Oberoende granskning gav verkliga röda regressioner och rättningar för fullständigt AIS-ankomstbevis i Node, återtag av stale relation, bibehållen verifierad/delbetald status, förfalskade nästlade rapportuppgifter och komplett rapport efter en tidigare delrapport. Metadata går inte via allokering/utkast. Öppning av detalj startar inte längre ett implicit skrivande provideranrop. Aktuellt kontomedgivande kontrolleras även innan äldre pendingrapporter får bli automatiskt ekonomiska individer.
 
@@ -105,3 +105,16 @@ Behörig läsning av hela `/api/state` i den befintliga webbläsarsessionen fann
 Förpublicering: befintligt projekt/Sites39, policy/auth/DB/R2 och tre schemans lägen lästa; arbetsyterevision35. Komplett backupmanifest191/191 original,191 verifierade kopior; bevarad JSON-kvittokontroll omfattar5 API-poster med kvitto och113 utan. Ingen återställning eller ny backupkörning gjord. Återgång är återpublicering av tidigare Sites39 samt normal Git-revert av kod; ingen destruktiv databasmigrering behövs i Sites och Node-tabell/kolumn är additiva. Exakt kodcommit/Actions och publiceringskvitto kompletteras efter faktisk leverans.
 
 Extern begränsning: rapportens löpnummer, generiska referens, datum och belopp är inte en gemensam stabil AIS-identitet. Automatiskt bankverifierad XLSX/AIS-koppling påstås inte färdig. Saknat eller motsägelsefullt AIS-ankomstkvitto får inte repareras genom att beräkna en ny historisk hash. Sådana fall ligger kvar som granskningskandidater med blockerande orsak. Autentiskt bank-/avtalsbevis och faktiskt tillåtet produktionsutfall återstår tills de verifierats separat.
+
+## Verifierad slutleverans
+
+- Kod på main: `fda982e7f67749f7db8f4a79b8584fa2484bf4f6`; [Actions41317590732](https://github.com/sharbel0022/Mgeorge/actions/runs/41317590732) success för båda jobb på exakt SHA. Tidigare implementatione01108b och dess Actions/publicering40 bevaras i kvittot.
+- **Sites41 succeeded**2026-11-01T14:46:39.980982Z. Källa `1f89b2fc820556f3f803529da4d1bcec7a01260e`, träd `f18602be3f3a2c1b104e5ddfbd30207b6f700670`, exakt samma som GitHubs `sites/`. [Publicerad bankvy](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/?view=bank).
+- Publiceringskopian behövde ren beroendeinstallation efter saknat XLSX-paket; därefter godkända TS/build och verifierad arkivpackning. En utgången kortlivad källbehörighet förnyades inom samma projekt. Första bytekopieringen normaliserades med Git-arkiv för att bevara exakt Git-träd över Windows-radslut. Inga runtimehemligheter ändrades.
+- Slutligt mätpar kördes om mot originalbasrevision1b017c0 och slutkoden, med samma runnerhash/korpus/facit. Git-checkout hade ändrat enbart runnerns radslut på Windows mellan de äldre körningarna; omkörningen undanröjer den hashskillnaden. Tidtabellen ovan gäller slutparet. Tidigare mätningar finns i Git-historiken; inga kundoriginal användes.
+- Två kompletterande riktiga SQLite-testfall: samma625kr-rapport som CSV+XLSX respektive stabil camt+XLSX bevarar två filoriginal och räknar en ekonomisk62500öre-insättning med noll allokeringar. Node-slutsviten är därför595/595; Sites951/951. Dessa är testtillägg, utan ändrad applikationskod eller nytt behov av Sites-publicering.
+- Autentiserad, enbart läsande driftkontroll: banklistan har exakt en relevant kandidattext och ett icke ekonomiskt granskningsunderlag. Detaljpanelen visar orsak om saknat AIS-kvitto, bevarat originallänk och spärrad bekräftelse. Mobilens faktiska klient-/dokumentbredd390/390px. Inget implicit bankdetaljanrop, inga verksamhetskopplingar eller originaluppladdningar gjordes.
+- Samma projekt, policy/auth, tre schemans ID/lägen, runtime9 och D1-tabeller. Oförändrat hosting-/migreringskällträd, bevarade DB/R2-bindningar; arbetsyterevision35 och ändringstid2026-11-01T14:04:55.157Z oförändrade efter bankdetaljen. D1-verktyget trunkerade payload; targeted browserläsning ersätter inte oberoende full ledgerberäkning.
+- Kvalitetsbetygen är oförändrade. Faktisk625kr-koppling väntar på intakt tillåtet AIS-kvitto, verifierad kontorelation och faktura/motpartsunderlag. Inga historiska bankfält eller fakturor ändrades. Denna leverans är säkert granskningsläge, inte färdig automatisk bankidentitet.
+
+Maskinläsbart kvitto och rollback: `BANKGIRO-AIS-LINKING-PUBLICATION.json`. Återgång till tidigare Sites39 är möjlig utan produktionsdatabasåterställning. Kompletterande tester och slutrapport skickas som separat dokumentationscommit; produktionskoden och Sites-trädet ovan är oförändrade.

@@ -7,13 +7,14 @@ import {openDatabase,storeTransactions,recordImport,listTransactions,allocate,li
 import {withSyntheticBankOriginal} from './bank-fixtures.js';
 import {makeBankgiroXLSX} from '../sites/tests/helpers/bankgiro-xlsx-fixture.mjs';
 import {encryptObject,digest} from '../src/security.js';
+import {parseBankFile} from '../src/importers.js';
 
 const module=await import('../src/bankgiro-links.js').catch(()=>({}));
 const account='SE4280000890119146168423',owner='synthetic-owner';
 function fixture(options={}){
  process.env.BANK_DATA_KEY='3'.repeat(64);delete process.env.ENCRYPTION_KEY;
  const directory=mkdtempSync(join(tmpdir(),'mgeorge-links-')),db=openDatabase(join(directory,'test.sqlite'));
- const tx=withSyntheticBankOriginal({account,booked_at:options.bankDate||'2026-10-26',amount_cents:62500,currency:'SEK',payer:'',reference:'',bank_reference:'SYNTHETIC-AIS-625',description:'Insättning'});
+ const tx=withSyntheticBankOriginal({account,booked_at:options.bankDate||'2026-10-26',amount_cents:62500,currency:'SEK',payer:'',reference:'',bank_reference:'SYNTHETIC-AIS-625',description:'Insättning',...(options.aggregate?{is_aggregate:true}:{})});
  storeTransactions(db,[tx],'enablebanking');
  db.prepare('INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status,selected_account_uid) VALUES(?,?,?,?,?,?,?,?,?)').run('connection','enablebanking','Syntetisk Bank',encryptObject({session_id:'synthetic'}),encryptObject([{uid:'account',account_id:{iban:account},currency:'SEK'}]),'2099-01-01',owner,'connected','account');
  const bytes=makeBankgiroXLSX({account:options.account??account,date:'2026-10-26',sequence:'83',payments:options.payments||[{party:'Syntetiskt Bistro AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}],...options.report});
@@ -23,6 +24,17 @@ function fixture(options={}){
 }
 const input=(f,report)=>({transaction_id:f.transaction_id,import_id:f.import_id,report_key:report.report_key,confirm:true,originals_checked:true,account_checked:true,evidence:'Syntetiska original och mottagarkonto kontrollerade.'});
 const counts=db=>({transactions:db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,allocations:db.prepare('SELECT COUNT(*) n FROM allocations').get().n,total:db.prepare('SELECT SUM(amount_cents) n FROM bank_transactions WHERE excluded=0').get().n});
+
+for(const format of ['csv','xml'])test(`same report as ${format.toUpperCase()} and XLSX keeps one economic deposit and both originals`,()=>{
+ const f=fixture({aggregate:true});try{
+  const csv=`Betalningsdatum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp;Valuta;Mottagarkonto;Bankreferens\n2026-10-26;Syntetiskt Bistro AB;0599;987-6543;625,00;SEK;${account};SYNTHETIC-AIS-625\n`;
+  const xml=`<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><IBAN>${account}</IBAN></Id></Acct><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><ValDt><Dt>2026-10-26</Dt></ValDt><AcctSvcrRef>SYNTHETIC-AIS-625</AcctSvcrRef><NtryDtls><TxDtls><Refs><TxId>SYNTHETIC-CHILD</TxId></Refs><AmtDtls><TxAmt><Amt Ccy="SEK">625.00</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>Syntetiskt Bistro AB</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>0599</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>`;
+  const content=Buffer.from(format==='csv'?csv:xml),rows=parseBankFile('synthetic.'+format,content.toString('base64'),account);
+  storeTransactions(f.db,rows,'file:synthetic.'+format,{content,mime_type:format==='csv'?'text/csv':'application/xml'});
+  const xlsx=parseBankFile('synthetic.xlsx',Buffer.from(f.bytes).toString('base64'),account);assert.throws(()=>storeTransactions(f.db,xlsx,'file:synthetic.xlsx'),/granskning/i);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM bank_transactions WHERE excluded=0').get().n,1);assert.equal(counts(f.db).total,62500);assert.equal(counts(f.db).allocations,0);assert.equal(f.db.prepare('SELECT COUNT(*) n FROM import_jobs WHERE content IS NOT NULL').get().n,2);assert.equal(f.db.prepare('SELECT content_sha256 FROM import_jobs WHERE id=?').get(f.import_id).content_sha256,digest(f.bytes));
+ }finally{f.close();}
+});
 
 test('AIS and retained XLSX can be manually associated and revoked without financial writes or changing originals',()=>{
  assert.equal(typeof module.bankSpecificationCandidates,'function','retained XLSX currently has no association API');

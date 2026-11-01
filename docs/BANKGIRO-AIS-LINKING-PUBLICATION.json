@@ -1,0 +1,166 @@
+{
+  "schema": "mgeorge-bankgiro-ais-linking-publication-v1",
+  "date": "2026-11-01",
+  "mode": "safe_manual_source_review",
+  "github": {
+    "repository": "https://github.com/sharbel0022/Mgeorge",
+    "codeCommit": "fda982e7f67749f7db8f4a79b8584fa2484bf4f6",
+    "ci": {
+      "id": 41317590732,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41317590732",
+      "headSha": "fda982e7f67749f7db8f4a79b8584fa2484bf4f6",
+      "conclusion": "success",
+      "jobs": {
+        "test": "success",
+        "sites": "success"
+      }
+    }
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "sourceCommit": "1f89b2fc820556f3f803529da4d1bcec7a01260e",
+    "sourceTree": "f18602be3f3a2c1b104e5ddfbd30207b6f700670",
+    "githubSitesSubtree": "f18602be3f3a2c1b104e5ddfbd30207b6f700670",
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_e68ab04926808191b16d211dfb5b32f7",
+    "versionNumber": 41,
+    "archiveStorage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_00000000716081f4b466014a1d54c0ef",
+      "content_hash": "sha256:8b53752f1c2315d07d99200b32b0ebcdbe55eca06ef333300f09ff4ca915e71c",
+      "size_bytes": 44369920,
+      "file_count": 329
+    },
+    "deploymentId": "appgdep_6ae750bd4770819181ae4a4693821839",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "envSetRevision": 9,
+    "updatedAt": "2026-11-01T14:46:39.980982+00:00"
+  },
+  "verification": {
+    "nodeTests": 595,
+    "sitesTests": 951,
+    "syntaxFiles": 89,
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "audit": {
+      "root": 0,
+      "sitesProduction": 0,
+      "sitesFullModerate": 16,
+      "sitesHighCritical": 0
+    },
+    "review": "Independent cross-reviews and final whole-change review; concrete defects reproduced and corrected. Candidate presentation issue caught in first live read-only QA, fixed in final code and re-published.",
+    "browser": {
+      "syntheticComponentHarness": {
+        "desktop": [
+          1440,
+          1000
+        ],
+        "mobile": [
+          390,
+          844
+        ],
+        "confirmedLink": true,
+        "confirmedRevoke": true,
+        "economicDepositCount": 1,
+        "amountCents": 62500,
+        "allocations": 0,
+        "documentHorizontalOverflow": false
+      },
+      "authenticatedProduction": {
+        "bankList": true,
+        "relevantCandidateLabels": 1,
+        "reviewOriginalLabels": 1,
+        "retainedOriginalLinkVisible": true,
+        "missingReceiptExplained": true,
+        "confirmDisabled": true,
+        "mobile": [
+          390,
+          844
+        ],
+        "documentHorizontalOverflow": false,
+        "realLinkConfirmed": false,
+        "originalUploaded": false
+      }
+    }
+  },
+  "preservation": {
+    "revisionBefore": 35,
+    "revisionAfter": 35,
+    "updatedAtBefore": "2026-11-01T14:04:55.157Z",
+    "updatedAtAfter": "2026-11-01T14:04:55.157Z",
+    "sameAuth": true,
+    "samePolicy": true,
+    "sameSchedules": true,
+    "sameDatabaseTables": true,
+    "hostingAndMigrationSourcesUnchanged": true,
+    "fullD1PayloadRead": false,
+    "browserTargetedStateRead": true
+  },
+  "backup": {
+    "day": "2026-11-01",
+    "scope": "manifest_pass",
+    "originals": 191,
+    "verifiedFiles": 191,
+    "verifiedAt": "2026-11-01T01:35:01.111Z",
+    "apiRecordsChecked": 5,
+    "apiRecordsWithoutReceipt": 113,
+    "restorePerformed": false,
+    "newBackupRun": false
+  },
+  "rollback": {
+    "sitesVersionNumber": 39,
+    "sitesVersionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_b47ac998f56c81918d4d25270eeeecbd",
+    "codeBase": "1b017c0a34821bdc04aa9ca3002765f78b2888b6",
+    "method": "Republish saved Sites39 or normal Git revert. Sites uses additive optional workspace fields; no destructive migration. Node table/owner column additive."
+  },
+  "metrics": {
+    "scenarios": 15,
+    "correctManualRelations": {
+      "before": 0,
+      "after": 10,
+      "denominator": 10
+    },
+    "economicDuplicateScenarios": {
+      "before": 0,
+      "after": 0,
+      "denominator": 15
+    },
+    "falseRelations": {
+      "before": 0,
+      "after": 0,
+      "denominator": 5
+    },
+    "unchangedInvoiceBalances": 15,
+    "unchangedAllocations": 15,
+    "visibleRowsForEightDeposits": {
+      "before": 16,
+      "after": 8
+    },
+    "crossFormatTests": "Real SQLite: CSV+XLSX and stable CAMT+XLSX retain two file originals, one economic deposit/62500 öre and zero allocations."
+  },
+  "ratings": {
+    "bankgiroImport": 8.5,
+    "payer": 7,
+    "paymentReference": 7,
+    "automaticMatching": 7.5,
+    "productionVerification": 6.5,
+    "changed": false
+  },
+  "limits": [
+    "No common stable bank-proven XLSX/AIS identity available; manual method is never labelled bank-verified.",
+    "Actual target AIS receipt is missing; its confirmation remains blocked.",
+    "No invoice number0599/599 or exact invoice OCR0599 exists in the read register; no invoice or counterparty relation was changed.",
+    "Stored consent/account/generation are checked without requesting new provider authorization; true provider revocation concurrency not verified.",
+    "D1 tool truncated payload; browser supplied targeted read-only state evidence, not a full independently recalculated production ledger.",
+    "No real customer email, payment, consent/secret/schedule change, production import/allocation, restore or destructive migration was performed.",
+    "Full Sites audit retains16 moderate development findings; authentic bank contract and OCR rules remain external."
+  ],
+  "previousPublication": {
+    "versionNumber": 40,
+    "sourceCommit": "b388d6890565ad08817ecf3317caa64e68b6be2e",
+    "codeCommit": "e01108bdc2c7c588e2e51d2fd04e2ffc617f70da",
+    "ciRunId": 41316939287,
+    "deploymentId": "appgdep_6ae74effe80881918116114260d5b388",
+    "status": "succeeded"
+  }
+}
