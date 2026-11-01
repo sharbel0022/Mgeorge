@@ -1,0 +1,162 @@
+{
+  "phase": "after",
+  "measuredAt": "2026-11-01T13:35:45.174Z",
+  "baselineCommit": "a8ec37a19d93ef453bf8e3a5db617121d7837576",
+  "candidateCommit": "a8ec37a19d93ef453bf8e3a5db617121d7837576",
+  "candidateWorktreeDirty": true,
+  "corpusSha256": "65bb2b87b6e070160d43f93dd5322b6c56cae45a3f04ae55acfd982ceda2b5db",
+  "scope": "Identical synthetic XLSX byte corpus, public specification parser; database/reconciliation outcomes require separate integration tests.",
+  "validFiles": 9,
+  "invalidFiles": 13,
+  "expectedRows": 11,
+  "acceptedValidFiles": 9,
+  "correctSenders": 11,
+  "correctReferences": 11,
+  "correctParsedRows": 11,
+  "parsedRows": 11,
+  "senderAccuracyPercent": 100,
+  "referenceAccuracyPercent": 100,
+  "rowAccuracyPercent": 100,
+  "falseAcceptedInvalidFiles": 0,
+  "falseAcceptancePercent": 0,
+  "rejectedInvalidFiles": 13,
+  "processingMs": 157.641,
+  "databaseImportedRows": null,
+  "falseAutomaticMatches": null,
+  "financialDuplicates": null,
+  "manualReviewCases": null,
+  "outcomes": [
+    {
+      "case": "single",
+      "valid": true,
+      "accepted": true,
+      "rows": 1
+    },
+    {
+      "case": "multiple",
+      "valid": true,
+      "accepted": true,
+      "rows": 2
+    },
+    {
+      "case": "multi-day-blocks",
+      "valid": true,
+      "accepted": true,
+      "rows": 2
+    },
+    {
+      "case": "shifted-headings",
+      "valid": true,
+      "accepted": true,
+      "rows": 1
+    },
+    {
+      "case": "swedish-text-money",
+      "valid": true,
+      "accepted": true,
+      "rows": 1
+    },
+    {
+      "case": "formatted-numeric-reference",
+      "valid": true,
+      "accepted": true,
+      "rows": 1
+    },
+    {
+      "case": "excel-date",
+      "valid": true,
+      "accepted": true,
+      "rows": 1
+    },
+    {
+      "case": "original-export-conventions",
+      "valid": true,
+      "accepted": true,
+      "rows": 1
+    },
+    {
+      "case": "explicit-account",
+      "valid": true,
+      "accepted": true,
+      "rows": 1
+    },
+    {
+      "case": "wrong-total",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "wrong-count",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "invalid-recipient-bg",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "invalid-date",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "missing-reference",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "missing-payer",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "numeric-reference-no-zero-format",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "negative-payment",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "duplicate-payment",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "duplicate-report",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "cached-formula",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "corrupt-archive",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    },
+    {
+      "case": "oversized-file",
+      "valid": false,
+      "accepted": false,
+      "rows": 0
+    }
+  ]
+}

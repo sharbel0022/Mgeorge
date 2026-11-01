@@ -1,6 +1,7 @@
 import {extractPaymentReferences} from './payment-references.js';
 import {camtPayerEvidence} from './camt-payer.js';
 import {csvPayerEvidence} from './payer-evidence.js';
+import {parseBankgiroXLSX} from './bankgiro-xlsx.js';
 
 import {readCamtDocument as xmlTree,xmlChildren as children,xmlPath as path,xmlValue as value,camtRemittanceNodes,camtAmount,camtDate,camtReportEvidence,validateCamtBatches,decodeCamtBytes} from './camt-xml.js';
 function remittanceEvidence(node){
@@ -84,9 +85,10 @@ export function parseBankgiroCSV(text,name='Bankgiro.csv'){
 }
 export function parseSpecificationBytes(bytes,name){
  if(bytes.byteLength<1||bytes.byteLength>15_000_000)throw Error('Välj en fil på högst 15 MB.');
+ if(/\.xlsx$/i.test(name))return parseBankgiroXLSX(bytes,name);
  if(/\.xml$/i.test(name))return parseBankgiroXML(decodeCamtBytes(bytes),name);
  let text;try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{text=new TextDecoder('windows-1252').decode(bytes);}
  if(/\.csv$/i.test(name))return parseBankgiroCSV(text,name);
- throw Error('Välj camt.054 XML eller Bankgiro CSV. Bilder och PDF behöver en betalningsspecifikation från banken.');
+ throw Error('Välj Bankgiro Excel (.xlsx), camt.054 XML eller Bankgiro CSV. Bilder och PDF behöver en betalningsspecifikation från banken.');
 }
 

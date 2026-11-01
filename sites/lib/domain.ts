@@ -212,7 +212,8 @@ function cleanInvoice(raw:any,existing?:Invoice):Invoice{
 }
 function cleanReportEvidence(raw:any):Record<string,string>|undefined{
  if(!raw||typeof raw!=='object'||Array.isArray(raw))return undefined;
- return Object.fromEntries(['profile','namespace','messageId','reportId','createdAt','accountServicer','entryReference','valueDate'].map(key=>[key,str(raw[key]??'',300)]));
+ const fields=['profile','namespace','messageId','reportId','createdAt','accountServicer','entryReference','valueDate',...['recipientBankgiro','sequence','paymentCount','totalCents','sheet'].filter(key=>Object.hasOwn(raw,key))];
+ return Object.fromEntries([...fields.map(key=>[key,str(raw[key]??'',300)]),...(raw.sourceCells?[['sourceCells',str(raw.sourceCells,12000)]]:[])]);
 }
 function cleanTransaction(raw:any):Transaction{
  if(!raw||raw.currency&&raw.currency!=="SEK")throw new Error("Endast bankhändelser i SEK stöds.");let kind=['payment','batch','unknown'].includes(raw.kind)?raw.kind:'unknown';
@@ -265,6 +266,9 @@ export function applyCommand(current:State,command:Command):{state:State;message
   if(!command.documentId||!command.hash)throw Error('Originalfilen måste sparas före import.');
   if(s.imports.some(i=>i.hash===command.hash)&&!s.transactions.some(t=>t.specificationStatus==='review'&&s.imports.find(i=>i.id===t.importId)?.hash===command.hash)){message='Filen har redan importerats. Inga nya betalningar skapades.';break;}
   const preview=specificationPreview(s,command.rows,command.targetId),record:ImportRecord={id:uid(),hash:str(command.hash,128),account:'Bankgiro',name:str(command.name,300),count:0,createdAt:now(),documentId:str(command.documentId,100)};
+  // Rechecking a held original may later link it to a verified bank entry.
+  // Until that changes, a new request receipt is not another import record.
+  if(s.imports.some(i=>i.hash===command.hash)&&preview.plans.every(p=>p.status==='review'&&!p.conflictIds.length)){message='Filen har redan importerats och väntar på verifierad bankkoppling. Inga nya betalningar skapades.';break;}
   for(const plan of preview.plans){
    if(plan.conflictIds.length){
     const first=plan.rows[0],incoming=cleanTransaction({...first,amount:plan.total,party:'',payerReference:'',bankReference:first.parentBankReference||first.bankReference,externalId:'',kind:'batch',verified:false});
@@ -281,7 +285,8 @@ export function applyCommand(current:State,command:Command):{state:State;message
     t.parentId=plan.parentId||'';t.importId=record.id;t.evidence='bankgiro_file';t.kind='payment';t.verified=plan.status==='linked'&&individualParty(t.party);
     if(t.parentId&&getTx(s,t.parentId).automaticMatchHold)t.automaticMatchHold=structuredClone(getTx(s,t.parentId).automaticMatchHold);
     t.bankFileProof={version:'bank-file-original-v1',documentId:record.documentId!,sha256:record.hash};
-    const duplicate=s.transactions.find(x=>x.specification&&x.date===t.date&&x.amount===t.amount&&x.party===t.party&&x.payerReference===t.payerReference&&x.bankReference===t.bankReference&&sameAccount(x.account,t.account));
+    const giro=(value?:string)=>String(value||'').replace(/[ -]/g,'');
+    const duplicate=s.transactions.find(x=>x.specification&&x.date===t.date&&x.amount===t.amount&&x.party===t.party&&x.payerReference===t.payerReference&&x.bankReference===t.bankReference&&sameAccount(x.account,t.account)&&giro(x.recipientBankgiro)===giro(t.recipientBankgiro)&&giro(x.payerBankgiro)===giro(t.payerBankgiro));
     const previous=(t.externalId?s.transactions.find(x=>sameAccount(x.account,t.account)&&x.externalId===t.externalId):undefined)||duplicate;
     if(previous){
      const fields=conflictingBankFacts(previous,t);if(previous.amount!==t.amount||previous.date!==t.date||previous.currency!==t.currency)fields.push('amountDateCurrency');

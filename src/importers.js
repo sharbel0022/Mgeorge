@@ -1,6 +1,7 @@
 import {extractPaymentReferences} from './payment-references.js';
 import {camtPayerEvidence} from '../sites/lib/camt-payer.js';
 import {apiPayerEvidence,csvPayerEvidence} from '../sites/lib/payer-evidence.js';
+import {parseBankgiroXLSX} from '../sites/lib/bankgiro-xlsx.js';
 import {readCamtDocument as xmlTree,xmlChildren as children,xmlPath as path,xmlValue as value,camtRemittanceNodes,camtAmount as amountNode,camtDate,camtReportEvidence,validateCamtBatches,decodeCamtBytes} from '../sites/lib/camt-xml.js';
 /**
  * MG FAKTURAKOLL – BANKFILER / FORMAT
@@ -198,9 +199,18 @@ export function parseCAMT(xml,account='Swedbank'){
 }
 /** Väljer parser för det uppladdade bankformatet och omvandlar resultatet till gemensamma transaktionsfält. */
 export function parseBankFile(name,base64,account='Swedbank'){
-  if(!/^[\w\p{L}(). -]+\.(csv|xml)$/iu.test(String(name)))throw new Error('Välj CSV eller XML');
+  if(!/^[\w\p{L}(). -]+\.(csv|xml|xlsx)$/iu.test(String(name)))throw new Error('Välj Bankgiro Excel (.xlsx), CSV eller XML');
   if(typeof base64!=='string'||base64.length>20_000_000||!base64.length||base64.length%4!==0||!/^[A-Za-z0-9+/]*={0,2}$/.test(base64))throw new Error('Fil saknas eller är för stor eller felaktig');
   const bytes=Buffer.from(base64,'base64');if(bytes.length>15_000_000)throw new Error('Max 15 MB');
+  if(/\.xlsx$/i.test(name))return validateItems(parseBankgiroXLSX(bytes,name).map(row=>({
+    payer_evidence:row.payerEvidence,reference_evidence:row.referenceEvidence,
+    account_evidence:{...fileAccountEvidence(row.account||'',account,'xlsx',row.currency),report:row.reportEvidence,cells:row.cellProvenance},
+    account:selectedAccount(account),booked_at:row.date,amount_cents:row.amount,currency:sek(row.currency),
+    payer:row.party,reference:row.payerReference,payer_bankgiro:row.payerBankgiro||'',bankgiro:row.recipientBankgiro||'',
+    bank_reference:'',description:row.description||'Bankgiro Excel betalningsspecifikation',review_only:true,needs_review:1,
+    review_reason:'Rapporten saknar verifierad koppling till bankkonto och stabil individuell bankidentitet. Originalet kan sparas för granskning utan att skapa bankhändelser.',
+    warnings:['Excelrapporten läses som bankuppgifter. En vald kontobeteckning, Bankgiro eller löpnummer verifierar inte kontot eller en individuell betalningsidentitet.'],
+  })));
   if(name.toLowerCase().endsWith('.xml'))return parseCAMT(decodeCamtBytes(bytes),account);
   let text;try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{text=new TextDecoder('windows-1252').decode(bytes);}
   return parseCSV(text,account);

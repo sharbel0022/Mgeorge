@@ -8,7 +8,7 @@ export async function readWorkspace(owner:string){const row=await db().prepare('
 /** The same owned, byte-checked original is required at import and allocation. */
 export async function readBankOriginalBytes(owner:string,documentId:string,maxBytes=15_000_000){
  const doc=await db().prepare('SELECT filename,mime,sha256,size FROM documents WHERE id=? AND owner=?').bind(documentId,owner).first<{filename:string;mime:string;sha256:string;size:number}>();
- if(!doc||!(doc.mime==='text/csv'&&/\.csv$/i.test(doc.filename)||doc.mime==='application/xml'&&/\.xml$/i.test(doc.filename)))throw Error('Välj ett sparat bankoriginal i CSV- eller camt XML-format.');
+ if(!doc||!(doc.mime==='text/csv'&&/\.csv$/i.test(doc.filename)||doc.mime==='application/xml'&&/\.xml$/i.test(doc.filename)||doc.mime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'&&/\.xlsx$/i.test(doc.filename)))throw Error('Välj ett sparat bankoriginal i XLSX-, CSV- eller camt XML-format.');
  if(!Number.isSafeInteger(doc.size)||doc.size<1||doc.size>15_000_000)throw Error('Bankoriginalets storlek är ogiltig.');
  if(doc.size>maxBytes)throw Error('Bankoriginalen överskrider kontrollens säkerhetsgräns. Granska underlagen i mindre omgångar.');
  const object=await env.BUCKET?.get(`${owner}/${documentId}`);if(!object||object.size!==doc.size)throw Error('Bankoriginalet saknas eller har ändrad storlek.');
@@ -19,6 +19,7 @@ export async function readBankOriginalBytes(owner:string,documentId:string,maxBy
 /** Bank facts come from retained bytes. An owned document ID alone is not evidence. */
 export async function readBankFileOriginal(owner:string,command:Record<string,any>){
  const doc=await readBankOriginalBytes(owner,command.documentId),bytes=doc.bytes;
+ if(/\.xlsx$/i.test(doc.filename))throw Error('Importera Excelrapporten via Importera Bankgirofil så att rapportens kontroller och granskningsspärrar används.');
  let text:string;try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{text=new TextDecoder('windows-1252').decode(bytes);}
  const {parseCSV,guessMapping,mapCSV,parseCAMT}=await import('./imports');
  let rows,mapping=undefined;

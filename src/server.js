@@ -157,6 +157,18 @@ function importBankFile(body,req){
   }
   try{return parseBankFile(body.name,body.content_base64,account);}catch(e){throw bad(400,e.message);}
 }
+function retainBankgiroReview(body,items,req){
+  assertSessionStillAuthorized(req);
+  const content=Buffer.from(body.content_base64,'base64'),sha256=digest(content),mime_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  db.exec('BEGIN IMMEDIATE');
+  try{
+    const previous=db.prepare("SELECT id FROM import_jobs WHERE source='bank_file' AND content_sha256=? AND mime_type=? LIMIT 1").get(sha256,mime_type);
+    const import_id=previous?.id||recordImport(db,{source:'bank_file',name:optionalString(body.name,240),found:items.length,review:items.length,status:'needs_review',error:items[0]?.review_reason||'',content,mime_type});
+    if(!previous)audit(db,'bankgiro_xlsx_review_saved',{import_id,sha256,found:items.length,financial_records_created:0});
+    db.exec('COMMIT');
+    return {import_id,imported:0,duplicate:previous?1:0,review:items.length,review_only:true,status:'needs_review'};
+  }catch(error){db.exec('ROLLBACK');throw error;}
+}
 function gmailStatus(){
   const connection=db.prepare('SELECT id,email,status,last_synced,last_error FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
   const credentials=connection&&db.prepare('SELECT encrypted_tokens FROM gmail_connections WHERE id=?').get(connection.id);
@@ -505,16 +517,17 @@ async function route(req,res){
   if(/^\/api\/imports\/[^/]+\/original$/.test(path)&&req.method==='GET'){
     const item=db.prepare('SELECT name,content,mime_type FROM import_jobs WHERE id=?').get(decodeURIComponent(path.split('/')[3]));
     if(!item?.content)throw bad(404,'Originalfilen saknas');
-    res.writeHead(200,{...baseHeaders,'Content-Type':item.mime_type||'application/octet-stream','Content-Disposition':`attachment; filename="bankunderlag${item.mime_type==='application/xml'?'.xml':'.csv'}"`,'Content-Length':item.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(item.content));
+    res.writeHead(200,{...baseHeaders,'Content-Type':item.mime_type||'application/octet-stream','Content-Disposition':`attachment; filename="bankunderlag${item.mime_type==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'?'.xlsx':item.mime_type==='application/xml'?'.xml':'.csv'}"`,'Content-Length':item.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(item.content));
   }
   if(path==='/api/import/preview'&&req.method==='POST'){
     const b=await readBody(req);const items=importBankFile(b,req);
     const warnings=[...new Set(items.flatMap(x=>x.warnings||[]))];
-    return json(res,200,{count:items.length,items,warnings,review:items.filter(i=>i.is_aggregate||!i.payer&&!i.reference).length});
+    return json(res,200,{count:items.length,items,warnings,review:items.filter(i=>i.review_only||i.is_aggregate||!i.payer&&!i.reference).length,review_only:items.some(i=>i.review_only)});
   }
   if(path==='/api/import/commit'&&req.method==='POST'){
     const b=await readBody(req);if(b.confirm!==true)throw bad(400,'Bekräfta importen');
     const items=importBankFile(b,req);
+    if(items.some(item=>item.review_only))return json(res,200,retainBankgiroReview(b,items,req));
     return json(res,200,storeTransactions(db,items,'file:'+optionalString(b.name,120),{content:Buffer.from(b.content_base64,'base64'),mime_type:/\.xml$/i.test(b.name)?'application/xml':'text/csv; charset=utf-8'}));
   }
   if(path==='/api/documents'&&req.method==='GET')return json(res,200,{items:listDocuments(db)});

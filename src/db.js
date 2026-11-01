@@ -323,6 +323,7 @@ function invalidateAbsenceChecks(db,importId='',reason='Nytt bankunderlag kräve
 }
 /** Lagrar importerade bankhändelser och använder identiteter/fingeravtryck för att minska risken för dubletter. */
 export function storeTransactions(db,items,source,original=null,guard=null) {
+  if(items.some(item=>item.review_only))throw Object.assign(new Error('Bankuppgifterna kräver granskning. Spara originalet utan att skapa ekonomiska bankhändelser.'),{status:409,code:'bank_review_only'});
   // Legacy lookup IDs and session account UIDs cannot safely be guessed into
   // stable identities. Block the whole API batch until a reviewed migration
   // preserves the old row IDs, exclusions and allocations. Never create a fresh

@@ -604,3 +604,12 @@ Poängen är exakt **253,5/330 = 7,68/10**,0/33 på9,5:250 +4,5 lokala förbätt
   "background_continuation_configured": false
 }
 ```
+
+
+## Direkt Bankgiro-XLSX — 2026-11-01
+
+- Startade från aktuell main a8ec37a. Original hittat och bevarat privat; slutlig parserkontroll13/13. Ingen riktig import, allokering, kundsändning eller betalning i produktion.
+- Direkt XLSX integrerad i båda apparna med gemensam parser, heltalsören, bevarad referenstyp, original/SHA och cellbevis. Sites behåller spärrade review-specifikationer; Node sparar privat review-original i befintliga import_jobs utan ekonomiska bankrader.
+- Fulla lokala grindar: Node578, Sites912, syntax84, TS och produktionsbygge gröna. Root audit0; Sites prod0/full16 moderate development, high-grind0. Oberoende reviewfynd rättade med röd/grön regression.
+- Identisk syntetisk korpus22: avsändare/ref/rader0→100%, felaccept0→0; behandlingstid2,198→157,641ms (före avvisade direkt). Browserprov på lokalt produktionsbygge: riktig filväljare, preview, demoimport, betalare/ref separata från OCR,1280/390px.
+- Rapport: docs/BANKGIRO-XLSX-IMPLEMENTATION.md; publiceringskvitto kompletteras efter exakt main/CI/Sites. Säkert fortsatt granskningsläge krävs utan stabil bank-id/avtalsverifierad kontokoppling.

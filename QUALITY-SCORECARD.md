@@ -1,5 +1,22 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Direkt Bankgiro-XLSX — 2026-11-01
+
+[Implementationsrapport](docs/BANKGIRO-XLSX-IMPLEMENTATION.md). Privat original verifierat13/13; inga verkliga bankvärden publicerade. Identisk22-filerskorpus: avsändare/referens/rader0/11→11/11, felaccept0/13→0/13. Fulla sviter578 Node+912 Sites; syntax84, TS/build och obligatorisk auditgrind godkända. Sites fullaudit har fortsatt16 moderate utvecklingsberoenden; produktionsaudit0. Publiceringsbevis kompletteras separat.
+
+| Berört område | Före → efter | Testbevis | Kvarstående begränsning |
+| --- | --- | --- | --- |
+| Bankgiroimport | 8 → 8,5 | Direkt XLSX,35 parser+18 API, privat original13/13 | Stabil rapport/AIS-identitet saknas; review utan pengar |
+| Verklig betalare | 6,5 → 7 | Faktisk export läst privat;11/11 syntetiska avsändare | Bankautenticitet/kontorelation måste verifieras |
+| Verklig OCR/fakturareferens | 6,5 → 7 | 11/11 exakta referenser; generisk referens blir inte OCR | Formellt OCR-avtal och verklig avstämning ej verifierade |
+| Automatisk betalningsmatchning | 7,5 → 7,5 | Inga osäkra XLSX-allokeringar/dubbelpengar | Ingen förbättring av produktionsmatchning påstås |
+| Betalningshistorik/säkerhet | 8 → 8 | SHA/original/ägare/CAS/rollback, oberoende review | Full produktionshistorik inte återberäknad |
+| Betalningsvyns användbarhet | 8 → 8 | Verklig filväljare, demoimport,1280/390px | Autentiserad produktionsimport ej utförd |
+| Kodkvalitet och tester | 8,5 → 8,5 | +62 fullsvitstester;0 fel | Syntetisk omfattning, inte felfrihetsgaranti |
+
+Övriga områden oförändrade. Höjningarna gäller den avgränsade verifierade Excel-funktionen; ingen9,5-poäng delas ut.
+
+
 **Aktuell komplettering: 2026-11-01. Verklig betalare och OCR: MÅLET 9,5/10 ÄR INTE UPPNÅTT.**
 
 Den nya [uppmätta före-/efterrapporten](docs/BANK-PAYER-OCR-IMPROVEMENT.md) utgår från senaste `origin/main` `9d45656`. Samma korrigerade 26 syntetiska original kördes före/efter: 49 parserutvärderingar, betalaridentitet 35/42 → 42/42, OCR-recall 34/37 → 37/37, fakturanummer 12/14 → 14/14, felaktiga organisationsfält 5 → 0 och inga falska betalarnamn. Separat faktisk SQLite-matchningskorpus: felaktig automatchning 3 → 0, säkra TP 5/5, manuell granskning 14/22 → 17/22. Den ursprungliga baslinjen före första kodändring är också bevarad; korrigeringen av COID-facit redovisas öppet.

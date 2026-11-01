@@ -42,6 +42,13 @@ test('numeric invoice reference is never labelled OCR without OCR evidence',()=>
   assert.deepEqual(view.bankPaymentReference(t),{value:'0599',kind:'invoice',ocr:''});
 });
 
+test('general bank payment reference is visible on desktop and mobile without becoming OCR',()=>{
+ const s=emptyState(),t=tx({kind:'payment',party:'Syntetisk betalare AB',description:'',payerReference:'000427'}, {reference_number:undefined,payment_reference:'000427'});s.transactions.push(t);
+ const html=render(ui.default,{state:s,transactions:[t],open(){}});
+ assert.ok((html.match(/Betalningsreferens 000427/g)||[]).length>=2);
+ assert.match(html,/Bank-OCR saknas/);assert.equal(view.bankPaymentReference(t).ocr,'');assert.equal(s.allocations.length,0);
+});
+
 test('manual completion does not rewrite the bank payer or reference in presentation',()=>{
   const s=emptyState(),t=tx({kind:'payment',description:'',party:'Manuell Kund AB',payerReference:'0599',original:{party:'',payerReference:'',description:'',amount:62500,date:'2026-10-26',account:'konto',bankReference:'BANK-625'},verification:{party:'Manuell Kund AB',payerReference:'0599',note:'Kontrollerad av administratör',at:'2026-10-27T12:00:00Z'},verified:true});
   s.transactions.push(t);const x=view.bankPaymentView(s,t);assert.equal(x.payer,'Betalare okänd');assert.equal(x.reference.value,'');assert.equal(x.manualPayer,'Manuell Kund AB');assert.equal(x.manualReference,'0599');
