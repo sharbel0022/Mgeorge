@@ -34,6 +34,17 @@ test('unlinked report is labelled as non-economic review evidence and possible r
  assert.equal(view.bankVisibleTransactions(state).length,2);assert.equal(economicTransactions(state).length,1);
  assert.equal(view.bankPaymentView(state,target).payer,'Betalare okänd');assert.equal(report.specificationStatus,'review');
 });
+test('review candidates apply only to incoming AIS rows with corresponding whole report amount and nearby date',()=>{
+ const {state,target,report}=fixture();
+ for(const other of [{...target,amount:-62500},{...target,amount:62600},{...target,date:'2026-09-26'},{...target,source:'Manuellt registrerad',evidence:'manual_verified',bankData:undefined,bankDataVersion:undefined,bankDataSha256:undefined},report]){
+  const html=renderToStaticMarkup(React.createElement(detail.default,{state,transaction:other,busy:false,error:'',save(){}}));assert.equal(html,'');
+ }
+});
+test('a legacy AIS source still shows the relevant blocked report candidate without an invented receipt',()=>{
+ const {state,target}=fixture();delete target.evidence;delete target.bankDataSha256;delete target.bankDataVersion;
+ const actual=view.bankPaymentView(state,target);assert.match(actual.candidateNote,/Möjlig tillhörande/);
+ const html=renderToStaticMarkup(React.createElement(detail.default,{state,transaction:target,busy:false,error:'',save(){}}));assert.match(html,/ankomstkvitto/);assert.match(html,/disabled=""[^>]*>Bekräfta underlagskoppling/);
+});
 test('manual relation presents one main row and separate generic reference without changing economic facts',()=>{
  const {state,target}=fixture(),before=JSON.stringify(state.transactions),beforeBalance=balance(state,state.invoices[0]);
  const next=applyCommand(state,{type:'bankgiro.link',transactionId:'ais',specificationId:'spec',note:'Båda syntetiska originalen och mottagarkontot kontrollerade.',confirmOriginals:true,confirmAccount:true}).state;

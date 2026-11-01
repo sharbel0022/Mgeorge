@@ -292,9 +292,11 @@ function bankgiroLinkIssue(s:State,target:Transaction,rows:Transaction[]){
 }
 /** Candidate fields are read-only hints; date and amount never establish identity. */
 export function bankgiroLinkCandidates(s:State,target:Transaction){
+ if(!hasBankApiOrigin(target)||target.specification||target.amount<=0||!validDate(target.date))return [];
  const seen=new Set<string>();return s.transactions.filter(row=>row.specification&&row.specificationStatus==='review').flatMap(row=>{
   const key=JSON.stringify([row.importId,row.specificationGroup]);if(seen.has(key))return [];seen.add(key);
   const rows=specificationGroup(s,row),reason=bankgiroLinkIssue(s,target,rows),dateDifference=validDate(row.date)&&validDate(target.date)?Math.round((Date.parse(row.date+'T12:00:00Z')-Date.parse(target.date+'T12:00:00Z'))/86400_000):NaN;
+  if(rows.reduce((sum,row)=>sum+row.amount,0)!==target.amount||rows.some(row=>row.currency!==target.currency)||!Number.isFinite(dateDifference)||Math.abs(dateDifference)>3)return [];
   return [{specificationId:row.id,rows,dateDifference,canLink:!reason,reason:reason||'Möjlig tillhörande Bankgirospecifikation – kontrollera båda originalen. Datum och belopp bevisar inte sambandet.'}];
  });
 }

@@ -68,7 +68,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
     status=invoices.some(i=>balance(state,i)>0)?'Delbetalning':available(state,t)>0?'Överbetalning':'Verifierad';
   }else if(possible.length)status='Möjlig matchning';
   const sources=sourceLink?'Swedbank + Bankgiro '+(sourceLink.rows.some(row=>/xlsx|excel/i.test(row.format||row.source||''))?'Excel':'specifikation'):'';
-  const candidateNote=!sourceLink&&t.evidence==='bank_api'&&bankgiroLinkCandidates(state,t).length?'Möjlig tillhörande Bankgirospecifikation – kontrollera.':'';
+  const candidateNote=!sourceLink&&bankgiroLinkCandidates(state,t).length?'Möjlig tillhörande Bankgirospecifikation – kontrollera.':'';
   return {...evidenceView,...(linkedPayer?{payer:linkedPayer,payerKnown:true}:{}),...(linkedReference?.value?{reference:linkedReference,referenceLabel:referenceLabel(linkedReference.kind)}:{}),sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
 }
 export function bankVisibleTransactions(state:State){

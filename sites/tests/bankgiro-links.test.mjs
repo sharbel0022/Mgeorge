@@ -34,7 +34,7 @@ test('a complete later report retains shared observations from an earlier partia
  const first={party:'Test A AB',reference:'0599',payerBankgiro:'987-6543',amount:25000},second={party:'Test B AB',reference:'0600',payerBankgiro:'123-4567',amount:37500},f=fixture({payments:[first]});
  const complete=domain.applyCommand(f.state,{type:'bankgiro.import',documentId:'complete-original',hash:'b'.repeat(64),name:'complete.xlsx',rows:parseSpecificationBytes(makeBankgiroXLSX({account:account.slice(5),date:'2026-10-26',sequence:'42',payments:[first,second]}),'complete.xlsx')}).state;
  const candidates=domain.bankgiroLinkCandidates(complete,f.transaction),candidate=candidates.find(item=>item.rows.some(row=>row.bankFileProof.documentId==='complete-original'));
- assert.equal(candidate.rows.length,2);assert.equal(candidate.canLink,true);assert.equal(candidates.find(item=>item.specificationId===f.specification.id).canLink,false);
+ assert.equal(candidate.rows.length,2);assert.equal(candidate.canLink,true);assert.equal(candidates.find(item=>item.specificationId===f.specification.id),undefined);assert.throws(()=>domain.applyCommand(complete,f.command),/summa|belopp/i);
  const linked=domain.applyCommand(complete,{...f.command,specificationId:candidate.specificationId}).state;assert.equal(domain.activeBankgiroLink(linked,f.transaction.id).rows.length,2);assert.equal(domain.economicTransactions(linked).length,1);assert.equal(linked.transactions.filter(row=>row.bankFileProof?.documentId==='synthetic-original').length,1);
 });
 test('same pair is idempotent and cannot create a second active relation',()=>{
