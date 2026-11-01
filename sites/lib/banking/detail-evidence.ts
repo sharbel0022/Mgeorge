@@ -1,4 +1,4 @@
-import {parseMoney,individualParty,usablePaymentReference,type Transaction,type State,now} from '../domain';
+import {parseMoney,individualParty,usablePaymentReference,type Transaction,type State,now,bankApiOriginalIssue,paymentEvidenceConflict,canonicalBankAccount} from '../domain';
 import type {ProviderTransaction} from './enable-banking';
 import {extractPaymentReferences} from '../payment-references.js';
 import {apiPayerEvidence} from '../payer-evidence.js';
@@ -22,4 +22,23 @@ export function enrichBankDetails(current:State,id:string,evidence:ReturnType<ty
  t.bankDetails={...evidence,checkedAt:now(),documentId,bankReferenceText:t.bankDetails?.bankReferenceText||t.original?.payerReference||t.payerReference};
  // Preserve original financial fields, kind, references and verification. Render evidence separately.
  return state;
+}
+
+/** Only pass a row normalized from the authenticated, freshly fetched list.
+ * Never seal retained JSON or replace any existing receipt, including invalid ones.
+ * Validate the preserved projection as well as the fresh provider facts before adoption.
+ */
+export function adoptFreshBankReceipt(state:State,id:string,fresh:import('../imports').BankRow){
+ const target=state.transactions.find(t=>t.id===id);
+ if(!target||target.bankDataVersion!==undefined||target.bankDataSha256!==undefined||paymentEvidenceConflict(state,target)||
+  !target.externalId||target.externalId!==fresh.externalId||canonicalBankAccount(target.account)!==fresh.account||
+  target.amount!==fresh.amount||target.date!==fresh.date||target.currency!==fresh.currency||target.bankReference!==fresh.bankReference||
+  target.bankData!==undefined&&JSON.stringify(target.bankData)!==JSON.stringify(fresh.bankData))return false;
+ const candidate={...target,bankData:target.bankData===undefined?structuredClone(fresh.bankData):target.bankData,
+  referenceEvidence:target.referenceEvidence??structuredClone(fresh.referenceEvidence),bankDataVersion:fresh.bankDataVersion,bankDataSha256:fresh.bankDataSha256};
+ if(bankApiOriginalIssue(candidate))return false;
+ if(target.bankData===undefined)target.bankData=candidate.bankData;
+ if(target.referenceEvidence===undefined)target.referenceEvidence=candidate.referenceEvidence;
+ target.bankDataVersion=candidate.bankDataVersion;target.bankDataSha256=candidate.bankDataSha256;
+ return true;
 }

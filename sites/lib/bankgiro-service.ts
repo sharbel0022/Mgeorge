@@ -37,6 +37,15 @@ export async function bankgiroPreview(owner:string,file:File,targetId:string){
  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
  return {rows,preview,revision,hash,duplicate:state.imports.some(i=>i.hash===hash)};
 }
+/** Inspect an owned retained original without importing, linking or contacting a provider. */
+export async function bankgiroRetainedPreview(owner:string,documentId:string,targetId=''){
+ const validId=(value:string)=>/^[a-zA-Z0-9_-]{1,100}$/.test(value);
+ if(!validId(documentId)||targetId&&!validId(targetId))throw Error('Välj ett giltigt sparat bankoriginal och en giltig bankhändelse.');
+ const {state,revision}=await readWorkspace(owner);
+ if(targetId&&!state.transactions.some(row=>row.id===targetId))throw Error('Bankhändelsen finns inte för ditt konto.');
+ const doc=await readBankOriginalBytes(owner,documentId),rawRows=parseSpecificationBytes(doc.bytes,doc.filename),rows=await resolveAccounts(owner,rawRows);
+ return {documentId,name:doc.filename,rawRows,rows,preview:specificationPreview(state,rows,targetId),revision,hash:doc.sha256,duplicate:state.imports.some(i=>i.hash===doc.sha256)};
+}
 
 const bankgiroObservation=(row:Transaction)=>JSON.stringify(Object.fromEntries(['date','amount','currency','party','payerReference','bankReference','parentBankReference','recipientBankgiro','payerBankgiro','payerAccount','remittanceMessage','settlementDate','format','organizationNumber','referenceEvidence','referenceParts','payerEvidence','reportEvidence','specificationGroup','specificationCount','specificationTotal','recipientAccount','account','original','bankDetails'].map(key=>[key,row[key as keyof Transaction]??null])));
 /** Reconstruct metadata commands from this owner's retained sources. No provider request. */

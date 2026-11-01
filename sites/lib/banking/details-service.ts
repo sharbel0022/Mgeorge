@@ -3,8 +3,8 @@ import {db,identity,readWorkspace,response} from '../server';
 import {canonicalBankAccount,now,uid} from '../domain';
 import {application,connection,accounts,providerConfig,sessionId,withBankLock} from './store';
 import {getSession,getTransactions,getTransactionDetails,ProviderError,type ProviderTransaction} from './enable-banking';
-import {stableAccountKey} from './transactions';
-import {transactionDetailEvidence,enrichBankDetails} from './detail-evidence';
+import {stableAccountKey,normalizeTransactions} from './transactions';
+import {transactionDetailEvidence,enrichBankDetails,adoptFreshBankReceipt} from './detail-evidence';
 
 export async function fetchBankDetails(req:Request){
  const user=await identity(req),body=await req.json() as any;
@@ -12,7 +12,7 @@ export async function fetchBankDetails(req:Request){
  return withBankLock(user.userId,async lease=>{
   const old=await readWorkspace(user.userId),target=old.state.transactions.find(t=>t.id===body.transactionId);
   if(!target||!target.source.startsWith('Enable Banking')||!target.bankReference||target.parentId)throw Error('Bankhändelsen saknar en verifierbar bankidentifierare för detaljhämtning.');
-  if(target.bankDetails&&Date.now()-Date.parse(target.bankDetails.checkedAt)<3600_000)return response({...old,details:target.bankDetails,cached:true});
+  if(!(target.bankDataVersion===undefined&&target.bankDataSha256===undefined)&&target.bankDetails&&Date.now()-Date.parse(target.bankDetails.checkedAt)<3600_000)return response({...old,details:target.bankDetails,cached:true});
   const app=await application(user.userId),conn=await connection(user.userId);
   if(!app||!conn||conn.status!=='connected'||app.generation!==conn.app_generation||conn.environment!=='PRODUCTION'||Date.parse(conn.valid_until)<=Date.now())throw Error('En giltig bankanslutning behövs för att hämta betalningsuppgifter.');
   if(Date.parse(conn.retry_after||'')>Date.now())throw Object.assign(new ProviderError('BANK_RATE_LIMIT','Banken har begränsat hämtningen. Vänta till nästa tillåtna försök.',429,true),{retryAfter:Math.ceil((Date.parse(conn.retry_after)-Date.now())/1000)});
@@ -25,7 +25,7 @@ export async function fetchBankDetails(req:Request){
   let key:string|undefined,listed:ProviderTransaction[]=[];const seen=new Set<string>();
   do{const page=await getTransactions(config,account.uid,{dateFrom:target.date,dateTo:target.date,continuationKey:key,psu});listed.push(...page.transactions.filter(t=>t.entry_reference===target.bankReference));key=page.continuation_key||undefined;if(key){if(seen.has(key)||seen.size>=10)throw Error('Bankens detaljsökning kunde inte slutföras.');seen.add(key);}}while(key);
   if(listed.length!==1)throw Error('Bankposten kunde inte hittas entydigt hos banken. Ingen OCR har gissats.');
-  const original=listed[0];let detail=original,unsupported=false;
+  const original=listed[0],fresh=await normalizeTransactions([original],{accountKey:canonicalBankAccount(target.account),accountLabel:account.name||'',bankName:conn.bank_name,dateFrom:target.date,dateTo:target.date});let detail=original,unsupported=false;
   if(original.transaction_id){try{detail=await getTransactionDetails(config,account.uid,original.transaction_id,psu);}catch(e){if(e instanceof ProviderError&&e.code==='BANK_RESOURCE_UNAVAILABLE')unsupported=true;else throw e;}}else unsupported=true;
   const evidence=transactionDetailEvidence(target,original,detail);
   if(unsupported&&evidence.status==='missing')evidence.reason='Swedbank erbjuder inga ytterligare betalardetaljer för den här posten via den befintliga bankanslutningen. Lägg till Bankgiros individuella betalningsspecifikation.';
@@ -35,9 +35,9 @@ export async function fetchBankDetails(req:Request){
   await lease.assert();
   await env.BUCKET.put(`${user.userId}/${documentId}`,bytes,{httpMetadata:{contentType:'application/json'}});
   const current=await readWorkspace(user.userId);if(current.revision!==old.revision)throw Error('Uppgifterna ändrades under hämtningen. Uppdatera sidan och försök igen.');
-  const state=enrichBankDetails(old.state,target.id,evidence,documentId),auditId=uid();
+  const state=enrichBankDetails(old.state,target.id,evidence,documentId),receiptAdopted=fresh.rows.length===1&&adoptFreshBankReceipt(state,target.id,fresh.rows[0]),auditId=uid();
   const committed=await lease.write([
-   db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(auditId,user.userId,old.revision+1,'bank.details',JSON.stringify({transactionId:target.id,status:evidence.status,documentId,reason:evidence.reason}),at,user.userId,old.revision),
+   db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(auditId,user.userId,old.revision+1,'bank.details',JSON.stringify({transactionId:target.id,status:evidence.status,documentId,receiptAdopted,reason:evidence.reason}),at,user.userId,old.revision),
    db().prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM audit_events WHERE id=? AND owner=?)').bind(documentId,user.userId,`bankuppgifter-${target.date}.json`,'application/json',bytes.length,hash,at,auditId,user.userId),
    db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(state),at,user.userId,old.revision)
   ]);
