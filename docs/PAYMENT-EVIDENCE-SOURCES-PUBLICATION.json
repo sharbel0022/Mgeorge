@@ -1,0 +1,189 @@
+{
+  "schema": "mgeorge-payment-evidence-sources-publication-v1",
+  "date": "2026-11-01",
+  "baseline": "88b8584f7895419bbf68685a72f35c33d26b580e",
+  "parentReceipt": "END-TO-END-PAYMENT-PUBLICATION.json",
+  "github": {
+    "repository": "https://github.com/sharbel0022/Mgeorge",
+    "codeCommit": "cda00d9c976ea83dfb9984fac21a8a727c9715bc",
+    "ci": {
+      "id": 41354521234,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41354521234",
+      "headSha": "cda00d9c976ea83dfb9984fac21a8a727c9715bc",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": {
+        "sites": "success",
+        "test": "success"
+      }
+    }
+  },
+  "validation": {
+    "node": 645,
+    "sites": 1126,
+    "total": 1771,
+    "newTests": 35,
+    "syntaxFiles": 92,
+    "typescript": "passed",
+    "build": "passed",
+    "rootAudit": 0,
+    "sitesProductionAudit": 0,
+    "sitesDevelopmentModerate": 16,
+    "highCritical": 0,
+    "independentReview": "Node aliases and raw evidence/UI, Sites field sources/raw reference/invoice original selection, and documentation independently reviewed; no remaining concrete findings in scope.",
+    "installScope": "Local installations reused only with unchanged package, lock and CI scripts/environment; exact GitHub Actions ran clean installations.",
+    "browser": {
+      "widths": [
+        1440,
+        390
+      ],
+      "steps": 11,
+      "overflow": false,
+      "scope": "Actual component/CSS with synthetic normalized transaction/detail evidence; viewport screenshots. Full-page CDP capture timed out. No 390px production claim."
+    }
+  },
+  "measurement": {
+    "before": "measurements/payment-evidence-sources-linking-before.json",
+    "after": "measurements/payment-evidence-sources-linking-after.json",
+    "librarySourceSha256": "657992c59e0a4a18d74db797133d21ce1085d7111fe97edf76adc28d1f6ccc59",
+    "matchesCommittedCode": true,
+    "provenance": "Measured while HEAD was baseline with dirty final implementation. Exact library source hash was recomputed on committed cda00d9 and matched. Historical artifacts retained unchanged.",
+    "cases": 15,
+    "correctManualBefore": 10,
+    "correctManualAfter": 10,
+    "falseRelations": 0,
+    "falseAllocations": 0,
+    "economicDuplicateScenarios": 0,
+    "unchangedBalances": 15,
+    "correctNamesAndReferences": 8,
+    "processingMsPerFileBefore": 8.6197,
+    "processingMsPerFileAfter": 8.386,
+    "scope": "Synthetic Sites domain corpus only; Node alias boundary has targeted regressions. Single timing observation, no production accuracy or SLA inference."
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "sourceCommit": "9c89b4778f179e908bd407f83277bdb4af14374d",
+    "sourceTree": "8e7d5eb47dcdb5e0e70ef51e0631aed3cf945a62",
+    "githubSitesSubtree": "8e7d5eb47dcdb5e0e70ef51e0631aed3cf945a62",
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_7ce5526984fc81918ad75bc60fc4fed9",
+    "versionNumber": 47,
+    "archiveStorage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_00000000b8d88210961be4e859084748",
+      "content_hash": "sha256:a06f2b07ad9ebc040a0f754c1551d526c2242886b3d33951af9bfbaf052774b1",
+      "size_bytes": 44533760,
+      "file_count": 335
+    },
+    "localArchiveSha256": "1ff78fe188f39885280056d4862f432df3dceec659402ca803a9e259b1e20ba8",
+    "deploymentId": "appgdep_6ae7b5fb2fa8819190e7cd172a6d8f0a",
+    "status": "succeeded",
+    "envSetRevision": 9,
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site"
+  },
+  "rollback": {
+    "previousStableVersion": 46,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_367a2fed94ec8191b9349dbdd88bbb6b",
+    "sourceCommit": "2869f0ac51946b5fb31cb25de79872bb92557ecd",
+    "scope": "Existing saved version; unchanged schema, bindings, secrets and schedules. Financial reversals remain separate audited decisions."
+  },
+  "backup": {
+    "manifestFiles": 191,
+    "verifiedFiles": 191,
+    "scope": "manifest_pass",
+    "olderApiRecordsWithoutReceipt": 113,
+    "fullDisasterRecoveryExercise": false
+  },
+  "externalRequirements": [
+    "Authoritative receiving-account alias/Bankgiro-to-account relationship for the actual report.",
+    "Explicit bank report/deposit relationship; report number, equal amount and date are insufficient.",
+    "Normal review and registration of intact invoice 0599 with duplicate/counterparty checks, followed by separate customer or third-party payer verification.",
+    "Fresh read-only reconciliation proposal and separate administrator approval before a real allocation."
+  ],
+  "objectiveApproved": false,
+  "scoresRaised": false,
+  "privacy": "Authentic originals, private raw account/customer data and their original checksums remain outside Git.",
+  "preservation": {
+    "latestVersion": 47,
+    "accessPolicyUnchanged": true,
+    "accessModeUnchanged": true,
+    "authClientUnchanged": true,
+    "schedulesUnchanged": true,
+    "runtimeRevisionBefore": 9,
+    "runtimeRevisionAfter": 9,
+    "runtimeEntryMetadataUnchanged": true,
+    "databaseTablesUnchanged": true,
+    "bindingsUnchanged": true,
+    "hostingDeclarationUnchanged": true
+  },
+  "production": {
+    "revisionBefore": 40,
+    "revisionAfter": 40,
+    "stateUnchanged": true,
+    "financialProjectionUnchanged": true,
+    "invoices": 5,
+    "allocations": 0,
+    "registered0599": false,
+    "automaticEligible": false,
+    "mode": "preview",
+    "changed": false,
+    "checks": [
+      {
+        "id": "received",
+        "status": "passed"
+      },
+      {
+        "id": "report",
+        "status": "review"
+      },
+      {
+        "id": "original",
+        "status": "passed"
+      },
+      {
+        "id": "account",
+        "status": "blocked"
+      },
+      {
+        "id": "deposit",
+        "status": "missing"
+      },
+      {
+        "id": "payer",
+        "status": "missing"
+      },
+      {
+        "id": "reference",
+        "status": "missing"
+      },
+      {
+        "id": "invoice",
+        "status": "review"
+      },
+      {
+        "id": "customer",
+        "status": "review"
+      },
+      {
+        "id": "amount",
+        "status": "missing"
+      },
+      {
+        "id": "reconciliation",
+        "status": "blocked"
+      }
+    ],
+    "desktop": {
+      "width": 1920,
+      "documentWidth": 1920,
+      "steps": 11
+    },
+    "financialWritesPerformed": 0,
+    "bankSyncTriggered": false,
+    "gmailSyncTriggered": false,
+    "mailSent": false,
+    "bankPaymentPerformed": false,
+    "mobileEvidence": "390px actual component and CSS with synthetic state only.",
+    "invoiceOriginal": "Owned intact original found, not registered.",
+    "sourceLinkConfirmed": false
+  }
+}
