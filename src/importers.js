@@ -1,4 +1,6 @@
 import {extractPaymentReferences} from './payment-references.js';
+import {camtPayerEvidence} from '../sites/lib/camt-payer.js';
+import {apiPayerEvidence,csvPayerEvidence} from '../sites/lib/payer-evidence.js';
 import {readCamtDocument as xmlTree,xmlChildren as children,xmlPath as path,xmlValue as value,camtRemittanceNodes,camtAmount as amountNode,camtDate,camtReportEvidence,validateCamtBatches,decodeCamtBytes} from '../sites/lib/camt-xml.js';
 /**
  * MG FAKTURAKOLL – BANKFILER / FORMAT
@@ -62,7 +64,10 @@ const aliases={
   bank_account:['konto','kontonummer','iban','account','account number'],
   payer:['avsändare','avsandare','betalare','mottagare','namn','motpart','counterparty','payer'],
   payer_organization_number:['organisationsnummer','organisationsnr','orgnr','payer_organization_number'],
-  reference:['ocr','referens','fakturareferens','betalningsreferens','betalningsreferens / ocr','meddelande','payment reference','referensnummer'],
+  reference:['referens','fakturareferens','betalningsreferens','betalningsreferens / ocr','payment reference','referensnummer'],
+  ocr:['ocr','ocr-nummer','ocrnummer'],
+  invoice_reference:['fakturanummer','fakturanr','invoice number'],
+  message:['meddelande'],
   bank_reference:['bankreferens','bank reference','transaktionsid','transaktions-id','transaction id','id'],
   bankgiro:['bankgiro','bankgironummer','företagets bankgiro','foretagets bankgiro'],
   payer_bankgiro:['bankgironummer/avinummer','bankgironummer / avinummer','avsändarens bankgironummer','avinummer'],
@@ -107,18 +112,19 @@ export function parseCSV(text,account='Swedbank'){
     if(reportedAccounts.size>1)throw new Error('Bankfilen innehåller flera konton. Importera ett konto åt gången.');
     const rawColumns={columns:rows[0].map((name,n)=>({[name]:row[n]??''}))};
     const reference_evidence=extractPaymentReferences(rawColumns);
-    const description=g('description'),payer=g('payer'),reference=g('reference')||reference_evidence.selected?.value||'';
+    const payer_evidence=csvPayerEvidence(rows[0],row,idx.payer,idx.payer_organization_number);
+    const description=g('description'),payer=g('payer'),reference=reference_evidence.selected?.value||g('reference')||'';
     const collective=requiresPaymentSpecification(description,payer,reference);
-    items.push({reference_evidence,account_evidence:fileAccountEvidence(reported,account,'csv',g('currency')),account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:g('payer_organization_number'),reference,bank_reference:bankId(g('bank_reference')),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
+    items.push({payer_evidence,reference_evidence,account_evidence:fileAccountEvidence(reported,account,'csv',g('currency')),account,booked_at:normalizeDate(g('date')),amount_cents:cents,currency:sek(g('currency')),payer,payer_organization_number:payer_evidence.organizationNumber,reference,bank_reference:bankId(g('bank_reference')),bankgiro:g('bankgiro'),payer_bankgiro:g('payer_bankgiro'),description,...(collective?aggregateFlags():{})});
   }
   return validateItems(items);
 }
 function reversed(node){const flags=children(node,'RvslInd');if(!flags.length)return false;const flag=value(node,'RvslInd');if(!/^(true|false|0|1)$/.test(flag))throw new Error('Ogiltig XML-flagga för återföring.');return /^(true|1)$/.test(flag);}
 function unsignedMoney(node){if(!/^\d+(?:\.\d{1,2})?$/.test(node.text.trim()))throw new Error('Bankpostens belopp måste vara ett osignerat decimaltal; riktningen anges separat.');return parseMoney(node.text);}
 function referenceEvidence(node){
-  const convert=n=>n.children.length?Object.fromEntries([...new Set(n.children.map(c=>c.name))].map(name=>[name,n.children.filter(c=>c.name===name).map(convert)])):n.text.trim();
-  const OCR=camtRemittanceNodes(node,'CdtrRefInf').filter(n=>/^(?:SE)?OCR$/i.test(value(n,'Tp','CdOrPrtry','Prtry')||value(n,'Tp','CdOrPrtry','Cd'))).map(n=>value(n,'Ref'));
-  return extractPaymentReferences({RmtInf:children(node,'RmtInf').map(convert),OCR,AddtlTxInf:value(node,'AddtlTxInf')});
+  path(node,'RmtInf'); // A transaction has one remittance container; never merge duplicates.
+  const convert=n=>n.children.length?Object.fromEntries([...new Set(n.children.map(c=>c.name))].map(name=>[name,n.children.filter(c=>c.name===name).map(convert)])):n.text;
+  return extractPaymentReferences({RmtInf:children(node,'RmtInf').map(convert),AddtlTxInf:path(node,'AddtlTxInf')?.text||''},{sourcePrefix:'$.'+node.sourcePath.replaceAll('/','.')});
 }
 function reference(node){return referenceEvidence(node).selected?.value||children(path(node,'RmtInf'),'Ustrd').map(x=>x.text.trim()).join(' ')||'';}
 function bankId(s){return /^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(s)?'':s;}
@@ -182,10 +188,10 @@ export function parseCAMT(xml,account='Swedbank'){
       if(details.length===1&&cents!==total)throw new Error('Betalningsbeloppet stämmer inte med bankpostens totalbelopp');
       const detailDirection=value(detail,'CdtDbtInd');if(detailDirection&&detailDirection!==direction)throw new Error('Motstridiga betalningsriktningar i XML-filen');
       const party=sign>0?'Dbtr':'Cdtr';
-      const payer=value(detail,'RltdPties',party,'Nm')||value(detail,'RltdPties',party,'Pty','Nm');
+      const payer_evidence=camtPayerEvidence(detail,sign>0),payer=payer_evidence.name?.value||'';
       const ref=reference(detail),specific=detailIds[index];
       const id=specific||(details.length===1?parentReference:'');
-      items.push({...common,reference_evidence:referenceEvidence(detail),amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(parentReference&&id!==parentReference?{parent_bank_reference:parentReference}:{})});
+      items.push({...common,payer_evidence,payer_organization_number:payer_evidence.organizationNumber,reference_evidence:referenceEvidence(detail),amount_cents:cents*sign,payer,reference:ref,bank_reference:id,description:description||value(detail,'AddtlTxInf'),...(payer_evidence.conflict?{needs_review:1,review_reason:payer_evidence.warnings.join(' ')}:{}),...(parentReference&&id!==parentReference?{parent_bank_reference:parentReference}:{})});
     }
   }
   return validateItems(items);
@@ -208,7 +214,7 @@ export function normalizeBankApiTransaction(x,account){
   if(!['CRDT','DBIT'].includes(x.credit_debit_indicator))throw new Error('Banken returnerade en okänd betalningsriktning');
   const sign=x.credit_debit_indicator==='DBIT'?-1:1;
   const text=value=>typeof value==='string'?value.trim():'';
-  const payer=text(sign>0?x.debtor?.name:x.creditor?.name);
+  const payer_evidence=apiPayerEvidence(x,sign>0),payer=text(sign>0?x.debtor?.name:x.creditor?.name);
   const remittance=Array.isArray(x.remittance_information)?x.remittance_information.map(text).filter(Boolean).join(' '):'';
   const reference_evidence=extractPaymentReferences(x);
   const ref=reference_evidence.incomplete?'':reference_evidence.selected?.value||'';
@@ -219,5 +225,6 @@ export function normalizeBankApiTransaction(x,account){
   if(!text(x.transaction_amount?.currency))throw new Error('Banken returnerade en transaktion utan valuta');
   // Per the official Transaction schema, transaction_id is a transient detail
   // lookup ID. Only entry_reference is immutable across renewed bank sessions.
-  return {reference_evidence,raw_bank_data:structuredClone(x),account,booked_at:normalizeDate(x.booking_date||x.value_date),amount_cents:amount*sign,currency:sek(x.transaction_amount.currency),payer,reference:ref,bank_reference:bankId(text(x.entry_reference)),provider_transaction_id:text(x.transaction_id),bankgiro,description,...(requiresPaymentSpecification(description,payer,text(x.reference_number))?aggregateFlags():{})};
+  if(requiresPaymentSpecification(description,payer,text(x.reference_number))){payer_evidence.scope='collective';payer_evidence.organizationNumber='';}
+  return {payer_evidence,payer_organization_number:payer_evidence.organizationNumber,reference_evidence,raw_bank_data:structuredClone(x),account,booked_at:normalizeDate(x.booking_date||x.value_date),amount_cents:amount*sign,currency:sek(x.transaction_amount.currency),payer,reference:ref,bank_reference:bankId(text(x.entry_reference)),provider_transaction_id:text(x.transaction_id),bankgiro,description,...(payer_evidence.conflict?{needs_review:1,review_reason:payer_evidence.warnings.join(' ')}:{}),...(requiresPaymentSpecification(description,payer,text(x.reference_number))?aggregateFlags():{})};
 }

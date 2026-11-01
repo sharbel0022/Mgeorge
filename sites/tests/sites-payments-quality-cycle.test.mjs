@@ -7,6 +7,7 @@ import {parseBankgiroXML} from '../lib/bankgiro-parser.js';
 
 const url=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports){
+ imports={'../payer-evidence.js':url('../lib/payer-evidence.js'),...imports};
  let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});
  for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));
  return 'data:text/javascript;base64,'+Buffer.from(code).toString('base64');

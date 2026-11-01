@@ -168,7 +168,9 @@ test('malformed reversal flags, repeated bank facts, signed magnitudes and date 
 });
 
 test('CSV ambiguous columns, inconsistent row width and malformed quotes cannot hide bank facts',()=>{
-  assert.throws(()=>parseCSV('Datum;Belopp;OCR;Referens\n2026-10-26;300;000018;OTHER'),/kolumn/i);
+  const multiple=parseCSV('Datum;Belopp;OCR;Referens\n2026-10-26;300;000018;OTHER')[0];
+  assert.deepEqual(new Set(multiple.reference_evidence.candidates.map(c=>c.value)),new Set(['000018','OTHER']));
+  assert.throws(()=>parseCSV('Datum;Belopp;OCR;OCR-nummer\n2026-10-26;300;000018;OTHER'),/kolumn/i);
   assert.throws(()=>parseCSV('Datum;Belopp;Betalare\n2026-10-26;300;Kund;EXTRA'),/kolumn|fält/i);
   assert.throws(()=>parseCSV('Datum;Belopp;Betalare\n2026-10-26;300;"Kund"suffix'),/CSV/i);
 });

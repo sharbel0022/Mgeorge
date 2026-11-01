@@ -9,7 +9,7 @@ import {randomToken} from '../lib/banking/security.ts';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const source=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 const url=path=>new URL(path,import.meta.url).href;
-function compiled(path,imports){let code=stripTypeScriptTypes(source(path),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));return data(code);}
+function compiled(path,imports){imports={'../payer-evidence.js':url('../lib/payer-evidence.js'),...imports};let code=stripTypeScriptTypes(source(path),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));return data(code);}
 const {reconcileState}=await import(compiled('../lib/reconciliation.ts',{'./domain':url('../lib/domain.ts'),'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')}));
 class LocalD1{
  constructor(sql){this.sql=sql;this.beforeBatch=null;}

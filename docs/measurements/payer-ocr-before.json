@@ -1,0 +1,1257 @@
+{
+  "version": 2,
+  "synthetic": true,
+  "commit": "9d456563a15e9681d8500a0e09f3ef32314c67b1",
+  "sourceHashes": {
+    "src/importers.js": "0a26e1136b1ae79025df276770560c7eea5e609586e216d6b9080dbf3572f1ba",
+    "src/payment-references.js": "1841ad876755d758b1526cf377d7154b25e6b91f4e0a791fbc570d7b1a8b8b43",
+    "sites/lib/bankgiro-parser.js": "19d40186862b79b1a28d933f09e6c4122888d19978553be60ed53d6a63f79e90",
+    "sites/lib/camt-xml.js": "d166661871bd9c0fab2976b4ccbea9510ed25bad2dfbe04de2c8d9e32b5534a7"
+  },
+  "corpusSha256": "4ccd13a77d11a2363e4a020bc3f7c588ad5fa2e719478ce14cfe7e12a009614f",
+  "evaluations": 49,
+  "originals": 26,
+  "summary": {
+    "payer": {
+      "correct": 35,
+      "total": 42,
+      "falseNames": 0,
+      "falseOrganization": 5
+    },
+    "ocr": {
+      "tp": 34,
+      "fp": 0,
+      "fn": 3,
+      "expected": 37,
+      "precision": 1,
+      "recall": 0.918918918918919
+    },
+    "invoice": {
+      "tp": 12,
+      "fp": 0,
+      "fn": 2,
+      "expected": 14,
+      "precision": 1,
+      "recall": 0.8571428571428571
+    },
+    "failedImports": 1,
+    "meanMs": 0.5097183673469387
+  },
+  "details": [
+    {
+      "engine": "node",
+      "id": "01-correct",
+      "error": "",
+      "ms": 5.725999999999999,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "02-no-ocr",
+      "error": "",
+      "ms": 0.30000000000000426,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "03-no-payer",
+      "error": "",
+      "ms": 0.386099999999999,
+      "expected": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "04-document-zero",
+      "error": "",
+      "ms": 0.6413999999999973,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "05-two-ocr",
+      "error": "",
+      "ms": 6.541900000000005,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018",
+          "1234567897"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018",
+          "1234567897"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "06-invalid-checksum",
+      "error": "",
+      "ms": 0.22560000000000002,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000019"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000019"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "07-multiple-invoices",
+      "error": "",
+      "ms": 0.1968000000000032,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594",
+          "0599"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594",
+          "0599"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "08-mixed-reference",
+      "error": "",
+      "ms": 0.221899999999998,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "09-org-coid",
+      "error": "",
+      "ms": 0.2728000000000037,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "10-bic-is-not-org",
+      "error": "",
+      "ms": 0.21179999999999666,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "11-customer-id-not-org",
+      "error": "",
+      "ms": 0.21650000000000347,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "12-unknown-id-not-org",
+      "error": "",
+      "ms": 0.3839000000000041,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "13-wrapped-party",
+      "error": "",
+      "ms": 0.18590000000000373,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "14-ultimate-is-not-payer",
+      "error": "",
+      "ms": 0.19489999999999696,
+      "expected": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "15-message-invoice",
+      "error": "",
+      "ms": 0.19249999999999545,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0599"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0599"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "16-raw-reference",
+      "error": "",
+      "ms": 0.16109999999999758,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "17-foreign-name-not-payer",
+      "error": "",
+      "ms": 0.20899999999999608,
+      "expected": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "18-camt053",
+      "error": "",
+      "ms": 0.19480000000000075,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "19-csv-ocr",
+      "error": "",
+      "ms": 0.943099999999994,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "20-csv-invoice",
+      "error": "",
+      "ms": 0.2749999999999986,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "21-csv-both",
+      "error": "",
+      "ms": 0.21920000000000073,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "22-csv-generic",
+      "error": "",
+      "ms": 0.2582000000000022,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "23-api-sebg",
+      "error": "",
+      "ms": 0.22570000000000334,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": false,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "24-api-unknown",
+      "error": "",
+      "ms": 0.1541999999999959,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "25-api-missing-individual",
+      "error": "",
+      "ms": 0.03499999999999659,
+      "expected": {
+        "payer": "",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "node",
+      "id": "26-explicit-se-coid",
+      "error": "",
+      "ms": 0.2190000000000012,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "5560000001",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": false,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "01-correct",
+      "error": "",
+      "ms": 1.6339999999999932,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "02-no-ocr",
+      "error": "",
+      "ms": 0.1781999999999968,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "03-no-payer",
+      "error": "",
+      "ms": 0.18679999999999808,
+      "expected": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "04-document-zero",
+      "error": "",
+      "ms": 0.2638999999999996,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "05-two-ocr",
+      "error": "",
+      "ms": 0.28070000000000306,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018",
+          "1234567897"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018",
+          "1234567897"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "06-invalid-checksum",
+      "error": "",
+      "ms": 0.18249999999999744,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000019"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000019"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "07-multiple-invoices",
+      "error": "",
+      "ms": 0.18469999999999942,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594",
+          "0599"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594",
+          "0599"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "08-mixed-reference",
+      "error": "",
+      "ms": 0.34129999999999683,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "09-org-coid",
+      "error": "",
+      "ms": 0.2687000000000026,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "556000-0001",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": false,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "10-bic-is-not-org",
+      "error": "",
+      "ms": 0.3072999999999979,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "TESTSESSXXX",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": false,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "11-customer-id-not-org",
+      "error": "",
+      "ms": 0.17660000000000053,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "1234567890",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": false,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "12-unknown-id-not-org",
+      "error": "",
+      "ms": 0.15210000000000434,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "1234567890",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": false,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "13-wrapped-party",
+      "error": "",
+      "ms": 0.1933000000000007,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "14-ultimate-is-not-payer",
+      "error": "",
+      "ms": 0.1524999999999963,
+      "expected": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "15-message-invoice",
+      "error": "",
+      "ms": 0.21270000000000522,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0599"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0599"
+        ]
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "16-raw-reference",
+      "error": "",
+      "ms": 0.15229999999999677,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "17-foreign-name-not-payer",
+      "error": "",
+      "ms": 0.14870000000000516,
+      "expected": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "18-camt053",
+      "error": "",
+      "ms": 0.14090000000000202,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "19-csv-ocr",
+      "error": "",
+      "ms": 0.4946999999999946,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": false,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "20-csv-invoice",
+      "error": "Bankgiro-CSV behöver kolumnerna datum, belopp, avsändare och betalningsreferens.",
+      "ms": 0.08520000000000039,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": false,
+      "ocrCorrect": false,
+      "invoiceCorrect": false
+    },
+    {
+      "engine": "sites",
+      "id": "21-csv-both",
+      "error": "",
+      "ms": 0.04860000000000042,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": [
+          "0594"
+        ]
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": false,
+      "invoiceCorrect": false
+    },
+    {
+      "engine": "sites",
+      "id": "22-csv-generic",
+      "error": "",
+      "ms": 0.02030000000000598,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "",
+        "ocr": [],
+        "invoice": []
+      },
+      "payerCorrect": true,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    },
+    {
+      "engine": "sites",
+      "id": "26-explicit-se-coid",
+      "error": "",
+      "ms": 0.3778999999999968,
+      "expected": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "5560000001",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "actual": {
+        "payer": "Syntetisk Kund AB",
+        "organization": "556000-0001",
+        "ocr": [
+          "000018"
+        ],
+        "invoice": []
+      },
+      "payerCorrect": false,
+      "ocrCorrect": true,
+      "invoiceCorrect": true
+    }
+  ]
+}

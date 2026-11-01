@@ -1,0 +1,36 @@
+{
+  "synthetic": true,
+  "desktop": {
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "headers": [
+      "Betalare",
+      "Faktura",
+      "OCR",
+      "Belopp",
+      "Datum",
+      "Status"
+    ]
+  },
+  "mobile": {
+    "viewport": 390,
+    "scrollWidth": 390,
+    "ocrMissing": true
+  },
+  "dialog": {
+    "viewport": 390,
+    "width": 370,
+    "scrollWidth": 368,
+    "openedWithEnter": true,
+    "closedWithEscape": true,
+    "focus": {
+      "tag": "BUTTON",
+      "text": "Betalare okänd+1 000,00 krBetalare okänd – banken har inte lämnat verifierade individuella uppgifter"
+    }
+  },
+  "fileUpload": {
+    "verifiedInBrowser": false,
+    "reason": "Chrome extension file URL access disabled; no access settings changed"
+  },
+  "production": false
+}

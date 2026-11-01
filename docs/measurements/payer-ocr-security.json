@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-01",
+  "node_all": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "sites_production": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "sites_all": {
+    "info": 0,
+    "low": 0,
+    "moderate": 16,
+    "high": 0,
+    "critical": 0
+  },
+  "required_audit_level": "high",
+  "gate_passed": true,
+  "advisory": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+  "remaining": "Dev-tool minimatch chain; no forced downgrade/major override applied."
+}

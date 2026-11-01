@@ -1,5 +1,6 @@
 import { parseMoney, validDate, suspectedBankCollection, PAYMENT_SPECIFICATION_REQUIRED } from '../domain';
 import { extractPaymentReferences } from '../payment-references.js';
+import { apiPayerEvidence } from '../payer-evidence.js';
 import { createHash } from 'node:crypto';
 import type { BankRow } from '../imports';
 import type { ProviderAccount, ProviderBankIdentity } from './enable-banking';
@@ -105,7 +106,8 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
     const collective=suspectedBankCollection(magnitude*(incoming?1:-1),`${bankCode} ${remittance}`,party,!missingReference(structured)?structured:'');
     const description = [collective?PAYMENT_SPECIFICATION_REQUIRED:'',bankCode, remittance, cleanText(raw.note), !booked ? 'Valutadatum används; banken saknar bokföringsdatum.' : ''].filter(Boolean).join(' · ').slice(0, 1_000);
     if (/bankgiro|\bbatch\b|samlings|buntbetal|sammandrag/i.test(`${bankCode} ${remittance}`)) ambiguousBatches++;
-    rows.push({ referenceEvidence, bankData: structuredClone(raw), bankDataVersion: 'bank-api-original-v1', bankDataSha256: createHash('sha256').update(JSON.stringify(raw),'utf8').digest('hex'), date, amount: magnitude * (incoming ? 1 : -1), party, payerReference,
+    const payerEvidence=apiPayerEvidence(raw,incoming,{collective});
+    rows.push({ payerEvidence,organizationNumber:payerEvidence.organizationNumber,referenceEvidence, bankData: structuredClone(raw), bankDataVersion: 'bank-api-original-v1', bankDataSha256: createHash('sha256').update(JSON.stringify(raw),'utf8').digest('hex'), date, amount: magnitude * (incoming ? 1 : -1), party, payerReference,
       bankReference: cleanText(entry).slice(0, 300), description,
       source: `Enable Banking · ${cleanText(options.bankName)} · ${cleanText(options.accountLabel)}`.slice(0, 300),
       currency: 'SEK', externalId: entry ? await stableEntryId(options.accountKey, entry) : '',

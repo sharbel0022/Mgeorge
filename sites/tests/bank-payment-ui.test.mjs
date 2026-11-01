@@ -94,3 +94,16 @@ test('an unmatched bank OCR is never described as an invoice number',()=>{
  const s=emptyState(),t=tx({kind:'payment',party:'Bankens betalare AB',description:'',payerReference:'000018'},{reference_number:undefined,ocr:'000018'});
  const message=paymentInvoiceAssessment(s,t).message;assert.match(message,/betalningsreferensen 000018/);assert.doesNotMatch(message,/faktura 000018/);assert.equal(s.allocations.length,0);
 });
+
+test('bank list explains unknown payer, missing bank OCR and a separately suggested invoice',()=>{
+ const s=emptyState(),t=tx();s.transactions.push(t);s.invoices.push(invoice({number:'0594'}));
+ const before=JSON.stringify(s),html=render(ui.default,{state:s,transactions:[t],candidates:{t:[{number:'0594',party:'Fakturakund AB'}]},open(){throw Error('Render must not write');}});
+ for(const text of ['Betalare okänd – banken har inte lämnat verifierade individuella uppgifter.','Bank-OCR saknas.','Fakturaförslag: 0594 – inte verifierat av bankens OCR.'])assert.ok(html.includes(text),text);
+ assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,6);assert.equal(JSON.stringify(s),before);assert.doesNotMatch(html,/OCR 0594/);
+});
+
+test('known payer and typed bank OCR do not receive missing-information explanations',()=>{
+ const s=emptyState(),t=tx({kind:'payment',party:'Bank payer',description:'',payerReference:'000018'}, {reference_number:undefined,ocr:'000018'});s.transactions.push(t);
+ const html=render(ui.default,{state:s,transactions:[t],open(){}});
+ assert.match(html,/Bank payer/);assert.match(html,/OCR 000018/);assert.doesNotMatch(html,/Bank-OCR saknas\.|banken har inte lämnat verifierade individuella uppgifter/);
+});

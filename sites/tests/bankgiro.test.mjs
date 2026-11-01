@@ -65,8 +65,8 @@ test('V3 explicit Swedish OCR type validates checksum while a numeric invoice nu
 
 test('V3 payer organisation and masked account survive original import',()=>{
  const input=xml(detail().replace('</Nm>','</Nm><Id><OrgId><Othr><Id>556123-4567</Id></Othr></OrgId></Id>'));
- const [r]=parseBankgiroXML(input);assert.equal(r.organizationNumber,'556123-4567');assert.equal(r.payerAccount,'•••• 8296');
- const s=importRows(setup(),[r]);assert.equal(s.transactions[1].payerAccount,'•••• 8296');assert.equal(s.transactions[1].organizationNumber,'556123-4567');
+ const [r]=parseBankgiroXML(input);assert.equal(r.organizationNumber,'');assert.equal(r.payerEvidence.identifiers[0].rawValue,'556123-4567');assert.equal(r.payerAccount,'•••• 8296');
+ const s=importRows(setup(),[r]);assert.equal(s.transactions[1].payerAccount,'•••• 8296');assert.equal(s.transactions[1].organizationNumber,'');assert.equal(s.transactions[1].payerEvidence.identifiers[0].rawValue,'556123-4567');
 });
 
 test('V3 conflicting individual references and a different payer never create allocations',()=>{

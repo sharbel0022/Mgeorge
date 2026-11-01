@@ -10,7 +10,7 @@ import {
 
 const compiled = ts.transpileModule(readFileSync(new URL('../lib/banking/transactions.ts', import.meta.url), 'utf8'), {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
-}).outputText.replace("'../payment-references.js'", JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href)).replace(/from ['"]\.\.\/domain['"]/, `from '${new URL('../lib/domain.ts', import.meta.url).href}'`);
+}).outputText.replace("'../payment-references.js'", JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href)).replace("'../payer-evidence.js'", JSON.stringify(new URL('../lib/payer-evidence.js',import.meta.url).href)).replace(/from ['"]\.\.\/domain['"]/, `from '${new URL('../lib/domain.ts', import.meta.url).href}'`);
 const { normalizeTransactions, stableAccountKey } = await import('data:text/javascript;base64,' + Buffer.from(compiled).toString('base64'));
 const applicationId = '11111111-1111-4111-8111-111111111111';
 const accountUid = '22222222-2222-4222-8222-222222222222';

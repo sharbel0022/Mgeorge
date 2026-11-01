@@ -1,0 +1,410 @@
+{
+  "schema": "synthetic-bank-matching-benchmark-v1",
+  "generated_at": "2026-11-01T12:32:28.549Z",
+  "source": {
+    "root": "C:\\Users\\sharbel\\Downloads\\Mgeorge-payer-ocr",
+    "revision": "9d456563a15e9681d8500a0e09f3ef32314c67b1",
+    "dirty": true,
+    "stable_during_run": true,
+    "file_sha256": {
+      "src/db.js": "86327465175187a8bd21b1e3a7d4e911a7c6729bd36c29b714f64f55469dfcd7",
+      "src/importers.js": "dd70cc1b22b32b7d815b36707845a915100cd7f103a75d9b69746428ff741b13",
+      "src/reconciliation.js": "7353ae245f35b7c6f4a497442d40a8b328f2e31f175aad13a0de15dca7bfa120",
+      "src/security.js": "8cc5b24c53016832e4c2bc272622da90dc33c0029b5ae3fc4f4e12eb37806423",
+      "src/bank-evidence.js": "828f4fb6a6c4fc7ffd5230d001ce29db1e0e27bf40a404a0b6853b2f686df1ed",
+      "src/payment-references.js": "43fb87c6a8144ae7ed48b341221d5124146da4c93a9f1673a3ad6c29a7fc5f94",
+      "sites/lib/payment-references.js": "43fb87c6a8144ae7ed48b341221d5124146da4c93a9f1673a3ad6c29a7fc5f94",
+      "sites/lib/payer-evidence.js": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661",
+      "sites/lib/camt-payer.js": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827",
+      "sites/lib/camt-xml.js": "93f72a958981645adf5e6bab24989f98c770eec75e0ab446f9b47bd0f83ec6cf",
+      "sites/lib/reference-evidence-compat.js": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba"
+    }
+  },
+  "runner_sha256": "129433dc6514b1d1b0ce74b02d306f8d22dcb6843d256580bb7e8ed9578b8b0f",
+  "corpus_sha256": "f772ec3e3be3fd85e5b0904b504e798d20a1cdb3b970d2b0c6a20207c281b27c",
+  "scope": "Synthetic Node reconciliationData -> pure analyzeReconciliation -> atomic runReconciliation with real temporary SQLite and preserved synthetic bank originals. No live API or production evidence.",
+  "definitions": {
+    "automatic": "At least one new allocation at the real reconciliation boundary.",
+    "manual_rate": "Cases without automatic allocation divided by evaluated persisted-payment cases; rejected originals and setup errors are reported separately.",
+    "truth": "Fixed case outcomes in bank-matching-corpus.js; this is a bounded regression benchmark, not a production error-rate estimate."
+  },
+  "metrics": {
+    "cases": 23,
+    "evaluated_payment_cases": 22,
+    "expected_automatic": 5,
+    "automatic_true_positives": 5,
+    "automatic_false_positives": 0,
+    "automatic_false_negatives": 0,
+    "automatic_precision": 1,
+    "automatic_recall": 1,
+    "manual_review_cases": 17,
+    "manual_rate": 0.7727272727272727,
+    "blocked_original_cases": 1,
+    "errors": 0,
+    "correct_cases": 23
+  },
+  "import_replay": {
+    "attempts": 2,
+    "first_imported": 1,
+    "repeated_imported": 0,
+    "repeated_duplicates": 1,
+    "stored_transactions": 1,
+    "allocations": 1,
+    "paid_cents": 10000
+  },
+  "aborted_import": {
+    "attempts": 1,
+    "rejected_imports": 1,
+    "rejection": "conflicting_bank_record",
+    "new_payment_rows": 0,
+    "stored_transactions": 1,
+    "conflict_records": 1
+  },
+  "cases": [
+    {
+      "id": "exact-api",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 10000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "correct"
+      ]
+    },
+    {
+      "id": "exact-retained-file",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 10000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "correct"
+      ]
+    },
+    {
+      "id": "missing-payer",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "different_payer"
+      ]
+    },
+    {
+      "id": "missing-reference",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "missing_reference"
+      ]
+    },
+    {
+      "id": "amount-only",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "unknown_payer"
+      ]
+    },
+    {
+      "id": "two-equal-open-invoices",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "missing_reference"
+      ]
+    },
+    {
+      "id": "multiple-reference-owners",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ]
+    },
+    {
+      "id": "explicit-invalid-ocr",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ]
+    },
+    {
+      "id": "sebg-invalid-ocr",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ]
+    },
+    {
+      "id": "partial-payment",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 6000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "partial"
+      ]
+    },
+    {
+      "id": "overpayment",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 1,
+      "paid_cents": 10000,
+      "available_cents": 2000,
+      "finding_kinds": [
+        "overpayment"
+      ]
+    },
+    {
+      "id": "explicit-refund",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "financial_review"
+      ]
+    },
+    {
+      "id": "explicit-reversal",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "financial_review"
+      ]
+    },
+    {
+      "id": "file-for-another-account",
+      "expected": "blocked",
+      "actual": "blocked",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 0,
+      "paid_cents": 0,
+      "available_cents": 0,
+      "finding_kinds": [],
+      "rejection": "Bankfilens konto stämmer inte med det valda företagskontot."
+    },
+    {
+      "id": "unavailable-original",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "correct"
+      ]
+    },
+    {
+      "id": "verified-historical-payer-link",
+      "expected": "automatic",
+      "actual": "automatic",
+      "correct": true,
+      "automatic_candidates": 1,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 1,
+      "transaction_count": 2,
+      "paid_cents": 10000,
+      "available_cents": 0,
+      "finding_kinds": [
+        "correct",
+        "possible_duplicate"
+      ]
+    },
+    {
+      "id": "unverified-historical-payer-link",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 2,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "different_payer"
+      ]
+    },
+    {
+      "id": "duplicate-source-accounts",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 2,
+      "paid_cents": 0,
+      "available_cents": 20000,
+      "finding_kinds": [
+        "possible_duplicate"
+      ]
+    },
+    {
+      "id": "two-payments-one-invoice",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 2,
+      "paid_cents": 0,
+      "available_cents": 20000,
+      "finding_kinds": [
+        "possible_duplicate"
+      ]
+    },
+    {
+      "id": "conflicting-payer-organization-identifiers",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "financial_review"
+      ]
+    },
+    {
+      "id": "changed-typed-payer-identifier-on-replay",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "bank_evidence_conflict"
+      ]
+    },
+    {
+      "id": "customer-identifier-is-not-organization",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "different_payer"
+      ]
+    },
+    {
+      "id": "company-bankgiro-is-not-invoice-ocr",
+      "expected": "manual",
+      "actual": "manual",
+      "correct": true,
+      "automatic_candidates": 0,
+      "analyzer_agrees_with_boundary": true,
+      "new_allocations": 0,
+      "transaction_count": 1,
+      "paid_cents": 0,
+      "available_cents": 10000,
+      "finding_kinds": [
+        "reference_conflict"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02">
+<BkToCstmrDbtCdtNtfctn><GrpHdr><MsgId>SYNTHETIC-MESSAGE</MsgId><CreDtTm>2026-10-27T10:00:00Z</CreDtTm></GrpHdr><Ntfctn><Id>SYNTHETIC-REPORT</Id>
+<Acct><Id><Othr><Id>Swedbank</Id></Othr></Id><Ccy>SEK</Ccy><Svcr><FinInstnId><BIC>SYNTHETIC</BIC></FinInstnId></Svcr></Acct>
+<Ntry><Amt Ccy="SEK">7179.16</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-27</Dt></BookgDt><ValDt><Dt>2026-10-27</Dt></ValDt><AcctSvcrRef>EXEMPEL-BG</AcctSvcrRef>
+<NtryDtls><TxDtls><Refs><TxId>SYNTHETIC-CHILD</TxId></Refs><AmtDtls><TxAmt><Amt Ccy="SEK">7179.16</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>Syntetisk betalare AB</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Tp><CdOrPrtry><Prtry>OCR</Prtry></CdOrPrtry></Tp><Ref>000018</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls>
+</Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>

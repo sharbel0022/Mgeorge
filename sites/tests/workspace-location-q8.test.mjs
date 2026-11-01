@@ -6,6 +6,9 @@ import ts from 'typescript';
 const locationModule=()=>import('../lib/workspace-location.ts');
 const draftsModule=()=>import('../lib/workspace-drafts.ts');
 const flush=async()=>{for(let n=0;n<4;n++)await new Promise(resolve=>setImmediate(resolve));};
+// Node's generic Event has a getter-only legacy returnValue; browsers expose
+// a writable string on BeforeUnloadEvent.
+const beforeUnloadEvent=()=>Object.defineProperty(new Event('beforeunload',{cancelable:true}),'returnValue',{value:'',writable:true});
 class Browser extends EventTarget{
  constructor(href='https://workspace.example/',state={framework:'preserved'}){
   super();this.entries=[{href,state}];this.index=0;this.moves=0;const self=this;
@@ -92,9 +95,9 @@ test('modal drafts survive view navigation and still warn before unloading the d
  const {createWorkspaceDraftGuard}=await draftsModule(),f=draftFixture(),guard=createWorkspaceDraftGuard(f.root),a=f.form('Original',true);
  f.emit('focusin',a.control);a.control.value='Unsaved modal';f.emit('input',a.control);
  assert.equal(guard.canLeave(()=>{throw Error('A surviving modal must not block a view change');}),true);assert.equal(guard.hasChanges(),true);
- const unload=new Event('beforeunload',{cancelable:true});f.browser.dispatchEvent(unload);assert.equal(unload.defaultPrevented,true);
+ const unload=beforeUnloadEvent();f.browser.dispatchEvent(unload);assert.equal(unload.defaultPrevented,true);
  guard.accept(a.form);assert.equal(guard.hasChanges(),false);
- const clean=new Event('beforeunload',{cancelable:true});f.browser.dispatchEvent(clean);assert.equal(clean.defaultPrevented,false);
+ const clean=beforeUnloadEvent();f.browser.dispatchEvent(clean);assert.equal(clean.defaultPrevented,false);
  guard.dispose();
 });
 test('accepting one saved form never clears a different draft and removed forms do not cause stale prompts',async()=>{
@@ -114,7 +117,7 @@ test('standalone message draft regions block view loss while unrelated search re
  const {createWorkspaceDraftGuard}=await draftsModule(),f=draftFixture(),guard=createWorkspaceDraftGuard(f.root),a=f.form('Original message',false,true);
  a.control.tagName='TEXTAREA';a.control.type='textarea';f.emit('focusin',a.control);f.emit('beforeinput',a.control);a.control.value='Unsaved message';f.emit('input',a.control);
  assert.equal(guard.hasChanges(),true);assert.equal(guard.canLeave(()=>false),false);
- const unload=new Event('beforeunload',{cancelable:true});f.browser.dispatchEvent(unload);assert.equal(unload.defaultPrevented,true);
+ const unload=beforeUnloadEvent();f.browser.dispatchEvent(unload);assert.equal(unload.defaultPrevented,true);
  a.control.value='Original message';f.emit('input',a.control);assert.equal(guard.hasChanges(),false);
  f.emit('input',{tagName:'INPUT',type:'search',form:null,closest:()=>null,value:'private filter'});assert.equal(guard.hasChanges(),false);guard.dispose();
 });

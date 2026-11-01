@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {extractPaymentReferences} from '../src/payment-references.js';
+import {referenceEvidenceCompatible} from '../sites/lib/reference-evidence-compat.js';
+const legacy=current=>({...current,version:'payment-references-2026-10-28.2',candidates:current.candidates.map(({rawValue,schema,...c})=>c),selected:current.selected&&(({rawValue,schema,...c})=>c)(current.selected)});
+test('legacy receipt retains unchanged facts without inventing missing evidence',()=>{const current=extractPaymentReferences({reference_number:'0594'});assert.equal(referenceEvidenceCompatible(legacy(current),current),true);assert.equal(referenceEvidenceCompatible({},current),false);});
+test('changed kind, invalid OCR or later references cannot inherit an older receipt',()=>{const old=legacy(extractPaymentReferences({reference_number:'000019'}));for(const current of [extractPaymentReferences({reference_number:'000019',reference_number_schema:'SEBG'}),extractPaymentReferences({reference_number:'000018'}),extractPaymentReferences({reference_number:'000019',invoice_number:'0594'})])assert.equal(referenceEvidenceCompatible(old,current),false);});
+test('current metadata remains immutable once recorded',()=>{const current=extractPaymentReferences({reference_number:' 0594 '});assert.equal(referenceEvidenceCompatible({...current,candidates:current.candidates.map(c=>({...c,rawValue:'0594'}))},current),false);});

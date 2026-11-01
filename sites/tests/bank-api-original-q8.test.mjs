@@ -2,16 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {pathToFileURL} from 'node:url';
+import {fileURLToPath,pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
-const root=new URL('../',import.meta.url).pathname;
+const root=fileURLToPath(new URL('../',import.meta.url));
 const url=p=>pathToFileURL(root+p).href,data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(root+path,'utf8'),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(value));return data(code);}
 const domain=url('lib/domain.ts'),engine=url('lib/reconciliation-engine.js');
 const {emptyState,applyCommand,balance,invoicePaymentEvidenceIssue,hasValidAbsenceCheck,paymentOriginalIssue}=await import(domain);
 const reconciliation=compiled('lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});
 const {reconcileWithOriginals,assertPaymentOriginal}=await import(compiled('lib/reconciliation-evidence.ts',{'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':engine,'./server':data('export async function readBankOriginalBytes(){throw Error("No file original requested in this API-only fixture");}')}));
-const {normalizeTransactions}=await import(compiled('lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':url('lib/payment-references.js')}));
+const {normalizeTransactions}=await import(compiled('lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':url('lib/payment-references.js'),'../payer-evidence.js':new URL('../lib/payer-evidence.js',import.meta.url).href}));
 async function state(){
  const raw={status:'BOOK',transaction_amount:{amount:'625.00',currency:'SEK'},credit_debit_indicator:'CRDT',booking_date:'2026-10-26',debtor:{name:'Synthetic customer AB'},reference_number:'000018',entry_reference:'Q8-SYNTHETIC-API-ORIGINAL'};
  const normalized=await normalizeTransactions([raw],{accountKey:'iban:SE4280000890119146168423',accountLabel:'Synthetic account',bankName:'Synthetic bank',dateFrom:'2026-10-01',dateTo:'2026-10-30'});

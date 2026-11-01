@@ -1,6 +1,7 @@
 import {parseMoney,individualParty,usablePaymentReference,type Transaction,type State,now} from '../domain';
 import type {ProviderTransaction} from './enable-banking';
 import {extractPaymentReferences} from '../payment-references.js';
+import {apiPayerEvidence} from '../payer-evidence.js';
 
 const text=(v:unknown)=>typeof v==='string'?v.trim():'';
 /** Details enrich presentation only; they cannot split a batch or create an allocation. */
@@ -14,7 +15,7 @@ export function transactionDetailEvidence(target:Transaction,listed:ProviderTran
  // Remittance is not promoted to OCR on a batch. It may merely be bank reference text.
  const payerReference=usablePaymentReference(structured)&&(individualParty(party)||schema==='SEBG'||schema==='SEPG')?structured:'';
  if(party.length>200||payerReference.length>300)throw Error('Bankens betalaruppgifter är för långa och behöver granskas i originalet.');
- return {referenceEvidence,party:individualParty(party)?party:'',payerReference,referenceSchema:schema,status:individualParty(party)&&payerReference?'identified' as const:'missing' as const,reason:individualParty(party)&&payerReference?'Bankens separata detaljsvar innehåller betalare och betalningsreferens. Fakturakopplingen behöver fortfarande kontrolleras.':'Bankens detaljsvar innehåller inte tillräckliga individuella betalar- och OCR-uppgifter. Betalningsspecifikationen behövs från Bankgiro.'};
+ return {payerEvidence:apiPayerEvidence(detail,target.amount>0),referenceEvidence,party:individualParty(party)?party:'',payerReference,referenceSchema:schema,status:individualParty(party)&&payerReference?'identified' as const:'missing' as const,reason:individualParty(party)&&payerReference?'Bankens separata detaljsvar innehåller betalare och betalningsreferens. Fakturakopplingen behöver fortfarande kontrolleras.':'Bankens detaljsvar innehåller inte tillräckliga individuella betalar- och OCR-uppgifter. Betalningsspecifikationen behövs från Bankgiro.'};
 }
 export function enrichBankDetails(current:State,id:string,evidence:ReturnType<typeof transactionDetailEvidence>,documentId:string){
  const state=structuredClone(current),t=state.transactions.find(t=>t.id===id);if(!t)throw Error('Bankhändelsen finns inte.');

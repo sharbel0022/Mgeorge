@@ -1,4 +1,5 @@
 import {matchingReferenceValues} from './payment-references.js';
+import {payerEvidenceConflict} from '../sites/lib/payer-evidence.js';
 
 export const BANK_EVIDENCE_CONFLICT_REASON = 'Bankunderlag med samma bankreferens innehåller motstridiga uppgifter. Granska båda originalen innan betalningen används.';
 export const AUTOMATIC_MATCH_HOLD_REASON = 'En tidigare betalningskoppling har återtagits. Granska underlaget och bekräfta en ny koppling manuellt.';
@@ -21,6 +22,8 @@ export function bankFinancialReview(transaction,{ancestors=true}={}) {
   if(inherited.some(review=>review.kind==='reversal'))return inherited.find(review=>review.kind==='reversal');
   if (/\breversal\b|\breversed\b|\bchargeback\b|återför|returbetal|\breturned\s+(?:payment|transfer)\b/iu.test(text))
     return {kind:'reversal', reason:'Bankunderlaget anger en återföring. Granska ursprungsbetalningen och rättelsen; händelsen får inte automatiskt reglera en faktura.'};
+  if(transaction.payer_evidence?.conflict)return {kind:'payer_conflict',reason:'Bankoriginalet innehåller motstridiga organisationsidentifierare. Granska originalet.'};
+  if(inherited.some(review=>review.kind==='payer_conflict'))return inherited.find(review=>review.kind==='payer_conflict');
   if(inherited.some(review=>review.kind==='refund'))return inherited.find(review=>review.kind==='refund');
   if (/\brefund(?:ed|s)?\b|återbetal/iu.test(text))
     return {kind:'refund', reason:'Bankunderlaget anger en återbetalning. Granska kreditfaktura och ursprungsbetalning innan beloppet fördelas.'};
@@ -43,6 +46,7 @@ export function sameBankPaymentIdentity(a,b) {
 /** Empty fields can be enriched; contradictory nonempty bank facts need a durable hold. */
 export function bankEvidenceConflictFields(previous, incoming) {
   const fields = [];
+  if(payerEvidenceConflict(previous.payer_evidence,incoming.payer_evidence))fields.push('payer_evidence');
   const compare = (field, normalize=reference) => {
     const before = normalize(previous[field]), after = normalize(incoming[field]);
     if (before && after && before !== after) fields.push(field);

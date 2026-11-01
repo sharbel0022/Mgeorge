@@ -6,6 +6,7 @@ import {normalizeBankApiTransaction,parseBankFile} from './importers.js';
 import {bankFinancialReview,hasBankEvidenceConflict,bankEvidenceReviewReason,sameBankPaymentIdentity} from './bank-evidence.js';
 
 import {matchingReferenceValues} from './payment-references.js';
+import {referenceEvidenceCompatible} from '../sites/lib/reference-evidence-compat.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
 export const RECONCILIATION_RULE_VERSION='verified-reference-2026-10-30.3';
 // Keep invoice-number punctuation: AB/12 and AB12 are not interchangeable IDs.
@@ -38,7 +39,8 @@ export function reconciliationData(db){
       &&String(original.bankgiro||'')===String(t.bankgiro||'')&&String(original.payer_bankgiro||'')===String(t.payer_bankgiro||'')
       &&(original.parent_bank_reference||original.aggregate_parent_reference||'')===t.parent_bank_reference
       &&bankFinancialReview(original,{ancestors:false})?.kind===bankFinancialReview(t,{ancestors:false})?.kind
-      &&!!original.is_aggregate===!!t.is_aggregate&&JSON.stringify(original.reference_evidence||{})===JSON.stringify(t.reference_evidence||{});
+      &&!!original.is_aggregate===!!t.is_aggregate&&referenceEvidenceCompatible(t.reference_evidence,original.reference_evidence)
+      &&(!t.payer_evidence?.version||JSON.stringify(t.payer_evidence)===JSON.stringify(original.payer_evidence));
   };
   const verifiedFileOriginal=t=>{
     if(!t.bank_reference||!originals.has(t.import_id)||!approvedAccounts.has(canonical(t.account)))return false;
@@ -148,8 +150,13 @@ export function runReconciliation(db){
   }catch(e){db.exec('ROLLBACK');throw e;}
 }
 export function verifyPayer(db,{invoice_id,payer,account,evidence},principal){
-  if(!principal||!payer?.trim()||!account?.trim()||!evidence?.trim()||!db.prepare('SELECT id FROM invoices WHERE id=?').get(invoice_id))throw Object.assign(new Error('Kund, betalare, konto och verifieringsunderlag krävs.'),{status:400});
-  const invoice=db.prepare('SELECT * FROM invoices WHERE id=?').get(invoice_id);
-  db.prepare('INSERT INTO payer_links(id,invoice_id,payer,account,evidence,verified_by,party,organization_number) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(invoice_id,payer,account) DO UPDATE SET evidence=excluded.evidence,verified_by=excluded.verified_by,party=excluded.party,organization_number=excluded.organization_number').run(randomUUID(),invoice_id,payer.trim(),account.trim(),evidence.trim(),principal,invoice.party,invoice.organization_number);
-  audit(db,'payer_verified',{invoice_id,payer,account,evidence,principal});
+  if(!principal||!payer?.trim()||!account?.trim()||!evidence?.trim())throw Object.assign(new Error('Kund, betalare, konto och verifieringsunderlag krävs.'),{status:400});
+  db.exec('BEGIN IMMEDIATE');
+  try{
+    const invoice=db.prepare('SELECT * FROM invoices WHERE id=?').get(invoice_id);
+    if(!invoice)throw Object.assign(new Error('Kund, betalare, konto och verifieringsunderlag krävs.'),{status:400});
+    db.prepare('INSERT INTO payer_links(id,invoice_id,payer,account,evidence,verified_by,party,organization_number) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(invoice_id,payer,account) DO UPDATE SET evidence=excluded.evidence,verified_by=excluded.verified_by,party=excluded.party,organization_number=excluded.organization_number').run(randomUUID(),invoice_id,payer.trim(),account.trim(),evidence.trim(),principal,invoice.party,invoice.organization_number);
+    audit(db,'payer_verified',{invoice_id,payer,account,evidence,principal});
+    db.exec('COMMIT');
+  }catch(error){db.exec('ROLLBACK');throw error;}
 }

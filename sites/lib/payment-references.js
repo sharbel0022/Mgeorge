@@ -1,5 +1,5 @@
 // Pure, bounded extraction. Bank IDs, account numbers and amounts are never payer references.
-export const REFERENCE_VERSION = 'payment-references-2026-10-28.2';
+export const REFERENCE_VERSION = 'payment-references-2026-11-01.1';
 const keyName = key => key.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 const missing = value => !value || /^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(value);
 
@@ -17,53 +17,111 @@ export function ocrChecksum(value) {
   return sum % 10 === 0;
 }
 
-export function extractPaymentReferences(raw) {
+/**
+ * Logical OCR checks against explicitly supplied rules, not proof of a bank
+ * agreement or bank acceptance. Soft control can permit another reference after
+ * a warning. Source: Bankgirot's OCR-referenskontroll (checked 2026-11-01).
+ */
+export function validateOcrAgreement(value, agreement) {
+  const checksumValid = ocrChecksum(value);
+  const formatValid = typeof value === 'string' && /^\d{2,25}$/.test(value);
+  const unknown = {status:'unknown', checksumValid, formatValid, lengthValid:null};
+  if (!agreement || typeof agreement !== 'object' || Array.isArray(agreement)) return unknown;
+  const {control, lengths} = agreement;
+  if (!['soft','hard','variable_length','fixed_length'].includes(control)) return unknown;
+  if (control === 'fixed_length' && (!Array.isArray(lengths) || lengths.length < 1 || lengths.length > 2 || lengths.some(n => !Number.isInteger(n) || n < 2 || n > 25) || new Set(lengths).size !== lengths.length)) return unknown;
+  const lengthValid = control === 'variable_length' ? formatValid && Number(value.at(-2)) === value.length % 10
+    : control === 'fixed_length' ? formatValid && lengths.includes(value.length) : null;
+  return {status:formatValid && checksumValid && lengthValid !== false ? 'valid' : 'invalid', checksumValid, formatValid, lengthValid};
+}
+
+export function extractPaymentReferences(raw, {sourcePrefix = '$'} = {}) {
+  if (typeof sourcePrefix !== 'string' || !sourcePrefix.startsWith('$') || sourcePrefix.length > 1000) throw new TypeError('Ogiltig källsökväg för betalningsreferenser.');
   const candidates = [], warnings = [], visited = new WeakSet();
   let nodes = 0, incomplete = false;
-  const add = (input, source, kind, priority) => {
+  const add = (input, source, kind, priority, rawValue = input, schema = '') => {
     if (typeof input !== 'string') return;
     const value = input.trim();
     if (missing(value)) return;
     if (value.length > 300 || candidates.length >= 40) { incomplete = true; return; }
-    if (candidates.some(c => c.value === value && c.source === source)) return;
+    if (candidates.some(c => c.value === value && c.source === source && c.kind === kind && (c.schema || '') === schema)) return;
     const validity = kind === 'ocr' ? ocrChecksum(value) ? 'checksum_valid' : 'checksum_invalid' : 'unchecked';
-    candidates.push({value, source, kind, priority: validity === 'checksum_valid' ? 100 : priority, validity});
+    candidates.push({value, rawValue, source, kind, priority: validity === 'checksum_valid' ? 100 : priority, validity, ...(schema ? {schema} : {})});
   };
   const labelled = (value, source) => {
     // Boundaries preserve AB/12, hyphens and leading zeros. Never guess from bare dates or amounts.
     const pattern = /(?:^|[\s,;])(?:faktura(?:nummer|\s*nr\.?)?|invoice(?:\s*(?:no\.?|number))?)\s*[:#]?\s*([\p{L}\p{N}][\p{L}\p{N}/_-]*)/giu;
     for (const match of value.matchAll(pattern)) {
-      if (/\d/.test(match[1])) add(match[1], source, 'invoice', 80);
+      if (/\d/.test(match[1])) add(match[1], source, 'invoice', 80, value);
     }
     const ocr=/(?:^|[\s,;])OCR(?:[- ]?(?:nummer|referens))?\s*[:#]?\s*(\d[\d -]*\d|[\p{L}\p{N}][\p{L}\p{N}/_-]*)/giu;
-    for(const match of value.matchAll(ocr))add(match[1],source,'ocr',80);
+    for(const match of value.matchAll(ocr))add(match[1],source,'ocr',80,value);
   };
-  const walk = (value, source = '$', context = '', depth = 0) => {
+  // XML-to-JSON readers retain repeated elements as arrays, including singleton
+  // elements. A repeated type is ambiguous and must not downgrade an OCR to a
+  // generic, unchecked reference.
+  const single = value => {
+    let depth = 0;
+    while (Array.isArray(value)) {
+      if (value.length !== 1 || ++depth > 5) { incomplete = true; return undefined; }
+      value = value[0];
+    }
+    return value;
+  };
+  const readField = (object, name) => {
+    object = single(object);
+    if (!object || typeof object !== 'object') return undefined;
+    const found = Object.entries(object).filter(([key]) => keyName(key) === name);
+    if (found.length > 1) { incomplete = true; return undefined; }
+    return found.length ? single(found[0][1]) : undefined;
+  };
+  const schemaText = input => {
+    const value = single(input);
+    if (value === undefined) return '';
+    if (typeof value !== 'string' || !value.trim() || value.length > 300) { incomplete = true; return ''; }
+    return value.trim();
+  };
+  const isoReferenceType = object => {
+    const type = readField(object, 'tp');
+    if (type === undefined) return '';
+    const choice = readField(type, 'cdorprtry');
+    if (!choice || typeof choice !== 'object') { incomplete = true; return ''; }
+    const code = readField(choice, 'cd'), proprietary = readField(choice, 'prtry');
+    if ((code !== undefined) === (proprietary !== undefined)) { incomplete = true; return ''; }
+    return {schema:schemaText(proprietary ?? code), ocr:proprietary !== undefined && /^(?:SE)?OCR$/i.test(schemaText(proprietary))};
+  };
+  const walk = (value, source = sourcePrefix, context = '', depth = 0, schema = '') => {
     if (++nodes > 2000 || depth > 12) { incomplete = true; return; }
     if (typeof value === 'string') {
       if (value.length > 10_000) { incomplete = true; return; }
-      if (context === 'ocr') add(value, source, 'ocr', 90);
+      if (context === 'ocr') add(value, source, 'ocr', 90, value, schema);
       else if (context === 'invoice') add(value, source, 'invoice', 85);
-      else if (context === 'structured') add(value, source, 'structured', 90);
+      else if (context === 'structured') add(value, source, 'structured', 90, value, schema);
       else if (context === 'remittance') { add(value, source, 'message', 40); labelled(value, source); }
       else if (context === 'message') labelled(value, source);
       return;
     }
     if (!value || typeof value !== 'object' || visited.has(value)) return;
     visited.add(value);
-    if (Array.isArray(value)) { value.slice(0, 100).forEach((item, n) => walk(item, `${source}[${n}]`, context, depth + 1)); if (value.length > 100) incomplete = true; return; }
+    if (Array.isArray(value)) { value.slice(0, 100).forEach((item, n) => walk(item, `${source}[${n}]`, context, depth + 1, schema)); if (value.length > 100) incomplete = true; return; }
+    const isoType = context === 'iso-creditor' ? isoReferenceType(value) : null;
     for (const [key, child] of Object.entries(value)) {
       if (nodes > 2000) { incomplete = true; break; }
       const k = keyName(key), field = `${source}.${key}`;
       if (/^(entryreference|bankreference|transactionid|endtoendid|acctsvcrref|iban|bban|bankgiro|payerbankgiro|creditoraccount|debtoraccount|transactionamount)$/.test(k)) continue;
-      const next = /^(ocr|ocrnumber|ocrnummer|ocrreference|ocrreferens)$/.test(k) ? 'ocr'
+      const apiSchema = k === 'referencenumber' ? schemaText(readField(value, 'referencenumberschema')) : '';
+      const referenceSchema = k === 'ref' && context === 'iso-creditor' ? isoType?.schema || '' : apiSchema;
+      const next = k === 'cdtrrefinf' ? 'iso-creditor'
+        : k === 'ref' && context === 'iso-creditor' ? isoType?.ocr ? 'ocr' : 'structured'
+        : k === 'referencenumber' && apiSchema.toUpperCase() === 'SEBG' ? 'ocr'
+        : /^(ocr|ocrnumber|ocrnummer|ocrreference|ocrreferens)$/.test(k) ? 'ocr'
         : /^(invoicenumber|invoiceno|fakturanummer|fakturanr)$/.test(k) ? 'invoice'
-        : /^(referencenumber|paymentreference|betalningsreferens|fakturareferens|betalningsreferensocr)$/.test(k) || k === 'ref' && /CdtrRefInf/i.test(source) ? 'structured'
+        : /^(referencenumber|paymentreference|betalningsreferens|fakturareferens|betalningsreferensocr|referens|referensnummer)$/.test(k) || k === 'ref' && /CdtrRefInf/i.test(source) ? 'structured'
         : k === 'nb' && /RfrdDocInf/i.test(source) ? 'invoice'
         : /^(remittanceinformation|ustrd|unstructured|remittance)$/.test(k) ? 'remittance'
         : /^(note|message|meddelande|addtltxinf|description)$/.test(k) ? 'message'
         : /^(value|text|reference|number)$/.test(k) ? context : '';
-      walk(child, field, next, depth + 1);
+      walk(child, field, next, depth + 1, referenceSchema || (/^(value|text|reference|number)$/.test(k) ? schema : ''));
     }
   };
   walk(raw);

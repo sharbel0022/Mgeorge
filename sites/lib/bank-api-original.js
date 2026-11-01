@@ -1,6 +1,8 @@
 import {sha256} from '@noble/hashes/sha2.js';
 import {bytesToHex} from '@noble/hashes/utils.js';
 import {extractPaymentReferences} from './payment-references.js';
+import {referenceEvidenceCompatible} from './reference-evidence-compat.js';
+import {apiPayerEvidence} from './payer-evidence.js';
 
 export const BANK_API_ORIGINAL_VERSION='bank-api-original-v1';
 const encoder=new TextEncoder(),cache=new WeakMap();
@@ -49,6 +51,10 @@ export function bankApiOriginalIssue(transaction,isCollection,collectionNotice){
  const remittance=Array.isArray(raw.remittance_information)?raw.remittance_information.filter(item=>typeof item==='string').map(text).filter(Boolean).join(' · '):'';
  const bankCode=record(raw.bank_transaction_code)?text(raw.bank_transaction_code.description):'',structured=text(raw.reference_number);
  const collection=isCollection(amount,`${bankCode} ${remittance}`,party,absent(structured)?'':structured);
+ const payerEvidence=apiPayerEvidence(raw,amount>0,{collective:collection});
+ if(transaction.payerEvidence&&JSON.stringify(transaction.payerEvidence)!==JSON.stringify(payerEvidence))return inconsistent;
+ if(transaction.organizationNumber&&transaction.organizationNumber!==payerEvidence.organizationNumber)return inconsistent;
+ if(payerEvidence.conflict)return 'Bankoriginalet innehåller motstridiga organisationsidentifierare. Granska originalet.';
  const description=[collection?collectionNotice:'',bankCode,remittance,text(raw.note),!text(raw.booking_date)?'Valutadatum används; banken saknar bokföringsdatum.':''].filter(Boolean).join(' · ').slice(0,1000).trim();
  if(original.description!==description||transaction.description!==description||collection&&transaction.kind!=='batch')return inconsistent;
  const rawEntry=typeof raw.entry_reference==='string'?raw.entry_reference:'',entry=absent(rawEntry.trim())?'':rawEntry;
@@ -62,7 +68,7 @@ export function bankApiOriginalIssue(transaction,isCollection,collectionNotice){
  else if(transaction.party!==party||transaction.payerReference!==payerReference)return inconsistent;
  const file=transaction.bankFileProof;
  const fileReferences=transaction.evidence==='bank_file'&&record(file)&&file.version==='bank-file-original-v1'&&typeof file.documentId==='string'&&!!file.documentId&&/^[a-f0-9]{64}$/.test(file.sha256)&&file.referenceEvidenceSha256===bankFileReferenceHash(file,transaction.referenceEvidence);
- if(JSON.stringify(transaction.referenceEvidence)!==JSON.stringify(references)&&!fileReferences)return inconsistent;
+ if(!referenceEvidenceCompatible(transaction.referenceEvidence,references)&&!fileReferences)return inconsistent;
  return '';
 }
 

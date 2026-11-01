@@ -1,6 +1,25 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
-**Bedömningsdatum: 2026-10-30. Status: MÅLET ÄR INTE UPPNÅTT.**
+**Aktuell komplettering: 2026-11-01. Verklig betalare och OCR: MÅLET 9,5/10 ÄR INTE UPPNÅTT.**
+
+Den nya [uppmätta före-/efterrapporten](docs/BANK-PAYER-OCR-IMPROVEMENT.md) utgår från senaste `origin/main` `9d45656`. Samma korrigerade 26 syntetiska original kördes före/efter: 49 parserutvärderingar, betalaridentitet 35/42 → 42/42, OCR-recall 34/37 → 37/37, fakturanummer 12/14 → 14/14, felaktiga organisationsfält 5 → 0 och inga falska betalarnamn. Separat faktisk SQLite-matchningskorpus: felaktig automatchning 3 → 0, säkra TP 5/5, manuell granskning 14/22 → 17/22. Den ursprungliga baslinjen före första kodändring är också bevarad; korrigeringen av COID-facit redovisas öppet.
+
+Lokalt **570/570 Node + 858/858 Sites**, syntax 82 filer, TypeScript och produktionsbygge godkända; oberoende slutreview utan kvarstående publiceringsblockerande fynd. Node audit 0, Sites produktionsaudit 0; full Sites-audit har 16 moderate i utvecklingsverktyg, 0 high/critical. Den obligatoriska high-grinden passerar. Allt detta är syntetisk kod-/testbevisning; autentisk bankprofil, företagsavtal och individuellt produktionsfacit saknas.
+
+| Område | Före → efter | Förbättring och testbevis | Produktionsbevis | Kvarstående problem |
+| --- | --- | --- | --- | --- |
+| Verklig betalare | 6,5 → 6,5 | Typad råevidens, svensk utfärdare, full fältväg, ärvd konflikt; 42/42 i korrigerad korpus | Endast läsande status före publicering | Individuellt autentiskt original/MIG/kanal |
+| Verklig OCR/fakturareferens | 6,5 → 6,5 | SEBG/OCR-typ, råvärde, flera referenser/CSV, ledande nollor; 37/37 OCR | Verkligt OCR-avtal/individfacit ej verifierat | Avtalad regel/profil och rapportoriginal |
+| Bankgiroimport | 8 → 8 | Multi-kolumn, typade ID, källspårning och hela import-/originalsviter | Publiceringskvitto redovisas separat | Autentisk bankprofil och leverans |
+| Automatisk betalningsmatchning | 7,5 → 7,5 | FP 3 → 0; TP 5/5; atomisk betalarrelation; refund/ancestorstopp | Inga testallokeringar i produktion | Representativa verkliga utfall |
+| Betalningshistorik | 8 → 8 | Audit och gamla pengar bevaras vid konflikt/rollback | Ingen ny testhistorik i produktion | Node har fortfarande global senaste-100-audit |
+| Betalningsstatus | 8 → 8 | Bankkonflikt före del-/överskottslabel; aktuell ursprungskontroll | Nytt faktiskt betalningsutfall ej prövat | Verklig historik-/saldojämförelse |
+| Automatisk bankhämtning | 8 → 8 | Befintlig AIS/intervall/medgivande behålls; striktare härledning | Ansluten sex-timmarsbank, inget nytt sync-anrop | AIS ger inte individuell rapportbehörighet |
+| Betalningsvyns användbarhet | 8 → 8 | Svartvit desktop/mobil, utfällbara råvärden, Enter/Escape/fokusretur | Kvitto för exakt revision anges separat | Autentiserat individuellt flöde; filväljarprov blockerades av tilläggsinställning |
+
+Varken hög syntetisk precision eller en lyckad publicering får ersätta den saknade produktionsbevisningen. Exakt main-/CI-/Sites-kvitto och bevarad arbetsyterevision dokumenteras i `docs/BANK-PAYER-OCR-PUBLICATION.json` efter genomförd leverans. De historiska cyklerna nedan behålls som historik.
+
+**Historiskt bedömningsdatum: 2026-10-30. Status då: MÅLET ÄR INTE UPPNÅTT.**
 
 Baslinjen nedan är den första samlade, dokumenterade bedömningen mot användarens33 områden; aktuella cykelresultat anges separat. Det är **inte** en uppfunnen historisk baslinje och visar ingen påstådd poängförbättring jämfört med tidigare körningar. Befintlig grund är `origin/main` på `b5a25e7`; denna körnings kodändringar, tester och begränsade observationer bedöms separat från äldre leveranser. Ingen poäng på 9,5 eller högre delas ut i denna version.
 

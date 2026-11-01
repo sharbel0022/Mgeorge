@@ -60,7 +60,8 @@ export function readCamtDocument(xml){
    if(expandedAttributes.has(expanded))throw Error('Upprepade XML-attribut.');expandedAttributes.add(expanded);
   }
   const prefix=parts.length===2?parts[0]:'';if(prefix&&!namespaces[prefix])throw Error('Odeklarerad XML-namnrymd.');
-  const node={name:parts.at(-1),qualified,namespace:namespaces[prefix]||'',namespaces,attributes,children:[],text:''};stack.at(-1).children.push(node);count++;
+  const parent=stack.at(-1),name=parts.at(-1),index=parent.children.filter(n=>n.name===name).length;
+  const node={name,qualified,sourcePath:(parent.sourcePath?parent.sourcePath+'/':'')+`${name}[${index}]`,namespace:namespaces[prefix]||'',namespaces,attributes,children:[],text:''};parent.children.push(node);count++;
   if(count>150000||stack.length>80)throw Error('XML-strukturen är för stor eller för djup.');if(!opening[3])stack.push(node);
  }
  if(stack.length!==1||root.children.length!==1)throw Error('Ofullständigt XML-dokument.');const doc=root.children[0];

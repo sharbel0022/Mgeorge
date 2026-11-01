@@ -41,7 +41,7 @@ async function finish(f,bucket=f.bucket,limit=5){
 const domainUrl=new URL('../lib/domain.ts',import.meta.url).href;
 const {emptyState,applyCommand,paymentOriginalIssue}=await import(domainUrl);
 const {stripTypeScriptTypes}=await import('node:module');
-let normalizedCode=stripTypeScriptTypes(readFileSync(new URL('../lib/banking/transactions.ts',import.meta.url),'utf8'),{mode:'transform'}).replaceAll("'../domain'",JSON.stringify(domainUrl)).replaceAll("'../payment-references.js'",JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href));
+let normalizedCode=stripTypeScriptTypes(readFileSync(new URL('../lib/banking/transactions.ts',import.meta.url),'utf8'),{mode:'transform'}).replaceAll("'../domain'",JSON.stringify(domainUrl)).replaceAll("'../payment-references.js'",JSON.stringify(new URL('../lib/payment-references.js',import.meta.url).href)).replaceAll("'../payer-evidence.js'",JSON.stringify(new URL('../lib/payer-evidence.js',import.meta.url).href));
 const {normalizeTransactions}=await import('data:text/javascript;base64,'+Buffer.from(normalizedCode).toString('base64'));
 async function apiState(){
  const raw={status:'BOOK',transaction_amount:{amount:'625.00',currency:'SEK'},credit_debit_indicator:'CRDT',booking_date:'2026-10-26',debtor:{name:'Synthetic backup payer AB'},reference_number:'000018',entry_reference:'SYNTHETIC-BACKUP-API'};
