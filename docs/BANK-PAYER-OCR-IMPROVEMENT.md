@@ -1,6 +1,6 @@
 # MGEORGE – verklig betalare och OCR, 1 november 2026
 
-**Kodförbättringarna är verifierade lokalt. Målet 9,5/10 är inte uppnått:** autentiskt individuellt Swedbankoriginal, företagets avtalade rapportprofil och OCR-regler saknas fortfarande. Produktionspublicering och exakt commit dokumenteras separat i `BANK-PAYER-OCR-PUBLICATION.json` när de har verifierats.
+**Kodförbättringarna är verifierade lokalt. Målet 9,5/10 är inte uppnått:** autentiskt individuellt Swedbankoriginal, företagets avtalade rapportprofil och OCR-regler saknas fortfarande. Kodcommit `c031b2e81374df7835c18462e1e32b2c4b5d0d89` finns på main och båda Actions-jobben är godkända i körning 41307488778. **Sites-version 37 är publicerad (succeeded)**. Exakt källa, arkiv, deployment och bevarande finns i `BANK-PAYER-OCR-PUBLICATION.json`.
 
 ## Vad som faktiskt var fel
 
@@ -129,6 +129,14 @@ Poängen behålls konservativt enligt senaste relevanta scorecard, trots uppmät
 | Betalningsstatus | 8 → 8 | Konflikt före del-/överbetalningsetikett; historiska pengar hålls åtskilda | Ingen faktisk ny betalning avstämd för test | Verklig saldo- och historikjämförelse |
 | Automatisk bankhämtning | 8 → 8 | Samma konto/medgivande/intervall; striktare SEBG-/identitetsprojektion | Befintlig anslutning läst, ingen ny hämtning utlöst | AIS-status ger ingen individuell Bankgirorättighet |
 | Användbarhet i betalningsvyn | 8 → 8 | Desktop/mobil/tangentbord; bank/manual/förslag och rådetaljer | Publiceringsrevision bevisas separat | Autentiserat verkligt individflöde och fysisk mobil återstår |
+
+## Verifierad leverans och läsande efterkontroll
+
+Samma befintliga projekt publicerades som version **37**, Sites-källa `306c0856c5f08d7fe19b73aff9b1879f40263e84`, deployment `appgdep_6ae733e12bd88191bbe9dbaf20478a1e`, **succeeded 2026-11-01T12:43:32Z**. Samtliga 27 ändrade Sites-filer matchar main-innehållet. Typkontroll och produktionsbygge kördes även i publiceringskällan. Första paketeringsförsöket stoppade på två saknade lokala byggberoenden; rätt installerare kördes och därefter passerade kontrollerna. Ingen felaktig version publicerades.
+
+Projektidentitet, åtkomstpolicy, auth-konfiguration, DB/R2, runtime-revision **9** och befintliga schema-ID/lägen är oförändrade. Arbetsyterevision är **31 före, efter publicering och efter webbläsarkontroll**, med samma ändringstid. Inga ekonomiska kommandon, bank/Gmail-synkar eller kundutskick utlöstes för kontrollen. Fullt payloadfält lästes inte; påståendet begränsas till oförändrad revision och observerad konfiguration/status.
+
+Den publicerade översikten och banklistan kunde läsas **autentiserat i Chromium**. De sex huvudfälten samt samtliga tre förklaringar (okänd betalare, saknad bank-OCR, overifierat fakturaförslag) verifierades i den riktiga banklistan, utan att öppna bankdetaljer som kan utlösa en detaljhämtning. Inga verkliga kunduppgifter eller produktionsskärmbilder sparades i repositoryt. Detta är begränsad läsande produktionsbevisning, inte ett verifierat individuellt import-/matchningsflöde.
 
 ## Nästa externa åtgärd
 

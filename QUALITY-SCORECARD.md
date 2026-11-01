@@ -17,7 +17,7 @@ Lokalt **570/570 Node + 858/858 Sites**, syntax 82 filer, TypeScript och produkt
 | Automatisk bankhämtning | 8 → 8 | Befintlig AIS/intervall/medgivande behålls; striktare härledning | Ansluten sex-timmarsbank, inget nytt sync-anrop | AIS ger inte individuell rapportbehörighet |
 | Betalningsvyns användbarhet | 8 → 8 | Svartvit desktop/mobil, utfällbara råvärden, Enter/Escape/fokusretur | Kvitto för exakt revision anges separat | Autentiserat individuellt flöde; filväljarprov blockerades av tilläggsinställning |
 
-Varken hög syntetisk precision eller en lyckad publicering får ersätta den saknade produktionsbevisningen. Exakt main-/CI-/Sites-kvitto och bevarad arbetsyterevision dokumenteras i `docs/BANK-PAYER-OCR-PUBLICATION.json` efter genomförd leverans. De historiska cyklerna nedan behålls som historik.
+Varken hög syntetisk precision eller en lyckad publicering får ersätta den saknade produktionsbevisningen. **Leverans verifierad:** main-kod `c031b2e`, Actions 41307488778 godkände Node/Sites; Sites **37 succeeded**, runtime-revision 9. Autentiserade översikts-/banklisteläsningar verifierade de nya förklaringarna. Arbetsyterevision **31 → 31**, samma ändringstid, oförändrad policy/DB/R2/scheman. Inget individuellt produktionsimport-/matchningsprov utfördes. Exakt kvitto: `docs/BANK-PAYER-OCR-PUBLICATION.json`. De historiska cyklerna nedan behålls som historik.
 
 **Historiskt bedömningsdatum: 2026-10-30. Status då: MÅLET ÄR INTE UPPNÅTT.**
 

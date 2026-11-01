@@ -11,7 +11,7 @@
 - [x] Review existing allocation/original/concurrency boundaries; reproduce and fix concrete safety defects without a parallel payment engine.
 - [x] Correct any misleading payer/OCR labels in payment and review surfaces, preserve mobile and technical details.
 - [x] Rerun corpus and full Node/Sites/type/build/audit gates; independently review.
-- [ ] Document metrics, all 25 requested scenarios and honest scores; fetch/integrate latest main, push without force, verify exact-SHA Actions.
-- [ ] Publish same Sites project using matching source/archive; verify identity/resources/schedules and read-only financial snapshot, record version and limitations.
+- [x] Document metrics, all 25 requested scenarios and honest scores; fetch/integrate latest main, push without force, verify exact-SHA Actions.
+- [x] Publish same Sites project using matching source/archive; verify identity/resources/schedules and read-only financial snapshot, record version and limitations.
 
 Review focus: party role/identifier scheme confusion; unknown bank profile/contract; competing invoice references; legacy receipt invalidation; partial/over/refund/concurrent/duplicate allocation; original raw bytes and migration compatibility.

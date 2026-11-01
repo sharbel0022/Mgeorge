@@ -12,6 +12,14 @@
 - Läsande drift före publicering: samma projekt/version 36, samma åtkomstpolicy/DB/R2 och schema-ID/lägen, ansluten sex-timmarsbank, komplett manifestbackup 191 original. Arbetsyterevision **31**. Stora D1-payloadfält förkortas av verktyget; fullständiga saldon påstås inte ha lästs där. Inget sync-/reconcile-/kundmejl-/betalningsanrop gjordes i produktion.
 - **Fortsättningspunkt:** commit/push verifierad kandidat utan force, kontrollera båda Actions-jobb på exakt SHA, synkronisera de ändrade Sites-filerna till den redan öppnade befintliga källan, paketera/publicera och bevara kvitto/revision/status. Uppdatera `docs/BANK-PAYER-OCR-PUBLICATION.json` efter faktiska resultat. 9,5-målet är fortfarande externt blockerat av individuellt autentiskt underlag, avtalad MIG/kanal och företagets OCR-regel; huvudbetygen behålls 6,5/10. Ingen bakgrundsfortsättning är konfigurerad.
 
+## Betalare/OCR — leveranskvittot är verifierat
+
+- Main-kod **c031b2e81374df7835c18462e1e32b2c4b5d0d89** pushad utan force; [Actions 41307488778](https://github.com/sharbel0022/Mgeorge/actions/runs/41307488778) är success för Node och Sites på exakt SHA.
+- Befintligt Sites-projekt publicerat som **version 37**, källcommit **306c0856c5f08d7fe19b73aff9b1879f40263e84**, deployment **appgdep_6ae733e12bd88191bbe9dbaf20478a1e**, **succeeded**. Typkontroll/produktionsbygge passerade i exakt publiceringskälla. Första paketeringen avbröts före push/publicering av saknade lokala beroenden; korrekt installation löste det.
+- Samma policy/auth/DB/R2, runtime-revision **9** och befintliga schema-ID/lägen bekräftade. Arbetsyta **31 → 31**, samma ändringstid, även efter autentiserad läsande översikt/banklista. Nya förklaringarna syns i publicerad banklista; inga produktionsdetaljer öppnades eller ekonomiska kommandon skickades. Ingen kunddata eller produktionsbild i Git.
+- Fryst programkod har fortfarande **570/570 Node + 858/858 Sites**, syntax82, TS/build, oberoende review och obligatorisk audit-grind godkända. Hashbundna mätartefakter matchar levererade källfiler.
+- Fullt kvitto och rollbackreferens finns i `docs/BANK-PAYER-OCR-PUBLICATION.json`. 9,5-målet är **inte uppnått**: autentiskt individuellt Swedbankfacit, företagsprofil och OCR-avtal/behörig kanal saknas. Nästa steg är tillåtet bankoriginal och bank-/avtalsbekräftelse, följt av läsande jämförelse före verksamhetsallokering. Ingen bakgrundsfortsättning är konfigurerad; den ägda lokala previewprocessen är stoppad.
+
 ## Fas 1 — inventering och baslinje, 2026-10-28
 
 - Läste hela uppdragsfilen och hämtade senaste `main` samt PR #9/#11. Ren arbetskopia; separat branch skapad från `a024216`.

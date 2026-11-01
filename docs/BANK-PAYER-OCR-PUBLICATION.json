@@ -1,0 +1,133 @@
+{
+  "schema": "mgeorge-bank-payer-ocr-publication-v1",
+  "date": "2026-11-01",
+  "goalAchieved": false,
+  "ratings": {
+    "realPayer": 6.5,
+    "bankOcrInvoiceReference": 6.5
+  },
+  "github": {
+    "repository": "https://github.com/sharbel0022/Mgeorge",
+    "codeCommit": "c031b2e81374df7835c18462e1e32b2c4b5d0d89",
+    "verifiedRemoteMainAtCodeDelivery": "c031b2e81374df7835c18462e1e32b2c4b5d0d89",
+    "ci": {
+      "id": 41307488778,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41307488778",
+      "headSha": "c031b2e81374df7835c18462e1e32b2c4b5d0d89",
+      "conclusion": "success",
+      "jobs": {
+        "test": "success",
+        "sites": "success"
+      }
+    }
+  },
+  "site": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "previousVersion": 36,
+    "version": 37,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_1f70fe3642e08191980496c585801b16",
+    "sourceCommit": "306c0856c5f08d7fe19b73aff9b1879f40263e84",
+    "archive": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_0000000074bc81f4ad1ab1de009e707c",
+      "content_hash": "sha256:852924136b27006e39d6c06721cfd947bf48ef434f54cdfbb8035e678b426d5e",
+      "size_bytes": 39495680,
+      "file_count": 329
+    },
+    "deploymentId": "appgdep_6ae733e12bd88191bbe9dbaf20478a1e",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "environmentRevision": 9,
+    "completedAt": "2026-11-01T12:43:32.095072+00:00",
+    "changedSourceFiles": 27,
+    "sourceContentMatchesMain": true
+  },
+  "preservation": {
+    "projectAccessPolicyAuthAndSchedulesUnchanged": true,
+    "dbBinding": "DB",
+    "r2Binding": "BUCKET",
+    "noNewDatabaseMigration": true,
+    "workspaceRevisionBefore": 31,
+    "workspaceRevisionAfterPublish": 31,
+    "workspaceRevisionAfterAuthenticatedBrowser": 31,
+    "workspaceUpdatedAtUnchanged": true,
+    "fullFinancialPayloadRead": false,
+    "payloadProjectionTruncated": true,
+    "noProductionImportSyncReconcileOrAllocationInvoked": true,
+    "bank": {
+      "connected": true,
+      "intervalHours": 6,
+      "lastSyncUnchanged": true
+    },
+    "backup": {
+      "status": "complete",
+      "originals": 191,
+      "bytes": 63448066,
+      "scope": "manifest_pass",
+      "apiReceiptsChecked": 5,
+      "legacyWithoutReceipt": 113
+    },
+    "existingAutomationModes": {
+      "bank": true,
+      "gmail": false,
+      "backup": true
+    },
+    "secretsUpdated": false
+  },
+  "browser": {
+    "authenticatedReadOnlyOverview": true,
+    "authenticatedReadOnlyBankList": true,
+    "headers": [
+      "Betalare",
+      "Faktura",
+      "OCR",
+      "Belopp",
+      "Datum",
+      "Status"
+    ],
+    "unknownPayerExplanation": true,
+    "missingBankOcrExplanation": true,
+    "invoiceSuggestionExplanation": true,
+    "viewport": 958,
+    "documentWidth": 943,
+    "paymentDetailsOpened": false,
+    "financialWritesTriggered": false,
+    "privateScreenshotCommitted": false
+  },
+  "localValidation": {
+    "nodeTests": 570,
+    "sitesTests": 858,
+    "failures": 0,
+    "skipped": 0,
+    "syntaxFiles": 82,
+    "typecheck": true,
+    "productionBuild": true,
+    "nodeAudit": 0,
+    "sitesProductionAudit": 0,
+    "sitesFullAudit": {
+      "moderate": 16,
+      "high": 0,
+      "critical": 0
+    },
+    "independentReview": "No unresolved release-blocking findings"
+  },
+  "rollback": {
+    "previousSavedVersionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_02dc0d2ce12c8191b61e302e59bb450d",
+    "previousDeploymentId": "appgdep_6ae4ffc57a7c8191aeb7a0499f73d882",
+    "note": "Redeploy the retained previous saved version if a release regression is confirmed; no rollback executed. Preserve DB/R2."
+  },
+  "remainingBlockers": [
+    "Authentic authorized individual Swedbank report and known payer/reference ground truth.",
+    "Company-agreed MIG/XSD/report product and OCR control rules.",
+    "Authorized individual-report delivery channel; AIS does not confer it."
+  ],
+  "remainingLimits": [
+    "No production economic test allocation performed.",
+    "Read-only authenticated overview/bank list is not an authenticated individual import/matching flow.",
+    "Full financial payload was truncated by the read tool; unchanged workspace revision is the preservation evidence.",
+    "Legacy XML receipts may require re-read/review; uncertain historic receipts are not upgraded.",
+    "Node payment audit remains global latest-100 rather than scoped pagination.",
+    "16 moderate development-tool advisories remain; production audit and high/critical gate are clear."
+  ],
+  "backgroundContinuationConfigured": false
+}
