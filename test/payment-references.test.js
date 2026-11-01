@@ -36,3 +36,23 @@ test('company Bankgiro in a payment reference is held even if invoice OCR was en
  const f=findings({reference_number:'58197013'},[{...invoice('i','0599','5819-7013'),bankgiro:'5819-7013'}]);
  assert.equal(f[0].safe,false);assert.match(f[0].reason,/eget Bankgironummer/);
 });
+
+test('AIS null schema profile opts in without changing the legacy parser or implying OCR',()=>{
+ const raw={reference_number:'000018',reference_number_schema:null},old=extractPaymentReferences(raw),fresh=extractPaymentReferences(raw,{profile:'ais-null-schema-v1'});
+ assert.equal(old.version,'payment-references-2026-11-01.1');assert.equal(old.incomplete,true);assert.equal(fresh.version,'payment-references-ais-null-schema-v1');assert.equal(fresh.incomplete,false);assert.equal(fresh.selected.kind,'structured');assert.equal(fresh.selected.validity,'unchecked');assert.equal(fresh.selected.schema,undefined);assert.equal(raw.reference_number_schema,null);
+});
+for(const value of ['',17,{},[],[null],['SEBG'],['SEBG','SEPG']])test(`AIS profile preserves incomplete schema handling: ${JSON.stringify(value)}`,()=>{
+ assert.equal(extractPaymentReferences({reference_number:'000018',reference_number_schema:value},{profile:'ais-null-schema-v1'}).incomplete,true);
+});
+test('AIS null schema profile leaves duplicate and ISO type ambiguity incomplete',()=>{
+ for(const raw of [
+  {reference_number:'000018',reference_number_schema:null,ReferenceNumberSchema:'SEBG'},
+  {RmtInf:{Strd:{CdtrRefInf:{Ref:'000018',Tp:{CdOrPrtry:{Prtry:null}}}}}}
+ ])assert.equal(extractPaymentReferences(raw,{profile:'ais-null-schema-v1'}).incomplete,true);
+});
+
+test('Node API normalization remains on the conservative legacy null-schema interpretation',async()=>{
+ const {normalizeBankApiTransaction}=await import('../src/importers.js'),row=normalizeBankApiTransaction({status:'BOOK',transaction_amount:{amount:'625.00',currency:'SEK'},credit_debit_indicator:'CRDT',booking_date:'2026-10-26',debtor:{name:'Synthetic payer AB'},reference_number:'000018',reference_number_schema:null,entry_reference:'SYNTHETIC-NODE-NULL-SCHEMA'},'synthetic-account');assert.equal(row.reference,'');assert.equal(row.reference_evidence.version,'payment-references-2026-11-01.1');assert.equal(row.reference_evidence.incomplete,true);
+});
+
+test('unknown reference extraction profiles fail closed',()=>{assert.throws(()=>extractPaymentReferences({reference_number:'000018',reference_number_schema:null},{profile:'unknown-future-profile'}),/profil/);});

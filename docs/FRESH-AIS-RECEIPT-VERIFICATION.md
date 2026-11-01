@@ -16,15 +16,17 @@ Nyligen sparade detaljer kan inte ersätta en färsk bankhämtning. Legacy-rader
 
 `GET /api/bankgiro/preview` kan läsa ett redan ägt dokument via `documentId` och valfritt ägt `targetId`. Befintlig originalkontroll verifierar ägare, storlek och hash. Svaret innehåller råa och kontoavstämda rader samt förhandsgranskning. Endpointen skriver inte dokument, audit eller arbetsyta och kontaktar inte bankleverantören. Kontoalias måste finnas uttryckligen i ägarens aktiva kontoresurs; ingen BBAN-/IBAN-omräkning införs.
 
-Node bedömdes: det saknar motsvarande riktade detaljendpoint och ändras inte. Dess befintliga bankhämtning och originalkontroller behålls; en generell historisk kvittomigrering ingår inte. Båda applikationernas obligatoriska kontroller körs.
+En driftfunnen variant hade äldre referensmetadata och ett uttryckligt null i bankens valfria referensschema. Den riktade hämtningen använder därför den separata profilen `ais-null-schema-v1`. Endast bokstavligt null i AIS-fältet behandlas som frånvarande schema: referensen är strukturerad och okontrollerad, aldrig formellt OCR. Malformade typer, arrayer, dubbla nycklar och ISO-tvetydighet behåller spärrarna. Tidigare metadata bevaras som `previousReferenceEvidence` i R2-originalet före en tillåten färsk övergång. Originalkontrollen väljer tolkning efter bevarad känd profilversion; okänd version ger inte ny tillit. En gammal härledd felmarkering rensas endast när den exakt motsvarar den kvittobrist som just har avhjälpts.
+
+Node bedömdes: det saknar motsvarande riktade detaljendpoint. Parserkopiorna i Node och Sites uppdateras identiskt, men standardprofilen och Node-bankhämtningens/originalkontrollernas tidigare tolkning behålls. Även vanlig Sites-synk behåller standardprofilen. Inga giltiga äldre kvitton uppgraderas genom versionsbyte; en generell historisk kvittomigrering ingår inte. Båda applikationernas obligatoriska kontroller körs.
 
 ## Testbevis före publicering
 
 - Rött före rättning: riktade tester reproducerade utebliven adoption och legacy-cache som blockerade färsk hämtning.
-- Grönt efter driftfunna legacy-varianter: 59 riktade detaljtester och fem nya ägar-/original-/aliasförhandsgranskningstester; oberoende riktad körning 64/64.
+- Riktade röda/gröna tester täcker samtliga driftfunna legacy-varianter, profilbyte och bevarande av äldre metadata; oberoende riktad profilgranskning passerade.
 - Rena installationer: rot `npm ci --ignore-scripts`, Sites `npm run install:ci`.
-- Full Node: 595/595; syntax 89 filer; audit 0.
-- Första fulla Sites-kontroll: 987/987; TypeScript och produktionsbygge godkända; produktionsaudit 0. Full audit har fortsatt 16 moderate i utvecklingsverktyg och 0 high/critical; obligatorisk high-grind passerar. Slutkontroll efter legacy-tillägget redovisas i framstegsloggen.
+- Slutlig full Node: 606/606; syntax 89 filer; audit 0 med oförändrade beroenden.
+- Slutlig full Sites-kontroll: 1022/1022; TypeScript och produktionsbygge godkända; produktionsaudit 0 med oförändrade beroenden. Full audit har fortsatt 16 moderate i utvecklingsverktyg och 0 high/critical; obligatorisk high-grind passerar.
 - Oberoende kodgranskning fann inga Critical/Important-fynd. Tester använder syntetiska underlag. Inga kundoriginal eller kontouppgifter lagras här.
 
 ## Verifieringsgräns

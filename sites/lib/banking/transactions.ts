@@ -48,7 +48,7 @@ export type NormalizeTransactionsResult = {
   skipped: { pending: number; nonSek: number; invalid: number; unstableId: number };
   warnings: string[];
 };
-export type NormalizeTransactionsOptions = { accountKey: string; accountLabel: string; bankName: string; dateFrom: string; dateTo: string };
+export type NormalizeTransactionsOptions = { accountKey: string; accountLabel: string; bankName: string; dateFrom: string; dateTo: string; referenceProfile?: 'ais-null-schema-v1' };
 
 async function stableEntryId(accountKey: string, entry: string): Promise<string> {
   // Length-prefixed JSON tuple prevents delimiter ambiguities; SHA-256 avoids truncating IDs.
@@ -96,7 +96,7 @@ export async function normalizeTransactions(transactions: readonly unknown[], op
     if (!entry) skipped.unstableId++;
     const structured = cleanText(raw.reference_number);
     const remittance = Array.isArray(raw.remittance_information) ? raw.remittance_information.filter(item => typeof item === 'string').map(cleanText).filter(Boolean).join(' · ') : '';
-    const referenceEvidence = extractPaymentReferences(raw);
+    const referenceEvidence = extractPaymentReferences(raw,{profile:options.referenceProfile});
     const reference = referenceEvidence.incomplete ? '' : referenceEvidence.selected?.value || '';
     if(referenceEvidence.incomplete) longReferences++;
     // Never manufacture a partial invoice/OCR reference by cutting its trailing characters.

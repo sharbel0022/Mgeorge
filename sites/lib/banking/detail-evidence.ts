@@ -55,13 +55,17 @@ export function adoptFreshBankReceipt(state:State,id:string,fresh:import('../imp
   original={party:fresh.party,payerReference:fresh.payerReference,description:fresh.description,amount:fresh.amount,date:fresh.date,account:fresh.account!,bankReference:fresh.bankReference};
  }
  const refreshRaw=target.bankData===undefined||JSON.stringify(target.bankData)!==JSON.stringify(fresh.bankData);
+ // Only a fresh, otherwise identical unmodified bank projection may advance
+ // its extraction profile. Manual/file evidence keeps its existing metadata.
+ // The caller archives previousReferenceEvidence before this transition.
+ const refreshReferences=target.verification===undefined&&target.bankFileProof===undefined&&target.party===fresh.party&&target.payerReference===fresh.payerReference&&target.description===fresh.description&&target.account===fresh.account;
  const candidate={...target,original,bankData:refreshRaw?structuredClone(fresh.bankData):target.bankData,
-  referenceEvidence:target.referenceEvidence??structuredClone(fresh.referenceEvidence),bankDataVersion:fresh.bankDataVersion,bankDataSha256:fresh.bankDataSha256};
+  referenceEvidence:refreshReferences?structuredClone(fresh.referenceEvidence):target.referenceEvidence,bankDataVersion:fresh.bankDataVersion,bankDataSha256:fresh.bankDataSha256};
  if(bankApiOriginalIssue(candidate))return false;
  const previousDerivedIssue=bankApiOriginalIssue(target);
  if(target.original===undefined)target.original=candidate.original;
  if(refreshRaw)target.bankData=candidate.bankData;
- if(target.referenceEvidence===undefined)target.referenceEvidence=candidate.referenceEvidence;
+ if(refreshReferences)target.referenceEvidence=candidate.referenceEvidence;
  target.bankDataVersion=candidate.bankDataVersion;target.bankDataSha256=candidate.bankDataSha256;
  // Clear only the exact pre-adoption derived receipt issue; unrelated retained
  // original availability and evidence holds remain independently authoritative.

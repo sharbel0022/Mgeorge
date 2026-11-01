@@ -1,6 +1,6 @@
 import {sha256} from '@noble/hashes/sha2.js';
 import {bytesToHex} from '@noble/hashes/utils.js';
-import {extractPaymentReferences} from './payment-references.js';
+import {extractPaymentReferences,AIS_NULL_SCHEMA_VERSION} from './payment-references.js';
 import {referenceEvidenceCompatible} from './reference-evidence-compat.js';
 import {apiPayerEvidence} from './payer-evidence.js';
 
@@ -47,7 +47,7 @@ export function bankApiOriginalIssue(transaction,isCollection,collectionNotice){
  if(raw.status!=='BOOK'||amount===null||!validDate(date)||!record(original)||transaction.currency!=='SEK')return inconsistent;
  const bankParty=record(raw[amount>0?'debtor':'creditor'])?text(raw[amount>0?'debtor':'creditor'].name):'';
  const party=bankParty.length<=200?bankParty:'';
- const references=extractPaymentReferences(raw),reference=references.incomplete?'':references.selected?.value||'',payerReference=reference.length<=300?reference:'';
+ const references=extractPaymentReferences(raw,{profile:transaction.referenceEvidence?.version===AIS_NULL_SCHEMA_VERSION?'ais-null-schema-v1':'legacy'}),reference=references.incomplete?'':references.selected?.value||'',payerReference=reference.length<=300?reference:'';
  const remittance=Array.isArray(raw.remittance_information)?raw.remittance_information.filter(item=>typeof item==='string').map(text).filter(Boolean).join(' · '):'';
  const bankCode=record(raw.bank_transaction_code)?text(raw.bank_transaction_code.description):'',structured=text(raw.reference_number);
  const collection=isCollection(amount,`${bankCode} ${remittance}`,party,absent(structured)?'':structured);

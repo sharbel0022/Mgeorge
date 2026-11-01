@@ -25,12 +25,12 @@ export async function fetchBankDetails(req:Request){
   let key:string|undefined,listed:ProviderTransaction[]=[];const seen=new Set<string>();
   do{const page=await getTransactions(config,account.uid,{dateFrom:target.date,dateTo:target.date,continuationKey:key,psu});listed.push(...page.transactions.filter(t=>t.entry_reference===target.bankReference));key=page.continuation_key||undefined;if(key){if(seen.has(key)||seen.size>=10)throw Error('Bankens detaljsökning kunde inte slutföras.');seen.add(key);}}while(key);
   if(listed.length!==1)throw Error('Bankposten kunde inte hittas entydigt hos banken. Ingen OCR har gissats.');
-  const original=listed[0],fresh=await normalizeTransactions([original],{accountKey:canonicalBankAccount(target.account),accountLabel:account.name||'',bankName:conn.bank_name,dateFrom:target.date,dateTo:target.date});let detail=original,unsupported=false;
+  const original=listed[0],fresh=await normalizeTransactions([original],{accountKey:canonicalBankAccount(target.account),accountLabel:account.name||'',bankName:conn.bank_name,dateFrom:target.date,dateTo:target.date,referenceProfile:'ais-null-schema-v1'});let detail=original,unsupported=false;
   if(original.transaction_id){try{detail=await getTransactionDetails(config,account.uid,original.transaction_id,psu);}catch(e){if(e instanceof ProviderError&&e.code==='BANK_RESOURCE_UNAVAILABLE')unsupported=true;else throw e;}}else unsupported=true;
   const evidence=transactionDetailEvidence(target,original,detail);
   if(unsupported&&evidence.status==='missing')evidence.reason='Swedbank erbjuder inga ytterligare betalardetaljer för den här posten via den befintliga bankanslutningen. Lägg till Bankgiros individuella betalningsspecifikation.';
   if(!env.BUCKET)throw Error('Originalfilen kan inte sparas just nu.');
-  const at=now(),documentId=uid(),content=JSON.stringify({source:'Enable Banking transaction details',account:target.account,bankReference:target.bankReference,checkedAt:at,supported:!unsupported,previousBankData:target.bankData,listed:original,detail});
+  const at=now(),documentId=uid(),content=JSON.stringify({source:'Enable Banking transaction details',account:target.account,bankReference:target.bankReference,checkedAt:at,supported:!unsupported,previousBankData:target.bankData,previousReferenceEvidence:target.referenceEvidence,listed:original,detail});
   const bytes=new TextEncoder().encode(content),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
   await lease.assert();
   await env.BUCKET.put(`${user.userId}/${documentId}`,bytes,{httpMetadata:{contentType:'application/json'}});

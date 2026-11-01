@@ -1,5 +1,6 @@
 // Pure, bounded extraction. Bank IDs, account numbers and amounts are never payer references.
 export const REFERENCE_VERSION = 'payment-references-2026-11-01.1';
+export const AIS_NULL_SCHEMA_VERSION = 'payment-references-ais-null-schema-v1';
 const keyName = key => key.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
 const missing = value => !value || /^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(value);
 
@@ -35,8 +36,9 @@ export function validateOcrAgreement(value, agreement) {
   return {status:formatValid && checksumValid && lengthValid !== false ? 'valid' : 'invalid', checksumValid, formatValid, lengthValid};
 }
 
-export function extractPaymentReferences(raw, {sourcePrefix = '$'} = {}) {
+export function extractPaymentReferences(raw, {sourcePrefix = '$', profile = 'legacy'} = {}) {
   if (typeof sourcePrefix !== 'string' || !sourcePrefix.startsWith('$') || sourcePrefix.length > 1000) throw new TypeError('Ogiltig källsökväg för betalningsreferenser.');
+  if (!['legacy','ais-null-schema-v1'].includes(profile)) throw new TypeError('Okänd referensprofil.');
   const candidates = [], warnings = [], visited = new WeakSet();
   let nodes = 0, incomplete = false;
   const add = (input, source, kind, priority, rawValue = input, schema = '') => {
@@ -109,7 +111,14 @@ export function extractPaymentReferences(raw, {sourcePrefix = '$'} = {}) {
       if (nodes > 2000) { incomplete = true; break; }
       const k = keyName(key), field = `${source}.${key}`;
       if (/^(entryreference|bankreference|transactionid|endtoendid|acctsvcrref|iban|bban|bankgiro|payerbankgiro|creditoraccount|debtoraccount|transactionamount)$/.test(k)) continue;
-      const apiSchema = k === 'referencenumber' ? schemaText(readField(value, 'referencenumberschema')) : '';
+      // AIS explicitly permits an absent optional schema as JSON null. Opt in
+      // only for its literal field; arrays, aliases/duplicates and ISO types
+      // retain the legacy strict handling. The raw response is never rewritten.
+      const apiSchemaValue = k === 'referencenumber' ? readField(value, 'referencenumberschema') : undefined;
+      const malformedAisSchema = profile === 'ais-null-schema-v1' && Object.hasOwn(value,'reference_number_schema') && value.reference_number_schema !== null && typeof value.reference_number_schema !== 'string';
+      if (k === 'referencenumber' && malformedAisSchema) incomplete = true;
+      const absentAisSchema = profile === 'ais-null-schema-v1' && Object.hasOwn(value,'reference_number_schema') && value.reference_number_schema === null && apiSchemaValue === null;
+      const apiSchema = k === 'referencenumber' && !absentAisSchema && !malformedAisSchema ? schemaText(apiSchemaValue) : '';
       const referenceSchema = k === 'ref' && context === 'iso-creditor' ? isoType?.schema || '' : apiSchema;
       const next = k === 'cdtrrefinf' ? 'iso-creditor'
         : k === 'ref' && context === 'iso-creditor' ? isoType?.ocr ? 'ocr' : 'structured'
@@ -130,7 +139,7 @@ export function extractPaymentReferences(raw, {sourcePrefix = '$'} = {}) {
   if (candidates.some(c => c.validity === 'checksum_invalid')) warnings.push('En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas.');
   const identities = candidates.filter(c => c.kind !== 'message');
   const selected = identities[0] || candidates[0];
-  return {version: REFERENCE_VERSION, candidates, selected: selected || null, incomplete, warnings};
+  return {version: profile === 'ais-null-schema-v1' ? AIS_NULL_SCHEMA_VERSION : REFERENCE_VERSION, candidates, selected: selected || null, incomplete, warnings};
 }
 
 /** Keep competing unstructured identifiers visible; narrative cannot override a structured reference. */

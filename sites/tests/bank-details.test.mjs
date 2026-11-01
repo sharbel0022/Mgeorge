@@ -1,5 +1,6 @@
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {createHash} from 'node:crypto';
+import {extractPaymentReferences} from '../lib/payment-references.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
 import {emptyState,applyCommand,paymentInvoiceAssessment,bankApiOriginalIssue,paymentOriginalIssue} from '../lib/domain.ts';
@@ -169,4 +170,30 @@ test('fresh receipt adoption preserves an unrelated original availability issue'
 });
 test('a failed fresh receipt adoption preserves its stale issue and all evidence holds',async t=>{
  const {f,s,transaction}=await legacyFixture(t);transaction.bankOriginalIssue='Bankoriginalet saknar ett verifierbart ankomstkvitto. Hämta bankuppgifterna igen eller granska originalunderlaget.';transaction.bankEvidenceConflicts=[{at:'2026-10-26',fields:['party'],incoming:{}}];saveFixture(f,s);const before=structuredClone(transaction),out=await(await fetchBankDetails(request(f.id))).json(),{bankDetails,...row}=out.state.transactions[0];assert.deepEqual(row,before);
+});
+
+async function nullSchemaLegacyFixture(t){
+ const x=await legacyFixture(t),r=x.f.page.transactions[0];r.reference_number_schema=null;x.f.detail=r;x.transaction.bankData=structuredClone(r);
+ const withoutSchema=structuredClone(r);delete withoutSchema.reference_number_schema;const evidence=extractPaymentReferences(withoutSchema),oldCandidate=({rawValue,schema,...candidate})=>candidate;x.transaction.referenceEvidence={...evidence,version:'payment-references-2026-10-28.1',candidates:evidence.candidates.map(oldCandidate),selected:oldCandidate(evidence.selected)};saveFixture(x.f,x.s);return x;
+}
+test('fresh AIS null-schema receipt preserves all bank facts and archives the previous parser evidence',async t=>{
+ const {f,s,transaction}=await nullSchemaLegacyFixture(t),before=financialSnapshot(s),previous=JSON.stringify(transaction.referenceEvidence),out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];
+ assert.equal(row.bankDataVersion,'bank-api-original-v1');assert.equal(bankApiOriginalIssue(row),'');assert.equal(row.payerReference,'58197013');assert.equal(row.referenceEvidence.version,'payment-references-ais-null-schema-v1');assert.equal(row.referenceEvidence.selected.kind,'structured');assert.equal(row.referenceEvidence.selected.validity,'unchecked');assert.deepEqual(financialSnapshot(out.state),before);const doc=JSON.parse(new TextDecoder().decode([...f.objects.values()][0]));assert.equal(JSON.stringify(doc.previousReferenceEvidence),previous);assert.equal(doc.listed.reference_number_schema,null);
+});
+for(const key of ['verification','bankFileProof'])test(`fresh AIS profile cannot replace retained reference evidence with existing ${key}`,async t=>{
+ const {f,s,transaction}=await nullSchemaLegacyFixture(t);transaction[key]=key==='verification'?{party:transaction.party,payerReference:transaction.payerReference,note:'Synthetic manual proof',at:'2026-10-26T00:00:00.000Z'}:{version:'bank-file-original-v1',documentId:'synthetic-document',sha256:'a'.repeat(64)};saveFixture(f,s);const before=structuredClone(transaction),out=await(await fetchBankDetails(request(f.id))).json(),{bankDetails,...row}=out.state.transactions[0];assert.deepEqual(row,before);
+});
+test('an already valid legacy null-schema receipt retains its original parser interpretation',async t=>{
+ const {f,s,transaction}=await nullSchemaLegacyFixture(t),raw=transaction.bankData;transaction.payerReference='';transaction.original.payerReference='';transaction.referenceEvidence=extractPaymentReferences(raw);transaction.bankDataVersion='bank-api-original-v1';transaction.bankDataSha256=createHash('sha256').update(JSON.stringify(raw)).digest('hex');assert.equal(bankApiOriginalIssue(transaction),'');saveFixture(f,s);const before=structuredClone(transaction),out=await(await fetchBankDetails(request(f.id))).json(),{bankDetails,...row}=out.state.transactions[0];assert.deepEqual(row,before);assert.equal(bankApiOriginalIssue(row),'');
+});
+
+test('fresh detail lookup repairs only evidence on a complete synthetic legacy shape with null AIS schema',async t=>{
+ const {f,s,transaction}=await nullSchemaLegacyFixture(t);delete transaction.original;delete transaction.evidence;transaction.bankData=reorderedKeys(transaction.bankData);transaction.bankOriginalIssue='Bankoriginalet saknar ett verifierbart ankomstkvitto. Hämta bankuppgifterna igen eller granska originalunderlaget.';saveFixture(f,s);const oldMetadata=JSON.stringify(transaction.referenceEvidence),oldRaw=JSON.stringify(transaction.bankData),out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];assert.equal(bankApiOriginalIssue(row),'');assert.equal(paymentOriginalIssue(out.state,row),'');assert.equal(row.payerReference,'58197013');assert.equal(row.original.payerReference,'58197013');assert.equal(row.referenceEvidence.version,'payment-references-ais-null-schema-v1');assert.equal(row.referenceEvidence.selected.kind,'structured');assert.equal(row.referenceEvidence.selected.validity,'unchecked');assert.equal(row.referenceEvidence.incomplete,false);assert.deepEqual(out.state.allocations,s.allocations);const document=JSON.parse(new TextDecoder().decode([...f.objects.values()][0]));assert.equal(JSON.stringify(document.previousReferenceEvidence),oldMetadata);assert.equal(JSON.stringify(document.previousBankData),oldRaw);assert.equal(document.listed.reference_number_schema,null);
+});
+test('AIS normalizer profile is explicit and cannot alter default import interpretation',async()=>{
+ const raw={status:'BOOK',transaction_amount:{amount:'625.00',currency:'SEK'},credit_debit_indicator:'CRDT',booking_date:'2026-10-26',debtor:{name:'Synthetic payer AB'},reference_number:'000018',reference_number_schema:null,entry_reference:'SYNTHETIC-NULL-SCHEMA'},options={accountKey:'synthetic-account',accountLabel:'Synthetic account',bankName:'Synthetic bank',dateFrom:'2026-10-26',dateTo:'2026-10-26'},old=await normalizeTransactions([raw],options),fresh=await normalizeTransactions([raw],{...options,referenceProfile:'ais-null-schema-v1'});assert.equal(old.rows[0].payerReference,'');assert.equal(old.rows[0].referenceEvidence.version,'payment-references-2026-11-01.1');assert.equal(fresh.rows[0].payerReference,'000018');assert.equal(fresh.rows[0].referenceEvidence.version,'payment-references-ais-null-schema-v1');assert.deepEqual(fresh.rows[0].bankData,raw);assert.equal(fresh.rows[0].bankDataSha256,old.rows[0].bankDataSha256);
+});
+
+test('an unknown stored reference parser version cannot validate a retained receipt',async t=>{
+ const {s,transaction}=await nullSchemaLegacyFixture(t);transaction.payerReference='';transaction.original.payerReference='';transaction.referenceEvidence={...extractPaymentReferences(transaction.bankData),version:'unknown-future-parser'};transaction.bankDataVersion='bank-api-original-v1';transaction.bankDataSha256=createHash('sha256').update(JSON.stringify(transaction.bankData)).digest('hex');assert.notEqual(bankApiOriginalIssue(s.transactions[0]),'');
 });
