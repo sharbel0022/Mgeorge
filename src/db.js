@@ -142,6 +142,13 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('gmail_connections','sync_started_at',"TEXT NOT NULL DEFAULT ''");
   addColumn('import_jobs','content','BLOB');
   addColumn('import_jobs','mime_type',"TEXT NOT NULL DEFAULT ''");
+  addColumn('import_jobs','owner',"TEXT NOT NULL DEFAULT ''");
+  db.exec(`CREATE TABLE IF NOT EXISTS bank_specification_links(
+    id TEXT PRIMARY KEY,owner TEXT NOT NULL,transaction_id TEXT NOT NULL REFERENCES bank_transactions(id),
+    import_id TEXT NOT NULL REFERENCES import_jobs(id),report_key TEXT NOT NULL,original_sha256 TEXT NOT NULL,
+    evidence TEXT NOT NULL,date_difference_note TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    revoked_at TEXT NOT NULL DEFAULT '',revoke_evidence TEXT NOT NULL DEFAULT '');
+    CREATE UNIQUE INDEX IF NOT EXISTS bank_specification_link_active_original ON bank_specification_links(import_id,report_key) WHERE revoked_at='';`);
   const originalHashUpgrade=!db.prepare('PRAGMA table_info(import_jobs)').all().some(column=>column.name==='content_sha256');
   if(originalHashUpgrade){
     db.exec('BEGIN IMMEDIATE');

@@ -1,4 +1,4 @@
-import {bankApiOriginalIssue as apiOriginalIssue,hasBankApiOrigin,bankFileReferenceHash,BANK_API_ORIGINAL_VERSION} from './bank-api-original.js';
+import {bankApiOriginalIssue as apiOriginalIssue,bankApiDataHash,hasBankApiOrigin,bankFileReferenceHash,BANK_API_ORIGINAL_VERSION} from './bank-api-original.js';
 export const bankApiOriginalIssue=(t:Transaction)=>apiOriginalIssue(t,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED);
 import {exactReference,normalizeName} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
@@ -10,6 +10,7 @@ export type Invoice = {
  organizationNumber?:string;vat?:number|null;net?:number|null;reconciledAt?:string;reconciliationNote?:string;note: string; bankgiro: string; documentId: string; source: string; createdAt: string;
 };
 export type Transaction = {
+ bankgiroAccountIssue?:string;
  payerEvidence?:ReturnType<typeof import('./payer-evidence.js').normalizePayerEvidence>;
  automaticMatchHold?:{at:string;reason:string};
  bankOriginalIssue?:string;
@@ -26,7 +27,9 @@ export type Transaction = {
 export type Allocation = {id:string;invoiceId:string;transactionId:string;amount:number;effect:"payment"|"refund";active:boolean;note:string;createdAt:string;reversedAt?:string};
 export type Credit = {id:string;invoiceId:string;amount:number;number:string;note:string;date:string;active:boolean};
 export type ImportRecord = {id:string;hash:string;account:string;name:string;count:number;createdAt:string;documentId?:string};
-export type State = {schemaVersion:1;company:{name:string;email:string};invoices:Invoice[];transactions:Transaction[];allocations:Allocation[];credits:Credit[];imports:ImportRecord[];receipts:string[];bankEvidenceHold?:{at:string;auditEventId:string;fingerprint:string}};
+/** A human decision about retained sources, never a financial allocation or bank identity. */
+export type BankgiroLink = {id:string;method:'manual_review';transactionId:string;specificationIds:string[];documentId:string;sha256:string;reportKey?:string;note:string;dateDifferenceNote:string;createdAt:string;transactionSnapshot:string;specificationSnapshots:Record<string,string>;revokedAt?:string;revocationNote?:string};
+export type State = {schemaVersion:1;company:{name:string;email:string};invoices:Invoice[];transactions:Transaction[];allocations:Allocation[];credits:Credit[];imports:ImportRecord[];receipts:string[];bankgiroLinks?:BankgiroLink[];bankEvidenceHold?:{at:string;auditEventId:string;fingerprint:string}};
 export type Command = {type:string;[key:string]:any};
 /** A rejected import may add evidence holds, never any of its attempted money. */
 export class BankImportEvidenceError extends Error{
@@ -230,7 +233,7 @@ export function specificationPreview(s:State,rows:any[],targetId=''){
   const first=group[0],total=group.reduce((n,r)=>n+cents(r.amount,false),0),ref=first.parentBankReference||first.bankReference;
   const candidates=s.transactions.filter(t=>!t.ignored&&!t.parentId&&needsPaymentSpecification(t)&&t.bankReference&&ref===t.bankReference&&first.account&&sameAccount(first.account,t.account)&&group.every(r=>r.date===t.date&&r.currency===t.currency&&sameAccount(r.account||'',t.account))&&t.amount===total);
   const parent=candidates.length===1?candidates[0]:undefined;
-  let reason=!first.account?'Mottagarkonto saknas i filen.':!ref?'Insättningens bankidentifierare saknas.':!parent?'Konto, datum, bankidentifierare och totalsumma kan inte kopplas entydigt till en samlingspost.':targetId&&parent.id!==targetId?'Filen tillhör en annan bankhändelse.':hasBankEvidenceConflict(parent)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(s,parent)?paymentOriginalIssue(s,parent):parent.duplicateOf||s.allocations.some(a=>a.transactionId===parent.id&&a.active)?'Samlingsposten har en tidigare matchning eller dubblettspärr.':'';
+  let reason=group.find(row=>row.bankgiroAccountIssue)?.bankgiroAccountIssue||(!first.account?'Mottagarkonto saknas i filen.':!ref?'Insättningens bankidentifierare saknas.':!parent?'Konto, datum, bankidentifierare och totalsumma kan inte kopplas entydigt till en samlingspost.':targetId&&parent.id!==targetId?'Filen tillhör en annan bankhändelse.':hasBankEvidenceConflict(parent)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(s,parent)?paymentOriginalIssue(s,parent):parent.duplicateOf||s.allocations.some(a=>a.transactionId===parent.id&&a.active)?'Samlingsposten har en tidigare matchning eller dubblettspärr.':'');
   if(group.some(r=>!individualParty(r.party||'')))reason='En eller flera betalare saknas i specifikationen.';
   const existing=parent?s.transactions.filter(t=>t.parentId===parent.id&&!t.ignored):[];
   const signature=(raw:any)=>{const r={...raw,...raw.original};return JSON.stringify([r.date,r.amount,r.currency,r.party,r.payerReference,r.bankReference]);};
@@ -258,10 +261,72 @@ export function paymentInvoiceAssessment(s:State,t:Transaction){
  return {invoice,status:issue?'review':allocated?'verified':exact.length>1?'ambiguous':invoice?'possible':'missing',message:issue|| (allocated?'Betalningen är verifierad mot fakturan.':exact.length>1?'Flera fakturor kan passa. Granska kundidentiteten.':invoice?'Referensen finns. Kund och betalningsunderlag behöver stämma.':individualParty(view.party)?usablePaymentReference(view.payerReference)?`Betalare identifierad – ingen faktura med betalningsreferensen ${view.payerReference} hittades i registret.`:'Betalare identifierad – fakturakoppling saknas.':'Betalaren behöver identifieras.')};
 }
 export function economicTransactions(s:State){return s.transactions.filter(t=>!t.ignored&&!t.duplicateOf&&t.specificationStatus!=='review'&&!s.transactions.some(c=>c.parentId===t.id&&!c.ignored));}
+const linkSnapshot=(t:Transaction)=>{const {bankOriginalIssue:derivedAvailability,bankgiroAccountIssue:derivedConsent,...original}=t;return bankApiDataHash({transaction:original});};
+function specificationGroup(s:State,t:Transaction){return s.transactions.filter(row=>row.specification&&row.importId===t.importId&&row.specificationGroup===t.specificationGroup);}
+/** Report identity survives a new file hash, layout, filename or cell address.
+ * It reserves a manually reviewed source; it never proves an AIS identity. */
+export function bankgiroReportKey(rows:Transaction[]){
+ const first=rows[0];if(!first)return '';
+ const giro=(value?:string)=>String(value||'').replace(/[\s-]/g,'');
+ const payments=rows.map(row=>[row.party,row.payerReference,giro(row.payerBankgiro),row.amount]).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)));
+ return bankApiDataHash({identity:[canonicalBankAccount(first.account),first.date,first.currency,giro(first.recipientBankgiro),first.reportEvidence?.sequence||first.reportEvidence?.reportId||first.parentBankReference||'',rows.length,rows.reduce((sum,row)=>sum+row.amount,0),payments]});
+}
+function linkedReportKey(s:State,link:BankgiroLink){return link.reportKey||bankgiroReportKey(link.specificationIds.flatMap(id=>{const row=s.transactions.find(row=>row.id===id);return row?[row]:[];}));}
+function bankgiroLinkIssue(s:State,target:Transaction,rows:Transaction[]){
+ if(!hasBankApiOrigin(target)||!target.bankData||!target.bankDataSha256||!target.bankDataVersion)return 'Bankoriginalet behöver ett verifierbart ankomstkvitto från AIS.';
+ const issue=paymentEvidenceIssue(s,target);if(issue)return issue;
+ if(target.amount<=0||target.currency!=='SEK'||target.ignored||target.duplicateOf||target.parentId||target.specification||s.transactions.some(row=>row.parentId===target.id&&!row.ignored))return 'Välj en aktiv, bokförd AIS-insättning utan befintlig uppdelning.';
+ const first=rows[0];if(!first||!first.specificationGroup||!first.importId||!Number.isSafeInteger(first.specificationCount)||first.specificationCount!==rows.length||rows.some(row=>row.specificationCount!==rows.length||row.specificationTotal!==first.specificationTotal)||rows.reduce((sum,row)=>sum+row.amount,0)!==first.specificationTotal)return 'Specifikationen saknar fullständigt antal eller korrekt totalsumma.';
+ if(rows.some(row=>row.evidence!=='bankgiro_file'||!row.original||row.bankDetails||(['party','payerReference','description','amount','date','account','bankReference'] as const).some(key=>row.original![key]!==row[key])))return 'Specifikationens ursprungliga uppgifter stämmer inte med originalobservationerna.';
+ if(rows.some(row=>row.specificationStatus!=='review'||row.parentId||row.ignored||row.duplicateOf||row.amount<=0||!hasBankFileProof(row)||paymentEvidenceIssue(s,row)))return 'Specifikationens bevarade original behöver kontrolleras innan underlagen kopplas.';
+ if(rows.some(row=>row.bankFileProof!.documentId!==first.bankFileProof!.documentId||row.bankFileProof!.sha256!==first.bankFileProof!.sha256))return 'Specifikationen innehåller motstridiga originalfiler.';
+ if(first.specificationTotal!==target.amount||rows.some(row=>row.currency!==target.currency))return 'Rapportens totalsumma eller valuta stämmer inte med insättningen.';
+ if(rows.some(row=>!row.recipientAccount||!sameAccount(row.account,target.account)))return 'Rapportens uttryckliga mottagarkonto måste stämma med AIS-insättningens konto.';
+ if(rows.some(row=>row.date!==first.date)||!validDate(first.date)||!validDate(target.date)||Math.abs(Date.parse(first.date+'T12:00:00Z')-Date.parse(target.date+'T12:00:00Z'))>3*86400_000)return 'Datumskillnaden får vara högst tre dagar och behöver förklaras.';
+ const active=(s.bankgiroLinks||[]).filter(link=>!link.revokedAt),ids=new Set(rows.map(row=>row.id));
+ if(active.some(link=>link.transactionId!==target.id&&link.specificationIds.some(id=>ids.has(id))))return 'Specifikationen är redan kopplad till en annan bankhändelse.';
+ const reportKey=bankgiroReportKey(rows);
+ if(active.some(link=>link.transactionId!==target.id&&linkedReportKey(s,link)===reportKey))return 'Samma rapport är redan manuellt kopplad till en annan bankhändelse, även om originalfilen har annan layout eller kontrollsumma.';
+ if(active.some(link=>link.transactionId===target.id&&(!link.specificationIds.every(id=>ids.has(id))||link.specificationIds.length!==ids.size)))return 'Bankhändelsen är redan kopplad till en annan specifikation. Återta den relationen först.';
+ return '';
+}
+/** Candidate fields are read-only hints; date and amount never establish identity. */
+export function bankgiroLinkCandidates(s:State,target:Transaction){
+ const seen=new Set<string>();return s.transactions.filter(row=>row.specification&&row.specificationStatus==='review').flatMap(row=>{
+  const key=JSON.stringify([row.importId,row.specificationGroup]);if(seen.has(key))return [];seen.add(key);
+  const rows=specificationGroup(s,row),reason=bankgiroLinkIssue(s,target,rows),dateDifference=validDate(row.date)&&validDate(target.date)?Math.round((Date.parse(row.date+'T12:00:00Z')-Date.parse(target.date+'T12:00:00Z'))/86400_000):NaN;
+  return [{specificationId:row.id,rows,dateDifference,canLink:!reason,reason:reason||'Möjlig tillhörande Bankgirospecifikation – kontrollera båda originalen. Datum och belopp bevisar inte sambandet.'}];
+ });
+}
+/** A stale or revoked decision must never hide a source or enrich a bank row. */
+export function activeBankgiroLink(s:State,targetId:string):(BankgiroLink&{rows:Transaction[]})|undefined{
+ const target=s.transactions.find(row=>row.id===targetId);if(!target)return;
+ for(const link of s.bankgiroLinks||[]){
+  if(link.revokedAt||link.transactionId!==targetId||link.transactionSnapshot!==linkSnapshot(target))continue;
+  const rows=link.specificationIds.map(id=>s.transactions.find(row=>row.id===id));
+  if(rows.some(row=>!row||link.specificationSnapshots[row.id]!==linkSnapshot(row)))continue;
+  const retained=rows as Transaction[];if(!retained.length||bankgiroLinkIssue(s,target,retained)||retained[0].bankFileProof?.documentId!==link.documentId||retained[0].bankFileProof?.sha256!==link.sha256)continue;
+  return {...link,rows:retained};
+ }
+}
 export function applyCommand(current:State,command:Command):{state:State;message:string}{
  const s=structuredClone(current);let message="Sparat";
  try{
  switch(command.type){
+ case'bankgiro.link':{
+  const target=getTx(s,command.transactionId),specification=getTx(s,command.specificationId),rows=specificationGroup(s,specification),note=str(command.note??'',1500),dateDifferenceNote=str(command.dateDifferenceNote??'',1000);
+  if(command.confirmOriginals!==true||command.confirmAccount!==true||!note)throw Error('Bekräfta att båda originalen och mottagarkontot är kontrollerade och beskriv kontrollen i en anteckning.');
+  const issue=bankgiroLinkIssue(s,target,rows);if(issue)throw Error(issue);
+  if(rows[0].date!==target.date&&!dateDifferenceNote)throw Error('Datumskillnaden behöver en separat förklaring från originalen.');
+  const previous=(s.bankgiroLinks||[]).find(link=>!link.revokedAt&&link.transactionId===target.id&&link.specificationIds.length===rows.length&&link.specificationIds.every(id=>rows.some(row=>row.id===id)));
+  if(previous){if(!activeBankgiroLink(s,target.id))throw Error('Den tidigare kopplingens original har ändrats. Återta relationen och granska originalen på nytt.');message='Underlagen är redan manuellt kopplade. Inga betalningar ändrades.';break;}
+  (s.bankgiroLinks??=[]).push({id:uid(),method:'manual_review',transactionId:target.id,specificationIds:rows.map(row=>row.id),documentId:rows[0].bankFileProof!.documentId,sha256:rows[0].bankFileProof!.sha256,reportKey:bankgiroReportKey(rows),note,dateDifferenceNote,createdAt:now(),transactionSnapshot:linkSnapshot(target),specificationSnapshots:Object.fromEntries(rows.map(row=>[row.id,linkSnapshot(row)]))});
+  message='Underlagen är manuellt kopplade. Fakturor, saldon och bankoriginal är oförändrade.';break;
+ }
+ case'bankgiro.unlink':{
+  const link=(s.bankgiroLinks||[]).find(link=>link.id===command.id);if(!link)throw Error('Underlagskopplingen finns inte för ditt konto.');const note=str(command.note??'',1500);if(!note)throw Error('Beskriv varför underlagskopplingen återtas i en anteckning.');
+  if(!link.revokedAt){link.revokedAt=now();link.revocationNote=note;}message='Underlagskopplingen är återtagen. Alla original och betalningskopplingar är bevarade.';break;
+ }
  case'bankgiro.import':{
   if(!command.documentId||!command.hash)throw Error('Originalfilen måste sparas före import.');
   if(s.imports.some(i=>i.hash===command.hash)&&!s.transactions.some(t=>t.specificationStatus==='review'&&s.imports.find(i=>i.id===t.importId)?.hash===command.hash)){message='Filen har redan importerats. Inga nya betalningar skapades.';break;}
@@ -280,6 +345,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
     const t=cleanTransaction({...raw,kind:'payment',verified:false});
     if(Array.isArray(raw.referenceParts))t.referenceParts=raw.referenceParts.slice(0,20).map((p:any)=>({value:str(p.value,300),source:str(p.source,200),kind:str(p.kind,60)}));t.specification=true;t.specificationStatus=plan.status as 'linked'|'review';t.parentBankReference=str(raw.parentBankReference||'',300);t.recipientBankgiro=str(raw.recipientBankgiro||'',100);t.payerBankgiro=str(raw.payerBankgiro||'',100);t.settlementDate=str(raw.settlementDate||'',10);t.format=str(raw.format||'',100);t.organizationNumber=str(raw.organizationNumber||'',40);
     t.referenceEvidence=structuredClone(raw.referenceEvidence);t.payerAccount=str(raw.payerAccount||'',100);t.remittanceMessage=str(raw.remittanceMessage||'',1000);t.reportEvidence=cleanReportEvidence(raw.reportEvidence);
+    if(Object.hasOwn(raw,'bankgiroAccountIssue'))t.bankgiroAccountIssue=str(raw.bankgiroAccountIssue,1000);
     t.specificationGroup=str(plan.rows[0].parentKey||plan.rows[0].parentBankReference||plan.rows[0].bankReference||plan.rows[0].key||'csv',300);t.specificationCount=plan.rows.length;t.specificationTotal=plan.total;
     t.recipientAccount=str(raw.recipientAccount||raw.account||'',100);t.original={party:t.party,payerReference:t.payerReference,description:t.description,amount:t.amount,date:t.date,account:t.account,bankReference:t.bankReference};
     t.parentId=plan.parentId||'';t.importId=record.id;t.evidence='bankgiro_file';t.kind='payment';t.verified=plan.status==='linked'&&individualParty(t.party);
@@ -297,7 +363,10 @@ export function applyCommand(current:State,command:Command):{state:State;message
      }
     }
     if(plan.duplicate)continue;
-    if(duplicate){if(!paymentEvidenceConflict(s,duplicate)&&!hasBankEvidenceConflict(t)&&duplicate.specificationStatus==='review'&&plan.status==='linked'){duplicate.parentId=t.parentId;duplicate.verified=t.verified;duplicate.specificationStatus='linked';duplicate.specificationGroup=t.specificationGroup;duplicate.specificationCount=t.specificationCount;duplicate.specificationTotal=t.specificationTotal;if(t.automaticMatchHold)duplicate.automaticMatchHold??=structuredClone(t.automaticMatchHold);}continue;}
+    // Review observations belong to their complete retained report. Reusing a
+    // shared row from an older partial report would silently truncate this one.
+    const separateReviewOriginal=duplicate&&plan.status==='review'&&duplicate.specificationStatus==='review'&&duplicate.bankFileProof?.documentId!==t.bankFileProof.documentId;
+    if(duplicate&&!separateReviewOriginal){if(!paymentEvidenceConflict(s,duplicate)&&!hasBankEvidenceConflict(t)&&duplicate.specificationStatus==='review'&&plan.status==='linked'){duplicate.parentId=t.parentId;duplicate.verified=t.verified;duplicate.specificationStatus='linked';duplicate.specificationGroup=t.specificationGroup;duplicate.specificationCount=t.specificationCount;duplicate.specificationTotal=t.specificationTotal;if(Object.hasOwn(t,'bankgiroAccountIssue'))duplicate.bankgiroAccountIssue=t.bankgiroAccountIssue;if(t.automaticMatchHold)duplicate.automaticMatchHold??=structuredClone(t.automaticMatchHold);}continue;}
     s.transactions.push(t);record.count++;
    }
   }

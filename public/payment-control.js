@@ -60,6 +60,7 @@ function bankPayerUI(t){
 }
 function bankOCRUI(t){return bankEvidenceUI(t)?(t.reference_evidence?.candidates||[]).find(c=>c.kind==='ocr'&&c.value===t.reference)?.value||'':'';}
 function paymentEvidenceUI(t){
+  if(t.specification_link?.verification==='manual')return {payer:paymentTitleUI(t),reference:t.specification_link.reference||'',referenceLabel:'Betalningsreferens',manualPayer:'',manualReference:''};
   const bank=bankEvidenceUI(t),reference=bank?t.reference||'':'',candidates=t.reference_evidence?.candidates||[];
   const kind=candidates.some(c=>c.kind==='ocr'&&c.value===reference)?'ocr':candidates.some(c=>c.kind==='invoice'&&c.value===reference)?'invoice':'reference';
   return {payer:paymentTitleUI(t),reference,referenceLabel:kind==='ocr'?'OCR':kind==='invoice'?'Fakturareferens':'Betalningsreferens',manualPayer:t.source==='manual'?t.payer||'':'',manualReference:t.source==='manual'?t.reference||'':''};
@@ -67,13 +68,15 @@ function paymentEvidenceUI(t){
 function bankStatusLabelUI(t){
   if(t.excluded||t.status==='excluded')return 'Undantagen';
   if(t.bank_evidence_conflicts?.length||t.ancestor_bank_evidence_conflicts?.length)return 'Motstridigt bankunderlag';
-  if(t.is_aggregate)return 'Specifikation saknas';
   const allocations=state.allocations.filter(a=>a.transaction_id===t.id),invoices=allocations.map(a=>state.invoices.find(i=>i.id===a.invoice_id));
   if(invoices.some(i=>i?.remaining_cents>0))return 'Delbetalning';
   if(allocations.length&&invoices.every(i=>i&&i.remaining_cents===0)&&t.available_cents>0)return 'Överbetalning';
+  if(allocations.length&&invoices.every(i=>i&&i.remaining_cents===0)&&t.available_cents===0)return undefined;
+  if(t.specification_link?.verification==='manual'&&!allocations.length)return 'Fakturan behöver granskas';
+  if(t.is_aggregate)return 'Specifikation saknas';
   return t.status==='partial'?'Delvis fördelad':undefined;
 }
-function paymentTitleUI(t){return bankPayerUI(t)||(t.amount_cents<0?'Mottagare okänd':'Betalare okänd');}
+function paymentTitleUI(t){return t.specification_link?.verification==='manual'?(t.specification_link.payer||'Flera betalare enligt specifikation'):bankPayerUI(t)||(t.amount_cents<0?'Mottagare okänd':'Betalare okänd');}
 function bankTechnicalEvidenceUI(t){
   return `<details class="node-bank-details"><summary>Tekniska originaluppgifter och fältsökvägar</summary><pre class="bank-raw-data">${esc(JSON.stringify({payer:t.payer_evidence||{},references:t.reference_evidence||{},bankOriginal:t.raw_bank_data||{}},null,2))}</pre><p class="muted">Råvärdena hör till bankunderlaget. Manuella kompletteringar och fakturaförslag ändrar dem inte.</p></details>`;
 }

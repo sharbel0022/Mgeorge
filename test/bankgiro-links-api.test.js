@@ -1,0 +1,37 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {request} from 'node:http';
+import {makeBankgiroXLSX} from '../sites/tests/helpers/bankgiro-xlsx-fixture.mjs';
+import {storeTransactions} from '../src/db.js';
+import {withSyntheticBankOriginal} from './bank-fixtures.js';
+import {encryptObject} from '../src/security.js';
+const directory=mkdtempSync(join(tmpdir(),'mgeorge-link-api-'));
+for(const key of Object.keys(process.env))if(/^(GOOGLE_|ENABLE_BANKING_|ENABLEBANKING_|MG_ADMIN_PASSWORD|ENCRYPTION_KEY)/.test(key))delete process.env[key];
+Object.assign(process.env,{NODE_ENV:'test',APP_ORIGIN:'https://mg.example.test',DB_PATH:join(directory,'synthetic.sqlite'),SESSION_SECRET:'1'.repeat(64),BANK_DATA_KEY:'3'.repeat(64),MG_ADMIN_PASSWORD:'Synthetic test password 123!'});
+const {server,db}=await import('../src/server.js');
+const base=await new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve(`http://127.0.0.1:${server.address().port}`)));let cookie='';
+async function call(path,method='GET',body,session=cookie){return new Promise((resolve,reject)=>{const payload=body===undefined?undefined:JSON.stringify(body),req=request(base+path,{method,headers:{Host:'mg.example.test',...(session?{Cookie:session}:{}),...(payload?{'Content-Type':'application/json','Content-Length':Buffer.byteLength(payload),Origin:process.env.APP_ORIGIN}:{})}},res=>{const chunks=[];res.on('data',part=>chunks.push(part));res.on('end',()=>{const bytes=Buffer.concat(chunks);let json={};try{json=JSON.parse(bytes.toString());}catch{}resolve({status:res.statusCode,headers:res.headers,bytes,json});});});req.on('error',reject);req.end(payload);});}
+test.after(()=>new Promise(resolve=>server.close(()=>{db.close();rmSync(directory,{recursive:true,force:true});resolve();})));
+test('authenticated review link API supports concurrent retries, preserves funds, verifies downloads and revokes',async()=>{
+ const account='SE4280000890119146168423';
+ const login=await call('/api/login','POST',{password:process.env.MG_ADMIN_PASSWORD},'');cookie=login.headers['set-cookie'][0].split(';')[0];
+ db.prepare('INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status,selected_account_uid) VALUES(?,?,?,?,?,?,?,?,?)').run('connection','enablebanking','Syntetisk Bank',encryptObject({session_id:'synthetic'}),encryptObject([{uid:'account',account_id:{iban:account},currency:'SEK'}]),'2099-01-01','administrator','connected','account');
+ storeTransactions(db,[withSyntheticBankOriginal({account,booked_at:'2026-10-26',amount_cents:62500,currency:'SEK',payer:'',reference:'',bank_reference:'SYNTHETIC-AIS',description:'Insättning'})],'enablebanking');
+ const transaction_id=db.prepare('SELECT id FROM bank_transactions').get().id,bytes=makeBankgiroXLSX({account,date:'2026-10-26',payments:[{party:'Syntetiskt Bistro AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
+ const saved=await call('/api/import/commit','POST',{name:'synthetic.xlsx',account,content_base64:Buffer.from(bytes).toString('base64'),confirm:true});assert.equal(saved.status,200);
+ assert.equal((await call(`/api/bank-specifications?transaction_id=${transaction_id}`,'GET',undefined,'')).status,401);
+ const preview=await call(`/api/bank-specifications?transaction_id=${transaction_id}`);assert.equal(preview.status,200,JSON.stringify(preview.json));assert.equal(preview.json.items[0].can_link,true);
+ const body={transaction_id,import_id:saved.json.import_id,report_key:preview.json.items[0].report_key,confirm:true,originals_checked:true,account_checked:true,evidence:'Syntetiska original kontrollerade.'};
+ assert.equal((await call('/api/bank-specification-links','POST',body,'')).status,401);
+ const replies=await Promise.all([call('/api/bank-specification-links','POST',body),call('/api/bank-specification-links','POST',body)]);for(const r of replies)assert.equal(r.status,200,JSON.stringify(r.json));assert.equal(replies[0].json.id,replies[1].json.id);
+ assert.equal(db.prepare('SELECT COUNT(*) n FROM bank_specification_links').get().n,1);assert.equal(db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,1);assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
+ const listed=await call('/api/bank-transactions');assert.equal(listed.json.items[0].specification_link.reference,'0599');assert.equal(listed.json.items[0].payer,'');assert.equal(listed.json.items[0].reference,'');
+ const bankOriginal=await call(`/api/bank-transactions/${transaction_id}/original`);assert.equal(bankOriginal.status,200);assert.equal(bankOriginal.json.entry_reference,'SYNTHETIC-AIS');
+ assert.equal((await call(`/api/bank-transactions/${transaction_id}/original`,'GET',undefined,'')).status,401);
+ assert.equal((await call(`/api/bank-specification-links/${replies[0].json.id}/revoke`,'POST',{evidence:'Syntetiskt återtag.'})).status,200);
+ assert.equal((await call('/api/bank-transactions')).json.items[0].specification_link,null);
+ db.prepare('UPDATE import_jobs SET content=? WHERE id=?').run(Buffer.from('tampered'),saved.json.import_id);assert.equal((await call(`/api/imports/${saved.json.import_id}/original`)).status,409);
+});

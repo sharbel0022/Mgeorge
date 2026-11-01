@@ -49,9 +49,25 @@ function requiredEvidence(state:State){
  return ids;
 }
 async function checkedState(owner:string,initial:State){
+ // Every pending report, including legacy rows, needs current account consent
+ // before its stable bank identifiers can promote it into economic child rows.
+ const pending=initial.transactions.filter(row=>row.specification&&row.specificationStatus==='review'),accountDecisions:any[]=[];
+ if(pending.length){
+  initial=structuredClone(initial);const issues=new Map<string,string>();
+  for(const row of pending){
+   if(!issues.has(row.account)){
+    let issue='En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.';
+    try{const {bankgiroAutomaticAccountIssue}=await import('./bankgiro-service');issue=await bankgiroAutomaticAccountIssue(owner,row.account);}catch{/* Unavailable consent evidence fails closed. */}
+    issues.set(row.account,issue);
+   }
+   const current=initial.transactions.find(item=>item.id===row.id)!,issue=issues.get(row.account)!;
+   if((current.bankgiroAccountIssue||'')!==issue)accountDecisions.push({id:uid(),at:now(),kind:issue?'bankgiro_account_held':'bankgiro_account_restored',safe:false,transaction_id:row.id,reason:issue||'Det valda mottagarkontot ingår i ägarens aktiva bankmedgivande.'});
+   current.bankgiroAccountIssue=issue;
+  }
+ }
  // A pure hypothetical pass discovers recovery candidates; none of its allocations escape.
  const probe=structuredClone(initial);for(const t of probe.transactions)delete t.bankOriginalIssue;
- const state=structuredClone(initial),read=originalReader(owner),decisions:any[]=[],checked=new Set<string>();
+ const state=structuredClone(initial),read=originalReader(owner),decisions:any[]=[...accountDecisions],checked=new Set<string>();
  for(let pass=0;pass<=state.transactions.length;pass++){
   const ids=requiredEvidence(pass===0?probe:state);
   if(pass===0)for(const t of initial.transactions)if(paymentOriginalIssue(initial,t))ids.add(t.id);

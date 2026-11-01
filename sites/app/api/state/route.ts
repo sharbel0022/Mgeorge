@@ -11,7 +11,9 @@ export async function POST(req:Request){try{
  const body=JSON.parse(text);if(!Number.isSafeInteger(body.revision)||typeof body.requestId!=='string'||!/^[a-zA-Z0-9-]{10,80}$/.test(body.requestId))return response({error:'Ogiltig förfrågan.'},400);
  const old=await readWorkspace(user.userId);if(old.state.receipts.includes(body.requestId))return response({...old,message:'Åtgärden är redan sparad.'});
  if(old.revision!==body.revision)return response({error:'Uppgifterna ändrades i ett annat fönster. Uppdatera sidan innan du försöker igen.'},409);
- const command=body.command;if(command&&typeof command==='object'){delete command.trustedBankImport;delete command.trustedBankFileImport;delete command.bankFileProof;}const documentId=command?.invoice?.documentId||command?.documentId;if(documentId){const doc=await db().prepare('SELECT id FROM documents WHERE id=? AND owner=?').bind(documentId,user.userId).first();if(!doc)throw new Error('Bilagan kunde inte hittas för ditt konto.');}
+ let command=body.command;const metadataOnly=['bankgiro.link','bankgiro.unlink'].includes(command?.type);
+ if(metadataOnly){const {prepareBankgiroLinkCommand}=await import('@/lib/bankgiro-service');command=await prepareBankgiroLinkCommand(user.userId,old.state,command);}
+ if(command&&typeof command==='object'){delete command.trustedBankImport;delete command.trustedBankFileImport;delete command.bankFileProof;}const documentId=command?.invoice?.documentId||command?.documentId;if(documentId){const doc=await db().prepare('SELECT id FROM documents WHERE id=? AND owner=?').bind(documentId,user.userId).first();if(!doc)throw new Error('Bilagan kunde inte hittas för ditt konto.');}
  if(command?.type==='bankgiro.import')Object.assign(command,await readBankgiroOriginal(user.userId,command));
  if(command?.type==='transactions.import'){
   if(command.documentId)Object.assign(command,await readBankFileOriginal(user.userId,command));
@@ -20,7 +22,7 @@ export async function POST(req:Request){try{
  const current=['match.create','transaction.verify','transaction.split'].includes(command?.type)?await assertPaymentOriginal(user.userId,old.state,command.transactionId||command.id):old.state;
  let result:ReturnType<typeof applyCommand>,automatic:Awaited<ReturnType<typeof reconcileWithOriginals>>,payload:string;
  try{
-  result=applyCommand(current,command);automatic=await reconcileWithOriginals(user.userId,result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];payload=JSON.stringify(result.state);
+  result=applyCommand(current,command);automatic=metadataOnly?{state:result.state,decisions:[],findings:[]}:await reconcileWithOriginals(user.userId,result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];payload=JSON.stringify(result.state);
   if(new TextEncoder().encode(payload).length>1_800_000){const message='Registret är för stort för den här versionen. Exportera dina uppgifter innan vidare import.';throw bankImportEvidenceError(old.state,result.state,message)||new Error(message);}
  }catch(error){
   if(!(error instanceof BankImportEvidenceError))throw error;
@@ -41,7 +43,7 @@ export async function POST(req:Request){try{
   db().prepare('UPDATE workspaces SET payload=?, revision=revision+1, updated_at=? WHERE owner=? AND revision=?').bind(payload,at,user.userId,old.revision)
  ]);
  if(batch[1].meta.changes!==1)return response({error:'En annan ändring sparades samtidigt. Uppdatera sidan och försök igen.'},409);
- await reconcileAndPrepare(user.userId);
+ if(!metadataOnly)await reconcileAndPrepare(user.userId);
  if(command.type==='bankgiro.import'){
   const fresh=result.state.transactions.filter(t=>t.specification&&t.specificationStatus==='linked'&&!old.state.transactions.some(x=>x.id===t.id));
   for(const t of fresh.slice(0,5))try{await searchBankgiroInvoice(user.userId,t.id);}catch{/* Import is durable even if Gmail is unavailable. */}

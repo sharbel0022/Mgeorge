@@ -1,5 +1,24 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## AIS/Bankgiro underlagskoppling — 2026-11-01
+
+[Mät- och leveransrapport](docs/BANKGIRO-AIS-LINKING-IMPROVEMENT.md). Separat ägarbunden, manuell och återtagbar originalrelation i båda befintliga applikationerna; inga nya ekonomiska poster eller allokeringar från relationen. Samma 15 syntetiska scenarier: korrekta manuella relationer 0/10→10/10, ekonomiska dubblettfall 0/15→0/15, felaktiga relationer 0/5→0/5, oförändrade saldon/allokeringar 15/15. Åtta huvudinsättningar visas på 16→8 rader med bevarade rapportoriginal.
+
+| Berört område | Före → efter | Ny evidens | Verifieringsgräns |
+| --- | --- | --- | --- |
+| Startsida och fakturasaldon | 8,5 / 8 → oförändrat | 15/15 oförändrade ekonomiska totaler och fakturasaldon; del/full betalning behåller status | Ingen riktig produktionsallokering prövad |
+| Swedbank/bankhämtning | 8,5 / 8 → oförändrat | AIS-kvitto, aktivt ägt konto och aktuellt medgivande krävs; historiska osignerade kvitton uppgraderas inte | Berörd verklig AIS-rad saknar ankomstkvitto |
+| Bankgiroimport | 8,5 → 8,5 | Kompletta grupper, överlappande del-/helrapporter, ägt omtolkat original och originalrelation | Autentisk stabil XLSX/AIS-identitet saknas |
+| Verklig betalare / referens | 7 / 7 → oförändrat | Syntetisk visning 2/8→8/8 namn och 0/8→8/8 exakt generell referens; tydlig manuell proveniens | Ingen generell referens uppgraderas till OCR |
+| Automatisk matchning | 7,5 → 7,5 | Metadata undantas helt från avstämning/utkast; gamla reviewgrupper kräver aktuellt kontomedgivande före automatisk promotion | Ingen automatisk XLSX-koppling utan bankbevis |
+| Dubblettkontroll / delbetalningar / historik / status | 8 → 8 | Samtidighet, återtag, avbrott, oförändrade allokeringar, separat ägarfiltrerad audit | Ingen ekonomisk dubblering reproducerades i startrevisionen; noll sådana rättningar påstås |
+| Säkerhet och åtkomstkontroll | 8,5 → 8,5 | Ägargränser, originalhash/version/omtolkning, CAS/SQLite-transaktion och reviderbart återtag | Bankmedgivandet läses ur bevarad konfiguration; ingen ny providerauktorisering görs |
+| Mobil / användbarhet | 8,5 / 8 → oförändrat | Verklig Chromium-komponentkontroll 1440/390 px, bekräftelse/återtag, ingen dokumentoverflow | Isolerade syntetiska minnesdata; full driftkedja separat |
+| Kodkvalitet och tester | 8,5 → 8,5 | 593/593 Node + 949/949 Sites, syntax89, TS/build; oberoende fynd reproducerade och rättade | Produktionsaudit0; full Sites16 moderate utvecklingsfynd, 0 high/critical |
+| Verifiering i verklig produktion | 6,5 → 6,5 | Behörig läsning fann ingen exakt faktura0599; inga betalnings-/kundrelationer ändrades | Kvitto/Sites-version kompletteras efter faktisk leverans |
+
+Övriga områden oförändrade. Ingen 9,5-poäng ges för syntetiska tester eller enbart ansluten integration.
+
 ## Direkt Bankgiro-XLSX — 2026-11-01
 
 [Implementationsrapport](docs/BANKGIRO-XLSX-IMPLEMENTATION.md). Privat original verifierat13/13; inga verkliga bankvärden publicerade. Identisk22-filerskorpus: avsändare/referens/rader0/11→11/11, felaccept0/13→0/13. Fulla sviter578 Node+912 Sites; syntax84, TS/build och obligatorisk auditgrind godkända. Sites fullaudit har fortsatt16 moderate utvecklingsberoenden; produktionsaudit0. Kod417fd4c (implementation359055c), exakt Actions41313420001 success; senaste Sites39 succeeded, samma Sites-källträd. Arbetsyterevision31→31, oförändrad ändringstid/policy/tabellista/scheman/runtime9. Publicerad importknapp/XLSX-filter och syntetisk minnesdemo verifierade; tydligt huvudvärde för referens. Inget riktigt import-/matchningsprov. Kvitto: docs/BANKGIRO-XLSX-PUBLICATION.json.

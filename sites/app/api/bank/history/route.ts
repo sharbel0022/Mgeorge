@@ -15,11 +15,12 @@ export async function GET(req:Request){try{
   (action LIKE 'transaction.%' AND json_extract(evidence,'$.command.id')=?)
   OR (action IN ('transaction.split','transaction.unsplit') AND json_extract(evidence,'$.command.id')=?)
   OR (action='match.create' AND json_extract(evidence,'$.command.transactionId')=?)
+  OR (action IN ('bankgiro.link','bankgiro.unlink') AND (json_extract(evidence,'$.command.transactionId')=? OR EXISTS (SELECT 1 FROM json_each(CASE WHEN json_type(evidence,'$.command.specificationIds')='array' THEN json_extract(evidence,'$.command.specificationIds') ELSE '[]' END) WHERE value=?)))
   OR (action='match.undo' AND json_extract(evidence,'$.command.id') IN (SELECT value FROM json_each(?)))
   OR (action='bank.details' AND json_extract(evidence,'$.transactionId')=?)
   OR EXISTS (SELECT 1 FROM json_each(CASE WHEN json_type(evidence,'$.automatic')='array' THEN json_extract(evidence,'$.automatic') ELSE '[]' END) d WHERE json_extract(CASE WHEN d.type='object' THEN d.value ELSE '{}' END,'$.transaction_id')=? OR EXISTS (SELECT 1 FROM json_each(CASE WHEN d.type='object' AND json_type(d.value,'$.child_ids')='array' THEN json_extract(d.value,'$.child_ids') ELSE '[]' END) WHERE value=?))
   OR EXISTS (SELECT 1 FROM json_each(CASE WHEN json_type(evidence,'$.decisions')='array' THEN json_extract(evidence,'$.decisions') ELSE '[]' END) d WHERE json_extract(CASE WHEN d.type='object' THEN d.value ELSE '{}' END,'$.transaction_id')=? OR EXISTS (SELECT 1 FROM json_each(CASE WHEN d.type='object' AND json_type(d.value,'$.child_ids')='array' THEN json_extract(d.value,'$.child_ids') ELSE '[]' END) WHERE value=?))
-  ORDER BY sequence DESC LIMIT 51`).bind(user.userId,before?Number(before):Number.MAX_SAFE_INTEGER,id,transaction.parentId||null,id,JSON.stringify(allocationIds),id,id,id,id,id).all<{sequence:number;id:string;action:string;detail:string;created_at:string}>();
+  ORDER BY sequence DESC LIMIT 51`).bind(user.userId,before?Number(before):Number.MAX_SAFE_INTEGER,id,transaction.parentId||null,id,id,id,JSON.stringify(allocationIds),id,id,id,id,id).all<{sequence:number;id:string;action:string;detail:string;created_at:string}>();
  const page=rows.results.slice(0,50),entries=page.map(row=>paymentHistoryEntry(row,id,{parentId:transaction.parentId,allocations,invoices:workspace.state.invoices})).filter(Boolean);
  return response({entries,next:rows.results.length>50?String(page[page.length-1].sequence):null});
  }catch(e){return failure(e);}}

@@ -12,6 +12,11 @@ const {GET}=await import(data(source));
 const request=extra=>new Request('https://test/api/bank/history?transactionId=payment'+(extra||''));
 function fixture(t){const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());sql.exec('CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT)');const f={sql,owner:'owner',DB:{prepare(query){return {bind(...args){return {async all(){return {results:sql.prepare(query).all(...args)};}};}};}},add(action,detail,owner='owner'){const id=crypto.randomUUID();sql.prepare('INSERT INTO audit_events VALUES(?,?,?,?,?,?)').run(id,owner,1,action,typeof detail==='string'?detail:JSON.stringify(detail),'2026-10-28T10:00:00Z');return id;}};globalThis.paymentHistoryFixture=f;return f;}
 
+test('manual original relation and revocation appear in payment history without creating an invoice settlement',async t=>{
+ const f=fixture(t);f.add('bankgiro.link',{command:{transactionId:'payment',specificationIds:['spec'],note:'Båda originalen kontrollerade',confirmAccount:true}});f.add('bankgiro.unlink',{command:{transactionId:'payment',specificationIds:['spec'],note:'Fel underlag återtaget'}});f.add('bankgiro.link',{command:{transactionId:'other',specificationIds:['else'],note:'PRIVATE OTHER'}});
+ const out=await (await GET(request())).json();assert.equal(out.entries.length,2);assert.equal(out.entries[0].label,'Underlagskoppling återtagen');assert.equal(out.entries[1].label,'Underlag manuellt kopplade');assert.equal(out.entries[1].note,'Båda originalen kontrollerade');assert.equal(out.entries[0].settlement,null);assert.doesNotMatch(JSON.stringify(out),/PRIVATE/);
+});
+
 test('old verification is visible beyond the global last-100 history, with correction and undo retained',async t=>{
  const f=fixture(t),first=f.add('transaction.verify',{command:{id:'payment',party:'Första verifierade namn',payerReference:'000018',note:'Kontrollerat original'}});
  for(let n=0;n<120;n++)f.add('transaction.verify',{command:{id:'unrelated',party:'OTHER PAYMENT'}});

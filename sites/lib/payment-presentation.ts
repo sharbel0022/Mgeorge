@@ -1,4 +1,4 @@
-import {available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,type State,type Transaction} from './domain';
+import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,type State,type Transaction} from './domain';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 
@@ -43,6 +43,8 @@ export function paymentEvidenceView(t:Transaction){
 }
 export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]=[]){
   const assessment=paymentInvoiceAssessment(state,t),evidenceView=paymentEvidenceView(t),requiresSpecification=needsPaymentSpecification(t);
+  const sourceLink=activeBankgiroLink(state,t.id),linkedRow=sourceLink?.rows.length===1?sourceLink.rows[0]:undefined;
+  const linkedPayer=linkedRow?cleanParty(linkedRow.party):'',linkedReference=linkedRow?referenceView(linkedRow.payerReference,linkedRow.referenceEvidence,linkedRow.referenceParts):undefined;
   const allocations=state.allocations.filter(a=>a.active&&a.transactionId===t.id),invoices=allocations.map(a=>state.invoices.find(i=>i.id===a.invoiceId)).filter(i=>!!i);
   const invoiceNumbers=[...new Set(invoices.map(i=>i.number))];
   const possible=[...new Set([...candidates.map(c=>c.number),...(assessment.status!=='verified'&&assessment.invoice?[assessment.invoice.number]:[])])];
@@ -57,6 +59,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   else if(bankConflict)status='Motstridigt bankunderlag';
   else if(paymentOriginalIssue(state,t))status='Original behöver verifieras';
   else if(needsBankFileValidation(t))status='Original behöver verifieras';
+  else if(sourceLink&&!allocations.length)status='Fakturan behöver granskas';
   else if(requiresSpecification)status='Specifikation saknas';
   else if(conflict)status='Konflikt';
   else if(t.specificationStatus==='review'||!t.verified||needsBankFileReview(t))status='Behöver granskas';
@@ -64,10 +67,14 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
     verified=true;
     status=invoices.some(i=>balance(state,i)>0)?'Delbetalning':available(state,t)>0?'Överbetalning':'Verifierad';
   }else if(possible.length)status='Möjlig matchning';
-  return {...evidenceView,invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
+  const sources=sourceLink?'Swedbank + Bankgiro '+(sourceLink.rows.some(row=>/xlsx|excel/i.test(row.format||row.source||''))?'Excel':'specifikation'):'';
+  const candidateNote=!sourceLink&&t.evidence==='bank_api'&&bankgiroLinkCandidates(state,t).length?'Möjlig tillhörande Bankgirospecifikation – kontrollera.':'';
+  return {...evidenceView,...(linkedPayer?{payer:linkedPayer,payerKnown:true}:{}),...(linkedReference?.value?{reference:linkedReference,referenceLabel:referenceLabel(linkedReference.kind)}:{}),sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
 }
 export function bankVisibleTransactions(state:State){
+  const linkedSpecifications=new Set((state.bankgiroLinks||[]).flatMap(link=>activeBankgiroLink(state,link.transactionId)?.rows.map(row=>row.id)||[]));
   return state.transactions.filter(t=>{
+    if(t.specificationStatus==='review'&&linkedSpecifications.has(t.id))return false;
     const children=state.transactions.filter(c=>c.parentId===t.id&&!c.ignored&&!c.duplicateOf);
     return !children.length||!children.every(c=>c.specificationStatus!=='review'&&c.account===t.account&&c.currency===t.currency)||children.reduce((n,c)=>n+c.amount,0)!==t.amount;
   });

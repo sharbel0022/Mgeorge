@@ -1,5 +1,17 @@
 # Verifierad progress
 
+## AIS/Bankgiro underlagskoppling — 2026-11-01
+
+- Nytt uttryckligt mandat omfattar utveckling, normal push till main och publicering i befintligt Sites-projekt. Hämtad/reviderad origin/main: `1b017c0a34821bdc04aa9ca3002765f78b2888b6`; ren start och separat branch `codex/bankgiro-ais-linking`, samma arbetskopia. Tidigare payer/OCR-worktree har inte ändrats.
+- Startrepro: Sites visar AIS625kr och en reviewrad, men räknar endast en ekonomisk post62500öre/noll allokeringar. Node har också en ekonomisk post och separat bevarat XLSX. Det påstådda ekonomiska dubbelfelet reproduceras inte i aktuell main; faktisk lucka är en originalrelation och missvisande separata huvudrader.
+- Implementerat separat manuell relation, ägare/aktuellt konto/medgivande, intakt AIS-kvitto och återläst/omtolkat original, komplett rapportantal/-summa, anteckning och återtag. Bankfält, original, fakturor och allokeringar bevaras. Metadata går inte via automatisk avstämning/meddelandeförberedelse. Originalöppning startar inte längre ett implicit bankdetaljanrop.
+- Oberoende review reproducerade och ledde till rättningar av ofullständig Node-kvittokontroll, stale återtagsåtkomst, förlorad verifierad betalningsstatus, förfalskade nästlade rapportfält samt ofullständig del-/helrapportgrupp. Nya positiva API-fixtures har aktuellt syntetiskt konto/medgivande; gamla affärsassertioner behållna. Även gamla reviewgruppers automatiska promotion spärras vid saknat medgivande.
+- Före/efter:15 scenarier, manuella relationer0/10→10/10, ekonomiska dubblettfall0/15→0/15, felaktiga relationer0/5→0/5, saldon/allokeringar15/15 oförändrade. Rapport: `docs/BANKGIRO-AIS-LINKING-IMPROVEMENT.md` och hashbundna mät-JSON.
+- Frysta lokala kontroller:593/593 Node,949/949 Sites, syntax89, TypeScript/produktionsbygge godkända. Rot och Sites produktion audit0; full Sites16 moderate i utvecklingsverktyg/0 high/critical, obligatorisk high-grind passerar. Rena installationer körda på samma oförändrade package-/lockfiler.
+- Chromium vid1440/390px: riktig bekräftelse och återtag i isolerad komponentpreview, en räknad625kr-post/noll allokeringar och ingen dokumentoverflow. Beviset gäller verkliga komponenter med syntetiskt minnestillstånd, inte en produktionsimport.
+- Läsande produktion: arbetsyterevision35, den berörda AIS-raden saknar ankomstkvitto och motsvarande rapport är review. Ingen faktura med exakt nummer0599 finns i läst register. Dessa uppgifter skrevs inte om och inga ekonomiska produktionskommandon kördes. Backupens manifestpass är komplett191/191, men113 äldre API-poster saknar kvitto; detta är ingen full katastrofövning.
+- Fortsättningspunkt före leverans: avsluta samlad review, commit/push utan force, verifiera exakt Actions-SHA; synkronisera endast `sites/` till öppnad befintlig källa, paketera/publicera och verifiera version plus läsande banklista. Bevara policy/auth/DB/R2/runtime9/scheman. Leveranskvittot kompletteras efter faktisk publicering. Autentiskt stabilt bankbevis och historiskt AIS-kvitto saknas; säker granskningsfunktion levereras, automatisk XLSX-bankidentitet påstås inte färdig.
+
 ## Aktuellt tillägg — verklig betalare och OCR, 2026-11-01
 
 - Användarens uttryckliga mandat omfattar autonom utveckling, push till main och säker publicering i befintligt Sites-projekt. Senaste `origin/main` hämtad före arbete och återkontrollerad: `9d456563a15e9681d8500a0e09f3ef32314c67b1`. Separat worktree `Mgeorge-payer-ocr`, branch `codex/payer-ocr`; andra arbetskopiors ocommittade arbete lämnat orört.

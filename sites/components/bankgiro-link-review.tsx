@@ -1,0 +1,26 @@
+'use client';
+import {useState,type FormEvent} from 'react';
+import {activeBankgiroLink,bankgiroLinkCandidates,money,type State,type Transaction,type Command} from '@/lib/domain';
+
+type Props={state:State;transaction:Transaction;save:(command:Command)=>Promise<boolean>;busy:boolean;error:string;demo?:boolean};
+function Originals({state,transaction,rows,demo}:{state:State;transaction:Transaction;rows:Transaction[];demo?:boolean}){
+ const documents=[...new Set(rows.map(row=>row.bankFileProof?.documentId||state.imports.find(i=>i.id===row.importId)?.documentId).filter(Boolean))];
+ return <><details className="original-bank-details"><summary>Öppna sparat Swedbankoriginal</summary><p>Bankens bevarade API-svar. Inga nya bankuppgifter hämtas när originalet öppnas.</p><pre className="bank-raw-data">{JSON.stringify(transaction.bankData,null,2)}</pre></details>{documents.map(id=>demo?<p key={id}>Syntetiskt Bankgirooriginal · endast demoläge</p>:<a key={id} className="text-button" href={'/api/files?id='+encodeURIComponent(id!)} target="_blank" rel="noopener">Öppna Bankgirooriginal</a>)}<dl className="details-grid">{rows.map(row=><div key={row.id}><dt>{row.party||'Betalare saknas'}</dt><dd>{money(row.amount)} · Betalningsreferens: <span className="mono">{row.payerReference||'Saknas'}</span></dd></div>)}</dl></>;
+}
+export default function BankgiroLinkReview({state,transaction,save,busy,error,demo}:Props){
+ const active=activeBankgiroLink(state,transaction.id),stored=state.bankgiroLinks?.find(link=>link.transactionId===transaction.id&&!link.revokedAt),linked=active||(stored?{...stored,rows:state.transactions.filter(row=>stored.specificationIds.includes(row.id))}:undefined),candidates=bankgiroLinkCandidates(state,transaction);
+ const [selected,setSelected]=useState(''),[note,setNote]=useState(''),[dateNote,setDateNote]=useState(''),[originals,setOriginals]=useState(false),[account,setAccount]=useState(false);
+ const candidate=candidates.find(c=>c.specificationId===selected)||candidates[0];
+ if(!linked&&!candidates.length)return null;
+ function resetReview(){setNote('');setDateNote('');setOriginals(false);setAccount(false);}
+ async function confirm(e:FormEvent){e.preventDefault();if(!candidate||!originals||!account||!note.trim())return;if(await save({type:'bankgiro.link',transactionId:transaction.id,specificationId:candidate.specificationId,note,confirmOriginals:originals,confirmAccount:account,dateDifferenceNote:dateNote}))resetReview();}
+ async function revoke(){if(linked&&note.trim()&&await save({type:'bankgiro.unlink',id:linked.id,note}))resetReview();}
+ return <section className="review-next-step" aria-label="Bankgirooriginal och bankkoppling"><h3>{active?'Manuellt verifierad underlagskoppling':stored?'Underlagskopplingen behöver granskas':'Möjlig tillhörande Bankgirospecifikation – kontrollera.'}</h3><p>Underlagskopplingen gäller originalen. Fakturakund, fakturakoppling och saldon kontrolleras separat.</p>
+ {linked?<><p>Källor: Swedbank + Bankgiro. Bekräftelsen är ett manuellt granskningsbeslut.</p><p>{linked.createdAt} · {linked.note}</p><Originals state={state} transaction={transaction} rows={linked.rows} demo={demo}/><label className="field"><span>Skäl för att återta kopplingen</span><input value={note} maxLength={1000} onChange={e=>setNote(e.target.value)}/></label><button type="button" className="btn" disabled={busy||!note.trim()} onClick={revoke}>Återta underlagskoppling</button></>:candidate&&<form onSubmit={confirm}>{candidates.length>1&&<label className="field"><span>Välj rapport att kontrollera</span><select value={candidate.specificationId} onChange={e=>{setSelected(e.target.value);setOriginals(false);setAccount(false);setNote('');setDateNote('');}}>{candidates.map(c=><option key={c.specificationId} value={c.specificationId}>{c.rows[0]?.date} · {c.rows.map(r=>r.party||'Okänd betalare').join(', ')} · {money(c.rows.reduce((n,r)=>n+r.amount,0))}</option>)}</select></label>}
+ <Originals state={state} transaction={transaction} rows={candidate.rows} demo={demo}/>{!candidate.canLink&&<p role="status">{candidate.reason}</p>}
+ <label className="field"><span>Hur verifierades sambandet mellan originalen?</span><textarea required value={note} maxLength={1000} onChange={e=>setNote(e.target.value)}/></label>
+ {candidate.dateDifference!==0&&<label className="field"><span>Förklara datumskillnaden ({candidate.dateDifference} dagar)</span><input required value={dateNote} maxLength={1000} onChange={e=>setDateNote(e.target.value)}/></label>}
+ <label className="check-field"><input type="checkbox" checked={originals} onChange={e=>setOriginals(e.target.checked)}/><span>Jag har öppnat båda originalen och verifierat att hela specifikationen tillhör denna bankinsättning.</span></label>
+ <label className="check-field"><input type="checkbox" checked={account} onChange={e=>setAccount(e.target.checked)}/><span>Jag har kontrollerat mottagarkonto och Bankgirorelation mot bankens uppgifter.</span></label>
+ <button className="btn primary" disabled={busy||!candidate.canLink||!originals||!account||!note.trim()||candidate.dateDifference!==0&&!dateNote.trim()}>Bekräfta underlagskoppling</button></form>}{error&&<p className="form-error" role="alert">{error}</p>}</section>;
+}

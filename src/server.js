@@ -23,6 +23,7 @@ import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,rev
 import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
 import {createPaymentControl,planBankControl} from './payment-control.js';
 import {buildPaymentOverview,invoiceAnalysis} from './payment-overview.js';
+import {bankSpecificationCandidates,confirmBankSpecificationLink,revokeBankSpecificationLink,bankSpecificationPresentation,bankApiOriginal} from './bankgiro-links.js';
 
 function reconcileAndPrepare(){const suggestions=runReconciliation(db);prepareMessages(db);return suggestions;}
 
@@ -162,9 +163,10 @@ function retainBankgiroReview(body,items,req){
   const content=Buffer.from(body.content_base64,'base64'),sha256=digest(content),mime_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   db.exec('BEGIN IMMEDIATE');
   try{
-    const previous=db.prepare("SELECT id FROM import_jobs WHERE source='bank_file' AND content_sha256=? AND mime_type=? LIMIT 1").get(sha256,mime_type);
+    const previous=db.prepare("SELECT id FROM import_jobs WHERE source='bank_file' AND content_sha256=? AND mime_type=? AND (owner='' OR owner=?) LIMIT 1").get(sha256,mime_type,req.principal);
     const import_id=previous?.id||recordImport(db,{source:'bank_file',name:optionalString(body.name,240),found:items.length,review:items.length,status:'needs_review',error:items[0]?.review_reason||'',content,mime_type});
-    if(!previous)audit(db,'bankgiro_xlsx_review_saved',{import_id,sha256,found:items.length,financial_records_created:0});
+    db.prepare("UPDATE import_jobs SET owner=? WHERE id=? AND owner=''").run(req.principal,import_id);
+    if(!previous)audit(db,'bankgiro_xlsx_review_saved',{import_id,sha256,found:items.length,financial_records_created:0,owner:req.principal});
     db.exec('COMMIT');
     return {import_id,imported:0,duplicate:previous?1:0,review:items.length,review_only:true,status:'needs_review'};
   }catch(error){db.exec('ROLLBACK');throw error;}
@@ -468,7 +470,14 @@ async function route(req,res){
     }catch(e){db.exec('ROLLBACK');throw e;}
   }
   if(path==='/api/bank-transactions'&&req.method==='GET'){
-    const suggestions=matchingSuggestions(db);return json(res,200,{items:listTransactions(db).map(t=>({...t,status:t.status==='unmatched'&&suggestions.some(s=>s.transaction_id===t.id)?'suggested':t.status}))});
+    const suggestions=matchingSuggestions(db);return json(res,200,{items:listTransactions(db).map(t=>({...t,specification_link:bankSpecificationPresentation(db,t.id,req.principal),status:t.status==='unmatched'&&suggestions.some(s=>s.transaction_id===t.id)?'suggested':t.status}))});
+  }
+  if(path==='/api/bank-specifications'&&req.method==='GET')return json(res,200,bankSpecificationCandidates(db,requiredString(url.searchParams.get('transaction_id'),'Bankhändelse'),req.principal));
+  if(path==='/api/bank-specification-links'&&req.method==='POST')return json(res,200,confirmBankSpecificationLink(db,await readBody(req),req.principal,()=>assertSessionStillAuthorized(req)));
+  if(/^\/api\/bank-specification-links\/[^/]+\/revoke$/.test(path)&&req.method==='POST')return json(res,200,revokeBankSpecificationLink(db,decodeURIComponent(path.split('/')[3]),await readBody(req),req.principal,()=>assertSessionStillAuthorized(req)));
+  if(/^\/api\/bank-transactions\/[^/]+\/original$/.test(path)&&req.method==='GET'){
+    const original=bankApiOriginal(db,decodeURIComponent(path.split('/')[3]),req.principal),bytes=Buffer.from(JSON.stringify(original));
+    res.writeHead(200,{...baseHeaders,'Content-Type':'application/json; charset=utf-8','Content-Disposition':'attachment; filename="bankoriginal.json"','Content-Length':bytes.length});return res.end(bytes);
   }
   if(path==='/api/bank-transactions'&&req.method==='POST')return json(res,201,addBankTransaction(await readBody(req)));
   if(path==='/api/bank-transactions'&&req.method==='PATCH'){
@@ -515,8 +524,9 @@ async function route(req,res){
   }
   if(path==='/api/imports'&&req.method==='GET')return json(res,200,{items:listImports(db)});
   if(/^\/api\/imports\/[^/]+\/original$/.test(path)&&req.method==='GET'){
-    const item=db.prepare('SELECT name,content,mime_type FROM import_jobs WHERE id=?').get(decodeURIComponent(path.split('/')[3]));
+    const item=db.prepare("SELECT name,content,mime_type,content_sha256 FROM import_jobs WHERE id=? AND (owner='' OR owner=?)").get(decodeURIComponent(path.split('/')[3]),req.principal);
     if(!item?.content)throw bad(404,'Originalfilen saknas');
+    if(!item.content_sha256||digest(item.content)!==item.content_sha256)throw bad(409,'Originalfilens SHA-256 kan inte verifieras.');
     res.writeHead(200,{...baseHeaders,'Content-Type':item.mime_type||'application/octet-stream','Content-Disposition':`attachment; filename="bankunderlag${item.mime_type==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'?'.xlsx':item.mime_type==='application/xml'?'.xml':'.csv'}"`,'Content-Length':item.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(item.content));
   }
   if(path==='/api/import/preview'&&req.method==='POST'){
@@ -577,7 +587,7 @@ async function route(req,res){
   if(path==='/api/export'&&req.method==='GET'){
     const evidence=reconciliationData(db);
     audit(db,'data_exported',{});
-    return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:evidence.invoices,transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),customer_messages:listMessages(db),message_approvals:db.prepare('SELECT * FROM message_approvals').all(),message_deliveries:db.prepare('SELECT * FROM message_deliveries').all(),verified_contacts:db.prepare('SELECT * FROM verified_contacts').all(),payer_links:db.prepare('SELECT * FROM payer_links').all(),reconciliation_findings:db.prepare('SELECT * FROM reconciliation_findings').all(),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
+    return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:evidence.invoices,transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),customer_messages:listMessages(db),message_approvals:db.prepare('SELECT * FROM message_approvals').all(),message_deliveries:db.prepare('SELECT * FROM message_deliveries').all(),verified_contacts:db.prepare('SELECT * FROM verified_contacts').all(),payer_links:db.prepare('SELECT * FROM payer_links').all(),bank_specification_links:db.prepare('SELECT * FROM bank_specification_links').all(),reconciliation_findings:db.prepare('SELECT * FROM reconciliation_findings').all(),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
   }
   // AIS only: reads account data, never creates, approves or executes payments.
   if(path==='/api/bank/status'&&req.method==='GET'){
