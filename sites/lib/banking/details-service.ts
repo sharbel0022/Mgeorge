@@ -30,14 +30,14 @@ export async function fetchBankDetails(req:Request){
   const evidence=transactionDetailEvidence(target,original,detail);
   if(unsupported&&evidence.status==='missing')evidence.reason='Swedbank erbjuder inga ytterligare betalardetaljer för den här posten via den befintliga bankanslutningen. Lägg till Bankgiros individuella betalningsspecifikation.';
   if(!env.BUCKET)throw Error('Originalfilen kan inte sparas just nu.');
-  const at=now(),documentId=uid(),content=JSON.stringify({source:'Enable Banking transaction details',account:target.account,bankReference:target.bankReference,checkedAt:at,supported:!unsupported,listed:original,detail});
+  const at=now(),documentId=uid(),content=JSON.stringify({source:'Enable Banking transaction details',account:target.account,bankReference:target.bankReference,checkedAt:at,supported:!unsupported,previousBankData:target.bankData,listed:original,detail});
   const bytes=new TextEncoder().encode(content),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
   await lease.assert();
   await env.BUCKET.put(`${user.userId}/${documentId}`,bytes,{httpMetadata:{contentType:'application/json'}});
   const current=await readWorkspace(user.userId);if(current.revision!==old.revision)throw Error('Uppgifterna ändrades under hämtningen. Uppdatera sidan och försök igen.');
-  const state=enrichBankDetails(old.state,target.id,evidence,documentId),receiptAdopted=fresh.rows.length===1&&adoptFreshBankReceipt(state,target.id,fresh.rows[0]),auditId=uid();
+  const state=enrichBankDetails(old.state,target.id,evidence,documentId),receiptAdopted=fresh.rows.length===1&&adoptFreshBankReceipt(state,target.id,fresh.rows[0]),originalSerializationRefreshed=receiptAdopted&&target.bankData!==undefined&&JSON.stringify(target.bankData)!==JSON.stringify(state.transactions.find(t=>t.id===target.id)?.bankData),auditId=uid();
   const committed=await lease.write([
-   db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(auditId,user.userId,old.revision+1,'bank.details',JSON.stringify({transactionId:target.id,status:evidence.status,documentId,receiptAdopted,reason:evidence.reason}),at,user.userId,old.revision),
+   db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(auditId,user.userId,old.revision+1,'bank.details',JSON.stringify({transactionId:target.id,status:evidence.status,documentId,receiptAdopted,originalSerializationRefreshed,reason:evidence.reason}),at,user.userId,old.revision),
    db().prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM audit_events WHERE id=? AND owner=?)').bind(documentId,user.userId,`bankuppgifter-${target.date}.json`,'application/json',bytes.length,hash,at,auditId,user.userId),
    db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(state),at,user.userId,old.revision)
   ]);

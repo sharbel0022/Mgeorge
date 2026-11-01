@@ -1,4 +1,5 @@
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
+import {createHash} from 'node:crypto';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
 import {emptyState,applyCommand,paymentInvoiceAssessment,bankApiOriginalIssue} from '../lib/domain.ts';
@@ -117,4 +118,44 @@ test('an existing valid receipt and retained original remain byte-for-byte uncha
 });
 for(const patch of [{psu_type:'personal'},{accounts:['different-account']},{status:'EXPIRED'},{aspsp:{name:'Other bank',country:'SE'}}])test(`fresh receipt requires exact live business consent: ${JSON.stringify(patch)}`,async t=>{
  const {f}=await legacyFixture(t);Object.assign(f.live,patch);await assert.rejects(fetchBankDetails(request(f.id)),/medgivande/);assert.equal(f.sql.prepare('SELECT revision FROM workspaces').get().revision,1);assert.equal(f.objects.size,0);assert.equal(f.calls.length,0);
+});
+
+for(const retained of [true,false])test(`fresh matching legacy row gains a fresh original projection only when absent (retained raw: ${retained})`,async t=>{
+ const {f,s,transaction}=await legacyFixture(t,{retained});delete transaction.original;delete transaction.evidence;saveFixture(f,s);
+ const before=structuredClone(s),out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];
+ assert.equal(row.bankDataVersion,'bank-api-original-v1');assert.equal(bankApiOriginalIssue(row),'');assert.deepEqual(row.original,{party:'',payerReference:'58197013',description:transaction.description,amount:62500,date:'2026-10-26',account:'iban:SE4280000890119146168423',bankReference:'ARCHIVE-625'});
+ const {bankDetails,bankDataSha256,bankDataVersion,bankData,original,referenceEvidence,...preserved}=row;
+ const {bankData:oldRaw,referenceEvidence:oldReferences,...expected}=before.transactions[0];assert.deepEqual(preserved,expected);assert.deepEqual(out.state.allocations,before.allocations);
+});
+for(const [name,mutate]of [
+ ['changed party',t=>t.party='Different legacy payer AB'],
+ ['changed reference',t=>t.payerReference='1234567897'],
+ ['changed description',t=>t.description='Different legacy description'],
+ ['manual verification',t=>t.verification={party:t.party,payerReference:t.payerReference,note:'Synthetic review',at:'2026-10-26T00:00:00.000Z'}],
+ ['null original',t=>t.original=null],
+ ['empty original',t=>t.original={}],
+ ['invalid original',t=>t.original='invalid']
+])test(`fresh lookup cannot create a missing historical tuple from ${name}`,async t=>{
+ const {f,s,transaction}=await legacyFixture(t);delete transaction.original;delete transaction.evidence;mutate(transaction);saveFixture(f,s);const before=structuredClone(transaction),out=await(await fetchBankDetails(request(f.id))).json(),{bankDetails,...row}=out.state.transactions[0];assert.deepEqual(row,before);assert.equal(JSON.parse(f.sql.prepare('SELECT detail FROM audit_events').get().detail).receiptAdopted,false);
+});
+
+const reorderedKeys=value=>Array.isArray(value)?value.map(reorderedKeys):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).reverse().map(([key,item])=>[key,reorderedKeys(item)])):value;
+test('a fresh structurally identical provider response refreshes serialization while retaining the previous raw in R2',async t=>{
+ const {f,s,transaction}=await legacyFixture(t);const previous=transaction.bankData;transaction.bankData=reorderedKeys(previous);saveFixture(f,s);const oldSerialization=JSON.stringify(transaction.bankData),freshSerialization=JSON.stringify(f.page.transactions[0]);assert.notEqual(oldSerialization,freshSerialization);
+ const before=financialSnapshot(s),out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];assert.equal(row.bankDataVersion,'bank-api-original-v1');assert.equal(row.bankDataSha256,createHash('sha256').update(freshSerialization).digest('hex'));assert.equal(JSON.stringify(row.bankData),freshSerialization);assert.equal(bankApiOriginalIssue(row),'');assert.deepEqual(financialSnapshot(out.state),before);
+ const retained=JSON.parse(new TextDecoder().decode([...f.objects.values()][0]));assert.equal(JSON.stringify(retained.previousBankData),oldSerialization);assert.equal(JSON.stringify(retained.listed),freshSerialization);const audit=JSON.parse(f.sql.prepare('SELECT detail FROM audit_events').get().detail);assert.equal(audit.receiptAdopted,true);assert.equal(audit.originalSerializationRefreshed,true);
+});
+for(const [name,alter]of [
+ ['changed nested value',raw=>raw.transaction_amount.amount='624.99'],
+ ['reordered array',raw=>raw.additional_metadata=['Second message','First message']],
+ ['changed JSON type',raw=>raw.transaction_amount.amount=625]
+])test(`structural receipt adoption rejects ${name} and retains the previous representation`,async t=>{
+ const {f,s,transaction}=await legacyFixture(t);f.page.transactions[0].additional_metadata=['First message','Second message'];f.detail=f.page.transactions[0];transaction.bankData=reorderedKeys(f.page.transactions[0]);alter(transaction.bankData);saveFixture(f,s);const before=structuredClone(transaction),out=await(await fetchBankDetails(request(f.id))).json(),{bankDetails,...row}=out.state.transactions[0];assert.deepEqual(row,before);const retained=JSON.parse(new TextDecoder().decode([...f.objects.values()][0]));assert.equal(JSON.stringify(retained.previousBankData),JSON.stringify(before.bankData));assert.equal(JSON.parse(f.sql.prepare('SELECT detail FROM audit_events').get().detail).receiptAdopted,false);
+});
+test('a valid existing receipt never refreshes its raw serialization on a differently ordered fresh response',async t=>{
+ const {f,s,transaction}=await legacyFixture(t);const {rows}=await normalizeTransactions(f.page.transactions,{accountKey:transaction.account,accountLabel:'Synthetic account',bankName:'Swedbank',dateFrom:transaction.date,dateTo:transaction.date});transaction.bankDataVersion=rows[0].bankDataVersion;transaction.bankDataSha256=rows[0].bankDataSha256;const oldSerialization=JSON.stringify(transaction.bankData);f.page.transactions[0]=reorderedKeys(f.page.transactions[0]);f.detail=f.page.transactions[0];saveFixture(f,s);const out=await(await fetchBankDetails(request(f.id))).json();assert.equal(JSON.stringify(out.state.transactions[0].bankData),oldSerialization);assert.equal(out.state.transactions[0].bankDataSha256,transaction.bankDataSha256);assert.equal(JSON.parse(f.sql.prepare('SELECT detail FROM audit_events').get().detail).receiptAdopted,false);
+});
+
+test('missing legacy projection and reordered retained JSON can adopt the same freshly received original together',async t=>{
+ const {f,s,transaction}=await legacyFixture(t);delete transaction.original;delete transaction.evidence;transaction.bankData=reorderedKeys(transaction.bankData);saveFixture(f,s);const previous=JSON.stringify(transaction.bankData),out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];assert.equal(bankApiOriginalIssue(row),'');assert.equal(JSON.stringify(row.bankData),JSON.stringify(f.page.transactions[0]));assert.equal(row.original.amount,62500);assert.equal(row.original.payerReference,'58197013');assert.equal(JSON.stringify(JSON.parse(new TextDecoder().decode([...f.objects.values()][0])).previousBankData),previous);assert.deepEqual(out.state.allocations,s.allocations);
 });

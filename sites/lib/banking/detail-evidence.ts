@@ -24,8 +24,20 @@ export function enrichBankDetails(current:State,id:string,evidence:ReturnType<ty
  return state;
 }
 
+// Provider JSON object key order is not a fact. Array order and JSON types are.
+// This compares values only; it never manufactures a receipt over retained JSON.
+function sameJsonFacts(left:unknown,right:unknown):boolean{
+ if(left===right)return true;
+ if(left===null||right===null||typeof left!=='object'||typeof right!=='object')return false;
+ if(Array.isArray(left)||Array.isArray(right))return Array.isArray(left)&&Array.isArray(right)&&left.length===right.length&&left.every((item,index)=>sameJsonFacts(item,right[index]));
+ const a=left as Record<string,unknown>,b=right as Record<string,unknown>,keys=Object.keys(a);
+ return keys.length===Object.keys(b).length&&keys.every(key=>Object.hasOwn(b,key)&&sameJsonFacts(a[key],b[key]));
+}
+
 /** Only pass a row normalized from the authenticated, freshly fetched list.
  * Never seal retained JSON or replace any existing receipt, including invalid ones.
+ * The caller must retain the previous raw representation in the owned detail
+ * document before refreshing serialization to the genuinely fresh provider object.
  * Validate the preserved projection as well as the fresh provider facts before adoption.
  */
 export function adoptFreshBankReceipt(state:State,id:string,fresh:import('../imports').BankRow){
@@ -33,11 +45,21 @@ export function adoptFreshBankReceipt(state:State,id:string,fresh:import('../imp
  if(!target||target.bankDataVersion!==undefined||target.bankDataSha256!==undefined||paymentEvidenceConflict(state,target)||
   !target.externalId||target.externalId!==fresh.externalId||canonicalBankAccount(target.account)!==fresh.account||
   target.amount!==fresh.amount||target.date!==fresh.date||target.currency!==fresh.currency||target.bankReference!==fresh.bankReference||
-  target.bankData!==undefined&&JSON.stringify(target.bankData)!==JSON.stringify(fresh.bankData))return false;
- const candidate={...target,bankData:target.bankData===undefined?structuredClone(fresh.bankData):target.bankData,
+  target.bankData!==undefined&&!sameJsonFacts(target.bankData,fresh.bankData))return false;
+ // Older imports did not retain a projection. Add one only from the fresh
+ // normalized response when every stored bank field matches exactly; a manual
+ // decision requires its pre-existing historical tuple and is never reconstructed.
+ let original=target.original;
+ if(original===undefined){
+  if(target.verification!==undefined||target.party!==fresh.party||target.payerReference!==fresh.payerReference||target.description!==fresh.description||target.account!==fresh.account)return false;
+  original={party:fresh.party,payerReference:fresh.payerReference,description:fresh.description,amount:fresh.amount,date:fresh.date,account:fresh.account!,bankReference:fresh.bankReference};
+ }
+ const refreshRaw=target.bankData===undefined||JSON.stringify(target.bankData)!==JSON.stringify(fresh.bankData);
+ const candidate={...target,original,bankData:refreshRaw?structuredClone(fresh.bankData):target.bankData,
   referenceEvidence:target.referenceEvidence??structuredClone(fresh.referenceEvidence),bankDataVersion:fresh.bankDataVersion,bankDataSha256:fresh.bankDataSha256};
  if(bankApiOriginalIssue(candidate))return false;
- if(target.bankData===undefined)target.bankData=candidate.bankData;
+ if(target.original===undefined)target.original=candidate.original;
+ if(refreshRaw)target.bankData=candidate.bankData;
  if(target.referenceEvidence===undefined)target.referenceEvidence=candidate.referenceEvidence;
  target.bankDataVersion=candidate.bankDataVersion;target.bankDataSha256=candidate.bankDataSha256;
  return true;
