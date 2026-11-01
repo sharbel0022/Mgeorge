@@ -9,12 +9,20 @@ const account='iban:SE4280000890119146168423';
 function fixture(options={}){
  let state=domain.applyCommand(domain.emptyState(),{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date:'2026-10-26',amount:62500,description:'Bankgiro inbetalning',party:'',payerReference:'',...options.bank})]}).state;
  state=domain.applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Annan syntetisk kund AB',number:'0599',ocr:'',total:62500,issued:'2026-10-01',due:'2026-10-31',reviewed:true}}).state;
- const payments=options.payments||[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}],bytes=makeBankgiroXLSX({account:account.slice(5),date:'2026-10-26',payments,...options.report});
+ const payments=options.payments||[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}],bytes=makeBankgiroXLSX({currency:'SEK',account:account.slice(5),date:'2026-10-26',payments,...options.report});
  state=domain.applyCommand(state,{type:'bankgiro.import',documentId:'synthetic-original',hash:'a'.repeat(64),name:'synthetic.xlsx',rows:parseSpecificationBytes(bytes,'synthetic.xlsx')}).state;
  const transaction=state.transactions.find(row=>!row.specification),specification=state.transactions.find(row=>row.specification);
  return {state,transaction,specification,command:{type:'bankgiro.link',transactionId:transaction.id,specificationId:specification.id,note:'Kontrollerat båda originalen och mottagarkontot.',confirmOriginals:true,confirmAccount:true}};
 }
 const financial=state=>({invoices:state.invoices,transactions:state.transactions,allocations:state.allocations,imports:state.imports});
+
+test('XLSX missing or legacy currency evidence blocks source linking without changing money',()=>{
+ for(const legacy of [false,true]){
+  const f=fixture({report:{currency:legacy?'SEK':undefined}});if(legacy)delete f.specification.reportEvidence.currencySource;
+  const before=structuredClone(financial(f.state)),candidate=domain.bankgiroLinkCandidates(f.state,f.transaction)[0];assert.equal(candidate.canLink,false);assert.match(candidate.reason,/valuta/i);
+  assert.throws(()=>domain.applyCommand(f.state,f.command),/valuta/i);assert.deepEqual(financial(f.state),before);
+ }
+});
 
 test('manual link retains both originals and every financial field without counting report money',()=>{
  const f=fixture(),result=domain.applyCommand(f.state,f.command),link=result.state.bankgiroLinks[0];
@@ -32,7 +40,7 @@ test('manual relation covers the entire complete multi-payer report group',()=>{
 });
 test('a complete later report retains shared observations from an earlier partial report',()=>{
  const first={party:'Test A AB',reference:'0599',payerBankgiro:'987-6543',amount:25000},second={party:'Test B AB',reference:'0600',payerBankgiro:'123-4567',amount:37500},f=fixture({payments:[first]});
- const complete=domain.applyCommand(f.state,{type:'bankgiro.import',documentId:'complete-original',hash:'b'.repeat(64),name:'complete.xlsx',rows:parseSpecificationBytes(makeBankgiroXLSX({account:account.slice(5),date:'2026-10-26',sequence:'42',payments:[first,second]}),'complete.xlsx')}).state;
+ const complete=domain.applyCommand(f.state,{type:'bankgiro.import',documentId:'complete-original',hash:'b'.repeat(64),name:'complete.xlsx',rows:parseSpecificationBytes(makeBankgiroXLSX({currency:'SEK',account:account.slice(5),date:'2026-10-26',sequence:'42',payments:[first,second]}),'complete.xlsx')}).state;
  const candidates=domain.bankgiroLinkCandidates(complete,f.transaction),candidate=candidates.find(item=>item.rows.some(row=>row.bankFileProof.documentId==='complete-original'));
  assert.equal(candidate.rows.length,2);assert.equal(candidate.canLink,true);assert.equal(candidates.find(item=>item.specificationId===f.specification.id),undefined);assert.throws(()=>domain.applyCommand(complete,f.command),/summa|belopp/i);
  const linked=domain.applyCommand(complete,{...f.command,specificationId:candidate.specificationId}).state;assert.equal(domain.activeBankgiroLink(linked,f.transaction.id).rows.length,2);assert.equal(domain.economicTransactions(linked).length,1);assert.equal(linked.transactions.filter(row=>row.bankFileProof?.documentId==='synthetic-original').length,1);
@@ -49,7 +57,7 @@ test('report group cannot attach to another bank transaction with identical date
 test('the same semantic report in different XLSX originals cannot be claimed by two distinct AIS deposits',()=>{
  for(const legacy of [false,true]){
   const f=fixture(),bank=domain.applyCommand(f.state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date:'2026-10-26',amount:62500,bankReference:'SECOND-INDEPENDENT-AIS',description:'Bankgiro inbetalning'})]}).state;
-  const secondBank=bank.transactions.find(row=>!row.specification&&row.id!==f.transaction.id),rows=parseSpecificationBytes(makeBankgiroXLSX({account:account.slice(5),date:'2026-10-26',shiftRows:1,payments:[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}),'layout-variant.xlsx'),both=domain.applyCommand(bank,{type:'bankgiro.import',rows,documentId:'layout-variant-original',hash:'b'.repeat(64),name:'layout-variant.xlsx'}).state;
+  const secondBank=bank.transactions.find(row=>!row.specification&&row.id!==f.transaction.id),rows=parseSpecificationBytes(makeBankgiroXLSX({currency:'SEK',account:account.slice(5),date:'2026-10-26',shiftRows:1,payments:[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}),'layout-variant.xlsx'),both=domain.applyCommand(bank,{type:'bankgiro.import',rows,documentId:'layout-variant-original',hash:'b'.repeat(64),name:'layout-variant.xlsx'}).state;
   const secondSpec=both.transactions.find(row=>row.bankFileProof?.documentId==='layout-variant-original'),linked=domain.applyCommand(both,f.command).state;
   if(legacy)delete linked.bankgiroLinks[0].reportKey;
   const candidate=domain.bankgiroLinkCandidates(linked,secondBank).find(item=>item.specificationId===secondSpec.id);
@@ -62,7 +70,7 @@ test('the same semantic report in different XLSX originals cannot be claimed by 
 });
 test('distinct report sequence numbers preserve two independent equal-value deposits',()=>{
  const f=fixture(),state=domain.applyCommand(f.state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date:'2026-10-26',amount:62500,bankReference:'SECOND-INDEPENDENT-AIS',description:'Bankgiro inbetalning'})]}).state,secondBank=state.transactions.find(row=>!row.specification&&row.id!==f.transaction.id);
- const rows=parseSpecificationBytes(makeBankgiroXLSX({account:account.slice(5),date:'2026-10-26',sequence:'42',payments:[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}),'distinct-report.xlsx'),both=domain.applyCommand(state,{type:'bankgiro.import',rows,documentId:'distinct-report-original',hash:'b'.repeat(64),name:'distinct-report.xlsx'}).state,secondSpec=both.transactions.find(row=>row.bankFileProof?.documentId==='distinct-report-original'),linked=domain.applyCommand(both,f.command).state;
+ const rows=parseSpecificationBytes(makeBankgiroXLSX({currency:'SEK',account:account.slice(5),date:'2026-10-26',sequence:'42',payments:[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}),'distinct-report.xlsx'),both=domain.applyCommand(state,{type:'bankgiro.import',rows,documentId:'distinct-report-original',hash:'b'.repeat(64),name:'distinct-report.xlsx'}).state,secondSpec=both.transactions.find(row=>row.bankFileProof?.documentId==='distinct-report-original'),linked=domain.applyCommand(both,f.command).state;
  assert.equal(domain.bankgiroLinkCandidates(linked,secondBank).find(item=>item.specificationId===secondSpec.id).canLink,true);assert.equal(domain.applyCommand(linked,{...f.command,transactionId:secondBank.id,specificationId:secondSpec.id}).state.bankgiroLinks.length,2);
 });
 test('wrong or missing explicit recipient account blocks manual linking despite checkbox',()=>{

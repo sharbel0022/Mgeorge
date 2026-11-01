@@ -1,5 +1,11 @@
 # Verifierad progress
 
+## Privat Bankgirooriginal — ny verifieringscykel
+
+Utgår från aktuell main `db1b81f`. Original läst direkt i Work, oförändrade bytes;12/12 privata facitkontroller. Faktura-PDF kontrollerad i verifierat företags-Gmail med full text och renderad sida. Uppgifter och kundoriginal ligger utanför Git. Läsande Sites visar aktiv Swedbankanslutning och revision40, men payload/kontoresurs trunkeras och browser kräver inloggning: färsk full AIS-/registerkontroll är blockerad. Ingen riktig import, registrering, källa-koppling, allokering, saldoförändring eller sändning utförd.
+
+Tre konkreta luckor rättade: typade/entydiga Sites-kontoalias över alla kontoresurser; antagen XLSX-SEK får inte bli explicit valuta eller manuell källrelation; generiskt rapportdatum får inte bli value-/settlementdatum. Äldre osäkra observationer hålls för granskning. Röda/gröna regressioner;646 Node +1142 Sites, syntax92, TS/build och high-auditgrindar godkända. Root0, Sites16 moderate utvecklingsfynd. Oberoende slutreview utan viktiga fynd. [Avgränsad rapport](docs/BANKGIRO-ORIGINAL-VERIFICATION.md), [plan](docs/superpowers/plans/2026-11-01-bankgiro-original-verification.md). Exakt push/CI/Sites-kvitto kompletteras efter leverans.
+
 ## Kravkontrollens alias och fältkällor — verifierad leverans 2026-11-01
 
 - Föregående målvarv är **framsteg**: main88b8584 och Sites46 verifierade. Aktuell origin/main hämtades och jämfördes med kod a8453a1; endast dokumentationsskillnad. [Ny full kravmatris](docs/PAYMENT-VERIFICATION-ACCEPTANCE.md) mot originalets16avsnitt identifierade två interna kravområden som kunde lösas utan fler bankunderlag: Node provider-alias och rätt faktisk fältkälla/proveniens i visningen.

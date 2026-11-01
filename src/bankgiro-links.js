@@ -48,7 +48,8 @@ function accountIdentifiers(resource){
 }
 function reportAccountRelation(context,t,report){
  const key=aliasKey(report.account);
- if(!key||report.rows.some(row=>aliasKey(row.account_evidence?.reported_account)!==key||row.account_evidence?.explicit_currency!==true))throw fail('Rapportens uttryckliga mottagarkonto måste motsvara bankens valda konto eller ett entydigt banklevererat kontoalias.');
+ if(report.rows.some(row=>row.account_evidence?.explicit_currency!==true))throw fail('Rapportoriginalet saknar uttrycklig valuta. Antagen SEK är inte verifierad valuta; komplettera bankunderlaget.');
+ if(!key||report.rows.some(row=>aliasKey(row.account_evidence?.reported_account)!==key))throw fail('Rapportens uttryckliga mottagarkonto måste motsvara bankens valda konto eller ett entydigt banklevererat kontoalias.');
  const common={source:'provider_account_resource',connection_id:context.connection.id,account_uid:context.selected.uid,selected_account:canonical(t.account),reported_account:report.reported_account};
  if(report.account===canonical(t.account)&&report.rows.every(row=>row.account_evidence.exact_match===true))return {...common,kind:'exact',scheme:'IBAN',field:'account_id.iban'};
  const holders=context.available.filter(resource=>accountIdentifiers(resource).some(identifier=>identifier.key===key));

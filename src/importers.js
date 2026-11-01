@@ -204,7 +204,7 @@ export function parseBankFile(name,base64,account='Swedbank'){
   const bytes=Buffer.from(base64,'base64');if(bytes.length>15_000_000)throw new Error('Max 15 MB');
   if(/\.xlsx$/i.test(name))return validateItems(parseBankgiroXLSX(bytes,name).map(row=>({
     payer_evidence:row.payerEvidence,reference_evidence:row.referenceEvidence,
-    account_evidence:{...fileAccountEvidence(row.account||'',account,'xlsx',row.currency),report:row.reportEvidence,cells:row.cellProvenance},
+    account_evidence:{...fileAccountEvidence(row.account||'',account,'xlsx',row.reportEvidence?.currencySource==='cell'?row.currency:''),report:row.reportEvidence,cells:row.cellProvenance},
     account:selectedAccount(account),booked_at:row.date,amount_cents:row.amount,currency:sek(row.currency),
     payer:row.party,reference:row.payerReference,payer_bankgiro:row.payerBankgiro||'',bankgiro:row.recipientBankgiro||'',
     bank_reference:'',description:row.description||'Bankgiro Excel betalningsspecifikation',review_only:true,needs_review:1,

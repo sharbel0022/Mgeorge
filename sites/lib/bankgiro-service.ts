@@ -25,10 +25,18 @@ export async function bankAccountConsentSnapshot(owner:string,account:string){
 async function resolveAccounts(owner:string,rows:any[]){
  let context:Awaited<ReturnType<typeof activeAccounts>>;try{context=await activeAccounts(owner);}catch{return rows.map(row=>({...row,bankgiroAccountIssue:'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.'}));}
  const {conn,selected,available}=context;
+ const identifierKeys=(resource:typeof available[number])=>[
+  {scheme_name:'IBAN',identification:resource.account_id?.iban},resource.account_id?.other,...(Array.isArray(resource.all_account_ids)?resource.all_account_ids:[]),
+ ].flatMap(identifier=>{
+  if(typeof identifier?.scheme_name!=='string'||!['IBAN','BBAN','CPAN'].includes(identifier.scheme_name.toUpperCase())||typeof identifier.identification!=='string')return [];
+  const key=identifier.identification.replace(/[\s-]/g,'').toUpperCase();return /^[A-Z0-9]{1,80}$/.test(key)?[key]:[];
+ });
  return rows.map(r=>{
   const raw=String(r.account||'').replace(/^iban:/i,'').replace(/[\s-]/g,'').toUpperCase();if(!raw)return {...r,bankgiroAccountIssue:'Mottagarkonto saknas i rapportoriginalet.'};
-  const matches=available.filter(a=>selected.includes(a.uid)&&a.currency==='SEK'&&[a.account_id?.iban,a.account_id?.other?.identification,...(a.all_account_ids||[]).filter(i=>['IBAN','BBAN','CPAN'].includes(i.scheme_name?.toUpperCase())).map(i=>i.identification)].some(x=>x&&x.replace(/[\s-]/g,'').toUpperCase()===raw));
-  const key=matches.length===1?stableAccountKey(matches[0],{name:conn.bank_name,country:conn.country}):null;
+  // An alias must belong to one provider resource, including resources that
+  // are unselected or use another currency. Account selection cannot erase ambiguity.
+  const holders=available.filter(resource=>identifierKeys(resource).includes(raw)),match=holders.length===1?holders[0]:undefined;
+  const key=match&&selected.includes(match.uid)&&match.currency==='SEK'?stableAccountKey(match,{name:conn.bank_name,country:conn.country}):null;
   return key?{...r,recipientAccount:r.account,account:key,bankgiroAccountIssue:''}:{...r,bankgiroAccountIssue:'Rapportens mottagarkonto ingår inte entydigt i ägarens aktiva bankmedgivande.'};
  });
 }

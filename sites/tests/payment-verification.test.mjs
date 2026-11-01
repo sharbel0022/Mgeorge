@@ -62,13 +62,13 @@ test('missing invoice and leading-zero document candidate are explicit and creat
 });
 
 test('same amount and date show a report candidate without declaring common bank identity or payer',{skip:!implemented},()=>{
- let s=fixture({batch:true});const t=s.transactions[0],bytes=makeBankgiroXLSX({account:t.account.slice(5),date:t.date,payments:[{party:'Report payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
+ let s=fixture({batch:true});const t=s.transactions[0],bytes=makeBankgiroXLSX({currency:'SEK',account:t.account.slice(5),date:t.date,payments:[{party:'Report payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
  s=applyCommand(s,{type:'bankgiro.import',documentId:'synthetic-report',hash:'a'.repeat(64),name:'synthetic.xlsx',rows:parseSpecificationBytes(bytes,'synthetic.xlsx')}).state;
  const r=build(s,t.id);assert.equal(step(r,'report').status,'review');assert.equal(step(r,'deposit').status,'missing');assert.equal(step(r,'payer').status,'missing');assert.equal(r.automaticEligible,false);assert.equal(s.allocations.length,0);
 });
 
 test('manual source relation stays separate from bank identity, invoice verification and allocation',{skip:!implemented},()=>{
- let s=fixture({batch:true});const t=s.transactions[0],bytes=makeBankgiroXLSX({account:t.account.slice(5),date:t.date,payments:[{party:'Report payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
+ let s=fixture({batch:true});const t=s.transactions[0],bytes=makeBankgiroXLSX({currency:'SEK',account:t.account.slice(5),date:t.date,payments:[{party:'Report payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
  s=applyCommand(s,{type:'bankgiro.import',documentId:'synthetic-report',hash:'a'.repeat(64),name:'synthetic.xlsx',rows:parseSpecificationBytes(bytes,'synthetic.xlsx')}).state;
  s=applyCommand(s,{type:'bankgiro.link',transactionId:t.id,specificationId:s.transactions.find(t=>t.specification).id,note:'Synthetic original relation only',confirmOriginals:true,confirmAccount:true}).state;
  const before=structuredClone(s),r=build(s,t.id);
@@ -87,7 +87,7 @@ test('an unavailable invoice document candidate is only a proposal, not a found 
 async function serviceFixture(t,{invoiceMode='valid',candidate=false,accountIssue='',unauthenticated=false,report=false,reportAccountIssue='',detailMode='none',sourceInvoices=false,booked=false}={}){
  const key='__payment_verification_'+crypto.randomUUID().replaceAll('-',''),bytes=new TextEncoder().encode('Synthetic invoice original, no customer data'),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex');
  let state=fixture({invoice:!candidate,batch:report}),reportRows=[];
- if(report){const original=makeBankgiroXLSX({account:state.transactions[0].account.slice(5),date:'2026-10-26',payments:[{party:'Report payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});reportRows=parseSpecificationBytes(original,'synthetic.xlsx');state=applyCommand(state,{type:'bankgiro.import',documentId:'synthetic-report',hash:'a'.repeat(64),name:'synthetic.xlsx',rows:reportRows}).state;}
+ if(report){const original=makeBankgiroXLSX({currency:'SEK',account:state.transactions[0].account.slice(5),date:'2026-10-26',payments:[{party:'Report payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});reportRows=parseSpecificationBytes(original,'synthetic.xlsx');state=applyCommand(state,{type:'bankgiro.import',documentId:'synthetic-report',hash:'a'.repeat(64),name:'synthetic.xlsx',rows:reportRows}).state;}
  if(sourceInvoices){const f=paymentFieldInvoiceFixture({booked});state=f.state;reportRows=f.reportRows;}
  let detailBytes=new Uint8Array(),detailHash='';
  if(detailMode!=='none'){

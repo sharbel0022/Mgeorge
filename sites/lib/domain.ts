@@ -217,7 +217,7 @@ function cleanInvoice(raw:any,existing?:Invoice):Invoice{
 }
 function cleanReportEvidence(raw:any):Record<string,string>|undefined{
  if(!raw||typeof raw!=='object'||Array.isArray(raw))return undefined;
- const fields=['profile','namespace','messageId','reportId','createdAt','accountServicer','entryReference','valueDate',...['recipientBankgiro','sequence','paymentCount','totalCents','sheet'].filter(key=>Object.hasOwn(raw,key))];
+ const fields=['profile','namespace','messageId','reportId','createdAt','accountServicer','entryReference','valueDate',...['recipientBankgiro','sequence','paymentCount','totalCents','sheet','reportDate','dateKind','currencySource'].filter(key=>Object.hasOwn(raw,key))];
  return Object.fromEntries([...fields.map(key=>[key,str(raw[key]??'',300)]),...(raw.sourceCells?[['sourceCells',str(raw.sourceCells,12000)]]:[])]);
 }
 function cleanTransaction(raw:any):Transaction{
@@ -282,6 +282,7 @@ function bankgiroLinkIssue(s:State,target:Transaction,rows:Transaction[]){
  if(rows.some(row=>row.evidence!=='bankgiro_file'||!row.original||row.bankDetails||(['party','payerReference','description','amount','date','account','bankReference'] as const).some(key=>row.original![key]!==row[key])))return 'Specifikationens ursprungliga uppgifter stämmer inte med originalobservationerna.';
  if(rows.some(row=>row.specificationStatus!=='review'||row.parentId||row.ignored||row.duplicateOf||row.amount<=0||!hasBankFileProof(row)||paymentEvidenceIssue(s,row)))return 'Specifikationens bevarade original behöver kontrolleras innan underlagen kopplas.';
  if(rows.some(row=>row.bankFileProof!.documentId!==first.bankFileProof!.documentId||row.bankFileProof!.sha256!==first.bankFileProof!.sha256))return 'Specifikationen innehåller motstridiga originalfiler.';
+ if(rows.some(row=>row.format==='Swedbank Bankgiro XLSX'&&row.reportEvidence?.currencySource!=='cell'))return 'Rapportoriginalet saknar uttrycklig valuta. Antagen SEK är inte verifierad valuta; komplettera bankunderlaget.';
  if(first.specificationTotal!==target.amount||rows.some(row=>row.currency!==target.currency))return 'Rapportens totalsumma eller valuta stämmer inte med insättningen.';
  if(rows.some(row=>!row.recipientAccount||!sameAccount(row.account,target.account)))return 'Rapportens uttryckliga mottagarkonto måste stämma med AIS-insättningens konto.';
  if(rows.some(row=>row.date!==first.date)||!validDate(first.date)||!validDate(target.date)||Math.abs(Date.parse(first.date+'T12:00:00Z')-Date.parse(target.date+'T12:00:00Z'))>3*86400_000)return 'Datumskillnaden får vara högst tre dagar och behöver förklaras.';

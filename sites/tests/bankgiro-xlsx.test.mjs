@@ -8,7 +8,17 @@ import {parseBankgiroXLSX} from '../lib/bankgiro-xlsx.js';
 const parse=options=>parseBankgiroXLSX(makeBankgiroXLSX(options),'synthetic.xlsx');
 test('XLSX reads observed metadata/summary/detail layout and preserves text references',()=>{
  const [r]=parse();assert.equal(r.party,'Testbageriet AB');assert.equal(r.payerReference,'0017');assert.equal(r.amount,12345);assert.equal(r.date,'2026-10-20');assert.equal(r.payerBankgiro,'987-6543');assert.equal(r.recipientBankgiro,'1234-5678');assert.equal(r.currency,'SEK');assert.equal(r.kind,'payment');assert.equal(r.account,'');assert.equal(r.verified,false);
- assert.equal(r.reportEvidence.reportId,'41');assert.equal(r.reportEvidence.valueDate,'2026-10-20');assert.equal(r.referenceEvidence.selected.kind,'structured');assert.equal(r.referenceEvidence.selected.validity,'unchecked');assert.equal(r.payerEvidence.name.value,r.party);assert.match(r.payerEvidence.name.source,/A19/);assert.equal(r.cellProvenance.reference.address,'C19');assert.equal(r.cellProvenance.amount.type,'n');
+ assert.equal(r.reportEvidence.reportId,'41');assert.equal(r.reportEvidence.reportDate,'2026-10-20');assert.equal(r.referenceEvidence.selected.kind,'structured');assert.equal(r.referenceEvidence.selected.validity,'unchecked');assert.equal(r.payerEvidence.name.value,r.party);assert.match(r.payerEvidence.name.source,/A19/);assert.equal(r.cellProvenance.reference.address,'C19');assert.equal(r.cellProvenance.amount.type,'n');
+});
+test('XLSX absent currency remains a profile assumption and generic Datum is only a report date',()=>{
+ const [row]=parse();assert.equal(row.reportEvidence.currencySource,'profile_assumption');assert.equal(row.reportEvidence.reportDate,'2026-10-20');assert.equal(row.reportEvidence.dateKind,'report_date');assert.equal(row.reportEvidence.valueDate,undefined);assert.equal(row.settlementDate,'');assert.equal(row.cellProvenance.currency,undefined);
+});
+test('XLSX explicitly labelled currency has exact cell provenance',()=>{
+ const [row]=parse({currency:'SEK'});assert.equal(row.currency,'SEK');assert.equal(row.reportEvidence.currencySource,'cell');assert.equal(row.cellProvenance.currency.address,'F5');assert.equal(row.cellProvenance.currency.rawValue,'SEK');
+});
+test('XLSX unsupported, empty and duplicate currency declarations fail closed',()=>{
+ for(const currency of ['EUR','',25])assert.throws(()=>parse({currency}),/valuta/i);
+ assert.throws(()=>parse({currency:'SEK',mutate:wb=>{const s=wb.Sheets[wb.SheetNames[0]];s.F6={t:'s',v:'Valuta'};s.G6={t:'s',v:'SEK'};s['!ref']='A1:G21';}}),/valuta/i);
 });
 test('XLSX locates headings after inserted blank rows',()=>{assert.equal(parse({shiftRows:5})[0].cellProvenance.reference.address,'C24');});
 test('XLSX actual export conventions: implicit row/cell addresses and default workbook content type',()=>{const [r]=parse({legacyCells:true});assert.equal(r.payerReference,'0017');assert.equal(r.amount,12345);assert.equal(r.cellProvenance.party.address,'A19');});

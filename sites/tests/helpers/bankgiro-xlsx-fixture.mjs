@@ -11,6 +11,9 @@ export function makeBankgiroWorkbook(options={}){
   while(data.length<offset)data.push([]);
   const money=n=>(n/100).toFixed(2).replace('.',',');
   const rows=[['','','Skapad av banken','',''],[],['Insättningsuppgift'],['Datum',block.account?'Bankkontonummer':'','Bankgironummer','Mottagare'],[date,block.account||'',recipientBankgiro,'Exempelbolaget AB'],['','','','Testgatan 1'],['','','','12345 Teststad'],['','','','Sverige'],[],['Belopp insatt på konto'],['Antal','Belopp','','Betalningstyp',`Löpnummer ${sequence}`],[String(block.declaredCount??payments.length),(block.summaryAmount??total)/100,'','Elektronisk'],['',0,'','Avi'],[String(block.totalCount??block.declaredCount??payments.length),money(block.totalAmount??total),'TOTALT'],[],['Insättningar'],['Sorterad på belopp','','','',`${block.detailCount??payments.length} st`],['Avsändare','','Betalningsreferens','Bankgironummer/\nAvinummer','Belopp'],...payments.map(p=>[p.party,'',p.reference,p.payerBankgiro,p.amount/100]),[],['© Bankgirot']];
+  // Optional explicit currency is synthetic additional evidence. The observed
+  // original-layout fixture deliberately omits it unless requested.
+  if(block.currency!==undefined){rows[3][5]='Valuta';rows[4][5]=block.currency;}
   data.push(...rows);
   for(const r of [0,9,15,16,17,...payments.map((_,n)=>18+n)])merges.push({s:{r:offset+r,c:0},e:{r:offset+r,c:1}});
   for(const r of [3,4,5,6,7])merges.push({s:{r:offset+r,c:3},e:{r:offset+r,c:4}});

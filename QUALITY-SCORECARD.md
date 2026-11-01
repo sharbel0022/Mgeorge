@@ -1,5 +1,18 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Originalverifiering — aktuell, konservativ bedömning
+
+| Berört område | Före | Efter | Evidens och begränsning |
+| --- | ---: | ---: | --- |
+| Bankgiroimport/kontorelation | 8,5 | 8,5 | Sex nya negativa aliastester och båda apparnas valutaspärr; verkligt rapport-/AIS-samband ej styrkt. |
+| Verklig betalare och referens | 7 | 7 | Privat original och faktura-PDF jämförda; generell referens förblir generell. Olika motpartsnamn kräver separat bevis. |
+| Automatisk matchning | 7,5 | 7,5 | Förslag/källrelationer skapar inte pengar; inga riktiga allokeringar prövas. |
+| Säkerhet och åtkomst | 8,5 | 8,5 | Aliasambiguitet och påhittad explicit valuta stoppas; original/medgivande krävs fortsatt. |
+| Kodkvalitet och tester | 8,5 | 8,5 | 646 Node +1142 Sites, syntax92, TS/build/high-audit och oberoende review. Sites16 moderate utvecklingsfynd kvarstår. |
+| Verklig produktion | 6,5 | 6,5 | Aktiv Swedbank läst, men full aktuell AIS-/konto-/registerläsning blockerad av trunkering/inloggning. |
+
+Poängen behålls trots mätbara kontrollförbättringar: ingen9,5 utan verksamhetens bevis. Övriga områden oförändrade. Fem valuta-/datumregressioner79/84→84/84; sex tidigare felaktigt tillåtna aliasfall→0. [Rapport och exakt avgränsning](docs/BANKGIRO-ORIGINAL-VERIFICATION.md). Ingen publiceringsframgång påstås före leveranskvitto.
+
 ## Kravkontrollens alias- och fältkällor — 2026-11-01
 
 [Samlad kravmatris](docs/PAYMENT-VERIFICATION-ACCEPTANCE.md), [kompletteringsrapport](docs/PAYMENT-EVIDENCE-SOURCES-VERIFICATION.md). Berörda bankimport-/konto-, betalar-/referens-, fakturavy-, historik-/saldo-, användbarhets-, säkerhets-, test- och produktionspoäng behålls. Ett uttryckligt provider-alias kan nu kontrolleras även vid Nodes manuella originalrelation utan att ändra parserns råa kontobevis eller ge allokeringsrätt. Node visar rapportens fulla råevidens/celler och döljer AIS-baserade förslagsmarkeringar som inte stöds av den visade rapportreferensen. Sites håller visat fält, identifierartyp/råvärde/fältsökväg och fakturaoriginal på samma källkedja; verkliga tidigare bokningar bevaras med referenskonflikt.
