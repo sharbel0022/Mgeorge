@@ -42,11 +42,17 @@ test('numeric invoice reference is never labelled OCR without OCR evidence',()=>
   assert.deepEqual(view.bankPaymentReference(t),{value:'0599',kind:'invoice',ocr:''});
 });
 
-test('general bank payment reference is visible on desktop and mobile without becoming OCR',()=>{
+test('general reference is the primary monospace value on desktop and mobile, separately from missing OCR',()=>{
  const s=emptyState(),t=tx({kind:'payment',party:'Syntetisk betalare AB',description:'',payerReference:'000427'}, {reference_number:undefined,payment_reference:'000427'});s.transactions.push(t);
  const html=render(ui.default,{state:s,transactions:[t],open(){}});
- assert.ok((html.match(/Betalningsreferens 000427/g)||[]).length>=2);
- assert.match(html,/Bank-OCR saknas/);assert.equal(view.bankPaymentReference(t).ocr,'');assert.equal(s.allocations.length,0);
+ const [desktop,mobile]=html.split('<div class="bank-mobile-list"');
+ for(const layout of [desktop,mobile]){
+  assert.match(layout,/<strong class="mono">000427<\/strong>/,'the observed reference must be a primary value rather than a small note');
+  assert.match(layout,/<span class="bank-reference-label">Betalningsreferens<\/span>/);
+  assert.match(layout,/<span class="bank-reference-note">Bank-OCR saknas\.<\/span>/);
+  assert.doesNotMatch(layout,/Saknas i bankunderlaget|<small>[^<]*000427|000427Bank-OCR/);
+ }
+ assert.equal(view.bankPaymentReference(t).ocr,'');assert.equal(s.allocations.length,0);
 });
 
 test('manual completion does not rewrite the bank payer or reference in presentation',()=>{
@@ -92,9 +98,9 @@ test('bank summary has exactly four facts and never invents a successful synchro
   const s=emptyState();s.transactions.push(tx());let html=render(ui.BankPaymentSummary,{state:s});assert.equal((html.match(/<dt>/g)||[]).length,4);assert.match(html,/Inte bekräftad/);html=render(ui.BankPaymentSummary,{state:s,lastSynced:'2026-10-28T10:06:00Z'});assert.doesNotMatch(html,/Inte bekräftad/);assert.match(html,/11:06/);
 });
 
-test('desktop exposes payer, invoice, OCR, amount, date and status; missing OCR stays explicit on mobile',()=>{
+test('desktop exposes six payment facts including reference and OCR; missing OCR stays explicit on mobile',()=>{
   const s=emptyState(),t=tx({kind:'payment',description:'',party:'<script>bank</script>'});s.transactions.push(t);const html=render(ui.default,{state:s,transactions:[t],open(){}});
-  assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,6);assert.match(html,/<th>OCR<\/th>/);assert.match(html,/OCR Saknas i bankunderlaget/);assert.match(html,/bank-mobile-list/);assert.match(html,/bank-payment-card/);assert.match(html,/aria-label="Visa betalning/);assert.match(html,/&lt;script&gt;bank/);assert.doesNotMatch(html,/<script>/);
+  assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,6);assert.match(html,/<th>Referens \/ OCR<\/th>/);assert.equal((html.match(/Bank-OCR saknas\./g)||[]).length,2);assert.match(html,/bank-mobile-list/);assert.match(html,/bank-payment-card/);assert.match(html,/aria-label="Visa betalning/);assert.match(html,/&lt;script&gt;bank/);assert.doesNotMatch(html,/<script>/);
 });
 
 test('an unmatched bank OCR is never described as an invoice number',()=>{
@@ -112,5 +118,5 @@ test('bank list explains unknown payer, missing bank OCR and a separately sugges
 test('known payer and typed bank OCR do not receive missing-information explanations',()=>{
  const s=emptyState(),t=tx({kind:'payment',party:'Bank payer',description:'',payerReference:'000018'}, {reference_number:undefined,ocr:'000018'});s.transactions.push(t);
  const html=render(ui.default,{state:s,transactions:[t],open(){}});
- assert.match(html,/Bank payer/);assert.match(html,/OCR 000018/);assert.doesNotMatch(html,/Bank-OCR saknas\.|banken har inte lämnat verifierade individuella uppgifter/);
+ assert.match(html,/Bank payer/);assert.equal((html.match(/<strong class="mono">000018<\/strong>/g)||[]).length,2);assert.equal((html.match(/<span class="bank-reference-label">OCR<\/span>/g)||[]).length,2);assert.doesNotMatch(html,/Bank-OCR saknas\.|banken har inte lämnat verifierade individuella uppgifter/);
 });
