@@ -1,5 +1,14 @@
 # Verifierad progress
 
+## Riktad underlagsundersökning — 2026-11-01
+
+- Fortsättningsmandatet gäller att hämta berört AIS-underlag, hitta fakturaoriginalet och koppla först efter verifierade bankuppgifter och motpart. Hämtad `origin/main` är fortsatt `64d359f797236d6f790ab8b4431fe57518474d2a`; ingen programkod ändrad.
+- En riktad hämtning med befintligt bankmedgivande sparade ett nytt autentiskt AIS-original. Arbetsyterevision35→36 genom `bank.details`; jämförda ekonomiska fält, fakturor, krediter och allokeringar oförändrade. Banken lämnar fortfarande ingen individuell betalare. Originalfakturan hittad och visuellt granskad; organisationsnumret överensstämmer med Bankgirots nuvarande offentliga motpartsregister trots namnvariation.
+- Mottagarkontots två format är ännu inte kontospecifikt verifierade och rapporten saknar gemensam stabil insättningsidentifierare med AIS. Skrivfri filförhandsgranskning stoppades av Chrome-tilläggets filbehörighet; inga behörigheter ändrades och ingen ny import sparades.
+- Färskt detaljoriginal finns nu, men den riktade detaljvägen adopterar inte nytt ankomstkvitto till äldre AIS-rader. Befintligt kopplingsskydd blockerar därför fortsatt. Ingen historisk hash-backfill, bekräftad relation, fakturaregistrering eller allokering gjordes. Slutkontroll: revision36, fem registrerade fakturor, noll allokeringar.
+- Privat faktura, AIS-JSON, Bankgirooriginal, SHA-256-manifest, skärmbild och exakt verifieringsanteckning bevarade utanför repositoryt. Inga kund-/kontouppgifter eller original publiceras. Inga tester omkörda: ingen programkod ändrades; tidigare svitresultat gäller endast den redan levererade koden. Poäng oförändrade. Ingen ny push eller Sites-publicering.
+- **Exakt fortsättningspunkt:** verifiera fullständigt kontoalias mot bankens kontoresurs eller kontospecifikt original, styrk rapportens relation till insättningen och bedöm därefter separat färsk kvittoadoption i `sites/lib/banking/details-service.ts` via befintlig normaliserare/adoptionsregel. Bekräfta först sedan eventuell manuell originalrelation och separat fakturakoppling. Säkerhetsstoppet får inte kringgås.
+
 ## AIS/Bankgiro underlagskoppling — 2026-11-01
 
 - Nytt uttryckligt mandat omfattar utveckling, normal push till main och publicering i befintligt Sites-projekt. Hämtad/reviderad origin/main: `1b017c0a34821bdc04aa9ca3002765f78b2888b6`; ren start och separat branch `codex/bankgiro-ais-linking`, samma arbetskopia. Tidigare payer/OCR-worktree har inte ändrats.

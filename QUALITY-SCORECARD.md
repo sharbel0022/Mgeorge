@@ -1,5 +1,11 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Aktuell underlagsevidens — 2026-11-01
+
+Samtliga poäng behålls. En riktad produktionshämtning har nu bevarat färskt autentiskt AIS-original, och det sökta fakturaoriginalet har hittats och visuellt granskats. Nuvarande offentlig Bankgiro-motpartsrelation stöder fakturans organisationsnummer. Detta ersätter den tidigare uppgiften att själva originalfakturan inte var hittad, men innebär ingen registrerad eller betald faktura.
+
+Swedbank/bankhämtning, Bankgiroimport, betalare/referens, automatisk matchning, saldon och produktionsverifiering höjs inte: fullständigt kontoalias och rapportens relation till den aktuella insättningen är ännu inte verifierade; äldre AIS-rad saknar fortsatt adopterat ankomstkvitto. Riktad hämtning ändrade revision35→36 med oförändrade ekonomiska fält/fakturor/krediter/allokeringar; slutkontroll gav fem registrerade fakturor och noll allokeringar. Ingen koppling, ny import, kodändring eller publicering. Skrivfri filförhandsgranskning kunde inte slutföras på grund av webbläsartilläggets filbehörighet. Underlag och exakt fortsättningspunkt bevaras privat; [framstegsanteckningen](PROGRESS.md) redovisar gränserna. Befintliga tester är tidigare leveransbevis, inte nya testkörningar för denna undersökning.
+
 ## AIS/Bankgiro underlagskoppling — 2026-11-01
 
 [Mät- och leveransrapport](docs/BANKGIRO-AIS-LINKING-IMPROVEMENT.md). Separat ägarbunden, manuell och återtagbar originalrelation i båda befintliga applikationerna; inga nya ekonomiska poster eller allokeringar från relationen. Samma 15 syntetiska scenarier: korrekta manuella relationer 0/10→10/10, ekonomiska dubblettfall 0/15→0/15, felaktiga relationer 0/5→0/5, oförändrade saldon/allokeringar 15/15. Åtta huvudinsättningar visas på 16→8 rader med bevarade rapportoriginal.
