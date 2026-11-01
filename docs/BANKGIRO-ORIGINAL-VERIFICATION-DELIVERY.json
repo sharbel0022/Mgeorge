@@ -1,0 +1,83 @@
+{
+  "schema": "mgeorge-bankgiro-original-verification-delivery-v1",
+  "baseline": "db1b81fdfabf966ad77ad59c4eb6ba6a4b36964c",
+  "objectiveApproved": false,
+  "github": {
+    "codeCommit": "89622547fbeadb232689ada5e7fd57fe7038d341",
+    "tree": "9ede96f46bec46bfd5e1ad1515a838c5b99a7974",
+    "reviewedLocalCommit": "754f4f4d8efbfbc38164a49db5c18f5d4a025c6c",
+    "reviewedLocalTreeIdentical": true,
+    "delivery": "Connected GitHub Git-data APIs; ordinary shell Git push lacked credentials",
+    "ci": {
+      "id": 41357990960,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41357990960",
+      "headSha": "89622547fbeadb232689ada5e7fd57fe7038d341",
+      "conclusion": "success",
+      "jobs": [
+        "test:success",
+        "sites:success"
+      ]
+    }
+  },
+  "validation": {
+    "node": 646,
+    "sites": 1142,
+    "total": 1788,
+    "syntaxFiles": 92,
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "rootAudit": 0,
+    "sitesProductionAudit": 0,
+    "sitesDevelopmentModerate": 16,
+    "highCritical": 0,
+    "privateOriginalAssertions": 12,
+    "originalBytesUnchanged": true,
+    "independentReview": "No critical/important findings; targeted 29 Node +136 Sites passed",
+    "redGreen": "Six negative alias regressions plus five currency/date regressions failed as intended before implementation and pass after correction"
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "sourceCommit": "a872fc68335d47159be6211010b4f1a2523e57d5",
+    "sourceTree": "2840ad2610a90eb9cf49a6c36813efb2d822ec37",
+    "githubSitesTreeIdentical": true,
+    "version": 48,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_79f25daec80c8191a8e2384734bc39c6",
+    "deploymentId": "appgdep_6ae7bf04edc88191af2dfcda814aecd5",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "envRevision": 9,
+    "localArchiveSha256": "a187eed2d48a06662dafb07c8c97889091b57d721ac156a71f6efea0e38292e8",
+    "serverNormalizedArchiveSha256": "dc909c0ed0a9ce05d523993eb4a349b2293c91bbde8346c4aad615dae8a7d5e4",
+    "policyAuthBindingsSchedulesPreserved": true
+  },
+  "productionReadOnly": {
+    "workspaceRevisionBefore": 40,
+    "workspaceRevisionAfter": 40,
+    "workspaceUpdatedAtUnchanged": true,
+    "workspacePayloadTruncated": true,
+    "fullBalancesIndependentlyRecomputed": false,
+    "currentRegisterPresenceVerified": false,
+    "currentAISOriginalInspected": false,
+    "activeSwedbankConnectionObserved": true,
+    "fullEncryptedAccountResourceTruncated": true,
+    "browserAuthenticated": false,
+    "tableListUnchanged": true,
+    "financialWritesPerformed": 0,
+    "realOriginalsPublished": 0
+  },
+  "outstanding": [
+    "Current full AIS original and integrity receipt",
+    "Bank-provided report-account/selected-AIS-account relation",
+    "Stable or independently verified report/deposit association",
+    "Supplementary bank currency evidence",
+    "Fresh complete invoice register read and ordinary registration if absent",
+    "Customer or authorized third-party relationship for differing payer/recipient names"
+  ],
+  "quality": {
+    "bankgiroBefore": 8.5,
+    "bankgiroAfter": 8.5,
+    "productionBefore": 6.5,
+    "productionAfter": 6.5,
+    "note": "Control defects fixed; external production evidence still incomplete. No 9.5 claim."
+  }
+}

@@ -44,3 +44,7 @@ The actual payment is **not fully verified**. Required next evidence:
 - Verified customer/third-party relationship resolving the different invoice recipient and report payer.
 
 No paid-state decision is made. Exact main, CI and Sites identity belong in the delivery receipt.
+
+## Verified code delivery
+
+Code `89622547fbeadb232689ada5e7fd57fe7038d341` is on main. Both jobs in [Actions41357990960](https://github.com/sharbel0022/Mgeorge/actions/runs/41357990960) succeeded on that exact SHA, including clean installations and build. **Sites48 succeeded**, with an identical source tree and runtime9. Post-publication workspace revision40 and modification time are unchanged; native data remains truncated. Existing audience/auth/DB/R2/table list and schedules are preserved. [Machine-readable receipt](BANKGIRO-ORIGINAL-VERIFICATION-DELIVERY.json). The code is delivered; the actual payment is not approved.

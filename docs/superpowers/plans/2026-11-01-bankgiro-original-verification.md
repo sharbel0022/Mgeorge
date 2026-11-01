@@ -46,6 +46,8 @@ Files: sites/lib/bankgiro-xlsx.js; sites/lib/domain.ts; src/importers.js; src/ba
 - [x] Read original directly and hash without modifying it; compare retained AIS/report/invoice originals through authorized read-only surfaces.
 - [x] Report observed facts and exact blockers, including any unavailable authenticated access.
 - [x] Independent review of integrated diff; fix important findings with red/green tests.
-- [ ] Update progress and affected quality scores with bounded claims; push exact main state and publish existing Sites; verify receipts.
+- [x] Update progress and affected quality scores with bounded claims; push exact main state and publish existing Sites; verify receipts.
 
 Execution evidence: 646/646 Node; 1142/1142 Sites; syntax92; TS/build passed; root/prod Sites audits0; Sites full16 moderate/0 high/critical. Final independent review: no important findings. Current full AIS/account-resource/register read remains explicitly blocked; no financial writes.
+
+Delivery: code8962254, exact CI41357990960 both jobs success; Sites48 succeeded, identical site tree/runtime9; workspace revision40 and modification time unchanged. Actual case remains blocked on the explicitly listed external/current-read evidence.

@@ -11,7 +11,7 @@
 | Kodkvalitet och tester | 8,5 | 8,5 | 646 Node +1142 Sites, syntax92, TS/build/high-audit och oberoende review. Sites16 moderate utvecklingsfynd kvarstår. |
 | Verklig produktion | 6,5 | 6,5 | Aktiv Swedbank läst, men full aktuell AIS-/konto-/registerläsning blockerad av trunkering/inloggning. |
 
-Poängen behålls trots mätbara kontrollförbättringar: ingen9,5 utan verksamhetens bevis. Övriga områden oförändrade. Fem valuta-/datumregressioner79/84→84/84; sex tidigare felaktigt tillåtna aliasfall→0. [Rapport och exakt avgränsning](docs/BANKGIRO-ORIGINAL-VERIFICATION.md). Ingen publiceringsframgång påstås före leveranskvitto.
+Poängen behålls trots mätbara kontrollförbättringar: ingen9,5 utan verksamhetens bevis. Övriga områden oförändrade. Fem valuta-/datumregressioner79/84→84/84; sex tidigare felaktigt tillåtna aliasfall→0. [Rapport och exakt avgränsning](docs/BANKGIRO-ORIGINAL-VERIFICATION.md). Kod8962254/exakt CI41357990960 båda success; Sites48 succeeded, samma källträd/runtime9; efterkontroll revision40/oförändrad ändringstid. [Verifierat leveranskvitto](docs/BANKGIRO-ORIGINAL-VERIFICATION-DELIVERY.json). Aktuell full AIS-/registerläsning återstår, poängen behålls.
 
 ## Kravkontrollens alias- och fältkällor — 2026-11-01
 
