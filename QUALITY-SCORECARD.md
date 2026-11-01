@@ -6,6 +6,8 @@ Den nya [uppmätta före-/efterrapporten](docs/BANK-PAYER-OCR-IMPROVEMENT.md) ut
 
 Lokalt **570/570 Node + 858/858 Sites**, syntax 82 filer, TypeScript och produktionsbygge godkända; oberoende slutreview utan kvarstående publiceringsblockerande fynd. Node audit 0, Sites produktionsaudit 0; full Sites-audit har 16 moderate i utvecklingsverktyg, 0 high/critical. Den obligatoriska high-grinden passerar. Allt detta är syntetisk kod-/testbevisning; autentisk bankprofil, företagsavtal och individuellt produktionsfacit saknas.
 
+Kompletterad mätkontroll skiljer parserkandidater från faktiska felbeslut: falsk automatisk acceptans vid osäker betalaridentitet **2/6 → 0/6**, vid ogiltig/egen OCR **1/3 → 0/3**. Hela lokala import-/originalkontroll-/avstämningskedjan mäts i22 scenarier/27 indataförsök: **3,4344 → 3,4620 ms per bankradsförsök**. Samma runner/facit före/efter, med dokumenterade undantag; ingen produktions-SLA eller produktionsidentitetsprecision påstås. Publicerad programkod/Sites37 ändras inte av mätkompletteringen.
+
 | Område | Före → efter | Förbättring och testbevis | Produktionsbevis | Kvarstående problem |
 | --- | --- | --- | --- | --- |
 | Verklig betalare | 6,5 → 6,5 | Typad råevidens, svensk utfärdare, full fältväg, ärvd konflikt; 42/42 i korrigerad korpus | Endast läsande status före publicering | Individuellt autentiskt original/MIG/kanal |

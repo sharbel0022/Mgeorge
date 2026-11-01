@@ -4,6 +4,7 @@ import {resolve,join,dirname} from 'node:path';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
+import {performance} from 'node:perf_hooks';
 import {matchingCases,matchingAccount as account} from '../test/bank-matching-corpus.js';
 
 const args=process.argv.slice(2),option=name=>{const i=args.indexOf(name);return i<0?undefined:args[i+1];};
@@ -20,6 +21,7 @@ const git=command=>{const r=spawnSync('git',['-C',sourceRoot,...command],{encodi
 const revision=option('--source-revision')||git(['rev-parse','HEAD']);
 const folder=mkdtempSync(join(tmpdir(),'mg-matching-benchmark-'));
 let counter=0;
+let processing=null;
 function fixture(){
  const db=openDatabase(join(folder,`synthetic-${counter++}.sqlite`));
  db.prepare('INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status,selected_account_uid) VALUES(?,?,?,?,?,?,?,?,?)').run('synthetic-bank','enablebanking','Synthetic bank',encryptObject({session_id:'synthetic-session'}),encryptObject([{uid:'synthetic-account',account_id:{iban:account},currency:'SEK'}]),'2099-01-01T00:00:00Z','synthetic-owner','connected','synthetic-account');
@@ -32,12 +34,15 @@ function raw({payer='Synthetic customer AB',reference='000018',amount=10000,desc
  return {status:'BOOK',booking_date:'2026-10-26',credit_debit_indicator:amount<0?'DBIT':'CRDT',transaction_amount:{amount:Math.trunc(Math.abs(amount)/100)+'.'+String(Math.abs(amount)%100).padStart(2,'0'),currency:'SEK'},debtor:{name:payer},creditor:{name:payer},reference_number:reference,entry_reference:bankId,...(description?{bank_transaction_code:{description}}:{}),...structuredClone(fields)};
 }
 function api(db,values={},selected=account,source='enablebanking'){
- const original=raw(values),transaction=normalizeBankApiTransaction(original,selected);
- return storeTransactions(db,[transaction],source);
+ const started=performance.now();
+ try{const original=raw(values),transaction=normalizeBankApiTransaction(original,selected);return storeTransactions(db,[transaction],source);}
+ finally{if(processing){processing.input_payments++;processing.import_ms+=performance.now()-started;}}
 }
 function file(db,reported=account){
+ const started=performance.now();try{
  const content=Buffer.from(`Datum;Belopp;Valuta;Betalare;Referens;Bankreferens;IBAN\n2026-10-26;100.00;SEK;Synthetic customer AB;000018;SYNTHETIC-FILE-1;${reported}\n`);
  return storeTransactions(db,parseCSV(content.toString('utf8'),account),'file:synthetic.csv',{content,mime_type:'text/csv'});
+ }finally{if(processing){processing.input_payments++;processing.import_ms+=performance.now()-started;}}
 }
 const org=(value,scheme='COID')=>({identification:value,scheme_name:scheme,issuer:'SE'});
 function prepare(db,scenario){
@@ -73,17 +78,20 @@ const results=[];
 try{
  for(const scenario of matchingCases){
   const db=fixture();
+  processing={input_payments:0,import_ms:0,evaluation_ms:0};
   try{
    let rejected='';try{prepare(db,scenario);}catch(error){if(scenario.expected!=='blocked')throw error;rejected=error.message;}
+   const evaluationStarted=performance.now();
    const before=db.prepare('SELECT COUNT(*) n FROM allocations').get().n,evidence=reconciliationData(db);
    const suggestions=analyzeReconciliation(evidence),safe=suggestions.filter(s=>s.safe&&s.amount_cents>0);
    // The actual boundary, rather than safe:true alone, determines the measured outcome.
    runReconciliation(db);
    const allocationCount=db.prepare('SELECT COUNT(*) n FROM allocations').get().n-before;
    const transactions=listTransactions(db),actual=allocationCount?'automatic':rejected&&!transactions.length?'blocked':'manual';
-   results.push({id:scenario.id,expected:scenario.expected,actual,correct:actual===scenario.expected,automatic_candidates:safe.length,analyzer_agrees_with_boundary:!!safe.length===!!allocationCount,new_allocations:allocationCount,transaction_count:transactions.length,paid_cents:listInvoices(db).find(i=>i.id==='invoice')?.paid_cents||0,available_cents:transactions.reduce((n,t)=>n+t.available_cents,0),finding_kinds:[...new Set(suggestions.map(s=>s.kind))],...(rejected?{rejection:rejected}:{})});
+   processing.evaluation_ms=performance.now()-evaluationStarted;
+   results.push({id:scenario.id,expected:scenario.expected,actual,correct:actual===scenario.expected,truth:{unsafe_payer_evidence:!!scenario.unsafePayerEvidence,unsafe_ocr_evidence:!!scenario.unsafeOcrEvidence},automatic_candidates:safe.length,analyzer_agrees_with_boundary:!!safe.length===!!allocationCount,new_allocations:allocationCount,transaction_count:transactions.length,paid_cents:listInvoices(db).find(i=>i.id==='invoice')?.paid_cents||0,available_cents:transactions.reduce((n,t)=>n+t.available_cents,0),finding_kinds:[...new Set(suggestions.map(s=>s.kind))],processing:{...processing,total_ms:processing.import_ms+processing.evaluation_ms},...(rejected?{rejection:rejected}:{})});
   }catch(error){results.push({id:scenario.id,expected:scenario.expected,actual:'error',correct:false,error:error.message});}
-  finally{db.close();}
+  finally{processing=null;db.close();}
  }
  const replayDb=fixture();let replay;
  try{
@@ -96,8 +104,9 @@ try{
   aborted={attempts:1,rejected_imports:rejection?1:0,rejection,new_payment_rows:abortDb.prepare("SELECT COUNT(*) n FROM bank_transactions WHERE bank_reference='SYNTHETIC-NEW-IN-ABORTED-BATCH'").get().n,stored_transactions:listTransactions(abortDb).length,conflict_records:listTransactions(abortDb).reduce((n,t)=>n+t.bank_evidence_conflicts.length,0)};
  }finally{abortDb.close();}
  const evaluated=results.filter(r=>r.actual!=='blocked'&&r.actual!=='error'),tp=evaluated.filter(r=>r.expected==='automatic'&&r.actual==='automatic').length,fp=evaluated.filter(r=>r.expected!=='automatic'&&r.actual==='automatic').length,fn=evaluated.filter(r=>r.expected==='automatic'&&r.actual!=='automatic').length,manual=evaluated.filter(r=>r.actual==='manual').length;
+ const processingSamples=evaluated.filter(r=>r.processing?.input_payments>0),inputPayments=processingSamples.reduce((n,r)=>n+r.processing.input_payments,0),totalProcessingMs=processingSamples.reduce((n,r)=>n+r.processing.total_ms,0);
  const stable=JSON.stringify(initialHashes)===JSON.stringify(sourceHashes());
- const report={schema:'synthetic-bank-matching-benchmark-v1',generated_at:new Date().toISOString(),source:{root:sourceRoot,revision,dirty:git(['status','--porcelain'])!==null?!!git(['status','--porcelain']):null,stable_during_run:stable,file_sha256:initialHashes},runner_sha256:hash(fileURLToPath(import.meta.url)),corpus_sha256:hash(join(runnerRoot,'test/bank-matching-corpus.js')),scope:'Synthetic Node reconciliationData -> pure analyzeReconciliation -> atomic runReconciliation with real temporary SQLite and preserved synthetic bank originals. No live API or production evidence.',definitions:{automatic:'At least one new allocation at the real reconciliation boundary.',manual_rate:'Cases without automatic allocation divided by evaluated persisted-payment cases; rejected originals and setup errors are reported separately.',truth:'Fixed case outcomes in bank-matching-corpus.js; this is a bounded regression benchmark, not a production error-rate estimate.'},metrics:{cases:results.length,evaluated_payment_cases:evaluated.length,expected_automatic:evaluated.filter(r=>r.expected==='automatic').length,automatic_true_positives:tp,automatic_false_positives:fp,automatic_false_negatives:fn,automatic_precision:tp+fp?tp/(tp+fp):null,automatic_recall:tp+fn?tp/(tp+fn):null,manual_review_cases:manual,manual_rate:evaluated.length?manual/evaluated.length:null,blocked_original_cases:results.filter(r=>r.actual==='blocked').length,errors:results.filter(r=>r.actual==='error').length,correct_cases:results.filter(r=>r.correct).length},import_replay:replay,aborted_import:aborted,cases:results};
+ const report={schema:'synthetic-bank-matching-benchmark-v2',generated_at:new Date().toISOString(),source:{root:sourceRoot,revision,dirty:git(['status','--porcelain'])!==null?!!git(['status','--porcelain']):null,stable_during_run:stable,file_sha256:initialHashes},runner_sha256:hash(fileURLToPath(import.meta.url)),corpus_sha256:hash(join(runnerRoot,'test/bank-matching-corpus.js')),scope:'Synthetic Node reconciliationData -> pure analyzeReconciliation -> atomic runReconciliation with real temporary SQLite and preserved synthetic bank originals. No live API or production evidence.',definitions:{false_verified_payer_acceptance:'An actual automatic allocation despite independently labelled unsafe payer evidence. This measures a false acceptance at the reconciliation boundary, not real-world bank identity verification.',false_verified_ocr_acceptance:'An actual automatic allocation despite independently labelled invalid or own-account OCR evidence. Company agreement validity is not inferred.',processing_time:'Measured parse/normalise/store plus retained-original verification, analysis and atomic reconciliation per input bank payment attempt. DB creation, invoice/history fixture setup, network, and rejected-original cases are excluded. Small local single-pass sample; not a production SLA.',automatic:'At least one new allocation at the real reconciliation boundary.',manual_rate:'Cases without automatic allocation divided by evaluated persisted-payment cases; rejected originals and setup errors are reported separately.',truth:'Fixed case outcomes in bank-matching-corpus.js; this is a bounded regression benchmark, not a production error-rate estimate.'},metrics:{unsafe_payer_cases:evaluated.filter(r=>r.truth.unsafe_payer_evidence).length,false_verified_payer_acceptances:evaluated.filter(r=>r.truth.unsafe_payer_evidence&&r.actual==='automatic').length,unsafe_ocr_cases:evaluated.filter(r=>r.truth.unsafe_ocr_evidence).length,false_verified_ocr_acceptances:evaluated.filter(r=>r.truth.unsafe_ocr_evidence&&r.actual==='automatic').length,processing_samples:processingSamples.length,input_payment_attempts:inputPayments,processing_total_ms:totalProcessingMs,processing_mean_ms_per_payment:inputPayments?totalProcessingMs/inputPayments:null,cases:results.length,evaluated_payment_cases:evaluated.length,expected_automatic:evaluated.filter(r=>r.expected==='automatic').length,automatic_true_positives:tp,automatic_false_positives:fp,automatic_false_negatives:fn,automatic_precision:tp+fp?tp/(tp+fp):null,automatic_recall:tp+fn?tp/(tp+fn):null,manual_review_cases:manual,manual_rate:evaluated.length?manual/evaluated.length:null,blocked_original_cases:results.filter(r=>r.actual==='blocked').length,errors:results.filter(r=>r.actual==='error').length,correct_cases:results.filter(r=>r.correct).length},import_replay:replay,aborted_import:aborted,cases:results};
  const output=option('--output');if(output){mkdirSync(dirname(resolve(output)),{recursive:true});writeFileSync(resolve(output),JSON.stringify(report,null,2)+'\n');}
  console.log(JSON.stringify({revision,metrics:report.metrics,import_replay:replay,aborted_import:aborted,...(output?{output:resolve(output)}:{})},null,2));
  if(report.metrics.errors||!stable)process.exitCode=1;

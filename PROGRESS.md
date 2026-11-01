@@ -20,6 +20,14 @@
 - Fryst programkod har fortfarande **570/570 Node + 858/858 Sites**, syntax82, TS/build, oberoende review och obligatorisk audit-grind godkända. Hashbundna mätartefakter matchar levererade källfiler.
 - Fullt kvitto och rollbackreferens finns i `docs/BANK-PAYER-OCR-PUBLICATION.json`. 9,5-målet är **inte uppnått**: autentiskt individuellt Swedbankfacit, företagsprofil och OCR-avtal/behörig kanal saknas. Nästa steg är tillåtet bankoriginal och bank-/avtalsbekräftelse, följt av läsande jämförelse före verksamhetsallokering. Ingen bakgrundsfortsättning är konfigurerad; den ägda lokala previewprocessen är stoppad.
 
+## Kompletterad mätkontroll — 2026-11-01
+
+- Förra målvarvet levererade faktisk kod, gröna exakta CI-kvitton och Sites37: klassificering **framsteg**. Ny kompletthetskontroll fann två mätluckor, inte en ny betalningsmotor att bygga: behandlingstid genom hela lokala kedjan samt falsk acceptans vid den riktiga allokeringsgränsen.
+- Kompletterad oförändrad 23-scenariokorpus körd med samma runner/facit på exakt9d45656 och publicerad programkod. Sex negativa betalarfall: falsk automatisk acceptans **2 → 0**. Tre negativa OCR-fall: **1 → 0**. Det är avgränsade syntetiska acceptansfel, inte bevisad produktionsidentitet eller företagets OCR-avtal.
+- Import/lagring + originalkontroll/analys/atomisk avstämning mäts nu för22 scenarier/27 inkommande bankradsförsök: **3,4344 → 3,4620 ms per försök**. Fixture/databasskapande och nätverk ingår inte; engångsmätning, ingen produktions-SLA. Befintliga utfall kvar: TP5/5, FP3→0, korrekt23/23 efter, återimport och avbruten batch utan extra ekonomiska rader. Runner-/korpushashar och aritmetik verifierade.
+- Återkommande betalare och återtag är redan täckta av befintliga konto-/kundbundna relationer och tester; Node latest100-audit är en redovisad begränsning, inte ett uttryckligt pagineringskrav i uppdraget. Ingen produktionskod eller Sites-version ändras av mätkompletteringen. Syntax82 godkänd; publicerad kod behåller tidigare570+858 och exakt CI.
+- Kvarvarande hinder är samma autentiska individuella bankfacit, avtalade MIG/OCR-regler och behöriga rapportkanal. Behåll ärliga6,5/10;9,5 är inte uppnått.
+
 ## Fas 1 — inventering och baslinje, 2026-10-28
 
 - Läste hela uppdragsfilen och hämtade senaste `main` samt PR #9/#11. Ren arbetskopia; separat branch skapad från `a024216`.

@@ -56,11 +56,18 @@ En separat fryst matchningskorpus kör verklig tillfällig SQLite, bevarade synt
 | --- | ---: | ---: | ---: |
 | Säkra automatchningar (TP) | 5/5 | 5/5 | Ingen förlorad säker täckning |
 | Felaktiga automatiska kopplingar (FP) | 3 | 0 | −3 |
+| Falsk acceptans av osäker betalaridentitet vid automatisk fördelning | 2/6 negativa identitetsfall | 0/6 | −2 |
+| Falsk acceptans av ogiltig/egen OCR vid automatisk fördelning | 1/3 negativa OCR-fall | 0/3 | −1 |
 | Automatchningsprecision / recall | 62,5 % / 100 % | 100 % / 100 % | +37,5 / 0 procentenheter |
 | Behöver granskning | 14/22 (63,64 %) | 17/22 (77,27 %) | +3 osäkra fall stoppas |
 | Rätt scenarioresultat | 20/23 | 23/23 | +3 |
 | Extra ekonomiska poster vid återimport | 0 (1 betalning, 1 allokering) | 0 (1 betalning, 1 allokering) | Oförändrat säkert |
 | Avbruten motstridig import | 1 avvisad; 0 nya rader | 1 avvisad; 0 nya rader | Ingen partiell ekonomisk import |
+| Behandlingstid genom import och avstämning per bankradsförsök | 3.4344 ms | 3.4620 ms | +0.0276 ms (+0.8 %) |
+
+Falsk acceptans mäts vid den riktiga automatiska allokeringsgränsen mot oberoende märkta negativa scenarier. Sex fall saknar eller motsäger säker betalaridentitet; tre fall har ogiltig eller företagets egen OCR. Räknarna avser faktiska felaktiga automatiska fördelningar, inte enbart felaktiga parserkandidater. De är inte produktionsstatistik över bankverifierade identiteter eller giltighet mot företagets ännu okända OCR-avtal.
+
+Behandlingstiden omfattar parsning/normalisering/lagring samt originalkontroll, analys och atomisk avstämning: 22 körda scenarier med 27 inkommande bankradsförsök i vardera revisionen. Databasskapande, faktura-/historikuppsättning, nätverk och det före lagring avvisade kontofallet ingår inte. Flera indata i ett scenario räknas i nämnaren. Detta är en liten lokal engångsmätning; procentförändringen ska inte tolkas som statistiskt säker eller som produktions-SLA.
 
 De tre falska automatchningarna var ogiltig SEBG-OCR, motstridiga COID och ändrat typat betalar-ID vid samma-ID-återimport. Matchningsmätningen avser Node, inte en uppmätt produktions- eller Sites-matchningsgrad. Sites motsvarande regler/proveniens/återbetalningar verifieras av integrationstester, utan att procentsatserna extrapoleras.
 
