@@ -61,6 +61,62 @@ export const identityCases=[
  ...ambiguousHeaderCases.map(item=>({...item,held:true,ambiguousColumns:true})),
 ];
 
+// Full labelled values are evidence; prefixes and invented concatenations are not.
+export const exactFieldCases=[
+ {name:'complete evidence integer amount columns',text:invoiceText.replace('Att betala: 3 750,00 SEK','Att betala: 3750    4000 SEK'),field:'total_cents'},
+ {name:'complete evidence character-spaced integer amount',text:invoiceText.replace('Att betala: 3 750,00 SEK','Att betala: 3 7 5 0 SEK'),field:'total_cents'},
+ {name:'complete evidence incorrect monetary thousand groups',text:invoiceText.replace('Netto: 3 000,00 kr','Netto: 30 00 SEK'),field:'net_cents'},
+ {name:'complete evidence consistent integer amount columns',text:invoiceText.replace('Netto: 3 000,00 kr','Netto: 3000    3200 SEK').replace('Moms: 750,00 kr','Moms: 1000    1200 SEK').replace('Att betala: 3 750,00 SEK','Att betala: 4000    4400 SEK'),field:'total_cents',fields:['total_cents','vat_cents','net_cents']},
+ {name:'complete evidence Bankgiro numeric suffix',text:invoiceText+'\nBankgiro: 123-4567.9',field:'bankgiro'},
+ {name:'complete evidence organization numeric suffix',text:invoiceText+'\nOrganisationsnummer: 556016-0680.9',field:'organization_number'},
+ {name:'complete evidence unreadable duplicate Bankgiro',text:invoiceText+'\nBankgiro: ???',field:'bankgiro'},
+ {name:'complete evidence unreadable duplicate organization',text:invoiceText+'\nOrg.nr: ???',field:'organization_number'},
+ {name:'complete evidence formatted organization checksum',text:invoiceText.replace('Organisationsnummer: 556016-0680','Org.nr: 556016 – 0681'),field:'organization_number'},
+ {name:'unreadable explicit currency label',text:invoiceText+'\nValuta: ???',field:'currency'},
+ {name:'known explicit currency prefix with junk',text:invoiceText+'\nValuta: SEK ???',field:'currency'},
+ {name:'unreadable hyphen-delimited duplicate invoice identity',text:invoiceText+'\nFakturanummer-???',field:'invoice_number'},
+ {name:'unreadable same-line explicit VAT label',text:invoiceText+'\nBankgiro: 123-4567 Moms: ???',field:'vat_cents'},
+ {name:'unreadable same-line explicit net label',text:invoiceText+'\nBankgiro: 123-4567 Netto: ???',field:'net_cents'},
+ {name:'two invoice identities on one line',text:invoiceText.replace('Fakturanummer: 0606','Fakturanummer: 0606 0607'),field:'invoice_number'},
+ {name:'two invoice identities in adjacent columns',text:invoiceText.replace('Fakturanummer: 0606','Fakturanummer: 0606    0607'),field:'invoice_number'},
+ {name:'unreadable second OCR',text:invoiceText+'\nOCR: ???',field:'reference'},
+ {name:'unreadable first OCR',text:'OCR: ???\n'+invoiceText,field:'reference'},
+ {name:'literal unreadable OCR',text:invoiceText.replace('OCR: 000018','OCR: oläsligt'),field:'reference'},
+ {name:'OCR with alphabetic suffix',text:invoiceText.replace('OCR: 000018','OCR: 000018x'),field:'reference'},
+ {name:'OCR with decimal suffix',text:invoiceText.replace('OCR: 000018','OCR: 000018.9'),field:'reference'},
+ {name:'OCR with slash suffix',text:invoiceText.replace('OCR: 000018','OCR: 000018/99'),field:'reference'},
+ {name:'OCR with unsupported punctuation',text:invoiceText.replace('OCR: 000018','OCR: 000018!'),field:'reference'},
+ {name:'OCR exceeding complete token limit',text:invoiceText.replace('OCR: 000018','OCR: '+'0'.repeat(121)),field:'reference',pdfOptions:{fontSize:5}},
+ {name:'two OCR values without distinct labels',text:invoiceText.replace('OCR: 000018','OCR: 000018 000019'),field:'reference'},
+ {name:'malformed generic reference suffix',text:invoiceText.replace('OCR: 000018','Betalningsreferens: AB/00606!'),field:'reference'},
+ {name:'two totals without distinct labels',text:invoiceText.replace('Att betala: 3 750,00 SEK','Att betala: 3 750,00 SEK 4 000,00 SEK'),field:'total_cents'},
+ {name:'two totals in adjacent columns',text:invoiceText.replace('Att betala: 3 750,00 SEK','Att betala: 3 750,00    4 000,00 SEK'),field:'total_cents'},
+ {name:'mixed-case conflicting currency',text:invoiceText+'\nValuta: eUr',field:'currency'},
+];
+export const exactFieldPositiveCases=[
+ {name:'complete evidence proper monetary integer thousand groups',text:invoiceText.replace('3 000,00 kr','3 000 SEK').replace('750,00 kr','750 SEK').replace('3 750,00 SEK','3 750 SEK'),number:'0606',reference:'000018'},
+ {name:'complete evidence proper monetary plain integers',text:invoiceText.replace('3 000,00 kr','3000 SEK').replace('750,00 kr','750 SEK').replace('3 750,00 SEK','3750 SEK'),number:'0606',reference:'000018'},
+ {name:'complete evidence proper monetary decimal dots',text:invoiceText.replace('3 000,00 kr','3000.00 SEK').replace('750,00 kr','750.00 SEK').replace('3 750,00 SEK','3750.00 SEK'),number:'0606',reference:'000018'},
+ {name:'complete evidence proper monetary dotted groups',text:invoiceText.replace('3 000,00 kr','3.000,00 SEK').replace('3 750,00 SEK','3.750,00 SEK'),number:'0606',reference:'000018'},
+ {name:'complete evidence formatted identifiers preserve raw evidence',text:invoiceText.replace('Bankgiro: 123-4567','Bankgiro: 123 - 4567').replace('Organisationsnummer: 556016-0680','Org.nr: 556016 – 0680'),number:'0606',reference:'000018',evidence:{bankgiro:'Bankgiro: 123 - 4567',organization_number:'Org.nr: 556016 – 0680'}},
+ {name:'complete evidence identical identifier duplicates',text:invoiceText+'\nBankgiro: 123-4567\nOrg.nr: 556016-0680',number:'0606',reference:'000018'},
+ {name:'complete evidence same-line known identifier labels',text:invoiceText.replace('Organisationsnummer: 556016-0680','Org.nr: 556016-0680 Bankgiro: 123-4567'),number:'0606',reference:'000018'},
+ {name:'net label before VAT word is one field',text:invoiceText.replace('Netto:','Belopp före moms:'),number:'0606',reference:'000018'},
+ {name:'net-exclusive label before VAT word is one field',text:invoiceText.replace('Netto:','Summa exkl. moms:'),number:'0606',reference:'000018'},
+ {name:'total label including VAT word is one field',text:invoiceText.replace('Att betala:','Totalt inklusive moms:'),number:'0606',reference:'000018'},
+ {name:'hyphen-delimited invoice identity',text:invoiceText.replace('Fakturanummer: 0606','Fakturanummer-0606'),number:'0606',reference:'000018'},
+ {name:'explicit valid currency label',text:invoiceText+'\nValuta: SEK',number:'0606',reference:'000018'},
+ {name:'ordinary inline VAT rates and net prose',text:invoiceText+'\nArtikel med moms 25 % och netto enligt avtalet.',number:'0606',reference:'000018'},
+ {name:'character-spaced invoice digits',text:invoiceText.replace('Fakturanummer: 0606','Fakturanummer: 0 6 0 6'),number:'0606',reference:'000018'},
+ {name:'character-spaced OCR digits',text:invoiceText.replace('OCR: 000018','OCR: 0 0 0 0 1 8'),number:'0606',reference:'000018'},
+ {name:'OCR before semicolon-delimited Bankgiro label',text:invoiceText.replace('OCR: 000018\nBankgiro:','OCR: 000018; Bankgiro:'),number:'0606',reference:'000018'},
+ {name:'OCR before pipe-delimited Bankgiro label',text:invoiceText.replace('OCR: 000018\nBankgiro:','OCR: 000018 | Bankgiro:'),number:'0606',reference:'000018'},
+ {name:'OCR before same-line Bankgiro label',text:invoiceText.replace('OCR: 000018\nBankgiro:','OCR: 000018 Bankgiro:'),number:'0606',reference:'000018'},
+ {name:'generic reference preserves separators',text:invoiceText.replace('OCR: 000018','Betalningsreferens: AB/00606'),number:'0606',reference:'AB/00606'},
+ {name:'same total before same-line OCR label',text:invoiceText.replace('Att betala: 3 750,00 SEK\nOCR:','Att betala: 3 750,00 SEK OCR:'),number:'0606',reference:'000018'},
+ {name:'lowercase SEK is the same currency',text:invoiceText.replaceAll('SEK','sek'),number:'0606',reference:'000018'},
+];
+
 export const moneyCases=[
  {name:'spaced VAT percentage cannot masquerade as a monetary amount',text:percentVat},
  {name:'unspaced VAT percentage remains unresolved',text:percentVat.replace('25 %','25%')},
@@ -78,7 +134,7 @@ export const dateCases=[
  {name:'a valid date cannot erase another invalid labelled date',text:hyphenDates+'\nFörfallodatum: 31-11-2026',held:'due_at'},
 ];
 
-function escapePdf(value){return value.replace(/[()\\]/g,'\\$&');}
+function escapePdf(value){return value.replace(/[()\\]/g,'\\$&').replace(/–/g,'\\226').replace(/—/g,'\\227');}
 export function invoicePdf(text,{fontSize=11,reverseColumnValueOrder=false}={}){
  const lines=text.split('\n'),commands=[];
  for(let n=0;n<lines.length;n++){

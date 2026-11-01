@@ -1,5 +1,20 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## OCR och fullständig evidens — aktuell mätning
+
+| Berört område | Före | Efter | Evidens och gräns |
+| --- | ---: | ---: | --- |
+| Faktura-/OCR-läsning | Behåll tidigare | Behåll tidigare | Exakt textkorpus42/100→100/100; faktisk optisk54/55→55/55; privat native9/9 per motor. Avgränsade layouter, ingen universell100%-garanti. |
+| Betalare och referens | 7 | 7 | Primär registerkälla löser namnvariation; komplett token14/40→40/40, falskt säkra26→0. Rapporten bevisar ingen formell OCR. |
+| Bankgiro/kontorelation | 8,5 | 8,5 | Avgränsade ägarbundna aktuella provider-GET, exakt medlemskap/alias, inga härledda konton. Faktisk relation återstår att styrka. |
+| Automatisk matchning | 7,5 | 7,5 | Ofullständiga token/källor och OCR hålls; inga verkliga allokeringar eller saldoförändringar. |
+| Säkerhet och åtkomst | 8,5 | 8,5 | Läsverktygens ägare, original, aktuell consent, sekretess och skrivfrihet granskade; fjärrarbetare kan inte ge sig PDF-tillit. |
+| Kodkvalitet/tester | 8,5 | 8,5 | TDD och oberoende scoped/integrerad review; 775/775 Node,1323/1323 Sites, syntax97, TS/build passerar; leveranskvitto pågår. Befintliga16 moderate utvecklingsfynd kvarstår. |
+| Verklig produktion | 6,5 | 6,5 | Ingen höjning för syntetisk precision eller ansluten bank; aktuell fullständig kontorelation/AIS/register krävs. |
+
+[Rapport och mätfiler](docs/COMPLETE-OCR-EVIDENCE-VERIFICATION.md). Övriga33 områden och historiska bedömningar behålls. Ingen9,5 utan verksamhetens fullständiga bevis. Slutlig publicering/CI redovisas separat från lokal testning.
+
+
 ## Originalverifiering — aktuell, konservativ bedömning
 
 | Berört område | Före | Efter | Evidens och begränsning |

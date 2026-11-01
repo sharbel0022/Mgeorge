@@ -7,7 +7,7 @@ import {join} from 'node:path';
 import {interpretInvoice,extractInvoice,runDocumentProcess} from '../src/invoice-extraction.js';
 import {openDatabase,storeDocument,getSettings,saveSettings,listInvoices} from '../src/db.js';
 import {analyzeDocument,approveDocument} from '../src/invoice-review.js';
-import {context,invoiceText,columnInvoice,adjacentOcr,hyphenDates,ambiguousHeaderCases,percentVat,identityCases,dateCases,moneyCases,invoicePdf,invoiceImage} from './helpers/invoice-parser-corpus.mjs';
+import {context,invoiceText,columnInvoice,adjacentOcr,hyphenDates,ambiguousHeaderCases,percentVat,identityCases,dateCases,moneyCases,exactFieldCases,exactFieldPositiveCases,invoicePdf,invoiceImage} from './helpers/invoice-parser-corpus.mjs';
 
 for(const item of identityCases)test('Q8 synthetic invoice identity: '+item.name,()=>{
  const result=interpretInvoice(item.text,context);
@@ -28,10 +28,21 @@ for(const item of moneyCases)test('Q8 synthetic invoice money unit: '+item.name,
  assert.notEqual(result.level,'green');assert.equal(result.fields.vat_cents.value,null);assert.equal(result.text_excerpt,item.text);
 });
 
+for(const item of exactFieldCases)test('exact invoice field must remain reviewable: '+item.name,()=>{
+ const result=interpretInvoice(item.text,context);
+ assert.notEqual(result.level,'green');for(const field of item.fields||[item.field])assert.equal(result.fields[field].value,null);assert.equal(result.text_excerpt,item.text);
+});
+for(const item of exactFieldPositiveCases)test('exact invoice field preserves ordinary evidence: '+item.name,()=>{
+ const result=interpretInvoice(item.text,context);
+ assert.equal(result.level,'green');assert.equal(result.fields.invoice_number.value,item.number);assert.equal(result.fields.reference.value,item.reference);assert.equal(result.fields.total_cents.value,375000);
+ assert.equal(result.fields.organization_number.value,'5560160680');assert.equal(result.fields.bankgiro.value,'123-4567');
+ for(const [field,evidence]of Object.entries(item.evidence||{}))assert.equal(result.fields[field].evidence,evidence);
+});
+
 async function registrationFixture(t){
  const folder=mkdtempSync(join(tmpdir(),'mg-invoice-corpus-')),db=openDatabase(join(folder,'synthetic.sqlite'));
  t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
- const document=(text,name='syntetiskt-underlag.pdf')=>storeDocument(db,{name,mime_type:'application/pdf',bytes:invoicePdf(text),metadata:context});
+ const document=(text,name='syntetiskt-underlag.pdf',pdfOptions={})=>storeDocument(db,{name,mime_type:'application/pdf',bytes:invoicePdf(text,pdfOptions),metadata:context});
  const seed=document(invoiceText.replace('Fakturanummer: 0606','Fakturanummer: SEED-01'));
  await analyzeDocument(db,seed.id);approveDocument(db,seed.id,{confirm:true});saveSettings(db,{...getSettings(db),auto_register_known:true});
  return {db,document};
@@ -62,7 +73,7 @@ test('Q8 identical visible PDF columns remain held regardless of content-stream 
 test('Q8 actual PDFs with punctuated or multiline heading lists remain unregistered',async t=>{
  const f=await registrationFixture(t);
  for(const item of ambiguousHeaderCases){
-  const doc=f.document(item.text),result=await analyzeDocument(f.db,doc.id);
+  const doc=f.document(item.text,undefined,item.pdfOptions),result=await analyzeDocument(f.db,doc.id);
   assert.equal(result.method,'pdf');assert.notEqual(result.level,'green',item.name);assert.equal(result.fields.invoice_number.value,null,item.name);assert.equal(result.fields.reference.value,null,item.name);
   assert.equal(listInvoices(f.db).length,1,item.name);assert.equal(f.db.prepare('SELECT status FROM documents WHERE id=?').get(doc.id).status,'needs_review');
  }
@@ -92,4 +103,15 @@ test('Q8 improved identity parsing does not admit unknown counterparties, credit
  for(const text of [hyphenDates.replace('Testbolaget AB','Okänd syntetisk leverantör AB'),hyphenDates.replace('Faktura\n','Kreditfaktura\n').replace('3 750,00','-3 750,00'),hyphenDates.replace('Moms: 750,00','Moms: 700,00')]){
   const doc=f.document(text),result=await analyzeDocument(f.db,doc.id);assert.notEqual(result.level,'green');assert.equal(listInvoices(f.db).length,1);
  }
+});
+
+for(const item of exactFieldCases)test('actual Node PDF cannot auto-register uncertain full fields: '+item.name,async t=>{
+ const f=await registrationFixture(t),doc=f.document(item.text,undefined,item.pdfOptions),result=await analyzeDocument(f.db,doc.id);
+ assert.equal(result.method,'pdf');assert.notEqual(result.level,'green');for(const field of item.fields||[item.field])assert.equal(result.fields[field].value,null);assert.equal(listInvoices(f.db).length,1);
+ assert.equal(f.db.prepare('SELECT status FROM documents WHERE id=?').get(doc.id).status,'needs_review');
+});
+for(const item of exactFieldPositiveCases)test('actual Node PDF registers exact full fields: '+item.name,async t=>{
+ const f=await registrationFixture(t),doc=f.document(item.text,undefined,item.pdfOptions),result=await analyzeDocument(f.db,doc.id);
+ const invoice=listInvoices(f.db).find(i=>i.invoice_number!=='SEED-01');assert.ok(invoice);assert.equal(invoice.invoice_number,item.number);assert.equal(invoice.reference,item.reference);assert.equal(invoice.total_cents,375000);
+ for(const [field,evidence]of Object.entries(item.evidence||{}))assert.equal(result.fields[field].evidence,evidence);
 });

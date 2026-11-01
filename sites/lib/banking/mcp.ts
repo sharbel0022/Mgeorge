@@ -1,6 +1,9 @@
 import { automaticSync, automaticSyncStatus, bankFailure } from './service';
 
 const tools = [
+  {name:'bank_account_evidence',title:'Läs aktuell bankverifierad kontoalias',description:'Kontaktar befintlig AIS-bankanslutning för att läsa högst fem av ägarens redan godkända kontoresurser. Jämför en ägd AIS-bankhändelse och ett ägt rapportoriginal mot bankens uttryckliga kontoidentifierare utan IBAN-beräkning. Kräver aktivt produktionsmedgivande och valt SEK-konto. Ändrar inga uppgifter eller saldon.',inputSchema:{type:'object',properties:{transactionId:{type:'string',pattern:'^[a-zA-Z0-9_-]{1,100}$'},documentId:{type:'string',pattern:'^[a-zA-Z0-9_-]{1,100}$'},sha256:{type:'string',pattern:'^[a-f0-9]{64}$'}},required:['transactionId'],oneOf:[{required:['documentId'],not:{required:['sha256']}},{required:['sha256'],not:{required:['documentId']}}],additionalProperties:false},annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:true}},
+  {name:'payment_evidence',title:'Läs privat betalnings- och fakturaevidens',description:'Läser endast den inloggade ägarens sparade betalningsunderlag och befintliga originalkontroller. Välj bankhändelse-ID eller exakt referens. Datum och heltalsören väljer enbart granskningsförslag, aldrig bevis. Ändrar ingenting och kontaktar inte banken eller Gmail.',inputSchema:{type:'object',properties:{transactionId:{type:'string',pattern:'^[a-zA-Z0-9_-]{1,100}$'},reference:{type:'string',minLength:1,maxLength:100},amountCents:{type:'integer',minimum:-100000000000,maximum:100000000000},date:{type:'string',format:'date'},offset:{type:'integer',minimum:0,maximum:100000},limit:{type:'integer',minimum:1,maximum:5}},oneOf:[{required:['transactionId'],not:{anyOf:[{required:['reference']},{required:['amountCents']},{required:['date']}]}},{required:['reference'],not:{required:['transactionId']}}],additionalProperties:false},annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false}},
+  {name:'retained_report_evidence',title:'Läs privat sparat bankrapportoriginal',description:'Kontrollerar endast ett befintligt ägt bankoriginals storlek, SHA256 och tolkade rader. Välj original-ID eller exakt SHA256. Sidindelade rader visar aktuell kontoverifiering och registerförekomst. Kopplar inga underlag eller fakturor och hämtar inga nya uppgifter.',inputSchema:{type:'object',properties:{documentId:{type:'string',pattern:'^[a-zA-Z0-9_-]{1,100}$'},sha256:{type:'string',pattern:'^[a-f0-9]{64}$'},transactionId:{type:'string',pattern:'^[a-zA-Z0-9_-]{1,100}$'},offset:{type:'integer',minimum:0,maximum:100000},limit:{type:'integer',minimum:1,maximum:100}},oneOf:[{required:['documentId'],not:{required:['sha256']}},{required:['sha256'],not:{required:['documentId']}}],additionalProperties:false},annotations:{readOnlyHint:true,destructiveHint:false,openWorldHint:false}},
   {name:'backup_step',title:'Säkerhetskopiera ekonomi och original',description:'Skapar eller återupptar dagens krypterade säkerhetskopia för den inloggade användaren. Kopierar högst fem original per anrop och kontrolläser varje kopia. Ändrar inga fakturor eller betalningar.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
   {name:'backup_status',title:'Status för verifierad säkerhetskopia',description:'Visar datum, verifieringsstatus och filantal för den inloggade användarens säkerhetskopior. Inga nycklar eller ekonomiska uppgifter returneras.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true}},
   {name:'process_invoice_documents',title:'Tolka väntande fakturaunderlag',description:'Bearbetar en begränsad beständig dokumentkö för den inloggade användaren. PDF-text läses i Sites; skannade dokument sparas i en beständig kö för OCR i molnet, med ansluten lokal dator som reserv. Registrerar endast gröna fakturor från uttryckligen verifierade motparter. Skickar inga mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
@@ -33,10 +36,17 @@ export async function bankRpc(body: unknown): Promise<Response> {
   const args = params.arguments ?? {};
   // Caller identity comes only from Sites OAuth headers. No owner, account,
   // credential, request-context or force-refresh argument is accepted.
-  if (!object(args) || Object.keys(args).length) return error(-32602, 'This tool accepts no arguments');
+  const evidenceReader=params.name==='payment_evidence'||params.name==='retained_report_evidence';
+  const currentAccountReader=params.name==='bank_account_evidence';
+  if (!evidenceReader&&!currentAccountReader&&(!object(args) || Object.keys(args).length)) return error(-32602, 'This tool accepts no arguments');
   let response: Response;
   try {
-    if(params.name==='backup_step'||params.name==='backup_status'){
+    if(currentAccountReader){
+      response=await(await import('./account-evidence')).readBankAccountEvidence(args);
+    }else if(evidenceReader){
+      const readers=await import('../evidence-read');
+      response=params.name==='payment_evidence'?await readers.readPaymentEvidence(args):await readers.readRetainedReportEvidence(args);
+    }else if(params.name==='backup_step'||params.name==='backup_status'){
       response=await(await import('../backups')).backupRpc(params.name==='backup_step');
     }else if(params.name==='process_invoice_documents'){
       const {identity,response:json}=await import('../server');const user=await identity();const processing=await import('../document-processing');const settings=await processing.processingSettings(user);
@@ -52,5 +62,5 @@ export async function bankRpc(body: unknown): Promise<Response> {
   }
   catch (cause) { response = bankFailure(cause); }
   const data = await response.json();
-  return result({ content: [{ type: 'text', text: JSON.stringify(data) }], structuredContent: data, ...(response.ok ? {} : { isError: true }) });
+  return result({ content: [{ type: 'text', text: (evidenceReader||currentAccountReader)&&response.ok?'Privat läsning utan ändringar. Evidens och fullständighet finns i structuredContent.':JSON.stringify(data) }], structuredContent: data, ...(response.ok ? {} : { isError: true }) });
 }

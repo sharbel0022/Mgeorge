@@ -235,7 +235,8 @@ test('Automatic catch-up overlaps the last successful fetch while preserving the
 test('MCP supports discovery but never accepts an owner override or unauthenticated bank operation', async t => {
   const f = await fixture(t); await f.seedApp(); await f.seedConnection();
   const list = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 1, method: 'tools/list' })).json();
-  assert.equal(list.result.tools.length, 8);assert.ok(list.result.tools.some(t=>t.name==='backup_step'));assert.ok(list.result.tools.some(t=>t.name==='backup_status'));assert.ok(!list.result.tools.some(t=>/send/.test(t.name)));
+  for(const name of ['payment_evidence','retained_report_evidence'])assert.equal(list.result.tools.find(tool=>tool.name===name)?.annotations.readOnlyHint,true);
+  assert.ok(list.result.tools.some(t=>t.name==='backup_step'));assert.ok(list.result.tools.some(t=>t.name==='backup_status'));assert.ok(!list.result.tools.some(t=>/send/.test(t.name)));
   assert.ok(list.result.tools.some(tool=>tool.name==='gmail_auto_sync'));
   const override = await (await f.mcp.bankRpc({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'bank_auto_sync', arguments: { owner: f.owner, force: true } } })).json();
   assert.equal(override.error.code, -32602);

@@ -19,7 +19,7 @@ test('all unstructured references remain available for conflict checks without i
 
 test('OCR uses modulus 10 and preserves leading zeros',()=>{assert.equal(ocrChecksum('000018'),true);assert.equal(ocrChecksum('1234567897'),true);assert.equal(ocrChecksum('1234567890'),false);assert.equal(ocrChecksum('0599'),false);assert.equal(ocrChecksum('AB/12'),false);assert.equal(extractPaymentReferences({OCR:'000018'}).selected.value,'000018');});
 test('structured, nested, array and ISO document fields retain every source',()=>{const x=extractPaymentReferences({reference_number:'0599',details:{OCR:{value:'1234567897'}},RmtInf:{Strd:[{CdtrRefInf:{Ref:'1234567897'}},{RfrdDocInf:{Nb:'0599'}}]},remittance_information:['Faktura: 0599']});assert.equal(x.selected.kind,'ocr');assert.equal(x.selected.value,'1234567897');assert.ok(x.candidates.some(c=>c.source==='$.details.OCR.value'));assert.ok(x.candidates.some(c=>c.source==='$.RmtInf.Strd[1].RfrdDocInf.Nb'));assert.deepEqual(new Set(matchingReferenceValues(x)),new Set(['1234567897','0599']));});
-test('bank IDs, own Bankgiro, account IDs, names, dates and amounts are never fabricated into references',()=>{const x=extractPaymentReferences({entry_reference:'0599',transaction_id:'0599',bank_reference:'0599',bankgiro:'58197013',creditor_account:{other:{identification:'0599'}},transaction_amount:{amount:'625.00'},debtor:{name:'Testkund 0599'},booking_date:'2026-10-26',note:'Betalning mottagen den 26 oktober'});assert.equal(x.selected,null);});
+test('bank IDs, own Bankgiro, account IDs, names, dates and amounts are never fabricated into references',()=>{const x=extractPaymentReferences({entry_reference:'0599',transaction_id:'0599',bank_reference:'0599',bankgiro:'12345678',creditor_account:{other:{identification:'0599'}},transaction_amount:{amount:'625.00'},debtor:{name:'Testkund 0599'},booking_date:'2026-10-26',note:'Betalning mottagen den 26 oktober'});assert.equal(x.selected,null);});
 test('placeholders are skipped while invoice labels in payer messages are found',()=>{const x=extractPaymentReferences({reference_number:'NOTPROVIDED',note:'Tack, faktura: 0599'});assert.equal(x.selected.value,'0599');assert.equal(x.selected.source,'$.note');assert.equal(extractPaymentReferences({note:'Faktura betald'}).selected,null);});
 test('valid OCR outranks a free message and invalid OCR stays visible',()=>{const x=extractPaymentReferences({OCR:'1234567890',invoice_number:'0599',remittance_information:['1234567897']});assert.ok(x.candidates.some(c=>c.validity==='checksum_invalid'));assert.ok(x.warnings.length);assert.ok(!x.candidates.some(c=>c.kind==='ocr'&&c.validity==='checksum_valid'));});
 test('same invoice OCR and number can jointly identify a verified payment',()=>{const f=findings({OCR:'1234567897',invoice_number:'0599'});assert.equal(f.length,1);assert.equal(f[0].safe,true);assert.equal(f[0].reference_sources.length,2);});
@@ -33,7 +33,7 @@ test('later candidates cannot silently replace a different original payment refe
 test('OCR in a payer message preserves separators without taking a numeric prefix',()=>{const x=extractPaymentReferences({note:'OCR: 123 456 7897'});assert.equal(x.selected.value,'123 456 7897');assert.equal(x.selected.validity,'checksum_valid');});
 
 test('company Bankgiro in a payment reference is held even if invoice OCR was entered incorrectly',()=>{
- const f=findings({reference_number:'58197013'},[{...invoice('i','0599','5819-7013'),bankgiro:'5819-7013'}]);
+ const f=findings({reference_number:'12345678'},[{...invoice('i','0599','1234-5678'),bankgiro:'1234-5678'}]);
  assert.equal(f[0].safe,false);assert.match(f[0].reason,/eget Bankgironummer/);
 });
 
@@ -52,3 +52,39 @@ test('AIS null schema profile leaves duplicate and ISO type ambiguity incomplete
 });
 
 test('unknown reference extraction profiles fail closed',()=>{assert.throws(()=>extractPaymentReferences({reference_number:'000018',reference_number_schema:null},{profile:'unknown-future-profile'}),/profil/);});
+
+for(const [label,value,prefix] of [
+ ['OCR','000018x','000018'],['OCR','000018.9','000018'],['OCR','000018/99','000018'],
+ ['Fakturanr','00606.9','00606'],['Fakturanr','AB/00606.9','AB/00606'],
+ ['OCR','000018,9','000018'],['OCR','000018;99','000018'],
+ ['Fakturanr','00606,9','00606'],['Fakturanr','00606;99','00606'],
+ ['OCR','000018, 9','000018'],['OCR','000018; 99','000018'],
+ ['Fakturanr','00606, 9','00606'],['Fakturanr','00606; 99','00606'],
+])test('complete labelled payment token prevents prefix matching: '+value,()=>{
+ const message=label+':'+value,raw={message},evidence=extractPaymentReferences(raw);
+ const result=findings(raw,[invoice('i',label==='OCR'?'0599':prefix,label==='OCR'?prefix:'1234567897')]);
+ assert.equal(result.length,1);assert.equal(result[0].safe,false);
+ assert.ok(!evidence.candidates.some(candidate=>candidate.value===prefix));
+ const retained=evidence.candidates.find(candidate=>candidate.value===value);
+ assert.ok(retained,'Malformed complete token remains available for review');
+ assert.equal(retained.rawValue,message);assert.equal(retained.source,'$.message');
+ assert.ok(evidence.incomplete||retained.validity==='checksum_invalid');
+ assert.ok(evidence.warnings.length>0);
+});
+
+test('valid adjacent labelled references keep exact values and can match safely',()=>{
+ for(const message of ['OCR: 000018 Fakturanr: 0599','Fakturanr: 0599 OCR: 000018','OCR: 000018; Fakturanr: 0599','OCR: 000 018, Fakturanr: 0599']){
+  const evidence=extractPaymentReferences({message});
+  assert.equal(evidence.incomplete,false);assert.deepEqual(evidence.warnings,[]);
+  assert.deepEqual(new Set(matchingReferenceValues(evidence)),new Set([message.includes('000 018')?'000 018':'000018','0599']));
+  const result=findings({message},[invoice('i','0599','000018')]);assert.equal(result.length,1);assert.equal(result[0].safe,true);
+ }
+});
+
+test('comma and semicolon before neighboring labels delimit valid references',()=>{
+ for(const message of ['OCR: 000018, Fakturanr: 00606','OCR: 000018; Fakturanr: 00606','OCR:000018,Fakturanr:00606','OCR:000018;Fakturanr:00606']){
+  const evidence=extractPaymentReferences({message});assert.equal(evidence.incomplete,false);assert.deepEqual(evidence.warnings,[]);
+  assert.deepEqual(new Set(matchingReferenceValues(evidence)),new Set(['000018','00606']));
+  const result=findings({message},[invoice('i','00606','000018')]);assert.equal(result.length,1);assert.equal(result[0].safe,true);
+ }
+});

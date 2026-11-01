@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
-import {context,invoiceText,columnInvoice,adjacentOcr,hyphenDates,ambiguousHeaderCases,percentVat,identityCases,dateCases,moneyCases,invoicePdf} from '../../test/helpers/invoice-parser-corpus.mjs';
+import {context,invoiceText,columnInvoice,adjacentOcr,hyphenDates,ambiguousHeaderCases,percentVat,identityCases,dateCases,moneyCases,exactFieldCases,exactFieldPositiveCases,invoicePdf} from '../../test/helpers/invoice-parser-corpus.mjs';
 import {serverPdfText} from '../lib/server-pdf.ts';
 
 const file=path=>new URL(path,import.meta.url).href;
@@ -29,6 +29,17 @@ for(const item of dateCases)test('Q8 Sites synthetic Swedish invoice date: '+ite
 for(const item of moneyCases)test('Q8 Sites synthetic invoice money unit: '+item.name,()=>{
  const result=interpretInvoice(item.text,context);
  assert.notEqual(result.level,'green');assert.equal(result.fields.vat_cents.value,null);assert.equal(result.text_excerpt,item.text);
+});
+
+for(const item of exactFieldCases)test('exact invoice field must remain reviewable: '+item.name,()=>{
+ const result=interpretInvoice(item.text,context);
+ assert.notEqual(result.level,'green');for(const field of item.fields||[item.field])assert.equal(result.fields[field].value,null);assert.equal(result.text_excerpt,item.text);
+});
+for(const item of exactFieldPositiveCases)test('exact invoice field preserves ordinary evidence: '+item.name,()=>{
+ const result=interpretInvoice(item.text,context);
+ assert.equal(result.level,'green');assert.equal(result.fields.invoice_number.value,item.number);assert.equal(result.fields.reference.value,item.reference);assert.equal(result.fields.total_cents.value,375000);
+ assert.equal(result.fields.organization_number.value,'5560160680');assert.equal(result.fields.bankgiro.value,'123-4567');
+ for(const [field,evidence]of Object.entries(item.evidence||{}))assert.equal(result.fields[field].evidence,evidence);
 });
 
 class MemoryD1{
@@ -80,7 +91,7 @@ test('Q8 actual Sites PDF pipeline never assigns invoice/OCR roles from content-
 
 test('Q8 actual Sites PDFs with punctuated or multiline heading lists remain unregistered',async t=>{
  for(const item of ambiguousHeaderCases){
-  const f=await fixture(t),doc=f.add(item.text);await f.processing.processDocuments(f.owner);
+  const f=await fixture(t),doc=f.add(item.text,undefined,item.pdfOptions);await f.processing.processDocuments(f.owner);
   const job=f.sql.prepare('SELECT state,extraction FROM document_jobs WHERE document_id=?').get(doc.id),result=JSON.parse(job.extraction);
   assert.equal(result.method,'pdf');assert.equal(job.state,'needs_review',item.name);assert.equal(result.fields.invoice_number.value,null,item.name);assert.equal(result.fields.reference.value,null,item.name);assert.equal(f.invoices().length,0,item.name);
  }
@@ -111,4 +122,17 @@ test('Q8 actual Sites PDF pipeline preserves credit and inconsistent VAT review 
   const f=await fixture(t),doc=f.add(text);await f.processing.processDocuments(f.owner);
   assert.equal(f.invoices().length,0);assert.equal(f.sql.prepare('SELECT state FROM document_jobs WHERE document_id=?').get(doc.id).state,'needs_review');
  }
+});
+
+for(const item of exactFieldCases)test('actual Sites PDF cannot auto-register uncertain full fields: '+item.name,async t=>{
+ const f=await fixture(t),doc=f.add(item.text,undefined,item.pdfOptions);await f.processing.processDocuments(f.owner);
+ const job=f.sql.prepare('SELECT state,extraction FROM document_jobs WHERE document_id=?').get(doc.id),result=JSON.parse(job.extraction);
+ assert.equal(result.method,'pdf');assert.equal(job.state,'needs_review');for(const field of item.fields||[item.field])assert.equal(result.fields[field].value,null);assert.equal(f.invoices().length,0);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);assert.deepEqual(f.objects.get(f.owner+'/'+doc.id),doc.bytes);
+});
+for(const item of exactFieldPositiveCases)test('actual Sites PDF registers exact full fields: '+item.name,async t=>{
+ const f=await fixture(t);f.add(item.text);await f.processing.processDocuments(f.owner);
+ assert.equal(f.invoices().length,1);assert.equal(f.invoices()[0].number,item.number);assert.equal(f.invoices()[0].ocr,item.reference);assert.equal(f.invoices()[0].total,375000);
+ const result=JSON.parse(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction);
+ for(const [field,evidence]of Object.entries(item.evidence||{}))assert.equal(result.fields[field].evidence,evidence);
 });

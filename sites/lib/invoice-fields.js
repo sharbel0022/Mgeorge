@@ -6,7 +6,7 @@ const validInvoiceIdentifier=value=>/^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,79}$/u.test(
 function normalizeInvoiceLayout(input){
   const original=String(input||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
   const warnings=[];
-  let text=original.replace(/(faktura\s*(?:nummer|nr)|invoice\s*(?:number|no))([ \t.:#-]*)([0-9][0-9 \t]*)(?=\n|$)/gi,(_,label,sep,value)=>label+sep+value.replace(/[ \t]/g,''));
+  let text=original;
   text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.replace(/[ \t]/g,''));
   text=text.replace(/([,.])[ \t]+(?=\d{2}\b)/g,'$1');
   // PDF drawing order can differ from the visible column order. Text alone
@@ -56,51 +56,91 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
   const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
-  const grab=(key,re,convert=s=>s.trim(),labels=null)=>{
-    const matches=[...text.matchAll(re)],converted=matches.map(m=>convert(m[1]));
-    // A valid occurrence cannot erase another labelled but unreadable value.
-    const matchedPositions=new Set(matches.map(m=>m.index));
-    if(converted.some(v=>v==null)||labels&&[...text.matchAll(labels)].some(m=>!matchedPositions.has(m.index))){
+  const record=(key,matches,convert=s=>s.trim(),invalid=false)=>{
+    const values=matches.map(m=>convert(m.value,m.label));
+    if(invalid||values.some(value=>value==null)){
       issues.push(`Ogiltigt värde för ${titles[key]}. Kontrollera samtliga märkta värden i originalet.`);
       return;
     }
-    const values=converted.filter(v=>v!=null);
     const distinct=[...new Set(values)];
-    if(distinct.length===1)set(key,distinct[0],matches[0][0]);
+    if(distinct.length===1)set(key,distinct[0],matches[0].evidence);
     else if(distinct.length>1)issues.push(`Motstridiga värden för ${titles[key]}; dokumentet kan innehålla flera fakturor.`);
-    else if(matches.length)issues.push(`Ogiltigt värde för ${titles[key]}.`);
   };
-  // Validate the entire token, including every labelled occurrence. Never
-  // silently truncate an identifier or ignore an unreadable second value.
-  grab('invoice_number',new RegExp(invoiceNumberLabel+'\\s*[.:#-]*\\s*(\\S+)','giu'),value=>validInvoiceIdentifier(value)?value:null,new RegExp(invoiceNumberLabel,'gi'));
+  const grab=(key,re,convert=s=>s.trim(),labels=null)=>{
+    const matches=[...text.matchAll(re)],positions=new Set(matches.map(m=>m.index));
+    record(key,matches.map(m=>({value:m[1],evidence:m[0]})),convert,!!labels&&[...text.matchAll(labels)].some(m=>!positions.has(m.index)));
+  };
+  const referenceLabel='(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)';
+  // A following explicit field label separates values on the same line. Other
+  // trailing content remains part of the value and must pass full validation.
+  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|bankgirokonto|bankgiro|bg|fakturadatum|invoice[ \\t]*date|förfallodatum|förfallodag|due[ \\t]*date|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms|total moms|moms(?:belopp)?|VAT|netto(?:belopp)?|totalt netto|net amount|valuta|currency)';
+  const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$))','iu');
+  const grabFull=(key,label,convert)=>{
+    const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency';
+    const suffix=invoiceLabel?'':currencyLabel?'(?=[\\s.:#-]|$)':'(?=[\\s.:#]|$)',separator=invoiceLabel||currencyLabel?'[:.#-]':'[:.#]';
+    const re=new RegExp('(?<![\\p{L}\\p{N}/_-])'+label+suffix+'[ \\t]*'+separator+'?[ \\t]*','giu'),matches=[];
+    for(const match of text.matchAll(re)){
+      let start=match.index+match[0].length;
+      // A value may be printed immediately below its label, but never borrow
+      // the next heading as a missing value.
+      if(text[start]==='\n')start++;
+      const end=text.indexOf('\n',start),line=text.slice(start,end<0?text.length:end);
+      const boundary=line.search(sibling),value=(boundary<0?line:line.slice(0,boundary)).trim();
+      matches.push({label:match[0],value,evidence:match[0]+(text[start-1]==='\n'?'\n':'')+value});
+    }
+    record(key,matches,convert);
+    return matches.length>0;
+  };
+  const compactDigits=value=>/^\d(?:[ \t]+\d)+$/.test(value)?value.replace(/[ \t]/g,''):value;
+  // Only character-spaced digits are unambiguous. Two complete identifiers
+  // must not be concatenated or reduced to a valid prefix.
+  grabFull('invoice_number',invoiceNumberLabel,value=>{const token=compactDigits(value);return validInvoiceIdentifier(token)?token:null;});
   grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{4})(?![\p{L}\p{N}./_-])/giu,invoiceDate,/(?:fakturadatum|faktureringsdatum|invoice\s*date)/gi);
   grab('due_at',/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{4})(?![\p{L}\p{N}./_-])/giu,invoiceDate,/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)/gi);
   // A percentage is a rate, never an explicitly stated monetary amount.
-  const amount='(-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|\\d[\\d \\t\\u00a0]*(?:[.,]\\d{1,2})?))(?![\\p{L}\\p{N}.,/_-]|\\s*%)(?:[ \\t]*(?:SEK|kr))?';
-  const money=s=>{try{return parseMoney(s);}catch{return null;}};
+  // Validate lexical groups before parseMoney removes whitespace. Several
+  // integer columns or character-spaced amounts must not become one number.
+  const amount='-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|(?:\\d+|\\d{1,3}(?: \\d{3})+)(?:[.,]\\d{1,2})?)';
+  const monetary=new RegExp('^(?:SEK[ \\t]*)?('+amount+')(?:[ \\t]*(?:SEK|kr))?$','iu');
+  const money=s=>{const match=s.match(monetary);if(!match)return null;try{return parseMoney(match[1]);}catch{return null;}};
   const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)';
-  const vatLabel='(?:^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)';
-  const netLabel='(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?:^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount))';
-  grab('total_cents',new RegExp(totalLabel+'\\s*[:.]?\\s*(?:SEK\\s*)?'+amount,'giu'),money,new RegExp(totalLabel,'gi'));
-  grab('vat_cents',new RegExp(vatLabel+'\\s*[:.]?\\s*'+amount,'giu'),money,new RegExp(vatLabel,'gi'));
-  grab('net_cents',new RegExp(netLabel+'\\s*[:.]?\\s*'+amount,'giu'),money,new RegExp(netLabel,'gi'));
-  grab('reference',/(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)\s*[:.]?\s*([\p{L}\p{N}][\p{L}\p{N} /_-]{0,119})/giu);
+  // Inline monetary labels require a colon. Words inside net/total labels
+  // and ordinary VAT-rate prose are not separate monetary fields.
+  const vatLabel='(?:(?<=^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)|(?<!(?:före|exklusive|inklusive|inkl\\.?|exkl\\.?)[ \\t]+)(?:total moms|moms(?:belopp)?|VAT)(?=[ \\t]*:))';
+  const netLabel='(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?<=^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount)|(?:totalt netto|netto(?:belopp)?|net amount)(?=[ \\t]*:))';
+  grabFull('total_cents',totalLabel,money);
+  grabFull('vat_cents',vatLabel,money);
+  grabFull('net_cents',netLabel,money);
+  grabFull('reference',referenceLabel,(value,label)=>{
+    const token=compactDigits(value);
+    if(/^OCR/i.test(label))return /^\d{1,120}$/.test(token)?token:null;
+    return /^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,119}$/u.test(token)?token:null;
+  });
   if(layout.ambiguousInvoiceColumns){set('invoice_number',null,null,0);set('reference',null,null,0);}
-  grab('bankgiro',/\b(?:bankgirokonto|bankgiro|bg)\s*[:.]?\s*(\d{3,4}[ -]\d{4})(?![\p{L}\p{N}/_-])/giu,s=>s.replace(/ /g,'-'),/\b(?:bankgirokonto|bankgiro|bg)\b/gi);
+  grabFull('bankgiro','(?:bankgirokonto|bankgiro|bg)',value=>{
+    const match=value.match(/^(\d{3,4})(?:[ \t]*[-\u2010-\u2015\u2212][ \t]*|[ \t]+)(\d{4})$/u);
+    return match?match[1]+'-'+match[2]:null;
+  });
   if(fields.invoice_number.value&&validDate(fields.invoice_number.value)){issues.push('Fakturanumret ser ut som ett datum. Kontrollera originalets kolumner.');set('invoice_number',null,fields.invoice_number.evidence,0);}
   const wholeText=text;
   if(direction==='customer'&&/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i.test(text))text=text.split(/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i).slice(1).join('\n').split(/Tilläggsinformation|Betalningsuppgifter/i)[0];
-  grab('organization_number',/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)\s*[:.]?\s*(\d{6}[-– ]?\d{4})(?![\p{L}\p{N}/_-])/giu,s=>validOrganization(s.replace(/–/g,'-'))?s.replace(/[-– ]/g,''):null,/(?:org(?:anisations)?\.?\s*(?:nr|nummer)|organisation number)/gi);
+  grabFull('organization_number','(?:org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number)',value=>{
+    const match=value.match(/^(\d{6})(?:[ \t]*[-\u2010-\u2015\u2212][ \t]*|[ \t]+)?(\d{4})$/u),number=match?match[1]+match[2]:null;
+    return number&&validOrganization(number)?number:null;
+  });
   const partyLabel=direction==='customer'?'kund|fakturamottagare|företags\\s*namn|customer|bill to':'leverantör|utställare|säljare|supplier|seller';
   grab('party',new RegExp('(?:^|\\n)[ \\t]*(?:'+partyLabel+')\\s*:[ \\t]*([^\\n]{2,240})','gi'));
   text=wholeText;
   if(['customer','supplier'].includes(direction))set('direction',direction,'Föreslagen från mejlets riktning',direction_confident?.94:.5);
   const kind=/kreditfaktura|credit\s*(?:invoice|note)/i.test(text)?'credit':/\bkvitto\b|\breceipt\b/i.test(text)?'receipt':/\bfaktura\b|\binvoice\b|fakturanr/i.test(text)?'invoice':'other';
   set('kind',kind,text.match(/kreditfaktura|credit\s*(?:invoice|note)|kvitto|receipt|faktura|invoice/i)?.[0]);
-  const currencies=[...new Set(text.match(/\b(?:SEK|EUR|USD|GBP|NOK|DKK)\b/g)||[])];
-  if(currencies.length===1)set('currency',currencies[0],currencies[0]);
-  else if(!currencies.length&&/\bkr\b/i.test(text))set('currency','SEK','kr',.7);
-  if(currencies.length>1)issues.push('Flera valutor finns i underlaget.');
+  // Explicit currency labels are a separate census. A valid inline SEK
+  // token cannot erase an unreadable label or a known prefix followed by junk.
+  const explicitCurrency=grabFull('currency','(?:valuta|currency)',value=>/^(?:SEK|EUR|USD|GBP|NOK|DKK)$/i.test(value)?value.toUpperCase():null);
+  const currencies=[...new Set((text.match(/\b(?:SEK|EUR|USD|GBP|NOK|DKK)\b/gi)||[]).map(value=>value.toUpperCase()))];
+  if(!explicitCurrency&&currencies.length===1)set('currency',currencies[0],currencies[0]);
+  else if(!explicitCurrency&&!currencies.length&&/\bkr\b/i.test(text))set('currency','SEK','kr',.7);
+  if(currencies.length>1){set('currency',null,null,0);issues.push('Flera valutor finns i underlaget.');}
   if(kind==='credit')for(const k of ['total_cents','net_cents','vat_cents'])if(fields[k].value!==null)fields[k].value=Math.abs(fields[k].value);
   const values=Object.fromEntries(fieldNames.map(k=>[k,fields[k].value]));
   issues.push(...validateInvoiceValues(values));

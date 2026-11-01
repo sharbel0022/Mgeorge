@@ -289,7 +289,11 @@ export async function workerAction(req:Request,action:string){
       await failJob(owner,job,'original_integrity');
       return response({error:'Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före ny tolkning.'},409);
     }
-    const result=await finish(owner,job,body);
+    // This endpoint leases OCR work, including PDFs that server extraction
+    // could not read. A worker's method claim cannot prove native PDF text:
+    // only serverPdfText's original-byte processing grants that provenance.
+    // Keep legacy PDF worker completions compatible, under the OCR cap.
+    const result=await finish(owner,job,{text:body.text,method:'ocr',confidence:body.confidence});
     if(mode==='cloud'&&!('ignored' in result)){
       try{await db().prepare('UPDATE document_automation SET cloud_worker_completed=? WHERE owner=?').bind(now(),owner).run();}
       catch{return response({...result,metadata_warning:METADATA_WARNING});}

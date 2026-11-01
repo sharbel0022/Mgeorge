@@ -6,27 +6,29 @@ import {createHash} from 'node:crypto';
 import ts from 'typescript';
 import {emptyState} from '../lib/domain.ts';
 import {randomToken} from '../lib/banking/security.ts';
+import {serverPdfText} from '../lib/server-pdf.ts';
 import {runSitesOcr} from '../../src/sites-ocr-pull.js';
-import {image as syntheticInvoiceImage} from '../../test/fixtures.js';
+import {image as syntheticInvoiceImage,pdf} from '../../test/fixtures.js';
 
 const read=p=>readFileSync(new URL(p,import.meta.url),'utf8');
 const data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
+const validInvoiceText='Faktura\nFakturanummer: 0007\nLeverantör: Exempelbolaget AB\nOrg.nr: 556016-0680\nFakturadatum: 24/10/2026\nFörfallodag: 07/11/2026\nBelopp före moms: 2 500,00 SEK\nTotal moms: 625,00 SEK\nSumma att betala: 3 125,00 SEK\nBankgiro: 123-4567';
 class D1 {
   constructor(sql){this.sql=sql;}
   prepare(query){const db=this.sql;return {args:[],bind(...args){this.args=args;return this;},async first(){return db.prepare(query).get(...this.args)||null;},async all(){return {results:db.prepare(query).all(...this.args)};},async run(){return this.execute();},execute(){return {meta:{changes:Number(db.prepare(query).run(...this.args).changes)}};}};}
   async batch(rows){this.sql.exec('BEGIN');try{const out=rows.map(row=>row.execute());this.sql.exec('COMMIT');return out;}catch(e){this.sql.exec('ROLLBACK');throw e;}}
 }
-async function fixture(t){
+async function fixture(t,{nativePdf=false}={}){
   const sql=new DatabaseSync(':memory:');
   for(const file of readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())sql.exec(read('../drizzle/'+file));
   const key='__cloud_ocr_'+crypto.randomUUID().replaceAll('-',''),owner='synthetic-owner';
-  const f={sql,owner,objects:new Map(),pdfCalls:0,env:{DOCUMENT_CLOUD_OCR_ENABLED:'true',DOCUMENT_CLOUD_WORKER_TOKEN:randomToken(),DOCUMENT_WORKER_TOKEN:randomToken(),DOCUMENT_OWNER_EMAIL:'owner@example.test'}};
+  const f={sql,owner,objects:new Map(),pdfCalls:0,parsePdf:nativePdf?serverPdfText:async()=>{throw Error('local_ocr_required');},env:{DOCUMENT_CLOUD_OCR_ENABLED:'true',DOCUMENT_CLOUD_WORKER_TOKEN:randomToken(),DOCUMENT_WORKER_TOKEN:randomToken(),DOCUMENT_OWNER_EMAIL:'owner@example.test'}};
   f.db=new D1(sql);f.env.BUCKET={get:async key=>{const bytes=f.objects.get(key);return bytes?{size:bytes.length,body:bytes,arrayBuffer:async()=>Uint8Array.from(bytes).buffer}:null;}};
   globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
   const ref=`globalThis[${JSON.stringify(key)}]`,domain=new URL('../lib/domain.ts',import.meta.url).href;
   const server=data(`import {emptyState} from ${JSON.stringify(domain)};const f=${ref};export const db=()=>f.db;export const response=(body,status=200)=>Response.json(body,{status});export const identity=async()=>({userId:f.owner,email:'owner@example.test'});export const readWorkspace=async owner=>{const row=f.sql.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').get(owner);return row?{revision:row.revision,state:JSON.parse(row.payload)}:{revision:0,state:emptyState()};};`);
   const fields=data(read('../lib/invoice-fields.js').replace("'./domain'",JSON.stringify(domain)).replace("'./document-triage.js'",JSON.stringify(new URL('../lib/document-triage.js',import.meta.url).href)));
-  const imports={'cloudflare:workers':data(`export const env=${ref}.env;`),'./server':server,'./domain':domain,'./banking/security':new URL('../lib/banking/security.ts',import.meta.url).href,'./invoice-fields.js':fields,'./server-pdf':data(`export async function serverPdfText(){${ref}.pdfCalls++;throw Error('local_ocr_required');}`),'./customer-messages':data("export async function reconcileAndPrepare(){throw Error('Unexpected automatic registration');}")};
+  const imports={'cloudflare:workers':data(`export const env=${ref}.env;`),'./server':server,'./domain':domain,'./banking/security':new URL('../lib/banking/security.ts',import.meta.url).href,'./invoice-fields.js':fields,'./server-pdf':data(`export async function serverPdfText(bytes){${ref}.pdfCalls++;return ${ref}.parsePdf(bytes);}`),'./customer-messages':data("export async function reconcileAndPrepare(){throw Error('Unexpected automatic registration');}")};
   let source=ts.transpileModule(read('../lib/document-processing.ts'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
   for(const [name,url] of Object.entries(imports))for(const q of ['"',"'"])source=source.replaceAll(q+name+q,JSON.stringify(url));
   f.api=await import(data(source));
@@ -46,6 +48,57 @@ async function fixture(t){
   f.complete=(job,extra={})=>f.call('complete',{id:job.id,lease:job.lease,sha256:job.sha256,method:'ocr',confidence:90,text:'Faktura 0599\nTotalt att betala 625,00 SEK',...extra});
   return f;
 }
+
+function enableTrustedAutomation(f){
+  f.sql.prepare('UPDATE document_automation SET auto_register=1').run();
+  f.sql.prepare('UPDATE gmail_sources SET metadata=?').run(JSON.stringify({direction:'supplier',direction_confident:true,subject:'Synthetic invoice',from:'supplier@example.test'}));
+  f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,f.api.counterpartyKey('supplier','Exempelbolaget AB','5560160680'),'supplier@example.test','123-4567','Explicitly verified synthetic original and counterparty','2026-01-01');
+}
+
+test('verified native PDF original retains server extraction confidence and automatic registration',async t=>{
+  const f=await fixture(t,{nativePdf:true}),doc=f.add('native-pdf','application/pdf');enableTrustedAutomation(f);
+  const stream='BT /F1 14 Tf 40 780 Td 22 TL\n'+validInvoiceText.split('\n').map((line,n)=>(n?'T* ':'')+'('+line.replace(/[()\\]/g,'\\$&')+') Tj').join('\n')+'\nET';
+  const bytes=pdf(['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',`<< /Length ${Buffer.byteLength(stream,'latin1')} >>\nstream\n${stream}\nendstream`]);
+  f.objects.set(f.owner+'/'+doc.id,bytes);f.sql.prepare('UPDATE documents SET size=?,sha256=? WHERE id=?').run(bytes.length,createHash('sha256').update(bytes).digest('hex'),doc.id);
+  const result=await f.api.processDocuments(f.owner);assert.equal(result.processed,1);
+  const job=f.sql.prepare('SELECT * FROM document_jobs').get(),extraction=JSON.parse(job.extraction);
+  assert.equal(job.state,'registered',JSON.stringify(extraction.issues));assert.equal(job.automatic,1);assert.equal(extraction.method,'pdf');assert.equal(extraction.fields.invoice_number.confidence,.96);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,1);
+  const workspace=JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload);assert.equal(workspace.invoices.length,1);assert.equal(workspace.invoices[0].number,'0007');assert.equal(workspace.invoices[0].total,312500);assert.equal(workspace.allocations.length,0);
+  assert.deepEqual(f.objects.get(f.owner+'/'+doc.id),bytes);
+});
+
+for(const mode of ['cloud','local'])for(const [method,confidence] of [['pdf',0],['pdf',99],['ocr',0],['ocr',99]])test(`${mode} image completion cannot promote ${method}/${confidence} into trusted PDF registration`,async t=>{
+  const f=await fixture(t),doc=f.add();enableTrustedAutomation(f);const job=await f.lease(mode);
+  const completed=await f.call('complete',{...job,text:validInvoiceText,method,confidence},mode);
+  assert.equal(completed.status,200);const outcome=await completed.json();assert.notEqual(outcome.registered,true);assert.equal(outcome.state,'needs_review');
+  const row=f.sql.prepare('SELECT * FROM document_jobs').get(),extraction=JSON.parse(row.extraction);
+  assert.equal(extraction.method,'ocr');assert.equal(extraction.fields.invoice_number.value,'0007');assert.equal(extraction.fields.total_cents.value,312500);
+  assert.equal(extraction.fields.invoice_number.confidence,confidence===0?0:.85);assert.equal(row.automatic,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  assert.deepEqual(f.objects.get(f.owner+'/'+doc.id),doc.bytes);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
+  assert.equal((await f.call('complete',{...job,text:validInvoiceText,method,confidence},mode)).status,409);
+});
+
+test('PDF returned to the OCR queue accepts worker PDF text only at OCR confidence',async t=>{
+  const f=await fixture(t),doc=f.add('queued-pdf','application/pdf');enableTrustedAutomation(f);
+  const processed=await (await f.call('process')).json();assert.equal(processed.waiting,1);
+  const job=await f.lease();assert.equal(job.mime,'application/pdf');
+  const outcome=await (await f.complete(job,{method:'pdf',confidence:0,text:validInvoiceText})).json();assert.notEqual(outcome.registered,true);assert.equal(outcome.state,'needs_review');
+  const extraction=JSON.parse(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction);
+  assert.equal(extraction.method,'ocr');assert.equal(extraction.fields.invoice_number.confidence,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  assert.deepEqual(f.objects.get(f.owner+'/'+doc.id),doc.bytes);
+});
+
+for(const method of [undefined,null,'unknown','PDF'])test(`worker completion rejects missing or unknown method ${String(method)} before saving evidence`,async t=>{
+  const f=await fixture(t);f.add();enableTrustedAutomation(f);const job=await f.lease();
+  assert.equal((await f.complete(job,{method,confidence:0,text:validInvoiceText})).status,400);
+  assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'processing');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  assert.equal((await (await f.complete(job,{confidence:0,text:validInvoiceText})).json()).state,'needs_review');
+});
 
 for(const [label,offset,local,cloud] of [
   ['future by a millisecond',1,false,false],['future by a day',86400000,false,false],['future by ten years',315360000000,false,false],

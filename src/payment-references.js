@@ -52,11 +52,17 @@ export function extractPaymentReferences(raw, {sourcePrefix = '$', profile = 'le
   };
   const labelled = (value, source) => {
     // Boundaries preserve AB/12, hyphens and leading zeros. Never guess from bare dates or amounts.
-    const pattern = /(?:^|[\s,;])(?:faktura(?:nummer|\s*nr\.?)?|invoice(?:\s*(?:no\.?|number))?)\s*[:#]?\s*([\p{L}\p{N}][\p{L}\p{N}/_-]*)/giu;
+    const pattern = /(?:^|[\s,;])(?:faktura(?:nummer|\s*nr\.?)?|invoice(?:\s*(?:no\.?|number))?)\s*[:#]?\s*([^\s,;]+(?:[,;][ \t]*\d[^\s,;]*)*)/giu;
     for (const match of value.matchAll(pattern)) {
-      if (/\d/.test(match[1])) add(match[1], source, 'invoice', 80, value);
+      if (/\d/.test(match[1])) {
+        if (!/^[\p{L}\p{N}][\p{L}\p{N}/_-]*$/u.test(match[1])) incomplete = true;
+        add(match[1], source, 'invoice', 80, value);
+      }
     }
-    const ocr=/(?:^|[\s,;])OCR(?:[- ]?(?:nummer|referens))?\s*[:#]?\s*(\d[\d -]*\d|[\p{L}\p{N}][\p{L}\p{N}/_-]*)/giu;
+    // Capture the whole final token, including unsupported punctuation. A
+    // checksum-valid numeric prefix is never evidence for the supplied value.
+    // Comma/semicolon plus another number is ambiguous, not a label delimiter.
+    const ocr=/(?:^|[\s,;])OCR(?:[- ]?(?:nummer|referens))?\s*[:#]?\s*((?:\d+(?:[ -]+\d+)*[^\s,;]*|[^\s,;]+)(?:[,;][ \t]*\d[^\s,;]*)*)/giu;
     for(const match of value.matchAll(ocr))add(match[1],source,'ocr',80,value);
   };
   // XML-to-JSON readers retain repeated elements as arrays, including singleton

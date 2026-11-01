@@ -1,0 +1,1047 @@
+{
+  "schema": "mgeorge-exact-invoice-fields-v1",
+  "synthetic": true,
+  "sourceCommit": "dfd852666cf3462588a82797717822347602e196",
+  "sourceHashes": {
+    "src/invoice-extraction.js": "01d95566e6c371305285a3c48a55146fc43de391d91e1c0b18449f6edfedb92c",
+    "sites/lib/invoice-fields.js": "73a9a6beecf9c46e87dd6f7a1726b5a92e8b9b6d066def14f987803f37ee6b86"
+  },
+  "corpusSha256": "83aeb575ced6742928c4382637ef317e6f877d9e2b0f4262ba2a634fb931aef7",
+  "cases": 50,
+  "evaluations": 100,
+  "summary": {
+    "correct": 100,
+    "invalidGreen": 0,
+    "exactPositive": 42,
+    "positiveTotal": 42
+  },
+  "scope": "Deterministic labelled-text extraction only; synthetic rasters and real originals are separate evidence. Dirty source hashes identify actual measured code.",
+  "details": [
+    {
+      "engine": "node",
+      "name": "complete evidence integer amount columns",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence character-spaced integer amount",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence incorrect monetary thousand groups",
+      "expected": "hold",
+      "field": "net_cents",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence consistent integer amount columns",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence Bankgiro numeric suffix",
+      "expected": "hold",
+      "field": "bankgiro",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence organization numeric suffix",
+      "expected": "hold",
+      "field": "organization_number",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence unreadable duplicate Bankgiro",
+      "expected": "hold",
+      "field": "bankgiro",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence unreadable duplicate organization",
+      "expected": "hold",
+      "field": "organization_number",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence formatted organization checksum",
+      "expected": "hold",
+      "field": "organization_number",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "unreadable explicit currency label",
+      "expected": "hold",
+      "field": "currency",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "known explicit currency prefix with junk",
+      "expected": "hold",
+      "field": "currency",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "unreadable hyphen-delimited duplicate invoice identity",
+      "expected": "hold",
+      "field": "invoice_number",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "unreadable same-line explicit VAT label",
+      "expected": "hold",
+      "field": "vat_cents",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "unreadable same-line explicit net label",
+      "expected": "hold",
+      "field": "net_cents",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "two invoice identities on one line",
+      "expected": "hold",
+      "field": "invoice_number",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "two invoice identities in adjacent columns",
+      "expected": "hold",
+      "field": "invoice_number",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "unreadable second OCR",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "unreadable first OCR",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "literal unreadable OCR",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "OCR with alphabetic suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "OCR with decimal suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "OCR with slash suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "OCR with unsupported punctuation",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "OCR exceeding complete token limit",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "two OCR values without distinct labels",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "malformed generic reference suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "two totals without distinct labels",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "two totals in adjacent columns",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "mixed-case conflicting currency",
+      "expected": "hold",
+      "field": "currency",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary integer thousand groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary plain integers",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary decimal dots",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary dotted groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence formatted identifiers preserve raw evidence",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence identical identifier duplicates",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence same-line known identifier labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "net label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "net-exclusive label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "total label including VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "hyphen-delimited invoice identity",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "explicit valid currency label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "ordinary inline VAT rates and net prose",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "character-spaced invoice digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "character-spaced OCR digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "OCR before semicolon-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "OCR before pipe-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "OCR before same-line Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "generic reference preserves separators",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "AB/00606",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "same total before same-line OCR label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "node",
+      "name": "lowercase SEK is the same currency",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence integer amount columns",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence character-spaced integer amount",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence incorrect monetary thousand groups",
+      "expected": "hold",
+      "field": "net_cents",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence consistent integer amount columns",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence Bankgiro numeric suffix",
+      "expected": "hold",
+      "field": "bankgiro",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence organization numeric suffix",
+      "expected": "hold",
+      "field": "organization_number",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence unreadable duplicate Bankgiro",
+      "expected": "hold",
+      "field": "bankgiro",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence unreadable duplicate organization",
+      "expected": "hold",
+      "field": "organization_number",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence formatted organization checksum",
+      "expected": "hold",
+      "field": "organization_number",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable explicit currency label",
+      "expected": "hold",
+      "field": "currency",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "known explicit currency prefix with junk",
+      "expected": "hold",
+      "field": "currency",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable hyphen-delimited duplicate invoice identity",
+      "expected": "hold",
+      "field": "invoice_number",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable same-line explicit VAT label",
+      "expected": "hold",
+      "field": "vat_cents",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable same-line explicit net label",
+      "expected": "hold",
+      "field": "net_cents",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "two invoice identities on one line",
+      "expected": "hold",
+      "field": "invoice_number",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "two invoice identities in adjacent columns",
+      "expected": "hold",
+      "field": "invoice_number",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable second OCR",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable first OCR",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "literal unreadable OCR",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with alphabetic suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with decimal suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with slash suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with unsupported punctuation",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "OCR exceeding complete token limit",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "two OCR values without distinct labels",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "malformed generic reference suffix",
+      "expected": "hold",
+      "field": "reference",
+      "correct": true,
+      "level": "yellow",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "two totals without distinct labels",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "two totals in adjacent columns",
+      "expected": "hold",
+      "field": "total_cents",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "mixed-case conflicting currency",
+      "expected": "hold",
+      "field": "currency",
+      "correct": true,
+      "level": "red",
+      "actual": null
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary integer thousand groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary plain integers",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary decimal dots",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary dotted groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence formatted identifiers preserve raw evidence",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence identical identifier duplicates",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence same-line known identifier labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "net label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "net-exclusive label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "total label including VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "hyphen-delimited invoice identity",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "explicit valid currency label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "ordinary inline VAT rates and net prose",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "character-spaced invoice digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "character-spaced OCR digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "OCR before semicolon-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "OCR before pipe-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "OCR before same-line Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "generic reference preserves separators",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "AB/00606",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "same total before same-line OCR label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    },
+    {
+      "engine": "sites",
+      "name": "lowercase SEK is the same currency",
+      "expected": "exact",
+      "correct": true,
+      "level": "green",
+      "actual": {
+        "invoice_number": "0606",
+        "reference": "000018",
+        "total_cents": 375000
+      }
+    }
+  ]
+}

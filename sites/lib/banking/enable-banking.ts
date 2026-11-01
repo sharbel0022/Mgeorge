@@ -22,6 +22,7 @@ export type ProviderAccount = {
   all_account_ids?: { identification: string; scheme_name: string }[];
   identification_hash?: string; identification_hashes?: string[];
   name?: string; details?: string; currency?: string; usage?: 'ORGA' | 'PRIV';
+  cash_account_type?: string;
 };
 export type ProviderAccess = { valid_until: string; balances?: boolean; transactions?: boolean; accounts?: ProviderAccountIdentification[] };
 export type ProviderSession = {
@@ -55,6 +56,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SESSION_PATH = /^\/sessions\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TRANSACTIONS_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/transactions$/i;
 const TRANSACTION_DETAIL_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/transactions\/[^/]+$/i;
+const ACCOUNT_DETAIL_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/details$/i;
 
 export class ProviderError extends Error {
   code: string;
@@ -77,10 +79,14 @@ function checkedUrl(path: string, method: string): URL {
   const url = new URL(path, API_ORIGIN);
   if (url.origin !== API_ORIGIN || url.username || url.password || url.hash) throw invalid();
   let allowedKeys: string[] = [];
+  // Account evidence uses an exact no-query route. Reject even an empty query
+  // or normalized traversal spelling rather than broadening this new surface.
+  if (ACCOUNT_DETAIL_PATH.test(url.pathname) && (path !== url.pathname || method !== 'GET')) throw invalid();
   if (method === 'GET' && url.pathname === '/application') { /* no query */ }
   else if (method === 'GET' && url.pathname === '/aspsps') allowedKeys = ['country', 'psu_type', 'service'];
   else if (method === 'POST' && (url.pathname === '/auth' || url.pathname === '/sessions')) { /* no query */ }
   else if ((method === 'GET' || method === 'DELETE') && SESSION_PATH.test(url.pathname)) { /* no query */ }
+  else if (method === 'GET' && ACCOUNT_DETAIL_PATH.test(url.pathname)) { /* no query */ }
   else if (method === 'GET' && TRANSACTIONS_PATH.test(url.pathname)) allowedKeys = ['date_from', 'date_to', 'transaction_status', 'continuation_key'];
   else if (method === 'GET' && TRANSACTION_DETAIL_PATH.test(url.pathname)) {
     let id:string;try{id=decodeURIComponent(url.pathname.split('/').pop()||'');}catch{throw invalid();}
@@ -278,6 +284,19 @@ export async function getSession(config: ProviderConfig, sessionId: string): Pro
     !stringArray(result.accounts) || result.accounts.some(id => !UUID.test(id)) || !Array.isArray(result.accounts_data) ||
     !record(result.access) || typeof result.access.valid_until !== 'string' || !Number.isFinite(Date.parse(result.access.valid_until))) throw invalidResponse();
   return result;
+}
+
+/** Official AccountResource read, never an account search or identifier guess.
+ * https://enablebanking.com/docs/api/reference/#get-account-details */
+export async function getAccountDetails(config:ProviderConfig,accountUid:string):Promise<ProviderAccount>{
+ if(typeof accountUid!=='string'||!UUID.test(accountUid))throw invalid();
+ const result=await providerRequest<ProviderAccount>(config,`/accounts/${accountUid}/details`);
+ const generic=(value:unknown)=>record(value)&&typeof value.identification==='string'&&!!value.identification.trim()&&value.identification.length<=80&&!/[\u0000-\u001f\u007f]/.test(value.identification)&&typeof value.scheme_name==='string'&&/^[A-Z][A-Z0-9_]{0,34}$/.test(value.scheme_name)&&(value.scheme_name!=='IBAN'||/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(value.identification.replace(/[\s-]/g,'').toUpperCase()));
+ const primary=result.account_id;
+ if(!record(result)||typeof result.currency!=='string'||!/^[A-Z]{3}$/.test(result.currency)||typeof result.cash_account_type!=='string'||!/^[A-Z0-9]{1,35}$/.test(result.cash_account_type)||!record(primary)||
+  primary.iban===undefined&&primary.other===undefined||primary.iban!==undefined&&(typeof primary.iban!=='string'||!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(primary.iban))||primary.other!==undefined&&!generic(primary.other)||
+  result.uid!==undefined&&(typeof result.uid!=='string'||result.uid!==accountUid)||result.all_account_ids!==undefined&&(!Array.isArray(result.all_account_ids)||result.all_account_ids.length>50||!result.all_account_ids.every(generic)))throw invalidResponse();
+ return result;
 }
 
 export async function deleteSession(config: ProviderConfig, sessionId: string): Promise<{ message?: string }> {

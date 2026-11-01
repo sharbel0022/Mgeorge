@@ -1,0 +1,811 @@
+{
+  "schema": "mgeorge-complete-payment-tokens-v1",
+  "synthetic": true,
+  "sourceCommit": "dfd852666cf3462588a82797717822347602e196",
+  "corpusSha256": "0f09ed6e9eeade8a55cfb7aab327c3d0702f33bd8e3dc042efef35dc4a560a8c",
+  "sourceHashes": {
+    "src/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+    "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+    "src/reconciliation.js": "f333e46682de7a517a71d1cbe8596ec2640cb7a9396e1f132befd120f428527e",
+    "sites/lib/reconciliation-engine.js": "afcae459894ea3662abb54acfe22f169bb86db8bfaf73c5c8560e597b23650f2"
+  },
+  "cases": 20,
+  "evaluations": 40,
+  "summary": {
+    "correct": 40,
+    "falseSafe": 0,
+    "positiveSafe": 14,
+    "positiveTotal": 14
+  },
+  "scope": "Synthetic complete-token references through the real reconciliation engines; no original bank identity or real allocation is inferred.",
+  "details": [
+    {
+      "engine": "node",
+      "message": "OCR:000018x",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018x",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018.9",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018.9",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018/99",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018/99",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "Fakturanr:00606.9",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606.9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "Fakturanr:AB/00606.9",
+      "number": "AB/00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "AB/00606.9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018,9",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018,9",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018;99",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018;99",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "Fakturanr:00606,9",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606,9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "Fakturanr:00606;99",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606;99",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018, 9",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018, 9",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018; 99",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018; 99",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "Fakturanr:00606, 9",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606, 9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "Fakturanr:00606; 99",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606; 99",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "node",
+      "message": "OCR: 000018 Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "node",
+      "message": "Fakturanr: 00606 OCR: 000018",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "node",
+      "message": "OCR: 000018; Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "node",
+      "message": "OCR: 000 018, Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000 018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "node",
+      "message": "OCR: 000018, Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018,Fakturanr:00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "node",
+      "message": "OCR:000018;Fakturanr:00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018x",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018x",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018.9",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018.9",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018/99",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018/99",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "Fakturanr:00606.9",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606.9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "Fakturanr:AB/00606.9",
+      "number": "AB/00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "AB/00606.9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018,9",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018,9",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018;99",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018;99",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "Fakturanr:00606,9",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606,9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "Fakturanr:00606;99",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606;99",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018, 9",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018, 9",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018; 99",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018; 99",
+          "validity": "checksum_invalid"
+        }
+      ],
+      "warnings": [
+        "En uttrycklig OCR-referens har felaktig kontrollsiffra och behöver granskas."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "Fakturanr:00606, 9",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606, 9",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "Fakturanr:00606; 99",
+      "number": "00606",
+      "ocr": "1234567897",
+      "expectedSafe": false,
+      "safe": false,
+      "correct": true,
+      "incomplete": true,
+      "candidates": [
+        {
+          "value": "00606; 99",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": [
+        "Alla referensfält kunde inte analyseras inom säkerhetsgränsen. Granska bankoriginalet."
+      ]
+    },
+    {
+      "engine": "sites",
+      "message": "OCR: 000018 Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "sites",
+      "message": "Fakturanr: 00606 OCR: 000018",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "sites",
+      "message": "OCR: 000018; Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "sites",
+      "message": "OCR: 000 018, Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000 018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "sites",
+      "message": "OCR: 000018, Fakturanr: 00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018,Fakturanr:00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "engine": "sites",
+      "message": "OCR:000018;Fakturanr:00606",
+      "number": "00606",
+      "ocr": "000018",
+      "expectedSafe": true,
+      "safe": true,
+      "correct": true,
+      "incomplete": false,
+      "candidates": [
+        {
+          "value": "000018",
+          "validity": "checksum_valid"
+        },
+        {
+          "value": "00606",
+          "validity": "unchecked"
+        }
+      ],
+      "warnings": []
+    }
+  ]
+}

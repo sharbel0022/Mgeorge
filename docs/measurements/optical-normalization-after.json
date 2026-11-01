@@ -1,0 +1,1686 @@
+{
+  "generated_at": "2026-11-01T23:08:20.896Z",
+  "scope": "Reproducible synthetic cases, one invoice layout.11 text fields; context-derived direction excluded. Single process startup+extraction timing observation per case, not a benchmark.",
+  "normalization": "1.5x scale, ceil both axes, high-quality canvas interpolation; skip enlargement when rounded result would exceed12M pixels. Color and grayscale retained. PDF initial render scale2 unchanged.",
+  "before": {
+    "summary": {
+      "sample_count": 7,
+      "per_field": {
+        "invoice_number": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "party": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "organization_number": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "issued_at": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "due_at": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "net_cents": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "vat_cents": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "total_cents": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "reference": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        },
+        "bankgiro": {
+          "correct": 6,
+          "missing": 0,
+          "wrong": 1
+        },
+        "currency": {
+          "correct": 7,
+          "missing": 0,
+          "wrong": 0
+        }
+      },
+      "totals": {
+        "correct": 76,
+        "missing": 0,
+        "wrong": 1,
+        "denominator": 77
+      },
+      "all_fields_correct_documents": 6
+    },
+    "actual_optical_summary": {
+      "sample_count": 5,
+      "per_field": {
+        "invoice_number": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "party": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "organization_number": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "issued_at": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "due_at": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "net_cents": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "vat_cents": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "total_cents": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "reference": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        },
+        "bankgiro": {
+          "correct": 4,
+          "missing": 0,
+          "wrong": 1
+        },
+        "currency": {
+          "correct": 5,
+          "missing": 0,
+          "wrong": 0
+        }
+      },
+      "totals": {
+        "correct": 54,
+        "missing": 0,
+        "wrong": 1,
+        "denominator": 55
+      },
+      "all_fields_correct_documents": 4
+    },
+    "jpeg_pipeline": {
+      "source_sha256": "a3413268eca080e44691ecb92a60c272e8b59fe246cd2e8bd3e728a00f333efb",
+      "elapsed_ms": 1477.316781,
+      "global_confidence": 91,
+      "fields": {
+        "invoice_number": "0606",
+        "party": "Testbolaget AB",
+        "organization_number": "5560160680",
+        "issued_at": "2026-10-24",
+        "due_at": "2026-11-07",
+        "total_cents": 375000,
+        "vat_cents": 75000,
+        "net_cents": 300000,
+        "reference": "0606",
+        "bankgiro": "1223-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "text": "Faktura\n\nFakturanummer: 0606\nLeverantör: Testbolaget AB\nKund: Café Exempel AB\nOrganisationsnummer: 556016-0680\nFakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07\nNetto: 3 000,00 kr\n\nMoms: 750,00 kr\n\nAtt betala: 3 750,00 SEK\nOCR: 0606\n\nBankgiro: 1223-4567\n"
+    }
+  },
+  "summary": {
+    "sample_count": 7,
+    "per_field": {
+      "invoice_number": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "party": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "organization_number": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "issued_at": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "due_at": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "net_cents": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "vat_cents": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "total_cents": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "reference": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "bankgiro": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      },
+      "currency": {
+        "correct": 7,
+        "missing": 0,
+        "wrong": 0
+      }
+    },
+    "totals": {
+      "correct": 77,
+      "missing": 0,
+      "wrong": 0,
+      "denominator": 77
+    },
+    "all_fields_correct_documents": 7
+  },
+  "actual_optical_summary": {
+    "sample_count": 5,
+    "per_field": {
+      "invoice_number": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "party": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "organization_number": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "issued_at": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "due_at": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "net_cents": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "vat_cents": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "total_cents": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "reference": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "bankgiro": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      },
+      "currency": {
+        "correct": 5,
+        "missing": 0,
+        "wrong": 0
+      }
+    },
+    "totals": {
+      "correct": 55,
+      "missing": 0,
+      "wrong": 0,
+      "denominator": 55
+    },
+    "all_fields_correct_documents": 5
+  },
+  "native_control_summary": {
+    "sample_count": 2,
+    "per_field": {
+      "invoice_number": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "party": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "organization_number": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "issued_at": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "due_at": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "net_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "vat_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "total_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "reference": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "bankgiro": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "currency": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      }
+    },
+    "totals": {
+      "correct": 22,
+      "missing": 0,
+      "wrong": 0,
+      "denominator": 22
+    },
+    "all_fields_correct_documents": 2
+  },
+  "ink_guard_summary": {
+    "sample_count": 2,
+    "per_field": {
+      "invoice_number": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "party": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "organization_number": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "issued_at": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "due_at": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "net_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "vat_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "total_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "reference": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "bankgiro": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "currency": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      }
+    },
+    "totals": {
+      "correct": 22,
+      "missing": 0,
+      "wrong": 0,
+      "denominator": 22
+    },
+    "all_fields_correct_documents": 2
+  },
+  "unreadable_control_summary": {
+    "sample_count": 2,
+    "per_field": {
+      "invoice_number": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "party": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "organization_number": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "issued_at": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "due_at": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "net_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "vat_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "total_cents": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "reference": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "bankgiro": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      },
+      "currency": {
+        "correct": 2,
+        "missing": 0,
+        "wrong": 0
+      }
+    },
+    "totals": {
+      "correct": 22,
+      "missing": 0,
+      "wrong": 0,
+      "denominator": 22
+    },
+    "all_fields_correct_documents": 2
+  },
+  "jpeg_source_equal_before_after": true,
+  "samples": [
+    {
+      "id": "native-text-pdf",
+      "group": "native_control",
+      "mime": "application/pdf",
+      "source_sha256": "fba09558f13eaf43e0c4d1a6b351e3a935909f1d5cc0b66ab9c393b684c546b3",
+      "source_bytes": 945,
+      "original_bytes_unchanged": true,
+      "source_raster": null,
+      "ocr_raster": null,
+      "ocr_pixels": null,
+      "method": "pdf",
+      "global_confidence": 100,
+      "elapsed_ms": 466.01253700000007,
+      "level": "green",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "image/png",
+      "group": "actual_optical",
+      "mime": "image/png",
+      "source_sha256": "b9182c829f0b51941c2898990f7467904f21956d60a5084a2a8ea4d579d16f38",
+      "source_bytes": 101802,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1400,
+        "height": 1400
+      },
+      "ocr_raster": {
+        "width": 2100,
+        "height": 2100
+      },
+      "ocr_pixels": 4410000,
+      "method": "ocr",
+      "global_confidence": 94,
+      "elapsed_ms": 2068.07248,
+      "level": "yellow",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "image/jpeg",
+      "group": "actual_optical",
+      "mime": "image/jpeg",
+      "source_sha256": "a3413268eca080e44691ecb92a60c272e8b59fe246cd2e8bd3e728a00f333efb",
+      "source_bytes": 89476,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1400,
+        "height": 1400
+      },
+      "ocr_raster": {
+        "width": 2100,
+        "height": 2100
+      },
+      "ocr_pixels": 4410000,
+      "method": "ocr",
+      "global_confidence": 94,
+      "elapsed_ms": 1973.431553,
+      "level": "yellow",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "image/webp",
+      "group": "actual_optical",
+      "mime": "image/webp",
+      "source_sha256": "c527915808ef9067e491463fb070c7d9f37809d2f2935338db415a3067638d4f",
+      "source_bytes": 44520,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1400,
+        "height": 1400
+      },
+      "ocr_raster": {
+        "width": 2100,
+        "height": 2100
+      },
+      "ocr_pixels": 4410000,
+      "method": "ocr",
+      "global_confidence": 94,
+      "elapsed_ms": 1834.76519,
+      "level": "yellow",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "image-only-pdf",
+      "group": "actual_optical",
+      "mime": "application/pdf",
+      "source_sha256": "74e405d399db00e8b46bc6e31ef4a2ccd47b44141223d7f0d82df1f3e86e674c",
+      "source_bytes": 90297,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1190,
+        "height": 1684
+      },
+      "ocr_raster": {
+        "width": 1785,
+        "height": 2526
+      },
+      "ocr_pixels": 4508910,
+      "method": "ocr",
+      "global_confidence": 94,
+      "elapsed_ms": 1987.476959999999,
+      "level": "yellow",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "scan-with-digital-footer",
+      "group": "actual_optical",
+      "mime": "application/pdf",
+      "source_sha256": "611629066fea51d1b88d14599f32d3d52a029aaa48bf4e7d5c58fe1c81eda243",
+      "source_bytes": 90454,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1190,
+        "height": 1684
+      },
+      "ocr_raster": {
+        "width": 1785,
+        "height": 2526
+      },
+      "ocr_pixels": 4508910,
+      "method": "ocr",
+      "global_confidence": 94,
+      "elapsed_ms": 2399.683247000001,
+      "level": "yellow",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "native-text-with-raster",
+      "group": "native_control",
+      "mime": "application/pdf",
+      "source_sha256": "4b34bdbdd7e1defa7b78adccefd21d240823e9a66c81da960dfaacc4d1c0df4c",
+      "source_bytes": 2951,
+      "original_bytes_unchanged": true,
+      "source_raster": null,
+      "ocr_raster": null,
+      "ocr_pixels": null,
+      "method": "pdf",
+      "global_confidence": 100,
+      "elapsed_ms": 419.00412099999994,
+      "level": "green",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.96,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "blank-image",
+      "group": "unreadable_control",
+      "mime": "image/png",
+      "source_sha256": "b4fb2028e86993a7ee9d52435acd88252e69bdfd16be9c99b0d91e477cb47605",
+      "source_bytes": 10912,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1400,
+        "height": 1400
+      },
+      "ocr_raster": {
+        "width": 2100,
+        "height": 2100
+      },
+      "ocr_pixels": 4410000,
+      "method": "ocr",
+      "global_confidence": 0,
+      "elapsed_ms": 1226.036739000001,
+      "level": "red",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "party": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "organization_number": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "issued_at": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "due_at": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "net_cents": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "vat_cents": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "total_cents": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "reference": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "bankgiro": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "currency": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        }
+      },
+      "issues": [
+        "Dokumentet saknar tillräcklig läsbar text.",
+        "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, totalbelopp, valuta, organisationsnummer"
+      ],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "pixelated-image",
+      "group": "unreadable_control",
+      "mime": "image/png",
+      "source_sha256": "e44610c902ed3a113e0f905db3e8dbd3f0756b4c456269850852ee43184d8957",
+      "source_bytes": 11226,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1400,
+        "height": 1400
+      },
+      "ocr_raster": {
+        "width": 2100,
+        "height": 2100
+      },
+      "ocr_pixels": 4410000,
+      "method": "ocr",
+      "global_confidence": 26,
+      "elapsed_ms": 1205.4463889999988,
+      "level": "red",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "party": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "organization_number": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "issued_at": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "due_at": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "net_cents": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "vat_cents": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "total_cents": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "reference": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "bankgiro": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        },
+        "currency": {
+          "expected": null,
+          "actual": null,
+          "outcome": "correct",
+          "confidence": 0,
+          "evidence": null
+        }
+      },
+      "issues": [
+        "Dokumentet saknar tillräcklig läsbar text.",
+        "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, totalbelopp, valuta, organisationsnummer"
+      ],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "invoice-ink-#b0b0b0",
+      "group": "readable_ink_guard",
+      "mime": "image/png",
+      "source_sha256": "373b36eaff0395a72c701e5fe7b65df4c660249ae96dd86b1cf5766d2c880930",
+      "source_bytes": 88111,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1400,
+        "height": 1400
+      },
+      "ocr_raster": {
+        "width": 2100,
+        "height": 2100
+      },
+      "ocr_pixels": 4410000,
+      "method": "ocr",
+      "global_confidence": 94,
+      "elapsed_ms": 1768.1954779999996,
+      "level": "yellow",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    },
+    {
+      "id": "invoice-ink-#4682b4",
+      "group": "readable_ink_guard",
+      "mime": "image/png",
+      "source_sha256": "4fa160cccbb05ff37d2fc9826bde5d3bd4fb8c865106722ce263b102411047fb",
+      "source_bytes": 103623,
+      "original_bytes_unchanged": true,
+      "source_raster": {
+        "width": 1400,
+        "height": 1400
+      },
+      "ocr_raster": {
+        "width": 2100,
+        "height": 2100
+      },
+      "ocr_pixels": 4410000,
+      "method": "ocr",
+      "global_confidence": 94,
+      "elapsed_ms": 1801.071167,
+      "level": "yellow",
+      "counts": {
+        "correct": 11,
+        "missing": 0,
+        "wrong": 0
+      },
+      "fields": {
+        "invoice_number": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturanummer: 0606"
+        },
+        "party": {
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "\nLeverantör: Testbolaget AB"
+        },
+        "organization_number": {
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Organisationsnummer: 556016-0680"
+        },
+        "issued_at": {
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Fakturadatum: 2026-10-24"
+        },
+        "due_at": {
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Förfallodatum: 2026-11-07"
+        },
+        "net_cents": {
+          "expected": 300000,
+          "actual": 300000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Netto: 3 000,00 kr"
+        },
+        "vat_cents": {
+          "expected": 75000,
+          "actual": 75000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Moms: 750,00 kr"
+        },
+        "total_cents": {
+          "expected": 375000,
+          "actual": 375000,
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Att betala: 3 750,00 SEK"
+        },
+        "reference": {
+          "expected": "0606",
+          "actual": "0606",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "OCR: 0606"
+        },
+        "bankgiro": {
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "Bankgiro: 123-4567"
+        },
+        "currency": {
+          "expected": "SEK",
+          "actual": "SEK",
+          "outcome": "correct",
+          "confidence": 0.85,
+          "evidence": "SEK"
+        }
+      },
+      "issues": [],
+      "excluded_context_direction": "supplier"
+    }
+  ],
+  "final_reverification": {
+    "node_tests": 775,
+    "sites_tests": 1323,
+    "zero_failures": true,
+    "source_hashes": {
+      "src/invoice-worker.js": "5fa2a10123940baf5e19e330c51c7a6f046110ac36898e9a55e0bb5fc8b980a4",
+      "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+      "src/pdf-text.js": "7ffa67a0efbd3569fc989fb4c869b63173cc86688d4b7b40a5e6560eca80e249",
+      "src/invoice-extraction.js": "01d95566e6c371305285a3c48a55146fc43de391d91e1c0b18449f6edfedb92c",
+      "sites/lib/server-pdf.ts": "391b8a3e2979bfdb5649f1ec8dfbd70882ec8fc5045270f8bb1a7fbdf244ce81",
+      "sites/lib/pdf-text.js": "7ffa67a0efbd3569fc989fb4c869b63173cc86688d4b7b40a5e6560eca80e249",
+      "sites/lib/invoice-fields.js": "73a9a6beecf9c46e87dd6f7a1726b5a92e8b9b6d066def14f987803f37ee6b86"
+    },
+    "scope": "Final full suites reassert every declared readable optical/native field plus unreadable and colored/gray controls. Timing observations above belong to the original normalization run."
+  }
+}

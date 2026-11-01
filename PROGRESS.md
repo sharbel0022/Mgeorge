@@ -1,5 +1,14 @@
 # Verifierad progress
 
+## Fullständig OCR- och evidensrättning — pågående leverans
+
+Utgångspunkt main `dfd8526`. Båda motorerna rättade för kompletta referenstoken, alla etikettförekomster/monetära kolumner, OCR-proveniens och skannad PDF med digital sidfot. Ny gemensam princip för positionerade PDF-fragment bevarar siffror och kolumner. Högkvalitativ begränsad rasterförstoring rättade det uppmätta JPEG-felet utan grå-/färgförlust. Ägarbundna skrivfria MCP-läsare tillför fullständig avgränsad register-/original-/AIS-evidens; separat aktuell kontoläsare gör endast befintliga AIS-GET och kräver exakt aktuellt konto-/medgivandemedlemskap.
+
+Samma deklarerade korpus: fakturafältsbeslut42/100→100/100, felaktigt gröna48→0; kompletta betalningsreferenser14/40→40/40, falskt säkra26→0; optiska fält54/55→55/55, läsbara inklusive native76/77→77/77. Universell100%OCR är inte styrkt. Privat original12/12 och faktisk nativefaktura9/9 per motor; oförändrade bytes. Primär offentlig Bankgirokälla löser namnvariation till samma organisation. Inga ekonomiska produktionsskrivningar. [Ny rapport](docs/COMPLETE-OCR-EVIDENCE-VERIFICATION.md), [plan/ledger](docs/superpowers/plans/2026-11-01-complete-ocr-evidence.md).
+
+Oberoende granskningar passerade efter röda/gröna rättningar, inklusive extra konto i aktuellt medgivande. Slutgrindar godkända:775/775 Node,1323/1323 Sites, syntax97, TypeScript och produktionsbygge. ExaktCI, push och separat Sites-publicering pågår; tidigare leverans är Sites48. Kontorelation, rapport-/AIS-identitet, valutabevis och färsk registerkontroll krävs fortsatt före betalningsbeslut. Övriga poäng behålls; inga9,5 eller påståenden om felfri produktion.
+
+
 ## Privat Bankgirooriginal — ny verifieringscykel
 
 Utgår från aktuell main `db1b81f`. Original läst direkt i Work, oförändrade bytes;12/12 privata facitkontroller. Faktura-PDF kontrollerad i verifierat företags-Gmail med full text och renderad sida. Uppgifter och kundoriginal ligger utanför Git. Läsande Sites visar aktiv Swedbankanslutning och revision40, men payload/kontoresurs trunkeras och browser kräver inloggning: färsk full AIS-/registerkontroll är blockerad. Ingen riktig import, registrering, källa-koppling, allokering, saldoförändring eller sändning utförd.

@@ -260,7 +260,7 @@ test('Q8 review: a final processing timestamp failure preserves a committed invo
   assert.equal(result.last_processed,'');assert.equal(f.sql.prepare('SELECT last_cloud_run FROM document_automation').get().last_cloud_run,'');
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,1);assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'registration_aftercheck_pending');assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,1);
 });
-test('Q8 review: real cloud pull accepts committed output when its completion timestamp cannot be saved',async t=>{
+test('Q8 review: real cloud pull accepts saved OCR review evidence when its completion timestamp cannot be saved',async t=>{
   const f=await processingFixture(t);f.doc('pdf');f.pdfError='parse_timeout';f.reconcileError=true;
   f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,f.processing.counterpartyKey('supplier','Exempelbolaget AB','5560160680'),'supplier@example.test','123-4567','Synthetic verified supplier','2026-01-01');
   Object.assign(f.env,{DOCUMENT_CLOUD_OCR_ENABLED:'true',DOCUMENT_CLOUD_WORKER_TOKEN:'C'.repeat(43)});f.env.BUCKET.get=async()=>({size:f.bytes.length,body:f.bytes,arrayBuffer:async()=>f.bytes});
@@ -269,8 +269,9 @@ test('Q8 review: real cloud pull accepts committed output when its completion ti
   const result=await runSitesOcr({origin:'https://synthetic.example',token:f.env.DOCUMENT_CLOUD_WORKER_TOKEN,mode:'cloud'},{maxJobs:1,extract:async()=>({text:syntheticText(),method:'pdf',confidence:100}),fetchImpl:async(url,options)=>{
     try{const action=new URL(url).pathname.split('/').pop(),response=await f.processing.workerAction(new Request(url,options),action);if(action==='complete')completion=await response.clone().json();return response;}catch{return Response.json({error:'unavailable'},{status:500});}
   }});
-  assert.deepEqual(result,{processed:1,failed:0});assert.equal(completion.registered,true);assert.equal(completion.aftercheck_pending,true);assert.match(completion.metadata_warning,/sparat.*tidsstämpel/s);assert.doesNotMatch(completion.metadata_warning,/synthetic private/);
-  assert.equal((await f.processing.processingStatus(f.owner)).cloud_last_completed,'');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,1);assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'registration_aftercheck_pending');assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,1);
+  assert.deepEqual(result,{processed:1,failed:0});assert.equal(completion.state,'needs_review');assert.equal(completion.registered,undefined);assert.equal(completion.aftercheck_pending,undefined);assert.match(completion.metadata_warning,/sparat.*tidsstämpel/s);assert.doesNotMatch(completion.metadata_warning,/synthetic private/);
+  assert.equal((await f.processing.processingStatus(f.owner)).cloud_last_completed,'');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);assert.equal(f.sql.prepare('SELECT error_code FROM document_jobs').get().error_code,'');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  const history=f.sql.prepare('SELECT result FROM document_extractions').all();assert.equal(history.length,1);assert.equal(JSON.parse(history[0].result).method,'ocr');assert.equal(JSON.parse(history[0].result).fields.invoice_number.confidence,.85);
 });
 test('Q8 review: a failed registration marker rolls back the entire financial commit',async t=>{
   const f=await processingFixture(t);f.doc();f.sql.exec("CREATE TRIGGER stop_marker BEFORE INSERT ON document_jobs BEGIN SELECT RAISE(ABORT,'synthetic marker failure'); END");
@@ -365,15 +366,16 @@ test('Q8: real registration and reconciliation recover the same receipt and remo
   f.doc('doc-2');const next=await (await f.api.gmailReview(post('review',{...body,document_id:'doc-2',invoice:{...body.invoice,number:'0008'}}))).json();assert.equal(next.registered,true);assert.equal(next.aftercheck_pending,false);assert.equal(next.warning,undefined);
   assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,2);assert.equal(f.providerCalls,0);
 });
-test('Q8: real cloud pull accepts a committed invoice when only its after-check needs recovery',async t=>{
-  const f=await processingFixture(t);f.doc('pdf');f.pdfError='parse_timeout';f.reconcileError=true;
+test('Q8: real cloud pull accepts a server-PDF committed invoice when only its after-check needs recovery',async t=>{
+  const f=await processingFixture(t);f.doc('pdf');f.reconcileError=true;
   f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,f.processing.counterpartyKey('supplier','Exempelbolaget AB','5560160680'),'supplier@example.test','123-4567','Synthetic verified supplier','2026-01-01');
   Object.assign(f.env,{DOCUMENT_CLOUD_OCR_ENABLED:'true',DOCUMENT_CLOUD_WORKER_TOKEN:'C'.repeat(43)});
   f.env.BUCKET.get=async()=>({size:f.bytes.length,body:f.bytes,arrayBuffer:async()=>f.bytes});
   const {runSitesOcr}=await import('../../src/sites-ocr-pull.js');
-  const result=await runSitesOcr({origin:'https://synthetic.example',token:f.env.DOCUMENT_CLOUD_WORKER_TOKEN,mode:'cloud'},{maxJobs:1,extract:async()=>({text:syntheticText(),method:'pdf',confidence:100}),fetchImpl:async(url,options)=>f.processing.workerAction(new Request(url,options),new URL(url).pathname.split('/').pop())});
-  assert.equal(result.processed,1);assert.equal(result.failed,0);const status=await f.processing.processingStatus(f.owner);assert.ok(status.cloud_last_completed);assert.equal(status.aftercheck_pending,1);
+  const result=await runSitesOcr({origin:'https://synthetic.example',token:f.env.DOCUMENT_CLOUD_WORKER_TOKEN,mode:'cloud'},{maxJobs:1,extract:async()=>{throw Error('Native server PDF must not be sent to OCR');},fetchImpl:async(url,options)=>f.processing.workerAction(new Request(url,options),new URL(url).pathname.split('/').pop())});
+  assert.equal(result.processed,1);assert.equal(result.failed,0);const status=await f.processing.processingStatus(f.owner);assert.ok(status.last_processed);assert.equal(status.cloud_last_completed,'');assert.equal(status.aftercheck_pending,1);
   assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'registered');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,1);
+  const extraction=JSON.parse(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction);assert.equal(extraction.method,'pdf');assert.equal(extraction.fields.invoice_number.confidence,.96);
 });
 test('layout parsing keeps spaced leading zeroes, recipient identity, Swedish dates and explicit VAT',async t=>{
   const f=await fixture(t),text=syntheticText('0 0 0 7').replace('Leverantör: Exempelbolaget AB\nOrg.nr: 556016-0680\n','').concat('\nMottagare\nFöretags Namn: Exempelkunden AB\nOrg.nr: 556016-0680\n');
@@ -481,14 +483,14 @@ test('document metadata changed at the registration write boundary cannot use an
   assert.equal(f.sql.prepare('SELECT status FROM gmail_sources').get().status,'needs_review');
 });
 
-test('automatic registration rechecks lease expiry under the database write clock',async t=>{
+test('automatic server-PDF registration rechecks lease expiry under the database write clock',async t=>{
   const f=await processingFixture(t),key=f.processing.counterpartyKey('supplier','Exempelbolaget AB','5560160680');
-  f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,key,'supplier@example.test','123-4567','Synthetic verified supplier','2026-01-01');f.doc('image','image/png');
-  const job=(await (await f.worker('lease')).json()).job,at=Date.now();
+  f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,key,'supplier@example.test','123-4567','Synthetic verified supplier','2026-01-01');f.doc();
+  const at=Date.now();
   t.mock.timers.enable({apis:['Date'],now:at-60000});
   const batch=f.d1.batch.bind(f.d1);let writes=0;
   f.d1.batch=async items=>{writes++;if(writes===2)f.sql.prepare('UPDATE document_jobs SET lease_until=?').run(new Date(at-1000).toISOString());return batch(items);};
-  await f.worker('complete',{id:'image',lease:job.lease,sha256:f.sha,text:syntheticText(),method:'pdf',confidence:100});
+  await f.processing.processDocuments(f.owner);
   assert.equal(writes,2);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
   assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,0);
