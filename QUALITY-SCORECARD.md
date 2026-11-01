@@ -1,5 +1,11 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Färskt AIS-kvitto i drift — 2026-11-01
+
+Poäng oförändrade för bankhämtning, Bankgiroimport, betalare/referens, matchning, saldon, åtkomst, tester och produktionsverifiering. Nödvändig kvittoevidens har förbättrats: riktad färsk bankhämtning adopterade ett giltigt kvitto till äldre rad i Sites44, revision37→38, utan ändrade ekonomiska fält/fakturor/krediter/allokeringar. Noll allokeringar; ingen originalrelation eller fakturakoppling bekräftad. Privat bank-PDF kompletterar konto-/rapportkontrollen, men aktivt kontoalias och gemensam stabil rapport-/AIS-identitet saknas fortsatt. Sådant underlag kan inte ersättas av syntetiska tester eller fri text.
+
+Slutlig verifiering: 606 Node +1022 Sites, syntax89, TypeScript/bygge; produktion audit0 och full Sites16 moderate utvecklingsfynd. Oberoende review utan Critical/Important, exakt kod-CI grönt och Sites44 succeeded med samma källträd. Separat referensprofil bevarar giltiga äldre kvittons tolkning; Node-standardflödet är oförändrat. [Rapport](docs/FRESH-AIS-RECEIPT-VERIFICATION.md), [leveransbevis](docs/FRESH-AIS-RECEIPT-PUBLICATION.json), [fortsättningspunkt](PROGRESS.md). Ingen produktionsberoende poäng höjs till9,5.
+
 ## Aktuell underlagsevidens — 2026-11-01
 
 Samtliga poäng behålls. En riktad produktionshämtning har nu bevarat färskt autentiskt AIS-original, och det sökta fakturaoriginalet har hittats och visuellt granskats. Nuvarande offentlig Bankgiro-motpartsrelation stöder fakturans organisationsnummer. Detta ersätter den tidigare uppgiften att själva originalfakturan inte var hittad, men innebär ingen registrerad eller betald faktura.

@@ -1,0 +1,63 @@
+{
+  "schema": "fresh-ais-receipt-publication-v1",
+  "date": "2026-11-01",
+  "github": {
+    "repository": "https://github.com/sharbel0022/Mgeorge",
+    "codeCommit": "dba8f426bfe96076c269c88c096f5f4cee665484",
+    "ci": {
+      "id": 41331777434,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41331777434",
+      "jobs": {
+        "test": "success",
+        "sites": "success"
+      }
+    }
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "sourceCommit": "e0c9b8cbb510ddd267e31bbcd250143a61c31987",
+    "sourceTree": "ca3bdc647bce8d2e4cedffb038e6c824be6447a0",
+    "githubSitesSubtree": "ca3bdc647bce8d2e4cedffb038e6c824be6447a0",
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_6e59ff882ed08191bff0c92ecc42f945",
+    "versionNumber": 44,
+    "archiveStorage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_00000000ef9481f4932edf1c45572584",
+      "content_hash": "sha256:68dbc61bcb03b205ffd5d42357abc0bd871df1b58a9726f27d0f34743f703bf1",
+      "size_bytes": 44390400,
+      "file_count": 329
+    },
+    "deploymentId": "appgdep_6ae77763280081918251e897f271e655",
+    "status": "succeeded",
+    "envSetRevision": 9,
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site"
+  },
+  "verification": {
+    "node": 606,
+    "sites": 1022,
+    "syntax": 89,
+    "typescript": "passed",
+    "build": "passed",
+    "rootAudit": 0,
+    "sitesProductionAudit": 0,
+    "sitesFullModerate": 16,
+    "independentReview": "No Critical or Important findings; versioned legacy replay and owned-original preservation reviewed.",
+    "production": {
+      "revisionBefore": 37,
+      "revisionAfter": 38,
+      "receiptAdopted": true,
+      "legacyIssueCleared": true,
+      "financialProjectionUnchanged": true,
+      "allocations": 0,
+      "sourceLinkConfirmed": false,
+      "invoiceRegistered": false,
+      "accountAliasConfirmedByProvider": false,
+      "stableReportAisIdentity": false
+    }
+  },
+  "scope": {
+    "originals": "Retained privately outside Git; no customer documents, account data or original checksums in this report.",
+    "node": "Parser copy kept identical; default Node normalization and receipt replay unchanged.",
+    "remaining": "Provider-backed receiving-account alias and an explicit report/deposit identity are still required before linking originals or allocating an invoice."
+  }
+}
