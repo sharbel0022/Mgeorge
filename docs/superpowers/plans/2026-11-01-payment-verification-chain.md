@@ -49,3 +49,16 @@
 - [ ] External completion: authoritative receiving-account/report identity, ordinary invoice registration/counterparty review and separate administrator allocation decision. No test allocation in production.
 
 Ruling: Continue directly under the user's detailed execution instruction. Existing engines and explicit administrative manual-allocation semantics are retained; new automatic consent bypasses are closed. Production case remains review-only until actual external evidence and separate administrator authorization exist.
+
+## Completion audit follow-up on main 88b8584
+
+Previous goal turn: progress, with verified main/CI/Sites46 delivery. Current main differs from verified program commit a8453a1 only in documentation. Existing 625 Node + 1111 Sites evidence is reused as the pre-change baseline because code, dependencies and environment remain applicable; it is not a new test run.
+
+Two explicit internal requirements still need implementation before classifying the remaining work as exclusively external:
+
+- [x] Node manual original relation: support an exact IBAN/BBAN/CPAN alias explicitly supplied by this owner's active selected unambiguous SEK account resource. Files: `src/bankgiro-links.js` and its tests. Preserve reported account, raw evidence and hashes; do not change `exact_match`, economic import or automatic allocation. RED/green cases: valid alias, absent/ambiguous alias, wrong owner/deselection and alias removed after confirmation; unchanged finances. The read-only `project()` and `public/app.js` also retain the selected report's typed/raw/cell evidence and avoid displaying AIS-only invoice suggestions beside a different selected report reference.
+- [x] Sites displayed-field provenance: select payer/ref/identifier evidence from the actual linked report or detail original used for that field. Files: `sites/lib/payment-presentation.ts`, `payment-verification.ts`, dashboard and relevant tests. Expose identifier value, scheme/issuer, original raw value and field path in the existing expandable controls. RED/green cases: separate detail COID/SE, linked report whose source differs from AIS/detail metadata, unavailable/invalid original remains blocked, unchanged inputs/finances. Read-only invoice selection and the owned invoice original read follow the selected field source too: report reference0599 cannot display/read the unselected detail reference0800's invoice; actual recorded allocations are preserved and explained separately.
+- [x] Independent review and local full suites: 645 Node, 1126 Sites, syntax92, type/build/audit passed. Architecture, measurements/report/progress/affected scorecard evidence updated; scores unchanged.
+- [ ] Safe main delivery, exact CI and publication in the same Sites project if Sites source changes. Read-only production verification; no real invoice/source relation/allocation or economic data writes.
+
+The authentic 625-case still needs authoritative account/report identity and the separately approved invoice/counterparty/allocation workflow after these internal fixes. No bank identity or account conversion may be fabricated.

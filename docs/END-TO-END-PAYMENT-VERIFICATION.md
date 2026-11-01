@@ -2,6 +2,12 @@
 
 Datum: 2026-11-01. Startrevision: `fa524c2b3d06530d1b75b48df45ae14b28ab1182`. Föregående verifierad kod: `dba8f426bfe96076c269c88c096f5f4cee665484`; skillnaden fram till startrevisionen är endast framsteg/poäng/leveransdokumentation. [Arkitektur, beslutsträd, datamodell och UI](PAYMENT-VERIFICATION-ARCHITECTURE.md).
 
+## Aktuell komplettering efter hela kravkontrollen
+
+[Kravmatrisen mot samtliga 16 uppdragsavsnitt](PAYMENT-VERIFICATION-ACCEPTANCE.md) identifierade återstående interna alias-/fältkällor efter leveransen nedan. [Kompletteringsrapporten](PAYMENT-EVIDENCE-SOURCES-VERIFICATION.md) redovisar faktiskt provider-alias vid Nodes manuella originalrelation, full rapportproveniens i Node, gemensamt källval i Sites och fakturaförslag/originalkontroll från samma valda referens. Verkliga tidigare bokningar bevaras med tydlig referensavvikelse. Ingen ny ekonomimotor eller allokeringsrätt införs.
+
+Ny lokal slutkandidat: **645 Node +1126 Sites =1771 tester**, syntax92, TypeScript/produktionsbygge och auditgrindar godkända, produktionsaudit0 och full Sites16 moderate utvecklingsfynd/0 high/critical. Riktade nya fel har reproducerats före rättning och oberoendegranskats efteråt. Ny exakt main-/CI-/Sites-identitet kompletteras efter verklig leverans. Föregående leverans och dess mätningar nedan behålls som verifierad historik, inte som bevis för ny opublicerad kod.
+
 **Slutmålet är inte produktionsgodkänt.** Interna kontroller och mätningar kan levereras medan den autentiska konto-/rapportrelationen fortfarande är blockerad. Ingen verklig fakturaregistrering, fakturaallokering, bankbetalning eller kundmejl ingår i provningen.
 
 ## Vad kartläggningen visade
@@ -69,7 +75,7 @@ Samma relationskorpus behåller 8/8 visade individuella namn och 8/8 exakta refe
 | Komplett säker betalning | Node `reconciliation.test.js`; Sites `bankgiro.test.mjs`, aktuella kontopositivfall |
 | Saknat bankkvitto | Node `bank-reference-storage.test.js`, ny kontokorpus; Sites `bank-api-original-q8.test.mjs` |
 | Fel mottagarkonto | Nya Node/Sites kontotester, `bankgiro-links` och XLSX-integration |
-| Saknat kontoalias | Sites `bankgiro-retained-preview.test.mjs`, betalningspanelens rapportkontroll; Node kräver exakt IBAN |
+| Saknat kontoalias | Sites `bankgiro-retained-preview.test.mjs`, betalningspanelens rapportkontroll; nya Node-regressioner för uttryckligt provider-alias, saknat/tvetydigt/borttaget alias och oförändrad ekonomisk import |
 | Saknad stabil bankidentitet | XLSX-integration och `bankgiro-links`: förslag/manuell metadata, inga pengar |
 | Två insättningar med samma belopp | `bankgiro-links` i båda apparna, Node matchningskorpus |
 | Samlingsbetalning med flera betalare | `bankgiro.test.mjs`, Node reconciliation, oförändrad komplett barnsumma |

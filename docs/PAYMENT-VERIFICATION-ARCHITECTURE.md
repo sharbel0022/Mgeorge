@@ -104,7 +104,7 @@ erDiagram
     INVOICE_ALLOCATION ||--o{ AUDIT_EVENT : creation_and_reversal
 ```
 
-Bankgiro-till-kontorelation i modellen är ett krav på bankevidens, **inte en ny fristående verifierad mappningstabell**. Sites löser endast exakta identifierare i det valda kontots banklevererade resurs. Node kräver exakt IBAN. Saknat alias får inte fyllas med en fri manuell sifferöversättning. Bankgironumret i rapporten är en originalobservation och bevisar inte ensamt mottagarkontorelationen.
+Bankgiro-till-kontorelation i modellen är ett krav på bankevidens, **inte en ny fristående verifierad mappningstabell**. Sites och Nodes manuella originalrelationskontroll kan verifiera exakta IBAN/BBAN/CPAN-identifierare som uttryckligen finns i samma ägares aktiva valda entydiga SEK-kontoresurs. Node bevarar rapportens råkonto som `reported_account`, redovisar aliasets provider-fält och ändrar inte parserns `exact_match:false` eller den ekonomiska importgränsen. Saknat alias får inte fyllas med en fri manuell sifferöversättning. Bankgironumret i rapporten är en originalobservation och bevisar inte ensamt mottagarkontorelationen.
 
 | Evidensnivå | Node | Sites | Vad den bevisar |
 | --- | --- | --- | --- |
@@ -156,6 +156,8 @@ flowchart LR
 ```
 
 Svart och vitt, tydliga textstatusar, tangentbordsåtkomliga utfällningar och radbrytning för långa värden. Gränssnittet skiljer på bankfakta, manuella beslut, förslag och bokförda belopp. Fakturakund ersätter aldrig bankens betalarnamn. Ett registerfynd utan kontrollerat fakturaoriginal visas med den begränsningen. Tidpunkten avser den läsande kontrollen och får inte kallas bankens attesttid.
+
+För Sites väljer `bankPaymentFieldSources` källa per faktiskt visat fält. Ett individuellt kopplat rapportfält, ett faktiskt använt detaljfält och AIS-/transaktionsoriginal hålls åtskilda; namn och referens kan ha olika källor. Identifierare, typ/scheme, utfärdare, råvärde och fältsökväg hämtas från just den källan. `bankPaymentInvoiceAssessment` använder samma valda referens för läsande fakturaförslag och originalkontroll. En redan bokad faktura bevaras och visas med referenskonflikt om den avviker. Ingen av dessa hjälpare ändrar avstämningsmotorn eller bokföringen.
 
 ## Externa gränser
 

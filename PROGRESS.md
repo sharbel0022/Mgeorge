@@ -1,5 +1,13 @@
 # Verifierad progress
 
+## Kravkontrollens alias och fältkällor — kodkandidat 2026-11-01
+
+- Föregående målvarv är **framsteg**: main88b8584 och Sites46 verifierade. Aktuell origin/main hämtades och jämfördes med kod a8453a1; endast dokumentationsskillnad. [Ny full kravmatris](docs/PAYMENT-VERIFICATION-ACCEPTANCE.md) mot originalets16avsnitt identifierade två interna kravområden som kunde lösas utan fler bankunderlag: Node provider-alias och rätt faktisk fältkälla/proveniens i visningen.
+- Node verifierar nu uttryckliga IBAN/BBAN/CPAN-alias i samma ägares aktiva valda entydiga SEK-kontoresurs vid manuella originalrelationer. Rått rapportkonto och `exact_match:false` bevaras; aliasborttagning/tvetydighet/ägarskifte/avval/giltighetsbrist gör relationen stale. Ingen ekonomisk import eller allokeringsrätt tillkommer.
+- I båda apparna hålls läsande fakturaförslag till den faktiskt visade referenskällan; AIS/detalj0600/0800 får inte föreslås bredvid rapport0599 som om det vore samma källa. Bekräftade andra bokningar och saldon bevaras och avvikelsen visas. Node återger omtolkade råfält/celler. Sites använder samma val för namn/ref, identifierare/typ/issuer/raw/path och fakturaoriginalread; original0599 kontrolleras utan felaktig0800-read.
+- Röda/gröna regressioner och oberoende slutgranskningar utan kvarstående konkreta fynd. Lokalt **645 Node +1126 Sites =1771**, syntax92, TypeScript/bygge och auditgrindar godkända. Oförändrade paket-/lock-/CI-filer; tidigare installationer återanvända där inputs/miljö gäller. Samma15-fallskorpus bibehåller10/10relationer och15/15oförändrade saldon,0falska relationer/allokeringar/dubbletter. UI1440/390px visarCOID/SE/ID/råfält/fältväg utan dokumentoverflow; faktisk komponent med syntetiska data. Fullsidesbild timeoutade, viewportbilder lyckades. Previewfil borttagen/serverstoppad.
+- [Kompletteringsrapport](docs/PAYMENT-EVIDENCE-SOURCES-VERIFICATION.md). Kodkandidaten är ännu inte pushad/publicerad; senaste faktiska leverans är fortsatt Sites46. Nästa steg: exakt main/CI, samma Sites-projekt och läsande efterkontroll. Verkliga original/saldon/fakturor/originalrelationer/allokeringar lämnas orörda. Externa bank- och administratörskrav kvarstår; mål och poäng är inte slutgodkända/höjda.
+
 ## Hela betalningskedjan — verifierad kodleverans 2026-11-01
 
 - **Slutleverans:** main-kod `a8453a151113f7cb5b47d155b4905f8fca02c3f6`, båda [Actions 41351500449](https://github.com/sharbel0022/Mgeorge/actions/runs/41351500449) success på exakt SHA. **Sites 46 succeeded**, source `2869f0ac51946b5fb31cb25de79872bb92557ecd`, identiskt GitHub/Sites-träd `b5799183ae5fca8b9101c4c73f27e287106c4b77`, runtime 9. Fullt kvitto: `docs/END-TO-END-PAYMENT-PUBLICATION.json`.

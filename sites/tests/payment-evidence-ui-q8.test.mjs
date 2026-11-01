@@ -6,6 +6,7 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {emptyState,applyCommand} from '../lib/domain.ts';
 import {extractPaymentReferences} from '../lib/payment-references.js';
+import {paymentFieldSourceFixture,paymentFieldInvoiceFixture} from './helpers/payment-field-source-fixture.mjs';
 
 const read=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 const file=path=>new URL(path,import.meta.url).href;
@@ -23,7 +24,7 @@ const detailImports=dashboard.split('\n').filter(line=>line.startsWith('import {
 const {default:Detail}=await import(compile(detailImports+`\nimport {analyze} from 'reconciliation';const shortDate=x=>x,controlDate=x=>x;const DetailSurface=({children})=>children,BankgiroLinkReview=()=>null,PaymentHistory=()=>null,PaymentVerificationPanel=()=>null,InvoiceEvidence=()=>null,FormError=()=>null,Field=({children})=>children;\n`+detailCode+'\nexport default TransactionDetail;',{'@/lib/payment-presentation':presentation,reconciliation}));
 const snapshot={party:'RETAINED ORIGINAL PAYER',payerReference:'0594',bankReference:'SOURCE-1',description:'Synthetic retained description',date:'2026-10-30',amount:10000,account:'Synthetic account'};
 const payment=extra=>({id:'synthetic-payment',...snapshot,currency:'SEK',source:'Enable Banking',evidence:'bank_api',externalId:'SOURCE-1',kind:'payment',verified:true,duplicateOf:'',ignored:false,parentId:'',importId:'',createdAt:'2026-10-30',original:{...snapshot},...extra});
-function renderDetail(t){const state=emptyState();state.transactions.push(t);const before=JSON.stringify(state);const html=renderToStaticMarkup(React.createElement(Detail,{tx:t,state,demo:true,save(){throw Error('Render must not save');},close(){},open(){},busy:false,error:''}));assert.equal(JSON.stringify(state),before);return html;}
+function renderDetail(t,suppliedState){const state=suppliedState||emptyState();if(!suppliedState)state.transactions.push(t);const before=JSON.stringify(state);const html=renderToStaticMarkup(React.createElement(Detail,{tx:t,state,demo:true,save(){throw Error('Render must not save');},close(){},open(){},busy:false,error:''}));assert.equal(JSON.stringify(state),before);return html;}
 function originalSection(html){return [...html.matchAll(/<details[^>]*><summary>[^<]*<\/summary>(?:(?!<details).)*?<\/details>/gs)].map(match=>match[0]).find(block=>block.includes('RETAINED ORIGINAL PAYER'));}
 async function renderMessage(t,transaction,{finding}={}){
   const key='__payment_ui_'+crypto.randomUUID().replaceAll('-','');
@@ -64,4 +65,15 @@ test('Q8 UI evidence: unknown historical payment origin is neither bank supplied
 });
 test('Q8 UI evidence: an unproven bank-file snapshot is not reclassified as manual by a historical default source label',()=>{
   const html=renderDetail(payment({evidence:'bank_file',source:'Manuellt registrerad'})),section=originalSection(html);assert.ok(section);assert.match(section,/källan är inte verifierad/i);assert.doesNotMatch(section,/Bankens ursprungliga|manuellt registrerade ursprungsuppgifter/i);
+});
+
+test('payment details explain the payer and reference evidence actually selected from a linked report',()=>{
+ const {state,target}=paymentFieldSourceFixture(),html=renderDetail(target,state),payer=html.split('<summary>Bankens betalarfält och råvärden</summary>')[1]?.split('</details>')[0],reference=html.split('<summary>Bankens referenskällor</summary>')[1]?.split('</details>')[0];
+ assert.ok(payer);assert.ok(reference);assert.match(payer,/333333-3333/);assert.match(payer,/COID/);assert.match(payer,/SE/);assert.match(payer,/\$\.columns\[7\]\.Organisationsnummer/);assert.doesNotMatch(payer,/111111|222222/);assert.match(reference,/0599/);assert.match(reference,/columns/);assert.doesNotMatch(reference,/0800|\$\.detail/);assert.match(html,/Betalarnamnets källa/);assert.match(html,/Referensens källa/);assert.equal(state.allocations.length,0);
+});
+
+for(const booked of [false,true])test(`dashboard invoice lookup follows the report reference and preserves ${booked?'a conflicting historical booking':'the unallocated state'}`,()=>{
+ const {state,target}=paymentFieldInvoiceFixture({booked}),html=renderDetail(target,state),primary=html.split('<dl class="details-grid bank-primary-details">')[1]?.split('</dl>')[0],assessment=html.split('<dt>Fakturakoppling</dt><dd>')[1]?.split('</dd>')[0];
+ assert.ok(primary);assert.ok(assessment);assert.match(primary,/0599/);
+ if(booked){assert.match(primary,/0800/);assert.match(html,/Referenskonflikt/);assert.match(assessment,/0800.*0599/);assert.equal(state.allocations.length,1);}else{assert.doesNotMatch(primary,/0800/);assert.match(assessment,/0599/);assert.doesNotMatch(assessment,/0800/);assert.equal(state.allocations.length,0);}
 });

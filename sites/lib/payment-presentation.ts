@@ -27,10 +27,39 @@ function referenceView(value:string,evidence:Transaction['referenceEvidence'],pa
   return {value,kind:ocr?'ocr' as const:invoice?'invoice' as const:'reference' as const,ocr:ocr?value:''};
 }
 export function bankPaymentReference(t:Transaction){
-  const evidence=t.bankDetails?.referenceEvidence||t.referenceEvidence;
   if(!hasBankSource(t)&&!t.bankDetails?.payerReference)return {value:'',kind:'missing' as const,ocr:''};
-  const value=t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'':t.original?t.original.payerReference:t.verification?'':t.payerReference)||'';
-  return referenceView(value,evidence,t.referenceParts);
+  // Detail metadata and AIS referenceParts belong to different originals.
+  if(t.bankDetails?.payerReference)return referenceView(t.bankDetails.payerReference,t.bankDetails.referenceEvidence,undefined);
+  const value=(needsPaymentSpecification(t)?'':t.original?t.original.payerReference:t.verification?'':t.payerReference)||'';
+  return referenceView(value,t.referenceEvidence,t.referenceParts);
+}
+type FieldSourceKind='report'|'detail'|'transaction';
+const fieldSourceLabel=(kind:FieldSourceKind,t:Transaction)=>kind==='report'?'Kopplat Bankgirooriginal':kind==='detail'?'Bankens separata detaljoriginal':hasBankSource(t)?'Bankens transaktionsoriginal':'Sparad transaktionsuppgift · bankkälla ej verifierad';
+/** One read-only source decision per displayed field. Never fall back to a
+ * different original's identifiers or reference classifications. */
+export function bankPaymentFieldSources(state:State,t:Transaction){
+  const link=activeBankgiroLink(state,t.id),linkedRow=link?.rows.length===1?link.rows[0]:undefined;
+  const linkedPayer=linkedRow?cleanParty(linkedRow.party):'',detailPayer=cleanParty(t.bankDetails?.party),payerKind:FieldSourceKind=linkedPayer?'report':detailPayer?'detail':'transaction';
+  const payerRow=payerKind==='report'?linkedRow!:t,payerValue=linkedPayer||bankPayer(t);
+  const linkedReference=linkedRow?referenceView(linkedRow.payerReference,linkedRow.referenceEvidence,linkedRow.referenceParts):undefined,referenceKind:FieldSourceKind=linkedReference?.value?'report':t.bankDetails?.payerReference?'detail':'transaction';
+  const referenceRow=referenceKind==='report'?linkedRow!:t,referenceValue=linkedReference?.value?linkedReference:bankPaymentReference(t);
+  return {
+    payer:{kind:payerKind,label:fieldSourceLabel(payerKind,t),row:payerRow,value:payerValue,evidence:payerKind==='detail'?t.bankDetails?.payerEvidence:payerRow.payerEvidence},
+    reference:{kind:referenceKind,label:fieldSourceLabel(referenceKind,t),row:referenceRow,value:referenceValue,evidence:referenceKind==='detail'?t.bankDetails?.referenceEvidence:referenceRow.referenceEvidence,parts:referenceKind==='detail'?undefined:referenceRow.referenceParts}
+  };
+}
+/** Read-only invoice lookup for the displayed reference. Recorded allocations
+ * remain separate historical facts; source selection never rewrites them. */
+export function bankPaymentInvoiceAssessment(state:State,t:Transaction,fields=bankPaymentFieldSources(state,t)){
+  const reference=fields.reference.value.value,direction=t.amount>0?'receivable':'payable';
+  const registered=reference?state.invoices.filter(i=>!i.voided&&i.direction===direction&&[i.number,i.ocr].some(value=>value&&exactReference(reference,value))):[];
+  const bookedIds=[...new Set(state.allocations.filter(a=>a.active&&a.transactionId===t.id).map(a=>a.invoiceId))],bookedInvoices=bookedIds.flatMap(id=>{const invoice=state.invoices.find(i=>i.id===id);return invoice?[invoice]:[];});
+  const allocationConflict=!!reference&&bookedIds.some(id=>!registered.some(invoice=>invoice.id===id));
+  const invoice=registered.length===1?registered[0]:!reference&&bookedInvoices.length===1?bookedInvoices[0]:undefined;
+  const current=paymentInvoiceAssessment(state,t),issue=current.status==='review'?current.message:'';
+  const status=allocationConflict?'conflict' as const:issue?'review' as const:registered.length>1?'ambiguous' as const:invoice?bookedIds.length?'verified' as const:'possible' as const:'missing' as const;
+  const message=allocationConflict?`Bokad koppling till faktura ${bookedInvoices.map(i=>i.number).join(', ')||'som saknas i registret'} avviker från den visade betalningsreferensen ${reference}. Granska historiken; inga saldon ändras.`:issue|| (registered.length>1?'Flera fakturor har den visade referensen. Granska fakturaidentiteten.':invoice?bookedIds.length?'Betalningen är registrerad mot fakturan.':`Den visade referensen ${reference} finns i faktura ${invoice.number}. Kund och betalningsunderlag behöver kontrolleras separat.`:reference?`Ingen entydig registerfaktura med den visade betalningsreferensen ${reference} hittades.`:'Betalningsreferens och faktura behöver identifieras.');
+  return {invoice,status,message,registered,bookedInvoices,bookedIds,allocationConflict,reference};
 }
 const referenceLabel=(kind:string)=>kind==='ocr'?'OCR':kind==='invoice'?'Fakturareferens':'Betalningsreferens';
 export function paymentEvidenceView(t:Transaction){
@@ -42,14 +71,14 @@ export function paymentEvidenceView(t:Transaction){
   return {payer:payerLabel(t),payerKnown:!!bankPayer(t),reference,referenceLabel:referenceLabel(reference.kind),manualPayer:t.verification?.party||(t.evidence==='verified_specification'?t.party:''),manualReference:t.verification?.payerReference||(t.evidence==='verified_specification'?t.payerReference:''),original:{source,label:source==='bank'?'Bankens ursprungliga uppgifter':source==='manual'?'Manuellt registrerade ursprungsuppgifter':'Sparade ursprungsuppgifter · källan är inte verifierad',referenceLabel:referenceLabel(originalReference.kind)}};
 }
 export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]=[]){
-  const assessment=paymentInvoiceAssessment(state,t),evidenceView=paymentEvidenceView(t),requiresSpecification=needsPaymentSpecification(t);
-  const sourceLink=activeBankgiroLink(state,t.id),linkedRow=sourceLink?.rows.length===1?sourceLink.rows[0]:undefined;
-  const linkedPayer=linkedRow?cleanParty(linkedRow.party):'',linkedReference=linkedRow?referenceView(linkedRow.payerReference,linkedRow.referenceEvidence,linkedRow.referenceParts):undefined;
+  const sourceLink=activeBankgiroLink(state,t.id),fieldSources=bankPaymentFieldSources(state,t);
+  const assessment=bankPaymentInvoiceAssessment(state,t,fieldSources),evidenceView=paymentEvidenceView(t),requiresSpecification=needsPaymentSpecification(t);
   const allocations=state.allocations.filter(a=>a.active&&a.transactionId===t.id),invoices=allocations.map(a=>state.invoices.find(i=>i.id===a.invoiceId)).filter(i=>!!i);
   const invoiceNumbers=[...new Set(invoices.map(i=>i.number))];
-  const possible=[...new Set([...candidates.map(c=>c.number),...(assessment.status!=='verified'&&assessment.invoice?[assessment.invoice.number]:[])])];
-  const evidence=t.bankDetails?.referenceEvidence||t.referenceEvidence;
-  const references=matchingReferenceValues(evidence,t.payerReference);
+  const selectedReference=fieldSources.reference.value.value,sourceCandidates=candidates.filter(c=>!selectedReference||exactReference(selectedReference,c.number)||state.invoices.some(i=>i.number===c.number&&i.ocr&&exactReference(selectedReference,i.ocr)));
+  const possible=[...new Set([...sourceCandidates.map(c=>c.number),...(assessment.status!=='verified'&&assessment.invoice?[assessment.invoice.number]:[])])];
+  const evidence=fieldSources.reference.evidence;
+  const references=matchingReferenceValues(evidence,fieldSources.reference.value.value);
   const owners=new Set(state.invoices.filter(i=>!i.voided&&references.some(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual)))).map(i=>i.id));
   const contradictory=references.length>1&&!state.invoices.some(i=>references.every(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual))));
   const bankConflict=paymentEvidenceConflict(state,t),conflict=bankConflict||!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
@@ -59,6 +88,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   else if(bankConflict)status='Motstridigt bankunderlag';
   else if(paymentOriginalIssue(state,t))status='Original behöver verifieras';
   else if(needsBankFileValidation(t))status='Original behöver verifieras';
+  else if(assessment.allocationConflict)status='Referenskonflikt';
   else if(sourceLink&&!allocations.length)status='Fakturan behöver granskas';
   else if(requiresSpecification)status='Specifikation saknas';
   else if(conflict)status='Konflikt';
@@ -69,7 +99,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   }else if(possible.length)status='Möjlig matchning';
   const sources=sourceLink?'Swedbank + Bankgiro '+(sourceLink.rows.some(row=>/xlsx|excel/i.test(row.format||row.source||''))?'Excel':'specifikation'):'';
   const candidateNote=!sourceLink&&bankgiroLinkCandidates(state,t).length?'Möjlig tillhörande Bankgirospecifikation – kontrollera.':'';
-  return {...evidenceView,...(linkedPayer?{payer:linkedPayer,payerKnown:true}:{}),...(linkedReference?.value?{reference:linkedReference,referenceLabel:referenceLabel(linkedReference.kind)}:{}),sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
+  return {...evidenceView,payer:fieldSources.payer.value||(t.amount<0?'Mottagare okänd':'Betalare okänd'),payerKnown:!!fieldSources.payer.value,reference:fieldSources.reference.value,referenceLabel:referenceLabel(fieldSources.reference.value.kind),fieldSources,sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!assessment.allocationConflict&&assessment.status!=='ambiguous'&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
 }
 export function bankVisibleTransactions(state:State){
   const linkedSpecifications=new Set((state.bankgiroLinks||[]).flatMap(link=>activeBankgiroLink(state,link.transactionId)?.rows.map(row=>row.id)||[]));

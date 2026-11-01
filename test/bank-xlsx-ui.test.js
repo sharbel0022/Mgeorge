@@ -50,3 +50,33 @@ test('stale Node source relation exposes revoke controls without a valid display
  const run=view();run(`state.me={authenticated:true};state.transactions=[{id:'bank',amount_cents:62500,booked_at:'2026-10-26',specification_link:null}];globalThis.dialogHtml='';modal=(title,html)=>{dialogHtml=html;};api=async()=>({items:[],active_links:[{id:'stale-link',evidence:'Tidigare granskning',created_at:'2026-10-26T10:00:00Z',stale:true,reason:'Originalfilen saknas'}]});`);
  await run('bankSpecificationDialog("bank")');assert.match(run('dialogHtml'),/data-revoke-bank-specification="stale-link"/);assert.match(run('dialogHtml'),/Originalfilen saknas/);assert.doesNotMatch(run('dialogHtml'),/Bekräfta manuell källkoppling/);
 });
+
+test('linked report reference never borrows an invoice suggestion from a different AIS reference',()=>{
+ const run=view();run(`state.invoices=[{id:'ais-invoice',invoice_number:'0600',reference:'0600',party:'AIS customer'},{id:'report-invoice',invoice_number:'0599',reference:'0599',party:'Report customer'}];state.suggestions=[{transaction_id:'bank',invoice_id:'ais-invoice',reason:'AIS reference'}];state.transactions=[{id:'bank',amount_cents:62500,booked_at:'2026-10-26',payer:'AIS payer',reference:'0600',status:'review',specification_link:{verification:'manual',payer:'Report customer',reference:'0599',payments:[{payer:'Report customer',reference:'0599'}]}}];`);
+ const before=run('JSON.stringify(state)'),html=run('bankTable(state.transactions)');
+ assert.match(html,/Report customer/);assert.match(html,/>0599</);assert.doesNotMatch(html,/Möjlig faktura: 0600/);assert.match(html,/referenser.*skiljer sig/i);
+ assert.equal(run('JSON.stringify(state)'),before);
+ run("state.suggestions.push({transaction_id:'bank',invoice_id:'report-invoice',reason:'Report reference'})");
+ assert.match(run('bankTable(state.transactions)'),/Möjlig faktura: 0599/);
+});
+
+test('confirmed allocations remain visible when linked-report and AIS references differ',()=>{
+ const run=view();run(`state.invoices=[{id:'allocated',invoice_number:'0600',reference:'0600',remaining_cents:0}];state.allocations=[{transaction_id:'bank',invoice_id:'allocated',amount_cents:62500}];state.suggestions=[];state.transactions=[{id:'bank',amount_cents:62500,booked_at:'2026-10-26',reference:'0600',status:'matched',available_cents:0,specification_link:{verification:'manual',payer:'Report customer',reference:'0599'}}];`);
+ const before=run('JSON.stringify(state)'),html=run('bankTable(state.transactions)');assert.match(html,/<td data-label="Faktura">0600/);assert.match(html,/>0599</);assert.match(html,/referenser.*skiljer sig/i);assert.equal(run('JSON.stringify(state)'),before);
+});
+
+test('linked report detail renders retained raw evidence and uses the report booking date',()=>{
+ const run=view();run(`globalThis.linked={id:'bank',booked_at:'2026-10-27',specification_link:{verification:'manual',import_id:'original',payments:[{payer:'Report customer',reference:'0599',amount_cents:62500,booked_at:'2026-10-26',bankgiro:'1234-5678',account_evidence:{reported_account:'8000000123456789',report:{sequence:'83'},cells:{reference:{sheet:'Insättningsuppgift',address:'C19',type:'s',rawValue:'0599'}}},payer_evidence:{name:{raw:' Report customer ',source:'$.xlsx["Insättningsuppgift"].A19'}},reference_evidence:{candidates:[{value:'0599',kind:'structured',raw:'0599',source:'$.xlsx["Insättningsuppgift"].C19'}]}}]}}`);
+ const html=run('bankSpecificationLinkedPanel(linked)');assert.match(html,/Bankens originaluppgifter och celler/);assert.match(html,/C19/);assert.match(html,/structured/);assert.match(html,/rawValue/);assert.match(html,/reported_account/);assert.match(html,/1234-5678/);assert.match(html,/data-label="Datum">2026-10-26/);assert.doesNotMatch(html,/data-label="Datum">2026-10-27/);
+});
+
+test('linked suggestion filtering preserves leading zeros and does not invent a multi-payer main candidate',()=>{
+ const run=view();run(`state.invoices=[{id:'different',invoice_number:'599',reference:'599'}];state.suggestions=[{transaction_id:'bank',invoice_id:'different'}];state.transactions=[{id:'bank',amount_cents:62500,booked_at:'2026-10-26',reference:'599',specification_link:{verification:'manual',payer:'Report customer',reference:'0599'}}]`);
+ assert.doesNotMatch(run('bankTable(state.transactions)'),/Möjlig faktura: 599/);
+ run("state.transactions[0].specification_link.reference=''");assert.doesNotMatch(run('bankTable(state.transactions)'),/Möjlig faktura/);
+});
+
+test('linked transaction dialog keeps all selectable invoices but does not label an unrelated AIS suggestion',()=>{
+ const run=view();run(`state.invoices=[{id:'ais',invoice_number:'0600',reference:'0600',direction:'customer',remaining_cents:62500},{id:'report',invoice_number:'0599',reference:'0599',direction:'customer',remaining_cents:62500}];state.suggestions=[{transaction_id:'bank',invoice_id:'ais',reason:'UNRELATED AIS SUGGESTION'}];state.transactions=[{id:'bank',source:'enablebanking',amount_cents:62500,available_cents:62500,booked_at:'2026-10-26',reference:'0600',payer:'AIS payer',specification_link:{verification:'manual',reference:'0599',payer:'Report customer'}}];globalThis.dialogHtml='';modal=(title,html)=>{dialogHtml=html;};transactionDialog('bank')`);
+ const html=run('dialogHtml');assert.match(html,/value="ais"/);assert.match(html,/value="report"/);assert.doesNotMatch(html,/UNRELATED AIS SUGGESTION/);
+});

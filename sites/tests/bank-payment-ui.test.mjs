@@ -7,6 +7,7 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {emptyState,paymentInvoiceAssessment} from '../lib/domain.ts';
 import {extractPaymentReferences} from '../lib/payment-references.js';
+import {paymentFieldSourceFixture,paymentFieldInvoiceFixture} from './helpers/payment-field-source-fixture.mjs';
 
 const url=p=>new URL(p,import.meta.url).href;
 function compiled(path,imports={}){
@@ -119,4 +120,39 @@ test('known payer and typed bank OCR do not receive missing-information explanat
  const s=emptyState(),t=tx({kind:'payment',party:'Bank payer',description:'',payerReference:'000018'}, {reference_number:undefined,ocr:'000018'});s.transactions.push(t);
  const html=render(ui.default,{state:s,transactions:[t],open(){}});
  assert.match(html,/Bank payer/);assert.equal((html.match(/<strong class="mono">000018<\/strong>/g)||[]).length,2);assert.equal((html.match(/<span class="bank-reference-label">OCR<\/span>/g)||[]).length,2);assert.doesNotMatch(html,/Bank-OCR saknas\.|banken har inte lämnat verifierade individuella uppgifter/);
+});
+
+test('one shared read-only selector returns the actual independent payer and reference sources',()=>{
+ assert.equal(typeof view.bankPaymentFieldSources,'function');
+ const {state,target,report}=paymentFieldSourceFixture(),before=structuredClone(state),sources=view.bankPaymentFieldSources(state,target);
+ assert.equal(sources.payer.kind,'report');assert.equal(sources.reference.kind,'report');assert.equal(sources.payer.row.id,report.id);assert.equal(sources.reference.row.id,report.id);assert.equal(sources.payer.evidence.organizationNumber,'3333333333');assert.equal(sources.reference.value.value,'0599');assert.match(sources.reference.evidence.candidates[0].source,/columns/);assert.deepEqual(state,before);assert.equal(state.allocations.length,0);
+});
+
+test('detail payer and AIS reference keep different original evidence when detail has no reference',()=>{
+ assert.equal(typeof view.bankPaymentFieldSources,'function');
+ const {state,target}=paymentFieldSourceFixture({linked:false,detailReference:'',collective:false});
+ const sources=view.bankPaymentFieldSources(state,target);
+ assert.equal(sources.payer.kind,'detail');assert.equal(sources.payer.evidence.organizationNumber,'2222222222');assert.equal(sources.reference.kind,'transaction');assert.equal(sources.reference.evidence,target.referenceEvidence);
+});
+
+test('a general detail reference never inherits an AIS OCR referencePart with the same value',()=>{
+ const t=tx({kind:'payment',party:'AIS payer AB',description:'',payerReference:'000018',referenceParts:[{value:'000018',source:'$.ais.ocr',kind:'ocr'}]},{reference_number:undefined,ocr:'000018'});
+ t.bankDetails={party:'Detail payer AB',payerReference:'000018',referenceEvidence:extractPaymentReferences({payment_reference:'000018'})};
+ assert.equal(view.bankPaymentReference(t).kind,'reference');assert.equal(view.bankPaymentReference(t).ocr,'');
+});
+
+test('unused detail reference metadata cannot classify the AIS reference as OCR',()=>{
+ const t=tx({kind:'payment',party:'AIS payer AB',description:'',payerReference:'000018'},{reference_number:undefined,payment_reference:'000018'});
+ t.bankDetails={party:'Detail payer AB',payerReference:'',referenceEvidence:extractPaymentReferences({ocr:'000018'})};
+ assert.equal(view.bankPaymentReference(t).kind,'reference');assert.equal(view.bankPaymentReference(t).ocr,'');
+});
+
+test('a displayed report reference selects its invoice rather than the different detail-reference invoice',()=>{
+ const {state,target}=paymentFieldInvoiceFixture(),before=structuredClone(state),actual=view.bankPaymentView(state,target,[{number:'0800',party:'Detail source payer AB'}]);
+ assert.equal(actual.reference.value,'0599');assert.equal(actual.invoice,'Möjlig: 0599');assert.deepEqual(actual.possible,['0599']);assert.deepEqual(state,before);assert.equal(state.allocations.length,0);
+});
+
+test('an existing different booking remains visible with a reference conflict and an independent report-invoice proposal',()=>{
+ const {state,target}=paymentFieldInvoiceFixture({booked:true}),before=structuredClone(state),actual=view.bankPaymentView(state,target);
+ assert.equal(actual.reference.value,'0599');assert.equal(actual.invoice,'0800');assert.deepEqual(actual.invoiceNumbers,['0800']);assert.deepEqual(actual.possible,['0599']);assert.equal(actual.status,'Referenskonflikt');assert.equal(actual.invoiceVerified,false);assert.deepEqual(state,before);
 });

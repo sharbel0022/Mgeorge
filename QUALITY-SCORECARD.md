@@ -1,5 +1,11 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Kravkontrollens alias- och fältkällor — 2026-11-01
+
+[Samlad kravmatris](docs/PAYMENT-VERIFICATION-ACCEPTANCE.md), [kompletteringsrapport](docs/PAYMENT-EVIDENCE-SOURCES-VERIFICATION.md). Berörda bankimport-/konto-, betalar-/referens-, fakturavy-, historik-/saldo-, användbarhets-, säkerhets-, test- och produktionspoäng behålls. Ett uttryckligt provider-alias kan nu kontrolleras även vid Nodes manuella originalrelation utan att ändra parserns råa kontobevis eller ge allokeringsrätt. Node visar rapportens fulla råevidens/celler och döljer AIS-baserade förslagsmarkeringar som inte stöds av den visade rapportreferensen. Sites håller visat fält, identifierartyp/råvärde/fältsökväg och fakturaoriginal på samma källkedja; verkliga tidigare bokningar bevaras med referenskonflikt.
+
+Lokalt **645/645 Node +1126/1126 Sites**, syntax92, TypeScript/produktionsbygge och auditgrindar passerar. Oförändrade paket-/lockfiler; produktionaudit0, full Sites16 moderate utvecklingsfynd/0high/critical. Samma15-fallskorpus:10/10 korrekta manuella relationer,0 felaktiga relationer/allokeringar/dubblettfall,15/15 oförändrade saldon och8/8 namn/referenser före/efter. Granskning utan kvarstående konkreta fynd. Mobil390px-provet gäller faktisk komponent/CSS med syntetiskt tillstånd. Ny leveransidentitet redovisas först efter faktisk main/CI/Sites-publicering; produktionspoäng6,5 och övriga senaste poäng oförändrade, inget9,5. Verkligt kontoalias/rapport-/AIS-samband och separat registrering/kundattest för0599 återstår.
+
 ## Hela betalningskedjan — 2026-11-01
 
 Leverans verifierad: main `a8453a1`, [exakt Actions success](https://github.com/sharbel0022/Mgeorge/actions/runs/41351500449), Sites **46 succeeded**, samma Sites-träd och runtime 9. Läsande verklig elvastegskontroll och faktisk dialog: revision **40 → 40**, hela tillståndet/ekonomiska projektionen oförändrade, fem fakturor och noll allokeringar. Kontoalias/rapportidentitet och registrering/kundrelation återstår. Policy, auth, DB/R2-deklarationer, tabellista och scheman bevarade. [Exakta bevis](docs/END-TO-END-PAYMENT-PUBLICATION.json). Poängen är fortsatt oförändrade; leveransframgång är ingen färdig verksamhetsavstämning.

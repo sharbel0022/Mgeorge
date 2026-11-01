@@ -6,6 +6,7 @@ import {emptyState,applyCommand,balance} from '../lib/domain.ts';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {makeBankgiroXLSX} from './helpers/bankgiro-xlsx-fixture.mjs';
 import {parseSpecificationBytes} from '../lib/bankgiro-parser.js';
+import {paymentFieldSourceFixture,paymentFieldInvoiceFixture} from './helpers/payment-field-source-fixture.mjs';
 
 const url=p=>new URL(p,import.meta.url).href,data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
 function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [name,value]of Object.entries({'./payment-references.js':url('../lib/payment-references.js'),'./bank-api-original.js':url('../lib/bank-api-original.js'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(value));return data(code);}
@@ -83,13 +84,17 @@ test('an unavailable invoice document candidate is only a proposal, not a found 
  assert.equal(step(r,'invoice').statusLabel,'Underlagsförslag · ej registrerad');assert.match(step(r,'invoice').reason,/inte.*kontroller|saknas/i);
 });
 
-async function serviceFixture(t,{invoiceMode='valid',candidate=false,accountIssue='',unauthenticated=false,report=false,reportAccountIssue='',detailMode='none'}={}){
+async function serviceFixture(t,{invoiceMode='valid',candidate=false,accountIssue='',unauthenticated=false,report=false,reportAccountIssue='',detailMode='none',sourceInvoices=false,booked=false}={}){
  const key='__payment_verification_'+crypto.randomUUID().replaceAll('-',''),bytes=new TextEncoder().encode('Synthetic invoice original, no customer data'),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex');
  let state=fixture({invoice:!candidate,batch:report}),reportRows=[];
  if(report){const original=makeBankgiroXLSX({account:state.transactions[0].account.slice(5),date:'2026-10-26',payments:[{party:'Report payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});reportRows=parseSpecificationBytes(original,'synthetic.xlsx');state=applyCommand(state,{type:'bankgiro.import',documentId:'synthetic-report',hash:'a'.repeat(64),name:'synthetic.xlsx',rows:reportRows}).state;}
+ if(sourceInvoices){const f=paymentFieldInvoiceFixture({booked});state=f.state;reportRows=f.reportRows;}
  let detailBytes=new Uint8Array(),detailHash='';
  if(detailMode!=='none'){
   const target=state.transactions[0],listed=structuredClone(target.bankData),detail={...structuredClone(listed),debtor:{name:'Synthetic detail payer AB'}},at='2026-10-29T12:00:00.000Z';
+  if(detailMode==='organization')detail.debtor.organisation_id={identification:'556777-8899',scheme_name:'COID',issuer:'SE'};
+  if(detailMode==='raw-reference')detail.reference_number=' 0599 ';
+  if(detailMode==='raw-message'){delete detail.reference_number;detail.remittance_information=['Faktura 0599'];}
   target.bankDetails={...transactionDetailEvidence(target,listed,detail),checkedAt:at,documentId:'synthetic-detail-original',bankReferenceText:''};
   const envelope={source:'Enable Banking transaction details',account:detailMode==='envelope'?'iban:FOREIGN':target.account,bankReference:target.bankReference,checkedAt:at,listed,detail};
   detailBytes=new TextEncoder().encode(JSON.stringify(envelope));detailHash=Buffer.from(await crypto.subtle.digest('SHA-256',detailBytes)).toString('hex');
@@ -100,7 +105,7 @@ async function serviceFixture(t,{invoiceMode='valid',candidate=false,accountIssu
  }
  const f={owner:'synthetic-owner',state,queries:[],reads:[],accountChecks:[],originalChecks:[],reportChecks:[],reportRows,reportAccountIssue,previewChecks:0,revision:17,accountIssue,unauthenticated,invoiceMode,candidate,bytes,hash,detailMode};
  f.DB={prepare(sql){assert.match(sql,/^SELECT /);assert.match(sql,/owner\s*=/);return{bind(...args){f.queries.push({sql,args});return{async first(){assert.equal(args[1],f.owner);if(args[0]==='synthetic-detail-original')return detailMode==='foreign'?null:{mime:detailMode==='mime'?'text/plain':'application/json',size:detailBytes.length,sha256:detailHash};return invoiceMode==='foreign'?null:{size:bytes.length,sha256:hash};},async all(){assert.equal(args[0],f.owner);return{results:candidate?[{document_id:'synthetic-invoice-original',status:'needs_review',extraction:JSON.stringify({direction:'customer',kind:'invoice',currency:'SEK',invoice_number:'0599',party:'Synthetic customer AB',total_cents:62500,issued_at:'2026-10-01'})}]:[]};}};}};}};
- f.env={BUCKET:{async get(path){f.reads.push(path);assert.ok([f.owner+'/synthetic-invoice-original',f.owner+'/synthetic-detail-original'].includes(path));const isDetail=path.endsWith('/synthetic-detail-original'),mode=isDetail?detailMode:invoiceMode;if(mode==='missing')return null;const contents=mode==='corrupt'?new TextEncoder().encode('Tampered synthetic data'):isDetail?detailBytes:bytes;return{size:contents.length,arrayBuffer:async()=>contents.buffer};}}};
+ f.env={BUCKET:{async get(path){f.reads.push(path);assert.ok(['synthetic-invoice-original','synthetic-detail-original','synthetic-invoice-0599','synthetic-invoice-0800'].map(id=>f.owner+'/'+id).includes(path));const isDetail=path.endsWith('/synthetic-detail-original'),mode=isDetail?detailMode:invoiceMode;if(mode==='missing')return null;const contents=mode==='corrupt'?new TextEncoder().encode('Tampered synthetic data'):isDetail?detailBytes:bytes;return{size:contents.length,arrayBuffer:async()=>contents.buffer};}}};
  globalThis[key]=f;t.after(()=>delete globalThis[key]);
  const server=data(`const f=globalThis[${JSON.stringify(key)}];export function db(){return f.DB;}export async function identity(){if(f.unauthenticated)throw Error('AUTH_REQUIRED');return {userId:f.owner};}export async function readWorkspace(owner){if(owner!==f.owner)throw Error('Wrong owner');return {state:f.state,revision:f.revision};}export const response=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'private, no-store'}});export const failure=error=>response({error:error.message},error.message==='AUTH_REQUIRED'?401:400);`);
  const evidence=data(`import {paymentOriginalIssue} from ${JSON.stringify(domain)};const f=globalThis[${JSON.stringify(key)}];export async function paymentOriginalAvailabilityIssue(owner,state,id){if(owner!==f.owner||state!==f.state)throw Error('Wrong owner/state');f.originalChecks.push(id);const target=state.transactions.find(t=>t.id===id);return target?paymentOriginalIssue(state,target):'Original saknas';}export async function reconciliationPreviewWithOriginals(owner,state){if(owner!==f.owner||state!==f.state)throw Error('Wrong owner/state');f.previewChecks++;return {findings:[]};}`);
@@ -212,4 +217,25 @@ for(const [label,damage,expected]of [
  const before=structuredClone(f.state),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+transaction.id)),r=await response.json();
  assert.equal(response.status,200);assert.equal(step(r,'received').status,'passed');assert.equal(step(r,'original').status,expected);if(expected==='passed')assert.equal(step(r,'original').statusLabel,'Intakt i denna kontroll');else assert.equal(r.automaticEligible,false);
  assert.deepEqual(f.state,before);assert.equal(f.state.allocations.length,0);assert.equal(f.control.originalChecks.length,1);
+});
+
+test('a checked detail payer displays its own COID/SE value, raw identifier and source path',{skip:!implemented},async t=>{
+ const f=await serviceFixture(t,{detailMode:'organization'}),before=structuredClone(f.state),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+f.state.transactions[0].id)),r=await response.json(),payer=step(r,'payer'),facts=payer.facts.map(f=>f.label+': '+f.value).join('\n');
+ assert.equal(response.status,200);assert.equal(payer.status,'passed');assert.equal(payer.source,'Bankens separata detaljoriginal');assert.match(facts,/Svenskt organisationsnummer/);assert.match(facts,/5567778899/);assert.match(facts,/556777-8899/);assert.match(facts,/COID/);assert.match(facts,/SE/);assert.match(facts,/\$\.debtor\.organisation_id\.identification/);assert.deepEqual(f.state,before);
+});
+
+test('a linked report payer and reference expose the report identifiers and paths, not AIS or detail metadata',{skip:!implemented},()=>{
+ const {state,target}=paymentFieldSourceFixture(),before=structuredClone(state),r=build(state,target.id),payer=step(r,'payer'),reference=step(r,'reference'),facts=payer.facts.map(f=>f.label+': '+f.value).join('\n');
+ assert.equal(payer.source,'Kopplat Bankgirooriginal');assert.equal(reference.source,'Kopplat Bankgirooriginal');assert.match(facts,/3333333333/);assert.match(facts,/333333-3333/);assert.match(facts,/COID/);assert.match(facts,/SE/);assert.match(facts,/\$\.columns\[7\]\.Organisationsnummer/);assert.doesNotMatch(facts,/111111|222222/);assert.equal(reference.facts.find(f=>f.label==='Referens').value,'0599');assert.deepEqual(state,before);assert.equal(state.allocations.length,0);
+});
+
+for(const [detailMode,raw]of [['raw-reference',' 0599 '],['raw-message','Faktura 0599']])test(`the ${detailMode} source keeps its complete raw reference while the selected reference stays normalized`,{skip:!implemented},async t=>{
+ const f=await serviceFixture(t,{detailMode}),before=structuredClone(f.state),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+f.state.transactions[0].id)),r=await response.json(),reference=step(r,'reference');
+ assert.equal(response.status,200);assert.equal(reference.status,'passed');assert.equal(reference.facts.find(f=>f.label==='Referens').value,'0599');assert.equal(reference.facts.find(f=>f.label==='Ursprunglig referens 1').value,raw);assert.deepEqual(f.state,before);assert.equal(f.state.allocations.length,0);
+});
+
+for(const booked of [false,true])test(`GET selects and rereads the displayed report reference invoice with ${booked?'an intact conflicting booking':'no booking'}`,{skip:!implemented},async t=>{
+ const f=await serviceFixture(t,{sourceInvoices:true,booked}),before=structuredClone(f.state),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+f.state.transactions[0].id)),r=await response.json(),invoice=step(r,'invoice');
+ assert.equal(response.status,200);assert.equal(step(r,'reference').facts.find(f=>f.label==='Referens').value,'0599');assert.equal(invoice.facts.find(f=>f.label==='Fakturanummer').value,'0599');assert.ok(f.control.reads.includes('synthetic-owner/synthetic-invoice-0599'));assert.ok(!f.control.reads.includes('synthetic-owner/synthetic-invoice-0800'));assert.equal(r.automaticEligible,false);assert.deepEqual(f.state,before);assert.equal(balance(f.state,f.state.invoices.find(i=>i.number==='0599')),62500);assert.equal(balance(f.state,f.state.invoices.find(i=>i.number==='0800')),booked?0:62500);
+ if(booked){assert.equal(invoice.status,'blocked');assert.match(invoice.facts.map(f=>f.label+': '+f.value).join('\n'),/Bokade fakturor: 0800/);assert.equal(step(r,'reconciliation').status,'blocked');assert.equal(f.state.allocations.length,1);}else assert.equal(f.state.allocations.length,0);
 });

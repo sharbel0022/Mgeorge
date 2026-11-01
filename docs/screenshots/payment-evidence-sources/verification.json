@@ -1,0 +1,20 @@
+{
+  "scope": "Actual PaymentVerificationReport and buildPaymentVerification with synthetic normalizeTransactions/transactionDetailEvidence, no API, DB or provider calls.",
+  "desktop": {
+    "width": 1440,
+    "documentWidth": 1425,
+    "steps": 11,
+    "COID": true,
+    "issuerSE": true,
+    "fieldPath": true
+  },
+  "mobile": {
+    "documentWidth": 375,
+    "hasCOID": true,
+    "hasPath": true,
+    "steps": 11,
+    "width": 390
+  },
+  "screenshotScope": "Viewport screenshots; full-page CDP capture timed out, same tab viewport capture succeeded.",
+  "keyboardExpand": true
+}

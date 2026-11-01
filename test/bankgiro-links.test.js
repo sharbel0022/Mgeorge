@@ -44,6 +44,8 @@ test('AIS and retained XLSX can be manually associated and revoked without finan
   assert.equal(report.can_link,true);assert.equal(report.rows[0].reference,'0599');
   const link=module.confirmBankSpecificationLink(f.db,input(f,report),owner);
   assert.equal(link.verification,'manual');assert.equal(link.payer,'Syntetiskt Bistro AB');assert.equal(link.reference,'0599');
+  assert.deepEqual(link.payments[0].payer_evidence,report.rows[0].payer_evidence);assert.deepEqual(link.payments[0].reference_evidence,report.rows[0].reference_evidence);assert.deepEqual(link.payments[0].account_evidence,report.rows[0].account_evidence);
+  assert.equal(link.payments[0].account_evidence.cells.reference.rawValue,'0599');assert.equal(link.payments[0].account_evidence.cells.reference.type,'s');assert.equal(link.payments[0].account_evidence.cells.reference.address,'C19');
   assert.deepEqual(counts(f.db),before);assert.deepEqual(f.db.prepare('SELECT * FROM bank_transactions').get(),original);
   assert.equal(module.confirmBankSpecificationLink(f.db,input(f,report),owner).id,link.id);
   assert.equal(f.db.prepare("SELECT COUNT(*) n FROM audit_events WHERE action='bank_specification_linked'").get().n,1);
@@ -124,4 +126,63 @@ test('stale source decisions remain reachable for owner-scoped revocation after 
  const f=fixture();try{const report=module.bankSpecificationCandidates(f.db,f.transaction_id,owner).items[0],link=module.confirmBankSpecificationLink(f.db,input(f,report),owner);mutate(f);
  const review=module.bankSpecificationCandidates(f.db,f.transaction_id,owner);assert.equal(review.active_links[0].id,link.id);assert.equal(review.active_links[0].owner,owner);module.revokeBankSpecificationLink(f.db,review.active_links[0].id,{evidence:'Omprövning efter förlorat underlag.'},owner);assert.equal(f.db.prepare("SELECT COUNT(*) n FROM bank_specification_links WHERE revoked_at=''").get().n,0);
  }finally{f.close();}}
+});
+
+const reportAlias='8000-0 00123456789';
+const aliasResource=(more={})=>({uid:'account',account_id:{iban:account},currency:'SEK',all_account_ids:[{scheme_name:'BBAN',identification:reportAlias}],...more});
+const resources=(f,items)=>f.db.prepare('UPDATE bank_connections SET accounts_json=?').run(encryptObject(items));
+const financialRows=f=>Object.fromEntries(['bank_transactions','invoices','allocations','payer_links'].map(table=>[table,f.db.prepare(`SELECT * FROM ${table}`).all()]));
+
+for(const [source,alias,resource,expectedField] of [
+ ['BBAN all_account_ids',reportAlias,aliasResource(),'all_account_ids[0]'],
+ ['CPAN all_account_ids','0012345678901',aliasResource({all_account_ids:[{scheme_name:'CPAN',identification:'0012345678901'}]}),'all_account_ids[0]'],
+ ['IBAN all_account_ids','SE4550000000058398257466',aliasResource({all_account_ids:[{scheme_name:'IBAN',identification:'SE4550000000058398257466'}]}),'all_account_ids[0]'],
+ ['BBAN account_id.other',reportAlias,aliasResource({account_id:{iban:account,other:{scheme_name:'BBAN',identification:reportAlias}},all_account_ids:[]}),'account_id.other'],
+])test(`an exact provider-backed ${source} permits only a manual original relation`,()=>{
+ const f=fixture({account:alias});try{
+  resources(f,[resource]);const before=financialRows(f),original=Buffer.from(f.db.prepare('SELECT content FROM import_jobs WHERE id=?').get(f.import_id).content);
+  const report=module.bankSpecificationCandidates(f.db,f.transaction_id,owner).items[0];
+  assert.equal(report.can_link,true);assert.equal(report.rows[0].account_evidence.exact_match,false,'Do not rewrite the parser evidence.');
+  assert.equal(report.reported_account,alias);assert.equal(report.account_relation.kind,'provider_alias');assert.equal(report.account_relation.field,expectedField);
+  const link=module.confirmBankSpecificationLink(f.db,input(f,report),owner);
+  assert.equal(link.verification,'manual');assert.equal(link.reported_account,alias);assert.equal(link.account_relation.kind,'provider_alias');assert.equal(link.account_relation.selected_account,account);
+  assert.equal(module.bankSpecificationPresentation(f.db,f.transaction_id,owner).reported_account,alias);
+  assert.deepEqual(financialRows(f),before);assert.deepEqual(Buffer.from(f.db.prepare('SELECT content FROM import_jobs WHERE id=?').get(f.import_id).content),original);
+  assert.equal(module.bankSpecificationCandidates(f.db,f.transaction_id,owner).items[0].rows[0].account_evidence.exact_match,false);
+ }finally{f.close();}
+});
+
+for(const [name,items] of [
+ ['missing alias',[aliasResource({all_account_ids:[]})]],
+ ['similar digits',[aliasResource({all_account_ids:[{scheme_name:'BBAN',identification:'8000000123456780'}]})]],
+ ['unknown scheme',[aliasResource({all_account_ids:[{scheme_name:'OTHER',identification:reportAlias}]})]],
+ ['numeric identifier',[aliasResource({all_account_ids:[{scheme_name:'BBAN',identification:800000123456789}]})]],
+ ['alias on another resource',[aliasResource(),aliasResource({uid:'another',account_id:{iban:'SE4550000000058398257466'}})]],
+ ['duplicate selected UID',[aliasResource(),aliasResource()]],
+])test(`a ${name} cannot authorize a provider account alias relation`,()=>{
+ const f=fixture({account:reportAlias});try{
+  resources(f,items);const before=financialRows(f);
+  let report;try{report=module.bankSpecificationCandidates(f.db,f.transaction_id,owner).items[0];}catch(error){assert.match(error.message,/konto|medgivande/i);}
+  if(report)assert.equal(report.can_link,false);
+  assert.throws(()=>module.confirmBankSpecificationLink(f.db,input(f,report||{report_key:'missing'}),owner));
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM bank_specification_links').get().n,0);assert.deepEqual(financialRows(f),before);
+ }finally{f.close();}
+});
+
+for(const [name,change] of [
+ ['removed alias',f=>resources(f,[aliasResource({all_account_ids:[]})])],
+ ['foreign owner',f=>f.db.prepare("UPDATE bank_connections SET owner='another-owner'").run()],
+ ['deselected account',f=>f.db.prepare("UPDATE bank_connections SET selected_account_uid='another-account'").run()],
+ ['expired consent',f=>f.db.prepare("UPDATE bank_connections SET valid_until='2000-01-01'").run()],
+ ['ambiguous alias',f=>resources(f,[aliasResource(),aliasResource({uid:'another',account_id:{iban:'SE4550000000058398257466'}})])],
+])test(`an existing alias relation becomes stale after ${name} without changing money`,()=>{
+ const f=fixture({account:reportAlias});try{
+  resources(f,[aliasResource()]);const report=module.bankSpecificationCandidates(f.db,f.transaction_id,owner).items[0];assert.equal(report.can_link,true);
+  const link=module.confirmBankSpecificationLink(f.db,input(f,report),owner),before=financialRows(f);change(f);
+  assert.equal(module.bankSpecificationPresentation(f.db,f.transaction_id,owner),null);
+  const review=module.bankSpecificationCandidates(f.db,f.transaction_id,owner);assert.equal(review.active_links[0].id,link.id);assert.equal(review.active_links[0].stale,true);
+  assert.ok(review.items.every(item=>!item.can_link&&item.link===null));
+  assert.throws(()=>module.confirmBankSpecificationLink(f.db,input(f,report),owner));assert.deepEqual(financialRows(f),before);
+  module.revokeBankSpecificationLink(f.db,link.id,{evidence:'Removed or invalid provider account evidence checked.'},owner);assert.deepEqual(financialRows(f),before);
+ }finally{f.close();}
 });
