@@ -8,7 +8,7 @@ import {makeBankgiroXLSX} from './helpers/bankgiro-xlsx-fixture.mjs';
 import {parseSpecificationBytes} from '../lib/bankgiro-parser.js';
 
 const url=p=>new URL(p,import.meta.url).href,data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
-function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [name,value]of Object.entries({'./payment-references.js':url('../lib/payment-references.js'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(value));return data(code);}
+function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [name,value]of Object.entries({'./payment-references.js':url('../lib/payment-references.js'),'./bank-api-original.js':url('../lib/bank-api-original.js'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(value));return data(code);}
 const domain=url('../lib/domain.ts'),engine=url('../lib/reconciliation-engine.js');
 const presentation=compiled('../lib/payment-presentation.ts',{'./domain':domain,'./reconciliation-engine.js':engine,'./payment-references.js':url('../lib/payment-references.js')});
 const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});
@@ -103,7 +103,7 @@ async function serviceFixture(t,{invoiceMode='valid',candidate=false,accountIssu
  f.env={BUCKET:{async get(path){f.reads.push(path);assert.ok([f.owner+'/synthetic-invoice-original',f.owner+'/synthetic-detail-original'].includes(path));const isDetail=path.endsWith('/synthetic-detail-original'),mode=isDetail?detailMode:invoiceMode;if(mode==='missing')return null;const contents=mode==='corrupt'?new TextEncoder().encode('Tampered synthetic data'):isDetail?detailBytes:bytes;return{size:contents.length,arrayBuffer:async()=>contents.buffer};}}};
  globalThis[key]=f;t.after(()=>delete globalThis[key]);
  const server=data(`const f=globalThis[${JSON.stringify(key)}];export function db(){return f.DB;}export async function identity(){if(f.unauthenticated)throw Error('AUTH_REQUIRED');return {userId:f.owner};}export async function readWorkspace(owner){if(owner!==f.owner)throw Error('Wrong owner');return {state:f.state,revision:f.revision};}export const response=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'private, no-store'}});export const failure=error=>response({error:error.message},error.message==='AUTH_REQUIRED'?401:400);`);
- const evidence=data(`const f=globalThis[${JSON.stringify(key)}];export async function paymentOriginalAvailabilityIssue(owner,state,id){if(owner!==f.owner||state!==f.state)throw Error('Wrong owner/state');f.originalChecks.push(id);return '';}export async function reconciliationPreviewWithOriginals(owner,state){if(owner!==f.owner||state!==f.state)throw Error('Wrong owner/state');f.previewChecks++;return {findings:[]};}`);
+ const evidence=data(`import {paymentOriginalIssue} from ${JSON.stringify(domain)};const f=globalThis[${JSON.stringify(key)}];export async function paymentOriginalAvailabilityIssue(owner,state,id){if(owner!==f.owner||state!==f.state)throw Error('Wrong owner/state');f.originalChecks.push(id);const target=state.transactions.find(t=>t.id===id);return target?paymentOriginalIssue(state,target):'Original saknas';}export async function reconciliationPreviewWithOriginals(owner,state){if(owner!==f.owner||state!==f.state)throw Error('Wrong owner/state');f.previewChecks++;return {findings:[]};}`);
  const bankgiro=data(`const f=globalThis[${JSON.stringify(key)}];export async function bankgiroAutomaticAccountIssue(owner,account){f.accountChecks.push({owner,account});return f.accountIssue;}export async function bankgiroRetainedPreview(owner,documentId,targetId){if(owner!==f.owner)throw Error('Wrong owner');f.reportChecks.push({documentId,targetId});return {hash:'a'.repeat(64),rows:f.reportRows.map(row=>({...row,bankgiroAccountIssue:f.reportAccountIssue}))};}`);
  const service=compiled('../lib/payment-verification.ts',{'./domain':domain,'./payment-presentation':presentation,'./reconciliation-engine.js':engine,'./reconciliation-evidence':evidence,'./bankgiro-service':bankgiro,'./banking/invoice-candidates':candidates,'./banking/detail-evidence':detailEvidence,'./server':server,'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`)});
  const route=await import(compiled('../app/api/bank/verification/route.ts',{'@/lib/server':server,'@/lib/payment-verification':service}));
@@ -198,4 +198,18 @@ for(const party of [' Altered metadata payer AB ',12345,{label:'Malformed metada
  const get=f.control.env.BUCKET.get;f.control.env.BUCKET.get=async path=>{if(path.endsWith('/synthetic-detail-original')){f.control.reads.push(path);return null;}return get(path);};
  const before=structuredClone(f.state),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+f.state.transactions[0].id)),r=await response.json();
  assert.equal(response.status,200);assert.equal(step(r,'original').status,'blocked');assert.equal(step(r,'payer').status,'blocked');assert.equal(step(r,'payer').source,'Bankens separata detaljoriginal');assert.equal(step(r,'payer').facts.find(f=>f.label==='Bankens avsändare').value,String(party).trim());assert.ok(f.control.reads.includes('synthetic-owner/synthetic-detail-original'));assert.deepEqual(f.state,before);assert.equal(f.state.allocations.length,0);
+});
+
+for(const [label,damage,expected]of [
+ ['valid retained receipt',()=>{},'passed'],
+ ['missing checksum',t=>{delete t.bankDataSha256;},'blocked'],
+ ['malformed checksum',t=>{t.bankDataSha256='invalid-hash';},'blocked'],
+ ['incorrect checksum',t=>{t.bankDataSha256='b'.repeat(64);},'blocked'],
+ ['unknown receipt profile',t=>{t.bankDataVersion='unknown-profile-v99';},'blocked'],
+ ['altered retained projection',t=>{t.original.party='Altered synthetic projection';},'blocked']
+])test(`legacy AIS without evidence label: ${label} remains governed by the real original verifier`,{skip:!implemented},async t=>{
+ const f=await serviceFixture(t),transaction=f.state.transactions[0];delete transaction.evidence;damage(transaction);
+ const before=structuredClone(f.state),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+transaction.id)),r=await response.json();
+ assert.equal(response.status,200);assert.equal(step(r,'received').status,'passed');assert.equal(step(r,'original').status,expected);if(expected==='passed')assert.equal(step(r,'original').statusLabel,'Intakt i denna kontroll');else assert.equal(r.automaticEligible,false);
+ assert.deepEqual(f.state,before);assert.equal(f.state.allocations.length,0);assert.equal(f.control.originalChecks.length,1);
 });

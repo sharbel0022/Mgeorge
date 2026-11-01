@@ -2,6 +2,7 @@ import {env} from 'cloudflare:workers';
 import {db} from './server';
 import {activeBankgiroLink,available,balance,bankgiroLinkCandidates,money,needsPaymentSpecification,paymentEvidenceConflict,paymentInvoiceAssessment,paymentLineage,paymentOriginalIssue,type State,type Transaction} from './domain';
 import {bankPaymentView} from './payment-presentation';
+import {hasBankApiOrigin} from './bank-api-original.js';
 import {exactReference,RECONCILIATION_RULE_VERSION} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 import {candidateDocuments} from './banking/invoice-candidates';
@@ -43,7 +44,7 @@ export function buildPaymentVerification(state:State,id:string,checks:CheckConte
  const {transaction:t,lineage,ais,link,reportRows,reportCandidates,view,hintRows,hintReference,registered,invoice,allocations,allocatedIds,candidates,usesDetailPayer,usesDetailReference}=subject(state,id,checks.documents);
  const steps:PaymentVerificationStep[]=[];
  const add=(id:string,label:string,status:VerificationStatus,statusLabel:string,source:string,rule:string,reason:string,next:string,facts:PaymentVerificationStep['facts']=[])=>steps.push({id,label,status,statusLabel,source,rule,reason,next,facts,checkedAt:checks.checkedAt});
- const originalIssue=lineage.issue||checks.originalIssue,detailIssue=(usesDetailPayer||usesDetailReference)?checks.detailIssue||'':'',conflict=paymentEvidenceConflict(state,t),bankSource=lineage.ancestors.some(row=>['bank_api','bank_file','bankgiro_file'].includes(row.evidence||''));
+ const originalIssue=lineage.issue||checks.originalIssue,detailIssue=(usesDetailPayer||usesDetailReference)?checks.detailIssue||'':'',conflict=paymentEvidenceConflict(state,t),bankSource=lineage.ancestors.some(row=>hasBankApiOrigin(row)||['bank_file','bankgiro_file'].includes(row.evidence||''));
  const finding=checks.findings.find(f=>f.transaction_id===id&&f.safe&&f.invoice_id===invoice?.id),safeCandidate=!!finding;
  const originalOK=bankSource&&!originalIssue&&!detailIssue&&!checks.reportIssue&&!conflict;
  const accountIssue=checks.accountIssue||checks.reportAccountIssue||'',accountOK=!!t.account&&!accountIssue;

@@ -19,7 +19,7 @@
 | Kodkvalitet och tester | 8,5 → 8,5 | Röda/gröna regressioner, oberoende granskningar och obligatoriska slutgrindar redovisas i leveranskvittot | Sites fullaudit har16 moderate utvecklingsfynd; produktion0, high/critical0 |
 | Verifiering i verklig produktion | 6,5 → 6,5 | Privata original omgranskade läsande, revision40/fem fakturor/noll allokeringar; exakt leverans redovisas separat | Kontoalias, rapportidentitet, registrering, kundrelation och separat allokeringsgodkännande återstår |
 
-Övriga områden och äldre bedömningar behålls som historik. För slutliga testantal, exakt GitHub-/CI-/Sites-identitet och läsande efterkontroll gäller denna cykels leveranskvittto, inte äldre publiceringsuppgifter.
+Övriga områden och äldre bedömningar behålls som historik. För slutliga testantal, exakt GitHub-/CI-/Sites-identitet och läsande efterkontroll gäller denna cykels leveranskvitto, inte äldre publiceringsuppgifter. Lokalt 625 Node + 1111 Sites, syntax 92, TypeScript och produktionsbygge. En driftfunnen felklassificering av ett giltigt äldre AIS-kvitto i Sites 45 rättades med sex regressioner utan ändrad ekonomisk evidens eller lagring. Mellanversionen ersätts av den korrigerade leverans som anges i kvittot; inga poäng höjs av publiceringen.
 
 ## Färskt AIS-kvitto i drift — 2026-11-01
 

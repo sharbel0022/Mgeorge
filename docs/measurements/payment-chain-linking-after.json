@@ -1,9 +1,9 @@
 {
   "schema": "mgeorge-bankgiro-ais-linking-domain-v1",
   "phase": "after",
-  "measuredAt": "2026-11-01T21:13:25.516Z",
+  "measuredAt": "2026-11-01T21:19:26.715Z",
   "baselineCommit": "fa524c2b3d06530d1b75b48df45ae14b28ab1182",
-  "candidateCommit": "fa524c2b3d06530d1b75b48df45ae14b28ab1182",
+  "candidateCommit": "893fa421ded8a60ed8f8fe271badaadd503c213a",
   "candidateWorktreeDirty": true,
   "corpusSha256": "b12046a67374a354b48b1f9262e31a1beec78f7e709c7bb122cbaeb11525f6d1",
   "facitSha256": "25816c22eddfc0ed6d911cff09b9eed9b0b4a230a49593b2172fe3c4f225c09b",
@@ -35,8 +35,8 @@
     "rejectedInvalidFiles": 2,
     "inputFileAttempts": 16,
     "successfulImportAttempts": 14,
-    "processingMs": 143.1546,
-    "msPerInputFileAttempt": 8.9472
+    "processingMs": 144.5866,
+    "msPerInputFileAttempt": 9.0367
   },
   "outcomes": [
     {
@@ -371,5 +371,5 @@
       "error": "Antal betalningar i detaljtabellen stämmer inte med rapporten."
     }
   ],
-  "librarySourceSha256": "41c78e0477b958648f0e637b8d21babd2479de7029374d24b8891a3264b6779d"
+  "librarySourceSha256": "8b676f3b84f1e64c7679612fc39b6a26d0438bafec2c1ba47441fc6ac99ba0f0"
 }
