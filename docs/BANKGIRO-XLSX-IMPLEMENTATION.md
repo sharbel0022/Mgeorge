@@ -61,6 +61,8 @@ Gemensam parser: `sites/lib/bankgiro-xlsx.js`; koppling: `sites/lib/bankgiro-par
 
 ## Publicering och kvarstående begränsningar
 
-Exakt GitHub-main/Actions- och Sites-version/deploymentkvitto kompletteras i `BANKGIRO-XLSX-PUBLICATION.json` efter utförd publicering. Publicering sker i samma befintliga projekt med oförändrad audience, DB/R2, autentisering, hemligheter och scheman. Inget riktigt bankoriginal importeras i produktion under verifieringen.
+Kodcommit `359055c4c4e66041f53d9d185a492cb39d639703` finns på main. [Actions 41312435840](https://github.com/sharbel0022/Mgeorge/actions/runs/41312435840) godkände båda jobben på exakt SHA, inklusive rena installationer, tester, audits och Sites-bygge. **Sites-version38 är publicerad: succeeded.** Sites-källa `3862b4e1b91ae1c3b80cbdb912e2d6d45f52a928` har exakt samma träd som GitHub-commitens `sites/`. Fullt kvitto: `BANKGIRO-XLSX-PUBLICATION.json`.
+
+Nya importknappen, Exceltexten och `.xlsx`-filtret verifierades i publicerad browser utan uppladdning. Arbetsyterevision31→31 och ändringstid oförändrade; D1-tabellista, policy, scheman och runtime-revision9 oförändrade. D1-läsaren trunkerade payload; fullständiga produktionssaldon har därför inte oberoende återberäknats. Kontrollerna visar ingen ny arbetsyteskrivning. Inga schema-/auth-/hostingändringar ingår och inget riktigt bankoriginal importerades i produktion.
 
 Kvar: bank-/avtalsverifierad stabil koppling mellan denna rapport och AIS-insättningen, formell OCR-regel när sådan faktiskt gäller, samt autentiserat verkligt import-/avstämningsutfall. Systemet får därför visa bankens avsändare och betalningsreferens utan att automatiskt betala en faktura. Kvalitetsbetyg och produktionskontroll redovisas separat och konservativt.

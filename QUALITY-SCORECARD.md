@@ -2,7 +2,7 @@
 
 ## Direkt Bankgiro-XLSX — 2026-11-01
 
-[Implementationsrapport](docs/BANKGIRO-XLSX-IMPLEMENTATION.md). Privat original verifierat13/13; inga verkliga bankvärden publicerade. Identisk22-filerskorpus: avsändare/referens/rader0/11→11/11, felaccept0/13→0/13. Fulla sviter578 Node+912 Sites; syntax84, TS/build och obligatorisk auditgrind godkända. Sites fullaudit har fortsatt16 moderate utvecklingsberoenden; produktionsaudit0. Publiceringsbevis kompletteras separat.
+[Implementationsrapport](docs/BANKGIRO-XLSX-IMPLEMENTATION.md). Privat original verifierat13/13; inga verkliga bankvärden publicerade. Identisk22-filerskorpus: avsändare/referens/rader0/11→11/11, felaccept0/13→0/13. Fulla sviter578 Node+912 Sites; syntax84, TS/build och obligatorisk auditgrind godkända. Sites fullaudit har fortsatt16 moderate utvecklingsberoenden; produktionsaudit0. Kod359055c, exakt Actions41312435840 success; Sites38 succeeded, samma Sites-källträd. Arbetsyterevision31→31, oförändrad ändringstid/policy/tabellista/scheman/runtime9. Publicerad importknapp och XLSX-filter läsverifierade; inget riktigt import-/matchningsprov. Kvitto: docs/BANKGIRO-XLSX-PUBLICATION.json.
 
 | Berört område | Före → efter | Testbevis | Kvarstående begränsning |
 | --- | --- | --- | --- |

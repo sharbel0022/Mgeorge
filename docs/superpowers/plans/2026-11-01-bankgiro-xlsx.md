@@ -21,13 +21,13 @@
 
 ## Tasks
 
-- [ ] Measure unchanged Node/Sites baseline and direct XLSX rejection.
-- [ ] Inspect original privately; implement header-based bounded XLSX parser with integer cents, block validation, references and cell provenance; run red/green parser corpus.
-- [ ] Wire Sites picker, preview, owned-original upload/reread, retained report evidence and visible general reference; test API write isolation, owner access, concurrency, duplicates and balances.
-- [ ] Add safe Node adapter and private review-original retention using existing import jobs; test idempotence and no economic mutation.
-- [ ] Run full Node/Sites checks, tests, audits, production build and desktop/mobile QA; independently review financial boundaries.
-- [ ] Record identical-corpus before/after metrics, evidence and limitations; update scorecard and progress conservatively.
-- [ ] Fetch latest main, integrate without overwrites, commit/push without force, verify exact Actions SHA; publish the same Sites project and verify version and read-only economic snapshot.
+- [x] Measure unchanged Node/Sites baseline and direct XLSX rejection.
+- [x] Inspect original privately; implement header-based bounded XLSX parser with integer cents, block validation, references and cell provenance; run red/green parser corpus.
+- [x] Wire Sites picker, preview, owned-original upload/reread, retained report evidence and visible general reference; test API write isolation, owner access, concurrency, duplicates and balances.
+- [x] Add safe Node adapter and private review-original retention using existing import jobs; test idempotence and no economic mutation.
+- [x] Run full Node/Sites checks, tests, audits, production build and desktop/mobile QA; independently review financial boundaries.
+- [x] Record identical-corpus before/after metrics, evidence and limitations; update scorecard and progress conservatively.
+- [x] Fetch latest main, integrate without overwrites, commit/push without force, verify exact Actions SHA; publish the same Sites project and verify version and read-only economic snapshot.
 
 ## Review focus
 

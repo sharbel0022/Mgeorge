@@ -1,0 +1,113 @@
+{
+  "schema": "mgeorge-bankgiro-xlsx-publication-v1",
+  "date": "2026-11-01",
+  "github": {
+    "repository": "https://github.com/sharbel0022/Mgeorge",
+    "codeCommit": "359055c4c4e66041f53d9d185a492cb39d639703",
+    "ci": {
+      "id": 41312435840,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41312435840",
+      "headSha": "359055c4c4e66041f53d9d185a492cb39d639703",
+      "conclusion": "success",
+      "jobs": {
+        "test": "success",
+        "sites": "success"
+      }
+    }
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "sourceCommit": "3862b4e1b91ae1c3b80cbdb912e2d6d45f52a928",
+    "sourceTree": "5b8db6c4eaa11b6eb9a8a7a31685a6d4adbb80b6",
+    "githubSitesSubtree": "5b8db6c4eaa11b6eb9a8a7a31685a6d4adbb80b6",
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_4caf470871808191ae6a2db99a767151",
+    "versionNumber": 38,
+    "archiveStorage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_000000003bfc81f4831f788df4559af9",
+      "content_hash": "sha256:cf8248b7568d76fcf8238ca3a975ec7de411d4494dfa872ac34b2abc0c3759e7",
+      "size_bytes": 44277760,
+      "file_count": 329
+    },
+    "deploymentId": "appgdep_6ae742319914819186dc12a87f701133",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "envSetRevision": 9,
+    "updatedAt": "2026-11-01T13:44:38.704828+00:00"
+  },
+  "verification": {
+    "nodeTests": 578,
+    "sitesTests": 912,
+    "syntaxFiles": 84,
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "parserTests": 35,
+    "sitesXlsxApiTests": 18,
+    "nodeXlsxApiUiTests": 8,
+    "privateOriginalChecksPassed": 13,
+    "privateOriginalValuesPublished": false,
+    "audit": {
+      "root": 0,
+      "sitesProduction": 0,
+      "sitesFullModerate": 16,
+      "sitesHighCritical": 0
+    },
+    "localBrowser": {
+      "build": "production",
+      "syntheticOnly": true,
+      "realFileChooser": true,
+      "preview": true,
+      "confirmedDemoImport": true,
+      "bankPayerAndGeneralReference": true,
+      "desktop": [
+        1280,
+        900
+      ],
+      "mobile": [
+        390,
+        844
+      ],
+      "documentHorizontalOverflow": false
+    },
+    "productionBrowser": {
+      "newImportButton": true,
+      "xlsxFileFilter": true,
+      "dialogVisible": true,
+      "authenticatedImportTest": false,
+      "bankOriginalUploaded": false
+    }
+  },
+  "preservation": {
+    "workspaceMetadataUnchanged": true,
+    "payloadProjectionUnchanged": true,
+    "workspaceCount": 1,
+    "revisionBefore": 31,
+    "revisionAfter": 31,
+    "fullPayloadRead": false,
+    "projection": {
+      "truncated": true,
+      "truncated_values": 1,
+      "omitted_columns": 0,
+      "omitted_rows": 0,
+      "next_offset": null
+    },
+    "tableNamesUnchanged": true,
+    "audienceUnchanged": true,
+    "automationsUnchanged": true,
+    "envSetRevision": 9
+  },
+  "ratings": {
+    "bankgiroImport": 8.5,
+    "realPayer": 7,
+    "paymentReference": 7,
+    "automaticMatching": 7.5
+  },
+  "limitations": [
+    "A structurally valid XLSX does not prove bank authenticity or stable AIS transaction identity.",
+    "Reports without verified account and stable deposit identity stay non-economic review specifications.",
+    "Node retains review originals and preview observations without creating bank transactions.",
+    "Live D1 reader truncated the workspace payload; unchanged revision/time and projection were checked, balances were not independently recalculated.",
+    "No authenticated real production import or invoice allocation was performed.",
+    "Full Sites audit retains 16 moderate development-tool findings."
+  ]
+}
