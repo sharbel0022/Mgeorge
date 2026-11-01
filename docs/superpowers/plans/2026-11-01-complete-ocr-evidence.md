@@ -71,8 +71,8 @@ Interface: payment_evidence and retained_report_evidence, strict selectors, expl
 
 ### Task 6: Integrate, measure and deliver
 
-- [ ] Full Node/Sites, syntax, TypeScript, audit gates and production build; independent integrated review; fix important findings with RED/GREEN and repeat gates for changed inputs.
-- [ ] Update scorecard/progress with exact measured before/after and limits; push approved exact tree, verify exact CI, publish existing Sites and verify deployment/source parity.
+- [x] Full Node/Sites, syntax, TypeScript, audit gates and production build; independent integrated review; fix important findings with RED/GREEN and repeat gates for changed inputs.
+- [x] Update scorecard/progress with exact measured before/after and limits; push approved exact tree, verify exact CI, publish existing Sites and verify deployment/source parity.
 - [ ] Confirm republished same-Site MCP tool discovery, inspect the actual private case through read-only tools, compare supplied original and invoice evidence. Missing external bank/customer evidence remains a blocker, never invented.
 - [ ] If actual evidence reveals another reproducible internal defect, fix/test/review and publish again; retain a precise continuation point for any genuinely unavailable external fact.
 
@@ -104,3 +104,7 @@ Actual private original exposed an internal decoder defect: worker/server append
 Task6: independent normalization review passed; measured77/77 readablefields, actualOCR55/55 and ink22/22, unreadable2/2held.12Mcap applies percanvas, peakRSS/concurrency notmeasured; performance observationnotSLA. Final integrated P1wave correctedmonetarygroups/completeBGorg/currentreferencecontract; privatelegitformattedIDs nowread when nativefragmentspacingspreserved. Task8TDDinprogress beforefinalgates.
 
 Final implementation ledger: Tasks1–5 complete and scoped reviews passed. Task6 normalization scoped pass, all11fields readable77/77/optical55/55, controlsheld. Task7 exact live/stored membership P1 reproducedRED then fixedGREEN95, independent fixreview passed; no newUID fetched or stored on mismatch. Task8 scoped spec/quality pass; explicit/EOL/column/unknowngeometry controls and actual fragmentedPDF positives. Private actual invoice9/9 fields through both extraction/parserboundaries, PDF method/noissues/yellowcurrency; workbook12/12 unchangedbytes. Primary public register resolves differingnames tosamelegalentity. Final fullgates/publication/read-onlyproductionverification inprogress.
+
+Delivery: code `ee3d8aa3716fc818d7703335c5aabba2b32954d5` on main; exact Actions41362005970 succeeded with clean installations,775 Node and1323 Sites tests, syntax97, TypeScript and build. Sites49 succeeded from source0444e2e13efea60150fc3917ee6c533d0c461ce6; tree5a0dd51890c431a3247d67a07f366368098a6821 equals the GitHub Sites subtree. Runtime9, policy, auth, schedules and DB/R2 declarations are preserved. Workspace revision40 and updated timestamp are unchanged.
+
+Three published readers remain undefined in this chat while eight legacy tools remain connected. The native payload is truncated, direct unauthenticated metadata receives HTTP403/1010, and the local browser is unavailable. No identity bypass or financial write was used. A new chat refreshing the same connected plugin is the precise continuation. Account alias, report/deposit identity, missing currency evidence and the complete current register remain unverified. See COMPLETE-OCR-EVIDENCE-DELIVERY.json.

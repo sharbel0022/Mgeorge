@@ -1,0 +1,127 @@
+{
+  "schema": "mgeorge-complete-ocr-evidence-delivery-v1",
+  "baselineCommit": "dfd852666cf3462588a82797717822347602e196",
+  "codeCommit": "ee3d8aa3716fc818d7703335c5aabba2b32954d5",
+  "sourceTree": "4d297e18a75d328eb22244703c84371e4e29c099",
+  "ci": {
+    "id": 41362005970,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41362005970",
+    "headSha": "ee3d8aa3716fc818d7703335c5aabba2b32954d5",
+    "conclusion": "success",
+    "cleanInstall": true,
+    "jobs": [
+      {
+        "id": 125014166855,
+        "name": "test",
+        "conclusion": "success",
+        "tests": 775,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "id": 125014166710,
+        "name": "sites",
+        "conclusion": "success",
+        "tests": 1323,
+        "failures": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "local": {
+    "node": 775,
+    "sites": 1323,
+    "failed": 0,
+    "skipped": 0,
+    "syntaxFiles": 97,
+    "typeScript": "pass",
+    "productionBuild": "pass",
+    "rootAudit": 0,
+    "sitesProductionAudit": 0,
+    "sitesFullAudit": {
+      "moderate": 16,
+      "high": 0,
+      "critical": 0
+    },
+    "lockfilesChanged": false,
+    "followupSyntheticAnonymization": {
+      "node": 43,
+      "sites": 41
+    }
+  },
+  "site": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "versionNumber": 49,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_1ad502e2d55c819185015b8b6eda52d5",
+    "deploymentId": "appgdep_6ae7ca941ccc819194d7ce742e676e77",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "sourceCommit": "0444e2e13efea60150fc3917ee6c533d0c461ce6",
+    "sourceTree": "5a0dd51890c431a3247d67a07f366368098a6821",
+    "matchesGithubSitesTree": true,
+    "runtimeRevision": 9,
+    "accessPolicyPreserved": true,
+    "authPreserved": true,
+    "schedulesPreserved": true,
+    "d1R2DeclarationsPreserved": true
+  },
+  "measured": {
+    "labelledInvoiceDecisions": {
+      "beforeCorrect": 42,
+      "afterCorrect": 100,
+      "total": 100,
+      "beforeInvalidGreen": 48,
+      "afterInvalidGreen": 0
+    },
+    "paymentTokens": {
+      "beforeCorrect": 14,
+      "afterCorrect": 40,
+      "total": 40,
+      "beforeFalseSafe": 26,
+      "afterFalseSafe": 0
+    },
+    "opticalFields": {
+      "beforeCorrect": 54,
+      "afterCorrect": 55,
+      "total": 55
+    },
+    "readableNativeAndOpticalFields": {
+      "beforeCorrect": 76,
+      "afterCorrect": 77,
+      "total": 77
+    },
+    "unreadableControlsHeld": 2,
+    "universalOCRAccuracy": null
+  },
+  "privateOriginals": {
+    "suppliedWorkbookChecks": 12,
+    "nativeInvoiceChecksPerEngine": 9,
+    "engines": 2,
+    "bytesUnchanged": true,
+    "originalsInRepository": false,
+    "originalHashesInRepository": false,
+    "payerLegalIdentity": "resolved through primary public register"
+  },
+  "readOnlyProduction": {
+    "workspaceRevisionBefore": 40,
+    "workspaceRevisionAfter": 40,
+    "workspaceUpdatedAtUnchanged": true,
+    "bankConnected": true,
+    "bankLastError": null,
+    "financialWritesInvoked": false,
+    "fullWorkspaceReadable": false,
+    "legacyToolsAvailable": 8,
+    "newEvidenceToolsAvailableInThisChat": 0,
+    "completeCurrentRegisterAbsenceClaim": false,
+    "accountAliasLiveReadPerformed": false
+  },
+  "remaining": [
+    "New read tools are published but not discoverable/callable in this chat. Existing plugin is already connected; a new chat may refresh the tool registry.",
+    "Native live workspace and encrypted accounts are truncated. Unauthenticated direct metadata request receives HTTP403/1010; no authenticated bypass is used.",
+    "Explicit bank-supplied report-account/AIS-account alias and independent report/deposit identity remain unverified.",
+    "Supplied report lacks explicit currency/booking/value date; do not manufacture these from profile/date proximity.",
+    "Fresh complete invoice register/source assessment is still needed. Original invoice presence is verified, current registry absence is not."
+  ],
+  "paidStateDecision": "not approved",
+  "limitations": "Exact accuracy applies only to declared synthetic corpora. Existing moderate development dependency findings and unmeasured concurrent OCR memory remain disclosed."
+}

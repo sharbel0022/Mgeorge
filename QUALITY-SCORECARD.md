@@ -9,10 +9,10 @@
 | Bankgiro/kontorelation | 8,5 | 8,5 | Avgränsade ägarbundna aktuella provider-GET, exakt medlemskap/alias, inga härledda konton. Faktisk relation återstår att styrka. |
 | Automatisk matchning | 7,5 | 7,5 | Ofullständiga token/källor och OCR hålls; inga verkliga allokeringar eller saldoförändringar. |
 | Säkerhet och åtkomst | 8,5 | 8,5 | Läsverktygens ägare, original, aktuell consent, sekretess och skrivfrihet granskade; fjärrarbetare kan inte ge sig PDF-tillit. |
-| Kodkvalitet/tester | 8,5 | 8,5 | TDD och oberoende scoped/integrerad review; 775/775 Node,1323/1323 Sites, syntax97, TS/build passerar; leveranskvitto pågår. Befintliga16 moderate utvecklingsfynd kvarstår. |
+| Kodkvalitet/tester | 8,5 | 8,5 | TDD och oberoende scoped/integrerad review; 775/775 Node,1323/1323 Sites, syntax97, TS/build passerar; exaktCI41362005970 success, main`ee3d8aa` och Sites49 succeeded. Befintliga16 moderate utvecklingsfynd kvarstår. |
 | Verklig produktion | 6,5 | 6,5 | Ingen höjning för syntetisk precision eller ansluten bank; aktuell fullständig kontorelation/AIS/register krävs. |
 
-[Rapport och mätfiler](docs/COMPLETE-OCR-EVIDENCE-VERIFICATION.md). Övriga33 områden och historiska bedömningar behålls. Ingen9,5 utan verksamhetens fullständiga bevis. Slutlig publicering/CI redovisas separat från lokal testning.
+[Rapport och mätfiler](docs/COMPLETE-OCR-EVIDENCE-VERIFICATION.md). Övriga33 områden och historiska bedömningar behålls. Ingen9,5 utan verksamhetens fullständiga bevis. [Exakt leverans och begränsningar](docs/COMPLETE-OCR-EVIDENCE-DELIVERY.json): bådaCI-jobb success, Sites49/samma källträd/runtime9, revision40 oförändrad. Tre nya läsverktyg saknas i denna chatts register trots publicering; komplett aktuellt AIS-/konto-/registerunderlag fortfarande oläst. Ingen verklig betalning godkänd.
 
 
 ## Originalverifiering — aktuell, konservativ bedömning
