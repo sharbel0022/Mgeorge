@@ -2,7 +2,7 @@ import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {createHash} from 'node:crypto';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
-import {emptyState,applyCommand,paymentInvoiceAssessment,bankApiOriginalIssue} from '../lib/domain.ts';
+import {emptyState,applyCommand,paymentInvoiceAssessment,bankApiOriginalIssue,paymentOriginalIssue} from '../lib/domain.ts';
 const codeUrl=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
 function compiled(path,imports){imports={'../payer-evidence.js':new URL('../lib/payer-evidence.js',import.meta.url).href,...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let js=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])js=js.replaceAll(q+a+q,JSON.stringify(b));return codeUrl(js);}
 const domain=new URL('../lib/domain.ts',import.meta.url).href;
@@ -158,4 +158,15 @@ test('a valid existing receipt never refreshes its raw serialization on a differ
 
 test('missing legacy projection and reordered retained JSON can adopt the same freshly received original together',async t=>{
  const {f,s,transaction}=await legacyFixture(t);delete transaction.original;delete transaction.evidence;transaction.bankData=reorderedKeys(transaction.bankData);saveFixture(f,s);const previous=JSON.stringify(transaction.bankData),out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];assert.equal(bankApiOriginalIssue(row),'');assert.equal(JSON.stringify(row.bankData),JSON.stringify(f.page.transactions[0]));assert.equal(row.original.amount,62500);assert.equal(row.original.payerReference,'58197013');assert.equal(JSON.stringify(JSON.parse(new TextDecoder().decode([...f.objects.values()][0])).previousBankData),previous);assert.deepEqual(out.state.allocations,s.allocations);
+});
+
+test('successful fresh receipt adoption clears its exact stale derived missing-receipt issue',async t=>{
+ const {f,s,transaction}=await legacyFixture(t);transaction.bankOriginalIssue='Bankoriginalet saknar ett verifierbart ankomstkvitto. Hämta bankuppgifterna igen eller granska originalunderlaget.';assert.equal(bankApiOriginalIssue(transaction),transaction.bankOriginalIssue);saveFixture(f,s);
+ const out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];assert.equal(bankApiOriginalIssue(row),'');assert.equal(row.bankOriginalIssue,undefined);assert.equal(paymentOriginalIssue(out.state,row),'');
+});
+test('fresh receipt adoption preserves an unrelated original availability issue',async t=>{
+ const {f,s,transaction}=await legacyFixture(t);transaction.bankOriginalIssue='Synthetic retained document unavailable';saveFixture(f,s);const out=await(await fetchBankDetails(request(f.id))).json(),row=out.state.transactions[0];assert.equal(bankApiOriginalIssue(row),'');assert.equal(row.bankOriginalIssue,'Synthetic retained document unavailable');assert.equal(paymentOriginalIssue(out.state,row),'Synthetic retained document unavailable');
+});
+test('a failed fresh receipt adoption preserves its stale issue and all evidence holds',async t=>{
+ const {f,s,transaction}=await legacyFixture(t);transaction.bankOriginalIssue='Bankoriginalet saknar ett verifierbart ankomstkvitto. Hämta bankuppgifterna igen eller granska originalunderlaget.';transaction.bankEvidenceConflicts=[{at:'2026-10-26',fields:['party'],incoming:{}}];saveFixture(f,s);const before=structuredClone(transaction),out=await(await fetchBankDetails(request(f.id))).json(),{bankDetails,...row}=out.state.transactions[0];assert.deepEqual(row,before);
 });

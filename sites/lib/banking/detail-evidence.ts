@@ -58,9 +58,13 @@ export function adoptFreshBankReceipt(state:State,id:string,fresh:import('../imp
  const candidate={...target,original,bankData:refreshRaw?structuredClone(fresh.bankData):target.bankData,
   referenceEvidence:target.referenceEvidence??structuredClone(fresh.referenceEvidence),bankDataVersion:fresh.bankDataVersion,bankDataSha256:fresh.bankDataSha256};
  if(bankApiOriginalIssue(candidate))return false;
+ const previousDerivedIssue=bankApiOriginalIssue(target);
  if(target.original===undefined)target.original=candidate.original;
  if(refreshRaw)target.bankData=candidate.bankData;
  if(target.referenceEvidence===undefined)target.referenceEvidence=candidate.referenceEvidence;
  target.bankDataVersion=candidate.bankDataVersion;target.bankDataSha256=candidate.bankDataSha256;
+ // Clear only the exact pre-adoption derived receipt issue; unrelated retained
+ // original availability and evidence holds remain independently authoritative.
+ if(previousDerivedIssue&&target.bankOriginalIssue===previousDerivedIssue)delete target.bankOriginalIssue;
  return true;
 }
