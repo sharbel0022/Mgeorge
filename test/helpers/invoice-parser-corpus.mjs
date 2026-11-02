@@ -63,6 +63,16 @@ export const identityCases=[
 
 // Full labelled values are evidence; prefixes and invented concatenations are not.
 export const exactFieldCases=[
+ ...[['issued_at','Fakturadatum'],['due_at','Förfallodatum']].flatMap(([field,label])=>['-','_','A','1','/'].map(prefix=>({name:`date label census prefix ${prefix}${label} retains ambiguity`,text:invoiceText+'\n'+prefix+label+'2026-11-09 ???',field}))),
+ // Review round 1: a labelled occurrence must not disappear because its
+ // value touches the label or starts with an unsupported separator.
+ ...[['issued_at','Fakturadatum'],['issued_at','Invoice date'],['due_at','Förfallodatum'],['due_at','Due date'],['due_at','Betalas senast']].flatMap(([field,label])=>
+  ['2026-11-09 ???','- 2026-11-09 ???','???'].map(value=>({name:`date label census ${label} retains ${value}`,text:invoiceText+'\n'+label+value,field}))),
+ // Reintroducing date-prefix reads must fail both parsing and actual registration.
+ ...[['issued_at','Fakturadatum: 2026-10-24'],['due_at','Förfallodatum: 2026-11-07']].flatMap(([field,line])=>[
+  ...['; 2026-11-09',', 2026-11-09',' ???'].map(suffix=>({name:`complete date ${field} rejects suffix ${suffix}`,text:invoiceText.replace(line,line+suffix),field})),
+  ...['; 2026-11-09',', 2026-11-09',' ???'].map(suffix=>({name:`complete date ${field} rejects a malformed duplicate ${suffix}`,text:invoiceText+'\n'+line+suffix,field})),
+ ]),
  {name:'complete evidence integer amount columns',text:invoiceText.replace('Att betala: 3 750,00 SEK','Att betala: 3750    4000 SEK'),field:'total_cents'},
  {name:'complete evidence character-spaced integer amount',text:invoiceText.replace('Att betala: 3 750,00 SEK','Att betala: 3 7 5 0 SEK'),field:'total_cents'},
  {name:'complete evidence incorrect monetary thousand groups',text:invoiceText.replace('Netto: 3 000,00 kr','Netto: 30 00 SEK'),field:'net_cents'},
@@ -94,6 +104,15 @@ export const exactFieldCases=[
  {name:'mixed-case conflicting currency',text:invoiceText+'\nValuta: eUr',field:'currency'},
 ];
 export const exactFieldPositiveCases=[
+ ...[['issued_at','Fakturadatum','2026-10-24'],['due_at','Förfallodatum','2026-11-07']].flatMap(([field,label,value])=>['-','_','A','1','/'].map(prefix=>({name:`date label census prefix ${prefix}${label} retains a direct date`,text:invoiceText.replace(field==='issued_at'?'Fakturadatum: 2026-10-24':'Förfallodatum: 2026-11-07',prefix+label+value),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}}))),
+ ...[['issued_at','Fakturadatum','2026-10-24'],['issued_at','Invoice date','2026-10-24'],['due_at','Förfallodatum','2026-11-07'],['due_at','Due date','2026-11-07'],['due_at','Betalas senast','2026-11-07']].map(([field,label,value])=>({name:`date label census ${label} supports a direct value`,text:invoiceText.replace(field==='issued_at'?'Fakturadatum: 2026-10-24':'Förfallodatum: 2026-11-07',label+value),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}})),
+ {name:'date label census supports direct dates in semicolon-separated fields',text:invoiceText.replace('Fakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07','Fakturadatum2026-10-24; Förfallodatum2026-11-07'),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}},
+ {name:'complete date inline labelled fields',text:invoiceText.replace('Fakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07','Fakturadatum: 2026-10-24; Förfallodatum: 2026-11-07'),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}},
+ {name:'complete date values immediately below labels',text:invoiceText.replace('Fakturadatum: 2026-10-24','Fakturadatum:\n2026-10-24').replace('Förfallodatum: 2026-11-07','Förfallodatum:\n2026-11-07'),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}},
+ {name:'complete date character-spaced Swedish values',text:invoiceText.replace('2026-10-24','2 4 - 1 0 - 2 0 2 6').replace('2026-11-07','0 7 / 1 1 / 2 0 2 6'),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}},
+ {name:'complete date Swedish dot values',text:invoiceText.replace('2026-10-24','24.10.2026').replace('2026-11-07','7.11.2026'),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}},
+ {name:'complete date known alternate inline labels',text:invoiceText.replace('Fakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07','Faktureringsdatum: 24-10-2026 Betalas senast: 7-11-2026'),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}},
+ {name:'complete date invoice date and number column layout',text:invoiceText.replace('Fakturanummer: 0606\n','').replace('Fakturadatum: 2026-10-24','Fakturadatum Fakturanummer\n2026-10-24 0606'),number:'0606',reference:'000018',dates:{issued_at:'2026-10-24',due_at:'2026-11-07'}},
  {name:'complete evidence proper monetary integer thousand groups',text:invoiceText.replace('3 000,00 kr','3 000 SEK').replace('750,00 kr','750 SEK').replace('3 750,00 SEK','3 750 SEK'),number:'0606',reference:'000018'},
  {name:'complete evidence proper monetary plain integers',text:invoiceText.replace('3 000,00 kr','3000 SEK').replace('750,00 kr','750 SEK').replace('3 750,00 SEK','3750 SEK'),number:'0606',reference:'000018'},
  {name:'complete evidence proper monetary decimal dots',text:invoiceText.replace('3 000,00 kr','3000.00 SEK').replace('750,00 kr','750.00 SEK').replace('3 750,00 SEK','3750.00 SEK'),number:'0606',reference:'000018'},
@@ -115,6 +134,17 @@ export const exactFieldPositiveCases=[
  {name:'generic reference preserves separators',text:invoiceText.replace('OCR: 000018','Betalningsreferens: AB/00606'),number:'0606',reference:'AB/00606'},
  {name:'same total before same-line OCR label',text:invoiceText.replace('Att betala: 3 750,00 SEK\nOCR:','Att betala: 3 750,00 SEK OCR:'),number:'0606',reference:'000018'},
  {name:'lowercase SEK is the same currency',text:invoiceText.replaceAll('SEK','sek'),number:'0606',reference:'000018'},
+];
+
+// Removing the complete metadata token, or normalizing away a leading zero,
+// must fail the real conflict check instead of admitting a prefix as evidence.
+export const metadataIdentifierCases=[
+ ...['filename','subject'].flatMap(source=>[
+  {name:`${source} complete 82-character identifier`,source,value:'Faktura '+('A'.repeat(76)+'0599-2')+(source==='filename'?'.pdf':''),number:'A'.repeat(76)+'0599',expected:'A'.repeat(76)+'0599-2',held:true},
+  {name:`${source} exact 80-character identifier`,source,value:'Faktura '+('A'.repeat(76)+'0599')+(source==='filename'?'.pdf':''),number:'A'.repeat(76)+'0599',expected:'A'.repeat(76)+'0599'},
+  {name:`${source} exact leading zeros`,source,value:'Faktura 00599'+(source==='filename'?'.pdf':''),number:'00599',expected:'00599'},
+  {name:`${source} missing leading zeros is a conflict`,source,value:'Faktura 599'+(source==='filename'?'.pdf':''),number:'00599',expected:'599',held:true},
+ ]),
 ];
 
 export const moneyCases=[

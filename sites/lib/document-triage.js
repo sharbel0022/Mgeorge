@@ -42,7 +42,9 @@ export function classifyDocument(input = {}) {
 /** Explicit labels only. Leading zeros and separators are deliberately preserved. */
 export function sourceInvoiceNumbers(value) {
   const text = String(value || '').normalize('NFKC').replace(/\.pdf$/i, '');
-  return [...text.matchAll(/(?:faktura(?:[\s._-]*(?:nummer|nr|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+)|invoice(?:[\s._-]*(?:number|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+))([\p{L}\p{N}][\p{L}\p{N}/_-]{0,79})/giu)].map(m => m[1].toUpperCase()).filter(value => /\d/.test(value));
+  // Compare the complete metadata token, including unsupported lengths. An
+  // overlong source identifier must conflict rather than match its prefix.
+  return [...text.matchAll(/(?:faktura(?:[\s._-]*(?:nummer|nr|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+)|invoice(?:[\s._-]*(?:number|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+))([\p{L}\p{N}][\p{L}\p{N}/_-]*)/giu)].map(m => m[1].toUpperCase()).filter(value => /\d/.test(value));
 }
 export function documentConflicts(extraction, metadata = {}) {
   const meta = /** @type {any} */ (metadata), issues = [], number = String(fieldValue(extraction, 'invoice_number') || '').toUpperCase();

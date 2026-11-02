@@ -1,0 +1,1680 @@
+{
+  "schema": "mgeorge-final-invoice-fields-v1",
+  "synthetic": true,
+  "sourceCommit": "087e5ced733b2cfdb3f8540d006118fb26cb6107",
+  "sourceHashes": {
+    "src/invoice-extraction.js": "521d5df763d7ee1ca1551c8d8e1549564d5c86cad7ff165a81dcbf71612d907c",
+    "src/document-triage.js": "31621f24e3f7da3ff2c4043f4a660c43ec7ece7a5458ce96ad8f720224715d2d",
+    "sites/lib/invoice-fields.js": "3d2614f44e9619936936e5b1e1087a055b785ccdb71a9d1897f96c42cc59193e",
+    "sites/lib/document-triage.js": "31621f24e3f7da3ff2c4043f4a660c43ec7ece7a5458ce96ad8f720224715d2d"
+  },
+  "runnerSha256": "baec2346d8e0c97ca5cb14b3fe100c0d0cbf90045b7c0a97e1e2955e7202481c",
+  "corpusSha256": "77aa9f81f1c1ab2cba080f11a6eec62f09df1c2e362c0515d4696da7fb6ac16c",
+  "cases": 117,
+  "evaluations": 234,
+  "summary": {
+    "node": {
+      "cases": 117,
+      "correct": 117,
+      "positive": 47,
+      "truePositive": 47,
+      "falsePositive": 0,
+      "held": 70,
+      "precision": 1,
+      "recall": 1,
+      "coverage": 0.4017094017094017
+    },
+    "sites": {
+      "cases": 117,
+      "correct": 117,
+      "positive": 47,
+      "truePositive": 47,
+      "falsePositive": 0,
+      "held": 70,
+      "precision": 1,
+      "recall": 1,
+      "coverage": 0.4017094017094017
+    }
+  },
+  "scope": "Declared labelled-text and explicit-metadata corpus only. Green coverage is not recall for arbitrary invoices or optical OCR; actual registration, images, private originals and production are verified separately.",
+  "details": [
+    {
+      "engine": "node",
+      "name": "date label census prefix -Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix _Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix AFakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix 1Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix /Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix -Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix _Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix AFörfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix 1Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix /Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Fakturadatum retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Fakturadatum retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Fakturadatum retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Invoice date retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Invoice date retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Invoice date retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Förfallodatum retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Förfallodatum retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Förfallodatum retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Due date retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Due date retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Due date retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Betalas senast retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Betalas senast retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Betalas senast retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date issued_at rejects suffix ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date issued_at rejects suffix , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date issued_at rejects suffix  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date issued_at rejects a malformed duplicate ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date issued_at rejects a malformed duplicate , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date issued_at rejects a malformed duplicate  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date due_at rejects suffix ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date due_at rejects suffix , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date due_at rejects suffix  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date due_at rejects a malformed duplicate ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date due_at rejects a malformed duplicate , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete date due_at rejects a malformed duplicate  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence integer amount columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence character-spaced integer amount",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence incorrect monetary thousand groups",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence consistent integer amount columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence Bankgiro numeric suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence organization numeric suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence unreadable duplicate Bankgiro",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence unreadable duplicate organization",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence formatted organization checksum",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "unreadable explicit currency label",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "known explicit currency prefix with junk",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "unreadable hyphen-delimited duplicate invoice identity",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "unreadable same-line explicit VAT label",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "unreadable same-line explicit net label",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "two invoice identities on one line",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "two invoice identities in adjacent columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "unreadable second OCR",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "unreadable first OCR",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "literal unreadable OCR",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "OCR with alphabetic suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "OCR with decimal suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "OCR with slash suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "OCR with unsupported punctuation",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "OCR exceeding complete token limit",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "two OCR values without distinct labels",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "malformed generic reference suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "node",
+      "name": "two totals without distinct labels",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "two totals in adjacent columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "mixed-case conflicting currency",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix -Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix _Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix AFakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix 1Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix /Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix -Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix _Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix AFörfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix 1Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census prefix /Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Fakturadatum supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Invoice date supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Förfallodatum supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Due date supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census Betalas senast supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "date label census supports direct dates in semicolon-separated fields",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete date inline labelled fields",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete date values immediately below labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete date character-spaced Swedish values",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete date Swedish dot values",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete date known alternate inline labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete date invoice date and number column layout",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary integer thousand groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary plain integers",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary decimal dots",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence proper monetary dotted groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence formatted identifiers preserve raw evidence",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence identical identifier duplicates",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "complete evidence same-line known identifier labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "net label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "net-exclusive label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "total label including VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "hyphen-delimited invoice identity",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "explicit valid currency label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "ordinary inline VAT rates and net prose",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "character-spaced invoice digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "character-spaced OCR digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "OCR before semicolon-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "OCR before pipe-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "OCR before same-line Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "generic reference preserves separators",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "same total before same-line OCR label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "lowercase SEK is the same currency",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "filename complete 82-character identifier",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "filename exact 80-character identifier",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "filename exact leading zeros",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "filename missing leading zeros is a conflict",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "subject complete 82-character identifier",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "node",
+      "name": "subject exact 80-character identifier",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "subject exact leading zeros",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "node",
+      "name": "subject missing leading zeros is a conflict",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix -Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix _Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix AFakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix 1Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix /Fakturadatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix -Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix _Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix AFörfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix 1Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix /Förfallodatum retains ambiguity",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Fakturadatum retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Fakturadatum retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Fakturadatum retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Invoice date retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Invoice date retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Invoice date retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Förfallodatum retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Förfallodatum retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Förfallodatum retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Due date retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Due date retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Due date retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Betalas senast retains 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Betalas senast retains - 2026-11-09 ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Betalas senast retains ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date issued_at rejects suffix ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date issued_at rejects suffix , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date issued_at rejects suffix  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date issued_at rejects a malformed duplicate ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date issued_at rejects a malformed duplicate , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date issued_at rejects a malformed duplicate  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date due_at rejects suffix ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date due_at rejects suffix , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date due_at rejects suffix  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date due_at rejects a malformed duplicate ; 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date due_at rejects a malformed duplicate , 2026-11-09",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date due_at rejects a malformed duplicate  ???",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence integer amount columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence character-spaced integer amount",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence incorrect monetary thousand groups",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence consistent integer amount columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence Bankgiro numeric suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence organization numeric suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence unreadable duplicate Bankgiro",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence unreadable duplicate organization",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence formatted organization checksum",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable explicit currency label",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "known explicit currency prefix with junk",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable hyphen-delimited duplicate invoice identity",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable same-line explicit VAT label",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable same-line explicit net label",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "two invoice identities on one line",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "two invoice identities in adjacent columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable second OCR",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "unreadable first OCR",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "literal unreadable OCR",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with alphabetic suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with decimal suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with slash suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR with unsupported punctuation",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR exceeding complete token limit",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "two OCR values without distinct labels",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "malformed generic reference suffix",
+      "expected": "hold",
+      "correct": true,
+      "level": "yellow"
+    },
+    {
+      "engine": "sites",
+      "name": "two totals without distinct labels",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "two totals in adjacent columns",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "mixed-case conflicting currency",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix -Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix _Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix AFakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix 1Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix /Fakturadatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix -Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix _Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix AFörfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix 1Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census prefix /Förfallodatum retains a direct date",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Fakturadatum supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Invoice date supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Förfallodatum supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Due date supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census Betalas senast supports a direct value",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "date label census supports direct dates in semicolon-separated fields",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date inline labelled fields",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date values immediately below labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date character-spaced Swedish values",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date Swedish dot values",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date known alternate inline labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete date invoice date and number column layout",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary integer thousand groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary plain integers",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary decimal dots",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence proper monetary dotted groups",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence formatted identifiers preserve raw evidence",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence identical identifier duplicates",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "complete evidence same-line known identifier labels",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "net label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "net-exclusive label before VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "total label including VAT word is one field",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "hyphen-delimited invoice identity",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "explicit valid currency label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "ordinary inline VAT rates and net prose",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "character-spaced invoice digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "character-spaced OCR digits",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR before semicolon-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR before pipe-delimited Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "OCR before same-line Bankgiro label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "generic reference preserves separators",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "same total before same-line OCR label",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "lowercase SEK is the same currency",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "filename complete 82-character identifier",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "filename exact 80-character identifier",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "filename exact leading zeros",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "filename missing leading zeros is a conflict",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "subject complete 82-character identifier",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    },
+    {
+      "engine": "sites",
+      "name": "subject exact 80-character identifier",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "subject exact leading zeros",
+      "expected": "exact",
+      "correct": true,
+      "level": "green"
+    },
+    {
+      "engine": "sites",
+      "name": "subject missing leading zeros is a conflict",
+      "expected": "hold",
+      "correct": true,
+      "level": "red"
+    }
+  ]
+}

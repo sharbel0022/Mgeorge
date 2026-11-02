@@ -71,14 +71,18 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     record(key,matches.map(m=>({value:m[1],evidence:m[0]})),convert,!!labels&&[...text.matchAll(labels)].some(m=>!positions.has(m.index)));
   };
   const referenceLabel='(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)';
+  const issuedDateLabel='(?:fakturadatum|faktureringsdatum|invoice\\s*date)';
+  const dueDateLabel='(?:förfallodatum|förfallodag|förfaller|oss\\s*tillhanda\\s*senast|betalas\\s*senast|due\\s*date)';
   // A following explicit field label separates values on the same line. Other
   // trailing content remains part of the value and must pass full validation.
-  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|bankgirokonto|bankgiro|bg|fakturadatum|invoice[ \\t]*date|förfallodatum|förfallodag|due[ \\t]*date|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms|total moms|moms(?:belopp)?|VAT|netto(?:belopp)?|totalt netto|net amount|valuta|currency)';
-  const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$))','iu');
+  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms|total moms|moms(?:belopp)?|VAT|netto(?:belopp)?|totalt netto|net amount|valuta|currency)';
+  const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$)|'+issuedDateLabel+'|'+dueDateLabel+')','iu');
   const grabFull=(key,label,convert)=>{
-    const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency';
-    const suffix=invoiceLabel?'':currencyLabel?'(?=[\\s.:#-]|$)':'(?=[\\s.:#]|$)',separator=invoiceLabel||currencyLabel?'[:.#-]':'[:.#]';
-    const re=new RegExp('(?<![\\p{L}\\p{N}/_-])'+label+suffix+'[ \\t]*'+separator+'?[ \\t]*','giu'),matches=[];
+    const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency',dateField=key==='issued_at'||key==='due_at';
+    // Keep the old complete date-label census, including direct dates and
+    // unreadable values. Identifier boundaries apply only to other fields.
+    const suffix=invoiceLabel||dateField?'':currencyLabel?'(?=[\\s.:#-]|$)':'(?=[\\s.:#]|$)',separator=invoiceLabel||currencyLabel?'[:.#-]':'[:.#]';
+    const re=new RegExp((dateField?'':'(?<![\\p{L}\\p{N}/_-])')+label+suffix+'[ \\t]*'+separator+'?[ \\t]*','giu'),matches=[];
     for(const match of text.matchAll(re)){
       let start=match.index+match[0].length;
       // A value may be printed immediately below its label, but never borrow
@@ -95,8 +99,8 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // Only character-spaced digits are unambiguous. Two complete identifiers
   // must not be concatenated or reduced to a valid prefix.
   grabFull('invoice_number',invoiceNumberLabel,value=>{const token=compactDigits(value);return validInvoiceIdentifier(token)?token:null;});
-  grab('issued_at',/(?:fakturadatum|faktureringsdatum|invoice\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{4})(?![\p{L}\p{N}./_-])/giu,invoiceDate,/(?:fakturadatum|faktureringsdatum|invoice\s*date)/gi);
-  grab('due_at',/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)\s*[:.]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[./-]\d{1,2}[./-]\d{4})(?![\p{L}\p{N}./_-])/giu,invoiceDate,/(?:förfallodatum|förfallodag|förfaller|oss\s*tillhanda\s*senast|betalas\s*senast|due\s*date)/gi);
+  grabFull('issued_at',issuedDateLabel,invoiceDate);
+  grabFull('due_at',dueDateLabel,invoiceDate);
   // A percentage is a rate, never an explicitly stated monetary amount.
   // Validate lexical groups before parseMoney removes whitespace. Several
   // integer columns or character-spaced amounts must not become one number.

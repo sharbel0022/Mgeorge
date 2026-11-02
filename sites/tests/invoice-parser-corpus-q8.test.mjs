@@ -4,7 +4,8 @@ import {createHash} from 'node:crypto';
 import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
-import {context,invoiceText,columnInvoice,adjacentOcr,hyphenDates,ambiguousHeaderCases,percentVat,identityCases,dateCases,moneyCases,exactFieldCases,exactFieldPositiveCases,invoicePdf} from '../../test/helpers/invoice-parser-corpus.mjs';
+import {sourceInvoiceNumbers} from '../lib/document-triage.js';
+import {context,invoiceText,columnInvoice,adjacentOcr,hyphenDates,ambiguousHeaderCases,percentVat,identityCases,dateCases,moneyCases,exactFieldCases,exactFieldPositiveCases,metadataIdentifierCases,invoicePdf} from '../../test/helpers/invoice-parser-corpus.mjs';
 import {serverPdfText} from '../lib/server-pdf.ts';
 
 const file=path=>new URL(path,import.meta.url).href;
@@ -40,6 +41,15 @@ for(const item of exactFieldPositiveCases)test('exact invoice field preserves or
  assert.equal(result.level,'green');assert.equal(result.fields.invoice_number.value,item.number);assert.equal(result.fields.reference.value,item.reference);assert.equal(result.fields.total_cents.value,375000);
  assert.equal(result.fields.organization_number.value,'5560160680');assert.equal(result.fields.bankgiro.value,'123-4567');
  for(const [field,evidence]of Object.entries(item.evidence||{}))assert.equal(result.fields[field].evidence,evidence);
+ for(const [field,value]of Object.entries(item.dates||{}))assert.equal(result.fields[field].value,value);
+});
+
+for(const item of metadataIdentifierCases)test('complete metadata identifier remains exact: '+item.name,()=>{
+ const text=invoiceText.replace('Fakturanummer: 0606','Fakturanummer: '+item.number),result=interpretInvoice(text,{...context,[item.source]:item.value});
+ assert.deepEqual(sourceInvoiceNumbers(item.value),[item.expected]);
+ assert.equal(result.fields.invoice_number.value,item.number);assert.equal(result.text_excerpt,text);
+ assert.equal(result.level,item.held?'red':'green');
+ if(item.held)assert.ok(result.issues.some(issue=>issue.includes('Motstridigt fakturanummer')));
 });
 
 class MemoryD1{
@@ -135,4 +145,17 @@ for(const item of exactFieldPositiveCases)test('actual Sites PDF registers exact
  assert.equal(f.invoices().length,1);assert.equal(f.invoices()[0].number,item.number);assert.equal(f.invoices()[0].ocr,item.reference);assert.equal(f.invoices()[0].total,375000);
  const result=JSON.parse(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction);
  for(const [field,evidence]of Object.entries(item.evidence||{}))assert.equal(result.fields[field].evidence,evidence);
+ for(const [field,value]of Object.entries(item.dates||{}))assert.equal(result.fields[field].value,value);
+});
+
+for(const item of metadataIdentifierCases)test('actual Sites PDF checks complete metadata identity: '+item.name,async t=>{
+ const f=await fixture(t),text=invoiceText.replace('Fakturanummer: 0606','Fakturanummer: '+item.number),doc=f.add(text,undefined,{fontSize:5});
+ const metadata={...context,[item.source==='filename'?'original_filename':item.source]:item.value};
+ f.sql.prepare('UPDATE gmail_sources SET metadata=? WHERE document_id=?').run(JSON.stringify(metadata),doc.id);
+ if(item.source==='filename')f.sql.prepare('UPDATE documents SET filename=? WHERE id=?').run(item.value,doc.id);
+ await f.processing.processDocuments(f.owner);
+ const job=f.sql.prepare('SELECT state,extraction FROM document_jobs WHERE document_id=?').get(doc.id),result=JSON.parse(job.extraction);
+ assert.equal(result.method,'pdf');assert.equal(result.fields.invoice_number.value,item.number);
+ assert.equal(result.level,item.held?'red':'green');assert.equal(f.invoices().length,item.held?0:1);
+ assert.equal(job.state,item.held?'needs_review':'registered');assert.deepEqual(f.objects.get(f.owner+'/'+doc.id),doc.bytes);
 });
