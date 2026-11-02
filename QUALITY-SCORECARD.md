@@ -1,5 +1,47 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Stabilisering och branchrensning — 2026-11-02
+
+| Nr | Område | Före | Efter | Evidens / kvarstående gräns |
+| --- | --- | ---: | ---: | --- |
+| 1 | Design och färger | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 2 | Startsida | 8,5 | 8,5 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 3 | Navigering | 8,5 | 8,5 | Navigation och fokus i offentlig bankvy; inloggad resa ej tillgänglig. |
+| 4 | Mobilanpassning | 8,5 | 8,5 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 5 | Sökning och filtrering | 7,5 | 7,5 | Revisions- och evidensbundna kandidater, sena/felaktiga svar hålls. |
+| 6 | Minimal manuell hantering | 6,5 | 6,5 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 7 | Kundfakturor | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 8 | Leverantörsfakturor | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 9 | PDF-tolkning | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 10 | Bild-OCR | 7 | 7 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 11 | Gmail-anslutning | 7,5 | 7,5 | Gmail efterkontrollerar accepterat arbete även vid HTTP429; skyddade Node-anrop fencas. |
+| 12 | Automatisk fakturaregistrering | 8 | 8 | Registreringstester syntetiska; inga verkliga registerposter skapade. |
+| 13 | Dubblettkontroll | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 14 | Dokumentgranskning | 8 | 8 | Förändrade dokument uppdaterar ordinarie/fokuserad vy även utan ekonomisk revision. |
+| 15 | Swedbank-anslutning | 8,5 | 8,5 | Ingen bankaliasrelation uppfinns; aktuell behörig läsning krävs fortsatt. |
+| 16 | Automatisk bankhämtning | 8 | 8 | Node-bankens fortsättningsanrop stoppas efter sessionsrevokering. |
+| 17 | Bankgiroimport | 8,5 | 8,5 | Befintliga XLSX/CSV/camt-original- och idempotensregler bevarade. |
+| 18 | Identifiera verklig betalare | 7 | 7 | Bankbetalare förblir separat från fakturaförslag. |
+| 19 | Verklig OCR/fakturareferens | 7 | 7 | Kandidatval följer samma faktiska rapport-/detalj-/AIS-referens som vyn. |
+| 20 | Automatisk betalningsmatchning | 7,5 | 7,5 | Inga ändringar av ekonomimotorns saldon eller allokeringar. |
+| 21 | Delbetalningar | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 22 | Överbetalningar | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 23 | Flera fakturor i en betalning | 7,5 | 7,5 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 24 | Betalningshistorik | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 25 | Betalningsstatus | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 26 | Kontrollera alla betalningar | 8 | 8 | Tidigare numerisk bedömning behålls; ingen ny fullständig områdescertifiering. |
+| 27 | Automatiska mejlutkast | 8 | 8 | Meddelandeåtgärders föräldrauppdatering inväntas; inga kundmejl skickade. |
+| 28 | Schemalagd automatisering | 6,5 | 6,5 | Befintliga scheman bevaras; ingen ny loop eller automatisering startas. |
+| 29 | Säkerhetskopiering | 7,5 | 7,5 | Verifierat privat Git-arkiv och syntetiska backup-/originalkontroller; manifestpass är historisk scan. |
+| 30 | Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Session återkontrolleras efter body/provider; parallella inloggningsförsök räknas korrekt. |
+| 31 | Katastrofåterställning | 5,5 | 5,5 | Främmande WAL/sidecars får inte påverka återställda bytes; syntetisk återställning verifierad. |
+| 32 | Kodkvalitet och tester | 8,5 | 8,5 | Reproducerade regressioner med RED/GREEN och oberoende delgranskning; slutgrindar kompletteras. |
+| 33 | Verifiering i verklig produktion | 6,5 | 6,5 | Ingen falsk full betalningsverifiering; aktuella bankbevis och inloggad UI begränsar poängen. |
+
+Dokumentär startsumma och oförändrad slutbedömning: **255/330 = 7,73/10**, 0/33 områden når9,5. Detta är summering av tidigare explicita områdespoäng med senare överlagringar, inte en ny statistisk produktmätning. Äldre tryckta253,5/7,68 avser poäng före höjningarna för områden17–19. Numeriska poäng höjs inte för att uppfylla målet; nya regressionsbevis redovisas separat. Äldre backup-/restore-motiveringar nedan är historik och ersätts av den nya fel-/testredovisningen.
+
+[Aktuell samlad rapport](docs/FINAL-MAIN-CLEANUP-REPORT.md).
+
 ## Samlad betalningskedja — ny verifiering 2026-11-02
 
 | Område | Före | Efter | Ny evidens och gräns |

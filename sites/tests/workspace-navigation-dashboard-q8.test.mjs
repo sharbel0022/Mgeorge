@@ -6,6 +6,7 @@ import {emptyState} from '../lib/domain.ts';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const file=path=>new URL(path,import.meta.url).href;
 const elements=node=>!node||typeof node!=='object'?[]:Array.isArray(node)?node.flatMap(elements):[node,...elements(node.props?.children)];
+const text=node=>node==null||typeof node==='boolean'?'':Array.isArray(node)?node.map(text).join(' '):typeof node==='object'?text(node.props?.children):String(node);
 const flush=async()=>{for(let n=0;n<8;n++)await new Promise(resolve=>setImmediate(resolve));};
 function compiled(path,imports){
  let source=readFileSync(new URL(path,import.meta.url),'utf8');if(path==='../app/dashboard.tsx')source+='\nexport {SettingsView};';
@@ -13,7 +14,7 @@ function compiled(path,imports){
  for(const [name,url]of Object.entries({'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'lucide-react':import.meta.resolve('lucide-react'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));
  return data(code);
 }
-async function fixture(t,{settingsOnly=false,messagesOnly=false}={}){
+async function fixture(t,{settingsOnly=false,messagesOnly=false,realControl=false}={}){
  const key='__dashboard_navigation_'+crypto.randomUUID().replaceAll('-',''),f={slots:[],cursor:0,effects:[],closed:false,scheduled:false,requests:[],reads:0,mainFocus:0};globalThis[key]=f;
  const equal=(a,b)=>a&&b&&a.length===b.length&&a.every((value,index)=>Object.is(value,b[index]));
  f.schedule=()=>{if(f.closed||f.scheduled)return;f.scheduled=true;queueMicrotask(()=>{f.scheduled=false;f.render();});};
@@ -25,7 +26,7 @@ async function fixture(t,{settingsOnly=false,messagesOnly=false}={}){
  const ref=`globalThis[${JSON.stringify(key)}]`,react=data(`const f=${ref};export const useState=(...a)=>f.state(...a),useRef=(...a)=>f.ref(...a),useCallback=(...a)=>f.callback(...a),useMemo=(...a)=>f.memo(...a),useEffect=(...a)=>f.effect(...a);`);
  const browser=new EventTarget();browser.location=new URL('https://workspace.example/?view=settings');browser.confirm=()=>false;browser.history={state:null,replaceState(state,unused,url){this.state=state;browser.location=new URL(url,browser.location);},pushState(state,unused,url){this.replaceState(state,unused,url);},go(){throw Error('No traversal needed in this request-race test');}};
  const shell={ownerDocument:{defaultView:browser},contains:()=>false,addEventListener(){},removeEventListener(){}};
- const previousWindow=globalThis.window,previousDocument=globalThis.document;globalThis.window=browser;globalThis.document={activeElement:null};
+ const previousWindow=globalThis.window,previousDocument=globalThis.document;globalThis.window=browser;globalThis.document=Object.assign(new EventTarget(),{activeElement:null});
  const inert=data('export default function View(){return null;}');
  const aliases=Object.fromEntries(['economy-overview','payment-history','payment-verification','gmail-summary','invoice-evidence','customer-messages','gmail-workspace','bank-connection','bankgiro-link-review'].map(name=>['@/components/'+name,inert]));
  const noCalls=names=>data(names.map(name=>`export function ${name}(){throw Error('Unexpected unrelated ${name} call');}`).join('\n'));
@@ -33,7 +34,7 @@ async function fixture(t,{settingsOnly=false,messagesOnly=false}={}){
  const hook=compiled('../components/use-workspace-navigation.ts',{react,'@/lib/workspace-location':location,'@/lib/workspace-drafts':file('../lib/workspace-drafts.ts')});
  const module=await import(compiled('../app/dashboard.tsx',{...aliases,react,'@/components/workspace-navigation':navigation,'@/components/use-workspace-navigation':hook,'@/lib/workspace-location':location,'@/lib/domain':file('../lib/domain.ts'),
   '@/components/bank-payments':data('export default function BankPayments(){return null;} export function BankPaymentSummary(){return null;}'),
-  '@/components/payment-control':data('export function usePaymentControl(){return {data:null,error:"",busy:false,refresh:async()=>{},start:async()=>{throw Error("History must not start controls");}};} export const ControlButton=()=>null,ControlConnections=()=>null,ControlProgress=()=>null,ControlQueue=()=>null,ControlReview=()=>null,controlDate=()=>"";'),
+  '@/components/payment-control':realControl?compiled('../components/payment-control.tsx',{react,'@/lib/domain':file('../lib/domain.ts'),'@/lib/economy-summary.js':file('../lib/economy-summary.js')}):data('export function usePaymentControl(){return {data:null,error:"",busy:false,refresh:async()=>{},start:async()=>{throw Error("History must not start controls");}};} export const ControlButton=()=>null,ControlConnections=()=>null,ControlProgress=()=>null,ControlQueue=()=>null,ControlReview=()=>null,controlDate=()=>"";'),
   '@/lib/payment-presentation':data('export const bankVisibleTransactions=state=>state.transactions,payerLabel=transaction=>transaction.party;export function bankPaymentView(){return {};}export function bankPaymentInvoiceAssessment(){return {};}'),
   '@/components/payment-bank-filter':data('export const needsPaymentIdentification=()=>false;'),
   '@/lib/payment-overview':noCalls(['buildPaymentOverview','paymentGroup','paymentTitle']),
@@ -44,17 +45,19 @@ async function fixture(t,{settingsOnly=false,messagesOnly=false}={}){
  const original=emptyState();original.company={...original.company,name:'Original synthetic company'};
  const saved=structuredClone(original);saved.company.name='Saved synthetic company';
  f.original=original;f.saved=saved;
+ f.controlOverview={run:null,totals:{},counts:{review:2},queue:[],connections:{gmail:{},bank:{},ocr:{}},last_successful_control:null};
  t.mock.method(globalThis,'fetch',async(path,options={})=>{
   f.requests.push({path,method:options.method||'GET'});
-  if(messagesOnly){const message={id:'synthetic-message-id',status:'draft',version:1,subject:'Synthetic subject',body:'Synthetic message',kind:'partial',invoice:{party:'Synthetic customer',number:'SYN-1'},facts:{total_cents:10000,paid_cents:0,remaining_cents:10000},payments:[],findings:[],recipient:'synthetic@example.test',review_id:'synthetic-review'};if(path==='/api/customer-messages/list')return Response.json({items:[message]});if(path==='/api/gmail/status?summary=1')return Response.json({send_enabled:false});if(path==='/api/customer-messages/review')return Response.json(message);throw Error('Unexpected message request '+path);}
+  if(messagesOnly){const message={id:'synthetic-message-id',status:'draft',version:1,subject:'Synthetic subject',body:'Synthetic message',kind:'partial',invoice:{party:'Synthetic customer',number:'SYN-1'},facts:{total_cents:10000,paid_cents:0,remaining_cents:10000},payments:[],findings:[],recipient:'synthetic@example.test',review_id:'synthetic-review'};if(path==='/api/customer-messages/list')return Response.json({items:[message]});if(path==='/api/gmail/status?summary=1')return Response.json({send_enabled:false});if(path==='/api/customer-messages/review')return Response.json(message);if(path==='/api/customer-messages/reconcile')return Response.json({});throw Error('Unexpected message request '+path);}
   if(path==='/api/bank/invoice-candidates')return Response.json({candidates:{}});
+  if(path==='/api/payment-control/overview')return Response.json(f.controlOverview);
   assert.equal(path,'/api/state');
   if(options.method==='POST')return Response.json({state:saved,revision:2,message:'Saved'});
   if(++f.reads===1)return Response.json({state:original,revision:1,audit:[]});
-  return await new Promise(resolve=>{f.releaseRead=()=>resolve(Response.json({state:original,revision:1,audit:[]}));});
+  return await new Promise(resolve=>{f.releaseRead=(state=original,revision=1)=>resolve(Response.json({state,revision,audit:[]}));});
  });
  f.settingsState=emptyState();f.settingsSave=async()=>true;
- f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=messages?messages.default({embedded:true,initialMessageId:'synthetic-message-id'}):settingsOnly?module.SettingsView({state:f.settingsState,save:f.settingsSave,busy:false,exportData(){},toggleDemo(){},demo:false}):module.default({initialView:'settings'});for(const node of elements(f.tree)){if(node.props?.className==='app-shell'&&node.props.ref)node.props.ref.current=shell;if(node.props?.id==='main-content'&&node.props.ref)node.props.ref.current={focus(){f.mainFocus++;}};}for(const effect of f.effects.splice(0))effect();};
+ f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=messages?messages.default({embedded:true,initialMessageId:'synthetic-message-id',onChanged:()=>f.onChanged?.()}):settingsOnly?module.SettingsView({state:f.settingsState,save:f.settingsSave,busy:false,exportData(){},toggleDemo(){},demo:false}):module.default({initialView:'settings'});for(const node of elements(f.tree)){if(node.props?.className==='app-shell'&&node.props.ref)node.props.ref.current=shell;if(node.props?.id==='main-content'&&node.props.ref)node.props.ref.current={focus(){f.mainFocus++;}};}for(const effect of f.effects.splice(0))effect();};
  f.find=predicate=>elements(f.tree).find(predicate);
  t.after(()=>{f.closed=true;for(const slot of f.slots)slot?.cleanup?.();delete globalThis[key];if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;});
  f.render();await flush();return f;
@@ -98,4 +101,23 @@ test('a completed Settings save releases only the submitted draft values',async 
  await f.find(node=>node.type==='form').props.onSubmit({preventDefault(){}});await flush();assert.equal(name().props.value,'Submitted name');
  name().props.onChange({target:{value:'Second submission'}});await flush();let finish;f.settingsSave=()=>new Promise(resolve=>{finish=resolve;});f.render();
  const pending=f.find(node=>node.type==='form').props.onSubmit({preventDefault(){}});name().props.onChange({target:{value:'Newer unsaved edit'}});await flush();finish(true);await pending;await flush();assert.equal(name().props.value,'Newer unsaved edit');
+});
+for(const area of ['documents','messages'])for(const focused of [false,true]){
+ test(`${focused?'focused':'ordinary'} ${area} changes await actual workspace and review queue refresh`,async t=>{
+  const f=await fixture(t,{realControl:true}),nav=()=>f.find(node=>node.props?.onNavigate&&node.props?.company&&node.props?.view);assert.equal(nav().props.reviewCount,2);
+  nav().props.onNavigate(focused?'review':area);await flush();
+  const embed=focused?f.find(node=>node.props?.renderDetail).props.renderDetail({id:'synthetic-task',type:area==='documents'?'document':'message',entity_id:'synthetic-item'}):f.find(node=>node.props?.embedded&&(area==='documents'?node.props.initialDocumentId!==undefined:node.props.initialMessageId!==undefined));
+  assert.equal(typeof embed.props.onChanged,'function');f.controlOverview={...f.controlOverview,counts:{review:0}};let done=false;
+  const pending=Promise.resolve(embed.props.onChanged()).then(()=>{done=true;});await flush();assert.equal(f.reads,2);assert.equal(done,false,'The mutation must remain pending until the parent workspace read completes');
+  f.releaseRead(f.saved,2);await pending;await flush();assert.equal(nav().props.company.name,'Saved synthetic company');assert.equal(nav().props.reviewCount,0);assert.equal(f.requests.some(request=>request.method!=='GET'),false);
+ });
+}
+test('message actions remain busy until their parent workspace refresh has completed',async t=>{
+ const f=await fixture(t,{messagesOnly:true});let release;f.onChanged=()=>new Promise(resolve=>{release=resolve;});const button=()=>f.find(node=>node.type==='button'&&text(node)==='Uppdatera avstämning och kö');
+ const pending=button().props.onClick();await flush();assert.equal(typeof release,'function');assert.equal(button().props.disabled,true);release();await pending;await flush();assert.equal(button().props.disabled,false);
+});
+test('message actions report a rejected parent refresh without leaving a floating promise',async t=>{
+ const f=await fixture(t,{messagesOnly:true});let reject;const failure=new Promise((resolve,rejectPromise)=>{reject=rejectPromise;});void failure.catch(()=>{});f.onChanged=()=>failure;
+ const pending=f.find(node=>node.type==='button'&&text(node)==='Uppdatera avstämning och kö').props.onClick();await flush();reject(Error('Synthetic workspace refresh unavailable'));await pending;await flush();
+ assert.match(text(f.find(node=>node.props?.role==='alert')),/Synthetic workspace refresh unavailable/);assert.equal(f.find(node=>node.type==='button'&&text(node)==='Uppdatera avstämning och kö').props.disabled,false);
 });

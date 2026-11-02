@@ -141,13 +141,14 @@ export function startConsentBody(aspsp,state,origin){
 }
 function validDate(date){return typeof date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date;}
 /** Hämtar bokförda transaktioner över flera API-sidor och förhindrar oändliga upprepningar av sidmarkörer. */
-export async function fetchBookedTransactions(accountId,{dateFrom,dateTo}){
+export async function fetchBookedTransactions(accountId,{dateFrom,dateTo,authorize=()=>{}}){
   if(typeof accountId!=='string'||!accountId||accountId.length>200)throw bankError('invalid_account','Välj ett godkänt konto.',400);
   if(!validDate(dateFrom)||!validDate(dateTo)||dateFrom>dateTo||Date.parse(dateTo)-Date.parse(dateFrom)>91*86400000)throw bankError('invalid_date_range','Välj ett giltigt datumintervall på högst 91 dagar.',400);
   const out=[];let cursor='';const seen=new Set();let received=0;
   for(let page=0;page<15;page++){
     const search=new URLSearchParams({date_from:dateFrom,date_to:dateTo,transaction_status:'BOOK'});
     if(cursor)search.set('continuation_key',cursor);
+    authorize();
     const data=await bankingRequest(`/accounts/${encodeURIComponent(accountId)}/transactions?${search}`);
     if(!Array.isArray(data.transactions))throw bankError('invalid_response','Banktjänsten returnerade en ogiltig transaktionslista.',502);
     received+=data.transactions.length;

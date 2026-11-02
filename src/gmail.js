@@ -68,37 +68,39 @@ async function tokenRequest(params,previous){
   return normalizedTokens(await requestJson('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}),previous);
 }
 /** Växlar Googles kortlivade auktoriseringskod mot token på servern. */
-export async function exchangeGmailCode(code,origin){
+export async function exchangeGmailCode(code,origin,{authorize=()=>{}}={}){
   if(typeof code!=='string'||!code||code.length>4096)throw fail('Saknar Googles engångskod.','invalid_code',400);
+  authorize();
   return tokenRequest({grant_type:'authorization_code',code,redirect_uri:callback(origin)});
 }
 /** Begär en ny access token med lagrad refresh token när den tidigare har gått ut. */
-export async function refreshGmailTokens(tokens){
+export async function refreshGmailTokens(tokens,{authorize=()=>{}}={}){
   if(!tokens?.refresh_token)throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
+  authorize();
   return tokenRequest({grant_type:'refresh_token',refresh_token:tokens.refresh_token},tokens);
 }
-async function apiRequest(path,tokens){
+async function apiRequest(path,tokens,authorize=()=>{}){
   if(typeof tokens?.access_token!=='string'||!tokens.access_token)throw fail('Gmail-anslutningen behöver förnyas.','renewal_required');
   if(!path.startsWith('/')||path.startsWith('//')||/[\r\n]/.test(path))throw fail('Ogiltig Gmail-sökväg.','invalid_path',400);
-  const request=()=>requestJson(apiBase+path,{headers:{Authorization:`Bearer ${tokens.access_token}`,Accept:'application/json'}});
+  const request=()=>{authorize();return requestJson(apiBase+path,{headers:{Authorization:`Bearer ${tokens.access_token}`,Accept:'application/json'}});};
   try{return await request();}catch(e){
     if(e.code!=='renewal_required'||!tokens.refresh_token)throw e;
-    Object.assign(tokens,await refreshGmailTokens(tokens));
+    Object.assign(tokens,await refreshGmailTokens(tokens,{authorize}));
     return request();
   }
 }
 /** Bekräftar att användaren verkligen godkänt företagets konfigurerade Gmail-konto. */
-export async function gmailProfile(tokens){
-  const profile=await apiRequest('/profile',tokens);
+export async function gmailProfile(tokens,{authorize=()=>{}}={}){
+  const profile=await apiRequest('/profile',tokens,authorize);
   if(typeof profile.emailAddress!=='string'||profile.emailAddress.toLowerCase()!==gmailAccount())throw fail(`Välj företagets Gmail-konto: ${gmailAccount()}.`,'account_mismatch');
   return profile;
 }
 export function hasGmailSendScope(tokens){return String(tokens?.scope||'').split(/\s+/).includes('https://www.googleapis.com/auth/gmail.send');}
 // Preflight may refresh/read. The returned sender performs exactly ONE POST, no retry.
-export async function prepareGmailSend(tokens){
-  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60000)Object.assign(tokens,await refreshGmailTokens(tokens));
+export async function prepareGmailSend(tokens,{authorize=()=>{}}={}){
+  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60000)Object.assign(tokens,await refreshGmailTokens(tokens,{authorize}));
   if(!hasGmailSendScope(tokens))throw fail('Koppla Gmail igen och godkänn utskicksbehörigheten gmail.send.','missing_send_scope');
-  await gmailProfile(tokens);
+  await gmailProfile(tokens,{authorize});
   if(!hasGmailSendScope(tokens))throw fail('Utskicksbehörigheten behöver förnyas.','missing_send_scope');
   return message=>{
     if(typeof message.recipient!=='string'||!/^[-A-Za-z0-9.!#$%&'*+/=?^_`{|}~]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(message.recipient)||message.recipient.length>240||/[\r\n\0]/.test(message.recipient)||typeof message.subject!=='string'||/[\r\n\0]/.test(message.subject)||!/^<[a-f0-9-]+@mg-fakturakoll\.local>$/.test(message.rfc_message_id))throw fail('Ogiltiga mejluppgifter.','invalid_message',400);
@@ -107,7 +109,8 @@ export async function prepareGmailSend(tokens){
     const subject=words.map(word=>'=?UTF-8?B?'+Buffer.from(word).toString('base64')+'?=').join('\r\n ');
     const body=Buffer.from(message.body,'utf8').toString('base64').match(/.{1,76}/g)?.join('\r\n')||'';
     const raw=Buffer.from(`From: ${gmailAccount()}\r\nTo: ${message.recipient}\r\nSubject: ${subject}\r\nMessage-ID: ${message.rfc_message_id}\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n${body}`).toString('base64url');
-    return requestJson(apiBase+'/messages/send',{method:'POST',headers:{Authorization:`Bearer ${tokens.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({raw})});
+    // Guard dispatch; an already dispatched send still needs its actual receipt.
+    authorize();return requestJson(apiBase+'/messages/send',{method:'POST',headers:{Authorization:`Bearer ${tokens.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({raw})});
   };
 }
 export async function revokeGmailTokens(tokens){
@@ -153,9 +156,9 @@ function attachmentMime(part){
 /**
  * Hämtar bilagor som originalunderlag för efterföljande tolkning och granskning.
  * @param {any} tokens
- * @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string}} options
+ * @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string,authorize?:()=>void}} options
  */
-export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken=''}={}){
+export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken='',authorize=()=>{}}={}){
   requireConfig();
   if(!Number.isInteger(maxMessages)||maxMessages<1||maxMessages>100)throw fail('Välj mellan 1 och 100 mejl per hämtning.','invalid_limit',400);
   if(typeof query!=='string'||query.length>1000)throw fail('Gmail-sökningen är för lång.','invalid_query',400);
@@ -169,8 +172,8 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
   }
   let current=tokens;
   const deadline=Date.now()+120000;
-  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60_000)Object.assign(current,await refreshGmailTokens(tokens));
-  await gmailProfile(current);
+  if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60_000)Object.assign(current,await refreshGmailTokens(tokens,{authorize}));
+  await gmailProfile(current,{authorize});
   let search=query.trim()||defaultQuery;
   // Gmail date-only search boundaries use PST. UTC seconds plus overlap prevent gaps
   // around midnight, delayed mail indexing and interrupted syncs; source IDs deduplicate.
@@ -180,13 +183,13 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
   for(let page=0;page<10;page++){
     const params=new URLSearchParams({q:search,maxResults:String(Math.min(50,maxMessages-received)),includeSpamTrash:'false'});
     if(cursor)params.set('pageToken',cursor);
-    const listing=await apiRequest(`/messages?${params}`,current);
+    const listing=await apiRequest(`/messages?${params}`,current,authorize);
     for(const item of listing.messages||[]){
       if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
       if(received>=maxMessages){truncated=true;break;}
       if(!item.id||seenMessages.has(item.id))continue;
       seenMessages.add(item.id);received++;
-      const message=await apiRequest(`/messages/${encodeURIComponent(item.id)}?format=full`,current);
+      const message=await apiRequest(`/messages/${encodeURIComponent(item.id)}?format=full`,current,authorize);
       const labels=message.labelIds||[];
       if(labels.some(l=>['SPAM','TRASH','DRAFT'].includes(l))){skipped++;continue;}
       const headers=Object.fromEntries((message.payload?.headers||[]).map(h=>[h.name.toLowerCase(),mimeText(h.value)]));
@@ -213,7 +216,7 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
         attachmentAttempts++;
         if(Number(part.body?.size)>maxFileBytes){warnings.push({source_id,message:`${name}: filen är större än 15 MB.`});skipped++;continue;}
         let body=part.body||{};
-        if(body.attachmentId)body=await apiRequest(`/messages/${encodeURIComponent(item.id)}/attachments/${encodeURIComponent(body.attachmentId)}`,current);
+        if(body.attachmentId)body=await apiRequest(`/messages/${encodeURIComponent(item.id)}/attachments/${encodeURIComponent(body.attachmentId)}`,current,authorize);
         const encoded=body.data;
         if(typeof encoded!=='string'||encoded.length>Math.ceil(maxFileBytes*4/3)+4||!/^[A-Za-z0-9_-]*={0,2}$/.test(encoded)){warnings.push({source_id,message:`${name}: bilagan kunde inte läsas.`});skipped++;continue;}
         const content=Buffer.from(encoded,'base64url');const mime_type=detectedMime(content);

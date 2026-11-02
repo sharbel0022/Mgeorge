@@ -34,17 +34,21 @@ async function fixture(t,{stored=null,processing=null,pending=0,connected=false}
     './sync-recovery-notice':compiled('../components/sync-recovery-notice.tsx'),
   }));
   f.doc={document_id:'synthetic-doc',filename:'synthetic.png',mime:'image/png',metadata:JSON.stringify({direction:'supplier',direction_confident:true,subject:'Synthetic invoice',from:'supplier@example.test',to:'owner@example.test'}),status:'needs_review',processing_state:'needs_review',created_at:'2026-10-30T00:00:00Z',extraction:JSON.stringify(stored||{}),processing_extraction:JSON.stringify(processing||{})};
-  f.response={registered:true};f.processResponse={processed:0};f.syncResponse={imported:0,duplicates:0};f.status={email:'owner@example.test',configured:true,candidates:[f.doc],runs:[],processing:{registered:0,aftercheck_pending:pending},...(connected?{connection:{status:'connected'}}:{})};
+  f.response={registered:true};f.processResponse={processed:0};f.syncResponse={imported:0,duplicates:0};f.syncStatus=200;f.status={email:'owner@example.test',configured:true,candidates:[f.doc],runs:[],processing:{registered:0,aftercheck_pending:pending},...(connected?{connection:{status:'connected'}}:{})};
+  f.failures={};f.workspace={revision:0};f.change=async()=>{f.workspace.revision++;};
   t.mock.method(globalThis,'fetch',async(path,options={})=>{
     const request={path,method:options.method||'GET',...(options.body?{body:JSON.parse(options.body)}:{})};f.requests.push(request);
+    if(f.failures[path] instanceof Error)throw f.failures[path];
+    if(f.failures[path])return Response.json({error:'Synthetic '+path.split('/').at(-1)+' unavailable'},{status:f.failures[path]});
     if(path==='/api/gmail/status')return Response.json(f.status);
     if(path==='/api/files?id=synthetic-doc')return new Response('synthetic original bytes',{headers:{'Content-Type':'image/png'}});
     if(path==='/api/gmail/review'&&request.method==='POST')return Response.json(f.response);
     if(path==='/api/gmail/process'&&request.method==='POST')return Response.json(f.processResponse);
-    if(path==='/api/gmail/sync'&&request.method==='POST')return Response.json(f.syncResponse);
+    if(path==='/api/gmail/sync'&&request.method==='POST')return Response.json(f.syncResponse,{status:f.syncStatus});
+    if(['/api/gmail/retry','/api/gmail/disconnect','/api/gmail/automation','/api/gmail/trust'].includes(path)&&request.method==='POST')return Response.json({ok:true});
     throw Error('Unexpected request '+path);
   });
-  f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=module.default({initialDocumentId:'synthetic-doc',embedded:true});for(const effect of f.effects.splice(0))effect();};
+  f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=module.default({initialDocumentId:'synthetic-doc',embedded:true,onChanged:()=>f.change()});for(const effect of f.effects.splice(0))effect();};
   f.flush=async()=>{for(let n=0;n<10;n++)await new Promise(r=>setImmediate(r));};
   f.find=predicate=>elements(f.tree).find(predicate);f.posts=()=>f.requests.filter(r=>r.method==='POST');
   t.after(()=>{f.closed=true;for(const slot of f.slots)slot?.cleanup?.();delete globalThis[key];});
@@ -103,4 +107,66 @@ test('Q8: review diagnostics explain overlap and coverage without presenting old
   const {DocumentOcrStatus}=await import(compiled('../components/document-ocr-status.tsx'));
   const html=renderToStaticMarkup(React.createElement(DocumentOcrStatus,{processing:{review_reasons:{basis:'stored_extraction',total:503,analyzed:500,limit:500,truncated:true,counts:{missing_dates:183,unverified_counterparty:175,possible_duplicate:2}}}}));
   assert.match(html,/500 av 503/);assert.match(html,/flera orsaker/);assert.match(html,/sparade tolkning/i);assert.match(html,/183/);assert.match(html,/datum/i);assert.match(html,/175/);assert.match(html,/motpart/i);assert.match(html,/2/);assert.match(html,/dubblett/i);
+});
+
+const click=async(f,label)=>{const button=f.find(n=>n.type==='button'&&text(n)===label);assert.ok(button,'Expected the real Gmail action '+label);await button.props.onClick();await f.flush();};
+async function approve(f){f.find(n=>n.type==='input'&&n.props.type==='checkbox'&&n.props.required).props.onChange({target:{checked:true}});await f.flush();return f.find(n=>n.type==='form').props.onSubmit({preventDefault(){}});}
+for(const [name,label]of [['sync','Hämta fakturaunderlag'],['process','Tolka väntande underlag'],['retry','Tolka igen']]){
+  test(`Gmail workspace refresh: accepted ${name} updates the parent revision and retains metadata warnings`,async t=>{
+    const f=await fixture(t,{connected:true}),warning='Synthetic accepted processing metadata warning';
+    f.processResponse={processed:1,metadata_warning:warning};f.syncResponse={imported:1,duplicates:0,processing:{processed:1,metadata_warning:warning}};
+    if(name==='retry')await click(f,'Stäng');
+    await click(f,label);assert.equal(f.workspace.revision,1);assert.match(text(f.tree),new RegExp(warning));
+    assert.deepEqual(f.posts().map(r=>r.path),name==='retry'?['/api/gmail/retry','/api/gmail/process']:['/api/gmail/'+name]);
+  });
+}
+for(const [name,run]of [['approve',approve],['reject',f=>f.find(n=>n.type==='button'&&text(n)==='Avvisa').props.onClick()]]){
+  test(`Gmail workspace refresh: ${name} waits for an asynchronous parent refresh before completing`,async t=>{
+    const f=await fixture(t);let release,started=false,settled=false;
+    f.change=async()=>{started=true;await new Promise(resolve=>{release=resolve;});f.workspace.revision++;};
+    const pending=run(f).then(()=>{settled=true;});await f.flush();assert.equal(started,true);assert.equal(settled,false);assert.equal(f.workspace.revision,0);
+    release();await pending;assert.equal(settled,true);assert.equal(f.workspace.revision,1);
+  });
+}
+test('Gmail workspace refresh: accepted processing still updates the parent after local status fails',async t=>{
+  const f=await fixture(t);f.processResponse={processed:1,metadata_warning:'Synthetic processing saved'};f.failures['/api/gmail/status']=503;
+  await click(f,'Tolka väntande underlag');assert.equal(f.workspace.revision,1);assert.match(text(f.tree),/Synthetic processing saved/);assert.match(text(f.tree),/Synthetic status unavailable/);
+});
+test('Gmail workspace refresh: a rejected asynchronous parent refresh is handled after accepted registration',async t=>{
+  const f=await fixture(t);let rejectRefresh;f.change=()=>new Promise((resolve,reject)=>{rejectRefresh=reject;});
+  const pending=approve(f);await f.flush();assert.equal(typeof rejectRefresh,'function');rejectRefresh(Error('Synthetic workspace refresh unavailable'));await pending;await f.flush();
+  assert.match(text(f.tree),/Fakturan är registrerad/);assert.match(text(f.tree),/Synthetic workspace refresh unavailable/);assert.equal(f.posts().length,1);
+});
+for(const [name,label]of [['sync','Hämta fakturaunderlag'],['process','Tolka väntande underlag'],['retry','Tolka igen'],['reject','Avvisa'],['approve',null]]){
+  for(const failure of [503,Error('Synthetic transport unavailable')]){
+    test(`Gmail workspace refresh: failed ${name} (${typeof failure==='number'?'HTTP':'transport'}) leaves the parent revision unchanged`,async t=>{
+      const f=await fixture(t,{connected:true});f.failures['/api/gmail/'+(['approve','reject'].includes(name)?'review':name)]=failure;
+      if(name==='retry')await click(f,'Stäng');
+      if(name==='approve')await approve(f);else await click(f,label);
+      await f.flush();assert.equal(f.workspace.revision,0);assert.match(text(f.tree),/Synthetic .* unavailable/);
+      assert.equal(f.requests.filter(r=>r.path==='/api/gmail/status').length,1);
+    });
+  }
+}
+test('Gmail workspace refresh: an accepted retry refreshes its changed queue even when processing fails',async t=>{
+  const f=await fixture(t);await click(f,'Stäng');f.failures['/api/gmail/process']=503;
+  await click(f,'Tolka igen');assert.equal(f.workspace.revision,1);assert.match(text(f.tree),/Synthetic process unavailable/);
+  assert.deepEqual(f.posts().map(r=>r.path),['/api/gmail/retry','/api/gmail/process']);
+});
+test('Gmail workspace refresh: rate-limited sync retains its error while accepted document processing refreshes both workspaces',async t=>{
+ const f=await fixture(t,{connected:true});f.syncStatus=429;f.syncResponse={status:'not_due',error:'Synthetic Gmail retrieval is rate limited',retry_after:'2027-01-01T00:00:00Z',processing:{processed:1,registered:1}};
+ await click(f,'Hämta fakturaunderlag');assert.equal(f.workspace.revision,1);assert.equal(f.requests.filter(r=>r.path==='/api/gmail/status').length,2);
+ assert.match(text(f.find(node=>node.props?.role==='alert')),/Synthetic Gmail retrieval is rate limited/);assert.doesNotMatch(text(f.find(node=>node.type==='p'&&node.props?.role==='status')),/nya underlag|dubbletter|kopplats från/);
+ assert.deepEqual(f.posts().map(r=>r.path),['/api/gmail/sync']);
+});
+test('Gmail workspace refresh: cumulative processing status in a rejected sync does not fabricate accepted work',async t=>{
+ const f=await fixture(t,{connected:true});f.syncStatus=429;f.syncResponse={status:'not_due',error:'Synthetic Gmail retrieval is rate limited',processing:{registered:8,counts:{registered:8,ready:0}}};
+ await click(f,'Hämta fakturaunderlag');assert.equal(f.workspace.revision,0);assert.equal(f.requests.filter(r=>r.path==='/api/gmail/status').length,1);assert.match(text(f.find(node=>node.props?.role==='alert')),/rate limited/);
+});
+test('Gmail workspace refresh: partial processing clears an earlier sync success and awaits the parent before retaining the sync error',async t=>{
+ const f=await fixture(t,{connected:true});f.syncResponse={imported:2,duplicates:0};await click(f,'Hämta fakturaunderlag');assert.match(text(f.tree),/2 nya underlag/);
+ f.syncStatus=429;f.syncResponse={status:'not_due',error:'Synthetic Gmail retrieval is rate limited',processing:{processed:1,registered:1}};let release,done=false;
+ f.change=async()=>{await new Promise(resolve=>{release=resolve;});f.workspace.revision++;};
+ const pending=f.find(node=>node.type==='button'&&text(node)==='Hämta fakturaunderlag').props.onClick().then(()=>{done=true;});await f.flush();assert.equal(typeof release,'function');assert.equal(done,false);assert.doesNotMatch(text(f.find(node=>node.type==='p'&&node.props?.role==='status')),/2 nya underlag/);
+ release();await pending;await f.flush();assert.equal(f.workspace.revision,2);assert.match(text(f.find(node=>node.props?.role==='alert')),/rate limited/);
 });

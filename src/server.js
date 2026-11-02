@@ -56,10 +56,13 @@ function duplicateInvoice(direction,invoice_number,party,excludeId=''){
   return db.prepare('SELECT id,invoice_number,party FROM invoices WHERE direction=? AND id<>?').all(direction,excludeId).some(i=>identity(i.invoice_number)===identity(invoice_number)&&identity(i.party)===identity(party));
 }
 function validateDate(s,required=false){if(!s&&!required)return ''; if(typeof s!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(s)||Number.isNaN(Date.parse(s+'T00:00:00Z'))||new Date(s+'T00:00:00Z').toISOString().slice(0,10)!==s)throw bad(400,'Ange ett giltigt datum som ÅÅÅÅ-MM-DD');return s;}
-async function readBody(req){
+async function readBody(req,{authenticated=true}={}){
   const chunks=[];let length=0;
   for await (const chunk of req){length+=chunk.length;if(length>22_000_000)throw bad(413,'Filen är för stor');chunks.push(chunk);}
-  try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw bad(400,'Ogiltig JSON');}
+  let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw bad(400,'Ogiltig JSON');}
+  // Reading a streamed body yields: the initiating session may now be revoked.
+  if(authenticated)assertSessionStillAuthorized(req);
+  return body;
 }
 function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
 // Local OS access represents one company administrator. HTTPS requires login.
@@ -188,6 +191,7 @@ const bankSyncing={
 };
 /** Förnyar Gmail-behörighet vid behov och laddar ned nya fakturaunderlag från företagets konto. */
 async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=false,interval=0}={}){
+  const authorize=()=>{if(req)assertSessionStillAuthorized(req);controlAuthorize?.();};
   const waiting=integrationJobs.state('gmail');
   if(waiting?.failures>=3&&waiting.last_error.startsWith('Gmail angav'))throw Object.assign(bad(409,waiting.last_error),{code:'integration_blocked'});
   if(waiting?.next_attempt>Date.now()&&waiting.last_error.startsWith('Gmail har begränsat'))throw Object.assign(bad(429,waiting.last_error),{code:'rate_limited',retryAfter:Math.ceil((waiting.next_attempt-Date.now())/1000)});
@@ -200,14 +204,13 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
     const knownIds=db.prepare('SELECT source_id FROM document_sources').all().map(x=>x.source_id);
     const rejectedIds=db.prepare('SELECT source_id FROM gmail_rejected_sources').all().map(x=>x.source_id);
     currentTokens=decryptObject(connection.encrypted_tokens);
-    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||''});
+    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{lease.assert();authorize();}});
     let imported=0,duplicate=result.duplicate||0;
     // Originals, token rotation and the checkpoint share the lease-fenced write.
     db.exec('BEGIN IMMEDIATE');
     try{
       lease.assert();
-      if(req)assertSessionStillAuthorized(req);
-      controlAuthorize?.();
+      authorize();
       db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(result.tokens),connection.id);
       for(const doc of result.documents){
         const payload=filePayload(doc);
@@ -224,11 +227,12 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
     }catch(e){db.exec('ROLLBACK');throw e;}
     // Originals/checkpoints are durable before interpretation; failed OCR stays
     // in the review queue and can be retried without downloading the mail again.
-    if(analyze)for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{lease.assert();if(req)assertSessionStillAuthorized(req);}});
+    if(analyze)for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{lease.assert();authorize();}});
     lease.assert();
     const summary={received:result.received??result.documents.length+(result.skipped||0),imported,duplicate,review:imported,skipped:result.skipped||0,truncated:!!result.truncated,warnings:result.warnings||[]};
-    lease.write(()=>{recordImport(db,{source:'gmail',name:connection.email,found:summary.received,imported,duplicate,review:imported});audit(db,'gmail_synced',summary);});reconcileAndPrepare();lease.success();return summary;
+    lease.write(()=>{authorize();recordImport(db,{source:'gmail',name:connection.email,found:summary.received,imported,duplicate,review:imported});audit(db,'gmail_synced',summary);});reconcileAndPrepare();lease.success();return summary;
   }catch(e){
+    authorize();
     const renewal=e.code==='renewal_required'||/invalid_grant|förnya|återkall|401|expired|behöver.*koppla/i.test(e.message);
     lease.write(()=>{
     if(currentTokens)db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(currentTokens),connection.id);
@@ -257,6 +261,13 @@ async function verifyBankSession(connection){
 }
 /** Hämtar bankhändelser för vald anslutning, kontrollerar bankens svar och sparar endast giltiga poster med dubblettskydd. */
 async function syncBank(connection,{account_uid,date_from,date_to,scheduled=false,interval=0}={},operationLocked=false){
+  const authorize=()=>{
+    if(connection.request_session_hash){
+      const active=db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(connection.request_session_hash,Date.now());
+      if(!active||active.principal!==connection.owner)throw bad(401,'Sessionen har avslutats. Logga in igen.');
+    }
+    connection.controlAuthorize?.();
+  };
   if(!operationLocked&&bankSyncing.has(connection.id))throw bad(409,'En bankåtgärd pågår redan');
   if(!connection.owner||!connection.selected_account_uid)throw bad(409,'Välj först ett godkänt företagskonto');
   if(!Number.isFinite(Date.parse(connection.valid_until))||Date.parse(connection.valid_until)<=Date.now()){
@@ -275,15 +286,11 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     const stored=db.prepare('SELECT * FROM bank_connections WHERE id=? AND owner=?').get(connection.id,connection.owner);
     if(!stored||stored.accounts_json!==connection.accounts_json||stored.encrypted_session!==connection.encrypted_session||stored.selected_account_uid!==connection.selected_account_uid)throw Object.assign(bad(409,'Bankanslutningen har ändrats. Läs in den igen.'),{code:'connection_changed'});
     await verifyBankSession(connection);
-    lease.assert();
-    const raw=await fetchBookedTransactions(selected.uid,{dateFrom:from,dateTo:to});
+    lease.assert();authorize();
+    const raw=await fetchBookedTransactions(selected.uid,{dateFrom:from,dateTo:to,authorize:()=>{lease.assert();authorize();}});
     lease.assert();
     // Login revocation during a slow provider request must not authorize a write.
-    if(connection.request_session_hash){
-      const active=db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(connection.request_session_hash,Date.now());
-      if(!active||active.principal!==connection.owner)throw bad(401,'Sessionen har avslutats. Logga in igen.');
-    }
-    connection.controlAuthorize?.();
+    authorize();
     const account=stableAccountIdentity(selected,connection.bank_name);
     const transactions=raw.map(x=>normalizeBankApiTransaction(x,account)).filter(x=>x&&x.booked_at>=from&&x.booked_at<=to);
     const result=storeTransactions(db,transactions,'enablebanking',null,lease.assert);
@@ -294,6 +301,7 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     lease.success();
     return {...result,received:raw.length};
   }catch(e){
+    authorize();
     if(e.code==='connection_changed'||e.status===401&&!e.providerStatus)throw e;
     const renewal=e.code==='renewal_required'||[401,404,410].includes(e.providerStatus);
     const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
@@ -400,12 +408,14 @@ async function route(req,res){
   if(path==='/api/me'&&req.method==='GET')return json(res,200,{authenticated:!!req.principal,login_required:check.secure,company:req.principal?getSettings(db).company_name:'MG Fakturakoll',role:req.principal?'administrator':null});
   if(req.method!=='GET')checkOrigin(req);
   if(path==='/api/login'&&req.method==='POST'&&check.secure){
+    const b=await readBody(req,{authenticated:false});
     const now=Date.now(),address=req.socket.remoteAddress;
     const attempt=loginAttempts.get(address);
     if(attempt&&attempt.until>now&&attempt.count>=5)throw bad(429,'För många inloggningsförsök. Försök igen om 15 minuter.');
-    const b=await readBody(req);
+    // No await between reading, checking and reserving this address's attempt.
+    loginAttempts.set(address,{count:attempt?.until>now?attempt.count+1:1,until:attempt?.until>now?attempt.until:now+900000});
     if(typeof b.password!=='string'||b.password.length>1024||!verifyPassword(b.password,check.adminHash)){
-      loginAttempts.set(address,{count:attempt?.until>now?attempt.count+1:1,until:attempt?.until>now?attempt.until:now+900000});throw bad(401,'Felaktigt lösenord');
+      throw bad(401,'Felaktigt lösenord');
     }
     loginAttempts.delete(address);db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));
     const value=token();db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
@@ -513,7 +523,7 @@ async function route(req,res){
     const result=await approveAndSend(db,id,b,req.principal,sessionHash(req),{authorize:()=>assertSessionStillAuthorized(req),prepare:async()=>{
       const c=db.prepare("SELECT * FROM gmail_connections WHERE status='connected' ORDER BY created_at DESC LIMIT 1").get();
       if(!c||c.email.toLowerCase()!==gmailAccount())throw bad(409,'Koppla företagets Gmail-konto först.');
-      const tokens=decryptObject(c.encrypted_tokens),deliver=await prepareGmailSend(tokens);
+      const tokens=decryptObject(c.encrypted_tokens),deliver=await prepareGmailSend(tokens,{authorize:()=>assertSessionStillAuthorized(req)});
       assertSessionStillAuthorized(req);
       const current=db.prepare("SELECT * FROM gmail_connections WHERE id=? AND status='connected'").get(c.id);
       if(!current||current.email!==c.email)throw bad(409,'Gmail-anslutningen har ändrats.');
@@ -546,6 +556,7 @@ async function route(req,res){
     if(b.invoice_id&&!db.prepare('SELECT id FROM invoices WHERE id=?').get(b.invoice_id))throw bad(404,'Fakturan saknas');
     const stored=storeDocument(db,{...payload,invoice_id:b.invoice_id||null});
     if(!stored.invoice_id&&!stored.duplicate){await analyzeDocument(db,stored.id,{authorize:()=>assertSessionStillAuthorized(req)});Object.assign(stored,listDocuments(db).find(d=>d.id===stored.id));}
+    assertSessionStillAuthorized(req);
     recordImport(db,{source:'document',name:payload.name,found:1,imported:stored.duplicate?0:1,duplicate:stored.duplicate?1:0,review:stored.duplicate||b.invoice_id?0:1});
     return json(res,stored.duplicate?200:201,stored);
   }
@@ -614,7 +625,9 @@ async function route(req,res){
     if(renewal&&bankSyncing.has(renewal.id))throw bad(409,'Vänta tills bankhämtningen har avslutats');
     // A local flag cannot assert vendor approval: check the actual registered app.
     await assertApplicationReady(check.origin);
+    assertSessionStillAuthorized(req);
     const banks=await findSwedbank();const bank=banks.find(x=>x.name==='Swedbank')||banks[0];
+    assertSessionStillAuthorized(req);
     if(!bank)throw bad(409,'Swedbank Företag är inte tillgänglig för denna applikation. Kontakta systemadministratören och Enable Banking.');
     const state=token();db.prepare('DELETE FROM bank_states WHERE expires_at<=? OR (session_hash=? AND consumed=0)').run(Date.now(),sessionHash(req));
     db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash,owner,renew_connection_id,bank_name) VALUES(?,?,?,?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req),req.principal,renewal?.id||'',bank.name);
@@ -680,8 +693,9 @@ async function route(req,res){
     audit(db,'bank_account_selected',{connection_id:connection.id});
     });
     try{return json(res,200,await syncBank({...ownedConnection(req,connection.id),request_session_hash:sessionHash(req)},{},true));}
-    catch(e){return json(res,200,{imported:0,duplicate:0,initial_sync_error:e.message});}
+    catch(e){if(e.status===401&&!e.providerStatus)throw e;return json(res,200,{imported:0,duplicate:0,initial_sync_error:e.message});}
     }catch(e){
+      assertSessionStillAuthorized(req);
       bankLeases.get(connection.id).write(()=>{
       if(e.status===429)db.prepare('UPDATE bank_connections SET retry_after=?,last_error=? WHERE id=?').run(Date.now()+Math.max(60,e.retryAfter||60)*1000,'Bankens anropsgräns är nådd. Försök igen senare.',connection.id);
       if(e.code==='renewal_required'||[401,404,410].includes(e.providerStatus))db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run('Bankanslutningen behöver förnyas – koppla igen',connection.id);
@@ -700,7 +714,7 @@ async function route(req,res){
     try{
     // Revoke at the provider first. A failed revocation must not be reported as success.
     try{await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Banken kunde inte återkalla åtkomsten. Försök igen eller återkalla medgivandet hos banken.');}
-    bankLeases.get(connection.id).write(()=>{db.prepare('DELETE FROM bank_connections WHERE id=?').run(connection.id);audit(db,'bank_disconnected',{id:connection.id});bankLeases.get(connection.id).success();});return json(res,200,{removed:true});
+    bankLeases.get(connection.id).write(()=>{assertSessionStillAuthorized(req);db.prepare('DELETE FROM bank_connections WHERE id=?').run(connection.id);audit(db,'bank_disconnected',{id:connection.id});bankLeases.get(connection.id).success();});return json(res,200,{removed:true});
     }finally{bankSyncing.delete(connection.id);}
   }
   if(path==='/api/gmail/status'&&req.method==='GET')return json(res,200,gmailStatus());
@@ -721,7 +735,7 @@ async function route(req,res){
     const code=url.searchParams.get('code');if(!code)throw bad(400,'Googles engångskod saknas');
     let tokens;const lease=integrationJobs.claim('gmail');
     try{
-      tokens=await exchangeGmailCode(code,check.origin);const profile=await gmailProfile(tokens);
+      tokens=await exchangeGmailCode(code,check.origin,{authorize:()=>assertSessionStillAuthorized(req)});assertSessionStillAuthorized(req);const profile=await gmailProfile(tokens,{authorize:()=>assertSessionStillAuthorized(req)});
       if(record.request_send&&!hasGmailSendScope(tokens))throw bad(409,'Google gav inte utskicksbehörighet. Koppla igen och godkänn gmail.send.');
       assertSessionStillAuthorized(req);lease.assert();
       if(!tokens.refresh_token){
@@ -741,7 +755,7 @@ async function route(req,res){
   if(path==='/api/gmail/connection'&&req.method==='DELETE'){
     const lease=integrationJobs.claim('gmail');
     try{const connection=db.prepare('SELECT * FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
-    if(connection){try{await revokeGmailTokens(decryptObject(connection.encrypted_tokens));}catch{throw bad(502,'Google kunde inte återkalla åtkomsten. Försök igen eller återkalla åtkomsten i Google-kontot.');}lease.write(()=>{db.prepare('DELETE FROM gmail_connections WHERE id=?').run(connection.id);audit(db,'gmail_disconnected',{email:connection.email});lease.success();});}
+    if(connection){try{await revokeGmailTokens(decryptObject(connection.encrypted_tokens));}catch{throw bad(502,'Google kunde inte återkalla åtkomsten. Försök igen eller återkalla åtkomsten i Google-kontot.');}lease.write(()=>{assertSessionStillAuthorized(req);db.prepare('DELETE FROM gmail_connections WHERE id=?').run(connection.id);audit(db,'gmail_disconnected',{email:connection.email});lease.success();});}
     return json(res,200,{removed:!!connection});}finally{lease.release();}
   }
   throw bad(404,'Okänd begäran');

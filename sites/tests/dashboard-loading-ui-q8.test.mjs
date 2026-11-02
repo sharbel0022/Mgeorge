@@ -28,7 +28,7 @@ function populatedState(){
 // Run the real Dashboard load handler against controlled HTTP responses. Child
 // services are inert; bank/invoice list rendering and navigation stay real.
 async function fixture(t,view='bank'){
- const key='__dashboard_loading_'+crypto.randomUUID().replaceAll('-',''),f={slots:[],cursor:0,effects:[],closed:false,scheduled:false,requests:[],reads:[],postState:populatedState(),postStatus:200};globalThis[key]=f;
+ const key='__dashboard_loading_'+crypto.randomUUID().replaceAll('-',''),f={slots:[],cursor:0,effects:[],closed:false,scheduled:false,requests:[],reads:[],candidateReads:[],candidateFrames:[],postState:populatedState(),postStatus:200};globalThis[key]=f;
  const equal=(a,b)=>a&&b&&a.length===b.length&&a.every((value,n)=>Object.is(value,b[n]));
  f.schedule=()=>{if(f.closed||f.scheduled)return;f.scheduled=true;queueMicrotask(()=>{f.scheduled=false;f.render();});};
  f.state=initial=>{const n=f.cursor++;f.slots[n]??={value:typeof initial==='function'?initial():initial};return [f.slots[n].value,value=>{f.slots[n].value=typeof value==='function'?value(f.slots[n].value):value;f.schedule();}];};
@@ -49,19 +49,20 @@ async function fixture(t,view='bank'){
  const {default:Dashboard}=await import(compiled('../app/dashboard.tsx',{...aliases,react,'@/components/workspace-navigation':navigation,'@/components/use-workspace-navigation':hook,'@/lib/workspace-location':location,'@/components/bank-payments':bankUrl,'@/lib/payment-presentation':presentation,'@/components/payment-control':control,'@/components/payment-bank-filter':compiled('../components/payment-bank-filter.ts'),'@/lib/payment-overview':noCalls(['buildPaymentOverview','paymentGroup','paymentTitle']),'@/lib/reconciliation':noCalls(['analyze']),'@/lib/bankgiro-parser.js':noCalls(['parseSpecificationBytes']),'@/lib/imports':noCalls(['parseCSV','guessMapping','mapCSV','parseCAMT','sha256','readInvoiceFile','extractInvoiceText','downloadFile','csvCell'])}));
  t.mock.method(globalThis,'fetch',async(path,options={})=>{
   f.requests.push({path,method:options.method||'GET'});
-  if(path==='/api/bank/invoice-candidates')return Response.json({candidates:{}});
+  if(path==='/api/bank/invoice-candidates')return await new Promise((resolve,reject)=>f.candidateReads.push({resolve,reject,signal:options.signal}));
   if(path==='/api/export')return Response.json({error:'Synthetic export unavailable'},{status:503});
   assert.equal(path,'/api/state');
   if(options.method==='POST'){if(f.postGate)await f.postGate;return Response.json(f.postStatus===200?{state:f.postState,revision:2,message:'Synthetic saved'}:{error:'Synthetic save unavailable'},{status:f.postStatus});}
   return await new Promise((resolve,reject)=>f.reads.push({resolve,reject}));
  });
- f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=Dashboard({initialView:view});for(const node of elements(f.tree)){if(node.props?.className==='app-shell'&&node.props.ref)node.props.ref.current=shell;if(node.props?.id==='main-content'&&node.props.ref)node.props.ref.current={focus(){}};}for(const effect of f.effects.splice(0))effect();};
+ f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=Dashboard({initialView:view});for(const node of elements(f.tree)){if(node.props?.className==='app-shell'&&node.props.ref)node.props.ref.current=shell;if(node.props?.id==='main-content'&&node.props.ref)node.props.ref.current={focus(){}};if(node.props?.candidates)f.candidateFrames.push({candidates:node.props.candidates,transactions:node.props.transactions.map(t=>t.id)});if(node.props?.invoiceCandidates)f.candidateFrames.push({candidates:node.props.invoiceCandidates,revision:node.props.historyRevision});}for(const effect of f.effects.splice(0))effect();};
  f.find=predicate=>elements(f.tree).find(predicate);
  f.listHtml=()=>renderToStaticMarkup(React.createElement(React.Fragment,null,...elements(f.tree).filter(node=>node.type===bank.BankPaymentSummary||node.type==='section'&&(node.props.className==='panel bank-payment-panel'||node.props.className==='panel'&&elements(node).some(child=>child.props?.className==='table-toolbar')))));
- f.respond=async(status=200,state=emptyState(),index=f.reads.length-1)=>{assert.ok(f.reads[index],'The real /api/state request must be pending');f.reads[index].resolve(Response.json(status===200?{state,revision:1,audit:[]}:{error:'Synthetic state unavailable'},{status}));await flush();};
+ f.respond=async(status=200,state=emptyState(),index=f.reads.length-1,revision=1)=>{assert.ok(f.reads[index],'The real /api/state request must be pending');f.reads[index].resolve(Response.json(status===200?{state,revision,audit:[]}:{error:'Synthetic state unavailable'},{status}));await flush();};
+ f.respondCandidates=async(candidates={},index=f.candidateReads.length-1,status=200)=>{assert.ok(f.candidateReads[index],'The real candidate GET must be pending');f.candidateReads[index].resolve(Response.json(status===200?{candidates}:{error:'Synthetic candidate unavailable'},{status}));await flush();};
  f.navigate=async next=>{assert.equal(f.find(node=>node.props?.onNavigate&&node.props?.company).props.onNavigate(next),true);await flush();};
  f.refresh=()=>f.find(node=>node.props?.['aria-label']==='Uppdatera').props.onClick();
- t.after(()=>{f.closed=true;for(const read of f.reads)read.resolve(Response.json({error:'Synthetic cleanup'},{status:401}));for(const slot of f.slots)slot?.cleanup?.();delete globalThis[key];if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;});
+ t.after(()=>{f.closed=true;for(const read of [...f.reads,...f.candidateReads])read.resolve(Response.json({error:'Synthetic cleanup'},{status:401}));for(const slot of f.slots)slot?.cleanup?.();delete globalThis[key];if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;});
  f.render();await flush();assert.equal(f.reads.length,1);return f;
 }
 const noEmptyClaims=html=>{assert.doesNotMatch(html,/<dd>0<\/dd>|>0 fakturor<|0,00|Lägg till din första faktura|Inga bankhändelser ännu|Inga fakturor matchar filtret|Inga bankhändelser matchar ditt filter/);};
@@ -131,4 +132,64 @@ test('Q8 dashboard readiness: a delayed save response cannot reveal list totals 
  const f=await fixture(t,'receivable');await f.respond(200,populatedState());await f.navigate('settings');let finish;f.postGate=new Promise(resolve=>{finish=resolve;});
  const pending=f.find(node=>node.props?.save&&node.props?.toggleDemo).props.save({type:'settings.save',name:'Synthetic workspace',email:'synthetic@example.test'});await flush();f.unauthorized();await flush();finish();assert.equal(await pending,true);await flush();
  await f.navigate('receivable');assert.doesNotMatch(f.listHtml(),/Synthetic receivable|class="table-footer"/);noEmptyClaims(f.listHtml());assert.match(f.listHtml(),/Logga in.*kundfakturor/);
+});
+
+const candidateMap=number=>({'synthetic-transaction':[{number,documentId:'synthetic-doc-'+number,party:'Synthetic invoice customer',amount:123400,issued:'2026-10-01',needsReview:true}]});
+for(const failure of ['pending','http','transport']){
+ test(`dashboard candidates: revision change with ${failure} refresh hides old proposals from list, search and transaction detail`,async t=>{
+  const f=await fixture(t),state=populatedState(),before=JSON.stringify(state);await f.respond(200,state);await f.respondCandidates(candidateMap('SYN-OLD'));
+  const bank=()=>f.find(node=>node.props?.candidates),detail=()=>f.find(node=>node.props?.invoiceCandidates);
+  f.find(node=>node.props?.['aria-label']==='Sök bankhändelser').props.onChange({target:{value:'SYN-OLD'}});await flush();assert.equal(bank().props.transactions.length,1);
+  bank().props.open('synthetic-transaction');await flush();assert.equal(detail().props.invoiceCandidates['synthetic-transaction'][0].number,'SYN-OLD');
+  const refresh=f.refresh();await flush();f.candidateFrames.length=0;await f.respond(200,state,undefined,2);await refresh;
+  assert.equal(f.candidateReads.length,2);assert.deepEqual(bank().props.candidates,{});assert.deepEqual(detail().props.invoiceCandidates,{});assert.equal(bank().props.transactions.length,0);
+  assert.ok(f.candidateFrames.length);for(const frame of f.candidateFrames)assert.deepEqual(frame.candidates,{},'No render may attach proposals from the previous workspace revision');
+  if(failure==='http')await f.respondCandidates({},undefined,503);
+  if(failure==='transport'){f.candidateReads.at(-1).reject(Error('Synthetic candidate transport failure'));await flush();}
+  assert.deepEqual(bank().props.candidates,{});assert.deepEqual(detail().props.invoiceCandidates,{});assert.equal(bank().props.transactions.length,0);assert.equal(JSON.stringify(state),before);assert.equal(f.requests.some(request=>request.method!=='GET'),false);
+ });
+}
+test('dashboard candidates: late old-revision response cannot replace the successful current proposals',async t=>{
+ const f=await fixture(t),state=populatedState();await f.respond(200,state);
+ const old=f.candidateReads[0],refresh=f.refresh();await flush();await f.respond(200,state,undefined,2);await refresh;assert.equal(old.signal.aborted,true);
+ await f.respondCandidates(candidateMap('SYN-CURRENT'));old.resolve(Response.json({candidates:candidateMap('SYN-LATE')}));await flush();
+ const bank=f.find(node=>node.props?.candidates);assert.equal(bank.props.candidates['synthetic-transaction'][0].number,'SYN-CURRENT');bank.props.open('synthetic-transaction');await flush();assert.equal(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates['synthetic-transaction'][0].number,'SYN-CURRENT');
+ f.find(node=>node.props?.['aria-label']==='Sök bankhändelser').props.onChange({target:{value:'SYN-CURRENT'}});await flush();assert.equal(f.find(node=>node.props?.candidates).props.transactions.length,1);
+});
+for(const invalidate of ['demo','signed_out']){
+ test(`dashboard candidates: ${invalidate} invalidation cannot revive proposals from an aborted request`,async t=>{
+  const f=await fixture(t),state=populatedState();await f.respond(200,state);const old=f.candidateReads[0];
+  if(invalidate==='demo'){await f.navigate('settings');f.find(node=>node.props?.toggleDemo).props.toggleDemo();await flush();await f.navigate('bank');assert.deepEqual(f.find(node=>node.props?.candidates).props.candidates,{});f.find(node=>node.type==='button'&&text(node).startsWith('Avsluta demo')).props.onClick();await flush();}
+  else{f.unauthorized();await flush();f.refresh();await flush();}
+  assert.equal(old.signal.aborted,true);await f.respond(200,state);await f.navigate('bank');await f.respondCandidates(candidateMap('SYN-CURRENT'));
+  old.resolve(Response.json({candidates:candidateMap('SYN-INVALIDATED')}));await flush();assert.equal(f.find(node=>node.props?.candidates).props.candidates['synthetic-transaction'][0].number,'SYN-CURRENT');assert.equal(f.requests.some(request=>request.method!=='GET'),false);
+ });
+}
+for(const response of ['success','http','transport']){
+ test(`dashboard candidates: a document change invalidates same-revision proposals during a ${response} evidence refresh`,async t=>{
+  const f=await fixture(t),state=populatedState(),before=JSON.stringify(state);await f.respond(200,state);await f.respondCandidates(candidateMap('SYN-REJECTED'));
+  f.find(node=>node.props?.['aria-label']==='Sök bankhändelser').props.onChange({target:{value:'SYN-REJECTED'}});await flush();f.find(node=>node.props?.candidates).props.open('synthetic-transaction');await flush();await f.navigate('documents');f.candidateFrames.length=0;
+  const changed=f.find(node=>node.props?.initialDocumentId!==undefined&&node.props?.embedded).props.onChanged();await flush();
+  assert.equal(f.candidateReads.length,1,'Candidate reads must wait until the financial workspace read has settled');assert.deepEqual(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates,{});for(const frame of f.candidateFrames)assert.deepEqual(frame.candidates,{},'Invalidation must apply on the first render before effect cleanup');
+  await f.respond(200,state,undefined,1);await changed;assert.equal(f.candidateReads.length,2,'Document evidence must refetch even when financial revision stays unchanged');await f.navigate('bank');assert.equal(f.find(node=>node.props?.candidates).props.transactions.length,0);
+  if(response==='transport'){f.candidateReads.at(-1).reject(Error('Synthetic evidence request unavailable'));await flush();}else await f.respondCandidates({},undefined,response==='http'?503:200);
+  assert.deepEqual(f.find(node=>node.props?.candidates).props.candidates,{});assert.deepEqual(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates,{});assert.equal(f.find(node=>node.props?.candidates).props.transactions.length,0);assert.equal(JSON.stringify(state),before);assert.equal(f.requests.some(request=>request.method!=='GET'),false);
+ });
+}
+test('dashboard candidates: a late response from before a same-revision document change cannot replace new evidence',async t=>{
+ const f=await fixture(t),state=populatedState();await f.respond(200,state);const old=f.candidateReads[0];await f.navigate('documents');
+ const changed=f.find(node=>node.props?.initialDocumentId!==undefined&&node.props?.embedded).props.onChanged();await flush();await f.respond(200,state,undefined,1);await changed;assert.equal(old.signal.aborted,true);assert.equal(f.candidateReads.length,2);
+ await f.respondCandidates(candidateMap('SYN-CURRENT'));old.resolve(Response.json({candidates:candidateMap('SYN-REJECTED')}));await flush();await f.navigate('bank');const bank=f.find(node=>node.props?.candidates);assert.equal(bank.props.candidates['synthetic-transaction'][0].number,'SYN-CURRENT');bank.props.open('synthetic-transaction');await flush();assert.equal(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates['synthetic-transaction'][0].number,'SYN-CURRENT');
+});
+test('dashboard candidates: a failed parent refresh withholds document proposals until a successful workspace retry',async t=>{
+ const f=await fixture(t),state=populatedState();await f.respond(200,state);await f.respondCandidates(candidateMap('SYN-REJECTED'));f.find(node=>node.props?.candidates).props.open('synthetic-transaction');await flush();await f.navigate('documents');
+ const changed=f.find(node=>node.props?.initialDocumentId!==undefined&&node.props?.embedded).props.onChanged();await flush();assert.equal(f.candidateReads.length,1);assert.deepEqual(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates,{});
+ await f.respond(503);await changed;assert.equal(f.candidateReads.length,1,'Failed workspace data must not authorize candidates tagged with the retained old revision');assert.deepEqual(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates,{});assert.match(text(f.tree),/Synthetic state unavailable/);
+ const retry=f.refresh();await flush();await f.respond(200,state,undefined,1);await retry;assert.equal(f.candidateReads.length,2);assert.deepEqual(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates,{});await f.respondCandidates(candidateMap('SYN-CURRENT'));assert.equal(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates['synthetic-transaction'][0].number,'SYN-CURRENT');assert.doesNotMatch(text(f.tree),/Synthetic state unavailable/);
+});
+test('dashboard candidates: completed payment control invalidates document evidence even when financial revision stays unchanged',async t=>{
+ const f=await fixture(t),state=populatedState();await f.respond(200,state);await f.respondCandidates(candidateMap('SYN-PRIOR-EXTRACTION'));f.find(node=>node.props?.candidates).props.open('synthetic-transaction');await flush();
+ const completed=f.complete();await flush();assert.deepEqual(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates,{},'Completed document processing must invalidate previous extraction proposals immediately');assert.equal(f.candidateReads.length,1);
+ await f.respond(200,state,undefined,1);await completed;assert.equal(f.candidateReads.length,2);await f.respondCandidates(candidateMap('SYN-CURRENT-EXTRACTION'));
+ assert.equal(f.find(node=>node.props?.candidates).props.candidates['synthetic-transaction'][0].number,'SYN-CURRENT-EXTRACTION');assert.equal(f.find(node=>node.props?.invoiceCandidates).props.invoiceCandidates['synthetic-transaction'][0].number,'SYN-CURRENT-EXTRACTION');assert.equal(f.requests.some(request=>request.method!=='GET'),false);
 });

@@ -1,5 +1,13 @@
 # Verifierad progress
 
+## Samlad stabilisering och säker branchrensning — 2026-11-02
+
+Bas maina4f09b8/Sites51. Reproducerade fel rättade: främmande WAL vid Node-restore, descriptorfelstädning, väntande body-mutation efter logout, parallell loginspärr, provider-refresh/retry/sidor efter sessionsrevokering, gamla Sites-kandidater vid revision/dokumentevidens, saknad parent-refresh och accepterad dokumentbearbetning bakom HTTP429, referensval som skilde från betalningsvyn. RED/GREEN och oberoende delgranskningar passerar efter rättning.
+
+Fryst produkt44560e3:847/847Node,1426/1426Sites, syntax99, TS, rent produktionsbygge och high-auditgrindar godkända;0fel/överhoppningar. Root/produktionsaudit0,fullSites16moderate. Alla33 poäng redovisas före/efter utan inflation: dokumentär summa255/330=7,73; ingen universell100%OCR. [Samlad rapport](docs/FINAL-MAIN-CLEANUP-REPORT.md).
+
+Privat fullständigt Git-arkiv återställt i fristående mirror, strictfsck och10refers SHA/träd verifierade. Fem fjärrbrancher utövermain inventerade, tre redan integrerade; två öppna draftPRs granskade, unikt runnerarbete bevarat privat. Main/CI/Sites och branchradering inväntar slutgranskning/leveransgater. Inga riktiga ekonomiska eller kundmejlsskrivningar. Bankfallet fortfarande beroende av uttrycklig bankalias-/insättningsidentitet och valuta/datum.
+
 ## Samlad betalningsslutkontroll — 2026-11-02
 
 Mainstart31aa90a/Sites49 inventerad. Alla tre privata läsverktyg fungerar nu; aktuell registerkontroll visar att målpost saknas, ägt bankoriginal och AIS-kvitto passerar. Verkliga original återhämtade privat,12/12 workbook och9/9 fakturafält per motor. Faktisk providerorsak observerad på Sites50: valfri all_account_ids=null; enda null-kompatibilitetsrättningen ger inga påhittade alias. Ägar-/medgivande-/snapshot- och identitetsgränser behållna.

@@ -1,6 +1,6 @@
 import {DatabaseSync} from 'node:sqlite';
 import {randomBytes,createCipheriv,createDecipheriv,createHash} from 'node:crypto';
-import {readFileSync,writeFileSync,mkdtempSync,rmSync,openSync,closeSync,unlinkSync,mkdirSync,existsSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdtempSync,rmSync,openSync,closeSync,unlinkSync,mkdirSync,existsSync,lstatSync,fstatSync,fsyncSync,readSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 
@@ -63,10 +63,39 @@ export function createBackup(database,archive,encryptionKey){
 }
 /** Authenticates, decrypts and opens an isolated restored database without changing production. */
 export function verifyBackup(archive,encryptionKey){return{verified:true,...inspect(unpack(archive,encryptionKey))};}
+function pathStatus(file){try{return lstatSync(file,{bigint:true});}catch(error){if(error.code==='ENOENT')return null;throw error;}}
+function assertRestoreDestinationAbsent(target,suffixes=['','-wal','-shm','-journal']){
+ for(const suffix of suffixes){const file=`${target}${suffix}`;if(pathStatus(file))throw Object.assign(Error('Återställningsmålet eller dess SQLite-sidfiler finns redan.'),{code:'EEXIST',path:file});}
+}
+function sameFile(file,owned){const current=pathStatus(file);return current?.isFile()&&current.dev===owned.dev&&current.ino===owned.ino;}
+const restoreMismatch=()=>Object.assign(Error('Den återställda filen stämmer inte med den verifierade backupen.'),{code:'backup_restore_mismatch'});
+function verifyRestoredBytes(fd,content){
+ if(fstatSync(fd).size!==content.length)throw restoreMismatch();
+ const hash=createHash('sha256'),chunk=Buffer.allocUnsafe(Math.min(content.length,65536));
+ for(let position=0;position<content.length;){const read=readSync(fd,chunk,0,Math.min(chunk.length,content.length-position),position);if(!read)throw restoreMismatch();hash.update(chunk.subarray(0,read));position+=read;}
+ if(fstatSync(fd).size!==content.length||hash.digest('hex')!==createHash('sha256').update(content).digest('hex'))throw restoreMismatch();
+}
 export function restoreBackup(archive,target,encryptionKey){
- const content=unpack(archive,encryptionKey);inspect(content);
- // Exclusive creation prevents replacing a running or existing database.
- const fd=openSync(target,'wx',0o600);try{writeFileSync(fd,content);}catch(error){closeSync(fd);unlinkSync(target);throw error;}closeSync(fd);return{restored:true,...integrity(target)};
+ const content=unpack(archive,encryptionKey),verified=inspect(content);
+ assertRestoreDestinationAbsent(target);
+ // SQLite must never open the target: a foreign WAL could replace authenticated
+ // financial state. Validate privately, then verify only the bytes we publish.
+ const fd=openSync(target,'wx+',0o600);let owned;
+ try{
+  owned=fstatSync(fd,{bigint:true});
+  writeFileSync(fd,content);fsyncSync(fd);verifyRestoredBytes(fd,content);
+  assertRestoreDestinationAbsent(target,['-wal','-shm','-journal']);
+  if(!sameFile(target,owned))throw restoreMismatch();
+ }catch(error){
+  // Preserve a foreign replacement and all sidecars. Like the final checks,
+  // this assumes a trusted parent directory, not a hostile same-user writer.
+  // Retry a failed initial stat only to identify a safe cleanup candidate. If
+  // metadata remains unavailable, close the fd and leave the pathname intact.
+  if(!owned)try{owned=fstatSync(fd,{bigint:true});}catch{}
+  if(owned&&sameFile(target,owned))unlinkSync(target);
+  throw error;
+ }finally{closeSync(fd);}
+ return{restored:true,...verified};
 }
 
 /** One verified snapshot per Stockholm date. Existing archives are authenticated, never overwritten. */

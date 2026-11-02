@@ -13,7 +13,7 @@ function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new U
 const domain=url('../lib/domain.ts'),engine=url('../lib/reconciliation-engine.js');
 const presentation=compiled('../lib/payment-presentation.ts',{'./domain':domain,'./reconciliation-engine.js':engine,'./payment-references.js':url('../lib/payment-references.js')});
 const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});
-const candidates=compiled('../lib/banking/invoice-candidates.ts',{'../domain':domain,'../reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href});
+const candidates=compiled('../lib/banking/invoice-candidates.ts',{'../domain':domain,'../reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href,'../payment-presentation':presentation});
 const detailEvidence=compiled('../lib/banking/detail-evidence.ts',{'../domain':domain,'../payment-references.js':url('../lib/payment-references.js'),'../payer-evidence.js':url('../lib/payer-evidence.js')});
 const {transactionDetailEvidence}=await import(detailEvidence);
 const ctx={checkedAt:'2026-11-01T21:00:00.000Z',originalIssue:'',accountIssue:'',reportIssue:'',invoiceOriginalIssue:'',invoiceOriginalChecked:true,documents:[],findings:[]};

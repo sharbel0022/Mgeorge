@@ -1,3 +1,9 @@
+# Mgeorge – aktuell stabilisering och branchrensning
+
+Aktuellt uppdrag2026-11-02: rätta reproducerade internt lösbara fel, leverera main och befintliga Sites och rensa endast bedömda, återställningsbara utvecklingsbrancher. [Arbetsplan](docs/superpowers/plans/2026-11-02-final-main-cleanup.md), [design och säkerhetsgränser](docs/superpowers/specs/2026-11-02-final-main-cleanup-design.md), [slutrapport](docs/FINAL-MAIN-CLEANUP-REPORT.md). Användarens uttryckliga mandat gäller kod/main/Sites och säker branchrensning; inga riktiga ekonomiska skrivningar eller kundutskick.
+
+## Tidigare planer – historik
+
 # Mgeorge – aktuell kvalitetsplan
 
 Aktivt uppdrag 2026-10-30: **maximalt åtta timmars självständigt kvalitetsarbete** från main `c519eef`, Sites 32 och dokumenterad bedömning 7,42/10. Se [aktuell arbetsplan](docs/QUALITY-8H-PLAN.md), `QUALITY-SCORECARD.md` och den senaste checkpointen i `PROGRESS.md`.

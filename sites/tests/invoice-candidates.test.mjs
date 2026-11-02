@@ -1,8 +1,12 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import ts from 'typescript';
 import {emptyState,applyCommand} from '../lib/domain.ts';
+import {paymentFieldSourceFixture,paymentFieldInvoiceFixture} from './helpers/payment-field-source-fixture.mjs';
 const domain=new URL('../lib/domain.ts',import.meta.url).href;
-const code=ts.transpileModule(readFileSync(new URL('../lib/banking/invoice-candidates.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText.replace("from '../domain'",`from '${domain}'`).replace("from '../reconciliation-engine.js'",`from '${new URL('../lib/reconciliation-engine.js',import.meta.url).href}'`);
-const {readInvoiceFields,candidateDocuments,bankInvoiceCandidates}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+const engine=new URL('../lib/reconciliation-engine.js',import.meta.url).href;
+function compiled(path,imports){let code=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [name,url]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));return 'data:text/javascript;base64,'+Buffer.from(code).toString('base64');}
+const presentation=compiled('../lib/payment-presentation.ts',{'./domain':domain,'./reconciliation-engine.js':engine,'./payment-references.js':new URL('../lib/payment-references.js',import.meta.url).href});
+const {bankPaymentView}=await import(presentation);
+const {readInvoiceFields,candidateDocuments,bankInvoiceCandidates}=await import(compiled('../lib/banking/invoice-candidates.ts',{'../domain':domain,'../reconciliation-engine.js':engine,'../payment-presentation':presentation}));
 const bank=(extra={})=>({id:'bank',amount:62500,date:'2026-10-26',kind:'batch',ignored:false,duplicateOf:'',payerReference:'99990004',bankReference:'archive',...extra});
 const doc=(extra={})=>({document_id:'document-0599',status:'needs_review',extraction:JSON.stringify({fields:Object.fromEntries(Object.entries({invoice_number:'0599',party:'Synthetic Customer AB',total_cents:62500,issued_at:'2026-10-10',direction:'customer',kind:'invoice',currency:'SEK',...extra}).map(([k,v])=>[k,{value:v,confidence:.96,evidence:'Originalfaktura'}]))})});
 test('real field wrappers expose 0599 as a suggestion without inventing bank OCR or changing state',()=>{const s=emptyState(),t=bank(),before=JSON.stringify({s,t}),found=bankInvoiceCandidates(s,t,[doc()]);assert.equal(found.length,1);assert.equal(found[0].number,'0599');assert.equal(found[0].party,'Synthetic Customer AB');assert.equal(found[0].needsReview,true);assert.match(found[0].reason,/inte verifierade/);assert.equal(JSON.stringify({s,t}),before);assert.equal(t.payerReference,'99990004');});
@@ -24,4 +28,37 @@ test('document reference and legacy OCR stay distinct searchable review candidat
  for(const reference of ['000018','000026']){const found=bankInvoiceCandidates(s,bank({bankDetails:{payerReference:reference}}),[row]);assert.equal(found.length,1);assert.equal(found[0].number,'0606');assert.equal(found[0].referenceConflict,true);assert.deepEqual(found[0].referenceFields,[{field:'reference',value:'000018'},{field:'ocr',value:'000026'}]);assert.equal(found[0].needsReview,true);}
  for(const reference of ['18','26','606'])assert.equal(bankInvoiceCandidates(s,bank({bankDetails:{payerReference:reference}}),[row]).length,0);
  assert.deepEqual(s,before);
+});
+
+const sourceDocuments=(numbers=['0599','0800'])=>numbers.map(number=>({...doc({invoice_number:number}),document_id:'synthetic-source-doc-'+number}));
+test('an active linked report selects its matching unregistered original over a conflicting detail reference',()=>{
+ const {state,target}=paymentFieldSourceFixture(),documents=sourceDocuments(),before=structuredClone({state,documents});
+ const candidates=bankInvoiceCandidates(state,target,documents),view=bankPaymentView(state,target,candidates);
+ assert.deepEqual(candidates.map(candidate=>candidate.number),['0599']);
+ assert.equal(candidates[0].documentId,'synthetic-source-doc-0599');assert.equal(candidates[0].needsReview,true);
+ assert.equal(view.reference.value,'0599');assert.equal(view.fieldSources.reference.kind,'report');assert.deepEqual(view.possible,['0599']);
+ assert.deepEqual({state,documents},before);
+});
+test('an active linked report selects its registered invoice while preserving separate detail evidence',()=>{
+ const {state,target}=paymentFieldInvoiceFixture(),before=structuredClone(state),documents=sourceDocuments().map(row=>({...row,document_id:'synthetic-invoice-'+JSON.parse(row.extraction).fields.invoice_number.value})),candidates=bankInvoiceCandidates(state,target,documents);
+ assert.deepEqual(candidates.map(candidate=>[candidate.number,candidate.source]),[['0599','invoice']]);
+ assert.equal(candidates[0].invoiceId,state.invoices.find(invoice=>invoice.number==='0599').id);
+ assert.equal(target.bankDetails.payerReference,'0800');assert.equal(target.payerReference,'0700');assert.deepEqual(state,before);
+});
+test('an unlinked report cannot override the actual detail reference in candidate discovery',()=>{
+ const {state,target}=paymentFieldSourceFixture({linked:false}),before=structuredClone(state),candidates=bankInvoiceCandidates(state,target,sourceDocuments());
+ assert.deepEqual(candidates.map(candidate=>candidate.number),['0800']);assert.equal(bankPaymentView(state,target,candidates).fieldSources.reference.kind,'detail');assert.deepEqual(state,before);
+});
+test('a revoked report relation falls back to actual detail evidence without rewriting the originals',()=>{
+ const original=paymentFieldSourceFixture(),state=applyCommand(original.state,{type:'bankgiro.unlink',id:original.state.bankgiroLinks[0].id,note:'Synthetic revoked relation'}).state,target=state.transactions.find(row=>row.id===original.target.id),before=structuredClone(state);
+ assert.deepEqual(bankInvoiceCandidates(state,target,sourceDocuments()).map(candidate=>candidate.number),['0800']);assert.deepEqual(state,before);
+});
+test('a collective transaction without a displayed reference retains amount-only review proposals',()=>{
+ const {state,target}=paymentFieldSourceFixture({linked:false,detailReference:''}),documents=[...sourceDocuments(['0599']),{...doc({invoice_number:'0700',total_cents:437500}),document_id:'synthetic-nonmatching-amount'}],before=structuredClone(state);
+ assert.equal(bankPaymentView(state,target).reference.value,'');assert.equal(target.payerReference,'0700');
+ assert.deepEqual(bankInvoiceCandidates(state,target,documents).map(candidate=>candidate.number),['0599']);assert.deepEqual(state,before);
+});
+test('linked report matching preserves leading zeros and does not promote a near identifier',()=>{
+ const {state,target}=paymentFieldSourceFixture(),documents=sourceDocuments(['599','0599','0800']),before=structuredClone({state,documents});
+ assert.deepEqual(bankInvoiceCandidates(state,target,documents).map(candidate=>candidate.number),['0599']);assert.deepEqual({state,documents},before);
 });
