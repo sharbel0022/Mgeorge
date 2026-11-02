@@ -11,28 +11,44 @@ async function activeAccounts(owner:string){
  const selected=JSON.parse(conn.selected_accounts);if(!Array.isArray(selected))throw Error('Bankens valda mottagarkonto behöver granskas.');
  return {conn,selected,available:await accounts(conn)};
 }
-/** Stored consent/account resources only. This never contacts the bank provider. */
-export async function bankgiroAutomaticAccountIssue(owner:string,account:string){
- try{const {conn,selected,available}=await activeAccounts(owner);return available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account)).length===1?'':'Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.';}catch{return 'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före nya betalningskopplingar.';}
-}
-/** Capture exactly the stored consent whose decoded account resource was checked.
- * The financial writer compares it again inside its atomic D1 batch. */
-export async function bankAccountConsentSnapshot(owner:string,account:string){
- const {conn,selected,available}=await activeAccounts(owner);
- if(available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account)).length!==1)throw Error('Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.');
- return conn;
-}
-async function resolveAccounts(owner:string,rows:any[]){
- let context:Awaited<ReturnType<typeof activeAccounts>>;try{context=await activeAccounts(owner);}catch{return rows.map(row=>({...row,bankgiroAccountIssue:'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.'}));}
- const {conn,selected,available}=context;
- const identifierKeys=(resource:typeof available[number])=>[
+type AccountContext=Awaited<ReturnType<typeof activeAccounts>>;
+const reportedAccountKey=(value:unknown)=>typeof value==='string'?value.replace(/^iban:/i,'').replace(/[\s-]/g,'').toUpperCase():'';
+function identifierKeys(resource:AccountContext['available'][number]){
+ return [
   {scheme_name:'IBAN',identification:resource.account_id?.iban},resource.account_id?.other,...(Array.isArray(resource.all_account_ids)?resource.all_account_ids:[]),
  ].flatMap(identifier=>{
   if(typeof identifier?.scheme_name!=='string'||!['IBAN','BBAN','CPAN'].includes(identifier.scheme_name.toUpperCase())||typeof identifier.identification!=='string')return [];
   const key=identifier.identification.replace(/[\s-]/g,'').toUpperCase();return /^[A-Z0-9]{1,80}$/.test(key)?[key]:[];
  });
+}
+function currentAccountIssue(context:AccountContext,account:string,reportedAccount?:string){
+ const {conn,selected,available}=context;
+ const matches=available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account));
+ if(matches.length!==1)return 'Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.';
+ // An omitted identifier belongs to an AIS/direct source. An empty report
+ // identifier is missing evidence and must never fall back to the resolved IBAN.
+ if(reportedAccount!==undefined){
+  const raw=reportedAccountKey(reportedAccount);if(!raw)return 'Mottagarkonto saknas i rapportoriginalet.';
+  const holders=available.filter(resource=>identifierKeys(resource).includes(raw));
+  if(holders.length!==1||holders[0]!==matches[0])return 'Rapportens mottagarkonto saknar ett entydigt banklevererat kontoalias till ägarens aktuella valda konto.';
+ }
+ return '';
+}
+/** Stored consent/account resources only. This never contacts the bank provider. */
+export async function bankgiroAutomaticAccountIssue(owner:string,account:string,reportedAccount?:string){
+ try{return currentAccountIssue(await activeAccounts(owner),account,reportedAccount);}catch{return 'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före nya betalningskopplingar.';}
+}
+/** Capture exactly the stored consent whose decoded account resource was checked.
+ * The financial writer compares it again inside its atomic D1 batch. */
+export async function bankAccountConsentSnapshot(owner:string,account:string,reportedAccount?:string){
+ const context=await activeAccounts(owner),issue=currentAccountIssue(context,account,reportedAccount);if(issue)throw Error(issue);
+ return context.conn;
+}
+async function resolveAccounts(owner:string,rows:any[]){
+ let context:AccountContext;try{context=await activeAccounts(owner);}catch{return rows.map(row=>({...row,bankgiroAccountIssue:'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.'}));}
+ const {conn,selected,available}=context;
  return rows.map(r=>{
-  const raw=String(r.account||'').replace(/^iban:/i,'').replace(/[\s-]/g,'').toUpperCase();if(!raw)return {...r,bankgiroAccountIssue:'Mottagarkonto saknas i rapportoriginalet.'};
+  const raw=reportedAccountKey(r.account);if(!raw)return {...r,bankgiroAccountIssue:'Mottagarkonto saknas i rapportoriginalet.'};
   // An alias must belong to one provider resource, including resources that
   // are unselected or use another currency. Account selection cannot erase ambiguity.
   const holders=available.filter(resource=>identifierKeys(resource).includes(raw)),match=holders.length===1?holders[0]:undefined;

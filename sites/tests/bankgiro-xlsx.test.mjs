@@ -80,3 +80,20 @@ test('a separately labelled sequence retains the actual value cell and exact lea
  assert.equal(row.cellProvenance.sequence.address,'E12');assert.equal(row.cellProvenance.sequence.rawValue,'00041');
  assert.equal(row.cellProvenance.sequenceLabel.address,'E11');assert.equal(row.cellProvenance.sequenceLabel.rawValue,'Löpnummer');
 });
+
+
+for(const [label,second] of [
+ ['zero-padded sequence',{sequence:'00041'}],
+ ['another day in the same year',{date:'2026-10-21',sequence:'41'}],
+ ['recipient formatting',{recipientBankgiro:'12345678',sequence:'41'}],
+ ['changed payment fields',{sequence:'41',payments:[{...syntheticPayment,party:'Different synthetic sender AB',reference:'0599'}]}]
+])test('one XLSX cannot contain the same deposit again with '+label,()=>{
+ assert.throws(()=>parse({blocks:[{date:'2026-10-20',sequence:'41'},second]}),/dubblett|insättning|rapportblock/i);
+});
+for(const [label,second] of [
+ ['another sequence',{sequence:'42'}],
+ ['another year',{date:'2027-10-20',sequence:'41'}],
+ ['another recipient',{recipientBankgiro:'8765-4321',sequence:'41'}]
+])test('one XLSX can retain separately identified deposits for '+label,()=>{
+ const rows=parse({blocks:[{date:'2026-10-20',sequence:'41'},second]});assert.equal(rows.length,2);assert.equal(rows[0].reportEvidence.sequence,'41');
+});
