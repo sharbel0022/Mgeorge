@@ -9,7 +9,7 @@ const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base
 const file=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports={}){
   let code=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-  for(const [name,url] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'@/lib/domain':file('../lib/domain.ts'),'./domain':file('../lib/domain.ts'),'./document-triage.js':file('../lib/document-triage.js'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));
+  for(const [name,url] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'@/lib/domain':file('../lib/domain.ts'),'./domain':file('../lib/domain.ts'),'./document-triage.js':file('../lib/document-triage.js'),'./invoice-details.js':file('../lib/invoice-details.js'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));
   return data(code);
 }
 const fieldsUrl=compiled('../lib/invoice-fields.js'),fields=await import(fieldsUrl);

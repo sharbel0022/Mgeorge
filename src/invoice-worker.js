@@ -4,16 +4,10 @@ import {createCanvas,loadImage} from '@napi-rs/canvas';
 import {createWorker} from 'tesseract.js';
 import {imageDimensions} from './image-dimensions.js';
 import {ocrRasterSize} from './ocr-raster-size.js';
-import {reconstructPdfText} from './pdf-text.js';
-import {interpretInvoice} from './invoice-extraction.js';
+import {reconstructPdfText,pdfPageNeedsOpticalText} from './pdf-text.js';
 import {getDocument,OPS} from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const require=createRequire(import.meta.url);
-const rasterOperations=new Set([OPS.paintImageXObject,OPS.paintInlineImageXObject,OPS.paintImageXObjectRepeat,OPS.paintInlineImageXObjectGroup,OPS.paintImageMaskXObject,OPS.paintImageMaskXObjectGroup,OPS.paintImageMaskXObjectRepeat]);
-function usableInvoiceText(text){
-  const {fields}=interpretInvoice(text);
-  return fields.invoice_number.value!=null&&fields.total_cents.value!=null;
-}
 let ocr;
 async function recognize(canvas){
   // Give small glyphs more sampling resolution without discarding gray/color
@@ -55,10 +49,8 @@ async function run(workerData){
       const page=await pdf.getPage(n),content=await page.getTextContent();
       let pageText=reconstructPdfText(content.items);
       if(text.length+pageText.length>150000)throw Error('text');
-      // A digital archive footer can be long while every invoice field is in a
-      // scanned image. Inspect content, not just text length; a native invoice
-      // with a logo retains PDF provenance when its text already has the fields.
-      const needsOpticalText=pageText.replace(/\s/g,'').length<60||(!usableInvoiceText(pageText)&&(await page.getOperatorList()).fnArray.some(op=>rasterOperations.has(op)));
+      const viewAtOne=page.getViewport({scale:1});
+      const needsOpticalText=pdfPageNeedsOpticalText(content.items,pageText,await page.getOperatorList(),OPS,viewAtOne.width*viewAtOne.height);
       if(needsOpticalText){
         method='ocr';const view=page.getViewport({scale:2});
         if(view.width*view.height>12_000_000)throw Error('pixels');
@@ -66,7 +58,7 @@ async function run(workerData){
         await page.render({canvasContext:canvas.getContext('2d'),viewport:view}).promise;
         const result=await recognize(canvas);pageText=result.text;confidence=Math.min(confidence,result.confidence);
       }
-      text+=pageText+'\n';if(text.length>150000)throw Error('text');
+      text+=(n>1?'\f\n':'')+pageText+'\n';if(text.length>150000)throw Error('text');
       page.cleanup();
     }
     return {text,method,confidence};

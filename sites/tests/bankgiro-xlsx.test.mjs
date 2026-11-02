@@ -67,3 +67,33 @@ test('XLSX excessive merge work and overlapping merges are rejected',()=>{
  assert.throws(()=>parse({mutate:wb=>{const s=wb.Sheets[wb.SheetNames[0]];s['!merges']=Array.from({length:5001},()=>({s:{r:0,c:0},e:{r:0,c:1}}));}}),/sammanslagna/i);
  assert.throws(()=>parse({mutate:wb=>{const s=wb.Sheets[wb.SheetNames[0]];s['!merges'].push(s['!merges'][0]);}}),/sammanslagna/i);
 });
+
+
+test('Boolean cells cannot masquerade as a reported sender name',()=>{
+ const bytes=makeBankgiroXLSX({mutate:wb=>{wb.Sheets['Insättningsuppgift'].A19={t:'b',v:true};}});
+ assert.throws(()=>parseBankgiroXLSX(bytes,'boolean-payer.xlsx'),/avsändare/i);
+});
+test('a separately labelled sequence retains the actual value cell and exact leading zeros',()=>{
+ const bytes=makeBankgiroXLSX({mutate:wb=>{const sheet=wb.Sheets['Insättningsuppgift'];sheet.E11={t:'s',v:'Löpnummer'};sheet.E12={t:'s',v:'00041'};}});
+ const [row]=parseBankgiroXLSX(bytes,'separate-sequence.xlsx');
+ assert.equal(row.reportEvidence.sequence,'00041');assert.equal(row.reportEvidence.reportId,'00041');
+ assert.equal(row.cellProvenance.sequence.address,'E12');assert.equal(row.cellProvenance.sequence.rawValue,'00041');
+ assert.equal(row.cellProvenance.sequenceLabel.address,'E11');assert.equal(row.cellProvenance.sequenceLabel.rawValue,'Löpnummer');
+});
+
+
+for(const [label,second] of [
+ ['zero-padded sequence',{sequence:'00041'}],
+ ['another day in the same year',{date:'2026-10-21',sequence:'41'}],
+ ['recipient formatting',{recipientBankgiro:'12345678',sequence:'41'}],
+ ['changed payment fields',{sequence:'41',payments:[{...syntheticPayment,party:'Different synthetic sender AB',reference:'0599'}]}]
+])test('one XLSX cannot contain the same deposit again with '+label,()=>{
+ assert.throws(()=>parse({blocks:[{date:'2026-10-20',sequence:'41'},second]}),/dubblett|insättning|rapportblock/i);
+});
+for(const [label,second] of [
+ ['another sequence',{sequence:'42'}],
+ ['another year',{date:'2027-10-20',sequence:'41'}],
+ ['another recipient',{recipientBankgiro:'8765-4321',sequence:'41'}]
+])test('one XLSX can retain separately identified deposits for '+label,()=>{
+ const rows=parse({blocks:[{date:'2026-10-20',sequence:'41'},second]});assert.equal(rows.length,2);assert.equal(rows[0].reportEvidence.sequence,'41');
+});

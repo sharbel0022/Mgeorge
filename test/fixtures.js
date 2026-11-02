@@ -2,14 +2,14 @@ import {createCanvas} from '@napi-rs/canvas';
 export const text=`Faktura
 Fakturanummer: 0606
 Leverantör: Testbolaget AB
-Kund: Café Exempel AB
 Organisationsnummer: 556016-0680
+Kund: Café Exempel AB
 Fakturadatum: 2026-10-24
 Förfallodatum: 2026-11-07
 Netto: 3 000,00 kr
 Moms: 750,00 kr
 Att betala: 3 750,00 SEK
-OCR: 0606
+OCR: 000018
 Bankgiro: 123-4567`;
 export function pdf(objects){
   let content='%PDF-1.4\n',offsets=[0];for(let n=0;n<objects.length;n++){offsets.push(Buffer.byteLength(content,'latin1'));content+=`${n+1} 0 obj\n${objects[n]}\nendobj\n`;}

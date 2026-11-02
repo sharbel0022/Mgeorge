@@ -1,8 +1,8 @@
 import {createCanvas} from '@napi-rs/canvas';
 import {pdf} from '../fixtures.js';
 
-export const fragmentedFacit={invoice_number:'0606',party:'Testbolaget AB',organization_number:'5560160680',issued_at:'2026-10-24',due_at:'2026-11-07',net_cents:40000,vat_cents:10000,total_cents:50000,reference:'0606',bankgiro:'123-4567',currency:'SEK'};
-const fragments=[['Faktura'],['Faktura','nummer: ','06','06'],['Leverantör: ','Testbolaget',' ','AB'],['Kund: Café Exempel AB'],['Organisationsnummer: 556016-0680'],['Fakturadatum: ','2026-','10-24'],['Förfallodatum: 2026-11-07'],['Netto: 400,00 SEK'],['Moms: 100,00 SEK'],['Att betala: ','5','00,00 SEK'],['OCR: ','06','06'],['Bankgiro: 123-4567']];
+export const fragmentedFacit={invoice_number:'0606',party:'Testbolaget AB',organization_number:'5560160680',issued_at:'2026-10-24',due_at:'2026-11-07',net_cents:40000,vat_cents:10000,total_cents:50000,reference:'000018',bankgiro:'123-4567',currency:'SEK'};
+const fragments=[['Faktura'],['Faktura','nummer: ','06','06'],['Leverantör: ','Testbolaget',' ','AB'],['Organisationsnummer: 556016-0680'],['Kund: Café Exempel AB'],['Fakturadatum: ','2026-','10-24'],['Förfallodatum: 2026-11-07'],['Netto: 400,00 SEK'],['Moms: 100,00 SEK'],['Att betala: ','5','00,00 SEK'],['OCR: ','0000','18'],['Bankgiro: 123-4567']];
 
 // Font switches force real PDF text-item boundaries without adding word gaps.
 // All identities and numbers are generated synthetic fixture values.

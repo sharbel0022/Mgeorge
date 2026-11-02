@@ -5,6 +5,7 @@ import {exactReference,normalizeName} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 import {randomUuid} from './uuid.js';
 import {payerEvidenceConflict} from './payer-evidence.js';
+import {bankgiroDepositIdentity} from './bankgiro-deposit-identity.js';
 export type Invoice = {
  id: string; direction: "receivable" | "payable"; party: string; email: string; number: string; ocr: string;
  total: number; currency: "SEK"; issued: string; due: string; reviewed: boolean; voided: boolean;
@@ -281,6 +282,10 @@ export function bankgiroReportKey(rows:Transaction[]){
  return bankApiDataHash({identity:[canonicalBankAccount(first.account),first.date,first.currency,giro(first.recipientBankgiro),first.reportEvidence?.sequence||first.reportEvidence?.reportId||first.parentBankReference||'',rows.length,rows.reduce((sum,row)=>sum+row.amount,0),payments]});
 }
 function linkedReportKey(s:State,link:BankgiroLink){return link.reportKey||bankgiroReportKey(link.specificationIds.flatMap(id=>{const row=s.transactions.find(row=>row.id===id);return row?[row]:[];}));}
+function bankgiroDepositKey(rows:Transaction[]){
+ const first=rows[0],key=first?bankgiroDepositIdentity(first.reportEvidence,first.date):'';
+ return key&&rows.every(row=>bankgiroDepositIdentity(row.reportEvidence,row.date)===key)?key:'';
+}
 function bankgiroLinkIssue(s:State,target:Transaction,rows:Transaction[]){
  if(!hasBankApiOrigin(target)||!target.bankData||!target.bankDataSha256||!target.bankDataVersion)return 'Bankoriginalet behöver ett verifierbart ankomstkvitto från AIS.';
  const issue=paymentEvidenceIssue(s,target);if(issue)return issue;
@@ -297,6 +302,8 @@ function bankgiroLinkIssue(s:State,target:Transaction,rows:Transaction[]){
  if(active.some(link=>link.transactionId!==target.id&&link.specificationIds.some(id=>ids.has(id))))return 'Specifikationen är redan kopplad till en annan bankhändelse.';
  const reportKey=bankgiroReportKey(rows);
  if(active.some(link=>link.transactionId!==target.id&&linkedReportKey(s,link)===reportKey))return 'Samma rapport är redan manuellt kopplad till en annan bankhändelse, även om originalfilen har annan layout eller kontrollsumma.';
+ const depositKey=bankgiroDepositKey(rows);
+ if(depositKey&&active.some(link=>link.transactionId!==target.id&&bankgiroDepositKey(link.specificationIds.flatMap(id=>{const row=s.transactions.find(row=>row.id===id);return row?[row]:[];}))===depositKey))return 'Samma insättning i Bankgirorapporten är redan kopplad till en annan bankhändelse. Granska och återta den relationen först.';
  if(active.some(link=>link.transactionId===target.id&&(!link.specificationIds.every(id=>ids.has(id))||link.specificationIds.length!==ids.size)))return 'Bankhändelsen är redan kopplad till en annan specifikation. Återta den relationen först.';
  return '';
 }

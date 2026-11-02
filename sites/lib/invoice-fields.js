@@ -1,12 +1,13 @@
 import {classifyDocument,documentConflicts} from './document-triage.js';
+import {extractInvoiceDetails,invoiceScalarText} from './invoice-details.js';
 import {parseMoney} from './domain';
 const invoiceNumberLabel='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))(?=[\\s.:#-]|\\d|$)';
 const validInvoiceIdentifier=value=>/^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,79}$/u.test(value)&&!/^(?:ocr(?:[- /]?(?:nummer|referens))?|faktura(?:nummer|nr)?|fakturadatum|förfallo(?:datum|dag)|förfaller|invoice|date|leverantör|utställare|säljare|supplier|seller|kund|customer|netto|moms|vat|bankgiro|bg|totalbelopp|att)$/iu.test(value);
 // Only explicitly labelled values are normalized. Original text remains evidence.
 function normalizeInvoiceLayout(input){
   const original=String(input||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
-  const warnings=[];
-  let text=original;
+  const warnings=[],checkedRows=[];
+  let text=invoiceScalarText(original);
   text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.replace(/[ \t]/g,''));
   text=text.replace(/([,.])[ \t]+(?=\d{2}\b)/g,'$1');
   // PDF drawing order can differ from the visible column order. Text alone
@@ -22,15 +23,23 @@ function normalizeInvoiceLayout(input){
     hasNumber ||= Boolean(label[1]);hasOcr ||= Boolean(label[2]);previousEnd=label.index+label[0].length;
     if(hasNumber&&hasOcr){ambiguousInvoiceColumns=true;warnings.push('Fakturanummer och OCR i kolumner kan inte skiljas åt entydigt. Kontrollera originalets kolumner.');break;}
   }
-  // An undiscounted unit price plus VAT must agree with its displayed line total.
+  // This older explicit "quantity st / price kr / rate % / VAT kr / total"
+  // layout is validated as a whole line. Never begin at a decimal suffix.
+  const rowQuantity='-?(?:\\d{1,3}(?: \\d{3})+|\\d+)(?:[.,]\\d{1,4})?';
+  const rowMoney='-?(?:\\d{1,3}(?: \\d{3})+|\\d+)[,.]\\d{2}';
+  const rowPattern=new RegExp('^(?:.*?[ \\t]+)?(?<![\\p{L}\\p{N},.+/-])('+rowQuantity+')[ \\t]+(?:st|styck|pcs)[ \\t]+('+rowMoney+')[ \\t]*(?:kr|SEK)[ \\t]+(\\d{1,3}(?:[.,]\\d{1,3})?)[ \\t]*%[ \\t]+('+rowMoney+')[ \\t]*(?:kr|SEK)[ \\t]+('+rowMoney+')(?:[ \\t]*(?:kr|SEK))?[ \\t]*$','iu');
   for(const line of text.split('\n')){
-    const m=line.match(/\b(\d+)[ \t]+(?:st|styck|pcs)[ \t]+([\d \t]+[,.]\d{2})[ \t]*(?:kr|SEK)[ \t]+([\d \t]+)[ \t]*%[ \t]+([\d \t]+[,.]\d{2})[ \t]*(?:kr|SEK)[ \t]+([\d \t]+[,.]\d{2})/i);
-    if(m&&!/rabatt|discount/i.test(text)){
-      const n=s=>Math.round(Number(s.replace(/[ \t]/g,'').replace(',','.'))*100),qty=Number(m[1]),unit=n(m[2]),vat=n(m[4]),gross=n(m[5]);
+    const m=line.match(rowPattern);
+    if(!m&&/\b(?:st|styck|pcs)\b/i.test(line)&&/\b(?:kr|SEK)\b/i.test(line)&&line.includes('%'))warnings.push('Artikelradens antal, pris eller moms kan inte läsas entydigt. Kontrollera hela raden.');
+    if(m){
+      const n=s=>Math.round(Number(s.replace(/[ \t]/g,'').replace(',','.'))*100),qty=Number(m[1].replace(/[ \t]/g,'').replace(',','.')),unit=n(m[2]),vat=n(m[4]),gross=n(m[5]);
+      checkedRows.push({net_cents:Math.round(qty*unit),vat_cents:vat,total_cents:gross});
       if(Number.isSafeInteger(unit)&&Number.isSafeInteger(gross)&&Math.abs(qty*unit+vat-gross)>1)warnings.push('Radpris, moms och radbelopp stämmer inte överens. Kontrollera originalet.');
+      const rate=Number(m[3].replace(',','.')),expectedVat=Math.round(qty*unit*rate/100);
+      if(rate>100||!Number.isSafeInteger(expectedVat)||Math.abs(expectedVat-vat)>1)warnings.push('Radens momssats stämmer inte med det angivna momsbeloppet. Kontrollera originalet.');
     }
   }
-  return {text,original,warnings,ambiguousInvoiceColumns};
+  return {text,original,warnings,ambiguousInvoiceColumns,checkedRows};
 }
 
 export const fieldNames=['invoice_number','party','organization_number','issued_at','due_at','total_cents','vat_cents','net_cents','reference','bankgiro','direction','kind','currency'];
@@ -54,6 +63,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const layout=normalizeInvoiceLayout(text);text=layout.text;
   text=text.replace(/Fakturadatum[ \t]+Fakturanummer[ \t]*\n[ \t]*(\d{4}-\d{2}-\d{2})[ \t]+([A-Za-z0-9/_-]+)/gi,(_,date,number)=>`Fakturadatum: ${date}\nFakturanummer: ${number}`);
   const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
+  const scalarLabels=[];
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
   const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
   const record=(key,matches,convert=s=>s.trim(),invalid=false)=>{
@@ -83,6 +93,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     // unreadable values. Identifier boundaries apply only to other fields.
     const suffix=invoiceLabel||dateField?'':currencyLabel?'(?=[\\s.:#-]|$)':'(?=[\\s.:#]|$)',separator=invoiceLabel||currencyLabel?'[:.#-]':'[:.#]';
     const re=new RegExp((dateField?'':'(?<![\\p{L}\\p{N}/_-])')+label+suffix+'[ \\t]*'+separator+'?[ \\t]*','giu'),matches=[];
+    scalarLabels.push(new RegExp(re.source,'iu'));
     for(const match of text.matchAll(re)){
       let start=match.index+match[0].length;
       // A value may be printed immediately below its label, but never borrow
@@ -105,7 +116,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // Validate lexical groups before parseMoney removes whitespace. Several
   // integer columns or character-spaced amounts must not become one number.
   const amount='-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|(?:\\d+|\\d{1,3}(?: \\d{3})+)(?:[.,]\\d{1,2})?)';
-  const monetary=new RegExp('^(?:SEK[ \\t]*)?('+amount+')(?:[ \\t]*(?:SEK|kr))?$','iu');
+  const monetary=new RegExp('^(?:(?:SEK|EUR|USD|GBP|NOK|DKK)[ \\t]*)?('+amount+')(?:[ \\t]*(?:SEK|EUR|USD|GBP|NOK|DKK|kr))?$','iu');
   const money=s=>{const match=s.match(monetary);if(!match)return null;try{return parseMoney(match[1]);}catch{return null;}};
   const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms)';
   // Inline monetary labels require a colon. Words inside net/total labels
@@ -126,15 +137,6 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     return match?match[1]+'-'+match[2]:null;
   });
   if(fields.invoice_number.value&&validDate(fields.invoice_number.value)){issues.push('Fakturanumret ser ut som ett datum. Kontrollera originalets kolumner.');set('invoice_number',null,fields.invoice_number.evidence,0);}
-  const wholeText=text;
-  if(direction==='customer'&&/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i.test(text))text=text.split(/(?:^|\n)[ \t]*Mottagare[ \t]*\n/i).slice(1).join('\n').split(/Tilläggsinformation|Betalningsuppgifter/i)[0];
-  grabFull('organization_number','(?:org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number)',value=>{
-    const match=value.match(/^(\d{6})(?:[ \t]*[-\u2010-\u2015\u2212][ \t]*|[ \t]+)?(\d{4})$/u),number=match?match[1]+match[2]:null;
-    return number&&validOrganization(number)?number:null;
-  });
-  const partyLabel=direction==='customer'?'kund|fakturamottagare|företags\\s*namn|customer|bill to':'leverantör|utställare|säljare|supplier|seller';
-  grab('party',new RegExp('(?:^|\\n)[ \\t]*(?:'+partyLabel+')\\s*:[ \\t]*([^\\n]{2,240})','gi'));
-  text=wholeText;
   if(['customer','supplier'].includes(direction))set('direction',direction,'Föreslagen från mejlets riktning',direction_confident?.94:.5);
   const kind=/kreditfaktura|credit\s*(?:invoice|note)/i.test(text)?'credit':/\bkvitto\b|\breceipt\b/i.test(text)?'receipt':/\bfaktura\b|\binvoice\b|fakturanr/i.test(text)?'invoice':'other';
   set('kind',kind,text.match(/kreditfaktura|credit\s*(?:invoice|note)|kvitto|receipt|faktura|invoice/i)?.[0]);
@@ -146,10 +148,22 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   else if(!explicitCurrency&&!currencies.length&&/\bkr\b/i.test(text))set('currency','SEK','kr',.7);
   if(currencies.length>1){set('currency',null,null,0);issues.push('Flera valutor finns i underlaget.');}
   if(kind==='credit')for(const k of ['total_cents','net_cents','vat_cents'])if(fields[k].value!==null)fields[k].value=Math.abs(fields[k].value);
+  if(layout.checkedRows.length)for(const key of ['net_cents','vat_cents','total_cents']){
+    const sum=layout.checkedRows.reduce((total,row)=>total+row[key],0),printed=fields[key].value;
+    if(!Number.isSafeInteger(sum)||printed!==null&&Math.abs((kind==='credit'?Math.abs(sum):sum)-printed)>1)issues.push('Motstridiga artikelrader och fakturasummor. Kontrollera alla tryckta rader och totalsummor.');
+  }
+  // Reuse the actual scalar-label grammar when bounding a party value. A new
+  // accepted date/number label must never become the next-line party name.
+  const scalarBoundary=value=>{let boundary=-1;for(const pattern of scalarLabels){const match=pattern.exec(value);if(match&&(boundary<0||match.index<boundary))boundary=match.index;}return boundary;};
+  const detail=extractInvoiceDetails(layout.original,{direction,validOrganization,money,scalarBoundary,currency:fields.currency.value,invoice_number:fields.invoice_number.value,reference:fields.reference.value,credit:kind==='credit',summary:Object.fromEntries(['net_cents','vat_cents','total_cents'].map(key=>[key,fields[key].value]))});
+  issues.push(...detail.issues);
+  if(detail.currency_conflict)set('currency',null,null,0);
+  set('party',detail.counterparty.name,detail.counterparty.name_evidence);
+  set('organization_number',detail.counterparty.organization_number,detail.counterparty.organization_evidence);
   const values=Object.fromEntries(fieldNames.map(k=>[k,fields[k].value]));
   issues.push(...validateInvoiceValues(values));
   if(text.trim().length<40)issues.push('Dokumentet saknar tillräcklig läsbar text.');
-  const required=['invoice_number','party','issued_at','due_at','total_cents','direction','currency','organization_number'];
+  const required=['invoice_number','party','issued_at','due_at','total_cents','net_cents','vat_cents','direction','currency','organization_number'];
   const missing=required.filter(k=>values[k]==null);
   if(missing.length)issues.push('Saknade uppgifter: '+missing.map(k=>titles[k]).join(', '));
   const fatal=values.total_cents==null||values.invoice_number==null||!['invoice','credit'].includes(kind)||issues.some(s=>/Motstridiga|Momsberäkningen|Radpris|flera fakturor|Flera valutor|läsbar text/.test(s));
@@ -157,7 +171,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   issues.push(...metadataIssues);
   const classification=classifyDocument({filename,text:layout.original,extraction:{fields}});
   const level=metadataIssues.length||classification.exclude_from_invoice_queue?'red':fatal?'red':issues.length||missing.length||required.some(k=>fields[k].confidence<.9)?'yellow':'green';
-  return {version:3,method,fields,level,classification,issues:[...new Set(issues)],text_excerpt:layout.original.slice(0,20000),extracted_at:new Date().toISOString()};
+  return {version:3,method,fields,details:detail.details,level,classification,issues:[...new Set(issues)],text_excerpt:layout.original.slice(0,20000),extracted_at:new Date().toISOString()};
 }
 export function validateInvoiceValues(v){
   const issues=[];

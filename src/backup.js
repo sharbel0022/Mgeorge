@@ -1,8 +1,8 @@
 import {DatabaseSync} from 'node:sqlite';
 import {randomBytes,createCipheriv,createDecipheriv,createHash} from 'node:crypto';
-import {readFileSync,writeFileSync,mkdtempSync,rmSync,openSync,closeSync,unlinkSync,mkdirSync,existsSync,lstatSync,fstatSync,fsyncSync,readSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdtempSync,rmSync,openSync,closeSync,unlinkSync,linkSync,mkdirSync,existsSync,lstatSync,fstatSync,fsyncSync,readSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {join,resolve} from 'node:path';
+import {dirname,join,resolve} from 'node:path';
 
 const header=Buffer.from('MGBAK001');
 function key(value){if(typeof value!=='string'||! /^[a-f0-9]{64}$/i.test(value))throw Error('MG_BACKUP_KEY måste innehålla exakt 64 hextecken.');return Buffer.from(value,'hex');}
@@ -112,8 +112,16 @@ function inspect(content){const folder=mkdtempSync(join(tmpdir(),'mg-backup-chec
 export function createBackup(database,archive,encryptionKey){
  const encryption=key(encryptionKey),folder=mkdtempSync(join(tmpdir(),'mg-backup-'));
  try{const snapshot=join(folder,'snapshot.sqlite'),db=new DatabaseSync(resolve(database),{readOnly:true});try{db.prepare('VACUUM INTO ?').run(snapshot);}finally{db.close();}
-  integrity(snapshot);const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',encryption,iv);cipher.setAAD(header);const encrypted=Buffer.concat([cipher.update(readFileSync(snapshot)),cipher.final()]);writeFileSync(archive,Buffer.concat([header,iv,cipher.getAuthTag(),encrypted]),{flag:'wx',mode:0o600});
-  return verifyBackup(archive,encryptionKey);
+  integrity(snapshot);const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',encryption,iv);cipher.setAAD(header);const encrypted=Buffer.concat([cipher.update(readFileSync(snapshot)),cipher.final()]);
+  // Stage on the archive's filesystem. A crash while writing cannot reserve the
+  // daily filename with partial ciphertext; link publishes verified bytes only
+  // and, unlike rename, never overwrites an existing or concurrent archive.
+  const staging=mkdtempSync(join(dirname(resolve(archive)),'.mg-backup-'));
+  try{
+   const staged=join(staging,'archive.mgbak'),fd=openSync(staged,'wx',0o600);
+   try{writeFileSync(fd,Buffer.concat([header,iv,cipher.getAuthTag(),encrypted]));fsyncSync(fd);}finally{closeSync(fd);}
+   const verified=verifyBackup(staged,encryptionKey);linkSync(staged,archive);return verified;
+  }finally{rmSync(staging,{recursive:true,force:true});}
  }finally{rmSync(folder,{recursive:true,force:true});}
 }
 /** Authenticates, decrypts and opens an isolated restored database without changing production. */
@@ -170,7 +178,13 @@ export function restoreBackup(archive,target,encryptionKey){
 export function dailyBackup(database,directory,encryptionKey,at=new Date()){
  key(encryptionKey);mkdirSync(directory,{recursive:true,mode:0o700});
  const day=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Stockholm',year:'numeric',month:'2-digit',day:'2-digit'}).format(at);
- const archive=join(directory,`mgeorge-${day}.mgbak`),existing=existsSync(archive);
- const result=existing?verifyBackup(archive,encryptionKey):createBackup(database,archive,encryptionKey);
- return{...result,day,created:!existing};
+ const archive=join(directory,`mgeorge-${day}.mgbak`);
+ if(existsSync(archive))return{...verifyBackup(archive,encryptionKey),day,created:false};
+ try{return{...createBackup(database,archive,encryptionKey),day,created:true};}
+ catch(error){
+  if(error.code!=='EEXIST')throw error;
+  // Another daily run may have published first. Preserve its bytes and only
+  // accept it after authentication and full original/reference validation.
+  return{...verifyBackup(archive,encryptionKey),day,created:false};
+ }
 }

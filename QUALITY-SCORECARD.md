@@ -1,5 +1,19 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Backup och isolerad katastrofövning — avgränsad verifiering 2026-11-02
+
+Arbete från `a9f88ae1c0f697376b3ecd140e1e80a64405125a` på `codex/backup-security-stabilization-20261102`. Denna uppdatering gäller enbart backup, återställning och den granskade säkerhetsgränsen. [Verifieringsrapport och körinstruktioner](docs/DISASTER-RECOVERY-VERIFICATION.md) redovisar fullständiga testresultat, granskning, kvarstående beroendefynd och driftbegränsningar. Leverans sker via separat PR; ingen automatisk merge eller parallell Sites-publicering.
+
+| Område | Före | Efter | Nytt faktiskt bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 29. Säkerhetskopiering | 7,5 | 7,5 | Privat, flushad och återverifierad Node-publicering; avbrott och konkurrerande vinnare; befintlig nyckel får inte tyst ersättas när arkiv finns. Sites export autentiserar varje snapshot/original och exakt manifest. | Ingen ny dekryptering av den verkliga backupen, oberoende offsite-kopia eller full strömförlustverifiering. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Nekade HTTPS-anrop skapar inte persistenta anonyma sessioner. Befintliga ägar-/OAuth-/MCP-/krypteringsgränser regressionstestade; produktionsberoendena har 0 auditfynd. | Begränsad kod-/mönstergranskning, inte full penetrationstest. 16 moderate utvecklingsposter och ESLint 9:s supportbrist kvarstår. |
+| 31. Katastrofåterställning | 5,5 | 5,5 | Riktig isolerad SQLite-återställning med alla Node-tabeller respektive Sites 20 beständiga tabeller, exakta original, WAL, historik och återtagna länkar. Sites-verktyget använder separata `evidence_`-tabeller. | Syntetiska data. Ursprunglig produktionsnyckel, fullständig export, oberoende lagring och faktisk RPO/RTO-övning saknas; ingen tjänsteaktivering eller native Windows-verifiering. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | 1 083 Node + 1 973 Sites, 0 fel/överhoppade; syntax/typkontroll, separat bygge och oberoende granskning godkända. Riktiga filsystem-/SQLite-/HTTP-prov och negativa felinjektioner; granskningsfynd har regressioner. | Testutfall gäller rapporterad branch och miljö; scoped sviter överlappar helsviterna. Ett parallellt bygge avbröts, separat omtag passerade. |
+| 33. Verifiering i verklig produktion | 6,5 | 6,5 | Skrivfri aktuell status: backup 195/195 filer, 63 463 280 bytes, sparat `manifest_pass`; runtime revision 9 och 26 tabellnamn observerade. | Historiskt statuskvitto bevisar inte en ny filkontroll eller återställning. 112 äldre API-poster saknar kvitto. |
+
+**Inga numeriska poäng ändras.** Nya regressionsbevis stärker de avgränsade kontrollerna men ger ingen produktionscertifiering. Övriga områden och andra parallella uppdrags poäng lämnas oförändrade.
+
 ## Slutlig UI-granskning inför samordnad integration — 2026-11-02
 
 [Rapport för samtliga 33 områden](docs/FINAL-33-AREA-QUALITY-REPORT.md) och [fullständig UI-inventering](docs/UI-COMPONENT-INVENTORY.md). Egen branch `codex/final-ui-quality-2026-11-02`, bas `a9f88ae`; inga ändringar av ekonomimotorer, provider-/OCR-/backupimplementationer. Faktura- och banklistor begränsas till 50 synliga poster, käll-/betalarevidens och laddnings-/felstatus förtydligas, sökning/fokus förbättras. Mätningar och exakta testgränser finns i rapporten.

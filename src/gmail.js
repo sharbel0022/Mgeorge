@@ -23,6 +23,10 @@ function retryDelay(response){
   if(!Number.isFinite(seconds)||seconds<0)seconds=900;
   return {retryAfter:Math.max(1,Math.min(max,seconds)),retryBlocked};
 }
+function rateLimitFailure(response){
+  const wait=retryDelay(response);
+  return Object.assign(fail(wait.retryBlocked?'Gmail angav en väntetid som kräver manuell kontroll. Automatisk hämtning har stoppats.':'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.','rate_limited',429),wait);
+}
 export function gmailAccount(){return (process.env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();}
 export function isGmailConfigured(){return !!(process.env.GOOGLE_CLIENT_ID?.trim()&&process.env.GOOGLE_CLIENT_SECRET?.trim());}
 function requireConfig(){if(!isGmailConfigured())throw fail('En administratör behöver aktivera Gmail-kopplingen först.','not_configured');}
@@ -42,14 +46,26 @@ async function requestJson(url,options={}){
   let response;
   try{response=await fetch(url,{...options,redirect:'error',signal:AbortSignal.timeout(20_000)});}
   catch{throw fail('Det gick inte att nå Gmail. Försök igen.','connection_error',502);}
-  if(response.status===429){const wait=retryDelay(response);await response.body?.cancel().catch(()=>{});throw Object.assign(fail(wait.retryBlocked?'Gmail angav en väntetid som kräver manuell kontroll. Automatisk hämtning har stoppats.':'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.','rate_limited',429),wait);}
+  // Status remains authoritative even when an outage or expired session returns HTML.
+  if(response.status===429){await response.body?.cancel().catch(()=>{});throw rateLimitFailure(response);}
+  if(response.status>=500){await response.body?.cancel().catch(()=>{});throw Object.assign(fail('Gmail kunde inte slutföra begäran. Försök igen.','provider_error',502),retryDelay(response));}
   // A bounded read prevents a malformed response or huge attachment from exhausting memory.
   let bytes=0;const chunks=[];
-  if(response.body){for await(const chunk of response.body){bytes+=chunk.length;if(bytes>22_000_000){await response.body.cancel?.().catch(()=>{});throw fail('Svaret från Gmail var för stort.','response_too_large',413);}chunks.push(chunk);}}
-  let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw fail('Gmail returnerade ett ogiltigt svar.','invalid_response',502);}
+  try{
+    if(response.body){for await(const chunk of response.body){bytes+=chunk.length;if(bytes>22_000_000){await response.body.cancel?.().catch(()=>{});throw fail('Svaret från Gmail var för stort.','response_too_large',413);}chunks.push(chunk);}}
+  }catch(error){
+    if(error?.code==='response_too_large')throw error;
+    throw fail('Det gick inte att läsa svaret från Gmail. Försök igen.','connection_error',502);
+  }
+  let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{if(response.status===401)throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');if(response.status===403)throw fail('Gmail gav inte läsåtkomst. Kontrollera behörigheten och Gmail API i Google Cloud.','access_denied');throw fail('Gmail returnerade ett ogiltigt svar.','invalid_response',502);}
   if(!response.ok){
-    if(response.status===401||body.error==='invalid_grant')throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
-    if(response.status===403)throw fail('Gmail gav inte läsåtkomst. Kontrollera behörigheten och Gmail API i Google Cloud.','access_denied');
+    if(body?.error==='invalid_client'||body?.error==='unauthorized_client')throw fail('Google avvisade webbklienten. Kontrollera klient-id och klienthemlighet.','invalid_client');
+    if(response.status===401||body?.error==='invalid_grant')throw fail('Gmail-anslutningen behöver förnyas. Koppla Gmail igen.','renewal_required');
+    if(response.status===403){
+      const reasons=Array.isArray(body?.error?.errors)?body.error.errors:[];
+      if(reasons.some(error=>['rateLimitExceeded','userRateLimitExceeded','dailyLimitExceeded'].includes(error?.reason)))throw rateLimitFailure(response);
+      throw fail('Gmail gav inte läsåtkomst. Kontrollera behörigheten och Gmail API i Google Cloud.','access_denied');
+    }
     // Do not reflect provider responses: these may include secrets or mailbox content.
     throw fail('Gmail kunde inte slutföra begäran. Försök igen.','provider_error',502);
   }
@@ -131,11 +147,38 @@ function mailbox(value){
   const party=(decoded.includes('<')?decoded.slice(0,decoded.indexOf('<')):email||decoded).replace(/^\s*["']|["']\s*$/g,'').trim();
   return {email:email.slice(0,240),party:party.slice(0,240)};
 }
-function partsOf(payload,path='0',out=[]){
-  if(out.length>500)throw fail('Ett mejl har för många bilagor eller delar.','message_too_complex');
-  out.push({...payload,_part:payload.partId||path});
+const isObject=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+function parsedHeaders(value){
+  const headers=Object.create(null),entries=[];let valid=value===undefined||Array.isArray(value);
+  for(const header of Array.isArray(value)?value:[]){
+    if(!isObject(header)||typeof header.name!=='string'||!/^[-A-Za-z0-9]+$/.test(header.name)||typeof header.value!=='string'){valid=false;continue;}
+    const name=header.name.toLowerCase(),text=mimeText(header.value);
+    // Transport trace headers are legitimately repeated. Conflicts only matter
+    // for the single-valued metadata used for identity and MIME decisions.
+    if(Object.hasOwn(headers,name)&&headers[name]!==text&&['from','to','subject','content-disposition','content-id','content-type'].includes(name))valid=false;
+    else headers[name]=text;
+    entries.push({name,value:text});
+  }
+  return {headers,entries,valid};
+}
+function receivedAt(value){
+  const milliseconds=typeof value==='number'?value:typeof value==='string'&&/^\d{1,16}$/.test(value)?Number(value):NaN;
+  if(!Number.isSafeInteger(milliseconds)||milliseconds<0)return '';
+  const date=new Date(milliseconds);
+  return Number.isNaN(date.getTime())?'':date.toISOString();
+}
+function attachmentBodyIssue(body){
+  if(!isObject(body)||body.size!==undefined&&(typeof body.size!=='number'||!Number.isSafeInteger(body.size)||body.size<0)||body.attachmentId!==undefined&&typeof body.attachmentId!=='string')return 'attachment_unreadable';
+  return body.size>maxFileBytes?'attachment_too_large':'';
+}
+function partsOf(payload,path='0',out=[],state={invalid:false}){
+  if(!isObject(payload)){state.invalid=true;return out;}
+  if(out.length>=500)throw fail('Ett mejl har för många bilagor eller delar.','message_too_complex');
   if(path.split('.').length>20)throw fail('Ett mejl har för många nästlade delar.','message_too_complex');
-  for(const [i,part]of(payload.parts||[]).entries())partsOf(part,`${path}.${i}`,out);
+  const headers=parsedHeaders(payload.headers);
+  if(!headers.valid||payload.parts!==undefined&&!Array.isArray(payload.parts))state.invalid=true;
+  out.push({...payload,headers:headers.entries,_headers_valid:headers.valid,_part:typeof payload.partId==='string'&&payload.partId?payload.partId:path});
+  for(const [i,part]of(Array.isArray(payload.parts)?payload.parts:[]).entries())partsOf(part,path+'.'+i,out,state);
   return out;
 }
 function detectedMime(buffer){
@@ -190,22 +233,39 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
       if(!item.id||seenMessages.has(item.id))continue;
       seenMessages.add(item.id);received++;
       const message=await apiRequest(`/messages/${encodeURIComponent(item.id)}?format=full`,current,authorize);
-      const labels=message.labelIds||[];
+      // A missing envelope must not advance the checkpoint past possible originals.
+      if(!isObject(message)||!isObject(message.payload)||!isObject(message.payload.body)&&!Array.isArray(message.payload.parts))throw fail('Gmail returnerade ett ofullständigt mejl. Försök igen.','invalid_response',502);
+      const labelsValid=Array.isArray(message.labelIds)&&message.labelIds.every(label=>typeof label==='string');
+      const labels=Array.isArray(message.labelIds)?message.labelIds.filter(label=>typeof label==='string'):[];
       if(labels.some(l=>['SPAM','TRASH','DRAFT'].includes(l))){skipped++;continue;}
-      const headers=Object.fromEntries((message.payload?.headers||[]).map(h=>[h.name.toLowerCase(),mimeText(h.value)]));
+      const parsed=parsedHeaders(message.payload.headers),headers=parsed.headers;
       const subject=(headers.subject||'').slice(0,500);
       // Subjects cannot establish the contents of an attachment. Retain
       // uncertain originals; document interpretation decides what needs review.
       const direction=labels.includes('SENT')&&!labels.includes('INBOX')?'customer':'supplier';
       const contact=mailbox(direction==='customer'?headers.to:headers.from);
-      const parts=partsOf(message.payload||{});
-      const supported=parts.filter(p=>p.filename&&attachmentMime(p));
+      const partsState={invalid:false},parts=partsOf(message.payload,'0',[],partsState);
+      const supported=parts.filter(p=>attachmentMime(p)&&(typeof p.filename==='string'&&p.filename.trim()||String(p.mimeType||'').toLowerCase()==='application/pdf'));
+      if(partsState.invalid&&!supported.length)throw fail('Gmail returnerade ett ofullständigt mejl. Försök igen.','invalid_response',502);
+      const received_at=receivedAt(message.internalDate),missingMetadata=[];
+      if(!parsed.valid)missingMetadata.push('headers');
+      if(!labelsValid)missingMetadata.push('label_ids');
+      if(partsState.invalid)missingMetadata.push('parts');
+      if(!mailbox(headers.from).email)missingMetadata.push('from');
+      if(!mailbox(headers.to).email)missingMetadata.push('to');
+      if(!subject)missingMetadata.push('subject');
+      if(!received_at)missingMetadata.push('received_at');
+      let metadataWarned=false;
+      const warnMetadata=()=>{if(!metadataWarned){warnings.push({source_id:null,message_id:item.id,code:'message_metadata_invalid',message:'Mejlets metadata är ofullständiga. Originalet kräver granskning.'});metadataWarned=true;}};
+      if(missingMetadata.length)warnMetadata();
       let found=false;
       for(const part of supported){
         if(Date.now()>deadline){truncated=true;next_page_token=cursor;break;}
-        if(isInlineDecoration(part)){skipped++;continue;}
-        const original_filename=mimeText(part.filename).slice(0,240);
+        if(part._headers_valid&&isInlineDecoration(part)){skipped++;continue;}
+        const original_filename=typeof part.filename==='string'?mimeText(part.filename).slice(0,240):'';
         let name=original_filename.replace(/[\\/]/g,'_');
+        const missing_fields=[...missingMetadata];
+        if(!original_filename){missing_fields.push('original_filename');warnMetadata();}
         found=true;
         const source_id=`gmail:${gmailAccount()}:${item.id}:${part._part}`;
         if(known.has(source_id)){duplicate++;continue;}
@@ -214,23 +274,30 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
         // immutable rejected source IDs lets the next batch pass them and make progress.
         if(attachmentAttempts>=maxAttachmentAttempts){truncated=true;next_page_token=cursor;break;}
         attachmentAttempts++;
-        if(Number(part.body?.size)>maxFileBytes){warnings.push({source_id,message:`${name}: filen är större än 15 MB.`});skipped++;continue;}
-        let body=part.body||{};
-        if(body.attachmentId)body=await apiRequest(`/messages/${encodeURIComponent(item.id)}/attachments/${encodeURIComponent(body.attachmentId)}`,current,authorize);
+        const rejectPart=code=>{warnings.push({source_id,message_id:item.id,code,message:code==='attachment_too_large'?'Bilagan är större än 15 MB.':code==='attachment_format_invalid'?'Bilagans filformat kunde inte bekräftas.':'Bilagan kunde inte läsas.'});skipped++;};
+        const partIssue=attachmentBodyIssue(part.body);
+        if(partIssue){rejectPart(partIssue);continue;}
+        let body=part.body;
+        if(body.attachmentId){
+          try{body=await apiRequest(`/messages/${encodeURIComponent(item.id)}/attachments/${encodeURIComponent(body.attachmentId)}`,current,authorize);}
+          catch(error){if(error.code!=='response_too_large')throw error;rejectPart('attachment_too_large');continue;}
+        }
+        const bodyIssue=attachmentBodyIssue(body);
+        if(bodyIssue){rejectPart(bodyIssue);continue;}
         const encoded=body.data;
-        if(typeof encoded!=='string'||encoded.length>Math.ceil(maxFileBytes*4/3)+4||!/^[A-Za-z0-9_-]*={0,2}$/.test(encoded)){warnings.push({source_id,message:`${name}: bilagan kunde inte läsas.`});skipped++;continue;}
+        if(typeof encoded==='string'&&encoded.length>Math.ceil(maxFileBytes*4/3)+4){rejectPart('attachment_too_large');continue;}
+        if(typeof encoded!=='string'||!/^[A-Za-z0-9_-]*={0,2}$/.test(encoded)){rejectPart('attachment_unreadable');continue;}
         const content=Buffer.from(encoded,'base64url');const mime_type=detectedMime(content);
-        if(!content.length||content.length>maxFileBytes||mime_type!==attachmentMime(part)){warnings.push({source_id,message:`${name}: filformatet kunde inte bekräftas.`});skipped++;continue;}
+        if(content.length>maxFileBytes){rejectPart('attachment_too_large');continue;}
+        if(!content.length||mime_type!==attachmentMime(part)){rejectPart('attachment_format_invalid');continue;}
         // MIME attachments may have no extension, or a misleading one. Keep an inert,
         // correctly typed download name so the server's same-format validation accepts it.
         const extension={'application/pdf':'.pdf','image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp'}[mime_type];
         const matchingExtension=mime_type==='image/jpeg'?/\.jpe?g$/i.test(name):name.toLowerCase().endsWith(extension);
-        if(!matchingExtension)name=`${(name||'faktura').slice(0,240-extension.length)}${extension}`;
+        if(!matchingExtension)name=`${(name||'gmail-attachment').slice(0,240-extension.length)}${extension}`;
         if(totalBytes+content.length>maxBatchBytes||documents.length>=100){truncated=true;next_page_token=cursor;break;}
         totalBytes+=content.length;known.add(source_id);
-        const receivedDate=new Date(Number(message.internalDate));
-        const received_at=Number.isNaN(receivedDate.getTime())?'':receivedDate.toISOString();
-        documents.push({source_id,name,mime_type,content_base64:content.toString('base64'),direction,...contact,subject,received_at,needs_review:true,metadata:{message_id:item.id,attachment_id:part.body?.attachmentId||null,part_id:part._part,inline_decoration:false,from:headers.from||'',to:headers.to||'',original_filename,forwarded:/^(?:fw|fwd|vb):/i.test(subject),direction_confident:!(labels.includes('SENT')&&labels.includes('INBOX'))&&!/^(?:fw|fwd|vb):/i.test(subject),note:'Kontrollera originalet och de tolkade uppgifterna. Ingen betalningsstatus har antagits.'}});
+        documents.push({source_id,name,mime_type,content_base64:content.toString('base64'),direction,...contact,subject,received_at,needs_review:true,metadata:{message_id:item.id,attachment_id:part.body?.attachmentId||null,part_id:part._part,inline_decoration:false,from:headers.from||'',to:headers.to||'',original_filename,missing_fields,forwarded:/^(?:fw|fwd|vb):/i.test(subject),direction_confident:!missing_fields.length&&!(labels.includes('SENT')&&labels.includes('INBOX'))&&!/^(?:fw|fwd|vb):/i.test(subject),note:'Kontrollera originalet och de tolkade uppgifterna. Ingen betalningsstatus har antagits.'}});
       }
       if(!found)skipped++;
       if(truncated)break;
@@ -242,5 +309,5 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
     cursor=listing.nextPageToken;seenPages.add(cursor);
     if(page===9){truncated=true;next_page_token=cursor;}
   }
-  return {tokens:current,documents,received,skipped,duplicate,truncated,next_page_token,warnings,rejected_source_ids:warnings.map(w=>w.source_id)};
+  return {tokens:current,documents,received,skipped,duplicate,truncated,next_page_token,warnings,rejected_source_ids:warnings.filter(w=>w.source_id).map(w=>w.source_id)};
 }

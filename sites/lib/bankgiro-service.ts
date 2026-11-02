@@ -11,28 +11,44 @@ async function activeAccounts(owner:string){
  const selected=JSON.parse(conn.selected_accounts);if(!Array.isArray(selected))throw Error('Bankens valda mottagarkonto behöver granskas.');
  return {conn,selected,available:await accounts(conn)};
 }
-/** Stored consent/account resources only. This never contacts the bank provider. */
-export async function bankgiroAutomaticAccountIssue(owner:string,account:string){
- try{const {conn,selected,available}=await activeAccounts(owner);return available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account)).length===1?'':'Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.';}catch{return 'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före nya betalningskopplingar.';}
-}
-/** Capture exactly the stored consent whose decoded account resource was checked.
- * The financial writer compares it again inside its atomic D1 batch. */
-export async function bankAccountConsentSnapshot(owner:string,account:string){
- const {conn,selected,available}=await activeAccounts(owner);
- if(available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account)).length!==1)throw Error('Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.');
- return conn;
-}
-async function resolveAccounts(owner:string,rows:any[]){
- let context:Awaited<ReturnType<typeof activeAccounts>>;try{context=await activeAccounts(owner);}catch{return rows.map(row=>({...row,bankgiroAccountIssue:'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.'}));}
- const {conn,selected,available}=context;
- const identifierKeys=(resource:typeof available[number])=>[
+type AccountContext=Awaited<ReturnType<typeof activeAccounts>>;
+const reportedAccountKey=(value:unknown)=>typeof value==='string'?value.replace(/^iban:/i,'').replace(/[\s-]/g,'').toUpperCase():'';
+function identifierKeys(resource:AccountContext['available'][number]){
+ return [
   {scheme_name:'IBAN',identification:resource.account_id?.iban},resource.account_id?.other,...(Array.isArray(resource.all_account_ids)?resource.all_account_ids:[]),
  ].flatMap(identifier=>{
   if(typeof identifier?.scheme_name!=='string'||!['IBAN','BBAN','CPAN'].includes(identifier.scheme_name.toUpperCase())||typeof identifier.identification!=='string')return [];
   const key=identifier.identification.replace(/[\s-]/g,'').toUpperCase();return /^[A-Z0-9]{1,80}$/.test(key)?[key]:[];
  });
+}
+function currentAccountIssue(context:AccountContext,account:string,reportedAccount?:string){
+ const {conn,selected,available}=context;
+ const matches=available.filter(item=>selected.includes(item.uid)&&item.currency==='SEK'&&stableAccountKey(item,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(account));
+ if(matches.length!==1)return 'Bankhändelsens konto ingår inte entydigt i ägarens aktiva bankmedgivande.';
+ // An omitted identifier belongs to an AIS/direct source. An empty report
+ // identifier is missing evidence and must never fall back to the resolved IBAN.
+ if(reportedAccount!==undefined){
+  const raw=reportedAccountKey(reportedAccount);if(!raw)return 'Mottagarkonto saknas i rapportoriginalet.';
+  const holders=available.filter(resource=>identifierKeys(resource).includes(raw));
+  if(holders.length!==1||holders[0]!==matches[0])return 'Rapportens mottagarkonto saknar ett entydigt banklevererat kontoalias till ägarens aktuella valda konto.';
+ }
+ return '';
+}
+/** Stored consent/account resources only. This never contacts the bank provider. */
+export async function bankgiroAutomaticAccountIssue(owner:string,account:string,reportedAccount?:string){
+ try{return currentAccountIssue(await activeAccounts(owner),account,reportedAccount);}catch{return 'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före nya betalningskopplingar.';}
+}
+/** Capture exactly the stored consent whose decoded account resource was checked.
+ * The financial writer compares it again inside its atomic D1 batch. */
+export async function bankAccountConsentSnapshot(owner:string,account:string,reportedAccount?:string){
+ const context=await activeAccounts(owner),issue=currentAccountIssue(context,account,reportedAccount);if(issue)throw Error(issue);
+ return context.conn;
+}
+async function resolveAccounts(owner:string,rows:any[]){
+ let context:AccountContext;try{context=await activeAccounts(owner);}catch{return rows.map(row=>({...row,bankgiroAccountIssue:'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.'}));}
+ const {conn,selected,available}=context;
  return rows.map(r=>{
-  const raw=String(r.account||'').replace(/^iban:/i,'').replace(/[\s-]/g,'').toUpperCase();if(!raw)return {...r,bankgiroAccountIssue:'Mottagarkonto saknas i rapportoriginalet.'};
+  const raw=reportedAccountKey(r.account);if(!raw)return {...r,bankgiroAccountIssue:'Mottagarkonto saknas i rapportoriginalet.'};
   // An alias must belong to one provider resource, including resources that
   // are unselected or use another currency. Account selection cannot erase ambiguity.
   const holders=available.filter(resource=>identifierKeys(resource).includes(raw)),match=holders.length===1?holders[0]:undefined;
@@ -63,6 +79,25 @@ export async function bankgiroRetainedPreview(owner:string,documentId:string,tar
 }
 
 const bankgiroObservation=(row:Transaction)=>JSON.stringify(Object.fromEntries(['date','amount','currency','party','payerReference','bankReference','parentBankReference','recipientBankgiro','payerBankgiro','payerAccount','remittanceMessage','settlementDate','format','organizationNumber','referenceEvidence','referenceParts','payerEvidence','reportEvidence','specificationGroup','specificationCount','specificationTotal','recipientAccount','account','original','bankDetails'].map(key=>[key,row[key as keyof Transaction]??null])));
+/** Accept only the exact earlier label-cell receipt derived from this freshly
+ * parsed original. Other source cells and every payment fact remain exact. */
+function sameBankgiroObservations(rows:Transaction[],fresh:Transaction[]){
+ const unmatched=rows.map(bankgiroObservation);
+ for(const row of fresh){
+  const expected=[bankgiroObservation(row)],report=row.reportEvidence;
+  if(row.format==='Swedbank Bankgiro XLSX'&&report?.profile==='Swedbank Bankgiro XLSX'){
+   try{
+    const cells=JSON.parse(report.sourceCells||'{}');
+    if(cells.sequenceLabel&&cells.sequence){
+     const legacy={...cells,sequence:cells.sequenceLabel};delete legacy.sequenceLabel;
+     expected.push(bankgiroObservation({...row,reportEvidence:{...report,sourceCells:JSON.stringify(legacy)}}));
+    }
+   }catch{/* An unknown representation never receives a compatibility bypass. */}
+  }
+  const index=unmatched.findIndex(value=>expected.includes(value));if(index<0)return false;unmatched.splice(index,1);
+ }
+ return unmatched.length===0;
+}
 /** Reconstruct metadata commands from this owner's retained sources. No provider request. */
 export async function prepareBankgiroLinkCommand(owner:string,state:State,input:Command):Promise<Command>{
  if(input.type==='bankgiro.unlink'){
@@ -79,6 +114,7 @@ export async function prepareBankgiroLinkCommand(owner:string,state:State,input:
  const original=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId:proof.documentId});
  if(original.hash!==proof.sha256)throw Error('Specifikationens kontrollsumma stämmer inte med det bevarade originalet.');
  const fresh=applyCommand(emptyState(),original).state.transactions.filter(row=>row.specificationGroup===specification.specificationGroup);
- if(fresh.length!==rows.length||JSON.stringify(fresh.map(bankgiroObservation).sort())!==JSON.stringify(rows.map(bankgiroObservation).sort()))throw Error('Specifikationens uppgifter stämmer inte med det bevarade originalet. Importera eller granska originalet på nytt.');
+ const freshAccountIssue=fresh.find(row=>row.bankgiroAccountIssue)?.bankgiroAccountIssue;if(freshAccountIssue)throw Error(freshAccountIssue);
+ if(fresh.length!==rows.length||!sameBankgiroObservations(rows,fresh))throw Error('Specifikationens uppgifter stämmer inte med det bevarade originalet. Importera eller granska originalet på nytt.');
  return {type:'bankgiro.link',transactionId:target.id,specificationId:specification.id,specificationIds:rows.map(row=>row.id),note:input.note,confirmOriginals:input.confirmOriginals===true,confirmAccount:input.confirmAccount===true,dateDifferenceNote:input.dateDifferenceNote??''};
 }

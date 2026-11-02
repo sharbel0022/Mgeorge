@@ -1,13 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import {serverPdfText} from '../lib/server-pdf.ts';
 import {fragmentedInvoicePdf,fragmentedFacit} from '../../test/helpers/fragmented-pdf.mjs';
 import {reconstructPdfText as sitesText} from '../lib/pdf-text.js';
 
-const domain=new URL('../lib/domain.ts',import.meta.url).href;
-const source=readFileSync(new URL('../lib/invoice-fields.js',import.meta.url),'utf8').replace("'./domain'",JSON.stringify(domain)).replace("'./document-triage.js'",JSON.stringify(new URL('../lib/document-triage.js',import.meta.url).href));
-const {interpretInvoice:interpretSites}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const {interpretInvoice:interpretSites}=await import(invoiceParserUrl());
 const context={direction:'supplier',direction_confident:true};
 const engines={Sites:async bytes=>{const r=await serverPdfText(new Uint8Array(bytes));return interpretSites(r.text,{...context,method:r.method,ocrConfidence:r.confidence});}};
 const item=(str,x,width,extra={})=>({str,transform:[14,0,0,14,x,100],width,height:14,hasEOL:false,...extra});

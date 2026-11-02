@@ -41,10 +41,19 @@ export function classifyDocument(input = {}) {
 }
 /** Explicit labels only. Leading zeros and separators are deliberately preserved. */
 export function sourceInvoiceNumbers(value) {
-  const text = String(value || '').normalize('NFKC').replace(/\.pdf$/i, '');
-  // Compare the complete metadata token, including unsupported lengths. An
-  // overlong source identifier must conflict rather than match its prefix.
-  return [...text.matchAll(/(?:faktura(?:[\s._-]*(?:nummer|nr|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+)|invoice(?:[\s._-]*(?:number|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+))([\p{L}\p{N}][\p{L}\p{N}/_-]*)/giu)].map(m => m[1].toUpperCase()).filter(value => /\d/.test(value));
+  const text = String(value || '').normalize('NFKC').replace(/\.(?:pdf|png|jpe?g|webp|tiff?)$/i, '');
+  // Metadata only challenges source evidence. Keep punctuation/length intact
+  // so an unsupported suffix never agrees with a shorter document identifier.
+  const labels=/(?<![\p{L}\p{N}])(?:faktura(?:[\s._-]*(?:nummer|nr|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+)|invoice(?:[\s._-]*(?:number|no)(?:[\s:#._-]+|(?=\d))|[\s:#._-]+))([\p{L}\p{N}][^\s<>"'\[\]{}]*)/giu;
+  const result=[];
+  for(const match of text.matchAll(labels)){
+    const token=match[1],label=match[0].slice(0,-token.length),explicit=/(?:nummer|number|nr|no)[\s:#._-]*$/i.test(label);
+    if(/\b(?:not|no|inte|ingen)(?:[\s_-]+(?:an|a|en))?[\s_-]+$/i.test(text.slice(0,match.index)))continue;
+    if(!explicit&&/^(?:date|datum|export|id|uuid|message|document|attachment|archive|arkiv|scan)(?=[_:./-]|\d|$)/i.test(token))continue;
+    if(!explicit&&!/\d/.test(token)&&text.slice(match.index+match[0].length).trim())continue;
+    result.push(token.toUpperCase());
+  }
+  return result;
 }
 export function documentConflicts(extraction, metadata = {}) {
   const meta = /** @type {any} */ (metadata), issues = [], number = String(fieldValue(extraction, 'invoice_number') || '').toUpperCase();
