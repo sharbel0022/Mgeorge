@@ -26,11 +26,11 @@ const tx=(extra={},rawFields={})=>{
 const invoice=extra=>({id:'i',number:'0599',ocr:'',party:'Fakturakund AB',direction:'receivable',total:62500,reviewed:true,voided:false,currency:'SEK',issued:'2026-10-01',due:'2026-11-01',...extra});
 
 test('625 SEK collection never presents invoice customer, bank description or proposed 0599 as payer or OCR',()=>{
-  const s=emptyState(),t=tx({party:'Betalardetaljer saknas – importera betalningsspecifikation.',payerReference:'58197013'});s.transactions.push(t);s.invoices.push(invoice());
+  const s=emptyState(),t=tx({party:'Betalardetaljer saknas – importera betalningsspecifikation.',payerReference:'99990004'});s.transactions.push(t);s.invoices.push(invoice());
   const actual=view.bankPaymentView(s,t,[{number:'0599',party:'Fakturakund AB'}]);
   assert.equal(actual.payer,'Betalare okänd');assert.equal(actual.invoice,'Möjlig: 0599');assert.equal(actual.status,'Specifikation saknas');assert.equal(actual.reference.ocr,'');assert.equal(actual.verified,false);
   const before=JSON.stringify(s),html=render(ui.default,{state:s,transactions:[t],candidates:{t:[{number:'0599',party:'Fakturakund AB'}]},open(){throw Error('Render must never perform an action');}});
-  assert.match(html,/Betalare okänd/);assert.match(html,/Möjlig: 0599/);assert.doesNotMatch(html,/Fakturakund AB|58197013|Betalardetaljer|OCR 0599/);assert.equal(JSON.stringify(s),before);
+  assert.match(html,/Betalare okänd/);assert.match(html,/Möjlig: 0599/);assert.doesNotMatch(html,/Fakturakund AB|99990004|Betalardetaljer|OCR 0599/);assert.equal(JSON.stringify(s),before);
 });
 
 test('bank-supplied payer and labelled OCR keep leading zeros, separately from invoice identity',()=>{
@@ -156,3 +156,5 @@ test('an existing different booking remains visible with a reference conflict an
  const {state,target}=paymentFieldInvoiceFixture({booked:true}),before=structuredClone(state),actual=view.bankPaymentView(state,target);
  assert.equal(actual.reference.value,'0599');assert.equal(actual.invoice,'0800');assert.deepEqual(actual.invoiceNumbers,['0800']);assert.deepEqual(actual.possible,['0599']);assert.equal(actual.status,'Referenskonflikt');assert.equal(actual.invoiceVerified,false);assert.deepEqual(state,before);
 });
+
+test('a document candidate selected by its extracted reference remains visible in dashboard presentation',()=>{const s=emptyState(),t=tx({kind:'payment',description:'',payerReference:'000018'});s.transactions.push(t);const candidate={documentId:'synthetic-reference-document',invoiceId:'',number:'0712',party:'Synthetic payer',source:'gmail',identifiers:[{field:'number',value:'0712'},{field:'reference',value:'000018'}],matchedFields:['reference'],extractionSource:'document_jobs',referenceFields:[{field:'reference',value:'000018'}],referenceConflict:false};const actual=view.bankPaymentView(s,t,[candidate]);assert.deepEqual(actual.possible,['0712']);assert.equal(actual.invoiceVerified,false);const html=render(ui.default,{state:s,transactions:[t],candidates:{[t.id]:[candidate]},open(){}});assert.match(html,/0712/);assert.match(html,/Möjlig/);});

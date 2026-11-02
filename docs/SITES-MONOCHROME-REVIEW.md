@@ -1,5 +1,7 @@
 # MG Fakturakoll – publicerad svartvit granskningsyta
 
+> Motpartsnamn och Bankgironummer i exemplen är anonymiserade med syntetiska testvärden. Historiska slutsatser avser det ursprungliga underlaget.
+
 Verifierat 2026-10-28. Befintlig adress: https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/.
 
 ## Leverans
@@ -27,7 +29,7 @@ Kontrollresultatet visar faktiska sparade räknare med etiketter för underlag, 
 - Fyra nya regressionstester täcker samlad lista/detalj, laddning kontra tom kö, korrekta resultaträknare och att samlingspostens providerreferens inte presenteras som kund-OCR.
 - Isolerad lokal Workers/D1/R2-miljö: faktura 3 125 kr, verifierat 2 500 kr, kvar 625 kr och synligt original. Samlingspost saknar matchningsknapp. Huvudkontrollen visar Delvis klart vid saknade anslutningar och pausad testautomatik.
 - Syntetiskt kundmejl har spärrad Godkänn och skicka. Avvisning av testutkast minskar kön från 7 till 6; testdatabasen innehåller noll leveranser.
-- Publicerad version: fem huvudområden, filtrering/sortering och verklig samlingspost 625 kr den 26 oktober kontrollerade. Referenstext 58197013 visas separat; betalarens OCR anges saknas. Enda primära detaljåtgärd är Lägg till underlag.
+- Publicerad version: fem huvudområden, filtrering/sortering och verklig samlingspost 625 kr den 26 oktober kontrollerade. Referenstext 99990004 visas separat; betalarens OCR anges saknas. Enda primära detaljåtgärd är Lägg till underlag.
 - Publicerad global sökning hittar faktura 0594, Notuddskajens café AB, 4 375 kr. Fakturadetaljen visar 0 kr verifierat betalt, 4 375 kr kvar och faktiskt renderad originalbild.
 - Befintligt produktionsutkast öppnades. Mottagaren saknar verifiering, godkännandet är tomt och Godkänn och skicka är spärrad. Öppningen använder den befintliga granskningsregistreringen; ingen adressverifiering, redigering, avvisning eller sändning utfördes i produktion.
 - Produktionsdatabasens arbetsyterevision är fortsatt **13** efter samtliga kontroller. De returnerade workspace-, bank- och Gmail-fälten är oförändrade jämfört med baslinjen; vissa långa värden är trunkerade av läsverktyget. `customer_deliveries` innehåller fortsatt **0** rader.

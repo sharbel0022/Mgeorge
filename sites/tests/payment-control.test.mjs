@@ -77,11 +77,11 @@ test('main bank control honors a failed or interrupted manual-control reservatio
 
 
 test('collection provider reference is never presented as an individual payer OCR',()=>{
- const batch={id:'batch',kind:'batch',parentId:'',amount:62500,party:'',description:'Bankgiro inbetalning',payerReference:'58197013'};
+ const batch={id:'batch',kind:'batch',parentId:'',amount:62500,party:'',description:'Bankgiro inbetalning',payerReference:'99990004'};
  assert.equal(overview.paymentPayerReference(batch),'Saknas – individuell specifikation behövs');
  assert.equal(overview.paymentPayerReference({...batch,kind:'unknown'}),'Saknas – individuell specifikation behövs');
  assert.equal(overview.paymentPayerReference({...batch,kind:'payment',parentId:'parent',party:'Testkund AB',payerReference:'0594'}),'0594');
- assert.equal(batch.payerReference,'58197013');
+ assert.equal(batch.payerReference,'99990004');
 });
 
 test('comparison preview is read-only and does not create runs, drafts or allocations',async t=>{const f=await fixture(t);const before=f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n;const response=await f.call('preview',{},'GET'),out=await response.json();assert.equal(response.status,200);assert.equal(out.mode,'preview');assert.equal(out.changed,false);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,before);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM payment_control_runs').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_deliveries').get().n,0);f.user=null;assert.equal((await f.call('preview',{},'GET')).status,401);});

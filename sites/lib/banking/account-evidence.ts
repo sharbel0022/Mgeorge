@@ -1,5 +1,6 @@
 import {identity,db,readWorkspace,readBankOriginalBytes,response} from '../server';
-import {hasBankApiOrigin,bankApiOriginalIssue,paymentOriginalIssue,paymentEvidenceConflict,canonicalBankAccount} from '../domain';
+import {hasBankApiOrigin,bankApiOriginalIssue,paymentOriginalIssue,paymentEvidenceConflict,canonicalBankAccount,type State} from '../domain';
+import {accountEvidenceTarget,type AccountEvidenceTarget} from '../account-evidence-presentation';
 import {connection,application,accounts,providerConfig,sessionId,metadata,type BankConnectionRow,type BankApplicationRow} from './store';
 import {getSession,getAccountDetails,providerResponseDiagnostic,ProviderError,type ProviderAccount} from './enable-banking';
 import {stableAccountKey} from './transactions';
@@ -34,8 +35,17 @@ function aliases(account:ProviderAccount){
 
 /** Explicit current provider read. This module has no mutation/lock/orchestration
  * dependency and never returns provider UIDs, raw resources or full accounts. */
-export async function readBankAccountEvidence(input:unknown){
+type TrustedAccountEvidenceSelection={owner:string;revision:number;target:AccountEvidenceTarget};
+export async function readBankAccountEvidence(input:unknown,trustedSelection?:TrustedAccountEvidenceSelection){
  const select=args(input),user=await identity(),owner=user.userId,{state,revision}=await readWorkspace(owner),target=state.transactions.find(t=>t.id===select.transactionId);
+ // This context is constructed by the same-origin UI route, never parsed from
+ // MCP/public selectors. Independent owned-report MCP inspection stays available.
+ const selectionCurrent=(currentState:State,currentRevision:number)=>{
+  if(!trustedSelection)return true;
+  const current=accountEvidenceTarget(currentState,select.transactionId);
+  return trustedSelection.owner===owner&&trustedSelection.revision===currentRevision&&trustedSelection.target.transactionId===select.transactionId&&trustedSelection.target.documentId===select.documentId&&current?.transactionId===trustedSelection.target.transactionId&&current.documentId===trustedSelection.target.documentId;
+ };
+ if(!selectionCurrent(state,revision))return response({changed:false,providerContacted:false,checkedAt:new Date().toISOString(),transactionId:select.transactionId,documentId:select.documentId,revision,status:'stale',reason:'Arbetsytan eller rapportvalet ändrades före bankläsningen. Läs betalningskontrollen på nytt.',snapshotCurrent:false,accountMatch:false,complete:false,ambiguous:false,resourcesRead:0,rows:[]},409);
  if(!target||target.parentId||!hasBankApiOrigin(target)||bankApiOriginalIssue(target)||paymentOriginalIssue(state,target)||paymentEvidenceConflict(state,target))throw Error('Välj en ägd AIS-bankhändelse med intakt original och ankomstkvitto.');
  const {app,conn}=active(owner,await application(owner),await connection(owner)),available=await accounts(conn),selected=JSON.parse(conn.selected_accounts) as unknown;
  if(!Array.isArray(available)||!available.length||available.length>100||available.some(a=>!object(a)||typeof a.uid!=='string'||!UUID.test(a.uid))||new Set(available.map(a=>a.uid)).size!==available.length||!Array.isArray(selected)||!selected.length||selected.some(id=>typeof id!=='string'||!UUID.test(id)||!available.some(a=>a.uid===id))||new Set(selected).size!==selected.length)throw Error('Bankmedgivandets befintliga kontoresurser eller kontoval är ogiltiga.');
@@ -52,7 +62,8 @@ export async function readBankAccountEvidence(input:unknown){
  const snapshotCurrent=async()=>{
   try{
    const current=active(owner,await application(owner),await connection(owner)),workspace=await db().prepare('SELECT revision FROM workspaces WHERE owner=?').bind(owner).first<{revision:number}>();
-   return workspace?.revision===revision&&consentSnapshot(current.conn)===beforeConsent&&appSnapshot(current.app)===beforeApp;
+   const currentWorkspace=trustedSelection?await readWorkspace(owner):null;
+   return workspace?.revision===revision&&consentSnapshot(current.conn)===beforeConsent&&appSnapshot(current.app)===beforeApp&&(!currentWorkspace||selectionCurrent(currentWorkspace.state,currentWorkspace.revision));
   }catch{return false;}
  };
  const stale=()=>response({...base,checkedAt:new Date().toISOString(),status:'stale',reason:'Arbetsytan eller bankmedgivandet ändrades under läsningen. Ingen positiv kontoverifiering lämnas.',snapshotCurrent:false,accountMatch:false,complete:false,ambiguous:false,resourcesRead,rows:[]});

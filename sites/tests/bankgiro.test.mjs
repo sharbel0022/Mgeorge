@@ -7,22 +7,22 @@ import {emptyState,applyCommand,specificationPreview,paymentInvoiceAssessment,ec
 import {parseBankgiroXML,parseBankgiroCSV,parseSpecificationBytes} from '../lib/bankgiro-parser.js';
 const account='SE4280000890119146168423';
 export const xml=(details=detail(),amount='625.00',extra='')=>`<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><IBAN>${account}</IBAN></Id></Acct><Ntry><Amt Ccy="SEK">${amount}</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><ValDt><Dt>2026-10-27</Dt></ValDt><AcctSvcrRef>SWED-TEST-1</AcctSvcrRef>${extra}<NtryDtls>${details}</NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>`;
-export function detail({amount='625.00',ref='0599',payer='Café Gränden Bistro AB',id='CHILD-1'}={}){return `<TxDtls><Refs><TxId>${id}</TxId></Refs><AmtDtls><TxAmt><Amt Ccy="SEK">${amount}</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>${payer}</Nm></Dbtr><DbtrAcct><Id><Othr><Id>501-8296</Id><SchmeNm><Prtry>BGNR</Prtry></SchmeNm></Othr></Id></DbtrAcct></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>${ref}</Ref></CdtrRefInf></Strd></RmtInf></TxDtls>`;}
+export function detail({amount='625.00',ref='0599',payer='Synthetic Café Payer AB',id='CHILD-1'}={}){return `<TxDtls><Refs><TxId>${id}</TxId></Refs><AmtDtls><TxAmt><Amt Ccy="SEK">${amount}</Amt></TxAmt></AmtDtls><RltdPties><Dbtr><Nm>${payer}</Nm></Dbtr><DbtrAcct><Id><Othr><Id>999-0003</Id><SchmeNm><Prtry>BGNR</Prtry></SchmeNm></Othr></Id></DbtrAcct></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>${ref}</Ref></CdtrRefInf></Strd></RmtInf></TxDtls>`;}
 const command=(rows,hash='fixture-1')=>({type:'bankgiro.import',rows,documentId:'retained-original',hash,name:'TEST.xml'});
-const parent=(overrides={})=>syntheticBankRow({date:'2026-10-26',amount:62500,party:'',payerReference:'58197013',bankReference:'SWED-TEST-1',externalId:'api-id',account,description:'Bankgiro inbetalning',kind:'batch',source:'Enable Banking',...overrides});
+const parent=(overrides={})=>syntheticBankRow({date:'2026-10-26',amount:62500,party:'',payerReference:'99990004',bankReference:'SWED-TEST-1',externalId:'api-id',account,description:'Bankgiro inbetalning',kind:'batch',source:'Enable Banking',...overrides});
 const setup=(overrides={})=>applyCommand(emptyState(),{type:'transactions.import',trustedBankImport:true,rows:[parent(overrides)]}).state;
-const invoice=(s,overrides={})=>applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Café Gränden Bistro AB',number:'0599',ocr:'0599',total:62500,currency:'SEK',issued:'2026-10-01',due:'2026-10-28',reviewed:true,...overrides}}).state;
+const invoice=(s,overrides={})=>applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic Café Payer AB',number:'0599',ocr:'0599',total:62500,currency:'SEK',issued:'2026-10-01',due:'2026-10-28',reviewed:true,...overrides}}).state;
 const importRows=(s,rows=parseBankgiroXML(xml()),hash='fixture-1')=>applyCommand(s,command(rows,hash)).state;
 function compile(path,imports){let code=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+a+q,JSON.stringify(b));return 'data:text/javascript;base64,'+Buffer.from(code).toString('base64');}
 const domain=new URL('../lib/domain.ts',import.meta.url).href;
 const engine=new URL('../lib/reconciliation-engine.js',import.meta.url).href;
 const {reconcileState,analyze}=await import(compile('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine}));
 
-test('Bankgiro XML preserves Café, 0599, sender BG, settlement date and individual ID',()=>{const [r]=parseBankgiroXML(xml());assert.equal(r.party,'Café Gränden Bistro AB');assert.equal(r.payerReference,'0599');assert.equal(r.amount,62500);assert.equal(r.payerBankgiro,'501-8296');assert.equal(r.settlementDate,'2026-10-27');assert.equal(r.bankReference,'CHILD-1');assert.equal(r.parentBankReference,'SWED-TEST-1');});
-test('exact invoice, verified payer and linked original can reconcile automatically',()=>{let s=importRows(invoice(setup()));s=reconcileState(s).state;assert.equal(balance(s,s.invoices[0]),0);assert.equal(s.allocations.length,1);assert.equal(paymentInvoiceAssessment(s,s.transactions[1]).status,'verified');assert.equal(s.transactions[0].payerReference,'58197013');assert.equal(s.transactions[0].kind,'batch');});
+test('Bankgiro XML preserves Café, 0599, sender BG, settlement date and individual ID',()=>{const [r]=parseBankgiroXML(xml());assert.equal(r.party,'Synthetic Café Payer AB');assert.equal(r.payerReference,'0599');assert.equal(r.amount,62500);assert.equal(r.payerBankgiro,'999-0003');assert.equal(r.settlementDate,'2026-10-27');assert.equal(r.bankReference,'CHILD-1');assert.equal(r.parentBankReference,'SWED-TEST-1');});
+test('exact invoice, verified payer and linked original can reconcile automatically',()=>{let s=importRows(invoice(setup()));s=reconcileState(s).state;assert.equal(balance(s,s.invoices[0]),0);assert.equal(s.allocations.length,1);assert.equal(paymentInvoiceAssessment(s,s.transactions[1]).status,'verified');assert.equal(s.transactions[0].payerReference,'99990004');assert.equal(s.transactions[0].kind,'batch');});
 test('0599 missing never marks equal-amount 0594 paid',()=>{let s=importRows(invoice(setup(),{number:'0594',ocr:'0594'}));s=reconcileState(s).state;assert.equal(s.allocations.length,0);assert.match(paymentInvoiceAssessment(s,s.transactions[1]).message,/betalningsreferensen 0599/);});
 test('same amount on several invoices is never payment evidence',()=>{let s=invoice(invoice(setup(),{number:'0594',ocr:'0594'}),{number:'0600',ocr:'0600'});s=reconcileState(importRows(s)).state;assert.equal(s.allocations.length,0);});
-test('payment without OCR keeps identified payer but does not auto allocate',()=>{let s=importRows(invoice(setup()),parseBankgiroXML(xml(detail({ref:''}))));assert.equal(s.transactions[1].party,'Café Gränden Bistro AB');assert.equal(reconcileState(s).state.allocations.length,0);});
+test('payment without OCR keeps identified payer but does not auto allocate',()=>{let s=importRows(invoice(setup()),parseBankgiroXML(xml(detail({ref:''}))));assert.equal(s.transactions[1].party,'Synthetic Café Payer AB');assert.equal(reconcileState(s).state.allocations.length,0);});
 test('wrong OCR owned by a different customer never moves to another invoice',()=>{let s=invoice(invoice(setup(),{number:'0599',ocr:'0599',party:'Annan kund'}),{number:'0594',ocr:'0594'});s=reconcileState(importRows(s)).state;assert.equal(s.allocations.length,0);assert.ok(analyze(s).some(f=>f.kind==='reference_conflict'));});
 test('partial payment retains exact remaining öre',()=>{let s=reconcileState(importRows(invoice(setup(),{total:100001}))).state;assert.equal(balance(s,s.invoices[0]),37501);});
 test('overpayment allocates invoice total and retains remainder on child only',()=>{let s=reconcileState(importRows(invoice(setup(),{total:60000}))).state;assert.equal(balance(s,s.invoices[0]),0);assert.equal(available(s,s.transactions[1]),2500);});
@@ -30,10 +30,10 @@ test('two individual payments replace collective economically once and API refre
 test('wrong account or booking date remains blocked and cannot be manually verified',()=>{for(const override of [{account:'SE2080000890119146168431'},{date:'2026-10-25'},{bankReference:'OTHER'}]){const rows=parseBankgiroXML(xml()).map(r=>({...r,...override,parentBankReference:override.bankReference||r.parentBankReference})),s=importRows(invoice(setup()),rows);assert.equal(s.transactions[1].specificationStatus,'review');assert.equal(reconcileState(s).state.allocations.length,0);assert.equal(economicTransactions(s).reduce((n,t)=>n+t.amount,0),62500);assert.throws(()=>applyCommand(s,{type:'transaction.verify',id:s.transactions[1].id,note:'test',party:s.transactions[1].party}),/kopplas/);}});
 test('incomplete sums and declared counts cannot unlock parent',()=>{assert.throws(()=>parseBankgiroXML(xml(detail({amount:'600.00'}))),/summan/);assert.throws(()=>parseBankgiroXML(xml(detail(),'625.00','<NtryDtls><Btch><NbOfTxs>2</NbOfTxs></Btch></NtryDtls>')),/antal/);assert.throws(()=>parseBankgiroXML(xml(detail({amount:'125.00'})+detail({amount:'500.00'})).replace('<AmtDtls><TxAmt><Amt Ccy="SEK">125.00</Amt></TxAmt></AmtDtls>','')),/individuellt belopp/);});
 test('same file and changed filename do not create a second spendable payment',()=>{let s=importRows(setup());s=importRows(s);assert.equal(s.transactions.length,2);s=importRows(s,parseBankgiroXML(xml()),'same-content-new-hash');assert.equal(s.transactions.length,2);assert.equal(economicTransactions(s).reduce((n,t)=>n+t.amount,0),62500);});
-test('overlapping Swedbank individual payment holds specification for duplicate review',()=>{let s=setup();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[parent({kind:'payment',externalId:'individual-1',description:'Individual payment',bankReference:'CHILD-1',party:'Café Gränden Bistro AB',payerReference:'0599',verified:true})]}).state;s=importRows(s);assert.equal(s.transactions.at(-1).verified,false);assert.equal(s.transactions.at(-1).specificationStatus,'review');});
+test('overlapping Swedbank individual payment holds specification for duplicate review',()=>{let s=setup();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[parent({kind:'payment',externalId:'individual-1',description:'Individual payment',bankReference:'CHILD-1',party:'Synthetic Café Payer AB',payerReference:'0599',verified:true})]}).state;s=importRows(s);assert.equal(s.transactions.at(-1).verified,false);assert.equal(s.transactions.at(-1).specificationStatus,'review');});
 test('scanned, malformed, DTD, oversized and foreign currency inputs fail safely',()=>{assert.throws(()=>parseSpecificationBytes(new TextEncoder().encode('%PDF-1.7 scan'),'bank.xml'));assert.throws(()=>parseBankgiroXML(xml().replace('</Ntry>','</Wrong>')));assert.throws(()=>parseBankgiroXML('<!DOCTYPE x>'+xml()));assert.throws(()=>parseBankgiroXML(xml().replaceAll('Ccy="SEK"','Ccy="EUR"')));assert.throws(()=>parseSpecificationBytes(new Uint8Array(15_000_001),'bank.csv'));});
-const csv='Betalningsdatum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp;Valuta;Mottagarkonto;Bankreferens\n2026-10-26;Café Gränden Bistro AB;0599;501-8296;625,00;SEK;'+account+';SWED-TEST-1';
-test('Bankgiro CSV mapping preserves sender BG separately and matches whole batch',()=>{const rows=parseBankgiroCSV(csv);assert.equal(rows[0].payerReference,'0599');assert.equal(rows[0].payerBankgiro,'501-8296');assert.equal(rows[0].recipientBankgiro,'');assert.equal(specificationPreview(setup(),rows).linked,1);});
+const csv='Betalningsdatum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp;Valuta;Mottagarkonto;Bankreferens\n2026-10-26;Synthetic Café Payer AB;0599;999-0003;625,00;SEK;'+account+';SWED-TEST-1';
+test('Bankgiro CSV mapping preserves sender BG separately and matches whole batch',()=>{const rows=parseBankgiroCSV(csv);assert.equal(rows[0].payerReference,'0599');assert.equal(rows[0].payerBankgiro,'999-0003');assert.equal(rows[0].recipientBankgiro,'');assert.equal(specificationPreview(setup(),rows).linked,1);});
 test('Windows-1252 input and missing mandatory currency are handled explicitly',()=>{const bytes=Buffer.from(csv.replace('ä','a').replace('ä','a'),'latin1');assert.match(parseSpecificationBytes(bytes,'BANK.csv')[0].party,/Café/);assert.throws(()=>parseBankgiroCSV(csv.replace(';Valuta','').replace(';SEK','')),/valuta saknas/);});
 test('selected parent is checked and previously allocated or conflicting batch cannot release',()=>{const s=setup(),rows=parseBankgiroXML(xml());assert.equal(specificationPreview(s,rows,'other-parent').review,1);s.allocations.push({transactionId:s.transactions[0].id,active:true});assert.equal(specificationPreview(s,rows).review,1);});
 test('pending specification can be reevaluated when original bank parent arrives later',()=>{let s=importRows(emptyState());assert.equal(s.transactions[0].specificationStatus,'review');s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[parent()]}).state;s=importRows(s);assert.equal(s.transactions.length,2);assert.equal(s.transactions[0].specificationStatus,'linked');assert.equal(economicTransactions(s).reduce((n,t)=>n+t.amount,0),62500);});
@@ -65,8 +65,8 @@ test('V3 explicit Swedish OCR type validates checksum while a numeric invoice nu
 
 test('V3 payer organisation and masked account survive original import',()=>{
  const input=xml(detail().replace('</Nm>','</Nm><Id><OrgId><Othr><Id>556123-4567</Id></Othr></OrgId></Id>'));
- const [r]=parseBankgiroXML(input);assert.equal(r.organizationNumber,'');assert.equal(r.payerEvidence.identifiers[0].rawValue,'556123-4567');assert.equal(r.payerAccount,'•••• 8296');
- const s=importRows(setup(),[r]);assert.equal(s.transactions[1].payerAccount,'•••• 8296');assert.equal(s.transactions[1].organizationNumber,'');assert.equal(s.transactions[1].payerEvidence.identifiers[0].rawValue,'556123-4567');
+ const [r]=parseBankgiroXML(input);assert.equal(r.organizationNumber,'');assert.equal(r.payerEvidence.identifiers[0].rawValue,'556123-4567');assert.equal(r.payerAccount,'•••• 0003');
+ const s=importRows(setup(),[r]);assert.equal(s.transactions[1].payerAccount,'•••• 0003');assert.equal(s.transactions[1].organizationNumber,'');assert.equal(s.transactions[1].payerEvidence.identifiers[0].rawValue,'556123-4567');
 });
 
 test('V3 conflicting individual references and a different payer never create allocations',()=>{
@@ -76,7 +76,7 @@ test('V3 conflicting individual references and a different payer never create al
 });
 
 test('V3 company Bankgiro mistaken for OCR blocks automation even if an invoice stores it',()=>{
- const s=importRows(invoice(setup(),{ocr:'5819-7013',bankgiro:'5819-7013'}),parseBankgiroXML(xml(detail({ref:'58197013'}))));
+ const s=importRows(invoice(setup(),{ocr:'9999-0004',bankgiro:'9999-0004'}),parseBankgiroXML(xml(detail({ref:'99990004'}))));
  assert.equal(reconcileState(s).state.allocations.length,0);assert.ok(analyze(s).some(f=>/eget Bankgironummer/.test(f.reason)));
 });
 
@@ -141,7 +141,7 @@ test('duplicate financial XML singletons never silently select the first bank fa
   ['<Amt Ccy="SEK">625.00</Amt>','<Amt Ccy="SEK">625.00</Amt><Amt Ccy="SEK">999.00</Amt>'],
   ['<CdtDbtInd>CRDT</CdtDbtInd>','<CdtDbtInd>CRDT</CdtDbtInd><CdtDbtInd>DBIT</CdtDbtInd>'],
   ['<BookgDt><Dt>2026-10-26</Dt></BookgDt>','<BookgDt><Dt>2026-10-26</Dt><Dt>2026-10-25</Dt></BookgDt>'],
-  ['<Dbtr><Nm>Café Gränden Bistro AB</Nm></Dbtr>','<Dbtr><Nm>Café Gränden Bistro AB</Nm><Nm>Annan betalare AB</Nm></Dbtr>'],
+  ['<Dbtr><Nm>Synthetic Café Payer AB</Nm></Dbtr>','<Dbtr><Nm>Synthetic Café Payer AB</Nm><Nm>Annan betalare AB</Nm></Dbtr>'],
   ['<Refs><TxId>CHILD-1</TxId></Refs>','<Refs><TxId>CHILD-1</TxId><TxId>CHILD-2</TxId></Refs>'],
  ])assert.throws(()=>parseBankgiroXML(xml().replace(before,after)),/XML|tvetyd|flera/);
 });
@@ -155,11 +155,11 @@ test('CSV dates cannot discard trailing content and XML date-times remain explic
 test('ambiguous CSV headers, column counts and malformed quoted payer names fail closed',()=>{
  for(const input of [
   csv.replace(';Belopp;',';Belopp;Inbetalningsbelopp;').replace(';625,00;',';625,00;999,00;'),
-  csv.replace(';Avsändare;',';Avsändare;Betalare;').replace(';Café Gränden Bistro AB;',';Café Gränden Bistro AB;Annan kund;'),
+  csv.replace(';Avsändare;',';Avsändare;Betalare;').replace(';Synthetic Café Payer AB;',';Synthetic Café Payer AB;Annan kund;'),
   csv+';extra-column',
-  csv.replace('Café Gränden Bistro AB','Café "Gränden" Bistro AB'),
-  csv.replace('Café Gränden Bistro AB','"Café Gränden Bistro AB"annat'),
+  csv.replace('Synthetic Café Payer AB','Café "Gränden" Bistro AB'),
+  csv.replace('Synthetic Café Payer AB','"Synthetic Café Payer AB"annat'),
  ])assert.throws(()=>parseBankgiroCSV(input),/CSV|kolumn|citat|tvetyd/i);
- assert.equal(parseBankgiroCSV(csv.replace('Café Gränden Bistro AB','"Café ""Gränden""; Bistro AB"'))[0].party,'Café "Gränden"; Bistro AB');
+ assert.equal(parseBankgiroCSV(csv.replace('Synthetic Café Payer AB','"Café ""Gränden""; Bistro AB"'))[0].party,'Café "Gränden"; Bistro AB');
 });
 

@@ -2,7 +2,7 @@ import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,individualPa
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 
-type Candidate={number:string;party?:string};
+type Candidate={number:string;party?:string;identifiers?:{field:string;value:string}[];referenceFields?:{field:string;value:string}[]};
 const hasBankSource=(t:Transaction)=>['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'')&&!needsBankFileValidation(t);
 const cleanParty=(value?:string)=>{
   const name=String(value||'').trim();
@@ -75,7 +75,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   const assessment=bankPaymentInvoiceAssessment(state,t,fieldSources),evidenceView=paymentEvidenceView(t),requiresSpecification=needsPaymentSpecification(t);
   const allocations=state.allocations.filter(a=>a.active&&a.transactionId===t.id),invoices=allocations.map(a=>state.invoices.find(i=>i.id===a.invoiceId)).filter(i=>!!i);
   const invoiceNumbers=[...new Set(invoices.map(i=>i.number))];
-  const selectedReference=fieldSources.reference.value.value,sourceCandidates=candidates.filter(c=>!selectedReference||exactReference(selectedReference,c.number)||state.invoices.some(i=>i.number===c.number&&i.ocr&&exactReference(selectedReference,i.ocr)));
+  const selectedReference=fieldSources.reference.value.value,sourceCandidates=candidates.filter(c=>!selectedReference||exactReference(selectedReference,c.number)||(c.identifiers||c.referenceFields||[]).some(identifier=>exactReference(selectedReference,identifier.value))||state.invoices.some(i=>i.number===c.number&&i.ocr&&exactReference(selectedReference,i.ocr)));
   const possible=[...new Set([...sourceCandidates.map(c=>c.number),...(assessment.status!=='verified'&&assessment.invoice?[assessment.invoice.number]:[])])];
   const evidence=fieldSources.reference.evidence;
   const references=matchingReferenceValues(evidence,fieldSources.reference.value.value);

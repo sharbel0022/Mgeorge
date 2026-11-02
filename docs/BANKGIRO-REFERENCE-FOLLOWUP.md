@@ -1,10 +1,12 @@
 # OCR och fakturanummer – uppföljning 2026-10-28
 
+> Motpartsnamn och Bankgironummer i exemplen är anonymiserade med syntetiska testvärden. Historiska slutsatser avser det ursprungliga underlaget.
+
 Användarens skärmbild visade att den faktiska 625-kronorsposten fortfarande saknade OCR och fakturanummer. Version 24 hade infört import men inte fyllt dataluckan för den befintliga bankposten.
 
 ## Verklig kontroll
 
-Swedbanks sparade CSV visar 625 kr den 26 oktober och texten 58197013. Samma text återkommer på många andra insättningar och är företagets Bankgiro 5819-7013, inte ett kund-OCR. Den får inte användas som fakturanummer.
+Swedbanks sparade CSV visar 625 kr den 26 oktober och texten 99990004. Samma text återkommer på många andra insättningar och är företagets Bankgiro 9999-0004, inte ett kund-OCR. Den får inte användas som fakturanummer.
 
 Bankintegrationen använde bara kontots transaktionslista. Version 25 lade till Enable Bankings dokumenterade detalj-API. Kontot, den stabila bankreferensen, bokföringsdatumet, beloppet, valutan och riktningen kontrolleras mot en ny lista innan aktuellt tillfälligt transaction_id används. Bankens svar sparas som ägarskyddat original i R2 och kontrollen loggas. Ursprungliga bankfält, samlingsstatus, allokeringar och fakturasaldon ändras inte.
 

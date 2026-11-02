@@ -1,5 +1,19 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Samlad betalningskedja — ny verifiering 2026-11-02
+
+| Område | Före | Efter | Ny evidens och gräns |
+| --- | ---: | ---: | --- |
+| Konto/Bankgiroimport | 8,5 | 8,5 | Verkligt schemafel observerat och rättat; entydigt bankalias får inte uppfinnas. Slutlig livekontroll återstår efter publicering. |
+| Betalare/referens | 7 | 7 | Privat individoriginal, ledande nollor och primär juridisk identitetskälla omgranskade; bankens rapport-/AIS-samband är separat. |
+| Automatisk matchning | 7,5 | 7,5 | Samma13-fallskorpus5/13→13/13 för read-onlypreview,0 tillståndsändringar. Ingen verksamhetsallokering eller ny ekonomimotor. |
+| Säkerhet/åtkomst | 8,5 | 8,5 | Explicit ägar-/origin-/revisionsbunden konto-POST, trusted serverval och oförändrade publika MCP-selectorer; otillräckliga/motstridiga svar hålls. |
+| Kod/tester | 8,5 | 8,5 | Baseline775/1323; slutligSites1381, TS/syntax98/rent bygge och oberoende review. Produktionsaudit0,16 moderate utvecklingsfynd. |
+| Verklig produktion | 6,5 | 6,5 | Aktuell bank-/original-/registerläsning fungerar; browser-QA/inloggad resa och återstående bankbevis förhindrar högre slutbetyg. |
+
+Övriga områden och senaste användbarhetsbetyg behålls. [Full rapport, mätningar och begränsningar](docs/REAL-PAYMENT-0599-FINAL-REPORT.md). Ingen9,5-inflation eller falsk betaldmarkering. Slutligt leveranskvitto tillkommer efter exakt CI/publicering och läsande efterkontroll.
+
+
 ## OCR och fullständig evidens — aktuell mätning
 
 | Berört område | Före | Efter | Evidens och gräns |

@@ -1,5 +1,7 @@
 # Bankgiro – leverans 2026-10-28
 
+> Motpartsnamn och Bankgironummer i exemplen är anonymiserade med syntetiska testvärden. Historiska slutsatser avser det ursprungliga underlaget.
+
 ## Implementerat
 
 Den befintliga Sites-källan finns nu komplett i `sites/` i GitHub-repositoryt. Tidigare fanns endast patchar. Källan motsvarar Sites-commit `3546fb00dcb990a28dc8709da2ca3a5b630dad90`, version 24. Projektet är fortsatt `appgprj_6adf2f7f7e848191b64192161886b528`.
@@ -21,9 +23,9 @@ Node-versionen har dessutom fått in PR #6, stöd för Betalningsdatum, separat 
 
 209/209 Node-tester och 209/209 Sites-tester passerar. Sites har 28 nya tester för Bankgirodomän och verkliga API-funktioner med isolerade SQLite/D1- och R2-gränser. TypeScript, syntaxkontroll och produktionsbygge är godkända.
 
-Tester täcker Café Gränden Bistro AB/0599/625 kr; exakt faktura; saknad faktura; flera fakturor med samma belopp; saknad OCR; referens som tillhör annan kund; delbetalning; överbetalning; två betalningar per insättning; fel datum/konto/identifierare; ofullständiga belopp och antal; dubbelimport; överlappande bankunderlag; skannad/felaktig/överdimen­sionerad/DTD-indata; avslutad session; fel origin; ägaråtkomst; återläsning av originalet och skydd mot manipulerade browserrader. Importvägen har inget anrop som skickar kundmejl.
+Tester täcker Synthetic Café Payer AB/0599/625 kr; exakt faktura; saknad faktura; flera fakturor med samma belopp; saknad OCR; referens som tillhör annan kund; delbetalning; överbetalning; två betalningar per insättning; fel datum/konto/identifierare; ofullständiga belopp och antal; dubbelimport; överlappande bankunderlag; skannad/felaktig/överdimen­sionerad/DTD-indata; avslutad session; fel origin; ägaråtkomst; återläsning av originalet och skydd mot manipulerade browserrader. Importvägen har inget anrop som skickar kundmejl.
 
-I lokal Workers-miljö genomfördes det verkliga webbflödet: syntetisk Swedbank-samlingspost och faktura 0599 → filval → förhandsgranskning → importbekräftelse → Café Gränden Bistro AB/0599 → automatiskt verifierad betalning 625 kr. Originalet kan hämtas från R2 och föräldern öppnas separat. Mobilbredd 390 px gav dokumentbredd och scrollbredd 390 px.
+I lokal Workers-miljö genomfördes det verkliga webbflödet: syntetisk Swedbank-samlingspost och faktura 0599 → filval → förhandsgranskning → importbekräftelse → Synthetic Café Payer AB/0599 → automatiskt verifierad betalning 625 kr. Originalet kan hämtas från R2 och föräldern öppnas separat. Mobilbredd 390 px gav dokumentbredd och scrollbredd 390 px.
 
 Lokala bildbevis: `.codex-work/bankgiro-local-verifierad.png` och `.codex-work/bankgiro-local-mobil.png`. Dessa är syntetiska testuppgifter, inte företagets verkliga betalningar.
 
@@ -35,13 +37,13 @@ Anslutningsstatus från den befintliga MG Fakturakoll-pluginen visade Swedbank a
 
 En vanlig HTTP-läsning av produktions-API:erna kräver fortfarande användarens ChatGPT-inloggning och svarade 401 utan den. De publicerade Bankgirovägarna gav också 401 utan session.
 
-Efter uttryckligt godkännande användes användarens redan inloggade Chrome-flik och den publicerade versionen laddades om. Den riktiga posten 625 kr den 26 oktober, konto ••••0101 och referenstext 58197013 visades som samlingspost med saknad individuell OCR. Ingen faktura presenterades som betald. Den nya importdialogen öppnades och visade Bekräfta import spärrad före filval.
+Efter uttryckligt godkännande användes användarens redan inloggade Chrome-flik och den publicerade versionen laddades om. Den riktiga posten 625 kr den 26 oktober, konto ••••0101 och referenstext 99990004 visades som samlingspost med saknad individuell OCR. Ingen faktura presenterades som betald. Den nya importdialogen öppnades och visade Bekräfta import spärrad före filval.
 
 Test av syntetisk fil i produktionsförhandsgranskningen kunde inte slutföras: Chrome-tilläggets filåtkomst var avstängd. Inga tilläggsbehörigheter ändrades. Försöket med vanligt filval stoppades sedan av datorverktyget eftersom aktuell Chrome-adress inte kunde fastställas tillräckligt säkert. UI-kontrollen avslutades där. Den lokala fullflödeskontrollen ska därför inte beskrivas som en bekräftad import i företagets produktionsregister.
 
 ## Kvar att verifiera
 
-Företagets verkliga Bankgiroexport har inte tillhandahållits. Sambandet mellan Café Gränden Bistro AB/0599/625 kr och Swedbankposten med referenstext 58197013 är fortfarande obevisat. Inga fakturor, inklusive 0594, får markeras betalda på den grunden.
+Företagets verkliga Bankgiroexport har inte tillhandahållits. Sambandet mellan Synthetic Café Payer AB/0599/625 kr och Swedbankposten med referenstext 99990004 är fortfarande obevisat. Inga fakturor, inklusive 0594, får markeras betalda på den grunden.
 
 Bankgirots officiella manual dokumenterar fälten i Insättningsuppgift via Internet, men ingen universell CSV-exportlayout kunde verifieras. Swedbank dokumenterar camt.054; länkad MIG-PDF och exempel-ZIP gav 403. Testfilerna är syntetiska och stödprofilen behöver verifieras mot ett verkligt original. Olika datum eller identifierare hålls för granskning.
 

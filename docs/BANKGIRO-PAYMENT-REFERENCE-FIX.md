@@ -1,7 +1,9 @@
 # Bankgiro: betalningsreferens och avsändare
 
+> Motpartsnamn och Bankgironummer i exemplen är anonymiserade med syntetiska testvärden. Historiska slutsatser avser det ursprungliga underlaget.
+
 ## Bekräftat från användarens två skärmbilder
-Bankgiros webblista visar en individuell post med avsändare **Café Gränden Bistro AB**, betalningsreferens **0599**, fältet **Bankgironummer/Avinummer** och belopp **625,00 kr**. MG Fakturakoll visar för 26 oktober en Swedbank-samlingspost på **625,00 kr** med okänd betalare och bankens egen referens. Det är **inte verifierat** att bilderna representerar samma transaktionsunderlag: datum och kontokoppling måste jämföras.
+Bankgiros webblista visar en individuell post med avsändare **Synthetic Café Payer AB**, betalningsreferens **0599**, fältet **Bankgironummer/Avinummer** och belopp **625,00 kr**. MG Fakturakoll visar för 26 oktober en Swedbank-samlingspost på **625,00 kr** med okänd betalare och bankens egen referens. Det är **inte verifierat** att bilderna representerar samma transaktionsunderlag: datum och kontokoppling måste jämföras.
 
 ## Denna kodändring
 Node-CSV-importen känner nu igen rubriken `Betalningsreferens` och behåller `0599` som betalningsreferens. Testet kontrollerar att den inte förvandlas till bankens `bank_reference` och att avsändarnamnet bevaras. Koden hittar inte av sig själv uppgifter inne på Bankgiros inloggade webbplats.

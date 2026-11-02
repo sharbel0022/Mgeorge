@@ -28,3 +28,13 @@ test('untrusted error properties cannot forge a provider schema diagnostic',()=>
  assert.equal(adapter.providerResponseDiagnostic(malicious),null);
  assert.equal(adapter.providerResponseDiagnostic({code:'INVALID_PROVIDER_RESPONSE',validationIssue:{field:account,kind:'string'}}),null);
 });
+
+test('the observed null alias collection is retained as no additional aliases',async t=>{
+ const r=resource();r.all_account_ids=null;t.mock.method(globalThis,'fetch',async()=>json(r));
+ const result=await adapter.getAccountDetails(config,account);assert.equal(result.all_account_ids,null);assert.equal(result.account_id.iban,'SE4280000890119146168423');
+});
+test('nullable alias collection does not permit malformed lists or other null account fields',async t=>{
+ for(const change of [r=>{r.all_account_ids='BBAN';},r=>{r.all_account_ids=[null];},r=>{r.all_account_ids=[{identification:'123',scheme_name:null}];},r=>{r.account_id=null;},r=>{r.account_id.other=null;},r=>{r.uid=null;},r=>{r.currency=null;}]){
+  const r=resource();r.all_account_ids=null;change(r);t.mock.method(globalThis,'fetch',async()=>json(r));await assert.rejects(adapter.getAccountDetails(config,account),e=>e.code==='INVALID_PROVIDER_RESPONSE');
+ }
+});

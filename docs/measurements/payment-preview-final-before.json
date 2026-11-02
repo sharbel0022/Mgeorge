@@ -1,0 +1,138 @@
+{
+  "schema": "mgeorge-payment-preview-v1",
+  "synthetic": true,
+  "runnerSha256": "ef724d0b54591f26f9bbc9c4275e9dd9282603bd12237706f1d8e6a9a527bef1",
+  "harnessSha256": "ad25d3dc205fef14d319658f23ecc29b1ad24e2a5b2ba3096a8285a8c6fd8ac2",
+  "loadedHarnessSha256": "a67bc7dfc4d9564ec6706703daab3ccf93275197170373c4c4586551c57cb492",
+  "sourceCommit": "31aa90ade9ee957af193ecef36f96971924217d5",
+  "sourceModifiedFromCommit": [],
+  "sourceHashes": {
+    "sites/lib/payment-verification.ts": "f54256a969f0a48c3980b46d9341082851aa43806c65b6c43f61eda99e11eeea",
+    "sites/lib/banking/invoice-candidates.ts": "c8ebcf3902d7abed390dbfe8329ef968fa9c9f72fb1b833ea98c121900fb883c",
+    "sites/lib/payment-presentation.ts": "7702aec165c54f76ec0dbea9f711df9e494228e5195d14a9d916c51ed52ea82e"
+  },
+  "corpusSha256": "fe0c3f24db68e3c713c764db7c5ba41df42541186a0b35185fbca567bff5c753",
+  "cases": 13,
+  "correct": 5,
+  "stateUnchanged": 13,
+  "scope": "Pure real verification projection with controlled intact-original/current-account context and actual reconciliation findings; existing test loader, synthetic bank fixtures. runnerSha256 covers this runner; harnessSha256 covers the source checkout test file; loadedHarnessSha256 covers the imported prelude. sourceCommit identifies HEAD at measurement time, with modified measured files listed separately; sourceHashes cover only the three named projection files, not the entire dependency tree. Opaque fixture IDs/receipt timestamps are generated; no production authorization, external bank relation or OCR accuracy is measured.",
+  "details": [
+    {
+      "name": "registered positive control",
+      "correct": true,
+      "unchanged": true,
+      "invoiceStatus": "passed",
+      "customerStatus": "passed",
+      "automaticEligible": true,
+      "countedEconomically": null
+    },
+    {
+      "name": "registered original with one competing reference original",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "passed",
+      "customerStatus": "passed",
+      "automaticEligible": true,
+      "countedEconomically": null
+    },
+    {
+      "name": "registered original also found in Gmail is one subject",
+      "correct": true,
+      "unchanged": true,
+      "invoiceStatus": "passed",
+      "customerStatus": "passed",
+      "automaticEligible": true,
+      "countedEconomically": null
+    },
+    {
+      "name": "intact unregistered original availability",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "review",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    },
+    {
+      "name": "current extracted reference differs from invoice number",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "missing",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    },
+    {
+      "name": "legacy extracted OCR differs from invoice number",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "missing",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    },
+    {
+      "name": "leading zeros remain distinct",
+      "correct": true,
+      "unchanged": true,
+      "invoiceStatus": "missing",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    },
+    {
+      "name": "current extraction never merges stale source",
+      "correct": true,
+      "unchanged": true,
+      "invoiceStatus": "missing",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    },
+    {
+      "name": "multiple original candidates without register",
+      "correct": true,
+      "unchanged": true,
+      "invoiceStatus": "blocked",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    },
+    {
+      "name": "multiple reference candidates alongside reviewed register",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "passed",
+      "customerStatus": "passed",
+      "automaticEligible": true,
+      "countedEconomically": null
+    },
+    {
+      "name": "conflicting reference and OCR alongside reviewed register",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "passed",
+      "customerStatus": "passed",
+      "automaticEligible": true,
+      "countedEconomically": null
+    },
+    {
+      "name": "economic record is explicitly identified",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "missing",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    },
+    {
+      "name": "review report is not a second economic deposit",
+      "correct": false,
+      "unchanged": true,
+      "invoiceStatus": "missing",
+      "customerStatus": "review",
+      "automaticEligible": false,
+      "countedEconomically": null
+    }
+  ]
+}

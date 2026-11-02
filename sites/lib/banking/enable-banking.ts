@@ -19,7 +19,7 @@ export type ProviderBank = ProviderBankIdentity & {
 export type ProviderAccountIdentification = { iban?: string | null; other?: { identification: string; scheme_name: string } | null };
 export type ProviderAccount = {
   uid: string; account_id?: ProviderAccountIdentification | null;
-  all_account_ids?: { identification: string; scheme_name: string }[];
+  all_account_ids?: { identification: string; scheme_name: string }[] | null;
   identification_hash?: string; identification_hashes?: string[];
   name?: string; details?: string; currency?: string; usage?: 'ORGA' | 'PRIV';
   cash_account_type?: string;
@@ -319,7 +319,8 @@ export async function getAccountDetails(config:ProviderConfig,accountUid:string)
  if(primary.iban!==undefined&&(typeof primary.iban!=='string'||!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(primary.iban)))throw invalidResponse('account_id.iban',primary.iban);
  if(primary.other!==undefined)generic(primary.other,'account_id.other');
  if(result.uid!==undefined&&(typeof result.uid!=='string'||result.uid!==accountUid))throw invalidResponse('uid',result.uid);
- if(result.all_account_ids!==undefined){
+ // Observed provider null means no additional aliases; retain the raw value.
+ if(result.all_account_ids!==undefined&&result.all_account_ids!==null){
   if(!Array.isArray(result.all_account_ids)||result.all_account_ids.length>50)throw invalidResponse('all_account_ids',result.all_account_ids);
   for(const id of result.all_account_ids)generic(id,'all_account_ids[]');
  }

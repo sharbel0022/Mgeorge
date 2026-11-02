@@ -5,7 +5,7 @@ import {readPaymentVerification} from './payment-verification';
 import {bankgiroRetainedPreview} from './bankgiro-service';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
-import {candidateDocuments,readInvoiceFields} from './banking/invoice-candidates';
+import {matchingDocumentCandidates} from './banking/invoice-candidates';
 
 // The MCP text block is a short summary, rather than a second serialized copy.
 // This leaves room for the largest permitted request ID in the RPC envelope.
@@ -111,19 +111,11 @@ export async function readPaymentEvidence(input:unknown){
  const exactCount=rows.filter(row=>row.selection==='exact_reference').length,payments=[];
  for(const {t,selection,referenceSearch}of rows.slice(args.offset,args.offset+args.limit)){
   const view=bankPaymentView(state,t),assessment=bankPaymentInvoiceAssessment(state,t),verification=await readPaymentVerification(user.userId,state,t.id);
-  payments.push({transactionId:t.id,selection,selectionIsProof:false,date:t.date,amountCents:t.amount,currency:t.currency,source:t.source,bankReference:t.bankReference,payer:view.payerKnown?view.payer:'',reference:view.reference,referenceSearch,registry:registry(state,view.reference.value),bookedInvoices:assessment.bookedInvoices.slice(0,20).map(i=>invoiceFact(state,i)),bookedInvoiceCount:assessment.bookedInvoices.length,allocationConflict:assessment.allocationConflict,verification:safeVerification(verification)});
+  payments.push({transactionId:t.id,countedEconomically:verification.countedEconomically,selection,selectionIsProof:false,date:t.date,amountCents:t.amount,currency:t.currency,source:t.source,bankReference:t.bankReference,payer:view.payerKnown?view.payer:'',reference:view.reference,referenceSearch,registry:registry(state,view.reference.value),bookedInvoices:assessment.bookedInvoices.slice(0,20).map(i=>invoiceFact(state,i)),bookedInvoiceCount:assessment.bookedInvoices.length,allocationConflict:assessment.allocationConflict,verification:safeVerification(verification)});
  }
  const documents=await db().prepare("SELECT s.document_id,s.status,s.extraction,j.extraction job_extraction FROM gmail_sources s LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=? AND s.status<>'rejected' ORDER BY s.created_at DESC LIMIT 1001").bind(user.userId).all<any>();
  const sourceReference=ref||(payments.length===1?payments[0].reference.value:''),scanned=documents.results.slice(0,1000);
- const sourceCandidates=candidateDocuments(scanned).flatMap(candidate=>{
-  const row=scanned.find((r:any)=>r.document_id===candidate.documentId),job=readInvoiceFields(row?.job_extraction),fromJob=Object.keys(job).length>0,fields=fromJob?job:readInvoiceFields(row?.extraction);
-  // The current processor stores interpretInvoice.fields.reference. The legacy
-  // ocr field is a separate observation: neither may overwrite the other.
-  const referenceFields=['reference','ocr'].flatMap(field=>typeof fields[field]==='string'&&fields[field].trim()?[{field,value:fields[field] as string}]:[]);
-  const matchedFields=[{field:'number',value:candidate.number},...referenceFields].filter(item=>exactReference(sourceReference,item.value)).map(item=>item.field);
-  const referenceConflict=referenceFields.length>1&&!exactReference(referenceFields[0].value,referenceFields[1].value);
-  return matchedFields.length?[{...candidate,matchedField:matchedFields[0],matchedFields,extractionSource:fromJob?'document_jobs':'gmail_sources',referenceFields,referenceConflict,originalVerified:false}]:[];
- });
+ const sourceCandidates=matchingDocumentCandidates(scanned,sourceReference).map(candidate=>({...candidate,originalVerified:false}));
  const referenceRegistry=registry(state,ref),next=args.offset+payments.length<rows.length?args.offset+payments.length:null,sourceComplete=documents.results.length<=1000&&sourceCandidates.length<=20,snapshotCurrent=await snapshotStillCurrent(user.userId,revision),referenceSearchComplete=(ref?sources:rows).every(row=>!row.referenceSearch.incomplete);
  return response(bounded(privateProjection({...base,offset:args.offset,limit:args.limit,total:rows.length,exactReferenceCount:exactCount,ambiguous:exactCount>1||referenceRegistry.ambiguous||rows.some(row=>row.referenceSearch.conflicting),referenceSearchComplete,candidateOnlyNotice:'Alla referenssökningar väljer endast granskningsförslag. Datum och belopp bevisar aldrig betalnings-, kund- eller fakturasamband.',registry:referenceRegistry,sourceCandidates:sourceCandidates.slice(0,20),sourceCandidateCount:sourceCandidates.length,sourceSearchComplete:sourceComplete,sourceSearchLimit:1000,snapshotCurrent,payments,nextOffset:next,complete:next===null&&referenceSearchComplete&&sourceComplete&&referenceRegistry.complete&&payments.every(p=>p.registry.complete&&p.bookedInvoiceCount<=20)&&snapshotCurrent},state),'payments'));
 }

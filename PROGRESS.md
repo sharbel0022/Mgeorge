@@ -1,5 +1,14 @@
 # Verifierad progress
 
+## Samlad betalningsslutkontroll — 2026-11-02
+
+Mainstart31aa90a/Sites49 inventerad. Alla tre privata läsverktyg fungerar nu; aktuell registerkontroll visar att målpost saknas, ägt bankoriginal och AIS-kvitto passerar. Verkliga original återhämtade privat,12/12 workbook och9/9 fakturafält per motor. Faktisk providerorsak observerad på Sites50: valfri all_account_ids=null; enda null-kompatibilitetsrättningen ger inga påhittade alias. Ägar-/medgivande-/snapshot- och identitetsgränser behållna.
+
+Gemensamma fakturakandidater/ledande nollor/källprioritet, original separat från registrering, ekonomisk medlemskapstext, explicit transient kontokontroll med serverfence och privat bytekvitto implementerade. Oberoende granskningar fann och ledde till RED/GREEN-rättningar av felkod-getter, kandidatambiguitet även med registerpost, kundstatus, klientens gränsvärden och stale serverval. Slutreview godkänner distinkta original inklusive ett enda konkurrerande underlag; samma original dedupliceras.
+
+Samma13-fallskorpus5/13→13/13 korrekta previewbeslut,13/13 oförändrade tillstånd före/efter. Ren baseline775 Node/1323 Sites; slutligSites1381/1381, TS, syntax98 och rent bygge godkända. Root/produktionsaudit0; fullSites16 moderate. Browser390/1440/inloggad UI är blockerad av previewdaemon/inloggning och räknas inte som passerad. QA-route/stale chunks borttagna,347 färska byggfiler utan QA-referens. [Samlad rapport](docs/REAL-PAYMENT-0599-FINAL-REPORT.md). Slutlig main/CI/Sites och faktisk konto-/originalefterkontroll kompletteras efter publicering. Inga riktiga ekonomiska skrivningar eller nya scheman; backupmanifest195/195,112 äldre API-poster utan kvitto inom redovisad omfattning. Alla senaste poäng behålls i väntan på bankbevis och full browserverifiering.
+
+
 ## Fullständig OCR- och evidensrättning — pågående leverans
 
 Utgångspunkt main `dfd8526`. Båda motorerna rättade för kompletta referenstoken, alla etikettförekomster/monetära kolumner, OCR-proveniens och skannad PDF med digital sidfot. Ny gemensam princip för positionerade PDF-fragment bevarar siffror och kolumner. Högkvalitativ begränsad rasterförstoring rättade det uppmätta JPEG-felet utan grå-/färgförlust. Ägarbundna skrivfria MCP-läsare tillför fullständig avgränsad register-/original-/AIS-evidens; separat aktuell kontoläsare gör endast befintliga AIS-GET och kräver exakt aktuellt konto-/medgivandemedlemskap.

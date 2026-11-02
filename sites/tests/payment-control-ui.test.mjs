@@ -29,8 +29,8 @@ test('empty queue never asserts paid status, and all risk categories remain avai
 test('review keeps selected evidence beside the unresolved list without opening a dialog',()=>{
  const task={id:'batch',entity_id:'tx',type:'specification',title:'Samlingsbetalning',reason:'Specifikation saknas',action:'Lägg till underlag',amount_cents:62500,priority:15,date:'2026-10-26'};
  let detail;
- const html=render(ui.ControlReview,{data:{queue:[task]},open(){throw Error('Rendering must not perform an action');},renderDetail:item=>{detail=item;return React.createElement('p',null,'Bankreferens 58197013. Betalarens OCR saknas.');}});
- assert.equal(detail.id,'batch');assert.match(html,/aria-current="true"/);assert.match(html,/Bankreferens 58197013/);assert.match(html,/2026-10-26/);assert.doesNotMatch(html,/<dialog|Bekräfta matchning/);
+ const html=render(ui.ControlReview,{data:{queue:[task]},open(){throw Error('Rendering must not perform an action');},renderDetail:item=>{detail=item;return React.createElement('p',null,'Bankreferens 99990004. Betalarens OCR saknas.');}});
+ assert.equal(detail.id,'batch');assert.match(html,/aria-current="true"/);assert.match(html,/Bankreferens 99990004/);assert.match(html,/2026-10-26/);assert.doesNotMatch(html,/<dialog|Bekräfta matchning/);
 });
 
 test('loading review is distinguished from an empty successfully loaded queue',()=>{

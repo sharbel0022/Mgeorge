@@ -37,19 +37,20 @@ Interface: existing getSession/getAccountDetails return contract unchanged; read
 ### Task2: Consistent invoice candidates and original status
 
 Files: sites/lib/banking/invoice-candidates.ts, payment-verification.ts, evidence-read.ts and related tests; shared contracts only where necessary.
-Interface: one candidate-field interpretation for number/reference/legacy OCR, explicit source/conflict; existing read preview remains no-fetch/no-write.
+Interface: one candidate-field interpretation for number/reference/legacy OCR, explicit source/conflict; existing read preview remains no-fetch/no-write. Add per-payment `countedEconomically` from the existing `economicTransactions(state)` membership so a separate review observation cannot appear to be a second deposit. No new financial classification rule or aggregate relationship inference.
 
-- [ ] RED: intact unregistered original says original present and registration absent; exact extracted reference with differing invoice number appears consistently; conflicts/multiple originals remain review and no financial writes.
-- [ ] GREEN: minimally share candidate identifiers and correct factual wording; preserve stored extraction precedence, leading zeros and source separation.
-- [ ] Focused suites/TS and independent review.
+- [x] RED: intact unregistered original says original present and registration absent; exact extracted reference with differing invoice number appears consistently; conflicts/multiple originals remain review and no financial writes. AIS plus review report exposes true/false economic membership respectively; ignored, duplicate and parent-summary records agree with the existing engine.
+- [x] GREEN: minimally share candidate identifiers and correct factual wording; preserve stored extraction precedence, leading zeros and source separation.
+- [x] Focused suites/TS and independent review.
 
 ### Task3: Explicit account-check UI
 
-Files: existing owner bank read route, existing payment verification component/dashboard, focused route/component tests.
-Interface: explicit read-only request invokes readBankAccountEvidence with an owned transaction/report; panel opening stays stored-only. Result source/time/completeness/reason remain visible separately.
+Files: create sites/app/api/bank/account-evidence/route.ts; update sites/lib/payment-verification.ts, components/payment-verification.tsx and existing candidate presentation/dashboard; add focused route/component tests and one small pure presentation module if useful.
+Interface: POST /api/bank/account-evidence uses identity(req), strict same-origin JSON/body limits and the existing readBankAccountEvidence({transactionId,documentId}); never accepts owner/account/credentials. The stored verification GET exposes an optional accountEvidenceTarget only for AIS plus one unambiguous report original; server revalidates it. Panel opening stays stored-only. Explicit button results remain transient and separate from stored consent/original/relationship. Positive display requires exact returned transaction/document IDs, current revision, snapshotCurrent/complete/accountMatch strictly true and matched status. Clear/abort on transaction/revision/demo changes, reject late responses and malformed payloads. Result source/time/completeness/reason and next action remain visible.
 
-- [ ] RED: malformed/error/stale/mismatch/incomplete/ambiguous responses show unknown/blocked, no alias promotion, no state writes; only explicit action contacts provider.
-- [ ] GREEN: reuse existing reader and panel, one necessary action, masked data, current revision invalidation; no new matching engine or persisted alias.
+- [x] RED: malformed/error/stale/mismatch/incomplete/ambiguous responses show unknown/blocked, no alias promotion, no state writes; only explicit action contacts provider.
+- [x] GREEN: reuse existing reader and panel, one necessary action, masked data, current revision invalidation; no new matching engine or persisted alias.
+- [x] Show countedEconomically as evidence-row versus economic record, keep deposit A/B/C distinctions, and title the control from the actual unique invoice number/hint with proposal wording where needed. Use shared candidate identifiers so an extracted-reference candidate is not lost from the existing dashboard. No hard-coded real invoice/customer data.
 - [ ] 1440/390px real-component synthetic QA, keyboard/focus/overflow; independent review.
 
 ### Task4: Actual provider discrepancy and private recheck
@@ -60,9 +61,9 @@ Interface: explicit read-only request invokes readBankAccountEvidence with an ow
 
 ### Task5: Full gates and delivery
 
-- [ ] Inspect existing moderate dependency findings; apply only justified compatible fixes, otherwise disclose exact residual scope.
-- [ ] Fresh clean-install baseline and final Node/Sites/syntax/TS/audits/build, meaningful before/after measurements, scoped/final independent review. Fix findings with RED/GREEN.
-- [ ] Write docs/REAL-PAYMENT-0599-FINAL-REPORT.md (sanitized), update PROGRESS/QUALITY-SCORECARD with measured evidence and honest scores. No numerical target inflation.
+- [x] Inspect existing moderate dependency findings; apply only justified compatible fixes, otherwise disclose exact residual scope.
+- [x] Fresh clean-install baseline and final Node/Sites/syntax/TS/audits/build, meaningful before/after measurements, scoped/final independent review. Fix findings with RED/GREEN.
+- [x] Write docs/REAL-PAYMENT-0599-FINAL-REPORT.md (sanitized), update PROGRESS/QUALITY-SCORECARD with measured evidence and honest scores. No numerical target inflation.
 - [ ] Fetch/integrate latest main, nonforce push and verify exact CI. Check backup and saved rollback, build/publish matching Sites source and preserve runtime/policy/schedules/DB/R2.
 - [ ] Read-only production recheck, attempted owner UI verification, delivery receipt with exact source/version/CI and precise external actions. No claims of background work or completed payment.
 
@@ -71,3 +72,5 @@ Interface: explicit read-only request invokes readBankAccountEvidence with an ow
 Fresh main31aa90a; open PR9/10 are older independent work and will not be merged implicitly. Sites49/runtime9/audience/auth/schedules unchanged. Bank/backup schedules enabled, Gmail schedule paused and fetch stale. Backup manifest195/195 verified,112 older API records lack receipts in that backup scope. Current workspace revision41. Three evidence tools work; current target invoice absent with complete register result; bank report/receipt integrity pass. Live current-account reader returns INVALID_PROVIDER_RESPONSE/resourcesRead0; bounded diagnostic needed before a fix. New isolated worktree codex/real-payment-final; dependencies reinstalling after scratch reset.
 
 Task1 scoped review passed after accessor-disclosure RED/GREEN fix: commits5f8f4df/677f48c. Fixed enum diagnostics do not relax null acceptance; live diagnosis follows exact tested publication. Task1 fullSites1328 before lastfix, focused57 and TS afterfix; controller finalfullgates recorded separately. No financial writes.
+
+Finala kodgrindar efter en samlad fixvåg: Sites1381/1381, TypeScript, syntax98, rent produktionsbygge. Avgränsad13-fallskorpus5/13→13/13 med13/13 oförändrade tillstånd på båda sidor. QA-source/stale chunks borttagna;347 färska dist-filer utan QA-referens. Browserpixel/inloggad UI blockerad och explicit ej passerad. Alla scoped reviews passerar; slutlig fixvågsrereview godkänner. Publicering och faktisk ägarbunden efterkontroll återstår. Ingen riktig ekonomisk skrivning.

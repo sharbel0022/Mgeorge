@@ -28,7 +28,7 @@ function fixture(){
  return db;
 }
 function invoice(db,{id='invoice',number='SYN-1',reference='000018',party='Synthetic customer AB',total=10000,organization=''}={}){
- db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at,organization_number,bankgiro) VALUES(?,?,?,?,?,?,?,?,?)').run(id,'customer',number,party,total,reference,'2026-10-01',organization,reference==='58197013'?'5819-7013':'');
+ db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at,organization_number,bankgiro) VALUES(?,?,?,?,?,?,?,?,?)').run(id,'customer',number,party,total,reference,'2026-10-01',organization,reference==='99990004'?'9999-0004':'');
 }
 function raw({payer='Synthetic customer AB',reference='000018',amount=10000,description='',bankId='SYNTHETIC-BANK-1',fields={}}={}){
  return {status:'BOOK',booking_date:'2026-10-26',credit_debit_indicator:amount<0?'DBIT':'CRDT',transaction_amount:{amount:Math.trunc(Math.abs(amount)/100)+'.'+String(Math.abs(amount)%100).padStart(2,'0'),currency:'SEK'},debtor:{name:payer},creditor:{name:payer},reference_number:reference,entry_reference:bankId,...(description?{bank_transaction_code:{description}}:{}),...structuredClone(fields)};
@@ -48,7 +48,7 @@ const org=(value,scheme='COID')=>({identification:value,scheme_name:scheme,issue
 function prepare(db,scenario){
  if(scenario.mode==='invalid-ocr'||scenario.mode==='invalid-sebg')invoice(db,{reference:'000019'});
  else if(scenario.mode==='customer-id')invoice(db,{organization:'5560160680'});
- else if(scenario.mode==='own-bankgiro')invoice(db,{reference:'58197013'});
+ else if(scenario.mode==='own-bankgiro')invoice(db,{reference:'99990004'});
  else if(!['payer-link','unverified-link'].includes(scenario.mode))invoice(db);
  switch(scenario.mode){
   case'api':api(db,scenario.payment);break;
@@ -70,7 +70,7 @@ function prepare(db,scenario){
   case'conflicting-payer':api(db,{fields:{debtor:{name:'Synthetic customer AB',organisation_id:[org('5560160680'),org('5560000000')]}}});break;
   case'changed-payer-id':api(db,{fields:{debtor:{name:'Synthetic customer AB',organisation_id:org('CUSTOMER-1','CUST')}}});api(db,{fields:{debtor:{name:'Synthetic customer AB',organisation_id:org('CUSTOMER-2','CUST')}}});break;
   case'customer-id':api(db,{fields:{debtor:{name:'Unrelated synthetic company',organisation_id:org('5560160680','CUST')}}});break;
-  case'own-bankgiro':api(db,{reference:'58197013'});break;
+  case'own-bankgiro':api(db,{reference:'99990004'});break;
   default:throw Error('Unknown synthetic scenario '+scenario.mode);
  }
 }

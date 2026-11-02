@@ -51,7 +51,7 @@ test('overlong bank payer identity is retained in original but never truncated i
  assert.equal(state.transactions[0].verified,false);assert.equal(state.transactions[0].party,'');
 });
 test('transaction details use the documented scoped GET and retain the payer reference as text',async t=>{
- let call;t.mock.method(globalThis,'fetch',async(url,init)=>{call={url,init};return json(rawTx({reference_number:'0599',debtor:{name:'Café Gränden Bistro AB'}}));});
+ let call;t.mock.method(globalThis,'fetch',async(url,init)=>{call={url,init};return json(rawTx({reference_number:'0599',debtor:{name:'Synthetic Café Payer AB'}}));});
  const tx=await getTransactionDetails(config,accountUid,'fresh-lookup:id');assert.equal(tx.reference_number,'0599');assert.equal(call.url,`https://api.enablebanking.com/accounts/${accountUid}/transactions/fresh-lookup%3Aid`);assert.equal(call.init.method,'GET');
 });
 test('transaction detail paths reject traversal, unscoped IDs and arbitrary query strings before network',async t=>{

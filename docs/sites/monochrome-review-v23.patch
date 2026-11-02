@@ -421,8 +421,8 @@ index 13b8c07..1b7f117 100644
 +test('review keeps selected evidence beside the unresolved list without opening a dialog',()=>{
 + const task={id:'batch',entity_id:'tx',type:'specification',title:'Samlingsbetalning',reason:'Specifikation saknas',action:'Lägg till underlag',amount_cents:62500,priority:15,date:'2026-10-26'};
 + let detail;
-+ const html=render(ui.ControlReview,{data:{queue:[task]},open(){throw Error('Rendering must not perform an action');},renderDetail:item=>{detail=item;return React.createElement('p',null,'Bankreferens 58197013. Betalarens OCR saknas.');}});
-+ assert.equal(detail.id,'batch');assert.match(html,/aria-current="true"/);assert.match(html,/Bankreferens 58197013/);assert.match(html,/2026-10-26/);assert.doesNotMatch(html,/<dialog|Bekräfta matchning/);
++ const html=render(ui.ControlReview,{data:{queue:[task]},open(){throw Error('Rendering must not perform an action');},renderDetail:item=>{detail=item;return React.createElement('p',null,'Bankreferens 99990004. Betalarens OCR saknas.');}});
++ assert.equal(detail.id,'batch');assert.match(html,/aria-current="true"/);assert.match(html,/Bankreferens 99990004/);assert.match(html,/2026-10-26/);assert.doesNotMatch(html,/<dialog|Bekräfta matchning/);
 +});
 +
 +test('loading review is distinguished from an empty successfully loaded queue',()=>{
@@ -449,9 +449,9 @@ index e9b8d72..94794d8 100644
  
 +
 +test('collection provider reference is never presented as an individual payer OCR',()=>{
-+ const batch={id:'batch',kind:'batch',parentId:'',amount:62500,party:'',description:'Bankgiro inbetalning',payerReference:'58197013'};
++ const batch={id:'batch',kind:'batch',parentId:'',amount:62500,party:'',description:'Bankgiro inbetalning',payerReference:'99990004'};
 + assert.equal(overview.paymentPayerReference(batch),'Saknas – individuell specifikation behövs');
 + assert.equal(overview.paymentPayerReference({...batch,kind:'unknown'}),'Saknas – individuell specifikation behövs');
 + assert.equal(overview.paymentPayerReference({...batch,kind:'payment',parentId:'parent',party:'Testkund AB',payerReference:'0594'}),'0594');
-+ assert.equal(batch.payerReference,'58197013');
++ assert.equal(batch.payerReference,'99990004');
 +});
