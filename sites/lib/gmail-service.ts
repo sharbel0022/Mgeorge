@@ -139,16 +139,27 @@ export async function gmailSync(req?:Request,scheduled=false,invoiceReference=''
       for(const doc of result.documents){
         const bytes=Buffer.from(doc.content_base64,'base64'),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
         const existing=await db().prepare('SELECT id FROM documents WHERE owner=? AND sha256=?').bind(user.userId,hash).first<{id:string}>();
-        const id=existing?.id||uid();
+        let id=existing?.id||uid();
         if(!existing){
           if(!env.BUCKET)throw Error('storage');await lease.assert();await env.BUCKET.put(`${user.userId}/${id}`,bytes,{httpMetadata:{contentType:doc.mime_type}});
-          try{await lease.write([db().prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').bind(id,user.userId,doc.name,doc.mime_type,bytes.length,hash,now())]);}
+          // Gmail's lease does not cover manual uploads. The SQL statement
+          // makes the owner/hash choice while holding the database write lock.
+          try{await lease.write([db().prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) SELECT ?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM documents WHERE owner=? AND sha256=?)').bind(id,user.userId,doc.name,doc.mime_type,bytes.length,hash,now(),user.userId,hash)]);}
           catch(error){
             // A lost D1 response can have committed. Preserve the object unless
             // a fresh read confirms that no document references this upload.
             try{if(!await db().prepare('SELECT id FROM documents WHERE owner=? AND id=?').bind(user.userId,id).first())await env.BUCKET.delete(`${user.userId}/${id}`);}catch{}
             throw error;
-          }imported++;
+          }
+          const retained=await db().prepare('SELECT id FROM documents WHERE owner=? AND sha256=? LIMIT 1').bind(user.userId,hash).first<{id:string}>();
+          if(!retained)throw Error('D1_ERROR: document insertion outcome unavailable');
+          if(retained.id===id)imported++;
+          else{
+            // Only our own conclusively unused upload can be cleaned up. A
+            // failed read/delete keeps the extra bytes, never the winner's.
+            try{if(!await db().prepare('SELECT id FROM documents WHERE owner=? AND id=?').bind(user.userId,id).first())await env.BUCKET.delete(`${user.userId}/${id}`);}catch{}
+            id=retained.id;duplicates++;
+          }
         }else duplicates++;
         const meta={...doc.metadata,direction:doc.direction,subject:doc.subject,from:doc.metadata.from,to:doc.metadata.to,received_at:doc.received_at};
         const prior=await db().prepare('SELECT status FROM gmail_sources WHERE owner=? AND document_id=? LIMIT 1').bind(user.userId,id).first<{status:string}>();
