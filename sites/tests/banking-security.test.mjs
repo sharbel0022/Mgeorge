@@ -11,13 +11,14 @@ import { ProviderError } from '../lib/banking/enable-banking.ts';
 import { seal, unseal, randomToken, digest, validFlowToken, cookieValue } from '../lib/banking/security.ts';
 import { runtimeBankConfig, runtimeBankStatus } from '../lib/banking/runtime-config.ts';
 import { confirmedBankConsent } from '../lib/banking/status-view.ts';
+import { accountReadCooldown } from '../lib/banking/account-read-cooldown.ts';
 
 // Exercise the real route services, encryption, domain and SQL. Only the identity
 // provider and banking HTTP boundary are replaced. No test can call a live bank.
 const source = path => readFileSync(new URL(path, import.meta.url), 'utf8');
 const jsUrl = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
 function compiledModule(path, imports, jsx = ts.JsxEmit.Preserve) {
-  imports = { './sync-periods': new URL('../lib/banking/sync-periods.ts', import.meta.url).href, '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
+  imports = { './account-read-cooldown': new URL('../lib/banking/account-read-cooldown.ts', import.meta.url).href, './sync-periods': new URL('../lib/banking/sync-periods.ts', import.meta.url).href, '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
   let js = ts.transpileModule(source(path), { fileName: path, compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx } }).outputText;
   for (const [name, replacement] of Object.entries(imports)) {
     for (const quote of ['"', "'"]) js = js.replaceAll(`${quote}${name}${quote}`, JSON.stringify(replacement));
@@ -69,6 +70,7 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));
   sql.exec(source('../drizzle/0002_brief_chronomancer.sql'));
   sql.exec(source('../drizzle/0012_minor_naoko.sql'));
+  sql.exec(source('../drizzle/0016_agent2_account_read_guard.sql'));
   const f = { sql, owner: 'owner-alice', user: { userId: 'owner-alice' }, calls: [], provider: {}, env: {
     BANK_DATA_ENCRYPTION_KEY: randomToken(), ENABLE_BANKING_APPLICATION_ID: appId,
     ENABLE_BANKING_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',
@@ -87,8 +89,9 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig });
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
-  const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
-  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, '../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
+  const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError,providerCooldownDiagnostic} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
+  const readGuardUrl = compiledModule('../lib/banking/account-read-guard.ts', { '../server': serverUrl, './store': storeUrl, './enable-banking': providerUrl });
+  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, './account-read-guard': readGuardUrl, '../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
   f.store = await import(storeUrl); f.service = await import(serviceUrl);
   f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
   f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
@@ -826,4 +829,51 @@ test('consent expiring during pagination stops before another request and preser
  f.provider.getTransactions=async()=>{calls++;if(calls===1){t.mock.timers.enable({apis:['Date'],now:at+60000});return{transactions:[rawTx()],continuation_key:'after-expiry'};}return{transactions:[]};};
  await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_RECONNECT_REQUIRED');
  assert.equal(calls,1);assert.equal(f.connection().status,'reauth_required');assert.equal(f.connection().last_synced_at,null);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+for(const retryAfter of [null,'120'])test('actual sync throttling retains '+(retryAfter===null?'unknown':'known')+' account-read advice across a later successful transaction sync',async t=>{
+ const f=await fixture(t,'PRODUCTION',{actualProvider:true});
+ f.env.ENABLE_BANKING_PRIVATE_KEY=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+ await f.seedApp();await f.seedConnection();let limited=true;
+ t.mock.method(globalThis,'fetch',async address=>{
+  const path=new URL(address).pathname;
+  if(path===`/sessions/${remoteSession}`)return Response.json(f.live);
+  assert.equal(path,`/accounts/${accountUid}/transactions`);
+  return limited?new Response('',{status:429,headers:retryAfter===null?{}:{'Retry-After':retryAfter}}):Response.json({transactions:[]});
+ });
+ await assert.rejects(f.service.sync(post('sync')),error=>error.code==='BANK_RATE_LIMIT');
+ const guard=f.connection().account_evidence_retry;
+ assert.ok(guard,'the response provenance must be persisted, separately from fallback retry_after');
+ assert.equal(JSON.parse(guard).status,retryAfter===null?'unknown':'known');
+ limited=false;f.sql.exec("UPDATE bank_connections SET retry_after=''");
+ await f.service.sync(post('sync'));
+ assert.equal(f.connection().account_evidence_retry,guard,'successful transaction reads cannot resolve a distinct account-details wait');
+ assert.ok(f.connection().last_synced_at);
+});
+
+for(const stage of ['session','transactions'])for(const failure of ['result save','lease loss'])for(const priorKnown of [false,true])test(`sync ${stage} retains a pending read guard after ${failure} with ${priorKnown?'an older known deadline':'no prior wait'}`,async t=>{
+ const f=await fixture(t,'PRODUCTION',{actualProvider:true});
+ f.env.ENABLE_BANKING_PRIVATE_KEY=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+ await f.seedApp();await f.seedConnection();let failing=false,pending='',calls=[];
+ t.mock.method(globalThis,'fetch',async address=>{
+  const path=new URL(address).pathname;calls.push(path);
+  const currentStage=path===`/sessions/${remoteSession}`?'session':'transactions';
+  if(currentStage==='transactions')assert.equal(path,`/accounts/${accountUid}/transactions`);
+  if(failing&&currentStage===stage){
+   pending=f.connection().account_evidence_retry;
+   if(failure==='lease loss')f.sql.prepare("UPDATE bank_locks SET token='synthetic-replacement',expires_at=?").run(future());
+   else f.d1.beforeBatch=statements=>{if(statements.some(statement=>statement.sql.includes('account_evidence_retry'))){f.d1.beforeBatch=null;throw Error('Synthetic result save failed');}};
+   return new Response('',{status:429});
+  }
+  return Response.json(currentStage==='session'?f.live:{transactions:[rawTx()]});
+ });
+ await f.service.sync(post('sync'));const original=f.workspace(),runs=count(f,'bank_sync_runs');
+ f.sql.prepare('UPDATE bank_connections SET last_synced_at=NULL,account_evidence_retry=?').run(priorKnown?JSON.stringify({status:'known',checkedAt:new Date().toISOString(),notBefore:new Date(Date.now()+120000).toISOString(),provenance:'retry_after_seconds'}):'');
+ failing=true;calls=[];await assert.rejects(f.service.sync(post('sync')));
+ const saved=f.connection().account_evidence_retry;
+ assert.ok(pending,'uncertainty must be durable before contacting the provider');assert.equal(JSON.parse(pending).status,'pending');assert.equal(saved,pending);
+ assert.equal(accountReadCooldown(saved,Date.now()+180000).blocked,true,'the older deadline cannot release an unresolved result');
+ assert.deepEqual(f.workspace(),original);assert.equal(f.connection().last_synced_at,null);assert.equal(count(f,'bank_sync_runs'),runs);
+ assert.equal(calls.length,stage==='session'?1:2);
+ if(failure==='lease loss')assert.equal(f.sql.prepare('SELECT token FROM bank_locks').get().token,'synthetic-replacement');
 });

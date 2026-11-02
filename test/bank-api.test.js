@@ -40,7 +40,7 @@ globalThis.fetch=async(url,options)=>{
     if(options.method==='DELETE')return new Response(null,{status:204});
     if(mode==='pause_verify'){mode='';providerReached();await providerWait;}
     if(mode==='expired')return Response.json({error:'EXPIRED_SESSION'},{status:400});
-    return Response.json({status:'AUTHORIZED',accounts:['account-'+target.pathname.split('-').at(-1)],access:{valid_until:new Date(Date.now()+86400000).toISOString()}});
+    return Response.json({status:'AUTHORIZED',accounts:['account-'+target.pathname.split('-').at(-1)],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+86400000).toISOString()}});
   }
   if(target.pathname.endsWith('/transactions')){
     transactionCalls++;lastQuery=target.searchParams;

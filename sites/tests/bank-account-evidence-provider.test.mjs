@@ -83,3 +83,20 @@ test('provider error codes come from constructor metadata without inspecting pub
  for(const error of [forged,proxy,revoked.proxy,{code:'BANK_TIMEOUT'},null,undefined,'BANK_TIMEOUT'])assert.equal(adapter.providerErrorCode?.(error),undefined);
  assert.equal(reads,0);
 });
+
+test('a documented account resource may omit account_id without synthesizing a number',async t=>{
+ const r=resource();delete r.account_id;delete r.uid;r.identification_hash='synthetic-primary-exact';r.identification_hashes=['synthetic-nonunique'];
+ t.mock.method(globalThis,'fetch',async()=>json(r));const out=await adapter.getAccountDetails(config,account);
+ assert.equal(out.account_id,undefined);assert.equal(out.uid,undefined);assert.equal(out.identification_hash,r.identification_hash);
+ assert.deepEqual(out,r,'retain the bank-supplied resource exactly');
+});
+
+test('trusted operational cooldowns also cover provider-coded rate limits and 503 Retry-After',async t=>{
+ for(const [status,body,header,want]of [[400,{error:'ASPSP_RATE_LIMIT_EXCEEDED'},'120','known'],[400,{error:'ASPSP_RATE_LIMIT_EXCEEDED'},null,'unknown'],[503,{},'120','known'],[503,{},'invalid','unknown']]){
+  t.mock.method(globalThis,'fetch',async()=>json(body,status,header===null?{}:{'Retry-After':header}));
+  await assert.rejects(adapter.getAccountDetails(config,account),error=>{
+   assert.equal(typeof adapter.providerCooldownDiagnostic,'function');
+   assert.equal(adapter.providerCooldownDiagnostic(error).status,want);return true;
+  });
+ }
+});

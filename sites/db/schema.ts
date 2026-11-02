@@ -28,6 +28,7 @@ export const bankConnections = sqliteTable('bank_connections', {
   autoSyncEnabled: integer('auto_sync_enabled').notNull().default(0),
   autoLastAttemptAt: text('auto_last_attempt_at'), autoNextAt: text('auto_next_at'),
   retryAfter: text('retry_after').notNull().default(''), syncFailures: integer('sync_failures').notNull().default(0),
+  accountEvidenceRetry: text('account_evidence_retry').notNull().default(''),
   controlLastAttemptAt: text('control_last_attempt_at'),
 });
 export const bankAuthFlows = sqliteTable('bank_auth_flows', {

@@ -2,7 +2,7 @@ import { db, identity, readWorkspace, response } from '@/lib/server';
 import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, uid, validDate } from '@/lib/domain';
 import {
   ProviderError, getApplication, listBusinessBanks, startAuth, createSession,
-  getSession, deleteSession, getTransactions,
+  getSession, deleteSession, getTransactions, providerCooldownDiagnostic,
   type ProviderAccount, type ProviderApplication, type ProviderPsu,
 } from './enable-banking';
 import { normalizeTransactions, stableAccountKey } from './transactions';
@@ -13,6 +13,8 @@ import {
 import { cookieValue, digest, randomToken, validFlowToken } from './security';
 import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
+import { mergeAccountReadCooldown } from './account-read-cooldown';
+import { guardedBankRead } from './account-read-guard';
 
 export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
 const COOKIE = '__Secure-mg-bank-flow';
@@ -394,7 +396,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
     let needsReauthorization = false;
     try {
       await lease.assert();
-      const live = await getSession(config, await sessionId(conn));
+      const live = await guardedBankRead(user.userId, conn, lease, async () => getSession(config, await sessionId(conn)));
       await lease.assert();
       const expiry = Date.parse(live.access.valid_until);
       if (live.status !== 'AUTHORIZED' || !Number.isFinite(expiry) || expiry <= Date.now() || live.aspsp.name !== conn.bank_name || live.aspsp.country !== conn.country || live.psu_type !== 'business') {
@@ -426,7 +428,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         const accountKey = canonicalKey;
         const periods = await fetchBankPeriods({dateFrom: from, dateTo: to, budget, authorize: authorizeFetch,
           isPeriodError: error => error instanceof ProviderError && error.code === 'BANK_PERIOD_UNAVAILABLE',
-          fetchPage: input => getTransactions(config, id, {...input, psu: options.psu}),
+          fetchPage: input => guardedBankRead(user.userId, conn, lease, () => getTransactions(config, id, {...input, psu: options.psu})),
         });
         for (const period of periods) {
           const normalized = await normalizeTransactions(period.transactions, { accountKey, accountLabel: maskAccount(account, {name: conn.bank_name, country: conn.country}), bankName: conn.bank_name, dateFrom: period.dateFrom, dateTo: period.dateTo });
@@ -508,13 +510,18 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       return response({ message: test ? `Testhämtningen är klar. ${rows.length} testhändelser lästes utan att påverka ditt register.` : `${imported} nya bankhändelser hämtades. Kontrollera underlagen före matchning.`, imported, skipped, warnings: [...warnings], test });
     } catch (error) {
       await lease.assert();
+      const current = await connection(user.userId);
+      if (!current || current.id !== conn.id || current.app_generation !== conn.app_generation || current.encrypted_session !== conn.encrypted_session) throw new Error('BANK_ACCOUNT_READ_CONTEXT_CHANGED');
       const exhausted=options.automatic&&conn.sync_failures+1>=3;
       const detail = error instanceof BankError || error instanceof ProviderError || error instanceof BankPeriodError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.';
       const message = exhausted ? `Automatisk bankhämtning är stoppad efter tre avbrutna eller misslyckade försök. ${detail}` : detail;
       const expired = needsReauthorization || error instanceof ProviderError && error.code === 'BANK_RECONNECT_REQUIRED';
       const limited=error instanceof ProviderError&&(error.status===429||error.retryAfter!==undefined||error.retryBlocked===true);
-      const retry=limited?(error.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+Math.max(60,error.retryAfter||60)*1000).toISOString()):conn.retry_after;
-      await lease.run(db().prepare('UPDATE bank_connections SET last_error=?,status=?,retry_after=?,sync_failures=CASE WHEN ? THEN 3 ELSE sync_failures END,updated_at=? WHERE owner=? AND id=?').bind(message, expired ? 'reauth_required' : conn.status,retry,limited&&error.retryBlocked?1:0, now(), user.userId, conn.id));
+      const retry=limited?(error.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+Math.max(60,error.retryAfter||60)*1000).toISOString()):current.retry_after;
+      // Keep actual supplier advice separate from the six-hour background
+      // fallback. A successful transactions sync never clears this read guard.
+      const accountRetry=mergeAccountReadCooldown(current.account_evidence_retry,providerCooldownDiagnostic(error));
+      await lease.run(db().prepare('UPDATE bank_connections SET last_error=?,status=?,retry_after=?,account_evidence_retry=?,sync_failures=CASE WHEN ? THEN 3 ELSE sync_failures END,updated_at=? WHERE owner=? AND id=?').bind(message, expired ? 'reauth_required' : current.status,retry,accountRetry,limited&&error.retryBlocked?1:0, now(), user.userId, conn.id));
       throw error;
     }
   });

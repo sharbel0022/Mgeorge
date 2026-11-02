@@ -1,5 +1,16 @@
 # Verifierad progress
 
+## Agent 2 — Swedbank och bankkontoidentitet, 2026-11-02
+
+Separat branch `feature/mgeorge-swedbank-account-evidence`, runtimebas `7366218`, uppdaterad mot kontrakt och syntetisk integrationsacceptans på `12c9868` (PR22/23). [Exakt kontrakt och Agent 3/4-överlämning](docs/integration/bank-account-evidence.md), [verifieringsrapport](docs/integration/agent-2-swedbank-verification.md), [genomförandeplan](docs/integration/agent2-implementation-plan.md).
+
+- Node validerar aktuellt bank-/land-/företagsmedgivande och tidigaste giltighetstid genom sidindelning och commit. Bankoriginal, import, historikcheckpunkt, audit och jobbframgång sparas atomiskt. Efterföljande kontrollfel rapporteras som varning till en genomförd import.
+- Sites har ägarbundet lås och separat beständig kontospärr. Okänd spärr löper inte ut med den generiska synkfördröjningen. Ett unikt väntande anrop sparas före provideråtkomst; misslyckad resultatlagring eller förlorat lås lämnar kontokontrollen spärrad.
+- Typat `BankAccountEvidence` v1 verifierar enbart aktuell kontoidentitet från bankstyrkt identifierare. Bankgirokoppling och betalningsbehörighet förblir separata och spärrade. Ett faktiskt returnerat alias kan bindas med exakt primärhash; kontonummer och OCR beräknas aldrig fram.
+- Oberoende review reproducerade två fynd, som rättats med RED/GREEN-regressioner i samtliga tre berörda läsvägar. Slutliga grindar och tidigare miljö-/testfel redovisas i verifieringsrapporten. Migration0016 är additiv; inget nytt paket, schemajobb eller produktionsanrop ingår. Integratören ansvarar för merge och publicering.
+
+Samtliga33 kvalitetspoäng behålls på **255/330 = 7,73**. Verkligt mottagarkontoalias, explicit bankstyrkt Bankgirorelation, upplösning av eventuell äldre okänd spärr, individuella betalaruppgifter och ny auktoriserad produktionsacceptans kvarstår enligt kontraktets exakta lista.
+
 ## Ny sjuagentsintegration — gemensam kontraktsbaslinje, 2026-11-02
 
 [Kontrakt](docs/integration/README.md) och [aktuell integrationsrapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) skiljer den nya omgångens leveranser från tidigare PR #14–21. Separat granskad kontrakts-PR #22 är normalt mergad som `b65273500c214a4e16b880e3840dac90d8bd7401`; exakt main-CI 41531868549 passerar 1 309 Node + 2 331 Sites = 3 640 tester, utan fel eller överhoppade/avbrutna tester. Rapporter och riktade syntetiska kedjetester kompletteras medan faktisk GitHub-leverans från agenterna inventeras. Saknad företagspolicy/BankgiroReportSource får inte räknas som implementerad genom gamla tester.

@@ -1,5 +1,18 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 2 — avgränsat bankbevis, 2026-11-02
+
+Ny separat leverans på `feature/mgeorge-swedbank-account-evidence`, integrationbas `12c9868`. [Verifieringsrapport](docs/integration/agent-2-swedbank-verification.md) skiljer syntetiska tester, slutgrindar och kvarstående extern evidens. Inga numeriska poäng ändras; alla33 områden ligger kvar på **255/330 = 7,73/10**.
+
+| Berört område | Före | Efter | Nytt bevis inom Agent 2 | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | Aktuell bank/SE/business/medgivandetid, ägarbundet kontocensus och exakt bankstyrkt alias testas; ett versionerat identitetskontrakt tillkommer. | Verkliga tillgängliga kontofält, bankgirokoppling och förnyad produktionsåtkomst är inte verifierade av syntetiska svar. |
+| 16. Automatisk bankhämtning | 8 | 8 | Node import/checkpunkt/audit/jobb commit är atomisk; Sites behåller okänd spärr även efter avbruten resultatlagring eller synkframgång. | Ny produktionsexekvering och full tillgänglig historik behöver separat auktoriserat kvitto. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Befintligt ägarlås och skrivstängsel skyddar väntande anrop. Fälthämtare/proxyer och klientuppgifter kan inte skapa providerbevis eller häva spärren. | Ingen ny penetrationstest, produktionsmigration eller automatisk lösning av okända äldre spärrar. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Oberoende reviewfynd reproduceras och rättas med regressionsprov i kontoläsning, synk och detaljhämtning. Exakta slutgrindar finns i rapporten. | Befintlig lintskuld och16 moderate utvecklingsberoendefynd kvarstår; lokal Node24 ersätter inte exakt Node22 PR-CI. |
+
+Övriga områdens bedömningar och tidigare publiceringsbevis nedan behåller sin angivna historiska omfattning. Ett verifierat kontoalias ger ingen separat Bankgirorelation eller rätt att allokera en betalning.
+
 ## Ny sjuagentsintegration — kontraktsbaslinje, 2026-11-02
 
 [Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar den nya omgångens faktiska PR:er och skiljer dem från tidigare leveranser. Kontrakts-PR #22/main `b65273500c214a4e16b880e3840dac90d8bd7401` har grön exakt CI: **1 309 Node + 2 331 Sites = 3 640 godkända tester**, utan fel eller överhoppade/avbrutna tester. Kontrakt och syntetiska regressioner verifierar inte en ännu saknad behörig Bankgirokälla, bankens verkliga konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Rapporten återger alla 33 före/eftervärden och aktuella begränsningar. Äldre tabeller nedan behålls som detaljerad evidens/historik.

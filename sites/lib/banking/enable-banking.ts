@@ -87,7 +87,7 @@ export function providerResponseDiagnostic(error:unknown):ResponseDiagnostic|nul
   const issue=error!==null&&typeof error==='object'?responseDiagnostics.get(error):undefined;
   return issue?{...issue}:null;
 }
-type RetryDiagnostic =
+export type RetryDiagnostic =
   | {status:'known';checkedAt:string;notBefore:string;provenance:'retry_after_seconds'|'retry_after_http_date'}
   | {status:'unknown';checkedAt:string;provenance:'retry_after_missing'|'retry_after_invalid'}
   | {status:'manual_block';checkedAt:string;provenance:'retry_after_exceeds_limit'};
@@ -96,6 +96,13 @@ const DEFAULT_RATE_LIMIT_RETRY_SECONDS=6*3600;
 // Only response parsing may create advice. Public ProviderError retry fields are
 // legacy sync policy, including a fallback, and cannot prove a supplier deadline.
 const retryDiagnostics=new WeakMap<object,RetryDiagnostic>();
+// Operational throttling also includes real provider-coded rate limits and
+// HTTP 503 Retry-After. Keep the older HTTP-429 display contract unchanged.
+const cooldownDiagnostics=new WeakMap<object,RetryDiagnostic>();
+export function providerCooldownDiagnostic(error:unknown):RetryDiagnostic|null {
+  const advice=error!==null&&typeof error==='object'?cooldownDiagnostics.get(error):undefined;
+  return advice?{...advice}:null;
+}
 export function providerRetryDiagnostic(error:unknown):RetryDiagnostic|null {
   const advice=error!==null&&typeof error==='object'?retryDiagnostics.get(error):undefined;
   return advice?{...advice}:null;
@@ -214,6 +221,7 @@ function mappedError(status: number, payload: unknown, retryHeader: string | nul
     const retryAfter=advice.status==='known'?Math.max(1,Math.ceil((Date.parse(advice.notBefore)-now)/1000)):blocked?MAX_RETRY_SECONDS:DEFAULT_RATE_LIMIT_RETRY_SECONDS;
     const error=Object.assign(new ProviderError('BANK_RATE_LIMIT', blocked?'Bankens väntetid kräver manuell kontroll. Automatisk hämtning har stoppats.':'Bankens gräns för hämtningar har nåtts. Vänta till nästa tillåtna försök.', 429, true), {retryAfter,retryBlocked:blocked});
     if(status===429)retryDiagnostics.set(error,advice);
+    cooldownDiagnostics.set(error,advice);
     return error;
   }
   if (['EXPIRED_SESSION', 'REVOKED_SESSION', 'CLOSED_SESSION', 'SESSION_DOES_NOT_EXIST', 'EXPIREDSESSION'].includes(code)) {
@@ -271,6 +279,7 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
       const error = mappedError(response.status, null, retryHeader);
       if (response.status === 503) {
         const at = Date.now(), advice = responseRetryDiagnostic(retryHeader, at);
+        cooldownDiagnostics.set(error,advice);
         error.retryBlocked = advice.status === 'manual_block';
         error.retryAfter = advice.status === 'known' ? Math.max(1, Math.ceil((Date.parse(advice.notBefore) - at) / 1000)) : error.retryBlocked ? MAX_RETRY_SECONDS : DEFAULT_RATE_LIMIT_RETRY_SECONDS;
       }
@@ -372,9 +381,13 @@ export async function getAccountDetails(config:ProviderConfig,accountUid:string)
  const primary=result.account_id;
  if(typeof result.currency!=='string'||!/^[A-Z]{3}$/.test(result.currency))throw invalidResponse('currency',result.currency);
  if(typeof result.cash_account_type!=='string'||!/^[A-Z0-9]{1,35}$/.test(result.cash_account_type))throw invalidResponse('cash_account_type',result.cash_account_type);
- if(!record(primary)||primary.iban===undefined&&primary.other===undefined)throw invalidResponse('account_id',primary);
- if(primary.iban!==undefined&&(typeof primary.iban!=='string'||!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(primary.iban)))throw invalidResponse('account_id.iban',primary.iban);
- if(primary.other!==undefined)generic(primary.other,'account_id.other');
+ // AccountResource may omit account_id. Never fill it from a UID, hash or
+ // another field; the consumer still requires exact stable identity evidence.
+ if(primary!==undefined){
+  if(!record(primary)||primary.iban===undefined&&primary.other===undefined)throw invalidResponse('account_id',primary);
+  if(primary.iban!==undefined&&(typeof primary.iban!=='string'||!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(primary.iban)))throw invalidResponse('account_id.iban',primary.iban);
+  if(primary.other!==undefined)generic(primary.other,'account_id.other');
+ }
  if(result.uid!==undefined&&(typeof result.uid!=='string'||result.uid!==accountUid))throw invalidResponse('uid',result.uid);
  // Observed provider null means no additional aliases; retain the raw value.
  if(result.all_account_ids!==undefined&&result.all_account_ids!==null){

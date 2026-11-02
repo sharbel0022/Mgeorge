@@ -10,6 +10,7 @@ import {fileURLToPath} from 'node:url';
 import fs from 'node:fs';
 import {syncBuiltinESMExports} from 'node:module';
 import {BACKUP_TABLES,backupStep,unsealBackup,sealBackup} from '../lib/backup-engine.ts';
+import {accountReadCooldown} from '../lib/banking/account-read-cooldown.ts';
 
 const owner='synthetic-isolated-recovery-owner',key='5'.repeat(64),at=new Date('2026-11-02T12:00:00Z');
 const uuid=index=>`00000000-0000-4000-8000-${String(index).padStart(12,'0')}`;
@@ -36,7 +37,7 @@ function fixture(t,count=7){
  const rows={
   audit_events:{id:'audit',revision:41,action:'invoice.save',detail:JSON.stringify({command:{type:'invoice.save',invoice:{documentId:uuid(2)}},automatic:[]}),created_at:at.toISOString()},
   bank_applications:{application_id:'synthetic-app',encrypted_key:'synthetic-encrypted-key',metadata:'{}',generation:'generation',created_at:at.toISOString(),updated_at:at.toISOString()},
-  bank_connections:{id:'connection',app_generation:'generation',environment:'test',bank_name:'Synthetic bank',country:'SE',encrypted_session:'synthetic-encrypted-session',encrypted_accounts:'synthetic-encrypted-accounts',selected_accounts:'[]',valid_until:at.toISOString(),date_from:'2026-01-01',status:'connected',auto_sync_enabled:1,created_at:at.toISOString(),updated_at:at.toISOString()},
+  bank_connections:{id:'connection',app_generation:'generation',environment:'test',bank_name:'Synthetic bank',country:'SE',encrypted_session:'synthetic-encrypted-session',encrypted_accounts:'synthetic-encrypted-accounts',selected_accounts:'[]',valid_until:at.toISOString(),date_from:'2026-01-01',status:'connected',account_evidence_retry:JSON.stringify({status:'unknown',checkedAt:at.toISOString(),provenance:'retry_after_missing'}),auto_sync_enabled:1,created_at:at.toISOString(),updated_at:at.toISOString()},
   bank_sync_runs:{id:'bank-run',connection_id:'connection',imported:1,skipped:0,warnings:'[]',test:1,created_at:at.toISOString()},
   gmail_connections:{email:'synthetic@example.invalid',tokens:'synthetic-encrypted-tokens'},
   customer_contacts:{invoice_id:'invoice',email:'synthetic@example.invalid',identity:'identity',evidence:'{}',updated_at:at.toISOString()},
@@ -67,6 +68,7 @@ test('authenticated export retains every durable table, historical original and 
  assert.equal(result.manifest.run.id,f.row().id);assert.equal(result.manifest.run.state,'complete');assert.equal(result.manifest.tables.length,20);
  assert.deepEqual(result.manifest.tables.map(table=>[table.name,table.rows]),BACKUP_TABLES.map(name=>[name,name==='documents'?7:1]));
  assert.equal(result.snapshot.tables.find(table=>table.name==='workspaces').rows[0].payload,JSON.stringify(f.state));
+ assert.equal(result.snapshot.tables.find(table=>table.name==='bank_connections').rows[0].account_evidence_retry,f.sql.prepare('SELECT account_evidence_retry FROM bank_connections').get().account_evidence_retry);
  assert.equal(result.manifest.objects.length,8);assert.equal(entries.size,10);
  assert.equal([...entries.values()].some(bytes=>Buffer.from(bytes).includes(Buffer.from('Synthetic recovery customer'))),false);
  assert.equal(f.puts.length,puts);assert.deepEqual(f.objects,originals);
@@ -168,6 +170,8 @@ test('a resumed interrupted backup restores every exact financial row and origin
  const restored=new DatabaseSync(join(result.directory,'evidence.sqlite'),{readOnly:true});
  try{
   for(const table of expected)assert.deepEqual(restoredRows(restored,table.name),table.rows,table.name+' exact rows');
+  const guard=restored.prepare('SELECT account_evidence_retry FROM evidence_bank_connections').get().account_evidence_retry;
+  assert.equal(JSON.parse(guard).status,'unknown');assert.equal(accountReadCooldown(guard,at.getTime()+30*86400_000).blocked,true,'a restored unknown bank wait cannot expire as a generic retry');
   assert.throws(()=>restored.prepare('SELECT * FROM workspaces').all(),/no such table/);
   assert.equal(restored.prepare('SELECT COUNT(*) n FROM evidence_bank_locks').get().n,0);
   assert.equal(restored.prepare('PRAGMA integrity_check').get().integrity_check,'ok');assert.equal(restored.prepare('PRAGMA foreign_key_check').all().length,0);

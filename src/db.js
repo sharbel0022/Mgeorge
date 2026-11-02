@@ -329,7 +329,7 @@ function invalidateAbsenceChecks(db,importId='',reason='Nytt bankunderlag kräve
   }
 }
 /** Lagrar importerade bankhändelser och använder identiteter/fingeravtryck för att minska risken för dubletter. */
-export function storeTransactions(db,items,source,original=null,guard=null) {
+export function storeTransactions(db,items,source,original=null,guard=null,beforeCommit=null) {
   if(items.some(item=>item.review_only))throw Object.assign(new Error('Bankuppgifterna kräver granskning. Spara originalet utan att skapa ekonomiska bankhändelser.'),{status:409,code:'bank_review_only'});
   // Legacy lookup IDs and session account UIDs cannot safely be guessed into
   // stable identities. Block the whole API batch until a reviewed migration
@@ -420,6 +420,11 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
       audit(db,'aggregate_replaced',{transaction_id:completed.id,children:1,specification_import_id:import_id,before:completed.before,after:db.prepare('SELECT * FROM bank_transactions WHERE id=?').get(completed.id)});
     }
     if(imported||enriched||conflicts)invalidateAbsenceChecks(db,import_id);
+    // Sync coverage and its audit must share this transaction with the originals.
+    // A callback cannot yield while the database owns the writer lock.
+    const completion=beforeCommit?.({imported,duplicate,enriched,conflicts,import_id});
+    if(completion&&typeof completion.then==='function')throw TypeError('Bank import completion must be synchronous');
+    guard?.();
     db.exec('COMMIT');
   } catch(e) {
     db.exec('ROLLBACK');
