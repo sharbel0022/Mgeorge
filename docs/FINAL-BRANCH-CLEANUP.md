@@ -1,5 +1,7 @@
 # Slutlig branchkontroll – Mgeorge
 
+**Uppföljning 2026-11-02:** Efter nytt konkret användargodkännande för de fem exakta namnen har huvudena kontrollerats igen och raderingen lyckats atomiskt med förväntade SHA-villkor. Endastmain återstår på GitHub; PR9/10 är closed/unmerged. Nytt privat återställningstestat bundle/mirror/strictfsck bevarar17vanliga refs/träd och allt unikt arbete. Se [aktuellt engineeringkvitto](MGEORGE-FINAL-ENGINEERING-REPORT.md). Texten nedan är den tidigare blockerade körningens historiska bevis, inte dagens raderingsstatus.
+
 Datum2026-11-02. Startmain b44b092cec10031650b4a7336e99b1e2334bda59, exakt CI41459045392 godkänd847Node/1426Sites. Kodrättningen är nu levererad på mainb0b67e58364283ce4c06ad6f9e913b2b926df647 med exakt CI41470820370 success847Node/1451Sites och Sites53; branchkontrollen bygger på faktisk GitHublista och ny originfetch, inte enbart äldre rapporter.
 
 ## Verifierat bevarande

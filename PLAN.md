@@ -14,6 +14,8 @@ Aktuellt leveransläge: kodgranskning och847Node/1426Sites godkända; main8516e1
 
 # Mgeorge – aktuell kvalitetsplan
 
+Aktivt fullständigt engineering-uppdrag 2026-11-02: [aktuell genomförandeplan](docs/superpowers/plans/2026-11-02-final-engineering.md), [samlad rapport](docs/MGEORGE-FINAL-ENGINEERING-REPORT.md) och senaste PROGRESS/QUALITY-SCORECARD. Aktuell användarinstruktion godkänner normal main-push och publicering i befintligt Sites-projekt; riktiga ekonomiska registreringar/allokeringar kräver separat konkret verksamhetsbeslut. De fem namngivna fjärrbrancherna är efter nytt uttryckligt åtgärdsgodkännande raderade; main är enda fjärrbranch och unikt arbete privat återställningsbart. Äldre planers tidsboxar och raderingsblockering är historik.
+
 Aktivt uppdrag 2026-10-30: **maximalt åtta timmars självständigt kvalitetsarbete** från main `c519eef`, Sites 32 och dokumenterad bedömning 7,42/10. Se [aktuell arbetsplan](docs/QUALITY-8H-PLAN.md), `QUALITY-SCORECARD.md` och den senaste checkpointen i `PROGRESS.md`.
 
 Main-integration och publicering i det befintliga Sites-projektet ingår i användarens aktuella uttryckliga godkännande. Äldre avgränsningar nedan är historik.

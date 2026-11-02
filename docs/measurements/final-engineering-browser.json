@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-02",
+  "environment": "Local Windows Chromium through the supported in-app browser, synthetic browser-memory demo, isolated local D1 schema",
+  "productionAuthenticated": false,
+  "physicalMobile": false,
+  "overview": [
+    {"viewportWidth":320,"documentWidth":305,"mainWidth":305,"summaryPresent":true},
+    {"viewportWidth":390,"documentWidth":375,"mainWidth":375,"summaryPresent":true},
+    {"viewportWidth":768,"documentWidth":753,"mainWidth":578,"summaryPresent":true},
+    {"viewportWidth":1024,"documentWidth":1009,"mainWidth":819,"summaryPresent":true},
+    {"viewportWidth":1440,"documentWidth":1425,"mainWidth":1209,"summaryPresent":true}
+  ],
+  "flows": {
+    "mobileMenuAndSettingsNavigation": "passed",
+    "bankSearchExactInvoice1003ShowsOneRow": "passed",
+    "missingSpecificationFilterShowsOneBatch": "passed",
+    "unknownPayerAndReferenceExplanation": "passed",
+    "dialogInitialFocus": "close button",
+    "dialogEscape": "closed",
+    "desktopDialogThen390AndEscapeBefore": {"focusTag":"BODY"},
+    "desktopDialogThen390AndEscapeAfter": {"focusTag":"MAIN","focusId":"main-content","dialogOpen":false,"viewportWidth":390,"documentWidth":375},
+    "ordinaryMobileDialogAndEscapeAfter": {"focusTag":"BUTTON","focusTarget":"same synthetic payment card","dialogOpen":false},
+    "syntheticXlsxRealFileChooser": {"previewRows":1,"reference":"0017","amountCents":12345,"missingRecipientAccountHeld":true},
+    "syntheticXlsxDemoConfirmation": {"scope":"browser-memory demo only","reviewRowsAdded":1,"countedAsMoney":false,"documentWidth":375,"viewportWidth":390}
+  },
+  "limits": [
+    "Scrollbar accounts for viewport/document width differences.",
+    "The demo has no retained bank or invoice originals and does not verify the authenticated eleven-step production chain.",
+    "Development HMR reset demo data while code changed; final focus and filter checks were repeated after code freeze.",
+    "Original production accounts, schedules, registrations and allocations were not modified."
+  ]
+}

@@ -1,0 +1,101 @@
+# MGEORGE – final engineering
+
+Datum: 2026-11-02. Start `087e5ced733b2cfdb3f8540d006118fb26cb6107`, Sites 53, runtime 9. Denna rapport innehåller sanerade slutsatser och syntetiska mätningar. Verkliga original, kontrollsummor, konto-/kundidentifierare och nycklar bevaras privat utanför Git.
+
+**Leveranskontroll pågår.** Kodgranskning och fullständiga slutgrindar skiljs från main-push, Sites-publicering och faktisk drift. Slutligt leveranskvitto kompletteras efter dessa åtgärder. Målet 9,5 i alla områden är inte uppnått.
+
+## Reproducerade fel och rättningar
+
+| Fel | Grundorsak och rättning | Regressionsbevis |
+| --- | --- | --- |
+| P1: sparat uppladdningsoriginal kunde raderas | D1 INSERT kan committa trots att svaret förloras. `/api/files` raderade då R2-objektet. Ägarbunden efterläsning måste nu bekräfta frånvaro före städning; okänt utfall bevarar bytes. | Tre RED-fel i sex nya multipart/SQLite/routefall. GREEN omfattar commit-/precommitfel, efterläsningsfel, retry, ägargräns och byteidentisk nedladdning. |
+| P1: Windows restore avvisade sin egen fil | `lstat.dev` och `fstat.dev` använder olika representation på aktuell Windows/Node. Windows jämför nu två deskriptorers bigint dev+ino samt pathname före/efter öppning. Linuxgrenen är oförändrad. | Native krypterad SQLite-backup, misslyckad flush/städning och utbytt pathname var RED. Riktad Linux 55/55 inklusive symlänkar; Windows 48/56 med åtta verkliga EPERM-fall uttryckligen överhoppade. Junction-/WAL-/bytefallen körs. |
+| P1: tvetydiga fakturadatum blev gröna | Parsern godtog ett giltigt datumprefix före extra datum eller okänt innehåll. Båda motorerna granskar nu hela märkta värdet och bibehåller den tidigare fullständiga etikettcensusen. | Direkt parsning och faktisk syntetisk PDF-autoregistrering: initialt 28 RED per motor. Oberoende censusfynd gav ytterligare RED och rättning; slutlig riktad Node 338/338, Sites 315/315. |
+| P2: längre metadata-ID klipptes till ett giltigt prefix | Explicit fakturanummer i filnamn/mejlrubrik begränsades till 80 tecken innan jämförelse. Hela token jämförs nu i båda apparna. | 82-teckens konflikt kontra 80-teckens original hålls; lika identifierare och ledande nollor bevaras. |
+| P1: redan attesterad betalare kunde flyttas till annan organisation | Sites tillät ändrat organisationsnummer bakom en aktiv fakturaallokering och lärde relation från den ändrade identiteten. Samma skrivgräns som skyddar bokade kärnfält skyddar nu organisationsidentiteten. | Verklig domän/avstämning med syntetiska AIS-kvitton: felaktig ny kundrelation stoppas. Node bedömd separat och har redan fryst organisationssnapshot; två SQLite-regressioner tillagda. |
+| P2: känd evidensbrist doldes efter bokning | Faktura-, bank- och ekonomiprojektioner ignorerade aktuell kontospärr/händelsetyp. En gemensam bedömning följer ursprungskedjan och samtliga aktiva allokeringseffekter. | RED tio fall; kontofel, återföring och felaktig refund hålls. Korrekt explicit refund fungerar. Oberoende blandad-allokeringsprobe är ordningsoberoende efter rättning. Bokade saldon/original bevaras. |
+| P2: dialog tappade fokus efter breddbyte | Desktopknappen fanns kvar i DOM men doldes på mobil. Efter Escape gick fokus till BODY. Dialogen kontrollerar nu synlighet och faktiskt återställt fokus; annars används befintligt `main-content`. | Fyra av sex RED-fall; GREEN 6/6 och 72 närliggande fall. Faktisk Chromium 1440→390→Escape ger MAIN/main-content; vanlig mobilstängning återfokuserar betalningskortet. |
+
+Oberoende granskningar har lett till rättningsrundor för datumcensus och blandade allokeringseffekter. Grön självgranskning används inte som ersättning för dessa kontroller. Inga testkrav togs bort för att maskera produktfel; Windows filsymlänkar särredovisas och motsvarande verkliga Linuxfall körs.
+
+## Befintliga motorer och verklig dataväg
+
+Den tidigare [arkitekturkartan](PAYMENT-VERIFICATION-ARCHITECTURE.md) gäller fortsatt. Node använder `bank.js`/importers → bevarat original och kvitto i SQLite → aktuell ägd kontokonfiguration → `reconciliation.js`/`db.js` under skrivlås → allokering/saldo/audit. Sites använder banking-adaptrar/store → bevarat AIS/R2-original → bankgiro-service och original-/kontoevidens → reconciliation-evidence med revisions-CAS och atomisk medgivandefence → befintligt workspace/allokering/audit.
+
+Gmail/native PDF/OCR går via respektive befintlig dokumentkö och fältparser till original-/motpartsgranskning och registreringsgräns. Registreringsförslag och läsande betalningskandidater skapar inga pengar. Bankbetalare, fakturakund, generell referens, formell OCR och manuell attest är separata evidensslag. Ingen parallell betalningsmotor, ny ekonomidatabas eller produktionsmigration införs.
+
+## Samma korpus före och efter
+
+[`measure-final-invoice-fields.mjs`](../scripts/measure-final-invoice-fields.mjs) kör samma 117 syntetiska text-/metadatafall genom båda fakturamotorerna mot baslinje och kandidat. Runner- och korpushash är identiska i [före](measurements/final-engineering-fields-before.json) och [efter](measurements/final-engineering-fields-after.json). Källhashar anger verklig arbetsytekod även före commit.
+
+| Mått, per motor | Före | Efter |
+| --- | ---: | ---: |
+| Korrekta beslut | 103/117 | 117/117 |
+| Korrekta positiva/gröna | 47/47 | 47/47 |
+| Felaktigt gröna negativa | 14 | 0 |
+| Korrekt hållna negativa | 56/70 | 70/70 |
+| Precision bland gröna i korpusen | 77,05 % | 100 % |
+| Recall för deklarerade positiva | 100 % | 100 % |
+| Andel gröna av samtliga fall | 52,14 % | 40,17 % |
+
+Detta är en avsiktligt avgränsad regressionskorpus. Minskad grön andel kommer från stoppad falsk säkerhet. Siffrorna är inte precision/recall för alla verkliga PDF:er, fotograferade underlag eller produktions-OCR. Inga nya universella OCR-, prestanda- eller volymgarantier ges. Verklig privat native-PDF och arbetsbok kontrolleras separat nedan.
+
+## Verkligt betalningsfall – 23 skrivfria kontroller
+
+Färsk exakt AIS-läsning är komplett, arbetsyterevision 42. Ägt rapportoriginal är intakt och komplett som strukturell enradskontroll. Den separata registerkontrollen för målreferensen är komplett utan träff. Referenssökningens övergripande `complete=false` är inte ett fullständigt referensbevis. Inget nytt bank-/Gmail-synk- eller kontodetaljanrop har gjorts.
+
+| Nr / kontroll | Källa, regel och faktiskt bevis | Felorsak / nästa åtgärd | Allokeringsrätt här |
+| --- | --- | --- | --- |
+| 1. Banktransaktionens identitet | Ägt sparat AIS-original, exakt extern identitet och kvitto passerar. | Rapportrelation bedöms separat. | Nej |
+| 2. Aktuellt medgivande | Ägarbunden sparad produktionsstatus är connected; aktuell kontogrind används i förhandskontrollen. | Bankens separata detaljväntetid är okänd. | Nej |
+| 3. Valt ägt konto | AIS-kontot godtas i aktuellt sparat medgivande. | Rapportens kontorelation är inte styrkt. | Nej |
+| 4. Originalkvitto/version | Befintlig versionsbunden AIS-kvittoprofil och omtolkning passerar. | Inga historiska kvitton skapas i efterhand. | Nej |
+| 5. Rapportintegritet | Ägd R2-fil och privat kopia har samma storlek/SHA; originalbytes oförändrade. | Hash ensam bevisar inte bankautenticitet. | Nej |
+| 6. Mottagarens Bankgiro | Uttrycklig originalcell läst och kontrollerad. | Konto-/Bankgirorelation behöver bankbevis. | Nej |
+| 7. Bankgirots mottagarkonto | Originalets kontotext bevarad. | Bankutfärdad relation till valt AIS-konto saknas. | Nej |
+| 8. Kontoalias | Senaste kompletta historiska kontoläsning saknade alias; senare detaljförsök rate-limit. | **Bankstyrkt kontoalias saknas – extern verifiering krävs.** | Nej |
+| 9. Rapportfullständighet | Parserns deklarerade antal och kompletta strukturella detaljgrupp passerar. | Ingen signatur-/kanalgaranti från filstrukturen. | Nej |
+| 10. Individuella rader | En detaljrad, ursprungliga betalar-/referensceller och råproveniens finns. | Relationen till AIS-insättningen återstår. | Nej |
+| 11. Rapporttotal | Antal, total och detaljsumma stämmer i heltalsören. | Summalikhet ersätter inte bankidentitet. | Nej |
+| 12. Gemensam insättningsidentitet | Kandidat på datum/belopp, ingen gemensam stabil bankidentitet eller beslutad originalrelation. | Bankutfärdat underlag som binder just rapport och insättning. | Nej |
+| 13. Verklig betalare | Namn från individuell rapport, AIS lämnar ingen individuell betalare. | Rapportnamnet får inte automatiskt bli AIS-betalare. | Nej |
+| 14. Referens/OCR | Exakt `0599` med inledande nolla; generell strukturerad betalningsreferens. | Formellt OCR-avtal/checksumma är inte styrkt. | Nej |
+| 15. Fakturaoriginal | Ägt R2-original matchar privat PDF; nio visuellt/maskinellt kontrollerade fält per motor passerar. | Native PDF är gul/granskningspliktig; ingen registrering. | Nej |
+| 16. Fakturaregister | Aktuell fullständig målregistersökning har noll träffar. | Privat förberett ej insänt förslag; separat registreringsgodkännande krävs. | Nej |
+| 17. Kund-/tredjepartsrelation | Originalets juridiska identitet finns; ingen färdig registerattest skapas. | Separat behörig original-/kundgranskning. | Nej |
+| 18. Valuta/datum | AIS anger bokförd SEK-händelse; rapportdatum/belopp kan passa. | Rapportens SEK är profilantagande; uttrycklig valuta och relevanta datum måste styrkas. | Nej |
+| 19. Tidigare allokeringar | Noll aktiva kopplingar på de relevanta observationerna. | Inga riktiga kopplingar tillförs som test. | Nej |
+| 20. Dubblettkontroll | Två observationer, AIS ekonomiskt räknad en gång och rapport noll gånger. | Avgränsad kontroll, ingen oberoende full ledgerexport. | Nej |
+| 21. Matchningsbeslut | Befintlig skrivfri förhandskontroll anger blockerad och automaticEligible=false. | Åtgärda externa bevis; nytt förslag före beslut. | Nej |
+| 22. Fakturasaldo | Registerpost saknas; inget verkligt registersaldo kan räknas. | Visa inte påhittat nollsaldo eller betaldstatus. | Nej |
+| 23. Revisionshistorik | Befintliga kopplingar bevaras, läsverktygen anger changed=false. | Ingen fullständig separat audithistorikexport påstås; ekonomiska beslut måste revideras separat. | Nej |
+
+Privat kontroll efter parserfrysning: 12/12 workbookkontroller och 9/9 fakturafält i vardera verklig motor passerar; PDF har gul nivå och noll parserissues. Originalens bytes, ägarskap/hash och storlek stämmer. Ingen kundidentitet, verklig originalhash eller kontouppgift läggs i Git. Inga verkliga fakturor, saldon, originalrelationer eller allokeringar har ändrats.
+
+## Gmail, bank, backup och drift
+
+Gmail är anslutet; timschemat är uttryckligen pausat och senaste lyckade hämtning är 2026-10-29. Ett konfigurerat schema, lokal arbetarheartbeat och ansluten OAuth är olika bevis; de styrker inte aktuell schemalagd hämtning eller slutfört moln-OCR-jobb. Läsningen visar 183 dokument som behöver granskning, med betydande saknade fält/obekräftad motpart. Den avsiktliga pausen bevaras; inga kundmejl skickas.
+
+Bankens ordinarie hämtning lyckades 2026-11-02 14:07Z och nästa ordinarie tid anges 20:06Z. Detta är inte kontodetalj-API:ts Retry-After. Den gamla detaljdeadlinen är okänd; inga fler sådana bankanrop eller nya kontoautomatiseringar görs.
+
+Backupstatus anger verifierat manifestpass 195/195 filer och kontroll av elva kvittoförsedda API-original; 112 äldre API-poster saknar kvitto i den redovisade omfattningen. Fullständig katastrofåterställning av faktisk produktionsbackup, separat katastrofkopia och tillgång till betrodda återställningsnycklar är inte verifierade. Inga produktionsåterställningar utförs.
+
+## Webbläsare och mätgräns
+
+Lokal Chromium med fiktiv minnesdemo: översikt vid 320/390/768/1024/1440 px utan dokumentoverflow, mobilmeny/navigation, exakt fakturasökning, specifikationsfilter, betalningsdialog, fel-/tomläge och Escape/fokus. [Observationer](measurements/final-engineering-browser.json). Lokal D1 är en separat syntetisk instans; inget produktionsschema tillämpades. Produktionsinloggad ekonomiresa, fysisk mobil och hela verkliga dokument-/betalningskedjan är separata kvarstående acceptansprov.
+
+## GitHub och arkiv
+
+Efter uttryckligt nytt användargodkännande för de fem exakta branchnamnen kontrollerades huvuden igen. En atomisk radering med förväntade SHA-villkor tog bort dem utan att mutera main eller force-pusha någon commit. Ny fjärrlista innehåller **endast main**. PR #9 och #10 är därefter verifierat closed/unmerged; de stängdes av GitHub när huvudbrancherna raderades.
+
+Komplett privat Gitbundle har återställts som fristående mirror och passerat strict fsck. Alla 17 vanliga lokala-/fjärrreferenser och deras träd stämmer med arkivet. Arkivet innehåller även Codex kontrollreferenser; dessa räknas inte som utvecklingsbrancher. Tre unika PR-commits är bevarade, och den valfria runnern integreras inte automatiskt. Arkiv, manifest och återställningsväg finns privat utanför Git. Den befintliga andra arbetskatalogen har inte ändrats.
+
+## Kvalitet, leverans och fortsättning
+
+Alla 33 före-/efterbedömningar med fynd, test-/produktionsgräns, risk och nästa åtgärd finns i den översta fullständiga tabellen i [QUALITY-SCORECARD](../QUALITY-SCORECARD.md). Dokumentära områdespoäng behålls: **255/330 = 7,73/10, 0/33 på 9,5**. Förbättrade kontrollregler eller en lyckad deploy är inte slutlig verksamhetsacceptans.
+
+Root/Sites paket och lockfiler är oförändrade. Rootaudit och Sites produktionsaudit har noll sårbarheter; full Sitesaudit behåller 16 moderate utvecklingsfynd och high-grinden passerar. Brytande godtyckliga verktygsnedgraderingar är inte en verifierad säkerhetsfix. Ingen full prestanda-/samtidighets-SLA eller representativ generell OCRprecision har fastställts.
+
+Exakt kod-/main-SHA, fullständiga slutgrindar, Actions och separat Sitesversion/publicering fylls i leveranskvittot efter faktiskt utförande. Före leverans är återgången sparad Sites 53; produktionsidentitet, audience, auth, runtime 9, tre befintliga scheman och DB/R2-bindningar ska bevaras. Ingen datamigrering eller ekonomisk återställning ingår.
+
+Fortsättningspunkt: slutför aktuell granskning/test/leverans och läsande efterkontroll. Därefter behövs bankutfärdat kontoalias/Bankgirokonto och rapport-/insättningsidentitet, explicit valuta/datum, separat konkret fakturaregistrerings-/kund-/allokeringsbeslut, aktuellt godkänt Gmail-schema, representativ OCR-/volymutvärdering och isolerat verkligt katastrofprov. Ingen obemannad fortsättning påstås utan faktisk varaktig körning.
