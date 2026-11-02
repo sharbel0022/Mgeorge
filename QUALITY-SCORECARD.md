@@ -14,6 +14,8 @@
 Övriga områden och senaste användbarhetsbetyg behålls. [Full rapport, mätningar och begränsningar](docs/REAL-PAYMENT-0599-FINAL-REPORT.md). Ingen9,5-inflation eller falsk betaldmarkering. Slutligt leveranskvitto tillkommer efter exakt CI/publicering och läsande efterkontroll.
 
 
+Slutlig läsande produktionskontroll efter main991214e/exakt CI41432323395/Sites51: aktuellt konto2/2 komplett men ingen matchande bankaliasrelation; ägda fakturabytes lika Gmail; registerkontroll komplett/0träffar; AIS ekonomiskt1, rapport0, båda0allokeringar och automaticEligiblefalse. Revision41 och kontrollerade ekonomiska fält oförändrade. D1struktur26tabeller, runtime9, policy/auth/scheman jämförda oförändrade. [Leveranskvitto](docs/REAL-PAYMENT-0599-DELIVERY.json). Poängen behålls; betalningsutfallet EXTERNT BLOCKERAT.
+
 ## OCR och fullständig evidens — aktuell mätning
 
 | Berört område | Före | Efter | Evidens och gräns |

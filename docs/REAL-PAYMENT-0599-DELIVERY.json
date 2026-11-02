@@ -1,0 +1,167 @@
+{
+  "schema": "mgeorge-real-payment-delivery-v1",
+  "date": "2026-11-02",
+  "status": "EXTERNT BLOCKERAD",
+  "scope": "Sanitized code and read-only production verification; no real invoice registration, relation attestation, allocation, payment or balance change",
+  "repository": "sharbel0022/Mgeorge",
+  "baseline": {
+    "commit": "31aa90ade9ee957af193ecef36f96971924217d5",
+    "sitesVersion": 49,
+    "nodeTests": 775,
+    "sitesTests": 1323
+  },
+  "code": {
+    "commit": "991214e80af753952abd1075cf2b4ab8ec71ccf7",
+    "tree": "89c1151917acca464d0f8c17c794b6616e1e396d",
+    "ciRun": 41432323395,
+    "ciUrl": "https://github.com/sharbel0022/Mgeorge/actions/runs/41432323395",
+    "jobs": {
+      "node": "success",
+      "sites": "success"
+    },
+    "node": {
+      "tests": 775,
+      "pass": 775,
+      "fail": 0,
+      "skipped": 0
+    },
+    "sites": {
+      "tests": 1381,
+      "pass": 1381,
+      "fail": 0,
+      "skipped": 0
+    },
+    "syntaxFiles": 98,
+    "typeScript": "passed",
+    "cleanProductionBuild": "passed",
+    "independentReview": "ready_after_one_final_fix_wave"
+  },
+  "privacy": {
+    "inheritedExampleFilesAnonymized": 17,
+    "fullOccurrencesAnonymized": 79,
+    "inheritedMaskedSuffixCorrected": true,
+    "privateNeedleScanTrackedPaths": 637,
+    "privateNeedleHits": 0,
+    "originalFilesPublished": false,
+    "originalHashesPublished": false,
+    "historyRewritten": false,
+    "productPublicIdentityPreserved": true
+  },
+  "measurement": {
+    "synthetic": true,
+    "cases": 13,
+    "beforeCorrect": 5,
+    "afterCorrect": 13,
+    "beforeStateUnchanged": 13,
+    "afterStateUnchanged": 13,
+    "scope": "Pure production preview and actual reconciliation analysis with controlled original/account context; not OCR accuracy, bank identity, or production authorization"
+  },
+  "audits": {
+    "root": 0,
+    "sitesProduction": 0,
+    "sitesFull": {
+      "moderate": 16,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencyLockfilesChanged": false,
+    "residual": "Development dependency minimatch advisory and dependent metadata; no verified compatible complete update identified"
+  },
+  "site": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 51,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_28c77d9d62048191a5a13db5c0132a10",
+    "sourceCommit": "e7509687dbfcbd71326d95074ecf0f4007d939d0",
+    "sourceTree": "96fd8fd8270914b2b95f2babe130484dd854344e",
+    "matchesMainSitesTree": true,
+    "deploymentId": "appgdep_6ae86c16af7c81919d10b5d407cea2b3",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "runtimeRevision": 9,
+    "runtimeEntriesUnchanged": true,
+    "policyAuthSchedulesUnchanged": true,
+    "bindingsD1R2Unchanged": true,
+    "schemaTables": 26,
+    "schemaUnchanged": true,
+    "migrationsApplied": false,
+    "rollbackVersion": 50,
+    "archive": {
+      "files": 375,
+      "sha256": "80460eb7e799c3457e63b3c8fdef0100f5f5009424ccd6f705d6b1fddac0f0a3",
+      "freshOutput": true,
+      "artifactCopyHashParity": true,
+      "qaReferences": 0
+    }
+  },
+  "production": {
+    "checkedAt": "2026-11-02T10:56:32.917Z",
+    "beforeRevision": 41,
+    "afterRevision": 41,
+    "snapshotCurrent": true,
+    "exactAisReadComplete": true,
+    "aisOriginalAndReceipt": "passed",
+    "reportOriginalIntegrity": "passed",
+    "reportReadComplete": true,
+    "reportEqualsPrivateWorkbook": true,
+    "invoiceOwnedBytesEqualGmailOriginal": true,
+    "currentAccount": {
+      "providerContacted": true,
+      "resourcesRead": 2,
+      "resourcesTotal": 2,
+      "resourcesComplete": true,
+      "complete": true,
+      "status": "missing",
+      "accountMatch": false,
+      "relationshipProved": false
+    },
+    "registry": {
+      "complete": true,
+      "matchCount": 0
+    },
+    "referenceQuery": {
+      "total": 2,
+      "outputLimited": false,
+      "nextOffset": null,
+      "complete": false,
+      "referenceSearchComplete": false,
+      "reason": "Other workspace records have incomplete reference evidence; independent registry and exact AIS checks are complete"
+    },
+    "selectedEconomicObservations": {
+      "total": 2,
+      "economicallyCounted": 1,
+      "aisCounted": true,
+      "reportCounted": false,
+      "bookedAllocations": 0,
+      "automaticEligible": false
+    },
+    "selectedFinancialFieldsUnchanged": true,
+    "unchangedStateScope": "Revision plus selected dates, amounts, currencies, bank references, payer/reference observations, booked invoices/allocation counters. No separate full-workspace economic export was available.",
+    "privateUnsubmittedRegistrationDraftPrepared": true
+  },
+  "backup": {
+    "day": "2026-11-02",
+    "status": "complete",
+    "verificationScope": "manifest_pass",
+    "files": 195,
+    "verifiedFiles": 195,
+    "legacyApiRecordsWithoutReceiptInBackupScope": 112,
+    "fullDisasterRestoreTested": false
+  },
+  "blocked": [
+    "Bank-issued explicit report recipient account to selected AIS account mapping",
+    "Bank-issued stable report to specific booked AIS deposit identity",
+    "Explicit report currency and relevant booking/value-date evidence",
+    "Registered invoice and any customer attestation/allocation require separate concrete business decisions",
+    "Authenticated browser UI, 390/1440px and keyboard QA blocked by preview infrastructure and missing active browser session"
+  ],
+  "universalOcr100PercentClaimed": false,
+  "scores": {
+    "bankImport": 8.5,
+    "payerReference": 7,
+    "automaticMatching": 7.5,
+    "security": 8.5,
+    "codeTests": 8.5,
+    "realProduction": 6.5,
+    "changed": false
+  }
+}

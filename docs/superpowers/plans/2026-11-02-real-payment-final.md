@@ -55,17 +55,17 @@ Interface: POST /api/bank/account-evidence uses identity(req), strict same-origi
 
 ### Task4: Actual provider discrepancy and private recheck
 
-- [ ] Use Task1 live stage/schema evidence before defining any compatibility fix. Add actual shape as synthetic RED regression and retain malformed-value rejection. Independent review and repeat owned read after publication.
-- [ ] Reread private supplied workbook and invoice via authorized sources; recheck identity/source/amount/date/currency and complete current register. No real registration or relation creation.
-- [ ] Identify A bank / B manual / C candidate relation; current missing evidence stays blocked. Verify economic-count assertions using real readers and synthetic state; no fabricated full-state comparison.
+- [x] Use Task1 live stage/schema evidence before defining any compatibility fix. Add actual shape as synthetic RED regression and retain malformed-value rejection. Independent review and repeat owned read after publication.
+- [x] Reread private supplied workbook and invoice via authorized sources; recheck identity/source/amount/date/currency and complete current register. No real registration or relation creation.
+- [x] Identify A bank / B manual / C candidate relation; current missing evidence stays blocked. Verify economic-count assertions using real readers and synthetic state; no fabricated full-state comparison.
 
 ### Task5: Full gates and delivery
 
 - [x] Inspect existing moderate dependency findings; apply only justified compatible fixes, otherwise disclose exact residual scope.
 - [x] Fresh clean-install baseline and final Node/Sites/syntax/TS/audits/build, meaningful before/after measurements, scoped/final independent review. Fix findings with RED/GREEN.
 - [x] Write docs/REAL-PAYMENT-0599-FINAL-REPORT.md (sanitized), update PROGRESS/QUALITY-SCORECARD with measured evidence and honest scores. No numerical target inflation.
-- [ ] Fetch/integrate latest main, nonforce push and verify exact CI. Check backup and saved rollback, build/publish matching Sites source and preserve runtime/policy/schedules/DB/R2.
-- [ ] Read-only production recheck, attempted owner UI verification, delivery receipt with exact source/version/CI and precise external actions. No claims of background work or completed payment.
+- [x] Fetch/integrate latest main, nonforce push and verify exact CI. Check backup and saved rollback, build/publish matching Sites source and preserve runtime/policy/schedules/DB/R2.
+- [x] Read-only production recheck, attempted owner UI verification, delivery receipt with exact source/version/CI and precise external actions. No claims of background work or completed payment.
 
 ## Inventory ledger
 
@@ -73,4 +73,4 @@ Fresh main31aa90a; open PR9/10 are older independent work and will not be merged
 
 Task1 scoped review passed after accessor-disclosure RED/GREEN fix: commits5f8f4df/677f48c. Fixed enum diagnostics do not relax null acceptance; live diagnosis follows exact tested publication. Task1 fullSites1328 before lastfix, focused57 and TS afterfix; controller finalfullgates recorded separately. No financial writes.
 
-Finala kodgrindar efter en samlad fixvåg: Sites1381/1381, TypeScript, syntax98, rent produktionsbygge. Avgränsad13-fallskorpus5/13→13/13 med13/13 oförändrade tillstånd på båda sidor. QA-source/stale chunks borttagna;347 färska dist-filer utan QA-referens. Browserpixel/inloggad UI blockerad och explicit ej passerad. Alla scoped reviews passerar; slutlig fixvågsrereview godkänner. Publicering och faktisk ägarbunden efterkontroll återstår. Ingen riktig ekonomisk skrivning.
+Finala kodgrindar efter en samlad fixvåg: Sites1381/1381, TypeScript, syntax98, rent produktionsbygge. Avgränsad13-fallskorpus5/13→13/13 med13/13 oförändrade tillstånd på båda sidor. QA-source/stale chunks borttagna;347 färska dist-filer utan QA-referens. Browserpixel/inloggad UI blockerad och explicit ej passerad. Alla scoped reviews passerar; slutlig fixvågsrereview godkänner. Levererat main991214e, exakt CI41432323395 success, Sites51 success med identiskt källträd/runtime9. Ägarbunden efterkontroll revision41, konto2/2 komplett/missing, ägt fakturaoriginal byteidentiskt med Gmail, komplett register0träffar, AIS ekonomisk1/rapport0,0allokeringar och valda ekonomiska fält oförändrade. Privat registreringsförslag förberett ej insänt. [Leveranskvitto](../../REAL-PAYMENT-0599-DELIVERY.json). Browser-QA blockerad och ej passerad. Ingen riktig ekonomisk skrivning.

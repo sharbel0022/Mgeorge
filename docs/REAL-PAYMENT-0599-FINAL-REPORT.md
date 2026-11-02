@@ -1,6 +1,6 @@
 # MGEORGE – FULLSTÄNDIG BETALNINGSVERIFIERING
 
-Teknisk slutleverans för publicering, 2026-11-02. Start main `31aa90ade9ee957af193ecef36f96971924217d5`, Sites49. Rapporten innehåller endast sanerade slutsatser och syntetiska testmått. Verkliga original, källidentifierare och originalhashar i denna undersökning hanteras endast privat. En sista kontroll fann verkliga motparts-/betalningsuppgifter i äldre offentliga testexempel; 79 förekomster i 17 befintliga test-/exempelfiler anonymiserades före slutleveransen; produktens avsiktliga företagsprofil/kontakt behölls. Tidigare Git-historik skrivs inte om.
+Verifierad teknisk slutleverans, 2026-11-02. Start main `31aa90ade9ee957af193ecef36f96971924217d5`, Sites49. Rapporten innehåller endast sanerade slutsatser och syntetiska testmått. Verkliga original, källidentifierare och originalhashar i denna undersökning hanteras endast privat. En sista kontroll fann verkliga motparts-/betalningsuppgifter i äldre offentliga testexempel; 79 förekomster i 17 befintliga test-/exempelfiler anonymiserades före slutleveransen; produktens avsiktliga företagsprofil/kontakt behölls. Tidigare Git-historik skrivs inte om.
 
 ## A. Verklig betalning
 
@@ -8,14 +8,14 @@ Teknisk slutleverans för publicering, 2026-11-02. Start main `31aa90ade9ee957af
 | --- | --- | --- |
 | Swedbankinsättning | Ägarautentiserad specifik bankpost, bevarat AIS-original och aktuell kvittoprofil passerar | Originalet verifierat; separat rapportrelation återstår |
 | Bankgirooriginal | Båda tidigare uppladdade privata kopiorna är identiska; ägt sparat original har samma integritet. Arbetsbok, celler, formatering, antal och totalsumma kontrollerade | 12/12 privata parser-/originalkontroller passerar |
-| Mottagarkonto | Aktuellt produktionsmedgivande och valt AIS-konto passerar. Första aktuella kontodetaljsvaret avvisades på valfri aliaslista som var null | Internt schemafel rättat med RED/GREEN och granskning; slutlig aktuell aliasläsning efter publicering återstår |
+| Mottagarkonto | Aktuellt produktionsmedgivande och valt AIS-konto passerar. Första aktuella kontodetaljsvaret avvisades på valfri aliaslista som var null. Efter rättningen lästes samtliga två godkända kontoresurser | Aktuell läsning complete=true, status=missing, accountMatch=false; banken lämnar ingen uttrycklig matchande relation |
 | Samma insättning | Rapporten saknar gemensam stabil insättningsidentifierare med AIS. Belopp/datum är kandidatkriterier | Inte bankstyrkt; ingen manuell relation bekräftad |
 | Betalare | Individuell originalrad och aktuell primär offentlig registerkälla granskade | Rapportens betalare identifierad; ersätter inte AIS-bankens saknade individuella betalare |
 | Betalningsreferens | Exakt text, inledande nolla, fälttyp och cell bevarade | Generell betalningsreferens, inte uttryckligen formell OCR |
-| Fakturaoriginal | Exakt original hämtat från verifierat företags-Gmail; text och renderad sida granskade | 9/9 kontrollerade numeriska/datum-/valutafält per motor; native PDF, gul granskningsnivå |
+| Fakturaoriginal | Exakt original hämtat från verifierat företags-Gmail; text och renderad sida granskade | 9/9 kontrollerade numeriska/datum-/valutafält per motor; native PDF, gul granskningsnivå. Mgeorges ägda R2-bytes har samma storlek och SHA256 som Gmail-originalet |
 | Fakturaregistrering | Färsk ägarbunden referenssökning anger fullständig registerkontroll utan träff | Original finns; ingen riktig registerpost har skapats |
 | Kundrelation | Aktuellt Bankgiroregister och fakturaoriginal anger samma juridiska organisation trots namnvariation | Offentligt identitetsstöd finns; ingen kundattest eller registerrelation har skrivits |
-| Saldo/allokering | Inga aktiva allokeringar på de två relevanta observationerna. Fakturan saknar registerpost | Verkligt fakturasaldo kan inte beräknas i registret; ingen betaldstatus beslutad |
+| Saldo/allokering | Inga aktiva allokeringar på de två relevanta observationerna. AIS räknas ekonomiskt, rapporten räknas inte som ytterligare insättning. Fakturan saknar registerpost | En ekonomisk insättning i den avgränsade tvåpostskontrollen; verkligt fakturasaldo kan inte beräknas i registret |
 | Automatisk matchning | Preview anger automaticEligible=false och noll ekonomiska skrivningar | Blockerad |
 
 Excelrapporten har inget uttryckligt valutafält och inget separat etiketterat bokförings-/valutadatum. En export-/rapporthuvudtidpunkt är separat från radens datum. Profilens SEK och datumlikhet får inte ersätta saknade bankbevis. Fakturans instruktion att ange fakturanummer som referens ger inte ett formellt OCR-avtal.
@@ -39,7 +39,7 @@ Målfallet är tills vidare C. Begär ett bankutfärdat underlag som uttrycklige
 | Dubblettskydd | Två observationer kunde missförstås som två insättningar | countedEconomically kommer direkt från befintlig ekonomisk projektion; ingen ny betalningsmotor |
 | UI | Befintlig svartvit elvastegspanel, kontoresultatet endast i MCP | Uttrycklig läsande kontokontroll, tillfälliga resultat och svenska felorsaker. SSR/hook/route-tester passerar; faktisk browser-QA är blockerad |
 | Säkerhet | Providerfelens orsak var oklar | Fasta diagnostikfält/typer och låst felkod; förfalskade egenskaper/getters kan inte läcka identifierare |
-| Produktion | Tre läsverktyg saknades i den förra chatten | Alla tre fungerar nu; aktuell bank-/original-/registerkontroll kan utföras inom ägargränsen |
+| Produktion | Tre läsverktyg saknades i den förra chatten | Alla tre fungerar nu. Efter publicering: exakt AIS-läsning och rapportläsning kompletta; aktuellt konto läst2/2, alias saknas; registerkontroll komplett utan träff |
 
 Ren baseline: Node775/775 och Sites1323/1323, noll fel/överhoppningar. Färdig Sites-kod:1381/1381, TypeScript, syntax98 och rent produktionsbygge passerar. Node-kod och dess beroenden/berörda parserkopior är oförändrade; hela Node-sviten har också körts om lokalt med775/775; anonymiserade fixtures får separata berörda tester och hela Node-sviten körs igen i exakt leverans-CI. Oberoende del- och slutgranskning passerar efter RED/GREEN-rättningar.
 
@@ -57,15 +57,21 @@ Dagens backup har komplett verifierat manifestpass195/195 filer. 112 äldre API-
 
 Databasinventeringen använder endast den behöriga strukturöversikten. Verkliga faktura-/bankkontroller går via ägarbundna läsverktyg; ingen direkt databaskringväg, sessionsimitation eller identitetsförbikoppling används. Inga migreringar eller nya ekonomiska register behövs.
 
-Slutlig main/CI/Sites-identitet, återgångsversion och läsande efterkontroll redovisas i ett separat leveranskvitto efter publicering. Föregående verifierade Sites50 bevaras som återgångsversion; inga produktionsmigreringar görs.
+Kodleverans på main `991214e80af753952abd1075cf2b4ab8ec71ccf7`, [exakt Actions41432323395](https://github.com/sharbel0022/Mgeorge/actions/runs/41432323395), båda jobb success efter rena installationer: Node775/775, Sites1381/1381, inga fel/överhoppningar, syntax98, TypeScript, high-auditgrindar och produktionsbygge. Testfixtures anonymiserades och berörda235 Sites/57 Node-prov samt23 bankmatchningsfall passerar separat.
+
+Sites51 **succeeded**, samma befintliga [produktionsadress](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site). Sites-källcommit `e7509687dbfcbd71326d95074ecf0f4007d939d0`; källträd `96fd8fd8270914b2b95f2babe130484dd854344e` är identiskt med kodleveransens sites-träd. Slutligt rent bygge:375 filer, exakt hashparitet mellan bygg- och paketeringskatalog, noll QA-referenser. Runtime9, åtkomstpolicy, authklient och samtliga tre befintliga scheman jämförda oförändrade. D1/R2-bindningar och migrationsfiler oförändrade; aktuell behörig D1-strukturöversikt visar samma26 tabeller utan trunkering. Föregående verifierade Sites50 bevaras som återgångsversion. [Maskinläsbart leveranskvitto](REAL-PAYMENT-0599-DELIVERY.json).
+
+Ägarbunden efterkontroll2026-11-02T10:56:32Z: revision41 före/efter och snapshotCurrent=true. Exakt AIS-läsning complete=true; ägt rapportoriginal complete=true/integrity=passed; privat fakturaoriginalkvitto bytejämfört med Gmail och lika. Kontoläsning complete=true/resourcesComplete=true, två av två resurser, status=missing/accountMatch=false. Detta är ett fungerande läsresultat med saknat bankalias, inte ett kvarvarande parserfel.
+
+Belopp/datum-sökningen läser alla lagrade transaktioner till sina urvalskriterier och visar två observationer, utan trunkering eller nästa sida: AIS countedEconomically=true, rapport=false, båda0 allokeringar och automaticEligible=false. Valda datum/belopp/valuta/bankreferens/betalare/referens/bokade fakturor/allokeringsräknare är oförändrade jämfört med före publicering. Det styrker den avgränsade kontrollen; ingen separat fullständig ekonomisk projektion av hela arbetsytan har exporterats. Referenssökningens övergripande complete=false beror på ofullständiga referenser i andra arbetsyteposter. Den separata registerkontrollen är complete=true/matchCount=0 och exakt AIS-läsning complete=true. Inga ofullständiga sökningar presenteras som ett fullständigt referensbevis.
 
 Browser-QA har en faktisk miljögräns: det officiella managed-previewflödet avvisade terminal.local när lokal profil saknades; officiell profilreparation följdes av upprepade kvarvarande vinext-serverlås i daemonens miljö. Ingen alternativ server, nätverksförbikoppling eller ändring av fungerande programkod användes. Browserns produktionssida nådde inloggning men saknade aktiv ChatGPT-session; inga inloggningsuppgifter begärdes eller matades in. Därför påstås varken390/1440-pixeltest, tangentbordsprov i browser eller inloggad UI-resa. SSR/hook/route-prov är separat verifiering.
 
-Den tillfälliga syntetiska QA-routen togs bort och preview stoppades. En första kontroll hittade tre kvarvarande QA-chunkar/maps i tidigare byggutdata. Hela den genererade dist-katalogen rensades och byggdes om:347 färska filer kontrollerade i sökväg och fulla bytes, noll QA-referenser. Ingen sådan route eller chunk har pushats eller publicerats.
+Den tillfälliga syntetiska QA-routen togs bort och preview stoppades. En första kontroll hittade tre kvarvarande QA-chunkar/maps i tidigare byggutdata. Hela den genererade dist-katalogen rensades och byggdes om:347 färska filer kontrollerade i sökväg och fulla bytes, noll QA-referenser. Efter slutlig fixtureanonymisering gjordes ytterligare ett rent bygge med375 kontrollerade filer; det är artefakten som publicerades. Ingen sådan QA-route eller chunk har pushats eller publicerats.
 
 ## D. Slutstatus
 
-**EXTERNT BLOCKERAD** för det verkliga betalningsutfallet. De identifierade internt lösbara kodrättningarna har godkända tester och granskning; exakt CI/publicering och ägarbunden efterkontroll kompletteras i leveranskvittot. Kontorelation och rapport-/insättningsidentitet är inte styrkta av en kodleverans. Ingen riktig faktura registreras, ingen källa bekräftas och ingen allokering eller betaldstatus ändras under uppdraget.
+**EXTERNT BLOCKERAD** för det verkliga betalningsutfallet. De identifierade internt lösbara kodrättningarna är granskade, testade, pushade, CI-verifierade och publicerade med ägarbunden efterkontroll. Aktuell komplett bankläsning saknar matchande kontoalias; rapport-/insättningsidentitet saknas fortfarande. Det privata registreringsförslaget är förberett men ej insänt. Ingen riktig faktura registreras, ingen källa bekräftas och ingen allokering eller betaldstatus ändras under uppdraget.
 
 ## Val och konsekvenser
 
