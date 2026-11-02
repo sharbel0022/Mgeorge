@@ -72,3 +72,70 @@ for(const pending of [false,true])test((pending?'legacy report promotion':'new r
  const command=pending?undefined:{type:'bankgiro.import',documentId:'synthetic-report'},blocked=await f.post(command);assert.equal(blocked.status,409,JSON.stringify(blocked.body));assert.deepEqual(f.read(),before);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
  f.beforeBatch=null;f.restore();const result=await f.post(command);assert.equal(result.status,200,JSON.stringify(result.body));assert.equal(f.read().state.transactions.find(row=>row.specification).specificationStatus,'linked');assert.equal(f.read().state.allocations.length,1);
 });
+
+
+const reportAlias='8000000123456789';
+const selectedAliasResource=()=>({uid:'selected',currency:'SEK',account_id:{iban},all_account_ids:[{scheme_name:'BBAN',identification:reportAlias}]});
+function setAliasResources(f,resources){f.sqlite.prepare('UPDATE bank_connections SET encrypted_accounts=?').run(JSON.stringify(resources));}
+function setSyntheticState(f,state){f.sqlite.prepare('UPDATE workspaces SET payload=?,revision=revision+1 WHERE owner=?').run(JSON.stringify(state),'synthetic-owner');}
+function addAliasPayment(state){
+ return applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account:'iban:'+iban,date:'2026-10-26',amount:62500,party:'',payerReference:'',description:'Bankgiro inbetalning',bankReference:'SYNTHETIC-ALIAS-DEPOSIT'})]}).state;
+}
+function addAliasInvoice(state){
+ return applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;
+}
+async function aliasFixture(t,linked=false){
+ let state=emptyState();if(linked)state=addAliasPayment(state);const f=await fixture(t,state);
+ setAliasResources(f,[selectedAliasResource()]);
+ const xml='<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><Othr><Id>'+reportAlias+'</Id></Othr></Id></Acct><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AcctSvcrRef>SYNTHETIC-ALIAS-DEPOSIT</AcctSvcrRef><NtryDtls><TxDtls><Refs><TxId>SYNTHETIC-ALIAS-CHILD</TxId></Refs><RltdPties><Dbtr><Nm>Synthetic customer AB</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>0599</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>',bytes=new TextEncoder().encode(xml),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex');
+ f.env.BUCKET={async get(key){return key==='synthetic-owner/synthetic-alias-report'?{size:bytes.length,arrayBuffer:async()=>bytes.buffer}:null;}};
+ f.sqlite.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run('synthetic-alias-report','synthetic-owner','Synthetic-alias.xml','application/xml',bytes.length,hash,'2026-10-26');
+ const imported=await f.post({type:'bankgiro.import',documentId:'synthetic-alias-report'});assert.equal(imported.status,200,JSON.stringify(imported.body));
+ const importedRow=f.read().state.transactions.find(row=>row.specification);assert.equal(importedRow.specificationStatus,linked?'linked':'review');assert.equal(importedRow.recipientAccount,reportAlias);assert.equal(importedRow.account,'iban:'+iban);
+ assert.equal(f.read().state.allocations.length,0);
+ state=f.read().state;if(!linked)state=addAliasPayment(state);state=addAliasInvoice(state);setSyntheticState(f,state);
+ f.originalBytes=bytes;f.originalHash=hash;return f;
+}
+const invalidAliasResources=[
+ ['removed',()=>[{uid:'selected',currency:'SEK',account_id:{iban}}]],
+ ['reassigned',()=>[{uid:'selected',currency:'SEK',account_id:{iban}},{...selectedAliasResource(),uid:'unselected',account_id:{iban:'SE4550000000058398257466'}}]],
+ ['duplicated',()=>[selectedAliasResource(),{...selectedAliasResource(),uid:'unselected',account_id:{iban:'SE4550000000058398257466'}}]],
+ ['duplicated on another currency',()=>[selectedAliasResource(),{...selectedAliasResource(),uid:'unselected',currency:'EUR',account_id:{iban:'SE4550000000058398257466'}}]],
+ ['untyped',()=>[{...selectedAliasResource(),all_account_ids:[{scheme_name:'OTHER',identification:reportAlias}]}]],
+ ['similar digits',()=>[{...selectedAliasResource(),all_account_ids:[{scheme_name:'BBAN',identification:'8000000123456780'}]}]]
+];
+for(const linked of [false,true])for(const [label,resources] of invalidAliasResources)test((linked?'linked':'pending')+' report with '+label+' current bank alias cannot allocate invoice 0599',async t=>{
+ const f=await aliasFixture(t,linked),before=f.read().state,original=structuredClone(before.transactions.find(row=>row.specification).original);setAliasResources(f,resources());
+ const result=await f.post();assert.equal(result.status,200,JSON.stringify(result.body));const state=f.read().state,row=state.transactions.find(item=>item.specification);
+ assert.equal(state.allocations.length,0);assert.equal(balance(state,state.invoices[0]),62500);assert.equal(row.specificationStatus,linked?'linked':'review');
+ assert.match(row.bankAccountIssue||row.bankgiroAccountIssue,/konto|medgivande/i);assert.equal(row.payerReference,'0599');assert.equal(row.party,'Synthetic customer AB');assert.equal(row.recipientAccount,reportAlias);assert.deepEqual(row.original,original);assert.equal(row.bankFileProof.sha256,f.originalHash);
+ assert.deepEqual(new Uint8Array(await(await f.env.BUCKET.get('synthetic-owner/synthetic-alias-report')).arrayBuffer()),f.originalBytes);
+});
+for(const linked of [false,true])test((linked?'linked':'pending')+' report recovers only when its explicit bank alias returns, then replay allocates once',async t=>{
+ const f=await aliasFixture(t,linked);setAliasResources(f,invalidAliasResources[0][1]());assert.equal((await f.post()).status,200);assert.equal(f.read().state.allocations.length,0);
+ setAliasResources(f,[{...selectedAliasResource(),all_account_ids:[{scheme_name:'BBAN',identification:'8000 0001-2345 6789'}]}]);
+ assert.equal((await f.post()).status,200);const first=f.read().state,row=first.transactions.find(item=>item.specification);
+ assert.equal(row.specificationStatus,'linked');assert.equal(first.allocations.length,1);assert.equal(balance(first,first.invoices[0]),0);assert.equal(row.recipientAccount,reportAlias);assert.equal(row.payerReference,'0599');assert.equal(row.bankFileProof.sha256,f.originalHash);
+ assert.equal((await f.post()).status,200);assert.deepEqual(f.read().state.allocations,first.allocations);
+});
+for(const linked of [false,true])test((linked?'linked':'pending')+' report without retained recipient identity cannot reuse only its resolved IBAN',async t=>{
+ const f=await aliasFixture(t,linked),state=f.read().state;delete state.transactions.find(row=>row.specification).recipientAccount;setSyntheticState(f,state);
+ assert.equal((await f.post()).status,200);assert.equal(f.read().state.allocations.length,0);assert.equal(balance(f.read().state,f.read().state.invoices[0]),62500);
+});
+test('alias removal during initial account decoding is rejected again before any financial commit',async t=>{
+ const f=await aliasFixture(t),before=f.read(),audit=f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n;let fired=false;
+ f.onAccounts=()=>{if(!fired){fired=true;setAliasResources(f,invalidAliasResources[0][1]());}};
+ const result=await f.post();assert.equal(fired,true);assert.equal(result.status,409,JSON.stringify(result.body));assert.deepEqual(f.read(),before);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,audit);
+});
+test('alias removal inside the commit window rolls back promotion, allocation and audit atomically',async t=>{
+ const f=await aliasFixture(t),before=f.read(),audit=f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n;let fired=false;
+ f.beforeBatch=statements=>{if(!fired&&statements.some(statement=>/UPDATE workspaces SET payload/.test(statement.query))){fired=true;setAliasResources(f,invalidAliasResources[0][1]());}};
+ const result=await f.post();assert.equal(fired,true);assert.equal(result.status,409,JSON.stringify(result.body));assert.deepEqual(f.read(),before);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,audit);
+});
+test('concurrent reconciliation of one retained alias report allocates once and reimport preserves exact reference',async t=>{
+ const f=await aliasFixture(t),results=await Promise.all([f.post(),f.post()]);
+ assert.deepEqual(results.map(result=>result.status).sort(),[200,409]);const first=f.read().state;
+ assert.equal(first.allocations.length,1);assert.equal(balance(first,first.invoices[0]),0);assert.equal(first.transactions.filter(row=>row.specification).length,1);
+ const replay=await f.post({type:'bankgiro.import',documentId:'synthetic-alias-report'});assert.equal(replay.status,200,JSON.stringify(replay.body));
+ const state=f.read().state;assert.deepEqual(state.allocations,first.allocations);assert.equal(state.transactions.filter(row=>row.specification).length,1);assert.equal(state.transactions.find(row=>row.specification).payerReference,'0599');assert.equal(state.transactions.find(row=>row.specification).bankFileProof.sha256,f.originalHash);
+});

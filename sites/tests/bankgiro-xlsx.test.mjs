@@ -67,3 +67,16 @@ test('XLSX excessive merge work and overlapping merges are rejected',()=>{
  assert.throws(()=>parse({mutate:wb=>{const s=wb.Sheets[wb.SheetNames[0]];s['!merges']=Array.from({length:5001},()=>({s:{r:0,c:0},e:{r:0,c:1}}));}}),/sammanslagna/i);
  assert.throws(()=>parse({mutate:wb=>{const s=wb.Sheets[wb.SheetNames[0]];s['!merges'].push(s['!merges'][0]);}}),/sammanslagna/i);
 });
+
+
+test('Boolean cells cannot masquerade as a reported sender name',()=>{
+ const bytes=makeBankgiroXLSX({mutate:wb=>{wb.Sheets['Insättningsuppgift'].A19={t:'b',v:true};}});
+ assert.throws(()=>parseBankgiroXLSX(bytes,'boolean-payer.xlsx'),/avsändare/i);
+});
+test('a separately labelled sequence retains the actual value cell and exact leading zeros',()=>{
+ const bytes=makeBankgiroXLSX({mutate:wb=>{const sheet=wb.Sheets['Insättningsuppgift'];sheet.E11={t:'s',v:'Löpnummer'};sheet.E12={t:'s',v:'00041'};}});
+ const [row]=parseBankgiroXLSX(bytes,'separate-sequence.xlsx');
+ assert.equal(row.reportEvidence.sequence,'00041');assert.equal(row.reportEvidence.reportId,'00041');
+ assert.equal(row.cellProvenance.sequence.address,'E12');assert.equal(row.cellProvenance.sequence.rawValue,'00041');
+ assert.equal(row.cellProvenance.sequenceLabel.address,'E11');assert.equal(row.cellProvenance.sequenceLabel.rawValue,'Löpnummer');
+});
