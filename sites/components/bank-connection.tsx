@@ -26,7 +26,8 @@ async function bankRequest<T>(path: string, method = "GET", body?: unknown, sign
   if (!response.ok || !data || typeof data !== "object" || data.error) throw new BankApiError(typeof data?.error === "string" ? data.error : "Bankåtgärden kunde inte slutföras. Försök igen.");
   return data as T;
 }
-function localDate(date = new Date()) { return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", year: "numeric", month: "2-digit", day: "2-digit" }).format(date); }
+// Provider date filters are inclusive UTC dates; display timestamps stay Swedish.
+function localDate(date = new Date()) { return date.toISOString().slice(0, 10); }
 function initialDate() { const date = new Date(localDate() + "T12:00:00Z"); date.setUTCDate(date.getUTCDate() - 29); return date.toISOString().slice(0, 10); }
 function dateLabel(value?: string | null) { return value && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "Inte hämtat ännu"; }
 function followBankUrl(value: string) {

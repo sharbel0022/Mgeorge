@@ -1,5 +1,5 @@
 import { db, identity, readWorkspace, response } from '@/lib/server';
-import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, today, uid, validDate } from '@/lib/domain';
+import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, uid, validDate } from '@/lib/domain';
 import {
   ProviderError, getApplication, listBusinessBanks, startAuth, createSession,
   getSession, deleteSession, getTransactions,
@@ -12,12 +12,11 @@ import {
 } from './store';
 import { cookieValue, digest, randomToken, validFlowToken } from './security';
 import { RuntimeBankError } from './runtime-config';
+import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
 
 export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
 const COOKIE = '__Secure-mg-bank-flow';
 const FLOW_AGE_MS = 15 * 60_000;
-const MAX_ROWS = 1000;
-const MAX_PAGES = 25;
 const POSTPROCESS_WARNING='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
 const stockholmClock = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
 function clockParts(at: number) { return Object.fromEntries(stockholmClock.formatToParts(at).filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)])); }
@@ -58,7 +57,12 @@ export function bankFailure(error: unknown): Response {
   if (code === 'BANK_SECRET_UNREADABLE') return response({ error: 'Bankanslutningens skyddade uppgifter kunde inte läsas. Kontakta administratören.' }, 503);
   if (error instanceof RuntimeBankError || code === 'BANK_RUNTIME_CONFIGURATION_CHANGED') return response({ error: 'Banktjänsten behöver aktiveras av systemadministratören.' }, 409);
   if (error instanceof BankError) return response({ error: error.message }, error.status);
-  if (error instanceof ProviderError) return response({ error: error.message, code: error.code, ...(error.retryAfter?{retryAfter:error.retryAfter}:{}) }, error.status === 429 ? 429 : 502);
+  if (error instanceof BankPeriodError) return response({error: error.message, code: error.code}, error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 409);
+  if (error instanceof ProviderError) {
+    const result = response({ error: error.message, code: error.code, ...(error.retryAfter?{retryAfter:error.retryAfter}:{}) }, error.status === 429 ? 429 : error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 502);
+    if (Number.isSafeInteger(error.retryAfter) && error.retryAfter! > 0) result.headers.set('Retry-After', String(error.retryAfter));
+    return result;
+  }
   return response({ error: 'Bankåtgärden kunde inte slutföras. Försök igen. Dina tidigare fakturor och bankhändelser är kvar.' }, 500);
 }
 
@@ -86,7 +90,7 @@ async function jsonBody(request: Request): Promise<Record<string, unknown>> {
 }
 
 function dateFrom(value: unknown): string {
-  if (typeof value !== 'string' || !validDate(value) || value < '2000-01-01' || value > today()) throw new BankError('Välj ett startdatum mellan 1 januari 2000 och idag.');
+  if (typeof value !== 'string' || !validDate(value) || value < '2000-01-01' || value > bankUtcDate()) throw new BankError('Välj ett startdatum mellan 1 januari 2000 och dagens UTC-datum.');
   return value;
 }
 
@@ -275,7 +279,9 @@ export async function selectAccounts(request: Request): Promise<Response> {
     const available = await accounts(conn), selected = [...new Set(body.accountUids as string[])];
     if (!selected.every(id => available.some(account => account.uid === id && account.currency === 'SEK' && stableAccountKey(account, { name: conn.bank_name, country: conn.country })))) throw new BankError('Endast tillgängliga SEK-konton med en stabil kontoidentifierare kan importeras.');
     const from = body.dateFrom === undefined ? conn.date_from : dateFrom(body.dateFrom);
-    await lease.run(db().prepare('UPDATE bank_connections SET selected_accounts=?,date_from=?,updated_at=? WHERE owner=? AND id=?').bind(JSON.stringify(selected), from, now(), user.userId, conn.id));
+    const previous: string[] = JSON.parse(conn.selected_accounts);
+    const scopeChanged = from !== conn.date_from || previous.length !== selected.length || previous.some(id => !selected.includes(id));
+    await lease.run(db().prepare('UPDATE bank_connections SET selected_accounts=?,date_from=?,last_synced_at=CASE WHEN ? THEN NULL ELSE last_synced_at END,updated_at=? WHERE owner=? AND id=?').bind(JSON.stringify(selected), from, Number(scopeChanged), now(), user.userId, conn.id));
     return response({ message: 'Konton och startdatum är sparade. Du kan nu hämta bankhändelser.' });
   });
 }
@@ -377,6 +383,8 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
     if (conn.last_synced_at && Date.now() - Date.parse(conn.last_synced_at) < 60_000) throw new BankError('Uppgifterna hämtades nyss. Vänta en minut innan nästa hämtning.', 429);
     const selected: string[] = JSON.parse(conn.selected_accounts);
     if (!selected.length) throw new BankError('Välj vilka konton du vill hämta först.');
+    // Freeze a validated UTC interval before any provider call or reservation.
+    const {dateFrom: from, dateTo: to} = bankSyncRange(conn.date_from, conn.last_synced_at);
     if(options.control)await lease.run(db().prepare('UPDATE bank_connections SET control_last_attempt_at=? WHERE owner=? AND id=?').bind(now(),owner,conn.id));
     // Reserve the next attempt before contacting the provider. Retries, multiple
     // tabs and scheduled task replays cannot create an unbounded polling loop.
@@ -385,7 +393,9 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
     const config = await providerConfig(app), bankAccounts = await accounts(conn);
     let needsReauthorization = false;
     try {
+      await lease.assert();
       const live = await getSession(config, await sessionId(conn));
+      await lease.assert();
       const expiry = Date.parse(live.access.valid_until);
       if (live.status !== 'AUTHORIZED' || !Number.isFinite(expiry) || expiry <= Date.now() || live.aspsp.name !== conn.bank_name || live.aspsp.country !== conn.country || live.psu_type !== 'business') {
         needsReauthorization = true;
@@ -396,11 +406,17 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         needsReauthorization = true;
         throw new BankError('Ett valt konto ingår inte längre i bankens medgivande. Anslut banken igen.');
       }
+      const consentExpiresAt = Math.min(expiry, Date.parse(conn.valid_until));
+      const authorizeFetch = async () => {
+        await lease.assert();
+        if (!Number.isFinite(consentExpiresAt) || Date.now() >= consentExpiresAt) {
+          needsReauthorization = true;
+          throw new ProviderError('BANK_RECONNECT_REQUIRED', 'Bankmedgivandet gick ut under hämtningen. Anslut banken igen. Inga nya bankhändelser sparades.', 409);
+        }
+      };
       const rows: Record<string, unknown>[] = [], warnings = new Set<string>();
-      let skipped = 0, rawCount = 0, pageCount = 0;
-      const to = today();
-      const overlap = conn.last_synced_at ? new Date(Date.parse(conn.last_synced_at.slice(0, 10) + 'T12:00:00Z') - 3 * 86400_000).toISOString().slice(0, 10) : conn.date_from;
-      const from = options.automatic && overlap > conn.date_from ? overlap : conn.date_from;
+      let skipped = 0;
+      const budget = {requests: 0, rows: 0};
       for (const id of selected) {
         const account = bankAccounts.find(item => item.uid === id);
         const canonicalKey = account && stableAccountKey(account, { name: conn.bank_name, country: conn.country });
@@ -408,25 +424,16 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         // Use the same canonical bank identity as file imports. Provider UIDs
         // change after reauthorisation and must never be used for deduplication.
         const accountKey = canonicalKey;
-        let continuationKey: string | undefined;
-        const seen = new Set<string>();
-        do {
-          if (++pageCount > MAX_PAGES) throw new BankError('Perioden innehåller för många sidor. Välj ett senare startdatum och hämta igen. Inga nya bankhändelser har sparats.');
-          const page = await getTransactions(config, id, { dateFrom: from, dateTo: to, continuationKey, psu: options.psu });
-          await lease.assert();
-          if (!Array.isArray(page.transactions)) throw new BankError('Banken lämnade ett oväntat svar. Inga nya bankhändelser har sparats.');
-          rawCount += page.transactions.length;
-          if (rawCount > MAX_ROWS) throw new BankError('Perioden innehåller fler än 1 000 bankhändelser. Välj ett senare startdatum och hämta igen. Inga nya bankhändelser har sparats.');
-          const normalized = await normalizeTransactions(page.transactions, { accountKey, accountLabel: maskAccount(account, {name: conn.bank_name, country: conn.country}), bankName: conn.bank_name, dateFrom: from, dateTo: to });
+        const periods = await fetchBankPeriods({dateFrom: from, dateTo: to, budget, authorize: authorizeFetch,
+          isPeriodError: error => error instanceof ProviderError && error.code === 'BANK_PERIOD_UNAVAILABLE',
+          fetchPage: input => getTransactions(config, id, {...input, psu: options.psu}),
+        });
+        for (const period of periods) {
+          const normalized = await normalizeTransactions(period.transactions, { accountKey, accountLabel: maskAccount(account, {name: conn.bank_name, country: conn.country}), bankName: conn.bank_name, dateFrom: period.dateFrom, dateTo: period.dateTo });
           rows.push(...normalized.rows);
           skipped += normalized.skipped.pending + normalized.skipped.nonSek + normalized.skipped.invalid;
           normalized.warnings.forEach(warning => warnings.add(warning));
-          continuationKey = page.continuation_key || undefined;
-          if (continuationKey) {
-            if (typeof continuationKey !== 'string' || seen.has(continuationKey)) throw new BankError('Bankens sidindelning kunde inte slutföras. Inga nya bankhändelser har sparats.');
-            seen.add(continuationKey);
-          }
-        } while (continuationKey);
+        }
       }
       warnings.add('Bankgiro kan redovisas som en samlad insättning. Komplettera vid behov med camt.054 eller bankens betalningsspecifikation innan du matchar.');
       const test = conn.environment === 'SANDBOX', at = now();
@@ -435,6 +442,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       const persistedWarnings=()=>JSON.stringify([...warnings,...(!test?[POSTPROCESS_WARNING]:[])]);
       let imported = 0;
       const runId = uid();
+      await authorizeFetch();
       const old = !test ? await readWorkspace(user.userId) : null;
       const candidateRows = rows.filter(row => {
         if (!old || !row.externalId) return true;
@@ -468,6 +476,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         const payload = JSON.stringify(result.state);
         await lease.run(db().prepare('INSERT OR IGNORE INTO workspaces (owner,revision,payload,updated_at) VALUES (?,0,?,?)').bind(user.userId, JSON.stringify(emptyState()), at));
         const auditId = uid();
+        await authorizeFetch();
         const committed = await lease.write([
           db().prepare(`INSERT INTO audit_events (id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS (SELECT 1 FROM workspaces WHERE owner=? AND revision=?)`)
             .bind(auditId, user.userId, old.revision + 1, 'bank.sync', JSON.stringify({ message: `${imported} bankhändelser hämtade från ${conn.bank_name}`, command: { type: 'bank.sync', connectionId: conn.id, from, to, imported, skipped } }), at, user.userId, old.revision),
@@ -481,6 +490,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         // Sandbox is intentionally never written into the financial register.
         if (test) warnings.add(`${rows.length} testhändelser lästes. Inga testuppgifter sparades bland dina riktiga bankhändelser.`);
         else skipped += rows.length;
+        await authorizeFetch();
         await lease.write([
           db().prepare('INSERT INTO bank_sync_runs (id,owner,connection_id,imported,skipped,warnings,test,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(runId, user.userId, conn.id, 0, skipped, persistedWarnings(), test ? 1 : 0, at),
           db().prepare("UPDATE bank_connections SET last_synced_at=?,last_error=NULL,retry_after='',sync_failures=0,updated_at=? WHERE owner=? AND id=?").bind(at, at, user.userId, conn.id),
@@ -496,9 +506,10 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
     } catch (error) {
       await lease.assert();
       const exhausted=options.automatic&&conn.sync_failures+1>=3;
-      const message = exhausted?'Automatisk bankhämtning är stoppad efter tre avbrutna eller misslyckade försök. Kontrollera anslutningen och gör en manuell hämtning.':error instanceof BankError || error instanceof ProviderError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.';
+      const detail = error instanceof BankError || error instanceof ProviderError || error instanceof BankPeriodError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.';
+      const message = exhausted ? `Automatisk bankhämtning är stoppad efter tre avbrutna eller misslyckade försök. ${detail}` : detail;
       const expired = needsReauthorization || error instanceof ProviderError && error.code === 'BANK_RECONNECT_REQUIRED';
-      const limited=error instanceof ProviderError&&error.status===429;
+      const limited=error instanceof ProviderError&&(error.status===429||error.retryAfter!==undefined||error.retryBlocked===true);
       const retry=limited?(error.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+Math.max(60,error.retryAfter||60)*1000).toISOString()):conn.retry_after;
       await lease.run(db().prepare('UPDATE bank_connections SET last_error=?,status=?,retry_after=?,sync_failures=CASE WHEN ? THEN 3 ELSE sync_failures END,updated_at=? WHERE owner=? AND id=?').bind(message, expired ? 'reauth_required' : conn.status,retry,limited&&error.retryBlocked?1:0, now(), user.userId, conn.id));
       throw error;

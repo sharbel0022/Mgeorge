@@ -92,6 +92,7 @@ type RetryDiagnostic =
   | {status:'unknown';checkedAt:string;provenance:'retry_after_missing'|'retry_after_invalid'}
   | {status:'manual_block';checkedAt:string;provenance:'retry_after_exceeds_limit'};
 const MAX_RETRY_SECONDS=365*86400;
+const DEFAULT_RATE_LIMIT_RETRY_SECONDS=6*3600;
 // Only response parsing may create advice. Public ProviderError retry fields are
 // legacy sync policy, including a fallback, and cannot prove a supplier deadline.
 const retryDiagnostics=new WeakMap<object,RetryDiagnostic>();
@@ -148,7 +149,8 @@ function checkedUrl(path: string, method: string): URL {
   }
   if (TRANSACTIONS_PATH.test(url.pathname)) {
     const from = url.searchParams.get('date_from') ?? '', to = url.searchParams.get('date_to') ?? '';
-    if (!isoDate(from) || !isoDate(to) || from > to || url.searchParams.get('transaction_status') !== 'BOOK') throw invalid();
+    const today = new Date(Date.now()).toISOString().slice(0, 10);
+    if (!isoDate(from) || !isoDate(to) || from > to || from > today || to > today || url.searchParams.get('transaction_status') !== 'BOOK') throw invalid();
     const continuation = url.searchParams.get('continuation_key');
     if (continuation !== null && (!continuation || continuation.length > 4_096 || /[\u0000-\u001f\u007f]/.test(continuation))) throw invalid();
   }
@@ -204,6 +206,16 @@ async function boundedJson(response: Response): Promise<unknown> {
 
 function mappedError(status: number, payload: unknown, retryHeader: string | null): ProviderError {
   const code = record(payload) && typeof payload.error === 'string' ? payload.error : '';
+  // A rate-limited response must never enter date recovery, even if its body
+  // reports a conflicting error. Missing supplier advice uses the documented
+  // six-hour background policy without becoming a trusted supplier deadline.
+  if (status === 429 || code === 'ASPSP_RATE_LIMIT_EXCEEDED') {
+    const now=Date.now(),advice=responseRetryDiagnostic(retryHeader,now),blocked=advice.status==='manual_block';
+    const retryAfter=advice.status==='known'?Math.max(1,Math.ceil((Date.parse(advice.notBefore)-now)/1000)):blocked?MAX_RETRY_SECONDS:DEFAULT_RATE_LIMIT_RETRY_SECONDS;
+    const error=Object.assign(new ProviderError('BANK_RATE_LIMIT', blocked?'Bankens väntetid kräver manuell kontroll. Automatisk hämtning har stoppats.':'Bankens gräns för hämtningar har nåtts. Vänta till nästa tillåtna försök.', 429, true), {retryAfter,retryBlocked:blocked});
+    if(status===429)retryDiagnostics.set(error,advice);
+    return error;
+  }
   if (['EXPIRED_SESSION', 'REVOKED_SESSION', 'CLOSED_SESSION', 'SESSION_DOES_NOT_EXIST', 'EXPIREDSESSION'].includes(code)) {
     return new ProviderError('BANK_RECONNECT_REQUIRED', 'Bankmedgivandet har gått ut eller avslutats. Anslut banken igen.', 409);
   }
@@ -212,16 +224,10 @@ function mappedError(status: number, payload: unknown, retryHeader: string | nul
   }
   if (code === 'NO_ACCOUNTS_ADDED') return new ProviderError('NO_LINKED_ACCOUNTS', 'Applikationen saknar tillåtna bankkonton. Kontrollera kontoaktiveringen hos Enable Banking.', 409);
   if (code === 'REDIRECT_URI_NOT_ALLOWED') return new ProviderError('CALLBACK_NOT_REGISTERED', 'Returadressen är inte registrerad hos Enable Banking. Kontrollera bankkopplingens inställningar.', 400);
-  if (['WRONG_TRANSACTIONS_PERIOD', 'WRONG_DATE_INTERVAL', 'DATE_FROM_IN_FUTURE', 'DATE_TO_WITHOUT_DATE_FROM'].includes(code)) return new ProviderError('BANK_PERIOD_UNAVAILABLE', 'Banken kan inte lämna den valda perioden. Välj ett senare startdatum eller en kortare period.', 400);
+  if (code === 'WRONG_TRANSACTIONS_PERIOD') return new ProviderError('BANK_PERIOD_UNAVAILABLE', 'Banken kan inte lämna den valda perioden. Välj ett senare startdatum eller en kortare period.', 400);
+  if (['WRONG_DATE_INTERVAL', 'DATE_FROM_IN_FUTURE', 'DATE_TO_WITHOUT_DATE_FROM'].includes(code)) return new ProviderError('BANK_DATE_RANGE_INVALID', 'Bankens datumintervall är ogiltigt. Kontrollera datumen och försök igen.', 400);
   if (['ASPSP_ACCOUNT_NOT_ACCESSIBLE', 'ACCOUNT_DOES_NOT_EXIST'].includes(code)) return new ProviderError('BANK_ACCOUNT_UNAVAILABLE', 'Bankkontot är inte tillgängligt med det aktuella medgivandet. Anslut banken igen och välj företagets konto.', 409);
   if (code === 'ASPSP_PSU_ACTION_REQUIRED') return new ProviderError('BANK_ACTION_REQUIRED', 'Banken kräver en åtgärd från dig. Logga in hos banken och kontrollera meddelanden och behörigheter.', 409);
-  if (status === 429 || code === 'ASPSP_RATE_LIMIT_EXCEEDED') {
-    const now=Date.now(),value=(retryHeader||'').trim(),seconds=/^\d+$/.test(value)?Number(value):Math.ceil((Date.parse(value)-now)/1000);
-    const blocked=/^\d{11,}$/.test(value)||Number.isFinite(seconds)&&seconds>365*86400;
-    const error=Object.assign(new ProviderError('BANK_RATE_LIMIT', blocked?'Bankens väntetid kräver manuell kontroll. Automatisk hämtning har stoppats.':'Bankens gräns för hämtningar har nåtts. Vänta till nästa tillåtna försök.', 429, true), {retryAfter:Number.isFinite(seconds)?Math.max(1,Math.min(365*86400,seconds)):60,retryBlocked:blocked});
-    if(status===429)retryDiagnostics.set(error,responseRetryDiagnostic(retryHeader,now));
-    return error;
-  }
   if (status === 408 || code === 'ASPSP_TIMEOUT') return new ProviderError('BANK_TIMEOUT', 'Banktjänsten svarade inte i tid. Försök igen om en stund.', 504, true);
   if (['PSU_HEADER_NOT_PROVIDED', 'PSU_HEADER_INVALID', 'PSUHEADERNOT_PROVIDED'].includes(code)) return new ProviderError('BANK_USER_CONTEXT_REQUIRED', 'Banken behöver en aktiv användarsession. Öppna sidan och försök hämta bankhändelser igen.', 409);
   if (status === 401 || ['AUTHORIZATION_NOT_PROVIDED', 'UNAUTHORIZED_ACCESS', 'WRONG_CREDENTIALS_PROVIDED'].includes(code)) return new ProviderError('PROVIDER_AUTHORIZATION_FAILED', 'Banktjänsten behöver aktiveras av systemadministratören. Enable Banking kunde inte verifiera serverns åtkomst.', 400);
@@ -258,6 +264,19 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
     // Workers supports manual redirects, but rejects redirect: 'error'. Never
     // follow a redirect with bank credentials or an authorization-code body.
     const response = await fetch(url.href, { method, headers, body, signal: controller.signal, redirect: 'manual', cache: 'no-store' });
+    const retryHeader = response.headers.get('retry-after');
+    if (response.status === 429 || response.status === 503 && retryHeader !== null) {
+      // A malformed, oversized or stalled error body cannot erase a cooldown
+      // already established by HTTP headers. Cancellation must not delay it.
+      const error = mappedError(response.status, null, retryHeader);
+      if (response.status === 503) {
+        const at = Date.now(), advice = responseRetryDiagnostic(retryHeader, at);
+        error.retryBlocked = advice.status === 'manual_block';
+        error.retryAfter = advice.status === 'known' ? Math.max(1, Math.ceil((Date.parse(advice.notBefore) - at) / 1000)) : error.retryBlocked ? MAX_RETRY_SECONDS : DEFAULT_RATE_LIMIT_RETRY_SECONDS;
+      }
+      void response.body?.cancel().catch(() => {});
+      throw error;
+    }
     if (response.status >= 300 && response.status < 400) {
       await response.body?.cancel();
       throw new ProviderError('PROVIDER_REDIRECT_DENIED', 'Banktjänsten svarade med en oväntad omdirigering. Ingen import gjordes.');
