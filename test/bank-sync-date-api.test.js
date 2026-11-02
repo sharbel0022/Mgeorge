@@ -1,0 +1,193 @@
+import test,{beforeEach,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {generateKeyPairSync} from 'node:crypto';
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {request} from 'node:http';
+import {encryptObject,decryptObject} from '../src/security.js';
+
+// Only a temporary SQLite database and generated credentials are used here.
+const folder=mkdtempSync(join(tmpdir(),'mg-bank-sync-dates-'));
+process.env.NODE_ENV='test';process.env.APP_ORIGIN='http://localhost:3000';
+process.env.DB_PATH=join(folder,'db.sqlite');process.env.SESSION_SECRET='6'.repeat(64);process.env.BANK_DATA_KEY='7'.repeat(64);
+for(const name of ['ENCRYPTION_KEY','ENABLEBANKING_APP_ID','ENABLEBANKING_PRIVATE_KEY_FILE','ENABLEBANKING_ENVIRONMENT','ENABLE_BANKING_PRIVATE_KEY_FILE'])delete process.env[name];
+process.env.ENABLE_BANKING_ENVIRONMENT='SANDBOX';process.env.ENABLE_BANKING_APPLICATION_ID='synthetic-sync-dates';
+process.env.ENABLE_BANKING_PRIVATE_KEY=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+const {server,db,runScheduledSync}=await import('../src/server.js');
+const base=await new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve(`http://127.0.0.1:${server.address().port}`)));
+const originalFetch=globalThis.fetch;
+const connectionId='synthetic-date-connection',accountNumber='SYNTHETIC-ACCOUNT-UTC';
+const account={uid:'account',name:'Synthetic date account',currency:'SEK',usage:'ORGA',account_id:{other:{identification:accountNumber}}};
+let provider,verifyProvider,requests,calls,cookie='';
+const transaction=(id,date,extra={})=>({status:'BOOK',entry_reference:id,transaction_id:'lookup-'+id,booking_date:date,transaction_amount:{amount:'125.00',currency:'SEK'},credit_debit_indicator:'CRDT',debtor:{name:'Synthetic payer AB'},reference_number:'SYNTHETIC-REF',...extra});
+globalThis.fetch=async(url,options)=>{
+  const target=new URL(url);assert.equal(target.origin,'https://api.enablebanking.com');calls++;
+  if(target.pathname.startsWith('/sessions/'))return verifyProvider?verifyProvider(target,options):Response.json({status:'AUTHORIZED',accounts:['account']});
+  assert.equal(target.pathname,'/accounts/account/transactions');
+  requests.push([target.searchParams.get('date_from'),target.searchParams.get('date_to'),target.searchParams.get('continuation_key')]);
+  return provider(target,options);
+};
+beforeEach(()=>{
+  db.exec('DELETE FROM bank_transactions; DELETE FROM bank_connections; DELETE FROM integration_jobs; DELETE FROM import_jobs; DELETE FROM audit_events; DELETE FROM sessions;');
+  db.prepare('UPDATE app_settings SET data=? WHERE id=1').run(JSON.stringify({sync_interval_minutes:15,gmail_sync_interval_minutes:0}));
+  db.prepare('INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status,selected_account_uid) VALUES(?,?,?,?,?,?,?,?,?)').run(connectionId,'enablebanking','Swedbank',encryptObject({session_id:'synthetic-private-session'}),encryptObject([account]),'2099-01-01T00:00:00Z','local-admin','connected','account');
+  provider=async()=>Response.json({transactions:[]});verifyProvider=null;requests=[];calls=0;cookie='';
+});
+after(async()=>{globalThis.fetch=originalFetch;await new Promise(resolve=>server.close(resolve));db.close();rmSync(folder,{recursive:true,force:true});});
+async function call(path,body){
+  return new Promise((resolve,reject)=>{
+    const text=body===undefined?'':JSON.stringify(body);
+    const req=request(base+path,{method:body===undefined?'GET':'POST',headers:{Host:'localhost:3000',...(cookie?{Cookie:cookie}:{}),...(body===undefined?{}:{Origin:process.env.APP_ORIGIN,'Content-Type':'application/json','Content-Length':Buffer.byteLength(text)})}},res=>{
+      const chunks=[];res.on('data',chunk=>chunks.push(chunk));res.on('end',()=>{if(res.headers['set-cookie'])cookie=res.headers['set-cookie'][0].split(';')[0];resolve({status:res.statusCode,body:JSON.parse(Buffer.concat(chunks).toString()),headers:res.headers});});
+    });req.on('error',reject);req.end(text);
+  });
+}
+const sync=body=>call('/api/bank/sync',{connection_id:connectionId,...body});
+const stored=()=>db.prepare('SELECT * FROM bank_connections WHERE id=?').get(connectionId);
+const freeze=(t,iso='2026-11-02T10:00:00Z')=>t.mock.timers.enable({apis:['Date'],now:new Date(iso)});
+
+test('bank defaults use UTC dates when Stockholm has already entered the following day',async t=>{
+  freeze(t,'2026-06-01T22:30:00Z');
+  const result=await sync({});assert.equal(result.status,200);
+  assert.deepEqual(requests,[['2026-05-03','2026-06-01',null]]);
+});
+
+test('explicit malformed or future dates do not call the provider or advance a checkpoint',async t=>{
+  freeze(t);
+  const before=stored().encrypted_session;
+  for(const range of [{date_from:'2026-02-30',date_to:'2026-03-01'},{date_from:'2026-11-02',date_to:'2026-11-01'},{date_from:'2026-11-01',date_to:'2026-11-03'},{date_from:false},{date_to:0}])assert.equal((await sync(range)).status,400);
+  assert.equal(calls,0);assert.equal(stored().last_synced,'');assert.equal(stored().encrypted_session,before);
+});
+
+test('a historical fetch preserves the current-sync timestamp and schedules the unrequested gap',async t=>{
+  freeze(t);
+  db.prepare('UPDATE bank_connections SET last_synced=? WHERE id=?').run('2026-10-01T12:00:00Z',connectionId);
+  assert.equal((await sync({date_from:'2026-08-01',date_to:'2026-08-31'})).status,200);
+  assert.equal(stored().last_synced,'2026-10-01T12:00:00Z');
+  requests=[];
+  await runScheduledSync();
+  assert.deepEqual(requests,[['2026-08-30','2026-11-02',null]]);
+  const status=(await call('/api/bank/status')).body.connections[0];
+  assert.deepEqual(status.sync_coverage,{date_from:'2026-08-01',date_to:'2026-11-02',pending_from:'',complete:true});
+});
+
+test('a long outage recovers every UTC date without clamping away old history',async t=>{
+  freeze(t);db.prepare('UPDATE bank_connections SET last_synced=? WHERE id=?').run('2026-03-01T12:00:00Z',connectionId);
+  await runScheduledSync();
+  assert.deepEqual(requests,[['2026-02-28','2026-05-28',null],['2026-05-29','2026-08-26',null],['2026-08-27','2026-11-02',null]]);
+  assert.equal((await call('/api/bank/status')).body.connections[0].sync_coverage.date_to,'2026-11-02');
+});
+
+test('a later-window rate limit preserves every transaction and the old coverage across restart',async t=>{
+  freeze(t);db.prepare('UPDATE bank_connections SET last_synced=? WHERE id=?').run('2026-03-01T12:00:00Z',connectionId);
+  const before=stored().encrypted_session;
+  provider=async()=>requests.length===1?Response.json({transactions:[transaction('first-window','2026-04-01')]}):Response.json({error:'ASPSP_RATE_LIMIT_EXCEEDED'},{status:429,headers:{'Retry-After':'172800'}});
+  const result=await sync({});assert.equal(result.status,429);assert.equal(result.headers['retry-after'],'172800');
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM bank_transactions').get().n,0);
+  assert.equal(stored().encrypted_session,before);assert.equal(stored().last_synced,'2026-03-01T12:00:00Z');
+  const count=calls;assert.equal((await sync({})).status,429);assert.equal(calls,count);
+  const restarted=await import('../src/server.js?bank-date-retry-restart');
+  try{await restarted.runScheduledSync();assert.equal(calls,count);}finally{restarted.db.close();}
+});
+
+test('complete historical coverage survives restart and resumes with an overlap',async t=>{
+  freeze(t);
+  assert.equal((await sync({date_from:'2026-10-01',date_to:'2026-10-10'})).status,200);
+  const session=decryptObject(stored().encrypted_session);assert.equal(session.session_id,'synthetic-private-session');assert.ok(session.sync_coverage);
+  const text=JSON.stringify((await call('/api/bank/status')).body);
+  assert.ok(!text.includes('synthetic-private-session'));assert.ok(!text.includes('accounts":{'));assert.ok(!text.includes(accountNumber));
+  requests=[];
+  const restarted=await import('../src/server.js?bank-date-coverage-restart');
+  try{await restarted.runScheduledSync();}finally{restarted.db.close();}
+  assert.deepEqual(requests,[['2026-10-09','2026-11-02',null]]);
+});
+
+for(const [name,extra] of [
+  ['zero-valued booked row',{transaction_amount:{amount:'0.00',currency:'SEK'}}],
+  ['row outside the requested dates',{booking_date:'2026-10-31'}]
+])test(`${name} cannot silently mark the requested interval complete`,async t=>{
+  freeze(t);const before=stored().encrypted_session;
+  provider=async()=>Response.json({transactions:[transaction('valid-row','2026-11-01'),transaction('skipped-row','2026-11-02',extra)]});
+  assert.equal((await sync({date_from:'2026-11-01',date_to:'2026-11-02'})).status,502);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM bank_transactions').get().n,0);
+  assert.equal(stored().encrypted_session,before);assert.equal(stored().last_synced,'');
+});
+
+test('history without an immutable entry reference retains the original without inventing an ID',async t=>{
+  freeze(t);provider=async()=>Response.json({transactions:[transaction('historical','2026-10-01',{entry_reference:undefined})]});
+  const result=await sync({date_from:'2026-10-01',date_to:'2026-10-01'});assert.equal(result.status,200);assert.equal(result.body.imported,1);
+  const row=db.prepare('SELECT bank_reference,provider_transaction_id,needs_review,raw_bank_data FROM bank_transactions').get();
+  assert.equal(row.bank_reference,'');assert.equal(row.provider_transaction_id,'lookup-historical');assert.equal(row.needs_review,1);assert.equal(JSON.parse(row.raw_bank_data).transaction_id,'lookup-historical');
+});
+
+test('a replaced bank lease discards the pending response and preserves the replacement',async t=>{
+  freeze(t);let reach,release;
+  const reached=new Promise(resolve=>{reach=resolve;}),wait=new Promise(resolve=>{release=resolve;});
+  provider=async()=>{reach();await wait;return Response.json({transactions:[transaction('delayed','2026-11-01')]});};
+  const before=stored().encrypted_session,pending=sync({date_from:'2026-11-01',date_to:'2026-11-02'});
+  await reached;
+  db.prepare("UPDATE integration_jobs SET lease='synthetic-replacement',lease_until=? WHERE name=?").run(Date.now()+60000,'bank:'+connectionId);
+  release();assert.equal((await pending).status,409);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM bank_transactions').get().n,0);assert.equal(stored().encrypted_session,before);
+  assert.equal(db.prepare('SELECT lease FROM integration_jobs WHERE name=?').get('bank:'+connectionId).lease,'synthetic-replacement');
+});
+
+test('consent expiry between pages stops continuation and leaves the checkpoint unchanged',async t=>{
+  freeze(t);db.prepare('UPDATE bank_connections SET valid_until=? WHERE id=?').run('2026-11-02T10:01:00Z',connectionId);
+  const before=stored().encrypted_session;
+  provider=async()=>{t.mock.timers.tick(61000);return Response.json({transactions:[transaction('before-expiry','2026-11-01')],continuation_key:'after-expiry'});};
+  const result=await sync({date_from:'2026-11-01',date_to:'2026-11-02'});assert.equal(result.status,409);
+  assert.equal(requests.length,1);assert.equal(db.prepare('SELECT COUNT(*) AS n FROM bank_transactions').get().n,0);assert.equal(stored().encrypted_session,before);
+});
+
+test('a service-unavailable Retry-After persists and blocks an early manual retry',async t=>{
+  freeze(t);const before=stored().encrypted_session;
+  provider=async()=>new Response('Synthetic unavailable body',{status:503,headers:{'Retry-After':'172800'}});
+  const result=await sync({date_from:'2026-11-01',date_to:'2026-11-02'});
+  assert.equal(result.status,503);assert.equal(result.headers['retry-after'],'172800');
+  assert.equal(stored().retry_after,Date.now()+172800000);assert.equal(stored().encrypted_session,before);
+  const count=calls;assert.equal((await sync({})).status,429);assert.equal(calls,count);
+});
+
+test('a response crossing UTC midnight does not certify the unrequested new day',async t=>{
+  freeze(t,'2026-11-01T23:59:50Z');
+  provider=async()=>{t.mock.timers.tick(11000);return Response.json({transactions:[]});};
+  const result=await sync({});assert.equal(result.status,200);
+  assert.deepEqual(requests,[['2026-10-03','2026-11-01',null]]);
+  assert.equal(result.body.sync_coverage.complete,false);assert.equal(result.body.sync_coverage.pending_from,'2026-11-02');assert.equal(stored().last_synced,'');
+});
+
+for(const [name,mutation,status] of [
+  ['a newer cooldown',()=>db.prepare('UPDATE bank_connections SET retry_after=? WHERE id=?').run(Date.now()+172800000,connectionId),429],
+  ['a newer consent expiry',()=>db.prepare('UPDATE bank_connections SET valid_until=? WHERE id=?').run('2026-11-02T09:59:00Z',connectionId),409]
+])test(`${name} acquired between reading the connection and its lease blocks provider calls`,async t=>{
+  freeze(t);const prepare=db.prepare.bind(db);let first=true;
+  t.mock.method(db,'prepare',sql=>{
+    const statement=prepare(sql);
+    if(sql==='SELECT * FROM bank_connections WHERE id=? AND owner=?'){
+      const get=statement.get.bind(statement);
+      statement.get=(...args)=>{const row=get(...args);if(first){first=false;mutation();}return row;};
+    }
+    return statement;
+  });
+  assert.equal((await sync({})).status,status);assert.equal(calls,0);assert.equal(stored().last_synced,'');
+});
+
+for(const status of [401,403,404,410])test(`provider HTTP ${status} without an expired-session code does not revoke the customer consent`,async t=>{
+  freeze(t);const before=stored().encrypted_session;
+  provider=async()=>Response.json({error:status===401||status===403?'ACCESS_DENIED':'UNKNOWN_RESOURCE',message:'synthetic-private-diagnostic'},{status});
+  const result=await sync({date_from:'2026-11-01',date_to:'2026-11-02'});
+  assert.equal(stored().status,'error');assert.equal(stored().encrypted_session,before);assert.equal(stored().last_synced,'');
+  assert.ok(!JSON.stringify(result.body).includes('synthetic-private-diagnostic'));
+  if(status===401||status===403){assert.equal(result.status,409);assert.equal(result.body.code,'application_access_denied');assert.match(result.body.error,/systemadministratören/);}
+  else assert.equal(result.status,502);
+});
+
+test('application credentials failing account verification do not invalidate the existing customer consent',async t=>{
+  freeze(t);const before=stored().encrypted_session;
+  verifyProvider=async()=>Response.json({error:'ACCESS_DENIED'},{status:401});
+  const result=await call('/api/bank/accounts',{connection_id:connectionId,account_uid:'account'});
+  assert.equal(result.status,409);assert.equal(result.body.code,'application_access_denied');
+  assert.equal(stored().status,'connected');assert.equal(stored().encrypted_session,before);assert.equal(requests.length,0);
+});

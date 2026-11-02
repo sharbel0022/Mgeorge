@@ -5,7 +5,7 @@ import ts from 'typescript';
 import { emptyState, applyCommand } from '../lib/domain.ts';
 import {
   ProviderError, providerRequest, getApplication, listBusinessBanks, startAuth,
-  createSession, getSession, deleteSession, getTransactions, getTransactionDetails,
+  createSession, getSession, deleteSession, getTransactions, getTransactionDetails, providerRetryDiagnostic,
 } from '../lib/banking/enable-banking.ts';
 
 const compiled = ts.transpileModule(readFileSync(new URL('../lib/banking/transactions.ts', import.meta.url), 'utf8'), {
@@ -198,6 +198,81 @@ test('Transaction pagination encodes opaque keys, keeps dates and BOOK filter, a
   assert.equal(calls[1].headers.has('Psu-User-Agent'), false);
 });
 
+test('Future transaction dates are rejected before network using the UTC calendar day', async t => {
+  t.mock.method(Date, 'now', () => Date.parse('2026-11-02T00:05:00.000Z'));
+  let calls = 0;
+  t.mock.method(globalThis, 'fetch', async () => { calls++; return json({ transactions: [], continuation_key: null }); });
+  for (const [dateFrom, dateTo] of [['2026-11-03', '2026-11-03'], ['2026-11-01', '2026-11-03']]) {
+    await assert.rejects(getTransactions(config, accountUid, { dateFrom, dateTo }), error => error.code === 'INVALID_REQUEST');
+    await assert.rejects(providerRequest(config, `/accounts/${accountUid}/transactions?date_from=${dateFrom}&date_to=${dateTo}&transaction_status=BOOK`), error => error.code === 'INVALID_REQUEST');
+  }
+  assert.equal(calls, 0);
+  assert.deepEqual(await getTransactions(config, accountUid, { dateFrom: '2026-11-02', dateTo: '2026-11-02' }), { transactions: [], continuation_key: null });
+  assert.equal(calls, 1);
+});
+
+test('Invalid provider date errors cannot request transaction-history recovery', async t => {
+  for (const [upstream, expected] of [
+    ['WRONG_TRANSACTIONS_PERIOD', 'BANK_PERIOD_UNAVAILABLE'],
+    ['WRONG_DATE_INTERVAL', 'BANK_DATE_RANGE_INVALID'],
+    ['DATE_FROM_IN_FUTURE', 'BANK_DATE_RANGE_INVALID'],
+    ['DATE_TO_WITHOUT_DATE_FROM', 'BANK_DATE_RANGE_INVALID'],
+  ]) {
+    await t.test(upstream, async st => {
+      st.mock.method(globalThis, 'fetch', async () => json({ error: upstream, message: 'synthetic-private-bank-message' }, 400));
+      await assert.rejects(getTransactions(config, accountUid, { dateFrom: opts.dateFrom, dateTo: opts.dateTo }), error => {
+        assert.equal(error.code, expected); assert.equal(error.retryable, false);
+        assert.ok(!error.message.includes('synthetic-private-bank-message')); return true;
+      });
+    });
+  }
+});
+
+test('HTTP 429 blocks period recovery even when the payload contains a date error', async t => {
+  for (const upstream of ['WRONG_TRANSACTIONS_PERIOD', 'WRONG_DATE_INTERVAL', 'DATE_FROM_IN_FUTURE', 'DATE_TO_WITHOUT_DATE_FROM']) {
+    await t.test(upstream, async st => {
+      st.mock.method(globalThis, 'fetch', async () => json({ error: upstream }, 429, { 'Retry-After': '172800' }));
+      await assert.rejects(getTransactions(config, accountUid, { dateFrom: opts.dateFrom, dateTo: opts.dateTo }), error => {
+        assert.equal(error.code, 'BANK_RATE_LIMIT'); assert.equal(error.status, 429);
+        assert.equal(error.retryAfter, 172800); assert.equal(error.retryable, true); return true;
+      });
+    });
+  }
+});
+
+test('Missing or invalid bank retry headers use six hours without inventing supplier evidence', async t => {
+  t.mock.method(Date, 'now', () => Date.parse('2026-11-02T10:00:00.000Z'));
+  for (const header of [null, '', 'invalid', '-1', '1.5', 'January 1, 2028', 'Mon, 30 Feb 2026 10:00:00 GMT', 'Sun, 01 Nov 2026 10:00:00 GMT']) {
+    await t.test(String(header), async st => {
+      st.mock.method(globalThis, 'fetch', async () => json({ error: 'ASPSP_RATE_LIMIT_EXCEEDED' }, 429, header === null ? {} : { 'Retry-After': header }));
+      await assert.rejects(providerRequest(config, '/application'), error => {
+        assert.equal(error.code, 'BANK_RATE_LIMIT'); assert.equal(error.retryAfter, 21600); assert.equal(error.retryBlocked, false);
+        assert.deepEqual(providerRetryDiagnostic(error), { status: 'unknown', checkedAt: '2026-11-02T10:00:00.000Z', provenance: header === null ? 'retry_after_missing' : 'retry_after_invalid' });
+        return true;
+      });
+    });
+  }
+});
+
+test('A bank rate-limit code on a non-429 response receives the fallback without trusted retry advice', async t => {
+  t.mock.method(globalThis, 'fetch', async () => json({ error: 'ASPSP_RATE_LIMIT_EXCEEDED' }, 400));
+  await assert.rejects(providerRequest(config, '/application'), error => {
+    assert.equal(error.code, 'BANK_RATE_LIMIT'); assert.equal(error.retryAfter, 21600);
+    assert.equal(providerRetryDiagnostic(error), null); return true;
+  });
+});
+
+test('Valid retry seconds and HTTP dates retain the supplier wait including longer delays', async t => {
+  t.mock.method(Date, 'now', () => Date.parse('2026-11-02T10:00:00.000Z'));
+  for (const [header, retryAfter] of [['0', 1], ['7200', 7200], ['172800', 172800], ['Wed, 04 Nov 2026 10:00:00 GMT', 172800]]) {
+    t.mock.method(globalThis, 'fetch', async () => json({ error: 'ASPSP_RATE_LIMIT_EXCEEDED' }, 429, { 'Retry-After': header }));
+    await assert.rejects(providerRequest(config, '/application'), error => {
+      assert.equal(error.code, 'BANK_RATE_LIMIT'); assert.equal(error.retryAfter, retryAfter);
+      assert.equal(error.retryBlocked, false); assert.equal(providerRetryDiagnostic(error)?.status, 'known'); return true;
+    });
+  }
+});
+
 test('Provider errors are classified without leaking upstream messages or retrying POST', async t => {
   const secret = 'account-id-and-private-secret'; let calls = 0;
   const cases = [
@@ -259,6 +334,28 @@ test('A stalled bank request is aborted with a safe timeout', async t => {
   await started;
   t.mock.timers.tick(20_001);
   await assert.rejects(request, error => error.code === 'BANK_TIMEOUT' && error.retryable);
+});
+
+test('A bank response whose body stalls is aborted with the same safe timeout', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let ready;
+  const reading = new Promise(resolve => { ready = resolve; });
+  const diagnostics = [];
+  t.mock.method(console, 'error', (...items) => diagnostics.push(items));
+  t.mock.method(globalThis, 'fetch', async (_url, init) => new Response(new ReadableStream({
+    start(controller) {
+      init.signal.addEventListener('abort', () => controller.error(new DOMException('synthetic-private-body-error', 'AbortError')));
+    },
+    pull() { ready(); },
+  })));
+  const request = getApplication(config);
+  await reading;
+  t.mock.timers.tick(20_001);
+  await assert.rejects(request, error => {
+    assert.equal(error.code, 'BANK_TIMEOUT'); assert.equal(error.status, 504); assert.equal(error.retryable, true);
+    assert.ok(!error.message.includes('synthetic-private-body-error')); return true;
+  });
+  assert.deepEqual(diagnostics, []);
 });
 
 test('Stable account identity uses account numbers and never the session uid', () => {
@@ -390,4 +487,19 @@ test('provider Retry-After keeps long waits and treats extreme values as blocked
   t.mock.method(globalThis,'fetch',async()=>json({error:'ASPSP_RATE_LIMIT_EXCEEDED'},429,{'Retry-After':header}));
   await assert.rejects(providerRequest(config,'/application'),e=>e.code==='BANK_RATE_LIMIT'&&e.retryAfter>=minimum&&e.retryBlocked===blocked);
  }
+});
+
+test('HTTP 429 preserves Retry-After even when its response body is oversized or broken',async t=>{
+ for(const makeResponse of [
+  ()=>new Response('{}',{status:429,headers:{'Retry-After':'172800','content-length':String(3*1024*1024)}}),
+  ()=>new Response(new ReadableStream({start(controller){controller.error(Error('synthetic unreadable body'));}}),{status:429,headers:{'Retry-After':'172800'}}),
+ ]){
+  t.mock.method(globalThis,'fetch',async()=>makeResponse());
+  await assert.rejects(providerRequest(config,'/application'),error=>error.code==='BANK_RATE_LIMIT'&&error.retryAfter===172800);
+ }
+});
+
+test('HTTP 503 retains a supplied Retry-After even when its body cannot be decoded',async t=>{
+ t.mock.method(globalThis,'fetch',async()=>new Response(new ReadableStream({start(controller){controller.error(Error('synthetic broken maintenance page'));}}),{status:503,headers:{'Retry-After':'172800'}}));
+ await assert.rejects(providerRequest(config,'/application'),error=>error.code==='BANK_SERVICE_ERROR'&&error.retryAfter===172800);
 });
