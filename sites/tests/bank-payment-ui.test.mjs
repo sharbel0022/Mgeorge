@@ -5,7 +5,8 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {emptyState,paymentInvoiceAssessment} from '../lib/domain.ts';
+import {paymentInvoiceAssessment} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {extractPaymentReferences} from '../lib/payment-references.js';
 import {paymentFieldSourceFixture,paymentFieldInvoiceFixture} from './helpers/payment-field-source-fixture.mjs';
 

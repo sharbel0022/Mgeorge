@@ -7,6 +7,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {emptyState,applyCommand} from '../lib/domain.ts';
 import {extractPaymentReferences} from '../lib/payment-references.js';
 import {paymentFieldSourceFixture,paymentFieldInvoiceFixture} from './helpers/payment-field-source-fixture.mjs';
+import {genericCompanyState} from './helpers/reference-policy-fixture.mjs';
 
 const read=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 const file=path=>new URL(path,import.meta.url).href;
@@ -73,7 +74,8 @@ test('payment details explain the payer and reference evidence actually selected
 });
 
 for(const booked of [false,true])test(`dashboard invoice lookup follows the report reference and preserves ${booked?'a conflicting historical booking':'the unallocated state'}`,()=>{
- const {state,target}=paymentFieldInvoiceFixture({booked}),html=renderDetail(target,state),primary=html.split('<dl class="details-grid bank-primary-details">')[1]?.split('</dl>')[0],assessment=html.split('<dt>Fakturakoppling</dt><dd>')[1]?.split('</dd>')[0];
+ const {state,target}=paymentFieldInvoiceFixture({booked});state.company.name=genericCompanyState().company.name;
+ const html=renderDetail(target,state),primary=html.split('<dl class="details-grid bank-primary-details">')[1]?.split('</dl>')[0],assessment=html.split('<dt>Fakturakoppling</dt><dd>')[1]?.split('</dd>')[0];
  assert.ok(primary);assert.ok(assessment);assert.match(primary,/0599/);
  if(booked){assert.match(primary,/0800/);assert.match(html,/Referenskonflikt/);assert.match(assessment,/0800.*0599/);assert.equal(state.allocations.length,1);}else{assert.doesNotMatch(primary,/0800/);assert.match(assessment,/0599/);assert.doesNotMatch(assessment,/0800/);assert.equal(state.allocations.length,0);}
 });

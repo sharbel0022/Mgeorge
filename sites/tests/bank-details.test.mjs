@@ -3,7 +3,8 @@ import {createHash} from 'node:crypto';
 import {extractPaymentReferences} from '../lib/payment-references.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
-import {emptyState,applyCommand,paymentInvoiceAssessment,bankApiOriginalIssue,paymentOriginalIssue} from '../lib/domain.ts';
+import {applyCommand,paymentInvoiceAssessment,bankApiOriginalIssue,paymentOriginalIssue} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 const codeUrl=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
 function compiled(path,imports){imports={'../payer-evidence.js':new URL('../lib/payer-evidence.js',import.meta.url).href,...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let js=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])js=js.replaceAll(q+a+q,JSON.stringify(b));return codeUrl(js);}
 const domain=new URL('../lib/domain.ts',import.meta.url).href;
