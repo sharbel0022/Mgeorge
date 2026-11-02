@@ -33,7 +33,7 @@ async function fixture(t,state=stateWithRows(),candidates){
  f.memo=(fn,deps)=>{const n=f.cursor++;if(!equal(f.slots[n]?.deps,deps))f.slots[n]={value:fn(),deps};return f.slots[n].value;};
  const ref=`globalThis[${JSON.stringify(key)}]`,react=data(`const f=${ref};export const useState=(...a)=>f.stateHook(...a),useMemo=(...a)=>f.memo(...a);`);
  const observed=data(`import * as actual from ${JSON.stringify(presentation)};export * from ${JSON.stringify(presentation)};const f=${ref};export function bankPaymentView(...args){f.calls.push(args[1].id);return actual.bankPaymentView(...args);}export function bankPaymentCounts(...args){f.countCalls++;return actual.bankPaymentCounts(...args);}`);
- const aliases={react,'@/lib/payment-presentation':observed,'./list-pagination':compiled('../components/list-pagination.tsx')};
+ const aliases={react,'@/lib/payment-presentation':observed,'./list-pagination':compiled('../components/list-pagination.tsx'),'./bankgiro-availability':compiled('../components/bankgiro-availability.tsx')};
  const ui=await import(compiled('../components/bank-payments.tsx',aliases));
  f.props={state,transactions:state.transactions,open:id=>f.opened.push(id),...(candidates?{candidates}:{})};
  const expand=node=>!node||typeof node!=='object'?node:Array.isArray(node)?node.map(expand):typeof node.type==='function'?expand(node.type(node.props)):{...node,props:{...node.props,children:expand(node.props.children)}};

@@ -8,6 +8,7 @@ import {normalizeBankApiTransaction, parseCAMT, parseCSV} from '../src/importers
 import {analyzeReconciliation, reconciliationData, runReconciliation} from '../src/reconciliation.js';
 import {buildPaymentOverview} from '../src/payment-overview.js';
 import {approveSyntheticBankAccount,ensureSyntheticBankAccount,withSyntheticBankOriginal} from './bank-fixtures.js';
+import {retainSyntheticInvoiceOriginal} from './invoice-fixtures.js';
 import {syntheticCamt, account} from '../sites/tests/helpers/camt-integrity.mjs';
 
 function fixture(t) {
@@ -21,6 +22,7 @@ function fixture(t) {
 function invoice(db, {id='invoice', direction='customer', number='0604', party='Synthetic Customer AB', total=10000, kind='invoice'}={}) {
   db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at,kind) VALUES(?,?,?,?,?,?,?,?)')
     .run(id, direction, number, party, total, number, '2026-10-01', kind);
+  retainSyntheticInvoiceOriginal(db,id);
 }
 
 const apiOriginal = (extra={}) => ({

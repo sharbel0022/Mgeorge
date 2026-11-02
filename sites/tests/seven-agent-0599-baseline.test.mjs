@@ -49,7 +49,7 @@ const candidatesUrl=compiled('../lib/banking/invoice-candidates.ts',{
 const reactImports={'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime')};
 const pagination=compiled('../components/list-pagination.tsx',reactImports);
 const {default:BankPayments}=await import(compiled('../components/bank-payments.tsx',{
- ...reactImports,'@/lib/domain':domain,'@/lib/payment-presentation':presentationUrl,'./list-pagination':pagination
+ ...reactImports,'@/lib/domain':domain,'@/lib/payment-presentation':presentationUrl,'./list-pagination':pagination,'./bankgiro-availability':compiled('../components/bankgiro-availability.tsx',reactImports)
 }));
 const {normalizeTransactions,stableAccountKey}=await import(normalizer);
 const store=await import(storeUrl),bankgiro=await import(bankgiroUrl),evidence=await import(evidenceUrl);

@@ -1,12 +1,13 @@
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
-import {createHash} from 'node:crypto';
+import {createHash,generateKeyPairSync} from 'node:crypto';
 import {extractPaymentReferences} from '../lib/payment-references.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
 import {applyCommand,paymentInvoiceAssessment,bankApiOriginalIssue,paymentOriginalIssue} from '../lib/domain.ts';
 import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
+import {accountReadCooldown} from '../lib/banking/account-read-cooldown.ts';
 const codeUrl=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
-function compiled(path,imports){imports={'../payer-evidence.js':new URL('../lib/payer-evidence.js',import.meta.url).href,...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let js=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])js=js.replaceAll(q+a+q,JSON.stringify(b));return codeUrl(js);}
+function compiled(path,imports){imports={'./account-read-cooldown':new URL('../lib/banking/account-read-cooldown.ts',import.meta.url).href,'../payer-evidence.js':new URL('../lib/payer-evidence.js',import.meta.url).href,...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let js=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])js=js.replaceAll(q+a+q,JSON.stringify(b));return codeUrl(js);}
 const domain=new URL('../lib/domain.ts',import.meta.url).href;
 const evidenceModule=compiled('../lib/banking/detail-evidence.ts',{'../domain':domain,'../payment-references.js':new URL('../lib/payment-references.js',import.meta.url).href});
 const {transactionDetailEvidence,enrichBankDetails}=await import(evidenceModule);
@@ -29,12 +30,13 @@ test('negative detail magnitude cannot cancel an opposite direction to counterfe
 const shared=codeUrl('export const env=new Proxy({}, {get:(_,k)=>globalThis.bankDetailsTest.env[k]});');
 const auth=codeUrl('export async function getChatGPTUser(){return globalThis.bankDetailsTest.user;}');
 const server=compiled('../lib/server.ts',{'cloudflare:workers':shared,'@/app/chatgpt-auth':auth,'./domain':domain});
-const store=codeUrl(`export async function application(){return globalThis.bankDetailsTest.app;}export async function connection(){const f=globalThis.bankDetailsTest;return {...f.conn,...f.sql.prepare('SELECT retry_after FROM bank_connections').get()};}export async function accounts(){return globalThis.bankDetailsTest.accounts;}export async function providerConfig(){return {};}export async function sessionId(){return 'session';}export async function withBankLock(owner,fn){return fn({assert:async()=>{},write:items=>globalThis.bankDetailsTest.env.DB.batch(items),run:async item=>(await globalThis.bankDetailsTest.env.DB.batch([item]))[0]});}`);
-const provider=codeUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts',import.meta.url).href)};export async function getSession(){return globalThis.bankDetailsTest.live;}export async function getTransactions(...args){globalThis.bankDetailsTest.calls.push(['list',...args]);return globalThis.bankDetailsTest.page;}export async function getTransactionDetails(...args){globalThis.bankDetailsTest.calls.push(['details',...args]);if(globalThis.bankDetailsTest.detailError)throw globalThis.bankDetailsTest.detailError;return globalThis.bankDetailsTest.detail;}`);
+const store=codeUrl(`export async function application(){return globalThis.bankDetailsTest.app;}export async function connection(){const f=globalThis.bankDetailsTest;return {...f.conn,...f.sql.prepare('SELECT retry_after,account_evidence_retry FROM bank_connections').get()};}export async function accounts(){return globalThis.bankDetailsTest.accounts;}export async function providerConfig(){return {};}export async function sessionId(){return 'session';}export async function withBankLock(owner,fn){const f=globalThis.bankDetailsTest,lease={assert:async()=>{if(f.leaseLost)throw Error('BANK_LEASE_LOST');},write:async items=>{await lease.assert();return f.env.DB.batch(items);},run:async item=>(await lease.write([item]))[0]};return fn(lease);}`);
+const provider=codeUrl(`export {ProviderError,providerCooldownDiagnostic} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts',import.meta.url).href)};export async function getSession(){const f=globalThis.bankDetailsTest;await f.onRead?.('session');if(f.sessionError)throw f.sessionError;return f.live;}export async function getTransactions(...args){const f=globalThis.bankDetailsTest;f.calls.push(['list',...args]);await f.onRead?.('list');if(f.listError)throw f.listError;return f.page;}export async function getTransactionDetails(...args){const f=globalThis.bankDetailsTest;f.calls.push(['details',...args]);await f.onRead?.('details');if(f.detailError)throw f.detailError;return f.detail;}`);
 const normalizer=compiled('../lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':new URL('../lib/payment-references.js',import.meta.url).href});
 const {normalizeTransactions}=await import(normalizer);
-const {fetchBankDetails}=await import(compiled('../lib/banking/details-service.ts',{'cloudflare:workers':shared,'../server':server,'../domain':domain,'./store':store,'./enable-banking':provider,'./transactions':normalizer,'./detail-evidence':evidenceModule}));
-function fixture(t){const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());sql.exec("CREATE TABLE bank_connections(id TEXT,owner TEXT,retry_after TEXT DEFAULT '',sync_failures INTEGER DEFAULT 0,last_error TEXT,updated_at TEXT);INSERT INTO bank_connections(id,owner) VALUES('conn','owner');CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);");const objects=new Map(),DB={prepare(sqlText){return {bind(...args){return {async first(){return sql.prepare(sqlText).get(...args)||null;},async all(){return {results:sql.prepare(sqlText).all(...args)};},async run(){return {meta:{changes:sql.prepare(sqlText).run(...args).changes}};}};}};},async batch(stmts){sql.exec('BEGIN');try{const r=[];for(const s of stmts)r.push(await s.run());sql.exec('COMMIT');return r;}catch(e){sql.exec('ROLLBACK');throw e;}}};const s=state(),f={sql,user:{userId:'owner'},app:{generation:'one'},conn:{id:'conn',status:'connected',app_generation:'one',environment:'PRODUCTION',bank_name:'Swedbank',country:'SE',selected_accounts:'["account-uid"]',valid_until:new Date(Date.now()+86400_000).toISOString()},accounts:[{uid:'account-uid',currency:'SEK',account_id:{iban:'SE4280000890119146168423'}}],live:{status:'AUTHORIZED',access:{valid_until:new Date(Date.now()+86400000).toISOString()},accounts:['account-uid'],psu_type:'business',aspsp:{name:'Swedbank',country:'SE'}},calls:[],page:{transactions:[raw()]},detail:raw(),env:{DB,BUCKET:{async put(k,b){objects.set(k,b);}}},objects,id:s.transactions[0].id};sql.prepare('INSERT INTO workspaces VALUES(?,?,?,?)').run('owner',1,JSON.stringify(s),'at');globalThis.bankDetailsTest=f;return f;}
+const readGuard=compiled('../lib/banking/account-read-guard.ts',{'../server':server,'./store':store,'./enable-banking':provider});
+const {fetchBankDetails}=await import(compiled('../lib/banking/details-service.ts',{'cloudflare:workers':shared,'../server':server,'../domain':domain,'./store':store,'./enable-banking':provider,'./transactions':normalizer,'./detail-evidence':evidenceModule,'./account-read-guard':readGuard}));
+function fixture(t){const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());sql.exec("CREATE TABLE bank_connections(id TEXT,owner TEXT,app_generation TEXT DEFAULT 'one',encrypted_session TEXT DEFAULT 'session',retry_after TEXT DEFAULT '',account_evidence_retry TEXT DEFAULT '',sync_failures INTEGER DEFAULT 0,last_error TEXT,updated_at TEXT);INSERT INTO bank_connections(id,owner) VALUES('conn','owner');CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);");const objects=new Map(),DB={prepare(sqlText){return {bind(...args){return {async first(){return sql.prepare(sqlText).get(...args)||null;},async all(){return {results:sql.prepare(sqlText).all(...args)};},async run(){return {meta:{changes:sql.prepare(sqlText).run(...args).changes}};}};}};},async batch(stmts){sql.exec('BEGIN');try{const r=[];for(const s of stmts)r.push(await s.run());sql.exec('COMMIT');return r;}catch(e){sql.exec('ROLLBACK');throw e;}}};const s=state(),f={sql,user:{userId:'owner'},app:{generation:'one'},conn:{id:'conn',owner:'owner',encrypted_session:'session',status:'connected',app_generation:'one',environment:'PRODUCTION',bank_name:'Swedbank',country:'SE',selected_accounts:'["account-uid"]',valid_until:new Date(Date.now()+86400_000).toISOString()},accounts:[{uid:'account-uid',currency:'SEK',account_id:{iban:'SE4280000890119146168423'}}],live:{status:'AUTHORIZED',access:{valid_until:new Date(Date.now()+86400000).toISOString()},accounts:['account-uid'],psu_type:'business',aspsp:{name:'Swedbank',country:'SE'}},calls:[],page:{transactions:[raw()]},detail:raw(),env:{DB,BUCKET:{async put(k,b){objects.set(k,b);}}},objects,id:s.transactions[0].id};sql.prepare('INSERT INTO workspaces VALUES(?,?,?,?)').run('owner',1,JSON.stringify(s),'at');globalThis.bankDetailsTest=f;return f;}
 const request=(id,body={})=>new Request('https://mg.test/api/bank/details',{method:'POST',headers:{Origin:'https://mg.test','Content-Type':'application/json'},body:JSON.stringify({transactionId:id,...body})});
 test('real detail service refreshes lookup ID, retains original and caches without creating payments',async t=>{const f=fixture(t),r=await fetchBankDetails(request(f.id)),o=await r.json();assert.equal(o.details.payerReference,'0599');assert.equal(f.calls[1][3],'fresh-lookup');assert.equal(o.state.allocations.length,0);assert.equal(o.state.transactions.length,1);assert.equal(o.state.transactions[0].kind,'batch');assert.equal(f.objects.size,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);assert.equal(f.sql.prepare('SELECT action FROM audit_events').get().action,'bank.details');await fetchBankDetails(request(f.id));assert.equal(f.calls.length,2);});
 test('missing detail ID records a factual missing result rather than making up OCR',async t=>{const f=fixture(t);f.page={transactions:[raw({transaction_id:null,reference_number:null,reference_number_schema:null,debtor:null})]};const out=await (await fetchBankDetails(request(f.id))).json();assert.equal(out.details.payerReference,'');assert.equal(f.calls.length,1);assert.match(out.details.reason,/inga ytterligare/);assert.equal(out.state.allocations.length,0);});
@@ -50,7 +52,7 @@ test('candidate API denies an expired session',async t=>{const f=fixture(t);f.us
 test('detail fetching persists bank Retry-After and denies early follow-up without more bank calls',async t=>{
  const f=fixture(t),{ProviderError}=await import('../lib/banking/enable-banking.ts');f.detailError=Object.assign(new ProviderError('BANK_RATE_LIMIT','Vänta',429,true),{retryAfter:172800});
  await assert.rejects(fetchBankDetails(request(f.id)),e=>e.code==='BANK_RATE_LIMIT');
- assert.ok(Date.parse(f.sql.prepare('SELECT retry_after FROM bank_connections').get().retry_after)>Date.now()+172799000);
+ assert.ok(Date.parse(f.sql.prepare('SELECT retry_after,account_evidence_retry FROM bank_connections').get().retry_after)>Date.now()+172799000);
  const calls=f.calls.length;await assert.rejects(fetchBankDetails(request(f.id)),e=>e.code==='BANK_RATE_LIMIT');assert.equal(f.calls.length,calls);assert.equal(f.objects.size,0);assert.equal(f.sql.prepare('SELECT revision FROM workspaces').get().revision,1);
 });
 
@@ -198,4 +200,50 @@ test('AIS normalizer profile is explicit and cannot alter default import interpr
 
 test('an unknown stored reference parser version cannot validate a retained receipt',async t=>{
  const {s,transaction}=await nullSchemaLegacyFixture(t);transaction.payerReference='';transaction.original.payerReference='';transaction.referenceEvidence={...extractPaymentReferences(transaction.bankData),version:'unknown-future-parser'};transaction.bankDataVersion='bank-api-original-v1';transaction.bankDataSha256=createHash('sha256').update(JSON.stringify(transaction.bankData)).digest('hex');assert.notEqual(bankApiOriginalIssue(s.transactions[0]),'');
+});
+
+for(const status of [429,503])test('transaction-detail HTTP '+status+' retains account-read cooldown provenance',async t=>{
+ const f=fixture(t),adapter=await import('../lib/banking/enable-banking.ts');
+ const privateKeyPem=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+ t.mock.method(globalThis,'fetch',async()=>new Response('',{status,headers:status===503?{'Retry-After':'120'}:{}}));
+ try{await adapter.providerRequest({applicationId:'11111111-1111-4111-8111-111111111111',privateKeyPem},'/application');}catch(error){f.detailError=error;}
+ const original=f.sql.prepare('SELECT * FROM workspaces').get();
+ await assert.rejects(fetchBankDetails(request(f.id)));
+ const saved=f.sql.prepare('SELECT * FROM bank_connections').get();assert.ok(saved.account_evidence_retry,'actual provider retry provenance must survive a later request');
+ assert.equal(JSON.parse(saved.account_evidence_retry).status,status===429?'unknown':'known');
+ assert.ok(Date.parse(saved.retry_after)>Date.now());assert.deepEqual(f.sql.prepare('SELECT * FROM workspaces').get(),original);assert.equal(f.objects.size,0);
+});
+
+test('malformed local consent validity blocks transaction detail reads before the provider',async t=>{
+ const f=fixture(t);f.conn.valid_until='not-a-date';await assert.rejects(fetchBankDetails(request(f.id)));assert.equal(f.calls.length,0);assert.equal(f.objects.size,0);
+});
+
+for(const stage of ['session','list','details'])for(const failure of ['result save','lease loss'])test(`transaction ${stage} retains a pending read guard after ${failure}`,async t=>{
+ const f=fixture(t),adapter=await import('../lib/banking/enable-banking.ts');
+ const privateKeyPem=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+ t.mock.method(globalThis,'fetch',async()=>new Response('',{status:429}));
+ let throttle;try{await adapter.providerRequest({applicationId:'11111111-1111-4111-8111-111111111111',privateKeyPem},'/application');}catch(error){throttle=error;}
+ assert.equal(throttle?.code,'BANK_RATE_LIMIT');
+ f[stage==='session'?'sessionError':stage==='list'?'listError':'detailError']=throttle;
+ const before=f.sql.prepare('SELECT * FROM workspaces').get();let pending='';
+ f.onRead=readStage=>{
+  if(readStage!==stage)return;
+  pending=f.sql.prepare('SELECT account_evidence_retry FROM bank_connections').get().account_evidence_retry;
+  if(failure==='lease loss')f.leaseLost=true;
+  else f.sql.exec("CREATE TRIGGER reject_read_result BEFORE UPDATE OF account_evidence_retry ON bank_connections BEGIN SELECT RAISE(ABORT,'Synthetic result save failed'); END;");
+ };
+ await assert.rejects(fetchBankDetails(request(f.id)));
+ const saved=f.sql.prepare('SELECT account_evidence_retry FROM bank_connections').get().account_evidence_retry;
+ assert.ok(pending,'uncertainty must be durable before contacting the provider');assert.equal(JSON.parse(pending).status,'pending');assert.equal(saved,pending);
+ assert.equal(accountReadCooldown(saved,Date.now()+86400000).blocked,true);
+ assert.deepEqual(f.sql.prepare('SELECT * FROM workspaces').get(),before);assert.equal(f.objects.size,0);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
+});
+
+for(const status of ['unknown','manual_block'])test(`a successful transaction detail read preserves an existing ${status} account-read guard`,async t=>{
+ const f=fixture(t),guard=JSON.stringify({status,checkedAt:new Date().toISOString(),provenance:status==='unknown'?'retry_after_missing':'retry_after_exceeds_limit'});
+ f.sql.prepare('UPDATE bank_connections SET account_evidence_retry=?').run(guard);
+ assert.equal((await fetchBankDetails(request(f.id))).status,200);
+ assert.equal(f.sql.prepare('SELECT account_evidence_retry FROM bank_connections').get().account_evidence_retry,guard);
+ assert.equal(accountReadCooldown(guard).blocked,true);
 });

@@ -6,7 +6,7 @@
  */
 
 import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { digest } from './security.js';
@@ -157,6 +157,11 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
     try{addColumn('import_jobs','content_sha256',"TEXT NOT NULL DEFAULT ''");for(const original of db.prepare('SELECT id,content FROM import_jobs WHERE content IS NOT NULL').all())db.prepare('UPDATE import_jobs SET content_sha256=? WHERE id=?').run(digest(original.content),original.id);db.exec('COMMIT');}catch(error){db.exec('ROLLBACK');throw error;}
   }
   db.prepare("INSERT OR IGNORE INTO app_settings(id,data) VALUES(1,'{}')").run();
+  db.exec('BEGIN IMMEDIATE');
+  try{
+    if(!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='bankgiro_ingest_jobs'").get())db.exec(readFileSync(new URL('../sites/drizzle/0017_bankgiro_auto_ingest.sql',import.meta.url),'utf8'));
+    db.exec('COMMIT');
+  }catch(error){db.exec('ROLLBACK');throw error;}
   return db;
 }
 export function audit(db,action,details={}) {
@@ -369,7 +374,7 @@ function invalidateAbsenceChecks(db,importId='',reason='Nytt bankunderlag kräve
   }
 }
 /** Lagrar importerade bankhändelser och använder identiteter/fingeravtryck för att minska risken för dubletter. */
-export function storeTransactions(db,items,source,original=null,guard=null) {
+export function storeTransactions(db,items,source,original=null,guard=null,beforeCommit=null,transaction=null) {
   if(items.some(item=>item.review_only))throw Object.assign(new Error('Bankuppgifterna kräver granskning. Spara originalet utan att skapa ekonomiska bankhändelser.'),{status:409,code:'bank_review_only'});
   // Legacy lookup IDs and session account UIDs cannot safely be guessed into
   // stable identities. Block the whole API batch until a reviewed migration
@@ -378,8 +383,16 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
   if(source==='enablebanking')assertNoLegacyBankImports(db);
   const insert=db.prepare(`INSERT OR IGNORE INTO bank_transactions(id,fingerprint,account,booked_at,amount_cents,currency,payer,reference,bank_reference,description,source,needs_review,is_aggregate,parent_bank_reference,review_reason,bankgiro,provider_transaction_id,api_identity_version) VALUES(?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?,?,?)`);
   let imported=0,duplicate=0,enriched=0,conflicts=0,import_id;const inserted=[],completedSpecifications=[],pendingConflicts=[];
-  db.exec('BEGIN IMMEDIATE');
+  // The coordinator may own the transaction so its terminal completion rolls
+  // back together with bank rows, coverage and audit. Standalone callers retain
+  // the same transaction and guarded rejection-evidence behavior.
+  const write=transaction||((fn)=>{
+    db.exec('BEGIN IMMEDIATE');
+    try{const result=fn();if(result&&typeof result.then==='function')throw TypeError('Bank import writes must be synchronous');db.exec('COMMIT');return result;}
+    catch(error){db.exec('ROLLBACK');throw error;}
+  });
   try {
+    write(()=>{
     guard?.();
     for(const x of items){
       // A bank's stable transaction ID survives enriched payer/text fields on later syncs.
@@ -453,6 +466,7 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
     }
     audit(db,'bank_import',{source,imported,duplicate,enriched,conflicts});
     import_id=recordImport(db,{source:source==='manual'?'manual':source.startsWith('file:')?'bank_file':source,name:source.startsWith('file:')?source.slice(5):'',found:items.length,imported,duplicate,review:imported+enriched+conflicts,content:original?.content||null,mime_type:original?.mime_type||''});
+    if(original?.owner)db.prepare('UPDATE import_jobs SET owner=? WHERE id=?').run(original.owner,import_id);
     for(const conflict of pendingConflicts)recordBankEvidenceConflict(db,conflict.transactionId,source,conflict.incoming,conflict.fields,original?.content?import_id:'');
     for(const id of inserted)db.prepare('UPDATE bank_transactions SET import_id=? WHERE id=?').run(import_id,id);
     for(const completed of completedSpecifications){
@@ -460,9 +474,13 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
       audit(db,'aggregate_replaced',{transaction_id:completed.id,children:1,specification_import_id:import_id,before:completed.before,after:db.prepare('SELECT * FROM bank_transactions WHERE id=?').get(completed.id)});
     }
     if(imported||enriched||conflicts)invalidateAbsenceChecks(db,import_id);
-    db.exec('COMMIT');
+    // Sync coverage and its audit must share this transaction with the originals.
+    // A callback cannot yield while the database owns the writer lock.
+    const completion=beforeCommit?.({imported,duplicate,enriched,conflicts,import_id});
+    if(completion&&typeof completion.then==='function')throw TypeError('Bank import completion must be synchronous');
+    guard?.();
+    });
   } catch(e) {
-    db.exec('ROLLBACK');
     // Reject the financial batch while retaining every conflict already seen,
     // including earlier identity warnings when a later row/specification fails.
     const rejectedFile=source.startsWith('file:')&&original?.content?.length&&['conflicting_bank_record','conflicting_payment_specification','allocated_aggregate'].includes(e.code);
@@ -475,12 +493,14 @@ export function storeTransactions(db,items,source,original=null,guard=null) {
           rejectedImportId=db.prepare("SELECT id FROM import_jobs WHERE source='bank_file' AND status='blocked' AND content_sha256=? AND mime_type=? ORDER BY rowid LIMIT 1").get(digest(original.content),original.mime_type||'')?.id||'';
           if(!rejectedImportId){
             rejectedImportId=recordImport(db,{source:'bank_file',name:source.slice(5),found:items.length,review:Math.max(1,pendingConflicts.length),status:'blocked',error:e.message,content:original.content,mime_type:original.mime_type||''});
+            if(original?.owner)db.prepare('UPDATE import_jobs SET owner=? WHERE id=?').run(original.owner,rejectedImportId);
             audit(db,'bank_import_rejected',{import_id:rejectedImportId,source,code:e.code,reason:e.message,found:items.length,conflicts:pendingConflicts.length});
           }
           e.import_id=rejectedImportId;
         }
         for(const conflict of pendingConflicts)recordBankEvidenceConflict(db,conflict.transactionId,source,conflict.incoming,conflict.fields,rejectedImportId);
         invalidateAbsenceChecks(db,rejectedImportId,'Motstridigt eller avvisat bankunderlag kräver ny kontroll av utebliven betalning');
+        guard?.();
         db.exec('COMMIT');
       }
       catch(error){db.exec('ROLLBACK');throw error;}

@@ -42,6 +42,8 @@ export declare const MGEORGE_INVOICE_REFERENCE_POLICY: Readonly<InvoiceReference
 
 /** Inputs are validated at runtime; numbers are never coerced into identifiers. */
 export declare function resolveInvoiceReference(invoice: unknown, context?: unknown): InvoiceReferenceDecision;
+export declare function resolveInvoiceReferenceConfiguration(context?: unknown): {policy: InvoiceReferencePolicy | null; issue: string};
+export declare function canonicalInvoiceReference(value: unknown): string | null;
 export declare function strictInvoiceReferenceMatch(a: unknown, b: unknown): boolean;
 export declare function matchesInvoiceReference(decision: InvoiceReferenceDecision | null | undefined, value: unknown): boolean;
 export declare function validateInvoiceReferencePolicies(policies: unknown): InvoiceReferencePolicy[];

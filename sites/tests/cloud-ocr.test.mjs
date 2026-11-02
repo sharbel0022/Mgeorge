@@ -159,7 +159,9 @@ test('cloud runs text PDF discovery and scans without any local heartbeat',async
 test('completed cloud OCR keeps extraction provenance and requires review, replay is rejected',async t=>{
   const f=await fixture(t),doc=f.add(),job=await f.lease();const result=await (await f.complete(job)).json();
   assert.equal(result.state,'needs_review');const row=f.sql.prepare('SELECT * FROM document_jobs').get(),extraction=JSON.parse(row.extraction);
-  assert.equal(extraction.method,'ocr');assert.deepEqual(extraction.processing,{runner:'cloud',sha256:doc.sha256,version:'document-worker-v3'});
+  const {run_id,...provenance}=extraction.processing;
+  assert.equal(extraction.method,'ocr');assert.deepEqual(provenance,{runner:'cloud',sha256:doc.sha256,version:'document-worker-v3'});
+  assert.match(run_id,/^[A-Za-z0-9_-]{43}$/);assert.notEqual(run_id,job.lease);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
   assert.equal((await f.complete(job)).status,409);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
@@ -328,7 +330,8 @@ test('real cloud pull runner reads a scan from Sites and saves reviewed OCR with
   const job=f.sql.prepare('SELECT * FROM document_jobs WHERE owner=? AND document_id=?').get(f.owner,document.id),extraction=JSON.parse(job.extraction);
   assert.equal(job.state,'needs_review');assert.equal(job.lease,'');assert.equal(job.automatic,0);
   assert.equal(extraction.method,'ocr');assert.equal(extraction.fields.invoice_number.value,'0606');assert.equal(extraction.fields.total_cents.value,375000);assert.equal(extraction.level,'yellow');
-  assert.deepEqual(extraction.processing,{runner:'cloud',sha256,version:'document-worker-v3'});
+  const {run_id,...provenance}=extraction.processing;
+  assert.deepEqual(provenance,{runner:'cloud',sha256,version:'document-worker-v3'});assert.match(run_id,/^[A-Za-z0-9_-]{43}$/);
   const stored=f.sql.prepare('SELECT * FROM document_extractions WHERE owner=? AND document_id=?').all(f.owner,document.id);
   assert.equal(stored.length,1);assert.equal(JSON.parse(stored[0].result).fields.invoice_number.value,'0606');
   assert.equal(JSON.parse(f.sql.prepare('SELECT extraction FROM gmail_sources WHERE owner=? AND document_id=?').get(f.owner,document.id).extraction).method,'ocr');

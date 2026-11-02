@@ -50,7 +50,7 @@ test('invoice reads derive the intended reference without changing stored leadin
 });
 
 for(const number of ['0001','0599'])test('exact company invoice reference '+number+' can use independently verified bank evidence',t=>{
-  const db=fixture(t);invoice(db,{number});payment(db,{reference:number});
+  const db=fixture(t);invoice(db,{number});original(db,'invoice',{number});payment(db,{reference:number});
   assert.equal(listInvoices(db)[0].intendedPaymentReference,number);
   assert.equal(analyzeReconciliation(reconciliationData(db))[0].safe,true);
   const bankBefore=db.prepare('SELECT * FROM bank_transactions').get();
@@ -146,7 +146,7 @@ test('other-company and supplier invoices retain their distinct explicit referen
 });
 
 test('a supplier identifier does not become a duplicate of the issuing company invoice namespace',t=>{
-  const db=fixture(t);invoice(db);invoice(db,{id:'supplier',direction:'supplier',party:'Synthetic supplier AB'});payment(db);
+  const db=fixture(t);invoice(db);original(db,'invoice');invoice(db,{id:'supplier',direction:'supplier',party:'Synthetic supplier AB'});payment(db);
   assert.deepEqual(matchingSuggestions(db).map(row=>row.invoice_id),['invoice']);
   assert.equal(analyzeReconciliation(reconciliationData(db)).find(row=>row.invoice_id==='invoice').safe,true);
 });
@@ -243,7 +243,7 @@ for(const retainCandidates of [true,false])test('manual reference correction can
 for(const [profile,originalReference,safe] of [['ais-null-schema-v1','0599',true],['ais-null-schema-v1','0600',false],['legacy','0599',false]])test('raw bank reference checks preserve the recorded extraction profile '+profile+' / '+originalReference,()=>{
   const raw={reference_number:originalReference,reference_number_schema:null};
   const evidence=extractPaymentReferences(raw,{profile});
-  const data={company:{name:'M.George Vitvaror AB'},invoices:[{id:'invoice',invoice_number:'0599',reference:'',party:'Synthetic AB',direction:'customer',kind:'invoice',currency:'SEK',issued_at:'2026-10-01',remaining_cents:10000}],transactions:[{id:'transaction',reference:'0599',reference_evidence:evidence,raw_bank_data:raw,payer:'Synthetic AB',account,bank_reference:'SYNTHETIC',verified:true,booked_at:'2026-10-26',amount_cents:10000,available_cents:10000,currency:'SEK'}]};
+  const data={company:{name:'M.George Vitvaror AB'},invoices:[{id:'invoice',invoice_number:'0599',reference:'',party:'Synthetic AB',direction:'customer',kind:'invoice',currency:'SEK',issued_at:'2026-10-01',remaining_cents:10000,invoice_original_verified:true}],transactions:[{id:'transaction',reference:'0599',reference_evidence:evidence,raw_bank_data:raw,payer:'Synthetic AB',account,bank_reference:'SYNTHETIC',verified:true,booked_at:'2026-10-26',amount_cents:10000,available_cents:10000,currency:'SEK'}]};
   const before=structuredClone(data);
   assert.equal(analyzeReconciliation(data)[0].safe,safe);
   assert.deepEqual(data,before);

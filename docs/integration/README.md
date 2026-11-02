@@ -1,5 +1,7 @@
 # MG Fakturakoll — shared integration contract
 
+Current combined delivery: [final receipt](../MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md). Producer contracts below remain versioned; current source/active-allocation safety bridges are covered by the joined acceptance and delivery ledger.
+
 Contract edition: **`mgeorge-integration-v1`**. Runtime architecture baseline:
 **`73662187cddf9a5c504dea9bd8a1288bd929bc51`** (PR #21).
 Contract introduction: **PR #22**, reviewed head

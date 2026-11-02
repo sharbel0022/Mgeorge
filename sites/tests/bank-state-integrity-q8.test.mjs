@@ -349,7 +349,9 @@ test('Q8 absence: an allocation timestamp alone is not a verified absence check'
 });
 
 for(const compact of [false,true])test(`Q8 payment proof: a ${compact?'compact':'retained'} conflict preserves historical allocations without claiming current verification`,async t=>{
- const initial=reconcileState(bank(invoice(emptyState(),{total:312500,vat:62500,net:250000,due:'2026-10-20'}),{amount:250000})).state;
+ let initial=bank(invoice(emptyState(),{total:312500,vat:62500,net:250000,due:'2026-10-20'}),{amount:250000});
+ // A partial payment must already have an explicit reviewed booking; it never auto-allocates.
+ initial=applyCommand(initial,{type:'match.create',invoiceId:initial.invoices[0].id,transactionId:initial.transactions[0].id,amount:250000,note:'Synthetic prior manual allocation after original review'}).state;
  const f=await fixture(t,compact?nearCapacity(initial):initial),before=f.read();
  await f.original('allocated-conflict',oversizedConflictCsv('2600,00'));
  assert.equal((await f.post({type:'transactions.import',documentId:'allocated-conflict'})).response.status,400);

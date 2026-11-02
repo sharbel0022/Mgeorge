@@ -158,7 +158,8 @@ are not invented. A future controlled reinspection workflow remains separate.
 
 The existing reconciliation and allocation engines consume the policy. There is
 no second payment or reconciliation engine. Both runtime rule versions are
-`invoice-reference-policy-2026-11-02.1`, reflecting changed reference authority;
+`invoice-reference-policy-2026-11-02.2`, reflecting changed reference authority
+and automatic payment eligibility;
 this version does not upgrade old bank evidence or claim byte-identical engines.
 
 Every policy-scoped payment reference must match the complete intended string.

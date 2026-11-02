@@ -30,7 +30,7 @@ async function fixture(t){
   f.env.DB=f.d1;f.env.BUCKET={async get(id){const bytes=f.objects.get(id);return bytes?{size:bytes.length,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)}:null;}};
   const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`),securityUrl=new URL('../lib/banking/security.ts',import.meta.url).href;
   const originalServer=moduleUrl('../lib/server.ts',{'cloudflare:workers':cf,'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return ${reference}.user;}`),'./domain':domainUrl});
-  const server=data(`export {readBankOriginalBytes} from ${JSON.stringify(originalServer)};import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(b,status=200)=>Response.json(b,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(owner);return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
+  const server=data(`export {readBankOriginalBytes,readInvoiceOriginalBytes} from ${JSON.stringify(originalServer)};import {emptyState} from ${JSON.stringify(domainUrl)};const f=${reference};export const db=()=>f.d1;export const response=(b,status=200)=>Response.json(b,{status});export async function identity(req){if(!f.user)throw Error('AUTH_REQUIRED');if(req&&req.method!=='GET'&&req.headers.get('origin')!==new URL(req.url).origin)throw Error('ORIGIN_DENIED');return f.user;}export async function readWorkspace(owner){const r=f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(owner);return r?{revision:r.revision,state:JSON.parse(r.payload)}:{revision:0,state:emptyState()};}`);
   const store=data(`import {seal,unseal} from ${JSON.stringify(securityUrl)};const f=${reference};export const encrypt=(o,p,v)=>seal(f.key,o,p,v);export const decrypt=(o,p,v)=>unseal(f.key,o,p,v);export async function application(owner){return {owner,generation:'synthetic-generation'};}export async function connection(){return {...f.bankConnection};}export async function accounts(){return JSON.parse(f.bankConnection.encrypted_accounts);}`);
   const adapter=moduleUrl('../lib/gmail-adapter.js',{'cloudflare:workers':cf});
   const bankgiro=moduleUrl('../lib/bankgiro-service.ts',{'./server':server,'./domain':domainUrl,'./bankgiro-parser.js':new URL('../lib/bankgiro-parser.js',import.meta.url).href,'./banking/store':store,'./banking/transactions':data('export function stableAccountKey(account){return "iban:"+account.account_id.iban;}')});
@@ -42,7 +42,9 @@ async function fixture(t){
     if(url.endsWith('/messages/send')){f.posts++;f.raw=Buffer.from(JSON.parse(options.body).raw,'base64url').toString();if(f.timeout)throw Error('timeout');return Response.json({id:'gmail-test-'+f.posts});}
     throw Error('No live network allowed');
   });
-  let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0597',ocr:'0597',total:312500,vat:62500,net:250000,issued:'2026-01-01',due:'2026-01-02',reviewed:true}}).state;
+  const invoiceBytes=new TextEncoder().encode('%PDF-Synthetic reviewed customer invoice original'),invoiceHash=Buffer.from(await crypto.subtle.digest('SHA-256',invoiceBytes)).toString('hex');
+  for(const id of ['synthetic-invoice-0597','synthetic-invoice-0598']){f.objects.set(f.owner+'/'+id,invoiceBytes);sql.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run(id,f.owner,'invoice.pdf','application/pdf',invoiceBytes.length,invoiceHash,'2026-10-30');}
+  let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0597',ocr:'0597',documentId:'synthetic-invoice-0597',total:312500,vat:62500,net:250000,issued:'2026-01-01',due:'2026-01-02',reviewed:true}}).state;
   // Due date cannot precede issue date in actual input.
   return Object.assign(f,{
     async retainOriginal(id,row){const text=`<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><Othr><Id>${row.account||'MG'}</Id></Othr></Id></Acct><Ntry><Amt Ccy="SEK">${(row.amount/100).toFixed(2)}</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AcctSvcrRef>${row.parentBankReference}</AcctSvcrRef><NtryDtls><TxDtls><Refs><TxId>${row.bankReference}</TxId></Refs><RltdPties><Dbtr><Nm>${row.party}</Nm></Dbtr></RltdPties><RmtInf><Strd><CdtrRefInf><Ref>${row.payerReference}</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>`,bytes=new TextEncoder().encode(text),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex');f.objects.set(f.owner+'/'+id,bytes);sql.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run(id,f.owner,'synthetic.xml','application/xml',bytes.length,hash,'2026-10-30');return hash;},
@@ -54,6 +56,8 @@ async function fixture(t){
     async review(m){return f.call('review',{id:m.id,version:m.version});},
     async send(m,r){return f.call('send',{id:m.id,version:m.version,review_id:r.review_id,approve:true});},
     pay(amount=250000,extra={}){let s=f.state();s=applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount,party:'Kund AB',payerReference:'0597',bankReference:crypto.randomUUID(),kind:'unknown',source:'Enable Banking',account:'iban:SE4280000890119146168423',...extra})]}).state;f.put(s);},
+    // Partial and excess scenarios require an explicit prior reviewed booking.
+    matchLastPayment(){let s=f.state();const invoice=s.invoices[0],transaction=s.transactions.at(-1);s=applyCommand(s,{type:'match.create',invoiceId:invoice.id,transactionId:transaction.id,amount:Math.min(transaction.amount,balance(s,invoice)),note:'Synthetic explicit manual allocation after original review'}).state;f.put(s);},
     init(){f.put(state);},
   });
 }
@@ -176,8 +180,8 @@ test('Q8: one successful after-check acknowledges at most 100 captured registrat
 test('D1 migration preserves existing workspace and creates isolated message tables',async t=>{
   const f=await fixture(t);f.init();const state=f.state();await f.queue();assert.deepEqual(f.state(),state);assert.ok(f.sql.prepare("SELECT name FROM sqlite_master WHERE name='customer_deliveries'").get());
 });
-test('partial payment leaves exactly 625 SEK and generates a cautious VAT draft',async t=>{
-  const f=await fixture(t);f.init();f.pay();const items=await f.queue(),m=items.find(m=>m.status==='draft');assert.equal(m.kind,'possible_vat');assert.equal(m.facts.paid_cents,250000);assert.equal(m.facts.remaining_cents,62500);assert.match(m.body,/Kan betalningen ha avsett/);assert.equal(f.posts,0);
+test('manually reviewed partial payment leaves exactly 625 SEK and generates a cautious VAT draft',async t=>{
+  const f=await fixture(t);f.init();f.pay();assert.equal((await f.api.reconcileAndPrepare(f.owner)).automatic,0);f.matchLastPayment();const items=await f.queue(),m=items.find(m=>m.status==='draft');assert.equal(m.kind,'possible_vat');assert.equal(m.facts.paid_cents,250000);assert.equal(m.facts.remaining_cents,62500);assert.match(m.body,/Kan betalningen ha avsett/);assert.equal(f.posts,0);
 });
 test('unknown payer with right amount remains unallocated and amount alone is never safe',async t=>{
   const f=await fixture(t);f.init();f.pay(312500,{party:'Okänd',payerReference:''});await f.queue();assert.equal(paid(f.state(),f.state().invoices[0].id),0);
@@ -206,7 +210,7 @@ test('wrong OCR belonging to another invoice is held, preserving original refere
   const f=await fixture(t);f.init();let s=f.state();s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Annan AB',number:'0577',ocr:'0577',total:312500,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(250000,{payerReference:'0577'});const q=await f.queue();assert.ok(q.some(m=>m.kind==='wrong_reference'));assert.equal(paid(f.state(),f.state().invoices[0].id),0);assert.equal(f.state().transactions[0].original.payerReference,'0577');
 });
 test('correct payment, overpayment and two payments are distinguished',async t=>{
-  const f=await fixture(t);f.init();f.pay(350000);let q=await f.queue();assert.equal(balance(f.state(),f.state().invoices[0]),0);assert.ok(q.some(m=>m.kind==='overpayment'));f.pay(312500);q=await f.queue();assert.ok(q.some(m=>m.kind==='possible_duplicate'));
+  const f=await fixture(t);f.init();f.pay(350000);assert.equal((await f.api.reconcileAndPrepare(f.owner)).automatic,0);f.matchLastPayment();let q=await f.queue();assert.equal(balance(f.state(),f.state().invoices[0]),0);assert.ok(q.some(m=>m.kind==='overpayment'));f.pay(312500);q=await f.queue();assert.ok(q.some(m=>m.kind==='possible_duplicate'));
 });
 test('unverified absence cannot become a demand for an unpaid debt',async t=>{
   const f=await fixture(t);f.init();const q=await f.queue();assert.equal(q[0].kind,'confirmation');assert.equal(invoiceStatus(f.state(),f.state().invoices[0]).key,'unreconciled');
@@ -255,10 +259,10 @@ test('API and bank file representations remain one economic payment',async t=>{
   const f=await fixture(t);f.init();f.pay(312500);await f.queue();let s=f.state();s=applyCommand(s,{type:'transactions.import',documentId:'synthetic-copy',rows:[{date:'2026-10-26',amount:312500,kind:'payment',verified:true,party:'Kund AB',payerReference:'0597',bankReference:'FILE',source:'bank.xml',account:'File alias'}]}).state;f.put(s);await f.queue();assert.equal(paid(f.state(),f.state().invoices[0].id),312500);assert.ok(f.state().transactions[1].duplicateOf);assert.equal(f.state().allocations.length,1);
 });
 test('one transfer for several invoices stays a manual split proposal',async t=>{
-  const f=await fixture(t);f.init();let s=f.state();s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0598',ocr:'0598',total:50000,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(362500,{payerReference:'0597 0598'});await f.queue();assert.equal(f.state().allocations.length,0);assert.equal(reconciliation.analyze(f.state()).filter(f=>f.kind==='multiple_invoices').length,2);
+  const f=await fixture(t);f.init();let s=f.state();s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0598',ocr:'0598',documentId:'synthetic-invoice-0598',total:50000,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(362500,{payerReference:'0597 0598'});await f.queue();assert.equal(f.state().allocations.length,0);assert.equal(reconciliation.analyze(f.state()).filter(f=>f.kind==='multiple_invoices').length,2);
 });
 test('a manually verified private payer can be reused for the same customer and account',async t=>{
-  const f=await fixture(t);f.init();f.pay(312500,{party:'Anna Andersson'});let s=f.state();s=applyCommand(s,{type:'match.create',invoiceId:s.invoices[0].id,transactionId:s.transactions[0].id,amount:312500,note:'Kunden bekräftade betalaren'}).state;s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0598',ocr:'0598',total:50000,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(50000,{party:'Anna Andersson',payerReference:'0598'});await f.queue();assert.equal(paid(f.state(),f.state().invoices[1].id),50000);
+  const f=await fixture(t);f.init();f.pay(312500,{party:'Anna Andersson'});let s=f.state();s=applyCommand(s,{type:'match.create',invoiceId:s.invoices[0].id,transactionId:s.transactions[0].id,amount:312500,note:'Kunden bekräftade betalaren'}).state;s=applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Kund AB',number:'0598',ocr:'0598',documentId:'synthetic-invoice-0598',total:50000,issued:'2026-01-01',due:'2026-10-01',reviewed:true}}).state;f.put(s);f.pay(50000,{party:'Anna Andersson',payerReference:'0598'});await f.queue();assert.equal(paid(f.state(),f.state().invoices[1].id),50000);
 });
 test('missing OCR remains manual after bank evidence has been verified',async t=>{
   const f=await fixture(t);f.init();f.pay(312500,{payerReference:''});let s=f.state();s=applyCommand(s,{type:'transaction.verify',id:s.transactions[0].id,note:'Betalare och bokföring kontrollerade'}).state;f.put(s);await f.queue();assert.equal(f.state().allocations.length,0);assert.equal(reconciliation.analyze(f.state())[0].kind,'missing_reference');
@@ -308,7 +312,7 @@ async function conflictOnAllocatedPayment(state,compact){
 }
 for(const compact of [false,true])test(`Q8 payment proof: ${compact?'compact hold':'retained conflict'} replaces fresh payment assertions with neutral confirmation`,async t=>{
  for(const [amount,kind]of [[250000,'possible_vat'],[240000,'partial'],[350000,'overpayment']]){
-  const f=await fixture(t);f.init();f.pay(amount,{bankReference:'SYN-ALLOCATED',externalId:'SYN-ALLOCATED'});const prior=(await f.queue()).find(m=>m.kind===kind&&m.status==='draft');assert.ok(prior);
+  const f=await fixture(t);f.init();f.pay(amount,{bankReference:'SYN-ALLOCATED',externalId:'SYN-ALLOCATED'});f.matchLastPayment();const prior=(await f.queue()).find(m=>m.kind===kind&&m.status==='draft');assert.ok(prior);
   const before=f.state(),held=await conflictOnAllocatedPayment(before,compact);f.put(held);const items=await f.queue();
   assert.equal(items.some(m=>['partial','possible_vat','overpayment'].includes(m.kind)&&m.status==='draft'),false);
   const cautious=items.find(m=>m.kind==='confirmation'&&m.status==='draft');assert.ok(cautious);assert.match(cautious.facts.payment_evidence_issue,/motstridiga/);assert.doesNotMatch(cautious.body,/verifierat betalningar|verifierad betalning|Skillnaden motsvarar/);
@@ -317,7 +321,7 @@ for(const compact of [false,true])test(`Q8 payment proof: ${compact?'compact hol
 });
 for(const compact of [false,true])test(`Q8 payment proof: current-snapshot payment drafts cannot be reviewed or sent under ${compact?'compact hold':'retained conflict'}`,async t=>{
  for(const [amount,kind]of [[250000,'possible_vat'],[240000,'partial'],[350000,'overpayment']]){
-  const f=await fixture(t);f.init();await f.connect();f.pay(amount,{bankReference:'SYN-ALLOCATED',externalId:'SYN-ALLOCATED'});await f.queue();const id=f.state().invoices[0].id;
+  const f=await fixture(t);f.init();await f.connect();f.pay(amount,{bankReference:'SYN-ALLOCATED',externalId:'SYN-ALLOCATED'});f.matchLastPayment();await f.queue();const id=f.state().invoices[0].id;
   await f.call('contact',{invoice_id:id,email:'synthetic@example.test',evidence:'Synthetic contact agreement.',confirm:true});const m=(await f.queue()).find(m=>m.kind===kind&&m.status==='draft'),review=await f.review(m);
   f.put(await conflictOnAllocatedPayment(f.state(),compact));const contact=f.sql.prepare('SELECT * FROM customer_contacts WHERE owner=? AND invoice_id=?').get(f.owner,id),snapshot=await f.api.evidenceSnapshot(f.state(),contact);
   f.sql.prepare('UPDATE customer_messages SET snapshot=? WHERE id=?').run(snapshot,m.id);f.sql.prepare('UPDATE customer_reviews SET snapshot=? WHERE id=?').run(snapshot,review.review_id);
@@ -328,7 +332,7 @@ for(const compact of [false,true])test(`Q8 payment proof: current-snapshot payme
  }
 });
 test('Q8 payment proof: an unrelated row conflict preserves a valid payment claim while absence stays blocked',async t=>{
- const f=await fixture(t);f.init();f.pay(250000,{bankReference:'SYN-VALID',externalId:'SYN-VALID'});await f.queue();f.pay(10000,{party:'Unrelated synthetic sender',payerReference:'OTHER-REF',bankReference:'SYN-OTHER',externalId:'SYN-OTHER'});
+ const f=await fixture(t);f.init();f.pay(250000,{bankReference:'SYN-VALID',externalId:'SYN-VALID'});f.matchLastPayment();await f.queue();f.pay(10000,{party:'Unrelated synthetic sender',payerReference:'OTHER-REF',bankReference:'SYN-OTHER',externalId:'SYN-OTHER'});
  let state=f.state();const other=state.transactions.find(row=>row.bankReference==='SYN-OTHER');state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({...other,party:'Contradictory unrelated sender'})]}).state;f.put(state);
  const m=(await f.queue()).find(item=>item.kind==='possible_vat'&&item.status==='draft');assert.ok(m);assert.equal(m.facts.payment_evidence_issue,'');assert.equal(m.facts.paid_cents,250000);assert.equal(m.facts.remaining_cents,62500);assert.match(m.body,/Vi har verifierat betalningar/);assert.ok((await f.review(m)).review_id);
  await assert.rejects(f.call('absence',{invoice_id:state.invoices[0].id,note:'An unrelated bank contradiction still prevents an account-wide absence conclusion.',confirm:true}),/motstridiga/);assert.equal(f.posts,0);

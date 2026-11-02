@@ -7,12 +7,14 @@ import {openDatabase,storeTransactions,listTransactions,listInvoices,allocate} f
 import {reconciliationData,analyzeReconciliation,runReconciliation} from '../src/reconciliation.js';
 import {encryptObject} from '../src/security.js';
 import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixtures.js';
+import {retainSyntheticInvoiceOriginal} from './invoice-fixtures.js';
 
 const account='SE4280000890119146168423';
 function fixture(t){
   const folder=mkdtempSync(join(tmpdir(),'mg-api-consent-')),db=openDatabase(join(folder,'db.sqlite'));
   t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
   db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('invoice','customer','0599','Synthetic customer AB',62500,'0599','2026-10-01');
+  retainSyntheticInvoiceOriginal(db,'invoice');
   storeTransactions(db,[withSyntheticBankOriginal({account,booked_at:'2026-10-26',amount_cents:62500,currency:'SEK',payer:'Synthetic customer AB',reference:'0599',bank_reference:'SYNTHETIC-AIS-ENTRY'})],'enablebanking');
   return db;
 }

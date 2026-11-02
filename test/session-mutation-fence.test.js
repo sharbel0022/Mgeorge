@@ -141,7 +141,7 @@ test('logout while providers are pending blocks later writes and consent effects
       if(url.pathname==='/application')return Response.json({kid:'session-test',environment:'SANDBOX',active:true,countries:['SE'],services:['AIS'],redirect_urls:[origin+'/api/bank/callback']});
       if(url.pathname==='/aspsps')return Response.json({aspsps:[{name:'Swedbank',country:'SE',psu_types:['business'],maximum_consent_validity:86400}]});
       if(url.pathname==='/auth')return Response.json({url:'https://auth.enablebanking.com/ais/start?sessionid=synthetic'});
-      if(url.pathname.startsWith('/sessions/'))return options.method==='DELETE'?new Response(null,{status:204}):Response.json({status:'AUTHORIZED',accounts:['account']});
+      if(url.pathname.startsWith('/sessions/'))return options.method==='DELETE'?new Response(null,{status:204}):Response.json({status:'AUTHORIZED',accounts:['account'],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:'2099-01-01T00:00:00Z'}});
       if(url.pathname.endsWith('/transactions'))return Response.json({transactions:[]});
       if(url.pathname.endsWith('/profile'))return Response.json({emailAddress:process.env.GMAIL_ACCOUNT});
       if(url.pathname.endsWith('/messages'))return Response.json({messages:[]});
@@ -206,7 +206,7 @@ test('logout stops provider refreshes, retries, pagination and attachment contin
       if(url.pathname===listing)return Response.json(name==='Gmail next page'?url.searchParams.has('pageToken')?{messages:[]}:{messages:[],nextPageToken:'synthetic-next'}:{messages:[{id:'message-1'}]});
       if(url.pathname===message)return Response.json({id:'message-1',labelIds:[],internalDate:'0',payload:{headers:[],parts:[1,2].map(id=>({partId:String(id),filename:`synthetic-${id}.pdf`,mimeType:'application/pdf',body:{attachmentId:`part-${id}`,size:100}}))}});
       if(url.pathname.includes('/attachments/'))return Response.json({data:Buffer.from('%PDF-synthetic').toString('base64url')});
-      if(url.pathname.startsWith('/sessions/'))return Response.json({status:'AUTHORIZED',accounts:['account']});
+      if(url.pathname.startsWith('/sessions/'))return Response.json({status:'AUTHORIZED',accounts:['account'],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:'2099-01-01T00:00:00Z'}});
       if(url.pathname.endsWith('/transactions'))return Response.json(url.searchParams.has('continuation_key')?{transactions:[]}:{transactions:[],continuation_key:'synthetic-next'});
       throw Error('Unexpected synthetic continuation endpoint '+url.pathname);
     };

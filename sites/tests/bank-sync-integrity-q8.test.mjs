@@ -5,11 +5,12 @@ import {stripTypeScriptTypes} from 'node:module';
 import {DatabaseSync} from 'node:sqlite';
 import {applyCommand,emptyState,today} from '../lib/domain.ts';
 import {randomToken} from '../lib/banking/security.ts';
+import {bankUtcDate} from '../lib/banking/sync-periods.ts';
 
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const source=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 const url=path=>new URL(path,import.meta.url).href;
-function compiled(path,imports){imports={'./sync-periods':url('../lib/banking/sync-periods.ts'),'../payer-evidence.js':url('../lib/payer-evidence.js'),...imports};let code=stripTypeScriptTypes(source(path),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));return data(code);}
+function compiled(path,imports){imports={'./account-read-cooldown':url('../lib/banking/account-read-cooldown.ts'),'./sync-periods':url('../lib/banking/sync-periods.ts'),'../payer-evidence.js':url('../lib/payer-evidence.js'),...imports};let code=stripTypeScriptTypes(source(path),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));return data(code);}
 const {reconcileState}=await import(compiled('../lib/reconciliation.ts',{'./domain':url('../lib/domain.ts'),'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')}));
 class LocalD1{
  constructor(sql){this.sql=sql;this.beforeBatch=null;}
@@ -18,11 +19,11 @@ class LocalD1{
 }
 const accountUid='22222222-2222-4222-8222-222222222222',appId='11111111-1111-4111-8111-111111111111',owner='q8-synthetic-owner',iban='SE4280000890119146168423',origin='https://synthetic-bank.test';
 const future=()=>new Date(Date.now()+86400000).toISOString();
-const row=extra=>({entry_reference:'Q8-BANK-1',transaction_amount:{amount:'625.00',currency:'SEK'},credit_debit_indicator:'CRDT',status:'BOOK',booking_date:today(),debtor:{name:'Synthetic customer AB'},reference_number:'000018',...extra});
+const row=extra=>({entry_reference:'Q8-BANK-1',transaction_amount:{amount:'625.00',currency:'SEK'},credit_debit_indicator:'CRDT',status:'BOOK',booking_date:bankUtcDate(),debtor:{name:'Synthetic customer AB'},reference_number:'000018',...extra});
 
 async function fixture(t){
  const key='__q8_sync_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
- for(const migration of ['0000_confused_umar','0001_sudden_whirlwind','0002_brief_chronomancer','0012_minor_naoko'])sql.exec(source('../drizzle/'+migration+'.sql'));
+ for(const migration of ['0000_confused_umar','0001_sudden_whirlwind','0002_brief_chronomancer','0012_minor_naoko','0016_agent2_account_read_guard'])sql.exec(source('../drizzle/'+migration+'.sql'));
  const DB=new LocalD1(sql),f={sql,DB,rows:[],env:{DB,BANK_DATA_ENCRYPTION_KEY:randomToken(),ENABLE_BANKING_APPLICATION_ID:appId,ENABLE_BANKING_PRIVATE_KEY:'-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',ENABLE_BANKING_ENVIRONMENT:'PRODUCTION',ENABLE_BANKING_KEY_ROTATED:'true'}};
  globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
  t.mock.method(globalThis,'fetch',async()=>{throw Error('Live network is forbidden in synthetic bank tests.');});
@@ -30,14 +31,15 @@ async function fixture(t){
  const server=compiled('../lib/server.ts',{'cloudflare:workers':cloudflare,'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return {userId:${JSON.stringify(owner)}};}`),'./domain':domain});
  const storeUrl=compiled('../lib/banking/store.ts',{'cloudflare:workers':cloudflare,'@/lib/server':server,'./security':security,'./runtime-config':runtime}),store=await import(storeUrl);
  const normalizerUrl=compiled('../lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':url('../lib/payment-references.js')}),normalizer=await import(normalizerUrl);
- const provider=data(`export {ProviderError} from ${JSON.stringify(url('../lib/banking/enable-banking.ts'))};export async function getSession(){return {status:'AUTHORIZED',accounts:[${JSON.stringify(accountUid)}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:globalThis[${JSON.stringify(key)}].validUntil}};}export async function getTransactions(){return {transactions:globalThis[${JSON.stringify(key)}].rows};}export async function getApplication(){}export async function listBusinessBanks(){}export async function startAuth(){}export async function createSession(){}export async function deleteSession(){}`);
- const service=compiled('../lib/banking/service.ts',{'@/lib/server':server,'@/lib/domain':domain,'./store':storeUrl,'./security':security,'./runtime-config':runtime,'./transactions':normalizerUrl,'./enable-banking':provider,'../customer-messages':data('export async function reconcileAndPrepare(){throw Error("Rejected imports cannot run reconciliation");}')});
+ const provider=data(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(url('../lib/banking/enable-banking.ts'))};export async function getSession(){return {status:'AUTHORIZED',accounts:[${JSON.stringify(accountUid)}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:globalThis[${JSON.stringify(key)}].validUntil}};}export async function getTransactions(){return {transactions:globalThis[${JSON.stringify(key)}].rows};}export async function getApplication(){}export async function listBusinessBanks(){}export async function startAuth(){}export async function createSession(){}export async function deleteSession(){}`);
+ const readGuard=compiled('../lib/banking/account-read-guard.ts',{'../server':server,'./store':storeUrl,'./enable-banking':provider});
+ const service=compiled('../lib/banking/service.ts',{'@/lib/server':server,'@/lib/domain':domain,'./store':storeUrl,'./security':security,'./runtime-config':runtime,'./transactions':normalizerUrl,'./enable-banking':provider,'./account-read-guard':readGuard,'../customer-messages':data('export async function reconcileAndPrepare(){throw Error("Rejected imports cannot run reconciliation");}')});
  const route=await import(compiled('../app/api/bank/sync/route.ts',{'@/lib/banking/service':service}));
  const app=await store.application(owner),at=new Date().toISOString();f.validUntil=future();
  sql.prepare('INSERT INTO bank_applications VALUES(?,?,?,?,?,?,?)').run(owner,appId,await store.encrypt(owner,'key:generation-one','SYNTHETIC PRIVATE KEY'),JSON.stringify({name:'Synthetic app',kid:appId,environment:'PRODUCTION',active:true,redirect_urls:[origin+'/api/bank/callback'],countries:['SE'],services:['AIS']}),app.generation,at,at);
  const connectionId='q8-synthetic-connection';
- sql.prepare('INSERT INTO bank_connections(id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(connectionId,owner,app.generation,'PRODUCTION','Swedbank','SE',await store.encrypt(owner,'session:'+connectionId,'33333333-3333-4333-8333-333333333333'),await store.encrypt(owner,'accounts:'+connectionId,[{uid:accountUid,currency:'SEK',account_id:{iban},name:'Synthetic account'}]),JSON.stringify([accountUid]),f.validUntil,today(),'connected',at,at);
- const normalized=await normalizer.normalizeTransactions([row(),row({entry_reference:'Q8-IGNORED',transaction_amount:{amount:'100.00',currency:'SEK'},debtor:{name:'Other synthetic payer'},reference_number:'000026'})],{accountKey:'iban:'+iban,accountLabel:'Synthetic account',bankName:'Swedbank',dateFrom:today(),dateTo:today()});
+ sql.prepare('INSERT INTO bank_connections(id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(connectionId,owner,app.generation,'PRODUCTION','Swedbank','SE',await store.encrypt(owner,'session:'+connectionId,'33333333-3333-4333-8333-333333333333'),await store.encrypt(owner,'accounts:'+connectionId,[{uid:accountUid,currency:'SEK',account_id:{iban},name:'Synthetic account'}]),JSON.stringify([accountUid]),f.validUntil,bankUtcDate(),'connected',at,at);
+ const normalized=await normalizer.normalizeTransactions([row(),row({entry_reference:'Q8-IGNORED',transaction_amount:{amount:'100.00',currency:'SEK'},debtor:{name:'Other synthetic payer'},reference_number:'000026'})],{accountKey:'iban:'+iban,accountLabel:'Synthetic account',bankName:'Swedbank',dateFrom:bankUtcDate(),dateTo:bankUtcDate()});
  let initial=applyCommand(emptyState(),{type:'transactions.import',trustedBankImport:true,rows:normalized.rows}).state;
  initial=applyCommand(initial,{type:'transaction.ignore',id:initial.transactions[1].id}).state;
  sql.prepare('INSERT INTO workspaces VALUES(?,?,?,?)').run(owner,1,JSON.stringify(initial),at);
@@ -52,21 +54,21 @@ test('Q8: a rejected bank sync persists observed contradictions without new mone
  assert.deepEqual(saved.state.imports,before.state.imports);assert.deepEqual(saved.state.allocations,before.state.allocations);
  assert.deepEqual(saved.state.transactions[0].bankData,before.state.transactions[0].bankData);
  assert.equal(saved.state.transactions[0].bankEvidenceConflicts?.[0].incoming.bankData.debtor.name,'Contradictory synthetic payer');
- assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM bank_sync_runs').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,1);
+ assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM bank_sync_runs').get().n,0);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n,1);
  assert.equal(f.sql.prepare('SELECT last_synced_at FROM bank_connections').get().last_synced_at,null);
- const retry=await f.post();assert.equal(retry.response.status,400);assert.equal(f.read().revision,2);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,1);
+ const retry=await f.post();assert.equal(retry.response.status,400);assert.equal(f.read().revision,2);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n,1);
 });
 
 test('Q8: evidence-only bank failure cannot overwrite a concurrent workspace revision',async t=>{
  const f=await fixture(t),before=f.read();
  f.DB.beforeBatch=statements=>{if(statements.some(statement=>statement.values.includes('bank.sync_rejected'))){f.DB.beforeBatch=null;const concurrent=structuredClone(before.state);concurrent.company.name='Concurrent synthetic edit';f.sql.prepare('UPDATE workspaces SET revision=revision+1,payload=? WHERE owner=?').run(JSON.stringify(concurrent),owner);}};
- const result=await f.post();assert.equal(result.response.status,409);assert.equal(f.read().revision,2);assert.equal(f.read().state.company.name,'Concurrent synthetic edit');assert.equal(f.read().state.transactions[0].bankEvidenceConflicts,undefined);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
+ const result=await f.post();assert.equal(result.response.status,409);assert.equal(f.read().revision,2);assert.equal(f.read().state.company.name,'Concurrent synthetic edit');assert.equal(f.read().state.transactions[0].bankEvidenceConflicts,undefined);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n,0);
 });
 
 test('Q8: evidence-only bank failure cannot write after its lease is replaced',async t=>{
  const f=await fixture(t),before=f.read();
  f.DB.beforeBatch=statements=>{if(statements.some(statement=>statement.values.includes('bank.sync_rejected'))){f.DB.beforeBatch=null;f.sql.prepare("UPDATE bank_locks SET token='another-worker',expires_at=?").run(future());}};
- const result=await f.post();assert.equal(result.response.status,409);assert.match(result.body.error,/lås.*löpt ut/);assert.deepEqual(f.read(),before);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
+ const result=await f.post();assert.equal(result.response.status,409);assert.match(result.body.error,/lås.*löpt ut/);assert.deepEqual(f.read(),before);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n,0);
 });
 
 function atCapacity(f){
@@ -83,7 +85,7 @@ test('Q8 review: capped bank sync retains raw conflict evidence and a bounded ho
   const {bankEvidenceHold,...preserved}=saved.state;assert.deepEqual(preserved,before.state);const event=f.sql.prepare('SELECT owner,action,detail FROM audit_events WHERE id=?').get(bankEvidenceHold.auditEventId);assert.equal(event.owner,owner);assert.equal(event.action,'bank.sync_rejected');
   const evidence=JSON.parse(event.detail).retained_conflicts.flatMap(entry=>entry.conflicts).find(conflict=>conflict.incoming.bankData?.debtor?.name==='Contradictory synthetic payer').incoming;
   assert.equal(evidence.bankData.note,'d'.repeat(1000));assert.equal(evidence.amount,62500);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM bank_sync_runs').get().n,0);assert.equal(f.sql.prepare('SELECT last_synced_at FROM bank_connections').get().last_synced_at,null);
-  const retry=await f.post();assert.equal(retry.response.status,400);assert.equal(f.read().revision,2);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,1);
+  const retry=await f.post();assert.equal(retry.response.status,400);assert.equal(f.read().revision,2);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n,1);
   assert.equal(reconcileState(f.read().state).state.allocations.length,0);assert.throws(()=>applyCommand(f.read().state,{type:'match.create',invoiceId:saved.state.invoices[0].id,transactionId:saved.state.transactions[0].id,amount:62500,note:'Cannot bypass the compact safety hold.'}),/motstrid/i);
  }
 });
@@ -91,11 +93,11 @@ test('Q8 review: capped bank sync retains raw conflict evidence and a bounded ho
 test('Q8 review: a capped sync conflict audit and hold are fenced by the workspace revision',async t=>{
  const f=await fixture(t);atCapacity(f);const before=f.read();
  f.DB.beforeBatch=statements=>{if(statements.some(statement=>statement.values.includes('bank.sync_rejected'))){f.DB.beforeBatch=null;const concurrent=structuredClone(before.state);concurrent.company.name='Concurrent synthetic edit';f.sql.prepare('UPDATE workspaces SET revision=revision+1,payload=? WHERE owner=?').run(JSON.stringify(concurrent),owner);}};
- const result=await f.post();assert.equal(result.response.status,409);assert.equal(f.read().revision,2);assert.equal(f.read().state.company.name,'Concurrent synthetic edit');assert.equal(f.read().state.bankEvidenceHold,undefined);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
+ const result=await f.post();assert.equal(result.response.status,409);assert.equal(f.read().revision,2);assert.equal(f.read().state.company.name,'Concurrent synthetic edit');assert.equal(f.read().state.bankEvidenceHold,undefined);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n,0);
 });
 
 test('Q8 review: a capped sync conflict audit and hold are fenced by a replacement lease',async t=>{
  const f=await fixture(t);atCapacity(f);const before=f.read();
  f.DB.beforeBatch=statements=>{if(statements.some(statement=>statement.values.includes('bank.sync_rejected'))){f.DB.beforeBatch=null;f.sql.prepare("UPDATE bank_locks SET token='another-worker',expires_at=?").run(future());}};
- const result=await f.post();assert.equal(result.response.status,409);assert.match(result.body.error,/lås.*löpt ut/);assert.deepEqual(f.read(),before);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
+ const result=await f.post();assert.equal(result.response.status,409);assert.match(result.body.error,/lås.*löpt ut/);assert.deepEqual(f.read(),before);assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n,0);
 });

@@ -6,13 +6,14 @@ import {join} from 'node:path';
 import {openDatabase,storeTransactions,listInvoices,allocate,deleteAllocation,listTransactions} from '../src/db.js';
 import {normalizeName,analyzeReconciliation,reconciliationData,runReconciliation,verifyPayer} from '../src/reconciliation.js';
 import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixtures.js';
+import {retainSyntheticInvoiceOriginal} from './invoice-fixtures.js';
 import {parseCAMT,parseCSV} from '../src/importers.js';
 import {syntheticCamt,account as syntheticAccount} from '../sites/tests/helpers/camt-integrity.mjs';
 
 function fixture(t){const folder=mkdtempSync(join(tmpdir(),'mg-reconcile-')),db=openDatabase(join(folder,'db.sqlite'));t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});return db;}
 function invoice(db,id='i',extra={}){
   const x={id,number:id==='i'?'0597':id,party:'Kund AB',total:312500,...extra};
-  db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,vat_cents,net_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?,?,?)').run(x.id,'customer',x.number,x.party,x.total,62500,250000,x.number,'2026-01-01');return x.id;
+  db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,vat_cents,net_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?,?,?)').run(x.id,'customer',x.number,x.party,x.total,62500,250000,x.number,'2026-01-01');retainSyntheticInvoiceOriginal(db,x.id);return x.id;
 }
 function pay(db,extra={},source='enablebanking'){
   if(!db.prepare('SELECT id FROM bank_connections LIMIT 1').get())approveSyntheticBankAccount(db,syntheticAccount);
@@ -27,8 +28,10 @@ test('correct verified payment auto-allocates once without changing bank origina
   assert.equal(listInvoices(db)[0].status,'paid');assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,1);
   assert.deepEqual(db.prepare('SELECT * FROM bank_transactions').get(),before);
 });
-test('2500 of 3125 is a partial payment with a 625 balance',t=>{
-  const db=fixture(t);invoice(db);pay(db,{amount_cents:250000});runReconciliation(db);
+test('2500 of 3125 requires review before a partial allocation with a 625 balance',t=>{
+  const db=fixture(t);invoice(db);const tx=pay(db,{amount_cents:250000});runReconciliation(db);
+  assert.equal(listInvoices(db)[0].paid_cents,0);assert.equal(analyze(db)[0].kind,'partial');assert.equal(analyze(db)[0].safe,false);
+  allocate(db,'i',tx,250000);
   assert.equal(listInvoices(db)[0].paid_cents,250000);assert.equal(listInvoices(db)[0].remaining_cents,62500);assert.equal(listInvoices(db)[0].status,'partial');
 });
 test('wrong OCR belonging to another invoice is never silently corrected, even when owner is paid',t=>{
@@ -47,8 +50,9 @@ test('explicitly verified private payer linkage supports future matching',t=>{
   const db=fixture(t);invoice(db);pay(db,{payer:'Anna Andersson'});assert.equal(analyze(db)[0].safe,false);
   verifyPayer(db,{invoice_id:'i',payer:'Anna Andersson',account:syntheticAccount,evidence:'Kunden bekräftade betalaren'},'admin');runReconciliation(db);assert.equal(listInvoices(db)[0].status,'paid');
 });
-test('overpayment leaves traceable excess and two separate payments require duplicate review',t=>{
-  const db=fixture(t);invoice(db);pay(db,{amount_cents:350000});runReconciliation(db);assert.equal(listTransactions(db)[0].available_cents,37500);assert.equal(listInvoices(db)[0].paid_cents,312500);
+test('reviewed overpayment leaves traceable excess and two separate payments require duplicate review',t=>{
+  const db=fixture(t);invoice(db);const tx=pay(db,{amount_cents:350000});runReconciliation(db);assert.equal(listInvoices(db)[0].paid_cents,0);assert.equal(analyze(db)[0].safe,false);
+  allocate(db,'i',tx,312500);assert.equal(listTransactions(db)[0].available_cents,37500);assert.equal(listInvoices(db)[0].paid_cents,312500);
   const other=fixture(t);invoice(other);pay(other);pay(other,{bank_reference:'B2'});assert.ok(analyze(other).every(s=>!s.safe));runReconciliation(other);assert.equal(listInvoices(other)[0].paid_cents,0);
 });
 test('one transfer referencing multiple invoices proposes an explicit split without consuming money',t=>{

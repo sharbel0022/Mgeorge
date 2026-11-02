@@ -16,6 +16,7 @@ export type BankConnectionRow = {
   auto_sync_enabled: number; auto_last_attempt_at: string | null; auto_next_at: string | null;
   control_last_attempt_at: string | null;
   retry_after: string; sync_failures: number;
+  account_evidence_retry: string;
 };
 export type BankFlowRow = {
   state_hash: string; owner: string; cookie_hash: string; app_generation: string;

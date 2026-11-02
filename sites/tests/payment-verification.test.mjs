@@ -16,6 +16,8 @@ const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./r
 const candidates=compiled('../lib/banking/invoice-candidates.ts',{'../domain':domain,'../reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href,'../payment-presentation':presentation});
 const detailEvidence=compiled('../lib/banking/detail-evidence.ts',{'../domain':domain,'../payment-references.js':url('../lib/payment-references.js'),'../payer-evidence.js':url('../lib/payer-evidence.js')});
 const {transactionDetailEvidence}=await import(detailEvidence);
+// Pure explanation fixtures already declare invoiceOriginalChecked=true; pass
+// that request-local proof explicitly when obtaining actual engine findings.
 const ctx={checkedAt:'2026-11-01T21:00:00.000Z',originalIssue:'',accountIssue:'',reportIssue:'',invoiceOriginalIssue:'',invoiceOriginalChecked:true,documents:[],findings:[]};
 const file=new URL('../lib/payment-verification.ts',import.meta.url),implemented=existsSync(file);
 const moduleUrl=implemented?compiled('../lib/payment-verification.ts',{'./account-evidence-presentation':compiled('../lib/account-evidence-presentation.ts',{'./domain':domain}),'./domain':domain,'./payment-presentation':presentation,'./reconciliation-engine.js':engine,'./reconciliation-evidence':data('export async function paymentOriginalAvailabilityIssue(){return "";} export async function reconciliationPreviewWithOriginals(){return {findings:[]};}'),'./bankgiro-service':data('export async function bankgiroAutomaticAccountIssue(){return "";}export async function bankgiroRetainedPreview(){throw Error("Not used in pure projection");}'),'./banking/invoice-candidates':candidates,'./banking/detail-evidence':detailEvidence,'./server':data('export function db(){throw Error("No database reads during pure projection");}'),'cloudflare:workers':data('export const env={};')}):null;
@@ -156,7 +158,7 @@ test('GET denies unauthenticated, invalid and foreign ids before opening documen
 });
 
 test('the existing engine may propose a safe match but the detail still performs no allocation',{skip:!implemented},async()=>{
- const s=fixture(),before=structuredClone(s),{reconciliationPreview}=await import(reconciliation),preview=reconciliationPreview(s),r=build(s,s.transactions[0].id,{findings:preview.findings});
+ const s=fixture(),before=structuredClone(s),{reconciliationPreview}=await import(reconciliation),preview=reconciliationPreview(s,new Set(s.invoices.map(i=>i.id))),r=build(s,s.transactions[0].id,{findings:preview.findings});
  assert.equal(r.automaticEligible,true);assert.equal(step(r,'customer').statusLabel,'Stämmer enligt matchningsregeln');assert.equal(step(r,'reconciliation').statusLabel,'Förslag · separat beslut krävs');assert.deepEqual(s,before);assert.equal(s.allocations.length,0);
 });
 
@@ -164,7 +166,7 @@ test('a complete bank-identified report shows common identity and declared count
  let s=fixture({batch:true}),parent=s.transactions[0];
  const csv='Betalningsdatum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp;Valuta;Mottagarkonto;Bankreferens\n2026-10-26;Synthetic customer AB;0599;987-6543;625,00;SEK;'+parent.account.slice(5)+';'+parent.bankReference;
  s=applyCommand(s,{type:'bankgiro.import',documentId:'synthetic-report',hash:'a'.repeat(64),name:'synthetic.csv',rows:parseSpecificationBytes(new TextEncoder().encode(csv),'synthetic.csv')}).state;
- const child=s.transactions.find(t=>t.parentId),{reconciliationPreview}=await import(reconciliation),r=build(s,child.id,{findings:reconciliationPreview(s).findings});
+ const child=s.transactions.find(t=>t.parentId),{reconciliationPreview}=await import(reconciliation),r=build(s,child.id,{findings:reconciliationPreview(s,new Set(s.invoices.map(i=>i.id))).findings});
  assert.equal(step(r,'deposit').status,'passed');assert.equal(step(r,'deposit').statusLabel,'Gemensamt bank-ID');assert.equal(step(r,'report').facts.find(f=>f.label==='Antal kopplade betalningar').value,'1');assert.equal(r.automaticEligible,true);assert.equal(s.allocations.length,0);
  child.specificationCount=2;const broken=build(s,child.id);assert.notEqual(step(broken,'deposit').status,'passed');
 });
@@ -286,7 +288,7 @@ test('economic membership excludes ignored, duplicate and parent summaries while
 });
 
 for(const mode of ['one-competing-original','multiple-originals','reference-conflict'])test('safe engine findings cannot bypass '+mode+' beside a reviewed register invoice',async()=>{
- const s=fixture(),before=structuredClone(s),{analyze}=await import(reconciliation),findings=analyze(s);
+ const s=fixture(),before=structuredClone(s),{analyze}=await import(reconciliation),findings=analyze(s,new Set(s.invoices.map(i=>i.id)));
  assert.equal(findings.filter(f=>f.safe&&f.transaction_id===s.transactions[0].id&&f.invoice_id===s.invoices[0].id).length,1,'positive control uses the actual existing analysis');
  const documents=mode==='one-competing-original'?[candidateRow('unregistered-one',{party:'Another synthetic customer AB'})]:mode==='multiple-originals'?[candidateRow('unregistered-one'),candidateRow('unregistered-two')]:[candidateRow('unregistered-conflict',{ocr:'000026'})];
  const report=build(s,s.transactions[0].id,{documents,findings});
@@ -295,13 +297,13 @@ for(const mode of ['one-competing-original','multiple-originals','reference-conf
 });
 for(const mode of ['one-competing-original','multiple-originals','reference-conflict'])test('held '+mode+' preview preserves earlier bookings and their calculated saldo',async()=>{
  let s=fixture();s=applyCommand(s,{type:'match.create',invoiceId:s.invoices[0].id,transactionId:s.transactions[0].id,amount:20000,note:'Synthetic previously booked partial allocation'}).state;
- const before=structuredClone(s),{analyze}=await import(reconciliation),findings=analyze(s),documents=mode==='one-competing-original'?[candidateRow('unregistered-one',{party:'Another synthetic customer AB'})]:mode==='multiple-originals'?[candidateRow('unregistered-one'),candidateRow('unregistered-two')]:[candidateRow('unregistered-conflict',{ocr:'000026'})];
+ const before=structuredClone(s),{analyze}=await import(reconciliation),findings=analyze(s,new Set(s.invoices.map(i=>i.id))),documents=mode==='one-competing-original'?[candidateRow('unregistered-one',{party:'Another synthetic customer AB'})]:mode==='multiple-originals'?[candidateRow('unregistered-one'),candidateRow('unregistered-two')]:[candidateRow('unregistered-conflict',{ocr:'000026'})];
  const report=build(s,s.transactions[0].id,{documents,findings});assert.equal(step(report,'invoice').status,'blocked');assert.equal(step(report,'customer').status,'review');assert.equal(report.automaticEligible,false);assert.equal(report.bookedAllocationCount,1);assert.equal(step(report,'reconciliation').status,'blocked');assert.equal(step(report,'original').status,'passed');assert.equal(balance(s,s.invoices[0]),42500);assert.deepEqual(s,before);
  assert.equal(step(report,'amount').facts.find(f=>f.label==='Bokat återstående saldo').value,'425,00\u00a0kr');assert.equal(step(report,'amount').facts.find(f=>f.label==='Ofördelad bankbetalning').value,'425,00\u00a0kr');assert.equal(invoiceFact(report,'Original tillgängligt'),'Ja');assert.equal(invoiceFact(report,'Fakturanummer'),'0599');assert.equal(invoiceFact(report,'Registerkund'),'Synthetic customer AB');assert.equal(step(report,'reference').facts.find(f=>f.label==='Referens').value,'0599');
 });
 
 for(const candidate of [false,true])test('reviewed register original '+(candidate?'also found in Gmail':'alone')+' stays eligible with actual safe engine findings',async()=>{
- const s=fixture(),before=structuredClone(s),{analyze}=await import(reconciliation),findings=analyze(s),documents=candidate?[candidateRow('synthetic-invoice-original',{invoice_number:'0599'})]:[];
+ const s=fixture(),before=structuredClone(s),{analyze}=await import(reconciliation),findings=analyze(s,new Set(s.invoices.map(i=>i.id))),documents=candidate?[candidateRow('synthetic-invoice-original',{invoice_number:'0599'})]:[];
  assert.equal(findings.filter(f=>f.safe&&f.transaction_id===s.transactions[0].id&&f.invoice_id===s.invoices[0].id).length,1);
  const report=build(s,s.transactions[0].id,{documents,findings});
  assert.equal(step(report,'invoice').status,'passed');assert.equal(step(report,'customer').status,'passed');assert.equal(report.automaticEligible,true);assert.equal(step(report,'reconciliation').statusLabel,'Förslag · separat beslut krävs');assert.deepEqual(report.invoiceHint,{number:'0599',proposal:false});assert.equal(invoiceFact(report,'Original tillgängligt'),'Ja');assert.equal(report.bookedAllocationCount,0);assert.equal(balance(s,s.invoices[0]),62500);assert.deepEqual(s,before);

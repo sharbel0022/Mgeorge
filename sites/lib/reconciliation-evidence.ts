@@ -1,7 +1,7 @@
-import {readBankOriginalBytes} from './server';
+import * as retainedOriginals from './server';
 import {analyze,reconcileState,reconciliationPreview} from './reconciliation';
 import {normalizeName} from './reconciliation-engine.js';
-import {now,uid,bankApiOriginalIssue,canonicalBankAccount,hasBankApiOrigin,paymentLineage,paymentOriginalIssue,type State,type Transaction} from './domain';
+import {now,uid,bankApiOriginalIssue,canonicalBankAccount,hasBankApiOrigin,paymentLineage,paymentOriginalIssue,invoiceReferenceDecision,readBankgiroSourceEvidence,type State,type Transaction} from './domain';
 
 const MAX_ORIGINALS=32,MAX_BYTES=64_000_000;
 const missing='Bankoriginalet saknas eller kan inte verifieras. Nya matchningar väntar på ett tillgängligt, oförändrat original.';
@@ -33,7 +33,7 @@ function originalReader(owner:string){
   try{
    if(!files.has(source.documentId)){
     if(files.size>=MAX_ORIGINALS)return 'Bankoriginalen överskrider kontrollens säkerhetsgräns. Granska underlagen i mindre omgångar.';
-    files.set(source.documentId,readBankOriginalBytes(owner,source.documentId,MAX_BYTES-bytes).then(file=>{bytes+=file.size;return {sha256:file.sha256};}));
+    files.set(source.documentId,retainedOriginals.readBankOriginalBytes(owner,source.documentId,MAX_BYTES-bytes).then(file=>{bytes+=file.size;return {sha256:file.sha256};}));
    }
    const file=await files.get(source.documentId)!;
    return file.sha256===source.hash?'':'Bankoriginalets kontrollsumma skiljer sig från importen. Nya matchningar kräver granskning.';
@@ -45,9 +45,9 @@ function relatedTransactions(state:State,ids:Iterable<string>){
  for(const id of ids){const t=state.transactions.find(t=>t.id===id);if(t)for(const ancestor of paymentLineage(state,t).ancestors)result.add(ancestor.id);}
  return result;
 }
-function requiredEvidence(state:State){
- const proposed=reconcileState(state),ids=new Set<string>();
- for(const decision of [...analyze(state).filter(f=>f.safe),...proposed.decisions]){
+function requiredEvidence(state:State,verifiedInvoiceOriginals:ReadonlySet<string>,sourceReviewIssues:ReadonlyMap<string,string>){
+ const proposed=reconcileState(state,verifiedInvoiceOriginals,sourceReviewIssues),ids=new Set<string>();
+ for(const decision of [...analyze(state,verifiedInvoiceOriginals,sourceReviewIssues).filter(f=>f.safe),...proposed.decisions]){
   if(decision.transaction_id)ids.add(decision.transaction_id);
   for(const id of decision.child_ids||[])ids.add(id);
   if(!decision.invoice_id)continue;
@@ -61,7 +61,36 @@ function requiredEvidence(state:State){
  }
  return ids;
 }
+function reportOriginals(state:State,ids?:ReadonlySet<string>){
+ const originals=new Map<string,{documentId:string;sha256:string;importId:string}>();
+ for(const row of state.transactions.filter(t=>t.specification&&(!ids||ids.has(t.id)))){
+  const record=state.imports.find(record=>record.id===row.importId),documentId=row.bankFileProof?.documentId||record?.documentId||'',sha256=row.bankFileProof?.sha256||record?.hash||'';
+  if(documentId)originals.set(JSON.stringify([documentId,row.importId]),{documentId,sha256,importId:row.importId});
+ }
+ return [...originals.values()];
+}
+async function sourceEvidence(owner:string,state:State,database:ReturnType<typeof retainedOriginals.db>|undefined,ids?:ReadonlySet<string>){
+ const originals=reportOriginals(state,ids);
+ return originals.length?readBankgiroSourceEvidence(database||retainedOriginals.db(),owner,originals):{complete:true as const,reports:[],snapshot:[]};
+}
 async function checkedState(owner:string,initial:State){
+ const source=await sourceEvidence(owner,initial,undefined),sourceReviewIssues=new Map<string,string>();
+ for(const report of source.reports.filter(report=>report.issue))for(const row of initial.transactions){
+  const record=initial.imports.find(record=>record.id===row.importId);
+  if(report.importId&&row.importId===report.importId||report.documentId&&(row.bankFileProof?.documentId===report.documentId||record?.documentId===report.documentId))sourceReviewIssues.set(row.id,'Rapportkällans leveransunderlag kräver granskning: '+report.issue);
+ }
+
+ // Positive invoice proof exists only in this request and cannot be supplied by
+ // a stored workspace field. Generic reviewed invoices retain their manual semantics.
+ const verifiedInvoiceOriginals=new Set<string>(),invoiceFiles=new Map<string,Promise<{size:number}>>();let invoiceBytes=0;
+ for(const invoice of initial.invoices.filter(i=>i.reviewed&&!i.voided&&invoiceReferenceDecision(initial,i).applies)){
+  if(!invoice.documentId||invoiceFiles.size>=MAX_ORIGINALS&&!invoiceFiles.has(invoice.documentId))continue;
+  try{
+   if(!invoiceFiles.has(invoice.documentId))invoiceFiles.set(invoice.documentId,retainedOriginals.readInvoiceOriginalBytes(owner,invoice.documentId,MAX_BYTES-invoiceBytes).then(file=>{invoiceBytes+=file.size;return file;}));
+   await invoiceFiles.get(invoice.documentId);verifiedInvoiceOriginals.add(invoice.id);
+  }catch{/* Missing, foreign, altered and unavailable invoice originals remain review-only. */}
+ }
+
  // Every pending report, including legacy rows, needs current account consent
  // before its stable bank identifiers can promote it into economic child rows.
  const pending=initial.transactions.filter(row=>row.specification&&row.specificationStatus==='review'),accountDecisions:any[]=[],account=accountReader(owner);
@@ -77,10 +106,10 @@ async function checkedState(owner:string,initial:State){
  const probe=structuredClone(initial);for(const t of probe.transactions){delete t.bankOriginalIssue;delete t.bankAccountIssue;}
  const state=structuredClone(initial),read=originalReader(owner),decisions:any[]=[...accountDecisions],checked=new Set<string>();
  for(let pass=0;pass<=state.transactions.length;pass++){
-  const ids=requiredEvidence(pass===0?probe:state);
+  const ids=requiredEvidence(pass===0?probe:state,verifiedInvoiceOriginals,sourceReviewIssues);
   if(pass===0)for(const t of initial.transactions)if(paymentOriginalIssue(initial,t)||t.bankAccountIssue)ids.add(t.id);
   const pending=[...relatedTransactions(state,ids)].filter(id=>!checked.has(id));
-  if(!pending.length)return {state,decisions};
+  if(!pending.length)return {state,decisions,verifiedInvoiceOriginals,sourceReviewIssues};
   for(const id of pending){
    const t=state.transactions.find(t=>t.id===id)!;const issue=await read(state,t),old=t.bankOriginalIssue||'';checked.add(id);
    if(issue)t.bankOriginalIssue=issue;else delete t.bankOriginalIssue;
@@ -96,11 +125,11 @@ async function checkedState(owner:string,initial:State){
 }
 /** Production allocation boundary. Missing originals can never use a default trust bypass. */
 export async function reconcileWithOriginals(owner:string,initial:State){
- const checked=await checkedState(owner,initial),result=reconcileState(checked.state);
+ const checked=await checkedState(owner,initial),result=reconcileState(checked.state,checked.verifiedInvoiceOriginals,checked.sourceReviewIssues);
  return {...result,decisions:[...checked.decisions,...result.decisions]};
 }
 export async function reconciliationPreviewWithOriginals(owner:string,initial:State){
- const checked=await checkedState(owner,initial);return reconciliationPreview(checked.state);
+ const checked=await checkedState(owner,initial);return reconciliationPreview(checked.state,checked.verifiedInvoiceOriginals,checked.sourceReviewIssues);
 }
 /** Original availability only, for read-only explanations independent of consent. */
 export async function paymentOriginalAvailabilityIssue(owner:string,initial:State,id:string){
@@ -138,17 +167,48 @@ function financialSourceIds(before:State,after:State){
  }
  return relatedTransactions(after,ids);
 }
+const changedSource=()=>Object.assign(Error('Rapportkällans leveransunderlag ändrades under kontrollen. Inga nya betalningskopplingar sparades. Kör kontrollen igen.'),{code:'BANKGIRO_SOURCE_CHANGED',status:409,safe:true});
+const sourceFields=['owner','source_id','scope_id','authorization_generation','authorization_status','cursor','missing_report_ids','next_poll_at','attempts','last_error','updated_at'];
+const jobFields=['id','owner','source_id','scope_id','report_id','sha256','filename','available_at','authorization_generation','document_id','status','attempts','next_attempt_at','last_error','import_id','payment_count','created_at','updated_at'];
+/** Each predicate and its identity census run inside the allocation's D1 batch.
+ * The census detects a newly appended conflicting hash as well as row changes. */
+function sourceFences(database:D1Database,owner:string,revision:number,snapshots:unknown[]){
+ return snapshots.map(value=>{
+  const snapshot=value as {documentId:string;importId:string;jobs:Record<string,any>[];sources:Record<string,any>[]},clauses:string[]=[],values:unknown[]=[];
+  const jobScope=['document_id=?','import_id=?'];values.push(owner,snapshot.documentId,snapshot.importId);
+  const identities=new Map(snapshot.jobs.map(job=>[JSON.stringify([job.source_id,job.scope_id,job.report_id]),job]));
+  for(const job of identities.values()){jobScope.push('(source_id=? AND scope_id=? AND report_id=?)');values.push(job.source_id,job.scope_id,job.report_id);}
+  clauses.push(`(SELECT COUNT(*) FROM bankgiro_ingest_jobs WHERE owner=? AND (${jobScope.join(' OR ')}))=?`);values.push(snapshot.jobs.length);
+  for(const job of snapshot.jobs){clauses.push(`EXISTS(SELECT 1 FROM bankgiro_ingest_jobs WHERE ${jobFields.map(field=>field+' IS ?').join(' AND ')})`);values.push(...jobFields.map(field=>job[field]??null));}
+  for(const source of snapshot.sources){clauses.push(`EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE ${sourceFields.map(field=>field+' IS ?').join(' AND ')})`);values.push(...sourceFields.map(field=>source[field]??null));}
+  // Keep each bounded fence below D1's parameter limit; a large conflicting
+  // identity requires review instead of an incomplete financial check.
+  if(values.length+2>100)throw changedSource();
+  return database.prepare(`SELECT CASE WHEN ${clauses.join(' AND ')} THEN 1 ELSE json('BANKGIRO_SOURCE_CHANGED') END WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)`).bind(...values,owner,revision);
+ });
+}
 /** Caller supplies its audit and workspace CAS statements. The NOT NULL fence
  * executes under the SAME D1 write transaction, so a concurrent disconnect,
  * deselection, account replacement or expiry cannot leave partial finances. */
-export async function writePaymentState(owner:string,revision:number,before:State,after:State,database:D1Database,statements:D1PreparedStatement[]){
+export async function writePaymentState(owner:string,revision:number,before:State,after:State,database:D1Database,statements:D1PreparedStatement[],options:{manualAllocationIds?:ReadonlySet<string>}={}){
+ const financialIds=financialSourceIds(before,after),newAllocationIds=new Set(after.allocations.filter(a=>a.active&&!before.allocations.some(old=>old.active&&old.id===a.id)).map(a=>a.transactionId));
+ // Newly imported report rows are fenced by their intake lease and original
+ // receipt. Later allocation and promotion must bind the completed C3 receipt.
+ const reportIds=new Set([...financialIds].filter(id=>newAllocationIds.has(id)||before.transactions.some(row=>row.id===id))),source=await sourceEvidence(owner,after,database,reportIds);
+ for(const report of source.reports.filter(report=>report.issue)){
+  const matches=(row:Transaction)=>row.importId===report.importId||!!report.documentId&&(row.bankFileProof?.documentId===report.documentId||after.imports.find(record=>record.id===row.importId)?.documentId===report.documentId);
+  const affected=after.allocations.filter(a=>a.active&&!before.allocations.some(old=>old.active&&old.id===a.id)).filter(a=>{const row=after.transactions.find(t=>t.id===a.transactionId);return !!row&&matches(row);});
+  const promoted=after.transactions.some(row=>row.specification&&row.specificationStatus==='linked'&&matches(row)&&!before.transactions.some(old=>old.id===row.id&&old.specificationStatus==='linked'&&old.parentId===row.parentId));
+  if(promoted||!affected.length||affected.some(a=>!options.manualAllocationIds?.has(a.id)))throw changedSource();
+ }
+ const reportFences=sourceFences(database,owner,revision,source.snapshot);
  const accounts=new Map<string,{primary:string;reported:string|undefined}>();
- for(const id of financialSourceIds(before,after)){
+ for(const id of financialIds){
   const source=after.transactions.find(t=>t.id===id)!;if(!needsAccount(source))continue;
   const primary=canonicalBankAccount(source.account),reported=reportedAccount(source);
   accounts.set(JSON.stringify([primary,reported??null]),{primary,reported});
  }
- if(!accounts.size)return database.batch(statements);
+ if(!accounts.size){try{return (await database.batch([...reportFences,...statements])).slice(reportFences.length);}catch(error){if(reportFences.length&&/malformed JSON/i.test(String(error)))throw changedSource();throw error;}}
  const snapshots=new Map<string,unknown[]>();
  try{
   const {bankAccountConsentSnapshot}=await import('./bankgiro-service');
@@ -157,6 +217,6 @@ export async function writePaymentState(owner:string,revision:number,before:Stat
  }catch{throw changedConsent();}
  const match=[...snapshots].map(()=>`EXISTS(SELECT 1 FROM bank_connections WHERE ${consentFields.map(field=>field+'=?').join(' AND ')} AND julianday(valid_until)>julianday('now'))`).join(' AND ');
  const fence=database.prepare(`UPDATE workspaces SET payload=NULL WHERE owner=? AND revision=? AND NOT (${match})`).bind(owner,revision,...[...snapshots.values()].flat());
- try{return (await database.batch([fence,...statements])).slice(1);}
- catch(error){if(/NOT NULL constraint failed:\s*workspaces\.payload/i.test(String(error)))throw changedConsent();throw error;}
+ try{return (await database.batch([...reportFences,fence,...statements])).slice(reportFences.length+1);}
+ catch(error){if(reportFences.length&&/malformed JSON/i.test(String(error)))throw changedSource();if(/NOT NULL constraint failed:\s*workspaces\.payload/i.test(String(error)))throw changedConsent();throw error;}
 }

@@ -7,6 +7,7 @@ import {openDatabase,storeTransactions,listTransactions,allocate} from '../src/d
 import {analyzeReconciliation,reconciliationData,runReconciliation} from '../src/reconciliation.js';
 import {buildPaymentOverview} from '../src/payment-overview.js';
 import {approveSyntheticBankAccount,withSyntheticBankOriginal} from './bank-fixtures.js';
+import {retainSyntheticInvoiceOriginal} from './invoice-fixtures.js';
 
 const account='SE4280000890119146168423';
 function fixture(t){
@@ -15,6 +16,7 @@ function fixture(t){
 }
 function invoice(db,id,party,organization){
  db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,organization_number,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?,?)').run(id,'customer',id,party,organization,10000,id,'2026-10-01');
+ retainSyntheticInvoiceOriginal(db,id);
 }
 function payment(db,id,payer){
  storeTransactions(db,[withSyntheticBankOriginal({account,booked_at:'2026-10-26',amount_cents:10000,currency:'SEK',payer,reference:id,bank_reference:'SYNTHETIC-'+id})],'enablebanking');

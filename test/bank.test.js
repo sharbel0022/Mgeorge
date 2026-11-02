@@ -95,6 +95,11 @@ test('adapter permits AIS only and does not follow API redirects with its author
   await assert.rejects(bankingRequest('/payments',{method:'POST',body:{amount:'1'}}),e=>e.code==='read_only');
   assert.equal(called,1);
 });
+test('unused bare account reads are rejected before network access',async()=>{
+  let called=0;globalThis.fetch=async()=>{called++;return respond({uid:'account'});};
+  for(const path of ['/accounts/account','/accounts/account?unexpected=true'])await assert.rejects(bankingRequest(path),error=>error.code==='read_only');
+  assert.equal(called,0);
+});
 test('readiness confirms application activation, actual environment, AIS country and exact callback',async()=>{
   globalThis.fetch=async()=>respond(application());
   const ready=await assertApplicationReady(origin);assert.equal(ready.active,true);assert.equal(ready.environment,'SANDBOX');assert.ok(Date.parse(ready.checked_at));
@@ -125,12 +130,13 @@ test('bank authentication only redirects to the official HTTPS authorization ori
   for(const url of ['https://tilisy.enablebanking.com.evil.example/ais/start','https://tilisy.enablebanking.com/pis/start','https://auth.enablebanking.com/pis/start'])assert.throws(()=>validateAuthorizationUrl(url),e=>e.code==='invalid_authorization_url');
   for(const url of ['http://auth.enablebanking.com/ais/start','https://evil.enablebanking.com/','https://auth.enablebanking.com.evil.example/','https://user@auth.enablebanking.com/','https://auth.enablebanking.com:8443/','javascript:alert(1)','https://auth.enablebanking.com/#fragment'])assert.throws(()=>validateAuthorizationUrl(url),e=>e.code==='invalid_authorization_url');
 });
-test('session authorization and account retrieval use AIS POST/GET without accepting provider secrets in errors',async()=>{
+test('session authorization and status retrieval use AIS POST/GET without accepting provider secrets in errors',async()=>{
   const calls=[];
-  globalThis.fetch=async(url,options)=>{calls.push({url,options});return url.endsWith('/sessions')?respond({session_id:'confirmed-session',accounts:[{uid:'account',currency:'SEK'}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:'2026-11-01T12:00:00Z'}}):respond({uid:'account',currency:'SEK'});};
+  globalThis.fetch=async(url,options)=>{calls.push({url,options});return url.endsWith('/sessions')?respond({session_id:'confirmed-session',accounts:[{uid:'account',currency:'SEK'}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:'2026-11-01T12:00:00Z'}}):respond({status:'AUTHORIZED',accounts:['account']});};
   const session=await bankingRequest('/sessions',{method:'POST',body:{code:'one-use-code'}});
   assert.equal(session.accounts[0].uid,'account');assert.equal(JSON.parse(calls[0].options.body).code,'one-use-code');
-  assert.equal((await bankingRequest('/accounts/account')).uid,'account');
+  assert.deepEqual((await bankingRequest('/sessions/confirmed-session')).accounts,['account']);
+  assert.equal(calls[1].url,apiBase+'/sessions/confirmed-session');
   assert.equal(calls[1].options.method,'GET');
   globalThis.fetch=async()=>respond({error:'WRONG_AUTHORIZATION_CODE',message:'private banking data',detail:pem},400);
   await assert.rejects(bankingRequest('/sessions',{method:'POST',body:{code:'bad'}}),e=>e.code==='authorization_failed'&&!e.message.includes('private banking data')&&!e.message.includes('PRIVATE KEY'));

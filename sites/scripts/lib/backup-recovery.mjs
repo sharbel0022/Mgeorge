@@ -1,6 +1,6 @@
 // Offline recovery only. This module has no database mutation, R2 put/delete,
 // application route, runtime environment or production credential interface.
-import {BACKUP_TABLES,sealBackup,unsealBackup,validateSnapshot} from '../../lib/backup-engine.ts';
+import {backupTableSet,sealBackup,unsealBackup,validateSnapshot} from '../../lib/backup-engine.ts';
 
 const encoder=new TextEncoder(),decoder=new TextDecoder('utf-8',{fatal:true});
 const BUNDLE_FORMAT='MG-Sites-recovery-bundle-1',MANIFEST_FORMAT='MG-Sites-recovery-manifest-1';
@@ -78,7 +78,7 @@ function checkedSnapshot(bytes,run){
  if(!exact(evidence,Object.keys(snapshot.apiEvidence))||Object.keys(snapshot.apiEvidence).some(field=>evidence[field]!==snapshot.apiEvidence[field]))fail('census_invalid');
  return snapshot;
 }
-const tableCensus=snapshot=>BACKUP_TABLES.map(name=>({name,rows:snapshot.tables.find(table=>table.name===name).rows.length}));
+const tableCensus=snapshot=>backupTableSet(snapshot.tables.map(table=>table.name)).map(name=>({name,rows:snapshot.tables.find(table=>table.name===name).rows.length}));
 function descriptors(snapshot,run,snapshotSize){
  const prefix=sourcePrefix(run);
  return [
@@ -95,7 +95,8 @@ async function checkObject(bytes,entry,key,owner,id){
 function validateManifest(manifest,owner,id){
  if(!exact(manifest,['format','owner','backupId','run','tables','objects'])||manifest.format!==MANIFEST_FORMAT||manifest.owner!==owner||manifest.backupId!==id)fail('manifest_invalid');
  validateRun(manifest.run,owner,id);
- if(!Array.isArray(manifest.tables)||manifest.tables.length!==BACKUP_TABLES.length||manifest.tables.some((table,index)=>!exact(table,['name','rows'])||table.name!==BACKUP_TABLES[index]||!nonnegative(table.rows)||table.rows>MAX_ROWS))fail('census_invalid');
+ let tableSet;try{tableSet=backupTableSet(manifest.tables?.map(table=>table?.name));}catch{fail('census_invalid');}
+ if(manifest.tables.some((table,index)=>!exact(table,['name','rows'])||table.name!==tableSet[index]||!nonnegative(table.rows)||table.rows>MAX_ROWS))fail('census_invalid');
  if(!Array.isArray(manifest.objects)||manifest.objects.length!==manifest.run.total_docs+1)fail('census_invalid');
  for(const entry of manifest.objects){
   if(!exact(entry,OBJECT_FIELDS)||typeof entry.name!=='string'||typeof entry.path!=='string'||typeof entry.sourceKey!=='string'||!nonnegative(entry.size)||!nonnegative(entry.plaintextSize)||!HASH.test(entry.sha256)||!HASH.test(entry.plaintextSha256)||entry.size!==entry.plaintextSize+52||entry.plaintextSize>(entry.name==='snapshot'?MAX_SNAPSHOT:MAX_DOCUMENT))fail('manifest_invalid');
@@ -107,7 +108,7 @@ function validateManifest(manifest,owner,id){
 }
 function validateBinding(manifest,snapshot,snapshotSize){
  const expected=descriptors(snapshot,manifest.run,snapshotSize),census=tableCensus(snapshot);
- if(expected.length!==manifest.objects.length||census.some((table,index)=>table.name!==manifest.tables[index].name||table.rows!==manifest.tables[index].rows))fail('census_invalid');
+ if(expected.length!==manifest.objects.length||census.length!==manifest.tables.length||census.some((table,index)=>table.name!==manifest.tables[index].name||table.rows!==manifest.tables[index].rows))fail('census_invalid');
  for(let index=0;index<expected.length;index++)for(const [field,value]of Object.entries(expected[index]))if(manifest.objects[index][field]!==value)fail('manifest_invalid');
 }
 

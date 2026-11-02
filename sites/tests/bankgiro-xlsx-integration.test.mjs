@@ -7,6 +7,7 @@ import ts from 'typescript';
 import {emptyState,applyCommand,economicTransactions,balance} from '../lib/domain.ts';
 import {makeBankgiroXLSX,syntheticPayment} from './helpers/bankgiro-xlsx-fixture.mjs';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
+import {retainSyntheticIngestTables} from './helpers/bank-account-fixture.mjs';
 
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const url=path=>new URL(path,import.meta.url).href;
@@ -30,6 +31,7 @@ const sha256=bytes=>createHash('sha256').update(new Uint8Array(bytes)).digest('h
 
 function fixture(t){
  const sqlite=new DatabaseSync(':memory:');t.after(()=>sqlite.close());
+ retainSyntheticIngestTables(sqlite);
  sqlite.exec('CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);');
  const objects=new Map(),DB={prepare(sql){return {bind(...args){return {async first(){return sqlite.prepare(sql).get(...args)||null;},async all(){return {results:sqlite.prepare(sql).all(...args)};},async run(){return {meta:{changes:sqlite.prepare(sql).run(...args).changes}};}};}};},async batch(statements){sqlite.exec('BEGIN');try{const result=[];for(const statement of statements)result.push(await statement.run());sqlite.exec('COMMIT');return result;}catch(error){sqlite.exec('ROLLBACK');throw error;}}};
  const BUCKET={async put(key,bytes){objects.set(key,bytes);},async get(key){const bytes=objects.get(key);return bytes?{size:bytes.byteLength,body:bytes,arrayBuffer:async()=>bytes}:null;},async delete(key){objects.delete(key);}};

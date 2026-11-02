@@ -46,7 +46,7 @@ export async function reconcileAndPrepare(owner:string){
     if(batch[1].meta.changes!==1)throw error('Nya uppgifter sparades samtidigt. Kör kontrollen igen.');
     workspace={state:result.state,revision:workspace.revision+1};
   }
-  const findings=analyze(workspace.state);
+  const findings=result.findings;
   const statements=[db().prepare('UPDATE reconciliation_findings SET active=0 WHERE owner=?').bind(owner)];
   for(const f of findings.filter(f=>f.invoice_id))statements.push(db().prepare('INSERT INTO reconciliation_findings(id,owner,invoice_id,transaction_id,kind,details,created_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET active=1').bind(await digest(owner+JSON.stringify(f)),owner,f.invoice_id,f.transaction_id,f.kind,JSON.stringify(f),now()));
   // D1 caps statements per batch. Findings are derived; financial CAS above is authoritative.

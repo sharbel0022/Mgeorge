@@ -29,14 +29,14 @@ async function fixture(t,{settingsOnly=false,messagesOnly=false,realControl=fals
  const shell={ownerDocument:{defaultView:browser},contains:()=>false,addEventListener(){},removeEventListener(){}};
  const previousWindow=globalThis.window,previousDocument=globalThis.document;globalThis.window=browser;globalThis.document=Object.assign(new EventTarget(),{activeElement:null});
  const inert=data('export default function View(){return null;}');
- const aliases=Object.fromEntries(['economy-overview','payment-history','payment-verification','gmail-summary','invoice-evidence','customer-messages','gmail-workspace','bank-connection','bankgiro-link-review'].map(name=>['@/components/'+name,inert]));
+ const aliases=Object.fromEntries(['economy-overview','payment-history','payment-verification','reconciliation-proposal','gmail-summary','invoice-evidence','customer-messages','gmail-workspace','bank-connection','bankgiro-link-review'].map(name=>['@/components/'+name,inert]));
  const noCalls=names=>data(names.map(name=>`export function ${name}(){throw Error('Unexpected unrelated ${name} call');}`).join('\n'));
  const location=file('../lib/workspace-location.ts'),navigation=compiled('../components/workspace-navigation.tsx',{'react':import.meta.resolve('react'),'@/lib/workspace-location':location});
  const hook=compiled('../components/use-workspace-navigation.ts',{react,'@/lib/workspace-location':location,'@/lib/workspace-drafts':file('../lib/workspace-drafts.ts')});
  const module=await import(compiled('../app/dashboard.tsx',{...aliases,react,'@/components/workspace-navigation':navigation,'@/components/use-workspace-navigation':hook,'@/lib/workspace-location':location,'@/lib/domain':file('../lib/domain.ts'),
-  '@/components/bank-payments':data('export default function BankPayments(){return null;} export function BankPaymentSummary(){return null;}'),
+  '@/components/bank-payments':data('export default function BankPayments(){return null;} export function BankPaymentSummary(){return null;} export function BankPaymentReferences(){return null;} export function BankReportAvailability(){return null;}'),
   '@/components/payment-control':realControl?compiled('../components/payment-control.tsx',{react,'@/lib/domain':file('../lib/domain.ts'),'@/lib/economy-summary.js':file('../lib/economy-summary.js')}):data('export function usePaymentControl(){return {data:null,error:"",busy:false,refresh:async()=>{},start:async()=>{throw Error("History must not start controls");}};} export const ControlButton=()=>null,ControlConnections=()=>null,ControlProgress=()=>null,ControlQueue=()=>null,ControlReview=()=>null,controlDate=()=>"";'),
-  '@/lib/payment-presentation':data('export const bankVisibleTransactions=state=>state.transactions,payerLabel=transaction=>transaction.party;export function bankPaymentView(){return {};}export function bankPaymentInvoiceAssessment(){return {};}'),
+  '@/lib/payment-presentation':data('export const bankVisibleTransactions=state=>state.transactions,payerLabel=transaction=>transaction.party;export function bankPaymentView(){return {};}export function bankPaymentInvoiceAssessment(){return {};}export function invoiceIntendedReference(){throw Error("Unexpected unrelated invoice reference lookup");}'),
   '@/components/payment-bank-filter':data('export const needsPaymentIdentification=()=>false;'),
   '@/lib/payment-overview':noCalls(['buildPaymentOverview','paymentGroup','paymentTitle']),
   '@/lib/reconciliation':noCalls(['analyze']),'@/lib/bankgiro-parser.js':noCalls(['parseSpecificationBytes']),
