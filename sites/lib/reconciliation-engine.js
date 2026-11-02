@@ -14,18 +14,21 @@ export function exactReference(reference, candidate){
   return !!labelled&&labelled[1]===b;
 }
 
-function samePayer(i,t,links){
+function samePayer(i,t,links,nameOf){
   const org=value=>String(value||'').replace(/[- ]/g,'');
   const ownOrg=org(i.organization_number),payerOrg=org(t.payer_organization_number);
   if(ownOrg&&payerOrg)return ownOrg===payerOrg;
-  const name=normalizeName(t.payer);
-  return !!name&&(name===normalizeName(i.party)||links.some(l=>{
-    const identity=i.organization_number&&l.organization_number?org(i.organization_number)===org(l.organization_number):normalizeName(l.party)===normalizeName(i.party);
-    return identity&&normalizeName(l.payer)===name&&l.account===t.account;
+  const name=nameOf(t.payer);
+  return !!name&&(name===nameOf(i.party)||links.some(l=>{
+    const identity=i.organization_number&&l.organization_number?org(i.organization_number)===org(l.organization_number):nameOf(l.party)===nameOf(i.party);
+    return identity&&nameOf(l.payer)===name&&l.account===t.account;
   }));
 }
 /** @param {{invoices:any[],transactions:any[],links?:any[],allocations?:any[]}} data */
 export function analyzeReconciliation({invoices,transactions,links=[],allocations=[]}){
+  // Repeated invoice/link comparisons share normalization only for this call.
+  // A later analysis must read changed names and relations afresh.
+  const namesByValue=new Map(),nameOf=value=>{const raw=String(value||'');let name=namesByValue.get(raw);if(name===undefined){name=normalizeName(raw);namesByValue.set(raw,name);}return name;};
   const out=[];
   for(const t of transactions){
     if((t.evidence_conflict||t.original_issue)&&!t.excluded){
@@ -50,15 +53,15 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     const owners=references.length?invoices.filter(i=>[i.reference,i.invoice_number].some(x=>references.some(r=>exactReference(r,x)))):[];
     const dateOK=i=>!i.issued_at||t.booked_at>=i.issued_at;
     const eligible=invoices.filter(i=>i.direction===direction&&i.kind!=='credit'&&i.currency===t.currency&&paymentSign(i)===Math.sign(t.amount_cents)&&dateOK(i));
-    const names=eligible.filter(i=>samePayer(i,t,links));
+    const names=eligible.filter(i=>samePayer(i,t,links,nameOf));
     const tokens=String(t.reference||'').split(/[\s,;+/]+/).map(ref).filter(Boolean);
-    const grouped=eligible.filter(i=>i.remaining_cents>0&&samePayer(i,t,links)&&tokens.some(r=>[i.reference,i.invoice_number].some(x=>ref(x)===r)));
+    const grouped=eligible.filter(i=>i.remaining_cents>0&&samePayer(i,t,links,nameOf)&&tokens.some(r=>[i.reference,i.invoice_number].some(x=>ref(x)===r)));
     if(owners.length===0&&grouped.length>1&&grouped.reduce((s,i)=>s+i.remaining_cents,0)===t.available_cents){
       for(const i of grouped)out.push({transaction_id:t.id,invoice_id:i.id,kind:'multiple_invoices',safe:false,score:85,amount_cents:i.remaining_cents,reason:'En överföring hänvisar till flera fakturor. Bekräfta fördelningen manuellt.'});
       continue;
     }
     for(const i of eligible){
-      const exact=owners.some(x=>x.id===i.id),payer=samePayer(i,t,links);
+      const exact=owners.some(x=>x.id===i.id),payer=samePayer(i,t,links,nameOf);
       if(!exact&&!payer&&t.available_cents!==i.remaining_cents)continue; // Amount alone may be shown, but never accepted.
       const conflict=invalidReference||references.some(r=>!([i.reference,i.invoice_number].some(x=>exactReference(r,x))))&&references.length>1||reference&&owners.some(x=>x.id!==i.id);
       const duplicateEvidence=transactions.some(x=>x.id!==t.id&&!x.excluded&&!x.is_aggregate&&x.amount_cents===t.amount_cents&&x.currency===t.currency&&x.booked_at===t.booked_at&&(x.bank_reference&&x.bank_reference===t.bank_reference||x.account!==t.account&&ref(x.reference)===reference&&normalizeName(x.payer)===normalizeName(t.payer)));
