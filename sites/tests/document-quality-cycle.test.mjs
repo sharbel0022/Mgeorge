@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
@@ -6,10 +7,8 @@ import ts from 'typescript';
 import {classifyDocument,documentConflicts,sourceInvoiceNumbers,isInlineDecoration} from '../lib/document-triage.js';
 
 // Load the real browser parser with its real domain module in Node's isolated test runtime.
-const code=readFileSync(new URL('../lib/invoice-fields.js',import.meta.url),'utf8')
-  .replace("'./domain'",JSON.stringify(new URL('../lib/domain.ts',import.meta.url).href))
-  .replace("'./document-triage.js'",JSON.stringify(new URL('../lib/document-triage.js',import.meta.url).href));
-const {interpretInvoice}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+const parserUrl=invoiceParserUrl();
+const {interpretInvoice}=await import(parserUrl);
 const invoice=`Faktura
 Fakturanummer: 0594
 Leverantör: Syntetiska Exempelbolaget AB
@@ -19,7 +18,7 @@ Förfallodatum: 2026-11-01
 Att betala: 1 250,00 SEK
 Moms: 250,00 SEK
 Netto: 1 000,00 SEK
-OCR: 0000594
+OCR: 0000596
 Bankgiro: 123-4567`;
 const metadata={direction:'supplier',direction_confident:true};
 
@@ -27,7 +26,7 @@ test('document quality: consistent explicit invoice evidence retains leading zer
   const result=interpretInvoice(invoice,{...metadata,filename:'Faktura 0594.pdf',subject:'Faktura nr. 0594'});
   assert.equal(result.level,'green');
   assert.equal(result.fields.invoice_number.value,'0594');
-  assert.equal(result.fields.reference.value,'0000594');
+  assert.equal(result.fields.reference.value,'0000596');
   assert.equal(result.fields.total_cents.value,125000);
 });
 
@@ -128,7 +127,7 @@ async function processingFixture(t){
     'cloudflare:workers':data('export const env='+reference+'.env;'),
     './server':server,'./domain':domainUrl,
     './banking/security':new URL('../lib/banking/security.ts',import.meta.url).href,
-    './invoice-fields.js':data(code),
+    './invoice-fields.js':parserUrl,
     './server-pdf':data('export async function serverPdfText(){'+reference+'.pdfCalls++;return {text:'+JSON.stringify(invoice)+',method:"pdf",confidence:100};}'),
     './customer-messages':data('export async function reconcileAndPrepare(){}'),
   };

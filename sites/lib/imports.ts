@@ -1,6 +1,7 @@
 import {extractPaymentReferences} from './payment-references.js';
 import {parseBankgiroXML} from './bankgiro-parser.js';
 import {imageText,pdfInvoiceText} from './local-ocr';
+import {interpretInvoice} from './invoice-fields.js';
 import {parseMoney,validDate,today,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED} from './domain';
 export type BankRow={payerEvidence?:ReturnType<typeof import('./payer-evidence.js').normalizePayerEvidence>;organizationNumber?:string;bankDataSha256?:string;bankDataVersion?:string;referenceEvidence?:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;bankData?:Record<string,unknown>;date:string;amount:number;party:string;payerReference:string;bankReference:string;description:string;source:string;currency:string;externalId?:string;account?:string;kind:string;verified:boolean;key?:string;parentKey?:string};
 export function parseCSV(text:string){
@@ -53,34 +54,46 @@ export function mapCSV(parsed:ReturnType<typeof parseCSV>,mapping:Mapping,name:s
 export function parseCAMT(text:string,name:string):BankRow[]{return parseBankgiroXML(text,name).map(row=>row.specification===false?{...row,kind:suspectedBankCollection(row.amount,row.description,row.party,row.payerReference)?'batch':'unknown'}:row);}
 export async function sha256(file:File){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await file.arrayBuffer()))).map(n=>n.toString(16).padStart(2,'0')).join('');}
 export async function pdfText(bytes:ArrayBuffer){return (await pdfInvoiceText(bytes)).text;}
-export function extractInvoiceText(text:string){
- const find=(pattern:RegExp)=>text.match(pattern)?.[1]?.trim()??'';
- const number=find(/(?:fakturanummer|faktura\s*nr|invoice\s*(?:number|no\.?))\s*[:#]?\s*([A-Z0-9][A-Z0-9\/-]*)/i);
- const amount=find(/(?:att\s*betala|summa\s*att\s*betala|belopp\s*att\s*betala|total\s*due|amount\s*due)\s*[:]?\s*(?:SEK\s*)?([\d \u00a0.,]+)(?:\s*(?:kr|SEK))?/i);
- const issued=find(/(?:fakturadatum|invoice\s*date)\s*:?\s*(\d{4}-\d{2}-\d{2}|\d{2}[/.]\d{2}[/.]\d{4})/i);
- const due=find(/(?:förfallodatum|förfaller|betalas\s*senast|due\s*date)\s*:?\s*(\d{4}-\d{2}-\d{2}|\d{2}[/.]\d{2}[/.]\d{4})/i);
- const ocr=find(/(?:OCR(?:\s*nummer)?|betalningsreferens)\s*:?\s*([\d][\d \-]{2,})/i);
- const bankgiro=find(/(?:bankgiro|bankgironummer|bankgiro\s*nr)\s*:?\s*([\d]{3,4}-[\d]{4})/i);
- const foreignCurrency=/\b(EUR|USD|GBP|NOK|DKK|CHF|JPY|CAD|AUD)\b|[€£$]/i.test(text);
- let total='';try{if(amount&&!foreignCurrency)total=(parseMoney(amount)/100).toFixed(2);}catch{}
- return{number,total,issued:issued?normalizeDate(issued):'',due:due?normalizeDate(due):'',ocr:ocr.trim(),bankgiro,reviewed:false,note:'',foreignCurrency};
+type InvoiceTextContext={filename?:string;subject?:string;direction?:'customer'|'supplier';method?:'pdf'|'ocr';ocrConfidence?:number};
+function manualInvoiceInterpretation(text:string,context:InvoiceTextContext={}){
+ // The JavaScript parser accepts these direction strings; its null default
+ // does not describe that contract to TypeScript's inferred declaration.
+ const parserContext:any={...context,direction:context.direction||'supplier',direction_confident:false};
+ const extraction=interpretInvoice(text,parserContext);
+ const value=(key:string)=>(extraction.fields as Record<string,{value:unknown}>)[key]?.value;
+ const string=(key:string)=>value(key)==null?'':String(value(key));
+ const foreignCurrency=/\b(EUR|USD|GBP|NOK|DKK|CHF|JPY|CAD|AUD)\b|[€£$]/i.test(text)||value('currency')!=null&&value('currency')!=='SEK';
+ const amount=value('total_cents'),kind=value('kind');
+ const total=!foreignCurrency&&!['credit','receipt'].includes(String(kind))&&typeof amount==='number'&&Number.isSafeInteger(amount)&&amount>0?(amount/100).toFixed(2):'';
+ const warnings=[...extraction.issues];
+ if(kind==='credit')warnings.push('Kreditfakturan behöver hanteras i kreditflödet. Ingen ny fakturaskuld föreslås.');
+ if(kind==='receipt')warnings.push('Underlaget är ett kvitto. Kontrollera betalningen innan en fakturaskuld registreras.');
+ return {extraction,warnings,fields:{number:string('invoice_number'),total,issued:string('issued_at'),due:string('due_at'),ocr:string('reference'),bankgiro:string('bankgiro'),reviewed:false,note:'',foreignCurrency}};
 }
+export function extractInvoiceText(text:string){return manualInvoiceInterpretation(text).fields;}
 export async function readInvoiceFile(file:File,ownEmail:string){
- const ext=file.name.split('.').pop()?.toLowerCase();let text='',email='',party='',direction='payable',warning='',source=file.name,ocr=false,confidence=0;
+ const ext=file.name.split('.').pop()?.toLowerCase();let text='',direction='payable',warning='',source=file.name,ocr=false,confidence=0,filename=file.name,subject='';
  if(ext==='pdf'){const result=await pdfInvoiceText(await file.arrayBuffer());text=result.text;ocr=result.ocr;confidence=result.confidence;if(!text.trim())warning='PDF-filen verkar vara skannad. Fyll i uppgifterna manuellt från originalet.';}
  else if(ext==='eml'){
   const PostalMime=(await import('postal-mime')).default,mail=await PostalMime.parse(await file.arrayBuffer(),{maxNestingDepth:30,maxRfc822NestingDepth:3});
   const sender=(mail.from as any)?.address??'',outgoing=sender.toLowerCase()===ownEmail.toLowerCase();direction=outgoing?'receivable':'payable';
-  const person=outgoing?mail.to?.[0]:mail.from;email=(person as any)?.address??'';party=(person as any)?.name??'';
-  text=mail.text??'';if(!text&&mail.html){const doc=new DOMParser().parseFromString(mail.html,'text/html');doc.querySelectorAll('script,style').forEach(e=>e.remove());text=doc.body.textContent??'';}
+  subject=mail.subject||'';
   const attachments=mail.attachments.filter(a=>a.mimeType==='application/pdf');
-  if(attachments.length===1)try{text+='\n'+await pdfText(attachments[0].content as ArrayBuffer);}catch{warning='PDF-bilagan kunde inte tolkas. Kontrollera originalmejlet.';}
+  if(attachments.length===1){
+   // Mail headers/body are context. Do not mix their numbers with the retained
+   // invoice attachment, or lose the decoder's optical provenance.
+   filename=attachments[0].filename||file.name;
+   try{const result=await pdfInvoiceText(attachments[0].content as ArrayBuffer);text=result.text;ocr=result.ocr;confidence=result.confidence;}catch{warning='PDF-bilagan kunde inte tolkas. Kontrollera originalmejlet.';}
+  }else if(attachments.length===0){text=mail.text??'';if(!text&&mail.html){const doc=new DOMParser().parseFromString(mail.html,'text/html');doc.querySelectorAll('script,style').forEach(e=>e.remove());text=doc.body.textContent??'';}}
   if(attachments.length>1)warning='Mejlet innehåller flera PDF-bilagor. Importera varje faktura separat så att beloppen inte blandas ihop.';
   source=`Mejl: ${mail.subject??file.name}`;if(mail.messageId)source+=' · '+mail.messageId;
   warning=[warning,'Avsändaren kan vara en vidarebefordrare. Kontrollera rätt kund eller leverantör.'].filter(Boolean).join(' ');
  }else if(ext==='txt')text=await file.text();else if(['png','jpg','jpeg','webp'].includes(ext||'')){const result=await imageText(file);text=result.text;ocr=true;confidence=result.confidence;}else warning='Läs originalet och fyll i uppgifterna manuellt.';
- const fields=extractInvoiceText(text);if(fields.foreignCurrency)warning='Underlaget innehåller en annan valuta än SEK. Beloppet har inte fyllts i. Den här versionen hanterar endast fakturor i SEK. '+warning;
- return{fields:{...fields,email,party,direction,source:source.slice(0,300)},text:text.slice(0,50000),warning,ocr,confidence};
+ const interpreted=manualInvoiceInterpretation(text,{filename,subject,direction:direction==='receivable'?'customer':'supplier',method:ocr?'ocr':'pdf',ocrConfidence:confidence}),{fields,extraction}=interpreted;
+ warning=[warning,...interpreted.warnings,ocr?'OCR-tolkade uppgifter behöver kontrolleras mot originalet.':''].filter(Boolean).join(' ');
+ if(fields.foreignCurrency)warning='Underlaget innehåller en annan valuta än SEK. Beloppet har inte fyllts i. Den här versionen hanterar endast fakturor i SEK. '+warning;
+ const party=String(extraction.fields.party.value||'');
+ return{fields:{...fields,email:'',party,direction,source:source.slice(0,300)},text:text.slice(0,50000),warning,ocr,confidence,extraction};
 }
 export function downloadFile(filename:string,text:string,type='text/plain;charset=utf-8'){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}
 export function csvCell(value:unknown){let s=String(value??'');if(/^[=+@\-\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}

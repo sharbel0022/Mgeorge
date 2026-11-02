@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
@@ -31,7 +32,7 @@ async function processingFixture(t,bytes){
   globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
   const ref=`globalThis[${JSON.stringify(key)}]`,domain=new URL('../lib/domain.ts',import.meta.url).href;
   const server=moduleUrl(`import {emptyState} from ${JSON.stringify(domain)};const f=${ref};export const db=()=>f.db;export const response=(body,status=200)=>Response.json(body,{status});export const identity=async()=>({userId:f.owner,email:'owner@example.test'});export const readWorkspace=async owner=>{const row=f.sql.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').get(owner);return row?{revision:row.revision,state:JSON.parse(row.payload)}:{revision:0,state:emptyState()};};`);
-  const fields=moduleUrl(read('../lib/invoice-fields.js').replace("'./domain'",JSON.stringify(domain)).replace("'./document-triage.js'",JSON.stringify(new URL('../lib/document-triage.js',import.meta.url).href)));
+  const fields=invoiceParserUrl();
   const imports={'cloudflare:workers':moduleUrl(`export const env=${ref}.env;`),'./server':server,'./domain':domain,'./banking/security':new URL('../lib/banking/security.ts',import.meta.url).href,'./invoice-fields.js':fields,'./server-pdf':new URL('../lib/server-pdf.ts',import.meta.url).href,'./customer-messages':moduleUrl("export async function reconcileAndPrepare(){throw Error('Unexpected automatic registration');}")};
   let source=ts.transpileModule(read('../lib/document-processing.ts'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
   for(const [name,url] of Object.entries(imports))for(const q of ['"',"'"])source=source.replaceAll(q+name+q,JSON.stringify(url));

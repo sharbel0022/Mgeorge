@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync,readdirSync,existsSync} from 'node:fs';
@@ -10,7 +11,7 @@ import {syntheticConnection} from './helpers/bank-account-fixture.mjs';
 const data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64'),url=p=>new URL(p,import.meta.url).href;
 function compiled(path,imports={}){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+a+q,JSON.stringify(b));return data(code);}
 const origin='https://synthetic.example',iban='SE4280000890119146168423',docId='11111111-1111-4111-8111-111111111111';
-const {interpretInvoice}=await import(compiled('../lib/invoice-fields.js',{'./domain':url('../lib/domain.ts'),'./document-triage.js':url('../lib/document-triage.js')}));
+const {interpretInvoice}=await import(invoiceParserUrl());
 function currentInvoiceExtraction(){
  return interpretInvoice('Faktura\nFakturanummer: 0606\nKund: Synthetic customer AB\nOrganisationsnummer: 556016-0680\nFakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07\nNetto: 500,00 kr\nMoms: 125,00 kr\nAtt betala: 625,00 SEK\nOCR: 000018\nBankgiro: 123-4567',{direction:'customer',direction_confident:true,method:'pdf',filename:'synthetic-current-invoice.pdf'});
 }
