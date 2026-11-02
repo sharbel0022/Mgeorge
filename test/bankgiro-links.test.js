@@ -263,3 +263,25 @@ for(const [label,patch] of [
   assert.equal(f.db.prepare("SELECT COUNT(*) n FROM bank_specification_links WHERE revoked_at=''").get().n,2);assert.deepEqual(financialRows(f),before);
  }finally{f.close();}
 });
+
+
+test('an unreadable unrelated active original preserves an existing link but holds a new reservation',()=>{
+ const f=fixture();try{
+  const first=module.bankSpecificationCandidates(f.db,f.transaction_id,owner).items[0];module.confirmBankSpecificationLink(f.db,input(f,first),owner);
+  function addDistinct(sequence,bankReference){
+   storeTransactions(f.db,[withSyntheticBankOriginal({account,booked_at:'2026-10-26',amount_cents:62500,currency:'SEK',payer:'',reference:'',bank_reference:bankReference,description:'Insättning'})],'enablebanking');
+   const transaction=listTransactions(f.db).find(row=>row.bank_reference===bankReference),bytes=makeBankgiroXLSX({currency:'SEK',account,date:'2026-10-26',sequence,payments:[{party:'Syntetiskt Bistro AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}),importId=recordImport(f.db,{source:'bank_file',name:'distinct-'+sequence+'.xlsx',found:1,review:1,status:'needs_review',content:bytes,mime_type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+   const report=module.bankSpecificationCandidates(f.db,transaction.id,owner).items.find(item=>item.import_id===importId);assert.ok(report);assert.equal(report.can_link,true);
+   return {transaction,importId,command:{...input(f,report),transaction_id:transaction.id,import_id:importId}};
+  }
+  const b=addDistinct('84','UNRELATED-ORIGINAL-B'),linkB=module.confirmBankSpecificationLink(f.db,b.command,owner),c=addDistinct('85','UNRELATED-ORIGINAL-C'),before=financialRows(f);
+  f.db.prepare('UPDATE import_jobs SET content=? WHERE id=?').run(Buffer.from('corrupted synthetic retained source'),f.import_id);
+  assert.equal(module.bankSpecificationPresentation(f.db,f.transaction_id,owner),null);
+  assert.equal(module.bankSpecificationPresentation(f.db,b.transaction.id,owner)?.id,linkB.id);
+  assert.equal(module.confirmBankSpecificationLink(f.db,b.command,owner).id,linkB.id);
+  const reviewB=module.bankSpecificationCandidates(f.db,b.transaction.id,owner);assert.equal(reviewB.active_links.find(link=>link.id===linkB.id).stale,false);
+  const candidateC=module.bankSpecificationCandidates(f.db,c.transaction.id,owner).items.find(item=>item.import_id===c.importId);assert.ok(candidateC);assert.equal(candidateC.can_link,false);
+  assert.throws(()=>module.confirmBankSpecificationLink(f.db,c.command,owner),/aktiv.*rapport|original|koppling/i);
+  assert.equal(f.db.prepare("SELECT COUNT(*) n FROM bank_specification_links WHERE revoked_at=''").get().n,2);assert.deepEqual(financialRows(f),before);
+ }finally{f.close();}
+});

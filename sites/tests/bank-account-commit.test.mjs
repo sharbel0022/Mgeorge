@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {DatabaseSync} from 'node:sqlite';
-import {emptyState,applyCommand,balance} from '../lib/domain.ts';
+import {emptyState,applyCommand,balance,economicTransactions,invoicePaymentEvidenceIssue} from '../lib/domain.ts';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {parseBankgiroXML} from '../lib/bankgiro-parser.js';
 
@@ -26,6 +26,7 @@ async function fixture(t,state=seed()){
  const store=data(`const f=${ref};export async function connection(owner){return f.sqlite.prepare('SELECT * FROM bank_connections WHERE owner=?').get(owner)||null;}export async function application(owner){return {owner,generation:'synthetic-generation'};}export async function accounts(connection){f.accountCalls++;const result=JSON.parse(connection.encrypted_accounts);if(f.onAccounts)await f.onAccounts();return result;}export async function encrypt(){throw Error('Unused');}export async function decrypt(){throw Error('Unused');}`);
  const service=compiled('../lib/bankgiro-service.ts',{'./server':server,'./domain':domain,'./bankgiro-parser.js':url('../lib/bankgiro-parser.js'),'./banking/store':store,'./banking/transactions':data('export function stableAccountKey(account){return "iban:"+account.account_id.iban;}')});
  const evidence=compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':engine,'./bankgiro-service':service});
+ f.writePaymentState=(await import(evidence)).writePaymentState;
  const route=await import(compiled('../app/api/state/route.ts',{'@/lib/server':server,'@/lib/domain':domain,'@/lib/reconciliation-evidence':evidence,'@/lib/bankgiro-service':service,'@/lib/customer-messages':data('export async function reconcileAndPrepare(){}'),'@/lib/bankgiro-invoice-search':data('export async function searchBankgiroInvoice(){}')}));
  const messages=await import(compiled('../lib/customer-messages.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-evidence':evidence,'./customer-message-text.js':url('../lib/customer-message-text.js'),'./banking/security':url('../lib/banking/security.ts'),'./banking/store':store,'./gmail-adapter.js':data('export async function prepareGmailSend(){throw Error("Must not send");}export function gmailAccount(){return "synthetic@example.test";}export function hasGmailSendScope(){return false;}')}));
  f.post=async(command={type:'settings.save',name:'Synthetic company',email:'synthetic@example.test'})=>{const revision=f.read().revision;const response=await route.POST(new Request('https://mg.test/api/state',{method:'POST',headers:{Origin:'https://mg.test','Content-Type':'application/json'},body:JSON.stringify({revision,requestId:crypto.randomUUID(),command})}));return{status:response.status,body:await response.json()};};
@@ -138,4 +139,51 @@ test('concurrent reconciliation of one retained alias report allocates once and 
  assert.equal(first.allocations.length,1);assert.equal(balance(first,first.invoices[0]),0);assert.equal(first.transactions.filter(row=>row.specification).length,1);
  const replay=await f.post({type:'bankgiro.import',documentId:'synthetic-alias-report'});assert.equal(replay.status,200,JSON.stringify(replay.body));
  const state=f.read().state;assert.deepEqual(state.allocations,first.allocations);assert.equal(state.transactions.filter(row=>row.specification).length,1);assert.equal(state.transactions.find(row=>row.specification).payerReference,'0599');assert.equal(state.transactions.find(row=>row.specification).bankFileProof.sha256,f.originalHash);
+});
+
+
+const secondReportAlias='8000000987654321';
+const bothReportAliases=()=>[{...selectedAliasResource(),all_account_ids:[{scheme_name:'BBAN',identification:reportAlias},{scheme_name:'BBAN',identification:secondReportAlias}]}];
+async function twoAliasFixture(t){
+ const f=await aliasFixture(t,true);let state=f.read().state;const firstInvoices=structuredClone(state.invoices);state.invoices=[];
+ state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account:'iban:'+iban,date:'2026-10-27',amount:62500,party:'',payerReference:'',description:'Bankgiro inbetalning',bankReference:'SYNTHETIC-SECOND-ALIAS-DEPOSIT'})]}).state;
+ setSyntheticState(f,state);setAliasResources(f,bothReportAliases());
+ const xml=new TextDecoder().decode(f.originalBytes).replace('>'+reportAlias+'<','>'+secondReportAlias+'<').replaceAll('SYNTHETIC-ALIAS-','SYNTHETIC-SECOND-ALIAS-').replaceAll('2026-10-26','2026-10-27').replace('<Ref>0599</Ref>','<Ref>0600</Ref>');
+ const bytes=new TextEncoder().encode(xml),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex'),oldGet=f.env.BUCKET.get.bind(f.env.BUCKET);
+ f.env.BUCKET={async get(key){return key==='synthetic-owner/synthetic-second-alias-report'?{size:bytes.length,arrayBuffer:async()=>bytes.buffer}:oldGet(key);}};
+ f.sqlite.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run('synthetic-second-alias-report','synthetic-owner','Synthetic-second-alias.xml','application/xml',bytes.length,hash,'2026-10-27');
+ const imported=await f.post({type:'bankgiro.import',documentId:'synthetic-second-alias-report'});assert.equal(imported.status,200,JSON.stringify(imported.body));
+ state=f.read().state;state.invoices=firstInvoices;state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0600',ocr:'',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;setSyntheticState(f,state);
+ const rows=state.transactions.filter(row=>row.specification);assert.deepEqual(rows.map(row=>[row.recipientAccount,row.specificationStatus,row.payerReference]).sort((a,b)=>a[2].localeCompare(b[2])),[[reportAlias,'linked','0599'],[secondReportAlias,'linked','0600']]);assert.equal(state.allocations.length,0);return f;
+}
+test('per-call account cache does not reuse one valid report alias for another alias on the same primary account',async t=>{
+ const f=await twoAliasFixture(t),before=f.read().state;setAliasResources(f,[selectedAliasResource()]);
+ const result=await f.post();assert.equal(result.status,200,JSON.stringify(result.body));const state=f.read().state,first=state.invoices.find(i=>i.number==='0599'),second=state.invoices.find(i=>i.number==='0600'),held=state.transactions.find(row=>row.recipientAccount===secondReportAlias);
+ assert.equal(state.allocations.length,1);assert.equal(state.allocations[0].invoiceId,first.id);assert.equal(balance(state,first),0);assert.equal(balance(state,second),62500);assert.match(held.bankAccountIssue,/konto|medgivande/i);
+ assert.equal(held.specificationStatus,'linked');assert.equal(held.payerReference,'0600');assert.deepEqual(held.original,before.transactions.find(row=>row.id===held.id).original);
+});
+test('commit validates every recipient alias before deduplicating a shared account consent',async t=>{
+ const f=await twoAliasFixture(t),before=f.read(),auditBefore=f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n;let proposed=before.state;
+ for(const reference of ['0599','0600']){const invoice=proposed.invoices.find(i=>i.number===reference),row=proposed.transactions.find(row=>row.specification&&row.payerReference===reference);proposed=applyCommand(proposed,{type:'match.create',invoiceId:invoice.id,transactionId:row.id,amount:62500,note:'Synthetic separately checked proposal.'}).state;}
+ const statements=()=>[
+  f.env.DB.prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(crypto.randomUUID(),'synthetic-owner',before.revision+1,'synthetic.alias-commit','{}','2026-10-27','synthetic-owner',before.revision),
+  f.env.DB.prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(proposed),'2026-10-27','synthetic-owner',before.revision)
+ ];
+ setAliasResources(f,[selectedAliasResource()]);
+ await assert.rejects(f.writePaymentState('synthetic-owner',before.revision,before.state,proposed,f.env.DB,statements()),/medgivande|konto/i);
+ assert.deepEqual(f.read(),before);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,auditBefore);
+ setAliasResources(f,bothReportAliases());await f.writePaymentState('synthetic-owner',before.revision,before.state,proposed,f.env.DB,statements());
+ assert.deepEqual(f.read().state.allocations,proposed.allocations);assert.equal(f.read().state.allocations.length,2);assert.equal(f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n,auditBefore+1);
+});
+test('an alias hold preserves an existing partial allocation and economic child membership',async t=>{
+ const f=await aliasFixture(t,true);let state=f.read().state;const row=state.transactions.find(row=>row.specification),invoice=state.invoices[0];
+ state=applyCommand(state,{type:'match.create',invoiceId:invoice.id,transactionId:row.id,amount:25000,note:'Synthetic previously booked partial payment.'}).state;setSyntheticState(f,state);
+ const before=f.read().state,membership=economicTransactions(before).map(row=>[row.id,row.amount,row.parentId]);setAliasResources(f,[{uid:'selected',currency:'SEK',account_id:{iban}}]);
+ const response=await f.post();assert.equal(response.status,200,JSON.stringify(response.body));const held=f.read().state,current=held.transactions.find(item=>item.id===row.id);
+ assert.deepEqual(held.allocations,before.allocations);assert.equal(balance(held,held.invoices[0]),37500);assert.match(invoicePaymentEvidenceIssue(held,invoice.id),/konto|medgivande/i);
+ assert.equal(current.specificationStatus,'linked');assert.equal(current.parentId,row.parentId);assert.equal(current.verified,row.verified);assert.equal(current.payerReference,'0599');assert.deepEqual(current.original,row.original);
+ assert.deepEqual(economicTransactions(held).map(row=>[row.id,row.amount,row.parentId]),membership);assert.equal(economicTransactions(held).reduce((sum,row)=>sum+row.amount,0),62500);
+ assert.deepEqual(held.transactions.find(item=>item.id===row.parentId),before.transactions.find(item=>item.id===row.parentId));
+ setAliasResources(f,[selectedAliasResource()]);assert.equal((await f.post()).status,200);const restored=f.read().state;assert.equal(balance(restored,restored.invoices[0]),0);assert.equal(restored.allocations.length,2);assert.deepEqual(restored.allocations[0],before.allocations[0]);
+ assert.equal((await f.post()).status,200);assert.deepEqual(f.read().state.allocations,restored.allocations);
 });
