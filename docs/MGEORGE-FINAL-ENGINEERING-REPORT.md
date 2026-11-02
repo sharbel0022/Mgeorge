@@ -2,7 +2,7 @@
 
 Datum: 2026-11-02. Start `087e5ced733b2cfdb3f8540d006118fb26cb6107`, Sites 53, runtime 9. Denna rapport innehåller sanerade slutsatser och syntetiska mätningar. Verkliga original, kontrollsummor, konto-/kundidentifierare och nycklar bevaras privat utanför Git.
 
-**Leveranskontroll pågår.** Kodgranskning och fullständiga slutgrindar skiljs från main-push, Sites-publicering och faktisk drift. Slutligt leveranskvitto kompletteras efter dessa åtgärder. Målet 9,5 i alla områden är inte uppnått.
+**DELVIS LEVERERAD – TEKNISKT ARBETE ÅTERSTÅR.** De reproducerade rättningarna i denna cykel är granskade, testade, levererade till main och publicerade som Sites54. Målet9,5 i alla33områden är inte uppnått. Verkliga bank-/verksamhetsbevis, full katastrofåterställning, representativ utvärdering och utvecklingsberoendefynd kvarstår. [Exakt maskinläsbart leveranskvitto](MGEORGE-FINAL-ENGINEERING-DELIVERY.json).
 
 ## Reproducerade fel och rättningar
 
@@ -82,7 +82,7 @@ Backupstatus anger verifierat manifestpass 195/195 filer och kontroll av elva kv
 
 ## Webbläsare och mätgräns
 
-Lokal Chromium med fiktiv minnesdemo: översikt vid 320/390/768/1024/1440 px utan dokumentoverflow, mobilmeny/navigation, exakt fakturasökning, specifikationsfilter, betalningsdialog, fel-/tomläge och Escape/fokus. [Observationer](measurements/final-engineering-browser.json). Lokal D1 är en separat syntetisk instans; inget produktionsschema tillämpades. Produktionsinloggad ekonomiresa, fysisk mobil och hela verkliga dokument-/betalningskedjan är separata kvarstående acceptansprov.
+Lokal Chromium med fiktiv minnesdemo: översikt vid320/390/768/1024/1440px utan dokumentoverflow, mobilmeny/navigation, exakt fakturasökning, specifikationsfilter, betalningsdialog, fel-/tomläge och Escape/fokus. Syntetisk XLSX gick via riktig filväljare till preview och uttrycklig bekräftelse endast i minnesdemot; den visades som spärrat granskningsunderlag, exakt referens med ledande nollor och inga nya pengar. [Observationer](measurements/final-engineering-browser.json). Lokal D1 är en separat syntetisk instans; inget produktionsschema tillämpades. Publicerad Sites54-startsida/inloggningsgräns är observerad. Produktionsinloggad ekonomiresa, fysisk mobil och hela verkliga dokument-/betalningskedjan är separata kvarstående acceptansprov.
 
 ## GitHub och arkiv
 
@@ -96,6 +96,27 @@ Alla 33 före-/efterbedömningar med fynd, test-/produktionsgräns, risk och nä
 
 Root/Sites paket och lockfiler är oförändrade. Rootaudit och Sites produktionsaudit har noll sårbarheter; full Sitesaudit behåller 16 moderate utvecklingsfynd och high-grinden passerar. Brytande godtyckliga verktygsnedgraderingar är inte en verifierad säkerhetsfix. Ingen full prestanda-/samtidighets-SLA eller representativ generell OCRprecision har fastställts.
 
-Exakt kod-/main-SHA, fullständiga slutgrindar, Actions och separat Sitesversion/publicering fylls i leveranskvittot efter faktiskt utförande. Före leverans är återgången sparad Sites 53; produktionsidentitet, audience, auth, runtime 9, tre befintliga scheman och DB/R2-bindningar ska bevaras. Ingen datamigrering eller ekonomisk återställning ingår.
+En färsk [kompatibilitetsundersökning](DEPENDENCY-COMPATIBILITY-FOLLOWUP.md) verifierar den konkreta gränsen: global minimatch11override gav fyra verkliga lintregelkrascher och ett ESM-importfel. Publicerade beroende-/peerintervall ger ännu ingen stödd helkedja, och nuvarandeESLint9 har passerat sin supportperiod. Detta är öppna tekniska/uppströmsberoende krav, inte en åtgärdad audit genom borttagna kontroller. En separat fullt verifierad verktygsmigrering/fork kan behövas om uppströms inte levererar kompatibla versioner.
 
-Fortsättningspunkt: slutför aktuell granskning/test/leverans och läsande efterkontroll. Därefter behövs bankutfärdat kontoalias/Bankgirokonto och rapport-/insättningsidentitet, explicit valuta/datum, separat konkret fakturaregistrerings-/kund-/allokeringsbeslut, aktuellt godkänt Gmail-schema, representativ OCR-/volymutvärdering och isolerat verkligt katastrofprov. Ingen obemannad fortsättning påstås utan faktisk varaktig körning.
+## Verifierad leverans
+
+| Del | Faktiskt bevis |
+| --- | --- |
+| Main-kandidat och normal push | `2410e4b667fe3180c7119607e8fb602257ccdd01`, sex små commits från start087e5ce; ingen commit-forcepush. |
+| Kodträdet | Hela leveransträdet `0b0df9e9e11f33e8da8651435459a700f7c53c46`; Sites-delträdet `f539428088e93afaed113e40b605cda768c1537d`. |
+| Exakt Actions | [41480737514](https://github.com/sharbel0022/Mgeorge/actions/runs/41480737514), båda jobb success på2410e4b: Linux Node991/991, Sites1609/1609,0fail/skip, rena installationer, syntax101, TS/audits/bygge. |
+| Lokala slutgrindar | Windows Node992:984pass/0fail/8filsymlänk-EPERMskip; Sites1609/1609, syntax101, TS och produktionsbygge passerar. Separat full Linux22.23.4-körning passerar991/991,0skip i isolerad read-only container med befintliga systemfonter monterade read-only. |
+| Tidiga miljöprober | Den extra Alpinekontrollen krävde en exekverbar egen temporär testmount och tillgängliga fonter. Tidiga noexec/native-binding- respektive fontlösa OCRfel redovisas som miljöprober; inga tester eller produktregler försvagades. Slutlig full körning och obligatorisk exakt CI är båda gröna. Container och temporära testtillstånd är avslutade. |
+| Sites-källa | `26b380015cae63bbfc44c1f7dce7720220c6efbd`, exakt samma Sites-träd som verifierad main. Separat ren installation, TS, bygge och officiell packning passerade i publiceringscheckouten. |
+| Publicerad version | Sites54, version-ID `appgprj_6adf2f7f7e848191b64192161886b528~appgver_b77c2fe955e88191bb5cbbca09031aaa`. |
+| Deployment | `appgdep_6ae8b9b37f8c8191a456248720d30271`, succeeded2026-11-02T16:26:54.424558Z, runtime9. [MG Fakturakoll](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/). |
+| Artefakt |347 byggfiler,0QA-referenser. Lokalt gziparkiv, dekomprimerat lokalt tar och Sites lagrade tar har olika storlek/hash och redovisas separat i kvittot. Matchande källträd, filantal och backendens publiceringskvitto är verifierade; separat filbytesparitet mot en nedladdad server-tar påstås inte. |
+| Efterkontroll | Revision42→42 och exakt oförändrad jämförd ekonomisk projektion, målregister komplett/0träffar,0allokeringar, AIS ekonomiskt1/rapport0. Rapporthash och ägt fakturaoriginal oförändrade; privat Node/Sites-originalkontroll12bankfil-/9PDFfält per motor passerar. |
+| Bevarad produktion | Authklient/policy, runtimeposternas redovisade metadata/värden och revision9, alla tre scheman, D1översikt26tabeller, R2/DB-deklarationer och migrationskällor oförändrade. Hemligheters dolda värden exponeras inte. Backup195verifierade manifestfiler. |
+| Återgång | Sparad Sites53 och normala Git-revertcommits, ingen destruktiv ekonomisk databasrollback. |
+
+Efterkontrollen gjordes med de befintliga ägarbundna skrivfria verktygen. Den bekräftar jämförda fält/original och konfiguration, inte en oberoende fullständig export av hela ekonomiregistret eller en ny verksamhetsallokering. Ingen riktig faktura, betalning, manuell originalrelation, kundattest, schema eller runtimehemlighet skrevs av leveransen.
+
+Efterföljande dokumentationskvitto uppdaterar denna rapport/PROGRESS/scorecard utan ändrad produktkod eller nytt Sites-träd; dess aktuella main-SHA verifieras separat vid push. Därför avser2410e4b den exakt verifierade kodleveransen och inte ett löfte att inga senare dokumentationscommits finns.
+
+Fortsättningspunkt: utgå från denna verifierade kodleverans2410e4b, exakt Actions41480737514 och Sites54 med ovanstående källa/träd. Hämta aktuellmain och bedöm senare dokumentationsskillnader innan testbevis återanvänds. Bankutfärdat kontoalias/Bankgirokonto och rapport-/insättningsidentitet, explicit valuta/datum och separat konkret fakturaregistrerings-/kund-/allokeringsbeslut krävs före verklig avstämning. Fortsätt med kompatibel beroendekedja, ägarinloggad UIacceptans, relevant godkänt Gmail-schema med faktisk lyckad hämtning, representativ OCR-/volymutvärdering och isolerat verkligt katastrofprov. Fullt slutgodkännande/alla33≥9,5 påstås inte; ingen ny obemannad automation har skapats.

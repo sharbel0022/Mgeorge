@@ -84,3 +84,12 @@
 ## Förkontroll och beslut
 
 Task1–4 har separata produktfiler; parser och ekonomi delar endast oförändrade domänimporter. Task5 ägs av root. Ruling: oberoende implementationer får köras parallellt med uttryckligt filägarskap; gemensam commit och fullgranskning hålls sekventiellt. Det minskar väntan utan samtidiga ändringar i samma fil. Baslinjeinstallationer är klara; nya fullsviter körs i isolerad worktree före ändringar. Historiska gröna Linuxresultat ersätter inte aktuell Windowsverifiering.
+
+## Exekveringskvitto
+
+- [x] Task1–4: RED/GREEN, oberoende scoped granskning och rättningsrundor passerar.
+- [x] Tillagd Task6: faktisk responsiv dialog tappade fokus; minsta fallbackrättning, RED4→GREEN6, riktig Chromiumgreen och samlad slutreviewREADY.
+- [x] Task5 tekniska leveransgrindar: main2410e4b, exaktCI41480737514 med991Node/1609Sites/0fail/skip; separat Sites54/samma källträd, succeeded och skrivfri efterkontroll revision42/oförändrade jämförda fält.
+- [x] Ny konkret raderingsbekräftelse erhållen; fem brancher raderade med förväntade SHA-villkor,17refs/träd privat återställda, endastmain kvar ochPR9/10closed.
+- [x] Alla33områden,23bankkontroller, test-/arkiv-/produktionsbegränsningar och exakt fortsättningspunkt dokumenterade i slutrapport/kvittot.
+- [ ] Hela användarmålet9,5i33områden: externa bank-/verksamhets-/DRbevis och kvarstående teknisk/representativ acceptans återstår. Detta är inte ett slutfört verksamhetsgodkännande.

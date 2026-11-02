@@ -1,0 +1,223 @@
+{
+  "schema": "mgeorge-final-engineering-delivery-v1",
+  "date": "2026-11-02",
+  "status": "DELVIS LEVERERAD – TEKNISKT ARBETE ÅTERSTÅR",
+  "startMain": "087e5ced733b2cfdb3f8540d006118fb26cb6107",
+  "verifiedMainDelivery": "2410e4b667fe3180c7119607e8fb602257ccdd01",
+  "verifiedMainTree": "0b0df9e9e11f33e8da8651435459a700f7c53c46",
+  "sitesSourceTree": "f539428088e93afaed113e40b605cda768c1537d",
+  "commits": [
+    "7e1dcab",
+    "53db829",
+    "11d9e4c",
+    "fcb1ec0",
+    "d1c0809",
+    "2410e4b"
+  ],
+  "ci": {
+    "runId": 41480737514,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41480737514",
+    "sha": "2410e4b667fe3180c7119607e8fb602257ccdd01",
+    "conclusion": "success",
+    "node": {
+      "tests": 991,
+      "passed": 991,
+      "failed": 0,
+      "skipped": 0
+    },
+    "sites": {
+      "tests": 1609,
+      "passed": 1609,
+      "failed": 0,
+      "skipped": 0
+    },
+    "syntaxFiles": 101,
+    "cleanInstalls": true,
+    "typecheck": "passed",
+    "build": "passed",
+    "auditHighGates": "passed"
+  },
+  "local": {
+    "nodeVersion": "22.16.0",
+    "nodeWindows": {
+      "tests": 992,
+      "passed": 984,
+      "failed": 0,
+      "skipped": 8,
+      "skipReason": "actual win32 EPERM creating file symlinks; junction cases execute"
+    },
+    "nodeLinux": {
+      "runtime": "22.23.4 node:22-alpine",
+      "tests": 991,
+      "passed": 991,
+      "failed": 0,
+      "skipped": 0,
+      "rootfsReadOnly": true,
+      "sourceReadOnly": true,
+      "fontSource": "existing system fonts mounted read-only",
+      "temporaryStateOnly": true
+    },
+    "sites": {
+      "tests": 1609,
+      "passed": 1609,
+      "failed": 0,
+      "skipped": 0
+    },
+    "syntaxFiles": 101,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "publicationCheckoutCleanInstallTypecheckBuild": "passed",
+    "dependenciesAndLocksUnchanged": true,
+    "migrationsAndHostingUnchanged": true
+  },
+  "audits": {
+    "rootTotal": 0,
+    "sitesProductionTotal": 0,
+    "sitesFull": {
+      "moderate": 16,
+      "high": 0,
+      "critical": 0
+    },
+    "highGate": "passed"
+  },
+  "reviews": {
+    "originalUploadAndRestore": "READY",
+    "invoiceFieldsAfterCensusFix": "READY",
+    "paymentIdentityAfterAllocationOrderFix": "READY",
+    "wholeBranchIncludingDialogFocus": "READY"
+  },
+  "measurement": {
+    "synthetic": true,
+    "casesPerEngine": 117,
+    "evaluations": 234,
+    "correctBeforePerEngine": 103,
+    "correctAfterPerEngine": 117,
+    "falseGreenBeforePerEngine": 14,
+    "falseGreenAfterPerEngine": 0,
+    "positiveRetainedPerEngine": "47/47",
+    "precisionBefore": 0.7704918032786885,
+    "precisionAfter": 1,
+    "recallBefore": 1,
+    "recallAfter": 1,
+    "scope": "labelled text and explicit metadata only; no universal OCR claim"
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 54,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_b77c2fe955e88191bb5cbbca09031aaa",
+    "sourceCommit": "26b380015cae63bbfc44c1f7dce7720220c6efbd",
+    "sourceTree": "f539428088e93afaed113e40b605cda768c1537d",
+    "deploymentId": "appgdep_6ae8b9b37f8c8191a456248720d30271",
+    "deploymentStatus": "succeeded",
+    "deployedAt": "2026-11-02T16:26:54.424558+00:00",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "runtimeRevision": 9,
+    "rollbackVersion": 53,
+    "buildFiles": 347,
+    "qaReferences": 0,
+    "localArchive": {
+      "gzipBytes": 17705690,
+      "gzipSha256": "5ba68dee4020067f324e74778b2b0b2b087ae0d5d4d8f0831717ef86c1ee3a74",
+      "tarBytes": 44750848,
+      "tarSha256": "7cd199666564f29e8c0792e0eedb485546bc0eb85860989a5722f51d72755742",
+      "equalsServerStoredTar": false,
+      "serverStoredTarBytes": 44748800,
+      "serverStoredTarSha256": "44fab5ae181e455d86786d425c373482dd79a2517e64c75144fdb244fa15dfe3",
+      "localArchiveFileCount": 347,
+      "serverStoredFileCount": 347,
+      "scope": "Local gzip, decompressed local tar and server-stored tar have distinct hashes. Source tree and 347-file count match; server-tar file-byte parity is not independently asserted."
+    }
+  },
+  "postDeployment": {
+    "projectionScope": "Two selected payment observations, their booked allocations and target invoice registry/source evidence; not an independent full-ledger export.",
+    "revision": 42,
+    "changed": false,
+    "financialProjectionUnchanged": true,
+    "registryComplete": true,
+    "registryMatches": 0,
+    "reportIntegrity": "passed",
+    "reportHashUnchanged": true,
+    "reportComplete": true,
+    "latestVersion": 54,
+    "authUnchanged": true,
+    "policyUnchanged": true,
+    "schedulesUnchanged": true,
+    "runtimeRevision": 9,
+    "runtimeMetadataAndValuesUnchanged": true,
+    "dbStructureUnchanged": true,
+    "dbTables": 26,
+    "backupVerifiedFiles": 195,
+    "bankLastSyncedAt": "2026-11-02T14:07:28.306Z",
+    "gmailLastFetch": "2026-10-29T15:00:48.512Z"
+  },
+  "privateOriginalRead": {
+    "workbookChecksPerEngine": 12,
+    "invoiceFieldsPerEngine": 9,
+    "allPassed": true,
+    "pdfLevel": "yellow",
+    "parserIssues": 0,
+    "bytesUnchanged": true,
+    "sourceDigestsPublished": false
+  },
+  "bank": {
+    "accountDetailsCalls": 0,
+    "previousAccountDetailsDeadline": "unknown",
+    "accountAlias": "external evidence required",
+    "depositIdentity": "external evidence required",
+    "invoiceRegistered": false,
+    "allocations": 0,
+    "automaticEligible": false,
+    "financialWrites": 0
+  },
+  "branchCleanup": {
+    "specificApprovalReceived": true,
+    "deleted": [
+      "codex/bank-evidence-production-safety",
+      "codex/mgeorge-v3-cloud-ocr",
+      "codex/mgeorge-v4-bank-verification",
+      "fix/bank-list-clear-payer-and-unverified-reference",
+      "codex/mgeorge-24h-autopilot-20261028"
+    ],
+    "remainingRemoteBranches": [
+      "main"
+    ],
+    "prs": {
+      "9": "closed, unmerged",
+      "10": "closed, unmerged"
+    },
+    "atomicExpectedShaGuarded": true,
+    "forcePushedCommits": false,
+    "privateArchiveRestored": true,
+    "archiveStrictFsck": true,
+    "headsAndRemoteRefsAndTreesCompared": 17,
+    "uniquePrCommitsPreserved": 3
+  },
+  "quality": {
+    "areas": 33,
+    "beforeTotal": 255,
+    "afterTotal": 255,
+    "maximum": 330,
+    "mean": 7.7272727272727275,
+    "areasAtLeast9_5": 0
+  },
+  "remaining": [
+    "bank-supported account alias and deposit/report identity, explicit currency/relevant dates",
+    "separate invoice-registration/customer/allocation business approval",
+    "authenticated production browser acceptance and physical/mobile coverage",
+    "paused external Gmail schedule and observed completed cloud OCR",
+    "representative authorized OCR/volume evaluation",
+    "actual isolated production-backup disaster recovery",
+    "16 moderate development dependency findings and unsupported ESLint 9; verified compatibility gaps, no supported published complete upgrade chain found"
+  ],
+  "dependencyFollowup": {
+    "report": "docs/DEPENDENCY-COMPATIBILITY-FOLLOWUP.md",
+    "repositoryInputsChanged": false,
+    "globalMinimatch11Probe": {"ruleTypeErrors":4,"esmImportErrors":1},
+    "officialPublishedCompleteCompatibleChainFound": false
+  },
+  "productionBrowser": {"publicPageObserved":true,"signInBoundaryObserved":true,"authenticatedFinancialJourneyTested":false},
+  "documentationFollowupOnly": true,
+  "backgroundAutomationCreated": false,
+  "productionFinanceWrites": false,
+  "customerEmailsSent": false
+}
