@@ -178,13 +178,14 @@ function retainBankgiroReview(body,items,req){
     return {import_id,imported:0,duplicate:previous?1:0,review:items.length,review_only:true,status:'needs_review'};
   }catch(error){db.exec('ROLLBACK');throw error;}
 }
+const gmailReconnectStatuses=new Set(['renewal_required','access_denied','missing_scope','invalid_client','account_mismatch','invalid_tokens']);
 function gmailStatus(){
   const connection=db.prepare('SELECT id,email,status,last_synced,last_error FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
   const credentials=connection&&db.prepare('SELECT encrypted_tokens FROM gmail_connections WHERE id=?').get(connection.id);
   const send_enabled=!!credentials&&hasGmailSendScope(decryptObject(credentials.encrypted_tokens));
   const interval=getSettings(db).gmail_sync_interval_minutes,job=integrationJobs.state('gmail'),lastAttempt=Math.max(connection?.last_synced?utcTimestamp(connection.last_synced):0,job?.last_attempt||0);
   const imports=db.prepare("SELECT COALESCE(SUM(found),0) AS messages,COALESCE(SUM(imported),0) AS documents,COALESCE(SUM(duplicate),0) AS duplicates FROM import_jobs WHERE source='gmail'").get();
-  return {configured:isGmailConfigured(),send_enabled,email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&interval&&(!job||job.failures<3)?new Date(Math.max(Date.now(),lastAttempt+interval*60000,job?.next_attempt||0)).toISOString():null,syncing:integrationJobs.running('gmail'),job:integrationJobs.summary().find(j=>j.name==='gmail')||null,counts:imports,connection};
+  return {configured:isGmailConfigured(),send_enabled,email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&!gmailReconnectStatuses.has(connection.status)&&connection.status!=='blocked'&&interval&&(!job||job.failures<3)?new Date(Math.max(Date.now(),lastAttempt+interval*60000,job?.next_attempt||0)).toISOString():null,syncing:integrationJobs.running('gmail'),job:integrationJobs.summary().find(j=>j.name==='gmail')||null,counts:imports,connection};
 }
 const bankLeases=new Map();
 const bankSyncing={
@@ -197,8 +198,9 @@ const bankSyncing={
 async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=false,interval=0}={}){
   const authorize=()=>{if(req)assertSessionStillAuthorized(req);controlAuthorize?.();};
   const waiting=integrationJobs.state('gmail');
-  if(waiting?.failures>=3&&waiting.last_error.startsWith('Gmail angav'))throw Object.assign(bad(409,waiting.last_error),{code:'integration_blocked'});
-  if(waiting?.next_attempt>Date.now()&&waiting.last_error.startsWith('Gmail har begränsat'))throw Object.assign(bad(429,waiting.last_error),{code:'rate_limited',retryAfter:Math.ceil((waiting.next_attempt-Date.now())/1000)});
+  const retryState=db.prepare('SELECT status FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get()?.status;
+  if(waiting?.failures>=3&&(retryState==='blocked'||waiting.last_error.startsWith('Gmail angav')))throw Object.assign(bad(409,waiting.last_error),{code:'integration_blocked'});
+  if(waiting?.next_attempt>Date.now()&&(retryState==='retry_wait'||waiting.last_error.startsWith('Gmail har begränsat')))throw Object.assign(bad(429,'Gmail väntar på nästa tillåtna hämtningsförsök.'),{code:'rate_limited',retryAfter:Math.ceil((waiting.next_attempt-Date.now())/1000)});
   const lease=integrationJobs.claim('gmail',{scheduled,interval});
   const connection=db.prepare('SELECT * FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
   if(!connection){lease.release();throw bad(409,'Koppla Gmail först');}
@@ -238,11 +240,16 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
   }catch(e){
     authorize();
     const renewal=e.code==='renewal_required'||/invalid_grant|förnya|återkall|401|expired|behöver.*koppla/i.test(e.message);
+    const permanent=renewal?'renewal_required':gmailReconnectStatuses.has(e.code)?e.code:'';
+    const transient=['rate_limited','provider_error','connection_error'].includes(e.code);
+    const attempts=Math.max(1,Math.min(3,integrationJobs.state('gmail')?.failures||1));
+    const backoff=900000*2**(attempts-1)+Math.floor(Math.random()*1000);
+    const serverDelay=Number.isFinite(e.retryAfter)&&e.retryAfter>0?e.retryAfter*1000:0;
     lease.write(()=>{
     if(currentTokens)db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(currentTokens),connection.id);
-    db.prepare('UPDATE gmail_connections SET status=?,last_error=? WHERE id=?').run(renewal?'renewal_required':'error',renewal?'Gmail-anslutningen behöver förnyas':'Det gick inte att hämta från Gmail',connection.id);
+    db.prepare('UPDATE gmail_connections SET status=?,last_error=? WHERE id=?').run(permanent||(e.retryBlocked?'blocked':transient?'retry_wait':'error'),renewal?'Gmail-anslutningen behöver förnyas':'Det gick inte att hämta från Gmail',connection.id);
     recordImport(db,{source:'gmail',name:connection.email,status:'error',error:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen misslyckades'});
-    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',e.status===429?Math.max(900,e.retryAfter||900)*1000:0,e.retryBlocked===true);
+    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',transient?Math.max(backoff,serverDelay):0,e.retryBlocked===true);
     });
     if(e.status)throw e;throw bad(502,renewal?'Gmail-anslutningen behöver förnyas – koppla Gmail igen':'Det gick inte att hämta från Gmail. Kontrollera anslutningen och försök igen.');
   }finally{lease.release();}
@@ -341,7 +348,7 @@ export async function runScheduledSync(){
   schedulerState.running=true;schedulerState.last_error='';
   const due=(key,last,minutes)=>integrationJobs.due(key,last?utcTimestamp(last):0,minutes*60000);
   try{
-    const mail=db.prepare("SELECT * FROM gmail_connections WHERE status NOT IN ('renewal_required') ORDER BY created_at DESC LIMIT 1").get();
+    const mail=db.prepare("SELECT * FROM gmail_connections WHERE status NOT IN ('renewal_required','access_denied','missing_scope','invalid_client','account_mismatch','invalid_tokens','blocked') ORDER BY created_at DESC LIMIT 1").get();
     if(mail&&gmailInterval&&isGmailConfigured()&&due('gmail',mail.last_synced,gmailInterval)){
       try{await syncGmail(null,{scheduled:true,interval:gmailInterval*60000});}catch{schedulerState.last_error='Gmail-hämtningen behöver kontrolleras';}
     }

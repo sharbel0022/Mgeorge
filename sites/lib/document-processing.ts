@@ -18,6 +18,7 @@ export const counterpartyKey=(direction:string,party:string,org:string)=>JSON.st
 export const documentInvoiceKey=(i:Row)=>JSON.stringify(['invoice-v2',i.direction,normalize(i.organizationNumber||i.party),String(i.number||'').normalize('NFKC').trim().toUpperCase()]);
 const sourceFor=(owner:string,id:string)=>db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? ORDER BY created_at LIMIT 1').bind(owner,id).first<Row>();
 const activeSource="EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status='needs_review')";
+const idleEngine="NOT EXISTS(SELECT 1 FROM document_jobs busy WHERE busy.owner=document_jobs.owner AND busy.engine=document_jobs.engine AND busy.state='processing' AND busy.lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now'))";
 const AFTERCHECK_WARNING='Fakturan är registrerad. Efterkontrollen behöver köras igen via betalningskontrollen.';
 const METADATA_WARNING='Bearbetningsresultatet är sparat. Körningens tidsstämpel kunde inte uppdateras.';
 const PROCESSING_STATUS_WARNING='Bearbetningsresultatet är sparat. Aktuell köstatus kunde inte fastställas; kontrollera status igen.';
@@ -95,10 +96,13 @@ export async function enqueueDocuments(owner:string){
 }
 async function claim(owner:string,engine:string,runner='server'):Promise<Row|null>{
   const at=now(),wanted=engine==='cloud'?'queued':'waiting_ocr';
-  const job=await db().prepare(`SELECT document_jobs.*,d.mime,d.size,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND engine=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} ORDER BY available_at,document_id LIMIT 1`).bind(owner,engine,at,wanted,at).first<Row>();
+  const job=await db().prepare(`SELECT document_jobs.*,d.mime,d.size,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND engine=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} AND ${idleEngine} ORDER BY available_at,document_id LIMIT 1`).bind(owner,engine,at,wanted,at).first<Row>();
   if(!job)return null;
   const lease=randomToken(),until=new Date(Date.now()+(runner==='cloud'?300000:180000)).toISOString();
-  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,lease_runner=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource}`).bind(lease,until,runner,at,owner,job.document_id,engine,job.attempts,at,wanted,at).run();
+  // A per-document compare-and-swap prevents duplicate work on that original;
+  // the engine guard also bounds overlapping runners on different originals.
+  // Recheck it under the write lock, using the database clock for live leases.
+  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,lease_runner=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} AND ${idleEngine}`).bind(lease,until,runner,at,owner,job.document_id,engine,job.attempts,at,wanted,at).run();
   return r.meta.changes===1?{...job,lease,lease_until:until,lease_runner:runner,attempts:job.attempts+1}:null;
 }
 async function failJob(owner:string,job:Row,code:string){

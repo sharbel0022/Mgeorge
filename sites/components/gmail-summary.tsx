@@ -1,8 +1,8 @@
 'use client';
 import {useEffect,useState} from 'react';
-type Summary={connection?:{status?:string;blocked?:boolean};sync_health?:{state?:string;reason?:string};last_successful_fetch?:string;processing?:{registered?:number;counts?:Record<string,number>;worker_online?:boolean;cloud_ocr_configured?:boolean;cloud_worker_recent?:boolean;messages_waiting?:number}};
-const healthLabels:Record<string,string>={blocked:'Automatik stoppad',stale:'Hämtningen behöver kontrolleras',paused:'Dokumentautomatik pausad',waiting:'Väntar på Gmail',pending:'Hämtning behöver följas upp',not_configured:'Schema saknas',not_verified:'Hämtning inte verifierad',recent:'Nyligen hämtat',disconnected:'Behöver anslutas'};
-const date=(value?:string)=>value&&Number.isFinite(Date.parse(value))?new Intl.DateTimeFormat('sv-SE',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Stockholm'}).format(new Date(value)):'';
+import {gmailNeedsReconnect,DocumentQueueStatus,GmailAttachmentRejections,GmailFetchStatus,type AttachmentRejections,type Processing,type ScheduleObservation} from './document-ocr-status';
+type Summary={connection?:{status?:string;blocked?:boolean};sync_health?:{state?:string;reason?:string};last_successful_fetch?:string;schedule_observation?:ScheduleObservation;attachment_rejections?:AttachmentRejections;processing?:Processing};
+const healthLabels:Record<string,string>={blocked:'Automatik stoppad',stale:'Hämtningen behöver kontrolleras',paused:'Dokumentautomatik pausad',waiting:'Väntar på Gmail',pending:'Hämtning behöver följas upp',not_configured:'Automatik inte konfigurerad',not_verified:'Hämtning inte verifierad',recent:'Nyligen hämtat',disconnected:'Behöver anslutas'};
 export default function GmailSummary(){
   const [data,setData]=useState<Summary|null>(null),[failed,setFailed]=useState(false);
   useEffect(()=>{
@@ -13,8 +13,8 @@ export default function GmailSummary(){
       .catch(()=>{if(!controller.signal.aborted)setFailed(true);});
     return()=>controller.abort();
   },[]);
-  const status=failed?'Status kunde inte hämtas':!data?'Hämtar status…':healthLabels[data.sync_health?.state||'']||(data.connection?.blocked?'Automatik stoppad':data.connection?.status==='connected'?'Ansluten':'Ej ansluten');
-  const processing=data?.processing,at=date(data?.last_successful_fetch);
+  const status=failed?'Status kunde inte hämtas':!data?'Hämtar status…':!data.connection?'Ej ansluten':gmailNeedsReconnect(data.connection.status)?'Behöver anslutas igen':data.connection.status==='blocked'?'Behöver kontrolleras':['connected','retry_wait'].includes(data.connection.status||'')?'Ansluten':'Status okänd';
+  const processing=data?.processing,health=data?.connection?.blocked?'Automatik stoppad':healthLabels[data?.sync_health?.state||''];
   const ocr=processing?.cloud_ocr_configured?(processing.cloud_worker_recent?'Moln-OCR har nyligen kontakt':'Moln-OCR väntar på körning'):(processing?.worker_online?'OCR-dator ansluten':'OCR väntar på datorn');
-  return <div><a className="text-button" href="/gmail">Gmail: {status} →</a>{data?.sync_health?.reason&&<small>{data.sync_health.reason}</small>}{processing&&<small>{processing.registered??0} registrerade · {(processing.counts?.needs_review||0)+(processing.counts?.duplicate||0)} att granska · {ocr} · <a href="/kundmeddelanden">{processing.messages_waiting??0} mejlutkast</a>{at&&<> · Hämtat {at}</>}</small>}</div>;
+  return <div><a className="text-button" href="/gmail">Gmail: {status} →</a>{data&&<>{health&&<small className="block">{health}{data.sync_health?.reason?' · '+data.sync_health.reason:''}</small>}<GmailFetchStatus compact lastSuccessfulFetch={data.last_successful_fetch} observation={data.schedule_observation}/><DocumentQueueStatus compact processing={processing}/><GmailAttachmentRejections compact rejections={data.attachment_rejections}/>{processing&&<small className="block">{ocr} · <a href="/kundmeddelanden">{Number.isSafeInteger(processing.messages_waiting)?processing.messages_waiting:'Okänt antal'} mejlutkast</a></small>}</>}</div>;
 }
