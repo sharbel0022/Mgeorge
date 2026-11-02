@@ -285,3 +285,22 @@ test('an unreadable unrelated active original preserves an existing link but hol
   assert.equal(f.db.prepare("SELECT COUNT(*) n FROM bank_specification_links WHERE revoked_at=''").get().n,2);assert.deepEqual(financialRows(f),before);
  }finally{f.close();}
 });
+
+for(const [firstGiro,secondGiro] of [['123-4566','0123-4566'],['0123-4566','123-4566']])test('Node rejects a stale second reservation when recipient Bankgiro padding changes from '+firstGiro+' to '+secondGiro,()=>{
+ const f=fixture({report:{recipientBankgiro:firstGiro}});try{
+  storeTransactions(f.db,[withSyntheticBankOriginal({account,booked_at:'2026-10-26',amount_cents:62500,currency:'SEK',payer:'',reference:'',bank_reference:'SYNTHETIC-PADDED-GIRO-SECOND',description:'Insättning'})],'enablebanking');
+  const second=listTransactions(f.db).find(row=>row.id!==f.transaction_id),bytes=makeBankgiroXLSX({currency:'SEK',account,date:'2026-10-26',sequence:'83',recipientBankgiro:secondGiro,payments:[{party:'Syntetiskt Bistro AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}),importId=recordImport(f.db,{source:'bank_file',name:'padded-giro.xlsx',found:1,review:1,status:'needs_review',content:bytes,mime_type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const first=module.bankSpecificationCandidates(f.db,f.transaction_id,owner).items.find(row=>row.import_id===f.import_id),stale=module.bankSpecificationCandidates(f.db,second.id,owner).items.find(row=>row.import_id===importId);
+  assert.equal(first.can_link,true);assert.equal(stale.can_link,true);
+  assert.equal(first.recipient_bankgiro,firstGiro);assert.equal(stale.recipient_bankgiro,secondGiro);
+  const before=financialRows(f),link=module.confirmBankSpecificationLink(f.db,input(f,first),owner),auditBefore=f.db.prepare('SELECT COUNT(*) n FROM audit_events').get().n;
+  assert.equal(link.payments[0].bankgiro,firstGiro);
+  const current=module.bankSpecificationCandidates(f.db,second.id,owner).items.find(row=>row.import_id===importId);
+  assert.equal(current.can_link,false);assert.match(current.reason,/insättning|rapport|koppling/i);
+  assert.throws(()=>module.confirmBankSpecificationLink(f.db,{...input(f,stale),transaction_id:second.id,import_id:importId},owner),/insättning|rapport|koppling/i);
+  assert.equal(f.db.prepare("SELECT COUNT(*) n FROM bank_specification_links WHERE revoked_at=''").get().n,1);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM audit_events').get().n,auditBefore);assert.deepEqual(financialRows(f),before);assert.equal(counts(f.db).allocations,0);
+  assert.deepEqual(Buffer.from(f.db.prepare('SELECT content FROM import_jobs WHERE id=?').get(f.import_id).content),Buffer.from(f.bytes));
+  assert.deepEqual(Buffer.from(f.db.prepare('SELECT content FROM import_jobs WHERE id=?').get(importId).content),Buffer.from(bytes));
+ }finally{f.close();}
+});

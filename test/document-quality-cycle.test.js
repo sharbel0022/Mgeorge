@@ -18,7 +18,7 @@ Förfallodatum: 2026-11-01
 Att betala: 1 250,00 SEK
 Moms: 250,00 SEK
 Netto: 1 000,00 SEK
-OCR: 0000594
+OCR: 0000596
 Bankgiro: 123-4567`;
 const metadata={direction:'supplier',direction_confident:true};
 
@@ -26,7 +26,7 @@ test('document quality: consistent explicit invoice evidence retains leading zer
   const result=interpretInvoice(invoice,{...metadata,filename:'Faktura 0594.pdf',subject:'Faktura nr. 0594'});
   assert.equal(result.level,'green');
   assert.equal(result.fields.invoice_number.value,'0594');
-  assert.equal(result.fields.reference.value,'0000594');
+  assert.equal(result.fields.reference.value,'0000596');
   assert.equal(result.fields.total_cents.value,125000);
 });
 

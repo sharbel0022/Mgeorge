@@ -170,7 +170,7 @@ test('transactions follow continuation keys, preserve both directions and only r
 });
 test('invalid dates, malformed transaction status and repeated pagination fail the complete batch',async()=>{
   await assert.rejects(fetchBookedTransactions('a',{dateFrom:'2026-02-30',dateTo:'2026-03-01'}),e=>e.code==='invalid_date_range');
-  await assert.rejects(fetchBookedTransactions('a',{dateFrom:'2026-01-01',dateTo:'2026-10-27'}),e=>e.code==='invalid_date_range');
+  await assert.rejects(fetchBookedTransactions('a',{dateFrom:'2026-03-02',dateTo:'2026-03-01'}),e=>e.code==='invalid_date_range');
   globalThis.fetch=async()=>respond({transactions:[{booking_date:'2026-10-01'}]});
   await assert.rejects(fetchBookedTransactions('a',dateRange),e=>e.code==='invalid_response');
   let pages=0;globalThis.fetch=async()=>{pages++;return respond({transactions:[{status:'BOOK'}],continuation_key:'repeated'});};

@@ -41,17 +41,17 @@ test('nullable alias collection does not permit malformed lists or other null ac
 
 // Missing trusted metadata, an invented fallback deadline, or truncated oversized
 // waits would mislead the read-only account consumer about supplier permission.
-test('actual 429 responses retain only bounded explicit supplier retry advice and preserve existing sync fields',async t=>{
+test('actual 429 responses retain only bounded explicit supplier retry advice separately from sync fallback policy',async t=>{
  t.mock.method(Date,'now',()=>Date.parse('2026-11-02T10:00:00.000Z'));
  const checkedAt='2026-11-02T10:00:00.000Z';
  for(const [header,retryAfter,retryBlocked,want]of [
   ['7200',7200,false,{status:'known',checkedAt,notBefore:'2026-11-02T12:00:00.000Z',provenance:'retry_after_seconds'}],
   ['Mon, 02 Nov 2026 13:00:00 GMT',10800,false,{status:'known',checkedAt,notBefore:'2026-11-02T13:00:00.000Z',provenance:'retry_after_http_date'}],
   ['0',1,false,{status:'known',checkedAt,notBefore:'2026-11-02T10:00:00.000Z',provenance:'retry_after_seconds'}],
-  [null,60,false,{status:'unknown',checkedAt,provenance:'retry_after_missing'}],
-  ['private-account-'+account,60,false,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
-  ['January 1, 2028',31536000,true,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
-  ['Sun, 01 Nov 2026 10:00:00 GMT',1,false,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
+  [null,21600,false,{status:'unknown',checkedAt,provenance:'retry_after_missing'}],
+  ['private-account-'+account,21600,false,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
+  ['January 1, 2028',21600,false,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
+  ['Sun, 01 Nov 2026 10:00:00 GMT',21600,false,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
   ['31536001',31536000,true,{status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'}],
   ['999999999999999999999999999999999999',31536000,true,{status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'}],
   ['Thu, 02 Dec 2027 10:00:00 GMT',31536000,true,{status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'}],

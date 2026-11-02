@@ -6,7 +6,7 @@ import ts from 'typescript';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const local=path=>new URL('../../lib/'+path,import.meta.url).href;
 export function compiled(path,imports){
- imports={'./document-triage.js':local('document-triage.js'),'./economy-summary.js':local('economy-summary.js'),...imports};
+ imports={'./document-triage.js':local('document-triage.js'),'./economy-summary.js':local('economy-summary.js'),'./invoice-details.js':local('invoice-details.js'),...imports};
  let code=ts.transpileModule(readFileSync(new URL('../../'+path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
  for(const [name,url]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(url));
  return data(code);

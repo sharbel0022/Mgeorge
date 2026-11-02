@@ -4,15 +4,15 @@ import * as domain from '../lib/domain.ts';
 import {seal,unseal,randomToken} from '../lib/banking/security.ts';
 const source=p=>readFileSync(new URL(p,import.meta.url),'utf8');
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
-function moduleUrl(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let code=ts.transpileModule(source(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
+function moduleUrl(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary','invoice-details'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let code=ts.transpileModule(source(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
 class D1{
   constructor(sql){this.sql=sql;}
   prepare(query){const sql=this.sql;return{query,args:[],bind(...args){this.args=args;return this;},async first(){return sql.prepare(query).get(...this.args)||null;},async all(){return{results:sql.prepare(query).all(...this.args)};},async run(){return this.execute();},execute(){const r=sql.prepare(query).run(...this.args);return{meta:{changes:Number(r.changes)}};}};}
   async batch(items){this.sql.exec('BEGIN');try{const results=items.map(x=>x.execute());this.sql.exec('COMMIT');return results;}catch(e){this.sql.exec('ROLLBACK');throw e;}}
 }
-async function fixture(t,{realAftercheck=false}={}){
+async function fixture(t,{realAftercheck=false,automatic=false}={}){
   const key='__gmail_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');sql.exec(source('../drizzle/0000_confused_umar.sql'));sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));sql.exec(source('../drizzle/0002_brief_chronomancer.sql'));sql.exec(source('../drizzle/0003_needy_gravity.sql'));for(const file of (await import('node:fs')).readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>/^\d{4}.*sql$/.test(f)&&f.slice(0,4)>='0004'))sql.exec(source('../drizzle/'+file));
-  const f={sql,d1:new D1(sql),owner:'test-owner',key:randomToken(),wrongAccount:false,providerCalls:0,env:{GOOGLE_CLIENT_ID:'synthetic-client',GOOGLE_CLIENT_SECRET:'synthetic-secret'}};f.user={userId:f.owner,email:"owner@example.test"};
+  const f={sql,d1:new D1(sql),owner:'test-owner',key:randomToken(),wrongAccount:false,providerCalls:0,env:{GOOGLE_CLIENT_ID:'synthetic-client',GOOGLE_CLIENT_SECRET:'synthetic-secret'}};f.user={userId:f.owner,email:"owner@example.test"};if(automatic)Object.assign(f.env,{DOCUMENT_AUTOMATION_ENABLED:'true',DOCUMENT_OWNER_EMAIL:f.user.email,DOCUMENT_SCHEDULER_CONFIGURED:'true'});
   const objects=new Map();
   f.env.BUCKET={put:async(key,bytes)=>{f.bucketPuts=(f.bucketPuts||0)+1;objects.set(key,Buffer.from(bytes));},get:async key=>{const bytes=objects.get(key);return bytes?{size:bytes.length,body:bytes,arrayBuffer:async()=>Uint8Array.from(bytes).buffer}:null;},delete:async key=>{f.bucketDeletes=(f.bucketDeletes||0)+1;objects.delete(key);}};globalThis[key]=f;
   const reference=`globalThis[${JSON.stringify(key)}]`,cf=data(`export const env=${reference}.env;`);
@@ -50,6 +50,142 @@ async function fixture(t,{realAftercheck=false}={}){
 const origin='https://invoice.example';
 const post=(action,body={})=>new Request(origin+'/api/gmail/'+action,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify(body)});
 async function connect(f){const r=await f.api.gmailConnect(post('connect')),cookie=r.headers.get('set-cookie').split(';')[0],body=await r.json(),state=new URL(body.url).searchParams.get('state');return{cookie,state,callback:()=>new Request(origin+'/api/gmail/callback?state='+state+'&code=synthetic-code',{headers:{Cookie:cookie}})};}
+
+test('Gmail automation: pausing prevents provider fetches and leaves durable queue work intact',async t=>{
+  const f=await processingFixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.doc();
+  f.sql.prepare('UPDATE document_automation SET enabled=0').run();const calls=f.providerCalls;
+  const result=await(await f.api.gmailSync(undefined,true)).json();
+  assert.equal(result.status,'paused');assert.equal(f.providerCalls,calls);
+  assert.equal(f.sql.prepare('SELECT last_attempt FROM gmail_connections').get().last_attempt,'');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);
+  // Reference-search callers treat HTTP success as evidence of an actual fetch.
+  const referenceSearch=await f.api.gmailSync(undefined,true,'000018');
+  assert.equal(referenceSearch.ok,false);assert.equal(referenceSearch.status,409);assert.equal((await referenceSearch.json()).status,'paused');assert.equal(f.providerCalls,calls);
+});
+
+test('Gmail automation: connection outages persist exponential retry deadlines across module restart',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const originalFetch=globalThis.fetch;let outageCalls=0;
+  t.mock.method(globalThis,'fetch',async()=>{outageCalls++;throw Error('synthetic private network detail');});
+  for(const [attempt,minDelay]of [[1,900000],[2,1800000]]){
+    const before=Date.now();await assert.rejects(f.api.gmailSync(undefined,true),e=>e.code==='connection_error');
+    const row=f.sql.prepare('SELECT * FROM gmail_connections').get();
+    assert.equal(row.sync_failures,attempt);assert.equal(row.status,'retry_wait');
+    assert.ok(Date.parse(row.retry_after)>=before+minDelay);assert.ok(Date.parse(row.retry_after)<=Date.now()+minDelay+1000);
+    f.sql.prepare("UPDATE gmail_connections SET last_attempt='2000-01-01'").run();
+    const restarted=await import(f.apiUrl+'#retry-'+attempt),calls=outageCalls;
+    assert.equal((await(await restarted.gmailSync(undefined,true)).json()).status,'not_due');
+    assert.equal((await restarted.gmailSync(post('sync'))).status,429);assert.equal(outageCalls,calls);
+    const status=await(await restarted.gmailStatus(true)).json();assert.equal(status.sync_health.state,'waiting');
+    f.sql.prepare("UPDATE gmail_connections SET retry_after='' ").run();
+  }
+  globalThis.fetch=originalFetch;
+  await f.api.gmailSync(post('sync'));
+  const recovered=f.sql.prepare('SELECT status,sync_failures,retry_after FROM gmail_connections').get();
+  assert.deepEqual({...recovered},{status:'connected',sync_failures:0,retry_after:''});
+});
+
+test('Gmail automation: revoked refresh credentials stop unattended retries until reconnection',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const expired={access_token:'synthetic-expired',refresh_token:'synthetic-revoked',expires_at:0,scope:'https://www.googleapis.com/auth/gmail.readonly'};
+  f.sql.prepare('UPDATE gmail_connections SET tokens=?').run(await seal(f.key,f.owner,'gmail-tokens',expired));
+  f.tokenError={error:'invalid_grant'};await assert.rejects(f.api.gmailSync(undefined,true),e=>e.code==='renewal_required');
+  f.sql.prepare("UPDATE gmail_connections SET last_attempt='2000-01-01'").run();const calls=f.providerCalls;
+  const result=await(await f.api.gmailSync(undefined,true)).json();assert.equal(result.status,'reconnect_required');assert.equal(f.providerCalls,calls);
+  const status=await(await f.api.gmailStatus(true)).json();assert.equal(status.next_eligible_sync,null);
+});
+
+test('Gmail automation: interrupted response body persists backoff and blocks early manual retry',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());let calls=0;
+  t.mock.method(globalThis,'fetch',async()=>{calls++;return new Response(new ReadableStream({start(controller){controller.enqueue(new TextEncoder().encode('{"messages":'));},pull(controller){controller.error(Error('synthetic-private-stream-outage'));}}));});
+  const before=Date.now();await assert.rejects(f.api.gmailSync(undefined,true),error=>error.code==='connection_error');
+  const row=f.sql.prepare('SELECT status,retry_after FROM gmail_connections').get();assert.equal(row.status,'retry_wait');assert.ok(Date.parse(row.retry_after)>=before+900000);
+  const reached=calls,restarted=await import(f.apiUrl+'#stream-restart');
+  assert.equal((await restarted.gmailSync(post('sync'))).status,429);assert.equal(calls,reached);
+});
+
+test('Gmail automation: observations distinguish manual fetch, automatic invocation and external scheduler proof',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  let status=await(await f.api.gmailStatus(true)).json();assert.equal(status.schedule_observation.last_invoked_at,null);
+  await f.api.gmailSync(post('sync'));status=await(await f.api.gmailStatus(true)).json();
+  assert.ok(status.last_successful_fetch);assert.equal(status.schedule_observation.last_invoked_at,null);
+  f.sql.prepare("UPDATE gmail_connections SET last_attempt='' ").run();
+  await f.api.gmailSync(undefined,true);status=await(await f.api.gmailStatus(true)).json();
+  assert.ok(status.schedule_observation.last_invoked_at);assert.ok(status.schedule_observation.last_completed_at);
+  assert.equal(status.schedule_observation.last_outcome,'completed');
+  assert.equal(status.schedule_observation.source,'system_entrypoint');
+  assert.equal(status.schedule_observation.external_schedule_verified,false);assert.equal(status.sync_health.schedule_verified,false);
+  const completed=status.schedule_observation.last_completed_at;
+  await f.api.gmailSync(undefined,true);status=await(await f.api.gmailStatus(true)).json();
+  assert.equal(status.schedule_observation.last_outcome,'not_due');assert.equal(status.schedule_observation.last_completed_at,completed);
+  f.user={userId:'another-owner'};status=await(await f.api.gmailStatus(true)).json();assert.equal(status.schedule_observation.last_invoked_at,null);
+});
+
+test('Gmail automation: rejected attachment reasons survive replay and are scoped without exposing message data',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const originalFetch=globalThis.fetch;
+  t.mock.method(globalThis,'fetch',async(url,options)=>{
+    const path=new URL(url).pathname;
+    if(path.endsWith('/messages'))return Response.json({messages:[{id:'bad'},{id:'large'},{id:'good'}]});
+    if(path.endsWith('/messages/bad'))return Response.json({payload:{parts:[{partId:'1',filename:'private-invalid.pdf',mimeType:'application/pdf',body:{data:Buffer.from('not a PDF').toString('base64url')}}]}});
+    if(path.endsWith('/messages/large'))return Response.json({payload:{parts:[{partId:'1',filename:'private-large.pdf',mimeType:'application/pdf',body:{size:16*1024*1024,attachmentId:'large-attachment'}}]}});
+    return originalFetch(url,options);
+  });
+  await f.api.gmailSync(post('sync'));
+  let status=await(await f.api.gmailStatus(true)).json();
+  assert.deepEqual(status.attachment_rejections,{total:2,reasons:[{code:'attachment_format_invalid',count:1},{code:'attachment_too_large',count:1}]});
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);
+  assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM gmail_sources WHERE document_id='' AND status='rejected'").get().n,2);
+  assert.ok(!JSON.stringify(status.attachment_rejections).includes('private-'));
+  await f.api.gmailSync(post('sync'));
+  status=await(await f.api.gmailStatus(true)).json();assert.equal(status.attachment_rejections.total,2);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);
+  f.sql.prepare("INSERT INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,?,'',?,'rejected',?)").run(f.owner,'legacy','{malformed',new Date().toISOString());
+  status=await(await f.api.gmailStatus(true)).json();assert.equal(status.attachment_rejections.total,3);assert.deepEqual(status.attachment_rejections.reasons.at(-1),{code:'unclassified',count:1});
+  f.user={userId:'another-owner'};status=await(await f.api.gmailStatus(true)).json();assert.deepEqual(status.attachment_rejections,{total:0,reasons:[]});
+});
+
+test('Gmail automation: a lost observation receipt never reverses an accepted fetch and remains visibly unconfirmed',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const prepare=f.d1.prepare.bind(f.d1);let interrupted=false;
+  f.d1.prepare=query=>{
+    const statement=prepare(query),run=statement.run.bind(statement);
+    statement.run=async()=>{
+      if(!interrupted&&query.startsWith('INSERT INTO audit_events')&&statement.args.includes('gmail.automatic.result')){interrupted=true;throw Error('synthetic lost receipt');}
+      return run();
+    };
+    return statement;
+  };
+  const result=await(await f.api.gmailSync(undefined,true)).json();assert.equal(result.imported,1);assert.match(result.observation_warning,/körningskvitto/);
+  const status=await(await f.api.gmailStatus(true)).json();assert.ok(status.last_successful_fetch);assert.ok(status.schedule_observation.last_invoked_at);
+  assert.equal(status.schedule_observation.last_completed_at,null);assert.equal(status.schedule_observation.last_outcome,'running_or_interrupted');
+  f.sql.prepare("UPDATE gmail_connections SET last_attempt='' ").run();await f.api.gmailSync(undefined,true);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);
+});
+
+for(const terminal of ['rejected','registered'])test(`Gmail automation: concurrent ${terminal} decision is inherited by a repeated original`,async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());await f.api.gmailSync(post('sync'));
+  const documentId=f.sql.prepare('SELECT id FROM documents').get().id;
+  const originalFetch=globalThis.fetch;
+  t.mock.method(globalThis,'fetch',async(url,options)=>new URL(url).pathname.endsWith('/messages')?Response.json({messages:[{id:'reimport'}]}):originalFetch(url,options));
+  const originalBatch=f.d1.batch.bind(f.d1);let decided=false;
+  f.d1.batch=async items=>{
+    if(!decided&&items.some(s=>/^INSERT OR IGNORE INTO gmail_sources/.test(s.query))){
+      decided=true;
+      const body=terminal==='rejected'?{document_id:documentId,reject:true}:{document_id:documentId,confirm:true,invoice:{direction:'payable',party:'Synthetic supplier AB',number:'race-001',total:62500,issued:'2026-10-24',due:'2026-11-07',kind:'invoice'},fields:{currency:'SEK',vat_cents:'125.00',net_cents:'500.00'}};
+      assert.equal((await f.api.gmailReview(post('review',body))).status,200);
+    }
+    return originalBatch(items);
+  };
+  const result=await(await f.api.gmailSync(post('sync'))).json();assert.equal(result.imported,0);assert.equal(result.duplicates,1);assert.equal(decided,true);
+  const sources=f.sql.prepare('SELECT document_id,status FROM gmail_sources ORDER BY source_id').all();
+  assert.equal(sources.length,2);assert.ok(sources.every(row=>row.document_id===documentId&&row.status===terminal));
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);
+  await f.processing.enqueueDocuments(f.owner);
+  assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM document_jobs WHERE state IN ('queued','waiting_ocr','processing')").get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,terminal==='registered'?1:0);
+});
 
 test('OAuth diagnostics identify the failed stage without reflecting codes, cookies or provider secrets',async t=>{
   const f=await fixture(t),flow=await connect(f),logs=[];
@@ -128,7 +264,7 @@ test('a lost response after document registration cannot delete its referenced o
   f.d1.batch=original;await f.api.gmailSync(post('sync'));assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);assert.equal(f.bucketPuts,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_sources').get().n,1);
 });
 test('Sites rejects foreign currency and conflicting VAT before creating an invoice; scheduled sync respects cooldown',async t=>{
-  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());await f.api.gmailSync(post('sync'));
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());await f.api.gmailSync(post('sync'));
   assert.equal((await (await f.api.gmailSync(undefined,true)).json()).status,'not_due');
   const id=f.sql.prepare('SELECT id FROM documents').get().id;
   const invoice={direction:'payable',party:'Synthetic',number:'1',total:10000,issued:'2026-10-24',due:'2026-11-07'};
@@ -137,7 +273,7 @@ test('Sites rejects foreign currency and conflicting VAT before creating an invo
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
 });
 test('Sites persists the Gmail provider wait across scheduled and manual retries',async t=>{
-  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.retryAfter='7200';
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.retryAfter='7200';
   await assert.rejects(f.api.gmailSync(undefined,true),error=>error.code==='rate_limited'&&error.retryAfter===7200&&!error.message.includes('private-provider-secret'));
   const row=f.sql.prepare('SELECT * FROM gmail_connections').get();assert.ok(Date.parse(row.retry_after)>=Date.now()+7199_000);
   f.sql.prepare("UPDATE gmail_connections SET last_attempt='2000-01-01'").run();const calls=f.providerCalls;
@@ -509,7 +645,7 @@ test('scheduled Gmail cooldown still drains pending text jobs',async t=>{
 
 
 test('Sites Gmail scheduled failures stop after three persisted attempts and a manual success recovers',async t=>{
- const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.retryAfter='1';
+ const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.retryAfter='1';
  for(let n=1;n<=3;n++){
   f.sql.prepare("UPDATE gmail_connections SET last_attempt='',retry_after=''").run();
   await assert.rejects(f.api.gmailSync(undefined,true),e=>e.code==='rate_limited');
@@ -522,7 +658,7 @@ test('Sites Gmail scheduled failures stop after three persisted attempts and a m
 });
 
 test('three interrupted Sites Gmail reservations cannot silently retry forever',async t=>{
- const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+ const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
  f.messageReached=()=>f.sql.prepare("UPDATE gmail_locks SET token='replacement',expires_at=?").run(new Date(Date.now()+60000).toISOString());
  for(let n=1;n<=3;n++){
   f.sql.prepare('DELETE FROM gmail_locks').run();f.sql.prepare("UPDATE gmail_connections SET last_attempt=''").run();
@@ -535,7 +671,7 @@ test('three interrupted Sites Gmail reservations cannot silently retry forever',
 
 
 test('committed Gmail retrieval stays successful if document after-checks need retrying',async t=>{
- const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.reconcileError=true;
+ const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.reconcileError=true;
  const result=await(await f.api.gmailSync(undefined,true)).json();assert.equal(result.imported,1);assert.match(result.warning,/Efterkontrollen/);assert.equal(result.processing.status,'pending');assert.equal(f.sql.prepare('SELECT status FROM gmail_connections').get().status,'connected');assert.equal(f.sql.prepare('SELECT sync_failures FROM gmail_connections').get().sync_failures,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_runs').get().n,1);assert.equal(f.sql.prepare('SELECT status FROM gmail_runs').get().status,'completed_pending');
  const status=await(await f.api.gmailStatus()).json();assert.equal(status.connection.status,'connected');assert.match(status.connection.postprocess_warning,/Efterkontrollen/);assert.ok(status.last_successful_fetch);assert.equal(status.connection.sync_failures,0);
  f.reconcileError=false;await f.api.gmailSync(post('sync'));const recovered=await(await f.api.gmailStatus()).json();assert.equal(recovered.connection.postprocess_warning,null);

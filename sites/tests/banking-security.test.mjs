@@ -14,7 +14,7 @@ import { confirmedBankConsent } from '../lib/banking/status-view.ts';
 const source = path => readFileSync(new URL(path, import.meta.url), 'utf8');
 const jsUrl = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
 function compiledModule(path, imports) {
-  imports = { '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
+  imports = { './sync-periods': new URL('../lib/banking/sync-periods.ts', import.meta.url).href, '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
   let js = ts.transpileModule(source(path), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
   for (const [name, replacement] of Object.entries(imports)) {
     for (const quote of ['"', "'"]) js = js.replaceAll(`${quote}${name}${quote}`, JSON.stringify(replacement));
@@ -648,4 +648,143 @@ test('committed bank imports stay successful if the independent after-check need
  const result=await(await f.service.automaticSync()).json();assert.equal(result.imported,1);assert.ok(result.warnings.some(w=>w.includes('Efterkontrollen')));assert.equal(f.connection().last_error,null);assert.equal(f.connection().sync_failures,0);assert.equal(count(f,'bank_sync_runs'),1);assert.equal(count(f,'audit_events'),1);
  const visible=await(await f.service.status(new Request(origin+'/api/bank/status'))).json();assert.match(visible.connection.postprocessWarning,/Efterkontrollen/);assert.ok(visible.connection.lastSyncedAt);assert.equal(visible.automatic.failures,0);assert.match((await(await f.service.automaticSyncStatus()).json()).postprocessWarning,/Efterkontrollen/);
  f.reconcileError=false;f.sql.prepare('UPDATE bank_connections SET last_synced_at=NULL').run();await f.service.sync(post('sync'));assert.equal((await(await f.service.status(new Request(origin+'/api/bank/status'))).json()).connection.postprocessWarning,null);
+});
+
+test('Swedbank period rejection is recovered with complete non-overlapping shorter windows',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.sql.prepare('UPDATE bank_connections SET date_from=?').run('2026-01-01');
+ const ranges=[];
+ f.provider.getTransactions=async(_config,_id,input)=>{
+  ranges.push({...input});
+  if(Date.parse(input.dateTo)-Date.parse(input.dateFrom)>30*86400000)throw new ProviderError('BANK_PERIOD_UNAVAILABLE','Period unavailable',400);
+  return{transactions:[rawTx({entry_reference:'WINDOW-'+input.dateFrom,booking_date:input.dateFrom})]};
+ };
+ const result=await(await f.service.sync(post('sync'))).json();
+ assert.ok(result.imported>1);assert.ok(ranges.length<=25);
+ const successful=ranges.filter(x=>Date.parse(x.dateTo)-Date.parse(x.dateFrom)<=30*86400000);
+ assert.equal(successful[0].dateFrom,'2026-01-01');assert.equal(successful.at(-1).dateTo,new Date().toISOString().slice(0,10));
+ for(let i=1;i<successful.length;i++)assert.equal(Date.parse(successful[i].dateFrom)-Date.parse(successful[i-1].dateTo),86400000);
+ assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(f.owner).payload).transactions.length,successful.length);assert.ok(f.connection().last_synced_at);
+});
+
+test('manual updates use the successful overlap instead of repeatedly requesting old history',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ const end=new Date().toISOString().slice(0,10),last=new Date(Date.parse(end+'T12:00:00Z')-2*86400000).toISOString(),expected=new Date(Date.parse(end+'T12:00:00Z')-5*86400000).toISOString().slice(0,10);
+ f.sql.prepare('UPDATE bank_connections SET date_from=?,last_synced_at=?').run('2026-01-01',last);
+ await f.service.sync(post('sync'));
+ const input=f.calls.find(x=>x.name==='getTransactions').args[2];
+ assert.equal(input.dateFrom,expected);assert.equal(input.dateTo,end);assert.equal(f.connection().date_from,'2026-01-01');
+});
+
+test('saving an older date or different account scope resets incremental coverage',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ f.sql.prepare('UPDATE bank_connections SET last_synced_at=?').run(new Date(Date.now()-3600000).toISOString());
+ await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid],dateFrom:'2026-01-01'}));
+ assert.equal(f.connection().last_synced_at,null);
+});
+
+test('invalid stored bank dates fail before any provider request or cursor change',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.sql.prepare("UPDATE bank_connections SET date_from='2026-02-30'").run();
+ await assert.rejects(f.service.sync(post('sync')),/datum|period/i);
+ assert.equal(f.calls.length,0);assert.equal(f.connection().last_synced_at,null);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+test('lost lease after session response prevents even the next bank request',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.provider.getSession=async()=>{f.sql.prepare("UPDATE bank_locks SET token='other-run',expires_at=?").run(future());return structuredClone(f.live);};
+ await assert.rejects(f.service.sync(post('sync')),/BANK_LEASE_LOST/);
+ assert.equal(f.calls.filter(x=>x.name==='getTransactions').length,0);assert.equal(f.connection().last_synced_at,null);
+});
+
+test('Retry-After is exposed as an HTTP header as well as a safe admin message',async t=>{
+ const f=await fixture(t),error=Object.assign(new ProviderError('BANK_RATE_LIMIT','Vänta på banken',429,true),{retryAfter:172800});
+ const result=f.service.bankFailure(error);
+ assert.equal(result.status,429);assert.equal(result.headers.get('retry-after'),'172800');assert.equal((await result.json()).retryAfter,172800);
+});
+
+test('historical window failure preserves saved money and restarts without duplicate rows',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ await f.service.sync(post('sync'));const before=f.workspace();
+ await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid],dateFrom:'2026-01-01'}));
+ const history=rawTx({entry_reference:'HISTORY-1',booking_date:'2026-01-10'}),current=rawTx();let fail=true;
+ f.provider.getTransactions=async(_config,_id,input)=>{
+  if(fail&&input.dateFrom>'2026-03-01')throw new ProviderError('BANK_TIMEOUT','Banken svarade inte',504,true);
+  return{transactions:[history,current].filter(row=>row.booking_date>=input.dateFrom&&row.booking_date<=input.dateTo)};
+ };
+ await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_TIMEOUT');
+ assert.deepEqual(f.workspace(),before);assert.equal(f.connection().last_synced_at,null);assert.equal(count(f,'bank_sync_runs'),1);
+ fail=false;const resumed=await(await f.service.sync(post('sync'))).json();
+ assert.equal(resumed.imported,1);assert.equal(f.workspace().state.transactions.length,2);
+ f.sql.prepare('UPDATE bank_connections SET last_synced_at=NULL').run();
+ assert.equal((await(await f.service.sync(post('sync'))).json()).imported,0);assert.equal(f.workspace().state.transactions.length,2);
+});
+
+for(const [label,patch]of [
+ ['malformed amount',{transaction_amount:{amount:'broken',currency:'SEK'}}],
+ ['zero amount',{transaction_amount:{amount:'0.00',currency:'SEK'}}],
+ ['invalid booking date',{booking_date:'2026-02-30'}],
+ ['booking date outside the requested window',{booking_date:'2025-12-31'}],
+])test(`an invalid historical BOOK row with ${label} preserves success coverage for a complete retry`,async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ await f.service.sync(post('sync'));
+ await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid],dateFrom:'2026-01-01'}));
+ const before=f.workspace(),runs=count(f,'bank_sync_runs'),audits=count(f,'audit_events');
+ const valid=rawTx({entry_reference:'HISTORY-VALID',booking_date:'2026-01-10'}),repaired=rawTx({entry_reference:'HISTORY-REPAIRED',booking_date:'2026-01-11'});
+ let invalid=true;
+ f.provider.getTransactions=async(_config,_id,input)=>({transactions:input.dateFrom==='2026-01-01'?[valid,invalid?{...repaired,...patch}:repaired]:[]});
+ await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_INCOMPLETE_RESPONSE');
+ assert.deepEqual(f.workspace(),before);assert.equal(count(f,'bank_sync_runs'),runs);assert.equal(count(f,'audit_events'),audits);assert.equal(f.connection().last_synced_at,null);
+ invalid=false;f.calls=[];
+ const resumed=await(await f.service.sync(post('sync'))).json();
+ assert.equal(f.calls.find(call=>call.name==='getTransactions').args[2].dateFrom,'2026-01-01');
+ assert.equal(resumed.imported,2);assert.equal(f.workspace().state.transactions.length,3);assert.ok(f.connection().last_synced_at);
+});
+
+test('documented pending and foreign-currency skips can complete a bank interval',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.provider.getTransactions=async()=>({transactions:[rawTx(),rawTx({entry_reference:'PENDING',status:'PDNG'}),rawTx({entry_reference:'FOREIGN',transaction_amount:{amount:'10.00',currency:'EUR'}})]});
+ const result=await(await f.service.sync(post('sync'))).json();
+ assert.equal(result.imported,1);assert.equal(result.skipped,2);assert.equal(f.workspace().state.transactions.length,1);assert.ok(f.connection().last_synced_at);
+});
+
+test('rate limit encountered after period adjustment persists a cooldown without importing partial history',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ f.sql.prepare("UPDATE bank_connections SET date_from='2026-10-01'").run();
+ await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));let calls=0;
+ f.provider.getTransactions=async()=>{calls++;if(calls===1)throw new ProviderError('BANK_PERIOD_UNAVAILABLE','unavailable',400);throw Object.assign(new ProviderError('BANK_RATE_LIMIT','Vänta',429,true),{retryAfter:172800});};
+ const before=Date.now();await assert.rejects(f.service.automaticSync(),e=>e.code==='BANK_RATE_LIMIT');
+ assert.equal(calls,2);assert.ok(Date.parse(f.connection().retry_after)>=before+172800000);assert.equal(f.connection().last_synced_at,null);assert.equal(f.workspace(),null);
+ assert.equal((await(await f.service.automaticSync()).json()).reason,'not_due');assert.equal(calls,2);
+});
+
+test('unavailable history has bounded attempts and retains the failed period in admin status',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET date_from='2026-01-01'").run();
+ f.provider.getTransactions=async()=>{throw new ProviderError('BANK_PERIOD_UNAVAILABLE','unavailable',400);};
+ await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_PERIOD_UNAVAILABLE');
+ assert.equal(f.calls.filter(x=>x.name==='getTransactions').length,7);assert.equal(f.connection().last_synced_at,null);assert.equal(count(f,'bank_sync_runs'),0);
+ const status=await(await f.service.status(new Request(origin+'/api/bank/status'))).json();
+ assert.match(status.connection.lastError,/2026-01-01/);assert.match(status.connection.lastError,/tidigare historik finns kvar/);
+});
+
+test('bank date inputs use the provider UTC day while timestamps remain displayed in Sweden',()=>{
+ const component=source('../components/bank-connection.tsx'),body=component.match(/function localDate\(date = new Date\(\)\) \{([^\n]+)\}/)[1];
+ const actual=new Function('date',body);
+ assert.equal(actual(new Date('2026-12-31T23:30:00Z')),'2026-12-31');assert.equal(actual(new Date('2026-03-29T22:30:00Z')),'2026-03-29');
+});
+
+test('provider maintenance Retry-After blocks subsequent syncs without losing history',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.provider.getTransactions=async()=>{throw Object.assign(new ProviderError('BANK_SERVICE_ERROR','Tillfälligt underhåll',503,true),{retryAfter:172800});};
+ const before=Date.now();await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_SERVICE_ERROR');
+ assert.ok(Date.parse(f.connection().retry_after)>=before+172800000);const calls=f.calls.length;
+ await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_RATE_LIMIT');assert.equal(f.calls.length,calls);assert.equal(f.connection().last_synced_at,null);
+});
+
+test('consent expiring during pagination stops before another request and preserves the checkpoint',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ const at=Date.now();f.live.access.valid_until=new Date(at+30000).toISOString();let calls=0;
+ f.provider.getTransactions=async()=>{calls++;if(calls===1){t.mock.timers.enable({apis:['Date'],now:at+60000});return{transactions:[rawTx()],continuation_key:'after-expiry'};}return{transactions:[]};};
+ await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_RECONNECT_REQUIRED');
+ assert.equal(calls,1);assert.equal(f.connection().status,'reauth_required');assert.equal(f.connection().last_synced_at,null);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
 });

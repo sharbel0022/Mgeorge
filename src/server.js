@@ -15,6 +15,7 @@ import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
 import {dailyBackup} from './backup.js';
 import {createIntegrationJobs} from './integration-jobs.js';
 import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
+import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
 import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 import {analyzeDocument,approveDocument} from './invoice-review.js';
 import {runDocumentProcess} from './invoice-extraction.js';
@@ -66,7 +67,7 @@ async function readBody(req,{authenticated=true}={}){
 }
 function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
 // Local OS access represents one company administrator. HTTPS requires login.
-// Anonymous sessions can bind a browser, but never authorize public bank data.
+// HTTPS sessions are persisted only after successful administrator login.
 /** Skapar eller återanvänder webbläsarsessionen som binder OAuth- och bankreturer till rätt användare. Detta är inte samma sak som bankens egen inloggning. */
 function ensureBrowserSession(req,res){
   const existing=cookies(req).mg_session;
@@ -76,9 +77,12 @@ function ensureBrowserSession(req,res){
     if(!check.secure&&found.principal==='')db.prepare('UPDATE sessions SET principal=? WHERE id_hash=?').run('local-admin',digest(existing));
     return;
   }
+  // Denied requests and failed logins must not grow the persistent session
+  // table. HTTPS OAuth already requires a successfully authenticated session.
+  if(check.secure){req.principal='';return;}
   const session=token();
   db.prepare('DELETE FROM sessions WHERE expires_at<=?').run(Date.now());
-  req.principal=check.secure?'':'local-admin';
+  req.principal='local-admin';
   db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(session),Date.now()+8*3600000,req.principal);
   req.headers.cookie=(req.headers.cookie?req.headers.cookie+'; ':'')+'mg_session='+encodeURIComponent(session);
   // Replace an expired session cookie when computing the OAuth browser binding.
@@ -174,18 +178,19 @@ function retainBankgiroReview(body,items,req){
     return {import_id,imported:0,duplicate:previous?1:0,review:items.length,review_only:true,status:'needs_review'};
   }catch(error){db.exec('ROLLBACK');throw error;}
 }
+const gmailReconnectStatuses=new Set(['renewal_required','access_denied','missing_scope','invalid_client','account_mismatch','invalid_tokens']);
 function gmailStatus(){
   const connection=db.prepare('SELECT id,email,status,last_synced,last_error FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
   const credentials=connection&&db.prepare('SELECT encrypted_tokens FROM gmail_connections WHERE id=?').get(connection.id);
   const send_enabled=!!credentials&&hasGmailSendScope(decryptObject(credentials.encrypted_tokens));
   const interval=getSettings(db).gmail_sync_interval_minutes,job=integrationJobs.state('gmail'),lastAttempt=Math.max(connection?.last_synced?utcTimestamp(connection.last_synced):0,job?.last_attempt||0);
   const imports=db.prepare("SELECT COALESCE(SUM(found),0) AS messages,COALESCE(SUM(imported),0) AS documents,COALESCE(SUM(duplicate),0) AS duplicates FROM import_jobs WHERE source='gmail'").get();
-  return {configured:isGmailConfigured(),send_enabled,email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&interval&&(!job||job.failures<3)?new Date(Math.max(Date.now(),lastAttempt+interval*60000,job?.next_attempt||0)).toISOString():null,syncing:integrationJobs.running('gmail'),job:integrationJobs.summary().find(j=>j.name==='gmail')||null,counts:imports,connection};
+  return {configured:isGmailConfigured(),send_enabled,email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&!gmailReconnectStatuses.has(connection.status)&&connection.status!=='blocked'&&interval&&(!job||job.failures<3)?new Date(Math.max(Date.now(),lastAttempt+interval*60000,job?.next_attempt||0)).toISOString():null,syncing:integrationJobs.running('gmail'),job:integrationJobs.summary().find(j=>j.name==='gmail')||null,counts:imports,connection};
 }
 const bankLeases=new Map();
 const bankSyncing={
   has:id=>bankLeases.has(id)||integrationJobs.running('bank:'+id),
-  add(id,options){if(bankLeases.has(id))throw bad(409,'En bankåtgärd pågår redan');const lease=integrationJobs.claim('bank:'+id,options);bankLeases.set(id,lease);return lease;},
+  add(id,options){if(bankLeases.has(id))throw bad(409,'En bankåtgärd pågår redan');const lease=integrationJobs.claim('bank:'+id,options);lease.deadline=Math.min(Date.now()+240000,integrationJobs.state('bank:'+id).lease_until-30000);bankLeases.set(id,lease);return lease;},
   assert(id){const lease=bankLeases.get(id);if(!lease)throw bad(409,'Bankåtgärdens lås saknas');lease.assert();},
   delete(id){const lease=bankLeases.get(id);lease?.release();bankLeases.delete(id);}
 };
@@ -193,8 +198,9 @@ const bankSyncing={
 async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=false,interval=0}={}){
   const authorize=()=>{if(req)assertSessionStillAuthorized(req);controlAuthorize?.();};
   const waiting=integrationJobs.state('gmail');
-  if(waiting?.failures>=3&&waiting.last_error.startsWith('Gmail angav'))throw Object.assign(bad(409,waiting.last_error),{code:'integration_blocked'});
-  if(waiting?.next_attempt>Date.now()&&waiting.last_error.startsWith('Gmail har begränsat'))throw Object.assign(bad(429,waiting.last_error),{code:'rate_limited',retryAfter:Math.ceil((waiting.next_attempt-Date.now())/1000)});
+  const retryState=db.prepare('SELECT status FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get()?.status;
+  if(waiting?.failures>=3&&(retryState==='blocked'||waiting.last_error.startsWith('Gmail angav')))throw Object.assign(bad(409,waiting.last_error),{code:'integration_blocked'});
+  if(waiting?.next_attempt>Date.now()&&(retryState==='retry_wait'||waiting.last_error.startsWith('Gmail har begränsat')))throw Object.assign(bad(429,'Gmail väntar på nästa tillåtna hämtningsförsök.'),{code:'rate_limited',retryAfter:Math.ceil((waiting.next_attempt-Date.now())/1000)});
   const lease=integrationJobs.claim('gmail',{scheduled,interval});
   const connection=db.prepare('SELECT * FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
   if(!connection){lease.release();throw bad(409,'Koppla Gmail först');}
@@ -234,11 +240,16 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
   }catch(e){
     authorize();
     const renewal=e.code==='renewal_required'||/invalid_grant|förnya|återkall|401|expired|behöver.*koppla/i.test(e.message);
+    const permanent=renewal?'renewal_required':gmailReconnectStatuses.has(e.code)?e.code:'';
+    const transient=['rate_limited','provider_error','connection_error'].includes(e.code);
+    const attempts=Math.max(1,Math.min(3,integrationJobs.state('gmail')?.failures||1));
+    const backoff=900000*2**(attempts-1)+Math.floor(Math.random()*1000);
+    const serverDelay=Number.isFinite(e.retryAfter)&&e.retryAfter>0?e.retryAfter*1000:0;
     lease.write(()=>{
     if(currentTokens)db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(currentTokens),connection.id);
-    db.prepare('UPDATE gmail_connections SET status=?,last_error=? WHERE id=?').run(renewal?'renewal_required':'error',renewal?'Gmail-anslutningen behöver förnyas':'Det gick inte att hämta från Gmail',connection.id);
+    db.prepare('UPDATE gmail_connections SET status=?,last_error=? WHERE id=?').run(permanent||(e.retryBlocked?'blocked':transient?'retry_wait':'error'),renewal?'Gmail-anslutningen behöver förnyas':'Det gick inte att hämta från Gmail',connection.id);
     recordImport(db,{source:'gmail',name:connection.email,status:'error',error:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen misslyckades'});
-    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',e.status===429?Math.max(900,e.retryAfter||900)*1000:0,e.retryBlocked===true);
+    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',transient?Math.max(backoff,serverDelay):0,e.retryBlocked===true);
     });
     if(e.status)throw e;throw bad(502,renewal?'Gmail-anslutningen behöver förnyas – koppla Gmail igen':'Det gick inte att hämta från Gmail. Kontrollera anslutningen och försök igen.');
   }finally{lease.release();}
@@ -255,8 +266,8 @@ function stableAccountIdentity(account,bank){
   if(account.identification_hash)return `${bank}:SE:hash:${account.identification_hash}`;
   throw bad(502,'Banken saknar beständig kontoidentitet. Kontakta systemadministratören.');
 }
-async function verifyBankSession(connection){
-  const data=await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id));
+async function verifyBankSession(connection,deadline){
+  const data=await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{...(deadline===undefined?{}:{deadline})});
   if(data.status!=='AUTHORIZED'||!Array.isArray(data.accounts)||!data.accounts.includes(connection.selected_account_uid))throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
 }
 /** Hämtar bankhändelser för vald anslutning, kontrollerar bankens svar och sparar endast giltiga poster med dubblettskydd. */
@@ -270,46 +281,55 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
   };
   if(!operationLocked&&bankSyncing.has(connection.id))throw bad(409,'En bankåtgärd pågår redan');
   if(!connection.owner||!connection.selected_account_uid)throw bad(409,'Välj först ett godkänt företagskonto');
-  if(!Number.isFinite(Date.parse(connection.valid_until))||Date.parse(connection.valid_until)<=Date.now()){
+  if(!Number.isFinite(Date.parse(connection.valid_until))||Date.parse(connection.valid_until)<=Date.now()||connection.status==='renewal_required'){
     throw bad(409,'Bankanslutningen behöver förnyas – koppla igen');
   }
   if(connection.retry_after>Date.now())throw Object.assign(bad(429,'Bankens anropsgräns är nådd. Försök igen senare.'),{retryAfter:Math.ceil((connection.retry_after-Date.now())/1000)});
   if(account_uid&&account_uid!==connection.selected_account_uid)throw bad(400,'Välj konto innan hämtningen');
   const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid);if(!selected)throw bad(400,'Välj ett godkänt konto');
-  date_from||=new Date(Date.parse(today()+'T12:00:00Z')-29*86400000).toISOString().slice(0,10);date_to||=today();
-  const from=validateDate(date_from,true),to=validateDate(date_to,true);if(from>to||Math.abs(Date.parse(to)-Date.parse(from))>91*86400000)throw bad(400,'Välj ett datumintervall på högst 91 dagar');
+  const account=stableAccountIdentity(selected,connection.bank_name),plan=planBankSync(decryptObject(connection.encrypted_session),account,connection.last_synced,{date_from,date_to}),{from,to}=plan;
   assertNoLegacyBankImports(db);
   const lease=operationLocked?bankLeases.get(connection.id):bankSyncing.add(connection.id,{scheduled,interval});
+  const bankAuthorize=()=>{
+    lease.assert();authorize();
+    if(Date.parse(connection.valid_until)<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
+  };
   try{
     bankSyncing.assert(connection.id);
     // Account/session selection may have changed while this caller waited to run.
     const stored=db.prepare('SELECT * FROM bank_connections WHERE id=? AND owner=?').get(connection.id,connection.owner);
     if(!stored||stored.accounts_json!==connection.accounts_json||stored.encrypted_session!==connection.encrypted_session||stored.selected_account_uid!==connection.selected_account_uid)throw Object.assign(bad(409,'Bankanslutningen har ändrats. Läs in den igen.'),{code:'connection_changed'});
-    await verifyBankSession(connection);
-    lease.assert();authorize();
-    const raw=await fetchBookedTransactions(selected.uid,{dateFrom:from,dateTo:to,authorize:()=>{lease.assert();authorize();}});
-    lease.assert();
+    if(stored.retry_after>Date.now())throw Object.assign(bad(429,'Bankens anropsgräns är nådd. Försök igen senare.'),{retryAfter:Math.ceil((stored.retry_after-Date.now())/1000)});
+    if(stored.status==='renewal_required'||!Number.isFinite(Date.parse(stored.valid_until))||Date.parse(stored.valid_until)<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
+    bankAuthorize();
+    await verifyBankSession(connection,lease.deadline);
+    bankAuthorize();
+    const raw=await fetchBookedTransactions(selected.uid,{dateFrom:from,dateTo:to,authorize:bankAuthorize,deadline:lease.deadline});
+    bankAuthorize();
     // Login revocation during a slow provider request must not authorize a write.
     authorize();
-    const account=stableAccountIdentity(selected,connection.bank_name);
-    const transactions=raw.map(x=>normalizeBankApiTransaction(x,account)).filter(x=>x&&x.booked_at>=from&&x.booked_at<=to);
-    const result=storeTransactions(db,transactions,'enablebanking',null,lease.assert);
-    lease.write(()=>{db.prepare("UPDATE bank_connections SET last_synced=CURRENT_TIMESTAMP,status='connected',last_error='',retry_after=0 WHERE id=?").run(connection.id);
+    const transactions=raw.map(x=>normalizeBankApiTransaction(x,account));
+    if(transactions.some(x=>!x||x.booked_at<from||x.booked_at>to))throw Object.assign(bad(502,'Bankens svar innehöll bokförda händelser som inte kunde bevaras inom det begärda datumintervallet. Inga händelser från hämtningen har importerats.'),{code:'incomplete_bank_response'});
+    const completed=completeBankSync(plan);
+    const result=storeTransactions(db,transactions,'enablebanking',null,bankAuthorize);
+    lease.write(()=>{bankAuthorize();db.prepare("UPDATE bank_connections SET encrypted_session=?,last_synced=?,status='connected',last_error='',retry_after=0 WHERE id=?").run(encryptObject(completed.session),completed.coverage.complete?new Date().toISOString():connection.last_synced,connection.id);
     audit(db,'bank_synced',{connection_id:connection.id,from,to,received:raw.length,imported:result.imported,duplicate:result.duplicate});
     });
     reconcileAndPrepare();
     lease.success();
-    return {...result,received:raw.length};
+    return {...result,received:raw.length,sync_coverage:completed.coverage};
   }catch(e){
     authorize();
     if(e.code==='connection_changed'||e.status===401&&!e.providerStatus)throw e;
-    const renewal=e.code==='renewal_required'||[401,404,410].includes(e.providerStatus);
-    const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
-    lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,e.status===429?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
+    const renewal=e.code==='renewal_required';
+    const cooldown=e.status===429||e.code==='bank_unavailable'&&e.status===503&&Number.isFinite(e.retryAfter)&&e.retryAfter>0;
+    const safeBankFailure=['invalid_date_range','transaction_period_unavailable','page_limit','transaction_limit','bank_timeout','incomplete_bank_response','bank_sync_window_limit','application_access_denied'].includes(e.code);
+    const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
+    lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,cooldown?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
     recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
-    lease.fail(message,e.status===429?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true);
+    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true);
     });
-    throw Object.assign(bad(renewal?409:e.status===429?429:502,message),{safe:true,retryAfter:e.retryAfter});
+    throw Object.assign(bad(renewal?409:cooldown||safeBankFailure?e.status:502,message),{safe:true,retryAfter:e.retryAfter,...(safeBankFailure?{code:e.code}:{})});
   }
   finally{if(!operationLocked)bankSyncing.delete(connection.id);}
 }
@@ -328,16 +348,13 @@ export async function runScheduledSync(){
   schedulerState.running=true;schedulerState.last_error='';
   const due=(key,last,minutes)=>integrationJobs.due(key,last?utcTimestamp(last):0,minutes*60000);
   try{
-    const mail=db.prepare("SELECT * FROM gmail_connections WHERE status NOT IN ('renewal_required') ORDER BY created_at DESC LIMIT 1").get();
+    const mail=db.prepare("SELECT * FROM gmail_connections WHERE status NOT IN ('renewal_required','access_denied','missing_scope','invalid_client','account_mismatch','invalid_tokens','blocked') ORDER BY created_at DESC LIMIT 1").get();
     if(mail&&gmailInterval&&isGmailConfigured()&&due('gmail',mail.last_synced,gmailInterval)){
       try{await syncGmail(null,{scheduled:true,interval:gmailInterval*60000});}catch{schedulerState.last_error='Gmail-hämtningen behöver kontrolleras';}
     }
     if(interval&&isConfigured())for(const connection of db.prepare("SELECT * FROM bank_connections WHERE status IN ('connected','error') AND owner<>'' AND selected_account_uid<>''").all()){
       if(!due('bank:'+connection.id,connection.last_synced,interval))continue;
-      const fromDate=connection.last_synced?new Date(utcTimestamp(connection.last_synced)-86400000):new Date(Date.parse(today()+'T12:00:00Z')-29*86400000);
-      // Clamp resumed jobs to the provider's supported maximum interval.
-      const from=new Date(Math.max(fromDate.getTime(),Date.now()-90*86400000)).toISOString().slice(0,10);
-      try{await syncBank(connection,{date_from:from,date_to:today(),scheduled:true,interval:interval*60000});}catch{schedulerState.last_error='Bankhämtningen behöver kontrolleras';}
+      try{await syncBank(connection,{scheduled:true,interval:interval*60000});}catch{schedulerState.last_error='Bankhämtningen behöver kontrolleras';}
     }
     reconcileAndPrepare();
     schedulerState.last_run=new Date().toISOString();
@@ -417,7 +434,7 @@ async function route(req,res){
     if(typeof b.password!=='string'||b.password.length>1024||!verifyPassword(b.password,check.adminHash)){
       throw bad(401,'Felaktigt lösenord');
     }
-    loginAttempts.delete(address);db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));
+    loginAttempts.delete(address);db.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
     const value=token();db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
     return json(res,200,{authenticated:true},{'Set-Cookie':sessionCookie(value,true)});
   }
@@ -611,11 +628,11 @@ async function route(req,res){
   // AIS only: reads account data, never creates, approves or executes payments.
   if(path==='/api/bank/status'&&req.method==='GET'){
     const activation=configStatus();
-    const connections=db.prepare('SELECT id,bank_name,accounts_json,valid_until,last_synced,status,selected_account_uid,last_error,retry_after FROM bank_connections WHERE owner=? ORDER BY created_at DESC').all(req.principal);
+    const connections=db.prepare('SELECT id,bank_name,accounts_json,encrypted_session,valid_until,last_synced,status,selected_account_uid,last_error,retry_after FROM bank_connections WHERE owner=? ORDER BY created_at DESC').all(req.principal);
     return json(res,200,{configured:activation.configured,activation,environment:activation.environment,connections:connections.map(x=>{
-      let accounts=[],status=!Number.isFinite(Date.parse(x.valid_until))||Date.parse(x.valid_until)<=Date.now()?'renewal_required':x.status;
-      try{accounts=decryptObject(x.accounts_json).map(a=>({uid:a.uid,name:a.name,currency:a.currency,account_hint:maskAccount(a.account_id?.iban||a.account_id?.other?.identification)}));}catch{status='error';}
-      return {...x,status,accounts,accounts_json:undefined};
+      let accounts=[],sync_coverage=null,status=!Number.isFinite(Date.parse(x.valid_until))||Date.parse(x.valid_until)<=Date.now()?'renewal_required':x.status;
+      try{const saved=decryptObject(x.accounts_json),selected=saved.find(a=>a.uid===x.selected_account_uid);accounts=saved.map(a=>({uid:a.uid,name:a.name,currency:a.currency,account_hint:maskAccount(a.account_id?.iban||a.account_id?.other?.identification)}));if(selected)sync_coverage=bankSyncCoverage(decryptObject(x.encrypted_session),stableAccountIdentity(selected,x.bank_name),x.last_synced);}catch{status='error';}
+      return {...x,status,accounts,sync_coverage,accounts_json:undefined,encrypted_session:undefined};
     })});
   }
   if(path==='/api/bank/connect'&&req.method==='POST'){
@@ -661,10 +678,10 @@ async function route(req,res){
         const old=ownedConnection(req,id);
         if(bankSyncing.has(old.id))throw bad(409,'Vänta tills bankhämtningen har avslutats och förnya sedan igen');
         bankSyncing.add(old.id);renewalLock=old.id;
-        const previous=decryptObject(old.encrypted_session).session_id;
+        const previousSession=decryptObject(old.encrypted_session),previous=previousSession.session_id;
         if(previous!==session.session_id)try{await bankingRequest('/sessions/'+encodeURIComponent(previous),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Det tidigare medgivandet kunde inte återkallas. Förnya anslutningen igen.');}
         bankLeases.get(old.id).write(()=>{assertSessionStillAuthorized(req);
-        db.prepare("UPDATE bank_connections SET encrypted_session=?,accounts_json=?,valid_until=?,selected_account_uid='',status='pending_account',last_error='',retry_after=0 WHERE id=? AND owner=?").run(encryptObject({session_id:session.session_id}),encryptObject(accounts),session.access.valid_until,id,req.principal);
+        db.prepare("UPDATE bank_connections SET encrypted_session=?,accounts_json=?,valid_until=?,selected_account_uid='',status='pending_account',last_error='',retry_after=0 WHERE id=? AND owner=?").run(encryptObject({...previousSession,session_id:session.session_id}),encryptObject(accounts),session.access.valid_until,id,req.principal);
         bankLeases.get(old.id).success();});
       }else{
         db.prepare("INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status) VALUES(?,?,?,?,?,?,?,'pending_account')").run(id,'enablebanking',record.bank_name,encryptObject({session_id:session.session_id}),encryptObject(accounts),session.access.valid_until,req.principal);
@@ -686,7 +703,7 @@ async function route(req,res){
     const account=decryptObject(connection.accounts_json).find(a=>a.uid===b.account_uid);
     if(!account)throw bad(400,'Välj ett godkänt företagskonto');
     stableAccountIdentity(account,connection.bank_name);
-    await verifyBankSession({...connection,selected_account_uid:account.uid});
+    await verifyBankSession({...connection,selected_account_uid:account.uid},bankLeases.get(connection.id).deadline);
     bankLeases.get(connection.id).write(()=>{assertSessionStillAuthorized(req);
     const changed=connection.selected_account_uid!==account.uid;
     db.prepare("UPDATE bank_connections SET selected_account_uid=?,last_synced=?,status='connected',last_error='' WHERE id=? AND owner=?").run(account.uid,changed?'':connection.last_synced,connection.id,req.principal);
@@ -697,8 +714,8 @@ async function route(req,res){
     }catch(e){
       assertSessionStillAuthorized(req);
       bankLeases.get(connection.id).write(()=>{
-      if(e.status===429)db.prepare('UPDATE bank_connections SET retry_after=?,last_error=? WHERE id=?').run(Date.now()+Math.max(60,e.retryAfter||60)*1000,'Bankens anropsgräns är nådd. Försök igen senare.',connection.id);
-      if(e.code==='renewal_required'||[401,404,410].includes(e.providerStatus))db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run('Bankanslutningen behöver förnyas – koppla igen',connection.id);
+      if(e.status===429||e.code==='bank_unavailable'&&e.status===503&&Number.isFinite(e.retryAfter)&&e.retryAfter>0)db.prepare('UPDATE bank_connections SET retry_after=?,last_error=? WHERE id=?').run(Date.now()+Math.max(60,e.retryAfter||60)*1000,'Bankhämtningen behöver vänta till nästa tillåtna försök.',connection.id);
+      if(e.code==='renewal_required')db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=?").run('Bankanslutningen behöver förnyas – koppla igen',connection.id);
       });
       throw e;
     }finally{bankSyncing.delete(connection.id);}
