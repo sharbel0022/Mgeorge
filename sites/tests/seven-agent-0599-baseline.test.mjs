@@ -90,26 +90,29 @@ function reportBytes({reference='0599',entryReference=depositId}={}){
 async function fixture(t,{withAlias=true}={}){
  const sqlite=new DatabaseSync(':memory:');
  for(const name of readdirSync(new URL('../drizzle/',import.meta.url)).filter(name=>name.endsWith('.sql')).sort())sqlite.exec(readFileSync(new URL('../drizzle/'+name,import.meta.url),'utf8'));
- const objects=new Map(),f={sqlite,objects,beforeBatch:null,user:{userId:owner}};
+ const objects=new Map(),f={sqlite,objects,beforeBatch:null,user:{userId:owner},effects:{d1Writes:0,r2Writes:0,fetchCalls:0}};
+ // The current candidate path uses plain SELECTs. Count other SQL as a write
+ // attempt, even when it changes no rows or its failure is caught by the route.
+ const statement=sql=>{if(!/^\s*SELECT\b/i.test(sql))f.effects.d1Writes++;return sqlite.prepare(sql);};
  const DB={prepare(sql){return {args:[],bind(...args){this.args=args;return this;},
-  async first(){return sqlite.prepare(sql).get(...this.args)||null;},
-  async all(){return {results:sqlite.prepare(sql).all(...this.args)};},
-  async run(){return this.execute();},execute(){return {success:true,meta:{changes:Number(sqlite.prepare(sql).run(...this.args).changes)}};}
+  async first(){return statement(sql).get(...this.args)||null;},
+  async all(){return {results:statement(sql).all(...this.args)};},
+  async run(){return this.execute();},execute(){return {success:true,meta:{changes:Number(statement(sql).run(...this.args).changes)}};}
  };},async batch(statements){
   if(f.beforeBatch)await f.beforeBatch();
   sqlite.exec('BEGIN');try{const result=statements.map(statement=>statement.execute());sqlite.exec('COMMIT');return result;}
   catch(error){sqlite.exec('ROLLBACK');throw error;}
  }};
- const BUCKET={async put(key,bytes){objects.set(key,new Uint8Array(bytes).slice());},
+ const BUCKET={async put(key,bytes){f.effects.r2Writes++;objects.set(key,new Uint8Array(bytes).slice());},
   async get(key){const bytes=objects.get(key);return bytes?{size:bytes.length,body:bytes.slice(),arrayBuffer:async()=>bytes.slice().buffer}:null;},
-  async delete(key){objects.delete(key);}
+  async delete(key){f.effects.r2Writes++;objects.delete(key);}
  };
  f.env={DB,BUCKET,BANK_DATA_ENCRYPTION_KEY:randomToken(),ENABLE_BANKING_APPLICATION_ID:'11111111-1111-4111-8111-111111111111',
   ENABLE_BANKING_PRIVATE_KEY:'-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDLU5PVC1BLVJFQUwtS0VZ\n-----END PRIVATE KEY-----',
   ENABLE_BANKING_ENVIRONMENT:'PRODUCTION',ENABLE_BANKING_KEY_ROTATED:'true'};
  globalThis.sevenAgentBaselineFixture=f;
  t.after(()=>{delete globalThis.sevenAgentBaselineFixture;sqlite.close();});
- t.mock.method(globalThis,'fetch',async()=>{throw Error('Network access is forbidden in the synthetic baseline test');});
+ t.mock.method(globalThis,'fetch',async()=>{f.effects.fetchCalls++;throw Error('Network access is forbidden in the synthetic baseline test');});
  const app=await store.application(owner),at='2026-10-26T12:00:00Z';
  const encryptedSession=await store.encrypt(owner,'session:'+connectionId,'synthetic-session');
  const encryptedAccounts=await store.encrypt(owner,'accounts:'+connectionId,[accountResource(withAlias)]);
@@ -154,11 +157,12 @@ function conserved(state){
  assert.deepEqual(state.invoices.map(invoice=>[invoice.number,balance(state,invoice)]),[['0599',62500],['599',62500]]);
 }
 async function candidatesWithoutWrites(f,payment){
- const before=f.read(),audit=f.audit(),snapshot=structuredClone(before.state);
+ const before=f.read(),audit=f.audit(),snapshot=structuredClone(before.state),effects={...f.effects};
  const response=await candidateApi.GET(),body=await response.json();assert.equal(response.status,200,body.error);
  const candidates=body.candidates[payment.id]||[],view=bankPaymentView(before.state,payment,candidates);
  const html=renderToStaticMarkup(React.createElement(BankPayments,{state:before.state,transactions:bankVisibleTransactions(before.state),candidates:body.candidates,open(){throw Error('A read cannot open a mutation');}}));
  assert.deepEqual(before.state,snapshot);assert.deepEqual(f.read(),before);assert.deepEqual(f.audit(),audit);conserved(f.read().state);
+ assert.deepEqual(f.effects,effects,'candidate lookup and UI must not attempt D1/R2 writes or network access');
  return {candidates,view,html};
 }
 
@@ -186,7 +190,9 @@ test('current baseline 0599: AIS deposit, retained report, exact candidate and p
  assert.equal(candidates[0].invoiceId,state.invoices.find(invoice=>invoice.number==='0599').id);
  assert.equal(view.payer,payer);assert.equal(view.reference.value,'0599');assert.equal(view.reference.kind,'invoice');assert.equal(view.reference.ocr,'');
  assert.equal(view.referenceLabel,'Fakturareferens');assert.deepEqual(view.possible,['0599']);assert.equal(view.invoiceVerified,false);assert.equal(view.verified,false);
- for(const layout of html.split('<div class="bank-mobile-list"')){
+ assert.match(html,/<div class="bank-desktop-list">/);assert.match(html,/<div class="bank-mobile-list"/);
+ const layouts=html.split('<div class="bank-mobile-list"');assert.equal(layouts.length,2);
+ for(const layout of layouts){
   assert.match(layout,/Synthetic bank payer AB/);assert.match(layout,/<strong class="mono">0599<\/strong>/);assert.match(layout,/Fakturareferens/);
   assert.match(layout,/Bank-OCR saknas\./);assert.match(layout,/Möjlig: 0599/);assert.doesNotMatch(layout,/is-verified|Synthetic invoice customer AB/);
  }

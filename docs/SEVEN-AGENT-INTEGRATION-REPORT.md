@@ -42,8 +42,8 @@ PR merge were verified. No force-push or branch replacement was used.
 
 ## Six new workstreams
 
-Initial and repeated GitHub inventories through **2026-11-02 21:48 UTC
-(22:48 Europe/Stockholm)** found no new implementation PRs. Only the source
+Initial and repeated GitHub inventories through **2026-11-02 22:04 UTC
+(23:04 Europe/Stockholm)** found no new implementation PRs. Only the source
 adapter branch below had appeared, still identical to starting main. These are
 observations of GitHub delivery, not claims about another conversation's activity.
 
@@ -55,7 +55,7 @@ observations of GitHub delivery, not claims about another conversation's activit
 | 4 | Exact safe invoice candidates and matching | Not yet delivered | None | Awaiting producer-consumer contract and regression evidence |
 | 5 | Durable automation and recovery | Not yet delivered | None | Awaiting extension of existing locks/jobs/receipts |
 | 6 | Black/white payment overview | Not yet delivered | None | Awaiting consumer changes and UI tests |
-| 7 | Integration lead | `codex/seven-agent-contracts-20261102`; `codex/seven-agent-integration-report-20261102` | Contract #22 as above; report/test PR pending | Contract merged; baseline acceptance/receipt work in progress |
+| 7 | Integration lead | `codex/seven-agent-contracts-20261102`; `codex/seven-agent-integration-report-20261102` | Contract #22 as above; [report/test PR #23](https://github.com/sharbel0022/Mgeorge/pull/23) | Contract merged; initial report/test CI passed; final guard follow-up requires fresh CI |
 
 The order is contracts → reference policy → AIS → authorized report source →
 matching → orchestration → UI, subject to the delivered dependency graph.
@@ -135,6 +135,15 @@ from the bank payer: exact candidate selection must not confer verified payer
 identity or mark either invoice paid. Both desktop and mobile SSR markup show
 the invoice-reference classification without claiming formal OCR.
 
+An independent reviewer approved the report and test, then approved a narrow
+follow-up addressing two minor test-guard findings. Candidate lookup plus SSR
+now assert zero attempted network calls, R2 mutations and non-SELECT D1
+executions, including no-op or swallowed failures. Both layout markers and two
+separate layout chunks are required. A fresh six-case run passed after the
+change. Four temporary mutation probes independently introduced a no-op D1
+write, R2 deletion, swallowed fetch and missing mobile marker; each failed its
+intended guard. The probes were removed and product code was not modified.
+
 The test composes existing services and caller-owned workspace CAS/audit SQL;
 it does not exercise state-route Gmail/customer-message orchestration. SSR is
 not browser, physical mobile or accessibility acceptance. Source-specific
@@ -156,7 +165,9 @@ All writes in tests use synthetic fixtures and isolated storage.
 | Local root audit | 0 vulnerabilities |
 | Local full Sites audit | 16 moderate, 0 high/critical; required high gate passed |
 | Local Sites production-only audit | 0 vulnerabilities; all 16 moderate findings are outside the production-only audit |
-| New joined baseline test | Fresh direct Node `node:test` invocation: 6 tests, 6 pass, 0 fail/skip/cancel/todo; full report-PR CI pending |
+| New joined baseline test | Fresh direct Node `node:test` invocation after guard hardening: 6 tests, 6 pass, 0 fail/skip/cancel/todo |
+| Initial report-PR CI | [41533411197](https://github.com/sharbel0022/Mgeorge/actions/runs/41533411197), head `6b54420c82e6e7aa6a00ad3949abe7af8b3ffa4c`: 1309 Node + 2337 Sites = 3646 passed; all six new names explicitly executed; completed success at `22:03:06Z` |
+| Final report-PR gate | Guard follow-up must pass a new exact-head full CI and resulting-main CI before acceptance; earlier head is not reused as that gate |
 | Local baseline suites | Not used as a pass claim: initial sandbox rejected local listen with EPERM; authorized duplicate runs were stopped after exact-head CI success under heavy shared-host load |
 | Contract diff validation | `git diff --check` passed; only two Markdown files changed |
 | Additional full lint | No new full-lint run; unchanged prior documented debt is 211 errors / 2527 warnings |
@@ -167,7 +178,8 @@ The named targeted command is `node --experimental-strip-types
 --test-concurrency=1 tests/seven-agent-0599-baseline.test.mjs` from `sites/`.
 A separate local `--test` invocation returned only a passing file-wrapper result;
 it is not counted as six named cases. The direct run prints all six names and
-assertions; exact Node 22 GitHub CI must independently verify full-suite discovery.
+assertions; initial Node 22 GitHub CI independently verified all six names and
+the full suite. The final frozen head must repeat this check.
 
 ## Existing Sites and read-only production evidence
 
@@ -182,7 +194,7 @@ assertions; exact Node 22 GitHub CI must independently verify full-suite discove
 | Source correspondence | Existing publication receipt tree `45761f430862a3ecbf31bbba2c2c116db7b210a0` equals starting and contract-main Sites subtree |
 | Access/configuration | Owner role confirmed, existing public shell and authentication retained; `DB`/`BUCKET` manifest unchanged; three existing bank/Gmail/backup schedules enabled |
 | Bank status | Connected, automation enabled, six-hour interval, no current error/block/failures; stored last success `2026-11-02T20:07:20.589Z` |
-| Gmail status | Connected/configured; last successful fetch `2026-11-02T21:05:32.232Z`; external schedule execution not established by status; cloud-worker heartbeat stale |
+| Gmail status | Connected/configured; last successful fetch `2026-11-02T22:01:14.851Z`; stored system-entrypoint outcome completed at `22:01:21.692Z`; external schedule execution not established by status; cloud-worker heartbeat remains stale |
 | Backup | Stored complete snapshot for Nov 2, 195/195 originals, 63,463,280 bytes, `manifest_pass` at `01:29:26.785Z`; 11 checked API receipts and 112 older records without receipt |
 | Real `0599` read | Reference-registry query complete with zero registered matches. Separate direct report and amount/date-selected AIS observation reads complete/current at revision 43: one non-economic report and one economic observation, both with zero booked allocations and automatic eligibility false. Selection by amount/date is not relationship proof. Current account and deposit proof remain blocking. |
 
@@ -191,6 +203,12 @@ complete financial census. No invoice registration, account-evidence fetch,
 bank/Gmail sync, reconciliation, original linking, allocation, customer message,
 bank payment or production data change is initiated by this integration.
 Existing independent schedules may change status while this run is active.
+Read-only checks repeated at `2026-11-02T22:04:22Z` found the same revision 43
+and identical report/AIS evidence projections after ignoring check timestamps.
+Both direct reads were complete/current with zero booked allocations and
+automatic eligibility false. Native Site version 57/deployment success and
+all three enabled schedules were independently rechecked at approximately
+`22:03:48Z`; bank status and the stored backup receipt were unchanged.
 
 The saved morning backup predates newer originals; it is not a new whole-system
 backup or production restore certification. Before a new runtime deployment,
@@ -264,8 +282,10 @@ no unsupported score increase is applied.
 
 ## Continuation and final receipt
 
-Contract-main CI is green and the six-case baseline regression passed locally.
-Pending at this checkpoint: independent review and exact full report-PR/main CI;
+Contract-main CI and the initial report-PR CI are green. Independent review
+approved the report/test and its guard follow-up; the six-case regression and
+four deliberate guard-failure probes were verified locally.
+Pending at this checkpoint: final frozen-head full report-PR/main CI;
 re-inventory actual agent PRs; freeze and test
 each delivered head; run the new source/policy chain after producer delivery;
 integrate serially with green main CI; publish only when relevant runtime code

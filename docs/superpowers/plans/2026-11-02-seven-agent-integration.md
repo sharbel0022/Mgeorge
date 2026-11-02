@@ -84,3 +84,12 @@ Ruling: Stop redundant unchanged local baseline suites after exact-head GitHub
 CI passed, under shared-host load. Initial sandbox EPERM and stopped authorized
 runs are not counted as passing local tests. Both local locked installs and
 high-audit gates passed; Sites retains 16 moderate development findings.
+
+PR23 initial head `6b54420c82e6e7aa6a00ad3949abe7af8b3ffa4c` passed full CI
+41533411197: 1309 Node + 2337 Sites = 3646, including all six new named cases.
+Independent reviewer approved the report/test, then the narrow guard follow-up.
+Ruling: Address two minor findings because the claimed read-only and two-layout
+coverage otherwise admitted concrete false positives. Fresh six-case pass and
+four expected-failure mutation probes verify those guards; probes were removed.
+The new frozen head still requires exact CI and resulting-main CI. New agent
+implementation PRs remain absent in the 22:04UTC inventory.
