@@ -35,12 +35,12 @@
 | 29 | Säkerhetskopiering | 7,5 | 7,5 | Verifierat privat Git-arkiv och syntetiska backup-/originalkontroller; manifestpass är historisk scan. |
 | 30 | Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Session återkontrolleras efter body/provider; parallella inloggningsförsök räknas korrekt. |
 | 31 | Katastrofåterställning | 5,5 | 5,5 | Främmande WAL/sidecars får inte påverka återställda bytes; syntetisk återställning verifierad. |
-| 32 | Kodkvalitet och tester | 8,5 | 8,5 | Reproducerade regressioner med RED/GREEN och oberoende delgranskning; slutgrindar kompletteras. |
-| 33 | Verifiering i verklig produktion | 6,5 | 6,5 | Ingen falsk full betalningsverifiering; aktuella bankbevis och inloggad UI begränsar poängen. |
+| 32 | Kodkvalitet och tester | 8,5 | 8,5 | RED/GREEN, oberoende slutreview READY;847Node/1426Sites, syntax99/TS/bygge och exakt CI41456514768 passerar. |
+| 33 | Verifiering i verklig produktion | 6,5 | 6,5 | Sites52 publicerad/ägarbundna original/registerkontroller passerar; ny konto-GET BANK_RATE_LIMIT och tidigare saknat alias; inloggad UI saknas. |
 
 Dokumentär startsumma och oförändrad slutbedömning: **255/330 = 7,73/10**, 0/33 områden når9,5. Detta är summering av tidigare explicita områdespoäng med senare överlagringar, inte en ny statistisk produktmätning. Äldre tryckta253,5/7,68 avser poäng före höjningarna för områden17–19. Numeriska poäng höjs inte för att uppfylla målet; nya regressionsbevis redovisas separat. Äldre backup-/restore-motiveringar nedan är historik och ersätts av den nya fel-/testredovisningen.
 
-[Aktuell samlad rapport](docs/FINAL-MAIN-CLEANUP-REPORT.md).
+[Aktuell samlad rapport](docs/FINAL-MAIN-CLEANUP-REPORT.md), [leveranskvitto](docs/FINAL-MAIN-CLEANUP-DELIVERY.json). Lokal rensning klar; fjärrradering avvisad av automatisk godkännandekontroll och väntar åtgärdsspecifik bekräftelse. Poängen höjs inte för en blockerad handling.
 
 ## Samlad betalningskedja — ny verifiering 2026-11-02
 

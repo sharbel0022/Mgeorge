@@ -1,0 +1,189 @@
+{
+  "schema": "mgeorge-final-main-cleanup-v1",
+  "date": "2026-11-02",
+  "status": "DELVIS LEVERERAD: fjarrbranchrensning blockerad av automatisk godkannandekontroll",
+  "code": {
+    "commit": "8516e1193c10a5f5be91cc967ff8da79e426e29c",
+    "tree": "24f32a5573157a68ab65fb6c7ec5b98bdf23dc5b",
+    "ciRun": 41456514768,
+    "ciUrl": "https://github.com/sharbel0022/Mgeorge/actions/runs/41456514768",
+    "node": {
+      "tests": 847,
+      "pass": 847,
+      "fail": 0,
+      "skipped": 0
+    },
+    "sites": {
+      "tests": 1426,
+      "pass": 1426,
+      "fail": 0,
+      "skipped": 0
+    },
+    "syntaxFiles": 99,
+    "typeScript": "passed",
+    "productionBuild": "passed",
+    "independentTaskAndFinalReviews": "ready"
+  },
+  "site": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 52,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_9903f391cb408191a2f6a45a96d9d5f8",
+    "sourceCommit": "f9b2497d60c1c87c9af56d32bd32c872b3665531",
+    "sourceTree": "0510298e0cd238185acd2a6054fb29ce3fd939d2",
+    "matchesMain": true,
+    "deploymentId": "appgdep_6ae895eef63081919d3e090bc1f77a4c",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "runtimeRevision": 9,
+    "policyAuthSchedulesUnchanged": true,
+    "runtimeEntriesUnchanged": true,
+    "databaseStructureUnchanged": true,
+    "schemaTables": 26,
+    "bindingsAndMigrationsUnchanged": true,
+    "rollbackVersion": 51,
+    "artifact": {
+      "files": 347,
+      "sha256": "004212035f2304a7eda5e0cde3309fc787c1e13210adc5ba812e200ff92a7f52",
+      "freshOutput": true,
+      "copyHashParity": true,
+      "qaReferences": 0
+    }
+  },
+  "audit": {
+    "root": 0,
+    "sitesProduction": 0,
+    "sitesAll": {
+      "moderate": 16,
+      "high": 0,
+      "critical": 0
+    },
+    "lockfilesChanged": false
+  },
+  "archive": {
+    "private": true,
+    "completeHistory": true,
+    "bundleVerified": true,
+    "isolatedMirrorRestoreVerified": true,
+    "strictFsckPassed": true,
+    "exactRefsAndTreesVerified": 11,
+    "includesOriginalReviewedStabilizationCommits": true,
+    "includesUntrackedOriginalsOrSecrets": false,
+    "persisted": true
+  },
+  "branches": {
+    "localRemaining": [
+      "main"
+    ],
+    "localDeleted": [
+      "codex/real-payment-final",
+      "codex/final-main-cleanup"
+    ],
+    "remoteDeleted": [],
+    "remoteRemaining": [
+      {
+        "name": "codex/bank-evidence-production-safety",
+        "sha": "2d4530395742530353409f002fb254d75d149fa0",
+        "protected": false
+      },
+      {
+        "name": "codex/mgeorge-24h-autopilot-20261028",
+        "sha": "0f90a71522aaf0d00bad7d4d24e1298de31ef0bc",
+        "protected": false
+      },
+      {
+        "name": "codex/mgeorge-v3-cloud-ocr",
+        "sha": "1def87e60cd3a386485cb199f4206daa8bdec8f3",
+        "protected": false
+      },
+      {
+        "name": "codex/mgeorge-v4-bank-verification",
+        "sha": "d2537de46fcbea98bc6869205d1493976fc1f190",
+        "protected": false
+      },
+      {
+        "name": "fix/bank-list-clear-payer-and-unverified-reference",
+        "sha": "f8edfebc91eb2ec93dbd3b1c477bfd4a5889ceb6",
+        "protected": false
+      },
+      {
+        "name": "main",
+        "sha": "8516e1193c10a5f5be91cc967ff8da79e426e29c",
+        "protected": false
+      }
+    ],
+    "openDraftPullRequestsPreserved": [
+      9,
+      10
+    ],
+    "remoteBlocker": "Automatic approval review rejected the concrete browser deletion of codex/bank-evidence-production-safety, requiring action-time confirmation despite general mandate and verified archive. No retry, indirect execution or bypass.",
+    "mainForcePushed": false,
+    "workflowHistoryOrReleasesDeleted": false
+  },
+  "production": {
+    "checkedAt": "2026-11-02T13:56:04.321Z",
+    "revisionBefore": 41,
+    "revisionAfter": 41,
+    "selectedFinancialFieldsUnchanged": true,
+    "comparisonScope": "Selected dates, amounts, currencies, bank references, payer/reference observations, booked invoices/allocation counters and economic membership; no full-workspace economic export.",
+    "registry": {
+      "complete": true,
+      "matchCount": 0
+    },
+    "aisOriginalAndReceipt": "passed",
+    "exactAisReadComplete": true,
+    "reportIntegrity": "passed",
+    "reportReadComplete": true,
+    "originalsEqual": {
+      "invoice": true,
+      "report": true
+    },
+    "account": {
+      "status": "error",
+      "errorCode": "BANK_RATE_LIMIT",
+      "stage": "account_details",
+      "resourcesRead": 0,
+      "resourcesAttempted": 1,
+      "resourcesTotal": 2,
+      "complete": false,
+      "automaticRetryAttempted": false,
+      "priorCompletedRead": {
+        "resourcesRead": 2,
+        "complete": true,
+        "status": "missing",
+        "accountMatch": false
+      }
+    },
+    "selectedEconomicRecords": 1,
+    "selectedReportOnlyObservations": 1,
+    "bookedAllocations": 0,
+    "automaticEligible": false,
+    "businessWritesExecuted": false
+  },
+  "backup": {
+    "day": "2026-11-02",
+    "scope": "manifest_pass",
+    "files": 195,
+    "verifiedFiles": 195,
+    "fullProductionRestoreExecuted": false,
+    "historicalManifestScanNotAtomicCurrentAvailability": true
+  },
+  "quality": {
+    "areas": 33,
+    "documentaryBeforeTotal": 255,
+    "documentaryAfterTotal": 255,
+    "maximum": 330,
+    "meanBefore": 7.7272727272727275,
+    "meanAfter": 7.7272727272727275,
+    "areasAtLeast9_5": 0,
+    "newNumericUpliftClaimed": false,
+    "universalOcr100PercentClaimed": false
+  },
+  "limits": [
+    "Remote branch deletion awaits explicit action-time confirmation required by automatic approval review",
+    "Bank-issued recipient-account relation, same-deposit identity and currency/date evidence missing",
+    "Current account details additionally blocked by BANK_RATE_LIMIT; previous complete read found no matching alias",
+    "Authenticated owner browser/mobile QA not completed because no active browser session and unavailable preview infrastructure",
+    "16 moderate development dependency findings remain without a verified compatible complete fix",
+    "Manifest backup verification is historical, not an atomic guarantee or full production recovery exercise"
+  ]
+}

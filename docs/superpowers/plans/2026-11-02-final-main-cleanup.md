@@ -39,3 +39,7 @@
 ## Execution evidence
 
 Start evidence: exact main a4f09b8 CI success775Node/1381Sites from the preceding same-session delivery, unchanged dependencies/environment. Three independent inventory audits confirmed concrete new defects; all remote branches report protected=false and recent100 Actions runs contain no active run. Git write dry-run fails missing password; branch deletion capability must be resolved without credential extraction or bypass.
+
+## Utfört och kvarvarande
+
+Tasks1–5 passerar: rättningar/granskning,847Node/1426Sites/syntax99/TS/bygge, main8516e11 med exakt CI41456514768 success, Sites52 succeeded med identiskt källträd/runtime9 och läsande efterkontroll. Task6: lokala utvecklingsbrancher rensade; privat Git-arkiv med11 återställda refs bevarat. Automatisk godkännandekontroll avvisade konkret fjärrradering och kräver åtgärdsspecifik bekräftelse; fem fjärrbrancher ochPR9/10 lämnades orörda. Task7: [slutrapport](../../FINAL-MAIN-CLEANUP-REPORT.md) och [kvitto](../../FINAL-MAIN-CLEANUP-DELIVERY.json). Ny bankkonto-GET stoppad avBANK_RATE_LIMIT; ingen retry/kringväg eller riktig ekonomisk mutation.
