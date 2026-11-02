@@ -94,3 +94,46 @@ main{padding:28px 30px 0;max-width:1760px}h1{font-size:34px;line-height:1.18;fon
  .invoice-table tr{padding:17px 14px;gap:14px}.table-toolbar .table-tools,.table-toolbar .search-field{min-width:0;max-width:100%}.table-tools .search-field input{min-width:0;width:100%}
  .table-footer{gap:12px;flex-wrap:wrap}.workspace-search-results{left:0;min-width:0;width:calc(100vw - 32px)}
 }
+
+/* Payment evidence: visual grouping never creates another economic payment. */
+.bank-invoice-number{font-size:15px;font-weight:700;letter-spacing:.02em;color:#171717}
+.bank-reference-pair{display:grid;gap:14px;min-width:0;overflow-wrap:anywhere}
+.bank-intended-reference{display:grid;gap:4px}.bank-intended-reference .mono{font-size:14px;font-weight:650;color:#222}
+.bank-reference-label,.bank-reference-note,.bank-field-source{font-size:11px;line-height:1.5;color:#555}
+.bank-reference-note,.bank-field-source{display:block}.bank-reference-label{font-weight:500}
+.bank-status-copy{display:grid;gap:7px}.bank-status-copy>small,.bank-next-check{font-size:11px;line-height:1.6;color:#555}
+.bank-status{font-size:11px}.bank-status.is-blocked{border:1px solid #333;background:#f3f3f3;color:#171717}.bank-status.is-blocked:before{border-radius:1px;background:#222;width:6px;height:6px}
+.bank-status.is-review{border-style:dashed;color:#333}.bank-status.is-verified:before{background:#222}
+.bank-observation-note{margin:-9px 0 22px;font-size:12px;line-height:1.6;color:#555}
+.bank-observation-group{background:#f7f7f7}.bank-observation-group>tr>th,.bank-observation-group>h3{padding:15px 20px!important;text-align:left;font-size:12px;color:#333;background:#ededed;width:auto!important}
+.bank-evidence-amount-label{display:block;font-size:10px;line-height:1.5;font-weight:400;color:#555;margin-bottom:5px}
+.bank-report-availability{border:1px solid var(--line);border-radius:9px;background:#fff;padding:20px;margin-bottom:20px}
+.bank-report-availability h2{font-size:15px;margin:0 0 16px}.bank-report-availability dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin:0}
+.bank-report-availability dt{font-size:11px;line-height:1.5;color:#666}.bank-report-availability dd{font-size:12px;line-height:1.6;font-weight:600;margin:6px 0 0;overflow-wrap:anywhere}
+.bank-report-availability p{font-size:12px;line-height:1.7;color:#555;margin:16px 0 0}.bank-summary>div>small{display:block;font-size:10px;line-height:1.5;color:#666;margin-top:8px}
+.bank-detail-references{border-block:1px solid var(--line);padding:20px 0;margin:18px 0}.bank-detail-references .bank-reference-pair{grid-template-columns:1fr 1fr;gap:24px}.bank-detail-references .mono{font-size:17px}
+.bank-payments-table th:first-child,.bank-payments-table td:first-child{width:21%}.bank-payments-table th:nth-child(2){width:12%}.bank-payments-table th:nth-child(3){width:23%}.bank-payments-table th:nth-child(4){width:13%}.bank-payments-table th:nth-child(5){width:11%}.bank-payments-table th:nth-child(6){width:20%}
+.bank-payments-table th,.bank-payments-table td{vertical-align:top}.bank-payments-table .bank-amount{font-size:12px}
+.bank-open-payment{min-height:44px}.bank-open-payment strong{font-size:14px}.bank-open-payment small{font-size:11px;color:#555;line-height:1.5}
+.bank-open-payment:focus-visible,.bank-payment-card:focus-visible,.bank-report-availability summary:focus-visible{outline:2px solid #171717;outline-offset:4px}
+.payment-verification-summary{border:1px solid #aaa;border-radius:8px;padding:16px;margin:14px 0;background:#fafafa;color:#222}
+.payment-verification-summary.is-blocked{border-left:4px solid #222}.payment-verification-summary.is-review{border-style:dashed}
+.payment-verification-overall{display:flex;flex-wrap:wrap;gap:10px;font-size:14px;line-height:1.6;margin:0 0 10px}.payment-verification-next{font-size:13px;line-height:1.7;overflow-wrap:anywhere}.payment-verification-next p{margin:8px 0}
+.payment-verification .btn,.review-next-step .btn{max-width:100%;min-width:0;white-space:normal;line-height:1.5;overflow-wrap:anywhere}
+@media(max-width:1100px){
+ .bank-desktop-list{display:none}.bank-mobile-list{display:grid;padding:0 18px}
+ .bank-payment-card{display:block;text-align:left;min-width:0;width:100%;padding:20px 0;border-bottom:1px solid #ddd}
+ .bank-card-heading{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}.bank-card-heading>strong:first-child{font-size:15px;line-height:1.5;min-width:0;overflow-wrap:anywhere}.bank-card-heading>strong:last-child{font-size:14px;white-space:nowrap}
+ .bank-card-reference{display:block;font-size:12px;color:#555;margin:14px 0;overflow-wrap:anywhere}.bank-card-reference small{display:block;margin-top:4px}
+ .bank-card-reference>.bank-reference-pair{grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}
+ .bank-payment-footer{display:grid;grid-template-columns:100px 1fr;align-items:start;gap:16px}.bank-payment-footer time{font-size:12px;color:#555}
+ .bank-payment-card>small{display:block;font-size:11px;line-height:1.5;margin-top:7px;color:#555}
+ .bank-observation-group{margin-inline:-18px;padding-inline:18px}.bank-observation-group>h3{margin:0 -18px 0}
+ .bank-report-availability dl{grid-template-columns:1fr 1fr}.bank-status-copy{justify-items:start}
+}
+@media(max-width:480px){
+ .bank-report-availability{padding:16px}.bank-report-availability dl{grid-template-columns:1fr;gap:14px}
+ .bank-card-reference>.bank-reference-pair,.bank-detail-references .bank-reference-pair{grid-template-columns:1fr;gap:14px}
+ .bank-payment-footer{grid-template-columns:1fr;gap:10px}.bank-card-heading>strong:first-child{font-size:14px}
+ .bank-observation-note{font-size:11px}.bank-reference-label,.bank-reference-note,.bank-field-source{font-size:11px}
+}

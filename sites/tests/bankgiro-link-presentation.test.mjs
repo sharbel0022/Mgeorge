@@ -61,8 +61,8 @@ test('a stale source relation stays visible for revocation without hiding the re
  const html=renderToStaticMarkup(React.createElement(detail.default,{state:next,transaction:next.transactions[0],busy:false,error:'',save(){throw Error('No writes on render');}}));
  assert.match(html,/Underlagskopplingen behöver granskas/);assert.match(html,/Återta underlagskoppling/);
 });
-test('a metadata relation preserves a justified paid status and verified payment count',()=>{
+test('a manual metadata relation preserves the historical booking while its display remains review',()=>{
  const {state}=fixture();state.transactions[0]=syntheticBankTransaction({id:'ais',amount:62500,date:'2026-10-26',account:state.transactions[0].account,bankReference:'SYNTHETIC-PAID',party:'Syntetiska Bistro AB',payerReference:'0599',kind:'payment',verified:true});state.invoices[0].party='Syntetiska Bistro AB';state.allocations.push({id:'allocation',invoiceId:'invoice',transactionId:'ais',amount:62500,effect:'payment',active:true,note:'Previously checked',createdAt:''});
  const before=view.bankPaymentView(state,state.transactions[0]),next=applyCommand(state,{type:'bankgiro.link',transactionId:'ais',specificationId:'spec',note:'Separate original review',confirmOriginals:true,confirmAccount:true}).state,after=view.bankPaymentView(next,next.transactions[0]);
- assert.equal(before.status,'Verifierad');assert.equal(after.status,before.status);assert.equal(after.verified,true);assert.equal(view.bankPaymentCounts(next).verified,1);
+ assert.equal(before.status,'Verifierad');assert.equal(after.status,before.status);assert.equal(after.verified,true);assert.equal(after.decision.code,'REVIEW');assert.equal(view.bankPaymentCounts(next).verified,0);assert.equal(view.bankPaymentCounts(next).review,1);
 });

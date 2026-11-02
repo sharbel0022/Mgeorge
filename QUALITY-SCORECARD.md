@@ -1,5 +1,11 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 6 — avgränsade frontendbevis, 2026-11-02
+
+Poäng före och efter: **255/330 = 7,73/10; 0/33 ≥9,5**. [Agent 6:s rapport](docs/integration/agent-6-payment-ui.md) och [browseracceptans](docs/integration/agent-6-browser/README.md) kompletterar evidensen för design, mobil, tangentbord/fokus, sökning/filter, banköversikt, fakturareferenser, individuella betalare och granskningsstatus.
+
+Fryst lokal kod passerar **1309/1309 Node + 2411/2411 Sites** samt **19/19 Chromiumfall** med fem faktiska bredder och hashbundna produktresurser. Syntaxkontroll av 121 filer, TypeScript, exakt minimatch-mitigering och high-auditgrindar är gröna. Separat produktionsbygge godkänt på samma frysta kod. Exakt leverans-SHA och Node 22-CI redovisas i PR:ns leveranskvitto. Inga verkliga bankfakta, fullständig rapportbehörighetskedja, fysisk mobil, skärmläsarprov eller ny inloggad produktionsacceptans påstås. 16 befintliga moderate utvecklingsfynd och tidigare lintskuld kvarstår. Inga numeriska områdespoäng ändras; Agent 6 publicerar inte Sites.
+
 ## Ny sjuagentsintegration — kontrakt och syntetisk kedja, 2026-11-02
 
 [Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar mergade kontrakts-PR #22 och regressions-/rapport-PR #23. Exakt slutlig #23-head-CI 41534249801 passerar **1 309 Node + 2 337 Sites = 3 646 tester**, inklusive alla sex nya namngivna 0599-fall, utan fel eller överhoppade/avbrutna tester. Integrationsmain före slutkvittot är `12c9868606a0a45b31b722ddee8f897541687e64`; separat main-CI finns i rapporten. De sex nya implementationerna, inklusive företagspolicy och BankgiroReportSource, väntar fortfarande på PR-leverans. Kontrakt och tester bevisar inte bankens verkliga behörighet, konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Alla före/eftervärden och aktuella test-/produktionsgränser dokumenteras. Äldre tabeller nedan behålls som detaljerad evidens/historik.

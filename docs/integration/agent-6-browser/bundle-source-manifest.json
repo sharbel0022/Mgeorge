@@ -1,0 +1,233 @@
+{
+  "builtAt": "2026-11-02T22:38:21.106Z",
+  "sourceStableDuringBuild": true,
+  "harness": "Actual Sites Dashboard and imported product components, real React, actual Tailwind/PostCSS and bank connection CSS. Only the entry HTML and API fixtures are synthetic.",
+  "inputs": [
+    {
+      "path": "sites/lib/uuid.js",
+      "sha256": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4"
+    },
+    {
+      "path": "sites/lib/workspace-location.ts",
+      "sha256": "98ae3f322ca7f7c6ec114a40fb309a17c88ba2473853d49ced8f6a8bc407bb13"
+    },
+    {
+      "path": "sites/components/workspace-navigation.tsx",
+      "sha256": "df74aa67388aab54c60a4a88e433dde37e717b15a4485e859ca7c6a7acaa0698"
+    },
+    {
+      "path": "sites/lib/workspace-drafts.ts",
+      "sha256": "40d6d68fe42e72efc7f8f439e730d97565f127b9b9e365cee2e5d4530f4f8fb9"
+    },
+    {
+      "path": "sites/components/use-workspace-navigation.ts",
+      "sha256": "1439f561ea5898e2b32d91a1244f10cd0174f7cd28d5527e6f8fa2c6168079e7"
+    },
+    {
+      "path": "sites/lib/payment-references.js",
+      "sha256": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c"
+    },
+    {
+      "path": "sites/lib/reference-evidence-compat.js",
+      "sha256": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba"
+    },
+    {
+      "path": "sites/lib/payer-evidence.js",
+      "sha256": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661"
+    },
+    {
+      "path": "sites/lib/bank-api-original.js",
+      "sha256": "73a129b1e85445ed68c9107f7be25c0bdc6130d95ee3278b3d889c0671aea49f"
+    },
+    {
+      "path": "sites/lib/reconciliation-engine.js",
+      "sha256": "d1bd479c5453e49d18bdaa6e9f84de817f5edc76976608d2b8aa55d477416148"
+    },
+    {
+      "path": "sites/lib/bankgiro-deposit-identity.js",
+      "sha256": "46e1135ba45750e5c06f7c6a2e662ec462dc839218a2d5d707adafc95bec7ac4"
+    },
+    {
+      "path": "sites/lib/domain.ts",
+      "sha256": "13622a5194152b205caa472008a7b8f84ca893c3ad2700d8c5651330f3015bf2"
+    },
+    {
+      "path": "sites/lib/economy-summary.js",
+      "sha256": "14c5234877d71c005eb4e26396f92902af327759395a9efd7c501fcb67e6f074"
+    },
+    {
+      "path": "sites/components/payment-control.tsx",
+      "sha256": "cbf9f9d8e770dc7ea7c646d519dc33c8ba18b0ebb2da8d178aa8caa9a9f07155"
+    },
+    {
+      "path": "sites/components/economy-overview.tsx",
+      "sha256": "99763a7d14ea43b3ca30a3b98b5b4e5ae0d83b33dc0c656702a954c247c3f6ee"
+    },
+    {
+      "path": "sites/components/bankgiro-link-review.tsx",
+      "sha256": "b8f771f9174ca9a5090a31dfc5c5f6e5396f2229a69ed771c833dd187074f036"
+    },
+    {
+      "path": "sites/lib/payment-presentation.ts",
+      "sha256": "0772437eb17c8b8dbfeeac37cccdbd11362916c859d66eee841c8fb7ff29a9f6"
+    },
+    {
+      "path": "sites/components/list-pagination.tsx",
+      "sha256": "33638964bb6e47bc3b8a93f7fb0509482cfeef129cb2dd47bf48cc937a453b8e"
+    },
+    {
+      "path": "sites/components/bank-payments.tsx",
+      "sha256": "fff57c24aa24851b0e6186c04c6d56e3f4d3360824f59d331247b0ba5e850197"
+    },
+    {
+      "path": "sites/components/payment-history.tsx",
+      "sha256": "92137592477ddb61dd002762a10abdf7056d72565ca7efddd304ef7b5c4899d2"
+    },
+    {
+      "path": "sites/lib/account-evidence-presentation.ts",
+      "sha256": "6d5ac960a070f1724641b9ea8ad463acaeba548f5a808a895f34555f070ea924"
+    },
+    {
+      "path": "sites/components/use-payment-verification.ts",
+      "sha256": "f2cd616ca00ab4ca3774c2f9bc49749d553a23162b5b75b3b24d4be1715fe29d"
+    },
+    {
+      "path": "sites/components/payment-verification.tsx",
+      "sha256": "eae3522dcb5cf66ef86e91d7306ea4a9906786cb6b44f5bfabbf87f11a025836"
+    },
+    {
+      "path": "sites/components/document-ocr-status.tsx",
+      "sha256": "619f42ed46602680096c54c87bc733375ecd98d56d2b32e0178f7ff2aba2085e"
+    },
+    {
+      "path": "sites/components/gmail-summary.tsx",
+      "sha256": "a5363c97a3c179ded9b0153912dae13db9164bf03a457eea8dbc5c0ca44a436c"
+    },
+    {
+      "path": "sites/lib/reconciliation.ts",
+      "sha256": "15f7e5d233750eedb3dead66705830ed5c5fc699e8fe8c9e2b085a3ec81a917e"
+    },
+    {
+      "path": "sites/lib/pdf-text.js",
+      "sha256": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4"
+    },
+    {
+      "path": "sites/lib/local-ocr.ts",
+      "sha256": "72a82ead1f97ac22835fd7a6af370abe5c15f638079c3cd6277bf9c36060ce7e"
+    },
+    {
+      "path": "sites/components/invoice-evidence.tsx",
+      "sha256": "f4002ec4dc1377c09b981df37219030fbf8d7e478ecb2b5734df15214edd7f90"
+    },
+    {
+      "path": "sites/components/customer-messages.tsx",
+      "sha256": "f80504495afaa29a7f52f7c8c3fe79c087d8a800f7080c5b6b2416209460ef03"
+    },
+    {
+      "path": "sites/lib/document-triage.js",
+      "sha256": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb"
+    },
+    {
+      "path": "sites/lib/camt-xml.js",
+      "sha256": "a517eb363c4029a3bb9cb5870da32dfd3b32c2de722dfcb921ed81407342889e"
+    },
+    {
+      "path": "sites/lib/camt-payer.js",
+      "sha256": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827"
+    },
+    {
+      "path": "sites/lib/bankgiro-xlsx.js",
+      "sha256": "cca184605ad533867daa1f5486e27071c3c5551894e05feb161e313d2320c384"
+    },
+    {
+      "path": "sites/lib/bankgiro-parser.js",
+      "sha256": "fd5d1e07f2b89d906760b4b15849dc6e29dcd33573f74dc5af2d188aea79f0fd"
+    },
+    {
+      "path": "sites/lib/invoice-details.js",
+      "sha256": "a9812e6387778804e0f1c2a824a53067b324308112c29c02ce98bdf9540a103b"
+    },
+    {
+      "path": "sites/lib/invoice-fields.js",
+      "sha256": "696e3dad84c9616e8f4dc3edb86d8fec42136297cdc150901980848cca920938"
+    },
+    {
+      "path": "sites/lib/imports.ts",
+      "sha256": "9b32e3bfb36d6d68b557dc95e48faa8440bd430baab15efe840d07264bc53c62"
+    },
+    {
+      "path": "sites/components/sync-recovery-notice.tsx",
+      "sha256": "38a028d3b6021997ae67c607c69a4fb8cf6f0d331ffd98fee83a46a511175ed4"
+    },
+    {
+      "path": "sites/components/gmail-workspace.tsx",
+      "sha256": "a7a55d1530aa8936f9ea1d859392bd94172a80eac5b845f60673607e862857d1"
+    },
+    {
+      "path": "sites/lib/banking/status-view.ts",
+      "sha256": "4d5e5028e3c06422c540c46130ca3cdb2aa722163da5978d37218854e766465c"
+    },
+    {
+      "path": "sites/components/use-bank-refresh.ts",
+      "sha256": "bf1becc2b2888f854a5865a5b1b81e136a4f9e77a8eefe4034eff01f9ceccdf1"
+    },
+    {
+      "path": "sites/components/bank-connection.tsx",
+      "sha256": "ce3e9f4aab87e9670eadb027c7e52c958c32df0d3d398569af2419777327a371"
+    },
+    {
+      "path": "sites/lib/payment-overview.ts",
+      "sha256": "1026c0f0c20eeacd96228f18e21dc0609556c64ecb9c2b6df7e0d69eb6780d54"
+    },
+    {
+      "path": "sites/app/dashboard.tsx",
+      "sha256": "e757253fa1ab4d942a4e12369e72c500b504445b9d4263a2cbd8cce3ca36aa31"
+    },
+    {
+      "path": "sites/app/globals.css",
+      "sha256": "424cc6f6319fd0e96af8bcbb390fd07e99de200376d7defa7490cf12cd5600d1"
+    },
+    {
+      "path": "sites/styles/bank-connection.css",
+      "sha256": "06bbf0d4530ffb52fa130d9a1e0fc144ea077c918b55bc68f0769b2bb02e8570"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "app.js",
+      "sha256": "33b21923bd7210968069e7a4799df6dd4c67f9d10d233e3ff3fb42dbb1e9d71b"
+    },
+    {
+      "path": "chunks/src-P7D7Y64M.js",
+      "sha256": "a10f770f7d9d5ae9f3a6f211eb77410cac87ef7bfd0dd6143892935ebd039268"
+    },
+    {
+      "path": "chunks/pdf-5WF4MGGV.js",
+      "sha256": "a9edad3a9813fadd7952f9ebd1def2c6edc625bf032b786724e725cceb0edf4b"
+    },
+    {
+      "path": "chunks/local-ocr-5GXYXAMU.js",
+      "sha256": "e4b9b5dbc7b86773e7bd68eb31d130a08bb192a0d967d0971f804436fa5c7e39"
+    },
+    {
+      "path": "chunks/chunk-TM6LYNJI.js",
+      "sha256": "0584001ab1716a3e0a65fcb2780fe6b6976c2420fcbc09a680eaeddc7ef18dbc"
+    },
+    {
+      "path": "chunks/postal-mime-JGMYUF73.js",
+      "sha256": "9b465afa3b294163e1c1587bf687abcbfcd9ba112c5bff2cf878240954c33268"
+    },
+    {
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "sha256": "47e42dfbd47bb8e6ba9db884451b27f9a92888d367efe5e571c5f48e84e41c0b"
+    },
+    {
+      "path": "app.css",
+      "sha256": "836ef98df38082a11f49a5c91bb0ba99626ee413a255d9574142423c86e9c065"
+    },
+    {
+      "path": "index.html",
+      "sha256": "1f60bbec2e5ea7ea1582217a5298c4740ddb46363e489fbd4c5f2c88218c367a"
+    }
+  ]
+}

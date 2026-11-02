@@ -1,8 +1,12 @@
-import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,type State,type Transaction} from './domain';
+import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,economicTransactions,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentAccountIssue,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,type Invoice,type State,type Transaction} from './domain';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 
 type Candidate={number:string;party?:string;identifiers?:{field:string;value:string}[];referenceFields?:{field:string;value:string}[]};
+/** Preserve the declared invoice reference. Company-derived intentions belong
+ * to Agent 1's reviewed projection; the UI must not activate a global policy. */
+export const invoiceIntendedReference=(invoice:Pick<Invoice,'direction'|'number'|'ocr'>)=>invoice.ocr||'';
+type PaymentDisplayDecision={code:'VERIFIED'|'REVIEW'|'BLOCKED';label:string;reason:string;next:string};
 const hasBankSource=(t:Transaction)=>['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'')&&!needsBankFileValidation(t);
 const cleanParty=(value?:string)=>{
   const name=String(value||'').trim();
@@ -81,12 +85,12 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   const references=matchingReferenceValues(evidence,fieldSources.reference.value.value);
   const owners=new Set(state.invoices.filter(i=>!i.voided&&references.some(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual)))).map(i=>i.id));
   const contradictory=references.length>1&&!state.invoices.some(i=>references.every(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual))));
-  const bankConflict=paymentEvidenceConflict(state,t),conflict=bankConflict||!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
+  const bankConflict=paymentEvidenceConflict(state,t),originalIssue=paymentOriginalIssue(state,t),conflict=bankConflict||!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
   let status='Behöver granskas',verified=false;
   if(t.ignored)status='Undantagen';
   else if(t.duplicateOf)status='Möjlig dubblett';
   else if(bankConflict)status='Motstridigt bankunderlag';
-  else if(paymentOriginalIssue(state,t))status='Original behöver verifieras';
+  else if(originalIssue)status='Original behöver verifieras';
   else if(needsBankFileValidation(t))status='Original behöver verifieras';
   else if(assessment.status==='review')status='Behöver granskas';
   else if(assessment.allocationConflict)status='Referenskonflikt';
@@ -100,7 +104,30 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   }else if(possible.length)status='Möjlig matchning';
   const sources=sourceLink?'Swedbank + Bankgiro '+(sourceLink.rows.some(row=>/xlsx|excel/i.test(row.format||row.source||''))?'Excel':'specifikation'):'';
   const candidateNote=!sourceLink&&bankgiroLinkCandidates(state,t).length?'Möjlig tillhörande Bankgirospecifikation – kontrollera.':'';
-  return {...evidenceView,payer:fieldSources.payer.value||(t.amount<0?'Mottagare okänd':'Betalare okänd'),payerKnown:!!fieldSources.payer.value,reference:fieldSources.reference.value,referenceLabel:referenceLabel(fieldSources.reference.value.kind),fieldSources,sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!assessment.allocationConflict&&assessment.status!=='ambiguous'&&assessment.status!=='review'&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
+  const intendedInvoices=assessment.bookedInvoices.length?assessment.bookedInvoices:assessment.registered.length===1?assessment.registered:[];
+  const intendedReferences=[...new Map(intendedInvoices.map(invoice=>[invoice.id,{number:invoice.number,value:invoiceIntendedReference(invoice),proposal:!assessment.bookedIds.includes(invoice.id),source:invoice.ocr?'Fakturans uttryckliga referens':'Ingen uttrycklig referens',conflict:!!invoice.ocr&&!!selectedReference&&!exactReference(invoice.ocr,selectedReference)}])).values()];
+  const accountIssue=paymentAccountIssue(state,t)||t.bankgiroAccountIssue||(!t.account?.trim()?'Mottagarkontot saknas i bankunderlaget.':'');
+  // These labels describe the saved presentation. The existing original-check
+  // endpoint remains authoritative for a fresh read; no allocation is changed.
+  const decision:PaymentDisplayDecision={code:'REVIEW',label:'Behöver granskas',reason:status,next:assessment.invoice?'Granska fakturaoriginalet och kundrelationen före ett separat godkännande.':'Identifiera och granska rätt faktura och dess original.'};
+  const block=(reason:string,next:string)=>Object.assign(decision,{code:'BLOCKED',label:'Blockerad',reason,next});
+  if(t.ignored)block('Posten är undantagen.','Granska undantaget innan posten används för en betalning.');
+  else if(t.duplicateOf)block('Posten kan vara en dubblett.','Kontrollera bankens identitet och original mot den tidigare posten.');
+  else if(bankConflict)block('Bankunderlagen är motstridiga.','Jämför de motstridiga originalen innan avstämning.');
+  else if(originalIssue||needsBankFileValidation(t))block(originalIssue||'Bankoriginalet behöver verifieras.','Kontrollera det bevarade bankoriginalets integritet.');
+  else if(accountIssue)block(accountIssue,'Kontrollera mottagarkontot mot bankens uttryckliga kontouppgifter.');
+  else if(assessment.allocationConflict)block(assessment.message,'Granska fakturakopplingen mot den visade bankreferensen.');
+  else if(conflict)block('Referensen är ofullständig eller motstridig.','Kontrollera originalreferensen och eventuell OCR-kontroll.');
+  else if(requiresSpecification&&!sourceLink)block('Individuella Bankgirodetaljer saknas.','Hämta en individuell betalningsspecifikation med betalare, referens och delbelopp.');
+  else if(!fieldSources.payer.value)block('Banken har inte styrkt en individuell betalare eller mottagare.','Kontrollera betalaren i ett individuellt bankoriginal.');
+  else if(!selectedReference)block('Bankrapporterad betalningsreferens saknas.','Kontrollera referensen i bankens individuella betalningsunderlag.');
+  else if(assessment.status==='review')decision.reason=assessment.message;
+  else if(intendedReferences.some(reference=>reference.conflict)){decision.reason='Fakturans uttryckliga referens avviker från bankrapporterad referens.';decision.next='Jämför den uttryckliga referensen i fakturaoriginalet med bankens original innan betalningskopplingen verifieras.';}
+  else if(sourceLink){decision.reason='Underlagsrelationen är manuellt styrkt.';decision.next='Granska den manuella underlagsrelationen, kundrelationen och fakturan separat.';}
+  else if(t.specificationStatus==='review'){decision.reason='Rapportobservation, inte en separat ekonomisk betalning.';decision.next='Kontrollera rapportens mottagarkonto och relation till bankens insättning.';}
+  else if(allocations.length&&(!invoices.length||invoices.some(invoice=>!invoice.reviewed||!invoice.documentId))){decision.reason='Den registrerade fakturans granskning eller originalunderlag återstår.';decision.next='Öppna och granska fakturans original innan betalningskopplingen visas som verifierad.';}
+  else if(verified){decision.code='VERIFIED';decision.label='Verifierad';decision.reason='Fakturakopplingen stöds av sparat bankunderlag.';decision.next='Öppna betalningen för aktuell originalkontroll och betalningshistorik.';}
+  return {...evidenceView,payer:fieldSources.payer.value||(t.amount<0?'Mottagare okänd':'Betalare okänd'),payerKnown:!!fieldSources.payer.value,reference:fieldSources.reference.value,referenceLabel:referenceLabel(fieldSources.reference.value.kind),fieldSources,sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!assessment.allocationConflict&&assessment.status!=='ambiguous'&&assessment.status!=='review'&&!bankConflict&&!originalIssue,invoiceNumbers,intendedReferences,possible,status,decision,verified,requiresSpecification};
 }
 export function bankVisibleTransactions(state:State){
   const linkedSpecifications=new Set((state.bankgiroLinks||[]).flatMap(link=>activeBankgiroLink(state,link.transactionId)?.rows.map(row=>row.id)||[]));
@@ -111,7 +138,7 @@ export function bankVisibleTransactions(state:State){
   });
 }
 export function bankPaymentCounts(state:State){
-  const rows=bankVisibleTransactions(state);
-  const views=rows.filter(t=>!t.ignored&&t.amount>0).map(t=>bankPaymentView(state,t));
-  return {verified:views.filter(v=>v.verified).length,specifications:views.filter(v=>v.requiresSpecification).length,review:views.filter(v=>!v.verified&&!v.requiresSpecification).length};
+  const rows=bankVisibleTransactions(state),economicIds=new Set(economicTransactions(state).map(t=>t.id));
+  const views=rows.filter(t=>economicIds.has(t.id)&&t.amount>0).map(t=>bankPaymentView(state,t));
+  return {verified:views.filter(v=>v.decision.code==='VERIFIED').length,specifications:views.filter(v=>v.requiresSpecification).length,review:views.filter(v=>v.decision.code!=='VERIFIED'&&!v.requiresSpecification).length,observations:rows.filter(t=>!t.ignored&&!t.duplicateOf&&!economicIds.has(t.id)).length};
 }

@@ -101,7 +101,7 @@ test('bank summary has exactly four facts and never invents a successful synchro
 
 test('desktop exposes six payment facts including reference and OCR; missing OCR stays explicit on mobile',()=>{
   const s=emptyState(),t=tx({kind:'payment',description:'',party:'<script>bank</script>'});s.transactions.push(t);const html=render(ui.default,{state:s,transactions:[t],open(){}});
-  assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,6);assert.match(html,/<th>Referens \/ OCR<\/th>/);assert.equal((html.match(/Bank-OCR saknas\./g)||[]).length,2);assert.match(html,/bank-mobile-list/);assert.match(html,/bank-payment-card/);assert.match(html,/aria-label="Visa betalning/);assert.match(html,/&lt;script&gt;bank/);assert.doesNotMatch(html,/<script>/);
+  assert.equal((html.match(/<th(?:\s|>)/g)||[]).length,6);assert.match(html,/<th scope="col">Referenser<\/th>/);assert.equal((html.match(/Bank-OCR saknas\./g)||[]).length,2);assert.match(html,/bank-mobile-list/);assert.match(html,/bank-payment-card/);assert.match(html,/aria-label="Visa betalning/);assert.match(html,/&lt;script&gt;bank/);assert.doesNotMatch(html,/<script>/);
 });
 
 test('an unmatched bank OCR is never described as an invoice number',()=>{
@@ -119,7 +119,7 @@ test('bank list explains unknown payer, missing bank OCR and a separately sugges
 test('known payer and typed bank OCR do not receive missing-information explanations',()=>{
  const s=emptyState(),t=tx({kind:'payment',party:'Bank payer',description:'',payerReference:'000018'}, {reference_number:undefined,ocr:'000018'});s.transactions.push(t);
  const html=render(ui.default,{state:s,transactions:[t],open(){}});
- assert.match(html,/Bank payer/);assert.equal((html.match(/<strong class="mono">000018<\/strong>/g)||[]).length,2);assert.equal((html.match(/<span class="bank-reference-label">OCR<\/span>/g)||[]).length,2);assert.doesNotMatch(html,/Bank-OCR saknas\.|banken har inte lämnat verifierade individuella uppgifter/);
+ assert.match(html,/Bank payer/);assert.equal((html.match(/<strong class="mono">000018<\/strong>/g)||[]).length,2);assert.equal((html.match(/<span class="bank-reference-label">Formell OCR<\/span>/g)||[]).length,2);assert.doesNotMatch(html,/Bank-OCR saknas\.|banken har inte lämnat verifierade individuella uppgifter/);
 });
 
 test('one shared read-only selector returns the actual independent payer and reference sources',()=>{
