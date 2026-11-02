@@ -89,3 +89,36 @@ test('legacy pending reports need current consent before later automatic promoti
  const f=fixture(t,{csv:true,pending:true});f.connection.status='disconnected';const response=await actualRoute.POST(request({type:'settings.save',name:'Syntetiskt bolag',email:'test@example.test'})),out=await response.json();assert.equal(response.status,200,out.error);assert.equal(out.state.transactions[1].specificationStatus,'review');assert.equal(out.state.transactions[1].parentId,'');assert.equal(out.state.allocations.length,0);
  f.connection.status='connected';const next=await actualRoute.POST(request({type:'settings.save',name:'Syntetiskt bolag',email:'test@example.test'},2)),fresh=await next.json();assert.equal(next.status,200,fresh.error);assert.equal(fresh.state.transactions[1].specificationStatus,'linked');assert.equal(fresh.state.transactions[1].parentId,f.seed.transactions[0].id);
 });
+
+
+for(const location of ['account_id.other','all_account_ids'])for(const scheme of ['IBAN','BBAN'])for(const currency of ['SEK','EUR'])test('direct-primary report cannot be manually linked when '+location+' duplicates its '+scheme+' identifier on an unselected '+currency+' resource',async t=>{
+ const f=fixture(t),before=structuredClone(stored(f)),bytes=new Uint8Array(f.objects.get('owner/'+f.documentId)).slice();
+ const other={uid:'unselected',currency,account_id:{iban:'SE4550000000058398257466'}};
+ const identifier={scheme_name:scheme,identification:account};
+ if(location==='account_id.other')other.account_id.other=identifier;else other.all_account_ids=[identifier];
+ f.accounts.push(other);
+ const response=await actualRoute.POST(request(f.command)),out=await response.json();
+ assert.equal(response.status,400,JSON.stringify(out));assert.match(out.error,/mottagarkonto|kontoalias|medgivande/i);
+ assert.deepEqual(stored(f),before);assert.equal(audit(f).length,0);assert.equal(f.sqlite.prepare('SELECT revision FROM workspaces WHERE owner=?').get('owner').revision,1);
+ assert.deepEqual(new Uint8Array(f.objects.get('owner/'+f.documentId)),bytes);
+ const row=stored(f).transactions.find(row=>row.specification);assert.equal(row.payerReference,'0599');assert.equal(row.party,'Syntetiskt café AB');assert.equal(row.recipientAccount,account);
+ f.accounts=f.accounts.filter(resource=>resource.uid==='selected');
+ const restored=await actualRoute.POST(request(f.command)),accepted=await restored.json();assert.equal(restored.status,200,JSON.stringify(accepted));
+ assert.equal(accepted.state.bankgiroLinks.length,1);assert.equal(accepted.state.allocations.length,0);assert.deepEqual(finances(accepted.state),finances(before));assert.equal(audit(f).length,1);
+});
+
+
+for(const alteration of ['none','sequence address','sequence label','payer source'])test('legacy separate-sequence provenance '+alteration+' is checked against the unchanged original',async t=>{
+ const f=fixture(t,{report:{mutate:wb=>{const sheet=wb.Sheets['Insättningsuppgift'];sheet.E11={t:'s',v:'Löpnummer'};sheet.E12={t:'s',v:'00041'};}}}),legacy=structuredClone(f.seed),row=legacy.transactions.find(item=>item.specification),cells=JSON.parse(row.reportEvidence.sourceCells);
+ cells.sequence=cells.sequenceLabel;delete cells.sequenceLabel;
+ if(alteration==='sequence address')cells.sequence.address='E10';
+ if(alteration==='sequence label')cells.sequence.rawValue='Annan rubrik';
+ if(alteration==='payer source')cells.party.address='A20';
+ row.reportEvidence.sourceCells=JSON.stringify(cells);
+ f.sqlite.prepare('UPDATE workspaces SET payload=?').run(JSON.stringify(legacy));
+ const response=await actualRoute.POST(request(f.command)),out=await response.json();
+ if(alteration==='none'){
+  assert.equal(response.status,200,out.error);assert.ok(activeBankgiroLink(out.state,f.command.transactionId));assert.deepEqual(finances(out.state),finances(legacy));assert.equal(audit(f).length,1);
+  const retained=out.state.transactions.find(item=>item.id===row.id);assert.equal(retained.payerReference,'0599');assert.equal(retained.reportEvidence.sequence,'00041');assert.equal(retained.reportEvidence.sourceCells,row.reportEvidence.sourceCells);
+ }else{assert.equal(response.status,400,JSON.stringify(out));assert.match(out.error,/original|uppgifter/i);assert.deepEqual(stored(f),legacy);assert.equal(audit(f).length,0);}
+});

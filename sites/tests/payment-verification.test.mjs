@@ -297,3 +297,18 @@ test('stored report omits an action target for a direct AIS without a report and
 test('stored GET exposes the exact owned invoice byte proof after hashing R2 once, without making it payment authority',async t=>{const f=await serviceFixture(t,{candidate:true}),before=structuredClone(f.state),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+f.state.transactions[0].id)),r=await response.json();assert.deepEqual(r.invoiceOriginal,{documentId:'synthetic-invoice-original',integrity:'passed',sha256:f.hash,sizeBytes:f.bytes.length});assert.deepEqual(f.control.reads,['synthetic-owner/synthetic-invoice-original']);assert.equal(r.automaticEligible,false);assert.deepEqual(f.state,before);});
 for(const invoiceMode of ['missing','corrupt','foreign'])test('a '+invoiceMode+' invoice original never exposes a successful byte proof',async t=>{const f=await serviceFixture(t,{invoiceMode}),response=await f.route.GET(new Request('https://mg.test/api/bank/verification?transactionId='+f.state.transactions[0].id)),r=await response.json();assert.deepEqual(r.invoiceOriginal,{documentId:'synthetic-invoice-original',integrity:'blocked'});assert.equal(r.invoiceOriginal.sha256,undefined);assert.equal(r.invoiceOriginal.sizeBytes,undefined);});
 test('pure explanation projection never invents invoice byte proof',()=>{const s=fixture(),r=build(s,s.transactions[0].id);assert.equal(r.invoiceOriginal,undefined);});
+
+
+test('blocked deposit review names the exact bank evidence needed without registration or allocation',()=>{
+ let state=fixture({invoice:false,batch:true}),target=state.transactions[0];
+ const bytes=makeBankgiroXLSX({account:target.account.slice(5),date:target.date,sequence:'00041',payments:[{party:'Synthetic report sender AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]});
+ state=applyCommand(state,{type:'bankgiro.import',documentId:'synthetic-bank-evidence',hash:'d'.repeat(64),name:'evidence.xlsx',rows:parseSpecificationBytes(bytes,'evidence.xlsx')}).state;
+ const before=structuredClone(state),report=build(state,target.id,{reportAccountIssue:'Rapportens kontoalias saknas.'});
+ const accountStep=step(report,'account'),deposit=step(report,'deposit');
+ for(const field of [/bankutfärdat/i,/mottagarkonto/i,/Bankgiro/i,/AIS-konto/i,/giltighetsdatum/i])assert.match(accountStep.next,field);
+ for(const field of [/bank-ID/i,/insättningslöpnummer/i,/år/i,/valuta/i,/bokföringsdatum/i,/valutadatum/i])assert.match(deposit.next,field);
+ assert.equal(deposit.facts.find(f=>f.label==='Rapportens insättningslöpnummer').value,'00041');
+ assert.equal(deposit.facts.find(f=>f.label==='Rapportdatum').value,'2026-10-26');
+ assert.equal(report.automaticEligible,false);assert.equal(report.countedEconomically,true);assert.equal(report.changed,false);
+ assert.equal(state.invoices.length,0);assert.equal(state.allocations.length,0);assert.deepEqual(state,before);
+});

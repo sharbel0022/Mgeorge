@@ -97,3 +97,48 @@ test('unlink is reversible audit data and preserves originals, balances and acti
  assert.throws(()=>domain.applyCommand(linked,{type:'bankgiro.unlink',id,note:''}),/beskriv|anteckning/i);
  assert.equal(domain.applyCommand(result.state,f.command).state.bankgiroLinks.length,2);
 });
+
+
+for(const [label,patch] of [
+ ['zero-padded sequence',{sequence:'00041'}],
+ ['changed payer',{payments:[{party:'Different synthetic payer AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}],
+ ['changed reference',{payments:[{party:'Syntetiskt café AB',reference:'0600',payerBankgiro:'987-6543',amount:62500}]}],
+ ['different day within the same year',{date:'2026-10-27'}],
+ ['formatted recipient bankgiro',{recipientBankgiro:'12345678'}]
+])for(const legacy of [false,true])test('one ELIN deposit with '+label+' cannot be reserved for two AIS entries'+(legacy?' by a legacy link':''),()=>{
+ const f=fixture(),bank=domain.applyCommand(f.state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date:'2026-10-26',amount:62500,bankReference:'SECOND-ELIN-DEPOSIT',description:'Bankgiro inbetalning'})]}).state;
+ const secondBank=bank.transactions.find(row=>!row.specification&&row.id!==f.transaction.id);
+ const rows=parseSpecificationBytes(makeBankgiroXLSX({currency:'SEK',account:account.slice(5),date:'2026-10-26',payments:[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}],...patch}),'variant.xlsx');
+ const both=domain.applyCommand(bank,{type:'bankgiro.import',rows,documentId:'variant-original',hash:'e'.repeat(64),name:'variant.xlsx'}).state,secondSpec=both.transactions.find(row=>row.bankFileProof?.documentId==='variant-original'),linked=domain.applyCommand(both,f.command).state;
+ if(legacy)delete linked.bankgiroLinks[0].reportKey;
+ const before=structuredClone(financial(linked)),candidate=domain.bankgiroLinkCandidates(linked,secondBank).find(row=>row.specificationId===secondSpec.id);
+ assert.equal(candidate.canLink,false);assert.match(candidate.reason,/rapport|insättning|specifikation/i);
+ assert.throws(()=>domain.applyCommand(linked,{...f.command,transactionId:secondBank.id,specificationId:secondSpec.id,dateDifferenceNote:'Synthetic date review.'}),/rapport|insättning|specifikation/i);
+ assert.equal(linked.bankgiroLinks.length,1);assert.equal(linked.allocations.length,0);assert.deepEqual(financial(linked),before);
+ const revoked=domain.applyCommand(linked,{type:'bankgiro.unlink',id:linked.bankgiroLinks[0].id,note:'Separately approved synthetic source correction.'}).state;
+ assert.equal(domain.applyCommand(revoked,{...f.command,transactionId:secondBank.id,specificationId:secondSpec.id,dateDifferenceNote:'Synthetic date review.'}).state.bankgiroLinks.length,2);
+});
+for(const [label,patch] of [
+ ['sequence',{sequence:'42'}],
+ ['year',{date:'2027-10-26'}],
+ ['recipient bankgiro',{recipientBankgiro:'8765-4321'}]
+])test('ELIN deposit reservation is scoped by '+label,()=>{
+ const f=fixture(),date=patch.date||'2026-10-26',bank=domain.applyCommand(f.state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date,amount:62500,bankReference:'OTHER-SCOPED-ELIN-DEPOSIT',description:'Bankgiro inbetalning'})]}).state,secondBank=bank.transactions.find(row=>!row.specification&&row.id!==f.transaction.id);
+ const rows=parseSpecificationBytes(makeBankgiroXLSX({currency:'SEK',account:account.slice(5),date,payments:[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}],...patch}),'distinct.xlsx'),both=domain.applyCommand(bank,{type:'bankgiro.import',rows,documentId:'distinct-scoped-original',hash:'f'.repeat(64),name:'distinct.xlsx'}).state,secondSpec=both.transactions.find(row=>row.bankFileProof?.documentId==='distinct-scoped-original'),linked=domain.applyCommand(both,f.command).state;
+ assert.equal(domain.bankgiroLinkCandidates(linked,secondBank).find(row=>row.specificationId===secondSpec.id).canLink,true);
+ assert.equal(domain.applyCommand(linked,{...f.command,transactionId:secondBank.id,specificationId:secondSpec.id}).state.bankgiroLinks.length,2);
+ assert.equal(linked.allocations.length,0);
+});
+
+for(const [firstGiro,secondGiro] of [['123-4566','0123-4566'],['0123-4566','123-4566']])test('Sites rejects a stale second reservation when recipient Bankgiro padding changes from '+firstGiro+' to '+secondGiro,()=>{
+ const f=fixture({report:{recipientBankgiro:firstGiro}}),bank=domain.applyCommand(f.state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date:'2026-10-26',amount:62500,bankReference:'SYNTHETIC-PADDED-GIRO-SECOND',description:'Bankgiro inbetalning'})]}).state,secondBank=bank.transactions.find(row=>!row.specification&&row.id!==f.transaction.id);
+ const rows=parseSpecificationBytes(makeBankgiroXLSX({currency:'SEK',account:account.slice(5),date:'2026-10-26',sequence:'41',recipientBankgiro:secondGiro,payments:[{party:'Syntetiskt café AB',reference:'0599',payerBankgiro:'987-6543',amount:62500}]}),'padded-giro.xlsx'),both=domain.applyCommand(bank,{type:'bankgiro.import',rows,documentId:'padded-giro-original',hash:'e'.repeat(64),name:'padded-giro.xlsx'}).state,secondSpec=both.transactions.find(row=>row.bankFileProof?.documentId==='padded-giro-original');
+ const stale=domain.bankgiroLinkCandidates(both,secondBank).find(row=>row.specificationId===secondSpec.id);assert.equal(stale.canLink,true);
+ assert.equal(both.transactions.find(row=>row.id===f.specification.id).recipientBankgiro,firstGiro);assert.equal(secondSpec.recipientBankgiro,secondGiro);
+ const before=structuredClone(financial(both)),linked=domain.applyCommand(both,f.command).state,command={...f.command,transactionId:secondBank.id,specificationId:stale.specificationId};
+ const current=domain.bankgiroLinkCandidates(linked,secondBank).find(row=>row.specificationId===secondSpec.id);
+ assert.equal(current.canLink,false);assert.match(current.reason,/insättning|rapport|koppl/i);
+ assert.throws(()=>domain.applyCommand(linked,command),/insättning|rapport|koppl/i);
+ assert.equal(linked.bankgiroLinks.filter(link=>!link.revokedAt).length,1);assert.equal(linked.allocations.length,0);assert.deepEqual(financial(linked),before);
+ assert.equal(linked.transactions.find(row=>row.id===f.specification.id).recipientBankgiro,firstGiro);assert.equal(linked.transactions.find(row=>row.id===secondSpec.id).recipientBankgiro,secondGiro);
+});

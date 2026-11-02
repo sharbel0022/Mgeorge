@@ -62,3 +62,20 @@ test('linked report matching preserves leading zeros and does not promote a near
  const {state,target}=paymentFieldSourceFixture(),documents=sourceDocuments(['599','0599','0800']),before=structuredClone({state,documents});
  assert.deepEqual(bankInvoiceCandidates(state,target,documents).map(candidate=>candidate.number),['0599']);assert.deepEqual({state,documents},before);
 });
+
+
+// Registered invoices and unregistered originals use the same exact identifier boundary.
+for(const [reference,number,expected] of [
+ ['AB12','AB-12',false],
+ ['AB-12','AB12',false],
+ ['Faktura 0599','0599',true],
+ ['0599','599',false],
+ ['0599','0599',true]
+])test('registered and unregistered proposals agree for '+reference+' and '+number,()=>{
+ const t=bank({bankDetails:{payerReference:reference}}),documents=[doc({invoice_number:number})];
+ const state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',number,party:'Synthetic Customer AB',total:62500,issued:'2026-10-10',due:'2026-10-24',reviewed:true}}).state,before=structuredClone({state,t,documents});
+ assert.deepEqual(bankInvoiceCandidates(state,t).map(row=>row.number),expected?[number]:[]);
+ assert.deepEqual(bankInvoiceCandidates(emptyState(),t,documents).map(row=>row.number),expected?[number]:[]);
+ assert.deepEqual({state,t,documents},before);assert.equal(t.bankDetails.payerReference,reference);
+ assert.equal(state.allocations.length,0);
+});

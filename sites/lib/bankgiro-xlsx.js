@@ -2,6 +2,7 @@ import {read,utils,SSF} from 'xlsx';
 import {Inflate} from 'fflate';
 import {extractPaymentReferences} from './payment-references.js';
 import {normalizePayerEvidence,payerField} from './payer-evidence.js';
+import {bankgiroDepositIdentity} from './bankgiro-deposit-identity.js';
 
 const NS='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
 const MAX_BYTES=15_000_000,MAX_EXPANDED=24_000_000,MAX_ENTRY=8_000_000;
@@ -138,9 +139,9 @@ export function parseBankgiroXLSX(input,name='Bankgiro.xlsx'){
    const summaryHeader=only(findRows(cols=>cols.some(x=>label(x.cell)==='antal')&&cols.some(x=>label(x.cell)==='belopp')&&cols.some(x=>label(x.cell)==='betalningstyp')),'Rapportens antal och totalsumma saknas.');
    const countColumn=col(summaryHeader,['antal']),sumColumn=col(summaryHeader,['belopp']),typeColumn=col(summaryHeader,['betalningstyp']);
    const sequenceCells=[];for(let r=start;r<end;r++)for(const x of allRow(r))if(/^lopnummer(?:\s|$)/.test(label(x.cell)))sequenceCells.push(x);
-   const sequenceCell=only(sequenceCells,'Löpnummer saknas eller är motstridigt.');
+   const sequenceLabelCell=only(sequenceCells,'Löpnummer saknas eller är motstridigt.');let sequenceCell=sequenceLabelCell;
    let sequence=text(sequenceCell.cell).match(/^Löpnummer\s+(\d{1,10})$/i)?.[1];
-   if(!sequence&&label(sequenceCell.cell)==='lopnummer')sequence=text(below(sequenceCell.r,sequenceCell.c,'Löpnummer saknas.').cell);
+   if(!sequence&&label(sequenceCell.cell)==='lopnummer'){sequenceCell=below(sequenceCell.r,sequenceCell.c,'Löpnummer saknas.');sequence=text(sequenceCell.cell);}
    if(!/^\d{1,10}$/.test(sequence||''))fail('Löpnummer saknas eller är ogiltigt.');
    const totalRow=only(findRows(cols=>cols.some(x=>label(x.cell)==='totalt')),'Rapportens totalsumma saknas eller är motstridig.');
    if(totalRow<=summaryHeader)fail('Rapportens sammanfattning har fel ordning.');
@@ -158,7 +159,8 @@ export function parseBankgiroXLSX(input,name='Bankgiro.xlsx'){
    const columns={party:col(detailHeader,['avsandare']),reference:col(detailHeader,['betalningsreferens']),payerBankgiro:col(detailHeader,['bankgironummer/ avinummer','bankgironummer/avinummer','bankgironummer / avinummer']),amount:col(detailHeader,['belopp'])};
    const detailCounts=[];for(let r=totalRow+1;r<detailHeader;r++)for(const x of allRow(r))if(/^\d+ st$/i.test(text(x.cell)))detailCounts.push(x);
    if(detailCounts.length!==1||Number(text(detailCounts[0].cell).split(' ')[0])!==count)fail('Antal betalningar i detaljtabellen stämmer inte med rapporten.');
-   const reportKey=`xlsx:${recipientBankgiro}:${date}:${sequence}`;if(reportIds.has(reportKey))fail('Dubblett: samma rapportblock förekommer flera gånger.');reportIds.add(reportKey);
+   const reportKey=`xlsx:${recipientBankgiro}:${date}:${sequence}`,depositKey=bankgiroDepositIdentity({profile:'Swedbank Bankgiro XLSX',recipientBankgiro,sequence,reportDate:date});
+   if(!depositKey||reportIds.has(depositKey))fail('Dubblett: samma insättning förekommer i flera rapportblock.');reportIds.add(depositKey);
    const source=x=>({sheet:sheetName,address:utils.encode_cell(x),type:x.cell?.t||'',rawValue:x.cell?.v??'',numberFormat:x.cell?.z||'General'});
    const parsed=[],identities=new Set();let footer=false;
    for(let r=detailHeader+1;r<end;r++){
@@ -168,10 +170,10 @@ export function parseBankgiroXLSX(input,name='Bankgiro.xlsx'){
     if(footer||populated.some(x=>!Object.values(columns).includes(x.c)))fail('Okänd eller motstridig rad i betalningstabellen.');
     const cells=Object.fromEntries(Object.entries(columns).map(([key,c])=>[key,{r,c,cell:get(r,c)}]));
     for(const merge of sheet['!merges']||[]){const hits=Object.values(cells).filter(x=>x.r>=merge.s.r&&x.r<=merge.e.r&&x.c>=merge.s.c&&x.c<=merge.e.c);if(hits.length>1)fail('Sammanslagna betalningsfält är tvetydiga.');}
-    const party=text(cells.party.cell);if(!party||cells.party.cell?.t==='n'||party.length>200)fail('Avsändare saknas eller är ogiltig.');
+    const party=text(cells.party.cell);if(!party||!['s','str'].includes(cells.party.cell?.t)||party.length>200)fail('Avsändare saknas eller är ogiltig.');
     const payerReference=reference(cells.reference.cell),payerBankgiro=text(cells.payerBankgiro.cell);if(!/^\d{1,25}$|^\d{3,4}-\d{4}$/.test(payerBankgiro)||cells.payerBankgiro.cell?.t==='n')fail('Avsändarens Bankgiro/avinummer saknas eller är osäkert.');
     const amount=money(cells.amount.cell),identity=JSON.stringify([party,payerReference,payerBankgiro,amount]);if(identities.has(identity))fail('Dubblett: identiska individuella betalningar behöver granskas.');identities.add(identity);
-    const cellProvenance=Object.fromEntries(Object.entries({...cells,date:dateCell,recipientBankgiro:bgCell,...(accountCell?{account:accountCell}:{}),...(currencyCell?{currency:currencyCell}:{}),sequence:sequenceCell,total:totalCell,count:countCell}).map(([key,x])=>[key,source(x)]));
+    const cellProvenance=Object.fromEntries(Object.entries({...cells,date:dateCell,recipientBankgiro:bgCell,...(accountCell?{account:accountCell}:{}),...(currencyCell?{currency:currencyCell}:{}),sequence:sequenceCell,...(sequenceCell!==sequenceLabelCell?{sequenceLabel:sequenceLabelCell}:{}),total:totalCell,count:countCell}).map(([key,x])=>[key,source(x)]));
     const prefix=`$.xlsx[${JSON.stringify(sheetName)}]`,referenceEvidence=extractPaymentReferences({betalningsreferens:payerReference},{sourcePrefix:`${prefix}.${cellProvenance.reference.address}`});
     const payerEvidence=normalizePayerEvidence({name:payerField(party,`${prefix}.${cellProvenance.party.address}`),identifiers:[]});
     // Datum is the report's own label, not proof of booking/value/settlement

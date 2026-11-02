@@ -32,5 +32,5 @@ export function bankInvoiceCandidates(state:State,t:Transaction,documents:any[]=
  const exact=usablePaymentReference(reference)?normalizeOCR(reference):'';
  const registered=state.invoices.filter(i=>!i.voided&&i.direction==='receivable'&&balance(state,i)>0).map(i=>({documentId:i.documentId,invoiceId:i.id,number:i.number,party:i.party,amount:balance(state,i),issued:i.issued,needsReview:!i.reviewed,source:'invoice' as const,reason:'Belopp och fakturadatum kan passa. Betalningskopplingen är inte verifierad.',ocr:i.ocr}));
  const used=new Set(state.invoices.map(i=>i.documentId).filter(Boolean)),documentCandidates=exact?matchingDocumentCandidates(documents,reference):candidateDocuments(documents),all=[...registered,...documentCandidates.filter(d=>!used.has(d.documentId))];
- return all.filter(i=>i.issued<=t.date&&(exact?i.source==='gmail'||[i.number,'ocr' in i?i.ocr:''].some(n=>typeof n==='string'&&normalizeOCR(n)===exact):i.amount===available(state,t))).sort((a,b)=>b.issued.localeCompare(a.issued)||a.number.localeCompare(b.number)).slice(0,12);
+ return all.filter(i=>i.issued<=t.date&&(exact?i.source==='gmail'||[i.number,'ocr' in i?i.ocr:''].some(n=>typeof n==='string'&&exactReference(reference,n)):i.amount===available(state,t))).sort((a,b)=>b.issued.localeCompare(a.issued)||a.number.localeCompare(b.number)).slice(0,12);
 }

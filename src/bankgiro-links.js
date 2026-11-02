@@ -6,6 +6,7 @@ import {parseBankFile,normalizeBankApiTransaction} from './importers.js';
 import {digest,decryptObject} from './security.js';
 import {reconciliationData} from './reconciliation.js';
 import {bankFinancialReview} from './bank-evidence.js';
+import {bankgiroDepositIdentity} from '../sites/lib/bankgiro-deposit-identity.js';
 const mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 const canonical=value=>String(value||'').replace(/^iban:/i,'').replace(/\s/g,'').toUpperCase();
 const fail=message=>Object.assign(new Error(message),{status:409});
@@ -51,10 +52,11 @@ function reportAccountRelation(context,t,report){
  if(report.rows.some(row=>row.account_evidence?.explicit_currency!==true))throw fail('Rapportoriginalet saknar uttrycklig valuta. Antagen SEK är inte verifierad valuta; komplettera bankunderlaget.');
  if(!key||report.rows.some(row=>aliasKey(row.account_evidence?.reported_account)!==key))throw fail('Rapportens uttryckliga mottagarkonto måste motsvara bankens valda konto eller ett entydigt banklevererat kontoalias.');
  const common={source:'provider_account_resource',connection_id:context.connection.id,account_uid:context.selected.uid,selected_account:canonical(t.account),reported_account:report.reported_account};
- if(report.account===canonical(t.account)&&report.rows.every(row=>row.account_evidence.exact_match===true))return {...common,kind:'exact',scheme:'IBAN',field:'account_id.iban'};
  const holders=context.available.filter(resource=>accountIdentifiers(resource).some(identifier=>identifier.key===key));
  const identifier=accountIdentifiers(context.selected).find(item=>item.key===key);
  if(holders.length!==1||holders[0]!==context.selected||!identifier)throw fail('Rapportens mottagarkonto saknar ett entydigt banklevererat kontoalias till ägarens aktuella valda konto.');
+ // A primary IBAN is also ambiguous when another provider resource holds it.
+ if(report.account===canonical(t.account)&&report.rows.every(row=>row.account_evidence.exact_match===true))return {...common,kind:'exact',scheme:'IBAN',field:'account_id.iban'};
  return {...common,kind:'provider_alias',scheme:identifier.scheme,field:identifier.field};
 }
 function reports(db,importId,account,owner){
@@ -69,7 +71,7 @@ function reports(db,importId,account,owner){
   const row=group[0],report=row.account_evidence.report,total=group.reduce((sum,x)=>sum+x.amount_cents,0);
   if(!Number.isSafeInteger(total)||total<=0||Number(report.paymentCount)!==group.length||Number(report.totalCents)!==total||group.some(x=>x.currency!==row.currency||x.booked_at!==row.booked_at))throw fail('Rapportens totalsumma eller antal är ofullständigt.');
   const identity=[canonical(row.account_evidence.reported_account),row.booked_at,report.recipientBankgiro,report.sequence,group.length,total,group.map(x=>[x.payer,x.reference,x.payer_bankgiro,x.amount_cents]).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))];
-  return {import_id:original.id,name:original.name,report_key:digest(JSON.stringify(identity)),sha256:original.content_sha256,rows:group,amount_cents:total,currency:row.currency,booked_at:row.booked_at,account:canonical(row.account_evidence.reported_account),reported_account:row.account_evidence.cells?.account?.rawValue??row.account_evidence.reported_account,recipient_bankgiro:report.recipientBankgiro,sequence:report.sequence,original_url:`/api/imports/${encodeURIComponent(original.id)}/original`};
+  return {import_id:original.id,name:original.name,report_key:digest(JSON.stringify(identity)),deposit_identity:bankgiroDepositIdentity(report,row.booked_at),sha256:original.content_sha256,rows:group,amount_cents:total,currency:row.currency,booked_at:row.booked_at,account:canonical(row.account_evidence.reported_account),reported_account:row.account_evidence.cells?.account?.rawValue??row.account_evidence.reported_account,recipient_bankgiro:report.recipientBankgiro,sequence:report.sequence,original_url:`/api/imports/${encodeURIComponent(original.id)}/original`};
  });
 }
 function compatible(db,t,report,owner){
@@ -80,6 +82,18 @@ function compatible(db,t,report,owner){
  if(!Number.isInteger(days)||Math.abs(days)>3)throw fail('Datumskillnaden överstiger tre dagar. Granska annat bankunderlag.');
  const conflict=db.prepare("SELECT * FROM bank_specification_links WHERE revoked_at='' AND ((report_key=? AND transaction_id<>?) OR (transaction_id=? AND report_key<>?)) LIMIT 1").get(report.report_key,t.id,t.id,report.report_key);
  if(conflict)throw fail('Rapporten eller bankposten har redan en annan aktiv källkoppling.');
+ // Re-exported content can change its fingerprint while naming the same bank
+ // deposit. Retained originals also reserve legacy links without a schema rewrite.
+ if(report.deposit_identity){
+  const alreadyLinked=db.prepare("SELECT id FROM bank_specification_links WHERE owner=? AND transaction_id=? AND import_id=? AND report_key=? AND original_sha256=? AND revoked_at=''").get(owner,t.id,report.import_id,report.report_key,report.sha256);
+  for(const link of db.prepare("SELECT * FROM bank_specification_links WHERE owner=? AND revoked_at='' AND transaction_id<>?").all(owner,t.id)){
+   let previous;try{previous=reports(db,link.import_id,t.account,owner).find(item=>item.report_key===link.report_key&&item.sha256===link.original_sha256);}catch{}
+   // An unrelated unavailable original can hold a new reservation, but must
+   // not erase another source relation whose own original remains intact.
+   if(!previous){if(alreadyLinked)continue;throw fail('En aktiv rapportkoppling kan inte kontrolleras mot sitt original. Granska den kopplingen innan en ny rapport reserveras.');}
+   if(previous.deposit_identity===report.deposit_identity)throw fail('Samma insättning i Bankgirorapporten har redan en aktiv källkoppling till en annan bankpost. Granska och återta den relationen först.');
+  }
+ }
  return days;
 }
 function project(link,report){return {id:link.id,verification:'manual',verified_by:link.owner,created_at:link.created_at,evidence:link.evidence,date_difference_note:link.date_difference_note,import_id:link.import_id,report_key:link.report_key,sha256:link.original_sha256,original_url:report.original_url,reported_account:report.reported_account,account_relation:report.account_relation,payer:report.rows.length===1?report.rows[0].payer:'',reference:report.rows.length===1?report.rows[0].reference:'',payments:report.rows.map(row=>({payer:row.payer,reference:row.reference,amount_cents:row.amount_cents,booked_at:row.booked_at,bankgiro:row.bankgiro,payer_bankgiro:row.payer_bankgiro,reference_kind:'structured',payer_evidence:row.payer_evidence,reference_evidence:row.reference_evidence,account_evidence:row.account_evidence,cellProvenance:row.account_evidence?.cells})),bank_original_url:`/api/bank-transactions/${encodeURIComponent(link.transaction_id)}/original`};}
