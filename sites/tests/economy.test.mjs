@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
@@ -11,7 +12,7 @@ function compiled(path,imports){let code=ts.transpileModule(readFileSync(new URL
 const domain=new URL('../lib/domain.ts',import.meta.url).href,triage=new URL('../lib/document-triage.js',import.meta.url).href;
 const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href});
 const {buildPaymentOverview}=await import(compiled('../lib/payment-overview.ts',{'./domain':domain,'./reconciliation':reconciliation,'./document-triage.js':triage,'./economy-summary.js':new URL('../lib/economy-summary.js',import.meta.url).href}));
-const {interpretInvoice}=await import(compiled('../lib/invoice-fields.js',{'./domain':domain,'./document-triage.js':triage}));
+const {interpretInvoice}=await import(invoiceParserUrl());
 const state=()=>({invoices:[{id:'i',direction:'receivable',number:'0594',party:'Exempelkund AB',reviewed:true,voided:false,total:10000,issued:'2026-09-01',due:'2026-10-01',currency:'SEK'}],transactions:[],allocations:[],credits:[]});
 function allocate(s,{date='2026-10-20',amount=5000,verified=true,effect='payment',id='t',kind='payment',reference='0594'}={}){s.transactions.push({id,date,amount:effect==='refund'?-amount:amount,verified,kind,party:'Betalare AB',payerReference:reference,account:'account',currency:'SEK'});s.allocations.push({id:'a-'+id,invoiceId:'i',transactionId:id,amount,active:true,effect});return s;}
 test('monthly receipts do not restrict all-time receivables',()=>{const s=allocate(state(),{date:'2026-09-30',amount:3000});allocate(s,{id:'new',amount:2000});const x=economySummary(s,'2026-10-28');assert.equal(x.received_month_cents,2000);assert.equal(x.remaining_cents,5000);assert.equal(x.overdue_cents,5000);});

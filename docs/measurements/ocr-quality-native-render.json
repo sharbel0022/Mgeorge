@@ -1,0 +1,22 @@
+{
+  "schema": "mgeorge-ocr-quality-native-render-v1",
+  "synthetic": true,
+  "sourceCommit": "a9f88ae1c0f697376b3ecd140e1e80a64405125a",
+  "images": [
+    {
+      "id": "native-positioned-id-reference",
+      "inputSha256": "44824e4dec0ed84d2884b11ad6b49a16b731053257640ba0e780e1f44475a23f",
+      "width": 833,
+      "height": 1179,
+      "rgbaSha256": "c58a056af0577ee068012cca03fadd3e05ba74ed255839a97f28f2d952502159"
+    },
+    {
+      "id": "native-identical-visible-permuted-order",
+      "inputSha256": "b37456e9335fe3e06f0eeac7652081f808ae6d313eccc6cf7b6f75e7031eccc8",
+      "width": 833,
+      "height": 1179,
+      "rgbaSha256": "c58a056af0577ee068012cca03fadd3e05ba74ed255839a97f28f2d952502159"
+    }
+  ],
+  "identicalPixels": true
+}
