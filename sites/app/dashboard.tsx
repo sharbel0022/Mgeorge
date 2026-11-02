@@ -40,7 +40,11 @@ function Dialog({title,subtitle,close,children,wide=false,busy=false}:{title:str
  const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{
   const dialog=ref.current,opener=document.activeElement instanceof HTMLElement?document.activeElement:null;
   dialog?.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';
-  return()=>{dialog?.close();document.body.style.overflow=overflow;if(opener?.isConnected)opener.focus({preventScroll:true});};
+  return()=>{
+   dialog?.close();document.body.style.overflow=overflow;
+   if(opener?.isConnected&&opener.getClientRects().length){opener.focus({preventScroll:true});if(document.activeElement===opener)return;}
+   document.getElementById('main-content')?.focus({preventScroll:true});
+  };
  },[]);
  return <dialog ref={ref} className={`modal ${wide?'wide':''}`} onCancel={e=>{e.preventDefault();if(!busy)close();}} onClick={e=>{if(e.target===e.currentTarget&&!busy)close();}} aria-labelledby="modal-title"><div className="modal-shell"><header><div><h2 id="modal-title">{title}</h2>{subtitle&&<p>{subtitle}</p>}</div><button className="icon-button" onClick={close} disabled={busy} aria-label="Stäng dialog"><X size={20}/></button></header>{children}</div></dialog>;
 }
