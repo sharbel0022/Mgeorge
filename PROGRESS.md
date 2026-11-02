@@ -1,5 +1,11 @@
 # Verifierad progress
 
+## Slutlig UI-granskning inför samordnad integration — 2026-11-02
+
+[Rapport för samtliga 33 områden](docs/FINAL-33-AREA-QUALITY-REPORT.md) och [fullständig UI-inventering](docs/UI-COMPONENT-INVENTORY.md). Egen branch `codex/final-ui-quality-2026-11-02`, bas `a9f88ae`; inga ändringar av ekonomimotorer, provider-/OCR-/backupimplementationer. Faktura- och banklistor begränsas till 50 synliga poster, käll-/betalarevidens och laddnings-/felstatus förtydligas, sökning/fokus förbättras. Mätningar och exakta testgränser finns i rapporten.
+
+Samtliga 33 områdespoäng ligger kvar på **255/330 = 7,73/10; 0/33 på 9,5**. Färsk autentiserad läsning gäller den redan publicerade startsidan, inte den nya branchen. Färsk responsiv browseracceptans för ändringarna saknas. Extra full lint redovisas som underkänd med kvarstående teknisk skuld; den döljs inte av gröna CI-grindar. Användarens samordningsregel gäller: egen branch och PR, ingen main-push, automatisk merge eller Sites-publicering under parallellt arbete.
+
 ## Avgränsad avslutsleverans 2026-11-02
 
 Granskad minimatchbackport och analyslokalt betalarindex. Färska kontroller: Node1063tester/1055pass/0fail/8befintliga WindowsEPERMskip; Sites1912/1909pass/0fail/3Linux-onlyskip; syntax105, TypeScript, build, highaudit passerar, produktionsaudit0. Första rootkörningen hade27PDFworkerfel; full omkörning grön, exakt transientorsak ej styrkt. Samtliga33poäng kvar255/330=7,73 och0/33på9,5. Faktisk inloggad Chrome-läsvy/fem dialogbredder styrks nu; bank0599 fortsatt spärrad/revision42. Sites55 är tidigare driftversion, ny publicering och exakt main-CI återstår att verifiera.

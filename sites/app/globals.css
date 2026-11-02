@@ -63,3 +63,34 @@ main{padding:28px 30px 0;max-width:1760px}h1{font-size:34px;line-height:1.18;fon
 .navigation-close{position:absolute;right:12px;top:12px;width:40px;height:40px;color:#111}
 .mobile-navigation .nav-item{min-height:44px}
 @media(max-width:760px){.desktop-navigation{display:none}}
+
+/* Bounded lists: all records stay reachable without thousands of DOM rows. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.list-pagination{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 22px;border-top:1px solid var(--line);color:#444;background:#fff;flex-wrap:wrap}
+.list-pagination-count{font-size:12px;margin:0;line-height:1.6}
+.list-pagination-controls{display:flex;align-items:center;gap:12px;font-size:12px;flex-wrap:wrap}
+.list-pagination-controls .btn{min-height:44px}
+.list-pagination-controls [aria-disabled="true"]{color:#666;background:#f3f3f3;cursor:default}
+.list-pagination-controls :focus-visible,.invoice-row-action button:focus-visible,.workspace-search-results button:focus-visible{outline:3px solid #222;outline-offset:3px}
+.invoice-table{white-space:normal;table-layout:fixed;min-width:880px}
+.invoice-table th,.invoice-table td{overflow-wrap:anywhere;vertical-align:top}
+.invoice-table th:first-child{width:20%}.invoice-table th:nth-child(2){width:16%}.invoice-table th:nth-child(3){width:22%}.invoice-table th:last-child{width:48px}
+.invoice-table td small{display:block;margin-top:5px;font-size:11px;line-height:1.55;color:#555}
+.invoice-table .party-cell>div{min-width:0}.invoice-table .party-cell strong{white-space:normal}
+.invoice-table .contact-avatar{flex-shrink:0}.invoice-reference,.invoice-payer{line-height:1.55}
+.invoice-row-action button{min-height:44px;min-width:44px}
+.workspace-search-results{max-width:calc(100vw - 32px);max-height:min(70vh,600px);overflow-y:auto;overscroll-behavior:contain}
+.workspace-search-results button{min-height:44px}.workspace-search-results button>span{min-width:0;overflow-wrap:anywhere}.workspace-search-results button>strong{white-space:nowrap}
+@media(max-width:1100px){
+ .invoice-list{overflow:visible}.invoice-table{min-width:0;table-layout:auto}.invoice-table thead{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}
+ .invoice-table,.invoice-table tbody{display:block}.invoice-table tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 18px;padding:20px;border-bottom:1px solid var(--line)}
+ .invoice-table td{display:block;padding:0!important;border:0!important;min-width:0;text-align:left!important;font-size:13px}
+ .invoice-table td[data-label]:before{content:attr(data-label);display:block;margin-bottom:5px;font-size:10px;font-weight:600;letter-spacing:.3px;color:#555}
+ .invoice-table td:first-child,.invoice-table td:nth-child(3){grid-column:1/-1}.invoice-table .invoice-row-action{display:flex;justify-content:flex-end;align-items:flex-end}
+ .invoice-table tr:last-child{border-bottom:0}.invoice-table .party-cell{gap:10px}.invoice-table .pill{white-space:normal}
+}
+@media(max-width:600px){
+ .list-pagination{padding:16px 14px;gap:12px}.list-pagination-controls{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:10px}.list-pagination-controls>span{grid-column:1/-1;grid-row:1;text-align:center}.list-pagination-controls .btn{padding:10px 7px;font-size:12px;white-space:normal}
+ .invoice-table tr{padding:17px 14px;gap:14px}.table-toolbar .table-tools,.table-toolbar .search-field{min-width:0;max-width:100%}.table-tools .search-field input{min-width:0;width:100%}
+ .table-footer{gap:12px;flex-wrap:wrap}.workspace-search-results{left:0;min-width:0;width:calc(100vw - 32px)}
+}

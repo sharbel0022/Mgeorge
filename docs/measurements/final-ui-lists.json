@@ -1,0 +1,132 @@
+{
+  "schema": "mgeorge-synthetic-ui-lists-v1",
+  "recordedAt": "2026-11-02T18:48:46.443Z",
+  "baselineCommit": "a9f88ae",
+  "component": "sites/components/bank-payments.tsx",
+  "baselineComponentSha256": "ee81aaf9ecb9c8ef579b82c5143f148745b5699eb96d705f87155c601a3f01c0",
+  "currentComponentSha256": "4278406bb08b88f094d3645bf93a0b075c431a730a09ec3413b24c534b4fd185",
+  "runnerSha256": "188c27038d0853a0d5db70644e60ea0bdc2ddef1501226f2e89e42a7fa937707",
+  "dependencies": {
+    "sites/lib/domain.ts": "c6669fd566fb395c13ee47868d93ffe068f6969e12d9c7c7c53a99d2ab51a772",
+    "sites/lib/payment-presentation.ts": "b8d2721d7eb9736ca1b5e6bda56f9c5c356a4b27dae0894d4120eeb928bb7a72",
+    "sites/lib/reconciliation-engine.js": "d1bd479c5453e49d18bdaa6e9f84de817f5edc76976608d2b8aa55d477416148",
+    "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+    "sites/lib/payer-evidence.js": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661",
+    "sites/tests/helpers/bank-api-fixture.mjs": "520815af14c53be00e4c887fc8bf7fbda1cee9cf92a72c2fbaf8a3aff8533414",
+    "sites/components/list-pagination.tsx": "33638964bb6e47bc3b8a93f7fb0509482cfeef129cb2dd47bf48cc937a453b8e"
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "react": "19.3.1",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "logicalCpuCount": 9
+  },
+  "method": {
+    "requestedSizes": [
+      100,
+      1000,
+      5000
+    ],
+    "measuredRuns": 3,
+    "warmupRuns": 1,
+    "order": "Warm each variant once; alternate baseline/current order between measured rounds.",
+    "time": "performance.now around renderToStaticMarkup only; compilation, fixture creation, hashing and markup checks excluded.",
+    "render": "Real React SSR, real payment-presentation and domain modules; first page; no BankPaymentSummary.",
+    "budgetMs": 180000,
+    "synthetic": true
+  },
+  "limits": [
+    "Local synthetic shared-host measurement, not a production latency guarantee.",
+    "Excludes network, provider calls, fetching, search/filter work, complete-state summary, hydration, browser layout, keyboard focus and financial-engine SLA.",
+    "Fresh SSR instances do not measure client useMemo retention; separate interactive regression tests cover unchanged rerenders.",
+    "Only the baseline component source is historical; both variants share the same current dependent modules.",
+    "A synchronous render already in progress can exceed the configured between-dataset time budget."
+  ],
+  "datasets": [
+    {
+      "size": 100,
+      "inputBeforeSha256": "e8ce77adbb6a7404d642c3fe2a086637ff63c326a2c24f88abaea9ea8307b29b",
+      "inputAfterSha256": "e8ce77adbb6a7404d642c3fe2a086637ff63c326a2c24f88abaea9ea8307b29b",
+      "inputsUnchanged": true,
+      "baseline": {
+        "warmupMs": 1448.9741289999997,
+        "samplesMs": [
+          726.5709100000004,
+          554.0178100000003,
+          607.5213039999999
+        ],
+        "medianMs": 607.5213039999999,
+        "markupBytes": 114015,
+        "desktopRows": 100,
+        "mobileCards": 100,
+        "evidenceCallsPerRender": 100,
+        "markupSha256": "0e8bd709b3b5b7031d220f068eb0fed5356075f007d4147e520400f16daa5894"
+      },
+      "current": {
+        "warmupMs": 489.7241720000002,
+        "samplesMs": [
+          196.6195289999996,
+          173.48765300000014,
+          203.62299299999995
+        ],
+        "medianMs": 196.6195289999996,
+        "markupBytes": 57608,
+        "desktopRows": 50,
+        "mobileCards": 50,
+        "evidenceCallsPerRender": 50,
+        "markupSha256": "ca6095831f6bdd59741d58cbde0bd5a20a317d5db22f07c69fd0f60143b5237e"
+      },
+      "medianSpeedup": 3.089831956621161,
+      "markupReductionPercent": 49.473314914704204,
+      "totalElapsedMs": 4597.252259
+    },
+    {
+      "size": 1000,
+      "inputBeforeSha256": "52f8f8a62973eb6e6c07d81a711532a56936329d2ed41654a92c7ab3e1f24796",
+      "inputAfterSha256": "52f8f8a62973eb6e6c07d81a711532a56936329d2ed41654a92c7ab3e1f24796",
+      "inputsUnchanged": true,
+      "baseline": {
+        "warmupMs": 4321.622248000001,
+        "samplesMs": [
+          3698.7672789999997,
+          2192.7543590000023,
+          1965.7718710000008
+        ],
+        "medianMs": 2192.7543590000023,
+        "markupBytes": 1138490,
+        "desktopRows": 1000,
+        "mobileCards": 1000,
+        "evidenceCallsPerRender": 1000,
+        "markupSha256": "1d90b6dcfa1672a9d0a7d3b26669d9433dfca038b853eb915a51e1351be2dec1"
+      },
+      "current": {
+        "warmupMs": 149.7981810000001,
+        "samplesMs": [
+          269.46133799999916,
+          119.32406000000083,
+          109.4545939999989
+        ],
+        "medianMs": 119.32406000000083,
+        "markupBytes": 57610,
+        "desktopRows": 50,
+        "mobileCards": 50,
+        "evidenceCallsPerRender": 50,
+        "markupSha256": "f74372229749e88b6a19a23e4275a5ddabcbd7b5d727003a93b95021e7bbc0b5"
+      },
+      "medianSpeedup": 18.376464553753763,
+      "markupReductionPercent": 94.93978866744548,
+      "totalElapsedMs": 13293.528553
+    }
+  ],
+  "skipped": [
+    {
+      "size": 5000,
+      "reason": "Between-dataset time budget; conservative quadratic projection from the last completed dataset.",
+      "elapsedMs": 17906.544623,
+      "projectedDatasetMs": 332338.213825
+    }
+  ],
+  "elapsedMs": 17906.918911
+}

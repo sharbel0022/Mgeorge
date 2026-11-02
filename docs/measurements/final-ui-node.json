@@ -1,0 +1,145 @@
+{
+  "generated_at": "2026-11-02T18:52:29.842Z",
+  "scope": "Local synthetic presentation only; shared host; no production SLA or browser layout claim.",
+  "mode": "Supplied baseline directory; caller-provided reference label is not authenticated by this runner. Compare the recorded source hashes with git before attributing this result to a commit.",
+  "baseline_ref_label": "a9f88ae",
+  "baseline_source_sha256": {
+    "public/app.js": "8c7fe86d4e1c099dc57d8a0e552bc70d7c4957b1a709422aed25200fee0f7c90",
+    "public/messages.js": "41d3feec5dc68b8d9d7ac43569fffb78f7405b0d073fa2c97ed8c28f190210ad",
+    "public/payment-control.js": "06bf902619c9e29702b7007cd1721aa34bf118a4d3f96a805cbd39a4f5d4d836"
+  },
+  "current_source_sha256": {
+    "public/app.js": "41235c74579133bc1306cd34a0e5503403ae77f9bfea174db2fbbc9a7e1d47f2",
+    "public/messages.js": "41d3feec5dc68b8d9d7ac43569fffb78f7405b0d073fa2c97ed8c28f190210ad",
+    "public/payment-control.js": "c5e79ca2d74808339d5f6a4e0a250277549d252b29ae535e8a0b3e0ba971acd4"
+  },
+  "runner_sha256": "7a08a72fdc74035cc230a77a081a504ea8ae231641a9c93c90541f7d8b2b8bff",
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "arch": "x64",
+    "v8": "13.6.233.17-node.58",
+    "icu": "78.3"
+  },
+  "fixture": {
+    "rows": 5001,
+    "fixed_clock": "2026-11-02T12:00:00.000Z",
+    "input_sha256": "a4a0a2c5ae0cd7e3c31526bdda0fabde2a1329c99f1606f17202beb55f11936e",
+    "transactions": 0,
+    "allocations": 0,
+    "documents": 0
+  },
+  "method": {
+    "median_runs": 7,
+    "warmups": 1,
+    "paired_alternating": true,
+    "timing_boundary": "Production template/filter functions in VM. API, DOM, layout and network are synthetic boundaries; real formatters and list logic execute."
+  },
+  "inputs_unchanged": true,
+  "results": [
+    {
+      "name": "invoice-page-with-summary",
+      "before_ms": 3533.37,
+      "after_ms": 38.411,
+      "before_samples_ms": [
+        5253.414,
+        3432.646,
+        4290.78,
+        3533.37,
+        2916.398,
+        3657.517,
+        1746.078
+      ],
+      "after_samples_ms": [
+        55.479,
+        46.183,
+        33.713,
+        33.925,
+        38.411,
+        59.381,
+        12.443
+      ],
+      "same_invoice_order": true,
+      "invoice_order_sha256": "418583e87ea730450abcff1f3895ee0127555496fc0f196aa67a9c209f853050",
+      "invoice_count": 50
+    },
+    {
+      "name": "first-page-50",
+      "before_ms": 79.017,
+      "after_ms": 41.916,
+      "before_samples_ms": [
+        79.017,
+        251.871,
+        52.607,
+        76.596,
+        62.346,
+        81.191,
+        87.853
+      ],
+      "after_samples_ms": [
+        63.813,
+        41.916,
+        25.542,
+        27.077,
+        55.258,
+        33.515,
+        55.71
+      ],
+      "same_invoice_order": true,
+      "invoice_order_sha256": "418583e87ea730450abcff1f3895ee0127555496fc0f196aa67a9c209f853050",
+      "invoice_count": 50
+    },
+    {
+      "name": "reference-search",
+      "before_ms": 47.682,
+      "after_ms": 24.205,
+      "before_samples_ms": [
+        50.245,
+        39.62,
+        56.805,
+        33.202,
+        31.725,
+        65.678,
+        47.682
+      ],
+      "after_samples_ms": [
+        41.116,
+        24.205,
+        23.697,
+        15.145,
+        16.253,
+        34.608,
+        50.042
+      ],
+      "same_invoice_order": true,
+      "invoice_order_sha256": "c0475c93dd7da799fb1049195093d54c0e06f3496d12927d279479baaf89cd92",
+      "invoice_count": 1000
+    },
+    {
+      "name": "month-filter",
+      "before_ms": 909.81,
+      "after_ms": 10.928,
+      "before_samples_ms": [
+        1713.992,
+        973.47,
+        679.342,
+        756.778,
+        1087.518,
+        798.946,
+        909.81
+      ],
+      "after_samples_ms": [
+        30.909,
+        15.362,
+        7.779,
+        6.915,
+        131.077,
+        10.928,
+        7.363
+      ],
+      "same_invoice_order": true,
+      "invoice_order_sha256": "0c1ded152b8b23370e7ffc3f9d28a8e51c07f1656701dbe830be127b37eb4cdc",
+      "invoice_count": 2500
+    }
+  ]
+}
