@@ -1,7 +1,7 @@
 import {image,pdf} from '../fixtures.js';
 
 export const archiveFooter='Archived digital copy. This document was preserved by the synthetic document archive. Internal storage reference only.';
-export const opticalInvoiceFacit={invoice_number:'0606',party:'Testbolaget AB',organization_number:'5560160680',issued_at:'2026-10-24',due_at:'2026-11-07',net_cents:300000,vat_cents:75000,total_cents:375000,reference:'0606',bankgiro:'123-4567',currency:'SEK'};
+export const opticalInvoiceFacit={invoice_number:'0606',party:'Testbolaget AB',organization_number:'5560160680',issued_at:'2026-10-24',due_at:'2026-11-07',net_cents:300000,vat_cents:75000,total_cents:375000,reference:'000018',bankgiro:'123-4567',currency:'SEK'};
 
 // Every byte is generated from our synthetic invoice, never customer originals.
 export function rasterPdf({canvas=image(),textLayer='',textFontSize=10,pageSize=[595,842]}={}){

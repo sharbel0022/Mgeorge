@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
@@ -140,7 +141,7 @@ test('review: an explicit manual verification remains valid under its separate l
 
 test('review: exact trusted file replay binds its own reference metadata while API and manual originals remain separate',async()=>{
  const api=await state(),provider=api.transactions[0],bytes=Buffer.from(`Datum;Belopp;Betalare;OCR;Referens;Valuta;Transaktions-id;Konto\n2026-10-26;625,00;Synthetic customer AB;000018;${provider.bankReference};SEK;${provider.externalId};${provider.account}`),hash=createHash('sha256').update(bytes).digest('hex'),documentId='synthetic-api-file';
- const {parseCSV,guessMapping,mapCSV}=await import(compiled('lib/imports.ts',{'./domain':domain,'./local-ocr':data('export async function imageText(){} export async function pdfInvoiceText(){}'),'./payment-references.js':url('lib/payment-references.js'),'./bankgiro-parser.js':url('lib/bankgiro-parser.js')}));
+ const {parseCSV,guessMapping,mapCSV}=await import(compiled('lib/imports.ts',{'./invoice-fields.js':invoiceParserUrl(),'./domain':domain,'./local-ocr':data('export async function imageText(){} export async function pdfInvoiceText(){}'),'./payment-references.js':url('lib/payment-references.js'),'./bankgiro-parser.js':url('lib/bankgiro-parser.js')}));
  const parsed=parseCSV(bytes.toString()),rows=mapCSV(parsed,guessMapping(parsed.headers),'Synthetic.csv'),fileCommand={type:'transactions.import',trustedBankFileImport:true,documentId,hash,name:'Synthetic.csv',rows};
  let s=applyCommand({...emptyState(),invoices:structuredClone(api.invoices)},fileCommand).state;
  const fresh=await normalizeTransactions([structuredClone(provider.bankData)],{accountKey:provider.account,accountLabel:'Synthetic account',bankName:'Synthetic bank',dateFrom:'2026-10-01',dateTo:'2026-10-30'});

@@ -89,6 +89,16 @@ test('connected account exposes masked details, consent validity and actions',()
   assert.doesNotMatch(html,/Välj konto…|Anslut valt konto/);
 });
 
+test('bank date controls stay on the UTC day after Swedish midnight without changing invoice dates',()=>{
+  const view=ui();bankFixture(view,[connection]);
+  const at=Date.parse('2026-06-01T22:30:00Z');
+  view.set('Date',class extends Date{constructor(...args){super(...(args.length?args:[at]));}static now(){return at;}});
+  const html=view.run('connectionPage()');
+  assert.match(html,/id="from-test-connection" value="2026-05-03" max="2026-06-01"/);
+  assert.match(html,/id="to-test-connection" value="2026-06-01" max="2026-06-01"/);
+  assert.equal(view.run('iso()'),'2026-06-02');
+});
+
 test('public login replaces bank content and logout is offered only for authenticated public access',()=>{
   const view=ui();bankFixture(view,[connection]);
   view.run('state.me={authenticated:true,login_required:true};render()');
@@ -192,11 +202,29 @@ test('standalone import requires an explicit alias and never submits a saved con
 
 test('manual sync displays enriched payments and does not approve invoice matches',async()=>{
   const view=ui();bankFixture(view,[connection]);
+  view.element('#bank-range-test-connection').open=true;
   view.element('#from-test-connection').value='2026-09-28';view.element('#to-test-connection').value='2026-10-27';
   view.run('globalThis.requests=[];globalThis.messages=[];api=async(path,method,body)=>{requests.push({path,method,body});return {imported:0,duplicate:1,enriched:1};};refresh=async()=>true;toast=message=>messages.push(message)');
   await view.run('syncBank("test-connection")');
   assert.deepEqual(plain(view.run('requests.map(r=>r.path)')),['/bank/sync']);
+  assert.deepEqual(plain(view.run('requests[0].body')),{connection_id:'test-connection',date_from:'2026-09-28',date_to:'2026-10-27'});
   assert.match(view.run('messages[0]'),/1 bankhändelse kompletterad/);
+});
+
+test('the ordinary bank update uses saved recovery coverage instead of prefilled custom dates',async()=>{
+  const view=ui();bankFixture(view,[connection]);
+  view.element('#bank-range-test-connection').open=false;
+  view.element('#from-test-connection').value='2026-10-04';view.element('#to-test-connection').value='2026-11-02';
+  view.run('globalThis.requests=[];api=async(path,method,body)=>{requests.push({path,method,body});return {imported:0,duplicate:0};};refresh=async()=>true;toast=()=>{}');
+  await view.run('syncBank("test-connection")');
+  assert.deepEqual(plain(view.run('requests[0].body')),{connection_id:'test-connection'});
+});
+
+test('bank recovery displays the remaining date gap and safely escapes the actual failure reason',()=>{
+  const view=ui();bankFixture(view,[{...connection,status:'error',last_error:'Välj en kortare period <script>synthetic</script>',sync_coverage:{date_from:'2026-08-01',date_to:'2026-08-31',pending_from:'2026-09-01',complete:false}}]);
+  const html=view.run('connectionPage()');
+  assert.match(html,/2026-08-01/);assert.match(html,/2026-08-31/);assert.match(html,/2026-09-01/);
+  assert.match(html,/Välj en kortare period &lt;script&gt;synthetic&lt;\/script&gt;/);assert.doesNotMatch(html,/<script>/);
 });
 
 test('Bankgiro aggregate review does not expose a match approval and explains missing details',()=>{

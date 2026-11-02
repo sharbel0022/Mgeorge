@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
@@ -14,7 +15,7 @@ function compiled(path,imports={}){
  return data(code);
 }
 const domain=url('../lib/domain.ts');
-const parsers=compiled('../lib/imports.ts',{'./domain':domain,'./local-ocr':data('export async function imageText(){};export async function pdfInvoiceText(){}'),'./payment-references.js':url('../lib/payment-references.js'),'./bankgiro-parser.js':url('../lib/bankgiro-parser.js')});
+const parsers=compiled('../lib/imports.ts',{'./invoice-fields.js':invoiceParserUrl(),'./domain':domain,'./local-ocr':data('export async function imageText(){};export async function pdfInvoiceText(){}'),'./payment-references.js':url('../lib/payment-references.js'),'./bankgiro-parser.js':url('../lib/bankgiro-parser.js')});
 const parser=await import(parsers);
 const env=data('export const env=new Proxy({}, {get:(_,key)=>globalThis.bankFileProvenance.env[key]});');
 const server=compiled('../lib/server.ts',{'cloudflare:workers':env,'@/app/chatgpt-auth':data('export async function getChatGPTUser(){return globalThis.bankFileProvenance.user;}'),'./domain':domain,'./imports':parsers});

@@ -1,4 +1,5 @@
 import {syntheticBankRow,syntheticBankId} from './helpers/bank-api-fixture.mjs';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import {syntheticAccountStore,retainSyntheticConsent} from './helpers/bank-account-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -19,7 +20,7 @@ const domain=url('../lib/domain.ts'),engine=url('../lib/reconciliation-engine.js
 const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});
 const {reconcileState}=await import(reconciliation);
 const {buildPaymentOverview}=await import(compiled('../lib/payment-overview.ts',{'./domain':domain,'./reconciliation':reconciliation,'./economy-summary.js':url('../lib/economy-summary.js'),'./document-triage.js':url('../lib/document-triage.js')}));
-const parsers=compiled('../lib/imports.ts',{'./domain':domain,'./local-ocr':data('export async function imageText(){} export async function pdfInvoiceText(){}'),'./payment-references.js':url('../lib/payment-references.js'),'./bankgiro-parser.js':url('../lib/bankgiro-parser.js')});
+const parsers=compiled('../lib/imports.ts',{'./invoice-fields.js':invoiceParserUrl(),'./domain':domain,'./local-ocr':data('export async function imageText(){} export async function pdfInvoiceText(){}'),'./payment-references.js':url('../lib/payment-references.js'),'./bankgiro-parser.js':url('../lib/bankgiro-parser.js')});
 const account='iban:SE4280000890119146168423';
 const invoice=(s=emptyState(),extra={})=>applyCommand(s,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'000018',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true,...extra}}).state;
 const bank=(s,extra={})=>applyCommand(s,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount:62500,currency:'SEK',account,party:'Synthetic customer AB',payerReference:'000018',bankReference:'Q8-BANK-1',externalId:'Q8-BANK-1',source:'Enable Banking · Synthetic',kind:'payment',verified:true,...extra})]}).state;

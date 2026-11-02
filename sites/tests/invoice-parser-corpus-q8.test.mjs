@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync,readdirSync} from 'node:fs';
@@ -10,7 +11,7 @@ import {serverPdfText} from '../lib/server-pdf.ts';
 
 const file=path=>new URL(path,import.meta.url).href;
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
-const parserUrl=data(readFileSync(new URL('../lib/invoice-fields.js',import.meta.url),'utf8').replace("'./domain'",JSON.stringify(file('../lib/domain.ts'))).replace("'./document-triage.js'",JSON.stringify(file('../lib/document-triage.js'))));
+const parserUrl=invoiceParserUrl();
 const {interpretInvoice}=await import(parserUrl);
 
 for(const item of identityCases)test('Q8 Sites synthetic invoice identity: '+item.name,()=>{

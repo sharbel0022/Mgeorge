@@ -21,8 +21,9 @@ const originalFetch=globalThis.fetch;
 let cookie='',authBody,sessionIndex=0,providerCalls=0,transactionCalls=0,active=true,mode='',lastQuery;
 let releaseProvider,providerReached,providerWait;
 const syntheticIban='SE4280000890119146168423';
+const bookingDate=new Date(Date.now()-7*86400000).toISOString().slice(0,10);
 const account=(uid='account-1')=>({uid,name:'Test företagskonto',currency:'SEK',usage:'ORGA',account_id:{iban:syntheticIban},identification_hash:'stable-test-account'});
-const transaction=(entry,amount='100.00',direction='CRDT')=>({status:'BOOK',entry_reference:entry,transaction_id:'temporary-'+sessionIndex+'-'+entry,booking_date:'2026-10-26',transaction_amount:{amount,currency:'SEK'},credit_debit_indicator:direction,debtor:{name:'Testkund AB'},reference_number:'12345'});
+const transaction=(entry,amount='100.00',direction='CRDT')=>({status:'BOOK',entry_reference:entry,transaction_id:'temporary-'+sessionIndex+'-'+entry,booking_date:bookingDate,transaction_amount:{amount,currency:'SEK'},credit_debit_indicator:direction,debtor:{name:'Testkund AB'},reference_number:'12345'});
 globalThis.fetch=async(url,options)=>{
   if(String(url).startsWith(base))return originalFetch(url,options);
   const target=new URL(url);assert.equal(target.origin,'https://api.enablebanking.com');providerCalls++;
@@ -43,13 +44,14 @@ globalThis.fetch=async(url,options)=>{
   }
   if(target.pathname.endsWith('/transactions')){
     transactionCalls++;lastQuery=target.searchParams;
+    const requested=rows=>rows.filter(row=>row.booking_date>=target.searchParams.get('date_from')&&row.booking_date<=target.searchParams.get('date_to'));
     if(mode==='rate_limit')return Response.json({error:'ASPSP_RATE_LIMIT_EXCEEDED',message:'private-bank-data'},{status:429,headers:{'Retry-After':'120'}});
     if(mode==='rate_limit_missing')return Response.json({error:'ASPSP_RATE_LIMIT_EXCEEDED'},{status:429});
     if(mode==='failure')throw Error('secret-provider-error');
     if(mode==='aggregate')return Response.json({transactions:[{...transaction('bg-aggregate','200.00'),debtor:{name:'Bankgirot'},reference_number:undefined,remittance_information:['Bankgiro insättning']} ]});
-    if(!target.searchParams.has('continuation_key'))return Response.json({transactions:[transaction('entry-1')],continuation_key:'page-2'});
+    if(!target.searchParams.has('continuation_key'))return Response.json({transactions:requested([transaction('entry-1')]),continuation_key:'page-2'});
     assert.equal(target.searchParams.get('continuation_key'),'page-2');
-    return Response.json({transactions:[transaction('entry-2','20.00','DBIT')]});
+    return Response.json({transactions:requested([transaction('entry-2','20.00','DBIT')])});
   }
   throw Error('Unexpected mock endpoint '+target.pathname);
 };
@@ -106,7 +108,7 @@ test('explicit account selection verifies accounts and initially imports 30 days
   assert.equal(lastQuery.get('transaction_status'),'BOOK');
   assert.equal(Date.parse(lastQuery.get('date_to'))-Date.parse(lastQuery.get('date_from')),29*86400000);
   const connected=await current();assert.equal(connected.status,'connected');assert.ok(connected.last_synced);
-  const again=await call('/api/bank/sync','POST',{connection_id:c.id});assert.equal(again.json.imported,0);assert.equal(again.json.duplicate,2);
+  const again=await call('/api/bank/sync','POST',{connection_id:c.id,date_from:bookingDate,date_to:bookingDate});assert.equal(again.json.imported,0);assert.equal(again.json.duplicate,2);
 });
 test('wrong owner and another principal cannot read or mutate company banking data',async()=>{
   const c=await current();db.prepare('UPDATE bank_connections SET owner=? WHERE id=?').run('another-user',c.id);
@@ -126,7 +128,8 @@ test('rate limits persist cooldown; expired sessions require renewal without imp
 test('renewal replaces revoked consent and keeps stable transaction identities across account UIDs',async()=>{
   const old=await current();const result=await call('/api/bank/connect','POST',{renew_connection_id:old.id});assert.equal(result.res.status,200);
   assert.equal((await callback(authBody.state)).res.status,302);const c=await current();assert.equal(c.id,old.id);assert.equal(c.status,'pending_account');assert.notEqual(c.accounts[0].uid,old.accounts[0].uid);
-  const selected=await call('/api/bank/accounts','POST',{connection_id:c.id,account_uid:c.accounts[0].uid});assert.equal(selected.json.imported,0);assert.equal(selected.json.duplicate,2);
+  const selected=await call('/api/bank/accounts','POST',{connection_id:c.id,account_uid:c.accounts[0].uid});assert.equal(selected.json.imported,0);assert.equal(selected.json.initial_sync_error,undefined);
+  const replay=await call('/api/bank/sync','POST',{connection_id:c.id,date_from:bookingDate,date_to:bookingDate});assert.equal(replay.json.imported,0);assert.equal(replay.json.duplicate,2);
   assert.equal(db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,2);
 });
 test('account selection locks provider verification against concurrent selection, sync and disconnect',async()=>{
@@ -160,7 +163,7 @@ test('cancelled, expired and failed approvals never create a connection',async()
   assert.equal(db.prepare('SELECT COUNT(*) n FROM bank_connections').get().n,n);
 });
 test('Bankgiro totals without payer details are review-only and cannot pay invoices',async()=>{
-  const c=await current();mode='aggregate';const synced=await call('/api/bank/sync','POST',{connection_id:c.id});mode='';assert.equal(synced.json.imported,1);
+  const c=await current();mode='aggregate';const synced=await call('/api/bank/sync','POST',{connection_id:c.id,date_from:bookingDate,date_to:bookingDate});mode='';assert.equal(synced.json.imported,1);
   const t=(await call('/api/bank-transactions')).json.items.find(t=>t.bank_reference==='bg-aggregate');assert.equal(t.is_aggregate,1);assert.equal(t.status,'review');assert.match(t.review_reason,/Betalardetaljer saknas/);
   const invoice=await call('/api/invoices','POST',{direction:'customer',party:'Testkund AB',invoice_number:'BG-1',total_cents:20000,reference:'12345'});
   assert.equal((await call('/api/allocations','POST',{invoice_id:invoice.json.id,transaction_id:t.id,amount_cents:20000,confirm:true})).res.status,400);
@@ -185,9 +188,10 @@ test('scheduled ASPSP rate limits without Retry-After retain six-hour cooldown a
   db.prepare("UPDATE bank_connections SET last_synced='',retry_after=0,status='connected' WHERE id=?").run(c.id);db.prepare('DELETE FROM integration_jobs WHERE name=?').run(job);
   await call('/api/settings','PATCH',{sync_interval_minutes:15});mode='rate_limit_missing';const before=transactionCalls;
   try{
+    const attemptStarted=Date.now();
     await runScheduledSync();assert.equal(transactionCalls,before+1);
-    assert.ok(db.prepare('SELECT retry_after FROM bank_connections WHERE id=?').get(c.id).retry_after>=Date.now()+21599000);
-    assert.ok(db.prepare('SELECT next_attempt FROM integration_jobs WHERE name=?').get(job).next_attempt>=Date.now()+21599000);
+    assert.ok(db.prepare('SELECT retry_after FROM bank_connections WHERE id=?').get(c.id).retry_after>=attemptStarted+21600000);
+    assert.ok(db.prepare('SELECT next_attempt FROM integration_jobs WHERE name=?').get(job).next_attempt>=attemptStarted+21600000);
     // Even if the shorter configured interval elapsed, provider cooldown wins.
     db.prepare('UPDATE integration_jobs SET last_attempt=0 WHERE name=?').run(job);
     const restarted=await import('../src/server.js?aspsp-rate-fallback-restart');
