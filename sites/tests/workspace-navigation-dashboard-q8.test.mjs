@@ -9,6 +9,7 @@ const elements=node=>!node||typeof node!=='object'?[]:Array.isArray(node)?node.f
 const text=node=>node==null||typeof node==='boolean'?'':Array.isArray(node)?node.map(text).join(' '):typeof node==='object'?text(node.props?.children):String(node);
 const flush=async()=>{for(let n=0;n<8;n++)await new Promise(resolve=>setImmediate(resolve));};
 function compiled(path,imports){
+ if(path==='../app/dashboard.tsx')imports={...imports,'@/components/list-pagination':compiled('../components/list-pagination.tsx',{react:import.meta.resolve('react')})};
  let source=readFileSync(new URL(path,import.meta.url),'utf8');if(path==='../app/dashboard.tsx')source+='\nexport {SettingsView};';
  let code=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  for(const [name,url]of Object.entries({'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'lucide-react':import.meta.resolve('lucide-react'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));

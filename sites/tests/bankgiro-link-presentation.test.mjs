@@ -10,11 +10,11 @@ import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 const url=p=>new URL(p,import.meta.url).href;
 function compiled(path,imports={}){
  let text=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;
- for(const [name,target] of Object.entries({'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'./domain':url('../lib/domain.ts'),'@/lib/domain':url('../lib/domain.ts'),'./reconciliation-engine.js':url('../lib/reconciliation-engine.js'),'./payment-references.js':url('../lib/payment-references.js'),...imports}))for(const q of ['"',"'"])text=text.replaceAll(q+name+q,JSON.stringify(target));
+ for(const [name,target] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'./domain':url('../lib/domain.ts'),'@/lib/domain':url('../lib/domain.ts'),'./reconciliation-engine.js':url('../lib/reconciliation-engine.js'),'./payment-references.js':url('../lib/payment-references.js'),...imports}))for(const q of ['"',"'"])text=text.replaceAll(q+name+q,JSON.stringify(target));
  return 'data:text/javascript;base64,'+Buffer.from(text).toString('base64');
 }
 const presentation=compiled('../lib/payment-presentation.ts'),view=await import(presentation);
-const ui=await import(compiled('../components/bank-payments.tsx',{'@/lib/payment-presentation':presentation}));
+const ui=await import(compiled('../components/bank-payments.tsx',{'@/lib/payment-presentation':presentation,'./list-pagination':compiled('../components/list-pagination.tsx')}));
 const detail=await import(compiled('../components/bankgiro-link-review.tsx',{'react':import.meta.resolve('react')}));
 function fixture(){
  const state=emptyState();
