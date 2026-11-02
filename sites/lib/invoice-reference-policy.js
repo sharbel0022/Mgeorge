@@ -22,6 +22,11 @@ const companyKey = value => {
   return trimSpaces(value).replace(/ +/g, ' ').toLowerCase() || null;
 };
 
+/** Canonical comparison identity; raw observations must be retained separately. */
+export function canonicalInvoiceReference(value) {
+  return identifier(value);
+}
+
 /** Compare whole, bounded identifiers. Never coerce numbers or remove separators. */
 export function strictInvoiceReferenceMatch(a, b) {
   const left = identifier(a), right = identifier(b);
@@ -73,6 +78,22 @@ const issueReasons = Object.freeze({
   original_issuer_conflict: 'Originalets utställare är ett annat företag än det som referensregeln gäller för.',
 });
 
+/** Select the existing company configuration without inventing an invoice. */
+export function resolveInvoiceReferenceConfiguration(context = {}) {
+  const settings = isRecord(context) ? context : {};
+  let policies;
+  try {
+    policies = validateInvoiceReferencePolicies(settings.policies === undefined
+      ? [MGEORGE_INVOICE_REFERENCE_POLICY] : settings.policies);
+  } catch {
+    return {policy: null, issue: 'invalid_policy_configuration'};
+  }
+  if (policies.length === 0) return {policy: null, issue: ''};
+  const identity = isRecord(settings.company) ? companyKey(settings.company.name) : null;
+  if (!identity) return {policy: null, issue: 'invalid_company_configuration'};
+  return {policy: policies.find(candidate => companyKey(candidate.companyName) === identity) || null, issue: ''};
+}
+
 /**
  * Resolve an intended invoice reference without changing inputs or interpreting
  * bank OCR. A BLOCKED decision must never be replaced by legacy matching.
@@ -105,20 +126,10 @@ export function resolveInvoiceReference(invoice, context = {}) {
     issues: [issue],
     reason: issueReasons[issue],
   });
-  const settings = isRecord(context) ? context : {};
-  let policies;
-  try {
-    policies = validateInvoiceReferencePolicies(settings.policies === undefined
-      ? [MGEORGE_INVOICE_REFERENCE_POLICY] : settings.policies);
-  } catch {
-    return blockConfiguration('invalid_policy_configuration');
-  }
-  if (policies.length === 0) return result;
-
-  const identity = isRecord(settings.company) ? companyKey(settings.company.name) : null;
-  if (!identity) return blockConfiguration('invalid_company_configuration');
-  const policy = policies.find(candidate => companyKey(candidate.companyName) === identity);
+  const {policy, issue} = resolveInvoiceReferenceConfiguration(context);
+  if (issue) return blockConfiguration(issue);
   if (!policy) return result;
+  const identity = companyKey(context.company.name);
 
   const issues = [];
   const number = identifier(input.invoice_number);

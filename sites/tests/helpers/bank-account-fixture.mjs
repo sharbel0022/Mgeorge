@@ -9,8 +9,13 @@ export function syntheticConnection(owner='synthetic-owner',iban='SE428000089011
 /** Minimal real consent table for small D1 fixtures; full migration fixtures
  * retain their real table. Financial fences read the same persisted values. */
 export function retainSyntheticConsent(sql,resource=syntheticConnection()){
+ retainSyntheticIngestTables(sql);
  const fields=Object.keys(resource);sql.exec('CREATE TABLE IF NOT EXISTS bank_connections('+fields.map(field=>field+' TEXT NOT NULL').join(',')+',UNIQUE(owner))');
  sql.prepare('INSERT OR REPLACE INTO bank_connections('+fields.join(',')+') VALUES('+fields.map(()=>'?').join(',')+')').run(...Object.values(resource));return resource;
+}
+/** Real empty source census for small fixtures; full migrations retain rows. */
+export function retainSyntheticIngestTables(sql){
+ sql.exec(readFileSync(new URL('../../drizzle/0017_bankgiro_auto_ingest.sql',import.meta.url),'utf8').replaceAll('CREATE TABLE `','CREATE TABLE IF NOT EXISTS `').replaceAll('CREATE UNIQUE INDEX `','CREATE UNIQUE INDEX IF NOT EXISTS `').replaceAll('CREATE INDEX `','CREATE INDEX IF NOT EXISTS `'));
 }
 export function syntheticAccountStore(owner='synthetic-owner',iban='SE4280000890119146168423'){
  const resource=syntheticConnection(owner,iban);

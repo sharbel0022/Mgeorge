@@ -8,8 +8,10 @@ import {bankFinancialReview,hasBankEvidenceConflict,bankEvidenceReviewReason,sam
 import {matchingReferenceValues} from './payment-references.js';
 import {referenceEvidenceCompatible} from '../sites/lib/reference-evidence-compat.js';
 import {matchesInvoiceReference,strictInvoiceReferenceMatch} from './invoice-reference-policy.js';
+import {invoiceOriginalIsVerified} from './invoice-original.js';
+import {projectBankgiroSourceEvidence} from '../sites/lib/bankgiro-source-evidence.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
-export const RECONCILIATION_RULE_VERSION='invoice-reference-policy-2026-11-02.1';
+export const RECONCILIATION_RULE_VERSION='invoice-reference-policy-2026-11-02.2';
 // Keep invoice-number punctuation: AB/12 and AB12 are not interchangeable IDs.
 const ref=value=>String(value||'').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g,' ');
 export function exactReference(reference, candidate){
@@ -22,7 +24,7 @@ export function exactReference(reference, candidate){
 }
 
 export function reconciliationData(db,{owner}={}){
-  const retained=db.prepare('SELECT id,name,mime_type,content,content_sha256 FROM import_jobs WHERE content IS NOT NULL').all();
+  const retained=db.prepare('SELECT id,owner,name,mime_type,content,content_sha256 FROM import_jobs WHERE content IS NOT NULL').all();
   const originals=new Set(retained.filter(x=>x.content_sha256&&digest(x.content)===x.content_sha256).map(x=>x.id));
   const alteredOriginals=new Set(retained.filter(x=>!originals.has(x.id)).map(x=>x.id));
   const transactions=listTransactions(db),allocations=db.prepare('SELECT * FROM allocations').all();
@@ -34,6 +36,19 @@ export function reconciliationData(db,{owner}={}){
     try{const resources=decryptObject(connection.accounts_json),selected=Array.isArray(resources)?resources.filter(a=>a?.uid===connection.selected_account_uid):[],account=canonical(selected[0]?.account_id?.iban);if(selected.length===1&&selected[0]?.currency==='SEK'&&/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(account))approvedAccounts.add(account);}catch{}
   }
   const retainedById=new Map(retained.map(original=>[original.id,original])),parsedFiles=new Map();
+  // The queue is transport evidence, never a second matcher. Its current owned
+  // authorization/identity facts hold already-imported rows when a later
+  // delivery is blocked before reaching the financial sink. These reads occur
+  // under runReconciliation's writer lock together with the allocation reads.
+  const sourceJobs=db.prepare('SELECT * FROM bankgiro_ingest_jobs'+(owner!==undefined?' WHERE owner=?':'')).all(...(owner!==undefined?[owner]:[]));
+  const sourceRows=db.prepare('SELECT * FROM bankgiro_ingest_sources'+(owner!==undefined?' WHERE owner=?':'')).all(...(owner!==undefined?[owner]:[]));
+  const sourceIssues=new Map(),sourceImports=new Map();
+  for(const job of sourceJobs){if(!job.owner||!job.import_id||retainedById.get(job.import_id)?.owner!==job.owner)continue;const imports=sourceImports.get(job.owner)||new Set();imports.add(job.import_id);sourceImports.set(job.owner,imports);}
+  for(const [sourceOwner,ids] of sourceImports){
+    const sourceOriginals=[...ids].flatMap(id=>{const original=retainedById.get(id);return original?[{importId:id,sha256:original.content_sha256,intact:original.owner===sourceOwner&&originals.has(id)}]:[];});
+    const evidence=projectBankgiroSourceEvidence({owner:sourceOwner,originals:sourceOriginals,sources:sourceRows,jobs:sourceJobs});
+    for(const report of evidence.reports)if(report.issue)sourceIssues.set(report.importId,'Bankgirokällans behörighet eller rapportunderlag måste kontrolleras före automatisk matchning.');
+  }
   const sameDerivedFacts=(original,t)=>{
     const organization=value=>String(value||'').replace(/[- ]/g,'');
     return ['amount_cents','currency','booked_at','payer','reference','bank_reference'].every(field=>original[field]===t[field])
@@ -67,26 +82,29 @@ export function reconciliationData(db,{owner}={}){
   const originalVerifiedTransactions=transactions.map(t=>{
     const account_consent_issue=approvedAccounts.has(canonical(t.account))?'':'Aktivt ägt bankmedgivande med exakt valt SEK-konto krävs för automatisk betalningskontroll.';
     const original_verified=!hasBankEvidenceConflict(t)&&!alteredOriginals.has(t.import_id)&&(t.source==='enablebanking'&&t.api_identity_version===1&&(verifiedApiOriginal(t)||verifiedFileOriginal(t))||t.source.startsWith('file:')&&verifiedFileOriginal(t));
-    return {...t,account_consent_issue,original_verified,verified:!account_consent_issue&&original_verified};
+    return {...t,source_review_issue:sourceIssues.get(t.import_id)||'',account_consent_issue,original_verified,verified:!account_consent_issue&&original_verified};
   });
   const originalVerifiedById=new Map(originalVerifiedTransactions.map(t=>[t.id,t]));
   const verifiedTransactions=originalVerifiedTransactions.map(t=>{
     const ancestors=t.ancestor_bank_transaction_ids.map(id=>originalVerifiedById.get(id));
     const original_verified=t.original_verified&&ancestors.every(parent=>parent?.original_verified===true);
     const account_consent_issue=t.account_consent_issue||ancestors.find(parent=>parent?.account_consent_issue)?.account_consent_issue||'';
-    return {...t,original_verified,account_consent_issue,verified:original_verified&&!account_consent_issue&&ancestors.every(parent=>parent?.verified===true)};
+    const source_review_issue=t.source_review_issue||ancestors.find(parent=>parent?.source_review_issue)?.source_review_issue||'';
+    return {...t,source_review_issue,original_verified,account_consent_issue,verified:original_verified&&!account_consent_issue&&ancestors.every(parent=>parent?.verified===true)};
   });
   const transactionsById=new Map(verifiedTransactions.map(transaction=>[transaction.id,transaction]));
   const usablePayerEvidence=new Set(allocations.flatMap(allocation=>{
     const transaction=transactionsById.get(allocation.transaction_id);
-    return transaction?.verified&&!transaction.automatic_match_hold?.reason&&!bankFinancialReview(transaction)?[JSON.stringify([allocation.invoice_id,transaction.payer,transaction.account])]:[];
+    return transaction?.verified&&!transaction.source_review_issue&&!transaction.automatic_match_hold?.reason&&!bankFinancialReview(transaction)?[JSON.stringify([allocation.invoice_id,transaction.payer,transaction.account])]:[];
   }));
   const links=db.prepare('SELECT * FROM payer_links').all().filter(link=>link.verified_by!=='allocation'||usablePayerEvidence.has(JSON.stringify([link.invoice_id,link.payer,link.account])));
+  const invoiceDocuments=new Map(db.prepare('SELECT * FROM documents WHERE invoice_id IS NOT NULL').all().map(document=>[document.id,document]));
   const invoices=listInvoices(db).map(invoice=>{
     const missingOriginal=allocations.some(a=>a.invoice_id===invoice.id&&!transactionsById.get(a.transaction_id)?.original_verified);
     const accountIssue=allocations.filter(a=>a.invoice_id===invoice.id).map(a=>transactionsById.get(a.transaction_id)?.account_consent_issue).find(Boolean);
     const payment_evidence_issue=invoice.payment_evidence_issue||(missingOriginal?'Originalet för en registrerad betalningskoppling kan inte verifieras.':'')||accountIssue||'';
-    return {...invoice,payment_evidence_issue,absence_verified:invoice.absence_verified&&!payment_evidence_issue,reconciliation_state:payment_evidence_issue?'unreconciled':invoice.reconciliation_state,status:payment_evidence_issue?'unreconciled':invoice.status};
+    const invoice_original_verified=invoiceOriginalIsVerified(invoice,invoiceDocuments.get(invoice.document_id));
+    return {...invoice,invoice_original_verified,payment_evidence_issue,absence_verified:invoice.absence_verified&&!payment_evidence_issue,reconciliation_state:payment_evidence_issue?'unreconciled':invoice.reconciliation_state,status:payment_evidence_issue?'unreconciled':invoice.status};
   });
   return {invoices,transactions:verifiedTransactions,links,allocations};
 }
@@ -132,7 +150,7 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
   const out=[];
   for(const t of transactions){
     if(t.excluded||!Number.isSafeInteger(t.amount_cents)||t.amount_cents===0||!Number.isSafeInteger(t.available_cents)||t.available_cents<=0)continue;
-    const bankConflict=hasBankEvidenceConflict(t),financialReview=bankFinancialReview(t),automaticReview=t.automatic_match_hold?.reason;
+    const bankConflict=hasBankEvidenceConflict(t),financialReview=bankFinancialReview(t),automaticReview=t.automatic_match_hold?.reason||t.source_review_issue;
     const direction=t.amount_cents>0?'customer':'supplier';
     if(t.is_aggregate){out.push({transaction_id:t.id,invoice_id:'',kind:'aggregate',safe:false,reason:'Samlad insättning kräver individuella betalningsspecifikationer.',score:0});continue;}
     const reference=ref(t.reference);
@@ -161,13 +179,15 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
       const exact=i.referencePolicy?.applies?references.some(value=>matches(i,value)):owners.some(x=>x.id===i.id),payer=namedInvoices.has(i);
       if(!exact&&!payer&&t.available_cents!==i.remaining_cents)continue; // Amount alone may be shown, but never accepted.
       const policyIssue=invoiceReferenceMatchIssue(i,t,invoices);
+      const invoiceOriginalIssue=i.referencePolicy?.applies&&i.invoice_original_verified!==true?'Fakturans registrerade original kan inte verifieras. Granska fakturaunderlaget före automatisk matchning.':'';
+      const amountIssue=t.available_cents<i.remaining_cents?'Delbetalning kräver manuell granskning.':t.available_cents>i.remaining_cents?'Överbetalning kräver manuell granskning.':'';
       const conflict=i.referencePolicy?.applies&&(i.referencePolicy.status==='BLOCKED'||policyIssue&&exact)||invalidReference||references.some(r=>!matches(i,r))&&references.length>1||reference&&candidateOwners.some(x=>x.id!==i.id);
       const duplicateEvidence=transactions.some(x=>x.id!==t.id&&!x.excluded&&!x.is_aggregate&&x.amount_cents===t.amount_cents&&x.currency===t.currency&&x.booked_at===t.booked_at&&(x.account===t.account&&x.bank_reference&&x.bank_reference===t.bank_reference||x.account!==t.account&&sameBankPaymentIdentity(x,t)));
       const incomplete=t.parent_bank_reference&&transactions.some(x=>x.account===t.account&&x.bank_reference===t.parent_bank_reference&&x.is_aggregate&&!x.excluded);
       const ambiguous=candidateOwners.length>1||names.filter(x=>x.remaining_cents>0).length>1&&!exact||exact&&t.available_cents!==i.remaining_cents&&names.some(x=>x.id!==i.id&&x.remaining_cents===t.available_cents);
       const kind=bankConflict?'bank_evidence_conflict':financialReview?'financial_review':automaticReview?'manual_review':i.remaining_cents===0?(allocations.some(a=>a.invoice_id===i.id&&a.transaction_id===t.id)?'overpayment':'possible_duplicate'):conflict?'reference_conflict':!exact&&!payer?'unknown_payer':!exact&&reference?'wrong_reference':!reference?'missing_reference':!payer?'different_payer':t.available_cents<i.remaining_cents?'partial':t.available_cents>i.remaining_cents?'overpayment':'correct';
-      const safe=!bankConflict&&!financialReview&&!automaticReview&&!policyIssue&&Number.isSafeInteger(i.remaining_cents)&&!!t.verified&&exact&&payer&&!conflict&&!ambiguous&&!duplicateEvidence&&!incomplete&&i.remaining_cents>0;
-      out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,reference_values:references,reference_sources:evidence?.candidates||[],verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:bankConflict?bankEvidenceReviewReason(t):financialReview?financialReview.reason:automaticReview||t.account_consent_issue||(!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':ownBankgiro?'Referensen är företagets eget Bankgironummer. Granska bankoriginalet.':invalidReference?'OCR-kontrollsiffran är felaktig eller referensanalysen ofullständig. Granska bankoriginalet.':policyIssue|| (conflict?'Betalningsreferenserna är motstridiga. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.'))});
+      const safe=!bankConflict&&!financialReview&&!automaticReview&&!policyIssue&&!invoiceOriginalIssue&&!amountIssue&&Number.isSafeInteger(i.remaining_cents)&&!!t.verified&&exact&&payer&&!conflict&&!ambiguous&&!duplicateEvidence&&!incomplete&&i.remaining_cents>0;
+      out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,reference_values:references,reference_sources:evidence?.candidates||[],verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:bankConflict?bankEvidenceReviewReason(t):financialReview?financialReview.reason:automaticReview||t.account_consent_issue||(!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':ownBankgiro?'Referensen är företagets eget Bankgironummer. Granska bankoriginalet.':invalidReference?'OCR-kontrollsiffran är felaktig eller referensanalysen ofullständig. Granska bankoriginalet.':policyIssue||invoiceOriginalIssue|| (conflict?'Betalningsreferenserna är motstridiga. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':amountIssue|| (safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.')))});
     }
   }
   // Multiple payments for the same invoice must be reviewed together, never auto-consumed.

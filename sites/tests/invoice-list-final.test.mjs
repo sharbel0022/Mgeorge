@@ -14,7 +14,7 @@ function compile(source,aliases={}){
  for(const [name,url] of Object.entries({'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'lucide-react':import.meta.resolve('lucide-react'),'@/lib/domain':file('../lib/domain.ts'),'./domain':file('../lib/domain.ts'),'./reconciliation-engine.js':file('../lib/reconciliation-engine.js'),'./payment-references.js':file('../lib/payment-references.js'),...aliases}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));
  return data(code);
 }
-function invoices(count){return Array.from({length:count},(_,n)=>({id:'synthetic-'+n,number:String(n+1).padStart(4,'0'),direction:'receivable',party:'Synthetic customer '+n,email:'synthetic@example.test',total:12500,currency:'SEK',ocr:'0000599',issued:'2026-11-01',due:'2026-12-01',source:'Synthetic PDF original',reviewed:true,voided:false}));}
+function invoices(count){return Array.from({length:count},(_,n)=>({id:'synthetic-'+n,number:String(n+1).padStart(4,'0'),direction:'receivable',party:'Synthetic customer '+n,email:'synthetic@example.test',total:12500,currency:'SEK',ocr:String(n+1).padStart(4,'0'),issued:'2026-11-01',due:'2026-12-01',source:'Synthetic PDF original',documentId:'synthetic-invoice-original',reviewed:true,voided:false}));}
 async function fixture(t,count=123){
  const key='__invoice_ui_'+crypto.randomUUID().replaceAll('-',''),f={cursor:0,slots:[],opened:[]};globalThis[key]=f;
  const same=(a,b)=>a&&b&&a.length===b.length&&a.every((v,i)=>Object.is(v,b[i]));
@@ -28,7 +28,7 @@ async function fixture(t,count=123){
  const source=readFileSync(new URL('../app/dashboard.tsx',import.meta.url),'utf8');
  const start=source.includes('function invoiceListEvidence(')?source.indexOf('function invoiceListEvidence('):source.indexOf('function InvoiceTable(');
  const part=source.slice(start,source.indexOf('\nfunction Contacts('));
- const prefix=`import {useState,useMemo,useRef} from 'react';import {ChevronRight,Paperclip} from 'lucide-react';import {balance,invoiceStatus,paymentEvidenceIssue,invoicePaymentEvidenceIssue,money} from '@/lib/domain';import {bankPaymentView} from 'presentation';import ListPagination from 'pager';const init=s=>s.slice(0,2),shortDate=s=>s||'Saknas';function Pill({children,tone}){return <span className={'pill '+tone}>{children}</span>;}\n`;
+ const prefix=`import {useState,useMemo,useRef} from 'react';import {ChevronRight,Paperclip} from 'lucide-react';import {balance,invoiceStatus,paymentEvidenceIssue,invoicePaymentEvidenceIssue,invoiceReferenceDecision,money} from '@/lib/domain';import {bankPaymentView,invoiceIntendedReference} from 'presentation';import ListPagination from 'pager';const init=s=>s.slice(0,2),shortDate=s=>s||'Saknas';function Pill({children,tone}){return <span className={'pill '+tone}>{children}</span>;}\n`;
  const {default:Table}=await import(compile(prefix+part+'\nexport default InvoiceTable;',{react,presentation,pager}));
  f.stateData=emptyState();f.stateData.invoices=invoices(count);f.props={invoices:f.stateData.invoices,state:f.stateData,open:id=>f.opened.push(id)};
  f.render=()=>{f.cursor=0;f.tree=Table(f.props);};f.html=()=>renderToStaticMarkup(f.tree);f.page=()=>elements(f.tree).find(n=>n.props?.onPageChange);f.render();t.after(()=>delete globalThis[key]);return f;
@@ -42,12 +42,19 @@ test('invoice list bounds rendered rows, reaches every page and opens only the s
  const open=elements(f.tree).find(n=>n.type==='button'&&n.props?.['aria-label']==='Öppna faktura 0123');assert.ok(open);open.props.onClick({stopPropagation(){}});assert.deepEqual(f.opened,['synthetic-122']);
  assert.equal(JSON.stringify(f.stateData),before);
 });
+
+test('invoice list derives a scoped company intention and exposes an original reference conflict',async t=>{
+ const f=await fixture(t,1);f.stateData.company.name='M.George Vitvaror AB';f.stateData.invoices[0].number='0599';f.stateData.invoices[0].ocr='';f.props={...f.props,invoices:[...f.props.invoices]};f.render();
+ assert.match(f.html(),/Avsedd betalningsreferens: <span class="mono">0599/);assert.match(f.html(),/Företagets fakturanummerregel/);
+ f.stateData.invoices[0].referenceOriginal={invoice_number:'0599',reference:'599'};f.props={...f.props,invoices:[...f.props.invoices]};f.render();
+ assert.match(f.html(),/Blockerad referens/);assert.match(f.html(),/original.*referens|referens.*original/i);assert.equal(f.stateData.invoices[0].ocr,'');
+});
 test('a new filtered invoice result resets pagination before rendering its rows',async t=>{
  const f=await fixture(t);assert.ok(f.page(),'The list needs reachable page controls');f.page().props.onPageChange(3);
  f.props={...f.props,invoices:f.stateData.invoices.slice(0,2)};f.render();assert.equal(f.page().props.page,1);assert.equal((f.html().match(/<tr/g)||[]).length-1,2);assert.match(f.html(),/0001/);
 });
 test('invoice list shows explicit reference, original source and review status without inventing a payer',async t=>{
- const f=await fixture(t,1),html=f.html();assert.match(html,/0000599/);assert.match(html,/OCR/);assert.match(html,/Synthetic PDF original/);assert.match(html,/Granskad/);assert.match(html,/Ingen verifierad betalare/);
+ const f=await fixture(t,1);f.stateData.invoices[0].ocr='0000599';f.props={...f.props,state:{...f.stateData}};f.render();const html=f.html();assert.match(html,/0000599/);assert.match(html,/Avsedd betalningsreferens/);assert.doesNotMatch(html,/OCR \/ fakturareferens/);assert.match(html,/Synthetic PDF original/);assert.match(html,/Granskad/);assert.match(html,/Ingen verifierad betalare/);
  assert.doesNotMatch(html,/Verifierad betalare: Synthetic customer/);
 });
 test('invoice list does not turn a suggested or an invalidated linked bank identity into a verified payer',async t=>{
@@ -76,4 +83,23 @@ test('outgoing supplier payment names the verified recipient rather than calling
 test('zero recorded allocation never presents a counterparty as a verified invoice payment',async t=>{
  const f=await fixture(t,1);linkedPayment(f);f.stateData={...f.stateData,allocations:f.stateData.allocations.map(a=>({...a,amount:0}))};f.props={...f.props,state:f.stateData};f.render();
  assert.match(f.html(),/Ingen verifierad betalare/);assert.doesNotMatch(f.html(),/Verifierad betalare: Original bank counterparty/);
+});
+test('a fully allocated invoice without its original stays under review in the invoice list without changing balances',async t=>{
+ const f=await fixture(t,1);linkedPayment(f);
+ f.stateData={...f.stateData,invoices:f.stateData.invoices.map(i=>({...i,documentId:''}))};
+ f.props={...f.props,invoices:f.stateData.invoices,state:f.stateData};f.render();
+ const before=JSON.stringify(f.stateData),html=f.html();
+ assert.match(html,/Granska betalningsunderlag/);assert.doesNotMatch(html,/>Betald</);
+ assert.match(html,/Ingen verifierad betalare/);assert.equal(JSON.stringify(f.stateData),before);
+ assert.equal(f.stateData.allocations[0].amount,12500);
+});
+test('invoice list identifies the verified payer source separately from the invoice source',async t=>{
+ const f=await fixture(t,1);linkedPayment(f);const html=f.html();
+ assert.match(html,/Betalarkälla: Bankens transaktionsoriginal/);
+ assert.match(html,/Fakturakälla: Synthetic PDF original/);
+});
+
+test('invoice list does not invent a company-policy conflict for a separate explicit reference',async t=>{
+ const f=await fixture(t,1);f.stateData.invoices[0].ocr='0000599';f.props={...f.props,state:{...f.stateData}};f.render();
+ assert.match(f.html(),/0000599/);assert.doesNotMatch(f.html(),/Avviker från fakturanumret/);
 });

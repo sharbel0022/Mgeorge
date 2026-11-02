@@ -8,6 +8,7 @@ import {emptyState,applyCommand} from '../lib/domain.ts';
 import {extractPaymentReferences} from '../lib/payment-references.js';
 import {paymentFieldSourceFixture,paymentFieldInvoiceFixture} from './helpers/payment-field-source-fixture.mjs';
 import {genericCompanyState} from './helpers/reference-policy-fixture.mjs';
+import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 
 const read=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 const file=path=>new URL(path,import.meta.url).href;
@@ -19,13 +20,35 @@ function compile(source,imports={}){
 }
 const presentation=compile(read('../lib/payment-presentation.ts'));
 const reconciliation=compile(read('../lib/reconciliation.ts'));
+const bankPayments=compile(read('../components/bank-payments.tsx'),{'@/lib/payment-presentation':presentation,'./list-pagination':compile(read('../components/list-pagination.tsx')),'./bankgiro-availability':compile(read('../components/bankgiro-availability.tsx'))});
 const dashboard=read('../app/dashboard.tsx');
+const boundarySource=dashboard.slice(dashboard.indexOf('function readableWorkspace('),dashboard.indexOf('\n/** Validate the existing proposal'));
+const {readableWorkspace}=await import(compile("import {validDate} from '@/lib/domain';\n"+boundarySource+'\nexport {readableWorkspace};'));
 const detailCode=dashboard.slice(dashboard.indexOf('function TransactionDetail('),dashboard.indexOf('\nfunction NewTransaction('));
 const detailImports=dashboard.split('\n').filter(line=>line.startsWith('import {')&&/from '(?:react|lucide-react|@\/lib\/domain|@\/lib\/payment-presentation)'/.test(line)).join('\n');
-const {default:Detail}=await import(compile(detailImports+`\nimport {analyze} from 'reconciliation';const shortDate=x=>x,controlDate=x=>x;const DetailSurface=({children})=>children,BankgiroLinkReview=()=>null,PaymentHistory=()=>null,PaymentVerificationPanel=()=>null,InvoiceEvidence=()=>null,FormError=()=>null,Field=({children})=>children;\n`+detailCode+'\nexport default TransactionDetail;',{'@/lib/payment-presentation':presentation,reconciliation}));
+const {default:Detail}=await import(compile(detailImports+`\nimport {analyze} from 'reconciliation';import {BankPaymentReferences} from 'bank-payments';import ReconciliationProposalPanel from 'proposal-panel';const shortDate=x=>x,controlDate=x=>x;const DetailSurface=({children})=>children,BankgiroLinkReview=()=>null,PaymentHistory=()=>null,PaymentVerificationPanel=()=>null,InvoiceEvidence=()=>null,FormError=()=>null,Field=({children})=>children;\n`+detailCode+'\nexport default TransactionDetail;',{'@/lib/payment-presentation':presentation,reconciliation,'bank-payments':bankPayments,'proposal-panel':compile(read('../components/reconciliation-proposal.tsx'))}));
 const snapshot={party:'RETAINED ORIGINAL PAYER',payerReference:'0594',bankReference:'SOURCE-1',description:'Synthetic retained description',date:'2026-10-30',amount:10000,account:'Synthetic account'};
 const payment=extra=>({id:'synthetic-payment',...snapshot,currency:'SEK',source:'Enable Banking',evidence:'bank_api',externalId:'SOURCE-1',kind:'payment',verified:true,duplicateOf:'',ignored:false,parentId:'',importId:'',createdAt:'2026-10-30',original:{...snapshot},...extra});
-function renderDetail(t,suppliedState){const state=suppliedState||emptyState();if(!suppliedState)state.transactions.push(t);const before=JSON.stringify(state);const html=renderToStaticMarkup(React.createElement(Detail,{tx:t,state,demo:true,save(){throw Error('Render must not save');},close(){},open(){},busy:false,error:''}));assert.equal(JSON.stringify(state),before);return html;}
+function renderDetail(t,suppliedState,props={}){const state=suppliedState||emptyState();if(!suppliedState)state.transactions.push(t);const before=JSON.stringify(state);const html=renderToStaticMarkup(React.createElement(Detail,{tx:t,state,demo:true,save(){throw Error('Render must not save');},close(){},open(){},busy:false,error:'',...props}));assert.equal(JSON.stringify(state),before);return html;}
+test('an open payment detail with unavailable workspace data hides old bank facts and offers a read-only reload',()=>{
+ const state=emptyState();state.transactions=[syntheticBankTransaction({id:'synthetic-unavailable-detail',party:'Synthetic stale bank payer',payerReference:'0599'})];
+ const html=renderDetail(state.transactions[0],state,{readable:false,demo:false,onDetails(){throw Error('Reload must be explicit');}});
+ assert.match(html,/Betalningsunderlaget kunde inte läsas|Hämta uppgifterna igen/);
+ assert.doesNotMatch(html,/Synthetic stale bank payer|data-verification-state=|Bankrapporterad referens/);
+});
+for(const [name,change]of [
+ ['missing warnings',t=>{delete t.referenceEvidence.warnings;}],
+ ['structured warning',t=>{t.referenceEvidence.warnings=[{reason:'Synthetic bad warning'}];}],
+ ['structured selection',t=>{t.referenceEvidence.selected={value:{reference:'0599'}};}],
+ ['structured report identifier',t=>{t.reportEvidence={reportId:{id:'Synthetic bad report'}};}],
+])test('payment detail boundary withholds malformed evidence and renders a fresh valid result: '+name,()=>{
+ const state=emptyState();state.transactions=[syntheticBankTransaction({id:'synthetic-detail-boundary',kind:'payment',party:'Synthetic bank payer',payerReference:'0599'})];
+ const payload={state,revision:1,audit:[]},original=structuredClone(payload);
+ assert.equal(readableWorkspace(payload),true,'The actual producer fixture must be accepted');
+ change(state.transactions[0]);assert.equal(readableWorkspace(payload),false,'Malformed evidence may never reach the real detail component');
+ assert.equal(readableWorkspace(original),true);assert.doesNotThrow(()=>renderDetail(original.state.transactions[0],original.state));
+ assert.match(renderDetail(original.state.transactions[0],original.state),/0599|Bankens referenskällor/);
+});
 function originalSection(html){return [...html.matchAll(/<details[^>]*><summary>[^<]*<\/summary>(?:(?!<details).)*?<\/details>/gs)].map(match=>match[0]).find(block=>block.includes('RETAINED ORIGINAL PAYER'));}
 async function renderMessage(t,transaction,{finding}={}){
   const key='__payment_ui_'+crypto.randomUUID().replaceAll('-','');
@@ -74,8 +97,12 @@ test('payment details explain the payer and reference evidence actually selected
 });
 
 for(const booked of [false,true])test(`dashboard invoice lookup follows the report reference and preserves ${booked?'a conflicting historical booking':'the unallocated state'}`,()=>{
- const {state,target}=paymentFieldInvoiceFixture({booked});state.company.name=genericCompanyState().company.name;
- const html=renderDetail(target,state),primary=html.split('<dl class="details-grid bank-primary-details">')[1]?.split('</dl>')[0],assessment=html.split('<dt>Fakturakoppling</dt><dd>')[1]?.split('</dd>')[0];
- assert.ok(primary);assert.ok(assessment);assert.match(primary,/0599/);
- if(booked){assert.match(primary,/0800/);assert.match(html,/Referenskonflikt/);assert.match(assessment,/0800.*0599/);assert.equal(state.allocations.length,1);}else{assert.doesNotMatch(primary,/0800/);assert.match(assessment,/0599/);assert.doesNotMatch(assessment,/0800/);assert.equal(state.allocations.length,0);}
+ const {state,target}=paymentFieldInvoiceFixture({booked});state.company.name=genericCompanyState().company.name;const html=renderDetail(target,state),primary=html.split('<dl class="details-grid bank-primary-details">')[1]?.split('</dl>')[0],references=html.split('<div class="bank-detail-references">')[1]?.split('</div>')[0],bankReference=references?.split('<span class="bank-reference">')[1],assessment=html.split('<dt>Fakturakoppling</dt><dd>')[1]?.split('</dd>')[0];
+ assert.ok(primary);assert.ok(assessment);assert.ok(bankReference);assert.match(bankReference,/0599/);assert.doesNotMatch(bankReference,/0800/);
+ if(booked){assert.match(primary,/0800/);assert.match(html,/data-verification-state="BLOCKED">Blockerad<\/span>/);assert.match(assessment,/0800.*0599/);assert.equal(state.allocations.length,1);}else{assert.match(primary,/0599/);assert.doesNotMatch(primary,/0800/);assert.match(assessment,/0599/);assert.doesNotMatch(assessment,/0800/);assert.equal(state.allocations.length,0);}
+});
+
+test('payment detail includes a separate read-only C4 proposal surface',()=>{
+ const state=emptyState(),transaction=syntheticBankTransaction({id:'synthetic-proposal-payment',kind:'payment'});state.transactions=[transaction];
+ const html=renderDetail(transaction,state,{demo:false,historyRevision:7});assert.match(html,/Separat avstämningsförslag/);assert.match(html,/separat godkännande krävs/);assert.match(html,/Läser avstämningsförslaget/);assert.match(html,/inga saldon ändras/);
 });

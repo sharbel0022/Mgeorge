@@ -13,6 +13,9 @@ import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, aud
 import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
 import {dailyBackup} from './backup.js';
+import {createNodeBankgiroIngest} from './bankgiro-ingest.js';
+import {resolveBankgiroSource} from '../sites/lib/bankgiro-source-registry.js';
+import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
 import {createIntegrationJobs} from './integration-jobs.js';
 import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
 import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
@@ -20,6 +23,7 @@ import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCo
 import {analyzeDocument,approveDocument} from './invoice-review.js';
 import {runDocumentProcess} from './invoice-extraction.js';
 import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
+import {readReconciliationPreview} from './reconciliation-preview.js';
 import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from './customer-messages.js';
 import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
 import {createPaymentControl,planBankControl} from './payment-control.js';
@@ -41,6 +45,13 @@ function config(){
 const check=config();
 const db=openDatabase();
 const integrationJobs=createIntegrationJobs(db);
+async function bankgiroIngest(owner){return createNodeBankgiroIngest(db,{source:await resolveBankgiroSource(owner)});}
+export async function runScheduledBankgiro(){
+  const owner=check.secure?'administrator':'local-admin';
+  const source=await resolveBankgiroSource(owner);
+  if(!source)return;
+  return (await createNodeBankgiroIngest(db,{source})).run(owner);
+}
 const baseHeaders={
   'Content-Security-Policy':"default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'",
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -188,6 +199,7 @@ function gmailStatus(){
   return {configured:isGmailConfigured(),send_enabled,email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&!gmailReconnectStatuses.has(connection.status)&&connection.status!=='blocked'&&interval&&(!job||job.failures<3)?new Date(Math.max(Date.now(),lastAttempt+interval*60000,job?.next_attempt||0)).toISOString():null,syncing:integrationJobs.running('gmail'),job:integrationJobs.summary().find(j=>j.name==='gmail')||null,counts:imports,connection};
 }
 const bankLeases=new Map();
+const bankPostprocessWarning='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
 const bankSyncing={
   has:id=>bankLeases.has(id)||integrationJobs.running('bank:'+id),
   add(id,options){if(bankLeases.has(id))throw bad(409,'En bankåtgärd pågår redan');const lease=integrationJobs.claim('bank:'+id,options);lease.deadline=Math.min(Date.now()+240000,integrationJobs.state('bank:'+id).lease_until-30000);bankLeases.set(id,lease);return lease;},
@@ -210,12 +222,10 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
     const knownIds=db.prepare('SELECT source_id FROM document_sources').all().map(x=>x.source_id);
     const rejectedIds=db.prepare('SELECT source_id FROM gmail_rejected_sources').all().map(x=>x.source_id);
     currentTokens=decryptObject(connection.encrypted_tokens);
-    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{lease.assert();authorize();}});
+    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{authorize();lease.renew();}});
     let imported=0,duplicate=result.duplicate||0;
     // Originals, token rotation and the checkpoint share the lease-fenced write.
-    db.exec('BEGIN IMMEDIATE');
-    try{
-      lease.assert();
+    lease.write(()=>{
       authorize();
       db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(result.tokens),connection.id);
       for(const doc of result.documents){
@@ -229,11 +239,10 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
         reject.run(sourceId,reason);
       }
       db.prepare("UPDATE gmail_connections SET encrypted_tokens=?,last_synced=?,page_token=?,sync_started_at=?,status='connected',last_error='' WHERE id=?").run(encryptObject(result.tokens),result.truncated?connection.last_synced:startedAt,result.next_page_token||'',result.truncated?startedAt:'',connection.id);
-      db.exec('COMMIT');
-    }catch(e){db.exec('ROLLBACK');throw e;}
+    });
     // Originals/checkpoints are durable before interpretation; failed OCR stays
     // in the review queue and can be retried without downloading the mail again.
-    if(analyze)for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{lease.assert();authorize();}});
+    if(analyze)for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{authorize();lease.renew();}});
     lease.assert();
     const summary={received:result.received??result.documents.length+(result.skipped||0),imported,duplicate,review:imported,skipped:result.skipped||0,truncated:!!result.truncated,warnings:result.warnings||[]};
     lease.write(()=>{authorize();recordImport(db,{source:'gmail',name:connection.email,found:summary.received,imported,duplicate,review:imported});audit(db,'gmail_synced',summary);});reconcileAndPrepare();lease.success();return summary;
@@ -249,7 +258,7 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
     if(currentTokens)db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(currentTokens),connection.id);
     db.prepare('UPDATE gmail_connections SET status=?,last_error=? WHERE id=?').run(permanent||(e.retryBlocked?'blocked':transient?'retry_wait':'error'),renewal?'Gmail-anslutningen behöver förnyas':'Det gick inte att hämta från Gmail',connection.id);
     recordImport(db,{source:'gmail',name:connection.email,status:'error',error:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen misslyckades'});
-    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',transient?Math.max(backoff,serverDelay):0,e.retryBlocked===true);
+    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',transient?Math.max(backoff,serverDelay):0,e.retryBlocked===true,permanent||e.code);
     });
     if(e.status)throw e;throw bad(502,renewal?'Gmail-anslutningen behöver förnyas – koppla Gmail igen':'Det gick inte att hämta från Gmail. Kontrollera anslutningen och försök igen.');
   }finally{lease.release();}
@@ -268,7 +277,11 @@ function stableAccountIdentity(account,bank){
 }
 async function verifyBankSession(connection,deadline){
   const data=await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{...(deadline===undefined?{}:{deadline})});
-  if(data.status!=='AUTHORIZED'||!Array.isArray(data.accounts)||!data.accounts.includes(connection.selected_account_uid))throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
+  const expiresAt=typeof data.access?.valid_until==='string'?Date.parse(data.access.valid_until):NaN;
+  if(data.status!=='AUTHORIZED'||!Array.isArray(data.accounts)||!data.accounts.includes(connection.selected_account_uid)||
+    data.aspsp?.name!==connection.bank_name||data.aspsp?.country!=='SE'||data.psu_type!=='business'||
+    !Number.isFinite(expiresAt)||expiresAt<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
+  return expiresAt;
 }
 /** Hämtar bankhändelser för vald anslutning, kontrollerar bankens svar och sparar endast giltiga poster med dubblettskydd. */
 async function syncBank(connection,{account_uid,date_from,date_to,scheduled=false,interval=0}={},operationLocked=false){
@@ -290,10 +303,12 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
   const account=stableAccountIdentity(selected,connection.bank_name),plan=planBankSync(decryptObject(connection.encrypted_session),account,connection.last_synced,{date_from,date_to}),{from,to}=plan;
   assertNoLegacyBankImports(db);
   const lease=operationLocked?bankLeases.get(connection.id):bankSyncing.add(connection.id,{scheduled,interval});
-  const bankAuthorize=()=>{
-    lease.assert();authorize();
-    if(Date.parse(connection.valid_until)<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
+  let consentExpiresAt=Date.parse(connection.valid_until);
+  const consentAuthorize=()=>{
+    authorize();
+    if(!Number.isFinite(consentExpiresAt)||consentExpiresAt<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
   };
+  const bankAuthorize=()=>{lease.assert();consentAuthorize();};
   try{
     bankSyncing.assert(connection.id);
     // Account/session selection may have changed while this caller waited to run.
@@ -302,7 +317,9 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     if(stored.retry_after>Date.now())throw Object.assign(bad(429,'Bankens anropsgräns är nådd. Försök igen senare.'),{retryAfter:Math.ceil((stored.retry_after-Date.now())/1000)});
     if(stored.status==='renewal_required'||!Number.isFinite(Date.parse(stored.valid_until))||Date.parse(stored.valid_until)<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
     bankAuthorize();
-    await verifyBankSession(connection,lease.deadline);
+    // The current provider consent may expire before the original connection.
+    // Keep its narrower bound through every page and the final import guard.
+    consentExpiresAt=Math.min(consentExpiresAt,Date.parse(stored.valid_until),await verifyBankSession(connection,lease.deadline));
     bankAuthorize();
     const raw=await fetchBookedTransactions(selected.uid,{dateFrom:from,dateTo:to,authorize:bankAuthorize,deadline:lease.deadline});
     bankAuthorize();
@@ -311,13 +328,38 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     const transactions=raw.map(x=>normalizeBankApiTransaction(x,account));
     if(transactions.some(x=>!x||x.booked_at<from||x.booked_at>to))throw Object.assign(bad(502,'Bankens svar innehöll bokförda händelser som inte kunde bevaras inom det begärda datumintervallet. Inga händelser från hämtningen har importerats.'),{code:'incomplete_bank_response'});
     const completed=completeBankSync(plan);
-    const result=storeTransactions(db,transactions,'enablebanking',null,bankAuthorize);
-    lease.write(()=>{bankAuthorize();db.prepare("UPDATE bank_connections SET encrypted_session=?,last_synced=?,status='connected',last_error='',retry_after=0 WHERE id=?").run(encryptObject(completed.session),completed.coverage.complete?new Date().toISOString():connection.last_synced,connection.id);
-    audit(db,'bank_synced',{connection_id:connection.id,from,to,received:raw.length,imported:result.imported,duplicate:result.duplicate});
-    });
-    reconcileAndPrepare();
-    lease.success();
-    return {...result,received:raw.length,sync_coverage:completed.coverage};
+    const result=storeTransactions(db,transactions,'enablebanking',null,bankAuthorize,imported=>{
+      bankAuthorize();
+      db.prepare("UPDATE bank_connections SET encrypted_session=?,last_synced=?,status='connected',last_error=?,retry_after=0 WHERE id=?").run(encryptObject(completed.session),completed.coverage.complete?new Date().toISOString():connection.last_synced,bankPostprocessWarning,connection.id);
+      audit(db,'bank_synced',{connection_id:connection.id,from,to,received:raw.length,imported:imported.imported,duplicate:imported.duplicate});
+    },work=>lease.write(()=>{
+      const result=work();
+      lease.success();
+      // Completion is terminal. Recheck consent without reopening its write
+      // permission; lease.write performs the final ownership/fence assertion.
+      consentAuthorize();
+      return result;
+    }));
+    // The import is committed. Keep its pending warning if the independent
+    // after-check fails or this worker loses its lease after the commit.
+    const warnings=[];let aftercheck,released=false;
+    try{
+      lease.release();released=true;
+      // Follow-up uses the same coordinator as a credential/control operation.
+      // It cannot create a second fetch attempt or reuse a completed writer.
+      aftercheck=integrationJobs.claim('bank:'+connection.id,{recordAttempt:false});
+      aftercheck.assert();authorize();reconcileAndPrepare();
+      aftercheck.write(()=>{authorize();db.prepare("UPDATE bank_connections SET last_error='' WHERE id=?").run(connection.id);});
+      aftercheck.success();
+    }catch{warnings.push(bankPostprocessWarning);}
+    finally{
+      try{aftercheck?.release();if(!released)lease.release();}
+      catch{if(!warnings.length)warnings.push(bankPostprocessWarning);}
+      // Both writers are terminal or released. Avoid a redundant outer release
+      // turning an already committed import into a failed HTTP response.
+      bankLeases.delete(connection.id);
+    }
+    return {...result,received:raw.length,sync_coverage:completed.coverage,...(warnings.length?{warnings}:{})};
   }catch(e){
     authorize();
     if(e.code==='connection_changed'||e.status===401&&!e.providerStatus)throw e;
@@ -327,7 +369,7 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
     lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,cooldown?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
     recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
-    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true);
+    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true,e.code);
     });
     throw Object.assign(bad(renewal?409:cooldown||safeBankFailure?e.status:502,message),{safe:true,retryAfter:e.retryAfter,...(safeBankFailure?{code:e.code}:{})});
   }
@@ -440,6 +482,19 @@ async function route(req,res){
   }
   if(!req.principal)throw bad(401,'Logga in för att läsa företagets uppgifter');
   if(req.principal!==(check.secure?'administrator':'local-admin'))throw bad(403,'Användaren saknar behörighet till företagets arbetsyta');
+  if(path==='/api/bankgiro/source/status'&&req.method==='GET')return json(res,200,publicBankgiroStatus(await (await bankgiroIngest(req.principal)).status(req.principal)));
+  if(path==='/api/bankgiro/source/run'&&req.method==='POST'){
+    const body=await readBody(req);
+    if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).length)throw bad(400,'Bankgirohämtningen accepterar ingen ägare eller källkonfiguration.');
+    const ingest=await bankgiroIngest(req.principal);assertSessionStillAuthorized(req);
+    return json(res,200,publicBankgiroStatus(await ingest.run(req.principal)));
+  }
+  if(path==='/api/reconciliation/preview'&&req.method==='GET'){
+    if([...url.searchParams.keys()].some(key=>key!=='transactionId')||url.searchParams.getAll('transactionId').length>1)throw bad(400,'Förhandsgranskningen accepterar bara en bankhändelseidentifierare.');
+    const preview=await readReconciliationPreview(db,{owner:req.principal,transactionId:url.searchParams.get('transactionId')??undefined});
+    assertSessionStillAuthorized(req);
+    return json(res,200,preview);
+  }
   if(path==='/api/logout'&&req.method==='POST'){
     db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
     db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
@@ -678,7 +733,7 @@ async function route(req,res){
       if(record.renew_connection_id){
         const old=ownedConnection(req,id);
         if(bankSyncing.has(old.id))throw bad(409,'Vänta tills bankhämtningen har avslutats och förnya sedan igen');
-        bankSyncing.add(old.id);renewalLock=old.id;
+        bankSyncing.add(old.id,{recordAttempt:false});renewalLock=old.id;
         const previousSession=decryptObject(old.encrypted_session),previous=previousSession.session_id;
         if(previous!==session.session_id)try{await bankingRequest('/sessions/'+encodeURIComponent(previous),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Det tidigare medgivandet kunde inte återkallas. Förnya anslutningen igen.');}
         bankLeases.get(old.id).write(()=>{assertSessionStillAuthorized(req);
@@ -728,7 +783,7 @@ async function route(req,res){
   if(path==='/api/bank/connections'&&req.method==='DELETE'){
     const b=await readBody(req),connection=ownedConnection(req,b.id);
     if(bankSyncing.has(connection.id))throw bad(409,'Vänta tills bankhämtningen har avslutats');
-    bankSyncing.add(connection.id);
+    bankSyncing.add(connection.id,{recordAttempt:false});
     try{
     // Revoke at the provider first. A failed revocation must not be reported as success.
     try{await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Banken kunde inte återkalla åtkomsten. Försök igen eller återkalla medgivandet hos banken.');}
@@ -751,7 +806,7 @@ async function route(req,res){
     if(!db.prepare('UPDATE gmail_states SET consumed=1 WHERE state_hash=? AND consumed=0').run(digest(state)).changes)throw bad(403,'Gmail-returen har redan använts');
     if(url.searchParams.has('error'))return redirect(res,'/?tab=import&gmail=cancelled');
     const code=url.searchParams.get('code');if(!code)throw bad(400,'Googles engångskod saknas');
-    let tokens;const lease=integrationJobs.claim('gmail');
+    let tokens;const lease=integrationJobs.claim('gmail',{recordAttempt:false});
     try{
       tokens=await exchangeGmailCode(code,check.origin,{authorize:()=>assertSessionStillAuthorized(req)});assertSessionStillAuthorized(req);const profile=await gmailProfile(tokens,{authorize:()=>assertSessionStillAuthorized(req)});
       if(record.request_send&&!hasGmailSendScope(tokens))throw bad(409,'Google gav inte utskicksbehörighet. Koppla igen och godkänn gmail.send.');
@@ -771,7 +826,7 @@ async function route(req,res){
   }
   if(path==='/api/gmail/sync'&&req.method==='POST')return json(res,200,await syncGmail(req));
   if(path==='/api/gmail/connection'&&req.method==='DELETE'){
-    const lease=integrationJobs.claim('gmail');
+    const lease=integrationJobs.claim('gmail',{recordAttempt:false});
     try{const connection=db.prepare('SELECT * FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
     if(connection){try{await revokeGmailTokens(decryptObject(connection.encrypted_tokens));}catch{throw bad(502,'Google kunde inte återkalla åtkomsten. Försök igen eller återkalla åtkomsten i Google-kontot.');}lease.write(()=>{assertSessionStillAuthorized(req);db.prepare('DELETE FROM gmail_connections WHERE id=?').run(connection.id);audit(db,'gmail_disconnected',{email:connection.email});lease.success();});}
     return json(res,200,{removed:!!connection});}finally{lease.release();}
@@ -787,7 +842,7 @@ let schedulerTimer;
 if(process.env.NODE_ENV!=='test'){
   server.listen(check.port,'127.0.0.1',()=>console.log(`MG Fakturakoll: ${check.origin}`));
   scheduledBackup();
-  schedulerTimer=setInterval(()=>{scheduledBackup();runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';});},60000);schedulerTimer.unref();
+  schedulerTimer=setInterval(()=>{scheduledBackup();runScheduledBankgiro().catch(()=>{schedulerState.last_error='Bankgirohämtningen behöver kontrolleras';});runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';});},60000);schedulerTimer.unref();
 }
 server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);paymentControl.stop();});
 export {server,db};

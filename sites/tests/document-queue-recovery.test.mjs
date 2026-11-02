@@ -15,7 +15,7 @@ async function fixture(t){
   const sql=new DatabaseSync(':memory:');
   for(const file of readdirSync(new URL('../drizzle',import.meta.url)).filter(file=>/^\d{4}.*\.sql$/.test(file)).sort())sql.exec(readFileSync(new URL('../drizzle/'+file,import.meta.url),'utf8'));
   const key='__queue_recovery_'+crypto.randomUUID().replaceAll('-',''),f={sql,d1:new D1(sql),owner:'synthetic-queue-owner',pdfCalls:0,objects:new Map()};
-  f.env={DOCUMENT_AUTOMATION_ENABLED:'true',DOCUMENT_OWNER_EMAIL:'owner@example.test',DOCUMENT_WORKER_TOKEN:randomToken(),BUCKET:{get:async key=>{
+  f.env={DOCUMENT_AUTOMATION_ENABLED:'true',DOCUMENT_OWNER_EMAIL:'owner@example.test',DOCUMENT_WORKER_TOKEN:randomToken(),DOCUMENT_CLOUD_OCR_ENABLED:'true',DOCUMENT_CLOUD_WORKER_TOKEN:randomToken(),BUCKET:{get:async key=>{
     if(f.storageError)throw Error('synthetic private storage outage');
     const bytes=f.objects.get(key);return bytes?{size:bytes.length,arrayBuffer:async()=>bytes}:null;
   }}};
@@ -43,10 +43,24 @@ async function fixture(t){
     sql.prepare('INSERT INTO gmail_sources(owner,source_id,document_id,metadata,created_at) VALUES(?,?,?,?,?)').run(owner,'source-'+id,id,JSON.stringify({direction:'supplier',direction_confident:false,from:'synthetic@example.test',subject:'Synthetic document'}),at);
     return {id,sha};
   };
-  f.worker=(action,body={})=>f.processing.workerAction(new Request('https://synthetic.example/api/ocr-worker/'+action,{method:'POST',headers:{Authorization:'Bearer '+f.env.DOCUMENT_WORKER_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)}),action);
-  f.lease=async()=> (await (await f.worker('lease')).json()).job;
-  f.complete=(job,error=false)=>f.worker('complete',{id:job.id,lease:job.lease,sha256:job.sha256,text:'',method:'ocr',confidence:0,...(error?{error:true}:{})});
+  f.worker=(action,body={},mode='local')=>f.processing.workerAction(new Request('https://synthetic.example/api/ocr-worker/'+action,{method:'POST',headers:{Authorization:'Bearer '+(mode==='cloud'?f.env.DOCUMENT_CLOUD_WORKER_TOKEN:f.env.DOCUMENT_WORKER_TOKEN),'X-MG-OCR-Runner':mode,'Content-Type':'application/json'},body:JSON.stringify(body)}),action);
+  f.lease=async(mode='local')=> (await (await f.worker('lease',{},mode)).json()).job;
+  f.complete=(job,error=false,mode='local')=>f.worker('complete',{id:job.id,lease:job.lease,sha256:job.sha256,text:'',method:'ocr',confidence:0,...(error?{error:true}:{})},mode);
   return f;
+}
+
+function pauseAfterReceipt(f){
+  let release,reached,paused=false;
+  const waiting=new Promise(resolve=>{release=resolve;}),started=new Promise(resolve=>{reached=resolve;}),prepare=f.d1.prepare.bind(f.d1);
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query==='SELECT * FROM document_automation WHERE owner=?'){
+      const first=statement.first.bind(statement);
+      statement.first=async()=>{if(!paused){paused=true;reached();await waiting;}return first();};
+    }
+    return statement;
+  };
+  return {started,release:()=>release()};
 }
 
 test('only one OCR lease is active while another document waits; restart reclaims expiry once',async t=>{
@@ -142,4 +156,111 @@ test('changed originals never reach PDF extraction and stop after the bounded re
   assert.equal((await f.processing.processDocuments(f.owner,1)).processed,0);assert.equal(f.pdfCalls,0);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);assert.equal(f.objects.size,1);
+});
+
+for(const mode of ['local','cloud'])for(const phase of ['worker failure','original failure'])test(`${mode} ${phase} cannot requeue a lease that expires at the write boundary`,async t=>{
+  const f=await fixture(t);await f.document('a');const job=await f.lease(mode),before=f.sql.prepare('SELECT * FROM document_jobs').get();
+  const prepare=f.d1.prepare.bind(f.d1);let expired=false;
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query.startsWith('UPDATE document_jobs SET state=?,error_code=?'))statement.run=async()=>{
+      expired=true;f.sql.prepare("UPDATE document_jobs SET lease_until='2000-01-01'").run();return statement.execute();
+    };
+    return statement;
+  };
+  if(phase==='original failure')f.storageError=true;
+  const result=await f.complete(job,phase==='worker failure',mode);
+  assert.equal(expired,true);assert.equal(result.status,200);assert.deepEqual(await result.json(),{ignored:true});
+  assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},{...before,lease_until:'2000-01-01'});
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal((await f.processing.processingStatus(f.owner)).cloud_last_completed,'');
+});
+
+for(const change of ['replacement','rejection'])test(`a delayed OCR failure respects a concurrent ${change} at the write boundary`,async t=>{
+  const f=await fixture(t);await f.document('a');const job=await f.lease(),before=f.sql.prepare('SELECT * FROM document_jobs').get();
+  const prepare=f.d1.prepare.bind(f.d1);let changed=false;
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query.startsWith('UPDATE document_jobs SET state=?,error_code=?'))statement.run=async()=>{
+      changed=true;
+      if(change==='replacement')f.sql.prepare("UPDATE document_jobs SET lease='replacement'").run();
+      else f.sql.prepare("UPDATE gmail_sources SET status='rejected'").run();
+      return statement.execute();
+    };
+    return statement;
+  };
+  const result=await f.complete(job,true);
+  assert.equal(changed,true);assert.equal(result.status,200);assert.deepEqual(await result.json(),{ignored:true});
+  assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},{...before,...(change==='replacement'?{lease:'replacement'}:{})});
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+});
+
+for(const error of ['parse_timeout','local_ocr_required','page_limit'])test(`an expired PDF ${error} response cannot change the engine or retry budget`,async t=>{
+  const f=await fixture(t);await f.document('a','application/pdf');let claimed;
+  f.onPdf=async()=>{
+    f.sql.prepare("UPDATE document_jobs SET lease_until='2000-01-01'").run();claimed={...f.sql.prepare('SELECT * FROM document_jobs').get()};throw Error(error);
+  };
+  assert.equal((await f.processing.processDocuments(f.owner,1)).processed,0);
+  assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},claimed);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,0);
+  f.onPdf=undefined;await f.restart();
+  assert.equal((await f.processing.processDocuments(f.owner,1)).processed,1);
+  const recovered=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(recovered.state,'needs_review');assert.equal(recovered.attempts,2);assert.equal(recovered.engine,'cloud');
+});
+
+for(const mode of ['local','cloud'])for(const replay of ['same result','conflicting result','failure'])test(`${mode} overlapping ${replay} cannot replace the first accepted OCR receipt`,async t=>{
+  const f=await fixture(t);await f.document('a');const job=await f.lease(mode),pause=pauseAfterReceipt(f);
+  const body={id:job.id,lease:job.lease,sha256:job.sha256,text:'Faktura\nFakturanummer: 0001',method:'ocr',confidence:80};
+  const first=f.worker('complete',body,mode);await pause.started;
+  let duplicate;
+  try{
+    const extra=replay==='conflicting result'?{text:'Faktura\nFakturanummer: 0002'}:replay==='failure'?{text:'',confidence:0,error:true}:{};
+    duplicate=await f.worker('complete',{...body,...extra},mode);
+    assert.deepEqual(await duplicate.json(),{ignored:true});
+    assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'processing');
+    assert.equal((await f.processing.processingStatus(f.owner)).cloud_last_completed,'');
+  }finally{pause.release();await first;}
+  assert.equal(duplicate.status,200);assert.equal((await(await first).json()).state,'needs_review');
+  const history=f.sql.prepare('SELECT result FROM document_extractions').all(),current=f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction;
+  assert.equal(history.length,1);assert.equal(history[0].result,current);assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,current);
+  assert.equal(JSON.parse(current).fields.invoice_number.value,'0001');
+  for(const credential of [job.lease,f.env.DOCUMENT_WORKER_TOKEN,f.env.DOCUMENT_CLOUD_WORKER_TOKEN])assert.ok(!current.includes(credential));
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+});
+
+test('an accepted OCR receipt survives interruption and module restart while a new lease can reprocess',async t=>{
+  const f=await fixture(t);await f.document('a');const job=await f.lease(),prepare=f.d1.prepare.bind(f.d1);let interrupted=false;
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query==='SELECT * FROM document_automation WHERE owner=?'){
+      const first=statement.first.bind(statement);statement.first=async()=>{if(!interrupted){interrupted=true;throw Error('synthetic lost continuation');}return first();};
+    }
+    return statement;
+  };
+  await assert.rejects(f.complete(job),/synthetic lost continuation/);
+  const receipt=f.sql.prepare('SELECT result FROM document_extractions').get().result;
+  assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'processing');
+  await f.restart();assert.deepEqual(await(await f.complete(job)).json(),{ignored:true});
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction,receipt);
+  f.sql.prepare("UPDATE document_jobs SET lease_until='2000-01-01'").run();
+  const replacement=await f.lease();assert.notEqual(replacement.lease,job.lease);assert.equal((await f.complete(job)).status,409);
+  assert.equal((await(await f.complete(replacement)).json()).state,'needs_review');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,2);assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,receipt);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});
+
+test('a server PDF continuation failure cannot requeue an already accepted receipt',async t=>{
+  const f=await fixture(t);await f.document('a','application/pdf');const prepare=f.d1.prepare.bind(f.d1);let interrupted=false;
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query==='SELECT * FROM document_automation WHERE owner=?'){
+      const first=statement.first.bind(statement);statement.first=async()=>{if(!interrupted){interrupted=true;throw Error('synthetic lost continuation');}return first();};
+    }
+    return statement;
+  };
+  assert.equal((await f.processing.processDocuments(f.owner,1)).processed,0);
+  const row=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(row.state,'processing');assert.equal(row.attempts,1);assert.equal(row.error_code,'');
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);assert.notEqual(row.extraction,'{}');
+  assert.equal((await f.processing.processDocuments(f.owner,1)).processed,0);assert.equal(f.pdfCalls,1);
 });

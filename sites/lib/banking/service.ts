@@ -1,8 +1,8 @@
 import { db, identity, readWorkspace, response } from '@/lib/server';
 import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, uid, validDate } from '@/lib/domain';
 import {
-  ProviderError, getApplication, listBusinessBanks, startAuth, createSession,
-  getSession, deleteSession, getTransactions,
+  ProviderError, providerErrorCode, getApplication, listBusinessBanks, startAuth, createSession,
+  getSession, deleteSession, getTransactions, providerCooldownDiagnostic,
   type ProviderAccount, type ProviderApplication, type ProviderPsu,
 } from './enable-banking';
 import { normalizeTransactions, stableAccountKey } from './transactions';
@@ -13,11 +13,26 @@ import {
 import { cookieValue, digest, randomToken, validFlowToken } from './security';
 import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
+import { mergeAccountReadCooldown } from './account-read-cooldown';
+import { guardedBankRead } from './account-read-guard';
 
 export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
 const COOKIE = '__Secure-mg-bank-flow';
 const FLOW_AGE_MS = 15 * 60_000;
 const POSTPROCESS_WARNING='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
+const COMMITTED_REPLY_WARNING='Bankkörningen är sparad. Svaret kunde inte bekräftas; kontrollera status innan nästa hämtning.';
+const BANK_JOB_ERROR_CODES=new Set([
+  'BANK_RATE_LIMIT','BANK_TIMEOUT','BANK_NETWORK_ERROR','BANK_RECONNECT_REQUIRED','BANK_AUTHORIZATION_EXPIRED',
+  'BANK_PERIOD_UNAVAILABLE','BANK_DATE_RANGE_INVALID','BANK_ACCOUNT_UNAVAILABLE','BANK_ACTION_REQUIRED',
+  'BANK_USER_CONTEXT_REQUIRED','BANK_UNAVAILABLE','BANK_SYNC_RESTART_REQUIRED','BANK_RESOURCE_UNAVAILABLE','BANK_SERVICE_ERROR',
+  'BANK_INVALID_RESPONSE','BANK_INCOMPLETE_RESPONSE','BANK_SYNC_LIMIT',
+  'INVALID_REQUEST','INVALID_PROVIDER_RESPONSE','INVALID_CONFIGURATION','INVALID_PRIVATE_KEY','RESPONSE_TOO_LARGE',
+  'NO_LINKED_ACCOUNTS','CALLBACK_NOT_REGISTERED','PROVIDER_AUTHORIZATION_FAILED','PROVIDER_ACCESS_DENIED','PROVIDER_REDIRECT_DENIED',
+]);
+function bankJobErrorCode(error:unknown):string{
+  const code=providerErrorCode(error)??(error instanceof BankPeriodError?error.code:undefined);
+  return typeof code==='string'&&BANK_JOB_ERROR_CODES.has(code)?code:'BANK_SYNC_FAILED';
+}
 const stockholmClock = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
 function clockParts(at: number) { return Object.fromEntries(stockholmClock.formatToParts(at).filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)])); }
 function stockholmOffset(at: number) {
@@ -385,16 +400,26 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
     if (!selected.length) throw new BankError('Välj vilka konton du vill hämta först.');
     // Freeze a validated UTC interval before any provider call or reservation.
     const {dateFrom: from, dateTo: to} = bankSyncRange(conn.date_from, conn.last_synced_at);
-    if(options.control)await lease.run(db().prepare('UPDATE bank_connections SET control_last_attempt_at=? WHERE owner=? AND id=?').bind(now(),owner,conn.id));
+    const runId=uid(),mode=options.automatic?'automatic':options.control?'control':'manual';
+    const jobEvent=(state:'started'|'completed'|'failed',errorCode?:string)=>{
+      const statement=db().prepare(`INSERT INTO audit_events(id,owner,revision,action,detail,created_at)
+        SELECT ?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?
+        ${state==='completed'?'WHERE EXISTS(SELECT 1 FROM bank_sync_runs WHERE owner=? AND id=?)':''}`);
+      const values=[uid(),owner,owner,`bank.job.${state}`,JSON.stringify({run_id:runId,mode,...(errorCode?{error_code:errorCode}:{})}),now()];
+      return statement.bind(...values,...(state==='completed'?[owner,runId]:[]));
+    };
+    const reservations=[jobEvent('started')];
+    if(options.control)reservations.push(db().prepare('UPDATE bank_connections SET control_last_attempt_at=? WHERE owner=? AND id=?').bind(now(),owner,conn.id));
     // Reserve the next attempt before contacting the provider. Retries, multiple
     // tabs and scheduled task replays cannot create an unbounded polling loop.
-    if (options.automatic) await lease.run(db().prepare("UPDATE bank_connections SET auto_last_attempt_at=?,auto_next_at=?,sync_failures=sync_failures+1,last_error='Bankkörningen avbröts eller väntar på svar. Kontrollera anslutningen om felet kvarstår.' WHERE owner=? AND id=?")
+    if (options.automatic) reservations.push(db().prepare("UPDATE bank_connections SET auto_last_attempt_at=?,auto_next_at=?,sync_failures=sync_failures+1,last_error='Bankkörningen avbröts eller väntar på svar. Kontrollera anslutningen om felet kvarstår.' WHERE owner=? AND id=?")
       .bind(now(), nextAutomaticAttempt(), user.userId, conn.id));
-    const config = await providerConfig(app), bankAccounts = await accounts(conn);
-    let needsReauthorization = false;
+    await lease.write(reservations);
+    let needsReauthorization = false,commitAttempted=false;
     try {
+      const config = await providerConfig(app), bankAccounts = await accounts(conn);
       await lease.assert();
-      const live = await getSession(config, await sessionId(conn));
+      const live = await guardedBankRead(user.userId, conn, lease, async () => getSession(config, await sessionId(conn)));
       await lease.assert();
       const expiry = Date.parse(live.access.valid_until);
       if (live.status !== 'AUTHORIZED' || !Number.isFinite(expiry) || expiry <= Date.now() || live.aspsp.name !== conn.bank_name || live.aspsp.country !== conn.country || live.psu_type !== 'business') {
@@ -426,7 +451,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         const accountKey = canonicalKey;
         const periods = await fetchBankPeriods({dateFrom: from, dateTo: to, budget, authorize: authorizeFetch,
           isPeriodError: error => error instanceof ProviderError && error.code === 'BANK_PERIOD_UNAVAILABLE',
-          fetchPage: input => getTransactions(config, id, {...input, psu: options.psu}),
+          fetchPage: input => guardedBankRead(user.userId, conn, lease, () => getTransactions(config, id, {...input, psu: options.psu})),
         });
         for (const period of periods) {
           const normalized = await normalizeTransactions(period.transactions, { accountKey, accountLabel: maskAccount(account, {name: conn.bank_name, country: conn.country}), bankName: conn.bank_name, dateFrom: period.dateFrom, dateTo: period.dateTo });
@@ -444,7 +469,6 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       // A crash or expired lease after commit must leave a durable visible alert.
       const persistedWarnings=()=>JSON.stringify([...warnings,...(!test?[POSTPROCESS_WARNING]:[])]);
       let imported = 0;
-      const runId = uid();
       await authorizeFetch();
       const old = !test ? await readWorkspace(user.userId) : null;
       const candidateRows = rows.filter(row => {
@@ -480,6 +504,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         await lease.run(db().prepare('INSERT OR IGNORE INTO workspaces (owner,revision,payload,updated_at) VALUES (?,0,?,?)').bind(user.userId, JSON.stringify(emptyState()), at));
         const auditId = uid();
         await authorizeFetch();
+        commitAttempted=true;
         const committed = await lease.write([
           db().prepare(`INSERT INTO audit_events (id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS (SELECT 1 FROM workspaces WHERE owner=? AND revision=?)`)
             .bind(auditId, user.userId, old.revision + 1, 'bank.sync', JSON.stringify({ message: `${imported} bankhändelser hämtade från ${conn.bank_name}`, command: { type: 'bank.sync', connectionId: conn.id, from, to, imported, skipped } }), at, user.userId, old.revision),
@@ -487,6 +512,9 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
           db().prepare(`INSERT INTO bank_sync_runs (id,owner,connection_id,imported,skipped,warnings,test,created_at) SELECT ?,?,?,?,?,?,0,? WHERE EXISTS (SELECT 1 FROM audit_events WHERE id=? AND owner=?)`)
             .bind(runId, user.userId, conn.id, imported, skipped, persistedWarnings(), at, auditId, user.userId),
           db().prepare("UPDATE bank_connections SET last_synced_at=?,last_error=NULL,retry_after='',sync_failures=0,updated_at=? WHERE owner=? AND id=? AND EXISTS (SELECT 1 FROM bank_sync_runs WHERE id=?)").bind(at, at, user.userId, conn.id, runId),
+          // Completion is part of the accepted import, never a later write that
+          // could relabel already committed bank data as a failed attempt.
+          jobEvent('completed'),
         ]);
         if (committed[1].meta.changes !== 1) throw new BankError('Registret ändrades under hämtningen. Uppdatera sidan och hämta igen. Inga bankhändelser skrevs över.', 409);
       } else {
@@ -494,9 +522,11 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         if (test) warnings.add(`${rows.length} testhändelser lästes. Inga testuppgifter sparades bland dina riktiga bankhändelser.`);
         else skipped += rows.length;
         await authorizeFetch();
+        commitAttempted=true;
         await lease.write([
           db().prepare('INSERT INTO bank_sync_runs (id,owner,connection_id,imported,skipped,warnings,test,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(runId, user.userId, conn.id, 0, skipped, persistedWarnings(), test ? 1 : 0, at),
           db().prepare("UPDATE bank_connections SET last_synced_at=?,last_error=NULL,retry_after='',sync_failures=0,updated_at=? WHERE owner=? AND id=?").bind(at, at, user.userId, conn.id),
+          jobEvent('completed'),
         ]);
       }
       // Retention is housekeeping; a failed cleanup must not report a committed
@@ -507,14 +537,34 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       if(!test)try{await (await import('../customer-messages')).reconcileAndPrepare(user.userId);await lease.run(db().prepare('UPDATE bank_sync_runs SET warnings=? WHERE owner=? AND id=?').bind(JSON.stringify([...warnings]),user.userId,runId));}catch{warnings.add(POSTPROCESS_WARNING);}
       return response({ message: test ? `Testhämtningen är klar. ${rows.length} testhändelser lästes utan att påverka ditt register.` : `${imported} nya bankhändelser hämtades. Kontrollera underlagen före matchning.`, imported, skipped, warnings: [...warnings], test });
     } catch (error) {
+      if(commitAttempted){
+        // D1 can commit before its reply is lost. Its owner-bound receipt is
+        // authoritative even if this worker's lease was replaced afterwards.
+        // If the receipt cannot be read, leave the unknown outcome unchanged.
+        let accepted:{imported:number;skipped:number;warnings:string;test:number}|null;
+        try{accepted=await db().prepare('SELECT imported,skipped,warnings,test FROM bank_sync_runs WHERE owner=? AND id=?').bind(owner,runId).first();}
+        catch{throw error;}
+        if(accepted)return response({message:accepted.test?'Testhämtningen är sparad utan att påverka ditt register.':`${accepted.imported} nya bankhändelser hämtades. Kontrollera underlagen före matchning.`,imported:accepted.imported,skipped:accepted.skipped,warnings:[...JSON.parse(accepted.warnings),COMMITTED_REPLY_WARNING],test:!!accepted.test,metadata_warning:COMMITTED_REPLY_WARNING});
+      }
       await lease.assert();
+      const current = await connection(user.userId);
+      if (!current || current.id !== conn.id || current.app_generation !== conn.app_generation || current.encrypted_session !== conn.encrypted_session) throw new Error('BANK_ACCOUNT_READ_CONTEXT_CHANGED');
       const exhausted=options.automatic&&conn.sync_failures+1>=3;
       const detail = error instanceof BankError || error instanceof ProviderError || error instanceof BankPeriodError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.';
       const message = exhausted ? `Automatisk bankhämtning är stoppad efter tre avbrutna eller misslyckade försök. ${detail}` : detail;
       const expired = needsReauthorization || error instanceof ProviderError && error.code === 'BANK_RECONNECT_REQUIRED';
       const limited=error instanceof ProviderError&&(error.status===429||error.retryAfter!==undefined||error.retryBlocked===true);
-      const retry=limited?(error.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+Math.max(60,error.retryAfter||60)*1000).toISOString()):conn.retry_after;
-      await lease.run(db().prepare('UPDATE bank_connections SET last_error=?,status=?,retry_after=?,sync_failures=CASE WHEN ? THEN 3 ELSE sync_failures END,updated_at=? WHERE owner=? AND id=?').bind(message, expired ? 'reauth_required' : conn.status,retry,limited&&error.retryBlocked?1:0, now(), user.userId, conn.id));
+      const retry=limited?(error.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+Math.max(60,error.retryAfter||60)*1000).toISOString()):current.retry_after;
+      // Keep actual supplier advice separate from the six-hour background
+      // fallback. A successful transactions sync never clears this read guard.
+      const accountRetry=mergeAccountReadCooldown(current.account_evidence_retry,providerCooldownDiagnostic(error));
+      const failureState=db().prepare('UPDATE bank_connections SET last_error=?,status=?,retry_after=?,account_evidence_retry=?,sync_failures=CASE WHEN ? THEN 3 ELSE sync_failures END,updated_at=? WHERE owner=? AND id=?').bind(message, expired ? 'reauth_required' : current.status,retry,accountRetry,limited&&error.retryBlocked?1:0, now(), user.userId, conn.id);
+      try{await lease.write([failureState,jobEvent('failed',bankJobErrorCode(error))]);}
+      catch{
+        // Operational history must not discard the provider's durable cooldown.
+        // A replacement or expired lease still rejects this bounded fallback.
+        await lease.run(failureState);
+      }
       throw error;
     }
   });

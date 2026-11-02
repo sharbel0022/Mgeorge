@@ -189,3 +189,23 @@ test('a legacy snapshot without the typed bank specification link table remains 
  const f=fixture(t,false,null),db=openDatabase(f.source);db.exec('DROP TABLE bank_specification_links');db.close();sealSqlite(f.source,f.archive);
  assert.equal(verifyBackup(f.archive,key).verified,true);
 });
+
+function bankgiroQueueFixture(t){
+ const f=fixture(t,false),db=openDatabase(f.source),original=db.prepare('SELECT content,fingerprint FROM documents WHERE id=?').get(f.document.id);
+ db.prepare("UPDATE documents SET source='bankgiro_source',metadata=? WHERE id=?").run(JSON.stringify({owner:'local-admin'}),f.document.id);
+ const importId=recordImport(db,{source:'bank_file',name:'synthetic.csv',content:original.content,mime_type:'text/csv'});
+ db.prepare('UPDATE import_jobs SET owner=? WHERE id=?').run('local-admin',importId);
+ db.prepare("INSERT INTO bankgiro_ingest_jobs(id,owner,source_id,scope_id,report_id,sha256,filename,authorization_generation,document_id,import_id,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)").run('queue','local-admin','synthetic','contract','report',original.fingerprint,'synthetic.csv','1',f.document.id,importId,'IMPORTED',1,1);
+ return {...f,db,importId};
+}
+test('Bankgiro backup validates queue original and import owner/hash references',t=>{
+ for(const mutation of ["UPDATE bankgiro_ingest_jobs SET document_id='missing'","UPDATE documents SET metadata='{\"owner\":\"other\"}'","UPDATE bankgiro_ingest_jobs SET sha256='"+'0'.repeat(64)+"'","UPDATE bankgiro_ingest_jobs SET import_id='missing'","UPDATE import_jobs SET owner='other'","UPDATE bankgiro_ingest_jobs SET document_id=NULL"]){
+ const f=bankgiroQueueFixture(t);f.db.exec(mutation);f.db.close();
+ assert.throws(()=>createBackup(f.source,join(f.folder,'queue-invalid.mgbak'),key),error=>['backup_original_missing','backup_original_hash_mismatch','backup_original_reference_invalid'].includes(error.code),mutation);
+ }
+});
+test('Bankgiro backup restores queue status with exact owned original and import references',t=>{
+ const f=bankgiroQueueFixture(t);f.db.close();const archive=join(f.folder,'queue-valid.mgbak');
+ createBackup(f.source,archive,key);assert.equal(verifyBackup(archive,key).verified,true);restoreBackup(archive,f.target,key);
+ const restored=new DatabaseSync(f.target,{readOnly:true});try{const row=restored.prepare('SELECT status,document_id,import_id FROM bankgiro_ingest_jobs').get();assert.equal(row.status,'IMPORTED');assert.equal(row.document_id,f.document.id);assert.equal(row.import_id,f.importId);}finally{restored.close();}
+});

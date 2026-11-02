@@ -1,0 +1,1 @@
+ALTER TABLE `bank_connections` ADD `account_evidence_retry` text DEFAULT '' NOT NULL;

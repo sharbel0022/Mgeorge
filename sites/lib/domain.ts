@@ -1,3 +1,4 @@
+export {readBankgiroSourceEvidence} from './bankgiro-source-evidence.js';
 import {bankApiOriginalIssue as apiOriginalIssue,bankApiDataHash,hasBankApiOrigin,bankFileReferenceHash,BANK_API_ORIGINAL_VERSION} from './bank-api-original.js';
 export {hasBankApiOrigin} from './bank-api-original.js';
 export const bankApiOriginalIssue=(t:Transaction)=>apiOriginalIssue(t,suspectedBankCollection,PAYMENT_SPECIFICATION_REQUIRED);

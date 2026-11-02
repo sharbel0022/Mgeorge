@@ -29,7 +29,7 @@ function populatedState(){
 // Run the real Dashboard load handler against controlled HTTP responses. Child
 // services are inert; bank/invoice list rendering and navigation stay real.
 async function fixture(t,view='bank'){
- const key='__dashboard_loading_'+crypto.randomUUID().replaceAll('-',''),f={slots:[],cursor:0,effects:[],closed:false,scheduled:false,requests:[],reads:[],candidateReads:[],candidateFrames:[],postState:populatedState(),postStatus:200,suggestionCalls:0};globalThis[key]=f;
+ const key='__dashboard_loading_'+crypto.randomUUID().replaceAll('-',''),f={slots:[],cursor:0,effects:[],closed:false,scheduled:false,requests:[],reads:[],candidateReads:[],candidateFrames:[],postState:populatedState(),postStatus:200,suggestionCalls:0,downloads:[]};globalThis[key]=f;
  const equal=(a,b)=>a&&b&&a.length===b.length&&a.every((value,n)=>Object.is(value,b[n]));
  f.schedule=()=>{if(f.closed||f.scheduled)return;f.scheduled=true;queueMicrotask(()=>{f.scheduled=false;f.render();});};
  f.state=initial=>{const n=f.cursor++;f.slots[n]??={value:typeof initial==='function'?initial():initial};return [f.slots[n].value,value=>{f.slots[n].value=typeof value==='function'?value(f.slots[n].value):value;f.schedule();}];};
@@ -42,19 +42,21 @@ async function fixture(t,view='bank'){
  const shell={ownerDocument:{defaultView:browser},contains:()=>false,addEventListener(){},removeEventListener(){}};
  const location=file('../lib/workspace-location.ts'),navigation=compiled('../components/workspace-navigation.tsx',{'react':import.meta.resolve('react'),'@/lib/workspace-location':location});
  const hook=compiled('../components/use-workspace-navigation.ts',{react,'@/lib/workspace-location':location,'@/lib/workspace-drafts':file('../lib/workspace-drafts.ts')});
- const presentation=compiled('../lib/payment-presentation.ts'),bankUrl=compiled('../components/bank-payments.tsx',{'@/lib/payment-presentation':presentation,'./list-pagination':compiled('../components/list-pagination.tsx')}),bank=await import(bankUrl);
+ const presentation=compiled('../lib/payment-presentation.ts'),bankUrl=compiled('../components/bank-payments.tsx',{'@/lib/payment-presentation':presentation,'./list-pagination':compiled('../components/list-pagination.tsx'),'./bankgiro-availability':compiled('../components/bankgiro-availability.tsx')}),bank=await import(bankUrl);
  const inert=data('export default function View(){return null;}');
- const aliases=Object.fromEntries(['economy-overview','payment-history','payment-verification','gmail-summary','invoice-evidence','customer-messages','gmail-workspace','bank-connection','bankgiro-link-review'].map(name=>['@/components/'+name,inert]));
+ const aliases=Object.fromEntries(['economy-overview','payment-history','payment-verification','reconciliation-proposal','gmail-summary','invoice-evidence','customer-messages','gmail-workspace','bank-connection','bankgiro-link-review'].map(name=>['@/components/'+name,inert]));
  const noCalls=names=>data(names.map(name=>`export function ${name}(){throw Error('Unexpected unrelated ${name} call');}`).join('\n'));
  const control=data(`const f=${ref};export function usePaymentControl(enabled,revision,onComplete,onUnauthorized){f.complete=onComplete;f.unauthorized=onUnauthorized;return {data:enabled?{counts:{review:1},connections:{bank:{last_synced:'2026-10-01T12:00:00Z'}},run:null,queue:[]}:null,error:'',busy:false,refresh:async()=>{},start:async()=>{throw Error('No processing expected');}};}export const ControlButton=()=>null,ControlConnections=()=>null,ControlProgress=()=>null,ControlQueue=()=>null,ControlReview=()=>null,controlDate=()=>'';`);
  const domain=data(`export * from ${JSON.stringify(file('../lib/domain.ts'))};import {suggestions as realSuggestions} from ${JSON.stringify(file('../lib/domain.ts'))};export function suggestions(...args){${ref}.suggestionCalls++;return realSuggestions(...args);}`);
- const {default:Dashboard}=await import(compiled('../app/dashboard.tsx',{...aliases,react,'@/lib/domain':domain,'@/components/workspace-navigation':navigation,'@/components/use-workspace-navigation':hook,'@/lib/workspace-location':location,'@/components/bank-payments':bankUrl,'@/lib/payment-presentation':presentation,'@/components/payment-control':control,'@/components/payment-bank-filter':compiled('../components/payment-bank-filter.ts'),'@/lib/payment-overview':noCalls(['buildPaymentOverview','paymentGroup','paymentTitle']),'@/lib/reconciliation':noCalls(['analyze']),'@/lib/bankgiro-parser.js':noCalls(['parseSpecificationBytes']),'@/lib/imports':noCalls(['parseCSV','guessMapping','mapCSV','parseCAMT','sha256','readInvoiceFile','extractInvoiceText','downloadFile','csvCell'])}));
+ const csvSource=readFileSync(new URL('../lib/imports.ts',import.meta.url),'utf8').split('\n').find(line=>line.startsWith('export function csvCell('));
+ const importBoundary=data(`export * from ${JSON.stringify(noCalls(['parseCSV','guessMapping','mapCSV','parseCAMT','sha256','readInvoiceFile','extractInvoiceText']))};${ts.transpileModule(csvSource,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText} export function downloadFile(...args){${ref}.downloads.push(args);}`);
+ const {default:Dashboard}=await import(compiled('../app/dashboard.tsx',{...aliases,react,'@/lib/domain':domain,'@/components/workspace-navigation':navigation,'@/components/use-workspace-navigation':hook,'@/lib/workspace-location':location,'@/components/bank-payments':bankUrl,'@/lib/payment-presentation':presentation,'@/components/payment-control':control,'@/components/payment-bank-filter':compiled('../components/payment-bank-filter.ts'),'@/lib/payment-overview':noCalls(['buildPaymentOverview','paymentGroup','paymentTitle']),'@/lib/reconciliation':noCalls(['analyze']),'@/lib/bankgiro-parser.js':noCalls(['parseSpecificationBytes']),'@/lib/imports':importBoundary}));
  t.mock.method(globalThis,'fetch',async(path,options={})=>{
   f.requests.push({path,method:options.method||'GET'});
   if(path==='/api/bank/invoice-candidates')return await new Promise((resolve,reject)=>f.candidateReads.push({resolve,reject,signal:options.signal}));
   if(path==='/api/export')return Response.json({error:'Synthetic export unavailable'},{status:503});
   assert.equal(path,'/api/state');
-  if(options.method==='POST'){if(f.postGate)await f.postGate;return Response.json(f.postStatus===200?{state:f.postState,revision:2,message:'Synthetic saved'}:{error:'Synthetic save unavailable'},{status:f.postStatus});}
+  if(options.method==='POST'){if(f.postGate)await f.postGate;if(f.postReply)return f.postReply();return Response.json(f.postStatus===200?{state:f.postState,revision:2,message:'Synthetic saved'}:{error:'Synthetic save unavailable'},{status:f.postStatus});}
   return await new Promise((resolve,reject)=>f.reads.push({resolve,reject}));
  });
  f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=Dashboard({initialView:view});for(const node of elements(f.tree)){if(node.props?.className==='app-shell'&&node.props.ref)node.props.ref.current=shell;if(node.props?.id==='main-content'&&node.props.ref)node.props.ref.current={focus(){}};if(node.props?.candidates)f.candidateFrames.push({candidates:node.props.candidates,transactions:node.props.transactions.map(t=>t.id)});if(node.props?.invoiceCandidates)f.candidateFrames.push({candidates:node.props.invoiceCandidates,revision:node.props.historyRevision});}for(const effect of f.effects.splice(0))effect();};
@@ -136,7 +138,7 @@ test('Q8 dashboard readiness: a delayed save response cannot reveal list totals 
  await f.navigate('receivable');assert.doesNotMatch(f.listHtml(),/Synthetic receivable|class="table-footer"/);noEmptyClaims(f.listHtml());assert.match(f.listHtml(),/Logga in.*kundfakturor/);
 });
 
-const candidateMap=number=>({'synthetic-transaction':[{number,documentId:'synthetic-doc-'+number,party:'Synthetic invoice customer',amount:123400,issued:'2026-10-01',needsReview:true}]});
+const candidateMap=number=>({'synthetic-transaction':[{number,documentId:'synthetic-doc-'+number,invoiceId:'',party:'Synthetic invoice customer',amount:123400,issued:'2026-10-01',needsReview:true,source:'gmail',reason:'Synthetic review proposal'}]});
 for(const failure of ['pending','http','transport']){
  test(`dashboard candidates: revision change with ${failure} refresh hides old proposals from list, search and transaction detail`,async t=>{
   const f=await fixture(t),state=populatedState(),before=JSON.stringify(state);await f.respond(200,state);await f.respondCandidates(candidateMap('SYN-OLD'));
@@ -225,4 +227,115 @@ test('final UI: invoice search trims pasted whitespace and matches displayed sou
  for(const value of ['  SYN-receivable  ','synthetic original source','9 876']){
   search.props.onChange({target:{value}});await flush();assert.match(f.listHtml(),/Synthetic receivable/);
  }
+});
+
+for(const [name,change]of [
+ ['missing transaction array',state=>({...state,transactions:null})],
+ ['numeric bank reference',state=>({...state,transactions:state.transactions.map(row=>({...row,payerReference:599}))})],
+ ['malformed bank reference evidence',state=>({...state,transactions:state.transactions.map(row=>({...row,referenceEvidence:{candidates:null}}))})],
+ ['numeric invoice number',state=>({...state,invoices:state.invoices.map(row=>({...row,number:599}))})],
+ ['numeric original reference',state=>({...state,transactions:state.transactions.map(row=>({...row,original:{...row.original,payerReference:599}}))})],
+ ['malformed manual verification',state=>({...state,transactions:state.transactions.map(row=>({...row,verification:{party:{name:'Invalid'},payerReference:'0599',note:'Synthetic',at:'2026-11-02T00:00:00Z'}}))})],
+ ['malformed invoice reconciliation note',state=>({...state,invoices:state.invoices.map(row=>({...row,reconciledAt:'2026-11-02T00:00:00Z',reconciliationNote:{text:'Synthetic malformed note'}}))})],
+ ['missing reference warnings',state=>({...state,transactions:state.transactions.map(row=>({...row,referenceEvidence:{...row.referenceEvidence,warnings:undefined}}))})],
+ ['structured reference warning',state=>({...state,transactions:state.transactions.map(row=>({...row,referenceEvidence:{...row.referenceEvidence,warnings:[{reason:'Synthetic invalid warning'}]}}))})],
+ ['structured selected reference',state=>({...state,transactions:state.transactions.map(row=>({...row,referenceEvidence:{...row.referenceEvidence,selected:{value:{ref:'0599'}}}}))})],
+ ['structured report identifier',state=>({...state,transactions:state.transactions.map(row=>({...row,reportEvidence:{reportId:{id:'Synthetic invalid report'}}}))})],
+])test('payment UI rejects malformed workspace response: '+name,async t=>{
+ const f=await fixture(t),state=populatedState();
+ await f.respond(200,change(state));
+ assert.match(f.listHtml(),/kunde inte hämtas/i);noEmptyClaims(f.listHtml());
+ assert.doesNotMatch(f.listHtml(),/Synthetic bank payer|class="bank-summary"/);
+ const retry=f.refresh();await flush();await f.respond(200,state);await retry;
+ assert.match(f.listHtml(),/Synthetic bank payer/);
+});
+
+test('payment UI rejects a malformed audit entry before history renders it',async t=>{
+ const f=await fixture(t,'history'),state=populatedState();
+ f.reads[0].resolve(Response.json({state,revision:1,audit:[null]}));await flush();
+ const status=f.find(node=>node.type?.name==='WorkspaceListStatus');assert.ok(status);assert.equal(status.props.status,'failed');
+ const retry=f.refresh();await flush();await f.respond(200,state);await retry;
+ assert.equal(f.find(node=>node.type?.name==='WorkspaceListStatus'),undefined);
+});
+
+for(const detail of ['null','{"message":{"invalid":"object"}}'])test('payment UI history renders a safe fallback for structured audit text: '+detail,async t=>{
+ const f=await fixture(t,'history'),state=populatedState();
+ f.reads[0].resolve(Response.json({state,revision:1,audit:[{id:'synthetic-event',revision:1,action:'Synthetic event',detail,created_at:'2026-11-02T00:00:00Z'}]}));await flush();
+ assert.equal(f.find(node=>node.type?.name==='WorkspaceListStatus'),undefined);assert.match(text(f.tree),/Synthetic event/);
+});
+
+for(const [name,candidates]of [
+ ['null collection',null],
+ ['non-array transaction proposals',{'synthetic-transaction':'0599'}],
+ ['null proposal',{'synthetic-transaction':[null]}],
+ ['numeric invoice number',{'synthetic-transaction':[{...candidateMap('0599')['synthetic-transaction'][0],number:599}]}],
+ ['malformed identifiers',{'synthetic-transaction':[{...candidateMap('0599')['synthetic-transaction'][0],identifiers:{value:'0599'}}]}],
+ ['numeric nested reference',{'synthetic-transaction':[{...candidateMap('0599')['synthetic-transaction'][0],identifiers:[{field:'reference',value:599}]}]}],
+ ['malformed reference fields',{'synthetic-transaction':[{...candidateMap('0599')['synthetic-transaction'][0],referenceFields:[null]}]}],
+])test('payment UI rejects malformed candidate response and retries safely: '+name,async t=>{
+ const f=await fixture(t),state=populatedState(),before=structuredClone(state);await f.respond(200,state);
+ await f.respondCandidates(candidates);
+ assert.deepEqual(f.find(node=>node.props?.candidates).props.candidates,{});
+ assert.doesNotThrow(()=>f.listHtml());assert.match(text(f.tree),/Fakturaförslagen kunde inte hämtas/);
+ const retry=f.find(node=>node.type==='button'&&text(node)==='Hämta fakturaförslag igen');assert.ok(retry);retry.props.onClick();await flush();
+ assert.match(text(f.tree),/Hämtar fakturaförslag/);assert.equal(f.candidateReads.length,2);
+ await f.respondCandidates(candidateMap('0000599'));
+ assert.equal(f.find(node=>node.props?.candidates).props.candidates['synthetic-transaction'][0].number,'0000599');
+ assert.doesNotMatch(text(f.tree),/Fakturaförslagen kunde inte hämtas/);
+ assert.deepEqual(state,before);assert.equal(f.requests.some(request=>request.method!=='GET'),false);
+});
+
+for(const failure of ['http','transport'])test('payment UI identifies unavailable candidate evidence without hiding stored bank facts: '+failure,async t=>{
+ const f=await fixture(t);await f.respond(200,populatedState());assert.match(text(f.tree),/Hämtar fakturaförslag/);
+ if(failure==='http')await f.respondCandidates({},undefined,503);else{f.candidateReads.at(-1).reject(Error('Synthetic candidate network failure'));await flush();}
+ assert.match(text(f.tree),/Fakturaförslagen kunde inte hämtas/);assert.match(f.listHtml(),/Synthetic bank payer/);
+ assert.deepEqual(f.find(node=>node.props?.candidates).props.candidates,{});
+});
+
+for(const failure of ['malformed','json','transport','http400','http500'])test('payment UI requires a fresh read after an ambiguous save result: '+failure,async t=>{
+ const f=await fixture(t,'receivable'),state=populatedState();await f.respond(200,state);await f.navigate('settings');
+ const settings=()=>f.find(node=>node.props?.save&&node.props?.toggleDemo),command={type:'settings.save',name:'Synthetic workspace',email:'synthetic@example.test'};
+ if(failure==='malformed')f.postState={...state,transactions:null};
+ if(failure==='json')f.postReply=()=>new Response('{',{status:200,headers:{'Content-Type':'application/json'}});
+ if(failure==='transport')f.postReply=()=>{throw Error('Synthetic lost commit response');};
+ if(failure==='http400')f.postReply=()=>Response.json({error:'Synthetic original rejected after retaining its evidence',evidenceRetained:true,revision:2},{status:400});
+ if(failure==='http500')f.postReply=()=>Response.json({error:'Synthetic follow-up failed after saving'},{status:500});
+ const oldSave=settings().props.save;assert.equal(await oldSave(command),false);await flush();
+ assert.equal(await oldSave(command),false,'Even the retained event handler cannot resubmit after an ambiguous commit');await flush();
+ assert.equal(f.requests.filter(request=>request.method==='POST').length,1);
+ await f.navigate('receivable');assert.match(f.listHtml(),/kunde inte hämtas/i);assert.doesNotMatch(f.listHtml(),/Synthetic receivable|class="table-footer"/);
+ const retry=f.refresh();await flush();await f.respond(200,state,undefined,3);await retry;
+ await f.navigate('settings');f.postState=state;f.postReply=null;assert.equal(await settings().props.save(command),true);await flush();
+ assert.equal(f.requests.filter(request=>request.method==='POST').length,2);
+});
+
+test('payment UI requires reload for a failed save even when the response has no retention receipt',async t=>{
+ const f=await fixture(t,'receivable'),state=populatedState();await f.respond(200,state);await f.navigate('settings');
+ f.postStatus=400;assert.equal(await f.find(node=>node.props?.save&&node.props?.toggleDemo).props.save({type:'settings.save',name:'Synthetic workspace',email:'synthetic@example.test'}),false);await flush();
+ await f.navigate('receivable');assert.doesNotMatch(f.listHtml(),/Synthetic receivable/);assert.match(f.listHtml(),/kunde inte hämtas/);
+});
+
+test('payment UI marks an already open payment detail unreadable after an ambiguous save',async t=>{
+ const f=await fixture(t);await f.respond(200,populatedState());f.find(node=>node.props?.candidates).props.open('synthetic-transaction');await flush();
+ const detail=()=>f.find(node=>node.props?.invoiceCandidates);assert.equal(detail().props.readable,true);
+ f.postStatus=400;assert.equal(await detail().props.save({type:'settings.save',name:'Synthetic workspace',email:'synthetic@example.test'}),false);await flush();
+ assert.equal(detail().props.readable,false);assert.deepEqual(detail().props.invoiceCandidates,{});
+ const retry=f.refresh();await flush();await f.respond(200,populatedState(),undefined,2);await retry;assert.equal(detail().props.readable,true);
+});
+
+function fullyAllocatedInvoiceWithoutOriginal(){
+ const state=populatedState(),invoice=state.invoices[0];invoice.documentId='';state.invoices=[invoice];
+ const transaction=syntheticBankTransaction({id:'synthetic-allocated-payment',payerReference:invoice.number,party:'Synthetic bank payer',amount:invoice.total,kind:'payment',verified:true});state.transactions=[transaction];
+ state.allocations=[{id:'synthetic-allocation',invoiceId:invoice.id,transactionId:transaction.id,amount:invoice.total,effect:'payment',active:true}];return state;
+}
+test('invoice review filter uses the same evidence status as the visible table without changing recorded money',async t=>{
+ const f=await fixture(t,'receivable'),state=fullyAllocatedInvoiceWithoutOriginal(),before=JSON.stringify(state);await f.respond(200,state);
+ assert.match(f.listHtml(),/Granska betalningsunderlag/);
+ f.find(node=>node.type==='button'&&text(node)==='Att granska').props.onClick();await flush();assert.match(f.listHtml(),/Synthetic receivable/);assert.match(f.listHtml(),/Granska betalningsunderlag/);
+ f.find(node=>node.type==='button'&&text(node)==='Betalda').props.onClick();await flush();assert.doesNotMatch(f.listHtml(),/Synthetic receivable/);assert.match(f.listHtml(),/Inga fakturor matchar filtret/);assert.equal(JSON.stringify(state),before);
+});
+test('invoice CSV exports the visible evidence review status for a fully allocated invoice lacking its original',async t=>{
+ const f=await fixture(t,'receivable'),state=fullyAllocatedInvoiceWithoutOriginal(),before=JSON.stringify(state);await f.respond(200,state);
+ f.find(node=>node.props?.['aria-label']==='Exportera fakturor som CSV').props.onClick();assert.equal(f.downloads.length,1);
+ const [filename,csv]=f.downloads[0];assert.match(filename,/^fakturor-.*\.csv$/);assert.match(csv,/Granska betalningsunderlag/);assert.doesNotMatch(csv,/"Betald"/);assert.match(csv,/"0,00"/);assert.equal(JSON.stringify(state),before);assert.equal(f.requests.some(request=>request.method!=='GET'),false);
 });

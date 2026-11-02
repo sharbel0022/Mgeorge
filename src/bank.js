@@ -77,7 +77,7 @@ function requestUrl(path,method){
   if(typeof path!=='string'||/[\\\r\n#]/.test(path)||!path.startsWith('/')||path.startsWith('//'))throw bankError('invalid_path','Ogiltig API-sökväg',400);
   const url=new URL(apiBase+path),pathname=path.split('?')[0];
   if(url.origin!==apiBase||url.pathname!==pathname)throw bankError('invalid_path','Ogiltig API-sökväg',400);
-  const allowed=(method==='GET'&&(/^\/(application|aspsps)$/.test(pathname)||/^\/sessions\/[^/]+$/.test(pathname)||/^\/accounts\/[^/]+(?:\/transactions)?$/.test(pathname)))||
+  const allowed=(method==='GET'&&(/^\/(application|aspsps)$/.test(pathname)||/^\/sessions\/[^/]+$/.test(pathname)||/^\/accounts\/[^/]+\/transactions$/.test(pathname)))||
     (method==='POST'&&['/auth','/sessions'].includes(pathname))||
     (method==='DELETE'&&/^\/sessions\/[^/]+$/.test(pathname));
   if(!allowed||(method!=='GET'&&url.search))throw bankError('read_only','Bankintegrationen tillåter endast läsåtkomst och hantering av medgivanden.',400);

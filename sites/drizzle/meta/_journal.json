@@ -113,6 +113,20 @@
       "when": 1793380810989,
       "tag": "0015_bank_api_evidence",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1793655875899,
+      "tag": "0016_agent2_account_read_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1793656211762,
+      "tag": "0017_bankgiro_auto_ingest",
+      "breakpoints": true
     }
   ]
 }

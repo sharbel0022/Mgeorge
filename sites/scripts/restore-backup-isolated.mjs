@@ -9,7 +9,7 @@ import {BACKUP_TABLES} from '../lib/backup-engine.ts';
 import {verifyRecoveryBundle} from './lib/backup-recovery.mjs';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
-const OMITTED_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs'];
+const OMITTED_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs','bankgiro_ingest_leases'];
 const fail=code=>{throw Error('backup_recovery_'+code);};
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const quote=value=>'"'+value.replaceAll('"','""')+'"';

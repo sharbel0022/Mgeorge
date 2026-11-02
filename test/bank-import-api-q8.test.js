@@ -4,6 +4,7 @@ import {mkdtempSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {approveSyntheticBankAccount} from './bank-fixtures.js';
+import {retainSyntheticInvoiceOriginal} from './invoice-fixtures.js';
 import {reconciliationData} from '../src/reconciliation.js';
 
 const directory=mkdtempSync(join(tmpdir(),'mgeorge-q8-bank-route-'));
@@ -25,6 +26,7 @@ test('q8 review: the real CSV import route preserves its MIME parameters and sup
   db.prepare("UPDATE bank_connections SET owner='local-admin'").run();
   const created=await call('/api/invoices','POST',{direction:'customer',invoice_number:'000018',party:'Syntetisk Kund AB',total_cents:62500,reference:'000018',issued_at:'2026-10-01'});
   assert.equal(created.status,201);
+  retainSyntheticInvoiceOriginal(db,created.body.id);
   const csv=`Datum;Belopp;Valuta;Betalare;OCR;Bankreferens;IBAN\n2026-10-26;625.00;SEK;Syntetisk Kund AB;000018;SYNTHETIC-CSV-ROUTE;${account}\n`;
   const request={name:'synthetic-route.csv',connection_id:'synthetic-bank',account_uid:'synthetic-account',content_base64:Buffer.from(csv).toString('base64'),confirm:true};
   const imported=await call('/api/import/commit','POST',request);

@@ -1,5 +1,41 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Combined seven-agent delivery — current receipt
+
+[Final delivery and exact receipts](docs/MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md) supersede earlier pending-delivery observations. All six producer implementations are combined on an isolated integration branch, including the reviewed semantic conflict fixes. Local suites pass **1563 Node +2978 Sites =4541**,0fail/skip/cancel/todo; guarded types and audits pass; production build passed; exact GitHub/main and Sites receipts are recorded separately. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5**. Actual report authorization, current account/deposit proof, fresh unattended cloud OCR and complete production recovery remain distinct acceptance limits.
+
+
+## Agent 2 — avgränsat bankbevis, 2026-11-02
+
+Ny separat leverans på `feature/mgeorge-swedbank-account-evidence`, [PR25](https://github.com/sharbel0022/Mgeorge/pull/25), integrationbas `a779b0d`. [Verifieringsrapport](docs/integration/agent-2-swedbank-verification.md) skiljer syntetiska tester, slutgrindar och kvarstående extern evidens. Inga numeriska poäng ändras; alla33 områden ligger kvar på **255/330 = 7,73/10**.
+
+| Berört område | Före | Efter | Nytt bevis inom Agent 2 | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | Aktuell bank/SE/business/medgivandetid, ägarbundet kontocensus och exakt bankstyrkt alias testas; ett versionerat identitetskontrakt tillkommer. | Verkliga tillgängliga kontofält, bankgirokoppling och förnyad produktionsåtkomst är inte verifierade av syntetiska svar. |
+| 16. Automatisk bankhämtning | 8 | 8 | Node import/checkpunkt/audit/jobb commit är atomisk; Sites behåller okänd spärr även efter avbruten resultatlagring eller synkframgång. | Ny produktionsexekvering och full tillgänglig historik behöver separat auktoriserat kvitto. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Befintligt ägarlås och skrivstängsel skyddar väntande anrop. Fälthämtare/proxyer och klientuppgifter kan inte skapa providerbevis eller häva spärren. | Ingen ny penetrationstest, produktionsmigration eller automatisk lösning av okända äldre spärrar. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Oberoende reviewfynd reproduceras och rättas med regressionsprov i kontoläsning, synk och detaljhämtning. Exakta slutgrindar finns i rapporten. | Befintlig lintskuld och16 moderate utvecklingsberoendefynd kvarstår; lokal Node24 ersätter inte exakt Node22 PR-CI. |
+
+Övriga områdens bedömningar och tidigare publiceringsbevis nedan behåller sin angivna historiska omfattning. Ett verifierat kontoalias ger ingen separat Bankgirorelation eller rätt att allokera en betalning.
+
+Exakt Agent2-implementationshuvud04667ef, [CI41536046223](https://github.com/sharbel0022/Mgeorge/actions/runs/41536046223): **1 327Node +2 497Sites =3 824pass, 0fail/skip/cancel/todo**, båda jobb success. Lokala miljö-/testavvikelser redovisas öppet i rapporten; inga poäng höjs och inget produktionsbevis tillskrivs dessa syntetiska tester.
+## Agent 5 — avgränsad jobb- och återhämtningsverifiering, 2026-11-02
+
+Branch `feature/mgeorge-automation-orchestration`, integrationsbas `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`. [Exakta ändringar, tester och begränsningar](docs/integration/agent-5-automation-orchestration.md). Samtliga 33 poäng är oförändrade: **255/330 = 7,73/10; 0/33 ≥9,5**. Följande avgränsade teknikbevis kompletterar den tidigare bedömningen; de ersätter inget produktionsbevis.
+
+| Berörda områden | Nya faktiska bevis | Kvarstående gräns |
+| --- | --- | --- |
+| 10–14: OCR, Gmail, automatisk registrering, dubbletter och dokumentkö | Nya regressionsfall för sena timeout-/fel-/OCR-svar, samma lease med flera svar, återstart och bibehållet accepterat underlag. Gmail och registrering går genom befintliga gränser. | Syntetiska original och styrda arbetare; inget nytt verkligt schema- eller OCR-körkvitto. |
+| 15–17 och 28: bankhämtning, Bankgiro och scheman | Beständig 429-spärr även för manuella försök, separat senaste försök/resultat, generation och tidsbegränsad lease, atomiska bankkvitton och återläsning efter förlorat commitsvar. Ägarbunden statusläsning och spärrad Bankgiroförberedelse. | Verklig Bankgirokälla och C2/C3-integration saknas ännu. Ett generiskt OAuth-lås bevisar inte pågående synk. |
+| 29: säkerhetskopiering | Ett reproducerat sent objektanrop kan inte ersätta ersättningsarbetarens verifierade ciphertext; verifierad kopia återanvänds och felaktig kopia stoppas. | Ingen ny full produktionsrestore, offsite-kontroll eller RPO/RTO-övning. |
+| 30 och 32: åtkomstkontroll och kodkvalitet | Ägarfilter före DB-läsning, inga råa fel/leaseuppgifter i status, 77 nya fall och oberoende granskning. Slutliga fullsviter: 1 324 Node + 2 399 Sites, 0 fel/överhoppade/avbrutna; övriga grindar i leveransrapporten. | 16 ärvda moderate utvecklingsfynd kvarstår; full lint har inte omkörts eller åtgärdats i detta avgränsade uppdrag. |
+| 33: verklig produktion | Skrivfri inventering styrker samma tre externa automations-ID i ChatGPT och Sites. | Ingen ny driftsättning eller real bank-/verksamhetsacceptans. Tidigare Sites57-kvitto förblir historiskt bevis för den tidigare leveransen. |
+## Agent 6 — avgränsade frontendbevis, 2026-11-02
+
+Poäng före och efter: **255/330 = 7,73/10; 0/33 ≥9,5**. [Agent 6:s rapport](docs/integration/agent-6-payment-ui.md) och [browseracceptans](docs/integration/agent-6-browser/README.md) kompletterar evidensen för design, mobil, tangentbord/fokus, sökning/filter, banköversikt, fakturareferenser, individuella betalare och granskningsstatus.
+
+Fryst lokal kod passerar **1309/1309 Node + 2411/2411 Sites** samt **19/19 Chromiumfall** med fem faktiska bredder och hashbundna produktresurser. Syntaxkontroll av 121 filer, TypeScript, exakt minimatch-mitigering och high-auditgrindar är gröna. Separat produktionsbygge godkänt på samma frysta kod. Exakt leverans-SHA och Node 22-CI redovisas i PR:ns leveranskvitto. Inga verkliga bankfakta, fullständig rapportbehörighetskedja, fysisk mobil, skärmläsarprov eller ny inloggad produktionsacceptans påstås. 16 befintliga moderate utvecklingsfynd och tidigare lintskuld kvarstår. Inga numeriska områdespoäng ändras; Agent 6 publicerar inte Sites.
+
 ## Ny sjuagentsintegration — kontrakt och syntetisk kedja, 2026-11-02
 
 [Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar mergade kontrakts-PR #22 och regressions-/rapport-PR #23. Exakt slutlig #23-head-CI 41534249801 passerar **1 309 Node + 2 337 Sites = 3 646 tester**, inklusive alla sex nya namngivna 0599-fall, utan fel eller överhoppade/avbrutna tester. Integrationsmain före slutkvittot är `12c9868606a0a45b31b722ddee8f897541687e64`; separat main-CI finns i rapporten. De sex nya implementationerna, inklusive företagspolicy och BankgiroReportSource, väntar fortfarande på PR-leverans. Kontrakt och tester bevisar inte bankens verkliga behörighet, konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Alla före/eftervärden och aktuella test-/produktionsgränser dokumenteras. Äldre tabeller nedan behålls som detaljerad evidens/historik.
@@ -1028,3 +1064,6 @@ Registrerad2026-10-30T20:31:30+00:00. Föregående summa250; exakt ny summa253,5
 ## Agent 1 — avgränsat referenskontrakt, 2026-11-02
 
 Samtliga befintliga poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. De berörda områdena kund-/leverantörsfakturor, originalgranskning, dubbletter, referenser, betalningsmatchning, kundutkast och återställning får nya syntetiska regressionsbevis enligt [Agent 1-kontraktet](docs/integration/invoice-reference-policy.md) och PR-grindarna. Ingen produktionsacceptans eller publicering har utförts av Agent 1, och inga bankberoende poäng höjs. Två konkreta C1-kontraktsval — exakt M.George-standard och separata avsedda/deklarerade referenser vid konflikt — föreslås uttryckligen för integrationsansvarigs granskning.
+## Agent 3 — avgränsad Bankgiroleverans
+
+[Rapporten för automatisk Bankgiroinläsning](docs/integration/agent-3-bankgiro-auto-ingest.md) tillför syntetiska bevis för original/dubbletter, köåterhämtning, behörighetslås, rapportstatus och backupkompatibilitet. Områden 6, 13, 16–19, 24, 28–32 berörs, men **inga numeriska poäng höjs**. En ansluten verklig rapportkälla, bankavtal och verifierad produktionskörning saknas. CI- och testresultat gäller den separata funktionsbranchen och dess exakta PR-huvud; de certifierar inte bankfakta eller publicerad drift. Övriga agenters områden lämnas oförändrade.

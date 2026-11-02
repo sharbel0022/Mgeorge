@@ -1,5 +1,10 @@
 # Seven-agent integration report — MG Fakturakoll
 
+## Current combined delivery
+
+The following sections retain the earlier historical checkpoint. Current implementation, tests and GitHub/Sites status are recorded in [MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md](MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md); pending deployment/CI entries there remain explicit.
+
+
 ## Delivery state
 
 **Common contracts and the joined synthetic regression are merged; the six new

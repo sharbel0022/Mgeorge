@@ -38,7 +38,8 @@ for(const number of ['0001','0599'])test(`Sites derives intended ${number} witho
   assert.equal(facts.reference,'');
   assert.equal(facts.ocr,'');
   assert.equal(presentation.bankPaymentReference(transaction).ocr,'');
-  assert.equal(reconciliation.analyze(state).filter(f=>f.safe).length,1);
+  assert.equal(reconciliation.analyze(state).filter(f=>f.safe).length,0,'a reference decision cannot verify the retained invoice original');
+  assert.equal(reconciliation.analyze(state,new Set(state.invoices.map(i=>i.id))).filter(f=>f.safe).length,1);
   assert.equal(suggestions(state,transaction)[0].strength,'strong');
   assert.deepEqual(state,before);
   assert.equal(balance(state,invoice),62500);
@@ -72,7 +73,7 @@ test('Sites keeps other-company and supplier separate OCR behavior',()=>{
     const state=fixture({...options,reference:'000018',payment:'000018'}),facts=reconciliation.invoiceFacts(state,state.invoices[0]);
     assert.equal(facts.referencePolicy.applies,false);
     assert.equal(facts.intendedPaymentReference,'000018');
-    assert.equal(reconciliation.analyze(state).filter(f=>f.safe).length,1);
+    assert.equal(reconciliation.analyze(state,new Set(state.invoices.map(i=>i.id))).filter(f=>f.safe).length,1);
     assert.equal(balance(allocate(state),state.invoices[0]),0);
   }
 });
@@ -131,7 +132,7 @@ test('Sites preserves captured original references through later edits and block
 test('Sites includes same-number customer and supplier invoices in distinct issuer scopes',()=>{
   let state=fixture();
   state=applyCommand(state,{type:'invoice.save',invoice:{direction:'payable',party:'Synthetic supplier AB',number:'0599',ocr:'',total:62500,issued:'2026-10-01',reviewed:true}}).state;
-  assert.equal(reconciliation.analyze(state).filter(f=>f.safe).length,1);
+  assert.equal(reconciliation.analyze(state,new Set(state.invoices.map(i=>i.id))).filter(f=>f.safe).length,1);
   assert.equal(balance(allocate(state),state.invoices[0]),0);
 });
 

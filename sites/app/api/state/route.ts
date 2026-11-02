@@ -20,9 +20,10 @@ export async function POST(req:Request){try{
   else if(Array.isArray(command.rows))command.rows=command.rows.map((r:any)=>({...r,verified:false,specification:false,evidence:undefined}));
  }
  const current=['match.create','transaction.verify','transaction.split'].includes(command?.type)?await assertPaymentOriginal(user.userId,old.state,command.transactionId||command.id):old.state;
+ const manualAllocationIds=new Set<string>();
  let result:ReturnType<typeof applyCommand>,automatic:Awaited<ReturnType<typeof reconcileWithOriginals>>,payload:string;
  try{
-  result=applyCommand(current,command);automatic=metadataOnly?{state:result.state,decisions:[],findings:[]}:await reconcileWithOriginals(user.userId,result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];payload=JSON.stringify(result.state);
+  result=applyCommand(current,command);if(command?.type==='match.create')for(const allocation of result.state.allocations)if(allocation.active&&!current.allocations.some(old=>old.id===allocation.id))manualAllocationIds.add(allocation.id);automatic=metadataOnly?{state:result.state,decisions:[],findings:[]}:await reconcileWithOriginals(user.userId,result.state);result.state=automatic.state;result.state.receipts=[...old.state.receipts.slice(-199),body.requestId];payload=JSON.stringify(result.state);
   if(new TextEncoder().encode(payload).length>1_800_000){const message='Registret är för stort för den här versionen. Exportera dina uppgifter innan vidare import.';throw bankImportEvidenceError(old.state,result.state,message)||new Error(message);}
  }catch(error){
   if(!(error instanceof BankImportEvidenceError))throw error;
@@ -41,7 +42,7 @@ export async function POST(req:Request){try{
  const batch=await writePaymentState(user.userId,old.revision,old.state,result.state,db(),[
   db().prepare('INSERT INTO audit_events (id, owner, revision, action, detail, created_at) SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(uid(),user.userId,old.revision+1,command.type,detail,at,user.userId,old.revision),
   db().prepare('UPDATE workspaces SET payload=?, revision=revision+1, updated_at=? WHERE owner=? AND revision=?').bind(payload,at,user.userId,old.revision)
- ]);
+ ],{manualAllocationIds});
  if(batch[1].meta.changes!==1)return response({error:'En annan ändring sparades samtidigt. Uppdatera sidan och försök igen.'},409);
  if(!metadataOnly)await reconcileAndPrepare(user.userId);
  if(command.type==='bankgiro.import'){

@@ -1,0 +1,841 @@
+{
+  "startedAt": "2026-11-02T22:38:44.551Z",
+  "origin": "http://127.0.0.1:5276",
+  "syntheticOnly": true,
+  "externalRequests": [],
+  "cases": [
+    {
+      "name": "actual viewport 320: bank list, 0599, missing account, keyboard disclosure and Escape focus",
+      "outcome": "passed",
+      "durationMs": 5246,
+      "evidence": {
+        "dimensions": {
+          "innerWidth": 320,
+          "clientWidth": 320,
+          "devicePixelRatio": 1,
+          "mobileCards": true,
+          "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+        },
+        "list": {
+          "width": 320,
+          "documentClient": 320,
+          "documentScroll": 320,
+          "bodyScroll": 320,
+          "dialogs": []
+        },
+        "detail": {
+          "width": 320,
+          "documentClient": 320,
+          "documentScroll": 320,
+          "bodyScroll": 320,
+          "dialogs": [
+            {
+              "client": 298,
+              "scroll": 298,
+              "left": 10,
+              "right": 310
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "actual viewport 390: bank list, 0599, missing account, keyboard disclosure and Escape focus",
+      "outcome": "passed",
+      "durationMs": 2936,
+      "evidence": {
+        "dimensions": {
+          "innerWidth": 390,
+          "clientWidth": 390,
+          "devicePixelRatio": 1,
+          "mobileCards": true,
+          "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+        },
+        "list": {
+          "width": 390,
+          "documentClient": 390,
+          "documentScroll": 390,
+          "bodyScroll": 390,
+          "dialogs": []
+        },
+        "detail": {
+          "width": 390,
+          "documentClient": 390,
+          "documentScroll": 390,
+          "bodyScroll": 390,
+          "dialogs": [
+            {
+              "client": 368,
+              "scroll": 368,
+              "left": 10,
+              "right": 380
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "actual viewport 768: bank list, 0599, missing account, keyboard disclosure and Escape focus",
+      "outcome": "passed",
+      "durationMs": 7619,
+      "evidence": {
+        "dimensions": {
+          "innerWidth": 768,
+          "clientWidth": 768,
+          "devicePixelRatio": 1,
+          "mobileCards": false,
+          "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+        },
+        "list": {
+          "width": 768,
+          "documentClient": 768,
+          "documentScroll": 768,
+          "bodyScroll": 768,
+          "dialogs": []
+        },
+        "detail": {
+          "width": 768,
+          "documentClient": 768,
+          "documentScroll": 768,
+          "bodyScroll": 768,
+          "dialogs": [
+            {
+              "client": 732,
+              "scroll": 732,
+              "left": 17,
+              "right": 751
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "actual viewport 1024: bank list, 0599, missing account, keyboard disclosure and Escape focus",
+      "outcome": "passed",
+      "durationMs": 5461,
+      "evidence": {
+        "dimensions": {
+          "innerWidth": 1024,
+          "clientWidth": 1024,
+          "devicePixelRatio": 1,
+          "mobileCards": false,
+          "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+        },
+        "list": {
+          "width": 1024,
+          "documentClient": 1024,
+          "documentScroll": 1024,
+          "bodyScroll": 1024,
+          "dialogs": []
+        },
+        "detail": {
+          "width": 1024,
+          "documentClient": 1024,
+          "documentScroll": 1024,
+          "bodyScroll": 1024,
+          "dialogs": [
+            {
+              "client": 848,
+              "scroll": 848,
+              "left": 87,
+              "right": 937
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "actual viewport 1440: bank list, 0599, missing account, keyboard disclosure and Escape focus",
+      "outcome": "passed",
+      "durationMs": 5894,
+      "evidence": {
+        "dimensions": {
+          "innerWidth": 1440,
+          "clientWidth": 1440,
+          "devicePixelRatio": 1,
+          "mobileCards": false,
+          "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+        },
+        "list": {
+          "width": 1440,
+          "documentClient": 1440,
+          "documentScroll": 1440,
+          "bodyScroll": 1440,
+          "dialogs": []
+        },
+        "detail": {
+          "width": 1440,
+          "documentClient": 1440,
+          "documentScroll": 1440,
+          "bodyScroll": 1440,
+          "dialogs": [
+            {
+              "client": 848,
+              "scroll": 848,
+              "left": 295,
+              "right": 1145
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "desktop to mobile resize while dialog is open restores focus to visible main content",
+      "outcome": "passed",
+      "durationMs": 3252
+    },
+    {
+      "name": "multiple report payers remain separate from the aggregate payer and 0599 stays exact",
+      "outcome": "passed",
+      "durationMs": 2082
+    },
+    {
+      "name": "missing Bankgiro detail remains blocked and no bank-detail request runs on open",
+      "outcome": "passed",
+      "durationMs": 3177
+    },
+    {
+      "name": "pending workspace read stays loading until a genuine loaded empty result",
+      "outcome": "passed",
+      "durationMs": 1552
+    },
+    {
+      "name": "failed workspace read shows unavailable state and explicit read-only retry",
+      "outcome": "passed",
+      "durationMs": 1676
+    },
+    {
+      "name": "malformed stored verification shows an error without a verified result or bank action",
+      "outcome": "passed",
+      "durationMs": 2579
+    },
+    {
+      "name": "invalid workspace response is unavailable instead of trusted: malformed",
+      "outcome": "passed",
+      "durationMs": 1543
+    },
+    {
+      "name": "invalid workspace response is unavailable instead of trusted: numeric_reference",
+      "outcome": "passed",
+      "durationMs": 30664
+    },
+    {
+      "name": "invalid workspace response is unavailable instead of trusted: nested_numeric_reference",
+      "outcome": "passed",
+      "durationMs": 2647
+    },
+    {
+      "name": "late prior-payment response cannot replace the current report even when transport ignores abort",
+      "outcome": "passed",
+      "durationMs": 7808,
+      "evidence": {
+        "priorResponseCompleted": true,
+        "ignoredAbortInSyntheticTransport": true,
+        "currentTransactionId": "qa-multiple-payers"
+      }
+    },
+    {
+      "name": "mobile review keyboard selection focuses labelled details and Back restores its row",
+      "outcome": "passed",
+      "durationMs": 18177
+    },
+    {
+      "name": "Verifierade filter excludes a manually linked REVIEW payment with a historical allocation",
+      "outcome": "passed",
+      "durationMs": 13738,
+      "evidence": {
+        "decision": "REVIEW",
+        "originalAllocationCount": 1,
+        "fixtureUnchanged": true
+      }
+    },
+    {
+      "name": "primary control keyboard activation dispatches one existing action into the synthetic interceptor only",
+      "outcome": "passed",
+      "durationMs": 2051,
+      "evidence": {
+        "syntheticInterceptedPost": "/api/payment-control/run",
+        "dispatchCount": 1,
+        "deliveredToBackend": false,
+        "automaticAdvance": false
+      }
+    },
+    {
+      "name": "explicit invoice reference remains distinct from bank reference and its conflict stays REVIEW",
+      "outcome": "passed",
+      "durationMs": 1716,
+      "evidence": {
+        "intendedReference": "0000599",
+        "bankReportedReference": "0599",
+        "status": "REVIEW",
+        "formalBankOcrClaimed": false
+      }
+    }
+  ],
+  "viewportEvidence": [
+    {
+      "innerWidth": 320,
+      "clientWidth": 320,
+      "devicePixelRatio": 1,
+      "mobileCards": true,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+    },
+    {
+      "innerWidth": 390,
+      "clientWidth": 390,
+      "devicePixelRatio": 1,
+      "mobileCards": true,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+    },
+    {
+      "innerWidth": 768,
+      "clientWidth": 768,
+      "devicePixelRatio": 1,
+      "mobileCards": false,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+    },
+    {
+      "innerWidth": 1024,
+      "clientWidth": 1024,
+      "devicePixelRatio": 1,
+      "mobileCards": false,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+    },
+    {
+      "innerWidth": 1440,
+      "clientWidth": 1440,
+      "devicePixelRatio": 1,
+      "mobileCards": false,
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+    }
+  ],
+  "screenshotFiles": [
+    "bank-list-320.png",
+    "missing-account-dialog-320.png",
+    "bank-list-390.png",
+    "missing-account-dialog-390.png",
+    "bank-list-768.png",
+    "missing-account-dialog-768.png",
+    "bank-list-1024.png",
+    "missing-account-dialog-1024.png",
+    "bank-list-1440.png",
+    "missing-account-dialog-1440.png",
+    "multiple-payers-390.png",
+    "missing-bankgiro-1440.png",
+    "workspace-loading-320.png",
+    "workspace-empty-320.png",
+    "workspace-error-390.png",
+    "verification-malformed-390.png",
+    "workspace-invalid-malformed-390.png",
+    "workspace-invalid-numeric_reference-390.png",
+    "workspace-invalid-nested_numeric_reference-390.png",
+    "verification-current-after-stale-390.png",
+    "manual-link-excluded-from-verified-1440.png",
+    "explicit-reference-conflict-390.png"
+  ],
+  "requestEvidence": [
+    {
+      "width": 320,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 768,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 1024,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 1440,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 1440,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-payer-ref",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-multiple-payers",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 1440,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-bankgiro",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 320,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-multiple-payers",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/verification?transactionId=qa-missing-account",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 1440,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/run",
+          "method": "POST",
+          "hasRequestId": true,
+          "interceptedOnly": true
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    },
+    {
+      "width": 390,
+      "requests": [
+        {
+          "path": "/api/state",
+          "method": "GET"
+        },
+        {
+          "path": "/api/bank/invoice-candidates",
+          "method": "GET"
+        },
+        {
+          "path": "/api/payment-control/overview",
+          "method": "GET"
+        }
+      ],
+      "pageErrors": [],
+      "assetErrors": []
+    }
+  ],
+  "sourceManifestPath": "bundle-source-manifest.json",
+  "harnessInputs": [
+    {
+      "path": "browser-acceptance.mjs",
+      "sha256": "6974a5b45db09289e58d19d7533e164622636f0ace20726fc606714008914a62"
+    },
+    {
+      "path": "fixtures.mjs",
+      "sha256": "a6d67a0f18b831108b706e11644f10dd6490b8bbd9a8e0d868d31a7c1a7d3ea3"
+    },
+    {
+      "path": "build-harness.mjs",
+      "sha256": "da1e36edb0c3aec095d77bdd877c3fac172bc5452442e060f1db15500036c359"
+    },
+    {
+      "path": "serve-harness.mjs",
+      "sha256": "caec0736182a058533510d10abf4f88c8112f5271524cb81fe84d467eef0c3ef"
+    }
+  ],
+  "attestation": {
+    "before": {
+      "productInputs": 47,
+      "emittedAssets": 9,
+      "harnessInputs": 4
+    },
+    "after": {
+      "productInputs": 47,
+      "emittedAssets": 9,
+      "harnessInputs": 4
+    },
+    "stable": true
+  },
+  "executablePath": "/tmp/mgeorge-payment-ui-qa/browsers/chromium_headless_shell-1194/chrome-linux/headless_shell",
+  "browserVersion": "141.0.7390.37",
+  "finishedAt": "2026-11-02T22:40:45.426Z",
+  "browserReceivedAssets": [
+    {
+      "path": "index.html",
+      "sha256": "1f60bbec2e5ea7ea1582217a5298c4740ddb46363e489fbd4c5f2c88218c367a",
+      "responseCount": 19
+    },
+    {
+      "path": "app.css",
+      "sha256": "836ef98df38082a11f49a5c91bb0ba99626ee413a255d9574142423c86e9c065",
+      "responseCount": 19
+    },
+    {
+      "path": "app.js",
+      "sha256": "33b21923bd7210968069e7a4799df6dd4c67f9d10d233e3ff3fb42dbb1e9d71b",
+      "responseCount": 19
+    },
+    {
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "sha256": "47e42dfbd47bb8e6ba9db884451b27f9a92888d367efe5e571c5f48e84e41c0b",
+      "responseCount": 19
+    },
+    {
+      "path": "chunks/chunk-TM6LYNJI.js",
+      "sha256": "0584001ab1716a3e0a65fcb2780fe6b6976c2420fcbc09a680eaeddc7ef18dbc",
+      "responseCount": 19
+    }
+  ],
+  "passed": 19,
+  "failed": 0
+}
