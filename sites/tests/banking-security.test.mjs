@@ -61,6 +61,8 @@ const post = (path, body = {}, requestOrigin = origin) => new Request(`${origin}
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(requestOrigin === null ? {} : { Origin: requestOrigin }), 'CF-Connecting-IP': '192.0.2.1', 'User-Agent': 'MG local security tests' }, body: JSON.stringify(body),
 });
 const count = (f, table) => f.sql.prepare(`SELECT count(*) AS n FROM ${table}`).get().n;
+const financialAuditCount = f => f.sql.prepare("SELECT count(*) AS n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n;
+const bankJobEvents = f => f.sql.prepare("SELECT action,detail,created_at,revision FROM audit_events WHERE owner=? AND action LIKE 'bank.job.%' ORDER BY rowid").all(f.owner).map(row=>({...row,detail:JSON.parse(row.detail)}));
 
 async function fixture(t, environment = 'PRODUCTION', { actualProvider = false } = {}) {
   const key = `__mgBankTest_${crypto.randomUUID().replaceAll('-', '')}`;
@@ -87,7 +89,7 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig });
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
-  const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
+  const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError,providerErrorCode} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
   const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, '../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
   f.store = await import(storeUrl); f.service = await import(serviceUrl);
   f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
@@ -424,14 +426,14 @@ test('Selections and sync cannot retrieve accounts outside the current authorize
   assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0); assert.equal(count(f, 'workspaces'), 0);
 });
 
-test('Sandbox sync reads test data but never touches financial workspace or audit', async t => {
+test('Sandbox sync reads test data but never touches financial workspace or financial audit', async t => {
   const f = await fixture(t, 'SANDBOX'); await f.seedApp(); await f.seedConnection();
   const old = emptyState(); old.company.name = 'Existing live company';
   f.sql.prepare('INSERT INTO workspaces VALUES (?,?,?,?)').run(f.owner, 7, JSON.stringify(old), '2026-01-01T00:00:00Z');
   const before = f.workspace();
   const result = await (await f.service.sync(post('sync'))).json();
   assert.equal(result.test, true); assert.equal(result.imported, 0);
-  assert.deepEqual(f.workspace(), before); assert.equal(count(f, 'audit_events'), 0);
+  assert.deepEqual(f.workspace(), before); assert.equal(financialAuditCount(f), 0);
   assert.equal(f.sql.prepare('SELECT test FROM bank_sync_runs').get().test, 1);
   assert.ok(result.warnings.some(warning => warning.includes('testhändelser')));
 });
@@ -443,7 +445,7 @@ test('Production import and audit commit together; repeated stable references ar
   const first = f.workspace();
   assert.equal(first.revision, 1); assert.equal(first.state.transactions.length, 1);
   assert.equal(first.state.transactions[0].verified, true); assert.equal(first.state.transactions[0].kind, 'payment');assert.equal(first.state.transactions[0].evidence,'bank_api');
-  assert.equal(f.sql.prepare('SELECT revision FROM audit_events').get().revision, 1);
+  assert.equal(f.sql.prepare("SELECT revision FROM audit_events WHERE action='bank.sync'").get().revision, 1);
   f.sql.prepare('UPDATE bank_connections SET last_synced_at=NULL').run();
   result = await (await f.service.sync(post('sync'))).json();
   assert.equal(result.imported, 0); assert.equal(result.skipped, 1);
@@ -470,7 +472,7 @@ test('A later pagination failure cannot commit earlier pages or claim a successf
     throw new ProviderError('BANK_TIMEOUT', 'Banktjänsten svarade inte i tid.', 504, true);
   };
   await assert.rejects(f.service.sync(post('sync')), error => error.code === 'BANK_TIMEOUT');
-  assert.equal(count(f, 'workspaces'), 0); assert.equal(count(f, 'audit_events'), 0); assert.equal(count(f, 'bank_sync_runs'), 0);
+  assert.equal(count(f, 'workspaces'), 0); assert.equal(financialAuditCount(f), 0); assert.equal(count(f, 'bank_sync_runs'), 0);
   assert.equal(f.connection().last_synced_at, null);
 });
 
@@ -479,13 +481,13 @@ test('Optimistic revision conflict preserves a concurrent workspace edit and wri
   f.sql.prepare('INSERT INTO workspaces VALUES (?,?,?,?)').run(f.owner, 3, JSON.stringify(emptyState()), new Date().toISOString());
   const edited = emptyState(); edited.company.name = 'Concurrent user edit';
   f.d1.beforeBatch = async statements => {
-    if (!statements.some(statement => statement.sql.includes('INSERT INTO audit_events'))) return;
+    if (!statements.some(statement => statement.values.includes('bank.sync'))) return;
     f.d1.beforeBatch = null;
     f.sql.prepare('UPDATE workspaces SET revision=4,payload=? WHERE owner=?').run(JSON.stringify(edited), f.owner);
   };
   await assert.rejects(f.service.sync(post('sync')), error => error.status === 409);
   assert.equal(f.workspace().revision, 4); assert.equal(f.workspace().state.company.name, 'Concurrent user edit');
-  assert.equal(f.workspace().state.transactions.length, 0); assert.equal(count(f, 'audit_events'), 0); assert.equal(count(f, 'bank_sync_runs'), 0);
+  assert.equal(f.workspace().state.transactions.length, 0); assert.equal(financialAuditCount(f), 0); assert.equal(count(f, 'bank_sync_runs'), 0);
   assert.equal(f.connection().last_synced_at, null);
 });
 
@@ -494,7 +496,7 @@ test('A failed sync-run insert rolls back both financial data and its audit entr
   f.sql.exec("CREATE TRIGGER fail_sync_run BEFORE INSERT ON bank_sync_runs BEGIN SELECT RAISE(ABORT, 'simulated database failure'); END;");
   await assert.rejects(f.service.sync(post('sync')), /simulated database failure/);
   assert.equal(f.workspace().revision, 0); assert.equal(f.workspace().state.transactions.length, 0);
-  assert.equal(count(f, 'audit_events'), 0); assert.equal(count(f, 'bank_sync_runs'), 0); assert.equal(f.connection().last_synced_at, null);
+  assert.equal(financialAuditCount(f), 0); assert.equal(count(f, 'bank_sync_runs'), 0); assert.equal(f.connection().last_synced_at, null);
 });
 
 test('A terminal provider error leaves the connection requiring authorization', async t => {
@@ -606,7 +608,7 @@ test('D1 atomically fences bank writes even when a lease changes after a valid a
  const f=await fixture(t);await f.seedApp();await f.seedConnection();
  f.d1.beforeBatch=items=>{if(items.some(i=>i.sql.startsWith('INSERT OR IGNORE INTO workspaces'))){f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());}};
  await assert.rejects(f.service.sync(post('sync')),/BANK_LEASE_LOST/);
- assert.equal(f.workspace(),null);assert.equal(count(f,'audit_events'),0);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.connection().last_synced_at,null);
+ assert.equal(f.workspace(),null);assert.equal(financialAuditCount(f),0);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.connection().last_synced_at,null);
 });
 
 test('expired bank leases and delayed disconnects cannot overwrite a replacement connection',async t=>{
@@ -648,7 +650,7 @@ test('three failed or interrupted automatic bank attempts remain blocked until a
 
 test('committed bank imports stay successful if the independent after-check needs retrying',async t=>{
  const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));f.reconcileError=true;
- const result=await(await f.service.automaticSync()).json();assert.equal(result.imported,1);assert.ok(result.warnings.some(w=>w.includes('Efterkontrollen')));assert.equal(f.connection().last_error,null);assert.equal(f.connection().sync_failures,0);assert.equal(count(f,'bank_sync_runs'),1);assert.equal(count(f,'audit_events'),1);
+ const result=await(await f.service.automaticSync()).json();assert.equal(result.imported,1);assert.ok(result.warnings.some(w=>w.includes('Efterkontrollen')));assert.equal(f.connection().last_error,null);assert.equal(f.connection().sync_failures,0);assert.equal(count(f,'bank_sync_runs'),1);assert.equal(financialAuditCount(f),1);
  const visible=await(await f.service.status(new Request(origin+'/api/bank/status'))).json();assert.match(visible.connection.postprocessWarning,/Efterkontrollen/);assert.ok(visible.connection.lastSyncedAt);assert.equal(visible.automatic.failures,0);assert.match((await(await f.service.automaticSyncStatus()).json()).postprocessWarning,/Efterkontrollen/);
  f.reconcileError=false;f.sql.prepare('UPDATE bank_connections SET last_synced_at=NULL').run();await f.service.sync(post('sync'));assert.equal((await(await f.service.status(new Request(origin+'/api/bank/status'))).json()).connection.postprocessWarning,null);
 });
@@ -732,12 +734,12 @@ for(const [label,patch]of [
  const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
  await f.service.sync(post('sync'));
  await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid],dateFrom:'2026-01-01'}));
- const before=f.workspace(),runs=count(f,'bank_sync_runs'),audits=count(f,'audit_events');
+ const before=f.workspace(),runs=count(f,'bank_sync_runs'),audits=financialAuditCount(f);
  const valid=rawTx({entry_reference:'HISTORY-VALID',booking_date:'2026-01-10'}),repaired=rawTx({entry_reference:'HISTORY-REPAIRED',booking_date:'2026-01-11'});
  let invalid=true;
  f.provider.getTransactions=async(_config,_id,input)=>({transactions:input.dateFrom==='2026-01-01'?[valid,invalid?{...repaired,...patch}:repaired]:[]});
  await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_INCOMPLETE_RESPONSE');
- assert.deepEqual(f.workspace(),before);assert.equal(count(f,'bank_sync_runs'),runs);assert.equal(count(f,'audit_events'),audits);assert.equal(f.connection().last_synced_at,null);
+ assert.deepEqual(f.workspace(),before);assert.equal(count(f,'bank_sync_runs'),runs);assert.equal(financialAuditCount(f),audits);assert.equal(f.connection().last_synced_at,null);
  invalid=false;f.calls=[];
  const resumed=await(await f.service.sync(post('sync'))).json();
  assert.equal(f.calls.find(call=>call.name==='getTransactions').args[2].dateFrom,'2026-01-01');
@@ -826,4 +828,103 @@ test('consent expiring during pagination stops before another request and preser
  f.provider.getTransactions=async()=>{calls++;if(calls===1){t.mock.timers.enable({apis:['Date'],now:at+60000});return{transactions:[rawTx()],continuation_key:'after-expiry'};}return{transactions:[]};};
  await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_RECONNECT_REQUIRED');
  assert.equal(calls,1);assert.equal(f.connection().status,'reauth_required');assert.equal(f.connection().last_synced_at,null);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+for(const mode of ['manual','automatic','control'])test(`bank job audit records the ${mode} attempt before provider work and completes it with the imported run`,async t=>{
+ const f=await fixture(t);f.sql.exec(source('../drizzle/0008_minor_jazinda.sql'));await f.seedApp();const id=await f.seedConnection();
+ if(mode==='automatic')await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));
+ let reached,resume;const ready=new Promise(resolve=>{reached=resolve;}),gate=new Promise(resolve=>{resume=resolve;});
+ f.provider.getSession=async()=>{reached();await gate;return structuredClone(f.live);};
+ const run=()=>mode==='automatic'?f.service.automaticSync():mode==='control'?f.service.syncControl(post('sync')):f.service.sync(post('sync'));
+ const pending=run();await ready;const started=bankJobEvents(f);
+ try{
+  assert.equal(started.length,1);assert.equal(started[0].action,'bank.job.started');
+  assert.deepEqual(Object.keys(started[0].detail).sort(),['mode','run_id']);assert.equal(started[0].detail.mode,mode);assert.match(started[0].detail.run_id,/^[a-f0-9-]{36}$/);
+  assert.ok(Number.isFinite(Date.parse(started[0].created_at)));assert.equal(f.connection().last_synced_at,null);
+  await assert.rejects(run(),/BANK_BUSY/);assert.deepEqual(bankJobEvents(f),started,'a blocked overlap is not another attempt');
+ }finally{resume();await pending.catch(()=>{});}
+ assert.equal((await(await pending).json()).imported,1);
+ const events=bankJobEvents(f);assert.deepEqual(events.map(event=>event.action),['bank.job.started','bank.job.completed']);
+ assert.deepEqual(events[1].detail,started[0].detail);assert.equal(events[1].detail.run_id,f.sql.prepare('SELECT id FROM bank_sync_runs').get().id);
+ assert.equal(events[1].revision,f.workspace().revision);assert.ok(f.connection().last_synced_at);
+});
+
+for(const [label,makeError,expected]of [
+ ['rate limit',()=>Object.assign(new ProviderError('BANK_RATE_LIMIT','PRIVATE_PROVIDER_REFERENCE',429,true),{retryAfter:172800}),'BANK_RATE_LIMIT'],
+ ['timeout',()=>new ProviderError('BANK_TIMEOUT','PRIVATE_PROVIDER_REFERENCE',504,true),'BANK_TIMEOUT'],
+ ['mutated public field',()=>Object.assign(new ProviderError('BANK_TIMEOUT','PRIVATE_PROVIDER_REFERENCE',504,true),{code:'PRIVATE_PROVIDER_REFERENCE'}),'BANK_TIMEOUT'],
+ ['unrecognized provider',()=>new ProviderError('PRIVATE_PROVIDER_REFERENCE','PRIVATE_PROVIDER_REFERENCE',502),'BANK_SYNC_FAILED'],
+ ['untrusted error',()=>Object.assign(Error('PRIVATE_PROVIDER_REFERENCE'),{code:'BANK_RATE_LIMIT'}),'BANK_SYNC_FAILED'],
+])test(`failed bank job audit keeps a safe ${label} code and the previous success timestamp`,async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();const previous=new Date(Date.now()-120000).toISOString();
+ f.sql.prepare('UPDATE bank_connections SET last_synced_at=?').run(previous);f.provider.getTransactions=async()=>{throw makeError();};
+ await assert.rejects(f.service.sync(post('sync')));
+ const events=bankJobEvents(f);assert.deepEqual(events.map(event=>event.action),['bank.job.started','bank.job.failed']);
+ assert.deepEqual(events[1].detail,{run_id:events[0].detail.run_id,mode:'manual',error_code:expected});
+ assert.equal(JSON.stringify(events).includes('PRIVATE_PROVIDER_REFERENCE'),false);assert.equal(f.connection().last_synced_at,previous);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+test('bank completion audit failure rolls back the import instead of leaving a false success receipt',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.sql.exec("CREATE TRIGGER fail_completion_event BEFORE INSERT ON audit_events WHEN NEW.action='bank.job.completed' BEGIN SELECT RAISE(ABORT,'synthetic completion audit failure'); END;");
+ await assert.rejects(f.service.sync(post('sync')),/synthetic completion audit failure/);
+ assert.equal(f.workspace().state.transactions.length,0);assert.equal(f.workspace().revision,0);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(financialAuditCount(f),0);assert.equal(f.connection().last_synced_at,null);
+ assert.deepEqual(bankJobEvents(f).map(event=>event.action),['bank.job.started','bank.job.failed']);
+});
+
+test('bank failure audit errors cannot discard a provider cooldown or replace its original error',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.sql.exec("CREATE TRIGGER fail_failure_event BEFORE INSERT ON audit_events WHEN NEW.action='bank.job.failed' BEGIN SELECT RAISE(ABORT,'synthetic failure audit error'); END;");
+ const previous=new Date(Date.now()-120000).toISOString();f.sql.prepare('UPDATE bank_connections SET last_synced_at=?').run(previous);
+ const before=Date.now();f.provider.getTransactions=async()=>{throw Object.assign(new ProviderError('BANK_RATE_LIMIT','Vänta på banken',429,true),{retryAfter:172800});};
+ await assert.rejects(f.service.sync(post('sync')),error=>error.code==='BANK_RATE_LIMIT');
+ assert.ok(Date.parse(f.connection().retry_after)>=before+172800000);assert.equal(f.connection().last_synced_at,previous);assert.equal(f.connection().last_error,'Vänta på banken');
+ assert.deepEqual(bankJobEvents(f).map(event=>event.action),['bank.job.started']);assert.equal(count(f,'bank_sync_runs'),0);
+ const calls=f.calls.length;await assert.rejects(f.service.sync(post('sync')),error=>error.code==='BANK_RATE_LIMIT');assert.equal(f.calls.length,calls);
+});
+
+for(const [label,environment,empty,replaced]of [
+ ['production import','PRODUCTION',false,false],
+ ['empty successful fetch','PRODUCTION',true,false],
+ ['sandbox fetch','SANDBOX',false,false],
+ ['replacement lease','PRODUCTION',false,true],
+])test(`a lost ${label} commit reply cannot change a durable completed job into a failed attempt`,async t=>{
+ const f=await fixture(t,environment);await f.seedApp();await f.seedConnection();if(empty)f.provider.getTransactions=async()=>({transactions:[]});
+ const batch=f.d1.batch.bind(f.d1);let lost=false;
+ f.d1.batch=async statements=>{
+  const result=await batch(statements);
+  if(!lost&&statements.some(statement=>statement.sql.startsWith('INSERT INTO bank_sync_runs'))){
+   lost=true;
+   if(replaced){f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());f.sql.prepare("UPDATE bank_connections SET last_error='Newer worker status'").run();}
+   throw Error('PRIVATE_TRANSPORT_REPLY_DETAILS');
+  }
+  return result;
+ };
+ let result,failure;try{result=await(await f.service.sync(post('sync'))).json();}catch(error){failure=error.message;}
+ assert.equal(failure,undefined,'a durable committed run must remain an accepted result');
+ const imported=environment==='PRODUCTION'&&!empty?1:0;
+ assert.equal(result.imported,imported);assert.equal(result.test,environment==='SANDBOX');assert.equal(typeof result.metadata_warning,'string');assert.ok(result.metadata_warning.length>0);assert.equal(JSON.stringify(result).includes('PRIVATE_TRANSPORT_REPLY_DETAILS'),false);
+ assert.deepEqual(bankJobEvents(f).map(event=>event.action),['bank.job.started','bank.job.completed']);assert.equal(count(f,'bank_sync_runs'),1);assert.ok(f.connection().last_synced_at);assert.equal(f.connection().last_error,replaced?'Newer worker status':null);
+ assert.equal(f.workspace()?.state.transactions.length||0,imported);
+ if(replaced)assert.equal(f.sql.prepare('SELECT token FROM bank_locks').get().token,'replacement');
+});
+
+test('bank job audit does not record skipped automatic attempts or append results after losing the lease',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ assert.equal((await(await f.service.automaticSync()).json()).reason,'disabled');assert.deepEqual(bankJobEvents(f),[]);
+ await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));
+ f.provider.getTransactions=async()=>{f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());return{transactions:[rawTx()]};};
+ await assert.rejects(f.service.automaticSync(),/BANK_LEASE_LOST/);
+ const events=bankJobEvents(f);assert.deepEqual(events.map(event=>event.action),['bank.job.started']);
+ assert.equal(f.workspace(),null);assert.equal(f.connection().last_synced_at,null);assert.equal(f.sql.prepare('SELECT token FROM bank_locks').get().token,'replacement');
+ f.sql.prepare('DELETE FROM bank_locks').run();
+ assert.equal((await(await f.service.automaticSync()).json()).reason,'not_due');assert.deepEqual(bankJobEvents(f),events);
+});
+
+test('a committed bank job remains completed when later housekeeping loses its lease',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.d1.beforeBatch=statements=>{if(statements.some(statement=>statement.sql.startsWith('DELETE FROM bank_sync_runs'))){f.d1.beforeBatch=null;f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());}};
+ const response=await(await f.service.sync(post('sync'))).json();
+ assert.equal(response.imported,1);assert.ok(response.warnings.some(warning=>warning.includes('Efterkontrollen')));assert.equal(f.connection().last_error,null);assert.ok(f.connection().last_synced_at);
+ assert.deepEqual(bankJobEvents(f).map(event=>event.action),['bank.job.started','bank.job.completed']);assert.equal(f.workspace().state.transactions.length,1);
 });

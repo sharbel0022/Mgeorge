@@ -1,5 +1,17 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 5 — avgränsad jobb- och återhämtningsverifiering, 2026-11-02
+
+Branch `feature/mgeorge-automation-orchestration`, integrationsbas `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`. [Exakta ändringar, tester och begränsningar](docs/integration/agent-5-automation-orchestration.md). Samtliga 33 poäng är oförändrade: **255/330 = 7,73/10; 0/33 ≥9,5**. Följande avgränsade teknikbevis kompletterar den tidigare bedömningen; de ersätter inget produktionsbevis.
+
+| Berörda områden | Nya faktiska bevis | Kvarstående gräns |
+| --- | --- | --- |
+| 10–14: OCR, Gmail, automatisk registrering, dubbletter och dokumentkö | Nya regressionsfall för sena timeout-/fel-/OCR-svar, samma lease med flera svar, återstart och bibehållet accepterat underlag. Gmail och registrering går genom befintliga gränser. | Syntetiska original och styrda arbetare; inget nytt verkligt schema- eller OCR-körkvitto. |
+| 15–17 och 28: bankhämtning, Bankgiro och scheman | Beständig 429-spärr även för manuella försök, separat senaste försök/resultat, generation och tidsbegränsad lease, atomiska bankkvitton och återläsning efter förlorat commitsvar. Ägarbunden statusläsning och spärrad Bankgiroförberedelse. | Verklig Bankgirokälla och C2/C3-integration saknas ännu. Ett generiskt OAuth-lås bevisar inte pågående synk. |
+| 29: säkerhetskopiering | Ett reproducerat sent objektanrop kan inte ersätta ersättningsarbetarens verifierade ciphertext; verifierad kopia återanvänds och felaktig kopia stoppas. | Ingen ny full produktionsrestore, offsite-kontroll eller RPO/RTO-övning. |
+| 30 och 32: åtkomstkontroll och kodkvalitet | Ägarfilter före DB-läsning, inga råa fel/leaseuppgifter i status, 77 nya fall och oberoende granskning. Slutliga fullsviter: 1 324 Node + 2 399 Sites, 0 fel/överhoppade/avbrutna; övriga grindar i leveransrapporten. | 16 ärvda moderate utvecklingsfynd kvarstår; full lint har inte omkörts eller åtgärdats i detta avgränsade uppdrag. |
+| 33: verklig produktion | Skrivfri inventering styrker samma tre externa automations-ID i ChatGPT och Sites. | Ingen ny driftsättning eller real bank-/verksamhetsacceptans. Tidigare Sites57-kvitto förblir historiskt bevis för den tidigare leveransen. |
+
 ## Ny sjuagentsintegration — kontrakt och syntetisk kedja, 2026-11-02
 
 [Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar mergade kontrakts-PR #22 och regressions-/rapport-PR #23. Exakt slutlig #23-head-CI 41534249801 passerar **1 309 Node + 2 337 Sites = 3 646 tester**, inklusive alla sex nya namngivna 0599-fall, utan fel eller överhoppade/avbrutna tester. Integrationsmain före slutkvittot är `12c9868606a0a45b31b722ddee8f897541687e64`; separat main-CI finns i rapporten. De sex nya implementationerna, inklusive företagspolicy och BankgiroReportSource, väntar fortfarande på PR-leverans. Kontrakt och tester bevisar inte bankens verkliga behörighet, konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Alla före/eftervärden och aktuella test-/produktionsgränser dokumenteras. Äldre tabeller nedan behålls som detaljerad evidens/historik.

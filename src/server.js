@@ -210,12 +210,10 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
     const knownIds=db.prepare('SELECT source_id FROM document_sources').all().map(x=>x.source_id);
     const rejectedIds=db.prepare('SELECT source_id FROM gmail_rejected_sources').all().map(x=>x.source_id);
     currentTokens=decryptObject(connection.encrypted_tokens);
-    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{lease.assert();authorize();}});
+    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{authorize();lease.renew();}});
     let imported=0,duplicate=result.duplicate||0;
     // Originals, token rotation and the checkpoint share the lease-fenced write.
-    db.exec('BEGIN IMMEDIATE');
-    try{
-      lease.assert();
+    lease.write(()=>{
       authorize();
       db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(result.tokens),connection.id);
       for(const doc of result.documents){
@@ -229,11 +227,10 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
         reject.run(sourceId,reason);
       }
       db.prepare("UPDATE gmail_connections SET encrypted_tokens=?,last_synced=?,page_token=?,sync_started_at=?,status='connected',last_error='' WHERE id=?").run(encryptObject(result.tokens),result.truncated?connection.last_synced:startedAt,result.next_page_token||'',result.truncated?startedAt:'',connection.id);
-      db.exec('COMMIT');
-    }catch(e){db.exec('ROLLBACK');throw e;}
+    });
     // Originals/checkpoints are durable before interpretation; failed OCR stays
     // in the review queue and can be retried without downloading the mail again.
-    if(analyze)for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{lease.assert();authorize();}});
+    if(analyze)for(const doc of db.prepare("SELECT id FROM documents WHERE source='gmail' AND invoice_id IS NULL AND status='needs_review' AND extraction='{}' LIMIT 10").all())await analyzeDocument(db,doc.id,{authorize:()=>{authorize();lease.renew();}});
     lease.assert();
     const summary={received:result.received??result.documents.length+(result.skipped||0),imported,duplicate,review:imported,skipped:result.skipped||0,truncated:!!result.truncated,warnings:result.warnings||[]};
     lease.write(()=>{authorize();recordImport(db,{source:'gmail',name:connection.email,found:summary.received,imported,duplicate,review:imported});audit(db,'gmail_synced',summary);});reconcileAndPrepare();lease.success();return summary;
@@ -249,7 +246,7 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
     if(currentTokens)db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject(currentTokens),connection.id);
     db.prepare('UPDATE gmail_connections SET status=?,last_error=? WHERE id=?').run(permanent||(e.retryBlocked?'blocked':transient?'retry_wait':'error'),renewal?'Gmail-anslutningen behöver förnyas':'Det gick inte att hämta från Gmail',connection.id);
     recordImport(db,{source:'gmail',name:connection.email,status:'error',error:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen misslyckades'});
-    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',transient?Math.max(backoff,serverDelay):0,e.retryBlocked===true);
+    lease.fail(e.status===429?e.message:renewal?'Gmail-anslutningen behöver förnyas':'Gmail-hämtningen behöver kontrolleras',transient?Math.max(backoff,serverDelay):0,e.retryBlocked===true,permanent||e.code);
     });
     if(e.status)throw e;throw bad(502,renewal?'Gmail-anslutningen behöver förnyas – koppla Gmail igen':'Det gick inte att hämta från Gmail. Kontrollera anslutningen och försök igen.');
   }finally{lease.release();}
@@ -327,7 +324,7 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
     lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,cooldown?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
     recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
-    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true);
+    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true,e.code);
     });
     throw Object.assign(bad(renewal?409:cooldown||safeBankFailure?e.status:502,message),{safe:true,retryAfter:e.retryAfter,...(safeBankFailure?{code:e.code}:{})});
   }
@@ -677,7 +674,7 @@ async function route(req,res){
       if(record.renew_connection_id){
         const old=ownedConnection(req,id);
         if(bankSyncing.has(old.id))throw bad(409,'Vänta tills bankhämtningen har avslutats och förnya sedan igen');
-        bankSyncing.add(old.id);renewalLock=old.id;
+        bankSyncing.add(old.id,{recordAttempt:false});renewalLock=old.id;
         const previousSession=decryptObject(old.encrypted_session),previous=previousSession.session_id;
         if(previous!==session.session_id)try{await bankingRequest('/sessions/'+encodeURIComponent(previous),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Det tidigare medgivandet kunde inte återkallas. Förnya anslutningen igen.');}
         bankLeases.get(old.id).write(()=>{assertSessionStillAuthorized(req);
@@ -727,7 +724,7 @@ async function route(req,res){
   if(path==='/api/bank/connections'&&req.method==='DELETE'){
     const b=await readBody(req),connection=ownedConnection(req,b.id);
     if(bankSyncing.has(connection.id))throw bad(409,'Vänta tills bankhämtningen har avslutats');
-    bankSyncing.add(connection.id);
+    bankSyncing.add(connection.id,{recordAttempt:false});
     try{
     // Revoke at the provider first. A failed revocation must not be reported as success.
     try{await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Banken kunde inte återkalla åtkomsten. Försök igen eller återkalla medgivandet hos banken.');}
@@ -750,7 +747,7 @@ async function route(req,res){
     if(!db.prepare('UPDATE gmail_states SET consumed=1 WHERE state_hash=? AND consumed=0').run(digest(state)).changes)throw bad(403,'Gmail-returen har redan använts');
     if(url.searchParams.has('error'))return redirect(res,'/?tab=import&gmail=cancelled');
     const code=url.searchParams.get('code');if(!code)throw bad(400,'Googles engångskod saknas');
-    let tokens;const lease=integrationJobs.claim('gmail');
+    let tokens;const lease=integrationJobs.claim('gmail',{recordAttempt:false});
     try{
       tokens=await exchangeGmailCode(code,check.origin,{authorize:()=>assertSessionStillAuthorized(req)});assertSessionStillAuthorized(req);const profile=await gmailProfile(tokens,{authorize:()=>assertSessionStillAuthorized(req)});
       if(record.request_send&&!hasGmailSendScope(tokens))throw bad(409,'Google gav inte utskicksbehörighet. Koppla igen och godkänn gmail.send.');
@@ -770,7 +767,7 @@ async function route(req,res){
   }
   if(path==='/api/gmail/sync'&&req.method==='POST')return json(res,200,await syncGmail(req));
   if(path==='/api/gmail/connection'&&req.method==='DELETE'){
-    const lease=integrationJobs.claim('gmail');
+    const lease=integrationJobs.claim('gmail',{recordAttempt:false});
     try{const connection=db.prepare('SELECT * FROM gmail_connections ORDER BY created_at DESC LIMIT 1').get();
     if(connection){try{await revokeGmailTokens(decryptObject(connection.encrypted_tokens));}catch{throw bad(502,'Google kunde inte återkalla åtkomsten. Försök igen eller återkalla åtkomsten i Google-kontot.');}lease.write(()=>{assertSessionStillAuthorized(req);db.prepare('DELETE FROM gmail_connections WHERE id=?').run(connection.id);audit(db,'gmail_disconnected',{email:connection.email});lease.success();});}
     return json(res,200,{removed:!!connection});}finally{lease.release();}

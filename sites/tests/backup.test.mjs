@@ -5,7 +5,7 @@ const key='a'.repeat(64),owner='owner-a',date=new Date('2026-10-28T20:00:00Z');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 function database(){const sql=new DatabaseSync(':memory:');for(const name of readdirSync(new URL('../drizzle/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())sql.exec(readFileSync(new URL('../drizzle/'+name,import.meta.url),'utf8'));return sql;}
 function fixture(t,count=7){const sql=database();t.after(()=>sql.close());const objects=new Map();let puts=0,gets=0;
- const bucket={async put(k,b){puts++;objects.set(k,new Uint8Array(b));},async get(k){gets++;const b=objects.get(k);return b?{async arrayBuffer(){return b.slice().buffer;}}:null;}};
+ const bucket={async put(k,b,options){puts++;if(options?.onlyIf instanceof Headers&&options.onlyIf.get('If-None-Match')==='*'&&objects.has(k))return null;objects.set(k,new Uint8Array(b));return{key:k};},async get(k){gets++;const b=objects.get(k);return b?{async arrayBuffer(){return b.slice().buffer;}}:null;}};
  const db={prepare(text){let values=[];return{bind(...v){values=v;return this;},async first(){return sql.prepare(text).get(...values)||null;},async all(){return{results:sql.prepare(text).all(...values)};},async run(){return{meta:{changes:sql.prepare(text).run(...values).changes}};}};},async batch(statements){sql.exec('BEGIN');try{const out=[];for(const s of statements)out.push(await s.all());sql.exec('COMMIT');return out;}catch(e){sql.exec('ROLLBACK');throw e;}}};
  const state={schemaVersion:1,invoices:[{id:'invoice',number:'0599',party:'Fiktiv kund',total:62500}],transactions:[],allocations:[],credits:[],imports:[],receipts:[]};
  sql.prepare('INSERT INTO workspaces(owner,revision,payload,updated_at) VALUES(?,?,?,?)').run(owner,4,JSON.stringify(state),date.toISOString());sql.prepare('INSERT INTO workspaces(owner,revision,payload,updated_at) VALUES(?,?,?,?)').run('owner-b',1,JSON.stringify({...state,secret:'OTHER_OWNER_PRIVATE'}),date.toISOString());
@@ -66,6 +66,23 @@ test('an expired worker cannot overwrite the replacement snapshot or release its
  assert.equal(f.sql.prepare('SELECT snapshot_key FROM backup_runs').get().snapshot_key,row.snapshot_key);
  const restored=JSON.parse(new TextDecoder().decode(await unsealBackup(original,key,owner,row.id,'snapshot')));
  assert.equal(restored.tables.find(table=>table.name==='workspaces').rows[0].revision,99);
+});
+
+test('a delayed original write cannot replace the bytes already verified by a newer backup worker',async t=>{
+ const f=fixture(t,1);let resume,reached,paused=false;
+ const gate=new Promise(resolve=>{resume=resolve;}),ready=new Promise(resolve=>{reached=resolve;});
+ const bucket={...f.bucket,async put(path,bytes,options){if(!path.endsWith('/snapshot.bin')&&!paused){paused=true;reached();await gate;}return f.bucket.put(path,bytes,options);}};
+ const late=backupStep(f.db,bucket,owner,key,date);await ready;
+ f.sql.prepare("UPDATE backup_runs SET lease_until='2000-01-01T00:00:00Z'").run();
+ const copying=await backupStep(f.db,f.bucket,owner,key,date);
+ assert.equal(copying.status,'verifying');
+ const completed=await backupStep(f.db,f.bucket,owner,key,date),row=f.sql.prepare('SELECT * FROM backup_runs').get();
+ assert.equal(completed.status,'complete');
+ const fileId='00000000-0000-4000-8000-000000000000',path=row.snapshot_key.replace('snapshot.bin',fileId+'.bin'),verified=f.objects.get(path).slice();
+ resume();await late;
+ assert.deepEqual(f.sql.prepare('SELECT * FROM backup_runs').get(),row,'the completed checkpoint and replacement lease must remain untouched');
+ assert.deepEqual(f.objects.get(path),verified,'completion must keep the exact authenticated object that was verified');
+ assert.deepEqual(await unsealBackup(f.objects.get(path),key,owner,row.id,'document:'+fileId),f.objects.get(owner+'/'+fileId));
 });
 
 test('a delayed reader respects a retry limit reached by another worker',async t=>{

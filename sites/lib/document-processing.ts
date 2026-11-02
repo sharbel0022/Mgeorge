@@ -19,6 +19,10 @@ export const documentInvoiceKey=(i:Row)=>JSON.stringify(['invoice-v2',i.directio
 const sourceFor=(owner:string,id:string)=>db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? ORDER BY created_at LIMIT 1').bind(owner,id).first<Row>();
 const activeSource="EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status='needs_review')";
 const idleEngine="NOT EXISTS(SELECT 1 FROM document_jobs busy WHERE busy.owner=document_jobs.owner AND busy.engine=document_jobs.engine AND busy.state='processing' AND busy.lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now'))";
+// A receipt is unique to this owner, original and lease. Never retain the live
+// lease credential in interpretation history; a fresh lease has a new run ID.
+const documentRunId=(owner:string,job:Row)=>digest(JSON.stringify(['document-job-v1',owner,job.document_id,job.lease]));
+const unrecordedLease=`state='processing' AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${activeSource} AND COALESCE(json_extract(CASE WHEN json_valid(extraction) THEN extraction ELSE '{}' END,'$.processing.run_id'),'')<>?`;
 const AFTERCHECK_WARNING='Fakturan är registrerad. Efterkontrollen behöver köras igen via betalningskontrollen.';
 const METADATA_WARNING='Bearbetningsresultatet är sparat. Körningens tidsstämpel kunde inte uppdateras.';
 const PROCESSING_STATUS_WARNING='Bearbetningsresultatet är sparat. Aktuell köstatus kunde inte fastställas; kontrollera status igen.';
@@ -107,7 +111,8 @@ async function claim(owner:string,engine:string,runner='server'):Promise<Row|nul
 }
 async function failJob(owner:string,job:Row,code:string){
   const retry=job.attempts<3;
-  await db().prepare("UPDATE document_jobs SET state=?,error_code=?,available_at=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=? AND state='processing'").bind(retry?(job.engine==='local'?'waiting_ocr':'queued'):'failed',code,new Date(Date.now()+Math.min(job.attempts*60000,180000)).toISOString(),now(),owner,job.document_id,job.lease).run();
+  const saved=await db().prepare(`UPDATE document_jobs SET state=?,error_code=?,available_at=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND ${unrecordedLease}`).bind(retry?(job.engine==='local'?'waiting_ocr':'queued'):'failed',code,new Date(Date.now()+Math.min(job.attempts*60000,180000)).toISOString(),now(),owner,job.document_id,job.lease,await documentRunId(owner,job)).run();
+  return saved.meta.changes===1;
 }
 export async function registerProcessedInvoice(owner:string,documentId:string,raw:Row,fields:Row,options:{automatic?:boolean,lease?:string,trust?:Row,sha256?:string}={}){
   for(let attempt=0;attempt<3;attempt++){
@@ -162,7 +167,8 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
 async function finish(owner:string,job:Row,result:{text:string,method:string,confidence:number}){
   const source=await sourceFor(owner,job.document_id);if(source?.status!=='needs_review')return {ignored:true};
   const meta=JSON.parse(source.metadata),extraction=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||''});
-  Object.assign(extraction,{processing:{runner:job.lease_runner||'local',sha256:job.sha256,version:'document-worker-v3'}});
+  const runId=await documentRunId(owner,job);
+  Object.assign(extraction,{processing:{runner:job.lease_runner||'local',sha256:job.sha256,version:'document-worker-v3',run_id:runId}});
   const v=Object.fromEntries(fieldNames.map((k:string)=>[k,(extraction.fields as any)[k].value]));
   const key=counterpartyKey(v.direction,v.party,v.organization_number),email=mailbox(v.direction==='customer'?meta.to:meta.from);
   const trust=await db().prepare('SELECT * FROM invoice_counterparties WHERE owner=? AND identity=? AND email=?').bind(owner,key,email).first<Row>();
@@ -181,10 +187,11 @@ async function finish(owner:string,job:Row,result:{text:string,method:string,con
   if(duplicate){extraction.issues.push('Fakturan verkar redan registrerad. Ingen ny skuld skapas.');extraction.level='yellow';}
   const at=now(),state=duplicate?'duplicate':'needs_review',serialized=JSON.stringify(extraction),extractionId=uid();
   // A unique history row is the receipt for this atomic save. Validate the
-  // lease and verified original snapshot under the write lock, then preserve
-  // accepted evidence even if the deadline passes before the batch finishes.
+  // lease, previously unrecorded run and original snapshot under the write
+  // lock. Overlapping responses cannot replace the first accepted evidence,
+  // including when its continuation fails or the deadline passes in the batch.
   const saved=await db().batch([
-    db().prepare(`INSERT INTO document_extractions(id,owner,document_id,result,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM document_jobs WHERE owner=? AND document_id=? AND state='processing' AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${activeSource}) AND EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND size=?)`).bind(extractionId,owner,job.document_id,serialized,at,owner,job.document_id,job.lease,owner,job.document_id,job.sha256,job.size),
+    db().prepare(`INSERT INTO document_extractions(id,owner,document_id,result,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM document_jobs WHERE owner=? AND document_id=? AND ${unrecordedLease}) AND EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND size=?)`).bind(extractionId,owner,job.document_id,serialized,at,owner,job.document_id,job.lease,runId,owner,job.document_id,job.sha256,job.size),
     db().prepare("UPDATE document_jobs SET extraction=?,error_code='',updated_at=? WHERE owner=? AND document_id=? AND EXISTS(SELECT 1 FROM document_extractions WHERE owner=? AND document_id=? AND id=?)").bind(serialized,at,owner,job.document_id,owner,job.document_id,extractionId),
     db().prepare("UPDATE gmail_sources SET extraction=? WHERE owner=? AND document_id=? AND extraction='{}' AND EXISTS(SELECT 1 FROM document_extractions WHERE owner=? AND document_id=? AND id=?)").bind(serialized,owner,job.document_id,owner,job.document_id,extractionId),
   ]);
@@ -223,7 +230,7 @@ export async function processDocuments(owner:string,limit=2){
         const result=await serverPdfText(bytes),completed=await finish(owner,job,result);if(!('ignored' in completed))processed++;
       }catch(e){
         const code=e instanceof Error?e.message:'';
-        if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare("UPDATE document_jobs SET state='waiting_ocr',engine='local',attempts=0,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND lease=?").bind(now(),owner,job.document_id,job.lease).run();
+        if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare(`UPDATE document_jobs SET state='waiting_ocr',engine='local',attempts=0,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND ${unrecordedLease}`).bind(now(),owner,job.document_id,job.lease,await documentRunId(owner,job)).run();
         else await failJob(owner,job,['page_limit','text_limit','original_integrity'].includes(code)?code:'pdf_unreadable');
       }
     }
@@ -286,11 +293,11 @@ export async function workerAction(req:Request,action:string){
     const job=await db().prepare(`SELECT document_jobs.*,d.sha256,d.size FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,body.id,body.lease,mode).first<Row>();
     if(!job)return response({error:'Jobbet har ändrats eller gått ut.'},409);
     if(body.sha256!==job.sha256||typeof body.text!=='string'||body.text.length>150000||!['pdf','ocr'].includes(body.method)||!Number.isFinite(body.confidence)||body.confidence<0||body.confidence>100)return response({error:'Ogiltigt OCR-resultat.'},400);
-    if(body.error===true){await failJob(owner,job,mode==='cloud'?'cloud_ocr_failed':'local_ocr_failed');return response({ok:true});}
+    if(body.error===true)return response(await failJob(owner,job,mode==='cloud'?'cloud_ocr_failed':'local_ocr_failed')?{ok:true}:{ignored:true});
     // The worker's digest describes the bytes it read earlier. Recheck the
     // retained original before accepting its text or using it for registration.
     try{await originalBytes(owner,job);}catch{
-      await failJob(owner,job,'original_integrity');
+      if(!await failJob(owner,job,'original_integrity'))return response({ignored:true});
       return response({error:'Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före ny tolkning.'},409);
     }
     // This endpoint leases OCR work, including PDFs that server extraction

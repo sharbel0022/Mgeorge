@@ -123,7 +123,12 @@ test('rate limits persist cooldown; expired sessions require renewal without imp
   const c=await current();mode='rate_limit';const result=await call('/api/bank/sync','POST',{connection_id:c.id});assert.equal(result.res.status,429);assert.equal(result.res.headers.get('retry-after'),'120');
   const before=providerCalls;assert.equal((await call('/api/bank/sync','POST',{connection_id:c.id})).res.status,429);assert.equal(providerCalls,before);
   assert.equal((await call('/api/bank/accounts','POST',{connection_id:c.id,account_uid:c.accounts[0].uid})).res.status,429);assert.equal(providerCalls,before);
-  db.prepare('UPDATE bank_connections SET retry_after=0 WHERE id=?').run(c.id);mode='expired';assert.equal((await call('/api/bank/sync','POST',{connection_id:c.id})).res.status,409);assert.equal((await current()).status,'renewal_required');mode='';
+  // Clearing the connection projection must not bypass the durable job barrier.
+  db.prepare('UPDATE bank_connections SET retry_after=0 WHERE id=?').run(c.id);
+  assert.equal((await call('/api/bank/sync','POST',{connection_id:c.id})).res.status,429);assert.equal(providerCalls,before);
+  // Model elapsed cooldown in both stores before exercising provider expiry.
+  const elapsed=Date.now()-1;db.prepare('UPDATE integration_jobs SET retry_after=?,next_attempt=? WHERE name=?').run(elapsed,elapsed,'bank:'+c.id);
+  mode='expired';try{assert.equal((await call('/api/bank/sync','POST',{connection_id:c.id})).res.status,409);assert.equal((await current()).status,'renewal_required');}finally{mode='';}
 });
 test('renewal replaces revoked consent and keeps stable transaction identities across account UIDs',async()=>{
   const old=await current();const result=await call('/api/bank/connect','POST',{renew_connection_id:old.id});assert.equal(result.res.status,200);

@@ -159,7 +159,10 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
     await renew();
     const source=await bucket.get(`${owner}/${file.id}`);if(!source)throw Error('backup_original_missing');
     const bytes=new Uint8Array(await source.arrayBuffer());if(bytes.length!==file.size||await hash(bytes)!==file.sha256)throw Error('backup_original_hash_mismatch');
-    const name=`document:${file.id}`,path=prefix+'/'+file.id+'.bin';await bucket.put(path,await sealBackup(bytes,key,owner,row.id,name),{httpMetadata:{contentType:'application/octet-stream'}});
+    // A put may finish after this lease expires and a newer worker verifies the
+    // same path. Keep its exact object; readback below also authenticates an
+    // existing copy left by an interrupted attempt before advancing the cursor.
+    const name=`document:${file.id}`,path=prefix+'/'+file.id+'.bin';await bucket.put(path,await sealBackup(bytes,key,owner,row.id,name),{httpMetadata:{contentType:'application/octet-stream'},onlyIf:new Headers({'If-None-Match':'*'})});
     await verifyCopy(file);
     row.cursor++;row.bytes+=bytes.length;
     await checkpoint("cursor=?,bytes=?,state='running',updated_at=?",row.cursor,row.bytes,clock());
