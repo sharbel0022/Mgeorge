@@ -85,9 +85,12 @@ function compatible(db,t,report,owner){
  // Re-exported content can change its fingerprint while naming the same bank
  // deposit. Retained originals also reserve legacy links without a schema rewrite.
  if(report.deposit_identity){
+  const alreadyLinked=db.prepare("SELECT id FROM bank_specification_links WHERE owner=? AND transaction_id=? AND import_id=? AND report_key=? AND original_sha256=? AND revoked_at=''").get(owner,t.id,report.import_id,report.report_key,report.sha256);
   for(const link of db.prepare("SELECT * FROM bank_specification_links WHERE owner=? AND revoked_at='' AND transaction_id<>?").all(owner,t.id)){
    let previous;try{previous=reports(db,link.import_id,t.account,owner).find(item=>item.report_key===link.report_key&&item.sha256===link.original_sha256);}catch{}
-   if(!previous)throw fail('En aktiv rapportkoppling kan inte kontrolleras mot sitt original. Granska den kopplingen innan en ny rapport reserveras.');
+   // An unrelated unavailable original can hold a new reservation, but must
+   // not erase another source relation whose own original remains intact.
+   if(!previous){if(alreadyLinked)continue;throw fail('En aktiv rapportkoppling kan inte kontrolleras mot sitt original. Granska den kopplingen innan en ny rapport reserveras.');}
    if(previous.deposit_identity===report.deposit_identity)throw fail('Samma insättning i Bankgirorapporten har redan en aktiv källkoppling till en annan bankpost. Granska och återta den relationen först.');
   }
  }

@@ -144,27 +144,29 @@ test('concurrent reconciliation of one retained alias report allocates once and 
 
 const secondReportAlias='8000000987654321';
 const bothReportAliases=()=>[{...selectedAliasResource(),all_account_ids:[{scheme_name:'BBAN',identification:reportAlias},{scheme_name:'BBAN',identification:secondReportAlias}]}];
+// Distinct payer and amount isolate alias validation from the existing
+// multiple-payment review rule; both reports still share one primary account.
 async function twoAliasFixture(t){
  const f=await aliasFixture(t,true);let state=f.read().state;const firstInvoices=structuredClone(state.invoices);state.invoices=[];
- state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account:'iban:'+iban,date:'2026-10-27',amount:62500,party:'',payerReference:'',description:'Bankgiro inbetalning',bankReference:'SYNTHETIC-SECOND-ALIAS-DEPOSIT'})]}).state;
+ state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account:'iban:'+iban,date:'2026-10-27',amount:75000,party:'',payerReference:'',description:'Bankgiro inbetalning',bankReference:'SYNTHETIC-SECOND-ALIAS-DEPOSIT'})]}).state;
  setSyntheticState(f,state);setAliasResources(f,bothReportAliases());
- const xml=new TextDecoder().decode(f.originalBytes).replace('>'+reportAlias+'<','>'+secondReportAlias+'<').replaceAll('SYNTHETIC-ALIAS-','SYNTHETIC-SECOND-ALIAS-').replaceAll('2026-10-26','2026-10-27').replace('<Ref>0599</Ref>','<Ref>0600</Ref>');
+ const xml=new TextDecoder().decode(f.originalBytes).replace('>'+reportAlias+'<','>'+secondReportAlias+'<').replaceAll('SYNTHETIC-ALIAS-','SYNTHETIC-SECOND-ALIAS-').replaceAll('2026-10-26','2026-10-27').replace('<Ref>0599</Ref>','<Ref>0600</Ref>').replace('<Amt Ccy="SEK">625.00</Amt>','<Amt Ccy="SEK">750.00</Amt>').replace('<Nm>Synthetic customer AB</Nm>','<Nm>Second synthetic customer AB</Nm>');
  const bytes=new TextEncoder().encode(xml),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex'),oldGet=f.env.BUCKET.get.bind(f.env.BUCKET);
  f.env.BUCKET={async get(key){return key==='synthetic-owner/synthetic-second-alias-report'?{size:bytes.length,arrayBuffer:async()=>bytes.buffer}:oldGet(key);}};
  f.sqlite.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run('synthetic-second-alias-report','synthetic-owner','Synthetic-second-alias.xml','application/xml',bytes.length,hash,'2026-10-27');
  const imported=await f.post({type:'bankgiro.import',documentId:'synthetic-second-alias-report'});assert.equal(imported.status,200,JSON.stringify(imported.body));
- state=f.read().state;state.invoices=firstInvoices;state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0600',ocr:'',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;setSyntheticState(f,state);
+ state=f.read().state;state.invoices=firstInvoices;state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Second synthetic customer AB',number:'0600',ocr:'',total:75000,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;setSyntheticState(f,state);
  const rows=state.transactions.filter(row=>row.specification);assert.deepEqual(rows.map(row=>[row.recipientAccount,row.specificationStatus,row.payerReference]).sort((a,b)=>a[2].localeCompare(b[2])),[[reportAlias,'linked','0599'],[secondReportAlias,'linked','0600']]);assert.equal(state.allocations.length,0);return f;
 }
 test('per-call account cache does not reuse one valid report alias for another alias on the same primary account',async t=>{
  const f=await twoAliasFixture(t),before=f.read().state;setAliasResources(f,[selectedAliasResource()]);
  const result=await f.post();assert.equal(result.status,200,JSON.stringify(result.body));const state=f.read().state,first=state.invoices.find(i=>i.number==='0599'),second=state.invoices.find(i=>i.number==='0600'),held=state.transactions.find(row=>row.recipientAccount===secondReportAlias);
- assert.equal(state.allocations.length,1);assert.equal(state.allocations[0].invoiceId,first.id);assert.equal(balance(state,first),0);assert.equal(balance(state,second),62500);assert.match(held.bankAccountIssue,/konto|medgivande/i);
+ assert.equal(state.allocations.length,1);assert.equal(state.allocations[0].invoiceId,first.id);assert.equal(balance(state,first),0);assert.equal(balance(state,second),75000);assert.match(held.bankAccountIssue,/konto|medgivande/i);
  assert.equal(held.specificationStatus,'linked');assert.equal(held.payerReference,'0600');assert.deepEqual(held.original,before.transactions.find(row=>row.id===held.id).original);
 });
 test('commit validates every recipient alias before deduplicating a shared account consent',async t=>{
  const f=await twoAliasFixture(t),before=f.read(),auditBefore=f.sqlite.prepare('SELECT COUNT(*) n FROM audit_events').get().n;let proposed=before.state;
- for(const reference of ['0599','0600']){const invoice=proposed.invoices.find(i=>i.number===reference),row=proposed.transactions.find(row=>row.specification&&row.payerReference===reference);proposed=applyCommand(proposed,{type:'match.create',invoiceId:invoice.id,transactionId:row.id,amount:62500,note:'Synthetic separately checked proposal.'}).state;}
+ for(const reference of ['0599','0600']){const invoice=proposed.invoices.find(i=>i.number===reference),row=proposed.transactions.find(row=>row.specification&&row.payerReference===reference);proposed=applyCommand(proposed,{type:'match.create',invoiceId:invoice.id,transactionId:row.id,amount:invoice.total,note:'Synthetic separately checked proposal.'}).state;}
  const statements=()=>[
   f.env.DB.prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(crypto.randomUUID(),'synthetic-owner',before.revision+1,'synthetic.alias-commit','{}','2026-10-27','synthetic-owner',before.revision),
   f.env.DB.prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(proposed),'2026-10-27','synthetic-owner',before.revision)

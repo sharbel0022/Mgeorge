@@ -79,6 +79,25 @@ export async function bankgiroRetainedPreview(owner:string,documentId:string,tar
 }
 
 const bankgiroObservation=(row:Transaction)=>JSON.stringify(Object.fromEntries(['date','amount','currency','party','payerReference','bankReference','parentBankReference','recipientBankgiro','payerBankgiro','payerAccount','remittanceMessage','settlementDate','format','organizationNumber','referenceEvidence','referenceParts','payerEvidence','reportEvidence','specificationGroup','specificationCount','specificationTotal','recipientAccount','account','original','bankDetails'].map(key=>[key,row[key as keyof Transaction]??null])));
+/** Accept only the exact earlier label-cell receipt derived from this freshly
+ * parsed original. Other source cells and every payment fact remain exact. */
+function sameBankgiroObservations(rows:Transaction[],fresh:Transaction[]){
+ const unmatched=rows.map(bankgiroObservation);
+ for(const row of fresh){
+  const expected=[bankgiroObservation(row)],report=row.reportEvidence;
+  if(row.format==='Swedbank Bankgiro XLSX'&&report?.profile==='Swedbank Bankgiro XLSX'){
+   try{
+    const cells=JSON.parse(report.sourceCells||'{}');
+    if(cells.sequenceLabel&&cells.sequence){
+     const legacy={...cells,sequence:cells.sequenceLabel};delete legacy.sequenceLabel;
+     expected.push(bankgiroObservation({...row,reportEvidence:{...report,sourceCells:JSON.stringify(legacy)}}));
+    }
+   }catch{/* An unknown representation never receives a compatibility bypass. */}
+  }
+  const index=unmatched.findIndex(value=>expected.includes(value));if(index<0)return false;unmatched.splice(index,1);
+ }
+ return unmatched.length===0;
+}
 /** Reconstruct metadata commands from this owner's retained sources. No provider request. */
 export async function prepareBankgiroLinkCommand(owner:string,state:State,input:Command):Promise<Command>{
  if(input.type==='bankgiro.unlink'){
@@ -95,6 +114,7 @@ export async function prepareBankgiroLinkCommand(owner:string,state:State,input:
  const original=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId:proof.documentId});
  if(original.hash!==proof.sha256)throw Error('Specifikationens kontrollsumma stämmer inte med det bevarade originalet.');
  const fresh=applyCommand(emptyState(),original).state.transactions.filter(row=>row.specificationGroup===specification.specificationGroup);
- if(fresh.length!==rows.length||JSON.stringify(fresh.map(bankgiroObservation).sort())!==JSON.stringify(rows.map(bankgiroObservation).sort()))throw Error('Specifikationens uppgifter stämmer inte med det bevarade originalet. Importera eller granska originalet på nytt.');
+ const freshAccountIssue=fresh.find(row=>row.bankgiroAccountIssue)?.bankgiroAccountIssue;if(freshAccountIssue)throw Error(freshAccountIssue);
+ if(fresh.length!==rows.length||!sameBankgiroObservations(rows,fresh))throw Error('Specifikationens uppgifter stämmer inte med det bevarade originalet. Importera eller granska originalet på nytt.');
  return {type:'bankgiro.link',transactionId:target.id,specificationId:specification.id,specificationIds:rows.map(row=>row.id),note:input.note,confirmOriginals:input.confirmOriginals===true,confirmAccount:input.confirmAccount===true,dateDifferenceNote:input.dateDifferenceNote??''};
 }
