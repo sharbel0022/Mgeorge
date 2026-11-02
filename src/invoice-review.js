@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto';
-import {audit,getSettings,matchingSuggestions} from './db.js';
+import {audit,getSettings,matchingSuggestions,invoiceReferenceContext,invoiceReferenceOriginal,invoiceReferenceProjection} from './db.js';
 import {extractInvoice,interpretInvoice,fieldNames,validateInvoiceValues} from './invoice-extraction.js';
 import {digest} from './security.js';
 
@@ -46,6 +46,11 @@ export async function analyzeDocument(db,id,{extract=extractInvoice,authorize=()
   if(duplicates.length){extraction.level='yellow';extraction.issues.push('Fakturan verkar redan registrerad. Kontrollera och komplettera originalposten.');}
   const registrationIssues=automaticRegistrationIssues(db,v);
   if(registrationIssues.length){extraction.level=extraction.level==='red'?'red':'yellow';extraction.issues.push(...registrationIssues);}
+  const reference=invoiceReferenceProjection(v,invoiceReferenceContext(db),[invoiceReferenceOriginal(extraction)]);
+  extraction.referencePolicy=reference.referencePolicy;extraction.intendedPaymentReference=reference.intendedPaymentReference;
+  if(reference.referencePolicy.applies&&reference.referencePolicy.status==='BLOCKED'){
+    extraction.level='red';extraction.issues.push(reference.referencePolicy.reason);
+  }
   db.prepare('UPDATE documents SET extraction=? WHERE id=?').run(JSON.stringify(extraction),id);
   audit(db,'document_extracted',{id,level:extraction.level,method:extraction.method,extraction});
   if(extraction.level==='green'&&getSettings(db).auto_register_known===true)approveDocument(db,id,{},true);
@@ -70,6 +75,8 @@ export function approveDocument(db,id,body={},automatic=false){
     if(automatic){
       if(getSettings(db).auto_register_known!==true||extraction.processing?.sha256!==doc.fingerprint)issues.push('Automatisk registrering saknar aktuellt godkännande eller verifierat original.');
       issues.push(...automaticRegistrationIssues(db,values));
+      const reference=invoiceReferenceProjection(values,invoiceReferenceContext(db),[invoiceReferenceOriginal(extraction)]).referencePolicy;
+      if(reference.applies&&reference.status==='BLOCKED')issues.push(reference.reason);
     }
     for(const k of ['invoice_number','party','issued_at','due_at','total_cents','direction','kind','currency'])if(values[k]==null||typeof values[k]==='string'&&!values[k].trim())issues.push('En nödvändig fakturauppgift saknas.');
     if(!['customer','supplier'].includes(values.direction))issues.push('Välj kund- eller leverantörsfaktura.');

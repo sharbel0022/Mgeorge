@@ -83,6 +83,8 @@ test('quality cycle: removing a retained file refund description cannot restore 
 
 test('quality cycle: an explicit refund can settle a reviewed credit note but cannot settle an ordinary invoice', t => {
   const {db} = fixture(t);
+  // The credit uses a distinct generic payment reference in this refund test.
+  db.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
   invoice(db, {direction:'supplier'}); invoice(db, {id:'credit', kind:'credit', number:'K0604'});
   importApi(db, apiOriginal({credit_debit_indicator:'DBIT', bank_transaction_code:{description:'Refund'}}));
   const transaction = listTransactions(db)[0];

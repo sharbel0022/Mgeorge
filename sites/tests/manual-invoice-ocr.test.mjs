@@ -2,7 +2,25 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {loadInvoiceImports,dataModule} from './helpers/invoice-module-loader.mjs';
 import {layoutInvoiceText} from '../../test/helpers/pdf-layout-ocr.mjs';
+import {emptyState,applyCommand,invoiceReferenceDecision,balance} from '../lib/domain.ts';
 const imports=await loadInvoiceImports();
+
+test('reinterpreting pasted text cannot replace the first retained original reference observation',()=>{
+  const source='Fakturanummer: 0599\nBetalningsreferens: 0600';
+  const first=imports.extractInvoiceText(source),edited=imports.extractInvoiceText(source.replace('0600','0599'),first.referenceOriginal);
+  assert.equal(edited.ocr,'0599');
+  assert.equal(edited.referenceOriginal.reference,'0600');
+});
+
+for(const viaFile of [false,true])test(`manual ${viaFile?'file':'pasted text'} keeps original references after editable correction`,async()=>{
+  const text='Fakturanummer: 0599\nBetalningsreferens: 0600\nAtt betala: 625,00 SEK\nFakturadatum: 2026-10-01';
+  const fields=viaFile?(await imports.readInvoiceFile(new File([text],'synthetic-own-invoice.txt',{type:'text/plain'}),'owner@example.test')).fields:imports.extractInvoiceText(text);
+  assert.deepEqual(fields.referenceOriginal,{invoice_number:'0599',reference:'0600'});
+  const state=applyCommand(emptyState(),{type:'invoice.save',invoice:{...fields,direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'0599',total:62500,issued:'2026-10-01',reviewed:true}}).state;
+  assert.equal(invoiceReferenceDecision(state,state.invoices[0]).status,'BLOCKED');
+  assert.equal(balance(state,state.invoices[0]),62500);
+  assert.equal(state.allocations.length,0);
+});
 
 for(const [name,from,to,field,expected]of [
   ['character spaced leading zeros','Fakturanummer: 0606','Fakturanummer: 0 6 0 6','number','0606'],

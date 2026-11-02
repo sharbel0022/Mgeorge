@@ -111,6 +111,8 @@ test('V4 API references, candidates, party IDs and classification must match the
 
 test('V4 a forged payer organisation cannot override a different bank payer and pay an invoice',t=>{
   const db=fixture(t);approveSyntheticBankAccount(db,syntheticAccount);
+  // A generic distinct OCR keeps the provenance failure independent of company policy.
+  db.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
   db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,organization_number,issued_at) VALUES(?,?,?,?,?,?,?,?)').run('synthetic','customer','001','Invoice Customer AB',62500,'000018','5561234567','2026-10-01');
   const text=`Datum;Belopp;Betalare;OCR;Bankreferens;IBAN;Valuta\n2026-10-26;625;Different Bank Payer AB;000018;ACTUAL-ID;${syntheticAccount};SEK\n`,content=Buffer.from(text);
   storeTransactions(db,parseCSV(text,syntheticAccount),'file:synthetic.csv',{content,mime_type:'text/csv'});const saved=listTransactions(db)[0];assert.equal(reconciliationData(db).transactions[0].verified,true);

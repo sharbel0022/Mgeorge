@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import ts from 'typescript';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {emptyState} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 
 const data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');

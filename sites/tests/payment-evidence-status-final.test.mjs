@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {emptyState,applyCommand,balance,invoicePaymentEvidenceIssue,invoiceStatus,paymentInvoiceAssessment,paymentOriginalIssue} from '../lib/domain.ts';
+import {applyCommand,balance,invoicePaymentEvidenceIssue,invoiceStatus,paymentInvoiceAssessment,paymentOriginalIssue} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {economySummary} from '../lib/economy-summary.js';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 

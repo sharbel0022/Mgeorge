@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {emptyState,applyCommand,balance} from '../lib/domain.ts';
+import {applyCommand,balance} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 
 function fixture(direction='receivable'){

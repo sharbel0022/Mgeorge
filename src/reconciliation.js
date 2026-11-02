@@ -1,14 +1,15 @@
 // Suggestions never constitute payment evidence. All amounts are integer öre.
 import {randomUUID} from 'node:crypto';
-import {listInvoices,listTransactions,allocate,audit,paymentSign} from './db.js';
+import {listInvoices,listTransactions,allocate,audit,paymentSign,invoiceReferenceProjection,invoiceReferenceMatchIssue} from './db.js';
 import {digest,decryptObject} from './security.js';
 import {normalizeBankApiTransaction,parseBankFile} from './importers.js';
 import {bankFinancialReview,hasBankEvidenceConflict,bankEvidenceReviewReason,sameBankPaymentIdentity} from './bank-evidence.js';
 
 import {matchingReferenceValues} from './payment-references.js';
 import {referenceEvidenceCompatible} from '../sites/lib/reference-evidence-compat.js';
+import {matchesInvoiceReference,strictInvoiceReferenceMatch} from './invoice-reference-policy.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
-export const RECONCILIATION_RULE_VERSION='verified-reference-2026-11-01.1';
+export const RECONCILIATION_RULE_VERSION='invoice-reference-policy-2026-11-02.1';
 // Keep invoice-number punctuation: AB/12 and AB12 are not interchangeable IDs.
 const ref=value=>String(value||'').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g,' ');
 export function exactReference(reference, candidate){
@@ -99,7 +100,26 @@ function samePayer(i,t,links,nameOf){
     return identity&&nameOf(l.payer)===name&&l.account===t.account;
   }));
 }
-export function analyzeReconciliation({invoices,transactions,links=[],allocations=[]}){
+export function analyzeReconciliation({invoices,transactions,links=[],allocations=[],company,policies}){
+  // Database reads already carry an up-to-date policy projection. Explicit
+  // context also supports pure callers; context-free generic corpora retain
+  // their existing reference rules.
+  if(company!==undefined||policies!==undefined)invoices=invoices.map(invoice=>{
+    const projected=invoiceReferenceProjection(invoice,{company,policies},invoice.original?[invoice.original]:[]);
+    if(!invoice.referencePolicy?.applies||!projected.referencePolicy.applies)return projected;
+    // A database projection may summarize several originals which are not
+    // included in this pure call. Context alone cannot clear that evidence;
+    // refresh from the source to resolve an earlier block after a rule change.
+    if(invoice.referencePolicy.status==='BLOCKED')projected.referencePolicy={
+      ...projected.referencePolicy,status:'BLOCKED',
+      issues:[...new Set([...projected.referencePolicy.issues,...invoice.referencePolicy.issues])],
+      reason:[...new Set([invoice.referencePolicy.reason,projected.referencePolicy.reason])].join(' '),
+    };
+    projected.referencePolicyIdentifiers=[...new Set([...projected.referencePolicyIdentifiers,...(invoice.referencePolicyIdentifiers||[])])];
+    return projected;
+  });
+  const matches=(invoice,value)=>invoice.referencePolicy?.applies?matchesInvoiceReference(invoice.referencePolicy,value):[invoice.reference,invoice.invoice_number].some(candidate=>exactReference(value,candidate));
+  const owns=(invoice,value)=>invoice.referencePolicy?.applies?(invoice.referencePolicyIdentifiers||[invoice.invoice_number,invoice.reference,invoice.referencePolicy.intendedPaymentReference]).some(candidate=>strictInvoiceReferenceMatch(value,candidate)):matches(invoice,value);
   // Keep this cache local: later analyses must recheck changed identities.
   const namesByValue=new Map(),nameOf=value=>{const raw=String(value||'');let name=namesByValue.get(raw);if(name===undefined){name=normalizeName(raw);namesByValue.set(raw,name);}return name;};
   // Retain every identity in a payer/account bucket. samePayer still applies
@@ -123,27 +143,31 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     const ownBankgiro=references.some(r=>ownBankgiros.includes(String(r).replace(/[\s-]/g,'')));
     const invalidReference=ownBankgiro||!!evidence?.incomplete||!!evidence?.candidates?.some(c=>c.validity==='checksum_invalid');
     // Include closed invoices: a mistyped OCR may belong to an already paid invoice.
-    const owners=references.length?invoices.filter(i=>[i.reference,i.invoice_number].some(x=>references.some(r=>exactReference(r,x)))):[];
+    const owners=references.length?invoices.filter(i=>references.some(value=>owns(i,value))):[];
     const dateOK=i=>!i.issued_at||t.booked_at>=i.issued_at;
     const eligible=invoices.filter(i=>i.direction===direction&&i.kind!=='credit'&&i.currency===t.currency&&paymentSign(i)===Math.sign(t.amount_cents)&&dateOK(i));
     const payerLinks=linksByAccount.get(t.account)?.get(nameOf(t.payer))||[];
     const names=eligible.filter(i=>samePayer(i,t,payerLinks,nameOf)),namedInvoices=new Set(names);
     const tokens=String(t.reference||'').split(/[\s,;+/]+/).map(ref).filter(Boolean);
-    const grouped=names.filter(i=>i.remaining_cents>0&&tokens.some(r=>[i.reference,i.invoice_number].some(x=>ref(x)===r)));
+    const grouped=names.filter(i=>i.remaining_cents>0&&tokens.some(r=>i.referencePolicy?.applies?matches(i,r):[i.reference,i.invoice_number].some(x=>ref(x)===r)));
     if(owners.length===0&&grouped.length>1&&grouped.reduce((s,i)=>s+i.remaining_cents,0)===t.available_cents){
       for(const i of grouped)out.push({transaction_id:t.id,invoice_id:i.id,kind:'multiple_invoices',safe:false,score:85,amount_cents:i.remaining_cents,reason:'En överföring hänvisar till flera fakturor. Bekräfta fördelningen manuellt.'});
       continue;
     }
     for(const i of eligible){
-      const exact=owners.some(x=>x.id===i.id),payer=namedInvoices.has(i);
+      // A supplier's number belongs to that supplier's namespace. Scoped
+      // customer invoices still reserve every conflicting/closed owner.
+      const candidateOwners=i.referencePolicy?.applies?owners.filter(owner=>owner.direction===i.direction&&owner.referencePolicy?.applies):owners;
+      const exact=i.referencePolicy?.applies?references.some(value=>matches(i,value)):owners.some(x=>x.id===i.id),payer=namedInvoices.has(i);
       if(!exact&&!payer&&t.available_cents!==i.remaining_cents)continue; // Amount alone may be shown, but never accepted.
-      const conflict=invalidReference||references.some(r=>!([i.reference,i.invoice_number].some(x=>exactReference(r,x))))&&references.length>1||reference&&owners.some(x=>x.id!==i.id);
+      const policyIssue=invoiceReferenceMatchIssue(i,t,invoices);
+      const conflict=i.referencePolicy?.applies&&(i.referencePolicy.status==='BLOCKED'||policyIssue&&exact)||invalidReference||references.some(r=>!matches(i,r))&&references.length>1||reference&&candidateOwners.some(x=>x.id!==i.id);
       const duplicateEvidence=transactions.some(x=>x.id!==t.id&&!x.excluded&&!x.is_aggregate&&x.amount_cents===t.amount_cents&&x.currency===t.currency&&x.booked_at===t.booked_at&&(x.account===t.account&&x.bank_reference&&x.bank_reference===t.bank_reference||x.account!==t.account&&sameBankPaymentIdentity(x,t)));
       const incomplete=t.parent_bank_reference&&transactions.some(x=>x.account===t.account&&x.bank_reference===t.parent_bank_reference&&x.is_aggregate&&!x.excluded);
-      const ambiguous=owners.length>1||names.filter(x=>x.remaining_cents>0).length>1&&!exact||exact&&t.available_cents!==i.remaining_cents&&names.some(x=>x.id!==i.id&&x.remaining_cents===t.available_cents);
+      const ambiguous=candidateOwners.length>1||names.filter(x=>x.remaining_cents>0).length>1&&!exact||exact&&t.available_cents!==i.remaining_cents&&names.some(x=>x.id!==i.id&&x.remaining_cents===t.available_cents);
       const kind=bankConflict?'bank_evidence_conflict':financialReview?'financial_review':automaticReview?'manual_review':i.remaining_cents===0?(allocations.some(a=>a.invoice_id===i.id&&a.transaction_id===t.id)?'overpayment':'possible_duplicate'):conflict?'reference_conflict':!exact&&!payer?'unknown_payer':!exact&&reference?'wrong_reference':!reference?'missing_reference':!payer?'different_payer':t.available_cents<i.remaining_cents?'partial':t.available_cents>i.remaining_cents?'overpayment':'correct';
-      const safe=!bankConflict&&!financialReview&&!automaticReview&&Number.isSafeInteger(i.remaining_cents)&&!!t.verified&&exact&&payer&&!conflict&&!ambiguous&&!duplicateEvidence&&!incomplete&&i.remaining_cents>0;
-      out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,reference_values:references,reference_sources:evidence?.candidates||[],verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:bankConflict?bankEvidenceReviewReason(t):financialReview?financialReview.reason:automaticReview||t.account_consent_issue||(!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':ownBankgiro?'Referensen är företagets eget Bankgironummer. Granska bankoriginalet.':invalidReference?'OCR-kontrollsiffran är felaktig eller referensanalysen ofullständig. Granska bankoriginalet.':conflict?'Betalningsreferenserna är motstridiga. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.')});
+      const safe=!bankConflict&&!financialReview&&!automaticReview&&!policyIssue&&Number.isSafeInteger(i.remaining_cents)&&!!t.verified&&exact&&payer&&!conflict&&!ambiguous&&!duplicateEvidence&&!incomplete&&i.remaining_cents>0;
+      out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,reference_values:references,reference_sources:evidence?.candidates||[],verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:bankConflict?bankEvidenceReviewReason(t):financialReview?financialReview.reason:automaticReview||t.account_consent_issue||(!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':ownBankgiro?'Referensen är företagets eget Bankgironummer. Granska bankoriginalet.':invalidReference?'OCR-kontrollsiffran är felaktig eller referensanalysen ofullständig. Granska bankoriginalet.':policyIssue|| (conflict?'Betalningsreferenserna är motstridiga. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.'))});
     }
   }
   // Multiple payments for the same invoice must be reviewed together, never auto-consumed.

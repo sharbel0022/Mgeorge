@@ -12,6 +12,8 @@ import { randomUUID } from 'node:crypto';
 import { digest } from './security.js';
 import { bankFinancialReview, bankEvidenceConflictFields, hasBankEvidenceConflict, bankEvidenceReviewReason, sameBankPaymentIdentity, BANK_EVIDENCE_CONFLICT_REASON, AUTOMATIC_MATCH_HOLD_REASON } from './bank-evidence.js';
 import { parseBankFile } from './importers.js';
+import {AIS_NULL_SCHEMA_VERSION,extractPaymentReferences,matchingReferenceValues} from './payment-references.js';
+import {resolveInvoiceReference,matchesInvoiceReference,strictInvoiceReferenceMatch,validateInvoiceReferencePolicies} from './invoice-reference-policy.js';
 
 /** Öppnar SQLite och förbereder databasschemat. Här bevaras företagets fakturor och historik mellan serverstarter. */
 export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sqlite') {
@@ -164,15 +166,52 @@ export function today(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe
 export function bankEvidenceBlocksAbsence(db){
   return !!db.prepare("SELECT 1 FROM bank_transactions WHERE CASE WHEN json_valid(bank_evidence_conflicts) THEN json_type(bank_evidence_conflicts)<>'array' OR json_array_length(bank_evidence_conflicts)>0 ELSE 1 END LIMIT 1").get();
 }
+export function invoiceReferenceContext(db){
+  const settings=getSettings(db);
+  return {company:{name:settings.company_name,organizationNumber:settings.organization_number},...(Object.hasOwn(settings,'invoice_reference_policies')?{policies:settings.invoice_reference_policies}:{})};
+}
+export function invoiceReferenceOriginal(extraction){
+  if(!extraction||typeof extraction!=='object'||Array.isArray(extraction))return [];
+  return {invoice_number:extraction.fields?.invoice_number?.value,reference:extraction.fields?.reference?.value,issuer_name:extraction.details?.supplier?.name};
+}
+export function invoiceReferenceProjection(invoice,context,originals=[]){
+  const decisions=[resolveInvoiceReference(invoice,context),...originals.map(original=>resolveInvoiceReference({...invoice,original},context))];
+  const blocked=decisions.filter(decision=>decision.applies&&decision.status==='BLOCKED');
+  const referencePolicy=blocked.length?{...blocked[0],issues:[...new Set(blocked.flatMap(decision=>decision.issues))],reason:[...new Set(blocked.map(decision=>decision.reason))].join(' ')}:decisions[0];
+  // These identifiers reserve ambiguous ownership only. They never authorize
+  // a match or replace the intended reference, bank reference, or stored row.
+  const referencePolicyIdentifiers=[...new Set([invoice.invoice_number,invoice.reference,referencePolicy.intendedPaymentReference,...originals.flatMap(original=>[original?.invoice_number,original?.reference])].filter(value=>typeof value==='string'&&value))];
+  return {...invoice,referencePolicy,intendedPaymentReference:referencePolicy.intendedPaymentReference,referencePolicyIdentifiers};
+}
+export function invoiceReferenceMatchIssue(invoice,transaction,invoices){
+  const decision=invoice.referencePolicy;
+  if(!decision?.applies)return '';
+  if(decision.status==='BLOCKED')return decision.reason;
+  const evidence=transaction.reference_evidence,rawEvidence=transaction.raw_bank_data?extractPaymentReferences(transaction.raw_bank_data,{profile:evidence?.version===AIS_NULL_SCHEMA_VERSION?'ais-null-schema-v1':'legacy'}):null;
+  // A later manual value cannot replace typed candidates or identifiers in
+  // retained bank originals, including older rows without typed evidence.
+  const references=[...new Set([...matchingReferenceValues(evidence,transaction.reference),...matchingReferenceValues(rawEvidence)])];
+  if([evidence,rawEvidence].some(source=>source?.incomplete||source?.candidates?.some(candidate=>candidate.validity==='checksum_invalid')))return 'Betalningsreferensens bankunderlag är ofullständigt eller har en ogiltig OCR-kontrollsiffra. Granska originalet.';
+  if(!references.length||!references.every(value=>matchesInvoiceReference(decision,value)))return 'Betalningsreferensen måste exakt motsvara fakturans avsedda betalningsreferens. Granska originalet.';
+  const otherOwner=invoices.some(other=>other.id!==invoice.id&&other.direction===invoice.direction&&other.referencePolicy?.applies&&(other.referencePolicyIdentifiers||[other.invoice_number,other.reference,other.referencePolicy.intendedPaymentReference]).some(identifier=>references.some(value=>strictInvoiceReferenceMatch(identifier,value))));
+  return otherOwner?'Flera fakturor gör anspråk på samma betalningsreferens. Granska möjliga dubbletter och motstridiga original.':'';
+}
 export function listInvoices(db) {
   const blocked=bankEvidenceBlocksAbsence(db),transactions=new Map(listTransactions(db).map(t=>[t.id,t])),allocations=new Map();
+  const context=invoiceReferenceContext(db),originals=new Map();
+  for(const document of db.prepare('SELECT invoice_id,extraction FROM documents WHERE invoice_id IS NOT NULL').all()){
+    let original;try{original=invoiceReferenceOriginal(JSON.parse(document.extraction));}catch{original=[];}
+    originals.set(document.invoice_id,[...(originals.get(document.invoice_id)||[]),original]);
+  }
   for(const a of db.prepare('SELECT invoice_id,transaction_id FROM allocations').all())allocations.set(a.invoice_id,[...(allocations.get(a.invoice_id)||[]),a.transaction_id]);
   return db.prepare(`SELECT i.*, COALESCE((SELECT SUM(a.amount_cents) FROM allocations a WHERE a.invoice_id=i.id),0) AS paid_cents,(SELECT d.id FROM documents d WHERE d.invoice_id=i.id ORDER BY d.created_at DESC LIMIT 1) AS document_id FROM invoices i ORDER BY i.due_at ASC, i.created_at DESC`).all().map(i=>{
+    const projection=invoiceReferenceProjection(i,context,originals.get(i.id));
+    const referenceIssue=projection.referencePolicy.applies&&projection.referencePolicy.status==='BLOCKED'?projection.referencePolicy.reason:'';
     const remaining_cents=i.total_cents-i.paid_cents,is_overdue=remaining_cents>0&&!!i.due_at&&i.due_at<today();
-    const payment_evidence_issue=(allocations.get(i.id)||[]).map(id=>{const t=transactions.get(id);if(!t)return 'Underlag för en registrerad betalningskoppling saknas.';const financial=bankFinancialReview(t);return bankEvidenceReviewReason(t)||(financial&&(financial.kind==='payer_conflict'||financial.kind==='reversal'||financial.kind==='refund'&&i.kind!=='credit')?financial.reason:'');}).find(Boolean)||'';
+    const payment_evidence_issue=(allocations.get(i.id)||[]).map(id=>{const t=transactions.get(id);if(!t)return 'Underlag för en registrerad betalningskoppling saknas.';const financial=bankFinancialReview(t);return bankEvidenceReviewReason(t)||(financial&&(financial.kind==='payer_conflict'||financial.kind==='reversal'||financial.kind==='refund'&&i.kind!=='credit')?financial.reason:'');}).find(Boolean)||referenceIssue;
     const absence_verified=!!i.reconciled_at&&!!i.reconciliation_note?.trim()&&!blocked&&!payment_evidence_issue;
     const reconciliation_state=i.reconciled_at&&!payment_evidence_issue&&(i.paid_cents>0||absence_verified)?'verified':'unreconciled';
-    return {...i,remaining_cents,is_overdue,absence_verified,payment_evidence_issue,reconciliation_state,status:remaining_cents===0?'paid':i.paid_cents>0?'partial':!absence_verified?'unreconciled':is_overdue?'overdue':'unpaid'};
+    return {...projection,remaining_cents,is_overdue,absence_verified,payment_evidence_issue,reconciliation_state,status:remaining_cents===0?'paid':i.paid_cents>0?'partial':!absence_verified?'unreconciled':is_overdue?'overdue':'unpaid'};
   });
 }
 export function listTransactions(db) {
@@ -220,7 +259,7 @@ export function paymentSign(invoice){return (invoice.direction==='customer'?1:-1
 function normalized(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]/gu,'');}
 /** Föreslår fakturamatchningar när betalningsriktning, referens eller betalare och belopp uppfyller reglerna; förslag är inte bekräftade betalningar. */
 export function matchingSuggestions(db){
-  const invoices=listInvoices(db).filter(i=>i.remaining_cents>0),out=[];
+  const allInvoices=listInvoices(db),invoices=allInvoices.filter(i=>i.remaining_cents>0),out=[];
   for(const t of listTransactions(db)){
     if(t.excluded||t.is_aggregate||t.available_cents<=0)continue;
     const ref=normalized(t.reference),party=normalized(t.payer);
@@ -228,10 +267,11 @@ export function matchingSuggestions(db){
       if(hasBankEvidenceConflict(t)||bankFinancialReview(t)&&(i.kind!=='credit'||bankFinancialReview(t).kind==='reversal'))continue;
       if(Math.sign(t.amount_cents)!==paymentSign(i)||i.currency!==t.currency)continue;
       if(i.issued_at&&t.booked_at<i.issued_at)continue;
-      const exactReference=!!ref&&[i.reference,i.invoice_number].some(r=>normalized(r)&&normalized(r)===ref);
+      if(invoiceReferenceMatchIssue(i,t,allInvoices))continue;
+      const exactReference=i.referencePolicy.applies?matchingReferenceValues(t.reference_evidence,t.reference).some(value=>matchesInvoiceReference(i.referencePolicy,value)):!!ref&&[i.reference,i.invoice_number].some(r=>normalized(r)&&normalized(r)===ref);
       const sameParty=!!party&&party===normalized(i.party),sameAmount=t.available_cents===i.remaining_cents;
       if(!exactReference&&!(sameParty&&sameAmount))continue;
-      out.push({transaction_id:t.id,invoice_id:i.id,confidence:exactReference?'high':'medium',reason:exactReference?'Exakt OCR eller fakturareferens':'Samma belopp och betalare – kontrollera referensen',amount_cents:Math.min(t.available_cents,i.remaining_cents)});
+      out.push({transaction_id:t.id,invoice_id:i.id,confidence:exactReference?'high':'medium',reason:exactReference?i.referencePolicy.applies?'Exakt avsedd betalningsreferens':'Exakt OCR eller fakturareferens':'Samma belopp och betalare – kontrollera referensen',amount_cents:Math.min(t.available_cents,i.remaining_cents)});
     }
   }
   return out.sort((a,b)=>(a.confidence==='high'?0:1)-(b.confidence==='high'?0:1));
@@ -454,7 +494,7 @@ export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false
   if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');
   if(!transactionOpen)db.exec('BEGIN IMMEDIATE');
   try {
-    const i=listInvoices(db).find(x=>x.id===invoiceId),t=listTransactions(db).find(x=>x.id===transactionId);
+    const invoices=listInvoices(db),i=invoices.find(x=>x.id===invoiceId),t=listTransactions(db).find(x=>x.id===transactionId);
     if(!i||!t)throw new Error('Faktura eller bankhändelse saknas');
     if(hasBankEvidenceConflict(t))throw new Error(bankEvidenceReviewReason(t));
     if(t.payer_evidence?.conflict)throw new Error('Bankoriginalet innehåller motstridiga organisationsidentifierare. Granska originalet.');
@@ -471,6 +511,8 @@ export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false
     if(i.currency!==t.currency)throw new Error('Valutorna skiljer sig');
     if(amountCents>i.remaining_cents||amountCents>t.available_cents)throw new Error('Beloppet överskrider återstående saldo');
     if(!t.payer&&!t.reference)throw new Error('Betalare/referens saknas. Komplettera bankunderlag före matchning.');
+    const referenceIssue=invoiceReferenceMatchIssue(i,t,invoices);
+    if(referenceIssue)throw Object.assign(new Error(referenceIssue),{status:409,code:'invoice_reference_policy'});
     db.prepare('INSERT INTO allocations(id,invoice_id,transaction_id,amount_cents) VALUES(?,?,?,?)').run(randomUUID(),invoiceId,transactionId,amountCents);
     db.prepare('UPDATE invoices SET reconciled_at=CURRENT_TIMESTAMP WHERE id=?').run(invoiceId);
     if(t.payer)db.prepare('INSERT OR IGNORE INTO payer_links(id,invoice_id,payer,account,evidence,verified_by,party,organization_number) VALUES(?,?,?,?,?,?,?,?)').run(randomUUID(),i.id,t.payer,t.account,`Verifierad betalningskoppling ${transactionId}`,'allocation',i.party,i.organization_number);
@@ -497,7 +539,11 @@ export function deleteAllocation(db,id){
 }
 export const defaultSettings={company_name:'M.George Vitvaror AB',organization_number:'',email:'mg.vitvaror@gmail.com',phone:'',address:'',bankgiro:'',notifications_due:true,notifications_review:true,reminders_enabled:false,sync_interval_minutes:0,gmail_sync_interval_minutes:15,auto_register_known:false};
 export function getSettings(db){return {...defaultSettings,...JSON.parse(db.prepare('SELECT data FROM app_settings WHERE id=1').get().data)};}
-export function saveSettings(db,settings){db.prepare('UPDATE app_settings SET data=? WHERE id=1').run(JSON.stringify(settings));audit(db,'settings_updated',{fields:Object.keys(settings)});return getSettings(db);}
+export function saveSettings(db,settings){
+  const values={...settings};
+  if(Object.hasOwn(values,'invoice_reference_policies'))values.invoice_reference_policies=validateInvoiceReferencePolicies(values.invoice_reference_policies);
+  db.prepare('UPDATE app_settings SET data=? WHERE id=1').run(JSON.stringify(values));audit(db,'settings_updated',{fields:Object.keys(values)});return getSettings(db);
+}
 export function recordImport(db,{source,name='',found=0,imported=0,duplicate=0,review=0,status='completed',error='',content=null,mime_type=''}){
   const id=randomUUID();db.prepare('INSERT INTO import_jobs(id,source,name,found,imported,duplicate,review,status,error,content,mime_type,content_sha256) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').run(id,source,name,found,imported,duplicate,review,status,error,content,mime_type,content===null?'':digest(content));return id;
 }

@@ -6,7 +6,8 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {DatabaseSync} from 'node:sqlite';
-import {emptyState,applyCommand,balance,available,invoiceStatus,paymentInvoiceAssessment} from '../lib/domain.ts';
+import {applyCommand,balance,available,invoiceStatus,paymentInvoiceAssessment} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {economySummary} from '../lib/economy-summary.js';
 
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');

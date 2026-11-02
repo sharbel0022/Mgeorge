@@ -1,8 +1,9 @@
 const paymentSign=i=>(i.direction==='customer'?1:-1)*(i.kind==='credit'?-1:1);
 // Shared conservative rules ported from MG Node main d029679. No I/O.
 import {matchingReferenceValues} from './payment-references.js';
+import {matchesInvoiceReference,strictInvoiceReferenceMatch} from './invoice-reference-policy.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
-export const RECONCILIATION_RULE_VERSION='verified-reference-2026-10-30.3';
+export const RECONCILIATION_RULE_VERSION='invoice-reference-policy-2026-11-02.1';
 // Keep invoice-number punctuation: AB/12 and AB12 are not interchangeable IDs.
 const ref=value=>String(value||'').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g,' ');
 export function exactReference(reference, candidate){
@@ -26,6 +27,12 @@ function samePayer(i,t,links,nameOf){
 }
 /** @param {{invoices:any[],transactions:any[],links?:any[],allocations?:any[]}} data */
 export function analyzeReconciliation({invoices,transactions,links=[],allocations=[]}){
+  const referenceMatch=(i,value,ownership=false)=>{
+    const policy=i.referencePolicy;
+    if(!policy?.applies)return [i.reference,i.invoice_number].some(candidate=>exactReference(value,candidate));
+    if(ownership)return [policy.intendedPaymentReference,i.invoice_number,i.reference,...(i.referencePolicyIdentifiers||[])].some(candidate=>strictInvoiceReferenceMatch(value,candidate));
+    return matchesInvoiceReference(policy,value);
+  };
   // Repeated invoice/link comparisons share normalization only for this call.
   // A later analysis must read changed names and relations afresh.
   const namesByValue=new Map(),nameOf=value=>{const raw=String(value||'');let name=namesByValue.get(raw);if(name===undefined){name=normalizeName(raw);namesByValue.set(raw,name);}return name;};
@@ -41,7 +48,7 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     if((t.evidence_conflict||t.original_issue)&&!t.excluded){
       const linked=allocations.filter(a=>a.transaction_id===t.id).map(a=>a.invoice_id);
       const references=matchingReferenceValues(t.reference_evidence,t.reference);
-      const candidates=invoices.filter(i=>[i.reference,i.invoice_number].some(value=>references.some(reference=>exactReference(reference,value)))).map(i=>i.id);
+      const candidates=invoices.filter(i=>references.some(reference=>referenceMatch(i,reference,true))).map(i=>i.id);
       const ids=[...new Set(linked.length?linked:candidates)];
       for(const id of ids.length?ids:[''])out.push({transaction_id:t.id,invoice_id:id,kind:t.evidence_conflict?'bank_evidence_conflict':'bank_original_review',safe:false,score:100,amount_cents:Math.max(0,t.available_cents||0),reason:t.review_reason||'Bankunderlagen för samma bank-ID är motstridiga och behöver granskas.'});
       continue;
@@ -52,26 +59,28 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     const reference=ref(t.reference);
     // Manual verification is separate evidence; preserved bank candidates still remain visible.
     const evidence=t.reference_evidence;
-    const references=matchingReferenceValues(evidence,t.reference);
+    const scoped=invoices.some(i=>i.referencePolicy?.applies&&(i.referencePolicyDirection||i.direction)===direction);
+    const references=[...new Set([...matchingReferenceValues(evidence,t.reference),...(scoped?t.reference_policy_values||[]:[])])];
     const ownBankgiros=invoices.filter(i=>i.direction==='customer').map(i=>String(i.bankgiro||'').replace(/[\s-]/g,'')).filter(Boolean);
     const ownBankgiro=references.some(r=>ownBankgiros.includes(String(r).replace(/[\s-]/g,'')));
-    const invalidReference=ownBankgiro||!!evidence?.incomplete||!!evidence?.candidates?.some(c=>c.validity==='checksum_invalid');
+    const invalidReference=ownBankgiro||!!evidence?.incomplete||!!evidence?.candidates?.some(c=>c.validity==='checksum_invalid')||scoped&&!!t.reference_policy_invalid;
     // Include closed invoices: a mistyped OCR may belong to an already paid invoice.
-    const owners=references.length?invoices.filter(i=>[i.reference,i.invoice_number].some(x=>references.some(r=>exactReference(r,x)))):[];
+    const owners=references.length?invoices.filter(i=>(!scoped||(i.referencePolicyDirection||i.direction)===direction)&&references.some(r=>referenceMatch(i,r,true))):[];
     const dateOK=i=>!i.issued_at||t.booked_at>=i.issued_at;
     const eligible=invoices.filter(i=>i.direction===direction&&i.kind!=='credit'&&i.currency===t.currency&&paymentSign(i)===Math.sign(t.amount_cents)&&dateOK(i));
     const payerLinks=linksByAccount.get(t.account)?.get(nameOf(t.payer))||[];
     const names=eligible.filter(i=>samePayer(i,t,payerLinks,nameOf)),namedInvoices=new Set(names);
     const tokens=String(t.reference||'').split(/[\s,;+/]+/).map(ref).filter(Boolean);
-    const grouped=names.filter(i=>i.remaining_cents>0&&tokens.some(r=>[i.reference,i.invoice_number].some(x=>ref(x)===r)));
+    const grouped=names.filter(i=>i.remaining_cents>0&&tokens.some(r=>referenceMatch(i,r)));
     if(owners.length===0&&grouped.length>1&&grouped.reduce((s,i)=>s+i.remaining_cents,0)===t.available_cents){
       for(const i of grouped)out.push({transaction_id:t.id,invoice_id:i.id,kind:'multiple_invoices',safe:false,score:85,amount_cents:i.remaining_cents,reason:'En överföring hänvisar till flera fakturor. Bekräfta fördelningen manuellt.'});
       continue;
     }
     for(const i of eligible){
-      const exact=owners.some(x=>x.id===i.id),payer=namedInvoices.has(i);
+      const exact=owners.some(x=>x.id===i.id)&&(!i.referencePolicy?.applies||references.some(r=>referenceMatch(i,r))),payer=namedInvoices.has(i);
       if(!exact&&!payer&&t.available_cents!==i.remaining_cents)continue; // Amount alone may be shown, but never accepted.
-      const conflict=invalidReference||references.some(r=>!([i.reference,i.invoice_number].some(x=>exactReference(r,x))))&&references.length>1||reference&&owners.some(x=>x.id!==i.id);
+      const policyConflict=i.referencePolicy?.applies&&i.referencePolicy.status==='BLOCKED';
+      const conflict=policyConflict||invalidReference||references.some(r=>!referenceMatch(i,r))&&references.length>1||reference&&owners.some(x=>x.id!==i.id);
       const duplicateEvidence=transactions.some(x=>x.id!==t.id&&!x.excluded&&!x.is_aggregate&&x.amount_cents===t.amount_cents&&x.currency===t.currency&&x.booked_at===t.booked_at&&(x.bank_reference&&x.bank_reference===t.bank_reference||x.account!==t.account&&ref(x.reference)===reference&&normalizeName(x.payer)===normalizeName(t.payer)));
       const incomplete=t.parent_bank_reference&&transactions.some(x=>x.account===t.account&&x.bank_reference===t.parent_bank_reference&&x.is_aggregate&&!x.excluded);
       const ambiguous=owners.length>1||names.filter(x=>x.remaining_cents>0).length>1&&!exact||exact&&t.available_cents!==i.remaining_cents&&names.some(x=>x.id!==i.id&&x.remaining_cents===t.available_cents);

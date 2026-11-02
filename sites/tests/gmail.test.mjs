@@ -577,6 +577,23 @@ test('manual registration during a local lease makes a delayed result harmless',
   assert.equal((await f.worker('complete',{id:'image',lease:one.job.lease,sha256:f.sha,text:syntheticText(),method:'ocr',confidence:99})).status,409);assert.equal(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload).invoices.length,1);
 });
 
+test('invoice reference policy preserves the original declaration when a review changes editable fields',async t=>{
+  const f=await processingFixture(t);f.doc('policy-original','application/pdf',{direction:'customer',direction_confident:true,from:'company@example.test',to:'customer@example.test',subject:'Synthetic own invoice'});
+  const extraction={fields:{invoice_number:{value:'0599'},reference:{value:'0600'}},details:{supplier:{name:'M.George Vitvaror AB'}}};
+  f.sql.prepare('UPDATE gmail_sources SET extraction=? WHERE document_id=?').run(JSON.stringify(extraction),'policy-original');
+  const invoice={direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'0599',total:312500,issued:'2026-10-24',due:'2026-11-07',kind:'invoice'};
+  const fields={currency:'SEK',organization_number:'5560160680',vat_cents:62500,net_cents:250000};
+  await assert.rejects(f.processing.registerProcessedInvoice(f.owner,'policy-original',invoice,fields,{automatic:true,sha256:f.sha}),/referens/i);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+  await f.processing.registerProcessedInvoice(f.owner,'policy-original',invoice,fields);
+  const state=JSON.parse(f.sql.prepare('SELECT payload FROM workspaces').get().payload),saved=state.invoices[0];
+  assert.equal(saved.number,'0599');assert.equal(saved.ocr,'0599');
+  assert.deepEqual(saved.referenceOriginal,{invoice_number:'0599',reference:'0600',issuer_name:'M.George Vitvaror AB'});
+  assert.equal(domain.invoiceReferenceDecision(state,saved).status,'BLOCKED');
+  assert.equal(domain.balance(state,saved),312500);assert.equal(state.allocations.length,0);
+  assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,JSON.stringify(extraction));
+});
+
 for(const missing of [true,false])test('reviewed invoice registration requires the retained original to be '+(missing?'available':'unchanged'),async t=>{
   const f=await processingFixture(t);f.doc();
   if(missing)f.env.BUCKET.get=async()=>null;

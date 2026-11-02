@@ -68,9 +68,10 @@ function manualInvoiceInterpretation(text:string,context:InvoiceTextContext={}){
  const warnings=[...extraction.issues];
  if(kind==='credit')warnings.push('Kreditfakturan behöver hanteras i kreditflödet. Ingen ny fakturaskuld föreslås.');
  if(kind==='receipt')warnings.push('Underlaget är ett kvitto. Kontrollera betalningen innan en fakturaskuld registreras.');
- return {extraction,warnings,fields:{number:string('invoice_number'),total,issued:string('issued_at'),due:string('due_at'),ocr:string('reference'),bankgiro:string('bankgiro'),reviewed:false,note:'',foreignCurrency}};
+ const referenceOriginal=Object.fromEntries([['invoice_number',value('invoice_number')],['reference',value('reference')],['issuer_name',extraction.details?.supplier?.name]].filter(([,value])=>typeof value==='string'&&!!value));
+ return {extraction,warnings,fields:{number:string('invoice_number'),total,issued:string('issued_at'),due:string('due_at'),ocr:string('reference'),referenceOriginal,bankgiro:string('bankgiro'),reviewed:false,note:'',foreignCurrency}};
 }
-export function extractInvoiceText(text:string){return manualInvoiceInterpretation(text).fields;}
+export function extractInvoiceText(text:string,original?:ReturnType<typeof manualInvoiceInterpretation>['fields']['referenceOriginal']){const fields=manualInvoiceInterpretation(text).fields;return {...fields,referenceOriginal:original??fields.referenceOriginal};}
 export async function readInvoiceFile(file:File,ownEmail:string){
  const ext=file.name.split('.').pop()?.toLowerCase();let text='',direction='payable',warning='',source=file.name,ocr=false,confidence=0,filename=file.name,subject='';
  if(ext==='pdf'){const result=await pdfInvoiceText(await file.arrayBuffer());text=result.text;ocr=result.ocr;confidence=result.confidence;if(!text.trim())warning='PDF-filen verkar vara skannad. Fyll i uppgifterna manuellt från originalet.';}

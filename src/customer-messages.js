@@ -3,12 +3,15 @@ import {listInvoices,listTransactions,audit,today} from './db.js';
 import {digest} from './security.js';
 import {reconciliationData} from './reconciliation.js';
 import {invoiceAbsenceVerified} from './bank-evidence.js';
+import {strictInvoiceReferenceMatch} from './invoice-reference-policy.js';
 
 const fail=(message,status=409)=>Object.assign(new Error(message),{status});
 const paymentAssertions=new Set(['partial','possible_vat','overpayment']);
+const blockedReference=invoice=>invoice.referencePolicy?.applies&&invoice.referencePolicy.status==='BLOCKED';
 function messageEvidenceIssue(evidence,message){
   const invoice=evidence.invoices.find(i=>i.id===message.invoice_id);
   if(!invoice)return 'Fakturan saknas.';
+  if(blockedReference(invoice)&&message.kind!=='confirmation')return invoice.referencePolicy.reason;
   if(paymentAssertions.has(message.kind)&&invoice.payment_evidence_issue)return invoice.payment_evidence_issue;
   if(message.kind==='overdue'&&!invoiceAbsenceVerified(invoice))return 'Utebliven betalning är inte verifierad mot aktuella bankunderlag.';
   return '';
@@ -32,10 +35,12 @@ export function paymentSnapshot(db,id){
 }
 const money=c=>new Intl.NumberFormat('sv-SE',{style:'currency',currency:'SEK'}).format(c/100);
 export function generateMessage(i,kind){
+  if(blockedReference(i)&&kind!=='confirmation')throw fail(i.referencePolicy.reason);
   if(paymentAssertions.has(kind)&&i.payment_evidence_issue)throw fail(i.payment_evidence_issue);
   const intro=`Hej ${i.party},\n\nVi kontaktar er angående faktura ${i.invoice_number} på ${money(i.total_cents)}.`,paid=`Vi har verifierat betalningar på ${money(i.paid_cents)}. Återstående saldo är ${money(i.remaining_cents)}.`;
   const text={partial:`${paid} Vänligen kontrollera resterande belopp och återkom om ni har frågor.`,possible_vat:`${paid} Skillnaden motsvarar fakturans momsbelopp på ${money(i.vat_cents)}. Kan betalningen ha avsett beloppet exklusive moms? Hjälp oss gärna att kontrollera detta.`,missing_reference:'Betalningsunderlaget saknar fakturareferens. Kan ni bekräfta betalningsdatum, belopp och vilken faktura betalningen avser? Betalningen är ännu inte säkert kopplad.',wrong_reference:'Betalningsreferensen behöver kontrolleras. Kan ni bekräfta vilken faktura betalningen avser och ange korrekt fakturanummer?',overdue:`${paid} Förfallodatum var ${i.due_at}. Våra betalningsunderlag har kontrollerats. Vänligen kontrollera betalningen och återkom med betalningsbekräftelse om beloppet redan har betalats.`,overpayment:'En verifierad betalning överstiger det belopp som fördelats till fakturan. Kan ni hjälpa oss att kontrollera vad det överskjutande beloppet avser?',possible_duplicate:'Vi har hittat betalningsunderlag som kan avse ytterligare en betalning för fakturan. Vi behöver er hjälp att kontrollera detta innan vi drar någon slutsats.',confirmation:'Vi behöver hjälp att stämma av betalningsunderlaget. Kan ni skicka betalningsdatum, belopp och betalningsreferens? Vi har ännu inte kunnat fastställa betalningsstatus.'}[kind];
-  const referenceNote=kind==='wrong_reference'&&i.payment_references?.length?`\n\nReferenser i underlaget: ${i.payment_references.join(', ')}. Fakturans referens: ${i.reference||i.invoice_number}.`:'';
+  const intendedReference=i.referencePolicy?.applies?i.intendedPaymentReference||'kräver granskning':i.reference||i.invoice_number;
+  const referenceNote=kind==='wrong_reference'&&i.payment_references?.length?`\n\nReferenser i underlaget: ${i.payment_references.join(', ')}. Fakturans referens: ${intendedReference}.`:'';
   return {subject:`Avstämning av faktura ${i.invoice_number}`.replace(/[\r\n\0]/g,' '),body:`${intro}\n\n${text}${referenceNote}\n\nTack för hjälpen!\nM.George Vitvaror AB`};
 }
 export function prepareMessages(db){
@@ -52,11 +57,12 @@ export function prepareMessages(db){
     if(findings.some(f=>['reference_conflict','wrong_reference'].includes(f.kind)))kinds.add('wrong_reference');
     const identity=value=>String(value||'').replace(/[^\p{L}\p{N}]/gu,'').toLowerCase();
     if(findings.some(f=>f.kind==='missing_reference'))kinds.add('missing_reference');
-    const allocatedReferences=db.prepare('SELECT t.reference FROM bank_transactions t JOIN allocations a ON a.transaction_id=t.id WHERE a.invoice_id=?').all(i.id).filter(t=>t.reference&&![i.reference,i.invoice_number].some(r=>identity(r)===identity(t.reference))).map(t=>t.reference);
+    const allocatedReferences=db.prepare('SELECT t.reference FROM bank_transactions t JOIN allocations a ON a.transaction_id=t.id WHERE a.invoice_id=?').all(i.id).filter(t=>t.reference&&!(i.referencePolicy?.applies?strictInvoiceReferenceMatch(i.intendedPaymentReference,t.reference):[i.reference,i.invoice_number].some(r=>identity(r)===identity(t.reference)))).map(t=>t.reference);
     if(allocatedReferences.length)kinds.add('wrong_reference');
     if(findings.some(f=>f.kind==='possible_duplicate'))kinds.add('possible_duplicate');
     const excess=db.prepare('SELECT t.amount_cents,(SELECT COALESCE(SUM(amount_cents),0) FROM allocations WHERE transaction_id=t.id) AS used FROM bank_transactions t JOIN allocations a ON a.transaction_id=t.id WHERE a.invoice_id=? AND t.excluded=0 AND t.is_aggregate=0').all(i.id).filter(t=>t.amount_cents>t.used);
     if(i.remaining_cents===0&&excess.length&&!i.payment_evidence_issue)kinds.add('overpayment');
+    if(blockedReference(i)){kinds.clear();kinds.add('confirmation');}
     const storedContact=db.prepare('SELECT * FROM verified_contacts WHERE invoice_id=?').get(i.id),contact=storedContact?.identity===contactIdentity(i)?storedContact:null,snapshot=paymentSnapshot(db,i.id);
     for(const kind of kinds){
       if(db.prepare("SELECT id FROM customer_messages WHERE invoice_id=? AND kind=? AND status IN ('sending','sent','unknown') LIMIT 1").get(i.id,kind))continue;

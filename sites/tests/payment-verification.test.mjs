@@ -31,6 +31,22 @@ const step=(report,id)=>report.steps.find(s=>s.id===id);
 
 test('read-only payment verification exposes an implemented explanation projection',()=>assert.equal(typeof api.buildPaymentVerification,'function'));
 
+test('invoice policy intention is visible separately from actual formal bank OCR',()=>{
+ const state=fixture(),report=build(state,state.transactions[0].id);
+ assert.equal(step(report,'invoice').facts.find(f=>f.label==='Avsedd betalningsreferens')?.value,'0599');
+ assert.equal(step(report,'reference').facts.find(f=>f.label==='Formell bank-OCR')?.value,'Saknas');
+});
+
+test('a historical allocation with no bank reference does not verify a conflicting invoice original',()=>{
+ const state=fixture({reference:''}),invoice=state.invoices[0],transaction=state.transactions[0];
+ invoice.referenceOriginal={invoice_number:'0599',reference:'0600'};
+ state.allocations.push({id:'synthetic-historical-policy-allocation',invoiceId:invoice.id,transactionId:transaction.id,amount:62500,effect:'payment',active:true,note:'Synthetic historical snapshot',createdAt:'2026-10-26'});
+ const before=structuredClone(state),report=build(state,transaction.id);
+ assert.equal(step(report,'invoice').status,'blocked');
+ assert.equal(step(report,'reconciliation').status,'blocked');
+ assert.equal(report.automaticEligible,false);assert.deepEqual(state,before);
+});
+
 test('eleven explainable stages keep source, rule, reason, timestamp and next action without changing input',{skip:!implemented},()=>{
  const state=fixture(),before=structuredClone(state),report=build(state,state.transactions[0].id);
  assert.equal(report.mode,'preview');assert.equal(report.changed,false);assert.equal(report.steps.length,11);

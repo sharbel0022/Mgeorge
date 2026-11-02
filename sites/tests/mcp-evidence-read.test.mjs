@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync,readdirSync,existsSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {emptyState,applyCommand} from '../lib/domain.ts';
+import {applyCommand} from '../lib/domain.ts';
+import {MGEORGE_INVOICE_REFERENCE_POLICY} from '../lib/invoice-reference-policy.js';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {syntheticConnection} from './helpers/bank-account-fixture.mjs';
 
@@ -39,11 +41,94 @@ async function fixture(t){
  const candidates=compiled('../lib/banking/invoice-candidates.ts',{'../domain':domain,'../reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href,'../payment-presentation':presentation});
  const detail=compiled('../lib/banking/detail-evidence.ts',{'../domain':domain,'../payment-references.js':url('../lib/payment-references.js'),'../payer-evidence.js':url('../lib/payer-evidence.js')});
  const verification=compiled('../lib/payment-verification.ts',{'./account-evidence-presentation':compiled('../lib/account-evidence-presentation.ts',{'./domain':domain}),'cloudflare:workers':data(`export const env=${ref}.env;`),'./server':server,'./domain':domain,'./payment-presentation':presentation,'./bank-api-original.js':url('../lib/bank-api-original.js'),'./reconciliation-engine.js':engine,'./payment-references.js':url('../lib/payment-references.js'),'./banking/invoice-candidates':candidates,'./banking/detail-evidence':detail,'./reconciliation-evidence':evidence,'./bankgiro-service':bankgiro});
- const reader=existsSync(new URL('../lib/evidence-read.ts',import.meta.url))?compiled('../lib/evidence-read.ts',{'./server':server,'./domain':domain,'./payment-presentation':presentation,'./payment-verification':verification,'./bankgiro-service':bankgiro,'./reconciliation-engine.js':engine,'./payment-references.js':url('../lib/payment-references.js'),'./banking/invoice-candidates':candidates}):data('export function readPaymentEvidence(){throw Error("Reader not implemented")}');
+ const reader=existsSync(new URL('../lib/evidence-read.ts',import.meta.url))?compiled('../lib/evidence-read.ts',{'./server':server,'./domain':domain,'./payment-presentation':presentation,'./payment-verification':verification,'./bankgiro-service':bankgiro,'./reconciliation-engine.js':engine,'./payment-references.js':url('../lib/payment-references.js'),'./invoice-reference-policy.js':url('../lib/invoice-reference-policy.js'),'./banking/invoice-candidates':candidates}):data('export function readPaymentEvidence(){throw Error("Reader not implemented")}');
  const rpc=compiled('../lib/banking/mcp.ts',{'./service':data(`export {failure as bankFailure} from ${JSON.stringify(server)};export function automaticSync(){throw Error('No sync')}export function automaticSyncStatus(){throw Error('No sync')}`),'../evidence-read':reader});
  f.route=await import(compiled('../app/mcp/route.ts',{'@/lib/banking/mcp':rpc}));
  f.call=async(name,args={},requestOptions={})=>{const r=await f.route.POST(new Request(origin+'/mcp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name,arguments:args}}),...requestOptions}));const raw=await r.text();let body;try{body=JSON.parse(raw);}catch{body={raw};}return{r,body,out:body.result?.structuredContent};};return f;
 }
+
+function ownReferenceReadState(f,{number='0599',reference='',bankReference=number,companyName='M.George Vitvaror AB',direction='receivable'}={}){
+ const state={...f.state,company:{...f.state.company,name:companyName},transactions:[],allocations:[],imports:[],invoices:[{...f.state.invoices[0],number,ocr:reference,direction}]};
+ f.state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount:direction==='payable'?-62500:62500,account:iban,party:'Synthetic customer AB',payerReference:bankReference,bankReference:'SYNTHETIC-POLICY-READ'})]}).state;
+ f.save();
+}
+
+for(const number of ['0001','0599'])test('invoice reference policy read: exact intended reference is projected as review intention: '+number,async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{number});const before=f.snapshot(),{out,body}=await f.call('payment_evidence',{reference:number});assert.ok(out,JSON.stringify(body));
+ assert.equal(out.exactReferenceCount,1);assert.equal(out.registry.matchCount,1);const invoice=out.registry.invoices[0];
+ assert.equal(invoice.number,number);assert.equal(invoice.ocr,'');assert.equal(invoice.intendedPaymentReference,number);assert.equal(invoice.referencePolicy.applies,true);assert.equal(invoice.referencePolicy.status,'REVIEW');
+ assert.equal(out.payments[0].registry.matchCount,1);assert.equal(out.payments[0].reference.value,number);assert.equal(out.payments[0].selectionIsProof,false);assert.equal(out.changed,false);assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read: separators, omitted zeros and prefixes cannot be repaired into an exact match',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f);const before=f.snapshot();
+ for(const reference of ['05-99','599','0599x','X0599','0599.0','０５９９']){
+  const {out,body}=await f.call('payment_evidence',{reference});assert.ok(out,JSON.stringify(body));
+  assert.equal(out.exactReferenceCount,0,reference);assert.equal(out.registry.matchCount,0,reference);assert.equal(out.total,0,reference);
+ }
+ assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read: a different complete bank identifier never becomes an exact invoice match',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{bankReference:'05-99'});const before=f.snapshot(),query=await f.call('payment_evidence',{reference:'0599'});
+ assert.equal(query.out.registry.matchCount,1);assert.equal(query.out.exactReferenceCount,0);assert.equal(query.out.total,0);
+ const {out,body}=await f.call('payment_evidence',{transactionId:f.state.transactions[0].id});assert.ok(out,JSON.stringify(body));
+ assert.equal(out.payments[0].reference.value,'05-99');assert.equal(out.payments[0].registry.matchCount,0);assert.equal(out.payments[0].selectionIsProof,false);assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read: workspace scope stays strict when the invoice register is empty',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f);f.state.invoices=[];f.save();const before=f.snapshot();
+ const {out,body}=await f.call('payment_evidence',{reference:'05-99'});assert.ok(out,JSON.stringify(body));assert.equal(out.total,0);assert.equal(out.exactReferenceCount,0);assert.equal(out.registry.matchCount,0);assert.equal(f.snapshot(),before);
+});
+
+for(const [number,reference]of [['0600','0599'],['0599','000018']])test('invoice reference policy read: blocked invoice is not projected as an exact registered match: '+number+' / '+reference,async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{number,reference,bankReference:'0599'});const before=f.snapshot(),{out,body}=await f.call('payment_evidence',{reference:'0599'});assert.ok(out,JSON.stringify(body));
+ assert.equal(out.exactReferenceCount,1,'The exact preserved bank value remains searchable');assert.equal(out.registry.matchCount,0);assert.equal(out.payments[0].registry.matchCount,0);
+ assert.equal(out.payments[0].referenceSearch.conflicting,true);assert.equal(out.ambiguous,true);assert.equal(out.payments[0].selectionIsProof,false);assert.equal(out.payments[0].verification.automaticEligible,false);assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read: booked conflicting invoice exposes intended and raw references without changing history',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{reference:'000018'});
+ f.state.allocations.push({id:'synthetic-policy-booking',invoiceId:f.state.invoices[0].id,transactionId:f.state.transactions[0].id,amount:62500,effect:'payment',active:true,note:'Synthetic historical decision',createdAt:'2026-10-27T00:00:00Z'});f.save();
+ const before=f.snapshot(),{out,body}=await f.call('payment_evidence',{transactionId:f.state.transactions[0].id});assert.ok(out,JSON.stringify(body));const payment=out.payments[0],invoice=payment.bookedInvoices[0];
+ assert.equal(invoice.number,'0599');assert.equal(invoice.ocr,'000018');assert.equal(invoice.intendedPaymentReference,'0599');assert.equal(invoice.referencePolicy.status,'BLOCKED');assert.equal(invoice.remainingCents,0);
+ assert.equal(payment.registry.matchCount,0);assert.equal(payment.verification.automaticEligible,false);assert.equal(out.changed,false);assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read: generic-company reference comparison and explicit OCR remain unchanged',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{companyName:'Synthetic Reference Issuer AB',reference:'000018',bankReference:'05-99'});const before=f.snapshot(),{out,body}=await f.call('payment_evidence',{reference:'0599'});assert.ok(out,JSON.stringify(body));
+ assert.equal(out.exactReferenceCount,1);assert.equal(out.registry.matchCount,1);assert.equal(out.registry.invoices[0].referencePolicy.applies,false);assert.equal(out.registry.invoices[0].intendedPaymentReference,'000018');assert.equal(out.payments[0].reference.value,'05-99');assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read: supplier invoices keep their separate explicit reference',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{direction:'payable',reference:'000018',bankReference:'000018'});const before=f.snapshot(),{out,body}=await f.call('payment_evidence',{reference:'000018'});assert.ok(out,JSON.stringify(body));
+ assert.equal(out.registry.matchCount,1);assert.equal(out.registry.invoices[0].direction,'payable');assert.equal(out.registry.invoices[0].referencePolicy.applies,false);assert.equal(out.registry.invoices[0].intendedPaymentReference,'000018');assert.equal(out.payments[0].reference.value,'000018');assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read review: outgoing supplier payments retain the legacy reference comparison',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{number:'S-0001',direction:'payable',reference:'0599',bankReference:'0599'});const before=f.snapshot(),{out,body}=await f.call('payment_evidence',{reference:'05-99'});assert.ok(out,JSON.stringify(body));
+ assert.equal(out.exactReferenceCount,1);assert.equal(out.total,1);assert.equal(out.registry.matchCount,1);
+ assert.equal(out.registry.invoices[0].referencePolicy.applies,false);assert.equal(out.registry.invoices[0].intendedPaymentReference,'0599');
+ assert.equal(out.payments[0].amountCents,-62500);assert.equal(out.payments[0].reference.value,'0599');assert.deepEqual(out.payments[0].referenceSearch.matchedValues,['0599']);
+ assert.equal(out.payments[0].selectionIsProof,false);assert.equal(out.changed,false);assert.equal(f.snapshot(),before);
+});
+
+test('invoice reference policy read review: all scoped identifiers reserve ownership in the payment direction',async t=>{
+ const f=await fixture(t);ownReferenceReadState(f,{number:'0001',reference:'0599',bankReference:'0599'});
+ f.state.company.invoiceReferencePolicies=[{...MGEORGE_INVOICE_REFERENCE_POLICY,referenceSource:'explicit_reference'}];
+ f.state=applyCommand(f.state,{type:'invoice.save',invoice:{direction:'receivable',number:'0599',ocr:'0600',party:'Other synthetic customer AB',total:62500,issued:'2026-10-01',due:'2026-11-01',reviewed:true}}).state;
+ for(const scenario of [
+  {companyName:'M.George Vitvaror AB',direction:'receivable',conflicting:true},
+  {companyName:'M.George Vitvaror AB',direction:'payable',conflicting:false},
+  {companyName:'Synthetic Reference Issuer AB',direction:'payable',conflicting:true}
+ ]){
+  f.state.company.name=scenario.companyName;f.state.invoices[1].direction=scenario.direction;f.save();
+  const before=f.snapshot(),{out,body}=await f.call('payment_evidence',{reference:'0599'});assert.ok(out,JSON.stringify(body));
+  assert.equal(out.exactReferenceCount,1);assert.equal(out.payments[0].referenceSearch.conflicting,scenario.conflicting,JSON.stringify(scenario));
+  if(scenario.conflicting){assert.equal(out.ambiguous,true);assert.equal(out.payments[0].verification.automaticEligible,false);}
+  assert.equal(out.payments[0].reference.value,'0599');assert.equal(out.payments[0].selectionIsProof,false);assert.equal(out.changed,false);assert.equal(f.snapshot(),before);
+ }
+});
 
 test('owner MCP payment reader exposes existing verifier without writes or account resources',async t=>{const f=await fixture(t),before=f.snapshot(),{out,body}=await f.call('payment_evidence',{transactionId:f.state.transactions[0].id});assert.ok(out,JSON.stringify(body));assert.equal(out.changed,false);assert.equal(out.scope.email,'owner@example.test');assert.equal(out.revision,7);assert.equal(out.payments[0].verification.steps.length,11);assert.equal(out.payments[0].registry.matchCount,1);assert.equal(out.payments[0].verification.steps.find(s=>s.id==='original').status,'passed');assert.doesNotMatch(JSON.stringify(out),new RegExp(iban+'|synthetic-session-resource|encrypted_accounts'));assert.equal(f.snapshot(),before);});
 test('exact-reference ambiguity survives amount/date selectors and includes missing-reference AIS candidates',async t=>{const f=await fixture(t),before=f.snapshot(),query={reference:'000018',amountCents:62500,date:'2026-10-26',limit:1},{out,body}=await f.call('payment_evidence',query);assert.ok(out,JSON.stringify(body));assert.equal(out.exactReferenceCount,2);assert.equal(out.ambiguous,true);assert.equal(out.total,3);assert.equal(out.registry.matchCount,1);const page=await f.call('payment_evidence',{...query,offset:2});assert.equal(page.out.payments[0].transactionId,f.state.transactions[2].id);assert.equal(page.out.payments[0].selection,'amount_date_candidate');assert.equal(page.out.payments[0].selectionIsProof,false);assert.equal(page.out.payments[0].reference.value,'');assert.equal(page.out.changed,false);assert.equal(f.snapshot(),before);});

@@ -1,5 +1,5 @@
 import {db,identity,readWorkspace,response} from './server';
-import {uid,now,today,applyCommand,balance,hasValidAbsenceCheck,invoicePaymentEvidenceIssue,paymentEvidenceIssue,type State} from './domain';
+import {uid,now,today,applyCommand,balance,hasValidAbsenceCheck,invoicePaymentEvidenceIssue,paymentEvidenceIssue,invoiceReferenceDecision,invoiceReferenceMatches,type State} from './domain';
 import {analyze,invoiceFacts,contactIdentity} from './reconciliation';
 import {reconcileWithOriginals,writePaymentState} from './reconciliation-evidence';
 import {generateMessage,validRecipient} from './customer-message-text.js';
@@ -18,6 +18,8 @@ async function contactFor(owner:string,id:string){return db().prepare('SELECT * 
 async function getMessage(owner:string,id:string){const m=await db().prepare('SELECT * FROM customer_messages WHERE owner=? AND id=?').bind(owner,id).first<Row>();if(!m)throw error('Meddelandet saknas.',404);return m;}
 function validMessageEvidence(state:State,m:Row){
  const invoice=state.invoices.find(i=>i.id===m.invoice_id);if(!invoice)return false;
+ const referencePolicy=invoiceReferenceDecision(state,invoice);
+ if(referencePolicy.applies&&referencePolicy.status==='BLOCKED'&&m.kind!=='confirmation')return false;
  if(['partial','possible_vat','overpayment','overdue'].includes(m.kind)&&invoicePaymentEvidenceIssue(state,invoice.id))return false;
  return m.kind!=='overdue'||hasValidAbsenceCheck(state,invoice);
 }
@@ -65,8 +67,8 @@ export async function reconcileAndPrepare(owner:string){
         db().prepare("UPDATE customer_messages SET status='stale',updated_at=? WHERE owner=? AND id=? AND status='draft'").bind(now(),owner,m.id),
       ]);
     }
-    const kinds=new Set<string>(),paymentReferences:string[]=[];
-    if(facts.payment_evidence_issue)kinds.add('confirmation');
+    const kinds=new Set<string>(),paymentReferences:string[]=[],referenceBlocked=facts.referencePolicy.applies&&facts.referencePolicy.status==='BLOCKED';
+    if(referenceBlocked||facts.payment_evidence_issue)kinds.add('confirmation');
     if(facts.paid_cents>0&&facts.remaining_cents>0)kinds.add(i.vat&&i.net!=null&&i.net+i.vat===i.total&&facts.remaining_cents===i.vat&&i.net===facts.paid_cents?'possible_vat':'partial');
     if(!facts.paid_cents&&facts.remaining_cents>0&&i.due&&i.due<today())kinds.add(hasValidAbsenceCheck(workspace.state,i)&&!related.length?'overdue':'confirmation');
     if(related.some(f=>['wrong_reference','reference_conflict'].includes(f.kind)))kinds.add('wrong_reference');
@@ -74,7 +76,7 @@ export async function reconcileAndPrepare(owner:string){
     if(related.some(f=>f.kind==='possible_duplicate'))kinds.add('possible_duplicate');
     for(const a of workspace.state.allocations.filter(a=>a.active&&a.invoiceId===i.id&&a.effect==='payment')){
       const t=workspace.state.transactions.find(t=>t.id===a.transactionId);if(!t)continue;
-      if(t.payerReference&&![i.ocr,i.number].some(r=>r.replace(/\W/g,'')===t.payerReference.replace(/\W/g,'')))paymentReferences.push(t.payerReference);
+      if(!referenceBlocked&&t.payerReference&&!(facts.referencePolicy.applies?invoiceReferenceMatches(workspace.state,i,t.payerReference):[i.ocr,i.number].some(r=>r.replace(/\W/g,'')===t.payerReference.replace(/\W/g,''))))paymentReferences.push(t.payerReference);
       const used=workspace.state.allocations.filter(a=>a.active&&a.transactionId===t.id).reduce((n,a)=>n+a.amount,0);
       if(balance(workspace.state,i)===0&&t.amount>used)kinds.add('overpayment');
     }

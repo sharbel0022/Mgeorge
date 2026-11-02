@@ -39,6 +39,8 @@ test('two real processes import and reconcile one bank payment once, then replay
   const folder=mkdtempSync(join(tmpdir(),'mg-payment-concurrency-')),path=join(folder,'db.sqlite');
   t.after(()=>rmSync(folder,{recursive:true,force:true}));
   const setup=openDatabase(path);
+  // Reopened workers test generic distinct OCR, not the M.George number rule.
+  setup.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
   setup.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('synthetic-invoice','customer','001','Syntetisk Kund AB',10000,'000018','2026-10-01');
   approveSyntheticBankAccount(setup,account);
   setup.close();
@@ -62,6 +64,7 @@ test('abrupt process exit during bank insertion rolls back the entire import and
   const folder=mkdtempSync(join(tmpdir(),'mg-payment-crash-')),path=join(folder,'db.sqlite');
   t.after(()=>rmSync(folder,{recursive:true,force:true}));
   const setup=openDatabase(path),priorOriginal=Buffer.from('Preserved synthetic original');
+  setup.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
   setup.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('synthetic-invoice','customer','001','Syntetisk Kund AB',10000,'000018','2026-10-01');
   approveSyntheticBankAccount(setup,account);
   storeTransactions(setup,[],'file:preserved.csv',{content:priorOriginal,mime_type:'text/csv'});

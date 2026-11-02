@@ -9,6 +9,8 @@ import {withSyntheticBankOriginal,approveSyntheticBankAccount} from './bank-fixt
 
 function fixture(t){
   const folder=mkdtempSync(join(tmpdir(),'mg-payer-atomic-')),db=openDatabase(join(folder,'synthetic.sqlite'));
+  // This fixture tests generic, distinct invoice-number/OCR semantics.
+  db.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
   t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
   approveSyntheticBankAccount(db,'SE4280000890119146168423');
   db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('invoice','customer','SYN-1','Synthetic customer AB',10000,'000018','2026-10-01');
