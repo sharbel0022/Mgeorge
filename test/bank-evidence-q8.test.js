@@ -156,6 +156,8 @@ test('q8: explicit undo survives restart and import replay until a new manual al
 
 test('q8: undoing one part of a payment prevents its remaining allocation from teaching payer identity', t => {
   const {db} = fixture(t);
+  // This generic shared-payment test deliberately allocates one reference to two numbers.
+  db.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
   invoice(db, {total:31250}); invoice(db, {id:'second', number:'0605', total:31250});
   importApi(db, apiOriginal()); const prior = listTransactions(db)[0];
   allocate(db, 'invoice', prior.id, 31250); allocate(db, 'second', prior.id, 31250);

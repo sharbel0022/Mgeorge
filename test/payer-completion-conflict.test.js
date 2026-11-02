@@ -16,6 +16,8 @@ delete process.env.ENCRYPTION_KEY;
 
 function fixture(t,description='Batch'){
  const folder=mkdtempSync(join(tmpdir(),'mg-payer-completion-')),db=openDatabase(join(folder,'synthetic.sqlite'));
+ // Keep this negative case focused on contradictory payer identities.
+ db.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
  t.after(()=>{db.close();rmSync(folder,{recursive:true,force:true});});
  db.prepare('INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status,selected_account_uid) VALUES(?,?,?,?,?,?,?,?,?)').run('synthetic-bank','enablebanking','Synthetic bank',encryptObject({session_id:'synthetic-session'}),encryptObject([{uid:'synthetic-account',account_id:{iban:account},currency:'SEK'}]),'2099-01-01T00:00:00Z','synthetic-owner','connected','synthetic-account');
  db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('invoice','customer','0594','Syntetisk Kund AB',62500,'000018','2026-10-01');

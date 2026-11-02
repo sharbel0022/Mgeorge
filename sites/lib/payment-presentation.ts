@@ -1,4 +1,4 @@
-import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,type State,type Transaction} from './domain';
+import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,invoiceReferenceMatches,invoiceReferenceDecision,type State,type Transaction} from './domain';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
 
@@ -52,7 +52,7 @@ export function bankPaymentFieldSources(state:State,t:Transaction){
  * remain separate historical facts; source selection never rewrites them. */
 export function bankPaymentInvoiceAssessment(state:State,t:Transaction,fields=bankPaymentFieldSources(state,t)){
   const reference=fields.reference.value.value,direction=t.amount>0?'receivable':'payable';
-  const registered=reference?state.invoices.filter(i=>!i.voided&&i.direction===direction&&[i.number,i.ocr].some(value=>value&&exactReference(reference,value))):[];
+  const registered=reference?state.invoices.filter(i=>!i.voided&&i.direction===direction&&invoiceReferenceMatches(state,i,reference)):[];
   const bookedIds=[...new Set(state.allocations.filter(a=>a.active&&a.transactionId===t.id).map(a=>a.invoiceId))],bookedInvoices=bookedIds.flatMap(id=>{const invoice=state.invoices.find(i=>i.id===id);return invoice?[invoice]:[];});
   const allocationConflict=!!reference&&bookedIds.some(id=>!registered.some(invoice=>invoice.id===id));
   const invoice=registered.length===1?registered[0]:!reference&&bookedInvoices.length===1?bookedInvoices[0]:undefined;
@@ -79,8 +79,9 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   const possible=[...new Set([...sourceCandidates.map(c=>c.number),...(assessment.status!=='verified'&&assessment.invoice?[assessment.invoice.number]:[])])];
   const evidence=fieldSources.reference.evidence;
   const references=matchingReferenceValues(evidence,fieldSources.reference.value.value);
-  const owners=new Set(state.invoices.filter(i=>!i.voided&&references.some(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual)))).map(i=>i.id));
-  const contradictory=references.length>1&&!state.invoices.some(i=>references.every(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual))));
+  const direction=t.amount>0?'receivable':'payable',scoped=state.invoices.some(i=>i.direction===direction&&invoiceReferenceDecision(state,i).applies);
+  const owners=new Set(state.invoices.filter(i=>!i.voided&&(!scoped||i.direction===direction)&&references.some(value=>invoiceReferenceMatches(state,i,value,true))).map(i=>i.id));
+  const contradictory=references.length>1&&!state.invoices.some(i=>references.every(value=>invoiceReferenceMatches(state,i,value)));
   const bankConflict=paymentEvidenceConflict(state,t),conflict=bankConflict||!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
   let status='Behöver granskas',verified=false;
   if(t.ignored)status='Undantagen';

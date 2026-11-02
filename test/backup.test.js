@@ -1,8 +1,29 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import fs,{mkdtempSync,mkdirSync,rmSync,readFileSync,writeFileSync,copyFileSync,lstatSync,symlinkSync,readlinkSync,unlinkSync} from 'node:fs';import {syncBuiltinESMExports} from 'node:module';import {join} from 'node:path';import {tmpdir} from 'node:os';import {DatabaseSync} from 'node:sqlite';
-import {openDatabase} from '../src/db.js';import {createBackup,verifyBackup,restoreBackup,dailyBackup} from '../src/backup.js';
+import {openDatabase,saveSettings,getSettings,listInvoices,storeDocument} from '../src/db.js';import {createBackup,verifyBackup,restoreBackup,dailyBackup} from '../src/backup.js';
+import {MGEORGE_INVOICE_REFERENCE_POLICY} from '../src/invoice-reference-policy.js';
 import {createDecipheriv} from 'node:crypto';
 function fixture(t){const folder=mkdtempSync(join(tmpdir(),'mg-backup-test-'));const f={db:join(folder,'db.sqlite'),archive:join(folder,'backup.mgbak'),target:join(folder,'restored.sqlite'),key:'a'.repeat(64),close:()=>{}};t.after(()=>{f.close();rmSync(folder,{recursive:true,force:true});});return f;}
+test('encrypted restore retains configured invoice policy and original reference conflicts without rewriting money',t=>{
+ const f=fixture(t),db=openDatabase(f.db);f.close=()=>db.close();
+ saveSettings(db,{...getSettings(db),invoice_reference_policies:[MGEORGE_INVOICE_REFERENCE_POLICY]});
+ db.prepare("INSERT INTO invoices(id,direction,invoice_number,reference,party,total_cents) VALUES('policy','customer','0001','','Synthetic policy customer AB',62500)").run();
+ const doc=storeDocument(db,{name:'synthetic-reference.txt',mime_type:'text/plain',bytes:Buffer.from('Synthetic original: invoice 0001, declared reference 0599'),invoice_id:'policy'});
+ const extraction=JSON.stringify({fields:{invoice_number:{value:'0001'},reference:{value:'0599'}}});
+ db.prepare('UPDATE documents SET extraction=? WHERE id=?').run(extraction,doc.id);
+ const before=JSON.stringify(db.prepare('SELECT * FROM invoices').all());
+ assert.equal(createBackup(f.db,f.archive,f.key).verified,true);
+ assert.equal(restoreBackup(f.archive,f.target,f.key).restored,true);
+ const restored=openDatabase(f.target);
+ try{
+  assert.deepEqual(getSettings(restored).invoice_reference_policies,[MGEORGE_INVOICE_REFERENCE_POLICY]);
+  const invoice=listInvoices(restored)[0];assert.equal(invoice.invoice_number,'0001');assert.equal(invoice.reference,'');assert.equal(invoice.intendedPaymentReference,'0001');assert.equal(invoice.referencePolicy.status,'BLOCKED');assert.equal(invoice.remaining_cents,62500);
+  assert.equal(restored.prepare('SELECT extraction FROM documents WHERE id=?').get(doc.id).extraction,extraction);
+  assert.equal(restored.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
+  assert.equal(JSON.stringify(restored.prepare('SELECT * FROM invoices').all()),before);
+ }finally{restored.close();}
+ assert.equal(JSON.stringify(db.prepare('SELECT * FROM invoices').all()),before);
+});
 test('encrypted snapshot restores committed WAL data and passes integrity without modifying source',t=>{const f=fixture(t),db=openDatabase(f.db);f.close=()=>db.close();db.prepare("INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES('i','customer','0599','Privat testkund',62500)").run();assert.equal(createBackup(f.db,f.archive,f.key).verified,true);assert.equal(readFileSync(f.archive).includes(Buffer.from('Privat testkund')),false);assert.equal(restoreBackup(f.archive,f.target,f.key).restored,true);const restored=new DatabaseSync(f.target,{readOnly:true});try{assert.equal(restored.prepare('SELECT invoice_number FROM invoices').get().invoice_number,'0599');}finally{restored.close();}assert.throws(()=>restoreBackup(f.archive,f.db,f.key));assert.equal(db.prepare('SELECT COUNT(*) n FROM invoices').get().n,1);});
 test('wrong keys and altered ciphertext fail authentication and cannot produce a restored database',t=>{const f=fixture(t),db=openDatabase(f.db);db.close();createBackup(f.db,f.archive,f.key);assert.throws(()=>verifyBackup(f.archive,'b'.repeat(64)));const content=readFileSync(f.archive);content[40]^=1;writeFileSync(f.archive,content);assert.throws(()=>restoreBackup(f.archive,f.target,f.key));assert.throws(()=>readFileSync(f.target));});
 test('backup requires a dedicated valid key and refuses to overwrite an existing backup',t=>{const f=fixture(t),db=openDatabase(f.db);db.close();assert.throws(()=>createBackup(f.db,f.archive,''));createBackup(f.db,f.archive,f.key);assert.throws(()=>createBackup(f.db,f.archive,f.key));assert.equal(verifyBackup(f.archive,f.key).verified,true);});

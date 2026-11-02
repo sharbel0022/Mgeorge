@@ -1,6 +1,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';import {readFileSync,readdirSync} from 'node:fs';import {createHash} from 'node:crypto';
 import {backupStep,backupStatus,sealBackup,unsealBackup,validateSnapshot,BACKUP_TABLES} from '../lib/backup-engine.ts';
+import {emptyState,applyCommand,invoiceReferenceDecision,balance} from '../lib/domain.ts';
+import {MGEORGE_INVOICE_REFERENCE_POLICY} from '../lib/invoice-reference-policy.js';
 const key='a'.repeat(64),owner='owner-a',date=new Date('2026-10-28T20:00:00Z');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 function database(){const sql=new DatabaseSync(':memory:');for(const name of readdirSync(new URL('../drizzle/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())sql.exec(readFileSync(new URL('../drizzle/'+name,import.meta.url),'utf8'));return sql;}
@@ -12,6 +14,19 @@ function fixture(t,count=7){const sql=database();t.after(()=>sql.close());const 
  for(let n=0;n<count;n++){const id=`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,bytes=Buffer.from('Syntetisk PDF '+n);sql.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run(id,owner,'original.pdf','application/pdf',bytes.length,sha(bytes),date.toISOString());objects.set(owner+'/'+id,new Uint8Array(bytes));}
  return{db,sql,bucket,objects,state,stats:()=>({puts,gets})};}
 async function finishVerification(f,result){for(let n=0;n<5&&result.status==='verifying';n++)result=await backupStep(f.db,f.bucket,owner,key,date);return result;}
+test('encrypted workspace restore preserves policy configuration, raw original references and balances',async t=>{
+ const f=fixture(t,0);let state=emptyState();state.company.invoiceReferencePolicies=[MGEORGE_INVOICE_REFERENCE_POLICY];
+ state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic policy customer AB',number:'0001',ocr:'',total:62500,issued:'2026-10-01',reviewed:true,referenceOriginal:{invoice_number:' 0001 ',reference:'0599'}}}).state;
+ const before=JSON.stringify(state);f.sql.prepare('UPDATE workspaces SET payload=? WHERE owner=?').run(before,owner);
+ const result=await finishVerification(f,await backupStep(f.db,f.bucket,owner,key,date));assert.equal(result.status,'complete');
+ const run=f.sql.prepare('SELECT * FROM backup_runs').get(),snapshot=JSON.parse(new TextDecoder().decode(await unsealBackup(f.objects.get(run.snapshot_key),key,owner,run.id,'snapshot')));validateSnapshot(snapshot,owner);
+ const restored=database();try{
+  for(const table of snapshot.tables)for(const row of table.rows){const columns=Object.keys(row);restored.prepare(`INSERT INTO ${table.name} (${columns.map(name=>'"'+name+'"').join(',')}) VALUES (${columns.map(()=>'?').join(',')})`).run(...Object.values(row));}
+  const payload=restored.prepare('SELECT payload FROM workspaces WHERE owner=?').get(owner).payload;assert.equal(payload,before);
+  const copy=JSON.parse(payload);assert.deepEqual(copy.company.invoiceReferencePolicies,[MGEORGE_INVOICE_REFERENCE_POLICY]);assert.equal(copy.invoices[0].referenceOriginal.invoice_number,' 0001 ');assert.equal(invoiceReferenceDecision(copy,copy.invoices[0]).status,'BLOCKED');assert.equal(balance(copy,copy.invoices[0]),62500);assert.equal(copy.allocations.length,0);
+ }finally{restored.close();}
+ assert.equal(f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(owner).payload,before);
+});
 test('backup encrypts authenticated envelopes and rejects wrong owner, object, key and tampering',async()=>{const plain=new TextEncoder().encode('Privat ekonomiskt original'),encrypted=await sealBackup(plain,key,owner,'backup-id','snapshot');assert.equal(Buffer.from(encrypted).includes(Buffer.from(plain)),false);assert.deepEqual(await unsealBackup(encrypted,key,owner,'backup-id','snapshot'),plain);for(const [k,o,id,name]of [['b'.repeat(64),owner,'backup-id','snapshot'],[key,'owner-b','backup-id','snapshot'],[key,owner,'backup-id','document:other'],[key,owner,'other-id','snapshot']])await assert.rejects(()=>unsealBackup(encrypted,k,o,id,name));encrypted[40]^=1;await assert.rejects(()=>unsealBackup(encrypted,key,owner,'backup-id','snapshot'));});
 test('snapshot and every original are resumable, authenticated and restorable into an isolated database',async t=>{const f=fixture(t),before=f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(owner).payload;let r=await backupStep(f.db,f.bucket,owner,key,date);assert.equal(r.status,'running');assert.equal(r.copied,5);r=await backupStep(f.db,f.bucket,owner,key,date);assert.equal(r.status,'verifying');r=await finishVerification(f,r);assert.equal(r.status,'complete');assert.equal(r.files,7);assert.equal(r.copied,7);assert.ok(r.verified_at);const puts=f.stats().puts;assert.equal((await backupStep(f.db,f.bucket,owner,key,date)).id,r.id);assert.equal(f.stats().puts,puts);assert.equal(f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(owner).payload,before);
  const row=f.sql.prepare('SELECT * FROM backup_runs').get();const snapshot=JSON.parse(new TextDecoder().decode(await unsealBackup(f.objects.get(row.snapshot_key),key,owner,row.id,'snapshot')));assert.ok(!JSON.stringify(snapshot).includes('OTHER_OWNER_PRIVATE'));validateSnapshot(snapshot,owner);

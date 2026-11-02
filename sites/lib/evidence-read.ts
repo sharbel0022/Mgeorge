@@ -1,10 +1,11 @@
 import {identity,db,readWorkspace,response} from './server';
-import {balance,validDate,type State,type Transaction,type Invoice} from './domain';
+import {balance,validDate,invoiceReferenceDecision,invoiceReferenceMatches,type State,type Transaction,type Invoice} from './domain';
 import {bankPaymentView,bankPaymentInvoiceAssessment,bankPaymentFieldSources} from './payment-presentation';
 import {readPaymentVerification} from './payment-verification';
 import {bankgiroRetainedPreview} from './bankgiro-service';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues} from './payment-references.js';
+import {strictInvoiceReferenceMatch} from './invoice-reference-policy.js';
 import {matchingDocumentCandidates} from './banking/invoice-candidates';
 
 // The MCP text block is a short summary, rather than a second serialized copy.
@@ -35,18 +36,30 @@ function argumentsFor(value:unknown,kind:'payment'|'report'):Args&{offset:number
  if(kind==='payment'&&value.transactionId!==undefined&&(offset!==0||limit!==1))throw Error('Ett bankhändelse-ID läses en gång utan sidindelning.');
  return {...value,offset:offset as number,limit:limit as number};
 }
-function invoiceFact(state:State,i:Invoice){return {invoiceId:i.id,number:i.number,ocr:i.ocr,direction:i.direction,party:i.party,totalCents:i.total,remainingCents:balance(state,i),reviewed:i.reviewed,originalAttached:!!i.documentId};}
+function invoiceFact(state:State,i:Invoice){
+ const referencePolicy=invoiceReferenceDecision(state,i);
+ return {invoiceId:i.id,number:i.number,ocr:i.ocr,direction:i.direction,party:i.party,totalCents:i.total,remainingCents:balance(state,i),reviewed:i.reviewed,originalAttached:!!i.documentId,referencePolicy,intendedPaymentReference:referencePolicy.intendedPaymentReference};
+}
 function registry(state:State,ref:string){
- const found=ref?state.invoices.filter(i=>!i.voided&&[i.number,i.ocr].some(v=>v&&exactReference(ref,v))):[];
+ const found=ref?state.invoices.filter(i=>!i.voided&&invoiceReferenceMatches(state,i,ref)):[];
  return {reference:ref,matchCount:found.length,ambiguous:found.length>1,complete:found.length<=20,invoices:found.slice(0,20).map(i=>invoiceFact(state,i))};
 }
 /** Search every preserved identifier from the selected reference original.
  * Detail, report and AIS identifiers remain separate source observations. */
 function referenceSearch(state:State,t:Transaction,query:string){
  const source=bankPaymentFieldSources(state,t).reference,values=matchingReferenceValues(source.evidence,source.value.value);
- const invoices=state.invoices.filter(i=>!i.voided),owners=invoices.filter(i=>values.some(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual))));
- const contradictory=values.length>1&&!invoices.some(i=>values.every(value=>[i.number,i.ocr].some(actual=>actual&&exactReference(value,actual))));
- return {sourceKind:source.kind,values,matchedValues:values.filter(value=>exactReference(value,query)),incomplete:!!source.evidence?.incomplete,invalidChecksum:!!source.evidence?.candidates.some(c=>c.validity==='checksum_invalid'),conflicting:owners.length>1||contradictory};
+ const direction=t.amount>0?'receivable':'payable',active=state.invoices.filter(i=>!i.voided);
+ const scoped=active.some(i=>i.direction===direction&&invoiceReferenceDecision(state,i).applies);
+ const invoices=active.filter(i=>!scoped||i.direction===direction),owners=invoices.filter(i=>values.some(value=>invoiceReferenceMatches(state,i,value,true)));
+ const contradictory=values.length>1&&!invoices.some(i=>values.every(value=>invoiceReferenceMatches(state,i,value)));
+ const blockedOwner=invoices.some(i=>{
+  const policy=invoiceReferenceDecision(state,i);
+  return policy.applies&&policy.status==='BLOCKED'&&values.some(value=>invoiceReferenceMatches(state,i,value,true));
+ });
+ // This query-only shape selects the workspace's comparison mode. It is never
+ // exposed as an invoice, registered owner, intended reference or bank proof.
+ const queryScope=invoiceReferenceDecision(state,{number:query,ocr:query,direction});
+ return {sourceKind:source.kind,values,matchedValues:values.filter(value=>queryScope.applies?strictInvoiceReferenceMatch(value,query):exactReference(value,query)),incomplete:!!source.evidence?.incomplete,invalidChecksum:!!source.evidence?.candidates.some(c=>c.validity==='checksum_invalid'),conflicting:owners.length>1||contradictory||blockedOwner};
 }
 async function context(){
  const user=await identity(),workspace=await db().prepare('SELECT revision FROM workspaces WHERE owner=?').bind(user.userId).first<{revision:number}>(),{state,revision}=await readWorkspace(user.userId);

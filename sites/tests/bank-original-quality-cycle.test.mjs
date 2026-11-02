@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {DatabaseSync} from 'node:sqlite';
-import {emptyState,applyCommand,balance} from '../lib/domain.ts';
+import {applyCommand,balance} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {parseBankgiroXML} from '../lib/bankgiro-parser.js';
 const url=path=>new URL(path,import.meta.url).href,data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));return data(code);}

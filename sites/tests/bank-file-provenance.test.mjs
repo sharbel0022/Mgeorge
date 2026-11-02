@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
-import {emptyState,applyCommand} from '../lib/domain.ts';
+import {applyCommand} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {extractPaymentReferences} from '../lib/payment-references.js';
 
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');

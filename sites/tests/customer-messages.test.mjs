@@ -8,6 +8,7 @@ import ts from 'typescript';
 import {emptyState,applyCommand,paid,balance,invoiceStatus,prepareBankImportFailure,uid} from '../lib/domain.ts';
 import {seal,unseal,randomToken,digest} from '../lib/banking/security.ts';
 import {analyzeReconciliation} from '../lib/reconciliation-engine.js';
+import {generateMessage} from '../lib/customer-message-text.js';
 
 const read=p=>readFileSync(new URL(p,import.meta.url),'utf8'),data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
 function moduleUrl(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let s=ts.transpileModule(read(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [key,val]of Object.entries(imports))for(const q of ['"',"'"])s=s.replaceAll(q+key+q,JSON.stringify(val));return data(s);}
@@ -58,6 +59,73 @@ async function fixture(t){
 }
 // Use a historical real date on both sides of the invoice validation boundary.
 // All records and keys in this file are synthetic.
+
+async function historicalReferenceDraft(t,{number='AB-0001',reference=number,bankReference='AB0001',companyName='M.George Vitvaror AB'}={}){
+  const f=await fixture(t);f.init();let state=f.state();
+  state.company.name=companyName;state.invoices[0].number=number;state.invoices[0].ocr=reference;f.put(state);
+  f.pay(312500,{payerReference:bankReference});state=f.state();
+  // Preserve an existing historical allocation; today's strict policy is not
+  // permission to create this allocation or to rewrite the original bank row.
+  state.allocations.push({id:'synthetic-reference-history',invoiceId:state.invoices[0].id,transactionId:state.transactions[0].id,amount:312500,effect:'payment',active:true,note:'Synthetic historical decision',createdAt:'2026-10-27T00:00:00Z'});
+  f.put(state);return f;
+}
+
+for(const [number,bankReference]of [['AB-0001','AB0001'],['0599','05-99'],['0001','1'],['AB-0001','ab-0001']])test('invoice reference policy: historical bank identifier stays distinct in drafts: '+number+' / '+bankReference,async t=>{
+  const f=await historicalReferenceDraft(t,{number,bankReference}),before=f.state(),items=await f.queue(),draft=items.find(item=>item.kind==='wrong_reference'&&item.status==='draft');
+  assert.ok(draft,'A distinct complete historical bank reference requires review');
+  assert.ok(draft.body.includes('Referenser i underlaget: '+bankReference+'.'));
+  assert.ok(draft.body.includes('Fakturans referens: '+number+'.'));
+  assert.deepEqual(f.state(),before);assert.equal(f.posts,0);
+});
+
+test('invoice reference policy: an exact historical leading-zero reference does not create a correction draft',async t=>{
+  const f=await historicalReferenceDraft(t,{number:'0001',bankReference:'0001'}),before=f.state(),items=await f.queue();
+  assert.equal(items.some(item=>item.status==='draft'&&item.kind==='wrong_reference'),false);assert.deepEqual(f.state(),before);assert.equal(f.posts,0);
+});
+
+test('invoice reference policy: a generic issuer retains its legacy historical reference comparison',async t=>{
+  const f=await historicalReferenceDraft(t,{companyName:'Synthetic Reference Issuer AB'}),before=f.state(),items=await f.queue();
+  assert.equal(items.some(item=>item.status==='draft'&&item.kind==='wrong_reference'),false);assert.deepEqual(f.state(),before);assert.equal(f.posts,0);
+});
+
+test('invoice reference policy: draft text uses the derived intended reference without rewriting raw invoice text',()=>{
+  const state=emptyState(),invoice={id:'synthetic-reference-text',direction:'receivable',number:'0001',ocr:' 0001 ',party:'Synthetic customer AB',total:10000,currency:'SEK',issued:'2026-10-01',due:'2026-10-30',reviewed:true};
+  state.invoices.push(invoice);const before=structuredClone(state),facts=reconciliation.invoiceFacts(state,invoice);
+  assert.equal(facts.referencePolicy.status,'REVIEW');assert.equal(facts.intendedPaymentReference,'0001');
+  const draft=generateMessage({...facts,payment_references:['1']},'wrong_reference');
+  assert.match(draft.body,/Fakturans referens: 0001\./);assert.deepEqual(state,before);
+});
+
+test('invoice reference policy: blocked policy text permits only neutral confirmation',()=>{
+  const state=emptyState(),invoice={id:'synthetic-reference-conflict',direction:'receivable',number:'0599',ocr:'000018',party:'Synthetic customer AB',total:10000,currency:'SEK',issued:'2026-10-01',due:'2026-10-30',reviewed:true};
+  state.invoices.push(invoice);const facts={...reconciliation.invoiceFacts(state,invoice),payment_references:['000018']};
+  assert.equal(facts.referencePolicy.status,'BLOCKED');
+  for(const kind of ['partial','possible_vat','missing_reference','wrong_reference','overdue','overpayment','possible_duplicate'])assert.throws(()=>generateMessage(facts,kind),/referens.*gransk|gransk.*referens/i);
+  const draft=generateMessage(facts,'confirmation');assert.match(draft.body,/ännu inte kunnat fastställa betalningsstatus/);assert.doesNotMatch(draft.body,/000018|Fakturans referens:|Vi har verifierat|Vänligen kontrollera resterande/);
+});
+
+test('invoice reference policy: blocked own-invoice conflict produces only a neutral confirmation draft',async t=>{
+  const f=await fixture(t);f.init();let state=f.state();state.invoices[0].number='0599';state.invoices[0].ocr='000018';f.put(state);f.pay(250000,{payerReference:'000018'});
+  const before=f.state(),items=await f.queue(),drafts=items.filter(item=>item.status==='draft');
+  assert.deepEqual(drafts.map(item=>item.kind),['confirmation']);
+  assert.doesNotMatch(drafts[0].body,/000018|Fakturans referens:|Vi har verifierat|Vänligen kontrollera resterande/);
+  assert.deepEqual(f.state().invoices,before.invoices);assert.deepEqual(f.state().transactions,before.transactions);assert.deepEqual(f.state().allocations,before.allocations);assert.equal(f.posts,0);
+});
+
+test('invoice reference policy: an unsafe old correction draft is stale even with a current snapshot',async t=>{
+  const f=await fixture(t);f.init();const state=f.state();state.invoices[0].number='0599';state.invoices[0].ocr='000018';f.put(state);
+  const snapshot=await f.api.evidenceSnapshot(state,null),id='synthetic-unsafe-reference-draft';
+  f.sql.prepare('INSERT INTO customer_messages(id,owner,invoice_id,kind,recipient,subject,body,snapshot,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)').run(id,f.owner,state.invoices[0].id,'wrong_reference','','Synthetic old correction','Fakturans referens: 000018.',snapshot,'2026-10-30','2026-10-30');
+  const items=(await f.api.messageList(f.owner)).items;assert.equal(items.find(item=>item.id===id).status,'stale');
+  await assert.rejects(f.call('review',{id,version:1}),/ändrats|underlag|gransk/i);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM customer_reviews').get().n,0);assert.equal(f.posts,0);assert.deepEqual(f.state(),state);
+});
+
+test('invoice reference policy: generic issuer draft text keeps its separate explicit reference',()=>{
+  const state=emptyState();state.company.name='Synthetic Reference Issuer AB';const invoice={id:'synthetic-generic-reference',direction:'receivable',number:'0599',ocr:'000018',party:'Synthetic customer AB',total:10000,currency:'SEK',issued:'2026-10-01',due:'2026-10-30',reviewed:true};state.invoices.push(invoice);
+  const facts=reconciliation.invoiceFacts(state,invoice);assert.equal(facts.referencePolicy.applies,false);
+  assert.match(generateMessage({...facts,payment_references:['OTHER']},'wrong_reference').body,/Fakturans referens: 000018\./);
+});
 
 function pendingRegistration(f,documentId,invoiceId,{owner=f.owner,receipt='receipt-'+documentId}={}){
   const at='2026-10-30T10:00:00.000Z';

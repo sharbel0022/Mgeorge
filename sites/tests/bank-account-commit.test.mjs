@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {DatabaseSync} from 'node:sqlite';
-import {emptyState,applyCommand,balance,economicTransactions,invoicePaymentEvidenceIssue} from '../lib/domain.ts';
+import {applyCommand,balance,economicTransactions,invoicePaymentEvidenceIssue} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {parseBankgiroXML} from '../lib/bankgiro-parser.js';
 

@@ -6,9 +6,11 @@ import {matchingReferenceValues} from './payment-references.js';
 import {randomUuid} from './uuid.js';
 import {payerEvidenceConflict} from './payer-evidence.js';
 import {bankgiroDepositIdentity} from './bankgiro-deposit-identity.js';
+import {resolveInvoiceReference,matchesInvoiceReference,strictInvoiceReferenceMatch,validateInvoiceReferencePolicies,type InvoiceReferencePolicy,type InvoiceReferenceInput} from './invoice-reference-policy.js';
 export type Invoice = {
  id: string; direction: "receivable" | "payable"; party: string; email: string; number: string; ocr: string;
  total: number; currency: "SEK"; issued: string; due: string; reviewed: boolean; voided: boolean;
+ referenceOriginal?:InvoiceReferenceInput['original'];
  organizationNumber?:string;vat?:number|null;net?:number|null;reconciledAt?:string;reconciliationNote?:string;note: string; bankgiro: string; documentId: string; source: string; createdAt: string;
 };
 export type Transaction = {
@@ -32,7 +34,7 @@ export type Credit = {id:string;invoiceId:string;amount:number;number:string;not
 export type ImportRecord = {id:string;hash:string;account:string;name:string;count:number;createdAt:string;documentId?:string};
 /** A human decision about retained sources, never a financial allocation or bank identity. */
 export type BankgiroLink = {id:string;method:'manual_review';transactionId:string;specificationIds:string[];documentId:string;sha256:string;reportKey?:string;note:string;dateDifferenceNote:string;createdAt:string;transactionSnapshot:string;specificationSnapshots:Record<string,string>;revokedAt?:string;revocationNote?:string};
-export type State = {schemaVersion:1;company:{name:string;email:string};invoices:Invoice[];transactions:Transaction[];allocations:Allocation[];credits:Credit[];imports:ImportRecord[];receipts:string[];bankgiroLinks?:BankgiroLink[];bankEvidenceHold?:{at:string;auditEventId:string;fingerprint:string}};
+export type State = {schemaVersion:1;company:{name:string;email:string;invoiceReferencePolicies?:InvoiceReferencePolicy[]};invoices:Invoice[];transactions:Transaction[];allocations:Allocation[];credits:Credit[];imports:ImportRecord[];receipts:string[];bankgiroLinks?:BankgiroLink[];bankEvidenceHold?:{at:string;auditEventId:string;fingerprint:string}};
 export type Command = {type:string;[key:string]:any};
 /** A rejected import may add evidence holds, never any of its attempted money. */
 export class BankImportEvidenceError extends Error{
@@ -102,7 +104,6 @@ export function invoiceStatus(s:State,i:Invoice,at=today()):{key:string;label:st
  if(!i.due)return{key:"open",label:"Förfallodatum saknas",tone:"amber"};return{key:"open",label:i.due===at?"Förfaller idag":"Obetald efter verifierad kontroll",tone:"neutral"};
 }
 export const normalizeOCR=(s:string)=>s.replace(/[\s-]/g,"").toUpperCase();
-const tokenMatch=exactReference;
 export const PAYMENT_SPECIFICATION_REQUIRED='Betalardetaljer saknas – importera betalningsspecifikation.';
 export const usablePaymentReference=(value:string)=>!!value.trim()&&!/^(NOTPROVIDED|NONREF|N\/A|NONE|NULL|UNKNOWN)$/i.test(value.trim());
 export const individualParty=(value:string)=>!!value.trim()&&!/^(bankgiro(?:t)?(?:\s+ab)?|swedbank(?:\s+ab)?|bg|okänd(?: betalare)?|unknown)$/i.test(value.trim());
@@ -167,12 +168,39 @@ export function suspectedBankCollection(amount:number,description:string,party:s
 }
 export function needsPaymentSpecification(t:Transaction){return !t.parentId&&(t.kind==='batch'||suspectedBankCollection(t.amount,t.description,t.party,t.payerReference));}
 const sameParty=(a:string,b:string)=>individualParty(a)&&a.normalize('NFKC').trim().toLocaleLowerCase('sv-SE')===b.normalize('NFKC').trim().toLocaleLowerCase('sv-SE');
-const exactPaymentReference=(t:Transaction,i:Invoice)=>usablePaymentReference(t.payerReference)&&((!!i.ocr&&exactReference(t.payerReference,i.ocr))||tokenMatch(t.payerReference,i.number));
+/** A derived business intention, never a replacement for the invoice or bank original. */
+export function invoiceReferenceDecision(s:State,i:Pick<Invoice,'number'|'ocr'|'direction'|'referenceOriginal'>,original=i.referenceOriginal){
+ return resolveInvoiceReference({invoice_number:i.number,reference:i.ocr,direction:i.direction==='receivable'?'customer':'supplier',...(original?{original}:{})},{company:s.company,policies:s.company.invoiceReferencePolicies});
+}
+/** All scoped identifiers reserve ownership; only the intended reference authorizes matching. */
+export function invoiceReferenceMatches(s:State,i:Pick<Invoice,'number'|'ocr'|'direction'|'referenceOriginal'>,value:string,ownership=false){
+ const decision=invoiceReferenceDecision(s,i);
+ if(!decision.applies)return [i.ocr,i.number].some(candidate=>!!candidate&&exactReference(value,candidate));
+ if(ownership)return [decision.intendedPaymentReference,i.number,i.ocr,i.referenceOriginal?.invoice_number,i.referenceOriginal?.reference].some(candidate=>strictInvoiceReferenceMatch(value,candidate));
+ return matchesInvoiceReference(decision,value);
+}
+const exactPaymentReference=(s:State,t:Transaction,i:Invoice)=>usablePaymentReference(t.payerReference)&&invoiceReferenceMatches(s,i,t.payerReference);
+/** Manual corrections never erase reference observations from retained bank sources. */
+export function invoicePolicyPaymentReferences(t:Transaction){
+ const evidence=[t.referenceEvidence,t.bankDetails?.referenceEvidence].filter(Boolean);
+ const values=[...new Set([...matchingReferenceValues(t.referenceEvidence,t.payerReference),...matchingReferenceValues(t.bankDetails?.referenceEvidence,t.bankDetails?.payerReference||''),...(t.original?.payerReference?[t.original.payerReference]:[])])];
+ return {values,invalid:evidence.some(item=>item?.incomplete||item?.candidates?.some(candidate=>candidate.validity==='checksum_invalid'))};
+}
+/** Validate every reference candidate and every invoice owner before creating new money. */
+export function invoiceReferenceMatchIssue(s:State,i:Invoice,t:Transaction){
+ const decision=invoiceReferenceDecision(s,i);if(!decision.applies)return '';
+ if(decision.status==='BLOCKED')return decision.reason;
+ const {values,invalid}=invoicePolicyPaymentReferences(t);
+ if(!values.length||values.some(value=>!matchesInvoiceReference(decision,value)))return 'Betalningsreferensen stämmer inte exakt med fakturans avsedda betalningsreferens. Granska originalen.';
+ if(invalid)return 'Bankens referensunderlag är ofullständigt eller innehåller ogiltig OCR. Granska originalet.';
+ const owners=s.invoices.filter(other=>!other.voided&&other.direction===i.direction&&values.some(value=>invoiceReferenceMatches(s,other,value,true)));
+ return owners.length!==1||owners[0].id!==i.id?'Flera fakturor äger betalningsreferensen. Granska dubbletterna innan någon ny matchning.':'';
+}
 export function suggestions(s:State,t:Transaction){
  if(t.ignored||t.duplicateOf||!t.verified||t.kind!=="payment"||needsPaymentSpecification(t)||needsBankFileReview(t)||paymentEvidenceConflict(s,t)||paymentOriginalIssue(s,t)||available(s,t)<=0)return[];
  const direction=t.amount>0?"receivable":"payable",all=s.invoices.filter(i=>i.reviewed&&!i.voided&&i.direction===direction&&(!i.issued||t.date>=i.issued));
- const references=all.filter(i=>exactPaymentReference(t,i));
- if(references.length)return references.map(i=>({invoice:i,amount:Math.min(Math.max(0,balance(s,i)),available(s,t)),strength:references.length===1?"strong":"ambiguous",reason:balance(s,i)<=0?"Referensen tillhör en reglerad faktura – möjlig dubbelbetalning":references.length>1?"Referensen stämmer med flera fakturor":i.ocr&&exactReference(t.payerReference,i.ocr)?"OCR stämmer":"Fakturanumret finns i betalningsreferensen"}));
+ const references=all.filter(i=>exactPaymentReference(s,t,i)&&!invoiceReferenceMatchIssue(s,i,t));
+ if(references.length)return references.map(i=>({invoice:i,amount:Math.min(Math.max(0,balance(s,i)),available(s,t)),strength:references.length===1?"strong":"ambiguous",reason:balance(s,i)<=0?"Referensen tillhör en reglerad faktura – möjlig dubbelbetalning":references.length>1?"Referensen stämmer med flera fakturor":invoiceReferenceDecision(s,i).applies?"Avsedd betalningsreferens stämmer exakt":i.ocr&&exactReference(t.payerReference,i.ocr)?"OCR stämmer":"Fakturanumret finns i betalningsreferensen"}));
  return all.filter(i=>balance(s,i)>0&&balance(s,i)===available(s,t)&&sameParty(t.party,i.party)).map(i=>({invoice:i,amount:Math.min(balance(s,i),available(s,t)),strength:"weak",reason:"Betalare och belopp stämmer – kontrollera underlaget"}));
 }
 export function canonicalBankAccount(value:string){
@@ -216,10 +244,17 @@ function retainBankConflict(previous:Transaction,incoming:Transaction,fields:str
  previous.bankEvidenceConflicts??=[];
  if(!previous.bankEvidenceConflicts.some(conflict=>signature(conflict.incoming)===signature(evidence)))previous.bankEvidenceConflicts.push({at:now(),fields,incoming:structuredClone(evidence)});
 }
-function cleanInvoice(raw:any,existing?:Invoice):Invoice{
+function cleanInvoice(raw:any,existing?:Invoice,company?:State['company']):Invoice{
  if(!raw||!['receivable','payable'].includes(raw.direction))throw new Error("Välj fakturatyp.");if(raw.currency&&raw.currency!=="SEK"||raw.foreignCurrency&&!raw.currencyConfirmed)throw new Error("Endast SEK stöds. Importera inte andra valutor som kronor.");
  const i:Invoice={id:existing?.id??uid(),direction:raw.direction,party:str(raw.party,200),email:str(raw.email??"",200),number:str(raw.number,100),ocr:str(raw.ocr??"",100),total:cents(raw.total),currency:"SEK",issued:date(raw.issued),due:date(raw.due??"",true),reviewed:raw.reviewed===true,voided:existing?.voided??false,note:str(raw.note??"",3000),bankgiro:str(raw.bankgiro??"",100),documentId:str(raw.documentId??"",100),source:str(raw.source??"Manuellt registrerad",300),createdAt:existing?.createdAt??now()};
  i.organizationNumber=str(raw.organizationNumber??existing?.organizationNumber??'',40);i.vat=raw.vat??existing?.vat??null;i.net=raw.net??existing?.net??null;i.reconciledAt=existing?.reconciledAt||'';i.reconciliationNote=existing?.reconciliationNote||'';
+ if(existing?.referenceOriginal&&existing.documentId!==i.documentId&&resolveInvoiceReference({invoice_number:i.number,reference:i.ocr,direction:i.direction==='receivable'?'customer':'supplier'},{company,policies:company?.invoiceReferencePolicies}).applies)throw Error('Originalunderlaget kan inte bytas när fakturans ursprungliga referensuppgifter har sparats. Granska den befintliga fakturan.');
+ const original=existing?.referenceOriginal??raw.referenceOriginal;
+ if(original!=null){
+  if(typeof original!=='object'||Array.isArray(original))throw Error('Originalets referensuppgifter måste granskas.');
+  i.referenceOriginal={};
+  for(const key of ['invoice_number','reference','issuer_name'] as const)if(original[key]!=null){str(original[key],key==='issuer_name'?200:100);i.referenceOriginal[key]=original[key];}
+ }
  if([i.vat,i.net].some(n=>n!=null&&(!Number.isSafeInteger(n)||n<0))||i.vat!=null&&i.net!=null&&i.vat+i.net!==i.total)throw new Error('Netto och moms måste stämma med fakturabeloppet.');
  if(!i.party||!i.number)throw new Error("Namn och fakturanummer behövs.");if(i.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.email))throw new Error("Kontrollera e-postadressen.");if(i.due&&i.due<i.issued)throw new Error("Förfallodatum får inte vara före fakturadatum.");return i;
 }
@@ -265,9 +300,10 @@ export function specificationPreview(s:State,rows:any[],targetId=''){
 }
 export function paymentInvoiceAssessment(s:State,t:Transaction){
  const view={...t,party:t.bankDetails?.party||t.party,payerReference:t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'':t.payerReference)};
- const exact=s.invoices.filter(i=>!i.voided&&i.direction===(t.amount>0?'receivable':'payable')&&exactPaymentReference(view,i));
+ const exact=s.invoices.filter(i=>!i.voided&&i.direction===(t.amount>0?'receivable':'payable')&&exactPaymentReference(s,view,i));
  const allocations=s.allocations.filter(a=>a.active&&a.transactionId===t.id),allocated=allocations[0],invoice=allocated?s.invoices.find(i=>i.id===allocated.invoiceId):exact.length===1?exact[0]:undefined;
- const issue=allocated?allocations.map(a=>allocationPaymentEvidenceIssue(s,t,a.effect)).find(Boolean)||'':paymentEvidenceIssue(s,t)||paymentAccountIssue(s,t)||bankPaymentReviewReason(t,s);
+ const policyIssue=invoice?invoiceReferenceMatchIssue(s,invoice,view):'';
+ const issue=(allocated?allocations.map(a=>allocationPaymentEvidenceIssue(s,t,a.effect)).find(Boolean)||'':paymentEvidenceIssue(s,t)||paymentAccountIssue(s,t)||bankPaymentReviewReason(t,s))||policyIssue;
  return {invoice,status:issue?'review':allocated?'verified':exact.length>1?'ambiguous':invoice?'possible':'missing',message:issue|| (allocated?'Betalningen är verifierad mot fakturan.':exact.length>1?'Flera fakturor kan passa. Granska kundidentiteten.':invoice?'Referensen finns. Kund och betalningsunderlag behöver stämma.':individualParty(view.party)?usablePaymentReference(view.payerReference)?`Betalare identifierad – ingen faktura med betalningsreferensen ${view.payerReference} hittades i registret.`:'Betalare identifierad – fakturakoppling saknas.':'Betalaren behöver identifieras.')};
 }
 export function economicTransactions(s:State){return s.transactions.filter(t=>!t.ignored&&!t.duplicateOf&&t.specificationStatus!=='review'&&!s.transactions.some(c=>c.parentId===t.id&&!c.ignored));}
@@ -396,7 +432,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
   s.imports.push(record);message=`${record.count} betalningar importerade. ${preview.review} specifikationer behöver granskning.`;break;
  }
  case'invoice.save':{
-  const old=command.invoice.id?getInvoice(s,command.invoice.id):undefined,item=cleanInvoice(command.invoice,old);
+  const old=command.invoice.id?getInvoice(s,command.invoice.id):undefined,item=cleanInvoice(command.invoice,old,s.company);
   const duplicate=s.invoices.find(i=>i.id!==item.id&&!i.voided&&i.direction===item.direction&&i.party.toLowerCase()===item.party.toLowerCase()&&i.number.toUpperCase()===item.number.toUpperCase());
   if(duplicate)throw new Error("Fakturanumret finns redan för den här kunden/leverantören. Öppna den befintliga fakturan.");
   if(old&&(s.allocations.some(a=>a.active&&a.invoiceId===old.id)||credited(s,old.id)>0)&&(item.total!==old.total||item.direction!==old.direction||item.party!==old.party||item.number!==old.number||item.reviewed!==old.reviewed||(item.organizationNumber||'').replace(/[- ]/g,'')!==(old.organizationNumber||'').replace(/[- ]/g,'')))throw new Error("Fakturan har betalningar eller krediter. Ångra dessa först, eller registrera en kreditfaktura.");
@@ -494,12 +530,13 @@ export function applyCommand(current:State,command:Command):{state:State;message
   const review=bankPaymentReview(t,s);if(review&&(review.kind==='reversal'||review.kind==='refund'&&effect!=='refund'))throw Error(review.reason);
   if(needsBankFileReview(t))throw Error('Bankoriginalet behöver kontrolläsas och kontot bekräftas före matchning. Importera samma originalfil och granska bankuppgifterna.');
   if(!i.reviewed||i.voided||!t.verified||t.kind!=='payment'||t.ignored||t.duplicateOf)throw new Error("Granska fakturan och bankhändelsen innan matchning.");if(needsPaymentSpecification(t))throw new Error(PAYMENT_SPECIFICATION_REQUIRED);const expected=(i.direction==='receivable'?1:-1)*(effect==='refund'?-1:1);if(Math.sign(t.amount)!==expected)throw new Error("Betalningens riktning stämmer inte med fakturan.");
-  if(!exactPaymentReference(t,i)&&!(sameParty(t.party,i.party)&&Math.abs(balance(s,i))===available(s,t))&&command.referenceCorrection!==true)throw new Error('Matchningen kräver exakt OCR/fakturareferens eller samma betalare och belopp. Beloppet ensamt styrker inte betalningen.');
+  const referenceIssue=invoiceReferenceMatchIssue(s,i,t);if(referenceIssue)throw Error(referenceIssue);
+  if(!exactPaymentReference(s,t,i)&&!(sameParty(t.party,i.party)&&Math.abs(balance(s,i))===available(s,t))&&command.referenceCorrection!==true)throw new Error('Matchningen kräver exakt OCR/fakturareferens eller samma betalare och belopp. Beloppet ensamt styrker inte betalningen.');
   if(amount>available(s,t)||amount>balance(s,i)*(effect==='refund'?-1:1))throw new Error("Beloppet överstiger det som återstår. Uppdatera sidan och kontrollera beloppen.");const note=str(command.note??"",1000);if(!note)throw new Error("Ange vilket underlag som bekräftar matchningen.");
   i.reconciledAt=now();s.allocations.push({id:uid(),invoiceId:i.id,transactionId:t.id,amount,effect,active:true,note,createdAt:now()});message=effect==='refund'?"Återbetalningen är avstämd":"Betalningen är matchad";break;
  }
  case'match.undo':{const a=s.allocations.find(a=>a.id===command.id&&a.active);if(!a)throw new Error("Matchningen finns inte längre.");const note=str(command.note??"",1000);if(!note)throw new Error("Ange varför matchningen ångras.");a.active=false;a.reversedAt=now();getTx(s,a.transactionId).automaticMatchHold={at:a.reversedAt,reason:note};const i=getInvoice(s,a.invoiceId);i.reconciledAt='';i.reconciliationNote='';message="Matchningen är ångrad. Automatisk matchning väntar på en ny granskning av betalningsuppgifterna.";break;}
- case'settings.save':{s.company={name:str(command.name,200),email:str(command.email,200)};if(!s.company.name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.company.email))throw new Error("Ange företagsnamn och en giltig e-postadress.");break;}
+ case'settings.save':{s.company={...s.company,name:str(command.name,200),email:str(command.email,200)};if(Object.hasOwn(command,'invoiceReferencePolicies'))s.company.invoiceReferencePolicies=validateInvoiceReferencePolicies(command.invoiceReferencePolicies);if(!s.company.name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.company.email))throw new Error("Ange företagsnamn och en giltig e-postadress.");break;}
  default:throw new Error("Okänd åtgärd.");
  }
  for(const i of s.invoices){if(paid(s,i.id)<0)throw new Error('Ångra kopplade återbetalningar innan den ursprungliga betalningen återtas.');if(credited(s,i.id)>i.total)throw new Error('Kreditbeloppet överstiger fakturans totalbelopp.');}

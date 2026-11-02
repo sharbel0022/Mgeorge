@@ -87,7 +87,10 @@ test('restart retains sending lock and cannot consume a second approval',async t
   await assert.rejects(send(db,m,r,opts(async()=>({id:'gmail'}))),/ändrats/);prepareMessages(db);assert.equal(listMessages(db).length,1);
 });
 test('correcting an OCR allocation preserves the bank original and prepares a factual reference draft',t=>{
-  const db=fixture(t);storeTransactions(db,[{account:'MG',booked_at:'2026-10-26',amount_cents:312500,currency:'SEK',payer:'Kund AB',reference:'0577',bank_reference:'OCR'}],'enablebanking');
+  const db=fixture(t);
+  // The generic manual-reference correction remains available outside this company policy.
+  db.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
+  storeTransactions(db,[{account:'MG',booked_at:'2026-10-26',amount_cents:312500,currency:'SEK',payer:'Kund AB',reference:'0577',bank_reference:'OCR'}],'enablebanking');
   const tx=db.prepare('SELECT * FROM bank_transactions').get();allocate(db,'i',tx.id,312500);runReconciliation(db);prepareMessages(db);
   const m=draft(db);assert.equal(m.kind,'wrong_reference');assert.match(m.body,/0577/);assert.match(m.body,/0597/);assert.equal(db.prepare('SELECT reference FROM bank_transactions').get().reference,'0577');
 });

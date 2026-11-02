@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {emptyState,applyCommand,balance,paid,economicTransactions} from '../lib/domain.ts';
+import {applyCommand,balance,paid,economicTransactions} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 import {parseBankgiroXML} from '../lib/bankgiro-parser.js';
 
 const url=path=>new URL(path,import.meta.url).href;

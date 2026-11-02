@@ -1,6 +1,6 @@
 import {env} from 'cloudflare:workers';
 import {db,identity,readWorkspace,response} from './server';
-import {applyCommand,emptyState,now,uid,type Invoice} from './domain';
+import {applyCommand,emptyState,invoiceReferenceDecision,now,uid,type Invoice} from './domain';
 import {digest,randomToken} from './banking/security';
 import {fieldNames,interpretInvoice,validateInvoiceValues,validOrganization} from './invoice-fields.js';
 import {serverPdfText} from './server-pdf';
@@ -17,6 +17,10 @@ export const counterpartyKey=(direction:string,party:string,org:string)=>JSON.st
 // duplicate checks for those historical registrations.
 export const documentInvoiceKey=(i:Row)=>JSON.stringify(['invoice-v2',i.direction,normalize(i.organizationNumber||i.party),String(i.number||'').normalize('NFKC').trim().toUpperCase()]);
 const sourceFor=(owner:string,id:string)=>db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? ORDER BY created_at LIMIT 1').bind(owner,id).first<Row>();
+const referenceOriginal=(extraction:Row):Invoice['referenceOriginal']=>{
+  const fields=extraction.fields||extraction.values||{},value=(key:string)=>fields[key]&&typeof fields[key]==='object'&&'value' in fields[key]?fields[key].value:fields[key];
+  return Object.fromEntries([['invoice_number',value('invoice_number')],['reference',value('reference')],['issuer_name',extraction.details?.supplier?.name]].filter(([,value])=>value!=null));
+};
 const activeSource="EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status='needs_review')";
 const idleEngine="NOT EXISTS(SELECT 1 FROM document_jobs busy WHERE busy.owner=document_jobs.owner AND busy.engine=document_jobs.engine AND busy.state='processing' AND busy.lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now'))";
 const AFTERCHECK_WARNING='Fakturan är registrerad. Efterkontrollen behöver köras igen via betalningskontrollen.';
@@ -118,7 +122,16 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
       if(!document||options.automatic&&options.sha256!==document.sha256)throw Error('original_integrity');
       await originalBytes(owner,{...document,document_id:documentId});
     }catch{throw safe('Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före registrering.');}
-    const old=await readWorkspace(owner),invoice:Row={...raw,documentId,reviewed:true,source:'Gmail: '+JSON.parse(source.metadata).subject};delete invoice.id;
+    const old=await readWorkspace(owner),invoice:Row={...raw,documentId,reviewed:true,source:'Gmail: '+JSON.parse(source.metadata).subject};delete invoice.id;delete invoice.referenceOriginal;
+    // Capture the current original interpretation independently of editable
+    // review fields. A current worker extraction supersedes older Gmail data.
+    const job=await db().prepare('SELECT extraction FROM document_jobs WHERE owner=? AND document_id=?').bind(owner,documentId).first<Row>();
+    const currentExtraction=JSON.parse(job?.extraction||'{}'),extraction=Object.keys(currentExtraction).length?currentExtraction:JSON.parse(source.extraction);
+    if(invoiceReferenceDecision(old.state,invoice as Invoice).applies){
+      invoice.referenceOriginal=referenceOriginal(extraction);
+      const policy=invoiceReferenceDecision(old.state,invoice as Invoice);
+      if(options.automatic&&policy.status==='BLOCKED')throw safe(policy.reason);
+    }
     const checks={issued_at:invoice.issued,due_at:invoice.due,total_cents:invoice.total,organization_number:fields.organization_number||null,currency:fields.currency,vat_cents:fields.vat_cents,net_cents:fields.net_cents};
     const issues=validateInvoiceValues(checks);if(fields.currency!=='SEK'||!invoice.due||!['receivable','payable'].includes(invoice.direction))issues.push('Kontrollera datum, valuta och fakturatyp.');
     if(issues.length)throw safe(issues.join(' '));
@@ -137,8 +150,8 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
     const saved=result.state.invoices.find(i=>i.documentId===documentId)!;
     const at=now(),receipt=uid();
     await db().prepare('INSERT OR IGNORE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(owner,JSON.stringify(emptyState()),at).run();
-    const guard=` AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=? AND d.id=? AND d.sha256=? AND d.size=?)`+(options.automatic?` AND EXISTS(SELECT 1 FROM document_jobs j WHERE j.owner=? AND j.document_id=? AND j.state='processing' AND j.lease=? AND j.lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now')) AND EXISTS(SELECT 1 FROM invoice_counterparties c WHERE c.owner=? AND c.identity=? AND c.version=?) AND EXISTS(SELECT 1 FROM document_automation a WHERE a.owner=? AND a.enabled=1 AND a.auto_register=1)`:'');
-    const binds=[owner,documentId,document!.sha256,document!.size,...(options.automatic?[owner,documentId,options.lease,owner,options.trust!.identity,options.trust!.version,owner]:[])];
+    const guard=` AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=? AND d.id=? AND d.sha256=? AND d.size=?) AND EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=? AND s.source_id=? AND s.document_id=? AND s.extraction=?)`+(job?` AND EXISTS(SELECT 1 FROM document_jobs j WHERE j.owner=? AND j.document_id=? AND j.extraction=?)`:` AND NOT EXISTS(SELECT 1 FROM document_jobs j WHERE j.owner=? AND j.document_id=?)`)+(options.automatic?` AND EXISTS(SELECT 1 FROM document_jobs j WHERE j.owner=? AND j.document_id=? AND j.state='processing' AND j.lease=? AND j.lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now')) AND EXISTS(SELECT 1 FROM invoice_counterparties c WHERE c.owner=? AND c.identity=? AND c.version=?) AND EXISTS(SELECT 1 FROM document_automation a WHERE a.owner=? AND a.enabled=1 AND a.auto_register=1)`:'');
+    const binds=[owner,documentId,document!.sha256,document!.size,owner,source.source_id,documentId,source.extraction,owner,documentId,...(job?[job.extraction]:[]),...(options.automatic?[owner,documentId,options.lease,owner,options.trust!.identity,options.trust!.version,owner]:[])];
     let batch;
     try{batch=await db().batch([
       db().prepare(`INSERT INTO document_registrations(owner,document_id,identity,invoice_id,attempt,total,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?) AND EXISTS(SELECT 1 FROM gmail_sources WHERE owner=? AND document_id=? AND status='needs_review')${guard}`).bind(owner,documentId,key,saved.id,receipt,invoice.total,at,owner,old.revision,owner,documentId,...binds),
@@ -176,7 +189,9 @@ async function finish(owner:string,job:Row,result:{text:string,method:string,con
   }
   if(v.vat_cents==null||v.net_cents==null){extraction.issues.push('Moms och nettobelopp behöver kontrolleras före automatisk registrering.');if(extraction.level==='green')extraction.level='yellow';}
   if(!trust){extraction.issues.push('Motparten behöver verifieras för automatisk registrering.');if(extraction.level==='green')extraction.level='yellow';}
-  const w=await readWorkspace(owner),invoice={direction:v.direction==='customer'?'receivable':'payable',party:v.party,number:v.invoice_number,organizationNumber:v.organization_number,total:v.total_cents};
+  const w=await readWorkspace(owner),invoice={direction:v.direction==='customer'?'receivable' as const:'payable' as const,party:v.party,number:v.invoice_number,ocr:v.reference||'',organizationNumber:v.organization_number,total:v.total_cents,referenceOriginal:referenceOriginal(extraction)};
+  const referencePolicy=invoiceReferenceDecision(w.state,invoice);Object.assign(extraction,{referencePolicy});
+  if(referencePolicy.applies&&referencePolicy.status==='BLOCKED'){extraction.issues.push(referencePolicy.reason);extraction.level='yellow';}
   const duplicate=w.state.invoices.some(i=>!i.voided&&documentInvoiceKey(i)===documentInvoiceKey(invoice));
   if(duplicate){extraction.issues.push('Fakturan verkar redan registrerad. Ingen ny skuld skapas.');extraction.level='yellow';}
   const at=now(),state=duplicate?'duplicate':'needs_review',serialized=JSON.stringify(extraction),extractionId=uid();

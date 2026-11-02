@@ -5,7 +5,8 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {emptyState,applyCommand,paid,balance} from '../lib/domain.ts';
+import {applyCommand,paid,balance} from '../lib/domain.ts';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 
 const url=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports){

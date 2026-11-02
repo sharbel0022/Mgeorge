@@ -464,6 +464,7 @@ async function route(req,res){
     const b=await readBody(req),settings=getSettings(db);
     const limits={company_name:240,organization_number:40,email:240,phone:80,address:500,bankgiro:80};
     for(const [key,max] of Object.entries(limits))if(b[key]!==undefined)settings[key]=key==='company_name'?requiredString(b[key],'Företagsnamn',max):optionalString(b[key],max);
+    if(Object.hasOwn(b,'invoice_reference_policies'))settings.invoice_reference_policies=b.invoice_reference_policies;
     for(const key of ['notifications_due','notifications_review','auto_register_known'])if(b[key]!==undefined){if(typeof b[key]!=='boolean')throw bad(400,'Aviseringsinställningen måste vara på eller av');settings[key]=b[key];}
     if(b.reminders_enabled===true)throw bad(409,'Automatiskt utskick av påminnelser är inte aktiverat. Du kan skapa och kontrollera utkast.');
     if(b.sync_interval_minutes!==undefined){if(![0,15,30,60,240,1440].includes(b.sync_interval_minutes))throw bad(400,'Välj ett giltigt hämtningsintervall');settings.sync_interval_minutes=b.sync_interval_minutes;}

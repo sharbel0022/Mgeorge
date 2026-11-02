@@ -6,11 +6,12 @@ import {stripTypeScriptTypes} from 'node:module';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
 import {syntheticAccountService} from './helpers/bank-account-fixture.mjs';
+import {genericCompanyState as emptyState} from './helpers/reference-policy-fixture.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const url=p=>pathToFileURL(root+p).href,data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 function compiled(path,imports){if(path==='lib/reconciliation-evidence.ts')imports={'./bankgiro-service':syntheticAccountService(),...imports};let code=stripTypeScriptTypes(readFileSync(root+path,'utf8'),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(value));return data(code);}
 const domain=url('lib/domain.ts'),engine=url('lib/reconciliation-engine.js');
-const {emptyState,applyCommand,balance,invoicePaymentEvidenceIssue,hasValidAbsenceCheck,paymentOriginalIssue}=await import(domain);
+const {applyCommand,balance,invoicePaymentEvidenceIssue,hasValidAbsenceCheck,paymentOriginalIssue}=await import(domain);
 const reconciliation=compiled('lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});
 const {reconcileWithOriginals,assertPaymentOriginal}=await import(compiled('lib/reconciliation-evidence.ts',{'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':engine,'./server':data('export async function readBankOriginalBytes(){throw Error("No file original requested in this API-only fixture");}')}));
 const {normalizeTransactions}=await import(compiled('lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':url('lib/payment-references.js'),'../payer-evidence.js':new URL('../lib/payer-evidence.js',import.meta.url).href}));
