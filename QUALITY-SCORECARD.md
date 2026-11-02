@@ -1,5 +1,9 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Ny sjuagentsintegration — kontraktsbaslinje, 2026-11-02
+
+[Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar den nya omgångens faktiska PR:er och skiljer dem från tidigare leveranser. Kontrakts-PR #22/main `b65273500c214a4e16b880e3840dac90d8bd7401` har grön exakt CI: **1 309 Node + 2 331 Sites = 3 640 godkända tester**, utan fel eller överhoppade/avbrutna tester. Kontrakt och syntetiska regressioner verifierar inte en ännu saknad behörig Bankgirokälla, bankens verkliga konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Rapporten återger alla 33 före/eftervärden och aktuella begränsningar. Äldre tabeller nedan behålls som detaljerad evidens/historik.
+
 ## Samordnad sex-PR-integration — 2026-11-02
 
 Aktuell integrationsrapport: [SIX-PR-INTEGRATION-REPORT.md](docs/SIX-PR-INTEGRATION-REPORT.md). Före och efter **255/330 = 7,73/10; 0/33 ≥9,5**. Tabellen nedan ersätter äldre observationsbeskrivningar som aktuell bedömning, men bevarar deras historik. Inga poäng höjs för fler tester eller ett mål utan komplett acceptans. Exakt acceptansmain4d20b3e/Actions41524529308 och oberoende lokal körning: **1309Node+2331Sites=3640pass/0fail/skip**. **Sites57 succeeded**, identiskt Sites-källträd45761f430862a3ecbf31bbba2c2c116db7b210a0, runtime9, auth/bindningar/tre scheman bevarade; valda ekonomiska originalprojektioner43→43 lika. Autentiserad desktopresa och originalvisning verifierade. Viewportändringen slog inte igenom: faktisk1920px, ingen ny mobilacceptans. Gmail anslutet men nytt externt schema/cloudkvitto och full produktionsrestore kvarstår. Alla skrivtester använder isolerad syntetisk data; verkliga ekonomiska uppgifter läses endast.
