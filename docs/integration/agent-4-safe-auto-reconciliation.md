@@ -2,6 +2,8 @@
 
 Branch: `feature/mgeorge-safe-auto-reconciliation`.
 
+Pull request: [#28](https://github.com/sharbel0022/Mgeorge/pull/28). Initial published implementation: `9f8b6f17c791639bc65f2c4eb018f25eee75f09e`; the subsequent C1 ownership correction is delivered as a normal follow-up on the same branch. The PR's current head and exact-head CI receipt identify the final delivery.
+
 Initial main: `73662187cddf9a5c504dea9bd8a1288bd929bc51`. The branch incorporated the released contract at `b65273500c214a4e16b880e3840dac90d8bd7401`, then fast-forwarded to final base **`a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`** (PR24). Those main updates added documentation and six synthetic acceptance cases, with no runtime changes. The six added cases were executed separately after the fast-forward. The implementation proposal is `mgeorge-reconciliation-v1` under the released `mgeorge-integration-v1` edition. The PR is the review boundary; merge and publication belong to the integration lead.
 
 ## Outcome and integration dependencies
@@ -10,13 +12,13 @@ The new surface returns deterministic allocation proposals and explicit VERIFIED
 
 **Agent 1 integration remains required.** Both adapters accept an explicit server-side `referencePolicy`; the GET routes deliberately supply no invented policy provider. Until the reviewed company-bound C1 projection is wired in, these routes return BLOCKED with `REFERENCE_POLICY_REQUIRED`. A configured company name is insufficient. Positive tests inject a synthetic server policy; they are not evidence that C1 has shipped.
 
-Agents 2 and 3 can supply their reviewed source/account/report results through the versioned canonical interfaces in [reconciliation-contract.md](reconciliation-contract.md). Current adapters use existing retained-source and consent services, and do not invent external provider fields or endpoints. C5 and C6 can consume the new preview after the integration lead approves this concrete mapping.
+The concrete C1/C2/C3 proposals were inspected at PR #27 `5fada91`, PR #25 `9dcf038` and PR #26 `5c9b51b`. Exact hashes, field mappings and activation gates are recorded in [reconciliation-contract.md](reconciliation-contract.md). The new C1 bridge consumes the producer's optional server invoice projection without silently merging its code. Current C2/C3 adapters use existing retained-source and consent services. C2's live account reader is not read-only; C3 delivery identity, imported row count and queue status cannot substitute for bank identity, original count or reconciliation evidence. C5/C6 can consume the preview after the integration lead approves the complete producer mapping. No cumulative merged-producer test is claimed.
 
 ## Exact exports and APIs
 
 | Surface | Contract |
 | --- | --- |
-| `sites/lib/reconciliation-contract.js` | `RECONCILIATION_CONTRACT_VERSION`, `buildReconciliationPreview(input)`, `validateReconciliationApproval(preview, approval, context)`; shared ES module with adjacent TypeScript declarations |
+| `sites/lib/reconciliation-contract.js` | `RECONCILIATION_CONTRACT_VERSION`, `adaptInvoiceReferenceEvidence(facts)`, `buildReconciliationPreview(input)`, `validateReconciliationApproval(preview, approval, context)`; shared ES module with adjacent TypeScript declarations |
 | `src/reconciliation-preview.js` | `readReconciliationPreview(db, {owner, transactionId?, referencePolicy?})` |
 | Node `GET /api/reconciliation/preview` | Authenticated principal; optional single `transactionId`; rejects all other parameters; session rechecked after asynchronous hashing |
 | `sites/lib/reconciliation-preview.ts` | `readReconciliationPreview(owner, state, revision, transactionId, options?)`; `options.referencePolicy` is a trusted server option |
@@ -29,6 +31,7 @@ No new persistence fields, tables, migrations, dependency packages, provider end
 ## Evidence and economic behavior
 
 - References remain strings with their original value, kind and source. `0599` cannot match `599`. The policy cannot change a bank observation or create OCR evidence. A contradictory explicit invoice reference is preserved and held for REVIEW with no allocation proposal.
+- Every current, declared and known original invoice reference reserves ownership, including closed, held, voided and fully credited records. `conflictingInvoiceIds` is separate from exact-number `candidateInvoiceIds`; ambiguous ownership blocks proposals. Invalid/incomplete C1 reservations block the complete snapshot, and supplied C1 BLOCKED decisions are preserved. C4's company-wide reservations are intentionally stricter than C1's proposed separate supplier scope pending the integration decision.
 - Original bank payer evidence is kept separately from invoice customer data, manual report relations and optional bank-detail metadata. Conflicting organization identity blocks a proposal; a separately approved third-party relationship remains REVIEW.
 - A complete report must conserve the deposit amount and match original count, account, currency, date and shared bank deposit identity. CAMT count/total come from retained XML declarations. Missing counts are never replaced with imported row counts.
 - Every report member and every child naming its deposit participate in group completeness. Conflicts in a parent, sibling or historically allocated source propagate to the dependent proposal. Different original document IDs/hashes cannot be treated as one report.
@@ -57,11 +60,15 @@ A fresh independent review found five P2 correctness issues on the intermediate 
 
 Additional observed regressions cover modified report payer/reference metadata behind an unchanged file hash, ambiguous/unreadable active account resources, omitted foreign-source allocations, logout during preview hashing, route parameter validation, and C1 policy/reference conflicts. The new source replay uses actual retained synthetic bytes and existing parsers; tests deny provider calls and persistent preview writes.
 
+The later C1 comparison exposed a second invoice's declared/original reference not reserving ownership against an exact number candidate. Shared and real-adapter regression cases reproduced it and now block every affected proposal, including closed/held/credited competitors. A narrow follow-up review also reproduced an incomplete census hidden behind an early C1 BLOCKED/not-applicable/unsupported return. Validation now checks known current, decision and Sites original identifiers before those returns; missing membership sets `complete: false` and globally holds uniqueness. The review's supplier-scope observation is retained as an explicit conservative limitation, not represented as C1 semantic parity. An independent rereview ran the four original synthetic reproducers against the corrected code, confirmed BLOCKED/no proposals, and found no remaining blocker in that narrow follow-up. It did not test cumulative C1/C2/C3 integration. Earlier review findings refer to their intermediate snapshots; final regression receipts below cover the corrected code.
+
 ## Verification receipt
 
-Final local gates passed on Node **v22.23.4**, matching the CI major. The required gates are those in `.github/workflows/payment-control-ci.yml`. The managed local `--test` runner reported only passing file wrappers in some invocations; those wrappers are not counted as named-case evidence. Each complete test-file glob was therefore executed directly in isolated Node22 processes, with its named TAP cases and exit status recorded. The normal real npm executable context was supplied for the installation-entrypoint test. The current-main six-case addition was then executed separately; all previously tested runtime/test inputs were unchanged by that documentation/test-only fast-forward.
+The initial implementation's complete local gates passed on Node **v22.23.4**, matching the CI major. The required gates are those in `.github/workflows/payment-control-ci.yml`. The managed local `--test` runner reported only passing file wrappers in some invocations; those wrappers are not counted as named-case evidence. Each complete test-file glob was therefore executed directly in isolated Node22 processes, with its named TAP cases and exit status recorded. The normal real npm executable context was supplied for the installation-entrypoint test. The current-main six-case addition was then executed separately; all previously tested runtime/test inputs were unchanged by that documentation/test-only fast-forward.
 
-| Complete gate | Result |
+GitHub subsequently confirmed the complete initial implementation in [run 41537795349](https://github.com/sharbel0022/Mgeorge/actions/runs/41537795349), testing merge `bb07145a8775689dc8b6d372e258af5fe77b24b2` of head `9f8b6f17c791639bc65f2c4eb018f25eee75f09e` into base `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`: **1381 Node + 2399 Sites = 3780 passed**, zero failed/skipped/cancelled/todo. Both CI jobs and the Sites production build succeeded. This receipt precedes the C1 follow-up; the final exact-head run is recorded in the PR.
+
+| Initial implementation complete gate | Result |
 | --- | --- |
 | Root locked install (`npm ci --ignore-scripts`) | Passed |
 | Sites locked install (`npm run install:ci`) | Passed |
@@ -79,18 +86,21 @@ Final local gates passed on Node **v22.23.4**, matching the CI major. The requir
 
 The build emitted toolchain sourcemap/dynamic-import/timing warnings and completed successfully. No dependency, lockfile, migration or CI change was needed.
 
-Current focused evidence on the final implementation:
+Focused evidence after the C1 ownership/census correction:
 
 | Check | Result |
 | --- | --- |
-| Shared contract corpus | 42 cases in each runtime |
+| Shared contract corpus | 47 cases in each runtime |
 | Additional source/approval integrity cases | 9 cases |
-| Combined shared run | 93 passed, 0 failed/skipped/cancelled |
-| Node adapter and authenticated route | 21 passed, 0 failed/skipped |
-| Sites adapter and authenticated route | 20 passed, 0 failed/skipped |
-| Sites typecheck after C1/count fixes | Passed |
+| Combined shared run | 103 passed, 0 failed/skipped/cancelled |
+| Node adapter and authenticated route | 24 passed, 0 failed/skipped |
+| Sites adapter and authenticated route | 23 passed, 0 failed/skipped |
+| New executed regressions across both runtimes | 150 passed |
+| Sites typecheck after C1 adapter changes | Passed |
 
 Two local runner interruptions are retained honestly: the existing Node PDF/OCR corpus reached a temporary 240-second harness limit after 198 passing cases, then completed unchanged with **284/284** passes in 334 seconds under a 600-second harness limit; the Sites npm-postinstall case initially failed because the direct-file runner lacked `npm_execpath`, then passed all **12/12** cases with the actual installed npm CLI context. No assertions or repository tests were weakened, and no failing/partial attempt contributes to the final totals. Earlier interrupted baseline runs and file-wrapper-only reports are likewise not counted as successful complete suites.
+
+The follow-up Node HTTP fixture initially hit sandbox `listen EPERM` after 22 passing cases. The unchanged synthetic adapter/route suite was then rerun with localhost permission and passed **24/24** (including its nested route case). This was an environment restriction, not a relaxed assertion or changed financial path.
 
 ## Fresh read-only real-case receipt
 
@@ -111,12 +121,13 @@ These are checks of the already deployed application, not acceptance of this bra
 
 ## Remaining limits and required production evidence
 
-1. Integrate Agent 1's reviewed company policy at the server adapter boundary, preserving explicit-reference conflicts. Until then the GET routes remain blocked.
+1. Integrate Agent 1's reviewed company policy at the server adapter boundary, preserving explicit-reference conflicts and complete ownership. Resolve C1/C4 fallback, space, status and customer/supplier-scope differences; until then the GET routes remain blocked.
 2. Obtain bank-origin proof connecting the report's receiving account to the selected current account and the report to the specific AIS deposit. Matching amount/date or a manual relation alone does not establish a VERIFIED bank identity.
 3. Preserve an individual payment identity, actual payer, valid currency/booking-date facts and complete original report count/total. The real retained XLSX observation cannot be assigned a fabricated bank payment ID or booking date.
 4. Register/review the intended invoice through the authorized business flow and establish customer/third-party evidence. No real registered `0599` invoice was found by the complete read.
 5. Obtain separate business approval before any real allocation. Approval persistence/execution is outside this read-only PR.
-6. V1 verifies SEK payments only. Sites validates a bounded selected lineage/report group. Unchecked historical sources can hold a balance-dependent proposal. Generic non-report `bank_file` sources remain blocked pending exact financial/payer replay. Node cannot assert environment/application-generation provenance absent from its existing consent schema.
+6. Review the C2 retained-proof/freshness boundary and map C3 queue authorization, conflict and completeness into the canonical snapshot before activating those new producer paths. C2's live reader must stay out of the GET preview; C3's production resolver is disabled. The integrator owns the C2/C3 migration-0016 collision and cumulative merge tests.
+7. V1 verifies SEK payments only. Sites validates a bounded selected lineage/report group. Unchecked historical sources can hold a balance-dependent proposal. Generic non-report `bank_file` sources remain blocked pending exact financial/payer replay. Node cannot assert environment/application-generation provenance absent from its existing consent schema.
 
 Production-dependent quality scores remain unchanged. The existing complete scorecard is 255/330 (7.73/10), with no claim that this scoped synthetic verification makes all areas 9.5. This PR does not change Sites57, its identity, bindings, secrets or schedules. The integration lead owns cumulative merge tests and any later publication.
 

@@ -5,11 +5,12 @@ import {
   type State, type Transaction,
 } from './domain';
 import {
-  buildReconciliationPreview, RECONCILIATION_CONTRACT_VERSION,
+  adaptInvoiceReferenceEvidence, buildReconciliationPreview, RECONCILIATION_CONTRACT_VERSION,
   type BankAccountEvidence, type BankTransaction, type InvoiceReferencePolicy,
   type OriginalEvidence, type ReconciliationInput, type ReportDepositRelationship,
 } from './reconciliation-contract.js';
 import {readPaymentVerification, type PaymentVerification} from './payment-verification';
+import {invoiceFacts} from './reconciliation';
 import {bankPaymentFieldSources} from './payment-presentation';
 import {bankAccountConsentSnapshot,bankgiroRetainedPreview} from './bankgiro-service';
 import {apiPayerEvidence} from './payer-evidence.js';
@@ -215,11 +216,15 @@ export async function readReconciliationPreview(owner: string, initial: State, r
   const input: ReconciliationInput = {
     contractVersion:RECONCILIATION_CONTRACT_VERSION,ownerId:owner,companyId,revision,checkedAt,complete:true,referencePolicy:policy,
     transactions,reports,relationships,customerRelationships:[],
-    invoices:state.invoices.map(invoice => ({
-      id:invoice.id,companyId,number:invoice.number,explicitReference:invoice.ocr ?? '',customerName:invoice.party,customerOrganizationNumber:invoice.organizationNumber || '',direction:invoice.direction,currency:invoice.currency,
-      totalMinor:invoice.total,creditMinor:credited(state,invoice.id),reviewed:invoice.reviewed,voided:invoice.voided,issuedDate:invoice.issued,
-      evidenceIssue:invoiceProof?.integrity === 'passed' && invoice.documentId === invoiceProof.documentId && step('invoice')?.status === 'passed' ? '' : 'Fakturaoriginalet har inte verifierats entydigt i denna kontroll.',
-    })),
+    invoices:state.invoices.map(invoice => {
+      const reference = adaptInvoiceReferenceEvidence(invoiceFacts(state,invoice));
+      const originalIssue = invoiceProof?.integrity === 'passed' && invoice.documentId === invoiceProof.documentId && step('invoice')?.status === 'passed' ? '' : 'Fakturaoriginalet har inte verifierats entydigt i denna kontroll.';
+      return {
+        id:invoice.id,companyId,number:invoice.number,explicitReference:invoice.ocr ?? '',referenceClaims:reference.referenceClaims,referenceClaimsComplete:reference.complete,customerName:invoice.party,customerOrganizationNumber:invoice.organizationNumber || '',direction:invoice.direction,currency:invoice.currency,
+        totalMinor:invoice.total,creditMinor:credited(state,invoice.id),reviewed:invoice.reviewed,voided:invoice.voided,issuedDate:invoice.issued,
+        evidenceIssue:[reference.issue,originalIssue].filter(Boolean).join(' '),
+      };
+    }),
     allocations:state.allocations.map(allocation => ({id:allocation.id,invoiceId:allocation.invoiceId,transactionId:allocation.transactionId,amountMinor:allocation.amount,active:allocation.active,effect:allocation.effect})),
     // These are committed import receipts, not provider jobs or evidence that a
     // pending report has acquired a deposit relationship.

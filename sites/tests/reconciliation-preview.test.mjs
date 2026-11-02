@@ -73,6 +73,14 @@ test('conflicting explicit invoice reference stays intact and prevents an invoic
  assert.equal(decision.status,'REVIEW');assert.equal(decision.allocations.length,0);assert.deepEqual(f.state,before);assert.equal(f.state.invoices[0].ocr,'0588');
 });
 
+for(const status of ['held','voided','closed'])test('a '+status+' invoice still reserves its explicit reference against another invoice number',async t=>{
+ const state=previewState(),first=state.invoices[0],other={...structuredClone(first),id:'synthetic-competing-invoice',number:'0777',ocr:'0599',party:'Other synthetic customer AB',reviewed:status!=='held',voided:status==='voided',documentId:'synthetic-competing-original'};
+ state.invoices.push(other);
+ if(status==='closed')state.credits.push({id:'synthetic-competing-credit',invoiceId:other.id,amount:other.total,number:'synthetic-credit-number',note:'Synthetic closed balance',date:'2026-10-20',active:true});
+ const f=await previewFixture(t,{state}),before=f.read(),preview=await f.preview(),decision=selected(preview,f.state.transactions[0].id);
+ assert.equal(decision.status,'BLOCKED');assert.equal(decision.allocations.length,0);assert.deepEqual(decision.candidateInvoiceIds,[first.id]);assert.deepEqual(new Set(decision.conflictingInvoiceIds),new Set([first.id,other.id]));assert.deepEqual(f.read(),before);assert.deepEqual(f.state,before.state);assert.equal(f.state.allocations.length,0);
+});
+
 for(const linked of [false,true])test((linked?'complete bank-identified':'manually associated')+' report preserves count, relation and economic membership',async t=>{
  const state=previewState({batch:true}),report=addPreviewReport(state,{linked,manual:!linked}),f=await previewFixture(t,{state,report}),before=f.read(),target=linked?f.state.transactions.find(row=>row.specification):f.state.transactions[0],preview=await f.preview({transactionId:target.id}),decision=selected(preview,target.id);
  assert.equal(decision.status,linked?'VERIFIED':'BLOCKED',JSON.stringify(decision));if(!linked){assert.equal(decision.allocations.length,0);assert.ok(decision.reasonCodes.includes('MANUAL_REPORT_RELATION'));assert.ok(decision.reasonCodes.includes('BANK_PAYMENT_ID_REQUIRED'));}assert.deepEqual(f.read(),before);assert.equal(f.state.allocations.length,0);

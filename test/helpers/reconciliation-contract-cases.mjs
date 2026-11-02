@@ -124,6 +124,48 @@ export function runReconciliationContractCases(api){
   const input=reconciliationContractFixture();input.invoices[0].explicitReference='00042';
   assert.equal(decision(await build(input)).status,'VERIFIED');
  });
+ check('declared and original reference claims reserve every invoice including closed or held owners',async()=>{
+  for(const fields of [{explicitReference:'00042'},{explicitReference:'00042',reviewed:false},{explicitReference:'00042',voided:true},{explicitReference:'',referenceClaims:['00043','00042']}]){
+   const input=reconciliationContractFixture();input.invoices.push({...structuredClone(input.invoices[0]),id:'claim-owner',number:'00043',...fields});
+   const before=structuredClone(input),item=decision(await build(input));
+   assert.equal(item.status,'BLOCKED');assert.ok(item.reasonCodes.includes('AMBIGUOUS_INVOICE_REFERENCE'));assert.deepEqual(item.allocations,[]);
+   assert.deepEqual(item.candidateInvoiceIds,['invoice-1']);assert.deepEqual(item.conflictingInvoiceIds,['claim-owner','invoice-1']);assert.deepEqual(input,before);
+  }
+ });
+ check('additional reference claims are exact snapshot facts and malformed claims fail closed',async()=>{
+  const input=reconciliationContractFixture(),first=await build(input);
+  input.invoices[0].referenceClaims=['00042','00042','OLD-00042'];
+  const second=await build(input);assert.equal(decision(second).status,'VERIFIED');assert.notEqual(second.snapshot.sha256,first.snapshot.sha256);
+  for(const referenceClaims of ['00042',[42],[''],[null],new Array(1)]){
+   const bad=reconciliationContractFixture();bad.invoices[0].referenceClaims=referenceClaims;
+   assert.equal(decision(await build(bad)).status,'BLOCKED');
+  }
+  const incomplete=reconciliationContractFixture();incomplete.invoices.push({...structuredClone(incomplete.invoices[0]),id:'incomplete-owner',number:'00043',referenceClaimsComplete:false,evidenceIssue:'Unknown C1 census'});
+  const blocked=decision(await build(incomplete));assert.equal(blocked.status,'BLOCKED');assert.ok(blocked.reasonCodes.includes('INCOMPLETE_REFERENCE_OWNERSHIP'));
+ });
+ const c1Facts=()=>({invoice_number:'00042',reference:'00042',referencePolicyIdentifiers:['00042','OLD-00042'],referencePolicy:{version:'invoice-reference-policy-v1',policyId:'synthetic-c1-policy',applies:true,status:'REVIEW',invoiceNumber:'00042',intendedPaymentReference:'00042',declaredPaymentReference:'00042',source:'invoice_number_policy',issues:[],reason:'Synthetic company intention; no bank claim.'}});
+ check('C1 projection adapter preserves complete reservations without treating intention as bank evidence',()=>{
+  ensure();assert.equal(typeof api.adaptInvoiceReferenceEvidence,'function');
+  const facts=deepFreeze(c1Facts()),before=structuredClone(facts),mapped=api.adaptInvoiceReferenceEvidence(facts);
+  assert.deepEqual(mapped,{referenceClaims:['00042','OLD-00042'],issue:'',complete:true});assert.notStrictEqual(mapped.referenceClaims,facts.referencePolicyIdentifiers);assert.deepEqual(facts,before);
+  assert.deepEqual(api.adaptInvoiceReferenceEvidence({invoice_number:'00042',reference:'00042'}),{referenceClaims:[],issue:'',complete:true});
+ });
+ check('unknown blocked incomplete or unsupported C1 projections hold proposals and preserve possible owners',()=>{
+  ensure();assert.equal(typeof api.adaptInvoiceReferenceEvidence,'function');
+  const changes=[f=>{f.referencePolicy.version='future-c1-v2';},f=>{f.referencePolicy.status='BLOCKED';},f=>{f.referencePolicy.status='VERIFIED';},f=>{f.referencePolicy.applies=false;},f=>{f.referencePolicy.source='explicit_invoice_reference';},f=>{f.referencePolicy.intendedPaymentReference='OTHER';},f=>{f.referencePolicy.invoiceNumber='OTHER';},f=>{f.referencePolicy.declaredPaymentReference='OTHER';},f=>{delete f.referencePolicy;},f=>{delete f.referencePolicyIdentifiers;},f=>{f.referencePolicyIdentifiers=['OLD-00042',42];},f=>{f.referencePolicyIdentifiers=['OLD-00042'];}];
+  for(const change of changes){const facts=c1Facts();change(facts);const mapped=api.adaptInvoiceReferenceEvidence(facts);assert.ok(mapped.issue);assert.equal(mapped.complete,mapped.issue!=='C1_REFERENCE_POLICY_INVALID');assert.deepEqual(mapped.referenceClaims,Array.isArray(facts.referencePolicyIdentifiers)?facts.referencePolicyIdentifiers.filter(v=>typeof v==='string'&&v.length>0):[]);}
+ });
+ check('C1 projections cannot certify a census omitting known current decision or original references',async()=>{
+  ensure();assert.equal(typeof api.adaptInvoiceReferenceEvidence,'function');
+  for(const hold of [()=>{},f=>{f.referencePolicy.status='BLOCKED';},f=>{f.referencePolicy.applies=false;},f=>{f.referencePolicy.source='explicit_invoice_reference';}]){
+   for(const omit of [f=>{f.referencePolicyIdentifiers=[];},f=>{f.referencePolicy.intendedPaymentReference='UNLISTED-ORIGINAL';},f=>{f.reference='UNLISTED-DECLARED';f.referencePolicy.declaredPaymentReference='UNLISTED-DECLARED';},f=>{f.referenceOriginal={invoice_number:'UNLISTED-ORIGINAL',reference:'00042'};},f=>{f.referenceOriginal={invoice_number:'00042',reference:'UNLISTED-ORIGINAL'};}]){
+    const facts=c1Facts();hold(facts);omit(facts);const before=structuredClone(facts),mapped=api.adaptInvoiceReferenceEvidence(facts);
+    assert.equal(mapped.complete,false);assert.equal(mapped.issue,'C1_REFERENCE_POLICY_INVALID');assert.deepEqual(facts,before);
+    const input=reconciliationContractFixture();input.invoices.push({...structuredClone(input.invoices[0]),id:'held-claim-owner',number:'00043',referenceClaims:mapped.referenceClaims,referenceClaimsComplete:mapped.complete,evidenceIssue:mapped.issue});
+    const item=decision(await build(input));assert.equal(item.status,'BLOCKED');assert.ok(item.reasonCodes.includes('INCOMPLETE_REFERENCE_OWNERSHIP'));assert.deepEqual(item.allocations,[]);
+   }
+  }
+ });
  check('claimed original verification cannot mask absent hash or a bank conflict',async()=>{
   const changes=[input=>{input.transactions[0].original.sha256='';},input=>{input.transactions[0].original.sha256='not-a-sha256';},input=>{input.transactions[0].original.id='';},input=>{input.transactions[0].original.status='REVIEW';},input=>{input.transactions[0].conflict=true;},input=>{input.transactions[0].payerEvidence.conflict=true;}];
   for(const change of changes){const input=reconciliationContractFixture();change(input);const preview=await build(input);assert.equal(decision(preview).status,'BLOCKED');noAllocations(preview);}

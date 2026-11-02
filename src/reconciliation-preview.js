@@ -7,7 +7,7 @@ import {parseBankFile,normalizeBankApiTransaction,parseMoney} from './importers.
 import {hasBankEvidenceConflict,bankFinancialReview} from './bank-evidence.js';
 import {bankSpecificationPresentation} from './bankgiro-links.js';
 import {readCamtDocument,xmlChildren,xmlPath,xmlValue,camtDate,decodeCamtBytes} from '../sites/lib/camt-xml.js';
-import {buildReconciliationPreview,RECONCILIATION_CONTRACT_VERSION} from '../sites/lib/reconciliation-contract.js';
+import {buildReconciliationPreview,adaptInvoiceReferenceEvidence,RECONCILIATION_CONTRACT_VERSION} from '../sites/lib/reconciliation-contract.js';
 
 const fail=(status,message)=>Object.assign(new Error(message),{status});
 const text=value=>typeof value==='string'?value:'';
@@ -139,11 +139,14 @@ function buildInput(db,{owner,referencePolicy},checkedAt){
  const policy=referencePolicy??null,companyId=text(policy?.companyId)||`workspace:${owner}`;
  const invoices=data.invoices.map(invoice=>{
   const original=documentRows.find(doc=>doc.id===invoice.document_id&&doc.invoice_id===invoice.id),intact=!!original?.content&&original.status==='registered'&&/^[a-f0-9]{64}$/.test(original.fingerprint)&&digest(original.content)===original.fingerprint;
+  // Consume C1's existing read projection, including blocked/closed ownership
+  // claims. This does not create or activate a company reference policy.
+  const referenceEvidence=adaptInvoiceReferenceEvidence(invoice);
   // Canonical direction is the obligation's cashflow. Node stores a standalone
   // credit as its own positive-face-value invoice with reversed paymentSign;
   // it is not a negative payment on a different, ordinary invoice. Preserve
   // that history while keeping every new credit proposal in separate review.
-  return {id:invoice.id,companyId,number:invoice.invoice_number,explicitReference:invoice.reference,customerName:invoice.party,customerOrganizationNumber:invoice.organization_number,direction:paymentSign(invoice)>0?'receivable':'payable',currency:invoice.currency,totalMinor:invoice.total_cents,creditMinor:0,reviewed:intact&&invoice.kind!=='credit',voided:false,issuedDate:invoice.issued_at,evidenceIssue:invoice.payment_evidence_issue||(!intact?'Fakturans registrerade original kan inte verifieras.':invoice.kind==='credit'?'Kreditfakturan kräver separat återbetalningsgranskning.':'')};
+  return {id:invoice.id,companyId,number:invoice.invoice_number,explicitReference:invoice.reference,referenceClaims:referenceEvidence.referenceClaims,referenceClaimsComplete:referenceEvidence.complete,customerName:invoice.party,customerOrganizationNumber:invoice.organization_number,direction:paymentSign(invoice)>0?'receivable':'payable',currency:invoice.currency,totalMinor:invoice.total_cents,creditMinor:0,reviewed:intact&&invoice.kind!=='credit',voided:false,issuedDate:invoice.issued_at,evidenceIssue:[referenceEvidence.issue,invoice.payment_evidence_issue||(!intact?'Fakturans registrerade original kan inte verifieras.':invoice.kind==='credit'?'Kreditfakturan kräver separat återbetalningsgranskning.':'')].filter(Boolean).join(' ')};
  });
  // Every recorded allocation constrains company invoice balances. A source
  // outside the readable bank scope stays unresolved and blocks the core; it

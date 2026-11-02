@@ -116,6 +116,22 @@ test('explicit conflicting invoice references remain review evidence under invoi
  }
 });
 
+for(const state of ['open','held','closed'])test(`a conflicting declaration on ${state==='open'?'an':'a'} ${state} invoice reserves ownership against another exact-number candidate`,async t=>{
+ const db=fixture(t);invoice(db,{id:'synthetic-exact-owner',number:'0001'});
+ const competing=invoice(db,{id:'synthetic-declared-owner',number:'0002',original:state!=='held'});
+ if(state==='closed'){
+  const settled=payment(db,{bankId:'SYNTHETIC-CLOSED-OWNER',reference:'0002'});
+  allocate(db,competing,settled,62500);
+ }
+ db.prepare('UPDATE invoices SET reference=? WHERE id=?').run('0001',competing);
+ const id=payment(db,{reference:'0001'}),row=decision(await readonlyPreview(db),id);
+ assert.equal(row.status,'BLOCKED',JSON.stringify(row.reasonCodes));assert.ok(row.reasonCodes.includes('AMBIGUOUS_INVOICE_REFERENCE'));assert.equal(row.allocations.length,0);
+ assert.deepEqual(row.candidateInvoiceIds,['synthetic-exact-owner']);
+ assert.deepEqual([...row.conflictingInvoiceIds].sort(),['synthetic-declared-owner','synthetic-exact-owner']);
+ assert.equal(db.prepare('SELECT reference FROM invoices WHERE id=?').get(competing).reference,'0001');
+ assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,state==='closed'?1:0);
+});
+
 test('explicit server policy can derive invoice number only when no contradictory reference is stored',async t=>{
  const db=fixture(t);invoice(db);db.prepare("UPDATE invoices SET reference='' WHERE id='invoice-0599'").run();const id=payment(db);
  const row=decision(await readonlyPreview(db),id);assert.equal(row.status,'VERIFIED');assert.equal(row.allocations[0].amountMinor,62500);assert.equal(row.references[0].value,'0599');

@@ -57,6 +57,30 @@ function bankProblems(t,input){
  return problems;
 }
 
+/** Consume C1's server-derived invoice projection, not its configuration or a
+ * browser payload. The legacy absence case keeps the explicit-reference census;
+ * incomplete future projections cannot certify uniqueness of other invoices. */
+export function adaptInvoiceReferenceEvidence(facts){
+ if(!facts||typeof facts!=='object'||Array.isArray(facts))return {referenceClaims:[],issue:'C1_REFERENCE_POLICY_INVALID',complete:false};
+ const decision=facts.referencePolicy,rawClaims=facts.referencePolicyIdentifiers;
+ const referenceClaims=Array.isArray(rawClaims)?rawClaims.filter(text):[];
+ const result=(issue,complete=true)=>({referenceClaims,issue,complete});
+ if(decision===undefined&&rawClaims===undefined)return result('');
+ const validClaims=Array.isArray(rawClaims)&&Array.from(rawClaims).every(text);
+ if(!decision||decision.version!=='invoice-reference-policy-v1'||!['REVIEW','BLOCKED'].includes(decision.status)||typeof decision.applies!=='boolean'||!validClaims||!Array.isArray(decision.issues)||!Array.from(decision.issues).every(v=>typeof v==='string')||typeof decision.reason!=='string')return result('C1_REFERENCE_POLICY_INVALID',false);
+ const number=facts.invoice_number??facts.number,declared=facts.reference??facts.ocr??'';
+ const decisionReferences=[decision.invoiceNumber,decision.intendedPaymentReference,decision.declaredPaymentReference];
+ const knownClaims=[number,declared,...decisionReferences,facts.referenceOriginal?.invoice_number,facts.referenceOriginal?.reference].filter(text);
+ // Held/non-applicable invoices still reserve their known original identities.
+ // An incomplete census can invalidate uniqueness for a different invoice.
+ if(typeof number!=='string'||typeof declared!=='string'||decisionReferences.some(value=>value!==null&&typeof value!=='string')||knownClaims.some(value=>!referenceClaims.includes(value)))return result('C1_REFERENCE_POLICY_INVALID',false);
+ if(decision.status==='BLOCKED')return result('C1_REFERENCE_POLICY_BLOCKED');
+ if(!decision.applies)return result('C1_REFERENCE_POLICY_NOT_APPLICABLE');
+ if(decision.source!=='invoice_number_policy')return result('C1_REFERENCE_POLICY_MODE_UNSUPPORTED');
+ if(!text(decision.policyId)||!text(number)||decision.invoiceNumber!==number||decision.intendedPaymentReference!==number||!referenceClaims.includes(number)||typeof declared!=='string'||(decision.declaredPaymentReference??'')!==declared||declared&&!referenceClaims.includes(declared))return result('C1_REFERENCE_POLICY_INVALID',false);
+ return result('');
+}
+
 /**
  * Build a proposal from a complete, authoritative adapter snapshot. Verification
  * flags are adapter results, never authentication of arbitrary browser JSON.
@@ -99,7 +123,8 @@ export async function buildReconciliationPreview(raw){
   usedByTransaction.set(t.id,used??NaN);paidByInvoice.set(i.id,paid??NaN);
  }
  for(const i of invoices){
-  if(!i||!text(i.number)||typeof i.explicitReference!=='string'||i.companyId!==input.companyId||!positive(i.totalMinor)||!money(i.creditMinor)||i.creditMinor>i.totalMinor||!['receivable','payable'].includes(i.direction)||typeof i.reviewed!=='boolean'||typeof i.voided!=='boolean'){
+  if(i?.referenceClaimsComplete===false)problems.push('INCOMPLETE_REFERENCE_OWNERSHIP');
+  if(!i||!text(i.number)||typeof i.explicitReference!=='string'||i.referenceClaims!==undefined&&(!Array.isArray(i.referenceClaims)||!Array.from(i.referenceClaims).every(text))||i.referenceClaimsComplete!==undefined&&typeof i.referenceClaimsComplete!=='boolean'||i.companyId!==input.companyId||!positive(i.totalMinor)||!money(i.creditMinor)||i.creditMinor>i.totalMinor||!['receivable','payable'].includes(i.direction)||typeof i.reviewed!=='boolean'||typeof i.voided!=='boolean'){
    problems.push('INVALID_INVOICE');continue;
   }
   const paid=paidByInvoice.get(i.id)||0,remaining=sum([i.totalMinor,-i.creditMinor,-paid]);
@@ -198,12 +223,17 @@ export async function buildReconciliationPreview(raw){
   }
   return false;
  };
- const ownersByReference=new Map();
- for(const i of invoices)if(i&&text(i.number))ownersByReference.set(i.number,[...(ownersByReference.get(i.number)||[]),i]);
+ const ownersByReference=new Map(),claimOwners=new Map();
+ for(const i of invoices)if(i&&text(i.number)){
+  ownersByReference.set(i.number,[...(ownersByReference.get(i.number)||[]),i]);
+  for(const value of new Set([i.number,i.explicitReference,...(Array.isArray(i.referenceClaims)?i.referenceClaims:[])].filter(text))){
+   const owners=claimOwners.get(value)||new Set();owners.add(i.id);claimOwners.set(value,owners);
+  }
+ }
  for(const t of transactions){
   if(!t)continue;
   const available=t.economic&&!t.ignored&&!t.duplicateOf&&Number.isSafeInteger(t.amountMinor)?Math.max(0,Math.abs(t.amountMinor)-(usedByTransaction.get(t.id)||0)):0;
-  const decision={transactionId:t.id,status:'VERIFIED',bankEvidenceStatus:'VERIFIED',reasonCodes:[],payer:structuredClone(t.payerEvidence??null),references:structuredClone(Array.isArray(t.references)?t.references:[]),candidateInvoiceIds:[],allocations:[],availableMinor:Number.isSafeInteger(available)?available:0,unallocatedMinor:Number.isSafeInteger(available)?available:0,reportedAmountMinor:t.amountMinor,economic:t.economic===true};
+  const decision={transactionId:t.id,status:'VERIFIED',bankEvidenceStatus:'VERIFIED',reasonCodes:[],payer:structuredClone(t.payerEvidence??null),references:structuredClone(Array.isArray(t.references)?t.references:[]),candidateInvoiceIds:[],conflictingInvoiceIds:[],allocations:[],availableMinor:Number.isSafeInteger(available)?available:0,unallocatedMinor:Number.isSafeInteger(available)?available:0,reportedAmountMinor:t.amountMinor,economic:t.economic===true};
   preview.decisions.push(decision);
   for(const problem of problems)hold(decision,'BLOCKED',problem);
   for(const problem of sourceProblems(t))hold(decision,'BLOCKED',problem,true);
@@ -239,7 +269,8 @@ export async function buildReconciliationPreview(raw){
   if(!values.length)hold(decision,'BLOCKED','PAYMENT_REFERENCE_REQUIRED',true);
   const owners=[...new Set(values.flatMap(value=>ownersByReference.get(value)||[]))];
   decision.candidateInvoiceIds=owners.map(i=>i.id).sort();
-  if(values.some(value=>(ownersByReference.get(value)||[]).length>1))hold(decision,'BLOCKED','AMBIGUOUS_INVOICE_REFERENCE');
+  decision.conflictingInvoiceIds=[...new Set(values.flatMap(value=>(claimOwners.get(value)?.size||0)>1?[...claimOwners.get(value)]:[]))].sort();
+  if(decision.conflictingInvoiceIds.length)hold(decision,'BLOCKED','AMBIGUOUS_INVOICE_REFERENCE');
   if(!owners.length)hold(decision,'REVIEW','INVOICE_NOT_FOUND');
   if(values.some(value=>!(ownersByReference.get(value)||[]).length)&&owners.length)hold(decision,'BLOCKED','CONFLICTING_PAYMENT_REFERENCES',true);
   const payer=t.payerEvidence;

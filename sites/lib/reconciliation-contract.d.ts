@@ -14,7 +14,7 @@ export type BankTransaction = {
 export type IndividualPayment = BankTransaction & {kind:'payment'};
 export type BankgiroReport = {id:string; bankDepositId:string; accountId:string; currency:string; bookedDate:string; totalMinor:number; paymentCount:number; paymentIds:string[]; original:OriginalEvidence};
 export type ReportDepositRelationship = {id:string; reportId:string; transactionId:string; method:'bank_identity'|'manual_review'; status:ReconciliationStatus; active:boolean};
-export type ReconciliationInvoice = {id:string; companyId:string; number:string; explicitReference:string; customerName:string; customerOrganizationNumber:string; direction:'receivable'|'payable'; currency:string; totalMinor:number; creditMinor:number; reviewed:boolean; voided:boolean; issuedDate:string; evidenceIssue:string};
+export type ReconciliationInvoice = {id:string; companyId:string; number:string; explicitReference:string; referenceClaims?:string[]; referenceClaimsComplete?:boolean; customerName:string; customerOrganizationNumber:string; direction:'receivable'|'payable'; currency:string; totalMinor:number; creditMinor:number; reviewed:boolean; voided:boolean; issuedDate:string; evidenceIssue:string};
 export type ReconciliationAllocation = {id:string; invoiceId:string; transactionId:string; amountMinor:number; active:boolean; effect:'payment'|'refund'};
 export type CustomerRelationship = {id:string; invoiceId:string; accountId:string; payerName:string; payerOrganizationNumber:string; approved:boolean; active:boolean; evidence:string};
 export type ImportJobStatus = {id:string; status:'complete'|'pending'|'blocked'; complete:boolean};
@@ -28,7 +28,7 @@ export type ReconciliationProposal = {invoiceId:string; amountMinor:number; curr
 export type ReconciliationDecision = {
  transactionId:string; status:ReconciliationStatus; bankEvidenceStatus:ReconciliationStatus;
  reasonCodes:string[]; payer:Record<string,any>|null; references:PaymentReference[];
- candidateInvoiceIds:string[]; allocations:ReconciliationProposal[]; availableMinor:number;
+ candidateInvoiceIds:string[]; conflictingInvoiceIds:string[]; allocations:ReconciliationProposal[]; availableMinor:number;
  unallocatedMinor:number; reportedAmountMinor:number; economic:boolean; evidenceValidUntil:string|null;
 };
 export type ReconciliationPreview = {
@@ -42,4 +42,5 @@ export type ReconciliationApproval = {
  decisions:{transactionId:string; allocations:{invoiceId:string; amountMinor:number; currency:string}[]}[];
 };
 export function buildReconciliationPreview(input:ReconciliationInput):Promise<ReconciliationPreview>;
+export function adaptInvoiceReferenceEvidence(facts:unknown):{referenceClaims:string[];issue:string;complete:boolean};
 export function validateReconciliationApproval(preview:ReconciliationPreview, approval:ReconciliationApproval|null|undefined, context:{ownerId:string; now:string; consumedRequestIds?:string[]}):{valid:boolean; reasonCodes:string[]; writesAllowed:false};

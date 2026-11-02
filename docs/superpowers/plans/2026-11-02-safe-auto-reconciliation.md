@@ -50,6 +50,15 @@ Files: `src/reconciliation-preview.js`, `src/server.js`; `sites/lib/reconciliati
 - [x] Recheck origin/main and report conflicts rather than overwrite parallel work.
 - [x] Record exact results and remaining real-bank blockers; prepare the tested feature commit. The final commit SHA and PR number are recorded in GitHub delivery metadata.
 
+## C1 producer follow-up
+
+- [x] Inspect concrete C1/C2/C3 contracts and document exact revisions, mappings and activation gaps.
+- [x] Reproduce conflicting declared/original ownership on open, held and closed invoices; preserve ownership claims separately from exact-number candidates.
+- [x] Add a version-aware C1 invoice projection bridge without company policy defaults or unmerged module imports.
+- [x] Reproduce an incomplete census behind held C1 decisions and omitted known original references; validate membership before all early returns and globally hold an incomplete snapshot.
+- [x] Verify corrected shared/integrity and adapter suites: 103 +24 +23 =150 named cases passed; Sites types and root syntax passed. Preserve C4's stricter cross-direction reservations as an explicit integration limitation.
+- [x] Publish initial PR #28; its complete CI passed at head `9f8b6f17c791639bc65f2c4eb018f25eee75f09e` in run41537795349 (1381 Node +2399 Sites). The ownership correction is a normal follow-up on that PR; its exact final head and fresh CI receipt are recorded there.
+
 ## Execution ledger
 
 - Start: base `73662187cddf9a5c504dea9bd8a1288bd929bc51`; user supplied explicit scope and autonomous execution authorization.
@@ -57,8 +66,9 @@ Files: `src/reconciliation-preview.js`, `src/server.js`; `sites/lib/reconciliati
 - Design decision: partial/excess/split proposals remain REVIEW in the new v1 surface; existing allocation engine behavior is retained.
 - Independent review: five P2 findings reproduced and fixed (dependent duplicate identities, closed parent/report membership, elapsed evidence expiry, original CAMT count, standalone credit-settlement normalization).
 - Released contract update: fast-forwarded documentation-only main to `b65273500c214a4e16b880e3840dac90d8bd7401`; removed company-name policy inference and preserved contradictory explicit references. GET policy wiring awaits reviewed C1; no unreviewed storage/export was guessed.
-- Frozen focused tests: shared 42 cases per runtime plus 9 integrity cases (93 pass); Node adapter 21 pass; Sites adapter 20 pass; no failed/skipped cases. Sites typecheck, 125-file root syntax and exact minimatch mitigation pass. Root/Sites production audit 0; full Sites audit 16 moderate, 0 high/critical.
+- Initial focused tests: shared 42 cases per runtime plus 9 integrity cases (93 pass); Node adapter 21 pass; Sites adapter 20 pass; no failed/skipped cases. Sites typecheck, 125-file root syntax and exact minimatch mitigation pass. Root/Sites production audit 0; full Sites audit 16 moderate, 0 high/critical.
 - Read-only real case: exact selected reads and retained original current/unchanged at revision43 on 2026-11-02 21:53 UTC; account/deposit proof missing, registered exact invoice count0, allocations0. Broad reference search separately incomplete. No real original is committed or used as a mutable fixture.
-- Final named-case Node22 gates: 1381 Node +2399 Sites =3780 pass, zero fail/skip/cancel/todo; syntax125, types, exact mitigation, production build and high-audit gates pass. The full Sites count includes six new acceptance cases after a documentation/test-only fast-forward to `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`; all previously checked runtime inputs were unchanged.
+- Initial complete named-case Node22 gates: 1381 Node +2399 Sites =3780 pass, zero fail/skip/cancel/todo; syntax125, types, exact mitigation, production build and high-audit gates pass. The full Sites count includes six new acceptance cases after a documentation/test-only fast-forward to `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`; all previously checked runtime inputs were unchanged. GitHub run41537795349 independently confirmed the complete totals. Final follow-up CI is recorded against the current PR head.
+- C1 follow-up: 47 shared cases per runtime +9 integrity +24 Node adapter/route +23 Sites adapter/route =150 pass. A sandbox localhost `EPERM` was resolved by rerunning the unchanged synthetic HTTP fixture with network permission; no assertion or financial path changed.
 - Local harness limits were resolved without repository changes: a 240-second PDF/OCR interruption was rerun to 284/284 passing cases with a 600-second limit; the npm lifecycle-entrypoint fixture passed12/12 after supplying the actual npm executable context. Earlier interrupted attempts and wrapper-only reports are not counted. See the full [delivery receipt](../../integration/agent-4-safe-auto-reconciliation.md).
 - Publication boundary: only the named feature branch and PR are authorized here. GitHub's final commit/PR metadata is the immutable delivery identifier; the integration lead owns merge and any later Sites publication.
