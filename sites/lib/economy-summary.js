@@ -1,4 +1,4 @@
-import {hasValidAbsenceCheck,individualParty,needsBankFileReview,needsBankFileValidation,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference} from './domain.ts';
+import {hasValidAbsenceCheck,individualParty,needsBankFileReview,needsBankFileValidation,allocationPaymentEvidenceIssue,usablePaymentReference} from './domain.ts';
 
 /** Read-only projection of confirmed allocations. All values are integer öre. */
 export const ECONOMY_RULE_VERSION = 'economy-2026-10-30.1';
@@ -33,7 +33,7 @@ export function economySummary(state, at = new Intl.DateTimeFormat('sv-SE', {tim
     if (!validDate(t.date) || !Number.isSafeInteger(t.amount) || t.currency!=='SEK' || i.currency!=='SEK') {issues.push('En betalningskoppling har ogiltigt datum, belopp eller valuta.');continue;}
     const evidence=t.bankDetails?.referenceEvidence||t.referenceEvidence;
     const referenceConflict=!!evidence?.incomplete||!!evidence?.candidates?.some(c=>c.validity==='checksum_invalid');
-    const verified = !needsSpecification(t) && t.verified && t.kind==='payment' && !t.ignored && !t.duplicateOf && t.specificationStatus!=='review' && !needsBankFileReview(t) && !paymentEvidenceConflict(state,t) && !paymentOriginalIssue(state,t) && !referenceConflict && Math.sign(t.amount)===sign;
+    const verified = !needsSpecification(t) && t.verified && t.kind==='payment' && !t.ignored && !t.duplicateOf && t.specificationStatus!=='review' && !needsBankFileReview(t) && !allocationPaymentEvidenceIssue(state,t,a.effect) && !referenceConflict && Math.sign(t.amount)===sign;
     if (!verified) { unverifiedAllocations++; continue; }
     if (i.direction!=='receivable' || !i.reviewed || i.voided || !/^\d{4}-\d{2}-\d{2}$/.test(t.date) || t.date>at) continue;
     if (t.date.slice(0,7)===month) { if (a.effect==='refund') refunded+=a.amount; else received+=a.amount; }

@@ -88,6 +88,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   else if(bankConflict)status='Motstridigt bankunderlag';
   else if(paymentOriginalIssue(state,t))status='Original behöver verifieras';
   else if(needsBankFileValidation(t))status='Original behöver verifieras';
+  else if(assessment.status==='review')status='Behöver granskas';
   else if(assessment.allocationConflict)status='Referenskonflikt';
   else if(sourceLink&&!allocations.length)status='Fakturan behöver granskas';
   else if(requiresSpecification)status='Specifikation saknas';
@@ -99,7 +100,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   }else if(possible.length)status='Möjlig matchning';
   const sources=sourceLink?'Swedbank + Bankgiro '+(sourceLink.rows.some(row=>/xlsx|excel/i.test(row.format||row.source||''))?'Excel':'specifikation'):'';
   const candidateNote=!sourceLink&&bankgiroLinkCandidates(state,t).length?'Möjlig tillhörande Bankgirospecifikation – kontrollera.':'';
-  return {...evidenceView,payer:fieldSources.payer.value||(t.amount<0?'Mottagare okänd':'Betalare okänd'),payerKnown:!!fieldSources.payer.value,reference:fieldSources.reference.value,referenceLabel:referenceLabel(fieldSources.reference.value.kind),fieldSources,sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!assessment.allocationConflict&&assessment.status!=='ambiguous'&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
+  return {...evidenceView,payer:fieldSources.payer.value||(t.amount<0?'Mottagare okänd':'Betalare okänd'),payerKnown:!!fieldSources.payer.value,reference:fieldSources.reference.value,referenceLabel:referenceLabel(fieldSources.reference.value.kind),fieldSources,sourceLink,sources,candidateNote,sourceLabel:sourceLink?'Manuellt verifierad underlagskoppling':t.specificationStatus==='review'?'Granskningsunderlag · räknas inte som pengar':'',invoice:invoiceNumbers.length?invoiceNumbers.join(', '):possible.length?'Möjlig: '+possible.join(', '):'Saknas',invoiceVerified:invoiceNumbers.length>0&&!assessment.allocationConflict&&assessment.status!=='ambiguous'&&assessment.status!=='review'&&!bankConflict&&!paymentOriginalIssue(state,t),invoiceNumbers,possible,status,verified,requiresSpecification};
 }
 export function bankVisibleTransactions(state:State){
   const linkedSpecifications=new Set((state.bankgiroLinks||[]).flatMap(link=>activeBankgiroLink(state,link.transactionId)?.rows.map(row=>row.id)||[]));

@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
-import {emptyState,applyCommand,balance,paymentOriginalIssue} from '../lib/domain.ts';
+import {emptyState,applyCommand,balance,paymentOriginalIssue,invoicePaymentEvidenceIssue,invoiceStatus} from '../lib/domain.ts';
+import {economySummary} from '../lib/economy-summary.js';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
@@ -10,6 +11,7 @@ const url=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [from,to] of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+from+quote,JSON.stringify(to));return data(code);}
 const domain=url('../lib/domain.ts'),engine=url('../lib/reconciliation-engine.js');
 const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});
+const presentation=await import(compiled('../lib/payment-presentation.ts',{'./domain':domain,'./reconciliation-engine.js':engine,'./payment-references.js':url('../lib/payment-references.js')}));
 const iban='SE4280000890119146168423',account='iban:'+iban;
 function seed(){
  let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'000018',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;
@@ -68,11 +70,20 @@ test('a manually split payment inherits its AIS parent account prerequisite',asy
  assert.equal(result.state.allocations.length,0);assert.match(result.state.transactions[0].bankAccountIssue,/konto|medgivande|bankanslutning/i);
  await assert.rejects(f.evidence.assertPaymentOriginal('synthetic-owner',state,child.id));assert.deepEqual(state,before);
 });
-test('loss of account consent cannot reverse a recorded allocation or replace its original',async t=>{
- const f=await fixture(t),allocated=(await f.evidence.reconcileWithOriginals('synthetic-owner',seed())).state,before=structuredClone(allocated);f.connection=null;
+test('known loss of account consent cannot reverse a recorded allocation or retain a verified status',async t=>{
+ const f=await fixture(t),connection=structuredClone(f.connection),allocated=(await f.evidence.reconcileWithOriginals('synthetic-owner',seed())).state;
+ allocated.transactions[0].bankAccountIssue='Earlier known account consent issue';const before=structuredClone(allocated);f.connection=null;
  const result=await f.evidence.reconcileWithOriginals('synthetic-owner',allocated);
  assert.deepEqual(result.state.allocations,before.allocations);assert.equal(balance(result.state,result.state.invoices[0]),0);
  assert.deepEqual(result.state.transactions[0].original,before.transactions[0].original);assert.deepEqual(allocated,before);
+ assert.match(invoicePaymentEvidenceIssue(result.state,result.state.invoices[0].id),/konto|medgivande|bankanslutning/i);
+ assert.equal(invoiceStatus(result.state,result.state.invoices[0]).key,'review');
+ const view=presentation.bankPaymentView(result.state,result.state.transactions[0]);assert.equal(view.verified,false);assert.equal(view.invoiceVerified,false);
+ const summary=economySummary(result.state,'2026-10-30');assert.equal(summary.received_month_cents,0);assert.equal(summary.unverified_allocation_count,1);assert.equal(summary.remaining_cents,0);
+ f.connection=connection;
+ const restored=(await f.evidence.reconcileWithOriginals('synthetic-owner',result.state)).state;
+ assert.equal(invoiceStatus(restored,restored.invoices[0]).key,'paid');assert.equal(presentation.bankPaymentView(restored,restored.transactions[0]).verified,true);
+ assert.equal(economySummary(restored,'2026-10-30').received_month_cents,62500);assert.deepEqual(restored.allocations,before.allocations);
 });
 test('integrity-only availability check remains separate from current consent and never writes',async t=>{
  const f=await fixture(t),state=seed(),before=structuredClone(state);f.connection=null;
@@ -93,4 +104,22 @@ for(const connected of [false,true])test('a learned payer relation rechecks its 
  assert.equal(result.state.allocations.length,connected?2:1);assert.equal(balance(result.state,result.state.invoices[1]),connected?0:62500);
  assert.equal(!!result.state.transactions[0].bankAccountIssue,!connected);assert.deepEqual(result.state.allocations[0],before.allocations[0]);
  assert.deepEqual(state,before);assert.equal(f.checks,1);
+});
+
+test('a booked organization cannot be changed to teach a third-party payer a different customer identity',async t=>{
+ const f=await fixture(t);let state=seed();
+ state=applyCommand(state,{type:'invoice.save',invoice:{...state.invoices[0],organizationNumber:'1111111111'}}).state;
+ const received=syntheticBankRow({account,date:'2026-10-26',amount:62500,party:'Synthetic third-party payer',payerReference:'000018',bankReference:'IDENTITY-SOURCE',kind:'payment',verified:true});
+ state=applyCommand({...emptyState(),invoices:structuredClone(state.invoices)},{type:'transactions.import',trustedBankImport:true,rows:[received]}).state;
+ state=applyCommand(state,{type:'match.create',invoiceId:state.invoices[0].id,transactionId:state.transactions[0].id,amount:62500,note:'Separately verified synthetic third-party relationship'}).state;
+ state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Different synthetic customer AB',organizationNumber:'2222222222',number:'0600',ocr:'000026',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;
+ state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date:'2026-10-27',amount:62500,party:'Synthetic third-party payer',payerReference:'000026',bankReference:'IDENTITY-TARGET',kind:'payment',verified:true})]}).state;
+ const before=structuredClone(state);
+ assert.equal((await f.evidence.reconcileWithOriginals('synthetic-owner',state)).state.allocations.length,1);
+ assert.throws(()=>applyCommand(state,{type:'invoice.save',invoice:{...state.invoices[0],organizationNumber:'2222222222'}}),/betalningar|krediter|identitet/i);
+ assert.deepEqual(state,before);
+ const edited=applyCommand(state,{type:'invoice.save',invoice:{...state.invoices[0],organizationNumber:'111111-1111',email:'synthetic@example.invalid',note:'Allowed metadata correction',due:'2026-11-10'}}).state;
+ const checked=(await f.evidence.reconcileWithOriginals('synthetic-owner',edited)).state;
+ assert.equal(checked.invoices[0].note,'Allowed metadata correction');assert.equal(checked.allocations.length,1);assert.deepEqual(checked.allocations,before.allocations);
+ assert.equal(balance(checked,checked.invoices[0]),0);assert.equal(balance(checked,checked.invoices[1]),62500);assert.deepEqual(checked.transactions,before.transactions);
 });

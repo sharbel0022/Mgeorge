@@ -1,8 +1,8 @@
-import {applyCommand,available,balance,paid,uid,now,needsPaymentSpecification,needsBankFileReview,specificationPreview,individualParty,paymentEvidenceConflict,paymentOriginalIssue,paymentLineage,invoicePaymentEvidenceIssue,automaticMatchHoldReason,bankPaymentReviewReason,BANK_EVIDENCE_CONFLICT,type State,type Invoice,type Transaction} from './domain';
+import {applyCommand,available,balance,paid,uid,now,needsPaymentSpecification,needsBankFileReview,specificationPreview,individualParty,paymentEvidenceConflict,paymentOriginalIssue,paymentAccountIssue,invoicePaymentEvidenceIssue,automaticMatchHoldReason,bankPaymentReviewReason,BANK_EVIDENCE_CONFLICT,type State,type Invoice} from './domain';
 import {analyzeReconciliation,normalizeName,RECONCILIATION_RULE_VERSION} from './reconciliation-engine.js';
 
 export function invoiceFacts(state:State,i:Invoice){return {...i,invoice_number:i.number,reference:i.ocr,total_cents:i.total,paid_cents:paid(state,i.id),remaining_cents:balance(state,i),payment_evidence_issue:invoicePaymentEvidenceIssue(state,i.id),vat_cents:i.vat??null,net_cents:i.net??null,due_at:i.due};}
-const accountIssue=(state:State,t:Transaction)=>paymentLineage(state,t).ancestors.map(row=>row.bankAccountIssue||'').find(Boolean)||'';
+const accountIssue=paymentAccountIssue;
 export function analyze(state:State){
   const links=state.allocations.filter(a=>a.active&&a.effect==='payment').flatMap(a=>{
     const i=state.invoices.find(i=>i.id===a.invoiceId),t=state.transactions.find(t=>t.id===a.transactionId);

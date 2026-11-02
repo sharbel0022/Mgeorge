@@ -119,6 +119,7 @@ export function paymentLineage(s:State,t:Transaction){
  return {ancestors,issue:''};
 }
 function paymentAncestors(s:State,t:Transaction){return paymentLineage(s,t).ancestors;}
+export const paymentAccountIssue=(s:State,t:Transaction)=>paymentAncestors(s,t).map(original=>original.bankAccountIssue||'').find(Boolean)||'';
 export const paymentEvidenceConflict=(s:State,t:Transaction)=>!!s.bankEvidenceHold||paymentAncestors(s,t).some(hasBankEvidenceConflict);
 export function paymentOriginalIssue(s:State,t:Transaction){const lineage=paymentLineage(s,t);return lineage.issue||lineage.ancestors.map(original=>original.payerEvidence?.conflict?'Bankoriginalet innehåller motstridiga organisationsidentifierare. Granska originalet.':bankApiOriginalIssue(original)||original.bankOriginalIssue||'').find(Boolean)||'';}
 export const automaticMatchHoldReason=(t:Transaction)=>t.automaticMatchHold?'En matchning har återtagits. Automatisk matchning väntar tills betalningsuppgifterna har granskats och bekräftats på nytt.':'';
@@ -130,7 +131,7 @@ export function invoicePaymentEvidenceIssue(s:State,invoiceId:string){
  if(s.bankEvidenceHold)return BANK_EVIDENCE_CONFLICT;
  for(const allocation of s.allocations.filter(a=>a.active&&a.invoiceId===invoiceId)){
   const payment=s.transactions.find(t=>t.id===allocation.transactionId);if(!payment)return 'Betalningsunderlaget för en registrerad koppling saknas.';
-  const issue=paymentEvidenceIssue(s,payment);if(issue)return issue;
+  const issue=allocationPaymentEvidenceIssue(s,payment,allocation.effect);if(issue)return issue;
  }
  return '';
 }
@@ -153,6 +154,12 @@ export function bankPaymentReview(t:Transaction,state?:State):{kind:'reversal'|'
  return null;
 }
 export const bankPaymentReviewReason=(t:Transaction,state?:State):string=>bankPaymentReview(t,state)?.reason||'';
+/** Current evidence can hold a booked allocation without changing its balance.
+ * An explicit refund allocation already records the reviewed refund direction. */
+export function allocationPaymentEvidenceIssue(s:State,t:Transaction,effect:Allocation['effect']){
+ const issue=paymentEvidenceIssue(s,t)||paymentAccountIssue(s,t);if(issue)return issue;
+ const review=bankPaymentReview(t,s);return review&&!(review.kind==='refund'&&effect==='refund')?review.reason:'';
+}
 export function suspectedBankCollection(amount:number,description:string,party:string,structuredReference:string){
  const collective=/\bbatch\b|samlings|samlad|buntbetal|sammandrag/i.test(description);
  return collective||amount>0&&/bankgiro|bg\s*inbetalning/i.test(`${description} ${party}`)&&(!individualParty(party)||!usablePaymentReference(structuredReference));
@@ -258,8 +265,8 @@ export function specificationPreview(s:State,rows:any[],targetId=''){
 export function paymentInvoiceAssessment(s:State,t:Transaction){
  const view={...t,party:t.bankDetails?.party||t.party,payerReference:t.bankDetails?.payerReference||(needsPaymentSpecification(t)?'':t.payerReference)};
  const exact=s.invoices.filter(i=>!i.voided&&i.direction===(t.amount>0?'receivable':'payable')&&exactPaymentReference(view,i));
- const allocated=s.allocations.find(a=>a.active&&a.transactionId===t.id),invoice=allocated?s.invoices.find(i=>i.id===allocated.invoiceId):exact.length===1?exact[0]:undefined;
- const issue=paymentEvidenceIssue(s,t);
+ const allocations=s.allocations.filter(a=>a.active&&a.transactionId===t.id),allocated=allocations[0],invoice=allocated?s.invoices.find(i=>i.id===allocated.invoiceId):exact.length===1?exact[0]:undefined;
+ const issue=allocated?allocations.map(a=>allocationPaymentEvidenceIssue(s,t,a.effect)).find(Boolean)||'':paymentEvidenceIssue(s,t)||paymentAccountIssue(s,t)||bankPaymentReviewReason(t,s);
  return {invoice,status:issue?'review':allocated?'verified':exact.length>1?'ambiguous':invoice?'possible':'missing',message:issue|| (allocated?'Betalningen är verifierad mot fakturan.':exact.length>1?'Flera fakturor kan passa. Granska kundidentiteten.':invoice?'Referensen finns. Kund och betalningsunderlag behöver stämma.':individualParty(view.party)?usablePaymentReference(view.payerReference)?`Betalare identifierad – ingen faktura med betalningsreferensen ${view.payerReference} hittades i registret.`:'Betalare identifierad – fakturakoppling saknas.':'Betalaren behöver identifieras.')};
 }
 export function economicTransactions(s:State){return s.transactions.filter(t=>!t.ignored&&!t.duplicateOf&&t.specificationStatus!=='review'&&!s.transactions.some(c=>c.parentId===t.id&&!c.ignored));}
@@ -385,7 +392,7 @@ export function applyCommand(current:State,command:Command):{state:State;message
   const old=command.invoice.id?getInvoice(s,command.invoice.id):undefined,item=cleanInvoice(command.invoice,old);
   const duplicate=s.invoices.find(i=>i.id!==item.id&&!i.voided&&i.direction===item.direction&&i.party.toLowerCase()===item.party.toLowerCase()&&i.number.toUpperCase()===item.number.toUpperCase());
   if(duplicate)throw new Error("Fakturanumret finns redan för den här kunden/leverantören. Öppna den befintliga fakturan.");
-  if(old&&(s.allocations.some(a=>a.active&&a.invoiceId===old.id)||credited(s,old.id)>0)&&(item.total!==old.total||item.direction!==old.direction||item.party!==old.party||item.number!==old.number||item.reviewed!==old.reviewed))throw new Error("Fakturan har betalningar eller krediter. Ångra dessa först, eller registrera en kreditfaktura.");
+  if(old&&(s.allocations.some(a=>a.active&&a.invoiceId===old.id)||credited(s,old.id)>0)&&(item.total!==old.total||item.direction!==old.direction||item.party!==old.party||item.number!==old.number||item.reviewed!==old.reviewed||(item.organizationNumber||'').replace(/[- ]/g,'')!==(old.organizationNumber||'').replace(/[- ]/g,'')))throw new Error("Fakturan har betalningar eller krediter. Ångra dessa först, eller registrera en kreditfaktura.");
   if(old)s.invoices[s.invoices.indexOf(old)]=item;else s.invoices.push(item);message=item.reviewed?"Fakturan är sparad och granskad":"Fakturan är sparad för granskning";break;
  }
  case'invoice.reconcile':{const i=getInvoice(s,command.id);const note=str(command.note??'',1500);if(command.confirm!==true||!note)throw new Error('Bekräfta kontrollen och ange bankunderlaget.');const issue=absenceCheckIssue(s);if(issue)throw new Error(issue);i.reconciledAt=now();i.reconciliationNote=note;message='Betalningsunderlaget är kontrollerat';break;}
