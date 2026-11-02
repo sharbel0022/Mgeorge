@@ -84,19 +84,36 @@ function requestUrl(path,method){
   return url.href;
 }
 function retryAfterSeconds(value,fallback=60){
-  const text=(value||'').trim(),seconds=/^\d+$/.test(text)?Number(text):Math.ceil((Date.parse(text)-Date.now())/1000);
-  const retryBlocked=/^\d{11,}$/.test(text)||Number.isFinite(seconds)&&seconds>365*86400;
-  return {retryAfter:retryBlocked?Math.ceil((Date.UTC(9999,11,31)-Date.now())/1000):Number.isFinite(seconds)&&seconds>=0?Math.max(1,seconds):fallback,retryBlocked};
+  const text=(value||'').trim(),numeric=/^\d+$/.test(text),time=/^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(text)?Date.parse(text):NaN;
+  const validDate=Number.isFinite(time)&&new Date(time).toUTCString()===text&&time>Date.now();
+  const seconds=numeric?Number(text):validDate?Math.ceil((time-Date.now())/1000):NaN;
+  const retryBlocked=numeric&&!Number.isFinite(seconds)||Number.isFinite(seconds)&&seconds>365*86400;
+  return {retryAfter:retryBlocked?Math.ceil((Date.UTC(9999,11,31)-Date.now())/1000):Number.isFinite(seconds)&&seconds>=0?Math.max(1,seconds):fallback,retryBlocked,retryKnown:numeric||validDate};
 }
 /** Skickar tidsbegränsade anrop till Enable Bankings fasta API-domän med signerad token; leverantörsfel hanteras centralt. */
-export async function bankingRequest(path,{method='GET',body}={}){
+export async function bankingRequest(path,{method='GET',body,deadline=Date.now()+18000}={}){
   const url=requestUrl(path,method),authorization=`Bearer ${jwt()}`;
-  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),18000);
+  const remaining=Math.min(18000,deadline-Date.now());
+  const timedOut=()=>bankError('bank_timeout','Bankförfrågan tog för lång tid. Försök igen.',502);
+  if(!Number.isFinite(remaining)||remaining<=0)throw timedOut();
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),remaining);
   try{
     let result;
     try{result=await fetch(url,{method,redirect:'error',signal:controller.signal,headers:{Authorization:authorization,Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});}
     catch{throw bankError(controller.signal.aborted?'bank_timeout':'bank_unavailable',controller.signal.aborted?'Bankförfrågan tog för lång tid. Försök igen.':'Banktjänsten kunde inte nås. Försök igen senare.',502);}
+    if(result.status===429||result.status===503){
+      const retry=retryAfterSeconds(result.headers.get('retry-after'),6*3600);
+      if(result.status===429||retry.retryKnown){
+        // A stalled or malformed error body must not erase a known cooldown.
+        // Cancellation can itself wait indefinitely, so it is never awaited.
+        try{result.body?.cancel().catch(()=>{});}catch{}
+        throw bankError(result.status===429?'rate_limited':'bank_unavailable',result.status===429?'Bankens anropsgräns är nådd. Vänta innan du försöker igen.':'Banktjänsten är tillfälligt otillgänglig. Vänta till nästa tillåtna försök.',result.status,{providerStatus:result.status,...retry});
+      }
+    }
     const data=result.status===204?{}:await result.json().catch(()=>null);
+    // Fetch can finish its headers while the response body is still waiting.
+    // A body abort must keep its timeout identity and must never start recovery.
+    if(controller.signal.aborted||Date.now()>=deadline)throw timedOut();
     if(!result.ok){
       const providerStatus=result.status,extra={providerStatus};
       if(providerStatus===429||data?.error==='ASPSP_RATE_LIMIT_EXCEEDED')throw bankError('rate_limited','Bankens anropsgräns är nådd. Vänta innan du försöker igen.',429,{...extra,...retryAfterSeconds(result.headers.get('retry-after'),data?.error==='ASPSP_RATE_LIMIT_EXCEEDED'?6*3600:60)});
@@ -104,6 +121,8 @@ export async function bankingRequest(path,{method='GET',body}={}){
       if(data?.error==='REDIRECT_URI_NOT_ALLOWED')throw bankError('redirect_not_registered','Bankens returadress måste registreras av systemadministratören.',409,extra);
       if(providerStatus===401||providerStatus===403)throw bankError('application_access_denied','Banktjänsten behöver aktiveras av systemadministratören. Kontrollera nyckel, produktionsgodkännande och AIS-behörighet.',409,extra);
       if(['EXPIRED_AUTHORIZATION_CODE','WRONG_AUTHORIZATION_CODE','ALREADY_AUTHORIZED'].includes(data?.error))throw bankError('authorization_failed','Bankgodkännandet kunde inte slutföras. Starta en ny anslutning.',409,extra);
+      if(data?.error==='WRONG_DATE_INTERVAL')throw bankError('invalid_date_range','Banken avvisade datumordningen. Kontrollera från- och tilldatum.',400,extra);
+      if(data?.error==='WRONG_TRANSACTIONS_PERIOD')throw bankError('transaction_period_unavailable','Banken kunde inte lämna hela det begärda datumintervallet. Välj en kortare period eller komplettera med bankfil. Inga händelser från hämtningen har importerats.',409,extra);
       throw bankError('bank_error','Banktjänsten kunde inte genomföra förfrågan. Kontrollera anslutningen och försök igen.',502,extra);
     }
     if(!data||typeof data!=='object'||Array.isArray(data))throw bankError('invalid_response','Banktjänsten returnerade ett ogiltigt svar.',502);
@@ -140,28 +159,48 @@ export function startConsentBody(aspsp,state,origin){
   return {access:{valid_until,transactions:true,balances:false},aspsp:{name:aspsp.name,country:'SE'},state,redirect_url:`${validatedOrigin(origin,environment)}/api/bank/callback`,psu_type:'business',language:'sv'};
 }
 function validDate(date){return typeof date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date;}
-/** Hämtar bokförda transaktioner över flera API-sidor och förhindrar oändliga upprepningar av sidmarkörer. */
-export async function fetchBookedTransactions(accountId,{dateFrom,dateTo,authorize=()=>{}}){
+/** Hämtar hela det inkluderande UTC-intervallet innan några händelser lämnas till lagring. */
+export async function fetchBookedTransactions(accountId,{dateFrom,dateTo,authorize=()=>{},deadline=Date.now()+240000}){
   if(typeof accountId!=='string'||!accountId||accountId.length>200)throw bankError('invalid_account','Välj ett godkänt konto.',400);
-  if(!validDate(dateFrom)||!validDate(dateTo)||dateFrom>dateTo||Date.parse(dateTo)-Date.parse(dateFrom)>91*86400000)throw bankError('invalid_date_range','Välj ett giltigt datumintervall på högst 91 dagar.',400);
-  const out=[];let cursor='';const seen=new Set();let received=0;
-  for(let page=0;page<15;page++){
-    const search=new URLSearchParams({date_from:dateFrom,date_to:dateTo,transaction_status:'BOOK'});
-    if(cursor)search.set('continuation_key',cursor);
-    authorize();
-    const data=await bankingRequest(`/accounts/${encodeURIComponent(accountId)}/transactions?${search}`);
-    if(!Array.isArray(data.transactions))throw bankError('invalid_response','Banktjänsten returnerade en ogiltig transaktionslista.',502);
-    received+=data.transactions.length;
-    if(received>5000)throw bankError('transaction_limit','För många händelser – välj ett kortare datumintervall.',409);
-    // Do not trust a provider that ignores the BOOK query filter.
-    for(const item of data.transactions){
-      if(!item||typeof item!=='object'||typeof item.status!=='string')throw bankError('invalid_response','Banktjänsten returnerade en transaktion utan bekräftad bokföringsstatus.',502);
-      if(item.status==='BOOK')out.push(item);
+  if(!validDate(dateFrom)||!validDate(dateTo)||dateFrom>dateTo)throw bankError('invalid_date_range','Välj ett giltigt från- och tilldatum.',400);
+  const day=86400000,out=[],end=Date.parse(dateTo);
+  let start=Date.parse(dateFrom),width=90,adjustments=0,requests=0,received=0;
+  // 90 dates is a local request-size policy, not a claim about bank retention.
+  // Global budgets include rejected attempts; a partial history never escapes.
+  while(start<=end){
+    const until=Math.min(end,start+(width-1)*day),from=new Date(start).toISOString().slice(0,10),to=new Date(until).toISOString().slice(0,10);
+    const window=[],seen=new Set();let cursor='';
+    try{
+      while(true){
+        authorize();
+        if(requests>=15)throw bankError('page_limit','För många bankanrop – välj ett kortare datumintervall. Inga händelser från hämtningen har importerats.',409);
+        const search=new URLSearchParams({date_from:from,date_to:to,transaction_status:'BOOK'});
+        if(cursor)search.set('continuation_key',cursor);
+        requests++;
+        const data=await bankingRequest(`/accounts/${encodeURIComponent(accountId)}/transactions?${search}`,{deadline});
+        authorize();
+        if(!Array.isArray(data.transactions))throw bankError('invalid_response','Banktjänsten returnerade en ogiltig transaktionslista.',502);
+        received+=data.transactions.length;
+        if(received>5000)throw bankError('transaction_limit','För många händelser – välj ett kortare datumintervall.',409);
+        // Do not trust a provider that ignores the BOOK query filter.
+        for(const item of data.transactions){
+          if(!item||typeof item!=='object'||typeof item.status!=='string')throw bankError('invalid_response','Banktjänsten returnerade en transaktion utan bekräftad bokföringsstatus.',502);
+          if(item.status==='BOOK')window.push(item);
+        }
+        if(data.continuation_key===undefined||data.continuation_key===null||data.continuation_key==='')break;
+        if(typeof data.continuation_key!=='string'||data.continuation_key.length>8000)throw bankError('invalid_response','Banktjänsten returnerade en ogiltig sidmarkör.',502);
+        if(seen.has(data.continuation_key))throw bankError('repeated_cursor','Banktjänsten upprepade samma sidmarkör. Inga händelser har importerats.',502);
+        cursor=data.continuation_key;seen.add(cursor);
+      }
+    }catch(error){
+      authorize();
+      if(error.code!=='transaction_period_unavailable'||until===start||adjustments>=6)throw error;
+      // Discard this window's pages, retry its exact start, and keep the narrower
+      // width for the remainder. Never trim unavailable dates or use longest.
+      width=Math.max(1,Math.floor(((until-start)/day+1)/2));adjustments++;
+      continue;
     }
-    if(data.continuation_key===undefined||data.continuation_key===null||data.continuation_key==='')return out;
-    if(typeof data.continuation_key!=='string'||data.continuation_key.length>8000)throw bankError('invalid_response','Banktjänsten returnerade en ogiltig sidmarkör.',502);
-    if(seen.has(data.continuation_key))throw bankError('repeated_cursor','Banktjänsten upprepade samma sidmarkör. Inga händelser har importerats.',502);
-    cursor=data.continuation_key;seen.add(cursor);
+    out.push(...window);start=until+day;
   }
-  throw bankError('page_limit','För många banksidor – välj ett kortare datumintervall.',409);
+  return out;
 }
