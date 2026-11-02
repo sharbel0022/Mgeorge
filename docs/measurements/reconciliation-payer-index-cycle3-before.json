@@ -1,0 +1,243 @@
+{
+  "schema": "synthetic-reconciliation-volume-v1",
+  "generatedAt": "2026-11-02T18:11:43.639Z",
+  "node": "v22.16.0",
+  "typeScript": "5.9.3",
+  "revision": "807b654",
+  "runnerSha256": "eed75a21cfedb2c0a543b6735b1224c232f26bd4f5a123adb66d4b21a264cb50",
+  "workload": {
+    "pureSizes": [
+      50,
+      100,
+      200,
+      400
+    ],
+    "stateSizes": [
+      10,
+      25,
+      50,
+      100,
+      200
+    ]
+  },
+  "sourceBindings": {
+    "revisionPaths": [
+      "src/reconciliation.js",
+      "sites/lib/reconciliation-engine.js",
+      "sites/lib/reconciliation.ts"
+    ],
+    "checkoutPaths": [
+      "sites/lib/domain.ts",
+      "sites/lib/bank-api-original.js",
+      "sites/lib/payment-references.js",
+      "sites/lib/reference-evidence-compat.js",
+      "sites/lib/payer-evidence.js",
+      "sites/lib/uuid.js",
+      "sites/tests/helpers/bank-api-fixture.mjs",
+      "src/payment-references.js",
+      "src/bank-evidence.js",
+      "src/db.js",
+      "src/security.js",
+      "src/importers.js"
+    ]
+  },
+  "sourceSha256": {
+    "src/reconciliation.js": "070046ebac38da87506813ee3951743f27e0cf5c89bf5cb410cf2f0fc1561d70",
+    "sites/lib/reconciliation-engine.js": "c446cbb9eacb64f922f0f1015f79baa05e5324ff95d7c16480e2433f9953840f",
+    "sites/lib/reconciliation.ts": "15f7e5d233750eedb3dead66705830ed5c5fc699e8fe8c9e2b085a3ec81a917e",
+    "sites/lib/domain.ts": "c863660030effdcdb235174807a02116b17e4bf2ad408b4efbd8f7b7f0e5b161",
+    "sites/lib/bank-api-original.js": "cffeeb040f312f318caa7247f40f83b811e92ee23fb6ee2ea278617a8b9410f4",
+    "sites/lib/payment-references.js": "b74e877300fb6fa67bbfb6e6ecd44346875ed7ba5bbad94961363affbf18593e",
+    "sites/lib/reference-evidence-compat.js": "3206b3ad9e120c2fb61074736227a21a5750879e79ca6c0937b76f30558203a7",
+    "sites/lib/payer-evidence.js": "9031830addf7abc16128ae31cf34b8be4a0eeb6971a936a57be2da1df0862c0b",
+    "sites/lib/uuid.js": "1cd888409db943afaa5d6638d98c991ff049c7929e00ad995487bc86484e044c",
+    "sites/tests/helpers/bank-api-fixture.mjs": "cfc604f282569e2b0aea904af7eb62dab458b7e25e12845f247ce0a8bea3d20b",
+    "src/payment-references.js": "b74e877300fb6fa67bbfb6e6ecd44346875ed7ba5bbad94961363affbf18593e",
+    "src/bank-evidence.js": "67cc2899d24baf7edbc84cae12e980c8bb9cf55ad984d5018b4200a33310e1a9",
+    "src/db.js": "344d5cb629f48ba403ade05ad96817f057503506cdd86b47d3edcea0d70f71cf",
+    "src/security.js": "8cc5b24c53016832e4c2bc272622da90dc33c0029b5ae3fc4f4e12eb37806423",
+    "src/importers.js": "2a99d3c19e2bf0a7b2f33695a0286c124c0744cc68a5869d201f3ee55d6c98a5"
+  },
+  "scope": "Local synthetic pure Node/Sites analysis and Sites domain allocations with retained synthetic API originals. No network, D1/R2, browser, production throughput or SLA claim. Only revisionPaths are pinned; domain/support imports and selected support hashes use this checkout. This is not an isolated historical dependency environment; compare only when those inputs are unchanged.",
+  "pure": [
+    {
+      "engine": "node",
+      "invoices": 50,
+      "payments": 50,
+      "safe": 50,
+      "samplesMs": [
+        9.295100000000048,
+        4.5388000000000375,
+        4.374700000000075
+      ],
+      "findingsSha256": "e3187a11703a4f38b3a5a2373ecca2af6d11e0db620fab254dac33b0e8acf41c",
+      "inputSha256": "e857c8fccb2118beb6a2774e61729553e394076aa29517595216215b804a13c8",
+      "inputUnchanged": true
+    },
+    {
+      "engine": "sites",
+      "invoices": 50,
+      "payments": 50,
+      "safe": 50,
+      "samplesMs": [
+        7.829200000000014,
+        4.437400000000025,
+        2.741999999999962
+      ],
+      "findingsSha256": "955f187ce0fff6cef07522a26d80d1345b3f46ef713fe933a9ac08db737f0ee0",
+      "inputSha256": "e857c8fccb2118beb6a2774e61729553e394076aa29517595216215b804a13c8",
+      "inputUnchanged": true
+    },
+    {
+      "engine": "node",
+      "invoices": 100,
+      "payments": 100,
+      "safe": 100,
+      "samplesMs": [
+        12.308899999999994,
+        11.145600000000059,
+        11.997100000000046
+      ],
+      "findingsSha256": "329692ff2e80bbaea625fbfbf55a5cab23e3debd42dc1c0547b118781afd869d",
+      "inputSha256": "99a837f28760830a0fbec4ee6a0468143f8d58a799132388c3bd146f9213c6d4",
+      "inputUnchanged": true
+    },
+    {
+      "engine": "sites",
+      "invoices": 100,
+      "payments": 100,
+      "safe": 100,
+      "samplesMs": [
+        9.380400000000009,
+        11.590000000000032,
+        11.002399999999966
+      ],
+      "findingsSha256": "5cbb2176e8f8e9b9320c92e2f4480c4fc1b0c89fab78e839a272242b550a7196",
+      "inputSha256": "99a837f28760830a0fbec4ee6a0468143f8d58a799132388c3bd146f9213c6d4",
+      "inputUnchanged": true
+    },
+    {
+      "engine": "node",
+      "invoices": 200,
+      "payments": 200,
+      "safe": 200,
+      "samplesMs": [
+        36.32619999999997,
+        38.6819999999999,
+        36.594600000000014
+      ],
+      "findingsSha256": "c40a352e957b9625896214e72ab9c9757323e8fa8425cc25d5b5b2513d5e092a",
+      "inputSha256": "688c946b04618d128ae99cc738437e5f2d7481f0e9393eaa665187ea2e54fbc5",
+      "inputUnchanged": true
+    },
+    {
+      "engine": "sites",
+      "invoices": 200,
+      "payments": 200,
+      "safe": 200,
+      "samplesMs": [
+        37.279199999999946,
+        35.8614,
+        35.19139999999993
+      ],
+      "findingsSha256": "6c62308dab442bf5899f8b7edb6864df94976363a581f6709cbb9594e54f1fbd",
+      "inputSha256": "688c946b04618d128ae99cc738437e5f2d7481f0e9393eaa665187ea2e54fbc5",
+      "inputUnchanged": true
+    },
+    {
+      "engine": "node",
+      "invoices": 400,
+      "payments": 400,
+      "safe": 400,
+      "samplesMs": [
+        128.1295,
+        139.27420000000006,
+        138.8067000000001
+      ],
+      "findingsSha256": "d364c6501247b015222656fc4487f57cdc4ff3b5ddb7b1a9d06f953d611e2fed",
+      "inputSha256": "386e643052a45a3d11c35edc22048a65df7cf1b7ccb17741d493b0ee01d7702a",
+      "inputUnchanged": true
+    },
+    {
+      "engine": "sites",
+      "invoices": 400,
+      "payments": 400,
+      "safe": 400,
+      "samplesMs": [
+        134.21150000000011,
+        134.1014,
+        153.68870000000015
+      ],
+      "findingsSha256": "090ca855c634a08baa9a7050f1b605b401b5e338ee9ec5c92cbf6d3593a51c5c",
+      "inputSha256": "386e643052a45a3d11c35edc22048a65df7cf1b7ccb17741d493b0ee01d7702a",
+      "inputUnchanged": true
+    }
+  ],
+  "stateRuns": [
+    {
+      "invoices": 10,
+      "payments": 10,
+      "allocations": 10,
+      "allBalancesZero": true,
+      "inputUnchanged": true,
+      "originalsUnchanged": true,
+      "elapsedMs": 30.445699999999988,
+      "inputSha256": "cbd19ee79803e0d90a3f5043d360dddabbcf20af4384264e53c2434d96c7adc7",
+      "originalsSha256": "abc8a2fe0519460befd6d0d4ae4c4253ba620f555842b69b9b4b3ba7f86e2aaf",
+      "findingsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "allocationFactsSha256": "0caca1b37275625769328336cd5b1e28f300c007e0f9566f23d24a62c7026f5a"
+    },
+    {
+      "invoices": 25,
+      "payments": 25,
+      "allocations": 25,
+      "allBalancesZero": true,
+      "inputUnchanged": true,
+      "originalsUnchanged": true,
+      "elapsedMs": 77.94090000000006,
+      "inputSha256": "8fd8882f5319ac9de1a356b3c7ab2c2912506d67af387f9fc2ee049d3053c94f",
+      "originalsSha256": "ca30e134f14bd1270b348858e30dea44c1a1f7012dd45675a2b7a0bc96219873",
+      "findingsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "allocationFactsSha256": "827b3910731d85e5f27bcd3667efe85970b3494c5b5e8f66a601080822c35838"
+    },
+    {
+      "invoices": 50,
+      "payments": 50,
+      "allocations": 50,
+      "allBalancesZero": true,
+      "inputUnchanged": true,
+      "originalsUnchanged": true,
+      "elapsedMs": 298.59490000000005,
+      "inputSha256": "0d6b0933a647ffd086e43ec69a80ca8cbab74e0dba07b3a26d650e4f61ac0723",
+      "originalsSha256": "88a2340c652470e228e54089e57b76264aa498ebba8657f517ec8f6f176d5660",
+      "findingsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "allocationFactsSha256": "cac77d56572bea602043cc936fb1eb134afd7417cbc4f60dc320f2cad2a4a93c"
+    },
+    {
+      "invoices": 100,
+      "payments": 100,
+      "allocations": 100,
+      "allBalancesZero": true,
+      "inputUnchanged": true,
+      "originalsUnchanged": true,
+      "elapsedMs": 2174.4694,
+      "inputSha256": "55d0c6e860ecac856224e219c961371f659cf12a5706fe1490b758b8bdd49307",
+      "originalsSha256": "7feba6f8ca6eabef8967727c16c435f23ab3609a8ec1e50f35dcceaf2110591e",
+      "findingsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "allocationFactsSha256": "39daf5d9b85ac04e405fb98c33d0d23718022cef6a29ded2efb2b1017a87fd0e"
+    },
+    {
+      "invoices": 200,
+      "payments": 200,
+      "allocations": 200,
+      "allBalancesZero": true,
+      "inputUnchanged": true,
+      "originalsUnchanged": true,
+      "elapsedMs": 22006.4888,
+      "inputSha256": "8e2db973f32e54393d382956ba3a250df757dc5b7c46253dd72b98a2ebdab8ad",
+      "originalsSha256": "a5ac183f07a96b81749d5ff772c7fe4ec30810094377fa41d0f019a380e79dc8",
+      "findingsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "allocationFactsSha256": "fb71aa6251270d00683c01e2ac2aaac3757e9659d1bf8b1d1e4b43120531a983"
+    }
+  ]
+}

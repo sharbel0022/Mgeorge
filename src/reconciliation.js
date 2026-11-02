@@ -102,6 +102,13 @@ function samePayer(i,t,links,nameOf){
 export function analyzeReconciliation({invoices,transactions,links=[],allocations=[]}){
   // Keep this cache local: later analyses must recheck changed identities.
   const namesByValue=new Map(),nameOf=value=>{const raw=String(value||'');let name=namesByValue.get(raw);if(name===undefined){name=normalizeName(raw);namesByValue.set(raw,name);}return name;};
+  // Retain every identity in a payer/account bucket. samePayer still applies
+  // the original strict account predicate (including NaN !== NaN).
+  const linksByAccount=new Map();
+  for(const link of links){
+    let payers=linksByAccount.get(link.account);if(!payers){payers=new Map();linksByAccount.set(link.account,payers);}
+    const name=nameOf(link.payer),bucket=payers.get(name);if(bucket)bucket.push(link);else payers.set(name,[link]);
+  }
   const out=[];
   for(const t of transactions){
     if(t.excluded||!Number.isSafeInteger(t.amount_cents)||t.amount_cents===0||!Number.isSafeInteger(t.available_cents)||t.available_cents<=0)continue;
@@ -119,15 +126,16 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
     const owners=references.length?invoices.filter(i=>[i.reference,i.invoice_number].some(x=>references.some(r=>exactReference(r,x)))):[];
     const dateOK=i=>!i.issued_at||t.booked_at>=i.issued_at;
     const eligible=invoices.filter(i=>i.direction===direction&&i.kind!=='credit'&&i.currency===t.currency&&paymentSign(i)===Math.sign(t.amount_cents)&&dateOK(i));
-    const names=eligible.filter(i=>samePayer(i,t,links,nameOf));
+    const payerLinks=linksByAccount.get(t.account)?.get(nameOf(t.payer))||[];
+    const names=eligible.filter(i=>samePayer(i,t,payerLinks,nameOf)),namedInvoices=new Set(names);
     const tokens=String(t.reference||'').split(/[\s,;+/]+/).map(ref).filter(Boolean);
-    const grouped=eligible.filter(i=>i.remaining_cents>0&&samePayer(i,t,links,nameOf)&&tokens.some(r=>[i.reference,i.invoice_number].some(x=>ref(x)===r)));
+    const grouped=names.filter(i=>i.remaining_cents>0&&tokens.some(r=>[i.reference,i.invoice_number].some(x=>ref(x)===r)));
     if(owners.length===0&&grouped.length>1&&grouped.reduce((s,i)=>s+i.remaining_cents,0)===t.available_cents){
       for(const i of grouped)out.push({transaction_id:t.id,invoice_id:i.id,kind:'multiple_invoices',safe:false,score:85,amount_cents:i.remaining_cents,reason:'En överföring hänvisar till flera fakturor. Bekräfta fördelningen manuellt.'});
       continue;
     }
     for(const i of eligible){
-      const exact=owners.some(x=>x.id===i.id),payer=samePayer(i,t,links,nameOf);
+      const exact=owners.some(x=>x.id===i.id),payer=namedInvoices.has(i);
       if(!exact&&!payer&&t.available_cents!==i.remaining_cents)continue; // Amount alone may be shown, but never accepted.
       const conflict=invalidReference||references.some(r=>!([i.reference,i.invoice_number].some(x=>exactReference(r,x))))&&references.length>1||reference&&owners.some(x=>x.id!==i.id);
       const duplicateEvidence=transactions.some(x=>x.id!==t.id&&!x.excluded&&!x.is_aggregate&&x.amount_cents===t.amount_cents&&x.currency===t.currency&&x.booked_at===t.booked_at&&(x.account===t.account&&x.bank_reference&&x.bank_reference===t.bank_reference||x.account!==t.account&&sameBankPaymentIdentity(x,t)));

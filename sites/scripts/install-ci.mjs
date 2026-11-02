@@ -4,6 +4,7 @@ import path from "node:path";
 import { projectRoot } from "./sites-env.mjs";
 import { readExecutionProfile } from "./execution-profile.mjs";
 import { runNpmInstall } from "./npm-install.mjs";
+import { guardMinimatchBackport } from "./minimatch-backport.mjs";
 
 if (!process.env.npm_execpath) {
   throw new Error("Run this installer with npm run install:ci.");
@@ -34,6 +35,9 @@ const installed = await runNpmInstall([
 ]);
 if (installed.signal) process.kill(process.pid, installed.signal);
 if (installed.code !== 0 || installed.signal) process.exit(installed.code || 1);
+
+// Explicit proof also covers npm configured with ignore-scripts.
+console.log("[minimatch-backport]", guardMinimatchBackport({ requireTarget: true }));
 
 try {
   accessSync(

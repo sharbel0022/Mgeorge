@@ -1,5 +1,12 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Avgränsad avslutsleverans 2026-11-02
+
+Granskad minimatchbackport och analyslokalt betalarindex. Färska kontroller: Node1063tester/1055pass/0fail/8befintliga WindowsEPERMskip; Sites1912/1909pass/0fail/3Linux-onlyskip; syntax105, TypeScript, build, highaudit passerar, produktionsaudit0. Första rootkörningen hade27PDFworkerfel; full omkörning grön, exakt transientorsak ej styrkt. Samtliga33poäng kvar255/330=7,73 och0/33på9,5. Faktisk inloggad Chrome-läsvy/fem dialogbredder styrks nu; bank0599 fortsatt spärrad/revision42. Sites55 är tidigare driftversion, ny publicering och exakt main-CI återstår att verifiera.
+
+[Senaste rapport](docs/MAINTAINED-RUNTIME-DELIVERY-REPORT.md). Ofärdig Sitesexport/offlinerestore är privat hashbevarad och ingår inte. Ingen fortsatt obemannad körning.
+
+
 ## Originalreferenser och avstämningskostnad – samtliga 33 områden, 2026-11-02
 
 Bas origin/main `38769f2`/Sites54, verifierad fortsättning Sites55. Områdespoängen använder samma dokumentära modell som föregående kompletta bedömning: **255/330 = 7,73/10 före och efter; 0/33 på 9,5**. De höjs inte för att uppfylla målet. Nya testbevis stärker avgränsade kontroller; de certifierar inte hela området. **Verifierad leverans:** maincc2be7b/exaktActions41491162166 success, Sites55 succeeded med samma Sites-källträd, runtime9/revision42→42. **Historiskt verifierad leverans:** main2410e4b/Actions41480737514 success, Sites54 med samma källträd, runtime9/revision42. [Aktuell rapport](docs/ORIGINAL-REFERENCE-INTEGRITY-REPORT.md), [plan](docs/superpowers/plans/2026-11-02-original-reference-integrity.md), [specifikation](docs/superpowers/specs/2026-11-02-original-reference-integrity-design.md). [Föregående leveransrapport](docs/MGEORGE-FINAL-ENGINEERING-REPORT.md) och [kvitto](docs/MGEORGE-FINAL-ENGINEERING-DELIVERY.json) behålls som historik.

@@ -178,6 +178,8 @@ if [[ ! -x "${vinext}" ]]; then
   exit 69
 fi
 
+node "${script_dir}/minimatch-backport.mjs" --require-target
+
 node --input-type=module - "${SITES_PROJECT_ROOT}/node_modules/.sites-install.json" "${lockfile_sha256}" <<'NODE'
 import { writeFile } from "node:fs/promises";
 

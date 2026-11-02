@@ -43,6 +43,8 @@ jobs:
           cache: npm
           cache-dependency-path: sites/package-lock.json
       - run: npm run install:ci
+      - name: Verify exact installed minimatch mitigation bytes
+        run: node scripts/minimatch-backport.mjs --check --require-target
       - name: Install shared OCR runtime for cloud integration test
         working-directory: .
         run: npm ci --ignore-scripts

@@ -1,0 +1,87 @@
+{
+  "schema": "synthetic-cycle3-payer-index-comparison-v1",
+  "generatedAt": "2026-11-02T18:12:51.697Z",
+  "baseline": "807b654",
+  "runnerSha256": "eed75a21cfedb2c0a543b6735b1224c232f26bd4f5a123adb66d4b21a264cb50",
+  "node": "v22.16.0",
+  "typeScript": "5.9.3",
+  "workload": {
+    "pureSizes": [
+      50,
+      100,
+      200,
+      400
+    ],
+    "stateSizes": [
+      10,
+      25,
+      50,
+      100,
+      200
+    ]
+  },
+  "unchangedSupportSources": [
+    "sites/lib/domain.ts",
+    "sites/lib/bank-api-original.js",
+    "sites/lib/payment-references.js",
+    "sites/lib/reference-evidence-compat.js",
+    "sites/lib/payer-evidence.js",
+    "sites/lib/uuid.js",
+    "sites/tests/helpers/bank-api-fixture.mjs",
+    "src/payment-references.js",
+    "src/bank-evidence.js",
+    "src/db.js",
+    "src/security.js",
+    "src/importers.js"
+  ],
+  "changedSources": [
+    "src/reconciliation.js",
+    "sites/lib/reconciliation-engine.js",
+    "sites/lib/reconciliation.ts"
+  ],
+  "adapterSourceParity": {
+    "canonicalLfEqual": true,
+    "canonicalLfSha256": "15f7e5d233750eedb3dead66705830ed5c5fc699e8fe8c9e2b085a3ec81a917e",
+    "rawDifference": "Git LF versus Windows checkout CRLF; no adapter logic change"
+  },
+  "pureFindingAndInputHashesEqual": 8,
+  "stateAllocationFindingInputAndOriginalHashesEqual": 5,
+  "diagnostic": {
+    "budgetMs": 15000,
+    "childHardLimitMs": 60000,
+    "beforeExitCode": 1,
+    "afterExitCode": 0,
+    "neitherTimedOut": true,
+    "before200Ms": 22006.4888,
+    "after200Ms": 5041.7595,
+    "localRatio": 4.364843027518468
+  },
+  "differential": {
+    "seed": "0x7ec3d421",
+    "literalPerEngine": 21,
+    "seededPerEngine": 2000,
+    "mutationComparisonsPerEngine": 1200,
+    "totalExactOrderedFindingComparisons": 6442,
+    "allInputsUnchanged": true,
+    "resultsSha256": "b7af329900566949f6962a6cdc532dc412b33e0f2712fa7ed0dab70ff16db379",
+    "runnerSha256": "8c1636cbeb482b0e8729b22b6d3815208f213912604b918ba7e53ecdc56ea084"
+  },
+  "neighborTests": {
+    "node": {
+      "pass": 161,
+      "fail": 0,
+      "skip": 0
+    },
+    "sites": {
+      "pass": 171,
+      "fail": 0,
+      "skip": 0
+    },
+    "sitesBankStateIntegrity": {
+      "pass": 28,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "scope": "Single local diagnostic samples, not representative medians, production throughput or SLA. Pure analyzers and Sites adapter are baseline-pinned; domain and support imports remain the working checkout. domain.ts directly imports current exactReference/normalizeName exports from the working engine in both final runs; those two exports are unchanged by this patch. No financial recheck removed and no network, D1/R2 or browser used."
+}

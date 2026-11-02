@@ -1,5 +1,12 @@
 # Verifierad progress
 
+## Avgränsad avslutsleverans 2026-11-02
+
+Granskad minimatchbackport och analyslokalt betalarindex. Färska kontroller: Node1063tester/1055pass/0fail/8befintliga WindowsEPERMskip; Sites1912/1909pass/0fail/3Linux-onlyskip; syntax105, TypeScript, build, highaudit passerar, produktionsaudit0. Första rootkörningen hade27PDFworkerfel; full omkörning grön, exakt transientorsak ej styrkt. Samtliga33poäng kvar255/330=7,73 och0/33på9,5. Faktisk inloggad Chrome-läsvy/fem dialogbredder styrks nu; bank0599 fortsatt spärrad/revision42. Sites55 är tidigare driftversion, ny publicering och exakt main-CI återstår att verifiera.
+
+[Senaste rapport](docs/MAINTAINED-RUNTIME-DELIVERY-REPORT.md). Ofärdig Sitesexport/offlinerestore är privat hashbevarad och ingår inte. Ingen fortsatt obemannad körning.
+
+
 ## Fortsatt engineering – originalreferenser och samtidighet, 2026-11-02
 
 Utgångspunkt main `38769f2` / Sites 54; aktuell origin/main kontrollerades före normal fast-forward-push utan parallell koddifferens. [Aktuell rapport](docs/ORIGINAL-REFERENCE-INTEGRITY-REPORT.md), [exakt kvitto](docs/ORIGINAL-REFERENCE-INTEGRITY-DELIVERY.json), [plan](docs/superpowers/plans/2026-11-02-original-reference-integrity.md).
