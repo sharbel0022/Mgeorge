@@ -35,8 +35,8 @@
 - [x] T5 Integrate PR18 Gmail preserving parser test changes/full gates; main CI.
 - [x] T6 Integrate PR14 Bankgiro/full gates; main CI.
 - [x] T7 Integrate PR17 UI preserving prior reports/bank UI/full gates; main CI.
-- [ ] T8 Exercise cumulative synthetic flows A–E and failure matrix; correct concrete integration regressions with RED/GREEN.
-- [ ] T9 Update 33-area scorecard and integration report; merge verified report/fixes through PR; main CI.
+- [x] T8 Exercise cumulative synthetic flows A–E and failure matrix; correct concrete integration regressions with RED/GREEN.
+- [x] T9 Update 33-area scorecard and integration report; acceptance PR20 merged with verified main CI; publish final documentation receipt through its own normal PR.
 - [x] T10 Package exact main Site subtree, preserve configuration, deploy existing Site once, verify provenance/status/read-only economic projection and document final evidence.
 
 ## Evidence ledger
@@ -66,3 +66,11 @@ Final independent cumulative review READY; no Critical/Important codeblockers. D
 Fresh localChromium e42 demoactualoverview/list/partialdetail/missingoriginal/Escfocus/invoice; bankaggregateblocked/Escsame row; desktopdialog screenshotinspected. No real writes.
 
 PR17exactCI41522610556success1309Node/2328Sites0fail/skip. Normalmerge79e7aa2acf78925c23d106fa826d92c25c642579; mainCI41523255146successsamecounts. All6maintreesexactcandidateparityverified. Finalverifierworktree22af91 fullSites2331pass; rootrunpending; lint211errors2527warnings/0fatal baseline debt; TypeScript/minimatch/audits pass.
+
+Final acceptance: independent frozen local worktree1309Node/2331Sites=3640pass/0fail/skip/cancel/todo; syntax121,TypeScript,portable31.20sbuild,audit gates pass; full lint211errors2527warnings remains debt. PR20heada34cbf53e275d093719b8565d19093dd093a8ef3 exactCI41524022526success; normal merge4d20b3ecaa5dbbbf9a5b4f75bd189c1aab51c089 mainCI41524529308success1309/2331. Final implementation tree9b797a1f83d184d8f5c201c7eeec8c3f1996604e.
+
+Publication: existing project appgprj_6adf2f7f7e848191b64192161886b528, version57, native deploymentappgdep_6ae8fb66f92c8191b59b1dd5985180a3 succeeded21:07:11.694632Z. Supported managed build/package349files; normal Sites source12ece026c917a87c2b53f5feb02af488e35e40d1 tree45761f430862a3ecbf31bbba2c2c116db7b210a0 exactly main4d20:sites. Rollback56 retained. Runtime9/masked entries/auth/policy/3schedules/26tableoverview/DB-R2 preserved. Selected direct-ID financial/original projections43→43 identical; earlier42→43 predates publication. Registry0/allocations0/economicAIS1/report0/automaticEligiblefalse. No full ledger census via truncated payload.
+
+Published browser: authenticated desktop overview/invoice list/detail/retained original first-page image/Escape focus/back home passed. Actual image379.5×535.66, no loading/error. Requested five viewport widths all remained1920px; reset and explicitly NOT responsive passes. Local synthetic Chromium earlier bank-aggregate and missing-original/focus checks remain separate. No financial writes.
+
+Production limits confirmed: healthy bankfetch20:07 predates publication; Gmailfetch21:05 predates deployment, ongoing independent local processing changes review counts234 at21:17 while registered outcomes remain5; no new cloud/scheduler execution receipt. Saved195/195backup01:29 manifest unchanged, predates newer originals, no full production restore/key/offsite/RPO-RTO. Score33rows255/330 unchanged; no universal OCR/physical mobile/screenreader certification. Final documentation receipt changes no sites files and requires no second publication; final merge/CI identifiers come from its PR and closing delivery message.
