@@ -720,6 +720,34 @@ test('historical window failure preserves saved money and restarts without dupli
  assert.equal((await(await f.service.sync(post('sync'))).json()).imported,0);assert.equal(f.workspace().state.transactions.length,2);
 });
 
+for(const [label,patch]of [
+ ['malformed amount',{transaction_amount:{amount:'broken',currency:'SEK'}}],
+ ['zero amount',{transaction_amount:{amount:'0.00',currency:'SEK'}}],
+ ['invalid booking date',{booking_date:'2026-02-30'}],
+ ['booking date outside the requested window',{booking_date:'2025-12-31'}],
+])test(`an invalid historical BOOK row with ${label} preserves success coverage for a complete retry`,async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
+ await f.service.sync(post('sync'));
+ await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid],dateFrom:'2026-01-01'}));
+ const before=f.workspace(),runs=count(f,'bank_sync_runs'),audits=count(f,'audit_events');
+ const valid=rawTx({entry_reference:'HISTORY-VALID',booking_date:'2026-01-10'}),repaired=rawTx({entry_reference:'HISTORY-REPAIRED',booking_date:'2026-01-11'});
+ let invalid=true;
+ f.provider.getTransactions=async(_config,_id,input)=>({transactions:input.dateFrom==='2026-01-01'?[valid,invalid?{...repaired,...patch}:repaired]:[]});
+ await assert.rejects(f.service.sync(post('sync')),e=>e.code==='BANK_INCOMPLETE_RESPONSE');
+ assert.deepEqual(f.workspace(),before);assert.equal(count(f,'bank_sync_runs'),runs);assert.equal(count(f,'audit_events'),audits);assert.equal(f.connection().last_synced_at,null);
+ invalid=false;f.calls=[];
+ const resumed=await(await f.service.sync(post('sync'))).json();
+ assert.equal(f.calls.find(call=>call.name==='getTransactions').args[2].dateFrom,'2026-01-01');
+ assert.equal(resumed.imported,2);assert.equal(f.workspace().state.transactions.length,3);assert.ok(f.connection().last_synced_at);
+});
+
+test('documented pending and foreign-currency skips can complete a bank interval',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.provider.getTransactions=async()=>({transactions:[rawTx(),rawTx({entry_reference:'PENDING',status:'PDNG'}),rawTx({entry_reference:'FOREIGN',transaction_amount:{amount:'10.00',currency:'EUR'}})]});
+ const result=await(await f.service.sync(post('sync'))).json();
+ assert.equal(result.imported,1);assert.equal(result.skipped,2);assert.equal(f.workspace().state.transactions.length,1);assert.ok(f.connection().last_synced_at);
+});
+
 test('rate limit encountered after period adjustment persists a cooldown without importing partial history',async t=>{
  const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
  f.sql.prepare("UPDATE bank_connections SET date_from='2026-10-01'").run();

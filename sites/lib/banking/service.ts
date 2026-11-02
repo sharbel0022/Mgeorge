@@ -430,6 +430,9 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
         });
         for (const period of periods) {
           const normalized = await normalizeTransactions(period.transactions, { accountKey, accountLabel: maskAccount(account, {name: conn.bank_name, country: conn.country}), bankName: conn.bank_name, dateFrom: period.dateFrom, dateTo: period.dateTo });
+          // Invalid booked originals must keep this interval pending. Advancing
+          // the incremental checkpoint would otherwise prevent a complete retry.
+          if (normalized.skipped.invalid) throw new BankPeriodError('BANK_INCOMPLETE_RESPONSE', `Banken lämnade ogiltiga bokförda händelser för perioden ${period.dateFrom}–${period.dateTo}. Inga nya bankhändelser sparades. Hämta perioden igen eller komplettera med bankfil.`);
           rows.push(...normalized.rows);
           skipped += normalized.skipped.pending + normalized.skipped.nonSek + normalized.skipped.invalid;
           normalized.warnings.forEach(warning => warnings.add(warning));

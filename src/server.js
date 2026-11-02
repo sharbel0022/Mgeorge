@@ -67,7 +67,7 @@ async function readBody(req,{authenticated=true}={}){
 }
 function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
 // Local OS access represents one company administrator. HTTPS requires login.
-// Anonymous sessions can bind a browser, but never authorize public bank data.
+// HTTPS sessions are persisted only after successful administrator login.
 /** Skapar eller återanvänder webbläsarsessionen som binder OAuth- och bankreturer till rätt användare. Detta är inte samma sak som bankens egen inloggning. */
 function ensureBrowserSession(req,res){
   const existing=cookies(req).mg_session;
@@ -77,9 +77,12 @@ function ensureBrowserSession(req,res){
     if(!check.secure&&found.principal==='')db.prepare('UPDATE sessions SET principal=? WHERE id_hash=?').run('local-admin',digest(existing));
     return;
   }
+  // Denied requests and failed logins must not grow the persistent session
+  // table. HTTPS OAuth already requires a successfully authenticated session.
+  if(check.secure){req.principal='';return;}
   const session=token();
   db.prepare('DELETE FROM sessions WHERE expires_at<=?').run(Date.now());
-  req.principal=check.secure?'':'local-admin';
+  req.principal='local-admin';
   db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(session),Date.now()+8*3600000,req.principal);
   req.headers.cookie=(req.headers.cookie?req.headers.cookie+'; ':'')+'mg_session='+encodeURIComponent(session);
   // Replace an expired session cookie when computing the OAuth browser binding.
@@ -424,7 +427,7 @@ async function route(req,res){
     if(typeof b.password!=='string'||b.password.length>1024||!verifyPassword(b.password,check.adminHash)){
       throw bad(401,'Felaktigt lösenord');
     }
-    loginAttempts.delete(address);db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));
+    loginAttempts.delete(address);db.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
     const value=token();db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
     return json(res,200,{authenticated:true},{'Set-Cookie':sessionCookie(value,true)});
   }

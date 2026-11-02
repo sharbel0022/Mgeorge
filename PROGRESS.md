@@ -1,5 +1,17 @@
 # Verifierad progress
 
+## Backup- och säkerhetsstabilisering — separat PR, 2026-11-02
+
+Bas `a9f88ae1c0f697376b3ecd140e1e80a64405125a`; egen branch `codex/backup-security-stabilization-20261102`. [Verifieringsrapport](docs/DISASTER-RECOVERY-VERIFICATION.md), [genomförandeplan](docs/superpowers/plans/2026-11-02-disaster-recovery-stabilization.md). Endast backup/restore, nyckelkonfiguration och ett reproducerat autentiseringsfel omfattas. Sex parallella uppdrag samordnas genom separat PR, utan push till main, automatisk merge eller Sites-publicering.
+
+- Node-arkiv publiceras först efter privat skrivning, flush, dekryptering och full SQLite-/originalverifiering. Riktig processkill, diskfel och samtidiga körningar bevarar en giltig vinnare och tillåter säker omkörning.
+- Lokal backupkonfiguration bevarar befintliga nycklar och integrationsvärden, stoppar saknad nyckel med befintliga arkiv och skyddar filersättning med exklusivt lås, readback och identitetskontroll.
+- Ny fristående Sites-export/CLI återställer autentiserade rader och original till en ny privat evidenskatalog. Alla 26 tabeller har `evidence_`-prefix; 20 beständiga tabeller bevaras exakt och sex tillfälliga tabeller lämnas tomma. Ingen produktionsdatabas eller R2-skrivning accepteras som restoremål.
+- Verkliga syntetiska SQLite-prov bevarar committad WAL, originalbytes, ekonomiska händelser, gamla bilagor och återtagna länkar; avvisar inkompletta manifest, fel nyckel/ägare och främmande filer. Återställda integrationsuppgifter innebär ingen aktivering av en tjänst.
+- Nekade HTTPS-läsningar samt misslyckad/spärrad login allokerar inte längre persistenta anonyma sessioner. Säkerhetsgranskningen fann inga ytterligare etablerade ägar-/nyckelläckor inom granskad omfattning.
+- Aktuell skrivfri driftobservation: sparat manifestpass 195/195 filer och 63 463 280 bytes; 11 API-kvitton kontrollerade och 112 äldre poster utan kvitto. Ingen produktionsbackup har dekrypterats/återställts i uppdraget. Full export, ursprunglig återställningsnyckel, oberoende arkivåtkomst och faktisk RPO/RTO-övning återstår.
+- Slutliga lokala grindar: **1 083/1 083 Node och 1 973/1 973 Sites**, 0 fel/överhoppade; syntax 108 plus tre nya Sites-filer, TypeScript, separat produktionsbygge och oberoende slutreview godkända. Ett parallellt bygge avbröts med exit 137; oförändrat separat omtag passerade. Root-/Sites-produktionsaudit 0; full Sites-audit 16 moderate, 0 high/critical. Paket, låsfiler, migrationer och CI oförändrade. Berörda kvalitetspoäng behålls.
+
 ## Avgränsad avslutsleverans 2026-11-02
 
 Granskad minimatchbackport och analyslokalt betalarindex. Färska kontroller: Node1063tester/1055pass/0fail/8befintliga WindowsEPERMskip; Sites1912/1909pass/0fail/3Linux-onlyskip; syntax105, TypeScript, build, highaudit passerar, produktionsaudit0. Första rootkörningen hade27PDFworkerfel; full omkörning grön, exakt transientorsak ej styrkt. Samtliga33poäng kvar255/330=7,73 och0/33på9,5. Faktisk inloggad Chrome-läsvy/fem dialogbredder styrks nu; bank0599 fortsatt spärrad/revision42. Sites55 är tidigare driftversion, ny publicering och exakt main-CI återstår att verifiera.
