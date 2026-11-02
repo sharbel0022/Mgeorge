@@ -2,7 +2,7 @@
 
 ## Agent 2 — Swedbank och bankkontoidentitet, 2026-11-02
 
-Separat branch `feature/mgeorge-swedbank-account-evidence`, runtimebas `7366218`, uppdaterad mot kontrakt och syntetisk integrationsacceptans på `12c9868` (PR22/23). [Exakt kontrakt och Agent 3/4-överlämning](docs/integration/bank-account-evidence.md), [verifieringsrapport](docs/integration/agent-2-swedbank-verification.md), [genomförandeplan](docs/integration/agent2-implementation-plan.md).
+Separat branch `feature/mgeorge-swedbank-account-evidence`, [PR25](https://github.com/sharbel0022/Mgeorge/pull/25), runtimebas `7366218`, uppdaterad mot kontrakt, syntetisk integrationsacceptans och kvitto på `a779b0d` (PR22–24). [Exakt kontrakt och Agent 3/4-överlämning](docs/integration/bank-account-evidence.md), [verifieringsrapport](docs/integration/agent-2-swedbank-verification.md), [genomförandeplan](docs/integration/agent2-implementation-plan.md).
 
 - Node validerar aktuellt bank-/land-/företagsmedgivande och tidigaste giltighetstid genom sidindelning och commit. Bankoriginal, import, historikcheckpunkt, audit och jobbframgång sparas atomiskt. Efterföljande kontrollfel rapporteras som varning till en genomförd import.
 - Sites har ägarbundet lås och separat beständig kontospärr. Okänd spärr löper inte ut med den generiska synkfördröjningen. Ett unikt väntande anrop sparas före provideråtkomst; misslyckad resultatlagring eller förlorat lås lämnar kontokontrollen spärrad.
@@ -11,11 +11,11 @@ Separat branch `feature/mgeorge-swedbank-account-evidence`, runtimebas `7366218`
 
 Samtliga33 kvalitetspoäng behålls på **255/330 = 7,73**. Verkligt mottagarkontoalias, explicit bankstyrkt Bankgirorelation, upplösning av eventuell äldre okänd spärr, individuella betalaruppgifter och ny auktoriserad produktionsacceptans kvarstår enligt kontraktets exakta lista.
 
-## Ny sjuagentsintegration — gemensam kontraktsbaslinje, 2026-11-02
+## Ny sjuagentsintegration — kontrakt och syntetisk kedja integrerade, 2026-11-02
 
-[Kontrakt](docs/integration/README.md) och [aktuell integrationsrapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) skiljer den nya omgångens leveranser från tidigare PR #14–21. Separat granskad kontrakts-PR #22 är normalt mergad som `b65273500c214a4e16b880e3840dac90d8bd7401`; exakt main-CI 41531868549 passerar 1 309 Node + 2 331 Sites = 3 640 tester, utan fel eller överhoppade/avbrutna tester. Rapporter och riktade syntetiska kedjetester kompletteras medan faktisk GitHub-leverans från agenterna inventeras. Saknad företagspolicy/BankgiroReportSource får inte räknas som implementerad genom gamla tester.
+[Kontrakt](docs/integration/README.md) och [slutligt integrationskvitto](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) skiljer den nya omgången från tidigare PR #14–21. Kontrakts-PR #22 och regressions-/rapport-PR #23 är normalt mergade efter oberoende granskning och separata CI-grindar. Senaste integrationsmain före detta dokumentationskvitto är `12c9868606a0a45b31b722ddee8f897541687e64`. Fryst #23-head `15f259d1ef46f28fbecf66d522ac70054cf2e6b4` passerar exakt CI 41534249801: **1 309 Node + 2 337 Sites = 3 646 tester**, utan fel eller överhoppade/avbrutna tester. Sex nya namngivna 0599-fall binder samman befintlig AIS-, original-, konto-/insättnings-, kandidat- och betalningsvylogik. Fyra avsiktliga felprover verifierar skrivskydds-/layoutkontrollerna. De sex nya implementationsuppdragen har ännu inga levererade PR:er; företagspolicy och BankgiroReportSource är fortfarande blockerande leveransluckor.
 
-Sites 57 är fortsatt verifierad befintlig publicering; kontraktsändringen berör inte körkod. Läsande produktionskontroll bevarar revision 43, noll allokeringar i de valda 0599-underlagen och fortsatt konto-/insättningsspärr. Ny källa behöver bankens verkliga behöriga integration. Alla 33 poäng är kvar på 255/330 = 7,73. Senaste frysta PR-/main-/Sitesstatus och exakt återstående arbete finns i rapporten; ingen fortlöpande övervakning efter avslutad körning påstås.
+Sites 57 är fortsatt verifierad befintlig publicering. Endast dokumentation och ett test har ändrats, så ingen ny körkod publiceras. Upprepade läsande produktionskontroller visar identiska revision-43-projektioner, noll allokeringar i de två valda 0599-underlagen och fortsatt konto-/insättningsspärr. Bank/Gmail är anslutna; bankens behöriga Bankgirokälla och vissa externa kör-/restorebevis återstår. Alla 33 poäng är kvar på 255/330 = 7,73. Exakta main-CI-kvitton och kvarstående integrations-/publiceringskrav finns i rapporten. Ingen force-push, branchradering, produktionsskrivning eller ny övervakningsautomation har utförts.
 
 ## Samordnad integration av sex PR — 2026-11-02
 

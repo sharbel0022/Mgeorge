@@ -2,7 +2,7 @@
 
 ## Agent 2 — avgränsat bankbevis, 2026-11-02
 
-Ny separat leverans på `feature/mgeorge-swedbank-account-evidence`, integrationbas `12c9868`. [Verifieringsrapport](docs/integration/agent-2-swedbank-verification.md) skiljer syntetiska tester, slutgrindar och kvarstående extern evidens. Inga numeriska poäng ändras; alla33 områden ligger kvar på **255/330 = 7,73/10**.
+Ny separat leverans på `feature/mgeorge-swedbank-account-evidence`, [PR25](https://github.com/sharbel0022/Mgeorge/pull/25), integrationbas `a779b0d`. [Verifieringsrapport](docs/integration/agent-2-swedbank-verification.md) skiljer syntetiska tester, slutgrindar och kvarstående extern evidens. Inga numeriska poäng ändras; alla33 områden ligger kvar på **255/330 = 7,73/10**.
 
 | Berört område | Före | Efter | Nytt bevis inom Agent 2 | Kvarstående gräns |
 | --- | ---: | ---: | --- | --- |
@@ -13,9 +13,9 @@ Ny separat leverans på `feature/mgeorge-swedbank-account-evidence`, integration
 
 Övriga områdens bedömningar och tidigare publiceringsbevis nedan behåller sin angivna historiska omfattning. Ett verifierat kontoalias ger ingen separat Bankgirorelation eller rätt att allokera en betalning.
 
-## Ny sjuagentsintegration — kontraktsbaslinje, 2026-11-02
+## Ny sjuagentsintegration — kontrakt och syntetisk kedja, 2026-11-02
 
-[Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar den nya omgångens faktiska PR:er och skiljer dem från tidigare leveranser. Kontrakts-PR #22/main `b65273500c214a4e16b880e3840dac90d8bd7401` har grön exakt CI: **1 309 Node + 2 331 Sites = 3 640 godkända tester**, utan fel eller överhoppade/avbrutna tester. Kontrakt och syntetiska regressioner verifierar inte en ännu saknad behörig Bankgirokälla, bankens verkliga konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Rapporten återger alla 33 före/eftervärden och aktuella begränsningar. Äldre tabeller nedan behålls som detaljerad evidens/historik.
+[Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar mergade kontrakts-PR #22 och regressions-/rapport-PR #23. Exakt slutlig #23-head-CI 41534249801 passerar **1 309 Node + 2 337 Sites = 3 646 tester**, inklusive alla sex nya namngivna 0599-fall, utan fel eller överhoppade/avbrutna tester. Integrationsmain före slutkvittot är `12c9868606a0a45b31b722ddee8f897541687e64`; separat main-CI finns i rapporten. De sex nya implementationerna, inklusive företagspolicy och BankgiroReportSource, väntar fortfarande på PR-leverans. Kontrakt och tester bevisar inte bankens verkliga behörighet, konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Alla före/eftervärden och aktuella test-/produktionsgränser dokumenteras. Äldre tabeller nedan behålls som detaljerad evidens/historik.
 
 ## Samordnad sex-PR-integration — 2026-11-02
 

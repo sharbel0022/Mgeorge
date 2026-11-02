@@ -4,7 +4,7 @@
 
 **Goal:** retain complete booked AIS history, respect provider access/cooldown boundaries and expose versioned account identity evidence without inferring a Bankgiro relationship.
 
-**Baseline:** runtime `7366218`; refreshed through contract PR #22 (`b652735`) to `12c9868` on `origin/main` after documentation/synthetic-test PR #23. No intervening production code changed. Previous six-PR integration and Sites57 are historical evidence, not verification of this branch. Branch: `feature/mgeorge-swedbank-account-evidence`.
+**Baseline:** runtime `7366218`; refreshed through contract PR #22 (`b652735`), documentation/synthetic-test PR #23 (`12c9868`) and integration receipt PR #24 (`a779b0d`). No intervening production code changed. Previous six-PR integration and Sites57 are historical evidence, not verification of this branch. Branch: `feature/mgeorge-swedbank-account-evidence`, PR #25.
 
 **Architecture:** extend the existing Enable Banking adapter and owner-scoped bank lease; preserve the existing transactional import/checkpoint and immutable originals. Add a bounded typed evidence projection alongside the legacy account reader response. Keep all financial reconciliation and report ingestion interfaces unchanged.
 
@@ -66,3 +66,4 @@ Files: the existing Node `src/server.js` bank session validation and relevant te
 - Reproduced gap: generic sync retry timestamps cannot represent an unresolved account-read cooldown. The additive connection column and generated migration 0016 are necessary to retain that independent operational fact; no new engine/table is introduced.
 - Independent review reproduced loss of a just-observed throttle when result persistence fails. A durable pre-request pending marker now protects session and data reads, and regression tests cover failed arming, failed result persistence and lease loss. This is a concrete requirement-driven extension of the original cooldown task.
 - Reproduced Node gap: rows could commit before coverage/audit/job bookkeeping failed. The optional synchronous store callback makes these writes atomic; post-commit independent follow-up failure returns committed success with a bounded durable warning.
+- Main advanced during publication with documentation-only receipt PR #24. A normal merge into this feature branch preserves both Agent 2 progress sections and the full integrator receipt. No production code conflict or force-push is involved.

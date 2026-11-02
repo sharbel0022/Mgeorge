@@ -2,16 +2,17 @@
 
 ## Delivery state
 
-**Integration checkpoint; the six new implementation deliveries are not yet
-accepted.** The common architecture contract has been independently reviewed,
-passed exact-head CI and merged through a separate PR. The initial existing
-application is already deployed as Sites version 57. The earlier six-PR round
-and this new round are recorded separately below.
+**Common contracts and the joined synthetic regression are merged; the six new
+implementation deliveries remain pending.** Separate reviewed PRs #22 and #23
+preserve the existing architecture and add six integration regressions. The
+existing application remains deployed as Sites version 57. The earlier six-PR
+round and this new round are recorded separately below.
 
-This is a live coordinator receipt during the active run. Pending fields do not
-mean success. The final GitHub PR metadata and final receipt section identify
-the last verified main commit, CI and Site source. No continuous monitoring is
-promised after the active run ends, and no new automation has been created.
+This closing receipt records the latest tested integration main before its own
+documentation-only follow-up. The receipt PR's final GitHub comment records
+that subsequent merge SHA and exact main CI without a self-referential commit
+claim. No continuous monitoring is promised after this run; no new automation
+has been created.
 
 ## Baselines and released contract
 
@@ -28,6 +29,13 @@ promised after the active run ends, and no new automation has been created.
 | Contract exact-head CI | [41531331428](https://github.com/sharbel0022/Mgeorge/actions/runs/41531331428), both required jobs success |
 | Normal contract merge / released baseline | `b65273500c214a4e16b880e3840dac90d8bd7401` |
 | Contract main CI | [41531868549](https://github.com/sharbel0022/Mgeorge/actions/runs/41531868549), exact push head, completed success at `2026-11-02T21:52:21Z`; 1309 Node + 2331 Sites = 3640 passed, zero fail/skip/cancel/todo |
+| Integration regression/report PR | [#23](https://github.com/sharbel0022/Mgeorge/pull/23), `codex/seven-agent-integration-report-20261102` |
+| Frozen final reviewed regression head | `15f259d1ef46f28fbecf66d522ac70054cf2e6b4` |
+| Exact reviewed regression root tree | `e4681c5028ba68a25e233516e873d3cc566fae67`, local/GitHub parity |
+| Final regression PR CI | [41534249801](https://github.com/sharbel0022/Mgeorge/actions/runs/41534249801), exact head, all steps success at `2026-11-02T22:07:54Z`; 1309 Node + 2337 Sites = 3646 passed, zero fail/skip/cancel/todo |
+| Latest integration main before this documentation receipt | `12c9868606a0a45b31b722ddee8f897541687e64`, normal PR #23 merge; both expected parents and exact tree independently verified |
+| Integration main CI | [41534722847](https://github.com/sharbel0022/Mgeorge/actions/runs/41534722847), exact push head, completed success at `2026-11-02T22:11:13Z`; 1309 Node + 2337 Sites = 3646 passed, zero fail/skip/cancel/todo; all six new names verified in actual logs |
+| Integrated Sites subtree | `274b9003ade34171a1f3db777de2e61ff0ae0a9f`; the sole difference from published runtime baseline is the new test file |
 
 The separate independent architecture reviewer approved the final document.
 Two findings were corrected before release: C2/C4/C5/C6 extend existing code,
@@ -42,8 +50,8 @@ PR merge were verified. No force-push or branch replacement was used.
 
 ## Six new workstreams
 
-Initial and repeated GitHub inventories through **2026-11-02 22:04 UTC
-(23:04 Europe/Stockholm)** found no new implementation PRs. Only the source
+Initial and repeated GitHub inventories through **2026-11-02 22:11 UTC
+(23:11 Europe/Stockholm)** found no new implementation PRs. Only the source
 adapter branch below had appeared, still identical to starting main. These are
 observations of GitHub delivery, not claims about another conversation's activity.
 
@@ -55,7 +63,7 @@ observations of GitHub delivery, not claims about another conversation's activit
 | 4 | Exact safe invoice candidates and matching | Not yet delivered | None | Awaiting producer-consumer contract and regression evidence |
 | 5 | Durable automation and recovery | Not yet delivered | None | Awaiting extension of existing locks/jobs/receipts |
 | 6 | Black/white payment overview | Not yet delivered | None | Awaiting consumer changes and UI tests |
-| 7 | Integration lead | `codex/seven-agent-contracts-20261102`; `codex/seven-agent-integration-report-20261102` | Contract #22 as above; [report/test PR #23](https://github.com/sharbel0022/Mgeorge/pull/23) | Contract merged; initial report/test CI passed; final guard follow-up requires fresh CI |
+| 7 | Integration lead | `codex/seven-agent-contracts-20261102`; `codex/seven-agent-integration-report-20261102`; `codex/seven-agent-final-receipt-20261102` | Contract #22 and report/test #23 with exact heads/merges above; final branch contains this documentation receipt | #22 and #23 merged serially after independent review and exact-head CI; no new runtime implementation represented as delivered |
 
 The order is contracts → reference policy → AIS → authorized report source →
 matching → orchestration → UI, subject to the delivered dependency graph.
@@ -98,7 +106,10 @@ High-risk shared edits are `src/server.js`, `src/db.js`, `sites/lib/domain.ts`,
 helpers, schemas, payment-control orchestration and overview consumers. Node
 imports several helpers under `sites/lib`, so both suites are required.
 
-No code merge conflict has been resolved in the new round yet. Future reports
+No textual merge conflicts occurred in #22 or #23. Semantic review corrected
+the distinction between existing capability extensions and absent C1/C3, the
+distinction between deduplication identity and bank deposit proof, and the two
+test-guard gaps described below. Existing product code was not altered. Future reports
 must distinguish textual conflicts from semantic conflicts and record the exact
 regression that validates each resolution. A changed head or main invalidates
 the prior cumulative candidate and requires fresh review/checks.
@@ -159,7 +170,7 @@ All writes in tests use synthetic fixtures and isolated storage.
 | --- | --- |
 | Exact contract PR CI | Both Node and Sites jobs success |
 | Exact contract-main CI | Actual job logs: Node 1309/1309; Sites 2331/2331; 3640 total passed, 0 failed/skipped/cancelled/todo |
-| Required CI gates | Locked installations, Node syntax/test/audit; Sites exact installed mitigation/typecheck/test/audit/build passed on contract head |
+| Required CI gates | Locked installations, Node syntax/test/audit; Sites exact installed mitigation/typecheck/test/audit/build passed on the final frozen #23 head |
 | Local root locked installation | Passed |
 | Local Sites locked installation | Passed; mitigation then rechecked with one target and zero writes |
 | Local root audit | 0 vulnerabilities |
@@ -167,7 +178,8 @@ All writes in tests use synthetic fixtures and isolated storage.
 | Local Sites production-only audit | 0 vulnerabilities; all 16 moderate findings are outside the production-only audit |
 | New joined baseline test | Fresh direct Node `node:test` invocation after guard hardening: 6 tests, 6 pass, 0 fail/skip/cancel/todo |
 | Initial report-PR CI | [41533411197](https://github.com/sharbel0022/Mgeorge/actions/runs/41533411197), head `6b54420c82e6e7aa6a00ad3949abe7af8b3ffa4c`: 1309 Node + 2337 Sites = 3646 passed; all six new names explicitly executed; completed success at `22:03:06Z` |
-| Final report-PR gate | Guard follow-up must pass a new exact-head full CI and resulting-main CI before acceptance; earlier head is not reused as that gate |
+| Final report-PR gate | [41534249801](https://github.com/sharbel0022/Mgeorge/actions/runs/41534249801), exact guarded head `15f259d1ef46f28fbecf66d522ac70054cf2e6b4`: all required steps success, 3646 passed, all six new names explicitly executed |
+| Resulting integration-main gate | [41534722847](https://github.com/sharbel0022/Mgeorge/actions/runs/41534722847) completed success for `12c9868606a0a45b31b722ddee8f897541687e64`; actual logs confirm 1309 Node + 2337 Sites = 3646 passed and all six new cases, zero fail/skip/cancel/todo |
 | Local baseline suites | Not used as a pass claim: initial sandbox rejected local listen with EPERM; authorized duplicate runs were stopped after exact-head CI success under heavy shared-host load |
 | Contract diff validation | `git diff --check` passed; only two Markdown files changed |
 | Additional full lint | No new full-lint run; unchanged prior documented debt is 211 errors / 2527 warnings |
@@ -178,8 +190,9 @@ The named targeted command is `node --experimental-strip-types
 --test-concurrency=1 tests/seven-agent-0599-baseline.test.mjs` from `sites/`.
 A separate local `--test` invocation returned only a passing file-wrapper result;
 it is not counted as six named cases. The direct run prints all six names and
-assertions; initial Node 22 GitHub CI independently verified all six names and
-the full suite. The final frozen head must repeat this check.
+assertions; both initial and final frozen-head Node 22 GitHub CI independently
+verified all six names and the full suite. The changed head received fresh
+review and CI; the prior passing run was not reused.
 
 ## Existing Sites and read-only production evidence
 
@@ -280,14 +293,35 @@ Per-area existing test evidence and remaining acceptance requirements remain in
 [QUALITY-SCORECARD.md](../QUALITY-SCORECARD.md). New evidence is added above;
 no unsupported score increase is applied.
 
-## Continuation and final receipt
+## Final scope and continuation
 
-Contract-main CI and the initial report-PR CI are green. Independent review
-approved the report/test and its guard follow-up; the six-case regression and
-four deliberate guard-failure probes were verified locally.
-Pending at this checkpoint: final frozen-head full report-PR/main CI;
-re-inventory actual agent PRs; freeze and test
-each delivered head; run the new source/policy chain after producer delivery;
-integrate serially with green main CI; publish only when relevant runtime code
-has changed and gates pass. The final receipt will state exactly which of these
-became available within the active run.
+Delivered in this run: a separate released common contract PR; explicit
+six-workstream ownership, field/API/version rules and shared-file review gates;
+GitHub inventories during the active run; reviewed synthetic baseline-chain
+regressions; exact-head full CI before serial merges; a coverage-gap audit;
+read-only Site/bank/Gmail/backup/0599 checks; and all 33 unchanged quality scores.
+No force-push, branch deletion or production financial write was performed.
+
+Remaining acceptance is concrete:
+
+1. Each of the six new workstreams must deliver its implementation PR and
+   `docs/integration/agent-N-<topic>.md` against the released contract. A branch
+   at unchanged old main is not an implementation delivery.
+2. Review C1's actual company policy and C3's actual authorized-source adapter
+   before merging their consumers. The internal C3 infrastructure is not yet
+   delivered merely because the existing report parser works.
+3. Extend the joined regression through those real producers and source-job
+   orchestration. Verify missing authorization, multiple payers, conflicts,
+   concurrent polling and recovery across retrieval/retention/import boundaries.
+4. Freeze/review/test each actual head and cumulative base, merge serially and
+   require green resulting-main CI. A moved main/head requires fresh evaluation.
+5. For integrated runtime changes, obtain a current backup/rollback receipt,
+   publish the exact source into the existing Site, and verify source/version
+   and read-only production projections. This run changed only docs/tests, so
+   it does not fabricate a new deployment or certify the absent new features.
+6. Real Bankgiro fetching awaits the bank-authorized company source and explicit
+   account/deposit evidence. It must remain blocked until those facts exist.
+
+The complete seven-agent product goal is **not yet achieved**. This receipt is
+a reproducible, green foundation and a precise handoff, not acceptance of
+undelivered work. Monitoring here ends with the active run.

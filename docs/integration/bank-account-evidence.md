@@ -1,6 +1,6 @@
 # BankAccountEvidence v1 — Agent 2 integration contract
 
-Status: additive contract proposal on `feature/mgeorge-swedbank-account-evidence`; merge and production migration belong to the integrator. Runtime baseline: `73662187cddf9a5c504dea9bd8a1288bd929bc51`. Updated integration base: `12c9868606a0a45b31b722ddee8f897541687e64` (PR #22 contracts and PR #23 documentation/synthetic tests; production code unchanged). This is the concrete C2 proposal under [mgeorge-integration-v1](README.md).
+Status: additive contract proposal in [PR #25](https://github.com/sharbel0022/Mgeorge/pull/25) on `feature/mgeorge-swedbank-account-evidence`; merge and production migration belong to the integrator. Runtime baseline: `73662187cddf9a5c504dea9bd8a1288bd929bc51`. Updated integration base: `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5` (PR #22 contracts, PR #23 documentation/synthetic tests and PR #24 receipt; production code unchanged). This is the concrete C2 proposal under [mgeorge-integration-v1](README.md).
 
 ## Scope and ownership
 

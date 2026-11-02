@@ -1,8 +1,8 @@
 # Agent 2 — Swedbank/account-evidence verification
 
-Date: 2026-11-02. Branch: `feature/mgeorge-swedbank-account-evidence`.
+Date: 2026-11-02. Branch: `feature/mgeorge-swedbank-account-evidence`. Delivery: [PR #25](https://github.com/sharbel0022/Mgeorge/pull/25).
 Runtime baseline: `73662187cddf9a5c504dea9bd8a1288bd929bc51`.
-Integration base refreshed through shared-contract PR #22 to `12c9868606a0a45b31b722ddee8f897541687e64` after reading the new report and synthetic acceptance test from PR #23. Both updates preserve production code. The final PR head is the authoritative delivery commit; this report and the contract travel with that head.
+Integration base refreshed through shared-contract PR #22, report/synthetic acceptance PR #23 and receipt PR #24 to `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`. These updates preserve production code. The receipt's two progress-file conflicts were resolved by retaining both complete sections in a normal merge into this feature branch. The final PR head is the authoritative delivery commit; this report and the contract travel with that head.
 
 ## Delivered scope
 

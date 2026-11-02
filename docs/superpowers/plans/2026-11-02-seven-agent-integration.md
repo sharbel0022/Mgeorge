@@ -46,12 +46,14 @@ shared contract and must be exercised after its owning implementation arrives.
 - [ ] T5 Exercise synthetic 0599 adapter-to-overview chain and negative/replay/
   concurrency/recovery matrix, with no duplicate economic effects. Preserve actual
   coverage gaps if a required implementation has not been delivered.
-- [ ] T6 Run complete Node/Sites suites, syntax/TypeScript, security gates and
-  production build for the final implementation; review independent results.
-- [ ] T7 If relevant Sites code changed and gates pass, check current backup and
-  retained rollback, preserve exact source/configuration, deploy existing project
-  and verify version/tree plus read-only bank/Gmail/economic projections.
-- [ ] T8 Final report: PR/SHA/branch inventory, merges/conflicts, exact tests, real
+- [x] T6 Run complete Node/Sites suites, syntax/TypeScript, security gates and
+  production build for the delivered contract/regression heads; independently
+  verify all six named cases. Repeat these gates for future implementations.
+- [x] T7 Evaluate the publication condition: only docs/tests changed; no runtime
+  publication is due. Recheck existing Site 57, bank/Gmail, stored backup and
+  read-only economic projections. A future runtime merge still requires fresh
+  backup/rollback, exact source deployment and production verification.
+- [x] T8 Final report: PR/SHA/branch inventory, merges/conflicts, exact tests, real
   external bank blocks, Site/main state and all 33 quality scores/deltas. Leave a
   precise continuation point, without claiming ongoing monitoring after this run.
 
@@ -91,5 +93,19 @@ Independent reviewer approved the report/test, then the narrow guard follow-up.
 Ruling: Address two minor findings because the claimed read-only and two-layout
 coverage otherwise admitted concrete false positives. Fresh six-case pass and
 four expected-failure mutation probes verify those guards; probes were removed.
-The new frozen head still requires exact CI and resulting-main CI. New agent
+At that checkpoint, the new frozen head required exact CI and resulting-main CI. New agent
 implementation PRs remain absent in the 22:04UTC inventory.
+
+Final #23 review head `15f259d1ef46f28fbecf66d522ac70054cf2e6b4`, tree
+`e4681c5028ba68a25e233516e873d3cc566fae67`, passed exact CI41534249801:
+1309 Node + 2337 Sites = 3646, all six new names present and every job step
+successful. Main/base was rechecked immediately before normal merge to
+`12c9868606a0a45b31b722ddee8f897541687e64`; both expected merge parents and
+tree were verified. Separate main CI41534722847 completed successfully at
+22:11:13UTC; actual logs confirm 1309 Node + 2337 Sites = 3646 and all six new
+cases, zero fail/skip/cancel/todo. The 22:11UTC inventory has no open PRs or
+new implementation commits; the adapter branch remains at starting main.
+
+T4/T5 remain open for the six undelivered workstreams and full C1/C3 source
+chain. Delivered #22/#23 were reviewed and merged serially. The final report
+states this scope explicitly; the complete product goal remains pending.
