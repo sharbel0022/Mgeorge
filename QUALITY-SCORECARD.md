@@ -13,6 +13,8 @@ Ny separat leverans på `feature/mgeorge-swedbank-account-evidence`, [PR25](http
 
 Övriga områdens bedömningar och tidigare publiceringsbevis nedan behåller sin angivna historiska omfattning. Ett verifierat kontoalias ger ingen separat Bankgirorelation eller rätt att allokera en betalning.
 
+Exakt Agent2-implementationshuvud04667ef, [CI41536046223](https://github.com/sharbel0022/Mgeorge/actions/runs/41536046223): **1 327Node +2 497Sites =3 824pass, 0fail/skip/cancel/todo**, båda jobb success. Lokala miljö-/testavvikelser redovisas öppet i rapporten; inga poäng höjs och inget produktionsbevis tillskrivs dessa syntetiska tester.
+
 ## Ny sjuagentsintegration — kontrakt och syntetisk kedja, 2026-11-02
 
 [Aktuell rapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) redovisar mergade kontrakts-PR #22 och regressions-/rapport-PR #23. Exakt slutlig #23-head-CI 41534249801 passerar **1 309 Node + 2 337 Sites = 3 646 tester**, inklusive alla sex nya namngivna 0599-fall, utan fel eller överhoppade/avbrutna tester. Integrationsmain före slutkvittot är `12c9868606a0a45b31b722ddee8f897541687e64`; separat main-CI finns i rapporten. De sex nya implementationerna, inklusive företagspolicy och BankgiroReportSource, väntar fortfarande på PR-leverans. Kontrakt och tester bevisar inte bankens verkliga behörighet, konto-/insättningsrelation eller ett nytt externt schemakvitto. **Samtliga 33 betyg är kvar på 255/330 = 7,73; förändring 0 och 0/33 på 9,5.** Alla före/eftervärden och aktuella test-/produktionsgränser dokumenteras. Äldre tabeller nedan behålls som detaljerad evidens/historik.

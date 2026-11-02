@@ -33,7 +33,7 @@ Files: `sites/lib/banking/account-evidence.ts`, a new `account-evidence-contract
 - [x] Serialize the account read with the existing owner bank lease; persist only operational cooldown metadata on provider throttling, preserving financial/original state.
 - [x] Add the additive `bankAccountEvidence` v1 response, with `verified`, `review`, `blocked` status and explicitly separate absent Bankgiro mapping.
 - [x] Verify aliases only from an exact bank-supplied IBAN/BBAN/CPAN field, complete consent census, current snapshot and original integrity; retain all existing legacy response fields.
-- [ ] Run focused tests and commit the coherent deliverable.
+- [x] Run focused tests and commit the coherent deliverable.
 
 ### 3. Correct demonstrated sync identity/coverage gaps
 
@@ -46,9 +46,9 @@ Files: the existing Node `src/server.js` bank session validation and relevant te
 ### 4. Integrator handoff and delivery
 
 - [x] Document the final contract in `docs/integration/bank-account-evidence.md`; identify Agent 3 and Agent 4 consumption rules and any operational API changes explicitly.
-- [ ] Record exact tests, dependency/build findings, remaining external data and continuation point; keep scorecard claims bounded.
-- [ ] Run mandatory root/Sites syntax/types/tests/audits/build and a fresh independent branch review. Fix material findings with regression tests.
-- [ ] Recheck current main and remote branch, push only the feature branch, open/update PR and verify its head/CI. Leave merge to the integrator.
+- [x] Record exact tests, dependency/build findings, remaining external data and continuation point; keep scorecard claims bounded.
+- [x] Run mandatory root/Sites syntax/types/tests/audits/build and a fresh independent branch review. Fix material findings with regression tests.
+- [x] Recheck current main and remote branch, publish only the feature branch, open/update PR and verify its head/CI. Leave merge to the integrator.
 
 ## Review focus
 
@@ -67,3 +67,4 @@ Files: the existing Node `src/server.js` bank session validation and relevant te
 - Independent review reproduced loss of a just-observed throttle when result persistence fails. A durable pre-request pending marker now protects session and data reads, and regression tests cover failed arming, failed result persistence and lease loss. This is a concrete requirement-driven extension of the original cooldown task.
 - Reproduced Node gap: rows could commit before coverage/audit/job bookkeeping failed. The optional synchronous store callback makes these writes atomic; post-commit independent follow-up failure returns committed success with a bounded durable warning.
 - Main advanced during publication with documentation-only receipt PR #24. A normal merge into this feature branch preserves both Agent 2 progress sections and the full integrator receipt. No production code conflict or force-push is involved.
+- Exact implementation-head CI41536046223 passed on04667ef: 1,327 Node +2,497 Sites =3,824, zero fail/skip/cancel/todo. Follow-up documentation receipts preserve production/test code; final PR metadata and the delivery response identify the final head and its CI.

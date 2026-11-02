@@ -26,9 +26,9 @@ Agent 3 must keep recipient-account proof separate from report/deposit identity 
 
 ## Verification commands and results
 
-All writes and provider responses in tests are synthetic. Local runtime: Linux, Node 24.22.1, npm 11.9.0. GitHub's required workflow uses Node 22; local results do not substitute for its exact PR-head checks.
+All writes and provider responses in tests are synthetic. Local runtime: Linux, Node 24.22.1, npm 11.9.0. GitHub's required workflow uses Node 22. Its complete run [41536046223](https://github.com/sharbel0022/Mgeorge/actions/runs/41536046223) passed on the frozen implementation head **`04667ef28277091a2940eba7928128b693f721f5`**, tree **`3f360e1c2c3bd88e6311193acbd16a160bb1c6d5`**, against main **`a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`**. Both job logs were downloaded and their named test totals checked. This subsequent receipt update changes documentation only; the final PR metadata identifies its head and fresh CI.
 
-| Gate | Result at this checkpoint |
+| Gate | Verified result |
 | --- | --- |
 | Root `npm ci --ignore-scripts` | Passed, locked dependencies. |
 | Sites `npm run install:ci` | Passed; exact minimatch mitigation verified. |
@@ -37,23 +37,29 @@ All writes and provider responses in tests are synthetic. Local runtime: Linux, 
 | Sites `node scripts/minimatch-backport.mjs --check --require-target` | Passed: 1 target, 0 writes, verified. |
 | Sites `npm audit --audit-level=high` | Passed: 16 moderate development dependency findings, 0 high/critical. |
 | Sites `npm audit --omit=dev --audit-level=high` | Passed: 0 production findings. |
-| Final root full test suite | Running; update before delivery. |
-| Final Sites full test suite | Running on the frozen correction; update before delivery. |
+| Full Node 22 CI suite | **1,327/1,327 passed**, 0 fail/skip/cancel/todo. |
+| Full Sites Node 22 CI suite | **2,497/2,497 passed**, 0 fail/skip/cancel/todo; includes final guard fixture and latest-main 0599 file. |
+| Full local Node 24 suite | **1,327/1,327 passed**, 0 fail/skip/cancel/todo, after the unchanged bounded rerun. |
+| Local direct Sites run | 2,490 passed / 1 runner-context failure: npm_execpath was absent; unchanged affected file passed12/12 with the actual npm entrypoint. The complete npm-driven CI above passed. |
 | Sites `npm run check` | Passed on frozen production source. |
 | Sites `npm run build` | Passed on frozen production source; no publication. |
 | Updated-main joined 0599 chain | Passed: 6/6; added by main PR #23 and run separately after refresh. |
 | Guard backup/restore compatibility | Passed: 61/61 existing recovery cases with a nonempty unknown guard fixture; encrypted snapshot and isolated SQLite row preserve the value, still blocking after 30 days. |
 | Independent review | Passed within Agent 2 scope: initial Important persistence failure and Minor contact-reporting defect resolved; no Critical/Important finding remains. Full-suite/typecheck/build gates are separate. |
 
-The final local full-suite commands place the concurrency option before the file arguments:
+**Mandatory CI total: 3,824 passed, zero failed/skipped/cancelled/todo.** Relative to main's 1,309 Node and 2,337 Sites cases, this branch adds **18 Node +160 Sites =178 cases**, and strengthens existing backup/restore assertions.
+
+Reproduce the repository's required suites through npm so its executable context is available:
 
 ```sh
-node --test --test-concurrency=2 test/*.test.js
+npm test
 cd sites
-node --experimental-strip-types --test --test-concurrency=2 tests/*.test.mjs
+npm test
 ```
 
-Focused runs overlap the full suites and must not be added to their counts. The account projection's 119 cases, account reader/cooldown's 58 cases, and service/details/integrity's 158 cases passed; the final full-suite totals supersede those individual receipts. The local full Sites command had already expanded its file list when main added the six-case 0599 file; those six new cases were therefore run separately. The recovery fixture was then strengthened and its entire 61-case file rerun. No production source changed after the final full runs began; exact PR CI must include the new main file and final fixture together.
+The local bounded Node command was `node --test --test-concurrency=2 test/*.test.js`. A direct Sites invocation also needs the real npm_execpath for the existing postinstall integration test; omitting npm's context caused the explicitly reported runner failure, not a mitigation or banking defect. No test was changed for it.
+
+Focused runs overlap the full suites and must not be added to their counts. The account projection's 119 cases, account reader/cooldown's 58 cases, and service/details/integrity's 158 cases passed; the CI totals supersede those individual receipts. The local full Sites command had already expanded its file list when main added the six-case 0599 file; those six new cases were run separately. The recovery fixture was then strengthened and its entire 61-case file rerun. No production source changed after the final local full runs began; exact PR CI subsequently included the new main file and final fixture together.
 
 ### Regression coverage
 
@@ -65,9 +71,11 @@ Focused runs overlap the full suites and must not be added to their counts. The 
 
 ### Failures and environmental limits, retained explicitly
 
-The first full Node run completed with **1,326 passed / 1 failed**. Its only failure was `read ECONNRESET` in the existing scheduled-sync HTTP test, with no failed business assertion. The unchanged test file then passed **15/15**. A bounded full rerun is the final gate; stale keep-alive reuse under host load is plausible but not proven as the cause. No assertion or timeout was weakened.
+The first full Node run completed with **1,326 passed / 1 failed**. Its only failure was `read ECONNRESET` in the existing scheduled-sync HTTP test, with no failed business assertion. The unchanged test file then passed **15/15**, the bounded full local rerun passed **1,327/1,327**, and the complete CI run passed the same count. Stale keep-alive reuse under host load is plausible but not proven as the cause. No assertion or timeout was weakened.
 
 The first full Sites run passed **2,472/2,472** before the independent-review persistence correction. That count is historical for this branch and is not the final-code result. The review defect was reproduced, then new tests were observed failing before the durable pre-request guard was added. Three account-reader cases and 14 sync/details cases fail on the old behavior and exercise the corrected failure boundary; two additional tests preserve prior unknown/manual waits.
+
+The later direct local Sites command completed **2,490/2,491**, with the sole failure trying a nonexistent fallback npm path under the managed Node distribution. Supplying its actual npm entrypoint made the unchanged 12-case minimatch entrypoint file pass. The normal npm-driven Node22 CI then passed the complete **2,497-case** updated suite; no product/test patch, skip, weakened assertion or dependency change was needed.
 
 Early restricted-runtime attempts included denied local HTTP binding and a `fatal library error, lookup self`; those runs are not counted as product-test passes. Valid runs use the approved local execution environment and mocked provider fetches. One redundant earlier full Sites run was stopped during parallel work and is not counted. Existing full-project lint debt is unchanged and was not rerun or presented as passed; the previous integration report records 211 errors and 2,527 warnings.
 
@@ -81,4 +89,6 @@ No live authenticated bank request, production financial write, invoice registra
 
 ## Verifiable continuation point
 
-Resume from this feature branch, reread current main and this contract, and use the final PR head as the frozen code identity. Do not reset an unresolved guard automatically. Apply/reconcile migration 0016 before the new code, preserve existing Sites/DB/R2/secrets/schedules, run exact-head required CI and coordinate normal merge with the integrator. Local raw run logs are under the ignored `.agent2-evidence/` directory; the committed tests and CI provide the reproducible evidence.
+Resume from PR #25 and this feature branch, reread current main and this contract, and freeze the current PR head before integration. Do not reset an unresolved guard automatically. Apply/reconcile migration 0016 before the new code, preserve existing Sites/DB/R2/secrets/schedules, verify exact-head required CI and coordinate normal merge with the integrator. Local raw run logs are under the ignored `.agent2-evidence/` directory; the committed tests and CI provide the reproducible evidence.
+
+The local Git client had no HTTPS credential. The authorized GitHub connection published the identical Git tree, verified by exact local/remote tree SHA before each normal feature-ref update. No force-push or main-ref write was used. The feature checkout was aligned to the verified remote commit with identical source/index/working-tree bytes; unpublished local commit metadata was not presented as the delivered SHA.
