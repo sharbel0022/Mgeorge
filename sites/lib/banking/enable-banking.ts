@@ -69,7 +69,20 @@ export class ProviderError extends Error {
   }
 }
 const invalid = () => new ProviderError('INVALID_REQUEST', 'Bankförfrågan är ogiltig. Uppdatera sidan och försök igen.', 400);
-const invalidResponse = () => new ProviderError('INVALID_PROVIDER_RESPONSE', 'Banktjänsten lämnade ett svar som inte kunde kontrolleras. Ingen import gjordes.');
+type ResponseField = 'status'|'accounts'|'accounts_data'|'access'|'access.valid_until'|'currency'|'cash_account_type'|'account_id'|'account_id.iban'|'account_id.other'|'account_id.other.identification'|'account_id.other.scheme_name'|'uid'|'all_account_ids'|'all_account_ids[]'|'all_account_ids[].identification'|'all_account_ids[].scheme_name';
+type ResponseDiagnostic = {field:ResponseField;kind:'absent'|'null'|'string'|'object'|'array'|'other'};
+// Trust only diagnostics created here, never enumerable properties on an error
+// or provider payload. The map retains no bank values and exposes a copy.
+const responseDiagnostics = new WeakMap<object,ResponseDiagnostic>();
+export function providerResponseDiagnostic(error:unknown):ResponseDiagnostic|null {
+  const issue=error!==null&&typeof error==='object'?responseDiagnostics.get(error):undefined;
+  return issue?{...issue}:null;
+}
+const invalidResponse = (field?:ResponseField,value?:unknown) => {
+  const error=new ProviderError('INVALID_PROVIDER_RESPONSE', 'Banktjänsten lämnade ett svar som inte kunde kontrolleras. Ingen import gjordes.');
+  if(field)responseDiagnostics.set(error,{field,kind:value===undefined?'absent':value===null?'null':Array.isArray(value)?'array':typeof value==='string'?'string':typeof value==='object'?'object':'other'});
+  return error;
+};
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 const stringArray = (value: unknown): value is string[] => Array.isArray(value) && value.every(item => typeof item === 'string');
 const isoDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(`${value}T12:00:00Z`)) && new Date(`${value}T12:00:00Z`).toISOString().slice(0, 10) === value;
@@ -280,9 +293,11 @@ export async function createSession(config: ProviderConfig, code: string): Promi
 export async function getSession(config: ProviderConfig, sessionId: string): Promise<ProviderSessionStatusResponse> {
   if (!UUID.test(sessionId)) throw invalid();
   const result = await providerRequest<ProviderSessionStatusResponse>(config, `/sessions/${sessionId}`);
-  if (!['AUTHORIZED', 'CANCELLED', 'CLOSED', 'EXPIRED', 'INVALID', 'PENDING_AUTHORIZATION', 'RETURNED_FROM_BANK', 'REVOKED'].includes(result.status) ||
-    !stringArray(result.accounts) || result.accounts.some(id => !UUID.test(id)) || !Array.isArray(result.accounts_data) ||
-    !record(result.access) || typeof result.access.valid_until !== 'string' || !Number.isFinite(Date.parse(result.access.valid_until))) throw invalidResponse();
+  if (!['AUTHORIZED', 'CANCELLED', 'CLOSED', 'EXPIRED', 'INVALID', 'PENDING_AUTHORIZATION', 'RETURNED_FROM_BANK', 'REVOKED'].includes(result.status)) throw invalidResponse('status',result.status);
+  if (!stringArray(result.accounts) || result.accounts.some(id => !UUID.test(id))) throw invalidResponse('accounts',result.accounts);
+  if (!Array.isArray(result.accounts_data)) throw invalidResponse('accounts_data',result.accounts_data);
+  if (!record(result.access)) throw invalidResponse('access',result.access);
+  if (typeof result.access.valid_until !== 'string' || !Number.isFinite(Date.parse(result.access.valid_until))) throw invalidResponse('access.valid_until',result.access.valid_until);
   return result;
 }
 
@@ -291,11 +306,23 @@ export async function getSession(config: ProviderConfig, sessionId: string): Pro
 export async function getAccountDetails(config:ProviderConfig,accountUid:string):Promise<ProviderAccount>{
  if(typeof accountUid!=='string'||!UUID.test(accountUid))throw invalid();
  const result=await providerRequest<ProviderAccount>(config,`/accounts/${accountUid}/details`);
- const generic=(value:unknown)=>record(value)&&typeof value.identification==='string'&&!!value.identification.trim()&&value.identification.length<=80&&!/[\u0000-\u001f\u007f]/.test(value.identification)&&typeof value.scheme_name==='string'&&/^[A-Z][A-Z0-9_]{0,34}$/.test(value.scheme_name)&&(value.scheme_name!=='IBAN'||/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(value.identification.replace(/[\s-]/g,'').toUpperCase()));
+ const generic=(value:unknown,path:'account_id.other'|'all_account_ids[]')=>{
+  if(!record(value))throw invalidResponse(path,value);
+  if(typeof value.identification!=='string'||!value.identification.trim()||value.identification.length>80||/[\u0000-\u001f\u007f]/.test(value.identification))throw invalidResponse(`${path}.identification`,value.identification);
+  if(typeof value.scheme_name!=='string'||!/^[A-Z][A-Z0-9_]{0,34}$/.test(value.scheme_name))throw invalidResponse(`${path}.scheme_name`,value.scheme_name);
+  if(value.scheme_name==='IBAN'&&!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(value.identification.replace(/[\s-]/g,'').toUpperCase()))throw invalidResponse(`${path}.identification`,value.identification);
+ };
  const primary=result.account_id;
- if(!record(result)||typeof result.currency!=='string'||!/^[A-Z]{3}$/.test(result.currency)||typeof result.cash_account_type!=='string'||!/^[A-Z0-9]{1,35}$/.test(result.cash_account_type)||!record(primary)||
-  primary.iban===undefined&&primary.other===undefined||primary.iban!==undefined&&(typeof primary.iban!=='string'||!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(primary.iban))||primary.other!==undefined&&!generic(primary.other)||
-  result.uid!==undefined&&(typeof result.uid!=='string'||result.uid!==accountUid)||result.all_account_ids!==undefined&&(!Array.isArray(result.all_account_ids)||result.all_account_ids.length>50||!result.all_account_ids.every(generic)))throw invalidResponse();
+ if(typeof result.currency!=='string'||!/^[A-Z]{3}$/.test(result.currency))throw invalidResponse('currency',result.currency);
+ if(typeof result.cash_account_type!=='string'||!/^[A-Z0-9]{1,35}$/.test(result.cash_account_type))throw invalidResponse('cash_account_type',result.cash_account_type);
+ if(!record(primary)||primary.iban===undefined&&primary.other===undefined)throw invalidResponse('account_id',primary);
+ if(primary.iban!==undefined&&(typeof primary.iban!=='string'||!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(primary.iban)))throw invalidResponse('account_id.iban',primary.iban);
+ if(primary.other!==undefined)generic(primary.other,'account_id.other');
+ if(result.uid!==undefined&&(typeof result.uid!=='string'||result.uid!==accountUid))throw invalidResponse('uid',result.uid);
+ if(result.all_account_ids!==undefined){
+  if(!Array.isArray(result.all_account_ids)||result.all_account_ids.length>50)throw invalidResponse('all_account_ids',result.all_account_ids);
+  for(const id of result.all_account_ids)generic(id,'all_account_ids[]');
+ }
  return result;
 }
 

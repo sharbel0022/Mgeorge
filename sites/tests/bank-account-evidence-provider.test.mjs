@@ -12,3 +12,19 @@ test('account-details allowlist rejects caller paths, methods, queries and inval
 test('malformed, cross-account and over-cap account details never pass response validation',async t=>{assert.equal(typeof adapter.getAccountDetails,'function');for(const change of [r=>{r.currency=null;},r=>{delete r.cash_account_type;},r=>{r.account_id={};},r=>{r.account_id.iban=42;},r=>{r.uid=app;},r=>{r.all_account_ids={};},r=>{r.all_account_ids=[{identification:'123',scheme_name:5}];},r=>{r.all_account_ids=[{identification:'X'.repeat(81),scheme_name:'BBAN'}];},r=>{r.all_account_ids=Array.from({length:51},()=>({identification:'123',scheme_name:'BBAN'}));}]){const r=resource();change(r);t.mock.method(globalThis,'fetch',async()=>json(r));await assert.rejects(adapter.getAccountDetails(config,account),e=>e.code==='INVALID_PROVIDER_RESPONSE');}});
 test('account-detail errors and oversized responses use existing safe bounded provider handling',async t=>{assert.equal(typeof adapter.getAccountDetails,'function');t.mock.method(globalThis,'fetch',async()=>json({error:'NOT_FOUND',private:'never expose'},404));await assert.rejects(adapter.getAccountDetails(config,account),e=>e.code==='BANK_RESOURCE_UNAVAILABLE'&&!e.message.includes('never expose'));t.mock.method(globalThis,'fetch',async()=>json(resource(),200,{'Content-Length':String(2*1024*1024+1)}));await assert.rejects(adapter.getAccountDetails(config,account),e=>e.code==='RESPONSE_TOO_LARGE');});
 test('a malformed typed IBAN alias cannot masquerade as a domestic identifier',async t=>{const r=resource();r.all_account_ids=[{identification:'890119146168423',scheme_name:'IBAN'}];t.mock.method(globalThis,'fetch',async()=>json(r));await assert.rejects(adapter.getAccountDetails(config,account),e=>e.code==='INVALID_PROVIDER_RESPONSE');});
+
+test('account schema diagnostics describe null, absent and invalid fields without returning bank values',async t=>{
+ const cases=[
+  [r=>{r.account_id.other=null;},{field:'account_id.other',kind:'null'}],
+  [r=>{delete r.cash_account_type;},{field:'cash_account_type',kind:'absent'}],
+  [r=>{r.currency={secret:account};},{field:'currency',kind:'object'}],
+  [r=>{r.all_account_ids=[{identification:'123',scheme_name:account}];},{field:'all_account_ids[].scheme_name',kind:'string'}],
+ ];
+ for(const [change,want]of cases){const r=resource();change(r);t.mock.method(globalThis,'fetch',async()=>json(r));await assert.rejects(adapter.getAccountDetails(config,account),e=>{assert.equal(e.code,'INVALID_PROVIDER_RESPONSE');assert.deepEqual(adapter.providerResponseDiagnostic(e),want);assert.doesNotMatch(JSON.stringify(adapter.providerResponseDiagnostic(e)),new RegExp(account+'|890119146168423'));return true;});}
+});
+test('untrusted error properties cannot forge a provider schema diagnostic',()=>{
+ const malicious=new adapter.ProviderError(account,account);malicious.validationIssue={field:account,kind:account};
+ assert.equal(typeof adapter.providerResponseDiagnostic,'function');
+ assert.equal(adapter.providerResponseDiagnostic(malicious),null);
+ assert.equal(adapter.providerResponseDiagnostic({code:'INVALID_PROVIDER_RESPONSE',validationIssue:{field:account,kind:'string'}}),null);
+});

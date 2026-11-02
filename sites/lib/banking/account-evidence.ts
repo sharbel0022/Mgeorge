@@ -1,11 +1,12 @@
 import {identity,db,readWorkspace,readBankOriginalBytes,response} from '../server';
 import {hasBankApiOrigin,bankApiOriginalIssue,paymentOriginalIssue,paymentEvidenceConflict,canonicalBankAccount} from '../domain';
 import {connection,application,accounts,providerConfig,sessionId,metadata,type BankConnectionRow,type BankApplicationRow} from './store';
-import {getSession,getAccountDetails,ProviderError,type ProviderAccount} from './enable-banking';
+import {getSession,getAccountDetails,providerResponseDiagnostic,ProviderError,type ProviderAccount} from './enable-banking';
 import {stableAccountKey} from './transactions';
 import {parseSpecificationBytes} from '../bankgiro-parser.js';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i,ID=/^[a-zA-Z0-9_-]{1,100}$/,MAX_RESOURCES=5,MAX_ROWS=50;
+const providerErrorCodes=new Set(['INVALID_REQUEST','INVALID_PROVIDER_RESPONSE','INVALID_CONFIGURATION','INVALID_PRIVATE_KEY','RESPONSE_TOO_LARGE','BANK_RECONNECT_REQUIRED','BANK_AUTHORIZATION_EXPIRED','NO_LINKED_ACCOUNTS','CALLBACK_NOT_REGISTERED','BANK_PERIOD_UNAVAILABLE','BANK_ACCOUNT_UNAVAILABLE','BANK_ACTION_REQUIRED','BANK_RATE_LIMIT','BANK_TIMEOUT','BANK_USER_CONTEXT_REQUIRED','PROVIDER_AUTHORIZATION_FAILED','PROVIDER_ACCESS_DENIED','BANK_UNAVAILABLE','BANK_SYNC_RESTART_REQUIRED','BANK_RESOURCE_UNAVAILABLE','BANK_SERVICE_ERROR','PROVIDER_REDIRECT_DENIED','BANK_NETWORK_ERROR']);
 const object=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v);
 function args(value:unknown){
  if(!object(value)||Object.keys(value).some(k=>!['transactionId','documentId','sha256'].includes(k))||typeof value.transactionId!=='string'||!ID.test(value.transactionId)||(value.documentId!==undefined)===(value.sha256!==undefined)||value.documentId!==undefined&&(typeof value.documentId!=='string'||!ID.test(value.documentId))||value.sha256!==undefined&&(typeof value.sha256!=='string'||!/^[a-f0-9]{64}$/.test(value.sha256)))throw Error('Välj en ägd AIS-bankhändelse och exakt ett ägt original-ID eller SHA256. Ägare och bankkonton kan inte väljas.');
@@ -47,7 +48,7 @@ export async function readBankAccountEvidence(input:unknown){
  const config=await providerConfig(app),remoteId=await sessionId(conn),beforeConsent=consentSnapshot(conn),beforeApp=appSnapshot(app),resources=[account,...available.filter(a=>a.uid!==account.uid)].slice(0,MAX_RESOURCES);
  if(!UUID.test(remoteId))throw Error('Det sparade bankmedgivandets sessionsresurs är ogiltig.');
  const base={changed:false,providerContacted:false,checkedAt:new Date().toISOString(),revision,scope:{kind:'authenticated_owner',email:user.email},sourceScope:'current_owned_ais_consent',sourcePath:'GET /accounts/{consent-account}/details',documentId:docs.results[0].id,transactionId:target.id,resourcesTotal:available.length,resourceReadLimit:MAX_RESOURCES,reportRowCount:report.length,reportRowLimit:MAX_ROWS,originalIntegrity:'passed',reportSourceScope:'owned_retained_original',originalAuthenticityProved:false,relationshipProved:false};
- let resourcesRead=0;
+ let resourcesRead=0,resourcesAttempted=0,stage:'session'|'account_details'='session';
  const snapshotCurrent=async()=>{
   try{
    const current=active(owner,await application(owner),await connection(owner)),workspace=await db().prepare('SELECT revision FROM workspaces WHERE owner=?').bind(owner).first<{revision:number}>();
@@ -66,6 +67,7 @@ export async function readBankAccountEvidence(input:unknown){
   if(!await snapshotCurrent())return stale();
   const refreshed:{uid:string;details:ProviderAccount}[]=[];
   for(const prior of resources){
+   stage='account_details';resourcesAttempted++;
    const details=await getAccountDetails(config,prior.uid);resourcesRead++;
    if(stableAccountKey(details,bank)!==stableAccountKey(prior,bank)||details.currency!==prior.currency||prior.uid===account.uid&&details.currency!=='SEK')return response({...base,status:'mismatch',reason:'Bankens aktuella primära konto eller valuta avviker från medgivandets sparade resurs.',accountMatch:false,complete:false,ambiguous:false,resourcesRead,rows:[]});
    refreshed.push({uid:prior.uid,details});
@@ -79,7 +81,8 @@ export async function readBankAccountEvidence(input:unknown){
   const complete=resourcesComplete&&report.length<=MAX_ROWS,ambiguous=rows.some(row=>row.ambiguous),accountMatch=complete&&!ambiguous&&rows.every(row=>row.matched);
   return response({...base,checkedAt:new Date().toISOString(),status:ambiguous?'ambiguous':!complete?'incomplete':accountMatch?'matched':'missing',snapshotCurrent:true,resourcesRead,resourcesComplete,accountMatch,complete,ambiguous,rows});
  }catch(error){
-  if(error instanceof ProviderError&&['INVALID_REQUEST','INVALID_CONFIGURATION','INVALID_PRIVATE_KEY'].includes(error.code))base.providerContacted=false;
-  return response({...base,checkedAt:new Date().toISOString(),status:'error',reason:'Bankens aktuella kontouppgifter kunde inte verifieras. Ingen kontoöversättning har gjorts.',errorCode:error instanceof ProviderError?error.code:'ACCOUNT_EVIDENCE_UNAVAILABLE',resourcesRead,accountMatch:false,complete:false,ambiguous:false,rows:[]});
+  const providerCode=error instanceof ProviderError?error.code:undefined;
+  if(providerCode!==undefined&&['INVALID_REQUEST','INVALID_CONFIGURATION','INVALID_PRIVATE_KEY'].includes(providerCode))base.providerContacted=false;
+  return response({...base,checkedAt:new Date().toISOString(),status:'error',reason:'Bankens aktuella kontouppgifter kunde inte verifieras. Ingen kontoöversättning har gjorts.',errorCode:providerCode!==undefined&&providerErrorCodes.has(providerCode)?providerCode:'ACCOUNT_EVIDENCE_UNAVAILABLE',stage,validationIssue:providerResponseDiagnostic(error),resourcesAttempted,resourcesRead,accountMatch:false,complete:false,ambiguous:false,rows:[]});
  }
 }

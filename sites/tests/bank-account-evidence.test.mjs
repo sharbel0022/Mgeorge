@@ -6,6 +6,7 @@ import {stripTypeScriptTypes} from 'node:module';
 import {emptyState,applyCommand} from '../lib/domain.ts';
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {randomToken} from '../lib/banking/security.ts';
+import {ProviderError} from '../lib/banking/enable-banking.ts';
 const data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64'),url=p=>new URL(p,import.meta.url).href;
 function compiled(path,imports={}){let s=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])s=s.replaceAll(q+a+q,JSON.stringify(b));return data(s);}
 const appId='11111111-1111-4111-8111-111111111111',accountId='22222222-2222-4222-8222-222222222222',remoteSession='33333333-3333-4333-8333-333333333333',docId='44444444-4444-4444-8444-444444444444';
@@ -47,3 +48,32 @@ test('formatting-only alias comparison retains every account digit and requires 
 test('a live foreign bank, expired session or missing account blocks detail calls without exposing bank resources',async t=>{for(const mutate of [f=>{f.live.aspsp.name='Other bank';},f=>{f.live.access.valid_until='2000-01-01';},f=>{f.live.accounts=[];},f=>{f.live.psu_type='personal';}]){const f=await fixture(t);mutate(f);const before=f.snapshot(),{out}=await f.call();assert.equal(out.status,'blocked');assert.equal(out.accountMatch,false);assert.equal(f.calls.length,1);assert.equal(f.snapshot(),before);}});
 test('duplicate original hashes and malformed stored resource IDs are rejected before network',async t=>{const f=await fixture(t);f.sql.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) SELECT ?,owner,filename,mime,size,sha256,created_at FROM documents WHERE id=?').run('77777777-7777-4777-8777-777777777777',docId);const before=f.snapshot(),result=await f.call({transactionId:f.state.transactions[0].id,sha256:f.hash});assert.equal(result.body.result.isError,true);assert.deepEqual(f.calls,[]);assert.deepEqual(f.reads,[]);assert.equal(f.snapshot(),before);await f.setAccounts([{...f.accounts[0],uid:'../injected'}],['../injected']);const again=await f.call();assert.equal(again.body.result.isError,true);assert.deepEqual(f.calls,[]);});
 test('a live session account superset cannot claim complete alias uniqueness or trigger reads of new accounts',async t=>{const f=await fixture(t),extra='88888888-8888-4888-8888-888888888888';f.live.accounts.push(extra);f.live.accounts_data.push({uid:extra});f.fresh.set(extra,{uid:extra,account_id:{iban:'SE4550000000058398257466'},all_account_ids:[{identification:domestic,scheme_name:'BBAN'}],currency:'SEK',cash_account_type:'CACC'});const before=f.snapshot(),{out}=await f.call();assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.equal(out.status,'incomplete');assert.equal(out.resourcesRead,0);assert.deepEqual(out.rows,[]);assert.deepEqual(f.calls,['/sessions/'+remoteSession]);assert.equal(f.snapshot(),before);});
+
+test('session schema failure identifies its boundary before account reads without disclosing values or writing',async t=>{
+ const f=await fixture(t);f.live.accounts_data=null;f.live.private=accountId;const before=f.snapshot(),{out}=await f.call();
+ assert.equal(out.status,'error');assert.equal(out.errorCode,'INVALID_PROVIDER_RESPONSE');assert.equal(out.stage,'session');
+ assert.deepEqual(out.validationIssue,{field:'accounts_data',kind:'null'});assert.equal(out.resourcesAttempted,0);assert.equal(out.resourcesRead,0);
+ assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.equal(f.snapshot(),before);assert.doesNotMatch(JSON.stringify(out),new RegExp(accountId+'|'+remoteSession+'|'+iban));
+});
+test('first account schema failure identifies the attempted read while null optional fields remain rejected',async t=>{
+ const f=await fixture(t);f.fresh.get(accountId).account_id.other=null;const before=f.snapshot(),{out}=await f.call();
+ assert.equal(out.status,'error');assert.equal(out.stage,'account_details');assert.equal(out.errorCode,'INVALID_PROVIDER_RESPONSE');
+ assert.deepEqual(out.validationIssue,{field:'account_id.other',kind:'null'});assert.equal(out.resourcesAttempted,1);assert.equal(out.resourcesRead,0);
+ assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.equal(f.snapshot(),before);assert.doesNotMatch(JSON.stringify(out),new RegExp(accountId+'|'+remoteSession+'|'+iban));
+});
+
+test('forged provider errors cannot leak codes, messages or diagnostic properties through the reader',async t=>{
+ for(const code of ['INVALID_PROVIDER_RESPONSE',accountId]){
+  const f=await fixture(t),error=new ProviderError(code,'DO NOT RETURN '+iban);error.validationIssue={field:accountId,kind:iban};f.onFetch=()=>{throw error;};
+  const before=f.snapshot(),{out}=await f.call();assert.equal(out.status,'error');assert.equal(out.stage,'session');assert.equal(out.validationIssue,null);
+  assert.equal(out.errorCode,code==='INVALID_PROVIDER_RESPONSE'?'INVALID_PROVIDER_RESPONSE':'ACCOUNT_EVIDENCE_UNAVAILABLE');
+  assert.doesNotMatch(JSON.stringify(out),new RegExp(accountId+'|'+iban+'|DO NOT RETURN'));assert.equal(f.snapshot(),before);
+ }
+});
+
+test('a changing provider error code getter is read once before configuration checks and disclosure',async t=>{
+ const f=await fixture(t),error=new ProviderError('INVALID_PROVIDER_RESPONSE','Synthetic error');let reads=0;
+ Object.defineProperty(error,'code',{get(){reads++;return reads<=2?'INVALID_PROVIDER_RESPONSE':accountId;}});f.onFetch=()=>{throw error;};
+ const before=f.snapshot(),{out}=await f.call();assert.equal(out.errorCode,'INVALID_PROVIDER_RESPONSE');assert.equal(reads,1);
+ assert.doesNotMatch(JSON.stringify(out),new RegExp(accountId+'|'+iban));assert.equal(out.validationIssue,null);assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.equal(f.snapshot(),before);
+});
