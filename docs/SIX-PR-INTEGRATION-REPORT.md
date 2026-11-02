@@ -2,7 +2,9 @@
 
 ## Scope and authority
 
-Requested integration of PR14–19 into `main`, full cumulative gates, one publication to the existing Site, and read-only production acceptance. This report is being completed during the serial integration. **Pending fields below are not success claims.** The final receipt distinguishes the implementation SHA, documentation SHA and Sites source SHA.
+PR14–19 are integrated into `main`; all mandatory cumulative gates passed, and one combined **Sites version57** was published successfully in the existing project. Acceptance tests/report PR20 is also merged. Production acceptance is deliberately scoped: selected financial/original evidence and configuration were compared read-only; full production disaster recovery, new external scheduler/cloud execution and genuine mobile acceptance remain unverified. The 9.5/10 target is not met.
+
+Final implementation/acceptance main: **`4d20b3ecaa5dbbbf9a5b4f75bd189c1aab51c089`**, Actions **41524529308**, **1309 Node +2331 Sites =3640 pass,0fail,0skip,0cancel**. This subsequent deployment receipt changes documentation only. Its merge/main SHA and exact final CI are provided by the closing PR metadata and delivery message; its unchanged `sites/` tree identifies the already published code without a second deployment.
 
 Start main: `a9f88ae1c0f697376b3ecd140e1e80a64405125a`. Existing Site: `appgprj_6adf2f7f7e848191b64192161886b528`; rollback version **56**, saved source `4483058138ed4f04b93bdee775c79718c074dd80`.
 
@@ -92,11 +94,11 @@ Existing public shell with owner-bound private data, auth client, D1 `DB` (26 li
 
 Gmail: connected, recent successful fetch and durable queue observed. Existing automation ran independently; its predeployment success is not evidence for newly deployed code. At first integration status, 216 review items, no pending-job count shown, five registered outcomes, and stale cloud-worker heartbeat were reported. Later fresh status is the authoritative postdeployment receipt. GitHub scheduled-run history last reports cloud OCR run41503974414 at18:48:04Z on the old a9f88ae head; this does not certify the new code. No cloud run was manually dispatched.
 
-Bank: active connected configuration; saved period error observed. No bank fetch/account-details call was initiated by this integration. Existing scheduled attempts may update status independently.
+Bank: an earlier saved period error was observed initially. Before publication, the existing Site56 had already recorded a successful fetch at2026-11-02T20:07:20.589Z, `lastError=null`, zero failures and no block. These fields are identical immediately before/after deployment. This is connection/status evidence, not proof that the new period-recovery code executed against the live bank. No bank fetch/account-details call was initiated by this integration.
 
 Backup: today's stored complete manifest, **195/195 originals**, **63,463,280 bytes**, saved manifest-pass verification. API original census reports 11 retained receipt records and112 older records without receipts. This status is not a fresh full cryptographic production restore.
 
-0599: owner-bound exact-reference and ID reads at workspace revision42 show **one economic bank observation**, a separate **non-economic report observation**, zero allocations and a complete invoice-registry query with zero matches. Both selected original-integrity checks passed. Account/deposit identity remains insufficient and automatic reconciliation false. No payer identity, alias, invoice, allocation or paid status is fabricated. Exact bank/customer data and raw original bytes are deliberately omitted from this public report.
+0599: initial owner-bound exact-reference/ID reads were at workspace revision42. The workspace independently advanced to43 **before publication**. Fresh immediate pre/post direct-ID reads at **43→43** are complete/current and their selected financial/original projections are byte-identical: **one economic bank observation**, a separate **non-economic report observation**, zero allocations, automatic reconciliation false and both selected original-integrity checks passed. Exact-reference invoice-registry queries are complete with zero matches. Broader report-reference search has incomplete scope and is not substituted for these direct-ID reads. Account/deposit identity remains insufficient; no payer, alias, invoice, allocation or paid status is fabricated. Exact bank/customer data and raw original bytes are omitted from this public report.
 
 Production-wide preservation limitation: native D1 row inspection truncates the workspace payload (`truncated_values=1`), so it cannot establish a full ledger byte comparison. The selected payment projection/originals and visible overview totals can be compared read-only; do not expand that result into a full ledger census. Synthetic full-state conservation and restore tests supply broader code evidence.
 
@@ -110,16 +112,93 @@ Production-wide preservation limitation: native D1 row inspection truncates the 
 | 18 | d3566fdc90857517330127eef7f9d7911849e06a | 2bfe4e55059390deacde6b0107d6640245ff60f1 | 41520665359 | 1271 /2215 | success,0fail/skip |
 | 14 | 493365c7e20cd86639ecae32ca8acfddd7aec363 | 723b143515bac1a59ee290f6ea3881c096caf5ab | 41521668283 | 1293 /2279 | success,0fail/skip |
 | 17 | 72ce0daa891fccffc1d9112c3c8c45fa6901c672 | 79e7aa2acf78925c23d106fa826d92c25c642579 | 41523255146 | 1309 /2328 | success,0fail/skip |
+| 20 acceptance/tests/report | a34cbf53e275d093719b8565d19093dd093a8ef3 | 4d20b3ecaa5dbbbf9a5b4f75bd189c1aab51c089 | 41524529308 | 1309 /2331 | success,0fail/skip |
 
-All six original PRs merged successfully in the stated order. Every resulting main tree exactly matches its reviewed/tested candidate. Main79e7aa2acf78925c23d106fa826d92c25c642579 is green. A final acceptance PR adds the two tests-only flows and this report/scorecard; its exact main/Sites/publication receipt is recorded below after completion. All six workstream branches remain; no active work was deleted. Sites56 is still the rollback/current publication until the final native deployment succeeds.
+All six original PRs merged successfully in the stated order; none is blocked. Every resulting main tree exactly matches its reviewed/tested candidate. Acceptance PR20 exact-head CI41524022526 and mainCI41524529308 both passed with1309/2331. All six workstream branches and the acceptance branch remain; no active work was deleted. The final receipt uses a separate documentation branch. PR state and branch listing were rechecked before each merge; conversation liveness remains outside connector visibility.
+
+Preserved/current branch names at receipt preparation:
+
+- `main`.
+- `codex/backup-security-stabilization-20261102` (15).
+- `fix/swedbank-sync-date-recovery` (16).
+- `codex/ocr-quality-20261102` (19).
+- `fix/gmail-document-automation-20261102` (18).
+- `fix/payment-0599-bankgiro-verification-20261102` (14).
+- `codex/final-ui-quality-2026-11-02` (17).
+- `codex/six-pr-integration-acceptance-20261102` (20).
+- Final receipt is submitted on `codex/six-pr-deployment-receipt-20261102`; its final branch/main SHA is recorded by normal PR metadata.
+
+Updated exact-head PR workflow receipts, all success:15→41507434246;16→41518250475;19→41519043356;18→41520201235;14→41521105696;17→41522610556;20→41524022526. The serial table records the separate required main workflows.
+
+## Sites publication and production receipt
+
+| Evidence | Verified result |
+| --- | --- |
+| Existing project / URL | `appgprj_6adf2f7f7e848191b64192161886b528`; [MG Fakturakoll](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/) |
+| Published version | **57**, `appgprj_6adf2f7f7e848191b64192161886b528~appgver_0c68f010254c8191a7c78b53f1e0c17b` |
+| Deployment | `appgdep_6ae8fb66f92c8191b59b1dd5985180a3`; native **succeeded**,2026-11-02T21:07:11.694632Z; MCP enabled, runtime revision9 |
+| Exact source provenance | GitHub implementation main `4d20b3e:sites` = Sites source commit `12ece026c917a87c2b53f5feb02af488e35e40d1` tree = **`45761f430862a3ecbf31bbba2c2c116db7b210a0`** |
+| Existing source preservation | Opening Site56 source tree exactly equaled starting GitHub main's Sites tree; no separate unmerged Site changes were overwritten. Normal source commit/push; one combined publication. |
+| Packaging | Managed supported build/package successful;349 files; local gzip17,876,651 bytes,SHA256 `f3e6f1f9367d28d2baff41b43560077c47fff74ac4c25e2dafef8c890619e1de`. Service stores the unpacked/raw tar under a different archive hash; source-tree equality supplies provenance. No env/key/database/private-upload files in archive. |
+| Bindings / access | Hosting `DB`/`BUCKET` preserved; native D1 overview26same tables; auth client, access policy, public shell/private owner data unchanged. No schema migration required. |
+| Runtime / schedules | Revision9 and all masked key/type entries unchanged; three enabled bank/Gmail/backup schedules byte-identical. Masked values cannot certify secret bytes. No environment/schedule/auth update performed. |
+| Rollback | Prior version56 and saved source `4483058138ed4f04b93bdee775c79718c074dd80` retained; no rollback needed or executed. |
+| Financial conservation | Scoped direct-ID projection/original comparison43→43 identical as described above; exact-reference registry0 and allocations0. Visible overview money totals unchanged. Full ledger/R2 census unavailable through truncated workspace rows. |
+| Bank | Connected/enabled; last successful fetch20:07:20.589Z, no error/block/failures, identical pre/post. Success predates publication and does not certify new live recovery. |
+| Gmail / document queue | Connected/configured with last successful fetch21:05:32.232Z, **before** deployment began21:06:47Z. Independent preexisting processing changed review counts216→226→234; final read21:17Z shows234review/2registered states,5registered outcomes, local worker online and cloud heartbeat stale. Queue-count equality is not claimed; no integration-triggered real processing or registration. New-code external scheduler/cloud completion remains unproved. |
+| Backup | Saved day-Nov2 complete195/195manifest,63,463,280bytes, `manifest_pass` at01:29:26.785Z, identical pre/post;11retained receipts/112older without. This precedes newer Gmail originals and is not a fresh whole-system backup or production restore. Same-day completed snapshot is retained; original private key/offsite/RPO/RTO remain external acceptance work. |
+| Authenticated desktop browser | Reloaded published owner UI; overview→customer invoices→existing invoice detail→retained original first-page image→Escape focus restored→overview. Original preview image has nonzero379.5×535.66 layout and accessible description; no loading/error remained. List/source/review status and overview money cards render. No financial action clicked. |
+| Mobile / accessibility limit | Browser viewport setter returned actual1920px for requested320/390/768/1024/1440; screenshot confirmed desktop. Override was reset. **These are not five responsive passes.** No fresh mobile, physical-device or screen-reader certification; automated focus/stale/pagination/contrast tests and scoped desktop/demo checks are distinct evidence. |
+
+Fresh final local syntax check covered121files; TypeScript and portable production build passed (31.20s), alongside the managed Sites publication build. Required GitHub CI installation/syntax/type/test/high-audit/build steps all passed. Full ESLint remains the separately reported nonblocking failure, not a passed check. Mandatory final suites contain **zero skipped tests**; earlier discarded/shared-host observations and genuine unperformed production/device checks are explicitly disclosed rather than counted as passes.
 
 ## Quality assessment
 
 Latest complete 33-area baseline is **255/330=7.73/10**, **0/33 at9.5**. All 33 retain their scores until full acceptance has objective evidence. New code/test evidence strengthens scoped controls; it cannot establish missing bank facts, representative OCR accuracy, a production DR exercise or physical accessibility acceptance. The integrated table in `QUALITY-SCORECARD.md` records before/after, contributing PR, tests, production evidence and remaining risk per area.
 
+All 33 scores (detailed test/production evidence and remaining risks are recorded per row in the current scorecard):
+
+| Area | Before | After | PR |
+| --- | ---: | ---: | --- |
+| 1. Design och färger | 8 | 8 | 17 |
+| 2. Startsida | 8,5 | 8,5 | 17 |
+| 3. Navigering | 8,5 | 8,5 | 17 |
+| 4. Mobilanpassning | 8,5 | 8,5 | 17 |
+| 5. Sökning och filtrering | 7,5 | 7,5 | 17 |
+| 6. Minimal manuell hantering | 6,5 | 6,5 | 18/19/17 |
+| 7. Kundfakturor | 8 | 8 | 14/19/17 |
+| 8. Leverantörsfakturor | 8 | 8 | 18/19/17 |
+| 9. PDF-tolkning | 8 | 8 | 19 |
+| 10. Bild-OCR | 7 | 7 | 19 |
+| 11. Gmail-anslutning | 7,5 | 7,5 | 18 |
+| 12. Automatisk fakturaregistrering | 8 | 8 | 18/19 |
+| 13. Dubblettkontroll | 8 | 8 | 14/18/19 |
+| 14. Dokumentgranskning | 8 | 8 | 18/19/17 |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | 16 |
+| 16. Automatisk bankhämtning | 8 | 8 | 16 |
+| 17. Bankgiroimport | 8,5 | 8,5 | 14/17 |
+| 18. Identifiera verklig betalare | 7 | 7 | 14/17 |
+| 19. Verklig OCR/fakturareferens | 7 | 7 | 14/19/17 |
+| 20. Automatisk betalningsmatchning | 7,5 | 7,5 | 14/16/19 |
+| 21. Delbetalningar | 8 | 8 | 14 |
+| 22. Överbetalningar | 8 | 8 | 14 |
+| 23. Flera fakturor i en betalning | 7,5 | 7,5 | 14/19 |
+| 24. Betalningshistorik | 8 | 8 | 14/15/16/17 |
+| 25. Betalningsstatus | 8 | 8 | 14/17 |
+| 26. Kontrollera alla betalningar | 8 | 8 | 14/16/18/19/17 |
+| 27. Automatiska mejlutkast | 8 | 8 | 18/17 |
+| 28. Schemalagd automatisering | 6,5 | 6,5 | 16/18 |
+| 29. Säkerhetskopiering | 7,5 | 7,5 | 15 |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | 15/16/18/14/17 |
+| 31. Katastrofåterställning | 5,5 | 5,5 | 15 |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | 14–19 |
+| 33. Verifiering i verklig produktion | 6,5 | 6,5 | 14–19 |
+
 PR19's frozen synthetic corpus improves text scalar exact documents36/40→40/40 and false green7→0; native PDF2/3→3/3, false green1→0. Raster remains3/4 exact, precision96.67%, recall70.73%. Text green/review metrics do not imply universal100% OCR. Swedish textual month names still produce a safe review hold and remain a documented nonblocking inherited gap.
 
 ## Remaining acceptance and next steps
+
+Code integration, exact implementation-main CI and the single existing-Site publication are delivered. Overall production/9.5 acceptance is **partial** for the specific reasons below; no original PR is forced or left silently pending.
 
 1. Establish explicit bank account/deposit evidence and separate business authorization before any real blocked-case registration/allocation.
 2. Observe a new external Gmail schedule run and cloud OCR completion on the final deployed code; heartbeat/configuration alone is insufficient.
