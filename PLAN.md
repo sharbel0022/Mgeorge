@@ -1,3 +1,9 @@
+# Mgeorge – aktuell GitHub- och bankkontroll
+
+Aktivt uppdrag2026-11-02: slutför säker fjärrrensning efter konkret godkännande och verifiera bankfallet utan att kringgå väntetider. [Aktuell plan](docs/superpowers/plans/2026-11-02-github-bank-final.md), [branchinventering](docs/FINAL-BRANCH-CLEANUP.md), [samlad verifiering](docs/FINAL-GITHUB-AND-BANK-VERIFICATION.md). Kodens retryproveniens och felmeddelandeskydd är granskade/testade; exakt main/Sitesleverans redovisas i rapporten. Ingen kontoautomation skapas när den verkliga leverantörsdeadlinen saknas.
+
+## Tidigare uppdrag – historik
+
 # Mgeorge – aktuell stabilisering och branchrensning
 
 Aktuellt uppdrag2026-11-02: rätta reproducerade internt lösbara fel, leverera main och befintliga Sites och rensa endast bedömda, återställningsbara utvecklingsbrancher. [Arbetsplan](docs/superpowers/plans/2026-11-02-final-main-cleanup.md), [design och säkerhetsgränser](docs/superpowers/specs/2026-11-02-final-main-cleanup-design.md), [slutrapport](docs/FINAL-MAIN-CLEANUP-REPORT.md). Användarens uttryckliga mandat gäller kod/main/Sites och säker branchrensning; inga riktiga ekonomiska skrivningar eller kundutskick.

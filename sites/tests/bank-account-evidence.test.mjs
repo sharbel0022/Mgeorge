@@ -14,7 +14,7 @@ const appId='11111111-1111-4111-8111-111111111111',accountId='22222222-2222-4222
 const iban='SE4280000890119146168423',domestic='890119146168423',origin='https://synthetic.example';
 const keyPair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
 const pem='-----BEGIN PRIVATE KEY-----\n'+Buffer.from(await crypto.subtle.exportKey('pkcs8',keyPair.privateKey)).toString('base64').match(/.{1,64}/g).join('\n')+'\n-----END PRIVATE KEY-----\n';
-async function fixture(t){
+async function fixture(t,readerFailure=false){
  const sql=new DatabaseSync(':memory:');for(const file of readdirSync(new URL('../drizzle',import.meta.url)).filter(f=>f.endsWith('.sql')).sort())sql.exec(readFileSync(new URL('../drizzle/'+file,import.meta.url),'utf8'));
  const key='currentAccount'+crypto.randomUUID().replaceAll('-',''),f={sql,owner:'synthetic-owner',calls:[],reads:[],objects:new Map(),headers:new Headers({'oai-authenticated-user-id':'synthetic-owner','oai-authenticated-user-email':'owner@example.test'}),env:{BANK_DATA_ENCRYPTION_KEY:randomToken(),ENABLE_BANKING_APPLICATION_ID:appId,ENABLE_BANKING_PRIVATE_KEY:pem,ENABLE_BANKING_ENVIRONMENT:'PRODUCTION',ENABLE_BANKING_KEY_ROTATED:'true'}};globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});const ref=`globalThis[${JSON.stringify(key)}]`;
  f.env.DB={prepare(statement){assert.match(statement,/^SELECT\b/i,'No D1 mutation is permitted');return{bind(...args){return{async first(){const row=sql.prepare(statement).get(...args)||null;if(statement.includes('revision, payload FROM workspaces')){f.workspaceReads=(f.workspaceReads||0)+1;f.afterWorkspaceRead?.(f.workspaceReads);}return row;},async all(){return{results:sql.prepare(statement).all(...args)};},async run(){throw Error('D1 write forbidden');}};}};},async batch(){throw Error('D1 batch forbidden');}};
@@ -28,10 +28,11 @@ async function fixture(t){
  f.state=applyCommand(emptyState(),{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account:iban,date:'2026-10-26',amount:62500,payerReference:'000018',bankReference:'SYNTHETIC-AIS-ENTRY'})]}).state;f.save=()=>sql.prepare('INSERT OR REPLACE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,7,?,?)').run(f.owner,JSON.stringify(f.state),'2026-11-01');f.save();
  const report='Betalningsdatum;Avsändare;Betalningsreferens;Bankgironummer/Avinummer;Belopp;Valuta;Mottagarkonto\n2026-10-26;Synthetic payer AB;000018;987-6543;625,00;SEK;'+domestic;f.reportBytes=new TextEncoder().encode(report);f.hash=Buffer.from(await crypto.subtle.digest('SHA-256',f.reportBytes)).toString('hex');f.objects.set(f.owner+'/'+docId,f.reportBytes);sql.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run(docId,f.owner,'Synthetic.csv','text/csv',f.reportBytes.length,f.hash,'2026-11-01');
  f.live={status:'AUTHORIZED',accounts:[accountId],accounts_data:[{uid:accountId}],aspsp:{name:'Synthetic bank',country:'SE'},psu_type:'business',access:{valid_until:'2099-01-01'},created:'2026-11-01'};
- t.mock.method(globalThis,'fetch',async(address,init)=>{const u=new URL(address);assert.equal(u.origin,'https://api.enablebanking.com');assert.equal(init.method,'GET');assert.equal(init.redirect,'manual');assert.equal(init.headers.has('Psu-Ip-Address'),false);f.calls.push(u.pathname);if(f.onFetch)await f.onFetch(u.pathname);if(f.providerError)return new Response(JSON.stringify({error:'RATE_LIMIT',secret:'DO NOT RETURN PROVIDER BODY'}),{status:429,headers:{'Content-Type':'application/json'}});if(u.pathname==='/sessions/'+remoteSession)return Response.json(f.live);const m=u.pathname.match(/^\/accounts\/([a-f0-9-]+)\/details$/);assert.ok(m,'Only session and consent-account detail reads are permitted');return Response.json(f.fresh.get(m[1])??{});});
+ t.mock.method(globalThis,'fetch',async(address,init)=>{const u=new URL(address);assert.equal(u.origin,'https://api.enablebanking.com');assert.equal(init.method,'GET');assert.equal(init.redirect,'manual');assert.equal(init.headers.has('Psu-Ip-Address'),false);f.calls.push(u.pathname);const intercepted=f.onFetch?await f.onFetch(u.pathname):undefined;if(intercepted)return intercepted;if(f.providerError)return new Response(JSON.stringify({error:'RATE_LIMIT',secret:'DO NOT RETURN PROVIDER BODY'}),{status:429,headers:{'Content-Type':'application/json'}});if(u.pathname==='/sessions/'+remoteSession)return Response.json(f.live);const m=u.pathname.match(/^\/accounts\/([a-f0-9-]+)\/details$/);assert.ok(m,'Only session and consent-account detail reads are permitted');return Response.json(f.fresh.get(m[1])??{});});
  f.setAccounts=async(accounts,selected=[accountId])=>{f.accounts=accounts;const encrypted=await f.store.encrypt(f.owner,'accounts:synthetic-connection',accounts);sql.prepare('UPDATE bank_connections SET encrypted_accounts=?,selected_accounts=? WHERE owner=?').run(encrypted,JSON.stringify(selected),f.owner);f.live.accounts=accounts.map(a=>a.uid);f.live.accounts_data=accounts.map(a=>({uid:a.uid}));};
  const tx=compiled('../lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':url('../lib/payment-references.js'),'../payer-evidence.js':url('../lib/payer-evidence.js')});
- const reader=existsSync(new URL('../lib/banking/account-evidence.ts',import.meta.url))?compiled('../lib/banking/account-evidence.ts',{'../account-evidence-presentation':compiled('../lib/account-evidence-presentation.ts',{'./domain':domain}),'../server':server,'../domain':domain,'./store':store,'./transactions':tx,'./enable-banking':url('../lib/banking/enable-banking.ts'),'../bankgiro-parser.js':url('../lib/bankgiro-parser.js')}):data('export function readBankAccountEvidence(){throw Error("Not implemented")}');
+ const provider=readerFailure?data(`export * from ${JSON.stringify(url('../lib/banking/enable-banking.ts'))};export async function getSession(){throw ${ref}.readerFailure;}`):url('../lib/banking/enable-banking.ts');
+ const reader=existsSync(new URL('../lib/banking/account-evidence.ts',import.meta.url))?compiled('../lib/banking/account-evidence.ts',{'../account-evidence-presentation':compiled('../lib/account-evidence-presentation.ts',{'./domain':domain}),'../server':server,'../domain':domain,'./store':store,'./transactions':tx,'./enable-banking':provider,'../bankgiro-parser.js':url('../lib/bankgiro-parser.js')}):data('export function readBankAccountEvidence(){throw Error("Not implemented")}');
  const rpc=compiled('../lib/banking/mcp.ts',{'./service':data(`export {failure as bankFailure} from ${JSON.stringify(server)};export function automaticSync(){throw Error('No sync')}export function automaticSyncStatus(){throw Error('No sync')}`),'./account-evidence':reader});f.route=await import(compiled('../app/mcp/route.ts',{'@/lib/banking/mcp':rpc}));
  f.accountRoute=existsSync(new URL('../app/api/bank/account-evidence/route.ts',import.meta.url))?await import(compiled('../app/api/bank/account-evidence/route.ts',{'@/lib/server':server,'@/lib/banking/account-evidence':reader,'@/lib/account-evidence-presentation':compiled('../lib/account-evidence-presentation.ts',{'./domain':domain})})):{};
  f.args=()=>({transactionId:f.state.transactions[0].id,documentId:docId});f.call=async(args=f.args(),options={})=>{const r=await f.route.POST(new Request(origin+'/mcp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'bank_account_evidence',arguments:args}}),...options}));let body;try{body=await r.json();}catch{body={};}return{r,body,out:body.result?.structuredContent};};f.snapshot=()=>JSON.stringify(sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all().map(({name})=>[name,sql.prepare('SELECT * FROM "'+name+'" ORDER BY rowid').all()]));return f;
@@ -73,10 +74,10 @@ test('forged provider errors cannot leak codes, messages or diagnostic propertie
  }
 });
 
-test('a changing provider error code getter is read once before configuration checks and disclosure',async t=>{
+test('the constructor code remains compatible without evaluating a changed provider error code getter',async t=>{
  const f=await fixture(t),error=new ProviderError('INVALID_PROVIDER_RESPONSE','Synthetic error');let reads=0;
  Object.defineProperty(error,'code',{get(){reads++;return reads<=2?'INVALID_PROVIDER_RESPONSE':accountId;}});f.onFetch=()=>{throw error;};
- const before=f.snapshot(),{out}=await f.call();assert.equal(out.errorCode,'INVALID_PROVIDER_RESPONSE');assert.equal(reads,1);
+ const before=f.snapshot(),{out}=await f.call();assert.equal(out.errorCode,'INVALID_PROVIDER_RESPONSE');assert.equal(reads,0);
  assert.doesNotMatch(JSON.stringify(out),new RegExp(accountId+'|'+iban));assert.equal(out.validationIssue,null);assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.equal(f.snapshot(),before);
 });
 
@@ -88,7 +89,7 @@ test('a null live alias collection completes the read but cannot match a domesti
 });
 
 // The HTTP action must preserve all reader security gates and do no writes.
-async function explicitFixture(t){const f=await fixture(t);f.state=applyCommand(f.state,{type:'bankgiro.import',documentId:docId,hash:f.hash,name:'Synthetic.csv',rows:parseSpecificationBytes(f.reportBytes,'Synthetic.csv')}).state;f.save();f.post=async(body={...f.args(),revision:7},options={})=>{const r=await f.accountRoute.POST(new Request(origin+'/api/bank/account-evidence',{method:'POST',headers:{'Content-Type':'application/json',Origin:origin},body:JSON.stringify(body),...options}));return {r,out:await r.json()};};return f;}
+async function explicitFixture(t,readerFailure=false){const f=await fixture(t,readerFailure);f.state=applyCommand(f.state,{type:'bankgiro.import',documentId:docId,hash:f.hash,name:'Synthetic.csv',rows:parseSpecificationBytes(f.reportBytes,'Synthetic.csv')}).state;f.save();f.post=async(body={...f.args(),revision:7},options={})=>{const r=await f.accountRoute.POST(new Request(origin+'/api/bank/account-evidence',{method:'POST',headers:{'Content-Type':'application/json',Origin:origin},body:JSON.stringify(body),...options}));return {r,out:await r.json()};};return f;}
 test('explicit account action route is implemented',async t=>{const f=await fixture(t);assert.equal(typeof f.accountRoute.POST,'function');});
 const explicitImplemented=existsSync(new URL('../app/api/bank/account-evidence/route.ts',import.meta.url));
 test('same-origin owner action revalidates its report target and returns only transient reader evidence with zero DB/R2 writes',{skip:!explicitImplemented},async t=>{const f=await explicitFixture(t),before=f.snapshot(),{r,out}=await f.post();assert.equal(r.status,200);assert.equal(out.status,'matched');assert.equal(out.changed,false);assert.equal(out.transactionId,f.args().transactionId);assert.equal(out.documentId,docId);assert.equal(out.revision,7);assert.equal(out.accountMatch,true);assert.equal(f.calls.length,2);assert.equal(f.snapshot(),before);assert.equal(f.objects.size,1);assert.match(r.headers.get('Cache-Control'),/no-store/);});
@@ -99,4 +100,62 @@ test('several report originals do not authorize a client-selected bank account c
 for(const shift of ['revision','membership','revision-and-membership'])test('explicit action carries its selected owner/revision/report through a '+shift+' shift before reader reload',async t=>{const f=await explicitFixture(t);f.afterWorkspaceRead=count=>{if(count!==1)return;if(shift.includes('membership')){f.state.transactions=f.state.transactions.filter(row=>!row.specification);f.save();}if(shift.includes('revision'))f.sql.exec('UPDATE workspaces SET revision=revision+1');f.shiftSnapshot=f.snapshot();};const {r,out}=await f.post();assert.deepEqual(f.calls,[],'a stale route selection must never contact the bank');assert.equal(r.status,409);assert.equal(out.status,'stale');assert.equal(out.providerContacted,false);assert.equal(f.snapshot(),f.shiftSnapshot,'only the injected concurrent update may change D1');});
 test('explicit action reselects report membership again immediately before its first outbound read',async t=>{const f=await explicitFixture(t);f.onOriginalRead=()=>{f.onOriginalRead=null;f.state.transactions=f.state.transactions.filter(row=>!row.specification);f.save();f.shiftSnapshot=f.snapshot();};const {out}=await f.post();assert.deepEqual(f.calls,[]);assert.equal(out.status,'stale');assert.equal(out.providerContacted,false);assert.equal(f.snapshot(),f.shiftSnapshot);});
 test('public MCP input cannot supply UI trusted context and still reads an owned report without UI membership',async t=>{const f=await fixture(t),before=f.snapshot();const rejected=await f.call({...f.args(),trusted:{owner:f.owner,revision:7,target:f.args()}});assert.ok(rejected.body.result?.isError||rejected.body.error);assert.deepEqual(f.calls,[]);const {out}=await f.call();assert.equal(out.status,'matched');assert.equal(out.accountMatch,true);assert.equal(f.calls.length,2);assert.equal(f.snapshot(),before);});
+
+// The real provider, reader, MCP and explicit UI route must preserve the advice
+// together. All DB/R2 mutations and non-consent provider routes are forbidden.
+for(const [header,status,provenance,notBefore]of [
+ ['7200','known','retry_after_seconds','2026-11-02T12:00:00.000Z'],
+ ['Mon, 02 Nov 2026 13:00:00 GMT','known','retry_after_http_date','2026-11-02T13:00:00.000Z'],
+ [null,'unknown','retry_after_missing',undefined],
+ ['private-'+accountId,'unknown','retry_after_invalid',undefined],
+ ['999999999999999999999999999999999999','manual_block','retry_after_exceeds_limit',undefined],
+])test('read-only account-details 429 transports '+provenance+' without saving a retry or account fact',async t=>{
+ t.mock.method(Date,'now',()=>Date.parse('2026-11-02T10:00:00.000Z'));
+ const f=await explicitFixture(t),before=f.snapshot();f.onFetch=path=>{if(path.startsWith('/accounts/'))return new Response(JSON.stringify({error:'ASPSP_RATE_LIMIT_EXCEEDED',private:accountId}),{status:429,headers:header===null?{}:{'Retry-After':header}});};
+ const {r,out}=await f.post();assert.equal(r.status,200);assert.equal(out.status,'error');assert.equal(out.errorCode,'BANK_RATE_LIMIT');assert.equal(out.stage,'account_details');
+ assert.deepEqual(out.retryAdvice,{status,checkedAt:'2026-11-02T10:00:00.000Z',provenance,...notBefore?{notBefore}:{}});
+ assert.equal(out.changed,false);assert.equal(out.providerContacted,true);assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.deepEqual(out.rows,[]);
+ assert.equal(out.resourcesAttempted,1);assert.equal(out.resourcesRead,0);assert.equal(f.snapshot(),before);assert.equal(f.objects.size,1);
+ assert.deepEqual(f.calls,['/sessions/'+remoteSession,'/accounts/'+accountId+'/details']);
+ assert.doesNotMatch(JSON.stringify(out),new RegExp(accountId+'|'+remoteSession+'|'+iban+'|'+domestic+'|ASPSP_RATE_LIMIT|private-'));
+});
+test('session 429 advice stays bound to session stage without an account-details attempt or write',async t=>{
+ const f=await fixture(t),before=f.snapshot();f.providerError=true;const {out}=await f.call();
+ assert.equal(out.errorCode,'BANK_RATE_LIMIT');assert.equal(out.stage,'session');assert.equal(out.retryAdvice?.status,'unknown');assert.equal(out.retryAdvice?.provenance,'retry_after_missing');
+ assert.equal(out.resourcesAttempted,0);assert.equal(out.resourcesRead,0);assert.deepEqual(f.calls,['/sessions/'+remoteSession]);assert.equal(f.snapshot(),before);
+});
+test('forged rate-limit error metadata and getters cannot become trusted reader retry advice',async t=>{
+ for(const getters of [false,true]){
+  const f=await fixture(t),error=new ProviderError('BANK_RATE_LIMIT','private '+iban,429,true);let reads=0;
+  for(const name of ['retryAfter','retryBlocked','retryAdvice'])if(getters)Object.defineProperty(error,name,{get(){reads++;throw Error('Getter must not run');}});else error[name]=name==='retryAdvice'?{status:'known',checkedAt:'2026-11-02T10:00:00.000Z',notBefore:'2026-11-02T12:00:00.000Z',provenance:'retry_after_seconds'}:name==='retryAfter'?7200:false;
+  f.onFetch=()=>{throw error;};const before=f.snapshot(),{out}=await f.call();
+  assert.equal(out.status,'error');assert.equal(out.errorCode,'BANK_RATE_LIMIT');assert.equal(out.retryAdvice,null);assert.equal(reads,0);assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.equal(f.snapshot(),before);
+  assert.doesNotMatch(JSON.stringify(out),new RegExp(iban+'|'+accountId+'|private|2099'));
+ }
+});
 test('explicit action also rejects a changed authenticated owner before the reader contacts any bank',async t=>{const f=await explicitFixture(t),before=f.snapshot();f.afterWorkspaceRead=count=>{if(count===1)f.headers=new Headers({'oai-authenticated-user-id':'foreign-owner','oai-authenticated-user-email':'foreign@example.test'});};const {r,out}=await f.post();assert.equal(r.status,409);assert.equal(out.status,'stale');assert.equal(out.providerContacted,false);assert.deepEqual(f.calls,[]);assert.equal(f.snapshot(),before);});
+
+// Directly reading code here used to throw out of the safe reader catch and let
+// both outer API serializers disclose the getter's private exception message.
+for(const endpoint of ['mcp','ui'])test('a throwing provider code getter stays inside the safe '+endpoint+' reader response',async t=>{
+ const f=endpoint==='ui'?await explicitFixture(t):await fixture(t),error=new ProviderError('BANK_RATE_LIMIT','Synthetic safe message',429,true);let reads=0;
+ Object.defineProperty(error,'code',{get(){reads++;throw Error('SYNTHETIC_PRIVATE_GETTER_MESSAGE');}});f.onFetch=()=>{throw error;};
+ const before=f.snapshot(),result=endpoint==='ui'?await f.post():await f.call(),{r,out}=result;
+ assert.doesNotMatch(JSON.stringify(result.body??out),/SYNTHETIC_PRIVATE_GETTER_MESSAGE|Synthetic safe message/);
+ assert.equal(r.status,200);assert.equal(out.status,'error');assert.equal(out.errorCode,'BANK_RATE_LIMIT');assert.equal(out.retryAdvice,null);assert.equal(reads,0);
+ assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.deepEqual(out.rows,[]);assert.equal(f.snapshot(),before);assert.deepEqual(f.calls,['/sessions/'+remoteSession]);
+ if(endpoint==='mcp')assert.notEqual(result.body.result.isError,true);
+});
+test('unconstructed and proxied errors cannot run code or prototype traps at the reader boundary',async t=>{
+ for(const kind of ['unconstructed','proxy','revoked']){
+  const f=await explicitFixture(t,true);let reads=0;
+  const getter=()=>{reads++;throw Error('SYNTHETIC_PRIVATE_TRAP_MESSAGE');};
+  const unconstructed=Object.create(ProviderError.prototype);Object.defineProperty(unconstructed,'code',{get:getter});
+  const proxy=new Proxy(new ProviderError('BANK_RATE_LIMIT','SYNTHETIC_PRIVATE_TRAP_MESSAGE',429,true),{get:getter,getPrototypeOf:getter,getOwnPropertyDescriptor:getter});
+  const revoked=Proxy.revocable(new ProviderError('BANK_RATE_LIMIT','SYNTHETIC_PRIVATE_TRAP_MESSAGE'),{});revoked.revoke();
+  f.readerFailure=kind==='unconstructed'?unconstructed:kind==='proxy'?proxy:revoked.proxy;
+  const before=f.snapshot(),{r,out}=await f.post();assert.equal(r.status,200);assert.equal(out.status,'error');assert.equal(out.errorCode,'ACCOUNT_EVIDENCE_UNAVAILABLE');assert.equal(out.retryAdvice,null);assert.equal(out.validationIssue,null);assert.equal(reads,0);
+  assert.equal(out.accountMatch,false);assert.equal(out.complete,false);assert.deepEqual(out.rows,[]);assert.equal(f.snapshot(),before);assert.deepEqual(f.calls,[]);
+  assert.doesNotMatch(JSON.stringify(out),/SYNTHETIC_PRIVATE_TRAP_MESSAGE/);
+ }
+});

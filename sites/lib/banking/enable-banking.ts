@@ -58,6 +58,14 @@ const TRANSACTIONS_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 const TRANSACTION_DETAIL_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/transactions\/[^/]+$/i;
 const ACCOUNT_DETAIL_PATH = /^\/accounts\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/details$/i;
 
+// Reader projections use the original constructor code, never public fields or
+// prototype inspection on a caught value. Proxies and forged instances are not
+// members of this map, even when they imitate ProviderError's prototype.
+const constructorErrorCodes=new WeakMap<object,string>();
+export function providerErrorCode(error:unknown):string|undefined {
+  const code=error!==null&&typeof error==='object'?constructorErrorCodes.get(error):undefined;
+  return typeof code==='string'?code:undefined;
+}
 export class ProviderError extends Error {
   code: string;
   status: number;
@@ -66,6 +74,7 @@ export class ProviderError extends Error {
   retryBlocked?: boolean;
   constructor(code: string, message: string, status = 502, retryable = false) {
     super(message); this.name = 'ProviderError'; this.code = code; this.status = status; this.retryable = retryable;
+    constructorErrorCodes.set(this,code);
   }
 }
 const invalid = () => new ProviderError('INVALID_REQUEST', 'Bankförfrågan är ogiltig. Uppdatera sidan och försök igen.', 400);
@@ -77,6 +86,33 @@ const responseDiagnostics = new WeakMap<object,ResponseDiagnostic>();
 export function providerResponseDiagnostic(error:unknown):ResponseDiagnostic|null {
   const issue=error!==null&&typeof error==='object'?responseDiagnostics.get(error):undefined;
   return issue?{...issue}:null;
+}
+type RetryDiagnostic =
+  | {status:'known';checkedAt:string;notBefore:string;provenance:'retry_after_seconds'|'retry_after_http_date'}
+  | {status:'unknown';checkedAt:string;provenance:'retry_after_missing'|'retry_after_invalid'}
+  | {status:'manual_block';checkedAt:string;provenance:'retry_after_exceeds_limit'};
+const MAX_RETRY_SECONDS=365*86400;
+// Only response parsing may create advice. Public ProviderError retry fields are
+// legacy sync policy, including a fallback, and cannot prove a supplier deadline.
+const retryDiagnostics=new WeakMap<object,RetryDiagnostic>();
+export function providerRetryDiagnostic(error:unknown):RetryDiagnostic|null {
+  const advice=error!==null&&typeof error==='object'?retryDiagnostics.get(error):undefined;
+  return advice?{...advice}:null;
+}
+function responseRetryDiagnostic(header:string|null,now:number):RetryDiagnostic {
+  const checkedAt=new Date(now).toISOString(),value=(header||'').trim();
+  if(header===null)return {status:'unknown',checkedAt,provenance:'retry_after_missing'};
+  if(/^\d+$/.test(value)){
+    const seconds=Number(value);
+    if(/^\d{11,}$/.test(value)||!Number.isFinite(seconds)||seconds>MAX_RETRY_SECONDS)return {status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'};
+    return {status:'known',checkedAt,notBefore:new Date(now+seconds*1000).toISOString(),provenance:'retry_after_seconds'};
+  }
+  // Date.parse also accepts non-HTTP text and normalizes impossible dates. Only
+  // the exact supported HTTP-date format can supply this diagnostic's deadline.
+  const deadline=value.length===29&&/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(value)?Date.parse(value):NaN;
+  if(!Number.isFinite(deadline)||new Date(deadline).toUTCString()!==value||deadline<=now)return {status:'unknown',checkedAt,provenance:'retry_after_invalid'};
+  if(deadline-now>MAX_RETRY_SECONDS*1000)return {status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'};
+  return {status:'known',checkedAt,notBefore:new Date(deadline).toISOString(),provenance:'retry_after_http_date'};
 }
 const invalidResponse = (field?:ResponseField,value?:unknown) => {
   const error=new ProviderError('INVALID_PROVIDER_RESPONSE', 'Banktjänsten lämnade ett svar som inte kunde kontrolleras. Ingen import gjordes.');
@@ -180,9 +216,11 @@ function mappedError(status: number, payload: unknown, retryHeader: string | nul
   if (['ASPSP_ACCOUNT_NOT_ACCESSIBLE', 'ACCOUNT_DOES_NOT_EXIST'].includes(code)) return new ProviderError('BANK_ACCOUNT_UNAVAILABLE', 'Bankkontot är inte tillgängligt med det aktuella medgivandet. Anslut banken igen och välj företagets konto.', 409);
   if (code === 'ASPSP_PSU_ACTION_REQUIRED') return new ProviderError('BANK_ACTION_REQUIRED', 'Banken kräver en åtgärd från dig. Logga in hos banken och kontrollera meddelanden och behörigheter.', 409);
   if (status === 429 || code === 'ASPSP_RATE_LIMIT_EXCEEDED') {
-    const value=(retryHeader||'').trim(),seconds=/^\d+$/.test(value)?Number(value):Math.ceil((Date.parse(value)-Date.now())/1000);
+    const now=Date.now(),value=(retryHeader||'').trim(),seconds=/^\d+$/.test(value)?Number(value):Math.ceil((Date.parse(value)-now)/1000);
     const blocked=/^\d{11,}$/.test(value)||Number.isFinite(seconds)&&seconds>365*86400;
-    return Object.assign(new ProviderError('BANK_RATE_LIMIT', blocked?'Bankens väntetid kräver manuell kontroll. Automatisk hämtning har stoppats.':'Bankens gräns för hämtningar har nåtts. Vänta till nästa tillåtna försök.', 429, true), {retryAfter:Number.isFinite(seconds)?Math.max(1,Math.min(365*86400,seconds)):60,retryBlocked:blocked});
+    const error=Object.assign(new ProviderError('BANK_RATE_LIMIT', blocked?'Bankens väntetid kräver manuell kontroll. Automatisk hämtning har stoppats.':'Bankens gräns för hämtningar har nåtts. Vänta till nästa tillåtna försök.', 429, true), {retryAfter:Number.isFinite(seconds)?Math.max(1,Math.min(365*86400,seconds)):60,retryBlocked:blocked});
+    if(status===429)retryDiagnostics.set(error,responseRetryDiagnostic(retryHeader,now));
+    return error;
   }
   if (status === 408 || code === 'ASPSP_TIMEOUT') return new ProviderError('BANK_TIMEOUT', 'Banktjänsten svarade inte i tid. Försök igen om en stund.', 504, true);
   if (['PSU_HEADER_NOT_PROVIDED', 'PSU_HEADER_INVALID', 'PSUHEADERNOT_PROVIDED'].includes(code)) return new ProviderError('BANK_USER_CONTEXT_REQUIRED', 'Banken behöver en aktiv användarsession. Öppna sidan och försök hämta bankhändelser igen.', 409);

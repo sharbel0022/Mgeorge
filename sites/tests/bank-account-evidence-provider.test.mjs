@@ -38,3 +38,48 @@ test('nullable alias collection does not permit malformed lists or other null ac
   const r=resource();r.all_account_ids=null;change(r);t.mock.method(globalThis,'fetch',async()=>json(r));await assert.rejects(adapter.getAccountDetails(config,account),e=>e.code==='INVALID_PROVIDER_RESPONSE');
  }
 });
+
+// Missing trusted metadata, an invented fallback deadline, or truncated oversized
+// waits would mislead the read-only account consumer about supplier permission.
+test('actual 429 responses retain only bounded explicit supplier retry advice and preserve existing sync fields',async t=>{
+ t.mock.method(Date,'now',()=>Date.parse('2026-11-02T10:00:00.000Z'));
+ const checkedAt='2026-11-02T10:00:00.000Z';
+ for(const [header,retryAfter,retryBlocked,want]of [
+  ['7200',7200,false,{status:'known',checkedAt,notBefore:'2026-11-02T12:00:00.000Z',provenance:'retry_after_seconds'}],
+  ['Mon, 02 Nov 2026 13:00:00 GMT',10800,false,{status:'known',checkedAt,notBefore:'2026-11-02T13:00:00.000Z',provenance:'retry_after_http_date'}],
+  ['0',1,false,{status:'known',checkedAt,notBefore:'2026-11-02T10:00:00.000Z',provenance:'retry_after_seconds'}],
+  [null,60,false,{status:'unknown',checkedAt,provenance:'retry_after_missing'}],
+  ['private-account-'+account,60,false,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
+  ['January 1, 2028',31536000,true,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
+  ['Sun, 01 Nov 2026 10:00:00 GMT',1,false,{status:'unknown',checkedAt,provenance:'retry_after_invalid'}],
+  ['31536001',31536000,true,{status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'}],
+  ['999999999999999999999999999999999999',31536000,true,{status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'}],
+  ['Thu, 02 Dec 2027 10:00:00 GMT',31536000,true,{status:'manual_block',checkedAt,provenance:'retry_after_exceeds_limit'}],
+ ]){
+  t.mock.method(globalThis,'fetch',async()=>json({error:'ASPSP_RATE_LIMIT_EXCEEDED',private:account},429,header===null?{}:{'Retry-After':header}));
+  await assert.rejects(adapter.getAccountDetails(config,account),error=>{
+   assert.equal(error.code,'BANK_RATE_LIMIT');assert.equal(error.retryAfter,retryAfter);assert.equal(error.retryBlocked,retryBlocked);
+   assert.deepEqual(adapter.providerRetryDiagnostic?.(error),want);
+   const first=adapter.providerRetryDiagnostic(error);first.status='forged';assert.deepEqual(adapter.providerRetryDiagnostic(error),want);
+   assert.doesNotMatch(JSON.stringify(adapter.providerRetryDiagnostic(error)),new RegExp(account+'|private-account|ASPSP_RATE_LIMIT'));
+   return true;
+  });
+ }
+});
+test('retry advice ignores forged properties and getters and requires an actual HTTP 429 response',async t=>{
+ let reads=0;const error=new adapter.ProviderError('BANK_RATE_LIMIT','private '+account,429,true);
+ for(const name of ['retryAfter','retryBlocked','retryAdvice','checkedAt','notBefore','provenance'])Object.defineProperty(error,name,{get(){reads++;throw Error('Getter must not be evaluated');}});
+ assert.equal(adapter.providerRetryDiagnostic?.(error),null);
+ assert.equal(adapter.providerRetryDiagnostic?.({retryAdvice:{status:'known',notBefore:'2099-01-01T00:00:00.000Z'}}),null);
+ assert.equal(reads,0);
+ t.mock.method(globalThis,'fetch',async()=>json({error:'ASPSP_RATE_LIMIT_EXCEEDED'},400,{'Retry-After':'7200'}));
+ await assert.rejects(adapter.getAccountDetails(config,account),error=>{assert.equal(error.code,'BANK_RATE_LIMIT');assert.equal(error.retryAfter,7200);assert.equal(adapter.providerRetryDiagnostic(error),null);return true;});
+});
+test('provider error codes come from constructor metadata without inspecting public getters or prototypes',()=>{
+ let reads=0;const getter=()=>{reads++;throw Error('SYNTHETIC_PRIVATE_TRAP_MESSAGE');},real=new adapter.ProviderError('BANK_TIMEOUT','Synthetic safe message');
+ Object.defineProperty(real,'code',{get:getter});assert.equal(adapter.providerErrorCode?.(real),'BANK_TIMEOUT');
+ const forged=Object.create(adapter.ProviderError.prototype);Object.defineProperty(forged,'code',{get:getter});
+ const proxy=new Proxy(real,{get:getter,getPrototypeOf:getter,getOwnPropertyDescriptor:getter}),revoked=Proxy.revocable(real,{});revoked.revoke();
+ for(const error of [forged,proxy,revoked.proxy,{code:'BANK_TIMEOUT'},null,undefined,'BANK_TIMEOUT'])assert.equal(adapter.providerErrorCode?.(error),undefined);
+ assert.equal(reads,0);
+});

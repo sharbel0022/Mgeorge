@@ -2,7 +2,7 @@ import {identity,db,readWorkspace,readBankOriginalBytes,response} from '../serve
 import {hasBankApiOrigin,bankApiOriginalIssue,paymentOriginalIssue,paymentEvidenceConflict,canonicalBankAccount,type State} from '../domain';
 import {accountEvidenceTarget,type AccountEvidenceTarget} from '../account-evidence-presentation';
 import {connection,application,accounts,providerConfig,sessionId,metadata,type BankConnectionRow,type BankApplicationRow} from './store';
-import {getSession,getAccountDetails,providerResponseDiagnostic,ProviderError,type ProviderAccount} from './enable-banking';
+import {getSession,getAccountDetails,providerResponseDiagnostic,providerRetryDiagnostic,providerErrorCode,type ProviderAccount} from './enable-banking';
 import {stableAccountKey} from './transactions';
 import {parseSpecificationBytes} from '../bankgiro-parser.js';
 
@@ -92,8 +92,8 @@ export async function readBankAccountEvidence(input:unknown,trustedSelection?:Tr
   const complete=resourcesComplete&&report.length<=MAX_ROWS,ambiguous=rows.some(row=>row.ambiguous),accountMatch=complete&&!ambiguous&&rows.every(row=>row.matched);
   return response({...base,checkedAt:new Date().toISOString(),status:ambiguous?'ambiguous':!complete?'incomplete':accountMatch?'matched':'missing',snapshotCurrent:true,resourcesRead,resourcesComplete,accountMatch,complete,ambiguous,rows});
  }catch(error){
-  const providerCode=error instanceof ProviderError?error.code:undefined;
+  const providerCode=providerErrorCode(error);
   if(providerCode!==undefined&&['INVALID_REQUEST','INVALID_CONFIGURATION','INVALID_PRIVATE_KEY'].includes(providerCode))base.providerContacted=false;
-  return response({...base,checkedAt:new Date().toISOString(),status:'error',reason:'Bankens aktuella kontouppgifter kunde inte verifieras. Ingen kontoöversättning har gjorts.',errorCode:providerCode!==undefined&&providerErrorCodes.has(providerCode)?providerCode:'ACCOUNT_EVIDENCE_UNAVAILABLE',stage,validationIssue:providerResponseDiagnostic(error),resourcesAttempted,resourcesRead,accountMatch:false,complete:false,ambiguous:false,rows:[]});
+  return response({...base,checkedAt:new Date().toISOString(),status:'error',reason:'Bankens aktuella kontouppgifter kunde inte verifieras. Ingen kontoöversättning har gjorts.',errorCode:providerCode!==undefined&&providerErrorCodes.has(providerCode)?providerCode:'ACCOUNT_EVIDENCE_UNAVAILABLE',stage,validationIssue:providerResponseDiagnostic(error),retryAdvice:providerRetryDiagnostic(error),resourcesAttempted,resourcesRead,accountMatch:false,complete:false,ambiguous:false,rows:[]});
  }
 }

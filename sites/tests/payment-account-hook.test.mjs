@@ -24,3 +24,14 @@ test('a verified result is cleared immediately on revision change and stale stor
 
 test('malformed resource and report counts cannot produce verified current account evidence',{skip:!implemented},async t=>{for(const [resources,count]of [[0,1],[-1,1],[6,1],[101,1],[1,51]]){const h=await harness(t);await h.respond(report());void h.value.checkAccount();const value=evidence();value.resourcesRead=resources;value.resourcesTotal=resources;value.reportRowCount=count;value.rows=Array.from({length:count},(_,rowIndex)=>({...value.rows[0],rowIndex,reportSourcePath:`rows[${rowIndex}].account`}));await h.respond(value);assert.equal(h.value.account?.verified,false,`${resources} resources / ${count} rows`);assert.equal(h.value.account?.status,'unknown');}});
 test('the reader positive resource and row limits remain valid at their inclusive upper bounds',{skip:!implemented},async t=>{const h=await harness(t);await h.respond(report());void h.value.checkAccount();const value=evidence();value.resourcesRead=5;value.resourcesTotal=5;value.reportRowCount=50;value.rows=Array.from({length:50},(_,rowIndex)=>({...value.rows[0],rowIndex,reportSourcePath:`rows[${rowIndex}].account`}));await h.respond(value);assert.equal(h.value.account.verified,true);assert.equal(h.value.account.status,'matched');});
+
+test('rate-limit advice remains transient and advancing past a deadline never triggers a bank request',{skip:!implemented},async t=>{
+ t.mock.method(Date,'now',()=>Date.parse('2026-11-02T10:00:02.000Z'));
+ t.mock.timers.enable({apis:['setTimeout','setInterval']});
+ for(const retryAdvice of [{status:'known',checkedAt:'2026-11-02T10:00:00.000Z',notBefore:'2026-11-02T12:00:00.000Z',provenance:'retry_after_seconds'},{status:'unknown',checkedAt:'2026-11-02T10:00:00.000Z',provenance:'retry_after_missing'},{status:'manual_block',checkedAt:'2026-11-02T10:00:00.000Z',provenance:'retry_after_exceeds_limit'}]){
+  const h=await harness(t);await h.respond(report());const original=structuredClone(h.value.report);void h.value.checkAccount();
+  await h.respond({...evidence(),status:'error',checkedAt:'2026-11-02T10:00:01.000Z',snapshotCurrent:false,complete:false,accountMatch:false,rows:[],errorCode:'BANK_RATE_LIMIT',stage:'account_details',retryAdvice});
+  assert.equal(h.value.account.verified,false);assert.match(h.value.account.next,/Ingen automatisk/);assert.equal(h.calls.length,2);
+  t.mock.timers.tick(366*86400*1000);await h.flush();assert.equal(h.calls.length,2);assert.equal(h.value.account.verified,false);assert.deepEqual(h.value.report,original);assert.equal(h.value.report.automaticEligible,false);
+ }
+});

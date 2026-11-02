@@ -1,5 +1,21 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## GitHub och bankens väntetidsbevis — 2026-11-02
+
+| Område | Före | Efter | Nytt verifierat underlag / gräns |
+| --- | --- | --- | --- |
+| GitHubrensning |5fjärrbrancher utövermain|5kvar|Arkiv11refs/träd verifierat igen; specifikt raderingsgodkännande saknas, ingen dialog simuleras.|
+| Bankgiroimport/konto |8,5|8,5|12privata workbookkontroller passerar; inget kontoalias hittas på.|
+| Betalare/referens |7|7|Exakt original och inledande nolla; generell referens förblir separat från OCR/AIS.|
+| Konto-/rapportidentitet |Blockerad|Blockerad|Ordinariesynkens planerade tid är inte account_details-behörighet; äldre leverantörsdeadline okänd.|
+| Fakturaverifiering |Oförändrad numerisk bedömning|Oförändrad|9fält per faktisk parser passerar; komplett register0; ingen riktig registrering/allokering.|
+| Automatisk matchning |7,5|7,5|PreviewautomaticEligiblefalse, ekonomisk insättning1/rapport0, inga pengar skapade.|
+| Säkerhet/åtkomst |8,5|8,5|Betrodd WeakMap-retryproveniens och konstruktörskod, inget getter-/råheaderläckage i regressionsfallen.|
+| Kod/tester |8,5|8,5|OberoendeREADY,847Node/1451Sites/syntax99/TS/bygge/highgrindar;0produktion/16moderate devfynd.|
+| Produktion |6,5|6,5|Ägarbundna sparade underlag/status lästa; inget nytt bankkontoanrop när deadline saknas.|
+
+Samtliga33områdespoäng i föregående kompletta tabell behålls:255/330=7,73. Ingen9,5 eller universell100%OCR påstås. [Aktuell samlad rapport](docs/FINAL-GITHUB-AND-BANK-VERIFICATION.md).
+
 ## Stabilisering och branchrensning — 2026-11-02
 
 | Nr | Område | Före | Efter | Evidens / kvarstående gräns |
