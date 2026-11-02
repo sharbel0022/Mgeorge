@@ -1,5 +1,15 @@
 # Verifierad progress
 
+## Fortsatt engineering – originalreferenser och samtidighet, 2026-11-02
+
+Utgångspunkt main `38769f2` / Sites 54; aktuell origin/main är oförändrad efter fetch. [Aktuell rapport](docs/ORIGINAL-REFERENCE-INTEGRITY-REPORT.md), [plan](docs/superpowers/plans/2026-11-02-original-reference-integrity.md).
+
+- Rättat och oberoende granskat: atomisk originaldeduplicering över manuell uppladdning/Gmail; falsk backupfullständighet vid saknade aktuella/historiska originalreferenser och felaktig Bankgiro-länkhash; upprepad namnnormalisering i båda avstämningsmotorerna. Alla konkreta reviewfynd har RED-fall och är stängda, slutreview READY.
+- Slutliga lokala grindar: rena installationer, syntax104, Windows Node1037/1029pass/0fail/8verkliga befintliga filsymlänk-EPERM-skip; Sites1845/1845 utan skip, TS/produktionsbygge. Root/produktionsaudit0; fullSites16moderate utvecklingsfynd/high-grind passerar. Inga paket/lock-/migrationsändringar.
+- Samma volymrunner, faktiskt laddad domänfil och identiska analys-/allokeringsfakta:100Sitespar51,773→3,761sekunder lokalt. Ingen finansiell omkontroll borttagen, ingen global cache eller produktions-SLA.
+- Skrivfri baslinje revision42: exakt AIS-/rapportläsning komplett, oförändrad vald ekonomisk projektion, AIS1/rapport0 ekonomiskt,0allokeringar, komplett målregister0. Rapportintegritet passerar; bank-/verksamhetsbevis saknas fortsatt. Inget account_details-anrop, synkjobb, registrering, utskick, betalning eller schemaändring. Gammal195-filbackup är inte nycertifierad mot de stärkta reglerna. Inloggningsflödet är överlämnat till användaren; ingen ägarautentiserad browseracceptans påstås ännu.
+- **Leverans pågår:** ny main-push/exaktCI/Sites-publicering och skrivfri efterkontroll återstår. Senast publicerad är fortfarande Sites54/runtime9, som bevaras för återgång. Alla33poäng behålls255/330=7,73,0/33på9,5. **Fortsättningspunkt:** slutför denna rapports leveransgrindar; därefter kompatibel beroendefix, ägarinloggad UI, representativ utvärdering, godkänt Gmail-schema och faktiskt isolerat katastrofprov. Ingen ny obemannad automation har skapats.
+
 ## Final engineering – verifierad main/Sites54 och godkänd fjärrrensning, 2026-11-02
 
 - Aktuell origin/main hämtad: `087e5ced733b2cfdb3f8540d006118fb26cb6107`; endast dokumentation skiljde från senaste verifierade kod b0b67e5/Sites53. Separat native worktree och uttryckligt samordnat filägarskap; annan befintlig arbetskatalog bevarad. Rena root-/Sitesinstallationer genomförda. Ny Windowsbaslinje832/847 (sju verkliga restorefel och åtta EPERM-fixturfel), Sites1451/1451.

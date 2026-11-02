@@ -1,5 +1,7 @@
 # Aktiverad automatik och verifierade säkerhetskopior
 
+**Aktuell driftkontroll 2026-11-02:** Gmail är anslutet men dess externa timschema är pausat; senaste lyckade hämtning är 2026-10-29. Bank- och backupstatus läses separat. Tabellen och aktiveringsbevisen nedan gäller 2026-10-28 och är historik, inte ett nytt godkännande att aktivera scheman. Senaste skrivfria backupstatus visar 195 verifierade manifestfiler; det bevisar inte en ny fullständig katastrofåterställning.
+
 Den 28 oktober 2026 aktiverades de två befintliga molnschemana och ett nytt dagligt backupschema för MG Fakturakoll. Sites version 28 innehåller en beständig, återupptagbar backupmotor. Den ordinarie dagliga säkerhetskopieringen körs i molnet och kräver ingen påslagen dator.
 
 | Arbete | Aktivt schema i Europe/Stockholm | Sparat jobb |
@@ -36,7 +38,13 @@ De autentiserade verktygen `backup_status` och `backup_step` visar respektive dr
 
 Tre misslyckade försök stoppar samma dags kopia med ett tydligt fel. Åtgärda det saknade underlaget eller lagringsfelet innan en kontrollerad ny kopia skapas; markera aldrig en ofullständig kopia som verifierad. Äldre kopior och bankoriginal raderas inte av körningen. En faktisk återställning till produktion är en separat administrativ åtgärd och körs inte av schemat.
 
-## Lokal Node-installation
+## Kontroll av saknade originalreferenser
+
+En giltig kontrollsumma på de filer som finns i dokumentregistret bevisar inte att registret är komplett. Backupverifieringen kontrollerar även deklarerade originalreferenser från arbetsyta, beständiga dokumenttabeller och kända historikposter. Node kontrollerar dessutom SQLite:s främmande nycklar. En äldre bilaga som bara finns kvar i revisionshistoriken får inte tyst utelämnas.
+
+Vid fel om saknad originalreferens, kontrollsumma eller registerrelation ska kopian inte markeras komplett. Bevara den befintliga databasen, originalen och äldre arkiv. Utred den exakta posten genom behörig läsning och återanskaffa originalmetadata/bytes från en betrodd bevarad källa; skapa inte ersättningsmetadata eller nya kvitton genom gissning. Återställning prövas först i en separat miljö. En gammal redan komplett Sites-kopia omverifieras inte automatiskt av en kodpublicering, och dess historiska status är inget bevis för de nya kontrollerna.
+
+## Lokal Node-installation — historiskt konfigurationsbevis
 
 Den lokala `.env` har konfigurerats med separat `MG_BACKUP_KEY` och `MG_BACKUP_DIRECTORY`. En verklig krypterad snapshot med 24 tabeller skapades och återställningskontrollerades. Backuper och `backup-status.json` ligger i `%LOCALAPPDATA%\MGFakturakoll\backups`. `node --env-file=.env scripts/run-backup.mjs` verifierar eller skapar dagens kopia. `scripts/configure-backup.mjs` bevarar befintliga integrations- och backupnycklar vid omkörning.
 

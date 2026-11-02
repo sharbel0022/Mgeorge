@@ -22,7 +22,7 @@ Gmail använder Google OAuth och befintlig läsbehörighet. Följ [Gmail-guiden]
 
 ## Automatik
 
-**Aktuellt från Sites version 28:** De två molnschemana är aktiverade och ett separat dagligt molnbackupjobb är tillagt. Se [gällande tider och driftbevis](AUTOMATION-BACKUP.md). Beskrivningen nedan av pausade scheman avser leveransen av version 27.
+**Skrivfri driftkontroll 2026-11-02:** Gmail är anslutet men det externa timschemat är pausat och senaste lyckade hämtning är 2026-10-29. Bankhämtning och backup har separata statusar. Se [driftstatus och daterade historiska bevis](AUTOMATION-BACKUP.md). En anslutning, konfigurerad lokal arbetare eller tidigare aktivering bevisar inte att ett externt schema är aktivt nu. Återaktivera inte en avsiktlig paus utan relevant godkännande.
 
 Node kör schemalagda jobb när servern är igång och integrationernas intervall är aktiverade. Retry och sparad väntetid behålls vid bankfel. Sites kan använda befintliga schedulerfunktioner, men en publicering startar inte de två pausade molnschemana. Kontrollera giltigt medgivande, period, fullständig hämtning och tillgänglig OCR-dator före aktivering. En öppen webbsida är inte i sig ett bevis på obemannad drift.
 
@@ -41,6 +41,8 @@ node --env-file=.env scripts/backup.mjs restore D:\MGBackup\engangsbackup.mgbak 
 ```
 
 Målmapparna för manuell körning måste finnas. Restore kräver ett nytt filnamn och skriver aldrig över en befintlig databas. Stoppa applikationen och samordna driftkonfigurationen innan en återställd kopia tas i bruk. Testa först i isolerad miljö med skyddade nycklar. Fastställ verksamhetens lagrings- och gallringspolicy; koden tar inte automatiskt bort gamla backuper.
+
+Backupen måste också ha giltiga register- och originalreferenser, inklusive bevarad historik. Ett SQLite- eller originalreferensfel stoppar verifiering och återställning innan ett nytt mål tas i bruk. Bevara arkivet och utred den betrodda källan; ta inte bort historik eller tillverka originalmetadata för att få en grön kontroll.
 
 Denna backup gäller Node-databasen, inklusive dokument som den databasen lagrar. Sites D1/R2 är en separat installation och kräver en samordnad backup av register, original och runtimekonfiguration genom behörig driftåtkomst. JSON-export ensam är inte en komplett katastrofbackup.
 
