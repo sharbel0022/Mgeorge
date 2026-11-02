@@ -2,8 +2,11 @@
 
 Contract edition: **`mgeorge-integration-v1`**. Runtime architecture baseline:
 **`73662187cddf9a5c504dea9bd8a1288bd929bc51`** (PR #21).
-This document is introduced through a separate contract PR. Its reviewed head and
-merge commit are recorded in `../SEVEN-AGENT-INTEGRATION-REPORT.md` after merge;
+Contract introduction: **PR #22**, reviewed head
+**`75418773829e49e99bf7db64c34e8e0ba8577af2`**, normally merged as
+**`b65273500c214a4e16b880e3840dac90d8bd7401`**. This is the released contract
+baseline for the six new workstreams. Later implementation and test receipts
+are recorded in [the integration report](../SEVEN-AGENT-INTEGRATION-REPORT.md);
 an unmerged proposal is not a released implementation.
 
 ## Scope and source of truth
@@ -68,9 +71,13 @@ that a bank agreement exists.
 
 ### Non-negotiable financial and evidence rules
 
-1. Keep identifiers as strings. No `Number`, `parseInt`, zero padding, checksum
-   repair, truncation or lossy normalization may turn `599` into `0599` or make
-   the two equal. Preserve raw source text alongside permitted normalization.
+1. Keep identifiers as strings. No `Number`, `parseInt`, guessed zero padding,
+   checksum repair, truncation or lossy normalization may turn `599` into `0599`
+   or make the two equal. Preserve raw source text alongside permitted
+   normalization. An explicit original display format (for example an XLSX
+   numeric cell with its own `0000` format) may supply the evidenced displayed
+   value under the existing parser rules; retain the raw cell and format. An
+   unformatted numeric cell is not permission to reconstruct missing zeroes.
 2. An explicit invoice reference takes precedence over policy derivation. A
    contradictory explicit reference is a review condition, not a value to erase.
 3. Company intent may derive an intended invoice reference; it may not rewrite
@@ -233,6 +240,9 @@ and an agent's prose are not a delivery: a reviewed commit and tests are needed.
 
 - Existing `State.schemaVersion` stays `1` unless a reviewed migration changes it.
   Additive optional fields need explicit safe legacy defaults and round-trip tests.
+- Persistent schema additions must update the existing owner-scoped
+  export/backup/restore coverage and table census, with synthetic restore tests.
+  Transient leases remain transient; no secret-bearing job payload is introduced.
 - Reference extractor version is currently `payment-references-2026-11-01.1`;
   `payment-references-ais-null-schema-v1` is a separate opt-in compatibility profile.
   Node and Sites reconciliation rule versions currently differ; do not claim

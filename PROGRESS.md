@@ -1,5 +1,11 @@
 # Verifierad progress
 
+## Ny sjuagentsintegration — gemensam kontraktsbaslinje, 2026-11-02
+
+[Kontrakt](docs/integration/README.md) och [aktuell integrationsrapport](docs/SEVEN-AGENT-INTEGRATION-REPORT.md) skiljer den nya omgångens leveranser från tidigare PR #14–21. Separat granskad kontrakts-PR #22 är normalt mergad som `b65273500c214a4e16b880e3840dac90d8bd7401`; exakt main-CI 41531868549 passerar 1 309 Node + 2 331 Sites = 3 640 tester, utan fel eller överhoppade/avbrutna tester. Rapporter och riktade syntetiska kedjetester kompletteras medan faktisk GitHub-leverans från agenterna inventeras. Saknad företagspolicy/BankgiroReportSource får inte räknas som implementerad genom gamla tester.
+
+Sites 57 är fortsatt verifierad befintlig publicering; kontraktsändringen berör inte körkod. Läsande produktionskontroll bevarar revision 43, noll allokeringar i de valda 0599-underlagen och fortsatt konto-/insättningsspärr. Ny källa behöver bankens verkliga behöriga integration. Alla 33 poäng är kvar på 255/330 = 7,73. Senaste frysta PR-/main-/Sitesstatus och exakt återstående arbete finns i rapporten; ingen fortlöpande övervakning efter avslutad körning påstås.
+
 ## Samordnad integration av sex PR — 2026-11-02
 
 PR15→16→19→18→14→17 har integrerats normalt, med frysta huvuden, oberoende granskning, korrigerade regressionsfynd och fulla kumulativa Node22-grindar före merge. Inga brancher har raderats eller force-pushats. Slutlig kod-/acceptansmain efter PR20: **`4d20b3ecaa5dbbbf9a5b4f75bd189c1aab51c089`**, exakt main-CI41524529308 success med **1309Node+2331Sites=3640pass/0fail/skip/cancel**; samma antal i oberoende lokal slutacceptans. **Sites57 publicerad succeeded2026-11-02T21:07:11Z** i befintligt projekt, källcommit12ece026c917a87c2b53f5feb02af488e35e40d1, gemensamt Sites-träd45761f430862a3ecbf31bbba2c2c116db7b210a0. Version56 bevarad för återgång. Denna efterföljande kvittoändring berör enbart dokumentation. [Fullständig rapport](docs/SIX-PR-INTEGRATION-REPORT.md).

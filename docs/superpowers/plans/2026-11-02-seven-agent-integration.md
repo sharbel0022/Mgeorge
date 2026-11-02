@@ -36,9 +36,9 @@ shared contract and must be exercised after its owning implementation arrives.
 ## Tasks
 
 - [x] T1 Read current main, previous PRs/reports, current Site and live read-only status.
-- [ ] T2 Write exact existing field/API mappings and new capability contracts;
+- [x] T2 Write exact existing field/API mappings and new capability contracts;
   independent architecture/document review; separate contract PR, CI, normal merge.
-- [ ] T3 Record the reviewed contract head/merge SHA and concrete six-agent inventory
+- [x] T3 Record the reviewed contract head/merge SHA and concrete six-agent inventory
   in `docs/SEVEN-AGENT-INTEGRATION-REPORT.md`; recheck branches/PRs while active.
 - [ ] T4 For each delivered PR, freeze head/base/files/CI; review semantic dependencies
   and shared changes; reproduce/fix concrete defects with regression tests; test
@@ -70,3 +70,17 @@ inventing a second engine or declaring absent functions available.
 
 Ruling: Use the already authorized normal merge/publication workflow after review
 and CI. Do not request repeated permission for the steps the user assigned.
+
+Contract receipt: PR22 head `75418773829e49e99bf7db64c34e8e0ba8577af2`,
+tree `7a52d899f8fdbc5021a9368332936eab128f963a` matches the independent reviewer
+copy. Two architecture wording findings corrected; final APPROVE. Exact PR CI
+41531331428 both jobs success. Normal merge
+`b65273500c214a4e16b880e3840dac90d8bd7401`; exact push CI41531868549 observed
+complete/success: 1309 Node + 2331 Sites = 3640 pass, zero fail/skip/cancel/todo.
+Six new implementation PRs absent at
+21:48UTC. Report and coverage audit record this without claiming acceptance.
+
+Ruling: Stop redundant unchanged local baseline suites after exact-head GitHub
+CI passed, under shared-host load. Initial sandbox EPERM and stopped authorized
+runs are not counted as passing local tests. Both local locked installs and
+high-audit gates passed; Sites retains 16 moderate development findings.
