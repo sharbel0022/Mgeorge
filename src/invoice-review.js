@@ -53,6 +53,7 @@ export async function analyzeDocument(db,id,{extract=extractInvoice,authorize=()
 }
 export function approveDocument(db,id,body={},automatic=false){
   if(!automatic&&body.confirm!==true)throw failure('Kontrollera originalet och bekräfta fakturauppgifterna.',400);
+  let invoiceId;
   db.exec('BEGIN IMMEDIATE');
   try{
     const doc=db.prepare('SELECT * FROM documents WHERE id=?').get(id);
@@ -83,12 +84,15 @@ export function approveDocument(db,id,body={},automatic=false){
       db.prepare("UPDATE documents SET invoice_id=?,status='registered' WHERE id=?").run(target.id,id);
       audit(db,'document_duplicate_linked',{id,invoice_id:target.id});db.exec('COMMIT');return {id:target.id,duplicate:true};
     }
-    const invoiceId=randomUUID();
+    invoiceId=randomUUID();
     db.prepare('INSERT INTO invoices(id,direction,invoice_number,party,organization_number,issued_at,due_at,total_cents,vat_cents,net_cents,currency,reference,bankgiro,kind) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(invoiceId,values.direction,values.invoice_number.trim(),values.party.trim(),values.organization_number?.replace(/[- ]/g,'')||'',values.issued_at,values.due_at,values.total_cents,values.vat_cents,values.net_cents,'SEK',values.reference||'',values.bankgiro||'',values.kind);
     db.prepare("UPDATE documents SET invoice_id=?,status='registered' WHERE id=?").run(invoiceId,id);
     const changes={};for(const k of fieldNames)if((original[k]?.value??null)!==values[k])changes[k]={before:original[k]?.value??null,after:values[k]};
     audit(db,automatic?'invoice_auto_registered':'invoice_review_approved',{id,invoice_id:invoiceId,changes,values,extraction_version:extraction.version});
     db.exec('COMMIT');
-    return {id:invoiceId,suggestions:matchingSuggestions(db).filter(s=>s.invoice_id===invoiceId)};
   }catch(e){db.exec('ROLLBACK');throw e;}
+  // The invoice and original are already committed. A derived suggestions read
+  // must not report a failed registration or attempt to roll that commit back.
+  try{return {id:invoiceId,suggestions:matchingSuggestions(db).filter(s=>s.invoice_id===invoiceId)};}
+  catch{return {id:invoiceId,suggestions_unavailable:true,warning:'Fakturan är registrerad. Matchningsförslagen kunde inte läsas. Öppna Bank för en ny kontroll.'};}
 }
