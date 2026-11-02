@@ -2,7 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
+import { createHash, generateKeyPairSync } from 'node:crypto';
 import ts from 'typescript';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { emptyState, today } from '../lib/domain.ts';
 import { ProviderError } from '../lib/banking/enable-banking.ts';
 import { seal, unseal, randomToken, digest, validFlowToken, cookieValue } from '../lib/banking/security.ts';
@@ -13,9 +16,9 @@ import { confirmedBankConsent } from '../lib/banking/status-view.ts';
 // provider and banking HTTP boundary are replaced. No test can call a live bank.
 const source = path => readFileSync(new URL(path, import.meta.url), 'utf8');
 const jsUrl = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
-function compiledModule(path, imports) {
+function compiledModule(path, imports, jsx = ts.JsxEmit.Preserve) {
   imports = { './sync-periods': new URL('../lib/banking/sync-periods.ts', import.meta.url).href, '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
-  let js = ts.transpileModule(source(path), { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
+  let js = ts.transpileModule(source(path), { fileName: path, compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx } }).outputText;
   for (const [name, replacement] of Object.entries(imports)) {
     for (const quote of ['"', "'"]) js = js.replaceAll(`${quote}${name}${quote}`, JSON.stringify(replacement));
   }
@@ -59,7 +62,7 @@ const post = (path, body = {}, requestOrigin = origin) => new Request(`${origin}
 });
 const count = (f, table) => f.sql.prepare(`SELECT count(*) AS n FROM ${table}`).get().n;
 
-async function fixture(t, environment = 'PRODUCTION') {
+async function fixture(t, environment = 'PRODUCTION', { actualProvider = false } = {}) {
   const key = `__mgBankTest_${crypto.randomUUID().replaceAll('-', '')}`;
   const sql = new DatabaseSync(':memory:');
   sql.exec(source('../drizzle/0000_confused_umar.sql'));
@@ -84,7 +87,7 @@ async function fixture(t, environment = 'PRODUCTION') {
   const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig });
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
-  const providerUrl = jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
+  const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
   const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, '../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
   f.store = await import(storeUrl); f.service = await import(serviceUrl);
   f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
@@ -746,6 +749,42 @@ test('documented pending and foreign-currency skips can complete a bank interval
  f.provider.getTransactions=async()=>({transactions:[rawTx(),rawTx({entry_reference:'PENDING',status:'PDNG'}),rawTx({entry_reference:'FOREIGN',transaction_amount:{amount:'10.00',currency:'EUR'}})]});
  const result=await(await f.service.sync(post('sync'))).json();
  assert.equal(result.imported,1);assert.equal(result.skipped,2);assert.equal(f.workspace().state.transactions.length,1);assert.ok(f.connection().last_synced_at);
+});
+
+test('recovered bank history retains one financial receipt and truthful evidence in the paginated payment view',async t=>{
+ const end=new Date().toISOString().slice(0,10),date=offset=>new Date(Date.parse(end)+offset*86400000).toISOString().slice(0,10);
+ const f=await fixture(t,'PRODUCTION',{actualProvider:true});
+ f.env.ENABLE_BANKING_PRIVATE_KEY=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+ await f.seedApp();const id=await f.seedConnection();
+ await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid],dateFrom:date(-8)}));
+ const original=rawTx({entry_reference:'SYNTHETIC-FLOW-B-001',booking_date:date(-6),transaction_amount:{amount:'625.00',currency:'SEK'},debtor:{name:'Bankens verkliga betalare AB'},reference_number:undefined,payment_reference:'000427',remittance_information:[]});
+ const received=JSON.parse(JSON.stringify(original)),ranges=[];
+ t.mock.method(globalThis,'fetch',async(input,options)=>{
+  const target=new URL(input);assert.equal(target.origin,'https://api.enablebanking.com');assert.equal(options.method,'GET');assert.match(options.headers.get('Authorization'),/^Bearer [A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
+  if(target.pathname===`/sessions/${remoteSession}`)return Response.json(f.live);
+  assert.equal(target.pathname,`/accounts/${accountUid}/transactions`);assert.equal(target.searchParams.get('transaction_status'),'BOOK');
+  const from=target.searchParams.get('date_from'),to=target.searchParams.get('date_to'),cursor=target.searchParams.get('continuation_key');ranges.push([from,to,cursor]);
+  if(Date.parse(to)-Date.parse(from)>4*86400000)return Response.json({error:'WRONG_TRANSACTIONS_PERIOD'},{status:400});
+  if(from<=received.booking_date&&to>=received.booking_date)return Response.json(cursor?{transactions:[received]}:{transactions:[],continuation_key:'history-ready'});
+  return Response.json({transactions:[]});
+ });
+ const first=await(await f.service.sync(post('sync'))).json();
+ assert.equal(first.imported,1);assert.deepEqual(ranges,[[date(-8),end,null],[date(-8),date(-5),null],[date(-8),date(-5),'history-ready'],[date(-4),date(-1),null],[end,end,null]]);
+ const saved=f.workspace().state.transactions[0],receipt=createHash('sha256').update(JSON.stringify(received)).digest('hex');
+ assert.equal(saved.amount,62500);assert.equal(saved.payerReference,'000427');assert.equal(saved.bankReference,'SYNTHETIC-FLOW-B-001');assert.equal(saved.bankDataVersion,'bank-api-original-v1');assert.equal(saved.bankDataSha256,receipt);assert.deepEqual(saved.bankData,received);assert.ok(saved.referenceEvidence.candidates.some(candidate=>candidate.value==='000427'&&candidate.kind!=='ocr'));
+ // Widen the historical scope through the real account-selection service so
+ // the same observed payment is fetched again, rather than bypassing the cursor.
+ await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid],dateFrom:date(-9)}));ranges.length=0;
+ const repeated=await(await f.service.sync(post('sync'))).json(),persisted=f.workspace().state;
+ assert.equal(repeated.imported,0);assert.deepEqual(ranges,[[date(-9),end,null],[date(-9),date(-5),null],[date(-9),date(-5),'history-ready'],[date(-4),end,null]]);
+ assert.equal(persisted.transactions.length,1);assert.equal(persisted.transactions.reduce((sum,row)=>sum+row.amount,0),62500);assert.deepEqual(persisted.transactions[0],saved);assert.equal(persisted.allocations.length,0);assert.equal(count(f,'bank_sync_runs'),2);
+ const viewImports={'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'./domain':new URL('../lib/domain.ts',import.meta.url).href,'@/lib/domain':new URL('../lib/domain.ts',import.meta.url).href,'./reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href,'./payment-references.js':new URL('../lib/payment-references.js',import.meta.url).href};
+ const presentation=compiledModule('../lib/payment-presentation.ts',viewImports),pagination=compiledModule('../components/list-pagination.tsx',viewImports,ts.JsxEmit.ReactJSX);
+ const component=await import(compiledModule('../components/bank-payments.tsx',{...viewImports,'@/lib/payment-presentation':presentation,'./list-pagination':pagination},ts.JsxEmit.ReactJSX));
+ const before=JSON.stringify(persisted),html=renderToStaticMarkup(React.createElement(component.default,{state:persisted,transactions:persisted.transactions,candidates:{[saved.id]:[{number:'0712',party:'Fakturakund som inte är bankbetalaren AB',identifiers:[{field:'reference',value:'000427'}]}]},open(){throw Error('Rendering cannot change money');}}));
+ const [desktop,mobile]=html.split('<div class="bank-mobile-list"');assert.equal((desktop.match(/<tbody><tr>/g)||[]).length,1);assert.equal((mobile.match(/class="bank-payment-card"/g)||[]).length,1);
+ for(const layout of [desktop,mobile]){assert.match(layout,/Bankens verkliga betalare AB/);assert.match(layout,/<strong class="mono">000427<\/strong>/);assert.match(layout,/<span class="bank-reference-label">Betalningsreferens<\/span>/);assert.match(layout,/Bank-OCR saknas\./);assert.match(layout,/Möjlig: 0712/);assert.match(layout,/inte verifierat av bankens OCR/);assert.doesNotMatch(layout,/Fakturakund som inte är bankbetalaren|is-verified/);}
+ assert.match(html,/Bankbetalningar – sidnavigering/);assert.match(html,/Visar 1–1 av 1 bankbetalningar/);assert.match(html,/Sida 1 av 1/);assert.equal(JSON.stringify(persisted),before);
 });
 
 test('rate limit encountered after period adjustment persists a cooldown without importing partial history',async t=>{

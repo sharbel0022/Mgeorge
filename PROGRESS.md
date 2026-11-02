@@ -1,5 +1,13 @@
 # Verifierad progress
 
+## Samordnad integration av sex PR — 2026-11-02
+
+PR15→16→19→18→14→17 har integrerats normalt, med frysta huvuden, oberoende granskning, korrigerade regressionsfynd och fulla kumulativa Node22-grindar före merge. Inga brancher har raderats eller force-pushats. Kodmain efter de sex: `79e7aa2acf78925c23d106fa826d92c25c642579`; dess main-CI41523255146 är godkänd med1309Node/2328Sites. Full lokal slutacceptans med båda nya kedjefallen:1309Node+2331Sites=3640pass/0fail/skip. En gemensam Sites-publicering redovisas i [SIX-PR-INTEGRATION-REPORT.md](docs/SIX-PR-INTEGRATION-REPORT.md). Detta avsnitt kompletteras med slutligt publiceringskvitto; ingen publicering påstås ännu.
+
+Tre konkreta integrationer rättades med reproduktion: ogiltig bokförd bankrad får inte avancera historikcheckpunkt; Gmailkötest måste lösa OCRdetaljmodulen; mottagar-BG med utfyllnadsnollor ska reservera samma insättningsidentitet utan ändrade råoriginal. Två verkliga syntetiska backendkedjor binder Gmail/PDF/dedup/kö/granskningsförslag respektive bankperiod/ankomstkvitto/dedup/betalningsvy. Aktuella poäng för samtliga33 förblir255/330=7,73; inga bankfakta eller9,5betyg fabriceras.
+
+Verkliga0599 kontrolleras endast läsande: en ekonomisk observation och en separat rapport, inga allokeringar, ingen registerpost och fortsatt spärr. Full produktionsrestore, nytt publicerat schema-/OCRkvitto, bank-/verksamhetsbevis och fysisk tillgänglighetsacceptans kvarstår. Runtimedata, nycklar och befintliga tre scheman bevaras. Detaljer, exakta CIantal och slutliga driftgränser i integrationsrapporten gäller framför äldre observationer nedan.
+
 ## Backup- och säkerhetsstabilisering — separat PR, 2026-11-02
 
 Bas `a9f88ae1c0f697376b3ecd140e1e80a64405125a`; egen branch `codex/backup-security-stabilization-20261102`. [Verifieringsrapport](docs/DISASTER-RECOVERY-VERIFICATION.md), [genomförandeplan](docs/superpowers/plans/2026-11-02-disaster-recovery-stabilization.md). Endast backup/restore, nyckelkonfiguration och ett reproducerat autentiseringsfel omfattas. Sex parallella uppdrag samordnas genom separat PR, utan push till main, automatisk merge eller Sites-publicering.

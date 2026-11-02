@@ -1,5 +1,49 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Samordnad sex-PR-integration — 2026-11-02
+
+Aktuell integrationsrapport: [SIX-PR-INTEGRATION-REPORT.md](docs/SIX-PR-INTEGRATION-REPORT.md). Före och efter **255/330 = 7,73/10; 0/33 ≥9,5**. Tabellen nedan ersätter äldre observationsbeskrivningar som aktuell bedömning, men bevarar deras historik. Inga poäng höjs för fler tester eller ett mål utan komplett acceptans. Full lokal slutacceptans:1309Node+2331Sites=3640pass/0fail/skip. Färsk exakt main-/Sites-/produktionsstatus anges i integrationsrapportens slutkvitto. Alla skrivtester använder isolerad syntetisk data; produktionsstatus läses endast.
+
+| Nr / område | Före | Efter | PR | Nytt testbevis | Produktionsbevis och kvarstående risk |
+| --- | ---: | ---: | --- | --- | --- |
+| 1. Design och färger | 8 | 8 | 17 | CSS/kontrast, semantisk svartvit UI; fulla kumulativa CI-grindar. | Färsk integrerad browserbild återstår; fysisk hjälpmedelsacceptans saknas. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 2. Startsida | 8,5 | 8,5 | 17 | overview/readiness/zero-unknown pengar; fulla kumulativa CI-grindar. | Inga nya bankbevis eller full produktionsacceptans. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 3. Navigering | 8,5 | 8,5 | 17 | workspace-location, fokus och Back/Forward; fulla kumulativa CI-grindar. | Fysisk enhet/screen reader återstår. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 4. Mobilanpassning | 8,5 | 8,5 | 17 | responsiva fokus-/dialogregressioner; fulla kumulativa CI-grindar. | Viewportbevis ersätter inte fysisk mobil. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 5. Sökning och filtrering | 7,5 | 7,5 | 17 | normalisering, listpagination, stale epochs; fulla kumulativa CI-grindar. | Större representativ användaracceptans återstår. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 6. Minimal manuell hantering | 6,5 | 6,5 | 18/19/17 | Gmail PDF cross-flow; strikt parser; färre renderade rader; fulla kumulativa CI-grindar. | Okända motparter och svåra raster ska granskas. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 7. Kundfakturor | 8 | 8 | 14/19/17 | strikta identiteter, aktuella betalningsbevis, lista; fulla kumulativa CI-grindar. | Verklig bank-/verksamhetsacceptans saknas. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 8. Leverantörsfakturor | 8 | 8 | 18/19/17 | PDF/source/dedup/held supplier proposal; fulla kumulativa CI-grindar. | Ingen riktig registrering gjord för integrationstest. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 9. PDF-tolkning | 8 | 8 | 19 | frozen40text+9binary; faktisk permuterad PDF; fulla kumulativa CI-grindar. | Begränsad korpus och textmånader kvar. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 10. Bild-OCR | 7 | 7 | 19 | rasterprecision96,67%/recall70,73%; optical hold; fulla kumulativa CI-grindar. | Rasterförbättring och representativt facit saknas. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 11. Gmail-anslutning | 7,5 | 7,5 | 18 | retry/kvot/OAuth/strömfel; aktuell status; fulla kumulativa CI-grindar. | Ny kod behöver nytt externt körkvitto. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 12. Automatisk fakturaregistrering | 8 | 8 | 18/19 | atomiskt granskningsarv, post-COMMIT kvitto, strikt motpart; fulla kumulativa CI-grindar. | Ingen massregistrering eller ny produktionsregistrering. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 13. Dubblettkontroll | 8 | 8 | 14/18/19 | hash/source race, stabil bank-ID, normaliserad BG-reservation; fulla kumulativa CI-grindar. | Riktiga ofullständiga original kräver fortsatt granskning. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 14. Dokumentgranskning | 8 | 8 | 18/19/17 | lease/restart/queue, A→B→A original, exakta förslag; fulla kumulativa CI-grindar. | Verksamhetsbeslut och aktuell production browserkedja återstår. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | 16 | medgivande/fence/valt konto; lässtatus; fulla kumulativa CI-grindar. | Anslutning bevisar inte komplett tillgänglig historik. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 16. Automatisk bankhämtning | 8 | 8 | 16 | UTC/periodåterhämtning/429/checkpoint; invalid BOOK stop; fulla kumulativa CI-grindar. | Verkligt periodfel behöver ny lyckad drift. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 17. Bankgiroimport | 8,5 | 8,5 | 14/17 | XLSX integritet, alias, flera betalare, ny paddingregression; fulla kumulativa CI-grindar. | Bankens verkliga konto-/insättningsrelation saknas. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 18. Identifiera verklig betalare | 7 | 7 | 14/17 | inga gissade alias; positiv aktuell allokering/evidens för etikett; fulla kumulativa CI-grindar. | Namn i rapport bevisar inte individuell AIS-betalare. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 19. Verklig OCR/fakturareferens | 7 | 7 | 14/19/17 | ledande nollor, typad källa, synlig PDF-geometri; fulla kumulativa CI-grindar. | Generell referens förblir skild från formell OCR. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 20. Automatisk betalningsmatchning | 7,5 | 7,5 | 14/16/19 | identitet/original/atomisk commit, invalid BOOK, strikt referens; fulla kumulativa CI-grindar. | Ingen verklig allokering auktoriseras av integration. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 21. Delbetalningar | 8 | 8 | 14 | historiskt medlemskap och exakt öresaldo; fulla kumulativa CI-grindar. | Produktionssaldo endast avgränsat läst. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 22. Överbetalningar | 8 | 8 | 14 | överskott och konkurrerande allokeringar bevaras; fulla kumulativa CI-grindar. | Ingen verklig återbetalning eller saldoskrivning. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 23. Flera fakturor i en betalning | 7,5 | 7,5 | 14/19 | hela rapportgrupper och exakta referensgränser; fulla kumulativa CI-grindar. | Verkligt sammanhållet bankfacit återstår. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 24. Betalningshistorik | 8 | 8 | 14/15/16/17 | replay, originalsamband, exact restore och UI; fulla kumulativa CI-grindar. | Full produktionsledger kan inte jämföras via trunkerad rad. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 25. Betalningsstatus | 8 | 8 | 14/17 | känd kontospärr hindrar ny falsk verifiering; bokat bevaras; fulla kumulativa CI-grindar. | 0599 fortfarande blockerat och oregistrerat. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 26. Kontrollera alla betalningar | 8 | 8 | 14/16/18/19/17 | hela kontroll/regressionskedjan; tydlig huvudknapp; fulla kumulativa CI-grindar. | Ingen skrivande produktionskontroll startad. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 27. Automatiska mejlutkast | 8 | 8 | 18/17 | äkta registreringskvitto och separata säkra lästillstånd; fulla kumulativa CI-grindar. | Varje kundmejl kräver separat godkännande; inget skickat. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 28. Schemalagd automatisering | 6,5 | 6,5 | 16/18 | beständiga cooldowns, observed-run kontra schema; fulla kumulativa CI-grindar. | Förepubliceringskvitto certifierar inte ny kod. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 29. Säkerhetskopiering | 7,5 | 7,5 | 15 | exklusiv arkivpublicering, kryptering/hash/original/WAL; fulla kumulativa CI-grindar. | Sparat195manifest är inte nytt fullständigt DR-prov. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | 15/16/18/14/17 | sessionallokering/rotation, lease/consent, original och aktuella alias; fulla kumulativa CI-grindar. | Hotmodell, OS-/ACL- och bred produktionsacceptans kvar. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 31. Katastrofåterställning | 5,5 | 5,5 | 15 | riktig isolerad SQLite evidence restore, kill/retry/kvittogrind; fulla kumulativa CI-grindar. | Produktionsarkiv/ursprungsnyckel/offsite/RPO/RTO saknas. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | 14–19 | oberoende granskning,3integrationsrättningar,exakt kumulativCI; fulla kumulativa CI-grindar. | 16moderate devfynd och lintskuld kvar. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+| 33. Verifiering i verklig produktion | 6,5 | 6,5 | 14–19 | skrivfria status/original/0599,publiceringskvitto separat; fulla kumulativa CI-grindar. | Ingen full real bank/OCR/DR-census eller universell9,5. Se aktuellt begränsat driftkvitto i integrationsrapporten. |
+
+Testgrindar: Node check/test/audit; Sites exact minimatch/check/test/audit/build. Följande är **inte** certifierat av CI: verkliga bankrelationer, fysisk mobil, skärmläsare, representativ universell OCRprecision eller full produktionsrestore. Äldre tabellers paus-/stale-/versionsuppgifter är historik; färsk anslutnings-/köstatus i integrationsrapporten gäller nu.
+
+
+
 ## Backup och isolerad katastrofövning — avgränsad verifiering 2026-11-02
 
 Arbete från `a9f88ae1c0f697376b3ecd140e1e80a64405125a` på `codex/backup-security-stabilization-20261102`. Denna uppdatering gäller enbart backup, återställning och den granskade säkerhetsgränsen. [Verifieringsrapport och körinstruktioner](docs/DISASTER-RECOVERY-VERIFICATION.md) redovisar fullständiga testresultat, granskning, kvarstående beroendefynd och driftbegränsningar. Leverans sker via separat PR; ingen automatisk merge eller parallell Sites-publicering.
