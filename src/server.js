@@ -20,6 +20,7 @@ import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCo
 import {analyzeDocument,approveDocument} from './invoice-review.js';
 import {runDocumentProcess} from './invoice-extraction.js';
 import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
+import {readReconciliationPreview} from './reconciliation-preview.js';
 import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from './customer-messages.js';
 import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
 import {createPaymentControl,planBankControl} from './payment-control.js';
@@ -440,6 +441,12 @@ async function route(req,res){
   }
   if(!req.principal)throw bad(401,'Logga in för att läsa företagets uppgifter');
   if(req.principal!==(check.secure?'administrator':'local-admin'))throw bad(403,'Användaren saknar behörighet till företagets arbetsyta');
+  if(path==='/api/reconciliation/preview'&&req.method==='GET'){
+    if([...url.searchParams.keys()].some(key=>key!=='transactionId')||url.searchParams.getAll('transactionId').length>1)throw bad(400,'Förhandsgranskningen accepterar bara en bankhändelseidentifierare.');
+    const preview=await readReconciliationPreview(db,{owner:req.principal,transactionId:url.searchParams.get('transactionId')??undefined});
+    assertSessionStillAuthorized(req);
+    return json(res,200,preview);
+  }
   if(path==='/api/logout'&&req.method==='POST'){
     db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
     db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
