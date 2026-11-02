@@ -27,6 +27,71 @@ function snapshotApiEvidence(tables:{name:string;rows:Row[]}[]):ApiEvidence{
 }
 function validApiEvidence(value:any):value is ApiEvidence{return !!value&&value.version==='retained-api-receipts-v1'&&value.scope==='retained_json_checksums'&&Object.keys(value).length===4&&['records_checked','records_without_receipt'].every(key=>Number.isSafeInteger(value[key])&&value[key]>=0&&value[key]<=1_000_000);}
 function publicApiEvidence(serialized:unknown){try{const value=typeof serialized==='string'?JSON.parse(serialized):null;return validApiEvidence(value)?value:{scope:'unassessed'};}catch{return {scope:'unassessed'};}}
+function snapshotDocumentReferences(tables:{name:string;rows:Row[]}[],files:Map<string,Row>){
+ const rows=(name:string)=>tables.find(table=>table.name===name)!.rows;
+ const reference=(id:any,sha256?:any)=>{
+  // Manual invoices and older API-only imports have no file original. Rejected
+  // Gmail attachment markers also deliberately retain an empty document ID.
+  if(id===undefined||id===null||id==='')return;
+  const file=typeof id==='string'?files.get(id):undefined;
+  if(!file)throw Error('backup_document_reference_missing');
+  if(sha256!==undefined&&sha256!==null&&sha256!==''&&(typeof sha256!=='string'||!/^[a-f0-9]{64}$/i.test(sha256)||sha256.toLowerCase()!==file.sha256.toLowerCase()))throw Error('backup_document_reference_hash_mismatch');
+ };
+ const requiredReference=(id:any,sha256?:any)=>{if(typeof id!=='string'||!id)throw Error('backup_document_reference_missing');reference(id,sha256);};
+ const list=(value:any):Row[]=>{if(value===undefined)return [];if(!Array.isArray(value))throw Error('backup_snapshot_invalid');return value;};
+ const fileProof=(value:any)=>{
+  if(value===undefined||value===null)return;
+  if(typeof value!=='object'||Array.isArray(value)||value.version!=='bank-file-original-v1'||typeof value.documentId!=='string'||!value.documentId||typeof value.sha256!=='string'||!/^[a-f0-9]{64}$/i.test(value.sha256))throw Error('backup_document_reference_invalid');
+  reference(value.documentId,value.sha256);
+ };
+ const conflicts=(value:any)=>{for(const conflict of list(value))fileProof(conflict?.incoming?.bankFileProof);};
+ for(const row of rows('workspaces')){
+  const state=JSON.parse(row.payload);
+  for(const invoice of state.invoices)reference(invoice.documentId);
+  for(const record of list(state.imports))reference(record.documentId,record.hash);
+  for(const transaction of state.transactions){fileProof(transaction.bankFileProof);if(transaction.bankDetails!==undefined&&transaction.bankDetails!==null)requiredReference(transaction.bankDetails.documentId);conflicts(transaction.bankEvidenceConflicts);}
+  // Revoked links are retained evidence too. Their snapshot fields are hashes
+  // of transaction state, not additional file checksums or embedded objects.
+  for(const link of list(state.bankgiroLinks)){
+   requiredReference(link.documentId);
+   if(typeof link.sha256!=='string'||!/^[a-f0-9]{64}$/i.test(link.sha256))throw Error('backup_document_reference_invalid');
+   reference(link.documentId,link.sha256);
+  }
+ }
+ for(const name of ['gmail_sources','document_jobs','document_extractions','document_registrations'])for(const row of rows(name)){
+  if(!(name==='gmail_sources'&&row.status==='rejected'&&row.document_id===''))requiredReference(row.document_id);
+  const serialized=name==='document_extractions'?row.result:name==='gmail_sources'||name==='document_jobs'?row.extraction:undefined;
+  if(serialized!==undefined&&serialized!==null&&serialized!==''){
+   let extraction;try{extraction=JSON.parse(serialized);}catch{throw Error('backup_snapshot_invalid');}
+   // This known receipt hashes the document bytes. Arbitrary fields in OCR
+   // output or provider JSON are not document references.
+   const receipt=extraction?.processing?.sha256;
+   if(receipt!==undefined&&receipt!==null&&receipt!=='')requiredReference(row.document_id,receipt);
+  }
+ }
+ // The state route can reconcile after any accepted command. Only this
+ // generated decision kind carries a file receipt; other payload keys are data.
+ const commandAuditActions=new Set(['invoice.save','invoice.reconcile','invoice.void','credit.add','credit.undo','transactions.import','transaction.verify','transaction.ignore','transaction.unverify','transaction.unsplit','transaction.split','match.create','match.undo','settings.save','bankgiro.import']);
+ const auditActions=new Set([...commandAuditActions,'bank.details','bank.import_rejected','bank.sync_rejected','gmail.invoice.review','gmail.invoice.automatic','automatic.reconciliation']);
+ const bankgiroOriginal=(command:any)=>{requiredReference(command?.documentId);if(typeof command?.hash!=='string'||!/^[a-f0-9]{64}$/i.test(command.hash))throw Error('backup_document_reference_invalid');reference(command.documentId,command.hash);};
+ for(const row of rows('audit_events').filter(row=>auditActions.has(row.action))){
+  let detail;try{detail=JSON.parse(row.detail);}catch{throw Error(row.action==='bank.import_rejected'||row.action==='bank.sync_rejected'?'backup_api_evidence_invalid':'backup_snapshot_invalid');}
+  // A refresh or invoice edit can replace the current attachment. These
+  // producer-defined historical references still retain their original files.
+  if(row.action==='bank.details')requiredReference(detail?.documentId);
+  if(row.action==='invoice.save')reference(detail?.command?.invoice?.documentId);
+  if(row.action==='transactions.import')reference(detail?.command?.documentId,detail?.command?.hash);
+  if(row.action==='bankgiro.import')bankgiroOriginal(detail?.command);
+  if(row.action==='gmail.invoice.review'||row.action==='gmail.invoice.automatic')requiredReference(detail?.invoice?.documentId,detail?.extraction?.processing?.sha256);
+  if(row.action==='bank.import_rejected'){
+   if(detail?.command?.type==='bankgiro.import')bankgiroOriginal(detail.command);
+   else if(detail?.command?.type==='transactions.import')reference(detail.command.documentId,detail.command.hash);
+  }
+  if(row.action==='bank.import_rejected'||row.action==='bank.sync_rejected')for(const entry of list(detail?.retained_conflicts))conflicts(entry?.conflicts);
+  if(commandAuditActions.has(row.action))for(const decision of list(detail?.automatic))if(decision?.kind==='specification_linked')requiredReference(decision.document_id,decision.document_hash);
+  if(row.action==='automatic.reconciliation')for(const decision of list(detail?.decisions))if(decision?.kind==='specification_linked')requiredReference(decision.document_id,decision.document_hash);
+ }
+}
 export function validateSnapshot(value:any,owner:string){
  if(value?.format!=='MG-Sites-backup-1'||value.owner!==owner||!Array.isArray(value.tables)||value.tables.length!==BACKUP_TABLES.length)throw Error('backup_snapshot_invalid');
  for(const table of value.tables){if(!BACKUP_TABLES.includes(table.name)||!Array.isArray(table.rows)||table.rows.some((r:Row)=>r.owner!==owner))throw Error('backup_owner_mismatch');}
@@ -34,7 +99,8 @@ export function validateSnapshot(value:any,owner:string){
  const workspace=value.tables.find((t:Row)=>t.name==='workspaces').rows;if(workspace.length>1)throw Error('backup_snapshot_invalid');
  for(const row of workspace){const state=JSON.parse(row.payload);if(!Array.isArray(state.invoices)||!Array.isArray(state.transactions)||!Array.isArray(state.allocations))throw Error('backup_snapshot_invalid');}
  const files=value.tables.find((t:Row)=>t.name==='documents').rows;
- if(files.some((f:Row)=>!/^[a-f0-9-]{36}$/i.test(f.id)||!Number.isSafeInteger(f.size)||f.size<0||f.size>15_000_000||!/^[a-f0-9]{64}$/i.test(f.sha256)))throw Error('backup_document_invalid');
+ if(files.some((f:Row)=>!/^[a-f0-9-]{36}$/i.test(f.id)||!Number.isSafeInteger(f.size)||f.size<0||f.size>15_000_000||!/^[a-f0-9]{64}$/i.test(f.sha256))||new Set(files.map((f:Row)=>f.id)).size!==files.length)throw Error('backup_document_invalid');
+ snapshotDocumentReferences(value.tables,new Map(files.map((f:Row)=>[f.id,f])));
  const apiEvidence=snapshotApiEvidence(value.tables);
  if(value.apiEvidence!==undefined&&(!validApiEvidence(value.apiEvidence)||value.apiEvidence.records_checked!==apiEvidence.records_checked||value.apiEvidence.records_without_receipt!==apiEvidence.records_without_receipt))throw Error('backup_api_evidence_invalid');
  return {...value,apiEvidence} as {format:string;owner:string;createdAt:string;apiEvidence:ApiEvidence;tables:{name:string;rows:Row[]}[]};

@@ -49,7 +49,62 @@ function originalIntegrity(db,tables){
  }
  bankApiOriginalIntegrity(db);
 }
-function integrity(file){const db=new DatabaseSync(file,{readOnly:true});try{const checks=db.prepare('PRAGMA integrity_check').all();if(checks.length!==1||Object.values(checks[0])[0]!=='ok')throw Error('Databasens integritetskontroll misslyckades.');const tables=db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();if(!tables.some(t=>t.name==='invoices')||!tables.some(t=>t.name==='bank_transactions'))throw Error('Backupen saknar MG:s register.');originalIntegrity(db,tables);return{tables:tables.length};}finally{db.close();}}
+function originalReferenceIntegrity(db,tables){
+ const names=new Set(tables.map(table=>table.name));
+ const invalid=()=>Object.assign(Error('Backupen innehåller en ogiltig originalreferens.'),{code:'backup_original_reference_invalid'});
+ const parse=value=>{try{return JSON.parse(value);}catch{throw invalid();}};
+ const list=value=>{if(value===undefined||value===null)return [];if(!Array.isArray(value))throw invalid();return value;};
+ const columns=table=>new Set(db.prepare(`PRAGMA table_info(${table})`).all().map(column=>column.name));
+ const originals=(table,hashColumn)=>{
+  if(!names.has(table))return new Map();
+  const fields=columns(table),optional=name=>fields.has(name)?name:`NULL AS ${name}`;
+  return new Map(db.prepare(`SELECT id,${fields.has(hashColumn)?hashColumn:'NULL'} AS hash,${fields.has('content')?"typeof(content)='blob'":'0'} AS has_content,${optional('extraction')} FROM ${table}`).all().map(row=>[row.id,row]));
+ };
+ const documents=originals('documents','fingerprint'),imports=originals('import_jobs','content_sha256');
+ const reference=(registry,id,hash,required=false,file=false)=>{
+  if(id===undefined||id===null||id===''){if(required)throw originalFailure('backup_original_missing');return;}
+  const original=typeof id==='string'?registry.get(id):undefined;
+  if(!original||file&&!original.has_content)throw originalFailure('backup_original_missing');
+  if(hash!==undefined&&hash!==null&&hash!==''){
+   if(typeof hash!=='string'||!/^[a-f0-9]{64}$/i.test(hash))throw originalFailure('backup_original_hash_unavailable');
+   if(typeof original.hash!=='string'||hash.toLowerCase()!==original.hash.toLowerCase())throw originalFailure('backup_original_hash_mismatch');
+  }
+ };
+ const document=(id,hash,required=false)=>reference(documents,id,hash,required);
+ const imported=(id,hash,required=false,file=false)=>reference(imports,id,hash,required,file);
+ const conflictOriginals=value=>{for(const conflict of list(value))for(const id of list(conflict?.original_import_ids))imported(id,undefined,true,true);};
+ // These typed pointers are not declared as SQLite foreign keys. API/manual
+ // jobs may have no file bytes, while a retained conflict file must have them.
+ const transactionColumns=columns('bank_transactions');
+ if(transactionColumns.has('import_id'))for(const row of db.prepare('SELECT import_id FROM bank_transactions').all())imported(row.import_id);
+ if(transactionColumns.has('bank_evidence_conflicts'))for(const row of db.prepare('SELECT bank_evidence_conflicts FROM bank_transactions').all())conflictOriginals(parse(row.bank_evidence_conflicts));
+ if(names.has('bank_specification_links'))for(const row of db.prepare('SELECT import_id,original_sha256 FROM bank_specification_links').all()){
+  if(typeof row.original_sha256!=='string'||!/^[a-f0-9]{64}$/i.test(row.original_sha256))throw originalFailure('backup_original_hash_unavailable');
+  // Revocation preserves the reviewed original and its checksum as history.
+  imported(row.import_id,row.original_sha256,true,true);
+ }
+ for(const row of documents.values())if(row.extraction)document(row.id,parse(row.extraction)?.processing?.sha256,true);
+ if(!names.has('audit_events'))return;
+ const documentActions=new Set(['document_uploaded','document_attached','document_extracted','document_duplicate_linked','invoice_review_approved','invoice_auto_registered','document_dismissed','document_restored']);
+ const invoiceActions=new Set(['invoice_created','invoice_updated','invoice_reconciled']);
+ const importActions=new Set(['bank_import_rejected','bank_evidence_original_attached','bank_evidence_conflict','bankgiro_xlsx_review_saved','bank_specification_linked','bank_specification_link_revoked','aggregate_replaced','absence_check_invalidated']);
+ for(const row of db.prepare('SELECT action,details FROM audit_events').all()){
+  if(!documentActions.has(row.action)&&!invoiceActions.has(row.action)&&!importActions.has(row.action))continue;
+  const detail=parse(row.details);
+  // Only known producer fields are references. Historical attachments and
+  // file imports remain required even after the current source is replaced.
+  if(documentActions.has(row.action))document(detail?.id,row.action==='document_extracted'?detail?.extraction?.processing?.sha256:undefined,true);
+  if(invoiceActions.has(row.action))document(detail?.document_id);
+  if(['bank_import_rejected','bank_specification_link_revoked'].includes(row.action))imported(detail?.import_id,undefined,true,true);
+  if(row.action==='bank_evidence_original_attached')imported(detail?.original_import_id,undefined,true,true);
+  if(row.action==='bank_evidence_conflict')for(const id of list(detail?.original_import_ids))imported(id,undefined,true,true);
+  if(row.action==='bankgiro_xlsx_review_saved')imported(detail?.import_id,detail?.sha256,true,true);
+  if(row.action==='bank_specification_linked')imported(detail?.import_id,detail?.original_sha256,true,true);
+  if(row.action==='aggregate_replaced'){imported(detail?.specification_import_id,undefined,false,true);imported(detail?.before?.import_id);imported(detail?.after?.import_id);}
+  if(row.action==='absence_check_invalidated')imported(detail?.import_id);
+ }
+}
+function integrity(file){const db=new DatabaseSync(file,{readOnly:true});try{const checks=db.prepare('PRAGMA integrity_check').all();if(checks.length!==1||Object.values(checks[0])[0]!=='ok')throw Error('Databasens integritetskontroll misslyckades.');if(db.prepare('PRAGMA foreign_key_check').all().length)throw Object.assign(Error('Backupen innehåller brutna registerreferenser.'),{code:'backup_foreign_key_violation'});const tables=db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();if(!tables.some(t=>t.name==='invoices')||!tables.some(t=>t.name==='bank_transactions'))throw Error('Backupen saknar MG:s register.');originalIntegrity(db,tables);originalReferenceIntegrity(db,tables);return{tables:tables.length};}finally{db.close();}}
 function unpack(archive,encryptionKey){const bytes=readFileSync(archive);if(bytes.length<36||!bytes.subarray(0,8).equals(header))throw Error('Okänt backupformat.');const decipher=createDecipheriv('aes-256-gcm',key(encryptionKey),bytes.subarray(8,20));decipher.setAAD(header);decipher.setAuthTag(bytes.subarray(20,36));return Buffer.concat([decipher.update(bytes.subarray(36)),decipher.final()]);}
 function inspect(content){const folder=mkdtempSync(join(tmpdir(),'mg-backup-check-'));try{const file=join(folder,'restored.sqlite');writeFileSync(file,content,{mode:0o600});return integrity(file);}finally{rmSync(folder,{recursive:true,force:true});}}
 
