@@ -1,0 +1,229 @@
+{
+  "schema": "mgeorge-original-reference-integrity-delivery-v1",
+  "date": "2026-11-02",
+  "status": "DELVIS LEVERERAD – TEKNISKT ARBETE ÅTERSTÅR",
+  "goalComplete": false,
+  "git": {
+    "startMain": "38769f2f58ef2448915a782b29c803ecc31e8a15",
+    "verifiedMain": "cc2be7b0f25920c0e1cb8d1b601b5ac5a5ff3717",
+    "codeCommits": [
+      "07dcea4aa3d5c9b058adcded243a1bf342b89024",
+      "4b2025f97c5ff4c60ed9ae695e670b518ab41e98",
+      "940a94af87f422657d6a645db84832c1a0203653"
+    ],
+    "sitesTree": "c8e911c6e6656d8dafcadc96b61a54fa9d992a98",
+    "remoteBranches": [
+      "main"
+    ],
+    "normalFastForwardPush": true,
+    "laterDocumentationReceipt": "A subsequent documentation-only main commit records this actual deployment; its exact SHA/CI are verified separately."
+  },
+  "ci": {
+    "runId": 41491162166,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41491162166",
+    "head": "cc2be7b0f25920c0e1cb8d1b601b5ac5a5ff3717",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 125434194200,
+        "name": "test",
+        "tests": 1036,
+        "pass": 1036,
+        "fail": 0,
+        "skip": 0
+      },
+      {
+        "id": 125434194453,
+        "name": "sites",
+        "tests": 1845,
+        "pass": 1845,
+        "fail": 0,
+        "skip": 0
+      }
+    ],
+    "totalPassed": 2881
+  },
+  "local": {
+    "node": "22.16.0",
+    "windowsNode": {
+      "tests": 1037,
+      "pass": 1029,
+      "fail": 0,
+      "skip": 8,
+      "skipReason": "Existing actual Windows file-symlink EPERM capability cases"
+    },
+    "sites": {
+      "tests": 1845,
+      "pass": 1845,
+      "fail": 0,
+      "skip": 0
+    },
+    "syntaxFiles": 104,
+    "freshInstalls": true,
+    "typescript": "pass",
+    "productionBuild": "pass",
+    "audit": {
+      "root": 0,
+      "sitesProduction": 0,
+      "sitesFullModerate": 16,
+      "sitesHighCritical": 0,
+      "highGate": "pass"
+    },
+    "packageLockAndMigrationInputsChanged": false
+  },
+  "review": {
+    "verdict": "READY",
+    "independent": true,
+    "allConcreteFindingsClosed": true,
+    "finalIndependentNodeReferenceCases": 40,
+    "finalIndependentSitesReferenceCases": 216,
+    "independentUploadAndNormalizationCases": 25
+  },
+  "performance": {
+    "scope": "Local synthetic pure Node/Sites analysis and Sites domain allocations; four selected source bindings plus checkout support imports. No production SLA or detached complete historical environment claim.",
+    "sameRunnerHash": true,
+    "sameLoadedDomainHash": true,
+    "pureFindingHashesEqual": 8,
+    "allocationFactsHashesEqual": 4,
+    "sites100Pairs": {
+      "beforeMs": 51773.2832,
+      "afterMs": 3760.7247
+    },
+    "rulesOrFinancialRechecksRemoved": false,
+    "crossCallCache": false
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 55,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_e31b612e5ca08191ae11ebceb5e89249",
+    "sourceCommit": "7ede844f43f5a15937c2dd175fce998fa7c2f3cb",
+    "sourceTree": "c8e911c6e6656d8dafcadc96b61a54fa9d992a98",
+    "deploymentId": "appgdep_6ae8c8d202d88191b5f95c5a272b0c67",
+    "status": "succeeded",
+    "deployedAt": "2026-11-02T17:31:19.460444+00:00",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "runtimeRevision": 9,
+    "hasMcp": true,
+    "rollbackVersion": 54,
+    "sourceTypecheckAndOfficialBuildPassed": true,
+    "archive": {
+      "localGzip": {
+        "bytes": 17710255,
+        "sha256": "6683f29514c462c5fae6bc1aa0d87a6584ef8a1c018e76e2b726a87e2643ba86"
+      },
+      "localTar": {
+        "bytes": 44769792,
+        "sha256": "3217ba3529cefe95e239b4f383509a2aaf26a0ff7a245547c1c07032cf04eb15"
+      },
+      "serverStoredTar": {
+        "format": "tar",
+        "sha256": "db6fc22469292ea98aab6b877dabf833e5fbbdbc8fb5602ee29bf123824095b2",
+        "bytes": 44769280,
+        "fileCount": 347
+      },
+      "localFileCount": 347,
+      "unexpectedPrivatePaths": 0,
+      "qaPaths": 0,
+      "localAndServerTarDigestsEqual": false,
+      "downloadedServerFileParityVerified": false
+    }
+  },
+  "production": {
+    "checks": {
+      "deploymentSucceeded": true,
+      "version55": true,
+      "expectedSource": true,
+      "revisionUnchanged": true,
+      "selectedEconomicsUnchanged": true,
+      "exactReadsComplete": true,
+      "targetRegistryComplete": true,
+      "targetRegistryCount": 0,
+      "reportComplete": true,
+      "reportIntegrity": "passed",
+      "reportHashUnchanged": true,
+      "authUnchanged": true,
+      "accessPolicyUnchanged": true,
+      "audienceUnchanged": true,
+      "schedulesUnchanged": true,
+      "runtimeRevision": 9,
+      "runtimeEntriesUnchanged": true,
+      "databaseOverviewTablesUnchanged": true,
+      "tableCount": 26,
+      "backupStatusUnchanged": true,
+      "bankStatusUnchanged": true,
+      "gmailStatusUnchanged": false,
+      "gmailConfigurationAndQueueUnchanged": true,
+      "gmailObservedDifferences": [
+        "processing.worker_last_seen",
+        "next_eligible_sync"
+      ],
+      "gmailFetchTimestampUnchanged": true,
+      "controlRunsUnchanged": true
+    },
+    "workspaceRevisionBefore": 42,
+    "workspaceRevisionAfter": 42,
+    "scope": "Two exact owner-bound observations, target invoice registry, original integrity and stated configuration fields; not an independent complete ledger or storage export.",
+    "economicCounts": {
+      "ais": 1,
+      "report": 0
+    },
+    "bookedAllocations": 0,
+    "automaticEligible": false,
+    "referenceSearchGloballyComplete": false,
+    "targetRegistryComplete": true,
+    "targetRegistryCount": 0,
+    "reportIntegrity": "passed",
+    "reportComplete": true,
+    "backup": {
+      "historicalManifestFiles": 195,
+      "newReferenceRulesRetrospectivelyVerified": false,
+      "fullDisasterRecoveryVerified": false
+    },
+    "gmail": {
+      "configurationAndQueueUnchanged": true,
+      "lastSuccessfulFetch": "2026-10-29T15:00:48.512Z",
+      "externalHourlySchedule": "paused",
+      "observedDifferences": [
+        "worker heartbeat",
+        "read-time next eligible timestamp"
+      ],
+      "heartbeatIsCompletedJobProof": false
+    },
+    "bankAccountDetailsCalled": false,
+    "realFinancialWrites": false,
+    "customerEmailsSent": false,
+    "schedulesChanged": false,
+    "secretsExposed": false,
+    "historicalControlRuns": {
+      "count": 2,
+      "statuses": ["partial", "partial"],
+      "completePage": true,
+      "unchanged": true
+    }
+  },
+  "browser": {
+    "normalSignInReached": true,
+    "userIntendsToSignIn": true,
+    "authenticatedProductionFinancialUiObserved": false,
+    "publicProductionSignInBoundaryObserved": true,
+    "physicalMobileTested": false
+  },
+  "quality": {
+    "areas": 33,
+    "scoreBefore": 255,
+    "scoreAfter": 255,
+    "max": 330,
+    "average": 7.73,
+    "at9_5": 0
+  },
+  "remaining": [
+    "Bank-issued account alias/receiving-account and deposit identity/currency/date evidence",
+    "Separate authorized invoice registration/customer relation/allocation decisions",
+    "Owner-authenticated production UI acceptance",
+    "Representative OCR/volume/performance acceptance",
+    "Approved Gmail schedule and actual successful fetch/job completion",
+    "Isolated real production-backup disaster exercise with trusted recovery key/copy",
+    "Verified maintained dependency remediation;16moderate development findings and ESLint support gap remain"
+  ],
+  "newBackgroundAutomationCreated": false
+}

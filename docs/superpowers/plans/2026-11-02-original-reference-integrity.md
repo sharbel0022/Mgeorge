@@ -54,7 +54,10 @@ Files: `src/reconciliation.js`, `sites/lib/reconciliation-engine.js`, dedicated 
 ## Integration and delivery gates
 
 - [x] Run root/Sites installs, current syntax/type checks, full tests, audits and Sites production build. Distinguish any environment skips and open development audit findings.
-- [ ] Independent whole-change review; verify current main and integrate without force-push.
-- [ ] Push and verify exact Actions; publish changed Sites source into the same existing project with rollback retained.
-- [ ] Read-only production aftercheck for compared economic fields, originals, auth/runtime/schedules and deployment provenance.
-- [ ] Update PROGRESS, all affected scorecard evidence and final report with exact continuation. No score inflation; full goal remains broader than this cycle.
+- [x] Independent whole-change review; verify current main and integrate without force-push.
+- [x] Push and verify exact Actions; publish changed Sites source into the same existing project with rollback retained.
+- [x] Read-only production aftercheck for compared economic fields, originals, auth/runtime/schedules and deployment provenance.
+- [x] Update PROGRESS, all affected scorecard evidence and final report with exact continuation. No score inflation; full goal remains broader than this cycle.
+
+
+Delivery receipt: verified maincc2be7b/Actions41491162166, Sites55/source7ede844/c8e911 tree, succeeded17:31:19Z, revision42→42 and selected finance/originals/configuration unchanged. Documentation-only final receipt follows; full goal remains active with bank/DR/acceptance/dependency limits.

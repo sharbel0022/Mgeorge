@@ -42,6 +42,8 @@ Tre misslyckade försök stoppar samma dags kopia med ett tydligt fel. Åtgärda
 
 En giltig kontrollsumma på de filer som finns i dokumentregistret bevisar inte att registret är komplett. Backupverifieringen kontrollerar även deklarerade originalreferenser från arbetsyta, beständiga dokumenttabeller och kända historikposter. Node kontrollerar dessutom SQLite:s främmande nycklar. En äldre bilaga som bara finns kvar i revisionshistoriken får inte tyst utelämnas.
 
+Referensgrinden är levererad i maincc2be7b/Sites55; se [verifierad leverans](ORIGINAL-REFERENCE-INTEGRITY-REPORT.md). Nya originalbärande producentfält behöver motsvarande uttrycklig validering och positiva/negativa regressioner. Godtyckliga nycklar i användar- eller providerdata tolkas inte som originalreferenser.
+
 Vid fel om saknad originalreferens, kontrollsumma eller registerrelation ska kopian inte markeras komplett. Bevara den befintliga databasen, originalen och äldre arkiv. Utred den exakta posten genom behörig läsning och återanskaffa originalmetadata/bytes från en betrodd bevarad källa; skapa inte ersättningsmetadata eller nya kvitton genom gissning. Återställning prövas först i en separat miljö. En gammal redan komplett Sites-kopia omverifieras inte automatiskt av en kodpublicering, och dess historiska status är inget bevis för de nya kontrollerna.
 
 ## Lokal Node-installation — historiskt konfigurationsbevis
