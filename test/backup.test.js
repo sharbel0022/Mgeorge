@@ -1,6 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import fs,{mkdtempSync,rmSync,readFileSync,writeFileSync,copyFileSync,lstatSync,symlinkSync,readlinkSync,unlinkSync} from 'node:fs';import {syncBuiltinESMExports} from 'node:module';import {join} from 'node:path';import {tmpdir} from 'node:os';import {DatabaseSync} from 'node:sqlite';
+import fs,{mkdtempSync,mkdirSync,rmSync,readFileSync,writeFileSync,copyFileSync,lstatSync,symlinkSync,readlinkSync,unlinkSync} from 'node:fs';import {syncBuiltinESMExports} from 'node:module';import {join} from 'node:path';import {tmpdir} from 'node:os';import {DatabaseSync} from 'node:sqlite';
 import {openDatabase} from '../src/db.js';import {createBackup,verifyBackup,restoreBackup,dailyBackup} from '../src/backup.js';
+import {createDecipheriv} from 'node:crypto';
 function fixture(t){const folder=mkdtempSync(join(tmpdir(),'mg-backup-test-'));const f={db:join(folder,'db.sqlite'),archive:join(folder,'backup.mgbak'),target:join(folder,'restored.sqlite'),key:'a'.repeat(64),close:()=>{}};t.after(()=>{f.close();rmSync(folder,{recursive:true,force:true});});return f;}
 test('encrypted snapshot restores committed WAL data and passes integrity without modifying source',t=>{const f=fixture(t),db=openDatabase(f.db);f.close=()=>db.close();db.prepare("INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES('i','customer','0599','Privat testkund',62500)").run();assert.equal(createBackup(f.db,f.archive,f.key).verified,true);assert.equal(readFileSync(f.archive).includes(Buffer.from('Privat testkund')),false);assert.equal(restoreBackup(f.archive,f.target,f.key).restored,true);const restored=new DatabaseSync(f.target,{readOnly:true});try{assert.equal(restored.prepare('SELECT invoice_number FROM invoices').get().invoice_number,'0599');}finally{restored.close();}assert.throws(()=>restoreBackup(f.archive,f.db,f.key));assert.equal(db.prepare('SELECT COUNT(*) n FROM invoices').get().n,1);});
 test('wrong keys and altered ciphertext fail authentication and cannot produce a restored database',t=>{const f=fixture(t),db=openDatabase(f.db);db.close();createBackup(f.db,f.archive,f.key);assert.throws(()=>verifyBackup(f.archive,'b'.repeat(64)));const content=readFileSync(f.archive);content[40]^=1;writeFileSync(f.archive,content);assert.throws(()=>restoreBackup(f.archive,f.target,f.key));assert.throws(()=>readFileSync(f.target));});
@@ -18,6 +19,29 @@ function withFilesystemFault(name,replacement,run){
  const original=fs[name];fs[name]=(...args)=>replacement(original,...args);syncBuiltinESMExports();
  try{return run();}finally{fs[name]=original;syncBuiltinESMExports();}
 }
+function fileSymlink(t,destination,link){
+ try{symlinkSync(destination,link,'file');return true;}
+ catch(error){
+  if(process.platform!=='win32'||error.code!=='EPERM')throw error;
+  t.skip('Windows denied file-symlink creation (EPERM); requires Developer Mode or SeCreateSymbolicLinkPrivilege.');return false;
+ }
+}
+
+test('restore publishes the authenticated SQLite bytes with native file identities',t=>{
+ const f=archivedFixture(t),archive=readFileSync(f.archive),decipher=createDecipheriv('aes-256-gcm',Buffer.from(f.key,'hex'),archive.subarray(8,20));
+ decipher.setAAD(Buffer.from('MGBAK001'));decipher.setAuthTag(archive.subarray(20,36));
+ const authenticated=Buffer.concat([decipher.update(archive.subarray(36)),decipher.final()]);
+ assert.equal(restoreBackup(f.archive,f.target,f.key).restored,true);
+ assert.deepEqual(readFileSync(f.target),authenticated);
+ assert.deepEqual(readFileSync(f.archive),archive);
+});
+
+test('restore removes its fully written target when flushing the file fails',t=>{
+ const f=archivedFixture(t),failure=Object.assign(Error('Synthetic flush failure'),{code:'EIO'});
+ withFilesystemFault('fsyncSync',()=>{throw failure;},()=>assert.throws(()=>restoreBackup(f.archive,f.target,f.key),error=>error===failure));
+ assert.throws(()=>lstatSync(f.target),{code:'ENOENT'});
+ assert.equal(verifyBackup(f.archive,f.key).verified,true);
+});
 
 test('restore rejects an unrelated committed WAL without importing its financial state or changing it',t=>{
  const f=archivedFixture(t),foreignPath=join(f.db,'..','foreign.sqlite'),foreign=openDatabase(foreignPath);
@@ -40,10 +64,17 @@ for(const suffix of ['', '-wal', '-shm', '-journal']){
  });
  for(const dangling of [false,true])test(`restore refuses a ${dangling?'dangling':'live'} symlink at ${suffix||'the main file'} without touching its destination`,t=>{
   const f=archivedFixture(t),occupied=`${f.target}${suffix}`,destination=join(f.db,'..','caller-owned'),before=Buffer.from('Synthetic untouched symlink destination');
-  if(!dangling)writeFileSync(destination,before);symlinkSync(destination,occupied);
+  if(!dangling)writeFileSync(destination,before);if(!fileSymlink(t,destination,occupied))return;
   assert.throws(()=>restoreBackup(f.archive,f.target,f.key),{code:'EEXIST'});
   assert.equal(lstatSync(occupied).isSymbolicLink(),true);assert.equal(readlinkSync(occupied),destination);
   if(dangling)assert.throws(()=>lstatSync(destination),{code:'ENOENT'});else assert.deepEqual(readFileSync(destination),before);
+  if(suffix)assert.throws(()=>lstatSync(f.target),{code:'ENOENT'});
+ });
+ test(`restore refuses a directory link at ${suffix||'the main file'} without changing its contents`,t=>{
+  const f=archivedFixture(t),occupied=`${f.target}${suffix}`,destination=join(f.db,'..','caller-directory'),before=Buffer.from('Synthetic directory-link canary');
+  mkdirSync(destination);writeFileSync(join(destination,'canary'),before);symlinkSync(destination,occupied,process.platform==='win32'?'junction':'dir');
+  assert.throws(()=>restoreBackup(f.archive,f.target,f.key),{code:'EEXIST'});
+  assert.equal(lstatSync(occupied).isSymbolicLink(),true);assert.deepEqual(readFileSync(join(destination,'canary')),before);
   if(suffix)assert.throws(()=>lstatSync(f.target),{code:'ENOENT'});
  });
 }
@@ -102,4 +133,37 @@ for(const failedWrite of [false,true])test(`restore ${failedWrite?'failure clean
   if(failedWrite)throw failure;return result;
  },()=>assert.throws(()=>restoreBackup(f.archive,f.target,f.key),failedWrite?error=>error===failure:{code:'backup_restore_mismatch'}));
  assert.deepEqual(readFileSync(f.target),foreign);
+});
+
+test('restore refuses and preserves a directory link replacing its pathname during writing',t=>{
+ const f=archivedFixture(t),destination=join(f.db,'..','foreign-directory'),before=Buffer.from('Synthetic replacement-link canary');
+ mkdirSync(destination);writeFileSync(join(destination,'canary'),before);
+ withFilesystemFault('writeFileSync',(write,path,content,...args)=>{
+  const result=write(path,content,...args);if(typeof path!=='number')return result;
+  unlinkSync(f.target);symlinkSync(destination,f.target,process.platform==='win32'?'junction':'dir');return result;
+ },()=>assert.throws(()=>restoreBackup(f.archive,f.target,f.key),{code:'backup_restore_mismatch'}));
+ assert.equal(lstatSync(f.target).isSymbolicLink(),true);assert.deepEqual(readFileSync(join(destination,'canary')),before);
+});
+
+if(process.platform==='win32')test('restore refuses success when the pathname changes while its Windows identity handle is opened',t=>{
+ const f=archivedFixture(t),foreign=Buffer.from('Synthetic replacement during identity open');let replaced=false;
+ withFilesystemFault('openSync',(open,path,flags,...args)=>{
+  const fd=open(path,flags,...args);
+  if(path===f.target&&flags==='r'&&!replaced){replaced=true;unlinkSync(f.target);writeFileSync(f.target,foreign);}
+  return fd;
+ },()=>assert.throws(()=>restoreBackup(f.archive,f.target,f.key),{code:'backup_restore_mismatch'}));
+ assert.deepEqual(readFileSync(f.target),foreign);
+});
+
+test('restore preserves an unidentified pathname when its same-inode device evidence disagrees',t=>{
+ const f=archivedFixture(t);let restoreFd;
+ withFilesystemFault('openSync',(open,path,flags,...args)=>{
+  const fd=open(path,flags,...args);if(path===f.target&&flags==='wx+')restoreFd=fd;return fd;
+ },()=>withFilesystemFault(process.platform==='win32'?'fstatSync':'lstatSync',(stat,reference,...args)=>{
+  const current=stat(reference,...args);
+  if(process.platform==='win32'?reference!==restoreFd&&args[0]?.bigint:reference===f.target)current.dev+=1n;
+  return current;
+ },()=>assert.throws(()=>restoreBackup(f.archive,f.target,f.key),{code:'backup_restore_mismatch'})));
+ const preserved=new DatabaseSync(f.target,{readOnly:true});
+ try{assert.equal(preserved.prepare('SELECT invoice_number FROM invoices').get().invoice_number,'BACKUP-GOOD');}finally{preserved.close();}
 });

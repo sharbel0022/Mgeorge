@@ -67,7 +67,20 @@ function pathStatus(file){try{return lstatSync(file,{bigint:true});}catch(error)
 function assertRestoreDestinationAbsent(target,suffixes=['','-wal','-shm','-journal']){
  for(const suffix of suffixes){const file=`${target}${suffix}`;if(pathStatus(file))throw Object.assign(Error('Återställningsmålet eller dess SQLite-sidfiler finns redan.'),{code:'EEXIST',path:file});}
 }
-function sameFile(file,owned){const current=pathStatus(file);return current?.isFile()&&current.dev===owned.dev&&current.ino===owned.ino;}
+function sameFile(file,owned){
+ const current=pathStatus(file);if(!current?.isFile())return false;
+ if(process.platform!=='win32')return current.dev===owned.dev&&current.ino===owned.ino;
+ // Windows pathname stats can report dev=0 while descriptor stats report the
+ // volume serial. Compare two descriptors without dropping the volume check;
+ // lstat still rejects links and must identify the file that was opened.
+ let fd;
+ try{
+  fd=openSync(file,'r');const opened=fstatSync(fd,{bigint:true}),latest=pathStatus(file);
+  return opened.isFile()&&latest?.isFile()&&current.ino===opened.ino&&latest.ino===opened.ino&&opened.dev===owned.dev&&opened.ino===owned.ino;
+ }
+ catch(error){if(error.code==='ENOENT')return false;throw error;}
+ finally{if(fd!==undefined)closeSync(fd);}
+}
 const restoreMismatch=()=>Object.assign(Error('Den återställda filen stämmer inte med den verifierade backupen.'),{code:'backup_restore_mismatch'});
 function verifyRestoredBytes(fd,content){
  if(fstatSync(fd).size!==content.length)throw restoreMismatch();
