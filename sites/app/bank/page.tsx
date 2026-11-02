@@ -1,4 +1,5 @@
 import BankConnection from '@/components/bank-connection';
+import BankgiroSourceStatus from '@/components/bankgiro-source-status';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -11,5 +12,6 @@ export default function BankPage() {
       <span className="private-badge"><ShieldCheck size={15}/> Din arbetsyta</span>
     </nav>
     <BankConnection/>
+    <BankgiroSourceStatus/>
   </main>;
 }

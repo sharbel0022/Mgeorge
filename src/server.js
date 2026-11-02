@@ -13,6 +13,9 @@ import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, aud
 import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
 import {dailyBackup} from './backup.js';
+import {createNodeBankgiroIngest} from './bankgiro-ingest.js';
+import {resolveBankgiroSource} from '../sites/lib/bankgiro-source-registry.js';
+import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
 import {createIntegrationJobs} from './integration-jobs.js';
 import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
 import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
@@ -41,6 +44,13 @@ function config(){
 const check=config();
 const db=openDatabase();
 const integrationJobs=createIntegrationJobs(db);
+async function bankgiroIngest(owner){return createNodeBankgiroIngest(db,{source:await resolveBankgiroSource(owner)});}
+export async function runScheduledBankgiro(){
+  const owner=check.secure?'administrator':'local-admin';
+  const source=await resolveBankgiroSource(owner);
+  if(!source)return;
+  return (await createNodeBankgiroIngest(db,{source})).run(owner);
+}
 const baseHeaders={
   'Content-Security-Policy':"default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'",
   'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -440,6 +450,13 @@ async function route(req,res){
   }
   if(!req.principal)throw bad(401,'Logga in för att läsa företagets uppgifter');
   if(req.principal!==(check.secure?'administrator':'local-admin'))throw bad(403,'Användaren saknar behörighet till företagets arbetsyta');
+  if(path==='/api/bankgiro/source/status'&&req.method==='GET')return json(res,200,publicBankgiroStatus(await (await bankgiroIngest(req.principal)).status(req.principal)));
+  if(path==='/api/bankgiro/source/run'&&req.method==='POST'){
+    const body=await readBody(req);
+    if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).length)throw bad(400,'Bankgirohämtningen accepterar ingen ägare eller källkonfiguration.');
+    const ingest=await bankgiroIngest(req.principal);assertSessionStillAuthorized(req);
+    return json(res,200,publicBankgiroStatus(await ingest.run(req.principal)));
+  }
   if(path==='/api/logout'&&req.method==='POST'){
     db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
     db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
@@ -786,7 +803,7 @@ let schedulerTimer;
 if(process.env.NODE_ENV!=='test'){
   server.listen(check.port,'127.0.0.1',()=>console.log(`MG Fakturakoll: ${check.origin}`));
   scheduledBackup();
-  schedulerTimer=setInterval(()=>{scheduledBackup();runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';});},60000);schedulerTimer.unref();
+  schedulerTimer=setInterval(()=>{scheduledBackup();runScheduledBankgiro().catch(()=>{schedulerState.last_error='Bankgirohämtningen behöver kontrolleras';});runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';});},60000);schedulerTimer.unref();
 }
 server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);paymentControl.stop();});
 export {server,db};

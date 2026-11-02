@@ -52,6 +52,8 @@ function fixture(t,count=7){
   document_registrations:{document_id:uuid(0),identity:'identity',invoice_id:'invoice',attempt:'attempt',total:62500,created_at:at.toISOString()},
   payment_control_runs:{id:'control',status:'complete',steps:'[]',started_at:at.toISOString(),finished_at:at.toISOString(),updated_at:at.toISOString()},
   payment_control_requests:{request_id:'request',run_id:'control',created_at:at.toISOString()},
+  bankgiro_ingest_sources:{source_id:'synthetic-source',scope_id:'synthetic-scope',authorization_generation:'synthetic-generation',cursor:'delivery-2',updated_at:at.getTime()},
+  bankgiro_ingest_jobs:{id:'synthetic-report-job',source_id:'synthetic-source',scope_id:'synthetic-scope',report_id:'0000599',sha256:sha(documents[2].bytes),filename:'synthetic.xml',authorization_generation:'synthetic-generation',document_id:uuid(2),status:'REVIEW',created_at:at.getTime(),updated_at:at.getTime()},
  };
  for(const [name,row]of Object.entries(rows))insert(sql,name,{owner,...row});
  insert(sql,'bank_locks',{owner,token:'synthetic-live-lock',expires_at:at.toISOString()});
@@ -64,7 +66,7 @@ async function exported(f){const api=await recovery(),entries=new Map();await ap
 test('authenticated export retains every durable table, historical original and revoked reference without writes to source',async t=>{
  const f=fixture(t);await complete(f);const before=JSON.stringify(BACKUP_TABLES.map(name=>f.sql.prepare(`SELECT * FROM ${name} WHERE owner=?`).all(owner))),originals=new Map([...f.objects].map(([path,bytes])=>[path,bytes.slice()])),puts=f.puts.length;
  const api=await recovery(),entries=await exported(f),result=await api.verifyRecoveryBundle(source(entries),key,owner,f.row().id);
- assert.equal(result.manifest.run.id,f.row().id);assert.equal(result.manifest.run.state,'complete');assert.equal(result.manifest.tables.length,20);
+ assert.equal(result.manifest.run.id,f.row().id);assert.equal(result.manifest.run.state,'complete');assert.equal(result.manifest.tables.length,22);
  assert.deepEqual(result.manifest.tables.map(table=>[table.name,table.rows]),BACKUP_TABLES.map(name=>[name,name==='documents'?7:1]));
  assert.equal(result.snapshot.tables.find(table=>table.name==='workspaces').rows[0].payload,JSON.stringify(f.state));
  assert.equal(result.manifest.objects.length,8);assert.equal(entries.size,10);
@@ -176,7 +178,7 @@ test('a resumed interrupted backup restores every exact financial row and origin
  for(const document of f.documents){const restored=readFileSync(join(result.directory,'originals',document.id+'.bin'));assert.deepEqual(restored,document.bytes);assert.equal(sha(restored),sha(document.bytes));}
  assert.deepEqual(readFileSync(join(result.directory,'source','snapshot.bin')),Buffer.from(entries.get('objects/snapshot.bin')));
  assert.deepEqual(readFileSync(join(result.directory,'source','manifest.bin')),Buffer.from(entries.get('manifest.bin')));
- const receipt=JSON.parse(readFileSync(join(result.directory,'receipt.json'),'utf8'));assert.equal(receipt.mode,'evidence-only');assert.equal(receipt.originals.count,7);assert.equal(receipt.tables.length,20);assert.equal(receipt.databaseSha256,sha(readFileSync(join(result.directory,'evidence.sqlite'))));assert.equal(JSON.stringify(receipt).includes(key),false);
+ const receipt=JSON.parse(readFileSync(join(result.directory,'receipt.json'),'utf8'));assert.equal(receipt.mode,'evidence-only');assert.equal(receipt.originals.count,7);assert.equal(receipt.tables.length,22);assert.equal(receipt.databaseSha256,sha(readFileSync(join(result.directory,'evidence.sqlite'))));assert.equal(JSON.stringify(receipt).includes(key),false);
  if(process.platform!=='win32'){assert.equal(statSync(result.directory).mode&0o077,0);assert.equal(statSync(join(result.directory,'evidence.sqlite')).mode&0o077,0);}
  assert.deepEqual(f.objects,sourceBefore);for(const table of expected)assert.deepEqual(sortedRows(f.sql.prepare(`SELECT * FROM ${table.name} WHERE owner=?`).all(owner)),table.rows);
 });

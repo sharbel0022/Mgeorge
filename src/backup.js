@@ -58,7 +58,7 @@ function originalReferenceIntegrity(db,tables){
  const originals=(table,hashColumn)=>{
   if(!names.has(table))return new Map();
   const fields=columns(table),optional=name=>fields.has(name)?name:`NULL AS ${name}`;
-  return new Map(db.prepare(`SELECT id,${fields.has(hashColumn)?hashColumn:'NULL'} AS hash,${fields.has('content')?"typeof(content)='blob'":'0'} AS has_content,${optional('extraction')} FROM ${table}`).all().map(row=>[row.id,row]));
+  return new Map(db.prepare(`SELECT id,${fields.has(hashColumn)?hashColumn:'NULL'} AS hash,${fields.has('content')?"typeof(content)='blob'":'0'} AS has_content,${optional('extraction')},${optional('owner')},${optional('metadata')},${optional('source')} FROM ${table}`).all().map(row=>[row.id,row]));
  };
  const documents=originals('documents','fingerprint'),imports=originals('import_jobs','content_sha256');
  const reference=(registry,id,hash,required=false,file=false)=>{
@@ -72,6 +72,14 @@ function originalReferenceIntegrity(db,tables){
  };
  const document=(id,hash,required=false)=>reference(documents,id,hash,required);
  const imported=(id,hash,required=false,file=false)=>reference(imports,id,hash,required,file);
+ if(names.has('bankgiro_ingest_jobs'))for(const row of db.prepare('SELECT owner,status,document_id,import_id,sha256 FROM bankgiro_ingest_jobs').all()){
+  const terminal=['IMPORTED','REVIEW','DUPLICATE'].includes(row.status);
+  if(typeof row.owner!=='string'||!row.owner||typeof row.sha256!=='string'||!/^[a-f0-9]{64}$/i.test(row.sha256))throw invalid();
+  document(row.document_id,row.sha256,terminal);
+  imported(row.import_id,row.sha256,terminal,true);
+  if(row.document_id){const original=documents.get(row.document_id);if(original.source!=='bankgiro_source'||parse(original.metadata)?.owner!==row.owner)throw invalid();}
+  if(row.import_id&&imports.get(row.import_id)?.owner!==row.owner)throw invalid();
+ }
  const conflictOriginals=value=>{for(const conflict of list(value))for(const id of list(conflict?.original_import_ids))imported(id,undefined,true,true);};
  // These typed pointers are not declared as SQLite foreign keys. API/manual
  // jobs may have no file bytes, while a retained conflict file must have them.

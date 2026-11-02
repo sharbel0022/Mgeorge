@@ -774,3 +774,9 @@ Poängen är exakt **253,5/330 = 7,68/10**,0/33 på9,5:250 +4,5 lokala förbätt
 - Kvarstående externa beroenden: verifierat stabilt insättnings-id/rapport-AIS-koppling och bankavtal/OCR-regel där relevant. Inloggat verkligt produktionsimportprov återstår. Funktionens säkra granskningsläge är levererat; inga bakgrundsuppgifter skapade.
 
 - Visuell slutkontroll förbättrade referensen till tydligt huvudvärde med egen typetikett och separata rader; kod417fd4c35a9c585c78b22e5f7dc95ceb9fcf54f8, Actions41313420001 test+sites success. Full Sites912/TS/build omkörda gröna. Senaste Sites39 succeeded, källcommitd3b5dc35eaa8757d00064ab8dbd2df91f9034ea3; exakt samma sites-träd. Publicerad syntetisk minnesdemo passerade filväljare/preview/bekräftelse/lista utan serveruppladdning eller riktiga poster. Därefter fortsatt31→31 och oförändrad ändringstid/policy/scheman. Ägda lokala previewprocesser stoppade. Ingen fortsatt bakgrundskörning behövs för levererad funktion; externa bankidentitets-/avtalsbevis kvarstår uttryckligen.
+
+## Agent 3 — automatisk Bankgiroinläsning, separat funktionsbranch
+
+`feature/mgeorge-bankgiro-auto-ingest` tillför ett utbytbart auktoriserat rapportgränssnitt, beständig kö, original-/rapportdeduplicering, återupptagning, status-API/MCP och statusvy. Båda applikationerna återanvänder befintlig parser och ekonomimodell. Inga fakturaallokeringar körs av rapportarbetaren. [Kontrakt och bankkällor](docs/integration/bankgiro-source.md), [test- och leveransrapport](docs/integration/agent-3-bankgiro-auto-ingest.md).
+
+Riktig rapporthämtning är uttryckligen avstängd: kundens bankavtal, auktoriserade transport och exakta rapportprofil saknas. Syntetiska testresultat, lokal miljöbegränsning och obligatorisk CI redovisas separat i leveransrapporten/PR:n. Integrationsansvarig samordnar merge, migration och eventuell publicering; ingen produktionsskrivning eller publicering ingår i denna branch. Berörda kvalitetspoäng behålls.
