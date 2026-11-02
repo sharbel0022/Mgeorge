@@ -11,7 +11,12 @@ export async function POST(req:Request){try{
  const known=await db().prepare('SELECT id, filename FROM documents WHERE owner=? AND sha256=? LIMIT 1').bind(user.userId,hash).first();if(known)return response({...known,duplicate:true,sha256:hash});
  if(!env.BUCKET)throw new Error('Bilagelagringen är inte tillgänglig.');const id=uid(),filename=file.name.replace(/[\r\n\x00-\x1f]/g,'').slice(0,200);
  await env.BUCKET.put(`${user.userId}/${id}`,bytes,{httpMetadata:{contentType:allowed[ext]}});
- try{await db().prepare('INSERT INTO documents (id,owner,filename,mime,size,sha256,created_at) VALUES (?,?,?,?,?,?,?)').bind(id,user.userId,filename,allowed[ext],file.size,hash,now()).run();}catch(e){await env.BUCKET.delete(`${user.userId}/${id}`);throw e;}
+ try{await db().prepare('INSERT INTO documents (id,owner,filename,mime,size,sha256,created_at) VALUES (?,?,?,?,?,?,?)').bind(id,user.userId,filename,allowed[ext],file.size,hash,now()).run();}catch(e){
+  // The insert can commit even if its response is lost. Only remove bytes
+  // when an owned read confirms that no document references this upload.
+  try{if(!await db().prepare('SELECT id FROM documents WHERE owner=? AND id=?').bind(user.userId,id).first())await env.BUCKET.delete(`${user.userId}/${id}`);}catch{}
+  throw e;
+ }
  return response({id,filename,sha256:hash});
  }catch(e){return failure(e);}}
 export async function GET(req:Request){try{const user=await identity(),id=new URL(req.url).searchParams.get('id')??'';if(!/^[a-f0-9-]{36}$/.test(id))throw new Error('Ogiltig filreferens.');const doc=await db().prepare('SELECT filename,mime FROM documents WHERE id=? AND owner=?').bind(id,user.userId).first<{filename:string,mime:string}>();if(!doc)return response({error:'Filen finns inte.'},404);const obj=await env.BUCKET?.get(`${user.userId}/${id}`);if(!obj)return response({error:'Filen finns inte.'},404);return new Response(obj.body,{headers:{'Content-Type':doc.mime,'Content-Disposition':`attachment; filename*=UTF-8''${encodeURIComponent(doc.filename)}`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':'sandbox'}});}catch(e){return failure(e);}}
