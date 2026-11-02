@@ -12,7 +12,7 @@
 | Automatisk matchning |7,5|7,5|PreviewautomaticEligiblefalse, ekonomisk insättning1/rapport0, inga pengar skapade.|
 | Säkerhet/åtkomst |8,5|8,5|Betrodd WeakMap-retryproveniens och konstruktörskod, inget getter-/råheaderläckage i regressionsfallen.|
 | Kod/tester |8,5|8,5|OberoendeREADY,847Node/1451Sites/syntax99/TS/bygge/highgrindar;0produktion/16moderate devfynd.|
-| Produktion |6,5|6,5|Ägarbundna sparade underlag/status lästa; inget nytt bankkontoanrop när deadline saknas.|
+| Produktion |6,5|6,5|Exakt CI41470820370 och Sites53 succeeded med identiskt källträd; revision42/ekonomifält/original/auth/runtime9/scheman oförändrade; inloggad browserresa och bankrelation kvar.|
 
 Samtliga33områdespoäng i föregående kompletta tabell behålls:255/330=7,73. Ingen9,5 eller universell100%OCR påstås. [Aktuell samlad rapport](docs/FINAL-GITHUB-AND-BANK-VERIFICATION.md).
 

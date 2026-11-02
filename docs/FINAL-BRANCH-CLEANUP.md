@@ -1,6 +1,6 @@
 # Slutlig branchkontroll – Mgeorge
 
-Datum2026-11-02. Startmain b44b092cec10031650b4a7336e99b1e2334bda59, exakt CI41459045392 godkänd847Node/1426Sites. Aktuell slutleverans för den nya kodrättningen kompletteras efter push; branchkontrollen bygger på faktisk GitHublista och ny originfetch, inte enbart äldre rapporter.
+Datum2026-11-02. Startmain b44b092cec10031650b4a7336e99b1e2334bda59, exakt CI41459045392 godkänd847Node/1426Sites. Kodrättningen är nu levererad på mainb0b67e58364283ce4c06ad6f9e913b2b926df647 med exakt CI41470820370 success847Node/1451Sites och Sites53; branchkontrollen bygger på faktisk GitHublista och ny originfetch, inte enbart äldre rapporter.
 
 ## Verifierat bevarande
 
@@ -10,7 +10,7 @@ Det privata fullständiga Gitarkivets SHA256 och storlek stämmer med manifestet
 
 | Branch | Exakt kontrollerat huvud | Unikt mot startmain | PR / beslut |
 | --- | --- | ---: | --- |
-| main |b44b092cec10031650b4a7336e99b1e2334bda59|—|Behåll. Nya godkända leveranscommits får tillkomma utan force.|
+| main |b0b67e58364283ce4c06ad6f9e913b2b926df647|—|Behåll. Kodleverans verifierad, dokumentationskvittot följer utan force.|
 | codex/bank-evidence-production-safety |2d4530395742530353409f002fb254d75d149fa0|0|Integrerad; ingen öppen PR. Raderingsbeslut kodmässigt förberett, inväntar konkret godkännande.|
 | codex/mgeorge-v3-cloud-ocr |1def87e60cd3a386485cb199f4206daa8bdec8f3|0|Integrerad, tidigare PR11 mergad; inväntar godkännande.|
 | codex/mgeorge-v4-bank-verification |d2537de46fcbea98bc6869205d1493976fc1f190|0|Integrerad, tidigare PR13 mergad; inväntar godkännande.|
@@ -33,4 +33,4 @@ Tillgängliga GitHubverktyg saknar delete-ref och separat raderingsgodkännanded
 - Nödvändiga kodändringar finns på main; separat runnerarbete är bevarat privat utan att påstås mergat.
 - **Main är ännu inte enda fjärrbranchen.** Konkret bekräftelse krävs för de fem exakta namnen och eventuell stängning av de två granskade draft-PR:erna. Innan utförande kontrolleras huvuden/aktivitet på nytt; nya unika commits får inte kastas bort.
 
-Senaste leverans-/CI-identitet och ny efterkontroll finns i [den samlade rapporten](FINAL-GITHUB-AND-BANK-VERIFICATION.md). Privat återställningsarkiv hänvisas i Work-svaret, inte genom publik åtkomst i GitHub.
+Efter publicering lästes GitHubs branchlista på nytt: samtliga fem arkiverade huvuden är exakt oförändrade,0fjärrraderingar/PRstängningar. Endastmain finns bland lokala namngivna brancher. Senaste leverans-/CI-identitet och ny efterkontroll finns i [den samlade rapporten](FINAL-GITHUB-AND-BANK-VERIFICATION.md). Privat återställningsarkiv hänvisas i Work-svaret, inte genom publik åtkomst i GitHub.

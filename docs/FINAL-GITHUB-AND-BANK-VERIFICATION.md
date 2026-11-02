@@ -44,13 +44,33 @@ Nya sparade produktionskontroller har revision42 efter det redan befintliga sche
 
 Originalkontrollen kördes privat igen:12 workbookkontroller och9 fakturafält i vardera verklig Node-/Sitesmotor passerar. De nio fälten är fakturanummer, kundorganisation, faktura-/förfallodatum, netto/moms/total, valuta och mottagarbankgiro. Betalarnamn, råreferens, mottagarkonto, löpnummer, antal och cellformat kontrolleras i den privata workbookdelen. Den faktiska optiska precisionen för alla möjliga skanningar påstås inte vara100%.
 
-Läsverktygens checkedAt,11 källor/regler/reasons/next och originalmetadata bevaras privat. Den publika tabellen beskriver reglerna utan kund-/kontoidentifierare. Färsk efterkontroll och slutliga tids-/leveransreferenser kompletteras efter publicering, utan nytt kontoanrop.
+Läsverktygens checkedAt,11 källor/regler/reasons/next och originalmetadata bevaras privat. Den publika tabellen beskriver reglerna utan kund-/kontoidentifierare. Efterkontroll utförd2026-11-02T15:26:28Z: exakt AIS15:26:28.679Z, referensregister15:26:28.671Z och rapport15:26:28.710Z. De nya tiderna gäller de skrivfria sparade kontrollerna i tabellen; det gamla kontoalias-/väntetidsbeskedet anges uttryckligen som historiskt och återanropades inte.
 
 ## Tester, kvalitet och återstående bevis
 
-Bekräftat RED/GREEN:9 ursprungliga retryfall, explicit0-kontroll, strikt presentation och fem integritets-/getterregressioner. Korrigerad fokuserad svit78/78, befintlig sync-/provider-/detaljkompatibilitet145/145 och TypeScript passerar; oberoende scopedrereview READY. Fryst produktkod9451a43 passerar847/847Node,1451/1451Sites, syntax99,TypeScript och rent produktionsbygge;0fel/överhoppningar. Nodekod och dess importerade testunderlag är oförändrade av den avgränsade Sites-getterrättningen; exakt leverans-CI kör hela kedjan igen. Root/produktionsaudit0, highgrindar passerar; fullSites16moderate utvecklingsfynd kvarstår. Exakt main/CI/Sites kompletteras efter leverans. Inga testkrav togs bort för att få grönt.
+Bekräftat RED/GREEN:9 ursprungliga retryfall, explicit0-kontroll, strikt presentation och fem integritets-/getterregressioner. Korrigerad fokuserad svit78/78, befintlig sync-/provider-/detaljkompatibilitet145/145 och TypeScript passerar; oberoende scopedrereview READY. Fryst produktkod9451a43 passerar847/847Node,1451/1451Sites, syntax99,TypeScript och rent produktionsbygge;0fel/överhoppningar. Nodekod och dess importerade testunderlag är oförändrade av den avgränsade Sites-getterrättningen; exakt leverans-CI kör hela kedjan igen. Root/produktionsaudit0, highgrindar passerar; fullSites16moderate utvecklingsfynd kvarstår. Exakt main/CI/Sites redovisas nedan. Inga testkrav togs bort för att få grönt.
 
 Aktuell dokumentär33-områdesbedömning behålls:255/330=7,73/10;0/33 på9,5. Förbättringen är mätbar i bevarad retryproveniens och blockerad felmeddelandeläcka; den styrker inte bankrelationen eller ett nytt verksamhetsutfall. För minst9,5 krävs fortfarande tillräckliga bankbevis, komplett besluts-/registreringskedja efter konkret godkännande, ägarautentiserad desktop-/mobil-/tangentbordsverifiering, bredare representativ OCR-/volymutvärdering, verifierad säker återställningsövning och hantering av kvarvarande utvecklingsberoendefynd. Kompatibla fullständiga beroendefixar får inte ersättas med brytande godtyckliga nedgraderingar eller sänkta säkerhetskrav.
+
+## Verifierad leverans och efterkontroll
+
+| Del | Exakt observerat bevis |
+| --- | --- |
+| Kodleverans på main |b0b67e58364283ce4c06ad6f9e913b2b926df647, förälder b44b092cec10031650b4a7336e99b1e2334bda59; ingen forcepush.|
+| Hela godkända Gitträdet |f79aeb7979d391dcdf2909386dafa75509208ec1, exakt samma som lokal granskad/testad leverans.|
+| Sites-källträd |af2b3681d8a893e2dcb2b5504068095f0b706349, identiskt med main:sites och publiceringskällan.|
+| Exakt kod-CI |[41470820370](https://github.com/sharbel0022/Mgeorge/actions/runs/41470820370), Node/test och Sites båda success; loggar847/847 och1451/1451,0fail/skip, syntax99,TypeScript/audits/bygge passerar.|
+| Publicerad version |Sites53, version-ID appgprj_6adf2f7f7e848191b64192161886b528~appgver_5f85b4f9d89c8191898e6ce31a89ee0a.|
+| Publiceringskälla |9f3048e8ea2ce82d6b5861bc7383b862bd6a7bec;347filer hashidentiska med det rena godkända bygget,0QA-referenser.|
+| Lyckad deployment |appgdep_6ae8ab6a2a44819182676fadb2e8a4b9, succeeded2026-11-02T15:25:56Z, runtime revision9.|
+| Befintlig produktion |[MG Fakturakoll](https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/); offentlig startsida och navigation till bankvy observerade. Inloggad verifieringspanel/mobilresa är fortfarande inte browserverifierad i denna miljö.|
+| Återgång |Sites52 finns kvar. Backupmanifest195/195 verifierade filer,11 kvittoförsedda API-original i angiven checksummekontroll,112 äldre poster utan sådant kvitto; ingen fullständig produktionsåterställning påstås.|
+
+Efterkontrollen bekräftar samma workspace revision42 och exakt oförändrade valda betalnings-/register-/allokeringsfält som före publicering. Rapport/AIS har0allokeringar och automaticEligible=false; AIS ekonomiskt1/rapport0, målregistrets kompletta kontroll0träffar. Rapportoriginalets hash/integritet och det ägda fakturaoriginalets hash/storlek stämmer med privata original/facit. Originalbytes och12workbook/9PDFfält per motor kontrollerades igen efter publicering. Authklient, åtkomstpolicy, alla tre befintliga scheman, runtimeinställningar/revision9, D1översikt26tabeller och backupstatus är exakt oförändrade i före-/efterjämförelsen. Inga runtimehemligheter eller privata originalvärden publiceras.
+
+Bankstatus är oförändrad: senaste ordinariesynk14:07Z, nästa20:06Z/21:06svensk tid, inget synkfel. Detta tillåter inte ett separat account_details-anrop när leverantörens tidigare deadline fortfarande är okänd. Ingen sådan begäran, ny automation, fakturaregistrering eller ekonomisk skrivning gjordes. GitHubs nya branchlista efter leverans visar fortfarande main och samma fem arbetsbrancher, med oförändrade arkiverade huvuden; PR9/10 har inte stängts.
+
+Efterföljande leveranscommit för denna rapport ändrar endast dokumentation och ska inte utlösa en ny Sitespublicering; aktuell huvud-SHA och dess Actions visas av GitHub och redovisas i Work-svaret efter slutkontroll.
 
 ## Slutstatus
 
