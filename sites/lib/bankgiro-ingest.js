@@ -1,5 +1,5 @@
 import {ingestError,validateAuthorization,validateReportPage,sanitizedIngestCode,retryAt} from './bankgiro-source.js';
-import {registrationBinding} from './bankgiro-ingest-store.js';
+import {registrationBinding,bankgiroRegistrationPlan} from './bankgiro-ingest-store.js';
 const statuses=['PENDING','RETRY','IMPORTED','REVIEW','DUPLICATE','BLOCKED'];
 const blocked=code=>['AUTHORIZATION_BLOCKED','AUTHORIZATION_CHANGED','INVALID_PAGE','HASH_MISMATCH','IDENTITY_CONFLICT','INVALID_ORIGINAL','INVALID_SINK_RESULT'].includes(code);
 const iso=value=>value==null?null:new Date(value).toISOString();
@@ -16,12 +16,13 @@ export function createBankgiroIngest({source,store,sink,now=Date.now,allowSynthe
   if(disabled)return disabledStatus();if(invalid)return invalidStatus();checkOwner(owner);
   const snapshot=await store.snapshot(owner,source.id,production?registrationBinding(source.registration):undefined),s=snapshot.source,counts=emptyCounts();for(const row of snapshot.counts)counts[row.status]=row.count;
   const times=[s?.nextPollAt,snapshot.nextAttemptAt===0?now():snapshot.nextAttemptAt].filter(x=>x!=null);const nextPollAt=s?.lastError&&s.nextPollAt>now()?s.nextPollAt:times.length?Math.min(...times):null;
+  let admissionBlocked=false;if(production)try{bankgiroRegistrationPlan(owner,source,snapshot.authorities);}catch{admissionBlocked=true;}
   const currentCounts=production?Object.fromEntries((snapshot.currentCounts||[]).map(row=>[row.status,row.count])):counts;
-  const authorityChanged=production&&s&&(s.registrationRevision!==source.registration.configurationRevision||s.registrationBinding!==registrationBinding(source.registration));
+  const authorityChanged=admissionBlocked||production&&s&&(s.registrationRevision!==source.registration.configurationRevision||s.registrationBinding!==registrationBinding(source.registration));
   const expired=!!s?.authorizationValidUntil&&s.authorizationValidUntil<=now();
   const authStatus=authorityChanged||s?.authorizationStatus==='BLOCKED'?'BLOCKED':expired?'EXPIRED':s?.authorizationStatus==='VERIFIED'&&(!production||s.authorizationValidUntil>now()&&s.authorizationVerifiedAt>0&&s.authorizationVerifiedAt<=now())?'VERIFIED':'UNKNOWN';
-  const state=snapshot.lease?'RUNNING':['BLOCKED','EXPIRED'].includes(authStatus)||currentCounts.BLOCKED?'BLOCKED':nextPollAt>now()?'BACKOFF':currentCounts.REVIEW||JSON.parse(s?.missingReportIds||'[]').length?'REVIEW':'IDLE';
-  return {enabled:true,sourceId:source.id,mode:source.mode,state,reason:s?.lastError??null,cursor:s?.cursor??null,nextPollAt:iso(nextPollAt),missingReportIds:JSON.parse(s?.missingReportIds||'[]'),counts,jobs:snapshot.jobs,leaseExpiresAt:iso(snapshot.lease?.expiresAt),lastError:s?.lastError??null,authorization:{status:authStatus,verifiedAt:iso(s?.authorizationVerifiedAt),validUntil:iso(s?.authorizationValidUntil)},lastSuccessAt:iso(s?.lastSuccessAt),lastFailureAt:iso(s?.lastFailureAt),lastFailureCode:s?.lastFailureCode??null};
+  const state=admissionBlocked?'BLOCKED':snapshot.lease?'RUNNING':['BLOCKED','EXPIRED'].includes(authStatus)||currentCounts.BLOCKED?'BLOCKED':nextPollAt>now()?'BACKOFF':currentCounts.REVIEW||JSON.parse(s?.missingReportIds||'[]').length?'REVIEW':'IDLE';
+  return {enabled:true,sourceId:source.id,mode:source.mode,state,reason:admissionBlocked?'AUTHORIZATION_CHANGED':s?.lastError??null,cursor:s?.cursor??null,nextPollAt:iso(nextPollAt),missingReportIds:JSON.parse(s?.missingReportIds||'[]'),counts,jobs:snapshot.jobs,leaseExpiresAt:iso(snapshot.lease?.expiresAt),lastError:s?.lastError??null,authorization:{status:authStatus,verifiedAt:iso(s?.authorizationVerifiedAt),validUntil:iso(s?.authorizationValidUntil)},lastSuccessAt:iso(s?.lastSuccessAt),lastFailureAt:iso(s?.lastFailureAt),lastFailureCode:s?.lastFailureCode??null};
  }
  async function run(owner){
   if(source?.revocation){checkOwner(owner);if(source.revocation.owner!==owner)return invalidStatus();try{await store.revokeOwner(owner,source.revocation.configurationRevision);}catch{}return invalidStatus();}

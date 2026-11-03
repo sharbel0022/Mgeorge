@@ -9,6 +9,21 @@ const retiredGenerations=(row,retire=false)=>{
  if(list.length>64||JSON.stringify(list).length>65536)throw ingestError('AUTHORIZATION_CHANGED');
  return list;
 };
+/** Pure owner-scoped authority admission; never contacts a source or writes. */
+export function bankgiroRegistrationPlan(owner,source,sources){
+ const r=source?.registration;
+ if(source?.configurationValid!==true||!r||r.owner!==owner||r.id!==source.id||!Number.isSafeInteger(r.configurationRevision)||r.configurationRevision<1||r.enabled!==true||!Array.isArray(sources)||sources.some(row=>row.owner!==owner))throw ingestError('AUTHORIZATION_BLOCKED');
+   const revision=r.configurationRevision,binding=registrationBinding(r),previous=sources.find(row=>row.sourceId===source.id),latest=Math.max(0,...sources.map(row=>row.registrationRevision));
+   const retired=retiredGenerations(previous,Number(previous?.registrationRevision)>0&&previous.registrationBinding!==binding);
+   const otherRetirements=sources.filter(row=>row.sourceId!==source.id).map(row=>({row,retired:retiredGenerations(row,true)}));
+   // A source alias cannot reuse any owner-scoped retirement, including one
+   // this registration would create while replacing another active source.
+   if([retired,...otherRetirements.map(entry=>entry.retired)].some(history=>history.some(([scope,generation])=>scope===r.scopeId&&generation===r.generation)))throw ingestError('AUTHORIZATION_CHANGED');
+   // Reserve the current generation's future retirement before admitting it.
+   retiredGenerations({scopeId:r.scopeId,authorizationGeneration:r.generation,revokedGenerations:JSON.stringify(retired)},true);
+   if(revision<latest||revision===latest&&(!previous||previous.registrationBinding!==binding||previous.authorizationStatus==='BLOCKED'))throw ingestError('AUTHORIZATION_CHANGED');
+ return {revision,binding,previous,latest,retired,otherRetirements};
+}
 const camel=row=>row&&Object.fromEntries(Object.entries(row).map(([key,value])=>[key.replace(/_([a-z])/g,(_,c)=>c.toUpperCase()),value]));
 /** Database has D1's async prepare().bind().first/all/run and atomic batch(). */
 export function createBankgiroIngestStore(database,{now=Date.now,leaseMs=120000}={}){
@@ -32,14 +47,8 @@ export function createBankgiroIngestStore(database,{now=Date.now,leaseMs=120000}
    if(source.configurationValid!==true||!r||r.owner!==owner||r.id!==source.id||!Number.isSafeInteger(r.configurationRevision)||r.configurationRevision<1||r.enabled!==true)throw ingestError('AUTHORIZATION_BLOCKED');
    // One SQL snapshot supplies both the retirement history and its revision CAS.
    const sources=await rows('SELECT * FROM bankgiro_ingest_sources WHERE owner=?',owner);
-   const revision=r.configurationRevision,binding=registrationBinding(r),previous=sources.find(row=>row.sourceId===source.id),latest=Math.max(0,...sources.map(row=>row.registrationRevision));
-   const retired=retiredGenerations(previous,Number(previous?.registrationRevision)>0&&previous.registrationBinding!==binding);
-   if(retired.some(([scope,generation])=>scope===r.scopeId&&generation===r.generation))throw ingestError('AUTHORIZATION_CHANGED');
-   // Reserve the current generation's future retirement before admitting it.
-   retiredGenerations({scopeId:r.scopeId,authorizationGeneration:r.generation,revokedGenerations:JSON.stringify(retired)},true);
-   const otherSources=sources.filter(row=>row.sourceId!==source.id);
-   const retireOthers=otherSources.map(row=>statement("UPDATE bankgiro_ingest_sources SET authorization_status='BLOCKED',registration_revision=?,revoked_generations=?,updated_at=? WHERE owner=? AND source_id=?",revision,JSON.stringify(retiredGenerations(row,true)),now(),owner,row.sourceId));
-   if(revision<latest||revision===latest&&(!previous||previous.registrationBinding!==binding||previous.authorizationStatus==='BLOCKED'))throw ingestError('AUTHORIZATION_CHANGED');
+   const {revision,binding,previous,latest,retired,otherRetirements}=bankgiroRegistrationPlan(owner,source,sources);
+   const retireOthers=otherRetirements.map(({row,retired:history})=>statement("UPDATE bankgiro_ingest_sources SET authorization_status='BLOCKED',registration_revision=?,revoked_generations=?,updated_at=? WHERE owner=? AND source_id=?",revision,JSON.stringify(history),now(),owner,row.sourceId));
    if(revision===latest){this.fenceRegistration(lease,source);return;}
    await lease.write([
     statement("SELECT CASE WHEN coalesce((SELECT max(registration_revision) FROM bankgiro_ingest_sources WHERE owner=?),0)=? THEN 1 ELSE json('AUTHORIZATION_CHANGED') END",owner,latest),
@@ -100,7 +109,7 @@ export function createBankgiroIngestStore(database,{now=Date.now,leaseMs=120000}
   },
   async release(lease){await statement('DELETE FROM bankgiro_ingest_leases WHERE owner=? AND token=?',lease.owner,lease.token).run();},
   async source(owner,id){return camel(await statement('SELECT * FROM bankgiro_ingest_sources WHERE owner=? AND source_id=?',owner,id).first());},
-  async snapshot(owner,id,binding){return {currentCounts:binding?await rows('SELECT status,count(*) AS count FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? AND registration_binding=? GROUP BY status',owner,id,binding):null,source:await this.source(owner,id),jobs:await rows('SELECT * FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? ORDER BY created_at DESC,id DESC LIMIT 200',owner,id),counts:await rows('SELECT status,count(*) AS count FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? GROUP BY status',owner,id),lease:camel(await statement('SELECT * FROM bankgiro_ingest_leases WHERE owner=? AND expires_at>?',owner,now()).first()),nextAttemptAt:(await statement("SELECT min(coalesce(next_attempt_at,0)) AS due FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? AND status IN ('PENDING','RETRY')",owner,id).first())?.due??null};},
+  async snapshot(owner,id,binding){return {authorities:binding?await rows('SELECT * FROM bankgiro_ingest_sources WHERE owner=?',owner):null,currentCounts:binding?await rows('SELECT status,count(*) AS count FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? AND registration_binding=? GROUP BY status',owner,id,binding):null,source:await this.source(owner,id),jobs:await rows('SELECT * FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? ORDER BY created_at DESC,id DESC LIMIT 200',owner,id),counts:await rows('SELECT status,count(*) AS count FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? GROUP BY status',owner,id),lease:camel(await statement('SELECT * FROM bankgiro_ingest_leases WHERE owner=? AND expires_at>?',owner,now()).first()),nextAttemptAt:(await statement("SELECT min(coalesce(next_attempt_at,0)) AS due FROM bankgiro_ingest_jobs WHERE owner=? AND source_id=? AND status IN ('PENDING','RETRY')",owner,id).first())?.due??null};},
   async recordSource(owner,id,patch,lease){
    // Queue diagnostics never replay a previously read authority row. Promotion is
    // exclusively a trusted configuration lifecycle operation, not an error handler.
