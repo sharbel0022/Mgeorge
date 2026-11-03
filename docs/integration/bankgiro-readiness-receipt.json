@@ -1,0 +1,63 @@
+{
+  "scope": "Generic internal Bankgiro readiness; real production source remains absent",
+  "startMain": "d91ec6c45acc07c15b82b815ffaa305d6d213656",
+  "localCodeFreeze": "87c6be03fa9c19d2e810db80f3f1e2af548589b6",
+  "sitesSubtree": "55d834d5a507c8bde00f44d3d03d89ae2e3debc6",
+  "tests": {
+    "node": 1565,
+    "sites": 3117,
+    "bridge": 42,
+    "total": 4724,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "todo": 0,
+    "bridgeNodeFloor": "22.13.0",
+    "rootSitesNode": "24.22.1"
+  },
+  "checks": {
+    "rootSyntaxFiles": 136,
+    "guardedTypes": "pass",
+    "bridgeSyntax": "pass",
+    "productionBuild": "pass",
+    "rootAudit": 0,
+    "sitesProductionAudit": 0,
+    "bridgeAudit": 0,
+    "sitesInheritedModerateDevelopmentFindings": 16,
+    "highCriticalFindings": 0,
+    "independentReview": "no remaining Critical/Important blockers"
+  },
+  "productionBaseline": {
+    "siteVersion": 59,
+    "envRevision": 9,
+    "envEntries": 17,
+    "sourceConfigPresent": false,
+    "schedules": 3,
+    "selectedWorkspaceRevision": 45,
+    "selectedEconomicCounts": [
+      1,
+      0
+    ],
+    "selectedAllocations": 0,
+    "backupVerifiedFiles": 267
+  },
+  "release": {
+    "pr": null,
+    "mainCI": null,
+    "publishedSiteVersion": null
+  },
+  "status": {
+    "code": "complete_generic_local_gates",
+    "syntheticEndToEnd": "complete",
+    "sitesPublication": "pending",
+    "realBankSourceConnected": false,
+    "automaticProductionFetchVerified": false
+  },
+  "externalRequirements": [
+    "Actual bank contract/owner/company/Bankgiro/account scope",
+    "Authorized real SFTP or normalized HTTPS provider channel and authenticated server identity",
+    "Actual approved MIG/XSD/Envelope/security profile and sample originals",
+    "Bridge deployment private POSIX durable storage TLS proxy and egress controls when required",
+    "Real original list/download/import and separate account/deposit/customer acceptance"
+  ]
+}

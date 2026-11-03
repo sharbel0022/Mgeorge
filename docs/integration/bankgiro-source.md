@@ -1,5 +1,7 @@
 # BankgiroReportSource — proposed contract v1
 
+Current additive readiness work: [transport, trusted registration, durable authority and scheduler integration](../BANKGIRO-AUTOMATIC-SOURCE-READINESS.md). The dated producer proposal below remains historical where superseded by that receipt. Real production report access stays unconfigured.
+
 **Owner:** Agent 3. **Contract:** `mgeorge-integration-v1` / additive `BankgiroReportSource v1` proposal. **Status:** implementation on `feature/mgeorge-bankgiro-auto-ingest`, subject to integration review; no existing shared interface is silently replaced.
 
 This module transports and queues originals. It does not decide whether an invoice is paid. Source authorization is distinct from `BankAccountEvidence` (Agent 2) and `ReportDepositRelationship`/`ReconciliationDecision` (Agent 4).

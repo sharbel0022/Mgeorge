@@ -51,6 +51,28 @@ jobs:
       - run: npm run check
       - name: Audit Sites production dependencies
         run: npm audit --audit-level=high
+      - name: Install isolated bridge for full synthetic SFTP chain
+        run: npm --prefix ../bridge/bankgiro ci --ignore-scripts
       - name: Run Sites tests with synthetic data
         run: npm test
       - run: npm run build
+  bankgiro_bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: bridge/bankgiro/package-lock.json
+      - name: Install isolated SFTP bridge
+        run: npm --prefix bridge/bankgiro ci --ignore-scripts
+      - name: Check isolated bridge syntax
+        run: npm --prefix bridge/bankgiro run check
+      - name: Audit isolated bridge production dependencies
+        run: npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high
+      - name: Test synthetic SSH SFTP HTTP and durable recovery
+        run: npm --prefix bridge/bankgiro test

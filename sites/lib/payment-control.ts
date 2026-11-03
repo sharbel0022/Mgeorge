@@ -54,6 +54,8 @@ async function executeStep(owner:string,key:string,req:Request):Promise<StepResu
     return {state:waiting?'waiting':Number(counts.failed||0)>0?'blocked':'done',count:result.processed,note:waiting?`Sparad dokumentkö återstår. ${counts.waiting_ocr||0} väntar på ${result.cloud_ocr_configured?'moln-OCR':'lokal OCR'}${result.cloud_ocr_configured?(result.cloud_worker_recent?'':'; ingen molnkörning nyligen'):(result.worker_online?'':'; OCR-datorn är frånkopplad')}. Osäkra fält kräver granskning.`:Number(counts.failed||0)>0?'Dokument kunde inte tolkas. Originalen finns kvar för granskning.':'Sparade underlag har behandlats. Osäkra fält och dubbletter kräver fortfarande granskning.'};
   }
   if(key==='bank'){
+    const reports=await(await import('./bankgiro-ingest-service')).runBankgiroSource(owner);
+    if(reports.enabled&&reports.state==='BLOCKED')return {state:'blocked',note:'Rapportkällans behörighet eller sparade rapporter kräver granskning. Original och kö bevaras.'};
     const c=await db().prepare('SELECT status,environment,last_error,valid_until,last_synced_at,selected_accounts,auto_last_attempt_at,auto_next_at,control_last_attempt_at FROM bank_connections WHERE owner=?').bind(owner).first<Row>();
     if(!c||c.status!=='connected'||!Number.isFinite(Date.parse(c.valid_until))||Date.parse(c.valid_until)<=Date.now()||!JSON.parse(c.selected_accounts||'[]').length)return {state:'blocked',note:'En giltig bankanslutning med valt konto behövs. Sparade bankhändelser kontrolleras ändå.'};
     // Preserve the existing six-hour bank cadence, including an already reserved retry.

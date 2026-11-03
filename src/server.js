@@ -45,10 +45,10 @@ function config(){
 const check=config();
 const db=openDatabase();
 const integrationJobs=createIntegrationJobs(db);
-async function bankgiroIngest(owner){return createNodeBankgiroIngest(db,{source:await resolveBankgiroSource(owner)});}
+async function bankgiroIngest(owner){return createNodeBankgiroIngest(db,{source:await resolveBankgiroSource(owner,{configuration:process.env.BANKGIRO_SOURCE_CONFIG,secrets:process.env})});}
 export async function runScheduledBankgiro(){
   const owner=check.secure?'administrator':'local-admin';
-  const source=await resolveBankgiroSource(owner);
+  const source=await resolveBankgiroSource(owner,{configuration:process.env.BANKGIRO_SOURCE_CONFIG,secrets:process.env});
   if(!source)return;
   return (await createNodeBankgiroIngest(db,{source})).run(owner);
 }

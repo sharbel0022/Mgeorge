@@ -1,5 +1,10 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Automatic Bankgiro source readiness — 2026-11-03
+
+[Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3117 Sites +42 bridge =4724 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Normal PR/main CI and new Sites publication are separate pending release receipts. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.
+
+
 ## Combined seven-agent delivery — current receipt
 
 [Final delivery and exact receipts](docs/MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md) supersede earlier pending-delivery observations. All six producer implementations are merged with their histories through PR27/31; PR32 fixes selected-proposal display. Runtime main `93312189b52fc651a3ccc659272041282b937f03`, exact main CI41550351322: **1563 Node + 2980 Sites = 4543**,0fail/skip/cancel/todo; guarded types/audits and production build pass. **Sites59 succeeded**, source503448c, exact Sites subtree97b5de1; runtime9, auth/bindings/three schedules preserved. Selected0599 remains revision43 with zero allocations; backup267/267 verified. Gmail00:00UTC run completed, but fresh unattended cloud OCR remains unverified. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5**. Real Bankgiro authorization, account/deposit proof, physical/authenticated browser acceptance and complete production recovery remain external or separately unverified limits. The following dated producer sections retain their historical scope.

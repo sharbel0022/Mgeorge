@@ -21,7 +21,7 @@ export interface BankgiroImportPreparation {
   contractVersion: '1.0';
   jobType: 'bankgiro_import';
   timezone: 'Europe/Stockholm';
-  intervalMinutes: 60;
+  intervalMinutes: number;
   enabled: boolean;
   activationAllowed: boolean;
   externalScheduleCreated: false;
@@ -29,6 +29,8 @@ export interface BankgiroImportPreparation {
 }
 export function prepareBankgiroImportSchedule(input: {
   owner: string;
+  sourceStatus?: Record<string, any>;
+  intervalMinutes?: number;
   source?: BankgiroSourceRegistration | null;
   adapters?: ReadonlyMap<string, BankgiroReportAdapter>;
   requestedEnabled?: boolean;

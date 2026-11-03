@@ -1,9 +1,12 @@
 import { createImportJobStatus } from './import-job-status.js';
+import {resolveBankgiroSource} from './bankgiro-source-registry.js';
+import {createBankgiroIngest} from './bankgiro-ingest.js';
+import {createBankgiroIngestStore} from './bankgiro-ingest-store.js';
 import { prepareBankgiroImportSchedule } from './bankgiro-import-schedule.js';
 
 type Row = Record<string, any>;
 type Database = { prepare: (query: string) => any; batch: (statements: any[]) => Promise<{ results?: Row[] }[]> };
-type Configuration = { backupEnabled?: boolean; backupConfigured?: boolean };
+type Configuration = { backupEnabled?: boolean; backupConfigured?: boolean; bankgiroConfiguration?:unknown; bankgiroSecrets?:Record<string,unknown> };
 const permanentGmail = new Set(['renewal_required', 'missing_scope', 'access_denied', 'invalid_client', 'account_mismatch', 'invalid_tokens']);
 
 /** Read one owner-scoped database snapshot. No services, queue claims or writes. */
@@ -92,7 +95,9 @@ export async function readImportJobStatuses(database: Database, owner: string, c
 
   // There is intentionally no configured real report adapter yet. This endpoint
   // accepts neither source claims nor activation flags from a browser request.
-  const bankgiroPreparation = await prepareBankgiroImportSchedule({ owner, now });
+  const source=await resolveBankgiroSource(owner,{configuration:config.bankgiroConfiguration,secrets:config.bankgiroSecrets,now:()=>now});
+  const sourceStatus=await createBankgiroIngest({source,store:source?createBankgiroIngestStore(database,{now:()=>now}):null,sink:null,now:()=>now}).status(owner);
+  const bankgiroPreparation = await prepareBankgiroImportSchedule({ owner, now,sourceStatus,intervalMinutes:source?.intervalMinutes||60 });
   const jobs = [
     createImportJobStatus({ jobType: 'bank_sync', state: bankState, lastAttemptAt: bankStarted, lastSuccessAt: bankFinished, nextAttemptAt: bankNext, leaseExpiresAt: bankLock?.expires_at, errorCode: bankError }, { now }),
     createImportJobStatus({ jobType: 'gmail_sync', state: gmailState, lastAttemptAt: gmail?.last_attempt, lastSuccessAt: gmailFinished, nextAttemptAt: gmail?.retry_after, leaseExpiresAt: gmailLock?.expires_at, errorCode: gmailError }, { now }),

@@ -10,6 +10,7 @@ export async function GET() {
     const user = await identity();
     const config = env as unknown as Record<string, string>;
     return response(await readImportJobStatuses(db(), user.userId, {
+      bankgiroConfiguration:config.BANKGIRO_SOURCE_CONFIG,bankgiroSecrets:env as unknown as Record<string,unknown>,
       backupEnabled: config.BACKUP_ENABLED === 'true',
       backupConfigured: !!env.BUCKET && /^[a-f0-9]{64}$/i.test(config.BACKUP_ENCRYPTION_KEY || ''),
     }));

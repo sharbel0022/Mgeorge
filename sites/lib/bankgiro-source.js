@@ -14,7 +14,7 @@ export function validateReportPage(page,limit){
  return {reports,nextCursor:page.nextCursor,nextPollAt:page.nextPollAt,missingReportIds:page.missingReportIds};
 }
 export function sanitizedIngestCode(error){
- const allowed=['AUTHORIZATION_BLOCKED','AUTHORIZATION_CHANGED','INVALID_PAGE','HASH_MISMATCH','IDENTITY_CONFLICT','LEASE_LOST','TIMEOUT','INVALID_ORIGINAL','INVALID_SINK_RESULT'];
+ const allowed=['AUTHORIZATION_BLOCKED','AUTHORIZATION_CHANGED','INVALID_PAGE','HASH_MISMATCH','IDENTITY_CONFLICT','LEASE_LOST','TIMEOUT','INVALID_ORIGINAL','INVALID_SINK_RESULT','RATE_LIMITED','SOURCE_UNAVAILABLE'];
  if(allowed.includes(error?.code))return error.code;
  if(error?.status===429||error?.statusCode===429)return 'RATE_LIMITED';
  return 'SOURCE_UNAVAILABLE';
@@ -37,7 +37,8 @@ export function publicBankgiroStatus(status){
  const instant=value=>typeof value==='number'&&Number.isFinite(value)&&Number.isFinite(new Date(value).getTime())?new Date(value).toISOString():null;
  const fields=['enabled','sourceId','mode','state','reason','nextPollAt','missingReportIds','lastError'];
  const result=Object.fromEntries(fields.map(key=>[key,status[key]]));
+ for(const key of ['authorization','lastSuccessAt','lastFailureAt','lastFailureCode'])if(Object.hasOwn(status,key))result[key]=status[key];
  result.counts=Object.fromEntries(['PENDING','RETRY','IMPORTED','REVIEW','DUPLICATE','BLOCKED'].filter(key=>Object.hasOwn(status.counts||{},key)).map(key=>[key,status.counts[key]]));
- result.jobs=(status.jobs||[]).map(job=>({...Object.fromEntries(['id','reportId','status','attempts'].map(key=>[key,job[key]])),nextAttemptAt:instant(job.nextAttemptAt),updatedAt:instant(job.updatedAt)}));
+ result.jobs=(status.jobs||[]).map(job=>({...Object.fromEntries(['id','reportId','status','attempts'].map(key=>[key,job[key]])),nextAttemptAt:instant(job.nextAttemptAt),updatedAt:instant(job.updatedAt),...(Object.hasOwn(job,'lastError')&&sanitizedIngestCode({code:job.lastError})===job.lastError?{lastError:job.lastError}:{})}));
  return result;
 }

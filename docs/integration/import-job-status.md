@@ -1,5 +1,7 @@
 # ImportJobStatus v1 — Agent 5 automation orchestration
 
+Current additive readiness work: [transport, trusted registration, durable authority and scheduler integration](../BANKGIRO-AUTOMATIC-SOURCE-READINESS.md). The dated producer proposal below remains historical where superseded by that receipt. Real production report access stays unconfigured.
+
 ## Scope and design
 
 Branch: `feature/mgeorge-automation-orchestration`. Runtime baseline: `73662187cddf9a5c504dea9bd8a1288bd929bc51`, verified against GitHub `main` on 2026-11-02. Delivery base: `a779b0dd8d184eaf6e6d6e636c555c967f15f3d5`, incorporating contract PR #22, six-case checkpoint PR #23 and documentation receipt PR #24. Those advances change coordinator documentation and add six synthetic Sites acceptance cases, with no production source changes. This is an additive proposal for the integration owner; it does not change provider payloads, payment references, reconciliation decisions or external schedules.

@@ -160,6 +160,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   db.exec('BEGIN IMMEDIATE');
   try{
     if(!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='bankgiro_ingest_jobs'").get())db.exec(readFileSync(new URL('../sites/drizzle/0017_bankgiro_auto_ingest.sql',import.meta.url),'utf8'));
+    if(!db.prepare('PRAGMA table_info(bankgiro_ingest_sources)').all().some(column=>column.name==='registration_revision'))db.exec(readFileSync(new URL('../sites/drizzle/0018_bankgiro_source_readiness.sql',import.meta.url),'utf8'));
     db.exec('COMMIT');
   }catch(error){db.exec('ROLLBACK');throw error;}
   return db;

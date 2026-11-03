@@ -367,7 +367,10 @@ export async function setAutomaticSync(request: Request): Promise<Response> {
 // never send the task runner's IP or browser identity to the bank as the user's.
 export async function automaticSync(request?: Request): Promise<Response> {
   const user = await identity(request);
-  return synchronizeOwner(user.userId, { automatic: true, psu: request ? psuHeaders(request) : undefined });
+  const reports=await import('../bankgiro-ingest-service');
+  const bankgiro=await reports.runBankgiroSource(user.userId);
+  const result=await synchronizeOwner(user.userId, { automatic: true, psu: request ? psuHeaders(request) : undefined });
+  return response({...await result.json() as Record<string,unknown>,bankgiro},result.status);
 }
 
 export async function automaticSyncStatus(): Promise<Response> {

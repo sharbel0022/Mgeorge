@@ -118,7 +118,7 @@ test('public source status omits private delivery and original metadata',async t
  const f=await ingestFixture(t),input=await f.prepare();f.source={id:'synthetic-source',mode:'production',authorize(){throw Error('status must not authorize');},listReports(){throw Error('status must not list');},fetchReport(){throw Error('status must not fetch');}};
  f.sql.prepare("UPDATE bankgiro_ingest_sources SET cursor='synthetic-private-cursor' WHERE owner=?").run(f.owner);
  const result=await f.service.bankgiroSourceStatus(f.owner);
- assert.deepEqual(Object.keys(result).sort(),['enabled','sourceId','mode','state','reason','nextPollAt','missingReportIds','counts','jobs','lastError'].sort());
+ assert.deepEqual(Object.keys(result).sort(),['enabled','sourceId','mode','state','reason','nextPollAt','missingReportIds','counts','jobs','lastError','authorization','lastSuccessAt','lastFailureAt','lastFailureCode'].sort());
  assert.deepEqual(Object.keys(result.jobs[0]).sort(),['id','reportId','status','attempts','nextAttemptAt','updatedAt'].sort());
  const exposed=JSON.stringify(result);for(const value of [input.job.scopeId,input.job.authorizationGeneration,input.job.sha256,input.documentId,input.job.filename,'synthetic-private-cursor'])assert.equal(exposed.includes(value),false);
 });

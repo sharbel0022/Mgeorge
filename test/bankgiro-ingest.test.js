@@ -141,3 +141,15 @@ test('Node queue replays a renamed same-format original after an ambiguous commi
 test('Node rejects a retained original relabeled as a different file format',async()=>{
  const f=fixture();try{const input=await retained(f);input.job.filename='renamed.xml';f.db.prepare('UPDATE bankgiro_ingest_jobs SET filename=? WHERE id=?').run(input.job.filename,input.job.id);await assert.rejects(()=>f.sink.importReport(input),{code:'IDENTITY_CONFLICT'});assert.equal(f.db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,0);}finally{f.db.close();}
 });
+
+test('Node production commit rejects registration revision, company binding and stored expiry races atomically',async()=>{
+ for(const assignment of ["registration_revision=2","registration_binding='other-company'","authorization_valid_until=0"]){const f=fixture();try{
+  const input=await retained(f);input.authorization.registrationBinding='company-bank-profile';input.authorization.configurationRevision=1;input.job.registrationBinding='company-bank-profile';
+  f.db.prepare('UPDATE bankgiro_ingest_sources SET registration_revision=1,registration_binding=?,authorization_valid_until=?').run(input.authorization.registrationBinding,Date.now()+60000);
+  f.db.prepare('UPDATE bankgiro_ingest_jobs SET registration_binding=?').run(input.job.registrationBinding);
+  f.db.exec(`CREATE TRIGGER production_authority_race AFTER INSERT ON import_jobs BEGIN UPDATE bankgiro_ingest_sources SET ${assignment}; END`);
+  await assert.rejects(()=>f.sink.importReport(input),{code:'AUTHORIZATION_CHANGED'});
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,0);assert.equal(f.db.prepare('SELECT COUNT(*) n FROM import_jobs').get().n,0);assert.equal(f.db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
+ }finally{f.db.close();}}
+});
+test('Node import commit binds the persisted queued authority as well as the current source',async()=>{const f=fixture();try{const input=await retained(f);input.authorization.registrationBinding='authority';input.authorization.configurationRevision=1;input.job.registrationBinding='authority';f.db.prepare('UPDATE bankgiro_ingest_sources SET registration_revision=1,registration_binding=?,authorization_valid_until=?').run('authority',Date.now()+60000);f.db.prepare('UPDATE bankgiro_ingest_jobs SET registration_binding=?').run('authority');f.db.exec("CREATE TRIGGER queued_binding_race AFTER INSERT ON import_jobs BEGIN UPDATE bankgiro_ingest_jobs SET registration_binding='other-authority'; END");await assert.rejects(()=>f.sink.importReport(input),{code:'IDENTITY_CONFLICT'});assert.equal(f.db.prepare('SELECT count(*) n FROM bank_transactions').get().n,0);}finally{f.db.close();}});
