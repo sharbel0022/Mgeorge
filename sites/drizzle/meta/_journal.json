@@ -127,6 +127,13 @@
       "when": 1793656211762,
       "tag": "0017_bankgiro_auto_ingest",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1793699045026,
+      "tag": "0018_bankgiro_source_readiness",
+      "breakpoints": true
     }
   ]
 }

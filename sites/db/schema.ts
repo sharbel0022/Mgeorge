@@ -49,18 +49,23 @@ export const bankLocks = sqliteTable('bank_locks', {
 // Report delivery state is separate from AIS connections and financial rows.
 export const bankgiroIngestSources=sqliteTable('bankgiro_ingest_sources',{
  owner:text('owner').notNull(),sourceId:text('source_id').notNull(),scopeId:text('scope_id'),
+ revokedGenerations:text('revoked_generations').notNull().default('[]'),
+ registrationRevision:integer('registration_revision').notNull().default(0),registrationBinding:text('registration_binding'),
+ authorizationVerifiedAt:integer('authorization_verified_at'),authorizationValidUntil:integer('authorization_valid_until'),
+ lastSuccessAt:integer('last_success_at'),lastFailureAt:integer('last_failure_at'),lastFailureCode:text('last_failure_code'),
  authorizationGeneration:text('authorization_generation'),authorizationStatus:text('authorization_status').notNull().default('REVIEW'),
  cursor:text('cursor'),missingReportIds:text('missing_report_ids').notNull().default('[]'),nextPollAt:integer('next_poll_at'),
  attempts:integer('attempts').notNull().default(0),lastError:text('last_error'),updatedAt:integer('updated_at').notNull(),
 },t=>[primaryKey({columns:[t.owner,t.sourceId]})]);
 export const bankgiroIngestJobs=sqliteTable('bankgiro_ingest_jobs',{
  id:text('id').primaryKey().notNull(),owner:text('owner').notNull(),sourceId:text('source_id').notNull(),scopeId:text('scope_id').notNull(),
+ registrationBinding:text('registration_binding').notNull().default(''),
  reportId:text('report_id').notNull(),sha256:text('sha256').notNull(),filename:text('filename').notNull(),availableAt:text('available_at'),
  authorizationGeneration:text('authorization_generation').notNull(),documentId:text('document_id'),status:text('status').notNull().default('PENDING'),
  attempts:integer('attempts').notNull().default(0),nextAttemptAt:integer('next_attempt_at'),lastError:text('last_error'),
  importId:text('import_id'),paymentCount:integer('payment_count').notNull().default(0),createdAt:integer('created_at').notNull(),updatedAt:integer('updated_at').notNull(),
 },t=>[
- uniqueIndex('bankgiro_ingest_jobs_owner_report_hash').on(t.owner,t.sourceId,t.scopeId,t.reportId,t.sha256),
+ uniqueIndex('bankgiro_ingest_jobs_owner_report_hash').on(t.owner,t.sourceId,t.scopeId,t.reportId,t.sha256,t.registrationBinding),
  index('bankgiro_ingest_jobs_due').on(t.owner,t.sourceId,t.status,t.nextAttemptAt),
  index('bankgiro_ingest_jobs_hash').on(t.owner,t.sha256),index('bankgiro_ingest_jobs_identity').on(t.owner,t.scopeId,t.reportId),
 ]);

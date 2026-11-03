@@ -99,13 +99,17 @@ function diskSource(reference){
   },
  };
 }
+// Exact pre-0018 rows remain authenticated historical evidence. New authority
+// fields default to unknown; restoring evidence never activates a live source.
+const readinessDefaults={bankgiro_ingest_sources:{revoked_generations:'[]',registration_revision:0,registration_binding:null,authorization_verified_at:null,authorization_valid_until:null,last_success_at:null,last_failure_at:null,last_failure_code:null},bankgiro_ingest_jobs:{registration_binding:''}};
+function historicalRow(table,row){const defaults=readinessDefaults[table];return defaults&&Object.keys(defaults).every(key=>!Object.hasOwn(row,key))?{...row,...defaults}:row;}
 function checkDatabase(database,snapshot,prefix=''){
  if(database.prepare('PRAGMA integrity_check').get().integrity_check!=='ok'||database.prepare('PRAGMA foreign_key_check').all().length)fail('database_invalid');
  for(const table of snapshot.tables){
   const actual=database.prepare('SELECT * FROM '+quote(prefix+table.name)).all();
   const fields=database.prepare('PRAGMA table_info('+quote(prefix+table.name)+')').all().map(column=>column.name);
   const canonical=rows=>rows.map(row=>JSON.stringify(fields.map(field=>row[field]))).sort();
-  if(JSON.stringify(canonical(actual))!==JSON.stringify(canonical(table.rows)))fail('database_mismatch');
+  if(JSON.stringify(canonical(actual))!==JSON.stringify(canonical(table.rows.map(row=>historicalRow(table.name,row)))))fail('database_mismatch');
  }
 }
 function evidenceDatabase(snapshot){
@@ -123,7 +127,8 @@ function evidenceDatabase(snapshot){
    if(!BACKUP_TABLES.includes(table.name))fail('schema_invalid');
    const columns=database.prepare('PRAGMA table_info('+quote(table.name)+')').all(),names=columns.map(column=>column.name);
    const insert=database.prepare('INSERT INTO '+quote(table.name)+' ('+names.map(quote).join(',')+') VALUES ('+names.map(()=>'?').join(',')+')');
-   for(const row of table.rows){
+   for(const original of table.rows){
+    const row=historicalRow(table.name,original);
     if(Object.keys(row).length!==names.length||names.some(name=>!Object.hasOwn(row,name)))fail('schema_invalid');
     for(const column of columns){
      const value=row[column.name];

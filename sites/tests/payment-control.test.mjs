@@ -26,7 +26,7 @@ async function fixture(t){
  const bank=data(`const f=${ref};export async function syncControl(){f.calls.push('bank');if(f.bankError)throw f.bankError;return Response.json(f.bankResult);}`);
  const messages=data(`const f=${ref};export async function reconcileAndPrepare(){f.calls.push('reconcile');return {automatic:1};}export async function messageList(){return {items:f.messages};}`);
  const evidence=moduleUrl('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':new URL('../lib/reconciliation-engine.js',import.meta.url).href});
- f.api=await import(moduleUrl('../lib/payment-control.ts',{'./reconciliation-evidence':evidence,'./server':server,'./domain':domain,'./gmail-service':gmail,'./document-processing':docs,'./banking/service':bank,'./customer-messages':messages,'./payment-overview':moduleUrl('../lib/payment-overview.ts',{'./domain':domain,'./reconciliation':reconciliation})}));
+ f.api=await import(moduleUrl('../lib/payment-control.ts',{'./reconciliation-evidence':evidence,'./server':server,'./domain':domain,'./gmail-service':gmail,'./document-processing':docs,'./banking/service':bank,'./bankgiro-ingest-service':data(`const f=${ref};export async function runBankgiroSource(owner){if(f.reportEnabled){f.calls.push('reports');f.reportOwner=owner;}return {enabled:!!f.reportEnabled,state:'DISABLED'};}`),'./customer-messages':messages,'./payment-overview':moduleUrl('../lib/payment-overview.ts',{'./domain':domain,'./reconciliation':reconciliation})}));
  f.call=async(action,body={},method='POST',requestOrigin=origin)=>{try{return await f.api.paymentControlAction(request(action,body,method,requestOrigin),action.split('?')[0]);}catch(e){return f.api.controlFailure(e);}};
  f.start=async(id='request_000000000001')=>(await (await f.call('run',{request_id:id})).json()).job;
  f.advance=async id=>(await (await f.call('advance',{id})).json()).job;
@@ -131,3 +131,5 @@ for(const phase of ['running','final'])test(`a replacement control lease survive
  assert.deepEqual(f.sql.prepare('SELECT * FROM payment_control_runs').get(),replacement);
  assert.deepEqual(f.calls,phase==='running'?[]:['gmail']);
 });
+
+test('existing bank control stage dispatches canonical reports even when AIS is unavailable',async t=>{const f=await fixture(t);f.reportEnabled=true;await f.finish((await f.start()).id);assert.equal(f.reportOwner,f.owner);assert.deepEqual(f.calls,['documents','reports','reconcile','reconcile']);});

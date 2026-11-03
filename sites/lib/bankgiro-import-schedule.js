@@ -7,11 +7,18 @@ import { createImportJobStatus } from './import-job-status.js';
  * This function neither downloads reports nor creates/edits an automation.
  */
 export async function prepareBankgiroImportSchedule({
-  owner, source = null, adapters = new Map(), requestedEnabled = false, now = Date.now,
+  owner, sourceStatus, intervalMinutes=60, source = null, adapters = new Map(), requestedEnabled = false, now = Date.now,
 }) {
   if (typeof owner !== 'string' || !owner) throw new TypeError('An authenticated owner is required');
   const clock = typeof now === 'function' ? now : () => now;
   let at = clock();
+  if(sourceStatus){
+    const live=sourceStatus.authorization?.status==='VERIFIED'&&Date.parse(sourceStatus.authorization.validUntil)>at;
+    const errorCode=!sourceStatus.enabled?'source_not_configured':!live?'source_not_authorized':sourceStatus.lastError||(sourceStatus.state==='BLOCKED'?'queue_failed':null);
+    const state=!sourceStatus.enabled||!live||sourceStatus.state==='BLOCKED'?'blocked':sourceStatus.state==='RUNNING'?'running':sourceStatus.state==='BACKOFF'?'retry_wait':errorCode?'blocked':sourceStatus.lastSuccessAt?'succeeded':'queued';
+    return {contractVersion:'1.0',jobType:'bankgiro_import',timezone:'Europe/Stockholm',intervalMinutes,enabled:sourceStatus.enabled&&live,activationAllowed:live,externalScheduleCreated:false,jobStatus:createImportJobStatus({jobType:'bankgiro_import',state,lastSuccessAt:sourceStatus.lastSuccessAt,nextAttemptAt:sourceStatus.nextPollAt,leaseExpiresAt:sourceStatus.leaseExpiresAt,errorCode},{now:at})};
+  }
+
   if (!Number.isFinite(at)) throw new TypeError('Invalid preparation clock');
   let errorCode = null;
   if (!source?.id || !source?.adapterId) errorCode = 'source_not_configured';

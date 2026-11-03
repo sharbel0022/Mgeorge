@@ -27,13 +27,14 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
   if(!owner||lease?.owner!==owner)throw blocked('AUTHORIZATION_BLOCKED');
   const lock=db.prepare('SELECT token,expires_at FROM bankgiro_ingest_leases WHERE owner=?').get(owner);
   if(!lock||lock.token!==lease.token||lock.expires_at<=now()||lease.until<=now())throw blocked('LEASE_LOST');
+  if(authorization?.registrationBinding&&!db.prepare("SELECT 1 FROM bankgiro_ingest_sources WHERE owner=? AND source_id=? AND registration_binding=? AND registration_revision=? AND authorization_status='VERIFIED' AND authorization_valid_until>?").get(owner,authorization.sourceId,authorization.registrationBinding,authorization.configurationRevision,now()))throw blocked('AUTHORIZATION_CHANGED');
   if(authorization&&(authorization.owner!==owner||authorization.status!=='VERIFIED'||Date.parse(authorization.validUntil)<=now()||!Number.isFinite(Date.parse(authorization.validUntil))))throw blocked('AUTHORIZATION_BLOCKED');
  }
  function write(owner,lease,operation,authorization,assertOriginal=()=>{}){
   db.exec('BEGIN IMMEDIATE');try{guard(owner,lease,authorization);assertOriginal();const result=operation();guard(owner,lease,authorization);assertOriginal();db.exec('COMMIT');return result;}catch(error){db.exec('ROLLBACK');throw error;}
  }
  return {
-  async retain({owner,report,bytes,sha256,lease}){
+  async retain({owner,report,bytes,sha256,lease,authorization}){
    if(digest(bytes)!==sha256||report.sha256!==sha256)throw blocked('HASH_MISMATCH');
    return write(owner,lease,()=>{
     const old=db.prepare("SELECT id,metadata,content FROM documents WHERE fingerprint=? AND source='bankgiro_source'").all(sha256).find(row=>JSON.parse(row.metadata).owner===owner);
@@ -41,14 +42,15 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
     const id=randomUUID();
     db.prepare('INSERT INTO documents(id,name,mime_type,content,fingerprint,source,metadata,status) VALUES(?,?,?,?,?,?,?,?)').run(id,report.filename,mimeFor(report.filename),Buffer.from(bytes),sha256,'bankgiro_source',JSON.stringify({owner,reportId:report.reportId,sha256}),'bank_report');
     return {documentId:id};
-   });
+   },authorization);
   },
   async importReport({owner,job,documentId,authorization,lease}){
    const assertOriginal=()=>{
    guard(owner,lease,authorization);
+   if(authorization.registrationBinding&&job.registrationBinding!==authorization.registrationBinding)throw blocked('AUTHORIZATION_CHANGED');
    if(job.owner!==owner||job.documentId!==documentId||authorization.sourceId!==job.sourceId||authorization.scopeId!==job.scopeId||authorization.generation!==job.authorizationGeneration||!authorization.evidenceId)throw blocked('AUTHORIZATION_CHANGED');
    if(!db.prepare("SELECT 1 FROM bankgiro_ingest_sources WHERE owner=? AND source_id=? AND scope_id=? AND authorization_generation=? AND authorization_status='VERIFIED'").get(owner,job.sourceId,job.scopeId,job.authorizationGeneration))throw blocked('AUTHORIZATION_CHANGED');
-   const persisted=db.prepare("SELECT id FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND status IN ('PENDING','RETRY')").get(job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration);
+   const persisted=db.prepare("SELECT id FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND registration_binding=? AND status IN ('PENDING','RETRY')").get(job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration,job.registrationBinding??'');
    if(!persisted)throw blocked('IDENTITY_CONFLICT');
    const document=db.prepare("SELECT * FROM documents WHERE id=? AND source='bankgiro_source'").get(documentId);
    // Delivery names can change on replay. The owned bytes identify the original;

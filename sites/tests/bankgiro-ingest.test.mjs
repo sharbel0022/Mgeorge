@@ -9,6 +9,7 @@ const stores=await import('../lib/bankgiro-ingest-store.js').catch(()=>null);
 function fixture(t,source=syntheticSource(),options={}){
  assert.equal(typeof engine?.createBankgiroIngest,'function','shared ingest engine must exist');
  const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());sql.exec(readFileSync(new URL('../drizzle/0017_bankgiro_auto_ingest.sql',import.meta.url),'utf8'));
+ sql.exec(readFileSync(new URL('../drizzle/0018_bankgiro_source_readiness.sql',import.meta.url),'utf8'));
  sql.exec('CREATE TABLE originals(id TEXT PRIMARY KEY,owner TEXT,sha256 TEXT,bytes BLOB); CREATE TABLE imported(owner TEXT,sha256 TEXT,payload TEXT,UNIQUE(owner,sha256));');
  const DB={prepare(query){let args=[];const stmt={bind(...v){args=v;return stmt;},async first(){return sql.prepare(query).get(...args)||null;},async all(){return {results:sql.prepare(query).all(...args)};},async run(){return {meta:{changes:sql.prepare(query).run(...args).changes}};}};return stmt;},async batch(stmts){sql.exec('BEGIN');try{const out=[];for(const stmt of stmts)out.push(await stmt.run());sql.exec('COMMIT');return out;}catch(e){sql.exec('ROLLBACK');throw e;}}};
  const f={sql,DB,source,clock:Date.parse('2026-11-02T00:00:00Z'),lostResponse:false};const now=()=>f.clock;

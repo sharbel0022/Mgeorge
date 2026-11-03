@@ -5,23 +5,26 @@ const hash=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
 
 /** Bind each retained original to its own owner/source/scope/report identity.
  * Unlinked manual originals do not acquire a new source requirement. */
-export function projectBankgiroSourceEvidence({owner,originals,sources,jobs}){
+export function projectBankgiroSourceEvidence({owner,originals,sources,jobs,now=Date.now()}){
  if(!text(owner)||![originals,sources,jobs].every(Array.isArray))throw Error('BANKGIRO_SOURCE_SNAPSHOT_INCOMPLETE');
  const ownedJobs=jobs.filter(row=>row?.owner===owner),ownedSources=sources.filter(row=>row?.owner===owner);
  const reports=[],snapshot=[];
  for(const original of originals){
-  const anchors=ownedJobs.filter(job=>text(original.documentId)&&job.document_id===original.documentId||text(original.importId)&&job.import_id===original.importId);
+  const candidates=ownedJobs.filter(job=>text(original.documentId)&&job.document_id===original.documentId||text(original.importId)&&job.import_id===original.importId);
+  const currentAnchors=candidates.filter(job=>ownedSources.some(source=>source.authorization_status==='VERIFIED'&&(!Number(source.registration_revision)||source.authorization_valid_until>now)&&source.source_id===job.source_id&&source.scope_id===job.scope_id&&source.authorization_generation===job.authorization_generation&&(!Number(source.registration_revision)||source.registration_binding===job.registration_binding)));
+  const anchors=currentAnchors.length?currentAnchors:candidates;
   let issue='';const hold=code=>{if(!issue)issue=code;};
   const dependencies=new Map(),authorities=new Map();
   for(const anchor of anchors){
-   const identity=ownedJobs.filter(job=>job.source_id===anchor.source_id&&job.scope_id===anchor.scope_id&&job.report_id===anchor.report_id);
-   for(const job of identity)dependencies.set(job.id,job);
+   const history=ownedJobs.filter(job=>job.source_id===anchor.source_id&&job.scope_id===anchor.scope_id&&job.report_id===anchor.report_id);
+   const identity=history.filter(job=>job.authorization_generation===anchor.authorization_generation&&job.registration_binding===anchor.registration_binding);
+   for(const job of history)dependencies.set(job.id,job);
    const current=ownedSources.filter(source=>source.source_id===anchor.source_id);
    for(const source of current)authorities.set(source.source_id,source);
    const source=current[0];
-   if(current.length!==1||source.authorization_status!=='VERIFIED'||source.scope_id!==anchor.scope_id||source.authorization_generation!==anchor.authorization_generation)hold('BANKGIRO_SOURCE_AUTHORIZATION_CHANGED');
+   if(current.length!==1||Number(source?.registration_revision)>0&&(!(source.authorization_verified_at>0&&source.authorization_verified_at<=now&&source.authorization_valid_until>now)||!text(source.registration_binding)||source.registration_binding!==anchor.registration_binding)||source.authorization_status!=='VERIFIED'||source.scope_id!==anchor.scope_id||source.authorization_generation!==anchor.authorization_generation)hold('BANKGIRO_SOURCE_AUTHORIZATION_CHANGED');
    if(![anchor.source_id,anchor.scope_id,anchor.report_id,anchor.authorization_generation,anchor.document_id].every(text)||!hash(original.sha256)||anchor.sha256!==original.sha256||original.intact===false||text(original.importId)&&anchor.import_id!==original.importId)hold('BANKGIRO_SOURCE_ORIGINAL_CONFLICT');
-   if(identity.some(job=>!hash(job.sha256)||job.sha256!==original.sha256))hold('BANKGIRO_SOURCE_IDENTITY_CONFLICT');
+   if(history.some(job=>!hash(job.sha256)||job.sha256!==original.sha256))hold('BANKGIRO_SOURCE_IDENTITY_CONFLICT');
    if(identity.some(job=>!terminal.has(job.status)||job.last_error))hold('BANKGIRO_SOURCE_REPORT_INCOMPLETE');
    if(source){
     let missing;try{missing=JSON.parse(source.missing_report_ids);}catch{}

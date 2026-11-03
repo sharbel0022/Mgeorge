@@ -11,8 +11,8 @@ import {resolveBankgiroSource} from './bankgiro-source-registry.js';
 
 type Lease={owner:string;token:string;until:number;assert():Promise<void>;fence():D1PreparedStatement;write(statements:D1PreparedStatement[]):Promise<unknown>};
 type Report={reportId:string;filename:string;sha256:string};
-type Job=Report&{id:string;owner:string;sourceId:string;scopeId:string;documentId:string;authorizationGeneration:string};
-type Authorization={status:string;owner:string;sourceId:string;scopeId:string;generation:string;validUntil:string;evidenceId:string};
+type Job=Report&{registrationBinding?:string;id:string;owner:string;sourceId:string;scopeId:string;documentId:string;authorizationGeneration:string};
+type Authorization={registrationBinding?:string;configurationRevision?:number;status:string;owner:string;sourceId:string;scopeId:string;generation:string;validUntil:string;evidenceId:string};
 type ImportInput={owner:string;job:Job;documentId:string;authorization:Authorization;lease:Lease};
 type Outcome={status:'IMPORTED'|'REVIEW'|'DUPLICATE';importId?:string;paymentCount:number};
 const error=(code:string,message:string)=>Object.assign(Error(message),{code});
@@ -41,6 +41,7 @@ function ownerLease(owner:string,lease:Lease){
 }
 function checkAuthorization({owner,job,documentId,authorization,lease}:ImportInput){
  ownerLease(owner,lease);
+ if(authorization.registrationBinding&&job.registrationBinding!==authorization.registrationBinding)throw error('AUTHORIZATION_CHANGED','Rapportkällans registrering har ändrats.');
  if(job.owner!==owner||job.documentId!==documentId||authorization.status!=='VERIFIED'||authorization.owner!==owner||authorization.sourceId!==job.sourceId||authorization.scopeId!==job.scopeId||authorization.generation!==job.authorizationGeneration||!authorization.evidenceId||!(Date.parse(authorization.validUntil)>Date.now()))throw error('AUTHORIZATION_CHANGED','Rapportkällans behörighet eller identitet har ändrats. Kontrollera källan igen.');
  if(!/^[a-f0-9]{64}$/.test(job.sha256))throw originalError();
 }
@@ -80,7 +81,7 @@ export function createSitesBankgiroSink(){
  }
  function jobStatement(input:ImportInput){
   const {owner,job,documentId}=input;
-  return database.prepare("SELECT id FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND status IN ('PENDING','RETRY')").bind(job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration);
+  return database.prepare("SELECT id FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND registration_binding=? AND status IN ('PENDING','RETRY')").bind(job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration,job.registrationBinding??'');
  }
  async function assertCurrentAuthorization(input:ImportInput){
   const {owner,job,authorization}=input;
@@ -91,7 +92,7 @@ export function createSitesBankgiroSink(){
  async function commit(input:ImportInput,original:Awaited<ReturnType<typeof readBankOriginalBytes>>,old:Awaited<ReturnType<typeof readWorkspace>>,state:State,payload:string,action:string,detail:Record<string,unknown>,auditId=uid()){
   checkAuthorization(input);await input.lease.assert();
   const {owner,job,documentId,authorization,lease}=input,at=now();
-  const originalFence=database.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND filename=? AND mime=? AND size=?) AND EXISTS(SELECT 1 FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND status IN ('PENDING','RETRY')) AND EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE owner=? AND source_id=? AND scope_id=? AND authorization_generation=? AND authorization_status='VERIFIED') AND julianday(?)>julianday('now') THEN 1 ELSE json('BANKGIRO_ORIGINAL_CHANGED') END").bind(owner,documentId,job.sha256,original.filename,original.mime,original.size,job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration,owner,job.sourceId,job.scopeId,authorization.generation,authorization.validUntil);
+  const originalFence=database.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND filename=? AND mime=? AND size=?) AND EXISTS(SELECT 1 FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND registration_binding=? AND status IN ('PENDING','RETRY')) AND EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE owner=? AND source_id=? AND scope_id=? AND authorization_generation=? AND authorization_status='VERIFIED') AND julianday(?)>julianday('now') THEN 1 ELSE json('BANKGIRO_ORIGINAL_CHANGED') END").bind(owner,documentId,job.sha256,original.filename,original.mime,original.size,job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration,job.registrationBinding??'',owner,job.sourceId,job.scopeId,authorization.generation,authorization.validUntil);
   const statements=[lease.fence(),originalFence,
    database.prepare('INSERT OR IGNORE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(owner,JSON.stringify(emptyState()),at),
    database.prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(auditId,owner,old.revision+1,action,JSON.stringify(detail),at,owner,old.revision),
@@ -145,7 +146,7 @@ export function createSitesBankgiroSink(){
 }
 
 async function sourceWorker(owner:string){
- const source=await resolveBankgiroSource(owner) as {id:string;mode:string}|null;
+ const source=await resolveBankgiroSource(owner,{configuration:(env as unknown as Record<string,unknown>).BANKGIRO_SOURCE_CONFIG,secrets:env as unknown as Record<string,unknown>}) as {id:string;mode:string}|null;
  // An absent or synthetic source must not require D1/R2 or create a lease.
  if(!source||source.mode==='synthetic')return createBankgiroIngest({source,store:null,sink:null});
  return createBankgiroIngest({source,store:createBankgiroIngestStore(db()),sink:createSitesBankgiroSink()});

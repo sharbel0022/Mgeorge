@@ -13,7 +13,7 @@ const errorCodes = new Set([
   'retry_after_unknown', 'worker_unconfirmed',
 ]);
 const aliases = new Map([
-  ['BANK_RATE_LIMIT', 'provider_rate_limited'], ['BANK_LEASE_LOST', 'lease_lost'],
+  ['RATE_LIMITED', 'provider_rate_limited'], ['SOURCE_UNAVAILABLE','provider_error'], ['TIMEOUT','timeout'], ['BANK_RATE_LIMIT', 'provider_rate_limited'], ['BANK_LEASE_LOST', 'lease_lost'],
   ['integration_lease_lost', 'lease_lost'], ['gmail_lease_lost', 'lease_lost'],
   ['lease_expired', 'lease_lost'], ['backup_lease_lost', 'lease_lost'],
   ['BANK_TIMEOUT', 'timeout'], ['parse_timeout', 'timeout'],

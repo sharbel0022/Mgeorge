@@ -144,3 +144,12 @@ test('Gmail retry evidence cannot appear successful when timestamps coincide or 
   f.sql.prepare('UPDATE gmail_connections SET sync_failures=0').run();
   assert.equal((await f.read()).jobs.find(j=>j.jobType==='gmail_sync').state,'retry_wait');
 });
+
+test('stored source receipt preparation is read-only and uses actual acknowledged success',async()=>{
+ const {prepareBankgiroImportSchedule}=await import('../lib/bankgiro-import-schedule.js');let calls=0;
+ const sourceStatus={enabled:true,state:'IDLE',authorization:{status:'VERIFIED',verifiedAt:past,validUntil:future},lastSuccessAt:past,lastFailureAt:null,lastFailureCode:null,nextPollAt:future,counts:{}};
+ const result=await prepareBankgiroImportSchedule({owner:'synthetic-owner',sourceStatus,intervalMinutes:15,adapters:new Map([['poison',{verifySource(){calls++;throw Error('must not call')}}]]),now});
+ assert.equal(result.enabled,true);assert.equal(result.jobStatus.lastSuccessAt,past);assert.equal(result.intervalMinutes,15);assert.equal(calls,0);
+});
+
+test('stored report preparation preserves current blocked jobs and retry semantics over older success',async()=>{const {prepareBankgiroImportSchedule}=await import('../lib/bankgiro-import-schedule.js');const base={enabled:true,authorization:{status:'VERIFIED',validUntil:future},lastSuccessAt:past,nextPollAt:future};const blocked=await prepareBankgiroImportSchedule({owner:'synthetic-owner',sourceStatus:{...base,state:'BLOCKED',counts:{BLOCKED:1},lastError:null},now});assert.equal(blocked.jobStatus.state,'blocked');const retry=await prepareBankgiroImportSchedule({owner:'synthetic-owner',sourceStatus:{...base,state:'BACKOFF',lastError:'RATE_LIMITED'},now});assert.equal(retry.jobStatus.state,'retry_wait');assert.equal(retry.jobStatus.errorCode,'provider_rate_limited');});
