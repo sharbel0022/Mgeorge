@@ -21,6 +21,18 @@ test('a verified C4 decision is visibly a separate unapproved proposal without a
  assert.doesNotMatch(html,/Verifierad betalning|Betald|<form|<button|Godkänn|Registrera betalning/);assert.deepEqual(value,before);
 });
 
+test('a verified selected proposal remains visible when only an unrelated decision is blocked',()=>{
+ const result=preview({status:'BLOCKED',decisions:[decision(),decision({transactionId:'unrelated-payment',status:'BLOCKED',bankEvidenceStatus:'BLOCKED',reasonCodes:['ORIGINAL_MISSING_OR_INVALID'],allocations:[],unallocatedMinor:62500})]}),before=structuredClone(result);
+ const html=render({result});
+ assert.match(html,/Underlaget stöder ett förslag/);assert.match(html,/Faktura 0599/);assert.match(html,/625,00/);assert.match(html,/separat godkännande krävs/);
+ assert.doesNotMatch(html,/Blockerat förslag|Bankoriginalet saknas|Verifierad betalning/);assert.deepEqual(result,before);
+});
+
+test('snapshot-wide errors block a selected verified proposal and hide its allocations',()=>{
+ const html=render({result:preview({status:'BLOCKED',reasonCodes:['INVALID_SNAPSHOT_SCOPE']})});
+ assert.match(html,/Blockerat förslag/);assert.doesNotMatch(html,/Faktura 0599|625,00|Underlaget stöder/);
+});
+
 test('manual or missing policy decisions show a concrete pending control, not a paid label',()=>{
  for(const [status,code,reason]of [['REVIEW','MANUAL_REPORT_RELATION',/manuell.*underlagsrelation/i],['BLOCKED','REFERENCE_POLICY_REQUIRED',/företagsregel.*referens/i]]){
   const html=render({result:preview({status,selectedStatus:status,decisions:[decision({status,reasonCodes:[code],allocations:[],unallocatedMinor:62500})]})});
