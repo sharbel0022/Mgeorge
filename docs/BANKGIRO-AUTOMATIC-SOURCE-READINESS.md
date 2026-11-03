@@ -1,6 +1,6 @@
 # Bankgiro automatic source readiness — 2026-11-03
 
-**Release receipt in progress.** Start main:`d91ec6c45acc07c15b82b815ffaa305d6d213656`; local code freeze:`63554ac31bf676baf7685d5c07119d39c6f1f7a6`. Exact integrated main/CI and new Sites deployment receipts are added after the normal PR gates. This completes generic internal development for the supported transports, not a claim of company-specific bank approval or a real bank download.
+**Delivered and published.** Start main: `d91ec6c45acc07c15b82b815ffaa305d6d213656`; final runtime main: `c367fcd94594db8aa892bc900a813177ec498d04` through ordinary merge of [PR #34](https://github.com/sharbel0022/Mgeorge/pull/34). Exact PR/push/main CI passed; Sites **60** succeeded. A documentation-only follow-up records these receipts without changing the published runtime. This completes generic internal development for the supported transports, not a claim of company-specific bank approval or a real bank download.
 
 [Design](superpowers/specs/2026-11-03-bankgiro-source-readiness-design.md), [plan](superpowers/plans/2026-11-03-bankgiro-source-readiness.md), [execution ledger](integration/bankgiro-readiness-ledger.md). No endpoint, credential, bank profile or entitlement is invented.
 
@@ -29,7 +29,7 @@ Exact original bytes, SHA256, source/report identity, arrival/availability and i
 
 ## Verification and resolved findings
 
-Final local full verification: **1565 Node +3121 Sites +47 bridge =4733 passed;0failed,0skipped,0cancelled,0todo**. Root/Sites ran on Node24.22.1; the isolated bridge full suite also ran on the exact supported Node22.13.0 floor. Guarded TypeScript,136-file root syntax plus bridge syntax and production build pass. Root/Sites production/bridge audits are0; full Sites retains16 inherited moderate development findings,0high/critical. Dependency inputs are locked and unchanged in root/Sites. Exact PR/main CI and publication receipts remain pending below. Clean restored baseline was1563Node+2980Sites=4543,0fail/skip/cancel/todo. Final production-source code is independently reviewed at local freeze63554ac with no remaining Critical/Important blockers. Focused suites overlap the full suites and are not added to the final total.
+Final local full verification: **1565 Node +3121 Sites +47 bridge =4733 passed;0failed,0skipped,0cancelled,0todo**. Root/Sites ran on Node24.22.1; the isolated bridge full suite also ran on the exact supported Node22.13.0 floor. Guarded TypeScript,136-file root syntax plus bridge syntax and production build pass. Root/Sites production/bridge audits are0; full Sites retains16 inherited moderate development findings,0high/critical. Dependency inputs are locked and unchanged in root/Sites. Exact PR/push/main CI and publication receipts are recorded below. Clean restored baseline was1563Node+2980Sites=4543,0fail/skip/cancel/todo. Final production-source code is independently reviewed at local freeze63554ac with no remaining Critical/Important blockers. Focused suites overlap the full suites and are not added to the final total.
 
 Actual synthetic end-to-end tests join a local SSH/SFTP server, pinned/authenticated bridge, normalized HTTPS adapter, real SQLite-backed D1 queue, retained originals, real parser/domain sink, read-only C4 preview and payment/status rendering. The only network substitute in the full chain maps one exact fictional HTTPS origin to the real private loopback HTTP listener; it does not verify a deployed TLS proxy or bank server. The chain preserves original bytes and intended/observed0599, one economic deposit and zero allocations. A changed upstream original retains both bridge blobs, blocks the queue as IDENTITY_CONFLICT, leaves cursor and application originals/workspace/audit unchanged, and exposes review status rather than endless retry.
 
@@ -83,13 +83,39 @@ Existing backup:267/267 files verified,91664627bytes, manifest_pass2026-11-02T23
 
 Swedbank must still provide actual company entitlement, legal entity/account/Bankgiro scope and account aliases, the chosen SFTP/approved-provider channel and authentication/security arrangement, authenticated server identity, exact profile/MIG/XSD/Envelope/security requirements and approved originals, stable report/payment/deposit identities, individual payer/reference coverage, replay/retention/late-delivery/rate-limit/gap rules and operating cadence. The supplied generic transports need deployment configuration and real acceptance for supported protocols; a bank-specific proprietary wrapper/authentication outside them requires a separately reviewed adapter after its specification is known. It is not fabricated in advance.
 
+## Exact release and post-publication receipts
+
+| Gate | Verified receipt |
+| --- | --- |
+| Start main | `d91ec6c45acc07c15b82b815ffaa305d6d213656` |
+| Final feature head | `944fe16f864b55b3762b31ff808bded9d6e34c16`; tree `fdef4131476c963d25c4dfe03dfc9ea6ab8493ee` exactly matched the locally verified tree. |
+| PR #34 CI | [41621290758](https://github.com/sharbel0022/Mgeorge/actions/runs/41621290758), all three jobs success; push [41621284729](https://github.com/sharbel0022/Mgeorge/actions/runs/41621284729) also success. |
+| Final runtime main | `c367fcd94594db8aa892bc900a813177ec498d04`, ordinary merge2026-11-03T10:44:43Z; no force push. Independent fresh audit at18:57UTC confirmed main identical, zero unresolved PR threads. |
+| Main CI | [41621802705](https://github.com/sharbel0022/Mgeorge/actions/runs/41621802705), all three jobs success. Logs confirm1565 Node +3121 Sites +47 bridge,0fail/skip/cancel/todo, types/audits/build success. |
+| Sites source | `0b0aa755444cd0782bcd24d8f81bfb837d4f6ca5`; clean pushed source tree `145fe442d133e1afb2e2d347a343fcc7b71be599` equals approved main's `sites/` tree, all450 source files checked. Packaged output uses the same exact verified build inputs. |
+| Saved Sites version | **60**, saved source independently reread; archive SHA256 `22b854f49e22d373b334928848efb01d62f0fc777af26bb664508c23f9307288`,467 files,48476160 bytes. |
+| Deployment | `appgdep_6ae9bc63a0e88191a2ad484ec41a1abb`, succeeded2026-11-03T10:50:39Z, environment revision9; current version still60 at the18:57UTC check. |
+| Current production URL | [MG Fakturakoll](https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site). Sites returned this canonical URL for the existing project; the earlier URL contained `asdasdsa213`. No new project was created and reachability of the earlier alias is not claimed. |
+| Rollback | Saved version59/source `503448c869fa0385681ac8beee4e20d61ce25a6a` retained and inspected before publication; no restore performed. |
+
+Production postchecks were delayed by a long execution interruption; they are observations at approximately18:57UTC, not an immediate no-drift deployment comparison. Read-only authenticated status and evidence tools confirm:
+
+- Same project, auth client/access policy revision2, DB/R2 configuration and29 user tables; environment revision9/17 entries. `BANKGIRO_SOURCE_CONFIG` remains absent. No secret/configuration update was made.
+- Additive migration0018 is live: source authority/history/receipt columns and job registration binding are present. Sources and jobs are both empty with `has_more=false`. Live status is `DISABLED / SOURCE_NOT_CONFIGURED`, authorization `UNKNOWN`, no success/failure receipt and all queue counts zero.
+- Selected0599 AIS/report evidence is complete/current with `changed=false`. Workspace revision advanced45→46 during the elapsed operating period; selected amounts remain62500 öre each, economic counts1+0, no booked invoice or allocation, automaticEligible=false, same account/deposit/customer blocks and intact retained originals. General0599 remains distinct from formal bank OCR. This is a scoped comparison, not a claim that every production balance was audited or the whole workspace stayed byte-identical. No production financial test mutation was invoked.
+- Bank AIS remains enabled/connected without error: last successful fetch14:10:00.752UTC, next eligibility20:06UTC. This is unrelated to report-source authorization.
+- All three original schedule IDs/cadences remain present. Bank and backup are enabled; **Gmail is now disabled**, whereas it was enabled at preflight. No schedule mutation was invoked by this delivery; the cause/time of the external state change is not established, and it was not silently re-enabled. Gmail nevertheless has a recent fetch receipt18:38:10.461UTC and completed system-entrypoint observation18:38:20.842UTC. Local/cloud OCR worker freshness is false at postcheck,343 items need review; successful fetching does not establish unattended OCR completion.
+- Backup receipt remains complete267/267 verified files with no error, same fixed manifest_pass receipt and retained-API scope. It does not certify later arrivals or complete production disaster recovery.
+
+No live authenticated browser acceptance or real bank/TLS-proxy acceptance is claimed. UI acceptance here is the actual-component synthetic rendering/interaction suite plus live authenticated read-only API status. The bridge remains an undeployed isolated package until real transport identity, private storage, TLS/egress controls and bank approval are supplied.
+
 ## Release distinctions
 
 | Status | Current receipt |
 | --- | --- |
-| KOD KLAR |YES — reviewed generic code and all final local gates; exact PR/main CI receipt remains a separate release gate. |
+| KOD KLAR |YES — reviewed generic code, final local gates, exact PR/push/main CI and ordinary PR #34 merge. |
 | SYNTHETISK END-TO-END KLAR |YES — actual local SSH/SFTP through retained payment/status view; no bank/TLS-proxy certification. |
-| SITES PUBLICERAD |Existing59; new reviewed code publication pending. |
+| SITES PUBLICERAD |YES — version60 succeeded at2026-11-03T10:50:39Z; exact approved Sites tree and saved source verified. |
 | VERKLIG BANKKÄLLA ANSLUTEN |NO — actual channel/entitlement/profile/identity still external. |
 | AUTOMATISK PRODUKTIONSHÄMTNING VERIFIERAD |NO — no authorized real original/download receipt. |
 
