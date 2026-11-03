@@ -66,7 +66,10 @@ type ViewProps=Props&{result:Preview|null;loading?:boolean;error?:string;retry?:
 export function ReconciliationProposalView({transactionId,revision,invoices=[],demo=false,result,loading=false,error='',retry}:ViewProps){
  const valid=result&&validReconciliationProposal(result,transactionId,revision),selected=valid?result.decisions.find(decision=>decision.transactionId===transactionId):undefined;
  const expired=!!selected?.evidenceValidUntil&&Date.parse(selected.evidenceValidUntil)<=Date.now();
- const combined=expired||valid&&result.status==='BLOCKED'?'BLOCKED':selected?.status,reasonCodes=valid?[...new Set([...result.reasonCodes,...(selected?.reasonCodes||[])])]:[];
+ // Overall status includes unrelated decisions; only top-level reason codes
+ // describe errors in the shared snapshot that block this selected proposal.
+ const snapshotBlocked=valid&&result.reasonCodes.length>0;
+ const combined=expired||snapshotBlocked?'BLOCKED':selected?.status,reasonCodes=valid?[...new Set([...result.reasonCodes,...(selected?.reasonCodes||[])])]:[];
  return <section className="payment-verification" aria-label="Separat avstämningsförslag"><h3>Avstämningsförslag · separat godkännande krävs</h3>
   <p>Läsande förhandsgranskning · inga saldon ändras. Förslaget är inte ett godkännande eller en registrerad betalning.</p>
   {demo?<p>Demoläget läser inga avstämningsförslag från sparade bankunderlag.</p>:error?<p role="alert">{error}</p>:loading?<p role="status" aria-busy="true">Läser avstämningsförslaget…</p>:!valid||!selected?<p role="alert">Avstämningsförslaget kunde inte verifieras.</p>:<>
