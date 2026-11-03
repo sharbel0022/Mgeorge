@@ -1,6 +1,6 @@
 # Seven-agent combined delivery ledger
 
-The implementation brief is the user-provided seven-agent completion task of 2026-11-02. All financial acceptance reads are read-only; all write tests use isolated synthetic data. This ledger records an active run and is not a completion claim.
+The implementation brief is the user-provided seven-agent completion task of 2026-11-02. All financial acceptance reads are read-only; all write tests use isolated synthetic data. The final scoped results and production limits are recorded in [the final delivery receipt](../MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md).
 
 ## Execution and gates
 
@@ -15,10 +15,10 @@ The implementation brief is the user-provided seven-agent completion task of 202
 - [x] Seven joined new-producer acceptance cases pass; migration upgrade preserves workspace payload.
 - [x] Align active automatic eligibility with invoice-original and partial/excess review requirements; manual/history preserved.
 - [x] Bind C3 queue/source conflict and authority changes into C4 holds/snapshot and active writer eligibility, with atomic source race fences.
-- [x] Fresh Node1563/Sites2978/type/audit gates and independent review; production build passed (exit0 / Build complete).
-- [ ] Normal integration PR and exact-head/main CI.
-- [ ] Exact-main source publication to existing Site; read-only production comparisons.
-- [ ] Final receipt and safe branch inventory/archive assessment.
+- [x] Fresh Node1563/Sites2980/type/audit gates and independent review; production build passed (exit0 / Build complete).
+- [x] Normal integration PR31 and UI follow-up PR32; exact PR/main CI succeeded, final runtime93312189/mainCI41550351322.
+- [x] Exact-main Sites subtree97b5de1 published as Sites59/source503448c; deploymentappgdep_6ae9260a23f88191ae8f2380cf5c14c2 succeeded. Read-only revision43/zero-allocation comparisons passed.
+- [x] Final receipt,20-head ancestry inventory, verified Git bundle/isolated clone recovery; deletion unavailable through authorized interface, all histories preserved.
 
 ## Conflict matrix
 
@@ -38,8 +38,8 @@ The implementation brief is the user-provided seven-agent completion task of 202
 
 Initial main baseline on Node24.22.1:1309 Node and2337 Sites passed, no failures/skips/cancellations. Exact producer heads also have successful Node22 GitHub CI. Early combined Node run had545 failures due the renamed migration still referenced from Node bootstrap; fixed and focused Node ingest15/15 plus Sites migration/ingest41/41 pass. Earlier UI full run crossed Stockholm midnight and exposed bank test fixtures using business dates against UTC provider bounds; explicit UTC fixtures plus deterministic boundary regression95/95 pass. These earlier red runs are not final acceptance.
 
-Current production baseline:Sites57/source12ece026c917a87c2b53f5feb02af488e35e40d1; runtime revision9; DB/R2 and existing three schedules retained. Selected0599 reads at workspace revision43:one economic AIS record, one separate non-economic report, zero allocations; account and deposit relation unproved; no registered invoice. Latest observed backup195/195 complete. Initial Gmail fetch22:01UTC with240 review documents; refresh at publication.
+Pre-delivery production baseline:Sites57/source12ece026c917a87c2b53f5feb02af488e35e40d1; runtime revision9; DB/R2 and existing three schedules retained. Selected0599 reads at workspace revision43:one economic AIS record, one separate non-economic report, zero allocations; account and deposit relation unproved; no registered invoice. These are pre-delivery observations. Post59:backup267/267 verified, Gmail00:00UTC run completed and fetch00:00:35.642Z;240review/2registered/24waitingOCR at00:10UTC. Cloud completion remains18:48UTC and freshness unverified.
 
 No numeric quality increase is justified yet:255/330=7.73,0/33 at9.5. A successful internal synthetic source is not real bank authorization.
 
-Final local suites1563+2978 pass,0fail/skip/cancel/todo. Independent runtime review7164a2c closes all Critical/Important findings. Full-site preflight2963/2965 exposed one stale formal-OCR assertion and one new-component isolation alias; both corrected without removing original provenance/positive-formal controls. Native GitHub Git Data publication is used because terminal Git has no GitHub write credential; final root-tree parity and producer parents must be verified before a normal PR merge.
+Final local suites1563+2980 pass,0fail/skip/cancel/todo. Independent review of the earlier runtime7164a2c closes all Critical/Important findings. Full-site preflight2963/2965 exposed one stale formal-OCR assertion and one new-component isolation alias; both corrected without removing original provenance/positive-formal controls. Native GitHub Git Data publication is used because terminal Git has no GitHub write credential; root-tree parity and producer parents were verified before normal PR31/32 merges. Final Node22 mainCI confirms1563+2980=4543,0fail/skip/cancel/todo. Documentation closeout changes no runtime/Sites files.

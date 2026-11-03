@@ -1,0 +1,126 @@
+{
+  "scope": "Runtime93312189 and published Sites59; later receipt PR changes documentation only",
+  "runtimeMain": "93312189b52fc651a3ccc659272041282b937f03",
+  "runtimeRootTree": "2b0194f92cbd1bdb9735e8c09c9d72fd47e2e564",
+  "integration": {
+    "pr31": {
+      "head": "b86efe8adabc79b2feba419fbd307faaa7da390e",
+      "merge": "2736ce06ceae3f43dcb3bef505d10b42e4224c8c",
+      "prCI": 41547335405,
+      "mainCI": 41547826919
+    },
+    "pr32": {
+      "head": "dc0a05c99319c77e11876f5a0ac19cc1af39e7f2",
+      "merge": "93312189b52fc651a3ccc659272041282b937f03",
+      "prCI": 41549893179,
+      "mainCI": 41550351322
+    },
+    "ciConclusion": "success"
+  },
+  "tests": {
+    "node": 1563,
+    "sites": 2980,
+    "total": 4543,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "todo": 0,
+    "exactNode22MainRun": 41550351322
+  },
+  "sites": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version": 59,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_23b5c325aa3c81918d9c03c03184615d",
+    "sourceCommit": "503448c869fa0385681ac8beee4e20d61ce25a6a",
+    "subtree": "97b5de117a83aa7400de01e45775dca6b4e9f82c",
+    "deploymentId": "appgdep_6ae9260a23f88191ae8f2380cf5c14c2",
+    "status": "succeeded",
+    "updatedAt": "2026-11-03T00:08:59.021430Z",
+    "url": "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site",
+    "envRevision": 9,
+    "envEntryCount": 17,
+    "scheduleCount": 3,
+    "d1TableCount": 29,
+    "configuredReportSources": 0,
+    "ingestJobs": 0,
+    "loginRedirectVerified": true,
+    "authenticatedBrowserAcceptanceVerified": false
+  },
+  "readOnly0599": {
+    "revisionBefore": 43,
+    "revisionAfter": 43,
+    "complete": true,
+    "current": true,
+    "changed": false,
+    "economicAisCount": 1,
+    "economicReportCount": 0,
+    "allocations": 0,
+    "automaticEligible": false,
+    "account": "blocked",
+    "deposit": "missing",
+    "invoice": "original_found_unregistered",
+    "reconciliation": "blocked",
+    "formalBankOcr": false
+  },
+  "backup": {
+    "files": 267,
+    "verifiedFiles": 267,
+    "bytes": 91664627,
+    "verifiedAt": "2026-11-02T23:55:27.281Z",
+    "scope": "manifest_pass",
+    "retainedApiRecordsChecked": 14,
+    "historicalRecordsWithoutReceipt": 112,
+    "productionRestorePerformed": false
+  },
+  "gmail": {
+    "fetch": "2026-11-03T00:00:35.642Z",
+    "scheduleInvocation": "2026-11-03T00:00:11.819Z",
+    "scheduleCompleted": "2026-11-03T00:00:49.408Z",
+    "cloudLastCompleted": "2026-11-02T18:48:28.449Z",
+    "cloudFreshnessVerified": false,
+    "observedAt": "2026-11-03T00:10Z",
+    "counts": {
+      "needs_review": 240,
+      "registered": 2,
+      "waiting_ocr": 24
+    }
+  },
+  "bank": {
+    "connected": true,
+    "enabled": true,
+    "intervalHours": 6,
+    "lastSuccess": "2026-11-02T20:07:20.589Z",
+    "lastError": null,
+    "realAutomaticReportAccessVerified": false
+  },
+  "quality": {
+    "areas": 33,
+    "beforeSum": 255,
+    "afterSum": 255,
+    "maximumSum": 330,
+    "average": 7.73,
+    "areasAtLeast9_5": 0
+  },
+  "branchRecovery": {
+    "remoteHeadsInventoried": 20,
+    "uniqueUnmergedHeads": 0,
+    "bundleVerified": true,
+    "isolatedCloneTreeMatches": true,
+    "deleted": 0,
+    "deletionLimit": "Native connector has no delete-ref/branch operation; terminal lacks GitHub write credential",
+    "inventoryScope": "Post-PR32 remote heads before creation of the final documentation branch",
+    "runtimeMainAtInventory": "93312189b52fc651a3ccc659272041282b937f03"
+  },
+  "status": {
+    "code": "complete",
+    "integration": "complete",
+    "publication": "complete",
+    "realBankAutomation": "externally_blocked"
+  },
+  "limits": [
+    "Company-authorized bank report channel and current account/deposit identity proof absent",
+    "Fresh cloud OCR completion unverified",
+    "OpenAI login redirect verified, but no signed-in browser session for full UI acceptance; physical device acceptance absent",
+    "No full production restore/RPO/RTO exercise"
+  ]
+}
