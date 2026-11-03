@@ -42,14 +42,26 @@
     "backupVerifiedFiles": 267
   },
   "release": {
-    "pr": null,
-    "mainCI": null,
-    "publishedSiteVersion": null
+    "pr": 34,
+    "featureHead": "944fe16f864b55b3762b31ff808bded9d6e34c16",
+    "finalRuntimeMain": "c367fcd94594db8aa892bc900a813177ec498d04",
+    "prCI": 41621290758,
+    "pushCI": 41621284729,
+    "mainCI": 41621802705,
+    "allThreeJobs": "success",
+    "publishedSiteVersion": 60,
+    "sourceCommit": "0b0aa755444cd0782bcd24d8f81bfb837d4f6ca5",
+    "sitesSubtree": "145fe442d133e1afb2e2d347a343fcc7b71be599",
+    "deploymentId": "appgdep_6ae9bc63a0e88191a2ad484ec41a1abb",
+    "deploymentStatus": "succeeded",
+    "deploymentSucceededAt": "2026-11-03T10:50:39Z",
+    "productionUrl": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "documentationFollowup": "Documentation-only PR; published runtime unchanged"
   },
   "status": {
-    "code": "complete_generic_local_gates",
+    "code": "complete_generic_merged_main_ci_verified",
     "syntheticEndToEnd": "complete",
-    "sitesPublication": "pending",
+    "sitesPublication": "succeeded",
     "realBankSourceConnected": false,
     "automaticProductionFetchVerified": false
   },
@@ -59,5 +71,46 @@
     "Actual approved MIG/XSD/Envelope/security profile and sample originals",
     "Bridge deployment private POSIX durable storage TLS proxy and egress controls when required",
     "Real original list/download/import and separate account/deposit/customer acceptance"
-  ]
+  ],
+  "productionPostcheck": {
+    "checkedAt": "2026-11-03T18:57:00Z",
+    "timing": "Delayed after long execution interruption; current-state observation",
+    "siteVersion": 60,
+    "envRevision": 9,
+    "envEntries": 17,
+    "authPolicyRevision": 2,
+    "sourceConfigPresent": false,
+    "tables": 29,
+    "migration0018Columns": "present",
+    "sourceRows": 0,
+    "jobRows": 0,
+    "sourceState": "DISABLED",
+    "sourceReason": "SOURCE_NOT_CONFIGURED",
+    "authorization": "UNKNOWN",
+    "selectedWorkspaceRevision": 46,
+    "selectedPreviousWorkspaceRevision": 45,
+    "selectedEconomicCounts": [
+      1,
+      0
+    ],
+    "selectedAmountsCents": [
+      62500,
+      62500
+    ],
+    "selectedAllocations": 0,
+    "selectedAutomaticEligible": false,
+    "financialComparisonScope": "Two selected0599 AIS/report records; not every production balance",
+    "originalScheduleIdsAndCadences": "present unchanged",
+    "bankScheduleEnabled": true,
+    "gmailScheduleEnabled": false,
+    "backupScheduleEnabled": true,
+    "gmailScheduleDrift": "Preflight enabled; current disabled. No schedule mutation invoked by this delivery; cause/time not established; current state preserved.",
+    "gmailLastSuccessfulFetch": "2026-11-03T18:38:10.461Z",
+    "gmailLocalWorkerOnline": false,
+    "gmailCloudWorkerRecent": false,
+    "gmailNeedsReview": 343,
+    "backupVerifiedFiles": 267,
+    "backupVerificationScope": "manifest_pass fixed retained snapshot; not complete production recovery",
+    "checkedAtPrecision": "approximate_minute"
+  }
 }
