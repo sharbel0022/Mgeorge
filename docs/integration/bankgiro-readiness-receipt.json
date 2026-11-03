@@ -1,13 +1,13 @@
 {
   "scope": "Generic internal Bankgiro readiness; real production source remains absent",
   "startMain": "d91ec6c45acc07c15b82b815ffaa305d6d213656",
-  "localCodeFreeze": "87c6be03fa9c19d2e810db80f3f1e2af548589b6",
-  "sitesSubtree": "55d834d5a507c8bde00f44d3d03d89ae2e3debc6",
+  "localCodeFreeze": "2de17e5be26951fa1cc596f0df1d841524112c95",
+  "sitesSubtree": "f0fe32ce0193b8412e900f7d23007165df9145e9",
   "tests": {
     "node": 1565,
     "sites": 3117,
-    "bridge": 42,
-    "total": 4724,
+    "bridge": 47,
+    "total": 4729,
     "failed": 0,
     "skipped": 0,
     "cancelled": 0,

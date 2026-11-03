@@ -23,19 +23,21 @@ test('actual SFTP original flows through bridge HTTPS adapter durable queue pars
  const directory=await mkdtemp(join(tmpdir(),'bankgiro-full-e2e-'));let bridge;
  t.after(async()=>{await bridge?.close();await remote.close();await rm(directory,{recursive:true,force:true});});
  const token='isolated-only-012345678901234567890123456789';
- bridge=await createBridge({enabled:true,spoolDirectory:join(directory,'spool'),bearerToken:token,binding,entitlement,
+ const bridgeConfiguration={enabled:true,spoolDirectory:join(directory,'spool'),bearerToken:token,binding,entitlement,
   sftp:{host:'127.0.0.1',port:remote.port,username:'reader',password:'fixture-password',hostKeySha256:remote.hostKeySha256,remoteDirectory:'/reports'},
-  allowedFormats:['xml'],maxEntries:10,operationTimeoutMs:3000,scanTimeoutMs:10000});
+  allowedFormats:['xml'],maxEntries:10,operationTimeoutMs:3000,scanTimeoutMs:10000};
+ bridge=await createBridge(bridgeConfiguration);
  assert.deepEqual(await bridge.syncOnce(),{discovered:1,conflicts:0});
  const server=bridge.createHttpServer();server.listen(0,'127.0.0.1');await once(server,'listening');
- const loopback='http://127.0.0.1:'+server.address().port,calls=[];
+ let loopback='http://127.0.0.1:'+server.address().port,calls=[];
  const registration={id:binding.sourceId,owner:binding.owner,companyId:binding.companyId,bankgiro:binding.bankgiro,scopeId:binding.scopeId,generation:binding.generation,profileId:binding.profileId,
   mode:'production',enabled:true,transport:'https-v1',baseUrl:'https://reports.example.com',tokenSecret:'ISOLATED_TOKEN',allowedFormats:['xml'],intervalMinutes:15,entitlement};
- f.source=await resolveBankgiroSource(f.owner,{configuration:{version:1,revision:1,registrations:[registration]},secrets:{ISOLATED_TOKEN:token},fetchImpl:async(input,options)=>{
+ const sourceOptions={configuration:{version:1,revision:1,registrations:[registration]},secrets:{ISOLATED_TOKEN:token},fetchImpl:async(input,options)=>{
   const url=new URL(input);assert.equal(url.origin,'https://reports.example.com');assert.ok(url.pathname.startsWith('/v1/'));calls.push(url.pathname);
   const response=await networkFetch(loopback+url.pathname+url.search,options);
   return new Response(response.body,{status:response.status,statusText:response.statusText,headers:response.headers});
- }});
+ }};
+ f.source=await resolveBankgiroSource(f.owner,sourceOptions);
  const result=await f.worker().run(f.owner);
  assert.equal(result.counts.IMPORTED,1,JSON.stringify(result));assert.equal(result.authorization.status,'VERIFIED');
  assert.ok(calls.some(path=>/^\/v1\/reports\/[a-f0-9]{64}\/content$/.test(path)));
@@ -63,4 +65,19 @@ test('actual SFTP original flows through bridge HTTPS adapter durable queue pars
  assert.deepEqual(f.read(),before);assert.deepEqual(f.objects,objects);assert.equal(f.audits().length,1);
  assert.equal((await readdir(join(directory,'spool','blobs'))).length,2,'bridge retains both conflicting immutable originals');
  assert.match(f.renderSourceStatus(publicBankgiroStatus(blocked)),/Rapportens identitet eller innehåll har ändrats/);
+ // A new permission generation needs a new strict spool, but cannot rename an
+ // immutable delivery inside the same bank report scope to escape its history.
+ const firstReportId=result.jobs.find(job=>job.status==='IMPORTED').reportId;
+ await bridge.close();const nextGeneration='isolated-generation-2';
+ bridge=await createBridge({...bridgeConfiguration,spoolDirectory:join(directory,'renewed-spool'),binding:{...binding,generation:nextGeneration}});
+ assert.deepEqual(await bridge.syncOnce(),{discovered:1,conflicts:0});
+ assert.equal(bridge.listReports({limit:1}).reports[0].reportId,firstReportId,'same scope and remote delivery retain identity across authorization renewal');
+ const renewedServer=bridge.createHttpServer();renewedServer.listen(0,'127.0.0.1');await once(renewedServer,'listening');loopback='http://127.0.0.1:'+renewedServer.address().port;
+ f.source=await resolveBankgiroSource(f.owner,{...sourceOptions,configuration:{version:1,revision:2,registrations:[{...registration,generation:nextGeneration}]}});
+ const renewed=await f.worker().run(f.owner);assert.equal(renewed.state,'BLOCKED');assert.equal(renewed.counts.RETRY,0);
+ const currentJob=f.sql.prepare('SELECT report_id,last_error FROM bankgiro_ingest_jobs WHERE owner=? AND authorization_generation=?').get(f.owner,nextGeneration);
+ assert.equal(currentJob.report_id,firstReportId);assert.equal(currentJob.last_error,'IDENTITY_CONFLICT');
+ assert.deepEqual(f.read(),before);assert.equal(f.audits().length,1);
+ assert.deepEqual(f.objects.get(f.owner+'/'+payment.bankFileProof.documentId),f.report.bytes);
+ assert.ok([...f.objects.values()].some(bytes=>Buffer.from(bytes).equals(changed)),'new conflicted bytes remain retained for review');
 });

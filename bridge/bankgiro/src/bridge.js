@@ -69,7 +69,10 @@ async function syncDirectory(path) {
 class Journal {
   constructor(c) {
     this.c = c; this.events = []; this.reports = new Map();
-    const s = c.sftp;
+    const s = c.sftp; const b = c.binding;
+    // Authority renewal and transport configuration are not delivery identity.
+    // Keep this canonical field order/version distinct from strict spool binding.
+    this.deliveryNamespaceHash = digest(json(['bankgiro-delivery-namespace', 1, b.owner, b.sourceId, b.scopeId, b.companyId, b.bankgiro]));
     this.bindingHash = digest(json({ binding: c.binding, formats: c.allowedFormats, upstream: { host: s.host, port: s.port, username: s.username, pin: s.hostKeySha256, directory: s.remoteDirectory } }));
   }
   path(...parts) { return join(this.c.spoolDirectory, ...parts); }
@@ -89,7 +92,7 @@ class Journal {
       this.lock?.close(); this.lock = null; throw fail('SPOOL_LOCKED');
     }
     try {
-      await this.publish('binding.json', json({ version: 1, bindingHash: this.bindingHash }), 0o400, 'SPOOL_BINDING_MISMATCH');
+      await this.publish('binding.json', json({ version: 2, bindingHash: this.bindingHash, deliveryNamespaceHash: this.deliveryNamespaceHash }), 0o400, 'SPOOL_BINDING_MISMATCH');
       const names = (await readdir(this.path('journal'))).sort();
       requireValue(names.length <= this.c.maxJournalEntries, 'JOURNAL_LIMIT');
       for (const name of names) {
@@ -109,7 +112,7 @@ class Journal {
       }
     } catch (error) { await this.close(); throw error; }
   }
-  identity(filename) { return digest(`${this.bindingHash}\0${filename}`); }
+  identity(filename) { return digest(json(['bankgiro-delivery-id', 1, this.deliveryNamespaceHash, filename])); }
   eventName(sequence) { return `${String(sequence).padStart(12, '0')}.json`; }
   apply(event) {
     this.events.push(event);

@@ -412,3 +412,56 @@ for (const [name, options] of [['empty', { repeatEmptyListing: true }], ['dot-on
     assert.equal((await get(base, '/v1/authorization')).status, 503);
   });
 }
+
+for (const changed of [false, true]) {
+  test(`same-scope generation renewal preserves delivery ID with ${changed ? 'changed' : 'identical'} SFTP bytes`, async t => {
+    const { bridge, remote, dir, track } = await setup(t); await bridge.syncOnce();
+    const before = bridge.listReports({ limit: 10 }).reports[0];
+    if (changed) remote.files.get('report.csv').bytes = Buffer.from('reference,amount\n0599,200\n');
+    const renewedConfig = config(remote, join(dir, 'renewed-spool'));
+    renewedConfig.binding.generation = 'renewed-generation-2';
+    const renewed = track(await createBridge(renewedConfig)); await renewed.syncOnce();
+    const after = renewed.listReports({ limit: 10 }).reports[0];
+    assert.equal(after.reportId, before.reportId, 'authorization renewal cannot create a different scoped delivery identity');
+    if (changed) assert.notEqual(after.sha256, before.sha256); else assert.equal(after.sha256, before.sha256);
+    const beforeBase = await serving(bridge); const afterBase = await serving(renewed);
+    assert.equal((await (await get(beforeBase, '/v1/authorization')).json()).generation, '1');
+    assert.equal((await (await get(afterBase, '/v1/authorization')).json()).generation, 'renewed-generation-2');
+    assert.equal(await (await get(beforeBase, `/v1/reports/${before.reportId}/content`)).text(), 'reference,amount\n0599,100\n');
+    assert.equal(await (await get(afterBase, `/v1/reports/${after.reportId}/content`)).text(), changed ? 'reference,amount\n0599,200\n' : 'reference,amount\n0599,100\n');
+  });
+}
+
+test('delivery namespace separates canonical owner, source, scope, company and Bankgiro identities', async t => {
+  const { bridge, remote, dir, track } = await setup(t); await bridge.syncOnce();
+  const before = bridge.listReports({ limit: 10 }).reports[0];
+  for (const [field, value] of [['owner', 'other-owner'], ['sourceId', 'other-source'], ['scopeId', 'other-scope'], ['companyId', 'other-company'], ['bankgiro', '7654321']]) {
+    const c = config(remote, join(dir, `namespace-${field}`)); c.binding[field] = value;
+    const other = track(await createBridge(c)); await other.syncOnce();
+    const after = other.listReports({ limit: 10 }).reports[0];
+    assert.notEqual(after.reportId, before.reportId, `${field} is part of the canonical delivery namespace`);
+    assert.equal(after.sha256, before.sha256);
+  }
+});
+
+test('generation, profile, host, host key and formats still cannot reuse an existing spool', async t => {
+  const { bridge, remote, dir } = await setup(t); await bridge.syncOnce(); await bridge.close();
+  for (const mutate of [c => { c.binding.generation = 'renewed-generation'; }, c => { c.binding.profileId = 'other-profile'; }, c => { c.sftp.host = '127.0.0.2'; }, c => { c.sftp.hostKeySha256 = '0'.repeat(64); }, c => { c.allowedFormats = ['xml']; }]) {
+    const c = config(remote, join(dir, 'spool')); mutate(c);
+    await assert.rejects(createBridge(c), { code: 'SPOOL_BINDING_MISMATCH' });
+  }
+});
+
+test('pre-namespace spool metadata fails closed without rewriting retained originals', async t => {
+  const { bridge, remote, dir } = await setup(t); await bridge.syncOnce();
+  const report = bridge.listReports({ limit: 10 }).reports[0]; await bridge.close();
+  const bindingPath = join(dir, 'spool', 'binding.json');
+  const metadata = JSON.parse(await readFile(bindingPath, 'utf8'));
+  await chmod(bindingPath, 0o600);
+  await writeFile(bindingPath, JSON.stringify({ version: 1, bindingHash: metadata.bindingHash }));
+  await chmod(bindingPath, 0o400);
+  let admitted;
+  try { await assert.rejects(async () => { admitted = await createBridge(config(remote, join(dir, 'spool'))); }, { code: 'SPOOL_BINDING_MISMATCH' }); }
+  finally { await admitted?.close(); }
+  assert.equal(await readFile(join(dir, 'spool', 'blobs', report.sha256), 'utf8'), 'reference,amount\n0599,100\n');
+});
