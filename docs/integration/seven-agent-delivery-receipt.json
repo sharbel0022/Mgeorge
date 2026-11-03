@@ -42,7 +42,9 @@
     "scheduleCount": 3,
     "d1TableCount": 29,
     "configuredReportSources": 0,
-    "ingestJobs": 0
+    "ingestJobs": 0,
+    "loginRedirectVerified": true,
+    "authenticatedBrowserAcceptanceVerified": false
   },
   "readOnly0599": {
     "revisionBefore": 43,
@@ -118,7 +120,7 @@
   "limits": [
     "Company-authorized bank report channel and current account/deposit identity proof absent",
     "Fresh cloud OCR completion unverified",
-    "Fresh authenticated production browser transport unavailable; physical device acceptance absent",
+    "OpenAI login redirect verified, but no signed-in browser session for full UI acceptance; physical device acceptance absent",
     "No full production restore/RPO/RTO exercise"
   ]
 }
