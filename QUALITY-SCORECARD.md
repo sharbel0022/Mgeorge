@@ -2,7 +2,7 @@
 
 ## SaaS master integration candidate — 2026-11-04
 
-Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.md). This is cumulative local evidence for the repaired foundation candidate, not yet integrated main or deployed production. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5.**
+Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.md). Repaired foundation is now normally merged as mainf105e9c, with exact main CI41914833272 success (1649Node+3196Sites+47bridge=4892,0fail/skip/cancel/TODO). Below local figures retain their Windows scope; #36 cumulative integration follows separately. No new Sites publication or commercial activation. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5.**
 
 | Area | Before → after | New evidence | Remaining limit |
 | --- | --- | --- | --- |
@@ -24,6 +24,21 @@ Node använder en verifierad företagskatalog och separata SQLite-databaser; Sit
 Slutliga lokala helsviter: **1 633 Node + 3 190 Sites + 47 bridge = 4 870 godkända**, noll fel/överhoppade/avbrutna/TODO. Syntax, TypeScript, låsta installationer, exakt minimatch-kontroll, auditgrindar och Sites produktionsbygge godkända. Root/Sites produktionsberoenden/bridge har noll auditfynd; full Sites-audit har åtta moderate utvecklingsfynd och inga high/critical. Lokal Node är 24.22.1; exakt Node 22-verifiering sker i PR-flödets tre jobb. Oberoende review hittade ett återkallningsfel i worker-fallback; rättningen återverifierades med samma syntetiska reproduktion. Inga kvarvarande reproducerade Critical/Important-fynd inom granskad omfattning.
 
 Ingen produktion, verklig bank/Gmail, extern schemaläggning, merge eller publicering ingår. Efter första företagsbindning får en äldre tenant-omedveten app inte återstartas mot samma databas. Verklig onboarding/ägarverifiering, medgivanden, worker-dispatch och produktionsacceptans återstår enligt integrationskraven. **Alla 33 kvalitetspoäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.** Tidigare daterade kvitton nedan behåller sin historiska omfattning.
+
+## Agent 2 — Open Payments corporate adapter, 2026-11-04
+
+[Verifieringskvitto och integrationsgränser](docs/integration/saas/openpayments-adapter.md) samt [officiella API- och avtalskällor](docs/integration/saas/provider-capabilities.md). Leveransen är ett additivt adapterlager på `feature/saas-openpayments-provider`; inga produktionsfunktioner aktiveras. Samtliga 33 numeriska poäng förblir **255/330 = 7,73/10; 0/33 ≥9,5**.
+
+Lokalt verifierad implementation `79f27f0`: **1 585 Node + 3 191 Sites + 47 bridge = 4 823 godkända**, noll fel/skip/cancel/todo. Syntax, typer, obligatoriska auditgrindar och bygge godkända; 8 moderate utvecklingsberoendefynd i Sites redovisas separat. Oberoende granskning bekräftar båda rättningarna. Exakt Node 22-PR-CI redovisas i leveransens PR och ersätts inte av lokala Node 24-resultat.
+
+| Berört område | Före | Efter | Nytt bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | Befintlig Enable Banking-kod och dess regressionssviter bevaras. Ny banklista hämtas via dokumenterat ASPSP-kontrakt. | Ingen faktisk företagskontotäckning hos Open Payments verifierad. |
+| 16. Automatisk bankhämtning | 8 | 8 | Företags-/providerbundna medgivanden, tokenhantering, tidsgränser, paginering och återkontroll av giltighet. | Adapter är inte kopplad till produktionsschema eller beständig företagsmodell. |
+| 17. Bankgiroimport | 8,5 | 8,5 | Bankgiroobservationer bevaras separat från bokförda rader; saknat stöd blockerar ett uttryckligt Bankgirokrav. | Verklig ISO/BGI-onboarding, täckning och granskad originalimport saknas. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Scope-/vägspärrar, befintlig AES-GCM med företagsbundet ändamål, säkra fel och certifikat-/nyckelkontroller. | Beständig medlemskapskontroll, engångscallback och verkligt produktionscertifikat ska integreras och verifieras. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Nya kontrakts-, fel-, isolerings- och transporttester. Två oberoende reviewfynd reproducerade, rättade och omkontrollerade. | Fixtureframgång är inte sandboxacceptans. Befintliga moderate utvecklingsberoendefynd och lintskuld åtgärdas inte av denna PR. |
+| 33. Verifiering i verklig produktion | 6,5 | 6,5 | Exakt gräns mellan dokumentation, lokala tester och externa behörigheter redovisas. | Ingen Open Payments-sandbox, riktig bank, produktionshandshake eller publicering genomförd. |
 
 ## Automatic Bankgiro source readiness — 2026-11-03
 
