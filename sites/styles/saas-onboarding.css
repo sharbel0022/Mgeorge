@@ -1,0 +1,80 @@
+/* Company-scoped onboarding: monochrome, native controls, mobile first. */
+.onboarding-shell{max-width:1040px;margin:auto;color:#161616;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+.onboarding-shell *{box-sizing:border-box;min-width:0}
+.onboarding-header{position:relative;padding:18px 0 34px;border-bottom:1px solid #dedede;margin-bottom:26px}
+.onboarding-header h1{font-size:clamp(28px,4vw,42px);line-height:1.15;letter-spacing:-1.3px;max-width:690px;margin:12px 0 16px;color:#111;font-weight:700}
+.onboarding-header p{max-width:650px;color:#535353;margin:0 0 16px}
+.onboarding-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px}
+.onboarding-badge{display:inline-flex;border:1px solid #c9c9c9;border-radius:30px;padding:4px 10px;font-size:12px;line-height:1.5;background:#f5f5f5;color:#333;white-space:normal}
+.onboarding-card,.onboarding-section{background:#fff;border:1px solid #d6d6d6;border-radius:12px;padding:26px;margin:0 0 22px}
+.onboarding-shell h2{font-size:20px;line-height:1.35;font-weight:650;letter-spacing:-.35px;margin:0 0 12px;color:#111}
+.onboarding-shell h3{font-size:16px;line-height:1.5;font-weight:650;margin:0 0 10px}
+.onboarding-shell p{margin-top:0;margin-bottom:14px}
+.onboarding-muted{color:#555;font-size:13px;line-height:1.65}
+.onboarding-shell button,.onboarding-shell a.onboarding-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #b9b9b9;background:#fff;color:#181818;border-radius:7px;padding:10px 16px;min-height:44px;line-height:1.45;font-size:14px;font-weight:600;cursor:pointer;white-space:normal;text-decoration:none;max-width:100%}
+.onboarding-shell button:hover:not(:disabled){background:#f0f0f0;border-color:#666}
+.onboarding-shell .onboarding-primary{color:#fff;background:#191919;border-color:#191919}
+.onboarding-shell .onboarding-primary:hover:not(:disabled){background:#333;color:#fff}
+.onboarding-shell button:disabled{color:#656565;background:#f1f1f1;border-color:#d6d6d6;cursor:not-allowed}
+.onboarding-shell a{color:#181818;text-underline-offset:4px}
+.onboarding-shell :is(button,a,input,select,summary,[tabindex]):focus-visible,.onboarding-dialog :is(button,a,input):focus-visible{outline:3px solid #111;outline-offset:4px}
+.onboarding-shell :is(h2,[tabindex="-1"]):focus{outline:none}
+.onboarding-shell input:not([type=checkbox]):not([type=radio]),.onboarding-shell select{width:100%;min-height:46px;padding:10px 12px;border:1px solid #a8a8a8;border-radius:6px;color:#171717;background:#fff;font-size:16px;font-family:inherit;max-width:100%}
+.onboarding-shell input:is([type=checkbox],[type=radio]){width:19px;height:19px;min-width:19px;accent-color:#161616;margin:2px 0;vertical-align:middle}
+.onboarding-shell input:disabled,.onboarding-shell select:disabled{cursor:not-allowed;background:#f4f4f4}
+.onboarding-shell fieldset{border:0;margin:0 0 20px;padding:0;min-width:0}
+.onboarding-shell legend{font-weight:650;font-size:15px;margin-bottom:10px}
+.onboarding-field{margin-bottom:20px}
+.onboarding-field>label,.onboarding-label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
+.onboarding-field>.onboarding-muted{margin-top:6px}
+.onboarding-company-picker{display:flex;align-items:flex-end;gap:16px;padding:22px;background:#f6f6f6;border:1px solid #ddd;border-radius:10px;margin-bottom:24px;flex-wrap:wrap}
+.onboarding-company-picker>div{flex:1 1 220px}
+.onboarding-company-picker .onboarding-field{margin:0}
+.onboarding-company-picker label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
+.onboarding-company-picker p{margin:6px 0 0}
+.onboarding-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+.onboarding-secondary-actions{padding-top:18px;border-top:1px solid #e2e2e2;margin-bottom:16px}
+.onboarding-steps{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 25px;padding:0}
+.onboarding-steps li{border-top:2px solid #d5d5d5;padding-top:12px;font-size:12px;color:#656565;line-height:1.5}
+.onboarding-steps [aria-current=step]{border-color:#111;color:#111;font-weight:700}
+.onboarding-steps span,.onboarding-steps b{display:block}
+.onboarding-steps li>span:first-child{font-variant-numeric:tabular-nums;font-size:13px;font-weight:700;margin-bottom:3px}
+.onboarding-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.onboarding-grid>.onboarding-card{margin:0}
+.onboarding-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:14px 0}
+.onboarding-facts>div{border-top:1px solid #e3e3e3;padding-top:12px}
+.onboarding-facts dt{font-size:12px;color:#666;margin:0 0 4px}
+.onboarding-facts dd{margin:0;font-weight:600;font-size:14px;color:#222}
+.onboarding-choices{display:grid;gap:10px;margin-bottom:16px}
+.onboarding-choice{border:1px solid #ccc;border-radius:8px;padding:14px;min-height:48px}
+.onboarding-choice>label{display:grid;grid-template-columns:19px minmax(0,1fr);gap:3px 10px;cursor:pointer}
+.onboarding-choice>label>*{grid-column:2}
+.onboarding-choice>label>input{grid-column:1;grid-row:1/5}
+.onboarding-choice>label>.onboarding-badge{justify-self:start}
+.onboarding-choice>p,.onboarding-choice>div{margin:8px 0 0 29px}
+.onboarding-choice:has(input:checked){border-color:#1b1b1b;background:#f6f6f6}
+.onboarding-choice:has(input:disabled){cursor:default}
+.onboarding-choice strong{display:block;font-size:14px;margin:0 0 2px}
+.onboarding-choice .onboarding-muted{margin-bottom:0}
+.onboarding-choice input{flex-shrink:0}
+.onboarding-choice span{display:block}
+.onboarding-error,.onboarding-notice{border:1px solid #aaa;border-left:4px solid #252525;border-radius:7px;padding:16px 18px;background:#f6f6f6;margin:0 0 20px;font-size:14px;line-height:1.65}
+.onboarding-error p:last-child,.onboarding-notice p:last-child{margin-bottom:0}
+.onboarding-live:not(:empty){padding:14px 0 18px;font-size:14px;color:#333}
+.onboarding-payment-list{padding:0;margin:0;list-style:none}
+.onboarding-payment{padding:18px 0;border-top:1px solid #e3e3e3;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 22px}
+.onboarding-payment .onboarding-facts{grid-column:1/-1;margin:0}
+.onboarding-payment strong{font-weight:650}
+.onboarding-payment code,.onboarding-shell .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:14px;white-space:normal;overflow-wrap:anywhere}
+.onboarding-payment time{font-size:13px;color:#666}
+.onboarding-dialog{width:min(520px,calc(100% - 32px));max-width:calc(100% - 32px);max-height:calc(100dvh - 32px);margin:auto;padding:26px;border:1px solid #999;border-radius:12px;color:#161616;background:#fff;overflow:auto;line-height:1.65;font-family:Arial,Helvetica,sans-serif}
+.onboarding-dialog::backdrop{background:rgb(0 0 0 / 45%)}
+.onboarding-dialog h2{font-size:22px;margin:0 0 12px}
+.onboarding-dialog p{margin:0}
+.onboarding-manual{margin:20px 0}
+.onboarding-legacy-note{max-width:760px;margin:0 auto 24px;padding:16px 20px;border:1px solid #ccc;border-radius:8px;background:#f6f6f6;font-size:13px;line-height:1.65;color:#333}
+.onboarding-legacy-note p{margin:6px 0 10px}
+.onboarding-legacy-note button{min-height:44px;padding:8px 12px;background:white;border:1px solid #aaa;border-radius:6px;color:#222}
+@media(max-width:767px){.onboarding-grid{grid-template-columns:1fr}.onboarding-card,.onboarding-section{padding:20px}.onboarding-header{padding-top:8px}.onboarding-steps{gap:7px}.onboarding-steps li{font-size:11px}.onboarding-company-picker{padding:16px;gap:12px}.onboarding-company-picker>button{width:100%}.onboarding-shell h2{font-size:19px}}
+@media(max-width:419px){.onboarding-card,.onboarding-section{padding:17px 14px;border-radius:9px}.onboarding-facts{grid-template-columns:1fr;gap:12px}.onboarding-actions{flex-direction:column;align-items:stretch}.onboarding-actions>button{width:100%}.onboarding-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.onboarding-payment{grid-template-columns:1fr}.onboarding-header h1{letter-spacing:-.7px}.onboarding-dialog{padding:20px}.onboarding-shell .onboarding-primary{width:100%}}
+@media(prefers-reduced-motion:reduce){.onboarding-shell *{scroll-behavior:auto;animation:none!important;transition:none!important}}

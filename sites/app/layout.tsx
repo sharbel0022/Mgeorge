@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "@/styles/bank-connection.css";
 import "@/styles/bankgiro-source.css";
+import "@/styles/saas-onboarding.css";
 
 export const metadata: Metadata = {
   title: "MG Fakturakoll – betalningar & fakturor",

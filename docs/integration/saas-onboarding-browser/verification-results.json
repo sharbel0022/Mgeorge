@@ -1,0 +1,172 @@
+{
+  "recordedAt": "2026-11-04T20:12:14.319585+00:00",
+  "baseCommit": "14a042abd37fa455d08da9dfcc096ef4f603b512",
+  "node": "24.22.1",
+  "npm": "11.9.0",
+  "scope": "Local synthetic verification; not provider or production acceptance.",
+  "checks": [
+    {
+      "cwd": "root",
+      "command": "npm run check",
+      "exitCode": 0,
+      "testCount": null,
+      "localLog": "root-check-baseline.log",
+      "logBytes": 202,
+      "logSha256": "d5083d1b5f5ea9f5a5080b358a6b5a84db131c03323b3f750b80c888e8e2fa08"
+    },
+    {
+      "cwd": "root",
+      "command": "npm test",
+      "exitCode": 0,
+      "testCount": 1565,
+      "localLog": "root-test-baseline.log",
+      "logBytes": 164500,
+      "logSha256": "8b21de2fbb20a37ef0b5ec0f6bea65239edd20d7c670c8c184536eb932902b1b"
+    },
+    {
+      "cwd": "root",
+      "command": "npm audit --audit-level=high",
+      "exitCode": 0,
+      "testCount": null,
+      "localLog": "root-audit.log",
+      "logBytes": 123,
+      "logSha256": "68d7b0e53628962865da889964201260d748d6d98ba492735e201d6b80cc9bb5"
+    },
+    {
+      "cwd": "sites",
+      "command": "npm run check",
+      "exitCode": 0,
+      "testCount": null,
+      "localLog": "sites-types-final.log",
+      "logBytes": 186,
+      "logSha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c"
+    },
+    {
+      "cwd": "sites",
+      "command": "npm test",
+      "exitCode": 0,
+      "testCount": 3166,
+      "localLog": "sites-tests-final.log",
+      "logBytes": 321760,
+      "logSha256": "aa08bc98c77fb9b3bc930b97e7edabe794b43eb47c8744d7c470acb5f080b209"
+    },
+    {
+      "cwd": "sites",
+      "command": "npm audit --audit-level=high",
+      "exitCode": 0,
+      "testCount": null,
+      "localLog": "sites-audit.log",
+      "logBytes": 2160,
+      "logSha256": "e5d67fcf3e577c0317125d173ccabacaf2e02aec1aa11d1e8c80435b34ffd870"
+    },
+    {
+      "cwd": "sites",
+      "command": "npm run build",
+      "exitCode": 0,
+      "testCount": null,
+      "localLog": "sites-build.log",
+      "logBytes": 37160,
+      "logSha256": "ae334deb45668401ca683e24efda69d08fae01c4d52ec2a8d0c738f1b0da0900"
+    },
+    {
+      "cwd": "bridge/bankgiro",
+      "command": "npm run check",
+      "exitCode": 0,
+      "testCount": null,
+      "localLog": "bridge-check.log",
+      "logBytes": 354,
+      "logSha256": "4843392301f472bd2f730e36101d1b9fe29803f87b6286f8407882e6188d1340"
+    },
+    {
+      "cwd": "bridge/bankgiro",
+      "command": "npm test",
+      "exitCode": 0,
+      "testCount": 47,
+      "localLog": "bridge-tests.log",
+      "logBytes": 4886,
+      "logSha256": "88d6f4bcbfc441d677c51be24656c84e7bc7c759af61cb20d6c8e7150c11f011"
+    },
+    {
+      "cwd": "bridge/bankgiro",
+      "command": "npm audit --audit-level=high",
+      "exitCode": 0,
+      "testCount": null,
+      "localLog": "bridge-audit.log",
+      "logBytes": 123,
+      "logSha256": "68d7b0e53628962865da889964201260d748d6d98ba492735e201d6b80cc9bb5"
+    }
+  ],
+  "unitTestsPassed": 4778,
+  "unitTestsFailed": 0,
+  "browserPassed": 41,
+  "browserFailed": 0,
+  "browserReceipt": "acceptance-results.json",
+  "rootAndBridgeCodeUnchanged": true,
+  "sitesAudit": {
+    "moderate": 8,
+    "high": 0,
+    "critical": 0
+  },
+  "sourceManifest": [
+    {
+      "path": "sites/lib/banking/status-view.ts",
+      "sha256": "4d5e5028e3c06422c540c46130ca3cdb2aa722163da5978d37218854e766465c"
+    },
+    {
+      "path": "sites/components/use-bank-refresh.ts",
+      "sha256": "bf1becc2b2888f854a5865a5b1b81e136a4f9e77a8eefe4034eff01f9ceccdf1"
+    },
+    {
+      "path": "sites/components/sync-recovery-notice.tsx",
+      "sha256": "38a028d3b6021997ae67c607c69a4fb8cf6f0d331ffd98fee83a46a511175ed4"
+    },
+    {
+      "path": "sites/components/bank-connection.tsx",
+      "sha256": "ce3e9f4aab87e9670eadb027c7e52c958c32df0d3d398569af2419777327a371"
+    },
+    {
+      "path": "sites/components/bankgiro-source-status.tsx",
+      "sha256": "9b971a3699c0c59d4d85431dcd8456fd4dc655c99e1cbf5c041c4b9d78efc015"
+    },
+    {
+      "path": "sites/lib/onboarding/contract.ts",
+      "sha256": "efa5775e371940a351c7f2feb8de5aa9e4244c1922ef829e055415da13dc2f11"
+    },
+    {
+      "path": "sites/lib/onboarding/client.ts",
+      "sha256": "69a982e6801a4cde2b3b7e317b824ba05f622c8e68cb672bc67a93368e6750b9"
+    },
+    {
+      "path": "sites/lib/onboarding/request-scope.ts",
+      "sha256": "3471997c1a31503f0a45b44b0125d269cb94ff13dce03f60f424de802abbaa6a"
+    },
+    {
+      "path": "sites/components/onboarding/bank-onboarding-views.tsx",
+      "sha256": "ea14781ec0fe8d078482bc118e28e1d350f42eb0fe51bd9dd1d6d27dde006ecd"
+    },
+    {
+      "path": "sites/components/onboarding/bank-onboarding.tsx",
+      "sha256": "38704ec4a23ad6bb8e68df8ff2f4de8665bb065fb27ce32165501ad89a04bfe7"
+    },
+    {
+      "path": "sites/app/bank/page.tsx",
+      "sha256": "dfecc8a570b3a7a35f9c08f352afc63dfda170506b5f72b115343c4c2aca99f4"
+    },
+    {
+      "path": "sites/app/globals.css",
+      "sha256": "424cc6f6319fd0e96af8bcbb390fd07e99de200376d7defa7490cf12cd5600d1"
+    },
+    {
+      "path": "sites/styles/bank-connection.css",
+      "sha256": "06bbf0d4530ffb52fa130d9a1e0fc144ea077c918b55bc68f0769b2bb02e8570"
+    },
+    {
+      "path": "sites/styles/bankgiro-source.css",
+      "sha256": "32c24caffd5c836fc0bfb02153bac9a4b3fe791ce90893274020086a29ec0f0a"
+    },
+    {
+      "path": "sites/styles/saas-onboarding.css",
+      "sha256": "c68529dc2d2345d1d3a5d1301ac6b0aa795d1dfc8b71149a0ba2ced35a1f502b"
+    }
+  ]
+}

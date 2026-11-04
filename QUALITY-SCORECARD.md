@@ -1,5 +1,28 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 6 — SaaS-onboarding, 2026-11-04
+
+[Verifieringsrapport](docs/integration/saas-customer-onboarding-verification.md) och [hashbundet browserkvitto](docs/integration/saas-onboarding-browser/README.md) gäller frontendbranchen `feature/saas-customer-onboarding-ui`, bas `14a042a`. **4 778 Node/Sites/bridgetester och 41 browserfall passerar**; typer/syntax/high-audits/produktionsbygge är godkända. Lokal miljö är Node 24.22.1; fjärr-CI och faktisk drift måste bedömas med egna kvitton. Samtliga 33 numeriska poäng behålls: **255/330 =7,73/10; 0/33 ≥9,5**.
+
+| Berört område | Före | Efter | Nytt avgränsat bevis och återstående gräns |
+| --- | ---: | ---: | --- |
+| 1. Design och färger | 8 | 8 | Svartvit onboarding och visuellt granskade slutbilder; ingen publicerad SaaS-resa. |
+| 3. Navigering | 8,5 | 8,5 | Företagsbyte, hopplänk, native-modal, Tab/Escape och fokusåtergång testade. Riktig hjälpmedelsacceptans återstår. |
+| 4. Mobilanpassning | 8,5 | 8,5 | Faktiska 320/390/768/1024/1440 px utan sid-/dialogöverflöde. Fysiska enheter och fler browsermotorer återstår. |
+| 6. Minimal manuell hantering | 6,5 | 6,5 | Kontoval och första lyckade hämtning uppdaterar översikten automatiskt i syntetiskt flöde. Verklig jobbkedja saknas i SaaS-kontraktet. |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | Befintlig ägaranslutning bevaras; ny guide kräver bankens faktiska katalog och providerstyrd identifiering. Ingen ny BankID-/bankacceptans. |
+| 16. Automatisk bankhämtning | 8 | 8 | Samtycke, behörighet, aktuell status och nästa tillåtna tid styr UI. Frontendpollning läser lagrad status och skapar ingen scheduler. |
+| 17. Bankgiroimport | 8,5 | 8,5 | Separat Bankgirostöd/giltighet/synkstatus och tillåtet alternativflöde. Verkligt företagsavtal och källa behöver backendbevis. |
+| 18. Identifiera verklig betalare | 7 | 7 | Saknad betalare förblir okänd; fakturakund används inte som bankfakta. Verkliga underlag oförändrade. |
+| 19. Verklig OCR/fakturareferens | 7 | 7 | Faktisk typ/källa och inledande nollor bevaras. Inga referenser härleds från avsedd faktura. |
+| 25. Betalningsstatus | 8 | 8 | Verifierad kräver evidenskvitto; granskningsbehov och saknad Bankgiroinformation visas separat. Saldon/allokeringar ändras inte. |
+| 28. Schemalagd automatisering | 6,5 | 6,5 | UI skiljer accepterat jobb, pågående hämtning och lyckat resultat. Inget verkligt schema ändras eller verifieras. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Företags-/generationskontroll, 401/403-rensning, sena A→B→A-svar, callbackhints och strikta redirects testas. Serverns tenantauktorisering återstår hos Agents 1–5. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | 45 nya Sites-testfall, 41 browserfall, oberoende review och rättade regressioner. 8 moderate beroendefynd kvarstår; inga dependency-/lockfiländringar. |
+| 33. Verifiering i verklig produktion | 6,5 | 6,5 | Ingen produktionspublicering eller verklig providerresa ingår; frontendbevis höjer inte produktionspoängen. |
+
+Övriga områden och historiska driftkvitton nedan behåller sin tidigare omfattning. Ny SaaS-aktivering kräver överenskomna företagsspecifika API:er och auktoriserad provider-/callbackacceptans.
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.
