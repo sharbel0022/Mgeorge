@@ -1,5 +1,13 @@
 # Verifierad progress
 
+## SaaS Agent 4 — Bankgiroberikning, 2026-11-04
+
+Separat branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Leveransrapport, fältkontrakt, banktäckning och testbevis](docs/integration/saas/bankgiro-enrichment.md). Open Payments dokumenterade `transactions.bankgiro` normaliseras till individuella rapportobservationer. Exakta API-svar, kontrollsummor, ankomstkvitton, aktuell företags-/kontobehörighet och råa bankfält bevaras. Saknade detaljer och motstridiga identiteter blir tydliga granskningsspärrar. Befintliga CAMT054C/SFTP- och filimportvägar behålls.
+
+Rapporter skapar inga extra ekonomiska insättningar eller fakturaallokeringar. En API-grupp kräver en gemensam bankutfärdad postreferens och verifierad kontoidentitet för koppling till en befintlig AIS-insättning; datum och belopp räcker inte. Återimport och skilda betalningar med identiska belopp/referenser testas separat. `0599` och `599` förblir olika bankvärden och företagets referenspolicy bevaras. Historiska kundoriginal har inte använts som testdata eller ändrats.
+
+Leveransen gäller kod, tester, dokumentation, branch och PR. Grundmodellens företagsval, providerklientens råsvarskvitto samt kundens verkliga behörighet och banktäckning måste kopplas in innan produktionsaktivering. Den nuvarande ägarbaserade källregistreringen är ingen fullständig flerföretagsmodell. Exakta slutgrindar och kvarstående integrationsgränser finns i rapporten. **Samtliga 33 poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.

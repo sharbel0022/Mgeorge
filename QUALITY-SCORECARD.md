@@ -1,5 +1,16 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## SaaS Agent 4 — avgränsad Bankgiroberikning, 2026-11-04
+
+[Verifieringsrapport och leverantörsmatris](docs/integration/saas/bankgiro-enrichment.md), branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. **Samtliga 33 numeriska poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
+| Berörda områden | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | --- | --- |
+| Bank, Bankgiro, individuella betalare och dubbletter | Dokumenterad Open Payments-modell, exakt beloppsnormalisering, separata källidentiteter, samlingsinsättningar, ofullständig täckning, återimport och konflikter testas med syntetiska data. | Verklig kundbehörighet, bankens individuella fälttäckning och fullständig historik har inte verifierats. |
+| Ekonomisk korrekthet och fakturareferenser | Rapporter tillför inga extra ekonomiska insättningar. Gemensam bankreferens krävs; `0599`/`599`, generell referens, formell OCR och företagspolicy hålls isär. Ingen allokering sker vid import. | Det historiska 0599-fallet kräver fortfarande nödvändiga bankbevis och ett behörigt ekonomiskt beslut. |
+| Åtkomstkontroll och original | Företags-/konto-/rapportbindning, aktuella scope, oföränderliga råsvar, kontrollsummor och separata behörighetskvitton verifieras vid intake och commit. | Integrering med SaaS-grundmodell och providertransport återstår före aktivering; nuvarande register är ägarbaserat. |
+| Kodkvalitet och tester | Riktade positiva och negativa regressioner, fulla slutgrindar samt oberoende granskning redovisas med exakt omfattning i rapporten. | Lokal syntetisk framgång och dokumenterad leverantörskapacitet är inga produktionsbevis. |
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.

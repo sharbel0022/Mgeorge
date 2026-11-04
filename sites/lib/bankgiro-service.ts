@@ -1,5 +1,5 @@
 import {readWorkspace,readBankOriginalBytes} from './server';
-import {parseSpecificationBytes} from './bankgiro-parser.js';
+import {parseSpecificationBytes,readOpenPaymentsBankgiroCapture} from './bankgiro-parser.js';
 import {applyCommand,emptyState,canonicalBankAccount,bankApiOriginalIssue,paymentEvidenceIssue,specificationPreview,type Command,type State,type Transaction} from './domain';
 import {connection,accounts} from './banking/store';
 import {stableAccountKey} from './banking/transactions';
@@ -57,12 +57,22 @@ async function resolveAccounts(owner:string,rows:any[]){
  });
 }
 
-export async function readBankgiroOriginal(owner:string,command:Command){
+const captureOnly=()=>Object.assign(Error('API-underlaget måste läsas via företagets behöriga rapportkälla.'),{code:'AUTHORIZATION_BLOCKED'});
+function ownedCapture(owner:string,state:State,doc:{filename:string;bytes:Uint8Array|ArrayBuffer}){
+ if(!/\.opbg\.json$/i.test(doc.filename))return null;
+ const capture=readOpenPaymentsBankgiroCapture(doc.bytes);
+ if(capture.context.owner!==owner||!state.company.id||capture.context.companyId!==state.company.id)throw captureOnly();
+ return capture;
+}
+export async function readBankgiroOriginal(owner:string,command:Command,options:{allowApiCapture?:boolean}={}){
  const doc=await readBankOriginalBytes(owner,command.documentId);
+ if(/\.opbg\.json$/i.test(doc.filename)&&!options.allowApiCapture)throw captureOnly();
+ if(/\.opbg\.json$/i.test(doc.filename))ownedCapture(owner,(await readWorkspace(owner)).state,doc);
  const rows=await resolveAccounts(owner,parseSpecificationBytes(doc.bytes,doc.filename));
  return {...command,rows,hash:doc.sha256,name:doc.filename};
 }
 export async function bankgiroPreview(owner:string,file:File,targetId:string){
+ if(/\.opbg\.json$/i.test(file.name))throw captureOnly();
  const bytes=await file.arrayBuffer(),rows=await resolveAccounts(owner,parseSpecificationBytes(bytes,file.name)),{state,revision}=await readWorkspace(owner);
  const preview=specificationPreview(state,rows,targetId);
  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
@@ -74,11 +84,12 @@ export async function bankgiroRetainedPreview(owner:string,documentId:string,tar
  if(!validId(documentId)||targetId&&!validId(targetId))throw Error('Välj ett giltigt sparat bankoriginal och en giltig bankhändelse.');
  const {state,revision}=await readWorkspace(owner);
  if(targetId&&!state.transactions.some(row=>row.id===targetId))throw Error('Bankhändelsen finns inte för ditt konto.');
- const doc=await readBankOriginalBytes(owner,documentId),rawRows=parseSpecificationBytes(doc.bytes,doc.filename),rows=await resolveAccounts(owner,rawRows);
- return {documentId,name:doc.filename,rawRows,rows,preview:specificationPreview(state,rows,targetId),revision,hash:doc.sha256,duplicate:state.imports.some(i=>i.hash===doc.sha256)};
+ const doc=await readBankOriginalBytes(owner,documentId),capture=ownedCapture(owner,state,doc),rawRows=parseSpecificationBytes(doc.bytes,doc.filename),rows=await resolveAccounts(owner,rawRows);
+ const preview=capture&&!rows.length?{plans:[],payments:0,total:0,linked:0,review:1}:specificationPreview(state,rows,targetId);
+ return {documentId,name:doc.filename,rawRows,rows,preview,revision,hash:doc.sha256,duplicate:state.imports.some(i=>i.hash===doc.sha256),...(capture?{coverage:capture.normalization.coverage}:{})};
 }
 
-const bankgiroObservation=(row:Transaction)=>JSON.stringify(Object.fromEntries(['date','amount','currency','party','payerReference','bankReference','parentBankReference','recipientBankgiro','payerBankgiro','payerAccount','remittanceMessage','settlementDate','format','organizationNumber','referenceEvidence','referenceParts','payerEvidence','reportEvidence','specificationGroup','specificationCount','specificationTotal','recipientAccount','account','original','bankDetails'].map(key=>[key,row[key as keyof Transaction]??null])));
+const bankgiroObservation=(row:Transaction)=>JSON.stringify(Object.fromEntries(['date','amount','currency','party','payerReference','bankReference','parentBankReference','recipientBankgiro','payerBankgiro','payerAccount','remittanceMessage','settlementDate','format','organizationNumber','referenceEvidence','referenceParts','payerEvidence','reportEvidence','specificationGroup','specificationCount','specificationTotal','recipientAccount','account','original','bankDetails','enrichmentEvidence','rawBankData','bankgiroEnrichmentIssue'].map(key=>[key,row[key as keyof Transaction]??null])));
 /** Accept only the exact earlier label-cell receipt derived from this freshly
  * parsed original. Other source cells and every payment fact remain exact. */
 function sameBankgiroObservations(rows:Transaction[],fresh:Transaction[]){
@@ -111,9 +122,10 @@ export async function prepareBankgiroLinkCommand(owner:string,state:State,input:
  const accountIssue=await bankgiroAutomaticAccountIssue(owner,target.account);if(accountIssue)throw Error(accountIssue);
  const rows=state.transactions.filter(row=>row.specification&&row.importId===specification.importId&&row.specificationGroup===specification.specificationGroup),proof=specification.bankFileProof;
  if(!proof||rows.some(row=>row.bankFileProof?.documentId!==proof.documentId||row.bankFileProof?.sha256!==proof.sha256))throw Error('Specifikationens originalkoppling behöver granskas.');
- const original=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId:proof.documentId});
+ const original=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId:proof.documentId},{allowApiCapture:true});
  if(original.hash!==proof.sha256)throw Error('Specifikationens kontrollsumma stämmer inte med det bevarade originalet.');
- const fresh=applyCommand(emptyState(),original).state.transactions.filter(row=>row.specificationGroup===specification.specificationGroup);
+ const comparison=emptyState();comparison.company=structuredClone(state.company);
+ const fresh=applyCommand(comparison,original).state.transactions.filter(row=>row.specificationGroup===specification.specificationGroup);
  const freshAccountIssue=fresh.find(row=>row.bankgiroAccountIssue)?.bankgiroAccountIssue;if(freshAccountIssue)throw Error(freshAccountIssue);
  if(fresh.length!==rows.length||!sameBankgiroObservations(rows,fresh))throw Error('Specifikationens uppgifter stämmer inte med det bevarade originalet. Importera eller granska originalet på nytt.');
  return {type:'bankgiro.link',transactionId:target.id,specificationId:specification.id,specificationIds:rows.map(row=>row.id),note:input.note,confirmOriginals:input.confirmOriginals===true,confirmAccount:input.confirmAccount===true,dateDifferenceNote:input.dateDifferenceNote??''};

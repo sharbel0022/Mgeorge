@@ -16,6 +16,10 @@ const errors:Record<string,string>={
  RATE_LIMITED:'Källan begränsar antalet hämtningar.',TIMEOUT:'Hämtningen tog för lång tid.',SOURCE_UNAVAILABLE:'Rapportkällan kunde inte nås.',
  INVALID_PAGE:'Källans rapportlista kunde inte godkännas.',HASH_MISMATCH:'Rapportens kontrollsumma stämmer inte.',IDENTITY_CONFLICT:'Rapportens identitet eller innehåll har ändrats.',
  INVALID_ORIGINAL:'Rapportoriginalet kunde inte godkännas.',INVALID_SINK_RESULT:'Inläsningen kunde inte bekräftas.',LEASE_LOST:'Körningen avbröts när körlåset ändrades.',
+ ACCOUNT_MISMATCH:'Rapportens konto stämmer inte med företagets verifierade bankkonto.',
+ BANKGIRO_INFORMATION_UNAVAILABLE:'Individuell betalningsinformation är inte tillgänglig i API-underlaget.',
+ BANKGIRO_INFORMATION_PARTIAL:'Individuell betalningsinformation är ofullständig och behöver granskas.',
+ BANKGIRO_ENRICHMENT_REVIEW:'Bankgirodetaljerna behöver granskas mot bankoriginalet.',
 };
 const errorLabel=(code?:string|null)=>code?(Object.hasOwn(errors,code)?errors[code]:'Orsaken kunde inte visas. Kontrollera rapportkällan.'):null;
 
@@ -54,7 +58,7 @@ export function BankgiroSourceView({status,loading=false,error=false,demo=false}
   {status.missingReportIds.length>0&&<p role="status">Källan rapporterar {status.missingReportIds.length} saknade rapporter. Det bevisar inte att en betalning saknas.</p>}
   {(verifiedAt||validUntil)&&<details><summary>Behörighetskvitto</summary><dl className="bank-summary"><div><dt>Verifierad</dt><dd>{verifiedAt??'Ingen tid bekräftad'}</dd></div><div><dt>Giltig till</dt><dd>{validUntil??'Ingen tid bekräftad'}</dd></div></dl></details>}
   {status.jobs.length>0&&<details><summary>Senaste rapporterna</summary><ul>{status.jobs.slice(0,10).map(job=><li key={job.id}><span className="mono">{job.reportId}</span> · {labels[job.status]??'Behöver granskning'}{job.lastError&&<span className="bankgiro-job-error">{errorLabel(job.lastError)}</span>}</li>)}</ul></details>}
-  <p className="muted">Manuell Excelimport finns kvar som reserv. En inläst rapport innebär att underlaget har sparats; betalningen behöver fortfarande ha tillräckliga bankbevis.</p>
+  <p className="muted">Om API-underlaget saknar individuella betalningar används företagets CAMT054C/SFTP-källa när ett godkänt avtal finns. Manuell filimport, inklusive Excelimport, finns kvar som sista reserv. En inläst rapport innebär att underlaget har sparats; betalningen behöver fortfarande ha tillräckliga bankbevis.</p>
  </section>;
 }
 

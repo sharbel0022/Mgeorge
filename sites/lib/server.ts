@@ -9,7 +9,7 @@ export async function readWorkspace(owner:string){const row=await db().prepare('
 async function readOriginalBytes(owner:string,documentId:string,maxBytes:number,bank:boolean){
  const doc=await db().prepare('SELECT filename,mime,sha256,size FROM documents WHERE id=? AND owner=?').bind(documentId,owner).first<{filename:string;mime:string;sha256:string;size:number}>();
  if(!doc)throw Error(bank?'Välj ett sparat bankoriginal i XLSX-, CSV- eller camt XML-format.':'Originalet saknas för den aktuella ägaren.');
- if(bank&&!(doc.mime==='text/csv'&&/\.csv$/i.test(doc.filename)||doc.mime==='application/xml'&&/\.xml$/i.test(doc.filename)||doc.mime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'&&/\.xlsx$/i.test(doc.filename)))throw Error('Välj ett sparat bankoriginal i XLSX-, CSV- eller camt XML-format.');
+ if(bank&&!(doc.mime==='text/csv'&&/\.csv$/i.test(doc.filename)||doc.mime==='application/xml'&&/\.xml$/i.test(doc.filename)||doc.mime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'&&/\.xlsx$/i.test(doc.filename)||doc.mime==='application/vnd.mgeorge.openpayments-bankgiro+json'&&/\.opbg\.json$/i.test(doc.filename)))throw Error('Välj ett sparat bankoriginal i XLSX-, CSV- eller camt XML-format.');
  if(!Number.isSafeInteger(doc.size)||doc.size<1||doc.size>15_000_000||!/^[a-f0-9]{64}$/.test(doc.sha256))throw Error(bank?'Bankoriginalets storlek är ogiltig.':'Originalets storlek eller kontrollsumma är ogiltig.');
  if(doc.size>maxBytes)throw Error(bank?'Bankoriginalen överskrider kontrollens säkerhetsgräns. Granska underlagen i mindre omgångar.':'Originalen överskrider kontrollens säkerhetsgräns. Granska underlagen i mindre omgångar.');
  const object=await env.BUCKET?.get(`${owner}/${documentId}`);if(!object||object.size!==doc.size)throw Error(bank?'Bankoriginalet saknas eller har ändrad storlek.':'Originalet saknas eller har ändrad storlek.');
@@ -24,6 +24,7 @@ export async function readInvoiceOriginalBytes(owner:string,documentId:string,ma
 /** Bank facts come from retained bytes. An owned document ID alone is not evidence. */
 export async function readBankFileOriginal(owner:string,command:Record<string,any>){
  const doc=await readBankOriginalBytes(owner,command.documentId),bytes=doc.bytes;
+ if(/\.opbg\.json$/i.test(doc.filename))throw Error('API-underlaget ska läsas via den företagsbundna Bankgiroimporten.');
  if(/\.xlsx$/i.test(doc.filename))throw Error('Importera Excelrapporten via Importera Bankgirofil så att rapportens kontroller och granskningsspärrar används.');
  let text:string;try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{text=new TextDecoder('windows-1252').decode(bytes);}
  const {parseCSV,guessMapping,mapCSV,parseCAMT}=await import('./imports');

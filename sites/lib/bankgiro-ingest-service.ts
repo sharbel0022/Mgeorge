@@ -2,7 +2,7 @@ import {env} from 'cloudflare:workers';
 import {db,readWorkspace,readBankOriginalBytes} from './server';
 import {applyCommand,emptyState,now,uid,specificationPreview,BankImportEvidenceError,bankImportEvidenceError,prepareBankImportFailure,type State} from './domain';
 import {readBankgiroOriginal} from './bankgiro-service';
-import {parseSpecificationBytes} from './bankgiro-parser.js';
+import {parseSpecificationBytes,readOpenPaymentsBankgiroCapture,assertOpenPaymentsBankgiroAuthority} from './bankgiro-parser.js';
 import {assertPaymentOriginal,writePaymentState} from './reconciliation-evidence';
 import {createBankgiroIngest} from './bankgiro-ingest.js';
 import {createBankgiroIngestStore} from './bankgiro-ingest-store.js';
@@ -14,11 +14,11 @@ type Report={reportId:string;filename:string;sha256:string};
 type Job=Report&{registrationBinding?:string;id:string;owner:string;sourceId:string;scopeId:string;documentId:string;authorizationGeneration:string};
 type Authorization={registrationBinding?:string;configurationRevision?:number;status:string;owner:string;sourceId:string;scopeId:string;generation:string;validUntil:string;evidenceId:string};
 type ImportInput={owner:string;job:Job;documentId:string;authorization:Authorization;lease:Lease};
-type Outcome={status:'IMPORTED'|'REVIEW'|'DUPLICATE';importId?:string;paymentCount:number};
+type Outcome={status:'IMPORTED'|'REVIEW'|'DUPLICATE';importId?:string;paymentCount:number;reasonCode?:string};
 const error=(code:string,message:string)=>Object.assign(Error(message),{code});
 const originalError=()=>error('INVALID_ORIGINAL','Bankoriginalet behöver kontrolleras innan rapporten kan importeras.');
 const mimeTypes:Record<string,string>={xml:'application/xml',csv:'text/csv',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
-const mime=(filename:string)=>mimeTypes[filename.split('.').pop()?.toLowerCase()||''];
+const mime=(filename:string)=>/\.opbg\.json$/i.test(filename)?'application/vnd.mgeorge.openpayments-bankgiro+json':mimeTypes[filename.split('.').pop()?.toLowerCase()||''];
 const hash=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',Uint8Array.from(bytes))),byte=>byte.toString(16).padStart(2,'0')).join('');
 function originalFailure(failure:unknown):never{
  // The shared reader reports these fixed validation messages. Storage/network
@@ -89,8 +89,17 @@ export function createSitesBankgiroSink(){
   if(!current)throw error('AUTHORIZATION_CHANGED','Rapportkällans aktuella behörighet har ändrats. Kontrollera källan igen.');
  }
  function sourceEvidence(input:ImportInput){const {job,authorization}=input;return{jobId:job.id,sourceId:job.sourceId,scopeId:job.scopeId,reportId:job.reportId,authorizationGeneration:authorization.generation,authorizationEvidenceId:authorization.evidenceId};}
+ function captureAuthority(input:ImportInput,original:Awaited<ReturnType<typeof readBankOriginalBytes>>,state:State){
+  if(!/\.opbg\.json$/i.test(original.filename))return null;
+  const capture=readOpenPaymentsBankgiroCapture(original.bytes);
+  if(capture.reportId!==input.job.reportId)throw error('IDENTITY_CONFLICT','API-originalets rapportidentitet stämmer inte med rapportjobbet.');
+  const receipt=assertOpenPaymentsBankgiroAuthority(capture,input.authorization,{owner:input.owner,companyId:state.company.id,sourceId:input.job.sourceId,scopeId:input.job.scopeId});
+  return {capture,receipt};
+ }
  async function commit(input:ImportInput,original:Awaited<ReturnType<typeof readBankOriginalBytes>>,old:Awaited<ReturnType<typeof readWorkspace>>,state:State,payload:string,action:string,detail:Record<string,unknown>,auditId=uid()){
   checkAuthorization(input);await input.lease.assert();
+  const provider=captureAuthority(input,original,old.state);
+  if(provider)detail={...detail,enrichmentAuthorization:provider.receipt};
   const {owner,job,documentId,authorization,lease}=input,at=now();
   const originalFence=database.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND filename=? AND mime=? AND size=?) AND EXISTS(SELECT 1 FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND registration_binding=? AND status IN ('PENDING','RETRY')) AND EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE owner=? AND source_id=? AND scope_id=? AND authorization_generation=? AND authorization_status='VERIFIED') AND julianday(?)>julianday('now') THEN 1 ELSE json('BANKGIRO_ORIGINAL_CHANGED') END").bind(owner,documentId,job.sha256,original.filename,original.mime,original.size,job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration,job.registrationBinding??'',owner,job.sourceId,job.scopeId,authorization.generation,authorization.validUntil);
   const statements=[lease.fence(),originalFence,
@@ -106,8 +115,9 @@ export function createSitesBankgiroSink(){
   if(!await jobStatement(input).first())throw error('IDENTITY_CONFLICT','Rapportjobbet stämmer inte med den sparade leveransidentiteten.');
   const original=await checkedOriginal(owner,documentId);
   if(original.sha256!==job.sha256||original.mime!==mime(job.filename))throw error('HASH_MISMATCH','Det sparade originalet motsvarar inte rapportleveransen.');
+  const old=await readWorkspace(owner),provider=captureAuthority(input,original,old.state);
   let command:Awaited<ReturnType<typeof readBankgiroOriginal>>;
-  try{command=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId});}
+  try{command=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId},{allowApiCapture:true});}
   catch(failure){
    // Classify malformed bytes with the same parser, only on the error path.
    // A transient second R2 read must not permanently block a valid report.
@@ -116,7 +126,7 @@ export function createSitesBankgiroSink(){
   }
   if(command.hash!==job.sha256||command.name!==original.filename)throw error('HASH_MISMATCH','Originalets identitet ändrades under kontrollen.');
   await lease.assert();checkAuthorization(input);
-  const old=await readWorkspace(owner),previous=old.state.imports.filter(record=>record.hash===job.sha256||record.documentId===documentId),paymentCount=command.rows.filter((row:{kind:string})=>row.kind!=='batch').length;
+  const previous=old.state.imports.filter(record=>record.hash===job.sha256||record.documentId===documentId),paymentCount=command.rows.filter((row:{kind:string})=>row.kind!=='batch').length;
   await assertCurrentAuthorization(input);
   if(previous.length){
    if(previous.some(record=>record.hash!==job.sha256||!record.documentId))throw error('IDENTITY_CONFLICT','Originalet har en motstridig tidigare importidentitet.');
@@ -124,12 +134,21 @@ export function createSitesBankgiroSink(){
    // This receipt also recovers a commit whose response the worker never saw.
    return{status:'DUPLICATE',importId:previous[0].id,paymentCount};
   }
+  const enrichment=provider?{provider:'openpayments',profile:'openpayments-bankgiro-v1',...provider.capture.context,reportId:provider.capture.reportId,coverage:provider.capture.normalization.coverage,authorization:provider.receipt}:undefined;
+  if(provider&&!paymentCount){
+   const state=structuredClone(old.state),record={id:uid(),hash:job.sha256,account:'Bankgiro',name:original.filename,count:0,createdAt:now(),documentId,enrichment};state.imports.push(record);
+   const payload=JSON.stringify(state);if(new TextEncoder().encode(payload).length>1800000)throw originalError();
+   await commit(input,original,old,state,payload,'bankgiro.import',{message:'Individuell betalningsinformation är inte tillgänglig i API-underlaget.',source:sourceEvidence(input),allocationsCreated:0});
+   return{status:'REVIEW',importId:record.id,paymentCount:0,reasonCode:'BANKGIRO_INFORMATION_UNAVAILABLE'};
+  }
   const preview=validateReport(()=>specificationPreview(old.state,command.rows));let current=old.state;
   for(const id of new Set(preview.plans.flatMap(plan=>plan.parentId?[plan.parentId]:[])))current=await assertPaymentOriginal(owner,current,id);
   const auditCommand={type:command.type,documentId,hash:command.hash,name:command.name};
   let result:ReturnType<typeof applyCommand>,payload:string;
   try{
-   result=validateReport(()=>applyCommand(current,command));payload=JSON.stringify(result.state);
+   result=validateReport(()=>applyCommand(current,command));
+   const record=result.state.imports.find(record=>!old.state.imports.some(previous=>previous.id===record.id));if(record&&enrichment)record.enrichment=enrichment;
+   payload=JSON.stringify(result.state);
    if(JSON.stringify(result.state.allocations)!==JSON.stringify(old.state.allocations))throw error('INVALID_SINK_RESULT','Rapportimporten får inte ändra fakturornas betalningskopplingar.');
    if(new TextEncoder().encode(payload).length>1800000)throw bankImportEvidenceError(old.state,result.state,'Rapportimporten överskrider registrets storleksgräns.')||originalError();
   }catch(failure){
@@ -140,7 +159,8 @@ export function createSitesBankgiroSink(){
   }
   await commit(input,original,old,result.state,payload,'bankgiro.import',{message:result.message,command:auditCommand,source:sourceEvidence(input),allocationsCreated:0});
   const record=result.state.imports.find(record=>!old.state.imports.some(previous=>previous.id===record.id));
-  return{status:preview.review||paymentCount===0?'REVIEW':record?.count===0?'DUPLICATE':'IMPORTED',importId:record?.id,paymentCount};
+  const review=preview.review||paymentCount===0,reasonCode=provider&&review?(provider.capture.normalization.coverage.status==='partial'?'BANKGIRO_INFORMATION_PARTIAL':'BANKGIRO_ENRICHMENT_REVIEW'):undefined;
+  return{status:review?'REVIEW':record?.count===0?'DUPLICATE':'IMPORTED',importId:record?.id,paymentCount,...(reasonCode?{reasonCode}:{})};
  }
  return{retain,importReport};
 }
