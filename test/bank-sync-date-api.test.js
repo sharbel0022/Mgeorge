@@ -6,6 +6,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {request} from 'node:http';
 import {encryptObject,decryptObject} from '../src/security.js';
+import {createNodeCompanyBankSyncRuntime} from '../src/company-bank-sync.js';
 
 // Only a temporary SQLite database and generated credentials are used here.
 const folder=mkdtempSync(join(tmpdir(),'mg-bank-sync-dates-'));
@@ -47,6 +48,8 @@ async function call(path,body){
 const sync=body=>call('/api/bank/sync',{connection_id:connectionId,...body});
 const stored=()=>db.prepare('SELECT * FROM bank_connections WHERE id=?').get(connectionId);
 const freeze=(t,iso='2026-11-02T10:00:00Z')=>t.mock.timers.enable({apis:['Date'],now:new Date(iso)});
+const bindCompanyDuringLegacyRead=()=>createNodeCompanyBankSyncRuntime({db,companyId:'synthetic-enrolled-company',owner:'local-admin',evidenceId:'synthetic-binding',existingDataCompanyId:'synthetic-enrolled-company',resolveContext:async()=>null,assertCurrent:()=>true});
+const clearCompanyBinding=()=>{if(db.prepare("SELECT 1 FROM sqlite_master WHERE name='company_bank_sync_scopes'").get())db.exec('DELETE FROM company_bank_sync_scopes');};
 async function retainedHistory(){
   provider=async()=>Response.json({transactions:[transaction('retained-original','2026-10-15')]});
   const result=await sync({date_from:'2026-10-01',date_to:'2026-11-02'});
@@ -61,6 +64,36 @@ function assertHistoryUnchanged(before){
   assert.equal(stored().selected_account_uid,before.connection.selected_account_uid);
   assert.deepEqual(db.prepare('SELECT * FROM bank_transactions ORDER BY id').all(),before.transactions);
 }
+
+test('company enrollment during a legacy transaction response stops import and preserves existing originals',async t=>{
+ freeze(t);const before=await retainedHistory();
+ let responseReady,release;
+ const started=new Promise(resolve=>{responseReady=resolve;});
+ provider=async()=>{responseReady();return new Promise(resolve=>{release=()=>resolve(Response.json({transactions:[transaction('late-legacy-import','2026-11-02')]}));});};
+ const pending=sync({date_from:'2026-11-01',date_to:'2026-11-02'});
+ try{
+  await started;await bindCompanyDuringLegacyRead();release();
+  const result=await pending;assert.equal(result.status,409);assert.equal(result.body.code,'company_sync_required');
+  assertHistoryUnchanged(before);
+  assert.equal(db.prepare('SELECT count(*) n FROM import_jobs').get().n,1);
+ }finally{release?.();await pending;clearCompanyBinding();}
+});
+
+test('company enrollment during legacy account verification blocks the account-selection commit',async t=>{
+ freeze(t);await retainedHistory();
+ const other={...account,uid:'other-account',account_id:{other:{identification:'SYNTHETIC-OTHER-ACCOUNT'}}};
+ db.prepare('UPDATE bank_connections SET accounts_json=? WHERE id=?').run(encryptObject([account,other]),connectionId);
+ const before={connection:stored(),transactions:db.prepare('SELECT * FROM bank_transactions ORDER BY id').all()};
+ let responseReady,release;
+ const started=new Promise(resolve=>{responseReady=resolve;});
+ verifyProvider=async()=>{responseReady();return new Promise(resolve=>{release=()=>resolve(Response.json(liveSession({accounts:['account','other-account']})));});};
+ const pending=call('/api/bank/accounts',{connection_id:connectionId,account_uid:'other-account'});
+ try{
+  await started;await bindCompanyDuringLegacyRead();release();
+  const result=await pending;assert.equal(result.status,409);assert.equal(result.body.code,'company_sync_required');
+  assertHistoryUnchanged(before);assert.equal(requests.length,0);
+ }finally{release?.();await pending;clearCompanyBinding();}
+});
 
 for(const [name,patch] of [
   ['has expired',{access:{valid_until:'2026-11-02T09:59:00Z'}}],

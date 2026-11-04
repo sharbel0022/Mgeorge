@@ -17,6 +17,8 @@ import {createNodeBankgiroIngest} from './bankgiro-ingest.js';
 import {resolveBankgiroSource} from '../sites/lib/bankgiro-source-registry.js';
 import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
 import {createIntegrationJobs} from './integration-jobs.js';
+import {runScheduledCompanyBankSync,isCompanyBankSyncDatabase} from './company-bank-sync.js';
+export {createNodeCompanyBankSyncRuntime,registerCompanyBankSyncRuntime,nodeCompanyBankAccountKey} from './company-bank-sync.js';
 import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
 import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
 import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
@@ -30,7 +32,8 @@ import {createPaymentControl,planBankControl} from './payment-control.js';
 import {buildPaymentOverview,invoiceAnalysis} from './payment-overview.js';
 import {bankSpecificationCandidates,confirmBankSpecificationLink,revokeBankSpecificationLink,bankSpecificationPresentation,bankApiOriginal} from './bankgiro-links.js';
 
-function reconcileAndPrepare(){const suggestions=runReconciliation(db);prepareMessages(db);return suggestions;}
+function assertLegacyBankRuntime(){if(isCompanyBankSyncDatabase(db))throw Object.assign(bad(409,'Företagets bankhämtning och avstämning kräver den registrerade företagsanslutningen.'),{code:'company_sync_required'});}
+function reconcileAndPrepare(){assertLegacyBankRuntime();const suggestions=runReconciliation(db);prepareMessages(db);return suggestions;}
 
 function config(){
   const origin=(process.env.APP_ORIGIN||'http://localhost:3000').replace(/\/$/,'');
@@ -47,6 +50,7 @@ const db=openDatabase();
 const integrationJobs=createIntegrationJobs(db);
 async function bankgiroIngest(owner){return createNodeBankgiroIngest(db,{source:await resolveBankgiroSource(owner,{configuration:process.env.BANKGIRO_SOURCE_CONFIG,secrets:process.env})});}
 export async function runScheduledBankgiro(){
+  if(isCompanyBankSyncDatabase(db))return;
   const owner=check.secure?'administrator':'local-admin';
   const source=await resolveBankgiroSource(owner,{configuration:process.env.BANKGIRO_SOURCE_CONFIG,secrets:process.env});
   if(!source)return;
@@ -285,7 +289,9 @@ async function verifyBankSession(connection,deadline){
 }
 /** Hämtar bankhändelser för vald anslutning, kontrollerar bankens svar och sparar endast giltiga poster med dubblettskydd. */
 async function syncBank(connection,{account_uid,date_from,date_to,scheduled=false,interval=0}={},operationLocked=false){
+  assertLegacyBankRuntime();
   const authorize=()=>{
+    assertLegacyBankRuntime();
     if(connection.request_session_hash){
       const active=db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(connection.request_session_hash,Date.now());
       if(!active||active.principal!==connection.owner)throw bad(401,'Sessionen har avslutats. Logga in igen.');
@@ -386,10 +392,13 @@ function utcTimestamp(value){return Date.parse(value.includes('T')?value:value.r
 /** Kontrollerar om inställda synkroniseringsjobb är förfallna. Jobben körs bara medan denna Node-server kör. */
 export async function runScheduledSync(){
   const settings=getSettings(db),interval=settings.sync_interval_minutes,gmailInterval=settings.gmail_sync_interval_minutes;
-  if((!interval&&!gmailInterval)||schedulerState.running)return;
+  if(schedulerState.running)return;
   schedulerState.running=true;schedulerState.last_error='';
   const due=(key,last,minutes)=>integrationJobs.due(key,last?utcTimestamp(last):0,minutes*60000);
   try{
+    const companies=await runScheduledCompanyBankSync();
+    if(companies.results.some(result=>result.status!=='success'))schedulerState.last_error='Företagets bankhämtning behöver kontrolleras';
+    if(isCompanyBankSyncDatabase(db)||!interval&&!gmailInterval){if(companies.results.length)schedulerState.last_run=new Date().toISOString();return;}
     const mail=db.prepare("SELECT * FROM gmail_connections WHERE status NOT IN ('renewal_required','access_denied','missing_scope','invalid_client','account_mismatch','invalid_tokens','blocked') ORDER BY created_at DESC LIMIT 1").get();
     if(mail&&gmailInterval&&isGmailConfigured()&&due('gmail',mail.last_synced,gmailInterval)){
       try{await syncGmail(null,{scheduled:true,interval:gmailInterval*60000});}catch{schedulerState.last_error='Gmail-hämtningen behöver kontrolleras';}
@@ -484,6 +493,7 @@ async function route(req,res){
   if(req.principal!==(check.secure?'administrator':'local-admin'))throw bad(403,'Användaren saknar behörighet till företagets arbetsyta');
   if(path==='/api/bankgiro/source/status'&&req.method==='GET')return json(res,200,publicBankgiroStatus(await (await bankgiroIngest(req.principal)).status(req.principal)));
   if(path==='/api/bankgiro/source/run'&&req.method==='POST'){
+    assertLegacyBankRuntime();
     const body=await readBody(req);
     if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).length)throw bad(400,'Bankgirohämtningen accepterar ingen ägare eller källkonfiguration.');
     const ingest=await bankgiroIngest(req.principal);assertSessionStillAuthorized(req);
@@ -750,6 +760,7 @@ async function route(req,res){
     }finally{if(renewalLock)bankSyncing.delete(renewalLock);}
   }
   if(path==='/api/bank/accounts'&&req.method==='POST'){
+    assertLegacyBankRuntime();
     const b=await readBody(req),connection=ownedConnection(req,b.connection_id);
     if(bankSyncing.has(connection.id))throw bad(409,'Vänta tills bankåtgärden har avslutats');
     bankSyncing.add(connection.id);
@@ -760,7 +771,7 @@ async function route(req,res){
     if(!account)throw bad(400,'Välj ett godkänt företagskonto');
     stableAccountIdentity(account,connection.bank_name);
     await verifyBankSession({...connection,selected_account_uid:account.uid},bankLeases.get(connection.id).deadline);
-    bankLeases.get(connection.id).write(()=>{assertSessionStillAuthorized(req);
+    bankLeases.get(connection.id).write(()=>{assertLegacyBankRuntime();assertSessionStillAuthorized(req);
     const changed=connection.selected_account_uid!==account.uid;
     db.prepare("UPDATE bank_connections SET selected_account_uid=?,last_synced=?,status='connected',last_error='' WHERE id=? AND owner=?").run(account.uid,changed?'':connection.last_synced,connection.id,req.principal);
     audit(db,'bank_account_selected',{connection_id:connection.id});

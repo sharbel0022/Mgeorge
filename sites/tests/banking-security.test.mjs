@@ -94,7 +94,7 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
   const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
   const readGuardUrl = compiledModule('../lib/banking/account-read-guard.ts', { '../server': serverUrl, './store': storeUrl, './enable-banking': providerUrl });
-  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, './account-read-guard': readGuardUrl, '../bankgiro-ingest-service':jsUrl(`export async function runBankgiroSource(owner){globalThis[${JSON.stringify(key)}].reportOwner=owner;return {enabled:false,state:'DISABLED'};}`),'../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
+  const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, './account-read-guard': readGuardUrl, './company-sync':jsUrl('export async function dispatchCompanyAutomaticSync(){return null;}'), '../bankgiro-ingest-service':jsUrl(`export async function runBankgiroSource(owner){globalThis[${JSON.stringify(key)}].reportOwner=owner;return {enabled:false,state:'DISABLED'};}`),'../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
   f.store = await import(storeUrl); f.service = await import(serviceUrl);
   f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
   f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
@@ -168,6 +168,27 @@ test('Automatic fetching is opt-in and rejects foreign connection IDs and cross-
   assert.equal(f.connection().auto_sync_enabled, 0);
   await f.service.setAutomaticSync(post('automatic', { enabled: true, connectionId: id }));
   assert.equal((await (await f.service.automaticSyncStatus()).json()).enabled, true);
+});
+
+test('company reconnect preserves the disconnected same-bank connection identity and requires new account selection',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();f.sql.exec(source('../drizzle/0023_saas_bank_sync.sql'));
+ f.sql.prepare('INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES(?,?,?,?)').run('synthetic-company',f.owner,'synthetic-membership-proof',Date.now());
+ const retryAfter=new Date(Date.now()+3600000).toISOString();f.sql.prepare('UPDATE bank_connections SET retry_after=? WHERE owner=?').run(retryAfter,f.owner);
+ await f.service.disconnect(post('disconnect'));
+ const nextUid='44444444-4444-4444-8444-444444444444',nextSession='55555555-5555-4555-8555-555555555555';f.account.uid=nextUid;f.live.accounts=[nextUid];f.live.accounts_data=[{uid:nextUid}];
+ f.provider.createSession=async()=>({session_id:nextSession,accounts:[structuredClone(f.account)],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:future()}});
+ await f.start();assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'),'/bank?result=connected');
+ const conn=f.connection();assert.equal(conn.id,id);assert.equal(await f.store.sessionId(conn),nextSession);assert.equal((await f.store.accounts(conn))[0].uid,nextUid);assert.equal(conn.selected_accounts,'[]');assert.equal(conn.auto_sync_enabled,0);assert.equal(conn.retry_after,retryAfter);
+ await assert.rejects(f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[accountUid]})),/tillgängliga/);
+ await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[nextUid]}));assert.equal(f.connection().selected_accounts,JSON.stringify([nextUid]));
+ await assert.rejects(f.service.sync(post('sync')),error=>error.status===409);
+});
+
+test('company reconnect never aliases a different provider environment to the prior connection',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();f.sql.exec(source('../drizzle/0023_saas_bank_sync.sql'));
+ f.sql.prepare('INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES(?,?,?,?)').run('synthetic-company',f.owner,'synthetic-membership-proof',Date.now());
+ await f.service.disconnect(post('disconnect'));f.sql.prepare("UPDATE bank_connections SET environment='SANDBOX' WHERE owner=?").run(f.owner);
+ await f.start();assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'),'/bank?result=connected');assert.notEqual(f.connection().id,id);assert.equal(f.connection().selected_accounts,'[]');
 });
 
 test('main control reserves a six-hour retry inside the bank lock without enabling automatic sync',async t=>{

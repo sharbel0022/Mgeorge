@@ -102,14 +102,20 @@ function diskSource(reference){
 // Exact pre-0018 rows remain authenticated historical evidence. New authority
 // fields default to unknown; restoring evidence never activates a live source.
 const readinessDefaults={bankgiro_ingest_sources:{revoked_generations:'[]',registration_revision:0,registration_binding:null,authorization_verified_at:null,authorization_valid_until:null,last_success_at:null,last_failure_at:null,last_failure_code:null},bankgiro_ingest_jobs:{registration_binding:''}};
-function historicalRow(table,row){const defaults=readinessDefaults[table];return defaults&&Object.keys(defaults).every(key=>!Object.hasOwn(row,key))?{...row,...defaults}:row;}
+function recoveredRow(table,row){
+ const defaults=readinessDefaults[table],retained=defaults&&Object.keys(defaults).every(key=>!Object.hasOwn(row,key))?{...row,...defaults}:row;
+ // Captured lease tokens remain in the authenticated source snapshot, but no
+ // recovered row may reuse a former worker's authority. Quota, embargo,
+ // checkpoints and receipts are durable evidence and remain unchanged.
+ return table==='company_bank_sync_jobs'?{...retained,lease_token:'',lease_until:0,lease_deadline:0,fence_version:retained.fence_version+1}:retained;
+}
 function checkDatabase(database,snapshot,prefix=''){
  if(database.prepare('PRAGMA integrity_check').get().integrity_check!=='ok'||database.prepare('PRAGMA foreign_key_check').all().length)fail('database_invalid');
  for(const table of snapshot.tables){
   const actual=database.prepare('SELECT * FROM '+quote(prefix+table.name)).all();
   const fields=database.prepare('PRAGMA table_info('+quote(prefix+table.name)+')').all().map(column=>column.name);
   const canonical=rows=>rows.map(row=>JSON.stringify(fields.map(field=>row[field]))).sort();
-  if(JSON.stringify(canonical(actual))!==JSON.stringify(canonical(table.rows.map(row=>historicalRow(table.name,row)))))fail('database_mismatch');
+  if(JSON.stringify(canonical(actual))!==JSON.stringify(canonical(table.rows.map(row=>recoveredRow(table.name,row)))))fail('database_mismatch');
  }
 }
 function evidenceDatabase(snapshot){
@@ -128,7 +134,7 @@ function evidenceDatabase(snapshot){
    const columns=database.prepare('PRAGMA table_info('+quote(table.name)+')').all(),names=columns.map(column=>column.name);
    const insert=database.prepare('INSERT INTO '+quote(table.name)+' ('+names.map(quote).join(',')+') VALUES ('+names.map(()=>'?').join(',')+')');
    for(const original of table.rows){
-    const row=historicalRow(table.name,original);
+    const row=recoveredRow(table.name,original);
     if(Object.keys(row).length!==names.length||names.some(name=>!Object.hasOwn(row,name)))fail('schema_invalid');
     for(const column of columns){
      const value=row[column.name];
@@ -141,7 +147,7 @@ function evidenceDatabase(snapshot){
    }
   }
   database.exec('COMMIT');checkDatabase(database,snapshot);
-  // Keep exact authenticated rows, including encrypted integration records.
+  // Keep authenticated rows and the explicit lease invalidation above.
   // Missing application table names prevent this database being used live.
   for(const table of tables)database.exec('ALTER TABLE '+quote(table)+' RENAME TO '+quote('evidence_'+table));
   checkDatabase(database,snapshot,'evidence_');
@@ -195,7 +201,9 @@ export async function restoreBackupIsolated({bundleDirectory,outputParent,key,ex
   writePrivate(join(output,'source','bundle.json'),verified.sourceHeader,guard);
   writePrivate(join(output,'source','manifest.bin'),verified.sourceManifest,guard);
   writePrivate(join(output,'source','snapshot.bin'),verified.sourceSnapshot,guard);
-  const receipt={format:'MG-Sites-evidence-restore-1',mode:'evidence-only',schemaPrefix:'evidence_',owner:expectedOwner,backupId:expectedBackupId,restoredAt:new Date().toISOString(),snapshotSha256:verified.manifest.run.snapshot_hash,databaseSha256:sha(readFileSync(databasePath)),tables:verified.manifest.tables,originals:{count:verified.manifest.run.total_docs,bytes:verified.manifest.run.bytes}};
+  const companyJobs=verified.snapshot.tables.find(table=>table.name==='company_bank_sync_jobs');
+  const transforms=companyJobs?[{table:'company_bank_sync_jobs',kind:'invalidate_job_leases',rows:companyJobs.rows.length}]:[];
+  const receipt={format:'MG-Sites-evidence-restore-1',mode:'evidence-only',schemaPrefix:'evidence_',owner:expectedOwner,backupId:expectedBackupId,restoredAt:new Date().toISOString(),snapshotSha256:verified.manifest.run.snapshot_hash,databaseSha256:sha(readFileSync(databasePath)),tables:verified.manifest.tables,transforms,originals:{count:verified.manifest.run.total_docs,bytes:verified.manifest.run.bytes}};
   const pending=join(output,'receipt.pending');
   writePrivate(pending,new TextEncoder().encode(JSON.stringify(receipt,null,2)+'\n'),guard);
   database.close();database=undefined;

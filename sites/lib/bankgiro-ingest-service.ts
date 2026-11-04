@@ -20,6 +20,11 @@ const originalError=()=>error('INVALID_ORIGINAL','Bankoriginalet behöver kontro
 const mimeTypes:Record<string,string>={xml:'application/xml',csv:'text/csv',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
 const mime=(filename:string)=>mimeTypes[filename.split('.').pop()?.toLowerCase()||''];
 const hash=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',Uint8Array.from(bytes))),byte=>byte.toString(16).padStart(2,'0')).join('');
+async function legacySourceFence(owner:string,database:D1Database|undefined=env.DB){
+ if(!database||!await database.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='company_bank_sync_scopes'").first())return null;
+ if(await database.prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first())throw error('AUTHORIZATION_BLOCKED','Företagets Bankgirokälla måste använda företagets aktuella behörighet och importkontroller.');
+ return database.prepare("SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM company_bank_sync_scopes WHERE owner=?) THEN 1 ELSE json('AUTHORIZATION_BLOCKED') END").bind(owner);
+}
 function originalFailure(failure:unknown):never{
  // The shared reader reports these fixed validation messages. Storage/network
  // exceptions keep their retry semantics rather than becoming permanent holds.
@@ -63,6 +68,7 @@ export function createSitesBankgiroSink(){
  }
  async function retain({owner,report,bytes,sha256,lease}:{owner:string;report:Report;bytes:Uint8Array;sha256:string;lease:Lease}){
   ownerLease(owner,lease);await lease.assert();
+  const companyFence=await legacySourceFence(owner,database);
   if(!(bytes instanceof Uint8Array)||bytes.byteLength<1||bytes.byteLength>15000000||typeof report.filename!=='string'||report.filename.length>200||/[\u0000-\u001f]/.test(report.filename)||!mime(report.filename))throw originalError();
   if(!/^[a-f0-9]{64}$/.test(sha256)||report.sha256!==sha256||await hash(bytes)!==sha256)throw error('HASH_MISMATCH','Rapportens kontrollsumma stämmer inte med originalfilen.');
   const contentType=mime(report.filename),known=await knownDocument(owner,sha256);
@@ -72,7 +78,7 @@ export function createSitesBankgiroSink(){
   await bucket.put(`${owner}/${id}`,Uint8Array.from(bytes),{httpMetadata:{contentType}});
   try{
    await lease.assert();
-   await lease.write([database.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) SELECT ?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM documents WHERE owner=? AND sha256=?)').bind(id,owner,report.filename,contentType,bytes.byteLength,sha256,now(),owner,sha256)]);
+   await lease.write([...(companyFence?[companyFence]:[]),database.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) SELECT ?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM documents WHERE owner=? AND sha256=?)').bind(id,owner,report.filename,contentType,bytes.byteLength,sha256,now(),owner,sha256)]);
   }catch(failure){await cleanUnreferenced(owner,id);throw failure;}
   // No cleanup on an uncertain outcome read: this upload may be the winner.
   const saved=await knownDocument(owner,sha256);if(!saved)throw Error('D1_ERROR: report original outcome unavailable');
@@ -92,17 +98,19 @@ export function createSitesBankgiroSink(){
  async function commit(input:ImportInput,original:Awaited<ReturnType<typeof readBankOriginalBytes>>,old:Awaited<ReturnType<typeof readWorkspace>>,state:State,payload:string,action:string,detail:Record<string,unknown>,auditId=uid()){
   checkAuthorization(input);await input.lease.assert();
   const {owner,job,documentId,authorization,lease}=input,at=now();
+  const companyFence=await legacySourceFence(owner,database);
   const originalFence=database.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND filename=? AND mime=? AND size=?) AND EXISTS(SELECT 1 FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND registration_binding=? AND status IN ('PENDING','RETRY')) AND EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE owner=? AND source_id=? AND scope_id=? AND authorization_generation=? AND authorization_status='VERIFIED') AND julianday(?)>julianday('now') THEN 1 ELSE json('BANKGIRO_ORIGINAL_CHANGED') END").bind(owner,documentId,job.sha256,original.filename,original.mime,original.size,job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration,job.registrationBinding??'',owner,job.sourceId,job.scopeId,authorization.generation,authorization.validUntil);
-  const statements=[lease.fence(),originalFence,
+  const statements=[...(companyFence?[companyFence]:[]),lease.fence(),originalFence,
    database.prepare('INSERT OR IGNORE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(owner,JSON.stringify(emptyState()),at),
    database.prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(auditId,owner,old.revision+1,action,JSON.stringify(detail),at,owner,old.revision),
    database.prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(payload,at,owner,old.revision),lease.fence()
   ];
   const saved=await writePaymentState(owner,old.revision,old.state,state,database,statements);
-  if(saved[4].meta.changes!==1)throw error('WORKSPACE_CHANGED','Registret ändrades under importen. Rapporten finns kvar och kan bearbetas igen.');
+  if(saved[(companyFence?1:0)+4].meta.changes!==1)throw error('WORKSPACE_CHANGED','Registret ändrades under importen. Rapporten finns kvar och kan bearbetas igen.');
  }
  async function importReport(input:ImportInput):Promise<Outcome>{
   checkAuthorization(input);const {owner,job,documentId,lease}=input;await lease.assert();
+  await legacySourceFence(owner,database);
   if(!await jobStatement(input).first())throw error('IDENTITY_CONFLICT','Rapportjobbet stämmer inte med den sparade leveransidentiteten.');
   const original=await checkedOriginal(owner,documentId);
   if(original.sha256!==job.sha256||original.mime!==mime(job.filename))throw error('HASH_MISMATCH','Det sparade originalet motsvarar inte rapportleveransen.');
@@ -146,10 +154,19 @@ export function createSitesBankgiroSink(){
 }
 
 async function sourceWorker(owner:string){
- const source=await resolveBankgiroSource(owner,{configuration:(env as unknown as Record<string,unknown>).BANKGIRO_SOURCE_CONFIG,secrets:env as unknown as Record<string,unknown>}) as {id:string;mode:string}|null;
+ const source=await resolveBankgiroSource(owner,{configuration:(env as unknown as Record<string,unknown>).BANKGIRO_SOURCE_CONFIG,secrets:env as unknown as Record<string,unknown>}) as {id:string;mode:string;[key:string]:any}|null;
  // An absent or synthetic source must not require D1/R2 or create a lease.
  if(!source||source.mode==='synthetic')return createBankgiroIngest({source,store:null,sink:null});
- return createBankgiroIngest({source,store:createBankgiroIngestStore(db()),sink:createSitesBankgiroSink()});
+ try{await legacySourceFence(owner);}catch(failure){
+  if((failure as {code?:string})?.code!=='AUTHORIZATION_BLOCKED')throw failure;
+  // Status and an attempted legacy run both report the existing sanitized
+  // blocked projection. They cannot acquire a lease, call transport or mutate
+  // intake state. The sink still rejects any direct company-bound writes.
+  return createBankgiroIngest({source:{id:source.id,mode:source.mode,configurationValid:false},store:null,sink:null});
+ }
+ const guarded={...source};
+ for(const method of ['authorize','listReports','fetchReport'])if(typeof source[method]==='function')guarded[method]=async(...args:unknown[])=>{await legacySourceFence(owner);return source[method](...args);};
+ return createBankgiroIngest({source:guarded,store:createBankgiroIngestStore(db()),sink:createSitesBankgiroSink()});
 }
 export async function bankgiroSourceStatus(owner:string){return publicBankgiroStatus(await(await sourceWorker(owner)).status(owner));}
 export async function runBankgiroSource(owner:string){return publicBankgiroStatus(await(await sourceWorker(owner)).run(owner));}

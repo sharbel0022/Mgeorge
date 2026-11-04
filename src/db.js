@@ -14,6 +14,7 @@ import { bankFinancialReview, bankEvidenceConflictFields, hasBankEvidenceConflic
 import { parseBankFile } from './importers.js';
 import {AIS_NULL_SCHEMA_VERSION,extractPaymentReferences,matchingReferenceValues} from './payment-references.js';
 import {resolveInvoiceReference,matchesInvoiceReference,strictInvoiceReferenceMatch,validateInvoiceReferencePolicies} from './invoice-reference-policy.js';
+import {companyInvoiceReview} from '../sites/lib/company-reconciliation-policy.js';
 
 /** Öppnar SQLite och förbereder databasschemat. Här bevaras företagets fakturor och historik mellan serverstarter. */
 export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sqlite') {
@@ -183,7 +184,9 @@ export function invoiceReferenceOriginal(extraction){
 export function invoiceReferenceProjection(invoice,context,originals=[]){
   const decisions=[resolveInvoiceReference(invoice,context),...originals.map(original=>resolveInvoiceReference({...invoice,original},context))];
   const blocked=decisions.filter(decision=>decision.applies&&decision.status==='BLOCKED');
-  const referencePolicy=blocked.length?{...blocked[0],issues:[...new Set(blocked.flatMap(decision=>decision.issues))],reason:[...new Set(blocked.map(decision=>decision.reason))].join(' ')}:decisions[0];
+  let referencePolicy=blocked.length?{...blocked[0],issues:[...new Set(blocked.flatMap(decision=>decision.issues))],reason:[...new Set(blocked.map(decision=>decision.reason))].join(' ')}:decisions[0];
+  const companyIssue=companyInvoiceReview(invoice,originals,context?.companyReferenceMode);
+  if(companyIssue)referencePolicy={...referencePolicy,applies:true,status:'BLOCKED',issues:[...referencePolicy.issues,'company_reference_review'],reason:companyIssue};
   // These identifiers reserve ambiguous ownership only. They never authorize
   // a match or replace the intended reference, bank reference, or stored row.
   const referencePolicyIdentifiers=[...new Set([invoice.invoice_number,invoice.reference,referencePolicy.intendedPaymentReference,...originals.flatMap(original=>[original?.invoice_number,original?.reference])].filter(value=>typeof value==='string'&&value))];
@@ -202,9 +205,9 @@ export function invoiceReferenceMatchIssue(invoice,transaction,invoices){
   const otherOwner=invoices.some(other=>other.id!==invoice.id&&other.direction===invoice.direction&&other.referencePolicy?.applies&&(other.referencePolicyIdentifiers||[other.invoice_number,other.reference,other.referencePolicy.intendedPaymentReference]).some(identifier=>references.some(value=>strictInvoiceReferenceMatch(identifier,value))));
   return otherOwner?'Flera fakturor gör anspråk på samma betalningsreferens. Granska möjliga dubbletter och motstridiga original.':'';
 }
-export function listInvoices(db) {
+export function listInvoices(db,{referenceContext}={}) {
   const blocked=bankEvidenceBlocksAbsence(db),transactions=new Map(listTransactions(db).map(t=>[t.id,t])),allocations=new Map();
-  const context=invoiceReferenceContext(db),originals=new Map();
+  const context=referenceContext??invoiceReferenceContext(db),originals=new Map();
   for(const document of db.prepare('SELECT invoice_id,extraction FROM documents WHERE invoice_id IS NOT NULL').all()){
     let original;try{original=invoiceReferenceOriginal(JSON.parse(document.extraction));}catch{original=[];}
     originals.set(document.invoice_id,[...(originals.get(document.invoice_id)||[]),original]);
@@ -375,7 +378,7 @@ function invalidateAbsenceChecks(db,importId='',reason='Nytt bankunderlag kräve
   }
 }
 /** Lagrar importerade bankhändelser och använder identiteter/fingeravtryck för att minska risken för dubletter. */
-export function storeTransactions(db,items,source,original=null,guard=null,beforeCommit=null,transaction=null) {
+export function storeTransactions(db,items,source,original=null,guard=null,beforeCommit=null,transaction=null,rejectionTransaction=null) {
   if(items.some(item=>item.review_only))throw Object.assign(new Error('Bankuppgifterna kräver granskning. Spara originalet utan att skapa ekonomiska bankhändelser.'),{status:409,code:'bank_review_only'});
   // Legacy lookup IDs and session account UIDs cannot safely be guessed into
   // stable identities. Block the whole API batch until a reviewed migration
@@ -486,14 +489,17 @@ export function storeTransactions(db,items,source,original=null,guard=null,befor
     // including earlier identity warnings when a later row/specification fails.
     const rejectedFile=source.startsWith('file:')&&original?.content?.length&&['conflicting_bank_record','conflicting_payment_specification','allocated_aggregate'].includes(e.code);
     if(pendingConflicts.length||rejectedFile){
-      db.exec('BEGIN IMMEDIATE');
-      try{
+      const retainRejected=()=>{
         guard?.();
         let rejectedImportId='';
-        if(rejectedFile){
-          rejectedImportId=db.prepare("SELECT id FROM import_jobs WHERE source='bank_file' AND status='blocked' AND content_sha256=? AND mime_type=? ORDER BY rowid LIMIT 1").get(digest(original.content),original.mime_type||'')?.id||'';
+        // The company coordinator can retain a rejected API batch only after
+        // rolling back its outer financial transaction, under a fresh receipt.
+        const rejectedApi=!!rejectionTransaction&&source==='enablebanking'&&original?.content?.length;
+        if(rejectedFile||rejectedApi){
+          const rejectedSource=rejectedFile?'bank_file':'enablebanking';
+          rejectedImportId=db.prepare("SELECT id FROM import_jobs WHERE source=? AND status='blocked' AND content_sha256=? AND mime_type=? ORDER BY rowid LIMIT 1").get(rejectedSource,digest(original.content),original.mime_type||'')?.id||'';
           if(!rejectedImportId){
-            rejectedImportId=recordImport(db,{source:'bank_file',name:source.slice(5),found:items.length,review:Math.max(1,pendingConflicts.length),status:'blocked',error:e.message,content:original.content,mime_type:original.mime_type||''});
+            rejectedImportId=recordImport(db,{source:rejectedSource,name:rejectedFile?source.slice(5):'',found:items.length,review:Math.max(1,pendingConflicts.length),status:'blocked',error:e.message,content:original.content,mime_type:original.mime_type||''});
             if(original?.owner)db.prepare('UPDATE import_jobs SET owner=? WHERE id=?').run(original.owner,rejectedImportId);
             audit(db,'bank_import_rejected',{import_id:rejectedImportId,source,code:e.code,reason:e.message,found:items.length,conflicts:pendingConflicts.length});
           }
@@ -502,20 +508,27 @@ export function storeTransactions(db,items,source,original=null,guard=null,befor
         for(const conflict of pendingConflicts)recordBankEvidenceConflict(db,conflict.transactionId,source,conflict.incoming,conflict.fields,rejectedImportId);
         invalidateAbsenceChecks(db,rejectedImportId,'Motstridigt eller avvisat bankunderlag kräver ny kontroll av utebliven betalning');
         guard?.();
-        db.exec('COMMIT');
+        return {imported:0,duplicate:0,enriched:0,conflicts:pendingConflicts.length,import_id:rejectedImportId};
+      };
+      if(rejectionTransaction){
+        const completion=rejectionTransaction(retainRejected,e);
+        if(completion&&typeof completion.then==='function')throw TypeError('Bank rejection coordination must be synchronous');
+      }else{
+        db.exec('BEGIN IMMEDIATE');
+        try{retainRejected();db.exec('COMMIT');}
+        catch(error){db.exec('ROLLBACK');throw error;}
       }
-      catch(error){db.exec('ROLLBACK');throw error;}
     }
     throw e;
   }
   return {imported,duplicate,enriched,conflicts,import_id};
 }
 /** Bekräftar kopplingen mellan bankhändelse och faktura, med belopps- och riktningskontroller inom en databastransaktion. */
-export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false,transactionOpen=false}={}) {
+export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false,transactionOpen=false,referenceContext}={}) {
   if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');
   if(!transactionOpen)db.exec('BEGIN IMMEDIATE');
   try {
-    const invoices=listInvoices(db),i=invoices.find(x=>x.id===invoiceId),t=listTransactions(db).find(x=>x.id===transactionId);
+    const invoices=listInvoices(db,{referenceContext}),i=invoices.find(x=>x.id===invoiceId),t=listTransactions(db).find(x=>x.id===transactionId);
     if(!i||!t)throw new Error('Faktura eller bankhändelse saknas');
     if(hasBankEvidenceConflict(t))throw new Error(bankEvidenceReviewReason(t));
     if(t.payer_evidence?.conflict)throw new Error('Bankoriginalet innehåller motstridiga organisationsidentifierare. Granska originalet.');

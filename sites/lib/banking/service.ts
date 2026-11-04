@@ -264,15 +264,23 @@ export async function callback(request: Request): Promise<Response> {
         if (!Number.isFinite(expiry) || expiry <= Date.now()) throw new BankError('Bankanslutningen har gått ut.');
         const ids = result.accounts.map(account => account.uid);
         if (new Set(ids).size !== ids.length || !ids.every(id => typeof id === 'string' && checked.accounts.includes(id))) throw new BankError('Kontona kunde inte verifieras.');
-        const id = uid(), at = now();
-        const encryptedSession = await encrypt(owner, `session:${id}`, result.session_id);
-        const encryptedAccounts = await encrypt(owner, `accounts:${id}`, result.accounts);
         const existing = await connection(owner);
         if (existing?.encrypted_session) throw new BankError('Det finns redan en aktiv bankanslutning.');
+        const companyTable=existing?.status==='disconnected'&&await db().prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='company_bank_sync_scopes'").first();
+        const company=companyTable?await db().prepare('SELECT company_id,evidence_id,revision FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first<{company_id:string;evidence_id:string;revision:number}>():null;
+        // A fresh consent changes its session and selected UIDs, not this
+        // company's established same-bank connection namespace. Keeping the
+        // namespace preserves durable quotas, embargoes and import receipts.
+        const renewal=!!company&&!!existing&&existing.status==='disconnected'&&existing.bank_name===flow.bank_name&&existing.country===flow.country&&existing.environment===flow.environment;
+        const id=renewal?existing!.id:uid(),at=now();
+        const encryptedSession = await encrypt(owner, `session:${id}`, result.session_id);
+        const encryptedAccounts = await encrypt(owner, `accounts:${id}`, result.accounts);
+        const renewalFence=renewal?[db().prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM company_bank_sync_scopes WHERE company_id=? AND owner=? AND evidence_id=? AND revision=?) AND EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND status='disconnected' AND encrypted_session='' AND bank_name=? AND country=? AND environment=?) THEN 1 ELSE json('COMPANY_SCOPE_MISMATCH') END").bind(company!.company_id,owner,company!.evidence_id,company!.revision,owner,id,flow.bank_name,flow.country,flow.environment)]:[];
         await lease.write([
+          ...renewalFence,
           db().prepare(`INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,auto_next_at=NULL,auto_last_attempt_at=NULL,retry_after='',sync_failures=0,created_at=excluded.created_at,updated_at=excluded.updated_at`)
-            .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', new Date(expiry).toISOString(), flow.date_from, 'connected', at, at),
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,auto_next_at=NULL,auto_last_attempt_at=NULL,retry_after=${renewal?'bank_connections.retry_after':"''"},sync_failures=0,created_at=excluded.created_at,updated_at=excluded.updated_at`)
+            .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', new Date(expiry).toISOString(), flow.date_from, 'connected', renewal?existing!.created_at:at, at),
           db().prepare("UPDATE bank_auth_flows SET status='completed' WHERE state_hash=? AND owner=?").bind(stateHash, owner),
         ]);
         return callbackRedirect('connected');
@@ -367,6 +375,8 @@ export async function setAutomaticSync(request: Request): Promise<Response> {
 // never send the task runner's IP or browser identity to the bank as the user's.
 export async function automaticSync(request?: Request): Promise<Response> {
   const user = await identity(request);
+  const company=await (await import('./company-sync')).dispatchCompanyAutomaticSync(user.userId,{psu:request?psuHeaders(request):undefined,nextAutomaticAttempt});
+  if(company)return response(company);
   const reports=await import('../bankgiro-ingest-service');
   const bankgiro=await reports.runBankgiroSource(user.userId);
   const result=await synchronizeOwner(user.userId, { automatic: true, psu: request ? psuHeaders(request) : undefined });
@@ -383,7 +393,26 @@ export async function automaticSyncStatus(): Promise<Response> {
 
 async function synchronizeOwner(owner: string, options: { automatic?: boolean; control?:boolean; psu?: ProviderPsu }): Promise<Response> {
   const user = { userId: owner };
-  return withBankLock(user.userId, async lease => {
+  const companyScopes=!!await db().prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='company_bank_sync_scopes'").first();
+  const assertLegacy=async()=>{
+    if(companyScopes&&await db().prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first())throw new BankError('Den här arbetsytan tillhör ett företag. Bankhämtningen måste använda företagets aktuella behörighet och kontroller.',409);
+  };
+  await assertLegacy();
+  return withBankLock(user.userId, async ownerLease => {
+    // A company can be bound after the initial read. Fence every legacy write
+    // under the same owner-lock transaction so manual/control paths cannot
+    // bypass company authority while enrollment is changing concurrently.
+    const lease:BankLease=companyScopes?{
+      async assert(){await ownerLease.assert();await assertLegacy();},
+      async write(statements){
+        await assertLegacy();
+        const fence=db().prepare("SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM company_bank_sync_scopes WHERE owner=?) THEN 1 ELSE json('COMPANY_SCOPE_MISMATCH') END").bind(owner);
+        try{return (await ownerLease.write([fence,...statements])).slice(1);}
+        catch(error){await assertLegacy();throw error;}
+      },
+      async run(statement){return (await lease.write([statement]))[0];},
+    }:ownerLease;
+    await lease.assert();
     const app = await application(user.userId), conn = await connection(user.userId);
     if (options.automatic && (!conn || conn.auto_sync_enabled !== 1)) return response({ automatic: true, due: false, reason: 'disabled', imported: 0 });
     if (!app || !conn || app.generation !== conn.app_generation || storedStatus(conn) !== 'connected') throw new BankError('En giltig bankanslutning behövs. Anslut banken igen.');

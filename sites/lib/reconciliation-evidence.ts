@@ -1,5 +1,5 @@
 import * as retainedOriginals from './server';
-import {analyze,reconcileState,reconciliationPreview} from './reconciliation';
+import {analyze,reconcileState,reconciliationPreview,type ReconciliationOptions} from './reconciliation';
 import {normalizeName} from './reconciliation-engine.js';
 import {now,uid,bankApiOriginalIssue,canonicalBankAccount,hasBankApiOrigin,paymentLineage,paymentOriginalIssue,invoiceReferenceDecision,readBankgiroSourceEvidence,type State,type Transaction} from './domain';
 
@@ -45,9 +45,9 @@ function relatedTransactions(state:State,ids:Iterable<string>){
  for(const id of ids){const t=state.transactions.find(t=>t.id===id);if(t)for(const ancestor of paymentLineage(state,t).ancestors)result.add(ancestor.id);}
  return result;
 }
-function requiredEvidence(state:State,verifiedInvoiceOriginals:ReadonlySet<string>,sourceReviewIssues:ReadonlyMap<string,string>){
- const proposed=reconcileState(state,verifiedInvoiceOriginals,sourceReviewIssues),ids=new Set<string>();
- for(const decision of [...analyze(state,verifiedInvoiceOriginals,sourceReviewIssues).filter(f=>f.safe),...proposed.decisions]){
+function requiredEvidence(state:State,verifiedInvoiceOriginals:ReadonlySet<string>,sourceReviewIssues:ReadonlyMap<string,string>,options:ReconciliationOptions={}){
+ const proposed=reconcileState(state,verifiedInvoiceOriginals,sourceReviewIssues,options),ids=new Set<string>();
+ for(const decision of [...analyze(state,verifiedInvoiceOriginals,sourceReviewIssues,options).filter(f=>f.safe),...proposed.decisions]){
   if(decision.transaction_id)ids.add(decision.transaction_id);
   for(const id of decision.child_ids||[])ids.add(id);
   if(!decision.invoice_id)continue;
@@ -73,7 +73,7 @@ async function sourceEvidence(owner:string,state:State,database:ReturnType<typeo
  const originals=reportOriginals(state,ids);
  return originals.length?readBankgiroSourceEvidence(database||retainedOriginals.db(),owner,originals):{complete:true as const,reports:[],snapshot:[]};
 }
-async function checkedState(owner:string,initial:State){
+async function checkedState(owner:string,initial:State,options:ReconciliationOptions={}){
  const source=await sourceEvidence(owner,initial,undefined),sourceReviewIssues=new Map<string,string>();
  for(const report of source.reports.filter(report=>report.issue))for(const row of initial.transactions){
   const record=initial.imports.find(record=>record.id===row.importId);
@@ -106,7 +106,7 @@ async function checkedState(owner:string,initial:State){
  const probe=structuredClone(initial);for(const t of probe.transactions){delete t.bankOriginalIssue;delete t.bankAccountIssue;}
  const state=structuredClone(initial),read=originalReader(owner),decisions:any[]=[...accountDecisions],checked=new Set<string>();
  for(let pass=0;pass<=state.transactions.length;pass++){
-  const ids=requiredEvidence(pass===0?probe:state,verifiedInvoiceOriginals,sourceReviewIssues);
+  const ids=requiredEvidence(pass===0?probe:state,verifiedInvoiceOriginals,sourceReviewIssues,options);
   if(pass===0)for(const t of initial.transactions)if(paymentOriginalIssue(initial,t)||t.bankAccountIssue)ids.add(t.id);
   const pending=[...relatedTransactions(state,ids)].filter(id=>!checked.has(id));
   if(!pending.length)return {state,decisions,verifiedInvoiceOriginals,sourceReviewIssues};
@@ -124,8 +124,8 @@ async function checkedState(owner:string,initial:State){
  throw Error('Bankoriginalkontrollen kunde inte slutföras. Inga nya matchningar har sparats.');
 }
 /** Production allocation boundary. Missing originals can never use a default trust bypass. */
-export async function reconcileWithOriginals(owner:string,initial:State){
- const checked=await checkedState(owner,initial),result=reconcileState(checked.state,checked.verifiedInvoiceOriginals,checked.sourceReviewIssues);
+export async function reconcileWithOriginals(owner:string,initial:State,options:ReconciliationOptions={}){
+ const checked=await checkedState(owner,initial,options),result=reconcileState(checked.state,checked.verifiedInvoiceOriginals,checked.sourceReviewIssues,options);
  return {...result,decisions:[...checked.decisions,...result.decisions]};
 }
 export async function reconciliationPreviewWithOriginals(owner:string,initial:State){
