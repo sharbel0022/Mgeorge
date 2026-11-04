@@ -210,7 +210,7 @@ export async function connect(request: Request): Promise<Response> {
     const validUntil = new Date(Date.now() + Math.min(bank.maximum_consent_validity, 90 * 86400) * 1000 - 30_000).toISOString();
     const state = randomToken(), cookie = randomToken(), stateHash = await digest(state), at = now();
     await lease.write([
-      db().prepare('DELETE FROM bank_auth_flows WHERE owner=? OR expires_at<?').bind(user.userId, at),
+      db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
       db().prepare(`INSERT INTO bank_auth_flows (state_hash,owner,cookie_hash,app_generation,bank_name,country,environment,redirect_uri,date_from,expires_at,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
         .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, BANK_REDIRECT_URL, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at),
     ]);

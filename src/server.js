@@ -9,6 +9,7 @@ import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import {createCompanyRuntime} from './company-runtime.js';
 import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
 import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
@@ -19,7 +20,7 @@ import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
 import {createIntegrationJobs} from './integration-jobs.js';
 import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
 import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
-import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
+import { gmailAccount, withGmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 import {analyzeDocument,approveDocument} from './invoice-review.js';
 import {runDocumentProcess} from './invoice-extraction.js';
 import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
@@ -43,14 +44,35 @@ function config(){
   return {origin,secure,adminHash:secure?passwordHash(process.env.MG_ADMIN_PASSWORD):'',port:Number(process.env.PORT||3000)};
 }
 const check=config();
-const db=openDatabase();
-const integrationJobs=createIntegrationJobs(db);
-async function bankgiroIngest(owner){return createNodeBankgiroIngest(db,{source:await resolveBankgiroSource(owner,{configuration:process.env.BANKGIRO_SOURCE_CONFIG,secrets:process.env})});}
+const controlDb=openDatabase();
+const companyRuntime=createCompanyRuntime({controlDb,legacyDatabasePath:process.env.DB_PATH||'./data/mgeorge.sqlite',companyDirectory:process.env.MG_COMPANY_DIRECTORY,legacyPrincipal:check.secure?'administrator':'local-admin'});
+const db=companyRuntime.db;
+const integrationJobs=companyRuntime.service('integrationJobs');
+function companyMailbox(context){
+ if(!context||context.storageOwner===(check.secure?'administrator':'local-admin'))return (process.env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();
+ let accounts;try{accounts=JSON.parse(process.env.MG_COMPANY_GMAIL_ACCOUNTS||'{}');}catch{throw bad(503,'Företagets Gmail-konfiguration är ogiltig.');}
+ if(!accounts||typeof accounts!=='object'||Array.isArray(accounts))throw bad(503,'Företagets Gmail-konfiguration är ogiltig.');
+ return Object.hasOwn(accounts,context.companyId)?accounts[context.companyId]:'';
+}
+async function bankgiroIngest(owner){
+ const source=await resolveBankgiroSource(owner,{configuration:process.env.BANKGIRO_SOURCE_CONFIG,secrets:process.env});
+ const context=companyRuntime.current(),binding=source?.registration??source?.revocation;
+ // A trusted transport owner alone is insufficient: its verified company must
+ // match this immutable data partition before any queue, lease or provider call.
+ // Removing a registry entry carries only its owner and revision; this can
+ // revoke that owner's stored grants but can never authorize provider access.
+ const removedRegistration=source?.revocation&&!source?.registration&&!Object.hasOwn(source.revocation,'companyId');
+ if(context&&binding&&(owner!==context.storageOwner||binding.owner!==context.storageOwner||binding.companyId!==context.companyId&&!removedRegistration)){
+  const status=async()=>({enabled:false,sourceId:null,mode:'production',state:'BLOCKED',reason:'COMPANY_BOUNDARY_MISMATCH',cursor:null,nextPollAt:null,missingReportIds:[],counts:{PENDING:0,RETRY:0,IMPORTED:0,REVIEW:0,DUPLICATE:0,BLOCKED:0},jobs:[],lastError:'COMPANY_BOUNDARY_MISMATCH',authorization:{status:'BLOCKED',verifiedAt:null,validUntil:null},lastSuccessAt:null,lastFailureAt:null,lastFailureCode:null});
+  return {status,run:status};
+ }
+ return createNodeBankgiroIngest(db,{source});
+}
 export async function runScheduledBankgiro(){
-  const owner=check.secure?'administrator':'local-admin';
-  const source=await resolveBankgiroSource(owner,{configuration:process.env.BANKGIRO_SOURCE_CONFIG,secrets:process.env});
-  if(!source)return;
-  return (await createNodeBankgiroIngest(db,{source})).run(owner);
+  return forScheduledCompanies(async()=>{
+  const owner=companyRuntime.current()?.storageOwner||(check.secure?'administrator':'local-admin');
+  return (await bankgiroIngest(owner)).run(owner);
+  });
 }
 const baseHeaders={
   'Content-Security-Policy':"default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'",
@@ -58,8 +80,9 @@ const baseHeaders={
   'X-Frame-Options':'DENY','Cache-Control':'no-store','Permissions-Policy':'camera=(), microphone=(), geolocation=()'
 };
 if(check.secure)baseHeaders['Strict-Transport-Security']='max-age=31536000';
-function json(res,status,data,headers={}){res.writeHead(status,{...baseHeaders,'Content-Type':'application/json; charset=utf-8',...headers});res.end(JSON.stringify(data));}
-function redirect(res,url,cookie){res.writeHead(302,{...baseHeaders,Location:url,...(cookie?{'Set-Cookie':cookie}:{})});res.end();}
+function companyHeaders(){const context=companyRuntime.current();if(!context)return {};companyRuntime.assert();return {'X-Company-Id':context.companyId,'X-Company-Context-Version':String(context.contextVersion),Vary:'Cookie, X-Company-Id, X-Company-Context-Version'};}
+function json(res,status,data,headers={}){res.writeHead(status,{...baseHeaders,...companyHeaders(),'Content-Type':'application/json; charset=utf-8',...headers});res.end(JSON.stringify(data));}
+function redirect(res,url,cookie){res.writeHead(302,{...baseHeaders,...companyHeaders(),Location:url,...(cookie?{'Set-Cookie':cookie}:{})});res.end();}
 function bad(status,message){return Object.assign(new Error(message),{status});}
 function requiredString(x,label,max=240){if(typeof x!=='string'||!x.trim()||x.length>max)throw bad(400,`${label} krävs (max ${max} tecken)`);return x.trim();}
 function optionalString(x,max=1000){return String(x??'').trim().slice(0,max);}
@@ -74,6 +97,7 @@ async function readBody(req,{authenticated=true}={}){
   let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw bad(400,'Ogiltig JSON');}
   // Reading a streamed body yields: the initiating session may now be revoked.
   if(authenticated)assertSessionStillAuthorized(req);
+  if(authenticated&&!req.allowCompanySelection&&body&&typeof body==='object'&&['companyId','company_id','tenantId','storageOwner'].some(key=>Object.hasOwn(body,key)))throw bad(400,'Företagskontext väljs i företagsväljaren, inte i affärsdata.');
   return body;
 }
 function cookies(req){return Object.fromEntries((req.headers.cookie||'').split(';').filter(x=>x.includes('=')).map(x=>{const i=x.indexOf('=');let value='';try{value=decodeURIComponent(x.slice(i+1).trim());}catch{}return [x.slice(0,i).trim(),value];}));}
@@ -82,19 +106,19 @@ function cookies(req){return Object.fromEntries((req.headers.cookie||'').split('
 /** Skapar eller återanvänder webbläsarsessionen som binder OAuth- och bankreturer till rätt användare. Detta är inte samma sak som bankens egen inloggning. */
 function ensureBrowserSession(req,res){
   const existing=cookies(req).mg_session;
-  const found=existing&&db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(digest(existing),Date.now());
+  const found=existing&&controlDb.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(digest(existing),Date.now());
   if(found){
     req.principal=check.secure?found.principal:'local-admin';
-    if(!check.secure&&found.principal==='')db.prepare('UPDATE sessions SET principal=? WHERE id_hash=?').run('local-admin',digest(existing));
+    if(!check.secure&&found.principal==='')controlDb.prepare('UPDATE sessions SET principal=? WHERE id_hash=?').run('local-admin',digest(existing));
     return;
   }
   // Denied requests and failed logins must not grow the persistent session
   // table. HTTPS OAuth already requires a successfully authenticated session.
   if(check.secure){req.principal='';return;}
   const session=token();
-  db.prepare('DELETE FROM sessions WHERE expires_at<=?').run(Date.now());
+  controlDb.prepare('DELETE FROM sessions WHERE expires_at<=?').run(Date.now());
   req.principal='local-admin';
-  db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(session),Date.now()+8*3600000,req.principal);
+  controlDb.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(session),Date.now()+8*3600000,req.principal);
   req.headers.cookie=(req.headers.cookie?req.headers.cookie+'; ':'')+'mg_session='+encodeURIComponent(session);
   // Replace an expired session cookie when computing the OAuth browser binding.
   req.browserSession=session;
@@ -108,6 +132,8 @@ function checkOrigin(req){
   if(!String(req.headers['content-type']||'').startsWith('application/json'))throw bad(415,'Content-Type måste vara application/json');
 }
 function serveStatic(req,res,path){
+  const companyModules={'/company-client.js':'company-client.js','/company-contract.js':'company-contract.js','/invoice-reference-policy.js':'invoice-reference-policy.js'};
+  if(Object.hasOwn(companyModules,path)){const contents=readFileSync(new URL('../sites/lib/'+companyModules[path],import.meta.url));res.writeHead(200,{...baseHeaders,'Content-Type':'text/javascript; charset=utf-8'});return res.end(contents);}
   const legalPages={'/integritetspolicy':'integritetspolicy.html','/integritetspolicy/':'integritetspolicy.html','/integritetspolicy.html':'integritetspolicy.html','/anvandarvillkor':'anvandarvillkor.html','/anvandarvillkor/':'anvandarvillkor.html','/anvandarvillkor.html':'anvandarvillkor.html'};
   if(Object.hasOwn(legalPages,path)){
     const contents=readFileSync(resolve('public',legalPages[path]));
@@ -150,10 +176,11 @@ function addBankTransaction(body){
 }
 function maskAccount(s){return s?String(s).replace(/.(?=.{4})/g,'•'):'';}
 function sessionHash(req){return digest(req.browserSession||cookies(req).mg_session||'');}
-function assertSessionStillAuthorized(req){
-  const current=db.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(sessionHash(req),Date.now());
-  if(!current||current.principal!==req.principal)throw bad(401,'Sessionen har avslutats. Logga in och försök igen.');
+function assertSessionIdentity(req){
+  const current=controlDb.prepare('SELECT principal FROM sessions WHERE id_hash=? AND expires_at>?').get(sessionHash(req),Date.now());
+  if(!current||current.principal!==(req.actorId||req.principal))throw bad(401,'Sessionen har avslutats. Logga in och försök igen.');
 }
+function assertSessionStillAuthorized(req){assertSessionIdentity(req);companyRuntime.assert(req.companyAction||'read');}
 function filePayload(body){
   const name=requiredString(body.name,'Filnamn',240);
   if(typeof body.content_base64!=='string'||!body.content_base64||body.content_base64.length>20_000_000||!/^[A-Za-z0-9+/]*={0,2}$/.test(body.content_base64))throw bad(400,'Fil saknas eller är för stor');
@@ -198,13 +225,13 @@ function gmailStatus(){
   const imports=db.prepare("SELECT COALESCE(SUM(found),0) AS messages,COALESCE(SUM(imported),0) AS documents,COALESCE(SUM(duplicate),0) AS duplicates FROM import_jobs WHERE source='gmail'").get();
   return {configured:isGmailConfigured(),send_enabled,email:gmailAccount(),status:connection?.status||'not_connected',last_synced:connection?.last_synced||'',next_sync:connection&&!gmailReconnectStatuses.has(connection.status)&&connection.status!=='blocked'&&interval&&(!job||job.failures<3)?new Date(Math.max(Date.now(),lastAttempt+interval*60000,job?.next_attempt||0)).toISOString():null,syncing:integrationJobs.running('gmail'),job:integrationJobs.summary().find(j=>j.name==='gmail')||null,counts:imports,connection};
 }
-const bankLeases=new Map();
+const bankLeases=companyRuntime.service('bankLeases');
 const bankPostprocessWarning='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
 const bankSyncing={
   has:id=>bankLeases.has(id)||integrationJobs.running('bank:'+id),
   add(id,options){if(bankLeases.has(id))throw bad(409,'En bankåtgärd pågår redan');const lease=integrationJobs.claim('bank:'+id,options);lease.deadline=Math.min(Date.now()+240000,integrationJobs.state('bank:'+id).lease_until-30000);bankLeases.set(id,lease);return lease;},
   assert(id){const lease=bankLeases.get(id);if(!lease)throw bad(409,'Bankåtgärdens lås saknas');lease.assert();},
-  delete(id){const lease=bankLeases.get(id);lease?.release();bankLeases.delete(id);}
+  delete(id){const lease=bankLeases.get(id);try{lease?.release();}finally{bankLeases.delete(id);}}
 };
 /** Förnyar Gmail-behörighet vid behov och laddar ned nya fakturaunderlag från företagets konto. */
 async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=false,interval=0}={}){
@@ -375,16 +402,31 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
   }
   finally{if(!operationLocked)bankSyncing.delete(connection.id);}
 }
-const schedulerState={running:false,last_run:'',last_error:''};
-const backupStatus={enabled:!!process.env.MG_BACKUP_DIRECTORY,last_verified:'',day:'',error:'',retry_after:0};
+const schedulerState=companyRuntime.service('schedulerState');
+const backupStatus=companyRuntime.service('backupStatus');
 function scheduledBackup(){
+ return forScheduledCompanies(async()=>{
  if(!backupStatus.enabled||backupStatus.day===today()||Date.now()<backupStatus.retry_after)return;
- try{const result=dailyBackup(process.env.DB_PATH||'./data/mgeorge.sqlite',process.env.MG_BACKUP_DIRECTORY,process.env.MG_BACKUP_KEY);backupStatus.day=result.day;backupStatus.last_verified=new Date().toISOString();backupStatus.error='';}
+ const context=companyRuntime.current(),directory=context?join(process.env.MG_BACKUP_DIRECTORY,digest(context.companyId)):process.env.MG_BACKUP_DIRECTORY;
+ try{companyRuntime.assert('restore');const result=dailyBackup(companyRuntime.databasePath(context),directory,process.env.MG_BACKUP_KEY,new Date(),context?{expectedCompanyId:context.companyId}:undefined);backupStatus.day=result.day;backupStatus.last_verified=new Date().toISOString();backupStatus.error='';}
  catch{backupStatus.retry_after=Date.now()+15*60_000;backupStatus.error='Säkerhetskopian kunde inte skapas eller återställningskontrolleras. Kontrollera backupkonfigurationen.';}
+ });
+}
+async function forScheduledCompanies(operation){
+ if(companyRuntime.current())return operation();
+ let result;
+ for(const context of companyRuntime.scheduledContexts()){
+  try{result=await companyRuntime.runJob(context,()=>withGmailAccount(companyMailbox(context),operation));}catch{/* A revoked/suspended company cannot stop another company's independent scheduler. */}
+ }
+ if(!companyRuntime.legacyBound())result=await companyRuntime.run(null,()=>withGmailAccount(companyMailbox(null),operation));
+ return result;
 }
 function utcTimestamp(value){return Date.parse(value.includes('T')?value:value.replace(' ','T')+'Z')||0;}
 /** Kontrollerar om inställda synkroniseringsjobb är förfallna. Jobben körs bara medan denna Node-server kör. */
 export async function runScheduledSync(){
+ return forScheduledCompanies(runCompanyScheduledSync);
+}
+async function runCompanyScheduledSync(){
   const settings=getSettings(db),interval=settings.sync_interval_minutes,gmailInterval=settings.gmail_sync_interval_minutes;
   if((!interval&&!gmailInterval)||schedulerState.running)return;
   schedulerState.running=true;schedulerState.last_error='';
@@ -410,7 +452,7 @@ function paymentOverview(){
 }
 // Only existing service functions are used. Paused schedules and registration
 // preferences are never changed by this manual, bounded control run.
-const paymentControl=createPaymentControl(db,{
+function makePaymentControl(){return createPaymentControl(db,{
   summarize:()=>{const {counts,totals}=paymentOverview();return {counts,totals};},
   adapters:{
     gmail:async({authorize})=>{
@@ -451,7 +493,33 @@ const paymentControl=createPaymentControl(db,{
     reconcile:async({authorize})=>{authorize();const result=runReconciliation(db);return {state:'done',count:result.length,note:'Befintliga säkerhetsregler tillämpades. Osäkra betalningar och samlingsposter kräver granskning.'};},
     messages:async({authorize})=>{authorize();prepareMessages(db);const count=listMessages(db).filter(m=>m.status==='draft').length;return {state:'done',count,note:`${count} utkast att läsa. Inga mejl har skickats.`};}
   }
-});
+});}
+const paymentControl=companyRuntime.service('paymentControl');
+companyRuntime.configureServices(()=>({
+ integrationJobs:createIntegrationJobs(db),paymentControl:makePaymentControl(),bankLeases:new Map(),
+ schedulerState:{running:false,last_run:'',last_error:''},
+ backupStatus:{enabled:!!process.env.MG_BACKUP_DIRECTORY,last_verified:'',day:'',error:'',retry_after:0}
+}));
+companyRuntime.services();
+
+function companySelector(req,url){
+ const select=(header,query)=>{
+  if(url.searchParams.getAll(query).length>1||Array.isArray(req.headers[header]))throw bad(400,'Företagskontexten är tvetydig.');
+  const h=req.headers[header],q=url.searchParams.get(query);
+  if(h!==undefined&&q!==null&&h!==q)throw bad(400,'Företagskontexten är tvetydig.');
+  return h??q??undefined;
+ };
+ const companyId=select('x-company-id','companyId'),version=select('x-company-context-version','companyContextVersion');
+ if(version!==undefined&&(!/^[1-9]\d*$/.test(version)||!Number.isSafeInteger(Number(version))))throw bad(400,'Företagskontextens version är ogiltig.');
+ url.searchParams.delete('companyId');url.searchParams.delete('companyContextVersion');
+ return {companyId,contextVersion:version===undefined?undefined:Number(version)};
+}
+function companyAction(method,path){
+ if(method==='GET'&&!['/api/bank/callback','/api/gmail/callback'].includes(path))return 'read';
+ if(path==='/api/settings')return 'manage_company';
+ if(path.startsWith('/api/bank/')||path.startsWith('/api/gmail/')||path==='/api/bankgiro/source/run'||path==='/api/payment-control/run')return 'manage_integrations';
+ return 'write';
+}
 
 /** Huvudroutern: matchar HTTP-metod och URL, kontrollerar åtkomst och anropar rätt modul. */
 async function route(req,res){
@@ -464,7 +532,12 @@ async function route(req,res){
   const callback=['/api/bank/callback','/api/gmail/callback'].includes(path)&&req.method==='GET';
   if(!callback&&((req.headers.origin&&req.headers.origin!==check.origin)||req.headers['sec-fetch-site']==='cross-site'))throw bad(403,'Begäran måste komma från MG:s egen hemsida');
   ensureBrowserSession(req,res);
-  if(path==='/api/me'&&req.method==='GET')return json(res,200,{authenticated:!!req.principal,login_required:check.secure,company:req.principal?getSettings(db).company_name:'MG Fakturakoll',role:req.principal?'administrator':null});
+  req.actorId=req.principal;
+  if(path==='/api/me'&&req.method==='GET'){
+   if(!req.actorId)return json(res,200,{authenticated:false,login_required:check.secure,company:'MG Fakturakoll',role:null});
+   let context;try{context=companyRuntime.resolve({actorId:req.actorId});}catch(error){if(error.code!=='company_access_denied')throw error;return json(res,200,{authenticated:true,login_required:check.secure,company:'MG Fakturakoll',role:null});}
+   return companyRuntime.run(context,()=>json(res,200,{authenticated:true,login_required:check.secure,company:getSettings(db).company_name,role:context?.role||'administrator',companyContext:context}),{actorId:req.actorId,authorize:()=>assertSessionIdentity(req)});
+  }
   if(req.method!=='GET')checkOrigin(req);
   if(path==='/api/login'&&req.method==='POST'&&check.secure){
     const b=await readBody(req,{authenticated:false});
@@ -476,12 +549,28 @@ async function route(req,res){
     if(typeof b.password!=='string'||b.password.length>1024||!verifyPassword(b.password,check.adminHash)){
       throw bad(401,'Felaktigt lösenord');
     }
-    loginAttempts.delete(address);db.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
-    const value=token();db.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
+    loginAttempts.delete(address);controlDb.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
+    const value=token();controlDb.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
     return json(res,200,{authenticated:true},{'Set-Cookie':sessionCookie(value,true)});
   }
   if(!req.principal)throw bad(401,'Logga in för att läsa företagets uppgifter');
-  if(req.principal!==(check.secure?'administrator':'local-admin'))throw bad(403,'Användaren saknar behörighet till företagets arbetsyta');
+  if(path==='/api/logout'&&req.method==='POST'){
+   controlDb.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));controlDb.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
+   controlDb.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
+  }
+  if(path==='/api/companies'&&req.method==='GET'){assertSessionIdentity(req);return json(res,200,companyRuntime.listCompanies(req.actorId));}
+  if(path==='/api/companies/active'&&req.method==='POST'){
+   req.allowCompanySelection=true;const body=await readBody(req);
+   if(!body||Array.isArray(body)||typeof body!=='object'||Object.keys(body).some(key=>!['companyId','contextVersion'].includes(key)))throw bad(400,'Ogiltigt företagsval.');
+   const context=companyRuntime.selectActiveCompany({actorId:req.actorId,companyId:body.companyId,contextVersion:body.contextVersion});
+   return json(res,200,{context});
+  }
+  const context=companyRuntime.resolve({actorId:req.actorId,...companySelector(req,url)});
+  req.companyContext=context;req.companyAction=companyAction(req.method,path);
+  req.principal=context?.storageOwner||req.actorId;
+  return companyRuntime.run(context,()=>withGmailAccount(companyMailbox(context),()=>{companyRuntime.assert(req.companyAction);return companyRoute(req,res,url,path);}),{actorId:req.actorId,authorize:()=>assertSessionIdentity(req)});
+}
+async function companyRoute(req,res,url,path){
   if(path==='/api/bankgiro/source/status'&&req.method==='GET')return json(res,200,publicBankgiroStatus(await (await bankgiroIngest(req.principal)).status(req.principal)));
   if(path==='/api/bankgiro/source/run'&&req.method==='POST'){
     const body=await readBody(req);
@@ -494,10 +583,6 @@ async function route(req,res){
     const preview=await readReconciliationPreview(db,{owner:req.principal,transactionId:url.searchParams.get('transactionId')??undefined});
     assertSessionStillAuthorized(req);
     return json(res,200,preview);
-  }
-  if(path==='/api/logout'&&req.method==='POST'){
-    db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
-    db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
   }
   if(path==='/api/payment-control/overview'&&req.method==='GET')return json(res,200,{...paymentOverview(),run:paymentControl.latest(req.principal),last_successful_control:db.prepare("SELECT finished_at FROM payment_control_runs WHERE owner=? AND status='complete' ORDER BY finished_at DESC LIMIT 1").get(req.principal)?.finished_at||''});
   if(path==='/api/payment-control/run'&&req.method==='POST'){
@@ -560,7 +645,7 @@ async function route(req,res){
   if(/^\/api\/bank-specification-links\/[^/]+\/revoke$/.test(path)&&req.method==='POST')return json(res,200,revokeBankSpecificationLink(db,decodeURIComponent(path.split('/')[3]),await readBody(req),req.principal,()=>assertSessionStillAuthorized(req)));
   if(/^\/api\/bank-transactions\/[^/]+\/original$/.test(path)&&req.method==='GET'){
     const original=bankApiOriginal(db,decodeURIComponent(path.split('/')[3]),req.principal),bytes=Buffer.from(JSON.stringify(original));
-    res.writeHead(200,{...baseHeaders,'Content-Type':'application/json; charset=utf-8','Content-Disposition':'attachment; filename="bankoriginal.json"','Content-Length':bytes.length});return res.end(bytes);
+    res.writeHead(200,{...baseHeaders,...companyHeaders(),'Content-Type':'application/json; charset=utf-8','Content-Disposition':'attachment; filename="bankoriginal.json"','Content-Length':bytes.length});return res.end(bytes);
   }
   if(path==='/api/bank-transactions'&&req.method==='POST')return json(res,201,addBankTransaction(await readBody(req)));
   if(path==='/api/bank-transactions'&&req.method==='PATCH'){
@@ -581,19 +666,19 @@ async function route(req,res){
   if(path==='/api/customer-messages'&&req.method==='GET')return json(res,200,{items:listMessages(db)});
   if(path==='/api/customer-contacts'&&req.method==='POST'){
     const body=await readBody(req);assertSessionStillAuthorized(req);
-    verifyContact(db,body,req.principal);reconcileAndPrepare();return json(res,200,{ok:true});
+    verifyContact(db,body,req.actorId);reconcileAndPrepare();return json(res,200,{ok:true});
   }
   if(path==='/api/payer-links'&&req.method==='POST'){
     const body=await readBody(req);assertSessionStillAuthorized(req);
-    verifyPayer(db,body,req.principal);reconcileAndPrepare();return json(res,200,{ok:true});
+    verifyPayer(db,body,req.actorId);reconcileAndPrepare();return json(res,200,{ok:true});
   }
   if(/^\/api\/customer-messages\/[^/]+\/(edit|reject|review|send)$/.test(path)&&req.method==='POST'){
     const id=decodeURIComponent(path.split('/')[3]),action=path.split('/')[4],b=await readBody(req);
     assertSessionStillAuthorized(req);
-    if(action==='edit'){editMessage(db,id,b,req.principal);return json(res,200,{ok:true});}
-    if(action==='reject'){rejectMessage(db,id,b.version,req.principal);return json(res,200,{ok:true});}
-    if(action==='review')return json(res,200,reviewMessage(db,id,b.version,req.principal,sessionHash(req)));
-    const result=await approveAndSend(db,id,b,req.principal,sessionHash(req),{authorize:()=>assertSessionStillAuthorized(req),prepare:async()=>{
+    if(action==='edit'){editMessage(db,id,b,req.actorId);return json(res,200,{ok:true});}
+    if(action==='reject'){rejectMessage(db,id,b.version,req.actorId);return json(res,200,{ok:true});}
+    if(action==='review')return json(res,200,reviewMessage(db,id,b.version,req.actorId,sessionHash(req)));
+    const result=await approveAndSend(db,id,b,req.actorId,sessionHash(req),{authorize:()=>assertSessionStillAuthorized(req),prepare:async()=>{
       const c=db.prepare("SELECT * FROM gmail_connections WHERE status='connected' ORDER BY created_at DESC LIMIT 1").get();
       if(!c||c.email.toLowerCase()!==gmailAccount())throw bad(409,'Koppla företagets Gmail-konto först.');
       const tokens=decryptObject(c.encrypted_tokens),deliver=await prepareGmailSend(tokens,{authorize:()=>assertSessionStillAuthorized(req)});
@@ -610,7 +695,7 @@ async function route(req,res){
     const item=db.prepare("SELECT name,content,mime_type,content_sha256 FROM import_jobs WHERE id=? AND (owner='' OR owner=?)").get(decodeURIComponent(path.split('/')[3]),req.principal);
     if(!item?.content)throw bad(404,'Originalfilen saknas');
     if(!item.content_sha256||digest(item.content)!==item.content_sha256)throw bad(409,'Originalfilens SHA-256 kan inte verifieras.');
-    res.writeHead(200,{...baseHeaders,'Content-Type':item.mime_type||'application/octet-stream','Content-Disposition':`attachment; filename="bankunderlag${item.mime_type==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'?'.xlsx':item.mime_type==='application/xml'?'.xml':'.csv'}"`,'Content-Length':item.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(item.content));
+    res.writeHead(200,{...baseHeaders,...companyHeaders(),'Content-Type':item.mime_type||'application/octet-stream','Content-Disposition':`attachment; filename="bankunderlag${item.mime_type==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'?'.xlsx':item.mime_type==='application/xml'?'.xml':'.csv'}"`,'Content-Length':item.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(item.content));
   }
   if(path==='/api/import/preview'&&req.method==='POST'){
     const b=await readBody(req);const items=importBankFile(b,req);
@@ -651,12 +736,12 @@ async function route(req,res){
     const doc=db.prepare('SELECT * FROM documents WHERE id=?').get(decodeURIComponent(path.split('/')[3]));if(!doc)throw bad(404,'Underlaget saknas');
     let bytes=Buffer.from(doc.content),mime=doc.mime_type;
     if(mime==='application/pdf'){const result=await runDocumentProcess(bytes,mime,true);if(!result.preview)throw bad(422,'Förhandsvisningen kunde inte skapas. Ladda ned originalet.');bytes=Buffer.from(result.preview);mime='image/png';assertSessionStillAuthorized(req);}
-    res.writeHead(200,{...baseHeaders,'Content-Type':mime,'Content-Disposition':'inline','Content-Security-Policy':"sandbox; default-src 'none'; frame-ancestors 'self'",'X-Frame-Options':'SAMEORIGIN'});return res.end(bytes);
+    res.writeHead(200,{...baseHeaders,...companyHeaders(),'Content-Type':mime,'Content-Disposition':'inline','Content-Security-Policy':"sandbox; default-src 'none'; frame-ancestors 'self'",'X-Frame-Options':'SAMEORIGIN'});return res.end(bytes);
   }
   if(/^\/api\/documents\/[^/]+$/.test(path)&&req.method==='GET'){
     const id=decodeURIComponent(path.split('/').pop()),doc=db.prepare('SELECT * FROM documents WHERE id=?').get(id);if(!doc)throw bad(404,'Originalunderlaget saknas');
     const safeName=doc.name.replace(/[^A-Za-z0-9._-]/g,'_');
-    res.writeHead(200,{...baseHeaders,'Content-Type':doc.mime_type,'Content-Disposition':`attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(doc.name)}`,'Content-Length':doc.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(doc.content));
+    res.writeHead(200,{...baseHeaders,...companyHeaders(),'Content-Type':doc.mime_type,'Content-Disposition':`attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(doc.name)}`,'Content-Length':doc.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(doc.content));
   }
   if(path==='/api/allocations'&&req.method==='GET')return json(res,200,{items:db.prepare('SELECT * FROM allocations ORDER BY confirmed_at DESC').all()});
   if(path==='/api/allocations'&&req.method==='POST'){
@@ -836,7 +921,7 @@ async function route(req,res){
 const server=http.createServer((req,res)=>route(req,res).catch(err=>{
   const status=err.status||(err instanceof TypeError?400:500);
   if(status>=500)console.error('Serverfel',status); // No provider payloads, request URLs, keys or tokens.
-  if(!res.headersSent)json(res,status,{error:status>=500&&!err.safe&&!err.code?'Ett serverfel inträffade':err.message,...(err.code?{code:err.code}:{})},err.retryAfter?{'Retry-After':String(err.retryAfter)}:{});else res.end();
+  if(!res.headersSent)json(res,status,{error:status>=500&&!err.safe&&!err.code?'Ett serverfel inträffade':err.message,...(err.code?{code:err.code}:{})},{...(err.retryAfter?{'Retry-After':String(err.retryAfter)}:{}),...(err.code==='COMPANY_CONTEXT_STALE'?{'X-Company-Context-Stale':'1'}:{})});else res.end();
 }));
 let schedulerTimer;
 if(process.env.NODE_ENV!=='test'){
@@ -844,5 +929,5 @@ if(process.env.NODE_ENV!=='test'){
   scheduledBackup();
   schedulerTimer=setInterval(()=>{scheduledBackup();runScheduledBankgiro().catch(()=>{schedulerState.last_error='Bankgirohämtningen behöver kontrolleras';});runScheduledSync().catch(()=>{schedulerState.last_error='Automatisk hämtning kunde inte slutföras';});},60000);schedulerTimer.unref();
 }
-server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);paymentControl.stop();});
-export {server,db};
+server.on('close',()=>{if(schedulerTimer)clearInterval(schedulerTimer);companyRuntime.close();});
+export {server,db,companyRuntime};

@@ -14,8 +14,10 @@ export function compiled(path,imports){
 const environment=data('export const env=new Proxy({}, {get:(_,key)=>globalThis.uploadRaceFixture.env[key]});');
 const auth=data('export async function getChatGPTUser(){const f=globalThis.uploadRaceFixture;return f.users?.length?f.users.shift():f.user;}');
 const domain=local('domain.ts');
-const server=compiled('lib/server.ts',{'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':domain});
-export const files=await import(compiled('app/api/files/route.ts',{'cloudflare:workers':environment,'@/lib/server':server,'@/lib/domain':domain}));
+const server=compiled('lib/server.ts',{'./company-storage.js':new URL('../../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':domain});
+const fileRoutes=await import(compiled('app/api/files/route.ts',{'cloudflare:workers':environment,'@/lib/server':server,'@/lib/domain':domain}));
+const {withCompanyRequest}=await import(server);
+export const files={GET:withCompanyRequest(fileRoutes.GET),POST:withCompanyRequest(fileRoutes.POST)};
 const unused=(...names)=>data(names.map(name=>`export function ${name}(){throw Error('Unexpected unrelated ${name}');}`).join('\n'));
 const store=data('export const connection=async()=>null;export const accounts=async()=>[];export const application=async()=>null;export const encrypt=async(owner,purpose,value)=>JSON.stringify(value);export const decrypt=async(owner,purpose,value)=>JSON.parse(value);export const storageReady=()=>true;');
 const bankgiro=compiled('lib/bankgiro-service.ts',{'./server':server,'./domain':domain,'./bankgiro-parser.js':local('bankgiro-parser.js'),'./banking/store':store,'./banking/transactions':unused('stableAccountKey')});
@@ -38,7 +40,7 @@ export function fixture(t,{parallel=false,order='arrival',failure='',failInsert=
  const DB={prepare(sql){return{sql,args:[],bind(...args){this.args=args;return this;},async first(){
    if(insertStarted&&/SELECT .* FROM documents WHERE owner=\? AND sha256=\?/i.test(sql)){
     outcomeReads++;
-    if(!readFailed&&(readFailure==='gmail'?/^SELECT id FROM/.test(sql):readFailure&&outcomeReads===(readFailure===true?1:readFailure))){readFailed=true;throw Error('D1_ERROR: synthetic outcome read unavailable');}
+    if(!readFailed&&(readFailure==='gmail'?/\bSELECT id FROM/.test(sql):readFailure&&outcomeReads===(readFailure===true?1:readFailure))){readFailed=true;throw Error('D1_ERROR: synthetic outcome read unavailable');}
    }
    return sqlite.prepare(sql).get(...this.args)||null;
   },async all(){return{results:sqlite.prepare(sql).all(...this.args)};},execute(){
@@ -60,7 +62,7 @@ export function fixture(t,{parallel=false,order='arrival',failure='',failInsert=
   releaseLoser?.();throw Error('D1_ERROR: synthetic response lost after commit');
  };
  const BUCKET={async put(key,value){objects.set(key,new Uint8Array(value).slice());puts.push(key);if(parallel&&puts.length<=2){await new Promise(resolve=>{waiters.push({resolve,kind:Buffer.isBuffer(value)?'gmail':'manual'});if(waiters.length===2){if(['manual','gmail'].includes(order)){const winner=waiters.find(item=>item.kind===order),loser=waiters.find(item=>item!==winner);assert.ok(winner);releaseLoser=loser.resolve;winner.resolve();}else waiters.forEach(item=>item.resolve());}});}},async get(key){const value=objects.get(key);return value?{size:value.length,body:value,arrayBuffer:async()=>value.slice().buffer}:null;},async delete(key){if(deleteFailure)throw Error('R2_ERROR: synthetic cleanup failed');objects.delete(key);}};
- const f={sqlite,objects,puts,user:{userId:'synthetic-owner',email:'owner@example.test'},env:{DB,BUCKET,DOCUMENT_AUTOMATION_ENABLED:'true',DOCUMENT_OWNER_EMAIL:'owner@example.test'}};
+ const f={sqlite,objects,puts,user:{userId:'synthetic-owner',email:'owner@example.test'},env:{DB,BUCKET,GMAIL_ACCOUNT:'owner@example.test',DOCUMENT_AUTOMATION_ENABLED:'true',DOCUMENT_OWNER_EMAIL:'owner@example.test'}};
  f.gmailResult={tokens:{access_token:'synthetic'},received:1,duplicate:0,documents:[{source_id:'synthetic-message:1',name:'synthetic.csv',mime_type:'text/csv',content_base64:Buffer.from(bytes).toString('base64'),metadata:{from:'sender@example.test',to:'owner@example.test'},direction:'payable',subject:'Synthetic',received_at:'2026-11-02T10:00:00Z'}],rejected_source_ids:[],truncated:false,next_page_token:''};
  sqlite.prepare('INSERT INTO gmail_connections(owner,email,tokens) VALUES(?,?,?)').run(f.user.userId,f.user.email,'{}');
  globalThis.uploadRaceFixture=f;t.after(()=>{sqlite.close();delete globalThis.uploadRaceFixture;});return f;

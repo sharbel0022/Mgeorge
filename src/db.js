@@ -166,7 +166,8 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   return db;
 }
 export function audit(db,action,details={}) {
-  db.prepare('INSERT INTO audit_events(id,action,details) VALUES(?,?,?)').run(randomUUID(),action,JSON.stringify(details));
+  const context=db.companyContext;
+  db.prepare('INSERT INTO audit_events(id,action,details) VALUES(?,?,?)').run(randomUUID(),action,JSON.stringify(context?{...details,companyId:context.companyId,actorId:context.actorId,membershipVersion:context.membershipVersion}:details));
 }
 export function today(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Stockholm',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
 export function bankEvidenceBlocksAbsence(db){

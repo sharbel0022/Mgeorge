@@ -1,3 +1,4 @@
+import {applyCurrentMigrations} from './helpers/company-compat-fixture.mjs';
 import {syntheticBankRow,syntheticBankId} from './helpers/bank-api-fixture.mjs';
 import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import {syntheticAccountStore,retainSyntheticConsent} from './helpers/bank-account-fixture.mjs';
@@ -28,13 +29,13 @@ const bank=(s,extra={})=>applyCommand(s,{type:'transactions.import',trustedBankI
 
 async function fixture(t,state){
  const key='__q8_bank_state_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
- sql.exec('CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT NOT NULL,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);');retainSyntheticConsent(sql);
+ applyCurrentMigrations(sql);retainSyntheticConsent(sql);
  t.after(()=>{sql.close();delete globalThis[key];});
- const DB={prepare(statement){return{bind(...args){return{query:statement,values:args,async first(){return sql.prepare(statement).get(...args)||null;},async all(){return{results:sql.prepare(statement).all(...args)};},async run(){return{meta:{changes:sql.prepare(statement).run(...args).changes}};}};}};},async batch(statements){if(DB.beforeBatch)await DB.beforeBatch(statements);sql.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());sql.exec('COMMIT');return results;}catch(error){sql.exec('ROLLBACK');throw error;}}};
+ const DB={prepare(query){return{query,values:[],bind(...values){this.values=values;return this;},async first(){return sql.prepare(query).get(...this.values)||null;},async all(){return{results:sql.prepare(query).all(...this.values)};},async run(){return{meta:{changes:sql.prepare(query).run(...this.values).changes}};}};},async batch(statements){if(DB.beforeBatch)await DB.beforeBatch(statements);sql.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());sql.exec('COMMIT');return results;}catch(error){sql.exec('ROLLBACK');throw error;}}};
  const objects=new Map(),reads=[],f={sql,objects,reads,user:{userId:'synthetic-owner'},env:{DB,BUCKET:{async get(key){reads.push(key);const bytes=objects.get(key);return bytes?{size:bytes.byteLength,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)}:null;}}}};
  globalThis[key]=f;
  sql.prepare('INSERT INTO workspaces VALUES(?,?,?,?)').run('synthetic-owner',1,JSON.stringify(state),'2026-10-30');
- const server=compiled('../lib/server.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return globalThis[${JSON.stringify(key)}].user;}`),'./domain':domain,'./imports':parsers});
+ const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return globalThis[${JSON.stringify(key)}].user;}`),'./domain':domain,'./imports':parsers});
  const bankgiro=compiled('../lib/bankgiro-service.ts',{'./server':server,'./bankgiro-parser.js':url('../lib/bankgiro-parser.js'),'./domain':domain,'./banking/store':syntheticAccountStore(),'./banking/transactions':data('export function stableAccountKey(account){return "iban:"+account.account_id.iban;}')});
  const evidence=compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':engine,'./bankgiro-service':bankgiro});
  const route=await import(compiled('../app/api/state/route.ts',{'@/lib/server':server,'@/lib/domain':domain,'@/lib/reconciliation-evidence':evidence,'@/lib/bankgiro-service':bankgiro,'@/lib/customer-messages':data('export async function reconcileAndPrepare(){}'),'@/lib/bankgiro-invoice-search':data('export async function searchBankgiroInvoice(){}')}));

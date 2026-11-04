@@ -65,9 +65,9 @@ async function readSource(source,path,limit){
  if(!(bytes instanceof Uint8Array)||bytes.length>limit)fail('object_invalid');
  return bytes;
 }
-function checkedSnapshot(bytes,run){
+function checkedSnapshot(bytes,run,expectedCompanyBoundary){
  let snapshot;
- try{snapshot=validateSnapshot(parse(bytes,MAX_SNAPSHOT),run.owner);}catch{fail('snapshot_invalid');}
+ try{snapshot=validateSnapshot(parse(bytes,MAX_SNAPSHOT),run.owner,expectedCompanyBoundary);}catch{fail('snapshot_invalid');}
  if(!iso(snapshot.createdAt)||dayOf(snapshot.createdAt)!==run.day||snapshot.tables.some(table=>table.rows.length>MAX_ROWS))fail('snapshot_invalid');
  const files=snapshot.tables.find(table=>table.name==='documents').rows;
  if(files.some(file=>!UUID.test(file.id)))fail('snapshot_invalid');
@@ -116,11 +116,11 @@ function validateBinding(manifest,snapshot,snapshotSize){
  * The supplied run row must come from an owner-scoped, trusted metadata read.
  * No historical `complete` flag alone is treated as evidence of readable bytes.
  */
-export async function inspectBackup(bucket,row,key,owner){
+export async function inspectBackup(bucket,row,key,owner,{expectedCompanyBoundary}={}){
  const run=capturedRun(row,owner),snapshotBytes=await readBucket(bucket,run.snapshot_key,MAX_SNAPSHOT+52);
  const plain=await decrypt(snapshotBytes,key,owner,run.id,'snapshot',MAX_SNAPSHOT);
  if(await sha(plain)!==run.snapshot_hash)fail('snapshot_invalid');
- const snapshot=checkedSnapshot(plain,run),objects=[];
+ const snapshot=checkedSnapshot(plain,run,expectedCompanyBoundary),objects=[];
  for(const entry of descriptors(snapshot,run,plain.length)){
   const bytes=entry.name==='snapshot'?snapshotBytes:await readBucket(bucket,entry.sourceKey,MAX_DOCUMENT+52);
   const object={...entry,size:bytes.length,sha256:await sha(bytes)};
@@ -132,8 +132,8 @@ export async function inspectBackup(bucket,row,key,owner){
 /** Stream only authenticated ciphertext to an isolated writer. The final
  * bundle.json is a completion marker; interrupted exports remain incomplete.
  */
-export async function exportBackupBundle(bucket,row,key,owner,write){
- const {manifest}=await inspectBackup(bucket,row,key,owner);
+export async function exportBackupBundle(bucket,row,key,owner,write,options={}){
+ const {manifest}=await inspectBackup(bucket,row,key,owner,options);
  const manifestBytes=encoder.encode(JSON.stringify(manifest));
  if(manifestBytes.length>MAX_MANIFEST)fail('manifest_invalid');
  for(const entry of manifest.objects){
@@ -149,14 +149,14 @@ export async function exportBackupBundle(bucket,row,key,owner,write){
 /** Verify the exact portable file census before a restore may create output.
  * Re-reading a verified object is still authenticated, closing read/write gaps.
  */
-export async function verifyRecoveryBundle(source,key,owner,backupId){
+export async function verifyRecoveryBundle(source,key,owner,backupId,{expectedCompanyBoundary}={}){
  identity(owner,backupId);
  const header=parse(await readSource(source,'bundle.json',4096),4096);
  if(!exact(header,['format','owner','backupId','manifest'])||header.format!==BUNDLE_FORMAT||header.owner!==owner||header.backupId!==backupId||header.manifest!=='manifest.bin')fail('manifest_invalid');
  const sealed=await readSource(source,'manifest.bin',MAX_MANIFEST+52);
  const manifest=validateManifest(parse(await decrypt(sealed,key,owner,backupId,'recovery-manifest',MAX_MANIFEST),MAX_MANIFEST),owner,backupId);
  const snapshotBytes=await readSource(source,'objects/snapshot.bin',MAX_SNAPSHOT+52);
- const plain=await checkObject(snapshotBytes,manifest.objects[0],key,owner,backupId),snapshot=checkedSnapshot(plain,manifest.run);
+ const plain=await checkObject(snapshotBytes,manifest.objects[0],key,owner,backupId),snapshot=checkedSnapshot(plain,manifest.run,expectedCompanyBoundary);
  validateBinding(manifest,snapshot,plain.length);
  let paths;
  try{paths=await source.list();}catch{fail('read_failed');}
