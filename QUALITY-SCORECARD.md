@@ -13,7 +13,7 @@ Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.
 | 32 code/tests | 8.5→8.5 | Local Node1650/1641pass/9skip; Sites3196/3185pass/11skip,0fail; syntax142/types/build; audits0 production,8moderate Sites development. | Linux exact-head/main CI pending. Bridge is POSIX-only and fails required private-filesystem checks on Windows. |
 | 33 real production | 6.5→6.5 | Two exact complete read-only observations at revision50: one economic deposit, zero allocations. | Scoped evidence only; broad reference search incomplete; no new deployment or real Sandbox proof. |
 
-Other27-area claims and scores retain their existing scope; none is promoted by a synthetic result. The final integrated report will supersede this candidate checkpoint.
+Other area claims and scores retain their existing scope; none is promoted by a synthetic result. The final integrated report will supersede this candidate checkpoint.
 
 ## Agent 1 — flerföretagsgrund, 2026-11-04
 
