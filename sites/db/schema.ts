@@ -1,4 +1,4 @@
-import { primaryKey, sqliteTable, text, integer, index, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { primaryKey, sqliteTable, text, integer, index, uniqueIndex, check } from "drizzle-orm/sqlite-core";
 import { sql } from 'drizzle-orm';
 export const workspaces = sqliteTable("workspaces", {
   owner: text("owner").primaryKey(), revision: integer("revision").notNull().default(0),
@@ -36,6 +36,7 @@ export const bankAuthFlows = sqliteTable('bank_auth_flows', {
   appGeneration: text('app_generation').notNull(), bankName: text('bank_name').notNull(), country: text('country').notNull(),
   environment: text('environment').notNull(), redirectUri: text('redirect_uri').notNull(), dateFrom: text('date_from').notNull(),
   expiresAt: text('expires_at').notNull(), status: text('status').notNull(), createdAt: text('created_at').notNull(),
+  companyId:text('company_id'),companyActorId:text('company_actor_id'),companyContextVersion:integer('company_context_version'),companyMembershipVersion:integer('company_membership_version'),
 }, t => [index('bank_flow_owner').on(t.owner)]);
 export const bankSyncRuns = sqliteTable('bank_sync_runs', {
   id: text('id').primaryKey(), owner: text('owner').notNull(), connectionId: text('connection_id').notNull(),
@@ -81,6 +82,7 @@ export const gmailConnections = sqliteTable('gmail_connections', {
   syncFailures:integer('sync_failures').notNull().default(0),
 });
 export const gmailFlows=sqliteTable('gmail_flows',{
+  companyId:text('company_id'),companyActorId:text('company_actor_id'),companyContextVersion:integer('company_context_version'),companyMembershipVersion:integer('company_membership_version'),
   stateHash:text('state_hash').primaryKey(),owner:text('owner').notNull(),cookieHash:text('cookie_hash').notNull(),expiresAt:text('expires_at').notNull(),consumed:integer('consumed').notNull().default(0),
   requestSend:integer('request_send').notNull().default(0),
 });
@@ -143,3 +145,26 @@ export const backupRuns=sqliteTable('backup_runs',{
  lease:text('lease').notNull().default(''),leaseUntil:text('lease_until').notNull().default(''),lastError:text('last_error').notNull().default(''),
  createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),finishedAt:text('finished_at').notNull().default(''),
 },t=>[uniqueIndex('backup_owner_day').on(t.owner,t.day),index('backup_owner_created').on(t.owner,t.createdAt)]);
+
+// Company catalogue is additive. Existing owner values remain immutable storage
+// identities, including R2 prefixes and bank/Gmail encryption associated data.
+export const companyRoles=sqliteTable('company_roles',{
+ role:text('role').primaryKey().notNull(),
+},t=>[check('company_roles_valid',sql`${t.role} IN ('owner','admin','accountant','viewer')`)]);
+export const companies=sqliteTable('companies',{
+ id:text('id').primaryKey().notNull(),name:text('name').notNull(),storageOwner:text('storage_owner').notNull().unique(),
+ status:text('status').notNull().default('active'),companyVersion:integer('company_version').notNull().default(1),boundaryVersion:integer('boundary_version').notNull().default(1),legacyOwner:text('legacy_owner').unique(),
+ ownershipVerifiedBy:text('ownership_verified_by').notNull(),ownershipEvidence:text('ownership_evidence').notNull(),ownershipVerifiedAt:text('ownership_verified_at').notNull(),createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),
+},t=>[check('companies_status',sql`${t.status} IN ('active','suspended')`),check('companies_version',sql`${t.companyVersion}>0`),check('companies_boundary',sql`${t.boundaryVersion}=1`),check('companies_legacy_owner',sql`${t.legacyOwner} IS NULL OR ${t.legacyOwner}=${t.storageOwner}`)]);
+export const companyMemberships=sqliteTable('company_memberships',{
+ companyId:text('company_id').notNull().references(()=>companies.id),actorId:text('actor_id').notNull(),role:text('role').notNull().references(()=>companyRoles.role),status:text('status').notNull().default('active'),membershipVersion:integer('membership_version').notNull().default(1),createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),
+},t=>[primaryKey({columns:[t.companyId,t.actorId]}),index('company_memberships_actor').on(t.actorId,t.status),check('company_membership_status',sql`${t.status} IN ('active','revoked')`),check('company_membership_version_positive',sql`${t.membershipVersion}>0`)]);
+export const companyUserContexts=sqliteTable('company_user_contexts',{
+ actorId:text('actor_id').primaryKey().notNull(),activeCompanyId:text('active_company_id').references(()=>companies.id),contextVersion:integer('context_version').notNull().default(1),updatedAt:text('updated_at').notNull(),
+},t=>[check('company_context_version_positive',sql`${t.contextVersion}>0`)]);
+export const companyWorkerGrants=sqliteTable('company_worker_grants',{
+ id:text('id').primaryKey().notNull(),companyId:text('company_id').notNull().references(()=>companies.id),actorId:text('actor_id').notNull(),membershipVersion:integer('membership_version').notNull(),companyVersion:integer('company_version').notNull(),runner:text('runner').notNull(),credentialSha256:text('credential_sha256').notNull(),status:text('status').notNull().default('active'),grantVersion:integer('grant_version').notNull().default(1),createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),
+},t=>[uniqueIndex('company_worker_grants_company_runner').on(t.companyId,t.runner).where(sql`${t.status} = 'active'`),uniqueIndex('company_worker_grants_credential').on(t.credentialSha256),check('company_worker_membership_version',sql`${t.membershipVersion}>0`),check('company_worker_company_version',sql`${t.companyVersion}>0`),check('company_worker_runner',sql`${t.runner} IN ('cloud','local')`),check('company_worker_credential',sql`length(${t.credentialSha256})=64`),check('company_worker_status',sql`${t.status} IN ('active','revoked')`),check('company_worker_version',sql`${t.grantVersion}>0`)]);
+export const companyOperationGuard=sqliteTable('company_operation_guard',{
+ slot:integer('slot').primaryKey(),storageOwner:text('storage_owner').notNull(),companyId:text('company_id'),actorId:text('actor_id').notNull(),contextVersion:integer('context_version'),membershipVersion:integer('membership_version'),action:text('action').notNull(),authorized:integer('authorized').notNull(),
+},t=>[check('company_guard_singleton',sql`${t.slot}=1`),check('company_guard_authorized',sql`${t.authorized}=1`)]);

@@ -13,6 +13,7 @@ import { seal, unseal, randomToken, digest, validFlowToken, cookieValue } from '
 import { runtimeBankConfig, runtimeBankStatus } from '../lib/banking/runtime-config.ts';
 import { confirmedBankConsent } from '../lib/banking/status-view.ts';
 import { accountReadCooldown } from '../lib/banking/account-read-cooldown.ts';
+import { applyCurrentMigrations, businessSql } from './helpers/company-compat-fixture.mjs';
 
 // Exercise the real route services, encryption, domain and SQL. Only the identity
 // provider and banking HTTP boundary are replaced. No test can call a live bank.
@@ -69,11 +70,7 @@ const bankJobEvents = f => f.sql.prepare("SELECT action,detail,created_at,revisi
 async function fixture(t, environment = 'PRODUCTION', { actualProvider = false } = {}) {
   const key = `__mgBankTest_${crypto.randomUUID().replaceAll('-', '')}`;
   const sql = new DatabaseSync(':memory:');
-  sql.exec(source('../drizzle/0000_confused_umar.sql'));
-  sql.exec(source('../drizzle/0001_sudden_whirlwind.sql'));
-  sql.exec(source('../drizzle/0002_brief_chronomancer.sql'));
-  sql.exec(source('../drizzle/0012_minor_naoko.sql'));
-  sql.exec(source('../drizzle/0016_agent2_account_read_guard.sql'));
+  applyCurrentMigrations(sql);
   const f = { sql, owner: 'owner-alice', user: { userId: 'owner-alice' }, calls: [], provider: {}, env: {
     BANK_DATA_ENCRYPTION_KEY: randomToken(), ENABLE_BANKING_APPLICATION_ID: appId,
     ENABLE_BANKING_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',
@@ -87,7 +84,7 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const auth = jsUrl(`export async function getChatGPTUser(){return globalThis[${JSON.stringify(key)}].user;}`);
   const domain = new URL('../lib/domain.ts', import.meta.url).href;
   const security = new URL('../lib/banking/security.ts', import.meta.url).href;
-  const serverUrl = compiledModule('../lib/server.ts', { 'cloudflare:workers': cloudflare, '@/app/chatgpt-auth': auth, './domain': domain });
+  const serverUrl = compiledModule('../lib/server.ts', {'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href, 'cloudflare:workers': cloudflare, '@/app/chatgpt-auth': auth, './domain': domain });
   const runtimeConfig = new URL('../lib/banking/runtime-config.ts', import.meta.url).href;
   const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig });
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
@@ -171,7 +168,7 @@ test('Automatic fetching is opt-in and rejects foreign connection IDs and cross-
 });
 
 test('main control reserves a six-hour retry inside the bank lock without enabling automatic sync',async t=>{
-  const f=await fixture(t);f.sql.exec(source('../drizzle/0008_minor_jazinda.sql'));await f.seedApp();await f.seedConnection();
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
   f.provider.getTransactions=async()=>{throw new ProviderError('BANK_RATE_LIMIT','För många förfrågningar',429,true);};
   await assert.rejects(f.service.syncControl(post('sync')),e=>e.code==='BANK_RATE_LIMIT');
   const c=f.connection();assert.ok(c.control_last_attempt_at);assert.equal(c.auto_sync_enabled,0);assert.equal(c.auto_last_attempt_at,null);assert.equal(c.auto_next_at,null);assert.equal(c.last_synced_at,null);
@@ -180,7 +177,7 @@ test('main control reserves a six-hour retry inside the bank lock without enabli
 });
 
 test('main control honors an interrupted reservation and keeps real PSU headers',async t=>{
-  const f=await fixture(t);f.sql.exec(source('../drizzle/0008_minor_jazinda.sql'));await f.seedApp();await f.seedConnection();
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
   f.sql.prepare('UPDATE bank_connections SET control_last_attempt_at=?').run(new Date().toISOString());assert.equal((await (await f.service.syncControl(post('sync'))).json()).reason,'not_due');assert.equal(f.calls.length,0);
   f.sql.prepare("UPDATE bank_connections SET control_last_attempt_at='2000-01-01'").run();await f.service.syncControl(post('sync'));
   assert.equal(f.calls.find(c=>c.name==='getTransactions').args[2].psu.ipAddress,'192.0.2.1');assert.equal(f.connection().auto_sync_enabled,0);
@@ -315,9 +312,12 @@ test('Mutation services enforce real signed-in identity and exact same-origin be
 
 test('Owner locks exclude concurrent mutations, allow other owners and release after errors', async t => {
   const f = await fixture(t);
+  f.user = { userId: 'alice' };
   await f.store.withBankLock('alice', async () => {
     await assert.rejects(f.store.withBankLock('alice', async () => 'unexpected'), { message: 'BANK_BUSY' });
-    assert.equal(await f.store.withBankLock('bob', async () => 'other-owner'), 'other-owner');
+    f.user = { userId: 'bob' };
+    try { assert.equal(await f.store.withBankLock('bob', async () => 'other-owner'), 'other-owner'); }
+    finally { f.user = { userId: 'alice' }; }
   });
   await assert.rejects(f.store.withBankLock('alice', async () => { throw new Error('task failed'); }), /task failed/);
   assert.equal(count(f, 'bank_locks'), 0);
@@ -325,6 +325,7 @@ test('Owner locks exclude concurrent mutations, allow other owners and release a
 
 test('A stale invocation cannot release a replacement lock acquired after lease expiry', async t => {
   const f = await fixture(t);
+  f.user = { userId: 'alice' };
   let releaseReplacement, replacementStarted;
   const gate = new Promise(resolve => { releaseReplacement = resolve; });
   const started = new Promise(resolve => { replacementStarted = resolve; });
@@ -370,7 +371,9 @@ test('Explicit status refresh replaces stale activation and redirect metadata wh
   const updatedApp = await f.store.application(f.owner);
   assert.deepEqual(JSON.parse(updatedApp.metadata), f.info);
   assert.equal(updatedApp.encrypted_key, originalApp.encrypted_key); assert.equal(updatedApp.generation, originalApp.generation);
-  const otherApp = JSON.parse((await f.store.application('owner-bob')).metadata);
+  // Inspect the retained row directly: Alice's service cannot read Bob's key
+  // metadata, and refreshing Alice must still leave Bob's metadata unchanged.
+  const otherApp = JSON.parse(f.sql.prepare('SELECT metadata FROM bank_applications WHERE owner=?').get('owner-bob').metadata);
   assert.equal(otherApp.active, false); assert.deepEqual(otherApp.redirect_urls, ['https://old.example.test/callback']);
 
   const cached = await (await f.service.status(new Request(`${origin}/api/bank/status`))).json();
@@ -402,7 +405,9 @@ test('Callback rejects missing or ambiguous state, wrong browser, owner, expired
   for (const request of checks) assert.equal((await f.service.callback(request)).headers.get('location'), '/bank?result=expired');
   assert.equal((await f.service.callback(f.callbackRequest('', `${cookieName}=${randomToken()}`))).headers.get('location'), '/bank?result=wrong_user');
   f.user = { userId: 'owner-bob' };
-  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=wrong_user');
+  // The company boundary conceals another owner's flow altogether. The generic
+  // expired result preserves denial without revealing that the flow exists.
+  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=expired');
   f.user = { userId: f.owner };
   f.env.ENABLE_BANKING_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nUk9UQVRFRC1URVNULU9OTFk=\n-----END PRIVATE KEY-----';
   assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=expired');
@@ -610,7 +615,7 @@ test('delayed bank responses cannot write or release a replacement lease',async 
 
 test('D1 atomically fences bank writes even when a lease changes after a valid assertion',async t=>{
  const f=await fixture(t);await f.seedApp();await f.seedConnection();
- f.d1.beforeBatch=items=>{if(items.some(i=>i.sql.startsWith('INSERT OR IGNORE INTO workspaces'))){f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());}};
+ f.d1.beforeBatch=items=>{if(items.some(i=>businessSql(i.sql).startsWith('INSERT OR IGNORE INTO workspaces'))){f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());}};
  await assert.rejects(f.service.sync(post('sync')),/BANK_LEASE_LOST/);
  assert.equal(f.workspace(),null);assert.equal(financialAuditCount(f),0);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.connection().last_synced_at,null);
 });
@@ -632,7 +637,7 @@ test('delayed bank OAuth cannot overwrite a replacement flow or connection',asyn
 });
 
 test('bank Retry-After persists and blocks manual, control and automatic retries',async t=>{
- const f=await fixture(t);f.sql.exec(source('../drizzle/0008_minor_jazinda.sql'));await f.seedApp();const id=await f.seedConnection();await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));
  f.provider.getTransactions=async()=>{throw Object.assign(new ProviderError('BANK_RATE_LIMIT','Vänta',429,true),{retryAfter:172800});};
  await assert.rejects(f.service.automaticSync(),e=>e.code==='BANK_RATE_LIMIT');
  assert.ok(Date.parse(f.connection().retry_after)>Date.now()+172799000);const calls=f.calls.length;
@@ -882,7 +887,7 @@ for(const stage of ['session','transactions'])for(const failure of ['result save
 });
 
 for(const mode of ['manual','automatic','control'])test(`bank job audit records the ${mode} attempt before provider work and completes it with the imported run`,async t=>{
- const f=await fixture(t);f.sql.exec(source('../drizzle/0008_minor_jazinda.sql'));await f.seedApp();const id=await f.seedConnection();
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection();
  if(mode==='automatic')await f.service.setAutomaticSync(post('automatic',{enabled:true,connectionId:id}));
  let reached,resume;const ready=new Promise(resolve=>{reached=resolve;}),gate=new Promise(resolve=>{resume=resolve;});
  f.provider.getSession=async()=>{reached();await gate;return structuredClone(f.live);};
@@ -944,7 +949,7 @@ for(const [label,environment,empty,replaced]of [
  const batch=f.d1.batch.bind(f.d1);let lost=false;
  f.d1.batch=async statements=>{
   const result=await batch(statements);
-  if(!lost&&statements.some(statement=>statement.sql.startsWith('INSERT INTO bank_sync_runs'))){
+  if(!lost&&statements.some(statement=>businessSql(statement.sql).startsWith('INSERT INTO bank_sync_runs'))){
    lost=true;
    if(replaced){f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());f.sql.prepare("UPDATE bank_connections SET last_error='Newer worker status'").run();}
    throw Error('PRIVATE_TRANSPORT_REPLY_DETAILS');
@@ -974,7 +979,7 @@ test('bank job audit does not record skipped automatic attempts or append result
 
 test('a committed bank job remains completed when later housekeeping loses its lease',async t=>{
  const f=await fixture(t);await f.seedApp();await f.seedConnection();
- f.d1.beforeBatch=statements=>{if(statements.some(statement=>statement.sql.startsWith('DELETE FROM bank_sync_runs'))){f.d1.beforeBatch=null;f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());}};
+ f.d1.beforeBatch=statements=>{if(statements.some(statement=>businessSql(statement.sql).startsWith('DELETE FROM bank_sync_runs'))){f.d1.beforeBatch=null;f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());}};
  const response=await(await f.service.sync(post('sync'))).json();
  assert.equal(response.imported,1);assert.ok(response.warnings.some(warning=>warning.includes('Efterkontrollen')));assert.equal(f.connection().last_error,null);assert.ok(f.connection().last_synced_at);
  assert.deepEqual(bankJobEvents(f).map(event=>event.action),['bank.job.started','bank.job.completed']);assert.equal(f.workspace().state.transactions.length,1);

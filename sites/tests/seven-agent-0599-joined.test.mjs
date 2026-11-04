@@ -1,3 +1,4 @@
+import {isReadOnlySql} from './helpers/company-compat-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {resolveInvoiceReference} from '../lib/invoice-reference-policy.js';
@@ -28,7 +29,7 @@ function conserved(state){
 }
 async function readOnly(t,f,id){
  const before=f.read(),audits=f.audits(),objects=structuredClone(f.objects),prepare=f.database.prepare.bind(f.database);
- const guard=t.mock.method(f.database,'prepare',query=>{assert.match(query,/^\s*SELECT\b/i,'joined preview must not attempt SQL writes');return prepare(query);});
+ const guard=t.mock.method(f.database,'prepare',query=>{assert.ok(isReadOnlySql(f.sql,query),'joined preview must not attempt SQL writes');return prepare(query);});
  f.beforeBatch=()=>assert.fail('joined preview must not attempt a write batch');
  f.onPut=()=>assert.fail('joined preview must not attempt an R2 write');
  const deletion=t.mock.method(f.bucket,'delete',async()=>assert.fail('joined preview must not delete an original'));

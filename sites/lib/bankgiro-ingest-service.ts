@@ -1,5 +1,5 @@
 import {env} from 'cloudflare:workers';
-import {db,readWorkspace,readBankOriginalBytes} from './server';
+import {db,readWorkspace,readBankOriginalBytes,companyBoundaryForOwner} from './server';
 import {applyCommand,emptyState,now,uid,specificationPreview,BankImportEvidenceError,bankImportEvidenceError,prepareBankImportFailure,type State} from './domain';
 import {readBankgiroOriginal} from './bankgiro-service';
 import {parseSpecificationBytes} from './bankgiro-parser.js';
@@ -146,9 +146,17 @@ export function createSitesBankgiroSink(){
 }
 
 async function sourceWorker(owner:string){
- const source=await resolveBankgiroSource(owner,{configuration:(env as unknown as Record<string,unknown>).BANKGIRO_SOURCE_CONFIG,secrets:env as unknown as Record<string,unknown>}) as {id:string;mode:string}|null;
+ const source=await resolveBankgiroSource(owner,{configuration:(env as unknown as Record<string,unknown>).BANKGIRO_SOURCE_CONFIG,secrets:env as unknown as Record<string,unknown>}) as {id:string;mode:string;registration?:{owner?:string;companyId?:string};revocation?:{owner?:string;companyId?:string}}|null;
  // An absent or synthetic source must not require D1/R2 or create a lease.
  if(!source||source.mode==='synthetic')return createBankgiroIngest({source,store:null,sink:null});
+ const boundary=await companyBoundaryForOwner(owner);
+ // Removing a trusted registration can only revoke this immutable owner. New
+ // provider access additionally requires the exact verified company identity.
+ const ownRevocation=source.revocation?.owner===owner&&(!Object.hasOwn(source.revocation,'companyId')||source.revocation.companyId===boundary?.companyId);
+ if(boundary&&!ownRevocation&&(source.registration?.owner!==boundary.storageOwner||source.registration?.companyId!==boundary.companyId)){
+  const blocked={enabled:false,sourceId:source.id,mode:source.mode,state:'BLOCKED',reason:'COMPANY_BOUNDARY_MISMATCH',lastError:'COMPANY_BOUNDARY_MISMATCH',nextPollAt:null,missingReportIds:[],counts:{PENDING:0,RETRY:0,IMPORTED:0,REVIEW:0,DUPLICATE:0,BLOCKED:0},jobs:[],authorization:{status:'BLOCKED',verifiedAt:null,validUntil:null}};
+  return{status:async(_owner:string)=>blocked,run:async(_owner:string)=>blocked};
+ }
  return createBankgiroIngest({source,store:createBankgiroIngestStore(db()),sink:createSitesBankgiroSink()});
 }
 export async function bankgiroSourceStatus(owner:string){return publicBankgiroStatus(await(await sourceWorker(owner)).status(owner));}

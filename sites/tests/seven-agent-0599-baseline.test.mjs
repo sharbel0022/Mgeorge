@@ -1,3 +1,4 @@
+import {isReadOnlySql} from './helpers/company-compat-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -26,7 +27,7 @@ function compiled(path,imports={}){
 const domain=local('../lib/domain.ts'),engine=local('../lib/reconciliation-engine.js');
 const environment=data('export const env=new Proxy({}, {get:(_,key)=>globalThis.sevenAgentBaselineFixture.env[key]});');
 const auth=data('export async function getChatGPTUser(){return globalThis.sevenAgentBaselineFixture.user;}');
-const server=compiled('../lib/server.ts',{'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':domain});
+const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':domain});
 const normalizer=compiled('../lib/banking/transactions.ts',{
  '../domain':domain,'../payment-references.js':local('../lib/payment-references.js'),'../payer-evidence.js':local('../lib/payer-evidence.js')
 });
@@ -93,7 +94,7 @@ async function fixture(t,{withAlias=true}={}){
  const objects=new Map(),f={sqlite,objects,beforeBatch:null,user:{userId:owner},effects:{d1Writes:0,r2Writes:0,fetchCalls:0}};
  // The current candidate path uses plain SELECTs. Count other SQL as a write
  // attempt, even when it changes no rows or its failure is caught by the route.
- const statement=sql=>{if(!/^\s*SELECT\b/i.test(sql))f.effects.d1Writes++;return sqlite.prepare(sql);};
+ const statement=sql=>{if(!isReadOnlySql(sqlite,sql))f.effects.d1Writes++;return sqlite.prepare(sql);};
  const DB={prepare(sql){return {args:[],bind(...args){this.args=args;return this;},
   async first(){return statement(sql).get(...this.args)||null;},
   async all(){return {results:statement(sql).all(...this.args)};},

@@ -1,6 +1,17 @@
 import {createHash} from 'node:crypto';
 import {runDocumentProcess} from './invoice-extraction.js';
 const MAX_BYTES=15000000;
+// Only errors created here receive public diagnostics. Unknown thrown values
+// are never inspected: provider/body text, getters and token values stay private.
+const httpFailures=new WeakMap();
+export function sitesOcrFailure(error){
+  return httpFailures.get(error)??{failure_code:'UNCLASSIFIED_FAILURE'};
+}
+function rejectHttp(status){
+  const failure_code=status===404?'SITE_NOT_FOUND':status===401?'WORKER_UNAUTHORIZED':status===403?'WORKER_FORBIDDEN':status===429?'SITE_RATE_LIMITED':status>=300&&status<400?'SITE_REDIRECT_BLOCKED':status>=500?'SITE_UNAVAILABLE':'SITE_RESPONSE_REJECTED';
+  const error=Error(status===401?'authorization':'site_unavailable');
+  httpFailures.set(error,Object.freeze({failure_code,http_status:status}));throw error;
+}
 export async function boundedBody(response,limit){
   if(Number(response.headers.get('content-length'))>limit)throw Error('response_limit');
   const chunks=[];let length=0;
@@ -13,7 +24,7 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
   let processed=0,failed=0;
   const request=async(path,body,extra={},timeout=25000)=>{
     const result=await fetchImpl(origin.origin+path,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+config.token,...(cloud?{'X-MG-OCR-Runner':'cloud'}:{}),...(body===undefined?{}:{'Content-Type':'application/json'}),...extra},body:body===undefined?undefined:JSON.stringify(body),redirect:'manual',signal:AbortSignal.timeout(timeout)});
-    if(!result.ok)throw Error(result.status===401?'authorization':'site_unavailable');return result;
+    if(!result.ok)rejectHttp(result.status);return result;
   };
   const json=async(path,body,limit,timeout)=>{
     const value=JSON.parse((await boundedBody(await request(path,body,{},timeout),limit)).toString());
