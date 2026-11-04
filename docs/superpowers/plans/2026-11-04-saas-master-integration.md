@@ -36,16 +36,16 @@
 
 - [x] Fetch current origin/main and open PRs; inspect current progress, scorecard and latest delivery.
 - [x] Verify exact-head CI for #36–42 and preserve all producer refs.
-- [ ] Record schemas, contracts, dependencies and reproduced conflicts in the matrix.
+- [x] Record schemas, contracts, dependencies and reproduced conflicts in the matrix.
 
 ### Task 2: Foundation integration (#40)
 
 **Files:** src/company-runtime.js; src/server.js; sites/lib/company-storage.js; sites/lib/server.ts; company tests and migrations.
 **Interfaces:** Verified company context and immutable storage namespace from server membership.
 
-- [ ] Review all producer changes; reproduce any concrete finding before a minimal fix.
-- [ ] Run root/Sites/bridge cumulative gates and upgrade/legacy isolation tests.
-- [ ] Merge only an approved current head through GitHub, then verify exact main CI.
+- [x] Review all producer changes; reproduce any concrete finding before a minimal fix.
+- [x] Run root/Sites/bridge cumulative gates and upgrade/legacy isolation tests.
+- [x] Merge only an approved current head through GitHub, then verify exact main CI.
 
 ### Task 3: Provider and consent integration (#36, #39)
 

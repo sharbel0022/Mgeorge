@@ -31,4 +31,11 @@ Full changed filenames and frozen producer metadata are retained in `producer-in
 
 Provisional order: #40 → #36 → #39 → #41 → #42 → #38 → #37. Current head is re-read and frozen before every merge. Review all diff, reproduce concrete findings, apply minimal regression-backed repairs, run full cumulative workflow gates, then merge with expected head and verify exact new main CI. Conflicting or incomplete PRs remain blocked until repaired.
 
-No merge or production deployment has occurred in this integration at the time of this inventory. Sandbox access, real bank/company entitlement, Bankgiro coverage and commercial/legal approval are independent external gates.
+## Verified integration receipts
+
+- #40 repaired head `1d7dc21f0d61d98c239f51eb778facd79b6a6aed`: exact CI41914312271 success,1649Node+3196Sites+47bridge=4892pass,0fail/skip/cancel/TODO. Two Important foundation findings closed with RED/GREEN and independent recheck. Original producer SHA above remains the frozen inventory entry.
+- #40 merged normally to main `f105e9cc5404d1bff3b4fe41e4e6af14d944d212`; exact main CI41914833272 all three jobs success. Sites tree equals the tested repaired head. No new Sites deployment.
+- #36 next: read-only independent review READY for an inactive library. Current head remains1a634c1; actual conflict preview shows only PROGRESS and QUALITY-SCORECARD, whose additive producer evidence will be preserved.
+- #36 cumulative candidate: both documentary conflicts resolved additively; local Node1670/1661pass/9skip and Sites3266/3255pass/11skip,0fail/cancel/TODO; syntax/types/build pass. The20-case OpenSSL fixture failure was reproduced and corrected with explicit synthetic config, no transport assertion relaxed. Runtime provider files are unchanged; independent review READY. New candidate awaits exact-head Linux CI before merge.
+
+Sandbox access, real bank/company entitlement, Bankgiro coverage and commercial/legal approval are independent external gates. [Launch checklist](COMMERCIAL-LAUNCH-GATES.md) remains blocked.

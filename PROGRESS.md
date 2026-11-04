@@ -1,6 +1,6 @@
 # Verifierad progress
 
-## SaaS master integration — foundation repair candidate, 2026-11-04
+## SaaS master integration — foundation verified, 2026-11-04
 
 Start main `14a042abd37fa455d08da9dfcc096ef4f603b512`; all seven current producer heads and exact-head CI frozen in [integration matrix](docs/saas/INTEGRATION-MATRIX.md). #38 remains Draft. Separate native integration worktree; original checkout and production resources preserved.
 
@@ -10,7 +10,9 @@ Full local candidate on Windows/Node22.16: Node1650 total/1641pass/0fail/9 docum
 
 Separate operational diagnosis: latest cloud OCR run41877909285 used the obsolete Sites origin (404); canonical same-project endpoint returns401 without credentials. Repository variable MG_SITES_ORIGIN was corrected to the server-returned current origin and read back; worker secret, schedules and runtime settings unchanged, no workflow dispatched. This is not a successful authenticated OCR run. Gmail schedule remains disabled; last fetch2026-11-03T18:38:10.461Z. Read-only selected payment evidence at revision50 is exact/complete per observation, economic counts1+0 and zero allocations; broad reference search remains incomplete. Latest backup362 files is verifying35, earlier267-file manifest complete; no full production recovery claimed.
 
-All33 scores remain255/330=7.73; commercial/Sandbox/real Bankgiro acceptance is not inferred. Foundation candidate awaits fresh exact-head CI and safe PR merge; no new Sites deployment yet. [Execution plan](docs/superpowers/plans/2026-11-04-saas-master-integration.md).
+All33 scores remain255/330=7.73; commercial/Sandbox/real Bankgiro acceptance is not inferred. Repaired #40 head1d7dc21 passed exact CI41914312271; normal merge produced mainf105e9c, whose separate CI41914833272 passed1649Node+3196Sites+47bridge=4892 without fail/skip/cancel/TODO. Next #36 cumulative integration preserves both additive report sections; runtime adapter source remains byte-identical to its reviewed producer. No new Sites deployment yet. [Execution plan](docs/superpowers/plans/2026-11-04-saas-master-integration.md).
+
+PR36 cumulative candidate now passes Windows Node1670/1661pass/9platformskip and Sites3266/3255pass/11platformskip,0fail/cancel/TODO; syntax143 plus nested transport check, guarded TS and production build pass. Initial20 Node failures all came from an absent global OpenSSL config; private synthetic explicit test config fixed the actual environment dependency,20/20focused and independent review READY. Production provider code is unchanged and inactive. No package/lock change; matching clean installations/audits reused locally, exact-head Linux CI required before merge.
 
 ## Agent 1 — flerföretagsgrund, 2026-11-04
 
@@ -21,6 +23,18 @@ Node använder en verifierad företagskatalog och separata SQLite-databaser; Sit
 Slutliga lokala helsviter: **1 633 Node + 3 190 Sites + 47 bridge = 4 870 godkända**, noll fel/överhoppade/avbrutna/TODO. Syntax, TypeScript, låsta installationer, exakt minimatch-kontroll, auditgrindar och Sites produktionsbygge godkända. Root/Sites produktionsberoenden/bridge har noll auditfynd; full Sites-audit har åtta moderate utvecklingsfynd och inga high/critical. Lokal Node är 24.22.1; exakt Node 22-verifiering sker i PR-flödets tre jobb. Oberoende review hittade ett återkallningsfel i worker-fallback; rättningen återverifierades med samma syntetiska reproduktion. Inga kvarvarande reproducerade Critical/Important-fynd inom granskad omfattning.
 
 Ingen produktion, verklig bank/Gmail, extern schemaläggning, merge eller publicering ingår. Efter första företagsbindning får en äldre tenant-omedveten app inte återstartas mot samma databas. Verklig onboarding/ägarverifiering, medgivanden, worker-dispatch och produktionsacceptans återstår enligt integrationskraven. **Alla 33 kvalitetspoäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.** Tidigare daterade kvitton nedan behåller sin historiska omfattning.
+
+## Agent 2 — Open Payments corporate adapter, 2026-11-04
+
+Egen branch `feature/saas-openpayments-provider`, bas `14a042a`. [Adapter och verifieringskvitto](docs/integration/saas/openpayments-adapter.md), [verifierade leverantörsegenskaper](docs/integration/saas/provider-capabilities.md) och [integrationsöverlämning](docs/integration/agent-2-openpayments-provider.md).
+
+Additivt serverlager med provideroberoende kontrakt, företagsbundna krypterade resurser, strikt tillåtna lässcope, OAuth/tokenhantering, dokumenterade samtyckes-/SCA-/AIS-anrop, bankmetadata och Node-mTLS. `paymentinitiation` och betalningsvägar spärras. Bankgiroobservationer och bokförda bankrader hålls åtskilda; faktisk Bankgirotäckning och rätt att stämma av betalningar härleds inte från scope eller fixtures.
+
+Oberoende granskning identifierade två reproducerade fel: ändringsbara indata över asynkrona gränser och förlorad HTTP-felklassificering vid stora certifikattransportsvar. Båda är rättade med RED/GREEN-regressioner och oberoende omkontrollerade. Exakta slutgrindar redovisas i adapterrapporten. Befintliga Enable Banking-funktioner, datalagring och produktionskopplingar är oförändrade.
+
+Slutlig lokal verifiering på implementationscommit `79f27f0`: **1 585 Node + 3 191 Sites + 47 bridge = 4 823 godkända**, utan fel/skip/cancel/todo; 90 nya adaptertester ingår i totalsumman. Syntax, typer, låsta installationer, föreskrivna high-auditgrindar och Sites-bygge passerade. Sites har 8 moderate utvecklingsberoendefynd. GitHub Node 22-CI och leveranshuvud redovisas separat i PR:n; lokal körning använde Node 24.22.1.
+
+Ingen verklig Open Payments-sandbox eller produktionsbank har anropats. Sandboxuppgifter, kundspecifikt SaaS-/Bankgiro-/ISO-avtal, riktiga produktionscertifikat och verifierad bank-/företagstäckning återstår. Beständig företagskoppling, callbackkonsumtion, runtime-tokenkoordinering och granskad originalimport kräver separat integration. Alla 33 kvalitetspoäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**.
 
 ## Automatic Bankgiro source readiness — 2026-11-03
 
