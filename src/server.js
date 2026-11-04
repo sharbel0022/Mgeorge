@@ -17,7 +17,8 @@ import {createNodeBankgiroIngest} from './bankgiro-ingest.js';
 import {resolveBankgiroSource} from '../sites/lib/bankgiro-source-registry.js';
 import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
 import {createIntegrationJobs} from './integration-jobs.js';
-import { isConfigured, configStatus, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
+import { isConfigured, configStatus, consentApplicationFingerprint, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
+import {ConsentError,bankCompanyContext,requestedBankConsent,consentMetadata,assertConsentContext,validatedLiveAccountDetails,companyAccountGrant,assertCorporateAccountAccess,publicConsent,validateCallbackParameters,validateEnableConsent} from './bank-consent.js';
 import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
 import { gmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 import {analyzeDocument,approveDocument} from './invoice-review.js';
@@ -170,6 +171,7 @@ function importBankFile(body,req){
   let account=optionalString(body.account,120)||'Swedbank';
   if(body.connection_id){
     const connection=ownedConnection(req,body.connection_id);
+    assertCorporateAccountAccess(connection,req.principal,connection.selected_account_uid,body.companyId);
     const selected=decryptObject(connection.accounts_json).find(a=>a.uid===connection.selected_account_uid);
     if(!selected||(body.account_uid&&body.account_uid!==selected.uid))throw bad(400,'Välj bankanslutningens godkända konto');
     account=stableAccountIdentity(selected,connection.bank_name);
@@ -268,6 +270,31 @@ function ownedConnection(req,id){
   if(!connection)throw bad(404,'Bankanslutningen saknas eller tillhör en annan användare');
   return connection;
 }
+function finishBankFlow(stateHash,status,reason='',connectionId=''){
+  db.prepare("UPDATE bank_states SET consumed=1,status=?,terminal_reason=?,connection_id=? WHERE state_hash=? AND status IN ('pending','consuming')").run(status,reason,connectionId,stateHash);
+}
+function flowContext(record,actorId){
+  // Persisted legacy connections remain compatible, but old redirects must
+  // restart so they cannot create another metadata-free connection after rollout.
+  if(!record.context_json)throw new ConsentError('CONSENT_FLOW_EXPIRED',409);
+  let context;try{context=JSON.parse(record.context_json);}catch{throw new ConsentError('INVALID_CALLBACK',403);}
+  if(context?.version!==1||context.mode!=='company'||context.flowId!==record.flow_id||context.renewConnectionId!==record.renew_connection_id||context.intent!==(record.renew_connection_id?'renew':'connect'))throw new ConsentError('INVALID_CALLBACK',403);
+  assertConsentContext(context,actorId);
+  if(context.applicationFingerprint!==consentApplicationFingerprint())throw new ConsentError('CONSENT_APPLICATION_CHANGED',409);
+  return context;
+}
+function bankSessionInUse(sessionId){
+  for(const connection of db.prepare('SELECT encrypted_session FROM bank_connections').all()){
+    try{if(decryptObject(connection.encrypted_session).session_id===sessionId)return true;}
+    catch{return true;} // Do not revoke a session whose ownership is uncertain.
+  }
+  return false;
+}
+function assertCurrentBankConnection(connection){
+  const stored=db.prepare('SELECT * FROM bank_connections WHERE id=? AND owner=?').get(connection.id,connection.owner);
+  if(!stored||stored.encrypted_session!==connection.encrypted_session||stored.accounts_json!==connection.accounts_json||stored.consent_json!==connection.consent_json||stored.selected_account_uid!==connection.selected_account_uid)throw Object.assign(bad(409,'Bankanslutningen har ändrats. Läs in den igen.'),{code:'connection_changed'});
+  return stored;
+}
 function stableAccountIdentity(account,bank){
   const number=account.account_id?.iban?.replace(/\s/g,'').toUpperCase()||account.account_id?.other?.identification;
   // Keep the canonical account number compatible with earlier file/API imports.
@@ -277,9 +304,19 @@ function stableAccountIdentity(account,bank){
 }
 async function verifyBankSession(connection,deadline){
   const data=await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{...(deadline===undefined?{}:{deadline})});
+  const metadata=consentMetadata(connection);
+  if(metadata){
+    const saved=decryptObject(connection.accounts_json);
+    const grant=validateEnableConsent({session:{accounts:saved,aspsp:{name:connection.bank_name,country:'SE'},psu_type:'business',access:{valid_until:connection.valid_until,transactions:true}},checked:data,bankName:connection.bank_name,requestedValidUntil:connection.valid_until,requestedScopes:metadata.requestedScopes});
+    if(!grant.accountUids.includes(connection.selected_account_uid))throw new ConsentError('BANK_ACCOUNT_SCOPE_INVALID',409);
+    const current=validatedLiveAccountDetails(saved,data,connection.bank_name);
+    const authority=assertCorporateAccountAccess({...connection,accounts_json:encryptObject(current),valid_until:grant.validUntil});
+    return Math.min(Date.parse(grant.validUntil),Date.parse(authority.validUntil));
+  }
   const expiresAt=typeof data.access?.valid_until==='string'?Date.parse(data.access.valid_until):NaN;
   if(data.status!=='AUTHORIZED'||!Array.isArray(data.accounts)||!data.accounts.includes(connection.selected_account_uid)||
     data.aspsp?.name!==connection.bank_name||data.aspsp?.country!=='SE'||data.psu_type!=='business'||
+    data.access?.transactions!==undefined&&data.access.transactions!==true||
     !Number.isFinite(expiresAt)||expiresAt<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
   return expiresAt;
 }
@@ -293,6 +330,8 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     connection.controlAuthorize?.();
   };
   if(!operationLocked&&bankSyncing.has(connection.id))throw bad(409,'En bankåtgärd pågår redan');
+  if(connection.status==='revocation_pending')throw new ConsentError('BANK_DISCONNECT_PENDING',409,'Frånkopplingen behöver slutföras innan bankuppgifter kan hämtas.');
+  assertCorporateAccountAccess(connection);
   if(!connection.owner||!connection.selected_account_uid)throw bad(409,'Välj först ett godkänt företagskonto');
   if(!Number.isFinite(Date.parse(connection.valid_until))||Date.parse(connection.valid_until)<=Date.now()||connection.status==='renewal_required'){
     throw bad(409,'Bankanslutningen behöver förnyas – koppla igen');
@@ -306,6 +345,7 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
   let consentExpiresAt=Date.parse(connection.valid_until);
   const consentAuthorize=()=>{
     authorize();
+    assertCorporateAccountAccess(connection);
     if(!Number.isFinite(consentExpiresAt)||consentExpiresAt<=Date.now())throw Object.assign(bad(409,'Bankanslutningen behöver förnyas – koppla igen'),{code:'renewal_required'});
   };
   const bankAuthorize=()=>{lease.assert();consentAuthorize();};
@@ -365,7 +405,7 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
     if(e.code==='connection_changed'||e.status===401&&!e.providerStatus)throw e;
     const renewal=e.code==='renewal_required';
     const cooldown=e.status===429||e.code==='bank_unavailable'&&e.status===503&&Number.isFinite(e.retryAfter)&&e.retryAfter>0;
-    const safeBankFailure=['invalid_date_range','transaction_period_unavailable','page_limit','transaction_limit','bank_timeout','incomplete_bank_response','bank_sync_window_limit','application_access_denied'].includes(e.code);
+    const safeBankFailure=e instanceof ConsentError||['invalid_date_range','transaction_period_unavailable','page_limit','transaction_limit','bank_timeout','incomplete_bank_response','bank_sync_window_limit','application_access_denied'].includes(e.code);
     const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
     lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,cooldown?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
     recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
@@ -496,7 +536,7 @@ async function route(req,res){
     return json(res,200,preview);
   }
   if(path==='/api/logout'&&req.method==='POST'){
-    db.prepare('DELETE FROM bank_states WHERE session_hash=?').run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
+    db.prepare("UPDATE bank_states SET consumed=1,status='session_lost',terminal_reason='SESSION_ENDED' WHERE session_hash=? AND status IN ('pending','consuming')").run(sessionHash(req));db.prepare('DELETE FROM gmail_states WHERE session_hash=?').run(sessionHash(req));
     db.prepare('DELETE FROM sessions WHERE id_hash=?').run(sessionHash(req));return json(res,200,{authenticated:false},{'Set-Cookie':clearCookie(check.secure)});
   }
   if(path==='/api/payment-control/overview'&&req.method==='GET')return json(res,200,{...paymentOverview(),run:paymentControl.latest(req.principal),last_successful_control:db.prepare("SELECT finished_at FROM payment_control_runs WHERE owner=? AND status='complete' ORDER BY finished_at DESC LIMIT 1").get(req.principal)?.finished_at||''});
@@ -683,86 +723,148 @@ async function route(req,res){
   }
   // AIS only: reads account data, never creates, approves or executes payments.
   if(path==='/api/bank/status'&&req.method==='GET'){
+    if(url.searchParams.getAll('companyId').length>1)throw new ConsentError('COMPANY_ACCESS_DENIED',403);
+    const company=bankCompanyContext(req.principal,url.searchParams.get('companyId')??undefined,'read');
     const activation=configStatus();
-    const connections=db.prepare('SELECT id,bank_name,accounts_json,encrypted_session,valid_until,last_synced,status,selected_account_uid,last_error,retry_after FROM bank_connections WHERE owner=? ORDER BY created_at DESC').all(req.principal);
-    return json(res,200,{configured:activation.configured,activation,environment:activation.environment,connections:connections.map(x=>{
-      let accounts=[],sync_coverage=null,status=!Number.isFinite(Date.parse(x.valid_until))||Date.parse(x.valid_until)<=Date.now()?'renewal_required':x.status;
-      try{const saved=decryptObject(x.accounts_json),selected=saved.find(a=>a.uid===x.selected_account_uid);accounts=saved.map(a=>({uid:a.uid,name:a.name,currency:a.currency,account_hint:maskAccount(a.account_id?.iban||a.account_id?.other?.identification)}));if(selected)sync_coverage=bankSyncCoverage(decryptObject(x.encrypted_session),stableAccountIdentity(selected,x.bank_name),x.last_synced);}catch{status='error';}
-      return {...x,status,accounts,sync_coverage,accounts_json:undefined,encrypted_session:undefined};
+    const connections=db.prepare('SELECT * FROM bank_connections WHERE owner=? ORDER BY created_at DESC,rowid DESC').all(req.principal);
+    // Local status reads never call a bank. Keep terminal reasons instead of
+    // deleting expired attempts, so a lost navigation can be recovered safely.
+    db.prepare("UPDATE bank_states SET consumed=1,status='expired',terminal_reason='CONSENT_FLOW_EXPIRED' WHERE owner=? AND expires_at<=? AND status IN ('pending','consuming')").run(req.principal,Date.now());
+    db.prepare("UPDATE bank_states SET consumed=1,status='session_lost',terminal_reason='SESSION_ENDED' WHERE owner=? AND status='pending' AND NOT EXISTS (SELECT 1 FROM sessions WHERE id_hash=bank_states.session_hash AND expires_at>?)").run(req.principal,Date.now());
+    const flows=db.prepare('SELECT * FROM bank_states WHERE owner=? ORDER BY rowid DESC LIMIT 20').all(req.principal).map(flow=>({id:flow.flow_id||null,companyId:company.companyId,status:flow.status,reason:flow.terminal_reason||null,expiresAt:new Date(flow.expires_at).toISOString(),connectionId:flow.connection_id||null}));
+    return json(res,200,{configured:activation.configured,activation,environment:activation.environment,company:{id:company.companyId,canManageBank:true,membershipMode:'legacy_workspace'},consentFlow:flows[0]??null,consentFlows:flows,connections:connections.map(x=>{
+      let accounts=[],sync_coverage=null,status=x.status==='revocation_pending'?x.status:!Number.isFinite(Date.parse(x.valid_until))||Date.parse(x.valid_until)<=Date.now()?'renewal_required':x.status;
+      let consent;
+      try{
+        consent=publicConsent(x,req.principal);
+        const saved=decryptObject(x.accounts_json),selected=saved.find(a=>a.uid===x.selected_account_uid);
+        const allowed=consent.mode==='legacy'?saved:saved.filter(a=>consent.corporateAuthorization.status==='verified'&&consent.corporateAuthorization.accountUids.includes(a.uid));
+        accounts=allowed.filter(a=>a.currency==='SEK').map(a=>({uid:a.uid,name:a.name,currency:a.currency,account_hint:maskAccount(a.account_id?.iban||a.account_id?.other?.identification)}));
+        if(selected)sync_coverage=bankSyncCoverage(decryptObject(x.encrypted_session),stableAccountIdentity(selected,x.bank_name),x.last_synced);
+        if(!['renewal_required','revocation_pending'].includes(status)&&consent.mode==='company'&&consent.corporateAuthorization.status!=='verified')status='corporate_authorization_required';
+        else if(status==='corporate_authorization_required')status='pending_account';
+      }catch{status='error';}
+      return {id:x.id,bank_name:x.bank_name,valid_until:x.valid_until,last_synced:x.last_synced,selected_account_uid:x.selected_account_uid,last_error:x.last_error,retry_after:x.retry_after,status,accounts,sync_coverage,consent};
     })});
   }
   if(path==='/api/bank/connect'&&req.method==='POST'){
-    const b=await readBody(req),activation=configStatus();
+    const b=await readBody(req),{context:company,requiredScopes}=requestedBankConsent(req.principal,b),activation=configStatus();
     if(!activation.configured)throw Object.assign(bad(409,activation.message),{code:activation.code});
     const renewal=b.renew_connection_id?ownedConnection(req,b.renew_connection_id):null;
+    if(renewal?.status==='revocation_pending')throw new ConsentError('BANK_DISCONNECT_PENDING',409,'Slutför frånkopplingen innan du kopplar banken igen.');
+    if(renewal){assertConsentContext(consentMetadata(renewal),req.principal,company.companyId);if(b.bankName&&b.bankName!==renewal.bank_name)throw new ConsentError('BUSINESS_BANK_UNAVAILABLE',409);}
     if(renewal&&bankSyncing.has(renewal.id))throw bad(409,'Vänta tills bankhämtningen har avslutats');
     // A local flag cannot assert vendor approval: check the actual registered app.
     await assertApplicationReady(check.origin);
     assertSessionStillAuthorized(req);
-    const banks=await findSwedbank();const bank=banks.find(x=>x.name==='Swedbank')||banks[0];
+    const banks=await findSwedbank(),requestedBank=b.bankName||renewal?.bank_name;const bank=requestedBank?banks.find(x=>x.name===requestedBank):banks.find(x=>x.name==='Swedbank')||banks[0];
     assertSessionStillAuthorized(req);
-    if(!bank)throw bad(409,'Swedbank Företag är inte tillgänglig för denna applikation. Kontakta systemadministratören och Enable Banking.');
-    const state=token();db.prepare('DELETE FROM bank_states WHERE expires_at<=? OR (session_hash=? AND consumed=0)').run(Date.now(),sessionHash(req));
-    db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash,owner,renew_connection_id,bank_name) VALUES(?,?,?,?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req),req.principal,renewal?.id||'',bank.name);
+    if(!bank)throw new ConsentError('BUSINESS_BANK_UNAVAILABLE',409);
+    const state=token(),flowId=randomUUID(),body=startConsentBody(bank,state,check.origin);
+    const context={version:1,mode:'company',companyId:company.companyId,actorId:company.actorId,membershipVersion:company.membershipVersion,provider:'enablebanking',intent:renewal?'renew':'connect',flowId,requiredScopes,requestedValidUntil:body.access.valid_until,renewConnectionId:renewal?.id||'',previousSessionHash:renewal?digest(renewal.encrypted_session):'',applicationFingerprint:consentApplicationFingerprint()};
+    db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash,owner,renew_connection_id,bank_name,context_json,flow_id) VALUES(?,?,?,?,?,?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req),req.principal,renewal?.id||'',bank.name,JSON.stringify(context),flowId);
     try{
-      const auth=await bankingRequest('/auth',{method:'POST',body:startConsentBody(bank,state,check.origin)});
+      const auth=await bankingRequest('/auth',{method:'POST',body});
       assertSessionStillAuthorized(req);
       const authUrl=validateAuthorizationUrl(auth.url);
-      audit(db,'bank_consent_started',{bank:bank.name});return json(res,200,{url:String(authUrl),environment:activation.environment});
-    }catch(e){db.prepare('DELETE FROM bank_states WHERE state_hash=?').run(digest(state));throw e;}
+      audit(db,'bank_consent_started',{bank:bank.name,company_id:company.companyId,flow_id:flowId,intent:context.intent});return json(res,200,{url:String(authUrl),environment:activation.environment,companyId:company.companyId,flowId,requiredScopes,authorization:'provider_redirect',pkce:'not_exposed_by_adapter'});
+    }catch(e){finishBankFlow(digest(state),'failed',e.code||'authorization_failed');throw e;}
   }
   // Callback intentionally uses GET and SameSite=Lax cookie from interactive browser navigation.
   if(path==='/api/bank/callback'&&req.method==='GET'){
-    if(['state','code','error'].some(key=>url.searchParams.getAll(key).length>1))throw bad(403,'Ogiltig bankretur');
-    const state=url.searchParams.get('state')||'';
-    const record=db.prepare('SELECT * FROM bank_states WHERE state_hash=?').get(digest(state));
-    if(!state||state.length>256||!record||record.consumed||record.expires_at<=Date.now()||record.owner!==req.principal||!secureEqual(record.session_hash,sessionHash(req)))throw bad(403,'Ogiltig eller för gammal bankretur');
-    const consumed=db.prepare('UPDATE bank_states SET consumed=1 WHERE state_hash=? AND consumed=0').run(digest(state));
+    let callback;try{callback=validateCallbackParameters(url.searchParams);}catch{throw new ConsentError('INVALID_CALLBACK',403);}
+    const stateHash=digest(callback.state),record=db.prepare('SELECT * FROM bank_states WHERE state_hash=?').get(stateHash);
+    if(!record||record.consumed||record.expires_at<=Date.now()||record.owner!==req.principal||!secureEqual(record.session_hash,sessionHash(req)))throw bad(403,'Ogiltig eller för gammal bankretur');
+    const consumed=db.prepare("UPDATE bank_states SET consumed=1,status='consuming' WHERE state_hash=? AND consumed=0 AND status='pending' AND expires_at>? AND owner=? AND session_hash=?").run(stateHash,Date.now(),req.principal,sessionHash(req));
     if(!consumed.changes)throw bad(403,'Bankreturen har redan använts');
-    if(url.searchParams.has('error')){audit(db,'bank_consent_cancelled',{});return redirect(res,'/?tab=connections&status=cancelled');}
-    const code=url.searchParams.get('code');if(!code||code.length>4096)throw bad(400,'Saknar bankens engångskod');
-    const session=await bankingRequest('/sessions',{method:'POST',body:{code}});
-    let renewalLock='';
+    let renewalLock='',session,previousRemote='',committed=false;
     try{
-      assertSessionStillAuthorized(req);
-      const accounts=Array.isArray(session.accounts)?session.accounts.filter(a=>a&&typeof a.uid==='string'&&a.uid&&a.currency==='SEK'&&a.usage!=='PRIV'):[];
-      if(typeof session.session_id!=='string'||!session.session_id||!accounts.length||!Number.isFinite(Date.parse(session.access?.valid_until))||Date.parse(session.access.valid_until)<=Date.now())throw bad(502,'Banken returnerade inget tillgängligt företagskonto i SEK med giltigt medgivande');
-      if(session.aspsp?.name!==record.bank_name||session.aspsp?.country!=='SE'||session.psu_type!=='business')throw bad(502,'Bankens svar motsvarar inte det godkända företagsmedgivandet');
-      for(const a of accounts)stableAccountIdentity(a,record.bank_name);
+      const context=flowContext(record,req.principal),company=bankCompanyContext(req.principal,context.companyId);
+      if(callback.error){finishBankFlow(stateHash,callback.outcome,callback.error);audit(db,'bank_consent_'+callback.outcome,{flow_id:record.flow_id});return redirect(res,'/?tab=connections&status='+callback.outcome);}
       const id=record.renew_connection_id||randomUUID();
+      let old;
       if(record.renew_connection_id){
-        const old=ownedConnection(req,id);
+        old=ownedConnection(req,id);
         if(bankSyncing.has(old.id))throw bad(409,'Vänta tills bankhämtningen har avslutats och förnya sedan igen');
         bankSyncing.add(old.id,{recordAttempt:false});renewalLock=old.id;
-        const previousSession=decryptObject(old.encrypted_session),previous=previousSession.session_id;
-        if(previous!==session.session_id)try{await bankingRequest('/sessions/'+encodeURIComponent(previous),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Det tidigare medgivandet kunde inte återkallas. Förnya anslutningen igen.');}
-        bankLeases.get(old.id).write(()=>{assertSessionStillAuthorized(req);
-        db.prepare("UPDATE bank_connections SET encrypted_session=?,accounts_json=?,valid_until=?,selected_account_uid='',status='pending_account',last_error='',retry_after=0 WHERE id=? AND owner=?").run(encryptObject({...previousSession,session_id:session.session_id}),encryptObject(accounts),session.access.valid_until,id,req.principal);
-        bankLeases.get(old.id).success();});
-      }else{
-        db.prepare("INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status) VALUES(?,?,?,?,?,?,?,'pending_account')").run(id,'enablebanking',record.bank_name,encryptObject({session_id:session.session_id}),encryptObject(accounts),session.access.valid_until,req.principal);
+        if(context.previousSessionHash!==digest(old.encrypted_session))throw new ConsentError('CONSENT_RENEWAL_CONFLICT',409);
+        if(old.status==='revocation_pending')throw new ConsentError('BANK_DISCONNECT_PENDING',409);
+        previousRemote=decryptObject(old.encrypted_session).session_id;
       }
-      audit(db,'bank_accounts_authorized',{bank:record.bank_name,accounts:accounts.length,connection_id:id});
-      return redirect(res,'/?tab=connections&status=select_account');
+      const authorize=()=>{
+        assertSessionStillAuthorized(req);flowContext(record,req.principal);
+        const current=db.prepare('SELECT status,expires_at,context_json FROM bank_states WHERE state_hash=?').get(stateHash);
+        if(!current||current.status!=='consuming'||current.expires_at<=Date.now()||current.context_json!==record.context_json)throw new ConsentError('CONSENT_FLOW_EXPIRED',409);
+        if(old){bankLeases.get(old.id).assert();assertCurrentBankConnection(old);}
+      };
+      authorize();
+      session=await bankingRequest('/sessions',{method:'POST',body:{code:callback.code}});
+      authorize();
+      if(typeof session.session_id==='string'&&bankSessionInUse(session.session_id))throw Object.assign(bad(502,'Banken återanvände ett befintligt medgivande. Starta ett nytt försök.'),{code:'BANK_SESSION_REUSED'});
+      if(typeof session.session_id!=='string'||!session.session_id||session.session_id.length>256||/[\s\u0000-\u001f\u007f]/.test(session.session_id)||!Array.isArray(session.accounts)||!session.accounts.some(a=>a?.currency==='SEK'))throw bad(502,'Banken returnerade inget tillgängligt företagskonto i SEK med giltigt medgivande');
+      const checked=await bankingRequest('/sessions/'+encodeURIComponent(session.session_id));authorize();
+      const grant=validateEnableConsent({session,checked,bankName:record.bank_name,requestedValidUntil:context.requestedValidUntil,requestedScopes:context.requiredScopes});
+      const accounts=validatedLiveAccountDetails(session.accounts,checked,record.bank_name);
+      for(const account of accounts.filter(a=>a.currency==='SEK'))stableAccountIdentity(account,record.bank_name);
+      const corporate=companyAccountGrant(company,record.bank_name,accounts,grant.validUntil);
+      if(old&&corporate.authority.status!=='verified')throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED',409);
+      let validUntil=corporate.authority.status==='verified'?corporate.authority.validUntil:grant.validUntil;
+      const consent={version:'bank-consent-v1',mode:'company',companyId:company.companyId,actorId:company.actorId,membershipVersion:company.membershipVersion,provider:'enablebanking',intent:context.intent,requestedScopes:context.requiredScopes,grantedScopes:grant.grantedScopes,missingScopes:grant.missingScopes,requestedValidUntil:context.requestedValidUntil,validUntil,corporateAuthorization:corporate.authority};
+      const status=corporate.authority.status!=='verified'?'corporate_authorization_required':'pending_account';
+      const previousSession=old?decryptObject(old.encrypted_session):{};
+      if(old&&previousSession.session_id!==session.session_id){
+        // The provider may revoke successfully while its reply is lost. Fence
+        // the old row before the call so it cannot remain apparently usable.
+        bankLeases.get(old.id).write(()=>{authorize();db.prepare("UPDATE bank_connections SET status='renewal_required',last_error=? WHERE id=? AND owner=?").run('Det tidigare medgivandet ersätts. Slutför förnyelsen innan fler bankhändelser hämtas.',old.id,req.principal);});
+        try{await bankingRequest('/sessions/'+encodeURIComponent(previousSession.session_id),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus)&&e.code!=='renewal_required')throw bad(502,'Det tidigare medgivandet kunde inte avslutas. Förnya anslutningen igen.');}
+        authorize();
+      }
+      const write=()=>{
+        authorize();
+        // Two fresh callbacks can pass the earlier ownership read while both
+        // await GET /sessions. Recheck under SQLite's write lock before saving.
+        if(bankSessionInUse(session.session_id))throw Object.assign(bad(502,'Banken återanvände ett befintligt medgivande. Starta ett nytt försök.'),{code:'BANK_SESSION_REUSED'});
+        if(Date.parse(validUntil)<=Date.now())throw new ConsentError('BANK_CONSENT_EXPIRED',409);
+        if(corporate.authority.status==='verified'){
+          const current=companyAccountGrant(company,record.bank_name,accounts,validUntil);
+          if(current.authority.status!=='verified')throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED',409);
+          validUntil=current.authority.validUntil;consent.validUntil=validUntil;consent.corporateAuthorization=current.authority;
+        }
+        if(old)db.prepare("UPDATE bank_connections SET encrypted_session=?,accounts_json=?,valid_until=?,consent_json=?,selected_account_uid='',status=?,last_error='',retry_after=0 WHERE id=? AND owner=?").run(encryptObject({...previousSession,session_id:session.session_id}),encryptObject(accounts),validUntil,JSON.stringify(consent),status,id,req.principal);
+        else db.prepare('INSERT INTO bank_connections(id,provider,bank_name,encrypted_session,accounts_json,valid_until,owner,status,consent_json) VALUES(?,?,?,?,?,?,?,?,?)').run(id,'enablebanking',record.bank_name,encryptObject({session_id:session.session_id}),encryptObject(accounts),validUntil,req.principal,status,JSON.stringify(consent));
+        finishBankFlow(stateHash,status==='pending_account'?'pending_confirmation':status,'',id);
+        audit(db,'bank_accounts_authorized',{bank:record.bank_name,accounts:accounts.length,connection_id:id,company_id:company.companyId});
+        if(old)bankLeases.get(old.id).success();
+      };
+      if(old)bankLeases.get(old.id).write(write);else{db.exec('BEGIN IMMEDIATE');try{write();db.exec('COMMIT');}catch(error){db.exec('ROLLBACK');throw error;}}
+      committed=true;
+      return redirect(res,'/?tab=connections&status='+(status==='pending_account'?'select_account':status));
     }catch(e){
-      if(typeof session.session_id==='string'&&session.session_id)try{await bankingRequest('/sessions/'+encodeURIComponent(session.session_id),{method:'DELETE'});}catch{}
+      finishBankFlow(stateHash,'failed',e.code||'authorization_failed');
+      if(!committed&&typeof session?.session_id==='string'&&session.session_id&&session.session_id!==previousRemote&&!bankSessionInUse(session.session_id))try{await bankingRequest('/sessions/'+encodeURIComponent(session.session_id),{method:'DELETE'});}catch{}
       throw e;
     }finally{if(renewalLock)bankSyncing.delete(renewalLock);}
   }
   if(path==='/api/bank/accounts'&&req.method==='POST'){
     const b=await readBody(req),connection=ownedConnection(req,b.connection_id);
+    assertConsentContext(consentMetadata(connection),req.principal,b.companyId);
+    if(connection.status==='revocation_pending')throw new ConsentError('BANK_DISCONNECT_PENDING',409,'Slutför frånkopplingen innan du väljer ett konto.');
     if(bankSyncing.has(connection.id))throw bad(409,'Vänta tills bankåtgärden har avslutats');
     bankSyncing.add(connection.id);
     try{
     if(connection.retry_after>Date.now())throw Object.assign(bad(429,'Bankens anropsgräns är nådd. Försök igen senare.'),{retryAfter:Math.ceil((connection.retry_after-Date.now())/1000)});
     if(!Number.isFinite(Date.parse(connection.valid_until))||Date.parse(connection.valid_until)<=Date.now()||connection.status==='renewal_required')throw bad(409,'Bankanslutningen behöver förnyas – koppla igen');
     const account=decryptObject(connection.accounts_json).find(a=>a.uid===b.account_uid);
-    if(!account)throw bad(400,'Välj ett godkänt företagskonto');
+    if(!account||account.currency!=='SEK')throw bad(400,'Välj ett godkänt företagskonto');
+    assertCorporateAccountAccess(connection,req.principal,account.uid,b.companyId);
     stableAccountIdentity(account,connection.bank_name);
-    await verifyBankSession({...connection,selected_account_uid:account.uid},bankLeases.get(connection.id).deadline);
+    const expiresAt=await verifyBankSession({...connection,selected_account_uid:account.uid},bankLeases.get(connection.id).deadline);
     bankLeases.get(connection.id).write(()=>{assertSessionStillAuthorized(req);
+    assertCurrentBankConnection(connection);assertCorporateAccountAccess(connection,req.principal,account.uid,b.companyId);
+    if(expiresAt<=Date.now())throw new ConsentError('BANK_CONSENT_EXPIRED',409);
     const changed=connection.selected_account_uid!==account.uid;
-    db.prepare("UPDATE bank_connections SET selected_account_uid=?,last_synced=?,status='connected',last_error='' WHERE id=? AND owner=?").run(account.uid,changed?'':connection.last_synced,connection.id,req.principal);
+    db.prepare("UPDATE bank_connections SET selected_account_uid=?,last_synced=?,valid_until=?,status='connected',last_error='' WHERE id=? AND owner=?").run(account.uid,changed?'':connection.last_synced,new Date(Math.min(Date.parse(connection.valid_until),expiresAt)).toISOString(),connection.id,req.principal);
+    db.prepare("UPDATE bank_states SET status='connected',terminal_reason='' WHERE connection_id=? AND owner=? AND status IN ('pending_confirmation','corporate_authorization_required')").run(connection.id,req.principal);
     audit(db,'bank_account_selected',{connection_id:connection.id});
     });
     try{return json(res,200,await syncBank({...ownedConnection(req,connection.id),request_session_hash:sessionHash(req)},{},true));}
@@ -778,16 +880,22 @@ async function route(req,res){
   }
   if(path==='/api/bank/sync'&&req.method==='POST'){
     const b=await readBody(req),connection=ownedConnection(req,b.connection_id);
+    assertConsentContext(consentMetadata(connection),req.principal,b.companyId);
     return json(res,200,await syncBank({...connection,request_session_hash:sessionHash(req)},b));
   }
   if(path==='/api/bank/connections'&&req.method==='DELETE'){
     const b=await readBody(req),connection=ownedConnection(req,b.id);
+    assertConsentContext(consentMetadata(connection),req.principal,b.companyId);
     if(bankSyncing.has(connection.id))throw bad(409,'Vänta tills bankhämtningen har avslutats');
     bankSyncing.add(connection.id,{recordAttempt:false});
     try{
-    // Revoke at the provider first. A failed revocation must not be reported as success.
-    try{await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus))throw bad(502,'Banken kunde inte återkalla åtkomsten. Försök igen eller återkalla medgivandet hos banken.');}
-    bankLeases.get(connection.id).write(()=>{assertSessionStillAuthorized(req);db.prepare('DELETE FROM bank_connections WHERE id=?').run(connection.id);audit(db,'bank_disconnected',{id:connection.id});bankLeases.get(connection.id).success();});return json(res,200,{removed:true});
+    bankLeases.get(connection.id).write(()=>{assertSessionStillAuthorized(req);assertCurrentBankConnection(connection);db.prepare("UPDATE bank_connections SET status='revocation_pending',last_error=? WHERE id=? AND owner=?").run('Frånkopplingen väntar på bekräftelse från banktjänsten.',connection.id,req.principal);});
+    // Confirm the provider session closed; its API only closes bank consent if
+    // possible, so never claim that the bank's own revocation was confirmed.
+    try{await bankingRequest('/sessions/'+encodeURIComponent(decryptObject(connection.encrypted_session).session_id),{method:'DELETE'});}catch(e){if(![404,410].includes(e.providerStatus)&&e.code!=='renewal_required')throw bad(502,'Banken kunde inte återkalla åtkomsten. Försök igen eller återkalla medgivandet hos banken.');}
+    bankLeases.get(connection.id).write(()=>{assertSessionStillAuthorized(req);assertCurrentBankConnection(connection);db.prepare('DELETE FROM bank_connections WHERE id=? AND owner=?').run(connection.id,req.principal);
+    db.prepare("UPDATE bank_states SET consumed=1,status='disconnected',terminal_reason='CONNECTION_DISCONNECTED' WHERE owner=? AND ((renew_connection_id=? AND status='pending') OR (connection_id=? AND status IN ('pending_confirmation','corporate_authorization_required','connected')))").run(req.principal,connection.id,connection.id);
+    audit(db,'bank_disconnected',{id:connection.id,provider_session_revoked:true,bank_revocation_confirmed:false});bankLeases.get(connection.id).success();});return json(res,200,{removed:true,providerSessionRevoked:true,bankRevocationConfirmed:false});
     }finally{bankSyncing.delete(connection.id);}
   }
   if(path==='/api/gmail/status'&&req.method==='GET')return json(res,200,gmailStatus());

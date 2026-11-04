@@ -139,6 +139,14 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_states','owner',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','renew_connection_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','bank_name',"TEXT NOT NULL DEFAULT ''");
+  // Empty metadata marks existing rows only. Every newly initiated flow writes
+  // company-bound metadata; migrations never invent corporate authorization.
+  addColumn('bank_connections','consent_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','context_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','flow_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','status',"TEXT NOT NULL DEFAULT 'pending'");
+  addColumn('bank_states','terminal_reason',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','connection_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','page_token',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_states','request_send','INTEGER NOT NULL DEFAULT 0');
   addColumn('gmail_connections','sync_started_at',"TEXT NOT NULL DEFAULT ''");

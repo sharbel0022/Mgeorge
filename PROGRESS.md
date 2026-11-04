@@ -1,5 +1,17 @@
 # Verifierad progress
 
+## Agent 3 — företagsbundet bankmedgivande, 2026-11-04
+
+Egen utvecklingsbranch `feature/saas-bank-consent`, bas `14a042a`. [API-kontrakt, modeller, säkerhetsgränser och verifieringskvitto](docs/integration/saas/bank-consent.md). Leveransen omfattar befintliga Node- och Sites-routes, gemensam medgivandepolicy, additiv lagring och regressionstester. Ingen merge, Sites-publicering, produktionsmigration eller verklig bankidentifiering ingår.
+
+Slutliga lokala grindar: **1 587 Node + 3 227 Sites + 47 brygga = 4 861 godkända tester**, 0 fel/skip/cancel/todo; syntax, typer, exakt minimatchkontroll, high-audit och produktionsbygge godkända. Åtta måttliga utvecklingsberoendefynd kvarstår i Sites, inga high/critical. Konkreta oberoende granskningsfynd är rättade med regressionstester.
+
+Nya anslutningar binds till autentiserad användare, serverupplöst företag, bank, läsomfång, webbläsare och ett engångstillstånd. Bankens medgivande och separat verifierat företags-/kontounderlag krävs före uttrycklig kontobekräftelse. Utelämnat `companyId` ger ingen äldre undantagsväg; pågående redirects utan den nya kontexten måste startas om. Befintliga sparade äldre anslutningar bevaras och markeras som äldre, utan påhittad företagsverifiering. Avbruten eller nekad förnyelse bevarar den tidigare anslutningen; osäkra återkallelser stoppar användningen och behåller uppgifter för säker återhämtning.
+
+Basen saknar en släppt SaaS-medlemskapsmodell. Företagsupplösaren stödjer endast den autentiserade ägarens befintliga arbetsyta. Agent 1 måste ansluta sin auktoritativa företags-/rollmodell innan flera företagsmedlemmar aktiveras; Agent 2:s framtida provideradapter måste lämna verifierbart företags-/kontounderlag och dokumenterade identifieringsförmågor. Bankgirobehörighet kan inte härledas ur AIS. Exakta lokala testresultat och kvarstående externa acceptanskrav finns i integrationsdokumentet.
+
+Samtliga 33 numeriska kvalitetspoäng är oförändrade: **255/330 = 7,73/10; 0/33 ≥9,5**. Denna utvecklingsleverans ger inget nytt produktionsbevis.
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.

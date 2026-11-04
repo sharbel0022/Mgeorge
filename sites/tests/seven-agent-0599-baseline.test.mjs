@@ -31,7 +31,7 @@ const normalizer=compiled('../lib/banking/transactions.ts',{
  '../domain':domain,'../payment-references.js':local('../lib/payment-references.js'),'../payer-evidence.js':local('../lib/payer-evidence.js')
 });
 const storeUrl=compiled('../lib/banking/store.ts',{
- 'cloudflare:workers':environment,'@/lib/server':server,'./security':local('../lib/banking/security.ts'),'./runtime-config':local('../lib/banking/runtime-config.ts')
+ 'cloudflare:workers':environment,'@/lib/server':server,'./security':local('../lib/banking/security.ts'),'./runtime-config':local('../lib/banking/runtime-config.ts'),'./transactions':normalizer,'../bank-consent-policy.js':local('../lib/bank-consent-policy.js'),'../bank-company-authority.js':local('../lib/bank-company-authority.js')
 });
 const bankgiroUrl=compiled('../lib/bankgiro-service.ts',{
  './server':server,'./domain':domain,'./bankgiro-parser.js':local('../lib/bankgiro-parser.js'),'./banking/store':storeUrl,'./banking/transactions':normalizer

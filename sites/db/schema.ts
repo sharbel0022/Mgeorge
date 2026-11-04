@@ -30,12 +30,15 @@ export const bankConnections = sqliteTable('bank_connections', {
   retryAfter: text('retry_after').notNull().default(''), syncFailures: integer('sync_failures').notNull().default(0),
   accountEvidenceRetry: text('account_evidence_retry').notNull().default(''),
   controlLastAttemptAt: text('control_last_attempt_at'),
+  consentMetadata: text('consent_metadata').notNull().default(''),
 });
 export const bankAuthFlows = sqliteTable('bank_auth_flows', {
   stateHash: text('state_hash').primaryKey(), owner: text('owner').notNull(), cookieHash: text('cookie_hash').notNull(),
   appGeneration: text('app_generation').notNull(), bankName: text('bank_name').notNull(), country: text('country').notNull(),
   environment: text('environment').notNull(), redirectUri: text('redirect_uri').notNull(), dateFrom: text('date_from').notNull(),
   expiresAt: text('expires_at').notNull(), status: text('status').notNull(), createdAt: text('created_at').notNull(),
+  contextJson: text('context_json').notNull().default(''), resultCode: text('result_code').notNull().default(''),
+  connectionId: text('connection_id').notNull().default(''),
 }, t => [index('bank_flow_owner').on(t.owner)]);
 export const bankSyncRuns = sqliteTable('bank_sync_runs', {
   id: text('id').primaryKey(), owner: text('owner').notNull(), connectionId: text('connection_id').notNull(),
