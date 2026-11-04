@@ -40,9 +40,9 @@ runtime path until a separately reviewed company integration activates the adapt
 resource codec consumes existing owner/purpose `encrypt/decrypt`; provider selection
 requires exact provider ID, with legacy rows defaulting only to Enable Banking.
 
-- [ ] Write scope, provider selection and resource isolation tests; observe RED.
-- [ ] Implement exact scope/feature/version allowlists and scoped codec; observe GREEN.
-- [ ] Record policy decisions and commit.
+- [x] Write scope, provider selection and resource isolation tests; observe RED.
+- [x] Implement exact scope/feature/version allowlists and scoped codec; observe GREEN.
+- [x] Record policy decisions and commit.
 
 ### Task 2: HTTP, token and certificate boundary
 
@@ -54,10 +54,10 @@ requires exact provider ID, with legacy rows defaulting only to Enable Banking.
 Response; bounded HTTP returns `{data, headers}`; token client exposes only
 server authorization and redirect activation methods.
 
-- [ ] Test client-credentials form/scopes, refresh single flight, malformed token,
+- [x] Test client-credentials form/scopes, refresh single flight, malformed token,
   invalid_client, 401/403/429/5xx, redirects, abort, slow body and certificate errors.
-- [ ] Implement fixed hosts, byte/time limits, error classification and server cache.
-- [ ] Verify RED/GREEN and exact native certificate/key behavior; commit.
+- [x] Implement fixed hosts, byte/time limits, error classification and server cache.
+- [x] Verify RED/GREEN and exact native certificate/key behavior; commit.
 
 ### Task 3: Open Payments data adapter
 
@@ -69,19 +69,24 @@ consent create/status/delete, authorization create/start/status/redirect complet
 account list/details and bounded booked-transaction retrieval. All company data
 operations consume immutable server context and opaque scoped handles.
 
-- [ ] Write official-shape fixtures and tests before implementation.
-- [ ] Implement methods with current binding checks before/after asynchronous work.
-- [ ] Verify redirect state/scope/replay, partial consent, account ownership,
+- [x] Write official-shape fixtures and tests before implementation.
+- [x] Implement methods with current binding checks before/after asynchronous work.
+- [x] Verify redirect state/scope/replay, partial consent, account ownership,
   pagination and Bankgiro unknown/unsupported results. No inferred OCR/payer fields.
-- [ ] Verify original/checksum preservation and provider switch isolation; commit.
+- [x] Verify original/checksum preservation and provider switch isolation; commit.
 
 ### Task 4: Delivery and independent review
 
 **Files:** `docs/integration/saas/provider-capabilities.md`,
 `docs/integration/saas/openpayments-adapter.md`, `PROGRESS.md`, `QUALITY-SCORECARD.md`.
 
-- [ ] Record official sources, APIs, company integration boundary and live blockers.
-- [ ] Run root/Sites locked installations, syntax/types, tests, audits and build.
-- [ ] Obtain an independent branch review; reproduce and fix material findings.
-- [ ] Update evidence without increasing production scores from fixtures.
+- [x] Record official sources, APIs, company integration boundary and live blockers.
+- [x] Run root/Sites locked installations, syntax/types, tests, audits and build.
+- [x] Obtain an independent branch review; reproduce and fix material findings.
+- [x] Update evidence without increasing production scores from fixtures.
 - [ ] Commit, push the requested branch, open PR, verify remote head/PR and report.
+
+Implementation verification is complete at `79f27f0`: 1,585 Node + 3,191 Sites +
+47 bridge tests pass. Two independent review findings have passing regressions
+and independent confirmation. The publishing checkbox is the final external
+action after this documentation commit; its exact receipt belongs in the PR.

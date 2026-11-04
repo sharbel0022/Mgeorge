@@ -1,5 +1,17 @@
 # Verifierad progress
 
+## Agent 2 — Open Payments corporate adapter, 2026-11-04
+
+Egen branch `feature/saas-openpayments-provider`, bas `14a042a`. [Adapter och verifieringskvitto](docs/integration/saas/openpayments-adapter.md), [verifierade leverantörsegenskaper](docs/integration/saas/provider-capabilities.md) och [integrationsöverlämning](docs/integration/agent-2-openpayments-provider.md).
+
+Additivt serverlager med provideroberoende kontrakt, företagsbundna krypterade resurser, strikt tillåtna lässcope, OAuth/tokenhantering, dokumenterade samtyckes-/SCA-/AIS-anrop, bankmetadata och Node-mTLS. `paymentinitiation` och betalningsvägar spärras. Bankgiroobservationer och bokförda bankrader hålls åtskilda; faktisk Bankgirotäckning och rätt att stämma av betalningar härleds inte från scope eller fixtures.
+
+Oberoende granskning identifierade två reproducerade fel: ändringsbara indata över asynkrona gränser och förlorad HTTP-felklassificering vid stora certifikattransportsvar. Båda är rättade med RED/GREEN-regressioner och oberoende omkontrollerade. Exakta slutgrindar redovisas i adapterrapporten. Befintliga Enable Banking-funktioner, datalagring och produktionskopplingar är oförändrade.
+
+Slutlig lokal verifiering på implementationscommit `79f27f0`: **1 585 Node + 3 191 Sites + 47 bridge = 4 823 godkända**, utan fel/skip/cancel/todo; 90 nya adaptertester ingår i totalsumman. Syntax, typer, låsta installationer, föreskrivna high-auditgrindar och Sites-bygge passerade. Sites har 8 moderate utvecklingsberoendefynd. GitHub Node 22-CI och leveranshuvud redovisas separat i PR:n; lokal körning använde Node 24.22.1.
+
+Ingen verklig Open Payments-sandbox eller produktionsbank har anropats. Sandboxuppgifter, kundspecifikt SaaS-/Bankgiro-/ISO-avtal, riktiga produktionscertifikat och verifierad bank-/företagstäckning återstår. Beständig företagskoppling, callbackkonsumtion, runtime-tokenkoordinering och granskad originalimport kräver separat integration. Alla 33 kvalitetspoäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**.
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.

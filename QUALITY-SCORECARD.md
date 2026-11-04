@@ -1,5 +1,20 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 2 — Open Payments corporate adapter, 2026-11-04
+
+[Verifieringskvitto och integrationsgränser](docs/integration/saas/openpayments-adapter.md) samt [officiella API- och avtalskällor](docs/integration/saas/provider-capabilities.md). Leveransen är ett additivt adapterlager på `feature/saas-openpayments-provider`; inga produktionsfunktioner aktiveras. Samtliga 33 numeriska poäng förblir **255/330 = 7,73/10; 0/33 ≥9,5**.
+
+Lokalt verifierad implementation `79f27f0`: **1 585 Node + 3 191 Sites + 47 bridge = 4 823 godkända**, noll fel/skip/cancel/todo. Syntax, typer, obligatoriska auditgrindar och bygge godkända; 8 moderate utvecklingsberoendefynd i Sites redovisas separat. Oberoende granskning bekräftar båda rättningarna. Exakt Node 22-PR-CI redovisas i leveransens PR och ersätts inte av lokala Node 24-resultat.
+
+| Berört område | Före | Efter | Nytt bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | Befintlig Enable Banking-kod och dess regressionssviter bevaras. Ny banklista hämtas via dokumenterat ASPSP-kontrakt. | Ingen faktisk företagskontotäckning hos Open Payments verifierad. |
+| 16. Automatisk bankhämtning | 8 | 8 | Företags-/providerbundna medgivanden, tokenhantering, tidsgränser, paginering och återkontroll av giltighet. | Adapter är inte kopplad till produktionsschema eller beständig företagsmodell. |
+| 17. Bankgiroimport | 8,5 | 8,5 | Bankgiroobservationer bevaras separat från bokförda rader; saknat stöd blockerar ett uttryckligt Bankgirokrav. | Verklig ISO/BGI-onboarding, täckning och granskad originalimport saknas. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Scope-/vägspärrar, befintlig AES-GCM med företagsbundet ändamål, säkra fel och certifikat-/nyckelkontroller. | Beständig medlemskapskontroll, engångscallback och verkligt produktionscertifikat ska integreras och verifieras. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Nya kontrakts-, fel-, isolerings- och transporttester. Två oberoende reviewfynd reproducerade, rättade och omkontrollerade. | Fixtureframgång är inte sandboxacceptans. Befintliga moderate utvecklingsberoendefynd och lintskuld åtgärdas inte av denna PR. |
+| 33. Verifiering i verklig produktion | 6,5 | 6,5 | Exakt gräns mellan dokumentation, lokala tester och externa behörigheter redovisas. | Ingen Open Payments-sandbox, riktig bank, produktionshandshake eller publicering genomförd. |
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.
