@@ -4,6 +4,7 @@ import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {request} from 'node:http';
+import {generateKeyPairSync} from 'node:crypto';
 import {digest} from '../src/security.js';
 import {storeDocument} from '../src/db.js';
 import {createCompanyClient} from '../sites/lib/company-client.js';
@@ -161,4 +162,55 @@ test('a revoked active membership cannot fall through to old data and permits an
  assert.deepEqual(directory.body.companies.map(c=>c.id),['company-b']);assert.equal((await call('/api/invoices',{actor:'manager'})).status,403);
  const selected=await call('/api/companies/active',{actor:'manager',method:'POST',body:{companyId:'company-b',contextVersion:directory.body.contextVersion}});
  assert.equal(selected.status,200);assert.equal((await call('/api/invoices',{actor:'manager'})).body.items[0].party,'company-b');
+});
+
+async function oauthFixture(t,provider,tag){
+ const actor='oauth-'+tag,companyId='company-'+tag,otherCompanyId=companyId+'-other';
+ const context=app.companyRuntime.provisionCompany({companyId,name:companyId,actorId:actor,verification});
+ app.companyRuntime.provisionCompany({companyId:otherCompanyId,name:otherCompanyId,actorId:actor,verification});
+ app.companyRuntime.setMembership({companyId,actorId:actor+'-backup',role:'owner'});
+ const keys=['MG_COMPANY_GMAIL_ACCOUNTS','ENABLE_BANKING_APPLICATION_ID','ENABLE_BANKING_PRIVATE_KEY','ENABLE_BANKING_ENVIRONMENT'],saved=keys.map(key=>[key,process.env[key]]);
+ t.after(()=>{for(const [key,value]of saved)if(value===undefined)delete process.env[key];else process.env[key]=value;});
+ process.env.MG_COMPANY_GMAIL_ACCOUNTS=JSON.stringify({[companyId]:'company-oauth@example.test'});
+ process.env.ENABLE_BANKING_APPLICATION_ID='synthetic-company-application';process.env.ENABLE_BANKING_ENVIRONMENT='SANDBOX';
+ process.env.ENABLE_BANKING_PRIVATE_KEY=generateKeyPairSync('rsa',{modulusLength:2048,privateKeyEncoding:{format:'pem',type:'pkcs8'},publicKeyEncoding:{format:'pem',type:'spki'}}).privateKey;
+ let state,providerCalls=0;
+ t.mock.method(globalThis,'fetch',async(input,options={})=>{
+  providerCalls++;const url=new URL(input);
+  if(url.origin==='https://oauth2.googleapis.com'&&url.pathname==='/token')return Response.json({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_in:3600,scope:'https://www.googleapis.com/auth/gmail.readonly'});
+  if(url.origin==='https://gmail.googleapis.com'&&url.pathname.endsWith('/profile'))return Response.json({emailAddress:'company-oauth@example.test'});
+  assert.equal(url.origin,'https://api.enablebanking.com');
+  if(url.pathname==='/application')return Response.json({kid:'synthetic-company-application',environment:'SANDBOX',active:true,countries:['SE'],services:['AIS'],redirect_urls:[process.env.APP_ORIGIN+'/api/bank/callback']});
+  if(url.pathname==='/aspsps')return Response.json({aspsps:[{name:'Swedbank',country:'SE',psu_types:['business'],maximum_consent_validity:90*86400}]});
+  if(url.pathname==='/auth'){state=JSON.parse(options.body).state;return Response.json({url:'https://auth.enablebanking.com/ais/start?sessionid=synthetic'});}
+  if(url.pathname==='/sessions'&&options.method==='POST')return Response.json({session_id:'synthetic-session-'+tag,accounts:[{uid:'synthetic-account',currency:'SEK',usage:'ORGA',account_id:{iban:'SE4280000890119146168423'}}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+3600000).toISOString()}});
+  throw Error('Unexpected synthetic provider request');
+ });
+ const start=await call('/api/'+provider+'/connect',{actor,method:'POST',body:{}});assert.equal(start.status,200,JSON.stringify(start.body));
+ if(provider==='gmail')state=new URL(start.body.url).searchParams.get('state');
+ return {actor,companyId,otherCompanyId,context,state,calls:()=>providerCalls,callback:()=>call('/api/'+provider+'/callback?state='+state+'&code=synthetic-code',{actor}),connectionCount:()=>app.companyRuntime.run(app.companyRuntime.resolve({actorId:actor}),()=>db.prepare('SELECT count(*) n FROM '+(provider==='gmail'?'gmail_connections':'bank_connections')).get().n)};
+}
+for(const provider of ['bank','gmail'])for(const change of ['switch','revocation','company-version'])test(provider+' OAuth cannot revive an old flow after '+change,async t=>{
+ const f=await oauthFixture(t,provider,provider+'-'+change),calls=f.calls();
+ if(change==='switch'){
+  app.companyRuntime.selectActiveCompany({actorId:f.actor,companyId:f.otherCompanyId,contextVersion:1});
+  app.companyRuntime.selectActiveCompany({actorId:f.actor,companyId:f.companyId,contextVersion:2});
+ }else if(change==='revocation'){
+  app.companyRuntime.setMembership({companyId:f.companyId,actorId:f.actor,role:'owner',status:'revoked'});
+  app.companyRuntime.setMembership({companyId:f.companyId,actorId:f.actor,role:'owner',status:'active'});
+ }else app.companyRuntime.controlDb.prepare('UPDATE companies SET company_version=company_version+1 WHERE company_id=?').run(f.companyId);
+ const result=await f.callback();assert.ok([403,409].includes(result.status),JSON.stringify(result));
+ assert.equal(f.calls(),calls);assert.equal(f.connectionCount(),0);
+});
+for(const provider of ['bank','gmail'])test(provider+' OAuth retains its initiating company and completes once with current authority',async t=>{
+ const f=await oauthFixture(t,provider,provider+'-current');
+ const result=await f.callback();assert.equal(result.status,302,JSON.stringify(result.body));assert.equal(f.connectionCount(),1);
+ assert.equal((await f.callback()).status,403);assert.equal(f.connectionCount(),1);
+});
+test('a legacy Gmail redirect cannot gain a company binding through later verified adoption',async()=>{
+ const actor='administrator',start=await call('/api/gmail/connect',{actor,method:'POST',body:{}});assert.equal(start.status,200);
+ const state=new URL(start.body.url).searchParams.get('state');
+ app.companyRuntime.bindLegacyCompany({companyId:'verified-legacy',name:'Verified legacy',actorId:actor,storageOwner:actor,verification});
+ const result=await call('/api/gmail/callback?state='+state+'&error=access_denied',{actor});
+ assert.equal(result.status,409);assert.equal(result.body.code,'COMPANY_CONTEXT_STALE');
 });

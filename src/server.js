@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import {createCompanyRuntime} from './company-runtime.js';
+import {assertCompanyContext,companyCacheKey} from '../sites/lib/company-contract.js';
 import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
 import { digest, token, secureEqual, sessionCookie, clearCookie, encryptObject, decryptObject, passwordHash, verifyPassword, cipherKey } from './security.js';
 import { parseBankFile, normalizeBankApiTransaction } from './importers.js';
@@ -520,6 +521,26 @@ function companyAction(method,path){
  if(path.startsWith('/api/bank/')||path.startsWith('/api/gmail/')||path==='/api/bankgiro/source/run'||path==='/api/payment-control/run')return 'manage_integrations';
  return 'write';
 }
+function oauthCompanyPin(req){return JSON.stringify({version:'company-oauth-context-v1',actorId:req.actorId,storageOwner:req.principal,context:req.companyContext});}
+function callbackCompanyContext(req,url,path,current){
+ if(req.method!=='GET'||!['/api/bank/callback','/api/gmail/callback'].includes(path))return current;
+ if(['state','code','error'].some(key=>url.searchParams.getAll(key).length>1))throw bad(403,'Ogiltig OAuth-retur');
+ const state=url.searchParams.get('state')||'',table=path==='/api/bank/callback'?'bank_states':'gmail_states';
+ if(!state||state.length>256)throw bad(403,'Ogiltig OAuth-retur');
+ // Read the one-use flow only through this actor's current data boundary. A
+ // flow in another partition cannot select that partition from a public state.
+ const record=companyRuntime.run(current,()=>db.prepare(`SELECT company_context_json,session_hash,expires_at,consumed FROM ${table} WHERE state_hash=?`).get(digest(state)),{actorId:req.actorId,authorize:()=>assertSessionIdentity(req)});
+ if(!record||record.consumed||record.expires_at<=Date.now()||!secureEqual(record.session_hash,sessionHash(req)))throw bad(403,'Ogiltig eller för gammal OAuth-retur');
+ const stale=()=>{throw Object.assign(bad(409,'Företagskontexten har ändrats. Starta anslutningen igen.'),{code:'COMPANY_CONTEXT_STALE'});};
+ let pin;try{pin=JSON.parse(record.company_context_json);}catch{stale();}
+ if(pin?.version!=='company-oauth-context-v1'||pin.actorId!==req.actorId||pin.storageOwner!==(current?.storageOwner??req.actorId))stale();
+ if(pin.context===null){if(current!==null)stale();return null;}
+ let context;try{context=assertCompanyContext(pin.context);}catch{stale();}
+ if(!current||context.actorId!==pin.actorId||context.storageOwner!==pin.storageOwner||companyCacheKey(context)!==companyCacheKey(current))stale();
+ // Dispatch with the retained snapshot. Live membership, selection and session
+ // fences remain in force after provider awaits and at every business write.
+ return context;
+}
 
 /** Huvudroutern: matchar HTTP-metod och URL, kontrollerar åtkomst och anropar rätt modul. */
 async function route(req,res){
@@ -565,7 +586,8 @@ async function route(req,res){
    const context=companyRuntime.selectActiveCompany({actorId:req.actorId,companyId:body.companyId,contextVersion:body.contextVersion});
    return json(res,200,{context});
   }
-  const context=companyRuntime.resolve({actorId:req.actorId,...companySelector(req,url)});
+  const selected=companyRuntime.resolve({actorId:req.actorId,...companySelector(req,url)});
+  const context=callbackCompanyContext(req,url,path,selected);
   req.companyContext=context;req.companyAction=companyAction(req.method,path);
   req.principal=context?.storageOwner||req.actorId;
   return companyRuntime.run(context,()=>withGmailAccount(companyMailbox(context),()=>{companyRuntime.assert(req.companyAction);return companyRoute(req,res,url,path);}),{actorId:req.actorId,authorize:()=>assertSessionIdentity(req)});
@@ -788,7 +810,7 @@ async function companyRoute(req,res,url,path){
     assertSessionStillAuthorized(req);
     if(!bank)throw bad(409,'Swedbank Företag är inte tillgänglig för denna applikation. Kontakta systemadministratören och Enable Banking.');
     const state=token();db.prepare('DELETE FROM bank_states WHERE expires_at<=? OR (session_hash=? AND consumed=0)').run(Date.now(),sessionHash(req));
-    db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash,owner,renew_connection_id,bank_name) VALUES(?,?,?,?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req),req.principal,renewal?.id||'',bank.name);
+    db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash,owner,renew_connection_id,bank_name,company_context_json) VALUES(?,?,?,?,?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req),req.principal,renewal?.id||'',bank.name,oauthCompanyPin(req));
     try{
       const auth=await bankingRequest('/auth',{method:'POST',body:startConsentBody(bank,state,check.origin)});
       assertSessionStillAuthorized(req);
@@ -880,7 +902,7 @@ async function companyRoute(req,res,url,path){
     const options=await readBody(req);
     if(integrationJobs.running('gmail'))throw bad(409,'Vänta tills Gmail-hämtningen har avslutats');
     if(!isGmailConfigured())throw bad(409,'En administratör behöver först aktivera Google OAuth i serverns inställningar');
-    const state=token();db.prepare('DELETE FROM gmail_states WHERE expires_at<=? OR (session_hash=? AND consumed=0)').run(Date.now(),sessionHash(req));db.prepare('INSERT INTO gmail_states(state_hash,expires_at,session_hash) VALUES(?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req));
+    const state=token();db.prepare('DELETE FROM gmail_states WHERE expires_at<=? OR (session_hash=? AND consumed=0)').run(Date.now(),sessionHash(req));db.prepare('INSERT INTO gmail_states(state_hash,expires_at,session_hash,company_context_json) VALUES(?,?,?,?)').run(digest(state),Date.now()+15*60000,sessionHash(req),oauthCompanyPin(req));
     db.prepare('UPDATE gmail_states SET request_send=? WHERE state_hash=?').run(options.send===true?1:0,digest(state));
     return json(res,200,{url:gmailAuthorizationUrl(state,check.origin,{send:options.send===true})});
   }

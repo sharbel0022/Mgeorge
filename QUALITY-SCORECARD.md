@@ -1,5 +1,20 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## SaaS master integration candidate — 2026-11-04
+
+Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.md). This is cumulative local evidence for the repaired foundation candidate, not yet integrated main or deployed production. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5.**
+
+| Area | Before → after | New evidence | Remaining limit |
+| --- | --- | --- | --- |
+| 11 Gmail /28 scheduling | 7.5→7.5 /6.5→6.5 | Existing disabled schedule verified; obsolete OCR origin404 reproduced and repository variable corrected/read back without changing token or cadence. | No fresh successful fetch/OCR run; disabled schedule not silently enabled. |
+| 15 bank /16 sync /17 Bankgiro | 8.5→8.5 /8→8 /8.5→8.5 | Seven frozen producer heads; exact original head CI; current AIS status connected, source absent. | Joint company/provider/source/worker integration pending; no new bank proof. |
+| 24 history /29 backup /31 recovery | 8→8 /7.5→7.5 /5.5→5.5 | Synthetic originals-only admission/adoption and concurrent-write preservation; existing restore tests now run on Windows without EBUSY. | Latest362-file backup still verifying35; previous267-file manifest is not full current production recovery. |
+| 30 security | 8.5→8.5 | 13 new RED/GREEN foundation cases; actor/company/version-pinned Node OAuth, atomic29-table admission; independent review READY. | Joined all-provider/role/worker acceptance pending; no production tenant activation. |
+| 32 code/tests | 8.5→8.5 | Local Node1650/1641pass/9skip; Sites3196/3185pass/11skip,0fail; syntax142/types/build; audits0 production,8moderate Sites development. | Linux exact-head/main CI pending. Bridge is POSIX-only and fails required private-filesystem checks on Windows. |
+| 33 real production | 6.5→6.5 | Two exact complete read-only observations at revision50: one economic deposit, zero allocations. | Scoped evidence only; broad reference search incomplete; no new deployment or real Sandbox proof. |
+
+Other27-area claims and scores retain their existing scope; none is promoted by a synthetic result. The final integrated report will supersede this candidate checkpoint.
+
 ## Agent 1 — flerföretagsgrund, 2026-11-04
 
 Egen branch `feature/saas-multitenant-foundation`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Datamodell, migrering, rollback och verifiering](docs/integration/saas/multitenancy.md), [gemensamma kontrakt](docs/integration/saas/contracts.md) och [föreslagen version samt exakta fält till Agent 8](docs/integration/saas/agent-8-handoff.md).

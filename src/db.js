@@ -139,8 +139,12 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_states','owner',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','renew_connection_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','bank_name',"TEXT NOT NULL DEFAULT ''");
+  // Existing redirects remain retained but must restart: their original
+  // actor/company authorization generation cannot be inferred by migration.
+  addColumn('bank_states','company_context_json',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','page_token',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_states','request_send','INTEGER NOT NULL DEFAULT 0');
+  addColumn('gmail_states','company_context_json',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','sync_started_at',"TEXT NOT NULL DEFAULT ''");
   addColumn('import_jobs','content','BLOB');
   addColumn('import_jobs','mime_type',"TEXT NOT NULL DEFAULT ''");

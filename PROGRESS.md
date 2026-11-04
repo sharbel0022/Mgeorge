@@ -1,5 +1,17 @@
 # Verifierad progress
 
+## SaaS master integration — foundation repair candidate, 2026-11-04
+
+Start main `14a042abd37fa455d08da9dfcc096ef4f603b512`; all seven current producer heads and exact-head CI frozen in [integration matrix](docs/saas/INTEGRATION-MATRIX.md). #38 remains Draft. Separate native integration worktree; original checkout and production resources preserved.
+
+Before merging #40, independent review reproduced and test-first repairs closed two Important gaps: atomic first-company admission now checks all29 retained owner tables (including concurrent legacy writes and originals-only verified adoption); Node Gmail/bank OAuth retains actor, storage owner and all company/membership/selection versions before callback dispatch. Seven Node and six Sites RED cases turned GREEN; independent recheck READY. Two existing Windows test defects (four failures) were fixed without weakening assertions. OCR safely distinguishes static HTTP failure codes without inspecting unknown exceptions: seven RED cases,41 focused tests, independent review READY.
+
+Full local candidate on Windows/Node22.16: Node1650 total/1641pass/0fail/9 documented platform skips; Sites3196 total/3185pass/0fail/11 platform skips. Syntax142, guarded TypeScript and production build pass. Root/Sites-production/bridge-production audits0; full Sites8 moderate,0high/critical. Direct bridge execution on Windows fails its required POSIX private-filesystem checks and was stopped; exact Linux CI remains mandatory, no Windows bridge success claimed. Two redundant root verification processes were stopped when the independent full runs were already active; those stopped attempts are not counted as passing verification.
+
+Separate operational diagnosis: latest cloud OCR run41877909285 used the obsolete Sites origin (404); canonical same-project endpoint returns401 without credentials. Repository variable MG_SITES_ORIGIN was corrected to the server-returned current origin and read back; worker secret, schedules and runtime settings unchanged, no workflow dispatched. This is not a successful authenticated OCR run. Gmail schedule remains disabled; last fetch2026-11-03T18:38:10.461Z. Read-only selected payment evidence at revision50 is exact/complete per observation, economic counts1+0 and zero allocations; broad reference search remains incomplete. Latest backup362 files is verifying35, earlier267-file manifest complete; no full production recovery claimed.
+
+All33 scores remain255/330=7.73; commercial/Sandbox/real Bankgiro acceptance is not inferred. Foundation candidate awaits fresh exact-head CI and safe PR merge; no new Sites deployment yet. [Execution plan](docs/superpowers/plans/2026-11-04-saas-master-integration.md).
+
 ## Agent 1 — flerföretagsgrund, 2026-11-04
 
 Egen branch `feature/saas-multitenant-foundation`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Datamodell, migrering, rollback och verifiering](docs/integration/saas/multitenancy.md), [gemensamma kontrakt](docs/integration/saas/contracts.md) och [föreslagen version samt exakta fält till Agent 8](docs/integration/saas/agent-8-handoff.md).

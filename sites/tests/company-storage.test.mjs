@@ -22,6 +22,38 @@ test('additive migration preserves every legacy financial byte and requires veri
  assert.deepEqual({...f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get('legacy-owner')},{owner:'legacy-owner',revision:7,payload,updated_at:'2026-01-01'});
  await assert.rejects(assertScopeCurrent(f.raw,legacy),/COMPANY_CONTEXT_STALE/);
 });
+for(const [kind,seed]of [
+ ['original',sql=>sql.prepare('INSERT INTO documents VALUES(?,?,?,?,?,?,?)').run('retained-original','legacy-owner','original.pdf','application/pdf',12,'f'.repeat(64),'2026-01-01')],
+ ['automation',sql=>sql.prepare('INSERT INTO document_automation(owner,email,enabled,updated_at) VALUES(?,?,1,?)').run('legacy-owner','legacy@example.test','2026-01-01')],
+ ['bank consent',sql=>sql.prepare('INSERT INTO bank_connections(id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run('retained-consent','legacy-owner','retained-generation','PRODUCTION','Synthetic bank','SE','retained-session','retained-accounts','[]','2099-01-01','2026-01-01','connected','2026-01-01','2026-01-01')],
+ ['audit history',sql=>sql.prepare('INSERT INTO audit_events VALUES(?,?,?,?,?,?)').run('retained-audit','legacy-owner',1,'synthetic','{}','2026-01-01')],
+])test('empty-company creation cannot conceal a legacy '+kind+' without a workspace',async t=>{
+ const f=fixture(t);seed(f.sql);
+ await assert.rejects(provisionCompany(f.raw,{id:'fresh-company',name:'Fresh',actorId:'legacy-owner',verifiedBy:'legacy-owner',verificationEvidence:'Authenticated creation of a separate empty company.'}),/COMPANY_LEGACY_BINDING_REQUIRED/);
+ assert.equal((await companyDirectory(f.raw,'legacy-owner')).legacy,true);
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM companies').get().n,0);
+});
+test('the empty-company prerequisite is checked atomically after a concurrent legacy save',async t=>{
+ const f=fixture(t),payload='{"invoices":[{"id":"retained-invoice","total":125}]}';
+ f.beforeBatch=()=>{f.beforeBatch=null;f.sql.prepare('INSERT INTO workspaces VALUES(?,7,?,?)').run('actor-a',payload,'2026-01-01');};
+ await assert.rejects(f.create('company-a'),/COMPANY_LEGACY_BINDING_REQUIRED/);
+ assert.equal(f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get('actor-a').payload,payload);
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM companies').get().n,0);
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM company_operation_guard').get().n,0);
+ assert.equal((await companyDirectory(f.raw,'actor-a')).legacy,true);
+});
+test('verified originals-only legacy adoption retains its namespace and original metadata',async t=>{
+ const f=fixture(t);f.sql.prepare('INSERT INTO documents VALUES(?,?,?,?,?,?,?)').run('retained-original','legacy-owner','original.pdf','application/pdf',12,'f'.repeat(64),'2026-01-01');
+ const before=f.sql.prepare('SELECT * FROM documents').all();
+ const input={id:'legacy-company',name:'Verified legacy company',actorId:'legacy-owner',legacyOwner:'legacy-owner',verifiedBy:'operator',verificationEvidence:'Synthetic verified original owner relationship'};
+ await assert.rejects(provisionCompany(f.raw,input),/COMPANY_OWNERSHIP_PROOF_REQUIRED/);
+ const result=await provisionCompany(f.raw,{...input,verifiedLegacyOwner:'legacy-owner'});
+ assert.equal(result.storageOwner,'legacy-owner');
+ const scope=await f.scope('legacy-owner','legacy-company');
+ assert.deepEqual((await f.database(scope).prepare('SELECT * FROM documents').all()).results,before);
+ assert.equal((await f.database(scope).prepare('SELECT revision FROM workspaces').first()).revision,0);
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM company_operation_guard').get().n,0);
+});
 test('mailbox registration is company/owner bound and never falls back to M.George for a new company',async t=>{
  const f=fixture(t);await f.create('company-a');const {context}=await f.scope(),legacyAccount='legacy@example.test';
  assert.throws(()=>resolveCompanyMailbox(undefined,{context,legacyAccount}),/COMPANY_MAILBOX_UNVERIFIED/);

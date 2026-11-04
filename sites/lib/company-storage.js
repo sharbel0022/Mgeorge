@@ -70,21 +70,29 @@ export async function provisionCompany(database,input){
  if(legacyOwner!==undefined&&(!id(legacyOwner)||verifiedLegacyOwner!==legacyOwner||actorId!==legacyOwner))fail('COMPANY_OWNERSHIP_PROOF_REQUIRED');
  const owner=legacyOwner??'company:'+crypto.randomUUID(),timestamp=at();
  if(await first(database,'SELECT id FROM companies WHERE id=? OR storage_owner=?',companyId,owner))fail('COMPANY_ALREADY_BOUND',409);
- const existing=await first(database,'SELECT owner FROM workspaces WHERE owner=?',owner);
- if(legacyOwner&&!existing)fail('COMPANY_LEGACY_OWNER_NOT_FOUND',404);
- if(!legacyOwner&&await first(database,'SELECT owner FROM workspaces WHERE owner=? AND NOT EXISTS(SELECT 1 FROM companies WHERE storage_owner=?)',actorId,actorId))fail('COMPANY_LEGACY_BINDING_REQUIRED',409);
- const ops=[];
+ // Originals, consent, jobs and audit history may predate the first saved
+ // workspace. Check the complete retained namespace, both now and atomically
+ // with admission so an in-flight legacy save cannot be hidden by creation.
+ const retained=ownerTables.map(table=>`EXISTS(SELECT 1 FROM ${table} WHERE owner=?)`).join(' OR ');
+ const condition=legacyOwner?`(${retained})`:`EXISTS(SELECT 1 FROM companies WHERE storage_owner=?) OR NOT (${retained})`;
+ const conditionArgs=[...(legacyOwner?[]:[actorId]),...ownerTables.map(()=>legacyOwner??actorId)];
+ const rejected=()=>fail(legacyOwner?'COMPANY_LEGACY_OWNER_NOT_FOUND':'COMPANY_LEGACY_BINDING_REQUIRED',legacyOwner?404:409);
+ if((await first(database,'SELECT CASE WHEN '+condition+' THEN 1 ELSE 0 END AS allowed',...conditionArgs))?.allowed!==1)rejected();
+ const ops=[database.prepare(`INSERT INTO company_operation_guard(slot,storage_owner,company_id,actor_id,action,authorized) SELECT 1,?,NULL,?,'manage_company',CASE WHEN ${condition} THEN 1 ELSE 0 END`).bind(owner,actorId,...conditionArgs)];
+ // Verified adoption of originals-only storage supplies an absent workspace;
+ // INSERT OR IGNORE preserves every existing payload/revision byte unchanged.
+ const state={schemaVersion:1,company:{name:name.trim(),email:'',invoiceReferencePolicies:[]},invoices:[],transactions:[],allocations:[],credits:[],imports:[],receipts:[]};
+ ops.push(database.prepare('INSERT OR IGNORE INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(owner,JSON.stringify(state),timestamp));
  if(!legacyOwner){
   // Neutral state is written before the new binding, in the same transaction.
   // Nothing is copied from a legacy owner, company profile or reference policy.
-  const state={schemaVersion:1,company:{name:name.trim(),email:'',invoiceReferencePolicies:[]},invoices:[],transactions:[],allocations:[],credits:[],imports:[],receipts:[]};
-  ops.push(database.prepare('INSERT INTO workspaces(owner,revision,payload,updated_at) VALUES(?,0,?,?)').bind(owner,JSON.stringify(state),timestamp));
   ops.push(database.prepare('INSERT INTO document_automation(owner,email,enabled,updated_at) VALUES(?,?,0,?)').bind(owner,'',timestamp));
  }
  ops.push(database.prepare('INSERT INTO companies(id,name,storage_owner,legacy_owner,ownership_verified_by,ownership_evidence,ownership_verified_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(companyId,name.trim(),owner,legacyOwner??null,verifiedBy,verificationEvidence,timestamp,timestamp,timestamp));
  ops.push(database.prepare("INSERT INTO company_memberships(company_id,actor_id,role,created_at,updated_at) VALUES(?,?,'owner',?,?)").bind(companyId,actorId,timestamp,timestamp));
  ops.push(database.prepare('INSERT OR IGNORE INTO company_user_contexts(actor_id,active_company_id,context_version,updated_at) VALUES(?,?,1,?)').bind(actorId,companyId,timestamp));
- await database.batch(ops);
+ ops.push(unfence(database));
+ try{await database.batch(ops);}catch(error){if(/CHECK constraint failed: authorized|company_guard_authorized/.test(String(error?.message)))rejected();throw error;}
  return {companyId,storageOwner:owner};
 }
 
