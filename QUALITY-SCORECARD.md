@@ -1,5 +1,16 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
+
+[Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.
+
+| Område | Före | Efter | Nytt bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | RED/GREEN för sekretess i banktransportlogg, 8 KiB-login och 16 MB faktisk multipartbudget. 15 A/B/C-ownerprov med sex riktade IDOR-/bilageangrepp, original, kryptering och banklås. | CompanyMembership/RBAC, ny corporate-consent, origin-/certifikatdrift, nyckelrotation, retention och avtal kräver uttrycklig acceptans. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Fokuserad acceptans 480/480 med maskinläsbart kvitto; separat testmiljö, nätverksspärr, fixerad CLI-flaggordning och SHA-låsta Actions. Slutliga helgrindar och oberoende review redovisas i rapporten. | Befintlig lintskuld kvarstår. Aktuell lokal audit har 8 moderate Sites-fynd, 0 high/critical; inga beroenden ändras i denna PR. |
+
+Tillståndsfrågor, GDPR-rollfördelning, leverantörsavtal och produktionsåterställning får inga godkännandepoäng från denna delleverans. De tidigare daterade produktionskvittona nedan behåller sin historiska omfattning.
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.

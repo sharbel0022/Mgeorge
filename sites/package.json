@@ -14,7 +14,8 @@
     "lint": "node scripts/run-verified-tool.mjs lint",
     "db:generate": "drizzle-kit generate",
     "check": "node scripts/run-verified-tool.mjs check",
-    "test": "node --experimental-strip-types --test tests/*.test.mjs"
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test:isolated": "node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 tests/*.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

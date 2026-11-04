@@ -3,8 +3,17 @@ import { db, identity, response, failure } from "@/lib/server";
 import { uid, now } from "@/lib/domain";
 export const dynamic='force-dynamic';
 export async function POST(req:Request){try{
- const user=await identity(req);if(Number(req.headers.get('content-length')??0)>16_000_000)return response({error:'Filen får vara högst 15 MB.'},413);
- const data=await req.formData(),file=data.get('file');if(!(file instanceof File)||!file.size||file.size>15_000_000)throw new Error('Välj en fil mellan 1 byte och 15 MB.');
+ const user=await identity(req),maxBodyBytes=16_000_000;
+ if(Number(req.headers.get('content-length')??0)>maxBodyBytes){await req.body?.cancel().catch(()=>{});return response({error:'Filen får vara högst 15 MB.'},413);}
+ // Count the complete multipart stream before parsing, including ignored fields.
+ // Content-Length may be absent or smaller than the bytes actually received.
+ const reader=req.body?.getReader(),chunks:Uint8Array[]=[];let length=0;
+ if(reader)try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;
+  if(length>maxBodyBytes){await reader.cancel().catch(()=>{});return response({error:'Filen får vara högst 15 MB.'},413);}
+  chunks.push(value);
+ }}finally{reader.releaseLock();}
+ const body=new Uint8Array(length);let offset=0;for(const chunk of chunks){body.set(chunk,offset);offset+=chunk.byteLength;}
+ const data=await new Response(body,{headers:{'Content-Type':req.headers.get('content-type')??''}}).formData(),file=data.get('file');if(!(file instanceof File)||!file.size||file.size>15_000_000)throw new Error('Välj en fil mellan 1 byte och 15 MB.');
  const allowed:Record<string,string>={pdf:'application/pdf',eml:'message/rfc822',txt:'text/plain',csv:'text/csv',xml:'application/xml',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg'};
  const ext=file.name.split('.').pop()?.toLowerCase()??'';if(!allowed[ext])throw new Error('Välj PDF, EML, TXT, XLSX, CSV, XML, PNG eller JPG.');
  const bytes=await file.arrayBuffer(),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(b=>b.toString(16).padStart(2,'0')).join('');

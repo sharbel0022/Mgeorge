@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/main.js",
     "test": "node --test test/*.test.js",
+    "test:isolated": "node --import ../../scripts/saas-test-isolation.mjs --test --test-concurrency=1 test/*.test.js",
     "check": "node --check src/bridge.js && node --check src/main.js && node --check test/bridge.test.js && node --check test/sftp-server.js && node --check test/main.test.js && node --check test/adapter-contract.test.js"
   },
   "dependencies": { "ssh2": "1.17.0" }

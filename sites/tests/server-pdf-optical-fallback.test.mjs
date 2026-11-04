@@ -53,7 +53,8 @@ test('actual server PDF parser hands a long-footer raster invoice to the OCR que
 
 test('actual Workerd also routes the footer raster to local OCR without outbound calls',async()=>{
   const bundled=await build({stdin:{contents:`import {serverPdfText} from './lib/server-pdf';export default {async fetch(req){try{return Response.json(await serverPdfText(new Uint8Array(await req.arrayBuffer())));}catch(e){return Response.json({error:e.message},{status:422});}}}`,resolveDir:fileURLToPath(new URL('../',import.meta.url)),loader:'ts'},bundle:true,format:'esm',platform:'neutral',mainFields:['module','main'],conditions:['import','browser','default'],external:['node:*'],write:false,logLevel:'silent'});
-  const mf=new Miniflare(convertV4MiniflareOptions({modules:true,script:bundled.outputFiles[0].text,compatibilityDate:'2026-05-15',compatibilityFlags:['nodejs_compat'],outboundService:()=>{throw Error('No network in PDF parser');}}));
+  // Disables Miniflare's host-side cf.json fetch as well as worker egress.
+  const mf=new Miniflare(convertV4MiniflareOptions({cf:false,modules:true,script:bundled.outputFiles[0].text,compatibilityDate:'2026-05-15',compatibilityFlags:['nodejs_compat'],outboundService:()=>{throw Error('No network in PDF parser');}}));
   try{
     const result=await mf.dispatchFetch('https://test.example/',{method:'POST',body:rasterPdf({textLayer:archiveFooter})});
     assert.equal(result.status,422);assert.equal((await result.json()).error,'local_ocr_required');

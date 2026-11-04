@@ -1,5 +1,15 @@
 # Verifierad progress
 
+## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
+
+Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).
+
+Tre reproducerade brister har avgränsade rättningar med RED/GREEN-bevis: rå banktransporttext kunde läcka privata uppgifter till logg; oautentiserad Node-login hade dokumentimportens 22 MB-budget; Sites multipart kunde kringgå totalgränsen genom saknad/för låg Content-Length och ett stort ignorerat fält. Loggen använder nu en fast säker händelse, login har 8 KiB-budget och Sites räknar hela strömmen före multiparttolkning med 16 MB-tak och bibehållen 15 MB-filgräns.
+
+15 nya A/B/C-ownerfall provar verkliga API-/SQLite-/R2-/krypterings-/låsgränser. Den fokuserade acceptansen har **92 Node +388 Sites =480 godkända**, utan fel/skip/cancel/TODO. Nytt CI-jobb sparar syntetisk TAP/JSON-evidens; befintliga helgrindar behålls, actions är SHA-låsta och `test:isolated` laddar nätverksspärren före testerna. Fulla körningar, driftbegränsningar och miljöavvikelser redovisas i rapporten.
+
+Basen innehåller ännu ingen levererad generell company/member/role-modell eller ny corporate-provider. Befintliga ownerprov ger därför inget fullständigt SaaS- eller juridiskt godkännande. Agent 8 ska använda frysta producent-SHA:er och stänga de uttryckliga integrationsgrindarna. **Alla 33 poäng behålls: 255/330 =7,73/10; 0/33 ≥9,5.**
+
 ## Automatic Bankgiro source readiness — 2026-11-03
 
 [Current readiness report](docs/BANKGIRO-AUTOMATIC-SOURCE-READINESS.md) covers the new normalized HTTPS transport, isolated pinned SFTP bridge, trusted registration/revocation, durable receipts and existing-scheduler integration. Final local **1565 Node +3121 Sites +47 bridge =4733 pass**,0fail/skip/cancel/todo; types/syntax/audits/build and independent review pass. Bridge also verified on exact Node22.13.0. Ordinary PR34 merged runtime main c367fcd; exact PR/push/main CI passed all three jobs. Sites60 succeeded, source0b0aa755/tree145fe442 match approved main. Read-only postchecks confirm source absent/queue empty and selected economic counts1+0/zero allocations. Delayed postcheck observed Gmail schedule disabled externally; no schedule update was invoked, and this drift is documented in the report. Real source configuration/authorization/profile and production fetching remain absent. **All33 scores remain255/330=7.73/10,0/33≥9.5**; no production score increase is inferred from synthetic success. Earlier dated sections below retain their historical scope.

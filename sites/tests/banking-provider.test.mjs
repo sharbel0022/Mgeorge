@@ -314,12 +314,13 @@ test('Worker-compatible manual redirects never forward bank credentials or autho
   assert.equal(calls, 1);
 });
 
-test('Transport diagnostics redact URLs and credentials while retaining the runtime failure', async t => {
+test('Transport diagnostics retain a safe event without upstream exception text', async t => {
   const diagnostics = [];
   t.mock.method(console, 'error', (...items) => diagnostics.push(items));
   t.mock.method(globalThis, 'fetch', async () => { throw new Error('Network connection lost https://api.enablebanking.com/application?code=private-code Bearer abc.def.ghi secret-value-long-enough-to-redact'); });
   await assert.rejects(getApplication(config), error => error.code === 'BANK_NETWORK_ERROR');
-  assert.match(JSON.stringify(diagnostics), /Network connection lost/);
+  assert.match(JSON.stringify(diagnostics), /BANK_PROVIDER_TRANSPORT_ERROR/);
+  assert.ok(!JSON.stringify(diagnostics).includes('Network connection lost'));
   for (const secret of ['api.enablebanking.com', 'private-code', 'abc.def.ghi', 'secret-value-long-enough-to-redact']) assert.ok(!JSON.stringify(diagnostics).includes(secret));
 });
 
