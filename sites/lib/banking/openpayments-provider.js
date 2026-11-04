@@ -187,6 +187,7 @@ class OpenPaymentsCompanyConnection {
       payments: 'disabled', checkedAt: new Date(this.#now()).toISOString(), original: this.#original(response, 'bank_capabilities') });
   }
   async createConsent(input) {
+    input = Object.freeze(snapshot(input, 'AUTHORIZATION_INVALID'));
     this.#feature('consents'); this.#psuRequired();
     if (!isRecord(input) || Object.keys(input).some(key => !['validUntil', 'frequencyPerDay', 'redirectPreferred'].includes(key)) ||
         !validDate(input.validUntil) || Date.parse(endOfDate(input.validUntil)) <= this.#now() ||
@@ -220,6 +221,7 @@ class OpenPaymentsCompanyConnection {
     return this.#finish({ handle: await this.#resources.seal('authorisation', value, expiresAt), methods, scaStatus: status, original: this.#original(response, 'create_authorisation') });
   }
   async startAuthorisation(handle, input) {
+    input = Object.freeze(snapshot(input, 'AUTHORIZATION_INVALID'));
     this.#psuRequired();
     const authorization = await this.#resource('authorisation', handle);
     if (!isRecord(input) || Object.keys(input).some(key => !['authenticationMethodId', 'redirectUri'].includes(key)) || !authorization.methods.some(method => method.authenticationMethodId === input.authenticationMethodId)) throw authInvalid();
@@ -244,6 +246,7 @@ class OpenPaymentsCompanyConnection {
     return this.#finish({ scaStatus: scaStatus(response.data.scaStatus), challengeData: snapshot(response.data.challengeData ?? {}), consentValid: false });
   }
   async completeRedirect(handle, callback) {
+    callback = Object.freeze(snapshot(callback, 'AUTHORIZATION_INVALID'));
     const flow = await this.#resource('redirect', handle);
     try {
       if (!isRecord(callback) || Object.keys(callback).some(key => !['code', 'scope', 'state'].includes(key)) || callback.state !== flow.state || !safeText(callback.code, 4096) || typeof callback.scope !== 'string') throw Error();
@@ -280,6 +283,7 @@ class OpenPaymentsCompanyConnection {
     return this.#finish({ identity: ids, bankgiroMappingVerified: false, original: this.#original(response, 'account_details') }, account.consent);
   }
   async getTransactions(handle, input) {
+    input = Object.freeze(snapshot(input));
     this.#feature('transactions');
     if (!isRecord(input) || Object.keys(input).some(key => !['dateFrom', 'dateTo', 'requireBankgiro'].includes(key)) || !validDate(input.dateFrom) || !validDate(input.dateTo) || input.dateFrom > input.dateTo || input.requireBankgiro !== undefined && typeof input.requireBankgiro !== 'boolean') throw invalid();
     const account = await this.#resource('account', handle), requested = this.#config.scopes.includes('bankgiroinformation');

@@ -222,3 +222,46 @@ test('a consent shortened by the bank cannot expire during an AIS request and st
   const handle = await account(connection);
   await assert.rejects(connection.getAccount(handle), error => ['CONSENT_NOT_VALID', 'RESOURCE_EXPIRED'].includes(error.code));
 });
+
+test('transaction range and Bankgiro requirements cannot change after an asynchronous operation starts', async () => {
+  const { connection, calls } = setup(); const handle = await account(connection);
+  const range = { dateFrom: '2026-11-01', dateTo: '2026-11-04' };
+  const pending = connection.getTransactions(handle, range);
+  range.dateFrom = '2020-01-01';
+  await pending;
+  const request = calls.find(call => new URL(call.url).pathname.endsWith('/transactions'));
+  assert.equal(new URL(request.url).searchParams.get('dateFrom'), '2026-11-01');
+  const required = { dateFrom: '2026-11-01', dateTo: '2026-11-04', requireBankgiro: true };
+  const rejected = connection.getTransactions(handle, required); required.requireBankgiro = false;
+  await assert.rejects(rejected, { code: 'BANKGIRO_NOT_AVAILABLE' });
+});
+
+test('authorization and callback inputs are captured before any guard or resource await', async () => {
+  const { connection, calls } = setup({ [`PUT /psd2/consent/v1/consents/${CONSENT_ID}/authorisations/${AUTH_ID}`]: redirectResponse });
+  const authorization = await connection.createAuthorisation(await consent(connection, true));
+  const input = { authenticationMethodId: 'mbid', redirectUri: CONFIG.redirectUris[0] };
+  const pending = connection.startAuthorisation(authorization.handle, input);
+  input.authenticationMethodId = 'invented'; input.redirectUri = 'https://evil.example/callback';
+  const start = await pending;
+  const callback = { code: 'original-auth-code', scope: 'accountinformation corporate', state: new URL(start.redirectUrl).searchParams.get('state') };
+  const completed = connection.completeRedirect(start.flowHandle, callback);
+  callback.code = 'changed-auth-code'; callback.scope = 'paymentinitiation';
+  assert.equal((await completed).status, 'valid');
+  const activation = calls.find(call => call.url.endsWith('/connect/token') && new URLSearchParams(call.init.body).get('grant_type') === 'authorization_code');
+  assert.equal(new URLSearchParams(activation.init.body).get('code'), 'original-auth-code');
+});
+
+test('caller mutation while HTTP is pending cannot relax response range validation', async () => {
+  let release, entered;
+  const waiting = new Promise(resolve => { entered = resolve; });
+  const { connection } = setup({
+    [`GET /psd2/accountinformation/v1/accounts/${ACCOUNT_ID}/transactions`]: () => new Promise(resolve => {
+      release = () => resolve(json({ account: { iban: ACCOUNT.iban }, transactions: { booked: [{ ...TX, bookingDate: '2026-01-01' }], _links: {} } }));
+      entered();
+    }),
+  });
+  const handle = await account(connection), range = { dateFrom: '2026-11-01', dateTo: '2026-11-04' };
+  const pending = connection.getTransactions(handle, range);
+  await waiting; range.dateFrom = '2020-01-01'; release();
+  await assert.rejects(pending, { code: 'PROVIDER_RESPONSE_INVALID' });
+});
