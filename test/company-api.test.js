@@ -11,6 +11,7 @@ import {createCompanyClient} from '../sites/lib/company-client.js';
 
 const directory=mkdtempSync(join(tmpdir(),'mg-company-http-'));
 process.env.NODE_ENV='test';process.env.APP_ORIGIN='https://company.example.test';
+process.env.MG_SAAS_ONBOARDING_ENABLED='true';
 process.env.MG_ADMIN_PASSWORD='synthetic-owner-password';process.env.DB_PATH=join(directory,'legacy.sqlite');
 process.env.SESSION_SECRET='1'.repeat(64);process.env.BANK_DATA_KEY='2'.repeat(64);
 process.env.GOOGLE_CLIENT_ID='synthetic-client';process.env.GOOGLE_CLIENT_SECRET='synthetic-secret';process.env.GMAIL_ACCOUNT='synthetic-legacy@example.test';
@@ -184,6 +185,7 @@ async function oauthFixture(t,provider,tag){
   if(url.pathname==='/aspsps')return Response.json({aspsps:[{name:'Swedbank',country:'SE',psu_types:['business'],maximum_consent_validity:90*86400}]});
   if(url.pathname==='/auth'){state=JSON.parse(options.body).state;return Response.json({url:'https://auth.enablebanking.com/ais/start?sessionid=synthetic'});}
   if(url.pathname==='/sessions'&&options.method==='POST')return Response.json({session_id:'synthetic-session-'+tag,accounts:[{uid:'synthetic-account',currency:'SEK',usage:'ORGA',account_id:{iban:'SE4280000890119146168423'}}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+3600000).toISOString()}});
+  if(url.pathname.startsWith('/sessions/'))return options.method==='DELETE'?new Response(null,{status:204}):Response.json({status:'AUTHORIZED',accounts:['synthetic-account'],accounts_data:[{uid:'synthetic-account'}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+3600000).toISOString(),transactions:true}});
   throw Error('Unexpected synthetic provider request');
  });
  const start=await call('/api/'+provider+'/connect',{actor,method:'POST',body:{}});assert.equal(start.status,200,JSON.stringify(start.body));

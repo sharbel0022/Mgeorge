@@ -142,6 +142,58 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   // Existing redirects remain retained but must restart: their original
   // actor/company authorization generation cannot be inferred by migration.
   addColumn('bank_states','company_context_json',"TEXT NOT NULL DEFAULT ''");
+  // Empty metadata marks existing rows only. Every newly initiated flow writes
+  // company-bound metadata; migrations never invent corporate authorization.
+  addColumn('bank_connections','consent_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','context_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','flow_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','status',"TEXT NOT NULL DEFAULT 'pending'");
+  addColumn('bank_states','terminal_reason',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','connection_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','provider_kind',"TEXT NOT NULL DEFAULT 'enable_banking'");
+  addColumn('bank_states','provider_payload',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','provider_connection_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','provider_flow_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','provider_request_key_hash',"TEXT NOT NULL DEFAULT ''");
+  db.exec(`CREATE TABLE IF NOT EXISTS bank_provider_connections(
+    id TEXT PRIMARY KEY NOT NULL,owner TEXT NOT NULL,company_id TEXT NOT NULL,
+    provider_kind TEXT NOT NULL CHECK(provider_kind='open_payments'),
+    environment TEXT NOT NULL CHECK(environment IN ('SANDBOX','PRODUCTION')),
+    app_generation TEXT NOT NULL,bank_id TEXT NOT NULL,bank_name TEXT NOT NULL,status TEXT NOT NULL,
+    encrypted_state TEXT NOT NULL,selected_accounts TEXT NOT NULL DEFAULT '[]',valid_until TEXT NOT NULL DEFAULT '',
+    revision INTEGER NOT NULL DEFAULT 1 CHECK(revision>0),last_synced_at TEXT,last_error TEXT,
+    request_key_hash TEXT NOT NULL,created_at TEXT NOT NULL,updated_at TEXT NOT NULL,
+    grant_fingerprint TEXT NOT NULL DEFAULT '');
+    CREATE TABLE IF NOT EXISTS bank_provider_grant_claims(
+      fingerprint TEXT PRIMARY KEY NOT NULL,owner TEXT NOT NULL,company_id TEXT NOT NULL,connection_id TEXT NOT NULL,
+      provider_kind TEXT NOT NULL CHECK(provider_kind='open_payments'),
+      environment TEXT NOT NULL CHECK(environment IN ('SANDBOX','PRODUCTION')),created_at TEXT NOT NULL);`);
+  // A partially upgraded provider table may predate immutable grant history.
+  // Never infer/backfill a grant fingerprint from opaque encrypted state.
+  addColumn('bank_provider_connections','grant_fingerprint',"TEXT NOT NULL DEFAULT ''");
+  db.exec(`CREATE INDEX IF NOT EXISTS bank_provider_owner_company ON bank_provider_connections(owner,company_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS bank_provider_request ON bank_provider_connections(owner,request_key_hash);
+    CREATE UNIQUE INDEX IF NOT EXISTS bank_provider_current_grant ON bank_provider_connections(grant_fingerprint) WHERE grant_fingerprint<>'';
+    CREATE INDEX IF NOT EXISTS bank_provider_claim_owner ON bank_provider_grant_claims(owner,company_id,connection_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS bank_provider_flow_id ON bank_states(owner,provider_flow_id) WHERE provider_flow_id<>'';
+    CREATE UNIQUE INDEX IF NOT EXISTS bank_provider_flow_request ON bank_states(owner,provider_request_key_hash) WHERE provider_request_key_hash<>'';
+    CREATE TRIGGER IF NOT EXISTS bank_provider_identity_immutable BEFORE UPDATE ON bank_provider_connections
+      WHEN NEW.id IS NOT OLD.id OR NEW.owner IS NOT OLD.owner OR NEW.company_id IS NOT OLD.company_id OR NEW.provider_kind IS NOT OLD.provider_kind OR NEW.environment IS NOT OLD.environment OR NEW.app_generation IS NOT OLD.app_generation OR NEW.bank_id IS NOT OLD.bank_id OR NEW.request_key_hash IS NOT OLD.request_key_hash OR NEW.created_at IS NOT OLD.created_at
+      BEGIN SELECT RAISE(ABORT,'BANK_PROVIDER_IDENTITY_IMMUTABLE'); END;
+    CREATE TRIGGER IF NOT EXISTS bank_provider_revision_fence BEFORE UPDATE ON bank_provider_connections
+      WHEN NEW.revision<>OLD.revision+1 BEGIN SELECT RAISE(ABORT,'BANK_PROVIDER_REVISION_CONFLICT'); END;
+    CREATE TRIGGER IF NOT EXISTS bank_provider_retained BEFORE DELETE ON bank_provider_connections
+      BEGIN SELECT RAISE(ABORT,'BANK_PROVIDER_RETAINED'); END;
+    CREATE TRIGGER IF NOT EXISTS bank_provider_claim_immutable BEFORE UPDATE ON bank_provider_grant_claims
+      BEGIN SELECT RAISE(ABORT,'BANK_PROVIDER_CLAIM_IMMUTABLE'); END;
+    CREATE TRIGGER IF NOT EXISTS bank_provider_claim_retained BEFORE DELETE ON bank_provider_grant_claims
+      BEGIN SELECT RAISE(ABORT,'BANK_PROVIDER_CLAIM_RETAINED'); END;
+    CREATE TRIGGER IF NOT EXISTS bank_provider_claim_no_replace BEFORE INSERT ON bank_provider_grant_claims
+      WHEN EXISTS(SELECT 1 FROM bank_provider_grant_claims WHERE fingerprint=NEW.fingerprint)
+      BEGIN
+        SELECT CASE WHEN EXISTS(SELECT 1 FROM bank_provider_grant_claims WHERE fingerprint=NEW.fingerprint AND (owner IS NOT NEW.owner OR company_id IS NOT NEW.company_id OR connection_id IS NOT NEW.connection_id OR provider_kind IS NOT NEW.provider_kind OR environment IS NOT NEW.environment)) THEN RAISE(ABORT,'BANK_PROVIDER_CLAIM_IMMUTABLE') END;
+        SELECT RAISE(IGNORE);
+      END;`);
   addColumn('gmail_connections','page_token',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_states','request_send','INTEGER NOT NULL DEFAULT 0');
   addColumn('gmail_states','company_context_json',"TEXT NOT NULL DEFAULT ''");

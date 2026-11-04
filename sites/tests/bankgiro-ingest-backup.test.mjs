@@ -24,7 +24,7 @@ function snapshot(includeQueue=true){
  return {format:'MG-Sites-backup-1',owner,createdAt:at,tables};
 }
 test('new backups retain both durable Bankgiro tables while a transient lease is excluded',()=>{
- assert.deepEqual(BACKUP_TABLES,extended);
+ assert.deepEqual(BACKUP_TABLES,[...extended,'bank_provider_connections','bank_provider_grant_claims']);
  const value=validateSnapshot(snapshot(),owner);
  assert.equal(value.tables.find(t=>t.name==='bankgiro_ingest_jobs').rows[0].report_id,'0000599');
  assert.equal(value.tables.some(t=>t.name==='bankgiro_ingest_leases'),false);

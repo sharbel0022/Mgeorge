@@ -13,7 +13,7 @@ test('additive migration preserves every legacy financial byte and requires veri
   sql.prepare('INSERT INTO bank_connections(id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run('synthetic-consent','legacy-owner','original-generation','PRODUCTION','Synthetic bank','SE','original-encrypted-consent','original-encrypted-account-proof','["synthetic-account"]','2099-01-01','2026-01-01','connected','2026-01-01','2026-01-01');
   sql.prepare('INSERT INTO document_registrations VALUES(?,?,?,?,?,?,?)').run('legacy-owner','original-id','original-identity','same-invoice','original-attempt',100,'2026-01-01');
   sql.prepare('INSERT INTO bankgiro_ingest_sources(owner,source_id,scope_id,authorization_generation,authorization_status,updated_at) VALUES(?,?,?,?,?,?)').run('legacy-owner','synthetic-source','original-scope','original-authority','VERIFIED',1);
-  for(const table of ownerTables){const columns=sql.prepare('PRAGMA table_info('+table+')').all().map(c=>c.name);before.set(table,{columns,rows:sql.prepare('SELECT * FROM '+table).all()});}
+  for(const table of ownerTables){const columns=sql.prepare('PRAGMA table_info('+table+')').all().map(c=>c.name);if(columns.length)before.set(table,{columns,rows:sql.prepare('SELECT * FROM '+table).all()});}
  }});
  for(const [table,{columns,rows}]of before)assert.deepEqual(f.sql.prepare('SELECT '+columns.map(c=>'"'+c+'"').join(',')+' FROM '+table).all(),rows,table+' must retain every pre-migration column');
  const legacy=await resolveCompanyScope(f.raw,'legacy-owner',{});assert.equal(legacy.kind,'legacy');

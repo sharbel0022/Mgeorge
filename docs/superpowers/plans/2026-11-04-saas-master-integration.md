@@ -52,9 +52,9 @@
 **Files:** sites/lib/banking/*; src/bank-consent.js; shared consent policy; bank route/server adapters; cumulative D1 schema/journal.
 **Interfaces:** Current company context -> provider resources -> actor/session/state-bound callbacks -> proved accounts.
 
-- [ ] Verify documented read-only API contracts against official provider documentation.
+- [x] Verify documented read-only API contracts against official provider documentation.
 - [ ] Test and adapt company/consent/provider boundaries; preserve Enable Banking.
-- [ ] Resolve additive migration numbering and cumulative snapshots without dropping either branch.
+- [x] Resolve additive migration numbering and cumulative snapshots without dropping either branch.
 - [ ] Repeat full gates, review and exact-head/main CI per PR.
 
 ### Task 4: Enrichment and sync integration (#41, #42)
@@ -82,9 +82,9 @@
 **Files:** scripts/run-sites-cloud-ocr.mjs; .github/workflows/sites-cloud-ocr.yml; affected worker modules/tests.
 **Interfaces:** Existing schedule and secret references -> owner/company-bound worker leases and safe receipts.
 
-- [ ] Read latest complete failure logs and read-only production status; do not expose secret values.
-- [ ] Reproduce and fix internal errors, with RED/GREEN regression tests.
-- [ ] Record external configuration/credential/disabled-schedule blockers without fabricating runtime success.
+- [x] Read latest complete failure logs and read-only production status; do not expose secret values.
+- [x] Reproduce and fix internal errors, with RED/GREEN regression tests.
+- [x] Record external configuration/credential/disabled-schedule blockers without fabricating runtime success.
 
 ### Task 7: Final delivery and existing-Site publication
 

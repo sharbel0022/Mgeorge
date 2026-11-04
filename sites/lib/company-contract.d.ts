@@ -5,6 +5,7 @@ export declare const COMPANY_BOUNDARY_VERSION:'company-data-boundary-v1';
 export declare const COMPANY_REFERENCE_POLICY_VERSION:'company-reference-policy-v1';
 export declare const COMPANY_ROLES:readonly CompanyRole[];
 export declare const COMPANY_ACTIONS:readonly CompanyAction[];
+export function saasOnboardingEnabled(settings?:Record<string,unknown>|null):boolean;
 
 /** Server-resolved snapshot; validation alone never authorizes a request. */
 export interface CompanyContext {

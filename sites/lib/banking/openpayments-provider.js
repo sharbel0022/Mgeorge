@@ -67,6 +67,30 @@ export class OpenPaymentsProvider {
   forCompany(context, dependencies) {
     return new OpenPaymentsCompanyConnection(context, dependencies, this.#config, this.#http, this.#tokens, this.#now);
   }
+  /** Application ASPSP discovery precedes bank selection. It requires a current
+   * server authorization callback, and sends neither a fabricated BIC nor PSU
+   * or corporate identifiers. Consent/account discovery remains company-bound. */
+  async discoverBanks(countries=['SE'],dependencies) {
+    if (!this.#config.features.includes('bank_discovery')) throw new BankProviderError('FEATURE_NOT_ALLOWED',403);
+    if (typeof dependencies?.assertCurrent!=='function') throw new BankProviderError('INVALID_PROVIDER_BINDING',403);
+    if (dependencies.environment!==undefined&&dependencies.environment!==this.#config.environment||dependencies.generation!==undefined&&dependencies.generation!==this.#config.credentialGeneration)throw new BankProviderError('INVALID_PROVIDER_BINDING',403);
+    if (!Array.isArray(countries)||countries.length<1||countries.length>10||countries.some(country=>typeof country!=='string'||!/^[A-Z]{2}$/.test(country))||new Set(countries).size!==countries.length) throw invalid();
+    const guard=async()=>{
+      try { await dependencies.assertCurrent(); } catch { throw mismatch(); }
+      if (this.#config.credentialsValidUntil&&Date.parse(this.#config.credentialsValidUntil)<=this.#now()) throw new BankProviderError('CREDENTIALS_EXPIRED',409);
+    };
+    await guard();const token=await this.#tokens.accessToken();await guard();
+    let response;
+    try { response=await this.#http.send({path:`${ASPSPS}?${new URLSearchParams({isoCountryCodes:countries.join(',')})}`,headers:{Authorization:`Bearer ${token}`}}); }
+    catch(error){if(error instanceof BankProviderError&&error.code==='INVALID_ACCESS_TOKEN')this.#tokens.invalidate();throw error;}
+    await guard();
+    if(!Array.isArray(response.data.aspsps)||response.data.aspsps.length>2000)throw invalid();
+    const banks=response.data.aspsps.map(bank=>{
+      if(!isRecord(bank)||!BIC.test(bank.bicFi)||typeof bank.name!=='string'||!bank.name||bank.name.length>140||/[\u0000-\u001f\u007f]/.test(bank.name))throw invalid();
+      return {id:bank.bicFi,name:bank.name};
+    });
+    await guard();return {banks};
+  }
 }
 
 class OpenPaymentsCompanyConnection {
@@ -280,7 +304,7 @@ class OpenPaymentsCompanyConnection {
     const response = await this.#request(`${ACCOUNTS}/${account.id}`, { consent: account.consent });
     if (response.data.resourceId !== undefined && response.data.resourceId !== account.id) throw mismatch();
     const ids = identity(response.data); checkIdentity(account.identity, ids);
-    return this.#finish({ identity: ids, bankgiroMappingVerified: false, original: this.#original(response, 'account_details') }, account.consent);
+    return this.#finish({ identity: ids, effectiveConsentValidUntil: endOfDate(account.consent.validUntil), bankgiroMappingVerified: false, original: this.#original(response, 'account_details') }, account.consent);
   }
   async getTransactions(handle, input) {
     input = Object.freeze(snapshot(input));
@@ -320,6 +344,6 @@ class OpenPaymentsCompanyConnection {
       cursors.add(cursor); next = url.pathname + url.search;
     }
     if (input.requireBankgiro && !allHaveBankgiro) throw new BankProviderError('BANKGIRO_NOT_AVAILABLE', 409);
-    return this.#finish({ booked, bankgiro, originals, bankgiroEvidence: { status: !requested ? 'not_requested' : allHaveBankgiro ? 'returned_by_provider' : 'not_returned', completeness: 'unknown' }, paymentReconciliationAllowed: false }, account.consent);
+    return this.#finish({ booked, bankgiro, originals, effectiveConsentValidUntil: endOfDate(account.consent.validUntil), bankgiroEvidence: { status: !requested ? 'not_requested' : allHaveBankgiro ? 'returned_by_provider' : 'not_returned', completeness: 'unknown' }, paymentReconciliationAllowed: false }, account.consent);
   }
 }

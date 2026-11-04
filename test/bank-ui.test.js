@@ -89,6 +89,40 @@ test('connected account exposes masked details, consent validity and actions',()
   assert.doesNotMatch(html,/Välj konto…|Anslut valt konto/);
 });
 
+test('new company consent shows the unverified authority gate without account confirmation',()=>{
+  const view=ui();bankFixture(view,[{...connection,status:'corporate_authorization_required',selected_account_uid:'',accounts:[],consent:{mode:'company',corporateAuthorization:{status:'unverified'}}}]);
+  const html=view.run('connectionPage()');
+  assert.match(html,/Företagsbehörighet behöver verifieras/);assert.match(html,/bankens medgivande/i);
+  assert.doesNotMatch(html,/>Ansluten<|Anslut valt konto/);
+});
+
+test('stored pending and terminal consent attempts remain visible on ordinary status refresh',()=>{
+  const view=ui();
+  for(const [status,text]of [['pending','Väntar på godkännande hos banken'],['expired','Anslutningsförsöket har löpt ut'],['cancelled','Identifieringen avbröts'],['denied','Läsåtkomsten godkändes inte'],['session_lost','Sessionen för anslutningsförsöket avslutades']]){
+    bankFixture(view,[],{consentFlow:{id:'synthetic-flow',status}});assert.ok(view.run('connectionPage()').includes(text),status);
+  }
+});
+
+test('pending revocation is visible and bank retrieval is disabled',()=>{
+  const view=ui();bankFixture(view,[{...connection,status:'revocation_pending'}]);const html=view.run('connectionPage()');
+  assert.match(html,/Frånkoppling väntar/);assert.match(html,/data-sync="test-connection" disabled/);assert.doesNotMatch(html,/>Ansluten</);
+});
+
+test('new connect requests retain explicit read scope and leave company selection to the request boundary',async()=>{
+  const view=ui();bankFixture(view,[],{company:{id:'workspace:synthetic'}});
+  view.run("globalThis.requestBody=null;api=async(path,method,body)=>{requestBody=body;return {url:'https://auth.enablebanking.com/ais/start?sessionid=synthetic'};}");
+  await view.run('connectBank()');const body=plain(view.run('requestBody'));assert.equal(Object.hasOwn(body,'companyId'),false);assert.deepEqual(body.requiredScopes,['accounts:read','transactions:read']);
+});
+test('bank read roles keep masked facts visible and disable consent management controls',()=>{
+  const view=ui();bankFixture(view,[connection],{company:{id:'company-a',canManageBank:false}});
+  const html=view.run('connectionPage()');assert.match(html,/•••• 1234/);
+  for(const attribute of ['data-sync','data-renew-bank','data-disconnect-bank'])assert.match(html,new RegExp(attribute+'="test-connection"[^>]*disabled'));
+  bankFixture(view,[{...connection,status:'pending_account',selected_account_uid:''}],{company:{id:'company-a',canManageBank:false}});
+  assert.match(view.run('connectionPage()'),/data-select-bank-account="test-connection"[^>]*disabled/);
+  bankFixture(view,[],{company:{id:'company-a',canManageBank:false}});
+  assert.match(view.run('connectionPage()'),/data-action="connect-bank"[^>]*disabled/);
+});
+
 test('bank date controls stay on the UTC day after Swedish midnight without changing invoice dates',()=>{
   const view=ui();bankFixture(view,[connection]);
   const at=Date.parse('2026-06-01T22:30:00Z');

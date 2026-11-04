@@ -1,16 +1,18 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+**2026-11-05, användarstyrt stopp:** hela aktuella arbetsläget sparas som ofärdig WIP på integrationsbranchen. Ingen ny merge/publicering eller slutlig kandidatacceptans. Ett reproducerat P1 i importens sista registreringskontroll återstår; [stoppkvitto](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md). Senaste Sites-helkörning3540/3529pass/11skip/0fail samt typer/migration/build är godkända; Node1746/1737pass/9skip/0fail föregår sista legacy-rättningen (oberoende44focusedpass). Alla33poäng behålls255/330=7,73,0/33≥9,5. Ingen WIP- eller fixtureframgång ger produktionsgodkännande.
+
 ## SaaS master integration candidate — 2026-11-04
 
-Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.md). Repaired foundation is now normally merged as mainf105e9c, with exact main CI41914833272 success (1649Node+3196Sites+47bridge=4892,0fail/skip/cancel/TODO). Below local figures retain their Windows scope; #36 cumulative integration follows separately. No new Sites publication or commercial activation. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5.**
+Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.md) and [current master-integration receipt](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md). PR40 and36 are normally merged; current approved mainf75a293 has exact main CI41917609246 success. Exact PR36 Linux candidate CI passed1669Node+3266Sites+47bridge=4982,0fail/skip/cancel/TODO; local Windows scopes remain separate. PR39 is under local integration;41/42/38/37 follow. No new Sites publication or commercial activation. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5.**
 
 | Area | Before → after | New evidence | Remaining limit |
 | --- | --- | --- | --- |
-| 11 Gmail /28 scheduling | 7.5→7.5 /6.5→6.5 | Existing disabled schedule verified; obsolete OCR origin404 reproduced and repository variable corrected/read back without changing token or cadence. | No fresh successful fetch/OCR run; disabled schedule not silently enabled. |
+| 11 Gmail /28 scheduling | 7.5→7.5 /6.5→6.5 | Existing disabled schedule verified; user expressly chose to keep it paused. Obsolete OCR origin404 reproduced and repository variable corrected/read back without changing token or cadence. | No fresh successful fetch/OCR run; no new or enabled Gmail schedule. |
 | 15 bank /16 sync /17 Bankgiro | 8.5→8.5 /8→8 /8.5→8.5 | Seven frozen producer heads; exact original head CI; current AIS status connected, source absent. | Joint company/provider/source/worker integration pending; no new bank proof. |
-| 24 history /29 backup /31 recovery | 8→8 /7.5→7.5 /5.5→5.5 | Synthetic originals-only admission/adoption and concurrent-write preservation; existing restore tests now run on Windows without EBUSY. | Latest362-file backup still verifying35; previous267-file manifest is not full current production recovery. |
+| 24 history /29 backup /31 recovery | 8→8 /7.5→7.5 /5.5→5.5 | Synthetic originals-only admission/adoption and concurrent-write preservation; existing restore tests now run on Windows without EBUSY. Existing Nov4 snapshot is complete362/362/142968213bytes, manifest_pass2026-11-04T21:32:59.743Z with independent readback. New provider/claim backup and isolated restore tests pass locally. | Fixed snapshot scope;112 historical API records lack receipts. No full current production recovery or measured production RPO/RTO. |
 | 30 security | 8.5→8.5 | 13 new RED/GREEN foundation cases; actor/company/version-pinned Node OAuth, atomic29-table admission; independent review READY. | Joined all-provider/role/worker acceptance pending; no production tenant activation. |
-| 32 code/tests | 8.5→8.5 | Local Node1650/1641pass/9skip; Sites3196/3185pass/11skip,0fail; syntax142/types/build; audits0 production,8moderate Sites development. | Linux exact-head/main CI pending. Bridge is POSIX-only and fails required private-filesystem checks on Windows. |
+| 32 code/tests | 8.5→8.5 | PR36 Windows Node1670/1661pass/9skip; Sites3266/3255pass/11skip,0fail; syntax143/types/build and exact Linux candidate/main CI pass. Audits0 production,8moderate Sites development. PR39 preliminary Sites3491/3480pass/11skip, types/Drizzle check pass. | Final PR39 source and later integrated PRs still require full fresh gates. Bridge is POSIX-only and is certified separately by Linux CI. |
 | 33 real production | 6.5→6.5 | Two exact complete read-only observations at revision50: one economic deposit, zero allocations. | Scoped evidence only; broad reference search incomplete; no new deployment or real Sandbox proof. |
 
 Other area claims and scores retain their existing scope; none is promoted by a synthetic result. The final integrated report will supersede this candidate checkpoint.
@@ -39,6 +41,18 @@ Lokalt verifierad implementation `79f27f0`: **1 585 Node + 3 191 Sites + 47 brid
 | 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Scope-/vägspärrar, befintlig AES-GCM med företagsbundet ändamål, säkra fel och certifikat-/nyckelkontroller. | Beständig medlemskapskontroll, engångscallback och verkligt produktionscertifikat ska integreras och verifieras. |
 | 32. Kodkvalitet och tester | 8,5 | 8,5 | Nya kontrakts-, fel-, isolerings- och transporttester. Två oberoende reviewfynd reproducerade, rättade och omkontrollerade. | Fixtureframgång är inte sandboxacceptans. Befintliga moderate utvecklingsberoendefynd och lintskuld åtgärdas inte av denna PR. |
 | 33. Verifiering i verklig produktion | 6,5 | 6,5 | Exakt gräns mellan dokumentation, lokala tester och externa behörigheter redovisas. | Ingen Open Payments-sandbox, riktig bank, produktionshandshake eller publicering genomförd. |
+
+## Agent 3 — avgränsad företagsmedgivandeverifiering, 2026-11-04
+
+[Bank consent-kontrakt och verifieringskvitto](docs/integration/saas/bank-consent.md) gäller utvecklingsbranchen `feature/saas-bank-consent` från `14a042a`. Alla 33 poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. Syntetiska regressionsprov och oberoende kodgranskning ersätter inte bankens faktiska företagsbehörighet eller produktionsacceptans.
+
+| Berört område | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | --- | --- |
+| 15–16. Bankanslutning och hämtning | Företags-/användarbunden engångscallback, aktuella läsrättigheter, explicit kontoval, giltighet vid databascommit och säker förnyelse/frånkoppling. | Ingen faktisk SCA-/BankID-resa eller ny produktionsanslutning har körts. |
+| 17. Bankgiro | Saknat Bankgiro-scope avvisas uttryckligen; kontokontrollen läser inga konton utanför företagets verifierade omfång. | Separat rapportbehörighet och verklig bankstyrkt företags-/Bankgirorelation krävs fortfarande. |
+| 30. Säkerhet och åtkomstkontroll | State/cookie/CSRF/replay, samtidiga callbacks, företagsunderlag, återkallad åtkomst och osäkra återkallelser har konkreta regressioner. | Basen har en ägararbetsyta. Agent 1:s riktiga medlemskaps- och rollmodell måste integreras före flerföretagsdrift. |
+| 32. Kodkvalitet och tester | Gemensamma rena validatorer, verkliga HTTP-/SQLite-/D1-tester och rättade oberoende granskningsfynd. | Slutliga exakta kommandon/resultat redovisas i integrationskvitto; inga poäng höjs enbart för testantal. |
+| 33. Produktion | Utvecklingsbranch och PR är avsedda för samordnad granskning. | Ingen merge, publicering, produktionsmigration, verklig bankhämtning eller ändring av externa scheman. |
 
 ## Automatic Bankgiro source readiness — 2026-11-03
 

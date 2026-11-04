@@ -1,6 +1,16 @@
 # Verifierad progress
 
-## SaaS master integration — foundation verified, 2026-11-04
+## Stoppat på användarens begäran — 2026-11-05
+
+Användaren begärde att allt arbete skulle stoppas och hela arbetsläget pushas. Utvecklingsagenter stoppades; ingen fortsatt rättning, merge eller Sites-publicering görs. Alla repositoryändringar sparas som **ofärdig WIP** på `codex/saas-master-integration-20261104`. Senast godkända main är fortsatt `f75a293f367980cd360eca1886a2728db9c3e1f2`; endast PR40 och36 är mergade. PR39/41/42/38/37 återstår.
+
+Senast körda helsviter: Node1746 totalt/1737 godkända/9 plattformsundantag/0 fel,107600,7311ms; Sites3540/3529 godkända/11 plattformsundantag/0 fel,31588,336ms, typer/migrationskontroll/produktionsbygge godkända. Node-körningen föregår senaste legacy-sessionsrättningen, som separat har oberoende44/44 godkända fokustester. Ingen slutlig kandidat-CI, ny main-CI eller browseracceptans finns för WIP-trädet.
+
+**Kvarstående P1:** ändrad betrodd företagsregistrering under den sista asynkrona anslutningsläsningen kan godkännas av importens förkontroll innan slutkontrollen avvisar resultatet. Reproducerat med verklig shared runtime/SDK och syntetisk transport. Föreslagen rättning med registreringssnapshot var ännu inte färdig eller oberoende omverifierad vid stoppet. Decoupled-SCA med obligatorisk challenge behöver också färdigställas; inget sandboxkvitto finns. [Exakt WIP-/fortsättningskvitto](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md). Gmail-schemat ska fortsatt vara pausat enligt användarens uttryckliga besked.
+
+## SaaS master integration — provider merged, consent in progress, 2026-11-04
+
+Current checkpoint: [master integration receipt](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md). PR40 and36 are normally merged, approved main `f75a293f367980cd360eca1886a2728db9c3e1f2`, exact main CI41917609246 all three jobs success. PR39 is under local integration;41/42/38/37 remain. Sites60 is unchanged. Existing backup is now complete362/362/142968213bytes, manifest_pass2026-11-04T21:32:59.743Z, independently read back; fixed-snapshot and112 historical API-record limits remain. User explicitly chose to keep the existing Gmail schedule paused. OCR origin repair has no new authenticated runtime receipt yet. No financial production writes, customer mail or commercial activation. The following foundation checkpoint retains its earlier scope; the master receipt and execution ledger carry later evidence.
 
 Start main `14a042abd37fa455d08da9dfcc096ef4f603b512`; all seven current producer heads and exact-head CI frozen in [integration matrix](docs/saas/INTEGRATION-MATRIX.md). #38 remains Draft. Separate native integration worktree; original checkout and production resources preserved.
 
@@ -35,6 +45,18 @@ Oberoende granskning identifierade två reproducerade fel: ändringsbara indata 
 Slutlig lokal verifiering på implementationscommit `79f27f0`: **1 585 Node + 3 191 Sites + 47 bridge = 4 823 godkända**, utan fel/skip/cancel/todo; 90 nya adaptertester ingår i totalsumman. Syntax, typer, låsta installationer, föreskrivna high-auditgrindar och Sites-bygge passerade. Sites har 8 moderate utvecklingsberoendefynd. GitHub Node 22-CI och leveranshuvud redovisas separat i PR:n; lokal körning använde Node 24.22.1.
 
 Ingen verklig Open Payments-sandbox eller produktionsbank har anropats. Sandboxuppgifter, kundspecifikt SaaS-/Bankgiro-/ISO-avtal, riktiga produktionscertifikat och verifierad bank-/företagstäckning återstår. Beständig företagskoppling, callbackkonsumtion, runtime-tokenkoordinering och granskad originalimport kräver separat integration. Alla 33 kvalitetspoäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**.
+
+## Agent 3 — företagsbundet bankmedgivande, 2026-11-04
+
+Egen utvecklingsbranch `feature/saas-bank-consent`, bas `14a042a`. [API-kontrakt, modeller, säkerhetsgränser och verifieringskvitto](docs/integration/saas/bank-consent.md). Leveransen omfattar befintliga Node- och Sites-routes, gemensam medgivandepolicy, additiv lagring och regressionstester. Ingen merge, Sites-publicering, produktionsmigration eller verklig bankidentifiering ingår.
+
+Slutliga lokala grindar: **1 587 Node + 3 227 Sites + 47 brygga = 4 861 godkända tester**, 0 fel/skip/cancel/todo; syntax, typer, exakt minimatchkontroll, high-audit och produktionsbygge godkända. Åtta måttliga utvecklingsberoendefynd kvarstår i Sites, inga high/critical. Konkreta oberoende granskningsfynd är rättade med regressionstester.
+
+Nya anslutningar binds till autentiserad användare, serverupplöst företag, bank, läsomfång, webbläsare och ett engångstillstånd. Bankens medgivande och separat verifierat företags-/kontounderlag krävs före uttrycklig kontobekräftelse. Utelämnat `companyId` ger ingen äldre undantagsväg; pågående redirects utan den nya kontexten måste startas om. Befintliga sparade äldre anslutningar bevaras och markeras som äldre, utan påhittad företagsverifiering. Avbruten eller nekad förnyelse bevarar den tidigare anslutningen; osäkra återkallelser stoppar användningen och behåller uppgifter för säker återhämtning.
+
+Basen saknar en släppt SaaS-medlemskapsmodell. Företagsupplösaren stödjer endast den autentiserade ägarens befintliga arbetsyta. Agent 1 måste ansluta sin auktoritativa företags-/rollmodell innan flera företagsmedlemmar aktiveras; Agent 2:s framtida provideradapter måste lämna verifierbart företags-/kontounderlag och dokumenterade identifieringsförmågor. Bankgirobehörighet kan inte härledas ur AIS. Exakta lokala testresultat och kvarstående externa acceptanskrav finns i integrationsdokumentet.
+
+Samtliga 33 numeriska kvalitetspoäng är oförändrade: **255/330 = 7,73/10; 0/33 ≥9,5**. Denna utvecklingsleverans ger inget nytt produktionsbevis.
 
 ## Automatic Bankgiro source readiness — 2026-11-03
 

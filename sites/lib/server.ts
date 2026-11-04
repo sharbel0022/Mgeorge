@@ -2,7 +2,7 @@ import { env } from "cloudflare:workers";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
 import { emptyState, type State } from "./domain";
 import {AsyncLocalStorage} from 'node:async_hooks';
-import {createCompanyDatabase,resolveCompanyScope,assertScopeCurrent,boundaryForScope,companyDirectory,selectCompany,provisionCompany,changeCompanyMembership,resolveWorkerScope,resolveWorkerCredential,resolveCompanyMailbox,type CompanyScope} from './company-storage.js';
+import {createCompanyDatabase,resolveCompanyScope,assertScopeCurrent,boundaryForScope,companyDirectory,selectCompany,provisionCompany,changeCompanyMembership,resolveWorkerScope,resolveWorkerCredential,resolveCompanyMailbox,saasOnboardingEnabled,type CompanyScope} from './company-storage.js';
 import type {CompanyAction,CompanyContext} from './company-contract.js';
 
 type User=NonNullable<Awaited<ReturnType<typeof getChatGPTUser>>>;
@@ -14,6 +14,7 @@ function sameOrigin(req:Request){if(req.method!=='GET'&&req.method!=='HEAD'){con
 function companyHeaders():Record<string,string>{const c=currentCompanyContext();return c?{'X-Company-Id':c.companyId,'X-Company-Context-Version':String(c.contextVersion)}:{};}
 export const response=(data:unknown,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"private, no-store","X-Content-Type-Options":"nosniff",...companyHeaders()}});
 export function currentCompanyContext():Readonly<CompanyContext>|null{return requests.getStore()?.scope?.context??null;}
+export function companyOnboardingEnabled():boolean{return saasOnboardingEnabled(env as unknown as Record<string,unknown>);}
 function selectors(req?:Request){
  if(!req)return{};const p=new URL(req.url).searchParams;
  if(p.getAll('companyId').length>1||p.getAll('companyContextVersion').length>1)throw denied('COMPANY_CONTEXT_INVALID',400);
@@ -25,6 +26,7 @@ function selectors(req?:Request){
 }
 async function actionFor(req?:Request):Promise<CompanyAction>{
  if(!req)return'read';const path=new URL(req.url).pathname;
+ if(/^\/api\/companies\/[^/]+\/bank\//.test(path)&&(req.method!=='GET'&&req.method!=='HEAD'||/\/(?:open-payments\/banks|authorizations\/[^/]+\/redirect)$/.test(path)))return'manage_integrations';
  if(/\/api\/bank\/(?:config|connect|callback|disconnect|accounts|automatic|auto-sync|sync|details|account-evidence)$/.test(path)||/\/api\/gmail\/(?:connect|callback|disconnect|automation|trust|sync)$/.test(path)||/\/api\/bankgiro\/(?:source\/run|invoice-search)$/.test(path)||req.method==='POST'&&/^\/api\/payment-control\/(?:run|advance)$/.test(path))return'manage_integrations';
  if(path==='/api/state'&&req.method==='POST'){
   const body=await req.clone().json().catch(()=>null) as {command?:{type?:string}}|null;if(body?.command?.type==='settings.save')return Object.hasOwn(body.command,'invoiceReferencePolicies')?'manage_reference_policy':'manage_company';
@@ -53,23 +55,32 @@ async function resolveRequestScope(holder?:RequestCompany):Promise<CompanyScope>
   return resolveWorkerScope(rawDatabase(),owners.results[0].owner,runner,await digest(secret));
  }
  const user=await getChatGPTUser();if(!user)throw Error('AUTH_REQUIRED');if(holder)holder.user=user;
- let selection=selectors(req),flowMembershipVersion:number|null=null;
+ let selection=selectors(req),flowMembershipVersion:number|null=null,flowCompanyVersion:number|null=null;
  // Provider redirects cannot attach browser headers. Their retained one-use
  // flow carries the initiating actor and context version; switching invalidates it.
- if(req&&/\/api\/(?:bank\/callback|gmail\/callback)$/.test(path)){
+ const providerRedirect=/^\/api\/companies\/([^/]+)\/bank\/authorizations\/([^/]+)\/redirect$/.exec(path);
+ if(req&&(/\/api\/(?:bank\/callback|gmail\/callback)$/.test(path)||providerRedirect)){
   const state=new URL(req.url).searchParams.get('state');
-  if(state){const table=path.includes('/bank/')?'bank_auth_flows':'gmail_flows';
-   const flow=await rawDatabase().prepare(`SELECT company_id,company_actor_id,company_context_version,company_membership_version FROM ${table} WHERE state_hash=?`).bind(await oauthDigest(state)).first<{company_id:string|null;company_actor_id:string|null;company_context_version:number|null;company_membership_version:number|null}>();
+  if(state||providerRedirect){const table=path.includes('/bank/')?'bank_auth_flows':'gmail_flows',fields='company_id,company_actor_id,company_context_version,company_membership_version,company_version';
+   let flows:{results:{company_id:string|null;company_actor_id:string|null;company_context_version:number|null;company_membership_version:number|null;company_version:number|null}[]};
+   if(providerRedirect){
+    let companyId,flowId;try{companyId=decodeURIComponent(providerRedirect[1]);flowId=decodeURIComponent(providerRedirect[2]);}catch{throw denied('COMPANY_CONTEXT_INVALID',400);}
+    if(!companyId||!flowId||/[\x00-\x20/\\]/.test(companyId+flowId))throw denied('COMPANY_CONTEXT_INVALID',400);
+    flows=await rawDatabase().prepare(`SELECT ${fields} FROM bank_auth_flows WHERE company_id=? AND provider_kind='open_payments' AND provider_flow_id=? LIMIT 2`).bind(companyId,flowId).all();
+   }else if(table==='bank_auth_flows')flows=await rawDatabase().prepare(`SELECT ${fields} FROM bank_auth_flows WHERE (provider_kind='enable_banking' AND state_hash=?) OR (provider_kind='open_payments' AND state_hash=?) LIMIT 2`).bind(await oauthDigest(state!),await digest(state!)).all();
+   else flows=await rawDatabase().prepare(`SELECT ${fields} FROM gmail_flows WHERE state_hash=? LIMIT 2`).bind(await oauthDigest(state!)).all();
+   if(flows.results.length>1)throw denied('COMPANY_CONTEXT_STALE',409);const flow=flows.results[0];
    if(flow?.company_id){
     if(flow.company_actor_id!==user.userId)throw denied('COMPANY_FORBIDDEN');
-    if(!Number.isSafeInteger(flow.company_membership_version)||!flow.company_membership_version)throw denied('COMPANY_CONTEXT_STALE',409);
+    if(!Number.isSafeInteger(flow.company_membership_version)||!flow.company_membership_version||!Number.isSafeInteger(flow.company_version)||!flow.company_version)throw denied('COMPANY_CONTEXT_STALE',409);
     if(selection.companyId!==undefined&&(selection.companyId!==flow.company_id||selection.contextVersion!==flow.company_context_version))throw denied('COMPANY_CONTEXT_STALE',409);
-    selection={companyId:flow.company_id,contextVersion:flow.company_context_version??undefined};flowMembershipVersion=flow.company_membership_version;
-   }else if(selection.companyId!==undefined)throw denied('COMPANY_CONTEXT_STALE',409);
+    selection={companyId:flow.company_id,contextVersion:flow.company_context_version??undefined};flowMembershipVersion=flow.company_membership_version;flowCompanyVersion=flow.company_version;
+   }else if(selection.companyId!==undefined||providerRedirect)throw denied('COMPANY_CONTEXT_STALE',409);
   }
  }
  const scope=await resolveCompanyScope(rawDatabase(),user.userId,{...selection,action:await actionFor(req)});
  if(flowMembershipVersion!==null&&flowMembershipVersion!==scope.context?.membershipVersion)throw denied('COMPANY_CONTEXT_STALE',409);
+ if(flowCompanyVersion!==null&&flowCompanyVersion!==scope.context?.companyVersion)throw denied('COMPANY_CONTEXT_STALE',409);
  return scope;
 }
 async function requestScope(holder=requests.getStore()){
@@ -113,7 +124,8 @@ export async function companyWorkerConfigured(owner:string,runner='cloud'){
 export async function withCompanyOwner<T>(owner:string,action:CompanyAction,fn:()=>Promise<T>){const scope=await requestScope();if(scope.owner!==owner)throw denied('COMPANY_BOUNDARY_MISMATCH');await assertScopeCurrent(rawDatabase(),scope,action);return fn();}
 export async function companyCatalogueAction(req:Request,action:'list'|'active'|'create'|'membership'){
  const user=await getChatGPTUser();if(!user)throw Error('AUTH_REQUIRED');sameOrigin(req);const holder=requests.getStore();if(holder)holder.catalogue=true;
- if(action==='list')return response(await companyDirectory(rawDatabase(),user.userId));
+ if(action==='list')return response({...await companyDirectory(rawDatabase(),user.userId),canCreate:companyOnboardingEnabled()});
+ if(action==='create'&&!companyOnboardingEnabled())return response({error:'Registrering av nya företag är ännu inte aktiverad.',code:'SAAS_ONBOARDING_DISABLED'},503);
  const raw=await req.text();if(raw.length>10000)throw denied('COMPANY_REQUEST_TOO_LARGE',413);const body=JSON.parse(raw);
  if(action==='active'){if(Object.keys(body).some(k=>!['companyId','contextVersion'].includes(k)))throw denied('COMPANY_CONTEXT_INVALID',400);return response({context:await selectCompany(rawDatabase(),user.userId,body.companyId,body.contextVersion)});}
  if(action==='create'){

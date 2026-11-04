@@ -125,7 +125,31 @@ function companyIntegrity(db,tables,{expectedCompanyId}={}){
  }
  return {companyId:row.company_id,companyBoundaryVersion:1};
 }
-function integrity(file,options){const db=new DatabaseSync(file,{readOnly:true});try{const checks=db.prepare('PRAGMA integrity_check').all();if(checks.length!==1||Object.values(checks[0])[0]!=='ok')throw Error('Databasens integritetskontroll misslyckades.');if(db.prepare('PRAGMA foreign_key_check').all().length)throw Object.assign(Error('Backupen innehåller brutna registerreferenser.'),{code:'backup_foreign_key_violation'});const tables=db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();if(!tables.some(t=>t.name==='invoices')||!tables.some(t=>t.name==='bank_transactions'))throw Error('Backupen saknar MG:s register.');const company=companyIntegrity(db,tables,options);originalIntegrity(db,tables);originalReferenceIntegrity(db,tables);return{tables:tables.length,...company};}finally{db.close();}}
+function providerClaimIntegrity(db,tables){
+ const names=new Set(tables.map(table=>table.name));
+ const connections=names.has('bank_provider_connections')?db.prepare('SELECT * FROM bank_provider_connections').all():[];
+ const claims=names.has('bank_provider_grant_claims')?db.prepare('SELECT * FROM bank_provider_grant_claims').all():[];
+ if(!connections.length&&!claims.length)return;
+ // Whole-database snapshots retain opaque handles automatically. Their grant
+ // ownership must still agree with the verified physical company boundary.
+ const boundary=names.has('company_database_boundary')?db.prepare('SELECT company_id,storage_owner,boundary_version FROM company_database_boundary WHERE id=1').get():null;
+ if(!boundary)throw Object.assign(Error('Backupen tillhör inte det verifierade målföretaget.'),{code:'backup_company_mismatch'});
+ const invalid=()=>{throw Object.assign(Error('Backupens bankmedgivanden saknar giltig företagsbindning.'),{code:'backup_provider_claim_invalid'});};
+ const fingerprint=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+ const retained=new Map(),current=new Set(),history=new Map();
+ for(const row of connections){
+  if(typeof row.id!=='string'||!row.id||retained.has(row.id)||row.owner!==boundary.storage_owner||row.company_id!==boundary.company_id||row.provider_kind!=='open_payments'||!['SANDBOX','PRODUCTION'].includes(row.environment)||typeof row.encrypted_state!=='string'||!row.encrypted_state||typeof row.grant_fingerprint!=='string'||row.grant_fingerprint!==''&&!fingerprint(row.grant_fingerprint))invalid();
+  retained.set(row.id,row);
+  if(row.grant_fingerprint){if(current.has(row.grant_fingerprint))invalid();current.add(row.grant_fingerprint);}
+ }
+ for(const row of claims){
+  const connection=retained.get(row.connection_id);
+  if(!fingerprint(row.fingerprint)||history.has(row.fingerprint)||!connection||row.owner!==boundary.storage_owner||row.company_id!==boundary.company_id||row.company_id!==connection.company_id||row.provider_kind!==connection.provider_kind||row.environment!==connection.environment)invalid();
+  history.set(row.fingerprint,row);
+ }
+ for(const row of connections)if(row.grant_fingerprint&&history.get(row.grant_fingerprint)?.connection_id!==row.id)invalid();
+}
+function integrity(file,options){const db=new DatabaseSync(file,{readOnly:true});try{const checks=db.prepare('PRAGMA integrity_check').all();if(checks.length!==1||Object.values(checks[0])[0]!=='ok')throw Error('Databasens integritetskontroll misslyckades.');if(db.prepare('PRAGMA foreign_key_check').all().length)throw Object.assign(Error('Backupen innehåller brutna registerreferenser.'),{code:'backup_foreign_key_violation'});const tables=db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();if(!tables.some(t=>t.name==='invoices')||!tables.some(t=>t.name==='bank_transactions'))throw Error('Backupen saknar MG:s register.');const company=companyIntegrity(db,tables,options);providerClaimIntegrity(db,tables);originalIntegrity(db,tables);originalReferenceIntegrity(db,tables);return{tables:tables.length,...company};}finally{db.close();}}
 function unpack(archive,encryptionKey){const bytes=readFileSync(archive);if(bytes.length<36||!bytes.subarray(0,8).equals(header))throw Error('Okänt backupformat.');const decipher=createDecipheriv('aes-256-gcm',key(encryptionKey),bytes.subarray(8,20));decipher.setAAD(header);decipher.setAuthTag(bytes.subarray(20,36));return Buffer.concat([decipher.update(bytes.subarray(36)),decipher.final()]);}
 function inspect(content,options){const folder=mkdtempSync(join(tmpdir(),'mg-backup-check-'));try{const file=join(folder,'restored.sqlite');writeFileSync(file,content,{mode:0o600});return integrity(file,options);}finally{rmSync(folder,{recursive:true,force:true});}}
 

@@ -6,6 +6,8 @@ export const COMPANY_BOUNDARY_VERSION='company-data-boundary-v1';
 export const COMPANY_REFERENCE_POLICY_VERSION='company-reference-policy-v1';
 export const COMPANY_ROLES=Object.freeze(['owner','admin','accountant','viewer']);
 export const COMPANY_ACTIONS=Object.freeze(['read','write','manage_integrations','manage_members','manage_company','manage_reference_policy','restore']);
+/** Server configuration only. Truthy values and client input never activate SaaS. */
+export const saasOnboardingEnabled=settings=>settings?.MG_SAAS_ONBOARDING_ENABLED==='true';
 
 const grants=Object.freeze({
   owner:COMPANY_ACTIONS,

@@ -13,6 +13,9 @@ const OMITTED_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks'
 // Authorization is reconstructed only by separately verified administration.
 // Evidence restoration must not reactivate a user, worker grant or tenant.
 const CONTROL_TABLES=['companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard'];
+// These live admission gates alone need a temporary exception inside the new
+// in-memory evidence database. No catalogue or authorization rows are invented.
+const PROVIDER_ADMISSION_TRIGGERS={company_provider_bank_provider_connections_insert:'bank_provider_connections',company_provider_bank_provider_grant_claims_insert:'bank_provider_grant_claims'};
 const fail=code=>{throw Error('backup_recovery_'+code);};
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const quote=value=>'"'+value.replaceAll('"','""')+'"';
@@ -105,7 +108,16 @@ function diskSource(reference){
 // Exact pre-0018 rows remain authenticated historical evidence. New authority
 // fields default to unknown; restoring evidence never activates a live source.
 const readinessDefaults={bankgiro_ingest_sources:{revoked_generations:'[]',registration_revision:0,registration_binding:null,authorization_verified_at:null,authorization_valid_until:null,last_success_at:null,last_failure_at:null,last_failure_code:null},bankgiro_ingest_jobs:{registration_binding:''}};
-function historicalRow(table,row){const defaults=readinessDefaults[table];return defaults&&Object.keys(defaults).every(key=>!Object.hasOwn(row,key))?{...row,...defaults}:row;}
+function historicalRow(table,row){
+ const defaults=readinessDefaults[table];
+ if(defaults&&Object.keys(defaults).every(key=>!Object.hasOwn(row,key)))return {...row,...defaults};
+ // Exact additive schema generations only: pre-consent rows precede the
+ // session ownership column. A partially missing current row still fails.
+ if(table==='bank_connections'&&!Object.hasOwn(row,'session_fingerprint'))return {...row,...(!Object.hasOwn(row,'consent_metadata')?{consent_metadata:''}:{}),session_fingerprint:''};
+ return row;
+}
+const triggerDefinitions=database=>database.prepare("SELECT name,tbl_name,sql FROM sqlite_schema WHERE type='trigger' ORDER BY name").all();
+function checkTriggers(database,expected){if(JSON.stringify(triggerDefinitions(database))!==JSON.stringify(expected))fail('schema_invalid');}
 function checkDatabase(database,snapshot,prefix=''){
  if(database.prepare('PRAGMA integrity_check').get().integrity_check!=='ok'||database.prepare('PRAGMA foreign_key_check').all().length)fail('database_invalid');
  for(const table of snapshot.tables){
@@ -114,6 +126,7 @@ function checkDatabase(database,snapshot,prefix=''){
   const canonical=rows=>rows.map(row=>JSON.stringify(fields.map(field=>row[field]))).sort();
   if(JSON.stringify(canonical(actual))!==JSON.stringify(canonical(table.rows.map(row=>historicalRow(table.name,row)))))fail('database_mismatch');
  }
+ for(const name of [...CONTROL_TABLES,...OMITTED_TABLES])if(database.prepare('SELECT count(*) n FROM '+quote(prefix+name)).get().n!==0)fail('database_invalid');
 }
 function evidenceDatabase(snapshot){
  const database=new DatabaseSync(':memory:');
@@ -125,7 +138,16 @@ function evidenceDatabase(snapshot){
   const tables=database.prepare("SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all().map(row=>row.name);
   const expected=[...BACKUP_TABLES,...OMITTED_TABLES,...CONTROL_TABLES].sort();
   if(JSON.stringify(tables)!==JSON.stringify(expected))fail('schema_invalid');
+  // Migrations seed role vocabulary, not evidence. Keep all control tables
+  // empty so this artifact contains no reconstructed authorization catalogue.
+  database.exec('DELETE FROM company_roles');
+  const triggers=triggerDefinitions(database),admission=Object.entries(PROVIDER_ADMISSION_TRIGGERS).map(([name,table])=>{
+   const trigger=triggers.find(row=>row.name===name);
+   if(!trigger||trigger.tbl_name!==table||typeof trigger.sql!=='string')fail('schema_invalid');
+   return trigger;
+  });
   database.exec('BEGIN');
+  for(const trigger of admission)database.exec('DROP TRIGGER '+quote(trigger.name));
   for(const table of snapshot.tables){
    if(!BACKUP_TABLES.includes(table.name))fail('schema_invalid');
    const columns=database.prepare('PRAGMA table_info('+quote(table.name)+')').all(),names=columns.map(column=>column.name);
@@ -143,6 +165,8 @@ function evidenceDatabase(snapshot){
     insert.run(...names.map(name=>row[name]));
    }
   }
+  for(const trigger of admission)database.exec(trigger.sql);
+  checkTriggers(database,triggers);
   database.exec('COMMIT');checkDatabase(database,snapshot);
   // Keep exact authenticated rows, including encrypted integration records.
   // Missing application table names prevent this database being used live.
@@ -191,7 +215,7 @@ export async function restoreBackupIsolated({bundleDirectory,outputParent,key,ex
   const guard=()=>{checkOutput();unchangedDirectory(originalsIdentity,true);unchangedDirectory(sourceIdentity,true);};
   const databasePath=join(output,'evidence.sqlite');guard();database.prepare('VACUUM INTO ?').run(databasePath);chmodSync(databasePath,0o600);guard();
   const file=openSync(databasePath,'r+');try{fsyncSync(file);}finally{closeSync(file);}
-  const readback=new DatabaseSync(databasePath,{readOnly:true});try{checkDatabase(readback,verified.snapshot,'evidence_');}finally{readback.close();}
+  const readback=new DatabaseSync(databasePath,{readOnly:true});try{checkDatabase(readback,verified.snapshot,'evidence_');checkTriggers(readback,triggerDefinitions(database));}finally{readback.close();}
   for(const document of verified.snapshot.tables.find(table=>table.name==='documents').rows){
    writePrivate(join(output,'originals',document.id+'.bin'),await verified.readOriginal(document.id),guard);
   }

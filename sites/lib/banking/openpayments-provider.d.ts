@@ -79,11 +79,13 @@ export interface OpenPaymentsConnection extends BankDataConnection {
   getAuthorisationStatus(handle: string): Promise<{ scaStatus: OpenPaymentsScaStatus; challengeData: Record<string, unknown>; consentValid: false }>;
   completeRedirect(handle: string, callback: { code: string; scope: string; state: string }): Promise<{ status: OpenPaymentsConsentStatus; original: OpenPaymentsOriginal }>;
   listAccounts(consentHandle: string): Promise<{ accounts: OpenPaymentsAccount[]; original: OpenPaymentsOriginal }>;
-  getAccount(accountHandle: string): Promise<{ identity: OpenPaymentsAccountIdentity; bankgiroMappingVerified: false; original: OpenPaymentsOriginal }>;
+  getAccount(accountHandle: string): Promise<{ identity: OpenPaymentsAccountIdentity; effectiveConsentValidUntil: string; bankgiroMappingVerified: false; original: OpenPaymentsOriginal }>;
   getTransactions(accountHandle: string, input: { dateFrom: string; dateTo: string; requireBankgiro?: boolean }): Promise<{
     booked: Record<string, unknown>[];
     bankgiro: Record<string, unknown>[];
     originals: OpenPaymentsOriginal[];
+    /** Private authorization deadline: minimum retained and bank-shortened consent. */
+    effectiveConsentValidUntil: string;
     bankgiroEvidence: { status: 'not_requested' | 'returned_by_provider' | 'not_returned'; completeness: 'unknown' };
     paymentReconciliationAllowed: false;
   }>;
@@ -91,5 +93,6 @@ export interface OpenPaymentsConnection extends BankDataConnection {
 export class OpenPaymentsProvider implements BankDataProvider {
   readonly id: 'open_payments';
   constructor(configuration: OpenPaymentsConfig, options?: OpenPaymentsOptions);
+  discoverBanks(countries: string[], dependencies: { assertCurrent(): void | Promise<void>; environment?: ProviderEnvironment; generation?: string }): Promise<{ banks: { id: string; name: string }[] }>;
   forCompany(context: ProviderContext, dependencies: ProviderConnectionDependencies): OpenPaymentsConnection;
 }

@@ -1,8 +1,12 @@
 import {assertCompanyContext,assertCompanyPermission,companyDataBoundary,COMPANY_ROLES} from './company-contract.js';
+export {saasOnboardingEnabled} from './company-contract.js';
 
 // Every financial/automation table with an owner column. A migration regression
 // compares this manifest with the actual SQLite schema and its write triggers.
-export const ownerTables=Object.freeze(['audit_events','backup_runs','bank_applications','bank_auth_flows','bank_connections','bank_locks','bank_sync_runs','bankgiro_ingest_jobs','bankgiro_ingest_leases','bankgiro_ingest_sources','customer_contacts','customer_deliveries','customer_messages','customer_reviews','document_automation','document_extractions','document_jobs','document_registrations','documents','gmail_connections','gmail_flows','gmail_locks','gmail_runs','gmail_sources','invoice_counterparties','payment_control_requests','payment_control_runs','reconciliation_findings','workspaces']);
+export const ownerTables=Object.freeze(['audit_events','backup_runs','bank_applications','bank_auth_flows','bank_connections','bank_locks','bank_provider_connections','bank_provider_grant_claims','bank_sync_runs','bankgiro_ingest_jobs','bankgiro_ingest_leases','bankgiro_ingest_sources','customer_contacts','customer_deliveries','customer_messages','customer_reviews','document_automation','document_extractions','document_jobs','document_registrations','documents','gmail_connections','gmail_flows','gmail_locks','gmail_runs','gmail_sources','invoice_counterparties','payment_control_requests','payment_control_runs','reconciliation_findings','workspaces']);
+// Reviewed business columns are not catalogue tables. Operational company_*
+// tables must also enter the owner manifest before any business SQL can use them.
+const companyColumns=new Set(['company_id','company_actor_id','company_context_version','company_membership_version','company_version']);
 const statements=new WeakMap();
 const id=value=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9:@._-]{0,199}$/.test(value)&&value!=='.'&&value!=='..';
 const fail=(code,status=403)=>{throw Object.assign(Error(code),{code,status});};
@@ -216,7 +220,8 @@ function sqlShape(query){
  const shape=uncommented.replace(/'(?:''|[^'])*'/g,"''").replace(/[`"\[\]]/g,'');
  // REPLACE implicitly deletes conflicting rows without normal DELETE triggers.
  // Only explicit INSERT/UPSERT is supported, including for legacy namespaces.
- if(!/^\s*(SELECT|WITH|INSERT|UPDATE|DELETE)\b/i.test(shape)||/;\s*\S|\b(?:PRAGMA|ATTACH|DETACH|CREATE|DROP|ALTER|REPLACE|VACUUM|sqlite_master|sqlite_schema|companies|company_[a-z_]+)\b|\b(?:main|temp)\s*\./i.test(shape))fail('COMPANY_SQL_DENIED');
+ if(!/^\s*(SELECT|WITH|INSERT|UPDATE|DELETE)\b/i.test(shape)||/;\s*\S|\b(?:PRAGMA|ATTACH|DETACH|CREATE|DROP|ALTER|REPLACE|VACUUM|sqlite_master|sqlite_schema|companies)\b|\b(?:main|temp)\s*\./i.test(shape))fail('COMPANY_SQL_DENIED');
+ for(const match of shape.matchAll(/\bcompany_[a-z_]+\b/gi)){const name=match[0].toLowerCase();if(!companyColumns.has(name)&&!ownerTables.includes(name))fail('COMPANY_SQL_DENIED');}
  return shape;
 }
 function scopedStatement(database,entry,scope){

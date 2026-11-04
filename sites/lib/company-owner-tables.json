@@ -5,6 +5,8 @@
   "bank_auth_flows",
   "bank_connections",
   "bank_locks",
+  "bank_provider_connections",
+  "bank_provider_grant_claims",
   "bank_sync_runs",
   "bankgiro_ingest_jobs",
   "bankgiro_ingest_leases",

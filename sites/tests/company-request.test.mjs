@@ -11,7 +11,7 @@ const url=path=>new URL(path,import.meta.url).href;
 function compile(path,imports){let code=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [from,to]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+from+quote,JSON.stringify(to));return data(code);}
 async function fixture(t){
  const f=companyFixture(t),key='__company_request_'+crypto.randomUUID().replaceAll('-','');globalThis[key]=f;t.after(()=>delete globalThis[key]);f.user={userId:'actor-a',email:'synthetic@example.test',displayName:'Synthetic'};f.objects=new Map();f.reads=[];
- f.env={DB:f.raw,BUCKET:{async get(key){f.reads.push(key);if(f.onObjectRead)await f.onObjectRead(key);const bytes=f.objects.get(key);return bytes?{body:bytes,size:bytes.length,arrayBuffer:async()=>Uint8Array.from(bytes).buffer}:null;}}};
+ f.env={MG_SAAS_ONBOARDING_ENABLED:'true',DB:f.raw,BUCKET:{async get(key){f.reads.push(key);if(f.onObjectRead)await f.onObjectRead(key);const bytes=f.objects.get(key);return bytes?{body:bytes,size:bytes.length,arrayBuffer:async()=>Uint8Array.from(bytes).buffer}:null;}}};
  const ref=`globalThis[${JSON.stringify(key)}]`,environment=data(`export const env=${ref}.env;`),domain=url('../lib/domain.ts');
  const server=compile('../lib/server.ts',{'cloudflare:workers':environment,'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return ${ref}.user;}`),'./domain':domain,'./company-storage.js':url('../lib/company-storage.js')});
  f.moduleUrls={server,environment,domain,ref};
@@ -86,10 +86,34 @@ test('OAuth flows cannot survive a changed membership even when the same company
  await changeCompanyMembership(f.raw,f.a,{actorId:'admin',role:'owner',status:'active'});f.user.userId='admin';
  const handler=f.wrap(async()=>f.server.response(await f.server.identity()));assert.equal((await handler(f.request('/api/gmail/callback?state='+state,{companyId:null}))).status,409);assert.equal((await handler(f.request('/api/gmail/callback?state='+state))).status,409);
 });
+
+for(const bank of [false,true])test('company generation change invalidates retained '+(bank?'bank':'Gmail')+' callback before dispatch',async t=>{
+ const f=await fixture(t);await f.seed();const state='company-generation-'+(bank?'bank':'gmail'),hash=createHash('sha256').update(state).digest('base64url');
+ if(bank)await f.database(f.a).prepare("INSERT INTO bank_auth_flows(state_hash,owner,cookie_hash,app_generation,bank_name,country,environment,redirect_uri,date_from,expires_at,status,created_at) VALUES(?,?,?,'application','Synthetic bank','SE','SANDBOX','https://synthetic.test/api/bank/callback','2026-11-01','2099-01-01','pending','2026-11-04')").bind(hash,f.a.owner,'cookie').run();
+ else await f.database(f.a).prepare('INSERT INTO gmail_flows(state_hash,owner,cookie_hash,expires_at) VALUES(?,?,?,?)').bind(hash,f.a.owner,'cookie','2099-01-01').run();
+ let dispatched=0;const handler=f.wrap(async()=>{await f.server.identity();dispatched++;return f.server.response({ok:true});}),path='/api/'+(bank?'bank':'gmail')+'/callback?state='+state;
+ assert.equal((await handler(f.request(path,{companyId:null}))).status,200);assert.equal(dispatched,1);
+ f.sql.prepare("UPDATE companies SET status='suspended',company_version=company_version+1 WHERE id='company-a'").run();
+ f.sql.prepare("UPDATE companies SET status='active',company_version=company_version+1 WHERE id='company-a'").run();
+ const result=await handler(f.request(path,{companyId:null}));assert.equal(result.status,409);assert.equal(dispatched,1);
+});
 test('company directory and active endpoint authorize membership without client storageOwner',async t=>{
  const f=await fixture(t);await f.seed();await changeCompanyMembership(f.raw,f.a,{actorId:'viewer',role:'viewer',status:'active'});f.user.userId='viewer';const listed=await f.list(f.request('/api/companies',{companyId:null})),directory=await listed.json();assert.equal(directory.context.role,'viewer');assert.equal(directory.context.companyId,'company-a');
  const forged=await f.active(f.request('/api/companies/active',{companyId:null,method:'POST',body:{companyId:'company-b',contextVersion:1}}));assert.equal(forged.status,403);
  const extra=await f.active(f.request('/api/companies/active',{companyId:null,method:'POST',body:{companyId:'company-a',contextVersion:1,storageOwner:f.b.owner}}));assert.equal(extra.status,400);
+});
+
+for(const flag of [undefined,'false','TRUE',true])test('server activation gate rejects company creation for '+String(flag),async t=>{
+ const f=await fixture(t);if(flag===undefined)delete f.env.MG_SAAS_ONBOARDING_ENABLED;else f.env.MG_SAAS_ONBOARDING_ENABLED=flag;
+ const result=await f.create(f.request('/api/companies',{companyId:null,method:'POST',body:{name:'Synthetic empty company',confirmEmptyCompany:true}}));
+ assert.equal(result.status,503);assert.equal(f.sql.prepare('SELECT count(*) n FROM companies').get().n,0);
+});
+test('explicit server activation permits empty-workspace creation without certifying bank authority',async t=>{
+ const f=await fixture(t);f.env.MG_SAAS_ONBOARDING_ENABLED='true';
+ const result=await f.create(f.request('/api/companies',{companyId:null,method:'POST',body:{name:'Synthetic empty company',confirmEmptyCompany:true}}));
+ assert.equal(result.status,201);const row=f.sql.prepare('SELECT * FROM companies').get();
+ assert.equal(f.sql.prepare('SELECT count(*) n FROM bank_connections').get().n,0);assert.equal(f.sql.prepare('SELECT count(*) n FROM bank_provider_connections').get().n,0);
+ assert.deepEqual(JSON.parse(f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(row.storage_owner).payload).company.invoiceReferencePolicies,[]);
 });
 test('a private worker needs an explicit credential-bound company grant and cannot choose another tenant',async t=>{
  const f=await fixture(t);await f.seed();const token='s'.repeat(43);f.env.DOCUMENT_CLOUD_WORKER_TOKEN=token;f.env.DOCUMENT_CLOUD_OCR_ENABLED='true';f.env.DOCUMENT_OWNER_EMAIL='worker@example.test';

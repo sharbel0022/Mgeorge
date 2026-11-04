@@ -5,12 +5,13 @@ type Database={prepare:(sql:string)=>any;batch:(statements:any[])=>Promise<any[]
 type Bucket={get:(key:string)=>Promise<any>;put:(key:string,value:Uint8Array,options?:any)=>Promise<any>};
 type Row=Record<string,any>;
 const LEGACY_BACKUP_TABLES=['workspaces','audit_events','documents','bank_applications','bank_connections','bank_sync_runs','gmail_connections','customer_contacts','customer_messages','reconciliation_findings','customer_deliveries','gmail_sources','gmail_runs','document_automation','document_jobs','document_extractions','invoice_counterparties','document_registrations','payment_control_runs','payment_control_requests'];
-export const BACKUP_TABLES=[...LEGACY_BACKUP_TABLES,'bankgiro_ingest_sources','bankgiro_ingest_jobs'];
+const BANKGIRO_BACKUP_TABLES=[...LEGACY_BACKUP_TABLES,'bankgiro_ingest_sources','bankgiro_ingest_jobs'];
+export const BACKUP_TABLES=[...BANKGIRO_BACKUP_TABLES,'bank_provider_connections','bank_provider_grant_claims'];
 /** Exact historical schema sets only. Never fill a partially missing snapshot
  * with invented empty tables; old authenticated snapshots keep their own census. */
 export function backupTableSet(names:unknown):string[]{
  if(!Array.isArray(names)||new Set(names).size!==names.length)throw Error('backup_snapshot_invalid');
- const supported=[LEGACY_BACKUP_TABLES,BACKUP_TABLES].find(set=>set.length===names.length&&names.every(name=>typeof name==='string'&&set.includes(name)));
+ const supported=[LEGACY_BACKUP_TABLES,BANKGIRO_BACKUP_TABLES,BACKUP_TABLES].find(set=>set.length===names.length&&names.every(name=>typeof name==='string'&&set.includes(name)));
  if(!supported)throw Error('backup_snapshot_invalid');return supported;
 }
 const encoder=new TextEncoder(),magic=encoder.encode('MGBK0001');
@@ -105,6 +106,29 @@ function snapshotDocumentReferences(tables:{name:string;rows:Row[]}[],files:Map<
   if(row.action==='automatic.reconciliation')for(const decision of list(detail?.decisions))if(decision?.kind==='specification_linked')requiredReference(decision.document_id,decision.document_hash);
  }
 }
+function snapshotProviderClaims(tables:{name:string;rows:Row[]}[],owner:string,companyBoundary?:CompanyDataBoundary){
+ const connections=tables.find(table=>table.name==='bank_provider_connections')?.rows||[];
+ const claims=tables.find(table=>table.name==='bank_provider_grant_claims')?.rows||[];
+ if(!connections.length&&!claims.length)return;
+ // Provider handles are opaque ciphertext, not ownership proof. A retained
+ // claim must join the authenticated snapshot's namespace and connection.
+ const boundary=assertCompanyBoundary(companyBoundary);
+ if(boundary.storageOwner!==owner)throw Error('backup_company_boundary_mismatch');
+ const invalid=()=>{throw Error('backup_provider_claim_invalid');};
+ const fingerprint=(value:unknown)=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+ const retained=new Map<string,Row>(),current=new Set<string>(),history=new Map<string,Row>();
+ for(const row of connections){
+  if(typeof row.id!=='string'||!row.id||retained.has(row.id)||row.owner!==owner||row.company_id!==boundary.companyId||row.provider_kind!=='open_payments'||!['SANDBOX','PRODUCTION'].includes(row.environment)||typeof row.encrypted_state!=='string'||!row.encrypted_state||typeof row.grant_fingerprint!=='string'||row.grant_fingerprint!==''&&!fingerprint(row.grant_fingerprint))invalid();
+  retained.set(row.id,row);
+  if(row.grant_fingerprint){if(current.has(row.grant_fingerprint))invalid();current.add(row.grant_fingerprint);}
+ }
+ for(const row of claims){
+  const connection=retained.get(row.connection_id);
+  if(!fingerprint(row.fingerprint)||history.has(row.fingerprint)||!connection||row.owner!==owner||row.company_id!==boundary.companyId||row.company_id!==connection.company_id||row.provider_kind!==connection.provider_kind||row.environment!==connection.environment)invalid();
+  history.set(row.fingerprint,row);
+ }
+ for(const row of connections)if(row.grant_fingerprint&&history.get(row.grant_fingerprint)?.connection_id!==row.id)invalid();
+}
 export function validateSnapshot(value:any,owner:string,expectedCompanyBoundary?:CompanyDataBoundary){
  if(value?.format!=='MG-Sites-backup-1'||value.owner!==owner||!Array.isArray(value.tables))throw Error('backup_snapshot_invalid');
  if(expectedCompanyBoundary!==undefined||value.companyBoundary!==undefined){
@@ -119,6 +143,7 @@ export function validateSnapshot(value:any,owner:string,expectedCompanyBoundary?
  const files=value.tables.find((t:Row)=>t.name==='documents').rows;
  if(files.some((f:Row)=>!/^[a-f0-9-]{36}$/i.test(f.id)||!Number.isSafeInteger(f.size)||f.size<0||f.size>15_000_000||!/^[a-f0-9]{64}$/i.test(f.sha256))||new Set(files.map((f:Row)=>f.id)).size!==files.length)throw Error('backup_document_invalid');
  snapshotDocumentReferences(value.tables,new Map(files.map((f:Row)=>[f.id,f])));
+ snapshotProviderClaims(value.tables,owner,value.companyBoundary);
  const apiEvidence=snapshotApiEvidence(value.tables);
  if(value.apiEvidence!==undefined&&(!validApiEvidence(value.apiEvidence)||value.apiEvidence.records_checked!==apiEvidence.records_checked||value.apiEvidence.records_without_receipt!==apiEvidence.records_without_receipt))throw Error('backup_api_evidence_invalid');
  return {...value,apiEvidence} as {format:string;owner:string;createdAt:string;companyBoundary?:CompanyDataBoundary;apiEvidence:ApiEvidence;tables:{name:string;rows:Row[]}[]};

@@ -4,7 +4,13 @@ import {randomUUID} from 'node:crypto';
 import {readFileSync,mkdirSync,existsSync,realpathSync,lstatSync} from 'node:fs';
 import {dirname,join,resolve} from 'node:path';
 import {openDatabase,defaultSettings} from './db.js';
+import {decryptObject} from './security.js';
 import {assertCompanyContext,hasCompanyPermission,COMPANY_CONTEXT_VERSION} from '../sites/lib/company-contract.js';
+
+// Server adapters may read the already authenticated runtime scope without an
+// import of server.js. AsyncLocalStorage keeps concurrent requests/jobs apart.
+const currentExecution=new AsyncLocalStorage();
+export function currentCompanyContext(){return currentExecution.getStore()?.context??null;}
 
 const fail=(code,status=403)=>Object.assign(new Error(code),{code,status});
 const identity=value=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9:@._-]{0,199}$/.test(value)&&value!=='.'&&value!=='..';
@@ -65,7 +71,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   // A first active company would replace this principal's legacy view. Retain
   // that view until an operator explicitly verifies and binds its existing
   // business records, originals, consent and import history to a company.
-  const retainedTables=['invoices','bank_transactions','allocations','documents','document_sources','bank_connections','bank_states','gmail_connections','gmail_states','gmail_rejected_sources','mail_candidates','import_jobs','verified_contacts','payer_links','reconciliation_findings','customer_messages','message_reviews','message_approvals','message_deliveries','bank_specification_links','bankgiro_ingest_sources','bankgiro_ingest_jobs','audit_events'];
+  const retainedTables=['invoices','bank_transactions','allocations','documents','document_sources','bank_connections','bank_states','bank_provider_connections','bank_provider_grant_claims','gmail_connections','gmail_states','gmail_rejected_sources','mail_candidates','import_jobs','verified_contacts','payer_links','reconciliation_findings','customer_messages','message_reviews','message_approvals','message_deliveries','bank_specification_links','bankgiro_ingest_sources','bankgiro_ingest_jobs','audit_events'];
   if(retainedTables.some(table=>controlDb.prepare('SELECT 1 FROM '+table+' LIMIT 1').get()))throw fail('company_legacy_binding_required',409);
  }
  function transaction(operation){
@@ -262,7 +268,25 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   if(context){context=assertCompanyContext(context);assertMembership(context,{job});}
   else if(actorId!==legacyPrincipal||legacyCompany())throw fail('company_access_denied');
   const scope={context,bundle:getBundle(context,{job}),authorize,job,actorId};
-  return storage.run(scope,()=>{assertScope(scope);services();return callback();});
+  return storage.run(scope,()=>currentExecution.run(scope,()=>{assertScope(scope);services();return callback();}));
+ }
+ /** Trusted collision probes share path/boundary validation, including retained
+  * suspended companies. Only a boolean escapes; foreign business data does not. */
+ function retainedStorageContains(matches){
+  try{
+   const legacy=legacyCompany(),legacyContext=legacy?{companyId:legacy.company_id,storageOwner:legacy.storage_owner}:null;
+   if(legacyContext)assertBundleBoundary(legacyBundle,legacyContext);
+   if(matches(controlDb,legacyContext))return true;
+   for(const c of controlDb.prepare("SELECT company_id,storage_owner,database_key FROM companies WHERE database_key<>'legacy'").all()){
+    const context={companyId:c.company_id,storageOwner:c.storage_owner};
+    if(!/^[a-f0-9-]{36}$/.test(c.database_key))return true;
+    const path=join(directory,c.database_key+'.sqlite');
+    if(!existsSync(path)||!lstatSync(path).isFile()||lstatSync(path).isSymbolicLink()||realpathSync(dirname(path))!==realpathSync(directory))return true;
+    const inspection=new DatabaseSync(path,{readOnly:true});
+    try{assertBundleBoundary({db:inspection},context);if(matches(inspection,context))return true;}finally{inspection.close();}
+   }
+   return false;
+  }catch{return true;} // Missing/corrupt retained evidence cannot authorize reuse.
  }
  return {
   db,controlDb,
@@ -281,6 +305,67 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   resolve:resolveContext,run,
   runJob(context,callback,options={}){return run(context,callback,{...options,job:true});},
   assert(action='read'){assertScope(storage.getStore(),action);},
+  /** Exact provider-session collision check for trusted consent code. It exposes
+   * only a boolean, never another company's bank payload or credentials. The
+   * callback repeats this while holding the existing catalogue commit lock. */
+  retainedBankSessionInUse(sessionId,exceptConnectionId){
+   const scope=storage.getStore();if(!scope||scope.initializing)throw fail('company_access_denied');
+   assertScope(scope,'manage_integrations');
+   if(typeof sessionId!=='string'||!sessionId||sessionId.length>256||/[\s\u0000-\u001f\u007f]/.test(sessionId))return true;
+   const owner=scope.context?.storageOwner??scope.actorId;let exception=null,seen=false;
+   if(exceptConnectionId!==undefined){
+    if(!identity(exceptConnectionId))return true;
+    // A caller can exclude only a known row in its current live namespace,
+    // never a supplied owner/company tuple or an unrelated remote handle.
+    try{
+     const row=scope.bundle.db.prepare('SELECT id,owner,encrypted_session FROM bank_connections WHERE id=? AND owner=?').get(exceptConnectionId,owner);
+     if(!row||decryptObject(row.encrypted_session).session_id!==sessionId)return true;
+     exception=row;
+    }catch{return true;}
+   }
+   const contains=(database,boundary)=>{
+    for(const row of database.prepare('SELECT id,owner,encrypted_session FROM bank_connections').all()){
+     if(row.owner!==(boundary?.storageOwner??legacyPrincipal))return true;
+     const ownBoundary=scope.context?boundary?.companyId===scope.context.companyId&&boundary.storageOwner===owner:!boundary&&database===scope.bundle.db;
+     if(exception&&ownBoundary&&row.id===exception.id&&row.owner===owner&&row.encrypted_session===exception.encrypted_session){seen=true;continue;}
+     if(decryptObject(row.encrypted_session).session_id===sessionId)return true;
+    }
+    return false;
+   };
+   const retained=retainedStorageContains(contains);assertScope(scope,'manage_integrations');
+   return retained||!!exception&&!seen;
+  },
+  /** Call within the existing catalogue+tenant write transaction before claim
+   * insertion/CAS. A preflight alone is not a grant reservation. */
+  retainedProviderGrantInUse(fingerprint,connectionId){
+   const scope=storage.getStore();if(!scope?.context)throw fail('company_access_denied');
+   assertScope(scope,'manage_integrations');
+   const hash=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+   if(!hash(fingerprint)||!identity(connectionId))return true;
+   const current=scope.context,result=retainedStorageContains((database,boundary)=>{
+    const tables=new Set(database.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('bank_provider_connections','bank_provider_grant_claims')").all().map(row=>row.name));
+    if(!tables.size)return false;
+    if(tables.size!==2){const table=tables.has('bank_provider_connections')?'bank_provider_connections':'bank_provider_grant_claims';return !!database.prepare('SELECT 1 FROM '+table+' LIMIT 1').get();}
+    // Inspect only namespace/claim metadata, never encrypted state or accounts.
+    const rows=database.prepare('SELECT id,owner,company_id,provider_kind,environment,grant_fingerprint FROM bank_provider_connections').all();
+    const claims=database.prepare('SELECT fingerprint,owner,company_id,connection_id,provider_kind,environment FROM bank_provider_grant_claims').all();
+    if(!rows.length&&!claims.length)return false;
+    if(!boundary)return true;
+    const valid=row=>row.owner===boundary.storageOwner&&row.company_id===boundary.companyId&&row.provider_kind==='open_payments'&&['SANDBOX','PRODUCTION'].includes(row.environment);
+    const connections=new Map(rows.map(row=>[row.id,row])),history=new Map(claims.map(row=>[row.fingerprint,row]));
+    for(const row of rows){
+     if(!valid(row)||!identity(row.id)||typeof row.grant_fingerprint!=='string'||row.grant_fingerprint!==''&&!hash(row.grant_fingerprint))return true;
+     if(row.grant_fingerprint){const claim=history.get(row.grant_fingerprint);if(!claim||claim.connection_id!==row.id||claim.owner!==row.owner||claim.company_id!==row.company_id||claim.provider_kind!==row.provider_kind||claim.environment!==row.environment)return true;}
+    }
+    for(const claim of claims){
+     const row=connections.get(claim.connection_id);
+     if(!valid(claim)||!hash(claim.fingerprint)||!row||row.owner!==claim.owner||row.company_id!==claim.company_id||row.provider_kind!==claim.provider_kind||row.environment!==claim.environment)return true;
+     if(claim.fingerprint===fingerprint&&(claim.owner!==current.storageOwner||claim.company_id!==current.companyId||claim.connection_id!==connectionId))return true;
+    }
+    return false;
+   });
+   assertScope(scope,'manage_integrations');return result;
+  },
   databasePath(context){return getBundle(context).path;},
   listCompanies(actorId){
    checkIdentity(actorId);

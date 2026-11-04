@@ -12,6 +12,17 @@ function setup(overrides = {}, config = CONFIG, context = CONTEXT) {
 async function consent(connection, redirectPreferred = false) { return (await connection.createConsent({ validUntil: '2026-12-01', redirectPreferred })).handle; }
 async function account(connection) { return (await connection.listAccounts(await consent(connection))).accounts[0].handle; }
 
+test('application discovery needs live authority but no selected bank or corporate/PSU placeholder',async()=>{
+ const {provider,calls}=setup();let active=true;
+ assert.equal(typeof provider.discoverBanks,'function','application-level discovery must exist before bank selection');
+ const result=await provider.discoverBanks(['SE'],{async assertCurrent(){if(!active)throw Error('revoked');}});
+ assert.deepEqual(result,{banks:[{id:'OPBKSE21',name:'Synthetic Demo Bank'}]});
+ const request=calls.find(call=>new URL(call.url).pathname.endsWith('/aspsps'));
+ for(const header of ['X-BicFi','PSU-ID','PSU-Corporate-ID','PSU-IP-Address'])assert.equal(request.init.headers.get(header),null);
+ active=false;const count=calls.length;
+ await assert.rejects(provider.discoverBanks(['SE'],{async assertCurrent(){if(!active)throw Error('revoked');}}));assert.equal(calls.length,count);
+});
+
 test('bank list/details come from official ASPSP paths; bank payment capability never enables payments or proves company Bankgiro', async () => {
   const { connection, calls } = setup();
   const banks = await connection.listBanks(['SE']);
@@ -221,6 +232,21 @@ test('a consent shortened by the bank cannot expire during an AIS request and st
   const connection = provider.forCompany(CONTEXT, fixture.dependencies);
   const handle = await account(connection);
   await assert.rejects(connection.getAccount(handle), error => ['CONSENT_NOT_VALID', 'RESOURCE_EXPIRED'].includes(error.code));
+});
+test('transaction acquisition privately returns the minimum retained and bank-effective consent deadline across pagination',async()=>{
+ for(const [retained,bank,expected]of [['2026-11-20','2026-11-04','2026-11-04'],['2026-11-04','2026-12-01','2026-11-04'],['2026-12-01','2026-12-02','2026-12-01']]){
+  let validUntil=retained;const {connection}=setup({
+   [`GET /psd2/consent/v1/consents/${CONSENT_ID}`]:()=>json({consentStatus:'valid',validUntil,access:{}}),
+   [`GET /psd2/accountinformation/v1/accounts/${ACCOUNT_ID}/transactions`]:(url)=>json({account:{iban:ACCOUNT.iban},transactions:{booked:[TX],_links:new URL(url).searchParams.has('continuationKey')?{}:{next:{href:`/psd2/accountinformation/v1/accounts/${ACCOUNT_ID}/transactions?bookingStatus=booked&dateFrom=2026-11-01&dateTo=2026-11-04&continuationKey=second`}}}}),
+  });
+  const handle=await account(connection);validUntil=bank;
+  const result=await connection.getTransactions(handle,{dateFrom:'2026-11-01',dateTo:'2026-11-04'});
+  assert.equal(result.booked.length,2);assert.equal(result.originals.length,2);assert.equal(result.effectiveConsentValidUntil,expected+'T23:59:59.999Z');assert.equal(result.paymentReconciliationAllowed,false);
+ }
+});
+test('account details privately return the minimum retained and current bank consent deadline',async()=>{
+ let validUntil='2026-12-01';const {connection}=setup({[`GET /psd2/consent/v1/consents/${CONSENT_ID}`]:()=>json({consentStatus:'valid',validUntil,access:{}})}),handle=await account(connection);validUntil='2026-11-05';
+ const result=await connection.getAccount(handle);assert.equal(result.effectiveConsentValidUntil,'2026-11-05T23:59:59.999Z');assert.equal(result.bankgiroMappingVerified,false);
 });
 
 test('transaction range and Bankgiro requirements cannot change after an asynchronous operation starts', async () => {

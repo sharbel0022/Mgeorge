@@ -30,14 +30,51 @@ export const bankConnections = sqliteTable('bank_connections', {
   retryAfter: text('retry_after').notNull().default(''), syncFailures: integer('sync_failures').notNull().default(0),
   accountEvidenceRetry: text('account_evidence_retry').notNull().default(''),
   controlLastAttemptAt: text('control_last_attempt_at'),
-});
+  consentMetadata: text('consent_metadata').notNull().default(''),
+  sessionFingerprint:text('session_fingerprint').notNull().default(''),
+},t=>[uniqueIndex('bank_remote_session_unique').on(t.sessionFingerprint).where(sql`${t.sessionFingerprint} <> ''`)]);
 export const bankAuthFlows = sqliteTable('bank_auth_flows', {
   stateHash: text('state_hash').primaryKey(), owner: text('owner').notNull(), cookieHash: text('cookie_hash').notNull(),
   appGeneration: text('app_generation').notNull(), bankName: text('bank_name').notNull(), country: text('country').notNull(),
   environment: text('environment').notNull(), redirectUri: text('redirect_uri').notNull(), dateFrom: text('date_from').notNull(),
   expiresAt: text('expires_at').notNull(), status: text('status').notNull(), createdAt: text('created_at').notNull(),
   companyId:text('company_id'),companyActorId:text('company_actor_id'),companyContextVersion:integer('company_context_version'),companyMembershipVersion:integer('company_membership_version'),
-}, t => [index('bank_flow_owner').on(t.owner)]);
+
+  contextJson: text('context_json').notNull().default(''), resultCode: text('result_code').notNull().default(''),
+  connectionId: text('connection_id').notNull().default(''),
+  companyVersion:integer('company_version'),
+  providerKind:text('provider_kind').notNull().default('enable_banking'),providerPayload:text('provider_payload').notNull().default(''),
+  providerConnectionId:text('provider_connection_id').notNull().default(''),providerFlowId:text('provider_flow_id').notNull().default(''),
+  providerRequestKeyHash:text('provider_request_key_hash').notNull().default(''),
+}, t => [index('bank_flow_owner').on(t.owner),
+  uniqueIndex('bank_provider_flow_id').on(t.owner,t.providerFlowId).where(sql`${t.providerFlowId} <> ''`),
+  uniqueIndex('bank_provider_flow_request').on(t.owner,t.providerRequestKeyHash).where(sql`${t.providerRequestKeyHash} <> ''`)]);
+
+// Additional-provider resources never overwrite the legacy encrypted session.
+export const bankProviderConnections=sqliteTable('bank_provider_connections',{
+ id:text('id').primaryKey(),owner:text('owner').notNull(),companyId:text('company_id').notNull(),
+ providerKind:text('provider_kind').notNull(),environment:text('environment').notNull(),appGeneration:text('app_generation').notNull(),
+ bankId:text('bank_id').notNull(),bankName:text('bank_name').notNull(),status:text('status').notNull(),
+ encryptedState:text('encrypted_state').notNull(),selectedAccounts:text('selected_accounts').notNull().default('[]'),
+ validUntil:text('valid_until').notNull().default(''),revision:integer('revision').notNull().default(1),
+ lastSyncedAt:text('last_synced_at'),lastError:text('last_error'),requestKeyHash:text('request_key_hash').notNull(),
+ createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),grantFingerprint:text('grant_fingerprint').notNull().default(''),
+},t=>[index('bank_provider_owner_company').on(t.owner,t.companyId),
+ uniqueIndex('bank_provider_request').on(t.owner,t.requestKeyHash),
+ uniqueIndex('bank_provider_current_grant').on(t.grantFingerprint).where(sql`${t.grantFingerprint} <> ''`),
+ check('bank_provider_kind',sql`${t.providerKind} = 'open_payments'`),
+ check('bank_provider_revision',sql`${t.revision} > 0`),
+ check('bank_provider_environment',sql`${t.environment} IN ('SANDBOX','PRODUCTION')`)]);
+
+// Hash-only immutable history prevents renewed/revoked grants being assigned to
+// a different company/connection. Raw provider IDs never enter this table.
+export const bankProviderGrantClaims=sqliteTable('bank_provider_grant_claims',{
+ fingerprint:text('fingerprint').primaryKey().notNull(),owner:text('owner').notNull(),companyId:text('company_id').notNull(),
+ connectionId:text('connection_id').notNull(),providerKind:text('provider_kind').notNull(),environment:text('environment').notNull(),
+ createdAt:text('created_at').notNull(),
+},t=>[index('bank_provider_claim_owner').on(t.owner,t.companyId,t.connectionId),
+ check('bank_provider_claim_kind',sql`${t.providerKind} = 'open_payments'`),
+ check('bank_provider_claim_environment',sql`${t.environment} IN ('SANDBOX','PRODUCTION')`)]);
 export const bankSyncRuns = sqliteTable('bank_sync_runs', {
   id: text('id').primaryKey(), owner: text('owner').notNull(), connectionId: text('connection_id').notNull(),
   imported: integer('imported').notNull(), skipped: integer('skipped').notNull(), warnings: text('warnings').notNull(),
@@ -83,6 +120,7 @@ export const gmailConnections = sqliteTable('gmail_connections', {
 });
 export const gmailFlows=sqliteTable('gmail_flows',{
   companyId:text('company_id'),companyActorId:text('company_actor_id'),companyContextVersion:integer('company_context_version'),companyMembershipVersion:integer('company_membership_version'),
+  companyVersion:integer('company_version'),
   stateHash:text('state_hash').primaryKey(),owner:text('owner').notNull(),cookieHash:text('cookie_hash').notNull(),expiresAt:text('expires_at').notNull(),consumed:integer('consumed').notNull().default(0),
   requestSend:integer('request_send').notNull().default(0),
 });

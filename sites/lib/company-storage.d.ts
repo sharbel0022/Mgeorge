@@ -1,4 +1,5 @@
 import type {CompanyAction,CompanyContext,CompanyDataBoundary,CompanyRole} from './company-contract.js';
+export {saasOnboardingEnabled} from './company-contract.js';
 export interface CompanyScope {readonly kind:'legacy'|'legacy-worker'|'company'|'worker';readonly owner:string;readonly actorId:string;readonly action:CompanyAction;readonly context:Readonly<CompanyContext>|null;readonly grant?:{id:string;version:number;runner:string;credentialHash:string};readonly legacyCredential?:{runner:string;credentialHash:string};}
 export interface CompanyDirectory {version:'company-context-v1';companies:Array<{id:string;name:string;role:CompanyRole;membershipVersion:number;companyVersion:number}>;activeCompanyId:string|null;contextVersion:number;context?:Readonly<CompanyContext>;legacy?:true;selectionRequired?:true;actorId?:string;}
 export const ownerTables:readonly string[];

@@ -1,8 +1,80 @@
 import { env } from 'cloudflare:workers';
-import { db } from '@/lib/server';
+import { db, identity, currentCompanyContext } from '@/lib/server';
 import { randomToken, seal, unseal, digest } from './security';
 import type { ProviderApplication, ProviderAccount, ProviderConfig } from './enable-banking';
 import { runtimeBankConfig, runtimeBankStatus } from './runtime-config';
+import { ConsentError, companyBankContext as resolveCompanyBankContext, saasOnboardingEnabled } from '../bank-consent-policy.js';
+import { resolveCorporateAccountEvidence, type CompanyAccountEvidence } from '../bank-company-authority.js';
+import { stableAccountKey } from './transactions';
+
+export type ConsentMetadata = {
+  version: 'bank-consent-v1'; mode: 'company' | 'legacy'; companyId: string; actorId: string;
+  membershipVersion: string | number; storageOwnerId?: string; companyVersion?: number;
+  requestedScopes: string[]; grantedScopes: string[]; validUntil: string;
+  corporateAuthorization: CompanyAccountEvidence | { status: 'unverified'; reason: string };
+};
+
+export const companyOnboardingEnabled=()=>saasOnboardingEnabled(env as unknown as Record<string,unknown>);
+
+/** Identity is already resolved by the live request/worker boundary. */
+export function bankCompanyContext(actorId: string, companyId?: unknown, action: 'read' | 'manage' = 'manage') {
+  return resolveCompanyBankContext(currentCompanyContext(), actorId, companyId, action);
+}
+
+function connectionCompanyContext(row: BankConnectionRow, companyId?: string) {
+  const current = currentCompanyContext();
+  const context = bankCompanyContext(current?.actorId ?? row.owner, companyId, 'read');
+  if (context.storageOwnerId !== row.owner) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  return context;
+}
+
+export function consentMetadata(row: BankConnectionRow): ConsentMetadata | null {
+  if (!row.consent_metadata) return null;
+  try {
+    const value = JSON.parse(row.consent_metadata) as ConsentMetadata;
+    const context = connectionCompanyContext(row, value.companyId);
+    if (value.version !== 'bank-consent-v1' || !['company', 'legacy'].includes(value.mode) ||
+      typeof value.actorId !== 'string' || !value.actorId || value.actorId.length > 256 ||
+      value.companyId !== context.companyId || value.storageOwnerId !== undefined && value.storageOwnerId !== row.owner ||
+      !(typeof value.membershipVersion === 'string' && value.membershipVersion.length > 0 || Number.isSafeInteger(value.membershipVersion) && Number(value.membershipVersion) > 0) ||
+      !currentCompanyContext() && (value.actorId !== context.actorId || value.membershipVersion !== context.membershipVersion) ||
+      !Array.isArray(value.requestedScopes) || !Array.isArray(value.grantedScopes)) throw Error();
+    return value;
+  } catch { throw new ConsentError('COMPANY_ACCESS_DENIED', 403); }
+}
+
+export function corporateAccountEvidence(context: ReturnType<typeof bankCompanyContext>, bankName: string, country: string, available: ProviderAccount[], validUntil: string) {
+  return resolveCorporateAccountEvidence((env as unknown as Record<string, unknown>).BANK_COMPANY_AUTHORIZATIONS, {
+    context, bankName, country, validUntil,
+    accounts: available.map(account => ({ uid: account.uid, key: stableAccountKey(account, { name: bankName, country }) || '', usage: account.usage })),
+  });
+}
+
+export async function currentCompanyAuthorization(row: BankConnectionRow) {
+  const user = await identity();
+  if (user.userId !== row.owner) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  const saved = consentMetadata(row);
+  if (!saved || saved.mode === 'legacy') return { status: 'unverified' as const, reason: 'LEGACY_COMPANY_BINDING_UNVERIFIED' };
+  const context = connectionCompanyContext(row, saved.companyId);
+  return corporateAccountEvidence(context, row.bank_name, row.country, await accounts(row), row.valid_until) ??
+    { status: 'unverified' as const, reason: 'CORPORATE_AUTHORIZATION_REQUIRED' };
+}
+
+export async function assertCompanyConsent(row: BankConnectionRow, requiredAccountUids: readonly string[] = []): Promise<CompanyAccountEvidence | null> {
+  const user = await identity();
+  if (user.userId !== row.owner) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  const saved = consentMetadata(row);
+  if (!saved || saved.mode === 'legacy') {
+    if (currentCompanyContext()) throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED', 409);
+    return null;
+  }
+  const authorization = await currentCompanyAuthorization(row);
+  await identity();
+  if (authorization.status !== 'verified' || Date.parse(row.valid_until) <= Date.now()) throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED', 409);
+  const selected: string[] = JSON.parse(row.selected_accounts);
+  if ([...selected, ...requiredAccountUids].some(id => !authorization.accountUids.includes(id))) throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED', 409);
+  return authorization;
+}
 
 export type BankApplicationRow = {
   owner: string; application_id: string; encrypted_key: string; metadata: string;
@@ -17,11 +89,16 @@ export type BankConnectionRow = {
   control_last_attempt_at: string | null;
   retry_after: string; sync_failures: number;
   account_evidence_retry: string;
+  consent_metadata?: string;
+  session_fingerprint?: string;
 };
 export type BankFlowRow = {
   state_hash: string; owner: string; cookie_hash: string; app_generation: string;
   bank_name: string; country: string; environment: 'SANDBOX' | 'PRODUCTION';
   redirect_uri: string; date_from: string; expires_at: string; status: string; created_at: string;
+  context_json: string; result_code: string; connection_id: string;
+  company_id?: string | null; company_actor_id?: string | null;
+  company_context_version?: number | null; company_membership_version?: number | null;
 };
 
 function secret(): string {
@@ -65,7 +142,36 @@ export async function accounts(row: BankConnectionRow): Promise<ProviderAccount[
   return decrypt<ProviderAccount[]>(row.owner, `accounts:${row.id}`, row.encrypted_accounts);
 }
 export async function sessionId(row: BankConnectionRow): Promise<string> {
+  await assertCompanyConsent(row);
+  return revocationSessionId(row);
+}
+/** Reading a session solely to revoke it must remain possible after authority expires. */
+export async function revocationSessionId(row: BankConnectionRow): Promise<string> {
   return decrypt<string>(row.owner, `session:${row.id}`, row.encrypted_session);
+}
+
+/** Internal cross-company exclusion only. No retained identity or credential
+ * leaves this boolean boundary; ordinary business reads remain tenant-scoped.
+ * Empty legacy fingerprints still require decrypting their retained handle. */
+export async function sessionRetainedElsewhere(owner: string, remoteSession: string, lease: BankLease, exceptConnectionId?: string): Promise<boolean> {
+  const authorize = async () => {
+    const user = await identity(), context = bankCompanyContext(user.actorId ?? user.userId);
+    if (user.userId !== owner || context.storageOwnerId !== owner) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+    await lease.assert();
+  };
+  await authorize();
+  const retainedDatabase = env.DB;
+  if (!retainedDatabase) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  const result = await retainedDatabase.prepare("SELECT id,owner,encrypted_session FROM bank_connections WHERE encrypted_session<>''").all<{id:string;owner:string;encrypted_session:string}>();
+  let retained = !Array.isArray(result.results) || typeof remoteSession !== 'string' || !remoteSession;
+  for (const row of result.results ?? []) {
+    if (row.owner === owner && row.id === exceptConnectionId) continue;
+    try {
+      if (await decrypt<string>(row.owner, `session:${row.id}`, row.encrypted_session) === remoteSession) retained = true;
+    } catch { retained = true; } // Uncertain ownership never authorizes deletion.
+  }
+  await authorize();
+  return Boolean(retained);
 }
 
 // Serialize mutations for an owner, including callback, disconnect and sync.
