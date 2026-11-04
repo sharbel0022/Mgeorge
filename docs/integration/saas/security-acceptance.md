@@ -4,6 +4,8 @@
 
 Granskningsdatum enligt uppdraget: **2026-11-04**. Bas: `14a042abd37fa455d08da9dfcc096ef4f603b512`. Branch: `feature/saas-security-acceptance`. Befintligt kontrakt: [`mgeorge-integration-v1`](../README.md). [Genomförandeplan och arbetsanteckningar](security-acceptance-plan.md).
 
+**Leverans:** [PR #37](https://github.com/sharbel0022/Mgeorge/pull/37). Publicerad implementation: `663a0652ef8a826c157a4cb093f7f9cff4e9d19c`, källträd `4d0f950de27c09945a725fc45afc7d26a6542f45`. Trädet är byteidentiskt med den lokalt verifierade implementationen. Den efterföljande kvittouppdateringen ändrar endast dokumentation; PR-huvudets GitHub Actions ger aktuellt publiceringsbevis.
+
 ## 1. Omfattning och integrationsgräns
 
 Den inspekterade basen har två separata runtime-miljöer. Node-installationen har en administratör och ett företagsregister. Sites lagrar arbetsytor, bankanslutningar, original och jobb med en autentiserad `owner`. `owner` är i dag användaridentitet, inte ett bevis på medlemskap i ett valbart kundföretag.
