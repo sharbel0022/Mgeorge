@@ -54,7 +54,7 @@ Browserprovet bygger den faktiska bankrouten och dess komponenter/CSS, inte en s
 - **Bankidentifiering:** endast bankens dokumenterade providerprocess kan skapa det serverbundna överlämningssvaret. UI skapar ingen BankID-URL, visar ingen dekorativ BankID-knapp och begär inte betalningsinitiering. Testet verifierar frontendens bankredirect mot en syntetisk serverväg; verklig provider/BankID är inte provad.
 - **Callback och medgivande:** avbruten/misslyckad/utgången identifiering återges utan framgångspåstående. `result=connected` räcker inte; färskt företagsbundet medgivande och avslutad serverauktorisering krävs. Saknat/utgånget medgivande spärrar kontoval och synk.
 - **Företagsgräns:** medlemskap läses före företagsdata. Byte av företag avmonterar vyn och ogiltigförklarar läsningar och mutationer. Sena A → B → A-svar, sena redirects, 401/403, obehörig företagsparameter och felaktiga nästlade företags-ID:n har regressionsprov. Frontendkontroller ersätter inte serverns tenantauktorisering.
-- **Betalningsfakta:** AIS och Bankgiro har separata medgivanden/tider/statusar. Referens `0000599` behåller nollorna; saknad referens/betalare förblir saknad. Verifierad status kräver ett evidenskvitto. Första framgångsrika hämtningen, inte enbart ett accepterat jobb, visar en bekräftad betalningsöversikt.
+- **Betalningsfakta:** AIS och Bankgiro visas med separata status- och tidsfält; detta förutsätter inte separata samtyckesresurser hos providern. Referens `0000599` behåller nollorna; saknad referens/betalare förblir saknad. Verifierad status kräver ett evidenskvitto. Första framgångsrika hämtningen, inte enbart ett accepterat jobb, visar en bekräftad betalningsöversikt.
 
 ## Granskning och rättade fynd
 
@@ -73,3 +73,9 @@ En oberoende slutgranskning identifierade två viktiga statusfel och ett mindre 
 3. Därefter behövs ett auktoriserat end-to-end-prov med riktig provider/callback och relevant hjälpmedels-/enhetsacceptans före SaaS-aktivering.
 
 Alla **33 numeriska kvalitetspoäng behålls på 255/330 = 7,73/10; 0/33 ≥9,5**. Ingen ny Sites-publicering, produktionsskrivning, verklig bankidentifiering eller automatisk produktionshämtning ingår i denna leverans.
+
+## GitHub-överlämning och ny kontraktsavstämning
+
+[PR #38](https://github.com/sharbel0022/Mgeorge/pull/38) är öppnad som utkast mot `main`. Publicerad implementationscommit är `765d9e165d5ba9a773c6eb0792954d1281f2639f`, med filträd `52f199d3ec1880f3dfb87256c4ff25b57e1b99ae`. Trädet är identiskt med den lokalt verifierade implementationen. GitHub-integrationen användes för överföringen eftersom körmiljön saknade Git-skrivinloggning. Den efterföljande kvittouppdateringen ändrar endast dokumentation. Aktuellt PR-huvud och Node 22-CI redovisas i PR:ns beskrivning/Checks.
+
+Vid slutkontrollen hade Agent 2:s Open Payments-adapter och Agent 7:s säkerhetsbranch tillkommit. Oberoende avstämning mot frysta SHA:er bekräftar att ingen av dem implementerar de företagsspecifika webbroutes som frontend behöver. [Kontraktets avslutande mappningstabell](saas-customer-onboarding-ui.md#producer-handoffs-available-at-final-review) preciserar identitet/scopes, verkligt SCA-metodval och challenge, datum/status, serverredirect samt Bankgiro-/betalningsevidens. Ett generiskt decoupled-vänteläge får endast användas när alla nödvändiga challenge-steg redan har hanterats av den dokumenterade providerintegrationen; annars krävs en fungerande SCA-sida eller att banken markeras otillgänglig tills integrationen är klar.

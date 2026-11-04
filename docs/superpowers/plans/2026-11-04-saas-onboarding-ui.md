@@ -53,7 +53,7 @@ Files: `docs/integration/saas-onboarding-browser/*`; integration receipt; `PROGR
 - [x] Run required Node/Sites check/test/audit/build gates and separate bridge dependencies needed by the existing suite; report environmental failures accurately.
 - [x] Independent whole-change review; fix concrete findings and verify regressions.
 - [x] Record exact local outcomes and activation limits.
-- [ ] Commit, push the feature branch and create the integration PR; remote delivery is recorded separately from local acceptance.
+- [x] Commit, publish the feature branch and create the integration PR; remote delivery is recorded separately from local acceptance.
 
 ## Execution record
 
@@ -62,3 +62,5 @@ Files: `docs/integration/saas-onboarding-browser/*`; integration receipt; `PROGR
 - Browser acceptance: 41/41 pass, five actual viewport widths, 115 intercepted synthetic API requests, no JavaScript errors or external calls; source and served assets are hash-bound.
 - Independent review findings were reproduced and fixed: slow-read polling starvation, stale decoupled authorization notices and enabled sync for an unsupported selected account.
 - Final visual inspection of all six screenshots found no remaining overlap or clipping. Backend contracts remain a documented integration dependency; no live bank/BankID or production action was performed.
+- Published implementation `765d9e165d5ba9a773c6eb0792954d1281f2639f`, tree `52f199d3ec1880f3dfb87256c4ff25b57e1b99ae`, matches the locally verified tree. Draft [PR #38](https://github.com/sharbel0022/Mgeorge/pull/38) targets main without merge or deployment.
+- Final read-only comparison with newly available Agent 2 (`1a634c1`) and Agent 7 (`eed6879`) confirms no company/web authorization endpoints are yet supplied. Explicit SCA challenge, identity/scope, expiry and Bankgiro evidence mappings were added to the handoff document.

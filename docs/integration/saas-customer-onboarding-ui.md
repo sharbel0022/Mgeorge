@@ -17,7 +17,7 @@ The following is a **proposed version 1 frontend boundary**, not a claim that Ag
 | Agent 1 | Authenticated directory, company creation, roles/memberships, company-scoped state and data queries. Keep original M.George owner data intact. |
 | Agent 2 | Actual provider-supported bank catalogue and read permissions; bank-specific coverage and maximum consent duration. Never claim Open Payments or BankID availability from installation alone. |
 | Agent 3 | Persistent company/session-bound authorization, CSRF/state/replay protection, applicable PKCE, provider handoff, callback, renewal and remote revocation state. |
-| Agent 4 | Separately authorized Bankgiro availability, real payer/reference evidence and consent/sync timestamps. |
+| Agent 4 | Separately verified Bankgiro entitlement/coverage, real payer/reference evidence and applicable consent/sync timestamps. A separate UI status does not assume a separate provider consent resource. |
 | Agent 5 | Durable account-scoped synchronization with concurrency, rate limit, consent and idempotency checks; first-sync scheduling after account selection; verified result timestamps. |
 | Agent 6 | Bounded response validation, scope/generation checks, accessible presentation, safe request client, user actions and isolated browser evidence. Frontend checks are not server authorization. |
 
@@ -101,7 +101,9 @@ Connect and renew return the authorization envelope below. Other bank mutations 
 }
 ```
 
-For redirect mode, `redirectPath` must be **exactly** `/api/companies/:companyId/bank/authorizations/:authorizationId/redirect`, without query, fragment, credentials or another origin. Agent 3 implements this authenticated server route and validates the actual provider destination there. This prevents future provider domains from being guessed or trusted by a browser allowlist. The UI never constructs a BankID URL. For decoupled mode, return null and persist status so GET can observe completion/cancellation/expiry; do not make every status read perform provider SCA or bank reads.
+`mode` describes the UI handoff, not an unmodified provider SCA enum. For redirect mode, `redirectPath` must be **exactly** `/api/companies/:companyId/bank/authorizations/:authorizationId/redirect`, without query, fragment, credentials or another origin. Agent 3 implements this authenticated server route and validates the actual provider destination there. It may present the provider's actual method selection and challenge flow before external navigation. This prevents future provider domains from being guessed or trusted by a browser allowlist. The UI never constructs a BankID URL.
+
+Decoupled mode is a waiting state only: return it with a null path **only after** the provider integration has initiated a process that the user can complete without an additional method-selection, QR or autostart step in this UI. Persist status so GET can observe completion/cancellation/expiry; do not make every status read perform provider SCA or bank reads. Where a provider requires challenge presentation, Agent 3 must implement the authenticated SCA page reached through the exact server handoff route, or a separately reviewed contract extension. Until that flow exists and is tested, catalogue availability must remain false with `configuration_required`; a generic waiting message is not a working BankID integration. Five-second projection refresh is not a QR/challenge polling implementation.
 
 The provider callback may return the user to `/bank?company=:id&result=connected|cancelled|failed|expired|wrong_user|signin_required`. These query parameters are navigation hints only. A success notice additionally requires fresh active consent and this company's server-recorded completed authorization. Never send codes, tokens or raw error descriptions in the UI query. Callback state, CSRF/replay/PKCE and current membership checks remain server requirements.
 
@@ -119,3 +121,24 @@ The provider callback may return the user to `/bank?company=:id&result=connected
 ## Delivery evidence
 
 See [verification and delivery report](saas-customer-onboarding-verification.md) and the [browser reproduction instructions and receipt](saas-onboarding-browser/README.md). SaaS production activation remains dependent on the server handoffs above; this branch does not migrate existing data, change provider configuration, add schedules, merge to main or publish Sites.
+
+## Producer handoffs available at final review
+
+Two branches appeared after the initial inventory and were inspected without merging their changes:
+
+- Agent 2: [`1a634c1e845d8a739a1df1e0978ca0aa3534779c`](https://github.com/sharbel0022/Mgeorge/tree/1a634c1e845d8a739a1df1e0978ca0aa3534779c), `feature/saas-openpayments-provider`; [adapter contract](https://github.com/sharbel0022/Mgeorge/blob/1a634c1e845d8a739a1df1e0978ca0aa3534779c/docs/integration/saas/openpayments-adapter.md) and [capabilities](https://github.com/sharbel0022/Mgeorge/blob/1a634c1e845d8a739a1df1e0978ca0aa3534779c/docs/integration/saas/provider-capabilities.md).
+- Agent 7: [`eed68796179565e0fa76b8e201b23449b2a9c754`](https://github.com/sharbel0022/Mgeorge/tree/eed68796179565e0fa76b8e201b23449b2a9c754), `feature/saas-security-acceptance`; [security acceptance](https://github.com/sharbel0022/Mgeorge/blob/eed68796179565e0fa76b8e201b23449b2a9c754/docs/integration/saas/security-acceptance.md).
+
+Neither implements the company directory, membership model, onboarding projection, web mutations or SCA handoff route above. No direct API substitution is therefore available. Agent 8 should integrate the following explicit mappings with Agents 1/3/4/5:
+
+| Provider/server boundary | Required mapping to this UI |
+| --- | --- |
+| `forCompany()` context and PSU/company identity | Derive owner, company/connection, corporate ID, PSU identity, BIC and trusted interactive request metadata on the server. Browser IDs/permissions are not an identity or membership source. |
+| App scopes and user read purposes | Open Payments app scopes are not the UI's purpose strings. Enforce the actual granted data purposes per company and subsequent query/job; do not imply unsupported granular provider consent. |
+| `createAuthorisation()` / `startAuthorisation()` | Use a returned authentication method ID. Own method selection, actual challenge/QR/autostart and timely polling in the reviewed SCA integration. Raw challenge data cannot be silently replaced by this UI's waiting state. |
+| Opaque handles, status and expiry | Persist server-only handle mappings; expose public resource IDs. Convert provider dates/statuses conservatively to the UTC projection. Unknown expiry stays null. `partiallyAuthorised` is not active; final SCA still requires a valid consent check. |
+| Validated external `redirectUrl` | Store and validate it in the company/session-bound server handoff. Return only the exact internal path to this UI; never put opaque handles or OAuth data into the company URL. |
+| Bankgiro enrichment | The inspected adapter uses the AIS transaction resource and the same `Consent-ID`; no separate BGI consent resource is established. Verify the company's product/coverage separately. Keep entitlement, validity, next eligibility and completeness unknown/null unless evidenced; a bank catalogue entry or Bankgiro number is insufficient. |
+| Booked rows and Bankgiro observations | Agent 4/5 must preserve originals and actual reference/payer source, deduplicate economic effects and provide the authoritative reconciliation receipt. The adapter's `paymentReconciliationAllowed: false` cannot become a `verified` payment by projection alone. |
+
+Agent 7's company/role/provider acceptance and final integration gates remain open for the missing server work. The frontend's synthetic A/B/race coverage is additional evidence, not a substitute for those server tests or a commercial release decision.
