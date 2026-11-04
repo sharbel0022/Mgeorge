@@ -39,7 +39,7 @@ async function fixture(t){
  // The platform identity headers are the mocked boundary. The actual app auth,
  // Origin check, MCP dispatcher, reconciliation, SQL and draft writes all run.
  const auth=compiled('../app/chatgpt-auth.ts',{'next/headers':data(`export async function headers(){return ${ref}.headers;}`),'next/navigation':data('export function redirect(){throw Error("Unexpected redirect")}')});
- const server=compiled('../lib/server.ts',{'cloudflare:workers':data(`export const env=${ref}.env;`),'@/app/chatgpt-auth':auth,'./domain':domain});
+ const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':data(`export const env=${ref}.env;`),'@/app/chatgpt-auth':auth,'./domain':domain});
  const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':engine});
  const evidence=compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':engine});
  const unusedStore=data('export async function encrypt(){throw Error("No credentials in fixture")}export async function decrypt(){throw Error("No credentials in fixture")}');

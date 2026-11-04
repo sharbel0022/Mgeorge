@@ -52,6 +52,9 @@ export function createIntegrationJobs(db,{now=Date.now,leaseMs=5*60_000,maxRunMs
 
   const state=name=>db.prepare('SELECT * FROM integration_jobs WHERE name=?').get(name);
   function recoverExpired(){
+    // Viewer status reads must not perform maintenance writes. An authorized
+    // worker/admin will persist expiry on its next execution.
+    if(db.canWrite===false)return;
     // Legacy or malformed provider deadlines must not become an immediate retry
     // or crash status serialization. Preserve an explicit block with unknown ETA.
     db.prepare(`UPDATE integration_jobs SET job_state='blocked',retry_blocked=1,failures=MAX(failures,3),
@@ -91,7 +94,7 @@ export function createIntegrationJobs(db,{now=Date.now,leaseMs=5*60_000,maxRunMs
       if(recordAttempt&&(current.retry_blocked||current.failures>=3&&scheduled))throw failure(409,'integration_blocked','Automatisk hämtning stoppades efter tre avbrutna eller misslyckade försök. Kontrollera anslutningen och gör en manuell hämtning.');
       throw Object.assign(failure(429,'integration_wait','Hämtningen väntar på nästa tillåtna försök.'),{retryAfter:Math.max(1,Math.ceil((Math.max(current.next_attempt,current.retry_after)-at)/1000))});
     }
-    const version=row.fence_version;let completed='';
+    const version=row.fence_version,releaseScopedLease=db.releaseIntegrationLease;let completed='';
     const lost=()=>failure(409,'integration_lease_lost','Körningens lås har löpt ut. Inga uppgifter från det försenade svaret sparades.');
     function assertOwned(allowComplete=false){
       const current=state(name);
@@ -131,11 +134,18 @@ export function createIntegrationJobs(db,{now=Date.now,leaseMs=5*60_000,maxRunMs
         completed='failure';
       },
       release(){
-        db.prepare(`UPDATE integration_jobs SET
+        try{db.prepare(`UPDATE integration_jobs SET
           job_state=CASE WHEN record_attempt=1 AND job_state='running' THEN CASE WHEN failures>=3 THEN 'blocked' ELSE 'retry_wait' END ELSE job_state END,
           last_error=CASE WHEN record_attempt=1 AND job_state='running' THEN ? ELSE last_error END,
           error_code=CASE WHEN record_attempt=1 AND job_state='running' THEN 'integration_interrupted' ELSE error_code END,
-          lease='',lease_until=0,lease_deadline=0 WHERE name=? AND lease=? AND fence_version=?`).run(interrupted,name,id,version);
+          lease='',lease_until=0,lease_deadline=0 WHERE name=? AND lease=? AND fence_version=?`).run(interrupted,name,id,version);}
+        catch(error){
+          // After revoked membership/logout only the already captured exact
+          // lease may be released. Storage failures must still propagate so a
+          // committed import retains its durable after-check warning.
+          if(!releaseScopedLease||error.status!==401&&!['company_access_denied','company_authorization_changed','COMPANY_CONTEXT_STALE','company_permission_denied'].includes(error.code))throw error;
+          releaseScopedLease(interrupted,name,id,version);
+        }
       }
     };
   }

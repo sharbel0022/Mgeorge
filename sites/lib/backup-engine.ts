@@ -1,5 +1,6 @@
 // Owner-scoped, resumable encrypted snapshots. No payments or live restore writes.
 import {bankApiReceiptState} from './bank-api-original.js';
+import {assertCompanyBoundary,type CompanyDataBoundary} from './company-contract.js';
 type Database={prepare:(sql:string)=>any;batch:(statements:any[])=>Promise<any[]>};
 type Bucket={get:(key:string)=>Promise<any>;put:(key:string,value:Uint8Array,options?:any)=>Promise<any>};
 type Row=Record<string,any>;
@@ -104,8 +105,12 @@ function snapshotDocumentReferences(tables:{name:string;rows:Row[]}[],files:Map<
   if(row.action==='automatic.reconciliation')for(const decision of list(detail?.decisions))if(decision?.kind==='specification_linked')requiredReference(decision.document_id,decision.document_hash);
  }
 }
-export function validateSnapshot(value:any,owner:string){
+export function validateSnapshot(value:any,owner:string,expectedCompanyBoundary?:CompanyDataBoundary){
  if(value?.format!=='MG-Sites-backup-1'||value.owner!==owner||!Array.isArray(value.tables))throw Error('backup_snapshot_invalid');
+ if(expectedCompanyBoundary!==undefined||value.companyBoundary!==undefined){
+  const boundary=assertCompanyBoundary(value.companyBoundary,expectedCompanyBoundary);
+  if(boundary.storageOwner!==owner)throw Error('backup_company_boundary_mismatch');
+ }
  const tableSet=backupTableSet(value.tables.map((table:Row)=>table?.name));
  for(const table of value.tables){if(!BACKUP_TABLES.includes(table.name)||!Array.isArray(table.rows)||table.rows.some((r:Row)=>r.owner!==owner))throw Error('backup_owner_mismatch');}
  if(new Set(value.tables.map((t:Row)=>t.name)).size!==tableSet.length)throw Error('backup_snapshot_invalid');
@@ -116,19 +121,21 @@ export function validateSnapshot(value:any,owner:string){
  snapshotDocumentReferences(value.tables,new Map(files.map((f:Row)=>[f.id,f])));
  const apiEvidence=snapshotApiEvidence(value.tables);
  if(value.apiEvidence!==undefined&&(!validApiEvidence(value.apiEvidence)||value.apiEvidence.records_checked!==apiEvidence.records_checked||value.apiEvidence.records_without_receipt!==apiEvidence.records_without_receipt))throw Error('backup_api_evidence_invalid');
- return {...value,apiEvidence} as {format:string;owner:string;createdAt:string;apiEvidence:ApiEvidence;tables:{name:string;rows:Row[]}[]};
+ return {...value,apiEvidence} as {format:string;owner:string;createdAt:string;companyBoundary?:CompanyDataBoundary;apiEvidence:ApiEvidence;tables:{name:string;rows:Row[]}[]};
 }
 export function publicBackup(row:Row|null){return row?{id:row.id,day:row.day,status:row.state,files:row.total_docs,copied:row.cursor,bytes:row.bytes,created_at:row.created_at,verified_at:row.finished_at,verified_files:row.verification_cursor||0,verified_bytes:row.verified_bytes||0,verification_started_at:row.verification_started_at||'',verification_scope:row.verification_started_at?'manifest_pass':row.state==='complete'?'copy_readback':'pending',api_evidence:publicApiEvidence(row.api_evidence),error:row.last_error||null,attempts:row.attempts}:null;}
 export async function backupStatus(database:Database,owner:string){const latest=await database.prepare('SELECT * FROM backup_runs WHERE owner=? ORDER BY created_at DESC LIMIT 1').bind(owner).first();const complete=await database.prepare("SELECT * FROM backup_runs WHERE owner=? AND state='complete' ORDER BY finished_at DESC LIMIT 1").bind(owner).first();return{latest:publicBackup(latest),last_verified:publicBackup(complete)};}
-async function readSnapshot(bucket:Bucket,row:Row,key:string,owner:string){const object=await bucket.get(row.snapshot_key);if(!object)throw Error('backup_snapshot_missing');const bytes=await unsealBackup(new Uint8Array(await object.arrayBuffer()),key,owner,row.id,'snapshot');if(await hash(bytes)!==row.snapshot_hash)throw Error('backup_snapshot_hash');return validateSnapshot(JSON.parse(new TextDecoder().decode(bytes)),owner);}
-export async function backupStep(database:Database,bucket:Bucket,owner:string,key:string,at=new Date(),limit=5){
+async function readSnapshot(bucket:Bucket,row:Row,key:string,owner:string,companyBoundary?:CompanyDataBoundary){const object=await bucket.get(row.snapshot_key);if(!object)throw Error('backup_snapshot_missing');const bytes=await unsealBackup(new Uint8Array(await object.arrayBuffer()),key,owner,row.id,'snapshot');if(await hash(bytes)!==row.snapshot_hash)throw Error('backup_snapshot_hash');return validateSnapshot(JSON.parse(new TextDecoder().decode(bytes)),owner,companyBoundary);}
+export async function backupStep(database:Database,bucket:Bucket,owner:string,key:string,at=new Date(),limit=5,options:{companyBoundary?:CompanyDataBoundary}={}){
+ const companyBoundary=options.companyBoundary===undefined?undefined:assertCompanyBoundary(options.companyBoundary);
+ if(companyBoundary&&companyBoundary.storageOwner!==owner)throw Error('backup_company_boundary_mismatch');
  baseKey(key);const day=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Stockholm',year:'numeric',month:'2-digit',day:'2-digit'}).format(at),createdAt=at.toISOString();
  await database.prepare("INSERT OR IGNORE INTO backup_runs(id,owner,day,state,created_at,updated_at) VALUES(?,?,?,'preparing',?,?)").bind(crypto.randomUUID(),owner,day,createdAt,createdAt).run();
  let row=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND day=?').bind(owner,day).first();
- if(!row)throw Error('backup_unavailable');if(row.state==='complete'||row.attempts>=3)return publicBackup(row);
+ if(!row)throw Error('backup_unavailable');if(row.state==='complete'||row.attempts>=3){if(companyBoundary&&row.snapshot_key)await readSnapshot(bucket,row,key,owner,companyBoundary);return publicBackup(row);}
  const lease=crypto.randomUUID(),until=new Date(Date.now()+180_000).toISOString();
  const locked=await database.prepare("UPDATE backup_runs SET attempts=attempts+CASE WHEN lease<>'' THEN 1 ELSE 0 END,verification_cursor=CASE WHEN lease<>'' OR state='failed' THEN 0 ELSE verification_cursor END,verified_bytes=CASE WHEN lease<>'' OR state='failed' THEN 0 ELSE verified_bytes END,verification_started_at=CASE WHEN lease<>'' OR state='failed' THEN '' ELSE verification_started_at END,lease=?,lease_until=?,updated_at=? WHERE owner=? AND id=? AND state<>'complete' AND attempts<3 AND (lease='' OR lease_until<?)").bind(lease,until,clock(),owner,row.id,clock()).run();
- if(locked.meta.changes!==1){const current=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=?').bind(owner,row.id).first();return{...publicBackup(current),...(current?.state!=='complete'&&current?.attempts<3?{busy:true}:{})};}
+ if(locked.meta.changes!==1){const current=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=?').bind(owner,row.id).first();if(companyBoundary&&current?.snapshot_key)await readSnapshot(bucket,current,key,owner,companyBoundary);return{...publicBackup(current),...(current?.state!=='complete'&&current?.attempts<3?{busy:true}:{})};}
  // A previous worker may have checkpointed or finished after our first read.
  // Only state read under the newly acquired lease can drive this step.
  row=await database.prepare('SELECT * FROM backup_runs WHERE owner=? AND id=? AND lease=?').bind(owner,row.id,lease).first();
@@ -151,7 +158,7 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
    // One D1 batch provides a consistent database snapshot across all durable owner tables.
    const results=await database.batch(BACKUP_TABLES.map(name=>database.prepare(`SELECT * FROM ${name} WHERE owner=? LIMIT 5001`).bind(owner)));
    if(results.some(result=>!Array.isArray(result.results)||result.results.length>5000))throw Error('backup_snapshot_too_large');
-   const snapshot=validateSnapshot({format:'MG-Sites-backup-1',owner,createdAt,tables:BACKUP_TABLES.map((name,n)=>({name,rows:name==='documents'?results[n].results.sort((a:Row,b:Row)=>a.id.localeCompare(b.id)):results[n].results}))},owner),plain=encoder.encode(JSON.stringify(snapshot));
+   const snapshot=validateSnapshot({format:'MG-Sites-backup-1',owner,createdAt,...(companyBoundary?{companyBoundary}:{}),tables:BACKUP_TABLES.map((name,n)=>({name,rows:name==='documents'?results[n].results.sort((a:Row,b:Row)=>a.id.localeCompare(b.id)):results[n].results}))},owner,companyBoundary),plain=encoder.encode(JSON.stringify(snapshot));
    if(plain.length>12_000_000)throw Error('backup_snapshot_too_large');
    const snapshotKey=prefix+'/snapshot.bin',snapshotHash=await hash(plain);await bucket.put(snapshotKey,await sealBackup(plain,key,owner,row.id,'snapshot'),{httpMetadata:{contentType:'application/octet-stream'}});
    const total=snapshot.tables.find(t=>t.name==='documents')!.rows.length;
@@ -159,7 +166,7 @@ export async function backupStep(database:Database,bucket:Bucket,owner:string,ke
    await checkpoint("snapshot_key=?,snapshot_hash=?,total_docs=?,state='running',last_error='',updated_at=?",snapshotKey,snapshotHash,total,clock());
    row={...row,snapshot_key:snapshotKey,snapshot_hash:snapshotHash,total_docs:total,state:'running'};
   }
-  const snapshot=await readSnapshot(bucket,row,key,owner),files=snapshot.tables.find(t=>t.name==='documents')!.rows;
+  const snapshot=await readSnapshot(bucket,row,key,owner,companyBoundary),files=snapshot.tables.find(t=>t.name==='documents')!.rows;
   const apiEvidence=JSON.stringify(snapshot.apiEvidence);
   if(row.api_evidence&&row.api_evidence!==apiEvidence)throw Error('backup_api_evidence_invalid');
   if(!row.api_evidence){await checkpoint('api_evidence=?',apiEvidence);row.api_evidence=apiEvidence;}

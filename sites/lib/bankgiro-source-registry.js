@@ -20,7 +20,7 @@ export function createBankgiroSourceRegistry({configuration,secrets={},fetchImpl
    try{
     if(!Object.hasOwn(secrets,registration.tokenSecret))throw new Error();
     const source=createHttpsBankgiroSource({registration:{...registration,configurationRevision:config.revision},token:secrets[registration.tokenSecret],fetchImpl,now});sources.set(registration.owner,source);
-   }catch{sources.set(registration.owner,blocked(registration.enabled===false?{owner:registration.owner,configurationRevision:config.revision}:undefined));}
+   }catch{sources.set(registration.owner,blocked(registration.enabled===false?{owner:registration.owner,companyId:registration.companyId,configurationRevision:config.revision}:undefined));}
   }
  }
  return Object.freeze({resolve(owner){if(invalid||!text(owner))return blocked();return sources.get(owner)??blocked({owner,configurationRevision:config.revision});}});
