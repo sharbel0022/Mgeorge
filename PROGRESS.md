@@ -10,6 +10,23 @@ Lokala fullsviter under arbetet: **1 899 Node +3 756 Sites +47 brygga**, utan fe
 
 Skrivfri kontroll av verkligt sparat original för **BG 5819-7013 / 0599 / 625,00 SEK / 2026-10-26** bekräftar bevarad referens, belopp och individuellt rapportnamn samt intakt original. Formell OCR och organisationsnummer är inte styrkta. Kontoåtkomst, gemensam bankidentitet till AIS och registrerad faktura saknas i kedjan; rapportkällan är `SOURCE_NOT_CONFIGURED`. En ekonomisk AIS-post och en separat rapportobservation, **noll allokeringar**, fortsatt blockerad automatisk avstämning. Inga finansiella produktionsändringar, merge eller driftsättning ingår. **Bankgiro 8,5; alla 33 poäng kvar på 255/330 =7,73/10, 0/33 ≥9,5.**
 
+## Agent 5 — deterministisk betalningsavstämning, 2026-11-05
+
+Branch `feature/95-reconciliation`, bas `4ad205b`. [Inventering, ändringar,
+testmatris, mätkvitton och acceptansgränser](docs/integration/reconciliation-95.md).
+Node och Sites delar nu en deterministisk bedömning av konkurrerande betalningar:
+distinkta, exakt styrkta fakturareferenser blockerar inte längre varandra. Sites
+bevarar bankens typade referenser vid manuell verifiering, håller manuella
+ersättningsuppgifter utanför automatiken och skiljer bank-ID från CSV-OCR.
+Källorsaker, försiktiga dubblettvarningar och aktuella kontospärrar behålls.
+
+Den frysta 26-fallskorpusen går per motor från **2/8 till 8/8 korrekta tilldelningar,
+6→0 missade och 0 felaktiga**; **21/21 negativa scenarier** hålls både före och
+efter. Nya SQLite-/D1-prov verifierar återimport, oförändrade original/audit,
+historiska delbetalningar och exakt restsaldo. Slutliga helgrindar och review
+redovisas i rapporten. Resultaten är syntetiska; inga produktionspengar ändras.
+Samtliga 33 numeriska poäng behålls: **255/330 =7,73/10; 0/33 ≥9,5**.
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).

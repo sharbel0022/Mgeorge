@@ -12,6 +12,22 @@
 | Verkligt sparat obligatoriskt 0599-original återläst utan skrivning; referens/nolla, belopp och rapportnamn bevarade. | Automatisk rapportkälla saknas. Ingen gemensam bankutfärdad insättningsidentitet, aktuell verifierad kontokoppling eller registrerad faktura i det valda fallet. Noll allokeringar. |
 | Isolerade lokala testkvitton, syntax/typer/audit/bygge, ren installation och oberoende review enligt rapporten. | Syntetiska tester och kodreview är inte leverantörsavtal, driftsättning eller produktionsacceptans. Sites har åtta befintliga moderate utvecklingsberoendefynd. |
 
+## Agent 5 — avgränsad betalningsavstämning, 2026-11-05
+
+[Leveransrapport och maskinläsbart före/efter-facit](docs/integration/reconciliation-95.md)
+för `feature/95-reconciliation`, bas `4ad205b`. **Före och efter: 255/330 =7,73/10;
+0/33 ≥9,5.** Korrigerad kod och syntetiska tester ersätter inte verkliga bankoriginal
+och ett representativt verksamhetsfacit för målet 9,5.
+
+| Område | Före | Efter | Nytt avgränsat bevis | Återstående acceptans |
+| --- | ---: | ---: | --- | --- |
+| 20. Automatisk betalningsmatchning | 7,5 | 7,5 | Gemensam deterministisk konkurrensbedömning, strikt manuell/bankseparation och rättad CSV-referenstolkning. Per motor 2/8→8/8 förväntade tilldelningar, FN 6→0 och FP 0 i 26 syntetiska scenarier. | Representativt oberoende facit och aktuell bank-/företagsbehörighet i drift. |
+| 21–22. Delbetalningar och överbetalningar | 8 | 8 | Verkliga SQLite-/D1-prov för 2500+625 mot 3125 SEK samt 700 mot 625 SEK med 75 SEK spårbart överskott; historiska tilldelningar bevaras. | Ingen ny produktionsallokering eller verklig återbetalning prövas. |
+| 24–25. Betalningshistorik och status | 8 | 8 | Konkurrerande betalnings-ID:n och ursprungliga spärrorsaker; omkörning och återimport utan dubbla tilldelningar eller ekonomiska audit-händelser. | Full historisk evidensrekonstruktion efter senare importberikning ingår inte. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Delad regressionkorpus, separata proveniens-/CSV-regressioner och persistensfall; slutgrindar samt avgränsad oberoende granskning redovisas i rapporten. | 8 befintliga moderate utvecklingsberoendefynd i Sites och tidigare lintskuld kvarstår. |
+
+Ingen numerisk produktionspoäng höjs. Branch/PR innebär ingen merge eller Sites-publicering.
+
 ## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
 
 [Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.

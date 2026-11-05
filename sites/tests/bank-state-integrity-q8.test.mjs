@@ -167,7 +167,10 @@ test('Q8: splitting a manually undone payment cannot erase its automatic matchin
  const f=await fixture(t,initial),result=await f.post({type:'transaction.split',id:initial.transactions[0].id,rows:[{amount:62500,party:'Synthetic customer AB',payerReference:'000018'}]});
  assert.equal(result.response.status,200);assert.equal(result.body.state.allocations.filter(a=>a.active).length,0);assert.equal(balance(result.body.state,result.body.state.invoices[0]),62500);
  const child=result.body.state.transactions.find(row=>row.parentId),confirmed=await f.post({type:'transaction.verify',id:child.id,note:'Rechecked this individual payment against the specification.'});
- assert.equal(confirmed.response.status,200);assert.equal(confirmed.body.state.allocations.filter(a=>a.active).length,1);
+ assert.equal(confirmed.response.status,200);assert.equal(confirmed.body.state.allocations.filter(a=>a.active).length,0);
+ const matched=await f.post({type:'match.create',invoiceId:initial.invoices[0].id,transactionId:child.id,amount:62500,note:'Explicit reviewed allocation of the manually supplied specification.'});
+ assert.equal(matched.response.status,200);assert.equal(matched.body.state.allocations.filter(a=>a.active).length,1);
+ assert.equal(balance(matched.body.state,matched.body.state.invoices[0]),0);
 });
 
 test('Q8: a parent refund or reversal remains review evidence after its complete specification arrives',async t=>{
