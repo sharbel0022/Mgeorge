@@ -1,6 +1,6 @@
 # Kvalitet, CI och syntetisk prestanda
 
-Detta är Agent 8:s reproducerbara kvalitetsflöde. Körningarna använder syntetiska data och sparar faktiska processresultat, testantal, coverage och källidentitet. Aktuella leveransresultat redovisas separat; den här instruktionen är inte ett testkvitto.
+Detta är Agent 8:s reproducerbara kvalitetsflöde. Körningarna använder syntetiska data och sparar faktiska processresultat, testantal, coverage och källidentitet. [Leveransrapporten](AGENT-8-REPORT.md) och [CI-kvittot](evidence/ci-42083369457.json) redovisar faktiskt exekverade resultat; den här instruktionen är inte ett testkvitto.
 
 ## Kör lokalt
 
@@ -75,6 +75,8 @@ Browserstart, fel i källhashar och globala browserfel sparas som underkänd kö
 | `exitCode`, `signal`, `errorCode` | Faktiskt subprocessutfall, inklusive avbrott och timeout. |
 | `totals` | Faktiska tester/pass/fail/cancelled/skipped/TODO; saknade totalsiffror är inte noll. |
 | `coverage` | Uppmätt LCOV, inklusive täljare/nämnare och laddade filers omfattning. |
+| `coverage.files` / `coverage.records` | Unika SF-sökvägar respektive LCOV-poster. Samma källa kan förekomma flera gånger. |
+| `coverage.sourceLines` | Union av täckta rader per SF-sökväg/radnummer, endast när varje posts DA-data stämmer mot LF/LH. |
 | `artifacts[].sha256` | Integritetshash för logg/rapport som stöder resultatet. |
 | `syntheticOnly` / `realBankVerification` | Syntetisk acceptans respektive `NOT_RUN` för verklig bankverifiering. |
 
@@ -85,6 +87,8 @@ För godkänt testkvitto krävs processframgång, kompletta totalsiffror, minst 
 Det befintliga testet för avsiktligt misslyckad minimatch-filskrivning sätter en 64 KiB OS-gräns. Endast dess felinjicerade barnprocess körs utan V8-instrumentering, så att den inte samtidigt förstör hela körningens coverage-JSON. Samtliga fel-/reparationsassertions och föräldraprocessens instrumentering behålls.
 
 Node V8/LCOV mäter de produktionsfiler som laddades i den instrumenterade körningen. Oimporterade filer, källtextkontroller, vissa transformerade `data:`-moduler och browserkod ska inte räknas om till fullständig kodtäckning. Rapporten visar uttryckligen denna begränsning och exakta nämnare; den gör ingen uppskattning av okörd kod.
+
+Råa `lines`, `functions` och `branches` summeras per LCOV-post (`aggregation: per-lcov-record`). Query-importer kan lämna flera poster för samma källa. `sourceLines` förenar därför radträffar separat och lämnas omätt om DA-underlaget saknas eller är ofullständigt. Genererade funktions-/gren-ID:n kan ändras mellan modulinstanser; dessa slås inte ihop. GitHub-sammanfattningen visar båda måtten med deras omfattning. Äldre kvitton utan `records` använde `files` som postantal och ska läsas enligt [rapportens normalisering](evidence/coverage-8a083eb.json).
 
 Belastningsprofilen använder 1, 10 och 100 syntetiska företag, tio transaktioner per företag, seed 95 och högst fyra parallella företagsjobb. Den kör verkliga SQLite-partitioner, banksynk och beständiga leaser med en injicerad syntetisk provider. Initial import följs av replay och två konkurrerande anrop per företag; en konkurrent ska vinna och den andra få `ACCOUNT_BUSY`. Korrekthetskontrollerna kräver exakt 1 110 importerade rader, 2 220 dubbletter och 111 förväntade upptaget-svar över de tre storlekarna. Samma externa ID:n återanvänds mellan företagen för att avslöja läckage. Den redovisar parametrar, samtidighet, resultatkontroller, latens och genomströmning. Gamla benchmarkfiler tas bort före start, och CI kräver processframgång samt ett fullständigt strukturerat kvitto för alla tre storlekar på rätt commit. Tider är informativa utan sköra tidsgränser; korrekthet och komplett mätning är grindar. Dessa mätningar är lokala syntetiska arbetslaster. Banklatens, produktions-D1/R2 och faktisk kommersiell kapacitet kräver separata mätningar.
 

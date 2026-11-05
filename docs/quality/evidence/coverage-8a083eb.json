@@ -1,0 +1,367 @@
+{
+  "schemaVersion": 1,
+  "kind": "derived-unique-source-line-coverage",
+  "sourceCommit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+  "sourceHead": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+  "algorithm": "For each complete LCOV record validate DA line identity/count against LF/LH; union positive line hits by exact SF path and line number. Functions and branches are not merged because generated IDs vary across module instances.",
+  "scope": "Loaded reported LCOV source paths/line coordinates only; unimported and some transformed sources are not measured. Transformed source mappings are not verified.",
+  "profiles": {
+    "node-22": {
+      "records": 97,
+      "files": 79,
+      "lines": {
+        "covered": 10927,
+        "total": 11726,
+        "percent": 93.19
+      },
+      "lcovSha256": "a9746dc8636f56f20109d0970cde0aa985d510b2bb9ee60d77cd1c70d4a4c271",
+      "duplicateSources": {
+        "src/server.js": 19
+      },
+      "weakestByUncoveredLines": [
+        {
+          "path": "sites/lib/domain.ts",
+          "covered": 233,
+          "total": 588,
+          "uncovered": 355,
+          "percent": 39.63
+        },
+        {
+          "path": "sites/lib/reconciliation-engine.js",
+          "covered": 18,
+          "total": 100,
+          "uncovered": 82,
+          "percent": 18.0
+        },
+        {
+          "path": "sites/lib/banking/security.ts",
+          "covered": 19,
+          "total": 65,
+          "uncovered": 46,
+          "percent": 29.23
+        },
+        {
+          "path": "src/server.js",
+          "covered": 1095,
+          "total": 1141,
+          "uncovered": 46,
+          "percent": 95.97
+        },
+        {
+          "path": "sites/lib/banking/openpayments-provider.js",
+          "covered": 302,
+          "total": 328,
+          "uncovered": 26,
+          "percent": 92.07
+        },
+        {
+          "path": "sites/lib/bankgiro-http-source.js",
+          "covered": 123,
+          "total": 146,
+          "uncovered": 23,
+          "percent": 84.25
+        },
+        {
+          "path": "src/banking/openpayments-node-transport.js",
+          "covered": 238,
+          "total": 255,
+          "uncovered": 17,
+          "percent": 93.33
+        },
+        {
+          "path": "sites/lib/bank-api-original.js",
+          "covered": 85,
+          "total": 101,
+          "uncovered": 16,
+          "percent": 84.16
+        },
+        {
+          "path": "sites/lib/bankgiro-openpayments.js",
+          "covered": 226,
+          "total": 242,
+          "uncovered": 16,
+          "percent": 93.39
+        },
+        {
+          "path": "sites/lib/payment-references.js",
+          "covered": 142,
+          "total": 158,
+          "uncovered": 16,
+          "percent": 89.87
+        }
+      ]
+    },
+    "node-24": {
+      "records": 97,
+      "files": 79,
+      "lines": {
+        "covered": 10930,
+        "total": 11726,
+        "percent": 93.21
+      },
+      "lcovSha256": "cc63e65e644f9ce847e6278db2280be656b9f5cd315a77f2231fbb2647cbad4e",
+      "duplicateSources": {
+        "src/server.js": 19
+      },
+      "weakestByUncoveredLines": [
+        {
+          "path": "sites/lib/domain.ts",
+          "covered": 236,
+          "total": 588,
+          "uncovered": 352,
+          "percent": 40.14
+        },
+        {
+          "path": "sites/lib/reconciliation-engine.js",
+          "covered": 18,
+          "total": 100,
+          "uncovered": 82,
+          "percent": 18.0
+        },
+        {
+          "path": "sites/lib/banking/security.ts",
+          "covered": 19,
+          "total": 65,
+          "uncovered": 46,
+          "percent": 29.23
+        },
+        {
+          "path": "src/server.js",
+          "covered": 1095,
+          "total": 1141,
+          "uncovered": 46,
+          "percent": 95.97
+        },
+        {
+          "path": "sites/lib/banking/openpayments-provider.js",
+          "covered": 302,
+          "total": 328,
+          "uncovered": 26,
+          "percent": 92.07
+        },
+        {
+          "path": "sites/lib/bankgiro-http-source.js",
+          "covered": 123,
+          "total": 146,
+          "uncovered": 23,
+          "percent": 84.25
+        },
+        {
+          "path": "src/banking/openpayments-node-transport.js",
+          "covered": 238,
+          "total": 255,
+          "uncovered": 17,
+          "percent": 93.33
+        },
+        {
+          "path": "sites/lib/bank-api-original.js",
+          "covered": 85,
+          "total": 101,
+          "uncovered": 16,
+          "percent": 84.16
+        },
+        {
+          "path": "sites/lib/bankgiro-openpayments.js",
+          "covered": 226,
+          "total": 242,
+          "uncovered": 16,
+          "percent": 93.39
+        },
+        {
+          "path": "sites/lib/payment-references.js",
+          "covered": 142,
+          "total": 158,
+          "uncovered": 16,
+          "percent": 89.87
+        }
+      ]
+    },
+    "sites": {
+      "records": 87,
+      "files": 87,
+      "lines": {
+        "covered": 8227,
+        "total": 10339,
+        "percent": 79.57
+      },
+      "lcovSha256": "b78eaa2402e3412808a66c61f8f07d707f3a4a9871a52906e4989302b08fa567",
+      "duplicateSources": {},
+      "weakestByUncoveredLines": [
+        {
+          "path": "../src/db.js",
+          "covered": 53,
+          "total": 619,
+          "uncovered": 566,
+          "percent": 8.56
+        },
+        {
+          "path": "../src/company-runtime.js",
+          "covered": 31,
+          "total": 356,
+          "uncovered": 325,
+          "percent": 8.71
+        },
+        {
+          "path": "../src/invoice-details.js",
+          "covered": 40,
+          "total": 250,
+          "uncovered": 210,
+          "percent": 16.0
+        },
+        {
+          "path": "../src/importers.js",
+          "covered": 40,
+          "total": 240,
+          "uncovered": 200,
+          "percent": 16.67
+        },
+        {
+          "path": "../src/invoice-extraction.js",
+          "covered": 30,
+          "total": 223,
+          "uncovered": 193,
+          "percent": 13.45
+        },
+        {
+          "path": "../src/payment-references.js",
+          "covered": 20,
+          "total": 158,
+          "uncovered": 138,
+          "percent": 12.66
+        },
+        {
+          "path": "../src/bankgiro-ingest.js",
+          "covered": 33,
+          "total": 154,
+          "uncovered": 121,
+          "percent": 21.43
+        },
+        {
+          "path": "../src/pdf-text.js",
+          "covered": 112,
+          "total": 174,
+          "uncovered": 62,
+          "percent": 64.37
+        },
+        {
+          "path": "../src/document-triage.js",
+          "covered": 10,
+          "total": 68,
+          "uncovered": 58,
+          "percent": 14.71
+        },
+        {
+          "path": "lib/account-evidence-presentation.ts",
+          "covered": 11,
+          "total": 60,
+          "uncovered": 49,
+          "percent": 18.33
+        }
+      ]
+    },
+    "bridge": {
+      "records": 2,
+      "files": 2,
+      "lines": {
+        "covered": 412,
+        "total": 421,
+        "percent": 97.86
+      },
+      "lcovSha256": "d166d9c34b56452cd9fa470a50ee91060c5fce234af4064fb71b25cb9cb65460",
+      "duplicateSources": {},
+      "weakestByUncoveredLines": [
+        {
+          "path": "src/bridge.js",
+          "covered": 347,
+          "total": 352,
+          "uncovered": 5,
+          "percent": 98.58
+        },
+        {
+          "path": "src/main.js",
+          "covered": 65,
+          "total": 69,
+          "uncovered": 4,
+          "percent": 94.2
+        }
+      ]
+    }
+  },
+  "combinedProfiles": [
+    "node-24",
+    "sites",
+    "bridge"
+  ],
+  "combinedLargestUncoveredLoadedSources": [
+    {
+      "path": "sites/lib/account-evidence-presentation.ts",
+      "covered": 11,
+      "total": 60,
+      "uncovered": 49,
+      "percent": 18.33
+    },
+    {
+      "path": "src/server.js",
+      "covered": 1095,
+      "total": 1141,
+      "uncovered": 46,
+      "percent": 95.97
+    },
+    {
+      "path": "sites/lib/local-ocr.ts",
+      "covered": 5,
+      "total": 33,
+      "uncovered": 28,
+      "percent": 15.15
+    },
+    {
+      "path": "src/banking/openpayments-node-transport.js",
+      "covered": 238,
+      "total": 255,
+      "uncovered": 17,
+      "percent": 93.33
+    },
+    {
+      "path": "src/company-runtime.js",
+      "covered": 343,
+      "total": 356,
+      "uncovered": 13,
+      "percent": 96.35
+    },
+    {
+      "path": "src/backup.js",
+      "covered": 201,
+      "total": 211,
+      "uncovered": 10,
+      "percent": 95.26
+    },
+    {
+      "path": "src/bank-consent.js",
+      "covered": 81,
+      "total": 88,
+      "uncovered": 7,
+      "percent": 92.05
+    },
+    {
+      "path": "sites/lib/bankgiro-openpayments.js",
+      "covered": 237,
+      "total": 242,
+      "uncovered": 5,
+      "percent": 97.93
+    },
+    {
+      "path": "sites/lib/company-bank-sync.js",
+      "covered": 184,
+      "total": 189,
+      "uncovered": 5,
+      "percent": 97.35
+    },
+    {
+      "path": "bridge/bankgiro/src/bridge.js",
+      "covered": 347,
+      "total": 352,
+      "uncovered": 5,
+      "percent": 98.58
+    }
+  ]
+}

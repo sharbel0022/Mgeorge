@@ -1352,3 +1352,20 @@ Aktuell separat fixture-CUA täckte fem bredder, stabil inmatning och dialogfoku
 Källor: [samlad rapport](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md), [grindkvitto](docs/saas/evidence/2026-11-05/bank-compat-gates.json), [incident](docs/saas/evidence/2026-11-05/bank-incident.json) och [oberoende granskning](docs/saas/evidence/2026-11-05/bank-compat-independent-review.md). Alla 33 numeriska poäng är oförändrade.
 
 Färsk läsande OCR-kontroll **2026-11-05T15:39:02Z** hittade ingen nyare schemalagd körning bland API-listans senaste15. Senaste observerade är [42013301104](https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104), jobb127197454985, headf75; faktisk logg10:45:30.6420193Z gav **processed0, failed0**, schedule success. Detta verifierar varken bearbetning av ett verkligt dokument eller den nya b2e7-körkoden. Ingen workflowdispatch utfördes. [Sanerat OCR-kvitto](docs/saas/evidence/2026-11-05/final-ocr-observation.json).
+
+
+## Agent 8 — verifierbar testbarhet, CI och syntetisk belastning, 2026-11-05
+
+[Full rapport](docs/quality/AGENT-8-REPORT.md) och [kvalitetskvitto](docs/quality/evidence/ci-42083369457.json) gäller mätbashead `8a083eb`, PR-merge-checkout `1880ac2`, identiskt träd `ed59308`. [Huvud-CI 42083369457](https://github.com/sharbel0022/Mgeorge/actions/runs/42083369457) och [säkerhets-CI 42083372075](https://github.com/sharbel0022/Mgeorge/actions/runs/42083372075) är faktiskt godkända. Den senare LCOV-rapporteringsrättningen och dokumentationen får egna kontroller i PR #47.
+
+| Berört område | Före | Efter | Ny evidens | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Node 22/24 vardera 2 023/2 023, Sites 3 851/3 851, bridge 47/47, Chromium 46/46; noll fail/cancel/skip/TODO. Reproducerbara installationer, TAP/JUnit/LCOV, faktiska exitkoder, manifest-/logghashar och återhämtnings-/migrations-/kontraktsregressioner. Typer/build/syntax passerade. | Unika laddade rader kan mätas, men oimporterade och vissa transformerade källor saknas. Åtta moderate utvecklingsberoendefynd och ingen generell lintgrind. Main saknar tvingande branchskydd; anslutningen har inte administrationsåtkomst. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Överlappande säkerhetsurval 325 Node + 788 Sites samt syntetisk företagsväxling och återkallelse i riktig browser. Företagsgränser och beständiga leaser verifierade vid 1/10/100 företag. | Ingen ny verklig bankbehörighet, full produktionslik browser/backend/provider-kedja eller kommersiell acceptans. |
+| 31. Katastrofåterställning | 5,5 | 5,5 | Ytterligare lokal SQLite-reopen, originalkorruption, processavbrott och bevarad ekonomisk identitet. Kontrollerade startlås med samma 5 000 ms timeout före WAL. | Ingen full produktionsåterställning, RPO/RTO eller ny driftacceptans. |
+
+**Samtliga 33 numeriska poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.** Målet 9,5 inom testbarhet/CI/prestanda är inte certifierat. Förbättrad evidens ersätter ingen saknad mätning.
+
+Node 24:s normaliserade coverage är 10 930/11 726 = 93,21 % över 79 unika laddade källor. Ursprungsrapportens 48,00 % är en råsumma av 97 LCOV-poster, där `server.js` förekommer 19 gånger. Båda resultat bevaras; ingen testförbättring påstås från omräkningen. Sites 79,57 % och bridge 97,86 % har inga upprepade SF-poster. Unika funktions-/grenmått härleds inte ur instabila genererade ID:n. Se [exakta nämnare](docs/quality/evidence/coverage-8a083eb.json).
+
+Belastningsmätningen gav initial p95 130,90/422,76/458,33 ms för 1/10/100 företag, 1 110 sparade importer, 2 220 replaydubbletter och noll oväntade synkfel. Det är en begränsad syntetisk SQLite-körning med fyra parallella företagsjobb, utan produktions-D1/R2, banklatens eller långvarig kapacitetsmätning. CPU-profilen pekar ut upprepade företags-/databasgränskontroller för framtida arbete med bevarad isolering; ingen runtimeoptimering påstås.

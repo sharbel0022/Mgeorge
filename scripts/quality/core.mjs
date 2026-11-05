@@ -57,25 +57,60 @@ export function benchmarkVerdict(report, commit) {
 }
 
 export function parseLcov(text) {
-  const count = key => [...text.matchAll(new RegExp(`^${key}:(\\d+)\\s*$`, 'gm'))].reduce((sum, match) => sum + Number(match[1]), 0);
+  const summaryKeys = ['LF', 'LH', 'FNF', 'FNH', 'BRF', 'BRH'];
   const ratio = (covered, total) => ({ covered, total, percent: total ? Math.round(covered / total * 10000) / 100 : null });
-  const files = [...text.matchAll(/^SF:.+$/gm)].length;
+  const sources = [...text.matchAll(/^SF:([^\r\n]+)\r?$/gm)].map(match => match[1]);
+  const records = sources.length, files = new Set(sources).size;
   const completeRecords = text.split('end_of_record').slice(0, -1).filter(record => /^SF:.+$/m.test(record));
-  const valid = completeRecords.length === files && completeRecords.every(record => {
-    const values = Object.fromEntries(['LF', 'LH', 'FNF', 'FNH', 'BRF', 'BRH'].map(key => {
+  const parsedRecords = completeRecords.map(record => {
+    const values = Object.fromEntries(summaryKeys.map(key => {
       const matches = [...record.matchAll(new RegExp(`^${key}:(\\d+)\\s*$`, 'gm'))];
       return [key, matches.length === 1 ? Number(matches[0][1]) : null];
     }));
+    return { record, values };
+  });
+  const count = key => parsedRecords.reduce((sum, { values }) => sum + (Number.isSafeInteger(values[key]) ? values[key] : 0), 0);
+  // Reject every orphan counter, including zero, malformed or truncated values.
+  const counterCountsMatch = summaryKeys.every(key => [...text.matchAll(new RegExp(`^${key}:`, 'gm'))].length === records);
+  const valid = completeRecords.length === records && counterCountsMatch && parsedRecords.every(({ record, values }) => {
+    if ([...record.matchAll(/^SF:([^\r\n]+)\r?$/gm)].length !== 1) return false;
     return Object.values(values).every(value => Number.isSafeInteger(value) && value >= 0)
       && values.LH <= values.LF && values.FNH <= values.FNF && values.BRH <= values.BRF;
   });
+  // Query-suffixed imports can emit several records for the same source path.
+  // Line identities survive that conversion; generated function/branch IDs do
+  // not. Keep their raw totals and never invent a merged identity for them.
+  const sourceHits = new Map();
+  const sourceLinesMeasured = records > 0 && valid && parsedRecords.every(({ record, values }) => {
+    const source = record.match(/^SF:([^\r\n]+)\r?$/m)[1], hits = new Map();
+    for (const row of record.split(/\r?\n/).filter(line => line.startsWith('DA:'))) {
+      const match = /^DA:(\d+),(\d+)(?:,[^,\r\n]+)?$/.exec(row);
+      if (!match) return false;
+      const line = Number(match[1]), count = Number(match[2]);
+      if (!Number.isSafeInteger(line) || line < 1 || !Number.isSafeInteger(count) || hits.has(line)) return false;
+      hits.set(line, count > 0);
+    }
+    if (hits.size !== values.LF || [...hits.values()].filter(Boolean).length !== values.LH) return false;
+    const merged = sourceHits.get(source) ?? new Map();
+    for (const [line, hit] of hits) merged.set(line, Boolean(merged.get(line)) || hit);
+    sourceHits.set(source, merged);
+    return true;
+  });
+  const mergedHits = sourceLinesMeasured ? [...sourceHits.values()].flatMap(hits => [...hits.values()]) : [];
   return {
-    measured: files > 0 && valid,
+    measured: records > 0 && valid,
     scope: 'loaded production files only; unimported files are not measured',
-    files,
+    aggregation: 'per-lcov-record',
+    files, records,
     lines: ratio(count('LH'), count('LF')),
     functions: ratio(count('FNH'), count('FNF')),
     branches: ratio(count('BRH'), count('BRF')),
+    sourceLines: {
+      measured: sourceLinesMeasured,
+      aggregation: 'union-by-source-path-and-line',
+      scope: 'loaded LCOV source paths and line numbers only; transformed source mappings are not verified',
+      ...(sourceLinesMeasured ? ratio(mergedHits.filter(Boolean).length, mergedHits.length) : { covered: null, total: null, percent: null }),
+    },
   };
 }
 
@@ -222,7 +257,13 @@ export function renderSummary(report) {
   for (const step of report.steps ?? []) {
     const totals = step.totals ? totalNames.map(key => step.totals[key] ?? '?').join(' / ') : '—';
     lines.push(`| ${markdown(step.name)} | ${step.passed ? 'PASS' : step.skipped ? 'NOT_RUN' : 'FAIL'} | ${totals} | ${Number.isFinite(step.durationMs) ? (step.durationMs / 1000).toFixed(2) + ' s' : '—'} |`);
-    if (step.coverage?.measured) notes.push(`${markdown(step.name)} coverage: lines **${step.coverage.lines.percent}%**, branches **${step.coverage.branches.percent}%**, functions **${step.coverage.functions.percent}%** (${step.coverage.files} loaded files; unimported files are not measured).`);
+    if (step.coverage?.measured) {
+      const coverage = step.coverage, sourceLines = coverage.sourceLines;
+      const unique = sourceLines?.measured ? `**${sourceLines.percent}%** (${sourceLines.covered}/${sourceLines.total})` : '**NOT_MEASURED** (missing, incomplete or invalid DA data)';
+      // Older receipts counted records in `files`; do not relabel that number.
+      const uniqueFiles = Number.isSafeInteger(coverage.records) ? coverage.files : 'NOT_MEASURED';
+      notes.push(`${markdown(step.name)} coverage: ${uniqueFiles} unique loaded source paths / ${coverage.records ?? coverage.files} LCOV records. Unique source-line coverage: ${unique}. Record-weighted raw coverage: lines **${coverage.lines.percent}%**, branches **${coverage.branches.percent}%**, functions **${coverage.functions.percent}%**. Unimported files are not measured; transformed source mappings are not verified.`);
+    }
     if (step.audit?.measured) notes.push(`${markdown(step.name)} vulnerabilities: ${Object.entries(step.audit.vulnerabilities).map(([key, count]) => `${key}=${count}`).join(', ')}.`);
   }
   if (notes.length) lines.push('', '## Measurements', '', ...notes.map(note => `- ${note}`));

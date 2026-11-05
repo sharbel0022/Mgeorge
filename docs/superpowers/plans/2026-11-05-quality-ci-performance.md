@@ -66,11 +66,11 @@ Files: new `scripts/quality/benchmark*.mjs`, `test/quality-benchmark*.test.js`, 
 ## Task 5: Browser, final validation and delivery
 
 - [x] Automate existing synthetic browser acceptance using pinned test tooling; report fixture scope explicitly.
-- [ ] Run complete tests, syntax/type checks, production build and full/production dependency audits.
+- [x] Run complete tests, syntax/type checks, production build and full/production dependency audits.
 - [x] Run independent whole-branch review and fix concrete high-priority findings with reproductions.
-- [ ] Commit code; run final evidence against the immutable commit; keep report commit separate where needed.
-- [ ] Update `PROGRESS.md`, `QUALITY-SCORECARD.md`, quality report and JSON receipts with limitations.
-- [ ] Push only this branch, open PR against main, inspect exact-head GitHub checks and report their actual state.
+- [x] Commit code; run final evidence against the immutable commit; keep report commit separate where needed.
+- [x] Update `PROGRESS.md`, `QUALITY-SCORECARD.md`, quality report and JSON receipts with limitations.
+- [x] Push only this branch, open PR against main, inspect exact-head GitHub checks and report their actual state.
 
 ## Execution choices
 
@@ -84,6 +84,12 @@ The baseline was actually executed: Node 1899/1899, bridge 47/47, Sites 3752 pas
 
 Published code b24ea089a062e122ce240ec66ba01180efe533c9 was tested through PR merge checkout f347c2257b167c706861bc2f6d9a29db4553d4cf, tree362e10cb322ca269fd73f2d8f3f60fa879d9d2ab, in run42079194353. Node22 passed1923/1923; Node24 had1922pass/1startup failure. Sites had3756pass/1npm-lifecycle failure and a truncated coverage file. Bridge47/47, Chromium46/46, benchmark1/10/100 and the separate overlapping security subset325+750 passed. Build/types/production audits passed; Sites full audit retained8moderate findings.
 
-The startup failure reproduced as SQLite BUSY_RECOVERY before ready: the timeout was installed after the WAL pragma. A minimal production order correction retained the simultaneous financial assertions; controlled-lock RED/GREEN evidence and100/100 candidate startup attempts were observed. The final targeted startup/migration/HTTP set passed7/7. The quality runner now preserves the actual npm CLI path, and the deliberately file-limited minimatch fault child stops corrupting the parent V8 report. All40 related existing Sites tests passed together with valid script LCOV; no tests were skipped or weakened.
+A separate diagnosed startup failure reproduced as SQLite BUSY_RECOVERY before ready: the timeout was installed after the WAL pragma. The original CI child's exception had not been retained, so exact identity with that earlier failure cannot be established. A minimal production order correction retained the simultaneous financial assertions; controlled-lock RED/GREEN evidence and100/100 candidate startup attempts were observed. The final targeted startup/migration/HTTP set passed7/7. The quality runner now preserves the actual npm CLI path, and the deliberately file-limited minimatch fault child stops corrupting the parent V8 report. All40 related existing Sites tests passed together with valid script LCOV; no tests were skipped or weakened.
 
 Official SHA-pinned Node24-runtime Actions replace the deprecated Actions runtime in the two test workflows. The operational OCR workflow remains outside Agent8 modifications. Current main advanced through PR48 and was merged normally at bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee; the intersecting eight root regressions and one Sites OCR regression passed on the merged code. A new full CI run must verify this combined revision.
+
+## Verified integrated measurement baseline
+
+PR47 head8a083eb70babac68b08ab3eac50aaa5e225c5eb8 was tested through checkout1880ac268eeb7de752bec2ca9567bf35ffdfdec8 with identical treeed59308d7e41be58b49e0bb66a77b707e08fde86. Runs42083369457 and42083372075 completed successfully: Node22/24 each2023/2023, Sites3851/3851, bridge47/47, Chromium41+5=46/46, overlapping security325+788. All had zero fail/cancel/skip/TODO. Types/build/syntax passed; production audits zero, full Sites8moderate. All1/10/100 benchmark correctness checks passed. Seven ZIP digests/sizes and78 internal artifact hashes/sizes were verified.
+
+Final independent coverage review found19 LCOV records for src/server.js. The reporting correction keeps record-weighted totals, counts unique SF paths separately and validates a DA-based source-line union. An independently reproduced orphan-counter defect also received RED/GREEN coverage; all18 runner tests passed after the final correction. This correction and the report are a separate follow-up revision; its own CI status belongs in the PR and does not rewrite the measured baseline. See docs/quality/AGENT-8-REPORT.md and evidence/ci-42083369457.json. Numeric score remains8.5; no live-bank, production capacity, deployment or9.5 certification is claimed.
