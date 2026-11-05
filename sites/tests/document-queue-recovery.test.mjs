@@ -264,3 +264,108 @@ test('a server PDF continuation failure cannot requeue an already accepted recei
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);assert.notEqual(row.extraction,'{}');
   assert.equal((await f.processing.processDocuments(f.owner,1)).processed,0);assert.equal(f.pdfCalls,1);
 });
+
+test('queue health separates runnable work, backoff, active and expired leases without mutating jobs',async t=>{
+  const f=await fixture(t),at=Date.parse('2026-11-05T12:00:00.000Z');t.mock.method(Date,'now',()=>at);
+  const past='2026-11-05T11:00:00.000Z',future='2026-11-05T12:05:00.000Z';
+  const cases=[
+    ['pdf','queued','cloud',0,past,''],['ocr','waiting_ocr','local',0,past,''],
+    ['backoff','waiting_ocr','local',1,future,''],['busy','processing','local',1,past,future],
+    ['expired','processing','local',2,past,past],['exhausted','processing','cloud',3,past,past],
+    ['failed','failed','local',3,past,''],['rejected','waiting_ocr','local',0,past,''],
+  ];
+  for(const [id,state,engine,attempts,available,until] of cases){
+    await f.document(id,engine==='cloud'?'application/pdf':'image/png');
+    f.sql.prepare('UPDATE documents SET created_at=? WHERE id=?').run(past,id);
+    f.sql.prepare('INSERT INTO document_jobs(owner,document_id,state,engine,attempts,available_at,lease_until,updated_at) VALUES(?,?,?,?,?,?,?,?)').run(f.owner,id,state,engine,attempts,available,until,past);
+  }
+  f.sql.prepare("UPDATE gmail_sources SET status='rejected' WHERE document_id='rejected'").run();
+  // Repeated source observations must not multiply a single document's work.
+  f.sql.prepare('INSERT INTO gmail_sources(owner,source_id,document_id,metadata,created_at) VALUES(?,?,?,?,?)').run(f.owner,'second-source','ocr','{}',past);
+  await f.document('other','image/png','other-owner');
+  f.sql.prepare('INSERT INTO document_jobs(owner,document_id,state,engine,available_at,updated_at) VALUES(?,?,?,?,?,?)').run('other-owner','other','waiting_ocr','local',past,past);
+  const before=f.sql.prepare('SELECT * FROM document_jobs ORDER BY owner,document_id').all();
+  const status=await f.processing.processingStatus(f.owner);
+  assert.deepEqual(status.queue_health,{
+    basis:'current_jobs',observed_at:'2026-11-05T12:00:00.000Z',pending:6,ready_pdf:1,ready_ocr:1,deferred:1,
+    active:1,expired_leases:1,exhausted:2,failed:1,oldest_pending_at:past,next_retry_at:future,
+    ocr_worker_unavailable:true,
+  });
+  assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs ORDER BY owner,document_id').all(),before);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});
+
+test('queue throughput counts distinct accepted documents in the observed day and excludes other owners and unfinished work',async t=>{
+  const f=await fixture(t),at=Date.parse('2026-11-05T12:00:00.000Z');t.mock.method(Date,'now',()=>at);
+  for(const [id,state] of [['done','needs_review'],['old','needs_review'],['inflight','processing'],['future','needs_review'],['rejected','needs_review']]){
+    await f.document(id);
+    f.sql.prepare('INSERT INTO document_jobs(owner,document_id,state,available_at,updated_at) VALUES(?,?,?,?,?)').run(f.owner,id,state,'2026-11-05T10:00:00Z','2026-11-05T10:00:00Z');
+  }
+  const insert=f.sql.prepare('INSERT INTO document_extractions(id,owner,document_id,result,created_at) VALUES(?,?,?,?,?)');
+  for(const [id,document,time,owner=f.owner] of [
+    ['a','done','2026-11-04T12:00:00.000Z'],['b','done','2026-11-05T11:00:00.000Z'],
+    ['c','old','2026-11-04T11:59:59.999Z'],['d','inflight','2026-11-05T11:00:00.000Z'],
+    ['e','future','2026-11-05T12:00:00.001Z'],['f','rejected','2026-11-05T11:00:00.000Z'],
+    ['g','done','2026-11-05T11:00:00.000Z','other-owner'],
+  ])insert.run(id,owner,document,'{}',time);
+  f.sql.prepare("UPDATE gmail_sources SET status='rejected' WHERE document_id='rejected'").run();
+  const status=await f.processing.processingStatus(f.owner);
+  assert.deepEqual(status.throughput,{basis:'accepted_extractions_with_terminal_job',window_start:'2026-11-04T12:00:00.000Z',window_end:'2026-11-05T12:00:00.000Z',completed_documents:1});
+});
+
+test('queue health reports no unavailable worker for an empty or paused OCR queue',async t=>{
+  const f=await fixture(t);
+  assert.equal((await f.processing.processingStatus(f.owner)).queue_health.ocr_worker_unavailable,false);
+  await f.document('waiting');await f.processing.enqueueDocuments(f.owner);
+  assert.equal((await f.processing.processingStatus(f.owner)).queue_health.ocr_worker_unavailable,true);
+  f.sql.prepare('UPDATE document_automation SET enabled=0').run();
+  assert.equal((await f.processing.processingStatus(f.owner)).queue_health.ocr_worker_unavailable,false);
+  f.sql.prepare('UPDATE document_automation SET enabled=1,cloud_worker_seen=?').run(new Date().toISOString());
+  assert.equal((await f.processing.processingStatus(f.owner)).queue_health.ocr_worker_unavailable,false);
+});
+
+test('a final-attempt accepted extraction survives an interrupted continuation as review work without repeating OCR',async t=>{
+  const f=await fixture(t);await f.document('last-attempt');await f.processing.enqueueDocuments(f.owner);
+  f.sql.prepare('UPDATE document_jobs SET attempts=2').run();
+  const job=await f.lease(),prepare=f.d1.prepare.bind(f.d1);let interrupted=false;
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(query==='SELECT * FROM document_automation WHERE owner=?'){
+      const first=statement.first.bind(statement);statement.first=async()=>{if(!interrupted){interrupted=true;throw Error('synthetic final continuation failure');}return first();};
+    }
+    return statement;
+  };
+  await assert.rejects(f.complete(job),/synthetic final continuation failure/);
+  const before=f.sql.prepare('SELECT * FROM document_jobs').get(),history=f.sql.prepare('SELECT * FROM document_extractions').all(),original=f.objects.get(f.owner+'/last-attempt');
+  assert.equal(before.attempts,3);assert.equal(history.length,1);
+  f.sql.prepare("UPDATE document_jobs SET lease_until='2000-01-01'").run();await f.restart();
+  assert.equal(await f.lease(),null,'already accepted output needs review, not another OCR lease');
+  const after=f.sql.prepare('SELECT * FROM document_jobs').get();
+  assert.equal(after.state,'needs_review');assert.equal(after.error_code,'processing_interrupted_after_extraction');
+  assert.equal(after.attempts,3);assert.equal(after.extraction,before.extraction);assert.equal(after.lease,'');assert.equal(after.lease_until,'');
+  assert.deepEqual(f.sql.prepare('SELECT * FROM document_extractions').all(),history);
+  assert.deepEqual(f.objects.get(f.owner+'/last-attempt'),original);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal((await f.complete(job)).status,409);
+});
+
+for(const defect of ['previous lease receipt','missing history','changed original','rejected while reading'])test(`interrupted extraction recovery refuses ${defect}`,async t=>{
+  const f=await fixture(t);await f.document('guarded');await f.processing.enqueueDocuments(f.owner);
+  f.sql.prepare('UPDATE document_jobs SET attempts=2').run();const job=await f.lease();
+  const prepare=f.d1.prepare.bind(f.d1);let interrupted=false;
+  f.d1.prepare=query=>{const statement=prepare(query);if(query==='SELECT * FROM document_automation WHERE owner=?'){
+    const first=statement.first.bind(statement);statement.first=async()=>{if(!interrupted){interrupted=true;throw Error('synthetic interruption');}return first();};
+  }return statement;};
+  await assert.rejects(f.complete(job),/synthetic interruption/);
+  const receipt=f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction;
+  f.sql.prepare("UPDATE document_jobs SET lease_until='2000-01-01'").run();
+  if(defect==='previous lease receipt')f.sql.prepare("UPDATE document_jobs SET lease='replacement-lease'").run();
+  if(defect==='missing history')f.sql.prepare('DELETE FROM document_extractions').run();
+  if(defect==='changed original')f.objects.set(f.owner+'/guarded',Buffer.from('different synthetic bytes'));
+  if(defect==='rejected while reading'){
+    const get=f.env.BUCKET.get;f.env.BUCKET.get=async key=>{f.sql.prepare("UPDATE gmail_sources SET status='rejected'").run();return get(key);};
+  }
+  await f.restart();assert.equal(await f.lease(),null);
+  const after=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(after.state,'failed');assert.equal(after.extraction,receipt);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});
