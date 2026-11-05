@@ -1,0 +1,355 @@
+{
+  "schema": "workspace-search-review-followup-v1",
+  "generated_at": "2026-11-05T17:40:03.954Z",
+  "runtime": "v24.22.1",
+  "baseline_commit": "7d58953bccdd16e531db2465bd3e9f69e9458bed",
+  "before_source_sha256": "d545c4e69e5d9baf604d9c37e9bb5a6cc6195631a96c113225ce15e3a89daaa3",
+  "after_source_sha256": "34d9736feb4261ef27b34fba6421c62684f873dcc9068e6e45557006874c3e42",
+  "record_count": 10000,
+  "index_build_ms": 265.676331,
+  "input_mutations": 0,
+  "scope": "Synthetic cached-index search only, before and after review fixes. No browser/network measurement or payment evidence. Reordered ordinary text retains substring matching; recovered thousands prefixes require exact references. Shared development host, 3 warmups and 20 samples per case.",
+  "metrics": {
+    "before": {
+      "correct_cases": 7,
+      "cases": 12,
+      "slowest_case_p95_ms": 25.598187000000053
+    },
+    "after": {
+      "correct_cases": 12,
+      "cases": 12,
+      "slowest_case_p95_ms": 15.451706000000058
+    }
+  },
+  "cases": [
+    {
+      "phase": "before",
+      "id": "ambiguous-reference-first",
+      "correct": false,
+      "result": {
+        "invoices": [
+          "large-amount"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 1.1274670000000242,
+      "p95_ms": 16.96819699999992
+    },
+    {
+      "phase": "before",
+      "id": "reordered-unambiguous",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "short-reference",
+          "fuzzy-reference"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.6423099999999522,
+      "p95_ms": 6.176902000000155
+    },
+    {
+      "phase": "before",
+      "id": "unicode-grouping",
+      "correct": false,
+      "result": {
+        "invoices": [
+          "large-amount"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.24337000000014086,
+      "p95_ms": 9.279749999999922
+    },
+    {
+      "phase": "before",
+      "id": "date-preserved",
+      "correct": false,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.24313999999981206,
+      "p95_ms": 0.5221319999998286
+    },
+    {
+      "phase": "before",
+      "id": "multiple-group-boundaries",
+      "correct": false,
+      "result": {
+        "invoices": [
+          "multi-full"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.2506710000000112,
+      "p95_ms": 14.598925999999892
+    },
+    {
+      "phase": "before",
+      "id": "ordinary-swedish-thousands",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "ordinary-grouping"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.21059200000013334,
+      "p95_ms": 2.092243000000053
+    },
+    {
+      "phase": "before",
+      "id": "leading-zero-and-date",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "ordinary-grouping"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.20562300000005962,
+      "p95_ms": 0.2449019999999109
+    },
+    {
+      "phase": "before",
+      "id": "negative-amount",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": [
+          "negative"
+        ]
+      },
+      "samples": 20,
+      "p50_ms": 0.6950780000001942,
+      "p95_ms": 10.479563999999982
+    },
+    {
+      "phase": "before",
+      "id": "bounded-32-token-ambiguity",
+      "correct": false,
+      "result": {
+        "invoices": [
+          "large-amount"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.697289999999839,
+      "p95_ms": 25.598187000000053
+    },
+    {
+      "phase": "before",
+      "id": "no-match",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.9299150000001646,
+      "p95_ms": 10.670728000000054
+    },
+    {
+      "phase": "before",
+      "id": "blank",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.00048100000003614696,
+      "p95_ms": 0.0023530000000846485
+    },
+    {
+      "phase": "before",
+      "id": "over-term-limit",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.027029999999967913,
+      "p95_ms": 0.06668899999999667
+    },
+    {
+      "phase": "after",
+      "id": "ambiguous-reference-first",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "short-reference",
+          "large-amount"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.8363469999999325,
+      "p95_ms": 15.451706000000058
+    },
+    {
+      "phase": "after",
+      "id": "reordered-unambiguous",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "short-reference",
+          "fuzzy-reference"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 2.2482239999999365,
+      "p95_ms": 8.631282000000056
+    },
+    {
+      "phase": "after",
+      "id": "unicode-grouping",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "short-reference",
+          "large-amount"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.5661069999998745,
+      "p95_ms": 3.8909029999999802
+    },
+    {
+      "phase": "after",
+      "id": "date-preserved",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "short-reference"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 5.466591999999764,
+      "p95_ms": 11.89605900000015
+    },
+    {
+      "phase": "after",
+      "id": "multiple-group-boundaries",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "multi-first",
+          "multi-second",
+          "multi-full"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 1.768865999999889,
+      "p95_ms": 15.107487999999648
+    },
+    {
+      "phase": "after",
+      "id": "ordinary-swedish-thousands",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "ordinary-grouping"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 1.692403000000013,
+      "p95_ms": 5.313595999999961
+    },
+    {
+      "phase": "after",
+      "id": "leading-zero-and-date",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "ordinary-grouping"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 1.6980209999996987,
+      "p95_ms": 3.8529969999999594
+    },
+    {
+      "phase": "after",
+      "id": "negative-amount",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": [
+          "negative"
+        ]
+      },
+      "samples": 20,
+      "p50_ms": 0.8419349999999213,
+      "p95_ms": 13.909053999999742
+    },
+    {
+      "phase": "after",
+      "id": "bounded-32-token-ambiguity",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "short-reference",
+          "large-amount"
+        ],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.5562730000001466,
+      "p95_ms": 3.5160280000000057
+    },
+    {
+      "phase": "after",
+      "id": "no-match",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.7871039999999994,
+      "p95_ms": 4.025592000000415
+    },
+    {
+      "phase": "after",
+      "id": "blank",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.0005999999998493877,
+      "p95_ms": 0.0007110000001375738
+    },
+    {
+      "phase": "after",
+      "id": "over-term-limit",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 20,
+      "p50_ms": 0.045947999999953026,
+      "p95_ms": 0.05301800000006551
+    }
+  ]
+}

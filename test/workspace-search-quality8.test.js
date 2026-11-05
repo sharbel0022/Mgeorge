@@ -92,3 +92,22 @@ test('numeric suffixes and leading-zero references cannot be consumed into the f
  assert.equal(searchWorkspaceIndex(index,'001 123,00').invoices[0].id,'zero-ref');
  assert.deepEqual(searchWorkspaceIndex(index,'1 123,00').invoices.map(row=>row.id),['wrong-amount']);
 });
+
+test('ambiguous numeric reference and Swedish thousands amount both stay visible with the exact reference first',()=>{
+ const rows=[{type:'invoice',id:'large-amount',number:'OTHER',amountCents:12345600},{type:'invoice',id:'short-number',number:'123',amountCents:45600}];
+ const index=createWorkspaceSearchIndex(rows);
+ for(const query of ['123 456,00','123\u00a0456,00 kr','123 456,00 SEK']){
+  assert.deepEqual(searchWorkspaceIndex(index,query).invoices.map(row=>row.id),['short-number','large-amount'],query);
+  assert.deepEqual(searchWorkspaceIndex(index,query,{limitPerType:1}).invoices.map(row=>row.id),['short-number'],query);
+ }
+ assert.deepEqual(searchWorkspaceIndex(index,'456,00 123').invoices.map(row=>row.id),['short-number']);
+});
+
+test('alternative thousands parses require an exact saved reference and preserve all other constraints',()=>{
+ const rows=[{type:'invoice',id:'large',number:'OTHER',party:'Synthetic A',date:'2026-11-05',amountCents:12345678900},{type:'invoice',id:'first-split',number:'123',party:'Synthetic A',date:'2026-11-05',amountCents:45678900},{type:'invoice',id:'second-split',number:'123 456',party:'Synthetic A',date:'2026-11-05',amountCents:78900},{type:'invoice',id:'fuzzy-reference',number:'PREFIX-123',party:'Synthetic A',date:'2026-11-05',amountCents:45678900},{type:'invoice',id:'wrong-date',number:'123',party:'Synthetic A',date:'2026-11-06',amountCents:45678900},{type:'invoice',id:'wrong-amount',number:'123',party:'Synthetic A',date:'2026-11-05',amountCents:45678901}];
+ const index=createWorkspaceSearchIndex(rows);
+ assert.deepEqual(searchWorkspaceIndex(index,'123 456 789,00 Synthetic 05/11/2026').invoices.map(row=>row.id),['first-split','second-split','large']);
+ assert.deepEqual(searchWorkspaceIndex(index,'123 456 789,00 missingparty').invoices,[]);
+ assert.deepEqual(searchWorkspaceIndex(index,'123 456,00 789,00').invoices,[]);
+ assert.deepEqual(searchWorkspaceIndex(index,Array(33).fill('123 456,00').join(' ')).invoices,[]);
+});

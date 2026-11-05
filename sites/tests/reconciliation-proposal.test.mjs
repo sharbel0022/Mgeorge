@@ -45,6 +45,27 @@ test('C4 responses require the exact snapshot and unchanged read-only contract w
  for(const value of [null,preview({writesAllowed:true}),preview({approvalRequired:false}),preview({changed:true}),preview({contractVersion:'invented'}),preview({snapshot:{revision:8,sha256:'a'.repeat(64)}}),preview({snapshot:{revision:7,sha256:'bad'}}),preview({transactionId:'another-payment'}),preview({selectedStatus:'BLOCKED'}),preview({reasonCodes:[{}]}),preview({decisions:[decision(),decision()]}),preview({decisions:[decision({allocations:[{...decision().allocations[0],amountMinor:0.5}]})]}),preview({decisions:[decision({allocations:[{...decision().allocations[0],currency:'EUR'}]})]}),preview({decisions:[decision({reasonCodes:[{toString:null}]})]})])assert.equal(ui.validReconciliationProposal(value,'synthetic-payment',7),false,JSON.stringify(value));
 });
 
+test('C4 proposal availability cannot exceed the absolute bank-reported amount',()=>{
+ for(const reportedAmountMinor of [0,1,-1,62499,-62499]){
+  const value=preview({decisions:[decision({reportedAmountMinor})]});
+  assert.equal(ui.validReconciliationProposal(value,'synthetic-payment',7),false,String(reportedAmountMinor));
+  assert.doesNotMatch(render({result:value}),/Faktura 0599|Underlaget stöder/);
+ }
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({reportedAmountMinor:70000})]}),'synthetic-payment',7),true,'Prior allocations may leave less available than the original bank amount');
+});
+
+test('outgoing and reversal decisions remain blocked without discarding their absolute available amount',()=>{
+ for(const patch of [{reportedAmountMinor:-62500},{reasonCodes:['REVERSAL_OR_OUTGOING_PAYMENT']}]){
+  assert.equal(ui.validReconciliationProposal(preview({decisions:[decision(patch)]}),'synthetic-payment',7),false);
+  const held=decision({...patch,status:'BLOCKED',bankEvidenceStatus:'BLOCKED',reasonCodes:['REVERSAL_OR_OUTGOING_PAYMENT'],allocations:[],unallocatedMinor:62500});
+  const value=preview({status:'BLOCKED',selectedStatus:'BLOCKED',decisions:[held]});
+  assert.equal(ui.validReconciliationProposal(value,'synthetic-payment',7),true);
+  assert.doesNotMatch(render({result:value}),/Faktura 0599|Underlaget stöder/);
+ }
+ const zero=preview({status:'BLOCKED',selectedStatus:'BLOCKED',decisions:[decision({status:'BLOCKED',bankEvidenceStatus:'BLOCKED',reasonCodes:['INVALID_MONEY'],reportedAmountMinor:0,availableMinor:0,unallocatedMinor:0,allocations:[]})]});
+ assert.equal(ui.validReconciliationProposal(zero,'synthetic-payment',7),true);
+});
+
 test('malformed, loading, unavailable and demo results never expose old proposals',()=>{
  for(const props of [{loading:true},{error:'Förslaget kunde inte läsas.'},{demo:true},{result:preview({writesAllowed:true})}]){
   const html=render(props);assert.doesNotMatch(html,/Faktura 0599|625,00|Underlaget stöder/);

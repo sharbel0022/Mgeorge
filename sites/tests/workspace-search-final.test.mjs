@@ -146,3 +146,14 @@ test('production search keeps a manually completed reference separate from the b
  f.type('BANK-REFERENCE-001 123,00');assert.deepEqual(f.results.map(result=>result.key),['bank-original']);
  assert.match(text(f.results[0]),/BANK-REFERENCE-001/);assert.doesNotMatch(text(f.results[0]),/MANUAL-OVERLAY/);
 });
+
+test('production search displays both interpretations of an ambiguous amount and requires explicit result activation',t=>{
+ const state=syntheticState(),invoice=state.invoices[0];
+ state.invoices=[{...invoice,id:'large-amount',number:'OTHER',party:'Synthetic large AB',total:12345600},{...invoice,id:'short-number',number:'123',party:'Synthetic invoice AB',total:45600}];state.transactions=[];
+ const f=fixture(t,{state});f.type('123 456,00');
+ assert.deepEqual(f.results.map(result=>result.key),['short-number','large-amount']);
+ assert.match(text(f.results[0]),/123/);assert.match(text(f.results[0]),/456,00/);
+ assert.match(text(f.results[1]),/OTHER/);assert.match(text(f.results[1]),/123\s456,00/);
+ assert.deepEqual(f.opened,[]);f.press('Enter');assert.deepEqual(f.opened,[]);
+ f.click(0);assert.deepEqual(f.opened,[{kind:'detail',id:'short-number'}]);
+});

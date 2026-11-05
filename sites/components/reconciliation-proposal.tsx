@@ -23,7 +23,10 @@ export function validReconciliationProposal(value:unknown,transactionId:string,r
    if(!object(allocation)||!text(allocation.invoiceId)||invoices.has(allocation.invoiceId)||!natural(allocation.amountMinor)||allocation.amountMinor===0||allocation.currency!=='SEK'||!natural(allocation.invoiceRemainingBeforeMinor)||!natural(allocation.invoiceRemainingAfterMinor)||allocation.invoiceRemainingBeforeMinor-allocation.amountMinor!==allocation.invoiceRemainingAfterMinor||!['full','partial','excess','multiple'].includes(allocation.settlement))return false;
    invoices.add(allocation.invoiceId);allocated+=allocation.amountMinor;if(!Number.isSafeInteger(allocated))return false;
   }
-  if(allocated>decision.availableMinor||decision.unallocatedMinor!==decision.availableMinor-allocated||decision.status==='BLOCKED'&&decision.allocations.length||decision.status==='VERIFIED'&&decision.bankEvidenceStatus!=='VERIFIED')return false;
+  if(decision.availableMinor>Math.abs(decision.reportedAmountMinor)||allocated>decision.availableMinor||decision.unallocatedMinor!==decision.availableMinor-allocated||decision.status==='BLOCKED'&&decision.allocations.length||decision.status==='VERIFIED'&&decision.bankEvidenceStatus!=='VERIFIED')return false;
+  // C4 preserves absolute availability for display, but outgoing, zero-value and
+  // reversal decisions cannot propose allocations or acquire a verified label.
+  if((decision.reportedAmountMinor<=0||decision.reasonCodes.includes('REVERSAL_OR_OUTGOING_PAYMENT'))&&decision.status!=='BLOCKED')return false;
   if(!decision.economic&&decision.allocations.length)return false;
   // The producer never verifies a multi-invoice, partial or excess proposal.
   // Reject contradictory transport data before it can acquire a green label.
