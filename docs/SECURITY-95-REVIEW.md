@@ -6,6 +6,47 @@ Ursprunglig granskningsbas: `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`.
 Senare integrerad `main`: `bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee` (PR #48).
 Kvitton före och efter integrationen hålls åtskilda nedan.
 
+## Integrationsnot — 2026-11-05
+
+Senaste main `bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee` ingår i PR54.
+De tidigare **5 728** lokala testfallen och källhasharna i
+`docs/security-95/first-candidate-gates.json` avser kandidaten **före denna main-integration**.
+Antalen och hashvärdena behålls som historiska kvitton; de är inte slutbevis
+för en senare kombinerad version. PR54-head `cc50423315ba506f4e9f2cd8e5c5ef089dbe6269`
+klarade båda CI-flödena: [Payment control checks](https://github.com/sharbel0022/Mgeorge/actions/runs/42085006203)
+och [SaaS security acceptance](https://github.com/sharbel0022/Mgeorge/actions/runs/42085002637).
+
+Producentens senare `fc6b25b8acf5fe6db2135fc6bcb111b7ca3227f2` tillförde
+bankfixturens modulfiler och ett permanent kontrollDB/login-restoreprov.
+Dess 5 921 lokala testfall och 819 filers fingerprint i `gates.json` behålls
+oförändrade. Det kvittot gäller denna producentversion **före UTF-8-rättningen**,
+inte den efterföljande syntesen. Den granskade rättningen från `2545f880`
+förenas här ovanpå fc6b25b utan att förlora producentens testfall eller kvitton.
+
+Agent 9:s efterföljande syntesgranskning reproducerade att ett giltigt
+OCR-resultat med 120 000 flerbytestecken fick 413 i den nya ingressen trots
+att det accepterades av den befintliga worker-routen och domänvalideringen.
+Completion-ingressen använder nu routens redan befintliga gräns på
+**600 000 transportbyte**. Domänens gränser på 350 000 JSON-tecken och
+150 000 OCR-tecken är oförändrade; ingen trunkering eller POST-omsändning
+införs. Fyra nya regressioner går genom faktisk route, wrapper och
+workerhantering med syntetisk SQLite och bevarade original.
+
+Den första rättningskandidaten `2545f880` gav hela `document-queue-recovery`, `security-request-budget`
+och `company-request` **60/60** gröna på Node22.23.4; dess Sites typkontroll och
+exakt minimatchkontroll är gröna. En separat probe med PR52:s workerklient
+ger 2/2. Root har granskat koddiffen oberoende. Dessa fokuserade prov överlappar
+helsviterna och ersätter inte ny CI på rättningens publicerade exakta huvud.
+Ingen produktionsändring, publicering eller automatisk poänghöjning ingår.
+
+Efter föreningen med fc6b25b passerade de kompletta Node-filerna
+`security-login-rate-limit` och `saas-security-runner` **7/7**, samt Sites
+`banking-security`, `document-queue-recovery`, `security-request-budget` och
+`company-request` **228/228**, på Node22.23.4. Exakt minimatchkontroll och
+TypeScript passerade. Dessa riktade syntesprov bevarar producentens nya
+168 bankfall och kontrollDB-restoreprov samt de fyra UTF-8-regressionerna;
+de är inte en ny helsvitetotal eller produktionsacceptans.
+
 ## Bedömning och leveransgräns
 
 Den här PR:n förbättrar beständig inloggningsbegränsning, resursgränser för
@@ -69,7 +110,7 @@ behöver kroppen; en anonym filbegäran ska inte läsas in bara för att nekas.
 | --- | ---: | ---: |
 | `/api/files` | 16 000 000 byte; befintlig separat filgräns kvarstår | 120 sekunder |
 | `/api/state` | 1 500 000 byte | 120 sekunder |
-| `/api/ocr-worker/complete` | 350 000 byte | 120 sekunder |
+| `/api/ocr-worker/complete` | 600 000 byte; separata JSON-/OCR-teckengränser kvarstår | 120 sekunder |
 | Övriga muterande `/api/`-vägar och `/mcp` | 65 536 byte | 30 sekunder |
 
 Storlek, timeout och strömfel ger fasta 413/408/400-svar. Intern feltext eller

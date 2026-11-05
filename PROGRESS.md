@@ -8,6 +8,12 @@
 [exakta lokala grindar](docs/security-95/gates.json) och
 [oberoende granskning](docs/security-95/independent-review.md).
 
+Integrationsnot 2026-11-05: producentens nedanstående 5 921 testfall och
+källhashar hör till `fc6b25b`, före den efterföljande UTF-8-rättningen av
+OCR-ingressen. Äldre 5 728-fallskvitton är arkiverad historik före main.
+Den länkade säkerhetsrapporten skiljer dessa versioner och de nya fokuserade
+proven åt. Historiska antal och poäng behålls; ny exakt slut-CI krävs.
+
 Fem avgränsade förbättringar har reproduktionsbevis: beständig atomisk
 inloggningsbudget i SQLite, faktiska byte-/tidsgränser före Sites
 requestkloner, minimerade auditposter från accepterade domänuppgifter,
@@ -30,7 +36,9 @@ miljö-/utvecklingskörningar behålls separat.
 Rootens hela beroendegraf samt Sites och bryggans produktionsgrafer har noll
 auditfynd. Sites utvecklingsgraf har åtta moderate paketposter från **en**
 minimatch-advisory; installerad befintlig backport är verifierad. Inga paket,
-lockfiler, produktionsscheman eller credentials ändras av säkerhets-PR:n.
+lockfiler eller credentials ändras och ingen produktionsändring har utförts.
+Vid uppstart tillkommer den additiva Node-kontrolltabellen `login_rate_limits`;
+ingen D1-migration eller ändring av ekonomiska tabeller ingår.
 OCR-triggern från integrerade PR #48 är separat granskad med sina begränsningar.
 Lokala Node24-kvitton och Node22-PR-CI hålls åtskilda; sista publicerade
 SHA:s kontroller redovisas i PR:n.
