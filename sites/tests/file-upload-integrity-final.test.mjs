@@ -1,3 +1,4 @@
+import {applyCurrentMigrations,businessSql} from './helpers/company-compat-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
@@ -12,23 +13,28 @@ function compiled(path,imports){
 }
 const environment=data('export const env=new Proxy({}, {get:(_,key)=>globalThis.uploadIntegrityFixture.env[key]});');
 const auth=data('export async function getChatGPTUser(){return globalThis.uploadIntegrityFixture.user;}');
-const server=compiled('../lib/server.ts',{'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':new URL('../lib/domain.ts',import.meta.url).href});
+const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':new URL('../lib/domain.ts',import.meta.url).href});
 const files=await import(compiled('../app/api/files/route.ts',{'cloudflare:workers':environment,'@/lib/server':server,'@/lib/domain':new URL('../lib/domain.ts',import.meta.url).href}));
 const original=new TextEncoder().encode('Synthetic immutable invoice original 0599\n625,00 SEK');
 
 function fixture(t,{insertFailure='',readFailure=false,deleteFailure=false}={}){
  const sqlite=new DatabaseSync(':memory:');t.after(()=>{sqlite.close();delete globalThis.uploadIntegrityFixture;});
- sqlite.exec('CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT)');
+ applyCurrentMigrations(sqlite);
  const objects=new Map();let failed=false;
- const DB={prepare(sql){return {bind(...args){return {
-  async first(){if(failed&&readFailure)throw Error('D1_ERROR: synthetic read unavailable');return sqlite.prepare(sql).get(...args)||null;},
-  async run(){
-   if(!failed&&insertFailure==='before'){failed=true;throw Error('D1_ERROR: synthetic write rejected');}
-   const result=sqlite.prepare(sql).run(...args);
-   if(!failed&&insertFailure==='after'){failed=true;throw Error('D1_ERROR: synthetic response lost after commit');}
-   return {success:true,meta:{changes:Number(result.changes)}};
-  }
- };}};}};
+ const DB={prepare(sql){return {sql,args:[],bind(...args){this.args=args;return this;},
+  async first(){if(failed&&readFailure)throw Error('D1_ERROR: synthetic read unavailable');return sqlite.prepare(sql).get(...this.args)||null;},
+  execute(){
+   const insert=/^INSERT INTO documents\b/i.test(businessSql(sql));
+   if(insert&&!failed&&insertFailure==='before'){failed=true;throw Error('D1_ERROR: synthetic write rejected');}
+   return {success:true,meta:{changes:Number(sqlite.prepare(sql).run(...this.args).changes)}};
+  },async run(){return this.execute();}
+ };},async batch(items){
+  const loseReply=!failed&&insertFailure==='after'&&items.some(item=>/^INSERT INTO documents\b/i.test(businessSql(item.sql)));
+  sqlite.exec('BEGIN');let results;
+  try{results=items.map(item=>item.execute());sqlite.exec('COMMIT');}catch(error){sqlite.exec('ROLLBACK');throw error;}
+  if(loseReply){failed=true;throw Error('D1_ERROR: synthetic response lost after commit');}
+  return results;
+ }};
  const BUCKET={async put(key,bytes){objects.set(key,new Uint8Array(bytes).slice());},async get(key){const bytes=objects.get(key);return bytes?{size:bytes.byteLength,body:bytes,arrayBuffer:async()=>bytes.slice().buffer}:null;},async delete(key){if(deleteFailure)throw Error('R2_ERROR: synthetic cleanup failed');objects.delete(key);}};
  const f={sqlite,objects,user:{userId:'owner',displayName:'Synthetic'},env:{DB,BUCKET}};globalThis.uploadIntegrityFixture=f;return f;
 }

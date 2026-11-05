@@ -15,7 +15,14 @@ const suites = [
   {
     name: 'node-security', cwd: root,
     files: [
-      'test/saas-login-boundary.test.js', 'test/saas-test-isolation.test.js',
+      'test/saas-login-boundary.test.js', 'test/saas-test-isolation.test.js', 'test/saas-company-acceptance.test.js',
+      'test/company-api.test.js', 'test/company-boundary.test.js', 'test/company-client.test.js',
+      'test/bank-consent-api.test.js',
+      'test/openpayments-company-bank-sync.test.js', 'test/openpayments-company-bank-sync-normalization.test.js',
+      'test/openpayments-bankgiro-ingest.test.js', 'test/openpayments-node-transport.test.js',
+      'test/company-bank-sync.test.js', 'test/company-bank-sync-store.test.js',
+      'test/company-bank-sync-scheduler.test.js', 'test/company-bank-sync-fairness.test.js',
+      'test/company-bank-sync-legacy-binding.test.js', 'test/node-company-bank-sync.test.js',
       'test/security-session-allocation.test.js', 'test/session-mutation-fence.test.js',
       'test/bank-api.test.js', 'test/integration-job-api.test.js',
       'test/backup-disaster-recovery.test.js',
@@ -24,6 +31,16 @@ const suites = [
   {
     name: 'sites-security', cwd: join(root, 'sites'),
     files: [
+      'tests/saas-company-acceptance.test.mjs', 'tests/company-storage.test.mjs', 'tests/company-backup.test.mjs',
+      'tests/openpayments-lifecycle.test.mjs', 'tests/openpayments-expired-revocation.test.mjs', 'tests/saas-bank-runtime.test.mjs',
+      'tests/openpayments-company-sync.test.mjs', 'tests/openpayments-account-state.test.mjs',
+      'tests/openpayments-request-boundary.test.mjs', 'tests/openpayments-raw-receipt.test.mjs',
+      'tests/openpayments-capture.test.mjs', 'tests/openpayments-ingest.test.mjs', 'tests/openpayments-domain.test.mjs',
+      'tests/company-bank-sync.test.mjs', 'tests/company-bank-sync-backup.test.mjs',
+      'tests/company-sync-boundary-integration.test.mjs', 'tests/company-sync-scale.test.mjs',
+      'tests/saas-onboarding-server.test.mjs', 'tests/saas-onboarding-projection.test.mjs',
+      'tests/saas-onboarding-contract.test.mjs', 'tests/saas-onboarding-client.test.mjs', 'tests/saas-onboarding-views.test.mjs',
+      'tests/openpayments-provider.test.mjs', 'tests/openpayments-policy.test.mjs', 'tests/openpayments-http.test.mjs',
       'tests/saas-owner-isolation.test.mjs', 'tests/saas-transport-privacy.test.mjs', 'tests/saas-upload-boundary.test.mjs',
       'tests/banking-security.test.mjs', 'tests/banking-provider.test.mjs',
       'tests/bank-account-consent.test.mjs', 'tests/bank-account-commit.test.mjs',
@@ -52,8 +69,10 @@ const report = {
   workingTreeDirty: Boolean(git('status', '--porcelain')),
   node: process.version,
   startedAt: new Date().toISOString(),
-  scope: 'Existing Node administrator and Sites owner boundaries; synthetic data only.',
-  multiCompanyAcceptance: 'BLOCKED_PENDING_PRODUCER_INTEGRATION',
+  scope: 'Actual three-company Node SQLite partitions and Sites D1/R2 role boundaries; company switching/cache fencing; Open Payments lifecycle, expired consent recovery, durable sync and Bankgiro originals; real onboarding snapshot; isolated backup recovery; 1/10/100-tenant durable runner scale. Synthetic data only.',
+  tenantRoleCoverage: { minimumCompanies: 3, roles: ['owner', 'admin', 'accountant', 'viewer'], suites: ['test/saas-company-acceptance.test.js', 'tests/saas-company-acceptance.test.mjs'] },
+  scaleCoverage: { companies: [1, 10, 100], suite: 'tests/company-sync-scale.test.mjs', externalProviderPerformance: 'NOT_MEASURED' },
+  multiCompanyAcceptance: 'PENDING_INTEGRATED_INTERNAL_RUN',
   commercialLaunch: 'NOT_APPROVED',
   launchGates: 'docs/integration/saas/security-acceptance.md',
   network: 'Loopback only; fixture stubs replace provider responses. Guard is not a malicious-code sandbox.',
@@ -84,6 +103,8 @@ for (const suite of suites) {
 
 report.finishedAt = new Date().toISOString();
 report.regressionPassed = report.suites.every(suite => suite.passed);
+report.multiCompanyAcceptance = report.regressionPassed ? 'INTERNAL_BOUNDARIES_PASSED' : 'INTERNAL_BOUNDARIES_FAILED';
+report.productionAcceptance = 'NOT_VERIFIED';
 writeFileSync(join(output, 'report.json'), JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });
 console.log('Multi-company commercial launch remains gated; see docs/integration/saas/security-acceptance.md.');
 console.log(`Synthetic evidence: ${output}`);

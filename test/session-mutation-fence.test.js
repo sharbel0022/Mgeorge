@@ -194,6 +194,10 @@ test('logout stops provider refreshes, retries, pagination and attachment contin
   ];
   for(const [name,pausePath,expected] of cases)await t.test(name,async()=>{
     const cookie=await login(),reached=deferred(),release=deferred(),calls=[];let profileCalls=0;
+    // The previous independent disconnect/logout case now correctly leaves a
+    // durable revocation_pending fence. This pagination case starts with its
+    // own authorized synthetic connection rather than bypassing that fence.
+    if(name==='bank next page')db.prepare("UPDATE bank_connections SET status='connected',last_error='' WHERE id='bank'").run();
     db.prepare('UPDATE gmail_connections SET encrypted_tokens=? WHERE id=?').run(encryptObject({access_token:'synthetic-access',refresh_token:'synthetic-refresh',expires_at:name==='expired access token'?0:Date.now()+3600000,scope:'https://www.googleapis.com/auth/gmail.readonly'}),'gmail');
     providerHandler=async(url)=>{
       calls.push(url.pathname);if(url.pathname===profile)profileCalls++;

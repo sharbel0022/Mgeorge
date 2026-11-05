@@ -147,6 +147,19 @@ test('expired and revoked sessions explicitly require reconnection',async()=>{
     await assert.rejects(bankingRequest('/sessions/expired'),e=>e.code==='renewal_required'&&e.status===409&&e.providerStatus===404&&!e.message.includes('never reflect'));
   }
 });
+for(const [providerError,code] of [
+ ['ASPSP_ACCOUNT_NOT_ACCESSIBLE','account_unavailable'],
+ ['ACCOUNT_DOES_NOT_EXIST','account_unavailable'],
+ ['ASPSP_PSU_ACTION_REQUIRED','action_required'],
+ ['PSU_HEADER_NOT_PROVIDED','background_access_denied'],
+ ['PSU_HEADER_INVALID','background_access_denied'],
+ ['PSUHEADERNOT_PROVIDED','background_access_denied'],
+])test(`provider ${providerError} holds access instead of becoming a retryable generic outage`,async()=>{
+ let calls=0;
+ globalThis.fetch=async()=>{calls++;return respond({error:providerError,message:'private account diagnostic',detail:pem},400);};
+ await assert.rejects(bankingRequest('/accounts/account/transactions'),error=>error.code===code&&error.status===409&&error.providerStatus===400&&!error.message.includes('private account diagnostic')&&!error.message.includes('PRIVATE KEY'));
+ assert.equal(calls,1);
+});
 test('rate limits retain the provider retry delay and do not replay a failed POST',async()=>{
   let calls=0;globalThis.fetch=async()=>{calls++;return respond({error:'ASPSP_RATE_LIMIT_EXCEEDED',message:'private'},429,{'Retry-After':'120'});};
   await assert.rejects(bankingRequest('/auth',{method:'POST',body:{}}),e=>e.code==='rate_limited'&&e.status===429&&e.retryAfter===120);

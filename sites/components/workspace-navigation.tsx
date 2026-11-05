@@ -34,7 +34,7 @@ function NavigationContents({view,reviewCount,company,onNavigate}:Omit<Props,'op
  const active=area(view);
  return <>
   <a className="brand" href="/" onClick={event=>followLink(event,'overview',onNavigate)}><strong>MG</strong><span>Fakturakoll</span></a>
-  <div className="workspace"><span className="workspace-icon"><Building2 size={19}/></span><div><strong>M.George Vitvaror</strong><span>Företagsöversikt</span></div><ChevronDown size={15}/></div>
+  <div className="workspace"><span className="workspace-icon"><Building2 size={19}/></span><div><strong>{company.name}</strong><span>Företagsöversikt</span></div><ChevronDown size={15}/></div>
   <div className="nav-label">ARBETSYTA</div>
   <nav aria-label="Huvudmeny">{items.map(({id,label,icon:Icon})=><WorkspaceLink key={id} view={id} className={`nav-item ${active===id?'active':''}`} current={view===id?'page':active===id?'location':undefined} onNavigate={onNavigate}><Icon size={19} aria-hidden="true"/><span>{label}</span>{id==='review'&&reviewCount>0&&<b aria-label={`${reviewCount} ärenden att granska`}>{reviewCount}</b>}</WorkspaceLink>)}</nav>
   <div className="sidebar-bottom">

@@ -68,7 +68,7 @@ for(const server of [{status_unknown:true},{processed:0,status_unknown:true}])te
 });
 test('Q8 finalizer: cloud CLI reports accepted partial work without a false complete status or private warning',()=>{
   const script=readFileSync(new URL('../scripts/run-sites-cloud-ocr.mjs',import.meta.url),'utf8');
-  const fake='data:text/javascript;base64,'+Buffer.from("export async function runSitesOcr(){return {processed:2,failed:0,status_unknown:true,metadata_warning:'private warning'};}").toString('base64');
+  const fake='data:text/javascript;base64,'+Buffer.from("export async function runSitesOcr(){return {processed:2,failed:0,status_unknown:true,metadata_warning:'private warning'};}export function sitesOcrFailure(){return {};}").toString('base64');
   const result=spawnSync(process.execPath,['--input-type=module'],{input:script.replace("'../src/sites-ocr-pull.js'",JSON.stringify(fake)),encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot}});
   assert.ifError(result.error);assert.equal(result.status,1);assert.deepEqual(JSON.parse(result.stdout),{status:'needs_attention',processed:2,failed:0,status_unknown:true});assert.doesNotMatch(result.stdout,/private/);assert.equal(result.stderr,'');
 });
@@ -142,6 +142,22 @@ test('cloud worker rejects malformed leases and unsupported mode before extracti
 test('cloud CLI fails safely without printing environment secrets or exception details',()=>{
   const secret='private-sensitive-value',result=spawnSync(process.execPath,['scripts/run-sites-cloud-ocr.mjs'],{cwd:new URL('..',import.meta.url),encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot,MG_SITES_ORIGIN:secret,MG_SITES_OCR_TOKEN:secret}});
   assert.equal(result.status,1);assert.equal(JSON.parse(result.stdout).status,'failed');assert.ok(!result.stdout.includes(secret));assert.equal(result.stderr,'');
+});
+
+for(const [status,code] of [[404,'SITE_NOT_FOUND'],[401,'WORKER_UNAUTHORIZED'],[403,'WORKER_FORBIDDEN'],[429,'SITE_RATE_LIMITED'],[302,'SITE_REDIRECT_BLOCKED'],[503,'SITE_UNAVAILABLE']])test('cloud CLI distinguishes safe HTTP failure '+status,()=>{
+  const script=new URL('../scripts/run-sites-cloud-ocr.mjs',import.meta.url).href;
+  const setup=`process.env.MG_SITES_ORIGIN='https://synthetic.example';process.env.MG_SITES_OCR_TOKEN='C'.repeat(43);globalThis.fetch=async()=>new Response('private bank account and token',{status:${status}});await import(${JSON.stringify(script)});`;
+  const result=spawnSync(process.execPath,['--input-type=module'],{input:setup,encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot}});
+  assert.ifError(result.error);assert.equal(result.status,1);const value=JSON.parse(result.stdout);
+  assert.equal(value.failure_code,code);assert.equal(value.http_status,status);assert.equal(value.status,'failed');
+  assert.doesNotMatch(result.stdout,/private|CCCC|account|synthetic\.example/);assert.equal(result.stderr,'');
+});
+
+test('cloud CLI never reads an untrusted thrown failure code or message',()=>{
+  const script=new URL('../scripts/run-sites-cloud-ocr.mjs',import.meta.url).href;
+  const setup=`process.env.MG_SITES_ORIGIN='https://synthetic.example';process.env.MG_SITES_OCR_TOKEN='C'.repeat(43);globalThis.fetch=async()=>{throw Object.create(null,{code:{get(){throw Error('private code getter')}},message:{get(){throw Error('private message getter')}}});};await import(${JSON.stringify(script)});`;
+  const result=spawnSync(process.execPath,['--input-type=module'],{input:setup,encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot}});
+  assert.ifError(result.error);assert.equal(result.status,1);assert.equal(JSON.parse(result.stdout).failure_code,'UNCLASSIFIED_FAILURE');assert.doesNotMatch(result.stdout,/private|CCCC/);assert.equal(result.stderr,'');
 });
 
 test('cloud workflow confines credentials to main-only OCR step and has no document exports',()=>{

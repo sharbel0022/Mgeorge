@@ -1,11 +1,11 @@
-import {db,identity,readWorkspace,response} from './server';
+import {db,identity,readWorkspace,response,companyGmailAccount} from './server';
 import {uid,now,today,applyCommand,balance,hasValidAbsenceCheck,invoicePaymentEvidenceIssue,paymentEvidenceIssue,invoiceReferenceDecision,invoiceReferenceMatches,type State} from './domain';
 import {analyze,invoiceFacts,contactIdentity} from './reconciliation';
 import {reconcileWithOriginals,writePaymentState} from './reconciliation-evidence';
 import {generateMessage,validRecipient} from './customer-message-text.js';
 import {digest,randomToken,cookieValue} from './banking/security';
 import {encrypt,decrypt} from './banking/store';
-import {prepareGmailSend,gmailAccount,hasGmailSendScope} from './gmail-adapter.js';
+import {prepareGmailSend,hasGmailSendScope} from './gmail-adapter.js';
 
 type Row=Record<string,any>;
 const error=(text:string,status=409)=>Object.assign(Error(text),{safe:true,status});
@@ -31,6 +31,13 @@ async function current(owner:string,id:string,version:number){
   return {m,workspace,contact,invoice};
 }
 export async function reconcileAndPrepare(owner:string){
+  let companyScopes=true,companyBinding:unknown;
+  try{companyBinding=await db().prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first();}
+  catch(failure){if(failure instanceof Error&&/no such table:\s*(?:main\.)?company_bank_sync_scopes\b/i.test(failure.message))companyScopes=false;else throw failure;}
+  if(companyBinding)throw error('Företagets automatiska avstämning kräver aktuell företagsbehörighet och företagets referensregler.');
+  // Legacy autonomous jobs may only use the unbound workspace policy. A new
+  // company binding during original I/O must abort the financial transaction.
+  const companyFence=companyScopes?[db().prepare("SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM company_bank_sync_scopes WHERE owner=?) THEN 1 ELSE json('COMPANY_SCOPE_MISMATCH') END").bind(owner)]:[];
   // Capture receipts before reading the workspace. A later registration is
   // left pending for a later bounded control step, never acknowledged by an
   // older check. The marker is created atomically with the original invoice.
@@ -40,10 +47,11 @@ export async function reconcileAndPrepare(owner:string){
     if(new TextEncoder().encode(JSON.stringify(result.state)).length>1800000)throw error('Registret behöver utökad lagring innan fler automatiska matchningar sparas.');
     const at=now(),eventId=uid();
     const batch=await writePaymentState(owner,workspace.revision,workspace.state,result.state,db(),[
+      ...companyFence,
       db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(eventId,owner,workspace.revision+1,'automatic.reconciliation',JSON.stringify({decisions:result.decisions}),at,owner,workspace.revision),
       db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(JSON.stringify(result.state),at,owner,workspace.revision),
     ]);
-    if(batch[1].meta.changes!==1)throw error('Nya uppgifter sparades samtidigt. Kör kontrollen igen.');
+    if(batch[companyFence.length+1].meta.changes!==1)throw error('Nya uppgifter sparades samtidigt. Kör kontrollen igen.');
     workspace={state:result.state,revision:workspace.revision+1};
   }
   const findings=result.findings;
@@ -160,9 +168,10 @@ export async function messagesAction(req:Request,action:string){
   throw error('Okänd meddelandeåtgärd.',404);
 }
 async function sendMessage(req:Request,owner:string,body:Row){
+  const account=await companyGmailAccount(owner);
   const connection=await db().prepare("SELECT * FROM gmail_connections WHERE owner=? AND status='connected'").bind(owner).first<Row>();
-  if(!connection||connection.email.toLowerCase()!==gmailAccount())throw error('Koppla företagets Gmail-konto först.');
-  const tokens=await decrypt<any>(owner,'gmail-tokens',connection.tokens),deliver=await prepareGmailSend(tokens);
+  if(!connection||connection.email.toLowerCase()!==account)throw error('Koppla företagets Gmail-konto först.');
+  const tokens=await decrypt<any>(owner,'gmail-tokens',connection.tokens),deliver=await prepareGmailSend(tokens,{account});
   // Persist refresh only if the same connection still exists. Never resurrect a disconnect.
   const sealed=await encrypt(owner,'gmail-tokens',tokens);
   const updated=await db().prepare("UPDATE gmail_connections SET tokens=? WHERE owner=? AND tokens=? AND status='connected'").bind(sealed,owner,connection.tokens).run();

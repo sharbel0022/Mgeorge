@@ -1,3 +1,4 @@
+import {applyCurrentMigrations,isReadOnlySql} from './helpers/company-compat-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
@@ -10,13 +11,13 @@ const domain=url('../lib/domain.ts'),account='SE4280000890119146168423',document
 const xml='<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.02"><BkToCstmrDbtCdtNtfctn><Ntfctn><Acct><Id><Othr><Id>890119146168423</Id></Othr></Id></Acct><Ntry><Amt Ccy="SEK">625.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts><BookgDt><Dt>2026-10-26</Dt></BookgDt><AcctSvcrRef>SYNTHETIC-PARENT</AcctSvcrRef><NtryDtls><TxDtls><Refs><TxId>SYNTHETIC-CHILD</TxId></Refs><RmtInf><Strd><CdtrRefInf><Ref>000018</Ref></CdtrRefInf></Strd></RmtInf></TxDtls></NtryDtls></Ntry></Ntfctn></BkToCstmrDbtCdtNtfctn></Document>';
 async function fixture(t,reportAccount='890119146168423'){
  const sql=new DatabaseSync(':memory:'),key='retainedPreview'+crypto.randomUUID().replaceAll('-','');t.after(()=>{sql.close();delete globalThis[key];});
- sql.exec('CREATE TABLE documents(id TEXT,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT);CREATE TABLE workspaces(owner TEXT,revision INTEGER,payload TEXT);CREATE TABLE audit_events(id TEXT);');
+ applyCurrentMigrations(sql);
  const bytes=new TextEncoder().encode(xml.replace('890119146168423',reportAccount)),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex'),objects=new Map([['owner/'+documentId,bytes]]);
  const f={sql,objects,user:{userId:'owner'},reads:0,aliases:[],accountResources:null,env:{}};globalThis[key]=f;
- f.env.DB={prepare(statement){assert.match(statement,/^SELECT /);return{bind(...args){return{async first(){return sql.prepare(statement).get(...args)||null;}};}};}};
+ f.env.DB={prepare(statement){assert.ok(isReadOnlySql(sql,statement),'retained preview may only read');return{bind(...args){return{async first(){return sql.prepare(statement).get(...args)||null;}};}};}};
  f.env.BUCKET={async get(id){f.reads++;const b=objects.get(id);return b?{size:b.length,arrayBuffer:async()=>b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)}:null;}};
- sql.prepare('INSERT INTO documents VALUES(?,?,?,?,?,?)').run(documentId,'owner','Synthetic.xml','application/xml',bytes.length,hash);sql.prepare('INSERT INTO workspaces VALUES(?,?,?)').run('owner',7,JSON.stringify(emptyState()));
- const ref=`globalThis[${JSON.stringify(key)}]`,server=compiled('../lib/server.ts',{'cloudflare:workers':data(`export const env=${ref}.env;`),'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return ${ref}.user;}`),'./domain':domain});
+ sql.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run(documentId,'owner','Synthetic.xml','application/xml',bytes.length,hash,'2026-11-04');sql.prepare('INSERT INTO workspaces(owner,revision,payload,updated_at) VALUES(?,?,?,?)').run('owner',7,JSON.stringify(emptyState()),'2026-11-04');
+ const ref=`globalThis[${JSON.stringify(key)}]`,server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':data(`export const env=${ref}.env;`),'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return ${ref}.user;}`),'./domain':domain});
  const transactions=compiled('../lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':url('../lib/payment-references.js'),'../payer-evidence.js':url('../lib/payer-evidence.js')});
  const store=data(`export async function connection(owner){return {owner,status:'connected',environment:'PRODUCTION',app_generation:'synthetic',valid_until:'2099-01-01',selected_accounts:'["selected"]',bank_name:'Swedbank',country:'SE'};}export async function application(owner){return {owner,generation:'synthetic'};}export async function accounts(){return ${ref}.accountResources||[{uid:'selected',currency:'SEK',account_id:{iban:${JSON.stringify(account)}},all_account_ids:${ref}.aliases}];}`);
  const service=compiled('../lib/bankgiro-service.ts',{'./server':server,'./domain':domain,'./bankgiro-parser.js':url('../lib/bankgiro-parser.js'),'./banking/store':store,'./banking/transactions':transactions});

@@ -1,4 +1,5 @@
 import {isInlineDecoration} from './document-triage.js';
+import {AsyncLocalStorage} from 'node:async_hooks';
 /**
  * MG FAKTURAKOLL – GMAIL / GOOGLE OAUTH
  * ANSVAR: Bygger Googles medgivandelänk, växlar och förnyar token och hämtar fakturaliknande mejlbilagor. Bilagor är underlag för granskning, inte automatiskt bokförda fakturor.
@@ -27,8 +28,15 @@ function rateLimitFailure(response){
   const wait=retryDelay(response);
   return Object.assign(fail(wait.retryBlocked?'Gmail angav en väntetid som kräver manuell kontroll. Automatisk hämtning har stoppats.':'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.','rate_limited',429),wait);
 }
-export function gmailAccount(){return (process.env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();}
-export function isGmailConfigured(){return !!(process.env.GOOGLE_CLIENT_ID?.trim()&&process.env.GOOGLE_CLIENT_SECRET?.trim());}
+const companyMailboxScope=new AsyncLocalStorage();
+/** A request/job receives one immutable, operator-configured mailbox. Empty is
+ * explicitly unconfigured; it must never fall back to the legacy account. */
+export function withGmailAccount(account,operation){
+ if(typeof account!=='string'||account!==''&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account))throw fail('Företagets Gmail-konfiguration är ogiltig.','company_mailbox_invalid');
+ return companyMailboxScope.run(Object.freeze({account:account.toLowerCase()}),operation);
+}
+export function gmailAccount(){return companyMailboxScope.getStore()?.account??(process.env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();}
+export function isGmailConfigured(){return !!(gmailAccount()&&process.env.GOOGLE_CLIENT_ID?.trim()&&process.env.GOOGLE_CLIENT_SECRET?.trim());}
 function requireConfig(){if(!isGmailConfigured())throw fail('En administratör behöver aktivera Gmail-kopplingen först.','not_configured');}
 function callback(origin){
   const url=new URL(origin);

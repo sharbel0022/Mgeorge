@@ -1,0 +1,1086 @@
+{
+  "finishedAt": "2026-11-04T20:08:31.785Z",
+  "browserVersion": "141.0.7390.37",
+  "results": [
+    {
+      "name": "responsive keyboard and semantics at 320px",
+      "passed": true,
+      "durationMs": 585
+    },
+    {
+      "name": "responsive keyboard and semantics at 390px",
+      "passed": true,
+      "durationMs": 498
+    },
+    {
+      "name": "responsive keyboard and semantics at 768px",
+      "passed": true,
+      "durationMs": 567
+    },
+    {
+      "name": "responsive keyboard and semantics at 1024px",
+      "passed": true,
+      "durationMs": 610
+    },
+    {
+      "name": "responsive keyboard and semantics at 1440px",
+      "passed": true,
+      "durationMs": 786
+    },
+    {
+      "name": "provider start uses scoped server redirect and required read scopes",
+      "passed": true,
+      "durationMs": 378
+    },
+    {
+      "name": "callback cancelled remains retryable",
+      "passed": true,
+      "durationMs": 258
+    },
+    {
+      "name": "callback failed remains retryable",
+      "passed": true,
+      "durationMs": 214
+    },
+    {
+      "name": "callback expired remains retryable",
+      "passed": true,
+      "durationMs": 255
+    },
+    {
+      "name": "connected query alone cannot announce success",
+      "passed": true,
+      "durationMs": 271
+    },
+    {
+      "name": "expired consent blocks account changes and sync",
+      "passed": true,
+      "durationMs": 205
+    },
+    {
+      "name": "AIS without Bankgiro does not invent missing payer or reference",
+      "passed": true,
+      "durationMs": 812
+    },
+    {
+      "name": "company switch replaces all private payment facts",
+      "passed": true,
+      "durationMs": 697
+    },
+    {
+      "name": "late A to B to A response is rejected even when abort is ignored",
+      "passed": true,
+      "durationMs": 1005
+    },
+    {
+      "name": "late mutation never redirects after a company switch",
+      "passed": true,
+      "durationMs": 901
+    },
+    {
+      "name": "HTTP 401 clears company UI without legacy fallback",
+      "passed": true,
+      "durationMs": 479
+    },
+    {
+      "name": "HTTP 403 clears company UI without legacy fallback",
+      "passed": true,
+      "durationMs": 338
+    },
+    {
+      "name": "invalid account projection is hidden before rendering",
+      "passed": true,
+      "durationMs": 418
+    },
+    {
+      "name": "invalid payment projection is hidden before rendering",
+      "passed": true,
+      "durationMs": 405
+    },
+    {
+      "name": "invalid reference projection is hidden before rendering",
+      "passed": true,
+      "durationMs": 422
+    },
+    {
+      "name": "invalid stale projection is hidden before rendering",
+      "passed": true,
+      "durationMs": 491
+    },
+    {
+      "name": "unsupported bank has no fake authentication button",
+      "passed": true,
+      "durationMs": 495
+    },
+    {
+      "name": "untrusted redirect is rejected without external navigation",
+      "passed": true,
+      "durationMs": 833
+    },
+    {
+      "name": "decoupled authorization waits for bank confirmation",
+      "passed": true,
+      "durationMs": 701
+    },
+    {
+      "name": "renewal uses scoped consent endpoint without disconnecting first",
+      "passed": true,
+      "durationMs": 728
+    },
+    {
+      "name": "disconnect requires confirmation and fresh server status",
+      "passed": true,
+      "durationMs": 990
+    },
+    {
+      "name": "viewer cannot change bank consent or accounts",
+      "passed": true,
+      "durationMs": 610
+    },
+    {
+      "name": "company creation reloads membership before selecting returned company",
+      "passed": true,
+      "durationMs": 987
+    },
+    {
+      "name": "initial missing directory retains the existing bank connection",
+      "passed": true,
+      "durationMs": 607
+    },
+    {
+      "name": "forged company query never causes an unauthorized company request",
+      "passed": true,
+      "durationMs": 506
+    },
+    {
+      "name": "company-specific navigation never falls back into the unscoped owner workspace",
+      "passed": true,
+      "durationMs": 516
+    },
+    {
+      "name": "redirect handoff remains locked until navigation completes",
+      "passed": true,
+      "durationMs": 596
+    },
+    {
+      "name": "uncertain company creation requires a directory refresh before resubmission",
+      "passed": true,
+      "durationMs": 754
+    },
+    {
+      "name": "account acknowledgment does not claim a selection missing from the fresh read",
+      "passed": true,
+      "durationMs": 883
+    },
+    {
+      "name": "revision regression hides old bank data after refresh",
+      "passed": true,
+      "durationMs": 757
+    },
+    {
+      "name": "account selection and first successful sync produce the overview automatically",
+      "passed": true,
+      "durationMs": 939
+    },
+    {
+      "name": "slow pending authorization reads settle without polling starvation",
+      "passed": true,
+      "durationMs": 812
+    },
+    {
+      "name": "decoupled completed replaces temporary waiting instructions",
+      "passed": true,
+      "durationMs": 723
+    },
+    {
+      "name": "decoupled cancelled replaces temporary waiting instructions",
+      "passed": true,
+      "durationMs": 731
+    },
+    {
+      "name": "decoupled failed replaces temporary waiting instructions",
+      "passed": true,
+      "durationMs": 577
+    },
+    {
+      "name": "selected account that lost import support cannot show an enabled sync action",
+      "passed": true,
+      "durationMs": 559
+    }
+  ],
+  "passed": 41,
+  "failed": 0,
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank/authorizations/authorization-123/redirect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-beta/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-beta/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-beta/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/renew"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank/authorizations/authorization-123/redirect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/disconnect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-new/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bank/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bankgiro/source/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank/authorizations/authorization-123/redirect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/accounts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/accounts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "POST",
+      "path": "/api/companies/company-alpha/bank/connect"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies"
+    },
+    {
+      "method": "GET",
+      "path": "/api/companies/company-alpha/bank-onboarding"
+    }
+  ],
+  "browserErrors": [],
+  "externalRequests": [],
+  "assetChecks": [
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    },
+    {
+      "file": "app.css",
+      "match": true
+    },
+    {
+      "file": "app.js",
+      "match": true
+    }
+  ],
+  "sourceManifest": {
+    "generatedAt": "2026-11-04T20:08:05.920Z",
+    "inputs": [
+      {
+        "path": "sites/lib/banking/status-view.ts",
+        "sha256": "4d5e5028e3c06422c540c46130ca3cdb2aa722163da5978d37218854e766465c"
+      },
+      {
+        "path": "sites/components/use-bank-refresh.ts",
+        "sha256": "bf1becc2b2888f854a5865a5b1b81e136a4f9e77a8eefe4034eff01f9ceccdf1"
+      },
+      {
+        "path": "sites/components/sync-recovery-notice.tsx",
+        "sha256": "38a028d3b6021997ae67c607c69a4fb8cf6f0d331ffd98fee83a46a511175ed4"
+      },
+      {
+        "path": "sites/components/bank-connection.tsx",
+        "sha256": "ce3e9f4aab87e9670eadb027c7e52c958c32df0d3d398569af2419777327a371"
+      },
+      {
+        "path": "sites/components/bankgiro-source-status.tsx",
+        "sha256": "9b971a3699c0c59d4d85431dcd8456fd4dc655c99e1cbf5c041c4b9d78efc015"
+      },
+      {
+        "path": "sites/lib/onboarding/contract.ts",
+        "sha256": "efa5775e371940a351c7f2feb8de5aa9e4244c1922ef829e055415da13dc2f11"
+      },
+      {
+        "path": "sites/lib/onboarding/client.ts",
+        "sha256": "69a982e6801a4cde2b3b7e317b824ba05f622c8e68cb672bc67a93368e6750b9"
+      },
+      {
+        "path": "sites/lib/onboarding/request-scope.ts",
+        "sha256": "3471997c1a31503f0a45b44b0125d269cb94ff13dce03f60f424de802abbaa6a"
+      },
+      {
+        "path": "sites/components/onboarding/bank-onboarding-views.tsx",
+        "sha256": "ea14781ec0fe8d078482bc118e28e1d350f42eb0fe51bd9dd1d6d27dde006ecd"
+      },
+      {
+        "path": "sites/components/onboarding/bank-onboarding.tsx",
+        "sha256": "38704ec4a23ad6bb8e68df8ff2f4de8665bb065fb27ce32165501ad89a04bfe7"
+      },
+      {
+        "path": "sites/app/bank/page.tsx",
+        "sha256": "dfecc8a570b3a7a35f9c08f352afc63dfda170506b5f72b115343c4c2aca99f4"
+      },
+      {
+        "path": "sites/app/globals.css",
+        "sha256": "424cc6f6319fd0e96af8bcbb390fd07e99de200376d7defa7490cf12cd5600d1"
+      },
+      {
+        "path": "sites/styles/bank-connection.css",
+        "sha256": "06bbf0d4530ffb52fa130d9a1e0fc144ea077c918b55bc68f0769b2bb02e8570"
+      },
+      {
+        "path": "sites/styles/bankgiro-source.css",
+        "sha256": "32c24caffd5c836fc0bfb02153bac9a4b3fe791ce90893274020086a29ec0f0a"
+      },
+      {
+        "path": "sites/styles/saas-onboarding.css",
+        "sha256": "c68529dc2d2345d1d3a5d1301ac6b0aa795d1dfc8b71149a0ba2ced35a1f502b"
+      }
+    ],
+    "outputs": [
+      {
+        "path": "index.html",
+        "sha256": "6ce50a50032dced2ea62393e283c88839e24cf5664ceb4a3de85e9436e374c5e"
+      },
+      {
+        "path": "app.js",
+        "sha256": "b7ba16f9dd1a09e0140c1e5df51fe0d509ef39e383a954acc3819393ef836805"
+      },
+      {
+        "path": "app.css",
+        "sha256": "24938107133a85b419131bc4e98f4c50b53b2258781d68f379aa1bf92c303c32"
+      }
+    ]
+  }
+}

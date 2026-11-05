@@ -141,14 +141,16 @@ export async function readReconciliationPreview(owner: string, initial: State, r
   for (const row of state.transactions.filter(row => covered.has(row.id))) {
     const accountId = canonicalBankAccount(row.account);
     const reported = row.evidence === 'bankgiro_file' ? row.recipientAccount || '' : undefined;
-    const key = JSON.stringify([accountId,reported ?? null]);
+    const provider=row.bankDataVersion==='openpayments-response-v1'||row.enrichmentEvidence?.provider==='openpayments'?'open_payments':'enable_banking';
+    const key = JSON.stringify([provider,accountId,reported ?? null]);
     if (consent.has(key)) continue;
     const absent: BankAccountEvidence = {status:'BLOCKED',ownerId:owner,accountId,currency:row.currency,source:'missing',proofId:'',reason:missingAccount};
     if (consent.size >= 32) { consent.set(key,absent); continue; }
     try {
-      const current = await bankAccountConsentSnapshot(owner,accountId,reported);
-      const fingerprint = await sha256(consentFields.map(field => current[field]));
-      consent.set(key,{status:'VERIFIED',ownerId:owner,accountId,currency:row.currency,source:'bank_account_resource',proofId:fingerprint,validUntil:current.valid_until});
+      const current = await bankAccountConsentSnapshot(owner,accountId,reported,provider);
+      const op='provider' in current&&current.provider==='open_payments'?current:null;
+      const fingerprint = await sha256(op?[op.provider,op.owner,op.revision,op.payload,op.validUntil]:consentFields.map(field => (current as Record<string,unknown>)[field]));
+      consent.set(key,{status:'VERIFIED',ownerId:owner,accountId,currency:row.currency,source:'bank_account_resource',proofId:fingerprint,validUntil:op?op.validUntil:(current as {valid_until:string}).valid_until});
       consentContext.push({accountId,reportedAccount:reported ?? null,sha256:fingerprint,status:'VERIFIED'});
     } catch {
       consent.set(key,absent);
@@ -176,7 +178,8 @@ export async function readReconciliationPreview(owner: string, initial: State, r
     const fields = bankPaymentFieldSources(bankOnlyState,{...row,bankDetails:undefined});
     const evidence = fields.reference.evidence;
     const accountId = canonicalBankAccount(row.account);
-    const key = JSON.stringify([accountId,row.evidence === 'bankgiro_file' ? row.recipientAccount || '' : null]);
+    const provider=row.bankDataVersion==='openpayments-response-v1'||row.enrichmentEvidence?.provider==='openpayments'?'open_payments':'enable_banking';
+    const key = JSON.stringify([provider,accountId,row.evidence === 'bankgiro_file' ? row.recipientAccount || '' : null]);
     const review = bankPaymentReview(row,state);
     return {
       id:row.id,bankId:row.bankReference,accountId,amountMinor:row.amount,currency:row.currency,bookedDate:row.date,

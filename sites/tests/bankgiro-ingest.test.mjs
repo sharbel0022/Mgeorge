@@ -19,6 +19,17 @@ function fixture(t,source=syntheticSource(),options={}){
 test('absent source is disabled without touching storage',async()=>{assert.ok(engine);let touches=0;const poison=new Proxy({},{get(){touches++;throw Error('must not touch');}});const e=engine.createBankgiroIngest({source:null,store:poison,sink:poison});assert.equal((await e.run('owner')).state,'DISABLED');assert.equal((await e.status('owner')).enabled,false);assert.equal(touches,0);});
 test('synthetic source requires explicit test opt-in',async t=>{const f=fixture(t,syntheticSource(),{allowSynthetic:false});assert.equal((await f.ingest.run('owner')).state,'DISABLED');assert.deepEqual(f.source.calls,[]);assert.equal(f.sql.prepare('SELECT count(*) n FROM bankgiro_ingest_jobs').get().n,0);});
 test('retains originals and parses exact leading zero references without allocations',async t=>{const f=fixture(t);const s=await f.ingest.run('owner');assert.equal(s.counts.REVIEW,1);const rows=JSON.parse(f.sql.prepare('SELECT payload FROM imported').get().payload);assert.equal(rows[0].payerReference,'0599');assert.equal(rows[0].amount,10025);assert.equal(rows[0].currency,'SEK');assert.equal(rows[0].verified,false);assert.equal(f.sql.prepare('SELECT count(*) n FROM originals').get().n,1);});
+test('review completion persists a safe Bankgiro information reason across worker restart',async t=>{
+ const f=fixture(t);f.sink.importReport=async()=>({status:'REVIEW',paymentCount:0,reasonCode:'BANKGIRO_INFORMATION_UNAVAILABLE'});
+ const result=await f.ingest.run('owner');assert.equal(result.jobs[0].lastError,'BANKGIRO_INFORMATION_UNAVAILABLE');
+ assert.equal((await f.build().status('owner')).jobs[0].lastError,'BANKGIRO_INFORMATION_UNAVAILABLE');
+});
+test('a report account mismatch is retained but permanently blocked instead of retried',async t=>{
+ const f=fixture(t);f.sink.importReport=async()=>{throw Object.assign(Error('private account value'),{code:'ACCOUNT_MISMATCH'});};
+ const result=await f.ingest.run('owner');assert.equal(result.counts.BLOCKED,1);assert.equal(result.jobs[0].nextAttemptAt,null);
+ assert.equal(result.jobs[0].lastError,'ACCOUNT_MISMATCH');assert.equal(f.sql.prepare('SELECT count(*) n FROM originals').get().n,1);
+ assert.equal(JSON.stringify(result).includes('private account'),false);
+});
 test('restart and alternate filename/report identity deduplicate owner original',async t=>{const f=fixture(t);await f.ingest.run('owner');f.source.reports.push({...report(),reportId:'two',filename:'renamed.csv'});const s=await f.build().run('owner');assert.equal(s.counts.DUPLICATE,1);assert.equal(f.sql.prepare('SELECT count(*) n FROM imported').get().n,1);});
 test('same report identity changed bytes is retained and blocked',async t=>{const f=fixture(t);await f.ingest.run('owner');f.source.reports.push(report('one','0600'));const s=await f.ingest.run('owner');assert.equal(s.counts.BLOCKED,1);assert.equal(f.sql.prepare('SELECT count(*) n FROM originals').get().n,2);assert.equal(f.sql.prepare('SELECT count(*) n FROM imported').get().n,1);});
 test('unknown committed outcome survives process restart without duplicate effect',async t=>{const f=fixture(t);f.lostResponse=true;let s=await f.ingest.run('owner');assert.equal(s.counts.RETRY,1);assert.ok(s.nextPollAt);assert.ok(!JSON.stringify(s).includes('secret'));f.clock+=120000;s=await f.build().run('owner');assert.equal(s.counts.DUPLICATE,1);assert.equal(f.sql.prepare('SELECT count(*) n FROM imported').get().n,1);});

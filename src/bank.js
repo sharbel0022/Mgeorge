@@ -6,7 +6,7 @@
  */
 
 import { readFileSync, realpathSync } from 'node:fs';
-import { createPrivateKey, createSign } from 'node:crypto';
+import { createPrivateKey, createPublicKey, createHash, createSign } from 'node:crypto';
 import { isAbsolute, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -49,6 +49,11 @@ export function configStatus(){
   catch(e){return {configured:false,environment:undefined,code:e.code||'not_configured',message:e.code?e.message:'Banktjänsten behöver aktiveras av systemadministratören.'};}
 }
 export function isConfigured(){return configStatus().configured;}
+/** Bind a pending consent to the actual application and signing-key generation. */
+export function consentApplicationFingerprint(){
+  const {applicationId,key,environment}=configuration();
+  return createHash('sha256').update(JSON.stringify([applicationId,environment,createPublicKey(key).export({type:'spki',format:'der'}).toString('base64')])).digest('hex');
+}
 /** Skapar RS256-signerad JWT för att autentisera serverns API-anrop mot Enable Banking. Privat RSA-nyckel stannar på servern. */
 export function jwt(){
   const {applicationId,key}=configuration(),now=Math.floor(Date.now()/1000);
@@ -91,16 +96,16 @@ function retryAfterSeconds(value,fallback=60){
   return {retryAfter:retryBlocked?Math.ceil((Date.UTC(9999,11,31)-Date.now())/1000):Number.isFinite(seconds)&&seconds>=0?Math.max(1,seconds):fallback,retryBlocked,retryKnown:numeric||validDate};
 }
 /** Skickar tidsbegränsade anrop till Enable Bankings fasta API-domän med signerad token; leverantörsfel hanteras centralt. */
-export async function bankingRequest(path,{method='GET',body,deadline=Date.now()+18000}={}){
+export async function bankingRequest(path,{method='GET',body,deadline=Date.now()+18000,signal}={}){
   const url=requestUrl(path,method),authorization=`Bearer ${jwt()}`;
   const remaining=Math.min(18000,deadline-Date.now());
   const timedOut=()=>bankError('bank_timeout','Bankförfrågan tog för lång tid. Försök igen.',502);
   if(!Number.isFinite(remaining)||remaining<=0)throw timedOut();
-  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),remaining);
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),remaining),requestSignal=signal?AbortSignal.any([controller.signal,signal]):controller.signal;
   try{
     let result;
-    try{result=await fetch(url,{method,redirect:'error',signal:controller.signal,headers:{Authorization:authorization,Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});}
-    catch{throw bankError(controller.signal.aborted?'bank_timeout':'bank_unavailable',controller.signal.aborted?'Bankförfrågan tog för lång tid. Försök igen.':'Banktjänsten kunde inte nås. Försök igen senare.',502);}
+    try{result=await fetch(url,{method,redirect:'error',signal:requestSignal,headers:{Authorization:authorization,Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});}
+    catch{throw bankError(requestSignal.aborted?'bank_timeout':'bank_unavailable',requestSignal.aborted?'Bankförfrågan tog för lång tid. Försök igen.':'Banktjänsten kunde inte nås. Försök igen senare.',502);}
     if(result.status===429||result.status===503){
       const retry=retryAfterSeconds(result.headers.get('retry-after'),6*3600);
       if(result.status===429||retry.retryKnown){
@@ -113,11 +118,14 @@ export async function bankingRequest(path,{method='GET',body,deadline=Date.now()
     const data=result.status===204?{}:await result.json().catch(()=>null);
     // Fetch can finish its headers while the response body is still waiting.
     // A body abort must keep its timeout identity and must never start recovery.
-    if(controller.signal.aborted||Date.now()>=deadline)throw timedOut();
+    if(requestSignal.aborted||Date.now()>=deadline)throw timedOut();
     if(!result.ok){
       const providerStatus=result.status,extra={providerStatus};
       if(providerStatus===429||data?.error==='ASPSP_RATE_LIMIT_EXCEEDED')throw bankError('rate_limited','Bankens anropsgräns är nådd. Vänta innan du försöker igen.',429,{...extra,...retryAfterSeconds(result.headers.get('retry-after'),data?.error==='ASPSP_RATE_LIMIT_EXCEEDED'?6*3600:60)});
       if(['CLOSED_SESSION','EXPIRED_SESSION','REVOKED_SESSION','SESSION_DOES_NOT_EXIST'].includes(data?.error))throw bankError('renewal_required','Bankmedgivandet har upphört. Förnya anslutningen.',409,extra);
+      if(['ASPSP_ACCOUNT_NOT_ACCESSIBLE','ACCOUNT_DOES_NOT_EXIST'].includes(data?.error))throw bankError('account_unavailable','Det valda bankkontot kan inte längre läsas. Kontrollera bankanslutningen och kontots behörighet.',409,extra);
+      if(data?.error==='ASPSP_PSU_ACTION_REQUIRED')throw bankError('action_required','Banken kräver en åtgärd från kontoinnehavaren innan hämtningen kan fortsätta.',409,extra);
+      if(['PSU_HEADER_NOT_PROVIDED','PSU_HEADER_INVALID','PSUHEADERNOT_PROVIDED'].includes(data?.error))throw bankError('background_access_denied','Bankens behörighet för hämtning i bakgrunden behöver verifieras innan nya försök görs.',409,extra);
       if(data?.error==='REDIRECT_URI_NOT_ALLOWED')throw bankError('redirect_not_registered','Bankens returadress måste registreras av systemadministratören.',409,extra);
       if(providerStatus===401||providerStatus===403)throw bankError('application_access_denied','Banktjänsten behöver aktiveras av systemadministratören. Kontrollera nyckel, produktionsgodkännande och AIS-behörighet.',409,extra);
       if(['EXPIRED_AUTHORIZATION_CODE','WRONG_AUTHORIZATION_CODE','ALREADY_AUTHORIZED'].includes(data?.error))throw bankError('authorization_failed','Bankgodkännandet kunde inte slutföras. Starta en ny anslutning.',409,extra);
@@ -160,7 +168,7 @@ export function startConsentBody(aspsp,state,origin){
 }
 function validDate(date){return typeof date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date;}
 /** Hämtar hela det inkluderande UTC-intervallet innan några händelser lämnas till lagring. */
-export async function fetchBookedTransactions(accountId,{dateFrom,dateTo,authorize=()=>{},deadline=Date.now()+240000}){
+export async function fetchBookedTransactions(accountId,{dateFrom,dateTo,authorize=()=>{},deadline=Date.now()+240000,request=bankingRequest}){
   if(typeof accountId!=='string'||!accountId||accountId.length>200)throw bankError('invalid_account','Välj ett godkänt konto.',400);
   if(!validDate(dateFrom)||!validDate(dateTo)||dateFrom>dateTo)throw bankError('invalid_date_range','Välj ett giltigt från- och tilldatum.',400);
   const day=86400000,out=[],end=Date.parse(dateTo);
@@ -177,7 +185,7 @@ export async function fetchBookedTransactions(accountId,{dateFrom,dateTo,authori
         const search=new URLSearchParams({date_from:from,date_to:to,transaction_status:'BOOK'});
         if(cursor)search.set('continuation_key',cursor);
         requests++;
-        const data=await bankingRequest(`/accounts/${encodeURIComponent(accountId)}/transactions?${search}`,{deadline});
+        const data=await request(`/accounts/${encodeURIComponent(accountId)}/transactions?${search}`,{deadline});
         authorize();
         if(!Array.isArray(data.transactions))throw bankError('invalid_response','Banktjänsten returnerade en ogiltig transaktionslista.',502);
         received+=data.transactions.length;

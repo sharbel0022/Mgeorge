@@ -1,5 +1,7 @@
 # SaaS-säkerhet, efterlevnad och acceptans — Agent 7
 
+**Integration 2026-11-05:** [Aktuell gemensam intern acceptans](security-integrated-acceptance.md) provar nu faktiska företag, medlemskap, roller, Node-partitioner, D1/R2, medgivanden och klientcache. Beskrivningarna nedan av den ursprungliga owner-/administratörsbasen är historiskt producentunderlag; tillägget anger aktuell testomfattning och kvarstående externa gränser.
+
 **Beslut: kommersiell flerföretagslansering är blockerad.** Denna PR levererar avgränsade säkerhetsrättningar och körbar regressionsacceptans. Den är varken ett juridiskt godkännande eller bevis för en färdig företags-, roll- eller Open Payments-integration.
 
 Granskningsdatum enligt uppdraget: **2026-11-04**. Bas: `14a042abd37fa455d08da9dfcc096ef4f603b512`. Branch: `feature/saas-security-acceptance`. Befintligt kontrakt: [`mgeorge-integration-v1`](../README.md). [Genomförandeplan och arbetsanteckningar](security-acceptance-plan.md).

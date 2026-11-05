@@ -83,9 +83,9 @@ test('missing or modified invoice originals fail closed without changing stored 
   f.objects.delete(a.owner + '/' + f.records.get(a.owner).invoice.id);
   const changed = f.records.get(b.owner).invoice;
   f.objects.set(b.owner + '/' + changed.id, new Uint8Array(changed.bytes.length).fill(120));
-  await assert.rejects(f.server.readInvoiceOriginalBytes(a.owner, f.records.get(a.owner).invoice.id), /saknas/);
-  await assert.rejects(f.server.readInvoiceOriginalBytes(b.owner, changed.id), /kontrollsumma/);
-  assert.deepEqual(new Uint8Array((await f.server.readInvoiceOriginalBytes(c.owner, f.records.get(c.owner).invoice.id)).bytes), f.records.get(c.owner).invoice.bytes);
+  f.as(a);await assert.rejects(f.server.readInvoiceOriginalBytes(a.owner, f.records.get(a.owner).invoice.id), /saknas/);
+  f.as(b);await assert.rejects(f.server.readInvoiceOriginalBytes(b.owner, changed.id), /kontrollsumma/);
+  f.as(c);assert.deepEqual(new Uint8Array((await f.server.readInvoiceOriginalBytes(c.owner, f.records.get(c.owner).invoice.id)).bytes), f.records.get(c.owner).invoice.bytes);
   assert.equal(snapshot(f), before);
 });
 
@@ -99,7 +99,7 @@ test('lost platform identity denies state and originals even with an injected co
 test('three synthetic bank/consent records and a reused selector retain owner and purpose bound encryption', async t => {
   const f = await ownerFixture(t);
   for (const company of companies) {
-    const row = await f.store.connection(company.owner), expected = f.records.get(company.owner);
+    f.as(company);const row = await f.store.connection(company.owner), expected = f.records.get(company.owner);
     assert.equal(row.bank_name, company.bank); assert.equal(row.status, company.consent); assert.equal(row.valid_until, company.until);
     assert.equal(await f.store.sessionId(row), expected.session);
     assert.deepEqual(await f.store.accounts(row), [expected.account]);
@@ -109,7 +109,7 @@ test('three synthetic bank/consent records and a reused selector retain owner an
     }
     await assert.rejects(f.store.decrypt(company.owner, 'accounts:' + row.id, row.encrypted_session));
   }
-  assert.equal(await f.store.connection('synthetic-non-member'), null);
+  f.as({owner:'synthetic-non-member',label:'Unknown'});assert.equal(await f.store.connection('synthetic-non-member'), null);
 });
 
 test('concurrent bank work is serialized for A while B has an independent valid lease', async t => {
@@ -117,14 +117,14 @@ test('concurrent bank work is serialized for A while B has an independent valid 
   let entered, release;
   const started = new Promise(resolve => { entered = resolve; });
   const gate = new Promise(resolve => { release = resolve; });
-  const running = f.store.withBankLock(a.owner, async lease => { entered(); await gate; await lease.assert(); });
+  f.as(a);const running = f.server.withCompanyRequest(async()=>{await f.server.identity();await f.store.withBankLock(a.owner, async lease => { entered(); await gate; await lease.assert(); });return new Response();})(new Request('https://mg.test/api/bank/sync'));
   await started;
   try {
     await assert.rejects(f.store.withBankLock(a.owner, async () => assert.fail('duplicate A work started')), /BANK_BUSY/);
-    await f.store.withBankLock(b.owner, async lease => {
+    f.as(b);await f.server.withCompanyRequest(async()=>{await f.server.identity();await f.store.withBankLock(b.owner, async lease => {
       await lease.assert();
       assert.equal(f.sqlite.prepare('SELECT count(*) n FROM bank_locks').get().n, 2);
-    });
+    });return new Response();})(new Request('https://mg.test/api/bank/sync'));
   } finally { release(); await running; }
   assert.equal(f.sqlite.prepare('SELECT count(*) n FROM bank_locks').get().n, 0);
 });

@@ -38,7 +38,7 @@ export async function ownerFixture(t) {
         args: [], bind(...args) { this.args = args; return this; },
         async first() { return sqlite.prepare(query).get(...this.args) || null; },
         async all() { return { results: sqlite.prepare(query).all(...this.args) }; },
-        execute() { return { success: true, meta: { changes: Number(sqlite.prepare(query).run(...this.args).changes) } }; },
+        execute() { const statement=sqlite.prepare(query);return statement.columns().length?{success:true,results:statement.all(...this.args),meta:{changes:0}}:{success:true,results:[],meta:{changes:Number(statement.run(...this.args).changes)}}; },
         async run() { return this.execute(); },
       };
     },
@@ -64,7 +64,7 @@ export async function ownerFixture(t) {
   const environment = data(`export const env=${ref}.env;`);
   const auth = data(`export async function getChatGPTUser(){return ${ref}.user;}`);
   const domain = local('lib/domain.ts');
-  const server = compiled('lib/server.ts', { 'cloudflare:workers': environment, '@/app/chatgpt-auth': auth, './domain': domain });
+  const server = compiled('lib/server.ts', { './company-storage.js': local('lib/company-storage.js'), 'cloudflare:workers': environment, '@/app/chatgpt-auth': auth, './domain': domain });
   f.server = await import(server);
   f.files = await import(compiled('app/api/files/route.ts', { 'cloudflare:workers': environment, '@/lib/server': server, '@/lib/domain': domain }));
   f.state = await import(compiled('app/api/state/route.ts', {
@@ -74,9 +74,10 @@ export async function ownerFixture(t) {
     '@/lib/bankgiro-service': unavailable('readBankgiroOriginal', 'prepareBankgiroLinkCommand'),
     '@/lib/bankgiro-invoice-search': unavailable('searchBankgiroInvoice'),
   }));
+  const transactions=compiled('lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':local('lib/payment-references.js'),'../payer-evidence.js':local('lib/payer-evidence.js')});
   f.store = await import(compiled('lib/banking/store.ts', {
     'cloudflare:workers': environment, '@/lib/server': server,
-    './security': local('lib/banking/security.ts'), './runtime-config': local('lib/banking/runtime-config.ts'),
+    './security': local('lib/banking/security.ts'), './runtime-config': local('lib/banking/runtime-config.ts'), './transactions':transactions,'../bank-consent-policy.js':local('lib/bank-consent-policy.js'),'../bank-company-authority.js':local('lib/bank-company-authority.js'),
   }));
   f.as = company => { f.user = company ? { userId: company.owner, email: `company-${company.label.toLowerCase()}@example.test`, displayName: 'Synthetic ' + company.label } : null; };
   f.retain = (owner, filename, content) => {
