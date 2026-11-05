@@ -1,0 +1,144 @@
+{
+  "schema": "mgeorge-quality8-release-wave2-v1",
+  "recorded_at": "2026-11-05 22:58:14 UTC",
+  "status": "published_and_bounded_postchecks_completed",
+  "all_33_at_least_8": false,
+  "repository": "sharbel0022/Mgeorge",
+  "pull_request": 56,
+  "initial_failed_candidate": {
+    "head": "c17365187c5e97f164199e7ab070e6dacca6abec",
+    "ci_run": 42120342085,
+    "node_passed": 2277,
+    "sites_passed": 4169,
+    "sites_failed": 8,
+    "bridge_passed": 47,
+    "published": false
+  },
+  "corrected_candidate": {
+    "head": "d638f5e195711c3011816618f1899dc535c24120",
+    "tree": "3df3558ac496afc13c09227bf6d0f3ad5bd2a0d1",
+    "ci_run": 42122473766,
+    "node_passed": 2277,
+    "sites_passed": 4210,
+    "bridge_passed": 47,
+    "total_passed": 6534,
+    "failed": 0,
+    "skipped": 0
+  },
+  "main": {
+    "sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+    "tree": "3df3558ac496afc13c09227bf6d0f3ad5bd2a0d1",
+    "ci_run": 42123382389,
+    "event": "push",
+    "conclusion": "success",
+    "node_job": 127581233102,
+    "sites_job": 127581232685,
+    "bridge_job": 127581233185,
+    "node_passed": 2277,
+    "sites_passed": 4210,
+    "bridge_passed": 47,
+    "total_passed": 6534,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "todo": 0,
+    "mandatory_install_syntax_types_audits_build": "passed",
+    "audit": {
+      "root": 0,
+      "bridge": 0,
+      "sites_production": 0,
+      "sites_all_moderate": 8,
+      "sites_high": 0,
+      "sites_critical": 0
+    }
+  },
+  "publication": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "checkout_path": "/workspace/scratch/4d79ab4bea8e/site-source",
+    "commit_sha": "e6c313e1356a0043b76d0f83dffa7bcc86a5f217",
+    "archive": "/workspace/scratch/4d79ab4bea8e/rating8-wave2-site.tar.gz",
+    "tree": "6e024c917ba8833e516db5723f8be1ff1d1bc4dc",
+    "archive_sha256": "026694b1df6a588dd64c1ca19524cc5e646770e3d54f6011e234438359c351d9",
+    "archive_bytes": 18582895,
+    "main": "819adee2f3848b474167eb6b15f82584caeb39af",
+    "main_ci_run": 42123382389,
+    "main_ci_status": "success",
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_b0a8791465208191882eb0671b187cbe",
+    "version_number": 64,
+    "saved_archive_hash": "sha256:b7cefff50486449d5a4bc9d3d26f69cf7c9d191ebdd9c252ca6f45bd84fc88d8",
+    "saved_archive_bytes": 48066560,
+    "saved_archive_files": 439,
+    "main_ci_counts": {
+      "node": 2277,
+      "sites": 4210,
+      "bridge": 47,
+      "total": 6534,
+      "failed": 0,
+      "skipped": 0
+    },
+    "deployment_id": "appgdep_6aed07dafe148191a5e013c8498846f6"
+  },
+  "deployment": {
+    "id": "appgdep_6aed07dafe148191a5e013c8498846f6",
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "title": "MG Fakturakoll",
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_b0a8791465208191882eb0671b187cbe",
+    "type": "publish",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "has_mcp": true,
+    "screenshot_asset_pointer": "sediment://file_000000005e7c81f88394cd087954e42e",
+    "provider_deployment_id": "site---6adf2f7f7e848191b64192161886b528",
+    "failure_message": null,
+    "env_set_revision": 10,
+    "updated_at": "2026-11-05T22:49:18.621462+00:00"
+  },
+  "postpublication_evidence": {
+    "path": "docs/quality8/wave2-postpublication-observations.json",
+    "sha256": "7fd94d7e69aa0b43c99f6808a69a82d88a7fe1a3833e8ea92e7ab2c56b0189c5"
+  },
+  "prepublication_evidence": {
+    "path": "docs/quality8/wave2-prepublication-observations.json",
+    "sha256": "030858d677d2da75a36e71b3a08f0c8267595f9ae007d274c701829ba8c646a1"
+  },
+  "public_browser": {
+    "path": "docs/quality8/browser-wave2/publication64/observations.json",
+    "sha256": "773c1169f60e6e1e33f2dd385f7852057b8ecd31b6448e939ad52d122faa77dd"
+  },
+  "financial_comparison": {
+    "revision_before": 52,
+    "revision_after": 52,
+    "retained_original_integrity": "passed",
+    "report_payer_and_reference_preserved": true,
+    "ais_missing_fields_remain_missing": true,
+    "report_not_economically_counted": true,
+    "account_verified": false,
+    "target_relation_proved": false,
+    "booked_invoice_count_before_each": 0,
+    "booked_invoice_count_after_each": 0,
+    "financial_writes": false
+  },
+  "ocr_acceptance": {
+    "v1_first_holdout": "FAILED, unchanged",
+    "v2_first_holdout": "FAILED, unchanged",
+    "v2_mandatory_precision_percent": 100,
+    "v2_mandatory_recall_percent": 60,
+    "v2_exact_normal_documents_per_parser": "0/10",
+    "next_unpublished_parser_work_not_part_of_this_release": true
+  },
+  "remaining_domain_gaps": [
+    "6: full intended queue progression and normal-case completion",
+    "10: independent image OCR recall",
+    "15: bank ACCOUNT_USAGE_INVALID and no current approved account",
+    "16: no fresh successful authorized bank sync",
+    "28: current periodic OCR schedule not yet observed after refresh",
+    "33: bank and normal end-to-end production verification remain incomplete"
+  ],
+  "preserved": [
+    "Public audience and owner",
+    "Database and original-storage identities",
+    "Environment set revision10",
+    "Three existing enabled schedules",
+    "No customer email, payment or QA allocation"
+  ]
+}

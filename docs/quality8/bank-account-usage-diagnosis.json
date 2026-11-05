@@ -1,0 +1,504 @@
+{
+  "schema": "mgeorge-bank-usage-readonly-diagnosis-v1",
+  "sourceCommit": "819adee2f3848b474167eb6b15f82584caeb39af",
+  "sourceHashes": {
+    "sites/lib/bank-consent-policy.js": "452cff5e328f931a5f1e81ab57fcd47a9b935f542146b1045de3b3e838d90538",
+    "sites/lib/banking/enable-banking.ts": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+    "sites/lib/banking/service.ts": "f741eb7c6333b42efb82b86511264a0fdad8a5dd4e49d929a06a258e9e5dc34a",
+    "sites/lib/banking/store.ts": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+    "sites/lib/banking/mcp.ts": "62a91ce3e29f7c6bf41a1466af093630b20aaf8bce82bdc7bc9f17e444a3a854"
+  },
+  "scriptSha256": "e294c4c1e95784627a9dd29134e6fb79056e5675f382b6666c4e8b814be52c1c",
+  "node": "v24.22.1",
+  "bankRequests": 0,
+  "credentialReads": 0,
+  "productionDataReads": 0,
+  "productionWrites": 0,
+  "syntheticCases": 62,
+  "accepted": 15,
+  "rejected": 47,
+  "assertionsPassed": true,
+  "observations": [
+    {
+      "label": "saved:omitted",
+      "mode": "strict",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "saved:explicit_undefined",
+      "mode": "strict",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "saved:ORGA",
+      "mode": "strict",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "saved:PRIV",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:null",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:empty_string",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:lowercase_orga",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:padded_ORGA",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:business_string",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:other_string",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:number",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:boolean",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:array",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:object",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:omitted",
+      "mode": "strict",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "live:explicit_undefined",
+      "mode": "strict",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "live:ORGA",
+      "mode": "strict",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "live:PRIV",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:null",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:empty_string",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:lowercase_orga",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:padded_ORGA",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:business_string",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:other_string",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:number",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:boolean",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:array",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:object",
+      "mode": "strict",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:omitted",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "saved:explicit_undefined",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "saved:ORGA",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "saved:PRIV",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:null",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:empty_string",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:lowercase_orga",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:padded_ORGA",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:business_string",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:other_string",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:number",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:boolean",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:array",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "saved:object",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:omitted",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "live:explicit_undefined",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "live:ORGA",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "live:PRIV",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:null",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:empty_string",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:lowercase_orga",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:padded_ORGA",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:business_string",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:other_string",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:number",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:boolean",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:array",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "live:object",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "unselected_saved_private_retains_selected_grant",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "unselected_live_private_retains_selected_grant",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "unselected_explicit_null_retains_selected_grant",
+      "mode": "legacy",
+      "accepted": true,
+      "accountCount": 1,
+      "validUntil": "2026-11-05T13:00:00.000Z"
+    },
+    {
+      "label": "selected_second_private_is_held",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "ACCOUNT_USAGE_INVALID"
+    },
+    {
+      "label": "unselected_UID_set_mismatch_still_fails_full_inventory",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "LIVE_ACCOUNT_SET_MISMATCH"
+    },
+    {
+      "label": "unselected_invalid_UID_still_fails_full_inventory",
+      "mode": "legacy",
+      "accepted": false,
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "status": 409,
+      "reason": "LIVE_ACCOUNTS_INVALID"
+    }
+  ]
+}

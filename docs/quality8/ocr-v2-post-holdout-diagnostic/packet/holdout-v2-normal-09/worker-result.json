@@ -1,0 +1,33 @@
+{
+  "text": "FAKTURA\n\nLeverantör Faktureras till\n\nExempel Styrsystem AB Testmottagaren Handel AB\nTeknikparken 21 Handelsvägen 22\n\n901 23 Provhamn 123 40 Teststad\nFakturanummer: 284-6119\nFakturadatum: 2026-08-04\n\nFörfallodatum: 2026-09-03\n\nBeskrivning Antal Å-pris\nInstallation av styrsystem 12 1 050,00\nKabelförläggning 6 454,00\n\nSamtliga radbelopp i SEK, exklusive moms.\n\nMoms 25 246 beräknas på nettobeloppet. Netto\n\nSumma moms\n\nAtt betala\nBankgiro 827-3641\nOCR-nummer 00863025193\n\n\nOrganisationsnummer: 559762-3197\n\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse\n\nBelopp\n\n12 600,00\n\n2 724,00\n\n15 324,00\n3 831,00\n\n19 155,00 SEK\n\nGodkänd för F-skatt\n\nSida 1 (1)\n",
+  "confidence": 93,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+    "textSha256": "b0d76ecc4edbfa5beb58fe61b2495db39b81361e234a8ba4feeacf3f42d4b10b",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "93ca49f7931e2fa4c07cab5c55aea1d5920248eb9babe7aa68fc7a2dd6b64e0d",
+        "bankgiro": [
+          {
+            "line": 24,
+            "text": "Bankgiro 827-3641",
+            "value": "827-3641",
+            "words": [
+              {
+                "text": "Bankgiro",
+                "confidence": 96
+              },
+              {
+                "text": "827-3641",
+                "confidence": 91
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

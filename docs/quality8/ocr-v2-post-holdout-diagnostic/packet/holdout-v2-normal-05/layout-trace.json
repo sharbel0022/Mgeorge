@@ -1,0 +1,816 @@
+{
+  "schema": "mgeorge-layout-post-holdout-trace-v1",
+  "postHoldoutDiagnostic": true,
+  "acceptanceMeasurement": false,
+  "id": "05",
+  "sourceSha256": "2336f8a054490ce984603208b9ee7ffbfa9c22f9f8ca4cff6ec7b502646f9706",
+  "traceSourceSha256": "614e96ff110a5c46e3aef8521a1772519f1786f35a96e7fe6703fb9962c6a286",
+  "outputIdenticalToUnchangedHelper": true,
+  "segments": [
+    {
+      "id": 0,
+      "row": 0,
+      "text": "FAKTURA",
+      "box": {
+        "x0": 153,
+        "y0": 120,
+        "x1": 582,
+        "y1": 179
+      },
+      "glyphHeight": 59,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 1,
+      "row": 1,
+      "text": "Fakturanummer",
+      "box": {
+        "x0": 167,
+        "y0": 342,
+        "x1": 509,
+        "y1": 374
+      },
+      "glyphHeight": 32,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 2,
+      "row": 1,
+      "text": "Fakturadatum",
+      "box": {
+        "x0": 917,
+        "y0": 342,
+        "x1": 1215,
+        "y1": 374
+      },
+      "glyphHeight": 32,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 3,
+      "row": 1,
+      "text": "Förfallodatum",
+      "box": {
+        "x0": 1667,
+        "y0": 342,
+        "x1": 1965,
+        "y1": 374
+      },
+      "glyphHeight": 32,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 4,
+      "row": 2,
+      "text": "701682",
+      "box": {
+        "x0": 169,
+        "y0": 411,
+        "x1": 373,
+        "y1": 449
+      },
+      "glyphHeight": 38,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 5,
+      "row": 2,
+      "text": "2026-07-02",
+      "box": {
+        "x0": 918,
+        "y0": 411,
+        "x1": 1204,
+        "y1": 449
+      },
+      "glyphHeight": 38,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 6,
+      "row": 2,
+      "text": "2026-07-22",
+      "box": {
+        "x0": 1668,
+        "y0": 411,
+        "x1": 1954,
+        "y1": 449
+      },
+      "glyphHeight": 38,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 7,
+      "row": 3,
+      "text": "Leverantör",
+      "box": {
+        "x0": 153,
+        "y0": 630,
+        "x1": 386,
+        "y1": 662
+      },
+      "glyphHeight": 32,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 8,
+      "row": 3,
+      "text": "Faktureras till",
+      "box": {
+        "x0": 1278,
+        "y0": 630,
+        "x1": 1576,
+        "y1": 662
+      },
+      "glyphHeight": 32,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 9,
+      "row": 4,
+      "text": "Exempel Pump & Värme AB",
+      "box": {
+        "x0": 152,
+        "y0": 696,
+        "x1": 936,
+        "y1": 747
+      },
+      "glyphHeight": 38,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 10,
+      "row": 4,
+      "text": "Testmottagaren Handel AB",
+      "box": {
+        "x0": 1275,
+        "y0": 696,
+        "x1": 1933,
+        "y1": 743
+      },
+      "glyphHeight": 35,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 11,
+      "row": 5,
+      "text": "Industrivägen 9",
+      "box": {
+        "x0": 153,
+        "y0": 760,
+        "x1": 484,
+        "y1": 801
+      },
+      "glyphHeight": 30,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 12,
+      "row": 5,
+      "text": "Handelsvägen 22",
+      "box": {
+        "x0": 1278,
+        "y0": 762,
+        "x1": 1641,
+        "y1": 803
+      },
+      "glyphHeight": 31,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 13,
+      "row": 6,
+      "text": "567 89 Testköping",
+      "box": {
+        "x0": 153,
+        "y0": 825,
+        "x1": 541,
+        "y1": 866
+      },
+      "glyphHeight": 31,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 14,
+      "row": 6,
+      "text": "123 40 Teststad",
+      "box": {
+        "x0": 1280,
+        "y0": 820,
+        "x1": 1612,
+        "y1": 852
+      },
+      "glyphHeight": 30,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 15,
+      "row": 7,
+      "text": "Beskrivning",
+      "box": {
+        "x0": 179,
+        "y0": 1209,
+        "x1": 461,
+        "y1": 1258
+      },
+      "glyphHeight": 49,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 16,
+      "row": 7,
+      "text": "Antal",
+      "box": {
+        "x0": 1321,
+        "y0": 1213,
+        "x1": 1446,
+        "y1": 1245
+      },
+      "glyphHeight": 32,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 17,
+      "row": 7,
+      "text": "Å-pris",
+      "box": {
+        "x0": 1689,
+        "y0": 1213,
+        "x1": 1828,
+        "y1": 1262
+      },
+      "glyphHeight": 49,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 18,
+      "row": 7,
+      "text": "Belopp",
+      "box": {
+        "x0": 2060,
+        "y0": 1213,
+        "x1": 2221,
+        "y1": 1254
+      },
+      "glyphHeight": 41,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 19,
+      "row": 8,
+      "text": "Pumpservice",
+      "box": {
+        "x0": 179,
+        "y0": 1323,
+        "x1": 468,
+        "y1": 1374
+      },
+      "glyphHeight": 51,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 20,
+      "row": 8,
+      "text": "4",
+      "box": {
+        "x0": 1420,
+        "y0": 1327,
+        "x1": 1446,
+        "y1": 1361
+      },
+      "glyphHeight": 34,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 21,
+      "row": 8,
+      "text": "1 800,00",
+      "box": {
+        "x0": 1634,
+        "y0": 1327,
+        "x1": 1827,
+        "y1": 1366
+      },
+      "glyphHeight": 34,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 22,
+      "row": 8,
+      "text": "7 200,00",
+      "box": {
+        "x0": 2025,
+        "y0": 1327,
+        "x1": 2220,
+        "y1": 1366
+      },
+      "glyphHeight": 34,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 23,
+      "row": 9,
+      "text": "Reservdelssats",
+      "box": {
+        "x0": 179,
+        "y0": 1431,
+        "x1": 516,
+        "y1": 1481
+      },
+      "glyphHeight": 50,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 24,
+      "row": 9,
+      "text": "1",
+      "box": {
+        "x0": 1424,
+        "y0": 1435,
+        "x1": 1442,
+        "y1": 1469
+      },
+      "glyphHeight": 34,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 25,
+      "row": 9,
+      "text": "2 487,20",
+      "box": {
+        "x0": 1632,
+        "y0": 1435,
+        "x1": 1827,
+        "y1": 1474
+      },
+      "glyphHeight": 34,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 26,
+      "row": 9,
+      "text": "2 487,20",
+      "box": {
+        "x0": 2025,
+        "y0": 1435,
+        "x1": 2220,
+        "y1": 1474
+      },
+      "glyphHeight": 34,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 27,
+      "row": 10,
+      "text": "Samtliga radbelopp i SEK, exklusive moms.",
+      "box": {
+        "x0": 180,
+        "y0": 1569,
+        "x1": 1101,
+        "y1": 1610
+      },
+      "glyphHeight": 22,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 28,
+      "row": 11,
+      "text": "Bankgiro",
+      "box": {
+        "x0": 153,
+        "y0": 1807,
+        "x1": 343,
+        "y1": 1848
+      },
+      "glyphHeight": 41,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 29,
+      "row": 11,
+      "text": "Summa exkl. moms",
+      "box": {
+        "x0": 1264,
+        "y0": 1819,
+        "x1": 1702,
+        "y1": 1854
+      },
+      "glyphHeight": 23,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 30,
+      "row": 11,
+      "text": "9 687,20",
+      "box": {
+        "x0": 2038,
+        "y0": 1815,
+        "x1": 2246,
+        "y1": 1855
+      },
+      "glyphHeight": 35,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 31,
+      "row": 12,
+      "text": "241-9562",
+      "box": {
+        "x0": 153,
+        "y0": 1876,
+        "x1": 415,
+        "y1": 1914
+      },
+      "glyphHeight": 38,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 32,
+      "row": 13,
+      "text": "Moms (25 90)",
+      "box": {
+        "x0": 1262,
+        "y0": 1934,
+        "x1": 1559,
+        "y1": 1974
+      },
+      "glyphHeight": 33,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 33,
+      "row": 13,
+      "text": "2 421,80",
+      "box": {
+        "x0": 2038,
+        "y0": 1929,
+        "x1": 2246,
+        "y1": 1969
+      },
+      "glyphHeight": 35,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": true,
+      "disabled": true
+    },
+    {
+      "id": 34,
+      "row": 14,
+      "text": "OCR",
+      "box": {
+        "x0": 153,
+        "y0": 1975,
+        "x1": 249,
+        "y1": 2006
+      },
+      "glyphHeight": 31,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 35,
+      "row": 15,
+      "text": "00863025151",
+      "box": {
+        "x0": 153,
+        "y0": 2044,
+        "x1": 500,
+        "y1": 2082
+      },
+      "glyphHeight": 38,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 36,
+      "row": 15,
+      "text": "Att betala",
+      "box": {
+        "x0": 1260,
+        "y0": 2047,
+        "x1": 1507,
+        "y1": 2082
+      },
+      "glyphHeight": 33,
+      "label": true,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 37,
+      "row": 15,
+      "text": "12 109,00 SEK",
+      "box": {
+        "x0": 1808,
+        "y0": 2043,
+        "x1": 2249,
+        "y1": 2091
+      },
+      "glyphHeight": 39,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 38,
+      "row": 16,
+      "text": "Ange OCR-numret vid betalning.",
+      "box": {
+        "x0": 150,
+        "y0": 2146,
+        "x1": 842,
+        "y1": 2187
+      },
+      "glyphHeight": 30,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 39,
+      "row": 17,
+      "text": "Betalningsvillkor: 20 dagar. Valuta: SEK.",
+      "box": {
+        "x0": 152,
+        "y0": 2467,
+        "x1": 1075,
+        "y1": 2511
+      },
+      "glyphHeight": 33,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": false
+    },
+    {
+      "id": 40,
+      "row": 18,
+      "text": "Organisationsnummer: 559762-3155",
+      "box": {
+        "x0": 153,
+        "y0": 2721,
+        "x1": 1044,
+        "y1": 2768
+      },
+      "glyphHeight": 35,
+      "label": false,
+      "explicitLabel": false,
+      "complete": true,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 41,
+      "row": 18,
+      "text": "Godkänd för F-skatt",
+      "box": {
+        "x0": 1826,
+        "y0": 2721,
+        "x1": 2248,
+        "y1": 2753
+      },
+      "glyphHeight": 32,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 42,
+      "row": 19,
+      "text": "SYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse",
+      "box": {
+        "x0": 153,
+        "y0": 2910,
+        "x1": 1245,
+        "y1": 2945
+      },
+      "glyphHeight": 4,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    },
+    {
+      "id": 43,
+      "row": 19,
+      "text": "Sida 1 (1)",
+      "box": {
+        "x0": 2083,
+        "y0": 2910,
+        "x1": 2247,
+        "y1": 2941
+      },
+      "glyphHeight": 26,
+      "label": false,
+      "explicitLabel": false,
+      "complete": false,
+      "excluded": false,
+      "disabled": true
+    }
+  ],
+  "proposed": [
+    {
+      "label": 1,
+      "value": 4,
+      "claims": 1
+    },
+    {
+      "label": 2,
+      "value": 5,
+      "claims": 1
+    },
+    {
+      "label": 3,
+      "value": 6,
+      "claims": 1
+    },
+    {
+      "label": 7,
+      "value": 9,
+      "claims": 1
+    },
+    {
+      "label": 34,
+      "value": 35,
+      "claims": 1
+    }
+  ],
+  "pairs": [
+    {
+      "label": 1,
+      "value": 4
+    },
+    {
+      "label": 2,
+      "value": 5
+    },
+    {
+      "label": 3,
+      "value": 6
+    }
+  ],
+  "disabledRows": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    3,
+    4,
+    5,
+    6,
+    15,
+    18,
+    19
+  ]
+}

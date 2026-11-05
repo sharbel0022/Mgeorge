@@ -1,5 +1,51 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Aktuell bedömning efter Site 64 — 2026-11-05
+
+**27/33 områden har nu stöd för minst 8/10. Alla 33 är ännu inte klara.** Summa 256,5/330, medel 7,77. Målet gäller varje rad, inte medelvärdet. Denna daterade bedömning ersätter äldre summeringar som nuläge; tidigare avgränsade rapporter nedan är historik.
+
+Site 64 är publicerad från main`819adee2f3848b474167eb6b15f82584caeb39af`, med exakt 6534/6534 godkända obligatoriska tester. [Leverans och begränsningar](docs/quality8/release-wave2.md), [maskinläsbara 33 rader](docs/quality8/current-33-assessment.json), [verkliga efterkontroller](docs/quality8/wave2-postpublication-observations.json).
+
+| Nr | Område | Nu | Stöd / kvarstående krav |
+| --- | --- | ---: | --- |
+| 1 | Design | 8 | Berörda vyer kontrollerade lokalt och publicerat i separat demo. |
+| 2 | Startsida | 8 | Levererad källpolicy; preliminär översikt och noll verifierat vid saknat underlag observerat. |
+| 3 | Navigation | 8 | Publicerad sökning→ArrowDown/Enter→Escape återställer sökfokus. |
+| 4 | Mobil | 8 | 25/25 lokala geometrier vid fem bredder; samma CSS/Sites-träd publicerat. |
+| 5 | Sök/filter | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 6 | Minimal manuell hantering | 6,5 | Sex underlag behandlades utan körfel; hela normalflödet återstår. |
+| 7 | Kundfakturor | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 8 | Leverantörsfakturor | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 9 | PDF | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 10 | Bild-OCR | 6,5 | Första V2:100% precision/60% mandatory recall;0/10 kompletta normaldokument. Fortsatt arbete ej publicerat. |
+| 11 | Gmail | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 12 | Automatisk registrering | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 13 | Dubbletter | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 14 | Dokumentgranskning | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 15 | Swedbank | 6,5 | Publicerad revalidering avvisad:ACCOUNT_USAGE_INVALID; anslutningen förblir frånkopplad. |
+| 16 | Automatisk bankhämtning | 6,5 | Ingen ny lyckad behörig bankhämtning efter 08:05 UTC. |
+| 17 | Bankgiro-import | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 18 | Verklig betalare | 8 | Ägt verkligt rapportoriginal och exakt läsvy bevarar angiven betalare; saknad AIS-betalare förblir okänd. |
+| 19 | Verklig OCR/referens | 8 | Verklig explicit rapportreferens bevaras som generell referens; ingen formell OCR eller AIS-referens hittas på. |
+| 20 | Automatisk matchning | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 21 | Delbetalning | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 22 | Överbetalning | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 23 | Flera fakturor per betalning | 8 | Granskad explicit vektor publicerad; ingång/demo-spärr observerad; inga QA-allokeringar. |
+| 24 | Historik | 8 | Historisk registrering skiljs från aktuell verifiering i publicerad detalj. |
+| 25 | Betalstatus | 8 | Publicerad översikt/detalj behåller registrerat saldo och stoppar falskt verifierad visning. |
+| 26 | Kontrollera alla betalningar | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 27 | Mejlförslag | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
+| 28 | Schemaläggning | 6,5 | CI-utlöst OCR 6/0 är aktuell; ny periodisk körning efter cronuppdatering ännu ej observerad. |
+| 29 | Backup | 8 | 362/362 original och 142968213 byte verifierade; senare importer ingår inte. |
+| 30 | Säkerhet | 8,5 | Exakt full CI/audit och negativa säkerhetsgrindar godkända;8 moderate utvecklingsfynd kvarstår. |
+| 31 | Katastrofåterställning | 8 | Isolerad återställning med riktig kod; lokalRTO 3,417 s och simuleradRPO 15 min, inte produktionsåterställning. |
+| 32 | Kod/tester | 8,5 | Exakt main-CI 6534/6534,0 fel/skip; normalt publicerat identiskt Sites-träd. |
+| 33 | Verklig produktionsverifiering | 7 | Källkedja/publicering och avgränsade ekonomiska före/efterkontroller styrkta; bank/normalflöde återstår. |
+
+Återstående under 8: **6 minimal manuell hantering,10 bild-OCR,15 Swedbank,16 automatisk bankhämtning,28 schemaläggning,33 produktionsverifiering**. Banken avvisas med`ACCOUNT_USAGE_INVALID`. OCR-V2:s första oberoende prov är fortsatt underkänt på recall; kända utvecklingsregressioner ersätter inte det. Senaste nya OCR-körning behandlade 6 underlag utan körfel men var CI-utlöst, inte periodiskt schema.18/19 höjs efter faktisk kontroll av ett ägt original och bibehållen åtskillnad mellan rapportuppgift, okänd AIS-uppgift och separat, ännu obevisad bankrelation — enligt oförändrad PLAN och oberoende ombedömning.
+
+## Tidigare daterade bedömningar
+
 ## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
 
 [Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.

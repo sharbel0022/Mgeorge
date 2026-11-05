@@ -1,0 +1,16 @@
+{
+  "baseline": "b020d020ad7ab8d4ca7417959d01ceb1613a5709",
+  "combinations": 256,
+  "allowed": 4,
+  "denied": 252,
+  "strictDenialsWithoutDiagnostic": 252,
+  "unusualValues": 3,
+  "throwingReflectionPreservesOriginalDenial": true,
+  "sourceAndTestSha256": {
+    "sites/lib/bank-consent-policy.js": "bc9da88933c98ba1ad11aff9c2c34d0654387fef68f10da613d534a05138aba2",
+    "sites/lib/bank-consent-policy.d.ts": "4da7f6e70627a4dff69056e8b650aa058ba7a5eeb6642a79fc46835440325d25",
+    "sites/lib/banking/service.ts": "5884ebe8db3f8b14a439f02c5b9068dd8f4d05b5a6a8e6018a904d1cc5c80bee",
+    "sites/tests/bank-usage-diagnostic.test.mjs": "31b88f136af6f1d20929a178c9857b8467a157fa603f4d7d89dd1581f9e2fffe",
+    "sites/tests/banking-security.test.mjs": "9433e2a3a2cca453557c87bfcb75cf068fcfdda0a078a96bb59c1a74cecbe5bb"
+  }
+}

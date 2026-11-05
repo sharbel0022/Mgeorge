@@ -1,0 +1,44 @@
+{
+  "id": "holdout-v2-normal-05",
+  "question": "Do the actual words/bboxes support an unambiguous split of Leverantör and Faktureras till into exactly one company-name candidate per explicitly labelled role column?",
+  "postHoldoutDiagnostic": true,
+  "independentHoldout": false,
+  "acceptanceMeasurement": false,
+  "recognitionCalls": 1,
+  "targetSourceCommit": "571073b8172ab53899a4ce3c2b717c7fe24daee2",
+  "sourceSha256": "08407f895bca7925b5efae42f3d42907e6d09d6dffbc1a071e757440731a2ed4",
+  "inputSha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+  "startedAt": "2026-11-05T22:34:14.316Z",
+  "completedAt": "2026-11-05T22:34:19.458Z",
+  "durationMsIncludingCapture": 5142.417992000001,
+  "workerError": null,
+  "rawBlocks": 8,
+  "rawLines": 20,
+  "rawWords": 92,
+  "globalConfidence": 90,
+  "layoutReconstructed": true,
+  "firstV2ObservedTextSha256": "ae4df9cc0f1b2684310dd4f44289d03ffd8ccb4410724362719d9e240e1f6ee9",
+  "rawTextSha256": "50f8187c087a1ccab09e76256706edbc9da61f850946c790f95b977b88857bfd",
+  "workerTextSha256": "ae4df9cc0f1b2684310dd4f44289d03ffd8ccb4410724362719d9e240e1f6ee9",
+  "workerTextMatchesFirstV2": true,
+  "parameters": [
+    [
+      {
+        "tessedit_pageseg_mode": "3"
+      }
+    ]
+  ],
+  "captureHookSha256": "ddb9c61486230a118a940749d568f7b5799f7a3ca32cadc6dee47f1cbc167085",
+  "captureBridgeSha256": "0b15a9b65fdf8295270603fda54d3041a1bdbc2e21aa1fefaab362146f49c90d",
+  "artifactHashes": {
+    "question-and-input.json": "e41808e3ed6619e7d687fcaf2cbb0baaca3e7fa9ca770f2c3160b1f7d3352de0",
+    "recognition-input.png": "3c3a85f37365b6e407cd2be96ee4613893c8a06d0d63c5b0a5de5ea76ed01f5b",
+    "recognition-start.json": "b0705100ed2fdf415deef7a21ef9b5db8bd8cf9b4f921f93d677c46f5ecfba3e",
+    "recognition-finished.json": "5432266bc4b1c5bb0ef038e49de680d5c035efddd6c19f846e51d52a0decc1df",
+    "raw-response.json": "435b70d257be5f3f10bdf83a8463ce2c677df2a417b7f62a6d3c4f419d63b918",
+    "raw-response.v8": "81ff7472c12cf4d8ef8001779729db5b950d9b144fa75e252dade93eba39d30c",
+    "worker-result.json": "48c9e6203fbb3a859045a20e4253e0aecb04c05336cb5172202583c690965306",
+    "worker-stderr.txt": "616ea5f4e52bae009e99b6dac3a61e322b8051587da9de9166db734a336c388e",
+    "layout-replay.json": "b9d444b4eab3239100c7af25a9095aaabef50d6441f8551edf3d29f511d09975"
+  }
+}

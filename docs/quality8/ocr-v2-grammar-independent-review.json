@@ -1,0 +1,1215 @@
+{
+  "schema": "mgeorge-v2-grammar-independent-review-v1",
+  "decision": "NOT_READY",
+  "targetCommit": "abe5c1e099143ca59015562c5047b252ba9952bb",
+  "baselineCommit": "571073b8172ab53899a4ce3c2b717c7fe24daee2",
+  "opticalCalls": 0,
+  "productionCodeEdits": 0,
+  "independentHoldout": false,
+  "acceptanceMeasurement": false,
+  "node": "v24.22.1",
+  "testSha256": "135175e9990f0bbe6661e56a0f29efd3f9e05d0ce2034c22ccc168fc3cfd3f8e",
+  "sourceHashes": {
+    "src/invoice-extraction.js": "f42e250175405198475bbb677e3649bcf93906489a1cb0980b869b52ed1a138f",
+    "sites/lib/invoice-fields.js": "34d105697bbd7722bba1f46553bfc6aa00181bfd68d414632514ee79a6321bcd",
+    "src/invoice-details.js": "c17c65e1ccb1960cac96cdc11d93ce797d54edc7c70708f9b00658d36a91886c",
+    "sites/lib/invoice-details.js": "c17c65e1ccb1960cac96cdc11d93ce797d54edc7c70708f9b00658d36a91886c"
+  },
+  "delivered56": {
+    "logSha256": "9d898b4a318410bbd995ad03e8bae5ae348503fa330bca019d2e54d52f4e70fb",
+    "tests": 56,
+    "pass": 56,
+    "fail": 0,
+    "skip": 0,
+    "durationMs": 759.48371,
+    "cases": [
+      {
+        "name": "Node V2 diagnosis: VAT summary alias",
+        "pass": true,
+        "durationMs": 48.722081
+      },
+      {
+        "name": "Node V2 diagnosis: gross invoice amount alias",
+        "pass": true,
+        "durationMs": 4.63871
+      },
+      {
+        "name": "Node V2 diagnosis: VAT alias with a colon",
+        "pass": true,
+        "durationMs": 0.980072
+      },
+      {
+        "name": "Node V2 diagnosis: gross alias over an immediate line",
+        "pass": true,
+        "durationMs": 0.897719
+      },
+      {
+        "name": "Node V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 1.223161
+      },
+      {
+        "name": "Node V2 diagnosis: additional Summa moms oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.831031
+      },
+      {
+        "name": "Node V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 0.784893
+      },
+      {
+        "name": "Node V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.765874
+      },
+      {
+        "name": "Node V2 diagnosis: article description Summa moms 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 2.678747
+      },
+      {
+        "name": "Node V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 1.14841
+      },
+      {
+        "name": "Node V2 diagnosis: explicit colonless supplier role retains its complete name",
+        "pass": true,
+        "durationMs": 1.483928
+      },
+      {
+        "name": "Node V2 diagnosis: safe geometry pairing and the actual name consumer must agree",
+        "pass": true,
+        "durationMs": 7.824717
+      },
+      {
+        "name": "Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.795828
+      },
+      {
+        "name": "Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt",
+        "pass": true,
+        "durationMs": 0.635592
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB",
+        "pass": true,
+        "durationMs": 0.605887
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till",
+        "pass": true,
+        "durationMs": 0.590135
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB",
+        "pass": true,
+        "durationMs": 0.515663
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör",
+        "pass": true,
+        "durationMs": 0.866524
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803",
+        "pass": true,
+        "durationMs": 0.593598
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK",
+        "pass": true,
+        "durationMs": 0.630454
+      },
+      {
+        "name": "Node V2 diagnosis: supplier words inside a structured article do not become party evidence",
+        "pass": true,
+        "durationMs": 0.91115
+      },
+      {
+        "name": "Node V2 diagnosis: an unlabelled prose mention does not create a competing supplier field",
+        "pass": true,
+        "durationMs": 0.64805
+      },
+      {
+        "name": "Node V2 diagnosis: explicit new summaries terminate an incomplete article block",
+        "pass": true,
+        "durationMs": 0.833263
+      },
+      {
+        "name": "Node V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK",
+        "pass": true,
+        "durationMs": 0.808637
+      },
+      {
+        "name": "Node V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.702611
+      },
+      {
+        "name": "Node V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00",
+        "pass": true,
+        "durationMs": 0.66205
+      },
+      {
+        "name": "Node V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00",
+        "pass": true,
+        "durationMs": 0.635702
+      },
+      {
+        "name": "Node V2 diagnosis: text order cannot associate detached summary values",
+        "pass": true,
+        "durationMs": 0.825612
+      },
+      {
+        "name": "Sites V2 diagnosis: VAT summary alias",
+        "pass": true,
+        "durationMs": 7.64442
+      },
+      {
+        "name": "Sites V2 diagnosis: gross invoice amount alias",
+        "pass": true,
+        "durationMs": 1.085678
+      },
+      {
+        "name": "Sites V2 diagnosis: VAT alias with a colon",
+        "pass": true,
+        "durationMs": 0.878341
+      },
+      {
+        "name": "Sites V2 diagnosis: gross alias over an immediate line",
+        "pass": true,
+        "durationMs": 0.802869
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 1.062443
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Summa moms oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.908045
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 0.680177
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.707648
+      },
+      {
+        "name": "Sites V2 diagnosis: article description Summa moms 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 1.423748
+      },
+      {
+        "name": "Sites V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 1.020371
+      },
+      {
+        "name": "Sites V2 diagnosis: explicit colonless supplier role retains its complete name",
+        "pass": true,
+        "durationMs": 0.62801
+      },
+      {
+        "name": "Sites V2 diagnosis: safe geometry pairing and the actual name consumer must agree",
+        "pass": true,
+        "durationMs": 1.206706
+      },
+      {
+        "name": "Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.725314
+      },
+      {
+        "name": "Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt",
+        "pass": true,
+        "durationMs": 0.710352
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB",
+        "pass": true,
+        "durationMs": 0.69601
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till",
+        "pass": true,
+        "durationMs": 0.747437
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB",
+        "pass": true,
+        "durationMs": 0.649302
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör",
+        "pass": true,
+        "durationMs": 0.890359
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803",
+        "pass": true,
+        "durationMs": 0.674269
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK",
+        "pass": true,
+        "durationMs": 0.676913
+      },
+      {
+        "name": "Sites V2 diagnosis: supplier words inside a structured article do not become party evidence",
+        "pass": true,
+        "durationMs": 0.882516
+      },
+      {
+        "name": "Sites V2 diagnosis: an unlabelled prose mention does not create a competing supplier field",
+        "pass": true,
+        "durationMs": 0.653147
+      },
+      {
+        "name": "Sites V2 diagnosis: explicit new summaries terminate an incomplete article block",
+        "pass": true,
+        "durationMs": 0.639947
+      },
+      {
+        "name": "Sites V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK",
+        "pass": true,
+        "durationMs": 0.740666
+      },
+      {
+        "name": "Sites V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.653677
+      },
+      {
+        "name": "Sites V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00",
+        "pass": true,
+        "durationMs": 0.625547
+      },
+      {
+        "name": "Sites V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00",
+        "pass": true,
+        "durationMs": 2.009525
+      },
+      {
+        "name": "Sites V2 diagnosis: text order cannot associate detached summary values",
+        "pass": true,
+        "durationMs": 0.623905
+      }
+    ]
+  },
+  "independentBefore": {
+    "logSha256": "122e8fe2ebb7139abe5f4a7eb2d00594a87d17f8e91bb03fa25a5fc1b438ef3e",
+    "tests": 64,
+    "pass": 52,
+    "fail": 12,
+    "skip": 0,
+    "durationMs": 657.186656,
+    "cases": [
+      {
+        "name": "Node pdf independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 36.137585
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": false,
+        "durationMs": 3.834781
+      },
+      {
+        "name": "Node pdf independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 1.126429
+      },
+      {
+        "name": "Node pdf independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.644535
+      },
+      {
+        "name": "Node pdf independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 0.89046
+      },
+      {
+        "name": "Node pdf independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 0.728089
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 0.5873
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.617285
+      },
+      {
+        "name": "Node pdf independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 0.706817
+      },
+      {
+        "name": "Node pdf independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.76899
+      },
+      {
+        "name": "Node pdf independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.785073
+      },
+      {
+        "name": "Node pdf independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.542925
+      },
+      {
+        "name": "Node pdf independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.556495
+      },
+      {
+        "name": "Node pdf independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": false,
+        "durationMs": 0.611827
+      },
+      {
+        "name": "Node pdf independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 1.783323
+      },
+      {
+        "name": "Node pdf independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.639077
+      },
+      {
+        "name": "Node ocr independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 1.088924
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": false,
+        "durationMs": 0.89105
+      },
+      {
+        "name": "Node ocr independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.419722
+      },
+      {
+        "name": "Node ocr independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.552128
+      },
+      {
+        "name": "Node ocr independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 0.54628
+      },
+      {
+        "name": "Node ocr independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 0.553409
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 0.430178
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.787567
+      },
+      {
+        "name": "Node ocr independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 0.571977
+      },
+      {
+        "name": "Node ocr independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.539169
+      },
+      {
+        "name": "Node ocr independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.545889
+      },
+      {
+        "name": "Node ocr independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.394214
+      },
+      {
+        "name": "Node ocr independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.534562
+      },
+      {
+        "name": "Node ocr independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": false,
+        "durationMs": 0.624095
+      },
+      {
+        "name": "Node ocr independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 0.851231
+      },
+      {
+        "name": "Node ocr independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.56062
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 6.269218
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": false,
+        "durationMs": 1.143045
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.633488
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.777152
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 0.772214
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 0.62111
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 0.505678
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.49187
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 0.645667
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.779505
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.54657
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.467614
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.622111
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": false,
+        "durationMs": 0.762831
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 1.151776
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.597726
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 0.434784
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": false,
+        "durationMs": 0.548192
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.425089
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.393373
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 0.458079
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 0.452881
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 2.097077
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.402155
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 0.631486
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.504787
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.443938
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.367625
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.409346
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": false,
+        "durationMs": 0.881947
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 1.061473
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.552809
+      }
+    ]
+  },
+  "independentCandidate": {
+    "logSha256": "95647700063f3ab85784f4de25d5020c9176b142371f118fd0cbf9a32175d7a2",
+    "tests": 64,
+    "pass": 28,
+    "fail": 36,
+    "skip": 0,
+    "durationMs": 758.73125,
+    "cases": [
+      {
+        "name": "Node pdf independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 49.216724
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 4.608188
+      },
+      {
+        "name": "Node pdf independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": false,
+        "durationMs": 1.945132
+      },
+      {
+        "name": "Node pdf independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": false,
+        "durationMs": 1.061243
+      },
+      {
+        "name": "Node pdf independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": false,
+        "durationMs": 1.667831
+      },
+      {
+        "name": "Node pdf independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 0.783941
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicitly missing bare supplier",
+        "pass": false,
+        "durationMs": 1.202682
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": false,
+        "durationMs": 0.957378
+      },
+      {
+        "name": "Node pdf independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": false,
+        "durationMs": 1.123304
+      },
+      {
+        "name": "Node pdf independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 1.275049
+      },
+      {
+        "name": "Node pdf independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 0.848026
+      },
+      {
+        "name": "Node pdf independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.659437
+      },
+      {
+        "name": "Node pdf independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.712345
+      },
+      {
+        "name": "Node pdf independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.606358
+      },
+      {
+        "name": "Node pdf independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 2.373808
+      },
+      {
+        "name": "Node pdf independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.687839
+      },
+      {
+        "name": "Node ocr independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 1.314087
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 1.05961
+      },
+      {
+        "name": "Node ocr independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": false,
+        "durationMs": 0.741218
+      },
+      {
+        "name": "Node ocr independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": false,
+        "durationMs": 0.598837
+      },
+      {
+        "name": "Node ocr independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": false,
+        "durationMs": 0.770371
+      },
+      {
+        "name": "Node ocr independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 0.764262
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicitly missing bare supplier",
+        "pass": false,
+        "durationMs": 0.84374
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": false,
+        "durationMs": 0.732585
+      },
+      {
+        "name": "Node ocr independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": false,
+        "durationMs": 1.070065
+      },
+      {
+        "name": "Node ocr independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 1.109754
+      },
+      {
+        "name": "Node ocr independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 0.815018
+      },
+      {
+        "name": "Node ocr independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.617776
+      },
+      {
+        "name": "Node ocr independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.649372
+      },
+      {
+        "name": "Node ocr independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.687088
+      },
+      {
+        "name": "Node ocr independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 0.820676
+      },
+      {
+        "name": "Node ocr independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.784373
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 7.647151
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 1.105298
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": false,
+        "durationMs": 1.047242
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": false,
+        "durationMs": 0.900494
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": false,
+        "durationMs": 1.16038
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 0.828608
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicitly missing bare supplier",
+        "pass": false,
+        "durationMs": 0.807115
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": false,
+        "durationMs": 0.768129
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": false,
+        "durationMs": 0.987253
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 0.987323
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 0.846425
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.731474
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.800175
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.689461
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 1.229932
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.815308
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 0.591787
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 0.66126
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": false,
+        "durationMs": 0.713528
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": false,
+        "durationMs": 0.788097
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": false,
+        "durationMs": 0.713657
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": false,
+        "durationMs": 1.150294
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicitly missing bare supplier",
+        "pass": false,
+        "durationMs": 2.262173
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": false,
+        "durationMs": 0.643894
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": false,
+        "durationMs": 0.901366
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 0.972701
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": false,
+        "durationMs": 0.5472
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.452871
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.351872
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.361195
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 0.483467
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.588172
+      }
+    ]
+  },
+  "minimalBeforeAfterSnapshots": [
+    {
+      "name": "positive",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "candidate": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "inline missing new VAT alias",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK Summa moms oläsligt\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": null,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: belopp exklusive moms"
+        ]
+      },
+      "candidate": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "inline conflicting new VAT alias",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK Summa moms 375,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": null,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: belopp exklusive moms"
+        ]
+      },
+      "candidate": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "bare supplier with inline new VAT alias",
+      "text": "FAKTURA\nLeverantör Syntetiska Granhed System AB Summa moms 374,00 SEK\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "candidate": {
+        "party": "Syntetiska Granhed System AB Summa moms 374,00 SEK",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "English supplier org owner",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nSupplier organization number: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "candidate": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "name": "English seller org owner",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nSeller org number: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "candidate": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "name": "unknown bare supplier",
+      "text": "FAKTURA\nLeverantör saknas\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "candidate": {
+        "party": "saknas",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "missing bare supplier name",
+      "text": "FAKTURA\nLeverantör ej angiven\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "candidate": {
+        "party": "ej angiven",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "supplier heading unknown field next",
+      "text": "FAKTURA\nLeverantör namn\nAvtal: TEST-803\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "candidate": {
+        "party": "Avtal: TEST-803",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "mixed own name and explicit role",
+      "text": "FAKTURA\nLeverantör Syntetiska Granhed System AB Faktureras till: Syntetiska Handel AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "before": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "candidate": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    }
+  ]
+}

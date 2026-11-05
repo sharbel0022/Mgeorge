@@ -1,0 +1,10 @@
+{
+  "id": "holdout-v2-normal-05",
+  "question": "Do the actual words/bboxes support an unambiguous split of Leverantör and Faktureras till into exactly one company-name candidate per explicitly labelled role column?",
+  "inputSha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+  "inputBytes": 155370,
+  "width": 1600,
+  "height": 2000,
+  "mimeType": "image/png",
+  "filename": "images/holdout-v2-normal-05.png"
+}

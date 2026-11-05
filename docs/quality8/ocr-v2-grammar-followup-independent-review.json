@@ -1,0 +1,1200 @@
+{
+  "schema": "mgeorge-v2-grammar-followup-independent-review-v1",
+  "decision": "READY",
+  "sourceCommit": "ae56dc9a9e3d76697e38a196692a337ae0900b0d",
+  "parentCommit": "abe5c1e099143ca59015562c5047b252ba9952bb",
+  "reviewerProductionEdits": 0,
+  "opticalCalls": 0,
+  "V3MaterialRead": false,
+  "independentHoldout": false,
+  "acceptanceMeasurement": false,
+  "node": "v24.22.1",
+  "sourceHashes": {
+    "src/invoice-extraction.js": "4acea4e1afb431fcd8457eed1cc1e3a384b546af6f93895810274d3538a7a11d",
+    "sites/lib/invoice-fields.js": "f22fe3cdc4f5456e620d8d50e9f8c5bf9b857a9938586a4fb45608e0841176e6",
+    "src/invoice-details.js": "055c0e746502cc5151e140e123e1b0e59117c078168fced46bd0654220ed6ce4",
+    "sites/lib/invoice-details.js": "055c0e746502cc5151e140e123e1b0e59117c078168fced46bd0654220ed6ce4"
+  },
+  "unchangedOriginalTestSha256": "135175e9990f0bbe6661e56a0f29efd3f9e05d0ce2034c22ccc168fc3cfd3f8e",
+  "newIndependentTestSha256": "aca97a0026c912420f614123a4d4b30ccf88f1a539f7153884b22aed45f107e6",
+  "combined200": {
+    "logSha256": "93a9a8f984d4f3ad060566156fd0b85c10093010fbf8a05885c8ca98b86977b7",
+    "tests": 200,
+    "pass": 200,
+    "fail": 0,
+    "skip": 0,
+    "durationMs": 798.955512,
+    "cases": [
+      {
+        "name": "Node pdf independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 52.45687
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 3.918325
+      },
+      {
+        "name": "Node pdf independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 1.480673
+      },
+      {
+        "name": "Node pdf independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 1.171455
+      },
+      {
+        "name": "Node pdf independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 1.637596
+      },
+      {
+        "name": "Node pdf independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": true,
+        "durationMs": 0.86403
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 0.865873
+      },
+      {
+        "name": "Node pdf independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.778723
+      },
+      {
+        "name": "Node pdf independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 1.176302
+      },
+      {
+        "name": "Node pdf independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 1.001474
+      },
+      {
+        "name": "Node pdf independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.774247
+      },
+      {
+        "name": "Node pdf independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.663813
+      },
+      {
+        "name": "Node pdf independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.701038
+      },
+      {
+        "name": "Node pdf independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.722331
+      },
+      {
+        "name": "Node pdf independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 2.696544
+      },
+      {
+        "name": "Node pdf independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.866153
+      },
+      {
+        "name": "Node ocr independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 1.477468
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 1.062063
+      },
+      {
+        "name": "Node ocr independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.649533
+      },
+      {
+        "name": "Node ocr independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.555843
+      },
+      {
+        "name": "Node ocr independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 0.720618
+      },
+      {
+        "name": "Node ocr independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": true,
+        "durationMs": 0.714007
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 0.761939
+      },
+      {
+        "name": "Node ocr independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.651896
+      },
+      {
+        "name": "Node ocr independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 1.055994
+      },
+      {
+        "name": "Node ocr independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.774597
+      },
+      {
+        "name": "Node ocr independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.872343
+      },
+      {
+        "name": "Node ocr independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.803381
+      },
+      {
+        "name": "Node ocr independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.696421
+      },
+      {
+        "name": "Node ocr independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.736691
+      },
+      {
+        "name": "Node ocr independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 0.980192
+      },
+      {
+        "name": "Node ocr independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.921766
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 8.597536
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 1.141011
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 1.024147
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 1.022444
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 0.997387
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": true,
+        "durationMs": 0.792334
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 0.759104
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.859914
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 0.847214
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 1.036416
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.804052
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.786615
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.765134
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.826634
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 1.439453
+      },
+      {
+        "name": "Sites pdf independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.977548
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: existing complete document",
+        "pass": true,
+        "durationMs": 0.744513
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicit bare supplier and both new summary labels",
+        "pass": true,
+        "durationMs": 0.690433
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: unreadable inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.651304
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: conflicting inline VAT alias after net",
+        "pass": true,
+        "durationMs": 0.711114
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: bare supplier cannot absorb a monetary field",
+        "pass": true,
+        "durationMs": 0.874706
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: bare supplier cannot absorb or hide conflicting VAT",
+        "pass": true,
+        "durationMs": 0.701219
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicitly missing bare supplier",
+        "pass": true,
+        "durationMs": 0.826004
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: explicitly unspecified bare supplier",
+        "pass": true,
+        "durationMs": 0.643804
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: expanded supplier heading cannot borrow an unknown label",
+        "pass": true,
+        "durationMs": 3.522559
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: supplier-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.756171
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: seller-owned organization label is not a second empty name",
+        "pass": true,
+        "durationMs": 0.820346
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: merged two-role heading cannot assign two unseparated names",
+        "pass": true,
+        "durationMs": 0.814427
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: new VAT alias cannot repair a damaged percentage",
+        "pass": true,
+        "durationMs": 0.820735
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: new total alias on a later page remains in the census",
+        "pass": true,
+        "durationMs": 0.466292
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: structured article remains an article: Summa moms 781,00",
+        "pass": true,
+        "durationMs": 0.521643
+      },
+      {
+        "name": "Sites ocr independent V2 grammar: structured article remains an article: Fakturabelopp 781,00",
+        "pass": true,
+        "durationMs": 0.598988
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: inline unreadable explicit VAT after total",
+        "pass": true,
+        "durationMs": 50.049793
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: inline conflicting explicit VAT after date",
+        "pass": true,
+        "durationMs": 4.859729
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary",
+        "pass": true,
+        "durationMs": 2.743324
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt",
+        "pass": true,
+        "durationMs": 1.061643
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK",
+        "pass": true,
+        "durationMs": 1.112638
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt",
+        "pass": true,
+        "durationMs": 0.846354
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary",
+        "pass": true,
+        "durationMs": 0.876509
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn",
+        "pass": true,
+        "durationMs": 1.171436
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:",
+        "pass": true,
+        "durationMs": 1.070045
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Supplier name",
+        "pass": true,
+        "durationMs": 1.094963
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn",
+        "pass": true,
+        "durationMs": 0.867164
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:",
+        "pass": true,
+        "durationMs": 0.688811
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:",
+        "pass": true,
+        "durationMs": 0.776761
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: an explicit absent name is held: saknas",
+        "pass": true,
+        "durationMs": 1.280527
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: an explicit absent name is held: ej angiven",
+        "pass": true,
+        "durationMs": 0.716542
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: an explicit absent name is held: inte angiven",
+        "pass": true,
+        "durationMs": 0.63506
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: an explicit absent name is held: not provided",
+        "pass": true,
+        "durationMs": 0.568061
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: absence words inside a real name are not substring-rejected",
+        "pass": true,
+        "durationMs": 0.713126
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: a heading can still borrow an unambiguous company name",
+        "pass": true,
+        "durationMs": 0.697533
+      },
+      {
+        "name": "Node pdf reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt",
+        "pass": true,
+        "durationMs": 3.741523
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: inline unreadable explicit VAT after total",
+        "pass": true,
+        "durationMs": 1.544428
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: inline conflicting explicit VAT after date",
+        "pass": true,
+        "durationMs": 1.270061
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary",
+        "pass": true,
+        "durationMs": 0.748409
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt",
+        "pass": true,
+        "durationMs": 0.761428
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK",
+        "pass": true,
+        "durationMs": 0.893012
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt",
+        "pass": true,
+        "durationMs": 0.849999
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary",
+        "pass": true,
+        "durationMs": 0.747788
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn",
+        "pass": true,
+        "durationMs": 0.68858
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:",
+        "pass": true,
+        "durationMs": 0.651776
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Supplier name",
+        "pass": true,
+        "durationMs": 0.735589
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn",
+        "pass": true,
+        "durationMs": 0.701749
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:",
+        "pass": true,
+        "durationMs": 0.64095
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:",
+        "pass": true,
+        "durationMs": 0.730041
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: an explicit absent name is held: saknas",
+        "pass": true,
+        "durationMs": 0.707399
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: an explicit absent name is held: ej angiven",
+        "pass": true,
+        "durationMs": 0.714759
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: an explicit absent name is held: inte angiven",
+        "pass": true,
+        "durationMs": 0.687499
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: an explicit absent name is held: not provided",
+        "pass": true,
+        "durationMs": 0.654279
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: absence words inside a real name are not substring-rejected",
+        "pass": true,
+        "durationMs": 0.758523
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: a heading can still borrow an unambiguous company name",
+        "pass": true,
+        "durationMs": 0.812614
+      },
+      {
+        "name": "Node ocr reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt",
+        "pass": true,
+        "durationMs": 3.598342
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: inline unreadable explicit VAT after total",
+        "pass": true,
+        "durationMs": 7.984809
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: inline conflicting explicit VAT after date",
+        "pass": true,
+        "durationMs": 1.374797
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary",
+        "pass": true,
+        "durationMs": 0.785293
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt",
+        "pass": true,
+        "durationMs": 2.486003
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK",
+        "pass": true,
+        "durationMs": 0.987293
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt",
+        "pass": true,
+        "durationMs": 0.658696
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary",
+        "pass": true,
+        "durationMs": 1.014493
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn",
+        "pass": true,
+        "durationMs": 0.570896
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:",
+        "pass": true,
+        "durationMs": 0.535754
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Supplier name",
+        "pass": true,
+        "durationMs": 0.562823
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn",
+        "pass": true,
+        "durationMs": 0.476506
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:",
+        "pass": true,
+        "durationMs": 0.480662
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:",
+        "pass": true,
+        "durationMs": 0.701099
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: an explicit absent name is held: saknas",
+        "pass": true,
+        "durationMs": 0.378291
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: an explicit absent name is held: ej angiven",
+        "pass": true,
+        "durationMs": 0.656221
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: an explicit absent name is held: inte angiven",
+        "pass": true,
+        "durationMs": 0.943387
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: an explicit absent name is held: not provided",
+        "pass": true,
+        "durationMs": 0.701719
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: absence words inside a real name are not substring-rejected",
+        "pass": true,
+        "durationMs": 0.665526
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: a heading can still borrow an unambiguous company name",
+        "pass": true,
+        "durationMs": 0.735319
+      },
+      {
+        "name": "Sites pdf reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt",
+        "pass": true,
+        "durationMs": 3.330684
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: inline unreadable explicit VAT after total",
+        "pass": true,
+        "durationMs": 0.849599
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: inline conflicting explicit VAT after date",
+        "pass": true,
+        "durationMs": 0.636493
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary",
+        "pass": true,
+        "durationMs": 0.78294
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt",
+        "pass": true,
+        "durationMs": 1.027903
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK",
+        "pass": true,
+        "durationMs": 0.872783
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt",
+        "pass": true,
+        "durationMs": 0.677133
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary",
+        "pass": true,
+        "durationMs": 0.47872
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn",
+        "pass": true,
+        "durationMs": 0.557105
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:",
+        "pass": true,
+        "durationMs": 0.52672
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Supplier name",
+        "pass": true,
+        "durationMs": 0.474333
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn",
+        "pass": true,
+        "durationMs": 0.495314
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:",
+        "pass": true,
+        "durationMs": 0.412741
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:",
+        "pass": true,
+        "durationMs": 0.383308
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: an explicit absent name is held: saknas",
+        "pass": true,
+        "durationMs": 0.414454
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: an explicit absent name is held: ej angiven",
+        "pass": true,
+        "durationMs": 0.509045
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: an explicit absent name is held: inte angiven",
+        "pass": true,
+        "durationMs": 0.74213
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: an explicit absent name is held: not provided",
+        "pass": true,
+        "durationMs": 0.422656
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: absence words inside a real name are not substring-rejected",
+        "pass": true,
+        "durationMs": 0.414133
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: a heading can still borrow an unambiguous company name",
+        "pass": true,
+        "durationMs": 0.389537
+      },
+      {
+        "name": "Sites ocr reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt",
+        "pass": true,
+        "durationMs": 2.308921
+      },
+      {
+        "name": "Node V2 diagnosis: VAT summary alias",
+        "pass": true,
+        "durationMs": 47.77892
+      },
+      {
+        "name": "Node V2 diagnosis: gross invoice amount alias",
+        "pass": true,
+        "durationMs": 3.447487
+      },
+      {
+        "name": "Node V2 diagnosis: VAT alias with a colon",
+        "pass": true,
+        "durationMs": 0.76967
+      },
+      {
+        "name": "Node V2 diagnosis: gross alias over an immediate line",
+        "pass": true,
+        "durationMs": 0.80981
+      },
+      {
+        "name": "Node V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 1.183012
+      },
+      {
+        "name": "Node V2 diagnosis: additional Summa moms oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.760446
+      },
+      {
+        "name": "Node V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 0.895397
+      },
+      {
+        "name": "Node V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.737933
+      },
+      {
+        "name": "Node V2 diagnosis: article description Summa moms 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 2.323974
+      },
+      {
+        "name": "Node V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 0.807876
+      },
+      {
+        "name": "Node V2 diagnosis: explicit colonless supplier role retains its complete name",
+        "pass": true,
+        "durationMs": 1.071026
+      },
+      {
+        "name": "Node V2 diagnosis: safe geometry pairing and the actual name consumer must agree",
+        "pass": true,
+        "durationMs": 6.512848
+      },
+      {
+        "name": "Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.812273
+      },
+      {
+        "name": "Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt",
+        "pass": true,
+        "durationMs": 0.91145
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB",
+        "pass": true,
+        "durationMs": 0.629513
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till",
+        "pass": true,
+        "durationMs": 0.617374
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB",
+        "pass": true,
+        "durationMs": 0.414234
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör",
+        "pass": true,
+        "durationMs": 0.733187
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803",
+        "pass": true,
+        "durationMs": 0.551988
+      },
+      {
+        "name": "Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK",
+        "pass": true,
+        "durationMs": 0.576985
+      },
+      {
+        "name": "Node V2 diagnosis: supplier words inside a structured article do not become party evidence",
+        "pass": true,
+        "durationMs": 0.686337
+      },
+      {
+        "name": "Node V2 diagnosis: an unlabelled prose mention does not create a competing supplier field",
+        "pass": true,
+        "durationMs": 0.917779
+      },
+      {
+        "name": "Node V2 diagnosis: explicit new summaries terminate an incomplete article block",
+        "pass": true,
+        "durationMs": 0.742099
+      },
+      {
+        "name": "Node V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK",
+        "pass": true,
+        "durationMs": 1.10084
+      },
+      {
+        "name": "Node V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.488133
+      },
+      {
+        "name": "Node V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00",
+        "pass": true,
+        "durationMs": 0.531177
+      },
+      {
+        "name": "Node V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00",
+        "pass": true,
+        "durationMs": 0.557635
+      },
+      {
+        "name": "Node V2 diagnosis: text order cannot associate detached summary values",
+        "pass": true,
+        "durationMs": 0.564066
+      },
+      {
+        "name": "Sites V2 diagnosis: VAT summary alias",
+        "pass": true,
+        "durationMs": 6.735448
+      },
+      {
+        "name": "Sites V2 diagnosis: gross invoice amount alias",
+        "pass": true,
+        "durationMs": 1.16761
+      },
+      {
+        "name": "Sites V2 diagnosis: VAT alias with a colon",
+        "pass": true,
+        "durationMs": 0.894425
+      },
+      {
+        "name": "Sites V2 diagnosis: gross alias over an immediate line",
+        "pass": true,
+        "durationMs": 0.786195
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 0.736942
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Summa moms oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.571867
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census",
+        "pass": true,
+        "durationMs": 0.782078
+      },
+      {
+        "name": "Sites V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census",
+        "pass": true,
+        "durationMs": 0.498549
+      },
+      {
+        "name": "Sites V2 diagnosis: article description Summa moms 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 1.286897
+      },
+      {
+        "name": "Sites V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary",
+        "pass": true,
+        "durationMs": 1.212386
+      },
+      {
+        "name": "Sites V2 diagnosis: explicit colonless supplier role retains its complete name",
+        "pass": true,
+        "durationMs": 0.47223
+      },
+      {
+        "name": "Sites V2 diagnosis: safe geometry pairing and the actual name consumer must agree",
+        "pass": true,
+        "durationMs": 1.118378
+      },
+      {
+        "name": "Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.673637
+      },
+      {
+        "name": "Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt",
+        "pass": true,
+        "durationMs": 0.677074
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB",
+        "pass": true,
+        "durationMs": 0.768948
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till",
+        "pass": true,
+        "durationMs": 0.764673
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB",
+        "pass": true,
+        "durationMs": 0.612727
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör",
+        "pass": true,
+        "durationMs": 0.727287
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803",
+        "pass": true,
+        "durationMs": 0.505278
+      },
+      {
+        "name": "Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK",
+        "pass": true,
+        "durationMs": 0.579478
+      },
+      {
+        "name": "Sites V2 diagnosis: supplier words inside a structured article do not become party evidence",
+        "pass": true,
+        "durationMs": 0.879403
+      },
+      {
+        "name": "Sites V2 diagnosis: an unlabelled prose mention does not create a competing supplier field",
+        "pass": true,
+        "durationMs": 0.672677
+      },
+      {
+        "name": "Sites V2 diagnosis: explicit new summaries terminate an incomplete article block",
+        "pass": true,
+        "durationMs": 0.441434
+      },
+      {
+        "name": "Sites V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK",
+        "pass": true,
+        "durationMs": 0.781888
+      },
+      {
+        "name": "Sites V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB",
+        "pass": true,
+        "durationMs": 0.683162
+      },
+      {
+        "name": "Sites V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00",
+        "pass": true,
+        "durationMs": 0.609433
+      },
+      {
+        "name": "Sites V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00",
+        "pass": true,
+        "durationMs": 1.621982
+      },
+      {
+        "name": "Sites V2 diagnosis: text order cannot associate detached summary values",
+        "pass": true,
+        "durationMs": 0.474353
+      }
+    ]
+  },
+  "additional32": {
+    "logSha256": "56ac9bee3850663d8d7900a0c10c1a8c68408bf7ae128c2750e26a35bc12248a",
+    "tests": 32,
+    "pass": 32,
+    "fail": 0,
+    "skip": 0,
+    "durationMs": 640.657564,
+    "cases": [
+      {
+        "name": "Node pdf independent grammar follow-up: unreadable owned organization is not erased by the no-extra-name exception",
+        "pass": true,
+        "durationMs": 37.973145
+      },
+      {
+        "name": "Node pdf independent grammar follow-up: missing owned organization cannot borrow the following invoice label",
+        "pass": true,
+        "durationMs": 2.995927
+      },
+      {
+        "name": "Node pdf independent grammar follow-up: conflicting valid owned organizations remain in the full census",
+        "pass": true,
+        "durationMs": 0.771362
+      },
+      {
+        "name": "Node pdf independent grammar follow-up: identical owned organization evidence remains a legitimate positive",
+        "pass": true,
+        "durationMs": 1.630766
+      },
+      {
+        "name": "Node pdf independent grammar follow-up: three complete inline monetary aliases retain exact separate values",
+        "pass": true,
+        "durationMs": 0.6746
+      },
+      {
+        "name": "Node pdf independent grammar follow-up: unsupported generic VAT suffix stays visible after total",
+        "pass": true,
+        "durationMs": 0.6074
+      },
+      {
+        "name": "Node pdf independent grammar follow-up: conflicting explicit VAT after currency is still collected",
+        "pass": true,
+        "durationMs": 0.564866
+      },
+      {
+        "name": "Node pdf independent grammar follow-up: a complete second supplier does not hide explicit absence",
+        "pass": true,
+        "durationMs": 1.115392
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: unreadable owned organization is not erased by the no-extra-name exception",
+        "pass": true,
+        "durationMs": 1.270852
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: missing owned organization cannot borrow the following invoice label",
+        "pass": true,
+        "durationMs": 1.070015
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: conflicting valid owned organizations remain in the full census",
+        "pass": true,
+        "durationMs": 0.595902
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: identical owned organization evidence remains a legitimate positive",
+        "pass": true,
+        "durationMs": 0.581802
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: three complete inline monetary aliases retain exact separate values",
+        "pass": true,
+        "durationMs": 0.416606
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: unsupported generic VAT suffix stays visible after total",
+        "pass": true,
+        "durationMs": 0.528694
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: conflicting explicit VAT after currency is still collected",
+        "pass": true,
+        "durationMs": 0.381114
+      },
+      {
+        "name": "Node ocr independent grammar follow-up: a complete second supplier does not hide explicit absence",
+        "pass": true,
+        "durationMs": 0.871761
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: unreadable owned organization is not erased by the no-extra-name exception",
+        "pass": true,
+        "durationMs": 7.136821
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: missing owned organization cannot borrow the following invoice label",
+        "pass": true,
+        "durationMs": 1.388477
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: conflicting valid owned organizations remain in the full census",
+        "pass": true,
+        "durationMs": 0.663744
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: identical owned organization evidence remains a legitimate positive",
+        "pass": true,
+        "durationMs": 3.917812
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: three complete inline monetary aliases retain exact separate values",
+        "pass": true,
+        "durationMs": 0.629563
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: unsupported generic VAT suffix stays visible after total",
+        "pass": true,
+        "durationMs": 0.534832
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: conflicting explicit VAT after currency is still collected",
+        "pass": true,
+        "durationMs": 0.895566
+      },
+      {
+        "name": "Sites pdf independent grammar follow-up: a complete second supplier does not hide explicit absence",
+        "pass": true,
+        "durationMs": 0.745223
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: unreadable owned organization is not erased by the no-extra-name exception",
+        "pass": true,
+        "durationMs": 0.619608
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: missing owned organization cannot borrow the following invoice label",
+        "pass": true,
+        "durationMs": 0.754187
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: conflicting valid owned organizations remain in the full census",
+        "pass": true,
+        "durationMs": 0.558718
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: identical owned organization evidence remains a legitimate positive",
+        "pass": true,
+        "durationMs": 1.068302
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: three complete inline monetary aliases retain exact separate values",
+        "pass": true,
+        "durationMs": 0.52678
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: unsupported generic VAT suffix stays visible after total",
+        "pass": true,
+        "durationMs": 0.762339
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: conflicting explicit VAT after currency is still collected",
+        "pass": true,
+        "durationMs": 0.878372
+      },
+      {
+        "name": "Sites ocr independent grammar follow-up: a complete second supplier does not hide explicit absence",
+        "pass": true,
+        "durationMs": 0.529825
+      }
+    ]
+  }
+}

@@ -1,0 +1,430 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Synthetic parser review reproductions; no OCR, no holdout measurement",
+  "createdAt": "2026-11-05T22:49:15.030Z",
+  "sourceBase": "abe5c1e099143ca59015562c5047b252ba9952bb",
+  "sourceFiles": [
+    {
+      "path": "src/invoice-extraction.js",
+      "sha256": "4acea4e1afb431fcd8457eed1cc1e3a384b546af6f93895810274d3538a7a11d"
+    },
+    {
+      "path": "sites/lib/invoice-fields.js",
+      "sha256": "f22fe3cdc4f5456e620d8d50e9f8c5bf9b857a9938586a4fb45608e0841176e6"
+    },
+    {
+      "path": "src/invoice-details.js",
+      "sha256": "055c0e746502cc5151e140e123e1b0e59117c078168fced46bd0654220ed6ce4"
+    },
+    {
+      "path": "sites/lib/invoice-details.js",
+      "sha256": "055c0e746502cc5151e140e123e1b0e59117c078168fced46bd0654220ed6ce4"
+    }
+  ],
+  "beforeProbe": {
+    "sha256": "904e764b4c3eaefe0bbea894b0dbfecf6eb5f808e7eff3bea3495208bd73e043",
+    "beforeNodeSource": "abe5c1e099143ca59015562c5047b252ba9952bb"
+  },
+  "independentMatrix": {
+    "commit": "8271da891e251fbd99a1ed8caf5bd005152c9c1c",
+    "sha256": "135175e9990f0bbe6661e56a0f29efd3f9e05d0ce2034c22ccc168fc3cfd3f8e",
+    "before": {
+      "tests": 64,
+      "pass": 28,
+      "fail": 36
+    },
+    "after": {
+      "tests": 64,
+      "pass": 64,
+      "fail": 0
+    }
+  },
+  "ownMatrix": {
+    "path": "sites/tests/invoice-grammar-boundaries.test.mjs",
+    "sha256": "b9084c1a6c142da0069efb0ade0cb1a14a79feede6d2bbbfa61e3fce640424bc",
+    "before": {
+      "tests": 80,
+      "pass": 8,
+      "fail": 72
+    },
+    "after": {
+      "tests": 80,
+      "pass": 80,
+      "fail": 0
+    }
+  },
+  "combined": {
+    "tests": 434,
+    "pass": 434,
+    "fail": 0,
+    "skip": 0
+  },
+  "unchangedFirstV2ResultSha256": "13557c3012331fa0101fbe3e6fe498fd2fbf3346b8740cfe5fe4b83e8393b6e7",
+  "observations": [
+    {
+      "name": "positive",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "38d094b80ec8ff943c533a257e9053dd0275119fce676ca2b5d7d7e22fcd4777",
+      "beforeNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterSites": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "inline missing new VAT alias",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK Summa moms oläsligt\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "a36c77e201844f529d3cd1ea3159c7d826ffa26dc9f43a2898c388586a371a50",
+      "beforeNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: moms"
+        ]
+      },
+      "afterSites": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: moms"
+        ]
+      }
+    },
+    {
+      "name": "inline conflicting new VAT alias",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK Summa moms 375,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "d65fbbda4b46192c3f6a21706e9c8bd470e237d86288c39215c02e6590a8d0ea",
+      "beforeNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": null,
+        "level": "red",
+        "issues": [
+          "Motstridiga värden för moms; dokumentet kan innehålla flera fakturor.",
+          "Saknade uppgifter: moms"
+        ]
+      },
+      "afterSites": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": null,
+        "level": "red",
+        "issues": [
+          "Motstridiga värden för moms; dokumentet kan innehålla flera fakturor.",
+          "Saknade uppgifter: moms"
+        ]
+      }
+    },
+    {
+      "name": "bare supplier with inline new VAT alias",
+      "text": "FAKTURA\nLeverantör Syntetiska Granhed System AB Summa moms 374,00 SEK\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "2bdebd3b4d0536f77f6716c75bbefad8399cc99bac95008f30b013f49a750ad9",
+      "beforeNode": {
+        "party": "Syntetiska Granhed System AB Summa moms 374,00 SEK",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterSites": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "English supplier org owner",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nSupplier organization number: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "e5b946735d6d72e2da210701e23c001d37eb2ffd25517fc40a935ca0680f2f15",
+      "beforeNode": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "afterNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterSites": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "English seller org owner",
+      "text": "FAKTURA\nLeverantör: Syntetiska Granhed System AB\nSeller org number: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "cc2a806f7ee919f2ec70a76c7e01289fe9c375dcbf0b90af75d28e56aec90e44",
+      "beforeNode": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "afterNode": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterSites": {
+        "party": "Syntetiska Granhed System AB",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      }
+    },
+    {
+      "name": "unknown bare supplier",
+      "text": "FAKTURA\nLeverantör saknas\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "e91cd7934227472931d6112deb9703d2e624f75e122ef142c97dd4a1e77431af",
+      "beforeNode": {
+        "party": "saknas",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterNode": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "afterSites": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "name": "missing bare supplier name",
+      "text": "FAKTURA\nLeverantör ej angiven\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "ef7da9c7783a78b1d5283ba9d1c98456d2cb6e151acc6c816d2e1fa0f7b96812",
+      "beforeNode": {
+        "party": "ej angiven",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterNode": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "afterSites": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "name": "supplier heading unknown field next",
+      "text": "FAKTURA\nLeverantör namn\nAvtal: TEST-803\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "d0d29c123daa9244d5b88bd727f0994b3eef536cfb8037745ed5e90e13258bc5",
+      "beforeNode": {
+        "party": "Avtal: TEST-803",
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "green",
+        "issues": []
+      },
+      "afterNode": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "afterSites": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "name": "mixed own name and explicit role",
+      "text": "FAKTURA\nLeverantör Syntetiska Granhed System AB Faktureras till: Syntetiska Handel AB\nOrganisationsnummer: 556016-0680\nFakturanummer: RV-6824\nFakturadatum: 2026-08-16\nFörfallodatum: 2026-09-15\nNetto: 1496,00 SEK\nMomsbelopp: 374,00 SEK\nAtt betala: 1870,00 SEK\nValuta: SEK",
+      "inputTextSha256": "d5b626919c94003cdb727f089ce6167940a86807975d02432c08390bb777389b",
+      "beforeNode": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "afterNode": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      },
+      "afterSites": {
+        "party": null,
+        "org": "5560160680",
+        "total": 187000,
+        "net": 149600,
+        "vat": 37400,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för leverantörsnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    }
+  ]
+}

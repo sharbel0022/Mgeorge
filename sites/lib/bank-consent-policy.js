@@ -29,6 +29,7 @@ const ACCOUNT_SCOPE_REASONS = new Set([
 // Public error properties are not a provenance boundary. Only reasons created
 // here may be serialized; arbitrary fields/getters on other errors are ignored.
 const accountScopeReasons = new WeakMap();
+const accountUsageDiagnostics = new WeakMap();
 
 export class ConsentError extends Error {
   constructor(code, status = 400, safeMessage) {
@@ -49,6 +50,26 @@ export function bankAccountScopeError(reason) {
 }
 export function bankAccountScopeReason(error) {
   return accountScopeReasons.get(error) ?? null;
+}
+/** A bounded snapshot of validated selected resources, not authorization to
+ * expose it. The caller must additionally bind it to its authenticated request. */
+export function bankAccountUsageDiagnostic(error) {
+  return accountUsageDiagnostics.get(error) ?? null;
+}
+
+function selectedUsageCounts(accounts) {
+  const counts = { omitted: 0, orga: 0, priv: 0, explicitNull: 0, otherString: 0, wrongType: 0 };
+  for (const account of accounts) {
+    const property = Object.getOwnPropertyDescriptor(account, 'usage');
+    // Provider and stored inputs are JSON. Accessors/inherited properties are
+    // not diagnostic evidence; never re-read them or serialize unknown values.
+    if (property ? !Object.hasOwn(property, 'value') : 'usage' in account) return null;
+    const value = property?.value;
+    const category = value === undefined ? 'omitted' : value === 'ORGA' ? 'orga' : value === 'PRIV' ? 'priv'
+      : value === null ? 'explicitNull' : typeof value === 'string' ? 'otherString' : 'wrongType';
+    counts[category]++;
+  }
+  return Object.freeze(counts);
 }
 
 function clean(value, max = 300) {
@@ -202,11 +223,24 @@ export function validateLegacyEnableSelection(input) {
   if (!sameIds(liveIds, dataIds)) denyAccountScope('LIVE_ACCOUNT_SET_MISMATCH');
   if (!selected.every(id => savedIds.includes(id) && liveIds.includes(id))) denyAccountScope('SELECTED_ACCOUNT_MISSING');
   const chosen = new Set(selected);
-  return validateEnableConsent({ ...input,
+  const projected = { ...input,
     session: { ...input.session, accounts: input.session.accounts.filter(account => chosen.has(account.uid)) },
     checked: { ...input.checked, accounts: input.checked.accounts.filter(id => chosen.has(id)),
       accounts_data: input.checked.accounts_data.filter(account => chosen.has(account.uid)) },
-  });
+  };
+  try { return validateEnableConsent(projected); }
+  catch (error) {
+    if (bankAccountScopeReason(error) === 'ACCOUNT_USAGE_INVALID') {
+      // Diagnostic failures never replace or relax the original policy denial.
+      try {
+        const saved = selectedUsageCounts(projected.session.accounts), live = selectedUsageCounts(projected.checked.accounts_data);
+        if (saved && live) accountUsageDiagnostics.set(error, Object.freeze({
+          version: 'selected-account-usage-v1', selectedCount: selected.length, saved, live,
+        }));
+      } catch { /* Keep the original denial without diagnostic evidence. */ }
+    }
+    throw error;
+  }
 }
 
 /** Validate an attestation already authenticated by a trusted server adapter.

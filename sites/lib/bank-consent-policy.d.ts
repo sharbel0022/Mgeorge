@@ -70,6 +70,16 @@ export class ConsentError extends Error {
 export function bankAccountScopeError(reason: BankAccountScopeReason): ConsentError;
 /** Returns only a reason privately bound by this policy, ignoring public fields. */
 export function bankAccountScopeReason(error: unknown): BankAccountScopeReason | null;
+export type BankAccountUsageCounts = Readonly<{
+  omitted: number; orga: number; priv: number; explicitNull: number; otherString: number; wrongType: number;
+}>;
+export type BankAccountUsageDiagnostic = Readonly<{
+  version: 'selected-account-usage-v1'; selectedCount: number;
+  saved: BankAccountUsageCounts; live: BankAccountUsageCounts;
+}>;
+/** Private, immutable selected-resource counts. A caller must still establish
+ * request/owner provenance before exposing them; public error fields are ignored. */
+export function bankAccountUsageDiagnostic(error: unknown): BankAccountUsageDiagnostic | null;
 export function legacyCompanyContext(actorId: string, requestedCompanyId?: unknown): CompanyBankContext;
 export function assertCompanyBankAccess(context: CompanyBankContext, input: {
   actorId: string; companyId: string; action: 'read' | 'manage';

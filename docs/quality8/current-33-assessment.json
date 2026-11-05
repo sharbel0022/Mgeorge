@@ -1,0 +1,549 @@
+{
+  "schema": "mgeorge-quality8-current-assessment-v1",
+  "assessed_at": "2026-11-05 22:58:14 UTC",
+  "published_site_version": 64,
+  "published_main": "819adee2f3848b474167eb6b15f82584caeb39af",
+  "status": "current_evidence_assessment_goal_not_yet_met",
+  "method": "PLAN är oförändrad. Halvpoäng är en konservativ ordinal bedömning, inte en formel av tester. Aktuell bedömning ersätter historiska totalsummor som nuläge; historiken bevaras.18/19följer den oberoende rubric-korrigeringen och verkliga före/efterbevis.",
+  "aggregate": {
+    "sum": 256.5,
+    "maximum": 330,
+    "average": 7.7727272727272725,
+    "at_least_8": 27,
+    "area_count": 33,
+    "below_8_ids": [
+      6,
+      10,
+      15,
+      16,
+      28,
+      33
+    ],
+    "all_33_at_least_8": false
+  },
+  "evidence": [
+    "docs/quality8/PLAN.md",
+    "docs/quality8/assessment-independent-candidate.json",
+    "docs/quality8/payer-reference-live-evidence-reassessment.md",
+    "docs/quality8/release-wave2.json",
+    "docs/quality8/wave2-postpublication-observations.json",
+    "docs/quality8/browser-wave2/publication64/observations.json"
+  ],
+  "rows": [
+    {
+      "id": 1,
+      "area": "Design",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Läsbara huvudvyer, tydlig informationshierarki och fungerande fel-/tomlägen; visuell kontroll av berörda vyer.",
+      "evidence": "Berörda vyer kontrollerade lokalt och publicerat i separat demo.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "25 geometrier och 3 interaktioner är lokal demoacceptans; ingen fysisk mobil- eller skärmläsarcertifiering.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "browser",
+        "historical_33"
+      ]
+    },
+    {
+      "id": 2,
+      "area": "Startsida",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Sammanfattningar motsvarar källdata; okänd och föråldrad status visas korrekt.",
+      "evidence": "Levererad källpolicy; preliminär översikt och noll verifierat vid saknat underlag observerat.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Lokala syntetiska projektioner är inte en fullständig revision av hela produktionsregistret.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "overview_review",
+        "browser"
+      ]
+    },
+    {
+      "id": 3,
+      "area": "Navigation",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Centrala arbetsflöden kan nås och lämnas med tangentbord och tydliga länkar.",
+      "evidence": "Publicerad sökning→ArrowDown/Enter→Escape återställer sökfokus.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Ett extra Tab-cykelprov avbröts; det räknas inte som godkänt. Ingen grund för att ärva8,5 från äldre rapport.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "search_focus",
+        "browser"
+      ]
+    },
+    {
+      "id": 4,
+      "area": "Mobil",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Berörda huvudflöden fungerar vid 320, 390, 768, 1024 och 1440 px utan blockerande överlapp.",
+      "evidence": "25/25 lokala geometrier vid fem bredder; samma CSS/Sites-träd publicerat.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Iframe-vybredder är riktiga CSS-vybredder, men detta är inte fysisk telefon eller autentiserad produktionsresa. PLAN kräver inte fysisk mobil för 8.",
+      "prior_independent_evidence_refs": [
+        "browser",
+        "browser_receipt",
+        "published_release"
+      ]
+    },
+    {
+      "id": 5,
+      "area": "Sök/filter",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Kombinerade filter, svenska belopp/datum, referenser och tomträffar fungerar på båda implementationerna; relevanta prestandamätningar.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "10k syntetiska poster mäter lokal CPU, inte produktionens nätverk/rendering. Sökning skapar inga ekonomiska kopplingar.",
+      "prior_independent_evidence_refs": [
+        "payments",
+        "payments_followup",
+        "published_release",
+        "browser"
+      ]
+    },
+    {
+      "id": 6,
+      "area": "Minimal manuell hantering",
+      "score": 6.5,
+      "at_least_8": false,
+      "criterion": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
+      "evidence": "Sex underlag behandlades utan körfel; ett godtagbart normalunderlag genom hela den avsedda kedjan återstår att styrka.",
+      "remaining_for_8": "Verifiera ett godtagbart normalunderlag genom hela avsedda kedjan, konkret faktisk köprogress och säker återupptagning. Periodicitet bedöms separat i område28.",
+      "scope_and_limitations": "Gmailframgång är inte OCR-/registreringsframgång. Ingen scoreökning enbart av felavstående eller att granskning är säker.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "ocr_v2",
+        "root_handoff"
+      ]
+    },
+    {
+      "id": 7,
+      "area": "Kundfakturor",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Skapa, kontrollera och visa fakturor utan felaktiga betalstatusar eller ägarblandning.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Avser kodflödet och bevarade saldon, inte en ny verksamhetsattest eller kundfaktura skapad som QA.",
+      "prior_independent_evidence_refs": [
+        "historical_33",
+        "saas",
+        "published_release",
+        "overview_review"
+      ]
+    },
+    {
+      "id": 8,
+      "area": "Leverantörsfakturor",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Belopp, datum, motpart och original bevaras med samma gränser och kontroller som kundflödet.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "8 avser bevarande och registerflöde; det betyder inte att V2:s leverantörsnamn eller belopp återfinns automatiskt.",
+      "prior_independent_evidence_refs": [
+        "historical_33",
+        "documents",
+        "saas",
+        "published_release"
+      ]
+    },
+    {
+      "id": 9,
+      "area": "PDF",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Text- och bild-PDF hanteras, sid-/storleksgränser gäller och trasiga dokument stoppas begripligt.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Ingen generell korrekthetsgaranti för bild-PDF eller representativ fälttäckning följer av denna8. Rasterkvaliteten i 10 är underkänd och delas av optiska PDF-flöden.",
+      "prior_independent_evidence_refs": [
+        "documents",
+        "word_confidence",
+        "published_release"
+      ]
+    },
+    {
+      "id": 10,
+      "area": "Bild-OCR",
+      "score": 6.5,
+      "at_least_8": false,
+      "criterion": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
+      "evidence": "Första V2:100% precision/60% mandatory recall;0/10 kompletta normaldokument. Fortsatt arbete ej publicerat.",
+      "remaining_for_8": "Nytt fryst oberoende första OCR-prov ska nå förregistrerade precision-/recallkrav utan falskt grönt.",
+      "scope_and_limitations": "V2 får inte finjusteras eller beskrivas som ett nytt blint förstaprov efter omtolkning. Riktning är metadata, inte bildigenkänning.",
+      "prior_independent_evidence_refs": [
+        "ocr_v1",
+        "ocr_v2",
+        "ocr_v2_raw"
+      ]
+    },
+    {
+      "id": 11,
+      "area": "Gmail",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Aktuell lyckad hämtning, återförsök/dubblettskydd och synligt genomfört schema; inga mejl skickas av bakgrundsflödet.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "21Z-uppgiften kommer från root, inte min nya produktionsläsning. waiting_ocr41 gör inte hela bakgrundskedjan grön.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "operations",
+        "root_handoff"
+      ]
+    },
+    {
+      "id": 12,
+      "area": "Automatisk registrering",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Endast verifierad motpart och grön tolkning; atomär idempotens och återhämtning efter förlorat svar.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Detta bedömer registreringsvillkor och transaktionssäkerhet, inte hur stor del av verklig OCR som registreras automatiskt. Nya ekonomiska QA-skrivningar krävs inte.",
+      "prior_independent_evidence_refs": [
+        "documents",
+        "saas",
+        "historical_33",
+        "published_release"
+      ]
+    },
+    {
+      "id": 13,
+      "area": "Dubbletter",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Samma original eller betalning kan inte dubbelräknas vid omkörning eller samtidighet.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Historiskt saknade originalkvitton återskapas inte. Ingen ny totalinventering av kundregistret är gjord.",
+      "prior_independent_evidence_refs": [
+        "saas",
+        "payments",
+        "manual_review",
+        "published_release"
+      ]
+    },
+    {
+      "id": 14,
+      "area": "Dokumentgranskning",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Original och osäkerhet kan granskas; korrigering påverkar rätt dokument och lämnar spår.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Ingen faktisk massgodkänning av kundunderlag ingår; säker manuell granskning är en avsiktlig gräns.",
+      "prior_independent_evidence_refs": [
+        "historical_33",
+        "word_confidence",
+        "manual_review",
+        "published_release"
+      ]
+    },
+    {
+      "id": 15,
+      "area": "Swedbank",
+      "score": 6.5,
+      "at_least_8": false,
+      "criterion": "Aktuell godkänd anslutning och verifierad läsning av rätt valt konto; utgångna/återkallade medgivanden stoppas.",
+      "evidence": "Publicerad revalidering avvisad:ACCOUNT_USAGE_INVALID; anslutningen förblir frånkopplad.",
+      "remaining_for_8": "Lös den faktiska kontoanvändningsavvisningen och verifiera bankgodkänt rätt konto.",
+      "scope_and_limitations": "Ett framtida samtyckesdatum, nytt felmeddelande eller grön CI återställer inte bankbehörighet. Ingen bankuppgift antas.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "operations",
+        "bank_diagnostic_review",
+        "root_handoff"
+      ]
+    },
+    {
+      "id": 16,
+      "area": "Automatisk bankhämtning",
+      "score": 6.5,
+      "at_least_8": false,
+      "criterion": "Aktuell genomförd körning med befintligt samtycke, hållbara återförsök och korrekt nästa tid.",
+      "evidence": "Ingen ny lyckad behörig bankhämtning efter 08:05 UTC.",
+      "remaining_for_8": "Verifiera ny lyckad schemalagd bankhämtning med aktuellt medgivande.",
+      "scope_and_limitations": "Syntetiska retry-/jobbkvitton eller säkert avvisad revalidering är ingen lyckad automatisk bankhämtning.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "operations",
+        "saas",
+        "root_handoff"
+      ]
+    },
+    {
+      "id": 17,
+      "area": "Bankgiro-import",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Stödda originalformat bevaras och tolkas spårbart; manuell import och automatisk källa redovisas separat.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "8 gäller stödd manuell import. SOURCE_NOT_CONFIGURED får aldrig beskrivas som fungerande automatisk Bankgirotjänst.",
+      "prior_independent_evidence_refs": [
+        "saas",
+        "payments",
+        "published_release"
+      ]
+    },
+    {
+      "id": 18,
+      "area": "Verklig betalare",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Källtyp och bevisnivå syns, korrekt betalare visas när bankunderlaget har den, saknad uppgift hålls okänd; verkligt underlag verifieras utan antaganden.",
+      "evidence": "Ägt verkligt rapportoriginal och exakt läsvy bevarar angiven betalare; saknad AIS-betalare förblir okänd.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Uppgiften styrks som observation i det ägda rapportoriginalet. Ingen bankautenticitet, aktuell kontobehörighet, rapport–AIS-relation eller fakturakund härleds.",
+      "prior_independent_evidence_refs": [
+        "payments",
+        "overview_review",
+        "published_release",
+        "root_handoff"
+      ]
+    },
+    {
+      "id": 19,
+      "area": "Verklig OCR/referens",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Bankens explicit angivna referens bevaras skild från förslag och fakturanummer; verkligt original verifieras.",
+      "evidence": "Verklig explicit rapportreferens bevaras som generell referens; ingen formell OCR eller AIS-referens hittas på.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Uppgiften styrks som observation i det ägda rapportoriginalet. Ingen bankautenticitet, aktuell kontobehörighet, rapport–AIS-relation eller fakturakund härleds.",
+      "prior_independent_evidence_refs": [
+        "payments",
+        "overview_review",
+        "published_release"
+      ]
+    },
+    {
+      "id": 20,
+      "area": "Automatisk matchning",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Representativ separat acceptanskorpus med noll falskt säkra kopplingar, tydliga orsaker till avstående och atomärt idempotent resultat.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "8 gäller matchningspolicy under giltiga verifierade indata; 21 syntetiska fall uppskattar ingen verklig falskmatchningsfrekvens och bevisar inte fungerande bankdrift.",
+      "prior_independent_evidence_refs": [
+        "payments",
+        "payments_followup",
+        "published_release",
+        "manual_review"
+      ]
+    },
+    {
+      "id": 21,
+      "area": "Delbetalning",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Exakta heltalsören, korrekt restbelopp, återtag och samtidighetskontroller.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Ingen riktig delbetalning bokförs som kvalitetstest; ny manuell vektor stöder inte godtyckliga top-ups av befintliga par.",
+      "prior_independent_evidence_refs": [
+        "historical_33",
+        "payments",
+        "manual_multiple",
+        "manual_review",
+        "published_release"
+      ]
+    },
+    {
+      "id": 22,
+      "area": "Överbetalning",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Överskott särskiljs och kan inte automatiskt fördelas utan giltig grund.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Ingen återbetalning utförs, och ingen fri allokering av återstående bankmedel antas.",
+      "prior_independent_evidence_refs": [
+        "historical_33",
+        "manual_multiple",
+        "manual_review",
+        "published_release"
+      ]
+    },
+    {
+      "id": 23,
+      "area": "Flera fakturor per betalning",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Verifierade explicita fördelningar fungerar; tvetydiga delmängdssummor avstår; summor och samtidighet är säkra.",
+      "evidence": "Granskad explicit vektor publicerad; ingång/demo-spärr observerad; inga QA-allokeringar.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "C4 REVIEW blir inte automatiskt VERIFIED. D1-batch och R2-byteobjekt är inte en gemensam atomär transaktion; dokumenterade versions-/immutabilitetsgränser består.",
+      "prior_independent_evidence_refs": [
+        "multiple_baseline",
+        "manual_multiple",
+        "manual_review",
+        "integration_wave2"
+      ]
+    },
+    {
+      "id": 24,
+      "area": "Historik",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Källor och ändringar kan följas utan att förväxla tidigare och aktuella fakta.",
+      "evidence": "Historisk registrering skiljs från aktuell verifiering i publicerad detalj.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Historiskt receipt bevisar inte aktuellt samtycke eller saknade original.112 äldre API-poster saknar fortsatt kvitto.",
+      "prior_independent_evidence_refs": [
+        "historical_33",
+        "saas",
+        "manual_review",
+        "published_release"
+      ]
+    },
+    {
+      "id": 25,
+      "area": "Betalstatus",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Status beräknas från giltiga allokeringar och tillgängliga bankfakta; inaktuella resultat markeras.",
+      "evidence": "Publicerad översikt/detalj behåller registrerat saldo och stoppar falskt verifierad visning.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Registrerad koppling och verifierad bankfakta är olika statusar. Ingen generell full omverifiering av gamla kunddata ingår.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "overview_review",
+        "browser",
+        "manual_review"
+      ]
+    },
+    {
+      "id": 26,
+      "area": "Kontrollera alla betalningar",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Begränsad, återupptagbar körning med korrekt sammanfattning och felhantering.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "En betalningskontroll avslutar inte automatiskt Gmailrun; den återstående separata efterkontrollen får inte döljas.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "historical_33",
+        "saas"
+      ]
+    },
+    {
+      "id": 27,
+      "area": "Mejlförslag",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Korrekt underlag och förhandsgranskning; uttryckligt godkännande krävs före sändning.",
+      "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Inga kundmejl skickas som QA. Syntetisk godkännandekontroll är inte leveransbevis för verklig e-post.",
+      "prior_independent_evidence_refs": [
+        "historical_33",
+        "saas",
+        "published_release"
+      ]
+    },
+    {
+      "id": 28,
+      "area": "Schemaläggning",
+      "score": 6.5,
+      "at_least_8": false,
+      "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
+      "evidence": "CI-utlöst OCR 6/0 är aktuell; ny periodisk körning efter cronuppdatering ännu ej observerad.",
+      "remaining_for_8": "Observera aktuell faktisk periodisk OCR-körning och korrekt försenad/spärrad drift.",
+      "scope_and_limitations": "Enstaka tidigare6 + 6 OCR-jobb och konfigurationsflaggor bevisar inte ett fungerande aktuellt schema. Ingen generell schema-SLA är uppmätt.",
+      "prior_independent_evidence_refs": [
+        "operations",
+        "published_release",
+        "root_handoff"
+      ]
+    },
+    {
+      "id": 29,
+      "area": "Backup",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Aktuell krypterad backup är fullständigt kontrolläst; filantal, originalhashar och slutförandetid redovisas.",
+      "evidence": "362/362 original och 142968213 byte verifierade; senare importer ingår inte.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Statusens skapandetid 01:17 är inte självständigt verifierad intern snapshot-tid. Ingen extern reservkopia eller fullständig aktuell totaldatamängd styrks.",
+      "prior_independent_evidence_refs": [
+        "recovery",
+        "published_release",
+        "root_handoff"
+      ]
+    },
+    {
+      "id": 30,
+      "area": "Säkerhet",
+      "score": 8.5,
+      "at_least_8": true,
+      "criterion": "Ägar-/företagsgränser, sekretess, godkännanden och ekonomisk integritet bevaras; relevanta negativa tester och beroendegranskning.",
+      "evidence": "Exakt full CI/audit och negativa säkerhetsgrindar godkända;8 moderate utvecklingsfynd kvarstår.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Exakt main-audit: 0 produktionsfynd, 8 moderate utvecklingsfynd, 0 high/critical. Inte en full penetrationstest eller avtalsacceptans.",
+      "prior_independent_evidence_refs": [
+        "saas",
+        "published_release",
+        "manual_review",
+        "bank_diagnostic_review"
+      ]
+    },
+    {
+      "id": 31,
+      "area": "Katastrofåterställning",
+      "score": 8,
+      "at_least_8": true,
+      "criterion": "Isolerad återställningsövning med faktisk backup-/restore-kod, mätt RPO/RTO och kontroller av original, register, betalningar, korruption och fel ägare. Ingen återställning över produktion.",
+      "evidence": "Isolerad återställning med riktig kod; lokalRTO 3,417 s och simuleradRPO 15 min, inte produktionsåterställning.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "3,417 s gäller lokal restore+acceptans med paket redan tillgängligt.15 min RPO är simulerat. Extern nyckel/kopia, molnnedladdning och tjänsteaktivering är inte verifierade.",
+      "prior_independent_evidence_refs": [
+        "recovery",
+        "recovery_integrated"
+      ]
+    },
+    {
+      "id": 32,
+      "area": "Kod/tester",
+      "score": 8.5,
+      "at_least_8": true,
+      "criterion": "Berörda regressioner, oberoende granskning och fulla obligatoriska CI-grindar på exakt levererad kod.",
+      "evidence": "Exakt main-CI 6534/6534,0 fel/skip; normalt publicerat identiskt Sites-träd.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Betyget avser exakt main819adee/Site64 och fulla godkända grindar. Fokustestantal adderas inte dubbelt; tidigare ofullständiga lokala helkörningar räknas inte som godkända.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "integration_wave2",
+        "manual_review",
+        "overview_review",
+        "bank_diagnostic_review"
+      ]
+    },
+    {
+      "id": 33,
+      "area": "Verklig produktionsverifiering",
+      "score": 7,
+      "at_least_8": false,
+      "criterion": "Levererad version kopplas till exakt källträd; bank/Gmail/OCR/backup har relevanta aktuella observationer och ekonomiska skydd jämförs före/efter.",
+      "evidence": "Källkedja/publicering och avgränsade ekonomiska före/efterkontroller styrkta; bank/normalflöde återstår.",
+      "remaining_for_8": "Slutför relevant verklig bank-/normalflödesverifiering.",
+      "scope_and_limitations": "Publicerad demo och ägarbundna ekonomiska läskontroller är verifierade. Ingen autentiserad full bankresa, fysisk mobil eller fullständig ekonomirevision påstås.",
+      "prior_independent_evidence_refs": [
+        "published_release",
+        "browser",
+        "root_handoff",
+        "ocr_v2",
+        "recovery"
+      ]
+    }
+  ]
+}

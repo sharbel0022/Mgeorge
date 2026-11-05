@@ -1,0 +1,27 @@
+{
+  "schema": "mgeorge-v2-post-holdout-diagnostic-v1",
+  "postHoldoutDiagnostic": true,
+  "independentHoldout": false,
+  "acceptanceMeasurement": false,
+  "targetSourceCommit": "571073b8172ab53899a4ce3c2b717c7fe24daee2",
+  "firstV2ResultSha256": "13557c3012331fa0101fbe3e6fe498fd2fbf3346b8740cfe5fe4b83e8393b6e7",
+  "firstV2Passed": false,
+  "orderedQuestions": [
+    {
+      "id": "holdout-v2-normal-09",
+      "question": "Why does the visually explicit right-hand summary (Netto / Summa moms / Att betala, each with a value on its own physical row) not form a proven field column on unchanged 571: do the actual words/bboxes lack the association, or does a named existing layout guard stop it?"
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "question": "Do the actual words/bboxes support an unambiguous split of Leverantör and Faktureras till into exactly one company-name candidate per explicitly labelled role column?"
+    }
+  ],
+  "maximumRecognitionCalls": 2,
+  "oneRecognitionPerImage": true,
+  "sourceInventorySha256": "642a60e061dd7ad0462ab966dfdb35757dae68b8976be1e85a162942beadac87",
+  "runtimeInventorySha256": "03080a56035a686f321209a11ca089891eb56813171b4addf5c79355c973a1c4",
+  "protectedFilesSha256": "1d7627b6d35b5d7c6fa61f6044a8d0939421df0f0d530c1aa0ee5778ff6749b5",
+  "capture": "Unchanged source worker, observational ESM import hook wraps only its Tesseract createWorker/recognize methods; no OCR parameters or returned response are changed.",
+  "harnessSha256": "6ff770092ee1102f26b8ab294306bee817c8af235d392e8a5193badc4c91e6b2",
+  "createdAt": "2026-11-05T22:34:09.306Z"
+}

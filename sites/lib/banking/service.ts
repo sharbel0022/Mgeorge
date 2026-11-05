@@ -17,7 +17,11 @@ import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
 import { accountReadCooldown, mergeAccountReadCooldown } from './account-read-cooldown';
 import { guardedBankRead } from './account-read-guard';
-import { ConsentError, bankAccountScopeError, bankAccountScopeReason, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection } from '../bank-consent-policy.js';
+import { ConsentError, bankAccountScopeError, bankAccountScopeReason, bankAccountUsageDiagnostic, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection, type BankAccountUsageDiagnostic } from '../bank-consent-policy.js';
+
+// Only the exact revalidation attempt may publish its selected-usage snapshot,
+// after the existing failed-event write has rechecked ownership and the lease.
+const revalidationUsageDiagnostics = new WeakMap<ConsentError, BankAccountUsageDiagnostic>();
 
 type FlowContext = {
   version: 1; companyId: string; actorId: string; membershipVersion: string; mode: 'company' | 'legacy';
@@ -118,7 +122,8 @@ export function bankFailure(error: unknown): Response {
   if (error instanceof BankError) return response({ error: error.message }, error.status);
   if (error instanceof ConsentError) {
     const consentCode=error.code,reason=bankAccountScopeReason(error);
-    return response({error:consentCode==='BANK_ACCOUNT_SCOPE_INVALID'?new ConsentError(consentCode).message:error.message,code:consentCode,...(reason?{reason}:{})},error.status);
+    const usageDiagnostic=consentCode==='BANK_ACCOUNT_SCOPE_INVALID'&&error.status===409&&reason==='ACCOUNT_USAGE_INVALID'?revalidationUsageDiagnostics.get(error):undefined;
+    return response({error:consentCode==='BANK_ACCOUNT_SCOPE_INVALID'?new ConsentError(consentCode).message:error.message,code:consentCode,...(reason?{reason}:{}),...(usageDiagnostic?{usageDiagnostic}:{})},error.status);
   }
   if (error instanceof BankPeriodError) return response({error: error.message, code: error.code}, error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 409);
   if (error instanceof ProviderError) {
@@ -658,11 +663,13 @@ export async function revalidateConsent(request?: Request): Promise<Response> {
     if(!selected.length)throw bankAccountScopeError('SAVED_SELECTION_EMPTY');
     const event=(action:string,errorCode?:string)=>db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?)').bind(uid(),owner,owner,action,JSON.stringify({run_id:runId,...(errorCode?{error_code:errorCode}:{})}),now());
     await lease.run(event('bank.consent.revalidation.started'));
-    let commitAttempted=false,receiptId='',contextDigest='';
+    let commitAttempted=false,receiptId='',contextDigest='',validationError:unknown;
     try{
       const config=await providerConfig(app);
       const live=await guardedBankRead(owner,conn,lease,async()=>getSession(config,await sessionId(conn)),undefined,{strictCooldown:true});
-      const grant=validateLegacyEnableSelection({session:{accounts:savedAccounts,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:consentMetadata(conn)?.requestedScopes,selectedAccountUids:selected});
+      let grant:ReturnType<typeof validateLegacyEnableSelection>;
+      try{grant=validateLegacyEnableSelection({session:{accounts:savedAccounts,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:consentMetadata(conn)?.requestedScopes,selectedAccountUids:selected});}
+      catch(error){validationError=error;throw error;}
       await lease.assert();await providerConfig(app);
       const fence=db().prepare(`SELECT CASE WHEN EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND app_generation=? AND encrypted_session=? AND encrypted_accounts=? AND selected_accounts=? AND environment=? AND bank_name=? AND country=? AND COALESCE(consent_metadata,'')=? AND status='reauth_required' AND valid_until=? AND retry_after=? AND sync_failures=? AND account_evidence_retry=? AND ?>strftime('%Y-%m-%dT%H:%M:%fZ','now')) THEN 1 ELSE json('BANK_CONSENT_CONTEXT_CHANGED') END`).bind(owner,conn.id,conn.app_generation,conn.encrypted_session,conn.encrypted_accounts,conn.selected_accounts,conn.environment,conn.bank_name,conn.country,conn.consent_metadata||'',conn.valid_until,conn.retry_after,conn.sync_failures,conn.account_evidence_retry,grant.validUntil);
       receiptId=uid();contextDigest=await fingerprint(conn,grant.validUntil);const checkedAt=now();
@@ -687,7 +694,13 @@ export async function revalidateConsent(request?: Request): Promise<Response> {
         }catch{throw Error('BANK_CONSENT_OUTCOME_UNKNOWN');}
       }
       // Diagnostics contain only canonical codes and never clear a cooldown.
-      try{await lease.run(event('bank.consent.revalidation.failed',bankJobErrorCode(error)));}catch{}
+      try{
+        await lease.run(event('bank.consent.revalidation.failed',bankJobErrorCode(error)));
+        if(error===validationError&&error instanceof ConsentError){
+          const diagnostic=bankAccountUsageDiagnostic(error);
+          if(diagnostic)revalidationUsageDiagnostics.set(error,diagnostic);
+        }
+      }catch{}
       throw error;
     }
   });
