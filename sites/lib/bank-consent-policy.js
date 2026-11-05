@@ -153,6 +153,27 @@ export function validateEnableConsent(input) {
     grantedScopes: [...DEFAULT_SCOPES], missingScopes: [] };
 }
 
+/** Existing legacy selection only: callers must establish the retained legacy
+ * connection before choosing this adapter. This does not authorize a company,
+ * enroll an account, or replace strict full-set validation for new callbacks.
+ * Validate the complete provider UID inventory before narrowing to the persisted
+ * selection. Unavailable/unselected accounts never become an added grant. */
+export function validateLegacyEnableSelection(input) {
+  if (!object(input) || !object(input.session) || !object(input.checked)) deny('BANK_CONSENT_INVALID', 409);
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uids = values => { const ids = accountIds(values); return ids && ids.every(id => uuid.test(id)) ? ids : null; };
+  const resourceIds = values => Array.isArray(values) && values.length <= MAX_ACCOUNTS && values.every(object) ? uids(values.map(account => account.uid)) : null;
+  const savedIds = resourceIds(input.session.accounts), liveIds = uids(input.checked.accounts), dataIds = resourceIds(input.checked.accounts_data), selected = uids(input.selectedAccountUids);
+  if (!savedIds || !liveIds || !dataIds || !selected || !sameIds(liveIds, dataIds) ||
+    !selected.every(id => savedIds.includes(id) && liveIds.includes(id))) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  const chosen = new Set(selected);
+  return validateEnableConsent({ ...input,
+    session: { ...input.session, accounts: input.session.accounts.filter(account => chosen.has(account.uid)) },
+    checked: { ...input.checked, accounts: input.checked.accounts.filter(id => chosen.has(id)),
+      accounts_data: input.checked.accounts_data.filter(account => chosen.has(account.uid)) },
+  });
+}
+
 /** Validate an attestation already authenticated by a trusted server adapter.
  * This pure function cannot establish its provenance. Never pass browser-supplied
  * evidence here, and never convert a person hash or business usage into evidence. */
