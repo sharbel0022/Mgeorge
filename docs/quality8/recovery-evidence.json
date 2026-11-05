@@ -1,0 +1,437 @@
+{
+  "format": "Mgeorge-recovery-evidence-1",
+  "recordedOn": "2026-11-05",
+  "baseCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "deployedProjectVersionObserved": 62,
+  "productionBackupVerification": {
+    "scope": "deployed-encrypted-backup-verification-only",
+    "productionRestoreTested": false,
+    "observedAt": "2026-11-05T16:55:10.602Z",
+    "day": "2026-11-05",
+    "status": "complete",
+    "files": 362,
+    "copied": 362,
+    "bytes": 142968213,
+    "verifiedFiles": 362,
+    "verifiedBytes": 142968213,
+    "createdAt": "2026-11-05T01:17:18.090Z",
+    "verificationStartedAt": "2026-11-05T01:32:00.685Z",
+    "verifiedAt": "2026-11-05T16:55:10.290Z",
+    "verificationScope": "manifest_pass",
+    "apiEvidence": {
+      "version": "retained-api-receipts-v1",
+      "scope": "retained_json_checksums",
+      "records_checked": 16,
+      "records_without_receipt": 112
+    },
+    "error": null,
+    "attempts": 0,
+    "stepCallsThisSession": 66,
+    "initialVerifiedFiles": 35,
+    "initialLastVerifiedDay": "2026-11-04",
+    "lastVerifiedMatchesLatest": true,
+    "progress": [
+      {
+        "call": 9,
+        "observedAt": "2026-11-05T16:42:46.948Z",
+        "status": "verifying",
+        "day": "2026-11-05",
+        "files": 362,
+        "verified": 80,
+        "bytes": 142968213,
+        "verifiedBytes": 30234735
+      },
+      {
+        "call": 17,
+        "observedAt": "2026-11-05T16:46:01.797Z",
+        "status": "verifying",
+        "day": "2026-11-05",
+        "files": 362,
+        "copied": 362,
+        "verified": 120,
+        "bytes": 142968213,
+        "verifiedBytes": 46568157,
+        "verifiedAt": ""
+      },
+      {
+        "call": 25,
+        "observedAt": "2026-11-05T16:51:22.384Z",
+        "status": "verifying",
+        "day": "2026-11-05",
+        "files": 362,
+        "copied": 362,
+        "verified": 160,
+        "bytes": 142968213,
+        "verifiedBytes": 62381295,
+        "verifiedAt": ""
+      },
+      {
+        "call": 35,
+        "observedAt": "2026-11-05T16:53:22.284Z",
+        "status": "verifying",
+        "day": "2026-11-05",
+        "files": 362,
+        "copied": 362,
+        "verified": 210,
+        "bytes": 142968213,
+        "verifiedBytes": 80476170,
+        "verifiedAt": ""
+      },
+      {
+        "call": 45,
+        "observedAt": "2026-11-05T16:53:58.201Z",
+        "status": "verifying",
+        "day": "2026-11-05",
+        "files": 362,
+        "copied": 362,
+        "verified": 260,
+        "bytes": 142968213,
+        "verifiedBytes": 104028467,
+        "verifiedAt": ""
+      },
+      {
+        "call": 55,
+        "observedAt": "2026-11-05T16:54:29.202Z",
+        "status": "verifying",
+        "day": "2026-11-05",
+        "files": 362,
+        "copied": 362,
+        "verified": 310,
+        "bytes": 142968213,
+        "verifiedBytes": 121949222,
+        "verifiedAt": ""
+      },
+      {
+        "call": 65,
+        "observedAt": "2026-11-05T16:55:02.289Z",
+        "status": "verifying",
+        "day": "2026-11-05",
+        "files": 362,
+        "copied": 362,
+        "verified": 360,
+        "bytes": 142968213,
+        "verifiedBytes": 142817874,
+        "verifiedAt": ""
+      },
+      {
+        "call": 66,
+        "observedAt": "2026-11-05T16:55:10.602Z",
+        "status": "complete",
+        "day": "2026-11-05",
+        "files": 362,
+        "copied": 362,
+        "verified": 362,
+        "bytes": 142968213,
+        "verifiedBytes": 142968213,
+        "error": null,
+        "verifiedAt": "2026-11-05T16:55:10.290Z"
+      }
+    ],
+    "createdAtSource": "backup_status.latest.created_at; not independently decrypted snapshot metadata",
+    "snapshotCreatedAt": null,
+    "productionRpoMilliseconds": null,
+    "completionIsRecoveryPoint": false,
+    "coverageCaveat": "Only the frozen snapshot is covered. Writes after its cutoff, including later document ingestion, are not proven included."
+  },
+  "syntheticIsolatedRecovery": {
+    "format": "MG-Sites-synthetic-recovery-drill-1",
+    "scope": "synthetic-isolated-evidence-only",
+    "productionRestoreTested": false,
+    "startedAt": "2026-11-05T17:01:41.959Z",
+    "completedAt": "2026-11-05T17:01:52.000Z",
+    "runtime": {
+      "node": "v24.22.1",
+      "platform": "linux",
+      "architecture": "x64"
+    },
+    "accepted": true,
+    "objectives": {
+      "isolatedRtoMilliseconds": 60000,
+      "simulatedRpoMilliseconds": 900000
+    },
+    "timing": {
+      "backupAndResumeMilliseconds": 3016.032,
+      "exportMilliseconds": 1930.317,
+      "restoreAndAcceptanceMilliseconds": 2886.456,
+      "totalDrillMilliseconds": 10040.824,
+      "rtoIncludes": [
+        "authenticated bundle validation",
+        "fresh SQLite evidence database",
+        "original write and readback",
+        "independent row, owner, ledger and SHA-256 acceptance"
+      ],
+      "rtoExcludes": [
+        "operator response",
+        "cloud download or regional outage",
+        "key custody or access recovery",
+        "production application activation"
+      ]
+    },
+    "simulatedRecovery": {
+      "clock": "synthetic scenario, not a production measurement",
+      "recoveryPointAt": "2026-11-05T12:00:00.000Z",
+      "postSnapshotWriteAt": "2026-11-05T12:05:00.000Z",
+      "incidentAt": "2026-11-05T12:15:00.000Z",
+      "rpoMilliseconds": 900000,
+      "postSnapshotWritesExcluded": 1
+    },
+    "resume": {
+      "interruptionObserved": true,
+      "snapshotPreserved": true,
+      "steps": 147,
+      "attempts": 1
+    },
+    "tables": [
+      {
+        "name": "workspaces",
+        "rows": 1
+      },
+      {
+        "name": "audit_events",
+        "rows": 1
+      },
+      {
+        "name": "documents",
+        "rows": 362
+      },
+      {
+        "name": "bank_applications",
+        "rows": 1
+      },
+      {
+        "name": "bank_connections",
+        "rows": 1
+      },
+      {
+        "name": "bank_sync_runs",
+        "rows": 1
+      },
+      {
+        "name": "gmail_connections",
+        "rows": 1
+      },
+      {
+        "name": "customer_contacts",
+        "rows": 1
+      },
+      {
+        "name": "customer_messages",
+        "rows": 1
+      },
+      {
+        "name": "reconciliation_findings",
+        "rows": 1
+      },
+      {
+        "name": "customer_deliveries",
+        "rows": 1
+      },
+      {
+        "name": "gmail_sources",
+        "rows": 1
+      },
+      {
+        "name": "gmail_runs",
+        "rows": 1
+      },
+      {
+        "name": "document_automation",
+        "rows": 1
+      },
+      {
+        "name": "document_jobs",
+        "rows": 1
+      },
+      {
+        "name": "document_extractions",
+        "rows": 1
+      },
+      {
+        "name": "invoice_counterparties",
+        "rows": 1
+      },
+      {
+        "name": "document_registrations",
+        "rows": 1
+      },
+      {
+        "name": "payment_control_runs",
+        "rows": 1
+      },
+      {
+        "name": "payment_control_requests",
+        "rows": 1
+      },
+      {
+        "name": "bankgiro_ingest_sources",
+        "rows": 1
+      },
+      {
+        "name": "bankgiro_ingest_jobs",
+        "rows": 1
+      },
+      {
+        "name": "saas_bank_state",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_scopes",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_jobs",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_requests",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_receipts",
+        "rows": 1
+      }
+    ],
+    "originals": {
+      "count": 362,
+      "bytes": 142968213,
+      "hashesChecked": 362
+    },
+    "ledger": {
+      "invoices": 2,
+      "invoiceCents": 75000,
+      "transactions": 2,
+      "transactionCents": 75000,
+      "allocations": 1,
+      "allocatedCents": 62500,
+      "revokedCredits": 1,
+      "revokedBankgiroLinks": 1
+    },
+    "rejectionChecks": [
+      {
+        "case": "wrong_key",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "wrong_owner",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "wrong_company",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "corrupt_original",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "missing_original",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "altered_ledger",
+        "stage": "acceptance",
+        "rejected": true
+      },
+      {
+        "case": "altered_plaintext_original",
+        "stage": "acceptance",
+        "rejected": true
+      },
+      {
+        "case": "foreign_owner_row",
+        "stage": "acceptance",
+        "rejected": true
+      }
+    ],
+    "sourceUnchanged": true,
+    "otherOwnerExcluded": true,
+    "authorizationAndTransientRowsAbsent": true,
+    "workerLeasesInvalidated": true
+  },
+  "focusedTests": [
+    {
+      "tests": 348,
+      "pass": 348,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "name": "Sites backup and recovery",
+      "command": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --experimental-strip-types --test sites/tests/recovery-drill.test.mjs sites/tests/backup-recovery.test.mjs sites/tests/backup-integrity-q8.test.mjs sites/tests/backup-reference-integrity-final.test.mjs sites/tests/company-backup.test.mjs sites/tests/backup.test.mjs sites/tests/bank-api-backup-q8.test.mjs sites/tests/company-bank-sync-backup.test.mjs",
+      "durationMilliseconds": 9981.379844
+    },
+    {
+      "tests": 116,
+      "pass": 116,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "name": "Node backup and recovery",
+      "command": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --test test/backup.test.js test/backup-disaster-recovery.test.js test/backup-integrity-q8.test.js test/backup-reference-integrity-final.test.js test/backup-configuration.test.js test/integration-jobs-backup.test.js",
+      "durationMilliseconds": 3083.589041
+    }
+  ],
+  "redGreen": {
+    "initialNewTests": 2,
+    "initialFailures": 2,
+    "reason": "drill module not yet implemented",
+    "finalNewTests": 2,
+    "finalPassed": 2
+  },
+  "sourceFileSha256": {
+    "sites/scripts/recovery-drill.mjs": "5a80d1f5335ade1860b6e61f278a81d8c0df11818c38ce5f950e86a12da7dd89",
+    "sites/scripts/lib/recovery-acceptance.mjs": "79da81aba22c6579fc7730a3bca5f44c6e3967d68c9489e041fc9eeaf5b21fcf",
+    "sites/scripts/lib/recovery-drill-fixture.mjs": "ec7e9b7bef842abedafb601f5dd9ddcd5f42105d3056c02fc903426ad3752ede",
+    "sites/tests/recovery-drill.test.mjs": "a670f9c1ff17d37b4d9f2dd209fc404ceb5b3394b205dfde0b399f2e5d5489fe",
+    "sites/lib/backup-engine.ts": "b4cbd39002cc0c21b9e743d41e8e00dfa6c96769c08fc46178793257803f5d5a",
+    "sites/lib/backups.ts": "48cd4134fc6b6c4ad60934fc11e39da9856080bd3943100f55732d8cd4b4e970",
+    "sites/scripts/lib/backup-recovery.mjs": "c971322d5d076726d018de1bda011855e0c01404cf17e8dda332d85601ca218d",
+    "sites/scripts/restore-backup-isolated.mjs": "2ee2046484020f1013fe1778f45c06f00ef3a3aaaba00c9032c523ef356b46cb",
+    "sites/lib/company-contract.js": "5da17708a61f842002c3d57650679d260bb5142821baf97700353bc467e14c8e",
+    "src/backup.js": "68fcf28489d40b1acd107f404969b4188e225ee3dd554a5d4892fb4975dd03fa"
+  },
+  "migrationFileSha256": {
+    "sites/drizzle/0000_confused_umar.sql": "8dffbc7c63ce6634a9e38d93ef57ee7d766b9264f8542798f911533644b335b2",
+    "sites/drizzle/0001_sudden_whirlwind.sql": "334524db0cdd573f926573f87b0fa98826244d54e4361676a8801d801f58fee6",
+    "sites/drizzle/0002_brief_chronomancer.sql": "0bb9e7fda19d3209eae643f4887e14146fc5ee7ce428e16cda169f7a70985078",
+    "sites/drizzle/0003_needy_gravity.sql": "1cbde57ce4e6c39fa61015539f6ed3dd70e46289cfa54251b6f6d6ee8b6abc26",
+    "sites/drizzle/0004_silky_lily_hollister.sql": "600c2f1ec4aac72e61c50c0d4778892d7ff62e7f45139952be05047c113f9043",
+    "sites/drizzle/0005_ancient_puppet_master.sql": "a2a3d3a656ab4d17f6f05f9b664ffd95707dadfa646ca58989f6b0748e9d5ab6",
+    "sites/drizzle/0006_needy_namora.sql": "1df94a683f2297e2eef1704d0472b64b7619fda141870e6f152bf1a386e6b226",
+    "sites/drizzle/0007_material_the_spike.sql": "ded218405539ddb69e309df07d88b12d98b29351826e97085964f300129f501e",
+    "sites/drizzle/0008_minor_jazinda.sql": "6ed90201b4410e45d6932b02f6c16b3aeb1721e17f3283c17af6646573f7c9ec",
+    "sites/drizzle/0009_clumsy_rattler.sql": "0fb48b48a8ad04e04d6a9db4aeb29b5f62812818e365f3c886fe6ef5cabca98d",
+    "sites/drizzle/0010_silent_boomerang.sql": "5f4ce18db5d67f57e8e0e018abeb3ca021da4d38e84e613207e9cb47e62556db",
+    "sites/drizzle/0011_sturdy_zeigeist.sql": "e770a0af994ff1cb8b0c65046ec2ab207aae66b42ce38c2459bda5657ba5ebf5",
+    "sites/drizzle/0012_minor_naoko.sql": "6007c55f4a9ed6b3f659f1073f1bc88a1c094a8fdb8fcea836d29ef56f3a6215",
+    "sites/drizzle/0013_real_mindworm.sql": "7e0d2749b095c688a1d678956a5bc6cfeb9e89066faf3f3f32f6f7aed8f5e22b",
+    "sites/drizzle/0014_backup_verification.sql": "a4ce3ab9299ba701137734ac06bcef23e247d57dacd979bdfaec305a24f44e6f",
+    "sites/drizzle/0015_bank_api_evidence.sql": "99fb870d97c0845bc79b77a9f5297c8f0fafb239bce340ed7501766d9f90aeec",
+    "sites/drizzle/0016_agent2_account_read_guard.sql": "7c12bdb8970c4eb24aaef86f2efc7289ba7dada573404f8b0ae3e925f161bf27",
+    "sites/drizzle/0017_bankgiro_auto_ingest.sql": "2a142115a8aab1e73a07a7674a1154a23b00629b6e0d736951387a8bf6298b8c",
+    "sites/drizzle/0018_bankgiro_source_readiness.sql": "cdc854ea5d7dfe44ded1db8110d42e0c1b79113797a41432d7605154c7d56ba0",
+    "sites/drizzle/0019_company_boundaries.sql": "fdd1bc1cd3f70ea5bcaf2a23dd952a18d81504e553021f2e69920b1de4783e6a",
+    "sites/drizzle/0020_bank_consent_context.sql": "085e908f3b6b346deef330170e4c361bc09a26c64c464768ba94d6870de88b00",
+    "sites/drizzle/0023_saas_bank_sync.sql": "aa268f003a156a6661aa5d6fed44757c39a78c425ff4060e554c2f1e54eb6c1e",
+    "sites/drizzle/0024_company_sync_boundaries.sql": "7547c9aa7b40b0d36eaa2d12b6f86ce3e55befab33f1a3ae5f28547107cc9ac1"
+  },
+  "remainingUnverified": [
+    "Actual deployed encrypted bundle restored into an isolated environment",
+    "Independent external backup copy and regional failure retrieval",
+    "Backup-key custody and access after losing the primary environment",
+    "Production application reactivation and session/integration reauthorization",
+    "Production RTO and RPO",
+    "Original API receipts for 112 historical records"
+  ]
+}

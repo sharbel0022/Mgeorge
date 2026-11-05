@@ -9,7 +9,7 @@ import ListPagination from '@/components/list-pagination';
 import PaymentHistory from '@/components/payment-history';
 import PaymentVerificationPanel from '@/components/payment-verification';
 import ReconciliationProposalPanel from '@/components/reconciliation-proposal';
-import {bankPaymentView,bankVisibleTransactions,payerLabel,bankPaymentInvoiceAssessment,invoiceIntendedReference} from '@/lib/payment-presentation';
+import {bankPaymentView,bankVisibleTransactions,payerLabel,bankPaymentInvoiceAssessment,invoiceIntendedReference,bankPaymentReference} from '@/lib/payment-presentation';
 import {ControlButton,ControlConnections,ControlProgress,ControlQueue,ControlReview,usePaymentControl,controlDate,type ControlTask} from '@/components/payment-control';
 import GmailSummary from '@/components/gmail-summary';
 import InvoiceEvidence from '@/components/invoice-evidence';
@@ -24,6 +24,7 @@ import {buildPaymentOverview,paymentGroup,paymentTitle} from '@/lib/payment-over
 import {analyze} from '@/lib/reconciliation';
 import {parseSpecificationBytes} from '@/lib/bankgiro-parser.js';
 import type {BankInvoiceCandidate} from '@/lib/banking/invoice-candidates';
+import {createWorkspaceSearchIndex,searchWorkspaceIndex} from '@/lib/workspace-search.js';
 
 type View=WorkspaceView;
 type Modal={kind:string;id?:string;invoiceId?:string;transactionId?:string;direction?:string;action?:Command;title?:string;text?:string};
@@ -249,12 +250,14 @@ function InvoiceEditor({invoice,direction,company,save,close,busy,demo,error,rep
 function DetailSurface({inline=false,title,subtitle,close,busy,children}:{inline?:boolean;title:string;subtitle?:string;close:()=>void;busy:boolean;children:ReactNode}){return inline?<section className="inline-evidence"><header><div><h2>{title}</h2>{subtitle&&<p>{subtitle}</p>}</div></header>{children}</section>:<Dialog title={title} subtitle={subtitle} close={close} wide busy={busy}>{children}</Dialog>;}
 function WorkspaceSearch({state,open,available=true}:{state:State;open:(modal:Modal)=>void;available?:boolean}){
  const [query,setQuery]=useState('');const ref=useRef<HTMLDivElement>(null),q=available?normalizeSearch(query):'';
+ const index=useMemo(()=>createWorkspaceSearchIndex([
+  ...state.invoices.map(invoice=>({type:'invoice',id:invoice.id,number:invoice.number,party:invoice.party,reference:invoice.ocr,amountCents:invoice.total,dates:[invoice.issued,invoice.due],item:invoice})),
+  ...state.transactions.map(transaction=>({type:'transaction',id:transaction.id,party:payerLabel(transaction),bankReference:transaction.bankReference,reference:bankPaymentReference(transaction).value,amountCents:transaction.amount,date:transaction.date,item:transaction})),
+ ]),[state]);
  const results=useMemo(()=>{
-  const invoices:Invoice[]=[],transactions:Transaction[]=[];
-  if(q){for(const invoice of state.invoices){if(normalizeSearch(`${invoice.number} ${invoice.party} ${invoice.ocr} ${money(invoice.total)}`).includes(q))invoices.push(invoice);if(invoices.length===4)break;}
-   for(const transaction of state.transactions){if(normalizeSearch(`${payerLabel(transaction)} ${transaction.bankReference} ${transaction.payerReference} ${money(transaction.amount)}`).includes(q))transactions.push(transaction);if(transactions.length===4)break;}}
-  return {invoices,transactions};
- },[state,q]);
+  const found=searchWorkspaceIndex(index,q);
+  return {invoices:found.invoices.map(row=>row.item as Invoice),transactions:found.transactions.map(row=>row.item as Transaction)};
+ },[index,q]);
  const {invoices,transactions}=results;
  function dismiss(){setQuery('');ref.current?.querySelector('input')?.focus();}
  return <div className="workspace-search" ref={ref} onKeyDown={event=>{
@@ -265,7 +268,7 @@ function WorkspaceSearch({state,open,available=true}:{state:State;open:(modal:Mo
   if(index<0&&event.key!=='ArrowDown')return;
   event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:event.key==='ArrowDown'?Math.min(index+1,buttons.length-1):index-1;
   if(next<0)ref.current?.querySelector('input')?.focus();else buttons[next]?.focus();
- }}><label className="search-field"><Search size={18}/><input type="search" aria-label="Sök i arbetsytan" aria-controls={q?'workspace-search-results':undefined} aria-expanded={!!q} placeholder={available?'Sök fakturanummer, kund, OCR eller belopp…':'Sökning tillgänglig när uppgifterna hämtats'} value={available?query:''} disabled={!available} onChange={e=>setQuery(e.target.value)}/></label>{q&&<div className="workspace-search-results" id="workspace-search-results" role="region" aria-label="Sökresultat"><div className="search-results-heading"><strong>Sökresultat</strong><button type="button" className="icon-button" aria-label="Stäng sökresultat" onClick={dismiss}><X size={16}/></button></div><p className="sr-only" role="status">{invoices.length+transactions.length} resultat visas. Använd piltangenterna eller Tab för att välja.</p>{!invoices.length&&!transactions.length&&<p>Inga sparade uppgifter matchar sökningen.</p>}{invoices.map(i=><button type="button" data-search-result key={i.id} onClick={()=>{open({kind:'detail',id:i.id});setQuery('');}}><FileText size={17}/><span><strong>Faktura {i.number}</strong><small>{i.party}</small></span><strong>{money(i.total)}</strong></button>)}{transactions.map(t=><button type="button" data-search-result key={t.id} onClick={()=>{open({kind:'tx',id:t.id});setQuery('');}}><Landmark size={17}/><span><strong>{payerLabel(t)}</strong><small>{t.date} · {needsPaymentSpecification(t)?'Specifikation saknas':'Referens '+(t.payerReference||'saknas')}</small></span><strong>{money(t.amount)}</strong></button>)}</div>}</div>;
+ }}><label className="search-field"><Search size={18}/><input type="search" aria-label="Sök i arbetsytan" aria-controls={q?'workspace-search-results':undefined} aria-expanded={!!q} placeholder={available?'Sök nummer, kund, belopp eller datum…':'Sökning tillgänglig när uppgifterna hämtats'} value={available?query:''} disabled={!available} onChange={e=>setQuery(e.target.value)}/></label>{q&&<div className="workspace-search-results" id="workspace-search-results" role="region" aria-label="Sökresultat"><div className="search-results-heading"><strong>Sökresultat</strong><button type="button" className="icon-button" aria-label="Stäng sökresultat" onClick={dismiss}><X size={16}/></button></div><p className="sr-only" role="status">{invoices.length+transactions.length} resultat visas. Använd piltangenterna eller Tab för att välja.</p>{!invoices.length&&!transactions.length&&<p>Inga sparade uppgifter matchar sökningen.</p>}{invoices.map(i=><button type="button" data-search-result key={i.id} onClick={()=>{open({kind:'detail',id:i.id});setQuery('');}}><FileText size={17}/><span><strong>Faktura {i.number}</strong><small>{i.party}</small></span><strong>{money(i.total)}</strong></button>)}{transactions.map(t=><button type="button" data-search-result key={t.id} onClick={()=>{open({kind:'tx',id:t.id});setQuery('');}}><Landmark size={17}/><span><strong>{payerLabel(t)}</strong><small>{t.date} · {needsPaymentSpecification(t)?'Specifikation saknas':'Referens '+(bankPaymentReference(t).value||'saknas')}</small></span><strong>{money(t.amount)}</strong></button>)}</div>}</div>;
 }
 function InvoiceDetail({invoice:i,state,close,busy,open,toast,demo,onMessage,inline=false}:{inline?:boolean;invoice:Invoice;state:State;close:()=>void;busy:boolean;open:(m:Modal)=>void;toast:(s:string)=>void;demo:boolean;onMessage:(id:string)=>void}){
  const reference=invoiceReferenceDecision(state,i),recordedStatus=invoiceStatus(state,i),allocations=state.allocations.filter(a=>a.invoiceId===i.id),credits=state.credits.filter(c=>c.invoiceId===i.id&&c.active),hasCandidate=state.transactions.some(t=>suggestions(state,t).some(m=>m.invoice.id===i.id&&m.amount>0));

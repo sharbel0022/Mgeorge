@@ -1,7 +1,12 @@
 import {isReadOnlySql} from './company-compat-fixture.mjs';
 import assert from 'node:assert/strict';
+import {after} from 'node:test';
 import {DatabaseSync} from 'node:sqlite';
-import {readFileSync,readdirSync,existsSync} from 'node:fs';
+import {readFileSync,readdirSync,existsSync,mkdtempSync,rmSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {stripTypeScriptTypes} from 'node:module';
 import {applyCommand} from '../../lib/domain.ts';
 import {genericCompanyState as emptyState} from './reference-policy-fixture.mjs';
@@ -9,11 +14,12 @@ import {syntheticBankRow} from './bank-api-fixture.mjs';
 import {syntheticConnection} from './bank-account-fixture.mjs';
 
 const testDirectory=new URL('../',import.meta.url);
-// Reuse the compiled read-only module graph across sequential tests. A dynamic
-// environment points it at each test's isolated SQLite/R2 fixtures; embedding a
-// new graph in nested data URLs per test retains hundreds of MB in Node's cache.
+// Reuse the compiled graph while each test keeps isolated SQLite/R2 fixtures.
+// Short private file URLs preserve main's bound on nested module URL memory.
 const fixtureKey='evidenceRead'+crypto.randomUUID().replaceAll('-','');
-const data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64'),url=p=>new URL(p,testDirectory).href;
+const moduleDirectory=mkdtempSync(join(tmpdir(),'mgeorge-mcp-evidence-')),moduleFiles=new Map();
+after(()=>rmSync(moduleDirectory,{recursive:true,force:true}));
+const data=s=>{const hash=createHash('sha256').update(s).digest('hex');if(!moduleFiles.has(hash)){const path=join(moduleDirectory,hash+'.mjs');writeFileSync(path,s,{flag:'wx'});moduleFiles.set(hash,pathToFileURL(path).href);}return moduleFiles.get(hash);},url=p=>new URL(p,testDirectory).href;
 function compiled(path,imports={}){let code=stripTypeScriptTypes(readFileSync(new URL(path,testDirectory),'utf8'),{mode:'transform'});for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+a+q,JSON.stringify(b));return data(code);}
 export const origin='https://synthetic.example',iban='SE4280000890119146168423',docId='11111111-1111-4111-8111-111111111111';
 export async function fixture(t){

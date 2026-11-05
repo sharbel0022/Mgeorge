@@ -15,6 +15,7 @@ type BankStatus = {
   consentFlow?: { status: string; reason: string | null; expiresAt: string } | null;
   automatic?: { blocked?: boolean; failures?: number; enabled: boolean; intervalHours: number; lastAttemptAt: string | null; nextAttemptAt: string | null };
   activation?: { configured: boolean; message: string };
+  callback?: { originMatches: boolean; canStartAuthorization: boolean; reason: string | null };
   application: null | { environment: "SANDBOX" | "PRODUCTION"; active: boolean };
   connection: BankConnection | null;
   lastRun: null | { createdAt: string; imported: number; skipped: number; warnings: string[]; test: boolean };
@@ -117,6 +118,7 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
   }
   async function startConnection(renew = false) {
     if (!alive.current || demoMode.current) return;
+    if(status?.callback?.originMatches===false)throw new BankApiError(status.callback.reason||'Bankens returadress behöver kontrolleras av administratören.');
     const selectedBank = renew ? connection?.bankName : bankName;
     if (!selectedBank || !status?.company?.canManageBank) throw new BankApiError('Välj företag och bank innan du begär läsbehörighet.');
     const result = await bankRequest<{ url: string }>("/api/bank/connect", "POST", { companyId: status.company.id,
@@ -145,7 +147,9 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
       <div className="bank-connected-heading"><span className="bank-hero-icon"><Landmark size={27} /></span><div><h2>{connection?.bankName || "Företagets bank"}</h2><p className="bank-connected-label">Status: {readyForAccounts ? selected.length ? "Ansluten" : "Bekräfta företagskonto" : connection?.status === "corporate_authorization_required" ? "Företagsbehörighet behöver verifieras" : connection?.status === "revocation_pending" ? "Frånkoppling väntar på bekräftelse" : connection ? "Behöver förnyas" : "Ej ansluten"}</p></div></div>
       {sandbox && <div className="bank-sandbox" role="note"><AlertCircle size={18} /><p>Testmiljö – testhändelser sparas inte i företagets fakturaregister.</p></div>}
       {!configured && <div className="bank-inline-error" role="status">Banktjänsten behöver aktiveras av systemadministratören.</div>}
+      {status.callback?.reason && <p className="bank-inline-error" role="alert">{status.callback.reason}</p>}
       {connection?.postprocessWarning && <p className="bank-inline-error" role="alert">{connection.postprocessWarning}</p>}{connection?.lastError && <p className="bank-inline-error" role="alert">{connection.lastError}</p>}
+      {connection?.status==='reauth_required'&&connection.consent?.mode==='legacy'&&status.company?.canManageBank&&Date.parse(connection.validUntil)>Date.now()&&<div className="bank-spaced"><button className="btn" disabled={disabled||!configured||status.automatic?.blocked} onClick={()=>void run(async()=>{const result=await bankRequest<{message:string}>('/api/bank/revalidate','POST',{companyId:status.company?.id});if(!alive.current||demoMode.current)return;setNotice(result.message);await loadStatus();})}>Kontrollera befintligt medgivande</button><p className="bank-help">Kontrollen frågar banken om de redan valda kontona fortfarande får läsas. Den ändrar inga fakturor eller betalningskopplingar.</p></div>}
       {status.company && <label className="bank-field" htmlFor={formId + '-company'}><span>Företag</span><select id={formId + '-company'} value={status.company.id} disabled><option value={status.company.id}>{status.company.name}</option></select></label>}
       {!connection && <div className="bank-spaced"><label className="bank-field" htmlFor={formId + '-bank'}><span>Bank med stöd för företagskonton</span><select id={formId + '-bank'} value={bankName} disabled={disabled || !bankOptions.length} onChange={event => setBankName(event.target.value)}><option value="">Välj bank</option>{bankOptions.map(bank => <option key={bank.country + ':' + bank.name} value={bank.name}>{bank.name}</option>)}</select></label><button className="btn" disabled={disabled || !configured} onClick={() => void run(loadBanks)}>Hämta bankalternativ</button><p className="bank-help">Läsbehörigheten gäller konton och bankhändelser. Bankgirodetaljer kräver separat behörighet.</p></div>}
       {connection?.status === 'corporate_authorization_required' && <p className="bank-inline-error" role="status">Bankens medgivande finns, men underlag som binder kontot till det valda företaget saknas. Ingen bankhämtning aktiveras. Kontakta administratören för verifiering.</p>}
