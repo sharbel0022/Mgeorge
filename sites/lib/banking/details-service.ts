@@ -22,7 +22,7 @@ export async function fetchBankDetails(req:Request){
   try{
   const selected=JSON.parse(conn.selected_accounts),available=await accounts(conn),matches=available.filter(a=>selected.includes(a.uid)&&a.currency==='SEK'&&stableAccountKey(a,{name:conn.bank_name,country:conn.country})===canonicalBankAccount(target.account));
   if(matches.length!==1)throw Error('Bankhändelsens konto ingår inte entydigt i det valda företagskontot.');
-  const account=matches[0],config=await providerConfig(app),live=await guardedBankRead(user.userId,conn,lease,async()=>getSession(config,await sessionId(conn)));
+  const account=matches[0],config=await providerConfig(app),remote=await sessionId(conn),live=await guardedBankRead(user.userId,conn,lease,()=>getSession(config,remote));
   if(live.status!=='AUTHORIZED'||!(Date.parse(live.access?.valid_until)>Date.now())||!live.accounts.includes(account.uid)||live.psu_type!=='business'||live.aspsp?.name!==conn.bank_name||live.aspsp?.country!==conn.country)throw Error('Bankens medgivande behöver förnyas.');
   const savedConsent=consentMetadata(conn),consentInput={session:{accounts:available,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:savedConsent?.requestedScopes};
   // Validate every persisted selection, not just the account of this detail.

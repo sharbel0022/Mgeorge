@@ -2,7 +2,7 @@ import { env } from 'cloudflare:workers';
 import { db, currentCompanyContext } from '@/lib/server';
 import { randomToken, seal, unseal, digest } from './security';
 import type { ProviderApplication, ProviderAccount, ProviderConfig } from './enable-banking';
-import { RuntimeBankError, runtimeBankConfig, runtimeBankStatus } from './runtime-config';
+import { runtimeBankConfig, runtimeBankStatus, runtimeBankRedirectUrl } from './runtime-config';
 import { ConsentError, companyBankContext } from '../bank-consent-policy.js';
 import { resolveCorporateAccountEvidence, type CompanyAccountEvidence } from '../bank-company-authority.js';
 import { stableAccountKey } from './transactions';
@@ -87,31 +87,7 @@ export function storageReady(): boolean { try { secret(); return true; } catch {
 export const encrypt = (owner: string, purpose: string, value: unknown) => seal(secret(), owner, purpose, value);
 export const decrypt = <T>(owner: string, purpose: string, value: string) => unseal<T>(secret(), owner, purpose, value);
 export const configurationStatus = () => runtimeBankStatus(env as unknown as Record<string, unknown>);
-
-/** Only operator-controlled configuration may choose the bank callback host. */
-export function bankRedirectUrl(): string {
-  const settings = env as unknown as Record<string, unknown>;
-  const invalid = () => new RuntimeBankError('BANK_REDIRECT_CONFIGURATION_INVALID', 'Banktjänstens returadress kunde inte verifieras.');
-  try {
-    const configured = settings.ENABLE_BANKING_REDIRECT_URL;
-    const configuredOrigin = settings.APP_ORIGIN;
-    if (configured !== undefined && typeof configured !== 'string' || configuredOrigin !== undefined && typeof configuredOrigin !== 'string') throw invalid();
-    const explicit = typeof configured === 'string' ? configured.trim() : '';
-    const originValue = typeof configuredOrigin === 'string' ? configuredOrigin.trim() : '';
-    let origin = '';
-    if (originValue) {
-      const parsed = new URL(originValue);
-      if (parsed.protocol !== 'https:' || parsed.username || parsed.password ||
-        ![parsed.origin, parsed.origin + '/'].includes(originValue)) throw invalid();
-      origin = parsed.origin;
-    }
-    const redirect = explicit || (origin ? origin + '/api/bank/callback' : '');
-    const parsed = new URL(redirect);
-    if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.search || parsed.hash ||
-      parsed.pathname !== '/api/bank/callback' || parsed.href !== redirect || origin && parsed.origin !== origin) throw invalid();
-    return redirect;
-  } catch { throw invalid(); }
-}
+export const bankRedirectUrl = () => runtimeBankRedirectUrl(env as unknown as Record<string, unknown>);
 
 export async function application(owner: string): Promise<BankApplicationRow | null> {
   if (!configurationStatus().configured) return null;

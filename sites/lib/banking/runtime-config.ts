@@ -9,6 +9,32 @@ export class RuntimeBankError extends Error {
 }
 const activation = 'Banktjänsten behöver aktiveras av systemadministratören.';
 const value = (env: Record<string, unknown>, key: string) => typeof env[key] === 'string' ? env[key].trim() : '';
+// Legacy exported reference only; it is never a runtime configuration fallback.
+export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
+
+/** Only operator-controlled configuration may choose the bank callback host. */
+export function runtimeBankRedirectUrl(settings: Record<string, unknown>): string {
+  const invalid = () => new RuntimeBankError('BANK_CALLBACK_CONFIGURATION_INVALID', 'Banktjänstens returadress kunde inte verifieras.');
+  try {
+    const configured = settings.ENABLE_BANKING_REDIRECT_URL;
+    const configuredOrigin = settings.APP_ORIGIN;
+    if (configured !== undefined && typeof configured !== 'string' || configuredOrigin !== undefined && typeof configuredOrigin !== 'string') throw invalid();
+    const explicit = typeof configured === 'string' ? configured.trim() : '';
+    const originValue = typeof configuredOrigin === 'string' ? configuredOrigin.trim() : '';
+    let origin = '';
+    if (originValue) {
+      const parsed = new URL(originValue);
+      if (parsed.protocol !== 'https:' || parsed.username || parsed.password ||
+        ![parsed.origin, parsed.origin + '/'].includes(originValue)) throw invalid();
+      origin = parsed.origin;
+    }
+    const redirect = explicit || (origin ? origin + '/api/bank/callback' : '');
+    const parsed = new URL(redirect);
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.search || parsed.hash ||
+      parsed.pathname !== '/api/bank/callback' || parsed.href !== redirect || origin && parsed.origin !== origin) throw invalid();
+    return redirect;
+  } catch { throw invalid(); }
+}
 
 // Credentials come exclusively from protected Worker runtime secrets. A legacy
 // encrypted_key in D1, a request body or browser storage is never a source.

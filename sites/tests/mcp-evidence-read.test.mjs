@@ -1,9 +1,13 @@
 import {isReadOnlySql} from './helpers/company-compat-fixture.mjs';
-import test from 'node:test';
+import test,{after} from 'node:test';
 import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
-import {readFileSync,readdirSync,existsSync} from 'node:fs';
+import {readFileSync,readdirSync,existsSync,mkdtempSync,rmSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {stripTypeScriptTypes} from 'node:module';
 import {applyCommand} from '../lib/domain.ts';
 import {MGEORGE_INVOICE_REFERENCE_POLICY} from '../lib/invoice-reference-policy.js';
@@ -11,7 +15,12 @@ import {genericCompanyState as emptyState} from './helpers/reference-policy-fixt
 import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {syntheticConnection} from './helpers/bank-account-fixture.mjs';
 
-const data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64'),url=p=>new URL(p,import.meta.url).href;
+// Nested data URLs repeatedly embed the entire dependency graph in every parent
+// URL. Keep the same real modules and fixture boundaries, using short private
+// file URLs so repeated fixtures do not exhaust the test process's memory.
+const moduleDirectory=mkdtempSync(join(tmpdir(),'mgeorge-mcp-evidence-')),moduleFiles=new Map();
+after(()=>rmSync(moduleDirectory,{recursive:true,force:true}));
+const data=s=>{const hash=createHash('sha256').update(s).digest('hex');if(!moduleFiles.has(hash)){const path=join(moduleDirectory,hash+'.mjs');writeFileSync(path,s,{flag:'wx'});moduleFiles.set(hash,pathToFileURL(path).href);}return moduleFiles.get(hash);},url=p=>new URL(p,import.meta.url).href;
 function compiled(path,imports={}){let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});for(const [a,b]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+a+q,JSON.stringify(b));return data(code);}
 const origin='https://synthetic.example',iban='SE4280000890119146168423',docId='11111111-1111-4111-8111-111111111111';
 const {interpretInvoice}=await import(invoiceParserUrl());
