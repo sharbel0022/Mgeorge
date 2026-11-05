@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 // AIS only. Both environments use the same host; /application confirms which
 // environment the certificate is registered for. Never override this URL.
 export const apiBase='https://api.enablebanking.com';
+const MAX_RESPONSE_BYTES=2*1024*1024;
 const projectRoot=realpathSync(fileURLToPath(new URL('../',import.meta.url)));
 function bankError(code,message,status=409,extra={}){
   return Object.assign(new Error(message),{code,status,...extra});
@@ -104,6 +105,33 @@ async function untilAborted(operation,signal,abortError){
   try{return await Promise.race([operation(),stopped]);}
   finally{signal.removeEventListener('abort',abort);}
 }
+function cancelQuietly(body){
+  // Cleanup must not delay or replace the established banking error.
+  try{void body?.cancel().catch(()=>{});}catch{}
+}
+async function boundedJson(response,signal,abortError){
+  const tooLarge=()=>bankError('response_too_large','Bankens svar var för stort. Välj en kortare period. Ingen import gjordes.',502);
+  const declared=Number(response.headers.get('content-length'));
+  if(Number.isFinite(declared)&&declared>MAX_RESPONSE_BYTES){cancelQuietly(response.body);throw tooLarge();}
+  if(!response.body)return null;
+  const decoder=new TextDecoder();let reader,text='',size=0;
+  try{
+    reader=response.body.getReader();
+    while(true){
+      const chunk=await untilAborted(()=>reader.read(),signal,abortError);
+      if(chunk.done)break;
+      size+=chunk.value.byteLength;
+      if(size>MAX_RESPONSE_BYTES){cancelQuietly(reader);throw tooLarge();}
+      text+=decoder.decode(chunk.value,{stream:true});
+    }
+    text+=decoder.decode();
+  }catch(error){
+    if(error?.code==='response_too_large')throw error;
+    // Retain existing invalid-body/provider mappings; the caller checks abort.
+    return null;
+  }finally{if(signal.aborted)cancelQuietly(reader);reader?.releaseLock();}
+  try{return JSON.parse(text);}catch{return null;}
+}
 /** Skickar tidsbegränsade anrop till Enable Bankings fasta API-domän med signerad token; leverantörsfel hanteras centralt. */
 export async function bankingRequest(path,{method='GET',body,deadline=Date.now()+18000,signal}={}){
   const url=requestUrl(path,method),authorization=`Bearer ${jwt()}`;
@@ -115,16 +143,18 @@ export async function bankingRequest(path,{method='GET',body,deadline=Date.now()
     let result;
     try{result=await fetch(url,{method,redirect:'error',signal:requestSignal,headers:{Authorization:authorization,Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});}
     catch{throw bankError(requestSignal.aborted?'bank_timeout':'bank_unavailable',requestSignal.aborted?'Bankförfrågan tog för lång tid. Försök igen.':'Banktjänsten kunde inte nås. Försök igen senare.',502);}
+    // An abort-ignoring fetch may resolve after its caller has already timed out.
+    if(requestSignal.aborted||Date.now()>=deadline){cancelQuietly(result.body);throw timedOut();}
     if(result.status===429||result.status===503){
       const retry=retryAfterSeconds(result.headers.get('retry-after'),6*3600);
       if(result.status===429||retry.retryKnown){
         // A stalled or malformed error body must not erase a known cooldown.
         // Cancellation can itself wait indefinitely, so it is never awaited.
-        try{result.body?.cancel().catch(()=>{});}catch{}
+        cancelQuietly(result.body);
         throw bankError(result.status===429?'rate_limited':'bank_unavailable',result.status===429?'Bankens anropsgräns är nådd. Vänta innan du försöker igen.':'Banktjänsten är tillfälligt otillgänglig. Vänta till nästa tillåtna försök.',result.status,{providerStatus:result.status,...retry});
       }
     }
-    const data=result.status===204?{}:await result.json().catch(()=>null);
+    const data=result.status===204?{}:await boundedJson(result,requestSignal,timedOut);
     // Fetch can finish its headers while the response body is still waiting.
     // A body abort must keep its timeout identity and must never start recovery.
     if(requestSignal.aborted||Date.now()>=deadline)throw timedOut();
