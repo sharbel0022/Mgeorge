@@ -30,12 +30,15 @@ export const bankConnections = sqliteTable('bank_connections', {
   retryAfter: text('retry_after').notNull().default(''), syncFailures: integer('sync_failures').notNull().default(0),
   accountEvidenceRetry: text('account_evidence_retry').notNull().default(''),
   controlLastAttemptAt: text('control_last_attempt_at'),
+  consentMetadata: text('consent_metadata').notNull().default(''),
 });
 export const bankAuthFlows = sqliteTable('bank_auth_flows', {
   stateHash: text('state_hash').primaryKey(), owner: text('owner').notNull(), cookieHash: text('cookie_hash').notNull(),
   appGeneration: text('app_generation').notNull(), bankName: text('bank_name').notNull(), country: text('country').notNull(),
   environment: text('environment').notNull(), redirectUri: text('redirect_uri').notNull(), dateFrom: text('date_from').notNull(),
   expiresAt: text('expires_at').notNull(), status: text('status').notNull(), createdAt: text('created_at').notNull(),
+  contextJson: text('context_json').notNull().default(''), resultCode: text('result_code').notNull().default(''),
+  connectionId: text('connection_id').notNull().default(''),
   companyId:text('company_id'),companyActorId:text('company_actor_id'),companyContextVersion:integer('company_context_version'),companyMembershipVersion:integer('company_membership_version'),
 }, t => [index('bank_flow_owner').on(t.owner)]);
 export const bankSyncRuns = sqliteTable('bank_sync_runs', {
@@ -168,3 +171,5 @@ export const companyWorkerGrants=sqliteTable('company_worker_grants',{
 export const companyOperationGuard=sqliteTable('company_operation_guard',{
  slot:integer('slot').primaryKey(),storageOwner:text('storage_owner').notNull(),companyId:text('company_id'),actorId:text('actor_id').notNull(),contextVersion:integer('context_version'),membershipVersion:integer('membership_version'),action:text('action').notNull(),authorized:integer('authorized').notNull(),
 },t=>[check('company_guard_singleton',sql`${t.slot}=1`),check('company_guard_authorized',sql`${t.authorized}=1`)]);
+
+export const saasBankState = sqliteTable('saas_bank_state', {owner:text('owner').primaryKey().notNull(),revision:integer('revision').notNull(),payload:text('payload').notNull()});

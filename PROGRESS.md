@@ -1,5 +1,16 @@
 # Verifierad progress
 
+## Agent 3 — företagsbundet bankmedgivande, 2026-11-04
+
+Egen utvecklingsbranch `feature/saas-bank-consent`, bas `14a042a`. [API-kontrakt, modeller, säkerhetsgränser och verifieringskvitto](docs/integration/saas/bank-consent.md). Leveransen omfattar befintliga Node- och Sites-routes, gemensam medgivandepolicy, additiv lagring och regressionstester. Ingen merge, Sites-publicering, produktionsmigration eller verklig bankidentifiering ingår.
+
+Slutliga lokala grindar: **1 587 Node + 3 227 Sites + 47 brygga = 4 861 godkända tester**, 0 fel/skip/cancel/todo; syntax, typer, exakt minimatchkontroll, high-audit och produktionsbygge godkända. Åtta måttliga utvecklingsberoendefynd kvarstår i Sites, inga high/critical. Konkreta oberoende granskningsfynd är rättade med regressionstester.
+
+Nya anslutningar binds till autentiserad användare, serverupplöst företag, bank, läsomfång, webbläsare och ett engångstillstånd. Bankens medgivande och separat verifierat företags-/kontounderlag krävs före uttrycklig kontobekräftelse. Utelämnat `companyId` ger ingen äldre undantagsväg; pågående redirects utan den nya kontexten måste startas om. Befintliga sparade äldre anslutningar bevaras och markeras som äldre, utan påhittad företagsverifiering. Avbruten eller nekad förnyelse bevarar den tidigare anslutningen; osäkra återkallelser stoppar användningen och behåller uppgifter för säker återhämtning.
+
+Basen saknar en släppt SaaS-medlemskapsmodell. Företagsupplösaren stödjer endast den autentiserade ägarens befintliga arbetsyta. Agent 1 måste ansluta sin auktoritativa företags-/rollmodell innan flera företagsmedlemmar aktiveras; Agent 2:s framtida provideradapter måste lämna verifierbart företags-/kontounderlag och dokumenterade identifieringsförmågor. Bankgirobehörighet kan inte härledas ur AIS. Exakta lokala testresultat och kvarstående externa acceptanskrav finns i integrationsdokumentet.
+
+Samtliga 33 numeriska kvalitetspoäng är oförändrade: **255/330 = 7,73/10; 0/33 ≥9,5**. Denna utvecklingsleverans ger inget nytt produktionsbevis.
 ## SaaS master integration — foundation verified, 2026-11-04
 
 Start main `14a042abd37fa455d08da9dfcc096ef4f603b512`; all seven current producer heads and exact-head CI frozen in [integration matrix](docs/saas/INTEGRATION-MATRIX.md). #38 remains Draft. Separate native integration worktree; original checkout and production resources preserved.
@@ -864,3 +875,13 @@ Separat branch `feature/mgeorge-invoice-reference-policy`, aktuell main `12c9868
 `feature/mgeorge-bankgiro-auto-ingest` tillför ett utbytbart auktoriserat rapportgränssnitt, beständig kö, original-/rapportdeduplicering, återupptagning, status-API/MCP och statusvy. Båda applikationerna återanvänder befintlig parser och ekonomimodell. Inga fakturaallokeringar körs av rapportarbetaren. [Kontrakt och bankkällor](docs/integration/bankgiro-source.md), [test- och leveransrapport](docs/integration/agent-3-bankgiro-auto-ingest.md).
 
 Riktig rapporthämtning är uttryckligen avstängd: kundens bankavtal, auktoriserade transport och exakta rapportprofil saknas. Syntetiska testresultat, lokal miljöbegränsning och obligatorisk CI redovisas separat i leveransrapporten/PR:n. Integrationsansvarig samordnar merge, migration och eventuell publicering; ingen produktionsskrivning eller publicering ingår i denna branch. Berörda kvalitetspoäng behålls.
+
+## PR #39 gemensam företagskontext och Open Payments — lokal integration 2026-11-05
+
+Producer `32be7f5` och main `f75a293` har sammanförts normalt i `integrate/consent-20261105`. Företags-/medlemskontexten bevaras genom Enable Banking-flödet. Faktisk Open Payments-livscykel finns nu gemensamt för Node/Sites: beständig krypterad CAS, företags-/aktörs-/sessionsbundet state, engångsaktivering, verifierat medgivande och konton, idempotens, förnyelse/återkallelse samt budgeterat gränssnitt till befintlig banksynk. Konkret race där återkallelse hann ske före nästa kontoläsning reproducerades RÖTT och rättades med beständig revisionskontroll GRÖNT. D1 samlas i0020 efter foundation0019; snapshots, ägartabeller, skrivtriggers och backupcensus är kumulativa. Historiska backupformat bevaras.
+
+Fulla syntetiska sviter: Node1692/1692 och Sites3382/3382,0fel/skip/cancel/TODO. Syntax146; TypeScript och produktionsbygge gröna före den sista JS-revisionsspärren, som täcks av full Sites/regression. Root fullaudit0, Sites prod0/full8moderate utvecklingsberoenden och godkänd high-grind; befintlig minimatch-backport verifierad. Inga verkliga bank-/Gmail-/kundskrivningar, remote-merge eller Sites-publicering utfördes i detta delarbete. SaaS är serveravstängd som standard, Sites produktion saknar medvetet aktiverad mTLS-transport. Kvalitetspoäng ändras inte. [Livscykel och driftsgränser](docs/integration/saas/openpayments-consent-lifecycle.md). Integrationsansvarig slutför oberoende review, exakt gemensam CI och eventuell publicering.
+
+## 2026-11-05 — consent integration CI installation repair
+
+PR #39 exact published tree passed Sites TypeScript, all Sites tests, production build and bridge CI. The isolated Node CI exposed a missing direct runtime dependency: the shared Open Payments provider imports `bank-api-original.js`, which uses `@noble/hashes`. The root package now explicitly pins the same 2.4.0 release as Sites. With Sites dependencies temporarily absent, the full Node suite passed 1,692/1,692 tests (0 failed/skipped; 211.201 seconds). No security checks or tests were removed. Fresh exact-head remote CI remains a merge gate.

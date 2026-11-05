@@ -1,7 +1,8 @@
 type ConsentStatus = {
   configured?: boolean;
   storageReady?: boolean;
-  connection?: { status?: string; validUntil?: string } | null;
+  connection?: { status?: string; validUntil?: string;
+    consent?: { mode?: string; corporateAuthorization?: { status?: string } } } | null;
 };
 
 // URL result parameters are navigation hints. Only the authenticated server's
@@ -9,5 +10,7 @@ type ConsentStatus = {
 export function confirmedBankConsent(status: ConsentStatus | null | undefined, at = Date.now()): boolean {
   const connection = status?.connection;
   const expiry = Date.parse(connection?.validUntil || '');
-  return status?.configured === true && status.storageReady === true && connection?.status === 'connected' && Number.isFinite(expiry) && expiry > at;
+  return status?.configured === true && status.storageReady === true && connection?.status === 'connected' &&
+    (connection.consent?.mode !== 'company' || connection.consent.corporateAuthorization?.status === 'verified') &&
+    Number.isFinite(expiry) && expiry > at;
 }

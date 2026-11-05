@@ -184,6 +184,7 @@ async function oauthFixture(t,provider,tag){
   if(url.pathname==='/aspsps')return Response.json({aspsps:[{name:'Swedbank',country:'SE',psu_types:['business'],maximum_consent_validity:90*86400}]});
   if(url.pathname==='/auth'){state=JSON.parse(options.body).state;return Response.json({url:'https://auth.enablebanking.com/ais/start?sessionid=synthetic'});}
   if(url.pathname==='/sessions'&&options.method==='POST')return Response.json({session_id:'synthetic-session-'+tag,accounts:[{uid:'synthetic-account',currency:'SEK',usage:'ORGA',account_id:{iban:'SE4280000890119146168423'}}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+3600000).toISOString()}});
+  if(url.pathname.startsWith('/sessions/')&&options.method!=='DELETE')return Response.json({status:'AUTHORIZED',accounts:['synthetic-account'],accounts_data:[{uid:'synthetic-account'}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+3600000).toISOString()}});
   throw Error('Unexpected synthetic provider request');
  });
  const start=await call('/api/'+provider+'/connect',{actor,method:'POST',body:{}});assert.equal(start.status,200,JSON.stringify(start.body));
@@ -213,4 +214,12 @@ test('a legacy Gmail redirect cannot gain a company binding through later verifi
  app.companyRuntime.bindLegacyCompany({companyId:'verified-legacy',name:'Verified legacy',actorId:actor,storageOwner:actor,verification});
  const result=await call('/api/gmail/callback?state='+state+'&error=access_denied',{actor});
  assert.equal(result.status,409);assert.equal(result.body.code,'COMPANY_CONTEXT_STALE');
+});
+
+test('Open Payments HTTP is disabled by default and rejects a foreign company before banking',async()=>{
+ const actor='saas-synthetic-owner',companyId='saas-synthetic-company';
+ app.companyRuntime.provisionCompany({companyId,name:'Synthetic SaaS Company',actorId:actor,verification});
+ const status=await call(`/api/companies/${companyId}/bank`,{actor});assert.equal(status.status,200);assert.equal(status.body.actions.connect,false);assert.deepEqual(status.body.banks,[]);assert.equal(status.body.sync.errorCode,'configuration_required');
+ assert.equal((await call('/api/companies/company-a/bank',{actor})).status,403);
+ const start=await call(`/api/companies/${companyId}/bank/connect`,{actor,method:'POST',headers:{'Idempotency-Key':'synthetic-start-request'},body:{bankId:'OPBKSE21',permissions:['accounts:read','transactions:read'],expectedRevision:0}});assert.equal(start.status,409);assert.equal(start.body.code,'SAAS_BANK_DISABLED');
 });

@@ -78,7 +78,7 @@ export interface OpenPaymentsConnection extends BankDataConnection {
   >;
   getAuthorisationStatus(handle: string): Promise<{ scaStatus: OpenPaymentsScaStatus; challengeData: Record<string, unknown>; consentValid: false }>;
   completeRedirect(handle: string, callback: { code: string; scope: string; state: string }): Promise<{ status: OpenPaymentsConsentStatus; original: OpenPaymentsOriginal }>;
-  listAccounts(consentHandle: string): Promise<{ accounts: OpenPaymentsAccount[]; original: OpenPaymentsOriginal }>;
+  listAccounts(consentHandle: string): Promise<{ accounts: OpenPaymentsAccount[]; validUntil: string; original: OpenPaymentsOriginal }>;
   getAccount(accountHandle: string): Promise<{ identity: OpenPaymentsAccountIdentity; bankgiroMappingVerified: false; original: OpenPaymentsOriginal }>;
   getTransactions(accountHandle: string, input: { dateFrom: string; dateTo: string; requireBankgiro?: boolean }): Promise<{
     booked: Record<string, unknown>[];

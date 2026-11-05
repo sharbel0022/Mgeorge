@@ -6,7 +6,7 @@
  */
 
 import { readFileSync, realpathSync } from 'node:fs';
-import { createPrivateKey, createSign } from 'node:crypto';
+import { createPrivateKey, createPublicKey, createHash, createSign } from 'node:crypto';
 import { isAbsolute, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -49,6 +49,11 @@ export function configStatus(){
   catch(e){return {configured:false,environment:undefined,code:e.code||'not_configured',message:e.code?e.message:'Banktjänsten behöver aktiveras av systemadministratören.'};}
 }
 export function isConfigured(){return configStatus().configured;}
+/** Bind a pending consent to the actual application and signing-key generation. */
+export function consentApplicationFingerprint(){
+  const {applicationId,key,environment}=configuration();
+  return createHash('sha256').update(JSON.stringify([applicationId,environment,createPublicKey(key).export({type:'spki',format:'der'}).toString('base64')])).digest('hex');
+}
 /** Skapar RS256-signerad JWT för att autentisera serverns API-anrop mot Enable Banking. Privat RSA-nyckel stannar på servern. */
 export function jwt(){
   const {applicationId,key}=configuration(),now=Math.floor(Date.now()/1000);

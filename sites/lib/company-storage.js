@@ -2,7 +2,7 @@ import {assertCompanyContext,assertCompanyPermission,companyDataBoundary,COMPANY
 
 // Every financial/automation table with an owner column. A migration regression
 // compares this manifest with the actual SQLite schema and its write triggers.
-export const ownerTables=Object.freeze(['audit_events','backup_runs','bank_applications','bank_auth_flows','bank_connections','bank_locks','bank_sync_runs','bankgiro_ingest_jobs','bankgiro_ingest_leases','bankgiro_ingest_sources','customer_contacts','customer_deliveries','customer_messages','customer_reviews','document_automation','document_extractions','document_jobs','document_registrations','documents','gmail_connections','gmail_flows','gmail_locks','gmail_runs','gmail_sources','invoice_counterparties','payment_control_requests','payment_control_runs','reconciliation_findings','workspaces']);
+export const ownerTables=Object.freeze(['audit_events','backup_runs','bank_applications','bank_auth_flows','bank_connections','bank_locks','bank_sync_runs','bankgiro_ingest_jobs','bankgiro_ingest_leases','bankgiro_ingest_sources','customer_contacts','customer_deliveries','customer_messages','customer_reviews','document_automation','document_extractions','document_jobs','document_registrations','documents','gmail_connections','gmail_flows','gmail_locks','gmail_runs','gmail_sources','invoice_counterparties','payment_control_requests','payment_control_runs','reconciliation_findings','saas_bank_state','workspaces']);
 const statements=new WeakMap();
 const id=value=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9:@._-]{0,199}$/.test(value)&&value!=='.'&&value!=='..';
 const fail=(code,status=403)=>{throw Object.assign(Error(code),{code,status});};

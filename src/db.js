@@ -127,6 +127,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   }
   addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
   const identityUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='api_identity_version');
+  db.exec('CREATE TABLE IF NOT EXISTS saas_bank_state(owner TEXT PRIMARY KEY NOT NULL,revision INTEGER NOT NULL,payload TEXT NOT NULL)');
   addColumn('bank_transactions','api_identity_version','INTEGER NOT NULL DEFAULT 0');
   if(identityUpgrade)db.prepare("UPDATE bank_transactions SET api_identity_version=1 WHERE source='enablebanking' AND provider_transaction_id<>''").run();
   addColumn('bank_states','session_hash',"TEXT NOT NULL DEFAULT ''");
@@ -139,6 +140,14 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_states','owner',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','renew_connection_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','bank_name',"TEXT NOT NULL DEFAULT ''");
+  // Empty metadata marks existing rows only. Every newly initiated flow writes
+  // company-bound metadata; migrations never invent corporate authorization.
+  addColumn('bank_connections','consent_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','context_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','flow_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','status',"TEXT NOT NULL DEFAULT 'pending'");
+  addColumn('bank_states','terminal_reason',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','connection_id',"TEXT NOT NULL DEFAULT ''");
   // Existing redirects remain retained but must restart: their original
   // actor/company authorization generation cannot be inferred by migration.
   addColumn('bank_states','company_context_json',"TEXT NOT NULL DEFAULT ''");

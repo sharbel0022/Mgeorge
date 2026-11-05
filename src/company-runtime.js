@@ -65,7 +65,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   // A first active company would replace this principal's legacy view. Retain
   // that view until an operator explicitly verifies and binds its existing
   // business records, originals, consent and import history to a company.
-  const retainedTables=['invoices','bank_transactions','allocations','documents','document_sources','bank_connections','bank_states','gmail_connections','gmail_states','gmail_rejected_sources','mail_candidates','import_jobs','verified_contacts','payer_links','reconciliation_findings','customer_messages','message_reviews','message_approvals','message_deliveries','bank_specification_links','bankgiro_ingest_sources','bankgiro_ingest_jobs','audit_events'];
+  const retainedTables=['invoices','bank_transactions','allocations','documents','document_sources','bank_connections','bank_states','gmail_connections','gmail_states','gmail_rejected_sources','mail_candidates','import_jobs','verified_contacts','payer_links','reconciliation_findings','customer_messages','message_reviews','message_approvals','message_deliveries','bank_specification_links','bankgiro_ingest_sources','bankgiro_ingest_jobs','audit_events','saas_bank_state'];
   if(retainedTables.some(table=>controlDb.prepare('SELECT 1 FROM '+table+' LIMIT 1').get()))throw fail('company_legacy_binding_required',409);
  }
  function transaction(operation){

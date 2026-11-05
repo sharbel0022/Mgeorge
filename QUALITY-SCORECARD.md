@@ -1,5 +1,16 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 3 — avgränsad företagsmedgivandeverifiering, 2026-11-04
+
+[Bank consent-kontrakt och verifieringskvitto](docs/integration/saas/bank-consent.md) gäller utvecklingsbranchen `feature/saas-bank-consent` från `14a042a`. Alla 33 poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. Syntetiska regressionsprov och oberoende kodgranskning ersätter inte bankens faktiska företagsbehörighet eller produktionsacceptans.
+
+| Berört område | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | --- | --- |
+| 15–16. Bankanslutning och hämtning | Företags-/användarbunden engångscallback, aktuella läsrättigheter, explicit kontoval, giltighet vid databascommit och säker förnyelse/frånkoppling. | Ingen faktisk SCA-/BankID-resa eller ny produktionsanslutning har körts. |
+| 17. Bankgiro | Saknat Bankgiro-scope avvisas uttryckligen; kontokontrollen läser inga konton utanför företagets verifierade omfång. | Separat rapportbehörighet och verklig bankstyrkt företags-/Bankgirorelation krävs fortfarande. |
+| 30. Säkerhet och åtkomstkontroll | State/cookie/CSRF/replay, samtidiga callbacks, företagsunderlag, återkallad åtkomst och osäkra återkallelser har konkreta regressioner. | Basen har en ägararbetsyta. Agent 1:s riktiga medlemskaps- och rollmodell måste integreras före flerföretagsdrift. |
+| 32. Kodkvalitet och tester | Gemensamma rena validatorer, verkliga HTTP-/SQLite-/D1-tester och rättade oberoende granskningsfynd. | Slutliga exakta kommandon/resultat redovisas i integrationskvitto; inga poäng höjs enbart för testantal. |
+| 33. Produktion | Utvecklingsbranch och PR är avsedda för samordnad granskning. | Ingen merge, publicering, produktionsmigration, verklig bankhämtning eller ändring av externa scheman. |
 ## SaaS master integration candidate — 2026-11-04
 
 Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.md). Repaired foundation is now normally merged as mainf105e9c, with exact main CI41914833272 success (1649Node+3196Sites+47bridge=4892,0fail/skip/cancel/TODO). Below local figures retain their Windows scope; #36 cumulative integration follows separately. No new Sites publication or commercial activation. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5.**

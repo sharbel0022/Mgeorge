@@ -5,12 +5,13 @@ type Database={prepare:(sql:string)=>any;batch:(statements:any[])=>Promise<any[]
 type Bucket={get:(key:string)=>Promise<any>;put:(key:string,value:Uint8Array,options?:any)=>Promise<any>};
 type Row=Record<string,any>;
 const LEGACY_BACKUP_TABLES=['workspaces','audit_events','documents','bank_applications','bank_connections','bank_sync_runs','gmail_connections','customer_contacts','customer_messages','reconciliation_findings','customer_deliveries','gmail_sources','gmail_runs','document_automation','document_jobs','document_extractions','invoice_counterparties','document_registrations','payment_control_runs','payment_control_requests'];
-export const BACKUP_TABLES=[...LEGACY_BACKUP_TABLES,'bankgiro_ingest_sources','bankgiro_ingest_jobs'];
+const BANKGIRO_BACKUP_TABLES=[...LEGACY_BACKUP_TABLES,'bankgiro_ingest_sources','bankgiro_ingest_jobs'];
+export const BACKUP_TABLES=[...BANKGIRO_BACKUP_TABLES,'saas_bank_state'];
 /** Exact historical schema sets only. Never fill a partially missing snapshot
  * with invented empty tables; old authenticated snapshots keep their own census. */
 export function backupTableSet(names:unknown):string[]{
  if(!Array.isArray(names)||new Set(names).size!==names.length)throw Error('backup_snapshot_invalid');
- const supported=[LEGACY_BACKUP_TABLES,BACKUP_TABLES].find(set=>set.length===names.length&&names.every(name=>typeof name==='string'&&set.includes(name)));
+ const supported=[LEGACY_BACKUP_TABLES,BANKGIRO_BACKUP_TABLES,BACKUP_TABLES].find(set=>set.length===names.length&&names.every(name=>typeof name==='string'&&set.includes(name)));
  if(!supported)throw Error('backup_snapshot_invalid');return supported;
 }
 const encoder=new TextEncoder(),magic=encoder.encode('MGBK0001');

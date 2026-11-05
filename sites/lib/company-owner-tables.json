@@ -27,5 +27,6 @@
   "payment_control_requests",
   "payment_control_runs",
   "reconciliation_findings",
+  "saas_bank_state",
   "workspaces"
 ]

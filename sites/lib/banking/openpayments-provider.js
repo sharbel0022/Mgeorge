@@ -271,7 +271,7 @@ class OpenPaymentsCompanyConnection {
       const ids = identity(account), payload = { id: account.resourceId, identity: ids, consent };
       accounts.push({ handle: await this.#resources.seal('account', payload, expiresAt), identity: ids, name: typeof account.name === 'string' ? account.name : '', bankgiroMappingVerified: false });
     }
-    return this.#finish({ accounts, original: this.#original(response, 'list_accounts') }, consent);
+    return this.#finish({ accounts, validUntil: expiresAt, original: this.#original(response, 'list_accounts') }, consent);
   }
   async getAccount(handle) {
     this.#feature('accounts');

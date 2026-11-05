@@ -9,12 +9,39 @@ import { normalizeTransactions, stableAccountKey } from './transactions';
 import {
   accounts, application, connection, encrypt, metadata, providerConfig, configurationStatus, saveApplicationMetadata,
   sessionId, storageReady, withBankLock, type BankConnectionRow, type BankFlowRow, type BankLease,
+  bankCompanyContext, corporateAccountEvidence, consentMetadata, currentCompanyAuthorization, assertCompanyConsent,
+  revocationSessionId, type ConsentMetadata,
 } from './store';
 import { cookieValue, digest, randomToken, validFlowToken } from './security';
 import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
 import { mergeAccountReadCooldown } from './account-read-cooldown';
 import { guardedBankRead } from './account-read-guard';
+import { ConsentError, validateCallbackParameters, validateReadScopes, validateEnableConsent } from '../bank-consent-policy.js';
+
+type FlowContext = {
+  version: 1; companyId: string; actorId: string; membershipVersion: string; mode: 'company' | 'legacy';
+  flowId: string; requiredScopes: string[]; requestedValidUntil: string;
+  renewConnectionId: string; previousSessionHash: string;
+};
+
+function checkedKeys(body: Record<string, unknown>, allowed: string[]) {
+  if (Object.keys(body).some(key => !allowed.includes(key))) throw new BankError('Förfrågan innehåller otillåtna uppgifter.', 400);
+}
+function flowContext(flow: BankFlowRow): FlowContext | null {
+  if (!flow.context_json) return null; // Migration-era redirects require a new authorization start.
+  const value = JSON.parse(flow.context_json) as FlowContext;
+  const context = bankCompanyContext(flow.owner, value.companyId);
+  if (value.version !== 1 || value.actorId !== context.actorId || value.membershipVersion !== context.membershipVersion || value.mode !== 'company') throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  return value;
+}
+async function assertFlowActor(flow: BankFlowRow, context: FlowContext | null) {
+  const user = await identity(), actor=user.userId;
+  if (actor !== flow.owner || context && bankCompanyContext(actor).actorId !== context.actorId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  bankCompanyContext(actor, context?.companyId);
+  if (!Number.isFinite(Date.parse(flow.expires_at)) || Date.parse(flow.expires_at) <= Date.now()) throw new ConsentError('CONSENT_FLOW_EXPIRED', 409);
+}
+function flowCookie(stateHash: string) { return `${COOKIE}-${stateHash.slice(0, 32)}`; }
 
 export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
 const COOKIE = '__Secure-mg-bank-flow';
@@ -72,6 +99,7 @@ export function bankFailure(error: unknown): Response {
   if (code === 'BANK_SECRET_UNREADABLE') return response({ error: 'Bankanslutningens skyddade uppgifter kunde inte läsas. Kontakta administratören.' }, 503);
   if (error instanceof RuntimeBankError || code === 'BANK_RUNTIME_CONFIGURATION_CHANGED') return response({ error: 'Banktjänsten behöver aktiveras av systemadministratören.' }, 409);
   if (error instanceof BankError) return response({ error: error.message }, error.status);
+  if (error instanceof ConsentError) return response({ error: error.message, code: error.code }, error.status);
   if (error instanceof BankPeriodError) return response({error: error.message, code: error.code}, error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 409);
   if (error instanceof ProviderError) {
     const result = response({ error: error.message, code: error.code, ...(error.retryAfter?{retryAfter:error.retryAfter}:{}) }, error.status === 429 ? 429 : error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 502);
@@ -110,7 +138,8 @@ function dateFrom(value: unknown): string {
 }
 
 function storedStatus(row: BankConnectionRow): string {
-  return row.status === 'connected' && Date.parse(row.valid_until) <= Date.now() ? 'expired' : row.status;
+  return ['connected', 'pending_account', 'corporate_authorization_required'].includes(row.status) &&
+    (!Number.isFinite(Date.parse(row.valid_until)) || Date.parse(row.valid_until) <= Date.now()) ? 'expired' : row.status;
 }
 
 function maskAccount(account: ProviderAccount, bank: {name: string; country: string}): string {
@@ -134,6 +163,9 @@ async function checkedApplication(row: NonNullable<Awaited<ReturnType<typeof app
 
 export async function status(request: Request): Promise<Response> {
   const user = await identity();
+  const params = new URL(request.url).searchParams;
+  if (params.getAll('companyId').length > 1) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  const company = bankCompanyContext(user.userId, params.get('companyId') ?? undefined, 'read');
   const [storedApp, conn, run] = await Promise.all([
     application(user.userId), connection(user.userId),
     db().prepare('SELECT created_at,imported,skipped,warnings,test FROM bank_sync_runs WHERE owner=? ORDER BY created_at DESC,rowid DESC LIMIT 1').bind(user.userId).first<{ created_at: string; imported: number; skipped: number; warnings: string; test: number }>(),
@@ -146,20 +178,39 @@ export async function status(request: Request): Promise<Response> {
   }
   const selected: string[] = conn ? JSON.parse(conn.selected_accounts) : [];
   const bankAccounts = conn && storageReady() ? await accounts(conn) : [];
+  const savedConsent = conn ? consentMetadata(conn) : null;
+  const authority = conn ? await currentCompanyAuthorization(conn) : null;
+  const needsAuthority = savedConsent?.mode === 'company' && authority?.status !== 'verified';
+  const visibleConnectionStatus = conn ? storedStatus(conn) === 'corporate_authorization_required' && !needsAuthority ? 'pending_account' : storedStatus(conn) : null;
+  const latestFlow = await db().prepare('SELECT * FROM bank_auth_flows WHERE owner=? ORDER BY created_at DESC,rowid DESC LIMIT 1').bind(user.userId).first<BankFlowRow>();
+  const context = latestFlow ? flowContext(latestFlow) : null;
+  const requiresRestart = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && !context;
+  const expiredFlow = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && (Date.parse(latestFlow.expires_at) <= Date.now() || requiresRestart);
+  const workspace = await readWorkspace(company.storageOwnerId);
   return response({
+    company: { id: company.companyId, name: workspace.state.company.name, canManageBank: ['owner','admin'].includes(company.role), membershipMode: company.membershipVersion==='legacy-owner-v1'?'legacy_workspace':'company' },
+    consentFlow: latestFlow ? { id: context?.flowId ?? null, companyId: context?.companyId ?? company.companyId,
+      status: expiredFlow ? 'expired' : latestFlow.status, expiresAt: latestFlow.expires_at,
+      reason: requiresRestart ? 'CONSENT_RESTART_REQUIRED' : expiredFlow ? latestFlow.status === 'pending' ? 'CALLBACK_NOT_RECEIVED' : 'AUTHORIZATION_OUTCOME_UNKNOWN' : latestFlow.result_code || null,
+      connectionId: latestFlow.connection_id || null } : null,
     storageReady: storageReady(), configured: Boolean(app), activation: configurationStatus(),
     application: app ? safeApplication(metadata(app)) : null,
     redirectUrl: BANK_REDIRECT_URL, syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',
     automatic: { enabled: conn?.auto_sync_enabled === 1, intervalHours: 6, lastAttemptAt: conn?.auto_last_attempt_at ?? null, nextAttemptAt: conn ? automaticDueAt(conn) : null, blocked: (conn?.sync_failures||0)>=3, failures:conn?.sync_failures||0 },
     connection: conn ? {
-      id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: conn.encrypted_session && (!app || conn.app_generation !== app.generation) ? 'reauth_required' : storedStatus(conn),
+      id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: conn.encrypted_session && (!app || conn.app_generation !== app.generation) ? 'reauth_required' : needsAuthority && !['disconnected','revocation_pending','expired'].includes(storedStatus(conn)) ? 'corporate_authorization_required' : visibleConnectionStatus,
+      consent: { version: 'bank-consent-v1', companyId: savedConsent?.companyId ?? company.companyId,
+        mode: savedConsent?.mode ?? 'legacy', grantedScopes: savedConsent?.grantedScopes ?? ['accounts:read','transactions:read'],
+        corporateAuthorization: authority, bankgiro: { status: 'unavailable', reason: 'BANKGIRO_SCOPE_UNAVAILABLE' } },
       validUntil: conn.valid_until, lastSyncedAt: conn.last_synced_at, lastError: conn.last_error,
       dateFrom: conn.date_from,
       postprocessWarning:run&&JSON.parse(run.warnings).includes(POSTPROCESS_WARNING)?POSTPROCESS_WARNING:null,
       accounts: bankAccounts.map(account => ({
         uid: account.uid, label: maskAccount(account, {name: conn.bank_name, country: conn.country}), currency: account.currency || '',
         selected: selected.includes(account.uid),
-        importable: account.currency === 'SEK' && Boolean(stableAccountKey(account, { name: conn.bank_name, country: conn.country })),
+        importable: account.currency === 'SEK' && account.usage !== 'PRIV' && !needsAuthority &&
+          (savedConsent?.mode !== 'company' || authority?.status === 'verified' && authority.accountUids.includes(account.uid)) &&
+          Boolean(stableAccountKey(account, { name: conn.bank_name, country: conn.country })),
       })),
     } : null,
     lastRun: run ? { createdAt: run.created_at, imported: run.imported, skipped: run.skipped, warnings: JSON.parse(run.warnings), test: Boolean(run.test) } : null,
@@ -186,126 +237,245 @@ export async function removeConfig(request: Request): Promise<Response> {
 }
 
 export async function banks(request: Request): Promise<Response> {
-  const user = await identity(), row = await application(user.userId);
+  const user = await identity();
+  bankCompanyContext(user.userId, new URL(request.url).searchParams.get('companyId') ?? undefined);
+  const row = await application(user.userId);
   if (!row || !storageReady()) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören.', 409);
   const config = await providerConfig(row);
   await checkedApplication(row);
   const entries = await listBusinessBanks(config);
-  return response({ banks: entries.filter(bank => bank.country === 'SE' && /^Swedbank\b/i.test(bank.name) && bank.psu_types.includes('business')).map(bank => ({ name: bank.name, country: bank.country, maximumConsentSeconds: bank.maximum_consent_validity })) });
+  return response({ banks: entries.filter(bank => bank.country === 'SE' && bank.psu_types.includes('business')).map(bank => ({ name: bank.name, country: bank.country, maximumConsentSeconds: bank.maximum_consent_validity, corporateSupported: true, bankgiroSupported: false, authorization: 'provider_redirect' })) });
 }
 
 export async function connect(request: Request): Promise<Response> {
   const user = await identity(request), body = await jsonBody(request), from = dateFrom(body.dateFrom);
+  checkedKeys(body, ['companyId', 'bankName', 'country', 'dateFrom', 'requiredScopes', 'renewConnectionId']);
+  const company = bankCompanyContext(user.userId, body.companyId);
+  const requiredScopes = validateReadScopes(body.requiredScopes);
+  if (requiredScopes.includes('bankgiro:read')) throw new ConsentError('BANKGIRO_SCOPE_UNAVAILABLE', 409);
+  if (body.renewConnectionId !== undefined && (typeof body.renewConnectionId !== 'string' || !body.renewConnectionId || body.renewConnectionId.length > 200)) throw new BankError('Välj anslutningen som ska förnyas.');
   if (typeof body.bankName !== 'string' || body.bankName.length > 200 || body.country !== 'SE') throw new BankError('Välj en svensk företagsbank i listan.');
   return withBankLock(user.userId, async lease => {
     const app = await application(user.userId);
     if (!app || !storageReady()) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören.', 409);
     const existing = await connection(user.userId);
-    if (existing?.encrypted_session) throw new BankError('Koppla först från den befintliga anslutningen. Därefter kan du ansluta banken igen.', 409);
+    if (body.renewConnectionId && (!existing?.encrypted_session || existing.id !== body.renewConnectionId)) throw new BankError('Anslutningen som ska förnyas finns inte för företaget.', 409);
+    if (existing?.encrypted_session && !body.renewConnectionId) throw new BankError('Det finns redan en bankanslutning. Välj Förnya anslutningen.', 409);
+    if (existing && body.renewConnectionId && existing.bank_name !== body.bankName) throw new BankError('Förnya med samma bank. Koppla från anslutningen för att byta bank.', 409);
+    const pending = await db().prepare("SELECT count(*) AS total FROM bank_auth_flows WHERE owner=? AND status IN ('pending','exchanging') AND expires_at>?").bind(user.userId, now()).first<{ total: number }>();
+    if ((pending?.total ?? 0) >= 5) throw new BankError('Fem anslutningsförsök pågår. Slutför ett försök eller vänta tills det löper ut.', 429);
     const config = await providerConfig(app), info = await checkedApplication(app, true, lease);
     const available = await listBusinessBanks(config);
-    const bank = available.find(item => item.name === body.bankName && /^Swedbank\b/i.test(item.name) && item.country === 'SE' && item.psu_types.includes('business'));
-    if (!bank) throw new BankError('Den valda banken är inte tillgänglig för företagskonton i din anslutning.');
+    const bank = available.find(item => item.name === body.bankName && item.country === 'SE' && item.psu_types.includes('business'));
+    if (!bank) throw new ConsentError('BUSINESS_BANK_UNAVAILABLE', 409);
     if (!Number.isFinite(bank.maximum_consent_validity) || bank.maximum_consent_validity < 60) throw new BankError('Banken kunde inte ange en giltig period för anslutningen.');
     const validUntil = new Date(Date.now() + Math.min(bank.maximum_consent_validity, 90 * 86400) * 1000 - 30_000).toISOString();
     const state = randomToken(), cookie = randomToken(), stateHash = await digest(state), at = now();
+    const context: FlowContext = { version: 1, companyId: company.companyId, actorId: company.actorId, membershipVersion: company.membershipVersion,
+      mode: 'company',
+      flowId: uid(), requiredScopes, requestedValidUntil: validUntil, renewConnectionId: body.renewConnectionId as string || '',
+      previousSessionHash: existing?.encrypted_session ? await digest(existing.encrypted_session) : '' };
+    if ((await identity()).userId !== user.userId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
     await lease.write([
-      db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
-      db().prepare(`INSERT INTO bank_auth_flows (state_hash,owner,cookie_hash,app_generation,bank_name,country,environment,redirect_uri,date_from,expires_at,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`)
-        .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, BANK_REDIRECT_URL, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at),
+      db().prepare('DELETE FROM bank_auth_flows WHERE owner=? AND expires_at<?').bind(user.userId, new Date(Date.now() - 86400_000).toISOString()),
+      db().prepare(`INSERT INTO bank_auth_flows (state_hash,owner,cookie_hash,app_generation,bank_name,country,environment,redirect_uri,date_from,expires_at,status,created_at,context_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+        .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, BANK_REDIRECT_URL, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at, JSON.stringify(context)),
     ]);
     try {
       const result = await startAuth(config, { bank: { name: bank.name, country: bank.country }, state, redirectUrl: BANK_REDIRECT_URL, validUntil });
-      return Response.json({ url: result.url }, { headers: { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer', 'Set-Cookie': `${COOKIE}=${cookie}; Path=/api/bank/callback; Secure; HttpOnly; SameSite=Lax; Max-Age=900` } });
+      await lease.assert();
+      if ((await identity()).userId !== user.userId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+      return Response.json({ url: result.url, companyId: company.companyId, flowId: context.flowId, requiredScopes, authorization: 'provider_redirect', pkce: 'not_exposed_by_adapter' }, { headers: { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer', 'Set-Cookie': `${flowCookie(stateHash)}=${cookie}; Path=/api/bank/callback; Secure; HttpOnly; SameSite=Lax; Max-Age=900` } });
     } catch (error) {
-      await lease.run(db().prepare("UPDATE bank_auth_flows SET status='failed' WHERE state_hash=? AND owner=?").bind(stateHash, user.userId));
+      await lease.run(db().prepare("UPDATE bank_auth_flows SET status='failed',result_code='AUTHORIZATION_START_FAILED' WHERE state_hash=? AND owner=?").bind(stateHash, user.userId));
       throw error;
     }
   });
 }
 
-function callbackRedirect(result: string): Response {
+function callbackRedirect(result: string, cookieName?: string): Response {
   return new Response(null, { status: 303, headers: {
     Location: `/bank?result=${result}`, 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer',
-    'Set-Cookie': `${COOKIE}=; Path=/api/bank/callback; Secure; HttpOnly; SameSite=Lax; Max-Age=0`,
+    ...(cookieName ? { 'Set-Cookie': `${cookieName}=; Path=/api/bank/callback; Secure; HttpOnly; SameSite=Lax; Max-Age=0` } : {}),
   } });
 }
 
 export async function callback(request: Request): Promise<Response> {
-  const params = new URL(request.url).searchParams, state = params.get('state'), cookie = cookieValue(request, COOKIE);
-  if (params.getAll('state').length !== 1 || !validFlowToken(state) || !validFlowToken(cookie)) return callbackRedirect('expired');
+  const callbackUrl = new URL(request.url), params = callbackUrl.searchParams, state = params.get('state');
+  if (params.getAll('state').length !== 1 || !validFlowToken(state)) return callbackRedirect('expired');
+  let parsed: ReturnType<typeof validateCallbackParameters>;
+  try { parsed = validateCallbackParameters(params); } catch { return callbackRedirect('failed'); }
   let owner: string;
   try { owner = (await identity()).userId; } catch { return callbackRedirect('signin_required'); }
   const stateHash = await digest(state);
   const flow = await db().prepare('SELECT * FROM bank_auth_flows WHERE state_hash=?').bind(stateHash).first<BankFlowRow>();
   if (!flow || flow.status !== 'pending' || flow.expires_at <= now()) return callbackRedirect('expired');
+  const cookieName = flow.context_json ? flowCookie(stateHash) : COOKIE;
+  const cookie = cookieValue(request, cookieName);
+  if (!validFlowToken(cookie)) return callbackRedirect('expired');
   if (flow.owner !== owner || flow.cookie_hash !== await digest(cookie)) return callbackRedirect('wrong_user');
+  if (callbackUrl.origin + callbackUrl.pathname !== flow.redirect_uri) return callbackRedirect('failed');
+  if (!flow.context_json) return callbackRedirect('expired', cookieName);
   try {
+    const context = flowContext(flow);
     return await withBankLock(owner, async lease => {
+      await assertFlowActor(flow, context);
       const app = await application(owner);
       if (!app || app.generation !== flow.app_generation) return callbackRedirect('expired');
       const claimed = await lease.run(db().prepare("UPDATE bank_auth_flows SET status='exchanging' WHERE state_hash=? AND owner=? AND status='pending' AND expires_at>?").bind(stateHash, owner, now()));
       if (claimed.meta.changes !== 1) return callbackRedirect('expired');
-      if (params.has('error')) {
-        await lease.run(db().prepare("UPDATE bank_auth_flows SET status='cancelled' WHERE state_hash=?").bind(stateHash));
-        return callbackRedirect('cancelled');
+      if (parsed.error) {
+        const outcome = parsed.outcome || 'failed';
+        await lease.run(db().prepare('UPDATE bank_auth_flows SET status=?,result_code=? WHERE state_hash=? AND owner=? AND status=\'exchanging\'').bind(outcome, outcome === 'cancelled' ? 'IDENTIFICATION_CANCELLED' : outcome === 'denied' ? 'BANK_ACCESS_DENIED' : 'BANK_AUTHORIZATION_FAILED', stateHash, owner));
+        return callbackRedirect(outcome, cookieName);
       }
-      const code = params.get('code');
-      if (params.getAll('code').length !== 1 || !code || code.length > 4096) return callbackRedirect('failed');
       const config = await providerConfig(app);
-      let remoteSession = '';
+      let remoteSession = '', previousRemote = '', commitAttempted = false, replacedSessionRevoked = false;
+      const existing = await connection(owner);
+      const renewal = Boolean(context?.renewConnectionId);
+      let resultStatus = 'connected';
       try {
-        const result = await createSession(config, code);
+        if (renewal) {
+          if (!existing?.encrypted_session || existing.id !== context!.renewConnectionId || await digest(existing.encrypted_session) !== context!.previousSessionHash) throw new ConsentError('CONSENT_RENEWAL_CONFLICT', 409);
+          previousRemote = await revocationSessionId(existing);
+        } else if (existing?.encrypted_session) throw new BankError('Det finns redan en aktiv bankanslutning.', 409);
+        const result = await createSession(config, parsed.code!);
         remoteSession = result.session_id;
-        if (result.aspsp.name !== flow.bank_name || result.aspsp.country !== flow.country || result.psu_type !== 'business' || !Array.isArray(result.accounts) || result.accounts.length > 100 || !result.accounts.length) throw new BankError('Banken lämnade inga tillgängliga företagskonton.');
+        await assertFlowActor(flow, context);
+        await lease.assert();
+        if (previousRemote && remoteSession === previousRemote) throw new BankError('Banken återanvände det tidigare medgivandet.', 502);
         const checked = await getSession(config, result.session_id);
-        if (checked.status !== 'AUTHORIZED' || checked.aspsp.name !== flow.bank_name || checked.aspsp.country !== flow.country || checked.psu_type !== 'business') throw new BankError('Bankanslutningen är inte godkänd.');
-        const expiry = Date.parse(checked.access.valid_until);
-        if (!Number.isFinite(expiry) || expiry <= Date.now()) throw new BankError('Bankanslutningen har gått ut.');
-        const ids = result.accounts.map(account => account.uid);
-        if (new Set(ids).size !== ids.length || !ids.every(id => typeof id === 'string' && checked.accounts.includes(id))) throw new BankError('Kontona kunde inte verifieras.');
-        const id = uid(), at = now();
+        await assertFlowActor(flow, context);
+        await lease.assert();
+        const grant = validateEnableConsent({ session: result, checked, bankName: flow.bank_name, country: flow.country,
+          requestedValidUntil: context?.requestedValidUntil ?? result.access.valid_until, requestedScopes: context?.requiredScopes });
+        const company = bankCompanyContext(owner, context?.companyId);
+        const available = result.accounts.filter(account => grant.accountUids.includes(account.uid));
+        const authority = corporateAccountEvidence(company, flow.bank_name, flow.country, available, grant.validUntil) ??
+          { status: 'unverified' as const, reason: 'CORPORATE_AUTHORIZATION_REQUIRED' };
+        const validUntil = authority.status === 'verified' ? authority.validUntil : grant.validUntil;
+        const mode = context?.mode ?? 'legacy';
+        if (renewal && mode === 'company' && authority.status !== 'verified') throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED', 409);
+        const consent: ConsentMetadata = { version: 'bank-consent-v1', mode, companyId: company.companyId, actorId: company.actorId,
+          membershipVersion: company.membershipVersion, requestedScopes: context?.requiredScopes ?? ['accounts:read','transactions:read'],
+          grantedScopes: grant.grantedScopes, validUntil, corporateAuthorization: authority };
+        const id = renewal ? existing!.id : uid(), at = now();
+        const status = mode === 'company' ? authority.status === 'verified' ? 'pending_account' : 'corporate_authorization_required' : 'connected';
+        resultStatus = status === 'pending_account' ? 'select_account' : status;
         const encryptedSession = await encrypt(owner, `session:${id}`, result.session_id);
-        const encryptedAccounts = await encrypt(owner, `accounts:${id}`, result.accounts);
-        const existing = await connection(owner);
-        if (existing?.encrypted_session) throw new BankError('Det finns redan en aktiv bankanslutning.');
+        const encryptedAccounts = await encrypt(owner, `accounts:${id}`, available);
+        if (previousRemote) {
+          await assertFlowActor(flow, context);
+          // Remote deletion and the local replacement cannot be one atomic
+          // transaction. Record the potentially closed old session before the
+          // outbound request, so a lost response never leaves a usable claim.
+          const paused = await lease.run(db().prepare(`UPDATE bank_connections SET status='reauth_required',auto_sync_enabled=0,auto_next_at=NULL,
+            last_error='Förnyelsen påbörjade återkallelse av den tidigare sessionen. Kontrollera status eller förnya igen om svaret uteblir.',updated_at=?
+            WHERE owner=? AND id=? AND encrypted_session=? AND ?>strftime('%Y-%m-%dT%H:%M:%fZ','now')
+            AND EXISTS(SELECT 1 FROM bank_auth_flows WHERE state_hash=? AND owner=? AND status='exchanging' AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
+            .bind(now(), owner, existing!.id, existing!.encrypted_session, validUntil, stateHash, owner));
+          if (paused.meta.changes !== 1) throw new ConsentError('CONSENT_FLOW_EXPIRED', 409);
+          await lease.assert();
+          try { await deleteSession(config, previousRemote); }
+          catch (error) { if (!(error instanceof ProviderError) || error.code !== 'BANK_RECONNECT_REQUIRED') throw error; }
+          replacedSessionRevoked = true;
+        }
+        await assertFlowActor(flow, context);
+        if ((await application(owner))?.generation !== app.generation) throw new ConsentError('CONSENT_APPLICATION_CHANGED', 409);
+        // The existing lease and this flow/connection predicate fence the same
+        // atomic batch, including replacement races at D1's actual write boundary.
+        const connectionPredicate = renewal ? 'EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND encrypted_session=?)' : "NOT EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND encrypted_session<>'')";
+        const fence = db().prepare(`INSERT INTO bank_locks(owner,token,expires_at) VALUES(?,
+          (SELECT token FROM bank_locks WHERE owner=? AND EXISTS(SELECT 1 FROM bank_auth_flows WHERE state_hash=? AND owner=? AND status='exchanging' AND context_json=? AND cookie_hash=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+          AND ? > strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${connectionPredicate}),?) ON CONFLICT(owner) DO UPDATE SET token=excluded.token`)
+          .bind(owner, owner, stateHash, owner, flow.context_json, flow.cookie_hash, validUntil, owner,
+            ...(renewal ? [existing!.id, existing!.encrypted_session] : []), flow.expires_at);
+        commitAttempted = true;
         await lease.write([
-          db().prepare(`INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,auto_next_at=NULL,auto_last_attempt_at=NULL,retry_after='',sync_failures=0,created_at=excluded.created_at,updated_at=excluded.updated_at`)
-            .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', new Date(expiry).toISOString(), flow.date_from, 'connected', at, at),
-          db().prepare("UPDATE bank_auth_flows SET status='completed' WHERE state_hash=? AND owner=?").bind(stateHash, owner),
+          fence,
+          db().prepare(`INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at,consent_metadata)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,auto_sync_enabled=0,auto_next_at=NULL,auto_last_attempt_at=NULL,retry_after='',sync_failures=0,consent_metadata=excluded.consent_metadata,created_at=excluded.created_at,updated_at=excluded.updated_at`)
+            .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', validUntil, flow.date_from, status, at, at, JSON.stringify(consent)),
+          db().prepare("UPDATE bank_auth_flows SET status='completed',result_code=?,connection_id=? WHERE state_hash=? AND owner=? AND status='exchanging'").bind(authority.status === 'verified' ? 'BANK_CONSENT_APPROVED' : 'CORPORATE_AUTHORIZATION_REQUIRED', id, stateHash, owner),
         ]);
-        return callbackRedirect('connected');
-      } catch {
-        if (remoteSession) { try { await deleteSession(config, remoteSession); } catch { /* No local use of an unverified or unsaved provider session. */ } }
-        await lease.run(db().prepare("UPDATE bank_auth_flows SET status='failed' WHERE state_hash=? AND owner=?").bind(stateHash, owner));
-        return callbackRedirect('failed');
+        return callbackRedirect(resultStatus, cookieName);
+      } catch (error) {
+        // A lost commit response must never revoke a session now used locally.
+        if (commitAttempted) {
+          try {
+            const current = await connection(owner);
+            if (current?.encrypted_session && await revocationSessionId(current) === remoteSession) return callbackRedirect(resultStatus, cookieName);
+          } catch { return callbackRedirect('failed', cookieName); }
+        }
+        // A newer worker may own the remote session after this worker's lease
+        // expires. Cleanup is a mutation too: uncertain ownership leaves the
+        // unfinished flow visible until expiry and never revokes another run.
+        try { await lease.assert(); } catch { return callbackRedirect('failed', cookieName); }
+        if (remoteSession && remoteSession !== previousRemote) {
+          try {
+            const current = await connection(owner);
+            if (current?.encrypted_session && await revocationSessionId(current) === remoteSession) return callbackRedirect('failed', cookieName);
+            await lease.assert();
+            await deleteSession(config, remoteSession);
+          } catch { /* No local activation; the provider expiry remains the fallback. */ }
+        }
+        if (replacedSessionRevoked && existing) await lease.run(db().prepare("UPDATE bank_connections SET status='reauth_required',auto_sync_enabled=0,updated_at=? WHERE owner=? AND id=? AND encrypted_session=?").bind(now(), owner, existing.id, existing.encrypted_session));
+        const reason = error instanceof ConsentError ? error.code : 'BANK_AUTHORIZATION_FAILED';
+        await lease.run(db().prepare("UPDATE bank_auth_flows SET status='failed',result_code=? WHERE state_hash=? AND owner=? AND status='exchanging'").bind(reason, stateHash, owner));
+        return callbackRedirect(reason === 'CORPORATE_AUTHORIZATION_REQUIRED' ? 'corporate_authorization_required' : 'failed', cookieName);
       }
     });
-  } catch { return callbackRedirect('failed'); }
+  } catch (error) {
+    // A busy owner lock has not claimed this flow; preserve its browser binding
+    // so the user can retry the same callback while it is still pending.
+    return callbackRedirect(error instanceof Error && error.message === 'BANK_BUSY' ? 'retry' : 'failed', error instanceof Error && error.message === 'BANK_BUSY' ? undefined : cookieName);
+  }
 }
 
 export async function selectAccounts(request: Request): Promise<Response> {
   const user = await identity(request), body = await jsonBody(request);
+  checkedKeys(body, ['companyId','connectionId','accountUids','dateFrom']);
+  const company = bankCompanyContext(user.userId, body.companyId);
   if (!Array.isArray(body.accountUids) || body.accountUids.length < 1 || body.accountUids.length > 20 || body.accountUids.some(id => typeof id !== 'string')) throw new BankError('Välj mellan 1 och 20 konton.');
   return withBankLock(user.userId, async lease => {
-    const conn = await connection(user.userId);
-    if (!conn || conn.id !== body.connectionId || storedStatus(conn) !== 'connected') throw new BankError('Anslut banken igen innan du väljer konton.');
+    const conn = await connection(user.userId), app = await application(user.userId);
+    if (!conn || !app || app.generation !== conn.app_generation || conn.id !== body.connectionId || !['connected','pending_account','corporate_authorization_required'].includes(conn.status) || Date.parse(conn.valid_until) <= Date.now()) throw new BankError('Anslut banken igen innan du väljer konton.');
+    await assertCompanyConsent(conn);
     const available = await accounts(conn), selected = [...new Set(body.accountUids as string[])];
-    if (!selected.every(id => available.some(account => account.uid === id && account.currency === 'SEK' && stableAccountKey(account, { name: conn.bank_name, country: conn.country })))) throw new BankError('Endast tillgängliga SEK-konton med en stabil kontoidentifierare kan importeras.');
+    if (!selected.every(id => available.some(account => account.uid === id && account.currency === 'SEK' && account.usage !== 'PRIV' && stableAccountKey(account, { name: conn.bank_name, country: conn.country })))) throw new BankError('Endast tillgängliga SEK-konton med en stabil kontoidentifierare kan importeras.');
+    const savedConsent = consentMetadata(conn);
+    const authority = await currentCompanyAuthorization(conn);
+    if (savedConsent?.mode === 'company' && (authority.status !== 'verified' || selected.some(id => !authority.accountUids.includes(id)))) throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED', 409);
+    const live = await guardedBankRead(user.userId, conn, lease, async () => getSession(await providerConfig(app), await revocationSessionId(conn)));
+    const grant = validateEnableConsent({ session: { accounts: available, access: { valid_until: conn.valid_until }, aspsp: { name: conn.bank_name, country: conn.country }, psu_type: 'business' },
+      checked: live, bankName: conn.bank_name, country: conn.country, requestedValidUntil: conn.valid_until, requestedScopes: savedConsent?.requestedScopes });
+    if (!selected.every(id => grant.accountUids.includes(id))) throw new BankError('Kontot ingår inte längre i bankens medgivande.', 409);
+    if ((await identity()).userId !== company.actorId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+    bankCompanyContext(user.userId, savedConsent?.companyId ?? company.companyId);
+    const currentAuthority = await assertCompanyConsent(conn);
+    const validUntil = currentAuthority ? new Date(Math.min(Date.parse(grant.validUntil), Date.parse(currentAuthority.validUntil))).toISOString() : grant.validUntil;
     const from = body.dateFrom === undefined ? conn.date_from : dateFrom(body.dateFrom);
     const previous: string[] = JSON.parse(conn.selected_accounts);
     const scopeChanged = from !== conn.date_from || previous.length !== selected.length || previous.some(id => !selected.includes(id));
-    await lease.run(db().prepare('UPDATE bank_connections SET selected_accounts=?,date_from=?,last_synced_at=CASE WHEN ? THEN NULL ELSE last_synced_at END,updated_at=? WHERE owner=? AND id=?').bind(JSON.stringify(selected), from, Number(scopeChanged), now(), user.userId, conn.id));
+    const updated = await lease.run(db().prepare("UPDATE bank_connections SET selected_accounts=?,date_from=?,status='connected',valid_until=?,last_synced_at=CASE WHEN ? THEN NULL ELSE last_synced_at END,updated_at=? WHERE owner=? AND id=? AND encrypted_session=? AND ? > strftime('%Y-%m-%dT%H:%M:%fZ','now')")
+      .bind(JSON.stringify(selected), from, validUntil, Number(scopeChanged), now(), user.userId, conn.id, conn.encrypted_session, validUntil));
+    if (updated.meta.changes !== 1) throw new BankError('Bankanslutningen ändrades. Läs aktuell status och försök igen.', 409);
     return response({ message: 'Konton och startdatum är sparade. Du kan nu hämta bankhändelser.' });
   });
 }
 
 export async function disconnect(request: Request): Promise<Response> {
   const user = await identity(request);
+  const body = await jsonBody(request);
+  checkedKeys(body, ['companyId','connectionId']);
+  bankCompanyContext(user.userId, body.companyId);
   return withBankLock(user.userId, async lease => {
     const app = await application(user.userId), conn = await connection(user.userId);
-    if (!conn?.encrypted_session) return response({ message: 'Det finns ingen aktiv bankanslutning.' });
+    if (body.connectionId !== undefined && conn?.id !== body.connectionId) throw new BankError('Bankanslutningen tillhör inte företaget.', 404);
+    if (!conn?.encrypted_session) {
+      await lease.run(db().prepare("UPDATE bank_auth_flows SET status='cancelled',result_code='DISCONNECTED' WHERE owner=? AND status IN ('pending','exchanging')").bind(user.userId));
+      return response({ message: 'Det finns ingen aktiv bankanslutning.' });
+    }
     if (!app || app.generation !== conn.app_generation) {
       // Previously browser-uploaded keys are compromised and must never be used,
       // even to revoke a session. Detach locally and state the revocation limit.
@@ -316,20 +486,28 @@ export async function disconnect(request: Request): Promise<Response> {
       ]);
       return response({ message: 'Den lokala bankkopplingen är borttagen. Det tidigare medgivandet kunde inte återkallas med en betrodd servernyckel. Återkalla det hos Swedbank eller Enable Banking innan du ansluter igen.', remoteRevoked: false });
     }
-    const config = await providerConfig(app), remote = await sessionId(conn);
+    const config = await providerConfig(app), remote = await revocationSessionId(conn);
     // A failed revocation retains the credentials so the user can retry. Do not
     // tell the user bank access was revoked when the provider did not confirm it.
     try { await deleteSession(config, remote); }
     catch (error) {
       // The provider explicitly reports this session as expired/closed/missing.
       // Network failures or rejected application credentials are not confirmation.
-      if (!(error instanceof ProviderError) || error.code !== 'BANK_RECONNECT_REQUIRED') throw error;
+      if (!(error instanceof ProviderError) || error.code !== 'BANK_RECONNECT_REQUIRED') {
+        // Retain encrypted credentials only for retrying revocation; stop local use.
+        await lease.write([
+          db().prepare("UPDATE bank_connections SET status='revocation_pending',auto_sync_enabled=0,auto_next_at=NULL,updated_at=? WHERE owner=? AND id=? AND encrypted_session=?").bind(now(), user.userId, conn.id, conn.encrypted_session),
+          db().prepare("UPDATE bank_auth_flows SET status='cancelled',result_code='DISCONNECTED' WHERE owner=? AND status IN ('pending','exchanging')").bind(user.userId),
+        ]);
+        throw error;
+      }
     }
+    if ((await identity()).userId !== user.userId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
     await lease.write([
       db().prepare("UPDATE bank_connections SET status='disconnected',auto_sync_enabled=0,auto_next_at=NULL,encrypted_session='',encrypted_accounts='',selected_accounts='[]',last_error=NULL,updated_at=? WHERE owner=? AND id=?").bind(now(), user.userId, conn.id),
       db().prepare('DELETE FROM bank_auth_flows WHERE owner=?').bind(user.userId),
     ]);
-    return response({ message: 'Bankanslutningen är återkallad. Tidigare importerade bankhändelser finns kvar.' });
+    return response({ message: 'Bankkopplingen är frånkopplad och leverantörens session är avslutad. Kontrollera i banken om ett separat bankmedgivande behöver återkallas. Tidigare importerade bankhändelser finns kvar.', providerSessionRevoked: true, bankRevocationConfirmed: false });
   });
 }
 
@@ -342,6 +520,9 @@ function psuHeaders(request: Request) {
 
 export async function sync(request: Request): Promise<Response> {
   const user = await identity(request);
+  const body = await jsonBody(request);
+  checkedKeys(body, ['companyId']);
+  bankCompanyContext(user.userId, body.companyId);
   return synchronizeOwner(user.userId, { psu: psuHeaders(request) });
 }
 
@@ -354,10 +535,13 @@ export async function syncControl(request:Request):Promise<Response>{
 
 export async function setAutomaticSync(request: Request): Promise<Response> {
   const user = await identity(request), body = await jsonBody(request);
+  checkedKeys(body, ['companyId','connectionId','enabled']);
+  bankCompanyContext(user.userId, body.companyId);
   if (typeof body.enabled !== 'boolean' || typeof body.connectionId !== 'string') throw new BankError('Välj om automatisk hämtning ska vara på eller av.');
   return withBankLock(user.userId, async lease => {
     const conn = await connection(user.userId);
     if (!conn || conn.id !== body.connectionId || (body.enabled && (storedStatus(conn) !== 'connected' || !JSON.parse(conn.selected_accounts).length))) throw new BankError('Anslut och välj företagets konto först.');
+    if (body.enabled) await assertCompanyConsent(conn);
     await lease.run(db().prepare('UPDATE bank_connections SET auto_sync_enabled=?,auto_next_at=NULL,updated_at=? WHERE owner=? AND id=?').bind(body.enabled ? 1 : 0, now(), user.userId, conn.id));
     return response({ enabled: body.enabled, message: body.enabled ? 'Automatisk bankhämtning är aktiverad.' : 'Automatisk bankhämtning är pausad.' });
   });
@@ -387,6 +571,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
     const app = await application(user.userId), conn = await connection(user.userId);
     if (options.automatic && (!conn || conn.auto_sync_enabled !== 1)) return response({ automatic: true, due: false, reason: 'disabled', imported: 0 });
     if (!app || !conn || app.generation !== conn.app_generation || storedStatus(conn) !== 'connected') throw new BankError('En giltig bankanslutning behövs. Anslut banken igen.');
+    await assertCompanyConsent(conn);
     if(options.automatic&&conn.sync_failures>=3)return response({automatic:true,due:false,reason:'blocked',imported:0,error:'Automatisk bankhämtning är stoppad efter tre avbrutna eller misslyckade försök. Kontrollera anslutningen och gör en manuell hämtning.'});
     if(!options.control&&Date.parse(conn.retry_after||'')>Date.now()){
       if(options.automatic||options.control)return response({automatic:!!options.automatic,due:false,reason:'not_due',nextAttemptAt:conn.retry_after,imported:0});
@@ -424,19 +609,29 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       await lease.assert();
       const live = await guardedBankRead(user.userId, conn, lease, async () => getSession(config, await sessionId(conn)));
       await lease.assert();
-      const expiry = Date.parse(live.access.valid_until);
-      if (live.status !== 'AUTHORIZED' || !Number.isFinite(expiry) || expiry <= Date.now() || live.aspsp.name !== conn.bank_name || live.aspsp.country !== conn.country || live.psu_type !== 'business') {
+      let grant: ReturnType<typeof validateEnableConsent>;
+      try {
+        grant = validateEnableConsent({ session: { accounts: bankAccounts, access: { valid_until: conn.valid_until }, aspsp: { name: conn.bank_name, country: conn.country }, psu_type: 'business' },
+          checked: live, bankName: conn.bank_name, country: conn.country, requestedValidUntil: conn.valid_until, requestedScopes: consentMetadata(conn)?.requestedScopes });
+      } catch (error) {
         needsReauthorization = true;
         await lease.run(db().prepare("UPDATE bank_connections SET status='reauth_required',last_error=?,updated_at=? WHERE owner=? AND id=?").bind('Bankens medgivande är inte längre giltigt. Anslut banken igen.', now(), user.userId, conn.id));
-        throw new BankError('Bankens medgivande är inte längre giltigt. Anslut banken igen.');
+        throw error;
       }
       if (!selected.every(id => live.accounts.includes(id))) {
         needsReauthorization = true;
         throw new BankError('Ett valt konto ingår inte längre i bankens medgivande. Anslut banken igen.');
       }
-      const consentExpiresAt = Math.min(expiry, Date.parse(conn.valid_until));
+      const initialAuthority = await assertCompanyConsent(conn);
+      let consentExpiresAt = Math.min(Date.parse(grant.validUntil), Date.parse(initialAuthority?.validUntil ?? grant.validUntil));
+      const consentFence = () => db().prepare(`INSERT INTO bank_locks(owner,token,expires_at) VALUES(?,
+        (SELECT token FROM bank_locks WHERE owner=? AND EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND encrypted_session=? AND status='connected' AND valid_until>strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+        AND ?>strftime('%Y-%m-%dT%H:%M:%fZ','now')),?) ON CONFLICT(owner) DO UPDATE SET token=excluded.token`)
+        .bind(owner, owner, owner, conn.id, conn.encrypted_session, new Date(consentExpiresAt).toISOString(), new Date(consentExpiresAt).toISOString());
       const authorizeFetch = async () => {
         await lease.assert();
+        const authority = await assertCompanyConsent(conn);
+        consentExpiresAt = Math.min(consentExpiresAt, Date.parse(authority?.validUntil ?? grant.validUntil));
         if (!Number.isFinite(consentExpiresAt) || Date.now() >= consentExpiresAt) {
           needsReauthorization = true;
           throw new ProviderError('BANK_RECONNECT_REQUIRED', 'Bankmedgivandet gick ut under hämtningen. Anslut banken igen. Inga nya bankhändelser sparades.', 409);
@@ -494,7 +689,8 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
             if(!prepared.replayed){
               const saved=await lease.write([
                 db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(eventId,user.userId,old.revision+1,'bank.sync_rejected',JSON.stringify({message:error.message,connectionId:conn.id,from,to,retained_conflicts:prepared.conflicts,compact_hold:prepared.compact}),at,user.userId,old.revision),
-                db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(prepared.payload,at,user.userId,old.revision)
+                db().prepare('UPDATE workspaces SET payload=?,revision=revision+1,updated_at=? WHERE owner=? AND revision=?').bind(prepared.payload,at,user.userId,old.revision),
+                consentFence(),
               ]);
               if(saved[1].meta.changes!==1)throw new BankError('Registret ändrades under hämtningen. Uppdatera sidan och hämta igen. Inga bankhändelser skrevs över.',409);
             }
@@ -518,6 +714,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
           // Completion is part of the accepted import, never a later write that
           // could relabel already committed bank data as a failed attempt.
           jobEvent('completed'),
+          consentFence(),
         ]);
         if (committed[1].meta.changes !== 1) throw new BankError('Registret ändrades under hämtningen. Uppdatera sidan och hämta igen. Inga bankhändelser skrevs över.', 409);
       } else {
@@ -530,6 +727,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
           db().prepare('INSERT INTO bank_sync_runs (id,owner,connection_id,imported,skipped,warnings,test,created_at) VALUES (?,?,?,?,?,?,?,?)').bind(runId, user.userId, conn.id, 0, skipped, persistedWarnings(), test ? 1 : 0, at),
           db().prepare("UPDATE bank_connections SET last_synced_at=?,last_error=NULL,retry_after='',sync_failures=0,updated_at=? WHERE owner=? AND id=?").bind(at, at, user.userId, conn.id),
           jobEvent('completed'),
+          consentFence(),
         ]);
       }
       // Retention is housekeeping; a failed cleanup must not report a committed
