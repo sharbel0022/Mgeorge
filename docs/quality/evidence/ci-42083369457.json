@@ -1,0 +1,3285 @@
+{
+  "schemaVersion": 1,
+  "kind": "agent-8-quality-delivery-evidence",
+  "generatedAt": "2026-11-05T18:47:53.311555+00:00",
+  "repository": "sharbel0022/Mgeorge",
+  "branch": "feature/95-quality",
+  "pullRequest": "https://github.com/sharbel0022/Mgeorge/pull/47",
+  "status": "PASSED_FOR_DECLARED_SYNTHETIC_SCOPE",
+  "syntheticOnly": true,
+  "realBankVerification": "NOT_RUN",
+  "productionPerformance": "NOT_MEASURED",
+  "score": {
+    "target": 9.5,
+    "certified": false,
+    "existingCodeQualityScoreBefore": 8.5,
+    "existingCodeQualityScoreAfter": 8.5
+  },
+  "measuredSource": {
+    "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+    "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+    "branch": "",
+    "workingTreeDirty": false,
+    "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+    "fileCount": 1192,
+    "pullRequestHeadSha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+    "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+    "checkoutType": "GitHub pull_request merge checkout; exact tree equals branch head"
+  },
+  "runs": [
+    {
+      "id": 42083369457,
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42083369457",
+      "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T18:21:02Z",
+      "updated_at": "2026-11-05T18:32:39Z",
+      "run_attempt": 1
+    },
+    {
+      "id": 42083372075,
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42083372075",
+      "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T18:21:03Z",
+      "updated_at": "2026-11-05T18:23:58Z",
+      "run_attempt": 1
+    }
+  ],
+  "jobs": [
+    {
+      "id": 127442525311,
+      "name": "Chromium synthetic onboarding acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42083369457,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install locked browser tooling and run all synthetic UI scenarios",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain browser results, screenshots and source manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 127442525725,
+      "name": "Node 24.22.1",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42083369457,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 127442525914,
+      "name": "Sites types, tests and production build",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42083369457,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verified installs, types, audits, complete synthetic suite and production build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain Sites receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 127442525996,
+      "name": "Synthetic 1, 10 and 100 company performance",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42083369457,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Measure real SQLite work with synthetic companies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain workload, correctness and latency evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 127442526146,
+      "name": "Node 22.23.4",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42083369457,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 127442526150,
+      "name": "Bankgiro SFTP integration",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42083369457,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Locked install, syntax, audits and synthetic SSH SFTP HTTP recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain bridge receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 127441955518,
+      "name": "security_acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42083372075,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install locked dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install verified Sites dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Exercise synthetic authorization, isolation and recovery boundaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Retain synthetic acceptance evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ]
+    }
+  ],
+  "profiles": {
+    "node-22": {
+      "profile": "node",
+      "status": "PASSED",
+      "passed": true,
+      "syntheticOnly": true,
+      "realBankVerification": "NOT_RUN",
+      "productionPerformance": "NOT_MEASURED",
+      "source": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceAfter": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceChangedDuringRun": false,
+      "runtime": {
+        "node": "v22.23.4",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "github": {
+        "runId": "42083369457",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "pullRequestHeadSha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "installExecuted": true,
+      "startedAt": "2026-11-05T18:22:19.078Z",
+      "finishedAt": "2026-11-05T18:26:05.243Z",
+      "durationMs": 226165.804,
+      "receiptSha256": "0492b2aa2650152e774804c2cd69a0b398ddede57f64ead5274135cd4d2e0c64",
+      "reproduce": "npm run quality:node -- .codex-work/quality/new-run/node-22",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:19.082Z",
+          "finishedAt": "2026-11-05T18:22:22.214Z",
+          "durationMs": 3131.958,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/22.23.4/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "ci",
+              "--ignore-scripts",
+              "--no-audit",
+              "--no-fund"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "artifacts": [
+            {
+              "path": "install-node.stdout.log",
+              "bytes": 25,
+              "sha256": "a223d8572dc90213ef054c389efe2a7db29825b7d5f896410bf309a8413cf732"
+            },
+            {
+              "path": "install-node.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "syntax",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:22.214Z",
+          "finishedAt": "2026-11-05T18:22:26.466Z",
+          "durationMs": 4251.475,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/22.23.4/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "check"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "artifacts": [
+            {
+              "path": "syntax.stdout.log",
+              "bytes": 103,
+              "sha256": "8bd11c9f00a2655d177e81d86fed9101b6e1ec28fdbdb57e190e917b0c7b0523"
+            },
+            {
+              "path": "syntax.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:26.467Z",
+          "finishedAt": "2026-11-05T18:22:26.776Z",
+          "durationMs": 308.539,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/22.23.4/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high",
+              "--omit=dev"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-production.stdout.log",
+              "bytes": 361,
+              "sha256": "3a562f88d81e7f36d2e3d0d1a86abf500fdf10272f5f713a155b3602d8ebf832"
+            },
+            {
+              "path": "audit-production.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:26.778Z",
+          "finishedAt": "2026-11-05T18:22:27.065Z",
+          "durationMs": 287.668,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/22.23.4/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-all.stdout.log",
+              "bytes": 361,
+              "sha256": "3a562f88d81e7f36d2e3d0d1a86abf500fdf10272f5f713a155b3602d8ebf832"
+            },
+            {
+              "path": "audit-all.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "node-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:27.147Z",
+          "finishedAt": "2026-11-05T18:26:05.161Z",
+          "durationMs": 218013.863,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+            "args": [
+              "--import",
+              "/home/runner/work/Mgeorge/Mgeorge/scripts/saas-test-isolation.mjs",
+              "--experimental-strip-types",
+              "--test",
+              "--test-concurrency=1",
+              "--test-timeout=180000",
+              "--test-reporter=tap",
+              "--test-reporter-destination=stdout",
+              "--test-reporter=junit",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-node/tests/tests.junit.xml",
+              "--experimental-test-coverage",
+              "--test-reporter=lcov",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-node/tests/coverage.lcov",
+              "--test-coverage-include=src/**",
+              "--test-coverage-include=sites/lib/**",
+              "--test-coverage-exclude=**/node_modules/**",
+              "--test-coverage-exclude=**/test/**",
+              "--test-coverage-exclude=**/tests/**",
+              "test/absence-api-q8.test.js",
+              "test/absence-integrity-q8.test.js",
+              "test/api-account-consent.test.js",
+              "test/api.test.js",
+              "test/automatic-payment-safety.test.js",
+              "test/backup-configuration.test.js",
+              "test/backup-disaster-recovery.test.js",
+              "test/backup-integrity-q8.test.js",
+              "test/backup-reference-integrity-final.test.js",
+              "test/backup.test.js",
+              "test/bank-api.test.js",
+              "test/bank-consent-api.test.js",
+              "test/bank-date-recovery.test.js",
+              "test/bank-evidence-q8.test.js",
+              "test/bank-import-api-q8.test.js",
+              "test/bank-reference-storage.test.js",
+              "test/bank-sync-date-api.test.js",
+              "test/bank-ui.test.js",
+              "test/bank-xlsx-ui.test.js",
+              "test/bank-xlsx.test.js",
+              "test/bank.test.js",
+              "test/bankgiro-ingest.test.js",
+              "test/bankgiro-links-api.test.js",
+              "test/bankgiro-links.test.js",
+              "test/camt-integrity.test.js",
+              "test/cloud-ocr-trigger.test.js",
+              "test/company-api.test.js",
+              "test/company-bank-account-key.test.js",
+              "test/company-bank-sync-fairness.test.js",
+              "test/company-bank-sync-legacy-binding.test.js",
+              "test/company-bank-sync-scheduler.test.js",
+              "test/company-bank-sync-store.test.js",
+              "test/company-bank-sync.test.js",
+              "test/company-bankgiro-legacy-binding.test.js",
+              "test/company-boundary.test.js",
+              "test/company-client.test.js",
+              "test/company-contract.test.js",
+              "test/company-gmail-scheduler-integration.test.js",
+              "test/company-reconciliation-gate.test.js",
+              "test/company-reconciliation.test.js",
+              "test/company-reference-policy-bridge.test.js",
+              "test/company-ui.test.js",
+              "test/customer-messages-api.test.js",
+              "test/customer-messages.test.js",
+              "test/db.test.js",
+              "test/document-quality-cycle.test.js",
+              "test/document-registration-outcome.test.js",
+              "test/document-triage.test.js",
+              "test/file-account-evidence.test.js",
+              "test/gmail-adapter-reliability.test.js",
+              "test/gmail-additions.test.js",
+              "test/gmail-api.test.js",
+              "test/gmail-retry-automation.test.js",
+              "test/gmail-send.test.js",
+              "test/gmail.test.js",
+              "test/importers.test.js",
+              "test/integration-job-api.test.js",
+              "test/integration-job-status-api.test.js",
+              "test/integration-jobs-backup.test.js",
+              "test/integration-jobs-orchestration.test.js",
+              "test/integration-jobs.test.js",
+              "test/invoice-evidence-ocr.test.js",
+              "test/invoice-extraction.test.js",
+              "test/invoice-parser-corpus-q8.test.js",
+              "test/invoice-reference-integration.test.js",
+              "test/invoice-reference-policy.test.js",
+              "test/invoice-summary-labels.test.js",
+              "test/manual-allocation-evidence-api.test.js",
+              "test/message-evidence-projection.test.js",
+              "test/node-company-bank-sync.test.js",
+              "test/node-payments-quality-cycle.test.js",
+              "test/ocr-quality-metrics.test.js",
+              "test/openpayments-bankgiro-ingest.test.js",
+              "test/openpayments-company-bank-sync-normalization.test.js",
+              "test/openpayments-company-bank-sync.test.js",
+              "test/openpayments-node-transport.test.js",
+              "test/payer-completion-conflict.test.js",
+              "test/payer-evidence.test.js",
+              "test/payer-verification-atomic.test.js",
+              "test/payment-acceptance-quality8.test.js",
+              "test/payment-concurrency.test.js",
+              "test/payment-control-api.test.js",
+              "test/payment-control-receipts-q8.test.js",
+              "test/payment-control-ui.test.js",
+              "test/payment-control.test.js",
+              "test/payment-evidence-ui.test.js",
+              "test/payment-identity-evidence-final.test.js",
+              "test/payment-reference-sources.test.js",
+              "test/payment-references.test.js",
+              "test/pdf-layout-ocr.test.js",
+              "test/pdf-text-reconstruction.test.js",
+              "test/quality-benchmark.test.js",
+              "test/quality-regressions-contracts.test.js",
+              "test/quality-regressions-migration-replay.test.js",
+              "test/quality-regressions-recovery-api.test.js",
+              "test/quality-runner.test.js",
+              "test/quality-syntax.test.js",
+              "test/reconciliation-contract-integrity.test.js",
+              "test/reconciliation-contract.test.js",
+              "test/reconciliation-normalization-final.test.js",
+              "test/reconciliation-payer-index-final.test.js",
+              "test/reconciliation-preview.test.js",
+              "test/reconciliation.test.js",
+              "test/reference-evidence-compat.test.js",
+              "test/saas-company-acceptance.test.js",
+              "test/saas-login-boundary.test.js",
+              "test/saas-test-isolation.test.js",
+              "test/security-session-allocation.test.js",
+              "test/session-mutation-fence.test.js",
+              "test/sites-ocr-pull.test.js",
+              "test/ui-final-node.test.js",
+              "test/workspace-search-quality8.test.js"
+            ],
+            "cwd": "."
+          },
+          "totals": {
+            "tests": 2023,
+            "pass": 2023,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "coverage": {
+            "requested": true,
+            "measured": true,
+            "scope": "loaded production files only; unimported files are not measured",
+            "files": 97,
+            "lines": {
+              "covered": 15484,
+              "total": 32264,
+              "percent": 47.99
+            },
+            "functions": {
+              "covered": 2456,
+              "total": 4269,
+              "percent": 57.53
+            },
+            "branches": {
+              "covered": 9316,
+              "total": 13045,
+              "percent": 71.41
+            }
+          },
+          "failures": [],
+          "artifacts": [
+            {
+              "path": "tests.tap",
+              "bytes": 508057,
+              "sha256": "834886d2af1180db40ec71ca7aa8bc00369abaca4aef8fc564a27759d791ba2b"
+            },
+            {
+              "path": "tests.junit.xml",
+              "bytes": 279467,
+              "sha256": "60e018d3988a31014cf0e0b2c5263b2bb4797457c7c16e93d0ae2e6b67412aec"
+            },
+            {
+              "path": "coverage.lcov",
+              "bytes": 700515,
+              "sha256": "a9746dc8636f56f20109d0970cde0aa985d510b2bb9ee60d77cd1c70d4a4c271"
+            },
+            {
+              "path": "source-manifest.json",
+              "bytes": 213698,
+              "sha256": "325f8eb9bc303eb720b1b3793455202719e78d07da3fc00da05e7119c05dd576"
+            }
+          ],
+          "artifactDirectory": "tests"
+        }
+      ]
+    },
+    "node-24": {
+      "profile": "node",
+      "status": "PASSED",
+      "passed": true,
+      "syntheticOnly": true,
+      "realBankVerification": "NOT_RUN",
+      "productionPerformance": "NOT_MEASURED",
+      "source": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceAfter": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceChangedDuringRun": false,
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 7763 64-Core Processor"
+      },
+      "github": {
+        "runId": "42083369457",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "pullRequestHeadSha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "installExecuted": true,
+      "startedAt": "2026-11-05T18:22:18.928Z",
+      "finishedAt": "2026-11-05T18:25:39.292Z",
+      "durationMs": 200364.596,
+      "receiptSha256": "51853c1565fedfdfc888b2d86973239a7db62e31800184b6a29e3f16bb96ef11",
+      "reproduce": "npm run quality:node -- .codex-work/quality/new-run/node-24",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:18.934Z",
+          "finishedAt": "2026-11-05T18:22:20.318Z",
+          "durationMs": 1383.44,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "ci",
+              "--ignore-scripts",
+              "--no-audit",
+              "--no-fund"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "artifacts": [
+            {
+              "path": "install-node.stdout.log",
+              "bytes": 25,
+              "sha256": "a786805e292bdfafb821a7a5f96a28b26caa93d105e429e3eba2a854ec60f37e"
+            },
+            {
+              "path": "install-node.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "syntax",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:20.319Z",
+          "finishedAt": "2026-11-05T18:22:25.591Z",
+          "durationMs": 5272.443,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "check"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "artifacts": [
+            {
+              "path": "syntax.stdout.log",
+              "bytes": 103,
+              "sha256": "8bd11c9f00a2655d177e81d86fed9101b6e1ec28fdbdb57e190e917b0c7b0523"
+            },
+            {
+              "path": "syntax.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:25.593Z",
+          "finishedAt": "2026-11-05T18:22:26.002Z",
+          "durationMs": 409.417,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high",
+              "--omit=dev"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-production.stdout.log",
+              "bytes": 361,
+              "sha256": "3a562f88d81e7f36d2e3d0d1a86abf500fdf10272f5f713a155b3602d8ebf832"
+            },
+            {
+              "path": "audit-production.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:26.004Z",
+          "finishedAt": "2026-11-05T18:22:26.402Z",
+          "durationMs": 398.054,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-all.stdout.log",
+              "bytes": 361,
+              "sha256": "3a562f88d81e7f36d2e3d0d1a86abf500fdf10272f5f713a155b3602d8ebf832"
+            },
+            {
+              "path": "audit-all.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "node-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:26.496Z",
+          "finishedAt": "2026-11-05T18:25:39.196Z",
+          "durationMs": 192699.17,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "--import",
+              "/home/runner/work/Mgeorge/Mgeorge/scripts/saas-test-isolation.mjs",
+              "--experimental-strip-types",
+              "--test",
+              "--test-concurrency=1",
+              "--test-timeout=180000",
+              "--test-reporter=tap",
+              "--test-reporter-destination=stdout",
+              "--test-reporter=junit",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-node/tests/tests.junit.xml",
+              "--experimental-test-coverage",
+              "--test-reporter=lcov",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-node/tests/coverage.lcov",
+              "--test-coverage-include=src/**",
+              "--test-coverage-include=sites/lib/**",
+              "--test-coverage-exclude=**/node_modules/**",
+              "--test-coverage-exclude=**/test/**",
+              "--test-coverage-exclude=**/tests/**",
+              "test/absence-api-q8.test.js",
+              "test/absence-integrity-q8.test.js",
+              "test/api-account-consent.test.js",
+              "test/api.test.js",
+              "test/automatic-payment-safety.test.js",
+              "test/backup-configuration.test.js",
+              "test/backup-disaster-recovery.test.js",
+              "test/backup-integrity-q8.test.js",
+              "test/backup-reference-integrity-final.test.js",
+              "test/backup.test.js",
+              "test/bank-api.test.js",
+              "test/bank-consent-api.test.js",
+              "test/bank-date-recovery.test.js",
+              "test/bank-evidence-q8.test.js",
+              "test/bank-import-api-q8.test.js",
+              "test/bank-reference-storage.test.js",
+              "test/bank-sync-date-api.test.js",
+              "test/bank-ui.test.js",
+              "test/bank-xlsx-ui.test.js",
+              "test/bank-xlsx.test.js",
+              "test/bank.test.js",
+              "test/bankgiro-ingest.test.js",
+              "test/bankgiro-links-api.test.js",
+              "test/bankgiro-links.test.js",
+              "test/camt-integrity.test.js",
+              "test/cloud-ocr-trigger.test.js",
+              "test/company-api.test.js",
+              "test/company-bank-account-key.test.js",
+              "test/company-bank-sync-fairness.test.js",
+              "test/company-bank-sync-legacy-binding.test.js",
+              "test/company-bank-sync-scheduler.test.js",
+              "test/company-bank-sync-store.test.js",
+              "test/company-bank-sync.test.js",
+              "test/company-bankgiro-legacy-binding.test.js",
+              "test/company-boundary.test.js",
+              "test/company-client.test.js",
+              "test/company-contract.test.js",
+              "test/company-gmail-scheduler-integration.test.js",
+              "test/company-reconciliation-gate.test.js",
+              "test/company-reconciliation.test.js",
+              "test/company-reference-policy-bridge.test.js",
+              "test/company-ui.test.js",
+              "test/customer-messages-api.test.js",
+              "test/customer-messages.test.js",
+              "test/db.test.js",
+              "test/document-quality-cycle.test.js",
+              "test/document-registration-outcome.test.js",
+              "test/document-triage.test.js",
+              "test/file-account-evidence.test.js",
+              "test/gmail-adapter-reliability.test.js",
+              "test/gmail-additions.test.js",
+              "test/gmail-api.test.js",
+              "test/gmail-retry-automation.test.js",
+              "test/gmail-send.test.js",
+              "test/gmail.test.js",
+              "test/importers.test.js",
+              "test/integration-job-api.test.js",
+              "test/integration-job-status-api.test.js",
+              "test/integration-jobs-backup.test.js",
+              "test/integration-jobs-orchestration.test.js",
+              "test/integration-jobs.test.js",
+              "test/invoice-evidence-ocr.test.js",
+              "test/invoice-extraction.test.js",
+              "test/invoice-parser-corpus-q8.test.js",
+              "test/invoice-reference-integration.test.js",
+              "test/invoice-reference-policy.test.js",
+              "test/invoice-summary-labels.test.js",
+              "test/manual-allocation-evidence-api.test.js",
+              "test/message-evidence-projection.test.js",
+              "test/node-company-bank-sync.test.js",
+              "test/node-payments-quality-cycle.test.js",
+              "test/ocr-quality-metrics.test.js",
+              "test/openpayments-bankgiro-ingest.test.js",
+              "test/openpayments-company-bank-sync-normalization.test.js",
+              "test/openpayments-company-bank-sync.test.js",
+              "test/openpayments-node-transport.test.js",
+              "test/payer-completion-conflict.test.js",
+              "test/payer-evidence.test.js",
+              "test/payer-verification-atomic.test.js",
+              "test/payment-acceptance-quality8.test.js",
+              "test/payment-concurrency.test.js",
+              "test/payment-control-api.test.js",
+              "test/payment-control-receipts-q8.test.js",
+              "test/payment-control-ui.test.js",
+              "test/payment-control.test.js",
+              "test/payment-evidence-ui.test.js",
+              "test/payment-identity-evidence-final.test.js",
+              "test/payment-reference-sources.test.js",
+              "test/payment-references.test.js",
+              "test/pdf-layout-ocr.test.js",
+              "test/pdf-text-reconstruction.test.js",
+              "test/quality-benchmark.test.js",
+              "test/quality-regressions-contracts.test.js",
+              "test/quality-regressions-migration-replay.test.js",
+              "test/quality-regressions-recovery-api.test.js",
+              "test/quality-runner.test.js",
+              "test/quality-syntax.test.js",
+              "test/reconciliation-contract-integrity.test.js",
+              "test/reconciliation-contract.test.js",
+              "test/reconciliation-normalization-final.test.js",
+              "test/reconciliation-payer-index-final.test.js",
+              "test/reconciliation-preview.test.js",
+              "test/reconciliation.test.js",
+              "test/reference-evidence-compat.test.js",
+              "test/saas-company-acceptance.test.js",
+              "test/saas-login-boundary.test.js",
+              "test/saas-test-isolation.test.js",
+              "test/security-session-allocation.test.js",
+              "test/session-mutation-fence.test.js",
+              "test/sites-ocr-pull.test.js",
+              "test/ui-final-node.test.js",
+              "test/workspace-search-quality8.test.js"
+            ],
+            "cwd": "."
+          },
+          "totals": {
+            "tests": 2023,
+            "pass": 2023,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "coverage": {
+            "requested": true,
+            "measured": true,
+            "scope": "loaded production files only; unimported files are not measured",
+            "files": 97,
+            "lines": {
+              "covered": 15487,
+              "total": 32264,
+              "percent": 48
+            },
+            "functions": {
+              "covered": 2456,
+              "total": 4270,
+              "percent": 57.52
+            },
+            "branches": {
+              "covered": 9316,
+              "total": 13060,
+              "percent": 71.33
+            }
+          },
+          "failures": [],
+          "artifacts": [
+            {
+              "path": "tests.tap",
+              "bytes": 494692,
+              "sha256": "e3bbd0f6a122295d63eb5f8cdacfe1560a60be2648605740cb60b5ad2e12a3bf"
+            },
+            {
+              "path": "tests.junit.xml",
+              "bytes": 436685,
+              "sha256": "78844f0c816348fe493ad057b8f62e939aebaac8911e6316223c44f4f101b80b"
+            },
+            {
+              "path": "coverage.lcov",
+              "bytes": 700842,
+              "sha256": "cc63e65e644f9ce847e6278db2280be656b9f5cd315a77f2231fbb2647cbad4e"
+            },
+            {
+              "path": "source-manifest.json",
+              "bytes": 213698,
+              "sha256": "325f8eb9bc303eb720b1b3793455202719e78d07da3fc00da05e7119c05dd576"
+            }
+          ],
+          "artifactDirectory": "tests"
+        }
+      ]
+    },
+    "sites": {
+      "profile": "sites",
+      "status": "PASSED",
+      "passed": true,
+      "syntheticOnly": true,
+      "realBankVerification": "NOT_RUN",
+      "productionPerformance": "NOT_MEASURED",
+      "source": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceAfter": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceChangedDuringRun": false,
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "github": {
+        "runId": "42083369457",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "pullRequestHeadSha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "installExecuted": true,
+      "startedAt": "2026-11-05T18:22:17.091Z",
+      "finishedAt": "2026-11-05T18:32:32.697Z",
+      "durationMs": 615605.906,
+      "receiptSha256": "dc70c75c6a8d4e0349e254d79a28e83e30addb85b3b9411ab475e1aa838f5ff9",
+      "reproduce": "npm run quality:sites -- .codex-work/quality/new-run/sites",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:17.096Z",
+          "finishedAt": "2026-11-05T18:22:19.184Z",
+          "durationMs": 2088.181,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "ci",
+              "--ignore-scripts",
+              "--no-audit",
+              "--no-fund"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "artifacts": [
+            {
+              "path": "install-node.stdout.log",
+              "bytes": 25,
+              "sha256": "d8278ab3aceabe4471979c192f32e868850cdcd8138b9d49c50efa297e003b92"
+            },
+            {
+              "path": "install-node.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "install-sites",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:19.185Z",
+          "finishedAt": "2026-11-05T18:22:41.140Z",
+          "durationMs": 21954.706,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "install:ci"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+          },
+          "artifacts": [
+            {
+              "path": "install-sites.stdout.log",
+              "bytes": 327,
+              "sha256": "06c834604f8e93c4edd9bdf871426e601a9cb5559bb9319e8622c3d510ef2032"
+            },
+            {
+              "path": "install-sites.stderr.log",
+              "bytes": 898,
+              "sha256": "2a26cd0f5b146200b9b06d5d8f0e0f79df7380b7f5789d4eb752a157e042f77b"
+            }
+          ]
+        },
+        {
+          "name": "install-bridge",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:41.141Z",
+          "finishedAt": "2026-11-05T18:22:41.664Z",
+          "durationMs": 522.731,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "ci",
+              "--ignore-scripts",
+              "--no-audit",
+              "--no-fund"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+          },
+          "artifacts": [
+            {
+              "path": "install-bridge.stdout.log",
+              "bytes": 27,
+              "sha256": "76d9ec86462e2afd6ee7fd02e1e0f4ffdc02931473039e57c69960280d4c262e"
+            },
+            {
+              "path": "install-bridge.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "minimatch-mitigation",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:41.665Z",
+          "finishedAt": "2026-11-05T18:22:41.980Z",
+          "durationMs": 314.847,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "scripts/minimatch-backport.mjs",
+              "--check",
+              "--require-target"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+          },
+          "artifacts": [
+            {
+              "path": "minimatch-mitigation.stdout.log",
+              "bytes": 66,
+              "sha256": "03436c145f530b2840b889abbdfdc8cc588772302aa0ee8e3a20bf5daf58620c"
+            },
+            {
+              "path": "minimatch-mitigation.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "typecheck",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:41.981Z",
+          "finishedAt": "2026-11-05T18:22:52.776Z",
+          "durationMs": 10794.878,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "check"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+          },
+          "artifacts": [
+            {
+              "path": "typecheck.stdout.log",
+              "bytes": 87,
+              "sha256": "9a9df77b5312302129b33fb17ad560345605c381f472ccc40b22c19fa369cebf"
+            },
+            {
+              "path": "typecheck.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:52.777Z",
+          "finishedAt": "2026-11-05T18:22:53.312Z",
+          "durationMs": 535.5,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high",
+              "--omit=dev"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-production.stdout.log",
+              "bytes": 367,
+              "sha256": "7323c656c0262fdd461ba3aaa1571d85c8858a17d76f87f78f9fd12f95a55e2a"
+            },
+            {
+              "path": "audit-production.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:53.314Z",
+          "finishedAt": "2026-11-05T18:23:34.353Z",
+          "durationMs": 41038.956,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 8,
+              "high": 0,
+              "critical": 0,
+              "total": 8
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-all.stdout.log",
+              "bytes": 5251,
+              "sha256": "065db792a1ca84c25501d3546d435d10efd3963b259b25e6bf45d4b3e4ed637c"
+            },
+            {
+              "path": "audit-all.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "sites-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:23:34.458Z",
+          "finishedAt": "2026-11-05T18:32:17.968Z",
+          "durationMs": 523510.33,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "--import",
+              "/home/runner/work/Mgeorge/Mgeorge/scripts/saas-test-isolation.mjs",
+              "--experimental-strip-types",
+              "--test",
+              "--test-concurrency=1",
+              "--test-timeout=180000",
+              "--test-reporter=tap",
+              "--test-reporter-destination=stdout",
+              "--test-reporter=junit",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-sites/tests/tests.junit.xml",
+              "--experimental-test-coverage",
+              "--test-reporter=lcov",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-sites/tests/coverage.lcov",
+              "--test-coverage-include=lib/**",
+              "--test-coverage-include=app/**",
+              "--test-coverage-include=components/**",
+              "--test-coverage-include=../src/**",
+              "--test-coverage-exclude=**/node_modules/**",
+              "--test-coverage-exclude=**/test/**",
+              "--test-coverage-exclude=**/tests/**",
+              "tests/account-evidence-retry-presentation.test.mjs",
+              "tests/account-read-cooldown.test.mjs",
+              "tests/automatic-payment-eligibility.test.mjs",
+              "tests/automatic-report-source-eligibility.test.mjs",
+              "tests/backup-integrity-q8.test.mjs",
+              "tests/backup-recovery.test.mjs",
+              "tests/backup-reference-integrity-final.test.mjs",
+              "tests/backup.test.mjs",
+              "tests/bank-absence-ui-q8.test.mjs",
+              "tests/bank-account-commit.test.mjs",
+              "tests/bank-account-consent.test.mjs",
+              "tests/bank-account-evidence-contract.test.mjs",
+              "tests/bank-account-evidence-provider.test.mjs",
+              "tests/bank-account-evidence.test.mjs",
+              "tests/bank-api-backup-q8.test.mjs",
+              "tests/bank-api-original-q8.test.mjs",
+              "tests/bank-company-authority.test.mjs",
+              "tests/bank-consent-policy.test.mjs",
+              "tests/bank-details.test.mjs",
+              "tests/bank-file-provenance.test.mjs",
+              "tests/bank-list-final.test.mjs",
+              "tests/bank-original-quality-cycle.test.mjs",
+              "tests/bank-payment-ui.test.mjs",
+              "tests/bank-state-integrity-q8.test.mjs",
+              "tests/bank-sync-integrity-q8.test.mjs",
+              "tests/bank-sync-periods.test.mjs",
+              "tests/bankgiro-api.test.mjs",
+              "tests/bankgiro-authority.test.mjs",
+              "tests/bankgiro-availability.test.mjs",
+              "tests/bankgiro-http-source.test.mjs",
+              "tests/bankgiro-import-schedule.test.mjs",
+              "tests/bankgiro-ingest-backup.test.mjs",
+              "tests/bankgiro-ingest-mcp.test.mjs",
+              "tests/bankgiro-ingest-service.test.mjs",
+              "tests/bankgiro-ingest.test.mjs",
+              "tests/bankgiro-link-details.test.mjs",
+              "tests/bankgiro-link-presentation.test.mjs",
+              "tests/bankgiro-links-api.test.mjs",
+              "tests/bankgiro-links.test.mjs",
+              "tests/bankgiro-readiness-joined.test.mjs",
+              "tests/bankgiro-retained-preview.test.mjs",
+              "tests/bankgiro-sftp-e2e.test.mjs",
+              "tests/bankgiro-source-status.test.mjs",
+              "tests/bankgiro-xlsx-integration.test.mjs",
+              "tests/bankgiro-xlsx.test.mjs",
+              "tests/bankgiro.test.mjs",
+              "tests/banking-provider.test.mjs",
+              "tests/banking-security.test.mjs",
+              "tests/camt-integrity.test.mjs",
+              "tests/cloud-ocr.test.mjs",
+              "tests/company-backup.test.mjs",
+              "tests/company-bank-sync-backup.test.mjs",
+              "tests/company-bank-sync.test.mjs",
+              "tests/company-bankgiro.test.mjs",
+              "tests/company-client.test.mjs",
+              "tests/company-contract.test.mjs",
+              "tests/company-fixture-contract.test.mjs",
+              "tests/company-reconciliation.test.mjs",
+              "tests/company-request.test.mjs",
+              "tests/company-storage.test.mjs",
+              "tests/company-sync-boundary-integration.test.mjs",
+              "tests/company-sync-scale.test.mjs",
+              "tests/company-workspace-ui.test.mjs",
+              "tests/control-review-focus-q8.test.mjs",
+              "tests/customer-messages.test.mjs",
+              "tests/dashboard-loading-ui-q8.test.mjs",
+              "tests/dialog-return-focus-final.test.mjs",
+              "tests/document-quality-cycle.test.mjs",
+              "tests/document-queue-recovery.test.mjs",
+              "tests/domain.test.mjs",
+              "tests/economy-quality-cycle.test.mjs",
+              "tests/economy-readiness-final.test.mjs",
+              "tests/economy.test.mjs",
+              "tests/evidence-loading-final.test.mjs",
+              "tests/file-upload-concurrency-final.test.mjs",
+              "tests/file-upload-integrity-final.test.mjs",
+              "tests/gmail-adapter-reliability.test.mjs",
+              "tests/gmail-loading-ui-q8.test.mjs",
+              "tests/gmail-operational-status-ui.test.mjs",
+              "tests/gmail-pdf-cross-flow.test.mjs",
+              "tests/gmail-preview-q8.test.mjs",
+              "tests/gmail-upload-concurrency-final.test.mjs",
+              "tests/gmail.test.mjs",
+              "tests/import-job-overview.test.mjs",
+              "tests/import-job-route.test.mjs",
+              "tests/import-job-status.test.mjs",
+              "tests/invoice-candidates.test.mjs",
+              "tests/invoice-evidence-ocr.test.mjs",
+              "tests/invoice-list-final.test.mjs",
+              "tests/invoice-parser-corpus-q8.test.mjs",
+              "tests/invoice-reference-integration.test.mjs",
+              "tests/invoice-reference-policy.test.mjs",
+              "tests/invoice-summary-labels.test.mjs",
+              "tests/manual-invoice-ocr.test.mjs",
+              "tests/manual-return-allocation.test.mjs",
+              "tests/mcp-evidence-read.test.mjs",
+              "tests/mcp-security-q8.test.mjs",
+              "tests/minimatch-backport-final.test.mjs",
+              "tests/minimatch-entrypoints-final.test.mjs",
+              "tests/navigation-history-q8.test.mjs",
+              "tests/navigation-q8.test.mjs",
+              "tests/openpayments-account-state.test.mjs",
+              "tests/openpayments-bankgiro.test.mjs",
+              "tests/openpayments-capture.test.mjs",
+              "tests/openpayments-company-sync.test.mjs",
+              "tests/openpayments-domain.test.mjs",
+              "tests/openpayments-expired-revocation.test.mjs",
+              "tests/openpayments-format.test.mjs",
+              "tests/openpayments-http.test.mjs",
+              "tests/openpayments-ingest.test.mjs",
+              "tests/openpayments-lifecycle.test.mjs",
+              "tests/openpayments-policy.test.mjs",
+              "tests/openpayments-provider.test.mjs",
+              "tests/openpayments-raw-receipt.test.mjs",
+              "tests/openpayments-request-boundary.test.mjs",
+              "tests/openpayments-transport.test.mjs",
+              "tests/payer-evidence.test.mjs",
+              "tests/payment-acceptance-quality8.test.mjs",
+              "tests/payment-account-hook.test.mjs",
+              "tests/payment-control-ui.test.mjs",
+              "tests/payment-control.test.mjs",
+              "tests/payment-evidence-status-final.test.mjs",
+              "tests/payment-evidence-ui-q8.test.mjs",
+              "tests/payment-history.test.mjs",
+              "tests/payment-overview-ui.test.mjs",
+              "tests/payment-reference-sources.test.mjs",
+              "tests/payment-references.test.mjs",
+              "tests/payment-verification-summary.test.mjs",
+              "tests/payment-verification-ui.test.mjs",
+              "tests/payment-verification.test.mjs",
+              "tests/pdf-layout-ocr.test.mjs",
+              "tests/pdf-text-reconstruction.test.mjs",
+              "tests/quality-regressions-ocr-recovery.test.mjs",
+              "tests/reconciliation-contract.test.mjs",
+              "tests/reconciliation-normalization-final.test.mjs",
+              "tests/reconciliation-payer-index-final.test.mjs",
+              "tests/reconciliation-preview.test.mjs",
+              "tests/reconciliation-proposal.test.mjs",
+              "tests/recovery-drill.test.mjs",
+              "tests/saas-bank-runtime.test.mjs",
+              "tests/saas-company-acceptance.test.mjs",
+              "tests/saas-onboarding-client.test.mjs",
+              "tests/saas-onboarding-contract.test.mjs",
+              "tests/saas-onboarding-projection.test.mjs",
+              "tests/saas-onboarding-server.test.mjs",
+              "tests/saas-onboarding-views.test.mjs",
+              "tests/saas-owner-isolation.test.mjs",
+              "tests/saas-transport-privacy.test.mjs",
+              "tests/saas-upload-boundary.test.mjs",
+              "tests/server-pdf-optical-fallback.test.mjs",
+              "tests/server-pdf.test.mjs",
+              "tests/seven-agent-0599-baseline.test.mjs",
+              "tests/seven-agent-0599-joined.test.mjs",
+              "tests/seven-agent-migration-order.test.mjs",
+              "tests/sites-payments-quality-cycle.test.mjs",
+              "tests/ui-contrast-q8.test.mjs",
+              "tests/uuid-q8.test.mjs",
+              "tests/workspace-location-q8.test.mjs",
+              "tests/workspace-navigation-dashboard-q8.test.mjs",
+              "tests/workspace-search-final.test.mjs"
+            ],
+            "cwd": "sites"
+          },
+          "totals": {
+            "tests": 3851,
+            "pass": 3851,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "coverage": {
+            "requested": true,
+            "measured": true,
+            "scope": "loaded production files only; unimported files are not measured",
+            "files": 87,
+            "lines": {
+              "covered": 8227,
+              "total": 10339,
+              "percent": 79.57
+            },
+            "functions": {
+              "covered": 1670,
+              "total": 1872,
+              "percent": 89.21
+            },
+            "branches": {
+              "covered": 8459,
+              "total": 9340,
+              "percent": 90.57
+            }
+          },
+          "failures": [],
+          "artifacts": [
+            {
+              "path": "tests.tap",
+              "bytes": 922599,
+              "sha256": "2d19bc2179b456268b78b5ff4fadf4a1f0ca3a3e72d20fbcd06546a2626ed599"
+            },
+            {
+              "path": "tests.junit.xml",
+              "bytes": 845921,
+              "sha256": "09ce88d2c2285a6b4ffe94dd0a7ed1096ddb8f98905572594a09ed28d695e543"
+            },
+            {
+              "path": "coverage.lcov",
+              "bytes": 340917,
+              "sha256": "b78eaa2402e3412808a66c61f8f07d707f3a4a9871a52906e4989302b08fa567"
+            },
+            {
+              "path": "source-manifest.json",
+              "bytes": 213698,
+              "sha256": "325f8eb9bc303eb720b1b3793455202719e78d07da3fc00da05e7119c05dd576"
+            }
+          ],
+          "artifactDirectory": "tests"
+        },
+        {
+          "name": "production-build",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:32:17.974Z",
+          "finishedAt": "2026-11-05T18:32:32.596Z",
+          "durationMs": 14622.803,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "build"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+          },
+          "artifacts": [
+            {
+              "path": "production-build.stdout.log",
+              "bytes": 38281,
+              "sha256": "70af967b4e0847aa28684ad6e24f2cb0dc6f5743e7750c2eb0a0742414407c6b"
+            },
+            {
+              "path": "production-build.stderr.log",
+              "bytes": 6544,
+              "sha256": "bc6e24fb2bb4a077dff778d277c5bfae2c0ffa00dd072551ee2bf4835ef4450f"
+            }
+          ]
+        }
+      ]
+    },
+    "bridge": {
+      "profile": "bridge",
+      "status": "PASSED",
+      "passed": true,
+      "syntheticOnly": true,
+      "realBankVerification": "NOT_RUN",
+      "productionPerformance": "NOT_MEASURED",
+      "source": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceAfter": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceChangedDuringRun": false,
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V45 96-Core Processor"
+      },
+      "github": {
+        "runId": "42083369457",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "pullRequestHeadSha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "installExecuted": true,
+      "startedAt": "2026-11-05T18:22:21.410Z",
+      "finishedAt": "2026-11-05T18:22:27.773Z",
+      "durationMs": 6363.051,
+      "receiptSha256": "d6702e9ebb23c83d8fba2448879f37db2b4097014fbb3bd23eaae73461cfe8d4",
+      "reproduce": "npm run quality:bridge -- .codex-work/quality/new-run/bridge",
+      "steps": [
+        {
+          "name": "install-bridge",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:21.413Z",
+          "finishedAt": "2026-11-05T18:22:21.741Z",
+          "durationMs": 327.731,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "ci",
+              "--ignore-scripts",
+              "--no-audit",
+              "--no-fund"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+          },
+          "artifacts": [
+            {
+              "path": "install-bridge.stdout.log",
+              "bytes": 27,
+              "sha256": "531914c13533e2e5b72118d79aff870c212b16c6dd4e3c2444f568af799fada3"
+            },
+            {
+              "path": "install-bridge.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "syntax",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:21.742Z",
+          "finishedAt": "2026-11-05T18:22:21.909Z",
+          "durationMs": 167.082,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "check"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+          },
+          "artifacts": [
+            {
+              "path": "syntax.stdout.log",
+              "bytes": 255,
+              "sha256": "e795c43ec03e7487aab408cd3c0efdd37df0d691297af89b42d6c093b448e6f2"
+            },
+            {
+              "path": "syntax.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:21.910Z",
+          "finishedAt": "2026-11-05T18:22:22.236Z",
+          "durationMs": 325.823,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high",
+              "--omit=dev"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-production.stdout.log",
+              "bytes": 358,
+              "sha256": "74b9f06500613f856683fe87b372f7b3592c019e4cffdf8c3c63069a75dc0ec1"
+            },
+            {
+              "path": "audit-production.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:22.237Z",
+          "finishedAt": "2026-11-05T18:22:22.519Z",
+          "durationMs": 282.131,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/bridge/bankgiro"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-all.stdout.log",
+              "bytes": 358,
+              "sha256": "74b9f06500613f856683fe87b372f7b3592c019e4cffdf8c3c63069a75dc0ec1"
+            },
+            {
+              "path": "audit-all.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "bridge-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:22.592Z",
+          "finishedAt": "2026-11-05T18:22:27.703Z",
+          "durationMs": 5111.561,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "--import",
+              "/home/runner/work/Mgeorge/Mgeorge/scripts/saas-test-isolation.mjs",
+              "--experimental-strip-types",
+              "--test",
+              "--test-concurrency=1",
+              "--test-timeout=180000",
+              "--test-reporter=tap",
+              "--test-reporter-destination=stdout",
+              "--test-reporter=junit",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-bridge/tests/tests.junit.xml",
+              "--experimental-test-coverage",
+              "--test-reporter=lcov",
+              "--test-reporter-destination=/home/runner/work/_temp/quality-bridge/tests/coverage.lcov",
+              "--test-coverage-include=src/**",
+              "--test-coverage-exclude=**/node_modules/**",
+              "--test-coverage-exclude=**/test/**",
+              "--test-coverage-exclude=**/tests/**",
+              "test/adapter-contract.test.js",
+              "test/bridge.test.js",
+              "test/main.test.js"
+            ],
+            "cwd": "bridge/bankgiro"
+          },
+          "totals": {
+            "tests": 47,
+            "pass": 47,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "coverage": {
+            "requested": true,
+            "measured": true,
+            "scope": "loaded production files only; unimported files are not measured",
+            "files": 2,
+            "lines": {
+              "covered": 412,
+              "total": 421,
+              "percent": 97.86
+            },
+            "functions": {
+              "covered": 69,
+              "total": 76,
+              "percent": 90.79
+            },
+            "branches": {
+              "covered": 268,
+              "total": 289,
+              "percent": 92.73
+            }
+          },
+          "failures": [],
+          "artifacts": [
+            {
+              "path": "tests.tap",
+              "bytes": 11752,
+              "sha256": "0f33a3c8b135bf240a55721b8c4f26ca6cf1c753e6fd634d198c971605fbc033"
+            },
+            {
+              "path": "tests.junit.xml",
+              "bytes": 10078,
+              "sha256": "4ed6c1cf148bf7196f7e04639acce6558a6afad5dcc394725505bed9bbcb4e90"
+            },
+            {
+              "path": "coverage.lcov",
+              "bytes": 11613,
+              "sha256": "d166d9c34b56452cd9fa470a50ee91060c5fce234af4064fb71b25cb9cb65460"
+            },
+            {
+              "path": "source-manifest.json",
+              "bytes": 213698,
+              "sha256": "325f8eb9bc303eb720b1b3793455202719e78d07da3fc00da05e7119c05dd576"
+            }
+          ],
+          "artifactDirectory": "tests"
+        }
+      ]
+    },
+    "browser": {
+      "profile": "browser",
+      "status": "PASSED",
+      "passed": true,
+      "syntheticOnly": true,
+      "realBankVerification": "NOT_RUN",
+      "productionPerformance": "NOT_MEASURED",
+      "source": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceAfter": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceChangedDuringRun": false,
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 7763 64-Core Processor"
+      },
+      "github": {
+        "runId": "42083369457",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "pullRequestHeadSha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "installExecuted": true,
+      "startedAt": "2026-11-05T18:22:22.163Z",
+      "finishedAt": "2026-11-05T18:23:19.643Z",
+      "durationMs": 57481.085,
+      "receiptSha256": "2a26edeb0dca6cc7278f0cae77fb4b0413e93258f00c32b2bb62877c76063b84",
+      "reproduce": "npm run quality:browser -- .codex-work/quality/new-run/browser",
+      "steps": [
+        {
+          "name": "install-sites",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:22.167Z",
+          "finishedAt": "2026-11-05T18:22:41.459Z",
+          "durationMs": 19291.427,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "install:ci"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/sites"
+          },
+          "artifacts": [
+            {
+              "path": "install-sites.stdout.log",
+              "bytes": 327,
+              "sha256": "6a6a586aa3cc8c572935a7b3404b2c02fdf7c1c108bc2dd38acabfc7815b9b24"
+            },
+            {
+              "path": "install-sites.stderr.log",
+              "bytes": 898,
+              "sha256": "2a26cd0f5b146200b9b06d5d8f0e0f79df7380b7f5789d4eb752a157e042f77b"
+            }
+          ]
+        },
+        {
+          "name": "install-browser-tooling",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:41.460Z",
+          "finishedAt": "2026-11-05T18:22:41.886Z",
+          "durationMs": 426.663,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "ci",
+              "--ignore-scripts",
+              "--no-audit",
+              "--no-fund"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/qa/browser"
+          },
+          "artifacts": [
+            {
+              "path": "install-browser-tooling.stdout.log",
+              "bytes": 27,
+              "sha256": "157216635fbe1eefc554d6a3ea08b6c4f22ee756cb6187a4e0180fee8e8f45c4"
+            },
+            {
+              "path": "install-browser-tooling.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "install-chromium",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:41.887Z",
+          "finishedAt": "2026-11-05T18:23:03.392Z",
+          "durationMs": 21504.772,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "run",
+              "install:chromium"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/qa/browser"
+          },
+          "artifacts": [
+            {
+              "path": "install-chromium.stdout.log",
+              "bytes": 15970,
+              "sha256": "6dc15ac4edb01723540a33283ba05eded77b74f08fc347f45a641187b48f7e97"
+            },
+            {
+              "path": "install-chromium.stderr.log",
+              "bytes": 237,
+              "sha256": "3b419c69ff321ee6851fa5489a2bb0c9a2ef093815a709dbd05391f89767267f"
+            }
+          ]
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:23:03.393Z",
+          "finishedAt": "2026-11-05T18:23:03.824Z",
+          "durationMs": 430.273,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "audit",
+              "--json",
+              "--audit-level=high"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/qa/browser"
+          },
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          },
+          "artifacts": [
+            {
+              "path": "audit-all.stdout.log",
+              "bytes": 358,
+              "sha256": "a01267e7d3023badd5d4b64f1d798707912523aeba3545b611eaaa83ee261353"
+            },
+            {
+              "path": "audit-all.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "browser-acceptance",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:23:03.826Z",
+          "finishedAt": "2026-11-05T18:23:19.550Z",
+          "durationMs": 15724.798,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "scripts/quality/browser.mjs",
+              "/home/runner/work/_temp/quality-browser/browser"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "totals": {
+            "tests": 46,
+            "pass": 46,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "failures": [],
+          "artifacts": [
+            {
+              "path": "browser-acceptance.stdout.log",
+              "bytes": 125,
+              "sha256": "a1b52a5e5895c6a0e94da099b6cac220eb0205cdfb579a8abd16354b718b769c"
+            },
+            {
+              "path": "browser-acceptance.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        }
+      ]
+    },
+    "performance": {
+      "profile": "performance",
+      "status": "PASSED",
+      "passed": true,
+      "syntheticOnly": true,
+      "realBankVerification": "NOT_RUN",
+      "productionPerformance": "NOT_MEASURED",
+      "source": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceAfter": {
+        "commit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "tree": "ed59308d7e41be58b49e0bb66a77b707e08fde86",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "e1102d48e0fd80047d5c1a0f29f0c71a4fdfa4b862a8427a49bd70c8880b0a91",
+        "fileCount": 1192
+      },
+      "sourceChangedDuringRun": false,
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "github": {
+        "runId": "42083369457",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "pullRequestHeadSha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "installExecuted": true,
+      "startedAt": "2026-11-05T18:22:19.734Z",
+      "finishedAt": "2026-11-05T18:22:59.135Z",
+      "durationMs": 39402.671,
+      "receiptSha256": "dd7fe006c7b7f5c1156a0474a2e13bf2de5af74466490d43e1d53b0bbf812df0",
+      "reproduce": "npm run quality:performance -- .codex-work/quality/new-run/performance",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:19.740Z",
+          "finishedAt": "2026-11-05T18:22:21.115Z",
+          "durationMs": 1375.332,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "/opt/hostedtoolcache/node/24.22.1/x64/lib/node_modules/npm/bin/npm-cli.js",
+              "ci",
+              "--ignore-scripts",
+              "--no-audit",
+              "--no-fund"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "artifacts": [
+            {
+              "path": "install-node.stdout.log",
+              "bytes": 25,
+              "sha256": "a786805e292bdfafb821a7a5f96a28b26caa93d105e429e3eba2a854ec60f37e"
+            },
+            {
+              "path": "install-node.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        },
+        {
+          "name": "company-benchmark",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "startedAt": "2026-11-05T18:22:21.116Z",
+          "finishedAt": "2026-11-05T18:22:59.038Z",
+          "durationMs": 37922.145,
+          "command": {
+            "executable": "/opt/hostedtoolcache/node/24.22.1/x64/bin/node",
+            "args": [
+              "--import",
+              "./scripts/saas-test-isolation.mjs",
+              "scripts/quality/benchmark-companies.mjs",
+              "--output",
+              "/home/runner/work/_temp/quality-performance/benchmark.json"
+            ],
+            "cwd": "/home/runner/work/Mgeorge/Mgeorge/"
+          },
+          "artifacts": [
+            {
+              "path": "company-benchmark.stdout.log",
+              "bytes": 482,
+              "sha256": "36565ceb8e096c5d119ad6fea1cdc75f787102dd9897f5497a9f08ea0e23860a"
+            },
+            {
+              "path": "company-benchmark.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "browserAcceptance": {
+    "passed": true,
+    "scope": "Actual bundled onboarding UI in Chromium; API responses are intercepted synthetic fixtures. Backend and provider end-to-end coverage is not claimed.",
+    "playwrightVersion": "1.62.1",
+    "browserVersion": "151.0.7922.34",
+    "totals": {
+      "tests": 46,
+      "pass": 46,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "externalRequests": 0,
+    "browserErrors": 0,
+    "failures": [],
+    "workspace": {
+      "passed": true,
+      "tests": 5,
+      "failures": []
+    }
+  },
+  "securityAcceptance": {
+    "receiptSha256": "c2f2c3a54d8647369e6d4ee62037ef8f07148d0f458abfde0466d57e5062b4f4",
+    "overlapsFullSuites": true,
+    "report": {
+      "version": 1,
+      "sourceCommit": "1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+      "workingTreeDirty": false,
+      "node": "v22.23.4",
+      "startedAt": "2026-11-05T18:21:34.785Z",
+      "scope": "Actual three-company Node SQLite partitions and Sites D1/R2 role boundaries; company switching/cache fencing; Open Payments lifecycle, expired consent recovery, durable sync and Bankgiro originals; real onboarding snapshot; isolated backup recovery; 1/10/100-tenant durable runner scale. Synthetic data only.",
+      "tenantRoleCoverage": {
+        "minimumCompanies": 3,
+        "roles": [
+          "owner",
+          "admin",
+          "accountant",
+          "viewer"
+        ],
+        "suites": [
+          "test/saas-company-acceptance.test.js",
+          "tests/saas-company-acceptance.test.mjs"
+        ]
+      },
+      "scaleCoverage": {
+        "companies": [
+          1,
+          10,
+          100
+        ],
+        "suite": "tests/company-sync-scale.test.mjs",
+        "externalProviderPerformance": "NOT_MEASURED"
+      },
+      "multiCompanyAcceptance": "INTERNAL_BOUNDARIES_PASSED",
+      "commercialLaunch": "NOT_APPROVED",
+      "launchGates": "docs/integration/saas/security-acceptance.md",
+      "network": "Loopback only; fixture stubs replace provider responses. Guard is not a malicious-code sandbox.",
+      "suites": [
+        {
+          "name": "node-security",
+          "files": [
+            "test/saas-login-boundary.test.js",
+            "test/saas-test-isolation.test.js",
+            "test/saas-company-acceptance.test.js",
+            "test/company-api.test.js",
+            "test/company-boundary.test.js",
+            "test/company-client.test.js",
+            "test/bank-consent-api.test.js",
+            "test/openpayments-company-bank-sync.test.js",
+            "test/openpayments-company-bank-sync-normalization.test.js",
+            "test/openpayments-bankgiro-ingest.test.js",
+            "test/openpayments-node-transport.test.js",
+            "test/company-bank-sync.test.js",
+            "test/company-bank-sync-store.test.js",
+            "test/company-bank-sync-scheduler.test.js",
+            "test/company-bank-sync-fairness.test.js",
+            "test/company-bank-sync-legacy-binding.test.js",
+            "test/node-company-bank-sync.test.js",
+            "test/security-session-allocation.test.js",
+            "test/session-mutation-fence.test.js",
+            "test/bank-api.test.js",
+            "test/integration-job-api.test.js",
+            "test/backup-disaster-recovery.test.js"
+          ],
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "tests": 325,
+          "pass": 325,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        {
+          "name": "sites-security",
+          "files": [
+            "tests/saas-company-acceptance.test.mjs",
+            "tests/company-storage.test.mjs",
+            "tests/company-backup.test.mjs",
+            "tests/openpayments-lifecycle.test.mjs",
+            "tests/openpayments-expired-revocation.test.mjs",
+            "tests/saas-bank-runtime.test.mjs",
+            "tests/openpayments-company-sync.test.mjs",
+            "tests/openpayments-account-state.test.mjs",
+            "tests/openpayments-request-boundary.test.mjs",
+            "tests/openpayments-raw-receipt.test.mjs",
+            "tests/openpayments-capture.test.mjs",
+            "tests/openpayments-ingest.test.mjs",
+            "tests/openpayments-domain.test.mjs",
+            "tests/company-bank-sync.test.mjs",
+            "tests/company-bank-sync-backup.test.mjs",
+            "tests/company-sync-boundary-integration.test.mjs",
+            "tests/company-sync-scale.test.mjs",
+            "tests/saas-onboarding-server.test.mjs",
+            "tests/saas-onboarding-projection.test.mjs",
+            "tests/saas-onboarding-contract.test.mjs",
+            "tests/saas-onboarding-client.test.mjs",
+            "tests/saas-onboarding-views.test.mjs",
+            "tests/openpayments-provider.test.mjs",
+            "tests/openpayments-policy.test.mjs",
+            "tests/openpayments-http.test.mjs",
+            "tests/saas-owner-isolation.test.mjs",
+            "tests/saas-transport-privacy.test.mjs",
+            "tests/saas-upload-boundary.test.mjs",
+            "tests/banking-security.test.mjs",
+            "tests/banking-provider.test.mjs",
+            "tests/bank-account-consent.test.mjs",
+            "tests/bank-account-commit.test.mjs",
+            "tests/bank-state-integrity-q8.test.mjs",
+            "tests/mcp-security-q8.test.mjs",
+            "tests/bankgiro-authority.test.mjs",
+            "tests/backup-recovery.test.mjs",
+            "tests/seven-agent-0599-joined.test.mjs"
+          ],
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "tests": 788,
+          "pass": 788,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      ],
+      "finishedAt": "2026-11-05T18:23:54.357Z",
+      "regressionPassed": true,
+      "productionAcceptance": "NOT_VERIFIED"
+    }
+  },
+  "performance": {
+    "path": "benchmark-8a083eb.json",
+    "sha256": "ff6ccac270e97152cc4d914926558b3e35b2428a4402de1bf17f8e8cf1cbaa62",
+    "parameters": {
+      "companies": [
+        1,
+        10,
+        100
+      ],
+      "transactions": 10,
+      "concurrency": 4,
+      "replayRounds": 1,
+      "seed": 95
+    },
+    "totalMs": 37758.19389,
+    "imported": 1110,
+    "replayDuplicates": 2220,
+    "expectedBusy": 111,
+    "unexpectedErrors": 0
+  },
+  "cpuProfile": {
+    "path": "cpu-profile-b24ea08.json",
+    "sha256": "21fbb58e6fd8f0a2b95ff073efabd26a7109620bd59ed3d1aacb0f1d9e6804bb"
+  },
+  "coverageInterpretation": {
+    "originalReceiptMetrics": "Raw LF/LH, FNF/FNH and BRF/BRH are summed per LCOV record. Original receipt files field counts records, not unique source paths when SF repeats.",
+    "normalizedSourceLines": {
+      "path": "coverage-8a083eb.json",
+      "sha256": "7890385e49de9d94215bdd7f441b24dfaeb93073326bc3d4d7a9c3103bd028cf"
+    },
+    "nodeRepeatedSource": {
+      "path": "src/server.js",
+      "records": 19,
+      "linesPerRecord": 1141
+    },
+    "functionAndBranchLimit": "Generated FN and BRDA identities vary across module instances; no unique function/branch aggregation is claimed.",
+    "change": "The final reporting correction adds explicit records/files/aggregation and a validated source-line union; original downloaded receipts are retained unchanged."
+  },
+  "artifactVerification": {
+    "algorithm": "SHA-256",
+    "archives": [
+      {
+        "id": 13442691257,
+        "name": "quality-sites-1880ac268eeb7de752bec2ca9567bf35ffdfdec8-1",
+        "size_in_bytes": 486999,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13442691257",
+        "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13442691257/zip",
+        "expired": false,
+        "created_at": "2026-11-05T18:32:33Z",
+        "expires_at": "2026-11-19T18:32:32Z",
+        "updated_at": "2026-11-05T18:32:33Z",
+        "digest": "sha256:bb90ff775fcbe28db3ea9bc58638dca39b4428e380c46f55937fec6a60494787",
+        "workflow_run": {
+          "id": 42083369457,
+          "repository_id": 1434733412,
+          "head_repository_id": 1434733412,
+          "head_branch": "feature/95-quality",
+          "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8"
+        },
+        "localName": "sites.zip",
+        "digestVerified": true,
+        "sizeVerified": true
+      },
+      {
+        "id": 13442406615,
+        "name": "quality-performance-1880ac268eeb7de752bec2ca9567bf35ffdfdec8-1",
+        "size_in_bytes": 66845,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13442406615",
+        "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13442406615/zip",
+        "expired": false,
+        "created_at": "2026-11-05T18:23:00Z",
+        "expires_at": "2026-11-19T18:22:59Z",
+        "updated_at": "2026-11-05T18:23:00Z",
+        "digest": "sha256:669eafeafd6b8621d29653d83c5737202e901a7cdba56a95267c98925f6f46b0",
+        "workflow_run": {
+          "id": 42083369457,
+          "repository_id": 1434733412,
+          "head_repository_id": 1434733412,
+          "head_branch": "feature/95-quality",
+          "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8"
+        },
+        "localName": "performance.zip",
+        "digestVerified": true,
+        "sizeVerified": true
+      },
+      {
+        "id": 13442253127,
+        "name": "quality-bridge-1880ac268eeb7de752bec2ca9567bf35ffdfdec8-1",
+        "size_in_bytes": 130992,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13442253127",
+        "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13442253127/zip",
+        "expired": false,
+        "created_at": "2026-11-05T18:22:28Z",
+        "expires_at": "2026-11-19T18:22:27Z",
+        "updated_at": "2026-11-05T18:22:28Z",
+        "digest": "sha256:7cb7a1b5b1b665fac8d3e4347975b4e37e8cee810dc1857e2b65b55fe107e3f5",
+        "workflow_run": {
+          "id": 42083369457,
+          "repository_id": 1434733412,
+          "head_repository_id": 1434733412,
+          "head_branch": "feature/95-quality",
+          "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8"
+        },
+        "localName": "bridge.zip",
+        "digestVerified": true,
+        "sizeVerified": true
+      },
+      {
+        "id": 13441908617,
+        "name": "quality-browser-1880ac268eeb7de752bec2ca9567bf35ffdfdec8-1",
+        "size_in_bytes": 1667478,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441908617",
+        "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441908617/zip",
+        "expired": false,
+        "created_at": "2026-11-05T18:23:21Z",
+        "expires_at": "2026-11-19T18:23:19Z",
+        "updated_at": "2026-11-05T18:23:21Z",
+        "digest": "sha256:d6d84023fdd7680784d5acc70cc75be635632f4a2e1bccd8d28a1a19161363d4",
+        "workflow_run": {
+          "id": 42083369457,
+          "repository_id": 1434733412,
+          "head_repository_id": 1434733412,
+          "head_branch": "feature/95-quality",
+          "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8"
+        },
+        "localName": "browser.zip",
+        "digestVerified": true,
+        "sizeVerified": true
+      },
+      {
+        "id": 13441583027,
+        "name": "quality-node-22.23.4-1880ac268eeb7de752bec2ca9567bf35ffdfdec8-1",
+        "size_in_bytes": 400612,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441583027",
+        "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441583027/zip",
+        "expired": false,
+        "created_at": "2026-11-05T18:26:06Z",
+        "expires_at": "2026-11-19T18:26:05Z",
+        "updated_at": "2026-11-05T18:26:06Z",
+        "digest": "sha256:7d656bf768ff690bca8080f85e3d0f7d665d1432e59ff4d2760f80dba4f82c3f",
+        "workflow_run": {
+          "id": 42083369457,
+          "repository_id": 1434733412,
+          "head_repository_id": 1434733412,
+          "head_branch": "feature/95-quality",
+          "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8"
+        },
+        "localName": "node-22.zip",
+        "digestVerified": true,
+        "sizeVerified": true
+      },
+      {
+        "id": 13441218064,
+        "name": "quality-node-24.22.1-1880ac268eeb7de752bec2ca9567bf35ffdfdec8-1",
+        "size_in_bytes": 401792,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441218064",
+        "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441218064/zip",
+        "expired": false,
+        "created_at": "2026-11-05T18:25:40Z",
+        "expires_at": "2026-11-19T18:25:39Z",
+        "updated_at": "2026-11-05T18:25:40Z",
+        "digest": "sha256:7d4afe7d45e6f9020bbb8364463cee40c0941e9575bc13cf4254f34d71f298ff",
+        "workflow_run": {
+          "id": 42083369457,
+          "repository_id": 1434733412,
+          "head_repository_id": 1434733412,
+          "head_branch": "feature/95-quality",
+          "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8"
+        },
+        "localName": "node-24.zip",
+        "digestVerified": true,
+        "sizeVerified": true
+      },
+      {
+        "id": 13441172842,
+        "name": "saas-security-1880ac268eeb7de752bec2ca9567bf35ffdfdec8",
+        "size_in_bytes": 48197,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441172842",
+        "archive_download_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/artifacts/13441172842/zip",
+        "expired": false,
+        "created_at": "2026-11-05T18:23:55Z",
+        "expires_at": "2026-11-19T18:23:54Z",
+        "updated_at": "2026-11-05T18:23:55Z",
+        "digest": "sha256:912e1dbd004606ebc39ff1fa727783435c9eeedd209d730dbab88e828e2d9d17",
+        "workflow_run": {
+          "id": 42083372075,
+          "repository_id": 1434733412,
+          "head_repository_id": 1434733412,
+          "head_branch": "feature/95-quality",
+          "head_sha": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8"
+        },
+        "localName": "security.zip",
+        "digestVerified": true,
+        "sizeVerified": true
+      }
+    ],
+    "internalFilesVerified": 78,
+    "internalFiles": [
+      "node-22/install-node.stdout.log",
+      "node-22/install-node.stderr.log",
+      "node-22/syntax.stdout.log",
+      "node-22/syntax.stderr.log",
+      "node-22/audit-production.stdout.log",
+      "node-22/audit-production.stderr.log",
+      "node-22/audit-all.stdout.log",
+      "node-22/audit-all.stderr.log",
+      "node-22/tests/tests.tap",
+      "node-22/tests/tests.junit.xml",
+      "node-22/tests/coverage.lcov",
+      "node-22/tests/source-manifest.json",
+      "node-24/install-node.stdout.log",
+      "node-24/install-node.stderr.log",
+      "node-24/syntax.stdout.log",
+      "node-24/syntax.stderr.log",
+      "node-24/audit-production.stdout.log",
+      "node-24/audit-production.stderr.log",
+      "node-24/audit-all.stdout.log",
+      "node-24/audit-all.stderr.log",
+      "node-24/tests/tests.tap",
+      "node-24/tests/tests.junit.xml",
+      "node-24/tests/coverage.lcov",
+      "node-24/tests/source-manifest.json",
+      "sites/install-node.stdout.log",
+      "sites/install-node.stderr.log",
+      "sites/install-sites.stdout.log",
+      "sites/install-sites.stderr.log",
+      "sites/install-bridge.stdout.log",
+      "sites/install-bridge.stderr.log",
+      "sites/minimatch-mitigation.stdout.log",
+      "sites/minimatch-mitigation.stderr.log",
+      "sites/typecheck.stdout.log",
+      "sites/typecheck.stderr.log",
+      "sites/audit-production.stdout.log",
+      "sites/audit-production.stderr.log",
+      "sites/audit-all.stdout.log",
+      "sites/audit-all.stderr.log",
+      "sites/tests/tests.tap",
+      "sites/tests/tests.junit.xml",
+      "sites/tests/coverage.lcov",
+      "sites/tests/source-manifest.json",
+      "sites/production-build.stdout.log",
+      "sites/production-build.stderr.log",
+      "bridge/install-bridge.stdout.log",
+      "bridge/install-bridge.stderr.log",
+      "bridge/syntax.stdout.log",
+      "bridge/syntax.stderr.log",
+      "bridge/audit-production.stdout.log",
+      "bridge/audit-production.stderr.log",
+      "bridge/audit-all.stdout.log",
+      "bridge/audit-all.stderr.log",
+      "bridge/tests/tests.tap",
+      "bridge/tests/tests.junit.xml",
+      "bridge/tests/coverage.lcov",
+      "bridge/tests/source-manifest.json",
+      "browser/install-sites.stdout.log",
+      "browser/install-sites.stderr.log",
+      "browser/install-browser-tooling.stdout.log",
+      "browser/install-browser-tooling.stderr.log",
+      "browser/install-chromium.stdout.log",
+      "browser/install-chromium.stderr.log",
+      "browser/audit-all.stdout.log",
+      "browser/audit-all.stderr.log",
+      "browser/browser-acceptance.stdout.log",
+      "browser/browser-acceptance.stderr.log",
+      "performance/install-node.stdout.log",
+      "performance/install-node.stderr.log",
+      "performance/company-benchmark.stdout.log",
+      "performance/company-benchmark.stderr.log",
+      "browser/browser/bundle.stdout.log",
+      "browser/browser/bundle.stderr.log",
+      "browser/browser/chromium.stdout.log",
+      "browser/browser/chromium.stderr.log",
+      "browser/browser/workspace-bundle.stdout.log",
+      "browser/browser/workspace-bundle.stderr.log",
+      "browser/browser/workspace-chromium.stdout.log",
+      "browser/browser/workspace-chromium.stderr.log"
+    ],
+    "retentionDays": 14,
+    "scope": "All seven downloaded ZIPs match GitHub digests and sizes; recorded quality-step logs/TAP/JUnit/LCOV/manifests match receipt hashes."
+  },
+  "historicalFailedRun": {
+    "runId": 42079194353,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42079194353",
+    "status": "FAILED",
+    "profiles": {
+      "node-22": {
+        "status": "PASSED",
+        "source": {
+          "commit": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "tree": "362e10cb322ca269fd73f2d8f3f60fa879d9d2ab",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "a894bb38d26707a9d1abbd9d904c8bb428812f524a39256df6077425e635b112",
+          "fileCount": 1157
+        },
+        "github": {
+          "runId": "42079194353",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "pullRequestHeadSha": "b24ea089a062e122ce240ec66ba01180efe533c9",
+          "pullRequestBaseSha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5"
+        },
+        "receiptSha256": "100df8e8d8cc98376042598fe8c8ce1ea4ef9fce577cef9e0ddfc278210ab0f8",
+        "testResults": [
+          {
+            "name": "node-tests",
+            "totals": {
+              "tests": 1923,
+              "pass": 1923,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "failures": [],
+            "coverage": {
+              "requested": true,
+              "measured": true,
+              "scope": "loaded production files only; unimported files are not measured",
+              "files": 96,
+              "lines": {
+                "covered": 15370,
+                "total": 32150,
+                "percent": 47.81
+              },
+              "functions": {
+                "covered": 2440,
+                "total": 4253,
+                "percent": 57.37
+              },
+              "branches": {
+                "covered": 9229,
+                "total": 12984,
+                "percent": 71.08
+              }
+            }
+          }
+        ]
+      },
+      "node-24": {
+        "status": "FAILED",
+        "source": {
+          "commit": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "tree": "362e10cb322ca269fd73f2d8f3f60fa879d9d2ab",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "a894bb38d26707a9d1abbd9d904c8bb428812f524a39256df6077425e635b112",
+          "fileCount": 1157
+        },
+        "github": {
+          "runId": "42079194353",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "pullRequestHeadSha": "b24ea089a062e122ce240ec66ba01180efe533c9",
+          "pullRequestBaseSha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5"
+        },
+        "receiptSha256": "522fe9f83bf90fa48aacafa9504c3468d5fa09ab1799b1a690b56675b2d830f7",
+        "testResults": [
+          {
+            "name": "node-tests",
+            "totals": {
+              "tests": 1923,
+              "pass": 1922,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "failures": [
+              "two real processes import and reconcile one bank payment once, then replay safely after restart"
+            ],
+            "coverage": {
+              "requested": true,
+              "measured": true,
+              "scope": "loaded production files only; unimported files are not measured",
+              "files": 96,
+              "lines": {
+                "covered": 15373,
+                "total": 32150,
+                "percent": 47.82
+              },
+              "functions": {
+                "covered": 2440,
+                "total": 4254,
+                "percent": 57.36
+              },
+              "branches": {
+                "covered": 9229,
+                "total": 12959,
+                "percent": 71.22
+              }
+            }
+          }
+        ]
+      },
+      "sites": {
+        "status": "FAILED",
+        "source": {
+          "commit": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "tree": "362e10cb322ca269fd73f2d8f3f60fa879d9d2ab",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "a894bb38d26707a9d1abbd9d904c8bb428812f524a39256df6077425e635b112",
+          "fileCount": 1157
+        },
+        "github": {
+          "runId": "42079194353",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "pullRequestHeadSha": "b24ea089a062e122ce240ec66ba01180efe533c9",
+          "pullRequestBaseSha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5"
+        },
+        "receiptSha256": "711f4d13f24d3fbdf5b9fc71b41754db464a959e646fe09c147a734c58208c61",
+        "testResults": [
+          {
+            "name": "sites-tests",
+            "totals": {
+              "tests": 3757,
+              "pass": 3756,
+              "fail": 1,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "failures": [
+              "ordinary npm postinstall applies actual bytes without changing package/audit identity"
+            ],
+            "coverage": {
+              "requested": true,
+              "measured": false,
+              "scope": "loaded production files only; unimported files are not measured",
+              "files": 0,
+              "lines": {
+                "covered": 0,
+                "total": 0,
+                "percent": null
+              },
+              "functions": {
+                "covered": 0,
+                "total": 0,
+                "percent": null
+              },
+              "branches": {
+                "covered": 0,
+                "total": 0,
+                "percent": null
+              }
+            }
+          }
+        ]
+      },
+      "bridge": {
+        "status": "PASSED",
+        "source": {
+          "commit": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "tree": "362e10cb322ca269fd73f2d8f3f60fa879d9d2ab",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "a894bb38d26707a9d1abbd9d904c8bb428812f524a39256df6077425e635b112",
+          "fileCount": 1157
+        },
+        "github": {
+          "runId": "42079194353",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "pullRequestHeadSha": "b24ea089a062e122ce240ec66ba01180efe533c9",
+          "pullRequestBaseSha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5"
+        },
+        "receiptSha256": "3f165bd136ad8e00b8da13a404e258e24720cd3cf73b1b9d9b64d75ff31bccac",
+        "testResults": [
+          {
+            "name": "bridge-tests",
+            "totals": {
+              "tests": 47,
+              "pass": 47,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "failures": [],
+            "coverage": {
+              "requested": true,
+              "measured": true,
+              "scope": "loaded production files only; unimported files are not measured",
+              "files": 2,
+              "lines": {
+                "covered": 412,
+                "total": 421,
+                "percent": 97.86
+              },
+              "functions": {
+                "covered": 69,
+                "total": 76,
+                "percent": 90.79
+              },
+              "branches": {
+                "covered": 268,
+                "total": 289,
+                "percent": 92.73
+              }
+            }
+          }
+        ]
+      },
+      "browser": {
+        "status": "PASSED",
+        "source": {
+          "commit": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "tree": "362e10cb322ca269fd73f2d8f3f60fa879d9d2ab",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "a894bb38d26707a9d1abbd9d904c8bb428812f524a39256df6077425e635b112",
+          "fileCount": 1157
+        },
+        "github": {
+          "runId": "42079194353",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "pullRequestHeadSha": "b24ea089a062e122ce240ec66ba01180efe533c9",
+          "pullRequestBaseSha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5"
+        },
+        "receiptSha256": "58ff27f01dcfbf06974a5e86368e4b222b1e2715d8b97d3790f264847c041195",
+        "testResults": [
+          {
+            "name": "browser-acceptance",
+            "totals": {
+              "tests": 46,
+              "pass": 46,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            },
+            "failures": []
+          }
+        ]
+      },
+      "performance": {
+        "status": "PASSED",
+        "source": {
+          "commit": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "tree": "362e10cb322ca269fd73f2d8f3f60fa879d9d2ab",
+          "branch": "",
+          "workingTreeDirty": false,
+          "contentSha256": "a894bb38d26707a9d1abbd9d904c8bb428812f524a39256df6077425e635b112",
+          "fileCount": 1157
+        },
+        "github": {
+          "runId": "42079194353",
+          "runAttempt": "1",
+          "event": "pull_request",
+          "checkoutSha": "f347c2257b167c706861bc2f6d9a29db4553d4cf",
+          "pullRequestHeadSha": "b24ea089a062e122ce240ec66ba01180efe533c9",
+          "pullRequestBaseSha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5"
+        },
+        "receiptSha256": "6eba104eca5d02ced91519b4e0f242753742863b032d97beb7e7e2491bc62a62",
+        "testResults": []
+      }
+    },
+    "interpretation": "Retained as failed. Later complete runs do not rewrite this result. Original failing SQLite child exception was not captured; a separately reproduced startup contention defect was fixed."
+  },
+  "repositoryEnforcement": {
+    "observedAt": "2026-11-05T18:35:32.599Z",
+    "mainProtected": false,
+    "requiredStatusChecks": {
+      "enforcement_level": "off",
+      "contexts": [],
+      "checks": []
+    },
+    "rulesets": [],
+    "changePerformed": false,
+    "accessLimit": "Connected GitHub app excludes repository administration; branch-protection changes are not available through this connection."
+  },
+  "remainingGaps": [
+    "Coverage is valid only for loaded production files; unimported, transformed data modules, source-text checks and browser code are not full-repository coverage.",
+    "Sites full dependency audit retains eight moderate development-package findings (zero high/critical); production audit is zero.",
+    "Browser uses actual UI but synthetic intercepted API responses; a combined real browser-to-backend-to-authorized-provider end-to-end run was not performed.",
+    "Synthetic local SQLite load does not measure production D1/R2, real bank latency, distributed workers, sustained load, or capacity SLOs.",
+    "Repository main branch protection and enforced required checks were disabled when inspected.",
+    "Existing lint debt, representative optical OCR accuracy, cross-browser acceptance and production recovery evidence are outside the completed verification."
+  ],
+  "postMeasurementReportingCorrection": {
+    "status": "TARGETED_TESTS_PASSED; full follow-up CI status belongs to its new commit",
+    "sourceBaseCommit": "8a083eb70babac68b08ab3eac50aaa5e225c5eb8",
+    "workingTreeDirty": true,
+    "files": {
+      "scripts/quality/core.mjs": "9bc77c7764df3fb12742e1dac1c2cf0f967ad51a2cc1c948835ec40350654d8f",
+      "test/quality-runner.test.js": "bbe09e3ac07a89ce267d2e263a5428b44edcf24a54fa184325e046da0a77c075"
+    },
+    "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-reporter=tap test/quality-runner.test.js",
+    "logs": {
+      "red": {
+        "sha256": "8bf79584bbf14e6867f424e57033428e0e3e4dec3d0f352a8fa3c9595b0f7dcc",
+        "totals": {
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "exitCode": 1
+      },
+      "green": {
+        "sha256": "2c02d78d05b04c580fe073846e10ef2534f4dcccc9dbc18a283dec97a7f75fd7",
+        "totals": {
+          "tests": 18,
+          "pass": 18,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "exitCode": 0
+      }
+    },
+    "independentReview": "No blocker after orphan-counter correction; all four original CI LCOV files independently reconciled."
+  }
+}

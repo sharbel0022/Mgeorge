@@ -57,13 +57,70 @@ test('benchmark evidence rejects missing scenarios, failed correctness checks an
 test('coverage totals retain real denominators and label loaded-file scope', () => {
   const result = parseLcov('SF:src/one.js\nLF:10\nLH:7\nFNF:4\nFNH:2\nBRF:8\nBRH:3\nend_of_record\nSF:src/two.js\nLF:2\nLH:2\nFNF:1\nFNH:1\nBRF:0\nBRH:0\nend_of_record\n');
   assert.equal(result.files, 2);
+  assert.equal(result.records, 2);
+  assert.equal(result.aggregation, 'per-lcov-record');
   assert.deepEqual(result.lines, { covered: 9, total: 12, percent: 75 });
   assert.deepEqual(result.functions, { covered: 3, total: 5, percent: 60 });
   assert.deepEqual(result.branches, { covered: 3, total: 8, percent: 37.5 });
   assert.equal(result.scope, 'loaded production files only; unimported files are not measured');
+  assert.equal(result.sourceLines.measured, false, 'summary counters alone cannot establish unique source-line hits');
+  assert.equal(result.sourceLines.percent, null);
   assert.equal(parseLcov('').measured, false);
   assert.equal(parseLcov('SF:src/one.js\nLF:10\nLH:7\n').measured, false);
   assert.equal(parseLcov('SF:src/one.js\nLF:2\nLH:7\nFNF:0\nFNH:0\nBRF:0\nBRH:0\nend_of_record\n').measured, false);
+});
+
+test('coverage merges duplicate source-line hits while retaining record-weighted raw totals', () => {
+  const record = hits => `SF:src/reloaded.js\n${hits}\nLF:3\nLH:1\nFNF:1\nFNH:1\nBRF:2\nBRH:1\nend_of_record\n`;
+  const result = parseLcov(record('DA:1,5\nDA:2,0\nDA:3,0') + record('DA:1,0\nDA:2,7\nDA:3,0'));
+  assert.equal(result.measured, true);
+  assert.equal(result.files, 1);
+  assert.equal(result.records, 2);
+  assert.deepEqual(result.lines, { covered: 2, total: 6, percent: 33.33 });
+  assert.deepEqual(result.functions, { covered: 2, total: 2, percent: 100 });
+  assert.deepEqual(result.branches, { covered: 2, total: 4, percent: 50 });
+  assert.equal(result.sourceLines.measured, true);
+  assert.equal(result.sourceLines.covered, 2);
+  assert.equal(result.sourceLines.total, 3);
+  assert.equal(result.sourceLines.percent, 66.67);
+  const summary = renderSummary({ profile: 'fixture', steps: [{ name: 'tests', passed: true, coverage: result }] });
+  assert.match(summary, /1 unique loaded source paths \/ 2 LCOV records/);
+  assert.match(summary, /Unique source-line coverage: \*\*66\.67%\*\* \(2\/3\)/);
+  assert.match(summary, /Record-weighted raw coverage: lines \*\*33\.33%\*\*/);
+  assert.match(summary, /transformed source mappings are not verified/);
+});
+
+test('incomplete or invalid DA records never produce a partial unique coverage measurement', () => {
+  const record = hits => `SF:src/reloaded.js\n${hits}\nLF:3\nLH:1\nFNF:1\nFNH:1\nBRF:2\nBRH:1\nend_of_record\n`;
+  const complete = record('DA:1,1\nDA:2,0\nDA:3,0');
+  for (const invalid of [
+    'DA:1,1\nDA:2,0',
+    'DA:1,1\nDA:1,0\nDA:3,0',
+    'DA:0,1\nDA:2,0\nDA:3,0',
+    'DA:undefined,1\nDA:2,0\nDA:3,0',
+    'DA:1,-1\nDA:2,0\nDA:3,0',
+    'DA:1,1\nDA:2,1\nDA:3,0',
+  ]) {
+    const result = parseLcov(complete + record(invalid));
+    assert.equal(result.measured, true, 'valid raw counters remain available');
+    assert.equal(result.sourceLines.measured, false, invalid);
+    assert.equal(result.sourceLines.covered, null);
+    assert.equal(result.sourceLines.total, null);
+    assert.equal(result.sourceLines.percent, null);
+    assert.match(renderSummary({ steps: [{ name: 'tests', coverage: result }] }), /Unique source-line coverage: \*\*NOT_MEASURED\*\*/);
+  }
+});
+
+test('coverage rejects orphan summary counters without adding them to record totals', () => {
+  const record = 'SF:src/one.js\nDA:1,1\nDA:2,0\nLF:2\nLH:1\nFNF:1\nFNH:1\nBRF:1\nBRH:0\nend_of_record\n';
+  for (const orphan of ['LF:100\nLH:100\n', 'LF:0\nLH:0\n', 'FNF:0\nFNH:0\n', 'BRF:0\nBRH:0\n', 'LF:invalid\n', 'LH:\n']) {
+    const result = parseLcov(record + orphan);
+    assert.equal(result.measured, false, orphan);
+    assert.equal(result.sourceLines.measured, false, orphan);
+    assert.deepEqual(result.lines, { covered: 1, total: 2, percent: 50 });
+    assert.deepEqual(result.functions, { covered: 1, total: 1, percent: 100 });
+    assert.deepEqual(result.branches, { covered: 0, total: 1, percent: 0 });
+  }
 });
 
 test('synthetic test children do not inherit provider credentials, preload code or production state', () => {
@@ -103,6 +160,8 @@ test('quality suite executes actual tests and retains commit, TAP, JUnit, covera
   assert.equal(report.syntheticOnly, true);
   assert.equal(report.realBankVerification, 'NOT_RUN');
   assert.ok(report.coverage.lines.covered > 0);
+  assert.equal(report.coverage.sourceLines.measured, true);
+  assert.ok(report.coverage.sourceLines.covered > 0);
   for (const artifact of report.artifacts) assert.match(artifact.sha256, /^[a-f0-9]{64}$/);
   assert.match(readFileSync(join(root, 'results', 'tests.junit.xml'), 'utf8'), /real fixture/);
   assert.equal(JSON.parse(readFileSync(join(root, 'results', 'receipt.json'), 'utf8')).passed, true);
