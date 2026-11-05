@@ -16,7 +16,7 @@ const result = await require('esbuild').build({
   absWorkingDir: sites,
   stdin: { contents: `import React from 'react'; import {createRoot} from 'react-dom/client';
 import BankPage from './app/bank/page';
-${process.env.MGEORGE_ONBOARDING_PREVIEW === 'true' ? `import CompanyWorkspace from './components/company-workspace'; import {installPreviewFixtures} from '../docs/integration/saas-onboarding-browser/preview-fixtures.mjs'; installPreviewFixtures(); createRoot(document.getElementById('root')).render(<CompanyWorkspace><BankPage/></CompanyWorkspace>);` : `createRoot(document.getElementById('root')).render(<BankPage/>);`}`, resolveDir: sites, sourcefile: 'onboarding-test-entry.tsx', loader: 'tsx' },
+${process.env.MGEORGE_ONBOARDING_PREVIEW === 'true' ? `import CompanyWorkspace from './components/company-workspace'; import {installPreviewFixtures} from '../docs/integration/saas-onboarding-browser/preview-fixtures.mjs'; installPreviewFixtures(); createRoot(document.getElementById('root')).render(<CompanyWorkspace><BankPage/></CompanyWorkspace>);` : process.env.MGEORGE_ONBOARDING_WORKSPACE === 'true' ? `import CompanyWorkspace from './components/company-workspace'; createRoot(document.getElementById('root')).render(<CompanyWorkspace><BankPage/></CompanyWorkspace>);` : `createRoot(document.getElementById('root')).render(<BankPage/>);`}`, resolveDir: sites, sourcefile: 'onboarding-test-entry.tsx', loader: 'tsx' },
   outdir: web, entryNames: 'app', bundle: true, platform: 'browser', format: 'esm', target: ['chrome120'], jsx: 'automatic',
   alias: { '@': sites }, define: { 'process.env.NODE_ENV': '"production"' }, metafile: true, logLevel: 'warning',
 });
