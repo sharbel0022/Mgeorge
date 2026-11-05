@@ -70,6 +70,14 @@ test('summary distinguishes consent activity, expiry and remotely unconfirmed re
   assert.match(render(ui.ConnectionSummary, { snapshot, now: fixtureNow }), /Banken har bekräftat återkallelsen/);
 });
 
+test('an unknown consent creation explains the administrator recovery step without claiming bank approval',()=>{
+ const snapshot=snapshotFixture();snapshot.connection.status='error';snapshot.sync={...snapshot.sync,state:'blocked',errorCode:'consent_recovery_required',lastSuccessAt:null,automaticEnabled:false};
+ const html=render(ui.ConnectionSummary,{snapshot,now:fixtureNow});
+ assert.match(html,/role="status"[^>]*>[^<]*[Aa]dministratör|role="status"[^>]*>[\s\S]*[Aa]dministratör/);
+ assert.match(html,/kontrollera.*medgivande|medgivande.*kontrollera/i);
+ assert.doesNotMatch(html,/Aktivt medgivande|Banken har bekräftat återkallelsen/);
+});
+
 test('unknown bankgiro availability and missing sync times never become enabled service or schedule', () => {
   const snapshot = snapshotFixture(); snapshot.connection = null;
   snapshot.sync = { ...snapshot.sync, state: 'never', automaticEnabled: false, lastSuccessAt: null, nextAllowedAt: null };

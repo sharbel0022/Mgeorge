@@ -1,6 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtempSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {request} from 'node:http';
+import {digest} from '../src/security.js';
 import {storeTransactions,listTransactions} from '../src/db.js';
 import {approveSyntheticBankAccount,withSyntheticBankOriginal} from './bank-fixtures.js';
 const folder=mkdtempSync(join(tmpdir(),'mgeorge-api-'));
@@ -57,8 +58,16 @@ test('preview and import are separate and deduplicate repeated bank files',async
   assert.equal((await call('/api/import/commit','POST',{...body,confirm:true})).json.imported,1);
   assert.equal((await call('/api/import/commit','POST',{...body,confirm:true})).json.duplicate,1);
 });
-test('bank status exposes no secrets, connection requires server-side keys',async()=>{
-  const status=await call('/api/bank/status');assert.equal(status.json.configured,false);
+test('bank status exposes no secrets, preserves local flow evidence and requires server-side keys to connect',async()=>{
+  const at=Date.now(),browserHash=digest(decodeURIComponent(cookie.slice(cookie.indexOf('=')+1)));
+  for(const [id,expiresAt,sessionHash]of [['local-live',at+600000,browserHash],['local-lost',at+600000,digest('synthetic-missing-local-session')],['local-expired',at-1000,browserHash]]){
+    db.prepare('INSERT INTO bank_states(state_hash,expires_at,session_hash,owner,flow_id,status) VALUES(?,?,?,?,?,?)').run(digest(id),expiresAt,sessionHash,'local-admin',id,'pending');
+  }
+  const before=db.prepare('SELECT * FROM bank_states ORDER BY rowid').all(),status=await call('/api/bank/status');
+  assert.equal(status.res.status,200);assert.equal(status.json.configured,false);
+  const flows=Object.fromEntries(status.json.consentFlows.map(flow=>[flow.id,flow]));
+  assert.equal(flows['local-live'].status,'pending');assert.equal(flows['local-lost'].status,'session_lost');assert.equal(flows['local-expired'].status,'expired');
+  assert.deepEqual(db.prepare('SELECT * FROM bank_states ORDER BY rowid').all(),before);
   assert.equal((await call('/api/bank/connect','POST',{})).res.status,409);
 });
 test('invoice registration rejects duplicates and impossible dates, detail preserves originals and matches',async()=>{
@@ -107,6 +116,7 @@ test('company settings and export exclude secrets and refuse unsupported automat
   assert.equal((await call('/api/settings','PATCH',{sync_interval_minutes:1})).res.status,400);
   assert.equal((await call('/api/settings','PATCH',{reminders_enabled:true})).res.status,409);
   const output=(await call('/api/export')).json;assert.equal(output.settings.company_name,'Testföretaget AB');assert.equal(output.sessions,undefined);assert.equal(output.bank_connections,undefined);assert.equal(output.documents[0].content,undefined);
+  const exports=output.audit.filter(event=>event.action==='data_exported');assert.ok(exports.length>0);for(const event of exports)assert.deepEqual(JSON.parse(event.details),{},'local export retains its existing audit content');
 });
 test('Gmail OAuth state is session-bound, imports private originals and deduplicates without creating debts',async()=>{
   const previousFetch=globalThis.fetch,originalClient=process.env.GOOGLE_CLIENT_ID,originalSecret=process.env.GOOGLE_CLIENT_SECRET;

@@ -111,7 +111,7 @@ for (const [name, key, reply, knownConsent] of [
   assert.equal(snapshot.connection.status, 'error');
   assert.deepEqual(snapshot.accounts, []);
   const calls = f.transport.calls.length;
-  await assert.rejects(f.service({ requestKey: 'synthetic-start-request-0002' }).start(startBody(snapshot.revision)), { code: 'BANK_BUSY' });
+  await assert.rejects(f.service({ requestKey: 'synthetic-start-request-0002' }).start(startBody(snapshot.revision)), { code: knownConsent ? 'BANK_BUSY' : 'CONSENT_RECOVERY_REQUIRED' });
   await assert.rejects(f.service().syncContext('unconfirmed-account'), { code: 'BANK_CONSENT_INVALID' });
   assert.equal(f.transport.calls.length, calls);
   assert.equal(JSON.stringify(snapshot).includes(secret), false);
@@ -178,7 +178,7 @@ for (const status of ['failed', 'cancelled']) test(`legacy ${status} without a r
   assert.equal(snapshot.actions.connect, false);
   assert.equal(snapshot.actions.disconnect, false);
   assert.equal(snapshot.connection.status, 'error');
-  await assert.rejects(f.service({ requestKey: 'synthetic-start-request-0002' }).start(startBody(snapshot.revision)), { code: 'BANK_BUSY' });
+  await assert.rejects(f.service({ requestKey: 'synthetic-start-request-0002' }).start(startBody(snapshot.revision)), { code: 'CONSENT_RECOVERY_REQUIRED' });
   assert.equal(f.transport.calls.length, calls);
 });
 

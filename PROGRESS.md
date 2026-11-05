@@ -27,6 +27,20 @@ historiska delbetalningar och exakt restsaldo. Slutliga helgrindar och review
 redovisas i rapporten. Resultaten är syntetiska; inga produktionspengar ändras.
 Samtliga 33 numeriska poäng behålls: **255/330 =7,73/10; 0/33 ≥9,5**.
 
+## Agent 4 — kommersiell SaaS-arkitektur, 2026-11-05
+
+Branch `feature/95-saas`, bas `4ad205b`. [Leveransrapport med alla tolv uppdrag](docs/saas/95-SAAS-DELIVERY.md), [maskinläsbart testkvitto](docs/saas/evidence/2026-11-05/95-saas-verification.json), [Sites API-inventering](docs/saas/API-BOUNDARY-INVENTORY.md), [Node API-inventering](docs/saas/NODE-API-BOUNDARY-INVENTORY.md) och [kommersiella lanseringskrav](docs/saas/COMMERCIAL-LAUNCH-REQUIREMENTS.md).
+
+Kända medgivanden återkallas nu före ersättning efter misslyckad/avbruten bankidentifiering. En beständig skapandefas sparas före provider-POST; osäkert utfall blockerar nytt medgivande och ger tydlig återställningsinformation. Osäker DELETE, förlorat svar efter bekräftad återkallelse, utgången redirect och avbrott före POST har regressioner. Två företag hos samma bank, med samma externa resurs-ID men olika konton, behåller separata behörigheter och tillstånd. En oberoende granskning hittade och ledde till rättning av återställning som API tillät men webbläsarens åtgärdskontroll blockerade.
+
+Node-inventeringen reproducerade nekad bankstatus/export för läsrollen och felaktigt `session_lost` för en giltig företagssession. Status är nu en ren läsprojektion mot den centrala sessionsdatabasen. Exportens begränsade `recordDataExport()` bevarar företags-/aktörsbunden audit utan allmän skrivrätt. Sex nya HTTP-regressioner och 112 angränsande tester passerar; separat oberoende granskning fann inga Critical/Important-fynd och verifierade återställning av audit/lås efter ett injicerat behörighetsfel. Totalt tillkommer 19 testfall samt förstärkningar av befintliga tester.
+
+Lokala helsviter på den första frysta SaaS-versionen: **1 905 Node + 3 769 Sites + 47 bridge = 5 721 godkända**, inga fel/skip/cancel/TODO. Syntax, typer, exakt minimatch-kontroll, high-auditgrindar och Sites produktionsbygge passerar. Produktionsberoenden har inga auditfynd; Sites fulla audit har åtta moderate utvecklingsfynd. Node kördes efter den sista rättningen; Sites-källorna är byteidentiska med sin fulla test-/byggkörning. Exakta hashar, tidsstämplar och tidigare misslyckade miljöförsök finns i kvittot. Node 22-kontrollerna för leveransens commit redovisas i PR. Efter denna körning integrerades parallellt main-arbete från PR #48 (`bf24a3c`) utan konflikt. [Integrationskvitto](docs/saas/evidence/2026-11-05/95-saas-integration.json) skiljer kombinerade riktade kontroller från de tidigare helsviterna; slutlig full CI hör till [PR #50](https://github.com/sharbel0022/Mgeorge/pull/50). Sites-inventeringen omfattar nu 42 API-filer plus MCP.
+
+Ingen ny SQL-migration eller beroendeändring görs. Migrerings-/isoleringsacceptans på 42 Node- och 55 Sites-fall bevarar syntetiska äldre poster och original, avvisar återställning över företagsgräns och provar samtidiga jobb. Medgivandets nya fas är additiv metadata i befintlig krypterad payload; okända äldre försök kräver verifierad operatörsåterhämtning.
+
+**Kommersiell aktivering förblir NOT_APPROVED.** Sites har autentiserat skapande av tomma företagsarbetsytor; det verifierar inte juridisk företagsidentitet. Nodes publika inloggning är fortfarande `single_administrator` och får inte erbjudas som självständig fleranvändartjänst utan granskad identitetsadapter. Leverantörsavtal, AIS-roll, företags-/Bankgirobehörighet, verklig SCA och driftacceptans kräver extern evidens. Ingen produktion, publicering, kunddataändring, riktig BankID-signering eller produktionsmedgivande ingår. **Alla 33 poäng behålls: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).
