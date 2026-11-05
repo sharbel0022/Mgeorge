@@ -29,9 +29,11 @@ process.send({ready:true});
 
 function worker(path,t){
   const child=spawn(process.execPath,['--input-type=module','--eval',childSource,path],{stdio:['ignore','ignore','pipe','ipc'],windowsHide:true});
+  let diagnostics='';child.stderr.on('data',chunk=>{diagnostics=(diagnostics+chunk).slice(-12000);});
   t.after(()=>{if(child.exitCode===null)child.kill();});
-  const ready=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.ready)resolve();});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed before ready'));});});
-  const done=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.done)resolve(m);if(m.error)reject(new Error(m.error));});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed'));});});
+  const ready=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.ready)resolve();});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed before ready: '+diagnostics));});});
+  const done=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.done)resolve(m);if(m.error)reject(new Error(m.error));});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed: '+diagnostics));});});
+  done.catch(()=>{}); // Observe early completion rejection while awaiting startup.
   return {child,ready,done};
 }
 

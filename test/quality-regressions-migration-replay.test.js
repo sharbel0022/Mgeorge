@@ -5,6 +5,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
+import { spawn } from 'node:child_process';
 import { openDatabase, listInvoices } from '../src/db.js';
 
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -142,4 +143,34 @@ test('reopening an upgraded SQLite database does not bless changed bank or impor
   } finally {
     db.close();
   }
+});
+
+// Reopening a shared database must honor the configured busy timeout before
+// negotiating WAL; a second process can still own the existing journal lock.
+test('database startup waits for a transient journal lock before enabling WAL', { timeout: 10000 }, async t => {
+  const directory = mkdtempSync(join(tmpdir(), 'mgeorge-quality-startup-lock-'));
+  const filename = join(directory, 'locked.sqlite');
+  const locker = new DatabaseSync(filename);
+  locker.exec(`CREATE TABLE startup_marker (value TEXT); INSERT INTO startup_marker VALUES ('synthetic retained row');`);
+  locker.exec('BEGIN EXCLUSIVE;');
+  let lockHeld = true;
+  const release = () => { if (lockHeld) { locker.exec('COMMIT'); lockHeld = false; } };
+  t.after(() => { release(); locker.close(); rmSync(directory, { recursive: true, force: true }); });
+  const source = `import {openDatabase} from ${JSON.stringify(new URL('../src/db.js', import.meta.url).href)};
+    process.send({opening:true});
+    try { const db=openDatabase(process.argv[1]);
+      const marker=db.prepare('SELECT value FROM startup_marker').get();db.close();
+      process.send({ready:true,value:marker.value});process.disconnect();
+    } catch(error) { process.send({error:error.message,code:error.code});process.disconnect();process.exitCode=1; }`;
+  const child = spawn(process.execPath, ['--input-type=module','--eval',source,filename], { stdio:['ignore','ignore','pipe','ipc'] });
+  let diagnostics='', outcome, timer;
+  child.stderr.on('data', bytes => { diagnostics = (diagnostics + bytes).slice(-12000); });
+  t.after(() => { clearTimeout(timer); if(child.exitCode===null)child.kill(); });
+  child.on('message', message => {
+    if(message.opening) timer=setTimeout(release, 250);
+    else outcome=message;
+  });
+  const exitCode=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',resolve);});
+  assert.equal(exitCode,0,JSON.stringify(outcome)+' '+diagnostics);
+  assert.deepEqual(outcome,{ready:true,value:'synthetic retained row'});
 });

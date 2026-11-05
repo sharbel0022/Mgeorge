@@ -134,7 +134,7 @@ function tableHeader(line){
 const quantityValue=value=>/^-?\d+(?:[.,]\d{1,4})?$/.test(value)&&Number.isFinite(Number(value.replace(',','.')))&&Math.abs(Number(value.replace(',','.')))<=1_000_000_000?Number(value.replace(',','.')):null;
 const rateValue=value=>{const match=value.match(/^(\d{1,3}(?:[.,]\d{1,3})?)[ \t]*%?$/);if(!match)return null;const n=Number(match[1].replace(',','.'));return n>=0&&n<=100?n:null;};
 const rowKeys=['description','quantity','unit_price_cents','net_cents','vat_rate','vat_cents','total_cents'];
-const tableSummary=/^(?:netto(?:belopp)?|totalt netto|net amount|belopp (?:före|exklusive) moms|summa exkl\.? moms|moms(?:belopp)?|total moms|vat|att betala|summa att betala|totalbelopp|totalsumma|amount due|totalt inkl(?:usive|\.)? moms)[ \t]*[:.#]/iu;
+const tableSummary=/^(?:netto(?:belopp)?|totalt netto|net amount|belopp före moms|(?:summa|totalt|belopp)[ \t]+(?:inkl|exkl)(?:usive|\.?)[ \t]+moms|moms(?:belopp)?|total moms|vat|att betala|summa att betala|totalbelopp|totalsumma|amount due)[ \t]*[:.#]/iu;
 const pageCaption=/^(?:sida|page)[ \t]+\d+(?:[ \t]*(?:av|of|\/)[ \t]*\d+)?$/iu;
 const invoiceIdentity=/^(?:faktura[ \t]*(?:nummer|nr|no)|invoice[ \t]*(?:number|no))[ \t]*[:.#-]?[ \t]*([\p{L}\p{N}][\p{L}\p{N}/_-]*)$/iu;
 const continuationIdentity=/^(?:faktura|invoice)[ \t]+([\p{L}\p{N}][\p{L}\p{N}/_-]*)[ \t]*[,;:]?[ \t]*(?:fortsättning|continued|continuation)[ \t]+(?:sida|page)[ \t]+\d+(?:[ \t]+(?:av|of)[ \t]+\d+|[ \t]*\/[ \t]*\d+)?$/iu;
@@ -244,5 +244,7 @@ export function invoiceScalarText(input){
   const lines=linesOf(input),{covered}=parseTable(lines,{invoice_number:null,summary:{},credit:false,money:()=>null},[]);
   const pages=[];
   for(const source of lines){pages[source.page-1]||=[];pages[source.page-1].push(covered.has(`${source.page}:${source.line}`)?'':source.text);}
-  return pages.map(page=>page.join('\n')).join('\n');
+  // A page boundary is stronger evidence than an OCR paragraph gap. Preserve
+  // it so a missing labelled value cannot borrow a value on the next page.
+  return pages.map(page=>page.join('\n')).join('\n\f\n');
 }

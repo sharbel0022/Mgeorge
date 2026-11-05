@@ -25,13 +25,13 @@ function selectors(req?:Request){
 }
 async function actionFor(req?:Request):Promise<CompanyAction>{
  if(!req)return'read';const path=new URL(req.url).pathname;
- if(/\/api\/bank\/(?:config|connect|callback|disconnect|accounts|automatic|auto-sync|sync|details|account-evidence)$/.test(path)||/\/api\/gmail\/(?:connect|callback|disconnect|automation|trust|sync)$/.test(path)||/\/api\/bankgiro\/(?:source\/run|invoice-search)$/.test(path)||req.method==='POST'&&/^\/api\/payment-control\/(?:run|advance)$/.test(path))return'manage_integrations';
+ if(/\/api\/bank\/(?:config|connect|callback|disconnect|accounts|automatic|auto-sync|sync|details|account-evidence|revalidate)$/.test(path)||/\/api\/gmail\/(?:connect|callback|disconnect|automation|trust|sync)$/.test(path)||/\/api\/bankgiro\/(?:source\/run|invoice-search)$/.test(path)||req.method==='POST'&&/^\/api\/payment-control\/(?:run|advance)$/.test(path))return'manage_integrations';
  if(path==='/api/state'&&req.method==='POST'){
   const body=await req.clone().json().catch(()=>null) as {command?:{type?:string}}|null;if(body?.command?.type==='settings.save')return Object.hasOwn(body.command,'invoiceReferencePolicies')?'manage_reference_policy':'manage_company';
  }
  if(path==='/mcp'){
   const body=await req.clone().json().catch(()=>null) as {method?:string;params?:{name?:string}}|null,name=body?.params?.name||'';
-  if(body?.method==='tools/call'&&['bank_auto_sync','bank_account_evidence','bankgiro_auto_ingest','gmail_auto_sync'].includes(name))return'manage_integrations';
+  if(body?.method==='tools/call'&&['bank_auto_sync','bank_account_evidence','bank_revalidate_consent','bankgiro_auto_ingest','gmail_auto_sync'].includes(name))return'manage_integrations';
   return body?.method==='tools/call'&&!['payment_evidence','retained_report_evidence','backup_status','bankgiro_source_status','gmail_sync_status','bank_auto_sync_status'].includes(name)?'write':'read';
  }
  return req.method==='GET'||req.method==='HEAD'?'read':'write';

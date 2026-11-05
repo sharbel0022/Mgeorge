@@ -75,3 +75,19 @@ test('an active credit also locks the invoice organization while unrelated metad
  const before=structuredClone(state);assert.throws(()=>applyCommand(state,{type:'invoice.save',invoice:{...state.invoices[0],organizationNumber:'2222222222'}}),/betalningar|krediter|identitet/i);
  const edited=applyCommand(state,{type:'invoice.save',invoice:{...state.invoices[0],note:'Allowed correction'}}).state;assert.equal(balance(edited,edited.invoices[0]),9000);assert.deepEqual(edited.credits,before.credits);assert.deepEqual(state,before);
 });
+
+test('a booked invoice without its reviewed original cannot display an invoice verification badge',()=>{
+ const state=booked(),before=structuredClone(state),view=bankPaymentView(state,state.transactions[0]);
+ assert.equal(view.decision.code,'REVIEW');
+ assert.equal(view.invoiceVerified,false);
+ assert.deepEqual(state,before);assert.equal(balance(state,state.invoices[0]),0);
+});
+
+test('missing bank payer blocks the invoice verification badge on a historical allocation',()=>{
+ let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'SYN-1',total:10000,issued:'2026-10-01',due:'2026-10-30',reviewed:true,documentId:'synthetic-invoice-original'}}).state;
+ state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount:10000,party:'',payerReference:'SYN-1',bankReference:'SYNTHETIC-NO-PAYER',account:'synthetic-account',kind:'payment',verified:true})]}).state;
+ state.allocations.push({id:'synthetic-historical-no-payer',invoiceId:state.invoices[0].id,transactionId:state.transactions[0].id,amount:10000,effect:'payment',active:true,note:'Synthetic historical allocation',createdAt:'2026-10-27T00:00:00Z'});
+ const before=structuredClone(state),view=bankPaymentView(state,state.transactions[0]);
+ assert.equal(view.decision.code,'BLOCKED');assert.match(view.decision.reason,/betalare/);
+ assert.equal(view.invoiceVerified,false);assert.deepEqual(state,before);assert.equal(balance(state,state.invoices[0]),0);
+});

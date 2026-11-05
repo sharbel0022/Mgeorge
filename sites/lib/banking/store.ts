@@ -2,7 +2,7 @@ import { env } from 'cloudflare:workers';
 import { db, currentCompanyContext } from '@/lib/server';
 import { randomToken, seal, unseal, digest } from './security';
 import type { ProviderApplication, ProviderAccount, ProviderConfig } from './enable-banking';
-import { runtimeBankConfig, runtimeBankStatus } from './runtime-config';
+import { runtimeBankConfig, runtimeBankStatus, runtimeBankRedirectUrl } from './runtime-config';
 import { ConsentError, companyBankContext } from '../bank-consent-policy.js';
 import { resolveCorporateAccountEvidence, type CompanyAccountEvidence } from '../bank-company-authority.js';
 import { stableAccountKey } from './transactions';
@@ -87,6 +87,7 @@ export function storageReady(): boolean { try { secret(); return true; } catch {
 export const encrypt = (owner: string, purpose: string, value: unknown) => seal(secret(), owner, purpose, value);
 export const decrypt = <T>(owner: string, purpose: string, value: string) => unseal<T>(secret(), owner, purpose, value);
 export const configurationStatus = () => runtimeBankStatus(env as unknown as Record<string, unknown>);
+export const bankRedirectUrl = () => runtimeBankRedirectUrl(env as unknown as Record<string, unknown>);
 
 export async function application(owner: string): Promise<BankApplicationRow | null> {
   if (!configurationStatus().configured) return null;

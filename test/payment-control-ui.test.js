@@ -7,7 +7,7 @@ function view(){
  const elements=new Map();
  function el(key){if(!elements.has(key))elements.set(key,{innerHTML:'',textContent:'',hidden:false,isConnected:true,value:'',inert:false,disabled:false,focus(){},setAttribute(){},addEventListener(){},querySelector:el,querySelectorAll(){return[];}});return elements.get(key);}
  const ctx=vm.createContext({document:{querySelector:el,getElementById:id=>el('#'+id),addEventListener(){},body:{classList:{add(){},remove(){}}},hidden:false},window:{addEventListener(){},scrollTo(){}},location:{search:'',assign(){}},history:{pushState(){},replaceState(){}},URL,URLSearchParams,Intl,Date,matchMedia:()=>({matches:false,addEventListener(){}}),fetch:()=>new Promise(()=>{}),crypto:{randomUUID:()=> 'test_request_000000000001'},setTimeout:()=>1,clearTimeout(){}});
- for(const name of ['app','review','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${name}.js`,import.meta.url),'utf8'),ctx);
+ for(const name of ['workspace-search','app','review','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${name}.js`,import.meta.url),'utf8'),ctx);
  vm.runInContext("state.me={authenticated:true,login_required:true};state.control={counts:{review:0},totals:{},queue:[],run:null}",ctx);
  return {run:code=>vm.runInContext(code,ctx),set:(name,value)=>ctx[name]=value,html:()=>el('#app').innerHTML};
 }
