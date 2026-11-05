@@ -150,6 +150,29 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   catch(error){if(catalogLock)controlDb.exec('ROLLBACK');throw error;}
  }
  function capture(){const scope=storage.getStore(),bundle=scope?.bundle||legacyBundle;return {scope,bundle};}
+ /** A data export is a permitted read with one fixed, append-only audit effect.
+  * This capability accepts no SQL, event name, details or tenant selector and
+  * does not confer write permission through the ordinary database proxy. */
+ function recordDataExport(){
+  const {scope,bundle}=capture();
+  if(!scope||scope.initializing||bundle.transactionScope)throw fail('company_context_mismatch');
+  assertScope(scope,'read');
+  let catalogLocked=false,dataLocked=false;
+  try{
+   if(bundle.db!==controlDb){controlDb.exec('BEGIN IMMEDIATE');catalogLocked=true;}
+   bundle.db.exec('BEGIN IMMEDIATE');dataLocked=true;
+   assertScope(scope,'read');
+   const c=scope.context,details=c?{companyId:c.companyId,actorId:c.actorId,membershipVersion:c.membershipVersion}:{};
+   bundle.db.prepare('INSERT INTO audit_events(id,action,details) VALUES(?,?,?)').run(randomUUID(),'data_exported',JSON.stringify(details));
+   assertScope(scope,'read');
+   bundle.db.exec('COMMIT');dataLocked=false;
+   if(catalogLocked){controlDb.exec('COMMIT');catalogLocked=false;}
+  }catch(error){
+   if(dataLocked)try{bundle.db.exec('ROLLBACK');}catch{}
+   if(catalogLocked)try{controlDb.exec('ROLLBACK');}catch{}
+   throw error;
+  }
+ }
  function clearTransaction(bundle){bundle.transactionScope=null;bundle.catalogTransaction=false;bundle.transactionToken=null;bundle.savepoints=[];bundle.transactionMode=null;}
  function abortTransaction(bundle){
   try{bundle.db.exec('ROLLBACK');}catch{}
@@ -278,7 +301,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
    has(_target,key){return key in services()[name];},
    getOwnPropertyDescriptor(_target,key){const descriptor=Reflect.getOwnPropertyDescriptor(services()[name],key);return descriptor?{...descriptor,configurable:true}:undefined;}
   });},
-  resolve:resolveContext,run,
+  resolve:resolveContext,run,recordDataExport,
   runJob(context,callback,options={}){return run(context,callback,{...options,job:true});},
   assert(action='read'){assertScope(storage.getStore(),action);},
   databasePath(context){return getBundle(context).path;},

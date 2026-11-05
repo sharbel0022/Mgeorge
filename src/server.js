@@ -902,7 +902,7 @@ async function companyRoute(req,res,url,path){
   if(path==='/api/audit'&&req.method==='GET')return json(res,200,{items:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC LIMIT 100').all()});
   if(path==='/api/export'&&req.method==='GET'){
     const evidence=reconciliationData(db);
-    audit(db,'data_exported',{});
+    companyRuntime.recordDataExport();
     return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:evidence.invoices,transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),customer_messages:listMessages(db),message_approvals:db.prepare('SELECT * FROM message_approvals').all(),message_deliveries:db.prepare('SELECT * FROM message_deliveries').all(),verified_contacts:db.prepare('SELECT * FROM verified_contacts').all(),payer_links:db.prepare('SELECT * FROM payer_links').all(),bank_specification_links:db.prepare('SELECT * FROM bank_specification_links').all(),reconciliation_findings:db.prepare('SELECT * FROM reconciliation_findings').all(),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
   }
   // AIS only: reads account data, never creates, approves or executes payments.
@@ -911,11 +911,16 @@ async function companyRoute(req,res,url,path){
     const company=bankCompanyContext(req.principal,url.searchParams.get('companyId')??undefined,'read');
     const activation=configStatus();
     const connections=db.prepare('SELECT * FROM bank_connections WHERE owner=? ORDER BY created_at DESC,rowid DESC').all(req.principal);
-    // Local status reads never call a bank. Keep terminal reasons instead of
-    // deleting expired attempts, so a lost navigation can be recovered safely.
-    db.prepare("UPDATE bank_states SET consumed=1,status='expired',terminal_reason='CONSENT_FLOW_EXPIRED' WHERE owner=? AND expires_at<=? AND status IN ('pending','consuming')").run(req.principal,Date.now());
-    db.prepare("UPDATE bank_states SET consumed=1,status='session_lost',terminal_reason='SESSION_ENDED' WHERE owner=? AND status='pending' AND NOT EXISTS (SELECT 1 FROM sessions WHERE id_hash=bank_states.session_hash AND expires_at>?)").run(req.principal,Date.now());
-    const flows=db.prepare('SELECT * FROM bank_states WHERE owner=? ORDER BY rowid DESC LIMIT 20').all(req.principal).map(flow=>({id:flow.flow_id||null,companyId:company.companyId,status:flow.status,reason:flow.terminal_reason||null,expiresAt:new Date(flow.expires_at).toISOString(),connectionId:flow.connection_id||null}));
+    // Status is a read for every company role. Project terminal reasons without
+    // changing retained flow evidence or granting viewers database writes.
+    // Browser sessions live in the control database, not a company partition.
+    const observedAt=Date.now(),liveSession=controlDb.prepare('SELECT 1 FROM sessions WHERE id_hash=? AND expires_at>?');
+    const flows=db.prepare('SELECT * FROM bank_states WHERE owner=? ORDER BY rowid DESC LIMIT 20').all(req.principal).map(flow=>{
+      let status=flow.status,reason=flow.terminal_reason||null;
+      if(flow.expires_at<=observedAt&&['pending','consuming'].includes(status)){status='expired';reason='CONSENT_FLOW_EXPIRED';}
+      else if(status==='pending'&&!liveSession.get(flow.session_hash,observedAt)){status='session_lost';reason='SESSION_ENDED';}
+      return {id:flow.flow_id||null,companyId:company.companyId,status,reason,expiresAt:new Date(flow.expires_at).toISOString(),connectionId:flow.connection_id||null};
+    });
     return json(res,200,{configured:activation.configured,activation,environment:activation.environment,company:{id:company.companyId,canManageBank:['owner','admin'].includes(company.role),membershipMode:companyRuntime.current()?'company':'legacy_workspace'},consentFlow:flows[0]??null,consentFlows:flows,connections:connections.map(x=>{
       let accounts=[],sync_coverage=null,status=x.status==='revocation_pending'?x.status:!Number.isFinite(Date.parse(x.valid_until))||Date.parse(x.valid_until)<=Date.now()?'renewal_required':x.status;
       let consent;

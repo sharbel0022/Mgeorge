@@ -1,5 +1,18 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 4 — kommersiell SaaS-arkitektur, 2026-11-05
+
+[Leverans- och verifieringsrapport](docs/saas/95-SAAS-DELIVERY.md) samt [testkvitto](docs/saas/evidence/2026-11-05/95-saas-verification.json) gäller `feature/95-saas` från `4ad205b`. **Samtliga 33 numeriska poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.** De nya teknikbevisen utgör inte ett verifierat kommersiellt betyg på 9,5.
+
+| Berört område | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | --- | --- |
+| 15–17. Bankanslutning, synk och Bankgiro | Känd återkallelse före ersättning, beständig fas före POST, säkra återförsök och separata företag/konton vid identiska externa resurs-ID. | Verkliga leverantörsavtal, företags-/konto-/Bankgirobehörigheter och bankens SCA kräver extern acceptans. Okänd medgivandeskapning behöver leverantörsstödd avstämning. |
+| 29–31. Backup, åtkomst och återställning | API-inventering för båda systemen; 42 Node +55 Sites migrerings-/isoleringsfall; rättad läsroll och central sessionsprojektion; snäv, företagsbunden exportaudit med verifierad rollback. | Ingen produktionsrestore eller ny juridisk företagskontroll. Nodes publika identitet är fortfarande en enda administratör. |
+| 32. Kodkvalitet och tester | 19 nya fall; slutliga 1 905 Node +3 769 Sites +47 bridge =5 721 pass utan fel/skip/cancel/TODO; syntax, typer, auditgrindar, minimatch och bygge passerar. Två avgränsade oberoende kodgranskningar med redovisade resultat. | Lokal Node 24-verifiering skiljs från Node 22-PR-CI. Åtta moderate utvecklingsberoendefynd i Sites kvarstår; inga paket ändras. |
+| 33. Produktion | Exakt källfingeravtryck, migrations-/rollbackbeslut och kommersiell kravlista; branch/PR utgör leveransgränsen. | Ingen driftsättning, produktionsmigration, verklig bankidentifiering eller kundaktivering genomförd. |
+
+Det nya underlaget kompletterar tidigare daterade kvitton. Produktionsberoenden har noll auditfynd, och riktade testgrupper räknas inte en gång till ovanpå helsviterna. [Lanseringskraven](docs/saas/COMMERCIAL-LAUNCH-REQUIREMENTS.md) kräver separat avtalad AIS-modell, dataskydd, kundbehörigheter och driftbevis före verklig kundlansering.
+
 ## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
 
 [Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.

@@ -1,0 +1,464 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-05T18:03:06.254757+00:00",
+  "repository": "sharbel0022/Mgeorge",
+  "branch": "feature/95-saas",
+  "baseCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "source": {
+    "state": "frozen application/test files before delivery commit; documentation may be completed afterward",
+    "finalInputSha256": "6dea343a052fc615d6a2d8f92d2bc926bd1f687b644ffdd9ea6f3f7db4d3c27f",
+    "hashScope": "tracked and untracked nonignored files excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+    "hashAlgorithm": "SHA-256 over sorted unique relative UTF-8 path + NUL + file bytes + NUL",
+    "changedCodeFileSha256": {
+      "sites/components/onboarding/bank-onboarding-views.tsx": "3de8ffb3a3beb13125530148c00a0dfae286adfc2d6c35f0ee675e8104a4fc1f",
+      "sites/lib/banking/openpayments-lifecycle.js": "c577b74e5518544917a3616ce2107b2d3bde93d30b0f4217fdf19f2a7550688d",
+      "sites/lib/banking/saas-bank-runtime.js": "73a27d9fd3c41dc3d62ce90d4767c54671249b638a23225f385e9797a6758452",
+      "sites/tests/openpayments-lifecycle-recovery.test.mjs": "fc09585b3754df1a77878d63288bc7b995db670d2f1b5c67aa851fca95dd1ba2",
+      "sites/tests/saas-onboarding-views.test.mjs": "e6510bd202b3ca0e511568d814c2b4dff8e9868764bc5df7bb08b5b16b5f1c6a",
+      "src/company-runtime.js": "c37c60c5cff6dd6b32988ae1ba7f4d72e87ec133d5eeba2889d43ab11dab1f64",
+      "src/server.js": "02ab30c0200c533955638f36ac66c8c89de5132f8affaca6d4e8fa1a107c12ce",
+      "test/api.test.js": "e7fd725eeb61fdd6c909a5689873beff41ec53777ce4f9c7c82db25be5101c99",
+      "test/bank-consent-api.test.js": "a0b46829a875c039a22d648d7df0d713865e0f17977089b83e1b4f628012babe",
+      "test/company-read-api.test.js": "ac34b8cd994fb730c7012cf78327655fc0e8d5942259a06d1a37c28b5290c0ab"
+    },
+    "sitesTreeBeforeNodeOnlyRepair": {
+      "scope": "all tracked and untracked nonignored files under sites/",
+      "algorithm": "SHA-256 of sorted unique relative UTF-8 path + NUL + file bytes + NUL",
+      "files": 576,
+      "sha256": "72585302afbdc42452f123d2a44c8bc0dca259089886f9f490ba60327e954fb1"
+    },
+    "sitesTreeSha256AfterNodeOnlyRepair": "72585302afbdc42452f123d2a44c8bc0dca259089886f9f490ba60327e954fb1",
+    "sitesSourcesUnchangedByNodeRepair": true,
+    "note": "Sites tests/types/build ran before the later Node-only read-flow repair. Their whole-repository input hash differs; all 576 Sites files are unchanged. Final full Node tests ran after that repair. Exact Node 22 PR checks are recorded by GitHub for the pushed commit."
+  },
+  "environment": {
+    "os": "Linux",
+    "node": "v24.22.1",
+    "npm": "11.9.0",
+    "tests": "synthetic only, with scripts/saas-test-isolation.mjs; no production provider or BankID calls"
+  },
+  "gates": {
+    "nodeSyntax": {
+      "label": "final-node-check-with-read-fix",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": ".",
+      "startedAt": "2026-11-05T17:52:09.301319+00:00",
+      "inputHashBefore": "6dea343a052fc615d6a2d8f92d2bc926bd1f687b644ffdd9ea6f3f7db4d3c27f",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T17:53:02.269137+00:00",
+      "inputHashAfter": "6dea343a052fc615d6a2d8f92d2bc926bd1f687b644ffdd9ea6f3f7db4d3c27f",
+      "inputsUnchanged": true,
+      "logSha256": "92ee696153fccdaef6635fbd9663092d87747e8f7b21c6757970bd3971f37564",
+      "summary": {}
+    },
+    "nodeFullSuite": {
+      "label": "final-node-with-read-fix",
+      "command": [
+        "npm",
+        "run",
+        "test:isolated"
+      ],
+      "cwd": ".",
+      "startedAt": "2026-11-05T17:52:20.805589+00:00",
+      "inputHashBefore": "6dea343a052fc615d6a2d8f92d2bc926bd1f687b644ffdd9ea6f3f7db4d3c27f",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T18:02:14.234437+00:00",
+      "inputHashAfter": "6dea343a052fc615d6a2d8f92d2bc926bd1f687b644ffdd9ea6f3f7db4d3c27f",
+      "inputsUnchanged": true,
+      "logSha256": "96b41be9ecce067fb7a724bc89a8b476f066e05a6ac342c688401f04073a640e",
+      "summary": {
+        "tests": 1905,
+        "suites": 0,
+        "pass": 1905,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 590931.437418
+      }
+    },
+    "sitesTypes": {
+      "label": "final-sites-check",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "sites",
+      "startedAt": "2026-11-05T17:35:48.800139+00:00",
+      "inputHashBefore": "5b21eb09ffe68ff4f7e5f8cd2fde1a2684f7c37e5274db22fd5c69e70685b761",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T17:36:38.422999+00:00",
+      "inputHashAfter": "5b21eb09ffe68ff4f7e5f8cd2fde1a2684f7c37e5274db22fd5c69e70685b761",
+      "inputsUnchanged": true,
+      "logSha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c",
+      "summary": {}
+    },
+    "sitesFullSuite": {
+      "label": "final-sites",
+      "command": [
+        "npm",
+        "run",
+        "test:isolated"
+      ],
+      "cwd": "sites",
+      "startedAt": "2026-11-05T17:33:31.529107+00:00",
+      "inputHashBefore": "5b21eb09ffe68ff4f7e5f8cd2fde1a2684f7c37e5274db22fd5c69e70685b761",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T17:48:38.292361+00:00",
+      "inputHashAfter": "5b21eb09ffe68ff4f7e5f8cd2fde1a2684f7c37e5274db22fd5c69e70685b761",
+      "inputsUnchanged": true,
+      "logSha256": "92e089a72b26a737c59ff67b2b3ea965b62b8cb41911821bd372ec2c57d461d6",
+      "summary": {
+        "tests": 3769,
+        "suites": 0,
+        "pass": 3769,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 905837.363042
+      }
+    },
+    "sitesProductionBuild": {
+      "label": "final-sites-build-serial",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "sites",
+      "startedAt": "2026-11-05T17:48:42.741139+00:00",
+      "inputHashBefore": "5b21eb09ffe68ff4f7e5f8cd2fde1a2684f7c37e5274db22fd5c69e70685b761",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T17:49:38.284231+00:00",
+      "inputHashAfter": "5b21eb09ffe68ff4f7e5f8cd2fde1a2684f7c37e5274db22fd5c69e70685b761",
+      "inputsUnchanged": true,
+      "logSha256": "b5c1f59307aea7f0ecd2f3845f987a1df765870f12d0287ab036b0ae2ca7efe0",
+      "summary": {}
+    },
+    "bridgeFullSuite": {
+      "command": "NODE_ENV=test npm --prefix bridge/bankgiro run test:isolated",
+      "exitCode": 0,
+      "logSha256": "e722d5497c9362a562c2caffe3ed564d1bae7d7131b30ff44f3073554a681121",
+      "summary": {
+        "tests": 47,
+        "suites": 0,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 13807.940055
+      },
+      "sourceScope": "bridge/bankgiro unchanged from base"
+    },
+    "bridgeSyntax": {
+      "command": "npm --prefix bridge/bankgiro run check",
+      "exitCode": 0,
+      "logSha256": "4843392301f472bd2f730e36101d1b9fe29803f87b6286f8407882e6188d1340",
+      "summary": {},
+      "sourceScope": "bridge/bankgiro unchanged from base"
+    },
+    "minimatchMitigation": {
+      "command": "cd sites && node scripts/minimatch-backport.mjs --check --require-target",
+      "exitCode": 0,
+      "logSha256": "03436c145f530b2840b889abbdfdc8cc588772302aa0ee8e3a20bf5daf58620c",
+      "summary": {},
+      "targets": 1,
+      "writes": 0,
+      "status": "verified"
+    },
+    "nodeAudit": {
+      "command": "npm audit --audit-level=high --json",
+      "exitCode": 0,
+      "logSha256": "ed80d5dc4df1de0b8bd1fdcc27bcd52aa98f830a63c479be8838c598f4b3b6e1",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    },
+    "sitesAudit": {
+      "command": "cd sites && npm audit --audit-level=high --json",
+      "exitCode": 0,
+      "logSha256": "06697c5c384c5eb27d488c6f26f9e8c75a2f32ce5d1cd39fee43fdd4eeb26fab",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 8,
+        "high": 0,
+        "critical": 0,
+        "total": 8
+      }
+    },
+    "sitesProductionAudit": {
+      "command": "cd sites && npm audit --omit=dev --audit-level=high --json",
+      "exitCode": 0,
+      "logSha256": "fb1002a0db3061e57cdda8ba78ca035b50f88f3e1c235c2ed306eacc4024bb91",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    },
+    "bridgeAudit": {
+      "command": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high --json",
+      "exitCode": 0,
+      "logSha256": "e1815430d0a8729c1f29f3561b0c2fbddb0a52318a649d25c7c1cb5680a2d6ad",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    }
+  },
+  "targetedRuns": {
+    "nodeMigrationAndTenants": {
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 test/company-boundary.test.js test/company-bank-sync-store.test.js test/saas-company-acceptance.test.js",
+      "exitCode": 0,
+      "logSha256": "74468375a9c8cc0545ccf5753686be329de73db31d32acefbd7ba7988efc2ed0",
+      "summary": {
+        "tests": 42,
+        "suites": 0,
+        "pass": 42,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 11438.313197
+      }
+    },
+    "sitesMigrationAndTenants": {
+      "command": "cd sites && NODE_ENV=test node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 tests/company-storage.test.mjs tests/company-backup.test.mjs tests/company-bank-sync-backup.test.mjs tests/seven-agent-migration-order.test.mjs tests/company-sync-scale.test.mjs tests/saas-company-acceptance.test.mjs",
+      "exitCode": 0,
+      "logSha256": "18689b1df17044f6c2d1574dfe7928430fd9a8d41b11bf81cdb8016db49bdb1a",
+      "summary": {
+        "tests": 55,
+        "suites": 0,
+        "pass": 55,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 33714.7616
+      }
+    },
+    "sharedRecoveryAndBrowserContract": {
+      "command": null,
+      "exitCode": 0,
+      "logSha256": "4e6087c89e6f1f58dbc83822ebbfb01377d64b7bbc9765e252eb9b8781e8e04f",
+      "summary": {
+        "tests": 60,
+        "suites": 0,
+        "pass": 60,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 2719.115128
+      },
+      "scopeDescription": "Targeted lifecycle/runtime/expiry/onboarding UI/client tests; exact invocation not retained in the log metadata. All are included in the complete Sites suite above."
+    },
+    "nodeReadHttpAndAdjacent": {
+      "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 test/company-read-api.test.js test/company-api.test.js test/company-boundary.test.js test/bank-consent-api.test.js test/api.test.js test/bank-api.test.js test/security-session-allocation.test.js test/saas-login-boundary.test.js",
+      "exitCode": 0,
+      "logSha256": "60d6fc44724eee5587c54e228ec6e2a0fdd442487d671d9418002bb866b36d00",
+      "summary": {
+        "tests": 112,
+        "suites": 0,
+        "pass": 112,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 33597.24154
+      }
+    }
+  },
+  "reviews": [
+    {
+      "scope": "shared lifecycle/runtime/UI and new regressions",
+      "kind": "independent agent",
+      "importantFindings": 1,
+      "resolution": "Expired provably-uncreated flow was retryable in API but blocked by the browser. Added failing actual parseSnapshot/mutationAllowed assertions, repaired projection, expanded targeted suite passes 60. The independent pre-repair run of 12 tests was not proof of browser recovery."
+    },
+    {
+      "scope": "new Node read-role/status/export capability and touched HTTP tests",
+      "kind": "independent agent",
+      "criticalFindings": 0,
+      "importantFindings": 0,
+      "independentTests": {
+        "pass": 40,
+        "fail": 0
+      },
+      "extraChecks": [
+        "post-insert authorization failure rolls back audit and releases both locks; next viewer export succeeds",
+        "fixed export capability refuses calls outside runtime scope"
+      ]
+    }
+  ],
+  "migration": {
+    "schemaFilesChanged": [],
+    "dependencyFilesChanged": [],
+    "dataChange": "Additive consentCreation metadata in the existing encrypted JSON payload; no schema migration or customer-data rewrite.",
+    "legacyEvidence": "Synthetic retained financial rows/original bytes, immutable company ownership, migration ordering, company-scoped backup and cross-company restore denial tested.",
+    "rollback": "Disable new SaaS bank starts and reconcile unknown/unfinished attempts before reverting recovery code. Never reopen bound data with a tenant-unaware runtime."
+  },
+  "developmentFailuresNotCountedAsPassing": [
+    {
+      "label": "initial Node run while Sites installation was incomplete",
+      "summary": {
+        "tests": 1843,
+        "suites": 0,
+        "pass": 1837,
+        "fail": 6,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 765701.517977
+      },
+      "logSha256": "bdb47f1abf987540a5fa36de5dbddeb9c064fd6ac5b953e0a739d3aa734480da",
+      "reason": "Six module-load failures due to unavailable sites/node_modules/xlsx; completed locked reinstall followed by passing full reruns."
+    },
+    {
+      "label": "initial Sites locked install",
+      "exitCode": 137,
+      "logSha256": "18aaf424596e853145209a2a82767a9c1f1f702bc37e03d6fd41099775d328d6",
+      "resolution": "Memory-bounded locked reinstall completed; package/lock files unchanged."
+    },
+    {
+      "label": "parallel Sites production build",
+      "exitCode": 137,
+      "logSha256": "a94cab1da5dd77cfc9757cf9dd26e529da0a4165d19f9a752ad6ca8b7d1e4f36",
+      "resolution": "Serial build passed with the exact same input fingerprint."
+    }
+  ],
+  "regressionEvidence": {
+    "lifecycle-recovery-red.tap": {
+      "summary": {
+        "tests": 5,
+        "suites": 0,
+        "pass": 0,
+        "fail": 5,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 890.045182
+      },
+      "logSha256": "e6541e61ec85b6d314811ff1e1dc852d7576bdef5a7f150cb9fa5faddd942d7e"
+    },
+    "lifecycle-interruption-red.tap": {
+      "summary": {
+        "tests": 26,
+        "suites": 0,
+        "pass": 22,
+        "fail": 4,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 4791.425442
+      },
+      "logSha256": "59e600364f9d4c16552a43c8426d93fe6b5c5acb1aceb0f9b45fc957b8a1d008"
+    },
+    "lifecycle-before-create-red.tap": {
+      "summary": {
+        "tests": 12,
+        "suites": 0,
+        "pass": 10,
+        "fail": 2,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 909.942131
+      },
+      "logSha256": "884f850b3b08dc1bf8a357c7b8ebac7b074a99cb5ce3692931b8eb403979641a"
+    },
+    "review-browser-recovery-red.tap": {
+      "summary": {
+        "tests": 12,
+        "suites": 0,
+        "pass": 11,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 921.799109
+      },
+      "logSha256": "48d9df96c812ebdf5c28f2c860e5b85ceebb120e8feb54bc5ebb48f8132c2fe4"
+    },
+    "review-browser-recovery-green.tap": {
+      "summary": {
+        "tests": 60,
+        "suites": 0,
+        "pass": 60,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 2719.115128
+      },
+      "logSha256": "4e6087c89e6f1f58dbc83822ebbfb01377d64b7bbc9765e252eb9b8781e8e04f"
+    },
+    "node-read-api-red.tap": {
+      "summary": {
+        "tests": 6,
+        "suites": 0,
+        "pass": 1,
+        "fail": 5,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 2854.905299
+      },
+      "logSha256": "53a6ad8ceafd6b9d829fe60521de72f4b4e82ace9f0adb0c510f77454f8f5af8"
+    },
+    "node-read-api-green.tap": {
+      "summary": {
+        "tests": 6,
+        "suites": 0,
+        "pass": 6,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 2292.525832
+      },
+      "logSha256": "d0bdef827ad06518d213259973fb39245084379351bf0df403be6ae0ef70994c"
+    }
+  },
+  "counting": "Targeted/reviewer results overlap full suites and are not added to the full-suite total. Node RED has three behavior failures and two absent-capability assertions, not five independent vulnerabilities.",
+  "commercialLaunch": "NOT_APPROVED",
+  "realBankAcceptance": "NOT_APPROVED",
+  "limitations": [
+    "No deployment, production migration, customer data changes or production consent.",
+    "Node public login still has a single administrator; Sites empty workspace creation is not legal-entity verification.",
+    "Provider contracts, AIS regulatory role, corporate account/Bankgiro entitlement, privacy contracts and production restore/scheduler acceptance require external evidence.",
+    "Unknown remote consent creation requires provider-supported reconciliation and a reviewed operator process.",
+    "No numerical quality-score increase is inferred from synthetic tests."
+  ],
+  "fullSuiteTotal": 5721
+}

@@ -88,6 +88,7 @@ export function ConnectionSummary({ snapshot, now = Date.now() }: { snapshot: Sn
     <h2>Bankanslutningens status</h2>
     {snapshot.environment === 'sandbox' && <p className="onboarding-notice"><strong>Testläge · sandbox</strong> Anslutningen gäller en testmiljö och visar inte bekräftade produktionsuppgifter.</p>}
     <p><span className="onboarding-badge">{status}</span>{connection && <> · {connection.bankName}</>}</p>
+    {snapshot.sync.errorCode === 'consent_recovery_required' && <p className="onboarding-notice" role="status">Bankens svar saknas från ett tidigare anslutningsförsök. Kontakta administratören för att kontrollera medgivandet innan du försöker igen.</p>}
     {connection?.status === 'revoked' && <p className="onboarding-muted">{revocation === 'confirmed' ? 'Banken har bekräftat återkallelsen.' : revocation === 'pending' ? 'Bankens återkallelse väntar på bekräftelse. Kontrollera även åtkomsten hos banken.' : 'Bankens återkallelse är inte bekräftad. Kontrollera åtkomsten hos banken.'}</p>}
     <div className="onboarding-grid">
       <section className="onboarding-section"><h3>Kontodata (AIS)</h3><dl className="onboarding-facts">
