@@ -23,14 +23,14 @@ export function exactReference(reference, candidate){
   return !!labelled&&labelled[1]===b;
 }
 
-export function reconciliationData(db,{owner}={}){
+export function reconciliationData(db,{owner,connectionId,referenceContext}={}){
   const retained=db.prepare('SELECT id,owner,name,mime_type,content,content_sha256 FROM import_jobs WHERE content IS NOT NULL').all();
   const originals=new Set(retained.filter(x=>x.content_sha256&&digest(x.content)===x.content_sha256).map(x=>x.id));
   const alteredOriginals=new Set(retained.filter(x=>!originals.has(x.id)).map(x=>x.id));
   const transactions=listTransactions(db),allocations=db.prepare('SELECT * FROM allocations').all();
   const canonical=value=>String(value||'').replace(/^iban:/i,'').replace(/\s/g,'').toUpperCase();
   const approvedAccounts=new Set();
-  const connections=db.prepare("SELECT accounts_json,selected_account_uid,valid_until FROM bank_connections WHERE owner<>'' AND selected_account_uid<>'' AND status='connected'"+(owner!==undefined?' AND owner=?':'')).all(...(owner!==undefined?[owner]:[]));
+  const connections=db.prepare("SELECT accounts_json,selected_account_uid,valid_until FROM bank_connections WHERE owner<>'' AND selected_account_uid<>'' AND status='connected'"+(owner!==undefined?' AND owner=?':'')+(connectionId!==undefined?' AND id=?':'')).all(...(owner!==undefined?[owner]:[]),...(connectionId!==undefined?[connectionId]:[]));
   for(const connection of connections){
     if(!(Date.parse(connection.valid_until)>Date.now()))continue;
     try{const resources=decryptObject(connection.accounts_json),selected=Array.isArray(resources)?resources.filter(a=>a?.uid===connection.selected_account_uid):[],account=canonical(selected[0]?.account_id?.iban);if(selected.length===1&&selected[0]?.currency==='SEK'&&/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(account))approvedAccounts.add(account);}catch{}
@@ -99,7 +99,7 @@ export function reconciliationData(db,{owner}={}){
   }));
   const links=db.prepare('SELECT * FROM payer_links').all().filter(link=>link.verified_by!=='allocation'||usablePayerEvidence.has(JSON.stringify([link.invoice_id,link.payer,link.account])));
   const invoiceDocuments=new Map(db.prepare('SELECT * FROM documents WHERE invoice_id IS NOT NULL').all().map(document=>[document.id,document]));
-  const invoices=listInvoices(db).map(invoice=>{
+  const invoices=listInvoices(db,{referenceContext}).map(invoice=>{
     const missingOriginal=allocations.some(a=>a.invoice_id===invoice.id&&!transactionsById.get(a.transaction_id)?.original_verified);
     const accountIssue=allocations.filter(a=>a.invoice_id===invoice.id).map(a=>transactionsById.get(a.transaction_id)?.account_consent_issue).find(Boolean);
     const payment_evidence_issue=invoice.payment_evidence_issue||(missingOriginal?'Originalet för en registrerad betalningskoppling kan inte verifieras.':'')||accountIssue||'';
@@ -197,24 +197,29 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
   }
   return out.map(f=>({...f,rule_version:RECONCILIATION_RULE_VERSION})).sort((a,b)=>b.score-a.score);
 }
-export function runReconciliation(db){
+export function runReconciliation(db,{owner,connectionId,referenceContext,assertCurrent,includeSummary=false}={}){
   // Acquire the writer lock before reading any evidence. Imports and other
   // reconciliation processes cannot invalidate the decision before its commit.
   db.exec('BEGIN IMMEDIATE');
   try{
-    let suggestions=analyzeReconciliation(reconciliationData(db));
+    assertCurrent?.();
+    const data=()=>reconciliationData(db,{owner,connectionId,referenceContext});
+    let suggestions=analyzeReconciliation(data()),applied=0;
     for(const s of suggestions.filter(s=>s.safe&&s.amount_cents>0)){
-      allocate(db,s.invoice_id,s.transaction_id,s.amount_cents,{automatic:true,transactionOpen:true});
+      assertCurrent?.();
+      allocate(db,s.invoice_id,s.transaction_id,s.amount_cents,{automatic:true,transactionOpen:true,referenceContext});
       audit(db,'automatic_verified_match',s);
+      applied++;
     }
-    suggestions=analyzeReconciliation(reconciliationData(db));
+    suggestions=analyzeReconciliation(data());
     db.prepare('UPDATE reconciliation_findings SET active=0').run();
     for(const s of suggestions.filter(s=>s.invoice_id)){
       const id=digest(JSON.stringify(s));
       db.prepare('INSERT INTO reconciliation_findings(id,invoice_id,transaction_id,kind,details) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET active=1').run(id,s.invoice_id,s.transaction_id,s.kind,JSON.stringify(s));
     }
+    assertCurrent?.();
     db.exec('COMMIT');
-    return suggestions;
+    return includeSummary?{findings:suggestions,applied}:suggestions;
   }catch(e){db.exec('ROLLBACK');throw e;}
 }
 export function verifyPayer(db,{invoice_id,payer,account,evidence},principal){

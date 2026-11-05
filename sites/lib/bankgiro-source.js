@@ -10,11 +10,11 @@ export function validateReportPage(page,limit){
  if(!page||!Array.isArray(page.reports)||page.reports.length>limit||!(page.nextCursor===null||text(page.nextCursor,2000)))throw ingestError('INVALID_PAGE');
  if(page.nextPollAt!==undefined&&!Number.isFinite(Date.parse(page.nextPollAt)))throw ingestError('INVALID_PAGE');
  if(page.missingReportIds!==undefined&&(!Array.isArray(page.missingReportIds)||page.missingReportIds.length>1000||!page.missingReportIds.every(x=>text(x))))throw ingestError('INVALID_PAGE');
- const reports=page.reports.map(r=>{if(!r||!text(r.reportId)||!text(r.filename,255)||! /\.(csv|xml|xlsx)$/i.test(r.filename)||/[\\/]/.test(r.filename)||typeof r.sha256!=='string'||! /^[a-f0-9]{64}$/i.test(r.sha256)||r.availableAt!==undefined&&!Number.isFinite(Date.parse(r.availableAt)))throw ingestError('INVALID_PAGE');return {reportId:r.reportId,filename:r.filename,sha256:r.sha256.toLowerCase(),...(r.availableAt?{availableAt:r.availableAt}:{})};});
+ const reports=page.reports.map(r=>{if(!r||!text(r.reportId)||!text(r.filename,255)||! /\.(csv|xml|xlsx|opbg\.json)$/i.test(r.filename)||/[\\/]/.test(r.filename)||typeof r.sha256!=='string'||! /^[a-f0-9]{64}$/i.test(r.sha256)||r.availableAt!==undefined&&!Number.isFinite(Date.parse(r.availableAt)))throw ingestError('INVALID_PAGE');return {reportId:r.reportId,filename:r.filename,sha256:r.sha256.toLowerCase(),...(r.availableAt?{availableAt:r.availableAt}:{})};});
  return {reports,nextCursor:page.nextCursor,nextPollAt:page.nextPollAt,missingReportIds:page.missingReportIds};
 }
 export function sanitizedIngestCode(error){
- const allowed=['AUTHORIZATION_BLOCKED','AUTHORIZATION_CHANGED','INVALID_PAGE','HASH_MISMATCH','IDENTITY_CONFLICT','LEASE_LOST','TIMEOUT','INVALID_ORIGINAL','INVALID_SINK_RESULT','RATE_LIMITED','SOURCE_UNAVAILABLE'];
+ const allowed=['AUTHORIZATION_BLOCKED','AUTHORIZATION_CHANGED','INVALID_PAGE','HASH_MISMATCH','IDENTITY_CONFLICT','ACCOUNT_MISMATCH','LEASE_LOST','TIMEOUT','INVALID_ORIGINAL','INVALID_SINK_RESULT','RATE_LIMITED','SOURCE_UNAVAILABLE','BANKGIRO_INFORMATION_UNAVAILABLE','BANKGIRO_INFORMATION_PARTIAL','BANKGIRO_ENRICHMENT_REVIEW'];
  if(allowed.includes(error?.code))return error.code;
  if(error?.status===429||error?.statusCode===429)return 'RATE_LIMITED';
  return 'SOURCE_UNAVAILABLE';

@@ -4,6 +4,9 @@ import "@/styles/bank-connection.css";
 import "@/styles/bankgiro-source.css";
 import "@/styles/saas-onboarding.css";
 
+import "@/styles/company-workspace.css";
+import CompanyWorkspace from '@/components/company-workspace';
+
 export const metadata: Metadata = {
   title: "MG Fakturakoll – betalningar & fakturor",
   description: "Privat fakturaöversikt för M.George Vitvaror AB. Följ kundbetalningar, fakturor att betala och bankavstämning.",
@@ -20,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><CompanyWorkspace>{children}</CompanyWorkspace></body>
     </html>
   );
 }

@@ -16,11 +16,11 @@ const result = await require('esbuild').build({
   absWorkingDir: sites,
   stdin: { contents: `import React from 'react'; import {createRoot} from 'react-dom/client';
 import BankPage from './app/bank/page';
-createRoot(document.getElementById('root')).render(<BankPage/>);`, resolveDir: sites, sourcefile: 'onboarding-test-entry.tsx', loader: 'tsx' },
+${process.env.MGEORGE_ONBOARDING_PREVIEW === 'true' ? `import CompanyWorkspace from './components/company-workspace'; import {installPreviewFixtures} from '../docs/integration/saas-onboarding-browser/preview-fixtures.mjs'; installPreviewFixtures(); createRoot(document.getElementById('root')).render(<CompanyWorkspace><BankPage/></CompanyWorkspace>);` : `createRoot(document.getElementById('root')).render(<BankPage/>);`}`, resolveDir: sites, sourcefile: 'onboarding-test-entry.tsx', loader: 'tsx' },
   outdir: web, entryNames: 'app', bundle: true, platform: 'browser', format: 'esm', target: ['chrome120'], jsx: 'automatic',
   alias: { '@': sites }, define: { 'process.env.NODE_ENV': '"production"' }, metafile: true, logLevel: 'warning',
 });
-const cssFiles = ['app/globals.css', 'styles/bank-connection.css', 'styles/bankgiro-source.css', 'styles/saas-onboarding.css'];
+const cssFiles = ['app/globals.css', 'styles/bank-connection.css', 'styles/bankgiro-source.css', 'styles/saas-onboarding.css', 'styles/company-workspace.css'];
 const globalsPath = path.join(sites, cssFiles[0]);
 const compiled = await require('postcss')([require('@tailwindcss/postcss')({ base: sites })]).process(await fs.readFile(globalsPath, 'utf8'), { from: globalsPath, to: path.join(web, 'app.css') });
 const extra = await Promise.all(cssFiles.slice(1).map(file => fs.readFile(path.join(sites, file), 'utf8').catch(error => { if (file.endsWith('saas-onboarding.css') && error.code === 'ENOENT') return ''; throw error; })));

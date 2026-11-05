@@ -1,7 +1,7 @@
 /** The browser accepts only explicit, company-scoped facts from the server. */
 export type Permission = 'accounts:read' | 'transactions:read' | 'bankgiro:read';
-export type Company = { id: string; name: string; organizationNumber: string; role: 'owner' | 'admin' | 'viewer' };
-export type Directory = { version: 1; csrfToken: string; canCreate: boolean; companies: Company[] };
+export type Company = { id: string; name: string; organizationNumber: string | null; role: 'owner' | 'admin' | 'accountant' | 'viewer' };
+export type Directory = { version: 1; csrfToken: string; canCreate: boolean; activeCompanyId?: string | null; contextVersion?: number; legacy?: boolean; companies: Company[] };
 export type Bank = { id: string; name: string; country: string; providerLabel: string; available: boolean; authorization: 'redirect' | 'decoupled' | 'separate' | 'unavailable'; supportedPermissions: Permission[]; requiredPermissions: Permission[]; maximumConsentSeconds: number | null; bankgiro: 'included' | 'separate' | 'unsupported' | 'unknown'; unavailableReason: 'unsupported_bank' | 'provider_unavailable' | 'separate_agreement' | 'configuration_required' | null };
 export type Authorization = { id: string; companyId: string; mode: 'redirect' | 'decoupled'; state: 'pending' | 'completed' | 'cancelled' | 'failed'; expiresAt: string; redirectPath: string | null };
 export type Snapshot = {
@@ -45,15 +45,15 @@ function safeCode(value: unknown): string { const parsed = string(value, 64); if
 function version(value: unknown): 1 { if (value !== 1) invalid(); return 1; }
 
 export function parseCompany(input: unknown): Company {
-  const value = object(input), organizationNumber = string(value.organizationNumber, 11);
-  if (!/^\d{6}-?\d{4}$/.test(organizationNumber)) invalid();
-  return { id: id(value.id), name: string(value.name), organizationNumber, role: choice(value.role, ['owner', 'admin', 'viewer']) };
+  const value = object(input), organizationNumber = nullable(value.organizationNumber, raw => string(raw, 11));
+  if (organizationNumber !== null && !/^\d{6}-?\d{4}$/.test(organizationNumber)) invalid();
+  return { id: id(value.id), name: string(value.name), organizationNumber, role: choice(value.role, ['owner', 'admin', 'accountant', 'viewer']) };
 }
 export function parseDirectory(input: unknown): Directory {
   const value = object(input);
   const csrfToken = string(value.csrfToken, 512);
   if (!/^[\x21-\x7e]{16,512}$/.test(csrfToken)) invalid();
-  return { version: version(value.version), csrfToken, canCreate: boolean(value.canCreate), companies: unique(array(value.companies, parseCompany), item => item.id) };
+  return { version: version(value.version), csrfToken, canCreate: boolean(value.canCreate), ...(value.activeCompanyId === undefined ? {} : { activeCompanyId: nullable(value.activeCompanyId, id), contextVersion: integer(value.contextVersion, 1), legacy: boolean(value.legacy) }), companies: unique(array(value.companies, parseCompany), item => item.id) };
 }
 function parseBank(input: unknown): Bank {
   const value = object(input), country = string(value.country, 2);
@@ -90,7 +90,7 @@ export function parseSnapshot(input: unknown, companyId: string, now = Date.now(
     const item = object(raw), verification = object(item.verification);
     const status = choice(verification.status, ['verified', 'review', 'unverified'] as const), evidenceId = nullable(verification.evidenceId, id), reason = nullable(verification.reason, raw => choice(raw, ['missing_bankgiro', 'missing_reference', 'missing_payer', 'conflict', 'pending_review'] as const));
     if (status === 'verified' && (!evidenceId || reason !== null)) invalid();
-    const reference = item.reference === null ? null : (() => { const reference = object(item.reference); return { value: string(reference.value), kind: choice(reference.kind, ['ocr', 'payment', 'invoice'] as const), source: choice(reference.source, ['bank_account', 'bankgiro_report'] as const) }; })();
+    const reference = item.reference === null ? null : (() => { const reference = object(item.reference); return { value: string(reference.value,300), kind: choice(reference.kind, ['ocr', 'payment', 'invoice'] as const), source: choice(reference.source, ['bank_account', 'bankgiro_report'] as const) }; })();
     return { id: id(item.id), companyId: companyScope(item.companyId, companyId), date: calendarDate(item.date), amountMinor: integer(item.amountMinor, Number.MIN_SAFE_INTEGER), currency: currency(item.currency), payerName: nullable(item.payerName, string), reference, verification: { status, evidenceId, reason } };
   }), item => item.id);
   const manualImportPath = nullable(value.manualImportPath, path => string(path, 256));

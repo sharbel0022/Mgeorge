@@ -12,6 +12,9 @@ export interface BankgiroHttpsRegistration {
   owner: string;
   companyId: string;
   bankgiro: string;
+  /** Required for the Open Payments capture profile; supplied by verified consent. */
+  accountId?: string;
+  iban?: string;
   scopeId: string;
   generation: string;
   mode: 'production';
@@ -20,7 +23,8 @@ export interface BankgiroHttpsRegistration {
   baseUrl: string;
   tokenSecret: string;
   profileId: string;
-  allowedFormats: readonly ('csv' | 'xml' | 'xlsx')[];
+  /** json requires the exclusive openpayments-bankgiro-v1 capture profile. */
+  allowedFormats: readonly ('csv' | 'xml' | 'xlsx' | 'json')[];
   intervalMinutes: number;
   entitlement: BankgiroEntitlement;
   configurationRevision?: number;
@@ -31,6 +35,8 @@ export type BankgiroRegisteredAuthority = Readonly<Omit<BankgiroHttpsRegistratio
   transportBinding: string;
 }>;
 export interface BankgiroHttpsAuthorization extends BankgiroEntitlement {
+  accountId?: string;
+  iban?: string;
   owner: string;
   sourceId: string;
   companyId: string;

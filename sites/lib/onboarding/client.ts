@@ -73,9 +73,9 @@ export function createOnboardingClient(fetcher: Fetcher = (path, options) => fet
     }
   }
   return {
-    directory(signal?: AbortSignal): Promise<unknown | null> { return request('/api/companies', signal, undefined, true); },
+    directory(signal?: AbortSignal): Promise<unknown | null> { return request('/api/onboarding/companies', signal, undefined, true); },
     async snapshot(companyId: string, signal?: AbortSignal): Promise<unknown> { return request(`${base(companyId)}/bank-onboarding`, signal); },
-    createCompany(body: unknown, csrfToken: string, signal?: AbortSignal): Promise<unknown> { return request('/api/companies', signal, { body, csrfToken }); },
+    createCompany(body: unknown, csrfToken: string, signal?: AbortSignal): Promise<unknown> { return request('/api/onboarding/companies', signal, { body, csrfToken }); },
     async mutate(companyId: string, action: BankAction, body: unknown, csrfToken: string, signal?: AbortSignal): Promise<unknown> {
       if (!['connect', 'renew', 'disconnect', 'accounts', 'sync'].includes(action)) throw new OnboardingError('invalid');
       return request(`${base(companyId)}/bank/${action}`, signal, { body, csrfToken });

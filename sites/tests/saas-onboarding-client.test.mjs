@@ -8,7 +8,7 @@ const json = (body, status = 200) => new Response(JSON.stringify(body), { status
 test('directory read is same-origin, private, abortable, and never follows an API redirect', async () => {
   const signal = new AbortController().signal;
   const client = createOnboardingClient(async (path, options) => {
-    assert.equal(path, '/api/companies'); assert.equal(options.method, 'GET');
+    assert.equal(path, '/api/onboarding/companies'); assert.equal(options.method, 'GET');
     assert.equal(options.credentials, 'same-origin'); assert.equal(options.cache, 'no-store');
     assert.equal(options.redirect, 'error'); assert.ok(options.signal instanceof AbortSignal); assert.equal(options.signal.aborted, false);
     assert.equal(options.body, undefined); return json({ version: 1 });

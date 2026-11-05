@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { activeConsent, dateLabel, permissionLabels, type Company, type Bank, type Permission, type Snapshot } from '@/lib/onboarding/contract';
 
-const roleLabels: Record<Company['role'], string> = { owner: 'Ägare', admin: 'Administratör', viewer: 'Läsbehörighet' };
+const roleLabels: Record<Company['role'], string> = { owner: 'Ägare', admin: 'Administratör', accountant: 'Redovisning', viewer: 'Läsbehörighet' };
 function Timestamp({ value, empty }: { value: string | null; empty: string }) {
   return value ? <time dateTime={value}>{dateLabel(value)}</time> : <span>{empty}</span>;
 }
@@ -22,9 +22,9 @@ export function CompanyPicker({ companies, value, onChange, onCreate, canCreate 
     <div className="onboarding-field"><label className="onboarding-label" htmlFor={id}>Välj företag</label>
       <select id={id} value={value} onChange={event => onChange(event.target.value)} aria-describedby={id + '-details'} disabled={!companies.length}>
         {!value && <option value="">{companies.length ? 'Välj ett företag' : 'Inga företag att visa'}</option>}
-        {companies.map(company => <option key={company.id} value={company.id}>{company.name} · {company.organizationNumber} · {roleLabels[company.role]}</option>)}
+        {companies.map(company => <option key={company.id} value={company.id}>{company.name} · {company.organizationNumber ?? 'Organisationsnummer ej verifierat'} · {roleLabels[company.role]}</option>)}
       </select>
-      <p id={id + '-details'} className="onboarding-muted">{chosen ? <>{chosen.name} · Organisationsnummer {chosen.organizationNumber} · {roleLabels[chosen.role]}</> : 'Bankanslutningen hör till företaget du väljer.'}</p>
+      <p id={id + '-details'} className="onboarding-muted">{chosen ? <>{chosen.name} · {chosen.organizationNumber ? 'Organisationsnummer ' + chosen.organizationNumber : 'Organisationsnummer ej verifierat'} · {roleLabels[chosen.role]}</> : 'Bankanslutningen hör till företaget du väljer.'}</p>
     </div>
     {canCreate && <button type="button" onClick={onCreate}>Lägg till företag</button>}
   </section>;
@@ -94,7 +94,7 @@ export function ConnectionSummary({ snapshot, now = Date.now() }: { snapshot: Sn
         <div><dt>Medgivande giltigt till</dt><dd><Timestamp value={connection?.validUntil ?? null} empty="Giltighet inte bekräftad"/></dd></div>
         <div><dt>Senast lyckade hämtning</dt><dd><Timestamp value={snapshot.sync.lastSuccessAt} empty="Ingen lyckad hämtning bekräftad"/></dd></div>
         <div><dt>Nästa möjliga hämtning</dt><dd><Timestamp value={snapshot.sync.nextAllowedAt} empty="Ingen tid bekräftad"/></dd></div>
-        <div><dt>Automatisk hämtning</dt><dd>{snapshot.sync.automaticEnabled ? 'Aktiverad enligt leverantören' : 'Inte aktiverad'}</dd></div>
+        <div><dt>Automatisk hämtning</dt><dd>{snapshot.sync.automaticEnabled ? 'Aktiverad för företaget' : 'Inte aktiverad'}</dd></div>
         <div><dt>Hämtningsstatus</dt><dd>{({ never: 'Inte hämtat ännu', queued: 'Väntar på hämtning', running: 'Hämtning pågår', succeeded: 'Senaste hämtningen lyckades', failed: 'Hämtningen misslyckades', blocked: 'Hämtningen är blockerad' } as Record<string, string>)[snapshot.sync.state] ?? 'Status inte bekräftad'}</dd></div>
       </dl><p className="onboarding-muted">Nästa möjliga tid är en begränsning för nya hämtningar. Automatisk hämtning innebär inget löfte om en viss tid eller frekvens.</p></section>
       <section className="onboarding-section"><h3>Bankgiroinformation</h3><p>{bankgiroActive ? 'Aktiv Bankgiroinformation' : snapshot.bankgiro.state === 'available' ? 'Aktiv giltighet för Bankgiroinformation är inte bekräftad' : bankgiroLabels[snapshot.bankgiro.state] ?? 'Tillgänglighet inte bekräftad'}</p><dl className="onboarding-facts">

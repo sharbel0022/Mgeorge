@@ -10,6 +10,9 @@ import {verifyRecoveryBundle} from './lib/backup-recovery.mjs';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const OMITTED_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs','bankgiro_ingest_leases'];
+// Authorization is reconstructed only by separately verified administration.
+// Evidence restoration must not reactivate a user, worker grant or tenant.
+const CONTROL_TABLES=['companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard'];
 const fail=code=>{throw Error('backup_recovery_'+code);};
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const quote=value=>'"'+value.replaceAll('"','""')+'"';
@@ -102,14 +105,20 @@ function diskSource(reference){
 // Exact pre-0018 rows remain authenticated historical evidence. New authority
 // fields default to unknown; restoring evidence never activates a live source.
 const readinessDefaults={bankgiro_ingest_sources:{revoked_generations:'[]',registration_revision:0,registration_binding:null,authorization_verified_at:null,authorization_valid_until:null,last_success_at:null,last_failure_at:null,last_failure_code:null},bankgiro_ingest_jobs:{registration_binding:''}};
-function historicalRow(table,row){const defaults=readinessDefaults[table];return defaults&&Object.keys(defaults).every(key=>!Object.hasOwn(row,key))?{...row,...defaults}:row;}
+function recoveredRow(table,row){
+ const defaults=readinessDefaults[table],retained=defaults&&Object.keys(defaults).every(key=>!Object.hasOwn(row,key))?{...row,...defaults}:row;
+ // Captured lease tokens remain in the authenticated source snapshot, but no
+ // recovered row may reuse a former worker's authority. Quota, embargo,
+ // checkpoints and receipts are durable evidence and remain unchanged.
+ return table==='company_bank_sync_jobs'?{...retained,lease_token:'',lease_until:0,lease_deadline:0,fence_version:retained.fence_version+1}:retained;
+}
 function checkDatabase(database,snapshot,prefix=''){
  if(database.prepare('PRAGMA integrity_check').get().integrity_check!=='ok'||database.prepare('PRAGMA foreign_key_check').all().length)fail('database_invalid');
  for(const table of snapshot.tables){
   const actual=database.prepare('SELECT * FROM '+quote(prefix+table.name)).all();
   const fields=database.prepare('PRAGMA table_info('+quote(prefix+table.name)+')').all().map(column=>column.name);
   const canonical=rows=>rows.map(row=>JSON.stringify(fields.map(field=>row[field]))).sort();
-  if(JSON.stringify(canonical(actual))!==JSON.stringify(canonical(table.rows.map(row=>historicalRow(table.name,row)))))fail('database_mismatch');
+  if(JSON.stringify(canonical(actual))!==JSON.stringify(canonical(table.rows.map(row=>recoveredRow(table.name,row)))))fail('database_mismatch');
  }
 }
 function evidenceDatabase(snapshot){
@@ -120,7 +129,7 @@ function evidenceDatabase(snapshot){
   const migrations=new URL('../drizzle/',import.meta.url);
   for(const file of readdirSync(migrations).filter(name=>/^\d{4}_[a-z0-9_]+\.sql$/.test(name)).sort())database.exec(readFileSync(new URL(file,migrations),'utf8'));
   const tables=database.prepare("SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all().map(row=>row.name);
-  const expected=[...BACKUP_TABLES,...OMITTED_TABLES].sort();
+  const expected=[...BACKUP_TABLES,...OMITTED_TABLES,...CONTROL_TABLES].sort();
   if(JSON.stringify(tables)!==JSON.stringify(expected))fail('schema_invalid');
   database.exec('BEGIN');
   for(const table of snapshot.tables){
@@ -128,7 +137,7 @@ function evidenceDatabase(snapshot){
    const columns=database.prepare('PRAGMA table_info('+quote(table.name)+')').all(),names=columns.map(column=>column.name);
    const insert=database.prepare('INSERT INTO '+quote(table.name)+' ('+names.map(quote).join(',')+') VALUES ('+names.map(()=>'?').join(',')+')');
    for(const original of table.rows){
-    const row=historicalRow(table.name,original);
+    const row=recoveredRow(table.name,original);
     if(Object.keys(row).length!==names.length||names.some(name=>!Object.hasOwn(row,name)))fail('schema_invalid');
     for(const column of columns){
      const value=row[column.name];
@@ -141,7 +150,7 @@ function evidenceDatabase(snapshot){
    }
   }
   database.exec('COMMIT');checkDatabase(database,snapshot);
-  // Keep exact authenticated rows, including encrypted integration records.
+  // Keep authenticated rows and the explicit lease invalidation above.
   // Missing application table names prevent this database being used live.
   for(const table of tables)database.exec('ALTER TABLE '+quote(table)+' RENAME TO '+quote('evidence_'+table));
   checkDatabase(database,snapshot,'evidence_');
@@ -168,13 +177,13 @@ function writePrivate(path,bytes,guard){
  * This trusts the invoking user and, on Windows, the caller-established ACLs;
  * pathname checks do not defeat a hostile process running as that same user.
  */
-export async function restoreBackupIsolated({bundleDirectory,outputParent,key,expectedOwner,expectedBackupId}){
+export async function restoreBackupIsolated({bundleDirectory,outputParent,key,expectedOwner,expectedBackupId,expectedCompanyBoundary}){
  let database;
  try{
   if(typeof key!=='string'||!/^[a-f0-9]{64}$/i.test(key))fail('key_unavailable');
   const input=directory(bundleDirectory),parent=directory(outputParent,true),nested=relative(input.path,parent.path);
   if(nested===''||(!isAbsolute(nested)&&nested!=='..'&&!nested.startsWith('..'+sep)))fail('output_parent_unsafe');
-  const source=diskSource(input),verified=await verifyRecoveryBundle(source,key,expectedOwner,expectedBackupId);
+  const source=diskSource(input),verified=await verifyRecoveryBundle(source,key,expectedOwner,expectedBackupId,{expectedCompanyBoundary});
   // Schema checks, primary-key/unique constraints and exact-row comparisons
   // happen in memory before any output directory is created.
   database=evidenceDatabase(verified.snapshot);
@@ -195,7 +204,9 @@ export async function restoreBackupIsolated({bundleDirectory,outputParent,key,ex
   writePrivate(join(output,'source','bundle.json'),verified.sourceHeader,guard);
   writePrivate(join(output,'source','manifest.bin'),verified.sourceManifest,guard);
   writePrivate(join(output,'source','snapshot.bin'),verified.sourceSnapshot,guard);
-  const receipt={format:'MG-Sites-evidence-restore-1',mode:'evidence-only',schemaPrefix:'evidence_',owner:expectedOwner,backupId:expectedBackupId,restoredAt:new Date().toISOString(),snapshotSha256:verified.manifest.run.snapshot_hash,databaseSha256:sha(readFileSync(databasePath)),tables:verified.manifest.tables,originals:{count:verified.manifest.run.total_docs,bytes:verified.manifest.run.bytes}};
+  const companyJobs=verified.snapshot.tables.find(table=>table.name==='company_bank_sync_jobs');
+  const transforms=companyJobs?[{table:'company_bank_sync_jobs',kind:'invalidate_job_leases',rows:companyJobs.rows.length}]:[];
+  const receipt={format:'MG-Sites-evidence-restore-1',mode:'evidence-only',schemaPrefix:'evidence_',owner:expectedOwner,backupId:expectedBackupId,...(verified.snapshot.companyBoundary?{companyBoundary:verified.snapshot.companyBoundary}:{}),restoredAt:new Date().toISOString(),snapshotSha256:verified.manifest.run.snapshot_hash,databaseSha256:sha(readFileSync(databasePath)),tables:verified.manifest.tables,transforms,originals:{count:verified.manifest.run.total_docs,bytes:verified.manifest.run.bytes}};
   const pending=join(output,'receipt.pending');
   writePrivate(pending,new TextEncoder().encode(JSON.stringify(receipt,null,2)+'\n'),guard);
   database.close();database=undefined;
@@ -214,9 +225,10 @@ export async function restoreBackupIsolated({bundleDirectory,outputParent,key,ex
 
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{
-  const [bundleDirectory,outputParent,expectedOwner,expectedBackupId,...extra]=process.argv.slice(2);
+  const [bundleDirectory,outputParent,expectedOwner,expectedBackupId,expectedCompanyId,...extra]=process.argv.slice(2);
   if(!bundleDirectory||!outputParent||!expectedOwner||!expectedBackupId||extra.length)fail('usage');
-  const result=await restoreBackupIsolated({bundleDirectory,outputParent,expectedOwner,expectedBackupId,key:process.env.MG_SITES_RECOVERY_KEY});
+  const expectedCompanyBoundary=expectedCompanyId?{version:'company-data-boundary-v1',companyId:expectedCompanyId,storageOwner:expectedOwner,boundaryVersion:1}:undefined;
+  const result=await restoreBackupIsolated({bundleDirectory,outputParent,expectedOwner,expectedBackupId,expectedCompanyBoundary,key:process.env.MG_SITES_RECOVERY_KEY});
   console.log(JSON.stringify(result,null,2));
  }catch(error){
   console.error(error instanceof Error&&/^backup_recovery_[a-z_]+$/.test(error.message)?error.message:'backup_recovery_failed');process.exitCode=1;

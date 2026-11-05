@@ -142,3 +142,23 @@ Neither implements the company directory, membership model, onboarding projectio
 | Booked rows and Bankgiro observations | Agent 4/5 must preserve originals and actual reference/payer source, deduplicate economic effects and provide the authoritative reconciliation receipt. The adapter's `paymentReconciliationAllowed: false` cannot become a `verified` payment by projection alone. |
 
 Agent 7's company/role/provider acceptance and final integration gates remain open for the missing server work. The frontend's synthetic A/B/race coverage is additional evidence, not a substitute for those server tests or a commercial release decision.
+
+## Integration revision — 2026-11-05
+
+The integration branch now implements the web boundary against the company foundation and the consent runtime. The earlier proposed `GET/POST /api/companies` contract is superseded by **`GET/POST /api/onboarding/companies`**; the foundation's `company-context-v1` endpoints retain their contract. Bank endpoints keep the paths documented above.
+
+The directory is projected from actual current memberships and active company context. `activeCompanyId`, `contextVersion` and `legacy` are included. The full application uses `CompanyWorkspace` to switch the server selection, invalidate the previous document and install the new fetch scope. A URL company identifier is never substituted for a current selection/version. The accountant role is preserved and has no integration mutation permission.
+
+Company creation now accepts `{name, confirmEmptyCompany:true}` and creates a separate empty workspace through the existing atomic provisioning transaction. The foundation has no verified organization-number registry, so `organizationNumber` is explicitly nullable and the UI labels it unverified. Entering a number in a form is not authority to bank for that entity. Trusted verified corporate identity remains a prerequisite of the provider runtime. No legacy namespace is adopted through this form. Creation derives its resource ID from the authenticated actor and the idempotency key; retries find the existing authorized company and changed payloads conflict.
+
+Mutations require current actor-bound CSRF proof, matching Origin, JSON content type and an idempotency key. The browser proof uses a Secure, HttpOnly, host-only, SameSite=Lax session cookie so the bank's top-level callback can retain the browser flow. Bank mutations additionally require current `manage_integrations` permission, current company selection, and the lifecycle's durable revision/idempotency checks. Redirect and callback GET navigation resolves the authenticated active selection before entering the same company request boundary. Callback codes are consumed server-side; only a verified snapshot can produce the `connected` navigation hint.
+
+Bank status calls the shared `saas-runtime` read-only snapshot. Provider configuration and corporate/redirect verification remain disabled by default. Missing configuration shows an explicit unavailable explanation and no functional connect action. Account selection, connection, renewal, revocation and callback use the consent module; synchronization status/dispatch is joined by the main integration owner with the existing durable scheduler. No successful sync is inferred from an accepted request, catalogue entry or account selection.
+
+The static preview supports actual `CompanyWorkspace` and `BankPage` together, with synthetic API responses only:
+
+```
+MGEORGE_ONBOARDING_PREVIEW=true MGEORGE_ONBOARDING_QA=/absolute/workspace/preview node docs/integration/saas-onboarding-browser/build-harness.mjs
+```
+
+Serve the generated `web` directory with the approved preview/browser tool. Scenario query values are `disconnected`, `unsupported`, `expired`, `viewer`, and `denied`; the default has a synthetic active account with missing Bankgiro/payer evidence. This preview does not prove provider operation or server authorization; real foundation/lifecycle tests provide the separate backend evidence. The preview uses synthetic sessionStorage only to retain fixture navigation; product onboarding stores no bank data or credentials there.

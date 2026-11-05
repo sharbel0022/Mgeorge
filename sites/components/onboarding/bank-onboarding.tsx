@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { activeConsent, callbackMessage, freshSnapshot, parseAuthorization, parseCompany, parseDirectory, parseSnapshot, selectedPermissions, type Company, type Directory, type Permission, type Snapshot, type Authorization } from '@/lib/onboarding/contract';
 import { createOnboardingClient, mutationAllowed, OnboardingError, type BankAction } from '@/lib/onboarding/client';
+import { useCompanyWorkspace } from '@/components/company-workspace';
 import { RequestScope } from '@/lib/onboarding/request-scope';
 import { AccountChooser, BankChooser, CompanyPicker, ConnectionSummary, OnboardingSteps, PaymentOverview, PermissionsChooser } from './bank-onboarding-views';
 
@@ -20,16 +21,15 @@ function updateCompanyLocation(id: string) {
 
 function CreateCompany({ csrfToken, onCreated, onCancel, onReload, onAccessLost }: { csrfToken: string; onCreated: (companyId: string) => void; onCancel: () => void; onReload: () => void; onAccessLost: (error: OnboardingError) => void }) {
   const id = useId(), scope = useRef(new RequestScope()), pending = useRef(false);
-  const [name, setName] = useState(''), [number, setNumber] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState(''), [uncertain, setUncertain] = useState(false);
+  const [name, setName] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState(''), [uncertain, setUncertain] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { heading.current?.focus(); const current = scope.current; return () => current.invalidate(); }, []);
   async function submit(event: FormEvent) {
     event.preventDefault(); if (pending.current || uncertain) return;
-    const normalized = number.replace(/[ -]/g, '');
-    if (name.trim().length < 2 || !/^\d{10}$/.test(normalized)) { setError('Ange företagsnamn och organisationsnummer med tio siffror.'); return; }
+    if (name.trim().length < 2) { setError('Ange företagets namn.'); return; }
     const ticket = scope.current.begin('company-registration'); pending.current = true; setBusy(true); setError('');
     try {
-      const value = await client.createCompany({ name: name.trim(), organizationNumber: normalized, country: 'SE' }, csrfToken, ticket.signal);
+      const value = await client.createCompany({ name: name.trim(), confirmEmptyCompany: true }, csrfToken, ticket.signal);
       if (!scope.current.current(ticket)) return;
       if (!value || typeof value !== 'object' || !('version' in value) || value.version !== 1 || !('company' in value)) throw new OnboardingError('invalid');
       const created = parseCompany(value.company);
@@ -44,10 +44,9 @@ function CreateCompany({ csrfToken, onCreated, onCancel, onReload, onAccessLost 
   }
   return <section className="onboarding-card" aria-labelledby={id + '-title'}>
     <h2 ref={heading} tabIndex={-1} id={id + '-title'}>Lägg till företag</h2>
-    <p className="onboarding-muted">Registrera företaget som ska använda Mgeorge. Bankens medgivande kopplas till det här företaget i nästa steg.</p>
+    <p className="onboarding-muted">Skapa en separat tom företagsarbetsyta. Organisationsnummer och rätt till bankåtkomst måste verifieras separat före bankanslutning. Befintliga uppgifter flyttas inte.</p>
     <form onSubmit={submit} aria-busy={busy}>
       <div className="onboarding-field"><label htmlFor={id + '-name'}>Företagsnamn</label><input id={id + '-name'} autoComplete="organization" value={name} maxLength={200} required onChange={event => setName(event.target.value)} disabled={busy}/></div>
-      <div className="onboarding-field"><label htmlFor={id + '-number'}>Organisationsnummer</label><input id={id + '-number'} inputMode="numeric" autoComplete="off" value={number} maxLength={13} required aria-describedby={id + '-help'} onChange={event => setNumber(event.target.value)} disabled={busy}/><p id={id + '-help'} className="onboarding-muted">Tio siffror, med eller utan bindestreck. Företagsuppgifter och din behörighet kontrolleras av tjänsten.</p></div>
       <div role="alert">{error && <div className="onboarding-error"><p>{error}</p>{uncertain && <button type="button" onClick={onReload}>Läs in företagslistan</button>}</div>}</div>
       <div className="onboarding-actions"><button className="onboarding-primary" disabled={busy || uncertain} type="submit">{busy ? 'Registrerar företag…' : 'Skapa företag'}</button><button type="button" onClick={busy || uncertain ? onReload : onCancel}>Avbryt</button></div>
     </form>
@@ -145,7 +144,7 @@ function CompanyBankPanel({ company, csrfToken, callbackResult, onAccessLost }: 
   const fresh = snapshot && freshSnapshot(snapshot, now), data = fresh ? snapshot : null;
   const connected = !!data && activeConsent(data, now), bank = data?.banks.find(item => item.id === bankId);
   const accountIds = accountDraft ?? data?.accounts.filter(account => account.selected).map(account => account.id) ?? [];
-  const locked = loading || !!busy || company.role === 'viewer' || !data;
+  const locked = loading || !!busy || !['owner', 'admin'].includes(company.role) || !data;
   const pendingAuth = handoff ?? data?.authorization;
   const pendingAuthActive = pendingAuth?.state === 'pending' && Date.parse(pendingAuth.expiresAt) > now;
   const callbackNotice = callbackMessage(callbackResult, data, now);
@@ -162,7 +161,8 @@ function CompanyBankPanel({ company, csrfToken, callbackResult, onAccessLost }: 
     {!data && !error && !snapshot && <div className="onboarding-card" aria-busy={loading}><p>{loading ? 'Hämtar bankanslutningen…' : 'Ingen bankstatus har kunnat bekräftas.'}</p></div>}
     {data && <>
       <ConnectionSummary snapshot={data} now={now}/>
-      {company.role === 'viewer' && <p className="onboarding-notice">Du har läsbehörighet. En företagsadministratör hanterar bankanslutningen.</p>}
+      {data.sync.errorCode === 'configuration_required' && <p className="onboarding-notice" role="status">Bankanslutning är inte aktiverad för företaget. Leverantörens avtal, företagsbehörighet och bankens stödda identifiering måste vara verifierade innan anslutningen kan startas.</p>}
+      {!['owner', 'admin'].includes(company.role) && <p className="onboarding-notice">Du har läsbehörighet. En företagsadministratör hanterar bankanslutningen.</p>}
       {(!connected || !data.connection) && <section className="onboarding-card" aria-labelledby="onboarding-bank-heading">
         <h2 id="onboarding-bank-heading">Anslut företagets bank</h2>
         <p className="onboarding-muted">Välj bank och läsbehörighet. Identifieringen sker hos banken. BankID används om banken erbjuder det.</p>
@@ -200,6 +200,7 @@ function CompanyBankPanel({ company, csrfToken, callbackResult, onAccessLost }: 
 }
 
 export default function BankOnboarding({ legacy }: { legacy?: ReactNode }) {
+  const workspace = useCompanyWorkspace();
   const scope = useRef(new RequestScope()), acceptedSaas = useRef(false), selection = useRef(0);
   const [directory, setDirectory] = useState<Directory | null>(null), [mode, setMode] = useState<'loading' | 'legacy' | 'ready' | 'error' | 'signin'>('loading');
   const [companyId, setCompanyId] = useState(''), [creating, setCreating] = useState(false), [error, setError] = useState(''), [callbackResult, setCallbackResult] = useState<string | null>(null), [selectionKey, setSelectionKey] = useState(0);
@@ -217,14 +218,15 @@ export default function BankOnboarding({ legacy }: { legacy?: ReactNode }) {
         setMode('legacy'); return;
       }
       const parsed = parseDirectory(value); acceptedSaas.current = true;
-      const params = new URLSearchParams(window.location.search), requested = preferred ?? params.get('company');
-      const chosen = requested ? parsed.companies.find(company => company.id === requested) : parsed.companies[0];
+      const params = new URLSearchParams(window.location.search), requested = preferred ?? params.get('company') ?? parsed.activeCompanyId;
+      const chosen = requested ? parsed.companies.find(company => company.id === requested) : parsed.activeCompanyId === undefined ? parsed.companies[0] : undefined;
+      if (chosen && workspace && chosen.id !== workspace.activeCompanyId) { await workspace.switchCompany(chosen.id); return; }
       setDirectory(parsed); setCompanyId(chosen?.id ?? ''); setSelectionKey(++selection.current); setMode('ready');
       setCallbackResult(!preferred && chosen ? params.get('result') : null);
       if (requested && !chosen) setError('Det valda företaget finns inte i din aktuella företagslista. Välj ett företag som du har åtkomst till.');
       if (preferred && chosen) updateCompanyLocation(chosen.id);
     } catch (cause) { if (scope.current.current(ticket) && !aborted(cause)) accessLost(safeError(cause)); }
-  }, [accessLost]);
+  }, [accessLost, workspace]);
   useEffect(() => {
     void load(); const current = scope.current;
     const restore = (event: PageTransitionEvent) => { if (event.persisted) void load(); };
@@ -233,6 +235,7 @@ export default function BankOnboarding({ legacy }: { legacy?: ReactNode }) {
   }, [load]);
   function choose(id: string) {
     if (!directory?.companies.some(company => company.id === id)) return;
+    if (workspace && id !== workspace.activeCompanyId) { setMode('loading'); setDirectory(null); setCompanyId(''); scope.current.invalidate(); void workspace.switchCompany(id); return; }
     setCompanyId(id); setCreating(false); setError(''); setCallbackResult(null); setSelectionKey(++selection.current); updateCompanyLocation(id);
   }
   function cancelCreate() { setCreating(false); window.requestAnimationFrame(() => pickerFocus.current?.querySelector<HTMLButtonElement>('button')?.focus()); }
@@ -247,8 +250,9 @@ export default function BankOnboarding({ legacy }: { legacy?: ReactNode }) {
     {mode === 'ready' && directory && <>
       <div ref={pickerFocus}><CompanyPicker companies={directory.companies} value={companyId} onChange={choose} canCreate={directory.canCreate} onCreate={() => { setCreating(true); setCallbackResult(null); }}/></div>
       <div id="onboarding-content" tabIndex={-1}>
-        {creating ? <><OnboardingSteps step={1}/><CreateCompany csrfToken={directory.csrfToken} onCreated={id => void load(id)} onCancel={cancelCreate} onReload={() => void load()} onAccessLost={accessLost}/></> : company ? <CompanyBankPanel key={company.id + ':' + selectionKey} company={company} csrfToken={directory.csrfToken} callbackResult={callbackResult} onAccessLost={accessLost}/> : <div className="onboarding-card"><OnboardingSteps step={1}/><h2>{directory.companies.length ? 'Välj företag för att fortsätta' : 'Välkommen till Mgeorge'}</h2><p>{directory.companies.length ? 'Bankuppgifter visas först när ett företag har valts.' : directory.canCreate ? 'Lägg till ditt första företag för att komma igång.' : 'Du har inga företag att visa. Be företagets administratör om åtkomst.'}</p>{directory.canCreate && !directory.companies.length && <button type="button" className="onboarding-primary" onClick={() => setCreating(true)}>Lägg till ditt första företag</button>}</div>}
+        {creating ? <><OnboardingSteps step={1}/><CreateCompany csrfToken={directory.csrfToken} onCreated={id => workspace ? window.location.replace('/bank?company=' + encodeURIComponent(id)) : void load(id)} onCancel={cancelCreate} onReload={() => void load()} onAccessLost={accessLost}/></> : company ? <CompanyBankPanel key={company.id + ':' + selectionKey} company={company} csrfToken={directory.csrfToken} callbackResult={callbackResult} onAccessLost={accessLost}/> : <div className="onboarding-card"><OnboardingSteps step={1}/><h2>{directory.companies.length ? 'Välj företag för att fortsätta' : 'Välkommen till Mgeorge'}</h2><p>{directory.companies.length ? 'Bankuppgifter visas först när ett företag har valts.' : directory.canCreate ? 'Lägg till ditt första företag för att komma igång.' : 'Du har inga företag att visa. Be företagets administratör om åtkomst.'}</p>{directory.canCreate && !directory.companies.length && <button type="button" className="onboarding-primary" onClick={() => setCreating(true)}>Lägg till ditt första företag</button>}</div>}
       </div>
+      {directory.legacy && legacy && <section aria-label="Befintlig arbetsyta"><h2>Din befintliga bankanslutning</h2><p>Den här anslutningen hör till din ursprungliga arbetsyta. Ny företagsregistrering flyttar inga befintliga uppgifter.</p>{legacy}</section>}
     </>}
   </section>;
 }

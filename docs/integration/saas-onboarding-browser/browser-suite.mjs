@@ -45,7 +45,7 @@ async function scenario(config = {}) {
     if (!url.pathname.startsWith('/api/')) return route.continue();
     requests.push({ method, path: url.pathname });
     const reply = (json, status = 200) => route.fulfill({ status, json });
-    if (url.pathname === '/api/companies') {
+    if (url.pathname === '/api/onboarding/companies') {
       if (method === 'POST') { posts.push({ path: url.pathname, body: req.postDataJSON(), headers: req.headers() }); state.created = true; return reply({ version: 1, company: { id: 'company-new', name: 'Nytt Exempelföretag AB', organizationNumber: '5599000019', role: 'owner' } }, config.createStatus || 200); }
       const d = config.directory ? config.directory() : directoryFixture();
       if (state.created) d.companies.push({ id: 'company-new', name: 'Nytt Exempelföretag AB', organizationNumber: '5599000019', role: 'owner' });
@@ -207,7 +207,7 @@ try {
   });
   await test('company creation reloads membership before selecting returned company', async () => {
     const { page, posts } = await scenario(); await ready(page); await page.getByRole('button', { name: 'Lägg till företag', exact: true }).click();
-    await page.getByRole('textbox', { name: 'Företagsnamn' }).fill('Nytt Exempelföretag AB'); await page.getByRole('textbox', { name: 'Organisationsnummer' }).fill('559900-0019'); await page.getByRole('button', { name: 'Skapa företag' }).click(); await ready(page, 'Nytt Exempelföretag AB');
+    await page.getByRole('textbox', { name: 'Företagsnamn' }).fill('Nytt Exempelföretag AB'); await page.getByRole('button', { name: 'Skapa företag' }).click(); await ready(page, 'Nytt Exempelföretag AB');
     assert.deepEqual(posts[0].body, { name: 'Nytt Exempelföretag AB', organizationNumber: '5599000019', country: 'SE' }); assert.equal(await page.getByRole('combobox', { name: 'Välj företag' }).inputValue(), 'company-new');
   });
   await test('initial missing directory retains the existing bank connection', async () => {
@@ -235,7 +235,7 @@ try {
   await test('uncertain company creation requires a directory refresh before resubmission', async () => {
     const { page, posts } = await scenario({ createStatus: 500 }); await ready(page);
     await page.getByRole('button', { name: 'Lägg till företag', exact: true }).click();
-    await page.getByRole('textbox', { name: 'Företagsnamn' }).fill('Nytt Exempelföretag AB'); await page.getByRole('textbox', { name: 'Organisationsnummer' }).fill('5599000019');
+    await page.getByRole('textbox', { name: 'Företagsnamn' }).fill('Nytt Exempelföretag AB');
     await page.getByRole('button', { name: 'Skapa företag' }).click();
     await page.getByRole('button', { name: 'Läs in företagslistan' }).waitFor({ timeout: 4000 });
     assert.ok(await page.getByRole('button', { name: 'Skapa företag' }).isDisabled());
