@@ -1,0 +1,2134 @@
+{
+  "head": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+  "source": "Actual complete-suite file lists in verified CI artifacts, not inferred from file existence.",
+  "criteria": [
+    {
+      "criterion": 1,
+      "test_files": [
+        {
+          "path": "test/payment-control-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/ui-final-node.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 2,
+      "test_files": [
+        {
+          "path": "test/ui-final-node.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-control-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/dashboard-loading-ui-q8.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 3,
+      "test_files": [
+        {
+          "path": "test/payment-control-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-evidence-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/workspace-navigation-dashboard-q8.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 4,
+      "test_files": [
+        {
+          "path": "test/payment-control-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-evidence-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 5,
+      "test_files": [
+        {
+          "path": "test/ui-final-node.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation-normalization-final.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/workspace-search-quality8.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/workspace-search-final.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 6,
+      "test_files": [
+        {
+          "path": "test/payment-control.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation-preview.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 7,
+      "test_files": [
+        {
+          "path": "test/invoice-reference-integration.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-control-api.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/quality-regressions-recovery-api.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 8,
+      "test_files": [
+        {
+          "path": "test/invoice-extraction.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/invoice-evidence-ocr.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/invoice-summary-labels.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/invoice-summary-labels.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 9,
+      "test_files": [
+        {
+          "path": "test/invoice-parser-corpus-q8.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/pdf-text-reconstruction.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/invoice-summary-labels.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/invoice-summary-labels.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 10,
+      "test_files": [
+        {
+          "path": "test/pdf-layout-ocr.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/ocr-quality-metrics.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/sites-ocr-pull.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/document-queue-recovery.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 11,
+      "test_files": [
+        {
+          "path": "test/integration-job-api.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/integration-jobs-orchestration.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/gmail.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 12,
+      "test_files": [
+        {
+          "path": "test/invoice-evidence-ocr.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/integration-jobs.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 13,
+      "test_files": [
+        {
+          "path": "test/integration-jobs.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/company-reconciliation.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-bank-sync-backup.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-concurrency.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/quality-regressions-migration-replay.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 14,
+      "test_files": [
+        {
+          "path": "test/invoice-evidence-ocr.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-evidence-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 15,
+      "test_files": [
+        {
+          "path": "test/openpayments-node-transport.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/openpayments-company-bank-sync.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/node-company-bank-sync.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/banking-security.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/openpayments-write-ambiguity.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/openpayments-lifecycle-recovery.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 16,
+      "test_files": [
+        {
+          "path": "test/openpayments-company-bank-sync.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-sync-boundary-integration.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-sync-scale.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 17,
+      "test_files": [
+        {
+          "path": "test/openpayments-bankgiro-ingest.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-reference-sources.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/mcp-report-provenance.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/openpayments-document-numbers.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/payment-verification.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 18,
+      "test_files": [
+        {
+          "path": "test/payer-evidence.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payer-completion-conflict.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payer-verification-atomic.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/reconciliation-manual-provenance.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 19,
+      "test_files": [
+        {
+          "path": "test/payment-reference-sources.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/invoice-reference-policy.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reference-evidence-compat.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/reconciliation-csv-reference.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/openpayments-document-numbers.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 20,
+      "test_files": [
+        {
+          "path": "test/reconciliation-contract.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation-contract-integrity.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/reconciliation-proposal.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation-batch-integration.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/reconciliation-batch-integration.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/reconciliation-decisions.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 21,
+      "test_files": [
+        {
+          "path": "test/reconciliation.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-control-api.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-concurrency.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation-batch-integration.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/reconciliation-batch-integration.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 22,
+      "test_files": [
+        {
+          "path": "test/reconciliation.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-control-api.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-concurrency.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation-batch-integration.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/reconciliation-batch-integration.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 23,
+      "test_files": [
+        {
+          "path": "test/reconciliation-contract.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/company-reconciliation-gate.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 24,
+      "test_files": [
+        {
+          "path": "test/payment-identity-evidence-final.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/integration-jobs-backup.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-backup.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/mcp-report-provenance.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/recovery-drill.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 25,
+      "test_files": [
+        {
+          "path": "test/message-evidence-projection.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-identity-evidence-final.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/node-payments-quality-cycle.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/payment-evidence-status-final.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/banking-security.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 26,
+      "test_files": [
+        {
+          "path": "test/payment-control-api.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-control-receipts-q8.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-control.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 27,
+      "test_files": [
+        {
+          "path": "test/message-evidence-projection.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-evidence-ui.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 28,
+      "test_files": [
+        {
+          "path": "test/integration-jobs-orchestration.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-sync-scale.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/sites-ocr-pull.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/cloud-ocr-trigger.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 29,
+      "test_files": [
+        {
+          "path": "test/integration-jobs-backup.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-backup.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-bank-sync-backup.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/recovery-drill.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/security-login-rate-limit.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 30,
+      "test_files": [
+        {
+          "path": "test/saas-company-acceptance.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/saas-company-acceptance.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/saas-login-boundary.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/session-mutation-fence.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/openpayments-write-ambiguity.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/openpayments-lifecycle-recovery.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/security-login-rate-limit.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/security-request-budget.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-request.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/bank-state-integrity-q8.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 31,
+      "test_files": [
+        {
+          "path": "sites/tests/company-backup.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-bank-sync-backup.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/integration-jobs-backup.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/recovery-drill.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/backup-disaster-recovery.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 32,
+      "test_files": [
+        {
+          "path": "test/saas-test-isolation.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/reconciliation-contract.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/company-sync-boundary-integration.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/quality-runner.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "test/payment-concurrency.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "criterion": 33,
+      "test_files": [
+        {
+          "path": "test/saas-company-acceptance.test.js",
+          "executed_in": [
+            {
+              "profile": "node",
+              "node": "v22.23.4",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            },
+            {
+              "profile": "node",
+              "node": "v24.22.1",
+              "tests_in_suite": 2152,
+              "all_passed": true
+            }
+          ]
+        },
+        {
+          "path": "sites/tests/saas-company-acceptance.test.mjs",
+          "executed_in": [
+            {
+              "profile": "sites",
+              "node": "v24.22.1",
+              "tests_in_suite": 4128,
+              "all_passed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 ## User goal and authorized delivery
 
-Improve Bankgiro and payment evidence on `feature/95-bankgiro`, test both applications, document actual provider limits and open a PR to `main`. Production financial records, allocations, provider configuration and deployments are outside this change. The required acceptance tuple is Bankgiro `5819-7013`, reference `0599`, SEK 625.00, booking date 2026-10-26. Real originals are inspected only through authenticated read-only evidence tools; tests use explicitly synthetic originals and identities.
+Improve Bankgiro and payment evidence on `feature/95-bankgiro`, test both applications, document actual provider limits and open a PR to `main`. Production financial records, allocations, provider configuration and deployments are outside this change. The required acceptance case uses [recipient Bankgiro withheld], an exact text reference with a leading zero [reference value withheld], [original amount withheld] in SEK and [original booking date withheld]. Real originals are inspected only through authenticated read-only evidence tools; tests use explicitly synthetic originals and identities.
 
 ## Existing architecture
 

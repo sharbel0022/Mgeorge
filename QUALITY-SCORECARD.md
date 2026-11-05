@@ -1,5 +1,36 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 9 — aktuell verifierad samlad bedömning, 2026-11-05
+
+**255/330 historiskt → 250/330 verifierat nu (7,58/10); netto −5; 64 poäng saknas till 314.**
+Målet 9,5/10 är inte styrkt. Full samlad CI och oberoende granskning är godkända
+på kod `0ce2604de16b77bf96ff76ccedab115f61a3f9ac` / träd
+`50d1ec1226d7ced62bb640707740244c4504ab4c`.
+
+[Full 33-punktsmatris](docs/integration/95/QUALITY-REASSESSMENT.md) och
+[maskinläsbar bedömning](docs/integration/95/QUALITY-REASSESSMENT.json) anger varje
+äldre/ny poäng, F/S/K/U/P-delpoäng, konkreta bevis, testfiler, kvarstående brister
+och motivering. Samma rubric och halvsteg används. Höjningar i bild-OCR,
+Gmail, backup och recovery stöds av aktuella driftutfall respektive utförda
+kritiska syntetiska återställningsfall. Lägre total följer av omprövade
+produktionspoäng; den betyder inte att rättningarna försämrat produkten.
+
+[Fulla tester](docs/integration/95/TEST-RESULTS.md): 6 327 backendfall,
+Node-sviten 2 152 även på andra versionen, 46 Chromiumfall och separat överlappande
+säkerhetsurval 1 175/1175. Alla obligatoriska CI-grindar passerade på exakt kod.
+Kandidatens granskade förbättringar ersätter inte verklig bankbehörighet,
+Bankgirokälla, operativ produktionsrestore eller kund-/driftacceptans.
+
+**Releasebeslut: NOT APPROVED för kommersiell produktion.**
+[Releasegrindar](docs/integration/95/RELEASE-GATES.md) och
+[kvarstående acceptans per kriterium](docs/integration/95/REMAINING-TO-95.md)
+anger fortsättningspunkterna. Agent 6:s nya leverans saknas. Inget område har
+styrkt minst 9,5; 33×9,5=313,5 och ytterligare 0,5 krävs för 314.
+
+Daterade producentbedömningar och 255/330 nedan bevaras som historiska kvitton.
+De är inte den aktuella samlade bedömningen.
+
+
 ## Agent 2 — Bankgiro, referensintegritet och spårbarhet, 2026-11-05
 
 [Aktuell avgränsad leverans](docs/integration/bankgiro-95.md), branch `feature/95-bankgiro`, kodkandidat `5642be6`. **Bankgiro före/efter: 8,5/8,5. Totalen är oförändrad: 255/330 =7,73/10; 0/33 ≥9,5.** Målpoängen ersätter inte verklig bankacceptans.

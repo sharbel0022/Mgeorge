@@ -1,0 +1,750 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-11-05",
+  "repository": "sharbel0022/Mgeorge",
+  "reviewed_commit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "source": "QUALITY-SCORECARD.md",
+  "source_section": "## SaaS och legacybank — evidensuppdatering utan poängändring, 2026-11-05",
+  "source_status": "historical_documented_scores_carried_forward_without_recertification",
+  "criterion_count": 33,
+  "baseline_total": 255.0,
+  "maximum_total": 330,
+  "target_total": 314,
+  "gap_from_historical_baseline": 59,
+  "baseline_mean": 7.7272727272727275,
+  "baseline_areas_at_least_9_5": 0,
+  "fresh_total": null,
+  "recertified": false,
+  "approved_raise_total": 0,
+  "rubric": {
+    "components": [
+      "F",
+      "S",
+      "K",
+      "U",
+      "P"
+    ],
+    "component_min": 0,
+    "component_max": 2,
+    "component_step": 0.5,
+    "sum_rule": "F+S+K+U+P",
+    "without_required_authenticated_production_evidence_cap": 8.5,
+    "P_zero_when": "Necessary real outcome is missing or required automation is paused.",
+    "P_zero_arithmetic_maximum": 8,
+    "score_9_5_requires": "Critical acceptance met; no known blocking/serious defects; relevant production evidence; green final gates; correct deployed revision when applicable."
+  },
+  "scoring_decision": "255 is an exact historical baseline, not a newly verified current product/live score. Missing live bank outcome and absent Bankgiro source require reassessing P. If P=0, area total cannot exceed 8; historical area 15 and area 17 scores of 8.5 therefore cannot be certified unchanged for that current scope. No complete new component assessment was conducted, so no exact replacement total is asserted. A subsequent narrow reassessment of fresh 17:15:28 UTC production-readonly evidence supports Gmail P=1 and backup P=1. Proposed 246 is provisional pending full component disclosure and exact-candidate final gates; it is not yet a certified total. Area 17 covers manual CSV/camt import, so source configuration alone is not the rationale for P=0.",
+  "evidence_scope": "Read-only document, workflow and selected test-source review of 4ad205b; no suites run by this reviewer; no production write or provider request. Test file existence checked. Root reports main CI42059325916 green with 5702 tests; root new candidate a8dfcec tests and newly discovered consent defect are outside this reviewed commit.",
+  "candidate_unreviewed": {
+    "short_commit": "a8dfcec",
+    "reported_by": "root",
+    "status": "Root final tests in progress at handoff; not reviewed or scored here."
+  },
+  "criteria": [
+    {
+      "id": 1,
+      "name": "Design och färger",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payment-control-ui.test.js",
+        "test/ui-final-node.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Historiska UI-regressioner och nyare avgränsad CompanyWorkspace/BankPage-fixture. Inte full visuell eller tillgänglighetsacceptans.",
+      "required_for_raise": "Acceptera samtliga relevanta vyer med verklig text, kontrast, 200–400 % zoom och skärmläsare på publicerad revision.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7,
+      "provisional_reassessment_P": 0.5
+    },
+    {
+      "id": 2,
+      "name": "Startsida",
+      "baseline_score": 8.5,
+      "documented_after_score": 8.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/ui-final-node.test.js",
+        "test/payment-control-ui.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Översiktens summeringar och fel-/laddningslägen har lokalt stöd i äldre rapport.",
+      "required_for_raise": "Stäm av autentiserade startsidans kort, perioder och summor mot en godkänd uppsättning original och ekonomiska facit.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 0.5
+    },
+    {
+      "id": 3,
+      "name": "Navigering",
+      "baseline_score": 8.5,
+      "documented_after_score": 8.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payment-control-ui.test.js",
+        "test/payment-evidence-ui.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokala dialog-/navigeringsregressioner; ny fixture visar fokus/Escape i avgränsat flöde.",
+      "required_for_raise": "Dokumentera Tab, Shift+Tab, Escape, framåt/bakåt samt fokusåtergång genom alla centrala autentiserade vyer och dialoger.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 0.5
+    },
+    {
+      "id": 4,
+      "name": "Mobilanpassning",
+      "baseline_score": 8.5,
+      "documented_after_score": 8.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payment-control-ui.test.js",
+        "test/payment-evidence-ui.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Fixture vid 320/390/768/1024/1440 är avgränsad; historiska 41 Chromiumfall är inte en ny körning.",
+      "required_for_raise": "Acceptera iOS/Android, rotation, tangentbord, långa referenser och originaldialoger på aktuell publicering; komplettera relevant hjälpmedelskontroll.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 0.5
+    },
+    {
+      "id": 5,
+      "name": "Sökning och filtrering",
+      "baseline_score": 7.5,
+      "documented_after_score": 7.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/ui-final-node.test.js",
+        "test/reconciliation-normalization-final.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Sök-/normaliseringsfall och historiska listmätningar. Hela workspace-API:t är fortfarande en volymgräns.",
+      "required_for_raise": "Verifiera referensvarianter, kombinerade filter och komplett resultat mot facit på stor realistisk datamängd; mät hela data- och användarkedjan.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 6,
+      "name": "Minimal manuell hantering",
+      "baseline_score": 6.5,
+      "documented_after_score": 6.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payment-control.test.js",
+        "test/reconciliation-preview.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Automations- och förhandsvisningsregressioner visar lokal funktion, inte faktiskt minskad handpåläggning.",
+      "required_for_raise": "Mät en godkänd representativ arbetsperiod: korrekta avslutade ärenden, manuella beslut, tid och undantag; verifiera bank/Gmail-kedjorna.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 6,
+      "provisional_reassessment_P": 0
+    },
+    {
+      "id": 7,
+      "name": "Kundfakturor",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/invoice-reference-integration.test.js",
+        "test/payment-control-api.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokala faktura-/betalningsregressioner. Verkliga ofullständiga original kan inte ersättas av fixture.",
+      "required_for_raise": "Verifiera godkänt originalinventarium, registrering, belopp, referens, kundrelation och betalningshistorik i ett autentiserat flöde.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 8,
+      "name": "Leverantörsfakturor",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/invoice-extraction.test.js",
+        "test/invoice-evidence-ocr.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Extraktion och evidensflöden är lokalt testbara.",
+      "required_for_raise": "Verifiera godkända leverantörslayouter, kredit/negativa belopp, mottagarrelation och originalbevarande mot ett märkt verkligt facit.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 9,
+      "name": "PDF-tolkning",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/invoice-parser-corpus-q8.test.js",
+        "test/pdf-text-reconstruction.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Versionsbunden parserkorpus och PDF-textregressioner.",
+      "required_for_raise": "Utöka och frys godkänd representativ PDF-korpus med fältfacit; redovisa felaktiga gröna godkännanden, osäkerhet och fellägen.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 10,
+      "name": "Bild-OCR",
+      "baseline_score": 7.0,
+      "documented_after_score": 7.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/pdf-layout-ocr.test.js",
+        "test/ocr-quality-metrics.test.js",
+        "test/sites-ocr-pull.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokala OCR-/layout-/workerregressioner. Historiskt processed=0, failed=0 visar ingen dokumentgenomströmning.",
+      "required_for_raise": "Kör godkänd rasterkorpus och aktuell cloud-worker med verkligt underlag; mät fältkvalitet, osäkerhet, fel, total tid och spårbarhet.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 6.5,
+      "provisional_reassessment_P": 0
+    },
+    {
+      "id": 11,
+      "name": "Gmail-anslutning",
+      "baseline_score": 7.5,
+      "documented_after_score": 7.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/integration-job-api.test.js",
+        "test/integration-jobs-orchestration.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Initial snapshot had Gmail paused. Fresh authenticated status observation at 17:15:28 UTC records connected, successful fetch 16:56:59.219Z and system_entrypoint completed 16:57:23.901Z; externalScheduleVerified=false. This supports P=1 for Gmail connection/fetch, not complete scheduling/OCR acceptance.",
+      "required_for_raise": "P=1 is supported by the current successful fetch. Provisional total 8.5 additionally requires explicit, supported F/S/K/U summing 7.5. Higher acceptance requires current revision/user-chain verification and documented original provenance; scheduling and OCR remain separate.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 8.5,
+      "provisional_reassessment_P": 1
+    },
+    {
+      "id": 12,
+      "name": "Automatisk fakturaregistrering",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/invoice-evidence-ocr.test.js",
+        "test/integration-jobs.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokala dokument- och jobbregressioner stödjer delar av kedjan.",
+      "required_for_raise": "Verifiera automatisk registrering av godkända original med samtliga kritiska fält, exakt-en-gång-beteende och oförändrade äldre poster.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 13,
+      "name": "Dubblettkontroll",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/integration-jobs.test.js",
+        "test/company-reconciliation.test.js",
+        "sites/tests/company-bank-sync-backup.test.mjs"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Hash/replay/dedup och företagsscope stöds lokalt; skalfallet återspelar samma kvitto utan ny import.",
+      "required_for_raise": "Verifiera ägarbundet originalinventarium, godkänd återhämtning, korrigering och historiska luckor; visa att dubbla/importerade original inte skapar dubbel ekonomi.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 14,
+      "name": "Dokumentgranskning",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/invoice-evidence-ocr.test.js",
+        "test/payment-evidence-ui.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Evidens-/dialogregressioner; äldre rapport beskriver version-/besöksskydd och felhantering.",
+      "required_for_raise": "Acceptera prioriterade verkliga dokument med original, versionsbyte, fel/retry och korrekt synlig osäkerhet i aktuell autentiserad UI.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 15,
+      "name": "Swedbank-anslutning",
+      "baseline_score": 8.5,
+      "documented_after_score": 8.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/openpayments-node-transport.test.js",
+        "test/openpayments-company-bank-sync.test.js",
+        "test/node-company-bank-sync.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Node/Sites-adaptrar och scopegränser har kodbevis. Verklig legacybank är reauth_required/connected=false; ny OP är NOT_VERIFIED.",
+      "required_for_raise": "Verifiera aktuell bankutfärdad kontorelation, behörighet, detaljer, förnyelse och tillåtna retry-fall. Stäng alla allvarliga consentfel med regression och aktuellt verkligt bankbevis.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 0
+    },
+    {
+      "id": 16,
+      "name": "Automatisk bankhämtning",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/openpayments-company-bank-sync.test.js",
+        "sites/tests/company-sync-boundary-integration.test.mjs",
+        "sites/tests/company-sync-scale.test.mjs"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokal koordinator, companygräns, kvitto och replay; inget nytt godkänt verkligt bankjobb.",
+      "required_for_raise": "Verifiera ett auktoriserat komplett aktuellt bankjobb inklusive sidindelning, leases, kvitton, dedup, avbrott/återupptagning och oförändrad ekonomi vid nekad åtkomst.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 0
+    },
+    {
+      "id": 17,
+      "name": "Bankgiroimport",
+      "baseline_score": 8.5,
+      "documented_after_score": 8.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/openpayments-bankgiro-ingest.test.js",
+        "test/payment-reference-sources.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Area 17 explicitly includes manual CSV/camt import validation and preservation of originals. SOURCE_NOT_CONFIGURED describes unavailable automated bankgiro ingestion; it does not demonstrate failure of manual import. The original rubric also lacks an authentic individual corporate report with agreed MIG/XSD; no newer successful authentic import was supplied.",
+      "required_for_raise": "Konfigurera och godkänn faktisk bank-/företags-/kontobunden källa med profil och råkvitto; verifiera betalare, referens och samlingsinsättning före separat fakturarelation.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 0
+    },
+    {
+      "id": 18,
+      "name": "Identifiera verklig betalare",
+      "baseline_score": 7.0,
+      "documented_after_score": 7.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payer-evidence.test.js",
+        "test/payer-completion-conflict.test.js",
+        "test/payer-verification-atomic.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Payer-bevis, konflikt och atomiska ändringar har lokala regressioner.",
+      "required_for_raise": "Styrk verklig betalare från bankoriginal eller godkänd redovisningsrelation; verifiera attest, konflikt och återkallande utan att interna kunduppgifter blir bankfakta.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 19,
+      "name": "Verklig OCR/fakturareferens",
+      "baseline_score": 7.0,
+      "documented_after_score": 7.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payment-reference-sources.test.js",
+        "test/invoice-reference-policy.test.js",
+        "test/reference-evidence-compat.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Referenskällor, policy och kompatibilitet har lokala regressioner.",
+      "required_for_raise": "Verifiera bankbunden verklig OCR/referens inklusive avtal/checksiffra där relevant, inledande nollor, frånvaro och konflikter mot ett märkt originalfacit.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 20,
+      "name": "Automatisk betalningsmatchning",
+      "baseline_score": 7.5,
+      "documented_after_score": 7.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/reconciliation-contract.test.js",
+        "test/reconciliation-contract-integrity.test.js",
+        "sites/tests/reconciliation-proposal.test.mjs"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Gemensamma kontrakt, integritet och förslag testas lokalt; förhandsvisning får inte skriva allokeringar.",
+      "required_for_raise": "Verifiera representativ betalningsvolym med korrekt bankpart, godkända fakturarelationer och exakt facit; mät falska positiva och bevara förslag/bokföring som separata steg.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 21,
+      "name": "Delbetalningar",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/reconciliation.test.js",
+        "test/payment-control-api.test.js",
+        "test/payment-concurrency.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokala betalnings-/reconciliation-/samtidighetsfall är referenser för ekonomisk korrekthet.",
+      "required_for_raise": "Verifiera verkliga godkända delbetalningar med korrekt restbelopp, tidsordning, avstämning och obruten audit.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 22,
+      "name": "Överbetalningar",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/reconciliation.test.js",
+        "test/payment-control-api.test.js",
+        "test/payment-concurrency.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokala betalnings- och samtidighetsfall; driftutfall har inte nycertifierats.",
+      "required_for_raise": "Verifiera verklig överbetalning och godkänd affärshantering, saldo/status, beslut och audit utan automatisk felaktig fakturakoppling.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 23,
+      "name": "Flera fakturor i en betalning",
+      "baseline_score": 7.5,
+      "documented_after_score": 7.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/reconciliation-contract.test.js",
+        "test/reconciliation.test.js",
+        "test/company-reconciliation-gate.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Gemensamt kontrakt och company-gate finns lokalt.",
+      "required_for_raise": "Verifiera kompletta original och godkända grupperingar med summerade belopp, referenser och dokumenterade beslut för flera fakturor per betalning.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 24,
+      "name": "Betalningshistorik",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payment-identity-evidence-final.test.js",
+        "test/integration-jobs-backup.test.js",
+        "sites/tests/company-backup.test.mjs"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Identitet, historik-/backupformat och isolerad restore stödjer spårbarhet.",
+      "required_for_raise": "Verifiera autentiserad historik vid realistisk volym, pagination, tidsordning och audit genom migrering och återställning; eliminera relevanta obegränsade listgränser.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 25,
+      "name": "Betalningsstatus",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/message-evidence-projection.test.js",
+        "test/payment-identity-evidence-final.test.js",
+        "test/node-payments-quality-cycle.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Projektioner separerar fakta och bedömning. 0599-ekonomin är oförändrad men tre samtyckesbedömningsfält försämrades.",
+      "required_for_raise": "Verifiera aktuell betalningsstatus mot godkända original, kontorelation och aktuellt samtycke; acceptera även reauth/okänd/ofullständig status utan falsk grön signal.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 26,
+      "name": "Kontrollera alla betalningar",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/payment-control-api.test.js",
+        "test/payment-control-receipts-q8.test.js",
+        "test/payment-control.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Lokala kontroll-/kvittofall; ingen aktuell fullständig godkänd produktionskontroll.",
+      "required_for_raise": "Genomför tillåtet komplett produktionsflöde mot avgränsat godkänt underlag med audit, korrekta undantag och dokumenterad tidsåtgång.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 0
+    },
+    {
+      "id": 27,
+      "name": "Automatiska mejlutkast",
+      "baseline_score": 8.0,
+      "documented_after_score": 8.0,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/message-evidence-projection.test.js",
+        "test/payment-evidence-ui.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Äldre rapport beskriver utkast-/besöksskydd, recipient/evidence och separerad sändning.",
+      "required_for_raise": "Acceptera mottagare, innehåll, osäker evidens och fel-/retry-lägen i aktuellt flöde. Verifiera att förhandsvisning aldrig sänder och att sändning kräver tillåtet separat beslut.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 28,
+      "name": "Schemalagd automatisering",
+      "baseline_score": 6.5,
+      "documented_after_score": 6.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/integration-jobs-orchestration.test.js",
+        "sites/tests/company-sync-scale.test.mjs",
+        "test/sites-ocr-pull.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Fresh Gmail system_entrypoint completed, but externalScheduleVerified=false; bank connected=false; OCR cloudWorkerRecent=false with 15 waiting. Complete scheduled automation remains unverified.",
+      "required_for_raise": "Verifiera faktiska auktoriserade Gmail-, bank- och OCR-körningar med rätt identitet/kadens, 429/restart/leasehantering och bevarade original.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 6.5,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 29,
+      "name": "Säkerhetskopiering",
+      "baseline_score": 7.5,
+      "documented_after_score": 7.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/integration-jobs-backup.test.js",
+        "sites/tests/company-backup.test.mjs",
+        "sites/tests/company-bank-sync-backup.test.mjs"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Fresh Nov5 backup status complete, 362/362 verified at 16:55:10.290Z with verificationScope=manifest_pass. API receipts: 16 checked, 112 without receipt; restorationVerified=false. This supports current limited backup-operation evidence, not independent full restore.",
+      "required_for_raise": "Verifiera aktuell komplett separat kopia av alla nödvändiga original, metadata och nycklar; kontrollera hash och genomför ägarisolerad restore utan gamla behörigheter/leaser.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 7.5,
+      "provisional_reassessment_P": 1
+    },
+    {
+      "id": 30,
+      "name": "Säkerhet och åtkomstkontroll",
+      "baseline_score": 8.5,
+      "documented_after_score": 8.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/saas-company-acceptance.test.js",
+        "sites/tests/saas-company-acceptance.test.mjs",
+        "test/saas-login-boundary.test.js",
+        "test/session-mutation-fence.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "ABC-företag och fyra roller via faktisk SQLite/D1/R2; negativa gränser, storleksgränser och fences. Intern acceptans är inte fullständigt pentest.",
+      "required_for_raise": "Stäng kända allvarliga consent-/racefel; kör aktuell oberoende säkerhetsgranskning på rätt SHA inklusive sessioner, ägarbyte, callbacks, export/original och faktiska driftinställningar.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8,
+      "provisional_reassessment_P": 0.5
+    },
+    {
+      "id": 31,
+      "name": "Katastrofåterställning",
+      "baseline_score": 5.5,
+      "documented_after_score": 5.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "sites/tests/company-backup.test.mjs",
+        "sites/tests/company-bank-sync-backup.test.mjs",
+        "test/integration-jobs-backup.test.js"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Isolerad lokal restore och formatkompatibilitet; ingen full driftåterställning med uppmätta RPO/RTO.",
+      "required_for_raise": "Återställ från en oberoende komplett backup i isolerad miljö med nycklar, original, ägare, behörigheter, historik och ekonomisk avstämning; mät RPO/RTO och dokumentera start/återgång.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 5.5,
+      "provisional_reassessment_P": null
+    },
+    {
+      "id": 32,
+      "name": "Kodkvalitet och tester",
+      "baseline_score": 8.5,
+      "documented_after_score": 8.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/saas-test-isolation.test.js",
+        "test/reconciliation-contract.test.js",
+        "sites/tests/company-sync-boundary-integration.test.mjs"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Main-CI på 4ad205b uppges av huvudgranskaren verifiera 1 899+3 756+47=5 702; denna granskare har inte kört helsviter.",
+      "required_for_raise": "Knyt alla slutgrindar till exakt kandidatrevision och miljö; redovisa typer/build/syntax/audit, relevanta UI-/volymfall och aktuell lintskuld utan att dubbelräkna delsviter.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": false,
+      "provisional_reassessment_score": 8.5,
+      "provisional_reassessment_P": 1
+    },
+    {
+      "id": 33,
+      "name": "Verifiering i verklig produktion",
+      "baseline_score": 6.5,
+      "documented_after_score": 6.5,
+      "fresh_score": null,
+      "proposed_raise": 0,
+      "supporting_test_files": [
+        "test/saas-company-acceptance.test.js",
+        "sites/tests/saas-company-acceptance.test.mjs"
+      ],
+      "test_reference_status": "Files exist; supporting references only, not full coverage certification or a new execution by this reviewer.",
+      "code_and_existing_evidence": "Kodacceptans och lyckad webbpublicering finns, men verklig bank är underkänd och autentiserad verksamhetskedja/DR saknas.",
+      "required_for_raise": "Verifiera exakt levererad revision, representativa autentiserade kundflöden, faktisk bank/Gmail/OCR, original-/ekonomifacit och återställningsövning; stäng kommersiella go/no-go-grindar.",
+      "requires_current_production_or_user_acceptance": true,
+      "production_reassessment_required": true,
+      "provisional_reassessment_score": 5,
+      "provisional_reassessment_P": 0
+    }
+  ],
+  "current_reassessment": {
+    "status": "Provisionally defensible; final exact-SHA gates and explicit full five-component matrix still required.",
+    "source_file": "/workspace/scratch/a96c4ccdbd4d/integration-evidence/production-readonly.json",
+    "source_sha256": "d0baafb3aef018a321844728f92b714829fbaeb92fa69356d4c7657e0039d629",
+    "observed_at_utc": "2026-11-05 17:15:28 UTC",
+    "proposed_scores": [
+      7,
+      7.5,
+      7.5,
+      7.5,
+      7.5,
+      6,
+      8,
+      8,
+      8,
+      6.5,
+      8.5,
+      8,
+      8,
+      8,
+      7.5,
+      7.5,
+      7.5,
+      7,
+      7,
+      7.5,
+      8,
+      8,
+      7.5,
+      8,
+      8,
+      7.5,
+      8,
+      6.5,
+      7.5,
+      8,
+      5.5,
+      8.5,
+      5
+    ],
+    "proposed_total": 246,
+    "net_delta_from_historical": -9,
+    "gap_to_314": 68,
+    "mean": 7.454545454545454,
+    "complete_component_matrix_reviewed": false,
+    "final_candidate_CI_reviewed_here": false,
+    "Gmail_P_1_supported": true,
+    "Gmail_scope": "Current successful connection/fetch only; not externally verified schedule, complete OCR, or all registrations.",
+    "backup_P_1_supported": true,
+    "backup_scope": "Current complete manifest_pass outcome; not independently restored originals or complete API receipts.",
+    "bankgiro_scope_correction": "Manual CSV/camt import is part of criterion 17. Missing automated source alone cannot refute manual-import capability. P=0 is defensible because no authentic corporate report/import outcome is supplied.",
+    "required_conditions": [
+      "All 33 F/S/K/U/P values must be explicit and sum exactly to each proposed score.",
+      "No reuse of full-suite green as blanket proof that every functional criterion is met.",
+      "Area 28 P=0 while required complete bank/OCR/external-schedule outcomes are absent.",
+      "P32=1 and the final grade remain provisional until exact candidate revision CI and final gates succeed.",
+      "No claim that the new candidate is deployed or production accepted merely because Sites62 succeeds."
+    ]
+  }
+}

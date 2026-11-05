@@ -1,5 +1,40 @@
 # Verifierad progress
 
+## Agent 9 — slutförd kodintegration och evidensbaserad releasebedömning, 2026-11-05
+
+**Verifierat betyg: 250/330 = 7,58/10. Kommersiell produktionslansering: NOT APPROVED.**
+Sju producenter (Agent 1–5, 7–8) har levererat; Agent 6:s nya leverans saknas.
+[Samlad PR 49](https://github.com/sharbel0022/Mgeorge/pull/49) innehåller granskade
+PR 45,46,47,50,51,52,53,54 och den egna medgivanderättningen. Samtliga slutliga
+producentheads har grön egen CI; den exakta kombinerade koden är också grön.
+
+Fryst kod `0ce2604de16b77bf96ff76ccedab115f61a3f9ac`, träd
+`50d1ec1226d7ced62bb640707740244c4504ab4c`. GitHubs utcheckade PR-merge
+`248bb4d1a7148e53cfbdd80aaef441dbc5efe26e` har identiskt träd.
+[Full CI 42091716726](https://github.com/sharbel0022/Mgeorge/actions/runs/42091716726):
+**2152/2152 Node 22, 2152/2152 Node 24, 4128/4128 Sites, 47/47 bridge, 46/46 Chromium**
+samt korrekt 1/10/100-företagsprov. [Säkerhetsacceptans 42091716587](https://github.com/sharbel0022/Mgeorge/actions/runs/42091716587)
+ger 332+843=1175/1175. Delsviter och Node-versioner dubbelräknas inte.
+Installationer, 224-filers syntax, typer/minimatchguard, build och auditgrindar
+passerade. Produktionsgrafer har 0 auditfynd; Sites dev har 8 moderate paketposter.
+Sju artefakt-ZIP:ar och 86 loggreferenser är hashkontrollerade; 1 270 manifestfiler
+jämfördes självständigt mot exakta Git-bytes. Inga källor ändrades under CI.
+
+Senaste skrivfria produktionsobservation 19:14 UTC: bankfrånkopplad,
+Bankgirokälla ej konfigurerad, Gmailhämtning 18:59:26, moln-OCR:s sex faktiska
+resultat 18:23 kvar som daterat delbevis men worker inte längre färsk. Backupens
+362/362 manifestpass är inte en oberoende operativ restore. Befintlig Sites 63
+är publicerad av annan aktör; exakt GitHub-källmotsvarighet är inte verifierad.
+Kandidaten är inte driftsatt och main har inte ändrats av Agent 9.
+
+[Slutrapport](docs/integration/95/FINAL-REPORT.md), [alla 33 kriterier](docs/integration/95/QUALITY-REASSESSMENT.md),
+[testregister](docs/integration/95/TEST-RESULTS.md), [integrationsmatris](docs/integration/95/INTEGRATION-MATRIX.md)
+och [exakt kvarstående acceptans](docs/integration/95/REMAINING-TO-95.md).
+En separat rapportcommit får egen full CI; slutlig PR-head binds i PR 49:s
+verifieringskommentar och evidensbilaga. Alla daterade producentrapporter och
+äldre 255/330 nedan är historik, inte den nya samlade bedömningen.
+
+
 ## Agent 2 — Bankgiro och verifierad betalningsreferens, 2026-11-05
 
 Egen branch `feature/95-bankgiro`, bas `4ad205b`; fryst kod `5642be6`. [Inventering, fältkontrakt, detaljerad testmatris och leveranskvitto](docs/integration/bankgiro-95.md). Befintliga Open Payments-, CAMT/XML-, XLSX-, CSV- och SFTP-vägar behålls. Ny ägarbunden läsprojektion visar det exakta originalets importer, källkvitton, betalningsobservationer, allokeringshistorik och manuella underlagsbeslut med hashavvikelser, pagination och ändringskontroll. Sparad historik utger sig inte för bankautenticitet eller korrekt fakturarelation.
@@ -8,7 +43,7 @@ En reproducerad brist är rättad: en referens kan inte längre passera när ori
 
 Lokala fullsviter under arbetet: **1 899 Node +3 756 Sites +47 brygga**, utan fel/skip/cancel/TODO. Efter sista kodändringarna passerar **67 Node +217 parser/intag +145 evidens/visning** i isolerade fokuserade körningar; dessa delantal överlappar de fulla sviterna. Syntax, typer, exakt minimatchkontroll, high-auditgrindar, ren installation och produktionsbygge är godkända enligt rapporten. Oberoende kodgranskning: **READY**, inga Critical/Important-fynd inom omfattningen. Exakt leveranshuvud och hela slutkandidatens Node 22-CI redovisas på PR:n; tidigare lokala fullsviter tillskrivs inte de senare testerna.
 
-Skrivfri kontroll av verkligt sparat original för **BG 5819-7013 / 0599 / 625,00 SEK / 2026-10-26** bekräftar bevarad referens, belopp och individuellt rapportnamn samt intakt original. Formell OCR och organisationsnummer är inte styrkta. Kontoåtkomst, gemensam bankidentitet till AIS och registrerad faktura saknas i kedjan; rapportkällan är `SOURCE_NOT_CONFIGURED`. En ekonomisk AIS-post och en separat rapportobservation, **noll allokeringar**, fortsatt blockerad automatisk avstämning. Inga finansiella produktionsändringar, merge eller driftsättning ingår. **Bankgiro 8,5; alla 33 poäng kvar på 255/330 =7,73/10, 0/33 ≥9,5.**
+Skrivfri kontroll av ett verkligt sparat Bankgirooriginal bekräftar bevarad referens med inledande nolla, belopp och rapportmetadata samt intakt original. Privata konto-, belopps-, datum- och namnuppgifter återges inte i denna rapport. Formell OCR och organisationsnummer är inte styrkta. Kontoåtkomst, gemensam bankidentitet till AIS och registrerad faktura saknas i kedjan; rapportkällan är `SOURCE_NOT_CONFIGURED`. En ekonomisk AIS-post och en separat rapportobservation, **noll allokeringar**, fortsatt blockerad automatisk avstämning. Inga finansiella produktionsändringar, merge eller driftsättning ingår. **Bankgiro 8,5; alla 33 poäng kvar på 255/330 =7,73/10, 0/33 ≥9,5.**
 
 ## Agent 5 — deterministisk betalningsavstämning, 2026-11-05
 
