@@ -18,12 +18,13 @@ export function createOpenPaymentsLifecycle(options){
   async start(input){
    let row=await read();expected(row,input);const permissions=validateReadScopes(input.permissions);
    if(permissions.includes('bankgiro:read')&&!options.bankgiroAllowed)fail('BANKGIRO_SCOPE_UNAVAILABLE');
-   if(row.value&&!['revoked','failed','cancelled'].includes(row.value.status))fail('BANK_BUSY');
+   if(row.value&&row.value.status!=='revoked'&&!(row.value.status==='failed'&&row.value.retrySafe===true&&!row.value.consentHandle))fail('BANK_BUSY');
    const value={id:context.binding.connectionId,bankId:input.bankId,bankName:options.bankName||input.bankId,status:'starting',actorPin,sessionHash,permissions,accounts:[],selected:[],authorizationId:crypto.randomUUID(),expiresAt:new Date(now()+10*60000).toISOString(),validUntil:new Date(now()+90*86400000).toISOString().slice(0,10)+'T23:59:59.999Z',generation:context.binding.generation};
-   row=await write(row,value);const c=client();
+   row=await write(row,value);const c=client();let createdConsentHandle,consentRequested=false;
    try{
     const caps=await c.discoverCapabilities();await guard();if(!caps.authorizationMethods.includes('redirect'))fail('BUSINESS_BANK_UNAVAILABLE');
-    const consent=await c.createConsent({validUntil:value.validUntil.slice(0,10),redirectPreferred:true});await guard();
+    consentRequested=true;
+    const consent=await c.createConsent({validUntil:value.validUntil.slice(0,10),redirectPreferred:true});createdConsentHandle=consent.handle;await guard();
     row=await write(row,{...row.value,consentHandle:consent.handle});
     const authorization=await c.createAuthorisation(consent.handle);await guard();
     const method=authorization.methods.find(m=>m.authenticationMethodId===options.authenticationMethodId)||authorization.methods.length===1&&authorization.methods[0];
@@ -32,7 +33,13 @@ export function createOpenPaymentsLifecycle(options){
     if(redirect.approach!=='redirect')fail('BUSINESS_BANK_UNAVAILABLE');
     const state=new URL(redirect.redirectUrl).searchParams.get('state');if(!state||!/^[-_A-Za-z0-9]{43}$/.test(state))fail('INVALID_CALLBACK');
     row=await write(row,{...row.value,status:'pending',stateHash:await hash(state),flowHandle:redirect.flowHandle,redirectUrl:redirect.redirectUrl});return row;
-   }catch(error){try{await write(row,{...row.value,status:'failed'});}catch{}throw error;}
+   }catch(error){
+    // A missing receipt is not proof that the remote consent was never created.
+    // Keep known authority for explicit revocation; never replace it on retry.
+    const consentHandle=createdConsentHandle||row.value?.consentHandle;
+    const status=consentHandle||consentRequested&&error?.mayHaveSucceeded===true?'recovery_required':'failed';
+    try{await write(row,{...row.value,...(consentHandle?{consentHandle}:{}),status,retrySafe:status==='failed'});}catch{}throw error;
+   }
   },
   async redirect(authorizationId){const row=await read();flowCheck(row.value);if(row.value.authorizationId!==authorizationId||row.value.status!=='pending')fail('INVALID_CALLBACK',403);return row.value.redirectUrl;},
   async complete(callback){

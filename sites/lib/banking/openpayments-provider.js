@@ -14,6 +14,11 @@ const invalid = () => new BankProviderError('PROVIDER_RESPONSE_INVALID');
 const authInvalid = () => new BankProviderError('AUTHORIZATION_INVALID', 403);
 const mismatch = () => new BankProviderError('RESOURCE_SCOPE_MISMATCH', 403);
 const endOfDate = date => `${date}T23:59:59.999Z`;
+const uncertainWrite = error => new BankProviderError(
+  error instanceof BankProviderError ? error.code : 'PROVIDER_RESPONSE_INVALID',
+  error instanceof BankProviderError ? error.status : 502,
+  { mayHaveSucceeded: true },
+);
 
 function identity(raw) {
   if (!isRecord(raw) || raw.usage === 'PRIV' || typeof raw.currency !== 'string' || !/^[A-Z]{3}$/.test(raw.currency)) throw invalid();
@@ -114,16 +119,19 @@ class OpenPaymentsCompanyConnection {
     await this.#guard(); consentTime();
     const token = await this.#tokens.accessToken();
     await this.#guard(); consentTime();
+    let acceptedWrite = false;
     try {
       const result = await this.#http.send({ path, method, body: body === undefined ? undefined : JSON.stringify(body), headers: {
         ...(discovery ? {} : this.#headers(consent)), Authorization: `Bearer ${token}`,
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
         ...(consent && path.startsWith(ACCOUNTS) ? { 'Consent-ID': consent.id } : {}),
       } });
+      acceptedWrite = method === 'POST' || method === 'PUT';
       await this.#guard(); consentTime();
       return result;
     } catch (error) {
       if (error instanceof BankProviderError && error.code === 'INVALID_ACCESS_TOKEN') this.#tokens.invalidate();
+      if (acceptedWrite) throw uncertainWrite(error);
       throw error;
     }
   }
@@ -201,9 +209,11 @@ class OpenPaymentsCompanyConnection {
       corporateIdType: this.#context.corporateIdType, affiliatedAspspId: this.#context.affiliatedAspspId,
       validUntil: input.validUntil, redirectPreferred: input.redirectPreferred === true };
     const response = await this.#request(CONSENTS, { method: 'POST', consent, body: { access: {}, recurringIndicator: true, validUntil: input.validUntil, frequencyPerDay, combinedServiceIndicator: false } });
-    if (!resourceId(response.data.consentId)) throw invalid();
-    consent.id = response.data.consentId;
-    return this.#finish({ handle: await this.#resources.seal('consent', consent, endOfDate(consent.validUntil)), status: consentStatus(response.data.consentStatus), original: this.#original(response, 'create_consent') });
+    try {
+      if (!resourceId(response.data.consentId)) throw invalid();
+      consent.id = response.data.consentId;
+      return await this.#finish({ handle: await this.#resources.seal('consent', consent, endOfDate(consent.validUntil)), status: consentStatus(response.data.consentStatus), original: this.#original(response, 'create_consent') });
+    } catch (error) { throw uncertainWrite(error); }
   }
   async getConsentStatus(handle) {
     const consent = await this.#resource('consent', handle), response = await this.#request(`${CONSENTS}/${consent.id}/status`, { consent });
@@ -217,11 +227,13 @@ class OpenPaymentsCompanyConnection {
   async createAuthorisation(handle) {
     this.#psuRequired();
     const consent = await this.#resource('consent', handle), response = await this.#request(`${CONSENTS}/${consent.id}/authorisations`, { method: 'POST', consent });
-    if (!resourceId(response.data.authorisationId)) throw authInvalid();
-    const methods = methodsFromResponse(response.data), status = scaStatus(response.data.scaStatus);
-    const value = { id: response.data.authorisationId, consent, methods };
-    const expiresAt = new Date(Math.min(Date.parse(endOfDate(consent.validUntil)), this.#now() + 10 * 60_000)).toISOString();
-    return this.#finish({ handle: await this.#resources.seal('authorisation', value, expiresAt), methods, scaStatus: status, original: this.#original(response, 'create_authorisation') });
+    try {
+      if (!resourceId(response.data.authorisationId)) throw authInvalid();
+      const methods = methodsFromResponse(response.data), status = scaStatus(response.data.scaStatus);
+      const value = { id: response.data.authorisationId, consent, methods };
+      const expiresAt = new Date(Math.min(Date.parse(endOfDate(consent.validUntil)), this.#now() + 10 * 60_000)).toISOString();
+      return await this.#finish({ handle: await this.#resources.seal('authorisation', value, expiresAt), methods, scaStatus: status, original: this.#original(response, 'create_authorisation') });
+    } catch (error) { throw uncertainWrite(error); }
   }
   async startAuthorisation(handle, input) {
     input = Object.freeze(snapshot(input, 'AUTHORIZATION_INVALID'));
@@ -230,17 +242,19 @@ class OpenPaymentsCompanyConnection {
     if (!isRecord(input) || Object.keys(input).some(key => !['authenticationMethodId', 'redirectUri'].includes(key)) || !authorization.methods.some(method => method.authenticationMethodId === input.authenticationMethodId)) throw authInvalid();
     if (authorization.consent.redirectPreferred && (!this.#config.redirectUris.includes(input.redirectUri) || typeof this.#dependencies.consumeRedirectState !== 'function')) throw authInvalid();
     const response = await this.#request(`${CONSENTS}/${authorization.consent.id}/authorisations/${authorization.id}`, { method: 'PUT', consent: authorization.consent, body: { authenticationMethodId: input.authenticationMethodId } });
-    const status = scaStatus(response.data.scaStatus), approach = response.headers.get('aspsp-sca-approach');
-    if (approach === 'DECOUPLED') {
-      if (response.data.challengeData !== undefined && !isRecord(response.data.challengeData)) throw authInvalid();
-      return this.#finish({ approach: 'decoupled', scaStatus: status, challengeData: snapshot(response.data.challengeData ?? {}), consentValid: false });
-    }
-    if (approach !== 'REDIRECT' || typeof this.#dependencies.consumeRedirectState !== 'function') throw authInvalid();
-    const state = randomState(), flowId = crypto.randomUUID(), redirectUri = input.redirectUri;
-    const redirectUrl = authorizationRedirect(response.data._links?.scaOAuth?.href, { config: this.#config, consent: authorization.consent, authorisationId: authorization.id, redirectUri, state });
-    const expiresAt = new Date(Math.min(Date.parse(endOfDate(authorization.consent.validUntil)), this.#now() + 10 * 60_000)).toISOString();
-    const flowHandle = await this.#resources.seal('redirect', { consent: authorization.consent, authorisationId: authorization.id, state, redirectUri, flowId }, expiresAt);
-    return this.#finish({ approach: 'redirect', scaStatus: status, redirectUrl, flowHandle, consentValid: false });
+    try {
+      const status = scaStatus(response.data.scaStatus), approach = response.headers.get('aspsp-sca-approach');
+      if (approach === 'DECOUPLED') {
+        if (response.data.challengeData !== undefined && !isRecord(response.data.challengeData)) throw authInvalid();
+        return await this.#finish({ approach: 'decoupled', scaStatus: status, challengeData: snapshot(response.data.challengeData ?? {}), consentValid: false });
+      }
+      if (approach !== 'REDIRECT' || typeof this.#dependencies.consumeRedirectState !== 'function') throw authInvalid();
+      const state = randomState(), flowId = crypto.randomUUID(), redirectUri = input.redirectUri;
+      const redirectUrl = authorizationRedirect(response.data._links?.scaOAuth?.href, { config: this.#config, consent: authorization.consent, authorisationId: authorization.id, redirectUri, state });
+      const expiresAt = new Date(Math.min(Date.parse(endOfDate(authorization.consent.validUntil)), this.#now() + 10 * 60_000)).toISOString();
+      const flowHandle = await this.#resources.seal('redirect', { consent: authorization.consent, authorisationId: authorization.id, state, redirectUri, flowId }, expiresAt);
+      return await this.#finish({ approach: 'redirect', scaStatus: status, redirectUrl, flowHandle, consentValid: false });
+    } catch (error) { throw uncertainWrite(error); }
   }
   async getAuthorisationStatus(handle) {
     const authorization = await this.#resource('authorisation', handle);
