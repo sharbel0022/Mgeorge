@@ -1,5 +1,16 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
+
+[Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.
+
+| Område | Före | Efter | Nytt bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | RED/GREEN för sekretess i banktransportlogg, 8 KiB-login och 16 MB faktisk multipartbudget. 15 A/B/C-ownerprov med sex riktade IDOR-/bilageangrepp, original, kryptering och banklås. | CompanyMembership/RBAC, ny corporate-consent, origin-/certifikatdrift, nyckelrotation, retention och avtal kräver uttrycklig acceptans. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Fokuserad acceptans 480/480 med maskinläsbart kvitto; separat testmiljö, nätverksspärr, fixerad CLI-flaggordning och SHA-låsta Actions. Slutliga helgrindar och oberoende review redovisas i rapporten. | Befintlig lintskuld kvarstår. Aktuell lokal audit har 8 moderate Sites-fynd, 0 high/critical; inga beroenden ändras i denna PR. |
+
+Tillståndsfrågor, GDPR-rollfördelning, leverantörsavtal och produktionsåterställning får inga godkännandepoäng från denna delleverans. De tidigare daterade produktionskvittona nedan behåller sin historiska omfattning.
+
 ## Agent 3 — avgränsad företagsmedgivandeverifiering, 2026-11-04
 
 [Bank consent-kontrakt och verifieringskvitto](docs/integration/saas/bank-consent.md) gäller utvecklingsbranchen `feature/saas-bank-consent` från `14a042a`. Alla 33 poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. Syntetiska regressionsprov och oberoende kodgranskning ersätter inte bankens faktiska företagsbehörighet eller produktionsacceptans.

@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
           cache: npm
@@ -26,7 +26,9 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --audit-level=high
       - name: Run tests with synthetic data
-        run: npm test
+        env:
+          NODE_ENV: test
+        run: npm run test:isolated
   sites:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -34,10 +36,10 @@ jobs:
       run:
         working-directory: sites
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
           cache: npm
@@ -54,16 +56,22 @@ jobs:
       - name: Install isolated bridge for full synthetic SFTP chain
         run: npm --prefix ../bridge/bankgiro ci --ignore-scripts
       - name: Run Sites tests with synthetic data
-        run: npm test
+        env:
+          NODE_ENV: test
+          CLOUDFLARE_CF_FETCH_ENABLED: 'false'
+          WRANGLER_SEND_METRICS: 'false'
+        run: npm run test:isolated
       - run: npm run build
+        env:
+          CLOUDFLARE_CF_FETCH_ENABLED: 'false'
   bankgiro_bridge:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
           cache: npm
@@ -75,4 +83,6 @@ jobs:
       - name: Audit isolated bridge production dependencies
         run: npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high
       - name: Test synthetic SSH SFTP HTTP and durable recovery
-        run: npm --prefix bridge/bankgiro test
+        env:
+          NODE_ENV: test
+        run: npm --prefix bridge/bankgiro run test:isolated

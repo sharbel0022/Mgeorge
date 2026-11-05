@@ -1,5 +1,14 @@
 # Verifierad progress
 
+## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
+
+Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).
+
+Tre reproducerade brister har avgränsade rättningar med RED/GREEN-bevis: rå banktransporttext kunde läcka privata uppgifter till logg; oautentiserad Node-login hade dokumentimportens 22 MB-budget; Sites multipart kunde kringgå totalgränsen genom saknad/för låg Content-Length och ett stort ignorerat fält. Loggen använder nu en fast säker händelse, login har 8 KiB-budget och Sites räknar hela strömmen före multiparttolkning med 16 MB-tak och bibehållen 15 MB-filgräns.
+
+15 nya A/B/C-ownerfall provar verkliga API-/SQLite-/R2-/krypterings-/låsgränser. Den fokuserade acceptansen har **92 Node +388 Sites =480 godkända**, utan fel/skip/cancel/TODO. Nytt CI-jobb sparar syntetisk TAP/JSON-evidens; befintliga helgrindar behålls, actions är SHA-låsta och `test:isolated` laddar nätverksspärren före testerna. Fulla körningar, driftbegränsningar och miljöavvikelser redovisas i rapporten.
+
+Basen innehåller ännu ingen levererad generell company/member/role-modell eller ny corporate-provider. Befintliga ownerprov ger därför inget fullständigt SaaS- eller juridiskt godkännande. Agent 8 ska använda frysta producent-SHA:er och stänga de uttryckliga integrationsgrindarna. **Alla 33 poäng behålls: 255/330 =7,73/10; 0/33 ≥9,5.**
 ## Agent 6 — SaaS-onboarding och bankanslutning, 2026-11-04
 
 Frontend på `feature/saas-customer-onboarding-ui`, bas `14a042a`. [Leverans- och verifieringsrapport](docs/integration/saas-customer-onboarding-verification.md), [föreslaget API-kontrakt](docs/integration/saas-customer-onboarding-ui.md) och [browserkvitto/skärmbilder](docs/integration/saas-onboarding-browser/README.md). Svartvit företagsväljare/registrering, bankguide, läsbehörigheter, providerstyrd identifiering, separat kontodata/Bankgirostatus, medgivandetider, konton, förnyelse/frånkoppling och betalningsreferenser med evidensstatus är implementerade.
@@ -909,6 +918,13 @@ Riktig rapporthämtning är uttryckligen avstängd: kundens bankavtal, auktorise
 Producer `32be7f5` och main `f75a293` har sammanförts normalt i `integrate/consent-20261105`. Företags-/medlemskontexten bevaras genom Enable Banking-flödet. Faktisk Open Payments-livscykel finns nu gemensamt för Node/Sites: beständig krypterad CAS, företags-/aktörs-/sessionsbundet state, engångsaktivering, verifierat medgivande och konton, idempotens, förnyelse/återkallelse samt budgeterat gränssnitt till befintlig banksynk. Konkret race där återkallelse hann ske före nästa kontoläsning reproducerades RÖTT och rättades med beständig revisionskontroll GRÖNT. D1 samlas i0020 efter foundation0019; snapshots, ägartabeller, skrivtriggers och backupcensus är kumulativa. Historiska backupformat bevaras.
 
 Fulla syntetiska sviter: Node1692/1692 och Sites3382/3382,0fel/skip/cancel/TODO. Syntax146; TypeScript och produktionsbygge gröna före den sista JS-revisionsspärren, som täcks av full Sites/regression. Root fullaudit0, Sites prod0/full8moderate utvecklingsberoenden och godkänd high-grind; befintlig minimatch-backport verifierad. Inga verkliga bank-/Gmail-/kundskrivningar, remote-merge eller Sites-publicering utfördes i detta delarbete. SaaS är serveravstängd som standard, Sites produktion saknar medvetet aktiverad mTLS-transport. Kvalitetspoäng ändras inte. [Livscykel och driftsgränser](docs/integration/saas/openpayments-consent-lifecycle.md). Integrationsansvarig slutför oberoende review, exakt gemensam CI och eventuell publicering.
+
+
+## PR #37 integrerad intern säkerhetsacceptans — 2026-11-05
+
+Separat lokal branch har normalt sammanfört aktuell foundation/main, PR #39:s företagsbundna Open Payments-livscykel och PR #41:s Bankgirobevis. Nya syntetiska tester använder verklig företagsprovisionering, medlemskap, vald kontext, Node-partitioner och D1/R2-rutter för tre företag med kolliderande affärs-id:n. Roll-/företagsbyte och återkallat medlemskap stoppar fångad SQL och svar över await; R2-original levereras inte efter återkallelse; privat browsercache förkastar gammalt svar; backupidentitet kontrolleras. Äldre owner-fixture har anpassats till faktisk auktorisering utan sänkta assertions.
+
+Utökad isolerad acceptans: Node178/178 och Sites523/523 utan fel, skip, cancel eller TODO. Befintliga begränsade login-/multipartkroppar och redigerade transportloggar bevaras. Detta är intern syntetisk acceptans; PR #42/#38:s slutliga kumulativa grindar och extern produktions-/kommersiell evidens återstår hos integrationsansvarig. Ingen fjärrmerge, publicering, kund-/bank-/Gmailskrivning eller poänghöjning har gjorts. Se [precis omfattning och kvarstående gränser](docs/integration/saas/security-integrated-acceptance.md).
 
 ## 2026-11-05 — consent integration CI installation repair
 

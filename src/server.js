@@ -100,9 +100,10 @@ function duplicateInvoice(direction,invoice_number,party,excludeId=''){
   return db.prepare('SELECT id,invoice_number,party FROM invoices WHERE direction=? AND id<>?').all(direction,excludeId).some(i=>identity(i.invoice_number)===identity(invoice_number)&&identity(i.party)===identity(party));
 }
 function validateDate(s,required=false){if(!s&&!required)return ''; if(typeof s!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(s)||Number.isNaN(Date.parse(s+'T00:00:00Z'))||new Date(s+'T00:00:00Z').toISOString().slice(0,10)!==s)throw bad(400,'Ange ett giltigt datum som ÅÅÅÅ-MM-DD');return s;}
-async function readBody(req,{authenticated=true}={}){
+async function readBody(req,{authenticated=true,maxBytes=22_000_000}={}){
+  if(Number(req.headers['content-length'])>maxBytes)throw bad(413,'Förfrågan är för stor');
   const chunks=[];let length=0;
-  for await (const chunk of req){length+=chunk.length;if(length>22_000_000)throw bad(413,'Filen är för stor');chunks.push(chunk);}
+  for await (const chunk of req){length+=chunk.length;if(length>maxBytes)throw bad(413,'Förfrågan är för stor');chunks.push(chunk);}
   let body;try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw bad(400,'Ogiltig JSON');}
   // Reading a streamed body yields: the initiating session may now be revoked.
   if(authenticated)assertSessionStillAuthorized(req);
@@ -643,7 +644,9 @@ async function route(req,res){
   }
   if(req.method!=='GET')checkOrigin(req);
   if(path==='/api/login'&&req.method==='POST'&&check.secure){
-    const b=await readBody(req,{authenticated:false});
+    // Login is unauthenticated and never uploads originals. Do not give it the
+    // 22 MB document-import budget before the existing password/rate checks.
+    const b=await readBody(req,{authenticated:false,maxBytes:8_192});
     const now=Date.now(),address=req.socket.remoteAddress;
     const attempt=loginAttempts.get(address);
     if(attempt&&attempt.until>now&&attempt.count>=5)throw bad(429,'För många inloggningsförsök. Försök igen om 15 minuter.');

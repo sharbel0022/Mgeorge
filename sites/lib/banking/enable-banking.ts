@@ -297,14 +297,10 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
   } catch (error) {
     if (error instanceof ProviderError) throw error;
     if (controller.signal.aborted) throw new ProviderError('BANK_TIMEOUT', 'Banktjänsten svarade inte i tid. Försök igen om en stund.', 504, true);
-    // Keep deployment transport failures diagnosable without logging request
-    // headers, JWTs, authorization codes, account IDs or upstream response data.
-    const detail = error instanceof Error ? error.message : 'Unknown transport failure';
-    console.error('BANK_PROVIDER_TRANSPORT_ERROR', detail
-      .replace(/https?:\/\/\S+/gi, '[url]')
-      .replace(/Bearer\s+\S+/gi, '[authorization]')
-      .replace(/[A-Za-z0-9+/=_-]{24,}/g, '[redacted]')
-      .slice(0, 240));
+    // Exceptions may embed short tokens, personal identity, bank details or
+    // forged log lines. Regex masking cannot make arbitrary upstream text safe.
+    // A fixed event keeps this failure observable without copying that text.
+    console.error('BANK_PROVIDER_TRANSPORT_ERROR');
     throw new ProviderError('BANK_NETWORK_ERROR', 'Banktjänsten kunde inte nås. Ingen import gjordes.', 502, true);
   } finally { clearTimeout(timeout); }
 }
