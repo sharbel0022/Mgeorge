@@ -28,6 +28,8 @@ The Sites callback is hardcoded to the prior site host. Use server-owned validat
 Ruling: enhance existing provider modules rather than replace them; the current implementation already supplies the transaction/authorization fences and a replacement would risk established evidence semantics.
 Ruling: parallel tasks have explicit non-overlapping file ownership; root integrates shared policy/status changes after the service owner hands back its files.
 
+Integration update: during final verification, main advanced through PR #48 to `bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee`. Merge its existing changes without editing unrelated areas. Reconcile its callback UI and explicit legacy-consent revalidation with strict callback configuration, truthful health and current authorization guards. Re-run affected tests and full CI against the merged application code; earlier counts remain historical evidence for their original source only.
+
 ## Review focus
 
 - Changed callback host and in-flight old flow: exact stored redirect, same origin, trusted configuration; no token exchange on mismatch.
@@ -69,7 +71,9 @@ Files: only existing bank provider modules and directly relevant tests as justif
 - [x] Document unresolved external provider requirements precisely.
 
 ### 6. Verify, review and deliver
-- [ ] Targeted RED/GREEN checks plus required root syntax/test/audit and Sites install/type/test/audit/build; bridge gate where shared verification requires it.
-- [ ] Independent review of the frozen diff; repair material findings and rerun affected/full gates as warranted.
-- [ ] Update PROGRESS and relevant scorecard evidence without claiming unverified production acceptance.
-- [ ] Commit and push only `feature/95-bank`, create PR against main, inspect exact-head CI, report files/tests/PR/external gates.
+- [x] Targeted RED/GREEN checks plus required root syntax/test/audit and Sites install/type/test/audit/build; bridge gate where shared verification requires it.
+- [x] Independent review of the frozen diff; repair material findings and rerun affected/full gates as warranted.
+- [x] Update PROGRESS and relevant scorecard evidence without claiming unverified production acceptance.
+- [x] Commit and push only `feature/95-bank`, create PR against main, inspect exact-head CI, report files/tests/PR/external gates.
+
+Integrated code `5f71a3c4840739bcf0786693a00b4213ab59ceba`, CI merge `9264e1515fd1a431dbf3455e0e1c30860091c240`, identical tree `80214932045cb75df02d54c8324f4df0a5443ee0`: 2,013 Node + 3,938 Sites + 47 bridge = 5,998 passing tests, plus 1,148 overlapping security checks. Syntax/types/audits/production build passed. [Final report](../../integration/bank-95/README.md) and [machine-readable receipt](../../integration/bank-95/verification.json). PR #45 remains a proposed merge into main; no production activation or bank acceptance is claimed.

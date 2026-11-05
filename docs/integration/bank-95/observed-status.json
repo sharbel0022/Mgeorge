@@ -1,5 +1,5 @@
 {
-  "observedAt": "2026-11-05T17:35:53Z",
+  "observedAt": "2026-11-05T18:21:20Z",
   "source": "existing deployed bank_auto_sync_status, read-only stored-state projection",
   "providerRequestsPerformed": 0,
   "productionMutationsPerformed": 0,
@@ -22,5 +22,7 @@
     "exactFailedPredicate": "NOT_DETERMINED",
     "providerPayloadRetained": false
   },
-  "interpretation": "No fresh provider authorization is established. The obsolete nextAttemptAt does not prove a scheduled retry can run. Code changes on feature/95-bank have not been deployed."
+  "interpretation": "No fresh provider authorization is established. The obsolete nextAttemptAt does not prove a scheduled retry can run. Code changes on feature/95-bank have not been deployed.",
+  "previousObservedAt": "2026-11-05T17:35:53Z",
+  "unchangedSincePreviousObservation": true
 }
