@@ -191,22 +191,39 @@ async function signedToken(config: ProviderConfig): Promise<string> {
   }
 }
 
-async function boundedJson(response: Response): Promise<unknown> {
+// Signal cancellation alone cannot bound a transport that ignores it.
+async function untilAborted<T>(operation: () => Promise<T>, signal: AbortSignal): Promise<T> {
+  signal.throwIfAborted();
+  let abort!: () => void;
+  const stopped = new Promise<never>((_resolve, reject) => {
+    abort = () => reject(signal.reason);
+    signal.addEventListener('abort', abort, { once: true });
+  });
+  try { return await Promise.race([operation(), stopped]); }
+  finally { signal.removeEventListener('abort', abort); }
+}
+
+function cancelQuietly(body: { cancel(): Promise<unknown> } | null): void {
+  // Cleanup must neither delay nor replace the established provider error.
+  try { void body?.cancel().catch(() => {}); } catch {}
+}
+
+async function boundedJson(response: Response, signal: AbortSignal): Promise<unknown> {
   const declared = Number(response.headers.get('content-length'));
   if (Number.isFinite(declared) && declared > MAX_RESPONSE_BYTES) {
-    await response.body?.cancel(); throw new ProviderError('RESPONSE_TOO_LARGE', 'Bankens svar var för stort. Välj en kortare period. Ingen import gjordes.');
+    cancelQuietly(response.body); throw new ProviderError('RESPONSE_TOO_LARGE', 'Bankens svar var för stort. Välj en kortare period. Ingen import gjordes.');
   }
   if (!response.body) return null;
   const reader = response.body.getReader(); const decoder = new TextDecoder(); let text = '', size = 0;
   try {
     while (true) {
-      const chunk = await reader.read(); if (chunk.done) break;
+      const chunk = await untilAborted(() => reader.read(), signal); if (chunk.done) break;
       size += chunk.value.byteLength;
-      if (size > MAX_RESPONSE_BYTES) { await reader.cancel(); throw new ProviderError('RESPONSE_TOO_LARGE', 'Bankens svar var för stort. Välj en kortare period. Ingen import gjordes.'); }
+      if (size > MAX_RESPONSE_BYTES) { cancelQuietly(reader); throw new ProviderError('RESPONSE_TOO_LARGE', 'Bankens svar var för stort. Välj en kortare period. Ingen import gjordes.'); }
       text += decoder.decode(chunk.value, { stream: true });
     }
     text += decoder.decode();
-  } finally { reader.releaseLock(); }
+  } finally { if (signal.aborted) cancelQuietly(reader); reader.releaseLock(); }
   if (!text.trim()) return null;
   try { return JSON.parse(text); } catch { if (!response.ok) return null; throw invalidResponse(); }
 }
@@ -271,7 +288,7 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
   try {
     // Workers supports manual redirects, but rejects redirect: 'error'. Never
     // follow a redirect with bank credentials or an authorization-code body.
-    const response = await fetch(url.href, { method, headers, body, signal: controller.signal, redirect: 'manual', cache: 'no-store' });
+    const response = await untilAborted(() => fetch(url.href, { method, headers, body, signal: controller.signal, redirect: 'manual', cache: 'no-store' }), controller.signal);
     const retryHeader = response.headers.get('retry-after');
     if (response.status === 429 || response.status === 503 && retryHeader !== null) {
       // A malformed, oversized or stalled error body cannot erase a cooldown
@@ -283,14 +300,14 @@ export async function providerRequest<T>(config: ProviderConfig, path: string, o
         error.retryBlocked = advice.status === 'manual_block';
         error.retryAfter = advice.status === 'known' ? Math.max(1, Math.ceil((Date.parse(advice.notBefore) - at) / 1000)) : error.retryBlocked ? MAX_RETRY_SECONDS : DEFAULT_RATE_LIMIT_RETRY_SECONDS;
       }
-      void response.body?.cancel().catch(() => {});
+      cancelQuietly(response.body);
       throw error;
     }
     if (response.status >= 300 && response.status < 400) {
-      await response.body?.cancel();
+      cancelQuietly(response.body);
       throw new ProviderError('PROVIDER_REDIRECT_DENIED', 'Banktjänsten svarade med en oväntad omdirigering. Ingen import gjordes.');
     }
-    const payload = await boundedJson(response);
+    const payload = await boundedJson(response, controller.signal);
     if (!response.ok) throw mappedError(response.status, payload, response.headers.get('retry-after'));
     if (!record(payload)) throw invalidResponse();
     return payload as T;

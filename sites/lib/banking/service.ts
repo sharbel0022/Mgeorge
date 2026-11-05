@@ -7,7 +7,7 @@ import {
 } from './enable-banking';
 import { normalizeTransactions, stableAccountKey } from './transactions';
 import {
-  accounts, application, connection, encrypt, metadata, providerConfig, configurationStatus, saveApplicationMetadata,
+  accounts, application, connection, encrypt, metadata, providerConfig, configurationStatus, saveApplicationMetadata, bankRedirectUrl,
   sessionId, storageReady, withBankLock, type BankConnectionRow, type BankFlowRow, type BankLease,
   bankCompanyContext, corporateAccountEvidence, consentMetadata, currentCompanyAuthorization, assertCompanyConsent,
   revocationSessionId, type ConsentMetadata,
@@ -17,7 +17,8 @@ import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
 import { mergeAccountReadCooldown } from './account-read-cooldown';
 import { guardedBankRead } from './account-read-guard';
-import { ConsentError, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection } from '../bank-consent-policy.js';
+import { ConsentError, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection,
+  consentDiagnostic, storedConsentDiagnostic, storedEnableConnectionHealth } from '../bank-consent-policy.js';
 
 type FlowContext = {
   version: 1; companyId: string; actorId: string; membershipVersion: string; mode: 'company' | 'legacy';
@@ -37,13 +38,17 @@ function flowContext(flow: BankFlowRow): FlowContext | null {
 }
 async function assertFlowActor(flow: BankFlowRow, context: FlowContext | null) {
   const user = await identity(), actor=user.userId;
-  if (actor !== flow.owner || context && bankCompanyContext(actor).actorId !== context.actorId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
-  bankCompanyContext(actor, context?.companyId);
+  if (actor !== flow.owner) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  if (context) assertCompanySnapshot(actor, context);
+  else bankCompanyContext(actor);
   if (!Number.isFinite(Date.parse(flow.expires_at)) || Date.parse(flow.expires_at) <= Date.now()) throw new ConsentError('CONSENT_FLOW_EXPIRED', 409);
+}
+function assertCompanySnapshot(owner: string, expected: Pick<FlowContext, 'companyId' | 'actorId' | 'membershipVersion'>) {
+  const current = bankCompanyContext(owner, expected.companyId);
+  if (current.actorId !== expected.actorId || current.membershipVersion !== expected.membershipVersion) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
 }
 function flowCookie(stateHash: string) { return `${COOKIE}-${stateHash.slice(0, 32)}`; }
 
-export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
 const COOKIE = '__Secure-mg-bank-flow';
 const FLOW_AGE_MS = 15 * 60_000;
 const POSTPROCESS_WARNING='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
@@ -56,20 +61,41 @@ const BANK_JOB_ERROR_CODES=new Set([
   'INVALID_REQUEST','INVALID_PROVIDER_RESPONSE','INVALID_CONFIGURATION','INVALID_PRIVATE_KEY','RESPONSE_TOO_LARGE',
   'NO_LINKED_ACCOUNTS','CALLBACK_NOT_REGISTERED','PROVIDER_AUTHORIZATION_FAILED','PROVIDER_ACCESS_DENIED','PROVIDER_REDIRECT_DENIED',
 ]);
-// Persist only known policy diagnostics. ConsentError permits a caller-supplied
-// message, so reconstruct the canonical text instead of retaining that input.
-const BANK_CONSENT_DIAGNOSTIC_CODES = new Set([
-  'COMPANY_ACCESS_DENIED', 'INVALID_CONSENT_SCOPES', 'BANKGIRO_SCOPE_UNAVAILABLE',
-  'BANK_CONSENT_INVALID', 'BANK_CONSENT_EXPIRED', 'BANK_ACCOUNT_SCOPE_INVALID',
-  'BANK_TRANSACTION_SCOPE_REQUIRED', 'CORPORATE_AUTHORIZATION_REQUIRED',
-]);
-function bankConsentDiagnostic(error: unknown): { code: string; message: string } | null {
-  try {
-    if (!(error instanceof ConsentError)) return null;
-    const code = error.code;
-    if (typeof code !== 'string' || !BANK_CONSENT_DIAGNOSTIC_CODES.has(code)) return null;
-    return { code, message: new ConsentError(code).message };
-  } catch { return null; }
+const bankConsentDiagnostic = consentDiagnostic;
+const BANK_PROVIDER_MESSAGES: Readonly<Record<string, string>> = Object.freeze({
+  BANK_RATE_LIMIT: 'Banken har begränsat antalet förfrågningar. Vänta till nästa tillåtna försök.',
+  BANK_TIMEOUT: 'Banktjänsten svarade inte i tid. Försök igen om en stund.',
+  BANK_NETWORK_ERROR: 'Banktjänsten kunde inte nås. Ingen import gjordes.',
+  BANK_RECONNECT_REQUIRED: 'Bankmedgivandet har gått ut eller avslutats. Anslut banken igen.',
+  BANK_AUTHORIZATION_EXPIRED: 'Bankinloggningen kunde inte slutföras. Börja om med Anslut bank.',
+  BANK_PERIOD_UNAVAILABLE: 'Banken kan inte lämna den valda perioden. Välj ett senare startdatum eller en kortare period.',
+  BANK_DATE_RANGE_INVALID: 'Bankens datumintervall är ogiltigt. Kontrollera datumen och försök igen.',
+  BANK_ACCOUNT_UNAVAILABLE: 'Bankkontot är inte tillgängligt med det aktuella medgivandet. Anslut banken igen och kontrollera kontovalet.',
+  BANK_ACTION_REQUIRED: 'Banken kräver en åtgärd från dig. Kontrollera meddelanden och behörigheter hos banken.',
+  BANK_USER_CONTEXT_REQUIRED: 'Banken behöver en aktiv användarsession. Öppna sidan och försök igen.',
+  BANK_UNAVAILABLE: 'Bankalternativet är inte längre tillgängligt. Hämta banklistan igen.',
+  BANK_SYNC_RESTART_REQUIRED: 'Bankens sidnyckel har gått ut. Börja om hämtningen. Ingen import gjordes.',
+  BANK_RESOURCE_UNAVAILABLE: 'Den begärda bankuppgiften finns inte tillgänglig.',
+  INVALID_REQUEST: 'Bankförfrågan är ogiltig. Uppdatera sidan och försök igen.',
+  INVALID_CONFIGURATION: 'Banktjänsten behöver aktiveras av systemadministratören.',
+  INVALID_PRIVATE_KEY: 'Banktjänstens skyddade serveruppgifter kunde inte verifieras.',
+  RESPONSE_TOO_LARGE: 'Bankens svar var för stort. Välj en kortare period. Ingen import gjordes.',
+  NO_LINKED_ACCOUNTS: 'Applikationen saknar tillåtna bankkonton. Kontrollera kontoaktiveringen hos Enable Banking.',
+  CALLBACK_NOT_REGISTERED: 'Returadressen är inte registrerad hos Enable Banking. Kontrollera bankkopplingens inställningar.',
+  PROVIDER_AUTHORIZATION_FAILED: 'Enable Banking kunde inte verifiera serverns åtkomst. Kontakta systemadministratören.',
+  PROVIDER_ACCESS_DENIED: 'Enable Banking har inte aktiverat åtkomsten. Kontrollera applikationens status och avtal.',
+  PROVIDER_REDIRECT_DENIED: 'Banktjänsten svarade med en oväntad omdirigering. Ingen import gjordes.',
+});
+function bankProviderDiagnostic(error: unknown) {
+  const originalCode = providerErrorCode(error);
+  if (!originalCode) return null;
+  const code = BANK_JOB_ERROR_CODES.has(originalCode) ? originalCode : 'BANK_SYNC_FAILED';
+  return { code, message: BANK_PROVIDER_MESSAGES[code] ?? 'Banktjänstens svar kunde inte verifieras. Ingen import gjordes.' };
+}
+function publicRetryAfter(error: unknown): number | undefined {
+  if (!error || typeof error !== 'object') return undefined;
+  const value = Object.getOwnPropertyDescriptor(error, 'retryAfter')?.value;
+  return Number.isSafeInteger(value) && value > 0 ? value : undefined;
 }
 function bankJobErrorCode(error:unknown):string{
   const consent=bankConsentDiagnostic(error);if(consent)return consent.code;
@@ -106,6 +132,18 @@ export class BankError extends Error {
 }
 
 export function bankFailure(error: unknown): Response {
+  const consent = bankConsentDiagnostic(error);
+  if (consent) return response({ error: consent.message, code: consent.code,
+    ...(consent.reason ? { reason: consent.reason } : {}) }, consent.status);
+  if (error instanceof ConsentError) return response({ error: 'Bankanslutningen kunde inte verifieras.', code: 'BANK_CONSENT_INVALID' }, 400);
+  const provider = bankProviderDiagnostic(error);
+  if (provider) {
+    const retryAfter = publicRetryAfter(error);
+    const result = response({ error: provider.message, code: provider.code, ...(retryAfter ? { retryAfter } : {}) },
+      provider.code === 'BANK_RATE_LIMIT' ? 429 : provider.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 502);
+    if (retryAfter) result.headers.set('Retry-After', String(retryAfter));
+    return result;
+  }
   const code = error instanceof Error ? error.message : '';
   if (code === 'AUTH_REQUIRED') return response({ error: 'Logga in med ChatGPT för att hantera din bankanslutning.', signIn: '/signin-with-chatgpt?return_to=%2Fbank' }, 401);
   if (code === 'ORIGIN_DENIED') return response({ error: 'Åtgärden måste startas från MG Fakturakoll.' }, 403);
@@ -115,13 +153,7 @@ export function bankFailure(error: unknown): Response {
   if (code === 'BANK_SECRET_UNREADABLE') return response({ error: 'Bankanslutningens skyddade uppgifter kunde inte läsas. Kontakta administratören.' }, 503);
   if (error instanceof RuntimeBankError || code === 'BANK_RUNTIME_CONFIGURATION_CHANGED') return response({ error: 'Banktjänsten behöver aktiveras av systemadministratören.' }, 409);
   if (error instanceof BankError) return response({ error: error.message }, error.status);
-  if (error instanceof ConsentError) return response({ error: error.message, code: error.code }, error.status);
   if (error instanceof BankPeriodError) return response({error: error.message, code: error.code}, error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 409);
-  if (error instanceof ProviderError) {
-    const result = response({ error: error.message, code: error.code, ...(error.retryAfter?{retryAfter:error.retryAfter}:{}) }, error.status === 429 ? 429 : error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 502);
-    if (Number.isSafeInteger(error.retryAfter) && error.retryAfter! > 0) result.headers.set('Retry-After', String(error.retryAfter));
-    return result;
-  }
   return response({ error: 'Bankåtgärden kunde inte slutföras. Försök igen. Dina tidigare fakturor och bankhändelser är kvar.' }, 500);
 }
 
@@ -158,6 +190,35 @@ function storedStatus(row: BankConnectionRow): string {
     (!Number.isFinite(Date.parse(row.valid_until)) || Date.parse(row.valid_until) <= Date.now()) ? 'expired' : row.status;
 }
 
+function connectionHealth(app: Awaited<ReturnType<typeof application>>, conn: BankConnectionRow | null,
+  selected: unknown, savedConsent: ConsentMetadata | null, authority: Awaited<ReturnType<typeof currentCompanyAuthorization>> | null) {
+  const info = app ? metadata(app) : null;
+  const authorizedAccounts = authority?.status === 'verified' ? authority.accountUids : [];
+  return storedEnableConnectionHealth({ present: Boolean(conn), status: conn?.status, validUntil: conn?.valid_until,
+    applicationReady: !!info && info.active === true && info.kid === app?.application_id && info.environment === conn?.environment &&
+      info.services.includes('AIS') && info.countries.includes(conn?.country ?? 'SE'),
+    generationMatches: !!app && !!conn && conn.app_generation === app.generation,
+    storageReady: storageReady(), companyRequired: savedConsent?.mode === 'company',
+    companyAuthorized: authority?.status === 'verified' && Array.isArray(selected) && selected.every(id => authorizedAccounts.includes(id)),
+    selectedAccountUids: selected });
+}
+
+async function latestConnectionDiagnostic(conn: BankConnectionRow | null) {
+  if (!conn?.last_error || !Number.isFinite(Date.parse(conn.updated_at))) return null;
+  // The event and failed state are committed together. Never borrow a failure
+  // from another connection or from before a successful renewal/state change.
+  const row = await db().prepare("SELECT detail FROM audit_events WHERE owner=? AND action='bank.job.failed' AND created_at>=? ORDER BY rowid DESC LIMIT 1")
+    .bind(conn.owner, conn.updated_at).first<{ detail: string }>();
+  if (!row || row.detail.length > 2048) return null;
+  try {
+    const detail = JSON.parse(row.detail);
+    if (!detail || detail.connection_id !== conn.id) return null;
+    return storedConsentDiagnostic(detail.error_code, detail.validation_reason ?? null) ??
+      (typeof detail.error_code === 'string' && (BANK_JOB_ERROR_CODES.has(detail.error_code) || detail.error_code === 'BANK_SYNC_FAILED')
+        ? { code: detail.error_code, reason: null } : null);
+  } catch { return null; }
+}
+
 function maskAccount(account: ProviderAccount, bank: {name: string; country: string}): string {
   const key = stableAccountKey(account, bank);
   // A primary identification hash is a stable identity, not an account number.
@@ -165,13 +226,19 @@ function maskAccount(account: ProviderAccount, bank: {name: string; country: str
   return [account.name?.slice(0, 80) || 'Bankkonto', ending ? `•••• ${ending}` : 'kontonummer saknas'].join(' · ');
 }
 
+function configuredRedirectUrl(): string | null {
+  try { return bankRedirectUrl(); } catch { return null; }
+}
 function safeApplication(app: ProviderApplication) {
-  return { name: app.name, environment: app.environment, active: app.active, redirectConfigured: app.redirect_urls.includes(BANK_REDIRECT_URL) };
+  const redirectUrl = configuredRedirectUrl();
+  return { name: app.name, environment: app.environment, active: app.active, redirectConfigured: !!redirectUrl && app.redirect_urls.includes(redirectUrl) };
 }
 
-async function checkedApplication(row: NonNullable<Awaited<ReturnType<typeof application>>>, requireActive = true, lease?: BankLease) {
+async function checkedApplication(row: NonNullable<Awaited<ReturnType<typeof application>>>, requireActive = true, lease?: BankLease, redirectUrl = bankRedirectUrl()) {
   const info = await getApplication(await providerConfig(row));
-  if (info.kid !== row.application_id || info.environment !== metadata(row).environment || !info.services.includes('AIS') || !info.countries.includes('SE') || !info.redirect_urls.includes(BANK_REDIRECT_URL)) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Kontrollera registrerad miljö, svensk läsåtkomst och returadress hos Enable Banking.', 409);
+  await providerConfig(row);
+  if (bankRedirectUrl() !== redirectUrl) throw new RuntimeBankError('BANK_REDIRECT_CONFIGURATION_INVALID', 'Banktjänstens returadress kunde inte verifieras.');
+  if (info.kid !== row.application_id || info.environment !== metadata(row).environment || !info.services.includes('AIS') || !info.countries.includes('SE') || !info.redirect_urls.includes(redirectUrl)) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Kontrollera registrerad miljö, svensk läsåtkomst och returadress hos Enable Banking.', 409);
   await saveApplicationMetadata(row, info, lease);
   if (requireActive && !info.active) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Enable Banking har ännu inte godkänt applikationen.', 409);
   return info;
@@ -195,9 +262,10 @@ export async function status(request: Request): Promise<Response> {
   const selected: string[] = conn ? JSON.parse(conn.selected_accounts) : [];
   const bankAccounts = conn && storageReady() ? await accounts(conn) : [];
   const savedConsent = conn ? consentMetadata(conn) : null;
-  const authority = conn ? await currentCompanyAuthorization(conn) : null;
+  const authority = conn ? await currentCompanyAuthorization(conn, 'read') : null;
   const needsAuthority = savedConsent?.mode === 'company' && authority?.status !== 'verified';
-  const visibleConnectionStatus = conn ? storedStatus(conn) === 'corporate_authorization_required' && !needsAuthority ? 'pending_account' : storedStatus(conn) : null;
+  const health = connectionHealth(app, conn, selected, savedConsent, authority);
+  const diagnostic = await latestConnectionDiagnostic(conn);
   const latestFlow = await db().prepare('SELECT * FROM bank_auth_flows WHERE owner=? ORDER BY created_at DESC,rowid DESC LIMIT 1').bind(user.userId).first<BankFlowRow>();
   const context = latestFlow ? flowContext(latestFlow) : null;
   const requiresRestart = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && !context;
@@ -211,10 +279,14 @@ export async function status(request: Request): Promise<Response> {
       connectionId: latestFlow.connection_id || null } : null,
     storageReady: storageReady(), configured: Boolean(app), activation: configurationStatus(),
     application: app ? safeApplication(metadata(app)) : null,
-    redirectUrl: BANK_REDIRECT_URL, syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',
-    automatic: { enabled: conn?.auto_sync_enabled === 1, intervalHours: 6, lastAttemptAt: conn?.auto_last_attempt_at ?? null, nextAttemptAt: conn ? automaticDueAt(conn) : null, blocked: (conn?.sync_failures||0)>=3, failures:conn?.sync_failures||0 },
+    redirectUrl: configuredRedirectUrl(), syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',
+    automatic: { enabled: conn?.auto_sync_enabled === 1, intervalHours: 6, lastAttemptAt: conn?.auto_last_attempt_at ?? null,
+      nextAttemptAt: conn && conn.auto_sync_enabled === 1 && health.syncAllowed ? automaticDueAt(conn) : null,
+      blocked: (conn?.sync_failures||0)>=3, failures:conn?.sync_failures||0 },
     connection: conn ? {
-      id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: conn.encrypted_session && (!app || conn.app_generation !== app.generation) ? 'reauth_required' : needsAuthority && !['disconnected','revocation_pending','expired'].includes(storedStatus(conn)) ? 'corporate_authorization_required' : visibleConnectionStatus,
+      id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: health.status,
+      requiresReauthentication: health.requiresReauthentication, blockedReason: health.blockedReason, nextAction: health.nextAction,
+      statusEvidence: health.evidence, diagnostic,
       consent: { version: 'bank-consent-v1', companyId: savedConsent?.companyId ?? company.companyId,
         mode: savedConsent?.mode ?? 'legacy', grantedScopes: savedConsent?.grantedScopes ?? ['accounts:read','transactions:read'],
         corporateAuthorization: authority, bankgiro: { status: 'unavailable', reason: 'BANKGIRO_SCOPE_UNAVAILABLE' } },
@@ -271,6 +343,10 @@ export async function connect(request: Request): Promise<Response> {
   if (requiredScopes.includes('bankgiro:read')) throw new ConsentError('BANKGIRO_SCOPE_UNAVAILABLE', 409);
   if (body.renewConnectionId !== undefined && (typeof body.renewConnectionId !== 'string' || !body.renewConnectionId || body.renewConnectionId.length > 200)) throw new BankError('Välj anslutningen som ska förnyas.');
   if (typeof body.bankName !== 'string' || body.bankName.length > 200 || body.country !== 'SE') throw new BankError('Välj en svensk företagsbank i listan.');
+  const redirectUrl = bankRedirectUrl();
+  // The browser must return the host-only flow cookie to this same origin.
+  // Request headers never select the configured destination.
+  if (new URL(request.url).origin !== new URL(redirectUrl).origin) throw new RuntimeBankError('BANK_REDIRECT_CONFIGURATION_INVALID', 'Starta bankanslutningen på tjänstens konfigurerade adress.');
   return withBankLock(user.userId, async lease => {
     const app = await application(user.userId);
     if (!app || !storageReady()) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören.', 409);
@@ -280,7 +356,7 @@ export async function connect(request: Request): Promise<Response> {
     if (existing && body.renewConnectionId && existing.bank_name !== body.bankName) throw new BankError('Förnya med samma bank. Koppla från anslutningen för att byta bank.', 409);
     const pending = await db().prepare("SELECT count(*) AS total FROM bank_auth_flows WHERE owner=? AND status IN ('pending','exchanging') AND expires_at>?").bind(user.userId, now()).first<{ total: number }>();
     if ((pending?.total ?? 0) >= 5) throw new BankError('Fem anslutningsförsök pågår. Slutför ett försök eller vänta tills det löper ut.', 429);
-    const config = await providerConfig(app), info = await checkedApplication(app, true, lease);
+    const config = await providerConfig(app), info = await checkedApplication(app, true, lease, redirectUrl);
     const available = await listBusinessBanks(config);
     const bank = available.find(item => item.name === body.bankName && item.country === 'SE' && item.psu_types.includes('business'));
     if (!bank) throw new ConsentError('BUSINESS_BANK_UNAVAILABLE', 409);
@@ -292,15 +368,21 @@ export async function connect(request: Request): Promise<Response> {
       flowId: uid(), requiredScopes, requestedValidUntil: validUntil, renewConnectionId: body.renewConnectionId as string || '',
       previousSessionHash: existing?.encrypted_session ? await digest(existing.encrypted_session) : '' };
     if ((await identity()).userId !== user.userId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+    assertCompanySnapshot(user.userId, context);
+    await providerConfig(app);
+    if (bankRedirectUrl() !== redirectUrl) throw new RuntimeBankError('BANK_REDIRECT_CONFIGURATION_INVALID', 'Banktjänstens returadress kunde inte verifieras.');
     await lease.write([
       db().prepare('DELETE FROM bank_auth_flows WHERE owner=? AND expires_at<?').bind(user.userId, new Date(Date.now() - 86400_000).toISOString()),
       db().prepare(`INSERT INTO bank_auth_flows (state_hash,owner,cookie_hash,app_generation,bank_name,country,environment,redirect_uri,date_from,expires_at,status,created_at,context_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-        .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, BANK_REDIRECT_URL, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at, JSON.stringify(context)),
+        .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, redirectUrl, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at, JSON.stringify(context)),
     ]);
     try {
-      const result = await startAuth(config, { bank: { name: bank.name, country: bank.country }, state, redirectUrl: BANK_REDIRECT_URL, validUntil });
+      const result = await startAuth(config, { bank: { name: bank.name, country: bank.country }, state, redirectUrl, validUntil });
       await lease.assert();
       if ((await identity()).userId !== user.userId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+      assertCompanySnapshot(user.userId, context);
+      await providerConfig(app);
+      if (bankRedirectUrl() !== redirectUrl) throw new RuntimeBankError('BANK_REDIRECT_CONFIGURATION_INVALID', 'Banktjänstens returadress kunde inte verifieras.');
       return Response.json({ url: result.url, companyId: company.companyId, flowId: context.flowId, requiredScopes, authorization: 'provider_redirect', pkce: 'not_exposed_by_adapter' }, { headers: { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer', 'Set-Cookie': `${flowCookie(stateHash)}=${cookie}; Path=/api/bank/callback; Secure; HttpOnly; SameSite=Lax; Max-Age=900` } });
     } catch (error) {
       await lease.run(db().prepare("UPDATE bank_auth_flows SET status='failed',result_code='AUTHORIZATION_START_FAILED' WHERE state_hash=? AND owner=?").bind(stateHash, user.userId));
@@ -590,11 +672,21 @@ export async function automaticSyncStatus(): Promise<Response> {
   const user = await identity();
   const openPayments=await (await import('./openpayments-scheduler')).dispatchOpenPaymentsSchedule(user.userId,undefined,true);
   if(openPayments)return response(openPayments);
-  const conn = await connection(user.userId);
+  const [app, conn] = await Promise.all([application(user.userId), connection(user.userId)]);
+  let selected: unknown = [];
+  try { selected = conn ? JSON.parse(conn.selected_accounts) : []; } catch { /* Invalid selection cannot advertise access. */ }
+  const savedConsent = conn ? consentMetadata(conn) : null, authority = conn ? await currentCompanyAuthorization(conn, 'read') : null;
+  const health = connectionHealth(app, conn, selected, savedConsent, authority), diagnostic = await latestConnectionDiagnostic(conn);
+  const failures = conn?.sync_failures || 0, retryPending = Date.parse(conn?.retry_after || '') > Date.now();
   const run=await db().prepare('SELECT warnings FROM bank_sync_runs WHERE owner=? ORDER BY created_at DESC,rowid DESC LIMIT 1').bind(user.userId).first<{warnings:string}>();
-  return response({ enabled: conn?.auto_sync_enabled === 1, connected: !!conn && storedStatus(conn) === 'connected', intervalHours: 6,
+  return response({ enabled: conn?.auto_sync_enabled === 1, connected: health.connected, intervalHours: 6,
+    connectionStatus: health.status, requiresReauthentication: health.requiresReauthentication, statusEvidence: health.evidence,
+    syncAllowed: health.syncAllowed && failures < 3 && !retryPending,
+    blockedReason: health.blockedReason ?? (failures >= 3 ? 'BANK_SYNC_BLOCKED' : retryPending ? 'BANK_RATE_LIMIT' : null),
+    nextAction: health.nextAction !== 'none' ? health.nextAction : failures >= 3 ? 'inspect_connection' : retryPending ? 'wait' : 'none', diagnostic,
     lastSyncedAt: conn?.last_synced_at ?? null, lastAttemptAt: conn?.auto_last_attempt_at ?? null,
-    nextAttemptAt: conn ? automaticDueAt(conn) : null, lastError: conn?.last_error ?? null, blocked:(conn?.sync_failures||0)>=3, failures:conn?.sync_failures||0,postprocessWarning:run&&JSON.parse(run.warnings).includes(POSTPROCESS_WARNING)?POSTPROCESS_WARNING:null });
+    nextAttemptAt: conn && conn.auto_sync_enabled === 1 && health.syncAllowed ? automaticDueAt(conn) : null,
+    lastError: conn?.last_error ?? null, blocked:failures>=3, failures,postprocessWarning:run&&JSON.parse(run.warnings).includes(POSTPROCESS_WARNING)?POSTPROCESS_WARNING:null });
 }
 
 async function synchronizeOwner(owner: string, options: { automatic?: boolean; control?:boolean; psu?: ProviderPsu }): Promise<Response> {
@@ -642,11 +734,12 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
     // Freeze a validated UTC interval before any provider call or reservation.
     const {dateFrom: from, dateTo: to} = bankSyncRange(conn.date_from, conn.last_synced_at);
     const runId=uid(),mode=options.automatic?'automatic':options.control?'control':'manual';
-    const jobEvent=(state:'started'|'completed'|'failed',errorCode?:string)=>{
+    const jobEvent=(state:'started'|'completed'|'failed',errorCode?:string,validationReason?:string|null)=>{
       const statement=db().prepare(`INSERT INTO audit_events(id,owner,revision,action,detail,created_at)
         SELECT ?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?
         ${state==='completed'?'WHERE EXISTS(SELECT 1 FROM bank_sync_runs WHERE owner=? AND id=?)':''}`);
-      const values=[uid(),owner,owner,`bank.job.${state}`,JSON.stringify({run_id:runId,mode,...(errorCode?{error_code:errorCode}:{})}),now()];
+      const values=[uid(),owner,owner,`bank.job.${state}`,JSON.stringify({run_id:runId,mode,connection_id:conn.id,
+        ...(errorCode?{error_code:errorCode}:{}),...(validationReason?{validation_reason:validationReason}:{})}),now()];
       return statement.bind(...values,...(state==='completed'?[owner,runId]:[]));
     };
     const reservations=[jobEvent('started')];
@@ -807,7 +900,8 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       const current = await connection(user.userId);
       if (!current || current.id !== conn.id || current.app_generation !== conn.app_generation || current.encrypted_session !== conn.encrypted_session) throw new Error('BANK_ACCOUNT_READ_CONTEXT_CHANGED');
       const exhausted=options.automatic&&conn.sync_failures+1>=3;
-      const detail = bankConsentDiagnostic(error)?.message ?? (error instanceof BankError || error instanceof ProviderError || error instanceof BankPeriodError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.');
+      const detail = bankConsentDiagnostic(error)?.message ?? bankProviderDiagnostic(error)?.message ??
+        (error instanceof BankError || error instanceof BankPeriodError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.');
       const message = exhausted ? `Automatisk bankhämtning är stoppad efter tre avbrutna eller misslyckade försök. ${detail}` : detail;
       const expired = needsReauthorization || error instanceof ProviderError && error.code === 'BANK_RECONNECT_REQUIRED';
       const limited=error instanceof ProviderError&&(error.status===429||error.retryAfter!==undefined||error.retryBlocked===true);
@@ -816,7 +910,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       // fallback. A successful transactions sync never clears this read guard.
       const accountRetry=mergeAccountReadCooldown(current.account_evidence_retry,providerCooldownDiagnostic(error));
       const failureState=db().prepare('UPDATE bank_connections SET last_error=?,status=?,retry_after=?,account_evidence_retry=?,sync_failures=CASE WHEN ? THEN 3 ELSE sync_failures END,updated_at=? WHERE owner=? AND id=?').bind(message, expired ? 'reauth_required' : current.status,retry,accountRetry,limited&&error.retryBlocked?1:0, now(), user.userId, conn.id);
-      try{await lease.write([failureState,jobEvent('failed',bankJobErrorCode(error))]);}
+      try{await lease.write([failureState,jobEvent('failed',bankJobErrorCode(error),bankConsentDiagnostic(error)?.reason)]);}
       catch{
         // Operational history must not discard the provider's durable cooldown.
         // A replacement or expired lease still rejects this bounded fallback.

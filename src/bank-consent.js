@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 import {decryptObject} from './security.js';
 import {ConsentError,companyBankContext,validateReadScopes,corporateAuthorization} from '../sites/lib/bank-consent-policy.js';
 import {resolveCorporateAccountEvidence} from '../sites/lib/bank-company-authority.js';
-export {ConsentError,validateCallbackParameters,validateEnableConsent} from '../sites/lib/bank-consent-policy.js';
+export {ConsentError,consentDiagnostic,validateCallbackParameters,validateEnableConsent} from '../sites/lib/bank-consent-policy.js';
 
 let currentContext=()=>null;
 export function configureBankCompanyContext(resolver){currentContext=resolver;}

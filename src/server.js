@@ -24,7 +24,7 @@ import {createIntegrationJobs} from './integration-jobs.js';
 import {runScheduledCompanyBankSync,isCompanyBankSyncDatabase} from './company-bank-sync.js';
 export {createNodeCompanyBankSyncRuntime,registerCompanyBankSyncRuntime,nodeCompanyBankAccountKey} from './company-bank-sync.js';
 import { isConfigured, configStatus, consentApplicationFingerprint, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
-import {ConsentError,configureBankCompanyContext,bankCompanyContext,requestedBankConsent,consentMetadata,assertConsentContext,validatedLiveAccountDetails,companyAccountGrant,assertCorporateAccountAccess,publicConsent,validateCallbackParameters,validateEnableConsent} from './bank-consent.js';
+import {ConsentError,consentDiagnostic,configureBankCompanyContext,bankCompanyContext,requestedBankConsent,consentMetadata,assertConsentContext,validatedLiveAccountDetails,companyAccountGrant,assertCorporateAccountAccess,publicConsent,validateCallbackParameters,validateEnableConsent} from './bank-consent.js';
 import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
 import { gmailAccount, withGmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 import {analyzeDocument,approveDocument} from './invoice-review.js';
@@ -446,15 +446,16 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
   }catch(e){
     authorize();
     if(e.code==='connection_changed'||e.status===401&&!e.providerStatus)throw e;
-    const renewal=e.code==='renewal_required';
+    const consent=consentDiagnostic(e);
+    const renewal=e.code==='renewal_required'||['BANK_CONSENT_EXPIRED','BANK_CONSENT_INVALID','BANK_ACCOUNT_SCOPE_INVALID','BANK_TRANSACTION_SCOPE_REQUIRED','CORPORATE_AUTHORIZATION_REQUIRED'].includes(consent?.code);
     const cooldown=e.status===429||e.code==='bank_unavailable'&&e.status===503&&Number.isFinite(e.retryAfter)&&e.retryAfter>0;
-    const safeBankFailure=e instanceof ConsentError||['invalid_date_range','transaction_period_unavailable','page_limit','transaction_limit','bank_timeout','incomplete_bank_response','bank_sync_window_limit','application_access_denied'].includes(e.code);
-    const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
+    const safeBankFailure=!!consent||['invalid_date_range','transaction_period_unavailable','page_limit','transaction_limit','bank_timeout','incomplete_bank_response','bank_sync_window_limit','application_access_denied'].includes(e.code);
+    const message=consent?.message??(renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.');
     lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,cooldown?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
     recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
-    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true,e.code);
+    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true,consent?.code??e.code);
     });
-    throw Object.assign(bad(renewal?409:cooldown||safeBankFailure?e.status:502,message),{safe:true,retryAfter:e.retryAfter,...(safeBankFailure?{code:e.code}:{})});
+    throw Object.assign(bad(renewal?409:consent?.status??(cooldown||safeBankFailure?e.status:502),message),{safe:true,retryAfter:e.retryAfter,...(safeBankFailure?{code:consent?.code??e.code}:{})});
   }
   finally{if(!operationLocked)bankSyncing.delete(connection.id);}
 }

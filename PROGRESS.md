@@ -1,5 +1,15 @@
 # Verifierad progress
 
+## Agent 1 — verklig bankanslutning, 2026-11-05
+
+Branch `feature/95-bank`, inventerad main-bas `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`. [Bankrapport, officiella källor och externa krav](docs/integration/bank-95/README.md), [skrivfritt statuskvitto](docs/integration/bank-95/observed-status.json) och [genomförandeplan](docs/superpowers/plans/2026-11-05-real-bank-connection.md).
+
+Sites hårdkodade gamla returadress ersätts av validerad serverkonfiguration och exakt registrerings-/flow-bindning. Starten måste använda samma origin som den värdbundna callbackcookien. App-/returadress-/medlemskapsbyten under asynkront arbete stoppar anslutningen. Utgånget medgivande kan förnyas via befintlig ny SCA utan återställning av gammal bankstatus. Node klassar nu kanoniska medgivande-/kontobehörighetsavslag som `renewal_required` och gör inga nya provideranrop vid nästa blockerade försök.
+
+Enable-transportens tidsgräns gäller även en transport/svarskropp som ignorerar AbortSignal. Open Payments avvisar uttryckligen spärrade/avslutade konton och behåller osäkert utfall vid förlorat DELETE-svar. Lokala bankstatusar använder aktuell konfiguration, vald kontomängd och företagsbehörighet; läsroller får status utan hanteringsrätt. Fasta felkoder och tolv kontopredikat ger diagnostik utan kontovärden, token eller råa feltexter. Befintlig pagination, varaktiga kvoter, stabil kontoidentitet, atomisk import och dubblettskydd bevaras.
+
+Riktade RED/GREEN-prov och slutliga helgrindar redovisas i bankrapporten; syntetiska tester är inte produktionsacceptans. Färsk status 17:35 UTC är fortsatt `connected=false`, senaste lyckade hämtning 08:05 UTC. Historiskt `BANK_ACCOUNT_SCOPE_INVALID` är styrkt; exakt då underkänt kontopredikat är okänt. Ingen verklig bankhämtning, betalning, ny signering, produktionsskrivning eller publicering har utförts. Bankområdenas 8,5/8,0 och totalsumman **255/330 = 7,73** behålls tills externa behörigheter och verklig acceptans kan styrkas.
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).

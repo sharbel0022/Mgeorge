@@ -15,8 +15,16 @@ const authInvalid = () => new BankProviderError('AUTHORIZATION_INVALID', 403);
 const mismatch = () => new BankProviderError('RESOURCE_SCOPE_MISMATCH', 403);
 const endOfDate = date => `${date}T23:59:59.999Z`;
 
+function assertAccountAvailable(raw) {
+  if (!isRecord(raw) || raw.usage !== undefined && raw.usage !== 'ORGA' ||
+      raw.status !== undefined && !['enabled', 'blocked', 'deleted'].includes(raw.status)) throw invalid();
+  // The documented absent status means available. An explicit restriction is
+  // bank evidence and must survive otherwise matching account identifiers.
+  if (raw.status === 'blocked' || raw.status === 'deleted') throw new BankProviderError('BANK_ACCOUNT_UNAVAILABLE', 403);
+}
 function identity(raw) {
-  if (!isRecord(raw) || raw.usage === 'PRIV' || typeof raw.currency !== 'string' || !/^[A-Z]{3}$/.test(raw.currency)) throw invalid();
+  assertAccountAvailable(raw);
+  if (typeof raw.currency !== 'string' || !/^[A-Z]{3}$/.test(raw.currency)) throw invalid();
   const fields = ['iban', 'bban', 'clearingNumber', 'accountNumber', 'bankgiroNumber', 'plusgiroNumber'];
   const result = { currency: raw.currency };
   for (const field of fields) {
@@ -29,6 +37,7 @@ function identity(raw) {
   return result;
 }
 function checkIdentity(expected, actual) {
+  assertAccountAvailable(actual);
   const fields = ['iban', 'bban', 'clearingNumber', 'accountNumber'];
   let shared = false;
   for (const key of fields) if (expected[key] !== undefined && actual[key] !== undefined) {

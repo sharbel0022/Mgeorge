@@ -95,6 +95,15 @@ function retryAfterSeconds(value,fallback=60){
   const retryBlocked=numeric&&!Number.isFinite(seconds)||Number.isFinite(seconds)&&seconds>365*86400;
   return {retryAfter:retryBlocked?Math.ceil((Date.UTC(9999,11,31)-Date.now())/1000):Number.isFinite(seconds)&&seconds>=0?Math.max(1,seconds):fallback,retryBlocked,retryKnown:numeric||validDate};
 }
+// Aborting fetch is best effort; the caller's deadline must also bound a
+// transport/body promise that does not react to its signal.
+async function untilAborted(operation,signal,abortError){
+  if(signal.aborted)throw abortError();
+  let abort;
+  const stopped=new Promise((_,reject)=>{abort=()=>reject(abortError());signal.addEventListener('abort',abort,{once:true});});
+  try{return await Promise.race([operation(),stopped]);}
+  finally{signal.removeEventListener('abort',abort);}
+}
 /** Skickar tidsbegränsade anrop till Enable Bankings fasta API-domän med signerad token; leverantörsfel hanteras centralt. */
 export async function bankingRequest(path,{method='GET',body,deadline=Date.now()+18000,signal}={}){
   const url=requestUrl(path,method),authorization=`Bearer ${jwt()}`;
@@ -102,7 +111,7 @@ export async function bankingRequest(path,{method='GET',body,deadline=Date.now()
   const timedOut=()=>bankError('bank_timeout','Bankförfrågan tog för lång tid. Försök igen.',502);
   if(!Number.isFinite(remaining)||remaining<=0)throw timedOut();
   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),remaining),requestSignal=signal?AbortSignal.any([controller.signal,signal]):controller.signal;
-  try{
+  try{return await untilAborted(async()=>{
     let result;
     try{result=await fetch(url,{method,redirect:'error',signal:requestSignal,headers:{Authorization:authorization,Accept:'application/json',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});}
     catch{throw bankError(requestSignal.aborted?'bank_timeout':'bank_unavailable',requestSignal.aborted?'Bankförfrågan tog för lång tid. Försök igen.':'Banktjänsten kunde inte nås. Försök igen senare.',502);}
@@ -135,7 +144,7 @@ export async function bankingRequest(path,{method='GET',body,deadline=Date.now()
     }
     if(!data||typeof data!=='object'||Array.isArray(data))throw bankError('invalid_response','Banktjänsten returnerade ett ogiltigt svar.',502);
     return data;
-  }finally{clearTimeout(timeout);}
+  },requestSignal,timedOut);}finally{clearTimeout(timeout);}
 }
 /** Kontrollerar att applikationens miljö, behörighet, aktivering och callback är lämpliga innan riktig bankanslutning startar. */
 export async function assertApplicationReady(origin){
