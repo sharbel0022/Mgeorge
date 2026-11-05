@@ -4,8 +4,9 @@ const fail=(code,status=409)=>{throw new ConsentError(code,status);};
 const hash=async value=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),n=>n.toString(16).padStart(2,'0')).join('');
 // Without a handle, an attempted remote creation cannot be safely retried or
 // declared revoked. Older unfinished records have no proof of non-creation.
-export const consentRecoveryRequired=value=>!!value&&!value.consentHandle&&value.status!=='revoked'&&value.consentCreation!=='not_started';
-export const canRestartUncreatedConsent=(value,now=Date.now())=>value?.status==='starting'&&value.consentCreation==='not_started'&&Date.parse(value.expiresAt)<=now;
+export const canRetryConsent=value=>value?.status==='failed'&&!value.consentHandle&&(value.retrySafe===true||value.consentCreation==='not_started');
+export const consentRecoveryRequired=value=>!!value&&!value.consentHandle&&value.status!=='revoked'&&value.consentCreation!=='not_started'&&!canRetryConsent(value);
+export const canRestartUncreatedConsent=(value,now=Date.now())=>value?.status==='starting'&&!value.consentHandle&&value.consentCreation==='not_started'&&Date.parse(value.expiresAt)<=now;
 /** Durable application lifecycle. Store CAS must be atomic and guarded by live
  * membership. All provider handles remain in the encrypted server payload. */
 export function createOpenPaymentsLifecycle(options){
@@ -23,17 +24,16 @@ export function createOpenPaymentsLifecycle(options){
    let row=await read();expected(row,input);const permissions=validateReadScopes(input.permissions);
    if(permissions.includes('bankgiro:read')&&!options.bankgiroAllowed)fail('BANKGIRO_SCOPE_UNAVAILABLE');
    if(consentRecoveryRequired(row.value))fail('CONSENT_RECOVERY_REQUIRED');
-   if(row.value&&!['revoked','failed','cancelled','revocation_pending'].includes(row.value.status)&&!canRestartUncreatedConsent(row.value,now()))fail('BANK_BUSY');
-   // A denied/failed browser flow is not proof that its remote consent was
-   // deleted. Retain its handle until confirmed cleanup, including retries
-   // after an ambiguous DELETE, before replacing the only durable reference.
-   if(row.value?.consentHandle&&row.value.status!=='revoked')row=await this.revoke({connectionId:row.value.id,expectedRevision:row.revision});
+   // Known authority requires explicit renewal/revocation. A fresh start must
+   // never replace it, including after failed or cancelled authorisation.
+   if(row.value&&row.value.status!=='revoked'&&!canRetryConsent(row.value)&&!canRestartUncreatedConsent(row.value,now()))fail('BANK_BUSY');
    const value={id:context.binding.connectionId,bankId:input.bankId,bankName:options.bankName||input.bankId,status:'starting',consentCreation:'not_started',actorPin,sessionHash,permissions,accounts:[],selected:[],authorizationId:crypto.randomUUID(),expiresAt:new Date(now()+10*60000).toISOString(),validUntil:new Date(now()+90*86400000).toISOString().slice(0,10)+'T23:59:59.999Z',generation:context.binding.generation};
-   row=await write(row,value);const c=client();
+   row=await write(row,value);const c=client();let createdConsentHandle,consentRequested=false;
    try{
     const caps=await c.discoverCapabilities();await guard();if(!caps.authorizationMethods.includes('redirect'))fail('BUSINESS_BANK_UNAVAILABLE');
     row=await write(row,{...row.value,consentCreation:'pending'});
-    const consent=await c.createConsent({validUntil:value.validUntil.slice(0,10),redirectPreferred:true});await guard();
+    consentRequested=true;
+    const consent=await c.createConsent({validUntil:value.validUntil.slice(0,10),redirectPreferred:true});createdConsentHandle=consent.handle;await guard();
     row=await write(row,{...row.value,consentHandle:consent.handle,consentCreation:'known'});
     const authorization=await c.createAuthorisation(consent.handle);await guard();
     const method=authorization.methods.find(m=>m.authenticationMethodId===options.authenticationMethodId)||authorization.methods.length===1&&authorization.methods[0];
@@ -42,7 +42,13 @@ export function createOpenPaymentsLifecycle(options){
     if(redirect.approach!=='redirect')fail('BUSINESS_BANK_UNAVAILABLE');
     const state=new URL(redirect.redirectUrl).searchParams.get('state');if(!state||!/^[-_A-Za-z0-9]{43}$/.test(state))fail('INVALID_CALLBACK');
     row=await write(row,{...row.value,status:'pending',stateHash:await hash(state),flowHandle:redirect.flowHandle,redirectUrl:redirect.redirectUrl});return row;
-   }catch(error){try{await write(row,{...row.value,status:'failed'});}catch{}throw error;}
+   }catch(error){
+    // A missing receipt is not proof that the remote consent was never created.
+    // Keep known authority for explicit revocation; never replace it on retry.
+    const consentHandle=createdConsentHandle||row.value?.consentHandle;
+    const status=consentHandle||consentRequested&&error?.mayHaveSucceeded===true?'recovery_required':'failed';
+    try{await write(row,{...row.value,...(consentHandle?{consentHandle,consentCreation:'known'}:{}),status,retrySafe:status==='failed'});}catch{}throw error;
+   }
   },
   async redirect(authorizationId){const row=await read();flowCheck(row.value);if(row.value.authorizationId!==authorizationId||row.value.status!=='pending')fail('INVALID_CALLBACK',403);return row.value.redirectUrl;},
   async complete(callback){

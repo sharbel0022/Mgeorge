@@ -10,14 +10,14 @@ const context={version:'company-context-v1',companyId:'company-a',storageOwner:'
 const startBody={bankId:'OPBKSE21',expectedRevision:0,permissions:['accounts:read','transactions:read']};
 
 function fixture({companyId=context.companyId,storageOwner=context.storageOwner,account=ACCOUNT}={}){
- let row={revision:0,value:null},interruptRevocation=false;
+ let row={revision:0,value:null},interruptRevocation=false,failKnownHandleOnce=false;
  const companyContext={...context,companyId,storageOwner};
  const transport=fixtureTransport({
   [`PUT ${consentPath}/${CONSENT_ID}/authorisations/${AUTH_ID}`]:()=>json({scaStatus:'started',_links:{scaOAuth:{href:`https://oauth.sandbox.openbankingplatform.com/connect/authorize?client_id=[CLIENT_ID]&scope=accountinformation%20corporate&response_type=code&redirect_uri=[TPP_REDIRECT_URI]&state=[TPP_STATE]&acr_values=idp:OPBKSE21%20consentId:${CONSENT_ID}%20ConsentAuthorisationId:${AUTH_ID}`}}},200,{'aspsp-sca-approach':'REDIRECT'}),
   'GET /psd2/accountinformation/v1/accounts':()=>json({accounts:[structuredClone(account)]}),
   [`GET /psd2/accountinformation/v1/accounts/${ACCOUNT_ID}`]:()=>json(structuredClone(account)),
  });
- const store={async read(){return structuredClone(row);},async compareAndSet(revision,value){if(revision!==row.revision)return false;row={revision:revision+1,value:structuredClone(value)};if(interruptRevocation&&value.status==='revoked'){interruptRevocation=false;throw new Error('Synthetic lost commit reply');}return true;}};
+ const store={async read(){return structuredClone(row);},async compareAndSet(revision,value){if(revision!==row.revision)return false;if(failKnownHandleOnce&&value.consentHandle){failKnownHandleOnce=false;throw new Error('Synthetic transient first handle storage failure');}row={revision:revision+1,value:structuredClone(value)};if(interruptRevocation&&value.status==='revoked'){interruptRevocation=false;throw new Error('Synthetic lost commit reply');}return true;}};
  const registration={companyId,actorId:context.actorId,verified:true,corporateAccessVerified:true,redirectVerified:true,corporateId:'synthetic-'+companyId,psuId:'synthetic-psu-a',bicFi:'OPBKSE21',bankId:'OPBKSE21',bankName:'Synthetic Bank',psu:{ipAddress:'192.0.2.10',userAgent:'Synthetic'},ratePolicy:{verified:true,evidenceId:'synthetic-budget',maxRequests:10,windowMs:60000,scope:'company'}};
  const options={context:companyContext,config:CONFIG,registration,enabled:true,codec,assertCurrent:async()=>{},sessionHash:'synthetic-browser-a',redirectUri:CONFIG.redirectUris[0],providerOptions:{transport:transport.transport},requestKey:'synthetic-initial-start'};
  return {
@@ -25,6 +25,7 @@ function fixture({companyId=context.companyId,storageOwner=context.storageOwner,
   read:()=>structuredClone(row),
   replace:value=>{row={revision:row.revision+1,value:structuredClone(value)};},
   interruptAfterRevocation:()=>{interruptRevocation=true;},
+  failFirstHandleStore:()=>{failKnownHandleOnce=true;},
   runtime:(extra={})=>createSaasBankRuntime({...options,store:{...store},...extra}),
   async cancel(){const runtime=this.runtime();const started=await runtime.start(startBody);const state=new URL(await runtime.redirect(started.authorization.id)).searchParams.get('state');await this.runtime().callback({state,error:'access_denied'});},
  };
@@ -32,11 +33,15 @@ function fixture({companyId=context.companyId,storageOwner=context.storageOwner,
 
 const providerMethods=f=>f.transport.calls.filter(call=>new URL(call.url).pathname.startsWith(consentPath)).map(call=>`${call.init.method} ${new URL(call.url).pathname}`);
 
-test('reconnecting after denied authorisation revokes the retained consent before creating a replacement',async()=>{
+test('explicit renewal after denied authorisation revokes the retained consent before creating a replacement',async()=>{
  const f=fixture();await f.cancel();
  const old=f.read();assert.equal(old.value.status,'cancelled');assert.ok(old.value.consentHandle);
  const before=f.transport.calls.length;
- await f.runtime({requestKey:'synthetic-replacement-start'}).start({...startBody,expectedRevision:old.revision});
+ await assert.rejects(f.runtime({requestKey:'synthetic-blocked-fresh-start'}).start({...startBody,expectedRevision:old.revision}),{code:'BANK_BUSY'});
+ assert.equal(f.transport.calls.length,before,'a fresh start cannot replace known authority');
+ const snapshot=parseSnapshot(await f.runtime().snapshot(),'company-a');
+ assert.equal(snapshot.actions.connect,false);assert.equal(mutationAllowed(snapshot,'owner','renew'),true);
+ await f.runtime({requestKey:'synthetic-replacement-renew'}).renew({connectionId:old.value.id,expectedRevision:old.revision});
  const calls=f.transport.calls.slice(before).filter(call=>new URL(call.url).pathname.startsWith(consentPath));
  assert.equal(calls[0].init.method,'DELETE','known cancelled consent must be deleted before another one is created');
  assert.equal(new URL(calls[0].url).pathname,`${consentPath}/${CONSENT_ID}`);
@@ -44,15 +49,16 @@ test('reconnecting after denied authorisation revokes the retained consent befor
  assert.equal(f.read().value.status,'pending');
 });
 
-test('failed authorisation remains visible and its known consent is cleaned before retry',async()=>{
+test('failed authorisation remains visible and explicit renewal cleans its known consent before retry',async()=>{
  const f=fixture(),request=f.transport.transport.request;let failAuthorisation=true;
  f.transport.transport.request=async(url,init)=>failAuthorisation&&init.method==='POST'&&new URL(url).pathname.endsWith('/authorisations')?json({},503):request(url,init);
  await assert.rejects(f.runtime().start(startBody));
  const snapshot=await f.runtime().snapshot();
  assert.equal(snapshot.connection?.status,'error','the user must be able to see and disconnect an unfinished remote consent');
  assert.equal(snapshot.actions.disconnect,true);
+ assert.equal(snapshot.actions.connect,false);assert.equal(snapshot.actions.renew,true);
  failAuthorisation=false;
- await f.runtime({requestKey:'synthetic-replacement-start'}).start({...startBody,expectedRevision:f.read().revision});
+ await f.runtime({requestKey:'synthetic-replacement-renew'}).renew({connectionId:snapshot.connection.id,expectedRevision:snapshot.revision});
  const methods=providerMethods(f);
  const cleanup=methods.indexOf(`DELETE ${consentPath}/${CONSENT_ID}`);
  assert.ok(cleanup>=0);assert.ok(cleanup<methods.lastIndexOf(`POST ${consentPath}`));
@@ -65,15 +71,15 @@ test('an ambiguous replacement cleanup blocks new consent creation and recovers 
   if(init.method==='DELETE'&&++attempts===1)return json({},502);
   return request(url,init);
  };
- const body={...startBody,expectedRevision:f.read().revision},options={requestKey:'synthetic-replacement-retry'};
- await assert.rejects(f.runtime(options).start(body));
+ const body={connectionId:f.read().value.id,expectedRevision:f.read().revision},options={requestKey:'synthetic-replacement-retry'};
+ await assert.rejects(f.runtime(options).renew(body));
  assert.equal(f.read().value.status,'revocation_pending');
  assert.equal(providerMethods(f).filter(value=>value===`POST ${consentPath}`).length,1);
- const started=await f.runtime(options).start(body);
+ const started=await f.runtime(options).renew(body);
  assert.equal(started.authorization.state,'pending');assert.equal(attempts,2);
  assert.equal(providerMethods(f).filter(value=>value===`POST ${consentPath}`).length,2);
  const calls=f.transport.calls.length;
- assert.deepEqual(await f.runtime(options).start(body),started);
+ assert.deepEqual(await f.runtime(options).renew(body),started);
  assert.equal(f.transport.calls.length,calls,'a repeated successful request must not create or revoke another consent');
 });
 
@@ -95,7 +101,7 @@ test('an expired redirect can be renewed with cleanup without presenting bank ap
 test('revoked authority during replacement cleanup prevents a new consent and preserves blocked state',async()=>{
  const f=fixture();await f.cancel();let current=true;const request=f.transport.transport.request;
  f.transport.transport.request=async(url,init)=>{const result=await request(url,init);if(init.method==='DELETE')current=false;return result;};
- await assert.rejects(f.runtime({requestKey:'synthetic-replacement-revoked',assertCurrent:async()=>{if(!current)throw Object.assign(new Error('company_access_denied'),{code:'company_access_denied'});}}).start({...startBody,expectedRevision:f.read().revision}));
+ await assert.rejects(f.runtime({requestKey:'synthetic-replacement-revoked',assertCurrent:async()=>{if(!current)throw Object.assign(new Error('company_access_denied'),{code:'company_access_denied'});}}).renew({connectionId:f.read().value.id,expectedRevision:f.read().revision}));
  assert.equal(f.read().value.status,'revocation_pending');
  assert.equal(providerMethods(f).filter(value=>value===`POST ${consentPath}`).length,1);
 });
@@ -180,10 +186,49 @@ test('an old failed record without creation evidence requires recovery instead o
 
 test('a replacement resumes after confirmed revocation was committed but its reply was lost',async()=>{
  const f=fixture();await f.cancel();f.interruptAfterRevocation();
- const body={...startBody,expectedRevision:f.read().revision},options={requestKey:'synthetic-revocation-commit'};
- await assert.rejects(f.runtime(options).start(body),/Synthetic lost commit reply/);
+ const body={connectionId:f.read().value.id,expectedRevision:f.read().revision},options={requestKey:'synthetic-revocation-commit'};
+ await assert.rejects(f.runtime(options).renew(body),/Synthetic lost commit reply/);
  assert.equal(f.read().value.status,'revoked');
- const result=await f.runtime(options).start(body);assert.equal(result.authorization.state,'pending');
+ const result=await f.runtime(options).renew(body);assert.equal(result.authorization.state,'pending');
  assert.equal(providerMethods(f).filter(value=>value===`DELETE ${consentPath}/${CONSENT_ID}`).length,1);
  assert.equal(providerMethods(f).filter(value=>value===`POST ${consentPath}`).length,2);
+});
+
+test('a known consent handle survives a transient first persistence failure and stays available for explicit revocation',async()=>{
+ const f=fixture();f.failFirstHandleStore();
+ await assert.rejects(f.runtime().start(startBody),/Synthetic transient first handle storage failure/);
+ const retained=f.read(),snapshot=await f.runtime().snapshot();
+ assert.equal(retained.value.status,'recovery_required');assert.equal(retained.value.consentCreation,'known');
+ assert.ok(retained.value.consentHandle);assert.equal(retained.value.retrySafe,false);
+ assert.equal(snapshot.actions.connect,false);assert.equal(snapshot.actions.disconnect,true);
+ const calls=f.transport.calls.length;
+ await assert.rejects(f.runtime({requestKey:'synthetic-after-storage-failure'}).start({...startBody,expectedRevision:retained.revision}),{code:'BANK_BUSY'});
+ assert.deepEqual(f.read(),retained);assert.equal(f.transport.calls.length,calls);
+ const revoked=await f.runtime({requestKey:'synthetic-revoke-retained-handle'}).revoke({connectionId:retained.value.id,expectedRevision:retained.revision});
+ assert.equal(revoked.connection.revocationStatus,'confirmed');
+ assert.equal(providerMethods(f).filter(v=>v===`POST ${consentPath}`).length,1);
+ assert.equal(providerMethods(f).filter(v=>v===`DELETE ${consentPath}/${CONSENT_ID}`).length,1);
+});
+
+test('an explicit rejected consent creation records safe retry without erasing its attempted phase or correlation',async()=>{
+ const f=fixture(),request=f.transport.transport.request;let reject=true,attempt,consentPosts=0;
+ f.transport.transport.request=async(url,init)=>{
+  if(init.method==='POST'&&new URL(url).pathname===consentPath){consentPosts++;if(reject){attempt=f.read();return json({error:'invalid_request'},400);}}
+  return request(url,init);
+ };
+ await assert.rejects(f.runtime().start(startBody),{code:'PROVIDER_REQUEST_REJECTED'});
+ assert.equal(consentPosts,1,'the rejected request is not automatically retried');
+ const retained=f.read(),snapshot=await f.runtime().snapshot();
+ assert.equal(retained.value.status,'failed');assert.equal(retained.value.retrySafe,true);
+ assert.equal(retained.value.consentCreation,'pending','retain proof that an attempt was made rather than rewriting it as not_started');
+ assert.equal(retained.value.authorizationId,attempt.value.authorizationId);assert.equal(retained.value.expiresAt,attempt.value.expiresAt);
+ assert.deepEqual(retained.value.request,attempt.value.request);assert.deepEqual(retained.value.permissions,attempt.value.permissions);
+ assert.equal(retained.value.consentHandle,undefined);assert.equal(snapshot.actions.connect,true);assert.equal(snapshot.actions.disconnect,false);
+ assert.equal(mutationAllowed(parseSnapshot(snapshot,'company-a'),'owner','connect'),true);
+ reject=false;
+ const restarted=await f.runtime({requestKey:'synthetic-after-explicit-rejection'}).start({...startBody,expectedRevision:retained.revision});
+ assert.equal(restarted.authorization.state,'pending');
+ assert.equal(consentPosts,2);
+ assert.equal(providerMethods(f).filter(v=>v===`POST ${consentPath}`).length,1,'only the explicitly requested replacement reaches the successful provider fixture');
+ assert.equal(providerMethods(f).filter(v=>v.startsWith('DELETE')).length,0,'no handle or remote revocation is fabricated for the rejected attempt');
 });
