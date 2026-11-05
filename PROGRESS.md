@@ -7,6 +7,11 @@ Branch `feature/95-security`, bas `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`.
 [exakta lokala grindar](docs/security-95/gates.json) och
 [oberoende granskning](docs/security-95/independent-review.md).
 
+Integrationsnot 2026-11-05: nedanstående 5 728 testfall och källhashar är
+historik före main-integrationen. Den länkade säkerhetsrapportens nya not
+redovisar senare exakt CI, OCR-ingressens UTF-8-rättning och dess fokuserade
+prov. Historiska antal och poäng behålls; ny slutlig integrations-CI krävs.
+
 Fem avgränsade förbättringar har RED/GREEN-bevis: beständig och atomisk
 inloggningsbudget i kontrollens SQLite-databas, faktiska byte-/tidsgränser före
 Sites requestkloner, minimerade auditposter från accepterade domänuppgifter,
@@ -24,8 +29,10 @@ och den avbrutna första Sites-körningen redovisas öppet i rapporten.
 Rootens hela beroendegraf samt Sites och bryggans produktionsgrafer har noll
 auditfynd. Sites utvecklingsgraf har åtta moderate paketposter från **en**
 minimatch-advisory; installerad befintlig backport är verifierad. Inga paket,
-lockfiler, produktionsscheman eller credentials ändras. Lokala Node24-kvitton
-och Node22-PR-CI ska hållas åtskilda.
+lockfiler eller credentials ändras och ingen produktionsändring har utförts.
+Vid uppstart tillkommer den additiva Node-kontrolltabellen `login_rate_limits`;
+ingen D1-migration eller ändring av ekonomiska tabeller ingår. Lokala
+Node24-kvitton och Node22-PR-CI ska hållas åtskilda.
 
 **Målet 9,5/10 är inte styrkt.** Nyckellivscykel, aktuell fullständig
 katastrofåterställning och kommersiella dataskyddsprocesser kräver operativa
