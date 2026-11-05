@@ -21,6 +21,9 @@ const originalFetch=globalThis.fetch;
 let cookie='',authBody,sessionIndex=0,providerCalls=0,transactionCalls=0,active=true,mode='',lastQuery;
 let releaseProvider,providerReached,providerWait;
 const syntheticIban='SE4280000890119146168423';
+// New consents require independently provisioned bank/company account evidence.
+// This test registry is synthetic and grants only this test workspace/account.
+process.env.BANK_COMPANY_AUTHORIZATIONS=JSON.stringify({version:1,bindings:[{companyId:'workspace:administrator',storageOwnerId:'administrator',provider:'enablebanking',bankName:'Swedbank',country:'SE',accountKeys:['iban:'+syntheticIban],status:'active',origin:'bank',evidenceId:'synthetic-bank-api-authority',checkedAt:new Date(Date.now()-60000).toISOString(),validUntil:new Date(Date.now()+7*86400000).toISOString()}]});
 const bookingDate=new Date(Date.now()-7*86400000).toISOString().slice(0,10);
 const account=(uid='account-1')=>({uid,name:'Test företagskonto',currency:'SEK',usage:'ORGA',account_id:{iban:syntheticIban},identification_hash:'stable-test-account'});
 const transaction=(entry,amount='100.00',direction='CRDT')=>({status:'BOOK',entry_reference:entry,transaction_id:'temporary-'+sessionIndex+'-'+entry,booking_date:bookingDate,transaction_amount:{amount,currency:'SEK'},credit_debit_indicator:direction,debtor:{name:'Testkund AB'},reference_number:'12345'});
@@ -40,7 +43,7 @@ globalThis.fetch=async(url,options)=>{
     if(options.method==='DELETE')return new Response(null,{status:204});
     if(mode==='pause_verify'){mode='';providerReached();await providerWait;}
     if(mode==='expired')return Response.json({error:'EXPIRED_SESSION'},{status:400});
-    return Response.json({status:'AUTHORIZED',accounts:['account-'+target.pathname.split('-').at(-1)],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+86400000).toISOString()}});
+    return Response.json({status:'AUTHORIZED',accounts:['account-'+target.pathname.split('-').at(-1)],accounts_data:[account('account-'+target.pathname.split('-').at(-1))],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:new Date(Date.now()+86400000).toISOString()}});
   }
   if(target.pathname.endsWith('/transactions')){
     transactionCalls++;lastQuery=target.searchParams;
@@ -161,7 +164,7 @@ test('revoked consent during initial account verification exposes a renewal path
 });
 test('cancelled, expired and failed approvals never create a connection',async()=>{
   const n=db.prepare('SELECT COUNT(*) n FROM bank_connections').get().n;
-  let state=await start();const cancelled=await call('/api/bank/callback?state='+state+'&error=access_denied&error_description=private-data');assert.equal(cancelled.res.status,302);assert.match(cancelled.res.headers.get('location'),/cancelled/);assert.equal((await callback(state)).res.status,403);
+  let state=await start();const denied=await call('/api/bank/callback?state='+state+'&error=access_denied&error_description=private-data');assert.equal(denied.res.status,302);assert.match(denied.res.headers.get('location'),/denied/);assert.equal((await callback(state)).res.status,403);
   state=await start();db.prepare('UPDATE bank_states SET expires_at=0 WHERE state_hash=?').run(digest(state));assert.equal((await callback(state)).res.status,403);
   state=await start();mode='code_error';const error=await callback(state);assert.equal(error.res.status,409);assert.ok(!JSON.stringify(error.json).includes('private-code'));mode='';
   state=await start();mode='no_accounts';assert.equal((await callback(state)).res.status,502);mode='';

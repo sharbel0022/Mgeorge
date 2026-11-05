@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createOpenPaymentsBankgiroCapture,readOpenPaymentsBankgiroCapture} from '../lib/bankgiro-openpayments-capture.js';
+import {provisionCompany} from '../lib/company-storage.js';
 import {applyCommand,economicTransactions,specificationPreview} from '../lib/domain.ts';
 import {ingestFixture,seedState,account,hash} from './helpers/bankgiro-ingest-fixture.mjs';
 const companyId='synthetic-company-a';
@@ -13,6 +14,20 @@ function capture({company=companyId,owner='synthetic-owner',reference='0599',pay
 async function fixture(t,{company=companyId,...options}={}){
  const state=seedState(options);if(company)state.company.id=company;
  const f=await ingestFixture(t,{state});
+ if(company){
+  await provisionCompany(f.database,{id:company,name:'Synthetic tenant',actorId:f.owner,legacyOwner:f.owner,verifiedLegacyOwner:f.owner,verifiedBy:'synthetic-operator',verificationEvidence:'Synthetic explicit adoption'});
+  const server=await import(f.moduleUrls.server),sink=f.sink;
+  f.bound=async operation=>{
+   let result,failure;
+   const handler=server.withCompanyRequest(async()=>{try{result=await operation();return server.response({ok:true});}catch(error){failure=error;throw error;}});
+   const response=await handler(new Request('https://synthetic.test/api/bankgiro/source/run',{method:'POST',headers:{Origin:'https://synthetic.test','X-Company-Id':company,'X-Company-Context-Version':'1'}}));
+   if(failure)throw failure;if(!response.ok)throw Object.assign(Error('company scope rejected'),{code:(await response.json()).code});return result;
+  };
+  f.sink={retain:input=>f.bound(()=>sink.retain(input)),importReport:input=>f.bound(()=>sink.importReport(input))};
+  const prepare=f.prepare;
+  f.prepare=(...args)=>f.bound(()=>prepare(...args));
+  f.write=state=>f.bound(()=>f.scopedDatabase.prepare('UPDATE workspaces SET payload=?,revision=revision+1 WHERE owner=?').bind(JSON.stringify(state),f.owner).run());
+ }
  f.authorization={...f.authorization,companyId,bankgiro:'1234567',accountId:'account-a',iban:account,profileId:'openpayments-bankgiro-v1',origin:'provider_authorization',checkedAt:new Date().toISOString(),capabilities:['bankgiro_reports:read','accountinformation','bankgiroinformation','corporate']};
  f.capture=async input=>{const c=capture(input);return {...await f.prepare(c.bytes,{filename:c.filename,reportId:c.reportId}),capture:c};};
  return f;
@@ -32,7 +47,7 @@ test('native JSON intake retains raw pages and links a fully evidenced deposit w
  assert.deepEqual(JSON.parse(f.audits()[0].detail).enrichmentAuthorization,receipt);
 });
 test('two individual payers and 0599 versus 599 survive the whole source-to-model path with a custom reference policy',async t=>{
- const f=await fixture(t),configured=f.read().state;configured.company.invoiceReferencePolicies=[{version:'invoice-reference-policy-v1',id:'company-reference-policy',companyName:configured.company.name,referenceSource:'invoice_number',direction:'customer',matchMode:'exact'}];f.write(configured);
+ const f=await fixture(t),configured=f.read().state;configured.company.invoiceReferencePolicies=[{version:'invoice-reference-policy-v1',id:'company-reference-policy',companyName:configured.company.name,referenceSource:'invoice_number',direction:'customer',matchMode:'exact'}];await f.write(configured);
  const input=await f.capture({payments:[{id:'CHILD-A',amount:'125.00',payer:'Synthetic payer A',reference:'0599'},{id:'CHILD-B',amount:'500.00',payer:'Synthetic payer B',reference:'599'}]}),result=await f.sink.importReport(input),state=f.read().state;
  assert.equal(result.status,'IMPORTED');assert.equal(result.paymentCount,2);
  assert.deepEqual(state.transactions.filter(row=>row.specification).map(row=>[row.party,row.amount,row.payerReference]),[['Synthetic payer A',12500,'0599'],['Synthetic payer B',50000,'599']]);
@@ -81,12 +96,12 @@ test('a valid transport hash cannot override a foreign account in the actual pro
  await assert.rejects(()=>f.sink.importReport(input),{code:'ACCOUNT_MISMATCH'});assert.deepEqual(f.read(),before);assert.deepEqual(f.objects.get(f.owner+'/'+input.documentId),bytes);
 });
 test('job and capture report identities must agree even when the owned original hash is correct',async t=>{
- const f=await fixture(t),input=await f.capture(),before=f.read();input.job.reportId='different-report';f.sql.prepare('UPDATE bankgiro_ingest_jobs SET report_id=? WHERE id=?').run(input.job.reportId,input.job.id);
+ const f=await fixture(t),input=await f.capture(),before=f.read();input.job.reportId='different-report';await f.bound(()=>f.scopedDatabase.prepare('UPDATE bankgiro_ingest_jobs SET report_id=? WHERE id=?').bind(input.job.reportId,input.job.id).run());
  await assert.rejects(()=>f.sink.importReport(input),{code:'IDENTITY_CONFLICT'});assert.deepEqual(f.read(),before);
 });
 test('a concurrent company switch prevents committing the earlier company capture',async t=>{
  const f=await fixture(t),input=await f.capture(),before=f.read().state;
- f.beforeBatch=async()=>{f.beforeBatch=null;const changed=f.read().state;changed.company.id='company-b';f.write(changed);};
+ f.beforeBatch=async()=>{f.beforeBatch=null;const changed=f.read().state;changed.company.id='company-b';await f.write(changed);};
  await assert.rejects(()=>f.sink.importReport(input));const after=f.read().state;
  assert.equal(after.company.id,'company-b');assert.deepEqual(after.transactions,before.transactions);assert.deepEqual(after.allocations,before.allocations);assert.equal(f.audits().length,0);
 });
@@ -100,4 +115,29 @@ test('a provider completeness hold cannot be erased by account resolution or dir
  const c=capture({amount:'125.00'}),rows=c.normalization.rows;
  rows[0].amount=62500; // simulate a caller trying to paper over the incomplete original
  assert.equal(specificationPreview(state,rows).linked,0);assert.equal(specificationPreview(state,rows).review,1);
+});
+
+test('real provider raw receipt joins catalog-scoped intake and represents an AIS aggregate exactly once',async t=>{
+ const {OpenPaymentsProvider}=await import('../lib/banking/openpayments-provider.js');
+ const {CONFIG,CONTEXT,ACCOUNT,ACCOUNT_ID,NOW,fixtureTransport,json}=await import('./helpers/openpayments-fixture.mjs');
+ const {createOpenPaymentsBankgiroCaptureFromProvider}=await import('../lib/bankgiro-openpayments-capture.js');
+ const f=await fixture(t),template=capture(),body=template.pages[0].body;
+ const transport=fixtureTransport({
+  'GET /psd2/accountinformation/v1/accounts':()=>json({accounts:[{...ACCOUNT,iban:account}]}),
+  ['GET /psd2/accountinformation/v1/accounts/'+ACCOUNT_ID+'/transactions']:()=>new Response(body,{headers:{'Content-Type':'application/json'}}),
+ });
+ const provider=new OpenPaymentsProvider({...CONFIG,features:['consents','accounts','transactions','bankgiro_enrichment']},{transport:transport.transport,now:()=>NOW});
+ const binding={...CONTEXT.binding,owner:f.owner,companyId};
+ const connection=provider.forCompany({...CONTEXT,binding},{...transport.dependencies,assertCurrent:async input=>assert.deepEqual(input,binding)});
+ const consent=await connection.createConsent({validUntil:'2026-12-01'}),accounts=await connection.listAccounts(consent.handle);
+ const result=await connection.getTransactions(accounts.accounts[0].handle,{dateFrom:'2026-10-26',dateTo:'2026-10-26'});
+ const joined=createOpenPaymentsBankgiroCaptureFromProvider({context:{...template.context,accountId:ACCOUNT_ID},captureId:'provider-to-intake-1',originals:result.originals,binding});
+ f.authorization.accountId=ACCOUNT_ID;
+ const input=await f.prepare(joined.bytes,{filename:joined.filename,reportId:joined.reportId});
+ const outcome=await f.sink.importReport(input),state=f.read().state;
+ assert.equal(outcome.status,'IMPORTED');assert.equal(state.allocations.length,0);
+ assert.equal(economicTransactions(state).reduce((sum,row)=>sum+row.amount,0),62500);
+ assert.equal(state.transactions.filter(row=>row.specification).length,1);
+ assert.equal(readOpenPaymentsBankgiroCapture(f.objects.get(f.owner+'/'+input.documentId)).pages[0].body,body);
+ assert.equal((await f.sink.importReport(input)).status,'DUPLICATE');
 });

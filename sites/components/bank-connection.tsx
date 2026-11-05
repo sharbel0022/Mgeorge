@@ -7,9 +7,12 @@ import { useBankRefresh } from './use-bank-refresh';
 import SyncRecoveryNotice from './sync-recovery-notice';
 
 type BankAccount = { uid: string; label: string; currency: string; selected: boolean; importable: boolean };
-type BankConnection = { id: string; bankName: string; environment: "SANDBOX" | "PRODUCTION"; status: string; validUntil: string; lastSyncedAt: string | null; lastError: string | null; postprocessWarning?: string | null; accounts: BankAccount[]; dateFrom: string };
+type BankConnection = { id: string; bankName: string; environment: "SANDBOX" | "PRODUCTION"; status: string; validUntil: string; lastSyncedAt: string | null; lastError: string | null; postprocessWarning?: string | null; accounts: BankAccount[]; dateFrom: string;
+  consent?: { mode: 'company' | 'legacy'; corporateAuthorization: { status: string }; bankgiro: { status: string } } };
 type BankStatus = {
   configured: boolean; storageReady: boolean;
+  company?: { id: string; name: string; canManageBank: boolean };
+  consentFlow?: { status: string; reason: string | null; expiresAt: string } | null;
   automatic?: { blocked?: boolean; failures?: number; enabled: boolean; intervalHours: number; lastAttemptAt: string | null; nextAttemptAt: string | null };
   activation?: { configured: boolean; message: string };
   application: null | { environment: "SANDBOX" | "PRODUCTION"; active: boolean };
@@ -37,9 +40,13 @@ function followBankUrl(value: string) {
 }
 const resultMessages: Record<string, string> = {
   connected: "Banken har bekräftat medgivandet. Välj företagets konto och hämta bankhändelser.",
+  select_account: "Banken har godkänt läsbehörigheten. Bekräfta vilket av företagets konton som ska anslutas.",
+  corporate_authorization_required: "Bankens inloggning är klar, men kopplingen mellan kontot och företaget behöver verifieras innan anslutningen kan användas. Kontakta administratören.",
   cancelled: "Bankanslutningen avbröts. Du kan koppla igen när du vill.",
+  denied: "Banken eller användaren godkände inte läsbehörigheten. Kontrollera företagets behörigheter hos banken och försök igen.",
   expired: "Anslutningsförsöket har gått ut. Börja med Koppla banken igen.",
   failed: "Bankanslutningen kunde inte slutföras. Kontrollera status och försök igen.",
+  retry: "En annan bankåtgärd pågår. Vänta tills den är klar och kontrollera anslutningsstatus innan du försöker igen.",
   signin_required: "Logga in med det ChatGPT-konto som startade bankanslutningen.",
   wrong_user: "Använd samma ChatGPT-konto och webbläsare som när anslutningen startades.",
 };
@@ -48,6 +55,7 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
   const [status, setStatus] = useState<BankStatus | null>(null), [loading, setLoading] = useState(!demo), [busy, setBusy] = useState(false);
   const [error, setError] = useState(""), [notice, setNotice] = useState(""), [signIn, setSignIn] = useState("");
   const [accountUids, setAccountUids] = useState<string[]>([]), [dateFrom, setDateFrom] = useState(initialDate), [confirmDisconnect, setConfirmDisconnect] = useState(false);
+  const [bankOptions, setBankOptions] = useState<{ name: string; country: string }[]>([]), [bankName, setBankName] = useState('');
   const alive = useRef(true), operation = useRef(false), version = useRef(0), controller = useRef<AbortController | null>(null), demoMode = useRef(demo), formId = useId();
   const handleError = useCallback((cause: unknown) => {
     if (cause instanceof Error && cause.name === "AbortError") return;
@@ -78,6 +86,8 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
       if (cancelled || !alive.current || demoMode.current) return;
       if (result === "connected") {
         if (confirmedBankConsent(verified)) setNotice(resultMessages.connected);
+      } else if (result === 'select_account') {
+        if (verified?.connection?.status === 'pending_account') setNotice(resultMessages.select_account);
       } else if (result && resultMessages[result]) setNotice(resultMessages[result]);
     })();
     return () => { cancelled = true; alive.current = false; version.current++; controller.current?.abort(); };
@@ -91,29 +101,37 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
   };
   const connection = status?.connection?.status === "disconnected" ? null : status?.connection;
   const connected = confirmedBankConsent(status);
+  const readyForAccounts = connected || connection?.status === 'pending_account';
   const eligible = connection?.accounts.filter(a => a.importable && a.currency === "SEK") || [];
   const selected = eligible.filter(a => a.selected).map(a => a.uid);
   const configured = !!status?.configured && !!status.storageReady;
   const sandbox = (connection?.environment || status?.application?.environment) === "SANDBOX";
   const disabled = busy || loading;
   useBankRefresh(!demo && connected && selected.length > 0, busy || loading || accountUids.length !== selected.length || accountUids.some(id => !selected.includes(id)) || dateFrom !== connection?.dateFrom, () => { void loadStatus(); onDataChanged?.(); });
-  async function startConnection() {
+  async function loadBanks() {
     if (!alive.current || demoMode.current) return;
-    const available = await bankRequest<{ banks: { name: string; country: string }[] }>("/api/bank/banks");
+    const available = await bankRequest<{ banks: { name: string; country: string }[] }>("/api/bank/banks" + (status?.company ? '?companyId=' + encodeURIComponent(status.company.id) : ''));
     if (!alive.current || demoMode.current) return;
-    const bank = available.banks.find(b => b.name === "Swedbank" && b.country === "SE") || available.banks.find(b => /^Swedbank\b/i.test(b.name) && b.country === "SE");
-    if (!bank) throw new BankApiError("Swedbanks företagsanslutning är inte tillgänglig. Kontakta systemadministratören.");
-    const result = await bankRequest<{ url: string }>("/api/bank/connect", "POST", { bankName: bank.name, country: "SE", dateFrom: initialDate() });
+    if (!available.banks.length) throw new BankApiError('Ingen företagsbank är tillgänglig för den önskade läsanslutningen. Kontakta administratören.');
+    setBankOptions(available.banks); setBankName(available.banks.length === 1 ? available.banks[0].name : '');
+  }
+  async function startConnection(renew = false) {
+    if (!alive.current || demoMode.current) return;
+    const selectedBank = renew ? connection?.bankName : bankName;
+    if (!selectedBank || !status?.company?.canManageBank) throw new BankApiError('Välj företag och bank innan du begär läsbehörighet.');
+    const result = await bankRequest<{ url: string }>("/api/bank/connect", "POST", { companyId: status.company.id,
+      bankName: selectedBank, country: "SE", dateFrom: connection?.dateFrom || initialDate(), requiredScopes: ['accounts:read','transactions:read'],
+      ...(renew && connection ? { renewConnectionId: connection.id } : {}) });
     if (alive.current && !demoMode.current) followBankUrl(result.url);
   }
   function synchronize(event: FormEvent) {
-    event.preventDefault(); if (!connected || !connection) return;
+    event.preventDefault(); if (!readyForAccounts || !connection) return;
     void run(async () => {
       if (!accountUids.length) throw new BankApiError("Välj företagets konto först.");
       if (!/^\d{4}-\d{2}-\d{2}$/.test(dateFrom) || dateFrom > localDate()) throw new BankApiError("Välj ett giltigt startdatum.");
-      if (selected.length !== accountUids.length || accountUids.some(id => !selected.includes(id)) || dateFrom !== connection.dateFrom) await bankRequest("/api/bank/accounts", "POST", { connectionId: connection.id, accountUids, dateFrom });
+      if (!connected || selected.length !== accountUids.length || accountUids.some(id => !selected.includes(id)) || dateFrom !== connection.dateFrom) await bankRequest("/api/bank/accounts", "POST", { companyId: status?.company?.id, connectionId: connection.id, accountUids, dateFrom });
       if (!alive.current || demoMode.current) return;
-      const result = await bankRequest<SyncResult>("/api/bank/sync", "POST", {});
+      const result = await bankRequest<SyncResult>("/api/bank/sync", "POST", { companyId: status?.company?.id });
       if (!alive.current || demoMode.current) return;
       setNotice(result.message); await loadStatus(); if (!result.test && alive.current && !demoMode.current) onDataChanged?.();
     });
@@ -124,19 +142,25 @@ export default function BankConnection({ demo = false, onDataChanged }: { demo?:
     {error && <div className="bank-message bank-message-error" role="alert"><AlertCircle size={19} /><p>{error}</p></div>}
     {notice && <div className="bank-message bank-message-success" role="status"><CheckCircle2 size={19} /><p>{notice}</p></div>}
     {demo ? <div className="bank-card bank-welcome"><h2>Bankkopplingen är avstängd i demo</h2><p>Avsluta demoläget för att ansluta företagets bank.</p></div> : signIn ? <div className="bank-card bank-welcome"><h2>Koppla företagets bank</h2><a className="btn primary bank-primary" href={signIn} target="_top"><LogIn size={18} />Logga in och fortsätt</a></div> : !status ? <div className="bank-card bank-welcome" role="status">{loading ? <><RefreshCw className="spin" /><p>Hämtar anslutningsstatus…</p></> : <button className="btn" onClick={() => void loadStatus()}>Försök igen</button>}</div> : <div className="bank-card bank-connected">
-      <div className="bank-connected-heading"><span className="bank-hero-icon"><Landmark size={27} /></span><div><h2>{connection?.bankName || "Swedbank"}</h2><p className="bank-connected-label">Status: {connected ? selected.length ? "Ansluten" : "Välj företagskonto" : connection ? "Behöver förnyas" : "Ej ansluten"}</p></div></div>
+      <div className="bank-connected-heading"><span className="bank-hero-icon"><Landmark size={27} /></span><div><h2>{connection?.bankName || "Företagets bank"}</h2><p className="bank-connected-label">Status: {readyForAccounts ? selected.length ? "Ansluten" : "Bekräfta företagskonto" : connection?.status === "corporate_authorization_required" ? "Företagsbehörighet behöver verifieras" : connection?.status === "revocation_pending" ? "Frånkoppling väntar på bekräftelse" : connection ? "Behöver förnyas" : "Ej ansluten"}</p></div></div>
       {sandbox && <div className="bank-sandbox" role="note"><AlertCircle size={18} /><p>Testmiljö – testhändelser sparas inte i företagets fakturaregister.</p></div>}
       {!configured && <div className="bank-inline-error" role="status">Banktjänsten behöver aktiveras av systemadministratören.</div>}
       {connection?.postprocessWarning && <p className="bank-inline-error" role="alert">{connection.postprocessWarning}</p>}{connection?.lastError && <p className="bank-inline-error" role="alert">{connection.lastError}</p>}
-      {!connection && <><button className="btn primary bank-primary" disabled={disabled || !configured} onClick={() => void run(startConnection)}><Landmark size={18} />{busy ? "Öppnar banken…" : "Koppla banken"}<ArrowRight size={17} /></button><p className="bank-help">Du skickas till bankens säkra inloggning för att godkänna att MG Fakturakoll får läsa dina bankhändelser.</p></>}
-      {connection && connected && <form onSubmit={synchronize} aria-label="Hämta bankhändelser"><fieldset disabled={disabled || !configured}><legend className="sr-only">Konto och hämtningsperiod</legend>
+      {status.company && <label className="bank-field" htmlFor={formId + '-company'}><span>Företag</span><select id={formId + '-company'} value={status.company.id} disabled><option value={status.company.id}>{status.company.name}</option></select></label>}
+      {!connection && <div className="bank-spaced"><label className="bank-field" htmlFor={formId + '-bank'}><span>Bank med stöd för företagskonton</span><select id={formId + '-bank'} value={bankName} disabled={disabled || !bankOptions.length} onChange={event => setBankName(event.target.value)}><option value="">Välj bank</option>{bankOptions.map(bank => <option key={bank.country + ':' + bank.name} value={bank.name}>{bank.name}</option>)}</select></label><button className="btn" disabled={disabled || !configured} onClick={() => void run(loadBanks)}>Hämta bankalternativ</button><p className="bank-help">Läsbehörigheten gäller konton och bankhändelser. Bankgirodetaljer kräver separat behörighet.</p></div>}
+      {connection?.status === 'corporate_authorization_required' && <p className="bank-inline-error" role="status">Bankens medgivande finns, men underlag som binder kontot till det valda företaget saknas. Ingen bankhämtning aktiveras. Kontakta administratören för verifiering.</p>}
+      {connection?.status === 'revocation_pending' && <p className="bank-inline-error" role="status">Användningen av anslutningen är stoppad. Leverantören kunde inte bekräfta återkallelsen. Försök koppla från igen eller kontrollera medgivandet hos banken.</p>}
+      {connection?.consent?.mode === 'legacy' && <p className="bank-help" role="status">Den äldre anslutningen saknar separat verifiering av företagsbehörighet. Förnya anslutningen för att genomföra den nya företagskontrollen.</p>}
+      {status.consentFlow?.status === 'expired' && <p className="bank-help" role="status">Anslutningsförsöket löpte ut utan bekräftat slutresultat. Starta ett nytt försök.</p>}
+      {!connection && <><button className="btn primary bank-primary" disabled={disabled || !configured || !bankName || !status.company?.canManageBank} onClick={() => void run(() => startConnection())}><Landmark size={18} />{busy ? "Öppnar banken…" : "Koppla banken"}<ArrowRight size={17} /></button><p className="bank-help">Du skickas till bankens godkända identifiering, med BankID där banken stöder det. Banken måste godkänna läsbehörigheten för företagets konton. BankID identifierar dig och är inte ensamt bevis på företagsbehörighet.</p></>}
+      {connection && readyForAccounts && <form onSubmit={synchronize} aria-label="Hämta bankhändelser"><fieldset disabled={disabled || !configured}><legend className="sr-only">Konto och hämtningsperiod</legend>
         {selected.length > 0 && <div className="bank-saved-accounts">{eligible.filter(a => a.selected).map(a => <div key={a.uid}><Wallet size={18} /><strong>{a.label}</strong><span>{a.currency}</span></div>)}</div>}
-        <details className="bank-inline-details" open={selected.length === 0}><summary><span>{selected.length ? "Ändra konto eller period" : "Välj företagets konto"}</span><ChevronDown size={16} /></summary><div className="bank-details-body"><div className="bank-accounts">{eligible.map(a => <label className="bank-account" key={a.uid}><input type="checkbox" checked={accountUids.includes(a.uid)} onChange={event => setAccountUids(current => event.target.checked ? [...current, a.uid] : current.filter(id => id !== a.uid))} /><Wallet size={18} /><span>{a.label}</span><strong>SEK</strong></label>)}</div><p className="bank-help">Välj konton som hör till M.George Vitvaror AB. Kontonumret visas maskerat.</p><label className="bank-field" htmlFor={formId + "-date"}><span>Hämta bankhändelser från</span><input id={formId + "-date"} type="date" value={dateFrom} min="2000-01-01" max={localDate()} onChange={event => setDateFrom(event.target.value)} required /></label></div></details>
+        <details className="bank-inline-details" open={selected.length === 0}><summary><span>{selected.length ? "Ändra konto eller period" : "Välj företagets konto"}</span><ChevronDown size={16} /></summary><div className="bank-details-body"><div className="bank-accounts">{eligible.map(a => <label className="bank-account" key={a.uid}><input type="checkbox" checked={accountUids.includes(a.uid)} onChange={event => setAccountUids(current => event.target.checked ? [...current, a.uid] : current.filter(id => id !== a.uid))} /><Wallet size={18} /><span>{a.label}</span><strong>SEK</strong></label>)}</div><p className="bank-help">Välj konton som hör till {status.company?.name || 'företaget'}. Kontonumret visas maskerat.</p><label className="bank-field" htmlFor={formId + "-date"}><span>Hämta bankhändelser från</span><input id={formId + "-date"} type="date" value={dateFrom} min="2000-01-01" max={localDate()} onChange={event => setDateFrom(event.target.value)} required /></label></div></details>
         {!eligible.length && <p className="bank-inline-error">Banken lämnade inget företagskonto i SEK. Förnya medgivandet och välj rätt konto hos banken.</p>}
         <button className="btn primary bank-primary" disabled={!accountUids.length} type="submit"><RefreshCw size={18} className={busy ? "spin" : ""} />{busy ? "Hämtar bankhändelser…" : selected.length ? "Uppdatera bankhändelser" : "Anslut valt konto och hämta"}</button>
       </fieldset></form>}
-      {connection && <><dl className="bank-facts"><div><dt>Senast uppdaterad</dt><dd>{dateLabel(connection.lastSyncedAt)}</dd></div><div><dt>Medgivandet gäller till</dt><dd>{dateLabel(connection.validUntil)}</dd></div></dl><button className="btn bank-primary" disabled={disabled || !configured} onClick={() => void run(async () => { const result = await bankRequest<{ message: string; remoteRevoked?: boolean }>("/api/bank/disconnect", "POST", {}); if (!alive.current || demoMode.current) return; if (result.remoteRevoked === false) { setNotice(result.message); await loadStatus(); return; } await startConnection(); })}><RefreshCw size={17} />Förnya anslutningen</button>{confirmDisconnect ? <div className="bank-confirm"><p>Koppla från banken? Tidigare importerade bankhändelser behålls.</p><button className="btn" disabled={disabled} onClick={() => setConfirmDisconnect(false)}>Avbryt</button><button className="btn bank-danger-button" disabled={disabled} onClick={() => void run(async () => { const result = await bankRequest<{ message: string }>("/api/bank/disconnect", "POST", {}); if (!alive.current || demoMode.current) return; setConfirmDisconnect(false); setNotice(result.message); await loadStatus(); })}>Ja, koppla från</button></div> : <button className="text-button bank-danger-link" disabled={disabled} onClick={() => setConfirmDisconnect(true)}><Unlink size={16} />Koppla från banken</button>}</>}
-      {connection && connected && selected.length > 0 && <div className="bank-spaced"><label className="bank-account"><input type="checkbox" checked={!!status?.automatic?.enabled} disabled={disabled} onChange={event => { const enabled = event.target.checked; void run(async () => { await bankRequest('/api/bank/automatic', 'POST', { enabled, connectionId: connection.id }); await loadStatus(); }); }} /><span><strong>Automatisk bankhämtning</strong><br />Nya bankhändelser hämtas var sjätte timme när funktionen är aktiverad.</span></label>{status?.automatic?.blocked && <SyncRecoveryNotice channel="bank"/>}{status?.automatic?.enabled && !status.automatic.blocked && <p className="bank-help">Nästa hämtning: {status.automatic.nextAttemptAt ? dateLabel(status.automatic.nextAttemptAt) : 'Vid nästa automatiska kontroll'}. Bankens medgivande behöver fortfarande förnyas när det går ut.</p>}</div>}
+      {connection && <><dl className="bank-facts"><div><dt>Senast uppdaterad</dt><dd>{dateLabel(connection.lastSyncedAt)}</dd></div><div><dt>Medgivandet gäller till</dt><dd>{dateLabel(connection.validUntil)}</dd></div></dl><button className="btn bank-primary" disabled={disabled || !configured} onClick={() => void run(() => startConnection(true))}><RefreshCw size={17} />Förnya anslutningen</button>{confirmDisconnect ? <div className="bank-confirm"><p>Koppla från banken? Tidigare importerade bankhändelser behålls.</p><button className="btn" disabled={disabled} onClick={() => setConfirmDisconnect(false)}>Avbryt</button><button className="btn bank-danger-button" disabled={disabled} onClick={() => void run(async () => { const result = await bankRequest<{ message: string }>("/api/bank/disconnect", "POST", { companyId: status.company?.id, connectionId: connection.id }); if (!alive.current || demoMode.current) return; setConfirmDisconnect(false); setNotice(result.message); await loadStatus(); })}>Ja, koppla från</button></div> : <button className="text-button bank-danger-link" disabled={disabled} onClick={() => setConfirmDisconnect(true)}><Unlink size={16} />Koppla från banken</button>}</>}
+      {connection && connected && selected.length > 0 && <div className="bank-spaced"><label className="bank-account"><input type="checkbox" checked={!!status?.automatic?.enabled} disabled={disabled} onChange={event => { const enabled = event.target.checked; void run(async () => { await bankRequest('/api/bank/automatic', 'POST', { companyId: status.company?.id, enabled, connectionId: connection.id }); await loadStatus(); }); }} /><span><strong>Automatisk bankhämtning</strong><br />Nya bankhändelser hämtas var sjätte timme när funktionen är aktiverad.</span></label>{status?.automatic?.blocked && <SyncRecoveryNotice channel="bank"/>}{status?.automatic?.enabled && !status.automatic.blocked && <p className="bank-help">Nästa hämtning: {status.automatic.nextAttemptAt ? dateLabel(status.automatic.nextAttemptAt) : 'Vid nästa automatiska kontroll'}. Bankens medgivande behöver fortfarande förnyas när det går ut.</p>}</div>}
       <div className="bank-spaced">{manualAlternative}</div><p className="bank-fine-print"><ShieldCheck size={15} />Endast läsåtkomst. Inga betalningar utförs och inga BankID-koder eller banklösenord sparas.</p>
     </div>}
     {status?.lastRun && !demo && <section className="bank-last-run"><div className="bank-result-line"><CheckCircle2 size={19} /><div><strong>{status.lastRun.test ? "Testhämtningen är klar" : status.lastRun.imported + " nya bankhändelser"}</strong><p>{dateLabel(status.lastRun.createdAt)}</p></div></div>{!status.lastRun.test && <a className="text-button" href="/?view=bank">Visa bankhändelser<ArrowRight size={15} /></a>}{status.lastRun.warnings.length > 0 && <details className="bank-inline-details"><summary>Att kontrollera<ChevronDown size={16} /></summary><ul>{status.lastRun.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></details>}</section>}

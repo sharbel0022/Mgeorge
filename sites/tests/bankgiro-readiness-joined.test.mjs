@@ -67,7 +67,7 @@ test('joined durable429 survives worker restart and resumes retained intake with
   if(!failed){failed=true;f.source.calls.push('fetch429');throw Object.assign(Error('sensitive provider body must not escape'),{status:429,retryAfter:120});}
   return fetch(input);
  };
- const worker=()=>createBankgiroIngest({source:f.source,store:createBankgiroIngestStore(f.database,{now:()=>at}),sink:f.sink,now:()=>at,allowSynthetic:true});
+ const worker=()=>createBankgiroIngest({source:f.source,store:createBankgiroIngestStore(f.scopedDatabase,{now:()=>at}),sink:f.sink,now:()=>at,allowSynthetic:true});
  const held=await worker().run(f.owner);assert.equal(held.counts.RETRY,1);assert.equal(held.lastError,'RATE_LIMITED');
  assert.ok(Date.parse(held.nextPollAt)>=at+120000);assert.equal(children(f).length,0);
  const calls=f.source.calls.length;await worker().run(f.owner);assert.equal(f.source.calls.length,calls,'restart respects the persisted embargo');

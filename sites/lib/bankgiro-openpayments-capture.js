@@ -41,7 +41,14 @@ function checkedContext(raw){
  if(!raw||keys.some(key=>!text(raw[key]))||! /^[A-Za-z0-9_-]{1,128}$/.test(raw.accountId)||! /^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(raw.iban)||raw.bankgiro!==undefined&&!/^\d{4,10}$/.test(raw.bankgiro))throw error('AUTHORIZATION_BLOCKED');
  return Object.fromEntries([...keys,...(raw.bankgiro!==undefined?['bankgiro']:[])].map(key=>[key,raw[key]]));
 }
-function requestPath(value,context){
+function requestPath(value,context,allowAbsolute=false){
+ // The provider validates the environment before following a link. A retained
+ // capture can also inspect either documented origin, without making a request.
+ if(allowAbsolute&&typeof value==='string'&&value.startsWith('https://')){
+  let link;try{link=new URL(value);}catch{throw error('ACCOUNT_MISMATCH');}
+  if(!['https://api.openbankingplatform.com','https://api.sandbox.openbankingplatform.com'].includes(link.origin)||link.username||link.password||link.hash||/[\\\r\n]/.test(value))throw error('ACCOUNT_MISMATCH');
+  value=link.pathname+link.search;
+ }
  const base='/psd2/accountinformation/v1/accounts/'+encodeURIComponent(context.accountId)+'/transactions';
  if(!text(value,2000)||!value.startsWith(base+'?')||/[\\#]/.test(value))throw error('ACCOUNT_MISMATCH');
  let url;try{url=new URL(value,'https://api.openbankingplatform.com');}catch{throw error('ACCOUNT_MISMATCH');}
@@ -64,7 +71,7 @@ function readContainer(container){
   const path=requestPath(page.requestPath,context);if(paths.has(path)||pages.length&&path!==previousNext)throw error('INVALID_ORIGINAL');paths.add(path);
   const body=strictJSON(page.body);if(!body||typeof body!=='object'||Array.isArray(body))throw error('INVALID_ORIGINAL');
   const next=body.transactions?._links?.next?.href;
-  previousNext=next==null?undefined:requestPath(next,context);
+  previousNext=next==null?undefined:requestPath(next,context,true);
   if(previousNext&&paths.has(previousNext))throw error('INVALID_ORIGINAL');
   pages.push({body:page.body,sha256:page.sha256,requestPath:page.requestPath,requestId:page.requestId,receivedAt:page.receivedAt});bodies.push(body);
  }
@@ -97,4 +104,18 @@ export function bankgiroEnrichmentFallback({companyId,coverage,sftp,now=Date.now
  const source=available?'camt054c_sftp':'manual_file';
  const message=coverage?.status==='partial'?'Individuell betalningsinformation är ofullständig och behöver granskas.':'Individuell betalningsinformation är inte tillgänglig i API-underlaget.';
  return {source,message:message+(available?' Använd företagets godkända CAMT054C/SFTP-källa.':' Använd en bankfil för manuell import; SFTP kräver ett godkänt företagsavtal.')};
+}
+
+/** Join the server-only provider receipts to the existing report source contract.
+ * This does not grant authority, persist a report or fetch any remote resource. */
+export function createOpenPaymentsBankgiroCaptureFromProvider({context,captureId,originals,binding}){
+ const scoped=checkedContext(context);
+ if(!binding||binding.provider!=='open_payments'||binding.owner!==scoped.owner||binding.companyId!==scoped.companyId||!text(binding.connectionId)||!text(binding.generation)||!['SANDBOX','PRODUCTION'].includes(binding.environment)||!Array.isArray(originals)||!originals.length)throw error('AUTHORIZATION_BLOCKED');
+ const pages=originals.map(original=>{
+  if(original?.provider!=='open_payments'||original.operation!=='transactions'||['owner','companyId','connectionId','provider','environment','generation'].some(key=>original.binding?.[key]!==binding[key]))throw error('AUTHORIZATION_BLOCKED');
+  const receipt=original.rawResponse;
+  if(!receipt||typeof receipt.body!=='string'||receipt.sha256!==digest(encoder.encode(receipt.body))||original.requestId!==receipt.requestId||original.receivedAt!==receipt.receivedAt)throw error('HASH_MISMATCH');
+  return receipt;
+ });
+ return createOpenPaymentsBankgiroCapture({context:scoped,captureId,pages});
 }

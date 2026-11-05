@@ -117,3 +117,18 @@ test('Node renewed authority preserves earlier audit evidence while stable dupli
  status=await f.worker.run(owner);assert.equal(status.counts.REVIEW,1,JSON.stringify(status));assert.equal(reviewAudit(f.db).length,2);
  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM import_jobs').get().n,1);assert.equal(f.db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,0);assert.equal(f.db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
 });
+
+for(const [label,boundCompany,boundOwner,expected] of [
+ ['authoritative company overrides a forged profile',companyId,owner,'REVIEW'],
+ ['foreign immutable company defeats matching editable settings','foreign-company',owner,'BLOCKED'],
+ ['storage owner differs from company identity',companyId,'foreign-storage','BLOCKED'],
+])test('Node catalog boundary: '+label,async t=>{
+ const f=await fixture(t);
+ f.db.exec('CREATE TABLE company_database_boundary(id INTEGER PRIMARY KEY,company_id TEXT,storage_owner TEXT,boundary_version INTEGER,verification_ref TEXT,verified_by TEXT)');
+ f.db.prepare('INSERT INTO company_database_boundary VALUES(1,?,?,1,?,?)').run(boundCompany,boundOwner,'synthetic-proof','synthetic-operator');
+ if(expected==='REVIEW')saveSettings(f.db,{...getSettings(f.db),company_id:'forged-profile-id'});
+ const status=await f.worker.run(owner);
+ assert.equal(status.counts[expected],1,JSON.stringify(status));
+ assert.equal(f.db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,0);
+ assert.equal(f.db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
+});

@@ -12,7 +12,7 @@ import {randomToken,seal} from '../lib/banking/security.ts';
 const environment=dataModule('export const env=new Proxy({}, {get:(_,key)=>globalThis.uploadRaceFixture.env[key]});');
 const auth=dataModule('export async function getChatGPTUser(){const f=globalThis.uploadRaceFixture;return f.users?.length?f.users.shift():f.user;}');
 const domain=libUrl('domain.ts'),security=libUrl('banking/security.ts');
-const server=compiled('lib/server.ts',{'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':domain});
+const server=compiled('lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':environment,'@/app/chatgpt-auth':auth,'./domain':domain});
 const store=dataModule(`import {seal,unseal} from ${JSON.stringify(security)};export const storageReady=()=>true;export const encrypt=(owner,purpose,value)=>seal(globalThis.uploadRaceFixture.key,owner,purpose,value);export const decrypt=(owner,purpose,value)=>unseal(globalThis.uploadRaceFixture.key,owner,purpose,value);`);
 const adapter=compiled('lib/gmail-adapter.js',{'cloudflare:workers':environment});
 const reconciliation=compiled('lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':libUrl('reconciliation-engine.js')});

@@ -1,5 +1,5 @@
 import {env} from 'cloudflare:workers';
-import {db,identity,readWorkspace,response} from './server';
+import {db,identity,readWorkspace,response,companyWorkerIdentity,companyWorkerConfigured} from './server';
 import {applyCommand,emptyState,invoiceReferenceDecision,now,uid,type Invoice} from './domain';
 import {digest,randomToken} from './banking/security';
 import {fieldNames,interpretInvoice,validateInvoiceValues,validOrganization} from './invoice-fields.js';
@@ -92,7 +92,7 @@ export async function processingStatus(owner:string){
   const registered=await db().prepare("SELECT COUNT(DISTINCT document_id) count FROM gmail_sources WHERE owner=? AND status='registered'").bind(owner).first<Row>();
   const pending=await db().prepare("SELECT COUNT(*) count FROM document_jobs j JOIN document_registrations r ON r.owner=j.owner AND r.document_id=j.document_id AND r.invoice_id=j.invoice_id WHERE j.owner=? AND j.state='registered' AND j.error_code='registration_aftercheck_pending'").bind(owner).first<Row>();
   const messages=await db().prepare("SELECT COUNT(*) count FROM customer_messages WHERE owner=? AND status='draft'").bind(owner).first<Row>();
-  const cloud=cloudOcrConfigured(),cloudSeen=settings?.cloud_worker_seen||'',at=Date.now();
+  const cloud=(await companyWorkerConfigured(owner))??cloudOcrConfigured(),cloudSeen=settings?.cloud_worker_seen||'',at=Date.now();
   const recent=(seen:string,window:number)=>{const age=at-Date.parse(seen);return Number.isFinite(age)&&age>=0&&age<window;};
   const review=await reviewReasons(owner,counts.results.filter(r=>['needs_review','duplicate','failed'].includes(r.state)).reduce((sum,r)=>sum+Number(r.count),0));
   return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:recent(settings?.worker_seen||'',180000),cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&recent(cloudSeen,45*60000),cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,aftercheck_pending:pending?.count||0,review_reasons:review,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
@@ -276,6 +276,8 @@ export async function processingAction(req:Request,action:string){
   throw safe('Okänd dokumentåtgärd.');
 }
 async function workerOwner(req:Request){
+  const scoped=await companyWorkerIdentity(req);
+  if(scoped){await db().prepare(scoped.mode==='cloud'?'UPDATE document_automation SET cloud_worker_seen=? WHERE owner=?':'UPDATE document_automation SET worker_seen=? WHERE owner=?').bind(now(),scoped.owner).run();return scoped;}
   const mode=req.headers.get('x-mg-ocr-runner')||'local';
   if(!['cloud','local'].includes(mode)||mode==='cloud'&&!cloudOcrConfigured())throw Error('WORKER_AUTH');
   const token=req.headers.get('authorization')?.replace(/^Bearer /,'')||'',secret=(mode==='cloud'?config.DOCUMENT_CLOUD_WORKER_TOKEN:config.DOCUMENT_WORKER_TOKEN)||'';

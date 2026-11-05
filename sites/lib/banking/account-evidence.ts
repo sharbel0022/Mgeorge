@@ -1,7 +1,7 @@
 import {identity,db,readWorkspace,readBankOriginalBytes,response} from '../server';
 import {hasBankApiOrigin,bankApiOriginalIssue,paymentOriginalIssue,paymentEvidenceConflict,canonicalBankAccount,type State} from '../domain';
 import {accountEvidenceTarget,type AccountEvidenceTarget} from '../account-evidence-presentation';
-import {connection,application,accounts,providerConfig,sessionId,metadata,withBankLock,type BankLease,type BankConnectionRow,type BankApplicationRow} from './store';
+import {connection,application,accounts,providerConfig,sessionId,metadata,withBankLock,assertCompanyConsent,consentMetadata,currentCompanyAuthorization,type BankLease,type BankConnectionRow,type BankApplicationRow} from './store';
 import {getSession,getAccountDetails,providerResponseDiagnostic,providerRetryDiagnostic,providerCooldownDiagnostic,providerErrorCode,type ProviderAccount} from './enable-banking';
 import {stableAccountKey} from './transactions';
 import {parseSpecificationBytes} from '../bankgiro-parser.js';
@@ -22,7 +22,7 @@ function active(owner:string,app:BankApplicationRow|null,conn:BankConnectionRow|
  if(info.kid!==app.application_id||info.environment!=='PRODUCTION'||info.active!==true||!info.services?.includes('AIS')||!info.countries?.includes('SE')||conn.country!=='SE')throw Error('Bankapplikationens befintliga svenska AIS-åtkomst behöver verifieras.');
  return {app,conn};
 }
-const consentFields=['id','owner','status','environment','app_generation','valid_until','selected_accounts','encrypted_accounts','encrypted_session','bank_name','country','retry_after','account_evidence_retry'] as const;
+const consentFields=['id','owner','status','environment','app_generation','valid_until','selected_accounts','encrypted_accounts','encrypted_session','bank_name','country','retry_after','account_evidence_retry','consent_metadata'] as const;
 const consentSnapshot=(conn:BankConnectionRow)=>JSON.stringify(consentFields.map(k=>conn[k]));
 const appSnapshot=(app:BankApplicationRow)=>JSON.stringify([app.owner,app.application_id,app.generation,app.metadata]);
 /** Formatting only. Never change digits, clearing length, leading zeros or IBAN. */
@@ -64,6 +64,13 @@ async function readLocked(select:ReturnType<typeof args>,user:Awaited<ReturnType
  if(cooldown.blocked||genericWait)return evidenceResponse({changed:false,operationalStateChanged:false,providerContacted:false,checkedAt:new Date().toISOString(),revision,transactionId:select.transactionId,documentId:select.documentId,status:'blocked',sourceScope:'current_owned_ais_consent',reason:'Bankens väntetid är aktiv eller inte fastställd. Ingen ny kontokontroll görs innan spärren är utredd.',retryAdvice:cooldown.retryAdvice,accountMatch:false,complete:false,ambiguous:false,resourcesRead:0,rows:[]});
  const available=await accounts(conn),selected=JSON.parse(conn.selected_accounts) as unknown;
  if(!Array.isArray(available)||!available.length||available.length>100||available.some(a=>!object(a)||typeof a.uid!=='string'||!UUID.test(a.uid))||new Set(available.map(a=>a.uid)).size!==available.length||!Array.isArray(selected)||!selected.length||selected.some(id=>typeof id!=='string'||!UUID.test(id)||!available.some(a=>a.uid===id))||new Set(selected).size!==selected.length)throw Error('Bankmedgivandets befintliga kontoresurser eller kontoval är ogiltiga.');
+ if(consentMetadata(conn)?.mode==='company'){
+  await assertCompanyConsent(conn);
+  const authority=await currentCompanyAuthorization(conn);
+  // Alias uniqueness needs the full census. A company-scoped connection must
+  // never inspect another company's account merely to complete that census.
+  if(authority.status!=='verified'||available.some(account=>!authority.accountUids.includes(account.uid)))return evidenceResponse({changed:false,providerContacted:false,operationalStateChanged:false,checkedAt:new Date().toISOString(),revision,transactionId:select.transactionId,documentId:select.documentId,status:'incomplete',reason:'Kontokontrollen kräver konton utanför företagets verifierade behörighet. Inga bankkonton har lästs.',sourceScope:'current_owned_ais_consent',accountMatch:false,complete:false,ambiguous:false,resourcesRead:0,rows:[]});
+ }
  const bank={name:conn.bank_name,country:conn.country},targetKey=canonicalBankAccount(target.account),matches=available.filter(a=>stableAccountKey(a,bank)===targetKey);
  if(matches.length!==1||matches[0].currency!=='SEK'||!selected.includes(matches[0].uid))throw Error('AIS-bankhändelsens primära konto ingår inte entydigt i det valda SEK-kontot.');
  const account=matches[0],docs=select.documentId?await db().prepare('SELECT id FROM documents WHERE owner=? AND id=? LIMIT 2').bind(owner,select.documentId).all<{id:string}>():await db().prepare('SELECT id FROM documents WHERE owner=? AND sha256=? ORDER BY id LIMIT 2').bind(owner,select.sha256).all<{id:string}>();
@@ -79,6 +86,7 @@ async function readLocked(select:ReturnType<typeof args>,user:Awaited<ReturnType
   try{
    await lease.assert();
    const current=active(owner,await application(owner),await connection(owner)),workspace=await db().prepare('SELECT revision FROM workspaces WHERE owner=?').bind(owner).first<{revision:number}>();
+   await assertCompanyConsent(current.conn, resources.map(account=>account.uid));
    const currentWorkspace=trustedSelection?await readWorkspace(owner):null;
    return workspace?.revision===revision&&consentSnapshot(current.conn)===beforeConsent&&appSnapshot(current.app)===beforeApp&&(!currentWorkspace||selectionCurrent(currentWorkspace.state,currentWorkspace.revision));
   }catch{return false;}
@@ -87,20 +95,21 @@ async function readLocked(select:ReturnType<typeof args>,user:Awaited<ReturnType
  try{
   if(!await snapshotCurrent())return stale();
   const live=await guarded(()=>getSession(config,remoteId));
-  if(live.status!=='AUTHORIZED'||!(Date.parse(live.access.valid_until)>Date.now())||live.psu_type!=='business'||live.aspsp?.name!==conn.bank_name||live.aspsp?.country!==conn.country||resources.some(a=>!live.accounts.includes(a.uid)))return evidenceResponse({...base,status:'blocked',reason:'Bankens aktuella medgivande motsvarar inte de ägda kontoresurserna.',accountMatch:false,complete:false,ambiguous:false,resourcesRead,rows:[]});
+  if(live.status!=='AUTHORIZED'||!(Date.parse(live.access.valid_until)>Date.now())||live.access.transactions!==undefined&&live.access.transactions!==true||live.psu_type!=='business'||live.aspsp?.name!==conn.bank_name||live.aspsp?.country!==conn.country||live.accounts_data.some(a=>'usage' in a&&a.usage!==undefined&&a.usage!=='ORGA')||resources.some(a=>!live.accounts.includes(a.uid)))return evidenceResponse({...base,status:'blocked',reason:'Bankens aktuella medgivande motsvarar inte de ägda kontoresurserna.',accountMatch:false,complete:false,ambiguous:false,resourcesRead,rows:[]});
   // Unread live accounts could share the same domestic alias. Never expand the
   // read set to newly observed UIDs or claim uniqueness from a strict subset.
   if(live.accounts.length!==available.length||new Set(live.accounts).size!==live.accounts.length||available.some(a=>!live.accounts.includes(a.uid)))return evidenceResponse({...base,status:'incomplete',reason:'Bankens aktuella kontolista skiljer sig från det sparade medgivandet. Inga ytterligare konton har hämtats.',sourcePath:'GET /sessions/{owned-session}',consentMembershipCurrent:false,accountMatch:false,complete:false,ambiguous:false,resourcesRead,rows:[]});
   if(!await snapshotCurrent())return stale();
   const refreshed:{uid:string;details:ProviderAccount}[]=[];
   for(const prior of resources){
+   await assertCompanyConsent(conn, [prior.uid]);
    stage='account_details';resourcesAttempted++;
    const details=await guarded(()=>getAccountDetails(config,prior.uid));resourcesRead++;
    const priorKey=stableAccountKey(prior,bank),freshKey=stableAccountKey(details,bank);
    // A bank may omit account_id while returning a real typed alias. Exact
    // singular hash continuity may bind that alias; fuzzy hashes never may.
    const exactPrimaryHash=priorKey?.startsWith('enable-account:')&&typeof prior.identification_hash==='string'&&prior.identification_hash===details.identification_hash;
-   if(!priorKey||(!exactPrimaryHash&&freshKey!==priorKey)||details.currency!==prior.currency||prior.uid===account.uid&&details.currency!=='SEK')return evidenceResponse({...base,status:'mismatch',reason:'Bankens aktuella primära konto eller valuta avviker från medgivandets sparade resurs.',accountMatch:false,complete:false,ambiguous:false,resourcesRead,rows:[]});
+   if(!priorKey||(!exactPrimaryHash&&freshKey!==priorKey)||details.usage!==undefined&&details.usage!=='ORGA'||details.currency!==prior.currency||prior.uid===account.uid&&details.currency!=='SEK')return evidenceResponse({...base,status:'mismatch',reason:'Bankens aktuella primära konto eller valuta avviker från medgivandets sparade resurs.',accountMatch:false,complete:false,ambiguous:false,resourcesRead,rows:[]});
    refreshed.push({uid:prior.uid,details});
    if(!await snapshotCurrent()||!(Date.parse(live.access.valid_until)>Date.now()))return stale();
   }

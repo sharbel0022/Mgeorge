@@ -134,6 +134,20 @@
       "when": 1793699045026,
       "tag": "0018_bankgiro_source_readiness",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1793821941028,
+      "tag": "0019_company_boundaries",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1793826000000,
+      "tag": "0020_bank_consent_context",
+      "breakpoints": true
     }
   ]
 }

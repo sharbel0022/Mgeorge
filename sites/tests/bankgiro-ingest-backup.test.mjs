@@ -24,7 +24,7 @@ function snapshot(includeQueue=true){
  return {format:'MG-Sites-backup-1',owner,createdAt:at,tables};
 }
 test('new backups retain both durable Bankgiro tables while a transient lease is excluded',()=>{
- assert.deepEqual(BACKUP_TABLES,extended);
+ assert.deepEqual(BACKUP_TABLES,[...extended,'saas_bank_state']);
  const value=validateSnapshot(snapshot(),owner);
  assert.equal(value.tables.find(t=>t.name==='bankgiro_ingest_jobs').rows[0].report_id,'0000599');
  assert.equal(value.tables.some(t=>t.name==='bankgiro_ingest_leases'),false);
@@ -49,11 +49,13 @@ for(const queue of [false,true])test(`${queue?'current':'legacy'} encrypted bund
  await exportBackupBundle(bucket,run,key,owner,async(path,bytes)=>entries.set(path,bytes));
  const source={list:async()=>[...entries.keys()],get:async path=>entries.get(path)?.slice()??null};
  const verified=await verifyRecoveryBundle(source,key,owner,id);assert.equal(verified.snapshot.tables.length,queue?22:20);
- const directory=mkdtempSync(join(tmpdir(),'mg-bankgiro-backup-'));t.after(()=>rmSync(directory,{recursive:true,force:true}));
+ const directory=mkdtempSync(join(tmpdir(),'mg-bankgiro-backup-'));
+ let sql;
+ t.after(()=>{sql?.close();rmSync(directory,{recursive:true,force:true});});
  const bundle=join(directory,'bundle'),output=join(directory,'restored');mkdirSync(bundle,{mode:0o700});mkdirSync(output,{mode:0o700});mkdirSync(join(bundle,'objects'),{mode:0o700});
  for(const [path,bytes]of entries)writeFileSync(join(bundle,path),bytes,{mode:0o600});
  const restored=await restoreBackupIsolated({bundleDirectory:bundle,outputParent:output,key,expectedOwner:owner,expectedBackupId:id});
- const sql=new DatabaseSync(join(restored.directory,'evidence.sqlite'),{readOnly:true});t.after(()=>sql.close());
+ sql=new DatabaseSync(join(restored.directory,'evidence.sqlite'),{readOnly:true});
  assert.equal(sql.prepare('SELECT count(*) n FROM evidence_bankgiro_ingest_jobs').get().n,queue?1:0);
  assert.equal(sql.prepare('SELECT count(*) n FROM evidence_bankgiro_ingest_leases').get().n,0);
  assert.equal(sql.prepare('SELECT count(*) n FROM evidence_documents').get().n,1);

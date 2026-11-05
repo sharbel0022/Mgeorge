@@ -77,3 +77,12 @@ test('fallback selects SFTP only for a current company-specific approved agreeme
  assert.equal(api.bankgiroEnrichmentFallback({...base,coverage:{status:'available'}}).source,'api');
  assert.match(api.bankgiroEnrichmentFallback(base).message,/Individuell betalningsinformation.*inte tillgänglig/);
 });
+
+test('capture accepts provider-approved absolute next links while preserving their exact raw bytes',()=>{
+ const first=raw(),next=path+'&continuationKey=absolute-next';
+ first.transactions._links.next={href:'https://api.sandbox.openbankingplatform.com'+next};
+ const pages=[{body:JSON.stringify(first),requestPath:path,requestId:'r1',receivedAt:'2026-11-04T18:00:00Z'},{body:body(),requestPath:next,requestId:'r2',receivedAt:'2026-11-04T18:00:01Z'}];
+ const captured=make({pages});assert.equal(captured.pages[0].body,pages[0].body);assert.equal(captured.pages.length,2);
+ first.transactions._links.next.href='https://untrusted.example'+next;
+ assert.throws(()=>make({pages:[{...pages[0],body:JSON.stringify(first)},pages[1]]}),{code:'ACCOUNT_MISMATCH'});
+});

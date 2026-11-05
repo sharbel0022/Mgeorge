@@ -1,5 +1,5 @@
 import {env} from 'cloudflare:workers';
-import {db,readWorkspace,readBankOriginalBytes} from './server';
+import {db,readWorkspace,readBankOriginalBytes,companyBoundaryForOwner} from './server';
 import {applyCommand,emptyState,now,uid,specificationPreview,BankImportEvidenceError,bankImportEvidenceError,prepareBankImportFailure,type State} from './domain';
 import {readBankgiroOriginal} from './bankgiro-service';
 import {parseSpecificationBytes,readOpenPaymentsBankgiroCapture,assertOpenPaymentsBankgiroAuthority} from './bankgiro-parser.js';
@@ -89,16 +89,18 @@ export function createSitesBankgiroSink(){
   if(!current)throw error('AUTHORIZATION_CHANGED','Rapportkällans aktuella behörighet har ändrats. Kontrollera källan igen.');
  }
  function sourceEvidence(input:ImportInput){const {job,authorization}=input;return{jobId:job.id,sourceId:job.sourceId,scopeId:job.scopeId,reportId:job.reportId,authorizationGeneration:authorization.generation,authorizationEvidenceId:authorization.evidenceId};}
- function captureAuthority(input:ImportInput,original:Awaited<ReturnType<typeof readBankOriginalBytes>>,state:State){
+ async function captureAuthority(input:ImportInput,original:Awaited<ReturnType<typeof readBankOriginalBytes>>,state:State){
   if(!/\.opbg\.json$/i.test(original.filename))return null;
   const capture=readOpenPaymentsBankgiroCapture(original.bytes);
   if(capture.reportId!==input.job.reportId)throw error('IDENTITY_CONFLICT','API-originalets rapportidentitet stämmer inte med rapportjobbet.');
-  const receipt=assertOpenPaymentsBankgiroAuthority(capture,input.authorization,{owner:input.owner,companyId:state.company.id,sourceId:input.job.sourceId,scopeId:input.job.scopeId});
+  const boundary=await companyBoundaryForOwner(input.owner);
+  if(!boundary||boundary.storageOwner!==input.owner||boundary.companyId!==state.company.id)throw error('AUTHORIZATION_BLOCKED','Företagets aktuella behörighet krävs.');
+  const receipt=assertOpenPaymentsBankgiroAuthority(capture,input.authorization,{owner:input.owner,companyId:boundary.companyId,sourceId:input.job.sourceId,scopeId:input.job.scopeId});
   return {capture,receipt};
  }
  async function commit(input:ImportInput,original:Awaited<ReturnType<typeof readBankOriginalBytes>>,old:Awaited<ReturnType<typeof readWorkspace>>,state:State,payload:string,action:string,detail:Record<string,unknown>,auditId=uid()){
   checkAuthorization(input);await input.lease.assert();
-  const provider=captureAuthority(input,original,old.state);
+  const provider=await captureAuthority(input,original,old.state);
   if(provider)detail={...detail,enrichmentAuthorization:provider.receipt};
   const {owner,job,documentId,authorization,lease}=input,at=now();
   const originalFence=database.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM documents WHERE owner=? AND id=? AND sha256=? AND filename=? AND mime=? AND size=?) AND EXISTS(SELECT 1 FROM bankgiro_ingest_jobs WHERE id=? AND owner=? AND source_id=? AND scope_id=? AND report_id=? AND sha256=? AND filename=? AND document_id=? AND authorization_generation=? AND registration_binding=? AND status IN ('PENDING','RETRY')) AND EXISTS(SELECT 1 FROM bankgiro_ingest_sources WHERE owner=? AND source_id=? AND scope_id=? AND authorization_generation=? AND authorization_status='VERIFIED') AND julianday(?)>julianday('now') THEN 1 ELSE json('BANKGIRO_ORIGINAL_CHANGED') END").bind(owner,documentId,job.sha256,original.filename,original.mime,original.size,job.id,owner,job.sourceId,job.scopeId,job.reportId,job.sha256,job.filename,documentId,job.authorizationGeneration,job.registrationBinding??'',owner,job.sourceId,job.scopeId,authorization.generation,authorization.validUntil);
@@ -115,7 +117,7 @@ export function createSitesBankgiroSink(){
   if(!await jobStatement(input).first())throw error('IDENTITY_CONFLICT','Rapportjobbet stämmer inte med den sparade leveransidentiteten.');
   const original=await checkedOriginal(owner,documentId);
   if(original.sha256!==job.sha256||original.mime!==mime(job.filename))throw error('HASH_MISMATCH','Det sparade originalet motsvarar inte rapportleveransen.');
-  const old=await readWorkspace(owner),provider=captureAuthority(input,original,old.state);
+  const old=await readWorkspace(owner),provider=await captureAuthority(input,original,old.state);
   let command:Awaited<ReturnType<typeof readBankgiroOriginal>>;
   try{command=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId},{allowApiCapture:true});}
   catch(failure){
@@ -166,9 +168,17 @@ export function createSitesBankgiroSink(){
 }
 
 async function sourceWorker(owner:string){
- const source=await resolveBankgiroSource(owner,{configuration:(env as unknown as Record<string,unknown>).BANKGIRO_SOURCE_CONFIG,secrets:env as unknown as Record<string,unknown>}) as {id:string;mode:string}|null;
+ const source=await resolveBankgiroSource(owner,{configuration:(env as unknown as Record<string,unknown>).BANKGIRO_SOURCE_CONFIG,secrets:env as unknown as Record<string,unknown>}) as {id:string;mode:string;registration?:{owner?:string;companyId?:string};revocation?:{owner?:string;companyId?:string}}|null;
  // An absent or synthetic source must not require D1/R2 or create a lease.
  if(!source||source.mode==='synthetic')return createBankgiroIngest({source,store:null,sink:null});
+ const boundary=await companyBoundaryForOwner(owner);
+ // Removing a trusted registration can only revoke this immutable owner. New
+ // provider access additionally requires the exact verified company identity.
+ const ownRevocation=source.revocation?.owner===owner&&(!Object.hasOwn(source.revocation,'companyId')||source.revocation.companyId===boundary?.companyId);
+ if(boundary&&!ownRevocation&&(source.registration?.owner!==boundary.storageOwner||source.registration?.companyId!==boundary.companyId)){
+  const blocked={enabled:false,sourceId:source.id,mode:source.mode,state:'BLOCKED',reason:'COMPANY_BOUNDARY_MISMATCH',lastError:'COMPANY_BOUNDARY_MISMATCH',nextPollAt:null,missingReportIds:[],counts:{PENDING:0,RETRY:0,IMPORTED:0,REVIEW:0,DUPLICATE:0,BLOCKED:0},jobs:[],authorization:{status:'BLOCKED',verifiedAt:null,validUntil:null}};
+  return{status:async(_owner:string)=>blocked,run:async(_owner:string)=>blocked};
+ }
  return createBankgiroIngest({source,store:createBankgiroIngestStore(db()),sink:createSitesBankgiroSink()});
 }
 export async function bankgiroSourceStatus(owner:string){return publicBankgiroStatus(await(await sourceWorker(owner)).status(owner));}

@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {applyCurrentMigrations} from './helpers/company-compat-fixture.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
@@ -10,7 +11,7 @@ import {bankUtcDate} from '../lib/banking/sync-periods.ts';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const source=path=>readFileSync(new URL(path,import.meta.url),'utf8');
 const url=path=>new URL(path,import.meta.url).href;
-function compiled(path,imports){imports={'./account-read-cooldown':url('../lib/banking/account-read-cooldown.ts'),'./sync-periods':url('../lib/banking/sync-periods.ts'),'../payer-evidence.js':url('../lib/payer-evidence.js'),...imports};let code=stripTypeScriptTypes(source(path),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));return data(code);}
+function compiled(path,imports){imports={'../bank-consent-policy.js':url('../lib/bank-consent-policy.js'),'../bank-company-authority.js':url('../lib/bank-company-authority.js'),'./account-read-cooldown':url('../lib/banking/account-read-cooldown.ts'),'./sync-periods':url('../lib/banking/sync-periods.ts'),'../payer-evidence.js':url('../lib/payer-evidence.js'),...imports};let code=stripTypeScriptTypes(source(path),{mode:'transform'});for(const [name,value]of Object.entries(imports))for(const quote of ['"',"'"])code=code.replaceAll(quote+name+quote,JSON.stringify(value));return data(code);}
 const {reconcileState}=await import(compiled('../lib/reconciliation.ts',{'./domain':url('../lib/domain.ts'),'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')}));
 class LocalD1{
  constructor(sql){this.sql=sql;this.beforeBatch=null;}
@@ -23,15 +24,15 @@ const row=extra=>({entry_reference:'Q8-BANK-1',transaction_amount:{amount:'625.0
 
 async function fixture(t){
  const key='__q8_sync_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
- for(const migration of ['0000_confused_umar','0001_sudden_whirlwind','0002_brief_chronomancer','0012_minor_naoko','0016_agent2_account_read_guard'])sql.exec(source('../drizzle/'+migration+'.sql'));
+ applyCurrentMigrations(sql);
  const DB=new LocalD1(sql),f={sql,DB,rows:[],env:{DB,BANK_DATA_ENCRYPTION_KEY:randomToken(),ENABLE_BANKING_APPLICATION_ID:appId,ENABLE_BANKING_PRIVATE_KEY:'-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',ENABLE_BANKING_ENVIRONMENT:'PRODUCTION',ENABLE_BANKING_KEY_ROTATED:'true'}};
  globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
  t.mock.method(globalThis,'fetch',async()=>{throw Error('Live network is forbidden in synthetic bank tests.');});
  const domain=url('../lib/domain.ts'),security=url('../lib/banking/security.ts'),runtime=url('../lib/banking/runtime-config.ts'),cloudflare=data(`export const env=globalThis[${JSON.stringify(key)}].env;`);
- const server=compiled('../lib/server.ts',{'cloudflare:workers':cloudflare,'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return {userId:${JSON.stringify(owner)}};}`),'./domain':domain});
- const storeUrl=compiled('../lib/banking/store.ts',{'cloudflare:workers':cloudflare,'@/lib/server':server,'./security':security,'./runtime-config':runtime}),store=await import(storeUrl);
+ const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':cloudflare,'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return {userId:${JSON.stringify(owner)}};}`),'./domain':domain});
  const normalizerUrl=compiled('../lib/banking/transactions.ts',{'../domain':domain,'../payment-references.js':url('../lib/payment-references.js')}),normalizer=await import(normalizerUrl);
- const provider=data(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(url('../lib/banking/enable-banking.ts'))};export async function getSession(){return {status:'AUTHORIZED',accounts:[${JSON.stringify(accountUid)}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:globalThis[${JSON.stringify(key)}].validUntil}};}export async function getTransactions(){return {transactions:globalThis[${JSON.stringify(key)}].rows};}export async function getApplication(){}export async function listBusinessBanks(){}export async function startAuth(){}export async function createSession(){}export async function deleteSession(){}`);
+ const storeUrl=compiled('../lib/banking/store.ts',{'cloudflare:workers':cloudflare,'@/lib/server':server,'./security':security,'./runtime-config':runtime,'./transactions':normalizerUrl}),store=await import(storeUrl);
+ const provider=data(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(url('../lib/banking/enable-banking.ts'))};export async function getSession(){return {status:'AUTHORIZED',accounts:[${JSON.stringify(accountUid)}],accounts_data:[{uid:${JSON.stringify(accountUid)}}],aspsp:{name:'Swedbank',country:'SE'},psu_type:'business',access:{valid_until:globalThis[${JSON.stringify(key)}].validUntil}};}export async function getTransactions(){return {transactions:globalThis[${JSON.stringify(key)}].rows};}export async function getApplication(){}export async function listBusinessBanks(){}export async function startAuth(){}export async function createSession(){}export async function deleteSession(){}`);
  const readGuard=compiled('../lib/banking/account-read-guard.ts',{'../server':server,'./store':storeUrl,'./enable-banking':provider});
  const service=compiled('../lib/banking/service.ts',{'@/lib/server':server,'@/lib/domain':domain,'./store':storeUrl,'./security':security,'./runtime-config':runtime,'./transactions':normalizerUrl,'./enable-banking':provider,'./account-read-guard':readGuard,'../customer-messages':data('export async function reconcileAndPrepare(){throw Error("Rejected imports cannot run reconciliation");}')});
  const route=await import(compiled('../app/api/bank/sync/route.ts',{'@/lib/banking/service':service}));

@@ -1,4 +1,5 @@
 /** Original-preserving adapter for the shared source queue. No reconciliation is run here. */
+import {readCompanyDatabaseBoundary} from './company-runtime.js';
 import {randomUUID} from 'node:crypto';
 import {digest} from './security.js';
 import {parseBankFile} from './importers.js';
@@ -67,7 +68,9 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
      const original=assertOriginal();
      const capture=readOpenPaymentsBankgiroCapture(original.content);
      if(capture.reportId!==job.reportId)throw blocked('IDENTITY_CONFLICT');
-     const receipt=assertOpenPaymentsBankgiroAuthority(capture,authorization,{owner,companyId:getSettings(db).company_id,sourceId:job.sourceId,scopeId:job.scopeId,now:now()});
+     const boundary=readCompanyDatabaseBoundary(db);
+     if(boundary&&boundary.storageOwner!==owner)throw blocked('AUTHORIZATION_BLOCKED');
+     const receipt=assertOpenPaymentsBankgiroAuthority(capture,authorization,{owner,companyId:boundary?boundary.companyId:getSettings(db).company_id,sourceId:job.sourceId,scopeId:job.scopeId,now:now()});
      return {original,capture,receipt};
     };
     assertCapture();

@@ -1,3 +1,4 @@
+import {applyCurrentMigrations} from './helpers/company-compat-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
@@ -15,17 +16,17 @@ const {reconcileState}=await import(reconciliation);
 const original=Buffer.from('%PDF-Synthetic reviewed invoice 0599, total 625.00 SEK'),hash=createHash('sha256').update(original).digest('hex');
 async function fixture(t,{amount=62500,mode='intact',generic=false}={}){
  const owner='synthetic-auto-owner',key='__auto_payment_'+crypto.randomUUID().replaceAll('-',''),sql=new DatabaseSync(':memory:');
- sql.exec('CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT);');
+ applyCurrentMigrations(sql);
  const DB={prepare(statement){return{bind(...values){return{async first(){return sql.prepare(statement).get(...values)||null;}};}};}};
  const objects=new Map([[owner+'/invoice-original',original]]);
  if(mode==='missing')objects.clear();if(mode==='tampered')objects.set(owner+'/invoice-original',Buffer.from('%PDF-Synthetic reviewed invoice 0599, total 626.00 SEK'));
- sql.prepare('INSERT INTO documents VALUES(?,?,?,?,?,?)').run('invoice-original',mode==='foreign'?'another-owner':owner,'invoice.pdf','application/pdf',original.length,hash);
+ sql.prepare('INSERT INTO documents(id,owner,filename,mime,size,sha256,created_at) VALUES(?,?,?,?,?,?,?)').run('invoice-original',mode==='foreign'?'another-owner':owner,'invoice.pdf','application/pdf',original.length,hash,'2026-11-04');
  globalThis[key]={env:{DB,BUCKET:{async get(id){const bytes=objects.get(id);return bytes?{size:bytes.length,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)}:null;}}}};
  t.after(()=>{sql.close();delete globalThis[key];});
  let state=emptyState();if(generic)state.company.name='Synthetic Reference Issuer AB';
  state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',number:'0599',ocr:'0599',party:'Synthetic customer AB',total:62500,currency:'SEK',issued:'2026-10-01',due:'2026-10-30',reviewed:true,documentId:mode==='no-document'?'':'invoice-original'}}).state;
  state.transactions=[syntheticBankTransaction({id:'synthetic-payment',amount,party:'Synthetic customer AB',payerReference:'0599',kind:'payment',verified:true,date:'2026-10-26'})];
- const server=compiled('../lib/server.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/app/chatgpt-auth':data('export async function getChatGPTUser(){throw Error("No auth call expected");}'),'./domain':domain});
+ const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/app/chatgpt-auth':data('export async function getChatGPTUser(){return {userId:"synthetic-auto-owner"};}'),'./domain':domain});
  const evidence=await import(compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':engine,'./bankgiro-service':data('export async function bankgiroAutomaticAccountIssue(){return "";}')}));
  return {state,owner,evidence,objects};
 }

@@ -1,5 +1,10 @@
 # MG Fakturakoll — shared integration contract
 
+SaaS proposal for Agent 8: [multi-company foundation](saas/multitenancy.md),
+[versioned company contracts](saas/contracts.md), and [handoff](saas/agent-8-handoff.md).
+This separate branch proposes `mgeorge-saas-v1` / `mgeorge-integration-v2`;
+the released edition below is unchanged until reviewed integration.
+
 Current combined delivery: [final receipt](../MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md). Producer contracts below remain versioned; current source/active-allocation safety bridges are covered by the joined acceptance and delivery ledger.
 
 Contract edition: **`mgeorge-integration-v1`**. Runtime architecture baseline:
