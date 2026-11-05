@@ -369,3 +369,52 @@ for(const defect of ['previous lease receipt','missing history','changed origina
   const after=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(after.state,'failed');assert.equal(after.extraction,receipt);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
 });
+
+
+async function realIngressWorker(t,f){
+  const key='__ocr_ingress_'+crypto.randomUUID().replaceAll('-','');
+  globalThis[key]=f;t.after(()=>{delete globalThis[key];});
+  const reference='globalThis['+JSON.stringify(key)+']';
+  let source=ts.transpileModule(readFileSync(new URL('../lib/server.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
+  const imports={
+    'cloudflare:workers':data('export const env={};'),
+    '@/app/chatgpt-auth':data('export async function getChatGPTUser(){return null;}'),
+    './domain':new URL('../lib/domain.ts',import.meta.url).href,
+    './company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,
+  };
+  for(const [from,to] of Object.entries(imports))for(const quote of ['"',"'"])source=source.replaceAll(quote+from+quote,JSON.stringify(to));
+  const {withCompanyRequest}=await import(data(source));
+  let route=ts.transpileModule(readFileSync(new URL('../app/api/ocr-worker/[action]/route.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
+  const worker=data('const f='+reference+';export const workerAction=(...args)=>{f.ingressDispatches++;return f.processing.workerAction(...args);};');
+  route=route.replace("'@/lib/document-processing'",JSON.stringify(worker));
+  const handle=withCompanyRequest((await import(data(route))).POST);f.ingressDispatches=0;
+  return body=>handle(new Request('https://synthetic.example/api/ocr-worker/complete',{method:'POST',headers:{Authorization:'Bearer '+f.env.DOCUMENT_WORKER_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)}));
+}
+
+test('OCR completion accepts valid multibyte text through the real route and company ingress',async t=>{
+  const f=await fixture(t);await f.document('utf8-completion');const job=await f.lease();
+  const original=Buffer.from(f.objects.get(f.owner+'/'+job.id));
+  const complete=await realIngressWorker(t,f),body={...job,text:'漢'.repeat(120000),method:'ocr',confidence:90};
+  const raw=JSON.stringify(body);assert.ok(raw.length<350000&&Buffer.byteLength(raw)>350000&&Buffer.byteLength(raw)<600000);
+  const result=await complete(body);assert.equal(result.status,200);assert.equal((await result.json()).state,'needs_review');
+  assert.equal(f.ingressDispatches,1,'Exactly one completion reaches the existing worker handler');
+  assert.equal(f.sql.prepare('SELECT state FROM document_jobs WHERE document_id=?').get(job.id).state,'needs_review');
+  assert.deepEqual(f.objects.get(f.owner+'/'+job.id),original,'The retained original is unchanged');
+});
+
+test('OCR completion keeps the finite 600000-byte ingress ceiling before worker dispatch',async t=>{
+  const f=await fixture(t),complete=await realIngressWorker(t,f);
+  const body={text:'漢'.repeat(200000)};assert.ok(Buffer.byteLength(JSON.stringify(body))>600000);
+  const result=await complete(body);assert.equal(result.status,413);assert.equal((await result.json()).code,'REQUEST_BODY_TOO_LARGE');
+  assert.equal(f.ingressDispatches,0);
+});
+
+for(const [name,extra,status] of [
+  ['OCR text characters',{text:'x'.repeat(150001)},400],
+  ['raw JSON characters',{padding:'x'.repeat(350000)},413],
+])test('OCR ingress preserves the existing domain limit for '+name,async t=>{
+  const f=await fixture(t);await f.document('domain-limit');const job=await f.lease(),complete=await realIngressWorker(t,f);
+  const result=await complete({...job,text:'Synthetic OCR',method:'ocr',confidence:90,...extra});
+  assert.equal(result.status,status);assert.equal(f.ingressDispatches,1,'The unchanged domain validator rejects this finite request');
+  assert.equal(f.sql.prepare('SELECT state FROM document_jobs WHERE document_id=?').get(job.id).state,'processing');
+});

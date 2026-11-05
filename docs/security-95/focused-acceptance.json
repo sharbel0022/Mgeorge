@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "sourceCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "sourceCommit": "cc50423315ba506f4e9f2cd8e5c5ef089dbe6269",
   "workingTreeDirty": true,
   "node": "v24.22.1",
-  "startedAt": "2026-11-05T18:00:06.782Z",
+  "startedAt": "2026-11-05T18:48:30.805Z",
   "scope": "Actual three-company Node SQLite partitions and Sites D1/R2 role boundaries; company switching/cache fencing; Open Payments lifecycle, expired consent recovery, durable sync and Bankgiro originals; real onboarding snapshot; isolated backup recovery; 1/10/100-tenant durable runner scale. Synthetic data only.",
   "tenantRoleCoverage": {
     "minimumCompanies": 3,
@@ -63,8 +63,8 @@
       "passed": true,
       "exitCode": 0,
       "signal": null,
-      "tests": 331,
-      "pass": 331,
+      "tests": 332,
+      "pass": 332,
       "fail": 0,
       "cancelled": 0,
       "skipped": 0,
@@ -115,15 +115,15 @@
       "passed": true,
       "exitCode": 0,
       "signal": null,
-      "tests": 767,
-      "pass": 767,
+      "tests": 805,
+      "pass": 805,
       "fail": 0,
       "cancelled": 0,
       "skipped": 0,
       "todo": 0
     }
   ],
-  "finishedAt": "2026-11-05T18:03:58.085Z",
+  "finishedAt": "2026-11-05T18:51:26.070Z",
   "regressionPassed": true,
   "productionAcceptance": "NOT_VERIFIED"
 }

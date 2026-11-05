@@ -55,21 +55,22 @@ Det nya underlaget kompletterar tidigare daterade kvitton. Parallellt main-arbet
 ## Agent 7 — säkerhet och driftsäkerhet, 2026-11-05
 
 [Rapport och kvarstående risker](docs/SECURITY-95-REVIEW.md) gäller
-`feature/95-security` från den integrerade basen `4ad205b`. Syntetiska
+[PR #54](https://github.com/sharbel0022/Mgeorge/pull/54),
+`feature/95-security`, efter integration av `bf24a3c`. Syntetiska
 förbättringar styrker inte ensamma 9,5/10 i drift. **Alla 33 poäng är
 oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
 
 | Område | Före | Efter | Nytt verifierat bevis | Kvarstående gräns |
 | --- | ---: | ---: | --- | --- |
-| 29. Säkerhetskopiering | 7,5 | 7,5 | Producent och recovery kräver samma UUID-format; två RED/GREEN-fall stoppar oåterställbara snapshots före R2-skrivning och bevarar original. | Ingen ny fullständig produktionsbackup-/offsite-/nyckelkontroll. |
+| 29. Säkerhetskopiering | 7,5 | 7,5 | Producent och recovery kräver samma UUID-format; två RED/GREEN-fall stoppar oåterställbara snapshots före R2-skrivning. Krypterad kontrollDB-backup återställs med oförändrad loginspärr; källdatabas och giltigt arkiv bevaras byteidentiska. | Ett företagssnapshot bevisar inte kontrollDB-täckning. Ingen ny operativ fullständig backup-/offsite-/nyckelkontroll. |
 | 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Beständig atomisk loginbudget, ingress före kloning, accepterade auditprojektioner, återtestade tenant/session/OAuth-gränser och oberoende review. | Produktionsingress, nyckelrotation och dataskyddslivscykel är inte verifierade; äldre Node-token-AAD och övergripande trafikskydd kvarstår. |
-| 31. Katastrofåterställning | 5,5 | 5,5 | Isolerade syntetiska corruption-/restore-/restart-/leasefall i fullsviterna; formatfelet rättat utan att ändra produktionskopior. | Aktuell fullständig återställning, oberoende kopia/nyckel och uppmätt RPO/RTO saknar nytt operativt kvitto. |
-| 32. Kodkvalitet och tester | 8,5 | 8,5 | 1 905 + 3 776 + 47 = 5 728 pass, 0 fail/skip/cancel/TODO; 26 nya regressioner. Syntax173, typer, build, exakta beroendebytes och high-audits godkända. Testbarn ärver inte operatörens Node-startflaggor. | Åtta moderate utvecklingspaketposter för en mitigierad advisory; repo-mergekrav overifierade genom den tillgängliga integrationen. Lokal Node24 är separat från Node22-CI. |
+| 31. Katastrofåterställning | 5,5 | 5,5 | Nya isolerade kontrollDB-restore-/felnyckel-/korruptionsbevis och befintliga omstarts-/leasefall; original och ekonomisk historik bevaras. | Aktuell återställning från verklig produktionsbackup, separat tillgänglig nyckel, tjänsteaktivering och fullständigt RPO/RTO saknar nytt operativt kvitto. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | 2 004 + 3 870 + 47 = 5 921 pass, 0 fail/skip/cancel/TODO; 27 nya regressioner. Syntax183, typer, build, exakta beroendebytes och high-audits godkända. Testbarn ärver inte NODE_OPTIONS; bankfixturen använder 76,94 % lägre uppmätt max-RSS utan ändrade assertions. | Åtta moderate utvecklingspaketposter för en mitigierad advisory; repo-mergekrav overifierade. Lokal Node24 och Node22-CI redovisas separat. Ursprungliga filprocessavbrotts exakta signal är okänd. |
 
-[Maskinläsbart grindkvitto](docs/security-95/gates.json) binder resultat till
-källfingeravtryck och dokumenterar omkörningen av Sites efter en audit-
-kompatibilitetsrättning. Fokuserade 1 098 och oberoende 81 tester överlappar
-fullsviterna. Inga produktions-/bank-/juridiska godkännanden härleds ur dem.
+[Maskinläsbart grindkvitto](docs/security-95/gates.json) binder resultaten till
+källfingeravtryck och behåller misslyckade försök med deras förklaringar.
+Fokuserade 1 137 och oberoende testkörningar överlappar fullsviterna.
+Inga produktions-/bank-/juridiska godkännanden härleds ur dem.
 
 ## Agent 3 — fakturatolkning och OCR-kö, 2026-11-05
 

@@ -21,7 +21,9 @@ const boundedRequests=new WeakSet<Request>();
 function boundedRequest(req:Request):Request{
  const path=new URL(req.url).pathname;
  if(boundedRequests.has(req)||['GET','HEAD'].includes(req.method)||!path.startsWith('/api/')&&path!=='/mcp')return req;
- const max=path==='/api/files'?16_000_000:path==='/api/state'?1_500_000:path==='/api/ocr-worker/complete'?350_000:65_536;
+ // OCR's route already caps transport bytes at 600k; its smaller JSON/text
+ // character limits remain in the worker validator and must allow UTF-8 input.
+ const max=path==='/api/files'?16_000_000:path==='/api/state'?1_500_000:path==='/api/ocr-worker/complete'?600_000:65_536;
  const length=req.headers.get('content-length');
  if(length!==null&&(!/^\d+$/.test(length)||!Number.isSafeInteger(Number(length)))){
   throw denied('REQUEST_BODY_INVALID',400);

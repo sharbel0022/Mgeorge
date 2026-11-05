@@ -51,7 +51,8 @@ The full Node gate's application, test and shared-library inputs did not change
 during this Sites-route-only correction. The before/after source manifests
 differ only at `sites/app/api/state/route.ts`. The focused acceptance runner
 subsequently ran on the final source manifest. Exact command receipts and
-source fingerprints are recorded in [gates.json](gates.json).
+source fingerprints are retained in
+[first-candidate-gates.json](first-candidate-gates.json).
 
 Real Next/Cloudflare transport, provider-specific Request properties,
 production identities and bank/provider calls were not exercised by this
@@ -89,3 +90,121 @@ a general SQL sandbox; the privacy policy is a draft in inspected source rather
 than a newly verified live publication; and H1–H3 are operational evidence gaps,
 not demonstrated exploitable High vulnerabilities. The older Node token helper's
 lack of AAD is scoped separately from context-bound backup/provider formats.
+
+## Integration review after main PR #48
+
+The coordinator integrated `bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee`.
+The locally reviewed merge `5f2e5878f81e9e9c6010c487084d1c7ffc7720b0`
+and initially published commit `cc50423315ba506f4e9f2cd8e5c5ef089dbe6269`
+have the same Git tree, `cc066d47bcbe12b8cc30b737e399fa781f27d903`.
+Publication through the repository connector changed commit metadata, not
+file contents. The pre-integration review above retains its original scope.
+
+The integration reviewer found no new confirmed Critical, High or Medium
+defect. Request-budget failures still propagate before effects, while the new
+`/api/bank/revalidate` route and `bank_revalidate_consent` MCP tool require
+`manage_integrations`. The coordinator extended the existing accountant-denial
+regression and ran the combined budget/company-request selection: 32/32 pass.
+
+The reviewer separately inspected the integrated revalidation service,
+account-read guard and runtime configuration. Revalidation preserves legacy
+owner scope, rejects company/adoption misuse, checks authority before provider
+work and commit, and cannot expand authorized accounts or create financial
+records. Concurrent cooldowns and durable consent receipts remain fenced.
+A lost commit reply is checked against the durable owner-bound receipt; an
+unreadable result remains unknown. Canonical callback configuration requires
+the expected HTTPS origin/path and provider registration. These observations
+are code-review results, not live provider or deployment tests.
+
+The reviewer's first combined run of budget/company/banking tests ended with
+164 passing cases and a generic banking-security file-process failure; it is
+not counted as a passing run. A separate TAP run of all 168 banking-security
+cases then passed with zero fail/skip/cancel/TODO. The coordinator's full
+Sites run reproduced a generic file failure, so a separate instrumentation
+pass was requested instead of treating the isolated success as a full gate.
+The final report records that investigation and the eventual source-specific
+full-suite results.
+
+### Production OCR trigger inherited from main
+
+The supply-chain reviewer inspected the exact main versions of
+`.github/workflows/sites-cloud-ocr.yml`,
+`scripts/verify-cloud-ocr-trigger.mjs` and `test/cloud-ocr-trigger.test.js`.
+Its own syntax check and **43/43 synthetic trigger cases** passed.
+
+The new `workflow_run` path requires successful CI for a same-repository
+`push` to `main`, matching the checked SHA, with two fresh main-ref preflights.
+Checkout is SHA-pinned and no PR/fork artifact is consumed. OCR credentials
+appear only in the execution step; preflight uses a read-only GitHub token.
+Schedule/manual paths retain main/flag/fresh-ref requirements but do not
+require a preceding successful CI run. Preflight does not lock the branch
+through later execution. No live workflow was dispatched by this review.
+Repository policy enforcement remains unverified independently of workflow
+source review.
+
+### Search and recovery changes inherited from main
+
+The risk/report reviewer examined the new workspace search and recovery drill
+without editing files or running additional tests. Search uses bounded text
+processing with fixed regular expressions, 512-character/32-term query limits,
+escaped Node text and React text rendering. The inspected paths do not build
+SQL, dynamic regular expressions, HTML or network destinations from the query.
+The Sites workspace boundary invalidates old company state and cached search
+results on company transitions; this static review is not exhaustive browser
+testing.
+
+The new recovery drill uses temporary synthetic keys and data, checks original
+hashes and relational/authority invariants, and explicitly reports
+`productionRestoreTested: false`. Its measured recovery interval begins after
+the package is local; it does not measure independent key retrieval, backup
+download or real service activation. The evidence in
+[`docs/quality8/recovery-evidence.md`](../quality8/recovery-evidence.md)
+therefore does not close H1, even where synthetic row or byte counts match a
+historical production observation. No new production data was read here.
+
+## Final fixture-representation review
+
+The independent reviewer read the complete proposed change to
+`sites/tests/banking-security.test.mjs` and its static/dynamic import mappings.
+Verdict: **READY with limits**, no confirmed Critical/High/Medium finding.
+`git apply --check` passed. This review did not modify files or execute tests.
+
+SHA-256 content identity preserves the existing reuse of identical modules,
+while the fixture-specific global keys continue to distinguish Cloudflare,
+identity, provider, server, store, service and MCP instances. Absolute import
+mappings remain intact. `.mjs` and `pathToFileURL()` avoid dependence on the
+temporary directory's package type or platform path syntax.
+
+The unique temporary directory and exclusive mode-0600 writes prevent
+accidental overwrite. Suite teardown runs after test completion; existing
+per-test global-state/SQLite cleanup and network replacement are unchanged.
+The generated modules reference fixture objects by their global identifiers;
+runtime keys, database contents and provider results are not serialized into
+those files. File/import/cleanup failures remain visible test failures.
+
+The diagnostic worker then ran all 168 original banking tests, with zero
+fail/cancel/skip/TODO, verified byte-identical test bodies/assertions, measured
+lower RSS and observed directory/file permissions and cleanup on Linux.
+This is separate execution evidence from the static reviewer. Windows and
+abrupt-kill cleanup were not exercised. The exact cause/signal of the original
+generic file-process failures remains unverified.
+
+## Added isolated control-database recovery coverage
+
+The recovery worker added one integrated case to
+`test/security-login-rate-limit.test.js`, using real production backup,
+authenticated-encryption, verification and restore functions with synthetic
+data and a new temporary destination. It verifies the exact retained login
+window, rejection one second before expiry, admission at expiry, rejection of
+a wrong key/modified ciphertext before destination creation, and unchanged
+source/valid archive bytes. The complete login file passed 6/6 under the
+sanitized environment and network guard; no original assertions or production
+files changed. [The execution receipt](control-recovery.json) records times,
+command, source hashes and the log digest. This additional coverage passed on
+its first run and is not described as a newly reproduced production bug.
+
+The coordinator reread the diff and verified its scope. The test explicitly
+backs up the control database. Scheduled company backups select the company
+database path, so this test does not prove that operational backups include
+both company partitions and the separate control database. H1 includes that
+inventory and real independent recovery requirement.
