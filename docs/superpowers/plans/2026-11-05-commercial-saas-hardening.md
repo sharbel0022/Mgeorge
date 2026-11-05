@@ -43,7 +43,7 @@
 
 **Interfaces:** Keep authoritative `CompanyContext`, `RequestDb` and current-context guards; public clients cannot choose a storage owner.
 
-- [x] Trace all API route families and owner/object access through company context and current permissions; record all 41 API files plus MCP in the inventory.
+- [x] Trace all API route families and owner/object access through company context and current permissions; after integrating concurrent main `bf24a3c`, record all 42 API files plus MCP and the new legacy-only revalidation path.
 - [x] Assess concrete findings: no new Sites boundary bypass was reproduced; lifecycle findings are handled in Task 3.
 - [x] Run existing D1/R2/route and migration acceptance tests without speculative boundary rewrites.
 - [x] Verify existing stale-membership/company-selection and late-response guards through source review and acceptance tests.
@@ -69,4 +69,4 @@
 - [x] Write sourced conditional requirements for providers, permissions, GDPR, financial regulation and operations.
 - [x] Run root syntax/tests/audit, Sites types/tests/audit/build/mitigation check and bridge syntax/tests/audit: 1,905 Node + 3,769 Sites + 47 bridge = 5,721 passed, no failures/skips/cancellations/TODO. Source fingerprints and earlier failed environment attempts are preserved in the verification receipt.
 - [x] Independently review the changed application/test diff and audit both tenant architectures; repair the one Important browser-recovery finding with an actual client-contract regression. The final expanded targeted suite passes 60 tests.
-- [ ] Commit and push only the requested branch, create a PR against `main`, and report exact verification and remaining launch blockers.
+- [x] Commit and publish only the requested branch and open [PR #50 against main](https://github.com/sharbel0022/Mgeorge/pull/50). The uploaded Git tree is checked against the local tree. Integrate concurrent main `bf24a3c` on this branch and distinguish its combined-code checks from the earlier complete local suites; exact final CI is linked from the PR. Commercial launch remains blocked by the documented external requirements.

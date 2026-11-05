@@ -1,4 +1,4 @@
-import { db, identity, readWorkspace, response } from '@/lib/server';
+import { db, identity, readWorkspace, response, currentCompanyContext } from '@/lib/server';
 import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, uid, validDate } from '@/lib/domain';
 import {
   ProviderError, providerErrorCode, getApplication, listBusinessBanks, startAuth, createSession,
@@ -10,12 +10,12 @@ import {
   accounts, application, connection, encrypt, metadata, providerConfig, configurationStatus, saveApplicationMetadata,
   sessionId, storageReady, withBankLock, type BankConnectionRow, type BankFlowRow, type BankLease,
   bankCompanyContext, corporateAccountEvidence, consentMetadata, currentCompanyAuthorization, assertCompanyConsent,
-  revocationSessionId, type ConsentMetadata,
+  revocationSessionId, bankRedirectUrl, type ConsentMetadata,
 } from './store';
 import { cookieValue, digest, randomToken, validFlowToken } from './security';
 import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
-import { mergeAccountReadCooldown } from './account-read-cooldown';
+import { accountReadCooldown, mergeAccountReadCooldown } from './account-read-cooldown';
 import { guardedBankRead } from './account-read-guard';
 import { ConsentError, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection } from '../bank-consent-policy.js';
 
@@ -43,7 +43,7 @@ async function assertFlowActor(flow: BankFlowRow, context: FlowContext | null) {
 }
 function flowCookie(stateHash: string) { return `${COOKIE}-${stateHash.slice(0, 32)}`; }
 
-export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
+export { BANK_REDIRECT_URL } from './runtime-config';
 const COOKIE = '__Secure-mg-bank-flow';
 const FLOW_AGE_MS = 15 * 60_000;
 const POSTPROCESS_WARNING='Bankhändelserna är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
@@ -109,6 +109,7 @@ export function bankFailure(error: unknown): Response {
   const code = error instanceof Error ? error.message : '';
   if (code === 'AUTH_REQUIRED') return response({ error: 'Logga in med ChatGPT för att hantera din bankanslutning.', signIn: '/signin-with-chatgpt?return_to=%2Fbank' }, 401);
   if (code === 'ORIGIN_DENIED') return response({ error: 'Åtgärden måste startas från MG Fakturakoll.' }, 403);
+  if (code === 'BANK_CONSENT_OUTCOME_UNKNOWN') return response({error:'Bankkontrollen kan ha sparats, men resultatet kunde inte bekräftas. Uppdatera anslutningens status innan du försöker igen.',code,status_unknown:true},503);
   if (code === 'BANK_LEASE_LOST') return response({ error: 'Bankkörningens lås har löpt ut. Uppgifterna från det försenade svaret sparades inte.' }, 409);
   if (code === 'BANK_BUSY') return response({ error: 'En bankåtgärd pågår redan. Vänta tills den är klar innan du försöker igen.' }, 409);
   if (code === 'BANK_STORAGE_UNAVAILABLE') return response({ error: 'Säker lagring för bankanslutningen är inte konfigurerad ännu.' }, 503);
@@ -165,13 +166,13 @@ function maskAccount(account: ProviderAccount, bank: {name: string; country: str
   return [account.name?.slice(0, 80) || 'Bankkonto', ending ? `•••• ${ending}` : 'kontonummer saknas'].join(' · ');
 }
 
-function safeApplication(app: ProviderApplication) {
-  return { name: app.name, environment: app.environment, active: app.active, redirectConfigured: app.redirect_urls.includes(BANK_REDIRECT_URL) };
+function safeApplication(app: ProviderApplication, redirectUrl: string | null) {
+  return { name: app.name, environment: app.environment, active: app.active, redirectConfigured: !!redirectUrl&&app.redirect_urls.includes(redirectUrl) };
 }
 
 async function checkedApplication(row: NonNullable<Awaited<ReturnType<typeof application>>>, requireActive = true, lease?: BankLease) {
   const info = await getApplication(await providerConfig(row));
-  if (info.kid !== row.application_id || info.environment !== metadata(row).environment || !info.services.includes('AIS') || !info.countries.includes('SE') || !info.redirect_urls.includes(BANK_REDIRECT_URL)) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Kontrollera registrerad miljö, svensk läsåtkomst och returadress hos Enable Banking.', 409);
+  if (info.kid !== row.application_id || info.environment !== metadata(row).environment || !info.services.includes('AIS') || !info.countries.includes('SE') || !info.redirect_urls.includes(bankRedirectUrl())) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Kontrollera registrerad miljö, svensk läsåtkomst och returadress hos Enable Banking.', 409);
   await saveApplicationMetadata(row, info, lease);
   if (requireActive && !info.active) throw new BankError('Banktjänsten behöver aktiveras av systemadministratören. Enable Banking har ännu inte godkänt applikationen.', 409);
   return info;
@@ -203,6 +204,11 @@ export async function status(request: Request): Promise<Response> {
   const requiresRestart = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && !context;
   const expiredFlow = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && (Date.parse(latestFlow.expires_at) <= Date.now() || requiresRestart);
   const workspace = await readWorkspace(company.storageOwnerId);
+  let redirectUrl:string|null=null;
+  try{redirectUrl=bankRedirectUrl();}catch{/* A bad callback must not hide the existing connection's read-only status. */}
+  const originMatches=!!redirectUrl&&new URL(redirectUrl).origin===new URL(request.url).origin;
+  const callback={originMatches,canStartAuthorization:originMatches,
+    reason:!redirectUrl?'Bankens returadress behöver konfigureras av administratören.':!originMatches?'Bankens returadress hör till en annan webbplats. Administratören behöver ange den här webbplatsens godkända returadress och registrera samma adress hos Enable Banking.':null};
   return response({
     company: { id: company.companyId, name: workspace.state.company.name, canManageBank: ['owner','admin'].includes(company.role), membershipMode: company.membershipVersion==='legacy-owner-v1'?'legacy_workspace':'company' },
     consentFlow: latestFlow ? { id: context?.flowId ?? null, companyId: context?.companyId ?? company.companyId,
@@ -210,8 +216,8 @@ export async function status(request: Request): Promise<Response> {
       reason: requiresRestart ? 'CONSENT_RESTART_REQUIRED' : expiredFlow ? latestFlow.status === 'pending' ? 'CALLBACK_NOT_RECEIVED' : 'AUTHORIZATION_OUTCOME_UNKNOWN' : latestFlow.result_code || null,
       connectionId: latestFlow.connection_id || null } : null,
     storageReady: storageReady(), configured: Boolean(app), activation: configurationStatus(),
-    application: app ? safeApplication(metadata(app)) : null,
-    redirectUrl: BANK_REDIRECT_URL, syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',
+    application: app ? safeApplication(metadata(app),redirectUrl) : null,
+    redirectUrl, callback, syncMode: conn?.auto_sync_enabled === 1 ? 'automatic' : 'manual',
     automatic: { enabled: conn?.auto_sync_enabled === 1, intervalHours: 6, lastAttemptAt: conn?.auto_last_attempt_at ?? null, nextAttemptAt: conn ? automaticDueAt(conn) : null, blocked: (conn?.sync_failures||0)>=3, failures:conn?.sync_failures||0 },
     connection: conn ? {
       id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: conn.encrypted_session && (!app || conn.app_generation !== app.generation) ? 'reauth_required' : needsAuthority && !['disconnected','revocation_pending','expired'].includes(storedStatus(conn)) ? 'corporate_authorization_required' : visibleConnectionStatus,
@@ -267,6 +273,8 @@ export async function connect(request: Request): Promise<Response> {
   const user = await identity(request), body = await jsonBody(request), from = dateFrom(body.dateFrom);
   checkedKeys(body, ['companyId', 'bankName', 'country', 'dateFrom', 'requiredScopes', 'renewConnectionId']);
   const company = bankCompanyContext(user.userId, body.companyId);
+  const redirectUrl=bankRedirectUrl();
+  if(new URL(request.url).origin!==new URL(redirectUrl).origin)throw new BankError('Bankens returadress hör till en annan webbplats. Administratören behöver uppdatera och registrera rätt returadress innan du ansluter banken.',409);
   const requiredScopes = validateReadScopes(body.requiredScopes);
   if (requiredScopes.includes('bankgiro:read')) throw new ConsentError('BANKGIRO_SCOPE_UNAVAILABLE', 409);
   if (body.renewConnectionId !== undefined && (typeof body.renewConnectionId !== 'string' || !body.renewConnectionId || body.renewConnectionId.length > 200)) throw new BankError('Välj anslutningen som ska förnyas.');
@@ -295,10 +303,10 @@ export async function connect(request: Request): Promise<Response> {
     await lease.write([
       db().prepare('DELETE FROM bank_auth_flows WHERE owner=? AND expires_at<?').bind(user.userId, new Date(Date.now() - 86400_000).toISOString()),
       db().prepare(`INSERT INTO bank_auth_flows (state_hash,owner,cookie_hash,app_generation,bank_name,country,environment,redirect_uri,date_from,expires_at,status,created_at,context_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-        .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, BANK_REDIRECT_URL, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at, JSON.stringify(context)),
+        .bind(stateHash, user.userId, await digest(cookie), app.generation, bank.name, bank.country, info.environment, redirectUrl, from, new Date(Date.now() + FLOW_AGE_MS).toISOString(), 'pending', at, JSON.stringify(context)),
     ]);
     try {
-      const result = await startAuth(config, { bank: { name: bank.name, country: bank.country }, state, redirectUrl: BANK_REDIRECT_URL, validUntil });
+      const result = await startAuth(config, { bank: { name: bank.name, country: bank.country }, state, redirectUrl, validUntil });
       await lease.assert();
       if ((await identity()).userId !== user.userId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
       return Response.json({ url: result.url, companyId: company.companyId, flowId: context.flowId, requiredScopes, authorization: 'provider_redirect', pkce: 'not_exposed_by_adapter' }, { headers: { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer', 'Set-Cookie': `${flowCookie(stateHash)}=${cookie}; Path=/api/bank/callback; Secure; HttpOnly; SameSite=Lax; Max-Age=900` } });
@@ -595,6 +603,90 @@ export async function automaticSyncStatus(): Promise<Response> {
   return response({ enabled: conn?.auto_sync_enabled === 1, connected: !!conn && storedStatus(conn) === 'connected', intervalHours: 6,
     lastSyncedAt: conn?.last_synced_at ?? null, lastAttemptAt: conn?.auto_last_attempt_at ?? null,
     nextAttemptAt: conn ? automaticDueAt(conn) : null, lastError: conn?.last_error ?? null, blocked:(conn?.sync_failures||0)>=3, failures:conn?.sync_failures||0,postprocessWarning:run&&JSON.parse(run.warnings).includes(POSTPROCESS_WARNING)?POSTPROCESS_WARNING:null });
+}
+
+/** Check the retained legacy grant after a local validation failure. This is
+ * an explicit owner action, never an automatic bypass of a reconnect state.
+ * Only a fresh provider-confirmed session can restore the existing selection;
+ * no account, schedule, invoice or payment is created/changed. The retained
+ * expiry may only be shortened to the bank's current earlier deadline. */
+export async function revalidateConsent(request?: Request): Promise<Response> {
+  const user=await identity(request),body=request?await jsonBody(request):{};
+  checkedKeys(body,['companyId']);bankCompanyContext(user.userId,body.companyId);
+  const owner=user.userId;
+  const assertLegacy=async()=>{
+    bankCompanyContext(owner,body.companyId);
+    // Identity resolves the foundation's actual adoption, even before a bank
+    // sync scope exists. Its database adapter atomically fences legacy writes
+    // against a concurrent adoption; catalogue SQL stays inside that boundary.
+    if((await identity()).userId!==owner||currentCompanyContext()||await db().prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first())throw new ConsentError('COMPANY_ACCESS_DENIED',403);
+  };
+  await assertLegacy();
+  return withBankLock(owner,async ownerLease=>{
+    const lease:BankLease={
+      async assert(){await ownerLease.assert();await assertLegacy();},
+      async write(statements){
+        await assertLegacy();
+        const fence=db().prepare("SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM company_bank_sync_scopes WHERE owner=?) THEN 1 ELSE json('COMPANY_SCOPE_MISMATCH') END").bind(owner);
+        return (await ownerLease.write([fence,...statements])).slice(1);
+      },
+      async run(statement){return (await lease.write([statement]))[0];},
+    };
+    await lease.assert();
+    const app=await application(owner),conn=await connection(owner);
+    if(!app||!conn||app.generation!==conn.app_generation||conn.environment!==metadata(app).environment||!conn.encrypted_session)throw new BankError('En befintlig anslutning som behöver kontrolleras krävs.',409);
+    if(consentMetadata(conn)?.mode==='company')throw new ConsentError('COMPANY_ACCESS_DENIED',403);
+    if(!Number.isFinite(Date.parse(conn.valid_until))||Date.parse(conn.valid_until)<=Date.now())throw new ConsentError('BANK_CONSENT_EXPIRED',409);
+    // The receipt identifies the exact retained grant without retaining any
+    // clear-text session, account or payer data in the operational audit.
+    const fingerprint=(row:BankConnectionRow,validUntil=row.valid_until)=>digest(JSON.stringify([owner,row.id,row.app_generation,row.encrypted_session,row.encrypted_accounts,row.selected_accounts,row.environment,row.bank_name,row.country,row.consent_metadata||'',validUntil]));
+    const accepted=(status:string,checkedAt:string,replayed=false)=>response({status,revalidated:true,replayed,checkedAt,financialChanges:false,message:replayed?'Kontrollen av det befintliga medgivandet är redan sparad. Anslutningens aktuella status visas efter uppdatering. Inga fakturor eller betalningar har ändrats.':'Banken har bekräftat det befintliga medgivandet för de redan valda kontona. Inga fakturor eller betalningar har ändrats.'});
+    if(conn.status==='connected'){
+      const receipt=await db().prepare("SELECT detail,created_at FROM audit_events WHERE owner=? AND action='bank.consent.revalidated' ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(owner).first<{detail:string;created_at:string}>();
+      let saved:Record<string,unknown>|null=null;try{saved=receipt?JSON.parse(receipt.detail):null;}catch{}
+      if(receipt&&saved?.context_digest===await fingerprint(conn)&&Number.isFinite(Date.parse(receipt.created_at))&&Date.parse(receipt.created_at)<=Date.now())return accepted(storedStatus(conn),receipt.created_at,true);
+    }
+    if(conn.status!=='reauth_required')throw new BankError('En befintlig anslutning som behöver kontrolleras krävs.',409);
+    if(conn.sync_failures>=3||Date.parse(conn.retry_after||'')>Date.now()||accountReadCooldown(conn.account_evidence_retry).blocked)throw new BankError('Bankens väntetid eller stoppade försök måste hanteras innan medgivandet kan kontrolleras.',409);
+    const recent=await db().prepare("SELECT created_at FROM audit_events WHERE owner=? AND action='bank.consent.revalidation.started' ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(owner).first<{created_at:string}>();
+    if(recent&&(!Number.isFinite(Date.parse(recent.created_at))||Date.now()-Date.parse(recent.created_at)<15*60000))throw new BankError('Medgivandet kontrollerades nyss. Vänta minst 15 minuter före ett nytt försök.',429);
+    const savedAccounts=await accounts(conn),selected=JSON.parse(conn.selected_accounts),runId=uid();
+    if(!Array.isArray(selected)||!selected.length)throw new ConsentError('BANK_ACCOUNT_SCOPE_INVALID',409);
+    const event=(action:string,errorCode?:string)=>db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?)').bind(uid(),owner,owner,action,JSON.stringify({run_id:runId,...(errorCode?{error_code:errorCode}:{})}),now());
+    await lease.run(event('bank.consent.revalidation.started'));
+    let commitAttempted=false,receiptId='',contextDigest='';
+    try{
+      const config=await providerConfig(app);
+      const live=await guardedBankRead(owner,conn,lease,async()=>getSession(config,await sessionId(conn)),undefined,{strictCooldown:true});
+      const grant=validateLegacyEnableSelection({session:{accounts:savedAccounts,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:consentMetadata(conn)?.requestedScopes,selectedAccountUids:selected});
+      await lease.assert();await providerConfig(app);
+      const fence=db().prepare(`SELECT CASE WHEN EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND app_generation=? AND encrypted_session=? AND encrypted_accounts=? AND selected_accounts=? AND environment=? AND bank_name=? AND country=? AND COALESCE(consent_metadata,'')=? AND status='reauth_required' AND valid_until=? AND retry_after=? AND sync_failures=? AND account_evidence_retry=? AND ?>strftime('%Y-%m-%dT%H:%M:%fZ','now')) THEN 1 ELSE json('BANK_CONSENT_CONTEXT_CHANGED') END`).bind(owner,conn.id,conn.app_generation,conn.encrypted_session,conn.encrypted_accounts,conn.selected_accounts,conn.environment,conn.bank_name,conn.country,conn.consent_metadata||'',conn.valid_until,conn.retry_after,conn.sync_failures,conn.account_evidence_retry,grant.validUntil);
+      receiptId=uid();contextDigest=await fingerprint(conn,grant.validUntil);const checkedAt=now();
+      const receipt=db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?)').bind(receiptId,owner,owner,'bank.consent.revalidated',JSON.stringify({run_id:runId,context_digest:contextDigest}),checkedAt);
+      commitAttempted=true;
+      await lease.write([fence,db().prepare("UPDATE bank_connections SET status='connected',valid_until=?,last_error=NULL,updated_at=? WHERE owner=? AND id=?").bind(grant.validUntil,checkedAt,owner,conn.id),receipt]);
+      return accepted('connected',checkedAt);
+    }catch(error){
+      if(commitAttempted){
+        // D1 may commit and then lose its reply. Its owner-bound success
+        // receipt is authoritative, even after replacement of this lease.
+        // An unreadable receipt leaves the outcome unknown, never failed.
+        try{
+          await assertLegacy();
+          const receipt=await db().prepare("SELECT detail,created_at FROM audit_events WHERE owner=? AND id=? AND action='bank.consent.revalidated'").bind(owner,receiptId).first<{detail:string;created_at:string}>();
+          if(receipt){
+            const saved=JSON.parse(receipt.detail);
+            if(saved.run_id!==runId||saved.context_digest!==contextDigest)throw Error('BANK_CONSENT_RECEIPT_INVALID');
+            const current=await connection(owner);
+            return accepted(current?storedStatus(current):'unavailable',receipt.created_at,true);
+          }
+        }catch{throw Error('BANK_CONSENT_OUTCOME_UNKNOWN');}
+      }
+      // Diagnostics contain only canonical codes and never clear a cooldown.
+      try{await lease.run(event('bank.consent.revalidation.failed',bankJobErrorCode(error)));}catch{}
+      throw error;
+    }
+  });
 }
 
 async function synchronizeOwner(owner: string, options: { automatic?: boolean; control?:boolean; psu?: ProviderPsu }): Promise<Response> {

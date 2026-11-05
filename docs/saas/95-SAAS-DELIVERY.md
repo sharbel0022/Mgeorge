@@ -1,6 +1,8 @@
 # Agent 4 — commercial SaaS architecture hardening
 
-Date: 2026-11-05. Branch: `feature/95-saas`. Base: `4ad205b` (`origin/main`).
+Date: 2026-11-05. Branch: `feature/95-saas`. Original base: `4ad205b`.
+
+Delivery: [PR #50 against main](https://github.com/sharbel0022/Mgeorge/pull/50). After the first complete SaaS verification, concurrent main work from PR #48 (`bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee`) was integrated into this branch. The two verification phases are distinguished below.
 
 This delivery strengthens the integrated company architecture and repairs concrete consent-recovery defects. It does not certify commercial launch or a real bank connection. No deployment, production migration, original transfer, production consent or BankID operation is part of this work.
 
@@ -76,9 +78,9 @@ Sites empty-workspace creation does not adopt historical M.George records and do
 
 ## Verification record
 
-Final machine-readable gates, commands, source fingerprints and log hashes are recorded in [the verification receipt](evidence/2026-11-05/95-saas-verification.json). Local runtime: Linux, Node `v24.22.1`, npm `11.9.0`.
+The first complete SaaS verification, commands, source fingerprints and log hashes are recorded in [the pre-main-integration receipt](evidence/2026-11-05/95-saas-verification.json). Local runtime: Linux, Node `v24.22.1`, npm `11.9.0`. These full-suite counts belong to the SaaS changes on `4ad205b`, before adding PR #48's incoming cases.
 
-| Final complete suite | Passed | Failed / skipped / cancelled / TODO |
+| Complete suite before concurrent main integration | Passed | Failed / skipped / cancelled / TODO |
 | --- | ---: | --- |
 | Node, after the read-role repair | 1,905 | 0 / 0 / 0 / 0 |
 | Sites | 3,769 | 0 / 0 / 0 / 0 |
@@ -88,6 +90,12 @@ Final machine-readable gates, commands, source fingerprints and log hashes are r
 Root syntax, Sites TypeScript, bridge syntax, the exact installed minimatch mitigation, all required high-severity audit gates and the Sites production build pass. Root, bridge and Sites production dependencies have zero audit findings. The full Sites audit retains eight moderate development-dependency findings and no high/critical findings; dependencies and lockfiles are unchanged.
 
 The complete Sites suite, type check and successful serial build ran before the later Node-only read-flow repair. All 576 tracked/untracked nonignored Sites files have the same SHA-256 tree fingerprint afterward. The final complete Node suite and syntax check ran after that repair. The receipt preserves both whole-repository fingerprints rather than relabeling the earlier Sites execution as a later whole-tree run. Exact Node 22 PR checks are reported by GitHub for the pushed commit.
+
+### Concurrent main integration and final PR checks
+
+PR #48 introduced separate document/search/recovery work while this delivery was being verified. Its merge from `bf24a3c` was clean; the overlapping Node server change only adds the public workspace-search asset and preserves the new company read fixes. The incoming bank/tenant changes and the new `/api/bank/revalidate` route were reviewed separately. That route and its MCP equivalent require an eligible unbound legacy workspace; owner/admin company membership cannot use them to bypass the SaaS flow.
+
+The [integration receipt](evidence/2026-11-05/95-saas-integration.json) records the combined code fingerprint: **155 Node + 419 Sites = 574 targeted tests passed**, no failures/skips/cancellations/TODO. Root syntax, Sites TypeScript and a new serial Sites production build also pass on that combined fingerprint. The complete Node 22 suites and production build for the final combined commit are reported in [PR #50 checks](https://github.com/sharbel0022/Mgeorge/pull/50/checks). The 5,721 pre-integration count above is not presented as the count for PR #48's additional cases or the combined tree.
 
 Targeted runs completed in this development cycle (these overlap the complete suites):
 
@@ -102,7 +110,7 @@ Targeted runs completed in this development cycle (these overlap the complete su
 
 The first broad Node attempt overlapped an incomplete Sites installation and had six module-load failures (`xlsx` temporarily unavailable). It is not counted as a passing baseline. The first Sites install and a parallel build exited 137. A memory-bounded locked reinstall and a subsequent serial build completed successfully; the failed and successful build attempts have identical input fingerprints. Failed development attempts are retained separately in the receipt and are not counted as passing gates.
 
-The targeted Node and Sites audits identified no additional reproduced isolation bypass. They are source reviews plus the executed acceptance suites, not an independent penetration test or proof that every possible handler condition has been exercised. The [Sites API boundary inventory](API-BOUNDARY-INVENTORY.md) accounts for all 41 API files plus MCP. The [Node HTTP boundary inventory](NODE-API-BOUNDARY-INVENTORY.md) maps the six pre-company paths, 34 literal business paths, nine object/action patterns and eight SaaS bank subpaths, including the read-role repairs above.
+The targeted Node and Sites audits identified no additional reproduced isolation bypass. They are source reviews plus the executed acceptance suites, not an independent penetration test or proof that every possible handler condition has been exercised. The [Sites API boundary inventory](API-BOUNDARY-INVENTORY.md) now accounts for all 42 API files plus MCP, including the endpoint added by concurrent main work. The [Node HTTP boundary inventory](NODE-API-BOUNDARY-INVENTORY.md) maps the six pre-company paths, 34 literal business paths, nine object/action patterns and eight SaaS bank subpaths, including the read-role repairs above.
 
 ## Commercial activation decision
 

@@ -2,6 +2,8 @@
 
 Date: 2026-11-05. Scope: the actual HTTP dispatcher in [`src/server.js`](../../src/server.js), on `feature/95-saas` based on `4ad205b`. This complements the [Sites inventory](API-BOUNDARY-INVENTORY.md). It is a source census with test pointers, not an exhaustive endpoint penetration test or production acceptance.
 
+Integration update: concurrent main `bf24a3c` was subsequently merged into this branch. Its Node dispatcher change only adds `/workspace-search.js` to the public static-asset allowlist; the API census below is unchanged. The delivery report distinguishes pre-integration local test counts from the combined commit's targeted gates and PR CI.
+
 The dispatcher contains six API paths before company dispatch, 34 literal company business paths, nine other object/action patterns, and one SaaS bank dispatcher with eight supported subpaths. The tables account for all of them. No business route outside the installed company boundary was identified. Two existing viewer-read failures and an incorrect lost-session projection were reproduced and repaired during this census; see the regression record below.
 
 ## Installed boundary and identity limitation

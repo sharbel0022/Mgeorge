@@ -150,7 +150,7 @@ function serveStatic(req,res,path){
     // These standalone information documents contain their own fixed stylesheet.
     res.writeHead(200,{...baseHeaders,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"});return res.end(contents);
   }
-  if(!['/','/index.html','/app.js','/review.js','/messages.js','/style.css','/payment-control.js','/payment-control.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
+  if(!['/','/index.html','/app.js','/workspace-search.js','/review.js','/messages.js','/style.css','/payment-control.js','/payment-control.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
   const actual=path==='/'?'/index.html':path;
   const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'}[extname(actual)];
   const contents=readFileSync(resolve('public'+actual));
