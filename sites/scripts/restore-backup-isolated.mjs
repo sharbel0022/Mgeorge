@@ -10,6 +10,9 @@ import {verifyRecoveryBundle} from './lib/backup-recovery.mjs';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const OMITTED_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs','bankgiro_ingest_leases'];
+// Authorization is reconstructed only by separately verified administration.
+// Evidence restoration must not reactivate a user, worker grant or tenant.
+const CONTROL_TABLES=['companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard'];
 const fail=code=>{throw Error('backup_recovery_'+code);};
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const quote=value=>'"'+value.replaceAll('"','""')+'"';
@@ -120,7 +123,7 @@ function evidenceDatabase(snapshot){
   const migrations=new URL('../drizzle/',import.meta.url);
   for(const file of readdirSync(migrations).filter(name=>/^\d{4}_[a-z0-9_]+\.sql$/.test(name)).sort())database.exec(readFileSync(new URL(file,migrations),'utf8'));
   const tables=database.prepare("SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all().map(row=>row.name);
-  const expected=[...BACKUP_TABLES,...OMITTED_TABLES].sort();
+  const expected=[...BACKUP_TABLES,...OMITTED_TABLES,...CONTROL_TABLES].sort();
   if(JSON.stringify(tables)!==JSON.stringify(expected))fail('schema_invalid');
   database.exec('BEGIN');
   for(const table of snapshot.tables){
@@ -168,13 +171,13 @@ function writePrivate(path,bytes,guard){
  * This trusts the invoking user and, on Windows, the caller-established ACLs;
  * pathname checks do not defeat a hostile process running as that same user.
  */
-export async function restoreBackupIsolated({bundleDirectory,outputParent,key,expectedOwner,expectedBackupId}){
+export async function restoreBackupIsolated({bundleDirectory,outputParent,key,expectedOwner,expectedBackupId,expectedCompanyBoundary}){
  let database;
  try{
   if(typeof key!=='string'||!/^[a-f0-9]{64}$/i.test(key))fail('key_unavailable');
   const input=directory(bundleDirectory),parent=directory(outputParent,true),nested=relative(input.path,parent.path);
   if(nested===''||(!isAbsolute(nested)&&nested!=='..'&&!nested.startsWith('..'+sep)))fail('output_parent_unsafe');
-  const source=diskSource(input),verified=await verifyRecoveryBundle(source,key,expectedOwner,expectedBackupId);
+  const source=diskSource(input),verified=await verifyRecoveryBundle(source,key,expectedOwner,expectedBackupId,{expectedCompanyBoundary});
   // Schema checks, primary-key/unique constraints and exact-row comparisons
   // happen in memory before any output directory is created.
   database=evidenceDatabase(verified.snapshot);
@@ -195,7 +198,7 @@ export async function restoreBackupIsolated({bundleDirectory,outputParent,key,ex
   writePrivate(join(output,'source','bundle.json'),verified.sourceHeader,guard);
   writePrivate(join(output,'source','manifest.bin'),verified.sourceManifest,guard);
   writePrivate(join(output,'source','snapshot.bin'),verified.sourceSnapshot,guard);
-  const receipt={format:'MG-Sites-evidence-restore-1',mode:'evidence-only',schemaPrefix:'evidence_',owner:expectedOwner,backupId:expectedBackupId,restoredAt:new Date().toISOString(),snapshotSha256:verified.manifest.run.snapshot_hash,databaseSha256:sha(readFileSync(databasePath)),tables:verified.manifest.tables,originals:{count:verified.manifest.run.total_docs,bytes:verified.manifest.run.bytes}};
+  const receipt={format:'MG-Sites-evidence-restore-1',mode:'evidence-only',schemaPrefix:'evidence_',owner:expectedOwner,backupId:expectedBackupId,...(verified.snapshot.companyBoundary?{companyBoundary:verified.snapshot.companyBoundary}:{}),restoredAt:new Date().toISOString(),snapshotSha256:verified.manifest.run.snapshot_hash,databaseSha256:sha(readFileSync(databasePath)),tables:verified.manifest.tables,originals:{count:verified.manifest.run.total_docs,bytes:verified.manifest.run.bytes}};
   const pending=join(output,'receipt.pending');
   writePrivate(pending,new TextEncoder().encode(JSON.stringify(receipt,null,2)+'\n'),guard);
   database.close();database=undefined;
@@ -214,9 +217,10 @@ export async function restoreBackupIsolated({bundleDirectory,outputParent,key,ex
 
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  try{
-  const [bundleDirectory,outputParent,expectedOwner,expectedBackupId,...extra]=process.argv.slice(2);
+  const [bundleDirectory,outputParent,expectedOwner,expectedBackupId,expectedCompanyId,...extra]=process.argv.slice(2);
   if(!bundleDirectory||!outputParent||!expectedOwner||!expectedBackupId||extra.length)fail('usage');
-  const result=await restoreBackupIsolated({bundleDirectory,outputParent,expectedOwner,expectedBackupId,key:process.env.MG_SITES_RECOVERY_KEY});
+  const expectedCompanyBoundary=expectedCompanyId?{version:'company-data-boundary-v1',companyId:expectedCompanyId,storageOwner:expectedOwner,boundaryVersion:1}:undefined;
+  const result=await restoreBackupIsolated({bundleDirectory,outputParent,expectedOwner,expectedBackupId,expectedCompanyBoundary,key:process.env.MG_SITES_RECOVERY_KEY});
   console.log(JSON.stringify(result,null,2));
  }catch(error){
   console.error(error instanceof Error&&/^backup_recovery_[a-z_]+$/.test(error.message)?error.message:'backup_recovery_failed');process.exitCode=1;

@@ -36,8 +36,8 @@ function flowContext(flow: BankFlowRow): FlowContext | null {
   return value;
 }
 async function assertFlowActor(flow: BankFlowRow, context: FlowContext | null) {
-  const actor = (await identity()).userId;
-  if (actor !== flow.owner || context && actor !== context.actorId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
+  const user = await identity(), actor=user.userId;
+  if (actor !== flow.owner || context && bankCompanyContext(actor).actorId !== context.actorId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
   bankCompanyContext(actor, context?.companyId);
   if (!Number.isFinite(Date.parse(flow.expires_at)) || Date.parse(flow.expires_at) <= Date.now()) throw new ConsentError('CONSENT_FLOW_EXPIRED', 409);
 }
@@ -188,7 +188,7 @@ export async function status(request: Request): Promise<Response> {
   const expiredFlow = latestFlow && ['pending', 'exchanging'].includes(latestFlow.status) && (Date.parse(latestFlow.expires_at) <= Date.now() || requiresRestart);
   const workspace = await readWorkspace(company.storageOwnerId);
   return response({
-    company: { id: company.companyId, name: workspace.state.company.name, canManageBank: true, membershipMode: 'legacy_workspace' },
+    company: { id: company.companyId, name: workspace.state.company.name, canManageBank: ['owner','admin'].includes(company.role), membershipMode: company.membershipVersion==='legacy-owner-v1'?'legacy_workspace':'company' },
     consentFlow: latestFlow ? { id: context?.flowId ?? null, companyId: context?.companyId ?? company.companyId,
       status: expiredFlow ? 'expired' : latestFlow.status, expiresAt: latestFlow.expires_at,
       reason: requiresRestart ? 'CONSENT_RESTART_REQUIRED' : expiredFlow ? latestFlow.status === 'pending' ? 'CALLBACK_NOT_RECEIVED' : 'AUTHORIZATION_OUTCOME_UNKNOWN' : latestFlow.result_code || null,

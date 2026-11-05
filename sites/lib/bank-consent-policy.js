@@ -1,3 +1,4 @@
+import {assertCompanyContext} from './company-contract.js';
 /** Pure policy shared by the Sites and Node consent adapters. No identity,
  * membership, provider or evidence is fetched here: callers supply server data. */
 const CONTROL = /[\u0000-\u001f\u007f-\u009f]/;
@@ -73,7 +74,7 @@ export function assertCompanyBankAccess(context, input) {
   if (!object(context) || !object(input) || !clean(input.actorId, 256) || !clean(input.companyId) ||
     context.actorId !== input.actorId || context.companyId !== input.companyId || context.active !== true ||
     !clean(context.storageOwnerId, 256) || !clean(context.membershipVersion) ||
-    !['owner', 'admin', 'member', 'viewer'].includes(context.role) || !['read', 'manage'].includes(input.action) ||
+    !['owner', 'admin', 'accountant', 'member', 'viewer'].includes(context.role) || !['read', 'manage'].includes(input.action) ||
     (input.action === 'manage' && !['owner', 'admin'].includes(context.role))) deny('COMPANY_ACCESS_DENIED', 403);
   return context;
 }
@@ -171,4 +172,13 @@ export function corporateAuthorization(input) {
   return { status: 'verified', origin: evidence.origin, evidenceId: evidence.evidenceId,
     companyId, actorId, bankName, country, accountUids: ids, checkedAt: new Date(checkedAt).toISOString(),
     validUntil: new Date(Math.min(expiry, evidenceExpiry)).toISOString() };
+}
+
+/** Adapts only a context already resolved and fenced by the foundation. */
+export function companyBankContext(current, storageOwner, requestedCompanyId, action='manage') {
+  if(!current)return assertCompanyBankAccess(legacyCompanyContext(storageOwner,requestedCompanyId),{actorId:storageOwner,companyId:`workspace:${storageOwner}`,action});
+  const c=assertCompanyContext(current);
+  if(c.storageOwner!==storageOwner||requestedCompanyId!==undefined&&requestedCompanyId!==c.companyId)throw new ConsentError('COMPANY_ACCESS_DENIED',403);
+  const context={companyId:c.companyId,actorId:c.actorId,storageOwnerId:c.storageOwner,membershipVersion:String(c.membershipVersion),role:c.role,active:true};
+  return assertCompanyBankAccess(context,{actorId:c.actorId,companyId:c.companyId,action});
 }

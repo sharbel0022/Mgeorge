@@ -1,4 +1,4 @@
-import {runSitesOcr} from '../src/sites-ocr-pull.js';
+import {runSitesOcr,sitesOcrFailure} from '../src/sites-ocr-pull.js';
 
 // Credentials are read only by this step and are never printed or passed as
 // command-line arguments. The extraction child receives no credential variables.
@@ -7,7 +7,7 @@ try{
   const needsAttention=result.failed||result.status_unknown;
   console.log(JSON.stringify({status:needsAttention?'needs_attention':'complete',processed:result.processed,failed:result.failed,...(result.status_unknown?{status_unknown:true}:{})}));
   if(needsAttention)process.exitCode=1;
-}catch{
-  console.log(JSON.stringify({status:'failed',reason:'Kontrollera moln-OCR-konfigurationen och Sites jobbstatus.'}));
+}catch(error){
+  console.log(JSON.stringify({status:'failed',...sitesOcrFailure(error),reason:'Kontrollera moln-OCR-konfigurationen och Sites jobbstatus.'}));
   process.exitCode=1;
 }

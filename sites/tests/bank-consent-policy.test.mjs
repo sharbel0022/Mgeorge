@@ -233,3 +233,10 @@ test('validators neither mutate inputs nor reflect untrusted values in default e
   const error = new ConsentError('SYNTHETIC_PRIVATE_VALUE');
   assert.equal(error.status, 400); assert.equal(error.message.includes('SYNTHETIC_PRIVATE_VALUE'), false);
 });
+
+test('foundation context retains distinct actor/storage owner and rejects client-selected companies and accountant management',async()=>{
+ const {companyBankContext}=await import('../lib/bank-consent-policy.js');
+ const c={version:'company-context-v1',companyId:'company-a',storageOwner:'namespace-a',actorId:'admin-a',role:'admin',membershipVersion:3,companyVersion:1,contextVersion:2};
+ assert.deepEqual(companyBankContext(c,'namespace-a','company-a'),{companyId:'company-a',storageOwnerId:'namespace-a',actorId:'admin-a',role:'admin',membershipVersion:'3',active:true});
+ fails(()=>companyBankContext(c,'namespace-b','company-a'),'COMPANY_ACCESS_DENIED');fails(()=>companyBankContext(c,'namespace-a','company-b'),'COMPANY_ACCESS_DENIED');fails(()=>companyBankContext({...c,role:'accountant'},'namespace-a'),'COMPANY_ACCESS_DENIED');assert.equal(companyBankContext({...c,role:'accountant'},'namespace-a',undefined,'read').actorId,'admin-a');
+});

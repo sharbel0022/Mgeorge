@@ -3,14 +3,14 @@
  * proof. Bank-evidenced account mappings come solely from server configuration. */
 import {createHash} from 'node:crypto';
 import {decryptObject} from './security.js';
-import {ConsentError,legacyCompanyContext,assertCompanyBankAccess,validateReadScopes,corporateAuthorization} from '../sites/lib/bank-consent-policy.js';
+import {ConsentError,companyBankContext,validateReadScopes,corporateAuthorization} from '../sites/lib/bank-consent-policy.js';
 import {resolveCorporateAccountEvidence} from '../sites/lib/bank-company-authority.js';
 export {ConsentError,validateCallbackParameters,validateEnableConsent} from '../sites/lib/bank-consent-policy.js';
 
-export function bankCompanyContext(actorId,companyId,action='manage'){
-  const context=legacyCompanyContext(actorId,companyId);
-  return assertCompanyBankAccess(context,{actorId,companyId:context.companyId,action});
-}
+let currentContext=()=>null;
+export function configureBankCompanyContext(resolver){currentContext=resolver;}
+export function bankCompanyContext(owner,companyId,action='manage'){return companyBankContext(currentContext(),owner,companyId,action);}
+
 export function requestedBankConsent(actorId,body){
   if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).some(key=>!['companyId','bankName','country','requiredScopes','renew_connection_id'].includes(key)))throw new ConsentError('INVALID_CONSENT_SCOPES',400);
   const context=bankCompanyContext(actorId,body.companyId),requiredScopes=validateReadScopes(body.requiredScopes);
@@ -25,8 +25,8 @@ export function consentMetadata(connection){
   if(value?.version!=='bank-consent-v1'||value.mode!=='company')throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED',409);
   return value;
 }
-export function assertConsentContext(metadata,actorId,companyId){
-  const context=bankCompanyContext(actorId,companyId??metadata?.companyId);
+export function assertConsentContext(metadata,actorId,companyId,action='manage'){
+  const context=bankCompanyContext(actorId,companyId??metadata?.companyId,action);
   if(metadata&&(metadata.actorId!==context.actorId||metadata.companyId!==context.companyId||metadata.membershipVersion!==context.membershipVersion||metadata.provider!=='enablebanking'))throw new ConsentError('COMPANY_ACCESS_DENIED',403);
   return context;
 }
@@ -82,7 +82,7 @@ export function assertCorporateAccountAccess(connection,actorId=connection.owner
   return {...grant,context,validUntil:grant.authority.validUntil};
 }
 export function publicConsent(connection,actorId){
-  const metadata=consentMetadata(connection),context=assertConsentContext(metadata,actorId);
+  const metadata=consentMetadata(connection),context=assertConsentContext(metadata,actorId,undefined,'read');
   const corporate=metadata?companyAccountGrant(context,connection.bank_name,decryptObject(connection.accounts_json),connection.valid_until).authority:{status:'unverified',reason:'LEGACY_COMPANY_AUTHORIZATION_UNVERIFIED'};
   return {version:'bank-consent-v1',mode:metadata?'company':'legacy',companyId:context.companyId,actorId:context.actorId,membershipVersion:context.membershipVersion,provider:'enablebanking',intent:metadata?.intent??'legacy',requestedScopes:metadata?.requestedScopes??['accounts:read','transactions:read'],grantedScopes:metadata?.grantedScopes??['accounts:read','transactions:read'],missingScopes:metadata?.missingScopes??[],validUntil:connection.valid_until,corporateAuthorization:corporate};
 }

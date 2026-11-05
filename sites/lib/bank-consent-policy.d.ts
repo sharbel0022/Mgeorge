@@ -9,7 +9,7 @@ export type CompanyBankContext = {
   actorId: string;
   storageOwnerId: string;
   membershipVersion: string;
-  role: 'owner' | 'admin' | 'member' | 'viewer';
+  role: 'owner' | 'admin' | 'member' | 'accountant' | 'viewer';
   active: boolean;
 };
 
@@ -109,3 +109,5 @@ export function corporateAuthorization(input: {
   evidence?: unknown;
   now?: number;
 }): CorporateAuthorization;
+
+export function companyBankContext(current: unknown, storageOwner: string, requestedCompanyId?: unknown, action?: 'read' | 'manage'): CompanyBankContext;

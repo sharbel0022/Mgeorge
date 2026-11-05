@@ -50,7 +50,7 @@ export async function joinedFixture(t,{reference='0599',withAlias=true,relation=
  // the real worker's own acquisition, completion and replay instead.
  f.sql.prepare('DELETE FROM bankgiro_ingest_leases WHERE owner=?').run(f.owner);
  f.report=joinedReport({reference,relation,payments});f.source=sourceEnabled?syntheticSource([f.report]):null;
- f.worker=()=>createBankgiroIngest({source:f.source,store:createBankgiroIngestStore(f.database),sink:f.sink,allowSynthetic:true});
+ f.worker=()=>createBankgiroIngest({source:f.source,store:createBankgiroIngestStore(f.scopedDatabase),sink:f.sink,allowSynthetic:true});
  t.mock.method(globalThis,'fetch',async()=>{throw Error('Network access is forbidden in joined synthetic acceptance');});
  const key='__seven_agent_joined_'+crypto.randomUUID().replaceAll('-','');globalThis[key]=f;t.after(()=>delete globalThis[key]);
  const domain=local('../../lib/domain.ts'),engine=local('../../lib/reconciliation-engine.js'),{server,store,bankgiro,evidence,reconciliation}=f.moduleUrls;

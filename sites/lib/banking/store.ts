@@ -1,9 +1,9 @@
 import { env } from 'cloudflare:workers';
-import { db } from '@/lib/server';
+import { db, currentCompanyContext } from '@/lib/server';
 import { randomToken, seal, unseal, digest } from './security';
 import type { ProviderApplication, ProviderAccount, ProviderConfig } from './enable-banking';
 import { runtimeBankConfig, runtimeBankStatus } from './runtime-config';
-import { ConsentError, legacyCompanyContext, assertCompanyBankAccess } from '../bank-consent-policy.js';
+import { ConsentError, companyBankContext } from '../bank-consent-policy.js';
 import { resolveCorporateAccountEvidence, type CompanyAccountEvidence } from '../bank-company-authority.js';
 import { stableAccountKey } from './transactions';
 
@@ -16,9 +16,7 @@ export type ConsentMetadata = {
 /** Agent 1 replaces this resolver with its authoritative membership boundary.
  * Client company IDs select a context; they never become a storage owner. */
 export function bankCompanyContext(actorId: string, companyId?: unknown, action: 'read' | 'manage' = 'manage') {
-  const context = legacyCompanyContext(actorId, companyId);
-  assertCompanyBankAccess(context, { actorId, companyId: context.companyId, action });
-  return context;
+  return companyBankContext(currentCompanyContext(), actorId, companyId, action);
 }
 
 export function consentMetadata(row: BankConnectionRow): ConsentMetadata | null {
@@ -26,8 +24,8 @@ export function consentMetadata(row: BankConnectionRow): ConsentMetadata | null 
   try {
     const value = JSON.parse(row.consent_metadata) as ConsentMetadata;
     if (value.version !== 'bank-consent-v1' || !['company', 'legacy'].includes(value.mode) ||
-      value.actorId !== row.owner || value.companyId !== bankCompanyContext(row.owner).companyId ||
-      value.membershipVersion !== bankCompanyContext(row.owner).membershipVersion ||
+      value.actorId !== bankCompanyContext(row.owner,undefined,'read').actorId || value.companyId !== bankCompanyContext(row.owner,undefined,'read').companyId ||
+      value.membershipVersion !== bankCompanyContext(row.owner,undefined,'read').membershipVersion ||
       !Array.isArray(value.requestedScopes) || !Array.isArray(value.grantedScopes)) throw Error();
     return value;
   } catch { throw new ConsentError('COMPANY_ACCESS_DENIED', 403); }

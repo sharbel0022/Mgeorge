@@ -154,8 +154,10 @@ test('expired sessions erase private state and browser history cannot restore it
 test('a refresh completed after authentication loss cannot restore company records',async()=>{
   const view=ui();let release;const gate=new Promise(resolve=>{release=resolve;});
   view.set('gate',gate);view.set('responses',{'/dashboard':{},'/invoices':{items:[{secret:'PRIVATE RESPONSE'}]},'/bank-transactions':{items:[]},'/allocations':{items:[]},'/bank/status':{configured:false,connections:[]},'/settings':{company_name:'PRIVATE COMPANY'},'/gmail/status':{},'/suggestions':{items:[]},'/imports':{items:[]},'/documents':{items:[]}});
-  view.run("api=async path=>path==='/me'?{authenticated:true,login_required:true}:gate.then(()=>responses[path])");
-  const pending=view.run('refresh()');await Promise.resolve();
+  // This fixture isolates the existing session refresh fence. The shared real
+  // company bootstrap and switch races are exercised in company-ui.test.js.
+  view.run("initializeCompanyClient=async()=>({status:'legacy'});globalThis.dataRequests=0;api=async path=>{if(path==='/me')return {authenticated:true,login_required:true};dataRequests++;return gate.then(()=>responses[path]);}");
+  const pending=view.run('refresh()');for(let n=0;n<4;n++)await Promise.resolve();assert.ok(view.run('dataRequests')>0);
   view.run('showLogin()');release();await pending;
   assert.equal(view.run('state.invoices.length'),0);assert.equal(view.run('state.me.authenticated'),false);
   assert.match(view.html(),/id="login-form"/);assert.doesNotMatch(view.html(),/PRIVATE/);

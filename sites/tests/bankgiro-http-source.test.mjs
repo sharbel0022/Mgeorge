@@ -246,7 +246,7 @@ test('newer explicit disable/removal carries an immutable owner revocation recei
  for(const registrations of [[],[{...registration(),enabled:false}]]){
   const source=registry(undefined,()=>assert.fail('disabled network'),{configuration:{version:1,revision:8,registrations}}).resolve('owner-1');
   assert.ok(source,'configured removal must resolve an explicit revocation');assert.equal(source.configurationValid,false);
-  assert.deepEqual(source.revocation,{owner:'owner-1',configurationRevision:8});
+  assert.deepEqual(source.revocation,{owner:'owner-1',...(registrations.length?{companyId:registrations[0].companyId}:{}),configurationRevision:8});
   assert.equal(Object.isFrozen(source.revocation),true);
   await assert.rejects(source.authorize({owner:'owner-1'}),safeError('AUTHORIZATION_BLOCKED'));
  }
@@ -341,7 +341,7 @@ test('content identity conflict blocks the shared worker without advancing curso
   assert.fail('unexpected synthetic normalized protocol route');
  },{now:()=>clock}).resolve(f.owner);
  f.source=source;
- const store=createBankgiroIngestStore(f.database,{now:()=>clock,leaseMs:120000});
+ const store=createBankgiroIngestStore(f.scopedDatabase,{now:()=>clock,leaseMs:120000});
  const build=()=>createBankgiroIngest({source,store,sink:f.sink,now:()=>clock});
  const initial=await build().run(f.owner);assert.equal(initial.counts.IMPORTED,1);assert.equal(initial.cursor,'1');
  const state=f.read(),audits=f.audits(),retained=Array.from(f.objects,([key,value])=>[key,Uint8Array.from(value)]);
