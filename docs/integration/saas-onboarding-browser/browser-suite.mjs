@@ -19,11 +19,11 @@ async function verifyAssets() {
   for (const entry of manifest.inputs) assert.equal(sha(await fs.readFile(path.join(repo, entry.path))), entry.sha256, 'Changed product source: ' + entry.path);
   for (const entry of manifest.outputs) assert.equal(sha(await fs.readFile(path.join(scratch, 'web', entry.path))), entry.sha256, 'Changed product asset: ' + entry.path);
 }
-await verifyAssets(); await fs.mkdir(output, { recursive: true });
+await fs.mkdir(output, { recursive: true });
 const launch = { headless: true, args: ['--no-sandbox'] };
 if (process.env.MGEORGE_QA_CHROMIUM) launch.executablePath = process.env.MGEORGE_QA_CHROMIUM;
-const server = await startServer(), browser = await chromium.launch(launch);
-const results = [], requests = [], browserErrors = [], externalRequests = [], assetChecks = [], contexts = [];
+let server, browser;
+const results = [], requests = [], browserErrors = [], externalRequests = [], assetChecks = [], contexts = [], runnerErrors = [], omitted = [];
 const noConnection = (id, now) => {
   const s = snapshotFixture(id, now); s.connection = null; s.accounts = []; s.payments = [];
   s.sync = { state: 'never', automaticEnabled: false, lastSuccessAt: null, nextAllowedAt: null, errorCode: null }; return s;
@@ -89,13 +89,14 @@ async function shot(page, name) {
   return page.screenshot({ path: path.join(output, name + '.png'), fullPage: true });
 }
 async function test(name, fn) {
-  if (process.env.MGEORGE_QA_FILTER && !new RegExp(process.env.MGEORGE_QA_FILTER).test(name)) return;
+  if (process.env.MGEORGE_QA_FILTER && !new RegExp(process.env.MGEORGE_QA_FILTER).test(name)) { omitted.push(name); return; }
   const start = Date.now(); let timeout;
   try { await Promise.race([fn(), new Promise((_, reject) => { timeout = setTimeout(() => reject(Error('Scenario exceeded 20 seconds')), 20000); })]); results.push({ name, passed: true, durationMs: Date.now() - start }); console.log('PASS ' + name); }
   catch (error) { results.push({ name, passed: false, error: String(error), durationMs: Date.now() - start }); console.log('FAIL ' + name + ': ' + String(error).slice(0, 450)); }
   finally { clearTimeout(timeout); for (const context of contexts.splice(0)) await context.close(); }
 }
 try {
+  await verifyAssets(); server = await startServer(); browser = await chromium.launch(launch);
   for (const width of [320, 390, 768, 1024, 1440]) await test('responsive keyboard and semantics at ' + width + 'px', async () => {
     const { page, posts } = await scenario({ width }); await ready(page);
     assert.equal(await page.evaluate(() => window.innerWidth), width);
@@ -297,11 +298,17 @@ try {
     assert.ok(await page.getByRole('button', { name: 'Uppdatera betalningsöversikten' }).isDisabled());
     assert.match(await page.locator('.onboarding-shell').textContent(), /konto som stöder import/i); assert.equal(posts.length, 0);
   });
+} catch (error) {
+  runnerErrors.push(String(error));
 } finally {
-  await verifyAssets();
-  const receipt = { finishedAt: new Date().toISOString(), browserVersion: browser.version(), results, passed: results.filter(r => r.passed).length, failed: results.filter(r => !r.passed).length, requests, browserErrors, externalRequests, assetChecks, sourceManifest: manifest };
-  await fs.writeFile(path.join(output, 'acceptance-results.json'), JSON.stringify(receipt, null, 2)); await browser.close(); await new Promise(resolve => server.close(resolve));
+  try { await verifyAssets(); } catch (error) { runnerErrors.push(String(error)); }
+  const success = results.length > 0 && results.every(r => r.passed) && !runnerErrors.length && !browserErrors.length && !externalRequests.length && !omitted.length && assetChecks.length > 0 && assetChecks.every(r => r.match);
+  const receipt = { finishedAt: new Date().toISOString(), success, browserVersion: browser?.version() ?? null, results, passed: results.filter(r => r.passed).length, failed: results.filter(r => !r.passed).length, omitted, runnerErrors, requests, browserErrors, externalRequests, assetChecks, sourceManifest: manifest };
+  try { await fs.writeFile(path.join(output, 'acceptance-results.json'), JSON.stringify(receipt, null, 2)); }
+  finally { try { if (browser) await browser.close(); } finally { if (server) await new Promise(resolve => server.close(resolve)); } }
 }
+assert.deepEqual(runnerErrors, [], 'browser startup, source or runner failures');
+assert.ok(results.length > 0, 'no browser cases executed');
 assert.equal(results.filter(r => !r.passed).length, 0, 'browser acceptance failures');
 assert.deepEqual(browserErrors, [], 'JavaScript errors'); assert.deepEqual(externalRequests, [], 'external requests'); assert.ok(assetChecks.length > 0 && assetChecks.every(r => r.match), 'served asset mismatch');
 console.log(JSON.stringify({ passed: results.length, failed: 0, interceptedRequests: requests.length, browserErrors: 0, externalRequests: 0 }));

@@ -13,7 +13,12 @@
     "dev": "node --env-file=.env --watch src/server.js",
     "test": "node --test test/*.test.js",
     "test:isolated": "node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 test/*.test.js",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "quality:node": "node scripts/quality/run.mjs node",
+    "quality:sites": "node scripts/quality/run.mjs sites",
+    "quality:bridge": "node scripts/quality/run.mjs bridge",
+    "quality:performance": "node scripts/quality/run.mjs performance",
+    "quality:browser": "node scripts/quality/run.mjs browser"
   },
   "dependencies": {
     "@noble/hashes": "2.4.0",
