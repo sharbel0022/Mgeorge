@@ -1,0 +1,1 @@
+export function createOnboardingCompany(database: D1Database, actorId: string, body: {name:string}, idempotencyKey:string): Promise<{id:string;name:string;role:import('../company-contract.js').CompanyRole}>;

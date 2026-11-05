@@ -1,5 +1,13 @@
 # Verifierad progress
 
+## Agent 6 — SaaS-onboarding och bankanslutning, 2026-11-04
+
+Frontend på `feature/saas-customer-onboarding-ui`, bas `14a042a`. [Leverans- och verifieringsrapport](docs/integration/saas-customer-onboarding-verification.md), [föreslaget API-kontrakt](docs/integration/saas-customer-onboarding-ui.md) och [browserkvitto/skärmbilder](docs/integration/saas-onboarding-browser/README.md). Svartvit företagsväljare/registrering, bankguide, läsbehörigheter, providerstyrd identifiering, separat kontodata/Bankgirostatus, medgivandetider, konton, förnyelse/frånkoppling och betalningsreferenser med evidensstatus är implementerade.
+
+Slutliga lokala grindar: **1 565 Node +3 166 Sites +47 bridge =4 778 godkända**, inga fel/skip/cancel/todo; syntax, typer, high-audits och produktionsbygge godkända. Sites har 8 befintliga moderate beroendefynd. **41/41 Chromiumfall** på faktiska 320/390/768/1024/1440 px, 0 JavaScriptfel/externa anrop; käll-/resurshashar och syntetiska skärmbilder sparade. Oberoende reviewfynd om långsamma statusanrop, kvarhängande väntemeddelanden och otillåten synkknapp är rättade med regressioner. Sena svar/redirects och felaktig företagstillhörighet döljs innan UI-uppdatering.
+
+**Aktiveringsgräns:** den granskade huvudbranchen saknar företagsspecifika SaaS-API:er. Agents 1–5 måste acceptera eller anpassa kontraktet innan resan kan användas skarpt. Äldre ägarbundna endpoints behandlas aldrig som företagsisolerade. Verklig provider/BankID, fysisk mobil och manuell skärmläsaracceptans återstår. Ingen merge, Sites-publicering eller produktionsändring ingår. Alla 33 poäng är oförändrade: **255/330 =7,73/10; 0/33 ≥9,5**.
+
 ## Agent 3 — företagsbundet bankmedgivande, 2026-11-04
 
 Egen utvecklingsbranch `feature/saas-bank-consent`, bas `14a042a`. [API-kontrakt, modeller, säkerhetsgränser och verifieringskvitto](docs/integration/saas/bank-consent.md). Leveransen omfattar befintliga Node- och Sites-routes, gemensam medgivandepolicy, additiv lagring och regressionstester. Ingen merge, Sites-publicering, produktionsmigration eller verklig bankidentifiering ingår.

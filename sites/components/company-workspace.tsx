@@ -1,6 +1,9 @@
 'use client';
-import {useEffect,useRef,useState,type ReactNode} from 'react';
+import {createContext,useContext,useCallback,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
 import {createCompanyClient,installCompanyClientSurface,type CompanyClient,type CompanyClientSnapshot} from '@/lib/company-client.js';
+
+const WorkspaceContext = createContext<{ activeCompanyId: string | null; switchCompany: (id: string) => Promise<void> } | null>(null);
+export function useCompanyWorkspace() { return useContext(WorkspaceContext); }
 
 const roles={owner:'Ägare',admin:'Administratör',accountant:'Redovisning',viewer:'Läsbehörighet'};
 
@@ -20,11 +23,16 @@ export default function CompanyWorkspace({children}:{children:ReactNode}){
     }).catch(()=>{if(live)setSnapshot(boundary.snapshot);});
     return()=>{live=false;unsubscribe();removeSurface?.();boundary.dispose();if(client.current===boundary)client.current=null;};
   },[]);
-  async function switchCompany(companyId:string){
+  const switchCompany=useCallback(async(companyId:string)=>{
     const boundary=client.current;if(!boundary||companyId===boundary.snapshot.context?.companyId)return;
-    try{await boundary.switchCompany(companyId);window.location.replace('/');}
+    try{await boundary.switchCompany(companyId);window.location.replace(window.location.pathname === '/bank' ? '/bank?company=' + encodeURIComponent(companyId) : '/');}
     catch{/* The boundary stays blank until an explicit fresh read. */}
-  }
+  },[]);
+  // Ordinary reads publish fresh snapshots without changing the selected
+  // company. Keep this value stable so child forms are not reset by their own
+  // requests. Switching still unmounts the entire private subtree below.
+  const activeCompanyId=snapshot?.activeCompanyId??null;
+  const workspace=useMemo(()=>({activeCompanyId,switchCompany}),[activeCompanyId,switchCompany]);
   if(!snapshot||snapshot.status==='pending'||snapshot.status==='switching'||snapshot.status==='blocked')return <main className="company-access-status" role={snapshot?.status==='blocked'?'alert':'status'} aria-live="polite">
     <h1>{snapshot?.status==='blocked'?'Företagsåtkomsten behöver kontrolleras':snapshot?.status==='switching'?'Byter företag…':'Kontrollerar företagsåtkomst…'}</h1>
     {snapshot?.status==='blocked'&&<><p>{snapshot.error}</p><button className="btn" type="button" onClick={()=>window.location.reload()}>Läs in sidan igen</button></>}
@@ -33,9 +41,9 @@ export default function CompanyWorkspace({children}:{children:ReactNode}){
     <h1>Välj företag</h1><p>Välj en arbetsyta som du har aktuell behörighet till.</p>
     <label>Företag<select aria-label="Välj företag" value="" onChange={event=>switchCompany(event.target.value)}><option value="" disabled>Välj företag…</option>{snapshot.companies.map(company=><option key={company.id} value={company.id}>{company.name}</option>)}</select></label>
   </main>;
-  return <>{snapshot.status==='ready'&&snapshot.context&&<aside className="company-context-bar" aria-label="Företagskontext">
+  return <WorkspaceContext.Provider value={workspace}>{snapshot.status==='ready'&&snapshot.context&&<aside className="company-context-bar" aria-label="Företagskontext">
     <label className="company-context-selector"><span>Aktivt företag</span><select aria-label="Aktivt företag" value={snapshot.context.companyId} onChange={event=>switchCompany(event.target.value)}>{snapshot.companies.map(company=><option key={company.id} value={company.id}>{company.name}</option>)}</select></label>
     <span className="company-context-role">{roles[snapshot.context.role]}</span>
     {snapshot.companies.length>1&&<small>När du byter företag stängs öppna formulär.</small>}
-  </aside>}{children}</>;
+  </aside>}{children}</WorkspaceContext.Provider>;
 }

@@ -17,7 +17,8 @@ async function fixture(t){
   f.state=initial=>{const index=f.cursor++;f.slots[index]??={value:typeof initial==='function'?initial():initial};return [f.slots[index].value,next=>{f.slots[index].value=typeof next==='function'?next(f.slots[index].value):next;f.schedule();}];};
   f.ref=initial=>{const index=f.cursor++;f.slots[index]??={current:initial};return f.slots[index];};
   f.effect=(fn,deps)=>{const index=f.cursor++;if(!equal(f.slots[index]?.deps,deps))f.effects.push(()=>{f.slots[index]?.cleanup?.();f.slots[index]={deps,cleanup:fn()};});};
-  const react=data(`const f=globalThis[${JSON.stringify(key)}];export const useState=(...a)=>f.state(...a),useRef=(...a)=>f.ref(...a),useEffect=(...a)=>f.effect(...a);`);
+  f.memo=(fn,deps)=>{const index=f.cursor++;if(!equal(f.slots[index]?.deps,deps))f.slots[index]={deps,value:fn()};return f.slots[index].value;};
+  const react=data(`export {createContext,useContext} from ${JSON.stringify(import.meta.resolve('react'))};const f=globalThis[${JSON.stringify(key)}];export const useState=(...a)=>f.state(...a),useRef=(...a)=>f.ref(...a),useEffect=(...a)=>f.effect(...a),useMemo=(...a)=>f.memo(...a),useCallback=(fn,deps)=>f.memo(()=>fn,deps);`);
   const browser=new EventTarget();browser.location={href:'https://synthetic.example/',replace:value=>f.location=value,reload:()=>f.reloaded=true};browser.document=new EventTarget();browser.document.querySelectorAll=()=>[];
   const raw=(input,init)=>new Promise((resolve,reject)=>f.requests.push({input,init,resolve,reject}));browser.fetch=raw;
   const oldWindow=globalThis.window;globalThis.window=browser;
@@ -61,4 +62,13 @@ test('a remaining membership can be selected after revocation without mounting t
   const change=f.find(node=>node.type==='select').props.onChange({target:{value:'b'}});await flush();
   await f.respond(1,200,{context:context('b',4)});await change;assert.equal(f.location,'/');
   assert.equal(f.find(node=>node.props?.['data-company-private']),undefined);
+});
+
+
+test('same-company directory refresh preserves the workspace value and callback identity',async t=>{
+  const f=await fixture(t);await f.respond(0,200,directory());const initial=f.tree.props.value;
+  assert.equal(initial.activeCompanyId,'a');assert.equal(typeof initial.switchCompany,'function');
+  const reading=f.browser.fetch('/api/companies');await flush();await f.respond(1,200,directory());await reading;await flush();
+  assert.equal(f.tree.props.value,initial);assert.equal(f.tree.props.value.switchCompany,initial.switchCompany);
+  assert.ok(f.find(node=>node.props?.['data-company-private']));
 });

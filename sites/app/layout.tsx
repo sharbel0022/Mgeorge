@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "@/styles/bank-connection.css";
 import "@/styles/bankgiro-source.css";
+import "@/styles/saas-onboarding.css";
+
 import "@/styles/company-workspace.css";
 import CompanyWorkspace from '@/components/company-workspace';
 

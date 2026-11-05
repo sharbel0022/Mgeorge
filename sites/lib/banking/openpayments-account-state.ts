@@ -41,7 +41,8 @@ export async function readOpenPaymentsAccountState(owner:string){
  const current=await db().prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').bind(owner).first<{revision:number;payload:string}>();await guard();
  const validUntil=new Date(Math.min(Date.parse(value.validUntil),accountExpiry,Date.parse(consent.validUntil+'T23:59:59.999Z'),config.credentialsValidUntil?Date.parse(config.credentialsValidUntil):Infinity)).toISOString();
  if(!current||current.revision!==row.revision||current.payload!==row.payload||Date.parse(validUntil)<=Date.now())throw denied();
- return {snapshot:{provider:'open_payments',owner,revision:row.revision,payload:row.payload,validUntil} as OpenPaymentsConsentSnapshot,available,selected:value.selected as string[]};
+ const registration=matches[0],automaticEnabled=registration.automaticEnabled===true&&registration.operatorVerified===true&&typeof registration.operatorEvidenceId==='string'&&!!registration.operatorEvidenceId;
+ return {automaticEnabled,bankgiroRegistration:registration.bankgiroRegistration??null,snapshot:{provider:'open_payments',owner,revision:row.revision,payload:row.payload,validUntil} as OpenPaymentsConsentSnapshot,available,selected:value.selected as string[]};
 }
 export async function resolveOpenPaymentsAccount(owner:string,account:string,reportedAccount?:string){
  const context=await readOpenPaymentsAccountState(owner),matches=context.available.filter(a=>a.identity.currency==='SEK'&&a.key===account);
