@@ -108,17 +108,19 @@ class OpenPaymentsCompanyConnection {
     if (this.#context.psu) { headers['PSU-IP-Address'] = this.#context.psu.ipAddress; headers['PSU-User-Agent'] = this.#context.psu.userAgent; }
     return headers;
   }
-  async #request(path, { method = 'GET', body, consent, discovery = false } = {}) {
-    await this.#guard(); this.#consentTime(consent);
+  async #request(path, { method = 'GET', body, consent, discovery = false, revokeExpired = false } = {}) {
+    if (revokeExpired && (method !== 'DELETE' || body !== undefined || !consent || path !== `${CONSENTS}/${consent.id}`)) throw mismatch();
+    const consentTime = () => { if (!revokeExpired) this.#consentTime(consent); };
+    await this.#guard(); consentTime();
     const token = await this.#tokens.accessToken();
-    await this.#guard(); this.#consentTime(consent);
+    await this.#guard(); consentTime();
     try {
       const result = await this.#http.send({ path, method, body: body === undefined ? undefined : JSON.stringify(body), headers: {
         ...(discovery ? {} : this.#headers(consent)), Authorization: `Bearer ${token}`,
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
         ...(consent && path.startsWith(ACCOUNTS) ? { 'Consent-ID': consent.id } : {}),
       } });
-      await this.#guard(); this.#consentTime(consent);
+      await this.#guard(); consentTime();
       return result;
     } catch (error) {
       if (error instanceof BankProviderError && error.code === 'INVALID_ACCESS_TOKEN') this.#tokens.invalidate();
@@ -129,14 +131,15 @@ class OpenPaymentsCompanyConnection {
     const bankData = snapshot(response.data), bankDataSha256 = bankApiDataHash(bankData);
     if (!bankDataSha256) throw invalid();
     return { provider: 'open_payments', binding: this.binding, bankDataVersion: 'openpayments-response-v1', bankData,
-      bankDataSha256, representation: 'provider_json', operation, requestId: response.requestId, receivedAt: new Date(this.#now()).toISOString() };
+      bankDataSha256, representation: 'provider_json', operation, requestId: response.requestId, receivedAt: response.rawResponse.receivedAt, rawResponse: response.rawResponse };
   }
   async #finish(value, consent) { await this.#guard(); this.#consentTime(consent); return value; }
-  async #resource(kind, handle) {
+  async #resource(kind, handle, revokeExpired = false) {
+    if (revokeExpired && kind !== 'consent') throw mismatch();
     await this.#guard();
-    const value = await this.#resources.open(kind, handle), consent = kind === 'consent' ? value : value.consent;
+    const value = await (revokeExpired ? this.#resources.openConsentForRevocation(handle) : this.#resources.open(kind, handle)), consent = kind === 'consent' ? value : value.consent;
     if (!isRecord(consent) || consent.corporateId !== this.#context.corporateId || consent.psuId !== this.#context.psuId || consent.bicFi !== this.#context.bicFi ||
-        !resourceId(consent.id) || !validDate(consent.validUntil) || Date.parse(endOfDate(consent.validUntil)) <= this.#now() ||
+        !resourceId(consent.id) || !validDate(consent.validUntil) || (!revokeExpired && Date.parse(endOfDate(consent.validUntil)) <= this.#now()) ||
         consent.corporateIdType !== this.#context.corporateIdType || consent.affiliatedAspspId !== this.#context.affiliatedAspspId) throw mismatch();
     return value;
   }
@@ -207,8 +210,8 @@ class OpenPaymentsCompanyConnection {
     return this.#finish({ status: consentStatus(response.data.consentStatus), original: this.#original(response, 'consent_status') });
   }
   async revokeConsent(handle) {
-    const consent = await this.#resource('consent', handle);
-    await this.#request(`${CONSENTS}/${consent.id}`, { method: 'DELETE', consent });
+    const consent = await this.#resource('consent', handle, true);
+    await this.#request(`${CONSENTS}/${consent.id}`, { method: 'DELETE', consent, revokeExpired: true });
     await this.#guard();
   }
   async createAuthorisation(handle) {

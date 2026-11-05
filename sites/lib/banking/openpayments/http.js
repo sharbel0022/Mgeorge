@@ -1,4 +1,6 @@
 import { BankProviderError, assertServerRuntime, isRecord, validDate } from '../bank-data-provider.js';
+import { sha256 } from '@noble/hashes/sha2.js';
+import { bytesToHex } from '@noble/hashes/utils.js';
 import { OPENPAYMENTS_ORIGINS } from './config.js';
 
 const HEADER_ALLOWLIST = new Set(['accept', 'authorization', 'content-type', 'x-request-id', 'x-bicfi', 'psu-id', 'psu-corporate-id', 'psu-corporate-id-type', 'psu-ip-address', 'psu-user-agent', 'tpp-redirect-preferred', 'tpp-redirect-uri', 'consent-id', 'x-affiliatedaspsp-id', 'x-consentid', 'x-consentauthorisationid']);
@@ -59,7 +61,7 @@ function retryAdvice(value, now) {
 const cancelBody = response => { try { response.body?.cancel().catch(() => {}); } catch {} };
 
 async function readJson(response, signal, maxBytes) {
-  if (response.status === 204) return {};
+  if (response.status === 204) return { data: {}, body: '', sha256: bytesToHex(sha256(new Uint8Array())) };
   const length = response.headers.get('content-length');
   if (length !== null && (!/^\d+$/.test(length) || Number(length) > maxBytes)) { cancelBody(response); throw new BankProviderError('PROVIDER_RESPONSE_INVALID'); }
   if (!/^application\/(?:[a-z0-9.-]+\+)?json(?:\s*;|$)/i.test(response.headers.get('content-type') ?? '')) { cancelBody(response); throw new BankProviderError('PROVIDER_RESPONSE_INVALID'); }
@@ -80,9 +82,10 @@ async function readJson(response, signal, maxBytes) {
     }
     const bytes = new Uint8Array(size); let offset = 0;
     for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
-    const data = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+    const body = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
+    const data = JSON.parse(body);
     if (!isRecord(data)) throw Error();
-    return data;
+    return { data, body, sha256: bytesToHex(sha256(bytes)) };
   } catch (error) {
     if (error instanceof BankProviderError) throw error;
     throw new BankProviderError('PROVIDER_RESPONSE_INVALID');
@@ -129,13 +132,14 @@ export function createOpenPaymentsHttpClient(config, { transport, timeoutMs = 20
             if (status === 429) throw new BankProviderError('PROVIDER_RATE_LIMIT', 429, advice);
             throw new BankProviderError('PROVIDER_SERVICE_ERROR', 502, { ...advice, retryable: !write && advice.retryable, mayHaveSucceeded: write });
           }
-          const data = await readJson(response, controller.signal, maxResponseBytes);
+          const receipt = await readJson(response, controller.signal, maxResponseBytes), { data } = receipt;
           if (!response.ok) {
             if (service === 'auth' && data.error === 'invalid_client') throw new BankProviderError('INVALID_CLIENT_CREDENTIALS', 401);
             if (service === 'auth' && ['invalid_grant', 'invalid_scope', 'unauthorized_client'].includes(data.error)) throw new BankProviderError('INVALID_OAUTH_RESULT', 403);
             throw new BankProviderError('PROVIDER_REQUEST_REJECTED', 502);
           }
-          return { data, headers: response.headers, requestId: headers.get('X-Request-ID') };
+          return { data, headers: response.headers, requestId: headers.get('X-Request-ID'),
+            rawResponse: Object.freeze({ body: receipt.body, sha256: receipt.sha256, requestPath: path, requestId: headers.get('X-Request-ID'), receivedAt: new Date(now()).toISOString() }) };
         } catch (error) {
           if (error instanceof BankProviderError) throw error;
           if (['INVALID_CLIENT_CERTIFICATE', 'CLIENT_CERTIFICATE_EXPIRED'].includes(error?.code)) throw new BankProviderError(error.code, 409);

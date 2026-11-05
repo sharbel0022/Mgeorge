@@ -24,6 +24,14 @@ export interface OpenPaymentsOptions {
   timeoutMs?: number;
   maxResponseBytes?: number;
 }
+/** Exact UTF-8 HTTP body; its byte digest differs from canonical bankDataSha256. */
+export interface OpenPaymentsRawResponse {
+  body: string;
+  sha256: string;
+  requestPath: string;
+  requestId: string;
+  receivedAt: string;
+}
 export interface OpenPaymentsOriginal {
   provider: 'open_payments';
   binding: Readonly<ProviderBinding>;
@@ -31,6 +39,7 @@ export interface OpenPaymentsOriginal {
   bankData: Record<string, unknown>;
   bankDataSha256: string;
   representation: 'provider_json';
+  rawResponse: Readonly<OpenPaymentsRawResponse>;
   operation: string;
   requestId: string;
   receivedAt: string;

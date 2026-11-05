@@ -85,20 +85,24 @@ export function scopedResourceCodec(input, codec, now = Date.now) {
     if (!['consent', 'account', 'authorisation', 'redirect'].includes(kind)) throw new BankProviderError('RESOURCE_SCOPE_MISMATCH', 403);
     return `provider-resource-v1:${scope}:${kind}`;
   };
+  async function open(kind, handle, requireUnexpired) {
+    let value;
+    try {
+      if (typeof handle !== 'string' || handle.length > 32_768 || !handle) throw Error();
+      value = await codec.unseal(binding.owner, purpose(kind), handle);
+      if (!isRecord(value) || value.version !== 1 || !validInstant(value.expiresAt) || !isRecord(value.data)) throw Error();
+    } catch { throw new BankProviderError('RESOURCE_SCOPE_MISMATCH', 403); }
+    if (requireUnexpired && Date.parse(value.expiresAt) <= now()) throw new BankProviderError('RESOURCE_EXPIRED', 409);
+    return snapshot(value.data);
+  }
   return Object.freeze({
     async seal(kind, data, expiresAt) {
       if (!validInstant(expiresAt) || Date.parse(expiresAt) <= now()) throw new BankProviderError('RESOURCE_EXPIRED', 409);
       return codec.seal(binding.owner, purpose(kind), { version: 1, expiresAt, data: snapshot(data) });
     },
-    async open(kind, handle) {
-      let value;
-      try {
-        if (typeof handle !== 'string' || handle.length > 32_768 || !handle) throw Error();
-        value = await codec.unseal(binding.owner, purpose(kind), handle);
-        if (!isRecord(value) || value.version !== 1 || !validInstant(value.expiresAt) || !isRecord(value.data)) throw Error();
-      } catch { throw new BankProviderError('RESOURCE_SCOPE_MISMATCH', 403); }
-      if (Date.parse(value.expiresAt) <= now()) throw new BankProviderError('RESOURCE_EXPIRED', 409);
-      return snapshot(value.data);
-    },
+    open: (kind, handle) => open(kind, handle, true),
+    // Only consent cleanup may decode expired authority. Authentication, purpose
+    // and every owner/company/connection/generation binding remain unchanged.
+    openConsentForRevocation: handle => open('consent', handle, false),
   });
 }

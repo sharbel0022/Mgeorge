@@ -2,6 +2,8 @@
  * All authority and endpoints originate in trusted server configuration. */
 const MAX_ORIGINAL=15000000,MAX_JSON=65536,FRESH_MS=300000,TIMEOUT_MS=10000;
 const CAPABILITY='bankgiro_reports:read';
+const OPENPAYMENTS_PROFILE='openpayments-bankgiro-v1';
+const enrichmentScopes=value=>['accountinformation','bankgiroinformation','corporate'].every(scope=>value?.capabilities?.includes(scope));
 const clean=(value,max=500)=>typeof value==='string'&&value.length>0&&value.length<=max&&!/[\u0000-\u001f\u007f]/.test(value);
 const instant=value=>typeof value==='string'&&Number.isFinite(Date.parse(value));
 const error=code=>Object.assign(new Error(code),{code});
@@ -20,9 +22,13 @@ function endpoint(value){
 }
 function validRegistration(registration,time){
  let r;try{r=structuredClone(registration);}catch{throw error('AUTHORIZATION_BLOCKED');}
- if(!r||!['id','owner','companyId','scopeId','generation','profileId','tokenSecret'].every(key=>clean(r[key]))||!/^\d{4,10}$/.test(r.bankgiro)||r.mode!=='production'||r.enabled!==true||r.synthetic===true||r.entitlement?.synthetic===true||r.transport!=='https-v1'||!Number.isSafeInteger(r.intervalMinutes)||r.intervalMinutes<1||r.intervalMinutes>1440||!Array.isArray(r.allowedFormats)||r.allowedFormats.length<1||r.allowedFormats.length>3||!r.allowedFormats.every(format=>['csv','xml','xlsx'].includes(format))||new Set(r.allowedFormats).size!==r.allowedFormats.length||!entitlementValid(r.entitlement,time)||r.configurationRevision!==undefined&&(!Number.isSafeInteger(r.configurationRevision)||r.configurationRevision<1))throw error('AUTHORIZATION_BLOCKED');
+ if(!r||!['id','owner','companyId','scopeId','generation','profileId','tokenSecret'].every(key=>clean(r[key]))||!/^\d{4,10}$/.test(r.bankgiro)||r.mode!=='production'||r.enabled!==true||r.synthetic===true||r.entitlement?.synthetic===true||r.transport!=='https-v1'||!Number.isSafeInteger(r.intervalMinutes)||r.intervalMinutes<1||r.intervalMinutes>1440||!Array.isArray(r.allowedFormats)||r.allowedFormats.length<1||r.allowedFormats.length>3||!r.allowedFormats.every(format=>['csv','xml','xlsx','json'].includes(format))||new Set(r.allowedFormats).size!==r.allowedFormats.length||!entitlementValid(r.entitlement,time)||r.configurationRevision!==undefined&&(!Number.isSafeInteger(r.configurationRevision)||r.configurationRevision<1))throw error('AUTHORIZATION_BLOCKED');
+ // JSON is a narrowly versioned application capture. Generic JSON reports and
+ // mixed parser profiles cannot acquire the provider-specific admission path.
+ if(r.profileId===OPENPAYMENTS_PROFILE?r.allowedFormats.length!==1||r.allowedFormats[0]!=='json'||!enrichmentScopes(r.entitlement):r.allowedFormats.includes('json'))throw error('AUTHORIZATION_BLOCKED');
+ if(r.profileId===OPENPAYMENTS_PROFILE&&(!/^[A-Za-z0-9_-]{1,128}$/.test(r.accountId||'')||!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(r.iban||'')))throw error('AUTHORIZATION_BLOCKED');
  const base=endpoint(r.baseUrl),basePath=base.pathname.replace(/\/+$/,'');
- const registrationView=freeze({...Object.fromEntries(['id','owner','companyId','bankgiro','scopeId','generation','mode','enabled','transport','profileId','allowedFormats','intervalMinutes','configurationRevision'].filter(key=>r[key]!==undefined).map(key=>[key,r[key]])),entitlement:Object.fromEntries(['status','origin','evidenceId','checkedAt','validUntil','capabilities'].map(key=>[key,r.entitlement[key]])),transportBinding:JSON.stringify([base.origin,basePath,r.tokenSecret])});
+ const registrationView=freeze({...Object.fromEntries(['id','owner','companyId','bankgiro','scopeId','generation','mode','enabled','transport','profileId','allowedFormats','intervalMinutes','configurationRevision',...(r.profileId===OPENPAYMENTS_PROFILE?['accountId','iban']:[])].filter(key=>r[key]!==undefined).map(key=>[key,r[key]])),entitlement:Object.fromEntries(['status','origin','evidenceId','checkedAt','validUntil','capabilities'].map(key=>[key,r.entitlement[key]])),transportBinding:JSON.stringify([base.origin,basePath,r.tokenSecret])});
  return {r,base,basePath,registrationView};
 }
 function cancel(body){try{Promise.resolve(body?.cancel()).catch(()=>{});}catch{}}
@@ -71,10 +77,11 @@ function retryAfter(raw){
 }
 function reportDescriptor(value,formats){
  if(!value||!clean(value.reportId)||value.reportId==='.'||value.reportId==='..'||!clean(value.filename,255)||/[\\/]/.test(value.filename)||!formats.includes(value.filename.split('.').pop()?.toLowerCase())||typeof value.sha256!=='string'||! /^[a-f0-9]{64}$/i.test(value.sha256)||value.byteLength!==undefined&&(!Number.isSafeInteger(value.byteLength)||value.byteLength<1||value.byteLength>MAX_ORIGINAL)||value.availableAt!==undefined&&!instant(value.availableAt)||['url','downloadUrl','contentUrl','href'].some(key=>Object.hasOwn(value,key)))throw error('INVALID_PAGE');
+ if(formats.includes('json')&&!/\.opbg\.json$/i.test(value.filename))throw error('INVALID_PAGE');
  try{encodeURIComponent(value.reportId);}catch{throw error('INVALID_PAGE');}
  return {reportId:value.reportId,filename:value.filename,sha256:value.sha256.toLowerCase(),...(value.byteLength!==undefined?{byteLength:value.byteLength}:{}),...(value.availableAt!==undefined?{availableAt:value.availableAt}:{})};
 }
-const receiptKey=value=>JSON.stringify(['status','owner','sourceId','companyId','bankgiro','scopeId','generation','profileId','evidenceId','checkedAt','validUntil','origin','capabilities'].map(key=>value?.[key]));
+const receiptKey=value=>JSON.stringify(['status','owner','sourceId','companyId','bankgiro','scopeId','generation','profileId','evidenceId','checkedAt','validUntil','origin','capabilities','accountId','iban'].map(key=>value?.[key]));
 
 export function createHttpsBankgiroSource({registration,token,fetchImpl=globalThis.fetch,now=Date.now}){
  const {r,base,basePath,registrationView}=validRegistration(registration,now());
@@ -83,7 +90,8 @@ export function createHttpsBankgiroSource({registration,token,fetchImpl=globalTh
  const guard=owner=>{if(owner!==r.owner||!entitlementValid(r.entitlement,now()))throw error('AUTHORIZATION_BLOCKED');};
  const validateRemote=value=>{
   if(!entitlementValid(value,now(),true)||['owner','companyId','bankgiro','scopeId','generation','profileId'].some(key=>value[key]!==r[key])||value.sourceId!==r.id)throw error('AUTHORIZATION_BLOCKED');
-  return freeze({...Object.fromEntries(['status','owner','sourceId','companyId','bankgiro','scopeId','generation','profileId','evidenceId','checkedAt','validUntil','origin','capabilities'].map(key=>[key,structuredClone(value[key])])),validUntil:new Date(Math.min(Date.parse(value.validUntil),Date.parse(r.entitlement.validUntil))).toISOString()});
+  if(r.profileId===OPENPAYMENTS_PROFILE&&(!enrichmentScopes(value)||value.accountId!==r.accountId||value.iban!==r.iban))throw error('AUTHORIZATION_BLOCKED');
+  return freeze({...Object.fromEntries(['status','owner','sourceId','companyId','bankgiro','scopeId','generation','profileId','evidenceId','checkedAt','validUntil','origin','capabilities',...(r.profileId===OPENPAYMENTS_PROFILE?['accountId','iban']:[])].map(key=>[key,structuredClone(value[key])])),validUntil:new Date(Math.min(Date.parse(value.validUntil),Date.parse(r.entitlement.validUntil))).toISOString()});
  };
  const authorized=(owner,authorization)=>{guard(owner);validateRemote(authorization);if(!receipts.has(receiptKey(authorization)))throw error('AUTHORIZATION_BLOCKED');};
  async function request(path,params,signal,binary=false){

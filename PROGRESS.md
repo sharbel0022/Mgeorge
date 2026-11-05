@@ -1,5 +1,13 @@
 # Verifierad progress
 
+## SaaS Agent 4 — Bankgiroberikning, 2026-11-04
+
+Separat branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Leveransrapport, fältkontrakt, banktäckning och testbevis](docs/integration/saas/bankgiro-enrichment.md). Open Payments dokumenterade `transactions.bankgiro` normaliseras till individuella rapportobservationer. Exakta API-svar, kontrollsummor, ankomstkvitton, aktuell företags-/kontobehörighet och råa bankfält bevaras. Saknade detaljer och motstridiga identiteter blir tydliga granskningsspärrar. Befintliga CAMT054C/SFTP- och filimportvägar behålls.
+
+Rapporter skapar inga extra ekonomiska insättningar eller fakturaallokeringar. En API-grupp kräver en gemensam bankutfärdad postreferens och verifierad kontoidentitet för koppling till en befintlig AIS-insättning; datum och belopp räcker inte. Återimport och skilda betalningar med identiska belopp/referenser testas separat. `0599` och `599` förblir olika bankvärden och företagets referenspolicy bevaras. Historiska kundoriginal har inte använts som testdata eller ändrats.
+
+Leveransen gäller kod, tester, dokumentation, branch och PR. Grundmodellens företagsval, providerklientens råsvarskvitto samt kundens verkliga behörighet och banktäckning måste kopplas in innan produktionsaktivering. Den nuvarande ägarbaserade källregistreringen är ingen fullständig flerföretagsmodell. Exakta slutgrindar och kvarstående integrationsgränser finns i rapporten. **Samtliga 33 poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
 ## Agent 3 — företagsbundet bankmedgivande, 2026-11-04
 
 Egen utvecklingsbranch `feature/saas-bank-consent`, bas `14a042a`. [API-kontrakt, modeller, säkerhetsgränser och verifieringskvitto](docs/integration/saas/bank-consent.md). Leveransen omfattar befintliga Node- och Sites-routes, gemensam medgivandepolicy, additiv lagring och regressionstester. Ingen merge, Sites-publicering, produktionsmigration eller verklig bankidentifiering ingår.

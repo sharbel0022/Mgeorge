@@ -22,3 +22,15 @@ test('a correctly bound company source uses the existing original, account proof
  await changeCompanyMembership(f.database,scope,{actorId:f.owner,role:'owner',status:'revoked'});
  const calls=providerCalls;assert.equal((await handler(request())).status,403);assert.equal(providerCalls,calls);assert.deepEqual(f.read(),saved);
 });
+
+test('workspace tenant identity is derived from the catalog, never a stale editable profile',async t=>{
+ const f=await ingestFixture(t),state=f.read().state;state.company.id='forged-other-company';f.write(state);
+ const server=await import(f.moduleUrls.server);
+ assert.equal((await server.readWorkspace(f.owner)).state.company.id,undefined);
+ f.sql.prepare('DELETE FROM bankgiro_ingest_leases').run();
+ await provisionCompany(f.database,{id:'catalog-company-uuid',name:'Company 556677-8899',actorId:f.owner,legacyOwner:f.owner,verifiedLegacyOwner:f.owner,verifiedBy:'synthetic-operator',verificationEvidence:'Explicit synthetic adoption'});
+ const handler=server.withCompanyRequest(async()=>server.response((await server.readWorkspace(f.owner)).state));
+ const response=await handler(new Request('https://synthetic.test/api/workspace',{headers:{'X-Company-Id':'catalog-company-uuid','X-Company-Context-Version':'1'}}));
+ assert.equal(response.status,200);assert.equal((await response.json()).company.id,'catalog-company-uuid');
+ assert.equal(f.read().state.company.id,'forged-other-company','a read must not rewrite stored original profile');
+});

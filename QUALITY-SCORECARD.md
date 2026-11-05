@@ -1,5 +1,16 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## SaaS Agent 4 — avgränsad Bankgiroberikning, 2026-11-04
+
+[Verifieringsrapport och leverantörsmatris](docs/integration/saas/bankgiro-enrichment.md), branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. **Samtliga 33 numeriska poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
+| Berörda områden | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | --- | --- |
+| Bank, Bankgiro, individuella betalare och dubbletter | Dokumenterad Open Payments-modell, exakt beloppsnormalisering, separata källidentiteter, samlingsinsättningar, ofullständig täckning, återimport och konflikter testas med syntetiska data. | Verklig kundbehörighet, bankens individuella fälttäckning och fullständig historik har inte verifierats. |
+| Ekonomisk korrekthet och fakturareferenser | Rapporter tillför inga extra ekonomiska insättningar. Gemensam bankreferens krävs; `0599`/`599`, generell referens, formell OCR och företagspolicy hålls isär. Ingen allokering sker vid import. | Det historiska 0599-fallet kräver fortfarande nödvändiga bankbevis och ett behörigt ekonomiskt beslut. |
+| Åtkomstkontroll och original | Företags-/konto-/rapportbindning, aktuella scope, oföränderliga råsvar, kontrollsummor och separata behörighetskvitton verifieras vid intake och commit. | Integrering med SaaS-grundmodell och providertransport återstår före aktivering; nuvarande register är ägarbaserat. |
+| Kodkvalitet och tester | Riktade positiva och negativa regressioner, fulla slutgrindar samt oberoende granskning redovisas med exakt omfattning i rapporten. | Lokal syntetisk framgång och dokumenterad leverantörskapacitet är inga produktionsbevis. |
+
 ## Agent 3 — avgränsad företagsmedgivandeverifiering, 2026-11-04
 
 [Bank consent-kontrakt och verifieringskvitto](docs/integration/saas/bank-consent.md) gäller utvecklingsbranchen `feature/saas-bank-consent` från `14a042a`. Alla 33 poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. Syntetiska regressionsprov och oberoende kodgranskning ersätter inte bankens faktiska företagsbehörighet eller produktionsacceptans.

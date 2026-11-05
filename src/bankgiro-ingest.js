@@ -1,10 +1,13 @@
 /** Original-preserving adapter for the shared source queue. No reconciliation is run here. */
+import {readCompanyDatabaseBoundary} from './company-runtime.js';
 import {randomUUID} from 'node:crypto';
 import {digest} from './security.js';
 import {parseBankFile} from './importers.js';
-import {recordImport,storeTransactions} from './db.js';
+import {audit,getSettings,recordImport,storeTransactions} from './db.js';
+import {readOpenPaymentsBankgiroCapture,assertOpenPaymentsBankgiroAuthority} from '../sites/lib/bankgiro-openpayments-capture.js';
 
-const mimeFor=name=>/\.xlsx$/i.test(name)?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':/\.xml$/i.test(name)?'application/xml':'text/csv';
+const captureMime='application/vnd.mgeorge.openpayments-bankgiro+json';
+const mimeFor=name=>/\.opbg\.json$/i.test(name)?captureMime:/\.xlsx$/i.test(name)?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':/\.xml$/i.test(name)?'application/xml':'text/csv';
 const blocked=(code='INVALID_ORIGINAL')=>Object.assign(new Error('Bankgiro-originalet eller behörigheten måste kontrolleras.'),{code,status:409});
 const parseOriginal=(name,encoded,account)=>{try{return parseBankFile(name,encoded,account);}catch{throw blocked('INVALID_ORIGINAL');}};
 
@@ -60,6 +63,39 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
    return document;
    };
    const document=assertOriginal();
+   if(document.mime_type===captureMime){
+    const assertCapture=()=>{
+     const original=assertOriginal();
+     const capture=readOpenPaymentsBankgiroCapture(original.content);
+     if(capture.reportId!==job.reportId)throw blocked('IDENTITY_CONFLICT');
+     const boundary=readCompanyDatabaseBoundary(db);
+     if(boundary&&boundary.storageOwner!==owner)throw blocked('AUTHORIZATION_BLOCKED');
+     const receipt=assertOpenPaymentsBankgiroAuthority(capture,authorization,{owner,companyId:boundary?boundary.companyId:getSettings(db).company_id,sourceId:job.sourceId,scopeId:job.scopeId,now:now()});
+     return {original,capture,receipt};
+    };
+    assertCapture();
+    // Standalone SQLite cannot link company-scoped observations to economic events.
+    // Keep the captured original in review, including on replay, without posting rows.
+    return write(owner,lease,()=>{
+     const {original,capture,receipt}=assertCapture();
+     const paymentCount=capture.normalization.rows.length;
+     const reasonCode=capture.normalization.coverage.status==='unavailable'?'BANKGIRO_INFORMATION_UNAVAILABLE':capture.normalization.coverage.status==='partial'?'BANKGIRO_INFORMATION_PARTIAL':'BANKGIRO_ENRICHMENT_REVIEW';
+     const prior=db.prepare("SELECT * FROM import_jobs WHERE source='bank_file' AND content_sha256=? AND owner=? ORDER BY rowid LIMIT 1").get(job.sha256,owner);
+     let importId;
+     if(prior){
+      if(!prior.content||digest(prior.content)!==job.sha256||prior.mime_type!==captureMime||prior.status!=='needs_review')throw blocked('IDENTITY_CONFLICT');
+      importId=prior.id;
+     }else{
+      importId=recordImport(db,{source:'bank_file',name:original.name,found:paymentCount,review:paymentCount,status:'needs_review',content:original.content,mime_type:original.mime_type,error:reasonCode});
+      db.prepare('UPDATE import_jobs SET owner=? WHERE id=?').run(owner,importId);
+     }
+     const metadata=JSON.parse(original.metadata);
+  if(!prior||JSON.stringify(metadata.openPaymentsAuthorization)!==JSON.stringify(receipt))
+    audit(db,'bankgiro_enrichment_review',{owner,documentId,importId,reportId:job.reportId,sha256:job.sha256,currentReceipt:receipt,paymentCount,reasonCode,allocationsCreated:0});
+  db.prepare('UPDATE documents SET metadata=? WHERE id=?').run(JSON.stringify({...metadata,openPaymentsAuthorization:receipt}),documentId);
+     return {status:'REVIEW',importId,paymentCount,reasonCode};
+    },authorization,assertCapture);
+   }
    // Manual imports belong to this standalone application's single administrator.
    // Never adopt an explicitly owned import from a different administrator.
    const prior=db.prepare("SELECT * FROM import_jobs WHERE source='bank_file' AND content_sha256=? AND (owner=? OR owner='') ORDER BY rowid LIMIT 1").get(job.sha256,owner);

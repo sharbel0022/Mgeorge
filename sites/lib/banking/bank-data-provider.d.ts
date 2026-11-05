@@ -59,6 +59,7 @@ export function providerForConnection<T extends { id: BankProviderId }>(connecti
 export function scopedResourceCodec(binding: ProviderBinding, codec: ProviderResourceStorage, now?: () => number): {
   seal(kind: 'consent' | 'account' | 'authorisation' | 'redirect', data: Record<string, unknown>, expiresAt: string): Promise<string>;
   open(kind: 'consent' | 'account' | 'authorisation' | 'redirect', handle: string): Promise<Record<string, unknown>>;
+  openConsentForRevocation(handle: string): Promise<Record<string, unknown>>;
 };
 export function assertServerRuntime(): void;
 export function isRecord(value: unknown): value is Record<string, unknown>;
