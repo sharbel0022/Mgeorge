@@ -359,7 +359,12 @@ export async function callback(request: Request): Promise<Response> {
         const consent: ConsentMetadata = { version: 'bank-consent-v1', mode, companyId: company.companyId, actorId: company.actorId,
           membershipVersion: company.membershipVersion, requestedScopes: context?.requiredScopes ?? ['accounts:read','transactions:read'],
           grantedScopes: grant.grantedScopes, validUntil, corporateAuthorization: authority };
-        const id = renewal ? existing!.id : uid(), at = now();
+        const syncScope = existing?.status === 'disconnected' ? await db().prepare('SELECT company_id,evidence_id,revision FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first<{company_id:string;evidence_id:string;revision:number}>() : null;
+        // Reconnecting the same owned bank retains its durable quota namespace.
+        // The new corporate grant is still independently verified above.
+        const reconnect = !!syncScope && !!existing && existing.status === 'disconnected' && !existing.encrypted_session && existing.bank_name === flow.bank_name && existing.country === flow.country && existing.environment === flow.environment;
+        const preserveNamespace = renewal || reconnect;
+        const id = preserveNamespace ? existing!.id : uid(), at = now();
         const status = mode === 'company' ? authority.status === 'verified' ? 'pending_account' : 'corporate_authorization_required' : 'connected';
         resultStatus = status === 'pending_account' ? 'select_account' : status;
         const encryptedSession = await encrypt(owner, `session:${id}`, result.session_id);
@@ -384,18 +389,20 @@ export async function callback(request: Request): Promise<Response> {
         if ((await application(owner))?.generation !== app.generation) throw new ConsentError('CONSENT_APPLICATION_CHANGED', 409);
         // The existing lease and this flow/connection predicate fence the same
         // atomic batch, including replacement races at D1's actual write boundary.
-        const connectionPredicate = renewal ? 'EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND encrypted_session=?)' : "NOT EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND encrypted_session<>'')";
+        const connectionPredicate = preserveNamespace ? 'EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND id=? AND encrypted_session=?)' : "NOT EXISTS(SELECT 1 FROM bank_connections WHERE owner=? AND encrypted_session<>'')";
         const fence = db().prepare(`INSERT INTO bank_locks(owner,token,expires_at) VALUES(?,
           (SELECT token FROM bank_locks WHERE owner=? AND EXISTS(SELECT 1 FROM bank_auth_flows WHERE state_hash=? AND owner=? AND status='exchanging' AND context_json=? AND cookie_hash=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now'))
           AND ? > strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${connectionPredicate}),?) ON CONFLICT(owner) DO UPDATE SET token=excluded.token`)
           .bind(owner, owner, stateHash, owner, flow.context_json, flow.cookie_hash, validUntil, owner,
-            ...(renewal ? [existing!.id, existing!.encrypted_session] : []), flow.expires_at);
+            ...(preserveNamespace ? [existing!.id, existing!.encrypted_session] : []), flow.expires_at);
+        const scopeFence = reconnect ? [db().prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM company_bank_sync_scopes WHERE company_id=? AND owner=? AND evidence_id=? AND revision=?) THEN 1 ELSE json('COMPANY_SCOPE_MISMATCH') END").bind(syncScope!.company_id,owner,syncScope!.evidence_id,syncScope!.revision)] : [];
         commitAttempted = true;
         await lease.write([
           fence,
+          ...scopeFence,
           db().prepare(`INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at,consent_metadata)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,auto_sync_enabled=0,auto_next_at=NULL,auto_last_attempt_at=NULL,retry_after='',sync_failures=0,consent_metadata=excluded.consent_metadata,created_at=excluded.created_at,updated_at=excluded.updated_at`)
-            .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', validUntil, flow.date_from, status, at, at, JSON.stringify(consent)),
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(owner) DO UPDATE SET id=excluded.id,app_generation=excluded.app_generation,environment=excluded.environment,bank_name=excluded.bank_name,country=excluded.country,encrypted_session=excluded.encrypted_session,encrypted_accounts=excluded.encrypted_accounts,selected_accounts=excluded.selected_accounts,valid_until=excluded.valid_until,date_from=excluded.date_from,status=excluded.status,last_synced_at=NULL,last_error=NULL,auto_sync_enabled=0,auto_next_at=NULL,auto_last_attempt_at=NULL,retry_after=${preserveNamespace?'bank_connections.retry_after':"''"},sync_failures=0,consent_metadata=excluded.consent_metadata,created_at=excluded.created_at,updated_at=excluded.updated_at`)
+            .bind(id, owner, app.generation, flow.environment, flow.bank_name, flow.country, encryptedSession, encryptedAccounts, '[]', validUntil, flow.date_from, status, preserveNamespace?existing!.created_at:at, at, JSON.stringify(consent)),
           db().prepare("UPDATE bank_auth_flows SET status='completed',result_code=?,connection_id=? WHERE state_hash=? AND owner=? AND status='exchanging'").bind(authority.status === 'verified' ? 'BANK_CONSENT_APPROVED' : 'CORPORATE_AUTHORIZATION_REQUIRED', id, stateHash, owner),
         ]);
         return callbackRedirect(resultStatus, cookieName);
@@ -551,6 +558,10 @@ export async function setAutomaticSync(request: Request): Promise<Response> {
 // never send the task runner's IP or browser identity to the bank as the user's.
 export async function automaticSync(request?: Request): Promise<Response> {
   const user = await identity(request);
+  const openPayments=await (await import('./openpayments-scheduler')).dispatchOpenPaymentsSchedule(user.userId,request);
+  if(openPayments)return response(openPayments);
+  const company=await (await import('./company-sync')).dispatchCompanyAutomaticSync(user.userId,{psu:request?psuHeaders(request):undefined,nextAutomaticAttempt});
+  if(company)return response(company);
   const reports=await import('../bankgiro-ingest-service');
   const bankgiro=await reports.runBankgiroSource(user.userId);
   const result=await synchronizeOwner(user.userId, { automatic: true, psu: request ? psuHeaders(request) : undefined });
@@ -558,7 +569,10 @@ export async function automaticSync(request?: Request): Promise<Response> {
 }
 
 export async function automaticSyncStatus(): Promise<Response> {
-  const user = await identity(), conn = await connection(user.userId);
+  const user = await identity();
+  const openPayments=await (await import('./openpayments-scheduler')).dispatchOpenPaymentsSchedule(user.userId,undefined,true);
+  if(openPayments)return response(openPayments);
+  const conn = await connection(user.userId);
   const run=await db().prepare('SELECT warnings FROM bank_sync_runs WHERE owner=? ORDER BY created_at DESC,rowid DESC LIMIT 1').bind(user.userId).first<{warnings:string}>();
   return response({ enabled: conn?.auto_sync_enabled === 1, connected: !!conn && storedStatus(conn) === 'connected', intervalHours: 6,
     lastSyncedAt: conn?.last_synced_at ?? null, lastAttemptAt: conn?.auto_last_attempt_at ?? null,
@@ -567,7 +581,28 @@ export async function automaticSyncStatus(): Promise<Response> {
 
 async function synchronizeOwner(owner: string, options: { automatic?: boolean; control?:boolean; psu?: ProviderPsu }): Promise<Response> {
   const user = { userId: owner };
-  return withBankLock(user.userId, async lease => {
+  let companyScopes=true;
+  try{await db().prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first();}
+  catch(error){if(error instanceof Error&&/no such table:\s*(?:main\.)?company_bank_sync_scopes\b/i.test(error.message))companyScopes=false;else throw error;}
+  const assertLegacy=async()=>{
+    if(companyScopes&&await db().prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first())throw new BankError('Den här arbetsytan tillhör ett företag. Bankhämtningen måste använda företagets aktuella behörighet och kontroller.',409);
+  };
+  await assertLegacy();
+  return withBankLock(user.userId, async ownerLease => {
+    // A company can be bound after the initial read. Fence every legacy write
+    // under the same owner-lock transaction so manual/control paths cannot
+    // bypass company authority while enrollment is changing concurrently.
+    const lease:BankLease=companyScopes?{
+      async assert(){await ownerLease.assert();await assertLegacy();},
+      async write(statements){
+        await assertLegacy();
+        const fence=db().prepare("SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM company_bank_sync_scopes WHERE owner=?) THEN 1 ELSE json('COMPANY_SCOPE_MISMATCH') END").bind(owner);
+        try{return (await ownerLease.write([fence,...statements])).slice(1);}
+        catch(error){await assertLegacy();throw error;}
+      },
+      async run(statement){return (await lease.write([statement]))[0];},
+    }:ownerLease;
+    await lease.assert();
     const app = await application(user.userId), conn = await connection(user.userId);
     if (options.automatic && (!conn || conn.auto_sync_enabled !== 1)) return response({ automatic: true, due: false, reason: 'disabled', imported: 0 });
     if (!app || !conn || app.generation !== conn.app_generation || storedStatus(conn) !== 'connected') throw new BankError('En giltig bankanslutning behövs. Anslut banken igen.');

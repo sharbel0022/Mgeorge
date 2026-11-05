@@ -1,10 +1,33 @@
 import test from 'node:test';
+import {readFileSync} from 'node:fs';
+import {stripTypeScriptTypes} from 'node:module';
+import {seal,unseal,randomToken} from '../lib/banking/security.ts';
+import {OpenPaymentsProvider} from '../lib/banking/openpayments-provider.js';
+import {CONFIG,CONTEXT,ACCOUNT,fixtureTransport,json} from './helpers/openpayments-fixture.mjs';
 import assert from 'node:assert/strict';
 import {createOpenPaymentsBankgiroCapture,readOpenPaymentsBankgiroCapture} from '../lib/bankgiro-openpayments-capture.js';
-import {provisionCompany} from '../lib/company-storage.js';
+import {provisionCompany,resolveCompanyScope,assertScopeCurrent} from '../lib/company-storage.js';
 import {applyCommand,economicTransactions,specificationPreview} from '../lib/domain.ts';
 import {ingestFixture,seedState,account,hash} from './helpers/bankgiro-ingest-fixture.mjs';
 const companyId='synthetic-company-a';
+const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
+const local=path=>new URL('../lib/'+path,import.meta.url).href;
+function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL('../lib/'+path,import.meta.url),'utf8'),{mode:'transform'});for(const[from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
+async function withActualOpenPaymentsAuthority(t,f,company){
+ const key=randomToken(),registration={companyId:company,actorId:f.owner,verified:true,corporateAccessVerified:true,redirectVerified:true,bankId:'OPBKSE21',corporateId:CONTEXT.corporateId,psuId:CONTEXT.psuId,bicFi:CONTEXT.bicFi};
+ Object.assign(f.env,{SAAS_BANK_ENABLED:'true',SAAS_OPENPAYMENTS_CONFIG:JSON.stringify(CONFIG),SAAS_OPENPAYMENTS_REGISTRATIONS:JSON.stringify([registration]),BANK_DATA_ENCRYPTION_KEY:key});
+ const scope=await resolveCompanyScope(f.database,f.owner,{companyId:company,contextVersion:1,action:'write'});
+ const codec={seal:(o,p,v)=>seal(key,o,p,v),unseal:(o,p,v)=>unseal(key,o,p,v)},binding={...CONTEXT.binding,companyId:company,owner:f.owner};
+ const transport=fixtureTransport({'GET /psd2/accountinformation/v1/accounts':()=>json({accounts:[{...ACCOUNT,iban:account}]})}),provider=new OpenPaymentsProvider(CONFIG,{transport:transport.transport}),client=provider.forCompany({...CONTEXT,binding},{...transport.dependencies,codec,assertCurrent:async current=>{assert.deepEqual(current,binding);await assertScopeCurrent(f.database,scope,'manage_integrations');}});
+ const consent=await client.createConsent({validUntil:new Date(Date.now()+30*86400000).toISOString().slice(0,10)}),list=await client.listAccounts(consent.handle),payload=await seal(key,f.owner,'saas-bank-state',{id:binding.connectionId,bankId:'OPBKSE21',generation:CONFIG.credentialGeneration,status:'active',permissions:['accounts:read','transactions:read'],validUntil:list.validUntil,consentHandle:consent.handle,accounts:list.accounts.map((a,i)=>({...a,id:'selected-op-'+i})),selected:['selected-op-0']});
+ const globalKey='__op_ingest_'+crypto.randomUUID().replaceAll('-','');globalThis[globalKey]=f;t.after(()=>delete globalThis[globalKey]);const envUrl=data(`export const env=globalThis[${JSON.stringify(globalKey)}].env;`),server=f.moduleUrls.server,domain=local('domain.ts');
+ const resolver=compiled('banking/openpayments-account-state.ts',{'cloudflare:workers':envUrl,'../server':server,'./security':local('banking/security.ts'),'./bank-data-provider.js':local('banking/bank-data-provider.js'),'./openpayments/config.js':local('banking/openpayments/config.js'),'./openpayments-normalization.js':local('banking/openpayments-normalization.js')});
+ const transactions=compiled('banking/transactions.ts',{'../domain':domain,'../payment-references.js':local('payment-references.js'),'../payer-evidence.js':local('payer-evidence.js')}),bankgiro=compiled('bankgiro-service.ts',{'./server':server,'./domain':domain,'./bankgiro-parser.js':local('bankgiro-parser.js'),'./banking/store':f.moduleUrls.store,'./banking/transactions':transactions,'./banking/openpayments-account-state':resolver});
+ const evidence=compiled('reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':f.moduleUrls.reconciliation,'./reconciliation-engine.js':local('reconciliation-engine.js'),'./bankgiro-service':bankgiro});
+ const service=compiled('bankgiro-ingest-service.ts',{'cloudflare:workers':envUrl,'./server':server,'./domain':domain,'./bankgiro-service':bankgiro,'./bankgiro-parser.js':local('bankgiro-parser.js'),'./reconciliation-evidence':evidence,'./bankgiro-ingest.js':local('bankgiro-ingest.js'),'./bankgiro-ingest-store.js':local('bankgiro-ingest-store.js'),'./bankgiro-source.js':local('bankgiro-source.js'),'./bankgiro-source-registry.js':data('export const resolveBankgiroSource=async()=>null;')});
+ f.sink=(await import(service)).createSitesBankgiroSink();return payload;
+}
+
 function capture({company=companyId,owner='synthetic-owner',reference='0599',payer='Synthetic customer AB',captureId='capture-1',amount='625.00',parentReference='SYNTHETIC-DEPOSIT',bankgiro=true,payments}={}){
  const child={transactionId:'CHILD-1',entryReference:'CHILD-BANK-REF',transactionAmount:{amount,currency:'SEK'},bookingDate:'2026-10-26',debtorName:payer,remittanceInformationStructured:reference,aggregateTransactionId:'PARENT-1',aggregateAmount:'625.00',aggregateId:1,isAliasPayin:true,isEnriched:true,creditorAccount:{iban:account,bankgiroNumber:'123-4567'},additionalInformation:'Bank-reported detail'};
  const children=payments?payments.map(row=>({...child,transactionId:row.id,entryReference:row.id+'-BANK',transactionAmount:{amount:row.amount,currency:'SEK'},debtorName:row.payer,remittanceInformationStructured:row.reference})):[child];
@@ -16,6 +39,7 @@ async function fixture(t,{company=companyId,...options}={}){
  const f=await ingestFixture(t,{state});
  if(company){
   await provisionCompany(f.database,{id:company,name:'Synthetic tenant',actorId:f.owner,legacyOwner:f.owner,verifiedLegacyOwner:f.owner,verifiedBy:'synthetic-operator',verificationEvidence:'Synthetic explicit adoption'});
+  const payload=await withActualOpenPaymentsAuthority(t,f,company);
   const server=await import(f.moduleUrls.server),sink=f.sink;
   f.bound=async operation=>{
    let result,failure;
@@ -23,6 +47,7 @@ async function fixture(t,{company=companyId,...options}={}){
    const response=await handler(new Request('https://synthetic.test/api/bankgiro/source/run',{method:'POST',headers:{Origin:'https://synthetic.test','X-Company-Id':company,'X-Company-Context-Version':'1'}}));
    if(failure)throw failure;if(!response.ok)throw Object.assign(Error('company scope rejected'),{code:(await response.json()).code});return result;
   };
+  await f.bound(()=>f.scopedDatabase.prepare('INSERT INTO saas_bank_state(owner,revision,payload) VALUES(?,1,?)').bind(f.owner,payload).run());
   f.sink={retain:input=>f.bound(()=>sink.retain(input)),importReport:input=>f.bound(()=>sink.importReport(input))};
   const prepare=f.prepare;
   f.prepare=(...args)=>f.bound(()=>prepare(...args));

@@ -56,6 +56,10 @@ function fixture(t,count=7){
   saas_bank_state:{revision:1,payload:'synthetic-encrypted-consent-state'},
   bankgiro_ingest_sources:{source_id:'synthetic-source',scope_id:'synthetic-scope',authorization_generation:'synthetic-generation',cursor:'delivery-2',updated_at:at.getTime()},
   bankgiro_ingest_jobs:{id:'synthetic-report-job',source_id:'synthetic-source',scope_id:'synthetic-scope',report_id:'0000599',sha256:sha(documents[2].bytes),filename:'synthetic.xml',authorization_generation:'synthetic-generation',document_id:uuid(2),status:'REVIEW',created_at:at.getTime(),updated_at:at.getTime()},
+  company_bank_sync_scopes:{company_id:'synthetic-company',evidence_id:'synthetic-company-binding',reference_policy:JSON.stringify({companyId:'synthetic-company',owner,revision:1,companyName:'Synthetic recovery AB',mode:'invoice_number',evidenceId:'synthetic-policy'}),created_at:at.getTime()},
+  company_bank_sync_jobs:{company_id:'synthetic-company',account_key:'synthetic-account',provider:'synthetic-bank',connection_id:'connection',authority_hash:'a'.repeat(64),generation_hash:'b'.repeat(64),authority_revision:1,valid_until:at.getTime()+86400000,lease_token:'synthetic-former-worker',lease_until:at.getTime()+60000,lease_deadline:at.getTime()+90000,fence_version:4,status:'retry',next_attempt_at:at.getTime()+60000,error_code:'PROVIDER_429',checkpoint:'{"cursor":"synthetic-page"}'},
+  company_bank_sync_requests:{id:'synthetic-company-request',company_id:'synthetic-company',account_key:'synthetic-account',connection_id:'connection',provider:'synthetic-bank',reserved_at:at.getTime()},
+  company_bank_sync_receipts:{company_id:'synthetic-company',account_key:'synthetic-account',receipt_key:'synthetic-page',sha256:'c'.repeat(64),result:'{"imported":1}',committed_at:at.getTime()},
  };
  for(const [name,row]of Object.entries(rows))insert(sql,name,{owner,...row});
  insert(sql,'bank_locks',{owner,token:'synthetic-live-lock',expires_at:at.toISOString()});
@@ -172,7 +176,7 @@ test('a resumed interrupted backup restores every exact financial row and origin
  assert.equal(readFileSync(sentinel,'utf8'),'must remain untouched');
  const restored=new DatabaseSync(join(result.directory,'evidence.sqlite'),{readOnly:true});
  try{
-  for(const table of expected)assert.deepEqual(restoredRows(restored,table.name),table.rows,table.name+' exact rows');
+  for(const table of expected){const rows=table.name==='company_bank_sync_jobs'?table.rows.map(row=>({...row,lease_token:'',lease_until:0,lease_deadline:0,fence_version:row.fence_version+1})):table.rows;assert.deepEqual(restoredRows(restored,table.name),rows,table.name+' authenticated rows with explicit lease invalidation');}
   const guard=restored.prepare('SELECT account_evidence_retry FROM evidence_bank_connections').get().account_evidence_retry;
   assert.equal(JSON.parse(guard).status,'unknown');assert.equal(accountReadCooldown(guard,at.getTime()+30*86400_000).blocked,true,'a restored unknown bank wait cannot expire as a generic retry');
   assert.throws(()=>restored.prepare('SELECT * FROM workspaces').all(),/no such table/);
@@ -183,7 +187,7 @@ test('a resumed interrupted backup restores every exact financial row and origin
  for(const document of f.documents){const restored=readFileSync(join(result.directory,'originals',document.id+'.bin'));assert.deepEqual(restored,document.bytes);assert.equal(sha(restored),sha(document.bytes));}
  assert.deepEqual(readFileSync(join(result.directory,'source','snapshot.bin')),Buffer.from(entries.get('objects/snapshot.bin')));
  assert.deepEqual(readFileSync(join(result.directory,'source','manifest.bin')),Buffer.from(entries.get('manifest.bin')));
- const receipt=JSON.parse(readFileSync(join(result.directory,'receipt.json'),'utf8'));assert.equal(receipt.mode,'evidence-only');assert.equal(receipt.originals.count,7);assert.equal(receipt.tables.length,BACKUP_TABLES.length);assert.equal(receipt.databaseSha256,sha(readFileSync(join(result.directory,'evidence.sqlite'))));assert.equal(JSON.stringify(receipt).includes(key),false);
+ const receipt=JSON.parse(readFileSync(join(result.directory,'receipt.json'),'utf8'));assert.equal(receipt.mode,'evidence-only');assert.equal(receipt.originals.count,7);assert.equal(receipt.tables.length,BACKUP_TABLES.length);assert.deepEqual(receipt.transforms,[{table:'company_bank_sync_jobs',kind:'invalidate_job_leases',rows:1}]);assert.equal(receipt.databaseSha256,sha(readFileSync(join(result.directory,'evidence.sqlite'))));assert.equal(JSON.stringify(receipt).includes(key),false);
  if(process.platform!=='win32'){assert.equal(statSync(result.directory).mode&0o077,0);assert.equal(statSync(join(result.directory,'evidence.sqlite')).mode&0o077,0);}
  assert.deepEqual(f.objects,sourceBefore);for(const table of expected)assert.deepEqual(sortedRows(f.sql.prepare(`SELECT * FROM ${table.name} WHERE owner=?`).all(owner)),table.rows);
 });

@@ -35,16 +35,19 @@ function currentAccountIssue(context:AccountContext,account:string,reportedAccou
  return '';
 }
 /** Stored consent/account resources only. This never contacts the bank provider. */
-export async function bankgiroAutomaticAccountIssue(owner:string,account:string,reportedAccount?:string){
+export async function bankgiroAutomaticAccountIssue(owner:string,account:string,reportedAccount?:string,provider:'enable_banking'|'open_payments'='enable_banking'){
+ if(provider==='open_payments'){try{const {resolveOpenPaymentsAccount}=await import('./banking/openpayments-account-state');await resolveOpenPaymentsAccount(owner,account,reportedAccount);return '';}catch{return 'Open Payments-kontot saknar ett aktuellt företagsbundet medgivande.';}}
  try{return currentAccountIssue(await activeAccounts(owner),account,reportedAccount);}catch{return 'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före nya betalningskopplingar.';}
 }
 /** Capture exactly the stored consent whose decoded account resource was checked.
  * The financial writer compares it again inside its atomic D1 batch. */
-export async function bankAccountConsentSnapshot(owner:string,account:string,reportedAccount?:string){
+export async function bankAccountConsentSnapshot(owner:string,account:string,reportedAccount?:string,provider:'enable_banking'|'open_payments'='enable_banking'){
+ if(provider==='open_payments'){const {resolveOpenPaymentsAccount}=await import('./banking/openpayments-account-state');return resolveOpenPaymentsAccount(owner,account,reportedAccount);}
  const context=await activeAccounts(owner),issue=currentAccountIssue(context,account,reportedAccount);if(issue)throw Error(issue);
  return context.conn;
 }
-async function resolveAccounts(owner:string,rows:any[]){
+async function resolveAccounts(owner:string,rows:any[],provider:'enable_banking'|'open_payments'='enable_banking'){
+ if(provider==='open_payments'){try{const {readOpenPaymentsAccountState}=await import('./banking/openpayments-account-state'),context=await readOpenPaymentsAccountState(owner);return rows.map(r=>{const raw=reportedAccountKey(typeof r.account==='string'?r.account.replace(/^bban:/i,''):r.account),holders=context.available.filter(a=>a.aliases.includes(raw)),match=holders.length===1?holders[0]:null;return match&&context.selected.includes(match.id)&&match.identity.currency==='SEK'?{...r,recipientAccount:r.account,account:match.key,bankgiroAccountIssue:''}:{...r,bankgiroAccountIssue:'Rapportens mottagarkonto ingår inte entydigt i företagets aktiva Open Payments-medgivande.'};});}catch{return rows.map(r=>({...r,bankgiroAccountIssue:'Open Payments-kontot saknar ett aktuellt företagsbundet medgivande.'}));}}
  let context:AccountContext;try{context=await activeAccounts(owner);}catch{return rows.map(row=>({...row,bankgiroAccountIssue:'En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.'}));}
  const {conn,selected,available}=context;
  return rows.map(r=>{
@@ -68,7 +71,7 @@ export async function readBankgiroOriginal(owner:string,command:Command,options:
  const doc=await readBankOriginalBytes(owner,command.documentId);
  if(/\.opbg\.json$/i.test(doc.filename)&&!options.allowApiCapture)throw captureOnly();
  if(/\.opbg\.json$/i.test(doc.filename))ownedCapture(owner,(await readWorkspace(owner)).state,doc);
- const rows=await resolveAccounts(owner,parseSpecificationBytes(doc.bytes,doc.filename));
+ const rows=await resolveAccounts(owner,parseSpecificationBytes(doc.bytes,doc.filename),/\.opbg\.json$/i.test(doc.filename)?'open_payments':'enable_banking');
  return {...command,rows,hash:doc.sha256,name:doc.filename};
 }
 export async function bankgiroPreview(owner:string,file:File,targetId:string){
@@ -84,7 +87,7 @@ export async function bankgiroRetainedPreview(owner:string,documentId:string,tar
  if(!validId(documentId)||targetId&&!validId(targetId))throw Error('Välj ett giltigt sparat bankoriginal och en giltig bankhändelse.');
  const {state,revision}=await readWorkspace(owner);
  if(targetId&&!state.transactions.some(row=>row.id===targetId))throw Error('Bankhändelsen finns inte för ditt konto.');
- const doc=await readBankOriginalBytes(owner,documentId),capture=ownedCapture(owner,state,doc),rawRows=parseSpecificationBytes(doc.bytes,doc.filename),rows=await resolveAccounts(owner,rawRows);
+ const doc=await readBankOriginalBytes(owner,documentId),capture=ownedCapture(owner,state,doc),rawRows=parseSpecificationBytes(doc.bytes,doc.filename),rows=await resolveAccounts(owner,rawRows,capture?'open_payments':'enable_banking');
  const preview=capture&&!rows.length?{plans:[],payments:0,total:0,linked:0,review:1}:specificationPreview(state,rows,targetId);
  return {documentId,name:doc.filename,rawRows,rows,preview,revision,hash:doc.sha256,duplicate:state.imports.some(i=>i.hash===doc.sha256),...(capture?{coverage:capture.normalization.coverage}:{})};
 }
@@ -119,7 +122,7 @@ export async function prepareBankgiroLinkCommand(owner:string,state:State,input:
  if(!target||!specification)throw Error('Bankhändelsen eller specifikationen finns inte för ditt konto.');
  const originalIssue=bankApiOriginalIssue(target)||paymentEvidenceIssue(state,target);if(originalIssue)throw Error(originalIssue);
  if(!target.bankData||!target.bankDataSha256||!target.bankDataVersion)throw Error('AIS-originalet saknar verifierbart ankomstkvitto.');
- const accountIssue=await bankgiroAutomaticAccountIssue(owner,target.account);if(accountIssue)throw Error(accountIssue);
+ const accountIssue=await bankgiroAutomaticAccountIssue(owner,target.account,undefined,target.bankDataVersion==='openpayments-response-v1'||target.enrichmentEvidence?.provider==='openpayments'?'open_payments':'enable_banking');if(accountIssue)throw Error(accountIssue);
  const rows=state.transactions.filter(row=>row.specification&&row.importId===specification.importId&&row.specificationGroup===specification.specificationGroup),proof=specification.bankFileProof;
  if(!proof||rows.some(row=>row.bankFileProof?.documentId!==proof.documentId||row.bankFileProof?.sha256!==proof.sha256))throw Error('Specifikationens originalkoppling behöver granskas.');
  const original=await readBankgiroOriginal(owner,{type:'bankgiro.import',documentId:proof.documentId},{allowApiCapture:true});

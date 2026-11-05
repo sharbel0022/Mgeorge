@@ -172,4 +172,25 @@ export const companyOperationGuard=sqliteTable('company_operation_guard',{
  slot:integer('slot').primaryKey(),storageOwner:text('storage_owner').notNull(),companyId:text('company_id'),actorId:text('actor_id').notNull(),contextVersion:integer('context_version'),membershipVersion:integer('membership_version'),action:text('action').notNull(),authorized:integer('authorized').notNull(),
 },t=>[check('company_guard_singleton',sql`${t.slot}=1`),check('company_guard_authorized',sql`${t.authorized}=1`)]);
 
+// Company coordination is additive. Existing financial records keep their keys.
+export const companyBankSyncScopes=sqliteTable('company_bank_sync_scopes',{
+ companyId:text('company_id').primaryKey().notNull(),owner:text('owner').notNull().unique(),evidenceId:text('evidence_id').notNull(),
+ revision:integer('revision').notNull().default(1),referencePolicy:text('reference_policy'),createdAt:integer('created_at').notNull(),
+});
+export const companyBankSyncJobs=sqliteTable('company_bank_sync_jobs',{
+ companyId:text('company_id').notNull(),accountKey:text('account_key').notNull(),owner:text('owner').notNull(),provider:text('provider').notNull(),connectionId:text('connection_id').notNull(),
+ authorityHash:text('authority_hash').notNull(),generationHash:text('generation_hash').notNull(),authorityRevision:integer('authority_revision').notNull(),validUntil:integer('valid_until').notNull(),revoked:integer('revoked').notNull().default(0),
+ leaseToken:text('lease_token').notNull().default(''),leaseUntil:integer('lease_until').notNull().default(0),leaseDeadline:integer('lease_deadline').notNull().default(0),fenceVersion:integer('fence_version').notNull().default(0),
+ status:text('status').notNull().default('queued'),attempts:integer('attempts').notNull().default(0),lastAttemptAt:integer('last_attempt_at'),lastSuccessAt:integer('last_success_at'),
+ nextAttemptAt:integer('next_attempt_at').notNull().default(0),retryBlocked:integer('retry_blocked').notNull().default(0),errorCode:text('error_code'),
+ coverage:text('coverage').notNull().default('{"ais":"unknown","bankgiro":"unknown","paymentDataComplete":false}'),checkpoint:text('checkpoint'),
+},t=>[primaryKey({columns:[t.companyId,t.accountKey]}),index('company_bank_sync_jobs_due').on(t.status,t.nextAttemptAt)]);
+export const companyBankSyncRequests=sqliteTable('company_bank_sync_requests',{
+ id:text('id').primaryKey().notNull(),companyId:text('company_id').notNull(),owner:text('owner').notNull(),accountKey:text('account_key').notNull(),
+ connectionId:text('connection_id').notNull(),provider:text('provider').notNull(),reservedAt:integer('reserved_at').notNull(),
+},t=>[index('company_bank_sync_requests_budget').on(t.companyId,t.accountKey,t.reservedAt),index('company_bank_sync_requests_connection_budget').on(t.companyId,t.provider,t.connectionId,t.reservedAt)]);
+export const companyBankSyncReceipts=sqliteTable('company_bank_sync_receipts',{
+ companyId:text('company_id').notNull(),owner:text('owner').notNull(),accountKey:text('account_key').notNull(),receiptKey:text('receipt_key').notNull(),
+ sha256:text('sha256').notNull(),result:text('result').notNull(),committedAt:integer('committed_at').notNull(),
+},t=>[primaryKey({columns:[t.companyId,t.accountKey,t.receiptKey]})]);
 export const saasBankState = sqliteTable('saas_bank_state', {owner:text('owner').primaryKey().notNull(),revision:integer('revision').notNull(),payload:text('payload').notNull()});

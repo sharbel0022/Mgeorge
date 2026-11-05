@@ -93,14 +93,14 @@ async function readJson(response, signal, maxBytes) {
 }
 
 /** Fixed origin, read-only route gate, bounded bytes/deadline. No implicit retry. */
-export function createOpenPaymentsHttpClient(config, { transport, timeoutMs = 20_000, maxResponseBytes = 2 * 1024 * 1024, now = Date.now } = {}) {
+export function createOpenPaymentsHttpClient(config, { transport, requestBoundary, timeoutMs = 20_000, maxResponseBytes = 2 * 1024 * 1024, now = Date.now } = {}) {
   assertServerRuntime();
   if (!OPENPAYMENTS_ORIGINS[config?.environment] || !Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 20_000 || !Number.isInteger(maxResponseBytes) || maxResponseBytes < 1 || maxResponseBytes > 2 * 1024 * 1024) throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID', 409);
   if (config.environment === 'PRODUCTION' && (transport?.kind !== 'mtls' || typeof transport?.validateCertificate !== 'function')) throw new BankProviderError('INVALID_CLIENT_CERTIFICATE', 409);
   const selected = transport ?? { kind: 'sandbox', request: (url, init) => fetch(url, init) };
   if (typeof selected.request !== 'function') throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID', 409);
-  return Object.freeze({
-    async send({ path, service = 'api', method = 'GET', headers: values, body, signal }) {
+  if (requestBoundary !== undefined && typeof requestBoundary !== 'function') throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID', 409);
+  async function send({ path, service = 'api', method = 'GET', headers: values, body, signal }) {
       const url = requestUrl(config, service, path, method, body), headers = new Headers(values);
       if ([...headers.keys()].some(header => !HEADER_ALLOWLIST.has(header))) throw denied();
       headers.set('Accept', 'application/json'); headers.set('X-Request-ID', crypto.randomUUID());
@@ -148,6 +148,10 @@ export function createOpenPaymentsHttpClient(config, { transport, timeoutMs = 20
       };
       try { return await Promise.race([run(), interrupted]); }
       finally { clearTimeout(timer); signal?.removeEventListener('abort', onAbort); }
-    },
-  });
+  }
+  // The durable coordinator observes each complete HTTP exchange, including
+  // token renewal, pagination, body validation and Retry-After errors.
+  return Object.freeze({send(input) {
+    return requestBoundary ? requestBoundary(({signal}) => send({...input,signal})) : send(input);
+  }});
 }

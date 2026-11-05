@@ -2,7 +2,7 @@ import {assertCompanyContext,assertCompanyPermission,companyDataBoundary,COMPANY
 
 // Every financial/automation table with an owner column. A migration regression
 // compares this manifest with the actual SQLite schema and its write triggers.
-export const ownerTables=Object.freeze(['audit_events','backup_runs','bank_applications','bank_auth_flows','bank_connections','bank_locks','bank_sync_runs','bankgiro_ingest_jobs','bankgiro_ingest_leases','bankgiro_ingest_sources','customer_contacts','customer_deliveries','customer_messages','customer_reviews','document_automation','document_extractions','document_jobs','document_registrations','documents','gmail_connections','gmail_flows','gmail_locks','gmail_runs','gmail_sources','invoice_counterparties','payment_control_requests','payment_control_runs','reconciliation_findings','saas_bank_state','workspaces']);
+export const ownerTables=Object.freeze(["audit_events","backup_runs","bank_applications","bank_auth_flows","bank_connections","bank_locks","bank_sync_runs","bankgiro_ingest_jobs","bankgiro_ingest_leases","bankgiro_ingest_sources","company_bank_sync_jobs","company_bank_sync_receipts","company_bank_sync_requests","company_bank_sync_scopes","customer_contacts","customer_deliveries","customer_messages","customer_reviews","document_automation","document_extractions","document_jobs","document_registrations","documents","gmail_connections","gmail_flows","gmail_locks","gmail_runs","gmail_sources","invoice_counterparties","payment_control_requests","payment_control_runs","reconciliation_findings","saas_bank_state","workspaces"]);
 const statements=new WeakMap();
 const id=value=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9:@._-]{0,199}$/.test(value)&&value!=='.'&&value!=='..';
 const fail=(code,status=403)=>{throw Object.assign(Error(code),{code,status});};
@@ -212,11 +212,18 @@ function sqlShape(query){
 // catalogue/guard state; quoted string contents are not SQL identifiers.
  const uncommented=query.replace(/--[^\r\n]*|\/\*[\s\S]*?\*\//g,' ');
  if(/\b(?:FROM|JOIN|UPDATE|INTO)\s*'/i.test(uncommented))fail('COMPANY_SQL_DENIED');
- for(const literal of uncommented.matchAll(/'((?:''|[^'])*)'/g))if(ownerTables.includes(literal[1].toLowerCase())||/^(?:main|temp|companies|company_[a-z_]+|sqlite_[a-z_]+)$/i.test(literal[1]))fail('COMPANY_SQL_DENIED');
+ for(const literal of uncommented.matchAll(/'((?:''|[^'])*)'/g)){
+  // A fixed uppercase JSON error is a transaction fence, not a quoted table.
+  // Quoted identifiers (including parenthesized FROM spellings) remain denied.
+  const fenceError=/^COMPANY_[A-Z_]+$/.test(literal[1])&&/\bjson\s*\(\s*$/i.test(uncommented.slice(0,literal.index));
+  if(!fenceError&&(ownerTables.includes(literal[1].toLowerCase())||/^(?:main|temp|companies|company_[a-z_]+|sqlite_[a-z_]+)$/i.test(literal[1])))fail('COMPANY_SQL_DENIED');
+ }
  const shape=uncommented.replace(/'(?:''|[^'])*'/g,"''").replace(/[`"\[\]]/g,'');
  // REPLACE implicitly deletes conflicting rows without normal DELETE triggers.
  // Only explicit INSERT/UPSERT is supported, including for legacy namespaces.
- if(!/^\s*(SELECT|WITH|INSERT|UPDATE|DELETE)\b/i.test(shape)||/;\s*\S|\b(?:PRAGMA|ATTACH|DETACH|CREATE|DROP|ALTER|REPLACE|VACUUM|sqlite_master|sqlite_schema|companies|company_[a-z_]+)\b|\b(?:main|temp)\s*\./i.test(shape))fail('COMPANY_SQL_DENIED');
+ if(!/^\s*(SELECT|WITH|INSERT|UPDATE|DELETE)\b/i.test(shape)||/;\s*\S|\b(?:PRAGMA|ATTACH|DETACH|CREATE|DROP|ALTER|REPLACE|VACUUM|sqlite_master|sqlite_schema|companies)\b|\b(?:main|temp)\s*\./i.test(shape))fail('COMPANY_SQL_DENIED');
+ const companyColumns=['company_id','company_actor_id','company_context_version','company_membership_version','company_version'];
+ for(const identifier of shape.matchAll(/\bcompany_[a-z_]+\b/gi))if(!ownerTables.includes(identifier[0].toLowerCase())&&!companyColumns.includes(identifier[0].toLowerCase()))fail('COMPANY_SQL_DENIED');
  return shape;
 }
 function scopedStatement(database,entry,scope){

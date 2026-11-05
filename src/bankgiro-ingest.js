@@ -5,11 +5,18 @@ import {digest} from './security.js';
 import {parseBankFile} from './importers.js';
 import {audit,getSettings,recordImport,storeTransactions} from './db.js';
 import {readOpenPaymentsBankgiroCapture,assertOpenPaymentsBankgiroAuthority} from '../sites/lib/bankgiro-openpayments-capture.js';
+import {publicBankgiroStatus} from '../sites/lib/bankgiro-source.js';
 
 const captureMime='application/vnd.mgeorge.openpayments-bankgiro+json';
 const mimeFor=name=>/\.opbg\.json$/i.test(name)?captureMime:/\.xlsx$/i.test(name)?'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':/\.xml$/i.test(name)?'application/xml':'text/csv';
 const blocked=(code='INVALID_ORIGINAL')=>Object.assign(new Error('Bankgiro-originalet eller behörigheten måste kontrolleras.'),{code,status:409});
 const parseOriginal=(name,encoded,account)=>{try{return parseBankFile(name,encoded,account);}catch{throw blocked('INVALID_ORIGINAL');}};
+// Node's financial database is exclusive to one company. A caller using a
+// different owner cannot make an enrolled database a legacy workspace again.
+function companyBound(db){
+ return !!db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='company_bank_sync_scopes'").get()&&!!db.prepare('SELECT 1 FROM company_bank_sync_scopes LIMIT 1').get();
+}
+function assertLegacy(db){if(companyBound(db))throw blocked('AUTHORIZATION_BLOCKED');}
 
 /** D1's batch is atomic; keep that property when using synchronous SQLite. */
 export function nodeIngestDatabase(db){
@@ -25,8 +32,9 @@ export function nodeIngestDatabase(db){
  }};
 }
 
-export function createNodeBankgiroSink(db,{now=Date.now}={}){
+export function createNodeBankgiroSink(db,{now=Date.now,companyGuard}={}){
  function guard(owner,lease,authorization){
+  if(companyGuard){const boundary=readCompanyDatabaseBoundary(db);if(!boundary||boundary.companyId!==companyGuard.companyId||boundary.storageOwner!==owner||companyGuard.owner!==owner||typeof companyGuard.assert!=='function')throw blocked('AUTHORIZATION_BLOCKED');const result=companyGuard.assert();if(result?.then){Promise.resolve(result).catch(()=>{});throw blocked('AUTHORIZATION_CHANGED');}if(result===false)throw blocked('AUTHORIZATION_CHANGED');if(authorization&&authorization.profileId!=='openpayments-bankgiro-v1')throw blocked('AUTHORIZATION_BLOCKED');}else assertLegacy(db);
   if(!owner||lease?.owner!==owner)throw blocked('AUTHORIZATION_BLOCKED');
   const lock=db.prepare('SELECT token,expires_at FROM bankgiro_ingest_leases WHERE owner=?').get(owner);
   if(!lock||lock.token!==lease.token||lock.expires_at<=now()||lease.until<=now())throw blocked('LEASE_LOST');
@@ -38,6 +46,7 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
  }
  return {
   async retain({owner,report,bytes,sha256,lease,authorization}){
+   if(companyGuard&&!/\.opbg\.json$/i.test(report.filename))throw blocked('AUTHORIZATION_BLOCKED');
    if(digest(bytes)!==sha256||report.sha256!==sha256)throw blocked('HASH_MISMATCH');
    return write(owner,lease,()=>{
     const old=db.prepare("SELECT id,metadata,content FROM documents WHERE fingerprint=? AND source='bankgiro_source'").all(sha256).find(row=>JSON.parse(row.metadata).owner===owner);
@@ -63,6 +72,7 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
    return document;
    };
    const document=assertOriginal();
+   if(companyGuard&&document.mime_type!==captureMime)throw blocked('AUTHORIZATION_BLOCKED');
    if(document.mime_type===captureMime){
     const assertCapture=()=>{
      const original=assertOriginal();
@@ -74,7 +84,8 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
      return {original,capture,receipt};
     };
     assertCapture();
-    // Standalone SQLite cannot link company-scoped observations to economic events.
+    // The Node path retains provider observations for explicit review; this
+    // intake never creates a second financial row for the AIS deposit.
     // Keep the captured original in review, including on replay, without posting rows.
     return write(owner,lease,()=>{
      const {original,capture,receipt}=assertCapture();
@@ -123,6 +134,21 @@ export function createNodeBankgiroSink(db,{now=Date.now}={}){
 
 export async function createNodeBankgiroIngest(db,{source=null,now=Date.now,allowSynthetic=false}={}){
  const [{createBankgiroIngest},{createBankgiroIngestStore}]=await Promise.all([import('../sites/lib/bankgiro-ingest.js'),import('../sites/lib/bankgiro-ingest-store.js')]);
+ // Disabled sources still require neither a database nor a provider call.
+ if(!source||source.mode==='synthetic'&&!allowSynthetic)return createBankgiroIngest({source,store:null,sink:null,now,allowSynthetic});
+ const unavailable=createBankgiroIngest({source:{id:source.id,mode:source.mode,configurationValid:false},store:null,sink:null,now,allowSynthetic});
+ const unavailableStatus=async owner=>publicBankgiroStatus(await unavailable.status(owner));
+ const guarded={...source};
+ for(const method of ['authorize','listReports','fetchReport'])if(typeof source[method]==='function')guarded[method]=async(...args)=>{
+  assertLegacy(db);
+  try{return await source[method](...args);}finally{assertLegacy(db);}
+ };
  const store=createBankgiroIngestStore(nodeIngestDatabase(db),{now});
- return createBankgiroIngest({source,store,sink:createNodeBankgiroSink(db,{now}),now,allowSynthetic});
+ const worker=createBankgiroIngest({source:guarded,store,sink:createNodeBankgiroSink(db,{now}),now,allowSynthetic});
+ const invoke=async(method,owner)=>{
+  if(companyBound(db))return unavailableStatus(owner);
+  try{const result=await worker[method](owner);return companyBound(db)?unavailableStatus(owner):result;}
+  catch(error){if(companyBound(db))return unavailableStatus(owner);throw error;}
+ };
+ return {status:owner=>invoke('status',owner),run:owner=>invoke('run',owner)};
 }

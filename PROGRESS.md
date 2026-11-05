@@ -1,13 +1,5 @@
 # Verifierad progress
 
-## SaaS Agent 4 — Bankgiroberikning, 2026-11-04
-
-Separat branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Leveransrapport, fältkontrakt, banktäckning och testbevis](docs/integration/saas/bankgiro-enrichment.md). Open Payments dokumenterade `transactions.bankgiro` normaliseras till individuella rapportobservationer. Exakta API-svar, kontrollsummor, ankomstkvitton, aktuell företags-/kontobehörighet och råa bankfält bevaras. Saknade detaljer och motstridiga identiteter blir tydliga granskningsspärrar. Befintliga CAMT054C/SFTP- och filimportvägar behålls.
-
-Rapporter skapar inga extra ekonomiska insättningar eller fakturaallokeringar. En API-grupp kräver en gemensam bankutfärdad postreferens och verifierad kontoidentitet för koppling till en befintlig AIS-insättning; datum och belopp räcker inte. Återimport och skilda betalningar med identiska belopp/referenser testas separat. `0599` och `599` förblir olika bankvärden och företagets referenspolicy bevaras. Historiska kundoriginal har inte använts som testdata eller ändrats.
-
-Leveransen gäller kod, tester, dokumentation, branch och PR. Grundmodellens företagsval, providerklientens råsvarskvitto samt kundens verkliga behörighet och banktäckning måste kopplas in innan produktionsaktivering. Den nuvarande ägarbaserade källregistreringen är ingen fullständig flerföretagsmodell. Exakta slutgrindar och kvarstående integrationsgränser finns i rapporten. **Samtliga 33 poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
-
 ## Agent 3 — företagsbundet bankmedgivande, 2026-11-04
 
 Egen utvecklingsbranch `feature/saas-bank-consent`, bas `14a042a`. [API-kontrakt, modeller, säkerhetsgränser och verifieringskvitto](docs/integration/saas/bank-consent.md). Leveransen omfattar befintliga Node- och Sites-routes, gemensam medgivandepolicy, additiv lagring och regressionstester. Ingen merge, Sites-publicering, produktionsmigration eller verklig bankidentifiering ingår.
@@ -19,6 +11,13 @@ Nya anslutningar binds till autentiserad användare, serverupplöst företag, ba
 Basen saknar en släppt SaaS-medlemskapsmodell. Företagsupplösaren stödjer endast den autentiserade ägarens befintliga arbetsyta. Agent 1 måste ansluta sin auktoritativa företags-/rollmodell innan flera företagsmedlemmar aktiveras; Agent 2:s framtida provideradapter måste lämna verifierbart företags-/kontounderlag och dokumenterade identifieringsförmågor. Bankgirobehörighet kan inte härledas ur AIS. Exakta lokala testresultat och kvarstående externa acceptanskrav finns i integrationsdokumentet.
 
 Samtliga 33 numeriska kvalitetspoäng är oförändrade: **255/330 = 7,73/10; 0/33 ≥9,5**. Denna utvecklingsleverans ger inget nytt produktionsbevis.
+## SaaS Agent 4 — Bankgiroberikning, 2026-11-04
+
+Separat branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Leveransrapport, fältkontrakt, banktäckning och testbevis](docs/integration/saas/bankgiro-enrichment.md). Open Payments dokumenterade `transactions.bankgiro` normaliseras till individuella rapportobservationer. Exakta API-svar, kontrollsummor, ankomstkvitton, aktuell företags-/kontobehörighet och råa bankfält bevaras. Saknade detaljer och motstridiga identiteter blir tydliga granskningsspärrar. Befintliga CAMT054C/SFTP- och filimportvägar behålls.
+
+Rapporter skapar inga extra ekonomiska insättningar eller fakturaallokeringar. En API-grupp kräver en gemensam bankutfärdad postreferens och verifierad kontoidentitet för koppling till en befintlig AIS-insättning; datum och belopp räcker inte. Återimport och skilda betalningar med identiska belopp/referenser testas separat. `0599` och `599` förblir olika bankvärden och företagets referenspolicy bevaras. Historiska kundoriginal har inte använts som testdata eller ändrats.
+
+Leveransen gäller kod, tester, dokumentation, branch och PR. Grundmodellens företagsval, providerklientens råsvarskvitto samt kundens verkliga behörighet och banktäckning måste kopplas in innan produktionsaktivering. Den nuvarande ägarbaserade källregistreringen är ingen fullständig flerföretagsmodell. Exakta slutgrindar och kvarstående integrationsgränser finns i rapporten. **Samtliga 33 poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
 ## SaaS master integration — foundation verified, 2026-11-04
 
 Start main `14a042abd37fa455d08da9dfcc096ef4f603b512`; all seven current producer heads and exact-head CI frozen in [integration matrix](docs/saas/INTEGRATION-MATRIX.md). #38 remains Draft. Separate native integration worktree; original checkout and production resources preserved.
@@ -54,6 +53,19 @@ Oberoende granskning identifierade två reproducerade fel: ändringsbara indata 
 Slutlig lokal verifiering på implementationscommit `79f27f0`: **1 585 Node + 3 191 Sites + 47 bridge = 4 823 godkända**, utan fel/skip/cancel/todo; 90 nya adaptertester ingår i totalsumman. Syntax, typer, låsta installationer, föreskrivna high-auditgrindar och Sites-bygge passerade. Sites har 8 moderate utvecklingsberoendefynd. GitHub Node 22-CI och leveranshuvud redovisas separat i PR:n; lokal körning använde Node 24.22.1.
 
 Ingen verklig Open Payments-sandbox eller produktionsbank har anropats. Sandboxuppgifter, kundspecifikt SaaS-/Bankgiro-/ISO-avtal, riktiga produktionscertifikat och verifierad bank-/företagstäckning återstår. Beständig företagskoppling, callbackkonsumtion, runtime-tokenkoordinering och granskad originalimport kräver separat integration. Alla 33 kvalitetspoäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**.
+
+## Agent 5 — företagsbunden banksynk och avstämning, 2026-11-04
+
+Egen branch `feature/saas-bank-sync-reconciliation`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Kontrakt, tester och integrationskrav](docs/integration/saas/sync-reconciliation.md) dokumenterar den gemensamma koordinatorn, de konkreta Node-/Sites-adaptrarna och exakt lokal verifiering. Leveransen går via PR mot `main`; merge och Sites-publicering ingår inte.
+
+- Befintliga scheman kör företagsbundna jobb med beständig kontolease, aktuellt medgivande, verifierad anropsbudget, 429-spärrar och atomiska importkvitton. Förnyat medgivande nollställer inte kvoter eller accepterade importer. Node provar även rättvis dispatch av 101 separata företagsdatabaser över fem tickar och omstart.
+- Företagets uttryckliga policy väljer fakturanummer eller separat verifierad OCR. Betalare, konto, valuta, belopp, saldo och original går fortsatt genom befintliga avstämnings-/allokeringsregler. Osäker matchning lämnar fakturasaldot oförändrat. Saknad faktisk Bankgirotäckning ger inte fullständiga betalningsdata.
+- Beständig företagsbindning spärrar äldre automatiska vägar även efter omstart och under pågående provideranrop. Oberoende granskning reproducerade en återkallelse under Node-berikningen; en extra kvoträknad sessionskontroll före avstämning och en verklig allokeringsregression stänger luckan.
+- Additiv migration och backup omfattar fyra nya tabeller. Isolerad återställning bevarar kvoter, spärrar och kvitton men ogiltigförklarar gamla skrivleaser. Migration/ORM/snapshot/journal har jämförts oberoende.
+
+Fryst lokal kod: **1 704 Node + 3 207 Sites + 47 bridge = 4 958 godkända tester**, 0 fel/överhoppade/avbrutna/todo. Syntax (149 filer), Sites typer, exakt minimatchkontroll, high-auditgrindar och separat Sites-bygge passerar. Root och bridge har 0 auditfynd; Sites har 8 moderate utvecklingsfynd och 0 high/critical. Node 24.22.1/npm 11.9.0 användes lokalt; exakt Node 22-CI och leverans-SHA redovisas i PR. Tidigare installations-, körkontext- och fixturefel redovisas öppet i rapporten och räknas inte som lyckade körningar.
+
+Aktivering kräver Agent 1:s betrodda medlemskap/databindning, Agents 2/3:s aktuella behörighets- och budgetbevis samt Agent 4:s faktiska företagsbundna Bankgirokälla när den används. Node kräver en exklusiv databas per företag, Sites en exklusiv arbetsyta/lagringsägare. De konkreta adaptrarna använder befintlig svensk företagsbank/Enable Banking/SEK; andra banker och rapportkanaler behöver sina egna verifierade adaptrar. Inga verkliga bankanrop, kunddata, allokeringar i produktion eller driftsättningar ingår. **Alla 33 poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.** Äldre driftkvitton nedan gäller sina tidigare leveranser.
 
 ## Automatic Bankgiro source readiness — 2026-11-03
 

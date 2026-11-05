@@ -6,12 +6,13 @@ type Bucket={get:(key:string)=>Promise<any>;put:(key:string,value:Uint8Array,opt
 type Row=Record<string,any>;
 const LEGACY_BACKUP_TABLES=['workspaces','audit_events','documents','bank_applications','bank_connections','bank_sync_runs','gmail_connections','customer_contacts','customer_messages','reconciliation_findings','customer_deliveries','gmail_sources','gmail_runs','document_automation','document_jobs','document_extractions','invoice_counterparties','document_registrations','payment_control_runs','payment_control_requests'];
 const BANKGIRO_BACKUP_TABLES=[...LEGACY_BACKUP_TABLES,'bankgiro_ingest_sources','bankgiro_ingest_jobs'];
-export const BACKUP_TABLES=[...BANKGIRO_BACKUP_TABLES,'saas_bank_state'];
+const CONSENT_BACKUP_TABLES=[...BANKGIRO_BACKUP_TABLES,'saas_bank_state'];
+export const BACKUP_TABLES=[...BANKGIRO_BACKUP_TABLES,'saas_bank_state','company_bank_sync_scopes','company_bank_sync_jobs','company_bank_sync_requests','company_bank_sync_receipts'];
 /** Exact historical schema sets only. Never fill a partially missing snapshot
  * with invented empty tables; old authenticated snapshots keep their own census. */
 export function backupTableSet(names:unknown):string[]{
  if(!Array.isArray(names)||new Set(names).size!==names.length)throw Error('backup_snapshot_invalid');
- const supported=[LEGACY_BACKUP_TABLES,BANKGIRO_BACKUP_TABLES,BACKUP_TABLES].find(set=>set.length===names.length&&names.every(name=>typeof name==='string'&&set.includes(name)));
+ const supported=[LEGACY_BACKUP_TABLES,BANKGIRO_BACKUP_TABLES,CONSENT_BACKUP_TABLES,BACKUP_TABLES].find(set=>set.length===names.length&&names.every(name=>typeof name==='string'&&set.includes(name)));
  if(!supported)throw Error('backup_snapshot_invalid');return supported;
 }
 const encoder=new TextEncoder(),magic=encoder.encode('MGBK0001');
@@ -34,6 +35,49 @@ function snapshotApiEvidence(tables:{name:string;rows:Row[]}[]):ApiEvidence{
   if(detail?.retained_conflicts!==undefined){if(!Array.isArray(detail.retained_conflicts))throw Error('backup_api_evidence_invalid');for(const entry of detail.retained_conflicts)conflicts(entry?.conflicts);}
  }
  return evidence;
+}
+/** Company history is meaningful only within its immutable owner binding.
+ * Check the complete retained linkage, including records no longer runnable. */
+function snapshotCompanySync(tables:{name:string;rows:Row[]}[]){
+ const rows=(name:string)=>tables.find(table=>table.name===name)?.rows||[];
+ const scopes=rows('company_bank_sync_scopes'),jobs=rows('company_bank_sync_jobs'),requests=rows('company_bank_sync_requests'),receipts=rows('company_bank_sync_receipts');
+ const fail=()=>{throw Error('backup_company_sync_invalid');};
+ const text=(value:any,max=300)=>typeof value==='string'&&value.length>0&&value.length<=max&&value.trim()===value&&!/[\u0000-\u001f\u007f]/.test(value);
+ const integer=(value:any)=>Number.isSafeInteger(value)&&value>=0;
+ const hash=(value:any)=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+ const parse=(value:any)=>{if(typeof value!=='string')return fail();try{return JSON.parse(value);}catch{return fail();}};
+ if(scopes.length>1)fail();
+ const binding=scopes[0];
+ if(binding){
+  if(!text(binding.company_id)||!text(binding.evidence_id)||!integer(binding.revision)||binding.revision<1||!integer(binding.created_at))fail();
+  if(binding.reference_policy!==null){
+   const policy=parse(binding.reference_policy);
+   if(!policy||Array.isArray(policy)||policy.companyId!==binding.company_id||policy.owner!==binding.owner||!integer(policy.revision)||policy.revision<1||!text(policy.companyName)||!text(policy.evidenceId)||!['invoice_number','ocr'].includes(policy.mode))fail();
+  }
+ }
+ const identity=(row:Row)=>JSON.stringify([row.company_id,row.account_key]),byJob=new Map<string,Row>();
+ for(const row of jobs){
+  if(!binding||row.company_id!==binding.company_id||row.owner!==binding.owner||!text(row.account_key)||!text(row.provider)||!text(row.connection_id)||byJob.has(identity(row)))fail();
+  if(!hash(row.authority_hash)||!hash(row.generation_hash)||!integer(row.authority_revision)||row.authority_revision<1||!integer(row.valid_until)||!integer(row.fence_version)||row.fence_version>=Number.MAX_SAFE_INTEGER)fail();
+  if(![0,1].includes(row.revoked)||![0,1,2].includes(row.retry_blocked)||!['queued','running','success','partial','blocked','retry'].includes(row.status)||!['lease_until','lease_deadline','attempts','next_attempt_at'].every(key=>integer(row[key]))||typeof row.lease_token!=='string')fail();
+  const coverage=parse(row.coverage);if(!coverage||typeof coverage!=='object'||Array.isArray(coverage)||coverage.paymentDataComplete!==false)fail();
+  if(row.checkpoint!==null)parse(row.checkpoint);
+  byJob.set(identity(row),row);
+ }
+ const requestIds=new Set();
+ for(const row of requests){
+  const job=byJob.get(identity(row));
+  if(!job||row.owner!==job.owner||row.connection_id!==job.connection_id||row.provider!==job.provider||!text(row.id)||requestIds.has(row.id)||!integer(row.reserved_at))fail();
+  requestIds.add(row.id);
+ }
+ const receiptIds=new Set(),receiptJobs=new Set();
+ for(const row of receipts){
+  const key=JSON.stringify([row.company_id,row.account_key,row.receipt_key]),job=byJob.get(identity(row));
+  if(!job||row.owner!==job.owner||!text(row.receipt_key,1000)||receiptIds.has(key)||!hash(row.sha256)||!integer(row.committed_at))fail();
+  parse(row.result);receiptIds.add(key);receiptJobs.add(identity(row));
+ }
+ // A checkpoint and its receipt are committed together by the coordinator.
+ if(jobs.some(row=>row.checkpoint!==null&&!receiptJobs.has(identity(row))))fail();
 }
 function validApiEvidence(value:any):value is ApiEvidence{return !!value&&value.version==='retained-api-receipts-v1'&&value.scope==='retained_json_checksums'&&Object.keys(value).length===4&&['records_checked','records_without_receipt'].every(key=>Number.isSafeInteger(value[key])&&value[key]>=0&&value[key]<=1_000_000);}
 function publicApiEvidence(serialized:unknown){try{const value=typeof serialized==='string'?JSON.parse(serialized):null;return validApiEvidence(value)?value:{scope:'unassessed'};}catch{return {scope:'unassessed'};}}
@@ -120,6 +164,7 @@ export function validateSnapshot(value:any,owner:string,expectedCompanyBoundary?
  const files=value.tables.find((t:Row)=>t.name==='documents').rows;
  if(files.some((f:Row)=>!/^[a-f0-9-]{36}$/i.test(f.id)||!Number.isSafeInteger(f.size)||f.size<0||f.size>15_000_000||!/^[a-f0-9]{64}$/i.test(f.sha256))||new Set(files.map((f:Row)=>f.id)).size!==files.length)throw Error('backup_document_invalid');
  snapshotDocumentReferences(value.tables,new Map(files.map((f:Row)=>[f.id,f])));
+ snapshotCompanySync(value.tables);
  const apiEvidence=snapshotApiEvidence(value.tables);
  if(value.apiEvidence!==undefined&&(!validApiEvidence(value.apiEvidence)||value.apiEvidence.records_checked!==apiEvidence.records_checked||value.apiEvidence.records_without_receipt!==apiEvidence.records_without_receipt))throw Error('backup_api_evidence_invalid');
  return {...value,apiEvidence} as {format:string;owner:string;createdAt:string;companyBoundary?:CompanyDataBoundary;apiEvidence:ApiEvidence;tables:{name:string;rows:Row[]}[]};

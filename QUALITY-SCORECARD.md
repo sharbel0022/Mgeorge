@@ -1,16 +1,5 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
-## SaaS Agent 4 — avgränsad Bankgiroberikning, 2026-11-04
-
-[Verifieringsrapport och leverantörsmatris](docs/integration/saas/bankgiro-enrichment.md), branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. **Samtliga 33 numeriska poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
-
-| Berörda områden | Nytt avgränsat bevis | Kvarstående gräns |
-| --- | --- | --- |
-| Bank, Bankgiro, individuella betalare och dubbletter | Dokumenterad Open Payments-modell, exakt beloppsnormalisering, separata källidentiteter, samlingsinsättningar, ofullständig täckning, återimport och konflikter testas med syntetiska data. | Verklig kundbehörighet, bankens individuella fälttäckning och fullständig historik har inte verifierats. |
-| Ekonomisk korrekthet och fakturareferenser | Rapporter tillför inga extra ekonomiska insättningar. Gemensam bankreferens krävs; `0599`/`599`, generell referens, formell OCR och företagspolicy hålls isär. Ingen allokering sker vid import. | Det historiska 0599-fallet kräver fortfarande nödvändiga bankbevis och ett behörigt ekonomiskt beslut. |
-| Åtkomstkontroll och original | Företags-/konto-/rapportbindning, aktuella scope, oföränderliga råsvar, kontrollsummor och separata behörighetskvitton verifieras vid intake och commit. | Integrering med SaaS-grundmodell och providertransport återstår före aktivering; nuvarande register är ägarbaserat. |
-| Kodkvalitet och tester | Riktade positiva och negativa regressioner, fulla slutgrindar samt oberoende granskning redovisas med exakt omfattning i rapporten. | Lokal syntetisk framgång och dokumenterad leverantörskapacitet är inga produktionsbevis. |
-
 ## Agent 3 — avgränsad företagsmedgivandeverifiering, 2026-11-04
 
 [Bank consent-kontrakt och verifieringskvitto](docs/integration/saas/bank-consent.md) gäller utvecklingsbranchen `feature/saas-bank-consent` från `14a042a`. Alla 33 poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. Syntetiska regressionsprov och oberoende kodgranskning ersätter inte bankens faktiska företagsbehörighet eller produktionsacceptans.
@@ -22,6 +11,16 @@
 | 30. Säkerhet och åtkomstkontroll | State/cookie/CSRF/replay, samtidiga callbacks, företagsunderlag, återkallad åtkomst och osäkra återkallelser har konkreta regressioner. | Basen har en ägararbetsyta. Agent 1:s riktiga medlemskaps- och rollmodell måste integreras före flerföretagsdrift. |
 | 32. Kodkvalitet och tester | Gemensamma rena validatorer, verkliga HTTP-/SQLite-/D1-tester och rättade oberoende granskningsfynd. | Slutliga exakta kommandon/resultat redovisas i integrationskvitto; inga poäng höjs enbart för testantal. |
 | 33. Produktion | Utvecklingsbranch och PR är avsedda för samordnad granskning. | Ingen merge, publicering, produktionsmigration, verklig bankhämtning eller ändring av externa scheman. |
+## SaaS Agent 4 — avgränsad Bankgiroberikning, 2026-11-04
+
+[Verifieringsrapport och leverantörsmatris](docs/integration/saas/bankgiro-enrichment.md), branch `feature/saas-bankgiro-enrichment`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. **Samtliga 33 numeriska poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
+| Berörda områden | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | --- | --- |
+| Bank, Bankgiro, individuella betalare och dubbletter | Dokumenterad Open Payments-modell, exakt beloppsnormalisering, separata källidentiteter, samlingsinsättningar, ofullständig täckning, återimport och konflikter testas med syntetiska data. | Verklig kundbehörighet, bankens individuella fälttäckning och fullständig historik har inte verifierats. |
+| Ekonomisk korrekthet och fakturareferenser | Rapporter tillför inga extra ekonomiska insättningar. Gemensam bankreferens krävs; `0599`/`599`, generell referens, formell OCR och företagspolicy hålls isär. Ingen allokering sker vid import. | Det historiska 0599-fallet kräver fortfarande nödvändiga bankbevis och ett behörigt ekonomiskt beslut. |
+| Åtkomstkontroll och original | Företags-/konto-/rapportbindning, aktuella scope, oföränderliga råsvar, kontrollsummor och separata behörighetskvitton verifieras vid intake och commit. | Integrering med SaaS-grundmodell och providertransport återstår före aktivering; nuvarande register är ägarbaserat. |
+| Kodkvalitet och tester | Riktade positiva och negativa regressioner, fulla slutgrindar samt oberoende granskning redovisas med exakt omfattning i rapporten. | Lokal syntetisk framgång och dokumenterad leverantörskapacitet är inga produktionsbevis. |
 ## SaaS master integration candidate — 2026-11-04
 
 Current inventory and limits: [integration matrix](docs/saas/INTEGRATION-MATRIX.md). Repaired foundation is now normally merged as mainf105e9c, with exact main CI41914833272 success (1649Node+3196Sites+47bridge=4892,0fail/skip/cancel/TODO). Below local figures retain their Windows scope; #36 cumulative integration follows separately. No new Sites publication or commercial activation. **All33 numeric scores remain255/330=7.73/10,0/33≥9.5.**
@@ -61,6 +60,27 @@ Lokalt verifierad implementation `79f27f0`: **1 585 Node + 3 191 Sites + 47 brid
 | 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Scope-/vägspärrar, befintlig AES-GCM med företagsbundet ändamål, säkra fel och certifikat-/nyckelkontroller. | Beständig medlemskapskontroll, engångscallback och verkligt produktionscertifikat ska integreras och verifieras. |
 | 32. Kodkvalitet och tester | 8,5 | 8,5 | Nya kontrakts-, fel-, isolerings- och transporttester. Två oberoende reviewfynd reproducerade, rättade och omkontrollerade. | Fixtureframgång är inte sandboxacceptans. Befintliga moderate utvecklingsberoendefynd och lintskuld åtgärdas inte av denna PR. |
 | 33. Verifiering i verklig produktion | 6,5 | 6,5 | Exakt gräns mellan dokumentation, lokala tester och externa behörigheter redovisas. | Ingen Open Payments-sandbox, riktig bank, produktionshandshake eller publicering genomförd. |
+
+## Agent 5 — SaaS-synk och avstämning, avgränsad verifiering 2026-11-04
+
+Branch `feature/saas-bank-sync-reconciliation`, bas `14a042a`. [Kontrakt och fullständigt verifieringskvitto](docs/integration/saas/sync-reconciliation.md). **Alla 33 numeriska poäng förblir 255/330 = 7,73/10; 0/33 ≥9,5.** Nya syntetiska teknikbevis höjer inte produktionsberoende poäng. Följande berörda områden behåller uttryckligen sina före-/eftervärden; övriga områden och äldre leveransers driftbevis är oförändrade.
+
+| Berörda områden | Före | Efter | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 7 Kundfakturor; 13 Dubblettkontroll; 14 Dokumentgranskning | 8 | 8 | Företagets policy härleds från bevarade original; atomiska importkvitton och konflikter bevarar accepterat underlag genom omstart. | Ingen automatisk reparation av äldre kunddata eller verklig originalinventering. |
+| 15 Bankanslutning; 17 Bankgiroimport | 8,5 | 8,5 | Exakt företag/konto/medgivande, samma konto efter förnyelse och separata AIS-/Bankgirobevis. Saknad källa förblir otillgänglig. | Verkliga behörigheter, konto-/rapportrelationer och Agent 4:s företagsbundna källa måste integreras. |
+| 16 Automatisk bankhämtning | 8 | 8 | Aktuellt medgivande även före allokering, beständiga anropsreservationer, lång/okänd 429-spärr, sena svar och återförsök. | Verifierade faktiska bankkvoter krävs; applikationskvoter över separata databaser kräver delad providerbegränsare. |
+| 18 Verklig betalare; 19 Verklig OCR/referens | 7 | 7 | Företag A/B/C, exakt referens med inledande nollor, separat OCR och fel kund/konto hålls isär. | Syntetiska svar styrker inte verklig betalaridentitet eller saknad rapporttäckning. |
+| 20 Automatisk betalningsmatchning; 23 Flera fakturor i en betalning | 7,5 | 7,5 | Befintliga bevis-/beloppsregler återanvänds; samlingsinsättning och två rapporter skapar inte extra pengar. | Faktisk automatiserad kundacceptans och fullständiga bank-/rapportbevis återstår. |
+| 21 Delbetalningar; 22 Överbetalningar; 24 Betalningshistorik; 25 Betalningsstatus; 26 Utebliven betalning | 8 | 8 | Osäker del-/överbetalning allokeras inte; verifierat exakt restsaldo kan matchas. Original, audit och bokade saldon bevaras vid spärr/återkallelse. | Ingen ny produktionsallokering eller full historisk omverifiering. |
+| 28 Automatiska scheman | 6,5 | 6,5 | Befintlig scheduler, 100 isolerade syntetiska företag under parallell körning och 101 riktiga lokala SQLite-företagsdatabaser med rättvis fortsättning efter omstart. | Betrodd företagsregistrering och verkliga schemakvitton saknas i denna avgränsade leverans. |
+| 29 Säkerhetskopiering | 7,5 | 7,5 | Alla fyra nya tabeller ingår; exakta äldre 20/22-tabellformat accepteras utan att aktivera företag. | Ingen ny produktionsbackup-/offsite-verifiering. |
+| 30 Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Exklusiv databas/ägarscope, beständiga skrivstängsel och spärrade legacyvägar; oberoende reproducerat återkallelsefynd rättat. | Agent 1:s medlemskapsintegration och bred produktions-/penetrationsacceptans återstår. |
+| 31 Katastrofåterställning | 5,5 | 5,5 | Isolerad återställning bevarar kvoter/spärrar/kvitton och ogiltigförklarar fångade leaser; migration/schema/journal jämförda. | Ingen tjänsteaktivering, produktionsrestore eller verklig RPO/RTO-övning. |
+| 32 Kodkvalitet och tester | 8,5 | 8,5 | 1 704 Node + 3 207 Sites + 47 bridge = 4 958 pass, 0 fail/skip/cancel/todo; syntax/typer/audits/exakt mitigering/separat bygge godkända. Oberoende review och felaktiga försök redovisas. | Lokal Node 24 är inte Node 22-CI. Åtta moderate utvecklingsfynd och tidigare lintskuld kvarstår; inga paket ändras. |
+| 33 Verifiering i verklig produktion | 6,5 | 6,5 | Egen branch och PR är leveransgränsen; verkliga bankanrop och driftsättning ingår inte. | Ingen ny produktionscertifiering eller Sites-publicering. |
+
+Exakt commit och Node 22-workflow redovisas i PR. Root-/bridge-audit har 0 fynd; Sites high-grind passerar med 8 moderate och 0 high/critical. Testgrupper överlappar helsviterna och adderas inte en andra gång. Den konkreta integrationen kräver en Node-databas eller Sites-arbetsyta per företag samt betrodda, aktuella medlemskaps-/provider-/Bankgirokontrakt.
 
 ## Automatic Bankgiro source readiness — 2026-11-03
 

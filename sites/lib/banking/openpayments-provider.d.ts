@@ -20,6 +20,8 @@ export interface OpenPaymentsTransport {
 }
 export interface OpenPaymentsOptions {
   transport?: OpenPaymentsTransport;
+  /** Trusted server coordinator; never browser-supplied. Wraps every HTTP exchange. */
+  requestBoundary?: <T>(operation: (options: {signal: AbortSignal; deadline: number}) => Promise<T>) => Promise<T>;
   now?: () => number;
   timeoutMs?: number;
   maxResponseBytes?: number;
