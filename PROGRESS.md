@@ -1,5 +1,15 @@
 # Verifierad progress
 
+## Agent 2 — Bankgiro och verifierad betalningsreferens, 2026-11-05
+
+Egen branch `feature/95-bankgiro`, bas `4ad205b`; fryst kod `5642be6`. [Inventering, fältkontrakt, detaljerad testmatris och leveranskvitto](docs/integration/bankgiro-95.md). Befintliga Open Payments-, CAMT/XML-, XLSX-, CSV- och SFTP-vägar behålls. Ny ägarbunden läsprojektion visar det exakta originalets importer, källkvitton, betalningsobservationer, allokeringshistorik och manuella underlagsbeslut med hashavvikelser, pagination och ändringskontroll. Sparad historik utger sig inte för bankautenticitet eller korrekt fakturarelation.
+
+En reproducerad brist är rättad: en referens kan inte längre passera när originalets kvitto/hash brister. Råvärdet och `0599` bevaras för granskning. Dokumenterade Open Payments-dokumentnummer extraheras nu separat med tillåtna metadatafält; okända strukturer och kreditnotor förblir granskningsunderlag och skapar ingen OCR- eller fakturagissning. 17 nya beteendetester täcker de tre ändringarna.
+
+Lokala fullsviter under arbetet: **1 899 Node +3 756 Sites +47 brygga**, utan fel/skip/cancel/TODO. Efter sista kodändringarna passerar **67 Node +217 parser/intag +145 evidens/visning** i isolerade fokuserade körningar; dessa delantal överlappar de fulla sviterna. Syntax, typer, exakt minimatchkontroll, high-auditgrindar, ren installation och produktionsbygge är godkända enligt rapporten. Oberoende kodgranskning: **READY**, inga Critical/Important-fynd inom omfattningen. Exakt leveranshuvud och hela slutkandidatens Node 22-CI redovisas på PR:n; tidigare lokala fullsviter tillskrivs inte de senare testerna.
+
+Skrivfri kontroll av verkligt sparat original för **BG 5819-7013 / 0599 / 625,00 SEK / 2026-10-26** bekräftar bevarad referens, belopp och individuellt rapportnamn samt intakt original. Formell OCR och organisationsnummer är inte styrkta. Kontoåtkomst, gemensam bankidentitet till AIS och registrerad faktura saknas i kedjan; rapportkällan är `SOURCE_NOT_CONFIGURED`. En ekonomisk AIS-post och en separat rapportobservation, **noll allokeringar**, fortsatt blockerad automatisk avstämning. Inga finansiella produktionsändringar, merge eller driftsättning ingår. **Bankgiro 8,5; alla 33 poäng kvar på 255/330 =7,73/10, 0/33 ≥9,5.**
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).
