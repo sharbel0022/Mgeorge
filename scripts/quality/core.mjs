@@ -81,7 +81,9 @@ export function parseLcov(text) {
 
 export function cleanTestEnvironment(input = process.env) {
   const env = { NODE_ENV: 'test', TZ: 'UTC', LANG: 'C.UTF-8', CLOUDFLARE_CF_FETCH_ENABLED: 'false', WRANGLER_SEND_METRICS: 'false' };
-  for (const key of ['PATH', 'SystemRoot', 'WINDIR', 'TMPDIR', 'TMP', 'TEMP', 'CI', 'NO_COLOR']) {
+  // npm's executable path is toolchain identity, not registry configuration or
+  // credentials. Retain it for lifecycle tests on different installation layouts.
+  for (const key of ['PATH', 'npm_execpath', 'SystemRoot', 'WINDIR', 'TMPDIR', 'TMP', 'TEMP', 'CI', 'NO_COLOR']) {
     if (input[key] !== undefined) env[key] = input[key];
   }
   return env;

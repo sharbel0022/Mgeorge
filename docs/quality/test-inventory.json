@@ -9,7 +9,7 @@
       "command": "npm run quality:node",
       "scope": "Node unit, SQLite, HTTP, provider contracts and SaaS; synthetic",
       "baselineFileCount": 102,
-      "currentFileCount": 108,
+      "currentFileCount": 112,
       "files": [
         "test/absence-api-q8.test.js",
         "test/absence-integrity-q8.test.js",
@@ -36,6 +36,7 @@
         "test/bankgiro-links-api.test.js",
         "test/bankgiro-links.test.js",
         "test/camt-integrity.test.js",
+        "test/cloud-ocr-trigger.test.js",
         "test/company-api.test.js",
         "test/company-bank-account-key.test.js",
         "test/company-bank-sync-fairness.test.js",
@@ -76,6 +77,7 @@
         "test/invoice-parser-corpus-q8.test.js",
         "test/invoice-reference-integration.test.js",
         "test/invoice-reference-policy.test.js",
+        "test/invoice-summary-labels.test.js",
         "test/manual-allocation-evidence-api.test.js",
         "test/message-evidence-projection.test.js",
         "test/node-company-bank-sync.test.js",
@@ -88,6 +90,7 @@
         "test/payer-completion-conflict.test.js",
         "test/payer-evidence.test.js",
         "test/payer-verification-atomic.test.js",
+        "test/payment-acceptance-quality8.test.js",
         "test/payment-concurrency.test.js",
         "test/payment-control-api.test.js",
         "test/payment-control-receipts-q8.test.js",
@@ -118,15 +121,38 @@
         "test/security-session-allocation.test.js",
         "test/session-mutation-fence.test.js",
         "test/sites-ocr-pull.test.js",
-        "test/ui-final-node.test.js"
+        "test/ui-final-node.test.js",
+        "test/workspace-search-quality8.test.js"
       ],
       "addedFiles": [
+        "test/cloud-ocr-trigger.test.js",
+        "test/invoice-summary-labels.test.js",
+        "test/payment-acceptance-quality8.test.js",
+        "test/quality-benchmark.test.js",
+        "test/quality-regressions-contracts.test.js",
+        "test/quality-regressions-migration-replay.test.js",
+        "test/quality-regressions-recovery-api.test.js",
+        "test/quality-runner.test.js",
+        "test/quality-syntax.test.js",
+        "test/workspace-search-quality8.test.js"
+      ],
+      "integrationBaseFileCount": 106,
+      "addedByThisBranch": [
         "test/quality-benchmark.test.js",
         "test/quality-regressions-contracts.test.js",
         "test/quality-regressions-migration-replay.test.js",
         "test/quality-regressions-recovery-api.test.js",
         "test/quality-runner.test.js",
         "test/quality-syntax.test.js"
+      ],
+      "addedByIntegratedMain": [
+        "test/cloud-ocr-trigger.test.js",
+        "test/invoice-summary-labels.test.js",
+        "test/payment-acceptance-quality8.test.js",
+        "test/workspace-search-quality8.test.js"
+      ],
+      "modifiedByThisBranch": [
+        "test/payment-concurrency.test.js"
       ]
     },
     {
@@ -134,7 +160,7 @@
       "command": "npm run quality:sites",
       "scope": "Sites domain, D1 adapters, migrations, R2/provider fixtures and worker contracts; synthetic",
       "baselineFileCount": 156,
-      "currentFileCount": 157,
+      "currentFileCount": 160,
       "files": [
         "sites/tests/account-evidence-retry-presentation.test.mjs",
         "sites/tests/account-read-cooldown.test.mjs",
@@ -228,6 +254,7 @@
         "sites/tests/invoice-parser-corpus-q8.test.mjs",
         "sites/tests/invoice-reference-integration.test.mjs",
         "sites/tests/invoice-reference-policy.test.mjs",
+        "sites/tests/invoice-summary-labels.test.mjs",
         "sites/tests/manual-invoice-ocr.test.mjs",
         "sites/tests/manual-return-allocation.test.mjs",
         "sites/tests/mcp-evidence-read.test.mjs",
@@ -252,6 +279,7 @@
         "sites/tests/openpayments-request-boundary.test.mjs",
         "sites/tests/openpayments-transport.test.mjs",
         "sites/tests/payer-evidence.test.mjs",
+        "sites/tests/payment-acceptance-quality8.test.mjs",
         "sites/tests/payment-account-hook.test.mjs",
         "sites/tests/payment-control-ui.test.mjs",
         "sites/tests/payment-control.test.mjs",
@@ -272,6 +300,7 @@
         "sites/tests/reconciliation-payer-index-final.test.mjs",
         "sites/tests/reconciliation-preview.test.mjs",
         "sites/tests/reconciliation-proposal.test.mjs",
+        "sites/tests/recovery-drill.test.mjs",
         "sites/tests/saas-bank-runtime.test.mjs",
         "sites/tests/saas-company-acceptance.test.mjs",
         "sites/tests/saas-onboarding-client.test.mjs",
@@ -295,7 +324,22 @@
         "sites/tests/workspace-search-final.test.mjs"
       ],
       "addedFiles": [
+        "sites/tests/invoice-summary-labels.test.mjs",
+        "sites/tests/payment-acceptance-quality8.test.mjs",
+        "sites/tests/quality-regressions-ocr-recovery.test.mjs",
+        "sites/tests/recovery-drill.test.mjs"
+      ],
+      "integrationBaseFileCount": 159,
+      "addedByThisBranch": [
         "sites/tests/quality-regressions-ocr-recovery.test.mjs"
+      ],
+      "addedByIntegratedMain": [
+        "sites/tests/invoice-summary-labels.test.mjs",
+        "sites/tests/payment-acceptance-quality8.test.mjs",
+        "sites/tests/recovery-drill.test.mjs"
+      ],
+      "modifiedByThisBranch": [
+        "sites/tests/minimatch-backport-final.test.mjs"
       ]
     },
     {
@@ -309,7 +353,11 @@
         "bridge/bankgiro/test/bridge.test.js",
         "bridge/bankgiro/test/main.test.js"
       ],
-      "addedFiles": []
+      "addedFiles": [],
+      "integrationBaseFileCount": 3,
+      "addedByThisBranch": [],
+      "addedByIntegratedMain": [],
+      "modifiedByThisBranch": []
     }
   ],
   "workflows": [
@@ -342,5 +390,6 @@
     "Only loaded production files in Node LCOV; unimported code is unmeasured",
     "Transformed data: modules, source-text checks and browser code are not converted into full coverage",
     "Live bank, deployed D1/R2, real OCR accuracy and cross-process capacity need separate evidence"
-  ]
+  ],
+  "integratedMainCommit": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
 }

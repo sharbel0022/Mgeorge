@@ -28,10 +28,10 @@ jobs:
       matrix:
         node: ['22.23.4', '24.22.1']
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
           cache: npm
@@ -40,7 +40,7 @@ jobs:
         run: npm run quality:node -- "$RUNNER_TEMP/quality-node"
       - name: Retain Node receipts, failure logs, JUnit and LCOV
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: quality-node-${{ matrix.node }}-${{ github.sha }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/quality-node
@@ -52,10 +52,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24.22.1'
           cache: npm
@@ -67,7 +67,7 @@ jobs:
         run: npm run quality:sites -- "$RUNNER_TEMP/quality-sites"
       - name: Retain Sites receipts, failure logs, JUnit and LCOV
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: quality-sites-${{ github.sha }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/quality-sites
@@ -79,10 +79,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24.22.1'
           cache: npm
@@ -91,7 +91,7 @@ jobs:
         run: npm run quality:bridge -- "$RUNNER_TEMP/quality-bridge"
       - name: Retain bridge receipts, failure logs, JUnit and LCOV
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: quality-bridge-${{ github.sha }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/quality-bridge
@@ -103,10 +103,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24.22.1'
           cache: npm
@@ -115,7 +115,7 @@ jobs:
         run: npm run quality:performance -- "$RUNNER_TEMP/quality-performance"
       - name: Retain workload, correctness and latency evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: quality-performance-${{ github.sha }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/quality-performance
@@ -127,10 +127,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24.22.1'
           cache: npm
@@ -141,7 +141,7 @@ jobs:
         run: npm run quality:browser -- "$RUNNER_TEMP/quality-browser"
       - name: Retain browser results, screenshots and source manifests
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: quality-browser-${{ github.sha }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/quality-browser

@@ -67,10 +67,11 @@ test('coverage totals retain real denominators and label loaded-file scope', () 
 });
 
 test('synthetic test children do not inherit provider credentials, preload code or production state', () => {
-  const env = cleanTestEnvironment({ PATH: '/bin', TZ: 'Europe/Stockholm', NODE_OPTIONS: '--import private.mjs', DATABASE_URL: 'secret', MG_SITES_OCR_TOKEN: 'secret', NODE_ENV: 'production', HOME: '/operator', CI: 'true' });
+  const env = cleanTestEnvironment({ PATH: '/bin', npm_execpath: '/toolchain/lib/node_modules/npm/bin/npm-cli.js', TZ: 'Europe/Stockholm', NODE_OPTIONS: '--import private.mjs', DATABASE_URL: 'secret', MG_SITES_OCR_TOKEN: 'secret', NODE_ENV: 'production', HOME: '/operator', CI: 'true' });
   assert.equal(env.NODE_ENV, 'test');
   assert.equal(env.TZ, 'UTC');
   assert.equal(env.PATH, '/bin');
+  assert.equal(env.npm_execpath, '/toolchain/lib/node_modules/npm/bin/npm-cli.js', 'retain the actual caller npm CLI instead of guessing its filesystem layout');
   for (const key of ['DATABASE_URL', 'MG_SITES_OCR_TOKEN', 'NODE_OPTIONS', 'HOME']) assert.equal(env[key], undefined);
 });
 
