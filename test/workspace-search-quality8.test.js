@@ -111,3 +111,22 @@ test('alternative thousands parses require an exact saved reference and preserve
  assert.deepEqual(searchWorkspaceIndex(index,'123 456,00 789,00').invoices,[]);
  assert.deepEqual(searchWorkspaceIndex(index,Array(33).fill('123 456,00').join(' ')).invoices,[]);
 });
+
+test('decimal-looking saved references remain visible before matching amounts',()=>{
+ for(const [reference,amountCents]of [['2026.01',202601],['0599,00',59900],['1.2',120]]){
+  const rows=[{type:'invoice',id:'amount',number:'OTHER',amountCents},{type:'invoice',id:'reference',number:reference,amountCents:62500}];
+  const index=createWorkspaceSearchIndex(rows);
+  assert.deepEqual(searchWorkspaceIndex(index,reference).invoices.map(row=>row.id),['reference','amount'],reference);
+  assert.deepEqual(searchWorkspaceIndex(index,reference,{limitPerType:1}).invoices.map(row=>row.id),['reference'],reference);
+  for(const currency of [' SEK',' kr'])assert.deepEqual(searchWorkspaceIndex(index,reference+currency).invoices.map(row=>row.id),['amount'],reference+currency);
+ }
+});
+
+test('decimal references still require every separate amount, date and party constraint',()=>{
+ const invoice={type:'invoice',number:'2026.01',party:'Synthetic A',date:'2026-11-05',amountCents:62500};
+ const rows=[{...invoice,id:'exact'},{...invoice,id:'prefix-only',number:'PREFIX-2026.01'},{...invoice,id:'wrong-amount',amountCents:62501},{...invoice,id:'wrong-date',date:'2026-11-06'},{...invoice,id:'wrong-party',party:'Different company'},{...invoice,id:'numeric-amount',number:'OTHER',amountCents:202601}];
+ const index=createWorkspaceSearchIndex(rows);
+ for(const query of ['2026.01 625,00 05/11/2026 Synthetic','Synthetic 625,00 SEK 2026.01 2026-11-05']){
+  assert.deepEqual(searchWorkspaceIndex(index,query).invoices.map(row=>row.id),['exact'],query);
+ }
+});
