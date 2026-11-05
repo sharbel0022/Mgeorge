@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {loadInvoiceImports,dataModule} from './helpers/invoice-module-loader.mjs';
 import {layoutInvoiceText} from '../../test/helpers/pdf-layout-ocr.mjs';
 import {emptyState,applyCommand,invoiceReferenceDecision,balance} from '../lib/domain.ts';
+import {packet,digest,bankgiroText} from '../../test/helpers/ocr-bankgiro-cases.mjs';
 const imports=await loadInvoiceImports();
 
 test('reinterpreting pasted text cannot replace the first retained original reference observation',()=>{
@@ -69,4 +70,37 @@ test('an email attachment is the invoice source and retains its OCR review prove
   assert.equal(result.ocr,true);assert.equal(result.confidence,73);assert.match(result.warning,/Motstridigt fakturanummer/);
   assert.equal(result.fields.party,'Testbolaget AB');assert.equal(result.fields.reviewed,false);
   assert.ok(!result.text.includes('8 000,00'));
+});
+
+for(const kind of ['png','pdf','eml'])for(const scenario of ['high','low','missing','other-original'])test(`manual ${kind} binds bankgiro word proof to the selected original: ${scenario}`,async()=>{
+  const bytes=Buffer.from('%PDF-synthetic selected invoice '+kind),evidence=scenario==='missing'?undefined:packet(bankgiroText,{inputHash:digest(scenario==='other-original'?Buffer.from('another synthetic original'):bytes),confidence:scenario==='low'?0:95});
+  // The decoder's own claimed input hash must never replace the independently
+  // hashed selected file/attachment at this consumer boundary.
+  const decoded={text:bankgiroText,ocr:true,confidence:99,ocrEvidence:evidence,inputSha256:evidence?.inputSha256};
+  const local=dataModule(`const decoded=${JSON.stringify(decoded)};export async function imageText(){return decoded;}export async function pdfInvoiceText(){return decoded;}`),imp=await loadInvoiceImports({'./local-ocr':local});
+  const file=new File([kind==='eml'?email('Bankgiro: 999-9999',bytes.toString()):bytes],'synthetic.'+kind,{type:kind==='png'?'image/png':kind==='pdf'?'application/pdf':'message/rfc822'});
+  const result=await imp.readInvoiceFile(file,'owner@example.test');
+  assert.equal(result.ocrInputSha256,digest(bytes));assert.deepEqual(result.ocrEvidence,evidence);
+  assert.equal(result.fields.bankgiro,scenario==='high'?'123-4567':'');assert.equal(result.fields.reviewed,false);
+  assert.equal(result.text,bankgiroText);assert.ok(!result.text.includes('999-9999'));assert.match(result.extraction.fields.bankgiro.evidence,/123-4567/);
+  if(scenario!=='high')assert.match(result.warning,/Bankgiro.*ordunderlag/);
+});
+
+test('multiple PDF originals in one email cannot borrow word evidence or combine invoice fields',async()=>{
+  const original=email('Bankgiro: 999-9999','%PDF-first'),second='--synthetic\r\nContent-Type: application/pdf; name="second.pdf"\r\nContent-Disposition: attachment; filename="second.pdf"\r\nContent-Transfer-Encoding: base64\r\n\r\n'+Buffer.from('%PDF-second').toString('base64')+'\r\n';
+  const source=original.replace('--synthetic--\r\n',second+'--synthetic--\r\n');
+  const local=dataModule("export async function imageText(){throw Error('unexpected decoder');}export async function pdfInvoiceText(){throw Error('must not select among multiple originals');}"),imp=await loadInvoiceImports({'./local-ocr':local});
+  const result=await imp.readInvoiceFile(new File([source],'synthetic.eml',{type:'message/rfc822'}),'owner@example.test');
+  assert.equal(result.text,'');assert.equal(result.fields.bankgiro,'');assert.equal(result.fields.number,'');assert.equal(result.fields.total,'');assert.match(result.warning,/flera PDF-bilagor/);
+});
+
+for(const repeats of [1500,4500])test('manual OCR retains bounded interpretation text separately from its shorter display text: '+repeats,async()=>{
+  const bytes=Buffer.from('synthetic long invoice original'),text=bankgiroText+'\n'+'Syntetiskt bilageinnehåll utan nya fält.\n'.repeat(repeats);
+  assert.ok(text.length>50000);assert.equal(text.length<=150000,repeats===1500);
+  const decoded={text,ocr:true,confidence:99,ocrEvidence:packet(text,{inputHash:digest(bytes)})};
+  const local=dataModule(`const decoded=${JSON.stringify(decoded)};export async function imageText(){return decoded;}export async function pdfInvoiceText(){return decoded;}`),imp=await loadInvoiceImports({'./local-ocr':local});
+  const result=await imp.readInvoiceFile(new File([bytes],'synthetic.png',{type:'image/png'}),'owner@example.test');
+  assert.equal(result.text.length,50000);assert.equal(result.interpretationText,text.slice(0,150000));assert.equal(result.fields.bankgiro,repeats===1500?'123-4567':'');
+  assert.equal(result.ocrEvidence.textSha256,digest(text));assert.equal(result.ocrInputSha256,digest(bytes));
+  if(repeats===4500)assert.match(result.warning,/Bankgiro.*ordunderlag/);
 });

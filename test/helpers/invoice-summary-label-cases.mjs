@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {labelDevelopmentCases,labelSafetyCases} from './document-label-corpus.mjs';
 import {evidenceTable} from './invoice-evidence-cases.mjs';
+import {packet,inputSha256} from './ocr-bankgiro-cases.mjs';
 
 export function registerSummaryLabelTests(engine,parse){
   test(`${engine}: paragraph gaps never establish invoice identity from another line`,()=>{
@@ -36,7 +37,7 @@ export function registerSummaryLabelTests(engine,parse){
   test(`${engine}: OCR paragraph gaps preserve explicit wrapped summary values`,()=>{
     const sample=labelDevelopmentCases.find(sample=>sample.id==='wrapped-summaries');
     const text=sample.text.replaceAll('moms:\n','moms:\n \n\t');
-    const result=parse(text,{...sample.metadata,method:'ocr',ocrConfidence:99});
+    const result=parse(text,{...sample.metadata,method:'ocr',ocrConfidence:99,ocrEvidence:packet(text),ocrInputSha256:inputSha256});
     assert.deepEqual(Object.fromEntries(Object.entries(result.fields).map(([key,field])=>[key,field.value])),sample.gold.fields);
     assert.notEqual(result.level,'green','OCR still requires human verification');
     assert.match(result.fields.net_cents.evidence,/moms:\n \n\t4 000,00 SEK/);

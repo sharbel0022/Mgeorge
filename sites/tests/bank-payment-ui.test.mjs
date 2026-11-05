@@ -63,7 +63,7 @@ test('manual completion does not rewrite the bank payer or reference in presenta
 });
 
 test('identified detail response enriches payer while aggregate remains unverified',()=>{
-  const s=emptyState(),t=tx({bankDetails:{status:'identified',party:'Bankens Betalare AB',payerReference:'0599',referenceEvidence:extractPaymentReferences({invoice_number:'0599'})}});s.transactions.push(t);s.invoices.push(invoice());
+  const s=emptyState(),t=tx({bankDetails:{status:'identified',documentId:'synthetic-detail-original',checkedAt:'2026-11-01T00:00:00Z',party:'Bankens Betalare AB',payerReference:'0599',referenceEvidence:extractPaymentReferences({invoice_number:'0599'})}});s.transactions.push(t);s.invoices.push(invoice());
   const x=view.bankPaymentView(s,t);assert.equal(x.payer,'Bankens Betalare AB');assert.equal(x.status,'Specifikation saknas');assert.equal(x.verified,false);assert.equal(x.reference.ocr,'');
 });
 
@@ -138,13 +138,13 @@ test('detail payer and AIS reference keep different original evidence when detai
 
 test('a general detail reference never inherits an AIS OCR referencePart with the same value',()=>{
  const t=tx({kind:'payment',party:'AIS payer AB',description:'',payerReference:'000018',referenceParts:[{value:'000018',source:'$.ais.ocr',kind:'ocr'}]},{reference_number:undefined,ocr:'000018'});
- t.bankDetails={party:'Detail payer AB',payerReference:'000018',referenceEvidence:extractPaymentReferences({payment_reference:'000018'})};
+ t.bankDetails={status:'identified',documentId:'synthetic-detail-original',checkedAt:'2026-11-01T00:00:00Z',party:'Detail payer AB',payerReference:'000018',referenceEvidence:extractPaymentReferences({payment_reference:'000018'})};
  assert.equal(view.bankPaymentReference(t).kind,'reference');assert.equal(view.bankPaymentReference(t).ocr,'');
 });
 
 test('unused detail reference metadata cannot classify the AIS reference as OCR',()=>{
  const t=tx({kind:'payment',party:'AIS payer AB',description:'',payerReference:'000018'},{reference_number:undefined,payment_reference:'000018'});
- t.bankDetails={party:'Detail payer AB',payerReference:'',referenceEvidence:extractPaymentReferences({ocr:'000018'})};
+ t.bankDetails={status:'missing',documentId:'synthetic-detail-original',checkedAt:'2026-11-01T00:00:00Z',party:'Detail payer AB',payerReference:'',referenceEvidence:extractPaymentReferences({ocr:'000018'})};
  assert.equal(view.bankPaymentReference(t).kind,'reference');assert.equal(view.bankPaymentReference(t).ocr,'');
 });
 

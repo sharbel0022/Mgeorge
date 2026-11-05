@@ -31,6 +31,7 @@ import {analyzeDocument,approveDocument} from './invoice-review.js';
 import {runDocumentProcess} from './invoice-extraction.js';
 import {runReconciliation,verifyPayer,analyzeReconciliation,reconciliationData} from './reconciliation.js';
 import {readReconciliationPreview} from './reconciliation-preview.js';
+import {discoverManualMultiple,previewManualMultiple,commitManualMultiple,readManualMultipleReceipt,decorateManualMultipleAllocations} from './manual-multiple-allocation.js';
 import {prepareMessages,listMessages,verifyContact,editMessage,rejectMessage,reviewMessage,approveAndSend} from './customer-messages.js';
 import {prepareGmailSend,hasGmailSendScope} from './gmail.js';
 import {createPaymentControl,planBankControl} from './payment-control.js';
@@ -150,7 +151,7 @@ function serveStatic(req,res,path){
     // These standalone information documents contain their own fixed stylesheet.
     res.writeHead(200,{...baseHeaders,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"});return res.end(contents);
   }
-  if(!['/','/index.html','/app.js','/workspace-search.js','/review.js','/messages.js','/style.css','/payment-control.js','/payment-control.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
+  if(!['/','/index.html','/app.js','/workspace-search.js','/manual-multiple-client.js','/review.js','/messages.js','/style.css','/payment-control.js','/payment-control.css'].includes(path)){json(res,404,{error:'Sidan finns inte'});return;}
   const actual=path==='/'?'/index.html':path;
   const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'}[extname(actual)];
   const contents=readFileSync(resolve('public'+actual));
@@ -754,7 +755,7 @@ async function companyRoute(req,res,url,path){
   if(path==='/api/invoices'&&req.method==='POST')return json(res,201,addInvoice(await readBody(req)));
   if(/^\/api\/invoices\/[^/]+$/.test(path)&&req.method==='GET'){
     const evidence=reconciliationData(db),id=decodeURIComponent(path.split('/').pop()),invoice=evidence.invoices.find(i=>i.id===id);if(!invoice)throw bad(404,'Fakturan saknas');
-    const transactions=listTransactions(db),allocations=db.prepare('SELECT * FROM allocations WHERE invoice_id=? ORDER BY confirmed_at DESC').all(id).map(a=>({...a,transaction:transactions.find(t=>t.id===a.transaction_id)}));
+    const transactions=listTransactions(db),allocations=decorateManualMultipleAllocations(db,db.prepare('SELECT * FROM allocations WHERE invoice_id=? ORDER BY confirmed_at DESC').all(id)).map(a=>({...a,transaction:transactions.find(t=>t.id===a.transaction_id)}));
     return json(res,200,{invoice,allocations,documents:listDocuments(db).filter(d=>d.invoice_id===id),analysis:invoiceAnalysis(invoice,analyzeReconciliation(evidence).filter(s=>s.invoice_id===id))});
   }
   if(path==='/api/invoices'&&req.method==='PATCH'){
@@ -882,7 +883,18 @@ async function companyRoute(req,res,url,path){
     const safeName=doc.name.replace(/[^A-Za-z0-9._-]/g,'_');
     res.writeHead(200,{...baseHeaders,...companyHeaders(),'Content-Type':doc.mime_type,'Content-Disposition':`attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(doc.name)}`,'Content-Length':doc.content.length,'Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(Buffer.from(doc.content));
   }
-  if(path==='/api/allocations'&&req.method==='GET')return json(res,200,{items:db.prepare('SELECT * FROM allocations ORDER BY confirmed_at DESC').all()});
+  if(path==='/api/allocations'&&req.method==='GET')return json(res,200,{items:decorateManualMultipleAllocations(db,db.prepare('SELECT * FROM allocations ORDER BY confirmed_at DESC').all())});
+  if(path==='/api/manual-allocations'&&req.method==='GET'){
+    const keys=[...url.searchParams.keys()];if(keys.length!==1||!['transactionId','requestId'].includes(keys[0]))throw bad(400,'Välj en bankhändelse eller en kvittoidentifierare.');
+    const result=keys[0]==='requestId'?readManualMultipleReceipt(db,{owner:req.principal,requestId:url.searchParams.get('requestId')}):await discoverManualMultiple(db,{owner:req.principal,transactionId:url.searchParams.get('transactionId')});
+    assertSessionStillAuthorized(req);return json(res,200,result);
+  }
+  if(path==='/api/manual-allocations/preview'&&req.method==='POST'){
+    const result=await previewManualMultiple(db,{owner:req.principal,request:await readBody(req)});assertSessionStillAuthorized(req);return json(res,200,result);
+  }
+  if(path==='/api/manual-allocations'&&req.method==='POST'){
+    const result=await commitManualMultiple(db,{owner:req.principal,request:await readBody(req),assertCurrent:()=>assertSessionStillAuthorized(req)});return json(res,result.replayed?200:201,result);
+  }
   if(path==='/api/allocations'&&req.method==='POST'){
     const b=await readBody(req);if(b.confirm!==true)throw bad(400,'Matchning måste bekräftas manuellt');
     const invoiceId=requiredString(b.invoice_id,'Faktura-ID'),transactionId=requiredString(b.transaction_id,'Bankhändelse-ID');

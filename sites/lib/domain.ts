@@ -7,7 +7,7 @@ import {matchingReferenceValues} from './payment-references.js';
 import {randomUuid} from './uuid.js';
 import {payerEvidenceConflict} from './payer-evidence.js';
 import {bankgiroDepositIdentity} from './bankgiro-deposit-identity.js';
-import {resolveInvoiceReference,matchesInvoiceReference,strictInvoiceReferenceMatch,validateInvoiceReferencePolicies,type InvoiceReferencePolicy,type InvoiceReferenceInput} from './invoice-reference-policy.js';
+import {resolveInvoiceReference,matchesInvoiceReference,strictInvoiceReferenceMatch,canonicalInvoiceReference,validateInvoiceReferencePolicies,type InvoiceReferencePolicy,type InvoiceReferenceInput} from './invoice-reference-policy.js';
 export type Invoice = {
  id: string; direction: "receivable" | "payable"; party: string; email: string; number: string; ocr: string;
  total: number; currency: "SEK"; issued: string; due: string; reviewed: boolean; voided: boolean;
@@ -33,7 +33,7 @@ export type Transaction = {
  description: string; source: string; externalId: string; account: string; kind: "payment" | "batch" | "unknown";
  evidence?:string;organizationNumber?:string;original?:{party:string;payerReference:string;description:string;amount:number;date:string;account:string;bankReference:string};verification?:{party:string;payerReference:string;note:string;at:string};verified: boolean; duplicateOf: string; ignored: boolean; parentId: string; importId: string; createdAt: string;
 };
-export type Allocation = {id:string;invoiceId:string;transactionId:string;amount:number;effect:"payment"|"refund";active:boolean;note:string;createdAt:string;reversedAt?:string};
+export type Allocation = {id:string;invoiceId:string;transactionId:string;amount:number;effect:"payment"|"refund";active:boolean;note:string;createdAt:string;reversedAt?:string;manualReview?:{method:'manual_multiple';receiptId:string;requestId:string;approvedAt:string;approvedBy:string;reviewHash:string}};
 export type Credit = {id:string;invoiceId:string;amount:number;number:string;note:string;date:string;active:boolean};
 export type ImportRecord = {id:string;hash:string;account:string;name:string;count:number;createdAt:string;documentId?:string;enrichment?:Record<string,unknown>};
 /** A human decision about retained sources, never a financial allocation or bank identity. */
@@ -171,6 +171,27 @@ export function suspectedBankCollection(amount:number,description:string,party:s
  return collective||amount>0&&/bankgiro|bg\s*inbetalning/i.test(`${description} ${party}`)&&(!individualParty(party)||!usablePaymentReference(structuredReference));
 }
 export function needsPaymentSpecification(t:Transaction){return !t.parentId&&(t.kind==='batch'||suspectedBankCollection(t.amount,t.description,t.party,t.payerReference));}
+export function bankPayerName(value:unknown){
+ const name=String(value||'').trim();
+ return individualParty(name)&&name.length<=200&&!/betalardetaljer|betalningsspecifikation|betalare\s+(?:saknas|okänd)|mottagare\s+okänd|inbetalning\s*[–-]|utbetalning\s*[–-]|^bankgiro\s+inbetalning/iu.test(name)?name:'';
+}
+/** Select saved bank fields for read-only presentation. Detail metadata needs
+ * its own retained original and an AIS source; a typed snapshot proves neither.
+ * Fresh byte integrity is still checked by the original-verification service. */
+export function bankPaymentSourceFacts(t:Transaction){
+ const details=t.bankDetails,hasDetailValues=!!String(details?.party||'').trim()||!!String(details?.payerReference||'').trim();
+ const backedDetails=!!details&&!!String(details.documentId||'').trim()&&hasBankApiOrigin(t)&&['identified','missing'].includes(details.status);
+ const detailIssue=hasDetailValues&&!backedDetails?'Bankens separata detaljuppgifter saknar ett kopplat original eller verifierbar AIS-källa. Granska det bevarade underlaget.':'';
+ const bankSource=['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'')&&!needsBankFileValidation(t);
+ const original=bankSource&&!needsPaymentSpecification(t)?t.original||(t.verification?undefined:t):undefined;
+ const detailPayer=backedDetails?bankPayerName(details?.party):'',detailReference=backedDetails&&usablePaymentReference(String(details?.payerReference||''))?details!.payerReference:'';
+ const originalReference=String(original?.payerReference||'');
+ return {payer:detailPayer||bankPayerName(original?.party),reference:detailReference||(usablePaymentReference(originalReference)?originalReference:''),
+  payerSource:detailPayer?'detail' as const:'transaction' as const,referenceSource:detailReference?'detail' as const:'transaction' as const,
+  payerEvidence:detailPayer?details?.payerEvidence:t.payerEvidence,referenceEvidence:detailReference?details?.referenceEvidence:t.referenceEvidence,referenceParts:detailReference?undefined:t.referenceParts,detailIssue};
+}
+/** Current saved account holds used by both overview and payment presentation. */
+export const paymentPresentationAccountIssue=(s:State,t:Transaction)=>paymentAccountIssue(s,t)||paymentAncestors(s,t).map(row=>row.bankgiroAccountIssue||'').find(Boolean)||(!String(t.account||'').trim()?'Mottagarkontot saknas i bankunderlaget.':'');
 const sameParty=(a:string,b:string)=>individualParty(a)&&a.normalize('NFKC').trim().toLocaleLowerCase('sv-SE')===b.normalize('NFKC').trim().toLocaleLowerCase('sv-SE');
 /** A derived business intention, never a replacement for the invoice or bank original. */
 export function invoiceReferenceDecision(s:State,i:Pick<Invoice,'number'|'ocr'|'direction'|'referenceOriginal'>,original=i.referenceOriginal){
@@ -178,10 +199,67 @@ export function invoiceReferenceDecision(s:State,i:Pick<Invoice,'number'|'ocr'|'
 }
 /** All scoped identifiers reserve ownership; only the intended reference authorizes matching. */
 export function invoiceReferenceMatches(s:State,i:Pick<Invoice,'number'|'ocr'|'direction'|'referenceOriginal'>,value:string,ownership=false){
- const decision=invoiceReferenceDecision(s,i);
+ return resolvedInvoiceReferenceMatches(i,value,ownership,invoiceReferenceDecision(s,i));
+}
+function resolvedInvoiceReferenceMatches(i:Pick<Invoice,'number'|'ocr'|'direction'|'referenceOriginal'>,value:string,ownership:boolean,decision:ReturnType<typeof invoiceReferenceDecision>){
  if(!decision.applies)return [i.ocr,i.number].some(candidate=>!!candidate&&exactReference(value,candidate));
  if(ownership)return [decision.intendedPaymentReference,i.number,i.ocr,i.referenceOriginal?.invoice_number,i.referenceOriginal?.reference].some(candidate=>strictInvoiceReferenceMatch(value,candidate));
  return matchesInvoiceReference(decision,value);
+}
+/** A projection-local cache only: discard it before any state or policy change. */
+export function createPaymentPresentationReferenceMatcher(s:State){
+ const decisions=new Map<Invoice,ReturnType<typeof invoiceReferenceDecision>>();
+ const decisionOf=(i:Invoice)=>{
+  let decision=decisions.get(i);if(!decision){decision=invoiceReferenceDecision(s,i);decisions.set(i,decision);}
+  return decision;
+ };
+ const matches=(i:Invoice,value:string,ownership=false)=>resolvedInvoiceReferenceMatches(i,value,ownership,decisionOf(i));
+ const strictOwners=new Map<string,Set<Invoice>>(),textOwners=new Map<string,Set<Invoice>>(),numericOwners=new Map<string,Set<Invoice>>();
+ // These keys only select candidates. The authoritative matcher above makes
+ // every ownership decision, including case, punctuation and scoped policies.
+ const textKey=(value:unknown)=>String(value||'').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g,' ');
+ const numericKey=(value:string)=>/^\d[\d -]*$/.test(value)?value.replace(/[ -]/g,''):null;
+ const add=(index:Map<string,Set<Invoice>>,i:Invoice,value:string|null)=>{if(!value)return;const key=i.direction+'|'+value,items=index.get(key)||new Set<Invoice>();items.add(i);index.set(key,items);};
+ let indexed=false;
+ const ensureIndex=()=>{
+  if(indexed)return;indexed=true;
+  for(const i of s.invoices){
+   if(i.voided)continue; // Paid and unreviewed invoices still reserve their identifiers.
+   const decision=decisionOf(i);
+   if(decision.applies)for(const value of [decision.intendedPaymentReference,i.number,i.ocr,i.referenceOriginal?.invoice_number,i.referenceOriginal?.reference])add(strictOwners,i,canonicalInvoiceReference(value));
+   else for(const value of [i.number,i.ocr]){const key=textKey(value);add(textOwners,i,key);add(numericOwners,i,numericKey(key));}
+  }
+ };
+ const owners=(direction:Invoice['direction'],values:string[])=>{
+  ensureIndex();const result=new Set<Invoice>();
+  for(const value of values){
+   const candidates=new Set<Invoice>(),collect=(index:Map<string,Set<Invoice>>,key:string|null)=>{if(key)for(const i of index.get(direction+'|'+key)||[])candidates.add(i);};
+   collect(strictOwners,canonicalInvoiceReference(value));
+   const key=textKey(value);collect(numericOwners,numericKey(key));
+   // A generic labelled reference can match a trailing identifier. Query all
+   // suffixes, then apply exactReference through matches; do not duplicate its label grammar.
+   for(let start=0;start<key.length;start++)collect(textOwners,key.slice(start));
+   for(const i of candidates)if(matches(i,value,true))result.add(i);
+  }
+  return [...result];
+ };
+ return Object.assign(matches,{owners,policyIssue:(i:Invoice,t:Transaction)=>resolvedInvoiceReferenceMatchIssue(i,t,decisionOf(i),values=>owners(i.direction,values))});
+}
+/** Read-only source assessment of a recorded allocation. It never creates,
+ * reverses or authorizes a booking, and explicit refunds retain their direction. */
+export function recordedPaymentSourceIssue(s:State,t:Transaction,i:Invoice,effect:Allocation['effect'],facts=bankPaymentSourceFacts(t),referenceMatches=createPaymentPresentationReferenceMatcher(s)){
+ const issue=allocationPaymentEvidenceIssue(s,t,effect)||paymentPresentationAccountIssue(s,t)||facts.detailIssue;if(issue)return issue;
+ if(!facts.payer)return 'Banken har inte styrkt en individuell betalare eller mottagare.';
+ if(!facts.reference)return 'Bankrapporterad betalningsreferens saknas.';
+ if(activeBankgiroLink(s,t.id))return 'Kopplingen mellan bankunderlagen är manuellt styrkt och behöver granskas separat.';
+ if(!s.company)return 'Företagskontexten för betalningsreferensen saknas.';
+ if(Math.sign(t.amount)!==(i.direction==='receivable'?1:-1)*(effect==='refund'?-1:1))return 'Bankbeloppets riktning avviker från den registrerade betalningen.';
+ const evidence=facts.referenceEvidence,references=matchingReferenceValues(evidence,facts.reference);
+ if(invoicePolicyPaymentReferences(t).invalid)return 'Bankens referensunderlag är ofullständigt eller innehåller ogiltig OCR.';
+ const policyIssue=referenceMatches.policyIssue(i,t);if(policyIssue)return policyIssue;
+ if(i.voided||!referenceMatches(i,facts.reference)||references.some(reference=>!referenceMatches(i,reference)))return 'Den registrerade fakturakopplingen avviker från bankens bevarade betalningsreferens. Granska originalen; saldot ändras inte.';
+ if(referenceMatches.owners(i.direction,references).some(other=>other.id!==i.id))return 'Flera fakturor äger bankens bevarade betalningsreferens. Granska fakturaidentiteten.';
+ return '';
 }
 const exactPaymentReference=(s:State,t:Transaction,i:Invoice)=>usablePaymentReference(t.payerReference)&&invoiceReferenceMatches(s,i,t.payerReference);
 /** Manual corrections never erase reference observations from retained bank sources. */
@@ -192,12 +270,15 @@ export function invoicePolicyPaymentReferences(t:Transaction){
 }
 /** Validate every reference candidate and every invoice owner before creating new money. */
 export function invoiceReferenceMatchIssue(s:State,i:Invoice,t:Transaction){
- const decision=invoiceReferenceDecision(s,i);if(!decision.applies)return '';
+ return resolvedInvoiceReferenceMatchIssue(i,t,invoiceReferenceDecision(s,i),values=>s.invoices.filter(other=>!other.voided&&other.direction===i.direction&&values.some(value=>invoiceReferenceMatches(s,other,value,true))));
+}
+function resolvedInvoiceReferenceMatchIssue(i:Invoice,t:Transaction,decision:ReturnType<typeof invoiceReferenceDecision>,ownersForValues:(values:string[])=>Invoice[]){
+ if(!decision.applies)return '';
  if(decision.status==='BLOCKED')return decision.reason;
  const {values,invalid}=invoicePolicyPaymentReferences(t);
  if(!values.length||values.some(value=>!matchesInvoiceReference(decision,value)))return 'Betalningsreferensen stämmer inte exakt med fakturans avsedda betalningsreferens. Granska originalen.';
  if(invalid)return 'Bankens referensunderlag är ofullständigt eller innehåller ogiltig OCR. Granska originalet.';
- const owners=s.invoices.filter(other=>!other.voided&&other.direction===i.direction&&values.some(value=>invoiceReferenceMatches(s,other,value,true)));
+ const owners=ownersForValues(values);
  return owners.length!==1||owners[0].id!==i.id?'Flera fakturor äger betalningsreferensen. Granska dubbletterna innan någon ny matchning.':'';
 }
 export function suggestions(s:State,t:Transaction){

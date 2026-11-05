@@ -173,7 +173,7 @@ const sourceFields=['owner','source_id','scope_id','authorization_generation','a
 const jobFields=['id','owner','source_id','scope_id','report_id','sha256','filename','available_at','authorization_generation','document_id','status','attempts','next_attempt_at','last_error','import_id','payment_count','created_at','updated_at'];
 /** Each predicate and its identity census run inside the allocation's D1 batch.
  * The census detects a newly appended conflicting hash as well as row changes. */
-function sourceFences(database:D1Database,owner:string,revision:number,snapshots:unknown[]){
+export function paymentSourceSnapshotFences(database:D1Database,owner:string,revision:number,snapshots:unknown[]){
  return snapshots.map(value=>{
   const snapshot=value as {documentId:string;importId:string;jobs:Record<string,any>[];sources:Record<string,any>[]},clauses:string[]=[],values:unknown[]=[];
   const jobScope=['document_id=?','import_id=?'];values.push(owner,snapshot.documentId,snapshot.importId);
@@ -202,7 +202,7 @@ export async function writePaymentState(owner:string,revision:number,before:Stat
   const promoted=after.transactions.some(row=>row.specification&&row.specificationStatus==='linked'&&matches(row)&&!before.transactions.some(old=>old.id===row.id&&old.specificationStatus==='linked'&&old.parentId===row.parentId));
   if(promoted||!affected.length||affected.some(a=>!options.manualAllocationIds?.has(a.id)))throw changedSource();
  }
- const reportFences=sourceFences(database,owner,revision,source.snapshot);
+ const reportFences=paymentSourceSnapshotFences(database,owner,revision,source.snapshot);
  const accounts=new Map<string,{primary:string;reported:string|undefined;provider:'enable_banking'|'open_payments'}>();
  for(const id of financialIds){
   const source=after.transactions.find(t=>t.id===id)!;if(!needsAccount(source))continue;

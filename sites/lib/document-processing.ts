@@ -177,9 +177,9 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
   }
   throw safe('Uppgifterna ändrades samtidigt. Försök igen.');
 }
-async function finish(owner:string,job:Row,result:{text:string,method:string,confidence:number}){
+async function finish(owner:string,job:Row,result:{text:string,method:string,confidence:number,ocrEvidence?:any}){
   const source=await sourceFor(owner,job.document_id);if(source?.status!=='needs_review')return {ignored:true};
-  const meta=JSON.parse(source.metadata),extraction=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||''});
+  const meta=JSON.parse(source.metadata),extraction=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||'',ocrEvidence:result.ocrEvidence,ocrInputSha256:job.sha256});
   const runId=await documentRunId(owner,job);
   Object.assign(extraction,{processing:{runner:job.lease_runner||'local',sha256:job.sha256,version:'document-worker-v3',run_id:runId}});
   const v=Object.fromEntries(fieldNames.map((k:string)=>[k,(extraction.fields as any)[k].value]));
@@ -321,7 +321,7 @@ export async function workerAction(req:Request,action:string){
     // could not read. A worker's method claim cannot prove native PDF text:
     // only serverPdfText's original-byte processing grants that provenance.
     // Keep legacy PDF worker completions compatible, under the OCR cap.
-    const result=await finish(owner,job,{text:body.text,method:'ocr',confidence:body.confidence});
+    const result=await finish(owner,job,{text:body.text,method:'ocr',confidence:body.confidence,ocrEvidence:body.ocrEvidence});
     if(mode==='cloud'&&!('ignored' in result)){
       try{await db().prepare('UPDATE document_automation SET cloud_worker_completed=? WHERE owner=?').bind(now(),owner).run();}
       catch{return response({...result,metadata_warning:METADATA_WARNING});}

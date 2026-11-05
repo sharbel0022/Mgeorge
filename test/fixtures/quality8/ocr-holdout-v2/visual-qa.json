@@ -1,0 +1,102 @@
+{
+  "schema": "mgeorge-independent-ocr-visual-qa-v2",
+  "reviewerRole": "Independent corpus creator/observer",
+  "completedAt": "2026-11-05T19:54:28.203596+00:00",
+  "method": "Viewed all three contact sheets and each of the twelve full-size raster images before freezing; no OCR, extracted text or application parser was run.",
+  "normalCount": 10,
+  "stressCount": 2,
+  "normalBodyFontPixels": [
+    28,
+    30,
+    32,
+    34,
+    36
+  ],
+  "titleFontPixels": 52,
+  "nonFieldFooterFontPixels": 23,
+  "normalChecks": [
+    "All printed canonical fields are visually readable",
+    "No clipping or overlapping field text",
+    "Natural supplier/customer blocks, item tables, dates, payment sections and VAT summaries",
+    "Five regular sans/serif font families across ten new layout arrangements",
+    "Literal gold and line arithmetic checked independently of OCR"
+  ],
+  "images": [
+    {
+      "id": "holdout-v2-normal-01",
+      "population": "normal-readable",
+      "sha256": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "population": "normal-readable",
+      "sha256": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-03",
+      "population": "normal-readable",
+      "sha256": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "population": "normal-readable",
+      "sha256": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "population": "normal-readable",
+      "sha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "population": "normal-readable",
+      "sha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "population": "normal-readable",
+      "sha256": "6cdc1af980952c6efacf2060bc282c086aeaac21711f5d158b7b37f669f795b7",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "population": "normal-readable",
+      "sha256": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "population": "normal-readable",
+      "sha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "population": "normal-readable",
+      "sha256": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b",
+      "visualStatus": "readable-normal"
+    },
+    {
+      "id": "holdout-v2-stress-lost-bottom",
+      "population": "stress",
+      "sha256": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e",
+      "visualStatus": "separate-stress-requires-abstention"
+    },
+    {
+      "id": "holdout-v2-stress-defocused-photo",
+      "population": "stress",
+      "sha256": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606",
+      "visualStatus": "separate-stress-requires-abstention"
+    }
+  ],
+  "ocrInvocations": 0,
+  "applicationParserInvocations": 0,
+  "normalFactsDisjointFromV1": true,
+  "v1Unmodified": true
+}

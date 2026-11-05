@@ -127,6 +127,7 @@ function tableHeader(line){
   // OCR may collapse every column gap to one space. Recognize the supported
   // heading family, but do not guess where its data cells begin and end.
   if(split.cells.length===1&&/^(?:beskrivning|benämning|artikel|description|item)[ \t]+(?:antal|quantity|qty)[ \t]+(?:[àáa][ -]?pris|enhetspris|styckpris|unit[ \t]+price)\b/iu.test(normalized(line)))return {...split,columns:[null],complete:false};
+  if(split.cells.length===1&&/^(?:beskrivning|benämning|artikel|description|item)[ \t]+(?:antal|quantity|qty)[ \t]+(?:(?:belopp|summa)[ \t]+exkl(?:usive|\.?)[ \t]+moms|netto(?:belopp)?|net[ \t]+amount)$/iu.test(normalized(line)))return {...split,columns:[null],complete:false};
   if(recognizable.length<2||!recognizable.some(value=>['quantity','unit_price_cents','vat_rate'].includes(value)))return null;
   const complete=columns.every(Boolean)&&new Set(columns).size===columns.length&&['description','quantity','unit_price_cents','net_cents'].every(key=>columns.includes(key));
   return {...split,columns,complete};
@@ -134,7 +135,7 @@ function tableHeader(line){
 const quantityValue=value=>/^-?\d+(?:[.,]\d{1,4})?$/.test(value)&&Number.isFinite(Number(value.replace(',','.')))&&Math.abs(Number(value.replace(',','.')))<=1_000_000_000?Number(value.replace(',','.')):null;
 const rateValue=value=>{const match=value.match(/^(\d{1,3}(?:[.,]\d{1,3})?)[ \t]*%?$/);if(!match)return null;const n=Number(match[1].replace(',','.'));return n>=0&&n<=100?n:null;};
 const rowKeys=['description','quantity','unit_price_cents','net_cents','vat_rate','vat_cents','total_cents'];
-const tableSummary=/^(?:netto(?:belopp)?|totalt netto|net amount|belopp före moms|(?:summa|totalt|belopp)[ \t]+(?:inkl|exkl)(?:usive|\.?)[ \t]+moms|moms(?:belopp)?|total moms|vat|att betala|summa att betala|totalbelopp|totalsumma|amount due)[ \t]*[:.#]/iu;
+const tableSummary=/^(?:netto(?:belopp)?|totalt netto|net amount|belopp före moms|(?:summa|totalt|belopp)[ \t]+(?:inkl|exkl)(?:usive|\.?)[ \t]+moms|moms(?:belopp)?|total moms|vat|att betala|summa att betala|totalbelopp|totalsumma|amount due)(?=[ \t]*[:.#]|[ \t]*$|[ \t]+(?:-?\d|SEK\b|EUR\b|USD\b|GBP\b|NOK\b|DKK\b))/iu;
 const pageCaption=/^(?:sida|page)[ \t]+\d+(?:[ \t]*(?:av|of|\/)[ \t]*\d+)?$/iu;
 const invoiceIdentity=/^(?:faktura[ \t]*(?:nummer|nr|no)|invoice[ \t]*(?:number|no))[ \t]*[:.#-]?[ \t]*([\p{L}\p{N}][\p{L}\p{N}/_-]*)$/iu;
 const continuationIdentity=/^(?:faktura|invoice)[ \t]+([\p{L}\p{N}][\p{L}\p{N}/_-]*)[ \t]*[,;:]?[ \t]*(?:fortsättning|continued|continuation)[ \t]+(?:sida|page)[ \t]+\d+(?:[ \t]+(?:av|of)[ \t]+\d+|[ \t]*\/[ \t]*\d+)?$/iu;

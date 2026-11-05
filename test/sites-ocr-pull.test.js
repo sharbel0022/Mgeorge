@@ -7,6 +7,7 @@ import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {runDocumentProcess} from '../src/invoice-extraction.js';
 import {image} from './fixtures.js';
+import {packet,bankgiroText,digest} from './helpers/ocr-bankgiro-cases.mjs';
 test('OCR pull worker makes one bounded job at a time and never follows redirects',async()=>{
   const bytes=Buffer.from('synthetic document'),token=randomBytes(32).toString('base64url'),lease=randomBytes(32).toString('base64url');let count=0,complete=0;
   const fetchImpl=async(url,options)=>{
@@ -43,6 +44,18 @@ function cloudFixture({extract=async()=>({text:'Synthetic OCR',method:'ocr',conf
   };
   return {token,lease,job,calls,bodies,run:options=>runSitesOcr({origin:'https://site.example',token,mode},{fetchImpl,extract:async(...args)=>{extractCalls++;return extract(...args);},...options}),get extractCalls(){return extractCalls;}};
 }
+
+for(const kind of ['valid','low-confidence','other-original','other-text'])test('OCR pull carries only original-bound bankgiro word evidence: '+kind,async()=>{
+  const bytes=Buffer.from('synthetic document '+kind),evidence=packet(bankgiroText,{inputHash:digest(bytes),confidence:kind==='low-confidence'?0:95});
+  if(kind==='other-original')evidence.inputSha256=digest('different synthetic original');
+  if(kind==='other-text')evidence.textSha256=digest('different synthetic OCR text');
+  Object.assign(evidence,{id:'injected',lease:'injected',debug:'unrelated private metadata'});
+  const f=cloudFixture({bytes,extract:async()=>({text:bankgiroText,method:'ocr',confidence:99,ocrEvidence:evidence})});
+  assert.deepEqual(await f.run(),{processed:1,failed:0});
+  const body=f.bodies[0];assert.equal(body.id,f.job.id);assert.equal(body.lease,f.lease);assert.equal(body.sha256,digest(bytes));assert.equal(body.text,bankgiroText);
+  if(kind.startsWith('other-'))assert.equal(body.ocrEvidence,undefined);
+  else{assert.equal(body.ocrEvidence.inputSha256,digest(bytes));assert.equal(body.ocrEvidence.pages[0].bankgiro[0].words[1].confidence,kind==='low-confidence'?0:95);assert.equal(body.ocrEvidence.debug,undefined);assert.equal(body.ocrEvidence.lease,undefined);}
+});
 
 test('cloud worker processes the text queue before OCR and counts only saved completions',async t=>{
   const timeouts=[];t.mock.method(AbortSignal,'timeout',milliseconds=>{timeouts.push(milliseconds);return new AbortController().signal;});

@@ -2,6 +2,8 @@
 
 2026-11-05. Bas: `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`. Denna leverans tilldelar inget nytt kvalitetsbetyg. Alla underlag är syntetiska.
 
+Denna rapport bevarar den första leveransens resultat. Den senare, separata ordkonfidensspärren och dess nya före-/eftermätning redovisas i [documents-word-confidence.md](documents-word-confidence.md). De äldre observationerna och facit nedan är oförändrade.
+
 ## Ändringen
 
 Den tidigare parsern tappade uttryckliga belopp märkta exempelvis **Summa inklusive moms**, **Summa exklusive moms**, **Summa inkl. moms** och **Totalt exklusive moms**. En giltig, tidigare känd etikett kunde dessutom dölja en motsägande eller oläslig summa med en sådan etikett. Fyra textfall blev felaktigt gröna före ändringen.

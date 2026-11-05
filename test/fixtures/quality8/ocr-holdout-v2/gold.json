@@ -1,0 +1,235 @@
+{
+  "schema": "mgeorge-independent-ocr-gold-v2",
+  "synthetic": true,
+  "annotation": "Separately transcribed literal canonical facts, never generated from OCR or application parser output. Direction is supplied metadata and is not an image-derived result. Stress gold retains the undamaged source facts.",
+  "cases": {
+    "holdout-v2-normal-01": {
+      "fields": {
+        "invoice_number": "KS-28417",
+        "party": "Exempel Kustteknik AB",
+        "organization_number": "5597623114",
+        "issued_at": "2026-06-03",
+        "due_at": "2026-07-03",
+        "total_cents": 468225,
+        "vat_cents": 93645,
+        "net_cents": 374580,
+        "reference": "00863025110",
+        "bankgiro": "781-3421",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-02": {
+      "fields": {
+        "invoice_number": "2026-4729",
+        "party": "Fiktiva Björk Konsult AB",
+        "organization_number": "5597623122",
+        "issued_at": "2026-06-11",
+        "due_at": "2026-07-01",
+        "total_cents": 1608000,
+        "vat_cents": 321600,
+        "net_cents": 1286400,
+        "reference": "00863025128",
+        "bankgiro": "4628-7314",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-03": {
+      "fields": {
+        "invoice_number": "V104382",
+        "party": "Exempel Ådal Ventilation AB",
+        "organization_number": "5597623130",
+        "issued_at": "2026-06-18",
+        "due_at": "2026-07-18",
+        "total_cents": 734000,
+        "vat_cents": 146800,
+        "net_cents": 587200,
+        "reference": "00863025136",
+        "bankgiro": "936-4175",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-04": {
+      "fields": {
+        "invoice_number": "LF-63072",
+        "party": "Fiktiva Lönn Kontor AB",
+        "organization_number": "5597623148",
+        "issued_at": "2026-06-25",
+        "due_at": "2026-07-25",
+        "total_cents": 266700,
+        "vat_cents": 53340,
+        "net_cents": 213360,
+        "reference": "00863025144",
+        "bankgiro": "5736-0828",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-05": {
+      "fields": {
+        "invoice_number": "701682",
+        "party": "Exempel Pump & Värme AB",
+        "organization_number": "5597623155",
+        "issued_at": "2026-07-02",
+        "due_at": "2026-07-22",
+        "total_cents": 1210900,
+        "vat_cents": 242180,
+        "net_cents": 968720,
+        "reference": "00863025151",
+        "bankgiro": "241-9562",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-06": {
+      "fields": {
+        "invoice_number": "SR-260419",
+        "party": "Fiktiva Skärvik IT AB",
+        "organization_number": "5597623163",
+        "issued_at": "2026-07-10",
+        "due_at": "2026-08-09",
+        "total_cents": 200000,
+        "vat_cents": 40000,
+        "net_cents": 160000,
+        "reference": "00863025169",
+        "bankgiro": "8627-0535",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-07": {
+      "fields": {
+        "invoice_number": "F-98342",
+        "party": "Exempel Fräsverkstan AB",
+        "organization_number": "5597623171",
+        "issued_at": "2026-07-16",
+        "due_at": "2026-08-15",
+        "total_cents": 919350,
+        "vat_cents": 183870,
+        "net_cents": 735480,
+        "reference": "00863025177",
+        "bankgiro": "619-4823",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-08": {
+      "fields": {
+        "invoice_number": "2608-117",
+        "party": "Fiktiva Rönn Frakt AB",
+        "organization_number": "5597623189",
+        "issued_at": "2026-07-23",
+        "due_at": "2026-08-22",
+        "total_cents": 524950,
+        "vat_cents": 104990,
+        "net_cents": 419960,
+        "reference": "00863025185",
+        "bankgiro": "3547-0186",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-09": {
+      "fields": {
+        "invoice_number": "284-6119",
+        "party": "Exempel Styrsystem AB",
+        "organization_number": "5597623197",
+        "issued_at": "2026-08-04",
+        "due_at": "2026-09-03",
+        "total_cents": 1915500,
+        "vat_cents": 383100,
+        "net_cents": 1532400,
+        "reference": "00863025193",
+        "bankgiro": "827-3641",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-normal-10": {
+      "fields": {
+        "invoice_number": "NV-20735",
+        "party": "Fiktiva Norrvik Ritning AB",
+        "organization_number": "5597623205",
+        "issued_at": "2026-08-12",
+        "due_at": "2026-09-11",
+        "total_cents": 355800,
+        "vat_cents": 71160,
+        "net_cents": 284640,
+        "reference": "00863025201",
+        "bankgiro": "4952-1875",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-stress-lost-bottom": {
+      "fields": {
+        "invoice_number": "284-6119",
+        "party": "Exempel Styrsystem AB",
+        "organization_number": "5597623197",
+        "issued_at": "2026-08-04",
+        "due_at": "2026-09-03",
+        "total_cents": 1915500,
+        "vat_cents": 383100,
+        "net_cents": 1532400,
+        "reference": "00863025193",
+        "bankgiro": "827-3641",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    },
+    "holdout-v2-stress-defocused-photo": {
+      "fields": {
+        "invoice_number": "2026-4729",
+        "party": "Fiktiva Björk Konsult AB",
+        "organization_number": "5597623122",
+        "issued_at": "2026-06-11",
+        "due_at": "2026-07-01",
+        "total_cents": 1608000,
+        "vat_cents": 321600,
+        "net_cents": 1286400,
+        "reference": "00863025128",
+        "bankgiro": "4628-7314",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "OCR-source policy requires manual review; damaged stress images additionally require safe abstention."
+    }
+  }
+}

@@ -185,6 +185,50 @@ test('rating8: fresh consent revalidation recovers only operational status and n
   assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,1);
 });
 
+for(const [selection,reason] of [[[],'SAVED_SELECTION_EMPTY'],[{},'SAVED_SELECTION_INVALID']])test('scope diagnostic: revalidation preflight '+reason+' performs no bank GET',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();
+ f.sql.prepare("UPDATE bank_connections SET status='reauth_required',selected_accounts=?").run(JSON.stringify(selection));
+ const before={...f.connection()};let error;
+ try{await f.service.revalidateConsent(post('revalidate'));}catch(caught){error=caught;}
+ const response=f.service.bankFailure(error),body=await response.json();
+ assert.equal(response.status,409);assert.deepEqual(body,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason});
+ assert.equal(f.calls.length,0);assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);
+ assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action LIKE 'bank.consent.revalidation.%'").get().n,0);
+});
+
+for(const [name,mutate,reason] of [
+ ['live inventory',f=>f.live.accounts.push(accountUid),'LIVE_ACCOUNTS_INVALID'],
+ ['selected usage',f=>f.live.accounts_data[0].usage='SYNTHETIC_PRIVATE_USAGE','ACCOUNT_USAGE_INVALID'],
+ ['account identity',f=>f.live.accounts_data[0].identification_hash='SYNTHETIC_PRIVATE_CHANGED_IDENTITY','ACCOUNT_IDENTITY_CHANGED'],
+])test('scope diagnostic: fresh '+name+' denial is sanitized and does not recover status',async t=>{
+ const f=await fixture(t);await f.seedApp();
+ f.account.identification_hash='SYNTHETIC_SAVED_IDENTITY';f.live.accounts_data[0].identification_hash='SYNTHETIC_SAVED_IDENTITY';
+ await f.seedConnection();
+ f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();mutate(f);
+ const before={...f.connection()};let error;
+ try{await f.service.revalidateConsent(post('revalidate'));}catch(caught){error=caught;}
+ const response=f.service.bankFailure(error),body=await response.json();
+ assert.equal(response.status,409);assert.equal(body.code,'BANK_ACCOUNT_SCOPE_INVALID');assert.equal(body.reason,reason);
+ assert.equal(body.error,new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message);
+ assert.deepEqual(f.calls.map(call=>call.name),['getSession']);assert.equal(f.connection().status,'reauth_required');
+ for(const key of ['encrypted_accounts','selected_accounts','encrypted_session','valid_until','retry_after','sync_failures'])assert.equal(f.connection()[key],before[key]);
+ assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+ const diagnostic=JSON.stringify(body)+JSON.stringify(f.sql.prepare("SELECT detail FROM audit_events WHERE action LIKE 'bank.consent.revalidation.%'").all());
+ for(const secret of [accountUid,remoteSession,'SYNTHETIC_PRIVATE_USAGE','SYNTHETIC_PRIVATE_CHANGED_IDENTITY','Swedbank'])assert.ok(!diagnostic.includes(secret));
+});
+
+test('scope diagnostic: serializer rejects forged reasons and never reflects supplied scope-error text',async t=>{
+ const f=await fixture(t),secret='SYNTHETIC_PRIVATE_SCOPE_REASON';
+ for(const reason of [secret,'ACCOUNT_USAGE_INVALID',{account:secret},['ACCOUNT_USAGE_INVALID'],()=>secret]){
+  const error=new ConsentError('BANK_ACCOUNT_SCOPE_INVALID',409,secret);error.reason=reason;
+  assert.deepEqual(await f.service.bankFailure(error).json(),{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID'});
+ }
+ const accessor=new ConsentError('BANK_ACCOUNT_SCOPE_INVALID',409,secret);
+ Object.defineProperty(accessor,'reason',{get(){throw Error(secret);}});
+ assert.deepEqual(await f.service.bankFailure(accessor).json(),{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID'});
+ assert.equal(f.calls.length,0);
+});
+
 for(const [label,mutate] of [
   ['revoked session',f=>{f.live.status='REVOKED';}],
   ['missing selected account',f=>{f.live.accounts=[];f.live.accounts_data=[];}],
@@ -1650,4 +1694,48 @@ test('company selected scope retains strict full-account equality when unselecte
   assert.equal(f.connection().status, 'reauth_required');
   assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
   assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
+});
+
+
+// Independent review: run the real HTTP MCP route, real RPC and real bank
+// service against the existing local SQL fixture. Provider/network stay mocked.
+async function independentScopeRoute(t,f){
+ const key='__independentScopeRoute_'+crypto.randomUUID().replaceAll('-','');globalThis[key]=f.service;t.after(()=>delete globalThis[key]);
+ const service=jsUrl(`const s=globalThis[${JSON.stringify(key)}];export const automaticSync=s.automaticSync,automaticSyncStatus=s.automaticSyncStatus,bankFailure=s.bankFailure,revalidateConsent=s.revalidateConsent;`);
+ const rpc=compiledModule('../lib/banking/mcp.ts',{'./service':service});
+ return await import(compiledModule('../app/mcp/route.ts',{'@/lib/banking/mcp':rpc}));
+}
+const independentScopeRequest=(args={})=>new Request(origin+'/mcp',{method:'POST',headers:{'Content-Type':'application/json',Origin:origin},body:JSON.stringify({jsonrpc:'2.0',id:'scope-review',method:'tools/call',params:{name:'bank_revalidate_consent',arguments:args}})});
+for(const [name,mutate,reason,calls] of [
+ ['empty saved selection',f=>f.sql.prepare('UPDATE bank_connections SET selected_accounts=?').run('[]'),'SAVED_SELECTION_EMPTY',[]],
+ ['non-array saved selection',f=>f.sql.prepare('UPDATE bank_connections SET selected_accounts=?').run('{}'),'SAVED_SELECTION_INVALID',[]],
+ ['live account usage',f=>{f.live.accounts_data[0].usage='INDEPENDENT_PRIVATE_USAGE';},'ACCOUNT_USAGE_INVALID',['getSession']],
+])test('independent scope review: HTTP MCP preserves '+name+' reason and safe denial',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();mutate(f);
+ const before={...f.connection()},route=await independentScopeRoute(t,f),response=await route.POST(independentScopeRequest()),body=await response.json();
+ assert.equal(response.status,200,'The existing JSON-RPC envelope transports tool errors with isError');
+ assert.equal(body.result.isError,true);assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason});
+ assert.deepEqual(JSON.parse(body.result.content[0].text),body.result.structuredContent);
+ assert.deepEqual(f.calls.map(c=>c.name),calls);assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);
+ assert.equal(count(f,'bank_sync_runs'),0);assert.equal(response.headers.get('cache-control'),'private, no-store');
+ const serialized=JSON.stringify(body)+JSON.stringify(f.sql.prepare("SELECT detail FROM audit_events WHERE action LIKE 'bank.consent.revalidation.%'").all());
+ for(const value of [accountUid,remoteSession,'INDEPENDENT_PRIVATE_USAGE','Swedbank'])assert.ok(!serialized.includes(value));
+});
+
+test('independent scope review: HTTP MCP suppresses forged allowed reason and private error text',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+ const secret='INDEPENDENT_PRIVATE_PROVIDER_ERROR';f.provider.getSession=async()=>{const error=new ConsentError('BANK_ACCOUNT_SCOPE_INVALID',409,secret);Object.defineProperty(error,'reason',{get(){throw new Error(secret);}});throw error;};
+ const route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest())).json();
+ assert.equal(body.result.isError,true);assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID'});
+ assert.ok(!JSON.stringify(body).includes(secret));assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);assert.deepEqual(f.calls.map(c=>c.name),['getSession']);
+});
+
+test('independent scope review: caller-supplied reason cannot bypass the MCP argument boundary',async t=>{
+ const f=await fixture(t),route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest({reason:'ACCOUNT_USAGE_INVALID',owner:'other'}))).json();
+ assert.equal(body.error.code,-32602);assert.equal(f.calls.length,0);assert.equal(f.workspace(),null);
+});
+
+test('independent scope review: unauthenticated MCP cannot request a bank diagnostic',async t=>{
+ const f=await fixture(t);f.user=null;const route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest())).json();
+ assert.equal(body.result.isError,true);assert.ok(body.result.structuredContent.signIn);assert.ok(!('reason' in body.result.structuredContent));assert.equal(f.calls.length,0);assert.equal(f.workspace(),null);
 });

@@ -98,10 +98,10 @@ for(const sample of binaryInputs){
   catch{processed={error:true};error='document-process-exception';}
   const processingTimeMs=performance.now()-start;
   const text=processed.text||'';
-  processing.push({id:sample.id,mimeType:sample.mimeType,inputBytes:sample.bytes.length,inputSha256:hash(sample.bytes),method:processed.method??null,ocrConfidence:processed.confidence??null,processingTimeMs,error,extractedCharacters:text.length,extractedTextSha256:hash(text),observedText:text});
+  processing.push({id:sample.id,mimeType:sample.mimeType,inputBytes:sample.bytes.length,inputSha256:hash(sample.bytes),method:processed.method??null,ocrConfidence:processed.confidence??null,ocrEvidence:processed.ocrEvidence??null,processingTimeMs,error,extractedCharacters:text.length,extractedTextSha256:hash(text),observedText:text});
   for(const [engine,parse] of parsers){
     const parsingStart=performance.now();let extraction,parserError=null;
-    try{extraction=parse(text,{...sample.metadata,method:processed.method||'pdf',ocrConfidence:processed.confidence||0});}
+    try{extraction=parse(text,{...sample.metadata,method:processed.method||'pdf',ocrConfidence:processed.confidence||0,ocrEvidence:processed.ocrEvidence,ocrInputSha256:hash(sample.bytes)});}
     catch{extraction={fields:{},level:'red',issues:[]};parserError='parser-error';}
     if(error)extraction.level='red';
     const parsingTimeMs=performance.now()-parsingStart;

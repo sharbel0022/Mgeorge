@@ -27,7 +27,7 @@ export default function GmailWorkspace({initialDocumentId='',embedded=false,focu
     const response=await fetch('/api/files?id='+encodeURIComponent(doc.document_id));if(!response.ok)throw Error('Originalet kunde inte hämtas.');
     const file=new File([await response.blob()],doc.filename,{type:doc.mime}),meta=JSON.parse(doc.metadata),latest=JSON.parse(doc.processing_extraction||'{}'),first=JSON.parse(doc.extraction||'{}'),stored=latest.fields?latest:first;
     const parsed=stored.fields?null:await readInvoiceFile(file,data.email);
-    const extraction=stored.fields?stored:interpretInvoice(parsed!.text,{direction:meta.direction,direction_confident:meta.direction_confident,method:(parsed as any).ocr?'ocr':'pdf',ocrConfidence:(parsed as any).confidence||0,filename:doc.filename,subject:meta.subject||''});
+    const extraction=stored.fields?stored:interpretInvoice(parsed!.interpretationText??parsed!.text,{direction:meta.direction,direction_confident:meta.direction_confident,method:(parsed as any).ocr?'ocr':'pdf',ocrConfidence:(parsed as any).confidence||0,ocrEvidence:parsed!.ocrEvidence as any,ocrInputSha256:parsed!.ocrInputSha256,filename:doc.filename,subject:meta.subject||''});
     const v:Record<string,string>={};for(const [key,field]of Object.entries(extraction.fields) as [string,any][]){v[key]=field.value==null?'':key.endsWith('_cents')?(field.value/100).toFixed(2):String(field.value);}
     setValues(v);setConfirmed(false);setReview({doc,extraction,url:URL.createObjectURL(doc.mime==='application/pdf'?await pdfPreview(file):file),meta});
   }catch(e){setError((e as Error).message);}finally{setBusy(false);}}

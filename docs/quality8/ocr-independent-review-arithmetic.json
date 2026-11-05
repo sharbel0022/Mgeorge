@@ -1,0 +1,91 @@
+{
+  "reportCommit": "d52bfd985a6a1324703b9b1c8a6b11a7ba76b31c",
+  "reportSha256": "c992ad8445979a72dac0b01ea3ba486c0c184d3a6f9bc3fd77391f9cc8cd9e41",
+  "sourceCommit": "68e3cb752d05f825e36f88eab58f925cb056e3e8",
+  "newOpticalRuns": 0,
+  "independentHoldout": false,
+  "imageCount": 10,
+  "parserEvaluations": 20,
+  "engines": {
+    "node": {
+      "all13": {
+        "documents": 8,
+        "tp": 94,
+        "fp": 1,
+        "fn": 10,
+        "exactDocuments": 3,
+        "precision": 0.9894736842105263,
+        "recall": 0.9038461538461539
+      },
+      "mandatory10": {
+        "documents": 8,
+        "tp": 75,
+        "fp": 1,
+        "fn": 5,
+        "exactDocuments": 5,
+        "precision": 0.9868421052631579,
+        "recall": 0.9375
+      },
+      "image9": {
+        "documents": 8,
+        "tp": 67,
+        "fp": 1,
+        "fn": 5,
+        "exactDocuments": 5,
+        "precision": 0.9852941176470589,
+        "recall": 0.9305555555555556
+      },
+      "stress": {
+        "documents": 2,
+        "green": 0,
+        "allCriticalAmountsReferencesAndBankgiroNull": true
+      },
+      "allGreenDocuments": 0
+    },
+    "sites": {
+      "all13": {
+        "documents": 8,
+        "tp": 94,
+        "fp": 1,
+        "fn": 10,
+        "exactDocuments": 3,
+        "precision": 0.9894736842105263,
+        "recall": 0.9038461538461539
+      },
+      "mandatory10": {
+        "documents": 8,
+        "tp": 75,
+        "fp": 1,
+        "fn": 5,
+        "exactDocuments": 5,
+        "precision": 0.9868421052631579,
+        "recall": 0.9375
+      },
+      "image9": {
+        "documents": 8,
+        "tp": 67,
+        "fp": 1,
+        "fn": 5,
+        "exactDocuments": 5,
+        "precision": 0.9852941176470589,
+        "recall": 0.9305555555555556
+      },
+      "stress": {
+        "documents": 2,
+        "green": 0,
+        "allCriticalAmountsReferencesAndBankgiroNull": true
+      },
+      "allGreenDocuments": 0
+    }
+  },
+  "sourceInventoryAudit": {
+    "files": 188,
+    "mismatches": 0,
+    "sourceCommit": "68e3cb752d05f825e36f88eab58f925cb056e3e8"
+  },
+  "protectedFirstEvidenceAudit": {
+    "files": 18,
+    "mismatches": 0,
+    "snapshotCommit": "d52bfd985a6a1324703b9b1c8a6b11a7ba76b31c"
+  }
+}

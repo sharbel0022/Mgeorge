@@ -10,7 +10,7 @@ import {digest,randomToken,cookieValue} from './banking/security';
 import {hasGmailSendScope,isGmailConfigured,gmailAuthorizationUrl,exchangeGmailCode,gmailProfile,fetchGmailInvoiceDocuments,revokeGmailTokens} from './gmail-adapter.js';
 
 type GmailLease={assert:()=>Promise<void>;write:(statements:any[])=>Promise<any[]>};
-const POSTPROCESS_WARNING='Gmail-underlagen är sparade. Efterkontrollen behöver köras igen via betalningskontrollen.';
+const POSTPROCESS_WARNING='Gmail-underlagen är sparade. Efterkontrollen behöver återupptas. Kör Gmail-hämtningen igen när väntetiden har gått ut.';
 const SYNC_METADATA_WARNING='Bearbetningsresultatet är sparat. Gmail-körningens slutstatus kunde inte bekräftas; kontrollera status igen.';
 const AUTOMATION_OBSERVATION_WARNING='Anropets körningskvitto kunde inte sparas. Kontrollera status igen.';
 const permanentGmailErrors=new Set(['renewal_required','missing_scope','access_denied','invalid_client','account_mismatch','invalid_tokens']);

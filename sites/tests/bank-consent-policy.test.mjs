@@ -247,6 +247,34 @@ function legacySelection(){
  const input=grant(),account=uid=>({uid,usage:'ORGA',currency:'SEK',cash_account_type:'CACC',identification_hash:'primary-'+uid,identification_hashes:['primary-'+uid]});
  input.session.accounts=[account(legacyA),account(legacyB)];input.checked.accounts=[legacyA];input.checked.accounts_data=[account(legacyA)];input.selectedAccountUids=[legacyA];return input;
 }
+for(const [label,mutate,reason] of [
+ ['empty saved selection',i=>i.selectedAccountUids=[],'SAVED_SELECTION_EMPTY'],
+ ['malformed saved selection',i=>i.selectedAccountUids=['private-account-value'],'SAVED_SELECTION_INVALID'],
+ ['invalid saved inventory',i=>i.session.accounts.push({...i.session.accounts[1]}),'SAVED_ACCOUNTS_INVALID'],
+ ['invalid live IDs',i=>i.checked.accounts.push(legacyA),'LIVE_ACCOUNTS_INVALID'],
+ ['invalid live resources',i=>i.checked.accounts_data.push({uid:'private-account-value'}),'LIVE_ACCOUNT_DATA_INVALID'],
+ ['live census mismatch',i=>i.checked.accounts.push(legacyB),'LIVE_ACCOUNT_SET_MISMATCH'],
+ ['selected missing live',i=>i.selectedAccountUids=[legacyB],'SELECTED_ACCOUNT_MISSING'],
+ ['selected missing saved',i=>i.session.accounts=i.session.accounts.filter(a=>a.uid!==legacyA),'SELECTED_ACCOUNT_MISSING'],
+ ['saved business usage',i=>i.session.accounts[0].usage='private-usage-value','ACCOUNT_USAGE_INVALID'],
+ ['live business usage',i=>i.checked.accounts_data[0].usage='private-usage-value','ACCOUNT_USAGE_INVALID'],
+ ['invalid account identity',i=>i.checked.accounts_data[0].identification_hash=' private-identity-value','ACCOUNT_IDENTITY_INVALID'],
+ ['changed account identity',i=>i.checked.accounts_data[0].identification_hash='private-identity-value','ACCOUNT_IDENTITY_CHANGED'],
+])test('scope diagnostic: '+label+' retains denial with a closed reason',()=>{
+ const input=legacySelection();mutate(input);const before=JSON.stringify(input);
+ assert.throws(()=>validateLegacyEnableSelection(freeze(input)),error=>{
+  assert.equal(error.code,'BANK_ACCOUNT_SCOPE_INVALID');assert.equal(error.status,409);assert.equal(error.reason,reason);
+  assert.equal(error.message,new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message);
+  const serialized=JSON.stringify(error);
+  for(const secret of [legacyA,legacyB,legacyC,'Synthetic Bank','private-account-value','private-usage-value','private-identity-value'])assert.ok(!serialized.includes(secret));
+  return true;
+ });
+ assert.equal(JSON.stringify(input),before);
+});
+test('scope diagnostic: strict callback full-set validation is still strict',()=>{
+ const input=grant();input.checked.accounts=['private-other-account'];input.checked.accounts_data=[{uid:'private-other-account'}];
+ assert.throws(()=>validateEnableConsent(input),error=>error.code==='BANK_ACCOUNT_SCOPE_INVALID'&&error.status===409&&error.reason==='ACCOUNT_SET_MISMATCH');
+});
 test('legacy selection preserves the selected authorized account after an unselected cached account is withdrawn',()=>{
  const input=freeze(legacySelection()),before=JSON.stringify(input),result=validateLegacyEnableSelection(input);
  assert.deepEqual(result.accountUids,[legacyA]);assert.equal(result.validUntil,later(60));assert.deepEqual(result.grantedScopes,['accounts:read','transactions:read']);assert.equal(JSON.stringify(input),before);

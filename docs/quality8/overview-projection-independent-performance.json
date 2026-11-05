@@ -1,0 +1,242 @@
+{
+  "schema": "overview-independent-review-v1",
+  "decision": "READY",
+  "reviewed_commit": "da12b51507d3a8fcc9a123dd9e752ee2f4479d2f",
+  "original_base": "69ec844e5f3d7d7104da75a264aeaf4144804bdb",
+  "intermediate_commit": "ae3b6433471c181dbc0da00236a6d6406149d7d2",
+  "runtime": "v24.22.1",
+  "synthetic_only": true,
+  "production_financial_writes": 0,
+  "independent_tests": {
+    "passed": 19,
+    "failed": 0,
+    "unchanged_files": {
+      "review-economy-evidence-independent.test.mjs": "bf7f3c222c3d6fbe9c2a9a9d81945ea1cdda372d18f7f9a03f0b1784d896bd30",
+      "review-economy-projection-boundaries.test.mjs": "da0334a6837be806698044522de84624a0c40a804fee585ed5b33e683403a3e2"
+    }
+  },
+  "focused_tests": {
+    "passed": 150,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "duration_ms": 2405.255277,
+    "files": [
+      "sites/tests/review-economy-evidence-independent.test.mjs",
+      "sites/tests/review-economy-projection-boundaries.test.mjs",
+      "sites/tests/economy-payment-evidence-independent.test.mjs",
+      "sites/tests/economy-payment-evidence.test.mjs",
+      "sites/tests/economy-quality-cycle.test.mjs",
+      "sites/tests/economy.test.mjs",
+      "sites/tests/bank-account-consent.test.mjs",
+      "sites/tests/payment-evidence-status-final.test.mjs",
+      "sites/tests/bank-payment-ui.test.mjs",
+      "sites/tests/payment-reference-owner-index.test.mjs"
+    ],
+    "overlap_note": "Runner total includes deliberately overlapping author and independent cases; not 150 unique scenarios."
+  },
+  "original_case_progression": {
+    "base_69ec844": {
+      "passed": 3,
+      "failed": 11
+    },
+    "initial_407f5f9": {
+      "passed": 9,
+      "failed": 5
+    },
+    "intermediate_ae3b643": {
+      "passed": 14,
+      "failed": 0
+    },
+    "final_da12b515": {
+      "passed": 14,
+      "failed": 0
+    }
+  },
+  "later_boundary_cases": {
+    "intermediate_ae3b643": {
+      "passed": 3,
+      "failed": 2
+    },
+    "final_da12b515": {
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "classification": {
+    "conflicting_ais_and_detail_reference": "Inherited gap in 407f5f9 and ae3b643; closed in da12b515.",
+    "incomplete_detail_hidden_by_ais_fallback": "Correctly held by 407f5f9 summary; regression in ae3b643; closed in da12b515.",
+    "repeated_full_owner_census": "Performance regression in ae3b643; local index removes repeated scan in da12b515."
+  },
+  "performance": {
+    "method": "Same synthetic population, before-then-after order at 100/500/1000 in a fresh process. Both summaries use the selected candidate domain; before summary is 407f5f9. No production or whole-version benchmark.",
+    "intermediate": {
+      "metadata": {
+        "runtime": "v24.22.1",
+        "beforeSummary": "407f5f9",
+        "sharedDomain": "The original projection and current projection use the same domain module from the selected root.",
+        "hashes": {
+          "sites/lib/economy-summary.js": "318b85dd71bf43bd889ec6cd777e19f6b9c77ed76f1d6d3e7adfa28761a4373e",
+          "sites/lib/domain.ts": "cd569bb8f493c0401c7ba4730b29d7b9e7f75239fc3e94f9703b1111ef3d9078",
+          "sites/tests/helpers/reference-policy-fixture.mjs": "00f34fa8473768d7350a1decefbfe689292a1250a1b41ff2f21c962eccfbf5f9",
+          "sites/tests/helpers/bank-api-fixture.mjs": "520815af14c53be00e4c887fc8bf7fbda1cee9cf92a72c2fbaf8a3aff8533414"
+        }
+      },
+      "measurements": [
+        {
+          "count": 100,
+          "before": {
+            "ms": 42.12,
+            "received": 1000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 32.12,
+            "received": 1000000,
+            "held": 0
+          }
+        },
+        {
+          "count": 500,
+          "before": {
+            "ms": 37.37,
+            "received": 5000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 507.59,
+            "received": 5000000,
+            "held": 0
+          }
+        },
+        {
+          "count": 1000,
+          "before": {
+            "ms": 58.37,
+            "received": 10000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 1871,
+            "received": 10000000,
+            "held": 0
+          }
+        }
+      ]
+    },
+    "final_first": {
+      "metadata": {
+        "runtime": "v24.22.1",
+        "beforeSummary": "407f5f9",
+        "sharedDomain": "The original projection and current projection use the same domain module from the selected root.",
+        "hashes": {
+          "sites/lib/economy-summary.js": "318b85dd71bf43bd889ec6cd777e19f6b9c77ed76f1d6d3e7adfa28761a4373e",
+          "sites/lib/domain.ts": "55cadd62982e5d9cbb7e15f90add09dea77307f2881e7d05bda0d8608ef25932",
+          "sites/tests/helpers/reference-policy-fixture.mjs": "00f34fa8473768d7350a1decefbfe689292a1250a1b41ff2f21c962eccfbf5f9",
+          "sites/tests/helpers/bank-api-fixture.mjs": "520815af14c53be00e4c887fc8bf7fbda1cee9cf92a72c2fbaf8a3aff8533414"
+        }
+      },
+      "measurements": [
+        {
+          "count": 100,
+          "before": {
+            "ms": 72.72,
+            "received": 1000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 75.68,
+            "received": 1000000,
+            "held": 0
+          }
+        },
+        {
+          "count": 500,
+          "before": {
+            "ms": 141.83,
+            "received": 5000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 135.46,
+            "received": 5000000,
+            "held": 0
+          }
+        },
+        {
+          "count": 1000,
+          "before": {
+            "ms": 76.77,
+            "received": 10000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 117.23,
+            "received": 10000000,
+            "held": 0
+          }
+        }
+      ]
+    },
+    "final_persisted_script_check": {
+      "metadata": {
+        "runtime": "v24.22.1",
+        "beforeSummary": "407f5f9",
+        "sharedDomain": "The original projection and current projection use the same domain module from the selected root.",
+        "hashes": {
+          "sites/lib/economy-summary.js": "318b85dd71bf43bd889ec6cd777e19f6b9c77ed76f1d6d3e7adfa28761a4373e",
+          "sites/lib/domain.ts": "55cadd62982e5d9cbb7e15f90add09dea77307f2881e7d05bda0d8608ef25932",
+          "sites/tests/helpers/reference-policy-fixture.mjs": "00f34fa8473768d7350a1decefbfe689292a1250a1b41ff2f21c962eccfbf5f9",
+          "sites/tests/helpers/bank-api-fixture.mjs": "520815af14c53be00e4c887fc8bf7fbda1cee9cf92a72c2fbaf8a3aff8533414"
+        }
+      },
+      "measurements": [
+        {
+          "count": 100,
+          "before": {
+            "ms": 42.62,
+            "received": 1000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 22.91,
+            "received": 1000000,
+            "held": 0
+          }
+        },
+        {
+          "count": 500,
+          "before": {
+            "ms": 46.42,
+            "received": 5000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 45.96,
+            "received": 5000000,
+            "held": 0
+          }
+        },
+        {
+          "count": 1000,
+          "before": {
+            "ms": 73.12,
+            "received": 10000000,
+            "held": 0
+          },
+          "after": {
+            "ms": 109.86,
+            "received": 10000000,
+            "held": 0
+          }
+        }
+      ]
+    }
+  },
+  "limits": [
+    "No live bank identity or current consent claim",
+    "No R2 availability or fresh byte-integrity claim",
+    "No production SLA, browser latency or quality-rating claim",
+    "Integrated CI and release remain root responsibilities"
+  ]
+}

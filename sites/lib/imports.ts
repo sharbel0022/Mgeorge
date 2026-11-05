@@ -52,9 +52,10 @@ export function mapCSV(parsed:ReturnType<typeof parseCSV>,mapping:Mapping,name:s
 }
 // Use the same bounded, namespace-aware parser for preview and retained originals.
 export function parseCAMT(text:string,name:string):BankRow[]{return parseBankgiroXML(text,name).map(row=>row.specification===false?{...row,kind:suspectedBankCollection(row.amount,row.description,row.party,row.payerReference)?'batch':'unknown'}:row);}
-export async function sha256(file:File){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await file.arrayBuffer()))).map(n=>n.toString(16).padStart(2,'0')).join('');}
+const bytesSha256=async(bytes:ArrayBuffer)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');
+export async function sha256(file:File){return bytesSha256(await file.arrayBuffer());}
 export async function pdfText(bytes:ArrayBuffer){return (await pdfInvoiceText(bytes)).text;}
-type InvoiceTextContext={filename?:string;subject?:string;direction?:'customer'|'supplier';method?:'pdf'|'ocr';ocrConfidence?:number};
+type InvoiceTextContext={filename?:string;subject?:string;direction?:'customer'|'supplier';method?:'pdf'|'ocr';ocrConfidence?:number;ocrEvidence?:unknown;ocrInputSha256?:string};
 function manualInvoiceInterpretation(text:string,context:InvoiceTextContext={}){
  // The JavaScript parser accepts these direction strings; its null default
  // does not describe that contract to TypeScript's inferred declaration.
@@ -73,8 +74,8 @@ function manualInvoiceInterpretation(text:string,context:InvoiceTextContext={}){
 }
 export function extractInvoiceText(text:string,original?:ReturnType<typeof manualInvoiceInterpretation>['fields']['referenceOriginal']){const fields=manualInvoiceInterpretation(text).fields;return {...fields,referenceOriginal:original??fields.referenceOriginal};}
 export async function readInvoiceFile(file:File,ownEmail:string){
- const ext=file.name.split('.').pop()?.toLowerCase();let text='',direction='payable',warning='',source=file.name,ocr=false,confidence=0,filename=file.name,subject='';
- if(ext==='pdf'){const result=await pdfInvoiceText(await file.arrayBuffer());text=result.text;ocr=result.ocr;confidence=result.confidence;if(!text.trim())warning='PDF-filen verkar vara skannad. Fyll i uppgifterna manuellt från originalet.';}
+ const ext=file.name.split('.').pop()?.toLowerCase();let text='',direction='payable',warning='',source=file.name,ocr=false,confidence=0,filename=file.name,subject='',ocrEvidence:unknown,ocrInputSha256='';
+ if(ext==='pdf'){const bytes=await file.arrayBuffer();ocrInputSha256=await bytesSha256(bytes);const result=await pdfInvoiceText(bytes);text=result.text;ocr=result.ocr;confidence=result.confidence;ocrEvidence=result.ocrEvidence;if(!text.trim())warning='PDF-filen verkar vara skannad. Fyll i uppgifterna manuellt från originalet.';}
  else if(ext==='eml'){
   const PostalMime=(await import('postal-mime')).default,mail=await PostalMime.parse(await file.arrayBuffer(),{maxNestingDepth:30,maxRfc822NestingDepth:3});
   const sender=(mail.from as any)?.address??'',outgoing=sender.toLowerCase()===ownEmail.toLowerCase();direction=outgoing?'receivable':'payable';
@@ -84,17 +85,20 @@ export async function readInvoiceFile(file:File,ownEmail:string){
    // Mail headers/body are context. Do not mix their numbers with the retained
    // invoice attachment, or lose the decoder's optical provenance.
    filename=attachments[0].filename||file.name;
-   try{const result=await pdfInvoiceText(attachments[0].content as ArrayBuffer);text=result.text;ocr=result.ocr;confidence=result.confidence;}catch{warning='PDF-bilagan kunde inte tolkas. Kontrollera originalmejlet.';}
+   try{const bytes=attachments[0].content as ArrayBuffer;ocrInputSha256=await bytesSha256(bytes);const result=await pdfInvoiceText(bytes);text=result.text;ocr=result.ocr;confidence=result.confidence;ocrEvidence=result.ocrEvidence;}catch{warning='PDF-bilagan kunde inte tolkas. Kontrollera originalmejlet.';}
   }else if(attachments.length===0){text=mail.text??'';if(!text&&mail.html){const doc=new DOMParser().parseFromString(mail.html,'text/html');doc.querySelectorAll('script,style').forEach(e=>e.remove());text=doc.body.textContent??'';}}
   if(attachments.length>1)warning='Mejlet innehåller flera PDF-bilagor. Importera varje faktura separat så att beloppen inte blandas ihop.';
   source=`Mejl: ${mail.subject??file.name}`;if(mail.messageId)source+=' · '+mail.messageId;
   warning=[warning,'Avsändaren kan vara en vidarebefordrare. Kontrollera rätt kund eller leverantör.'].filter(Boolean).join(' ');
- }else if(ext==='txt')text=await file.text();else if(['png','jpg','jpeg','webp'].includes(ext||'')){const result=await imageText(file);text=result.text;ocr=true;confidence=result.confidence;}else warning='Läs originalet och fyll i uppgifterna manuellt.';
- const interpreted=manualInvoiceInterpretation(text,{filename,subject,direction:direction==='receivable'?'customer':'supplier',method:ocr?'ocr':'pdf',ocrConfidence:confidence}),{fields,extraction}=interpreted;
+ }else if(ext==='txt')text=await file.text();else if(['png','jpg','jpeg','webp'].includes(ext||'')){ocrInputSha256=await sha256(file);const result=await imageText(file);text=result.text;ocr=true;confidence=result.confidence;ocrEvidence=result.ocrEvidence;}else warning='Läs originalet och fyll i uppgifterna manuellt.';
+ const interpreted=manualInvoiceInterpretation(text,{filename,subject,direction:direction==='receivable'?'customer':'supplier',method:ocr?'ocr':'pdf',ocrConfidence:confidence,ocrEvidence,ocrInputSha256}),{fields,extraction}=interpreted;
  warning=[warning,...interpreted.warnings,ocr?'OCR-tolkade uppgifter behöver kontrolleras mot originalet.':''].filter(Boolean).join(' ');
  if(fields.foreignCurrency)warning='Underlaget innehåller en annan valuta än SEK. Beloppet har inte fyllts i. Den här versionen hanterar endast fakturor i SEK. '+warning;
  const party=String(extraction.fields.party.value||'');
- return{fields:{...fields,email:'',party,direction,source:source.slice(0,300)},text:text.slice(0,50000),warning,ocr,confidence,extraction};
+ // A contextual reparse must see the same bounded source text as its word
+ // proof, including conflicts after the shorter display excerpt. Never rebind
+ // an OCR proof to a truncated prefix to make it pass validation.
+ return{fields:{...fields,email:'',party,direction,source:source.slice(0,300)},text:text.slice(0,50000),interpretationText:text.slice(0,150000),warning,ocr,confidence,ocrEvidence,ocrInputSha256,extraction};
 }
 export function downloadFile(filename:string,text:string,type='text/plain;charset=utf-8'){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}
 export function csvCell(value:unknown){let s=String(value??'');if(/^[=+@\-\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}

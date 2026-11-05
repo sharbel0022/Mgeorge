@@ -1,5 +1,6 @@
 import {classifyDocument,documentConflicts} from './document-triage.js';
 import {extractInvoiceDetails,invoiceScalarText} from './invoice-details.js';
+import {assessOcrBankgiro,ocrInputHash} from '../sites/lib/ocr-bankgiro-evidence.js';
 import {fork} from 'node:child_process';
 import {parseMoney} from './importers.js';
 const invoiceNumberLabel='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))(?=[\\s.:#-]|\\d|$)';
@@ -9,7 +10,9 @@ function normalizeInvoiceLayout(input){
   const original=String(input||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
   const warnings=[],checkedRows=[];
   let text=invoiceScalarText(original);
-  text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.replace(/[ \t]/g,''));
+  // Compact character-spaced digits without erasing the separator before a
+  // sibling label. Trailing unknown content still goes through full validation.
+  text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.trimEnd().replace(/[ \t]/g,'')+(value.match(/[ \t]+$/)?.[0]||''));
   text=text.replace(/([,.])[ \t]+(?=\d{2}\b)/g,'$1');
   // PDF drawing order can differ from the visible column order. Text alone
   // cannot assign two numeric values to invoice/OCR headings with certainty.
@@ -60,8 +63,8 @@ export function validOrganization(value){
   const s=String(value||'').replace(/[-\s]/g,'');if(!/^\d{10}$/.test(s)||Number(s[2])<2)return false;
   return [...s].reduce((sum,c,i)=>{const n=Number(c)*(i%2?1:2);return sum+Math.floor(n/10)+n%10;},0)%10===0;
 }
-export function interpretInvoice(text,{direction=null,direction_confident=false,method='pdf',ocrConfidence=0,filename='',subject='',company_organization_number=''}={}){
-  const layout=normalizeInvoiceLayout(text);text=layout.text;
+export function interpretInvoice(text,{direction=null,direction_confident=false,method='pdf',ocrConfidence=0,filename='',subject='',company_organization_number='',ocrEvidence=null,ocrInputSha256=''}={}){
+  const originalInput=String(text||''),layout=normalizeInvoiceLayout(text);text=layout.text;
   text=text.replace(/Fakturadatum[ \t]+Fakturanummer[ \t]*\n[ \t]*(\d{4}-\d{2}-\d{2})[ \t]+([A-Za-z0-9/_-]+)/gi,(_,date,number)=>`Fakturadatum: ${date}\nFakturanummer: ${number}`);
   const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
   const scalarLabels=[];
@@ -129,7 +132,14 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // integer columns or character-spaced amounts must not become one number.
   const amount='-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|(?:\\d+|\\d{1,3}(?: \\d{3})+)(?:[.,]\\d{1,2})?)';
   const monetary=new RegExp('^(?:(?:SEK|EUR|USD|GBP|NOK|DKK)[ \\t]*)?('+amount+')(?:[ \\t]*(?:SEK|EUR|USD|GBP|NOK|DKK|kr))?$','iu');
-  const money=s=>{const match=s.match(monetary);if(!match)return null;try{return parseMoney(match[1]);}catch{return null;}};
+  const money=s=>{
+    const match=s.match(monetary);if(!match)return null;
+    // A zero-padded, nonzero whole-number OCR token without an explicit
+    // currency can be a neighbouring payment reference. Retain the raw text
+    // for review instead of treating that ambiguous identifier as money.
+    if(method==='ocr'&&/^-?0\d*[1-9]\d*$/.test(match[1].replaceAll(' ',''))&&!/[a-z]/i.test(s))return null;
+    try{return parseMoney(match[1]);}catch{return null;}
+  };
   const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|'+grossTaxSummaryLabel+')';
   // Inline monetary labels require a colon. Words inside net/total labels
   // and ordinary VAT-rate prose are not separate monetary fields.
@@ -148,10 +158,24 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     const match=value.match(/^(\d{3,4})(?:[ \t]*[-\u2010-\u2015\u2212][ \t]*|[ \t]+)(\d{4})$/u);
     return match?match[1]+'-'+match[2]:null;
   });
+  if(method==='ocr'&&fields.bankgiro.value!==null){
+    const proof=assessOcrBankgiro(originalInput,ocrInputSha256,ocrEvidence,fields.bankgiro.value);
+    if(!proof.accepted){
+      set('bankgiro',null,fields.bankgiro.evidence,0);
+      fields.bankgiro.warning=proof.reason;issues.push(proof.reason);
+    }
+  }
   if(fields.invoice_number.value&&validDate(fields.invoice_number.value)){issues.push('Fakturanumret ser ut som ett datum. Kontrollera originalets kolumner.');set('invoice_number',null,fields.invoice_number.evidence,0);}
   if(['customer','supplier'].includes(direction))set('direction',direction,'Föreslagen från mejlets riktning',direction_confident?.94:.5);
-  const kind=/kreditfaktura|credit\s*(?:invoice|note)/i.test(text)?'credit':/\bkvitto\b|\breceipt\b/i.test(text)?'receipt':/\bfaktura\b|\binvoice\b|fakturanr/i.test(text)?'invoice':'other';
-  set('kind',kind,text.match(/kreditfaktura|credit\s*(?:invoice|note)|kvitto|receipt|faktura|invoice/i)?.[0]);
+  // Missing OCR titles may use a valid invoice-number label as provisional
+  // evidence under the unchanged manual-review ceiling. Native documents do
+  // not acquire a type this way. A competing document type anywhere in the
+  // text (including a type/quotation-number label) blocks this inference.
+  const otherDocumentType=/(?<![\p{L}\p{N}/_-])(?:offert(?:[ \t]*(?:nummer|nr|no))?|quotation|quote|påminnelse|betalningspåminnelse|(?:order|beställnings|betalnings|leverans)?bekräftelse|confirmation|payment[ \t]+(?:reminder|confirmation)|order[ \t]+confirmation)(?=[\s:.-]|$)/iu.test(layout.original);
+  const numberedInvoice=method==='ocr'&&!otherDocumentType&&fields.invoice_number.value!==null?text.match(new RegExp('(?<![\\p{L}\\p{N}/_-])'+invoiceNumberLabel,'iu')):null;
+  const typeEvidence=text.match(/kreditfaktura|credit\s*(?:invoice|note)/i)||text.match(/\bkvitto\b|\breceipt\b/i)||text.match(/\bfaktura\b|\binvoice\b|fakturanr/i)||numberedInvoice;
+  const kind=typeEvidence?/kreditfaktura|credit\s*(?:invoice|note)/i.test(typeEvidence[0])?'credit':/\bkvitto\b|\breceipt\b/i.test(typeEvidence[0])?'receipt':'invoice':'other';
+  set('kind',kind,typeEvidence?.[0]);
   // Explicit currency labels are a separate census. A valid inline SEK
   // token cannot erase an unreadable label or a known prefix followed by junk.
   const explicitCurrency=grabFull('currency','(?:valuta|currency)',value=>/^(?:SEK|EUR|USD|GBP|NOK|DKK)$/i.test(value)?value.toUpperCase():null);
@@ -215,7 +239,7 @@ export async function extractInvoice(bytes,mime_type,metadata={}){
   try{
     const result=await runDocumentProcess(bytes,mime_type);
     if(result.error)throw Error('unreadable');
-    return interpretInvoice(result.text,{...metadata,filename:metadata.original_filename||metadata.filename||'',method:result.method,ocrConfidence:result.confidence});
+    return interpretInvoice(result.text,{...metadata,filename:metadata.original_filename||metadata.filename||'',method:result.method,ocrConfidence:result.confidence,ocrEvidence:result.ocrEvidence,ocrInputSha256:ocrInputHash(bytes)});
   }catch(e){
     if(e.status===429)throw e;
     return {...interpretInvoice('',metadata),level:'red',issues:['Dokumentet kunde inte läsas. Kontrollera originalet och fyll i uppgifterna manuellt.']};

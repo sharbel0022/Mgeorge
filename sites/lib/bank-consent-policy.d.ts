@@ -56,11 +56,20 @@ export type BankConsent = {
   corporateAuthorization: CorporateAuthorization;
 };
 
+/** Closed diagnostics only; never account identifiers, provider text or hashes. */
+export type BankAccountScopeReason = 'SAVED_SELECTION_EMPTY' | 'SAVED_SELECTION_INVALID' |
+  'SAVED_ACCOUNTS_INVALID' | 'LIVE_ACCOUNTS_INVALID' | 'LIVE_ACCOUNT_DATA_INVALID' |
+  'LIVE_ACCOUNT_SET_MISMATCH' | 'SELECTED_ACCOUNT_MISSING' | 'ACCOUNT_USAGE_INVALID' |
+  'ACCOUNT_SET_MISMATCH' | 'ACCOUNT_IDENTITY_INVALID' | 'ACCOUNT_IDENTITY_CHANGED';
 export class ConsentError extends Error {
   constructor(code: string, status?: number, safeMessage?: string);
   code: string;
   status: number;
+  readonly reason?: BankAccountScopeReason;
 }
+export function bankAccountScopeError(reason: BankAccountScopeReason): ConsentError;
+/** Returns only a reason privately bound by this policy, ignoring public fields. */
+export function bankAccountScopeReason(error: unknown): BankAccountScopeReason | null;
 export function legacyCompanyContext(actorId: string, requestedCompanyId?: unknown): CompanyBankContext;
 export function assertCompanyBankAccess(context: CompanyBankContext, input: {
   actorId: string; companyId: string; action: 'read' | 'manage';

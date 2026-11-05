@@ -171,7 +171,7 @@ function buildInput(db,{owner,referencePolicy},checkedAt){
  return {contractVersion:RECONCILIATION_CONTRACT_VERSION,ownerId:owner,companyId,revision:digest(JSON.stringify(context)),checkedAt,complete:true,referencePolicy:policy,transactions,invoices,allocations,reports,relationships,customerRelationships,importJobs:jobs,evidenceContext:context};
 }
 
-export async function readReconciliationPreview(db,{owner,transactionId,referencePolicy}={}){
+export function readReconciliationInput(db,{owner,transactionId,referencePolicy}={}){
  if(typeof owner!=='string'||!owner.trim())throw fail(401,'Ägarautentisering krävs för förhandsgranskningen.');
  if(transactionId!==undefined&&(typeof transactionId!=='string'||!transactionId||transactionId.length>1000))throw fail(400,'Ogiltig bankhändelse.');
  // A read savepoint gives every SQL read one consistent SQLite snapshot. It
@@ -181,6 +181,11 @@ export async function readReconciliationPreview(db,{owner,transactionId,referenc
  try{input=buildInput(db,{owner,referencePolicy},new Date().toISOString());db.exec('RELEASE reconciliation_preview_read');}
  catch(error){db.exec('ROLLBACK TO reconciliation_preview_read');db.exec('RELEASE reconciliation_preview_read');throw error;}
  if(transactionId&&!input.transactions.some(row=>row.id===transactionId))throw fail(404,'Bankhändelsen saknas.');
+ return input;
+}
+
+export async function readReconciliationPreview(db,{owner,transactionId,referencePolicy}={}){
+ const input=readReconciliationInput(db,{owner,transactionId,referencePolicy});
  const preview=await buildReconciliationPreview(input);
  // The complete competition set remains visible and bound to the snapshot,
  // including when the caller selects one transaction for presentation.

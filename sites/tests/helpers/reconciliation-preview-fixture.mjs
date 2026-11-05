@@ -73,5 +73,5 @@ export async function previewFixture(t,{state=previewState(),report,consent=true
  f.read=()=>{const row=sqlite.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').get(owner);return{revision:row.revision,state:JSON.parse(row.payload)};};
  f.preview=options=>api.readReconciliationPreview(owner,f.state,f.revision,options?.transactionId||f.state.transactions[0].id,{referencePolicy:previewPolicy,...options});
  f.get=async(id=f.state.transactions[0].id)=>{const response=await route.GET(new Request('https://mg.test/api/reconciliation/preview'+(id===null?'':'?transactionId='+encodeURIComponent(id))));return{response,body:await response.json()};};
- return {...f,control:f,api,route};
+ return {...f,control:f,api,route,modules:{server,preview,evidence}};
 }

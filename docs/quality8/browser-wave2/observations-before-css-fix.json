@@ -1,0 +1,145 @@
+{
+  "at": "2026-11-05T21:47:39.871Z",
+  "checks": [
+    {
+      "view": "overview",
+      "requestedWidth": 320,
+      "clientWidth": 305,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 320,
+      "mainWidth": 305,
+      "scrollWidth": 305
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 390,
+      "clientWidth": 375,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 390,
+      "mainWidth": 375,
+      "scrollWidth": 375
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 768,
+      "clientWidth": 753,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 768,
+      "mainWidth": 578,
+      "scrollWidth": 753
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 1024,
+      "clientWidth": 1009,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 1024,
+      "mainWidth": 819,
+      "scrollWidth": 1009
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 1440,
+      "clientWidth": 1425,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 1440,
+      "mainWidth": 1209,
+      "scrollWidth": 1425
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 1440,
+      "activeLabel": "Stäng dialog",
+      "clientWidth": 1440,
+      "dialog": null,
+      "innerWidth": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 1024,
+      "activeLabel": null,
+      "clientWidth": 1024,
+      "dialog": null,
+      "innerWidth": 1024,
+      "scrollWidth": 1024
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 768,
+      "activeLabel": null,
+      "clientWidth": 768,
+      "dialog": {
+        "clientWidth": 717,
+        "height": 850,
+        "scrollWidth": 717,
+        "width": 734,
+        "x": 17,
+        "y": 25
+      },
+      "innerWidth": 768,
+      "scrollWidth": 768
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 768,
+      "activeLabel": null,
+      "clientWidth": 768,
+      "dialog": {
+        "clientWidth": 717,
+        "height": 850,
+        "scrollWidth": 717,
+        "width": 734,
+        "x": 17,
+        "y": 25
+      },
+      "innerWidth": 768,
+      "scrollWidth": 768
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 390,
+      "activeLabel": null,
+      "clientWidth": 390,
+      "dialog": {
+        "clientWidth": 353,
+        "height": 876,
+        "scrollWidth": 353,
+        "width": 370,
+        "x": 10,
+        "y": 12
+      },
+      "innerWidth": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 320,
+      "activeLabel": null,
+      "clientWidth": 320,
+      "dialog": {
+        "clientWidth": 283,
+        "height": 876,
+        "scrollWidth": 309,
+        "width": 300,
+        "x": 10,
+        "y": 12
+      },
+      "innerWidth": 320,
+      "scrollWidth": 320
+    },
+    {
+      "view": "search-focus",
+      "requestedWidth": 320,
+      "query": "1003 3 200,00 11/10/2026",
+      "resultInvoice": "1003",
+      "resultCount": 1,
+      "afterEscape": {
+        "dialogOpen": false,
+        "activeTag": "INPUT",
+        "activeLabel": "Sök i arbetsytan",
+        "search": ""
+      }
+    }
+  ]
+}

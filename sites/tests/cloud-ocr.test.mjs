@@ -10,6 +10,7 @@ import {randomToken} from '../lib/banking/security.ts';
 import {serverPdfText} from '../lib/server-pdf.ts';
 import {runSitesOcr} from '../../src/sites-ocr-pull.js';
 import {image as syntheticInvoiceImage,pdf} from '../../test/fixtures.js';
+import {packet,digest} from '../../test/helpers/ocr-bankgiro-cases.mjs';
 
 const read=p=>readFileSync(new URL(p,import.meta.url),'utf8');
 const data=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
@@ -55,6 +56,24 @@ function enableTrustedAutomation(f){
   f.sql.prepare('UPDATE gmail_sources SET metadata=?').run(JSON.stringify({direction:'supplier',direction_confident:true,subject:'Synthetic invoice',from:'supplier@example.test'}));
   f.sql.prepare('INSERT INTO invoice_counterparties(owner,identity,email,bankgiro,evidence,verified_at) VALUES(?,?,?,?,?,?)').run(f.owner,f.api.counterpartyKey('supplier','Exempelbolaget AB','5560160680'),'supplier@example.test','123-4567','Explicitly verified synthetic original and counterparty','2026-01-01');
 }
+
+for(const mode of ['local','cloud'])for(const scenario of ['high','low','missing','other-original','other-text','real-four-digit'])test(`${mode} bankgiro word proof remains tied to the leased original: ${scenario}`,async t=>{
+  const f=await fixture(t),doc=f.add();enableTrustedAutomation(f);const job=await f.lease(mode);
+  const value=scenario==='real-four-digit'?'1223-4567':'123-4567',text=validInvoiceText.replace('123-4567',value);
+  const evidence=scenario==='missing'?undefined:packet(text,{inputHash:job.sha256,value,confidence:scenario==='low'?0:95});
+  if(scenario==='other-original')evidence.inputSha256=digest('a different synthetic original');
+  if(scenario==='other-text')evidence.textSha256=digest('a different synthetic OCR result');
+  const response=await f.call('complete',{...job,text,confidence:99,method:'ocr',ocrEvidence:evidence},mode);
+  assert.equal(response.status,200);assert.equal((await response.json()).state,'needs_review');
+  const row=f.sql.prepare('SELECT * FROM document_jobs').get(),stored=f.sql.prepare('SELECT result FROM document_extractions').get(),result=JSON.parse(row.extraction);
+  assert.equal(result.fields.bankgiro.value,['high','real-four-digit'].includes(scenario)?value:null);
+  assert.match(result.fields.bankgiro.evidence,new RegExp(value));assert.equal(result.text_excerpt,text);
+  assert.deepEqual(JSON.parse(stored.result).fields.bankgiro,result.fields.bankgiro);
+  if(!['high','real-four-digit'].includes(scenario))assert.match(result.fields.bankgiro.warning,/Bankgiro.*ordunderlag/);
+  assert.equal(result.fields.invoice_number.confidence,.85);assert.notEqual(result.level,'green');assert.equal(row.automatic,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.deepEqual(f.objects.get(f.owner+'/'+doc.id),doc.bytes);
+});
 
 test('verified native PDF original retains server extraction confidence and automatic registration',async t=>{
   const f=await fixture(t,{nativePdf:true}),doc=f.add('native-pdf','application/pdf');enableTrustedAutomation(f);
