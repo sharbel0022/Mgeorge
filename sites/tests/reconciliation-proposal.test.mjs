@@ -84,3 +84,24 @@ test('missing or invalid C4 previews fail closed and retry stays read-only; demo
  f.result.retry();f.render();f.requests[1].respond(preview({writesAllowed:true}));await flush();f.render();assert.equal(f.result.result,null);assert.ok(f.result.error);
  f.demo=true;f.render();const count=f.requests.length;assert.equal(f.result.result,null);f.result.retry();f.render();assert.equal(f.requests.length,count);
 });
+
+function multiInvoicePreview(){
+ const allocations=[{invoiceId:'synthetic-invoice',amountMinor:30001,currency:'SEK',invoiceRemainingBeforeMinor:30001,invoiceRemainingAfterMinor:0,settlement:'multiple'},{invoiceId:'synthetic-second',amountMinor:32499,currency:'SEK',invoiceRemainingBeforeMinor:32499,invoiceRemainingAfterMinor:0,settlement:'multiple'}];
+ return preview({status:'REVIEW',selectedStatus:'REVIEW',decisions:[decision({status:'REVIEW',reasonCodes:['MULTIPLE_INVOICES_REQUIRE_REVIEW'],allocations})]});
+}
+test('multiple-invoice and non-economic proposals cannot claim verified allocation status',()=>{
+ const valid=multiInvoicePreview();assert.equal(ui.validReconciliationProposal(valid,'synthetic-payment',7),true);
+ const falselyVerified=structuredClone(valid);falselyVerified.status='VERIFIED';falselyVerified.selectedStatus='VERIFIED';falselyVerified.decisions[0].status='VERIFIED';
+ assert.equal(ui.validReconciliationProposal(falselyVerified,'synthetic-payment',7),false);
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({economic:false})]}),'synthetic-payment',7),false);
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({allocations:[{...decision().allocations[0],settlement:'full',invoiceRemainingBeforeMinor:100000,invoiceRemainingAfterMinor:37500}]})]}),'synthetic-payment',7),false);
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({allocations:[{...decision().allocations[0],settlement:'partial',invoiceRemainingBeforeMinor:100000,invoiceRemainingAfterMinor:37500}]})]}),'synthetic-payment',7),false);
+});
+test('multiple-invoice proposal shows an exact total and zero remainder without a write control',()=>{
+ const value=multiInvoicePreview(),before=structuredClone(value);
+ const html=render({result:value,invoices:[{id:'synthetic-invoice',number:'SYN-01'},{id:'synthetic-second',number:'SYN-02'}]});
+ assert.match(html,/Behöver granskas/);assert.match(html,/SYN-01/);assert.match(html,/SYN-02/);
+ assert.match(html,/300,01/);assert.match(html,/324,99/);assert.match(html,/625,00/);
+ assert.match(html,/Fördelat i förslaget/);assert.match(html,/Kvar att fördela/);assert.match(html,/0,00/);
+ assert.doesNotMatch(html,/<form|<button|Verifierad betalning|Registrera betalning/);assert.deepEqual(value,before);
+});

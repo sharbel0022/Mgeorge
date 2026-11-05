@@ -27,7 +27,7 @@ function view(intl=Intl){
   const context=vm.createContext({document,location:{search:'?tab=customers'},window:{addEventListener(){},scrollTo(){}},
     history:{pushState(){},replaceState(){}},URL,URLSearchParams,Intl:intl,Date,
     matchMedia:()=>({matches:false,addEventListener(){}}),fetch:()=>new Promise(()=>{}),setTimeout:()=>1,clearTimeout(){}});
-  for(const file of ['app','review','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${file}.js`,import.meta.url),'utf8'),context,{filename:`public/${file}.js`});
+  for(const file of ['workspace-search','app','review','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${file}.js`,import.meta.url),'utf8'),context,{filename:`public/${file}.js`});
   vm.runInContext('state.me={authenticated:true,login_required:true}',context);
   return {element,document,set:(key,value)=>context[key]=value,run:code=>vm.runInContext(code,context)};
 }
@@ -162,4 +162,12 @@ test('home presents four primary decisions with existing totals and their scopes
   assert.match(cards,/hela registret/);
   assert.equal((html.match(/data-control-start/g)||[]).length,1);
   assert.equal(v.run('JSON.stringify(state.control)'),before);
+});
+
+test('combined Swedish amount date and reference filters the shipped invoice list',()=>{
+ const v=view();fixture(v,[invoice(),invoice({id:'invoice-other',total_cents:12501})]);
+ for(const q of ['000018 125,00 2026-10-01','30/11/2026 125,00 Åsa','REF/000018 125,00']){
+  v.set('query',q);v.run('state.filters.customers.q=query');
+  assert.deepEqual(plain(v.run('filteredInvoices().map(i=>i.id)')),['invoice-a'],q);
+ }
 });

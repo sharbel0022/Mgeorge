@@ -9,6 +9,18 @@ export class RuntimeBankError extends Error {
 }
 const activation = 'Banktjänsten behöver aktiveras av systemadministratören.';
 const value = (env: Record<string, unknown>, key: string) => typeof env[key] === 'string' ? env[key].trim() : '';
+export const BANK_REDIRECT_URL = 'https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback';
+
+// The return address is administrator configuration, never a request/header or
+// browser-supplied redirect. Keep the legacy default for existing installations.
+export function runtimeBankRedirectUrl(env: Record<string, unknown>): string {
+  const configured=value(env,'ENABLE_BANKING_REDIRECT_URL')||BANK_REDIRECT_URL;
+  try {
+    const url=new URL(configured);
+    if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash||url.pathname!=='/api/bank/callback'||url.href!==configured)throw Error();
+    return url.href;
+  } catch { throw new RuntimeBankError('BANK_CALLBACK_CONFIGURATION_INVALID','Bankens returadress behöver konfigureras av administratören.'); }
+}
 
 // Credentials come exclusively from protected Worker runtime secrets. A legacy
 // encrypted_key in D1, a request body or browser storage is never a source.

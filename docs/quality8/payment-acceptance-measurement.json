@@ -1,0 +1,378 @@
+{
+  "schema": "payment-acceptance-quality8-v1",
+  "generated_at": "2026-11-05T17:11:08.654Z",
+  "runtime": "v24.22.1",
+  "scope": "Independent synthetic read-only matching acceptance corpus; not provider-confirmed payer/OCR evidence or production accuracy. Existing SQLite concurrency/crash tests are reported separately.",
+  "sources": {
+    "contract_sha256": "b79bd0177b078f3af889fd6d213704b847b3c51d8b7404c87c5731ed0b86976e",
+    "corpus_sha256": "124a5f0da4fe1dd97228642c7ea21d623f797db01d31944cf72930ee3b3457e2"
+  },
+  "metrics": {
+    "cases": 21,
+    "correct_cases": 21,
+    "expected_verified": 1,
+    "false_verified": 0,
+    "abstentions": 20,
+    "explained_abstentions": 20,
+    "input_mutations": 0,
+    "financial_writes": 0
+  },
+  "cases": [
+    {
+      "id": "single-exact",
+      "expected": "VERIFIED",
+      "actual": "VERIFIED",
+      "correct": true,
+      "expected_allocations": 1,
+      "proposed_allocations": [
+        {
+          "invoiceId": "invoice-1",
+          "amountMinor": 73100,
+          "settlement": "full"
+        }
+      ],
+      "reason_codes": [
+        "EXACT_REFERENCE_AND_BANK_EVIDENCE"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 15.351062999999996
+    },
+    {
+      "id": "two-invoices-exact-ore",
+      "expected": "REVIEW",
+      "actual": "REVIEW",
+      "correct": true,
+      "expected_allocations": 2,
+      "proposed_allocations": [
+        {
+          "invoiceId": "invoice-1",
+          "amountMinor": 30001,
+          "settlement": "multiple"
+        },
+        {
+          "invoiceId": "invoice-2",
+          "amountMinor": 43099,
+          "settlement": "multiple"
+        }
+      ],
+      "reason_codes": [
+        "MULTIPLE_INVOICES_REQUIRE_REVIEW"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 15.002175999999992
+    },
+    {
+      "id": "three-invoices-exact-ore",
+      "expected": "REVIEW",
+      "actual": "REVIEW",
+      "correct": true,
+      "expected_allocations": 3,
+      "proposed_allocations": [
+        {
+          "invoiceId": "invoice-1",
+          "amountMinor": 10001,
+          "settlement": "multiple"
+        },
+        {
+          "invoiceId": "invoice-2",
+          "amountMinor": 20002,
+          "settlement": "multiple"
+        },
+        {
+          "invoiceId": "invoice-3",
+          "amountMinor": 43097,
+          "settlement": "multiple"
+        }
+      ],
+      "reason_codes": [
+        "MULTIPLE_INVOICES_REQUIRE_REVIEW"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 1.0036560000000065
+    },
+    {
+      "id": "multi-one-ore-short",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "MULTIPLE_INVOICES_REQUIRE_REVIEW",
+        "MULTIPLE_INVOICE_AMOUNT_CONFLICT"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.7964500000000214
+    },
+    {
+      "id": "multi-one-ore-excess",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "MULTIPLE_INVOICES_REQUIRE_REVIEW",
+        "MULTIPLE_INVOICE_AMOUNT_CONFLICT"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 1.6975040000000092
+    },
+    {
+      "id": "multi-conflicting-customer",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "PAYER_ORGANIZATION_CONFLICT"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.9204730000000154
+    },
+    {
+      "id": "multi-unregistered-reference",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "CONFLICTING_PAYMENT_REFERENCES"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.5765429999999867
+    },
+    {
+      "id": "multi-incomplete-reference",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "INVALID_OR_CONFLICTING_REFERENCE"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 1.2741159999999923
+    },
+    {
+      "id": "multi-invalid-ocr",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "INVALID_OR_CONFLICTING_REFERENCE"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.9633560000000045
+    },
+    {
+      "id": "multi-missing-payer",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "INDIVIDUAL_BANK_PAYER_REQUIRED",
+        "CUSTOMER_RELATION_REQUIRED"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 1.5819819999999822
+    },
+    {
+      "id": "multi-manual-payer-only",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "INDIVIDUAL_BANK_PAYER_REQUIRED",
+        "CUSTOMER_RELATION_REQUIRED"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.38652199999998516
+    },
+    {
+      "id": "multi-foreign-account",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "ACCOUNT_EVIDENCE_REQUIRED"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.611756000000014
+    },
+    {
+      "id": "multi-expired-consent",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "ACCOUNT_EVIDENCE_REQUIRED"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.5788879999999779
+    },
+    {
+      "id": "multi-missing-bank-original",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "ORIGINAL_MISSING_OR_INVALID"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.49734699999999066
+    },
+    {
+      "id": "multi-missing-invoice-original",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "INVOICE_REVIEW_OR_DIRECTION_REQUIRED"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.3821259999999995
+    },
+    {
+      "id": "multi-non-economic-observation",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "NON_ECONOMIC_REPORT_OBSERVATION"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.7697599999999909
+    },
+    {
+      "id": "multi-fractional-ore",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "INVALID_TRANSACTION",
+        "INVALID_MONEY",
+        "PAYMENT_ALREADY_ALLOCATED"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 1.3195929999999976
+    },
+    {
+      "id": "multi-competing-payment",
+      "expected": "REVIEW",
+      "actual": "REVIEW",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "MULTIPLE_INVOICES_REQUIRE_REVIEW",
+        "COMPETING_PAYMENTS_REQUIRE_REVIEW"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 2.102574000000004
+    },
+    {
+      "id": "multi-ambiguous-subset-sum",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "PAYMENT_REFERENCE_REQUIRED",
+        "INVOICE_NOT_FOUND"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.5318570000000022
+    },
+    {
+      "id": "single-leading-zero-mismatch",
+      "expected": "REVIEW",
+      "actual": "REVIEW",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "INVOICE_NOT_FOUND"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.6849249999999927
+    },
+    {
+      "id": "single-reference-owner-collision",
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "correct": true,
+      "expected_allocations": 0,
+      "proposed_allocations": [],
+      "reason_codes": [
+        "AMBIGUOUS_INVOICE_REFERENCE"
+      ],
+      "changed": false,
+      "writes_allowed": false,
+      "input_mutated": false,
+      "elapsed_ms": 0.3651710000000037
+    }
+  ]
+}

@@ -7,7 +7,7 @@ function ui(){
  const elements=new Map();
  const element=key=>{if(!elements.has(key))elements.set(key,{innerHTML:'',setAttribute(){},addEventListener(){},querySelector:element,querySelectorAll(){return[];}});return elements.get(key);};
  const context=vm.createContext({document:{querySelector:element,getElementById:element,addEventListener(){},body:{classList:{add(){},remove(){}}}},window:{addEventListener(){},scrollTo(){}},location:{search:''},history:{pushState(){},replaceState(){}},URL,URLSearchParams,Intl,Date,matchMedia:()=>({matches:false,addEventListener(){}}),fetch:()=>new Promise(()=>{}),setTimeout:()=>1,clearTimeout(){}});
- for(const name of ['app','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${name}.js`,import.meta.url),'utf8'),context);
+ for(const name of ['workspace-search','app','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${name}.js`,import.meta.url),'utf8'),context);
  return {run:code=>vm.runInContext(code,context),set:(key,value)=>context[key]=value};
 }
 const payment=(reference,kind)=>({id:'t',booked_at:'2026-10-26',amount_cents:62500,verified_cents:62500,account:'SYNTHETIC',payer:'Bank payer <AB>',reference,bank_reference:'BANK-ID',source:'enablebanking',raw_bank_data_sha256:'a'.repeat(64),raw_bank_data:{status:'BOOK',debtor:{name:'Bank payer <AB>'}},reference_evidence:{candidates:[{kind,value:reference}]}});

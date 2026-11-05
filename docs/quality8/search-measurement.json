@@ -1,0 +1,297 @@
+{
+  "schema": "workspace-search-quality8-v1",
+  "generated_at": "2026-11-05T17:17:14.424Z",
+  "runtime": "v24.22.1",
+  "record_count": 10000,
+  "index_build_ms": 154.04192300000003,
+  "source_sha256": "d545c4e69e5d9baf604d9c37e9bb5a6cc6195631a96c113225ce15e3a89daaa3",
+  "scope": "Synthetic CPU search measurement. Old production matching loop versus cached index; excludes React rendering, browser/network, and bank matching. Search results never establish payment evidence.",
+  "metrics": {
+    "before": {
+      "correct_cases": 4,
+      "cases": 9,
+      "slowest_case_p95_ms": 1765.9492050000003
+    },
+    "after": {
+      "correct_cases": 9,
+      "cases": 9,
+      "slowest_case_p95_ms": 16.289660000009462
+    }
+  },
+  "cases": [
+    {
+      "phase": "before",
+      "id": "common-party-many-results",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "synthetic-0",
+          "synthetic-1",
+          "synthetic-2",
+          "synthetic-3"
+        ],
+        "transactions": [
+          "synthetic-9",
+          "synthetic-11",
+          "synthetic-13",
+          "synthetic-15"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 0.2677659999999946,
+      "p95_ms": 9.33061600000002
+    },
+    {
+      "phase": "before",
+      "id": "combined-swedish",
+      "correct": false,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 1372.3341300000002,
+      "p95_ms": 1765.9492050000003
+    },
+    {
+      "phase": "before",
+      "id": "reordered-swedish",
+      "correct": false,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 1200.7053019999985,
+      "p95_ms": 1415.2421179999983
+    },
+    {
+      "phase": "before",
+      "id": "date-and-amount",
+      "correct": false,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 1105.2970169999971,
+      "p95_ms": 1718.2001010000022
+    },
+    {
+      "phase": "before",
+      "id": "exact-ranks-before-limit",
+      "correct": false,
+      "result": {
+        "invoices": [
+          "synthetic-0",
+          "synthetic-1",
+          "synthetic-2",
+          "synthetic-3"
+        ],
+        "transactions": [
+          "synthetic-599",
+          "synthetic-5991",
+          "synthetic-5993",
+          "synthetic-5995"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 241.03186200000346,
+      "p95_ms": 335.94904599999427
+    },
+    {
+      "phase": "before",
+      "id": "negative-amount",
+      "correct": false,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 1044.234755999998,
+      "p95_ms": 1509.497190999995
+    },
+    {
+      "phase": "before",
+      "id": "fullwidth-reference",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "exact-invoice"
+        ],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 776.7846200000058,
+      "p95_ms": 1203.4518000000098
+    },
+    {
+      "phase": "before",
+      "id": "no-match",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 774.0187189999997,
+      "p95_ms": 1045.8681309999956
+    },
+    {
+      "phase": "before",
+      "id": "blank",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 0.0009510000090813264,
+      "p95_ms": 0.001632999992580153
+    },
+    {
+      "phase": "after",
+      "id": "common-party-many-results",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "synthetic-0",
+          "synthetic-1",
+          "synthetic-2",
+          "synthetic-3"
+        ],
+        "transactions": [
+          "synthetic-9",
+          "synthetic-11",
+          "synthetic-13",
+          "synthetic-15"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 4.436058999999659,
+      "p95_ms": 16.029535000008764
+    },
+    {
+      "phase": "after",
+      "id": "combined-swedish",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "exact-invoice"
+        ],
+        "transactions": [
+          "exact-payment"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 0.7159400000091409,
+      "p95_ms": 9.004832999999053
+    },
+    {
+      "phase": "after",
+      "id": "reordered-swedish",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "exact-invoice"
+        ],
+        "transactions": [
+          "exact-payment"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 0.6362419999932172,
+      "p95_ms": 0.6643540000077337
+    },
+    {
+      "phase": "after",
+      "id": "date-and-amount",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "exact-invoice"
+        ],
+        "transactions": [
+          "exact-payment"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 0.6525159999873722,
+      "p95_ms": 0.6781040000059875
+    },
+    {
+      "phase": "after",
+      "id": "exact-ranks-before-limit",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "exact-invoice",
+          "synthetic-0",
+          "synthetic-1",
+          "synthetic-2"
+        ],
+        "transactions": [
+          "exact-payment",
+          "synthetic-599",
+          "synthetic-5991",
+          "synthetic-5993"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 4.437149999997928,
+      "p95_ms": 16.289660000009462
+    },
+    {
+      "phase": "after",
+      "id": "negative-amount",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": [
+          "negative-payment"
+        ]
+      },
+      "samples": 12,
+      "p50_ms": 0.704663000011351,
+      "p95_ms": 2.0821629999991274
+    },
+    {
+      "phase": "after",
+      "id": "fullwidth-reference",
+      "correct": true,
+      "result": {
+        "invoices": [
+          "exact-invoice"
+        ],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 0.9469919999974081,
+      "p95_ms": 3.165436999988742
+    },
+    {
+      "phase": "after",
+      "id": "no-match",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 0.8785199999983888,
+      "p95_ms": 2.193537999992259
+    },
+    {
+      "phase": "after",
+      "id": "blank",
+      "correct": true,
+      "result": {
+        "invoices": [],
+        "transactions": []
+      },
+      "samples": 12,
+      "p50_ms": 0.0007909999985713512,
+      "p95_ms": 0.0026040000084321946
+    }
+  ]
+}

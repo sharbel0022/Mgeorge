@@ -1,0 +1,3085 @@
+{
+  "schema": "mgeorge-document-quality-evidence-v1",
+  "synthetic": true,
+  "createdAt": "2026-11-05T17:12:06.021Z",
+  "requiredFields": [
+    "invoice_number",
+    "party",
+    "issued_at",
+    "due_at",
+    "total_cents",
+    "net_cents",
+    "vat_cents",
+    "direction",
+    "currency",
+    "organization_number"
+  ],
+  "methodology": {
+    "counts": "Wrong non-null values count as both FP and FN. Correct nulls do not inflate precision/recall.",
+    "scope": "All 13 scalar fields; original frozen text corpus additionally retains its existing reviewed detail fields. Both parsers consume the real local Node worker OCR result.",
+    "sitesLimit": "This is not a Sites browser/cloud OCR end-to-end result.",
+    "validationLimit": "The separate optical validation set was frozen before application edits, after the initial text-label diagnosis. Its observed paragraph gaps informed the second fix. It is a deterministic development validation set, not an untouched statistical holdout or a representative production sample.",
+    "timing": "Five warmed parser repeats; one cold OCR worker per optical sample. Same shared host; no speedup or latency guarantee is claimed."
+  },
+  "corpora": {
+    "frozen": {
+      "corpusVersion": "mgeorge-ocr-quality-corpus-v1",
+      "corpusSha256": "c1a28614d0812fa0687bbd2ce0ed00c800ce99d38297757077bd8d74a1a616f9",
+      "datasetSha256": "f54e3d3f0c5a7e1595a7caf3669773ab462282c36e6685a052b0c879a9e8eae0",
+      "corpusUnchanged": true,
+      "inputBytesUnchanged": true,
+      "inputManifest": [
+        {
+          "id": "sv-standard-leading-zeroes",
+          "subset": "text",
+          "sha256": "14fe4c246d43e14166cf98ef8dd32cea4c093268e10bb75c24dd0a3e02c62393"
+        },
+        {
+          "id": "en-standard-generic-reference",
+          "subset": "text",
+          "sha256": "54a8976edb179b858533770190f3c0c3aa2c52e68ef4ef7868dd87411873fd0c"
+        },
+        {
+          "id": "sv-character-spaced-identifiers",
+          "subset": "text",
+          "sha256": "84c246d4b75169cfcf0ab6b76dbf8db6bd9c5cfc0d6a4bc1bcbe5b8b9b5749ee"
+        },
+        {
+          "id": "sv-credit-negative-source-values",
+          "subset": "text",
+          "sha256": "d5d66c4f780044a9077449ac3156c4fdcc27f6437f16753f56df3e927e7e6491"
+        },
+        {
+          "id": "en-foreign-currency",
+          "subset": "text",
+          "sha256": "62d6d46adb73a5a38f788778f8052e40593e688cf3cd6f60553c9fb139cf361a"
+        },
+        {
+          "id": "sv-explicit-zero-vat",
+          "subset": "text",
+          "sha256": "032811c616391fc7d0a6b8ffb05fb7d94dbfecd7da7eab7fe9480ec61d2eafc5"
+        },
+        {
+          "id": "sv-zero-total-requires-review",
+          "subset": "text",
+          "sha256": "9ecadb54d81ac6fd0b9e3a1c671e246221a07f32e1dbe3a17df4214b2fe17d9b"
+        },
+        {
+          "id": "missing-invoice-number",
+          "subset": "text",
+          "sha256": "a49b0980a210935e286e167764dd38338bc4b5eec62a9368d746c05111d92eb7"
+        },
+        {
+          "id": "empty-invoice-number",
+          "subset": "text",
+          "sha256": "10d9a92375217e12cab4bb4fe099624029ac659f05ff2b054ad10a8fd7a7885e"
+        },
+        {
+          "id": "conflicting-invoice-numbers",
+          "subset": "text",
+          "sha256": "929d88e72607cc6f0697b1c13c1b9efb7d11ab28f3080c51b083ac4d8f197ebb"
+        },
+        {
+          "id": "metadata-filename-id-suffix",
+          "subset": "text",
+          "sha256": "14fe4c246d43e14166cf98ef8dd32cea4c093268e10bb75c24dd0a3e02c62393"
+        },
+        {
+          "id": "metadata-subject-id-suffix",
+          "subset": "text",
+          "sha256": "14fe4c246d43e14166cf98ef8dd32cea4c093268e10bb75c24dd0a3e02c62393"
+        },
+        {
+          "id": "metadata-cannot-fill-missing-id",
+          "subset": "text",
+          "sha256": "a49b0980a210935e286e167764dd38338bc4b5eec62a9368d746c05111d92eb7"
+        },
+        {
+          "id": "empty-supplier-name",
+          "subset": "text",
+          "sha256": "783554cca4cdfcbb06a748c64e413b7cd3be3ae5e805936679cf621a2d168921"
+        },
+        {
+          "id": "valid-supplier-plus-empty-supplier",
+          "subset": "text",
+          "sha256": "cfb41b31b508a9a3f9227d82b2d1b4575c30264c37ad15828c517729e2e9ef52"
+        },
+        {
+          "id": "conflicting-supplier-names",
+          "subset": "text",
+          "sha256": "9a3e1c05d4ca3cb0f88f004b13551784fb0f217e1bad6a41c4f5fde01d5e3948"
+        },
+        {
+          "id": "missing-organization-number",
+          "subset": "text",
+          "sha256": "00680c0daf4daf426e95e481dbe29d938392d49fb408a359bcb9ce22505665a7"
+        },
+        {
+          "id": "valid-org-plus-empty-org",
+          "subset": "text",
+          "sha256": "f0e629d953dab5abbc6492ea1d1992241e75d6ed1465e35a8d9ef2dd290ab3bf"
+        },
+        {
+          "id": "supplier-and-recipient-orgs",
+          "subset": "text",
+          "sha256": "c18c61e9ce4fc107fc9640dcf0a93c2d8c4bd13560e8cb1cb77e816f45beda12"
+        },
+        {
+          "id": "customer-direction-selects-recipient",
+          "subset": "text",
+          "sha256": "c18c61e9ce4fc107fc9640dcf0a93c2d8c4bd13560e8cb1cb77e816f45beda12"
+        },
+        {
+          "id": "same-supplier-conflicting-orgs",
+          "subset": "text",
+          "sha256": "8118e24c8ea0f216a1091d46fdc8c2f851790b76f305f47ebdcbbf03e38ff628"
+        },
+        {
+          "id": "explicit-ocr-invalid-check-digit",
+          "subset": "text",
+          "sha256": "989047bcf97698a3b9b661e6b2848891034629940ece06c70a2e1fad88201dc3"
+        },
+        {
+          "id": "ambiguous-two-numeric-columns",
+          "subset": "text",
+          "sha256": "ebcdaff6928f3f0fe0c2e2553a86d7449681b1225c152650fee90c4ced606f5a"
+        },
+        {
+          "id": "valid-ocr-plus-empty-ocr",
+          "subset": "text",
+          "sha256": "80641dacccf3f3cf3fd9e29e9781c57577a6c91cd0793c306215cc2fe0511af1"
+        },
+        {
+          "id": "conflicting-document-totals",
+          "subset": "text",
+          "sha256": "c1b7864d8f55e586ea059d4decde3d17449e31d8c16bf75e80e7acde87cca1d9"
+        },
+        {
+          "id": "document-arithmetic-conflict",
+          "subset": "text",
+          "sha256": "b0f45cbdfafe3dbc72fb8419a19e75c6485eda53025fc157700b211870dd4ac0"
+        },
+        {
+          "id": "vat-rate-is-not-vat-money",
+          "subset": "text",
+          "sha256": "79860b7ea76bf14b10bd6f92c2ba8124469d261f6034fbc007ec08dde342d389"
+        },
+        {
+          "id": "invalid-calendar-date",
+          "subset": "text",
+          "sha256": "8ccb0a6340b8c832d83f84766220ec46ce69dfbed06594843e02afe6f1eef9d7"
+        },
+        {
+          "id": "one-complete-swedish-row",
+          "subset": "text",
+          "sha256": "ea23c55dade5556ed5f8292e0b55cbd74e2beb6e01f77e2f5b09848d51c7e5d4"
+        },
+        {
+          "id": "two-rows-mixed-vat-rates",
+          "subset": "text",
+          "sha256": "e2e271e22c8e92f1381f05c86788bdfebf1a14c0e8e309dbd512169eb44a543a"
+        },
+        {
+          "id": "one-complete-english-row",
+          "subset": "text",
+          "sha256": "ff9f0cda2c71e8b17992e1b093b2808fe7a3cb1ac57980cb831a36cbfaf38ee3"
+        },
+        {
+          "id": "row-vat-conflicts-with-rate",
+          "subset": "text",
+          "sha256": "a77a67e93ea990cc00b992d9de110ff28e7386ac4f9af105135c3e11784ae0ad"
+        },
+        {
+          "id": "no-discount-prose-does-not-bypass-rate-check",
+          "subset": "text",
+          "sha256": "204f3683d83b29ebf6513c51680e97a6ab285a6c0296f73679cd5de207a5b3a5"
+        },
+        {
+          "id": "explicit-discount-needs-supported-calculation",
+          "subset": "text",
+          "sha256": "7752d1130769f610b5dac7c96be0a656f0fbcff2f8ea86befdc71ea7ebb36a23"
+        },
+        {
+          "id": "two-pages-same-invoice-table-continued",
+          "subset": "text",
+          "sha256": "fa7f51327941fc35db66d2bd60de0ed68e256f2a06e2891bbd5b7707d658b4fb"
+        },
+        {
+          "id": "second-page-starts-another-invoice",
+          "subset": "text",
+          "sha256": "cbce37ffa65ceaee6c2f5ed4f30e674122e27353f9a1c4a64293d11591f1b6cb"
+        },
+        {
+          "id": "row-with-missing-vat-cell",
+          "subset": "text",
+          "sha256": "8e64e502b747fff2863066a71ce28b7aa3431bc5ac9a266c6c1b52dabe674cd2"
+        },
+        {
+          "id": "row-total-cannot-fill-document-total",
+          "subset": "text",
+          "sha256": "b14fe750f904d5e1ac015750bd806902a7a1f95c54ad9345c734c5b2fa804263"
+        },
+        {
+          "id": "partial-second-row-never-dropped",
+          "subset": "text",
+          "sha256": "1634a7788fa46cc0fbebf557e3ace8ae94a0fa1c01c759141a5cdda81543af73"
+        },
+        {
+          "id": "three-rows-zero-six-and-twentyfive-vat",
+          "subset": "text",
+          "sha256": "eda9a4a3985abf0022cac07ee7b3568cd0976c496414fdb0937b322953d9caf9"
+        },
+        {
+          "id": "native-text-pdf",
+          "subset": "pdf-native",
+          "sha256": "abc37b2d3380763487bb93b669d0c0ac84191573e4cae77104fd6d3b262c38db"
+        },
+        {
+          "id": "native-positioned-id-reference",
+          "subset": "pdf-native",
+          "sha256": "44824e4dec0ed84d2884b11ad6b49a16b731053257640ba0e780e1f44475a23f"
+        },
+        {
+          "id": "native-identical-visible-permuted-order",
+          "subset": "pdf-native",
+          "sha256": "b37456e9335fe3e06f0eeac7652081f808ae6d313eccc6cf7b6f75e7031eccc8"
+        },
+        {
+          "id": "clear-png",
+          "subset": "raster",
+          "sha256": "b689ad57e3ed02dc127c76b976e795b54c2a61a8b3a7a3255527752e12dea2df"
+        },
+        {
+          "id": "clear-jpeg",
+          "subset": "raster",
+          "sha256": "033a76fb9a16a25e92107461a14b2527f4232aa65563863ed5b6f4230b601d62"
+        },
+        {
+          "id": "scanned-image-only-pdf",
+          "subset": "pdf-raster",
+          "sha256": "b7e329c13adac618e31933b7ec6e3c87fd2a95bfd403fe8fe8d9919ed22bcc87"
+        },
+        {
+          "id": "scanned-pdf-with-digital-footer",
+          "subset": "pdf-raster",
+          "sha256": "97b0005a5a488ccebbffe3d8dc114ce51c390293a4b924a4b292f7b96f39734b"
+        },
+        {
+          "id": "blank-raster",
+          "subset": "raster",
+          "sha256": "b4fb2028e86993a7ee9d52435acd88252e69bdfd16be9c99b0d91e477cb47605"
+        },
+        {
+          "id": "severely-pixelated-invoice",
+          "subset": "raster",
+          "sha256": "546b4e4c31271b2314dacbba55d6af18a34fe913350a65ca08c80f4a1cfb9731"
+        }
+      ],
+      "phases": {
+        "before": {
+          "startedAt": "2026-11-05T16:32:48.396Z",
+          "completedAt": "2026-11-05T16:33:08.095Z",
+          "sourceCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+          "sourceWorkingTreeDirty": false,
+          "sourceSha256": "69f4c6c0f65e79014d2801ff45bb94879069f94ce6ee8ab16dfcfa5d506bc88f",
+          "sourceHashes": {
+            "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+            "package.json": "ec6237dd6982279ca62783131a9a340ef12d5fee18a21ceba8381a5d4fc7bc2e",
+            "sites/lib/bank-api-original.js": "2868abc1423a942d6eed583cbc14a2ab7b68cba533f1320636d4d5692d993a27",
+            "sites/lib/bankgiro-deposit-identity.js": "46e1135ba45750e5c06f7c6a2e662ec462dc839218a2d5d707adafc95bec7ac4",
+            "sites/lib/bankgiro-source-evidence.js": "495ea7b21d978011cfef8b3f319f1ba5b68b4d04c7df3315b30e10527efff1e7",
+            "sites/lib/bankgiro-xlsx.js": "cca184605ad533867daa1f5486e27071c3c5551894e05feb161e313d2320c384",
+            "sites/lib/banking/openpayments-normalization.js": "13782ec9a42db954153b6bebaf35b8f795d62035d4d6259b0e8b21717ac5185b",
+            "sites/lib/camt-payer.js": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827",
+            "sites/lib/camt-xml.js": "a517eb363c4029a3bb9cb5870da32dfd3b32c2de722dfcb921ed81407342889e",
+            "sites/lib/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "sites/lib/domain.ts": "0c2c5cfa9e6889cd67f8b82e984d3c6bfb7dc2b14c1f418faee805cf10f6d6e7",
+            "sites/lib/invoice-details.js": "a9812e6387778804e0f1c2a824a53067b324308112c29c02ce98bdf9540a103b",
+            "sites/lib/invoice-fields.js": "696e3dad84c9616e8f4dc3edb86d8fec42136297cdc150901980848cca920938",
+            "sites/lib/invoice-reference-policy.js": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e",
+            "sites/lib/payer-evidence.js": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661",
+            "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "sites/lib/reconciliation-engine.js": "0a77b474b124405bff188a1a2fd5e122c849ae50c2687c6c1a4cc51345104f8c",
+            "sites/lib/reference-evidence-compat.js": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba",
+            "sites/lib/uuid.js": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4",
+            "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+            "sites/package.json": "296bf119047d447b5a5164855511f00d33684f0656bfdb6ed7c3d985f0e4b0be",
+            "src/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "src/image-dimensions.js": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+            "src/importers.js": "ba5a6c489c1a0f2836d1c132f304b050a3c3fa26b9aa119f12654c1e331c3252",
+            "src/invoice-details.js": "a9812e6387778804e0f1c2a824a53067b324308112c29c02ce98bdf9540a103b",
+            "src/invoice-extraction.js": "f0788cd1d72dc1c40d046d04d42ccf7608246cabb95892ebd280df736858baa1",
+            "src/invoice-worker.js": "eb705043cfc30c246760472fd04834cf584040ba76a1ee25356e83d5c6d1377e",
+            "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+            "src/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "src/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4"
+          },
+          "sourceStable": true,
+          "runnerSha256": "81ec6ebb7aefd0e9c023d43a4e5d5290787932d81aaafea50196bea9fb0851be",
+          "runtime": {
+            "node": "v24.22.1",
+            "dependencies": {
+              "pdfjs-dist": "5.4.149",
+              "@napi-rs/canvas": "0.1.80",
+              "tesseract.js": "6.0.1",
+              "@tesseract.js-data/swe": "1.0.0"
+            },
+            "loadBefore": [
+              1.1,
+              1.08,
+              0.92
+            ],
+            "loadAfter": [
+              1.36,
+              1.14,
+              0.94
+            ]
+          },
+          "summaries": {
+            "node": {
+              "text": {
+                "documents": 40,
+                "counts": {
+                  "tp": 612,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 612,
+                  "returnedNonNull": 612,
+                  "correctNull": 22,
+                  "reviewedFields": 634
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 40,
+                "documentCoverage": 1,
+                "greenCount": 12,
+                "falseGreenCount": 0,
+                "manualReviewCount": 28,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.42367258999999724,
+                "medianTimeMs": 0.4215327000000002,
+                "p95TimeMs": 0.5653958000000102,
+                "requiredFields": {
+                  "tp": 384,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "nativePdf": {
+                "documents": 3,
+                "counts": {
+                  "tp": 39,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 39,
+                  "returnedNonNull": 39,
+                  "correctNull": 0,
+                  "reviewedFields": 39
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 3,
+                "documentCoverage": 1,
+                "greenCount": 3,
+                "falseGreenCount": 0,
+                "manualReviewCount": 0,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 661.0486950000001,
+                "medianTimeMs": 649.9229140000002,
+                "p95TimeMs": 700.2865160000001,
+                "requiredFields": {
+                  "tp": 30,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "rasterAll": {
+                "documents": 4,
+                "counts": {
+                  "tp": 29,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 41,
+                  "returnedNonNull": 30,
+                  "correctNull": 11,
+                  "reviewedFields": 52
+                },
+                "fieldPrecision": 0.9666666666666667,
+                "fieldRecall": 0.7073170731707317,
+                "exactDocuments": 3,
+                "documentCoverage": 0.75,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 4,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2328.1286579999996,
+                "medianTimeMs": 2282.8482335,
+                "p95TimeMs": 2935.342357999998,
+                "requiredFields": {
+                  "tp": 22,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.7096774193548387
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3218.6523179999995,
+                "medianTimeMs": 3218.6523179999995,
+                "p95TimeMs": 3355.0966529999987,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2802.625579999999,
+                "medianTimeMs": 2802.625579999999,
+                "p95TimeMs": 2935.342357999998,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 1853.6317360000003,
+                "medianTimeMs": 1853.6317360000003,
+                "p95TimeMs": 1895.7876649999998,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            },
+            "sites": {
+              "text": {
+                "documents": 40,
+                "counts": {
+                  "tp": 612,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 612,
+                  "returnedNonNull": 612,
+                  "correctNull": 22,
+                  "reviewedFields": 634
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 40,
+                "documentCoverage": 1,
+                "greenCount": 12,
+                "falseGreenCount": 0,
+                "manualReviewCount": 28,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.3101425849999982,
+                "medianTimeMs": 0.2862692999999922,
+                "p95TimeMs": 0.4575561999999991,
+                "requiredFields": {
+                  "tp": 384,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "nativePdf": {
+                "documents": 3,
+                "counts": {
+                  "tp": 39,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 39,
+                  "returnedNonNull": 39,
+                  "correctNull": 0,
+                  "reviewedFields": 39
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 3,
+                "documentCoverage": 1,
+                "greenCount": 3,
+                "falseGreenCount": 0,
+                "manualReviewCount": 0,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 662.171615666667,
+                "medianTimeMs": 649.6438400000002,
+                "p95TimeMs": 700.139138,
+                "requiredFields": {
+                  "tp": 30,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "rasterAll": {
+                "documents": 4,
+                "counts": {
+                  "tp": 29,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 41,
+                  "returnedNonNull": 30,
+                  "correctNull": 11,
+                  "reviewedFields": 52
+                },
+                "fieldPrecision": 0.9666666666666667,
+                "fieldRecall": 0.7073170731707317,
+                "exactDocuments": 3,
+                "documentCoverage": 0.75,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 4,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2328.170977750001,
+                "medianTimeMs": 2282.657966500001,
+                "p95TimeMs": 2935.5145119999997,
+                "requiredFields": {
+                  "tp": 22,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.7096774193548387
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3218.1955014999985,
+                "medianTimeMs": 3218.1955014999985,
+                "p95TimeMs": 3354.6454049999975,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2802.560703,
+                "medianTimeMs": 2802.560703,
+                "p95TimeMs": 2935.5145119999997,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 1853.7812525000018,
+                "medianTimeMs": 1853.7812525000018,
+                "p95TimeMs": 1895.7090390000012,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            }
+          },
+          "nonExactDocuments": [
+            {
+              "id": "severely-pixelated-invoice",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Dokumentet saknar tillräcklig läsbar text.",
+                "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, totalbelopp, belopp exklusive moms, moms, valuta, organisationsnummer"
+              ],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": null
+                },
+                {
+                  "name": "currency",
+                  "expected": "SEK",
+                  "actual": null
+                },
+                {
+                  "name": "due_at",
+                  "expected": "2026-11-07",
+                  "actual": null
+                },
+                {
+                  "name": "invoice_number",
+                  "expected": "0606",
+                  "actual": null
+                },
+                {
+                  "name": "issued_at",
+                  "expected": "2026-10-24",
+                  "actual": null
+                },
+                {
+                  "name": "kind",
+                  "expected": "invoice",
+                  "actual": "other"
+                },
+                {
+                  "name": "net_cents",
+                  "expected": 300000,
+                  "actual": null
+                },
+                {
+                  "name": "organization_number",
+                  "expected": "5560160680",
+                  "actual": null
+                },
+                {
+                  "name": "party",
+                  "expected": "Testbolaget AB",
+                  "actual": null
+                },
+                {
+                  "name": "reference",
+                  "expected": "000018",
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 375000,
+                  "actual": null
+                },
+                {
+                  "name": "vat_cents",
+                  "expected": 75000,
+                  "actual": null
+                }
+              ]
+            }
+          ]
+        },
+        "after": {
+          "startedAt": "2026-11-05T17:10:35.338Z",
+          "completedAt": "2026-11-05T17:10:56.790Z",
+          "sourceCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+          "sourceWorkingTreeDirty": true,
+          "sourceSha256": "10edeb7b4f0db528c6c03945cf7254b2ebd5afa9df8488115f82ed66f7c66dd8",
+          "sourceHashes": {
+            "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+            "package.json": "ec6237dd6982279ca62783131a9a340ef12d5fee18a21ceba8381a5d4fc7bc2e",
+            "sites/lib/bank-api-original.js": "2868abc1423a942d6eed583cbc14a2ab7b68cba533f1320636d4d5692d993a27",
+            "sites/lib/bankgiro-deposit-identity.js": "46e1135ba45750e5c06f7c6a2e662ec462dc839218a2d5d707adafc95bec7ac4",
+            "sites/lib/bankgiro-source-evidence.js": "495ea7b21d978011cfef8b3f319f1ba5b68b4d04c7df3315b30e10527efff1e7",
+            "sites/lib/bankgiro-xlsx.js": "cca184605ad533867daa1f5486e27071c3c5551894e05feb161e313d2320c384",
+            "sites/lib/banking/openpayments-normalization.js": "13782ec9a42db954153b6bebaf35b8f795d62035d4d6259b0e8b21717ac5185b",
+            "sites/lib/camt-payer.js": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827",
+            "sites/lib/camt-xml.js": "a517eb363c4029a3bb9cb5870da32dfd3b32c2de722dfcb921ed81407342889e",
+            "sites/lib/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "sites/lib/domain.ts": "0c2c5cfa9e6889cd67f8b82e984d3c6bfb7dc2b14c1f418faee805cf10f6d6e7",
+            "sites/lib/invoice-details.js": "79f45c55f868c8fbb51161b96d382e430059254e69e9686e65df9c4cb9a16c6e",
+            "sites/lib/invoice-fields.js": "ec61aa0d1c46b974f559870047f2a4f08b2d6c5b656d14bca5443b9fbc28c64f",
+            "sites/lib/invoice-reference-policy.js": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e",
+            "sites/lib/payer-evidence.js": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661",
+            "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "sites/lib/reconciliation-engine.js": "0a77b474b124405bff188a1a2fd5e122c849ae50c2687c6c1a4cc51345104f8c",
+            "sites/lib/reference-evidence-compat.js": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba",
+            "sites/lib/uuid.js": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4",
+            "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+            "sites/package.json": "296bf119047d447b5a5164855511f00d33684f0656bfdb6ed7c3d985f0e4b0be",
+            "src/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "src/image-dimensions.js": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+            "src/importers.js": "ba5a6c489c1a0f2836d1c132f304b050a3c3fa26b9aa119f12654c1e331c3252",
+            "src/invoice-details.js": "79f45c55f868c8fbb51161b96d382e430059254e69e9686e65df9c4cb9a16c6e",
+            "src/invoice-extraction.js": "f7d12eb4a9d7b4a133f0dab5ac00addb4971663b2401e26bf27ece4c0c343de0",
+            "src/invoice-worker.js": "eb705043cfc30c246760472fd04834cf584040ba76a1ee25356e83d5c6d1377e",
+            "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+            "src/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "src/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4"
+          },
+          "sourceStable": true,
+          "runnerSha256": "df5e45757ec64d4e787d0b659c7cb4395b5b02ebdbe8c4a60aa0fee0ffa78113",
+          "runtime": {
+            "node": "v24.22.1",
+            "dependencies": {
+              "pdfjs-dist": "5.4.149",
+              "@napi-rs/canvas": "0.1.80",
+              "tesseract.js": "6.0.1",
+              "@tesseract.js-data/swe": "1.0.0"
+            },
+            "loadBefore": [
+              2.37,
+              2.27,
+              1.74
+            ],
+            "loadAfter": [
+              2.79,
+              2.38,
+              1.79
+            ]
+          },
+          "summaries": {
+            "node": {
+              "text": {
+                "documents": 40,
+                "counts": {
+                  "tp": 612,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 612,
+                  "returnedNonNull": 612,
+                  "correctNull": 22,
+                  "reviewedFields": 634
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 40,
+                "documentCoverage": 1,
+                "greenCount": 12,
+                "falseGreenCount": 0,
+                "manualReviewCount": 28,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.5533652500000021,
+                "medianTimeMs": 0.46391109999997293,
+                "p95TimeMs": 1.0754763999999342,
+                "requiredFields": {
+                  "tp": 384,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "nativePdf": {
+                "documents": 3,
+                "counts": {
+                  "tp": 39,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 39,
+                  "returnedNonNull": 39,
+                  "correctNull": 0,
+                  "reviewedFields": 39
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 3,
+                "documentCoverage": 1,
+                "greenCount": 3,
+                "falseGreenCount": 0,
+                "manualReviewCount": 0,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 792.7566733333337,
+                "medianTimeMs": 764.86321,
+                "p95TimeMs": 863.8772760000006,
+                "requiredFields": {
+                  "tp": 30,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "rasterAll": {
+                "documents": 4,
+                "counts": {
+                  "tp": 29,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 41,
+                  "returnedNonNull": 30,
+                  "correctNull": 11,
+                  "reviewedFields": 52
+                },
+                "fieldPrecision": 0.9666666666666667,
+                "fieldRecall": 0.7073170731707317,
+                "exactDocuments": 3,
+                "documentCoverage": 0.75,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 4,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2745.7596197500006,
+                "medianTimeMs": 2791.3355585000004,
+                "p95TimeMs": 3422.238115,
+                "requiredFields": {
+                  "tp": 22,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.7096774193548387
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3421.621380999999,
+                "medianTimeMs": 3421.621380999999,
+                "p95TimeMs": 3854.232995999997,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3360.9335184999995,
+                "medianTimeMs": 3360.9335184999995,
+                "p95TimeMs": 3422.238115,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2130.5857210000013,
+                "medianTimeMs": 2130.5857210000013,
+                "p95TimeMs": 2283.042195000002,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            },
+            "sites": {
+              "text": {
+                "documents": 40,
+                "counts": {
+                  "tp": 612,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 612,
+                  "returnedNonNull": 612,
+                  "correctNull": 22,
+                  "reviewedFields": 634
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 40,
+                "documentCoverage": 1,
+                "greenCount": 12,
+                "falseGreenCount": 0,
+                "manualReviewCount": 28,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.4992622600000062,
+                "medianTimeMs": 0.4373504000000139,
+                "p95TimeMs": 0.6324322000000393,
+                "requiredFields": {
+                  "tp": 384,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "nativePdf": {
+                "documents": 3,
+                "counts": {
+                  "tp": 39,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 39,
+                  "returnedNonNull": 39,
+                  "correctNull": 0,
+                  "reviewedFields": 39
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 3,
+                "documentCoverage": 1,
+                "greenCount": 3,
+                "falseGreenCount": 0,
+                "manualReviewCount": 0,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 792.4956269999999,
+                "medianTimeMs": 764.5111400000001,
+                "p95TimeMs": 863.5703410000001,
+                "requiredFields": {
+                  "tp": 30,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "rasterAll": {
+                "documents": 4,
+                "counts": {
+                  "tp": 29,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 41,
+                  "returnedNonNull": 30,
+                  "correctNull": 11,
+                  "reviewedFields": 52
+                },
+                "fieldPrecision": 0.9666666666666667,
+                "fieldRecall": 0.7073170731707317,
+                "exactDocuments": 3,
+                "documentCoverage": 0.75,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 4,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2745.5146022499994,
+                "medianTimeMs": 2791.1244614999987,
+                "p95TimeMs": 3421.8604749999995,
+                "requiredFields": {
+                  "tp": 22,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.7096774193548387
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3421.529554999999,
+                "medianTimeMs": 3421.529554999999,
+                "p95TimeMs": 3854.345271999997,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3360.6110455,
+                "medianTimeMs": 3360.6110455,
+                "p95TimeMs": 3421.8604749999995,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2130.418158999999,
+                "medianTimeMs": 2130.418158999999,
+                "p95TimeMs": 2282.8873069999972,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            }
+          },
+          "nonExactDocuments": [
+            {
+              "id": "severely-pixelated-invoice",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Dokumentet saknar tillräcklig läsbar text.",
+                "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, totalbelopp, belopp exklusive moms, moms, valuta, organisationsnummer"
+              ],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": null
+                },
+                {
+                  "name": "currency",
+                  "expected": "SEK",
+                  "actual": null
+                },
+                {
+                  "name": "due_at",
+                  "expected": "2026-11-07",
+                  "actual": null
+                },
+                {
+                  "name": "invoice_number",
+                  "expected": "0606",
+                  "actual": null
+                },
+                {
+                  "name": "issued_at",
+                  "expected": "2026-10-24",
+                  "actual": null
+                },
+                {
+                  "name": "kind",
+                  "expected": "invoice",
+                  "actual": "other"
+                },
+                {
+                  "name": "net_cents",
+                  "expected": 300000,
+                  "actual": null
+                },
+                {
+                  "name": "organization_number",
+                  "expected": "5560160680",
+                  "actual": null
+                },
+                {
+                  "name": "party",
+                  "expected": "Testbolaget AB",
+                  "actual": null
+                },
+                {
+                  "name": "reference",
+                  "expected": "000018",
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 375000,
+                  "actual": null
+                },
+                {
+                  "name": "vat_cents",
+                  "expected": 75000,
+                  "actual": null
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "labelVariants": {
+      "corpusVersion": "document-labels-2026-11-05-v1",
+      "corpusSha256": "f8e895f7057ca4d6a6a1a70299c711785858f8fefebf4e3ebb32e89681c598f6",
+      "datasetSha256": "fb5cb22ae688fe3277de1bc490d0249a0d4ce86eba136a3a72021ca5e938e369",
+      "corpusUnchanged": true,
+      "inputBytesUnchanged": true,
+      "inputManifest": [
+        {
+          "id": "full-word-sums",
+          "subset": "text",
+          "sha256": "ae080ee93f5dd832ac5313e769fe16adafa29b48235570a8bfdb65566d55ece3"
+        },
+        {
+          "id": "abbreviated-sums",
+          "subset": "text",
+          "sha256": "d5e0444de6df954116f5204e01f106e54bd029f134ff1c81aa6a53c945591e5e"
+        },
+        {
+          "id": "total-excluding-tax",
+          "subset": "text",
+          "sha256": "0f0798268e3cd3cb20a05f09ee143bd3c5c5222321ea2bc4a8d14b2ea2aa2d89"
+        },
+        {
+          "id": "amount-including-tax",
+          "subset": "text",
+          "sha256": "b5bf539d55c3fd9dd0af40f26ff3f70eec97deb705422f449243dcb7ca63a7ec"
+        },
+        {
+          "id": "same-line-summaries",
+          "subset": "text",
+          "sha256": "d3657f043c1a3170537f3ab6edbb565bb261947083954d97a171c457cf90c7be"
+        },
+        {
+          "id": "wrapped-summaries",
+          "subset": "text",
+          "sha256": "2ae968ce8a7028848f8142ca056fc4726f7ccd305d4f87a7ac607902f8e076e2"
+        },
+        {
+          "id": "existing-label-control",
+          "subset": "text",
+          "sha256": "e4a793ec0a482d40becf721cd3a539da2765fb80a7fe980db38bcbc9d2aca832"
+        },
+        {
+          "id": "conflicting-gross-alias",
+          "subset": "text",
+          "sha256": "836154f99369380fb5bf71a1c34f824b1ddf3a3dfe6d150f450832ebe067875d"
+        },
+        {
+          "id": "conflicting-net-alias",
+          "subset": "text",
+          "sha256": "7f36463da7a81cb063743a3bccc9f180be4282823cde67cc01700abc35fc2ec0"
+        },
+        {
+          "id": "invalid-gross-alias",
+          "subset": "text",
+          "sha256": "2e817741aa3a39c3cb4ade59d6648222a96d4cee078fa5489ea525227e62f4a5"
+        },
+        {
+          "id": "invalid-net-alias",
+          "subset": "text",
+          "sha256": "3de0d47775710f64de22eea2754ff464117ae9f3947ad66186b56eb27a1cd0f3"
+        },
+        {
+          "id": "bare-sum-is-not-a-gross-label",
+          "subset": "text",
+          "sha256": "0e872342220bf80016c372d573525458a093f00c7c091944c8ae16377a2c09e4"
+        },
+        {
+          "id": "subtotal-is-not-a-gross-label",
+          "subset": "text",
+          "sha256": "2bcd15fadc96109fd4f50c90b883fdf2623a3275763c7d45fd7b667f968c62e5"
+        },
+        {
+          "id": "gross-must-not-be-derived",
+          "subset": "text",
+          "sha256": "e429faf349d18dd4518e705d74c7e9a99722c1b7802a5606620c9013019cd2d3"
+        },
+        {
+          "id": "sum-full-png",
+          "subset": "raster",
+          "sha256": "af5c8a80a8992192313d76f58f5f7488a7f435dc1597ee831aadf6f38ec5ac11"
+        },
+        {
+          "id": "sum-abbreviated-jpeg",
+          "subset": "raster",
+          "sha256": "fcbd4d9795f06011b2ac199ccedf2d0c33fd58cd23f78226b3c7f71c81dac814"
+        },
+        {
+          "id": "total-full-png",
+          "subset": "raster",
+          "sha256": "ab415e2630238625a7b6311238f3af2a3af93e1db0960b4b6e2ce41b63d15424"
+        },
+        {
+          "id": "amount-full-jpeg",
+          "subset": "raster",
+          "sha256": "91baf435763a9183fe8474e24fdbf1d82b972744042ebeafb5c956ad2ab1a21c"
+        },
+        {
+          "id": "wrapped-tax-sums-png",
+          "subset": "raster",
+          "sha256": "82db47beb581f14f7f1b5f29fc2c64ff28f34e0b7f508f59850230461b1704b9"
+        },
+        {
+          "id": "conventional-control-png",
+          "subset": "raster",
+          "sha256": "e26ac71143e621c550af6436c3c6ad349efe7e456e39e9e37b894a93bf27df44"
+        },
+        {
+          "id": "native-inline-tax-summaries",
+          "subset": "pdf-native",
+          "sha256": "d7609ee05429247bba7b4573ffa4d57ac6c48fd77eca5266ffb70e3f1f52728b"
+        },
+        {
+          "id": "native-wrapped-tax-summaries",
+          "subset": "pdf-native",
+          "sha256": "5398575eb8323b119d28c08f2445581fb797fad8d733448d15a26f5a441c476a"
+        },
+        {
+          "id": "scanned-full-tax-summaries",
+          "subset": "pdf-raster",
+          "sha256": "56bfad24e9898ee8c39a9855cfd81920ca28cea50b33c5d8c54968ed88033b6c"
+        },
+        {
+          "id": "scanned-amount-tax-summaries",
+          "subset": "pdf-raster",
+          "sha256": "66bd952b6c4c98f63069cc396ee454284393c252ca9aa03b63127a57d1531539"
+        },
+        {
+          "id": "readable-conflicting-gross-png",
+          "subset": "raster",
+          "sha256": "ceae48a649843ce531c793ffac38dec89ec151ea8b55af460f2a76611da1b14a"
+        },
+        {
+          "id": "readable-invalid-gross-png",
+          "subset": "raster",
+          "sha256": "24961b8d3bb76bbacca8fcba30e77a684e2283960117df8755fb0999cdfb9134"
+        },
+        {
+          "id": "destroyed-low-resolution-source",
+          "subset": "raster",
+          "sha256": "6ef8827ea90746cb66e725fd4e112d921fecf6669221f55bae39df6db5bff8d6"
+        },
+        {
+          "id": "blank-raster",
+          "subset": "raster",
+          "sha256": "df91323eb7ebfa624de19e458e4acce1dc34592508ac249a3efb05271b70695d"
+        }
+      ],
+      "phases": {
+        "before": {
+          "startedAt": "2026-11-05T17:00:15.346Z",
+          "completedAt": "2026-11-05T17:00:57.567Z",
+          "sourceCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+          "sourceWorkingTreeDirty": false,
+          "sourceSha256": "69f4c6c0f65e79014d2801ff45bb94879069f94ce6ee8ab16dfcfa5d506bc88f",
+          "sourceHashes": {
+            "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+            "package.json": "ec6237dd6982279ca62783131a9a340ef12d5fee18a21ceba8381a5d4fc7bc2e",
+            "sites/lib/bank-api-original.js": "2868abc1423a942d6eed583cbc14a2ab7b68cba533f1320636d4d5692d993a27",
+            "sites/lib/bankgiro-deposit-identity.js": "46e1135ba45750e5c06f7c6a2e662ec462dc839218a2d5d707adafc95bec7ac4",
+            "sites/lib/bankgiro-source-evidence.js": "495ea7b21d978011cfef8b3f319f1ba5b68b4d04c7df3315b30e10527efff1e7",
+            "sites/lib/bankgiro-xlsx.js": "cca184605ad533867daa1f5486e27071c3c5551894e05feb161e313d2320c384",
+            "sites/lib/banking/openpayments-normalization.js": "13782ec9a42db954153b6bebaf35b8f795d62035d4d6259b0e8b21717ac5185b",
+            "sites/lib/camt-payer.js": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827",
+            "sites/lib/camt-xml.js": "a517eb363c4029a3bb9cb5870da32dfd3b32c2de722dfcb921ed81407342889e",
+            "sites/lib/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "sites/lib/domain.ts": "0c2c5cfa9e6889cd67f8b82e984d3c6bfb7dc2b14c1f418faee805cf10f6d6e7",
+            "sites/lib/invoice-details.js": "a9812e6387778804e0f1c2a824a53067b324308112c29c02ce98bdf9540a103b",
+            "sites/lib/invoice-fields.js": "696e3dad84c9616e8f4dc3edb86d8fec42136297cdc150901980848cca920938",
+            "sites/lib/invoice-reference-policy.js": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e",
+            "sites/lib/payer-evidence.js": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661",
+            "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "sites/lib/reconciliation-engine.js": "0a77b474b124405bff188a1a2fd5e122c849ae50c2687c6c1a4cc51345104f8c",
+            "sites/lib/reference-evidence-compat.js": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba",
+            "sites/lib/uuid.js": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4",
+            "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+            "sites/package.json": "296bf119047d447b5a5164855511f00d33684f0656bfdb6ed7c3d985f0e4b0be",
+            "src/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "src/image-dimensions.js": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+            "src/importers.js": "ba5a6c489c1a0f2836d1c132f304b050a3c3fa26b9aa119f12654c1e331c3252",
+            "src/invoice-details.js": "a9812e6387778804e0f1c2a824a53067b324308112c29c02ce98bdf9540a103b",
+            "src/invoice-extraction.js": "f0788cd1d72dc1c40d046d04d42ccf7608246cabb95892ebd280df736858baa1",
+            "src/invoice-worker.js": "eb705043cfc30c246760472fd04834cf584040ba76a1ee25356e83d5c6d1377e",
+            "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+            "src/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "src/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4"
+          },
+          "sourceStable": true,
+          "runnerSha256": "dcb84f2213df05f7c0defa82f17bf7f16a08f19ebe33e136461e5884f7acd529",
+          "runtime": {
+            "node": "v24.22.1",
+            "dependencies": {
+              "pdfjs-dist": "5.4.149",
+              "@napi-rs/canvas": "0.1.80",
+              "tesseract.js": "6.0.1",
+              "@tesseract.js-data/swe": "1.0.0"
+            },
+            "loadBefore": [
+              1.63,
+              1.26,
+              1.13
+            ],
+            "loadAfter": [
+              2.49,
+              1.54,
+              1.23
+            ]
+          },
+          "summaries": {
+            "node": {
+              "text": {
+                "documents": 14,
+                "counts": {
+                  "tp": 166,
+                  "fp": 4,
+                  "fn": 9,
+                  "expectedNonNull": 175,
+                  "returnedNonNull": 170,
+                  "correctNull": 3,
+                  "reviewedFields": 182
+                },
+                "fieldPrecision": 0.9764705882352941,
+                "fieldRecall": 0.9485714285714286,
+                "exactDocuments": 4,
+                "documentCoverage": 0.2857142857142857,
+                "greenCount": 5,
+                "falseGreenCount": 4,
+                "manualReviewCount": 9,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.43137737142856497,
+                "medianTimeMs": 0.4438579000000232,
+                "p95TimeMs": 0.6704583999999614,
+                "requiredFields": {
+                  "tp": 124,
+                  "fp": 4,
+                  "fn": 9,
+                  "fieldPrecision": 0.96875,
+                  "fieldRecall": 0.9323308270676691
+                }
+              },
+              "nativePdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 22,
+                  "fp": 0,
+                  "fn": 4,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 22,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 0.8461538461538461,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 691.1415079999988,
+                "medianTimeMs": 691.1415079999988,
+                "p95TimeMs": 705.8606819999986,
+                "requiredFields": {
+                  "tp": 16,
+                  "fp": 0,
+                  "fn": 4,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.8
+                }
+              },
+              "rasterAll": {
+                "documents": 10,
+                "counts": {
+                  "tp": 94,
+                  "fp": 7,
+                  "fn": 23,
+                  "expectedNonNull": 117,
+                  "returnedNonNull": 101,
+                  "correctNull": 11,
+                  "reviewedFields": 130
+                },
+                "fieldPrecision": 0.9306930693069307,
+                "fieldRecall": 0.8034188034188035,
+                "exactDocuments": 1,
+                "documentCoverage": 0.1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 10,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3220.117890800001,
+                "medianTimeMs": 3407.6759585000054,
+                "p95TimeMs": 3869.004428,
+                "requiredFields": {
+                  "tp": 73,
+                  "fp": 2,
+                  "fn": 16,
+                  "fieldPrecision": 0.9733333333333334,
+                  "fieldRecall": 0.8202247191011236
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 23,
+                  "fp": 0,
+                  "fn": 3,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 23,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 0.8846153846153846,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3417.2316825,
+                "medianTimeMs": 3417.2316825,
+                "p95TimeMs": 3453.1540520000017,
+                "requiredFields": {
+                  "tp": 17,
+                  "fp": 0,
+                  "fn": 3,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.85
+                }
+              },
+              "readableNormalRaster": {
+                "documents": 6,
+                "counts": {
+                  "tp": 69,
+                  "fp": 2,
+                  "fn": 9,
+                  "expectedNonNull": 78,
+                  "returnedNonNull": 71,
+                  "correctNull": 0,
+                  "reviewedFields": 78
+                },
+                "fieldPrecision": 0.971830985915493,
+                "fieldRecall": 0.8846153846153846,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 6,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3487.1121898333336,
+                "medianTimeMs": 3498.702716500001,
+                "p95TimeMs": 3869.004428,
+                "requiredFields": {
+                  "tp": 53,
+                  "fp": 0,
+                  "fn": 7,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.8833333333333333
+                }
+              },
+              "readableSafetyRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 22,
+                  "fp": 4,
+                  "fn": 2,
+                  "expectedNonNull": 24,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.8461538461538461,
+                "fieldRecall": 0.9166666666666666,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3422.841311000002,
+                "medianTimeMs": 3422.841311000002,
+                "p95TimeMs": 3503.5169409999944,
+                "requiredFields": {
+                  "tp": 18,
+                  "fp": 2,
+                  "fn": 0,
+                  "fieldPrecision": 0.9,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2216.4115735000014,
+                "medianTimeMs": 2216.4115735000014,
+                "p95TimeMs": 2345.5811199999953,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            },
+            "sites": {
+              "text": {
+                "documents": 14,
+                "counts": {
+                  "tp": 166,
+                  "fp": 4,
+                  "fn": 9,
+                  "expectedNonNull": 175,
+                  "returnedNonNull": 170,
+                  "correctNull": 3,
+                  "reviewedFields": 182
+                },
+                "fieldPrecision": 0.9764705882352941,
+                "fieldRecall": 0.9485714285714286,
+                "exactDocuments": 4,
+                "documentCoverage": 0.2857142857142857,
+                "greenCount": 5,
+                "falseGreenCount": 4,
+                "manualReviewCount": 9,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.4433869142857199,
+                "medianTimeMs": 0.31372959999998784,
+                "p95TimeMs": 1.1061257999999952,
+                "requiredFields": {
+                  "tp": 124,
+                  "fp": 4,
+                  "fn": 9,
+                  "fieldPrecision": 0.96875,
+                  "fieldRecall": 0.9323308270676691
+                }
+              },
+              "nativePdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 22,
+                  "fp": 0,
+                  "fn": 4,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 22,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 0.8461538461538461,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 690.9130589999986,
+                "medianTimeMs": 690.9130589999986,
+                "p95TimeMs": 705.6191039999976,
+                "requiredFields": {
+                  "tp": 16,
+                  "fp": 0,
+                  "fn": 4,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.8
+                }
+              },
+              "rasterAll": {
+                "documents": 10,
+                "counts": {
+                  "tp": 94,
+                  "fp": 7,
+                  "fn": 23,
+                  "expectedNonNull": 117,
+                  "returnedNonNull": 101,
+                  "correctNull": 11,
+                  "reviewedFields": 130
+                },
+                "fieldPrecision": 0.9306930693069307,
+                "fieldRecall": 0.8034188034188035,
+                "exactDocuments": 1,
+                "documentCoverage": 0.1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 10,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3217.5402195999995,
+                "medianTimeMs": 3407.543748,
+                "p95TimeMs": 3870.3280669999986,
+                "requiredFields": {
+                  "tp": 73,
+                  "fp": 2,
+                  "fn": 16,
+                  "fieldPrecision": 0.9733333333333334,
+                  "fieldRecall": 0.8202247191011236
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 23,
+                  "fp": 0,
+                  "fn": 3,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 23,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 0.8846153846153846,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3416.855810000001,
+                "medianTimeMs": 3416.855810000001,
+                "p95TimeMs": 3452.7671880000016,
+                "requiredFields": {
+                  "tp": 17,
+                  "fp": 0,
+                  "fn": 3,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.85
+                }
+              },
+              "readableNormalRaster": {
+                "documents": 6,
+                "counts": {
+                  "tp": 69,
+                  "fp": 2,
+                  "fn": 9,
+                  "expectedNonNull": 78,
+                  "returnedNonNull": 71,
+                  "correctNull": 0,
+                  "reviewedFields": 78
+                },
+                "fieldPrecision": 0.971830985915493,
+                "fieldRecall": 0.8846153846153846,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 6,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3483.019608666667,
+                "medianTimeMs": 3498.502464,
+                "p95TimeMs": 3870.3280669999986,
+                "requiredFields": {
+                  "tp": 53,
+                  "fp": 0,
+                  "fn": 7,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.8833333333333333
+                }
+              },
+              "readableSafetyRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 22,
+                  "fp": 4,
+                  "fn": 2,
+                  "expectedNonNull": 24,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.8461538461538461,
+                "fieldRecall": 0.9166666666666666,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3422.7054864999973,
+                "medianTimeMs": 3422.7054864999973,
+                "p95TimeMs": 3503.2232279999953,
+                "requiredFields": {
+                  "tp": 18,
+                  "fp": 2,
+                  "fn": 0,
+                  "fieldPrecision": 0.9,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2215.936785500002,
+                "medianTimeMs": 2215.936785500002,
+                "p95TimeMs": 2344.965078000001,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            }
+          },
+          "nonExactDocuments": [
+            {
+              "id": "full-word-sums",
+              "subset": "text",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Saknade uppgifter: totalbelopp, belopp exklusive moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": 400000,
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 500000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "abbreviated-sums",
+              "subset": "text",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": 500000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "total-excluding-tax",
+              "subset": "text",
+              "level": "yellow",
+              "error": null,
+              "issues": [
+                "Saknade uppgifter: belopp exklusive moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": 400000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "amount-including-tax",
+              "subset": "text",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": 500000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "same-line-summaries",
+              "subset": "text",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+                "Saknade uppgifter: totalbelopp, belopp exklusive moms, moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": 400000,
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 500000,
+                  "actual": null
+                },
+                {
+                  "name": "vat_cents",
+                  "expected": 100000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "wrapped-summaries",
+              "subset": "text",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": 500000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "conflicting-gross-alias",
+              "subset": "text",
+              "level": "green",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": null,
+                  "actual": 500000
+                }
+              ]
+            },
+            {
+              "id": "conflicting-net-alias",
+              "subset": "text",
+              "level": "green",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": null,
+                  "actual": 400000
+                }
+              ]
+            },
+            {
+              "id": "invalid-gross-alias",
+              "subset": "text",
+              "level": "green",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": null,
+                  "actual": 500000
+                }
+              ]
+            },
+            {
+              "id": "invalid-net-alias",
+              "subset": "text",
+              "level": "green",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": null,
+                  "actual": 400000
+                }
+              ]
+            },
+            {
+              "id": "sum-full-png",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Saknade uppgifter: totalbelopp, belopp exklusive moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                },
+                {
+                  "name": "net_cents",
+                  "expected": 240000,
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 300000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "sum-abbreviated-jpeg",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": 840000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "total-full-png",
+              "subset": "raster",
+              "level": "yellow",
+              "error": null,
+              "issues": [
+                "Saknade uppgifter: belopp exklusive moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": 1234500,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "amount-full-jpeg",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": 100000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "wrapped-tax-sums-png",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+                "Ogiltigt belopp: moms",
+                "Saknade uppgifter: totalbelopp, belopp exklusive moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": 161600,
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 202000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "conventional-control-png",
+              "subset": "raster",
+              "level": "yellow",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                }
+              ]
+            },
+            {
+              "id": "native-inline-tax-summaries",
+              "subset": "pdf-native",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+                "Saknade uppgifter: totalbelopp, belopp exklusive moms, moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": 280000,
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 350000,
+                  "actual": null
+                },
+                {
+                  "name": "vat_cents",
+                  "expected": 70000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "native-wrapped-tax-summaries",
+              "subset": "pdf-native",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": 700000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "scanned-full-tax-summaries",
+              "subset": "pdf-raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Saknade uppgifter: totalbelopp, belopp exklusive moms"
+              ],
+              "wrongFields": [
+                {
+                  "name": "net_cents",
+                  "expected": 360000,
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 450000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "scanned-amount-tax-summaries",
+              "subset": "pdf-raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "total_cents",
+                  "expected": 800000,
+                  "actual": null
+                }
+              ]
+            },
+            {
+              "id": "readable-conflicting-gross-png",
+              "subset": "raster",
+              "level": "yellow",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                },
+                {
+                  "name": "total_cents",
+                  "expected": null,
+                  "actual": 500000
+                }
+              ]
+            },
+            {
+              "id": "readable-invalid-gross-png",
+              "subset": "raster",
+              "level": "yellow",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                },
+                {
+                  "name": "total_cents",
+                  "expected": null,
+                  "actual": 500000
+                }
+              ]
+            },
+            {
+              "id": "destroyed-low-resolution-source",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Dokumentet saknar tillräcklig läsbar text.",
+                "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, totalbelopp, belopp exklusive moms, moms, valuta, organisationsnummer"
+              ],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": null
+                },
+                {
+                  "name": "currency",
+                  "expected": "SEK",
+                  "actual": null
+                },
+                {
+                  "name": "due_at",
+                  "expected": "2026-11-19",
+                  "actual": null
+                },
+                {
+                  "name": "invoice_number",
+                  "expected": "94150",
+                  "actual": null
+                },
+                {
+                  "name": "issued_at",
+                  "expected": "2026-10-20",
+                  "actual": null
+                },
+                {
+                  "name": "kind",
+                  "expected": "invoice",
+                  "actual": "other"
+                },
+                {
+                  "name": "net_cents",
+                  "expected": 240000,
+                  "actual": null
+                },
+                {
+                  "name": "organization_number",
+                  "expected": "5599990099",
+                  "actual": null
+                },
+                {
+                  "name": "party",
+                  "expected": "Exempelverkstan AB",
+                  "actual": null
+                },
+                {
+                  "name": "reference",
+                  "expected": "000026",
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 300000,
+                  "actual": null
+                },
+                {
+                  "name": "vat_cents",
+                  "expected": 60000,
+                  "actual": null
+                }
+              ]
+            }
+          ]
+        },
+        "after": {
+          "startedAt": "2026-11-05T17:08:58.873Z",
+          "completedAt": "2026-11-05T17:09:42.620Z",
+          "sourceCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+          "sourceWorkingTreeDirty": true,
+          "sourceSha256": "10edeb7b4f0db528c6c03945cf7254b2ebd5afa9df8488115f82ed66f7c66dd8",
+          "sourceHashes": {
+            "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+            "package.json": "ec6237dd6982279ca62783131a9a340ef12d5fee18a21ceba8381a5d4fc7bc2e",
+            "sites/lib/bank-api-original.js": "2868abc1423a942d6eed583cbc14a2ab7b68cba533f1320636d4d5692d993a27",
+            "sites/lib/bankgiro-deposit-identity.js": "46e1135ba45750e5c06f7c6a2e662ec462dc839218a2d5d707adafc95bec7ac4",
+            "sites/lib/bankgiro-source-evidence.js": "495ea7b21d978011cfef8b3f319f1ba5b68b4d04c7df3315b30e10527efff1e7",
+            "sites/lib/bankgiro-xlsx.js": "cca184605ad533867daa1f5486e27071c3c5551894e05feb161e313d2320c384",
+            "sites/lib/banking/openpayments-normalization.js": "13782ec9a42db954153b6bebaf35b8f795d62035d4d6259b0e8b21717ac5185b",
+            "sites/lib/camt-payer.js": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827",
+            "sites/lib/camt-xml.js": "a517eb363c4029a3bb9cb5870da32dfd3b32c2de722dfcb921ed81407342889e",
+            "sites/lib/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "sites/lib/domain.ts": "0c2c5cfa9e6889cd67f8b82e984d3c6bfb7dc2b14c1f418faee805cf10f6d6e7",
+            "sites/lib/invoice-details.js": "79f45c55f868c8fbb51161b96d382e430059254e69e9686e65df9c4cb9a16c6e",
+            "sites/lib/invoice-fields.js": "ec61aa0d1c46b974f559870047f2a4f08b2d6c5b656d14bca5443b9fbc28c64f",
+            "sites/lib/invoice-reference-policy.js": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e",
+            "sites/lib/payer-evidence.js": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661",
+            "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "sites/lib/reconciliation-engine.js": "0a77b474b124405bff188a1a2fd5e122c849ae50c2687c6c1a4cc51345104f8c",
+            "sites/lib/reference-evidence-compat.js": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba",
+            "sites/lib/uuid.js": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4",
+            "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+            "sites/package.json": "296bf119047d447b5a5164855511f00d33684f0656bfdb6ed7c3d985f0e4b0be",
+            "src/document-triage.js": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb",
+            "src/image-dimensions.js": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+            "src/importers.js": "ba5a6c489c1a0f2836d1c132f304b050a3c3fa26b9aa119f12654c1e331c3252",
+            "src/invoice-details.js": "79f45c55f868c8fbb51161b96d382e430059254e69e9686e65df9c4cb9a16c6e",
+            "src/invoice-extraction.js": "f7d12eb4a9d7b4a133f0dab5ac00addb4971663b2401e26bf27ece4c0c343de0",
+            "src/invoice-worker.js": "eb705043cfc30c246760472fd04834cf584040ba76a1ee25356e83d5c6d1377e",
+            "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+            "src/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+            "src/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4"
+          },
+          "sourceStable": true,
+          "runnerSha256": "dcb84f2213df05f7c0defa82f17bf7f16a08f19ebe33e136461e5884f7acd529",
+          "runtime": {
+            "node": "v24.22.1",
+            "dependencies": {
+              "pdfjs-dist": "5.4.149",
+              "@napi-rs/canvas": "0.1.80",
+              "tesseract.js": "6.0.1",
+              "@tesseract.js-data/swe": "1.0.0"
+            },
+            "loadBefore": [
+              2.17,
+              2.17,
+              1.65
+            ],
+            "loadAfter": [
+              2.57,
+              2.27,
+              1.71
+            ]
+          },
+          "summaries": {
+            "node": {
+              "text": {
+                "documents": 14,
+                "counts": {
+                  "tp": 175,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 175,
+                  "returnedNonNull": 175,
+                  "correctNull": 7,
+                  "reviewedFields": 182
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 14,
+                "documentCoverage": 1,
+                "greenCount": 7,
+                "falseGreenCount": 0,
+                "manualReviewCount": 7,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.47931405714285313,
+                "medianTimeMs": 0.4302961999999866,
+                "p95TimeMs": 0.8697040000000016,
+                "requiredFields": {
+                  "tp": 133,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "nativePdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 2,
+                "falseGreenCount": 0,
+                "manualReviewCount": 0,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 662.736997,
+                "medianTimeMs": 662.736997,
+                "p95TimeMs": 672.8360499999981,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "rasterAll": {
+                "documents": 10,
+                "counts": {
+                  "tp": 101,
+                  "fp": 5,
+                  "fn": 16,
+                  "expectedNonNull": 117,
+                  "returnedNonNull": 106,
+                  "correctNull": 13,
+                  "reviewedFields": 130
+                },
+                "fieldPrecision": 0.9528301886792453,
+                "fieldRecall": 0.8632478632478633,
+                "exactDocuments": 5,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 10,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3394.557704099999,
+                "medianTimeMs": 3486.1041849999983,
+                "p95TimeMs": 4122.66714,
+                "requiredFields": {
+                  "tp": 80,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.898876404494382
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3275.968929999999,
+                "medianTimeMs": 3275.968929999999,
+                "p95TimeMs": 3397.851168999994,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableNormalRaster": {
+                "documents": 6,
+                "counts": {
+                  "tp": 76,
+                  "fp": 2,
+                  "fn": 2,
+                  "expectedNonNull": 78,
+                  "returnedNonNull": 78,
+                  "correctNull": 0,
+                  "reviewedFields": 78
+                },
+                "fieldPrecision": 0.9743589743589743,
+                "fieldRecall": 0.9743589743589743,
+                "exactDocuments": 4,
+                "documentCoverage": 0.6666666666666666,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 6,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3706.4543153333325,
+                "medianTimeMs": 3772.865336,
+                "p95TimeMs": 4122.66714,
+                "requiredFields": {
+                  "tp": 60,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableSafetyRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 22,
+                  "fp": 2,
+                  "fn": 2,
+                  "expectedNonNull": 24,
+                  "returnedNonNull": 24,
+                  "correctNull": 2,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.9166666666666666,
+                "fieldRecall": 0.9166666666666666,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3449.686942999997,
+                "medianTimeMs": 3449.686942999997,
+                "p95TimeMs": 3583.3161489999984,
+                "requiredFields": {
+                  "tp": 18,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2403.7386315000003,
+                "medianTimeMs": 2403.7386315000003,
+                "p95TimeMs": 2405.3513779999994,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            },
+            "sites": {
+              "text": {
+                "documents": 14,
+                "counts": {
+                  "tp": 175,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 175,
+                  "returnedNonNull": 175,
+                  "correctNull": 7,
+                  "reviewedFields": 182
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 14,
+                "documentCoverage": 1,
+                "greenCount": 7,
+                "falseGreenCount": 0,
+                "manualReviewCount": 7,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 0.4771326571428566,
+                "medianTimeMs": 0.3984732000000122,
+                "p95TimeMs": 1.2324151999999913,
+                "requiredFields": {
+                  "tp": 133,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "nativePdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 2,
+                "falseGreenCount": 0,
+                "manualReviewCount": 0,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 662.4964,
+                "medianTimeMs": 662.4964,
+                "p95TimeMs": 672.4563159999998,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "rasterAll": {
+                "documents": 10,
+                "counts": {
+                  "tp": 101,
+                  "fp": 5,
+                  "fn": 16,
+                  "expectedNonNull": 117,
+                  "returnedNonNull": 106,
+                  "correctNull": 13,
+                  "reviewedFields": 130
+                },
+                "fieldPrecision": 0.9528301886792453,
+                "fieldRecall": 0.8632478632478633,
+                "exactDocuments": 5,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 10,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3391.2700907999983,
+                "medianTimeMs": 3486.2189199999993,
+                "p95TimeMs": 4090.8372170000007,
+                "requiredFields": {
+                  "tp": 80,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.898876404494382
+                }
+              },
+              "scannedPdf": {
+                "documents": 2,
+                "counts": {
+                  "tp": 26,
+                  "fp": 0,
+                  "fn": 0,
+                  "expectedNonNull": 26,
+                  "returnedNonNull": 26,
+                  "correctNull": 0,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 1,
+                "fieldRecall": 1,
+                "exactDocuments": 2,
+                "documentCoverage": 1,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3277.8054924999997,
+                "medianTimeMs": 3277.8054924999997,
+                "p95TimeMs": 3398.056923999997,
+                "requiredFields": {
+                  "tp": 20,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableNormalRaster": {
+                "documents": 6,
+                "counts": {
+                  "tp": 76,
+                  "fp": 2,
+                  "fn": 2,
+                  "expectedNonNull": 78,
+                  "returnedNonNull": 78,
+                  "correctNull": 0,
+                  "reviewedFields": 78
+                },
+                "fieldPrecision": 0.9743589743589743,
+                "fieldRecall": 0.9743589743589743,
+                "exactDocuments": 4,
+                "documentCoverage": 0.6666666666666666,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 6,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3701.2589963333317,
+                "medianTimeMs": 3771.5505189999994,
+                "p95TimeMs": 4090.8372170000007,
+                "requiredFields": {
+                  "tp": 60,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "readableSafetyRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 22,
+                  "fp": 2,
+                  "fn": 2,
+                  "expectedNonNull": 24,
+                  "returnedNonNull": 24,
+                  "correctNull": 2,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.9166666666666666,
+                "fieldRecall": 0.9166666666666666,
+                "exactDocuments": 0,
+                "documentCoverage": 0,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 3449.4615520000007,
+                "medianTimeMs": 3449.4615520000007,
+                "p95TimeMs": 3583.4283460000006,
+                "requiredFields": {
+                  "tp": 18,
+                  "fp": 0,
+                  "fn": 0,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 1
+                }
+              },
+              "unreadableRaster": {
+                "documents": 2,
+                "counts": {
+                  "tp": 3,
+                  "fp": 1,
+                  "fn": 12,
+                  "expectedNonNull": 15,
+                  "returnedNonNull": 4,
+                  "correctNull": 11,
+                  "reviewedFields": 26
+                },
+                "fieldPrecision": 0.75,
+                "fieldRecall": 0.2,
+                "exactDocuments": 1,
+                "documentCoverage": 0.5,
+                "greenCount": 0,
+                "falseGreenCount": 0,
+                "manualReviewCount": 2,
+                "unnecessaryReviewCount": 0,
+                "errorCount": 0,
+                "averageTimeMs": 2403.111912999997,
+                "medianTimeMs": 2403.111912999997,
+                "p95TimeMs": 2404.627935999997,
+                "requiredFields": {
+                  "tp": 2,
+                  "fp": 0,
+                  "fn": 9,
+                  "fieldPrecision": 1,
+                  "fieldRecall": 0.18181818181818182
+                }
+              }
+            }
+          },
+          "nonExactDocuments": [
+            {
+              "id": "sum-full-png",
+              "subset": "raster",
+              "level": "yellow",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                }
+              ]
+            },
+            {
+              "id": "conventional-control-png",
+              "subset": "raster",
+              "level": "yellow",
+              "error": null,
+              "issues": [],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                }
+              ]
+            },
+            {
+              "id": "readable-conflicting-gross-png",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Motstridiga värden för totalbelopp; dokumentet kan innehålla flera fakturor.",
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                }
+              ]
+            },
+            {
+              "id": "readable-invalid-gross-png",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+                "Ogiltigt belopp: moms",
+                "Ogiltigt belopp: belopp exklusive moms",
+                "Saknade uppgifter: totalbelopp"
+              ],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": "1223-4567"
+                }
+              ]
+            },
+            {
+              "id": "destroyed-low-resolution-source",
+              "subset": "raster",
+              "level": "red",
+              "error": null,
+              "issues": [
+                "Dokumentet saknar tillräcklig läsbar text.",
+                "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, totalbelopp, belopp exklusive moms, moms, valuta, organisationsnummer"
+              ],
+              "wrongFields": [
+                {
+                  "name": "bankgiro",
+                  "expected": "123-4567",
+                  "actual": null
+                },
+                {
+                  "name": "currency",
+                  "expected": "SEK",
+                  "actual": null
+                },
+                {
+                  "name": "due_at",
+                  "expected": "2026-11-19",
+                  "actual": null
+                },
+                {
+                  "name": "invoice_number",
+                  "expected": "94150",
+                  "actual": null
+                },
+                {
+                  "name": "issued_at",
+                  "expected": "2026-10-20",
+                  "actual": null
+                },
+                {
+                  "name": "kind",
+                  "expected": "invoice",
+                  "actual": "other"
+                },
+                {
+                  "name": "net_cents",
+                  "expected": 240000,
+                  "actual": null
+                },
+                {
+                  "name": "organization_number",
+                  "expected": "5599990099",
+                  "actual": null
+                },
+                {
+                  "name": "party",
+                  "expected": "Exempelverkstan AB",
+                  "actual": null
+                },
+                {
+                  "name": "reference",
+                  "expected": "000026",
+                  "actual": null
+                },
+                {
+                  "name": "total_cents",
+                  "expected": 300000,
+                  "actual": null
+                },
+                {
+                  "name": "vat_cents",
+                  "expected": 60000,
+                  "actual": null
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

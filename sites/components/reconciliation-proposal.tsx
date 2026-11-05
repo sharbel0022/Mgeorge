@@ -24,6 +24,12 @@ export function validReconciliationProposal(value:unknown,transactionId:string,r
    invoices.add(allocation.invoiceId);allocated+=allocation.amountMinor;if(!Number.isSafeInteger(allocated))return false;
   }
   if(allocated>decision.availableMinor||decision.unallocatedMinor!==decision.availableMinor-allocated||decision.status==='BLOCKED'&&decision.allocations.length||decision.status==='VERIFIED'&&decision.bankEvidenceStatus!=='VERIFIED')return false;
+  if(!decision.economic&&decision.allocations.length)return false;
+  // The producer never verifies a multi-invoice, partial or excess proposal.
+  // Reject contradictory transport data before it can acquire a green label.
+  if(decision.status==='VERIFIED'&&(decision.allocations.length!==1||decision.allocations[0].settlement!=='full'||decision.allocations[0].invoiceRemainingAfterMinor!==0||decision.unallocatedMinor!==0))return false;
+  if(decision.allocations.length>1&&(decision.status!=='REVIEW'||!decision.reasonCodes.includes('MULTIPLE_INVOICES_REQUIRE_REVIEW')||decision.unallocatedMinor!==0||decision.allocations.some((allocation:Allocation)=>allocation.settlement!=='multiple'||allocation.invoiceRemainingAfterMinor!==0)))return false;
+  if(decision.allocations.length===1&&decision.allocations[0].settlement==='multiple')return false;
  }
  return value.decisions.filter((decision:Decision)=>decision.transactionId===transactionId&&decision.status===value.selectedStatus).length===1;
 }
@@ -57,6 +63,7 @@ const reasons:Record<string,string>={
  REPORT_DEPOSIT_RELATION_REQUIRED:'Rapportens relation till insättningen behöver styrkas.',REPORT_INCOMPLETE_OR_CONFLICTING:'Rapporten är ofullständig eller motstridig.',
  INVOICE_NOT_FOUND:'Ingen entydig faktura har identifierats.',AMBIGUOUS_INVOICE_REFERENCE:'Flera fakturor har samma referens.',INVOICE_REVIEW_OR_DIRECTION_REQUIRED:'Fakturans granskning eller riktning behöver kontrolleras.',
  PARTIAL_PAYMENT_REQUIRES_REVIEW:'Förslaget gäller en delbetalning och behöver granskas.',OVERPAYMENT_REQUIRES_REVIEW:'Förslaget lämnar ett överskjutande belopp som behöver granskas.',MULTIPLE_INVOICES_REQUIRE_REVIEW:'Fördelning mot flera fakturor behöver granskas.',
+ MULTIPLE_INVOICE_AMOUNT_CONFLICT:'Summan av fakturornas återstående belopp stämmer inte exakt med betalningen.',MULTIPLE_INVOICE_CUSTOMER_CONFLICT:'Fakturorna avser olika kunder och kan inte fördelas tillsammans.',COMPETING_PAYMENTS_REQUIRE_REVIEW:'Flera betalningar kan avse samma faktura. Kontrollera dem tillsammans.',
  PAYMENT_ALREADY_ALLOCATED:'Betalningen har redan en registrerad fördelning.',NON_ECONOMIC_REPORT_OBSERVATION:'Underlaget är ingen separat ekonomisk betalning.',BANK_EVIDENCE_CONFLICT:'Bankunderlagen är motstridiga.',
  EXACT_REFERENCE_AND_BANK_EVIDENCE:'Exakt referens och bankunderlag stöder förslaget; separat godkännande krävs.',
 };
@@ -76,6 +83,7 @@ export function ReconciliationProposalView({transactionId,revision,invoices=[],d
    <p role="status"><strong>{combined==='BLOCKED'?'Blockerat förslag':combined==='REVIEW'?'Behöver granskas':'Underlaget stöder ett förslag'}</strong></p>
    {expired&&<p>Kontoevidensens giltighet har gått ut. Läs ett nytt förslag innan underlaget granskas.</p>}
    {reasonCodes.length>0&&<ul>{reasonCodes.map(code=><li key={code}>{reasons[code]||'Underlaget behöver kontrolleras innan förslaget kan godkännas.'}</li>)}</ul>}
+   {combined!=='BLOCKED'&&selected.allocations.length>0&&<dl aria-label="Fördelningens belopp"><div><dt>Tillgängligt i betalningen</dt><dd>{money(selected.availableMinor)}</dd></div><div><dt>Fördelat i förslaget</dt><dd>{money(selected.availableMinor-selected.unallocatedMinor)}</dd></div><div><dt>Kvar att fördela</dt><dd>{money(selected.unallocatedMinor)}</dd></div></dl>}
    {combined!=='BLOCKED'&&selected.allocations.length>0&&<ul aria-label="Föreslagna fakturakopplingar">{selected.allocations.map(allocation=><li key={allocation.invoiceId}>Faktura {invoices.find(invoice=>invoice.id===allocation.invoiceId)?.number||'som behöver identifieras'} · föreslaget belopp {money(allocation.amountMinor)}</li>)}</ul>}
    <p>Kontrollerad {new Date(result.checkedAt).toLocaleString('sv-SE',{timeZone:'Europe/Stockholm'})}. Ett nytt förslag behövs om underlaget ändras.</p>
   </>}

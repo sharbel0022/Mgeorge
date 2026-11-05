@@ -15,6 +15,7 @@ import { runtimeBankConfig, runtimeBankStatus } from '../lib/banking/runtime-con
 import { confirmedBankConsent } from '../lib/banking/status-view.ts';
 import { accountReadCooldown } from '../lib/banking/account-read-cooldown.ts';
 import { applyCurrentMigrations, businessSql } from './helpers/company-compat-fixture.mjs';
+import { provisionCompany } from '../lib/company-storage.js';
 
 // Exercise the real route services, encryption, domain and SQL. Only the identity
 // provider and banking HTTP boundary are replaced. No test can call a live bank.
@@ -94,7 +95,7 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const readGuardUrl = compiledModule('../lib/banking/account-read-guard.ts', { '../server': serverUrl, './store': storeUrl, './enable-banking': providerUrl });
   const openPaymentsSchedulerUrl = compiledModule('../lib/banking/openpayments-scheduler.ts', { 'cloudflare:workers': cloudflare, '../server': serverUrl });
   const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, './account-read-guard': readGuardUrl, './openpayments-scheduler':openPaymentsSchedulerUrl, './company-sync':jsUrl('export async function dispatchCompanyAutomaticSync(){return null;}'), '../bankgiro-ingest-service':jsUrl(`export async function runBankgiroSource(owner){globalThis[${JSON.stringify(key)}].reportOwner=owner;return {enabled:false,state:'DISABLED'};}`),'../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
-  f.store = await import(storeUrl); f.service = await import(serviceUrl);
+  f.server = await import(serverUrl); f.store = await import(storeUrl); f.service = await import(serviceUrl);
   f.mcp = await import(compiledModule('../lib/banking/mcp.ts', { './service': serviceUrl }));
   f.info = { name: 'Local test app', kid: appId, environment, active: true, redirect_urls: [redirect], countries: ['SE'], services: ['AIS'] };
   f.account = { uid: accountUid, name: 'Company account', currency: 'SEK', account_id: { iban: 'SE4550000000058398257466' } };
@@ -133,6 +134,221 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   f.connection = () => sql.prepare('SELECT * FROM bank_connections WHERE owner=?').get(f.owner);
   return f;
 }
+
+test('rating8: bank authorization rejects a page on another origin before contacting the provider',async t=>{
+  const f=await fixture(t);await f.seedApp();
+  const moved='https://moved-invoice.example';
+  const req=new Request(moved+'/api/bank/connect',{method:'POST',headers:{Origin:moved,'Content-Type':'application/json'},body:JSON.stringify({bankName:'Swedbank',country:'SE',dateFrom:bankUtcDate()})});
+  await assert.rejects(f.service.connect(req),/returadress/i);
+  assert.equal(f.calls.length,0);assert.equal(count(f,'bank_auth_flows'),0);
+  const status=await(await f.service.status(new Request(moved+'/api/bank/status'))).json();
+  assert.equal(status.callback.originMatches,false);
+  assert.equal(status.callback.canStartAuthorization,false);
+});
+
+test('rating8: a protected callback setting supports a migrated origin only after exact provider registration',async t=>{
+  const f=await fixture(t),moved='https://moved-invoice.example',target=moved+'/api/bank/callback';
+  f.env.ENABLE_BANKING_REDIRECT_URL=target;await f.seedApp();
+  const request=()=>new Request(moved+'/api/bank/connect',{method:'POST',headers:{Origin:moved,'Content-Type':'application/json'},body:JSON.stringify({bankName:'Swedbank',country:'SE',dateFrom:bankUtcDate()})});
+  await assert.rejects(f.service.connect(request()),/returadress/i);
+  assert.equal(f.calls.filter(c=>c.name==='startAuth').length,0);
+  f.info.redirect_urls=[target];
+  const result=await f.service.connect(request());assert.equal(result.status,200);
+  assert.equal(f.auth.redirectUrl,target);
+  assert.equal(f.sql.prepare('SELECT redirect_uri FROM bank_auth_flows').get().redirect_uri,target);
+  const status=await(await f.service.status(new Request(moved+'/api/bank/status'))).json();
+  assert.equal(status.callback.originMatches,true);assert.equal(status.callback.canStartAuthorization,true);
+});
+
+test('rating8: callback configuration cannot take a redirect target from query, credentials or another path',async t=>{
+  const f=await fixture(t);await f.seedApp();
+  for(const invalid of ['http://invoice.example/api/bank/callback','https://user:secret@invoice.example/api/bank/callback',origin+'/api/bank/callback?next=https://evil.example',origin+'/api/bank/callback#fragment',origin+'/other','not a URL']){
+    f.env.ENABLE_BANKING_REDIRECT_URL=invalid;
+    await assert.rejects(f.service.connect(post('connect',{bankName:'Swedbank',country:'SE',dateFrom:bankUtcDate()})));
+    assert.equal(f.calls.length,0);assert.equal(count(f,'bank_auth_flows'),0);
+  }
+});
+
+test('rating8: fresh consent revalidation recovers only operational status and never imports or allocates money',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required',last_error='Previous local validation failed',auto_sync_enabled=1,sync_failures=1").run();
+  const before={...f.connection()};
+  const result=await(await f.service.revalidateConsent(post('revalidate'))).json();
+  assert.equal(result.status,'connected');assert.equal(result.revalidated,true);
+  assert.equal(result.financialChanges,false);assert.equal(f.workspace(),null);
+  assert.deepEqual(f.calls.map(call=>call.name),['getSession']);
+  const after={...f.connection()};
+  for(const key of Object.keys(before).filter(key=>!['status','last_error','updated_at','valid_until'].includes(key)))assert.deepEqual(after[key],before[key],key);
+  assert.equal(after.valid_until,new Date(Math.min(Date.parse(before.valid_until),Date.parse(f.live.access.valid_until))).toISOString());
+  assert.equal(after.status,'connected');assert.equal(after.last_error,null);
+  assert.equal(count(f,'bank_sync_runs'),0);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,1);
+});
+
+for(const [label,mutate] of [
+  ['revoked session',f=>{f.live.status='REVOKED';}],
+  ['missing selected account',f=>{f.live.accounts=[];f.live.accounts_data=[];}],
+  ['wrong bank',f=>{f.live.aspsp.name='Another bank';}],
+  ['personal consent',f=>{f.live.psu_type='personal';}],
+  ['expired remote consent',f=>{f.live.access.valid_until='2000-01-01T00:00:00.000Z';}],
+])test('rating8: consent revalidation rejects '+label+' without clearing its blocked status',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();mutate(f);
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+  assert.equal(f.calls.filter(c=>c.name==='getTransactions').length,0);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+});
+
+test('rating8: consent revalidation obeys cooldowns, stopped retries and expired grants before provider access',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const checks=[
+    ['retry_after',new Date(Date.now()+600000).toISOString()],
+    ['sync_failures',3],
+    ['valid_until','2000-01-01T00:00:00.000Z'],
+    ['account_evidence_retry',JSON.stringify({status:'unknown',checkedAt:new Date().toISOString(),provenance:'retry_after_missing'})],
+    ['status','revocation_pending'],
+  ];
+  for(const [column,value]of checks){const before=f.connection()[column];f.sql.prepare(`UPDATE bank_connections SET ${column}=?`).run(value);await assert.rejects(f.service.revalidateConsent(post('revalidate')));f.sql.prepare(`UPDATE bank_connections SET ${column}=?`).run(before);}
+  f.sql.prepare("INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES('recent-check',?,0,'bank.consent.revalidation.started','{}',?)").run(f.owner,new Date().toISOString());
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(f.calls.length,0);
+});
+
+test('rating8: losing the bank lease during consent revalidation cannot restore the connection',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  f.provider.getSession=async()=>{f.sql.prepare("UPDATE bank_locks SET token='replacement'").run();return structuredClone(f.live);};
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+});
+
+for(const timing of ['before read','during read'])test('rating8: company binding '+timing+' blocks the legacy consent recovery path',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const bind=()=>f.sql.prepare("INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES('other-company',?,'evidence',?)").run(f.owner,Date.now());
+  if(timing==='before read')bind();else f.provider.getSession=async()=>{bind();return structuredClone(f.live);};
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+  assert.equal(f.calls.filter(c=>c.name==='getSession').length,timing==='before read'?0:1);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+});
+
+for(const [label,change]of [
+  ['selected accounts',f=>f.sql.prepare("UPDATE bank_connections SET selected_accounts='[]'").run()],
+  ['retained accounts',f=>f.sql.prepare("UPDATE bank_connections SET encrypted_accounts='replacement'").run()],
+  ['bank identity',f=>f.sql.prepare("UPDATE bank_connections SET bank_name='Another bank'").run()],
+  ['provider environment',f=>f.sql.prepare("UPDATE bank_connections SET environment='SANDBOX'").run()],
+  ['consent metadata',f=>f.sql.prepare("UPDATE bank_connections SET consent_metadata='{}'").run()],
+  ['local expiry',f=>f.sql.prepare("UPDATE bank_connections SET valid_until='2000-01-01T00:00:00.000Z'").run()],
+  ['authenticated owner',f=>{f.user={userId:'another-owner'};}],
+  ['runtime application',f=>{f.env.ENABLE_BANKING_APPLICATION_ID=accountUid;}],
+])test('rating8: changed '+label+' fences the consent recovery commit',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  f.provider.getSession=async()=>{change(f);return structuredClone(f.live);};
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+});
+
+test('rating8: consent recovery MCP rejects caller-supplied owner and records no financial work',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const rpc=argumentsValue=>f.mcp.bankRpc({jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'bank_revalidate_consent',arguments:argumentsValue}});
+  const denied=await(await rpc({owner:'another-owner'})).json();assert.equal(denied.error.code,-32602);assert.equal(f.calls.length,0);
+  const accepted=await(await rpc({})).json();assert.equal(accepted.result.structuredContent.revalidated,true);assert.equal(accepted.result.structuredContent.financialChanges,false);
+  assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+for(const replaced of [false,true])test('rating8 review: a lost consent commit reply remains successful'+(replaced?' after lease replacement':''),async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const batch=f.d1.batch.bind(f.d1);let lost=false;
+  f.d1.batch=async statements=>{
+    const result=await batch(statements);
+    if(!lost&&statements.some(s=>s.values?.includes('bank.consent.revalidated'))){
+      lost=true;if(replaced)f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());
+      throw Error('SYNTHETIC_LOST_COMMIT_REPLY');
+    }
+    return result;
+  };
+  const result=await(await f.service.revalidateConsent(post('revalidate'))).json();
+  assert.equal(result.revalidated,true);assert.equal(result.financialChanges,false);
+  assert.equal(result.status,'connected');assert.ok(result.checkedAt);
+  assert.equal(JSON.stringify(result).includes('SYNTHETIC_LOST_COMMIT_REPLY'),false);
+  assert.deepEqual(f.sql.prepare("SELECT action FROM audit_events ORDER BY rowid").all().map(x=>x.action),['bank.consent.revalidation.started','bank.consent.revalidated']);
+  assert.equal(f.calls.length,1);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+  if(replaced)f.sql.prepare('DELETE FROM bank_locks').run();
+  const replay=await(await f.service.revalidateConsent(post('revalidate'))).json();
+  assert.equal(replay.revalidated,true);assert.equal(replay.replayed,true);assert.equal(replay.checkedAt,result.checkedAt);assert.equal(f.calls.length,1);
+});
+
+test('rating8 review: an unreadable consent receipt preserves the unknown outcome without a false failure event',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const batch=f.d1.batch.bind(f.d1),prepare=f.d1.prepare.bind(f.d1);let lost=false;
+  f.d1.batch=async statements=>{const result=await batch(statements);if(!lost&&statements.some(s=>s.values?.includes('bank.consent.revalidated'))){lost=true;throw Error('SYNTHETIC_LOST_COMMIT_REPLY');}return result;};
+  f.d1.prepare=sql=>{if(lost&&sql.includes('FROM audit_events')&&sql.includes('bank.consent.revalidated'))throw Error('SYNTHETIC_RECEIPT_UNAVAILABLE');return prepare(sql);};
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')),/BANK_CONSENT_OUTCOME_UNKNOWN/);
+  assert.equal(f.connection().status,'connected');
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n,0);
+});
+
+test('rating8 review: lost consent reply plus replaced lease and unreadable receipt never claims that nothing was saved',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const batch=f.d1.batch.bind(f.d1),prepare=f.d1.prepare.bind(f.d1);let lost=false;
+  f.d1.batch=async statements=>{const result=await batch(statements);if(!lost&&statements.some(s=>s.values?.includes('bank.consent.revalidated'))){lost=true;f.sql.prepare("UPDATE bank_locks SET token='replacement',expires_at=?").run(future());throw Error('BANK_LEASE_LOST');}return result;};
+  f.d1.prepare=sql=>{if(lost&&sql.includes('FROM audit_events')&&sql.includes('bank.consent.revalidated'))throw Error('SYNTHETIC_RECEIPT_UNAVAILABLE');return prepare(sql);};
+  let failure;try{await f.service.revalidateConsent(post('revalidate'));}catch(error){failure=error;}
+  const response=f.service.bankFailure(failure),result=await response.json();
+  assert.equal(response.status,503);assert.equal(result.code,'BANK_CONSENT_OUTCOME_UNKNOWN');assert.equal(result.status_unknown,true);
+  assert.equal(result.error.includes('sparades inte'),false);assert.equal(result.error.includes('SYNTHETIC'),false);
+  assert.equal(f.connection().status,'connected');assert.equal(f.calls.length,1);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,1);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n,0);
+});
+
+test('rating8 review: a consent receipt cannot authorize replay after connection data changes',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  await f.service.revalidateConsent(post('revalidate'));
+  f.sql.prepare("UPDATE bank_connections SET encrypted_accounts='replacement'").run();
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(f.calls.length,1);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+test('rating8 review: adopted legacy storage cannot revalidate before a company sync scope exists',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  await provisionCompany(f.d1,{id:'synthetic-review-company',name:'Synthetic review company',actorId:f.owner,legacyOwner:f.owner,verifiedLegacyOwner:f.owner,verifiedBy:'synthetic-operator',verificationEvidence:'Explicit synthetic review ownership proof.'});
+  const req=post('revalidate',{companyId:'synthetic-review-company'});req.headers.set('x-company-id','synthetic-review-company');req.headers.set('x-company-context-version','1');
+  const result=await f.server.withCompanyRequest(async request=>{try{return await f.service.revalidateConsent(request);}catch(error){return f.service.bankFailure(error);}})(req);
+  assert.equal(result.status,403);assert.equal(f.calls.length,0);assert.equal(f.connection().status,'reauth_required');
+  assert.equal(count(f,'company_bank_sync_scopes'),0);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+test('rating8 review: foundation adoption immediately before commit still fences the legacy write',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  let adopted=false;
+  f.d1.beforeBatch=async statements=>{if(!adopted&&statements.some(s=>s.values?.includes('bank.consent.revalidated'))){adopted=true;await provisionCompany(f.d1,{id:'synthetic-race-company',name:'Synthetic race company',actorId:f.owner,legacyOwner:f.owner,verifiedLegacyOwner:f.owner,verifiedBy:'synthetic-operator',verificationEvidence:'Explicit synthetic concurrent adoption proof.'});}};
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(adopted,true);assert.equal(f.connection().status,'reauth_required');assert.equal(f.calls.length,1);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n,0);
+  assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.workspace().state.transactions.length,0);assert.equal(f.workspace().state.allocations.length,0);
+});
+
+for(const stage of ['started','reservation','reserved'])for(const column of ['account_evidence_retry','retry_after','sync_failures'])test('rating8 review: a new '+column+' hold at '+stage+' stops the outbound consent read',async t=>{
+  const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const value=column==='account_evidence_retry'?JSON.stringify({status:'unknown',checkedAt:new Date().toISOString(),provenance:'retry_after_missing'}):column==='retry_after'?future():3;
+  let changed=false;const applies=statements=>!changed&&statements.some(s=>stage==='started'?s.values?.includes('bank.consent.revalidation.started'):s.sql.includes('SET account_evidence_retry=?'));
+  const change=()=>{changed=true;f.sql.prepare(`UPDATE bank_connections SET ${column}=?`).run(value);};
+  if(stage==='reserved'){const batch=f.d1.batch.bind(f.d1);f.d1.batch=async statements=>{const result=await batch(statements);if(applies(statements))change();return result;};}
+  else f.d1.beforeBatch=statements=>{if(applies(statements))change();};
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(changed,true);assert.equal(f.calls.length,0);assert.equal(f.connection().status,'reauth_required');assert.equal(f.connection()[column],value);
+  assert.equal(count(f,'bank_sync_runs'),0);assert.equal(f.workspace(),null);
+});
 
 test('hash-only company accounts can be selected and synchronized without duplicates after renewed account UIDs', async t => {
   const f = await fixture(t);

@@ -4,9 +4,14 @@ on:
   schedule:
     - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
+  workflow_run:
+    workflows: [Payment control checks]
+    types: [completed]
+    branches: [main]
 
-# Only reviewed default-branch code may receive the OCR credential. Activation
-# follows the production checklist; this PR does not turn the service on.
+# Only reviewed default-branch code may receive the OCR credential. Resume the
+# durable queue after successful checks of the exact current main commit too;
+# the external periodic schedule may be delayed. Keep existing activation.
 permissions:
   contents: read
 concurrency:
@@ -15,18 +20,34 @@ concurrency:
 
 jobs:
   ocr:
-    if: github.ref == 'refs/heads/main' && vars.MG_CLOUD_OCR_ENABLED == 'true'
+    if: >-
+      github.ref == 'refs/heads/main' && vars.MG_CLOUD_OCR_ENABLED == 'true' &&
+      (github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.head_sha == github.sha))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
+      - name: Verify reviewed main before dependency installation
+        run: node scripts/verify-cloud-ocr-trigger.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Install locked OCR dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Recheck current main before OCR credential use
+        run: node scripts/verify-cloud-ocr-trigger.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Process at most six leased documents
         run: node scripts/run-sites-cloud-ocr.mjs
         env:
