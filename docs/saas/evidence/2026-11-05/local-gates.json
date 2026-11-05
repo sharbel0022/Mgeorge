@@ -1,0 +1,164 @@
+{
+  "sourceCommit": "95d9a4184275dcbec830ab9558973beba35c8c06",
+  "sourceTree": "41b5cda03ae26c619e69eeb3feb65959acc5d281",
+  "workingTreeClean": true,
+  "runtime": "v24.22.1",
+  "runtimeExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "npmExecPath": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/lib/node_modules/npm/bin/npm-cli.js",
+  "finishedAt": "2026-11-05T12:47:33.336799+00:00",
+  "expandedAcceptance": [
+    {
+      "name": "node-security",
+      "files": [
+        "test/saas-login-boundary.test.js",
+        "test/saas-test-isolation.test.js",
+        "test/saas-company-acceptance.test.js",
+        "test/company-api.test.js",
+        "test/company-boundary.test.js",
+        "test/company-client.test.js",
+        "test/bank-consent-api.test.js",
+        "test/openpayments-company-bank-sync.test.js",
+        "test/openpayments-company-bank-sync-normalization.test.js",
+        "test/openpayments-bankgiro-ingest.test.js",
+        "test/openpayments-node-transport.test.js",
+        "test/company-bank-sync.test.js",
+        "test/company-bank-sync-store.test.js",
+        "test/company-bank-sync-scheduler.test.js",
+        "test/company-bank-sync-fairness.test.js",
+        "test/company-bank-sync-legacy-binding.test.js",
+        "test/node-company-bank-sync.test.js",
+        "test/security-session-allocation.test.js",
+        "test/session-mutation-fence.test.js",
+        "test/bank-api.test.js",
+        "test/integration-job-api.test.js",
+        "test/backup-disaster-recovery.test.js"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "tests": 325,
+      "pass": 325,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    {
+      "name": "sites-security",
+      "files": [
+        "tests/saas-company-acceptance.test.mjs",
+        "tests/company-storage.test.mjs",
+        "tests/company-backup.test.mjs",
+        "tests/openpayments-lifecycle.test.mjs",
+        "tests/openpayments-expired-revocation.test.mjs",
+        "tests/saas-bank-runtime.test.mjs",
+        "tests/openpayments-company-sync.test.mjs",
+        "tests/openpayments-account-state.test.mjs",
+        "tests/openpayments-request-boundary.test.mjs",
+        "tests/openpayments-raw-receipt.test.mjs",
+        "tests/openpayments-capture.test.mjs",
+        "tests/openpayments-ingest.test.mjs",
+        "tests/openpayments-domain.test.mjs",
+        "tests/company-bank-sync.test.mjs",
+        "tests/company-bank-sync-backup.test.mjs",
+        "tests/company-sync-boundary-integration.test.mjs",
+        "tests/company-sync-scale.test.mjs",
+        "tests/saas-onboarding-server.test.mjs",
+        "tests/saas-onboarding-projection.test.mjs",
+        "tests/saas-onboarding-contract.test.mjs",
+        "tests/saas-onboarding-client.test.mjs",
+        "tests/saas-onboarding-views.test.mjs",
+        "tests/openpayments-provider.test.mjs",
+        "tests/openpayments-policy.test.mjs",
+        "tests/openpayments-http.test.mjs",
+        "tests/saas-owner-isolation.test.mjs",
+        "tests/saas-transport-privacy.test.mjs",
+        "tests/saas-upload-boundary.test.mjs",
+        "tests/banking-security.test.mjs",
+        "tests/banking-provider.test.mjs",
+        "tests/bank-account-consent.test.mjs",
+        "tests/bank-account-commit.test.mjs",
+        "tests/bank-state-integrity-q8.test.mjs",
+        "tests/mcp-security-q8.test.mjs",
+        "tests/bankgiro-authority.test.mjs",
+        "tests/backup-recovery.test.mjs",
+        "tests/seven-agent-0599-joined.test.mjs"
+      ],
+      "passed": true,
+      "exitCode": 0,
+      "signal": null,
+      "tests": 739,
+      "pass": 739,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  ],
+  "fullSuites": {
+    "node": {
+      "tests": 1899,
+      "pass": 1899,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sites": {
+      "tests": 3704,
+      "pass": 3704,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "bridge": {
+      "tests": 47,
+      "pass": 47,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "syntax": {
+    "node": "PASS:170 files",
+    "bridge": "PASS"
+  },
+  "sitesTypecheck": "PASS",
+  "sitesProductionBuild": "PASS",
+  "minimatchInstalledByteVerification": "PASS",
+  "audits": {
+    "root": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "sites": {
+      "info": 0,
+      "low": 0,
+      "moderate": 8,
+      "high": 0,
+      "critical": 0,
+      "total": 8
+    },
+    "bridge": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "excludedRuns": [
+    {
+      "runtime": "v27.0.0-alpha.0.0.0",
+      "reason": "npm exec selected cached alpha; transform-mode unsupported; runs terminated130 and excluded from passing evidence"
+    }
+  ],
+  "scope": "Synthetic local integration only. No real bank/Gmail or production financial action. Remote CI/main merge and any publication are parent-owned."
+}

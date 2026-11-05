@@ -1,0 +1,43 @@
+{
+  "observedAt": "2026-11-05T15:39:02Z",
+  "repository": "sharbel0022/Mgeorge",
+  "method": "Read-only GitHub Actions API list of latest 15 scheduled runs, run jobs, and actual latest OCR job log.",
+  "query": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?event=schedule&per_page=15",
+  "newerScheduledRunObserved": false,
+  "run": {
+    "id": 42013301104,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104",
+    "name": "Sites cloud OCR",
+    "workflowPath": ".github/workflows/sites-cloud-ocr.yml",
+    "headSha": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+    "branch": "main",
+    "event": "schedule",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "createdAt": "2026-11-05T10:45:08Z",
+    "startedAt": "2026-11-05T10:45:08Z",
+    "updatedAt": "2026-11-05T10:45:34Z"
+  },
+  "job": {
+    "id": 127197454985,
+    "name": "ocr",
+    "status": "completed",
+    "conclusion": "success",
+    "step": "Process at most six leased documents",
+    "stepConclusion": "success"
+  },
+  "actualLogResult": {
+    "timestamp": "2026-11-05T10:45:30.6420193Z",
+    "status": "complete",
+    "processed": 0,
+    "failed": 0
+  },
+  "safeLogExcerpt": "2026-11-05T10:45:30.6420193Z {\"status\":\"complete\",\"processed\":0,\"failed\":0}",
+  "limitations": [
+    "No newer scheduled run was returned by the current API listing.",
+    "A successful zero-document run does not verify OCR processing of a real document or the newly deployed application code.",
+    "The workflow-specific run-list endpoint was unavailable through the connector; the repository scheduled-run list and run/job log endpoints succeeded."
+  ],
+  "actionsPerformed": "Read-only inspection only; no workflow dispatch, activation, provider call, or production data modification."
+}

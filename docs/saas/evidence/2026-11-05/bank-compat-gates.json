@@ -1,0 +1,279 @@
+{
+  "baseCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+  "testedTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+  "localCommit": "47811cbbc91df25eb715af2953c79f92e8da38a1",
+  "publishedHead": "ab941744c3ee38be7ecd4c3121b8e7496082b9ab",
+  "sitesTree": "a17a42a1c9a4976717003defc40aeb54b9624bfa",
+  "sourceProvenance": "Full gates executed from a frozen staged index with no unstaged changes. The subsequent local commit and published head have exactly that tree. The sourceDirty field in individual receipts describes the staged, pre-commit execution accurately.",
+  "fullSuiteTotal": 5702,
+  "gates": {
+    "node-full": {
+      "name": "node-full",
+      "sourceCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+      "sourceTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+      "sourceDirty": true,
+      "frozenIndexNoUnstagedChanges": true,
+      "runtime": "v24.22.1",
+      "exitCode": 0,
+      "seconds": 242.504,
+      "startedAt": "2026-11-05T15:13:02.183629+00:00",
+      "finishedAt": "2026-11-05T15:17:04.687519+00:00",
+      "counts": {
+        "tests": 1899,
+        "pass": 1899,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "45de9d42aff29f387296cc498110e29a68b620080f22e6e705356cea9331b6d6",
+      "logBytes": 458521
+    },
+    "sites-full": {
+      "name": "sites-full",
+      "sourceCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+      "sourceTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+      "sourceDirty": true,
+      "frozenIndexNoUnstagedChanges": true,
+      "runtime": "v24.22.1",
+      "exitCode": 0,
+      "seconds": 233.686,
+      "startedAt": "2026-11-05T15:13:02.188344+00:00",
+      "finishedAt": "2026-11-05T15:16:55.874051+00:00",
+      "counts": {
+        "tests": 3756,
+        "pass": 3756,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "d2488fc88dd619531e31eb606f370ea31142be4fdce527d62dae5e974f1a98cb",
+      "logBytes": 891891
+    },
+    "bridge-full": {
+      "name": "bridge-full",
+      "sourceCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+      "sourceTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+      "sourceDirty": true,
+      "frozenIndexNoUnstagedChanges": true,
+      "runtime": "v24.22.1",
+      "exitCode": 0,
+      "seconds": 7.223,
+      "startedAt": "2026-11-05T15:13:02.182267+00:00",
+      "finishedAt": "2026-11-05T15:13:09.405736+00:00",
+      "counts": {
+        "tests": 47,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "3891e1ad50940a86db714464ef70f255ef65643d3698de98c6b1aeabe49b422e",
+      "logBytes": 10928
+    },
+    "syntax": {
+      "name": "syntax",
+      "sourceCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+      "sourceTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+      "sourceDirty": true,
+      "frozenIndexNoUnstagedChanges": true,
+      "runtime": "v24.22.1",
+      "exitCode": 0,
+      "seconds": 9.022,
+      "startedAt": "2026-11-05T15:16:38.619904+00:00",
+      "finishedAt": "2026-11-05T15:16:47.642279+00:00",
+      "counts": {},
+      "logSha256": "f0b91ae462185ef46114879dc9a0ed427e5355d6d3d442bdc07eb403b38d2c5a",
+      "logBytes": 42
+    },
+    "types": {
+      "name": "types",
+      "sourceCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+      "sourceTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+      "sourceDirty": true,
+      "frozenIndexNoUnstagedChanges": true,
+      "runtime": "v24.22.1",
+      "exitCode": 0,
+      "seconds": 18.048,
+      "startedAt": "2026-11-05T15:17:01.623092+00:00",
+      "finishedAt": "2026-11-05T15:17:19.671190+00:00",
+      "counts": {},
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logBytes": 0
+    },
+    "build": {
+      "name": "build",
+      "sourceCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+      "sourceTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+      "sourceDirty": true,
+      "frozenIndexNoUnstagedChanges": true,
+      "runtime": "v24.22.1",
+      "exitCode": 0,
+      "seconds": 22.894,
+      "startedAt": "2026-11-05T15:17:52.119790+00:00",
+      "finishedAt": "2026-11-05T15:18:15.013846+00:00",
+      "counts": {},
+      "logSha256": "bbeee52ba109774fdb305956d3a59b08bf1d863f9cf17461199555fc6097c5cb",
+      "logBytes": 44659
+    },
+    "minimatch": {
+      "name": "minimatch",
+      "sourceCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+      "sourceTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+      "sourceDirty": true,
+      "frozenIndexNoUnstagedChanges": true,
+      "runtime": "v24.22.1",
+      "exitCode": 0,
+      "seconds": 0.698,
+      "startedAt": "2026-11-05T15:16:38.605465+00:00",
+      "finishedAt": "2026-11-05T15:16:39.303200+00:00",
+      "counts": {},
+      "logSha256": "03436c145f530b2840b889abbdfdc8cc588772302aa0ee8e3a20bf5daf58620c",
+      "logBytes": 66
+    }
+  },
+  "audits": {
+    "root-audit": {
+      "exitCode": 0,
+      "seconds": 5.891,
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "lockFileScope": "dependency manifests and lockfiles unchanged from672c152",
+      "finishedAt": "2026-11-05T15:01:14.153677+00:00"
+    },
+    "sites-audit": {
+      "exitCode": 0,
+      "seconds": 12.152,
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 8,
+        "high": 0,
+        "critical": 0,
+        "total": 8
+      },
+      "lockFileScope": "dependency manifests and lockfiles unchanged from672c152",
+      "finishedAt": "2026-11-05T15:01:26.306282+00:00"
+    },
+    "sites-production-audit": {
+      "exitCode": 0,
+      "seconds": 5.449,
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "lockFileScope": "dependency manifests and lockfiles unchanged from672c152",
+      "finishedAt": "2026-11-05T15:01:31.757011+00:00"
+    },
+    "bridge-audit": {
+      "exitCode": 0,
+      "seconds": 5.556,
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "lockFileScope": "dependency manifests and lockfiles unchanged from672c152",
+      "finishedAt": "2026-11-05T15:01:37.314233+00:00"
+    }
+  },
+  "authorFocusedCounts": {
+    "policy": 54,
+    "service": 130,
+    "details": 90,
+    "totalOverlapping": 274
+  },
+  "independentFocusedTotalOverlapping": 180,
+  "logFingerprints": [
+    {
+      "file": "bank-compat-details-green.tap",
+      "bytes": 9080,
+      "sha256": "8f0fb726ca6f4f2400d60471bd621ecfe6f3c95d12b52fba5a001444c908723e"
+    },
+    {
+      "file": "bank-compat-details-red.tap",
+      "bytes": 506410,
+      "sha256": "826c3c8471b0c2d73665bd34c24cf2f130456e2b5d9288a448d3fd6e1ee86bc7"
+    },
+    {
+      "file": "bank-compat-diagnostics-full-green.tap",
+      "bytes": 13949,
+      "sha256": "cb3d77cf6cea6b06718ba19e45988c9d09f471bf2553cd156adc09030ef34915"
+    },
+    {
+      "file": "bank-compat-diagnostics-getter-red.tap",
+      "bytes": 957,
+      "sha256": "dd01c7293f51c9b10ee2bd37401f59010253f872b5acdfd2d9113c0b01635cb5"
+    },
+    {
+      "file": "bank-compat-diagnostics-green.tap",
+      "bytes": 652,
+      "sha256": "1f4b778d540a89004e1a64aba9cd58ea6f9ac54ae8a01257088b8547b908ecfa"
+    },
+    {
+      "file": "bank-compat-diagnostics-red.tap",
+      "bytes": 3476,
+      "sha256": "ac2b44b27dbdfbb20cdd9ef9f57186e29281de0e5d97d2fe331f830fd0e09d86"
+    },
+    {
+      "file": "bank-compat-independent-details.tap",
+      "bytes": 21214,
+      "sha256": "a6f884570ea8c0b4f3cbcea156287ff36436ac23040acc9223fc91e6c29e2cbe"
+    },
+    {
+      "file": "bank-compat-policy-green.tap",
+      "bytes": 4698,
+      "sha256": "f6055760f432f02876f9a59ec8f6b4d7f0fc14ed63560e413eeb2166a507bec4"
+    },
+    {
+      "file": "bank-compat-policy-red.tap",
+      "bytes": 9227,
+      "sha256": "0b3927478a6e7f4ea81b3bdb90ef19b62ed01cc5960ae5bb72bd97b854234d90"
+    },
+    {
+      "file": "bank-compat-selection-red.tap",
+      "bytes": 1188531,
+      "sha256": "606a9194f926eae1510077ea55758b9fbd1a73f5e330b17d9aeb3367708eaef5"
+    },
+    {
+      "file": "bank-compat-service-full-green.tap",
+      "bytes": 14398,
+      "sha256": "58e5ec3e0f6addfcdd287741e6d4941bd07940dd6cdea3f5f8102eb8406ae7a6"
+    },
+    {
+      "file": "bank-compat-independent-policy.txt",
+      "bytes": 4694,
+      "sha256": "e7ae49d70b9136c11d9df2f1fcadc901ce89295b75f4ef23334249d958033f17"
+    },
+    {
+      "file": "bank-compat-independent-service.txt",
+      "bytes": 4144,
+      "sha256": "9a88351a551e27de94735310e79bcb47f0528ed14bea48294e76720dc9c80d21"
+    },
+    {
+      "file": "bank-compat-policy-proof.log",
+      "bytes": 444,
+      "sha256": "ff1e4cda02f7b8d1f824b1ffb97548bbce98311b802d0567448e3fcd144e4371"
+    }
+  ],
+  "excludedAttempts": [
+    "Provisional five-file Node/Sites runs deliberately interrupted with exit130 when review identified the additional details consumer; retained as *-provisional-interrupted.log, not counted as passes.",
+    "One TypeScript runner preflight failed before TypeScript invocation because concurrent git write-tree calls contended for the index lock. The runner was changed to read/compare the pre-frozen tree; subsequent actual TypeScript check passed."
+  ],
+  "productionBankRecovery": "NOT_VERIFIED; no reauthorization state reset or real provider retry performed"
+}

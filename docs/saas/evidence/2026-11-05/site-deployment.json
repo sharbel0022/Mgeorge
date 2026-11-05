@@ -1,0 +1,73 @@
+{
+  "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+  "versionNumber": 61,
+  "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_d79c62621c9081918d7bb0ae46971bb6",
+  "sourceCommit": "2084aa358dd24dc241213dc3b71bae975f1e1029",
+  "applicationReleaseSha": "672c152242add9427c8526af8dd92431c526c8c2",
+  "applicationSitesTree": "fead95370aead0d422f3b7da766ad7eb9c33d0bc",
+  "siteSourceTree": "fead95370aead0d422f3b7da766ad7eb9c33d0bc",
+  "sourceTreeParityVerified": true,
+  "sourceFileCount": 575,
+  "workingTreeClean": true,
+  "deploymentId": "appgdep_6aec802803e08191b2e86f52a61d9abd",
+  "status": "succeeded",
+  "updatedAt": "2026-11-05T13:10:23.873423+00:00",
+  "environmentRevision": 9,
+  "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+  "savedArchive": {
+    "format": "tar",
+    "contentHash": "sha256:bca055fb457114127143b52f4bdd3260ff686a82966c127fc9e7e7d603f5bda3",
+    "fileCount": 429,
+    "sizeBytes": 47708160
+  },
+  "retainedPreviousVersion": {
+    "version": 60,
+    "source": "0b0aa755444cd0782bcd24d8f81bfb837d4f6ca5",
+    "available": true
+  },
+  "migrations": {
+    "deployedPrefix0000Through0018Unchanged": true,
+    "newJournalEntries": [
+      {
+        "index": 19,
+        "tag": "0019_company_boundaries"
+      },
+      {
+        "index": 20,
+        "tag": "0020_bank_consent_context"
+      },
+      {
+        "index": 21,
+        "tag": "0023_saas_bank_sync"
+      },
+      {
+        "index": 22,
+        "tag": "0024_company_sync_boundaries"
+      }
+    ],
+    "tableCountBefore": 29,
+    "tableCountAfter": 40,
+    "newTables": [
+      "companies",
+      "company_bank_sync_jobs",
+      "company_bank_sync_receipts",
+      "company_bank_sync_requests",
+      "company_bank_sync_scopes",
+      "company_memberships",
+      "company_operation_guard",
+      "company_roles",
+      "company_user_contexts",
+      "company_worker_grants",
+      "saas_bank_state"
+    ],
+    "evidence": "Successful native deployment of archive containing all journal entries; read-only live schema observation. No direct SQL trigger catalogue export was available."
+  },
+  "productionVisualCheck": {
+    "status": "NOT_COMPLETED",
+    "reason": "Connected browser navigation timed out and its session reset before a DOM observation. Direct unauthenticated executor HTTP received403. These are not counted as application visual acceptance.",
+    "authenticatedReadOnlyMcpChecks": "PASSED"
+  },
+  "sensitiveRuntimeValuesChanged": false,
+  "schedulesChanged": false,
+  "commercialSaasActivated": false
+}

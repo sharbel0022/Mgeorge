@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "algorithm": "SHA-256",
+  "sourceRoot": "Integration workspace evidence/ (external logs are not bundled)",
+  "scope": "Synthetic local tests and scoped code-review reports only. No production payloads or deployment receipts. Hashes identify retained evidence; they are not substitutes for logs or new test execution.",
+  "excluded": "Terminated Node27alpha attempts and initial failing/fixture-preparation runs are not passing evidence.",
+  "files": [
+    {
+      "source": "security-final-gates.json",
+      "bytes": 5176,
+      "sha256": "91a38b01deafb120b2c5962aea2bf51cb0dabb398207c7c85449e6f67890e09c"
+    },
+    {
+      "source": "security-final-95d9/report.json",
+      "bytes": 4659,
+      "sha256": "032812a2e2aae70f7b69b867aa9ed66d6c2eab4a3c513f18330f917f82b3868b"
+    },
+    {
+      "source": "security-final-95d9/node-security.tap",
+      "bytes": 71490,
+      "sha256": "623e4dacbe51e5f30cec1ac845e3633148cc20ae3f29b66eff2e2347375db27d"
+    },
+    {
+      "source": "security-final-95d9/sites-security.tap",
+      "bytes": 174814,
+      "sha256": "7ffcabbaec662a0a52ff5a097e750ec70f88d92d18879394f3b96246e045f198"
+    },
+    {
+      "source": "security-final-node-tests.txt",
+      "bytes": 196411,
+      "sha256": "06919e925bb6b51dba0d6c87db5a2d24860466b2acf91a02e7c8d4cabbc2a768"
+    },
+    {
+      "source": "security-final-sites-tests.txt",
+      "bytes": 374579,
+      "sha256": "12e45612ebc64f4b070800c681bf51a98dbe03b113004afc800a23125bf15a8f"
+    },
+    {
+      "source": "security-final-bridge-tests.txt",
+      "bytes": 4960,
+      "sha256": "8e11a8e61598772a47b21580fcc3bab88059a3f03acfa5e2d9d3d6fee26cff01"
+    },
+    {
+      "source": "security-final-node-syntax.txt",
+      "bytes": 202,
+      "sha256": "dcd3fd7f59c60950c2e47f71281eeaba515d4eeb692484ab026074d3432e51d3"
+    },
+    {
+      "source": "security-final-bridge-syntax.txt",
+      "bytes": 354,
+      "sha256": "4843392301f472bd2f730e36101d1b9fe29803f87b6286f8407882e6188d1340"
+    },
+    {
+      "source": "security-final-minimatch.txt",
+      "bytes": 66,
+      "sha256": "03436c145f530b2840b889abbdfdc8cc588772302aa0ee8e3a20bf5daf58620c"
+    },
+    {
+      "source": "security-final-sites-typecheck.txt",
+      "bytes": 186,
+      "sha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c"
+    },
+    {
+      "source": "security-final-sites-build.txt",
+      "bytes": 45045,
+      "sha256": "5229de952a2dcc2175ca847f5e8c7df06ecd80307a92bc8785a6c66169497117"
+    },
+    {
+      "source": "security-final-root-audit.json",
+      "bytes": 361,
+      "sha256": "3a562f88d81e7f36d2e3d0d1a86abf500fdf10272f5f713a155b3602d8ebf832"
+    },
+    {
+      "source": "security-final-sites-audit.json",
+      "bytes": 4925,
+      "sha256": "cc3c964c3e51f9b56d51500896ed239fd436e085666a136c9f3611a87ace2412"
+    },
+    {
+      "source": "security-final-bridge-audit.json",
+      "bytes": 358,
+      "sha256": "74b9f06500613f856683fe87b372f7b3592c019e4cffdf8c3c63069a75dc0ec1"
+    },
+    {
+      "source": "onboarding-gates/receipt.json",
+      "bytes": 3023,
+      "sha256": "82bd8ffbada59973dab97e5fcb6f5703bfba58e6137a210b65d1a3160a54f800"
+    },
+    {
+      "source": "onboarding-independent-review.md",
+      "bytes": 7320,
+      "sha256": "a524d52d92b891de6066da0b2829ca00efe09494b883f263aecfa94561e98b67"
+    },
+    {
+      "source": "onboarding-independent-focused.tap",
+      "bytes": 8692,
+      "sha256": "2ecd737eded0accd3a7cba455774b6479f0c6c2a3726d17ee0ee68aa61288edb"
+    },
+    {
+      "source": "onboarding-report.md",
+      "bytes": 14128,
+      "sha256": "7c61e495db05dbda790710885a4ba56595729f877334d96a04d74d43add87430"
+    },
+    {
+      "source": "consent-independent-review.md",
+      "bytes": 8370,
+      "sha256": "1bd64458e39cced769f59293809ee7de9991ab1e96b5e32b3bf1ad1ea6abfedd"
+    },
+    {
+      "source": "consent-expiry-repair-review.md",
+      "bytes": 2968,
+      "sha256": "9c33539b5a5093d2c69ef6f268683294878a3911446e59d43fc3d87bea705006"
+    },
+    {
+      "source": "enrichment-independent-review.md",
+      "bytes": 8601,
+      "sha256": "77aee73973550c1390b88b64c1a6c118470cd1688ab73e1406875e18e7cb61fe"
+    },
+    {
+      "source": "sync-independent-review.md",
+      "bytes": 5343,
+      "sha256": "1f613d63557f673d80be7351271b75fab34848ae042f32b6cfe782843211008a"
+    },
+    {
+      "source": "security-independent-review.md",
+      "bytes": 4666,
+      "sha256": "3228cf16837f6355aaba44fd1f898d048750cce632444543b1dcb5829094b9f3"
+    },
+    {
+      "source": "security-final-diff-review.md",
+      "bytes": 3813,
+      "sha256": "63eb08ad77afb631e3b9ca5e41f0378a7bfe52f3b16157f8492bb5d351118529"
+    }
+  ]
+}

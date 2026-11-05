@@ -1,0 +1,77 @@
+{
+  "reviewedAt": "2026-11-05T15:14:49.290223+00:00",
+  "baseCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+  "candidateTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+  "sourceMatchesFrozenTree": true,
+  "verdict": "NO_CRITICAL_OR_IMPORTANT_FINDINGS_IN_REVIEWED_DIFF",
+  "files": [
+    {
+      "path": "sites/lib/bank-consent-policy.d.ts",
+      "sha256": "546e85c5ec19867f9ad1093d7538a33808897e115ceac254ea07f45cf904d6cf"
+    },
+    {
+      "path": "sites/lib/bank-consent-policy.js",
+      "sha256": "828eb323b51b2101441b8c7c0405cb5a1fd126f5e587ab788b63636a01e60931"
+    },
+    {
+      "path": "sites/lib/banking/details-service.ts",
+      "sha256": "de77c415e73bc249bb42983e4024443e9759b9b96bc28e47818a7e3725d45459"
+    },
+    {
+      "path": "sites/lib/banking/service.ts",
+      "sha256": "8c90becc087213c7b577ad1d73bb2fce77460355240ac711c46a1da66eccd89e"
+    },
+    {
+      "path": "sites/tests/bank-consent-policy.test.mjs",
+      "sha256": "f91e95cc45309bffcfbcaf9b5706922250d9c31031d6f1bc7cd8787aa7fdb558"
+    },
+    {
+      "path": "sites/tests/bank-details.test.mjs",
+      "sha256": "f7f0175e2abe4749877c4726244900475a8b05fcfa99997c0d668ee6c59dab98"
+    },
+    {
+      "path": "sites/tests/banking-security.test.mjs",
+      "sha256": "6350cce5810ca0c8e4ab67e018d8a42927c1cbb2f45bec1ee8e9c54c484b3fa6"
+    }
+  ],
+  "independentFocusedTests": [
+    {
+      "file": "bank-compat-independent-policy.txt",
+      "tests": 54,
+      "pass": 54,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 263.435003,
+      "sha256": "e7ae49d70b9136c11d9df2f1fcadc901ce89295b75f4ef23334249d958033f17"
+    },
+    {
+      "file": "bank-compat-independent-service.txt",
+      "tests": 36,
+      "pass": 36,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 11861.299437,
+      "sha256": "9a88351a551e27de94735310e79bcb47f0528ed14bea48294e76720dc9c80d21"
+    },
+    {
+      "file": "bank-compat-independent-details.tap",
+      "tests": 90,
+      "pass": 90,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 6686.964732,
+      "sha256": "a6f884570ea8c0b4f3cbcea156287ff36436ac23040acc9223fc91e6c29e2cbe"
+    }
+  ],
+  "totalFocusedPasses": 180,
+  "wholeSuitesRunByReviewer": false,
+  "productionCallsOrWritesByReviewer": false,
+  "actualLiveFailureCause": "NOT_ESTABLISHED_FROM_UNAVAILABLE_RESPONSE",
+  "productionReauthorizationReset": false
+}

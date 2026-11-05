@@ -1165,3 +1165,104 @@ Samtliga befintliga poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. De ber�
 ## Agent 3 — avgränsad Bankgiroleverans
 
 [Rapporten för automatisk Bankgiroinläsning](docs/integration/agent-3-bankgiro-auto-ingest.md) tillför syntetiska bevis för original/dubbletter, köåterhämtning, behörighetslås, rapportstatus och backupkompatibilitet. Områden 6, 13, 16–19, 24, 28–32 berörs, men **inga numeriska poäng höjs**. En ansluten verklig rapportkälla, bankavtal och verifierad produktionskörning saknas. CI- och testresultat gäller den separata funktionsbranchen och dess exakta PR-huvud; de certifierar inte bankfakta eller publicerad drift. Övriga agenters områden lämnas oförändrade.
+
+## SaaS och legacybank — evidensuppdatering utan poängändring, 2026-11-05
+
+**VERKLIG BANKANSLUTNING GODKÄND: NEJ. Kommersiell lansering: NOT_APPROVED.** Den äldre anslutningen är reauth_required efter BANK_ACCOUNT_SCOPE_INVALID; ny verklig Open Payments-anslutning är NOT_VERIFIED. En granskad kodrättning, grön CI eller lyckad webbpublicering innebär inte godkänd verklig bankfunktion.
+
+**Före/efter:255/330=7,73/10, förändring0;0/33 områden≥9,5.** Nya tester och avgränsade produktionsläsningar ändrar evidensen, inte betygen.
+
+### Oförändrade områdespoäng
+
+| Nr | Område | Före | Efter |
+| ---: | --- | ---: | ---: |
+| 1 | Design och färger | 8 | 8 |
+| 2 | Startsida | 8,5 | 8,5 |
+| 3 | Navigering | 8,5 | 8,5 |
+| 4 | Mobilanpassning | 8,5 | 8,5 |
+| 5 | Sökning och filtrering | 7,5 | 7,5 |
+| 6 | Minimal manuell hantering | 6,5 | 6,5 |
+| 7 | Kundfakturor | 8 | 8 |
+| 8 | Leverantörsfakturor | 8 | 8 |
+| 9 | PDF-tolkning | 8 | 8 |
+| 10 | Bild-OCR | 7 | 7 |
+| 11 | Gmail-anslutning | 7,5 | 7,5 |
+| 12 | Automatisk fakturaregistrering | 8 | 8 |
+| 13 | Dubblettkontroll | 8 | 8 |
+| 14 | Dokumentgranskning | 8 | 8 |
+| 15 | Swedbank-anslutning | 8,5 | 8,5 |
+| 16 | Automatisk bankhämtning | 8 | 8 |
+| 17 | Bankgiroimport | 8,5 | 8,5 |
+| 18 | Identifiera verklig betalare | 7 | 7 |
+| 19 | Verklig OCR/fakturareferens | 7 | 7 |
+| 20 | Automatisk betalningsmatchning | 7,5 | 7,5 |
+| 21 | Delbetalningar | 8 | 8 |
+| 22 | Överbetalningar | 8 | 8 |
+| 23 | Flera fakturor i en betalning | 7,5 | 7,5 |
+| 24 | Betalningshistorik | 8 | 8 |
+| 25 | Betalningsstatus | 8 | 8 |
+| 26 | Kontrollera alla betalningar | 8 | 8 |
+| 27 | Automatiska mejlutkast | 8 | 8 |
+| 28 | Schemalagd automatisering | 6,5 | 6,5 |
+| 29 | Säkerhetskopiering | 7,5 | 7,5 |
+| 30 | Säkerhet och åtkomstkontroll | 8,5 | 8,5 |
+| 31 | Katastrofåterställning | 5,5 | 5,5 |
+| 32 | Kodkvalitet och tester | 8,5 | 8,5 |
+| 33 | Verifiering i verklig produktion | 6,5 | 6,5 |
+
+### Versionsbundna bevis och kvarstående gränser
+
+| Områden | Verifierad evidens | Begränsning |
+| --- | --- | --- |
+| 1,3,4: UI och mobil | Separat fixture-CUA på actual CompanyWorkspace/BankPage vid320/390/768/1024/1440, ingen horisontell overflow, stabil inmatning, dialogfokus/Escape, viewerstatus läsbar med mutationsknappar inaktiverade. | Historiska41 Chromiumfall är ingen ny körning. Produktionsbrowsern nådde ingen DOM efter verktygtimeout; ingen fysisk enhet/skärmläsaracceptans. |
+| 15–17,28: bank och automation | Integrerade Node/Sites-adaptrar och säkerhetsgränser. PR43 korrigerar reproducerad legacysemantik i kontoval/synk/detaljer med full inventariekontroll och strikt vald behörighet; säker diagnostik. | Faktisk legacybank är underkänd och ny OP-anslutning overifierad. Ingen återställd status eller ny providerhämtning. Bankgiro SOURCE_NOT_CONFIGURED; Gmail pausat. |
+| 13,18–26: ekonomisk korrekthet | Råoriginal, hash, replay/dedup, ad7-bankfakta samt noll allokeringar i förhandsvisning.0599 kl. 15:01 har bevarad ekonomi/revision 51. | Tre aktuella samtyckesbedömningsfält försämrades mot 13:13; den senare projektionen är inte helt identisk. Bankbevis saknas, fakturan ofullständig/oregistrerad. |
+| 24,29,31: historik och återställning | Additiva migrationer,27 ägarbundna backuptabeller, exakta historiska20/22/23-format, isolerad restore som inte återupplivar leaser/behörighet. | Senaste Nov5-backup35/362 verifierad, senaste fulla Nov4-backup362/362. Ingen full produktions-DR/RPO/RTO-övning. |
+| 30: säkerhet | Tre faktiska syntetiska företag och owner/admin/accountant/viewer via Node SQLite och Sites D1/R2.8KiB login,16MB total multipart/15MB fil, säkra loggar, pinnade Actions. PR43 bevarar company/callback, tenant, lease, cooldown och commitfences. | Intern avgränsad acceptans; inga produktionscertifikat/avtal, fullständigt penetrationstest eller kommersiellt godkännande. |
+| 32: ursprunglig release |95d9/672 gav1 899+3 704+47=5 650, överlappande 1 064 acceptansfall; historisk PR38 hade5 608 och oberoende78. | Dessa resultat gäller äldre träd och återanvänds inte som nya PR43-körningar. |
+| 32: separat PR43 | Nytt ed92-träd ger1 899+3 756+47=5 702,0 fail/skip/cancel/TODO; syntax 170, types/build/mitigation gröna. Oberoende 180 och författare 274 överlappar. | Runtimeaudits 0, full Sites8 moderate/0 high/critical, oförändrade beroenden. Ingen poänghöjning; provisoriska avbrutna försök räknas inte. |
+| 11,33: verklig drift | Historisk lyckad Sites61-publicering och13:13-kontroll; senare verkligt bankfel14:04 bekräftat14:47 och ny0599-läsning15:01. | Bankanslutningen är NEJ. Gmail pausorsak inte verifierad; historisk OCRprocessed0/failed0 bevisar ingen ny dokumentgenomströmning. |
+
+### Aktuell verklig bankanslutning: NEJ
+
+Det schemalagda legacybankförsöket **2026-11-05T14:04:35.832Z** misslyckades med **`BANK_ACCOUNT_SCOPE_INVALID`**, bekräftat i det fullständiga automationsresultatet och den läsande kontrollen **14:47:11.579Z**. Raden är `reauth_required`, `connected=false`, `sync_failures=1`, `blocked=false`; senaste lyckade synk är fortfarande **08:05:14.646Z**. Sparad giltighet löper till **2027-01-25T19:45:06.954Z**, och äldre consentmetadata saknas. En framtida utgångsdag bevisar inte aktuell auktorisering. [Daterat incidentkvitto](docs/saas/evidence/2026-11-05/bank-incident.json).
+
+Bekräftad felväg är samtyckesvalideringen, och den tidigare generiska felrapporteringen tappade den specifika ConsentError-diagnosen. **Exakt felande kontopredikat är inte fastställt:** det verkliga providersvaret har varken bevarats eller hämtats på nytt. Den separat reproducerade legacyregressionen gäller ett giltigt valt konto när ett annat, ovalt konto lämnar den cachade fullmängden. Dess rättning ska inte presenteras som bevisad orsak till dagens livefel.
+
+0599 lästes på nytt **15:01:10.767Z**: revision 51, `snapshotCurrent=true`, `changed=false`, fortfarande en ekonomisk AIS-observation och en icke-ekonomisk rapport på 62 500 öre vardera (625 kr), noll allokeringar, oregistrerad faktura och ofullständigt underlag. Jämförelsen mot 13:13 är **inte helt identisk**: utöver lästiden ändrades tre fält för aktuell samtyckesbedömning. Två kontoförklaringar kräver nu en aktiv ägarbunden anslutning och rapportens aktuella AIS-medgivande kräver granskning. Övriga valda svarsfält är lika. Efter Sites62 lästes samma valda svar15:37:27.308Z och jämfördes med15:01:10.767Z: **0 skillnader när enbart rekursiva checkedAt-fält undantas**. De tre samtyckesbedömningsskillnaderna mot13:13 kvarstår; ekonomin är bevarad. Ingen full workspacepayloadjämförelse påstås.
+
+Cachelagrad applikationsmetadata från **2026-10-27T19:45:36.601Z** innehåller callback på den äldre `asdasdsa213`-hosten, medan publicerad applikation använder `sharbelrasho.chatgpt.site`. Providerregistrering och callbackens nåbarhet behöver verifieras inför en behörigt initierad förnyelse. Detta är läst D1-cache, **ingen färsk verifiering eller ändring hos providern**. Inga manuella bankanrop, produktionsdataåterställningar, ekonomiska åtgärder eller schemaändringar gjordes. Sites62-publiceringen återställde inte reauthstatusen. Den läsande efterkontrollen15:38:53Z visar fortfarande `connected=false`, `reauth_required`, ett misslyckat försök, samma last_success08:05:14.646Z och oförändrad bankradstid14:04:45.787Z. Ingen verklig bankåterhämtning är verifierad. [Efterkontroll](docs/saas/evidence/2026-11-05/bank-compat-release.json).
+
+### Separat kompatibilitetsrelease, PR43
+
+[PR43](https://github.com/sharbel0022/Mgeorge/pull/43), head `ab941744c3ee38be7ecd4c3121b8e7496082b9ab`, motsvarar lokal commit `47811cbbc91df25eb715af2953c79f92e8da38a1`, repositoryträd `ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1` och Sites-underträd `a17a42a1c9a4976717003defc40aeb54b9624bfa`. Alla nya fulla grindar kördes på detta frysta index utan ostagade skillnader; senare commit och publicerat head har exakt samma träd. Det är nya körningar, inte återanvända672-resultat. [Nya grindar](docs/saas/evidence/2026-11-05/bank-compat-gates.json).
+
+**1 899 Node + 3 756 Sites + 47 bridge = 5 702 godkända**, med 0 fail/skip/cancel/TODO. Syntax 170, typer, build och installerad minimatch-mitigering godkända. Runtimeaudits är 0; full Sites-audit har 8 moderate och 0 high/critical, på oförändrade beroenden. Oberoende 180 och författarnas 274 riktade fall överlappar fullsviterna. [Oberoende granskning](docs/saas/evidence/2026-11-05/bank-compat-independent-review.md) · [fil-/logghashar](docs/saas/evidence/2026-11-05/bank-compat-independent-review.json).
+
+Sju filer korrigerar kontoval, synk och detaljhämtning för **endast befintlig legacykontext**. Fulla råa UID-inventeringar måste fortfarande vara begränsade, giltiga och unika; alla valda konton måste finnas i cache och aktuellt medgivande. Därefter bevaras strikt kontroll av vald usage, identitetshash, bank/PSU, transaktionsscope och utgång. Nya callbacks och company-mode förblir strikt fullmängdskontrollerade. Detaljhämtning kontrollerar hela det sparade kontovalet. Kanoniska felkoder/meddelanden bevaras utan providertext eller föränderliga gettervärden. Status, leaser, cooldowns, tenantgränser och data återställs inte. Tidigare assertions behålls; detaljfixturens konto-ID rättas till giltig UUID.
+
+| Uppföljningsfält | Verifierat slutkvitto |
+| --- | --- |
+| PR43 huvud-CI | [42054035748](https://github.com/sharbel0022/Mgeorge/actions/runs/42054035748), **success**; hämtade faktiska loggar visar1 899 Node+3 756 Sites+47 bridge,0 fail/skip/cancel/TODO. |
+| PR43 säkerhets-CI | [42054035605](https://github.com/sharbel0022/Mgeorge/actions/runs/42054035605), **success**;325 Node+750 Sites=1 075 överlappande fall,0 fail/skip/cancel/TODO. |
+| Normal merge / runtime-release-SHA | `b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f` |
+| Separat main-CI | [42055222273](https://github.com/sharbel0022/Mgeorge/actions/runs/42055222273), **success** på b2e7f4b; skapad15:27:51Z, uppdaterad15:33:32Z. Faktiska jobb127341662492/127341662657/127341662877 visar1 899/3 756/47,0 fail/skip/cancel/TODO. |
+| Uppföljningens Sites-version / source | **62, publicerad** / `1972b9a803458e20c6dedd30a8624ad4b96016f7`;575 källfiler matchar exakt Sites-trädet a17a42a1c9a4976717003defc40aeb54b9624bfa; ren arbetsyta. |
+| Deployment | `appgdep_6aeca22254f4819197e33847966a7c70`, **succeeded**, uppdaterad `2026-11-05T15:35:16.437170+00:00`, miljörevision9 och samma URL. |
+| Läsande efterkontroll | Kvitto15:38:53Z: publicerad version62,40 tabeller, samma arbetsyta/revision51, oförändrad auth/audience/miljömetadata och alla tre scheman. Bank fortfarande reauth_required.0599 kl.15:37:27.308Z är identisk mot15:01 utom rekursiva checkedAt-fält. |
+
+Normal merge är `b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f`; även den separata main-CI-körningen är success. Slutlig proveniens finns i [bank-compat-release.json](docs/saas/evidence/2026-11-05/bank-compat-release.json). Sites62 använder source `1972b9a803458e20c6dedd30a8624ad4b96016f7`; versionerna60 och61 finns kvar. Hosting- och migrationsfiler är byte-identiska mot61. De fem namngivna auktoritetstabellerna har fortsatt0 rader, roller4 och arbetsytor1. Hemliga värden var maskerade; oförändrad miljörevision/metadata och avsaknad av mutation är konfigurationsbeviset. **Den lyckade deploymenten bevarade reauth_required; verklig bankanslutning är fortfarande NEJ.**
+
+### Historisk Sites61-cutover, inte aktuell bankhälsa
+
+Applikationsrelease `672c152242add9427c8526af8dd92431c526c8c2`, repositoryträd `03e5f4dafd6b272463338adda52a109ed91ceae9`, publicerades som Sites61 från source `2084aa358dd24dc241213dc3b71bae975f1e1029`. Git-trädet `fead95370aead0d422f3b7da766ad7eb9c33d0bc` matchade exakt med 575 jämförda källfiler. Deployment `appgdep_6aec802803e08191b2e86f52a61d9abd` lyckades **13:10:23.873423+00:00**. [Historiskt deploymentkvitto](docs/saas/evidence/2026-11-05/site-deployment.json).
+
+Vid **13:13:22.521Z** var de maskerade bank-/Gmail-/Bankgiro-/backupobjekten identiska mot förkontrollen. Livetabellerna var 40, varav 11 nya; en arbetsyta behöll ägare/revision 51/uppdateringstid. **Endast de fem uttryckligen kontrollerade tabellerna** `companies`, `company_memberships`, `company_worker_grants`, `saas_bank_state` och `company_bank_sync_jobs` är belagda med 0 rader; `company_roles` hade 4. Detta är ingen census av samtliga nya auktoritetstabeller. Auth/audience/scheman och miljörevision9 med 17 nycklar var oförändrade. [Före](docs/saas/evidence/2026-11-05/production-before.json) · [Historiskt efter](docs/saas/evidence/2026-11-05/production-after.json).
+
+Bankens connected-status i detta historiska kvitto ersätts av den senare underkända statusen ovan. Gmail förblir pausat med okänd verifierad pausorsak; senaste lyckade hämtning2026-11-03T18:38:10.461Z och separat tom `connection.last_synced`. Bankgirokälla `SOURCE_NOT_CONFIGURED`. BackupNov5 hade362 kopierade/35 verifierade filer; senast fullaNov4 hade362/362, verifierad21:32:59.743Z. API-kvitton16 respektive15 och112 poster utan kvitto är andra mått än filverifiering. Historisk [OCR42013301104](https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104) påf75 hade processed0/failed0; tidigare404-originfel var rättat före fortsättningen. Ingen ny dokumentgenomströmning eller full katastrofåterställning certifieras.
+
+Aktuell separat fixture-CUA täckte fem bredder, stabil inmatning och dialogfokus; viewer kunde läsa status medan mutationsknappar var inaktiverade. Historiska41 Chromiumfall räknas inte som en ny körning. Produktionsbrowserns bootstrap lyckades men navigeringen fick verktygtimeout/sessionreset, utan DOM-observation. Ingen visuell produktionsacceptans eller appkrasch påstås; autentiserade MCP-/D1-läsningar lyckades inom sitt avgränsade scope.
+
+Källor: [samlad rapport](docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md), [grindkvitto](docs/saas/evidence/2026-11-05/bank-compat-gates.json), [incident](docs/saas/evidence/2026-11-05/bank-incident.json) och [oberoende granskning](docs/saas/evidence/2026-11-05/bank-compat-independent-review.md). Alla 33 numeriska poäng är oförändrade.
+
+Färsk läsande OCR-kontroll **2026-11-05T15:39:02Z** hittade ingen nyare schemalagd körning bland API-listans senaste15. Senaste observerade är [42013301104](https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104), jobb127197454985, headf75; faktisk logg10:45:30.6420193Z gav **processed0, failed0**, schedule success. Detta verifierar varken bearbetning av ett verkligt dokument eller den nya b2e7-körkoden. Ingen workflowdispatch utfördes. [Sanerat OCR-kvitto](docs/saas/evidence/2026-11-05/final-ocr-observation.json).

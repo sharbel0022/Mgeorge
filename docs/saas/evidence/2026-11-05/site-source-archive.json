@@ -1,0 +1,25 @@
+{
+  "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+  "applicationReleaseSha": "672c152242add9427c8526af8dd92431c526c8c2",
+  "applicationSitesTree": "fead95370aead0d422f3b7da766ad7eb9c33d0bc",
+  "sourceCommit": "2084aa358dd24dc241213dc3b71bae975f1e1029",
+  "sourceTree": "fead95370aead0d422f3b7da766ad7eb9c33d0bc",
+  "workingTreeClean": true,
+  "archiveSha256": "f1648634f8006064b38ec654aa41f082a3728adf0b00712f828648c49e058096",
+  "archiveBytes": 18480698,
+  "archiveEntryCount": 449,
+  "hosting": {
+    "d1": "DB",
+    "r2": "BUCKET",
+    "capabilities": [
+      "mcp"
+    ],
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528"
+  },
+  "finalMigrationTags": [
+    "0019_company_boundaries",
+    "0020_bank_consent_context",
+    "0023_saas_bank_sync",
+    "0024_company_sync_boundaries"
+  ]
+}
