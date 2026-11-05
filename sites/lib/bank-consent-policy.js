@@ -20,6 +20,15 @@ const MESSAGES = {
   CONSENT_APPLICATION_CHANGED: 'Banktjänstens inställningar ändrades. Starta ett nytt anslutningsförsök.',
 };
 const GENERIC_MESSAGE = 'Bankanslutningen kunde inte verifieras.';
+const ACCOUNT_SCOPE_REASONS = new Set([
+  'SAVED_SELECTION_EMPTY', 'SAVED_SELECTION_INVALID', 'SAVED_ACCOUNTS_INVALID',
+  'LIVE_ACCOUNTS_INVALID', 'LIVE_ACCOUNT_DATA_INVALID', 'LIVE_ACCOUNT_SET_MISMATCH',
+  'SELECTED_ACCOUNT_MISSING', 'ACCOUNT_USAGE_INVALID', 'ACCOUNT_SET_MISMATCH',
+  'ACCOUNT_IDENTITY_INVALID', 'ACCOUNT_IDENTITY_CHANGED',
+]);
+// Public error properties are not a provenance boundary. Only reasons created
+// here may be serialized; arbitrary fields/getters on other errors are ignored.
+const accountScopeReasons = new WeakMap();
 
 export class ConsentError extends Error {
   constructor(code, status = 400, safeMessage) {
@@ -30,11 +39,24 @@ export class ConsentError extends Error {
   }
 }
 
+export function bankAccountScopeError(reason) {
+  const error = new ConsentError('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  if (ACCOUNT_SCOPE_REASONS.has(reason)) {
+    accountScopeReasons.set(error, reason);
+    Object.defineProperty(error, 'reason', { value: reason, enumerable: true });
+  }
+  return error;
+}
+export function bankAccountScopeReason(error) {
+  return accountScopeReasons.get(error) ?? null;
+}
+
 function clean(value, max = 300) {
   return typeof value === 'string' && value.length > 0 && value.length <= max && value.trim() === value && !CONTROL.test(value);
 }
 function object(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
 function deny(code, status = 400) { throw new ConsentError(code, status); }
+function denyAccountScope(reason) { throw bankAccountScopeError(reason); }
 function timestamp(value) {
   if (typeof value !== 'string' || value.length > 50) return NaN;
   const parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?(?:Z|[+-](\d{2}):(\d{2}))$/.exec(value);
@@ -55,9 +77,11 @@ function accountIds(values) {
 function sameIds(left, right) {
   return left.length === right.length && left.every(id => right.includes(id));
 }
+function accountData(values) {
+  return Array.isArray(values) && values.length > 0 && values.length <= MAX_ACCOUNTS && values.every(object);
+}
 function businessAccountData(values) {
-  return Array.isArray(values) && values.length > 0 && values.length <= MAX_ACCOUNTS &&
-    values.every(account => object(account) && (account.usage === undefined || account.usage === 'ORGA'));
+  return accountData(values) && values.every(account => account.usage === undefined || account.usage === 'ORGA');
 }
 
 /** Compatibility context for the existing authenticated user's workspace.
@@ -134,18 +158,25 @@ export function validateEnableConsent(input) {
   }
   const deadlines = [session.access.valid_until, checked.access.valid_until, requestedValidUntil].map(timestamp);
   if (deadlines.some(deadline => !Number.isFinite(deadline) || deadline <= now)) deny('BANK_CONSENT_EXPIRED', 409);
-  if (!businessAccountData(session.accounts) || !businessAccountData(checked.accounts_data)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  if (!accountData(session.accounts)) denyAccountScope('SAVED_ACCOUNTS_INVALID');
+  if (!accountData(checked.accounts_data)) denyAccountScope('LIVE_ACCOUNT_DATA_INVALID');
+  if (!businessAccountData(session.accounts) || !businessAccountData(checked.accounts_data)) denyAccountScope('ACCOUNT_USAGE_INVALID');
   const sessionIds = accountIds(session.accounts.map(account => account.uid));
   const checkedIds = accountIds(checked.accounts);
   const dataIds = accountIds(checked.accounts_data.map(account => account.uid));
-  if (!sessionIds || !checkedIds || !dataIds || !sameIds(sessionIds, checkedIds) || !sameIds(sessionIds, dataIds)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  if (!sessionIds) denyAccountScope('SAVED_ACCOUNTS_INVALID');
+  if (!checkedIds) denyAccountScope('LIVE_ACCOUNTS_INVALID');
+  if (!dataIds) denyAccountScope('LIVE_ACCOUNT_DATA_INVALID');
+  if (!sameIds(sessionIds, checkedIds) || !sameIds(sessionIds, dataIds)) denyAccountScope('ACCOUNT_SET_MISMATCH');
   const currentAccounts = new Map(checked.accounts_data.map(account => [account.uid, account]));
   for (const account of session.accounts) {
     const originalHash = account.identification_hash, currentHash = currentAccounts.get(account.uid).identification_hash;
     // The singular hash must agree exactly when both responses supply it.
     // Overlap in identification_hashes is not evidence that repairs a conflict.
-    if (originalHash !== undefined && currentHash !== undefined &&
-      (!clean(originalHash, 4096) || !clean(currentHash, 4096) || originalHash !== currentHash)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+    if (originalHash !== undefined && currentHash !== undefined) {
+      if (!clean(originalHash, 4096) || !clean(currentHash, 4096)) denyAccountScope('ACCOUNT_IDENTITY_INVALID');
+      if (originalHash !== currentHash) denyAccountScope('ACCOUNT_IDENTITY_CHANGED');
+    }
   }
   // An AIS account/transaction session does not attest access to Bankgiro reports.
   if (scopes.includes('bankgiro:read')) deny('BANKGIRO_SCOPE_UNAVAILABLE', 409);
@@ -164,8 +195,12 @@ export function validateLegacyEnableSelection(input) {
   const uids = values => { const ids = accountIds(values); return ids && ids.every(id => uuid.test(id)) ? ids : null; };
   const resourceIds = values => Array.isArray(values) && values.length <= MAX_ACCOUNTS && values.every(object) ? uids(values.map(account => account.uid)) : null;
   const savedIds = resourceIds(input.session.accounts), liveIds = uids(input.checked.accounts), dataIds = resourceIds(input.checked.accounts_data), selected = uids(input.selectedAccountUids);
-  if (!savedIds || !liveIds || !dataIds || !selected || !sameIds(liveIds, dataIds) ||
-    !selected.every(id => savedIds.includes(id) && liveIds.includes(id))) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  if (!savedIds) denyAccountScope('SAVED_ACCOUNTS_INVALID');
+  if (!liveIds) denyAccountScope('LIVE_ACCOUNTS_INVALID');
+  if (!dataIds) denyAccountScope('LIVE_ACCOUNT_DATA_INVALID');
+  if (!selected) denyAccountScope(Array.isArray(input.selectedAccountUids) && !input.selectedAccountUids.length ? 'SAVED_SELECTION_EMPTY' : 'SAVED_SELECTION_INVALID');
+  if (!sameIds(liveIds, dataIds)) denyAccountScope('LIVE_ACCOUNT_SET_MISMATCH');
+  if (!selected.every(id => savedIds.includes(id) && liveIds.includes(id))) denyAccountScope('SELECTED_ACCOUNT_MISSING');
   const chosen = new Set(selected);
   return validateEnableConsent({ ...input,
     session: { ...input.session, accounts: input.session.accounts.filter(account => chosen.has(account.uid)) },

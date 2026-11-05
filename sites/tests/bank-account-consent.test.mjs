@@ -15,7 +15,7 @@ const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./r
 const presentation=await import(compiled('../lib/payment-presentation.ts',{'./domain':domain,'./reconciliation-engine.js':engine,'./payment-references.js':url('../lib/payment-references.js')}));
 const iban='SE4280000890119146168423',account='iban:'+iban;
 function seed(){
- let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'000018',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;
+ let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'0599',ocr:'000018',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true,documentId:'synthetic-invoice-original'}}).state;
  return applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account,date:'2026-10-26',amount:62500,party:'Synthetic customer AB',payerReference:'000018',bankReference:'CONSENT-SYNTHETIC-ENTRY',kind:'payment',verified:true})]}).state;
 }
 async function fixture(t){

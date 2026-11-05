@@ -14,11 +14,12 @@ import {invoiceFacts} from './reconciliation';
 import {bankPaymentFieldSources} from './payment-presentation';
 import {bankAccountConsentSnapshot,bankgiroRetainedPreview} from './bankgiro-service';
 import {apiPayerEvidence} from './payer-evidence.js';
-import {db,readBankOriginalBytes} from './server';
+import {db,readBankOriginalBytes,readInvoiceOriginalBytes} from './server';
+import {matchingReferenceValues} from './payment-references.js';
 import {readBankgiroSourceEvidence} from './bankgiro-source-evidence.js';
 import {readCamtDocument,decodeCamtBytes,xmlChildren,xmlPath,xmlValue,camtReportEvidence,camtDate} from './camt-xml.js';
 
-type PreviewOptions = {referencePolicy?: InvoiceReferencePolicy | null};
+type PreviewOptions = {referencePolicy?: InvoiceReferencePolicy | null;manualReview?:boolean};
 const missingOriginal = 'Originalet är inte verifierat i denna avgränsade kontroll.';
 const missingAccount = 'Aktuellt ägarbundet konto har inte verifierats i denna kontroll.';
 const consentFields = ['id','owner','status','environment','app_generation','valid_until','selected_accounts','encrypted_accounts','encrypted_session','bank_name','country'] as const;
@@ -68,7 +69,7 @@ function referencePolicy(supplied: PreviewOptions, owner: string, state: State) 
 
 /** Bounded stored-evidence read. The complete workspace still participates in
  * uniqueness, balances and the snapshot; unrelated sources remain unverified. */
-export async function readReconciliationPreview(owner: string, initial: State, revision: number, transactionId: string, options: PreviewOptions = {}) {
+export async function readReconciliationInput(owner: string, initial: State, revision: number, transactionId: string, options: PreviewOptions = {}) {
   if (!owner) throw Error('AUTH_REQUIRED');
   if (!validId(transactionId)) throw Error('Välj en giltig bankhändelse.');
   const state = structuredClone(initial), target = state.transactions.find(row => row.id === transactionId);
@@ -138,6 +139,7 @@ export async function readReconciliationPreview(owner: string, initial: State, r
   }
   const consent = new Map<string,BankAccountEvidence>();
   const consentContext: {accountId:string;reportedAccount:string|null;sha256:string;status:string}[] = [];
+  const manualConsents:Record<string,unknown>[]=[];
   for (const row of state.transactions.filter(row => covered.has(row.id))) {
     const accountId = canonicalBankAccount(row.account);
     const reported = row.evidence === 'bankgiro_file' ? row.recipientAccount || '' : undefined;
@@ -150,6 +152,7 @@ export async function readReconciliationPreview(owner: string, initial: State, r
       const current = await bankAccountConsentSnapshot(owner,accountId,reported,provider);
       const op='provider' in current&&current.provider==='open_payments'?current:null;
       const fingerprint = await sha256(op?[op.provider,op.owner,op.revision,op.payload,op.validUntil]:consentFields.map(field => (current as Record<string,unknown>)[field]));
+      if(options.manualReview)manualConsents.push(op?{provider:op.provider,owner:op.owner,revision:op.revision,payload:op.payload,validUntil:op.validUntil}:{provider:'enable_banking',...Object.fromEntries(consentFields.map(field=>[field,(current as Record<string,unknown>)[field]]))});
       consent.set(key,{status:'VERIFIED',ownerId:owner,accountId,currency:row.currency,source:'bank_account_resource',proofId:fingerprint,validUntil:op?op.validUntil:(current as {valid_until:string}).valid_until});
       consentContext.push({accountId,reportedAccount:reported ?? null,sha256:fingerprint,status:'VERIFIED'});
     } catch {
@@ -220,12 +223,29 @@ export async function readReconciliationPreview(owner: string, initial: State, r
     for (const id of ids) relationships.push({id:'manual:'+link.id+':'+id,reportId:id,transactionId:link.transactionId,method:'manual_review',status:active?'REVIEW':'BLOCKED',active});
   }
   const invoiceProof = verification?.invoiceOriginal;
+  const manualInvoiceProofs=new Set<string>(),manualOriginals=new Map<string,Record<string,unknown>>();let manualBytes=0;
+  if(options.manualReview){
+    const retain=async(documentId:string,bank:boolean)=>{
+      if(manualOriginals.has(documentId))return;
+      if(manualOriginals.size>=32)throw Error('För många original för en gemensam granskning.');
+      const file=await(bank?readBankOriginalBytes:readInvoiceOriginalBytes)(owner,documentId,64_000_000-manualBytes);manualBytes+=file.size;
+      const row=await db().prepare('SELECT id,owner,filename,mime,size,sha256,created_at FROM documents WHERE id=? AND owner=?').bind(documentId,owner).first<Record<string,unknown>>();
+      if(!row||['filename','mime','size','sha256'].some(field=>row[field]!==file[field as keyof typeof file]))throw Error('Originalets metadata ändrades under kontrollen.');
+      manualOriginals.set(documentId,{row,objectVersion:file.objectVersion,objectEtag:file.objectEtag});
+    };
+    const source=transactions.find(row=>row.id===target.id)!;
+    const values=matchingReferenceValues({candidates:source.references},'');
+    const candidates=state.invoices.filter(invoice=>values.includes(invoice.number));
+    if(candidates.length>20)throw Object.assign(Error('Högst 20 fakturor får granskas i samma fördelning.'),{status:409});
+    for(const invoice of candidates){try{if(invoice.documentId){await retain(invoice.documentId,false);manualInvoiceProofs.add(invoice.id);}}catch{/* A missing or changed original never becomes a positive proof. */}}
+    for(const row of transactions.filter(row=>covered.has(row.id)&&row.original.status==='VERIFIED'&&['bank_file','bankgiro_file'].includes(row.original.source)))await retain(row.original.id,true);
+  }
   const input: ReconciliationInput = {
     contractVersion:RECONCILIATION_CONTRACT_VERSION,ownerId:owner,companyId,revision,checkedAt,complete:true,referencePolicy:policy,
     transactions,reports,relationships,customerRelationships:[],
     invoices:state.invoices.map(invoice => {
       const reference = adaptInvoiceReferenceEvidence(invoiceFacts(state,invoice));
-      const originalIssue = invoiceProof?.integrity === 'passed' && invoice.documentId === invoiceProof.documentId && step('invoice')?.status === 'passed' ? '' : 'Fakturaoriginalet har inte verifierats entydigt i denna kontroll.';
+      const originalIssue = (options.manualReview?manualInvoiceProofs.has(invoice.id):invoiceProof?.integrity === 'passed' && invoice.documentId === invoiceProof.documentId && step('invoice')?.status === 'passed') ? '' : 'Fakturaoriginalet har inte verifierats entydigt i denna kontroll.';
       return {
         id:invoice.id,companyId,number:invoice.number,explicitReference:invoice.ocr ?? '',referenceClaims:reference.referenceClaims,referenceClaimsComplete:reference.complete,customerName:invoice.party,customerOrganizationNumber:invoice.organizationNumber || '',direction:invoice.direction,currency:invoice.currency,
         totalMinor:invoice.total,creditMinor:credited(state,invoice.id),reviewed:invoice.reviewed,voided:invoice.voided,issuedDate:invoice.issued,
@@ -240,10 +260,15 @@ export async function readReconciliationPreview(owner: string, initial: State, r
       workspaceSha256:await sha256(state),consent:consentContext,bankgiroSource:sourceEvidence.snapshot,
       selectedTransactionId:target.id,
       verification:verification ? {invoiceOriginal:verification.invoiceOriginal,steps:verification.steps.map(({id,status,rule,facts}) => ({id,status,rule,facts}))} : null,
+      ...(options.manualReview?{manualCommitEvidence:{consents:manualConsents,originals:[...manualOriginals.values()]}}:{}),
     },
   };
-  const preview = await buildReconciliationPreview(input);
   const currentSource=await readBankgiroSourceEvidence(db(),owner,sourceOriginals);
   if(JSON.stringify(currentSource.snapshot)!==JSON.stringify(sourceEvidence.snapshot))throw Object.assign(Error('Rapportkällans uppgifter ändrades under kontrollen. Läs en ny förhandsgranskning.'),{status:409});
-  return {...preview,transactionId:target.id,selectedStatus:preview.decisions.find(decision => decision.transactionId === target.id)?.status || 'BLOCKED'};
+  return input;
+}
+
+export async function readReconciliationPreview(owner:string,initial:State,revision:number,transactionId:string,options:PreviewOptions={}){
+  const input=await readReconciliationInput(owner,initial,revision,transactionId,options),preview=await buildReconciliationPreview(input);
+  return {...preview,transactionId,selectedStatus:preview.decisions.find(decision=>decision.transactionId===transactionId)?.status||'BLOCKED'};
 }

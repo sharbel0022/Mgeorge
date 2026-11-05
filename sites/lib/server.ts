@@ -138,7 +138,7 @@ async function readOriginalBytes(owner:string,documentId:string,maxBytes:number,
  const object=await env.BUCKET?.get(`${owner}/${documentId}`);if(!object||object.size!==doc.size)throw Error(bank?'Bankoriginalet saknas eller har ändrad storlek.':'Originalet saknas eller har ändrad storlek.');
  const bytes=await object.arrayBuffer();if(bytes.byteLength!==doc.size)throw Error(bank?'Bankoriginalets storlek stämmer inte.':'Originalets storlek stämmer inte.');
  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(n=>n.toString(16).padStart(2,'0')).join('');if(hash!==doc.sha256)throw Error(bank?'Bankoriginalets kontrollsumma stämmer inte. Ingen import har gjorts.':'Originalets kontrollsumma stämmer inte. Ingen import har gjorts.');
- return {...doc,bytes};
+ return {...doc,bytes,objectVersion:typeof object.version==='string'?object.version:null,objectEtag:typeof object.etag==='string'?object.etag:null};
 }
 /** The same owned, byte-checked bank original is required at import and allocation. */
 export async function readBankOriginalBytes(owner:string,documentId:string,maxBytes=15_000_000){return readOriginalBytes(owner,documentId,maxBytes,true);}

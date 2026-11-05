@@ -537,28 +537,33 @@ export function storeTransactions(db,items,source,original=null,guard=null,befor
   }
   return {imported,duplicate,enriched,conflicts,import_id};
 }
+/** Shared financial/source guards. This performs no write and grants no reference-policy exception. */
+export function assertAllocationEconomics(db,i,t,amountCents,{automatic=false}={}) {
+  if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');
+  if(!i||!t)throw new Error('Faktura eller bankhändelse saknas');
+  if(hasBankEvidenceConflict(t))throw new Error(bankEvidenceReviewReason(t));
+  if(t.payer_evidence?.conflict)throw new Error('Bankoriginalet innehåller motstridiga organisationsidentifierare. Granska originalet.');
+  if(automatic&&t.automatic_match_hold?.reason)throw new Error(t.automatic_match_hold.reason);
+  const financialReview=bankFinancialReview(t);
+  if(financialReview&&(automatic||financialReview.kind==='payer_conflict'||financialReview.kind==='reversal'||financialReview.kind==='refund'&&i.kind!=='credit'))throw new Error(financialReview.reason);
+  if(Math.sign(t.amount_cents)!==paymentSign(i))throw new Error('Fel betalningsriktning');
+  if(t.excluded)throw new Error('Bankhändelsen är undantagen från avstämning');
+  if(t.is_aggregate)throw new Error('Samlad Bankgiroinsättning kräver en betalningsspecifikation före matchning');
+  if(t.parent_bank_reference&&db.prepare('SELECT id FROM bank_transactions WHERE account=? AND bank_reference=? AND is_aggregate=1 AND excluded=0').get(t.account,t.parent_bank_reference))throw new Error('Bankgiro-specifikationen är ofullständig. Kontrollera samlingsposten före matchning.');
+  if(t.parent_bank_reference&&db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.account=? AND b.bank_reference=? LIMIT 1').get(t.account,t.parent_bank_reference))throw new Error('Samlingsposten har redan fördelats. Rätta den gamla kopplingen innan specifikationen används.');
+  if(t.bank_reference&&db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.id<>? AND b.account=? AND b.bank_reference=? AND b.amount_cents=? AND b.currency=? AND b.booked_at=? LIMIT 1').get(t.id,t.account,t.bank_reference,t.amount_cents,t.currency,t.booked_at))throw new Error('Bankreferensen har redan fördelats genom ett annat underlag. Kontrollera möjlig dubblett.');
+  if(t.payer&&t.reference&&db.prepare('SELECT DISTINCT b.payer,b.reference FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.id<>? AND b.account<>? AND b.amount_cents=? AND b.currency=? AND b.booked_at=?').all(t.id,t.account,t.amount_cents,t.currency,t.booked_at).some(other=>sameBankPaymentIdentity(t,other)))throw new Error('En motsvarande betalning från ett annat bankunderlag har redan fördelats. Kontrollera dubbletten.');
+  if(i.currency!==t.currency)throw new Error('Valutorna skiljer sig');
+  if(amountCents>i.remaining_cents||amountCents>t.available_cents)throw new Error('Beloppet överskrider återstående saldo');
+  if(!t.payer&&!t.reference)throw new Error('Betalare/referens saknas. Komplettera bankunderlag före matchning.');
+}
 /** Bekräftar kopplingen mellan bankhändelse och faktura, med belopps- och riktningskontroller inom en databastransaktion. */
 export function allocate(db,invoiceId,transactionId,amountCents,{automatic=false,transactionOpen=false,referenceContext}={}) {
   if(!Number.isSafeInteger(amountCents)||amountCents<=0)throw new Error('Ange ett positivt belopp');
   if(!transactionOpen)db.exec('BEGIN IMMEDIATE');
   try {
     const invoices=listInvoices(db,{referenceContext}),i=invoices.find(x=>x.id===invoiceId),t=listTransactions(db).find(x=>x.id===transactionId);
-    if(!i||!t)throw new Error('Faktura eller bankhändelse saknas');
-    if(hasBankEvidenceConflict(t))throw new Error(bankEvidenceReviewReason(t));
-    if(t.payer_evidence?.conflict)throw new Error('Bankoriginalet innehåller motstridiga organisationsidentifierare. Granska originalet.');
-    if(automatic&&t.automatic_match_hold?.reason)throw new Error(t.automatic_match_hold.reason);
-    const financialReview=bankFinancialReview(t);
-    if(financialReview&&(automatic||financialReview.kind==='payer_conflict'||financialReview.kind==='reversal'||financialReview.kind==='refund'&&i.kind!=='credit'))throw new Error(financialReview.reason);
-    if(Math.sign(t.amount_cents)!==paymentSign(i))throw new Error('Fel betalningsriktning');
-    if(t.excluded)throw new Error('Bankhändelsen är undantagen från avstämning');
-    if(t.is_aggregate)throw new Error('Samlad Bankgiroinsättning kräver en betalningsspecifikation före matchning');
-    if(t.parent_bank_reference&&db.prepare('SELECT id FROM bank_transactions WHERE account=? AND bank_reference=? AND is_aggregate=1 AND excluded=0').get(t.account,t.parent_bank_reference))throw new Error('Bankgiro-specifikationen är ofullständig. Kontrollera samlingsposten före matchning.');
-    if(t.parent_bank_reference&&db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.account=? AND b.bank_reference=? LIMIT 1').get(t.account,t.parent_bank_reference))throw new Error('Samlingsposten har redan fördelats. Rätta den gamla kopplingen innan specifikationen används.');
-    if(t.bank_reference&&db.prepare('SELECT a.id FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.id<>? AND b.account=? AND b.bank_reference=? AND b.amount_cents=? AND b.currency=? AND b.booked_at=? LIMIT 1').get(t.id,t.account,t.bank_reference,t.amount_cents,t.currency,t.booked_at))throw new Error('Bankreferensen har redan fördelats genom ett annat underlag. Kontrollera möjlig dubblett.');
-    if(t.payer&&t.reference&&db.prepare('SELECT DISTINCT b.payer,b.reference FROM allocations a JOIN bank_transactions b ON b.id=a.transaction_id WHERE b.id<>? AND b.account<>? AND b.amount_cents=? AND b.currency=? AND b.booked_at=?').all(t.id,t.account,t.amount_cents,t.currency,t.booked_at).some(other=>sameBankPaymentIdentity(t,other)))throw new Error('En motsvarande betalning från ett annat bankunderlag har redan fördelats. Kontrollera dubbletten.');
-    if(i.currency!==t.currency)throw new Error('Valutorna skiljer sig');
-    if(amountCents>i.remaining_cents||amountCents>t.available_cents)throw new Error('Beloppet överskrider återstående saldo');
-    if(!t.payer&&!t.reference)throw new Error('Betalare/referens saknas. Komplettera bankunderlag före matchning.');
+    assertAllocationEconomics(db,i,t,amountCents,{automatic});
     const referenceIssue=invoiceReferenceMatchIssue(i,t,invoices);
     if(referenceIssue)throw Object.assign(new Error(referenceIssue),{status:409,code:'invoice_reference_policy'});
     db.prepare('INSERT INTO allocations(id,invoice_id,transaction_id,amount_cents) VALUES(?,?,?,?)').run(randomUUID(),invoiceId,transactionId,amountCents);

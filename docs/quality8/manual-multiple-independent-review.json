@@ -1,0 +1,57 @@
+{
+  "schema": "mgeorge-independent-manual-allocation-review-v1",
+  "reviewedCommit": "4503944e4ecb9d34f467cbac27830dc529a15312",
+  "integratedSourceCommit": "6325f2d63565e2ab2bd9c02e5e6d3fc50cd04608",
+  "runtime": "Node v24.22.1",
+  "measuredSuites": [
+    {
+      "name": "independent adversarial cases",
+      "passed": 22,
+      "failed": 0,
+      "durationSeconds": 6.452
+    },
+    {
+      "name": "existing shared-client and UI regressions",
+      "passed": 58,
+      "failed": 0,
+      "durationSeconds": 0.786
+    },
+    {
+      "name": "actual API response to shipped client",
+      "passed": 2,
+      "failed": 0,
+      "durationSeconds": 1.122
+    }
+  ],
+  "relocationTestStatus": "The 22 cases ran in the original frozen review archive. Saving changes only relative import URLs. Syntax checked after saving; no new suite execution was requested solely for this report.",
+  "files": [
+    {
+      "original": "review-adapter-adversarial.test.mjs",
+      "saved": "test/quality8/manual-allocation-authorization.test.mjs",
+      "originalSha256": "65d5f75e1863604dff678550ac7a4f56dfc02eaea804c344be0a503e49530b65",
+      "savedSha256": "d046544eb7228f8548e411fde09d606a74918537674da9c603faa361ff179fd8",
+      "change": "relative import URLs only"
+    },
+    {
+      "original": "review-sites-client-integration.test.mjs",
+      "saved": "test/quality8/manual-allocation-sites-client.test.mjs",
+      "originalSha256": "569357681f07891168eda93d393d69f7e2c6c15d7fe0de0883c35db62b0f0f01",
+      "savedSha256": "938d53b96fc3d74b29ca59ac9608646583ebde5a976b5e878edb6980df30e2b1",
+      "change": "relative import URLs only"
+    },
+    {
+      "original": "review-client-lifecycle.test.mjs",
+      "saved": "test/quality8/manual-allocation-lifecycle.test.mjs",
+      "originalSha256": "982931aaa172dd574529f22fff5af906e39b1c6fdc08ca995738807f1c393384",
+      "savedSha256": "fb04b81caf8e34d5f808e02fa83373cca28813b2666bb74394573fc090409284",
+      "change": "relative import URLs only"
+    },
+    {
+      "original": "test/review-node-ui-revision.test.js",
+      "saved": "test/manual-allocation-independent-node.test.js",
+      "originalSha256": "c1231431beb94714d244848a39753ea62dd1692bbb5eb9cc8b66116471b201c7",
+      "savedSha256": "c1231431beb94714d244848a39753ea62dd1692bbb5eb9cc8b66116471b201c7",
+      "change": "byte-identical"
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "schema": "mgeorge-independent-ocr-gold-v1",
+  "synthetic": true,
+  "annotation": "Manually specified canonical facts from the printed synthetic invoices. This file is never generated from OCR or parser output. Direction is supplied trusted test metadata, not visually recovered.",
+  "cases": {
+    "holdout-normal-01": {
+      "fields": {
+        "invoice_number": "HF-73101",
+        "party": "Syntetiska Fjällservice AB",
+        "organization_number": "5598911013",
+        "issued_at": "2026-09-18",
+        "due_at": "2026-10-18",
+        "total_cents": 310000,
+        "vat_cents": 62000,
+        "net_cents": 248000,
+        "reference": "0074108010",
+        "bankgiro": "714-8125",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-normal-02": {
+      "fields": {
+        "invoice_number": "HF-73102",
+        "party": "Syntetiska Bruksmekanik AB",
+        "organization_number": "5598911021",
+        "issued_at": "2026-09-21",
+        "due_at": "2026-10-21",
+        "total_cents": 1025050,
+        "vat_cents": 205010,
+        "net_cents": 820040,
+        "reference": "0074108028",
+        "bankgiro": "8435-1725",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-normal-03": {
+      "fields": {
+        "invoice_number": "HF-73103",
+        "party": "Syntetiska Klarvik Konsult AB",
+        "organization_number": "5598911039",
+        "issued_at": "2026-09-24",
+        "due_at": "2026-10-24",
+        "total_cents": 199950,
+        "vat_cents": 39990,
+        "net_cents": 159960,
+        "reference": "0074108036",
+        "bankgiro": "928-1643",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-normal-04": {
+      "fields": {
+        "invoice_number": "HF-73104",
+        "party": "Syntetiska Eklunda Material AB",
+        "organization_number": "5598911047",
+        "issued_at": "2026-09-29",
+        "due_at": "2026-10-29",
+        "total_cents": 815375,
+        "vat_cents": 163075,
+        "net_cents": 652300,
+        "reference": "0074108044",
+        "bankgiro": "7654-8213",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-normal-05": {
+      "fields": {
+        "invoice_number": "HF-73105",
+        "party": "Syntetiska Norräng Frakt AB",
+        "organization_number": "5598911054",
+        "issued_at": "2026-10-02",
+        "due_at": "2026-11-01",
+        "total_cents": 124995,
+        "vat_cents": 24999,
+        "net_cents": 99996,
+        "reference": "0074108051",
+        "bankgiro": "618-2950",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-normal-06": {
+      "fields": {
+        "invoice_number": "HF-73106",
+        "party": "Syntetiska Ljusdal Form AB",
+        "organization_number": "5598911062",
+        "issued_at": "2026-10-07",
+        "due_at": "2026-11-06",
+        "total_cents": 1600000,
+        "vat_cents": 320000,
+        "net_cents": 1280000,
+        "reference": "0074108069",
+        "bankgiro": "4938-7160",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-normal-07": {
+      "fields": {
+        "invoice_number": "HF-73107",
+        "party": "Syntetiska Strandvik Drift AB",
+        "organization_number": "5598911070",
+        "issued_at": "2026-10-12",
+        "due_at": "2026-11-11",
+        "total_cents": 540150,
+        "vat_cents": 108030,
+        "net_cents": 432120,
+        "reference": "0074108077",
+        "bankgiro": "851-2741",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-normal-08": {
+      "fields": {
+        "invoice_number": "HF-73108",
+        "party": "Syntetiska Rosendal Kontor AB",
+        "organization_number": "5598911088",
+        "issued_at": "2026-10-16",
+        "due_at": "2026-11-15",
+        "total_cents": 308500,
+        "vat_cents": 61700,
+        "net_cents": 246800,
+        "reference": "0074108085",
+        "bankgiro": "3625-4787",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Actual OCR source; current product policy requires manual review even when all scalar values are correct."
+    },
+    "holdout-stress-pixelation": {
+      "fields": {
+        "invoice_number": "HF-73103",
+        "party": "Syntetiska Klarvik Konsult AB",
+        "organization_number": "5598911039",
+        "issued_at": "2026-09-24",
+        "due_at": "2026-10-24",
+        "total_cents": 199950,
+        "vat_cents": 39990,
+        "net_cents": 159960,
+        "reference": "0074108036",
+        "bankgiro": "928-1643",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Damaged image: abstain from green or automatic critical financial approval."
+    },
+    "holdout-stress-obscured-payment": {
+      "fields": {
+        "invoice_number": "HF-73108",
+        "party": "Syntetiska Rosendal Kontor AB",
+        "organization_number": "5598911088",
+        "issued_at": "2026-10-16",
+        "due_at": "2026-11-15",
+        "total_cents": 308500,
+        "vat_cents": 61700,
+        "net_cents": 246800,
+        "reference": "0074108085",
+        "bankgiro": "3625-4787",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true,
+      "reviewReason": "Damaged image: abstain from green or automatic critical financial approval."
+    }
+  }
+}

@@ -17,7 +17,7 @@ import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
 import { accountReadCooldown, mergeAccountReadCooldown } from './account-read-cooldown';
 import { guardedBankRead } from './account-read-guard';
-import { ConsentError, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection } from '../bank-consent-policy.js';
+import { ConsentError, bankAccountScopeError, bankAccountScopeReason, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection } from '../bank-consent-policy.js';
 
 type FlowContext = {
   version: 1; companyId: string; actorId: string; membershipVersion: string; mode: 'company' | 'legacy';
@@ -116,7 +116,10 @@ export function bankFailure(error: unknown): Response {
   if (code === 'BANK_SECRET_UNREADABLE') return response({ error: 'Bankanslutningens skyddade uppgifter kunde inte läsas. Kontakta administratören.' }, 503);
   if (error instanceof RuntimeBankError || code === 'BANK_RUNTIME_CONFIGURATION_CHANGED') return response({ error: 'Banktjänsten behöver aktiveras av systemadministratören.' }, 409);
   if (error instanceof BankError) return response({ error: error.message }, error.status);
-  if (error instanceof ConsentError) return response({ error: error.message, code: error.code }, error.status);
+  if (error instanceof ConsentError) {
+    const consentCode=error.code,reason=bankAccountScopeReason(error);
+    return response({error:consentCode==='BANK_ACCOUNT_SCOPE_INVALID'?new ConsentError(consentCode).message:error.message,code:consentCode,...(reason?{reason}:{})},error.status);
+  }
   if (error instanceof BankPeriodError) return response({error: error.message, code: error.code}, error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 409);
   if (error instanceof ProviderError) {
     const result = response({ error: error.message, code: error.code, ...(error.retryAfter?{retryAfter:error.retryAfter}:{}) }, error.status === 429 ? 429 : error.code === 'BANK_DATE_RANGE_INVALID' ? 400 : 502);
@@ -651,7 +654,8 @@ export async function revalidateConsent(request?: Request): Promise<Response> {
     const recent=await db().prepare("SELECT created_at FROM audit_events WHERE owner=? AND action='bank.consent.revalidation.started' ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(owner).first<{created_at:string}>();
     if(recent&&(!Number.isFinite(Date.parse(recent.created_at))||Date.now()-Date.parse(recent.created_at)<15*60000))throw new BankError('Medgivandet kontrollerades nyss. Vänta minst 15 minuter före ett nytt försök.',429);
     const savedAccounts=await accounts(conn),selected=JSON.parse(conn.selected_accounts),runId=uid();
-    if(!Array.isArray(selected)||!selected.length)throw new ConsentError('BANK_ACCOUNT_SCOPE_INVALID',409);
+    if(!Array.isArray(selected))throw bankAccountScopeError('SAVED_SELECTION_INVALID');
+    if(!selected.length)throw bankAccountScopeError('SAVED_SELECTION_EMPTY');
     const event=(action:string,errorCode?:string)=>db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?)').bind(uid(),owner,owner,action,JSON.stringify({run_id:runId,...(errorCode?{error_code:errorCode}:{})}),now());
     await lease.run(event('bank.consent.revalidation.started'));
     let commitAttempted=false,receiptId='',contextDigest='';

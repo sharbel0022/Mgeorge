@@ -1,0 +1,225 @@
+{
+  "schema": "mgeorge-holdout-render-v2",
+  "specificationSha256": "9b5d32a3ec386709e748be97555d2f2d4a1f89241fa95b643c84f0ed92fa8e52",
+  "generatorSha256": "9cdcfe833782a9da743450230072902b5c7cdd015a521d9c3181fa6aac71d88c",
+  "pillowVersion": "13.0.0",
+  "fonts": {
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf": "bade59d822652f76e6941aa87b40a87c13d1cc70db98ededb5011127efafd1d3",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf": "1b5f2da6f4cadce4c05b9ecebe3a6fcd374eb95ae443605e799f4c3287978939",
+    "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf": "9caef765d2e891c10dd73658894f01e660fe0c1c83e0bda7d6edf561d8f623d4",
+    "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf": "443a4dbd694b6e4689925947b456e0532e10b19c90fa32eb39ea6c2cd9db9ebd",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf": "8cb29f7db250ebb2551a6ce2c1e0bfd5a0eb520e9e233370db0493e82e1f36f7",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf": "aac3f559445d23f0f567a243f91f3f6ad6cb4b5cafa1521a3479fffe0637f0bd",
+    "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
+    "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf": "e83493c945848ecd4a9ad0f6d19164541a0d3e23a9c952304a00a46e00272ac5"
+  },
+  "images": [
+    {
+      "id": "holdout-v2-normal-01",
+      "population": "normal-readable",
+      "layout": "split-header-totals-right",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-01.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 170379,
+      "sha256": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d"
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "population": "normal-readable",
+      "layout": "formal-compact",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-02.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 146242,
+      "sha256": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604"
+    },
+    {
+      "id": "holdout-v2-normal-03",
+      "population": "normal-readable",
+      "layout": "right-address",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-03.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 160881,
+      "sha256": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338"
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "population": "normal-readable",
+      "layout": "upper-payment-panel",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-04.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 151028,
+      "sha256": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b"
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "population": "normal-readable",
+      "layout": "ledger-form",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-05.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 155370,
+      "sha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7"
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "population": "normal-readable",
+      "layout": "stacked-summary",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-06.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 149835,
+      "sha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b"
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "population": "normal-readable",
+      "layout": "horizontal-summary",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-07.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 150143,
+      "sha256": "6cdc1af980952c6efacf2060bc282c086aeaac21711f5d158b7b37f669f795b7"
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "population": "normal-readable",
+      "layout": "side-rail",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-08.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 153298,
+      "sha256": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac"
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "population": "normal-readable",
+      "layout": "classic-footer",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-09.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 142671,
+      "sha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1"
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "population": "normal-readable",
+      "layout": "paired-sections",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-10.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 159394,
+      "sha256": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b"
+    },
+    {
+      "id": "holdout-v2-stress-lost-bottom",
+      "population": "stress",
+      "layout": "lost-bottom-scan",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Simulated incomplete scan: lower financial/payment area is physically absent; original canonical gold is retained. Must abstain from green.",
+      "sourceId": "holdout-v2-normal-09",
+      "filename": "images/holdout-v2-stress-lost-bottom.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 90522,
+      "sha256": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e"
+    },
+    {
+      "id": "holdout-v2-stress-defocused-photo",
+      "population": "stress",
+      "layout": "defocused-tilted-photo",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Simulated low-resolution defocused phone photograph with reduced contrast and slight rotation; original canonical gold is retained. Must abstain from green.",
+      "sourceId": "holdout-v2-normal-02",
+      "filename": "images/holdout-v2-stress-defocused-photo.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 291796,
+      "sha256": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606"
+    }
+  ],
+  "noOcrInvoked": true
+}

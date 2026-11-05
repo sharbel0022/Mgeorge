@@ -1,0 +1,52 @@
+{
+  "sourceCommit": "98fb9a122ea5ccc2049321b22e41fe7ca6679587",
+  "runtime": "v24.22.1",
+  "syntheticOnly": true,
+  "productionCalls": 0,
+  "results": [
+    {
+      "invoiceRows": 2,
+      "companyInvoiceCensus": 2,
+      "samples": 20,
+      "warmup": 5,
+      "bindingBytes": 5506,
+      "p50ms": 0.84,
+      "p95ms": 1.12,
+      "falseAutomaticVerified": 0,
+      "notes": "Pure source-policy preview + manual plan + canonical binding; not HTTP/storage/bank latency"
+    },
+    {
+      "invoiceRows": 3,
+      "companyInvoiceCensus": 1000,
+      "samples": 20,
+      "warmup": 5,
+      "bindingBytes": 535734,
+      "p50ms": 31.29,
+      "p95ms": 34.21,
+      "falseAutomaticVerified": 0,
+      "notes": "Pure source-policy preview + manual plan + canonical binding; not HTTP/storage/bank latency"
+    },
+    {
+      "invoiceRows": 20,
+      "companyInvoiceCensus": 1000,
+      "samples": 20,
+      "warmup": 5,
+      "bindingBytes": 544346,
+      "p50ms": 36.42,
+      "p95ms": 38.14,
+      "falseAutomaticVerified": 0,
+      "notes": "Pure source-policy preview + manual plan + canonical binding; not HTTP/storage/bank latency"
+    },
+    {
+      "invoiceRows": 20,
+      "companyInvoiceCensus": 5000,
+      "samples": 20,
+      "warmup": 5,
+      "bindingBytes": 2676346,
+      "p50ms": 174.51,
+      "p95ms": 205.85,
+      "falseAutomaticVerified": 0,
+      "notes": "Pure source-policy preview + manual plan + canonical binding; not HTTP/storage/bank latency"
+    }
+  ]
+}

@@ -1,0 +1,399 @@
+{
+  "at": "2026-11-05T22:04:24.630Z",
+  "sourceCommit": "571073b8172ab53899a4ce3c2b717c7fe24daee2",
+  "mode": "local real browser, built-in synthetic demo, iframe CSS viewport widths, height 900",
+  "geometryChecks": 25,
+  "geometryPassed": 25,
+  "checks": [
+    {
+      "view": "overview",
+      "requestedWidth": 320,
+      "clientWidth": 305,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 320,
+      "mainWidth": 305,
+      "scrollWidth": 305
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 390,
+      "clientWidth": 375,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 390,
+      "mainWidth": 375,
+      "scrollWidth": 375
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 768,
+      "clientWidth": 753,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 768,
+      "mainWidth": 578,
+      "scrollWidth": 753
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 1024,
+      "clientWidth": 1009,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 1024,
+      "mainWidth": 819,
+      "scrollWidth": 1009
+    },
+    {
+      "view": "overview",
+      "requestedWidth": 1440,
+      "clientWidth": 1425,
+      "heading": "Ekonomiöversikt",
+      "innerWidth": 1440,
+      "mainWidth": 1209,
+      "scrollWidth": 1425
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 1440,
+      "activeLabel": null,
+      "clientWidth": 1440,
+      "dialog": {
+        "clientWidth": 833,
+        "height": 850,
+        "scrollWidth": 833,
+        "width": 850,
+        "x": 295,
+        "y": 25
+      },
+      "innerWidth": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 1024,
+      "activeLabel": null,
+      "clientWidth": 1024,
+      "dialog": {
+        "clientWidth": 833,
+        "height": 850,
+        "scrollWidth": 833,
+        "width": 850,
+        "x": 87,
+        "y": 25
+      },
+      "innerWidth": 1024,
+      "scrollWidth": 1024
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 768,
+      "activeLabel": null,
+      "clientWidth": 768,
+      "dialog": {
+        "clientWidth": 717,
+        "height": 850,
+        "scrollWidth": 717,
+        "width": 734,
+        "x": 17,
+        "y": 25
+      },
+      "innerWidth": 768,
+      "scrollWidth": 768
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 390,
+      "activeLabel": null,
+      "clientWidth": 390,
+      "dialog": {
+        "clientWidth": 353,
+        "height": 876,
+        "scrollWidth": 353,
+        "width": 370,
+        "x": 10,
+        "y": 12
+      },
+      "innerWidth": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "invoice",
+      "requestedWidth": 320,
+      "activeLabel": "Stäng dialog",
+      "clientWidth": 320,
+      "dialog": {
+        "clientWidth": 283,
+        "height": 876,
+        "scrollWidth": 283,
+        "width": 300,
+        "x": 10,
+        "y": 12
+      },
+      "innerWidth": 320,
+      "scrollWidth": 320
+    },
+    {
+      "view": "search-focus",
+      "requestedWidth": 320,
+      "query": "1003 3 200,00 11/10/2026",
+      "resultInvoice": "1003",
+      "resultCount": 1,
+      "afterEscape": {
+        "dialogOpen": false,
+        "activeTag": "INPUT",
+        "activeLabel": "Sök i arbetsytan",
+        "search": ""
+      }
+    },
+    {
+      "view": "bank",
+      "requestedWidth": 1440,
+      "activeLabel": "Stäng dialog",
+      "clientWidth": 1440,
+      "dialog": {
+        "clientWidth": 833,
+        "height": 850,
+        "scrollWidth": 833,
+        "width": 850,
+        "x": 295,
+        "y": 25
+      },
+      "innerWidth": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "bank",
+      "requestedWidth": 1024,
+      "activeLabel": null,
+      "clientWidth": 1024,
+      "dialog": {
+        "clientWidth": 833,
+        "height": 850,
+        "scrollWidth": 833,
+        "width": 850,
+        "x": 87,
+        "y": 25
+      },
+      "innerWidth": 1024,
+      "scrollWidth": 1024
+    },
+    {
+      "view": "bank",
+      "requestedWidth": 768,
+      "activeLabel": null,
+      "clientWidth": 768,
+      "dialog": {
+        "clientWidth": 717,
+        "height": 850,
+        "scrollWidth": 717,
+        "width": 734,
+        "x": 17,
+        "y": 25
+      },
+      "innerWidth": 768,
+      "scrollWidth": 768
+    },
+    {
+      "view": "bank",
+      "requestedWidth": 390,
+      "activeLabel": null,
+      "clientWidth": 390,
+      "dialog": {
+        "clientWidth": 353,
+        "height": 876,
+        "scrollWidth": 353,
+        "width": 370,
+        "x": 10,
+        "y": 12
+      },
+      "innerWidth": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "bank",
+      "requestedWidth": 320,
+      "activeLabel": null,
+      "clientWidth": 320,
+      "dialog": {
+        "clientWidth": 283,
+        "height": 876,
+        "scrollWidth": 283,
+        "width": 300,
+        "x": 10,
+        "y": 12
+      },
+      "innerWidth": 320,
+      "scrollWidth": 320
+    },
+    {
+      "view": "invoice-list",
+      "requestedWidth": 320,
+      "activeLabel": "Kundfakturor",
+      "clientWidth": 305,
+      "dialog": null,
+      "innerWidth": 320,
+      "scrollWidth": 305
+    },
+    {
+      "view": "invoice-list",
+      "requestedWidth": 390,
+      "clientWidth": 375,
+      "heading": "Kundfakturor",
+      "innerWidth": 390,
+      "scrollWidth": 375
+    },
+    {
+      "view": "invoice-list",
+      "requestedWidth": 768,
+      "clientWidth": 753,
+      "heading": "Kundfakturor",
+      "innerWidth": 768,
+      "scrollWidth": 753
+    },
+    {
+      "view": "invoice-list",
+      "requestedWidth": 1024,
+      "clientWidth": 1009,
+      "heading": "Kundfakturor",
+      "innerWidth": 1024,
+      "scrollWidth": 1009
+    },
+    {
+      "view": "invoice-list",
+      "requestedWidth": 1440,
+      "clientWidth": 1425,
+      "heading": "Kundfakturor",
+      "innerWidth": 1440,
+      "scrollWidth": 1425
+    },
+    {
+      "view": "invoice-form",
+      "requestedWidth": 1440,
+      "innerWidth": 1440,
+      "clientWidth": 1440,
+      "scrollWidth": 1440,
+      "dialog": {
+        "x": 295,
+        "y": 25,
+        "width": 850,
+        "height": 850,
+        "clientWidth": 833,
+        "scrollWidth": 833
+      },
+      "formColumns": "383px 383px",
+      "dateWidths": [
+        383,
+        383
+      ]
+    },
+    {
+      "view": "invoice-form",
+      "requestedWidth": 1024,
+      "innerWidth": 1024,
+      "clientWidth": 1024,
+      "scrollWidth": 1024,
+      "dialog": {
+        "x": 87,
+        "y": 25,
+        "width": 850,
+        "height": 850,
+        "clientWidth": 833,
+        "scrollWidth": 833
+      },
+      "formColumns": "383px 383px",
+      "dateWidths": [
+        383,
+        383
+      ]
+    },
+    {
+      "view": "invoice-form",
+      "requestedWidth": 768,
+      "innerWidth": 768,
+      "clientWidth": 768,
+      "scrollWidth": 768,
+      "dialog": {
+        "x": 17,
+        "y": 25,
+        "width": 734,
+        "height": 850,
+        "clientWidth": 717,
+        "scrollWidth": 717
+      },
+      "formColumns": "325px 325px",
+      "dateWidths": [
+        325,
+        325
+      ]
+    },
+    {
+      "view": "invoice-form",
+      "requestedWidth": 390,
+      "innerWidth": 390,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "dialog": {
+        "x": 10,
+        "y": 12,
+        "width": 370,
+        "height": 876,
+        "clientWidth": 353,
+        "scrollWidth": 353
+      },
+      "formColumns": "305px",
+      "dateWidths": [
+        305,
+        305
+      ]
+    },
+    {
+      "view": "invoice-form",
+      "requestedWidth": 320,
+      "innerWidth": 320,
+      "clientWidth": 320,
+      "scrollWidth": 320,
+      "dialog": {
+        "x": 10,
+        "y": 12,
+        "width": 300,
+        "height": 876,
+        "clientWidth": 283,
+        "scrollWidth": 283
+      },
+      "formColumns": "235px",
+      "dateWidths": [
+        235,
+        235
+      ]
+    },
+    {
+      "view": "bank-label",
+      "requestedWidth": 1440,
+      "recordedHeading": true,
+      "bankStateBlocked": true,
+      "missingPayerShown": true
+    },
+    {
+      "view": "form-close",
+      "requestedWidth": 1440,
+      "returnedTo": "Ny faktura",
+      "saveInvoked": false,
+      "source": "observed accessibility state after closing the empty form"
+    }
+  ],
+  "limits": [
+    "Not authenticated production UI acceptance",
+    "Not physical mobile or screen reader acceptance",
+    "Browser renderer error code 9 interrupted an intermediate check; recovered by reload",
+    "Full-page screenshots and the timed-out final Tab-cycle attempt are excluded",
+    "Demonstration mode exposes the manual allocation hold, not a successful real allocation"
+  ],
+  "sourceTree": "d4e4c7f46d9139eca1284f8410d2dc36e669fd76",
+  "sitesSourceTree": "cd676dd29c8805d55d216b9c6c34d3cccbe9010f",
+  "measurementTransport": "Read-only browser DOM metrics, then the temporary same-origin fixture button after a browser renderer crash. Browser actions use only the approved CUA surface.",
+  "screenshots": {
+    "invoice-320-before-fix.png": "d88525e27f034dbed764e31b695a621cc1d9b1cf34139cb8b15c309253d1ca40",
+    "invoice-320.png": "a8526abe3b7c731f245b7dbd016f1cc0a7dc3e54898d9a8d35571d014a346e8f",
+    "invoice-form-320.png": "aacad39f3933865c4c7452eb642560bba3f981f038fb5d9fe32e7831587b2094",
+    "bank-320.png": "0e9dedb23579e19afef7d48f251367e6815f92beb87de9f1db6229360451b93a",
+    "overview-1440.png": "5b63fd3a5b42f00cb5482e77b9e0c3ee1371885f1350c1bd1c248dbbc7cfeafe"
+  }
+}

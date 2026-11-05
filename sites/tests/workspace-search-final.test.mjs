@@ -104,6 +104,14 @@ for(const [kind,index,id]of [['detail',2,'invoice-3'],['tx',5,'bank-2']])test(`s
  assert.deepEqual(f.opened,[{kind,id}]);assert.equal(f.input.props.value,'');assert.equal(f.input.props['aria-expanded'],false);assert.equal(f.region(),undefined);
 });
 
+for(const [kind,index,id]of [['detail',2,'invoice-3'],['tx',5,'bank-2']])test(`opening a ${kind} result gives the dialog a stable focus return target`,t=>{
+ const f=fixture(t);f.type('synthetic');
+ let opener=null;f.render({open:modal=>{opener=f.active;f.opened.push(modal);}});f.resultNodes[index].focus();
+ f.click(index);
+ assert.equal(opener,f.inputNode,'The dialog must capture the persistent input, not a result removed when the query closes');
+ assert.equal(f.active,f.inputNode);assert.deepEqual(f.opened,[{kind,id}]);assert.equal(f.region(),undefined);
+});
+
 test('normalized matching bounds the result list to four invoices and four bank payments',t=>{
  const f=fixture(t);f.type(' \u00a0ＳＹＮＴＨＥＴＩＣ\t ');
  assert.equal(f.results.length,8);assert.match(text(f.status()),/8\s+resultat visas/);

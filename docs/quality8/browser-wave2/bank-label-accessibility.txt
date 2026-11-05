@@ -1,0 +1,76 @@
+Browser tab: 14, Title: "Mgeorge – lokal layoutkontroll", URL: "http://127.0.0.1:4173/__quality8-responsive.html".
+1 AXWebArea Mgeorge – lokal layoutkontroll, URL: 127.0.0.1:4173/__quality8-responsive.html
+	2 container
+		3 heading Lokal layoutkontroll, Value: 1
+			4 text Lokal layoutkontroll
+		5 container Välj vybredd
+			6 checkbox 320 px, Value: 0
+			7 checkbox 390 px, Value: 0
+			8 checkbox 768 px, Value: 0
+			9 checkbox 1024 px, Value: 0
+			10 checkbox 1440 px, Value: 1
+		69 text 1440 CSS-px · visningsskala 92 %
+		12 button Kontrollera layout, ID: measure
+		70 text {"innerWidth":1440,"clientWidth":1440,"scrollWidth":1440,"dialog":{"x":295,"y":25,"width":850,"height":850,"clientWidth":833,"scrollWidth":833},"formColumns":"383px 383px","dateWidths":[383,383]}
+	13 container Description: Mgeorge vid vald vybredd, ID: app
+		14 AXWebArea MG Fakturakoll – betalningar & fakturor, URL: 127.0.0.1:4173/?view=receivable
+			71 container Betalare okänd
+				72 container
+					73 heading Betalare okänd, Value: 2, ID: modal-title
+						74 text Betalare okänd
+					75 text Inbetalning
+					76 button Stäng dialog
+				77 text Belopp
+				78 heading 1 000,00 kr, Value: 2
+					79 text 1 000,00 kr
+				80 text Blockerad
+				81 definition list
+					82 container Betalare enligt banken
+						83 text Betalare enligt banken
+					84 text Betalare okänd
+					85 container Fakturanummer
+						86 text Fakturanummer
+					87 text 1003
+					88 container Betalningsdatum
+						89 text Betalningsdatum
+					90 text 4 nov.
+					91 container Betalaruppgiftens källa
+						92 text Betalaruppgiftens källa
+					93 text Sparad transaktionsuppgift · bankkälla ej verifierad
+				94 text Avsedd betalningsreferens
+				95 text 10039
+				96 container
+					97 text Källa:  Fakturans uttryckliga referens
+				98 text Bankrapporterad referens
+				99 text Saknas i bankunderlaget
+				100 text Bank-OCR saknas.
+				101 container Betalningskontroll
+					102 heading Betalningskontroll, Value: 3, ID: verification-heading-422f083a-ae05-4fab-af49-b17f8eb9b44d
+						103 text Betalningskontroll
+					104 text Demoläget har inga åtkomliga bank- eller fakturaoriginal. Verifieringsstegen visas vid läsning av en sparad betalning.
+				105 container Separat avstämningsförslag
+					106 heading Avstämningsförslag · separat godkännande krävs, Value: 3
+						107 text Avstämningsförslag · separat godkännande krävs
+					108 text Läsande förhandsgranskning · inga saldon ändras. Förslaget är inte ett godkännande eller en registrerad betalning.
+					109 text Demoläget läser inga avstämningsförslag från sparade bankunderlag.
+				110 container
+					111 heading Fördela på flera fakturor, Value: 3
+						112 text Fördela på flera fakturor
+					113 text Demoläget kan inte godkänna fördelningar mot sparade bank- och fakturaoriginal.
+				114 button (collapsed) Varifrån kommer uppgifterna?, Secondary Actions: Expand
+					115 text Varifrån kommer uppgifterna?
+				116 container
+					117 heading Faktura och nästa steg, Value: 3
+						118 text Faktura och nästa steg
+					119 text Betalningen är registrerad mot fakturan.
+					120 button Visa faktura
+				121 heading Registrerade kopplingar, Value: 3
+					122 text Registrerade kopplingar
+				123 container
+					124 text Faktura  1003  ·  1 000,00 kr
+				125 text Fiktivt exempel: delbetalning
+				126 button Ångra
+				127 button (collapsed) Fler åtgärder, Secondary Actions: Expand
+					128 text Fler åtgärder
+
+The focused UI element is 76 button Stäng dialog

@@ -1,0 +1,250 @@
+{
+  "schema": "mgeorge-recovery-integrated-rerun-v1",
+  "synthetic": true,
+  "productionRestoreTested": false,
+  "integrationHeadAtRun": "69ec844e5f3d7d7104da75a264aeaf4144804bdb",
+  "sourceFileSha256": {
+    "sites/scripts/recovery-drill.mjs": "5a80d1f5335ade1860b6e61f278a81d8c0df11818c38ce5f950e86a12da7dd89",
+    "sites/scripts/lib/recovery-acceptance.mjs": "79da81aba22c6579fc7730a3bca5f44c6e3967d68c9489e041fc9eeaf5b21fcf",
+    "sites/scripts/lib/recovery-drill-fixture.mjs": "ec7e9b7bef842abedafb601f5dd9ddcd5f42105d3056c02fc903426ad3752ede",
+    "sites/tests/recovery-drill.test.mjs": "a670f9c1ff17d37b4d9f2dd209fc404ceb5b3394b205dfde0b399f2e5d5489fe",
+    "sites/lib/backup-engine.ts": "b4cbd39002cc0c21b9e743d41e8e00dfa6c96769c08fc46178793257803f5d5a",
+    "sites/lib/backups.ts": "48cd4134fc6b6c4ad60934fc11e39da9856080bd3943100f55732d8cd4b4e970",
+    "sites/scripts/lib/backup-recovery.mjs": "c971322d5d076726d018de1bda011855e0c01404cf17e8dda332d85601ca218d",
+    "sites/scripts/restore-backup-isolated.mjs": "2ee2046484020f1013fe1778f45c06f00ef3a3aaaba00c9032c523ef356b46cb",
+    "sites/lib/company-contract.js": "5da17708a61f842002c3d57650679d260bb5142821baf97700353bc467e14c8e",
+    "src/backup.js": "68fcf28489d40b1acd107f404969b4188e225ee3dd554a5d4892fb4975dd03fa"
+  },
+  "matchesOriginalRecoveryImplementation": true,
+  "result": {
+    "format": "MG-Sites-synthetic-recovery-drill-1",
+    "scope": "synthetic-isolated-evidence-only",
+    "productionRestoreTested": false,
+    "startedAt": "2026-11-05T18:37:44.007Z",
+    "completedAt": "2026-11-05T18:37:55.613Z",
+    "runtime": {
+      "node": "v24.22.1",
+      "platform": "linux",
+      "architecture": "x64"
+    },
+    "accepted": true,
+    "objectives": {
+      "isolatedRtoMilliseconds": 60000,
+      "simulatedRpoMilliseconds": 900000
+    },
+    "timing": {
+      "backupAndResumeMilliseconds": 3443.077,
+      "exportMilliseconds": 2398.523,
+      "restoreAndAcceptanceMilliseconds": 3416.863,
+      "totalDrillMilliseconds": 11605.651,
+      "rtoIncludes": [
+        "authenticated bundle validation",
+        "fresh SQLite evidence database",
+        "original write and readback",
+        "independent row, owner, ledger and SHA-256 acceptance"
+      ],
+      "rtoExcludes": [
+        "operator response",
+        "cloud download or regional outage",
+        "key custody or access recovery",
+        "production application activation"
+      ]
+    },
+    "simulatedRecovery": {
+      "clock": "synthetic scenario, not a production measurement",
+      "recoveryPointAt": "2026-11-05T12:00:00.000Z",
+      "postSnapshotWriteAt": "2026-11-05T12:05:00.000Z",
+      "incidentAt": "2026-11-05T12:15:00.000Z",
+      "rpoMilliseconds": 900000,
+      "postSnapshotWritesExcluded": 1
+    },
+    "resume": {
+      "interruptionObserved": true,
+      "snapshotPreserved": true,
+      "steps": 147,
+      "attempts": 1
+    },
+    "tables": [
+      {
+        "name": "workspaces",
+        "rows": 1
+      },
+      {
+        "name": "audit_events",
+        "rows": 1
+      },
+      {
+        "name": "documents",
+        "rows": 362
+      },
+      {
+        "name": "bank_applications",
+        "rows": 1
+      },
+      {
+        "name": "bank_connections",
+        "rows": 1
+      },
+      {
+        "name": "bank_sync_runs",
+        "rows": 1
+      },
+      {
+        "name": "gmail_connections",
+        "rows": 1
+      },
+      {
+        "name": "customer_contacts",
+        "rows": 1
+      },
+      {
+        "name": "customer_messages",
+        "rows": 1
+      },
+      {
+        "name": "reconciliation_findings",
+        "rows": 1
+      },
+      {
+        "name": "customer_deliveries",
+        "rows": 1
+      },
+      {
+        "name": "gmail_sources",
+        "rows": 1
+      },
+      {
+        "name": "gmail_runs",
+        "rows": 1
+      },
+      {
+        "name": "document_automation",
+        "rows": 1
+      },
+      {
+        "name": "document_jobs",
+        "rows": 1
+      },
+      {
+        "name": "document_extractions",
+        "rows": 1
+      },
+      {
+        "name": "invoice_counterparties",
+        "rows": 1
+      },
+      {
+        "name": "document_registrations",
+        "rows": 1
+      },
+      {
+        "name": "payment_control_runs",
+        "rows": 1
+      },
+      {
+        "name": "payment_control_requests",
+        "rows": 1
+      },
+      {
+        "name": "bankgiro_ingest_sources",
+        "rows": 1
+      },
+      {
+        "name": "bankgiro_ingest_jobs",
+        "rows": 1
+      },
+      {
+        "name": "saas_bank_state",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_scopes",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_jobs",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_requests",
+        "rows": 1
+      },
+      {
+        "name": "company_bank_sync_receipts",
+        "rows": 1
+      }
+    ],
+    "originals": {
+      "count": 362,
+      "bytes": 142968213,
+      "hashesChecked": 362
+    },
+    "ledger": {
+      "invoices": 2,
+      "invoiceCents": 75000,
+      "transactions": 2,
+      "transactionCents": 75000,
+      "allocations": 1,
+      "allocatedCents": 62500,
+      "revokedCredits": 1,
+      "revokedBankgiroLinks": 1
+    },
+    "rejectionChecks": [
+      {
+        "case": "wrong_key",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "wrong_owner",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "wrong_company",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "corrupt_original",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "missing_original",
+        "stage": "restore",
+        "rejected": true,
+        "outputCreated": false
+      },
+      {
+        "case": "altered_ledger",
+        "stage": "acceptance",
+        "rejected": true
+      },
+      {
+        "case": "altered_plaintext_original",
+        "stage": "acceptance",
+        "rejected": true
+      },
+      {
+        "case": "foreign_owner_row",
+        "stage": "acceptance",
+        "rejected": true
+      }
+    ],
+    "sourceUnchanged": true,
+    "otherOwnerExcluded": true,
+    "authorizationAndTransientRowsAbsent": true,
+    "workerLeasesInvalidated": true
+  },
+  "limits": [
+    "No production snapshot was restored.",
+    "The package was already local at RTO start.",
+    "RPO is the explicit synthetic incident scenario.",
+    "No production activation, offsite access or key custody was tested."
+  ]
+}

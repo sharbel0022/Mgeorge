@@ -1,0 +1,1498 @@
+[
+  {
+    "id": "holdout-normal-01",
+    "text": "FAKTURA",
+    "x": 90,
+    "y": 112,
+    "size": 54,
+    "width": 279
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Leverantör: Syntetiska Fjällservice AB",
+    "x": 90,
+    "y": 270,
+    "size": 32,
+    "width": 606
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Organisationsnummer: 559891-1013",
+    "x": 90,
+    "y": 332,
+    "size": 30,
+    "width": 556
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Fakturanummer: HF-73101",
+    "x": 90,
+    "y": 430,
+    "size": 32,
+    "width": 485
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Fakturadatum: 2026-09-18",
+    "x": 90,
+    "y": 505,
+    "size": 32,
+    "width": 431
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Förfallodatum: 2026-10-18",
+    "x": 850,
+    "y": 505,
+    "size": 32,
+    "width": 430
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 90,
+    "y": 660,
+    "size": 29,
+    "width": 597
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 90,
+    "y": 705,
+    "size": 27,
+    "width": 469
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Benämning",
+    "x": 110,
+    "y": 883,
+    "size": 29,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Antal",
+    "x": 980,
+    "y": 883,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Belopp exkl. moms",
+    "x": 1160,
+    "y": 883,
+    "size": 29,
+    "width": 310
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Tillsyn och service av värmepump",
+    "x": 110,
+    "y": 965,
+    "size": 29,
+    "width": 496
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "1",
+    "x": 1005,
+    "y": 965,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "2 480,00",
+    "x": 1195,
+    "y": 965,
+    "size": 30,
+    "width": 134
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Netto: 2 480,00 SEK",
+    "x": 850,
+    "y": 1180,
+    "size": 32,
+    "width": 324
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Moms: 620,00 SEK",
+    "x": 850,
+    "y": 1244,
+    "size": 32,
+    "width": 300
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Att betala: 3 100,00 SEK",
+    "x": 850,
+    "y": 1320,
+    "size": 36,
+    "width": 498
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Bankgiro: 714-8125",
+    "x": 90,
+    "y": 1700,
+    "size": 32,
+    "width": 355
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "OCR: 0074108010",
+    "x": 840,
+    "y": 1700,
+    "size": 32,
+    "width": 294
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "Ange OCR-numret vid betalning.",
+    "x": 90,
+    "y": 1775,
+    "size": 27,
+    "width": 438
+  },
+  {
+    "id": "holdout-normal-01",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 710
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "FAKTURA",
+    "x": 90,
+    "y": 130,
+    "size": 54,
+    "width": 299
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Fakturanummer: HF-73102",
+    "x": 90,
+    "y": 260,
+    "size": 32,
+    "width": 491
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Leverantör: Syntetiska Bruksmekanik AB",
+    "x": 90,
+    "y": 370,
+    "size": 32,
+    "width": 672
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Organisationsnummer: 559891-1021",
+    "x": 90,
+    "y": 432,
+    "size": 30,
+    "width": 561
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Bankgiro",
+    "x": 1110,
+    "y": 305,
+    "size": 26,
+    "width": 121
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "8435-1725",
+    "x": 1110,
+    "y": 348,
+    "size": 32,
+    "width": 174
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Fakturadatum: 21.09.2026",
+    "x": 90,
+    "y": 560,
+    "size": 32,
+    "width": 434
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Förfallodatum: 21.10.2026",
+    "x": 90,
+    "y": 625,
+    "size": 32,
+    "width": 434
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 90,
+    "y": 760,
+    "size": 29,
+    "width": 610
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 90,
+    "y": 805,
+    "size": 27,
+    "width": 474
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Benämning",
+    "x": 110,
+    "y": 983,
+    "size": 29,
+    "width": 187
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Antal",
+    "x": 980,
+    "y": 983,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Belopp exkl. moms",
+    "x": 1160,
+    "y": 983,
+    "size": 29,
+    "width": 309
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Reservdelar och planerat verkstadsarbete",
+    "x": 110,
+    "y": 1065,
+    "size": 29,
+    "width": 620
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "1",
+    "x": 1005,
+    "y": 1065,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "8 200,40",
+    "x": 1195,
+    "y": 1065,
+    "size": 30,
+    "width": 134
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Netto: 8 200,40 SEK",
+    "x": 780,
+    "y": 1260,
+    "size": 32,
+    "width": 335
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Moms: 2 050,10 SEK",
+    "x": 780,
+    "y": 1324,
+    "size": 32,
+    "width": 342
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Att betala: 10 250,50 SEK",
+    "x": 780,
+    "y": 1400,
+    "size": 36,
+    "width": 522
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "OCR: 0074108028",
+    "x": 90,
+    "y": 1650,
+    "size": 32,
+    "width": 300
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "Betalningsvillkor: 30 dagar",
+    "x": 90,
+    "y": 1730,
+    "size": 29,
+    "width": 401
+  },
+  {
+    "id": "holdout-normal-02",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 756
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "FAKTURA",
+    "x": 90,
+    "y": 125,
+    "size": 54,
+    "width": 279
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Leverantör",
+    "x": 90,
+    "y": 265,
+    "size": 26,
+    "width": 142
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Syntetiska Klarvik Konsult AB",
+    "x": 90,
+    "y": 308,
+    "size": 31,
+    "width": 454
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Organisationsnummer: 559891-1039",
+    "x": 90,
+    "y": 373,
+    "size": 30,
+    "width": 556
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Fakturanummer",
+    "x": 1080,
+    "y": 245,
+    "size": 26,
+    "width": 208
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "HF-73103",
+    "x": 1080,
+    "y": 288,
+    "size": 32,
+    "width": 173
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Fakturadatum",
+    "x": 90,
+    "y": 535,
+    "size": 26,
+    "width": 182
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "24/09/2026",
+    "x": 90,
+    "y": 578,
+    "size": 32,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Förfallodatum",
+    "x": 840,
+    "y": 535,
+    "size": 26,
+    "width": 181
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "24/10/2026",
+    "x": 840,
+    "y": 578,
+    "size": 32,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 90,
+    "y": 720,
+    "size": 29,
+    "width": 597
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 90,
+    "y": 765,
+    "size": 27,
+    "width": 469
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Benämning",
+    "x": 110,
+    "y": 938,
+    "size": 29,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Antal",
+    "x": 980,
+    "y": 938,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Belopp exkl. moms",
+    "x": 1160,
+    "y": 938,
+    "size": 29,
+    "width": 310
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Rådgivning för systemdokumentation",
+    "x": 110,
+    "y": 1020,
+    "size": 29,
+    "width": 546
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "1",
+    "x": 1005,
+    "y": 1020,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "1599.60",
+    "x": 1195,
+    "y": 1020,
+    "size": 30,
+    "width": 125
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Netto: 1599.60 SEK",
+    "x": 90,
+    "y": 1220,
+    "size": 32,
+    "width": 314
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Moms: 399.90 SEK",
+    "x": 90,
+    "y": 1284,
+    "size": 32,
+    "width": 300
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Att betala: 1999.50 SEK",
+    "x": 90,
+    "y": 1360,
+    "size": 36,
+    "width": 485
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Bankgiro",
+    "x": 100,
+    "y": 1645,
+    "size": 26,
+    "width": 116
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "928-1643",
+    "x": 100,
+    "y": 1688,
+    "size": 32,
+    "width": 170
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "OCR",
+    "x": 850,
+    "y": 1645,
+    "size": 26,
+    "width": 57
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "0074108036",
+    "x": 850,
+    "y": 1688,
+    "size": 32,
+    "width": 204
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "Ange OCR-numret vid betalning.",
+    "x": 100,
+    "y": 1760,
+    "size": 27,
+    "width": 438
+  },
+  {
+    "id": "holdout-normal-03",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 710
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "FAKTURA",
+    "x": 90,
+    "y": 130,
+    "size": 54,
+    "width": 279
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 90,
+    "y": 270,
+    "size": 29,
+    "width": 597
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 90,
+    "y": 315,
+    "size": 27,
+    "width": 469
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Leverantör: Syntetiska Eklunda Material AB",
+    "x": 90,
+    "y": 420,
+    "size": 32,
+    "width": 695
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Organisationsnummer: 559891-1047",
+    "x": 90,
+    "y": 482,
+    "size": 30,
+    "width": 556
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Fakturanummer: HF-73104",
+    "x": 100,
+    "y": 645,
+    "size": 32,
+    "width": 485
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Fakturadatum: 2026-09-29",
+    "x": 100,
+    "y": 735,
+    "size": 32,
+    "width": 431
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Förfallodatum: 2026-10-29",
+    "x": 850,
+    "y": 735,
+    "size": 32,
+    "width": 430
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Benämning",
+    "x": 110,
+    "y": 948,
+    "size": 29,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Antal",
+    "x": 980,
+    "y": 948,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Belopp exkl. moms",
+    "x": 1160,
+    "y": 948,
+    "size": 29,
+    "width": 310
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Förbrukningsmaterial enligt leverans",
+    "x": 110,
+    "y": 1030,
+    "size": 29,
+    "width": 535
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "1",
+    "x": 1005,
+    "y": 1030,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "6 523,00",
+    "x": 1195,
+    "y": 1030,
+    "size": 30,
+    "width": 134
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Netto: 6 523,00 SEK",
+    "x": 820,
+    "y": 1220,
+    "size": 32,
+    "width": 324
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Moms: 1 630,75 SEK",
+    "x": 820,
+    "y": 1284,
+    "size": 32,
+    "width": 331
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Att betala: 8 153,75 SEK",
+    "x": 820,
+    "y": 1360,
+    "size": 36,
+    "width": 498
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Bankgiro: 7654-8213",
+    "x": 90,
+    "y": 1640,
+    "size": 32,
+    "width": 378
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "OCR: 0074108044",
+    "x": 90,
+    "y": 1715,
+    "size": 32,
+    "width": 294
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "Ange OCR-numret vid betalning.",
+    "x": 90,
+    "y": 1790,
+    "size": 27,
+    "width": 438
+  },
+  {
+    "id": "holdout-normal-04",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 710
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "FAKTURA",
+    "x": 100,
+    "y": 115,
+    "size": 54,
+    "width": 279
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Leverantör: Syntetiska Norräng Frakt AB",
+    "x": 100,
+    "y": 270,
+    "size": 32,
+    "width": 646
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Organisationsnummer: 559891-1054",
+    "x": 100,
+    "y": 332,
+    "size": 30,
+    "width": 556
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Fakturanummer: HF-73105",
+    "x": 100,
+    "y": 455,
+    "size": 32,
+    "width": 485
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Fakturadatum: 02-10-2026",
+    "x": 100,
+    "y": 540,
+    "size": 32,
+    "width": 431
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Förfallodatum: 01-11-2026",
+    "x": 100,
+    "y": 605,
+    "size": 32,
+    "width": 430
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Bankgiro",
+    "x": 1060,
+    "y": 510,
+    "size": 26,
+    "width": 116
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "618-2950",
+    "x": 1060,
+    "y": 553,
+    "size": 32,
+    "width": 155
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 100,
+    "y": 755,
+    "size": 29,
+    "width": 597
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 100,
+    "y": 800,
+    "size": 27,
+    "width": 469
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Benämning",
+    "x": 120,
+    "y": 968,
+    "size": 29,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Antal",
+    "x": 970,
+    "y": 968,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Belopp exkl. moms",
+    "x": 1150,
+    "y": 968,
+    "size": 29,
+    "width": 310
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Transport av verkstadsutrustning",
+    "x": 120,
+    "y": 1050,
+    "size": 29,
+    "width": 481
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "1",
+    "x": 995,
+    "y": 1050,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "999,96",
+    "x": 1185,
+    "y": 1050,
+    "size": 30,
+    "width": 105
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Netto: 999,96 SEK",
+    "x": 100,
+    "y": 1245,
+    "size": 32,
+    "width": 293
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Moms: 249,99 SEK",
+    "x": 100,
+    "y": 1309,
+    "size": 32,
+    "width": 300
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Att betala: 1 249,95 SEK",
+    "x": 100,
+    "y": 1385,
+    "size": 36,
+    "width": 498
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "OCR",
+    "x": 110,
+    "y": 1665,
+    "size": 26,
+    "width": 57
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "0074108051",
+    "x": 110,
+    "y": 1708,
+    "size": 32,
+    "width": 204
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "Ange OCR-numret vid betalning.",
+    "x": 790,
+    "y": 1720,
+    "size": 27,
+    "width": 438
+  },
+  {
+    "id": "holdout-normal-05",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 710
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "FAKTURA",
+    "x": 90,
+    "y": 145,
+    "size": 54,
+    "width": 299
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Leverantör",
+    "x": 90,
+    "y": 290,
+    "size": 26,
+    "width": 146
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Syntetiska Ljusdal Form AB",
+    "x": 90,
+    "y": 333,
+    "size": 34,
+    "width": 480
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Organisationsnummer: 559891-1062",
+    "x": 90,
+    "y": 398,
+    "size": 30,
+    "width": 561
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Fakturanummer",
+    "x": 90,
+    "y": 520,
+    "size": 26,
+    "width": 214
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "HF-73106",
+    "x": 90,
+    "y": 563,
+    "size": 32,
+    "width": 177
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Fakturadatum",
+    "x": 90,
+    "y": 700,
+    "size": 26,
+    "width": 187
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "2026-10-07",
+    "x": 90,
+    "y": 743,
+    "size": 32,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Förfallodatum",
+    "x": 850,
+    "y": 700,
+    "size": 26,
+    "width": 187
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "2026-11-06",
+    "x": 850,
+    "y": 743,
+    "size": 32,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 90,
+    "y": 880,
+    "size": 29,
+    "width": 610
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 90,
+    "y": 925,
+    "size": 27,
+    "width": 474
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Benämning",
+    "x": 110,
+    "y": 1093,
+    "size": 29,
+    "width": 187
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Antal",
+    "x": 980,
+    "y": 1093,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Belopp exkl. moms",
+    "x": 1160,
+    "y": 1093,
+    "size": 29,
+    "width": 309
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Formgivning av informationsmaterial",
+    "x": 110,
+    "y": 1175,
+    "size": 29,
+    "width": 549
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "1",
+    "x": 1005,
+    "y": 1175,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "12 800.00",
+    "x": 1195,
+    "y": 1175,
+    "size": 30,
+    "width": 153
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Netto: 12 800.00 SEK",
+    "x": 750,
+    "y": 1360,
+    "size": 32,
+    "width": 356
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Moms: 3 200.00 SEK",
+    "x": 750,
+    "y": 1424,
+    "size": 32,
+    "width": 342
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Att betala: 16 000.00 SEK",
+    "x": 750,
+    "y": 1500,
+    "size": 36,
+    "width": 522
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Bankgiro: 4938-7160",
+    "x": 90,
+    "y": 1740,
+    "size": 32,
+    "width": 381
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "OCR: 0074108069",
+    "x": 840,
+    "y": 1740,
+    "size": 32,
+    "width": 300
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "Ange OCR-numret vid betalning.",
+    "x": 90,
+    "y": 1815,
+    "size": 27,
+    "width": 448
+  },
+  {
+    "id": "holdout-normal-06",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 756
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "FAKTURA",
+    "x": 100,
+    "y": 145,
+    "size": 54,
+    "width": 279
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Fakturanummer: HF-73107",
+    "x": 90,
+    "y": 280,
+    "size": 32,
+    "width": 485
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Leverantör: Syntetiska Strandvik Drift AB",
+    "x": 90,
+    "y": 420,
+    "size": 32,
+    "width": 659
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Organisationsnummer: 559891-1070",
+    "x": 90,
+    "y": 482,
+    "size": 30,
+    "width": 556
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 90,
+    "y": 585,
+    "size": 29,
+    "width": 597
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 90,
+    "y": 630,
+    "size": 27,
+    "width": 469
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Fakturadatum: 12.10.2026",
+    "x": 90,
+    "y": 755,
+    "size": 32,
+    "width": 428
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Förfallodatum: 11.11.2026",
+    "x": 850,
+    "y": 755,
+    "size": 32,
+    "width": 427
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Benämning",
+    "x": 110,
+    "y": 958,
+    "size": 29,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Antal",
+    "x": 980,
+    "y": 958,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Belopp exkl. moms",
+    "x": 1160,
+    "y": 958,
+    "size": 29,
+    "width": 310
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Fastighetsservice enligt arbetsorder",
+    "x": 110,
+    "y": 1040,
+    "size": 29,
+    "width": 522
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "1",
+    "x": 1005,
+    "y": 1040,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "4 321,20",
+    "x": 1195,
+    "y": 1040,
+    "size": 30,
+    "width": 134
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Netto",
+    "x": 90,
+    "y": 1230,
+    "size": 26,
+    "width": 72
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "4 321,20 SEK",
+    "x": 90,
+    "y": 1273,
+    "size": 32,
+    "width": 215
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Moms",
+    "x": 90,
+    "y": 1340,
+    "size": 26,
+    "width": 78
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "1 080,30 SEK",
+    "x": 90,
+    "y": 1383,
+    "size": 32,
+    "width": 215
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Att betala",
+    "x": 90,
+    "y": 1450,
+    "size": 26,
+    "width": 128
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "5 401,50 SEK",
+    "x": 90,
+    "y": 1493,
+    "size": 36,
+    "width": 268
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Bankgiro",
+    "x": 850,
+    "y": 1280,
+    "size": 26,
+    "width": 116
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "851-2741",
+    "x": 850,
+    "y": 1323,
+    "size": 32,
+    "width": 170
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "OCR",
+    "x": 850,
+    "y": 1395,
+    "size": 26,
+    "width": 57
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "0074108077",
+    "x": 850,
+    "y": 1438,
+    "size": 32,
+    "width": 204
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "Ange OCR-numret vid betalning.",
+    "x": 850,
+    "y": 1500,
+    "size": 27,
+    "width": 438
+  },
+  {
+    "id": "holdout-normal-07",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 710
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "FAKTURA",
+    "x": 560,
+    "y": 140,
+    "size": 54,
+    "width": 299
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Fakturanummer: HF-73108",
+    "x": 90,
+    "y": 280,
+    "size": 32,
+    "width": 491
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Leverantör: Syntetiska Rosendal Kontor AB",
+    "x": 90,
+    "y": 415,
+    "size": 32,
+    "width": 708
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Organisationsnummer: 559891-1088",
+    "x": 90,
+    "y": 477,
+    "size": 30,
+    "width": 561
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Fakturadatum: 16/10/2026",
+    "x": 90,
+    "y": 600,
+    "size": 32,
+    "width": 436
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Förfallodatum",
+    "x": 850,
+    "y": 600,
+    "size": 26,
+    "width": 187
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "15/11/2026",
+    "x": 850,
+    "y": 643,
+    "size": 32,
+    "width": 185
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Kund: Syntetiska Exempelmottagaren AB",
+    "x": 90,
+    "y": 760,
+    "size": 29,
+    "width": 610
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Testgatan 12, 123 45 Exempelstad",
+    "x": 90,
+    "y": 805,
+    "size": 27,
+    "width": 474
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Bankgiro: 3625-4787",
+    "x": 100,
+    "y": 935,
+    "size": 32,
+    "width": 381
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "OCR: 0074108085",
+    "x": 850,
+    "y": 935,
+    "size": 32,
+    "width": 300
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Ange OCR-numret vid betalning.",
+    "x": 100,
+    "y": 1010,
+    "size": 27,
+    "width": 448
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Benämning",
+    "x": 110,
+    "y": 1213,
+    "size": 29,
+    "width": 187
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Antal",
+    "x": 980,
+    "y": 1213,
+    "size": 29,
+    "width": 87
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Belopp exkl. moms",
+    "x": 1160,
+    "y": 1213,
+    "size": 29,
+    "width": 309
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Kontorsmaterial och emballage",
+    "x": 110,
+    "y": 1295,
+    "size": 29,
+    "width": 462
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "1",
+    "x": 1005,
+    "y": 1295,
+    "size": 29,
+    "width": 19
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "2468,00",
+    "x": 1195,
+    "y": 1295,
+    "size": 30,
+    "width": 125
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Netto: 2468,00 SEK",
+    "x": 760,
+    "y": 1500,
+    "size": 32,
+    "width": 325
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Moms: 617,00 SEK",
+    "x": 760,
+    "y": 1564,
+    "size": 32,
+    "width": 312
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "Att betala: 3085,00 SEK",
+    "x": 760,
+    "y": 1640,
+    "size": 36,
+    "width": 485
+  },
+  {
+    "id": "holdout-normal-08",
+    "text": "SYNTETISKT TESTUNDERLAG  •  Inga verkliga affärshändelser",
+    "x": 90,
+    "y": 1940,
+    "size": 23,
+    "width": 756
+  }
+]

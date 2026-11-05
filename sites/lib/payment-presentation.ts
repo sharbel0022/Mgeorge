@@ -1,4 +1,4 @@
-import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,economicTransactions,individualParty,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentAccountIssue,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,invoiceReferenceMatches,invoiceReferenceDecision,type Invoice,type State,type Transaction} from './domain';
+import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,economicTransactions,bankPayerName,bankPaymentSourceFacts,bankPaymentReviewReason,recordedPaymentSourceIssue,paymentPresentationAccountIssue,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,invoiceReferenceMatches,invoiceReferenceDecision,type Invoice,type State,type Transaction} from './domain';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues,ocrChecksum} from './payment-references.js';
 
@@ -7,18 +7,10 @@ type Candidate={number:string;party?:string;identifiers?:{field:string;value:str
 export const invoiceIntendedReference=(state:State,invoice:Pick<Invoice,'direction'|'number'|'ocr'|'referenceOriginal'>)=>invoiceReferenceDecision(state,invoice).intendedPaymentReference||'';
 type PaymentDisplayDecision={code:'VERIFIED'|'REVIEW'|'BLOCKED';label:string;reason:string;next:string};
 const hasBankSource=(t:Transaction)=>['bank_api','bank_file','bankgiro_file'].includes(t.evidence||'')&&!needsBankFileValidation(t);
-const cleanParty=(value?:string)=>{
-  const name=String(value||'').trim();
-  return individualParty(name)&&name.length<=200&&!/betalardetaljer|betalningsspecifikation|betalare\s+(?:saknas|okänd)|mottagare\s+okänd|inbetalning\s*[–-]|utbetalning\s*[–-]|^bankgiro\s+inbetalning/iu.test(name)?name:'';
-};
+const cleanParty=bankPayerName;
 /** Bank originals and manual completion are deliberately separate identities. */
 export function bankPayer(t:Transaction){
-  const detailed=cleanParty(t.bankDetails?.party);
-  if(detailed)return detailed;
-  if(needsPaymentSpecification(t))return '';
-  if(!hasBankSource(t))return ''; // A typed name or a legacy snapshot alone is not bank evidence.
-  if(t.original)return cleanParty(t.original.party);
-  return t.verification?'':cleanParty(t.party);
+  return bankPaymentSourceFacts(t).payer;
 }
 export const payerLabel=(t:Transaction)=>bankPayer(t)||(t.amount<0?'Mottagare okänd':'Betalare okänd');
 type ReferenceDisplay={value:string;kind:'missing'|'ocr'|'invoice'|'reference';ocr:string;ocrIssue?:string};
@@ -33,11 +25,8 @@ function referenceView(value:string,evidence:Transaction['referenceEvidence'],pa
   return {value,kind:ocr?'ocr':invoice?'invoice':'reference',ocr:ocr&&!ocrIssue?value:'',...(ocrIssue?{ocrIssue}:{})};
 }
 export function bankPaymentReference(t:Transaction):ReferenceDisplay{
-  if(!hasBankSource(t)&&!t.bankDetails?.payerReference)return {value:'',kind:'missing',ocr:''};
-  // Detail metadata and AIS referenceParts belong to different originals.
-  if(t.bankDetails?.payerReference)return referenceView(t.bankDetails.payerReference,t.bankDetails.referenceEvidence,undefined);
-  const value=(needsPaymentSpecification(t)?'':t.original?t.original.payerReference:t.verification?'':t.payerReference)||'';
-  return referenceView(value,t.referenceEvidence,t.referenceParts);
+  const facts=bankPaymentSourceFacts(t);
+  return referenceView(facts.reference,facts.referenceEvidence,facts.referenceParts);
 }
 type FieldSourceKind='report'|'detail'|'transaction';
 const fieldSourceLabel=(kind:FieldSourceKind,t:Transaction)=>kind==='report'?'Kopplat Bankgirooriginal':kind==='detail'?'Bankens separata detaljoriginal':hasBankSource(t)?'Bankens transaktionsoriginal':'Sparad transaktionsuppgift · bankkälla ej verifierad';
@@ -45,9 +34,9 @@ const fieldSourceLabel=(kind:FieldSourceKind,t:Transaction)=>kind==='report'?'Ko
  * different original's identifiers or reference classifications. */
 export function bankPaymentFieldSources(state:State,t:Transaction){
   const link=activeBankgiroLink(state,t.id),linkedRow=link?.rows.length===1?link.rows[0]:undefined;
-  const linkedPayer=linkedRow?cleanParty(linkedRow.party):'',detailPayer=cleanParty(t.bankDetails?.party),payerKind:FieldSourceKind=linkedPayer?'report':detailPayer?'detail':'transaction';
-  const payerRow=payerKind==='report'?linkedRow!:t,payerValue=linkedPayer||bankPayer(t);
-  const linkedReference=linkedRow?referenceView(linkedRow.payerReference,linkedRow.referenceEvidence,linkedRow.referenceParts):undefined,referenceKind:FieldSourceKind=linkedReference?.value?'report':t.bankDetails?.payerReference?'detail':'transaction';
+  const facts=bankPaymentSourceFacts(t),linkedPayer=linkedRow?cleanParty(linkedRow.party):'',payerKind:FieldSourceKind=linkedPayer?'report':facts.payerSource;
+  const payerRow=payerKind==='report'?linkedRow!:t,payerValue=linkedPayer||facts.payer;
+  const linkedReference=linkedRow?referenceView(linkedRow.payerReference,linkedRow.referenceEvidence,linkedRow.referenceParts):undefined,referenceKind:FieldSourceKind=linkedReference?.value?'report':facts.referenceSource;
   const referenceRow=referenceKind==='report'?linkedRow!:t,referenceValue=linkedReference?.value?linkedReference:bankPaymentReference(t);
   return {
     payer:{kind:payerKind,label:fieldSourceLabel(payerKind,t),row:payerRow,value:payerValue,evidence:payerKind==='detail'?t.bankDetails?.payerEvidence:payerRow.payerEvidence},
@@ -89,6 +78,11 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   const owners=new Set(state.invoices.filter(i=>!i.voided&&(!scoped||i.direction===direction)&&references.some(value=>invoiceReferenceMatches(state,i,value,true))).map(i=>i.id));
   const contradictory=references.length>1&&!state.invoices.some(i=>references.every(value=>invoiceReferenceMatches(state,i,value)));
   const bankConflict=paymentEvidenceConflict(state,t),originalIssue=paymentOriginalIssue(state,t),conflict=bankConflict||!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
+  const sourceIssue=sourceLink?'':allocations.map(allocation=>{const invoice=invoices.find(item=>item.id===allocation.invoiceId);return invoice?recordedPaymentSourceIssue(state,t,invoice,allocation.effect):'Den registrerade fakturan saknas.';}).find(Boolean)||'';
+  // A chargeback/refund type is a review instruction, not an absent-original
+  // error. Keep all independent source/account/reference holds ahead of it.
+  const paymentTypeReview=!!sourceIssue&&assessment.status==='review'&&sourceIssue===bankPaymentReviewReason(t,state);
+  const detailIssue=bankPaymentSourceFacts(t).detailIssue;
   let status='Behöver granskas',verified=false;
   if(t.ignored)status='Undantagen';
   else if(t.duplicateOf)status='Möjlig dubblett';
@@ -97,6 +91,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   else if(needsBankFileValidation(t))status='Original behöver verifieras';
   else if(assessment.status==='review')status='Behöver granskas';
   else if(assessment.allocationConflict)status='Referenskonflikt';
+  else if(sourceIssue)status='Behöver granskas';
   else if(sourceLink&&!allocations.length)status='Fakturan behöver granskas';
   else if(requiresSpecification)status='Specifikation saknas';
   else if(conflict)status='Konflikt';
@@ -113,7 +108,7 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
     return [invoice.id,{number:invoice.number,value,proposal:!assessment.bookedIds.includes(invoice.id),source:reference.source==='invoice_number_policy'?'Företagets fakturanummerregel':value?'Fakturans uttryckliga referens':'Ingen uttrycklig referens',conflict:!!value&&!!selectedReference&&!(reference.applies?invoiceReferenceMatches(state,invoice,selectedReference):exactReference(value,selectedReference)),...(reference.status==='BLOCKED'?{issue:reference.reason}:{})}];
   })).values()];
   const policyIssue=intendedReferences.find(reference=>reference.issue)?.issue;
-  const accountIssue=paymentAccountIssue(state,t)||t.bankgiroAccountIssue||(!t.account?.trim()?'Mottagarkontot saknas i bankunderlaget.':'');
+  const accountIssue=paymentPresentationAccountIssue(state,t);
   // These labels describe the saved presentation. The existing original-check
   // endpoint remains authoritative for a fresh read; no allocation is changed.
   const decision:PaymentDisplayDecision={code:'REVIEW',label:'Behöver granskas',reason:status,next:assessment.invoice?'Granska fakturaoriginalet och kundrelationen före ett separat godkännande.':'Identifiera och granska rätt faktura och dess original.'};
@@ -123,12 +118,14 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   else if(bankConflict)block('Bankunderlagen är motstridiga.','Jämför de motstridiga originalen innan avstämning.');
   else if(originalIssue||needsBankFileValidation(t))block(originalIssue||'Bankoriginalet behöver verifieras.','Kontrollera det bevarade bankoriginalets integritet.');
   else if(accountIssue)block(accountIssue,'Kontrollera mottagarkontot mot bankens uttryckliga kontouppgifter.');
+  else if(detailIssue)block(detailIssue,'Kontrollera de separata detaljuppgifternas bevarade original och AIS-källa.');
   else if(policyIssue)block(policyIssue,'Granska fakturans avsedda referens, företagsregel och bevarade original.');
   else if(assessment.allocationConflict)block(assessment.message,'Granska fakturakopplingen mot den visade bankreferensen.');
   else if(conflict)block('Referensen är ofullständig eller motstridig.','Kontrollera originalreferensen och eventuell OCR-kontroll.');
   else if(requiresSpecification&&!sourceLink)block('Individuella Bankgirodetaljer saknas.','Hämta en individuell betalningsspecifikation med betalare, referens och delbelopp.');
   else if(!fieldSources.payer.value)block('Banken har inte styrkt en individuell betalare eller mottagare.','Kontrollera betalaren i ett individuellt bankoriginal.');
   else if(!selectedReference)block('Bankrapporterad betalningsreferens saknas.','Kontrollera referensen i bankens individuella betalningsunderlag.');
+  else if(sourceIssue&&!paymentTypeReview)block(sourceIssue,'Granska det bevarade bankunderlaget mot den registrerade fakturan.');
   else if(assessment.status==='review')decision.reason=assessment.message;
   else if(intendedReferences.some(reference=>reference.conflict)){decision.reason='Fakturans uttryckliga referens avviker från bankrapporterad referens.';decision.next='Jämför den uttryckliga referensen i fakturaoriginalet med bankens original innan betalningskopplingen verifieras.';}
   else if(sourceLink){decision.reason='Underlagsrelationen är manuellt styrkt.';decision.next='Granska den manuella underlagsrelationen, kundrelationen och fakturan separat.';}

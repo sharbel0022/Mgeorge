@@ -1,0 +1,47 @@
+{
+  "schema": "mgeorge-ocr-word-evidence-followup-v1",
+  "synthetic": true,
+  "baseCommit": "9fd47eada520a58cd1952a2842f36c4bb05f6384",
+  "reviewFinding": "P3: display text truncation invalidates full OCR evidence during Gmail contextual reparse",
+  "independentReview": {
+    "mode": "read-only code review; no independent test rerun",
+    "previousP3": "resolved",
+    "newBlockingFindings": 0
+  },
+  "displayTextLimit": 50000,
+  "interpretationTextLimit": 150000,
+  "proofRebinding": false,
+  "measuredSourceSha256": "2175c4fcdac95813d225bd7a45c9a50eceb2aca4b1a3bac1155325833b15490d",
+  "measuredSourcesUnchanged": true,
+  "corpusAndMetricsUnchanged": true,
+  "sourceHashes": {
+    "sites/lib/imports.ts": "36212e72b7d8e7be6ff4aecb3fccfb35e4101a7995e8f2b9066c36331e88523c",
+    "sites/components/gmail-workspace.tsx": "33e3d995827aa724f59b2c9f0a06b241b7d74cfd8080ab0b73142c17c66a0344",
+    "sites/tests/manual-invoice-ocr.test.mjs": "e50ba2dc2354f84d59e96304726a78439ed78da4853672229e163c0fff0a79b7",
+    "sites/tests/gmail-preview-q8.test.mjs": "35c2a31482e2de105cb40520762a4902168656f6be043eed3294ca1a58f06343"
+  },
+  "verification": {
+    "red": {
+      "tests": 4,
+      "passed": 0,
+      "failed": 4
+    },
+    "green": {
+      "tests": 66,
+      "passed": 66,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 8921.983216
+    },
+    "typecheck": {
+      "command": "node node_modules/typescript/bin/tsc --noEmit --incremental false",
+      "exitCode": 0
+    },
+    "cases": [
+      "supported value with source text between 50000 and 150000 characters",
+      "conflicting bankgiro after the first 50000 characters",
+      "display excerpt stays at 50000 characters",
+      "source text exceeding 150000 characters remains held; original proof hash is not replaced"
+    ]
+  }
+}

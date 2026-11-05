@@ -8,6 +8,7 @@ import {documentOcrFixture} from './helpers/document-ocr-fixture.mjs';
 import {browserOcrFixture} from './helpers/browser-ocr-fixture.mjs';
 import {fragmentedInvoicePdf} from '../../test/helpers/fragmented-pdf.mjs';
 import {rasterPdf,archiveFooter} from '../../test/helpers/optical-invoice-fixtures.mjs';
+import {checkedOcrBankgiroEvidence} from '../lib/ocr-bankgiro-evidence.js';
 const {interpretInvoice}=await loadInvoiceParser();
 
 test('permuted real PDF objects register only the visibly labelled invoice identity',async t=>{
@@ -58,7 +59,10 @@ test('browser PDF reconstruction preserves the same adjacent identifier and amou
 test('browser PDF fallback reads invoice pixels when a long native footer contains no invoice fields',async t=>{
   const browser=await browserOcrFixture(t),bytes=rasterPdf({textLayer:archiveFooter}),parsed=await browser.pdfInvoiceText(Uint8Array.from(bytes).buffer);
   assert.equal(parsed.ocr,true);assert.match(parsed.text,/0606/);
-  const result=interpretInvoice(parsed.text,{...layoutContext,method:'ocr',ocrConfidence:parsed.confidence});
+  const inputSha256=createHash('sha256').update(bytes).digest('hex');
+  assert.equal(parsed.inputSha256,inputSha256);assert.ok(checkedOcrBankgiroEvidence(parsed.text,inputSha256,parsed.ocrEvidence));
+  assert.ok(parsed.ocrEvidence.pages[0].bankgiro.length>0);
+  const result=interpretInvoice(parsed.text,{...layoutContext,method:'ocr',ocrConfidence:parsed.confidence,ocrInputSha256:inputSha256,ocrEvidence:parsed.ocrEvidence});
   assert.notEqual(result.level,'green');assert.ok(result.fields.invoice_number.confidence<=.85);
 });
 

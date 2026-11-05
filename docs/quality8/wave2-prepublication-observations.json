@@ -1,0 +1,152 @@
+{
+  "recordedAt": "2026-11-05T22:28:59Z",
+  "phase": "before-publication",
+  "publishedSiteVersion": 63,
+  "publishedMain": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+  "scope": "Read-only owner-scoped selected observations, not a complete workspace survey. No customer identifiers or account values retained.",
+  "retainedReport": {
+    "checkedAt": "2026-11-05T22:27:49.237Z",
+    "revision": 52,
+    "integrity": "passed",
+    "snapshotCurrent": true,
+    "complete": true,
+    "outputLimited": false,
+    "total": 1,
+    "targetRelationProved": false,
+    "payerPresent": true,
+    "payerMatchesSavedReport": true,
+    "referenceMatchesSavedReport": true,
+    "referenceKind": "structured",
+    "referenceCandidateKinds": [
+      "structured"
+    ],
+    "accountVerified": false,
+    "accountIssue": "En aktiv ägarbunden bankanslutning och ett verifierat mottagarkonto krävs före automatisk rapportkoppling.",
+    "registryComplete": true,
+    "registryMatchCount": 0
+  },
+  "payments": [
+    {
+      "kind": "non_economic_report_observation",
+      "checkedAt": "2026-11-05T22:28:24.428Z",
+      "revision": 52,
+      "complete": true,
+      "snapshotCurrent": true,
+      "outputLimited": false,
+      "total": 1,
+      "countedEconomically": false,
+      "bookedInvoiceCount": 0,
+      "allocationConflict": false,
+      "payerPresent": true,
+      "referencePresent": true,
+      "referenceKind": "reference",
+      "steps": [
+        {
+          "id": "received",
+          "status": "review"
+        },
+        {
+          "id": "report",
+          "status": "passed"
+        },
+        {
+          "id": "original",
+          "status": "passed"
+        },
+        {
+          "id": "account",
+          "status": "blocked"
+        },
+        {
+          "id": "deposit",
+          "status": "missing"
+        },
+        {
+          "id": "payer",
+          "status": "passed"
+        },
+        {
+          "id": "reference",
+          "status": "passed"
+        },
+        {
+          "id": "invoice",
+          "status": "review"
+        },
+        {
+          "id": "customer",
+          "status": "review"
+        },
+        {
+          "id": "amount",
+          "status": "missing"
+        },
+        {
+          "id": "reconciliation",
+          "status": "blocked"
+        }
+      ]
+    },
+    {
+      "kind": "economic_bank_observation",
+      "checkedAt": "2026-11-05T22:28:24.374Z",
+      "revision": 52,
+      "complete": true,
+      "snapshotCurrent": true,
+      "outputLimited": false,
+      "total": 1,
+      "countedEconomically": true,
+      "bookedInvoiceCount": 0,
+      "allocationConflict": false,
+      "payerPresent": false,
+      "referencePresent": false,
+      "referenceKind": "missing",
+      "steps": [
+        {
+          "id": "received",
+          "status": "passed"
+        },
+        {
+          "id": "report",
+          "status": "review"
+        },
+        {
+          "id": "original",
+          "status": "passed"
+        },
+        {
+          "id": "account",
+          "status": "blocked"
+        },
+        {
+          "id": "deposit",
+          "status": "missing"
+        },
+        {
+          "id": "payer",
+          "status": "missing"
+        },
+        {
+          "id": "reference",
+          "status": "missing"
+        },
+        {
+          "id": "invoice",
+          "status": "review"
+        },
+        {
+          "id": "customer",
+          "status": "review"
+        },
+        {
+          "id": "amount",
+          "status": "missing"
+        },
+        {
+          "id": "reconciliation",
+          "status": "blocked"
+        }
+      ]
+    }
+  ]
+}

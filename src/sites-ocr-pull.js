@@ -1,5 +1,6 @@
 import {createHash} from 'node:crypto';
 import {runDocumentProcess} from './invoice-extraction.js';
+import {checkedOcrBankgiroEvidence} from '../sites/lib/ocr-bankgiro-evidence.js';
 const MAX_BYTES=15000000;
 // Only errors created here receive public diagnostics. Unknown thrown values
 // are never inspected: provider/body text, getters and token values stay private.
@@ -60,7 +61,8 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
         const value=await extract(bytes,job.mime);
         if(!value||value.error||typeof value.text!=='string'||value.text.length>150000||!['pdf','ocr'].includes(value.method)||!Number.isFinite(value.confidence)||value.confidence<0||value.confidence>100)throw Error('ocr');
         // Do not let an extractor overwrite the authenticated lease identifiers.
-        result={text:value.text,method:value.method,confidence:value.confidence};
+        const ocrEvidence=checkedOcrBankgiroEvidence(value.text,job.sha256,value.ocrEvidence);
+        result={text:value.text,method:value.method,confidence:value.confidence,...(ocrEvidence?{ocrEvidence}:{})};
       }catch{result={text:'',method:'ocr',confidence:0,error:true};failed++;}
       const completion=await json('/api/ocr-worker/complete',{id:job.id,lease:job.lease,sha256:job.sha256,...result},16384);
       if(completion.ignored||!(result.error?completion.ok===true:completion.registered===true||['ready','needs_review','duplicate'].includes(completion.state)))throw Error('completion_rejected');

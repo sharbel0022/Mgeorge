@@ -132,6 +132,15 @@ main{padding:28px 30px 0;max-width:1760px}h1{font-size:34px;line-height:1.18;fon
  .bank-report-availability dl{grid-template-columns:1fr 1fr}.bank-status-copy{justify-items:start}
 }
 @media(max-width:480px){
+ .modal .form-grid{grid-template-columns:minmax(0,1fr)}
+ .modal .detail-heading{flex-wrap:wrap;align-items:flex-start}
+ .modal .detail-heading .party-cell{min-width:0;max-width:100%}
+ .modal .detail-heading .party-cell>div{overflow-wrap:anywhere}
+ .modal .detail-heading .pill{max-width:100%;white-space:normal}
+ .modal .amount-summary{grid-template-columns:minmax(0,1fr)}
+ .modal .amount-summary>div+div{border-left:0;border-top:1px solid #eaeaea}
+ .modal .amount-summary span{font-size:11px}
+ .modal .amount-summary strong{font-size:18px;white-space:normal;overflow-wrap:anywhere}
  .bank-report-availability{padding:16px}.bank-report-availability dl{grid-template-columns:1fr;gap:14px}
  .bank-card-reference>.bank-reference-pair,.bank-detail-references .bank-reference-pair{grid-template-columns:1fr;gap:14px}
  .bank-payment-footer{grid-template-columns:1fr;gap:10px}.bank-card-heading>strong:first-child{font-size:14px}

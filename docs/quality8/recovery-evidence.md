@@ -108,3 +108,9 @@ Det finns fortfarande ingen evidens här för återställning av ett **verkligt 
 De 112 historiska API-posterna utan kvitto blir inte fullständiga bankoriginal genom denna backup eller genom det syntetiska provet. Återställning bevarar historiken men kan inte återskapa saknat källbevis eller avgöra att varje gammalt ekonomiskt beslut var rätt.
 
 Denna leverans motiverar förbättrad bedömning av kodens verifierade återställningsförmåga och dagens backupstatus. Den motiverar inte ett påstående att full katastrofåterställning av den driftsatta tjänsten är bevisad eller att samtliga operativa kriterier automatiskt nått 8/10.
+
+## 6. Ny integrerad lokal körning
+
+Root upprepade den stora syntetiska övningen **18:37:44.007–18:37:55.613 UTC** efter integrationen av dokument- och flerfakturaadaptrarna. Samtliga tio tidigare listade återställningskällors SHA-256 är oförändrade. [Det nya körkvittot](recovery-integration-rerun.json) innehåller dessa hashvärden, integrationshuvudet och hela utdata.
+
+Även denna körning accepterade **362 original, 142 968 213 byte, alla 27 tabeller och samtliga åtta negativa kontroller**. Återställning inklusive oberoende acceptans tog **3 416,863 ms**; hela övningen **11 605,651 ms**. Den syntetiska återställningspunkten och incidenten ger fortfarande **15 minuters simulerad RPO**. Den tidigare mätningen ersätts inte, och skillnaden mellan lokala tider är ingen produktionsprestandamätning. Alla ovan angivna begränsningar kring produktion, extern kopia, nyckelåtkomst och aktivering består.

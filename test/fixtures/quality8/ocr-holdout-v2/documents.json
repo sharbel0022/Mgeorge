@@ -1,0 +1,500 @@
+{
+  "schema": "mgeorge-independent-ocr-documents-v2",
+  "synthetic": true,
+  "canvas": {
+    "width": 1600,
+    "height": 2000,
+    "dpi": 200
+  },
+  "normalBodyFontPixels": [
+    28,
+    30,
+    32,
+    34,
+    36
+  ],
+  "cases": [
+    {
+      "id": "holdout-v2-normal-01",
+      "layout": "split-header-totals-right",
+      "font": "liberation-sans",
+      "party": "Exempel Kustteknik AB",
+      "organization": "559762-3114",
+      "invoiceNumber": "KS-28417",
+      "issued": "2026-06-03",
+      "due": "2026-07-03",
+      "net": "3 745,80",
+      "vat": "936,45",
+      "total": "4 682,25",
+      "reference": "00863025110",
+      "bankgiro": "781-3421",
+      "address": [
+        "Verkstadsgatan 7",
+        "123 45 Exempelhamn"
+      ],
+      "rows": [
+        [
+          "Service och mätning",
+          "3",
+          "795,00",
+          "2 385,00"
+        ],
+        [
+          "Utbytesdelar",
+          "2",
+          "680,40",
+          "1 360,80"
+        ]
+      ],
+      "netLabel": "Summa exkl. moms",
+      "vatLabel": "Moms 25 %",
+      "totalLabel": "Att betala",
+      "referenceLabel": "OCR-nummer",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5201",
+      "orderNumber": "PO-83201",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "layout": "formal-compact",
+      "font": "liberation-serif",
+      "party": "Fiktiva Björk Konsult AB",
+      "organization": "559762-3122",
+      "invoiceNumber": "2026-4729",
+      "issued": "2026-06-11",
+      "due": "2026-07-01",
+      "net": "12 864,00",
+      "vat": "3 216,00",
+      "total": "16 080,00",
+      "reference": "00863025128",
+      "bankgiro": "4628-7314",
+      "address": [
+        "Parkallén 18",
+        "234 56 Provlunda"
+      ],
+      "rows": [
+        [
+          "Projektledning",
+          "8",
+          "1 350,00",
+          "10 800,00"
+        ],
+        [
+          "Dokumentation och uppföljning",
+          "1",
+          "2 064,00",
+          "2 064,00"
+        ]
+      ],
+      "netLabel": "Netto",
+      "vatLabel": "Momsbelopp (25 %)",
+      "totalLabel": "Summa att betala",
+      "referenceLabel": "OCR",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5202",
+      "orderNumber": "PO-83202",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-03",
+      "layout": "right-address",
+      "font": "noto-sans",
+      "party": "Exempel Ådal Ventilation AB",
+      "organization": "559762-3130",
+      "invoiceNumber": "V104382",
+      "issued": "2026-06-18",
+      "due": "2026-07-18",
+      "net": "5 872,00",
+      "vat": "1 468,00",
+      "total": "7 340,00",
+      "reference": "00863025136",
+      "bankgiro": "936-4175",
+      "address": [
+        "Kanalvägen 24",
+        "345 67 Testeby"
+      ],
+      "rows": [
+        [
+          "Filterpaket",
+          "12",
+          "289,00",
+          "3 468,00"
+        ],
+        [
+          "Kanalkontroll",
+          "2",
+          "1 202,00",
+          "2 404,00"
+        ]
+      ],
+      "netLabel": "Belopp exkl. moms",
+      "vatLabel": "Summa moms",
+      "totalLabel": "Att betala SEK",
+      "referenceLabel": "OCR-referens",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5203",
+      "orderNumber": "PO-83203",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "layout": "upper-payment-panel",
+      "font": "dejavu-sans",
+      "party": "Fiktiva Lönn Kontor AB",
+      "organization": "559762-3148",
+      "invoiceNumber": "LF-63072",
+      "issued": "2026-06-25",
+      "due": "2026-07-25",
+      "net": "2 133,60",
+      "vat": "533,40",
+      "total": "2 667,00",
+      "reference": "00863025144",
+      "bankgiro": "5736-0828",
+      "address": [
+        "Torget 3",
+        "456 78 Exempelby"
+      ],
+      "rows": [
+        [
+          "Stolsmattor",
+          "6",
+          "238,90",
+          "1 433,40"
+        ],
+        [
+          "Transport och inbärning",
+          "1",
+          "700,20",
+          "700,20"
+        ]
+      ],
+      "netLabel": "Netto",
+      "vatLabel": "Moms 25 %",
+      "totalLabel": "Fakturabelopp",
+      "referenceLabel": "Ange OCR-nummer",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5204",
+      "orderNumber": "PO-83204",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "layout": "ledger-form",
+      "font": "dejavu-serif",
+      "party": "Exempel Pump & Värme AB",
+      "organization": "559762-3155",
+      "invoiceNumber": "701682",
+      "issued": "2026-07-02",
+      "due": "2026-07-22",
+      "net": "9 687,20",
+      "vat": "2 421,80",
+      "total": "12 109,00",
+      "reference": "00863025151",
+      "bankgiro": "241-9562",
+      "address": [
+        "Industrivägen 9",
+        "567 89 Testköping"
+      ],
+      "rows": [
+        [
+          "Pumpservice",
+          "4",
+          "1 800,00",
+          "7 200,00"
+        ],
+        [
+          "Reservdelssats",
+          "1",
+          "2 487,20",
+          "2 487,20"
+        ]
+      ],
+      "netLabel": "Summa exkl. moms",
+      "vatLabel": "Moms (25 %)",
+      "totalLabel": "Att betala",
+      "referenceLabel": "OCR",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5205",
+      "orderNumber": "PO-83205",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "layout": "stacked-summary",
+      "font": "noto-sans",
+      "party": "Fiktiva Skärvik IT AB",
+      "organization": "559762-3163",
+      "invoiceNumber": "SR-260419",
+      "issued": "2026-07-10",
+      "due": "2026-08-09",
+      "net": "1 600,00",
+      "vat": "400,00",
+      "total": "2 000,00",
+      "reference": "00863025169",
+      "bankgiro": "8627-0535",
+      "address": [
+        "Datagatan 11",
+        "678 90 Provvik"
+      ],
+      "rows": [
+        [
+          "Serviceabonnemang",
+          "1",
+          "1 200,00",
+          "1 200,00"
+        ],
+        [
+          "Felsökning på distans",
+          "0,5",
+          "800,00",
+          "400,00"
+        ]
+      ],
+      "netLabel": "Netto",
+      "vatLabel": "Momsbelopp",
+      "totalLabel": "Att betala",
+      "referenceLabel": "OCR-nummer",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5206",
+      "orderNumber": "PO-83206",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "layout": "horizontal-summary",
+      "font": "liberation-sans",
+      "party": "Exempel Fräsverkstan AB",
+      "organization": "559762-3171",
+      "invoiceNumber": "F-98342",
+      "issued": "2026-07-16",
+      "due": "2026-08-15",
+      "net": "7 354,80",
+      "vat": "1 838,70",
+      "total": "9 193,50",
+      "reference": "00863025177",
+      "bankgiro": "619-4823",
+      "address": [
+        "Svarvargatan 6",
+        "789 01 Teståsen"
+      ],
+      "rows": [
+        [
+          "Materialbearbetning",
+          "6",
+          "845,80",
+          "5 074,80"
+        ],
+        [
+          "Maskinhyra",
+          "2",
+          "1 140,00",
+          "2 280,00"
+        ]
+      ],
+      "netLabel": "Netto",
+      "vatLabel": "Moms 25 %",
+      "totalLabel": "Att betala",
+      "referenceLabel": "OCR-referens",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5207",
+      "orderNumber": "PO-83207",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "layout": "side-rail",
+      "font": "dejavu-sans",
+      "party": "Fiktiva Rönn Frakt AB",
+      "organization": "559762-3189",
+      "invoiceNumber": "2608-117",
+      "issued": "2026-07-23",
+      "due": "2026-08-22",
+      "net": "4 199,60",
+      "vat": "1 049,90",
+      "total": "5 249,50",
+      "reference": "00863025185",
+      "bankgiro": "3547-0186",
+      "address": [
+        "Terminalvägen 14",
+        "890 12 Exempelstad"
+      ],
+      "rows": [
+        [
+          "Transport inom regionen",
+          "2",
+          "1 649,80",
+          "3 299,60"
+        ],
+        [
+          "Emballage",
+          "3",
+          "300,00",
+          "900,00"
+        ]
+      ],
+      "netLabel": "Summa exkl. moms",
+      "vatLabel": "Momsbelopp (25 %)",
+      "totalLabel": "Summa att betala",
+      "referenceLabel": "OCR",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5208",
+      "orderNumber": "PO-83208",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "layout": "classic-footer",
+      "font": "liberation-serif",
+      "party": "Exempel Styrsystem AB",
+      "organization": "559762-3197",
+      "invoiceNumber": "284-6119",
+      "issued": "2026-08-04",
+      "due": "2026-09-03",
+      "net": "15 324,00",
+      "vat": "3 831,00",
+      "total": "19 155,00",
+      "reference": "00863025193",
+      "bankgiro": "827-3641",
+      "address": [
+        "Teknikparken 21",
+        "901 23 Provhamn"
+      ],
+      "rows": [
+        [
+          "Installation av styrsystem",
+          "12",
+          "1 050,00",
+          "12 600,00"
+        ],
+        [
+          "Kabelförläggning",
+          "6",
+          "454,00",
+          "2 724,00"
+        ]
+      ],
+      "netLabel": "Netto",
+      "vatLabel": "Summa moms",
+      "totalLabel": "Att betala",
+      "referenceLabel": "OCR-nummer",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5209",
+      "orderNumber": "PO-83209",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "layout": "paired-sections",
+      "font": "noto-sans",
+      "party": "Fiktiva Norrvik Ritning AB",
+      "organization": "559762-3205",
+      "invoiceNumber": "NV-20735",
+      "issued": "2026-08-12",
+      "due": "2026-09-11",
+      "net": "2 846,40",
+      "vat": "711,60",
+      "total": "3 558,00",
+      "reference": "00863025201",
+      "bankgiro": "4952-1875",
+      "address": [
+        "Ritargatan 5",
+        "112 34 Testlunda"
+      ],
+      "rows": [
+        [
+          "Teknisk dokumentation",
+          "4",
+          "588,60",
+          "2 354,40"
+        ],
+        [
+          "Leveransutskrift",
+          "2",
+          "246,00",
+          "492,00"
+        ]
+      ],
+      "netLabel": "Belopp exkl. moms",
+      "vatLabel": "Moms 25 %",
+      "totalLabel": "Att betala SEK",
+      "referenceLabel": "Ange OCR-nummer",
+      "population": "normal-readable",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "recipient": "Testmottagaren Handel AB",
+      "customerNumber": "K-5210",
+      "orderNumber": "PO-83210",
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run."
+    },
+    {
+      "id": "holdout-v2-stress-lost-bottom",
+      "population": "stress",
+      "layout": "lost-bottom-scan",
+      "sourceId": "holdout-v2-normal-09",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Simulated incomplete scan: lower financial/payment area is physically absent; original canonical gold is retained. Must abstain from green."
+    },
+    {
+      "id": "holdout-v2-stress-defocused-photo",
+      "population": "stress",
+      "layout": "defocused-tilted-photo",
+      "sourceId": "holdout-v2-normal-02",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Simulated low-resolution defocused phone photograph with reduced contrast and slight rotation; original canonical gold is retained. Must abstain from green."
+    }
+  ]
+}

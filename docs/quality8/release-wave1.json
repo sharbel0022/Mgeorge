@@ -1,0 +1,242 @@
+{
+  "schema": "mgeorge-quality8-release-wave1-v1",
+  "date": "2026-11-05",
+  "assessment": "intermediate_release_not_all_33_approved",
+  "source": {
+    "repository": "sharbel0022/Mgeorge",
+    "pullRequest": 48,
+    "pullRequestUrl": "https://github.com/sharbel0022/Mgeorge/pull/48",
+    "localReviewedCommit": "0c570a03bac9945388eb5b7030ed7916242eb830",
+    "pullRequestHead": "e42b05a8b78e77a3210be00da0b0231454a29233",
+    "mainMergeCommit": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+    "repositoryTree": "f74752c5146d9867342828edfb766f07db570a7e",
+    "sitesSubtree": "ec997f7d5e43af779b1119a5a88939b946ef4c7c"
+  },
+  "ci": {
+    "mainRun": {
+      "id": 42081012356,
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42081012356",
+      "conclusion": "success",
+      "nodeTests": 1997,
+      "sitesTests": 3850,
+      "bridgeTests": 47,
+      "failed": 0,
+      "skipped": 0,
+      "sitesBuild": "success"
+    },
+    "pullRequestRun": 42079230293,
+    "securityAcceptance": {
+      "runId": 42079230295,
+      "conclusion": "success",
+      "sourceTreeSame": true,
+      "artifactId": 13440665202,
+      "artifactZipSha256": "047af96e2e4972b5464511faf54e0047d68b8d7bd4f6ef25e4083b44cbb5db69",
+      "nodeSecurityTests": 325,
+      "sitesSecurityTests": 788,
+      "overlapFullSuites": true
+    },
+    "testAdapterIndependentReview": {
+      "commit": "0c570a03bac9945388eb5b7030ed7916242eb830",
+      "critical": 0,
+      "important": 0,
+      "minor": 0,
+      "existingAssertionsPreserved": true
+    }
+  },
+  "deployment": {
+    "version": 63,
+    "status": "succeeded",
+    "completedAt": "2026-11-05T18:12:36.530631+00:00",
+    "siteUrl": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "nativeCommit": "b79213c21c955b1a23813a4cfaebeffafcb5a600",
+    "nativeTree": "ec997f7d5e43af779b1119a5a88939b946ef4c7c",
+    "gzip": {
+      "bytes": 18503122,
+      "sha256": "aa318ca29559f499b8fed86cc37628342955aa15e151703771a96dc2b8a9905c"
+    },
+    "storedTar": {
+      "bytes": 47779840,
+      "files": 431,
+      "sha256": "2fa6da505429fdca2aaed7fdc3c34bb47bca8f721f9b56e15fa52a993fb634d3"
+    },
+    "audience": "existing_public_unchanged",
+    "environmentRevision": 10,
+    "environmentChange": {
+      "at": "2026-11-05T17:57:48.138258Z",
+      "key": "ENABLE_BANKING_REDIRECT_URL",
+      "value": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site/api/bank/callback",
+      "otherKeysUnchanged": 17,
+      "providerRegisteredRedirectChanged": false
+    },
+    "authoritativePublishBuild": "success_after_source_copy_completed",
+    "earlierBuildExit137IsNotPass": true
+  },
+  "ocr": {
+    "runs": [
+      {
+        "id": 42081905168,
+        "event": "workflow_run",
+        "head": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+        "resultAt": "2026-11-05T18:13:37.6565119Z",
+        "processed": 6,
+        "failed": 0
+      },
+      {
+        "id": 42083409804,
+        "event": "schedule",
+        "head": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+        "resultAt": "2026-11-05T18:23:32.3522858Z",
+        "processed": 6,
+        "failed": 0
+      }
+    ],
+    "queueBefore": 23,
+    "queueAfterFirstRun": 17,
+    "queueAfterSecondRunBeforeNewImport": 11,
+    "totalProcessed": 12,
+    "automaticallyApprovedByTheseRuns": 0,
+    "destination": "needs_review",
+    "cloudLastCompleted": "2026-11-05T18:23:31.509Z",
+    "historicalScheduleGapCause": "unknown"
+  },
+  "gmail": {
+    "scheduleEnabled": true,
+    "platformRuns": [
+      {
+        "scheduledFor": "2026-11-05T17:00:00Z",
+        "startedAt": "2026-11-05T16:55:47.378927Z",
+        "completedAt": "2026-11-05T16:58:59.099439Z",
+        "recordedStatus": "completed",
+        "imported": 6
+      },
+      {
+        "scheduledFor": "2026-11-05T18:00:00Z",
+        "startedAt": "2026-11-05T18:04:04.607069Z",
+        "completedAt": "2026-11-05T18:06:26.109376Z",
+        "recordedStatus": "completed",
+        "resultMatchedRun": true,
+        "resultCreatedAt": "2026-11-05T18:06:25.933385Z",
+        "deliveryStatus": "unknown"
+      },
+      {
+        "scheduledFor": "2026-11-05T19:00:00Z",
+        "startedAt": "2026-11-05T18:58:11.922872Z",
+        "completedAt": "2026-11-05T19:01:55.216672Z",
+        "recordedStatus": "completed",
+        "imported": 8,
+        "resultMatchedRun": true,
+        "resultCreatedAt": "2026-11-05T19:01:53.489715Z",
+        "deliveryStatus": "unknown"
+      }
+    ],
+    "recovery": {
+      "entrypoint": "existing_gmail_auto_sync",
+      "lastSuccessfulFetch": "2026-11-05T18:28:50.457Z",
+      "completedAt": "2026-11-05T18:28:53.535Z",
+      "outcome": "completed",
+      "imported": 9,
+      "duplicates": 0,
+      "found": 10,
+      "more": true,
+      "postprocessWarning": null,
+      "counts": {
+        "needs_review": 362,
+        "queued": 7,
+        "registered": 2,
+        "waiting_ocr": 13
+      },
+      "aftercheckPending": 0
+    },
+    "appFetchReady": true,
+    "appBackgroundReady": false,
+    "appBackgroundReasons": [
+      "external_schedule_unverified"
+    ],
+    "externalScheduleVerifiedByApp": false,
+    "emailsSent": 0,
+    "followupAfterThirdSchedule": {
+      "lastSuccessfulFetch": "2026-11-05T18:59:26.053Z",
+      "completedAt": "2026-11-05T18:59:50.683Z",
+      "outcome": "completed",
+      "postprocessWarning": null,
+      "aftercheckPending": 0,
+      "counts": {
+        "needs_review": 362,
+        "registered": 2,
+        "waiting_ocr": 28
+      },
+      "backgroundReady": false,
+      "backgroundReasons": [
+        "external_schedule_unverified"
+      ],
+      "cloudLastCompleted": "2026-11-05T18:23:31.509Z",
+      "newImportsDoNotCountAsCompletedOcr": true
+    }
+  },
+  "financialGuard": {
+    "beforeAt": "2026-11-05T18:10:52.489Z",
+    "afterAt": "2026-11-05T18:29:24.114Z",
+    "comparedRows": 2,
+    "selectedEconomicFactsUnchanged": true,
+    "revisionBefore": 52,
+    "revisionAfter": 52,
+    "rowsCountedEconomically": 1,
+    "bookedInvoiceCount": 0,
+    "registryMatchCount": 0,
+    "allocationConflict": false,
+    "wholeEvidenceResponseComplete": false,
+    "referenceSearchComplete": false,
+    "notAFullWorkspaceAudit": true,
+    "manualReconciliationRecovery": {
+      "automatic": 0,
+      "findings": 121
+    }
+  },
+  "bank": {
+    "connected": false,
+    "lastSuccessfulFetch": "2026-11-05T08:05:14.646Z",
+    "freshProviderConsentRevalidationPerformed": false,
+    "toolAvailableInCurrentChat": false,
+    "accountReadVerified": false,
+    "notApprovedForCurrentOperationalRating": true
+  },
+  "backup": {
+    "copiedAndVerifiedOriginals": 362,
+    "bytes": 142968213,
+    "verifiedAt": "2026-11-05T16:55:10.290Z",
+    "productionSnapshotRecoveryPointVerified": false,
+    "laterImportsIncluded": false,
+    "report": "recovery-evidence.md"
+  },
+  "limitations": [
+    "Fresh bank consent and selected account read not yet verified.",
+    "New bank revalidation tool is deployed but not exposed in this conversation's tool catalogue.",
+    "A fresh tab enabled one desktop-width public demo check; five-width visual acceptance and authenticated bank UI remain unverified.",
+    "App cannot verify external schedule execution by itself; platform evidence is reported separately.",
+    "Frozen backup excludes subsequent imports; production RPO/RTO are not measured.",
+    "OCR word-evidence and manual multiple-invoice allocation changes belong to the following release."
+  ],
+  "publicUiFollowup": {
+    "scope": "published version63 with isolated fictional demo data",
+    "viewportCss": {
+      "width": 1363,
+      "height": 936,
+      "clientWidth": 1348,
+      "scrollWidth": 1348
+    },
+    "observed": [
+      "signed-out overview with unknown values",
+      "combined invoice number Swedish amount and date search",
+      "keyboard result activation",
+      "invoice and bank detail source labels"
+    ],
+    "findings": [
+      "overview verification weaker than detail view",
+      "search result removal loses stable dialog return focus"
+    ],
+    "fiveRequiredWidthsVerified": false,
+    "authenticatedWorkspaceReached": false,
+    "authPage": "https://auth.openai.com/log-in",
+    "credentialsRequested": false
+  }
+}

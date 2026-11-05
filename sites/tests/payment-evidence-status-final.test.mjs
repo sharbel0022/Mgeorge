@@ -13,7 +13,7 @@ for(const [name,target] of Object.entries({'./domain':url('../lib/domain.ts'),'.
 const {bankPaymentView,bankPaymentCounts}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
 
 function booked(description=''){
- let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',organizationNumber:'1111111111',number:'SYN-1',ocr:'',total:10000,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;
+ let state=applyCommand(emptyState(),{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',organizationNumber:'1111111111',number:'SYN-1',ocr:'',total:10000,issued:'2026-10-01',due:'2026-10-30',reviewed:true,documentId:'synthetic-invoice-original'}}).state;
  state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount:10000,party:'Synthetic customer AB',payerReference:'SYN-1',bankReference:'SYNTHETIC-STATUS',account:'synthetic-account',kind:'payment',verified:true},{bank_transaction_code:{description}})]}).state;
  // Preserved historical bookings also occur in legacy workspaces. They must
  // be assessed against today's bank facts without rewriting their money.
@@ -38,19 +38,19 @@ for(const description of ['Reversal','Card refund','Internal transfer','Payroll'
 test('an ancestor bank transaction type remains review evidence for its booked child',()=>{
  const state=booked(),parent=booked('Reversal').transactions[0];parent.id='synthetic-parent';state.transactions[0].parentId=parent.id;state.transactions.push(parent);assertHeld(state);
 });
-test('an explicitly booked refund keeps its verified refund classification',()=>{
+test('an explicitly booked refund keeps its classification but missing reference holds the verified overview',()=>{
  let state=booked();state=applyCommand(state,{type:'credit.add',invoiceId:state.invoices[0].id,amount:10000,number:'SYN-REFUND-CREDIT',date:'2026-10-27',note:'Synthetic return'}).state;
  state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-28',amount:-10000,party:'Synthetic customer AB',payerReference:'',bankReference:'SYNTHETIC-REFUND',account:'synthetic-account',kind:'payment',verified:true},{bank_transaction_code:{description:'Refund'}})]}).state;
  state=applyCommand(state,{type:'match.create',invoiceId:state.invoices[0].id,transactionId:state.transactions[1].id,amount:10000,effect:'refund',note:'Explicitly reviewed synthetic refund against the credit'}).state;
  const before=structuredClone(state),summary=economySummary(state,'2026-10-30');
  assert.equal(invoicePaymentEvidenceIssue(state,state.invoices[0].id),'');assert.equal(bankPaymentView(state,state.transactions[0]).verified,true);
- assert.equal(bankPaymentView(state,state.transactions[1]).verified,true);assert.equal(invoiceStatus(state,state.invoices[0]).key,'paid');assert.equal(balance(state,state.invoices[0]),0);
- assert.equal(summary.received_month_cents,10000);assert.equal(summary.refunded_month_cents,10000);assert.equal(summary.unverified_allocation_count,0);assert.deepEqual(state,before);
+ assert.equal(bankPaymentView(state,state.transactions[1]).verified,false);assert.equal(bankPaymentView(state,state.transactions[1]).decision.code,'BLOCKED');assert.equal(invoiceStatus(state,state.invoices[0]).key,'paid');assert.equal(balance(state,state.invoices[0]),0);
+ assert.equal(summary.received_month_cents,10000);assert.equal(summary.refunded_month_cents,0);assert.equal(summary.unverified_allocation_count,1);assert.deepEqual(state,before);
 });
 
 for(const refundFirst of [true,false])test('a mixed historical refund and payment holds the whole bank post regardless of allocation order: '+refundFirst,()=>{
  let state=emptyState();
- for(const [direction,number] of [['receivable','SYN-CUSTOMER'],['payable','SYN-SUPPLIER']])state=applyCommand(state,{type:'invoice.save',invoice:{direction,party:'Synthetic company AB',number,total:10000,issued:'2026-10-01',due:'2026-10-30',reviewed:true}}).state;
+ for(const [direction,number] of [['receivable','SYN-CUSTOMER'],['payable','SYN-SUPPLIER']])state=applyCommand(state,{type:'invoice.save',invoice:{direction,party:'Synthetic company AB',number,total:10000,issued:'2026-10-01',due:'2026-10-30',reviewed:true,documentId:'synthetic-original-'+number}}).state;
  state=applyCommand(state,{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({date:'2026-10-26',amount:10000,party:'Synthetic company AB',payerReference:'SYN-CUSTOMER',bankReference:'SYNTHETIC-INITIAL',account:'synthetic-account',kind:'payment',verified:true})]}).state;
  state=applyCommand(state,{type:'match.create',invoiceId:state.invoices[0].id,transactionId:state.transactions[0].id,amount:10000,note:'Synthetic initial payment'}).state;
  state=applyCommand(state,{type:'credit.add',invoiceId:state.invoices[0].id,amount:10000,number:'SYN-CREDIT',date:'2026-10-27',note:'Synthetic full credit'}).state;
@@ -65,7 +65,7 @@ for(const refundFirst of [true,false])test('a mixed historical refund and paymen
  assert.equal(paymentOriginalIssue(state,state.transactions[1]),'');assert.deepEqual(state.invoices.map(i=>balance(state,i)),[0,0]);
  assert.equal(paymentInvoiceAssessment(state,state.transactions[1]).status,'review');assert.equal(view.verified,false);assert.equal(view.invoiceVerified,false);
  assert.equal(invoicePaymentEvidenceIssue(state,state.invoices[0].id),'');assert.ok(invoicePaymentEvidenceIssue(state,state.invoices[1].id));
- assert.equal(summary.unverified_allocation_count,1);assert.equal(summary.refunded_month_cents,10000);assert.equal(summary.received_month_cents,10000);assert.equal(summary.remaining_cents,0);assert.equal(summary.payable_due_cents,0);
+ assert.equal(summary.unverified_allocation_count,2);assert.equal(summary.refunded_month_cents,0);assert.equal(summary.received_month_cents,10000);assert.equal(summary.remaining_cents,0);assert.equal(summary.payable_due_cents,0);
  assert.deepEqual(state,before);
 });
 
@@ -77,7 +77,7 @@ test('an active credit also locks the invoice organization while unrelated metad
 });
 
 test('a booked invoice without its reviewed original cannot display an invoice verification badge',()=>{
- const state=booked(),before=structuredClone(state),view=bankPaymentView(state,state.transactions[0]);
+ const state=booked();state.invoices[0].documentId='';const before=structuredClone(state),view=bankPaymentView(state,state.transactions[0]);
  assert.equal(view.decision.code,'REVIEW');
  assert.equal(view.invoiceVerified,false);
  assert.deepEqual(state,before);assert.equal(balance(state,state.invoices[0]),0);

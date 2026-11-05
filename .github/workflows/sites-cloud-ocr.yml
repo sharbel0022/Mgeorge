@@ -2,7 +2,9 @@ name: Sites cloud OCR
 
 on:
   schedule:
-    - cron: '7,22,37,52 * * * *'
+    # Equivalent minutes 7,22,37,52. Refresh cron registration after an
+    # observed scheduling gap; a future actual scheduled run is still needed.
+    - cron: '7/15 * * * *'
   workflow_dispatch:
   workflow_run:
     workflows: [Payment control checks]

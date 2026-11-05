@@ -1,0 +1,1477 @@
+{
+  "frozenAt": "2026-11-05T17:20:56.904Z",
+  "scriptSha256": "d08e34c1f1ed44ec366b942ee04fc70171200dd225770462d0726ea9ece1011d",
+  "node": "v24.22.1",
+  "sourceCommit": "303285ab1fec047ec0923614d994860c7d7ce6a5",
+  "passes": [
+    "current whole image with existing enlargement and default PSM",
+    "original-pixel rectangle from a unique detected Bankgiro label; SINGLE_LINE; no digit whitelist",
+    "original whole image with default PSM"
+  ],
+  "inputManifest": [
+    {
+      "id": "frozen:clear-png",
+      "inputSha256": "b689ad57e3ed02dc127c76b976e795b54c2a61a8b3a7a3255527752e12dea2df",
+      "expected": {
+        "invoice_number": "0606",
+        "party": "Testbolaget AB",
+        "organization_number": "5560160680",
+        "issued_at": "2026-10-24",
+        "due_at": "2026-11-07",
+        "total_cents": 375000,
+        "vat_cents": 75000,
+        "net_cents": 300000,
+        "reference": "000018",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true
+    },
+    {
+      "id": "frozen:clear-jpeg",
+      "inputSha256": "033a76fb9a16a25e92107461a14b2527f4232aa65563863ed5b6f4230b601d62",
+      "expected": {
+        "invoice_number": "0606",
+        "party": "Testbolaget AB",
+        "organization_number": "5560160680",
+        "issued_at": "2026-10-24",
+        "due_at": "2026-11-07",
+        "total_cents": 375000,
+        "vat_cents": 75000,
+        "net_cents": 300000,
+        "reference": "000018",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true
+    },
+    {
+      "id": "frozen:blank-raster",
+      "inputSha256": "b4fb2028e86993a7ee9d52435acd88252e69bdfd16be9c99b0d91e477cb47605",
+      "expected": {
+        "invoice_number": null,
+        "party": null,
+        "organization_number": null,
+        "issued_at": null,
+        "due_at": null,
+        "total_cents": null,
+        "vat_cents": null,
+        "net_cents": null,
+        "reference": null,
+        "bankgiro": null,
+        "direction": "supplier",
+        "kind": "other",
+        "currency": null
+      },
+      "requireReview": true
+    },
+    {
+      "id": "frozen:severely-pixelated-invoice",
+      "inputSha256": "546b4e4c31271b2314dacbba55d6af18a34fe913350a65ca08c80f4a1cfb9731",
+      "expected": {
+        "invoice_number": "0606",
+        "party": "Testbolaget AB",
+        "organization_number": "5560160680",
+        "issued_at": "2026-10-24",
+        "due_at": "2026-11-07",
+        "total_cents": 375000,
+        "vat_cents": 75000,
+        "net_cents": 300000,
+        "reference": "000018",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK"
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:sum-full-png",
+      "inputSha256": "af5c8a80a8992192313d76f58f5f7488a7f435dc1597ee831aadf6f38ec5ac11",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94150",
+        "net_cents": 240000,
+        "vat_cents": 60000,
+        "total_cents": 300000
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:sum-abbreviated-jpeg",
+      "inputSha256": "fcbd4d9795f06011b2ac199ccedf2d0c33fd58cd23f78226b3c7f71c81dac814",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94151",
+        "net_cents": 672000,
+        "vat_cents": 168000,
+        "total_cents": 840000
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:total-full-png",
+      "inputSha256": "ab415e2630238625a7b6311238f3af2a3af93e1db0960b4b6e2ce41b63d15424",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94152",
+        "net_cents": 1234500,
+        "vat_cents": 308625,
+        "total_cents": 1543125
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:amount-full-jpeg",
+      "inputSha256": "91baf435763a9183fe8474e24fdbf1d82b972744042ebeafb5c956ad2ab1a21c",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94153",
+        "net_cents": 80000,
+        "vat_cents": 20000,
+        "total_cents": 100000
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:wrapped-tax-sums-png",
+      "inputSha256": "82db47beb581f14f7f1b5f29fc2c64ff28f34e0b7f508f59850230461b1704b9",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94154",
+        "net_cents": 161600,
+        "vat_cents": 40400,
+        "total_cents": 202000
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:conventional-control-png",
+      "inputSha256": "e26ac71143e621c550af6436c3c6ad349efe7e456e39e9e37b894a93bf27df44",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94155",
+        "net_cents": 960000,
+        "vat_cents": 240000,
+        "total_cents": 1200000
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:readable-conflicting-gross-png",
+      "inputSha256": "ceae48a649843ce531c793ffac38dec89ec151ea8b55af460f2a76611da1b14a",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "86140",
+        "net_cents": 400000,
+        "vat_cents": 100000,
+        "total_cents": null
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:readable-invalid-gross-png",
+      "inputSha256": "24961b8d3bb76bbacca8fcba30e77a684e2283960117df8755fb0999cdfb9134",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "86140",
+        "net_cents": 400000,
+        "vat_cents": 100000,
+        "total_cents": null
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:destroyed-low-resolution-source",
+      "inputSha256": "6ef8827ea90746cb66e725fd4e112d921fecf6669221f55bae39df6db5bff8d6",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "123-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94150",
+        "net_cents": 240000,
+        "vat_cents": 60000,
+        "total_cents": 300000
+      },
+      "requireReview": true
+    },
+    {
+      "id": "labels:blank-raster",
+      "inputSha256": "df91323eb7ebfa624de19e458e4acce1dc34592508ac249a3efb05271b70695d",
+      "expected": {
+        "invoice_number": null,
+        "party": null,
+        "organization_number": null,
+        "issued_at": null,
+        "due_at": null,
+        "total_cents": null,
+        "vat_cents": null,
+        "net_cents": null,
+        "reference": null,
+        "bankgiro": null,
+        "direction": "supplier",
+        "kind": "other",
+        "currency": null
+      },
+      "requireReview": true
+    },
+    {
+      "id": "control:printed-four-digit-prefix",
+      "inputSha256": "e89bed7bd850bd5dc8157e8e09644dc2e3a7ce6ea3c55576565fcb97341e9956",
+      "expected": {
+        "party": "Exempelverkstan AB",
+        "organization_number": "5599990099",
+        "issued_at": "2026-10-20",
+        "due_at": "2026-11-19",
+        "reference": "000026",
+        "bankgiro": "1223-4567",
+        "direction": "supplier",
+        "kind": "invoice",
+        "currency": "SEK",
+        "invoice_number": "94150",
+        "net_cents": 240000,
+        "vat_cents": 60000,
+        "total_cents": 300000
+      },
+      "requireReview": true
+    }
+  ],
+  "limitations": [
+    "Synthetic exploratory sample, not production validation.",
+    "Same recognition engine in fresh workers, so errors can be correlated.",
+    "No numeric repair, no coordinate supplied from expected value, no mode selected by gold.",
+    "All passes retained. Original-wide comparison includes all scalar fields; row comparison only evaluates Bankgiro.",
+    "No production source changed. Timing includes a fresh worker for each pass."
+  ],
+  "completedAt": "2026-11-05T17:23:49.970Z",
+  "results": [
+    {
+      "id": "frozen:clear-png",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 0606\nLeverantör: Testbolaget AB\nOrganisationsnummer: 556016-0680\nKund: Café Exempel AB\nFakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07\nNetto: 3 000,00 kr\n\nMoms: 750,00 kr\n\nAtt betala: 3 750,00 SEK\nOCR: 000018\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 6681.719002999999,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 123-4567\n",
+            "confidence": 91,
+            "bbox": {
+              "x0": 93,
+              "y0": 1191,
+              "x1": 570,
+              "y1": 1238
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 93,
+                "bbox": {
+                  "x0": 93,
+                  "y0": 1191,
+                  "x1": 323,
+                  "y1": 1238
+                }
+              },
+              {
+                "text": "123-4567",
+                "confidence": 90,
+                "bbox": {
+                  "x0": 349,
+                  "y0": 1191,
+                  "x1": 570,
+                  "y1": 1227
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 91,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 50,
+          "top": 782,
+          "width": 342,
+          "height": 56
+        },
+        "durationMs": 2658.978934999999
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 0606\nLeverantör: Testbolaget AB\nOrganisationsnummer: 556016-0680\nKund: Café Exempel AB\nFakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07\nNetto: 3 000,00 kr\n\nMoms: 750,00 kr\n\nAtt betala: 3 750,00 SEK\nOCR: 000018\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 5245.811411999999
+      }
+    },
+    {
+      "id": "frozen:clear-jpeg",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 0606\nLeverantör: Testbolaget AB\nOrganisationsnummer: 556016-0680\nKund: Café Exempel AB\nFakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07\nNetto: 3 000,00 kr\n\nMoms: 750,00 kr\n\nAtt betala: 3 750,00 SEK\nOCR: 000018\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 5073.744618000001,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 123-4567\n",
+            "confidence": 92,
+            "bbox": {
+              "x0": 93,
+              "y0": 1191,
+              "x1": 570,
+              "y1": 1238
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 92,
+                "bbox": {
+                  "x0": 93,
+                  "y0": 1191,
+                  "x1": 323,
+                  "y1": 1238
+                }
+              },
+              {
+                "text": "123-4567",
+                "confidence": 91,
+                "bbox": {
+                  "x0": 349,
+                  "y0": 1191,
+                  "x1": 570,
+                  "y1": 1227
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 1223-4567\n",
+        "confidence": 48,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "1223-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 50,
+          "top": 782,
+          "width": 342,
+          "height": 56
+        },
+        "durationMs": 1417.3792899999971
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 0606\nLeverantör: Testbolaget AB\nOrganisationsnummer: 556016-0680\nKund: Café Exempel AB\nFakturadatum: 2026-10-24\nFörfallodatum: 2026-11-07\nNetto: 3 000,00 kr\n\nMoms: 750,00 kr\n\nAtt betala: 3 750,00 SEK\nOCR: 000018\n\nBankgiro: 1223-4567\n",
+        "confidence": 91,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "yellow",
+        "wrongFields": [
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": "1223-4567"
+          }
+        ],
+        "durationMs": 3403.6276069999985
+      }
+    },
+    {
+      "id": "frozen:blank-raster",
+      "expectedBankgiro": null,
+      "current": {
+        "text": "",
+        "confidence": 0,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [],
+        "durationMs": 3350.9959739999977,
+        "bankgiroRows": []
+      },
+      "originalRow": {
+        "skipped": "No labelled row detected"
+      },
+      "originalFull": {
+        "text": "",
+        "confidence": 0,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [],
+        "durationMs": 3470.5279070000033
+      }
+    },
+    {
+      "id": "frozen:severely-pixelated-invoice",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "a\nLJ\n",
+        "confidence": 24,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [
+          {
+            "field": "invoice_number",
+            "expected": "0606",
+            "actual": null
+          },
+          {
+            "field": "party",
+            "expected": "Testbolaget AB",
+            "actual": null
+          },
+          {
+            "field": "organization_number",
+            "expected": "5560160680",
+            "actual": null
+          },
+          {
+            "field": "issued_at",
+            "expected": "2026-10-24",
+            "actual": null
+          },
+          {
+            "field": "due_at",
+            "expected": "2026-11-07",
+            "actual": null
+          },
+          {
+            "field": "total_cents",
+            "expected": 375000,
+            "actual": null
+          },
+          {
+            "field": "vat_cents",
+            "expected": 75000,
+            "actual": null
+          },
+          {
+            "field": "net_cents",
+            "expected": 300000,
+            "actual": null
+          },
+          {
+            "field": "reference",
+            "expected": "000018",
+            "actual": null
+          },
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": null
+          },
+          {
+            "field": "kind",
+            "expected": "invoice",
+            "actual": "other"
+          },
+          {
+            "field": "currency",
+            "expected": "SEK",
+            "actual": null
+          }
+        ],
+        "durationMs": 3946.7009659999967,
+        "bankgiroRows": []
+      },
+      "originalRow": {
+        "skipped": "No labelled row detected"
+      },
+      "originalFull": {
+        "text": "ml\nNU HN\n",
+        "confidence": 16,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [
+          {
+            "field": "invoice_number",
+            "expected": "0606",
+            "actual": null
+          },
+          {
+            "field": "party",
+            "expected": "Testbolaget AB",
+            "actual": null
+          },
+          {
+            "field": "organization_number",
+            "expected": "5560160680",
+            "actual": null
+          },
+          {
+            "field": "issued_at",
+            "expected": "2026-10-24",
+            "actual": null
+          },
+          {
+            "field": "due_at",
+            "expected": "2026-11-07",
+            "actual": null
+          },
+          {
+            "field": "total_cents",
+            "expected": 375000,
+            "actual": null
+          },
+          {
+            "field": "vat_cents",
+            "expected": 75000,
+            "actual": null
+          },
+          {
+            "field": "net_cents",
+            "expected": 300000,
+            "actual": null
+          },
+          {
+            "field": "reference",
+            "expected": "000018",
+            "actual": null
+          },
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": null
+          },
+          {
+            "field": "kind",
+            "expected": "invoice",
+            "actual": "other"
+          },
+          {
+            "field": "currency",
+            "expected": "SEK",
+            "actual": null
+          }
+        ],
+        "durationMs": 3316.029447000001
+      }
+    },
+    {
+      "id": "labels:sum-full-png",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 94150\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nSumma exklusive moms: 2 400,00 SEK\nMoms: 600,00 SEK\n\nSumma inklusive moms: 3 000,00 SEK\nOCR: 000026\n\nBankgiro: 1223-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "yellow",
+        "wrongFields": [
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": "1223-4567"
+          }
+        ],
+        "durationMs": 4305.170172999999,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 1223-4567\n",
+            "confidence": 40,
+            "bbox": {
+              "x0": 102,
+              "y0": 1224,
+              "x1": 568,
+              "y1": 1271
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 102,
+                  "y0": 1224,
+                  "x1": 320,
+                  "y1": 1271
+                }
+              },
+              {
+                "text": "1223-4567",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 346,
+                  "y0": 1225,
+                  "x1": 568,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 56,
+          "top": 804,
+          "width": 335,
+          "height": 56
+        },
+        "durationMs": 1890.3084030000027
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 94150\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nSumma exklusive moms: 2 400,00 SEK\nMoms: 600,00 SEK\n\nSumma inklusive moms: 3 000,00 SEK\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 3754.3392590000003
+      }
+    },
+    {
+      "id": "labels:sum-abbreviated-jpeg",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 94151\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\nSumma exkl. moms: 6 720,00 SEK\nMoms: 1 680,00 SEK\n\nSumma inkl. moms: 8 400,00 SEK\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 6476.0257619999975,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 123-4567\n",
+            "confidence": 92,
+            "bbox": {
+              "x0": 100,
+              "y0": 1224,
+              "x1": 577,
+              "y1": 1271
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 93,
+                "bbox": {
+                  "x0": 100,
+                  "y0": 1224,
+                  "x1": 331,
+                  "y1": 1271
+                }
+              },
+              {
+                "text": "123-4567",
+                "confidence": 92,
+                "bbox": {
+                  "x0": 357,
+                  "y0": 1224,
+                  "x1": 577,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 1223-4567\n",
+        "confidence": 48,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "1223-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 54,
+          "top": 804,
+          "width": 343,
+          "height": 56
+        },
+        "durationMs": 1853.041545999993
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 94151\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\nSumma exkl. moms: 6 720,00 SEK\nMoms: 1 680,00 SEK\n\nSumma inkl. moms: 8 400,00 SEK\nOCR: 000026\n\nBankgiro: 1223-4567\n",
+        "confidence": 91,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "yellow",
+        "wrongFields": [
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": "1223-4567"
+          }
+        ],
+        "durationMs": 3449.8041879999946
+      }
+    },
+    {
+      "id": "labels:total-full-png",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 94152\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nTotalt exklusive moms: 12.345,00 SEK\nMoms: 3.086,25 SEK\n\nTotalt inklusive moms: 15.431,25 SEK\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 93,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 4271.040500999996,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 123-4567\n",
+            "confidence": 91,
+            "bbox": {
+              "x0": 100,
+              "y0": 1224,
+              "x1": 577,
+              "y1": 1271
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 92,
+                "bbox": {
+                  "x0": 100,
+                  "y0": 1224,
+                  "x1": 331,
+                  "y1": 1271
+                }
+              },
+              {
+                "text": "123-4567",
+                "confidence": 90,
+                "bbox": {
+                  "x0": 357,
+                  "y0": 1224,
+                  "x1": 577,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 91,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 54,
+          "top": 804,
+          "width": 343,
+          "height": 56
+        },
+        "durationMs": 1583.008520999996
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 94152\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nTotalt exklusive moms: 12.345,00 SEK\nMoms: 3.086,25 SEK\n\nTotalt inklusive moms: 15.431,25 SEK\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 3995.1118800000113
+      }
+    },
+    {
+      "id": "labels:amount-full-jpeg",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 94153\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nBelopp exklusive moms: 800,00 SEK\nMoms: 200,00 SEK\n\nBelopp inklusive moms: 1 000,00 SEK\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 3947.389678000007,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 123-4567\n",
+            "confidence": 92,
+            "bbox": {
+              "x0": 102,
+              "y0": 1225,
+              "x1": 539,
+              "y1": 1269
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 93,
+                "bbox": {
+                  "x0": 102,
+                  "y0": 1225,
+                  "x1": 306,
+                  "y1": 1269
+                }
+              },
+              {
+                "text": "123-4567",
+                "confidence": 92,
+                "bbox": {
+                  "x0": 331,
+                  "y0": 1227,
+                  "x1": 539,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 56,
+          "top": 804,
+          "width": 316,
+          "height": 54
+        },
+        "durationMs": 1751.6326529999933
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 94153\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nBelopp exklusive moms: 800,00 SEK\nMoms: 200,00 SEK\n\nBelopp inklusive moms: 1 000,00 SEK\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 6041.401479999986
+      }
+    },
+    {
+      "id": "labels:wrapped-tax-sums-png",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 94154\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\nSumma exkl moms:\n\n1 616,00 SEK\n\nMoms: 404,00 SEK\n\nSumma inkl moms:\n\n2 020,00 SEK\n\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 93,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 4947.326456999988,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 123-4567\n",
+            "confidence": 91,
+            "bbox": {
+              "x0": 100,
+              "y0": 1437,
+              "x1": 547,
+              "y1": 1479
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 93,
+                "bbox": {
+                  "x0": 100,
+                  "y0": 1437,
+                  "x1": 316,
+                  "y1": 1479
+                }
+              },
+              {
+                "text": "123-4567",
+                "confidence": 89,
+                "bbox": {
+                  "x0": 340,
+                  "y0": 1437,
+                  "x1": 547,
+                  "y1": 1470
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 54,
+          "top": 946,
+          "width": 323,
+          "height": 52
+        },
+        "durationMs": 1339.4697190000006
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 94154\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\nSumma exkl moms:\n\n1 616,00 SEK\n\nMoms: 404,00 SEK\n\nSumma inkl moms:\n\n2 020,00 SEK\n\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 3129.413161999997
+      }
+    },
+    {
+      "id": "labels:conventional-control-png",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 94155\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\nNetto: 9 600,00 SEK\n\nMoms: 2 400,00 SEK\n\nAtt betala: 12 000,00 SEK\n\nOCR: 000026\n\nBankgiro: 1223-4567\n",
+        "confidence": 91,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "yellow",
+        "wrongFields": [
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": "1223-4567"
+          }
+        ],
+        "durationMs": 3848.627259000001,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 1223-4567\n",
+            "confidence": 40,
+            "bbox": {
+              "x0": 102,
+              "y0": 1224,
+              "x1": 568,
+              "y1": 1271
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 102,
+                  "y0": 1224,
+                  "x1": 320,
+                  "y1": 1271
+                }
+              },
+              {
+                "text": "1223-4567",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 346,
+                  "y0": 1225,
+                  "x1": 568,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 56,
+          "top": 804,
+          "width": 335,
+          "height": 56
+        },
+        "durationMs": 1080.380489999996
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 94155\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\nNetto: 9 600,00 SEK\n\nMoms: 2 400,00 SEK\n\nAtt betala: 12 000,00 SEK\n\nOCR: 000026\n\nBankgiro: 123-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 3910.332202000005
+      }
+    },
+    {
+      "id": "labels:readable-conflicting-gross-png",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 86140\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nNetto: 4 000,00 SEK\n\nMoms: 1 000,00 SEK\n\nAtt betala: 5 000,00 SEK\n\nOCR: 000026\n\nBankgiro: 1223-4567\n\nSumma inklusive moms: 5 100,00 SEK\n",
+        "confidence": 92,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "red",
+        "wrongFields": [
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": "1223-4567"
+          }
+        ],
+        "durationMs": 4942.008386999994,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 1223-4567\n\n",
+            "confidence": 40,
+            "bbox": {
+              "x0": 102,
+              "y0": 1224,
+              "x1": 568,
+              "y1": 1271
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 102,
+                  "y0": 1224,
+                  "x1": 320,
+                  "y1": 1271
+                }
+              },
+              {
+                "text": "1223-4567",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 346,
+                  "y0": 1225,
+                  "x1": 568,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 56,
+          "top": 804,
+          "width": 335,
+          "height": 56
+        },
+        "durationMs": 2674.9864109999908
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 86140\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nNetto: 4 000,00 SEK\n\nMoms: 1 000,00 SEK\n\nAtt betala: 5 000,00 SEK\n\nOCR: 000026\n\nBankgiro: 123-4567\n\nSumma inklusive moms: 5 100,00 SEK\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "wrongFields": [],
+        "durationMs": 4485.699538999994
+      }
+    },
+    {
+      "id": "labels:readable-invalid-gross-png",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 86140\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nNetto: 4 000,00 SEK\n\nMoms: 1 000,00 SEK\n\nAtt betala: 5 000,00 SEK\n\nOCR: 000026\n\nBankgiro: 1223-4567\n\nSumma inkl. moms: 5 000,00 SEK till godo\n",
+        "confidence": 92,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "red",
+        "wrongFields": [
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": "1223-4567"
+          }
+        ],
+        "durationMs": 7299.384816000005,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 1223-4567\n\n",
+            "confidence": 40,
+            "bbox": {
+              "x0": 102,
+              "y0": 1224,
+              "x1": 568,
+              "y1": 1271
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 102,
+                  "y0": 1224,
+                  "x1": 320,
+                  "y1": 1271
+                }
+              },
+              {
+                "text": "1223-4567",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 346,
+                  "y0": 1225,
+                  "x1": 568,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 123-4567\n",
+        "confidence": 92,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 56,
+          "top": 804,
+          "width": 335,
+          "height": 56
+        },
+        "durationMs": 2364.6003710000077
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 86140\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nNetto: 4 000,00 SEK\n\nMoms: 1 000,00 SEK\n\nAtt betala: 5 000,00 SEK\n\nOCR: 000026\n\nBankgiro: 123-4567\n\nSumma inkl. moms: 5 000,00 SEK till godo\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "123-4567",
+        "level": "red",
+        "wrongFields": [],
+        "durationMs": 4949.427522999991
+      }
+    },
+    {
+      "id": "labels:destroyed-low-resolution-source",
+      "expectedBankgiro": "123-4567",
+      "current": {
+        "text": "",
+        "confidence": 0,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [
+          {
+            "field": "party",
+            "expected": "Exempelverkstan AB",
+            "actual": null
+          },
+          {
+            "field": "organization_number",
+            "expected": "5599990099",
+            "actual": null
+          },
+          {
+            "field": "issued_at",
+            "expected": "2026-10-20",
+            "actual": null
+          },
+          {
+            "field": "due_at",
+            "expected": "2026-11-19",
+            "actual": null
+          },
+          {
+            "field": "reference",
+            "expected": "000026",
+            "actual": null
+          },
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": null
+          },
+          {
+            "field": "kind",
+            "expected": "invoice",
+            "actual": "other"
+          },
+          {
+            "field": "currency",
+            "expected": "SEK",
+            "actual": null
+          },
+          {
+            "field": "invoice_number",
+            "expected": "94150",
+            "actual": null
+          },
+          {
+            "field": "net_cents",
+            "expected": 240000,
+            "actual": null
+          },
+          {
+            "field": "vat_cents",
+            "expected": 60000,
+            "actual": null
+          },
+          {
+            "field": "total_cents",
+            "expected": 300000,
+            "actual": null
+          }
+        ],
+        "durationMs": 2375.2601330000034,
+        "bankgiroRows": []
+      },
+      "originalRow": {
+        "skipped": "No labelled row detected"
+      },
+      "originalFull": {
+        "text": "",
+        "confidence": 0,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [
+          {
+            "field": "party",
+            "expected": "Exempelverkstan AB",
+            "actual": null
+          },
+          {
+            "field": "organization_number",
+            "expected": "5599990099",
+            "actual": null
+          },
+          {
+            "field": "issued_at",
+            "expected": "2026-10-20",
+            "actual": null
+          },
+          {
+            "field": "due_at",
+            "expected": "2026-11-19",
+            "actual": null
+          },
+          {
+            "field": "reference",
+            "expected": "000026",
+            "actual": null
+          },
+          {
+            "field": "bankgiro",
+            "expected": "123-4567",
+            "actual": null
+          },
+          {
+            "field": "kind",
+            "expected": "invoice",
+            "actual": "other"
+          },
+          {
+            "field": "currency",
+            "expected": "SEK",
+            "actual": null
+          },
+          {
+            "field": "invoice_number",
+            "expected": "94150",
+            "actual": null
+          },
+          {
+            "field": "net_cents",
+            "expected": 240000,
+            "actual": null
+          },
+          {
+            "field": "vat_cents",
+            "expected": 60000,
+            "actual": null
+          },
+          {
+            "field": "total_cents",
+            "expected": 300000,
+            "actual": null
+          }
+        ],
+        "durationMs": 2674.346790999989
+      }
+    },
+    {
+      "id": "labels:blank-raster",
+      "expectedBankgiro": null,
+      "current": {
+        "text": "",
+        "confidence": 0,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [],
+        "durationMs": 3740.813442999992,
+        "bankgiroRows": []
+      },
+      "originalRow": {
+        "skipped": "No labelled row detected"
+      },
+      "originalFull": {
+        "text": "",
+        "confidence": 0,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": null,
+        "level": "red",
+        "wrongFields": [],
+        "durationMs": 2568.315073000005
+      }
+    },
+    {
+      "id": "control:printed-four-digit-prefix",
+      "expectedBankgiro": "1223-4567",
+      "current": {
+        "text": "Faktura\n\nFakturanummer: 94150\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nSumma exklusive moms: 2 400,00 SEK\nMoms: 600,00 SEK\n\nSumma inklusive moms: 3 000,00 SEK\nOCR: 000026\n\nBankgiro: 1223-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 8394.223064999998,
+        "bankgiroRows": [
+          {
+            "text": "Bankgiro: 1223-4567\n",
+            "confidence": 96,
+            "bbox": {
+              "x0": 102,
+              "y0": 1224,
+              "x1": 599,
+              "y1": 1271
+            },
+            "words": [
+              {
+                "text": "Bankgiro:",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 102,
+                  "y0": 1224,
+                  "x1": 320,
+                  "y1": 1271
+                }
+              },
+              {
+                "text": "1223-4567",
+                "confidence": 95,
+                "bbox": {
+                  "x0": 346,
+                  "y0": 1225,
+                  "x1": 599,
+                  "y1": 1260
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "originalRow": {
+        "text": "Bankgiro: 1223-4567\n",
+        "confidence": 96,
+        "psm": "SINGLE_LINE",
+        "bankgiro": "1223-4567",
+        "level": "red",
+        "rectangle": {
+          "left": 56,
+          "top": 804,
+          "width": 356,
+          "height": 56
+        },
+        "durationMs": 3067.7616960000014
+      },
+      "originalFull": {
+        "text": "Faktura\n\nFakturanummer: 94150\n\nLeverantör: Exempelverkstan AB\nOrganisationsnummer: 559999-0099\nKund: Syntetiska Kontoret AB\nFakturadatum: 2026-10-20\nFörfallodatum: 2026-11-19\n\nSumma exklusive moms: 2 400,00 SEK\nMoms: 600,00 SEK\n\nSumma inklusive moms: 3 000,00 SEK\nOCR: 000026\n\nBankgiro: 1223-4567\n",
+        "confidence": 94,
+        "psm": "SINGLE_BLOCK",
+        "bankgiro": "1223-4567",
+        "level": "yellow",
+        "wrongFields": [],
+        "durationMs": 5686.283066000004
+      }
+    }
+  ]
+}

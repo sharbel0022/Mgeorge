@@ -1,0 +1,362 @@
+{
+  "schema": "mgeorge-independent-ocr-holdout-v2",
+  "synthetic": true,
+  "createdAt": "2026-11-05T19:56:18.503Z",
+  "sourceBinding": {
+    "status": "pending-delivery-sha-at-corpus-freeze",
+    "rule": "Do not run any OCR or application parser before root provides the frozen delivery SHA and a separate exact source binding is committed. The corpus, gold and harness remain unchanged.",
+    "inventory": "All tracked src/ and sites/lib/ files, package manifests/locks, transitive optical/downstream import graphs, installed OCR versions and local trained-data/WASM hashes."
+  },
+  "preregistration": {
+    "normalDocuments": 10,
+    "stressDocuments": 2,
+    "selection": "All twelve predetermined images remain included. No OCR, extracted text or application-parser result was observed before this freeze. No failed case is removed, replaced, relabelled or pooled with v1.",
+    "population": "Ten new printed Swedish SEK supplier invoices with 25% VAT, five normal sans/serif families, ten natural inline/stacked/two-column arrangements, 1600x2000 pixels and 28-36px normal field/body text. Two separately labelled damaged images retain their source gold. A purposive sample, not population-representative data.",
+    "metadata": "direction=supplier and direction_confident=true are supplied context. No direction-recognition claim may be drawn from these images. Report mandatory image-derived nine fields separately.",
+    "scalarFields": [
+      "invoice_number",
+      "party",
+      "organization_number",
+      "issued_at",
+      "due_at",
+      "total_cents",
+      "vat_cents",
+      "net_cents",
+      "reference",
+      "bankgiro",
+      "direction",
+      "kind",
+      "currency"
+    ],
+    "mandatoryFields": [
+      "invoice_number",
+      "party",
+      "organization_number",
+      "issued_at",
+      "due_at",
+      "total_cents",
+      "net_cents",
+      "vat_cents",
+      "direction",
+      "currency"
+    ],
+    "mandatoryImageFields": [
+      "invoice_number",
+      "party",
+      "organization_number",
+      "issued_at",
+      "due_at",
+      "total_cents",
+      "net_cents",
+      "vat_cents",
+      "currency"
+    ],
+    "criticalFields": [
+      "invoice_number",
+      "party",
+      "organization_number",
+      "due_at",
+      "total_cents",
+      "net_cents",
+      "vat_cents",
+      "reference",
+      "bankgiro",
+      "direction",
+      "currency"
+    ],
+    "normalPrecisionMinimum": 0.98,
+    "normalRecallMinimum": 0.85,
+    "acceptance": "For EACH parser, both all-13 and mandatory-10 normal scopes require precision >=98% and recall >=85%, with no processing errors. Also require zero critical false-green decisions and safe non-green abstention on BOTH stress images. No cross-parser or cross-population averaging.",
+    "stressAcceptance": "Keep original complete gold; absent source values count as FN. Stress never improves normal-population precision/recall or replaces a readable input.",
+    "freezeRule": "Commit literal gold, specification, visually inspected exact PNGs, generator, measurement code, metric definitions and thresholds before any OCR. Bind and commit the later delivered implementation SHA before first execution. Retain the first complete result and any infrastructure interruption transparently; no output-dependent tuning."
+  },
+  "previousV1": {
+    "separate": true,
+    "preserved": true,
+    "passed": false,
+    "normalDocuments": 8,
+    "stressDocuments": 2,
+    "artifactHashes": {
+      "test/fixtures/quality8/ocr-holdout-v1/manifest.json": "6d9bb30d672b23096e469a38d8eabf88ce2582501d3fc2a82b83a96f82f9311b",
+      "test/fixtures/quality8/ocr-holdout-v1/gold.json": "56e4b03f2b90f0d9cb2143376041d2751429d683397459df46a2a1e48d8141d3",
+      "docs/quality8/ocr-independent-holdout-result.json": "91e1bfd75277c0175a4145739e70759fa9f65b900a75d94dcf94e131b5e59c46",
+      "docs/quality8/ocr-independent-holdout-report.md": "d6614ad4d1c8b426c0a75e368462c0907d6ac13260fdd924cdcc2b20d3bbb83b"
+    }
+  },
+  "documentsSha256": "9b5d32a3ec386709e748be97555d2f2d4a1f89241fa95b643c84f0ed92fa8e52",
+  "goldSha256": "943a3f9039726d50817de5ad5e913c85aa5210f52e70db487be18e4bb5840af0",
+  "corpusHashes": {
+    "test/fixtures/quality8/ocr-holdout-v2/contact-1.png": "ae716a9fd0f802bdeec5aac54edf957fe124bfec790f99c3b7c5177988353574",
+    "test/fixtures/quality8/ocr-holdout-v2/contact-2.png": "913e60f670850df218c465daa494ff56191dfd0b7418721b05815aa320088d5f",
+    "test/fixtures/quality8/ocr-holdout-v2/contact-3.png": "56f6f58417c4c292d9a55ff961dd3d54f92999192c1b2d24bb43416cc0381cdd",
+    "test/fixtures/quality8/ocr-holdout-v2/documents.json": "9b5d32a3ec386709e748be97555d2f2d4a1f89241fa95b643c84f0ed92fa8e52",
+    "test/fixtures/quality8/ocr-holdout-v2/gold.json": "943a3f9039726d50817de5ad5e913c85aa5210f52e70db487be18e4bb5840af0",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-01.png": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-02.png": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-03.png": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-04.png": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-05.png": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-06.png": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-07.png": "6cdc1af980952c6efacf2060bc282c086aeaac21711f5d158b7b37f669f795b7",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-08.png": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-09.png": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-normal-10.png": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-stress-defocused-photo.png": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606",
+    "test/fixtures/quality8/ocr-holdout-v2/images/holdout-v2-stress-lost-bottom.png": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e",
+    "test/fixtures/quality8/ocr-holdout-v2/README.md": "948bea8070d76c5cba90464ad707a202e5ff65692c8466460e010d2d57da9b2c",
+    "test/fixtures/quality8/ocr-holdout-v2/render-inventory.json": "9f0d281a15803fb2d5a472f0283a6e6271e4ea45e38c3f947d57a1a1f285ed8c",
+    "test/fixtures/quality8/ocr-holdout-v2/rendered-text-bounds.json": "26c5e463aa8328c117f3a728770674cfe8b573d12fbb4148161cd800ec493cee",
+    "test/fixtures/quality8/ocr-holdout-v2/visual-qa.json": "77eefe886cd130626bdef328f8a21874a77af6edd712192da438dc3dbc77ea97"
+  },
+  "harnessHashes": {
+    "scripts/quality8/bind-ocr-holdout-v2.mjs": "eca49f27fb3375ded90e3fba6c586ed4a1a5003320e1fabe34c015cfc5fcfc50",
+    "scripts/quality8/freeze-ocr-holdout-v2.mjs": "40fe5a451897df50b2ca91df5081090f0cb6b7431c389796c658d8294fa70157",
+    "scripts/quality8/generate-ocr-holdout-v2.py": "9cdcfe833782a9da743450230072902b5c7cdd015a521d9c3181fa6aac71d88c",
+    "scripts/quality8/measure-ocr-holdout-v2.mjs": "2d3e84cac60ef54e253e71437cdf2b6384712408e4f3ec2acbe5714e5d3f1d3f",
+    "scripts/quality8/ocr-holdout-v2-provenance.mjs": "fb50aea4d2ce5faf9dd4766cdcea051bdde99ac36ec8e8c390b56794a12867b8",
+    "test/helpers/ocr-quality-metrics.mjs": "e799e8e7b759f1cc20aeae946d479b7bae4c730fef45fd015a5c809c42cc0ada"
+  },
+  "harnessSha256": "d107b46a069ae3db83d5963037ac3f7f449084a29ebf78db8bc941c4335d9522",
+  "generator": {
+    "sha256": "9cdcfe833782a9da743450230072902b5c7cdd015a521d9c3181fa6aac71d88c",
+    "pillowVersion": "13.0.0",
+    "fontHashes": {
+      "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf": "bade59d822652f76e6941aa87b40a87c13d1cc70db98ededb5011127efafd1d3",
+      "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf": "1b5f2da6f4cadce4c05b9ecebe3a6fcd374eb95ae443605e799f4c3287978939",
+      "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf": "9caef765d2e891c10dd73658894f01e660fe0c1c83e0bda7d6edf561d8f623d4",
+      "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf": "443a4dbd694b6e4689925947b456e0532e10b19c90fa32eb39ea6c2cd9db9ebd",
+      "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf": "57f73e11f51999432bf7ab22ce55b6f945d5eca1bf824404cfa9ec2e3718c84e",
+      "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf": "a4c5bc453ca281d90ea079e596da7ae0dfeb5777497c29ec254e76d97ff6f890",
+      "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf": "8cb29f7db250ebb2551a6ce2c1e0bfd5a0eb520e9e233370db0493e82e1f36f7",
+      "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf": "aac3f559445d23f0f567a243f91f3f6ad6cb4b5cafa1521a3479fffe0637f0bd",
+      "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
+      "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf": "e83493c945848ecd4a9ad0f6d19164541a0d3e23a9c952304a00a46e00272ac5"
+    }
+  },
+  "runtime": {
+    "versions": {
+      "@napi-rs/canvas": "0.1.80",
+      "@tesseract.js-data/swe": "1.0.0",
+      "tesseract.js": "6.0.1",
+      "tesseract.js-core": "6.1.2",
+      "pdfjs-dist": "5.4.149"
+    },
+    "artifacts": {
+      "swe/swe.traineddata.gz": "8432cbbf8c916ab80e21c00379591e696b7dfee5183242f8a137cad93ec4803b",
+      "tesseract-core/tesseract-core-lstm.wasm": "220e2e87551edccb85519796a170469f8ab2a8055216789e3b8b1ada18b7bc2b",
+      "tesseract-core/tesseract-core-simd-lstm.wasm": "187d76742dfc0d8929f0b49a619f145bb6370730776c7bd0d3e20c6b2098808d",
+      "tesseract-core/tesseract-core-simd.wasm": "ca11ee92a02023e4f5083eefd0966fb83b297416da54e997b9f6ce445f719c9b",
+      "tesseract-core/tesseract-core.wasm": "740f7e466a2f026e1f1e54a2e0d9957e386d8166110d1290224abd3d08986106"
+    }
+  },
+  "images": [
+    {
+      "id": "holdout-v2-normal-01",
+      "population": "normal-readable",
+      "layout": "split-header-totals-right",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-01.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 170379,
+      "sha256": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d"
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "population": "normal-readable",
+      "layout": "formal-compact",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-02.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 146242,
+      "sha256": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604"
+    },
+    {
+      "id": "holdout-v2-normal-03",
+      "population": "normal-readable",
+      "layout": "right-address",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-03.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 160881,
+      "sha256": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338"
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "population": "normal-readable",
+      "layout": "upper-payment-panel",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-04.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 151028,
+      "sha256": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b"
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "population": "normal-readable",
+      "layout": "ledger-form",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-05.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 155370,
+      "sha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7"
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "population": "normal-readable",
+      "layout": "stacked-summary",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-06.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 149835,
+      "sha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b"
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "population": "normal-readable",
+      "layout": "horizontal-summary",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-07.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 150143,
+      "sha256": "6cdc1af980952c6efacf2060bc282c086aeaac21711f5d158b7b37f669f795b7"
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "population": "normal-readable",
+      "layout": "side-rail",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-08.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 153298,
+      "sha256": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac"
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "population": "normal-readable",
+      "layout": "classic-footer",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-09.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 142671,
+      "sha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1"
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "population": "normal-readable",
+      "layout": "paired-sections",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+      "sourceId": null,
+      "filename": "images/holdout-v2-normal-10.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 159394,
+      "sha256": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b"
+    },
+    {
+      "id": "holdout-v2-stress-lost-bottom",
+      "population": "stress",
+      "layout": "lost-bottom-scan",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Simulated incomplete scan: lower financial/payment area is physically absent; original canonical gold is retained. Must abstain from green.",
+      "sourceId": "holdout-v2-normal-09",
+      "filename": "images/holdout-v2-stress-lost-bottom.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 90522,
+      "sha256": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e"
+    },
+    {
+      "id": "holdout-v2-stress-defocused-photo",
+      "population": "stress",
+      "layout": "defocused-tilted-photo",
+      "metadata": {
+        "direction": "supplier",
+        "direction_confident": true
+      },
+      "notes": "Simulated low-resolution defocused phone photograph with reduced contrast and slight rotation; original canonical gold is retained. Must abstain from green.",
+      "sourceId": "holdout-v2-normal-02",
+      "filename": "images/holdout-v2-stress-defocused-photo.png",
+      "mimeType": "image/png",
+      "width": 1600,
+      "height": 2000,
+      "bytes": 291796,
+      "sha256": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606"
+    }
+  ],
+  "datasetSha256": "b7cbaf1d830c2010a530b91bd2c04d8769ea6202b5009ac2d56fbf9baeba3d7b",
+  "visualQaSha256": "77eefe886cd130626bdef328f8a21874a77af6edd712192da438dc3dbc77ea97",
+  "ocrInvocationsBeforeFreeze": 0,
+  "applicationParserInvocationsBeforeFreeze": 0
+}

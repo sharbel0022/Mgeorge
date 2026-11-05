@@ -18,8 +18,8 @@ export async function browserOcrFixture(t){
   const pdf=new URL('../../node_modules/pdfjs-dist/legacy/build/pdf.mjs',import.meta.url).href,worker=new URL('../../node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs',import.meta.url).href;
   const pdfModule=dataModule(`import * as pdf from ${JSON.stringify(pdf)};export const OPS=pdf.OPS;export const GlobalWorkerOptions={};export function getDocument(options){pdf.GlobalWorkerOptions.workerSrc=${JSON.stringify(worker)};return pdf.getDocument({...options,verbosity:0});}`);
   const require=createRequire(import.meta.url),tesseract=pathToFileURL(require.resolve('tesseract.js')).href,langPath=require('@tesseract.js-data/swe').langPath;
-  const ocrModule=dataModule(`import {createWorker as createNodeWorker} from ${JSON.stringify(tesseract)};export function createWorker(language,oem){return createNodeWorker(language,oem,{langPath:${JSON.stringify(langPath)},cacheMethod:'none',logger:()=>{},errorHandler:()=>{}});}`);
+  const ocrModule=dataModule(`import {createWorker as createNodeWorker,PSM} from ${JSON.stringify(tesseract)};export {PSM};export function createWorker(language,oem){return createNodeWorker(language,oem,{langPath:${JSON.stringify(langPath)},cacheMethod:'none',logger:()=>{},errorHandler:()=>{}});}`);
   let source=ts.transpileModule(readFileSync(new URL('../../lib/local-ocr.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
-  for(const [name,url]of Object.entries({'pdfjs-dist':pdfModule,'tesseract.js':ocrModule,'./pdf-text.js':libUrl('pdf-text.js')}))for(const quote of ["'",'"'])source=source.replaceAll(quote+name+quote,JSON.stringify(url));
+  for(const [name,url]of Object.entries({'pdfjs-dist':pdfModule,'tesseract.js':ocrModule,'./pdf-text.js':libUrl('pdf-text.js'),'./ocr-bankgiro-evidence.js':libUrl('ocr-bankgiro-evidence.js'),'./ocr-layout.js':libUrl('ocr-layout.js')}))for(const quote of ["'",'"'])source=source.replaceAll(quote+name+quote,JSON.stringify(url));
   return import(dataModule(source));
 }

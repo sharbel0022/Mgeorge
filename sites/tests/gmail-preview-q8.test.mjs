@@ -4,12 +4,13 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
+import {packet,digest} from '../../test/helpers/ocr-bankgiro-cases.mjs';
 
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const file=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports={}){
   let code=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-  for(const [name,url] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'@/lib/domain':file('../lib/domain.ts'),'./domain':file('../lib/domain.ts'),'./document-triage.js':file('../lib/document-triage.js'),'./invoice-details.js':file('../lib/invoice-details.js'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));
+  for(const [name,url] of Object.entries({'react':import.meta.resolve('react'),'react/jsx-runtime':import.meta.resolve('react/jsx-runtime'),'@/lib/domain':file('../lib/domain.ts'),'./domain':file('../lib/domain.ts'),'./document-triage.js':file('../lib/document-triage.js'),'./invoice-details.js':file('../lib/invoice-details.js'),'./ocr-bankgiro-evidence.js':file('../lib/ocr-bankgiro-evidence.js'),...imports}))for(const q of ['"',"'"])code=code.replaceAll(q+name+q,JSON.stringify(url));
   return data(code);
 }
 const fieldsUrl=compiled('../lib/invoice-fields.js'),fields=await import(fieldsUrl);
@@ -18,7 +19,7 @@ const extraction=()=>fields.interpretInvoice(originalText,{direction:'supplier',
 const elements=node=>!node||typeof node!=='object'?[]:Array.isArray(node)?node.flatMap(elements):[node,...elements(node.props?.children)];
 const text=node=>node==null||typeof node==='boolean'?'':Array.isArray(node)?node.map(text).join(' '):typeof node==='object'?text(node.props?.children):String(node);
 
-async function fixture(t,{stored=null,processing=null,pending=0,connected=false}={}){
+async function fixture(t,{stored=null,processing=null,pending=0,connected=false,parsed={text:originalText}}={}){
   const key='__gmail_preview_'+crypto.randomUUID().replaceAll('-',''),f={slots:[],cursor:0,effects:[],scheduled:false,closed:false,requests:[]};globalThis[key]=f;
   const equal=(a,b)=>a&&b&&a.length===b.length&&a.every((v,n)=>Object.is(v,b[n]));
   f.state=initial=>{const n=f.cursor++;f.slots[n]??={value:typeof initial==='function'?initial():initial};return[f.slots[n].value,value=>{f.slots[n].value=typeof value==='function'?value(f.slots[n].value):value;f.schedule();}];};
@@ -28,7 +29,7 @@ async function fixture(t,{stored=null,processing=null,pending=0,connected=false}
   const ref=`globalThis[${JSON.stringify(key)}]`,react=data(`const f=${ref};export const useState=(...a)=>f.state(...a),useRef=(...a)=>f.ref(...a),useEffect=(...a)=>f.effect(...a);`);
   const module=await import(compiled('../components/gmail-workspace.tsx',{
     react,'@/lib/document-triage.js':file('../lib/document-triage.js'),'@/lib/invoice-fields.js':fieldsUrl,
-    '@/lib/imports':data(`export async function readInvoiceFile(){return {text:${JSON.stringify(originalText)}};}`),
+    '@/lib/imports':data(`export async function readInvoiceFile(){return ${JSON.stringify(parsed)};}`),
     '@/lib/local-ocr':data("export async function pdfPreview(file){return file;}"),
     './document-ocr-status':compiled('../components/document-ocr-status.tsx'),
     './sync-recovery-notice':compiled('../components/sync-recovery-notice.tsx'),
@@ -60,6 +61,27 @@ test('Q8: selecting a Gmail document opens its original using reads only',async 
   assert.deepEqual(f.requests.map(r=>[r.method,r.path]),[['GET','/api/gmail/status'],['GET','/api/files?id=synthetic-doc']]);
   assert.ok(f.find(n=>n.type==='img'&&n.props.alt==='Originalfaktura, första sidan'));
   f.find(n=>n.type==='button'&&text(n)==='Stäng').props.onClick();await f.flush();assert.equal(f.posts().length,0);
+});
+
+for(const scenario of ['high','low','missing','other-original'])test('Gmail preview preserves original-bound bankgiro words through its contextual parser: '+scenario,async t=>{
+  const inputSha256=digest('synthetic original bytes'),ocrEvidence=scenario==='missing'?undefined:packet(originalText,{inputHash:scenario==='other-original'?digest('another synthetic original'):inputSha256,confidence:scenario==='low'?0:95});
+  const f=await fixture(t,{parsed:{text:originalText,ocr:true,confidence:99,ocrEvidence,ocrInputSha256:inputSha256}});
+  const field=f.find(n=>n.type==='label'&&text(n).includes('Bankgiro'));
+  const input=elements(field).find(n=>n.type==='input');assert.ok(input);
+  assert.equal(input.props.value,scenario==='high'?'123-4567':'');assert.equal(f.posts().length,0);
+  if(scenario!=='high')assert.match(text(f.tree),/Bankgiro.*ordunderlag/);
+  assert.match(text(f.tree),/Behöver kontroll/);
+});
+
+for(const conflict of [false,true])test('Gmail preview interprets complete bounded OCR text beyond the display excerpt: '+(conflict?'late conflict':'supported value'),async t=>{
+  const inputSha256=digest('synthetic original bytes'),full=originalText+'\n'+'Syntetiskt bilageinnehåll utan nya fält.\n'.repeat(1500)+(conflict?'\nBankgiro: 999-9999':''),ocrEvidence=packet(full,{inputHash:inputSha256});
+  for(const row of ocrEvidence.pages[0].bankgiro)row.value=row.words[1].text;
+  assert.ok(full.length>50000&&full.length<150000);
+  const f=await fixture(t,{parsed:{text:full.slice(0,50000),interpretationText:full,ocr:true,confidence:99,ocrEvidence,ocrInputSha256:inputSha256}});
+  const input=elements(f.find(n=>n.type==='label'&&text(n).includes('Bankgiro'))).find(n=>n.type==='input');assert.ok(input);
+  assert.equal(input.props.value,conflict?'':'123-4567');assert.equal(f.posts().length,0);
+  if(conflict)assert.match(text(f.tree),/Motstridiga värden för Bankgiro/);
+  else assert.match(text(f.tree),/Behöver kontroll/);
 });
 test('Q8: explicit approval sends original extraction with the separately corrected invoice fields',async t=>{
   const f=await fixture(t);
