@@ -96,6 +96,17 @@ export function validateEnableConsent(input: {
   now?: number;
 }): { validUntil: string; accountUids: string[]; grantedScopes: ReadScope[]; missingScopes: ReadScope[] };
 
+/** Compatibility adapter only for an existing server-resolved legacy selection.
+ * Full cached and current UID inventories are bounded/unique valid UUIDs; the
+ * complete GET account/data sets must match before selection projection.
+ * Every selected UID must exist in both inventories. The unchanged strict
+ * validator then checks selected usage/identity and all consent invariants.
+ * Does not establish legacy eligibility, company authority or new account access.
+ * New callbacks and company consents must call validateEnableConsent directly. */
+export function validateLegacyEnableSelection(input: Parameters<typeof validateEnableConsent>[0] & {
+  selectedAccountUids: unknown;
+}): ReturnType<typeof validateEnableConsent>;
+
 /** Exact actor/company/bank/account-set evidence is required. Missing or invalid
  * evidence returns unverified; malformed/expired consent inputs throw.
  * Callers must authenticate the evidence through a trusted server adapter. */

@@ -3,7 +3,7 @@ import test from 'node:test';
 import {
   ConsentError, legacyCompanyContext, assertCompanyBankAccess,
   validateCallbackParameters, validateReadScopes, validateEnableConsent,
-  corporateAuthorization,
+  corporateAuthorization, validateLegacyEnableSelection,
 } from '../lib/bank-consent-policy.js';
 
 const now = Date.parse('2026-11-04T12:00:00.000Z');
@@ -240,3 +240,38 @@ test('foundation context retains distinct actor/storage owner and rejects client
  assert.deepEqual(companyBankContext(c,'namespace-a','company-a'),{companyId:'company-a',storageOwnerId:'namespace-a',actorId:'admin-a',role:'admin',membershipVersion:'3',active:true});
  fails(()=>companyBankContext(c,'namespace-b','company-a'),'COMPANY_ACCESS_DENIED');fails(()=>companyBankContext(c,'namespace-a','company-b'),'COMPANY_ACCESS_DENIED');fails(()=>companyBankContext({...c,role:'accountant'},'namespace-a'),'COMPANY_ACCESS_DENIED');assert.equal(companyBankContext({...c,role:'accountant'},'namespace-a',undefined,'read').actorId,'admin-a');
 });
+
+
+const legacyA='11111111-1111-4111-8111-111111111111',legacyB='22222222-2222-4222-8222-222222222222',legacyC='33333333-3333-4333-8333-333333333333';
+function legacySelection(){
+ const input=grant(),account=uid=>({uid,usage:'ORGA',currency:'SEK',cash_account_type:'CACC',identification_hash:'primary-'+uid,identification_hashes:['primary-'+uid]});
+ input.session.accounts=[account(legacyA),account(legacyB)];input.checked.accounts=[legacyA];input.checked.accounts_data=[account(legacyA)];input.selectedAccountUids=[legacyA];return input;
+}
+test('legacy selection preserves the selected authorized account after an unselected cached account is withdrawn',()=>{
+ const input=freeze(legacySelection()),before=JSON.stringify(input),result=validateLegacyEnableSelection(input);
+ assert.deepEqual(result.accountUids,[legacyA]);assert.equal(result.validUntil,later(60));assert.deepEqual(result.grantedScopes,['accounts:read','transactions:read']);assert.equal(JSON.stringify(input),before);
+ fails(()=>validateEnableConsent(input),'BANK_ACCOUNT_SCOPE_INVALID');
+});
+test('legacy selection does not import an unselected private account or grant newly observed accounts',()=>{
+ const input=legacySelection();input.session.accounts[1].usage='PRIV';input.checked.accounts.push(legacyB,legacyC);input.checked.accounts_data.push({...input.session.accounts[1]},{uid:legacyC,identification_hash:'new-primary',usage:'PRIV'});
+ const result=validateLegacyEnableSelection(freeze(input));assert.deepEqual(result.accountUids,[legacyA]);fails(()=>validateEnableConsent(input),'BANK_ACCOUNT_SCOPE_INVALID');
+});
+for(const [label,mutate] of [
+ ['empty selection',i=>i.selectedAccountUids=[]],['duplicate selection',i=>i.selectedAccountUids=[legacyA,legacyA]],['malformed selected UID',i=>i.selectedAccountUids=['not-a-uuid']],
+ ['selected absent from live',i=>i.selectedAccountUids=[legacyB]],['selected absent from saved',i=>i.session.accounts=i.session.accounts.filter(a=>a.uid!==legacyA)],
+ ['duplicate saved unused UID',i=>i.session.accounts.push({...i.session.accounts[1]})],['duplicate live UID',i=>i.checked.accounts.push(legacyA)],['duplicate live metadata',i=>i.checked.accounts_data.push({...i.checked.accounts_data[0]})],
+ ['UID-less GET metadata',i=>i.checked.accounts_data.push({identification_hash:'unavailable'})],['null GET metadata',i=>i.checked.accounts_data.push(null)],['malformed unused GET UID',i=>{i.checked.accounts.push('not-a-uuid');i.checked.accounts_data.push({uid:'not-a-uuid'});}],
+ ['malformed unused cached UID',i=>i.session.accounts[1].uid='not-a-uuid'],['UID-less cached account',i=>delete i.session.accounts[1].uid],
+ ['GET IDs lack metadata',i=>i.checked.accounts.push(legacyB)],['GET metadata lacks ID',i=>i.checked.accounts_data.push({...i.session.accounts[1]})],
+ ['private selected saved account',i=>i.session.accounts[0].usage='PRIV'],['private selected current account',i=>i.checked.accounts_data[0].usage='PRIV'],['unknown selected usage',i=>i.checked.accounts_data[0].usage='unknown'],
+ ['selected primary hash changed despite plural overlap',i=>{i.checked.accounts_data[0].identification_hash='changed';i.checked.accounts_data[0].identification_hashes=[i.session.accounts[0].identification_hash];}],
+ ['overbound saved accounts',i=>i.session.accounts=Array.from({length:101},(_,n)=>({uid:`aaaaaaaa-aaaa-4aaa-8aaa-${String(n).padStart(12,'0')}`}))],
+ ['overbound GET accounts',i=>{i.checked.accounts=Array.from({length:101},(_,n)=>`aaaaaaaa-aaaa-4aaa-8aaa-${String(n).padStart(12,'0')}`);i.checked.accounts_data=i.checked.accounts.map(uid=>({uid}));}],
+ ['overbound selection',i=>i.selectedAccountUids=Array.from({length:101},(_,n)=>`aaaaaaaa-aaaa-4aaa-8aaa-${String(n).padStart(12,'0')}`)],
+])test('legacy selected adapter rejects '+label,()=>{const input=legacySelection();mutate(input);fails(()=>validateLegacyEnableSelection(input),'BANK_ACCOUNT_SCOPE_INVALID');});
+for(const [label,mutate,code] of [
+ ['revoked session',i=>i.checked.status='REVOKED','BANK_CONSENT_INVALID'],['different bank',i=>i.checked.aspsp.name='Other Bank','BANK_CONSENT_INVALID'],['personal PSU',i=>i.checked.psu_type='personal','BANK_CONSENT_INVALID'],
+ ['withdrawn transaction scope',i=>i.checked.access.transactions=false,'BANK_TRANSACTION_SCOPE_REQUIRED'],['write scope',i=>i.requestedScopes=['accounts:read','transactions:read','payments:write'],'INVALID_CONSENT_SCOPES'],['missing transaction scope',i=>i.requestedScopes=['accounts:read'],'INVALID_CONSENT_SCOPES'],
+ ['Bankgiro scope',i=>i.requestedScopes=['accounts:read','transactions:read','bankgiro:read'],'BANKGIRO_SCOPE_UNAVAILABLE'],
+ ['expired cached access',i=>i.session.access.valid_until=later(-1),'BANK_CONSENT_EXPIRED'],['expired current access',i=>i.checked.access.valid_until=later(-1),'BANK_CONSENT_EXPIRED'],['expired requested cap',i=>i.requestedValidUntil=later(-1),'BANK_CONSENT_EXPIRED'],
+])test('legacy selected adapter retains '+label+' denial',()=>{const input=legacySelection();mutate(input);fails(()=>validateLegacyEnableSelection(input),code);});

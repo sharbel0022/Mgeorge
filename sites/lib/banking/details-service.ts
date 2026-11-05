@@ -7,7 +7,7 @@ import {stableAccountKey,normalizeTransactions} from './transactions';
 import {transactionDetailEvidence,enrichBankDetails,adoptFreshBankReceipt} from './detail-evidence';
 import {mergeAccountReadCooldown} from './account-read-cooldown';
 import {guardedBankRead} from './account-read-guard';
-import {validateEnableConsent} from '../bank-consent-policy.js';
+import {validateEnableConsent,validateLegacyEnableSelection} from '../bank-consent-policy.js';
 
 export async function fetchBankDetails(req:Request){
  const user=await identity(req),body=await req.json() as any;
@@ -24,7 +24,10 @@ export async function fetchBankDetails(req:Request){
   if(matches.length!==1)throw Error('Bankhändelsens konto ingår inte entydigt i det valda företagskontot.');
   const account=matches[0],config=await providerConfig(app),live=await guardedBankRead(user.userId,conn,lease,async()=>getSession(config,await sessionId(conn)));
   if(live.status!=='AUTHORIZED'||!(Date.parse(live.access?.valid_until)>Date.now())||!live.accounts.includes(account.uid)||live.psu_type!=='business'||live.aspsp?.name!==conn.bank_name||live.aspsp?.country!==conn.country)throw Error('Bankens medgivande behöver förnyas.');
-  const grant=validateEnableConsent({session:{accounts:available,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:consentMetadata(conn)?.requestedScopes});
+  const savedConsent=consentMetadata(conn),consentInput={session:{accounts:available,access:{valid_until:conn.valid_until},aspsp:{name:conn.bank_name,country:conn.country},psu_type:'business'},checked:live,bankName:conn.bank_name,country:conn.country,requestedValidUntil:conn.valid_until,requestedScopes:savedConsent?.requestedScopes};
+  // Validate every persisted selection, not just the account of this detail.
+  // Parsing errors cannot opt a company consent into legacy compatibility.
+  const grant=!savedConsent||savedConsent.mode==='legacy'?validateLegacyEnableSelection({...consentInput,selectedAccountUids:selected}):validateEnableConsent(consentInput);
   const psu={ipAddress:req.headers.get('cf-connecting-ip')||undefined,userAgent:req.headers.get('user-agent')||undefined};
   let key:string|undefined,listed:ProviderTransaction[]=[];const seen=new Set<string>();
   do{const page=await guardedBankRead(user.userId,conn,lease,()=>getTransactions(config,account.uid,{dateFrom:target.date,dateTo:target.date,continuationKey:key,psu}));listed.push(...page.transactions.filter(t=>t.entry_reference===target.bankReference));key=page.continuation_key||undefined;if(key){if(seen.has(key)||seen.size>=10)throw Error('Bankens detaljsökning kunde inte slutföras.');seen.add(key);}}while(key);

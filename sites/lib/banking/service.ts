@@ -17,7 +17,7 @@ import { RuntimeBankError } from './runtime-config';
 import { BankPeriodError, bankSyncRange, bankUtcDate, fetchBankPeriods } from './sync-periods';
 import { mergeAccountReadCooldown } from './account-read-cooldown';
 import { guardedBankRead } from './account-read-guard';
-import { ConsentError, validateCallbackParameters, validateReadScopes, validateEnableConsent } from '../bank-consent-policy.js';
+import { ConsentError, validateCallbackParameters, validateReadScopes, validateEnableConsent, validateLegacyEnableSelection } from '../bank-consent-policy.js';
 
 type FlowContext = {
   version: 1; companyId: string; actorId: string; membershipVersion: string; mode: 'company' | 'legacy';
@@ -56,7 +56,23 @@ const BANK_JOB_ERROR_CODES=new Set([
   'INVALID_REQUEST','INVALID_PROVIDER_RESPONSE','INVALID_CONFIGURATION','INVALID_PRIVATE_KEY','RESPONSE_TOO_LARGE',
   'NO_LINKED_ACCOUNTS','CALLBACK_NOT_REGISTERED','PROVIDER_AUTHORIZATION_FAILED','PROVIDER_ACCESS_DENIED','PROVIDER_REDIRECT_DENIED',
 ]);
+// Persist only known policy diagnostics. ConsentError permits a caller-supplied
+// message, so reconstruct the canonical text instead of retaining that input.
+const BANK_CONSENT_DIAGNOSTIC_CODES = new Set([
+  'COMPANY_ACCESS_DENIED', 'INVALID_CONSENT_SCOPES', 'BANKGIRO_SCOPE_UNAVAILABLE',
+  'BANK_CONSENT_INVALID', 'BANK_CONSENT_EXPIRED', 'BANK_ACCOUNT_SCOPE_INVALID',
+  'BANK_TRANSACTION_SCOPE_REQUIRED', 'CORPORATE_AUTHORIZATION_REQUIRED',
+]);
+function bankConsentDiagnostic(error: unknown): { code: string; message: string } | null {
+  try {
+    if (!(error instanceof ConsentError)) return null;
+    const code = error.code;
+    if (typeof code !== 'string' || !BANK_CONSENT_DIAGNOSTIC_CODES.has(code)) return null;
+    return { code, message: new ConsentError(code).message };
+  } catch { return null; }
+}
 function bankJobErrorCode(error:unknown):string{
+  const consent=bankConsentDiagnostic(error);if(consent)return consent.code;
   const code=providerErrorCode(error)??(error instanceof BankPeriodError?error.code:undefined);
   return typeof code==='string'&&BANK_JOB_ERROR_CODES.has(code)?code:'BANK_SYNC_FAILED';
 }
@@ -454,8 +470,10 @@ export async function selectAccounts(request: Request): Promise<Response> {
     const authority = await currentCompanyAuthorization(conn);
     if (savedConsent?.mode === 'company' && (authority.status !== 'verified' || selected.some(id => !authority.accountUids.includes(id)))) throw new ConsentError('CORPORATE_AUTHORIZATION_REQUIRED', 409);
     const live = await guardedBankRead(user.userId, conn, lease, async () => getSession(await providerConfig(app), await revocationSessionId(conn)));
-    const grant = validateEnableConsent({ session: { accounts: available, access: { valid_until: conn.valid_until }, aspsp: { name: conn.bank_name, country: conn.country }, psu_type: 'business' },
-      checked: live, bankName: conn.bank_name, country: conn.country, requestedValidUntil: conn.valid_until, requestedScopes: savedConsent?.requestedScopes });
+    const consentInput = { session: { accounts: available, access: { valid_until: conn.valid_until }, aspsp: { name: conn.bank_name, country: conn.country }, psu_type: 'business' },
+      checked: live, bankName: conn.bank_name, country: conn.country, requestedValidUntil: conn.valid_until, requestedScopes: savedConsent?.requestedScopes };
+    const grant = savedConsent?.mode === 'company' ? validateEnableConsent(consentInput)
+      : validateLegacyEnableSelection({ ...consentInput, selectedAccountUids: selected });
     if (!selected.every(id => grant.accountUids.includes(id))) throw new BankError('Kontot ingår inte längre i bankens medgivande.', 409);
     if ((await identity()).userId !== company.actorId) throw new ConsentError('COMPANY_ACCESS_DENIED', 403);
     bankCompanyContext(user.userId, savedConsent?.companyId ?? company.companyId);
@@ -646,8 +664,11 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       await lease.assert();
       let grant: ReturnType<typeof validateEnableConsent>;
       try {
-        grant = validateEnableConsent({ session: { accounts: bankAccounts, access: { valid_until: conn.valid_until }, aspsp: { name: conn.bank_name, country: conn.country }, psu_type: 'business' },
-          checked: live, bankName: conn.bank_name, country: conn.country, requestedValidUntil: conn.valid_until, requestedScopes: consentMetadata(conn)?.requestedScopes });
+        const savedConsent = consentMetadata(conn);
+        const consentInput = { session: { accounts: bankAccounts, access: { valid_until: conn.valid_until }, aspsp: { name: conn.bank_name, country: conn.country }, psu_type: 'business' },
+          checked: live, bankName: conn.bank_name, country: conn.country, requestedValidUntil: conn.valid_until, requestedScopes: savedConsent?.requestedScopes };
+        grant = savedConsent?.mode === 'company' ? validateEnableConsent(consentInput)
+          : validateLegacyEnableSelection({ ...consentInput, selectedAccountUids: selected });
       } catch (error) {
         needsReauthorization = true;
         await lease.run(db().prepare("UPDATE bank_connections SET status='reauth_required',last_error=?,updated_at=? WHERE owner=? AND id=?").bind('Bankens medgivande är inte längre giltigt. Anslut banken igen.', now(), user.userId, conn.id));
@@ -786,7 +807,7 @@ async function synchronizeOwner(owner: string, options: { automatic?: boolean; c
       const current = await connection(user.userId);
       if (!current || current.id !== conn.id || current.app_generation !== conn.app_generation || current.encrypted_session !== conn.encrypted_session) throw new Error('BANK_ACCOUNT_READ_CONTEXT_CHANGED');
       const exhausted=options.automatic&&conn.sync_failures+1>=3;
-      const detail = error instanceof BankError || error instanceof ProviderError || error instanceof BankPeriodError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.';
+      const detail = bankConsentDiagnostic(error)?.message ?? (error instanceof BankError || error instanceof ProviderError || error instanceof BankPeriodError ? error.message : 'Bankhändelserna kunde inte hämtas. Försök igen.');
       const message = exhausted ? `Automatisk bankhämtning är stoppad efter tre avbrutna eller misslyckade försök. ${detail}` : detail;
       const expired = needsReauthorization || error instanceof ProviderError && error.code === 'BANK_RECONNECT_REQUIRED';
       const limited=error instanceof ProviderError&&(error.status===429||error.retryAfter!==undefined||error.retryBlocked===true);

@@ -9,6 +9,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { emptyState } from '../lib/domain.ts';
 import { bankUtcDate } from '../lib/banking/sync-periods.ts';
 import { ProviderError } from '../lib/banking/enable-banking.ts';
+import { ConsentError } from '../lib/bank-consent-policy.js';
 import { seal, unseal, randomToken, digest, validFlowToken, cookieValue } from '../lib/banking/security.ts';
 import { runtimeBankConfig, runtimeBankStatus } from '../lib/banking/runtime-config.ts';
 import { confirmedBankConsent } from '../lib/banking/status-view.ts';
@@ -1310,4 +1311,127 @@ test('pre-migration redirects cannot create a new legacy connection without comp
   assert.equal(f.calls.filter(call => call.name === 'createSession').length, 0);
   const visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
   assert.equal(visible.consentFlow.reason, 'CONSENT_RESTART_REQUIRED');
+});
+
+
+for (const [label, code, mutate] of [
+  ['selected account missing from current account data', 'BANK_ACCOUNT_SCOPE_INVALID', f => { f.live.accounts_data = []; }],
+  ['transaction permission withdrawn', 'BANK_TRANSACTION_SCOPE_REQUIRED', f => { f.live.access.transactions = false; }],
+]) test(`consent sync diagnostic retains canonical reason for ${label} without resetting reauthorization`, async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  const lastSuccess = new Date(Date.now() - 7 * 3600_000).toISOString();
+  f.sql.prepare('UPDATE bank_connections SET auto_sync_enabled=1,last_synced_at=? WHERE owner=?').run(lastSuccess, f.owner);
+  mutate(f);
+  await assert.rejects(f.service.automaticSync(), error => error instanceof ConsentError && error.code === code);
+  const conn = f.connection(), status = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(conn.status, 'reauth_required'); assert.equal(status.connected, false);
+  assert.equal(conn.sync_failures, 1); assert.equal(status.blocked, false);
+  assert.equal(conn.last_synced_at, lastSuccess); assert.equal(status.lastSyncedAt, lastSuccess);
+  assert.equal(conn.last_error, new ConsentError(code).message);
+  assert.equal(status.lastError, new ConsentError(code).message);
+  assert.equal(bankJobEvents(f).find(event => event.action === 'bank.job.failed').detail.error_code, code);
+  assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
+  assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
+  assert.equal(financialAuditCount(f), 0);
+  const calls = f.calls.length;
+  await assert.rejects(f.service.automaticSync(), /En giltig bankanslutning/);
+  assert.equal(f.calls.length, calls, 'a diagnostic must never re-enable the rejected connection');
+  assert.equal(f.connection().status, 'reauth_required');
+});
+
+for (const code of ['BANK_ACCOUNT_SCOPE_INVALID', 'SYNTHETIC_PRIVATE_TOKEN_123'])
+  test(`consent sync diagnostic excludes arbitrary custom message and unsafe code ${code}`, async t => {
+    const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+    f.sql.prepare('UPDATE bank_connections SET auto_sync_enabled=1 WHERE owner=?').run(f.owner);
+    const privateMessage = 'Synthetic secret token and private account observation';
+    f.provider.getSession = async () => { throw new ConsentError(code, 409, privateMessage); };
+    await assert.rejects(f.service.automaticSync(), error => error instanceof ConsentError);
+    const recognized = code === 'BANK_ACCOUNT_SCOPE_INVALID';
+    const expectedMessage = recognized ? new ConsentError(code).message : 'Bankhändelserna kunde inte hämtas. Försök igen.';
+    const status = await (await f.service.automaticSyncStatus()).json();
+    assert.equal(f.connection().last_error, expectedMessage); assert.equal(status.lastError, expectedMessage);
+    assert.equal(bankJobEvents(f).find(event => event.action === 'bank.job.failed').detail.error_code, recognized ? code : 'BANK_SYNC_FAILED');
+    const persisted = JSON.stringify([f.connection(), bankJobEvents(f), status]);
+    assert.ok(!persisted.includes(privateMessage));
+    if (!recognized) assert.ok(!persisted.includes(code));
+    assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
+    assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
+  });
+
+test('consent sync diagnostic reads a changing code once and never persists getter-supplied secrets', async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare('UPDATE bank_connections SET auto_sync_enabled=1 WHERE owner=?').run(f.owner);
+  const secret = 'SYNTHETIC_CHANGING_CODE_SECRET'; let reads = 0;
+  const error = Object.create(ConsentError.prototype);
+  Object.defineProperty(error, 'code', { get: () => ++reads % 3 === 1 ? 'BANK_ACCOUNT_SCOPE_INVALID' : secret });
+  error.message = 'Synthetic private error text';
+  f.provider.getSession = async () => { throw error; };
+  await assert.rejects(f.service.automaticSync());
+  const status = await (await f.service.automaticSyncStatus()).json();
+  const persisted = JSON.stringify([f.connection(), bankJobEvents(f), status]);
+  assert.ok(!persisted.includes(secret)); assert.ok(!persisted.includes(error.message));
+  assert.equal(status.lastError, new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message);
+  assert.ok(['BANK_ACCOUNT_SCOPE_INVALID', 'BANK_SYNC_FAILED'].includes(bankJobEvents(f).find(event => event.action === 'bank.job.failed').detail.error_code));
+  assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
+});
+
+
+for (const forged of ['duck-typed', 'throwing-getter']) test(`consent sync diagnostic ignores ${forged} error details`, async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare('UPDATE bank_connections SET auto_sync_enabled=1 WHERE owner=?').run(f.owner);
+  const error = forged === 'duck-typed' ? { code: 'BANK_ACCOUNT_SCOPE_INVALID', message: 'Synthetic private message' } : Object.create(ConsentError.prototype);
+  if (forged === 'throwing-getter') Object.defineProperty(error, 'code', { get() { throw Error('Synthetic private getter message'); } });
+  f.provider.getSession = async () => { throw error; };
+  await assert.rejects(f.service.automaticSync());
+  const status = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(status.lastError, 'Bankhändelserna kunde inte hämtas. Försök igen.');
+  assert.equal(bankJobEvents(f).find(event => event.action === 'bank.job.failed').detail.error_code, 'BANK_SYNC_FAILED');
+  assert.ok(!JSON.stringify([f.connection(), bankJobEvents(f), status]).includes('Synthetic private'));
+  assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
+});
+
+const extraLegacyUid = '44444444-4444-4444-8444-444444444444';
+async function cachedLegacyAccounts(f, mode = null) {
+  await f.seedApp(); const id = await f.seedConnection();
+  const extra = { ...f.account, uid: extraLegacyUid, account_id: { iban: 'SE4550000000058398257474' } };
+  const encrypted = await f.store.encrypt(f.owner, `accounts:${id}`, [f.account, extra]);
+  f.sql.prepare('UPDATE bank_connections SET encrypted_accounts=? WHERE owner=?').run(encrypted, f.owner);
+  if (mode) {
+    const metadata = { version: 'bank-consent-v1', mode, companyId: 'workspace:' + f.owner, actorId: f.owner, membershipVersion: 'legacy-owner-v1', requestedScopes: ['accounts:read', 'transactions:read'], grantedScopes: ['accounts:read', 'transactions:read'], validUntil: future(), corporateAuthorization: { status: 'unverified' } };
+    f.sql.prepare('UPDATE bank_connections SET consent_metadata=? WHERE owner=?').run(JSON.stringify(metadata), f.owner);
+    if (mode === 'company') companyAuthority(f, { accountKeys: ['iban:' + f.account.account_id.iban, 'iban:' + extra.account_id.iban] });
+  }
+  return id;
+}
+
+for (const mode of [null, 'legacy']) test(`legacy selected scope ${mode ?? 'migration'} can retain A after unselected cached B leaves the live consent`, async t => {
+  const f = await fixture(t); const id = await cachedLegacyAccounts(f, mode);
+  assert.equal((await f.service.selectAccounts(post('accounts', { connectionId: id, accountUids: [accountUid] }))).status, 200);
+  assert.deepEqual(JSON.parse(f.connection().selected_accounts), [accountUid]);
+  const result = await (await f.service.sync(post('sync'))).json();
+  assert.equal(result.imported, 1);
+  assert.ok(f.calls.some(call => call.name === 'getTransactions'));
+  assert.ok(f.calls.filter(call => call.name === 'getTransactions').every(call => call.args[1] === accountUid));
+  assert.equal(f.connection().status, 'connected');
+  assert.equal(f.workspace().state.transactions.length, 1);
+  assert.equal(f.workspace().state.allocations.length, 0);
+});
+
+test('legacy selected scope never imports a selected cached account absent from the live consent', async t => {
+  const f = await fixture(t); const id = await cachedLegacyAccounts(f);
+  f.sql.prepare('UPDATE bank_connections SET selected_accounts=? WHERE owner=?').run(JSON.stringify([extraLegacyUid]), f.owner);
+  await assert.rejects(f.service.selectAccounts(post('accounts', { connectionId: id, accountUids: [extraLegacyUid] })), error => error.code === 'BANK_ACCOUNT_SCOPE_INVALID');
+  await assert.rejects(f.service.sync(post('sync')), error => error.code === 'BANK_ACCOUNT_SCOPE_INVALID');
+  assert.equal(f.connection().status, 'reauth_required');
+  assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
+  assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
+});
+
+test('company selected scope retains strict full-account equality when unselected cached B leaves consent', async t => {
+  const f = await fixture(t); const id = await cachedLegacyAccounts(f, 'company');
+  await assert.rejects(f.service.selectAccounts(post('accounts', { connectionId: id, accountUids: [accountUid] })), error => error.code === 'BANK_ACCOUNT_SCOPE_INVALID');
+  await assert.rejects(f.service.sync(post('sync')), error => error.code === 'BANK_ACCOUNT_SCOPE_INVALID');
+  assert.equal(f.connection().status, 'reauth_required');
+  assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
+  assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
 });
