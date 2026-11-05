@@ -1,5 +1,7 @@
 # Verifiering av backup och katastrofåterställning
 
+**Kompletterande evidens 2026-11-05:** dagens driftsatta backup är färdigverifierad (362 original, 142 968 213 byte). En ny reproducerbar syntetisk övning mäter faktisk isolerad restore och oberoende integritetsacceptans för 27 tabeller vid samma filantal och bytevolym. Se [mätningar, avgränsningar och regressioner](quality8/recovery-evidence.md) samt [JSON-evidens](quality8/recovery-evidence.json). En verklig produktionsrestore är fortfarande inte genomförd. Den daterade rapporten nedan beskriver den tidigare leveransen.
+
 Datum: **2026-11-02**, Europe/Stockholm. Bas: `a9f88ae1c0f697376b3ecd140e1e80a64405125a`.
 
 Arbetsbranch: `codex/backup-security-stabilization-20261102`.

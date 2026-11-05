@@ -9,10 +9,10 @@
     "unsafeFalseAcceptRate": "Green results / explicitly must-hold cases"
   },
   "sourceHashes": {
-    "src/invoice-extraction.js": "06904c4bd500c80c5c82a837b207e9616fcf100f75062dcbfb76332f9e7c4aba",
-    "src/invoice-details.js": "b09ab0a993a416644df5faf9f600ec771d99b24b60d46ad29fc356e9bc8d3c9b",
-    "sites/lib/invoice-fields.js": "6ef4cf3fc001982aee981627abeee33422cb92d22c63cafc1541c88dae1c972f",
-    "sites/lib/invoice-details.js": "b09ab0a993a416644df5faf9f600ec771d99b24b60d46ad29fc356e9bc8d3c9b"
+    "src/invoice-extraction.js": "5f7b970c669bfdaa23521fdef556a9c2fbdf2a5721140c28fb84bae3d276d7e2",
+    "src/invoice-details.js": "6e14bf048f5ae1109ef6a79f5e2c975e34971211e9056ecdca71004fc7eddc26",
+    "sites/lib/invoice-fields.js": "348cd6ff2f311bf92f9b3e142db2a483a20e1bbc51cc3faa4bcdba72231bc32b",
+    "sites/lib/invoice-details.js": "6e14bf048f5ae1109ef6a79f5e2c975e34971211e9056ecdca71004fc7eddc26"
   },
   "engines": {
     "node": {

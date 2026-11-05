@@ -190,5 +190,14 @@
         }
       }
     }
-  ]
+  ],
+  "provenance": {
+    "phase": "before integration of main bf24a3c",
+    "exact_source_snapshot_recorded": false,
+    "exact_execution_timestamp_recorded": false,
+    "limitations": [
+      "This historical smoke is not proof for the final PR head.",
+      "The final merged full suites separately exercise real synthetic PDF/image bytes."
+    ]
+  }
 }

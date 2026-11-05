@@ -1,31 +1,35 @@
 # Agent 3 — AI/OCR, Gmail och tillförlitlig fakturatolkning
 
-Branch: `feature/95-ocr`. Bas: `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`.
+Branch: `feature/95-ocr`. [PR #52 mot main](https://github.com/sharbel0022/Mgeorge/pull/52). Ursprunglig bas: `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`. Integrerad main: `bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee`.
 
 ## Omfattning och evidensgräns
 
 Leveransen förbättrar befintlig fakturatolkning, OCR-arbetarens återhämtning och dokumentkön. Ändringarna ska granskas i en PR mot `main`. Produktionskontrollerna är läsande. Inga kundoriginal, fakturabelopp, registreringar, bankdata, hemligheter, scheman eller Sites-versioner ändras av uppdraget.
 
-Syntetiska text-/bild-/PDF-prov och faktiska produktionsobservationer redovisas separat. En lyckad testsamling är inte ett mått på precisionen i kundens 350 dokument. Något manuellt märkt produktionsfacit har inte skapats och någon generell 9,5/10-bedömning utfärdas inte.
+Syntetiska text-/bild-/PDF-prov och faktiska produktionsobservationer redovisas separat. En lyckad testsamling är inte ett mått på precisionen i kundens observerade dokument. Något manuellt märkt produktionsfacit har inte skapats och någon generell 9,5/10-bedömning utfärdas inte.
 
 ## Verifierat produktionsläge
 
 Se det maskerade [observationskvittot](../measurements/95-ocr-production-observations.json).
 
-| Observation | Vid uppdragets start | Läsning 2026-11-05 18:03 UTC |
+| Observation | Vid uppdragets start | Läsning 2026-11-05 18:24 UTC |
 | --- | ---: | ---: |
-| Behöver granskning | 350 | 350 |
-| Väntar på OCR | 15 | 17 |
-| Väntar på serverns texttolkning | 0 | 3 |
+| Behöver granskning | 350 | 362 |
+| Väntar på OCR | 15 | 11 |
+| Väntar på serverns texttolkning | 0 | 0 |
 | Jobb i tillståndet registrerad | 2 | 2 |
 
-Gmail hade vid den senare läsningen en lyckad hämtning 17:13:52 UTC. Inflödet pågick samtidigt som kontrollen. Skillnaderna i kön är inte ett resultat av denna ännu odriftsatta branch.
+Gmail hade vid den senare läsningen en lyckad hämtning 18:05:02 UTC. En mellanliggande läsning 18:03 visade 350 för granskning, 17 OCR-väntande och 3 textjobb. Inflöde och behandling på main pågick samtidigt som arbetet. Skillnaderna i kön är inte ett resultat av denna ännu odriftsatta branch.
 
-Molnarbetarens senast observerade kontakt var 10:45:29 UTC och senaste sparade OCR-resultat 03:02:55 UTC. Den lokala arbetaren hade inte nyligen kontaktat tjänsten. GitHubs senaste returnerade schemakörning var [42013301104](https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104), vars verkliga jobblogg visar `processed:0, failed:0`. Historisk framgång med noll dokument bekräftar varken aktuell schemaläggning eller behandling av de nya väntande originalen. Verktyget för workflowmetadata avvisade endpointen, så aktuell enable/disable-status för GitHub-schemat har inte fastställts.
+Vid start och läsningen 18:03 var molnarbetarens senaste kontakt 10:45:29 UTC och senaste sparade OCR-resultat 03:02:55 UTC. Den då senaste returnerade schemakörningen [42013301104](https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104) hade `processed:0, failed:0`. Det förklarade varför historisk grön driftstatus inte räckte som belägg för aktuell genomströmning.
 
-Alla sidor i `document_jobs` lästes, men Gmail ändrade tabellen under sidindelningen. Den läsningen är därför ingen atomisk inventering och dess sidtotaler används inte som köantal. De väntande jobb som lästes hade noll försök, tom felkod och ködatum efter molnarbetarens senaste kontakt. Ingen förbrukad återförsöksbudget är belagd som orsak till denna produktionskö.
+Vid kontrollen 18:24 fanns en ny faktisk schemakörning: [42083409804](https://github.com/sharbel0022/Mgeorge/actions/runs/42083409804), skapad 18:21:17 på main `bf24a3c`, avslutad med `processed:6, failed:0` enligt den hämtade jobbloggen. Tjänsten bekräftade molnkontakt 18:23:26, sparat resultat 18:23:31 och `cloud_worker_recent:true`. Den lokala arbetaren var fortfarande inte nyligen aktiv. Den externa körningen utlöstes inte av denna uppgift och körde inte PR-grenen. Den bevisar en aktuell behandling av sex dokument, inte återkommande tillgänglighet, korrektheten i deras fakturafält eller en kapacitet per timme.
 
-Granskningsorsakerna är överlappande observationer av sparad tolkning: 349 saknade verifierad motpart, 288 hade osäkra fält, 244 saknade organisationsnummer, 186 datum, 144 motpart, 141 moms/netto, 130 giltigt totalbelopp och 101 fakturanummer. En OCR-körning kan inte i sig skapa den uttryckliga motpartsverifiering som saknas.
+Workflowmetadata-endpointen avvisades tidigare, så enable/disable-inställningen lästes inte. Den senare faktiska körningens event var `schedule`. Gmails separata externa schemaverifiering var fortfarande falsk, och status rapporterade två väntande meddelanden samt `postprocessing_pending`; därför påstås inte att hela bakgrundskedjan är färdig.
+
+Alla sidor i `document_jobs` lästes före den senare schemakörningen, men Gmail ändrade tabellen under sidindelningen. Den läsningen är därför ingen atomisk inventering och dess sidtotaler används inte som köantal. De väntande jobb som då lästes hade noll försök, tom felkod och ködatum efter den då senaste molnkontakten. Ingen förbrukad återförsöksbudget är belagd som orsak till den inspekterade produktionskön.
+
+Granskningsorsakerna vid den sista läsningen är överlappande observationer av sparad tolkning: 361 saknade verifierad motpart, 300 hade osäkra fält, 256 saknade organisationsnummer, 197 datum, 151 motpart, 153 moms/netto, 134 giltigt totalbelopp och 112 fakturanummer. Alla 362 granskningsposter ingick i orsaksräkningen. Vid start var motsvarande antal för verifierad motpart och osäkra fält 349 respektive 288. En OCR-körning kan inte i sig skapa den uttryckliga motpartsverifiering som saknas.
 
 ## Fakturaextraktion: samma syntetiska facit före och efter
 
@@ -43,18 +47,18 @@ Mätningen omfattar **15 deklarerade syntetiska textfall ×13 fält**, körda i 
 
 Riktningen är given i den syntetiska mejlmetadatan. Fältmåttet gäller alltså de deklarerade utdata med den kontexten, inte en separat mätning av hur väl riktningen kan härledas. Artikelvärden, fullständig mottagaridentitet och andra betalningsformat får inget 100-procentigt precisionspåstående från denna 13-fältstabell.
 
-| Mått, per motor | Före, bas `4ad205b` | Efter |
-| --- | ---: | ---: |
-| Exakta fält, inklusive nödvändiga tomma värden | 178/195 =91,28 % | 195/195 =100 % |
-| Precision bland returnerade, icke-tomma fält | 172/173 =99,42 % | 188/188 =100 % |
-| Återfunna korrekta värden bland förväntade, icke-tomma fält | 172/188 =91,49 % | 188/188 =100 % |
-| Helt korrekta fall, inklusive granskningsbeslut | 8/15 | 15/15 |
-| Korrekt hanterade positiva fall | 2/7 | 7/7 |
-| Felaktigt gröna resultat bland uttryckligen osäkra fall | 1/8 | 0/8 |
+| Mått, per motor | Ursprunglig bas `4ad205b` | Ny main `bf24a3c` | Sammanfogad branch |
+| --- | ---: | ---: | ---: |
+| Exakta fält, inklusive nödvändiga tomma värden | 178/195 =91,28 % | 178/195 =91,28 % | 195/195 =100 % |
+| Precision bland returnerade, icke-tomma fält | 172/173 =99,42 % | 172/173 =99,42 % | 188/188 =100 % |
+| Återfunna korrekta värden bland förväntade, icke-tomma fält | 172/188 =91,49 % | 172/188 =91,49 % | 188/188 =100 % |
+| Helt korrekta fall, inklusive granskningsbeslut | 8/15 | 8/15 | 15/15 |
+| Korrekt hanterade positiva fall | 2/7 | 2/7 | 7/7 |
+| Felaktigt gröna resultat bland uttryckligen osäkra fall | 1/8 | 1/8 | 0/8 |
 
 Precision är TP/(TP+FP) och recall är TP/(TP+FN). Ett felaktigt icke-tomt värde räknas som FP och även FN när ett annat icke-tomt värde förväntas. Korrekt avstående räknas separat: före TP172/FP1/FN16/korrekt tomt6, efter TP188/FP0/FN0/korrekt tomt7. Det finns **15 unika fall**, inte 30 oberoende dokument; motorerna delar samma facit.
 
-[Före](../measurements/95-ocr-extraction-before.json) och [efter](../measurements/95-ocr-extraction-after.json) innehåller samma korpus-hash, källfilshashar, definitioner och fel per fall. Korpus-hash: `40e6dac4e240e0f23a2e2c414a3897cde4cef7f0d9508bb7ff572c86e02f9137`. Baslinjen kördes mot ett separat git-arkiv av bascommitten, med samma mätare och facit. Aktuell mätning kan upprepas med `node --experimental-strip-types scripts/measure-invoice-reliability.mjs --output /tmp/95-ocr-extraction.json`; `--source-root` väljer ett annat källträd.
+[Ursprunglig baslinje](../measurements/95-ocr-extraction-before.json), [ny main-baslinje](../measurements/95-ocr-extraction-main-before.json) och [sammanfogat resultat](../measurements/95-ocr-extraction-after.json) innehåller samma korpus-hash, källfilshashar, definitioner och fel per fall. Korpus-hash: `40e6dac4e240e0f23a2e2c414a3897cde4cef7f0d9508bb7ff572c86e02f9137`. Båda baslinjerna kördes mot separata git-arkiv med samma mätare och facit. Ny main har samma utfall på just dessa 15 fall; dess förbättrade svenska summeringar och identitetsgränser har egna regressioner och tillskrivs inte denna PR. Aktuell mätning kan upprepas med `node --experimental-strip-types scripts/measure-invoice-reliability.mjs --output /tmp/95-ocr-extraction.json`; `--source-root` väljer ett annat källträd.
 
 **Detta är riktad textregression, inte ett representativt optiskt riktmärke eller produktionsprecision.** Tolv ytterligare gränsfall per motor ingår i regressionstesterna men inte i tabellens fasta 15-fallsmätning. Den oberoende granskningen hittade betalningsvillkoret `Net 30` utanför den fasta korpusen; den nya tolkningen kunde först felaktigt bli grön. Fem varianter per motor observerades röda före korrigeringen, och den slutliga oberoende gruppen passerade 54/54. Befintliga tester med faktiska syntetiska PDF-/bildbytes och Tesseract körs också i fullsviterna. Inga nya kundoriginal eller påhittade OCR-resultat används.
 
@@ -72,7 +76,7 @@ Ett rent engelskt prov med grupperade decimalbelopp renderades med repositoryts 
 | Observerad körtid, en körning | 5 347 ms | 2 291 ms |
 | Originalets SHA-256 före/efter | Oförändrad | Oförändrad |
 
-Riktningen tillfördes som kontrollerad syntetisk metadata; övriga tolv värden tolkades från dokumenttext. Grön PDF-extraktion betyder inte registrerad eller verifierad motpart. Ingen registrering gjordes. Dessa två rena underlag är ett begränsat funktionellt prov, ingen skattning av optisk produktionsprecision eller kapacitet.
+Riktningen tillfördes som kontrollerad syntetisk metadata; övriga tolv värden tolkades från dokumenttext. Grön PDF-extraktion betyder inte registrerad eller verifierad motpart. Ingen registrering gjordes. Detta separata prov genomfördes före integrationen av ny main; dess exakta källsnapshot och körningstidpunkt registrerades inte, så kvittot används inte som verifiering av slutligt PR-huvud. De sammanfogade fullsviterna provar också verkliga syntetiska PDF-/bildbytes. Dessa två rena underlag är ett begränsat funktionellt prov, ingen skattning av optisk produktionsprecision eller kapacitet.
 
 ## Köhantering och avbrutna jobb
 
@@ -124,35 +128,43 @@ Regressionen använder 350 påhittade dokument och 210 upprepade källor: result
 - Arbetarens första transportregressioner: 10 misslyckade och 1 passerat före rättning. En oberoende granskning av räknarna följdes av 7 misslyckade testfall före rättningen. Slutlig fokuserad transport-/pull-verifiering: 58/58, inklusive 17 nya fall.
 - Slutlig parserkorpus och extra gränsfall: 54/54 i de två motorerna, inklusive den oberoende `Net 30`-regressionen.
 
+### Integration av parallella main-ändringar
+
+Efter att PR #52 skapades hade main avancerat till `bf24a3c` genom PR #48. Fyra parserfiler hade överlappande ändringar. Konflikterna löstes i `feature/95-ocr`; inga ändringar slogs in i main av denna leverans. Main-versionens svenska momskvalificerade summeringsrubriker, begränsade återhämtning över styckesluckor, skydd för radbrutna fakturaidentiteter och sidgränser bevaras tillsammans med denna PR:s rättningar.
+
+Den fokuserade sammanfogade parser-/evidensgruppen passerade **204/204**. En oberoende granskare passerade dessutom **94/94** sammanfattnings-/reliabilitetsprov och kontrollerade kombinationer av svenska rubriker med engelska grupperade belopp, flersidiga tabeller, `Net` följt av en tom rad och `30`, samt separata leverantörs-/mottagaridentiteter. Dessa överlappande grupper adderas inte till fullsviternas antal. Gmail-integrationen granskades separat mot båda föräldrarna; main-versionens försiktiga driftstatus och denna PR:s fokuserade dokumentval bevaras. Det inkommande OCR-workflowet och dess verifieringsskript är oförändrade från main.
+
 ### Fulla slutgrindar
 
-Det maskinläsbara [slutkvittot](../measurements/95-ocr-verification.json) innehåller kommandon, antal, körtider, logghashar, oförändrade beroendelåsfiler och hash för varje ändrad käll-/testfil. Källornas hash kontrollerades efter helkörningarna mot den frysta versionen. Lokal miljö: Linux, Node 24.22.1, npm 11.9.0. GitHub-flödet provar separat Node 22 på PR-huvudet.
+Det tidigare [verifieringskvittot före integration](../measurements/95-ocr-pre-integration-verification.json) bevarar **1 945 Node +3 801 Sites +47 brygga =5 793** godkända tester och tillhörande kontroller för den dåvarande koden. Det återanvänds inte som bevis för den nya runtime-kombinationen.
+
+Alla fullsviter och källberoende kontroller kördes om på den sammanfogade koden, fryst 18:18:14 UTC. Det maskinläsbara [slutkvittot](../measurements/95-ocr-verification.json) innehåller kommandon, antal, körtider, logghashar och hash för varje ändrad käll-/testfil relativt ny main. Samtliga 742 frysta käll-/konfigurationsfiler hade oförändrade hashvärden efter körningarna. Lokal miljö: Linux, Node 24.22.1, npm 11.9.0. GitHub-flödets separata Node 22-resultat redovisas på PR-huvudets kontroller och härleds inte ur den lokala körningen.
 
 | Grind | Resultat |
 | --- | --- |
-| Node `NODE_ENV=test npm run test:isolated` | **1 945/1 945** |
-| Sites isolerade helsvit, externa Cloudflare-anrop avstängda | **3 801/3 801** |
+| Node `NODE_ENV=test npm run test:isolated` | **2 043/2 043** |
+| Sites isolerade helsvit, externa Cloudflare-anrop avstängda | **3 895/3 895** |
 | Bryggans isolerade helsvit | **47/47** |
-| Summa fullsviter | **5 793 passerade; 0 fail/skip/cancel/TODO** |
-| Rotens syntaxkontroll | 173 JavaScript-filer, exit 0 |
+| Summa fullsviter | **5 985 passerade; 0 fail/skip/cancel/TODO** |
+| Rotens syntaxkontroll | 183 JavaScript-filer, exit 0 |
 | Sites TypeScript-kontroll | Exit 0 |
 | Sites produktionsbygge | Exit 0 |
 | Bryggans syntaxkontroll | Exit 0 |
 | Exakt installerad minimatch-rättning | Verifierad, 1 mål, 0 ändringar vid slutkontrollen |
-| Auditgrindar | Root/brygga: 0 fynd. Sites: 8 befintliga moderate, 0 high/critical |
+| Auditgrindar | Root/brygga: 0 fynd. Sites: 8 befintliga moderate, 0 high/critical. Tidigare samma-session-audit återanvänds efter identiska manifest-/låshashar; ny CI gör egna auditkontroller. |
 
 Riktade grupper överlappar helsviterna och ska inte adderas som extra täckning. Separat agentgranskning omfattade kö/status, arbetare, navigering, parser och den sista testanpassningen; inga kvarstående Critical/Important-fynd fanns efter rättning. Framgång på syntetiska prover innebär inte att kunddokument eller motparter är verifierade.
 
-## Miljöobservationer
+## Miljöobservationer före integrationen av ny main
 
 Standardinstallationen för Sites avbröts två gånger med exit 137. Samma låsfil installerades sedan med begränsad Node-heap, en nedladdningsanslutning och avstängda installationsskript: 719 paket, följt av den obligatoriska, byteverifierade minimatch-rättningen. Manifest/låsfiler ändrades inte. En första teststart saknade obligatoriskt `NODE_ENV=test` och avvisades av isoleringsgrinden; den räknas inte som ett produktfel eller godkänt testresultat.
 
-En tidig Sites-byggning avbröts med exit 137 under klientfasen. Slutbygget med 384 MiB Node-heap och en Rayon-tråd avslutades med exit 0. En typkontroll med samma lilla heap avbröts med verifierad heap-OOM/exit 134; slutlig typkontroll med 1 024 MiB passerade. Två heltester stoppades avsiktligt med exit 130 när den oberoende granskningen hittade `Net 30`, så att grinden kunde köras på den färdiga koden. Avbrutna försök räknas inte som godkända. Rotens och bryggans audit hade inga fynd; full Sites-audit hade åtta befintliga moderate och inga high/critical.
+En tidig Sites-byggning avbröts med exit 137 under klientfasen. Det godkända bygget före integrationen använde 384 MiB Node-heap och en Rayon-tråd och avslutades med exit 0. En typkontroll med samma lilla heap avbröts med verifierad heap-OOM/exit 134; efterföljande typkontroll med 1 024 MiB passerade. Två heltester stoppades avsiktligt med exit 130 när den oberoende granskningen hittade `Net 30`, så att grinden kunde köras på den färdiga koden. Avbrutna försök räknas inte som godkända. Rotens och bryggans audit hade inga fynd; full Sites-audit hade åtta befintliga moderate och inga high/critical. De nya integrationsgrindarnas utfall redovisas separat ovan.
 
-Heltesterna identifierade även en föråldrad förväntan i de två befintliga dokumentkvalitetstesterna: ett giltigt engelskt `1,250.00 SEK` klassades som felaktigt format. Exakt två sådana fel reproducerades separat. Provet använder nu felaktiga `1,25.00`, medan nya positiva och negativa fall kontrollerar samma respektive motstridigt engelskt totalbelopp i båda ordningsföljderna. Alla 69 riktade prov passerade och teständringen granskades oberoende. Produktionskoden ändrades inte. Node-helkörningen startades om; Sites hade ännu inte laddat den berörda testfilen och dess godkända helkörning innehåller båda nya fallen. En överflödig, ännu pågående delkörning stoppades och räknas inte som godkänd verifiering.
+Heltesterna före integrationen identifierade även en föråldrad förväntan i de två befintliga dokumentkvalitetstesterna: ett giltigt engelskt `1,250.00 SEK` klassades som felaktigt format. Exakt två sådana fel reproducerades separat. Provet använder nu felaktiga `1,25.00`, medan nya positiva och negativa fall kontrollerar samma respektive motstridigt engelskt totalbelopp i båda ordningsföljderna. Alla 69 riktade prov passerade och teständringen granskades oberoende. Produktionskoden ändrades inte. Node-helkörningen startades om; Sites hade ännu inte laddat den berörda testfilen och dess godkända förintegrationskörning innehåller båda nya fallen. En överflödig, ännu pågående delkörning stoppades och räknas inte som godkänd verifiering.
 
 ## Kontroller inför produktionsacceptans
 
-Efter normal granskning/integrering krävs ett separat kontrollerat driftsprov: verifiera faktisk schemakörning på rätt commit och origin, välj ett fåtal ägda original med facit, håll osäkra resultat för granskning, jämför fält/identiteter/belopp mot original och mät köförändringen utan massregistrering. Kontrollera återstart, provider-/nätverksfel och att dubbla körningar inte skapar dubbla skulder.
+Efter normal granskning/integrering krävs ett separat kontrollerat driftsprov: verifiera schemakörning på den integrerade leveranscommitten och rätt origin över flera körningar, välj ett fåtal ägda original med facit, håll osäkra resultat för granskning, jämför fält/identiteter/belopp mot original och mät köförändringen utan massregistrering. Kontrollera återstart, provider-/nätverksfel och att dubbla körningar inte skapar dubbla skulder.
 
 Inga numeriska produktionspoäng höjs innan dessa drift- och precisionsbevis finns. Aktuell verklig extraktionsprecision är okänd; behovet av granskning är fortsatt verifierat.

@@ -782,6 +782,35 @@ test('Gmail MCP status is bounded and excludes invoice bodies and document works
  assert.equal(denied.result.isError,true);
 });
 
+test('rating8: a recent manual Gmail fetch cannot prove background readiness while the external schedule is unverified',async t=>{
+ const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+ await f.api.gmailSync(post('sync'));
+ const result=await(await f.api.gmailStatus(true)).json();
+ assert.equal(result.sync_health.state,'recent');
+ assert.equal(result.schedule_observation.external_schedule_verified,false);
+ assert.equal(result.background_ready,false);
+ assert.equal(result.fetch_ready,true);
+ assert.ok(result.background_health.reasons.includes('external_schedule_unverified'));
+});
+
+test('rating8: stalled OCR remains visible after a successful Gmail fetch without exposing documents',async t=>{
+ const f=await processingFixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+ Object.assign(f.env,{DOCUMENT_CLOUD_OCR_ENABLED:'true',DOCUMENT_CLOUD_WORKER_TOKEN:randomToken()});
+ f.doc('private-synthetic-image','image/png');await f.processing.enqueueDocuments(f.owner);
+ f.sql.prepare("INSERT INTO gmail_runs(id,owner,status,created_at) VALUES('fresh-fetch',?,'completed',?)").run(f.owner,new Date().toISOString());
+ const result=await(await f.api.gmailStatus(true)).json();
+ assert.equal(result.sync_health.state,'recent');assert.equal(result.background_ready,false);
+ assert.ok(result.background_health.reasons.includes('ocr_worker_unavailable'));
+ assert.doesNotMatch(JSON.stringify(result),/private-synthetic-image/);
+ f.sql.prepare('UPDATE document_automation SET cloud_worker_seen=? WHERE owner=?').run(new Date().toISOString(),f.owner);
+ const fresh=await(await f.api.gmailStatus(true)).json();
+ assert.equal(fresh.background_health.reasons.includes('ocr_worker_unavailable'),false);
+ assert.equal(fresh.background_ready,false,'OCR heartbeat is not external schedule proof');
+ f.sql.prepare("UPDATE document_automation SET cloud_worker_seen='',worker_seen=? WHERE owner=?").run(new Date().toISOString(),f.owner);
+ const fallback=await(await f.api.gmailStatus(true)).json();
+ assert.equal(fallback.background_health.reasons.includes('ocr_worker_unavailable'),false,'A live local fallback can drain the same OCR queue');
+});
+
 test('Gmail status distinguishes configured scheduling from observed successful execution',async t=>{
  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
  f.env.DOCUMENT_SCHEDULER_CONFIGURED='true';f.env.DOCUMENT_SCHEDULE_MINUTES='60';
@@ -792,7 +821,7 @@ test('Gmail status distinguishes configured scheduling from observed successful 
  insert.run(f.owner,new Date(Date.now()-24*3600000).toISOString());
  result=await inspect();assert.equal(result.sync_health.state,'stale');assert.equal(result.background_ready,false);
  f.sql.prepare('UPDATE gmail_runs SET created_at=?').run(new Date().toISOString());
- result=await inspect();assert.equal(result.sync_health.state,'recent');assert.equal(result.background_ready,true);assert.equal(result.sync_health.schedule_verified,false);
+ result=await inspect();assert.equal(result.sync_health.state,'recent');assert.equal(result.fetch_ready,true);assert.equal(result.background_ready,false);assert.equal(result.sync_health.schedule_verified,false);
  f.sql.prepare('UPDATE gmail_runs SET created_at=?').run(new Date(Date.now()+3600000).toISOString());
  result=await inspect();assert.equal(result.sync_health.state,'not_verified');assert.equal(result.background_ready,false);
  f.sql.prepare('UPDATE gmail_runs SET created_at=?').run(new Date().toISOString());

@@ -84,9 +84,14 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const referenceLabel='(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)';
   const issuedDateLabel='(?:fakturadatum|faktureringsdatum|invoice\\s*date)';
   const dueDateLabel='(?:förfallodatum|förfallodag|förfaller|oss\\s*tillhanda\\s*senast|betalas\\s*senast|due\\s*date)';
+  // Swedish summa/totalt/belopp summaries need explicit tax qualifiers.
+  // Reuse their grammar as sibling boundaries so inline fields stay separate.
+  const taxSummaryPrefix='(?:summa|totalt|belopp)[ \\t]+';
+  const grossTaxSummaryLabel=taxSummaryPrefix+'inkl(?:usive|\\.?)[ \\t]+moms';
+  const netTaxSummaryLabel=taxSummaryPrefix+'exkl(?:usive|\\.?)[ \\t]+moms';
   // A following explicit field label separates values on the same line. Other
   // trailing content remains part of the value and must pass full validation.
-  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms|total moms|moms(?:belopp)?|(?:total[ \\t]+)?VAT(?:[ \\t]+amount)?|netto(?:belopp)?|totalt netto|net(?:[ \\t]+amount)?|total(?:[ \\t]+amount)?|valuta|currency)';
+  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+grossTaxSummaryLabel+'|'+netTaxSummaryLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|att betala|summa att betala|totalsumma|totalbelopp|amount due|total moms|moms(?:belopp)?|(?:total[ \\t]+)?VAT(?:[ \\t]+amount)?|netto(?:belopp)?|totalt netto|net(?:[ \\t]+amount)?|total(?:[ \\t]+amount)?|belopp före moms|valuta|currency)';
   const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$)|'+issuedDateLabel+'|'+dueDateLabel+')','iu');
   const grabFull=(key,label,convert)=>{
     const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency',dateField=key==='issued_at'||key==='due_at';
@@ -97,12 +102,18 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     scalarLabels.push(new RegExp(re.source,'iu'));
     for(const match of text.matchAll(re)){
       let start=match.index+match[0].length;
-      // A value may be printed immediately below its label, but never borrow
-      // the next heading as a missing value.
-      if(text[start]==='\n')start++;
+      // Paragraph-gap recovery is only justified for explicit monetary
+      // summaries. An identity, reference, account or date must stay on its
+      // labelled line or the immediately adjacent line, never a later block.
+      const monetaryField=['total_cents','vat_cents','net_cents'].includes(key);
+      const blankLines=monetaryField?(text.slice(start).match(/^(?:\n[ \t]*)+/)?.[0]||''):(text[start]==='\n'?'\n':'');
+      start+=blankLines.length;
       const end=text.indexOf('\n',start),line=text.slice(start,end<0?text.length:end);
       const boundary=line.search(sibling),value=(boundary<0?line:line.slice(0,boundary)).trim();
-      matches.push({label:match[0],value,evidence:match[0]+(text[start-1]==='\n'?'\n':'')+value});
+      // A bare alphabetic line could be a section heading. Keep it unassigned
+      // instead of inventing an invoice identity; same-line IDs may be letters.
+      const assigned=invoiceLabel&&blankLines&&!/[0-9]/.test(value)?'':value;
+      matches.push({label:match[0],value:assigned,evidence:match[0]+blankLines+value});
     }
     record(key,matches,convert);
     return matches.length>0;
@@ -125,11 +136,11 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     const value=/^-?\d{1,3}(?:,\d{3})+\.\d{1,2}$/.test(match[1])?match[1].replace(/,/g,''):match[1];
     try{return parseMoney(value);}catch{return null;}
   };
-  const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|totalt inklusive moms|totalt inkl\\.? moms|(?<=^|\\n)[ \\t]*total(?:[ \\t]+amount)?(?![ \\t]+(?:vat|tax|net|moms)\\b)|total(?:[ \\t]+amount)?(?=[ \\t]*:))';
+  const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|'+grossTaxSummaryLabel+'|(?<=^|\\n)[ \\t]*total(?:[ \\t]+amount)?(?![ \\t]+(?:vat|tax|net|moms)\\b)|total(?:[ \\t]+amount)?(?=[ \\t]*:))';
   // Inline monetary labels require a colon. Words inside net/total labels
   // and ordinary VAT-rate prose are not separate monetary fields.
   const vatLabel='(?:(?<=^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|(?:total[ \\t]+)?VAT(?:[ \\t]+amount)?)(?![ \\t]*(?:rate\\b|%))|(?<!(?:före|exklusive|inklusive|inkl\\.?|exkl\\.?)[ \\t]+)(?:total moms|moms(?:belopp)?|(?:total[ \\t]+)?VAT(?:[ \\t]+amount)?)(?=[ \\t]*:))';
-  const netLabel='(?:belopp före moms|belopp exklusive moms|summa exkl\\.? moms|(?<=^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net(?:[ \\t]+amount)?)|(?:totalt netto|netto(?:belopp)?|net(?:[ \\t]+amount)?)(?=[ \\t]*:))';
+  const netLabel='(?:belopp före moms|'+netTaxSummaryLabel+'|(?<=^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net(?:[ \\t]+amount)?)|(?:totalt netto|netto(?:belopp)?|net(?:[ \\t]+amount)?)(?=[ \\t]*:))';
   grabFull('total_cents',totalLabel,money);
   grabFull('vat_cents',vatLabel,money);
   grabFull('net_cents',netLabel,(value,label)=>{

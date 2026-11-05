@@ -1,10 +1,11 @@
 {
-  "schema_version": 1,
-  "evidence_type": "synthetic_local_verification",
-  "completed_at": "2026-11-05T18:06:19.176910+00:00",
-  "base_commit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
-  "runtime_frozen_at": "2026-11-05T17:50:52.423237+00:00",
-  "final_test_files_frozen_at": "2026-11-05T17:56:04.836284+00:00",
+  "schema_version": 2,
+  "evidence_type": "synthetic_local_verification_after_main_integration",
+  "completed_at": "2026-11-05T18:28:06.331755+00:00",
+  "original_base_commit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "integrated_main_commit": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+  "previously_published_branch_commit": "ff210c54fbff8243fd3775c0e89f68e574f8c194",
+  "runtime_and_tests_frozen_at": "2026-11-05T18:18:14.975075+00:00",
   "runtime": {
     "node": "v24.22.1",
     "npm": "11.9.0",
@@ -14,26 +15,26 @@
     "node": {
       "command": "NODE_ENV=test npm run test:isolated",
       "exit_code": 0,
-      "tests": 1945,
-      "pass": 1945,
+      "tests": 2043,
+      "pass": 2043,
       "fail": 0,
       "cancelled": 0,
       "skipped": 0,
       "todo": 0,
-      "duration_ms": 501273.066878,
-      "log_sha256": "88ed17d8f9139382192e42f1f60f827574c14a38f38398551de0bc812365de91"
+      "duration_ms": 429370.995502,
+      "log_sha256": "3201a174f250dbea52a837f7905a5f0c0b26fc15a884530dcdb5c0ff6d950cd8"
     },
     "sites": {
       "command": "NODE_ENV=test CLOUDFLARE_CF_FETCH_ENABLED=false WRANGLER_SEND_METRICS=false npm run test:isolated",
       "exit_code": 0,
-      "tests": 3801,
-      "pass": 3801,
+      "tests": 3895,
+      "pass": 3895,
       "fail": 0,
       "cancelled": 0,
       "skipped": 0,
       "todo": 0,
-      "duration_ms": 753880.44434,
-      "log_sha256": "385621191e0eaad73fbfcc522c031f1196c4762a7a508c2e3fcd8c6cedd54c13"
+      "duration_ms": 527670.29888,
+      "log_sha256": "eaf4a86bd8c25ddf6dea4b8c211ac59142bd8b153c7d949f870a7265ed5ae3d4"
     },
     "bridge": {
       "command": "NODE_ENV=test npm --prefix bridge/bankgiro run test:isolated",
@@ -44,34 +45,39 @@
       "cancelled": 0,
       "skipped": 0,
       "todo": 0,
-      "duration_ms": 11788.003453,
-      "log_sha256": "8e5c597c03e8a63b98c5240c64e557b9292e784906cd5cf5c540a71835d95a4a"
+      "duration_ms": 9915.023902,
+      "log_sha256": "79bcac85a679e46317a3281c972d9b71302e9d8eae0addda58e1d411dbfd60cb"
     }
   },
-  "total_passed": 5793,
+  "total_passed": 5985,
   "checks": {
     "root_syntax": {
       "command": "npm run check",
       "exit_code": 0,
-      "javascript_files": 173
+      "javascript_files": 183,
+      "log_sha256": "15ab2b1c394f91d5327ea21ce9c5983734c70a4d4ce25f2d85881b15acb904d4"
     },
     "sites_types": {
       "command": "NODE_OPTIONS=--max-old-space-size=1024 CLOUDFLARE_CF_FETCH_ENABLED=false WRANGLER_SEND_METRICS=false npm run check",
-      "exit_code": 0
+      "exit_code": 0,
+      "log_sha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c"
     },
     "sites_build": {
       "command": "NODE_OPTIONS=--max-old-space-size=384 RAYON_NUM_THREADS=1 CLOUDFLARE_CF_FETCH_ENABLED=false WRANGLER_SEND_METRICS=false npm run build",
-      "exit_code": 0
+      "exit_code": 0,
+      "log_sha256": "1c112275cfcc5ec35c0fbc8ec412aded1aca3af59c51213f793c07fe8b44e333"
     },
     "minimatch": {
       "command": "node scripts/minimatch-backport.mjs --check --require-target",
+      "exit_code": 0,
       "status": "verified",
       "targets": 1,
       "writes": 0
     },
     "bridge_syntax": {
       "command": "npm --prefix bridge/bankgiro run check",
-      "exit_code": 0
+      "exit_code": 0,
+      "log_sha256": "4843392301f472bd2f730e36101d1b9fe29803f87b6286f8407882e6188d1340"
     }
   },
   "audits": {
@@ -100,6 +106,8 @@
       "total": 0
     }
   },
+  "audits_reused_from": "95-ocr-pre-integration-verification.json",
+  "audit_reuse_basis": "Same session, unchanged environment and identical dependency manifests/locks; GitHub CI performs fresh clean installation/audits.",
   "dependency_manifests_and_locks_unchanged": true,
   "dependency_file_sha256": {
     "package.json": "ec6237dd6982279ca62783131a9a340ef12d5fee18a21ceba8381a5d4fc7bc2e",
@@ -109,24 +117,28 @@
     "bridge/bankgiro/package.json": "abc9bae8e9de08e08854d473bc00311340b875aace4e90d2b30bff394e50f985",
     "bridge/bankgiro/package-lock.json": "543131a8a7d217ac6b84c4f2e5db4d53f94115204b19f7ee4a875b2b36964b6f"
   },
-  "changed_source_and_test_sha256": {
+  "frozen_source_file_count": 742,
+  "frozen_source_hashes_unchanged_after_full_runs": true,
+  "frozen_source_manifest_sha256": "e33255c85c543eae028a0c9e7a76b42947f6a243cbb551686e143cac2bda0f4e",
+  "frozen_source_manifest_scope": "All tracked non-docs .js/.mjs/.cjs/.ts/.tsx/.json/.yml/.yaml files; canonical sorted path-to-SHA256 JSON.",
+  "changed_source_and_test_sha256_relative_to_integrated_main": {
     "scripts/measure-invoice-reliability.mjs": "3e82123fbde111e4b01428547aeb2ee91e39f64378770fdccf71383be1923615",
     "sites/app/api/gmail/[action]/route.ts": "e017da201db87a056618e31fc99e9471ee855d857218d14df0cbd3bfb1386d86",
     "sites/app/gmail/page.tsx": "1c3f936cc3eb5272a16fa49fc451358dd0f82dfb3ab867758ad3ee2ae71c34a1",
     "sites/components/document-ocr-status.tsx": "70ad42ab41c98af879639822d430d76678b2d0a648e8ff5cd2ba0c7e7ee96672",
     "sites/components/gmail-workspace.tsx": "8723029adbbb9cc790032cab8dafc98a06f7d726b6aeac3b97db887fcb8e0ebb",
     "sites/lib/document-processing.ts": "a9c99cd683eb6ee7e260ee119b60861a6b15d738bf414beb9c1cd5d46037f206",
-    "sites/lib/gmail-service.ts": "f9e2b7d1372435dc7a8722e963ac18094f466f04954d157c7422efe9262dc6c4",
-    "sites/lib/invoice-details.js": "b09ab0a993a416644df5faf9f600ec771d99b24b60d46ad29fc356e9bc8d3c9b",
-    "sites/lib/invoice-fields.js": "6ef4cf3fc001982aee981627abeee33422cb92d22c63cafc1541c88dae1c972f",
+    "sites/lib/gmail-service.ts": "8243a34ac8e4e79fd4d748ca7ca19ca11b5f85959b8b3aab5117c3f15737e83f",
+    "sites/lib/invoice-details.js": "6e14bf048f5ae1109ef6a79f5e2c975e34971211e9056ecdca71004fc7eddc26",
+    "sites/lib/invoice-fields.js": "348cd6ff2f311bf92f9b3e142db2a483a20e1bbc51cc3faa4bcdba72231bc32b",
     "sites/tests/document-quality-cycle.test.mjs": "545968971becd29eb6352a21b1e4a177418cf49d772bc9e05c3e61505f86e8d0",
     "sites/tests/document-queue-recovery.test.mjs": "4ce41e217fb9d76d1610bd0ebd2dc3d1fafdaf4a7c42972b1d3819c257422c61",
     "sites/tests/gmail-operational-status-ui.test.mjs": "5f553dea14306e87d86761972adcb3589fd0adedd1b1867f0fc6bbfe8e3f80da",
     "sites/tests/gmail-preview-q8.test.mjs": "dbb3c9e19d154417d6bc44ec168a5c1e680897c46a1c79fe42729ff7115d2b50",
-    "sites/tests/gmail.test.mjs": "b802f85cfd4b67f5e251990153062f8f4f257fbc06021ce06efbe4eddfc46ea8",
+    "sites/tests/gmail.test.mjs": "2803c9ad30a2bd1351eb42bb1ddd18dcd5e3b1b0a4c00934febee94075fbeaf8",
     "sites/tests/invoice-reliability.test.mjs": "5fa72354edf1f3f5fa1321b69ea269b88784601551daf7a014a7e050d9af63cc",
-    "src/invoice-details.js": "b09ab0a993a416644df5faf9f600ec771d99b24b60d46ad29fc356e9bc8d3c9b",
-    "src/invoice-extraction.js": "06904c4bd500c80c5c82a837b207e9616fcf100f75062dcbfb76332f9e7c4aba",
+    "src/invoice-details.js": "6e14bf048f5ae1109ef6a79f5e2c975e34971211e9056ecdca71004fc7eddc26",
+    "src/invoice-extraction.js": "5f7b970c669bfdaa23521fdef556a9c2fbdf2a5721140c28fb84bae3d276d7e2",
     "src/sites-ocr-pull.js": "e9fd2c385c36aee4600d3772e3b5f6234cc0757e70f9d09b72d88b77945daceb",
     "test/document-quality-cycle.test.js": "9c33c794d676dec0427d3bc8c5ef1efac9c227fab2eabd64397e6120ceb162d6",
     "test/helpers/invoice-reliability-cases.mjs": "832c43c5811580e08f396a2d10101da13f04e8d9104671df05d25a8489b14fc5",
@@ -144,15 +156,21 @@
       "OCR worker transport",
       "Gmail review navigation",
       "mirrored parsers",
-      "quality cycle test alignment"
-    ]
+      "quality cycle test alignment",
+      "parser merge against both parents",
+      "Gmail auto-merge and incoming workflow",
+      "measurement arithmetic and evidence provenance"
+    ],
+    "merged_parser_focused_passed": 204,
+    "independent_merged_summary_reliability_passed": 94,
+    "focused_groups_overlap_full_suites": true
   },
   "scope_notes": [
-    "No production originals or customer financial data were used by the tests.",
-    "Focused tests overlap these full suites and are not added to their total.",
-    "The final Sites run loaded and passed both adjusted English grouped-total cases; runtime source remained frozen.",
-    "Earlier missing-environment, memory-limited, intentionally interrupted and obsolete-expectation runs are not passing gates.",
-    "The declared15-case text corpus and two-original optical smoke are separate from production precision.",
-    "GitHub Node22 CI is reported through the pull request checks, not inferred from this Node24 result."
+    "All full suites and source-dependent checks were rerun on the merged frozen source; pre-integration runs are preserved separately and not added to this total.",
+    "No production originals or customer financial data were used by the tests; all full suites used the repository isolation guard.",
+    "The main bf24 workflow/verifier and dependency files remain unchanged from incoming main.",
+    "The historical two-original optical smoke does not record its exact source snapshot and is not final-head verification; final full suites independently exercise actual synthetic PDF/image bytes.",
+    "The final live observation of one external main schedule run is separate production evidence, not caused by this undeployed branch.",
+    "GitHub Node22 CI is reported by the pull request checks; it is not inferred from the local Node24 results."
   ]
 }

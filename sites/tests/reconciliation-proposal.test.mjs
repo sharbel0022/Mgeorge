@@ -45,6 +45,27 @@ test('C4 responses require the exact snapshot and unchanged read-only contract w
  for(const value of [null,preview({writesAllowed:true}),preview({approvalRequired:false}),preview({changed:true}),preview({contractVersion:'invented'}),preview({snapshot:{revision:8,sha256:'a'.repeat(64)}}),preview({snapshot:{revision:7,sha256:'bad'}}),preview({transactionId:'another-payment'}),preview({selectedStatus:'BLOCKED'}),preview({reasonCodes:[{}]}),preview({decisions:[decision(),decision()]}),preview({decisions:[decision({allocations:[{...decision().allocations[0],amountMinor:0.5}]})]}),preview({decisions:[decision({allocations:[{...decision().allocations[0],currency:'EUR'}]})]}),preview({decisions:[decision({reasonCodes:[{toString:null}]})]})])assert.equal(ui.validReconciliationProposal(value,'synthetic-payment',7),false,JSON.stringify(value));
 });
 
+test('C4 proposal availability cannot exceed the absolute bank-reported amount',()=>{
+ for(const reportedAmountMinor of [0,1,-1,62499,-62499]){
+  const value=preview({decisions:[decision({reportedAmountMinor})]});
+  assert.equal(ui.validReconciliationProposal(value,'synthetic-payment',7),false,String(reportedAmountMinor));
+  assert.doesNotMatch(render({result:value}),/Faktura 0599|Underlaget stöder/);
+ }
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({reportedAmountMinor:70000})]}),'synthetic-payment',7),true,'Prior allocations may leave less available than the original bank amount');
+});
+
+test('outgoing and reversal decisions remain blocked without discarding their absolute available amount',()=>{
+ for(const patch of [{reportedAmountMinor:-62500},{reasonCodes:['REVERSAL_OR_OUTGOING_PAYMENT']}]){
+  assert.equal(ui.validReconciliationProposal(preview({decisions:[decision(patch)]}),'synthetic-payment',7),false);
+  const held=decision({...patch,status:'BLOCKED',bankEvidenceStatus:'BLOCKED',reasonCodes:['REVERSAL_OR_OUTGOING_PAYMENT'],allocations:[],unallocatedMinor:62500});
+  const value=preview({status:'BLOCKED',selectedStatus:'BLOCKED',decisions:[held]});
+  assert.equal(ui.validReconciliationProposal(value,'synthetic-payment',7),true);
+  assert.doesNotMatch(render({result:value}),/Faktura 0599|Underlaget stöder/);
+ }
+ const zero=preview({status:'BLOCKED',selectedStatus:'BLOCKED',decisions:[decision({status:'BLOCKED',bankEvidenceStatus:'BLOCKED',reasonCodes:['INVALID_MONEY'],reportedAmountMinor:0,availableMinor:0,unallocatedMinor:0,allocations:[]})]});
+ assert.equal(ui.validReconciliationProposal(zero,'synthetic-payment',7),true);
+});
+
 test('malformed, loading, unavailable and demo results never expose old proposals',()=>{
  for(const props of [{loading:true},{error:'Förslaget kunde inte läsas.'},{demo:true},{result:preview({writesAllowed:true})}]){
   const html=render(props);assert.doesNotMatch(html,/Faktura 0599|625,00|Underlaget stöder/);
@@ -83,4 +104,25 @@ test('missing or invalid C4 previews fail closed and retry stays read-only; demo
  const f=await fixture(t);f.requests[0].respond({},404);await flush();f.render();assert.equal(f.result.result,null);assert.match(f.result.error,/inte tillgängligt/);
  f.result.retry();f.render();f.requests[1].respond(preview({writesAllowed:true}));await flush();f.render();assert.equal(f.result.result,null);assert.ok(f.result.error);
  f.demo=true;f.render();const count=f.requests.length;assert.equal(f.result.result,null);f.result.retry();f.render();assert.equal(f.requests.length,count);
+});
+
+function multiInvoicePreview(){
+ const allocations=[{invoiceId:'synthetic-invoice',amountMinor:30001,currency:'SEK',invoiceRemainingBeforeMinor:30001,invoiceRemainingAfterMinor:0,settlement:'multiple'},{invoiceId:'synthetic-second',amountMinor:32499,currency:'SEK',invoiceRemainingBeforeMinor:32499,invoiceRemainingAfterMinor:0,settlement:'multiple'}];
+ return preview({status:'REVIEW',selectedStatus:'REVIEW',decisions:[decision({status:'REVIEW',reasonCodes:['MULTIPLE_INVOICES_REQUIRE_REVIEW'],allocations})]});
+}
+test('multiple-invoice and non-economic proposals cannot claim verified allocation status',()=>{
+ const valid=multiInvoicePreview();assert.equal(ui.validReconciliationProposal(valid,'synthetic-payment',7),true);
+ const falselyVerified=structuredClone(valid);falselyVerified.status='VERIFIED';falselyVerified.selectedStatus='VERIFIED';falselyVerified.decisions[0].status='VERIFIED';
+ assert.equal(ui.validReconciliationProposal(falselyVerified,'synthetic-payment',7),false);
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({economic:false})]}),'synthetic-payment',7),false);
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({allocations:[{...decision().allocations[0],settlement:'full',invoiceRemainingBeforeMinor:100000,invoiceRemainingAfterMinor:37500}]})]}),'synthetic-payment',7),false);
+ assert.equal(ui.validReconciliationProposal(preview({decisions:[decision({allocations:[{...decision().allocations[0],settlement:'partial',invoiceRemainingBeforeMinor:100000,invoiceRemainingAfterMinor:37500}]})]}),'synthetic-payment',7),false);
+});
+test('multiple-invoice proposal shows an exact total and zero remainder without a write control',()=>{
+ const value=multiInvoicePreview(),before=structuredClone(value);
+ const html=render({result:value,invoices:[{id:'synthetic-invoice',number:'SYN-01'},{id:'synthetic-second',number:'SYN-02'}]});
+ assert.match(html,/Behöver granskas/);assert.match(html,/SYN-01/);assert.match(html,/SYN-02/);
+ assert.match(html,/300,01/);assert.match(html,/324,99/);assert.match(html,/625,00/);
+ assert.match(html,/Fördelat i förslaget/);assert.match(html,/Kvar att fördela/);assert.match(html,/0,00/);
+ assert.doesNotMatch(html,/<form|<button|Verifierad betalning|Registrera betalning/);assert.deepEqual(value,before);
 });

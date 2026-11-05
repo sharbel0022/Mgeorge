@@ -137,7 +137,7 @@ const rowKeys=['description','quantity','unit_price_cents','net_cents','vat_rate
 // Unpunctuated summaries must contain one complete monetary value; a table
 // description beginning with Net/Total must not terminate and hide item rows.
 const summaryMoney='-?(?:\\d{1,3}(?:,\\d{3})+\\.\\d{1,2}|\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|(?:\\d+|\\d{1,3}(?: \\d{3})+)(?:[.,]\\d{1,2})?)';
-const tableSummary=new RegExp('^(?:netto(?:belopp)?|totalt netto|net(?:[ \\t]+amount)?|belopp (?:före|exklusive) moms|summa exkl\\.? moms|moms(?:belopp)?|total moms|(?:total[ \\t]+)?vat(?:[ \\t]+amount)?|att betala|summa att betala|totalbelopp|totalsumma|amount due|total(?:[ \\t]+amount)?|totalt inkl(?:usive|\\.)? moms)(?:[ \\t]*[:.#]|[ \\t]+(?:(?:SEK|EUR|USD|GBP|NOK|DKK)[ \\t]*)?'+summaryMoney+'(?:[ \\t]*(?:SEK|EUR|USD|GBP|NOK|DKK|kr))?[ \\t]*$)','iu');
+const tableSummary=new RegExp('^(?:netto(?:belopp)?|totalt netto|net(?:[ \\t]+amount)?|belopp före moms|(?:summa|totalt|belopp)[ \\t]+(?:inkl|exkl)(?:usive|\\.?)[ \\t]+moms|moms(?:belopp)?|total moms|(?:total[ \\t]+)?vat(?:[ \\t]+amount)?|att betala|summa att betala|totalbelopp|totalsumma|amount due|total(?:[ \\t]+amount)?)(?:[ \\t]*[:.#]|[ \\t]+(?:(?:SEK|EUR|USD|GBP|NOK|DKK)[ \\t]*)?'+summaryMoney+'(?:[ \\t]*(?:SEK|EUR|USD|GBP|NOK|DKK|kr))?[ \\t]*$)','iu');
 const pageCaption=/^(?:sida|page)[ \t]+\d+(?:[ \t]*(?:av|of|\/)[ \t]*\d+)?$/iu;
 const invoiceIdentity=/^(?:faktura[ \t]*(?:nummer|nr|no)|invoice[ \t]*(?:number|no))[ \t]*[:.#-]?[ \t]*([\p{L}\p{N}][\p{L}\p{N}/_-]*)$/iu;
 const continuationIdentity=/^(?:faktura|invoice)[ \t]+([\p{L}\p{N}][\p{L}\p{N}/_-]*)[ \t]*[,;:]?[ \t]*(?:fortsättning|continued|continuation)[ \t]+(?:sida|page)[ \t]+\d+(?:[ \t]+(?:av|of)[ \t]+\d+|[ \t]*\/[ \t]*\d+)?$/iu;
@@ -247,5 +247,7 @@ export function invoiceScalarText(input){
   const lines=linesOf(input),{covered}=parseTable(lines,{invoice_number:null,summary:{},credit:false,money:()=>null},[]);
   const pages=[];
   for(const source of lines){pages[source.page-1]||=[];pages[source.page-1].push(covered.has(`${source.page}:${source.line}`)?'':source.text);}
-  return pages.map(page=>page.join('\n')).join('\n');
+  // A page boundary is stronger evidence than an OCR paragraph gap. Preserve
+  // it so a missing labelled value cannot borrow a value on the next page.
+  return pages.map(page=>page.join('\n')).join('\n\f\n');
 }
