@@ -74,19 +74,19 @@ Den publika dokumentationen styrker inte den här kundens avtal, mandat, kontot�
 
 ## Obligatoriskt fall — faktiskt sparat original
 
-Skrivfri kontroll 2026-11-05 kl. 17:13–17:14 UTC, arbetsyterevision 52. Kontrollen använde de autentiserade verktygen `payment_evidence`, `retained_report_evidence` och `bankgiro_source_status`; inga syntetiska fixtures användes som bevis. Dokument-, transaktions-ID:n, kontrollsummor och privata betalaruppgifter återges inte i detta offentliga gitdokument.
+Skrivfri kontroll 2026-11-05 kl. 17:13–17:14 UTC, arbetsyterevision 52. Kontrollen använde de autentiserade verktygen `payment_evidence`, `retained_report_evidence` och `bankgiro_source_status`; inga syntetiska fixtures användes som bevis. Dokument- och transaktions-ID:n, kontrollsummor samt privata konto-, betalar-, belopps- och datumuppgifter från originalen återges inte i detta offentliga gitdokument. Referensens råvärde maskeras i fallbeskrivningen; dess ledande nolla, fälttyp och relation till de andra underlagen beskrivs oförändrat.
 
 | Kontroll | Observerat resultat |
 | --- | --- |
-| Mottagarens Bankgiro | `5819-7013` finns i det sparade XLSX-originalet. |
-| Referens | Exakt `0599`, med ledande nolla. Generisk betalningsreferens; fältet är inte styrkt som formell OCR. |
-| Belopp och datum | `625,00 SEK` / `62500` öre och datum `2026-10-26` i den valda rapportobservationen. Datumets rapportroll och eventuell profilbaserad valuta är fortfarande relevanta kontrollgränser. |
+| Mottagarens Bankgiro | [maskerat mottagar-Bankgiro] finns i det sparade XLSX-originalet. |
+| Referens | [maskerad referens med ledande nolla], bevarad exakt i originalet. Generisk betalningsreferens; fältet är inte styrkt som formell OCR. |
+| Belopp och datum | [maskerat originalbelopp] i SEK, representerat i heltalsören, och [maskerat originaldatum] i den valda rapportobservationen. Datumets rapportroll och eventuell profilbaserad valuta är fortfarande relevanta kontrollgränser. |
 | Original | Ägt sparat original kunde återläsas; byteantal/hash och parseromspelning passerade. Detta bevisar lagringsintegritet och de faktiskt lästa fälten, inte ensamt bankens autenticitet eller aktuell åtkomst. |
 | Betalare | Individuellt namn finns i rapporten med cellproveniens. Organisationsnummer saknas. Kundrelationen är inte verifierad. |
-| AIS | Separat sparad ekonomisk AIS-insättning finns för belopp/datum. Den har inte individuell betalare eller referens `0599`. Företagets eget Bankgironummer i AIS får inte behandlas som OCR. |
+| AIS | Separat sparad ekonomisk AIS-insättning finns för belopp/datum. Den har inte individuell betalare eller den valda rapportreferensen. Företagets eget Bankgironummer i AIS får inte behandlas som OCR. |
 | Rapport ↔ AIS | Gemensamt bankutfärdat insättnings-ID saknas. Ingen verifierad automatisk koppling finns. Belopp/datum räcker inte. |
 | Konto | Aktuell verifierad mottagarkontokoppling/behörighet saknas i kontrollen. |
-| Faktura | Ett separat sparat fakturaunderlag med nummer `0599` hittas, men någon motsvarande registrerad faktura finns inte. Dokumentförslaget är ingen registrering eller betalningsallokering. |
+| Faktura | Ett separat sparat fakturaunderlag med samma nummer som den valda rapportreferensen hittas, men någon motsvarande registrerad faktura finns inte. Dokumentförslaget är ingen registrering eller betalningsallokering. |
 | Ekonomi | En AIS-insättning räknas ekonomiskt, rapportobservationen räknas inte en andra gång. Noll allokeringar i det valda fallet; automatisk avstämning är blockerad. |
 | Automatisk rapportkälla | `DISABLED`, `SOURCE_NOT_CONFIGURED`, behörighetsstatus `UNKNOWN`; tom kö. |
 | Sökningens täckning | Den exakta originalrapportens läsning var komplett och oförändrad under kontrollen. Den bredare referenssökningen angav `complete: false` och `referenceSearchComplete: false`; den beskrivs inte som en fullständig inventering av alla möjliga underlag. |
