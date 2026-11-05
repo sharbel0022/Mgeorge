@@ -160,6 +160,24 @@ test('chargeback review preserves the domain explanation and historical allocati
  assert.doesNotMatch(html,/data-verification-state="VERIFIED"/);assert.deepEqual(state,before);
 });
 
+for(const [name,values,change,reason]of [
+ ['account hold',{},transaction=>{transaction.bankAccountIssue='Synthetic receiving account hold';},/Synthetic receiving account hold/],
+ ['unbacked detail original',{},transaction=>{transaction.bankDetails={status:'identified',party:'Unsupported detail payer',payerReference:'0599'};},/detaljuppgifter saknar ett kopplat original/],
+ ['missing payer',{party:''},()=>{},/individuell betalare eller mottagare/],
+ ['missing reference',{payerReference:''},()=>{},/Bankrapporterad betalningsreferens saknas/],
+ ['conflicting reference',{payerReference:'599'},()=>{},/avviker från den visade betalningsreferensen/],
+ ['collection without details',{party:'',payerReference:'',kind:'batch'},()=>{},/Individuella Bankgirodetaljer saknas/]
+])test('a chargeback review cannot hide '+name,()=>{
+ const state=emptyState(),transaction=payment({description:'Chargeback',...values});
+ change(transaction);state.transactions=[transaction];state.invoices=[invoice()];
+ state.allocations=[{id:'synthetic-allocation',invoiceId:'invoice-0599',transactionId:transaction.id,amount:62500,effect:'payment',active:true}];
+ const before=structuredClone(state),actual=view.bankPaymentView(state,transaction);
+ assert.equal(actual.decision.code,'BLOCKED');assert.match(actual.decision.reason,reason);
+ const html=render(ui.default,{state,transactions:[transaction],open(){}});
+ assert.match(html,/Blockerad/);assert.doesNotMatch(html,/data-verification-state="VERIFIED"/);
+ assert.deepEqual(state,before);
+});
+
 for(const [name,change]of [['unreviewed',{reviewed:false}],['missing original',{documentId:''}]])test('a recorded allocation cannot verify a known '+name+' invoice',()=>{
  const {state,transaction}=scenario();Object.assign(state.invoices[0],change);
  state.allocations=[{id:'synthetic-allocation',invoiceId:'invoice-0599',transactionId:transaction.id,amount:62500,effect:'payment',active:true}];

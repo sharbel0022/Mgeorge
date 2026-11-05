@@ -248,7 +248,10 @@ export function createPaymentPresentationReferenceMatcher(s:State){
 /** Read-only source assessment of a recorded allocation. It never creates,
  * reverses or authorizes a booking, and explicit refunds retain their direction. */
 export function recordedPaymentSourceIssue(s:State,t:Transaction,i:Invoice,effect:Allocation['effect'],facts=bankPaymentSourceFacts(t),referenceMatches=createPaymentPresentationReferenceMatcher(s)){
- const issue=allocationPaymentEvidenceIssue(s,t,effect)||paymentPresentationAccountIssue(s,t)||facts.detailIssue;if(issue)return issue;
+ // A payment-type review must not short-circuit independent source, direction
+ // or complete-reference checks. Presentation may keep a pure type review as
+ // REVIEW only after every hard evidence hold below has been evaluated.
+ const issue=paymentEvidenceIssue(s,t)||paymentPresentationAccountIssue(s,t)||facts.detailIssue;if(issue)return issue;
  if(!facts.payer)return 'Banken har inte styrkt en individuell betalare eller mottagare.';
  if(!facts.reference)return 'Bankrapporterad betalningsreferens saknas.';
  if(activeBankgiroLink(s,t.id))return 'Kopplingen mellan bankunderlagen är manuellt styrkt och behöver granskas separat.';
@@ -259,7 +262,7 @@ export function recordedPaymentSourceIssue(s:State,t:Transaction,i:Invoice,effec
  const policyIssue=referenceMatches.policyIssue(i,t);if(policyIssue)return policyIssue;
  if(i.voided||!referenceMatches(i,facts.reference)||references.some(reference=>!referenceMatches(i,reference)))return 'Den registrerade fakturakopplingen avviker från bankens bevarade betalningsreferens. Granska originalen; saldot ändras inte.';
  if(referenceMatches.owners(i.direction,references).some(other=>other.id!==i.id))return 'Flera fakturor äger bankens bevarade betalningsreferens. Granska fakturaidentiteten.';
- return '';
+ return allocationPaymentEvidenceIssue(s,t,effect);
 }
 const exactPaymentReference=(s:State,t:Transaction,i:Invoice)=>usablePaymentReference(t.payerReference)&&invoiceReferenceMatches(s,i,t.payerReference);
 /** Manual corrections never erase reference observations from retained bank sources. */

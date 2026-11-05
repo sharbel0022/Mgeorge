@@ -1,4 +1,4 @@
-import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,economicTransactions,bankPayerName,bankPaymentSourceFacts,recordedPaymentSourceIssue,paymentPresentationAccountIssue,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,invoiceReferenceMatches,invoiceReferenceDecision,type Invoice,type State,type Transaction} from './domain';
+import {activeBankgiroLink,bankgiroLinkCandidates,available,balance,economicTransactions,bankPayerName,bankPaymentSourceFacts,bankPaymentReviewReason,recordedPaymentSourceIssue,paymentPresentationAccountIssue,needsBankFileReview,needsBankFileValidation,needsPaymentSpecification,paymentInvoiceAssessment,paymentEvidenceConflict,paymentOriginalIssue,usablePaymentReference,invoiceReferenceMatches,invoiceReferenceDecision,type Invoice,type State,type Transaction} from './domain';
 import {exactReference} from './reconciliation-engine.js';
 import {matchingReferenceValues,ocrChecksum} from './payment-references.js';
 
@@ -79,6 +79,10 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   const contradictory=references.length>1&&!state.invoices.some(i=>references.every(value=>invoiceReferenceMatches(state,i,value)));
   const bankConflict=paymentEvidenceConflict(state,t),originalIssue=paymentOriginalIssue(state,t),conflict=bankConflict||!!evidence?.incomplete||!!evidence?.candidates.some(c=>c.validity==='checksum_invalid')||owners.size>1||contradictory;
   const sourceIssue=sourceLink?'':allocations.map(allocation=>{const invoice=invoices.find(item=>item.id===allocation.invoiceId);return invoice?recordedPaymentSourceIssue(state,t,invoice,allocation.effect):'Den registrerade fakturan saknas.';}).find(Boolean)||'';
+  // A chargeback/refund type is a review instruction, not an absent-original
+  // error. Keep all independent source/account/reference holds ahead of it.
+  const paymentTypeReview=!!sourceIssue&&assessment.status==='review'&&sourceIssue===bankPaymentReviewReason(t,state);
+  const detailIssue=bankPaymentSourceFacts(t).detailIssue;
   let status='Behöver granskas',verified=false;
   if(t.ignored)status='Undantagen';
   else if(t.duplicateOf)status='Möjlig dubblett';
@@ -114,13 +118,14 @@ export function bankPaymentView(state:State,t:Transaction,candidates:Candidate[]
   else if(bankConflict)block('Bankunderlagen är motstridiga.','Jämför de motstridiga originalen innan avstämning.');
   else if(originalIssue||needsBankFileValidation(t))block(originalIssue||'Bankoriginalet behöver verifieras.','Kontrollera det bevarade bankoriginalets integritet.');
   else if(accountIssue)block(accountIssue,'Kontrollera mottagarkontot mot bankens uttryckliga kontouppgifter.');
+  else if(detailIssue)block(detailIssue,'Kontrollera de separata detaljuppgifternas bevarade original och AIS-källa.');
   else if(policyIssue)block(policyIssue,'Granska fakturans avsedda referens, företagsregel och bevarade original.');
   else if(assessment.allocationConflict)block(assessment.message,'Granska fakturakopplingen mot den visade bankreferensen.');
-  else if(sourceIssue)block(sourceIssue,'Granska det bevarade bankunderlaget mot den registrerade fakturan.');
   else if(conflict)block('Referensen är ofullständig eller motstridig.','Kontrollera originalreferensen och eventuell OCR-kontroll.');
   else if(requiresSpecification&&!sourceLink)block('Individuella Bankgirodetaljer saknas.','Hämta en individuell betalningsspecifikation med betalare, referens och delbelopp.');
   else if(!fieldSources.payer.value)block('Banken har inte styrkt en individuell betalare eller mottagare.','Kontrollera betalaren i ett individuellt bankoriginal.');
   else if(!selectedReference)block('Bankrapporterad betalningsreferens saknas.','Kontrollera referensen i bankens individuella betalningsunderlag.');
+  else if(sourceIssue&&!paymentTypeReview)block(sourceIssue,'Granska det bevarade bankunderlaget mot den registrerade fakturan.');
   else if(assessment.status==='review')decision.reason=assessment.message;
   else if(intendedReferences.some(reference=>reference.conflict)){decision.reason='Fakturans uttryckliga referens avviker från bankrapporterad referens.';decision.next='Jämför den uttryckliga referensen i fakturaoriginalet med bankens original innan betalningskopplingen verifieras.';}
   else if(sourceLink){decision.reason='Underlagsrelationen är manuellt styrkt.';decision.next='Granska den manuella underlagsrelationen, kundrelationen och fakturan separat.';}

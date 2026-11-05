@@ -1,0 +1,917 @@
+{
+  "schema": "mgeorge-quality8-independent-assessment-candidate-v1",
+  "status": "candidate_for_independent_review_not_a_current_scorecard",
+  "created_at": "2026-11-05T22:17:29.233827+00:00",
+  "basis_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+  "assessed_runtime_source": "571073b8172ab53899a4ce3c2b717c7fe24daee2",
+  "published_baseline": {
+    "site_version": 63,
+    "main_commit": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+    "full_ci_tests": 5894,
+    "ci_run": "42081012356"
+  },
+  "old_draft": {
+    "path_as_read": "/tmp/rating8-assessment-draft.json",
+    "sha256": "d7b955c8559c10d4ef7f72bec46c6d8831a18c0024f6b957a4e0fe34120e37a3",
+    "treated_as": "historical_unaccepted_draft_not_ground_truth"
+  },
+  "method": {
+    "not_final": true,
+    "scale": "Halvpoäng är en konservativ ordinal bedömning, inte en formel av testantal eller procent.8 kräver PLAN:s normalflöde/gränser/evidens; 7–7,5 anger kvarstående relevant lucka, 6–6,5 stor aktuell drift- eller täckningslucka.",
+    "published_column": "Förslag till stöd för den faktiskt publicerade bf24/Site 63-versionen med senare kända motbevis. Inte en ny produktionsacceptans.",
+    "candidate_column": "Förslag efter exakt grön full CI, normal publicering och nödvändiga efterkontroller av samma runtime. Dessa steg antas inte redan genomförda; domänluckor blir inte godkända av CI.",
+    "scope_rule": "Tekniska register-/format-/säkerhetskriterier bedöms enligt PLAN utan krav på riktiga kundbetalningar eller kundutskick. Extern drift måste däremot ha verkliga aktuella observationer.",
+    "double_counting": "Ingen summering av överlappande testkörningar, geometrifall eller parsrar som delar samma OCR. Sammanställningar beräknas direkt från de 33raderna.",
+    "work_performed": "Läsande granskning av versionsbundna rapporter + en parallell läsande rimlighetskontroll. Inga nya tester, OCR-, produktions- eller kundanrop och inga ekonomiska writes."
+  },
+  "runtime_delta_to_base": {
+    "verified_with_git_diff": true,
+    "only_docs_and_responsive_test_harness_since_571073b": true
+  },
+  "new_operator_observations": {
+    "source_ref": "root_handoff",
+    "bank": {
+      "connected": false,
+      "revalidate_at": "2026-11-05T21:29:00Z",
+      "time_precision": "minute_from_handoff",
+      "code": "BANK_ACCOUNT_SCOPE_INVALID",
+      "saved_selected_account_count": 1,
+      "new_safe_diagnostic_published_at_cutoff": false
+    },
+    "gmail": {
+      "scheduled_hour": "2026-11-05T21:00:00Z",
+      "external_run_status": "completed",
+      "new_imports": 7,
+      "waiting_ocr_after_observation": 41
+    },
+    "ocr": {
+      "latest_observed_completed_at": "2026-11-05T18:23:31.509Z",
+      "current_operational_status": "stale_per_root_observation"
+    },
+    "backup": {
+      "verified_originals": 362,
+      "verified_bytes": 142968213,
+      "later_imports_included": false
+    }
+  },
+  "global_delivery_gates": [
+    {
+      "id": "G1",
+      "requirement": "Fulla obligatoriskaCI-grindar på exakt slutlig runtime, inklusive relevanta regressioner/beroendegranskning/bygge.",
+      "state_at_cutoff": "pending"
+    },
+    {
+      "id": "G2",
+      "requirement": "Normal merge/publicering med bevisat exakt källträd och slutfört deploymentkvitto.",
+      "state_at_cutoff": "pending"
+    },
+    {
+      "id": "G3",
+      "requirement": "Avgränsad publicerad UI-/status- och ekonomisk före/efterkontroll; inga QA-betalningar eller kundutskick.",
+      "state_at_cutoff": "pending"
+    }
+  ],
+  "aggregate": {
+    "plan_historical_score": {
+      "sum": 255.0,
+      "maximum": 330,
+      "average": 7.7272727272727275,
+      "at_least_8": 21,
+      "below_8_ids": [
+        5,
+        6,
+        10,
+        11,
+        18,
+        19,
+        20,
+        23,
+        28,
+        29,
+        31,
+        33
+      ]
+    },
+    "published_version_support_estimate": {
+      "sum": 251.0,
+      "maximum": 330,
+      "average": 7.606060606060606,
+      "at_least_8": 20,
+      "below_8_ids": [
+        2,
+        3,
+        4,
+        6,
+        10,
+        15,
+        16,
+        18,
+        19,
+        23,
+        25,
+        28,
+        33
+      ]
+    },
+    "post_delivery_candidate_score": {
+      "sum": 254.5,
+      "maximum": 330,
+      "average": 7.712121212121212,
+      "at_least_8": 25,
+      "below_8_ids": [
+        6,
+        10,
+        15,
+        16,
+        18,
+        19,
+        28,
+        33
+      ]
+    }
+  },
+  "all_33_at_least_8": false,
+  "sources": {
+    "plan": {
+      "path": "docs/quality8/PLAN.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "2b7c6e2bcfdd1c0c9d4929a96d9860925d44ed92fe6569c502e8057630a63b5a"
+    },
+    "published_release": {
+      "path": "docs/quality8/release-wave1.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "4f947d3dfbbf33ea8d82772ff2be6268e5c3779b6bd1ff908a0cd0297407b56e"
+    },
+    "published_receipt": {
+      "path": "docs/quality8/release-wave1.json",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "3c42c7e4a4d06a6f9c6c850cd9830e70c1dbdcfbdfa754fccda0b9d696d39d01"
+    },
+    "browser": {
+      "path": "docs/quality8/browser-wave2/README.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "51b11aa6df548a0c1cca193d065713daa9ca5f9a39ecb682b2b987604c480ed6"
+    },
+    "browser_receipt": {
+      "path": "docs/quality8/browser-wave2/final-observations.json",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "4d47d2404dee40730f950fd05ad5f036d54a7e4ecc38d8c752f5b776a1b8dfd7"
+    },
+    "overview_review": {
+      "path": "docs/quality8/overview-evidence-independent-review.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "d3b0ce2b1d130ab6bbde3a7acb97802257955fe6c3633c80b0e36fb9054462b9"
+    },
+    "search_focus": {
+      "path": "docs/quality8/search-focus-review.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "b795e5d3a0af367d407cae1869feccd70a3db8b2a35ed317ff8caa965605dc13"
+    },
+    "payments": {
+      "path": "docs/quality8/payments-evidence.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "38469dd286073c00a341d43f8726ea965960ad56de3973845480b100dfb2fcb2"
+    },
+    "payments_followup": {
+      "path": "docs/quality8/payments-review-followup.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "de601c78a35bf79915b623691bf737c79473c0cf12af88c0558f7e8e18f96dd4"
+    },
+    "manual_multiple": {
+      "path": "docs/quality8/manual-multiple-evidence.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "33693bc9a23e1eac79bd362952037e8fd0d5a5eb2fb24ae42e5be277342eb90f"
+    },
+    "manual_review": {
+      "path": "docs/quality8/manual-multiple-independent-review.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "316e760da07c34e623a9a12acd597edbd58dcae0363ca15e9a4fda144d5e9ee0"
+    },
+    "multiple_baseline": {
+      "path": "docs/quality8/multiple-invoice-existing-path-review.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "11b224881f4c0785c1469e360f9b153be8425ee265aa7af52ea9dadab9dba447"
+    },
+    "operations": {
+      "path": "docs/quality8/operations-evidence.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "bd4aa6ff9b6df12080187e5b93364578154b98b304db3a2d7e37ffe77ca98884"
+    },
+    "recovery": {
+      "path": "docs/quality8/recovery-evidence.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "24554c840d08e7b0574e11cabc96f46b346991c610ef22f60721128c4622209f"
+    },
+    "recovery_integrated": {
+      "path": "docs/quality8/recovery-integration-rerun.json",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "a1ca3e4082a2cd29b1db1aea182dce214d6c1e175c1d28ff5fdc13ae2081ce15"
+    },
+    "ocr_v2": {
+      "path": "docs/quality8/ocr-independent-holdout-v2-report.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "fec5118b1273c3a20866e9ab2b0d4ecc248e86a09e7beec471f498e576e18d70"
+    },
+    "ocr_v2_raw": {
+      "path": "docs/quality8/ocr-independent-holdout-v2-result.json",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "13557c3012331fa0101fbe3e6fe498fd2fbf3346b8740cfe5fe4b83e8393b6e7"
+    },
+    "ocr_v1": {
+      "path": "docs/quality8/ocr-independent-holdout-report.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "d6614ad4d1c8b426c0a75e368462c0907d6ac13260fdd924cdcc2b20d3bbb83b"
+    },
+    "documents": {
+      "path": "docs/quality8/documents-evidence.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "1b7eda0cff4a9dfebfda23232c8fab5a37b06153717377a6b1adfd5ef589b754"
+    },
+    "word_confidence": {
+      "path": "docs/quality8/documents-word-confidence.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "61255d73ee368003f3ad6b79c750479a10983c45614697c9716a3ec964a10261"
+    },
+    "integration_wave2": {
+      "path": "docs/quality8/integration-review-wave2.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "83ac32fd5dea9780c105eb61e50048c42898a6e4fc84ee2c6a0412670337c74b"
+    },
+    "saas": {
+      "path": "docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "0b6a7c7456d95dcc12fd8a7242ebb623ada52f71681b98f7a8c557cdd4112dad"
+    },
+    "historical_33": {
+      "path": "docs/FINAL-33-AREA-QUALITY-REPORT.md",
+      "repository_commit": "8fefb3ec9be16fcde3a32f33a24601c4f2402f79",
+      "sha256": "9971a19c4489a00d2b44d34d662f4d8d16e765d19ff083ebe03edca3932a18c4"
+    },
+    "bank_diagnostic_review": {
+      "path": "docs/quality8/bank-scope-diagnostic-review.md",
+      "repository_commit": "1ee480c1c3eaa6d6aef4116c9355b71a1e6e2bf6",
+      "sha256": "05db511578b74eab233701f8991efc235fa707a9b052d8c426cd2b235643c31d",
+      "note": "Separat oberoende reviewcommit efter bedömningsbasen; runtimefixen finns redan i 571073b. Ingen sådan dokumentfil påstås finnas i 8fefb3e."
+    },
+    "root_handoff": {
+      "kind": "parent_task_observation",
+      "recorded_in_this_assessment": true,
+      "date": "2026-11-05",
+      "independently_reread_production": false,
+      "scope": "Sanerade driftfakta uttryckligen tillhandahållna av root; dessa är inte egna nya produktionsanrop."
+    }
+  },
+  "rows": [
+    {
+      "id": 1,
+      "area": "Design",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Läsbara huvudvyer, tydlig informationshierarki och fungerande fel-/tomlägen; visuell kontroll av berörda vyer.",
+      "evidence_refs": [
+        "published_release",
+        "browser",
+        "historical_33"
+      ],
+      "basis": "Läsbara huvudvyer och fel-/tomtillstånd har publicerad desktopobservation; kandidatens ändrade vyer har faktisk lokal CUA.",
+      "remaining_for_8": "Ingen ny domänlucka utöver leveransgrindarna för kandidatens visuella ändringar.",
+      "scope_and_limitations": "25 geometrier och 3 interaktioner är lokal demoacceptans; ingen fysisk mobil- eller skärmläsarcertifiering.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 2,
+      "area": "Startsida",
+      "plan_historical_score": 8.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 7,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Sammanfattningar motsvarar källdata; okänd och föråldrad status visas korrekt.",
+      "evidence_refs": [
+        "published_release",
+        "overview_review",
+        "browser"
+      ],
+      "basis": "Site 63 har ett konkret falskt verifierat översiktsbelopp. Kandidatens gemensamma käll-/konto-/referenspolicy och19 egna negativa/positiva fall stänger fynden med bevarade bokade saldon.",
+      "remaining_for_8": "Publicera den granskade översiktsfixen efter exakt CI och kontrollera att den publicerade sammanfattningen visar registrerat/okänt korrekt mot samma källpolicy.",
+      "scope_and_limitations": "Lokala syntetiska projektioner är inte en fullständig revision av hela produktionsregistret.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 3,
+      "area": "Navigation",
+      "plan_historical_score": 8.5,
+      "old_draft_candidate_score": 8.5,
+      "published_version_support_estimate": 7.5,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Centrala arbetsflöden kan nås och lämnas med tangentbord och tydliga länkar.",
+      "evidence_refs": [
+        "published_release",
+        "search_focus",
+        "browser"
+      ],
+      "basis": "Tappat återgångsfokus är observerat i Site 63. Rättningen har beteendetester och faktisk lokal Escape/fokus-kontroll av kombinerad sökning.",
+      "remaining_for_8": "Leverera fokusfixen och gör en avgränsad publicerad tangentbordsresa genom sökning, öppning och stängning.",
+      "scope_and_limitations": "Ett extra Tab-cykelprov avbröts; det räknas inte som godkänt. Ingen grund för att ärva8,5 från äldre rapport.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 4,
+      "area": "Mobil",
+      "plan_historical_score": 8.5,
+      "old_draft_candidate_score": 7.5,
+      "published_version_support_estimate": 7.5,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Berörda huvudflöden fungerar vid 320, 390, 768, 1024 och 1440 px utan blockerande överlapp.",
+      "evidence_refs": [
+        "browser",
+        "browser_receipt",
+        "published_release"
+      ],
+      "basis": "Den aktuella lokala kontrollen hittade konkret320 px-överflöde och trånga datumfält; efter snäv CSS-fix passerar5 vyer × 5 verkliga CSS-bredder.",
+      "remaining_for_8": "Leverera samma granskade CSS och bind publicerat träd till den lokalt verifierade kandidaten; kontrollera att ingen publiceringsskillnad påverkar de berörda vyerna.",
+      "scope_and_limitations": "Iframe-vybredder är riktiga CSS-vybredder, men detta är inte fysisk telefon eller autentiserad produktionsresa. PLAN kräver inte fysisk mobil för 8.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 5,
+      "area": "Sök/filter",
+      "plan_historical_score": 7.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Kombinerade filter, svenska belopp/datum, referenser och tomträffar fungerar på båda implementationerna; relevanta prestandamätningar.",
+      "evidence_refs": [
+        "payments",
+        "payments_followup",
+        "published_release",
+        "browser"
+      ],
+      "basis": "Gemensam Node/Sites-sökning är publicerad, testad för svensk belopps-/datumkombination, ordordning, exakta referenser och tomfall; nya tvetydiga belopp har separat regression. Lokal CUA visar kombinerad verklig UI-sökning.",
+      "remaining_for_8": "Behåll exakta sök-/adapterregressioner i kandidatens fulla CI; ingen ny känd söklogiklucka.",
+      "scope_and_limitations": "10k syntetiska poster mäter lokal CPU, inte produktionens nätverk/rendering. Sökning skapar inga ekonomiska kopplingar.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 6,
+      "area": "Minimal manuell hantering",
+      "plan_historical_score": 6.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 6.5,
+      "post_delivery_candidate_score": 6.5,
+      "rating_is_final": false,
+      "rubric_for_8": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
+      "evidence_refs": [
+        "published_release",
+        "ocr_v2",
+        "root_handoff"
+      ],
+      "basis": "Tolv verkliga OCR-jobb gick framåt 18:13/18:23 men blev granskningsärenden. Senare kö 41 och stale OCR visar att normalflödet inte är uthålligt aktuellt; V2 saknar 40/100 obligatoriska värden.",
+      "remaining_for_8": "Återställ observerad aktuell köprogress genom hela avsedd kedja, visa säker återupptagning och mät hur ett godtagbart normalunderlag faktiskt når nästa korrekta steg utan fabricerat godkännande.",
+      "scope_and_limitations": "Gmailframgång är inte OCR-/registreringsframgång. Ingen scoreökning enbart av felavstående eller att granskning är säker.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    },
+    {
+      "id": 7,
+      "area": "Kundfakturor",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Skapa, kontrollera och visa fakturor utan felaktiga betalstatusar eller ägarblandning.",
+      "evidence_refs": [
+        "historical_33",
+        "saas",
+        "published_release",
+        "overview_review"
+      ],
+      "basis": "Befintliga skapa-/ägar-/belopps-/originalflöden har positiv och negativ regression samt full publicerad CI. Kandidatens verifieringspresentation bedöms särskilt i 2/25.",
+      "remaining_for_8": "Bevara dessa regressionsgrindar på levererad kandidat; inga nya bekräftade fel i kundfakturans register-/skapandeflöde.",
+      "scope_and_limitations": "Avser kodflödet och bevarade saldon, inte en ny verksamhetsattest eller kundfaktura skapad som QA.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 8,
+      "area": "Leverantörsfakturor",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Belopp, datum, motpart och original bevaras med samma gränser och kontroller som kundflödet.",
+      "evidence_refs": [
+        "historical_33",
+        "documents",
+        "saas",
+        "published_release"
+      ],
+      "basis": "Leverantörsregistreringens riktning, belopp, motpart, ägare och original har samma bevarandegränser som kundflödet. OCR-inläsningens dåliga täckning är separat öppet redovisad i 6/10.",
+      "remaining_for_8": "Bevara positiva manuella/korrekta textunderlag och negativa original-/riktningstester i exakt CI.",
+      "scope_and_limitations": "8 avser bevarande och registerflöde; det betyder inte att V2:s leverantörsnamn eller belopp återfinns automatiskt.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 9,
+      "area": "PDF",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Text- och bild-PDF hanteras, sid-/storleksgränser gäller och trasiga dokument stoppas begripligt.",
+      "evidence_refs": [
+        "documents",
+        "word_confidence",
+        "published_release"
+      ],
+      "basis": "Befintliga native/scanned-PDF-fall och sid-/storleks-/felgränser stöder PLAN:s avgränsade formatkrav. Det finns konkreta positiva PDF-fall, inte bara felavstående.",
+      "remaining_for_8": "Kandidatens ändrade PDF/OCR-importgraf måste ingå i fulla regressionsgrindar; inga kända formatgränsfel lämnas öppna.",
+      "scope_and_limitations": "Ingen generell korrekthetsgaranti för bild-PDF eller representativ fälttäckning följer av denna8. Rasterkvaliteten i 10 är underkänd och delas av optiska PDF-flöden.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 10,
+      "area": "Bild-OCR",
+      "plan_historical_score": 7.0,
+      "old_draft_candidate_score": 7.5,
+      "published_version_support_estimate": 6.5,
+      "post_delivery_candidate_score": 6.5,
+      "rating_is_final": false,
+      "rubric_for_8": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
+      "evidence_refs": [
+        "ocr_v1",
+        "ocr_v2",
+        "ocr_v2_raw"
+      ],
+      "basis": "Båda oberoende förstaproven är underkända. V2 på 571073b ger100 % precision men 60 % mandatory recall, 55,56 % bild9 och 0/10 kompletta dokument per parser; inga kritiskt falskt gröna.",
+      "remaining_for_8": "Generell fix med bibehållna säkerhetsspärrar, öppet namngiven regression på kända V1/V2 och ett nytt, före körning fryst oberoende hållprov som når minst 98 % precision/85 % recall för obligatoriska fält och det förregistrerade urvalet med alla 13 fält; stress ska avstå och dokumentnivå redovisas.",
+      "scope_and_limitations": "V2 får inte finjusteras eller beskrivas som ett nytt blint förstaprov efter omtolkning. Riktning är metadata, inte bildigenkänning.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    },
+    {
+      "id": 11,
+      "area": "Gmail",
+      "plan_historical_score": 7.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Aktuell lyckad hämtning, återförsök/dubblettskydd och synligt genomfört schema; inga mejl skickas av bakgrundsflödet.",
+      "evidence_refs": [
+        "published_release",
+        "operations",
+        "root_handoff"
+      ],
+      "basis": "Aktuell extern21Z-schemakörning är completed med 7 nya underlag. Tidigare app-/plattformsparade kvitton, återförsök och dedup finns; bakgrundsflödet skickar inga mejl.",
+      "remaining_for_8": "Behåll separata fetch-/bakgrundsstatusar och aktuell lyckad hämtning; inget konkret nytt Gmailhämtfel är visat.",
+      "scope_and_limitations": "21Z-uppgiften kommer från root, inte min nya produktionsläsning. waiting_ocr41 gör inte hela bakgrundskedjan grön.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 12,
+      "area": "Automatisk registrering",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Endast verifierad motpart och grön tolkning; atomär idempotens och återhämtning efter förlorat svar.",
+      "evidence_refs": [
+        "documents",
+        "saas",
+        "historical_33",
+        "published_release"
+      ],
+      "basis": "Verifierad motpart, grön tolkning, originalintegritet och atomär idempotens är explicit testade, inklusive positiva syntetiska native-PDF-/registreringsfall och återhämtning.",
+      "remaining_for_8": "Bevara positiva och negativa registreringsprov samt lost-response-/samtidighetsgrindar i full CI.",
+      "scope_and_limitations": "Detta bedömer registreringsvillkor och transaktionssäkerhet, inte hur stor del av verklig OCR som registreras automatiskt. Nya ekonomiska QA-skrivningar krävs inte.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 13,
+      "area": "Dubbletter",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Samma original eller betalning kan inte dubbelräknas vid omkörning eller samtidighet.",
+      "evidence_refs": [
+        "saas",
+        "payments",
+        "manual_review",
+        "published_release"
+      ],
+      "basis": "Original-, bank- och kvittodubbletter provas med omkörning, samtidiga processer, rollback och historiskt replay. Publicerad grund är fulltestad.",
+      "remaining_for_8": "Samma dubblett- och atomaritetskrav måste passera för den nya manuella vektorn i full CI.",
+      "scope_and_limitations": "Historiskt saknade originalkvitton återskapas inte. Ingen ny totalinventering av kundregistret är gjord.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 14,
+      "area": "Dokumentgranskning",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Original och osäkerhet kan granskas; korrigering påverkar rätt dokument och lämnar spår.",
+      "evidence_refs": [
+        "historical_33",
+        "word_confidence",
+        "manual_review",
+        "published_release"
+      ],
+      "basis": "Originalvisning, fel/retry, ändrad dokumentkontext och granskningsspår har konkreta tester; ordbevis förstärker kandidaten utan att göra osäker text till bankbevis.",
+      "remaining_for_8": "Bevara korrigerings-/kontext-/originaltester samt leverera de granskade tilläggen genom slutgrindarna.",
+      "scope_and_limitations": "Ingen faktisk massgodkänning av kundunderlag ingår; säker manuell granskning är en avsiktlig gräns.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 15,
+      "area": "Swedbank",
+      "plan_historical_score": 8.5,
+      "old_draft_candidate_score": 6.5,
+      "published_version_support_estimate": 6.5,
+      "post_delivery_candidate_score": 6.5,
+      "rating_is_final": false,
+      "rubric_for_8": "Aktuell godkänd anslutning och verifierad läsning av rätt valt konto; utgångna/återkallade medgivanden stoppas.",
+      "evidence_refs": [
+        "published_release",
+        "operations",
+        "bank_diagnostic_review",
+        "root_handoff"
+      ],
+      "basis": "connected=false. Ägarens kontroll 21:29 gav BANK_ACCOUNT_SCOPE_INVALID trots sparat urval 1 konto. Förbättrad säker reason finns granskad men var ännu inte publicerad vid bedömningsstoppet.",
+      "remaining_for_8": "Publicera säker diagnos, härled det faktiska avvisningsskälet och få aktuell bankgodkänd anslutning med verifierad läsning av rätt valt konto, med nödvändig ägarmedverkan.",
+      "scope_and_limitations": "Ett framtida samtyckesdatum, nytt felmeddelande eller grön CI återställer inte bankbehörighet. Ingen bankuppgift antas.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    },
+    {
+      "id": 16,
+      "area": "Automatisk bankhämtning",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 6.5,
+      "published_version_support_estimate": 6.5,
+      "post_delivery_candidate_score": 6.5,
+      "rating_is_final": false,
+      "rubric_for_8": "Aktuell genomförd körning med befintligt samtycke, hållbara återförsök och korrekt nästa tid.",
+      "evidence_refs": [
+        "published_release",
+        "operations",
+        "saas",
+        "root_handoff"
+      ],
+      "basis": "Senaste styrkta lyckade bankhämtning 08:05 är historisk; aktuell frånkoppling blockerar nytt normalt schemaflöde. Återförsök/kvot/fence har starka kodprov.",
+      "remaining_for_8": "Efter korrekt konto-/medgivandelösning behövs en aktuell faktiskt slutförd tillåten hämtning med korrekt konto, period/fullständighet, idempotens och nästa tid.",
+      "scope_and_limitations": "Syntetiska retry-/jobbkvitton eller säkert avvisad revalidering är ingen lyckad automatisk bankhämtning.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    },
+    {
+      "id": 17,
+      "area": "Bankgiro-import",
+      "plan_historical_score": 8.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Stödda originalformat bevaras och tolkas spårbart; manuell import och automatisk källa redovisas separat.",
+      "evidence_refs": [
+        "saas",
+        "payments",
+        "published_release"
+      ],
+      "basis": "Stödda manuella Bankgirooriginal och separat rapportproveniens är verifierade; icke-ekonomiska rapporter skapar inte extra pengar. PLAN skiljer uttryckligen manuell import och automatisk källa.",
+      "remaining_for_8": "Bevara original-/format-/dedupgränser och redovisa automatisk källa som ej konfigurerad tills verklig behörig källa finns.",
+      "scope_and_limitations": "8 gäller stödd manuell import. SOURCE_NOT_CONFIGURED får aldrig beskrivas som fungerande automatisk Bankgirotjänst.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 18,
+      "area": "Verklig betalare",
+      "plan_historical_score": 7.0,
+      "old_draft_candidate_score": 7,
+      "published_version_support_estimate": 7,
+      "post_delivery_candidate_score": 7,
+      "rating_is_final": false,
+      "rubric_for_8": "Källtyp och bevisnivå syns, korrekt betalare visas när bankunderlaget har den, saknad uppgift hålls okänd; verkligt underlag verifieras utan antaganden.",
+      "evidence_refs": [
+        "payments",
+        "overview_review",
+        "published_release",
+        "root_handoff"
+      ],
+      "basis": "Källtyp och saknad bankbetalare skiljs från fakturakund/manuell overlay. Den verkliga valda AIS-/rapportrelationen är fortfarande ofullständig; lokal syntetik fyller inte bankidentiteten.",
+      "remaining_for_8": "Verifiera ett relevant verkligt original med faktiskt bankstyrkt betalare och rätt konto/rapportrelation; visa det utan antaganden och behåll negativa saknat-/konfliktfall.",
+      "scope_and_limitations": "0 allokeringar och bevarad okänd betalare är korrekt säkerhet, inte ett positivt bevis på identifierad verklig betalare.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    },
+    {
+      "id": 19,
+      "area": "Verklig OCR/referens",
+      "plan_historical_score": 7.0,
+      "old_draft_candidate_score": 7,
+      "published_version_support_estimate": 7,
+      "post_delivery_candidate_score": 7,
+      "rating_is_final": false,
+      "rubric_for_8": "Bankens explicit angivna referens bevaras skild från förslag och fakturanummer; verkligt original verifieras.",
+      "evidence_refs": [
+        "payments",
+        "overview_review",
+        "published_release"
+      ],
+      "basis": "Exakta källreferenser och ledande nollor bevaras och visas separat från förslag. Komplett relevant verkligt original-/insättningsbevis saknas fortfarande.",
+      "remaining_for_8": "Verifiera faktisk explicit bankreferens i rätt original och relation; formell OCR får bara påstås när den typen är styrkt.",
+      "scope_and_limitations": "Fakturanummer, sökträff eller AI/manuell uppgift är inte bankens OCR-referens;0599/599 får inte likställas.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    },
+    {
+      "id": 20,
+      "area": "Automatisk matchning",
+      "plan_historical_score": 7.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Representativ separat acceptanskorpus med noll falskt säkra kopplingar, tydliga orsaker till avstående och atomärt idempotent resultat.",
+      "evidence_refs": [
+        "payments",
+        "payments_followup",
+        "published_release",
+        "manual_review"
+      ],
+      "basis": "Separat21-fallskorpus ger 21 rätt beslut,1 positivt VERIFIED och0 falskt VERIFIED i 20 avståendefall; förklaringar, heltalsören och befintlig atomär/idempotent skrivgräns provas.",
+      "remaining_for_8": "Bevara besluts-/skrivregressioner i exakt CI. Reell användning kräver därefter de bankfakta som 15–19 fortfarande saknar.",
+      "scope_and_limitations": "8 gäller matchningspolicy under giltiga verifierade indata; 21 syntetiska fall uppskattar ingen verklig falskmatchningsfrekvens och bevisar inte fungerande bankdrift.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 21,
+      "area": "Delbetalning",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Exakta heltalsören, korrekt restbelopp, återtag och samtidighetskontroller.",
+      "evidence_refs": [
+        "historical_33",
+        "payments",
+        "manual_multiple",
+        "manual_review",
+        "published_release"
+      ],
+      "basis": "Hela ören, fakturarest, återtag och samtidighet har befintliga tester; verkliga lokala API-/klientfall förstärker kandidatens underbetalningsväg.",
+      "remaining_for_8": "Full kandidat-CI ska bevara rätt rest och all-or-nothing vid underbetalning.",
+      "scope_and_limitations": "Ingen riktig delbetalning bokförs som kvalitetstest; ny manuell vektor stöder inte godtyckliga top-ups av befintliga par.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 22,
+      "area": "Överbetalning",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Överskott särskiljs och kan inte automatiskt fördelas utan giltig grund.",
+      "evidence_refs": [
+        "historical_33",
+        "manual_multiple",
+        "manual_review",
+        "published_release"
+      ],
+      "basis": "Överskott skiljs från fakturaskuld och godtycklig automatisk fördelning stoppas; nya explicita vektorn visar rest och nekar samtidig bankrest/fakturaskuld.",
+      "remaining_for_8": "Bevara överskotts-, refund- och atomaritetsgränser i exakt CI.",
+      "scope_and_limitations": "Ingen återbetalning utförs, och ingen fri allokering av återstående bankmedel antas.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 23,
+      "area": "Flera fakturor per betalning",
+      "plan_historical_score": 7.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 7.5,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Verifierade explicita fördelningar fungerar; tvetydiga delmängdssummor avstår; summor och samtidighet är säkra.",
+      "evidence_refs": [
+        "multiple_baseline",
+        "manual_multiple",
+        "manual_review",
+        "integration_wave2"
+      ],
+      "basis": "Publicerad befintlig väg kan inte atomärt fördela2+ explicita referenser. Ny 2–20-radsvektor, färsk quote/commit-fence, uttrycklig UI-bekräftelse och beständigt receipt är oberoende godkända efter tre stängda fynd.",
+      "remaining_for_8": "Full exakt CI, normal publicering och avgränsad kontroll att granskad ingång/etiketter finns i levererad UI; ingen riktig kundallokering behöver göras som QA.",
+      "scope_and_limitations": "C4 REVIEW blir inte automatiskt VERIFIED. D1-batch och R2-byteobjekt är inte en gemensam atomär transaktion; dokumenterade versions-/immutabilitetsgränser består.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 24,
+      "area": "Historik",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Källor och ändringar kan följas utan att förväxla tidigare och aktuella fakta.",
+      "evidence_refs": [
+        "historical_33",
+        "saas",
+        "manual_review",
+        "published_release"
+      ],
+      "basis": "Historik, audit och bevarade original/kvitton är spårbara; kandidaten läser ägt historiskt receipt även efter medgivandeåterkallelse utan ny ekonomisk skrivning.",
+      "remaining_for_8": "Leverera tydlig manuell provenance och historisk/aktuell statusseparation efter exakt CI; bevara behörighetsgrind vid kvittoläsning.",
+      "scope_and_limitations": "Historiskt receipt bevisar inte aktuellt samtycke eller saknade original.112 äldre API-poster saknar fortsatt kvitto.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 25,
+      "area": "Betalstatus",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 7,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Status beräknas från giltiga allokeringar och tillgängliga bankfakta; inaktuella resultat markeras.",
+      "evidence_refs": [
+        "published_release",
+        "overview_review",
+        "browser",
+        "manual_review"
+      ],
+      "basis": "Aktuell publicerad verifieringsmarkering kan vara falskt grön trots ofullständig källa; bokade saldon behöver bevaras. Oberoende granskad gemensam policy stänger source-/account-/reference-/refundfallen i kandidaten.",
+      "remaining_for_8": "Leverera granskad översikts-/detaljparitet med korrekt manuell historik och kontrollera publicerad visning mot samma källfakta.",
+      "scope_and_limitations": "Registrerad koppling och verifierad bankfakta är olika statusar. Ingen generell full omverifiering av gamla kunddata ingår.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 26,
+      "area": "Kontrollera alla betalningar",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Begränsad, återupptagbar körning med korrekt sammanfattning och felhantering.",
+      "evidence_refs": [
+        "published_release",
+        "historical_33",
+        "saas"
+      ],
+      "basis": "Begränsad återupptagbar kontroll är testad; faktisk kontroll gav0 automatiska matchningar och121 granskningsfynd. Sammanfattningen gör inte dessa till godkända betalningar.",
+      "remaining_for_8": "Bevara återupptagning, felstatus och korrekt sammanfattning i exakt CI.",
+      "scope_and_limitations": "En betalningskontroll avslutar inte automatiskt Gmailrun; den återstående separata efterkontrollen får inte döljas.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 27,
+      "area": "Mejlförslag",
+      "plan_historical_score": 8.0,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Korrekt underlag och förhandsgranskning; uttryckligt godkännande krävs före sändning.",
+      "evidence_refs": [
+        "historical_33",
+        "saas",
+        "published_release"
+      ],
+      "basis": "Utkast, underlag, förhandsgranskning och separat sändningsgodkännande omfattas av befintliga regressionsgrindar. Inga bakgrundsmejl skickades i observerad drift.",
+      "remaining_for_8": "Bevara uttryckligt godkännande och korrekt underlag i exakt CI.",
+      "scope_and_limitations": "Inga kundmejl skickas som QA. Syntetisk godkännandekontroll är inte leveransbevis för verklig e-post.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 28,
+      "area": "Schemaläggning",
+      "plan_historical_score": 6.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 6.5,
+      "post_delivery_candidate_score": 6.5,
+      "rating_is_final": false,
+      "rubric_for_8": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
+      "evidence_refs": [
+        "operations",
+        "published_release",
+        "root_handoff"
+      ],
+      "basis": "Gmailtimmen har flera verkliga lyckade körningar, inklusive21Z. OCR:s senaste faktiska körning18:23 är stale och kön har41 väntande; bankens schema kan inte visa aktuell lyckad drift medan anslutningen är bruten.",
+      "remaining_for_8": "Observera färsk OCR-schemakörning/återhämtning med faktisk köprogress och korrekt sen-/paus-/överlappstatus; bankjobb ska antingen fungera med aktuell behörighet eller vara tydligt blockerat utan falskt grönt.",
+      "scope_and_limitations": "Enstaka tidigare6 + 6 OCR-jobb och konfigurationsflaggor bevisar inte ett fungerande aktuellt schema. Ingen generell schema-SLA är uppmätt.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    },
+    {
+      "id": 29,
+      "area": "Backup",
+      "plan_historical_score": 7.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Aktuell krypterad backup är fullständigt kontrolläst; filantal, originalhashar och slutförandetid redovisas.",
+      "evidence_refs": [
+        "recovery",
+        "published_release",
+        "root_handoff"
+      ],
+      "basis": "Dagens frysta krypterade backup är faktiskt kontrolläst362/362 och142968213byte med completion 16:55. Detta uppfyller PLAN:s verifieringspass för snapshoten.",
+      "remaining_for_8": "Behåll snapshotens exakta datagräns synlig och kontrollera nästa ordinarie backup; påstå inte att senare importer ingår.",
+      "scope_and_limitations": "Statusens skapandetid 01:17 är inte självständigt verifierad intern snapshot-tid. Ingen extern reservkopia eller fullständig aktuell totaldatamängd styrks.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 30,
+      "area": "Säkerhet",
+      "plan_historical_score": 8.5,
+      "old_draft_candidate_score": 8.5,
+      "published_version_support_estimate": 8.5,
+      "post_delivery_candidate_score": 8.5,
+      "rating_is_final": false,
+      "rubric_for_8": "Ägar-/företagsgränser, sekretess, godkännanden och ekonomisk integritet bevaras; relevanta negativa tester och beroendegranskning.",
+      "evidence_refs": [
+        "saas",
+        "published_release",
+        "manual_review",
+        "bank_diagnostic_review"
+      ],
+      "basis": "Ägare/företag/roll, original, återkallelse, godkännande, korruption och atomära ekonomiska spärrar har bred negativ acceptans och oberoende review. Publicerad bas har full säkerhets-CI.",
+      "remaining_for_8": "Kandidatens nya yta behöver exakt full CI/audit och bevarade auth-/ekonomiska gränser före slutförd bedömning.",
+      "scope_and_limitations": "Senast styrkt audit:0 produktionsfynd,8 moderate utvecklingsfynd,0 high/critical; det är inte en ny audit av slutträdet eller en full penetrationstest/avtalsacceptans.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 31,
+      "area": "Katastrofåterställning",
+      "plan_historical_score": 5.5,
+      "old_draft_candidate_score": 8,
+      "published_version_support_estimate": 8,
+      "post_delivery_candidate_score": 8,
+      "rating_is_final": false,
+      "rubric_for_8": "Isolerad återställningsövning med faktisk backup-/restore-kod, mätt RPO/RTO och kontroller av original, register, betalningar, korruption och fel ägare. Ingen återställning över produktion.",
+      "evidence_refs": [
+        "recovery",
+        "recovery_integrated"
+      ],
+      "basis": "Isolerad övning använder verklig backup/export/restorekod,362 original,27 tabeller, oberoende hash-/ledgeracceptans och 8 negativa fall. Relevanta källor är byteidentiska vid integrerad kontroll.",
+      "remaining_for_8": "PLAN:s avgränsade övningskrav är uppfyllt; bevara källparitet eller gör en ny namngiven övning om återställningskoden ändras.",
+      "scope_and_limitations": "3,417 s gäller lokal restore+acceptans med paket redan tillgängligt.15 min RPO är simulerat. Extern nyckel/kopia, molnnedladdning och tjänsteaktivering är inte verifierade.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 32,
+      "area": "Kod/tester",
+      "plan_historical_score": 8.5,
+      "old_draft_candidate_score": 8.5,
+      "published_version_support_estimate": 8.5,
+      "post_delivery_candidate_score": 8.5,
+      "rating_is_final": false,
+      "rubric_for_8": "Berörda regressioner, oberoende granskning och fulla obligatoriska CI-grindar på exakt levererad kod.",
+      "evidence_refs": [
+        "published_release",
+        "integration_wave2",
+        "manual_review",
+        "overview_review",
+        "bank_diagnostic_review"
+      ],
+      "basis": "Site 63/main bf24 har exakt5 894 pass. Wave 2 har starka reproducerbara fokusbevis och stängda oberoende fynd men ännu ingen full slut-CI vid bedömningsstoppet.",
+      "remaining_for_8": "Alla obligatoriska Node/Sites/bridge-, syntax-, typ-, audit- och bygggrindar måste passera exakt det slutliga leveransträdet; bind även main/publicering till det trädet.",
+      "scope_and_limitations": "Nu-kolumnens8,5 gäller publicerade bf24. Den säger inget om att wave 2:s ofullständiga/avbrutna helkörning är grön. Fokustestantal adderas inte dubbelt.",
+      "post_delivery_status": "rubric_supported_if_delivery_gates_pass"
+    },
+    {
+      "id": 33,
+      "area": "Verklig produktionsverifiering",
+      "plan_historical_score": 6.5,
+      "old_draft_candidate_score": 7,
+      "published_version_support_estimate": 7,
+      "post_delivery_candidate_score": 7,
+      "rating_is_final": false,
+      "rubric_for_8": "Levererad version kopplas till exakt källträd; bank/Gmail/OCR/backup har relevanta aktuella observationer och ekonomiska skydd jämförs före/efter.",
+      "evidence_refs": [
+        "published_release",
+        "browser",
+        "root_handoff",
+        "ocr_v2",
+        "recovery"
+      ],
+      "basis": "Site 63/main bf24 och faktisk Gmail/OCR/backup är versionsbundet styrkta, men banken är frånkopplad, OCR-drift stale och wave 2/publicerad autentiserad UI-verifiering saknas vid stoppet.",
+      "remaining_for_8": "Exakt godkänd CI och publicering, relevanta aktuella bank/Gmail/OCR/backupobservationer och jämförelse av utvalda ekonomiska skydd före/efter; autentiserad ägarresa där den behövs.",
+      "scope_and_limitations": "Lokala25/25 är inte inloggad produktion eller fysisk mobil. Full ekonomirevision och bankbekräftad betalidentitet kan inte härledas ur syntetiska prov.",
+      "post_delivery_status": "still_below_8_after_delivery_without_new_domain_evidence"
+    }
+  ],
+  "independent_crosscheck": {
+    "mode": "read_only_parallel_peer",
+    "key_findings": "Aktuell 2/25 och 3/4 ska inte ärva äldre 8/8,5; lokala CUA och granskade fixes stöder villkorad 8.29/31 har konkret stöd inom PLAN.32 måste versionssepareras. Ingen generell sänkning av alla tekniska8 enbart för att verkliga ekonomiska QA-skrivningar saknas."
+  }
+}
