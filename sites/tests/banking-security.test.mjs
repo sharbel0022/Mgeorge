@@ -589,6 +589,9 @@ test('Legacy D1 keys cannot authorize any provider call when runtime configurati
   await assert.rejects(f.service.sync(post('sync')), /giltig bankanslutning/);
   const status = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
   assert.equal(status.configured, false); assert.equal(status.connection.status, 'reauth_required');
+  assert.equal(status.connection.connectionStatus, 'configuration_required');
+  assert.equal(status.connection.blockedReason, 'BANK_CONFIGURATION_REQUIRED');
+  assert.equal(status.connection.nextAction, 'configure_service');
   assert.equal(f.calls.length, 0);
   f.env.ENABLE_BANKING_KEY_ROTATED = 'false';
   assert.equal(f.store.configurationStatus().code, 'BANK_KEY_ROTATION_REQUIRED');

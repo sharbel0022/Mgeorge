@@ -284,7 +284,11 @@ export async function status(request: Request): Promise<Response> {
       nextAttemptAt: conn && conn.auto_sync_enabled === 1 && health.syncAllowed ? automaticDueAt(conn) : null,
       blocked: (conn?.sync_failures||0)>=3, failures:conn?.sync_failures||0 },
     connection: conn ? {
-      id: conn.id, bankName: conn.bank_name, environment: conn.environment, status: health.status,
+      id: conn.id, bankName: conn.bank_name, environment: conn.environment,
+      // Existing clients understand reauth_required. The additive assessment
+      // distinguishes operator configuration from a new customer signature.
+      status: health.status === 'configuration_required' ? 'reauth_required' : health.status,
+      connectionStatus: health.status,
       requiresReauthentication: health.requiresReauthentication, blockedReason: health.blockedReason, nextAction: health.nextAction,
       statusEvidence: health.evidence, diagnostic,
       consent: { version: 'bank-consent-v1', companyId: savedConsent?.companyId ?? company.companyId,

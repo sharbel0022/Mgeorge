@@ -44,6 +44,8 @@ Den gemensamma lokala hälsokontrollen skiljer mellan frånkoppling, pågående 
 
 Statussvaret behåller tidigare fält och kompletteras med `connectionStatus`, `requiresReauthentication`, `blockedReason`, `nextAction`, `syncAllowed`, `statusEvidence` och en säker diagnos. `statusEvidence=stored_connection` anger uttryckligen att inget nytt banksvar har hämtats. Ett återautentiseringskrav ger inget utlovat nytt schemalagt försök.
 
+Det etablerade `connection.status` behåller `reauth_required` vid saknad serverkonfiguration för äldre konsumenter. Det nya `connection.connectionStatus=configuration_required`, tillsammans med `nextAction=configure_service`, anger att operatörskonfiguration behöver åtgärdas. GitHubs första fulla körning fångade den kompatibilitetsavvikelsen; det befintliga säkerhetstestet behölls och kompletterades med assertioner för den nya diagnosen.
+
 Läsroller kan läsa befintlig bankstatus med uttrycklig läsbehörighet. Förvaltning och synk behåller standardkravet på hanteringsbehörighet; regressioner verifierar att viewer/accountant inte får `syncControl`-åtkomst genom statusrättningen.
 
 Kontovalideringen har tolv fasta orsaker, exempelvis `CURRENT_ACCOUNT_INVENTORY_MISMATCH`, `CONSENT_ACCOUNT_INVENTORY_CHANGED`, `ACCOUNT_IDENTITY_CHANGED` och `SELECTED_ACCOUNT_UNAVAILABLE`. Själva kontovärdet, IBAN, medgivande, token och rått providerfel sparas inte i diagnosen. Felklassens privata proveniens används; ändrade publika fält, anpassade feltexter, getter-funktioner och förfalskade prototyper kan inte bli diagnostiskt bevis. Även Enable-providerfel får kanonisk publik/persisterad text.
@@ -76,7 +78,7 @@ Befintlig pagination och identitetsmodell bevaras: Enable fortsätter genom `con
 | S1 | [Swedbank Open Banking FAQ](https://www.swedbank.com/openbanking/faq.html) | Svensk redirect-SCA/BankID och företagsadministratörens roll vid saknad Open Banking-behörighet. |
 | S2 | [Swedbank PSD2 onboarding](https://www.swedbank.com/openbanking/contact-us-openbanking/golive.html) | Direkt TPP-integration kräver relevant tillstånd, registrering och QSEAL/QWAC. Dessa direktkrav ska inte automatiskt tillskrivas aggregatorns kundmodell. |
 
-Swedbanks aktuellt länkade svenska PDF-adress gav HTTP 403 vid verifiering. Den inloggade portalversionen har därför inte certifierats som åtkomlig. Norges separata API-dokumentation används inte som ersättning för svenska produktionskrav. Generella eller äldre uppgifter om antal medgivandedagar hårdkodas inte; faktisk leverantörs-/bankgiltighet styr.
+Swedbanks aktuellt länkade svenska PDF-adress gav HTTP 403 vid verifiering. Den inloggade portalversionen har därför inte certifierats som åtkomlig. Norges separata API-dokumentation används inte som ersättning för svenska produktionskrav. Ingen ny livslängdsregel införs från äldre FAQ-uppgifter. Befintliga försiktiga applikationsgränser kan begränsa den begärda perioden; validerad leverantörs-/bankgiltighet är fortfarande en övre gräns.
 
 ## Externa krav innan verklig produktionsacceptans
 
