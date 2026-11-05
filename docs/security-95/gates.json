@@ -1,0 +1,444 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-05T18:11:16.926228+00:00",
+  "branch": "feature/95-security",
+  "baseCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "localNode": "24.22.1",
+  "npm": "11.9.0",
+  "platform": "Linux",
+  "source": {
+    "sha256": "010b3cf052e58a2913a1003cfa2e8a0c7d00f986acfeb53e839ad1bcd595c25b",
+    "fileCount": 798,
+    "excluded": [
+      "docs/",
+      "PROGRESS.md",
+      "QUALITY-SCORECARD.md"
+    ],
+    "algorithm": "SHA-256 of compact Python json.dumps(sorted relative-path to file-SHA256 mapping, sort_keys=True, separators=(comma,colon)); repository tracked and nonignored untracked files, excluded documentation only.",
+    "changedSourceFiles": {
+      "scripts/run-saas-security-acceptance.mjs": "e6a18d4653b8d47ad910924be37bf2142587ffccdd56ee8414fcbc3888e79c93",
+      "sites/app/api/state/route.ts": "e832f03cfdd93af9948fd7c475a4ff49b78e22bac9516e32faf2a2daaf8332a6",
+      "sites/lib/backup-engine.ts": "16c9c727c469d7083b917087eae852a07334888748e8d0041e404aca1296fd0c",
+      "sites/lib/server.ts": "1ede90e5fc3a956e369625aee6c886aaa63bd175684fadce827ac0b8cd366b45",
+      "sites/tests/backup-integrity-q8.test.mjs": "8a7fa4cf88bc1a6ff181fc54f3015b5d34605f2deed087c43bf91cbaa5fe781a",
+      "sites/tests/bank-state-integrity-q8.test.mjs": "6a45cc3679be399325ca5a148d1e9b304ef1bcf2af80ab9133344db21a6b02ea",
+      "sites/tests/company-request.test.mjs": "932659cf731466c6572c43a3c44778d721f4069e11fc9ec800df6855b0383a57",
+      "sites/tests/security-request-budget.test.mjs": "3de21c7a49ae0206c42c03f53d015cb975f7545e8d59f0107096ffcf4896daf0",
+      "src/login-rate-limit.js": "b99d802e8b221697f16df0a58a07b49c88172561729ed248392dbf6702d35ddb",
+      "src/server.js": "6e5aa81547d55debb6de7e0e79881b2b67c48ff4253d2bd948444942bd181a58",
+      "test/saas-security-runner.test.js": "7814c98c0d67cc5b1761e207dcf4796d14c4c5d629d29c679cf51b7136cc19cd",
+      "test/security-login-rate-limit.test.js": "2ddb3b0b528a6d457a7985849f48fe4615e61a69a3e686c3731b0f0429a6b2ab"
+    },
+    "previousSha256": "64f29b5e6f275c319970e27bbb154b6758bfa3b75c8d2d227387d8cf5b072721",
+    "correctionPaths": [
+      "sites/app/api/state/route.ts"
+    ],
+    "scopeNote": "Root runtime, test and shared-library inputs were unchanged during a Sites-route-only audit correction. Root full run started before that correction. Final Sites full run, focused acceptance, types and build ran after it. Other Node/bridge gates remain applicable to unchanged inputs."
+  },
+  "installations": [
+    {
+      "cwd": ".",
+      "command": [
+        "npm",
+        "ci",
+        "--ignore-scripts",
+        "--prefer-offline",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "exitCode": 0,
+      "logSha256": "8293a36a4b4e43307f1025de8832120ed2777740c08e9d55a20a4bc23ba37e36",
+      "note": "Completed before final gates; package and lock inputs unchanged since installation."
+    },
+    {
+      "cwd": "sites",
+      "command": [
+        "npm",
+        "run",
+        "install:ci"
+      ],
+      "exitCode": 0,
+      "logSha256": "e95f9350ac437052508fdd416cd1b1b402d96e9ddbc4bb7b4ee931f2ba3db1ad",
+      "note": "Completed before final gates; package and lock inputs unchanged since installation."
+    },
+    {
+      "cwd": "bridge/bankgiro",
+      "command": [
+        "npm",
+        "ci",
+        "--ignore-scripts",
+        "--prefer-offline",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "exitCode": 0,
+      "logSha256": "03db65cb9f081700eedbef7d07e35e61d434837862b518fb544af8d4bd3fd4d0",
+      "note": "Completed before final gates; package and lock inputs unchanged since installation."
+    }
+  ],
+  "gates": [
+    {
+      "name": "root-syntax",
+      "cwd": ".",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "startedAt": "2026-11-05T17:52:50.570607+00:00",
+      "completedAt": "2026-11-05T17:53:16.284323+00:00",
+      "elapsedSeconds": 25.714,
+      "exitCode": 0,
+      "counts": {},
+      "logSha256": "5116b6fbcf0c00984b3f0fa268c450887bd56776381a55fe13b1a0c91c77e60c",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "root-tests",
+      "cwd": ".",
+      "command": [
+        "npm",
+        "run",
+        "test:isolated"
+      ],
+      "startedAt": "2026-11-05T17:52:19.192201+00:00",
+      "completedAt": "2026-11-05T18:02:05.421351+00:00",
+      "elapsedSeconds": 586.229,
+      "exitCode": 0,
+      "counts": {
+        "tests": 1905,
+        "suites": 0,
+        "pass": 1905,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "15984c0b58b2d3130004756a8aef5bd278fe6d8fe96fda510ae625e536a79dce",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "bridge-syntax",
+      "cwd": "bridge/bankgiro",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "startedAt": "2026-11-05T17:52:50.702047+00:00",
+      "completedAt": "2026-11-05T17:52:52.185426+00:00",
+      "elapsedSeconds": 1.483,
+      "exitCode": 0,
+      "counts": {},
+      "logSha256": "e795c43ec03e7487aab408cd3c0efdd37df0d691297af89b42d6c093b448e6f2",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "bridge-tests",
+      "cwd": "bridge/bankgiro",
+      "command": [
+        "npm",
+        "run",
+        "test:isolated"
+      ],
+      "startedAt": "2026-11-05T17:52:19.198957+00:00",
+      "completedAt": "2026-11-05T17:52:35.470740+00:00",
+      "elapsedSeconds": 16.272,
+      "exitCode": 0,
+      "counts": {
+        "tests": 47,
+        "suites": 0,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "a19565c67bc06e7d37e7f8d92db939afd76f52e3bbf10dce861925cb5b7da916",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "sites-types-final",
+      "cwd": "sites",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "startedAt": "2026-11-05T18:04:58.732279+00:00",
+      "completedAt": "2026-11-05T18:05:18.218585+00:00",
+      "elapsedSeconds": 19.486,
+      "exitCode": 0,
+      "counts": {},
+      "logSha256": "9a9df77b5312302129b33fb17ad560345605c381f472ccc40b22c19fa369cebf",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "sites-tests-final",
+      "cwd": "sites",
+      "command": [
+        "npm",
+        "run",
+        "test:isolated"
+      ],
+      "startedAt": "2026-11-05T17:59:00.766535+00:00",
+      "completedAt": "2026-11-05T18:07:59.137053+00:00",
+      "elapsedSeconds": 538.371,
+      "exitCode": 0,
+      "counts": {
+        "tests": 3776,
+        "suites": 0,
+        "pass": 3776,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "a1686de61a8bb3babcd360fa41070a3dcdba89f32bce65113886e8078cc85d53",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "minimatch-bytes",
+      "cwd": "sites",
+      "command": [
+        "node",
+        "scripts/minimatch-backport.mjs",
+        "--check",
+        "--require-target"
+      ],
+      "startedAt": "2026-11-05T17:52:50.555114+00:00",
+      "completedAt": "2026-11-05T17:52:53.217736+00:00",
+      "elapsedSeconds": 2.663,
+      "exitCode": 0,
+      "counts": {},
+      "logSha256": "03436c145f530b2840b889abbdfdc8cc588772302aa0ee8e3a20bf5daf58620c",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "sites-build-final",
+      "cwd": "sites",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "startedAt": "2026-11-05T18:05:58.497760+00:00",
+      "completedAt": "2026-11-05T18:06:21.211086+00:00",
+      "elapsedSeconds": 22.713,
+      "exitCode": 0,
+      "counts": {},
+      "logSha256": "732ed52fc1e096cbdb313b8a8350735546cb6160aa757df540fa00d60c815925",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "production",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    },
+    {
+      "name": "focused-acceptance",
+      "cwd": ".",
+      "command": [
+        "node",
+        "scripts/run-saas-security-acceptance.mjs",
+        "<isolated-output-directory>"
+      ],
+      "startedAt": "2026-11-05T18:00:06.681909+00:00",
+      "completedAt": "2026-11-05T18:03:58.096927+00:00",
+      "elapsedSeconds": 231.415,
+      "exitCode": 0,
+      "counts": {},
+      "logSha256": "a4d065a96c97334a37f3338c0bbc89fa85524a159e802ae343c30e45ccb1362a",
+      "sanitizedEnvironment": true,
+      "networkGuard": "test:isolated or explicit preload for test commands; no provider calls authorized",
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      }
+    }
+  ],
+  "fullSuiteTotals": {
+    "tests": 5728,
+    "pass": 5728,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "focusedAcceptance": {
+    "node": 331,
+    "sites": 767,
+    "overlapsFullSuites": true,
+    "report": "focused-acceptance.json"
+  },
+  "audits": [
+    {
+      "name": "root-audit",
+      "command": [
+        "npm",
+        "audit",
+        "--audit-level=high",
+        "--json"
+      ],
+      "exitCode": 0,
+      "observedAt": "2026-11-05T17:59:37.904309+00:00",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "packages": [],
+      "auditSha256": "3a562f88d81e7f36d2e3d0d1a86abf500fdf10272f5f713a155b3602d8ebf832"
+    },
+    {
+      "name": "sites-audit",
+      "command": [
+        "npm",
+        "audit",
+        "--audit-level=high",
+        "--json"
+      ],
+      "exitCode": 0,
+      "observedAt": "2026-11-05T17:59:42.876281+00:00",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 8,
+        "high": 0,
+        "critical": 0,
+        "total": 8
+      },
+      "packages": [
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser",
+        "@typescript-eslint/type-utils",
+        "@typescript-eslint/typescript-estree",
+        "@typescript-eslint/utils",
+        "eslint-config-next",
+        "minimatch",
+        "typescript-eslint"
+      ],
+      "auditSha256": "cc3c964c3e51f9b56d51500896ed239fd436e085666a136c9f3611a87ace2412"
+    },
+    {
+      "name": "sites-production-audit",
+      "command": [
+        "npm",
+        "audit",
+        "--omit=dev",
+        "--audit-level=high",
+        "--json"
+      ],
+      "exitCode": 0,
+      "observedAt": "2026-11-05T17:59:36.020320+00:00",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "packages": [],
+      "auditSha256": "7323c656c0262fdd461ba3aaa1571d85c8858a17d76f87f78f9fd12f95a55e2a"
+    },
+    {
+      "name": "bridge-audit",
+      "command": [
+        "npm",
+        "audit",
+        "--omit=dev",
+        "--audit-level=high",
+        "--json"
+      ],
+      "exitCode": 0,
+      "observedAt": "2026-11-05T17:59:36.020320+00:00",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "packages": [],
+      "auditSha256": "74b9f06500613f856683fe87b372f7b3592c019e4cffdf8c3c63069a75dc0ec1"
+    }
+  ],
+  "independentReview": {
+    "verdict": "READY_WITH_LIMITS",
+    "reviewerReportedPassingTests": 81,
+    "overlapsFullSuites": true,
+    "report": "independent-review.md"
+  },
+  "nonpassingDevelopmentRuns": [
+    {
+      "name": "initial exploratory Node/Sites runs",
+      "finalEvidence": false,
+      "reason": "Code changed while queued test files were still pending; includes a fixed unread multipart regression."
+    },
+    {
+      "name": "sites-tests-before-audit-correction",
+      "exitCode": 130,
+      "finalEvidence": false,
+      "reason": "Stopped after existing Bankgiro audit-contract assertion failed; corrected without weakening assertion, then57/57 targeted and3776/3776 full Sites passed."
+    },
+    {
+      "name": "direct minimatch tests during supply-chain review",
+      "pass": 39,
+      "tests": 40,
+      "finalEvidence": false,
+      "reason": "One test required npm_execpath; rerun1/1 with real npm path passed. Final full Sites via npm passed both files."
+    }
+  ],
+  "productionAcceptance": "NOT_VERIFIED",
+  "commercialLaunch": "NOT_APPROVED",
+  "remoteCI": "Recorded separately by GitHub on the published pull request; local Node24 does not substitute Node22 CI."
+}

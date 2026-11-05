@@ -135,3 +135,22 @@ test('historical completed copies keep their original timestamp and expose their
  assert.equal(result.verification_scope,'copy_readback');assert.equal(result.verified_files,0);
  assert.equal(f.gets.length,0);assert.equal(f.puts.length,0);
 });
+
+for (const invalidDocumentId of ['a'.repeat(36), '-'.repeat(36)]) {
+  test(`backup rejects noncanonical document IDs before writing a snapshot (${invalidDocumentId[0]})`, async t => {
+    const f = fixture(t, 1);
+    const originalKey = `${owner}/${id(0)}`;
+    const originalBytes = f.objects.get(originalKey);
+    f.sql.prepare('UPDATE documents SET id=? WHERE owner=? AND id=?').run(invalidDocumentId, owner, id(0));
+    f.objects.delete(originalKey);
+    f.objects.set(`${owner}/${invalidDocumentId}`, originalBytes);
+    const sourceBefore = f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(owner).payload;
+    await backupStep(f.db, f.bucket, owner, key, at);
+    assert.equal(f.row().state, 'failed');
+    assert.equal(f.row().last_error, 'backup_document_invalid');
+    assert.ok(!f.row().finished_at);
+    assert.deepEqual(f.puts, []);
+    assert.equal(f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(owner).payload, sourceBefore);
+    assert.deepEqual(f.objects.get(`${owner}/${invalidDocumentId}`), originalBytes);
+  });
+}

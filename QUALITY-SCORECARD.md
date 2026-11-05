@@ -1,5 +1,24 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 7 — säkerhet och driftsäkerhet, 2026-11-05
+
+[Rapport och kvarstående risker](docs/SECURITY-95-REVIEW.md) gäller
+`feature/95-security` från den integrerade basen `4ad205b`. Syntetiska
+förbättringar styrker inte ensamma 9,5/10 i drift. **Alla 33 poäng är
+oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
+| Område | Före | Efter | Nytt verifierat bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 29. Säkerhetskopiering | 7,5 | 7,5 | Producent och recovery kräver samma UUID-format; två RED/GREEN-fall stoppar oåterställbara snapshots före R2-skrivning och bevarar original. | Ingen ny fullständig produktionsbackup-/offsite-/nyckelkontroll. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Beständig atomisk loginbudget, ingress före kloning, accepterade auditprojektioner, återtestade tenant/session/OAuth-gränser och oberoende review. | Produktionsingress, nyckelrotation och dataskyddslivscykel är inte verifierade; äldre Node-token-AAD och övergripande trafikskydd kvarstår. |
+| 31. Katastrofåterställning | 5,5 | 5,5 | Isolerade syntetiska corruption-/restore-/restart-/leasefall i fullsviterna; formatfelet rättat utan att ändra produktionskopior. | Aktuell fullständig återställning, oberoende kopia/nyckel och uppmätt RPO/RTO saknar nytt operativt kvitto. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | 1 905 + 3 776 + 47 = 5 728 pass, 0 fail/skip/cancel/TODO; 26 nya regressioner. Syntax173, typer, build, exakta beroendebytes och high-audits godkända. Testbarn ärver inte operatörens Node-startflaggor. | Åtta moderate utvecklingspaketposter för en mitigierad advisory; repo-mergekrav overifierade genom den tillgängliga integrationen. Lokal Node24 är separat från Node22-CI. |
+
+[Maskinläsbart grindkvitto](docs/security-95/gates.json) binder resultat till
+källfingeravtryck och dokumenterar omkörningen av Sites efter en audit-
+kompatibilitetsrättning. Fokuserade 1 098 och oberoende 81 tester överlappar
+fullsviterna. Inga produktions-/bank-/juridiska godkännanden härleds ur dem.
+
 ## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
 
 [Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.

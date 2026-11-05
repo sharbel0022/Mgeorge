@@ -15,7 +15,7 @@ const suites = [
   {
     name: 'node-security', cwd: root,
     files: [
-      'test/saas-login-boundary.test.js', 'test/saas-test-isolation.test.js', 'test/saas-company-acceptance.test.js',
+      'test/saas-login-boundary.test.js', 'test/saas-test-isolation.test.js', 'test/saas-security-runner.test.js', 'test/saas-company-acceptance.test.js',
       'test/company-api.test.js', 'test/company-boundary.test.js', 'test/company-client.test.js',
       'test/bank-consent-api.test.js',
       'test/openpayments-company-bank-sync.test.js', 'test/openpayments-company-bank-sync-normalization.test.js',
@@ -23,7 +23,7 @@ const suites = [
       'test/company-bank-sync.test.js', 'test/company-bank-sync-store.test.js',
       'test/company-bank-sync-scheduler.test.js', 'test/company-bank-sync-fairness.test.js',
       'test/company-bank-sync-legacy-binding.test.js', 'test/node-company-bank-sync.test.js',
-      'test/security-session-allocation.test.js', 'test/session-mutation-fence.test.js',
+      'test/security-session-allocation.test.js', 'test/security-login-rate-limit.test.js', 'test/session-mutation-fence.test.js',
       'test/bank-api.test.js', 'test/integration-job-api.test.js',
       'test/backup-disaster-recovery.test.js',
     ],
@@ -42,6 +42,7 @@ const suites = [
       'tests/saas-onboarding-contract.test.mjs', 'tests/saas-onboarding-client.test.mjs', 'tests/saas-onboarding-views.test.mjs',
       'tests/openpayments-provider.test.mjs', 'tests/openpayments-policy.test.mjs', 'tests/openpayments-http.test.mjs',
       'tests/saas-owner-isolation.test.mjs', 'tests/saas-transport-privacy.test.mjs', 'tests/saas-upload-boundary.test.mjs',
+      'tests/security-request-budget.test.mjs',
       'tests/banking-security.test.mjs', 'tests/banking-provider.test.mjs',
       'tests/bank-account-consent.test.mjs', 'tests/bank-account-commit.test.mjs',
       'tests/bank-state-integrity-q8.test.mjs', 'tests/mcp-security-q8.test.mjs',
@@ -53,8 +54,9 @@ const suites = [
 
 // Fixtures install their own synthetic credentials. Pass only process/runtime
 // settings, never an operator's bank, cloud, database or application secrets.
+// NODE_OPTIONS can preload operator code before the guard and must not be inherited.
 const testEnv = { NODE_ENV: 'test', CLOUDFLARE_CF_FETCH_ENABLED: 'false', WRANGLER_SEND_METRICS: 'false' };
-for (const key of ['PATH', 'SystemRoot', 'WINDIR', 'TMPDIR', 'TMP', 'TEMP', 'LANG', 'LC_ALL', 'TZ', 'NODE_OPTIONS', 'NO_COLOR', 'FORCE_COLOR', 'CI']) {
+for (const key of ['PATH', 'SystemRoot', 'WINDIR', 'TMPDIR', 'TMP', 'TEMP', 'LANG', 'LC_ALL', 'TZ', 'NO_COLOR', 'FORCE_COLOR', 'CI']) {
   if (process.env[key] !== undefined) testEnv[key] = process.env[key];
 }
 
