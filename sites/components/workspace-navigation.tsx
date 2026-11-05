@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect,useRef,type KeyboardEvent,type MouseEvent,type ReactNode} from 'react';
-import {ArrowRight,Building2,CheckCheck,ChevronDown,FileText,Landmark,LayoutDashboard,Menu,ReceiptText,Settings,ShieldCheck,X} from 'lucide-react';
+import {ArrowRight,Building2,CheckCheck,FileText,Landmark,LayoutDashboard,Menu,ReceiptText,Settings,ShieldCheck,X} from 'lucide-react';
 import {workspaceHref,isWorkspaceLinkClick,type WorkspaceView} from '@/lib/workspace-location';
 
 export type {WorkspaceView} from '@/lib/workspace-location';
@@ -34,7 +34,7 @@ function NavigationContents({view,reviewCount,company,onNavigate}:Omit<Props,'op
  const active=area(view);
  return <>
   <a className="brand" href="/" onClick={event=>followLink(event,'overview',onNavigate)}><strong>MG</strong><span>Fakturakoll</span></a>
-  <div className="workspace"><span className="workspace-icon"><Building2 size={19}/></span><div><strong>{company.name}</strong><span>Företagsöversikt</span></div><ChevronDown size={15}/></div>
+  <a className="workspace" href="/bank" aria-label={`Företag och bankanslutning för ${company.name}`}><span className="workspace-icon"><Building2 size={19} aria-hidden="true"/></span><div><strong>{company.name}</strong><span>Företag & bankanslutning</span></div><ArrowRight size={15} aria-hidden="true"/></a>
   <div className="nav-label">ARBETSYTA</div>
   <nav aria-label="Huvudmeny">{items.map(({id,label,icon:Icon})=><WorkspaceLink key={id} view={id} className={`nav-item ${active===id?'active':''}`} current={view===id?'page':active===id?'location':undefined} onNavigate={onNavigate}><Icon size={19} aria-hidden="true"/><span>{label}</span>{id==='review'&&reviewCount>0&&<b aria-label={`${reviewCount} ärenden att granska`}>{reviewCount}</b>}</WorkspaceLink>)}</nav>
   <div className="sidebar-bottom">

@@ -150,3 +150,45 @@ test('loaded empty economy cards explain absent records without claiming no mone
  const p=economyProps();p.data={economy:economySummary(p.state,'2026-10-28'),counts:{review:0,processing:0},queue:[],connections:{gmail:{},bank:{},ocr:{}}};
  const html=render(EconomyOverview,p);assert.match(html,/Inga verifierade betalningskopplingar/);assert.match(html,/Det betyder inte att inga pengar har kommit in/);assert.match(html,/Inga granskade öppna kundfakturor/);assert.doesNotMatch(html,/Hämtar betalningar|Hämtar fakturor|Logga in för att se/);
 });
+
+test('95 UI overview identifies the active company instead of another company',()=>{
+ const p=economyProps();p.state.company={...p.state.company,name:'Syntetiska Verkstaden AB'};
+ const html=render(EconomyOverview,p);
+ assert.match(html,/Syntetiska Verkstaden AB/);
+ assert.doesNotMatch(html,/M\.GEORGE VITVAROR/);
+});
+
+test('95 UI pending and signed-out overview never flashes the default company name',()=>{
+ for(const props of [{loading:true},{signedIn:false}]){
+  const html=render(EconomyOverview,{...economyProps(),...props});
+  assert.doesNotMatch(html,/M\.George Vitvaror|M\.GEORGE/);assert.match(html,/Din arbetsyta/);
+ }
+});
+
+test('95 UI failed review read offers recovery and hides stale decisions',()=>{
+ const html=render(ui.ControlReview,{data:{queue:[{id:'stale',title:'STALE PRIVATE TASK',priority:1}]},error:'Kunde inte läsa kön',retry:noAction,open:noAction});
+ assert.match(html,/role="alert"/);
+ assert.match(html,/Granskningskön kunde inte hämtas/);
+ assert.match(html,/Hämta granskningskön igen/);
+ assert.doesNotMatch(html,/STALE PRIVATE TASK|Hämtar granskningskön…|Inget i den här kön/);
+});
+
+test('95 UI signed-out review asks for login and suppresses stale queue content',()=>{
+ const html=render(ui.ControlReview,{data:{queue:[{id:'stale',title:'STALE PRIVATE TASK',priority:1}]},readStatus:'signed_out',open:noAction});
+ assert.match(html,/Logga in för att se dina granskningsärenden/);
+ assert.doesNotMatch(html,/STALE PRIVATE TASK|Hämtar granskningskön|Inget i den här kön/);
+});
+
+test('95 UI idle control describes an available action without claiming work has started',()=>{
+ const html=render(ui.ControlProgress,{});
+ assert.match(html,/Starta en kontroll/);
+ assert.doesNotMatch(html,/Hämtar underlag och kontrollerar/);
+});
+
+test('95 UI overview exposes a disconnected bank even when an earlier sync exists',()=>{
+ const p=economyProps();p.data={economy:economySummary(p.state,'2026-11-05'),counts:{review:0,processing:0},queue:[],connections:{gmail:{},bank:{connected:false,last_synced:'2026-11-04T12:00:00Z'},ocr:{}}};
+ const html=render(EconomyOverview,p);
+ assert.match(html,/Bankanslutningen behöver åtgärdas/);
+ assert.match(html,/Öppna bankanslutning/);
+ assert.doesNotMatch(html,/Alla bankuppgifter är aktuella/);
+});

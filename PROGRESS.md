@@ -1,5 +1,15 @@
 # Verifierad progress
 
+## Agent 6 — UI/UX och avgränsad acceptans, 2026-11-05
+
+`feature/95-ui`, integrerad main-bas `bf24a3c`; slutlig produktkod `495de11`. [Leveransrapport](docs/integration/agent-6-ui-95.md), [inventering](docs/integration/95-ui-inventory.md) och [browseracceptans med källhashar och 13 skärmbilder](docs/integration/95-ui-browser/browser-acceptance.md).
+
+Svartvit Sites-design, tydliga fakturanummer/referenser, uppgiftsbundna åtgärder, märkta filter, ett gemensamt företagsval och ärliga bank-/laddnings-/felstatusar. Återförsök bevarar nu osparade granskningsutkast under dolda och inerta kontroller. Sökdialog, mobilmeny och tillbakaåtgärder återför fokus. Finansiell logik och API-kontrakt är oförändrade i UI-diffen.
+
+Slutliga fulla sviter: **1 997 root + 3 888 Sites + 47 bridge = 5 932 godkända**, 0 fail/skip/cancel/TODO; syntax, typer och produktionsbygge godkända. Åtta separata harnessprov. Verklig Chrome med syntetiska data: 20 kombinationer av fyra huvudvyer och fem faktiska CSS-bredder 320–1440 px; 28 slutliga avgränsade layout-/textkontroller utan kontrast-, sidöverflödes-, märknings- eller knappstorleksfynd. Detta är ingen full WCAG-certifiering eller fysisk enhetsacceptans.
+
+Lokalt ren Sites-installation avbröts med 137; färdigställda låsta beroenden passerade slutgrindar, medan PR-CI ska styrka ren Node 22-installation. Sites har 8 befintliga moderate utvecklingsfynd, 0 high/critical. Live bank/BankID, faktisk Gmail-leverans, full avstämningskedja, hjälpmedel och fysisk enhetsprovning återstår enligt rapporten. **Alla 33 poäng är oförändrade: 255/330 = 7,73/10; 0/33 ≥9,5.**
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).

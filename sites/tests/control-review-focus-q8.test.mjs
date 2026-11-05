@@ -14,8 +14,10 @@ const tasks=()=>['First','Second','Third'].map((title,index)=>({id:'task-'+index
 // Native button activation is its focused click; hidden/removed focus falls to
 // BODY before effects, matching root's Chromium reproduction. Browser QA remains
 // separate; this harness asserts effects and DOM focus, never source patterns.
+// Input values survive only while their mounted host node survives. Disconnected
+// nodes are discarded so a remount cannot accidentally resurrect an edited draft.
 async function fixture(t,{width=390,inline=true}={}){
- const key='__review_focus_'+crypto.randomUUID().replaceAll('-',''),f={width,slots:[],cursor:0,effects:[],scheduled:false,closed:false,nodes:new Map(),queue:tasks(),opened:[],focusLog:[],listeners:new Set(),dialog:null};globalThis[key]=f;
+ const key='__review_focus_'+crypto.randomUUID().replaceAll('-',''),f={width,slots:[],cursor:0,effects:[],scheduled:false,closed:false,nodes:new Map(),queue:tasks(),opened:[],savedDrafts:[],focusLog:[],listeners:new Set(),dialog:null};globalThis[key]=f;
  const equal=(a,b)=>a&&b&&a.length===b.length&&a.every((value,index)=>Object.is(value,b[index]));
  f.schedule=()=>{if(f.closed||f.scheduled)return;f.scheduled=true;queueMicrotask(()=>{f.scheduled=false;f.render();});};
  f.state=initial=>{const index=f.cursor++;f.slots[index]??={value:typeof initial==='function'?initial():initial};return[f.slots[index].value,value=>{f.slots[index].value=typeof value==='function'?value(f.slots[index].value):value;f.schedule();}];};
@@ -25,7 +27,7 @@ async function fixture(t,{width=390,inline=true}={}){
  const browser=new EventTarget(),add=browser.addEventListener.bind(browser),remove=browser.removeEventListener.bind(browser);browser.addEventListener=(type,fn)=>{f.listeners.add(fn);add(type,fn);};browser.removeEventListener=(type,fn)=>{f.listeners.delete(fn);remove(type,fn);};
  const document={defaultView:browser,activeElement:null,querySelector:selector=>selector==='dialog[open]'?f.dialog:null};
  class Element{
-  constructor(tag,props={}){this.tagName=tag.toUpperCase();this.props=props;this.children=[];this.isConnected=true;this.parentElement=null;this.ownerDocument=document;}
+  constructor(tag,props={}){this.tagName=tag.toUpperCase();this.props=props;this.value=props.value??props.defaultValue??'';this.children=[];this.isConnected=true;this.parentElement=null;this.ownerDocument=document;}
   [Symbol.for('nodejs.util.inspect.custom')](){return `<${this.tagName} ${this.props['aria-label']||this.className}>`;}
   get className(){return this.props.className||'';}
   get tabIndex(){return this.props.tabIndex??(['BUTTON','INPUT','SELECT'].includes(this.tagName)?0:-1);}
@@ -55,21 +57,27 @@ async function fixture(t,{width=390,inline=true}={}){
   if(Array.isArray(jsx)){jsx.forEach((child,index)=>mount(child,parent,path+'/'+(child?.key??index)));return;}
   if(typeof jsx.type==='function'){mount(jsx.type(jsx.props),parent,path);return;}
   if(typeof jsx.type!=='string')return;
-  let element=f.nodes.get(path);if(!element||element.tagName!==jsx.type.toUpperCase()){element=new Element(jsx.type);f.nodes.set(path,element);}
+  let element=f.nodes.get(path);if(!element||element.tagName!==jsx.type.toUpperCase()){element=new Element(jsx.type,jsx.props);f.nodes.set(path,element);}
   element.props=jsx.props;element.parentElement=parent;element.children=[];element.isConnected=true;if(parent)parent.children.push(element);else f.root=element;
+  if(jsx.props.value!==undefined)element.value=jsx.props.value;
   reference(jsx.props.ref,element);mount(jsx.props.children,element,path+'/children');
  }
+ function DraftDetail({task,readable}){
+  if(!readable)return React.createElement('p',null,'Fresh detail data is required');
+  return React.createElement('div',null,React.createElement('input',{'aria-label':'Synthetic detail input',defaultValue:task.title}),React.createElement('button',{'aria-label':'Save synthetic draft',onClick:()=>f.savedDrafts.push(task.id)},'Save draft'));
+ }
  f.render=()=>{
-  if(f.closed)return;f.cursor=0;const tree=module.ControlReview({data:{queue:f.queue},open:task=>{f.opened.push(task.id);f.dialog=new Element('dialog',{open:true});f.dialog.focus();},renderDetail:inline?task=>React.createElement('div',{key:task.id},React.createElement('input',{'aria-label':'Synthetic detail input',defaultValue:task.title})):undefined});
-  for(const node of f.nodes.values()){reference(node.props.ref,null);node.isConnected=false;}mount(tree,null,'root');lostFocus();for(const effect of f.effects.splice(0))effect();
+  if(f.closed)return;f.cursor=0;const detailReadable=f.detailReadable!==false;const tree=module.ControlReview({data:f.dataAvailable===false?null:{queue:f.queue},readStatus:f.readStatus||'ready',error:f.error||'',retry:()=>{f.error='';f.readStatus=f.retryPending?'pending':'ready';if(f.retryPending)f.dataAvailable=false;f.render();},open:task=>{f.opened.push(task.id);f.dialog=new Element('dialog',{open:true});f.dialog.focus();},renderDetail:inline?task=>React.createElement(DraftDetail,{key:task.id,task,readable:detailReadable}):undefined});
+  for(const node of f.nodes.values()){reference(node.props.ref,null);node.isConnected=false;}mount(tree,null,'root');for(const [path,node]of f.nodes)if(!node.isConnected)f.nodes.delete(path);lostFocus();for(const effect of f.effects.splice(0))effect();
  };
  f.find=predicate=>[...f.nodes.values()].find(node=>node.isConnected&&predicate(node));
  f.row=id=>f.find(node=>node.props['aria-label']==='Granska '+f.queue.find(task=>task.id===id)?.title);
  f.detail=()=>f.find(node=>node.className==='review-detail');f.back=()=>f.find(node=>node.className.includes('review-back'));f.search=()=>f.find(node=>node.props['aria-label']==='Filtrera granskningskön');
- f.activate=async node=>{node.focus();node.props.onClick({target:node,currentTarget:node,detail:0});await flush();};
+ f.activate=async node=>{if(!node.getClientRects().length||node.props.disabled)return false;for(let ancestor=node;ancestor;ancestor=ancestor.parentElement)if(ancestor.props.inert)return false;node.focus();node.props.onClick({target:node,currentTarget:node,detail:0});await flush();return true;};
  f.resize=async next=>{f.width=next;lostFocus();browser.dispatchEvent(new Event('resize'));await flush();};
  f.update=async queue=>{f.queue=queue;f.render();await flush();};
  f.unmount=()=>{f.closed=true;for(const slot of f.slots)slot?.cleanup?.();for(const node of f.nodes.values()){reference(node.props.ref,null);node.isConnected=false;}lostFocus();};
+ f.remount=()=>{f.unmount();f.closed=false;f.slots=[];f.nodes=new Map();f.effects=[];f.render();};
  t.mock.method(globalThis,'fetch',async()=>{throw Error('Focus/render must not call an API');});
  t.after(()=>{f.unmount();delete globalThis[key];if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;});
  f.render();await flush();return f;
@@ -114,4 +122,79 @@ test('explicit modal opening retains modal focus and never runs from render or r
 test('unmount removes viewport recovery and never refocuses a disconnected review',async t=>{
  const f=await fixture(t);await f.activate(f.row('task-1'));f.unmount();f.outside.focus();const count=f.focusLog.length;await f.resize(1440);
  assert.equal(f.listeners.size,0);assert.equal(f.focusLog.length,count);assert.equal(f.document.activeElement,f.outside);
+});
+
+for(const width of [390,1440])test(`95 UI review read failure and retry keep keyboard focus inside the workspace at ${width}px`,async t=>{
+ const f=await fixture(t,{width});await f.activate(f.row('task-1'));
+ if(width===390)f.find(node=>node.props['aria-label']==='Synthetic detail input').focus();
+ f.error='Synthetic unavailable response';f.render();await flush();
+ assert.notEqual(f.document.activeElement,f.document.body,'a failed read must not drop focus to the document body');
+ assert.equal(f.document.activeElement,f.root);assert.equal(f.root.props.role,'alert');assert.ok(f.root.props['aria-label']);
+ const retry=f.find(node=>node.props.children==='Hämta granskningskön igen');await f.activate(retry);
+ assert.notEqual(f.document.activeElement,f.document.body,'recovery must retain a visible focus target');
+ assert.ok(f.root.contains(f.document.activeElement));assert.ok(f.document.activeElement.getClientRects().length);
+ assert.equal(f.root.props.role,undefined);assert.deepEqual(f.opened,[]);
+});
+test('95 UI a failed review read never steals focus from an unrelated page control',async t=>{
+ const f=await fixture(t);f.outside.focus();f.error='Synthetic unavailable response';f.render();await flush();
+ assert.equal(f.document.activeElement,f.outside);
+});
+for(const readStatus of ['pending','signed_out','failed'])test(`95 UI review ${readStatus} hides stale tasks and retains focus`,async t=>{
+ const f=await fixture(t);await f.activate(f.row('task-1'));f.find(node=>node.props['aria-label']==='Synthetic detail input').focus();
+ f.readStatus=readStatus;f.render();await flush();
+ const row=f.row('task-1');assert.equal(Boolean(row?.getClientRects().length),false,'unavailable review data must not expose a stale row');if(row)assert.equal(await f.activate(row),false);assert.ok(f.document.activeElement===f.root,'focus must move to the retained review region');assert.ok(f.root.props['aria-label']);
+ if(readStatus==='failed')await f.activate(f.find(node=>node.props.children==='Hämta granskningskön igen'));
+ else{f.readStatus='ready';f.render();await flush();}
+ assert.ok(f.root.contains(f.document.activeElement));assert.ok(f.document.activeElement.getClientRects().length);
+});
+
+for(const width of [390,1440])test(`edited review detail stays mounted and inert through a failed read, pending retry and recovery at ${width}px`,async t=>{
+ const f=await fixture(t,{width});await f.activate(f.row('task-1'));
+ const editor=f.find(node=>node.props['aria-label']==='Synthetic detail input'),save=f.find(node=>node.props['aria-label']==='Save synthetic draft');
+ editor.value='Unsaved corrected invoice reference';editor.focus();
+ f.error='Synthetic unavailable response';f.render();await flush();
+ assert.ok(f.find(node=>node.props['aria-label']==='Synthetic detail input')===editor,'a transient read error must not unmount the edited child');
+ assert.equal(editor.getClientRects().length,0,'stale detail must be hidden');
+ assert.equal(await f.activate(save),false,'stale save actions must be unavailable');
+ assert.deepEqual(f.savedDrafts,[]);
+ let inert=false;for(let node=editor;node;node=node.parentElement)inert||=node.props.inert===true;assert.equal(inert,true,'retained editor must also be inert');
+ f.retryPending=true;await f.activate(f.find(node=>node.props.children==='Hämta granskningskön igen'));
+ assert.ok(f.find(node=>node.props['aria-label']==='Synthetic detail input')===editor,'a pending retry without queue data must retain the same edited child');
+ assert.equal(editor.getClientRects().length,0);
+ f.readStatus='ready';f.dataAvailable=true;f.render();await flush();
+ assert.ok(f.find(node=>node.props['aria-label']==='Synthetic detail input')===editor);
+ assert.equal(editor.value,'Unsaved corrected invoice reference');assert.ok(editor.getClientRects().length);
+ await f.activate(save);assert.deepEqual(f.savedDrafts,['task-1']);
+});
+
+test('sign-out clears a retained review draft before the next sign-in',async t=>{
+ const f=await fixture(t);await f.activate(f.row('task-1'));
+ const editor=f.find(node=>node.props['aria-label']==='Synthetic detail input');editor.value='Private unsaved draft';
+ f.error='Synthetic unavailable response';f.render();await flush();
+ f.error='';f.readStatus='signed_out';f.dataAvailable=false;f.render();await flush();
+ assert.equal(editor.isConnected,false);assert.equal(f.find(node=>node.props['aria-label']==='Synthetic detail input'),undefined);
+ f.readStatus='ready';f.dataAvailable=true;f.render();await flush();
+ const reopened=f.find(node=>node.props['aria-label']==='Synthetic detail input');assert.notEqual(reopened,editor);assert.notEqual(reopened.value,'Private unsaved draft');
+});
+
+for(const width of [390,1440])test(`parent unreadable props cannot unmount a retained draft during failed refresh at ${width}px`,async t=>{
+ const f=await fixture(t,{width});await f.activate(f.row('task-1'));
+ const editor=f.find(node=>node.props['aria-label']==='Synthetic detail input');editor.value='Unsaved bank evidence note';editor.focus();
+ f.detailReadable=false;f.readStatus='failed';f.dataAvailable=false;f.render();await flush();
+ assert.ok(f.find(node=>node.props['aria-label']==='Synthetic detail input')===editor,'retain the last ready detail props, not a newly unreadable child');
+ assert.equal(editor.getClientRects().length,0);
+ f.retryPending=true;await f.activate(f.find(node=>node.props.children==='Hämta granskningskön igen'));
+ assert.ok(f.find(node=>node.props['aria-label']==='Synthetic detail input')===editor);
+ f.detailReadable=true;f.readStatus='ready';f.dataAvailable=true;f.render();await flush();
+ assert.ok(f.find(node=>node.props['aria-label']==='Synthetic detail input')===editor);assert.equal(editor.value,'Unsaved bank evidence note');assert.ok(editor.getClientRects().length);
+});
+
+test('company-boundary remount discards a retained review draft',async t=>{
+ const f=await fixture(t);await f.activate(f.row('task-1'));
+ const editor=f.find(node=>node.props['aria-label']==='Synthetic detail input');editor.value='Previous company draft';
+ f.error='Synthetic unavailable response';f.render();await flush();
+ f.error='';f.readStatus='pending';f.dataAvailable=false;f.queue=[{...tasks()[0],id:'other-company-task',title:'Other company document'}];f.remount();await flush();
+ assert.equal(editor.isConnected,false);assert.equal(f.find(node=>node.props['aria-label']==='Synthetic detail input'),undefined);
+ f.readStatus='ready';f.dataAvailable=true;f.render();await flush();
+ const reopened=f.find(node=>node.props['aria-label']==='Synthetic detail input');assert.ok(reopened!==editor);assert.equal(reopened.value,'Other company document');
 });
