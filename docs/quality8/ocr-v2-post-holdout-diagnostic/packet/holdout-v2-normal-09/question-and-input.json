@@ -1,0 +1,10 @@
+{
+  "id": "holdout-v2-normal-09",
+  "question": "Why does the visually explicit right-hand summary (Netto / Summa moms / Att betala, each with a value on its own physical row) not form a proven field column on unchanged 571: do the actual words/bboxes lack the association, or does a named existing layout guard stop it?",
+  "inputSha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+  "inputBytes": 142671,
+  "width": 1600,
+  "height": 2000,
+  "mimeType": "image/png",
+  "filename": "images/holdout-v2-normal-09.png"
+}

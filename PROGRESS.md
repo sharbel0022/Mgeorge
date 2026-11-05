@@ -1,5 +1,17 @@
 # Verifierad progress
 
+## 2026-11-05 — Site 64 publicerad,27/33 områden minst 8
+
+PR 56 är normalt mergad tillmain`819adee2f3848b474167eb6b15f82584caeb39af`. Den exakta huvudgrenen har 2277 Node + 4210 Sites + 47 bridge = 6534 godkända tester utan fel/skip/cancel/TODO. NativeSite 64 har identiskt Sites-träd och publiceringen lyckades 22:49:18 UTC med MCP och oförändrad envrevision 10.
+
+Levererat: säkrare betalnings-/översiktsstatus, explicit fördelning på flera fakturor, tangentbordsfokus, smala formulär, OCR-säkerhetsgränser och säker bankdiagnos. Den första underkända CI-körningen och stängda oberoende reviewfynd är dokumenterade. [Release 64](docs/quality8/release-wave2.md) och [aktuell 33-bedömning](docs/quality8/current-33-assessment.json).
+
+Verkliga efterkontroller: rapportens angivna betalare och generella referens bevaras; saknade AIS-fält hålls okända; ingen extra insättning eller fakturakoppling tillkom. Publicerad demo kontrollerade sök/öppna/Escape/fokus och korrekt skillnad mellan registrerad och verifierad betalning. Banken är fortsatt frånkopplad; nytt precist avvisningsskäl ärACCOUNT_USAGE_INVALID. En CI-utlöst moln-OCR-körning behandlade 6 underlag,0 fel. Ny periodisk OCR-körning efter schemauppdateringen är ännu inte observerad. Backup 362/362 original är verifierad, med senare importer uttryckligen utanför snapshoten.
+
+Målet är inte uppnått:6,10,15,16,28 och 33 är under 8. Fortsatt generell OCR-/geometriförbättring och oberoende nytt hållprov pågår separat. Bankens faktiska avvisningsorsak utreds utan att ändra behörighetspolicyn. Äldre totalsummor nedan är historiska och får inte användas som aktuellt läge.
+
+## Tidigare arbetslogg
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).

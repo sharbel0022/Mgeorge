@@ -1,0 +1,66 @@
+{
+  "node": "v24.22.1",
+  "versions": {
+    "node": "24.22.1",
+    "acorn": "8.18.0",
+    "ada": "4.0.0",
+    "amaro": "1.1.11",
+    "ares": "1.34.9",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.70.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.9",
+    "simdjson": "4.6.11",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.4",
+    "tz": "2026e",
+    "undici": "7.30.1",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.58",
+    "zlib": "1.3.2.1-motley-285e94b",
+    "zstd": "1.5.7"
+  },
+  "platform": "linux",
+  "architecture": "x64",
+  "osRelease": "6.18.57",
+  "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+  "cpuCount": 9,
+  "dependencies": {
+    "versions": {
+      "@napi-rs/canvas": "0.1.80",
+      "@tesseract.js-data/swe": "1.0.0",
+      "tesseract.js": "6.0.1",
+      "tesseract.js-core": "6.1.2",
+      "pdfjs-dist": "5.4.149"
+    },
+    "artifacts": {
+      "swe/swe.traineddata.gz": "8432cbbf8c916ab80e21c00379591e696b7dfee5183242f8a137cad93ec4803b",
+      "tesseract-core/tesseract-core-lstm.wasm": "220e2e87551edccb85519796a170469f8ab2a8055216789e3b8b1ada18b7bc2b",
+      "tesseract-core/tesseract-core-simd-lstm.wasm": "187d76742dfc0d8929f0b49a619f145bb6370730776c7bd0d3e20c6b2098808d",
+      "tesseract-core/tesseract-core-simd.wasm": "ca11ee92a02023e4f5083eefd0966fb83b297416da54e997b9f6ce445f719c9b",
+      "tesseract-core/tesseract-core.wasm": "740f7e466a2f026e1f1e54a2e0d9957e386d8166110d1290224abd3d08986106"
+    }
+  },
+  "sourceNodeModules": "/workspace/scratch/4d79ab4bea8e/onboarding/node_modules",
+  "loadBefore": [
+    1.43,
+    1.37,
+    1.55
+  ],
+  "loadAfter": [
+    1.59,
+    1.41,
+    1.56
+  ]
+}

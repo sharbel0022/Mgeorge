@@ -1,0 +1,908 @@
+{
+  "schema": "mgeorge-bank-usage-diagnostic-implementation-v1",
+  "recordedAt": "2026-11-05T23:23:34.105180+00:00",
+  "publishedBaseline": "819adee2f3848b474167eb6b15f82584caeb39af",
+  "diagnosisCommitAndImplementationParent": "b020d020ad7ab8d4ca7417959d01ceb1613a5709",
+  "runtime": {
+    "node": "v24.22.1",
+    "nodeExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "networkGuard": "scripts/saas-test-isolation.mjs"
+  },
+  "sourceAndTestSha256": {
+    "sites/lib/bank-consent-policy.js": "bc9da88933c98ba1ad11aff9c2c34d0654387fef68f10da613d534a05138aba2",
+    "sites/lib/bank-consent-policy.d.ts": "4da7f6e70627a4dff69056e8b650aa058ba7a5eeb6642a79fc46835440325d25",
+    "sites/lib/banking/service.ts": "5884ebe8db3f8b14a439f02c5b9068dd8f4d05b5a6a8e6018a904d1cc5c80bee",
+    "sites/tests/bank-usage-diagnostic.test.mjs": "31b88f136af6f1d20929a178c9857b8467a157fa603f4d7d89dd1581f9e2fffe",
+    "sites/tests/banking-security.test.mjs": "9433e2a3a2cca453557c87bfcb75cf068fcfdda0a078a96bb59c1a74cecbe5bb",
+    "scripts/quality8/review-bank-usage-diagnostic-parity.mjs": "c72b761cc6653f153a83a8e59b75464a2eb57ea4feb803d333741b89f9106e36"
+  },
+  "frozenTestsByteIdenticalBetweenRedAndGreen": true,
+  "red": {
+    "policy": {
+      "path": "/tmp/mgeorge-bank-usage-diagnostic-red-policy.tap",
+      "sha256": "4644c0fa04a515a8f752e94c591f3b7ce38425cff0efbcfcd404771db2503e9d",
+      "tests": 34,
+      "pass": 19,
+      "fail": 15,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 239.473145,
+      "failedTests": [
+        "usage diagnostic: selected saved null is separate from omitted live usage",
+        "usage diagnostic: selected live private is a fixed category, never a repair",
+        "usage diagnostic: selected live empty string is a fixed category, never a repair",
+        "usage diagnostic: selected live lower case is a fixed category, never a repair",
+        "usage diagnostic: selected live padded string is a fixed category, never a repair",
+        "usage diagnostic: selected live unknown string is a fixed category, never a repair",
+        "usage diagnostic: selected live null is a fixed category, never a repair",
+        "usage diagnostic: selected live boolean is a fixed category, never a repair",
+        "usage diagnostic: selected live number is a fixed category, never a repair",
+        "usage diagnostic: selected live array is a fixed category, never a repair",
+        "usage diagnostic: selected live object is a fixed category, never a repair",
+        "usage diagnostic: counts cover both selected sides and exclude complete unselected accounts",
+        "usage diagnostic: bounded full selected census includes all 100 accounts",
+        "usage diagnostic: captured counts cannot be mutated or changed by later input edits",
+        "usage diagnostic: unknown objects are classified without invoking conversion or serialization"
+      ]
+    },
+    "service": {
+      "path": "/tmp/mgeorge-bank-usage-diagnostic-frozen-red-service.tap",
+      "sha256": "2e16a8f3853096d24f2d8a2457a0e3d868d071d13e7d433e56c37923f2043793",
+      "tests": 25,
+      "pass": 20,
+      "fail": 5,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 8945.359711,
+      "failedTests": [
+        "independent scope review: HTTP MCP preserves live account usage reason and safe denial",
+        "usage diagnostic: ordinary HTTP MCP revalidation distinguishes saved null and omitted live without bank or financial mutations",
+        "usage diagnostic: ordinary HTTP MCP revalidation distinguishes private live without bank or financial mutations",
+        "usage diagnostic: ordinary HTTP MCP revalidation distinguishes unknown saved and wrong-type live without bank or financial mutations",
+        "usage diagnostic: real service counts only the persisted selection on both snapshots"
+      ]
+    }
+  },
+  "green": {
+    "policy": {
+      "path": "/tmp/mgeorge-bank-usage-diagnostic-green-policy.tap",
+      "sha256": "d3f0de8b890d707861db46b5fa850cbdf9117a0ed0236829bba77b58e4aa20ed",
+      "tests": 34,
+      "pass": 34,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 185.01296,
+      "failedTests": []
+    },
+    "service": {
+      "path": "/tmp/mgeorge-bank-usage-diagnostic-green-service.tap",
+      "sha256": "ef91bb3c6ffdba88b4960ea727168db648d6f23509427edbdf59884c2826557d",
+      "tests": 25,
+      "pass": 25,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 9085.809853,
+      "failedTests": []
+    }
+  },
+  "focusedRegression": {
+    "policyAndAdapters": {
+      "path": "/tmp/mgeorge-bank-usage-diagnostic-regression-policy.tap",
+      "sha256": "1ae6d2dce2788b503a3b8fa2175661cfc57d6577fe39f83667d5a35125ff4b55",
+      "tests": 153,
+      "pass": 153,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 3983.130331,
+      "failedTests": []
+    },
+    "service": {
+      "path": "/tmp/mgeorge-bank-usage-diagnostic-regression-service.tap",
+      "sha256": "f20a7cdf88ac5a9307164513deac54e17f213637e31b67d3b9f1895e5993e75f",
+      "tests": 56,
+      "pass": 56,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 19743.098053,
+      "failedTests": []
+    },
+    "uniqueTests": 209,
+    "redGreenSubsetAlreadyIncluded": 59
+  },
+  "preFreezeTestCorrection": {
+    "initialServiceRun": {
+      "path": "/tmp/mgeorge-bank-usage-diagnostic-red-service.tap",
+      "sha256": "dec0abd4528ed91104cf6be3415562eb8844287531214546951d8a5d143169c4",
+      "tests": 24,
+      "pass": 16,
+      "fail": 8,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 8783.271352,
+      "failedTests": [
+        "independent scope review: HTTP MCP preserves live account usage reason and safe denial",
+        "usage diagnostic: changed owner during GET suppresses categories without changing the denial",
+        "usage diagnostic: changed company adoption during GET suppresses categories without changing the denial",
+        "usage diagnostic: changed lease during GET suppresses categories without changing the denial",
+        "usage diagnostic: ordinary HTTP MCP revalidation distinguishes saved null and omitted live without bank or financial mutations",
+        "usage diagnostic: ordinary HTTP MCP revalidation distinguishes private live without bank or financial mutations",
+        "usage diagnostic: ordinary HTTP MCP revalidation distinguishes unknown saved and wrong-type live without bank or financial mutations",
+        "usage diagnostic: real service counts only the persisted selection on both snapshots"
+      ]
+    },
+    "productionSourceUnchangedAtCorrection": true,
+    "reason": "Three new expected error codes incorrectly assumed usage validation runs after ownership/lease failure; existing guardedBankRead preempts them. Expectations were corrected to observed baseline 500/403/409 before production edits. One additional foreign genuine policy-error negative was then added before frozen RED."
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "log": "/tmp/mgeorge-bank-usage-diagnostic-typecheck.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diffCheck": {
+    "exitCode": 0
+  },
+  "broadPolicyParity": {
+    "script": "scripts/quality8/review-bank-scope-parity.mjs",
+    "cases": 54,
+    "allowed": 7,
+    "denied": 47,
+    "decisionMismatches": 0,
+    "whitelistedReasons": 11,
+    "rejectedUntrustedReasonForms": 9
+  },
+  "usageParity": {
+    "schema": "mgeorge-bank-usage-diagnostic-parity-v1",
+    "node": "v24.22.1",
+    "beforeSourceSha256": "452cff5e328f931a5f1e81ab57fcd47a9b935f542146b1045de3b3e838d90538",
+    "afterSourceSha256": "bc9da88933c98ba1ad11aff9c2c34d0654387fef68f10da613d534a05138aba2",
+    "strictValidatorByteIdentical": true,
+    "businessPredicateByteIdentical": true,
+    "cases": 62,
+    "accepted": 15,
+    "rejected": 47,
+    "decisionMismatches": 0,
+    "inputMutations": 0,
+    "bankRequests": 0,
+    "productionDataReads": 0,
+    "productionWrites": 0,
+    "rows": [
+      {
+        "label": "saved:omitted",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:explicit_undefined",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:ORGA",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:PRIV",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:null",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:empty_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:lowercase_orga",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:padded_ORGA",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:business_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:other_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:number",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:boolean",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:array",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:object",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:omitted",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:explicit_undefined",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:ORGA",
+        "method": "validateEnableConsent",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:PRIV",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:null",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:empty_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:lowercase_orga",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:padded_ORGA",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:business_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:other_string",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:number",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:boolean",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:array",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:object",
+        "method": "validateEnableConsent",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:omitted",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:explicit_undefined",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "saved:PRIV",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:null",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:empty_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:lowercase_orga",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:padded_ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:business_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:other_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:number",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:boolean",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:array",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "saved:object",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:omitted",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:explicit_undefined",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "live:PRIV",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:null",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:empty_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:lowercase_orga",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:padded_ORGA",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:business_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:other_string",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:number",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:boolean",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:array",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "live:object",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "unselected_saved_private",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "unselected_live_private",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "unselected_both_null",
+        "method": "validateLegacyEnableSelection",
+        "accepted": true,
+        "grant": {
+          "validUntil": "2026-11-06T12:00:00.000Z",
+          "accountUids": [
+            "11111111-1111-4111-8111-111111111111"
+          ],
+          "grantedScopes": [
+            "accounts:read",
+            "transactions:read"
+          ],
+          "missingScopes": []
+        }
+      },
+      {
+        "label": "selected_second_private",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "ACCOUNT_USAGE_INVALID"
+      },
+      {
+        "label": "unselected_UID_mismatch",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "LIVE_ACCOUNT_SET_MISMATCH"
+      },
+      {
+        "label": "unselected_invalid_UID",
+        "method": "validateLegacyEnableSelection",
+        "accepted": false,
+        "code": "BANK_ACCOUNT_SCOPE_INVALID",
+        "status": 409,
+        "message": "Bankens godkända konton kunde inte verifieras.",
+        "reason": "LIVE_ACCOUNTS_INVALID"
+      }
+    ]
+  },
+  "independentReview": {
+    "outcome": "READY",
+    "agent": "/root/rating8_documents/usage_diagnostic_review",
+    "matrix": {
+      "baseline": "b020d020ad7ab8d4ca7417959d01ceb1613a5709",
+      "combinations": 256,
+      "allowed": 4,
+      "denied": 252,
+      "strictDenialsWithoutDiagnostic": 252,
+      "unusualValues": 3,
+      "throwingReflectionPreservesOriginalDenial": true,
+      "sourceAndTestSha256": {
+        "sites/lib/bank-consent-policy.js": "bc9da88933c98ba1ad11aff9c2c34d0654387fef68f10da613d534a05138aba2",
+        "sites/lib/bank-consent-policy.d.ts": "4da7f6e70627a4dff69056e8b650aa058ba7a5eeb6642a79fc46835440325d25",
+        "sites/lib/banking/service.ts": "5884ebe8db3f8b14a439f02c5b9068dd8f4d05b5a6a8e6018a904d1cc5c80bee",
+        "sites/tests/bank-usage-diagnostic.test.mjs": "31b88f136af6f1d20929a178c9857b8467a157fa603f4d7d89dd1581f9e2fffe",
+        "sites/tests/banking-security.test.mjs": "9433e2a3a2cca453557c87bfcb75cf068fcfdda0a078a96bb59c1a74cecbe5bb"
+      }
+    },
+    "httpServiceTests": {
+      "tests": 25,
+      "pass": 25,
+      "fail": 0,
+      "skipped": 0,
+      "duration_ms": 7930.334885
+    },
+    "artifacts": {
+      "docs/quality8/bank-usage-diagnostic-review/probe.mjs": "20e64c0740accc99ff1898c5c91adf56a5e6ffec15b49e0c2130a97dab3b6745",
+      "docs/quality8/bank-usage-diagnostic-review/probe-result.json": "d33c8cc789252dba133bb0750ae63775e77bdf6b1cee137f0a8c9ec65c701642",
+      "docs/quality8/bank-usage-diagnostic-review/README.md": "5162f416e80601df99cccf2569dc913256702b7b514ce1236c231eb1a0a1c411"
+    }
+  },
+  "effects": {
+    "actualBankRequests": 0,
+    "credentialReads": 0,
+    "productionDataReads": 0,
+    "productionWrites": 0,
+    "additionalProviderCallsIntroduced": 0,
+    "additionalDatabaseCallsIntroduced": 0,
+    "consentPredicatesChanged": false,
+    "rawUsageStringsExposed": false,
+    "accountIdentifiersExposed": false,
+    "existingStatus409AndCodePreserved": true,
+    "selectedCountMax": 100,
+    "permissionCooldownCasChanged": false
+  },
+  "commands": {
+    "redGreenPolicy": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/bank-usage-diagnostic.test.mjs",
+    "redGreenService": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap --test-name-pattern='usage diagnostic|independent scope review' sites/tests/banking-security.test.mjs",
+    "regressionPolicy": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/bank-consent-policy.test.mjs sites/tests/bank-usage-diagnostic.test.mjs sites/tests/bank-account-consent.test.mjs test/bank-consent-api.test.js test/api-account-consent.test.js",
+    "regressionService": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap --test-name-pattern='usage diagnostic|scope diagnostic|independent scope review|revalidation|consent recovery|consent commit reply|legacy selected scope|company selected scope' sites/tests/banking-security.test.mjs",
+    "broadParity": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs scripts/quality8/review-bank-scope-parity.mjs BEFORE_CHECKOUT AFTER_CHECKOUT",
+    "usageParity": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs scripts/quality8/review-bank-usage-diagnostic-parity.mjs BEFORE_CHECKOUT AFTER_CHECKOUT NEW_OUTPUT_JSON",
+    "independentMatrix": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs docs/quality8/bank-usage-diagnostic-review/probe.mjs",
+    "typecheckFromSites": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ../scripts/saas-test-isolation.mjs scripts/run-verified-tool.mjs check",
+    "diffCheck": "git diff --check"
+  },
+  "limits": [
+    "Actual selected saved/live usage categories remain unknown until an authorized ordinary production revalidation.",
+    "No claim of restored bank connectivity, legal account ownership or new consent.",
+    "Full integrated CI and production decisions belong to root.",
+    "Audit/owner/lease uncertainty suppresses categories rather than weakening a denial."
+  ]
+}

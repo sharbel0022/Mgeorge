@@ -1,0 +1,41 @@
+{
+  "schema": "mgeorge-v2-post-holdout-diagnostic-receipt-v1",
+  "status": "completed",
+  "postHoldoutDiagnostic": true,
+  "independentHoldout": false,
+  "acceptanceMeasurement": false,
+  "targetSourceCommit": "571073b8172ab53899a4ce3c2b717c7fe24daee2",
+  "firstV2Passed": false,
+  "firstV2ResultSha256": "13557c3012331fa0101fbe3e6fe498fd2fbf3346b8740cfe5fe4b83e8393b6e7",
+  "sourceStable": true,
+  "protectedFilesStable": true,
+  "runtimeDependenciesStable": true,
+  "totalRecognitionCalls": 2,
+  "cases": [
+    {
+      "id": "holdout-v2-normal-09",
+      "question": "Why does the visually explicit right-hand summary (Netto / Summa moms / Att betala, each with a value on its own physical row) not form a proven field column on unchanged 571: do the actual words/bboxes lack the association, or does a named existing layout guard stop it?",
+      "inputSha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+      "recognitionCalls": 1,
+      "rawBlocks": 17,
+      "rawLines": 26,
+      "rawWords": 85,
+      "globalConfidence": 93,
+      "layoutReconstructed": true,
+      "workerTextMatchesFirstV2": true
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "question": "Do the actual words/bboxes support an unambiguous split of Leverantör and Faktureras till into exactly one company-name candidate per explicitly labelled role column?",
+      "inputSha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+      "recognitionCalls": 1,
+      "rawBlocks": 8,
+      "rawLines": 20,
+      "rawWords": 92,
+      "globalConfidence": 90,
+      "layoutReconstructed": true,
+      "workerTextMatchesFirstV2": true
+    }
+  ],
+  "completedAt": "2026-11-05T22:34:19.535Z"
+}

@@ -1,0 +1,3 @@
+Browser tab: 15, Title: "MG Fakturakoll – betalningar & fakturor", URL: "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site/?view=bank".
+There has been no change in the accessibility tree.
+The focused UI element is 7 button Stäng dialog

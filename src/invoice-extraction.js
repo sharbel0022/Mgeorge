@@ -92,9 +92,16 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const taxSummaryPrefix='(?:summa|totalt|belopp)[ \\t]+';
   const grossTaxSummaryLabel=taxSummaryPrefix+'inkl(?:usive|\\.?)[ \\t]+moms';
   const netTaxSummaryLabel=taxSummaryPrefix+'exkl(?:usive|\\.?)[ \\t]+moms';
+  const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|fakturabelopp|amount due|'+grossTaxSummaryLabel+')';
+  // The explicit compound "Summa moms" has the same complete census inline
+  // and at line start. Generic VAT/net words still need a colon inline.
+  const vatLabel='(?:summa[ \\t]+moms|(?<=^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)|(?<!(?:före|exklusive|inklusive|inkl\\.?|exkl\\.?)[ \\t]+)(?:total moms|moms(?:belopp)?|VAT)(?=[ \\t]*:))';
+  const netLabel='(?:belopp före moms|'+netTaxSummaryLabel+'|(?<=^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount)|(?:totalt netto|netto(?:belopp)?|net amount)(?=[ \\t]*:))';
   // A following explicit field label separates values on the same line. Other
   // trailing content remains part of the value and must pass full validation.
-  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+grossTaxSummaryLabel+'|'+netTaxSummaryLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|att betala|summa att betala|totalsumma|totalbelopp|amount due|total moms|moms(?:belopp)?|VAT|netto(?:belopp)?|totalt netto|net amount|belopp före moms|valuta|currency)';
+  // Reuse the monetary census grammar exactly: a boundary must not discard an
+  // occurrence that the field's own collector would never inspect.
+  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+totalLabel+'|'+vatLabel+'|'+netLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|valuta|currency)';
   const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$)|'+issuedDateLabel+'|'+dueDateLabel+')','iu');
   const grabFull=(key,label,convert)=>{
     const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency',dateField=key==='issued_at'||key==='due_at';
@@ -140,11 +147,6 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     if(method==='ocr'&&/^-?0\d*[1-9]\d*$/.test(match[1].replaceAll(' ',''))&&!/[a-z]/i.test(s))return null;
     try{return parseMoney(match[1]);}catch{return null;}
   };
-  const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|amount due|'+grossTaxSummaryLabel+')';
-  // Inline monetary labels require a colon. Words inside net/total labels
-  // and ordinary VAT-rate prose are not separate monetary fields.
-  const vatLabel='(?:(?<=^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)|(?<!(?:före|exklusive|inklusive|inkl\\.?|exkl\\.?)[ \\t]+)(?:total moms|moms(?:belopp)?|VAT)(?=[ \\t]*:))';
-  const netLabel='(?:belopp före moms|'+netTaxSummaryLabel+'|(?<=^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount)|(?:totalt netto|netto(?:belopp)?|net amount)(?=[ \\t]*:))';
   grabFull('total_cents',totalLabel,money);
   grabFull('vat_cents',vatLabel,money);
   grabFull('net_cents',netLabel,money);

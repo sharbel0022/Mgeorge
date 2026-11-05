@@ -1,0 +1,2 @@
+import {registerHooks} from 'node:module';
+registerHooks({resolve(specifier,context,nextResolve){if(specifier==='tesseract.js'&&context.parentURL==="file:///tmp/mgeorge-v2-documents-diagnosis-7xwb632e/source/src/invoice-worker.js")return {url:"file:///tmp/mgeorge-v2-documents-diagnosis-7xwb632e/diagnostic/holdout-v2-normal-05/capture-tesseract.mjs",shortCircuit:true};return nextResolve(specifier,context);}});

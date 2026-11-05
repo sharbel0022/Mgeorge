@@ -9,7 +9,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { emptyState } from '../lib/domain.ts';
 import { bankUtcDate } from '../lib/banking/sync-periods.ts';
 import { ProviderError } from '../lib/banking/enable-banking.ts';
-import { ConsentError } from '../lib/bank-consent-policy.js';
+import { ConsentError, bankAccountScopeError, validateLegacyEnableSelection } from '../lib/bank-consent-policy.js';
 import { seal, unseal, randomToken, digest, validFlowToken, cookieValue } from '../lib/banking/security.ts';
 import { runtimeBankConfig, runtimeBankStatus } from '../lib/banking/runtime-config.ts';
 import { confirmedBankConsent } from '../lib/banking/status-view.ts';
@@ -68,6 +68,8 @@ const post = (path, body = {}, requestOrigin = origin) => new Request(`${origin}
 const count = (f, table) => f.sql.prepare(`SELECT count(*) AS n FROM ${table}`).get().n;
 const financialAuditCount = f => f.sql.prepare("SELECT count(*) AS n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n;
 const bankJobEvents = f => f.sql.prepare("SELECT action,detail,created_at,revision FROM audit_events WHERE owner=? AND action LIKE 'bank.job.%' ORDER BY rowid").all(f.owner).map(row=>({...row,detail:JSON.parse(row.detail)}));
+const usageCounts = (patch={}) => ({omitted:0,orga:0,priv:0,explicitNull:0,otherString:0,wrongType:0,...patch});
+const usageDiagnostic = (saved,live,selectedCount=1) => ({version:'selected-account-usage-v1',selectedCount,saved:usageCounts(saved),live:usageCounts(live)});
 
 async function fixture(t, environment = 'PRODUCTION', { actualProvider = false } = {}) {
   const key = `__mgBankTest_${crypto.randomUUID().replaceAll('-', '')}`;
@@ -175,6 +177,7 @@ test('rating8: fresh consent revalidation recovers only operational status and n
   const before={...f.connection()};
   const result=await(await f.service.revalidateConsent(post('revalidate'))).json();
   assert.equal(result.status,'connected');assert.equal(result.revalidated,true);
+  assert.ok(!('usageDiagnostic' in result));
   assert.equal(result.financialChanges,false);assert.equal(f.workspace(),null);
   assert.deepEqual(f.calls.map(call=>call.name),['getSession']);
   const after={...f.connection()};
@@ -1714,7 +1717,7 @@ for(const [name,mutate,reason,calls] of [
  const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();mutate(f);
  const before={...f.connection()},route=await independentScopeRoute(t,f),response=await route.POST(independentScopeRequest()),body=await response.json();
  assert.equal(response.status,200,'The existing JSON-RPC envelope transports tool errors with isError');
- assert.equal(body.result.isError,true);assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason});
+ assert.equal(body.result.isError,true);assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason,...(reason==='ACCOUNT_USAGE_INVALID'?{usageDiagnostic:usageDiagnostic({omitted:1},{otherString:1})}:{})});
  assert.deepEqual(JSON.parse(body.result.content[0].text),body.result.structuredContent);
  assert.deepEqual(f.calls.map(c=>c.name),calls);assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);
  assert.equal(count(f,'bank_sync_runs'),0);assert.equal(response.headers.get('cache-control'),'private, no-store');
@@ -1738,4 +1741,91 @@ test('independent scope review: caller-supplied reason cannot bypass the MCP arg
 test('independent scope review: unauthenticated MCP cannot request a bank diagnostic',async t=>{
  const f=await fixture(t);f.user=null;const route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest())).json();
  assert.equal(body.result.isError,true);assert.ok(body.result.structuredContent.signIn);assert.ok(!('reason' in body.result.structuredContent));assert.equal(f.calls.length,0);assert.equal(f.workspace(),null);
+});
+
+for(const args of [{usageDiagnostic:{saved:{priv:1}}},{selectedCount:100},{saved:{usage:null}},{owner:'other-owner'}])test('usage diagnostic: HTTP MCP rejects client category or owner arguments '+Object.keys(args)[0],async t=>{
+ const f=await fixture(t),route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest(args))).json();
+ assert.equal(body.error.code,-32602);assert.equal(f.calls.length,0);assert.equal(f.workspace(),null);
+ assert.ok(!JSON.stringify(body).includes('usageDiagnostic'));
+});
+
+for(const [name,change] of [
+ ['unauthenticated',f=>{f.user=null;}],
+ ['another owner',f=>{f.user={userId:'other-owner'};}],
+ ['adopted company',f=>{f.sql.prepare("INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES('synthetic-company',?,'synthetic-evidence',?)").run(f.owner,Date.now());}],
+ ['cooldown',f=>{f.sql.prepare('UPDATE bank_connections SET retry_after=?').run(future());}],
+])test('usage diagnostic: '+name+' cannot read selected usage categories',async t=>{
+ const f=await fixture(t);await f.seedApp();f.account.usage=null;await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();change(f);
+ const before={...f.connection()},route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest())).json();
+ assert.equal(body.result.isError,true);assert.ok(!('usageDiagnostic' in body.result.structuredContent));assert.equal(f.calls.length,0);
+ assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+});
+
+for(const [name,change,status,wanted] of [
+ ['owner',f=>{f.user={userId:'other-owner'};},500,{error:'Bankåtgärden kunde inte slutföras. Försök igen. Dina tidigare fakturor och bankhändelser är kvar.'}],
+ ['company adoption',f=>{f.sql.prepare("INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES('synthetic-company',?,'synthetic-evidence',?)").run(f.owner,Date.now());},403,{error:new ConsentError('COMPANY_ACCESS_DENIED').message,code:'COMPANY_ACCESS_DENIED'}],
+ ['lease',f=>{f.sql.prepare("UPDATE bank_locks SET token='replacement'").run();},409,{error:'Bankkörningens lås har löpt ut. Uppgifterna från det försenade svaret sparades inte.'}],
+ ['audit failure',f=>{const batch=f.d1.batch.bind(f.d1);f.d1.batch=async statements=>{if(statements.some(s=>s.values.includes('bank.consent.revalidation.failed')))throw Error('SYNTHETIC_AUDIT_FAILURE');return batch(statements);};},409,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason:'ACCOUNT_USAGE_INVALID'}],
+])test('usage diagnostic: changed '+name+' during GET suppresses categories without changing the denial',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+ f.live.accounts_data[0].usage=null;f.provider.getSession=async()=>{change(f);return structuredClone(f.live);};
+ let error;try{await f.service.revalidateConsent(post('revalidate'));}catch(caught){error=caught;}
+ const response=f.service.bankFailure(error),body=await response.json();
+ assert.equal(response.status,status);assert.deepEqual(body,wanted);assert.ok(!('usageDiagnostic' in body));
+ assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.equal(f.connection().status,'reauth_required');assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+ assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n,0);
+});
+
+test('usage diagnostic: a new account selection never emits revalidation categories',async t=>{
+ const f=await fixture(t);await f.seedApp();const id=await f.seedConnection(),other={...f.account,uid:extraLegacyUid,usage:null,account_id:{iban:'SE4550000000058398257474'}};
+ const encrypted=await f.store.encrypt(f.owner,`accounts:${id}`,[f.account,other]);f.sql.prepare('UPDATE bank_connections SET encrypted_accounts=?').run(encrypted);
+ f.live.accounts.push(extraLegacyUid);f.live.accounts_data.push({uid:extraLegacyUid,usage:null});
+ const before={...f.connection()};assert.deepEqual(JSON.parse(before.selected_accounts),[accountUid]);let error;try{await f.service.selectAccounts(post('accounts',{connectionId:id,accountUids:[extraLegacyUid]}));}catch(caught){error=caught;}
+ const response=f.service.bankFailure(error),body=await response.json();
+ assert.equal(response.status,409);assert.equal(body.reason,'ACCOUNT_USAGE_INVALID');assert.ok(!('usageDiagnostic' in body));
+ assert.deepEqual({...f.connection()},before);assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.equal(f.workspace(),null);
+});
+
+test('usage diagnostic: HTTP MCP never serializes forged diagnostic properties even with a genuine reason',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();let reads=0;
+ f.provider.getSession=async()=>{const error=bankAccountScopeError('ACCOUNT_USAGE_INVALID');Object.defineProperty(error,'usageDiagnostic',{get(){reads++;throw Error('PRIVATE_FORGED_USAGE');}});throw error;};
+ const route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest())).json();
+ assert.equal(body.result.isError,true);assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason:'ACCOUNT_USAGE_INVALID'});
+ assert.equal(reads,0);assert.ok(!JSON.stringify(body).includes('PRIVATE_FORGED_USAGE'));assert.equal(f.connection().status,'reauth_required');assert.deepEqual(f.calls.map(c=>c.name),['getSession']);
+});
+
+test('usage diagnostic: a provider-thrown genuine policy error is not bound to this revalidation input',async t=>{
+ const f=await fixture(t);await f.seedApp();await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+ const checked={...structuredClone(f.live),accounts:[extraLegacyUid],accounts_data:[{uid:extraLegacyUid,usage:null}]};let foreignError;
+ try{validateLegacyEnableSelection({session:{accounts:[{uid:extraLegacyUid,usage:'PRIV'}],aspsp:checked.aspsp,psu_type:'business',access:checked.access},checked,bankName:'Swedbank',country:'SE',requestedValidUntil:checked.access.valid_until,selectedAccountUids:[extraLegacyUid]});}catch(error){foreignError=error;}
+ assert.equal(foreignError?.code,'BANK_ACCOUNT_SCOPE_INVALID');f.provider.getSession=async()=>{throw foreignError;};
+ const route=await independentScopeRoute(t,f),body=await(await route.POST(independentScopeRequest())).json();
+ assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason:'ACCOUNT_USAGE_INVALID'});
+ assert.ok(!('usageDiagnostic' in body.result.structuredContent));assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.equal(f.connection().status,'reauth_required');
+});
+
+for(const [name,saved,live,wanted] of [
+ ['saved null and omitted live',null,undefined,usageDiagnostic({explicitNull:1},{omitted:1})],
+ ['private live', 'ORGA','PRIV',usageDiagnostic({orga:1},{priv:1})],
+ ['unknown saved and wrong-type live','PRIVATE_SYNTHETIC_USAGE',{secret:'PRIVATE_VALUE'},usageDiagnostic({otherString:1},{wrongType:1})],
+])test('usage diagnostic: ordinary HTTP MCP revalidation distinguishes '+name+' without bank or financial mutations',async t=>{
+ const f=await fixture(t);await f.seedApp();f.account.usage=saved;f.live.accounts_data[0].usage=live;await f.seedConnection();f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+ const before={...f.connection()},route=await independentScopeRoute(t,f),response=await route.POST(independentScopeRequest()),body=await response.json();
+ assert.equal(response.status,200);assert.equal(body.result.isError,true);
+ assert.deepEqual(body.result.structuredContent,{error:new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message,code:'BANK_ACCOUNT_SCOPE_INVALID',reason:'ACCOUNT_USAGE_INVALID',usageDiagnostic:wanted});
+ assert.deepEqual(JSON.parse(body.result.content[0].text),body.result.structuredContent);assert.equal(response.headers.get('cache-control'),'private, no-store');
+ assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.deepEqual({...f.connection()},before);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);assert.equal(financialAuditCount(f),2);
+ const audit=f.sql.prepare("SELECT detail FROM audit_events WHERE action='bank.consent.revalidation.failed'").get();assert.equal(JSON.parse(audit.detail).error_code,'BANK_ACCOUNT_SCOPE_INVALID');assert.ok(!audit.detail.includes('usageDiagnostic'));
+ for(const secret of [accountUid,remoteSession,'PRIVATE_SYNTHETIC_USAGE','PRIVATE_VALUE','Swedbank'])assert.ok(!JSON.stringify([body,audit]).includes(secret));
+});
+
+test('usage diagnostic: real service counts only the persisted selection on both snapshots',async t=>{
+ const f=await fixture(t);await f.seedApp();f.account.usage=null;const id=await f.seedConnection();
+ const encrypted=await f.store.encrypt(f.owner,`accounts:${id}`,[f.account,{...f.account,uid:extraLegacyUid,usage:'PRIVATE_UNSELECTED'}]);
+ f.sql.prepare("UPDATE bank_connections SET encrypted_accounts=?,status='reauth_required'").run(encrypted);f.live.accounts.push(extraLegacyUid);f.live.accounts_data.push({uid:extraLegacyUid,usage:'PRIV'});
+ const before={...f.connection()};let error;try{await f.service.revalidateConsent(post('revalidate'));}catch(caught){error=caught;}
+ const response=f.service.bankFailure(error),body=await response.json();assert.equal(response.status,409);
+ assert.deepEqual(body.usageDiagnostic,usageDiagnostic({explicitNull:1},{omitted:1}));assert.deepEqual({...f.connection()},before);
+ assert.deepEqual(f.calls.map(c=>c.name),['getSession']);assert.equal(f.workspace(),null);assert.equal(count(f,'bank_sync_runs'),0);
+ for(const value of [accountUid,extraLegacyUid,'PRIVATE_UNSELECTED'])assert.ok(!JSON.stringify(body).includes(value));
 });

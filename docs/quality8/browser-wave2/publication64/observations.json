@@ -1,0 +1,69 @@
+{
+  "schema": "mgeorge-quality8-publication-browser-v1",
+  "observed_at": "2026-11-05 22:56–22:57 UTC (minute precision)",
+  "site_version": 64,
+  "main": "819adee2f3848b474167eb6b15f82584caeb39af",
+  "source_tree": "6e024c917ba8833e516db5723f8be1ff1d1bc4dc",
+  "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site/",
+  "browser": "Cloud Chrome, existing tab15",
+  "scope": "Public signed-out shell and explicitly separate demo; no authenticated production UI and no real data writes.",
+  "observations": [
+    {
+      "id": "unknown-before-login",
+      "passed": true,
+      "observation": "Four financial cards show — and require sign-in; no fabricated zero balance."
+    },
+    {
+      "id": "demo-isolation",
+      "passed": true,
+      "observation": "Visible Demoläge, fictional customers/payments and session-only changes. Demo ended after checks."
+    },
+    {
+      "id": "overview-source-policy",
+      "passed": true,
+      "observation": "Preliminary warning remains; monthly verified receipts0, historical allocations excluded, no verified recent payments. Outstanding balance remains8695SEK."
+    },
+    {
+      "id": "keyboard-search-open-close",
+      "passed": true,
+      "observation": "Type1003; ArrowDown+Enter opens invoice1003 with focus on close button; Escape closes it and restores focus to workspace search."
+    },
+    {
+      "id": "registered-versus-verified",
+      "passed": true,
+      "observation": "Invoice shows registered allocation1000SEK needing review and remainder2200SEK. Bank detail is Blockerad, payer unknown, bank reference absent, invoice intended reference separate."
+    },
+    {
+      "id": "manual-multiple-entry",
+      "passed": true,
+      "observation": "Published bank detail contains Fördela på flera fakturor and explicitly refuses demo approval against saved originals."
+    },
+    {
+      "id": "registered-label",
+      "passed": true,
+      "observation": "Accessibility tree contains Registrerade kopplingar, with retained invoice1003 allocation1000SEK."
+    },
+    {
+      "id": "bank-modal-return",
+      "passed": true,
+      "observation": "Escape returns focus to the same bank-row button."
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "docs/quality8/browser-wave2/publication64/bank-detail.png",
+      "bytes": 75273,
+      "sha256": "718db5bd1c3e5f1dccfed001da13ddf54ba174cdf1e7fe85bbfb9fd2e2dbae69"
+    },
+    {
+      "path": "docs/quality8/browser-wave2/publication64/overview-demo.png",
+      "bytes": 103393,
+      "sha256": "fca149350b79ec7031cbcae09eb8253a16f4ac75f03edc8e78e8ccac9cf1fa9f"
+    }
+  ],
+  "limitations": [
+    "The text snapshots captured after screenshots are unchanged/diff receipts, not full accessibility-tree exports. Full visible states were observed in the tool transcript.",
+    "Screenshots are original browser bytes; no image editing.",
+    "Responsive acceptance remains the separately recorded25 local geometries at320/390/768/1024/1440px, bound to the delivered code. This postcheck does not repeat those25 or claim physical-device tests."
+  ]
+}

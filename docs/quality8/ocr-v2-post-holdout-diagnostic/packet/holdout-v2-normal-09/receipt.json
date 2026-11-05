@@ -1,0 +1,44 @@
+{
+  "id": "holdout-v2-normal-09",
+  "question": "Why does the visually explicit right-hand summary (Netto / Summa moms / Att betala, each with a value on its own physical row) not form a proven field column on unchanged 571: do the actual words/bboxes lack the association, or does a named existing layout guard stop it?",
+  "postHoldoutDiagnostic": true,
+  "independentHoldout": false,
+  "acceptanceMeasurement": false,
+  "recognitionCalls": 1,
+  "targetSourceCommit": "571073b8172ab53899a4ce3c2b717c7fe24daee2",
+  "sourceSha256": "08407f895bca7925b5efae42f3d42907e6d09d6dffbc1a071e757440731a2ed4",
+  "inputSha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+  "startedAt": "2026-11-05T22:34:09.311Z",
+  "completedAt": "2026-11-05T22:34:14.282Z",
+  "durationMsIncludingCapture": 4970.729491,
+  "workerError": null,
+  "rawBlocks": 17,
+  "rawLines": 26,
+  "rawWords": 85,
+  "globalConfidence": 93,
+  "layoutReconstructed": true,
+  "firstV2ObservedTextSha256": "b0d76ecc4edbfa5beb58fe61b2495db39b81361e234a8ba4feeacf3f42d4b10b",
+  "rawTextSha256": "d02400c71467f1366c1a26dd688b0e9867684af6afd6fce57878871ac93216b3",
+  "workerTextSha256": "b0d76ecc4edbfa5beb58fe61b2495db39b81361e234a8ba4feeacf3f42d4b10b",
+  "workerTextMatchesFirstV2": true,
+  "parameters": [
+    [
+      {
+        "tessedit_pageseg_mode": "3"
+      }
+    ]
+  ],
+  "captureHookSha256": "75d22b5896ba3f10a94e87d6f42b8915b14cc26960813a19093fecea70dd9352",
+  "captureBridgeSha256": "829aa23d2670a8907f69c8f81c1f4fa65fae161f82d192f1d1046ca254900554",
+  "artifactHashes": {
+    "question-and-input.json": "89b0dd07855b60aa21798ce13c731c6ece2e7bc5ef5a60e93cc6c11d7bfe3504",
+    "recognition-input.png": "db82bf3c25768aa0ae5e297db3fd731b8e06c5abedcc986534e35414f7cbb99a",
+    "recognition-start.json": "fc692c04a34f643f03ff746088cd482dbfe4af65bdc9a5da394c17095a93cc9e",
+    "recognition-finished.json": "2dc5c013075bf0e1a7e6f60c44e0dcb7a59ddbd8d6393dfbd346d5052f7b5034",
+    "raw-response.json": "c5d71ed5e6b09a1c362fc8c6cdc87a9b8b9bfca117f49752d2725a70a67951c8",
+    "raw-response.v8": "cd538408c8d69229adc070074b36ee66317314e862615ea453e0168bf3584cd6",
+    "worker-result.json": "7122e21194e3d9012c90d7bb0cbc00c12372395a09e0ca37b449ad21d3a97068",
+    "worker-stderr.txt": "cbdec0cfe020107c502ea2eb332a420a764cbb3e19d66fb9c6d253c6bf3cac80",
+    "layout-replay.json": "d3c1e3afe8e74e7aeb4f85c772cf5de2787d635efc797099adf29f505744c0bd"
+  }
+}

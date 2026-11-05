@@ -6,9 +6,9 @@ const supplierOwner='(?:leverantörens|utställarens|säljarens|supplier(?:[’\
 const recipientOwner='(?:kundens|mottagarens|fakturamottagarens|customer(?:[’\u0027]s)?|recipient(?:[’\u0027]s)?)';
 const orgLabel='(?:org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|org\\.?[ \\t]*number|organi[sz]ation[ \\t]+number)';
 const entityLabel='(?:'+supplierLabel+'|'+recipientLabel+')';
-const knownField=/^(?:faktura(?:nummer|nr|datum)|invoice(?:\s*(?:number|no|date))?|förfallo(?:datum|dag)|förfaller|due\s*date|betalningsuppgifter|tilläggsinformation|payment details|netto|net amount|moms|vat|att betala|amount due|totalbelopp|bankgiro|bg\b|ocr\b|betalningsreferens|payment reference|valuta|currency)/iu;
+const knownField=/^(?:faktura(?:nummer|nr|datum|belopp)|invoice(?:\s*(?:number|no|date))?|förfallo(?:datum|dag)|förfaller|due\s*date|betalningsuppgifter|tilläggsinformation|payment details|netto|net amount|summa[ \t]+moms|moms|vat|att betala|amount due|totalbelopp|bankgiro|bg\b|ocr\b|betalningsreferens|payment reference|valuta|currency)/iu;
 const boundaryLabel=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?=(?:'+entityLabel+'|(?:'+supplierOwner+'|'+recipientOwner+')[ \\t]+'+orgLabel+'|'+orgLabel+'|fakturanummer|fakturanr|invoice number|fakturadatum|invoice date|förfallodatum|due date|netto|net amount|moms|vat|att betala|amount due|bankgiro|ocr|betalningsreferens|payment reference|valuta|currency)[ \\t]*[:#])','iu');
-const nameValue=value=>value.length>=2&&value.length<=240&&/\p{L}/u.test(value)&&!/[?\uFFFD]/u.test(value)&&!/^(?:oläslig[ta]?|okänd|unknown|unreadable|n\/?a|null)$/iu.test(value)?value:null;
+const nameValue=value=>value.length>=2&&value.length<=240&&/\p{L}/u.test(value)&&!/[?\uFFFD]/u.test(value)&&!/^(?:oläslig[ta]?|okän[dt]|unknown|unreadable|n\/?a|null|saknas|(?:ej|inte)[ \t]+angiv(?:en|et|na)|not[ \t]+(?:provided|specified)|missing)$/iu.test(value)?value:null;
 const dedupeEvidence=items=>[...new Map(items.map(item=>[`${item.page}:${item.line}`,item])).values()];
 
 function linesOf(input){
@@ -29,7 +29,10 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1},
   const records={supplier:{names:[],organizations:[]},recipient:{names:[],organizations:[]}},unassigned=[];
   const namePattern=new RegExp('(?<![\\p{L}\\p{N}/_-])('+supplierLabel+'|'+recipientLabel+')(?:[ \\t]+(?:namn|name))?[ \\t]*:[ \\t]*','giu');
   const orgPattern=new RegExp('(?<![\\p{L}\\p{N}/_-])(?:(('+supplierOwner+')|('+recipientOwner+'))[ \\t]+)?'+orgLabel+'(?=[ \\t.:#]|$)[ \\t]*[:.#]?[ \\t]*','giu');
-  const headingPattern=new RegExp('^('+supplierLabel+'|'+recipientLabel+')[ \\t]*:?$','iu');
+  const headingPattern=new RegExp('^('+supplierLabel+'|'+recipientLabel+')(?:[ \\t]+(?:namn|name))?[ \\t]*:?$','iu');
+  const bareSupplierPattern=new RegExp('^('+supplierLabel+')(?:[ \\t]+(?:namn|name))?[ \\t]+(?=\\S)','iu');
+  const partyRoleSource='(?:'+entityLabel+'|faktureras[ \\t]+till)(?=[ \\t:#]|$)';
+  const partyRoleStart=new RegExp('^'+partyRoleSource,'iu'),competingRole=new RegExp('(?<![\\p{L}\\p{N}/_-])'+partyRoleSource,'iu');
   const isSupplier=value=>new RegExp('^'+supplierLabel+'$','iu').test(value);
   let section=null,page=0;
   for(let n=0;n<lines.length;n++){
@@ -38,6 +41,14 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1},
     const names=[...line.matchAll(namePattern)].map(match=>({kind:'name',role:isSupplier(match[1])?'supplier':'recipient',index:match.index,end:match.index+match[0].length}));
     const orgs=[...line.matchAll(orgPattern)].map(match=>({kind:'organization',role:match[2]?'supplier':match[3]?'recipient':null,index:match.index,end:match.index+match[0].length}));
     const heading=line.match(headingPattern);
+    // Only an explicit supplier role at the beginning of a source line can
+    // omit the colon. An unlabelled name or a prose mention is not a role.
+    // A recognized owner-qualified organization label already owns this
+    // prefix; it must not also create an empty name occurrence.
+    if(!heading&&![...names,...orgs].some(event=>event.index===0)){
+      const bare=line.match(bareSupplierPattern);
+      if(bare)names.push({kind:'name',role:'supplier',index:0,end:bare[0].length,bare:true});
+    }
     if(heading&&!names.length){
       const role=isSupplier(heading[1])?'supplier':'recipient';
       const following=lines[n+1],next=following&&following.page===source.page&&following.line===source.line+1?normalized(following.text):'';
@@ -53,12 +64,18 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1},
       const event=events[i];
       const raw=line.slice(event.end,i+1<events.length?events[i+1].index:line.length).replace(/[ \t;|]+$/u,'').trim();
       let value=valueAfter(raw,0,scalarBoundary),evidence=[source];
-      if(!raw){
+      if(!raw&&events.length===1){
         const following=lines[n+1],next=following&&following.page===source.page&&following.line===source.line+1?normalized(following.text):'';
-        if(next&&scalarBoundary(next)!==0&&!knownField.test(next)&&![...next.matchAll(namePattern)].length&&![...next.matchAll(orgPattern)].length&&!headingPattern.test(next)&&!next.includes('|')){value=next;evidence.push(following);}
+        // A neighbouring unknown labelled field is not a company name. Its
+        // colon/column separator stays in the original; never borrow its text.
+        if(next&&scalarBoundary(next)!==0&&!knownField.test(next)&&!partyRoleStart.test(next)&&![...next.matchAll(namePattern)].length&&![...next.matchAll(orgPattern)].length&&!headingPattern.test(next)&&!/[|:]/.test(next)){value=next;evidence.push(following);}
       }
       if(event.kind==='name'){
-        section=event.role;records[event.role].names.push({value:nameValue(value),evidence});
+        // Do not turn a second role, an unknown labelled field or unresolved
+        // columns into part of a colonless name. Keep this occurrence in the
+        // census as invalid so another supplier label cannot hide it.
+        const ambiguous=event.bare&&(competingRole.test(value)||/[:|]/.test(value));
+        section=event.role;records[event.role].names.push({value:ambiguous?null:nameValue(value),evidence});
       }else{
         const record={value:organizations(value,validOrganization),evidence},role=event.role||section;
         if(role)records[role].organizations.push(record);else unassigned.push(record);
@@ -135,7 +152,7 @@ function tableHeader(line){
 const quantityValue=value=>/^-?\d+(?:[.,]\d{1,4})?$/.test(value)&&Number.isFinite(Number(value.replace(',','.')))&&Math.abs(Number(value.replace(',','.')))<=1_000_000_000?Number(value.replace(',','.')):null;
 const rateValue=value=>{const match=value.match(/^(\d{1,3}(?:[.,]\d{1,3})?)[ \t]*%?$/);if(!match)return null;const n=Number(match[1].replace(',','.'));return n>=0&&n<=100?n:null;};
 const rowKeys=['description','quantity','unit_price_cents','net_cents','vat_rate','vat_cents','total_cents'];
-const tableSummary=/^(?:netto(?:belopp)?|totalt netto|net amount|belopp före moms|(?:summa|totalt|belopp)[ \t]+(?:inkl|exkl)(?:usive|\.?)[ \t]+moms|moms(?:belopp)?|total moms|vat|att betala|summa att betala|totalbelopp|totalsumma|amount due)(?=[ \t]*[:.#]|[ \t]*$|[ \t]+(?:-?\d|SEK\b|EUR\b|USD\b|GBP\b|NOK\b|DKK\b))/iu;
+const tableSummary=/^(?:netto(?:belopp)?|totalt netto|net amount|belopp före moms|(?:summa|totalt|belopp)[ \t]+(?:inkl|exkl)(?:usive|\.?)[ \t]+moms|summa[ \t]+moms|moms(?:belopp)?|total moms|vat|att betala|summa att betala|totalbelopp|totalsumma|fakturabelopp|amount due)(?=[ \t]*[:.#]|[ \t]*$|[ \t]+(?:-?\d|SEK\b|EUR\b|USD\b|GBP\b|NOK\b|DKK\b))/iu;
 const pageCaption=/^(?:sida|page)[ \t]+\d+(?:[ \t]*(?:av|of|\/)[ \t]*\d+)?$/iu;
 const invoiceIdentity=/^(?:faktura[ \t]*(?:nummer|nr|no)|invoice[ \t]*(?:number|no))[ \t]*[:.#-]?[ \t]*([\p{L}\p{N}][\p{L}\p{N}/_-]*)$/iu;
 const continuationIdentity=/^(?:faktura|invoice)[ \t]+([\p{L}\p{N}][\p{L}\p{N}/_-]*)[ \t]*[,;:]?[ \t]*(?:fortsättning|continued|continuation)[ \t]+(?:sida|page)[ \t]+\d+(?:[ \t]+(?:av|of)[ \t]+\d+|[ \t]*\/[ \t]*\d+)?$/iu;
@@ -163,8 +180,11 @@ function parseTable(lines,{invoice_number,summary,credit,money,currency},issues)
     const identity=lineIdentity(line);
     if(identity&&header){if(invoice_number&&identity[1]===invoice_number)allowed=true;else{documentConflict=true;allowed=false;conflict();}continue;}
     if(!header)continue;
-    if(tableSummary.test(line)){if(pending){incomplete();pending=null;}active=false;continue;}
     const split=splitCells(source.text,header.format);
+    // A supported label can also be an article description. Explicit table
+    // cells retain that context instead of promoting a cell to a summary.
+    const structuredRow=active&&split.cells.length>1&&split.cells.length===header.columns.length;
+    if(tableSummary.test(line)&&!structuredRow){if(pending){incomplete();pending=null;}active=false;continue;}
     if(split.cells.length===1&&knownField.test(line))continue;
     if(!active){if(split.cells.length>1)incomplete();continue;}
     covered.add(`${source.page}:${source.line}`);
