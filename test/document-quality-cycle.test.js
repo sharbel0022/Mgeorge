@@ -47,11 +47,41 @@ for(const [field,line] of [
   }
 });
 
-for(const value of ['1,250.00 SEK','1.250,001 SEK','1 250,00oops SEK','okänt SEK'])test(`document quality: malformed labelled total ${value} cannot be silently ignored`,()=>{
+for(const value of ['1,25.00 SEK','1.250,001 SEK','1 250,00oops SEK','okänt SEK'])test(`document quality: malformed labelled total ${value} cannot be silently ignored`,()=>{
   const result=interpretInvoice(invoice+'\nAtt betala: '+value,metadata);
   assert.notEqual(result.level,'green');
   assert.ok(result.issues.some(issue=>issue.includes('totalbelopp')));
   assert.ok(result.text_excerpt.includes(value));
+});
+
+test('document quality: repeated English grouped totals preserve exact invoice evidence',()=>{
+  for(const label of ['Att betala','Total']){
+    const line=label+': 1,250.00 SEK';
+    for(const text of [invoice+'\n'+line,line+'\n'+invoice]){
+      const result=interpretInvoice(text,metadata);
+      assert.equal(result.level,'green');
+      assert.equal(result.fields.total_cents.value,125000);
+      assert.equal(result.fields.net_cents.value,100000);
+      assert.equal(result.fields.vat_cents.value,25000);
+      assert.equal(result.fields.invoice_number.value,'0594');
+      assert.equal(result.fields.reference.value,'0000596');
+      assert.deepEqual(result.issues,[]);
+      assert.ok(result.text_excerpt.includes(line));
+    }
+  }
+});
+
+test('document quality: conflicting English grouped totals remain unresolved',()=>{
+  for(const label of ['Att betala','Total']){
+    const line=label+': 1,251.00 SEK';
+    for(const text of [invoice+'\n'+line,line+'\n'+invoice]){
+      const result=interpretInvoice(text,metadata);
+      assert.notEqual(result.level,'green');
+      assert.equal(result.fields.total_cents.value,null);
+      assert.ok(result.issues.some(issue=>issue.includes('Motstridiga värden för totalbelopp')));
+      assert.ok(result.text_excerpt.includes(line));
+    }
+  }
 });
 
 for(const [source,pattern] of [

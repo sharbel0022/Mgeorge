@@ -1,5 +1,20 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 3 — fakturatolkning och OCR-kö, 2026-11-05
+
+[Leveransrapport och verifieringsjournal](docs/integration/95-ocr-reliability.md), branch `feature/95-ocr`, bas `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`. Produktionsobservationerna är läsande och skiljs från syntetiska regressioner. **Alla 33 numeriska poäng behålls: 255/330 =7,73/10; 0/33 ≥9,5.** En godkänd parserkorpus eller testsamling är inget produktionsfacit.
+
+| Område | Före → efter | Nytt avgränsat bevis | Återstående acceptans |
+| --- | --- | --- | --- |
+| 9. PDF-tolkning /10. Bild-OCR | 8→8 /7→7 | Fasta syntetiska dokument, svenska/engelska fält, artikel- och beloppskontroller samt oförändrade originalgränser redovisas i leveransrapporten. | Manuellt märkt prov av verkliga original och aktuell optisk precision krävs före höjd produktionspoäng. |
+| 11. Gmail | 7,5→7,5 | Lyckad hämtning och förändrat inflöde verifierade utan att dokument bearbetas av denna branch. | Hämtning och OCR-genomströmning måste fungera tillsammans i kontrollerad drift. |
+| 12. Automatisk registrering /13. Dubbletter | 8→8 /8→8 | Motpartsverifiering, originalbindning, dubblettspärrar och granskningskrav bevaras. Återhämtning av en sparad tolkning registrerar ingen faktura. | Verkliga motparter ska verifieras uttryckligen; osäkra resultat får inte räknas som godkända. |
+| 14. Dokumentgranskning | 8→8 | Sista-försöket-avbrott med beständigt tolkningskvitto återförs säkert till granskning. Äldre dokument kan öppnas från granskningslänkar; 200-gränsen gäller unika dokument. Separata orsaker för belopp/moms, identitet, tabell och avbrott. | De 350 observerade granskningsposterna är inte omtolkade eller godkända av leveransen. |
+| 28. Schemaläggning | 6,5→6,5 | Läsande köstatus skiljer redo, uppskjutna, aktiva, utgångna och förbrukade jobb; saknad arbetarkontakt visas uttryckligen. | Molnarbetarens aktuella externa schema och färsk verklig OCR-bearbetning återstår att verifiera. |
+| 32. Kodkvalitet och tester | 8,5→8,5 | Reproducerade RED/GREEN-fall, samma syntetiska facit före/efter och fulla verifieringsgrindar redovisas med exakta resultat i rapporten. | Ingen poänghöjning enbart från testantal; åtta befintliga moderate Sites-beroendefynd kvarstår. |
+
+Tidigare daterade kvitton nedan behåller sin historiska omfattning. Inget produktionsbelopp, original, schema eller Sites-publicering ändras i denna PR.
+
 ## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
 
 [Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.

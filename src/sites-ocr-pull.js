@@ -1,30 +1,57 @@
 import {createHash} from 'node:crypto';
+import {setTimeout as delay} from 'node:timers/promises';
 import {runDocumentProcess} from './invoice-extraction.js';
 const MAX_BYTES=15000000;
 // Only errors created here receive public diagnostics. Unknown thrown values
 // are never inspected: provider/body text, getters and token values stay private.
 const httpFailures=new WeakMap();
+const bodyLimitFailures=new WeakSet();
+const retryDeferredFailures=new WeakSet();
+function bodyLimitFailure(){
+  const error=Error('response_limit');bodyLimitFailures.add(error);return error;
+}
 export function sitesOcrFailure(error){
   return httpFailures.get(error)??{failure_code:'UNCLASSIFIED_FAILURE'};
 }
-function rejectHttp(status){
+function rejectHttp(status,deferRetry=false){
   const failure_code=status===404?'SITE_NOT_FOUND':status===401?'WORKER_UNAUTHORIZED':status===403?'WORKER_FORBIDDEN':status===429?'SITE_RATE_LIMITED':status>=300&&status<400?'SITE_REDIRECT_BLOCKED':status>=500?'SITE_UNAVAILABLE':'SITE_RESPONSE_REJECTED';
   const error=Error(status===401?'authorization':'site_unavailable');
-  httpFailures.set(error,Object.freeze({failure_code,http_status:status}));throw error;
+  httpFailures.set(error,Object.freeze({failure_code,http_status:status}));
+  if(deferRetry)retryDeferredFailures.add(error);
+  throw error;
 }
 export async function boundedBody(response,limit){
-  if(Number(response.headers.get('content-length'))>limit)throw Error('response_limit');
+  if(Number(response.headers.get('content-length'))>limit){
+    const error=bodyLimitFailure();
+    try{await response.body?.cancel();}catch{}
+    throw error;
+  }
   const chunks=[];let length=0;
-  if(response.body){const reader=response.body.getReader();try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>limit){await reader.cancel();throw Error('response_limit');}chunks.push(value);}}finally{reader.releaseLock();}}
+  if(response.body){const reader=response.body.getReader();try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>limit){const error=bodyLimitFailure();try{await reader.cancel();}catch{}throw error;}chunks.push(value);}}finally{reader.releaseLock();}}
   return Buffer.concat(chunks,length);
 }
 export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentProcess,maxJobs=6}={}){
   const origin=new URL(config.origin);if(origin.protocol!=='https:'||origin.username||origin.password||origin.search||origin.hash||origin.pathname!=='/'||!config.token||!/^[A-Za-z0-9_-]{43}$/.test(config.token)||![undefined,'local','cloud'].includes(config.mode)||!Number.isInteger(maxJobs)||maxJobs<1)throw Error('configuration');
   const cloud=config.mode==='cloud';
-  let processed=0,failed=0;
+  let processed=0,failed=0,settled=0;
   const request=async(path,body,extra={},timeout=25000)=>{
     const result=await fetchImpl(origin.origin+path,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+config.token,...(cloud?{'X-MG-OCR-Runner':'cloud'}:{}),...(body===undefined?{}:{'Content-Type':'application/json'}),...extra},body:body===undefined?undefined:JSON.stringify(body),redirect:'manual',signal:AbortSignal.timeout(timeout)});
-    if(!result.ok)rejectHttp(result.status);return result;
+    if(!result.ok)rejectHttp(result.status,result.headers.get('retry-after')!==null);return result;
+  };
+  // A document GET is read-only. Restart an interrupted transfer once from
+  // byte zero; never retry leases or completion POSTs with uncertain outcomes.
+  const download=async(job)=>{
+    for(let attempt=0;attempt<2;attempt++){
+      try{
+        return await boundedBody(await request('/api/ocr-worker/document?id='+encodeURIComponent(job.id),undefined,{'X-MG-OCR-Lease':job.lease}),MAX_BYTES);
+      }catch(error){
+        const http=httpFailures.get(error);
+        // A server-requested delay belongs to the next durable queue recovery,
+        // not an immediate retry or an unbounded wait in this worker.
+        if(attempt===1||bodyLimitFailures.has(error)||retryDeferredFailures.has(error)||(http&&http.http_status<500))throw error;
+        await delay(250);
+      }
+    }
   };
   const json=async(path,body,limit,timeout)=>{
     const value=JSON.parse((await boundedBody(await request(path,body,{},timeout),limit)).toString());
@@ -53,23 +80,26 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
       if(lease.job===null)break;const job=lease.job;
       if(!job||typeof job!=='object')throw Error('invalid_job');
       if(!/^[a-zA-Z0-9_-]{1,100}$/.test(job.id)||!/^[A-Za-z0-9_-]{43}$/.test(job.lease)||!['application/pdf','image/png','image/jpeg','image/webp'].includes(job.mime)||!Number.isInteger(job.size)||job.size>MAX_BYTES||job.size<1||!/^[a-f0-9]{64}$/.test(job.sha256))throw Error('invalid_job');
+      // Transport failures leave the lease for durable queue recovery. They
+      // must not be acknowledged as a failed OCR interpretation.
+      const bytes=await download(job);
       let result;
       try{
-        const bytes=await boundedBody(await request('/api/ocr-worker/document?id='+encodeURIComponent(job.id),undefined,{'X-MG-OCR-Lease':job.lease}),MAX_BYTES);
         if(bytes.length!==job.size||createHash('sha256').update(bytes).digest('hex')!==job.sha256)throw Error('hash');
         const value=await extract(bytes,job.mime);
         if(!value||value.error||typeof value.text!=='string'||value.text.length>150000||!['pdf','ocr'].includes(value.method)||!Number.isFinite(value.confidence)||value.confidence<0||value.confidence>100)throw Error('ocr');
         // Do not let an extractor overwrite the authenticated lease identifiers.
         result={text:value.text,method:value.method,confidence:value.confidence};
-      }catch{result={text:'',method:'ocr',confidence:0,error:true};failed++;}
+      }catch{result={text:'',method:'ocr',confidence:0,error:true};}
       const completion=await json('/api/ocr-worker/complete',{id:job.id,lease:job.lease,sha256:job.sha256,...result},16384);
       if(completion.ignored||!(result.error?completion.ok===true:completion.registered===true||['ready','needs_review','duplicate'].includes(completion.state)))throw Error('completion_rejected');
-      if(!result.error)processed++;
+      settled++;
+      if(result.error)failed++;else processed++;
     }
   }catch(error){
-    // Preserve only server-accepted work. A later lease, body, or completion
-    // failure stops this run without counting an uncertain job or retrying it.
-    if(processed===0)throw error;
+    // Preserve accepted successes and acknowledged OCR failures when a later
+    // transport or queue operation stops the run. Completion POSTs are not retried.
+    if(processed===0&&settled===0)throw error;
     return {processed,failed,status_unknown:true};
   }
   return {processed,failed};

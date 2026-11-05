@@ -1,5 +1,17 @@
 # Verifierad progress
 
+## Agent 3 — AI/OCR, Gmail och fakturatolkning, 2026-11-05
+
+Branch `feature/95-ocr`, bas `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`. [Leveransrapport, före/efter-mätning och verifieringsjournal](docs/integration/95-ocr-reliability.md). Avgränsade rättningar förbättrar svensk/engelsk fakturatolkning, OCR-överföring, köåterhämtning, granskning av äldre dokument och driftstatus. Ingen merge eller publicering ingår.
+
+Samma **15 syntetiska textfall ×13 fält per motor** gav exakt fältöverensstämmelse **178/195→195/195**, precision bland returnerade värden **172/173→188/188**, recall **172/188→188/188** och felaktigt gröna osäkra fall **1/8→0/8**, identiskt för Node och Sites. Tolv extra gränsfall per motor ingår i regressionerna. Den oberoende granskningen hittade en ny `Net 30`-tvetydighet utanför korpusen; den rättades och verifierades även med kolon/radbrytning. Ett separat verkligt Tesseract-/PDF-prov av två rena syntetiska engelska original gav 13/13 fält vardera; bilden behöll granskningskravet. Detta är inga mått på kunddokumentens precision.
+
+Transportfel kvitteras inte som OCR-fel; ett enda begränsat nytt GET-försök tillåts, medan osäkra POST-utfall inte upprepas. Endast accepterade kvitteringar räknas. En sparad tolkning vars tredje försök avbröts kan återföras till granskning med exakta lease-/kvitto-/originalkontroller, utan registrering. Status visar redo/uppskjutna/aktiva/förbrukade jobb och unik genomströmning. Granskningslänkar kan öppna äldre dokument även när mer än 200 källposter finns; listgränsen gäller nu unika dokument.
+
+Separat agentgranskning har godkänt kö/status, arbetare, navigation och slutlig parser efter rättning. Slutliga fullsviter: **1 945 Node +3 801 Sites +47 brygga =5 793 godkända**, utan fail/skip/cancel/TODO. Syntax (173 JavaScript-filer), typer, exakt minimatch-grind, audits och Sites produktionsbygge passerar; full Sites-audit har 8 befintliga moderate och inga high/critical. Exakta kommandon, källhashar och begränsningar finns i leveransrapporten. Fokuserade grupper överlappar helsviterna och adderas inte som extra täckning.
+
+Läsande produktionsobservationer: start **350 att granska/15 OCR-väntande**; 18:03 UTC **350 att granska/17 OCR-väntande/3 textjobb i kö**. Gmail hämtade 17:13 UTC; ingen nylig arbetaraktivitet är verifierad. Köförändringen kommer från parallellt inflöde, inte denna odriftsatta branch. De väntande jobb som inspekterades hade noll försök. 349 granskningsposter saknade verifierad motpart och 288 hade osäkra fält; orsakerna överlappar. Inga verkliga original, belopp, registreringar, scheman eller driftinställningar ändrades. **Alla 33 poäng är oförändrade: 255/330 =7,73/10; 0/33 ≥9,5.** Produktionsprecision, färsk schemakörning och kontrollerad behandling av verkliga original återstår före 9,5-acceptans.
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).

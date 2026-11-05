@@ -67,7 +67,7 @@ export function gmailFailure(error?:unknown){
   if(cause?.safe||codes.includes(cause?.code||''))return response({error:cause.message,...(cause.retryAfter?{retry_after:cause.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+cause.retryAfter*1000).toISOString()}:{} )},cause.code==='rate_limited'?429:409);
   return response({error:'Gmail-åtgärden kunde inte slutföras. Kontrollera anslutningen och försök igen.'},409);
 }
-export async function gmailStatus(summary=false){
+export async function gmailStatus(summary=false,documentId=''){
   const user=await identity();
   const account=await companyGmailAccount(user.userId,{required:false});
   const processing=await processingStatus(user.userId);
@@ -98,7 +98,18 @@ export async function gmailStatus(summary=false){
   const attachment_rejections=await attachmentRejections(user.userId);
   const status={configured,email:account,send_enabled:!!send_enabled,connection,processing,last_successful_fetch,sync_health,schedule_observation,attachment_rejections,background_ready:state==='recent',scheduler_configured:processing.scheduler_configured,next_eligible_sync};
   if(summary)return response(status);
-  const candidates=await db().prepare("SELECT s.document_id,s.metadata,s.status,s.extraction,s.created_at,d.filename,d.mime,j.state processing_state,j.extraction processing_extraction,j.error_code,j.invoice_id,j.automatic FROM gmail_sources s JOIN documents d ON d.id=s.document_id AND d.owner=s.owner LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=? AND s.status<>'rejected' ORDER BY s.created_at DESC LIMIT 200").bind(user.userId).all();
+  const focusedDocumentId=typeof documentId==='string'&&/^[A-Za-z0-9_-]{1,100}$/.test(documentId)?documentId:'';
+  // Bound unique documents, not repeated message sources. A dashboard link
+  // can include an older owned document without expanding the response cap.
+  // Rank before filtering rejection so an older source cannot revive it.
+  const candidates=await db().prepare(`WITH ranked_sources AS (
+    SELECT s.document_id,s.metadata,s.status,s.extraction,s.created_at,d.filename,d.mime,j.state processing_state,j.extraction processing_extraction,j.error_code,j.invoice_id,j.automatic,
+      ROW_NUMBER() OVER (PARTITION BY s.document_id ORDER BY s.created_at DESC,s.source_id DESC) source_rank
+    FROM gmail_sources s JOIN documents d ON d.id=s.document_id AND d.owner=s.owner
+    LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=?
+  ) SELECT document_id,metadata,status,extraction,created_at,filename,mime,processing_state,processing_extraction,error_code,invoice_id,automatic
+    FROM ranked_sources WHERE source_rank=1 AND status<>'rejected'
+    ORDER BY (document_id=?) DESC,created_at DESC,document_id DESC LIMIT 200`).bind(user.userId,focusedDocumentId).all();
   const runs=await db().prepare('SELECT found,imported,duplicates,status,created_at FROM gmail_runs WHERE owner=? ORDER BY created_at DESC LIMIT 10').bind(user.userId).all();
   const workspace=await readWorkspace(user.userId);
   const documents=candidates.results.map((c:any)=>({...c,invoice_id:c.invoice_id||workspace.state.invoices.find(i=>i.documentId===c.document_id)?.id||''}));

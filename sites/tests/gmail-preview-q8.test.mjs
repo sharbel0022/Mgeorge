@@ -18,7 +18,7 @@ const extraction=()=>fields.interpretInvoice(originalText,{direction:'supplier',
 const elements=node=>!node||typeof node!=='object'?[]:Array.isArray(node)?node.flatMap(elements):[node,...elements(node.props?.children)];
 const text=node=>node==null||typeof node==='boolean'?'':Array.isArray(node)?node.map(text).join(' '):typeof node==='object'?text(node.props?.children):String(node);
 
-async function fixture(t,{stored=null,processing=null,pending=0,connected=false}={}){
+async function fixture(t,{stored=null,processing=null,pending=0,connected=false,documentId='synthetic-doc',requireFocus=false}={}){
   const key='__gmail_preview_'+crypto.randomUUID().replaceAll('-',''),f={slots:[],cursor:0,effects:[],scheduled:false,closed:false,requests:[]};globalThis[key]=f;
   const equal=(a,b)=>a&&b&&a.length===b.length&&a.every((v,n)=>Object.is(v,b[n]));
   f.state=initial=>{const n=f.cursor++;f.slots[n]??={value:typeof initial==='function'?initial():initial};return[f.slots[n].value,value=>{f.slots[n].value=typeof value==='function'?value(f.slots[n].value):value;f.schedule();}];};
@@ -33,22 +33,27 @@ async function fixture(t,{stored=null,processing=null,pending=0,connected=false}
     './document-ocr-status':compiled('../components/document-ocr-status.tsx'),
     './sync-recovery-notice':compiled('../components/sync-recovery-notice.tsx'),
   }));
-  f.doc={document_id:'synthetic-doc',filename:'synthetic.png',mime:'image/png',metadata:JSON.stringify({direction:'supplier',direction_confident:true,subject:'Synthetic invoice',from:'supplier@example.test',to:'owner@example.test'}),status:'needs_review',processing_state:'needs_review',created_at:'2026-10-30T00:00:00Z',extraction:JSON.stringify(stored||{}),processing_extraction:JSON.stringify(processing||{})};
+  f.doc={document_id:documentId,filename:'synthetic.png',mime:'image/png',metadata:JSON.stringify({direction:'supplier',direction_confident:true,subject:'Synthetic invoice',from:'supplier@example.test',to:'owner@example.test'}),status:'needs_review',processing_state:'needs_review',created_at:'2026-10-30T00:00:00Z',extraction:JSON.stringify(stored||{}),processing_extraction:JSON.stringify(processing||{})};
+  f.statusPath='/api/gmail/status?document='+encodeURIComponent(documentId);
   f.response={registered:true};f.processResponse={processed:0};f.syncResponse={imported:0,duplicates:0};f.syncStatus=200;f.status={email:'owner@example.test',configured:true,candidates:[f.doc],runs:[],processing:{registered:0,aftercheck_pending:pending},...(connected?{connection:{status:'connected'}}:{})};
   f.failures={};f.workspace={revision:0};f.change=async()=>{f.workspace.revision++;};
   t.mock.method(globalThis,'fetch',async(path,options={})=>{
+    const url=new URL(path,'https://synthetic.example'),pathname=url.pathname;
     const request={path,method:options.method||'GET',...(options.body?{body:JSON.parse(options.body)}:{})};f.requests.push(request);
-    if(f.failures[path] instanceof Error)throw f.failures[path];
-    if(f.failures[path])return Response.json({error:'Synthetic '+path.split('/').at(-1)+' unavailable'},{status:f.failures[path]});
-    if(path==='/api/gmail/status')return Response.json(f.status);
-    if(path==='/api/files?id=synthetic-doc')return new Response('synthetic original bytes',{headers:{'Content-Type':'image/png'}});
+    if(f.failures[pathname] instanceof Error)throw f.failures[pathname];
+    if(f.failures[pathname])return Response.json({error:'Synthetic '+pathname.split('/').at(-1)+' unavailable'},{status:f.failures[pathname]});
+    if(pathname==='/api/gmail/status'){
+      if(requireFocus){const recent=Array.from({length:200},(_,n)=>({...f.doc,document_id:'recent-'+n}));return Response.json({...f.status,candidates:url.searchParams.get('document')===documentId?[f.doc,...recent.slice(0,199)]:recent});}
+      return Response.json(f.status);
+    }
+    if(path==='/api/files?id='+encodeURIComponent(documentId))return new Response('synthetic original bytes',{headers:{'Content-Type':'image/png'}});
     if(path==='/api/gmail/review'&&request.method==='POST')return Response.json(f.response);
     if(path==='/api/gmail/process'&&request.method==='POST')return Response.json(f.processResponse);
     if(path==='/api/gmail/sync'&&request.method==='POST')return Response.json(f.syncResponse,{status:f.syncStatus});
     if(['/api/gmail/retry','/api/gmail/disconnect','/api/gmail/automation','/api/gmail/trust'].includes(path)&&request.method==='POST')return Response.json({ok:true});
     throw Error('Unexpected request '+path);
   });
-  f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=module.default({initialDocumentId:'synthetic-doc',embedded:true,onChanged:()=>f.change()});for(const effect of f.effects.splice(0))effect();};
+  f.render=()=>{if(f.closed)return;f.cursor=0;f.tree=module.default({initialDocumentId:documentId,embedded:true,onChanged:()=>f.change()});for(const effect of f.effects.splice(0))effect();};
   f.flush=async()=>{for(let n=0;n<10;n++)await new Promise(r=>setImmediate(r));};
   f.find=predicate=>elements(f.tree).find(predicate);f.posts=()=>f.requests.filter(r=>r.method==='POST');
   t.after(()=>{f.closed=true;for(const slot of f.slots)slot?.cleanup?.();delete globalThis[key];});
@@ -57,9 +62,25 @@ async function fixture(t,{stored=null,processing=null,pending=0,connected=false}
 
 test('Q8: selecting a Gmail document opens its original using reads only',async t=>{
   const f=await fixture(t);
-  assert.deepEqual(f.requests.map(r=>[r.method,r.path]),[['GET','/api/gmail/status'],['GET','/api/files?id=synthetic-doc']]);
+  assert.deepEqual(f.requests.map(r=>[r.method,r.path]),[['GET',f.statusPath],['GET','/api/files?id=synthetic-doc']]);
   assert.ok(f.find(n=>n.type==='img'&&n.props.alt==='Originalfaktura, första sidan'));
   f.find(n=>n.type==='button'&&text(n)==='Stäng').props.onClick();await f.flush();assert.equal(f.posts().length,0);
+});
+test('Gmail review navigation: requests the focused older document and opens it outside the recent 200',async t=>{
+  const f=await fixture(t,{documentId:'synthetic-old-document',requireFocus:true});
+  assert.deepEqual(f.requests.map(r=>[r.method,r.path]),[['GET','/api/gmail/status?document=synthetic-old-document'],['GET','/api/files?id=synthetic-old-document']]);
+  assert.ok(f.find(n=>n.type==='form'));assert.ok(f.find(n=>n.type==='input'&&n.props.value==='SYN-001'));assert.equal(f.posts().length,0);
+});
+test('Gmail review navigation: page changes the workspace key when document focus changes',async()=>{
+  const {default:Page}=await import(compiled('../app/gmail/page.tsx',{
+    '@/components/gmail-workspace':data('export default function GmailWorkspace(){return null;}'),
+    '@/app/chatgpt-auth':data('export async function requireChatGPTUser(){return {userId:"synthetic-owner"};}'),
+  }));
+  const first=await Page({searchParams:Promise.resolve({document:'first-document'})});
+  const next=await Page({searchParams:Promise.resolve({document:'old-document'})});
+  const overview=await Page({searchParams:Promise.resolve({})});
+  assert.equal(first.key,'first-document');assert.equal(next.key,'old-document');assert.equal(overview.key,'');
+  assert.notEqual(first.key,next.key);assert.equal(next.props.initialDocumentId,'old-document');
 });
 test('Q8: explicit approval sends original extraction with the separately corrected invoice fields',async t=>{
   const f=await fixture(t);
@@ -144,7 +165,7 @@ for(const [name,label]of [['sync','Hämta fakturaunderlag'],['process','Tolka v�
       if(name==='retry')await click(f,'Stäng');
       if(name==='approve')await approve(f);else await click(f,label);
       await f.flush();assert.equal(f.workspace.revision,0);assert.match(text(f.tree),/Synthetic .* unavailable/);
-      assert.equal(f.requests.filter(r=>r.path==='/api/gmail/status').length,1);
+      assert.equal(f.requests.filter(r=>r.path===f.statusPath).length,1);
     });
   }
 }
@@ -155,13 +176,13 @@ test('Gmail workspace refresh: an accepted retry refreshes its changed queue eve
 });
 test('Gmail workspace refresh: rate-limited sync retains its error while accepted document processing refreshes both workspaces',async t=>{
  const f=await fixture(t,{connected:true});f.syncStatus=429;f.syncResponse={status:'not_due',error:'Synthetic Gmail retrieval is rate limited',retry_after:'2027-01-01T00:00:00Z',processing:{processed:1,registered:1}};
- await click(f,'Hämta fakturaunderlag');assert.equal(f.workspace.revision,1);assert.equal(f.requests.filter(r=>r.path==='/api/gmail/status').length,2);
+ await click(f,'Hämta fakturaunderlag');assert.equal(f.workspace.revision,1);assert.equal(f.requests.filter(r=>r.path===f.statusPath).length,2);
  assert.match(text(f.find(node=>node.props?.role==='alert')),/Synthetic Gmail retrieval is rate limited/);assert.doesNotMatch(text(f.find(node=>node.type==='p'&&node.props?.role==='status')),/nya underlag|dubbletter|kopplats från/);
  assert.deepEqual(f.posts().map(r=>r.path),['/api/gmail/sync']);
 });
 test('Gmail workspace refresh: cumulative processing status in a rejected sync does not fabricate accepted work',async t=>{
  const f=await fixture(t,{connected:true});f.syncStatus=429;f.syncResponse={status:'not_due',error:'Synthetic Gmail retrieval is rate limited',processing:{registered:8,counts:{registered:8,ready:0}}};
- await click(f,'Hämta fakturaunderlag');assert.equal(f.workspace.revision,0);assert.equal(f.requests.filter(r=>r.path==='/api/gmail/status').length,1);assert.match(text(f.find(node=>node.props?.role==='alert')),/rate limited/);
+ await click(f,'Hämta fakturaunderlag');assert.equal(f.workspace.revision,0);assert.equal(f.requests.filter(r=>r.path===f.statusPath).length,1);assert.match(text(f.find(node=>node.props?.role==='alert')),/rate limited/);
 });
 test('Gmail workspace refresh: partial processing clears an earlier sync success and awaits the parent before retaining the sync error',async t=>{
  const f=await fixture(t,{connected:true});f.syncResponse={imported:2,duplicates:0};await click(f,'Hämta fakturaunderlag');assert.match(text(f.tree),/2 nya underlag/);

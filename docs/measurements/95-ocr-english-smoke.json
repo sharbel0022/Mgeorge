@@ -1,0 +1,194 @@
+{
+  "sample": "english-grouped-decimals",
+  "synthetic_only": true,
+  "observations": [
+    {
+      "format": "png",
+      "mime": "image/png",
+      "size_bytes": 89738,
+      "method": "ocr",
+      "worker_confidence": 93,
+      "review_level": "yellow",
+      "duration_ms": 5347,
+      "exact_fields": 13,
+      "total_fields": 13,
+      "issues": [],
+      "original_sha256_before": "090830deee035c281ed01e736ef05fc332b308aefd1f5c59048511e8c2eb9e1e",
+      "original_sha256_after": "090830deee035c281ed01e736ef05fc332b308aefd1f5c59048511e8c2eb9e1e",
+      "fields": {
+        "invoice_number": {
+          "exact": true,
+          "expected": "0606",
+          "actual": "0606",
+          "confidence": 0.85
+        },
+        "party": {
+          "exact": true,
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "confidence": 0.85
+        },
+        "organization_number": {
+          "exact": true,
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "confidence": 0.85
+        },
+        "issued_at": {
+          "exact": true,
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "confidence": 0.85
+        },
+        "due_at": {
+          "exact": true,
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "confidence": 0.85
+        },
+        "total_cents": {
+          "exact": true,
+          "expected": 375000,
+          "actual": 375000,
+          "confidence": 0.85
+        },
+        "vat_cents": {
+          "exact": true,
+          "expected": 75000,
+          "actual": 75000,
+          "confidence": 0.85
+        },
+        "net_cents": {
+          "exact": true,
+          "expected": 300000,
+          "actual": 300000,
+          "confidence": 0.85
+        },
+        "reference": {
+          "exact": true,
+          "expected": "000018",
+          "actual": "000018",
+          "confidence": 0.85
+        },
+        "bankgiro": {
+          "exact": true,
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "confidence": 0.85
+        },
+        "direction": {
+          "exact": true,
+          "expected": "supplier",
+          "actual": "supplier",
+          "confidence": 0.94
+        },
+        "kind": {
+          "exact": true,
+          "expected": "invoice",
+          "actual": "invoice",
+          "confidence": 0.85
+        },
+        "currency": {
+          "exact": true,
+          "expected": "SEK",
+          "actual": "SEK",
+          "confidence": 0.85
+        }
+      }
+    },
+    {
+      "format": "pdf",
+      "mime": "application/pdf",
+      "size_bytes": 1216,
+      "method": "pdf",
+      "worker_confidence": 100,
+      "review_level": "green",
+      "duration_ms": 2291,
+      "exact_fields": 13,
+      "total_fields": 13,
+      "issues": [],
+      "original_sha256_before": "7742ebfc621329ae0a5379125b9708db2aae9f7b473f2a85e9cff2bc7d8cbaa5",
+      "original_sha256_after": "7742ebfc621329ae0a5379125b9708db2aae9f7b473f2a85e9cff2bc7d8cbaa5",
+      "fields": {
+        "invoice_number": {
+          "exact": true,
+          "expected": "0606",
+          "actual": "0606",
+          "confidence": 0.96
+        },
+        "party": {
+          "exact": true,
+          "expected": "Testbolaget AB",
+          "actual": "Testbolaget AB",
+          "confidence": 0.96
+        },
+        "organization_number": {
+          "exact": true,
+          "expected": "5560160680",
+          "actual": "5560160680",
+          "confidence": 0.96
+        },
+        "issued_at": {
+          "exact": true,
+          "expected": "2026-10-24",
+          "actual": "2026-10-24",
+          "confidence": 0.96
+        },
+        "due_at": {
+          "exact": true,
+          "expected": "2026-11-07",
+          "actual": "2026-11-07",
+          "confidence": 0.96
+        },
+        "total_cents": {
+          "exact": true,
+          "expected": 375000,
+          "actual": 375000,
+          "confidence": 0.96
+        },
+        "vat_cents": {
+          "exact": true,
+          "expected": 75000,
+          "actual": 75000,
+          "confidence": 0.96
+        },
+        "net_cents": {
+          "exact": true,
+          "expected": 300000,
+          "actual": 300000,
+          "confidence": 0.96
+        },
+        "reference": {
+          "exact": true,
+          "expected": "000018",
+          "actual": "000018",
+          "confidence": 0.96
+        },
+        "bankgiro": {
+          "exact": true,
+          "expected": "123-4567",
+          "actual": "123-4567",
+          "confidence": 0.96
+        },
+        "direction": {
+          "exact": true,
+          "expected": "supplier",
+          "actual": "supplier",
+          "confidence": 0.94
+        },
+        "kind": {
+          "exact": true,
+          "expected": "invoice",
+          "actual": "invoice",
+          "confidence": 0.96
+        },
+        "currency": {
+          "exact": true,
+          "expected": "SEK",
+          "actual": "SEK",
+          "confidence": 0.96
+        }
+      }
+    }
+  ]
+}

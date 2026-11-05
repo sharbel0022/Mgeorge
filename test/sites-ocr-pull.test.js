@@ -78,8 +78,8 @@ for(const fail of ['lease','complete'])test('Q8 finalizer: accepted server work 
 test('Q8 finalizer: acknowledged local OCR survives the next lease failure and stops',async()=>{
   const f=cloudFixture({mode:'local',jobs:2,fail:'second lease'});assert.deepEqual(await f.run(),{processed:1,failed:0,status_unknown:true});assert.equal(f.bodies.length,1);assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,2);assert.equal(f.extractCalls,1);
 });
-test('Q8 finalizer: a failed failure-acknowledgment retains only prior accepted work and the known local failure',async()=>{
-  const f=cloudFixture({server:{processed:1},fail:'complete',extract:async()=>{throw Error('private extraction error');}});assert.deepEqual(await f.run(),{processed:1,failed:1,status_unknown:true});assert.equal(f.bodies.length,1);assert.equal(f.bodies[0].error,true);assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,1);
+test('Q8 finalizer: a failed failure-acknowledgment counts only prior accepted work',async()=>{
+  const f=cloudFixture({server:{processed:1},fail:'complete',extract:async()=>{throw Error('private extraction error');}});assert.deepEqual(await f.run(),{processed:1,failed:0,status_unknown:true});assert.equal(f.bodies.length,1);assert.equal(f.bodies[0].error,true);assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,1);
 });
 for(const fail of ['lease','complete'])test('Q8 finalizer: a '+fail+' failure before any accepted work still rejects',async()=>{
   const f=cloudFixture({fail});await assert.rejects(f.run(),/site_unavailable/);assert.equal(f.calls.filter(path=>path.endsWith('/lease')).length,1);

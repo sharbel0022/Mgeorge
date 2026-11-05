@@ -304,6 +304,50 @@ async function processingFixture(t,options){
   f.worker=(action,body={},token=f.env.DOCUMENT_WORKER_TOKEN)=>f.processing.workerAction(new Request(origin+'/api/ocr-worker/'+action,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)}),action);
   return f;
 }
+test('Gmail review navigation: deduplicates sources before the 200-document cap and includes an old focused document',async t=>{
+  const f=await processingFixture(t);
+  for(let n=0;n<350;n++){const id='review-'+String(n).padStart(4,'0');f.doc(id);f.sql.prepare('UPDATE gmail_sources SET created_at=? WHERE document_id=?').run(new Date(Date.UTC(2026,0,1,0,0,n)).toISOString(),id);}
+  for(let n=0;n<210;n++)f.sql.prepare('INSERT INTO gmail_sources(owner,source_id,document_id,metadata,created_at) VALUES(?,?,?,?,?)').run(f.owner,'repeat-'+String(n).padStart(4,'0'),'review-0349',JSON.stringify({subject:'repeat-'+n}),'2026-11-04T00:00:00Z');
+  let objectReads=0;f.env.BUCKET.get=async()=>{objectReads++;throw Error('Status must not read originals');};
+  const changes=f.sql.prepare('SELECT total_changes() n').get().n;
+  const recent=(await(await f.api.gmailStatus()).json()).candidates;
+  assert.equal(recent.length,200);assert.equal(new Set(recent.map(row=>row.document_id)).size,200);
+  assert.equal(recent[0].document_id,'review-0349');assert.equal(JSON.parse(recent[0].metadata).subject,'repeat-209');
+  assert.equal(recent.at(-1).document_id,'review-0150');assert.equal(recent.some(row=>row.document_id==='review-0000'),false);
+  const route=await import(moduleUrl('../app/api/gmail/[action]/route.ts',{'@/lib/gmail-service':f.apiUrl}));
+  const focused=(await(await route.GET(new Request(origin+'/api/gmail/status?document=review-0000'))).json()).candidates;
+  assert.equal(focused.length,200);assert.equal(new Set(focused.map(row=>row.document_id)).size,200);
+  assert.equal(focused[0].document_id,'review-0000');assert.equal(focused[1].document_id,'review-0349');assert.equal(focused.at(-1).document_id,'review-0151');
+  assert.equal(objectReads,0);assert.equal(f.sql.prepare('SELECT total_changes() n').get().n,changes);
+});
+test('Gmail review navigation: focus cannot expose foreign or rejected documents and invalid IDs are ignored',async t=>{
+  const f=await processingFixture(t);f.doc('owned-document');f.doc('rejected-document');
+  f.sql.prepare("UPDATE gmail_sources SET status='rejected' WHERE document_id='rejected-document'").run();
+  f.sql.prepare("INSERT INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,'older-rejected-source','rejected-document','{}','needs_review','2000-01-01')").run(f.owner);
+  const owner=f.owner;f.owner='foreign-owner';f.doc('foreign-document');f.owner=owner;
+  f.sql.prepare("INSERT INTO gmail_sources(owner,source_id,document_id,metadata,created_at) VALUES(?,'cross-owner-source','foreign-document','{}','2026-11-05')").run(owner);
+  const route=await import(moduleUrl('../app/api/gmail/[action]/route.ts',{'@/lib/gmail-service':f.apiUrl}));
+  let objectReads=0;f.env.BUCKET.get=async()=>{objectReads++;throw Error('Status must not read originals');};
+  const changes=f.sql.prepare('SELECT total_changes() n').get().n;
+  for(const focus of ['foreign-document','rejected-document','missing-document',"' OR 1=1 --",'../owned-document','x'.repeat(101)]){
+    const status=await(await route.GET(new Request(origin+'/api/gmail/status?document='+encodeURIComponent(focus)))).json();
+    assert.deepEqual(status.candidates.map(row=>row.document_id),['owned-document']);
+  }
+  assert.equal(objectReads,0);assert.equal(f.sql.prepare('SELECT total_changes() n').get().n,changes);
+  f.user=null;const denied=await route.GET(new Request(origin+'/api/gmail/status?document=owned-document'));
+  assert.equal(denied.status,401);assert.equal((await denied.json()).candidates,undefined);
+});
+test('Gmail review navigation: a focused summary remains bounded and never loads candidates or originals',async t=>{
+  const f=await processingFixture(t);f.doc('owned-document');
+  const queries=[],prepare=f.d1.prepare.bind(f.d1);f.d1.prepare=query=>{queries.push(query);return prepare(query);};
+  f.env.BUCKET.get=async()=>{throw Error('Summary must not read originals');};
+  const changes=f.sql.prepare('SELECT total_changes() n').get().n;
+  const route=await import(moduleUrl('../app/api/gmail/[action]/route.ts',{'@/lib/gmail-service':f.apiUrl}));
+  const summary=await(await route.GET(new Request(origin+'/api/gmail/status?summary=1&document=owned-document'))).json();
+  assert.equal(summary.candidates,undefined);assert.equal(summary.runs,undefined);
+  assert.equal(queries.some(query=>query.includes('s.metadata')||query.includes('SELECT revision,payload FROM workspaces')),false);
+  assert.equal(f.sql.prepare('SELECT total_changes() n').get().n,changes);
+});
 test('Q8: a preview-shaped review request cannot persist extraction, history or an invoice',async t=>{
   const f=await processingFixture(t);f.doc();
   const response=await f.api.gmailReview(post('review',{document_id:'doc-1',extraction:{fields:{party:{value:'Preview only'}}}}));
@@ -341,7 +385,7 @@ test('Q8: review diagnostics expose only overlapping owner-scoped reason counts 
   let objectReads=0;f.env.BUCKET.get=async()=>{objectReads++;throw Error('Status must not read originals');};
   const before=f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,status=await (await f.api.gmailStatus(true)).json(),reasons=status.processing.review_reasons;
   assert.ok(reasons);assert.equal(reasons.basis,'stored_extraction');assert.equal(reasons.total,6);assert.equal(reasons.analyzed,6);assert.equal(reasons.truncated,false);
-  assert.deepEqual(reasons.counts,{uninterpreted:1,missing_invoice_number:0,missing_party:0,missing_dates:1,missing_organization:1,missing_amount:1,missing_vat_or_net:0,unverified_counterparty:1,possible_duplicate:1,low_confidence:1,other_review:1});
+  assert.deepEqual(reasons.counts,{uninterpreted:1,missing_invoice_number:0,missing_party:0,missing_dates:1,missing_organization:1,missing_amount:1,missing_vat_or_net:0,unverified_counterparty:1,possible_duplicate:1,arithmetic_conflict:0,identity_conflict:0,table_incomplete:0,interrupted_after_extraction:0,low_confidence:1,other_review:1});
   assert.doesNotMatch(JSON.stringify(status),/private-|foreign-|Exempelbolaget|Fakturanummer|supplier@example|text_excerpt|fields/);assert.equal(objectReads,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,before);
 });
 test('Q8: review reason analysis is capped and reports partial coverage without returning document data',async t=>{
@@ -355,6 +399,20 @@ test('Q8: malformed or oversized saved extraction has an honest diagnostic witho
   for(const [id,extraction] of [['invalid','{broken'],['large',JSON.stringify({text_excerpt:'private '.repeat(8000),fields:{}})],['wrong-shape','{"fields":[]}']]){f.doc(id);f.sql.prepare("INSERT INTO document_jobs(owner,document_id,state,available_at,extraction,updated_at) VALUES(?,?,'failed','2026-10-30',?,'2026-10-30')").run(f.owner,id,extraction);}
   const reasons=(await f.processing.processingStatus(f.owner)).review_reasons;
   assert.ok(reasons);assert.equal(reasons.analyzed,3);assert.equal(reasons.counts.uninterpreted,3);assert.equal(reasons.counts.missing_dates,0);assert.doesNotMatch(JSON.stringify(reasons),/private|broken/);
+});
+test('review diagnostics distinguish arithmetic, identity, incomplete tables and interrupted accepted results',async t=>{
+  const f=await processingFixture(t),base=f.fields.interpretInvoice(syntheticText(),{direction:'supplier',direction_confident:true});
+  for(const [id,issue,tableStatus,errorCode] of [
+    ['math','Momsberäkningen stämmer inte med totalbeloppet.','absent',''],
+    ['identity','Motstridiga värden för mottagarens organisationsnummer. Kontrollera originalets identiteter.','absent',''],
+    ['table','','incomplete',''],['interrupted','','absent','processing_interrupted_after_extraction'],
+  ]){
+    f.doc(id);const extraction={...base,issues:issue?[issue]:[],details:{...base.details,table_status:tableStatus}};
+    f.sql.prepare("INSERT INTO document_jobs(owner,document_id,state,available_at,extraction,error_code,updated_at) VALUES(?,?,'needs_review','2026-10-30',?,?,'2026-10-30')").run(f.owner,id,JSON.stringify(extraction),errorCode);
+  }
+  const reasons=(await f.processing.processingStatus(f.owner)).review_reasons;
+  for(const key of ['arithmetic_conflict','identity_conflict','table_incomplete','interrupted_after_extraction'])assert.equal(reasons.counts[key],1,key);
+  assert.equal(reasons.counts.other_review,0);assert.equal(reasons.analyzed,4);
 });
 test('Q8: manual registration stays committed with a durable after-check warning when reconciliation fails',async t=>{
   const f=await processingFixture(t);f.doc();f.reconcileError=true;
