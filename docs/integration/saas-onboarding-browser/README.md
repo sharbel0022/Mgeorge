@@ -2,11 +2,15 @@
 
 This harness bundles the actual `sites/app/bank/page.tsx`, onboarding components, contract/client and existing legacy components with the application's CSS. It uses synthetic companies, accounts and payment evidence. All `/api/*` responses are intercepted; every external request is blocked and causes acceptance to fail. No provider or production service is contacted.
 
-## Recorded result
+## Historical automated receipt
 
-The final run passed **41/41 scenarios**, with **115 intercepted API requests**, **zero JavaScript errors** and **zero external requests**. See [acceptance-results.json](acceptance-results.json) for each scenario, browser version, source SHA-256 manifest, generated asset hashes and checks of the bytes actually served to the browser. These hashes are checked before and after the run; editing product sources during a run invalidates its result.
+The committed historical run passed **41/41 scenarios**, with **115 intercepted API requests**, **zero JavaScript errors** and **zero external requests**. See [acceptance-results.json](acceptance-results.json) for each scenario, browser version, source SHA-256 manifest, generated asset hashes and checks of the bytes actually served to the browser. These hashes are checked before and after the run; editing product sources during a run invalidates its result.
 
-Chromium headless shell **141.0.7390.37** was driven using Playwright **1.62.1** in the local Linux environment. This is isolated frontend acceptance, not a live provider/callback, physical-device, Safari/Firefox or real assistive-technology certification. The production build is checked separately in the [delivery report](../saas-customer-onboarding-verification.md).
+**This receipt is historical, not a rerun of the current integrated source.** Its manifest identifies the exact source bytes it covered; the committed JSON and screenshots have not been replaced or relabeled as current. The harness now follows the integrated company-create request contract (`name` and `confirmEmptyCompany: true`), but this correction does not imply that all 41 automated scenarios were rerun.
+
+The separate [integrated browser receipt dated 2026-11-05](integrated2026-11-05.md) records the parent/root agent's CUA checks of the integrated UI. It is not a new automated 41-scenario result. Provider/projection tests and full release gates remain separate evidence.
+
+For the historical run, Chromium headless shell **141.0.7390.37** was driven using Playwright **1.62.1** in the local Linux environment. This is isolated frontend acceptance, not a live provider/callback, physical-device, Safari/Firefox or real assistive-technology certification. The production build is checked separately in the [delivery report](../saas-customer-onboarding-verification.md).
 
 ## Reproduce
 
@@ -23,7 +27,7 @@ node docs/integration/saas-onboarding-browser/browser-suite.mjs
 
 When available, `CODEX_PRIMARY_RUNTIME_NODE_MODULES` supplies Playwright instead of `PLAYWRIGHT_MODULE_PATH`. `MGEORGE_QA_CHROMIUM` is optional if the matching Playwright browser is already installed. `MGEORGE_ONBOARDING_QA` can set an alternate scratch output directory; the default is the operating system's temporary directory plus `mgeorge-saas-onboarding-qa`.
 
-The runner starts its own loopback server at port 5178 in the same process tree as the browser. The server rejects API calls and writes if interception is accidentally removed. Do not point this runner at a live application. `MGEORGE_QA_FILTER` can select a case while developing a fix; the recorded final receipt comes from an unfiltered run.
+The runner starts its own loopback server at port 5178 in the same process tree as the browser. The server rejects API calls and writes if interception is accidentally removed. Do not point this runner at a live application. `MGEORGE_QA_FILTER` can select a case while developing a fix; the historical receipt came from an unfiltered run; a new integrated automated receipt requires another complete unfiltered run.
 
 ## Coverage
 
@@ -40,7 +44,7 @@ The runner starts its own loopback server at port 5178 in the same process tree 
 
 The request deadline/cancellation assertions and further timestamp, currency, scope and evidence invariants live in the ordinary Node-run Sites test suite. They supplement the browser scenarios; they are not counted again in the browser total.
 
-## Screenshots
+## Historical screenshots
 
 Each image is captured after the keyboard checks, from scroll position zero without hiding any product element. All company, provider and payment details are synthetic.
 
@@ -51,4 +55,4 @@ Each image is captured after the keyboard checks, from scroll position zero with
 - [1440 px](screenshots/onboarding-1440.png)
 - [Account connected, Bankgiro/reference missing](screenshots/missing-bankgiro-reference.png)
 
-The final visual review checked all five widths, monochrome hierarchy, account labels, reference `0000599`, review status and honest missing-data labels. Earlier full-page captures taken after keyboard scrolling placed the offscreen fixed skip link inside the image; viewport geometry and corrected captures confirm this was a screenshot-origin artifact. The final images do not contain that overlap.
+The historical visual review checked all five widths, monochrome hierarchy, account labels, reference `0000599`, review status and honest missing-data labels. Earlier full-page captures taken after keyboard scrolling placed the offscreen fixed skip link inside the image; viewport geometry and corrected captures confirm this was a screenshot-origin artifact. The final images do not contain that overlap.

@@ -46,9 +46,9 @@ async function scenario(config = {}) {
     requests.push({ method, path: url.pathname });
     const reply = (json, status = 200) => route.fulfill({ status, json });
     if (url.pathname === '/api/onboarding/companies') {
-      if (method === 'POST') { posts.push({ path: url.pathname, body: req.postDataJSON(), headers: req.headers() }); state.created = true; return reply({ version: 1, company: { id: 'company-new', name: 'Nytt Exempelföretag AB', organizationNumber: '5599000019', role: 'owner' } }, config.createStatus || 200); }
+      if (method === 'POST') { posts.push({ path: url.pathname, body: req.postDataJSON(), headers: req.headers() }); state.created = true; return reply({ version: 1, company: { id: 'company-new', name: 'Nytt Exempelföretag AB', organizationNumber: null, role: 'owner' } }, config.createStatus || 201); }
       const d = config.directory ? config.directory() : directoryFixture();
-      if (state.created) d.companies.push({ id: 'company-new', name: 'Nytt Exempelföretag AB', organizationNumber: '5599000019', role: 'owner' });
+      if (state.created) d.companies.push({ id: 'company-new', name: 'Nytt Exempelföretag AB', organizationNumber: null, role: 'owner' });
       return reply(d, config.directoryStatus || 200);
     }
     const read = url.pathname.match(/^\/api\/companies\/([^/]+)\/bank-onboarding$/);
@@ -208,7 +208,7 @@ try {
   await test('company creation reloads membership before selecting returned company', async () => {
     const { page, posts } = await scenario(); await ready(page); await page.getByRole('button', { name: 'Lägg till företag', exact: true }).click();
     await page.getByRole('textbox', { name: 'Företagsnamn' }).fill('Nytt Exempelföretag AB'); await page.getByRole('button', { name: 'Skapa företag' }).click(); await ready(page, 'Nytt Exempelföretag AB');
-    assert.deepEqual(posts[0].body, { name: 'Nytt Exempelföretag AB', organizationNumber: '5599000019', country: 'SE' }); assert.equal(await page.getByRole('combobox', { name: 'Välj företag' }).inputValue(), 'company-new');
+    assert.equal(posts.length, 1); assert.equal(posts[0].path, '/api/onboarding/companies'); assert.deepEqual(posts[0].body, { name: 'Nytt Exempelföretag AB', confirmEmptyCompany: true }); assert.equal(await page.getByRole('combobox', { name: 'Välj företag' }).inputValue(), 'company-new');
   });
   await test('initial missing directory retains the existing bank connection', async () => {
     const { page, posts } = await scenario({ directoryStatus: 404 }); await page.getByText('Din befintliga bankanslutning', { exact: true }).waitFor(); await page.getByRole('heading', { name: 'Bankanslutning', exact: true }).waitFor();
