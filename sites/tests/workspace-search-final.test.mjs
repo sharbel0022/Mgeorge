@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
-import {emptyState} from '../lib/domain.ts';
+import {applyCommand,emptyState} from '../lib/domain.ts';
 import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 
 const data=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
@@ -23,8 +23,8 @@ const start=dashboard.indexOf('function WorkspaceSearch('),end=dashboard.indexOf
 const normalizeStart=dashboard.indexOf('const normalizeSearch='),normalizeEnd=dashboard.indexOf('\nconst shortDate=',normalizeStart);
 assert.ok(start>=0&&end>start&&normalizeStart>=0&&normalizeEnd>normalizeStart,'Production search and normalization boundaries must be available');
 const presentation=compile(readFileSync(new URL('../lib/payment-presentation.ts',import.meta.url),'utf8'));
-const prefix=`import {money,needsPaymentSpecification} from '@/lib/domain';import {payerLabel} from 'presentation';export function createSearch({useState,useRef,useMemo}){const Search=()=>null,X=()=>null,FileText=()=>null,Landmark=()=>null;\n`;
-const {createSearch}=await import(compile(prefix+dashboard.slice(normalizeStart,normalizeEnd)+'\n'+dashboard.slice(start,end)+'\nreturn WorkspaceSearch;}',{presentation}));
+const prefix=`import {money,needsPaymentSpecification} from '@/lib/domain';import {payerLabel,bankPaymentReference} from 'presentation';import {createWorkspaceSearchIndex,searchWorkspaceIndex} from 'search';export function createSearch({useState,useRef,useMemo}){const Search=()=>null,X=()=>null,FileText=()=>null,Landmark=()=>null;\n`;
+const {createSearch}=await import(compile(prefix+dashboard.slice(normalizeStart,normalizeEnd)+'\n'+dashboard.slice(start,end)+'\nreturn WorkspaceSearch;}',{presentation,search:file('../lib/workspace-search.js')}));
 
 function syntheticState(){
  const state=emptyState();
@@ -126,4 +126,46 @@ test('empty and whitespace queries stay closed, while a nonempty unmatched query
  f.type('no-synthetic-match-9384');assert.ok(f.region());assert.match(text(f.region()),/Inga sparade uppgifter matchar sökningen/);assert.match(text(f.status()),/0\s+resultat visas/);
  assert.equal(f.results.length,0);assert.equal(f.press('ArrowDown').prevented,false);assert.equal(f.active,f.inputNode);
  f.press('Escape');assert.equal(f.region(),undefined);assert.equal(f.input.props.value,'');assert.deepEqual(f.opened,[]);
+});
+
+test('combined Swedish amount, date and reference finds the exact production bank result', t=>{
+ const f=fixture(t);f.type('123,00 26/10/2026 REF-1');
+ assert.deepEqual(f.results.map(result=>result.key),['bank-1']);
+ f.click(0);assert.deepEqual(f.opened,[{kind:'tx',id:'bank-1'}]);
+});
+
+test('an exact reference beyond the first four rows ranks first in the production search', t=>{
+ const state=syntheticState();state.invoices.forEach((invoice,index)=>{invoice.number='0599'+(index+1);});state.invoices[5].number='0599';
+ const f=fixture(t,{state});f.type('0599');
+ assert.equal(f.results.length,4);assert.equal(f.results[0].key,'invoice-6');
+});
+
+test('production search keeps a manually completed reference separate from the bank original', t=>{
+ const state=syntheticState();state.transactions=[syntheticBankTransaction({id:'bank-original',party:'Manual payer label',payerReference:'MANUAL-OVERLAY-001',amount:12300,date:'2026-10-26',bankReference:'SYNTHETIC-ORIGINAL-SEARCH',kind:'payment',original:{party:'Original synthetic payer',payerReference:'BANK-REFERENCE-001'},verification:{party:'Manual payer label',payerReference:'MANUAL-OVERLAY-001',note:'Synthetic manual review',at:'2026-11-05T10:00:00.000Z'}})];
+ const f=fixture(t,{state});f.type('MANUAL-OVERLAY-001');assert.equal(f.results.length,0);
+ f.type('BANK-REFERENCE-001 123,00');assert.deepEqual(f.results.map(result=>result.key),['bank-original']);
+ assert.match(text(f.results[0]),/BANK-REFERENCE-001/);assert.doesNotMatch(text(f.results[0]),/MANUAL-OVERLAY/);
+});
+
+test('production search displays both interpretations of an ambiguous amount and requires explicit result activation',t=>{
+ const state=syntheticState(),invoice=state.invoices[0];
+ state.invoices=[{...invoice,id:'large-amount',number:'OTHER',party:'Synthetic large AB',total:12345600},{...invoice,id:'short-number',number:'123',party:'Synthetic invoice AB',total:45600}];state.transactions=[];
+ const f=fixture(t,{state});f.type('123 456,00');
+ assert.deepEqual(f.results.map(result=>result.key),['short-number','large-amount']);
+ assert.match(text(f.results[0]),/123/);assert.match(text(f.results[0]),/456,00/);
+ assert.match(text(f.results[1]),/OTHER/);assert.match(text(f.results[1]),/123\s456,00/);
+ assert.deepEqual(f.opened,[]);f.press('Enter');assert.deepEqual(f.opened,[]);
+ f.click(0);assert.deepEqual(f.opened,[{kind:'detail',id:'short-number'}]);
+});
+
+test('a decimal invoice number accepted by the domain remains an explicit search result',t=>{
+ let state=emptyState();
+ for(const [number,total]of [['OTHER',202601],['2026.01',62500]])state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic company',number,total,issued:'2026-11-05',due:'2026-12-05',reviewed:true}}).state;
+ const [amount,reference]=state.invoices;
+ assert.equal(reference.number,'2026.01');
+ const f=fixture(t,{state});f.type('2026.01');
+ assert.deepEqual(f.results.map(result=>result.key),[reference.id,amount.id]);
+ assert.deepEqual(f.opened,[]);f.press('Enter');assert.deepEqual(f.opened,[]);
+ f.type('2026.01 SEK');assert.deepEqual(f.results.map(result=>result.key),[amount.id]);
+ f.type('2026.01');f.click(0);assert.deepEqual(f.opened,[{kind:'detail',id:reference.id}]);
 });

@@ -8,23 +8,25 @@ import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {performance} from 'node:perf_hooks';
 import {cpus,loadavg,platform,release,arch} from 'node:os';
-import {corpusVersion,textCases,opticalCases,buildOpticalInputs,scalarFieldNames} from '../test/helpers/ocr-quality-corpus.mjs';
+import * as frozenCorpus from '../test/helpers/ocr-quality-corpus.mjs';
+import * as labelCorpus from '../test/helpers/document-label-corpus.mjs';
 import {projectReviewedFields,evaluateDocument,summarizeDocuments} from '../test/helpers/ocr-quality-metrics.mjs';
 
-const args=process.argv.slice(2),allowed=new Set(['--source-root','--output','--text-repeats','--text-only','--help']);
+const args=process.argv.slice(2),allowed=new Set(['--source-root','--output','--text-repeats','--text-only','--label-corpus','--help']);
 for(let i=0;i<args.length;i++){
   if(!allowed.has(args[i]))throw Error('Unknown argument: '+args[i]);
-  if(!['--text-only','--help'].includes(args[i])){
+  if(!['--text-only','--label-corpus','--help'].includes(args[i])){
     if(!args[i+1]||args[i+1].startsWith('--'))throw Error('Missing value for '+args[i]);
     i++;
   }
 }
 if(args.includes('--help')){
-  console.log('node scripts/measure-ocr-quality.mjs --source-root CHECKOUT --output REPORT.json [--text-repeats 5] [--text-only]');
+  console.log('node scripts/measure-ocr-quality.mjs --source-root CHECKOUT --output REPORT.json [--text-repeats 5] [--text-only] [--label-corpus]');
   process.exit(0);
 }
 const option=name=>args.includes(name)?args[args.indexOf(name)+1]:undefined;
 const root=resolve(option('--source-root')||'.'),output=option('--output'),textOnly=args.includes('--text-only');
+const {corpusVersion,textCases,opticalCases,buildOpticalInputs,scalarFieldNames}=args.includes('--label-corpus')?labelCorpus:frozenCorpus;
 const repeats=Number(option('--text-repeats')??5);
 if(!Number.isSafeInteger(repeats)||repeats<1||repeats>1000)throw Error('--text-repeats must be an integer from 1 through 1000');
 const hash=value=>createHash('sha256').update(value).digest('hex');
@@ -117,7 +119,7 @@ const summaries=Object.fromEntries(parsers.map(([engine])=>[engine,{
   pdfRaster:summarizeDocuments(details.filter(row=>row.engine===engine&&row.subset==='pdf-raster')),
 }]));
 const afterHashes=sourceHashes(),sourceStable=JSON.stringify(beforeHashes)===JSON.stringify(afterHashes);
-const harnessFiles=['scripts/measure-ocr-quality.mjs','test/helpers/ocr-quality-metrics.mjs','test/helpers/ocr-quality-corpus.mjs'];
+const harnessFiles=['scripts/measure-ocr-quality.mjs','test/helpers/ocr-quality-metrics.mjs',args.includes('--label-corpus')?'test/helpers/document-label-corpus.mjs':'test/helpers/ocr-quality-corpus.mjs'];
 const harnessHashes=Object.fromEntries(harnessFiles.map(file=>[file,hash(readFileSync(join(runnerRoot,file)))]));
 const corpusSha256=hash(JSON.stringify({version:corpusVersion,textCases,opticalCases}));
 const inputManifest=samples.map(sample=>({id:sample.id,subset:sample.subset,sha256:sample.subset==='text'?hash(sample.text):hash(binaryInputs.find(input=>input.id===sample.id).bytes)}));
