@@ -38,10 +38,10 @@ export function corporateAccountEvidence(context: ReturnType<typeof bankCompanyC
   });
 }
 
-export async function currentCompanyAuthorization(row: BankConnectionRow) {
+export async function currentCompanyAuthorization(row: BankConnectionRow, action: 'read' | 'manage' = 'manage') {
   const saved = consentMetadata(row);
   if (!saved || saved.mode === 'legacy') return { status: 'unverified' as const, reason: 'LEGACY_COMPANY_BINDING_UNVERIFIED' };
-  const context = bankCompanyContext(row.owner, saved.companyId);
+  const context = bankCompanyContext(row.owner, saved.companyId, action);
   return corporateAccountEvidence(context, row.bank_name, row.country, await accounts(row), row.valid_until) ??
     { status: 'unverified' as const, reason: 'CORPORATE_AUTHORIZATION_REQUIRED' };
 }

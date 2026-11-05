@@ -18,8 +18,29 @@ const MESSAGES = {
   BUSINESS_BANK_UNAVAILABLE: 'Den valda banken är inte tillgänglig för företagsanslutning via den här integrationen.',
   CONSENT_FLOW_EXPIRED: 'Anslutningsförsöket har löpt ut. Starta ett nytt försök.',
   CONSENT_APPLICATION_CHANGED: 'Banktjänstens inställningar ändrades. Starta ett nytt anslutningsförsök.',
+  CONSENT_RENEWAL_CONFLICT: 'Bankanslutningen ändrades under återanslutningen. Starta ett nytt försök.',
+  BANK_DISCONNECT_PENDING: 'Slutför frånkopplingen innan bankanslutningen används igen.',
+  SAAS_BANK_CONFIGURATION_INVALID: 'Banktjänstens företagskonfiguration kunde inte verifieras.',
+  SAAS_BANK_DISABLED: 'Banktjänsten är inte aktiverad för företaget.',
+  BANK_BUSY: 'En bankåtgärd pågår redan. Vänta tills den är klar innan du försöker igen.',
+  BANK_STATE_CHANGED: 'Bankanslutningen ändrades under åtgärden. Kontrollera status och försök igen.',
+  RESOURCE_SCOPE_MISMATCH: 'Bankresursen tillhör inte den godkända anslutningen.',
+  BANK_AUTHENTICATION_METHOD_REQUIRED: 'Välj en av bankens tillgängliga autentiseringsmetoder.',
+  IDEMPOTENCY_KEY_REQUIRED: 'Åtgärden saknar ett giltigt idempotens-ID.',
+  IDEMPOTENCY_KEY_REUSED: 'Åtgärdens idempotens-ID har redan använts för andra uppgifter.',
+  BANK_RATE_POLICY_REQUIRED: 'Bankens tillåtna hämtningsfrekvens behöver konfigureras.',
 };
 const GENERIC_MESSAGE = 'Bankanslutningen kunde inte verifieras.';
+// Diagnostic provenance is internal. Mutable Error properties, custom text and
+// objects with a forged prototype must never become operational evidence.
+const DIAGNOSTICS = new WeakMap();
+const ACCOUNT_REASONS = new Set([
+  'SAVED_ACCOUNT_DATA_INVALID', 'CURRENT_ACCOUNT_DATA_INVALID',
+  'SAVED_ACCOUNT_USAGE_INVALID', 'CURRENT_ACCOUNT_USAGE_INVALID',
+  'SAVED_ACCOUNT_IDS_INVALID', 'CURRENT_ACCOUNT_IDS_INVALID', 'CURRENT_ACCOUNT_DETAILS_INVALID',
+  'CURRENT_ACCOUNT_INVENTORY_MISMATCH', 'CONSENT_ACCOUNT_INVENTORY_CHANGED',
+  'ACCOUNT_IDENTITY_CHANGED', 'SELECTED_ACCOUNT_IDS_INVALID', 'SELECTED_ACCOUNT_UNAVAILABLE',
+]);
 
 export class ConsentError extends Error {
   constructor(code, status = 400, safeMessage) {
@@ -27,14 +48,65 @@ export class ConsentError extends Error {
     this.name = 'ConsentError';
     this.code = code;
     this.status = Number.isInteger(status) && status >= 400 && status <= 599 ? status : 400;
+    if (typeof code === 'string' && Object.hasOwn(MESSAGES, code)) {
+      DIAGNOSTICS.set(this, Object.freeze({ code, message: MESSAGES[code], status: this.status, reason: null }));
+    }
   }
+}
+
+/** Canonical non-sensitive evidence from an error actually created here. */
+export function consentDiagnostic(error) {
+  return DIAGNOSTICS.get(error) ?? null;
+}
+
+/** Reconstruct a persisted diagnostic using only this module's fixed values.
+ * Callers must separately bind the stored event to the current connection. */
+export function storedConsentDiagnostic(code, reason = null) {
+  if (typeof code !== 'string' || !Object.hasOwn(MESSAGES, code)) return null;
+  if (reason !== null && (code !== 'BANK_ACCOUNT_SCOPE_INVALID' || !ACCOUNT_REASONS.has(reason))) return null;
+  return { code, message: MESSAGES[code], reason };
+}
+
+/** Read-only local assessment. A stored connected record is not a fresh
+ * provider check, and this function never changes consent or retry state. */
+export function storedEnableConnectionHealth(input, now = Date.now()) {
+  const state = (status, blockedReason, nextAction, requiresReauthentication = false) => ({
+    status, connected: status === 'connected', syncAllowed: status === 'connected',
+    requiresReauthentication, blockedReason, nextAction, evidence: 'stored_connection',
+  });
+  if (!input || input.present !== true || ['disconnected', 'revoked'].includes(input.status)) {
+    return state('disconnected', 'BANK_CONNECTION_REQUIRED', 'connect');
+  }
+  if (input.status === 'revocation_pending') return state('revocation_pending', 'BANK_DISCONNECT_PENDING', 'complete_revocation');
+  if (input.storageReady !== true) return state('configuration_required', 'BANK_STORAGE_UNAVAILABLE', 'configure_service');
+  if (input.applicationReady !== true) return state('configuration_required', 'BANK_CONFIGURATION_REQUIRED', 'configure_service');
+  if (input.generationMatches !== true) return state('reauth_required', 'CONSENT_APPLICATION_CHANGED', 'reconnect', true);
+  if (['reauth_required', 'renewal_required'].includes(input.status)) return state('reauth_required', 'BANK_RECONNECT_REQUIRED', 'reconnect', true);
+  const expiry = timestamp(input.validUntil);
+  if (input.status === 'expired' || !Number.isFinite(now) || !Number.isFinite(expiry) || expiry <= now) {
+    return state('expired', 'BANK_CONSENT_EXPIRED', 'reconnect', true);
+  }
+  if (input.companyRequired === true && input.companyAuthorized !== true) {
+    return state('corporate_authorization_required', 'CORPORATE_AUTHORIZATION_REQUIRED', 'verify_company_authority');
+  }
+  if (['pending_account', 'corporate_authorization_required', 'accounts'].includes(input.status) || !accountIds(input.selectedAccountUids)) {
+    return state('pending_account', 'BANK_ACCOUNT_SELECTION_REQUIRED', 'select_accounts');
+  }
+  if (input.status !== 'connected') return state('error', 'BANK_SYNC_FAILED', 'inspect_connection');
+  return state('connected', null, 'none');
 }
 
 function clean(value, max = 300) {
   return typeof value === 'string' && value.length > 0 && value.length <= max && value.trim() === value && !CONTROL.test(value);
 }
 function object(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
-function deny(code, status = 400) { throw new ConsentError(code, status); }
+function deny(code, status = 400, reason = null) {
+  const error = new ConsentError(code, status);
+  if (reason !== null && code === 'BANK_ACCOUNT_SCOPE_INVALID' && ACCOUNT_REASONS.has(reason)) {
+    DIAGNOSTICS.set(error, Object.freeze({ ...DIAGNOSTICS.get(error), reason }));
+  }
+  throw error;
+}
 function timestamp(value) {
   if (typeof value !== 'string' || value.length > 50) return NaN;
   const parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?(?:Z|[+-](\d{2}):(\d{2}))$/.exec(value);
@@ -55,9 +127,13 @@ function accountIds(values) {
 function sameIds(left, right) {
   return left.length === right.length && left.every(id => right.includes(id));
 }
-function businessAccountData(values) {
-  return Array.isArray(values) && values.length > 0 && values.length <= MAX_ACCOUNTS &&
-    values.every(account => object(account) && (account.usage === undefined || account.usage === 'ORGA'));
+function checkBusinessAccountData(values, source) {
+  if (!Array.isArray(values) || values.length < 1 || values.length > MAX_ACCOUNTS || !values.every(object)) {
+    deny('BANK_ACCOUNT_SCOPE_INVALID', 409, source === 'saved' ? 'SAVED_ACCOUNT_DATA_INVALID' : 'CURRENT_ACCOUNT_DATA_INVALID');
+  }
+  if (!values.every(account => account.usage === undefined || account.usage === 'ORGA')) {
+    deny('BANK_ACCOUNT_SCOPE_INVALID', 409, source === 'saved' ? 'SAVED_ACCOUNT_USAGE_INVALID' : 'CURRENT_ACCOUNT_USAGE_INVALID');
+  }
 }
 
 /** Compatibility context for the existing authenticated user's workspace.
@@ -134,18 +210,23 @@ export function validateEnableConsent(input) {
   }
   const deadlines = [session.access.valid_until, checked.access.valid_until, requestedValidUntil].map(timestamp);
   if (deadlines.some(deadline => !Number.isFinite(deadline) || deadline <= now)) deny('BANK_CONSENT_EXPIRED', 409);
-  if (!businessAccountData(session.accounts) || !businessAccountData(checked.accounts_data)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  checkBusinessAccountData(session.accounts, 'saved');
+  checkBusinessAccountData(checked.accounts_data, 'current');
   const sessionIds = accountIds(session.accounts.map(account => account.uid));
   const checkedIds = accountIds(checked.accounts);
   const dataIds = accountIds(checked.accounts_data.map(account => account.uid));
-  if (!sessionIds || !checkedIds || !dataIds || !sameIds(sessionIds, checkedIds) || !sameIds(sessionIds, dataIds)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  if (!sessionIds) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'SAVED_ACCOUNT_IDS_INVALID');
+  if (!checkedIds) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'CURRENT_ACCOUNT_IDS_INVALID');
+  if (!dataIds) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'CURRENT_ACCOUNT_DETAILS_INVALID');
+  if (!sameIds(checkedIds, dataIds)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'CURRENT_ACCOUNT_INVENTORY_MISMATCH');
+  if (!sameIds(sessionIds, checkedIds)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'CONSENT_ACCOUNT_INVENTORY_CHANGED');
   const currentAccounts = new Map(checked.accounts_data.map(account => [account.uid, account]));
   for (const account of session.accounts) {
     const originalHash = account.identification_hash, currentHash = currentAccounts.get(account.uid).identification_hash;
     // The singular hash must agree exactly when both responses supply it.
     // Overlap in identification_hashes is not evidence that repairs a conflict.
     if (originalHash !== undefined && currentHash !== undefined &&
-      (!clean(originalHash, 4096) || !clean(currentHash, 4096) || originalHash !== currentHash)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+      (!clean(originalHash, 4096) || !clean(currentHash, 4096) || originalHash !== currentHash)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'ACCOUNT_IDENTITY_CHANGED');
   }
   // An AIS account/transaction session does not attest access to Bankgiro reports.
   if (scopes.includes('bankgiro:read')) deny('BANKGIRO_SCOPE_UNAVAILABLE', 409);
@@ -164,8 +245,12 @@ export function validateLegacyEnableSelection(input) {
   const uids = values => { const ids = accountIds(values); return ids && ids.every(id => uuid.test(id)) ? ids : null; };
   const resourceIds = values => Array.isArray(values) && values.length <= MAX_ACCOUNTS && values.every(object) ? uids(values.map(account => account.uid)) : null;
   const savedIds = resourceIds(input.session.accounts), liveIds = uids(input.checked.accounts), dataIds = resourceIds(input.checked.accounts_data), selected = uids(input.selectedAccountUids);
-  if (!savedIds || !liveIds || !dataIds || !selected || !sameIds(liveIds, dataIds) ||
-    !selected.every(id => savedIds.includes(id) && liveIds.includes(id))) deny('BANK_ACCOUNT_SCOPE_INVALID', 409);
+  if (!savedIds) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'SAVED_ACCOUNT_IDS_INVALID');
+  if (!liveIds) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'CURRENT_ACCOUNT_IDS_INVALID');
+  if (!dataIds) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'CURRENT_ACCOUNT_DETAILS_INVALID');
+  if (!selected) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'SELECTED_ACCOUNT_IDS_INVALID');
+  if (!sameIds(liveIds, dataIds)) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'CURRENT_ACCOUNT_INVENTORY_MISMATCH');
+  if (!selected.every(id => savedIds.includes(id) && liveIds.includes(id))) deny('BANK_ACCOUNT_SCOPE_INVALID', 409, 'SELECTED_ACCOUNT_UNAVAILABLE');
   const chosen = new Set(selected);
   return validateEnableConsent({ ...input,
     session: { ...input.session, accounts: input.session.accounts.filter(account => chosen.has(account.uid)) },

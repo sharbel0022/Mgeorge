@@ -41,6 +41,17 @@ Ingen numerisk produktionspoäng höjs. Branch/PR innebär ingen merge eller Sit
 
 Det nya underlaget kompletterar tidigare daterade kvitton. Parallellt main-arbete från PR #48 (`bf24a3c`) integrerades efter de lokala helsviterna; kombinerad kod verifieras separat i [integrationskvittot](docs/saas/evidence/2026-11-05/95-saas-integration.json) och [PR #50:s fulla CI](https://github.com/sharbel0022/Mgeorge/pull/50/checks). Produktionsberoenden har noll auditfynd, och riktade testgrupper räknas inte en gång till ovanpå helsviterna. [Lanseringskraven](docs/saas/COMMERCIAL-LAUNCH-REQUIREMENTS.md) kräver separat avtalad AIS-modell, dataskydd, kundbehörigheter och driftbevis före verklig kundlansering.
 
+## Agent 1 — avgränsade bankintegrationsbevis, 2026-11-05
+
+[Bankrapport och verifieringskvitto](docs/integration/bank-95/README.md) gäller `feature/95-bank` från main `4ad205b`, med aktuell main `bf24a3c` integrerad. Kod `5f71a3c` och identiskt CI-träd har **5 998 godkända fulla tester** samt **1 148 överlappande säkerhetsfall**, 0 fel/skip/cancel/TODO; syntax, typer, high-audit och produktionsbygge passerar. Alla numeriska poäng är oförändrade: **255/330 = 7,73/10; 0/33 ≥9,5**. Skrivfri driftstatus 2026-11-05 18:21 UTC är fortsatt `connected=false`; ingen faktisk ny SCA eller bankläsning har körts.
+
+| Område | Före | Efter | Nytt avgränsat bevis | Kvarstående gräns |
+| --- | ---: | ---: | --- | --- |
+| 15. Swedbank-anslutning | 8,5 | 8,5 | Validerad konfigurerad callback, registrerings-/cookie-/flow-bindning, medlemskapsstängsel, förnyelse av utgångna medgivanden och tydlig lokal återanslutningsdiagnos. | Aktuell providerregistrering, produktionsavtal/nycklar/certifikat, företagets kontobehörighet och användarens faktiska SCA måste verifieras. Historiskt exakt kontofel är okänt. |
+| 16. Automatisk bankhämtning | 8 | 8 | Hårda tids-/storleksgränser, aktuellt medgivande precis före bankläsning, sekretessäkra fel, kontospecifik behörighetsstatus, ingen utlovad automatisk körning vid återautentisering och korrekt osäker återkallelse. Befintliga idempotens-/kvot-/importgränser behålls. | Syntetisk verifiering bevisar inte färsk produktionshämtning, bankens fullständiga historik eller faktisk schemakvot. |
+| 30. Säkerhet och åtkomstkontroll | 8,5 | 8,5 | Aktuellt medlemskap efter asynkront arbete, kanonisk felproveniens, inga konto-/tokenvärden i nya diagnoser, separerad statusläsning och förvaltning samt aktuella behörighets-/appgränser vid återvalidering. | Avtal, faktiska externa rättigheter och produktionsacceptans återstår. |
+| 32. Kodkvalitet och tester | 8,5 | 8,5 | Beteendebaserade RED/GREEN-regressioner, helgrindar och oberoende review med exakt omfattning i rapporten. | Befintliga åtta moderate Sites-utvecklingsberoendefynd och tidigare lintskuld ingår inte i denna bankändring. |
+
 ## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
 
 [Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.

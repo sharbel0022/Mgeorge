@@ -105,7 +105,9 @@ export function createOpenPaymentsHttpClient(config, { transport, requestBoundar
       if ([...headers.keys()].some(header => !HEADER_ALLOWLIST.has(header))) throw denied();
       headers.set('Accept', 'application/json'); headers.set('X-Request-ID', crypto.randomUUID());
       if (signal?.aborted) throw new BankProviderError('PROVIDER_ABORTED', 499);
-      const controller = new AbortController(), write = method === 'POST' || method === 'PUT';
+      // Revocation also changes remote consent. A lost DELETE response cannot
+      // establish whether the bank applied it, even though DELETE is idempotent.
+      const controller = new AbortController(), write = method !== 'GET';
       let timer, onAbort, timedOut = false;
       const interrupted = new Promise((_, reject) => {
         onAbort = () => { controller.abort(); reject(new BankProviderError('PROVIDER_ABORTED', 499, { mayHaveSucceeded: write })); };

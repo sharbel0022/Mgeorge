@@ -1,6 +1,9 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { createHash, generateKeyPairSync } from 'node:crypto';
 import ts from 'typescript';
@@ -20,7 +23,20 @@ import { provisionCompany } from '../lib/company-storage.js';
 // Exercise the real route services, encryption, domain and SQL. Only the identity
 // provider and banking HTTP boundary are replaced. No test can call a live bank.
 const source = path => readFileSync(new URL(path, import.meta.url), 'utf8');
-const jsUrl = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
+// Retain identical module sources and per-test isolated environments without
+// exponentially embedding dependency graphs in every data URL.
+const moduleDirectory = mkdtempSync(join(tmpdir(), 'mgeorge-banking-security-'));
+const moduleFiles = new Map();
+after(() => rmSync(moduleDirectory, { recursive: true, force: true }));
+const jsUrl = value => {
+  const hash = createHash('sha256').update(value).digest('hex');
+  if (!moduleFiles.has(hash)) {
+    const path = join(moduleDirectory, hash + '.mjs');
+    writeFileSync(path, value, { flag: 'wx' });
+    moduleFiles.set(hash, pathToFileURL(path).href);
+  }
+  return moduleFiles.get(hash);
+};
 function compiledModule(path, imports, jsx = ts.JsxEmit.Preserve) {
   imports = { '../bank-consent-policy.js': new URL('../lib/bank-consent-policy.js', import.meta.url).href, '../bank-company-authority.js': new URL('../lib/bank-company-authority.js', import.meta.url).href, './account-read-cooldown': new URL('../lib/banking/account-read-cooldown.ts', import.meta.url).href, './sync-periods': new URL('../lib/banking/sync-periods.ts', import.meta.url).href, '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
   let js = ts.transpileModule(source(path), { fileName: path, compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx } }).outputText;
@@ -62,21 +78,21 @@ const redirect = `${origin}/api/bank/callback`;
 const cookieName = '__Secure-mg-bank-flow';
 const future = () => new Date(Date.now() + 86400_000).toISOString();
 const rawTx = (patch = {}) => ({ entry_reference: 'BANK-001', transaction_amount: { amount: '1875.00', currency: 'SEK' }, credit_debit_indicator: 'CRDT', status: 'BOOK', booking_date: bankUtcDate(), debtor: { name: 'Example customer' }, reference_number: '10019', remittance_information: ['Invoice 1001'], ...patch });
-const post = (path, body = {}, requestOrigin = origin) => new Request(`${origin}/api/bank/${path}`, {
+const post = (path, body = {}, requestOrigin = origin, servedOrigin = origin) => new Request(`${servedOrigin}/api/bank/${path}`, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(requestOrigin === null ? {} : { Origin: requestOrigin }), 'CF-Connecting-IP': '192.0.2.1', 'User-Agent': 'MG local security tests' }, body: JSON.stringify(body),
 });
 const count = (f, table) => f.sql.prepare(`SELECT count(*) AS n FROM ${table}`).get().n;
 const financialAuditCount = f => f.sql.prepare("SELECT count(*) AS n FROM audit_events WHERE action NOT LIKE 'bank.job.%'").get().n;
 const bankJobEvents = f => f.sql.prepare("SELECT action,detail,created_at,revision FROM audit_events WHERE owner=? AND action LIKE 'bank.job.%' ORDER BY rowid").all(f.owner).map(row=>({...row,detail:JSON.parse(row.detail)}));
 
-async function fixture(t, environment = 'PRODUCTION', { actualProvider = false } = {}) {
+async function fixture(t, environment = 'PRODUCTION', { actualProvider = false, companyContext = false } = {}) {
   const key = `__mgBankTest_${crypto.randomUUID().replaceAll('-', '')}`;
   const sql = new DatabaseSync(':memory:');
   applyCurrentMigrations(sql);
   const f = { sql, owner: 'owner-alice', user: { userId: 'owner-alice' }, calls: [], provider: {}, env: {
     BANK_DATA_ENCRYPTION_KEY: randomToken(), ENABLE_BANKING_APPLICATION_ID: appId,
     ENABLE_BANKING_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nVEVTVC1PTkxZLU5PVC1SRUFM\n-----END PRIVATE KEY-----',
-    ENABLE_BANKING_ENVIRONMENT: environment, ENABLE_BANKING_KEY_ROTATED: 'true',
+    ENABLE_BANKING_ENVIRONMENT: environment, ENABLE_BANKING_KEY_ROTATED: 'true', ENABLE_BANKING_REDIRECT_URL: redirect,
   } };
   f.d1 = new LocalD1(sql); f.env.DB = f.d1;
   globalThis[key] = f;
@@ -89,7 +105,8 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const serverUrl = compiledModule('../lib/server.ts', {'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href, 'cloudflare:workers': cloudflare, '@/app/chatgpt-auth': auth, './domain': domain });
   const runtimeConfig = new URL('../lib/banking/runtime-config.ts', import.meta.url).href;
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
-  const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig, './transactions': normalizerUrl });
+  const storeServerUrl = companyContext ? jsUrl(`export * from ${JSON.stringify(serverUrl)}; export function currentCompanyContext(){return globalThis[${JSON.stringify(key)}].companyContext??null;}`) : serverUrl;
+  const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': storeServerUrl, './security': security, './runtime-config': runtimeConfig, './transactions': normalizerUrl });
   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'deleteSession', 'getTransactions'];
   const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
   const readGuardUrl = compiledModule('../lib/banking/account-read-guard.ts', { '../server': serverUrl, './store': storeUrl, './enable-banking': providerUrl });
@@ -122,8 +139,8 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
     sql.prepare('INSERT INTO bank_connections (id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(id, owner, (await f.store.application(owner)).generation, environment, 'Swedbank', 'SE', encryptedSession, encryptedAccounts, JSON.stringify([accountUid]), future(), bankUtcDate(), 'connected', new Date().toISOString(), new Date().toISOString());
     return id;
   };
-  f.start = async (options = {}) => {
-    const response = await f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: bankUtcDate(), ...options }));
+  f.start = async (options = {}, servedOrigin = origin) => {
+    const response = await f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: bankUtcDate(), ...options }, servedOrigin, servedOrigin));
     assert.equal(response.status, 200);
     const cookie = response.headers.get('set-cookie').split(';')[0];
     f.flowCookie = cookie; f.flowState = f.auth.state;
@@ -804,6 +821,9 @@ test('Legacy D1 keys cannot authorize any provider call when runtime configurati
   await assert.rejects(f.service.sync(post('sync')), /giltig bankanslutning/);
   const status = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
   assert.equal(status.configured, false); assert.equal(status.connection.status, 'reauth_required');
+  assert.equal(status.connection.connectionStatus, 'configuration_required');
+  assert.equal(status.connection.blockedReason, 'BANK_CONFIGURATION_REQUIRED');
+  assert.equal(status.connection.nextAction, 'configure_service');
   assert.equal(f.calls.length, 0);
   f.env.ENABLE_BANKING_KEY_ROTATED = 'false';
   assert.equal(f.store.configurationStatus().code, 'BANK_KEY_ROTATION_REQUIRED');
@@ -1135,7 +1155,7 @@ for(const mode of ['manual','automatic','control'])test(`bank job audit records 
  const pending=run();await ready;const started=bankJobEvents(f);
  try{
   assert.equal(started.length,1);assert.equal(started[0].action,'bank.job.started');
-  assert.deepEqual(Object.keys(started[0].detail).sort(),['mode','run_id']);assert.equal(started[0].detail.mode,mode);assert.match(started[0].detail.run_id,/^[a-f0-9-]{36}$/);
+  assert.deepEqual(Object.keys(started[0].detail).sort(),['connection_id','mode','run_id']);assert.equal(started[0].detail.connection_id,id);assert.equal(started[0].detail.mode,mode);assert.match(started[0].detail.run_id,/^[a-f0-9-]{36}$/);
   assert.ok(Number.isFinite(Date.parse(started[0].created_at)));assert.equal(f.connection().last_synced_at,null);
   await assert.rejects(run(),/BANK_BUSY/);assert.deepEqual(bankJobEvents(f),started,'a blocked overlap is not another attempt');
  }finally{resume();await pending.catch(()=>{});}
@@ -1156,8 +1176,9 @@ for(const [label,makeError,expected]of [
  f.sql.prepare('UPDATE bank_connections SET last_synced_at=?').run(previous);f.provider.getTransactions=async()=>{throw makeError();};
  await assert.rejects(f.service.sync(post('sync')));
  const events=bankJobEvents(f);assert.deepEqual(events.map(event=>event.action),['bank.job.started','bank.job.failed']);
- assert.deepEqual(events[1].detail,{run_id:events[0].detail.run_id,mode:'manual',error_code:expected});
+ assert.deepEqual(events[1].detail,{run_id:events[0].detail.run_id,connection_id:f.connection().id,mode:'manual',error_code:expected});
  assert.equal(JSON.stringify(events).includes('PRIVATE_PROVIDER_REFERENCE'),false);assert.equal(f.connection().last_synced_at,previous);assert.equal(count(f,'bank_sync_runs'),0);
+ assert.doesNotMatch(f.connection().last_error, /PRIVATE_PROVIDER_REFERENCE/);
 });
 
 test('bank completion audit failure rolls back the import instead of leaving a false success receipt',async t=>{
@@ -1174,7 +1195,7 @@ test('bank failure audit errors cannot discard a provider cooldown or replace it
  const previous=new Date(Date.now()-120000).toISOString();f.sql.prepare('UPDATE bank_connections SET last_synced_at=?').run(previous);
  const before=Date.now();f.provider.getTransactions=async()=>{throw Object.assign(new ProviderError('BANK_RATE_LIMIT','Vänta på banken',429,true),{retryAfter:172800});};
  await assert.rejects(f.service.sync(post('sync')),error=>error.code==='BANK_RATE_LIMIT');
- assert.ok(Date.parse(f.connection().retry_after)>=before+172800000);assert.equal(f.connection().last_synced_at,previous);assert.equal(f.connection().last_error,'Vänta på banken');
+ assert.ok(Date.parse(f.connection().retry_after)>=before+172800000);assert.equal(f.connection().last_synced_at,previous);assert.equal(f.connection().last_error,'Banken har begränsat antalet förfrågningar. Vänta till nästa tillåtna försök.');
  assert.deepEqual(bankJobEvents(f).map(event=>event.action),['bank.job.started']);assert.equal(count(f,'bank_sync_runs'),0);
  const calls=f.calls.length;await assert.rejects(f.service.sync(post('sync')),error=>error.code==='BANK_RATE_LIMIT');assert.equal(f.calls.length,calls);
 });
@@ -1281,6 +1302,124 @@ function companyAuthority(f, patch = {}) {
     checkedAt: new Date(Date.now() - 1000).toISOString(), validUntil: future(), status: 'active', ...patch,
   }] });
 }
+
+function reconnectCompanyContext(f) {
+  f.companyContext = { version: 'company-context-v1', companyId: 'workspace:' + f.owner,
+    storageOwner: f.owner, actorId: f.owner, role: 'owner', membershipVersion: 1,
+    companyVersion: 1, contextVersion: 1 };
+}
+
+test('consent-reconnect-95: configured callback is verified, saved and used exactly', async t => {
+  const f = await fixture(t); companyAuthority(f);
+  const configured = 'https://configured.example.test/api/bank/callback';
+  f.env.ENABLE_BANKING_REDIRECT_URL = configured;
+  f.info.redirect_urls = [configured];
+  await f.start({}, new URL(configured).origin);
+  assert.equal(f.auth.redirectUrl, configured);
+  assert.equal(f.sql.prepare('SELECT redirect_uri FROM bank_auth_flows').get().redirect_uri, configured);
+  const visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
+  assert.equal(visible.redirectUrl, configured);
+  assert.equal(visible.application.redirectConfigured, true);
+  const wrong = await f.service.callback(f.callbackRequest());
+  assert.equal(wrong.headers.get('location'), '/bank?result=failed');
+  assert.equal(f.calls.filter(call => call.name === 'createSession').length, 0);
+  const request = new Request(`${configured}?state=${f.flowState}&code=one-use-code`, { headers: { Cookie: f.flowCookie } });
+  assert.equal((await f.service.callback(request)).headers.get('location'), '/bank?result=select_account');
+  assert.equal((await f.service.callback(request)).headers.get('location'), '/bank?result=expired');
+  assert.equal(f.calls.filter(call => call.name === 'createSession').length, 1);
+});
+
+test('consent-reconnect-95: trusted APP_ORIGIN supplies the exact callback when no explicit URI is set', async t => {
+  const f = await fixture(t);
+  delete f.env.ENABLE_BANKING_REDIRECT_URL;
+  f.env.APP_ORIGIN = 'https://configured.example.test';
+  f.info.redirect_urls = [f.env.APP_ORIGIN + '/api/bank/callback'];
+  await f.start({}, f.env.APP_ORIGIN);
+  assert.equal(f.auth.redirectUrl, f.env.APP_ORIGIN + '/api/bank/callback');
+});
+
+test('consent-reconnect-95: absent, malformed or conflicting trusted callback config fails before provider calls', async t => {
+  const f = await fixture(t);
+  for (const settings of [
+    {}, { ENABLE_BANKING_REDIRECT_URL: 'http://configured.example.test/api/bank/callback' },
+    { ENABLE_BANKING_REDIRECT_URL: 'https://configured.example.test/api/bank/callback?next=private' },
+    { ENABLE_BANKING_REDIRECT_URL: 'https://configured.example.test/api/bank/callback#fragment' },
+    { ENABLE_BANKING_REDIRECT_URL: 'https://user:secret@configured.example.test/api/bank/callback' },
+    { ENABLE_BANKING_REDIRECT_URL: 'https://configured.example.test/other' },
+    { ENABLE_BANKING_REDIRECT_URL: redirect, APP_ORIGIN: 'https://other.example.test' },
+    { APP_ORIGIN: 'https://configured.example.test/untrusted/path' },
+  ]) {
+    delete f.env.ENABLE_BANKING_REDIRECT_URL; delete f.env.APP_ORIGIN; Object.assign(f.env, settings);
+    await assert.rejects(f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: bankUtcDate() })), error => error.code === 'BANK_CALLBACK_CONFIGURATION_INVALID');
+    assert.equal(f.calls.length, 0);
+    assert.equal(count(f, 'bank_auth_flows'), 0);
+  }
+});
+
+test('consent-reconnect-95: a configured callback missing from fresh registration cannot start consent', async t => {
+  const f = await fixture(t);
+  f.env.ENABLE_BANKING_REDIRECT_URL = 'https://configured.example.test/api/bank/callback';
+  await assert.rejects(f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: bankUtcDate() }, 'https://configured.example.test', 'https://configured.example.test')));
+  assert.equal(f.calls.filter(call => call.name === 'getApplication').length, 1);
+  assert.equal(f.calls.filter(call => call.name === 'startAuth').length, 0);
+  assert.equal(count(f, 'bank_auth_flows'), 0);
+});
+
+test('consent-reconnect-95: configuration rotation during application lookup cannot cache or start stale consent', async t => {
+  for (const rotate of [f => { f.env.ENABLE_BANKING_REDIRECT_URL = 'https://changed.example.test/api/bank/callback'; },
+    f => { f.env.ENABLE_BANKING_APPLICATION_ID = '66666666-6666-4666-8666-666666666666'; }]) {
+    const f = await fixture(t); await f.seedApp();
+    const before = { ...f.sql.prepare('SELECT * FROM bank_applications').get() };
+    f.provider.getApplication = async () => { rotate(f); return structuredClone(f.info); };
+    await assert.rejects(f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: bankUtcDate() })));
+    assert.equal(f.calls.filter(call => call.name === 'startAuth').length, 0);
+    assert.equal(count(f, 'bank_auth_flows'), 0);
+    assert.deepEqual({ ...f.sql.prepare('SELECT * FROM bank_applications').get() }, before);
+  }
+});
+
+test('consent-reconnect-95: an existing flow keeps its captured callback when deployment configuration changes', async t => {
+  const f = await fixture(t); companyAuthority(f); await f.start();
+  f.env.ENABLE_BANKING_REDIRECT_URL = 'https://changed.example.test/api/bank/callback';
+  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=select_account');
+  assert.equal(f.calls.filter(call => call.name === 'createSession').length, 1);
+});
+
+test('consent-reconnect-95: expired consent can be renewed without retaining the old account selection', async t => {
+  const f = await fixture(t); companyAuthority(f); await f.seedApp(); const id = await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET valid_until='2000-01-01T00:00:00.000Z',status='reauth_required',auto_sync_enabled=1 WHERE owner=?").run(f.owner);
+  const nextSession = '55555555-5555-4555-8555-555555555555', create = f.provider.createSession;
+  f.provider.createSession = async () => ({ ...await create(), session_id: nextSession });
+  await f.start({ renewConnectionId: id });
+  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=select_account');
+  assert.equal(f.connection().id, id);
+  assert.equal(await f.store.sessionId(f.connection()), nextSession);
+  assert.equal(f.connection().selected_accounts, '[]');
+  assert.equal(f.connection().auto_sync_enabled, 0);
+  assert.equal(f.calls.filter(call => call.name === 'deleteSession' && call.args[1] === remoteSession).length, 1);
+  assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
+});
+
+test('consent-reconnect-95: membership change while listing banks cannot initiate authorization', async t => {
+  const f = await fixture(t, 'PRODUCTION', { companyContext: true }); reconnectCompanyContext(f);
+  f.provider.listBusinessBanks = async () => { f.companyContext.membershipVersion = 2; return [structuredClone(f.bank)]; };
+  await assert.rejects(f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: bankUtcDate() })), error => error.code === 'COMPANY_ACCESS_DENIED');
+  assert.equal(f.calls.filter(call => call.name === 'startAuth').length, 0);
+  assert.equal(count(f, 'bank_auth_flows'), 0);
+});
+
+test('consent-reconnect-95: membership change during exchange preserves old consent and prevents further reads', async t => {
+  const f = await fixture(t, 'PRODUCTION', { companyContext: true }); reconnectCompanyContext(f); companyAuthority(f); await f.seedApp(); const id = await f.seedConnection();
+  const before = { ...f.connection() };
+  await f.start({ renewConnectionId: id });
+  const nextSession = '55555555-5555-4555-8555-555555555555', create = f.provider.createSession;
+  f.provider.createSession = async () => { f.companyContext.membershipVersion = 2; return { ...await create(), session_id: nextSession }; };
+  assert.equal((await f.service.callback(f.callbackRequest())).headers.get('location'), '/bank?result=failed');
+  assert.deepEqual({ ...f.connection() }, before);
+  assert.equal(f.calls.filter(call => call.name === 'getSession').length, 0);
+  assert.equal(f.calls.filter(call => call.name === 'deleteSession' && call.args[1] === remoteSession).length, 0);
+  assert.equal(f.calls.filter(call => call.name === 'deleteSession' && call.args[1] === nextSession).length, 1);
+});
 
 test('approved company consent requires separate bank company/account proof and explicit confirmation', async t => {
   const f = await fixture(t); companyAuthority(f);
@@ -1574,7 +1713,7 @@ for (const code of ['BANK_ACCOUNT_SCOPE_INVALID', 'SYNTHETIC_PRIVATE_TOKEN_123']
     assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
   });
 
-test('consent sync diagnostic reads a changing code once and never persists getter-supplied secrets', async t => {
+test('consent sync diagnostic rejects a forged changing code without reading getter-supplied secrets', async t => {
   const f = await fixture(t); await f.seedApp(); await f.seedConnection();
   f.sql.prepare('UPDATE bank_connections SET auto_sync_enabled=1 WHERE owner=?').run(f.owner);
   const secret = 'SYNTHETIC_CHANGING_CODE_SECRET'; let reads = 0;
@@ -1586,8 +1725,9 @@ test('consent sync diagnostic reads a changing code once and never persists gett
   const status = await (await f.service.automaticSyncStatus()).json();
   const persisted = JSON.stringify([f.connection(), bankJobEvents(f), status]);
   assert.ok(!persisted.includes(secret)); assert.ok(!persisted.includes(error.message));
-  assert.equal(status.lastError, new ConsentError('BANK_ACCOUNT_SCOPE_INVALID').message);
-  assert.ok(['BANK_ACCOUNT_SCOPE_INVALID', 'BANK_SYNC_FAILED'].includes(bankJobEvents(f).find(event => event.action === 'bank.job.failed').detail.error_code));
+  assert.equal(status.lastError, 'Bankhändelserna kunde inte hämtas. Försök igen.');
+  assert.equal(bankJobEvents(f).find(event => event.action === 'bank.job.failed').detail.error_code, 'BANK_SYNC_FAILED');
+  assert.equal(reads, 0);
   assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
 });
 
@@ -1650,4 +1790,223 @@ test('company selected scope retains strict full-account equality when unselecte
   assert.equal(f.connection().status, 'reauth_required');
   assert.equal(f.workspace(), null); assert.equal(count(f, 'bank_sync_runs'), 0);
   assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
+});
+
+test('95: reauthorization status suppresses scheduled retry promises without rewriting bank state', async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  const attempted = new Date(Date.now() - 60_000).toISOString();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required',auto_sync_enabled=1,auto_last_attempt_at=?,auto_next_at=? WHERE owner=?")
+    .run(attempted, future(), f.owner);
+  const before = { ...f.connection() };
+  const result = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(result.connected, false);
+  assert.equal(result.connectionStatus, 'reauth_required');
+  assert.equal(result.requiresReauthentication, true);
+  assert.equal(result.nextAction, 'reconnect');
+  assert.equal(result.nextAttemptAt, null);
+  assert.equal(result.syncAllowed, false);
+  assert.equal(result.statusEvidence, 'stored_connection');
+  assert.deepEqual({ ...f.connection() }, before);
+  assert.equal(f.calls.length, 0);
+});
+
+test('95: status rejects a stale application generation without contacting the bank', async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET app_generation='old-generation',auto_sync_enabled=1 WHERE owner=?").run(f.owner);
+  const before = { ...f.connection() };
+  const automatic = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(automatic.connected, false);
+  assert.equal(automatic.connectionStatus, 'reauth_required');
+  assert.equal(automatic.blockedReason, 'CONSENT_APPLICATION_CHANGED');
+  assert.equal(automatic.nextAttemptAt, null);
+  const visible = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
+  assert.equal(visible.connection.status, automatic.connectionStatus);
+  assert.deepEqual({ ...f.connection() }, before);
+  assert.equal(f.calls.length, 0);
+});
+
+test('95: automatic status rejects withdrawn corporate authority and empty account selection', async t => {
+  const f = await fixture(t); await cachedLegacyAccounts(f, 'company');
+  f.sql.prepare('UPDATE bank_connections SET auto_sync_enabled=1 WHERE owner=?').run(f.owner);
+  delete f.env.BANK_COMPANY_AUTHORIZATIONS;
+  let result = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(result.connected, false);
+  assert.equal(result.connectionStatus, 'corporate_authorization_required');
+  assert.equal(result.blockedReason, 'CORPORATE_AUTHORIZATION_REQUIRED');
+  f.sql.prepare("UPDATE bank_connections SET consent_metadata='',selected_accounts='[]' WHERE owner=?").run(f.owner);
+  result = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(result.connected, false);
+  assert.equal(result.connectionStatus, 'pending_account');
+  assert.equal(result.nextAction, 'select_accounts');
+  assert.equal(f.calls.length, 0);
+});
+
+test('95: safe account predicate is persisted and projected from the same failed connection only', async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare('UPDATE bank_connections SET auto_sync_enabled=1 WHERE owner=?').run(f.owner);
+  f.live.accounts = [extraLegacyUid]; f.live.accounts_data = [{ uid: extraLegacyUid }];
+  await assert.rejects(f.service.automaticSync(), e => e.code === 'BANK_ACCOUNT_SCOPE_INVALID');
+  const event = bankJobEvents(f).find(value => value.action === 'bank.job.failed');
+  assert.equal(event.detail.error_code, 'BANK_ACCOUNT_SCOPE_INVALID');
+  assert.equal(event.detail.validation_reason, 'SELECTED_ACCOUNT_UNAVAILABLE');
+  assert.equal(event.detail.connection_id, f.connection().id);
+  const result = await (await f.service.automaticSyncStatus()).json();
+  assert.deepEqual(result.diagnostic, { code: 'BANK_ACCOUNT_SCOPE_INVALID',
+    message: 'Bankens godkända konton kunde inte verifieras.', reason: 'SELECTED_ACCOUNT_UNAVAILABLE' });
+  assert.doesNotMatch(JSON.stringify(event.detail), /22222222|44444444|SE4550|PRIVATE/);
+  assert.equal(result.requiresReauthentication, true);
+  assert.equal(result.nextAttemptAt, null);
+  f.sql.prepare("UPDATE bank_connections SET id='replacement-connection' WHERE owner=?").run(f.owner);
+  assert.equal((await (await f.service.automaticSyncStatus()).json()).diagnostic, null);
+  assert.equal(f.calls.filter(call => call.name === 'getTransactions').length, 0);
+});
+
+test('95: public consent error never reflects custom or forged error properties', async t => {
+  const f = await fixture(t);
+  const error = new ConsentError('BANK_ACCOUNT_SCOPE_INVALID', 409, 'SYNTHETIC_SECRET_TOKEN');
+  Object.defineProperty(error, 'code', { get() { throw Error('SYNTHETIC_SECRET_GETTER'); } });
+  const result = f.service.bankFailure(error), body = await result.json();
+  assert.equal(result.status, 409);
+  assert.equal(body.code, 'BANK_ACCOUNT_SCOPE_INVALID');
+  assert.equal(body.error, 'Bankens godkända konton kunde inte verifieras.');
+  assert.doesNotMatch(JSON.stringify(body), /SYNTHETIC_SECRET/);
+});
+
+test('95: a partially withdrawn corporate grant cannot advertise the selected account as connected', async t => {
+  const f = await fixture(t); await cachedLegacyAccounts(f, 'company');
+  f.sql.prepare('UPDATE bank_connections SET selected_accounts=? WHERE owner=?').run(JSON.stringify([extraLegacyUid]), f.owner);
+  companyAuthority(f);
+  const before = { ...f.connection() };
+  const result = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(result.connected, false);
+  assert.equal(result.blockedReason, 'CORPORATE_AUTHORIZATION_REQUIRED');
+  assert.equal(result.syncAllowed, false);
+  assert.deepEqual({ ...f.connection() }, before);
+  assert.equal(f.calls.length, 0);
+});
+
+test('95: public provider failure uses the original code and canonical message only', async t => {
+  const f = await fixture(t);
+  const error = new ProviderError('BANK_TIMEOUT', 'SYNTHETIC_PRIVATE_PROVIDER_MESSAGE', 504, true);
+  Object.defineProperty(error, 'code', { get() { throw Error('SYNTHETIC_PRIVATE_PROVIDER_GETTER'); } });
+  const result = f.service.bankFailure(error), body = await result.json();
+  assert.equal(result.status, 502);
+  assert.equal(body.code, 'BANK_TIMEOUT');
+  assert.doesNotMatch(JSON.stringify(body), /SYNTHETIC_PRIVATE/);
+});
+
+for (const role of ['viewer', 'accountant']) test(`95: ${role} can read existing bank status without gaining management permission`, async t => {
+  const f = await fixture(t, 'PRODUCTION', { companyContext: true }); await cachedLegacyAccounts(f, 'company'); reconnectCompanyContext(f);
+  f.companyContext.role = role;
+  const metadata = JSON.parse(f.connection().consent_metadata); metadata.membershipVersion = '1';
+  f.sql.prepare('UPDATE bank_connections SET consent_metadata=? WHERE owner=?').run(JSON.stringify(metadata), f.owner);
+  const automatic = await (await f.service.automaticSyncStatus()).json();
+  assert.equal(automatic.connected, true);
+  const status = await (await f.service.status(new Request(origin + '/api/bank/status'))).json();
+  assert.equal(status.company.canManageBank, false);
+  assert.equal(status.connection.status, 'connected');
+  await assert.rejects(f.service.syncControl(post('sync')), error => error.code === 'COMPANY_ACCESS_DENIED');
+  assert.equal(f.calls.length, 0);
+});
+
+test('95: authorization cannot start on a host that cannot deliver its host-only callback cookie', async t => {
+  const f = await fixture(t);
+  const configured = 'https://configured.example.test/api/bank/callback';
+  f.env.ENABLE_BANKING_REDIRECT_URL = configured; f.info.redirect_urls = [configured];
+  await assert.rejects(f.service.connect(post('connect', { bankName: 'Swedbank', country: 'SE', dateFrom: bankUtcDate() })),
+    error => error.code === 'BANK_CALLBACK_CONFIGURATION_INVALID');
+  assert.equal(f.calls.length, 0);
+  assert.equal(count(f, 'bank_auth_flows'), 0);
+});
+
+for (const stage of ['started', 'reservation', 'reserved']) for (const [column, value] of [
+  ['valid_until', '2000-01-01T00:00:00.000Z'], ['status', 'revocation_pending'],
+]) test(`merge95: ${column} changed at ${stage} stops revalidation before the provider read`, async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  let changed = false;
+  const applies = statements => !changed && statements.some(statement => stage === 'started'
+    ? statement.values?.includes('bank.consent.revalidation.started') : statement.sql.includes('SET account_evidence_retry=?'));
+  const change = () => { changed = true; f.sql.prepare(`UPDATE bank_connections SET ${column}=?`).run(value); };
+  if (stage === 'reserved') {
+    const batch = f.d1.batch.bind(f.d1);
+    f.d1.batch = async statements => { const result = await batch(statements); if (applies(statements)) change(); return result; };
+  } else f.d1.beforeBatch = statements => { if (applies(statements)) change(); };
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(changed, true);
+  assert.equal(f.calls.length, 0, 'an expired or revoking retained grant cannot authorize a provider read');
+  assert.equal(f.connection()[column], value);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n, 0);
+  assert.equal(count(f, 'bank_sync_runs'), 0); assert.equal(f.workspace(), null);
+});
+
+for (const stage of ['before read', 'during response', 'at commit']) test(`merge95: inactive application ${stage} cannot restore connected status`, async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  let changed = false;
+  const deactivate = () => { changed = true; f.sql.prepare('UPDATE bank_applications SET metadata=?').run(JSON.stringify({ ...f.info, active: false })); };
+  if (stage === 'before read') deactivate();
+  else if (stage === 'during response') f.provider.getSession = async () => { deactivate(); return structuredClone(f.live); };
+  else f.d1.beforeBatch = statements => { if (!changed && statements.some(statement => statement.values?.includes('bank.consent.revalidated'))) deactivate(); };
+  await assert.rejects(f.service.revalidateConsent(post('revalidate')));
+  assert.equal(changed, true); assert.equal(f.calls.length, stage === 'before read' ? 0 : 1);
+  assert.equal(f.connection().status, 'reauth_required');
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidated'").get().n, 0);
+});
+
+for (const loseReply of [false, true]) test(`merge95: revalidation reports current health after a committed receipt with lost reply ${loseReply}`, async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  const batch = f.d1.batch.bind(f.d1); let changed = false;
+  f.d1.batch = async statements => {
+    const result = await batch(statements);
+    if (!changed && statements.some(statement => statement.values?.includes('bank.consent.revalidated'))) {
+      changed = true;
+      f.sql.prepare('UPDATE bank_applications SET metadata=?').run(JSON.stringify({ ...f.info, active: false }));
+      if (loseReply) throw Error('SYNTHETIC_LOST_COMMIT_REPLY');
+    }
+    return result;
+  };
+  const result = await (await f.service.revalidateConsent(post('revalidate'))).json();
+  assert.equal(changed, true); assert.equal(result.revalidated, true);
+  assert.equal(result.status, 'reauth_required'); assert.equal(result.connectionStatus, 'configuration_required');
+  assert.equal(result.connected, false); assert.equal(result.blockedReason, 'BANK_CONFIGURATION_REQUIRED');
+  assert.equal(f.connection().status, 'connected', 'the durable receipt still records the completed check');
+  assert.equal(f.calls.length, 1);
+  assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n, 0);
+});
+
+test('merge95: receipt replay projects current application health without another bank read', async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  f.sql.prepare("UPDATE bank_connections SET status='reauth_required'").run();
+  await f.service.revalidateConsent(post('revalidate'));
+  f.sql.prepare('UPDATE bank_applications SET metadata=?').run(JSON.stringify({ ...f.info, active: false }));
+  const replay = await (await f.service.revalidateConsent(post('revalidate'))).json();
+  assert.equal(replay.revalidated, true); assert.equal(replay.replayed, true);
+  assert.equal(replay.status, 'reauth_required'); assert.equal(replay.connectionStatus, 'configuration_required');
+  assert.equal(replay.connected, false); assert.equal(f.calls.length, 1);
+});
+
+for (const phase of ['session', 'transactions']) for (const [column, value] of [
+  ['valid_until', '2000-01-01T00:00:00.000Z'], ['status', 'revocation_pending'],
+]) test(`merge95: ordinary ${phase} read stops when ${column} changes after its reservation`, async t => {
+  const f = await fixture(t); await f.seedApp(); await f.seedConnection();
+  const batch = f.d1.batch.bind(f.d1); let reservations = 0, changed = false;
+  f.d1.batch = async statements => {
+    const result = await batch(statements);
+    if (statements.some(statement => statement.sql.includes('SET account_evidence_retry=?')) &&
+      JSON.parse(f.connection().account_evidence_retry || '{}').status === 'pending') {
+      reservations++;
+      if (reservations === (phase === 'session' ? 1 : 2)) {
+        changed = true; f.sql.prepare(`UPDATE bank_connections SET ${column}=?`).run(value);
+      }
+    }
+    return result;
+  };
+  let failure; try { await f.service.sync(post('sync')); } catch (error) { failure = error; }
+  assert.equal(changed, true, failure?.message);
+  assert.equal(f.calls.filter(call => call.name === (phase === 'session' ? 'getSession' : 'getTransactions')).length, 0,
+    'an expired or revoking grant must stop ordinary reads as well as revalidation');
+  assert.ok(failure); assert.equal(count(f, 'bank_sync_runs'), 0);
+  assert.equal(f.workspace()?.state.transactions.length || 0, 0);
 });

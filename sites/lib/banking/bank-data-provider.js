@@ -22,6 +22,7 @@ const messages = {
   PROVIDER_SERVICE_ERROR: 'Bankleverantören är tillfälligt otillgänglig.',
   PROVIDER_REQUEST_REJECTED: 'Bankleverantören avvisade förfrågan.',
   CONSENT_NOT_VALID: 'Bankmedgivandet är inte giltigt för läsning.',
+  BANK_ACCOUNT_UNAVAILABLE: 'Banken har markerat kontot som spärrat eller avslutat.',
   AUTHORIZATION_INVALID: 'Bankgodkännandet kunde inte verifieras.',
   BANKGIRO_NOT_AVAILABLE: 'Bankgiroberikning är inte verifierad för företaget och kontot.',
 };
