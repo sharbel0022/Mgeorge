@@ -1,5 +1,17 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Agent 2 — Bankgiro, referensintegritet och spårbarhet, 2026-11-05
+
+[Aktuell avgränsad leverans](docs/integration/bankgiro-95.md), branch `feature/95-bankgiro`, kodkandidat `5642be6`. **Bankgiro före/efter: 8,5/8,5. Totalen är oförändrad: 255/330 =7,73/10; 0/33 ≥9,5.** Målpoängen ersätter inte verklig bankacceptans.
+
+| Nytt faktiskt bevis | Kvarstående produktionsgräns |
+| --- | --- |
+| Läsande originalhistorik med dokument-/ägarbindning, hashjämförelser, importer, källkvitton, observationer och sparade allokeringar; åtta nya tester. | En sparad relation eller intakt hash bevisar inte bankautenticitet, rätt konto eller rätt faktura. |
+| RED/GREEN för referens som felaktigt passerade trots bristande original; tre nya tester. Separat saknad/osäker/verifierad status utan ändrat saldo. | Verkliga aktuella kontobehörigheter och kundrelation måste fortfarande styrkas. |
+| Sex nya tester för exakt dokumentnummer från Open Payments-arrayer, avgränsad metadata och äldre referensrepresentation. | Oklart creditor-reference-objekt tolkas inte som OCR. Strukturerade arrayer med oklar semantik stannar för granskning. |
+| Verkligt sparat obligatoriskt 0599-original återläst utan skrivning; referens/nolla, belopp och rapportnamn bevarade. | Automatisk rapportkälla saknas. Ingen gemensam bankutfärdad insättningsidentitet, aktuell verifierad kontokoppling eller registrerad faktura i det valda fallet. Noll allokeringar. |
+| Isolerade lokala testkvitton, syntax/typer/audit/bygge, ren installation och oberoende review enligt rapporten. | Syntetiska tester och kodreview är inte leverantörsavtal, driftsättning eller produktionsacceptans. Sites har åtta befintliga moderate utvecklingsberoendefynd. |
+
 ## Agent 7 — avgränsade SaaS-säkerhetsbevis, 2026-11-04
 
 [Aktuell säkerhets- och acceptansrapport](docs/integration/saas/security-acceptance.md) kompletterar evidensen på `feature/saas-security-acceptance`. **Före och efter: 255/330 =7,73/10; 0/33 ≥9,5.** Inga numeriska poäng höjs för syntetiska tester eller för en ännu inte integrerad företagsmodell.
