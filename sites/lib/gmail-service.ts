@@ -96,7 +96,17 @@ export async function gmailStatus(summary=false){
   const next_eligible_sync=connection&&!connection.blocked&&!permanentGmailErrors.has(connection.status)?new Date(Math.max(at,Date.parse(connection.last_attempt||'')+15*60000||0,Date.parse(connection.retry_after||'')||0)).toISOString():null;
   const schedule_observation=await automaticObservation(user.userId);
   const attachment_rejections=await attachmentRejections(user.userId);
-  const status={configured,email:account,send_enabled:!!send_enabled,connection,processing,last_successful_fetch,sync_health,schedule_observation,attachment_rejections,background_ready:state==='recent',scheduler_configured:processing.scheduler_configured,next_eligible_sync};
+  // A manual fetch and an OCR heartbeat prove only their own stages. Keep a
+  // combined readiness flag conservative until the external schedule itself
+  // has evidence; document identifiers and extraction values never enter it.
+  const pendingOcr=Number(processing.counts?.waiting_ocr||0);
+  const ocrAvailable=processing.cloud_ocr_configured&&processing.cloud_worker_recent||processing.worker_online;
+  const backgroundReasons=[...(state==='recent'?[]:['gmail_fetch_'+state]),
+    ...(!schedule_observation.external_schedule_verified?['external_schedule_unverified']:[]),
+    ...(pendingOcr>0&&!ocrAvailable?['ocr_worker_unavailable']:[]),
+    ...(completed?.status==='completed_pending'||Number(processing.aftercheck_pending)>0?['postprocessing_pending']:[])];
+  const background_health={state:backgroundReasons.length?'needs_attention':'ready',reasons:backgroundReasons};
+  const status={configured,email:account,send_enabled:!!send_enabled,connection,processing,last_successful_fetch,sync_health,schedule_observation,attachment_rejections,fetch_ready:state==='recent',background_ready:backgroundReasons.length===0,background_health,scheduler_configured:processing.scheduler_configured,next_eligible_sync};
   if(summary)return response(status);
   const candidates=await db().prepare("SELECT s.document_id,s.metadata,s.status,s.extraction,s.created_at,d.filename,d.mime,j.state processing_state,j.extraction processing_extraction,j.error_code,j.invoice_id,j.automatic FROM gmail_sources s JOIN documents d ON d.id=s.document_id AND d.owner=s.owner LEFT JOIN document_jobs j ON j.owner=s.owner AND j.document_id=s.document_id WHERE s.owner=? AND s.status<>'rejected' ORDER BY s.created_at DESC LIMIT 200").bind(user.userId).all();
   const runs=await db().prepare('SELECT found,imported,duplicates,status,created_at FROM gmail_runs WHERE owner=? ORDER BY created_at DESC LIMIT 10').bind(user.userId).all();

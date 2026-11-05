@@ -6,6 +6,7 @@ import vm from 'node:vm';
 function view(){
   const elements=new Map();const element=key=>{if(!elements.has(key))elements.set(key,{innerHTML:'',value:'',isConnected:true,focus(){},addEventListener(){},setAttribute(){},querySelector:selector=>element(key+' '+selector),querySelectorAll:()=>[]});return elements.get(key);};
   const context=vm.createContext({document:{querySelector:element,getElementById:id=>element('#'+id),addEventListener(){},body:{classList:{add(){},remove(){}}}},location:{search:''},window:{addEventListener(){},scrollTo(){}},history:{pushState(){},replaceState(){}},URL,URLSearchParams,Intl,Date,matchMedia:()=>({matches:false,addEventListener(){}}),fetch:()=>new Promise(()=>{}),setTimeout:()=>1,clearTimeout(){}});
+  vm.runInContext(readFileSync(new URL('../public/workspace-search.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../public/app.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../public/payment-control.js',import.meta.url),'utf8'),context);
   return code=>vm.runInContext(code,context);

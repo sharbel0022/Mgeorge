@@ -23,6 +23,7 @@ function ui(){
     location:{search:'?tab=connections',assign(){}},window:{addEventListener(name,handler){listeners.set('window:'+name,handler);},scrollTo(){}},history:{pushState(){},replaceState(){}},
     URLSearchParams,URL,Intl,Date,matchMedia:()=>({matches:false,addEventListener(){}}),fetch:()=>new Promise(()=>{}),setTimeout:()=>1,clearTimeout(){}
   });
+  vm.runInContext(readFileSync(new URL('../public/workspace-search.js',import.meta.url),'utf8'),context);
   vm.runInContext(source,context,{filename:'public/app.js'});
   vm.runInContext(readFileSync(new URL('../public/messages.js',import.meta.url),'utf8'),context,{filename:'public/messages.js'});
   vm.runInContext(readFileSync(new URL('../public/payment-control.js',import.meta.url),'utf8'),context,{filename:'public/payment-control.js'});

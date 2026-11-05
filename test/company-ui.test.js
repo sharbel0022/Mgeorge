@@ -15,7 +15,7 @@ function fixture(t,{legacy=false,directoryOverride}={}){
   const raw=(input,init)=>{const call={input,init};calls.push(call);if(input==='/api/companies')return Promise.resolve(Response.json(directoryOverride??(legacy?{version:'company-context-v1',companies:[],activeCompanyId:null,contextVersion:1,legacy:true}:directory())));return new Promise((resolve,reject)=>Object.assign(call,{resolve,reject}));};browser.fetch=raw;
   const sandbox={window:browser,document,location:browser.location,history:{pushState(){},replaceState(){}},URL,URLSearchParams,Headers,Response,Request,AbortController,AbortSignal,Intl,Date,clientModule,matchMedia:()=>({matches:false,addEventListener(){}}),setTimeout:()=>1,clearTimeout(){}};
   Object.defineProperty(sandbox,'fetch',{get:()=>browser.fetch,configurable:true});const runtime=vm.createContext(sandbox);
-  for(const name of ['app','review','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${name}.js`,import.meta.url),'utf8'),runtime,{filename:`public/${name}.js`});
+  for(const name of ['workspace-search','app','review','messages','payment-control'])vm.runInContext(readFileSync(new URL(`../public/${name}.js`,import.meta.url),'utf8'),runtime,{filename:`public/${name}.js`});
   const run=source=>vm.runInContext(source,runtime);run('loadCompanyClient=async()=>clientModule;state.me={authenticated:true,login_required:true};state.control={counts:{review:0},totals:{},queue:[],run:null}');
   t.after(()=>{try{run('resetCompanyClient()');}catch{/* A red test may predate the new boundary. */}});
   return {run,window:browser,calls,html:()=>el('#app').innerHTML,set:(name,value)=>runtime[name]=value};
