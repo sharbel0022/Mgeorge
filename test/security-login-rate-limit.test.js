@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { request } from 'node:http';
@@ -122,4 +122,64 @@ test('successful login clears only the account throttle and preserves authentica
   const retained = instance.db.prepare('SELECT * FROM login_rate_limits').all();
   assert.equal(retained.length, 1);
   assert.doesNotMatch(JSON.stringify(retained), /127\.0\.0\.1|password|token|synthetic/);
+});
+
+test('isolated encrypted control-database recovery preserves the login throttle and rejects unauthenticated archives', async t => {
+  const [{ openDatabase }, { createBackup, verifyBackup, restoreBackup }] = await Promise.all([
+    import('../src/db.js'), import('../src/backup.js'),
+  ]);
+  // This backs up the control database explicitly. A company-partition snapshot
+  // does not necessarily contain the separate administrator login state.
+  const folder = mkdtempSync(join(tmpdir(), 'mg-login-control-recovery-'));
+  t.after(() => rmSync(folder, { recursive: true, force: true }));
+  const source = join(folder, 'control.sqlite'), archive = join(folder, 'control.mgbak');
+  const restoredDirectory = join(folder, 'isolated-restore');
+  const encryptionKey = 'c'.repeat(64);
+  let now = 1_000_000, retained;
+  const sourceDb = openDatabase(source);
+  try {
+    const limiter = createLoginRateLimiter(sourceDb, { now: () => now });
+    for (let i = 0; i < 5; i++) limiter.reserve();
+    retained = { ...sourceDb.prepare('SELECT * FROM login_rate_limits').get() };
+    assert.deepEqual(retained, { account: 'administrator', attempts: 5, window_ends_at: 1_900_000 });
+  } finally { sourceDb.close(); }
+  const sourceBytes = readFileSync(source);
+  assert.equal(createBackup(source, archive, encryptionKey).verified, true);
+  assert.equal(verifyBackup(archive, encryptionKey).verified, true);
+  const archiveBytes = readFileSync(archive);
+  mkdirSync(restoredDirectory, { mode: 0o700 });
+
+  const corruptArchive = join(folder, 'corrupt.mgbak'), damaged = Buffer.from(archiveBytes);
+  damaged[damaged.length - 1] ^= 1;
+  writeFileSync(corruptArchive, damaged, { flag: 'wx', mode: 0o600 });
+  for (const [name, input, key] of [
+    ['wrong-key', archive, 'd'.repeat(64)],
+    ['corrupt', corruptArchive, encryptionKey],
+  ]) {
+    const rejectedTarget = join(restoredDirectory, `${name}.sqlite`);
+    assert.throws(() => restoreBackup(input, rejectedTarget, key), /unable to authenticate/i);
+    assert.equal(existsSync(rejectedTarget), false);
+    assert.deepEqual(readFileSync(source), sourceBytes);
+    assert.deepEqual(readFileSync(archive), archiveBytes);
+  }
+
+  const target = join(restoredDirectory, 'control.sqlite');
+  assert.equal(restoreBackup(archive, target, encryptionKey).restored, true);
+  const recovered = new DatabaseSync(target);
+  try {
+    assert.deepEqual({ ...recovered.prepare('SELECT * FROM login_rate_limits').get() }, retained);
+    now = retained.window_ends_at - 1000;
+    const limiter = createLoginRateLimiter(recovered, { now: () => now });
+    assert.throws(() => limiter.check(), error => error.status === 429 && error.retryAfter === 1);
+    assert.throws(() => limiter.reserve(), error => error.status === 429 && error.retryAfter === 1);
+    assert.deepEqual({ ...recovered.prepare('SELECT * FROM login_rate_limits').get() }, retained);
+    now = retained.window_ends_at;
+    limiter.check();
+    limiter.reserve();
+    assert.deepEqual({ ...recovered.prepare('SELECT * FROM login_rate_limits').get() }, {
+      account: 'administrator', attempts: 1, window_ends_at: retained.window_ends_at + 900_000,
+    });
+  } finally { recovered.close(); }
+  assert.deepEqual(readFileSync(source), sourceBytes);
+  assert.deepEqual(readFileSync(archive), archiveBytes);
 });

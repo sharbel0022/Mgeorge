@@ -1,6 +1,9 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { createHash, generateKeyPairSync } from 'node:crypto';
 import ts from 'typescript';
@@ -20,7 +23,23 @@ import { provisionCompany } from '../lib/company-storage.js';
 // Exercise the real route services, encryption, domain and SQL. Only the identity
 // provider and banking HTTP boundary are replaced. No test can call a live bank.
 const source = path => readFileSync(new URL(path, import.meta.url), 'utf8');
-const jsUrl = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
+// Keep the same per-fixture module identity without recursively embedding each
+// dependency's source in a data URL. Nested URLs retained by the ESM cache made
+// this suite's memory grow into gigabytes as more security cases were added.
+const moduleDirectory = mkdtempSync(join(tmpdir(), 'mg-banking-security-'));
+const moduleUrls = new Map();
+after(() => rmSync(moduleDirectory, { recursive: true, force: true }));
+const jsUrl = value => {
+  const digest = createHash('sha256').update(value).digest('hex');
+  let url = moduleUrls.get(digest);
+  if (!url) {
+    const path = join(moduleDirectory, `${digest}.mjs`);
+    writeFileSync(path, value, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+    url = pathToFileURL(path).href;
+    moduleUrls.set(digest, url);
+  }
+  return url;
+};
 function compiledModule(path, imports, jsx = ts.JsxEmit.Preserve) {
   imports = { '../bank-consent-policy.js': new URL('../lib/bank-consent-policy.js', import.meta.url).href, '../bank-company-authority.js': new URL('../lib/bank-company-authority.js', import.meta.url).href, './account-read-cooldown': new URL('../lib/banking/account-read-cooldown.ts', import.meta.url).href, './sync-periods': new URL('../lib/banking/sync-periods.ts', import.meta.url).href, '../payer-evidence.js': new URL('../lib/payer-evidence.js', import.meta.url).href, ...imports };
   let js = ts.transpileModule(source(path), { fileName: path, compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, jsx } }).outputText;

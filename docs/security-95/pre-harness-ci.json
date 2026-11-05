@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "scope": "Integrated security candidate before the test-fixture module representation change; retain separately from latest PR-head CI.",
+  "headCommit": "cc50423315ba506f4e9f2cd8e5c5ef089dbe6269",
+  "gitTree": "cc066d47bcbe12b8cc30b737e399fa781f27d903",
+  "sourceFingerprint": "56287823a2e87aefbd9e02747562247f0859ac260c651be4ac68c383f4e8b3d2",
+  "nodeMajor": 22,
+  "runs": [
+    {
+      "id": 42085006203,
+      "name": "Payment control checks",
+      "headSha": "cc50423315ba506f4e9f2cd8e5c5ef089dbe6269",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "pull_request",
+      "attempt": 1,
+      "createdAt": "2026-11-05T18:31:11Z",
+      "updatedAt": "2026-11-05T18:35:56Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42085006203"
+    },
+    {
+      "id": 42085002637,
+      "name": "SaaS security acceptance",
+      "headSha": "cc50423315ba506f4e9f2cd8e5c5ef089dbe6269",
+      "status": "completed",
+      "conclusion": "success",
+      "event": "pull_request",
+      "attempt": 1,
+      "createdAt": "2026-11-05T18:31:10Z",
+      "updatedAt": "2026-11-05T18:34:14Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42085002637"
+    }
+  ],
+  "fullSuites": {
+    "root": {
+      "jobId": 127447616051,
+      "tests": 2003,
+      "pass": 2003,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sites": {
+      "jobId": 127447616291,
+      "tests": 3870,
+      "pass": 3870,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "bridge": {
+      "jobId": 127447615952,
+      "tests": 47,
+      "pass": 47,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "total": 5920
+  },
+  "focused": {
+    "jobId": 127447603859,
+    "node": {
+      "tests": 331,
+      "pass": 331,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sites": {
+      "tests": 805,
+      "pass": 805,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "total": 1136,
+    "overlapsFullSuites": true
+  },
+  "providerCalls": false,
+  "productionAcceptance": "NOT_VERIFIED"
+}

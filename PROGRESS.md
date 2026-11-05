@@ -2,37 +2,46 @@
 
 ## Agent 7 — säkerhet och driftsäkerhet, 2026-11-05
 
-Branch `feature/95-security`, bas `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`.
-[Säkerhetsrapport och graderat riskregister](docs/SECURITY-95-REVIEW.md),
+[PR #54](https://github.com/sharbel0022/Mgeorge/pull/54), branch
+`feature/95-security`. Ursprunglig bas `4ad205b`; senare main `bf24a3c`
+är integrerad. [Säkerhetsrapport och graderat riskregister](docs/SECURITY-95-REVIEW.md),
 [exakta lokala grindar](docs/security-95/gates.json) och
 [oberoende granskning](docs/security-95/independent-review.md).
 
-Fem avgränsade förbättringar har RED/GREEN-bevis: beständig och atomisk
-inloggningsbudget i kontrollens SQLite-databas, faktiska byte-/tidsgränser före
-Sites requestkloner, minimerade auditposter från accepterade domänuppgifter,
+Fem avgränsade förbättringar har reproduktionsbevis: beständig atomisk
+inloggningsbudget i SQLite, faktiska byte-/tidsgränser före Sites
+requestkloner, minimerade auditposter från accepterade domänuppgifter,
 enhetligt UUID-format mellan backup och recovery samt testbarn utan ärvda
 `NODE_OPTIONS`. Original, avvisade bankkonflikter och ekonomiska
-granskningsanteckningar bevaras.
+granskningsanteckningar bevaras. Ett nytt isolerat kontrollDB-restoreprov
+bevarar loginspärrens sluttid och avvisar felnyckel/korruption utan att ändra
+källan. Detta påstår inte att varje företagssnapshot innehåller kontrollDB.
 
-Slutliga lokala helsviter: **1 905 Node + 3 776 Sites + 47 brygga = 5 728
-godkända**, 0 fail/skip/cancel/TODO. 26 nya regressioner ingår. Syntax173,
-typer, exakt minimatch-mitigering, high-auditgrindar och produktionsbygge är
-godkända. Fokuserad acceptans **331 + 767 = 1 098/1 098** och oberoende
-review **81/81** överlappar helsviterna. Två upptäckta regressions-/miljöförsök
-och den avbrutna första Sites-körningen redovisas öppet i rapporten.
+Slutliga lokala helsviter: **2 004 Node + 3 870 Sites + 47
+brygga = 5 921 godkända**, 0 fail/skip/cancel/TODO. **27 nya
+regressionsfall** ingår. Syntax183, typer, exakt minimatch-mitigering,
+high-auditgrindar och produktionsbygge är godkända. Fokuserad acceptans
+**332 + 805 = 1 137/1 137**
+överlappar helsviterna. Banktesternas tillfälliga modulrepresentation minskade
+uppmätt max-RSS 76,94 % med alla 168 testfall och deras assertions kvar; den exakta
+orsaken till tidigare filprocessavbrott är inte fastställd. Misslyckade
+miljö-/utvecklingskörningar behålls separat.
 
 Rootens hela beroendegraf samt Sites och bryggans produktionsgrafer har noll
 auditfynd. Sites utvecklingsgraf har åtta moderate paketposter från **en**
 minimatch-advisory; installerad befintlig backport är verifierad. Inga paket,
-lockfiler, produktionsscheman eller credentials ändras. Lokala Node24-kvitton
-och Node22-PR-CI ska hållas åtskilda.
+lockfiler, produktionsscheman eller credentials ändras av säkerhets-PR:n.
+OCR-triggern från integrerade PR #48 är separat granskad med sina begränsningar.
+Lokala Node24-kvitton och Node22-PR-CI hålls åtskilda; sista publicerade
+SHA:s kontroller redovisas i PR:n.
 
-**Målet 9,5/10 är inte styrkt.** Nyckellivscykel, aktuell fullständig
-katastrofåterställning och kommersiella dataskyddsprocesser kräver operativa
-acceptansbevis. Dessa luckor är inte påståenden om demonstrerade High-angrepp.
-Inga banker/leverantörer har penetrationstestats och ingen produktionsdata har
-återställts eller raderats. Alla 33 numeriska poäng behålls:
-**255/330 = 7,73/10; 0/33 ≥9,5**. PR:n innebär kodleverans, ingen publicering.
+**Målet 9,5/10 är inte styrkt.** Nyckellivscykel, återställning från en verklig
+produktionsbackup med separat nyckel/tjänsteaktivering och kommersiella
+dataskyddsprocesser kräver operativa acceptansbevis. Luckorna är inte påståenden
+om demonstrerade High-angrepp. Inga banker/leverantörer har penetrationstestats
+och ingen produktionsdata har återställts eller raderats. Alla 33 numeriska
+poäng behålls: **255/330 = 7,73/10; 0/33 ≥9,5**. PR:n är kodleverans för
+granskning; ingen merge eller driftsättning har utförts.
 
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 

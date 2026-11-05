@@ -69,9 +69,7 @@
           "@typescript-eslint/typescript-estree",
           "@typescript-eslint/utils"
         ],
-        "effects": [
-          "@typescript-eslint/eslint-plugin"
-        ],
+        "effects": [],
         "range": ">=6.16.0",
         "nodes": [
           "node_modules/@typescript-eslint/type-utils"
@@ -109,6 +107,7 @@
           "@typescript-eslint/typescript-estree"
         ],
         "effects": [
+          "@typescript-eslint/eslint-plugin",
           "typescript-eslint"
         ],
         "range": ">=6.16.0",
