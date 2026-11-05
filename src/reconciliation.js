@@ -10,8 +10,9 @@ import {referenceEvidenceCompatible} from '../sites/lib/reference-evidence-compa
 import {matchesInvoiceReference,strictInvoiceReferenceMatch} from './invoice-reference-policy.js';
 import {invoiceOriginalIsVerified} from './invoice-original.js';
 import {projectBankgiroSourceEvidence} from '../sites/lib/bankgiro-source-evidence.js';
+import {finalizeReconciliationFindings} from '../sites/lib/reconciliation-decisions.js';
 export function normalizeName(value){return String(value||'').normalize('NFKC').toLocaleLowerCase('sv-SE').replace(/[^\p{L}\p{N}]+/gu,' ').trim().replace(/\s+/g,' ');}
-export const RECONCILIATION_RULE_VERSION='invoice-reference-policy-2026-11-02.2';
+export const RECONCILIATION_RULE_VERSION='evidence-reconciliation-2026-11-05.1';
 // Keep invoice-number punctuation: AB/12 and AB12 are not interchangeable IDs.
 const ref=value=>String(value||'').normalize('NFKC').trim().toUpperCase().replace(/[ \t]+/g,' ');
 export function exactReference(reference, candidate){
@@ -190,12 +191,7 @@ export function analyzeReconciliation({invoices,transactions,links=[],allocation
       out.push({transaction_id:t.id,invoice_id:i.id,kind,safe,reference_values:references,reference_sources:evidence?.candidates||[],verified:!!t.verified,score:safe?100:exact?80:payer?60:10,amount_cents:Math.min(t.available_cents,Math.max(0,i.remaining_cents)),reason:bankConflict?bankEvidenceReviewReason(t):financialReview?financialReview.reason:automaticReview||t.account_consent_issue||(!t.verified?'Bokfört originalunderlag saknas för automatisk matchning.':incomplete?'Bankgiro-specifikationen är ofullständig.':duplicateEvidence?'Möjlig dubblett mellan bankunderlag; måste granskas.':ownBankgiro?'Referensen är företagets eget Bankgironummer. Granska bankoriginalet.':invalidReference?'OCR-kontrollsiffran är felaktig eller referensanalysen ofullständig. Granska bankoriginalet.':policyIssue||invoiceOriginalIssue|| (conflict?'Betalningsreferenserna är motstridiga. Ingen automatisk korrigering.':!exact&&!payer?'Endast beloppet stämmer. Okänd betalare måste verifieras; detta är inget betalningsbevis.':ambiguous?'Flera fakturor kan passa.':amountIssue|| (safe?'Unik fakturareferens, verifierad betalare och bokfört bankunderlag.':'Betalare eller referens behöver verifieras manuellt.')))});
     }
   }
-  // Multiple payments for the same invoice must be reviewed together, never auto-consumed.
-  for(const s of out)if(s.invoice_id&&out.some(x=>x.invoice_id===s.invoice_id&&x.transaction_id!==s.transaction_id)){
-    s.safe=false;if(!['financial_review','bank_evidence_conflict','manual_review'].includes(s.kind))s.reason='Flera betalningar kan avse fakturan; kontrollera möjlig dubbelbetalning.';
-    if(s.kind==='correct')s.kind='possible_duplicate';
-  }
-  return out.map(f=>({...f,rule_version:RECONCILIATION_RULE_VERSION})).sort((a,b)=>b.score-a.score);
+  return finalizeReconciliationFindings(out,RECONCILIATION_RULE_VERSION);
 }
 export function runReconciliation(db,{owner,connectionId,referenceContext,assertCurrent,includeSummary=false}={}){
   // Acquire the writer lock before reading any evidence. Imports and other
