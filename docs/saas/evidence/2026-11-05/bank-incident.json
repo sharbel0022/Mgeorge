@@ -1,0 +1,118 @@
+{
+  "observedAt": "2026-11-05T14:47:11.579Z",
+  "applicationCommit": "672c152242add9427c8526af8dd92431c526c8c2",
+  "siteVersion": 61,
+  "historicalCutover": "The 13:13 UTC pre/post comparison remains valid; this later scheduled attempt was observed separately.",
+  "bankConnection": {
+    "status": "reauth_required",
+    "environment": "PRODUCTION",
+    "valid_until": "2027-01-25T19:45:06.954Z",
+    "last_synced_at": "2026-11-05T08:05:14.646Z",
+    "updated_at": "2026-11-05T14:04:45.787Z",
+    "auto_last_attempt_at": "2026-11-05T14:04:35.832Z",
+    "sync_failures": 1
+  },
+  "consentMetadataAbsent": true,
+  "automation": {
+    "id": "Automation_42c8434b303c819199621e83f4b8fec1",
+    "enabled": true,
+    "scheduledFor": "2026-11-05T14:06:00Z",
+    "startedAt": "2026-11-05T14:03:58.248867Z",
+    "completedAt": "2026-11-05T14:04:58.167088Z",
+    "runId": "a96caf86-70f4-8325-b322-24c8c7540c61",
+    "resultRunId": "a96caf86-70f4-8325-b322-24c8c7540c61",
+    "resultCreatedAt": "2026-11-05T14:04:58.001754Z",
+    "resultTruncated": false,
+    "resultErrorCode": "BANK_ACCOUNT_SCOPE_INVALID"
+  },
+  "workerEvents": [
+    {
+      "timestamp": "2026-11-05T14:47:12.057Z",
+      "tool": "gmail_sync_status",
+      "status": 200,
+      "outcome": "ok",
+      "requestId": "0d16b352e224b2080bca5e01c22c9fe6"
+    },
+    {
+      "timestamp": "2026-11-05T14:47:11.579Z",
+      "tool": "bank_auto_sync_status",
+      "status": 200,
+      "outcome": "ok",
+      "requestId": "ae09f04a2c2e456104a4a953d71b3fe5"
+    },
+    {
+      "timestamp": "2026-11-05T14:04:51.957Z",
+      "tool": "bank_auto_sync_status",
+      "status": 200,
+      "outcome": "ok",
+      "requestId": "583e8a946e258a9ad9a871730bcef77f"
+    },
+    {
+      "timestamp": "2026-11-05T14:04:47.374Z",
+      "tool": "bank_auto_sync",
+      "status": 200,
+      "outcome": "ok",
+      "requestId": "03c06d651752d7f7fbdd36cb10420e30"
+    }
+  ],
+  "diagnosis": {
+    "confirmed": "An unexpired connection was marked reauth_required by the consent-validation failure path; the scheduled result reports BANK_ACCOUNT_SCOPE_INVALID. The saved last_error and audit helper dropped ConsentError specificity.",
+    "exactFailedAccountPredicate": "NOT_DETERMINED: no live provider response was retained or fetched during this investigation.",
+    "rejectedHypothesis": "A UID-less GET /sessions accounts_data fixture is not a documented valid SessionAccount; AccountResource UID optionality applies to the authorization exchange. No such policy exception is justified by that fixture."
+  },
+  "actions": {
+    "manualBankRequests": 0,
+    "productionDataResets": 0,
+    "financialActions": 0,
+    "scheduleChanges": 0
+  },
+  "source": "https://enablebanking.com/docs/api/reference/",
+  "selected0599PostFailure": {
+    "observedAt": "2026-11-05T15:01:10.767Z",
+    "revision": 51,
+    "snapshotCurrent": true,
+    "changed": false,
+    "comparisonWithHistoricalPostDeploy": {
+      "comparedAgainst": "2026-11-05T13:13:22.521Z",
+      "sameExceptCheckedAt": false,
+      "changedPaths": [
+        "payments.0.verification.steps.3.reason",
+        "payments.1.verification.steps.3.reason",
+        "payments.1.verification.steps.3.facts.1.value"
+      ]
+    },
+    "equalApartFromCheckedAtAndThreeListedCurrentConsentAssessmentFields": true,
+    "assessment": "The two current-account explanations now require an active owner-bound connection, and the report's current AIS-consent fact changed from verified to review required. All other selected response fields agree. This is not a full workspace-payload comparison."
+  },
+  "backupAfterFailure": {
+    "latest": {
+      "status": "verifying",
+      "files": 362,
+      "copied": 362,
+      "bytes": 142968213,
+      "created_at": "2026-11-05T01:17:18.090Z",
+      "verified_at": "",
+      "verified_files": 35,
+      "verified_bytes": 10927183
+    },
+    "lastVerified": {
+      "status": "complete",
+      "files": 362,
+      "copied": 362,
+      "bytes": 142968213,
+      "created_at": "2026-11-04T01:14:37.615Z",
+      "verified_at": "2026-11-04T21:32:59.743Z",
+      "verified_files": 362,
+      "verified_bytes": 142968213
+    }
+  },
+  "recoveryConfiguration": {
+    "cachedAt": "2026-10-27T19:45:36.601Z",
+    "registeredRedirectUrlsInCachedMetadata": [
+      "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback"
+    ],
+    "actualSiteUrl": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "providerConfigurationFreshlyVerified": false,
+    "meaning": "Before any authorized renewal, verify the provider's actual registered callback and reachability. This read inspected cached D1 metadata only; it neither queried nor changed provider configuration."
+  }
+}

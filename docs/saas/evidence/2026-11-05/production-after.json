@@ -1,0 +1,171 @@
+{
+  "observedOn": "2026-11-05",
+  "site": {
+    "version": 61,
+    "source": "2084aa358dd24dc241213dc3b71bae975f1e1029",
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "environmentRevision": 9,
+    "environmentKeyCount": 17,
+    "newSaasBankConfigured": false,
+    "dbTableCount": 40
+  },
+  "bank": {
+    "enabled": true,
+    "connected": true,
+    "intervalHours": 6,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T08:05:10.680Z",
+    "nextAttemptAt": "2026-11-05T08:06:00.000Z",
+    "blocked": false,
+    "failures": 0,
+    "lastError": null,
+    "postprocessWarning": null
+  },
+  "bankgiro": {
+    "enabled": false,
+    "mode": null,
+    "state": "DISABLED",
+    "reason": "SOURCE_NOT_CONFIGURED",
+    "nextPollAt": null,
+    "lastSuccessAt": null,
+    "lastFailureAt": null,
+    "lastFailureCode": null,
+    "counts": {
+      "PENDING": 0,
+      "RETRY": 0,
+      "IMPORTED": 0,
+      "REVIEW": 0,
+      "DUPLICATE": 0,
+      "BLOCKED": 0
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "latest": {
+      "day": "2026-11-05",
+      "status": "verifying",
+      "files": 362,
+      "copied": 362,
+      "bytes": 142968213,
+      "verified_at": "",
+      "verified_files": 35,
+      "verified_bytes": 10927183,
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 16,
+        "records_without_receipt": 112
+      }
+    },
+    "lastVerified": {
+      "day": "2026-11-04",
+      "status": "complete",
+      "files": 362,
+      "copied": 362,
+      "bytes": 142968213,
+      "verified_at": "2026-11-04T21:32:59.743Z",
+      "verified_files": 362,
+      "verified_bytes": 142968213,
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 15,
+        "records_without_receipt": 112
+      }
+    }
+  },
+  "gmail": {
+    "configured": true,
+    "sendEnabled": true,
+    "connection": {
+      "last_synced": "",
+      "status": "connected",
+      "last_attempt": "2026-11-03T18:37:52.843Z",
+      "retry_after": "",
+      "sync_failures": 0,
+      "blocked": false,
+      "postprocess_warning": null
+    },
+    "processing": {
+      "enabled": true,
+      "auto_register": true,
+      "cloud_ocr_configured": true,
+      "cloud_worker_last_seen": "2026-11-05T10:45:29.762Z",
+      "cloud_worker_recent": false,
+      "cloud_last_completed": "2026-11-05T03:02:55.417Z",
+      "last_processed": "2026-11-05T10:45:28.015Z",
+      "counts": {
+        "needs_review": 350,
+        "registered": 2
+      },
+      "registered": 5,
+      "aftercheck_pending": 0,
+      "messages_waiting": 2,
+      "scheduler_configured": true,
+      "schedule_minutes": 60,
+      "ocr_mode": "cloud"
+    },
+    "lastSuccessfulFetch": "2026-11-03T18:38:10.461Z",
+    "health": {
+      "state": "stale",
+      "reason": "Ingen färsk lyckad hämtning. Kontrollera det externa schemat och anslutningen.",
+      "interval_minutes": 60,
+      "stale_after_minutes": 120,
+      "schedule_verified": false
+    },
+    "scheduleObservation": {
+      "last_invoked_at": "2026-11-03T18:37:51.491Z",
+      "last_completed_at": "2026-11-03T18:38:20.842Z",
+      "last_outcome": "completed",
+      "source": "system_entrypoint",
+      "external_schedule_verified": false
+    }
+  },
+  "case0599": {
+    "checkedAt": "2026-11-05T13:13:22.521Z",
+    "revision": 51,
+    "snapshotCurrent": true,
+    "changed": false,
+    "candidateCount": 2,
+    "economicAisCount": 1,
+    "reportObservationCount": 1,
+    "amountCents": 62500,
+    "allocationCount": 0,
+    "complete": false,
+    "ambiguous": false,
+    "invoiceRegistered": false
+  },
+  "comparison": {
+    "workspaceCountUnchanged": true,
+    "workspaceOwnerUnchanged": true,
+    "workspaceRevisionBefore": 51,
+    "workspaceRevisionAfter": 51,
+    "workspaceUpdatedAtUnchanged": true,
+    "selectedEvidenceUnchangedExceptReadTimestamps": true,
+    "bankStatusUnchanged": true,
+    "gmailStatusUnchanged": true,
+    "bankgiroStatusUnchanged": true,
+    "backupStatusUnchanged": true,
+    "environmentRevisionUnchanged": true,
+    "environmentMetadataUnchanged": true,
+    "authClientUnchanged": true,
+    "audienceUnchanged": true,
+    "schedulesUnchanged": true
+  },
+  "newAuthorityRows": {
+    "companies": 0,
+    "company_memberships": 0,
+    "company_worker_grants": 0,
+    "saas_bank_state": 0,
+    "company_bank_sync_jobs": 0
+  },
+  "companyRoleRows": 4,
+  "limitations": [
+    "Read-only observations, no provider request or financial operation.",
+    "Bounded database row view truncates workspace payload; full payload hash not claimed.",
+    "New SaaS/Open Payments remains server-disabled; legacy connection is separate."
+  ]
+}

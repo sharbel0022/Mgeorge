@@ -1,0 +1,106 @@
+{
+  "startMain": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+  "siteProject": "appgprj_6adf2f7f7e848191b64192161886b528",
+  "siteBefore": 60,
+  "qualityBeforeAfter": {
+    "sum": 255,
+    "maximum": 330,
+    "scoresRaised": 0
+  },
+  "prs": {
+    "39": {
+      "head": "2eab8683db7e4ece1292b4c1f68c500af2f7e128",
+      "tree": "897c36afd03c155df6d1fa0f2080c1f74c30db83",
+      "prCi": 42023379476,
+      "merge": "d6c2894c8cdb52669bf73bea64daac58701b182a",
+      "mainCi": 42024120779,
+      "status": "merged_main_ci_success"
+    },
+    "41": {
+      "head": "86730fe47aab8736c6cfb04d672c5e04a10d473d",
+      "tree": "82563cb198cc4d6519c9dd074568dae619933bc6",
+      "prCi": 42026247960,
+      "merge": "7a535446a99f17a6f771dd8660fe2a99c6b84248",
+      "mainCi": 42026878862,
+      "status": "merged_main_ci_success",
+      "node": 1710,
+      "sites": 3497,
+      "bridge": 47
+    },
+    "42": {
+      "head": "6e3895218c719ad01a9382b360624d693a7a841f",
+      "tree": "f7d125883631d9354a3b7a730c3f6ad4d2fda73f",
+      "prCi": 42028424467,
+      "local": "25608fe6f36eb49d2420b95369592f4bd51d2f26",
+      "node": 1886,
+      "sites": 3616,
+      "bridge": 47,
+      "status": "merged_main_ci_success",
+      "merge": "f1058371c4f68589d3f91748cf98a4ef3601e893",
+      "mainCi": 42029000814
+    },
+    "38": {
+      "local": "a8714d12b7d8e8f879bcbafb49a560f703b6e235",
+      "tree": "09d180c8a2b0f240f26885d731a11bfd3b9abd64",
+      "node": 1886,
+      "sites": 3675,
+      "bridge": 47,
+      "status": "merged_main_ci_success",
+      "head": "a3b2b944428af5b4fbe31856e0f7076f3637405a",
+      "localMainIntegration": "90b912a03fdf05ee950e3d885660a840e4238559",
+      "previousHeadCi": 42029243279,
+      "independentReviewTests": 78,
+      "prCi": 42030628045,
+      "merge": "512aec368aa23898f352e9f1eabf786546d5969a",
+      "mainCi": 42031299170
+    },
+    "37": {
+      "local": "95d9a4184275dcbec830ab9558973beba35c8c06",
+      "tree": "41b5cda03ae26c619e69eeb3feb65959acc5d281",
+      "acceptance": 1064,
+      "status": "merged_main_ci_success",
+      "node": 1899,
+      "sites": 3704,
+      "bridge": 47,
+      "localMainIntegration": "8c05cb853b5b54da474d7df96b1dcd0bb5e193ce",
+      "publishedTree": "03e5f4dafd6b272463338adda52a109ed91ceae9",
+      "head": "3215d40b559b5cb60daf068fd197054e809e5f83",
+      "prCi": 42031544894,
+      "acceptanceCi": 42031544964,
+      "merge": "672c152242add9427c8526af8dd92431c526c8c2",
+      "pushAcceptanceCi": 42031538898,
+      "mainCi": 42032260699
+    },
+    "40": {
+      "head": "1d7dc21f0d61d98c239f51eb778facd79b6a6aed",
+      "merge": "f105e9cc5404d1bff3b4fe41e4e6af14d944d212",
+      "prCi": 41914312271,
+      "mainCi": 41914833272,
+      "status": "merged_before_start_main_ci_success"
+    },
+    "36": {
+      "head": "bbd19a5a891ae44d05af8c59aac5e4de21292ace",
+      "merge": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+      "status": "merged_before_start_main_ci_success",
+      "mainCi": 41917609246
+    }
+  },
+  "applicationReleaseSha": "672c152242add9427c8526af8dd92431c526c8c2",
+  "applicationReleaseTree": "03e5f4dafd6b272463338adda52a109ed91ceae9",
+  "applicationSitesTree": "fead95370aead0d422f3b7da766ad7eb9c33d0bc",
+  "allFiveMerged": true,
+  "applicationMainCiPassed": true,
+  "mainTestCounts": {
+    "node": 1899,
+    "sites": 3704,
+    "bridge": 47,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "todo": 0
+  },
+  "siteAfter": 61,
+  "siteSource": "2084aa358dd24dc241213dc3b71bae975f1e1029",
+  "deployment": "appgdep_6aec802803e08191b2e86f52a61d9abd",
+  "deploymentStatus": "succeeded"
+}

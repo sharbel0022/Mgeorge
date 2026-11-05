@@ -1,0 +1,399 @@
+{
+  "observedAt": "2026-11-05T15:38:53Z",
+  "initialBase": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+  "previousApplicationRelease": "672c152242add9427c8526af8dd92431c526c8c2",
+  "pullRequest": {
+    "number": 43,
+    "url": "https://github.com/sharbel0022/Mgeorge/pull/43",
+    "head": "ab941744c3ee38be7ecd4c3121b8e7496082b9ab",
+    "localCommit": "47811cbbc91df25eb715af2953c79f92e8da38a1",
+    "mergeMethod": "merge",
+    "expectedHeadVerified": true,
+    "applicationRelease": "b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f",
+    "tree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+    "changedFiles": 7,
+    "insertions": 252,
+    "deletions": 11
+  },
+  "ci": {
+    "primary": {
+      "runId": 42054035748,
+      "head": "ab941744c3ee38be7ecd4c3121b8e7496082b9ab",
+      "conclusion": "success",
+      "actualJobLogCounts": {
+        "node": 1899,
+        "sites": 3756,
+        "bridge": 47,
+        "total": 5702,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "security": {
+      "runId": 42054035605,
+      "jobId": 127337431550,
+      "head": "ab941744c3ee38be7ecd4c3121b8e7496082b9ab",
+      "conclusion": "success",
+      "actualJobLogCounts": {
+        "node": 325,
+        "sites": 750,
+        "total": 1075,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "overlapsFullSuite": true
+    },
+    "main": {
+      "id": 42055222273,
+      "head_sha": "b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f",
+      "head_branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42055222273",
+      "created_at": "2026-11-05T15:27:51Z",
+      "updated_at": "2026-11-05T15:33:32Z",
+      "jobs": [
+        {
+          "name": "test",
+          "jobId": 127341662492,
+          "conclusion": "success",
+          "counts": {
+            "tests": 1899,
+            "pass": 1899,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        {
+          "name": "sites",
+          "jobId": 127341662657,
+          "conclusion": "success",
+          "counts": {
+            "tests": 3756,
+            "pass": 3756,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        },
+        {
+          "name": "bankgiro_bridge",
+          "jobId": 127341662877,
+          "conclusion": "success",
+          "counts": {
+            "tests": 47,
+            "pass": 47,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        }
+      ],
+      "actualJobLogTotal": 5702
+    }
+  },
+  "source": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "applicationReleaseSha": "b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f",
+    "applicationTree": "ed92aa3c5ad5e8c50281aedf9670f68b9739ddd1",
+    "applicationSitesTree": "a17a42a1c9a4976717003defc40aeb54b9624bfa",
+    "sourceCommit": "1972b9a803458e20c6dedd30a8624ad4b96016f7",
+    "sourceTree": "a17a42a1c9a4976717003defc40aeb54b9624bfa",
+    "sourceFileCount": 575,
+    "workingTreeClean": true,
+    "hostingUnchangedFrom61": true,
+    "migrationFilesUnchangedFrom61": true,
+    "archiveSha256": "5e38b9afee607de63f9b7ab5b1e947a82c8c99bd4e386f7331272fec3ea2d050",
+    "archiveBytes": 18484853,
+    "archiveEntryCount": 449
+  },
+  "deployment": {
+    "projectId": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "versionNumber": 62,
+    "versionId": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_fb875b033d188191b21f12750ee6fcae",
+    "sourceCommit": "1972b9a803458e20c6dedd30a8624ad4b96016f7",
+    "deploymentId": "appgdep_6aeca22254f4819197e33847966a7c70",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "updatedAt": "2026-11-05T15:35:16.437170+00:00",
+    "environmentRevision": 9,
+    "savedArchive": {
+      "archive_format": "tar",
+      "content_hash": "sha256:4e330231520a705e7c4f856695f26ee23ec66f652cc34a63644e01f9875ca1e6",
+      "size_bytes": 47718400,
+      "file_count": 429
+    },
+    "retainedPreviousVersions": [
+      {
+        "version": 61,
+        "source": "2084aa358dd24dc241213dc3b71bae975f1e1029",
+        "available": true
+      },
+      {
+        "version": 60,
+        "source": "0b0aa755444cd0782bcd24d8f81bfb837d4f6ca5",
+        "available": true
+      }
+    ],
+    "productionVisualCheck": {
+      "status": "NOT_COMPLETED",
+      "evidence": "Historical Site61 browser attempt timed out before DOM observation; no new browser acceptance is claimed for this server-only correction."
+    }
+  },
+  "postDeployment": {
+    "observedAt": "2026-11-05T15:38:53Z",
+    "site": {
+      "version": 62,
+      "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+      "accessMode": "public",
+      "currentUserRole": "owner",
+      "environmentRevision": 9,
+      "environmentKeyCount": 17,
+      "newSaasBankConfigured": false,
+      "dbTableCount": 40
+    },
+    "comparisons": {
+      "environmentRevisionUnchanged": true,
+      "environmentMetadataUnchanged": true,
+      "authClientUnchanged": true,
+      "audienceUnchanged": true,
+      "schedulesUnchanged": true,
+      "workspaceCountUnchanged": true,
+      "workspaceOwnerUnchanged": true,
+      "workspaceRevisionBefore": 51,
+      "workspaceRevisionAfter": 51,
+      "workspaceUpdatedAtUnchanged": true,
+      "bankStatusUnchangedSinceFailure": true,
+      "selected0599ResponseUnchangedExceptReadTimestamps": true
+    },
+    "workspace": {
+      "rowCount": 1,
+      "revision": 51,
+      "ownerUnchanged": true,
+      "updatedAtUnchanged": true,
+      "fullPayloadHashClaimed": false
+    },
+    "bank": {
+      "enabled": true,
+      "connected": false,
+      "intervalHours": 6,
+      "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+      "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+      "nextAttemptAt": "2026-11-05T14:06:00.000Z",
+      "lastError": "Bankhändelserna kunde inte hämtas. Försök igen.",
+      "blocked": false,
+      "failures": 1,
+      "postprocessWarning": null,
+      "storedStatus": "reauth_required",
+      "storedEnvironment": "PRODUCTION",
+      "storedValidUntil": "2027-01-25T19:45:06.954Z",
+      "storedLastSyncedAt": "2026-11-05T08:05:14.646Z",
+      "storedUpdatedAt": "2026-11-05T14:04:45.787Z",
+      "consentMetadataAbsent": true,
+      "realRecoveryVerified": false
+    },
+    "case0599": {
+      "checkedAt": "2026-11-05T15:37:27.308Z",
+      "revision": 51,
+      "changed": false,
+      "snapshotCurrent": true,
+      "candidateCount": 2,
+      "economicAisCount": 1,
+      "reportObservationCount": 1,
+      "amountCents": 62500,
+      "allocationCount": 0,
+      "invoiceRegistered": false,
+      "complete": false,
+      "ambiguous": false,
+      "fullSelectedResponseComparison": {
+        "baseline": "incident 15:01 selected payment_evidence response",
+        "baselineCheckedAt": "2026-11-05T15:01:10.767Z",
+        "afterCheckedAt": "2026-11-05T15:37:27.308Z",
+        "ignoredRecursiveFields": [
+          "checkedAt"
+        ],
+        "differences": [],
+        "equal": true
+      },
+      "comparisonWithHistorical1313": "The same three current consent-assessment differences documented in bank-incident.json remain; all economic fields agree."
+    },
+    "gmail": {
+      "configured": true,
+      "sendEnabled": true,
+      "connection": {
+        "last_synced": "",
+        "status": "connected",
+        "last_attempt": "2026-11-03T18:37:52.843Z",
+        "retry_after": "",
+        "sync_failures": 0,
+        "blocked": false,
+        "postprocess_warning": null
+      },
+      "processing": {
+        "enabled": true,
+        "auto_register": true,
+        "cloud_ocr_configured": true,
+        "cloud_worker_last_seen": "2026-11-05T10:45:29.762Z",
+        "cloud_worker_recent": false,
+        "cloud_last_completed": "2026-11-05T03:02:55.417Z",
+        "last_processed": "2026-11-05T10:45:28.015Z",
+        "counts": {
+          "needs_review": 350,
+          "registered": 2
+        },
+        "registered": 5,
+        "aftercheck_pending": 0,
+        "messages_waiting": 2,
+        "scheduler_configured": true,
+        "schedule_minutes": 60,
+        "ocr_mode": "cloud"
+      },
+      "lastSuccessfulFetch": "2026-11-03T18:38:10.461Z",
+      "health": {
+        "state": "stale",
+        "reason": "Ingen färsk lyckad hämtning. Kontrollera det externa schemat och anslutningen.",
+        "interval_minutes": 60,
+        "stale_after_minutes": 120,
+        "schedule_verified": false
+      },
+      "scheduleObservation": {
+        "last_invoked_at": "2026-11-03T18:37:51.491Z",
+        "last_completed_at": "2026-11-03T18:38:20.842Z",
+        "last_outcome": "completed",
+        "source": "system_entrypoint",
+        "external_schedule_verified": false
+      }
+    },
+    "backup": {
+      "enabled": true,
+      "latest": {
+        "day": "2026-11-05",
+        "status": "verifying",
+        "files": 362,
+        "copied": 362,
+        "bytes": 142968213,
+        "verified_at": "",
+        "verified_files": 35,
+        "verified_bytes": 10927183,
+        "verification_scope": "manifest_pass",
+        "api_evidence": {
+          "version": "retained-api-receipts-v1",
+          "scope": "retained_json_checksums",
+          "records_checked": 16,
+          "records_without_receipt": 112
+        }
+      },
+      "lastVerified": {
+        "day": "2026-11-04",
+        "status": "complete",
+        "files": 362,
+        "copied": 362,
+        "bytes": 142968213,
+        "verified_at": "2026-11-04T21:32:59.743Z",
+        "verified_files": 362,
+        "verified_bytes": 142968213,
+        "verification_scope": "manifest_pass",
+        "api_evidence": {
+          "version": "retained-api-receipts-v1",
+          "scope": "retained_json_checksums",
+          "records_checked": 15,
+          "records_without_receipt": 112
+        }
+      }
+    },
+    "bankgiro": {
+      "enabled": false,
+      "mode": null,
+      "state": "DISABLED",
+      "reason": "SOURCE_NOT_CONFIGURED",
+      "nextPollAt": null,
+      "lastSuccessAt": null,
+      "lastFailureAt": null,
+      "lastFailureCode": null,
+      "counts": {
+        "PENDING": 0,
+        "RETRY": 0,
+        "IMPORTED": 0,
+        "REVIEW": 0,
+        "DUPLICATE": 0,
+        "BLOCKED": 0
+      }
+    },
+    "schedules": [
+      {
+        "id": "Automation_42c8434b303c819199621e83f4b8fec1",
+        "is_enabled": true,
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261027T210600\nRRULE:FREQ=DAILY;BYHOUR=3,9,15,21;BYMINUTE=6;BYSECOND=0\nEND:VEVENT",
+        "timezone": "Europe/Stockholm"
+      },
+      {
+        "id": "Automation_6efa3aafab4081918c48001acc562f96",
+        "is_enabled": false,
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+        "timezone": "Europe/Stockholm"
+      },
+      {
+        "id": "Automation_c8747435cd908191bc323aabc2a5704d",
+        "is_enabled": true,
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261029T021500\nRRULE:FREQ=DAILY;BYHOUR=2;BYMINUTE=15;BYSECOND=0\nEND:VEVENT",
+        "timezone": "Europe/Stockholm"
+      }
+    ],
+    "namedAuthorityTableRows": {
+      "companies": 0,
+      "company_memberships": 0,
+      "company_worker_grants": 0,
+      "saas_bank_state": 0,
+      "company_bank_sync_jobs": 0
+    },
+    "companyRoleRows": 4,
+    "limitations": [
+      "Authenticated read-only status, row metadata and selected payment evidence checks; no fresh provider request.",
+      "Bounded D1 views truncate large payload/ciphertext values; no complete workspace hash or full database export is claimed.",
+      "Runtime secret values were redacted; unchanged revision and metadata plus no mutation are the configuration evidence.",
+      "The deployment preserves the reauth_required state. A code correction does not prove recovered bank authorization."
+    ]
+  },
+  "runtimeInventory": {
+    "base": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+    "end": "b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f",
+    "files": 219,
+    "modified": 75,
+    "added": 144,
+    "deleted": 0,
+    "followupFilesAlreadyIncluded": 7,
+    "documentationOnlyChangesExcluded": true
+  },
+  "operations": {
+    "manualBankProviderRequests": 0,
+    "realInvoiceRegistrations": 0,
+    "realAllocations": 0,
+    "paymentsSent": 0,
+    "customerMessagesSent": 0,
+    "schedulesModified": false,
+    "reauthStateReset": false,
+    "commercialSaasActivated": false
+  },
+  "verdicts": {
+    "realBankConnectionApproved": false,
+    "legacyBankRecovery": "NOT_VERIFIED",
+    "openPaymentsProduction": "NOT_VERIFIED",
+    "commercialLaunch": "NOT_APPROVED",
+    "qualityScoresUnchanged": {
+      "total": 255,
+      "maximum": 330,
+      "mean": 7.73,
+      "atLeast9_5": 0,
+      "areas": 33
+    }
+  }
+}
