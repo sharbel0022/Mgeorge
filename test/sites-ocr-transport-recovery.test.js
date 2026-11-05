@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
-import { runSitesOcr } from '../src/sites-ocr-pull.js';
+import { boundedBody, runSitesOcr } from '../src/sites-ocr-pull.js';
 
 function fixture({ download, extract, completion, leaseFailureAfter, jobs = 1 } = {}) {
   const token = randomBytes(32).toString('base64url');
@@ -122,6 +122,42 @@ test('an oversized download is rejected without retry or an OCR failure acknowle
   assert.equal(worker.extractCalls, 0);
   assert.equal(worker.completions.length, 0);
 });
+
+for (const limitSource of ['declared', 'streamed']) {
+  for (const cleanup of ['never settles', 'rejects']) {
+    test(`an oversized ${limitSource} body preserves response_limit when cleanup ${cleanup}`, async () => {
+      let cancelled = 0;
+      const response = new Response(new ReadableStream({
+        start(controller) { controller.enqueue(new Uint8Array(9)); },
+        cancel() {
+          cancelled++;
+          return cleanup === 'never settles' ? new Promise(() => {}) : Promise.reject(Error('private cancellation failure'));
+        },
+      }), { headers: limitSource === 'declared' ? { 'Content-Length': '9' } : {} });
+      let timer;
+      try {
+        await assert.rejects(Promise.race([
+          boundedBody(response, 8),
+          new Promise((_, reject) => { timer = setTimeout(() => reject(Error('size rejection waited for cleanup')), 150); }),
+        ]), { message: 'response_limit' });
+        assert.equal(cancelled, 1);
+      } finally { clearTimeout(timer); }
+    });
+  }
+}
+
+for (const [size, declared] of [[7, 7], [8, 8], [8, null]]) {
+  test(`a ${size}-byte body with declared size ${declared} remains readable within the limit`, async () => {
+    const bytes = Uint8Array.from({ length: size }, (_, index) => index + 1);
+    let cancelled = 0;
+    const response = new Response(new ReadableStream({
+      start(controller) { controller.enqueue(bytes.subarray(0, 4)); controller.enqueue(bytes.subarray(4)); controller.close(); },
+      cancel() { cancelled++; },
+    }), { headers: declared === null ? {} : { 'Content-Length': String(declared) } });
+    assert.deepEqual(await boundedBody(response, 8), Buffer.from(bytes));
+    assert.equal(cancelled, 0);
+  });
+}
 
 test('an accepted OCR failure survives a later lease interruption in the partial-run counts', async () => {
   const worker = fixture({ extract: () => { throw Error('synthetic OCR failed'); }, leaseFailureAfter: 1 });

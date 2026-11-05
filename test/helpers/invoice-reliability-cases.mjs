@@ -52,6 +52,25 @@ export function reliabilityTests(test,assert,interpretInvoice){
 
 // Boundary regressions are kept separate from the fixed 15-case measurement.
 export function reliabilityBoundaryTests(test,assert,interpretInvoice){
+ test('Swedish tax summaries preserve grouped English amounts across blank lines',()=>{
+  const text=base.replace('Netto: 3 000,00 kr','Summa exklusive moms:\n\n3,000.00 SEK').replace('Moms: 750,00 kr','VAT amount:\n\n750.00 SEK').replace('Att betala: 3 750,00 SEK','Summa inklusive moms:\n\n3,750.00 SEK');
+  const result=interpretInvoice(text,reliabilityContext);
+  for(const [field,value]of Object.entries(expected))assert.deepEqual(result.fields[field].value,value,field);
+  assert.equal(result.level,'green',result.issues.join('; '));
+ });
+ test('paragraph recovery cannot turn English payment terms into net money',()=>{
+  const text=english.replace('Net: 3 000,00 kr','Payment terms:\nNet\n\n30').replace('VAT: 750,00 kr','VAT amount: 7.50 SEK').replace('Total: 3 750,00 SEK','Total: 37.50 SEK');
+  const result=interpretInvoice(text,reliabilityContext);
+  assert.equal(result.fields.net_cents.value,null);
+  assert.equal(result.fields.total_cents.value,3750);
+  assert.notEqual(result.level,'green');
+ });
+ test('English totals do not allow a later paragraph to supply the invoice identity',()=>{
+  const result=interpretInvoice(english.replace('Invoice number: 0606','Invoice number:\n\nPaymentInstructions'),reliabilityContext);
+  assert.equal(result.fields.invoice_number.value,null);
+  assert.equal(result.fields.total_cents.value,375000);
+  assert.notEqual(result.level,'green');
+ });
  for(const name of ['Total Consulting AB','Net Consulting AB'])test('literal supplier name '+name,()=>{
   const result=interpretInvoice(base.replace('Testbolaget AB',name),reliabilityContext);
   assert.equal(result.fields.party.value,name);

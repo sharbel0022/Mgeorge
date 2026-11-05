@@ -20,14 +20,18 @@ function rejectHttp(status,deferRetry=false){
   if(deferRetry)retryDeferredFailures.add(error);
   throw error;
 }
+function cancelBody(body){
+  // Cleanup cannot delay or replace an already established size rejection.
+  try{void Promise.resolve(body?.cancel()).catch(()=>{});}catch{}
+}
 export async function boundedBody(response,limit){
   if(Number(response.headers.get('content-length'))>limit){
     const error=bodyLimitFailure();
-    try{await response.body?.cancel();}catch{}
+    cancelBody(response.body);
     throw error;
   }
   const chunks=[];let length=0;
-  if(response.body){const reader=response.body.getReader();try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>limit){const error=bodyLimitFailure();try{await reader.cancel();}catch{}throw error;}chunks.push(value);}}finally{reader.releaseLock();}}
+  if(response.body){const reader=response.body.getReader();try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>limit){const error=bodyLimitFailure();cancelBody(reader);throw error;}chunks.push(value);}}finally{reader.releaseLock();}}
   return Buffer.concat(chunks,length);
 }
 export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentProcess,maxJobs=6}={}){
