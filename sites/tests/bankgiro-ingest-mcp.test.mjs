@@ -34,9 +34,10 @@ test('report tools advertise separate read status and idempotent bounded worker 
   if(name==='bankgiro_auto_ingest')assert.equal(tool.annotations.idempotentHint,true);
  }
 });
-test('actual report service stays disabled over MCP without reading or writing D1/R2',async t=>{
+test('disabled report service performs only authorization reads and no financial D1/R2 access',async t=>{
  const f=await fixture(t),before=f.read();
- f.env.DB={prepare(){throw Error('Disabled source may not access D1')},batch(){throw Error('Disabled source may not write D1')}};
+ const prepare=f.database.prepare.bind(f.database);
+ f.env.DB={prepare(query){assert.match(query,/^SELECT\b/i,'disabled source permits only authorization reads');assert.doesNotMatch(query,/\b(?:workspaces|documents|bankgiro_ingest_\w+)\b/i,'disabled source cannot read financial/source records');return prepare(query);},batch(){throw Error('Disabled source may not write D1')}};
  f.env.BUCKET={get(){throw Error('Disabled source may not read original')},put(){throw Error('Disabled source may not retain original')}};
  for(const name of ['bankgiro_source_status','bankgiro_auto_ingest']){
   const {body,response}=await f.call(name);assert.equal(response.headers.get('Cache-Control'),'private, no-store');

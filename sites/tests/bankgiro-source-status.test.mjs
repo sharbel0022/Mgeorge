@@ -149,3 +149,11 @@ test('demo always hides a previous production source status',async()=>{
  const html=await render({demo:true,status:status({jobs:[{id:'private',reportId:'PRIVATE_REPORT',status:'IMPORTED'}]})});
  assert.match(html,/demoläge/i);assert.doesNotMatch(html,/PRIVATE_REPORT/);
 });
+
+test('unavailable and partial Bankgiro enrichment show the actual gap and the approved fallback path',async()=>{
+ for(const [code,message]of [['BANKGIRO_INFORMATION_UNAVAILABLE',/Individuell betalningsinformation är inte tillgänglig/],['BANKGIRO_INFORMATION_PARTIAL',/Individuell betalningsinformation är ofullständig/]]){
+  const html=await render({status:status({state:'REVIEW',jobs:[{id:'capture',reportId:'synthetic-capture',status:'REVIEW',lastError:code}]})});
+  assert.match(html,message);assert.match(html,/CAMT054C\/SFTP/);assert.match(html,/godkänt.*avtal/);assert.match(html,/manuell.*import/i);
+  assert.doesNotMatch(html,/alla.*betalningar.*hämtade|fakturagissning|Orsaken kunde inte visas/i);
+ }
+});

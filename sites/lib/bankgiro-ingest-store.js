@@ -1,5 +1,5 @@
 import {ingestError} from './bankgiro-source.js';
-export const registrationBinding=r=>JSON.stringify([r.id,r.owner,r.companyId,r.bankgiro,r.scopeId,r.generation,r.profileId,r.allowedFormats??null,r.entitlement??null,r.transportBinding??null]);
+export const registrationBinding=r=>JSON.stringify([r.id,r.owner,r.companyId,r.bankgiro,r.scopeId,r.generation,r.profileId,r.allowedFormats??null,r.entitlement??null,r.transportBinding??null,...(r.profileId==='openpayments-bankgiro-v1'?[r.accountId,r.iban]:[])]);
 // Authority tombstones are bounded and never pruned. Exhaustion fails closed.
 const retiredGenerations=(row,retire=false)=>{
  let list;try{list=JSON.parse(row?.revokedGenerations??'[]');}catch{throw ingestError('AUTHORIZATION_CHANGED');}

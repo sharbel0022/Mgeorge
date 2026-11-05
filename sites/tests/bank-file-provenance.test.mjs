@@ -1,3 +1,4 @@
+import {applyCurrentMigrations} from './helpers/company-compat-fixture.mjs';
 import test from 'node:test';
 import {invoiceParserUrl} from './helpers/invoice-module-loader.mjs';
 import assert from 'node:assert/strict';
@@ -19,7 +20,7 @@ const domain=url('../lib/domain.ts');
 const parsers=compiled('../lib/imports.ts',{'./invoice-fields.js':invoiceParserUrl(),'./domain':domain,'./local-ocr':data('export async function imageText(){};export async function pdfInvoiceText(){}'),'./payment-references.js':url('../lib/payment-references.js'),'./bankgiro-parser.js':url('../lib/bankgiro-parser.js')});
 const parser=await import(parsers);
 const env=data('export const env=new Proxy({}, {get:(_,key)=>globalThis.bankFileProvenance.env[key]});');
-const server=compiled('../lib/server.ts',{'cloudflare:workers':env,'@/app/chatgpt-auth':data('export async function getChatGPTUser(){return globalThis.bankFileProvenance.user;}'),'./domain':domain,'./imports':parsers});
+const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':env,'@/app/chatgpt-auth':data('export async function getChatGPTUser(){return globalThis.bankFileProvenance.user;}'),'./domain':domain,'./imports':parsers});
 const presentation=await import(compiled('../lib/payment-presentation.ts',{'./domain':domain,'./payment-references.js':url('../lib/payment-references.js'),'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')}));
 const reconciliation=await import(compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')}));
 const evidence=compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')}),'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')});
@@ -27,8 +28,8 @@ const route=await import(compiled('../app/api/state/route.ts',{'@/lib/server':se
 const csv='Datum;Belopp;Betalare;OCR;Referens;Valuta\n2026-10-26;625,00;Verklig kund AB;000018;BANK-ID;SEK';
 const forgedRow={date:'2026-10-25',amount:1,currency:'SEK',party:'Påhittad kund AB',payerReference:'999998',referenceEvidence:extractPaymentReferences({ocr:'999998'}),bankReference:'FORGED',kind:'payment',verified:true};
 async function fixture(t,filename='Bank.csv',body=csv,mime='text/csv'){
- const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());sql.exec('CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);');
- const DB={prepare(statement){return{bind(...args){return{async first(){return sql.prepare(statement).get(...args)||null;},async all(){return{results:sql.prepare(statement).all(...args)};},async run(){return{meta:{changes:sql.prepare(statement).run(...args).changes}};}};}};},async batch(statements){sql.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());sql.exec('COMMIT');return results;}catch(error){sql.exec('ROLLBACK');throw error;}}};
+ const sql=new DatabaseSync(':memory:');t.after(()=>sql.close());applyCurrentMigrations(sql);
+ const DB={prepare(query){return{query,values:[],bind(...values){this.values=values;return this;},async first(){return sql.prepare(query).get(...this.values)||null;},async all(){return{results:sql.prepare(query).all(...this.values)};},async run(){return{meta:{changes:sql.prepare(query).run(...this.values).changes}};}};},async batch(statements){sql.exec('BEGIN');try{const results=[];for(const statement of statements)results.push(await statement.run());sql.exec('COMMIT');return results;}catch(error){sql.exec('ROLLBACK');throw error;}}};
  const bytes=new TextEncoder().encode(body),hash=Buffer.from(await crypto.subtle.digest('SHA-256',bytes)).toString('hex'),objects=new Map([['owner/original',bytes]]);
  sql.prepare('INSERT INTO documents VALUES(?,?,?,?,?,?,?)').run('original','owner',filename,mime,bytes.length,hash,'at');
  sql.prepare('INSERT INTO workspaces VALUES(?,?,?,?)').run('owner',1,JSON.stringify(emptyState()),'at');

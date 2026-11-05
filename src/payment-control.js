@@ -42,6 +42,7 @@ export function createPaymentControl(db, {adapters, summarize, now = Date.now, c
     updated_at: row.updated_at, finished_at: row.finished_at, steps: JSON.parse(row.steps), summary: JSON.parse(row.summary)} : null;
 
   function recover(owner) {
+    if(db.canWrite===false)return;
     for (const row of db.prepare("SELECT * FROM payment_control_runs WHERE owner=? AND status='running' AND lease_until<=?").all(owner, now())) {
       const steps = JSON.parse(row.steps).map(s => ['queued','running'].includes(s.state) ?
         {...s, state: 'interrupted', note: 'Kontrollen avbröts. Starta en ny kontroll; inga mejl har skickats.'} : s);
@@ -75,7 +76,8 @@ export function createPaymentControl(db, {adapters, summarize, now = Date.now, c
     const save = () => db.prepare("UPDATE payment_control_runs SET steps=?,updated_at=?,lease_until=? WHERE id=? AND status='running'")
       .run(JSON.stringify(steps), stamp(now), now() + leaseMs, id);
     const timer = setInterval(() => {
-      if (active(id)) db.prepare("UPDATE payment_control_runs SET lease_until=? WHERE id=? AND status='running'").run(now() + leaseMs, id);
+      try{guard();if (active(id)) db.prepare("UPDATE payment_control_runs SET lease_until=? WHERE id=? AND status='running'").run(now() + leaseMs, id);}
+      catch{clearInterval(timer);}
     }, Math.min(15_000, leaseMs / 3));
     timer.unref?.();
     try {
@@ -108,8 +110,10 @@ export function createPaymentControl(db, {adapters, summarize, now = Date.now, c
       for (const s of steps) if (['queued','running'].includes(s.state)) {
         s.state = 'interrupted'; s.note = 'Kontrollen stoppades. Logga in och kontrollera status innan du startar igen.';
       }
-      db.prepare("UPDATE payment_control_runs SET status='interrupted',steps=?,updated_at=?,finished_at=?,lease_until=0 WHERE id=? AND status='running'")
-        .run(JSON.stringify(steps), stamp(now), stamp(now), id);
+      // A removed member cannot even update a job receipt. Leave the expired
+      // lease for the next authorized recovery instead of weakening the fence.
+      try{db.prepare("UPDATE payment_control_runs SET status='interrupted',steps=?,updated_at=?,finished_at=?,lease_until=0 WHERE id=? AND status='running'")
+        .run(JSON.stringify(steps), stamp(now), stamp(now), id);}catch(error){if(!['company_access_denied','company_authorization_changed','COMPANY_CONTEXT_STALE','company_runtime_closed','company_permission_denied'].includes(error.code))throw error;}
     } finally {clearInterval(timer);}
   }
   function start(owner, requestId, authorize) {
@@ -142,7 +146,9 @@ export function createPaymentControl(db, {adapters, summarize, now = Date.now, c
       db.exec('COMMIT');
     } catch (error) {db.exec('ROLLBACK');throw error;}
     if (!reused) {
-      const task = Promise.resolve().then(() => execute(job.id, owner, authorize)).finally(() => pending.delete(job.id));
+      const task = Promise.resolve().then(() => execute(job.id, owner, authorize)).catch(error=>{
+        if(!['company_access_denied','company_authorization_changed','COMPANY_CONTEXT_STALE','company_runtime_closed','company_permission_denied'].includes(error.code))throw error;
+      }).finally(() => pending.delete(job.id));
       pending.set(job.id, task);
     }
     return {job, reused};

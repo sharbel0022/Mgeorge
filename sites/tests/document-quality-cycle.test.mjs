@@ -121,7 +121,7 @@ async function processingFixture(t){
   globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
   const reference='globalThis['+JSON.stringify(key)+']';
   const domainUrl=new URL('../lib/domain.ts',import.meta.url).href;
-  const server=data('import {emptyState} from '+JSON.stringify(domainUrl)+';const f='+reference+';export const db=()=>f.d1;export const response=(body,status=200)=>Response.json(body,{status});export const identity=async()=>({userId:f.owner,email:"owner@example.test"});export async function readWorkspace(owner){const row=await f.d1.prepare("SELECT revision,payload FROM workspaces WHERE owner=?").bind(owner).first();return row?{revision:row.revision,state:JSON.parse(row.payload)}:{revision:0,state:emptyState()};}');
+  const server=data('import {emptyState} from '+JSON.stringify(domainUrl)+';const f='+reference+';export async function companyWorkerIdentity(){return null;}export async function companyWorkerConfigured(){return null;}export const db=()=>f.d1;export const response=(body,status=200)=>Response.json(body,{status});export const identity=async()=>({userId:f.owner,email:"owner@example.test"});export async function readWorkspace(owner){const row=await f.d1.prepare("SELECT revision,payload FROM workspaces WHERE owner=?").bind(owner).first();return row?{revision:row.revision,state:JSON.parse(row.payload)}:{revision:0,state:emptyState()};}');
   let source=ts.transpileModule(readFileSync(new URL('../lib/document-processing.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
   const imports={
     'cloudflare:workers':data('export const env='+reference+'.env;'),

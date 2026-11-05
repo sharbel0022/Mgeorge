@@ -84,7 +84,7 @@ export function createCompanyBankSyncStore(database, { now = Date.now, leaseMs =
 
   async function setReferencePolicy(value) {
     await scope(value);
-    if (!integer(value.revision) || !text(value.companyName) || !['invoice_number', 'ocr'].includes(value.mode) || !text(value.evidenceId)) fail('REFERENCE_POLICY_UNVERIFIED');
+    if (!integer(value.revision) || !text(value.companyName) || !['invoice_number', 'explicit_only', 'ocr'].includes(value.mode) || !text(value.evidenceId)) fail('REFERENCE_POLICY_UNVERIFIED');
     const policy = { companyId: value.companyId, owner: value.owner, revision: value.revision, companyName: value.companyName, mode: value.mode, evidenceId: value.evidenceId };
     const previous = await referencePolicy(value), payload = json(policy);
     if (previous && (previous.revision > value.revision || previous.revision === value.revision && json(previous) !== payload)) fail('REFERENCE_POLICY_CHANGED');

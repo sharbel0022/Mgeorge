@@ -1,7 +1,8 @@
 import {ingestError,validateAuthorization,validateReportPage,sanitizedIngestCode,retryAt} from './bankgiro-source.js';
 import {registrationBinding,bankgiroRegistrationPlan} from './bankgiro-ingest-store.js';
 const statuses=['PENDING','RETRY','IMPORTED','REVIEW','DUPLICATE','BLOCKED'];
-const blocked=code=>['AUTHORIZATION_BLOCKED','AUTHORIZATION_CHANGED','INVALID_PAGE','HASH_MISMATCH','IDENTITY_CONFLICT','INVALID_ORIGINAL','INVALID_SINK_RESULT'].includes(code);
+const blocked=code=>['AUTHORIZATION_BLOCKED','AUTHORIZATION_CHANGED','ACCOUNT_MISMATCH','INVALID_PAGE','HASH_MISMATCH','IDENTITY_CONFLICT','INVALID_ORIGINAL','INVALID_SINK_RESULT'].includes(code);
+const reviewReasons=['BANKGIRO_INFORMATION_UNAVAILABLE','BANKGIRO_INFORMATION_PARTIAL','BANKGIRO_ENRICHMENT_REVIEW'];
 const iso=value=>value==null?null:new Date(value).toISOString();
 const emptyCounts=()=>Object.fromEntries(statuses.map(s=>[s,0]));
 /** Bounded transport worker. Financial interpretation belongs exclusively to the sink. */
@@ -79,7 +80,8 @@ export function createBankgiroIngest({source,store,sink,now=Date.now,allowSynthe
      if(duplicate){await store.update(job,{status:'DUPLICATE',importId:duplicate.importId,paymentCount:duplicate.paymentCount,nextAttemptAt:null,lastError:null},lease);continue;}
      await lease.assert();const result=await call(()=>sink.importReport({owner,job:{...job},documentId:job.documentId,authorization,lease}));
      if(!['IMPORTED','REVIEW','DUPLICATE'].includes(result?.status)||!Number.isSafeInteger(result.paymentCount)||result.paymentCount<0)throw ingestError('INVALID_SINK_RESULT');
-     await store.update(job,{status:result.status,importId:result.importId??null,paymentCount:result.paymentCount,nextAttemptAt:null,lastError:null},lease);
+     if(result.reasonCode!==undefined&&(result.status!=='REVIEW'||!reviewReasons.includes(result.reasonCode)))throw ingestError('INVALID_SINK_RESULT');
+     await store.update(job,{status:result.status,importId:result.importId??null,paymentCount:result.paymentCount,nextAttemptAt:null,lastError:result.reasonCode??null},lease);
     }catch(error){
      const code=sanitizedIngestCode(error);if(code==='LEASE_LOST')throw error;
      await store.update(job,{status:blocked(code)?'BLOCKED':'RETRY',lastError:code,nextAttemptAt:blocked(code)?null:retryAt(error,job.attempts,now())},lease);

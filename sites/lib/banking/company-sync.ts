@@ -40,9 +40,9 @@ const cas=(database:D1Database,owner:string,revision:number)=>database.prepare("
  * where the trusted runtime is unavailable. Unbound legacy owners are unchanged. */
 export async function dispatchCompanyAutomaticSync(owner:string,options:{psu?:ProviderPsu;nextAutomaticAttempt:(at?:number)=>string}){
  const database=db();
- const table=await database.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='company_bank_sync_scopes'").first();
- if(!table)return runtime?blocked('COMPANY_SCOPE_MISMATCH'):null;
- const bound=await database.prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first<{company_id:string}>();
+ let bound:{company_id:string}|null;
+ try{bound=await database.prepare('SELECT company_id FROM company_bank_sync_scopes WHERE owner=?').bind(owner).first<{company_id:string}>();}
+ catch(error){if(error instanceof Error&&/no such table:\s*(?:main\.)?company_bank_sync_scopes\b/i.test(error.message))return runtime?blocked('COMPANY_SCOPE_MISMATCH'):null;throw error;}
  const adapter=runtime;
  if(!adapter)return bound?blocked('AUTHORIZATION_UNVERIFIED'):null;
  let jobs:CompanySyncSelector[]|null;

@@ -1,6 +1,9 @@
-import test from 'node:test';
+import test,{after} from 'node:test';
 import assert from 'node:assert/strict';
-import {existsSync,readFileSync} from 'node:fs';
+import {existsSync,readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {stripTypeScriptTypes} from 'node:module';
 import {DatabaseSync} from 'node:sqlite';
 import {createHash} from 'node:crypto';
@@ -15,13 +18,21 @@ import {syntheticBankRow} from './helpers/bank-api-fixture.mjs';
 import {ingestFixture} from './helpers/bankgiro-ingest-fixture.mjs';
 
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
+// Keep real compiled modules in bounded files instead of recursively embedding
+// every dependency in each fixture's data URL. The latter grows exponentially
+// and can terminate this test process in a concurrent full-suite run.
+const moduleDirectory=mkdtempSync(join(tmpdir(),'mgeorge-company-sync-modules-'));
+let moduleSequence=0;
+after(()=>rmSync(moduleDirectory,{recursive:true,force:true}));
 const local=name=>new URL('../lib/'+name,import.meta.url).href;
 const source=name=>readFileSync(new URL(name,import.meta.url),'utf8');
 function compiled(name,imports={}){
  const path=new URL('../lib/'+name,import.meta.url);
  let code=existsSync(path)?stripTypeScriptTypes(readFileSync(path,'utf8'),{mode:'transform'}):'export {};';
  for(const [from,to] of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));
- return data(code);
+ code=code.replace(/(['"])(\.{1,2}\/[^'"]+\.js)\1/g,(_all,_quote,specifier)=>JSON.stringify(new URL(specifier,path).href));
+ const filename=join(moduleDirectory,`${++moduleSequence}.mjs`);writeFileSync(filename,code);
+ return pathToFileURL(filename).href;
 }
 class LocalD1{
  constructor(sql){this.sql=sql;this.beforeBatch=null;this.afterBatch=null;}
@@ -41,17 +52,18 @@ async function fixture(t,{bound=true,registered=true,bankgiro=false}={}){
  t.mock.method(globalThis,'fetch',async()=>{throw Error('Live network is forbidden in company sync tests.');});
  const domain=local('domain.ts'),security=local('banking/security.ts'),runtime=local('banking/runtime-config.ts');
  const server=compiled('server.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/app/chatgpt-auth':data(`export async function getChatGPTUser(){return {userId:${JSON.stringify(owner)}};}`),'./domain':domain});
- const storeUrl=compiled('banking/store.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/lib/server':server,'./security':security,'./runtime-config':runtime}),bankStore=await import(storeUrl);
  const normalizer=compiled('banking/transactions.ts',{'../domain':domain,'../payment-references.js':local('payment-references.js'),'../payer-evidence.js':local('payer-evidence.js')});
+ const storeUrl=compiled('banking/store.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'@/lib/server':server,'./security':security,'./runtime-config':runtime,'./transactions':normalizer}),bankStore=await import(storeUrl);
  const provider=data(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(local('banking/enable-banking.ts'))};export async function getSession(...args){return globalThis[${JSON.stringify(key)}].getSession(...args);}export async function getTransactions(...args){return globalThis[${JSON.stringify(key)}].getTransactions(...args);}export async function getApplication(){}export async function listBusinessBanks(){}export async function startAuth(){}export async function createSession(){}export async function deleteSession(){}`);
  const readGuard=compiled('banking/account-read-guard.ts',{'../server':server,'./store':storeUrl,'./enable-banking':provider,'./account-read-cooldown':local('banking/account-read-cooldown.ts')});
- const bankgiroService=compiled('bankgiro-service.ts',{'./server':server,'./domain':domain,'./bankgiro-parser.js':local('bankgiro-parser.js'),'./banking/store':storeUrl,'./banking/transactions':normalizer});
+ const openPaymentsAccounts=compiled('banking/openpayments-account-state.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'../server':server,'./security':security});
+ const bankgiroService=compiled('bankgiro-service.ts',{'./server':server,'./domain':domain,'./bankgiro-parser.js':local('bankgiro-parser.js'),'./banking/store':storeUrl,'./banking/transactions':normalizer,'./banking/openpayments-account-state':openPaymentsAccounts});
  const reconciliation=compiled('reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':local('reconciliation-engine.js'),'./company-reconciliation-policy.js':local('company-reconciliation-policy.js')});
  const evidence=compiled('reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':local('reconciliation-engine.js'),'./bankgiro-service':bankgiroService});
  const companyReconciliation=compiled('company-reconciliation.ts',{'./domain':domain,'./reconciliation-evidence':evidence,'./company-reconciliation-policy.js':local('company-reconciliation-policy.js'),'./company-bank-sync-store.js':local('company-bank-sync-store.js')});
  const adapter=compiled('banking/company-sync.ts',{'../server':server,'../domain':domain,'./store':storeUrl,'./security':security,'./enable-banking':provider,'./transactions':normalizer,'./account-read-guard':readGuard,'./account-read-cooldown':local('banking/account-read-cooldown.ts'),'./sync-periods':local('banking/sync-periods.ts'),'../company-bank-sync.js':local('company-bank-sync.js'),'../company-bank-sync-store.js':local('company-bank-sync-store.js'),'../company-bank-account-key.js':local('company-bank-account-key.js'),'../company-reconciliation':companyReconciliation,'../reconciliation-evidence':evidence});
- const service=compiled('banking/service.ts',{'@/lib/server':server,'@/lib/domain':domain,'./store':storeUrl,'./security':security,'./runtime-config':runtime,'./transactions':normalizer,'./enable-banking':provider,'./account-read-guard':readGuard,'./account-read-cooldown':local('banking/account-read-cooldown.ts'),'./sync-periods':local('banking/sync-periods.ts'),'./company-sync':adapter,'../customer-messages':data(`export async function reconcileAndPrepare(){globalThis[${JSON.stringify(key)}].legacyReconciled=true;}`),'../bankgiro-ingest-service':data(`export async function runBankgiroSource(){globalThis[${JSON.stringify(key)}].legacyBankgiro=true;return {state:'DISABLED'};}`)});
- f.adapter=await import(adapter);f.service=await import(service);f.bankStore=bankStore;f.store=createCompanyBankSyncStore(DB);
+ const service=compiled('banking/service.ts',{'@/lib/server':server,'@/lib/domain':domain,'./store':storeUrl,'./security':security,'./runtime-config':runtime,'./transactions':normalizer,'./enable-banking':provider,'./account-read-guard':readGuard,'./account-read-cooldown':local('banking/account-read-cooldown.ts'),'./sync-periods':local('banking/sync-periods.ts'),'./company-sync':adapter,'./openpayments-scheduler':compiled('banking/openpayments-scheduler.ts',{'cloudflare:workers':data(`export const env=globalThis[${JSON.stringify(key)}].env;`),'../server':server}),'../customer-messages':data(`export async function reconcileAndPrepare(){globalThis[${JSON.stringify(key)}].legacyReconciled=true;}`),'../bankgiro-ingest-service':data(`export async function runBankgiroSource(){globalThis[${JSON.stringify(key)}].legacyBankgiro=true;return {state:'DISABLED'};}`)});
+ f.adapter=await import(adapter);f.service=await import(service);f.bankStore=bankStore;f.store=createCompanyBankSyncStore(DB);f.scopedDatabase=(await import(server)).db();
  f.customerApi=await import(compiled('customer-messages.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-evidence':evidence,'./customer-message-text.js':local('customer-message-text.js'),'./banking/security':security,'./banking/store':storeUrl,'./gmail-adapter.js':data('export async function prepareGmailSend(){throw Error("Sending is forbidden in company sync tests");}export function gmailAccount(){return "synthetic@example.test";}export function hasGmailSendScope(){return false;}')}));
  const app=await bankStore.application(owner),at=new Date().toISOString();f.validUntil=new Date(Date.now()+86400000).toISOString();
  sql.prepare('INSERT INTO bank_applications VALUES(?,?,?,?,?,?,?)').run(owner,APP,await bankStore.encrypt(owner,'key:generation-one','SYNTHETIC PRIVATE KEY'),JSON.stringify({name:'Synthetic app',kid:APP,environment:'PRODUCTION',active:true,redirect_urls:[],countries:['SE'],services:['AIS']}),app.generation,at,at);
@@ -65,7 +77,7 @@ async function fixture(t,{bound=true,registered=true,bankgiro=false}={}){
  if(registered&&typeof f.adapter.registerCompanyBankSyncRuntime==='function')f.adapter.registerCompanyBankSyncRuntime({
   async jobsForOwner(received){assert.equal(received,owner);return f.jobs??[{companyId,connectionId,accountKey:f.context.accountKey}];},
   async resolveContext(){if(!f.authorized)throw companySyncError('AUTHORIZATION_UNVERIFIED');return {...f.context};},
-  async currentGuard(context){return {async assert(){const current=sql.prepare('SELECT * FROM synthetic_authority WHERE owner=?').get(owner);if(!current.active||current.generation!==context.generation||current.revision!==context.revision)throw companySyncError('AUTHORIZATION_CHANGED');},fence(){return DB.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM synthetic_authority WHERE owner=? AND generation=? AND revision=? AND active=1) THEN 1 ELSE json('AUTHORIZATION_CHANGED') END").bind(owner,context.generation,context.revision);}};},
+  async currentGuard(context){return {async assert(){const current=sql.prepare('SELECT * FROM synthetic_authority WHERE owner=?').get(owner);if(!current.active||current.generation!==context.generation||current.revision!==context.revision)throw companySyncError('AUTHORIZATION_CHANGED');},fence(){return f.scopedDatabase.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM synthetic_authority WHERE owner=? AND generation=? AND revision=? AND active=1) THEN 1 ELSE json('AUTHORIZATION_CHANGED') END").bind(owner,context.generation,context.revision);}};},
  });
  f.run=async()=>{const response=await f.service.automaticSync();return response.json();};
  f.read=()=>JSON.parse(sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(owner).payload);
@@ -115,7 +127,7 @@ test('same provider response replay has one original, one financial import and o
 });
 
 for(const change of ['workspace','owner lease','membership','scope','connection'])test('atomic '+change+' fence rolls back import and receipt together',async t=>{
- const f=await fixture(t);f.DB.beforeBatch=statements=>{if(!statements.some(s=>s.query.startsWith('INSERT INTO company_bank_sync_receipts')))return;f.DB.beforeBatch=null;
+ const f=await fixture(t);f.DB.beforeBatch=statements=>{if(!statements.some(s=>s.query.includes('INSERT INTO company_bank_sync_receipts')))return;f.DB.beforeBatch=null;
   if(change==='workspace')f.sql.prepare('UPDATE workspaces SET revision=revision+1 WHERE owner=?').run(f.owner);
   if(change==='owner lease')f.sql.prepare("UPDATE bank_locks SET token='replacement-worker' WHERE owner=?").run(f.owner);
   if(change==='membership')f.sql.prepare('UPDATE synthetic_authority SET active=0 WHERE owner=?').run(f.owner);
@@ -138,7 +150,7 @@ test('stale trusted consent ID cannot borrow a different encrypted provider sess
 });
 
 test('lost acknowledgement recovers the committed import count from its durable receipt',async t=>{
- const f=await fixture(t);f.DB.afterBatch=statements=>{if(statements.some(s=>s.query.startsWith('INSERT INTO company_bank_sync_receipts'))){f.DB.afterBatch=null;throw Error('Synthetic acknowledgement lost after commit');}};
+ const f=await fixture(t);f.DB.afterBatch=statements=>{if(statements.some(s=>s.query.includes('INSERT INTO company_bank_sync_receipts'))){f.DB.afterBatch=null;throw Error('Synthetic acknowledgement lost after commit');}};
  const result=await f.run();assert.equal(result.results[0].status,'success');assert.equal(result.imported,1);assert.equal(f.count('company_bank_sync_receipts'),1);assert.equal(f.count('bank_sync_runs'),1);assert.equal(f.read().transactions.length,1);
 });
 
@@ -189,13 +201,13 @@ test('unparseable provider retry advice remains blocked even if legacy retry fie
 });
 
 for(const entrypoint of ['sync','syncControl'])test('bound company cannot use legacy '+entrypoint+' to bypass company authority',async t=>{
- const f=await fixture(t);const request=new Request('https://synthetic.test/api/bank/sync',{method:'POST',headers:{origin:'https://synthetic.test'}});
+ const f=await fixture(t);const request=new Request('https://synthetic.test/api/bank/sync',{method:'POST',headers:{origin:'https://synthetic.test','content-type':'application/json'},body:'{}'});
  await assert.rejects(f.service[entrypoint](request),error=>error.status===409&&/företag/i.test(error.message));assert.equal(f.calls.length,0);assert.equal(f.read().transactions.length,0);assert.equal(f.count('bank_sync_runs'),0);
 });
 
 test('company binding installed at legacy commit fences the financial write atomically',async t=>{
- const f=await fixture(t,{registered:false,bound:false});f.DB.beforeBatch=statements=>{if(!statements.some(s=>s.query.startsWith('INSERT INTO bank_sync_runs')))return;f.DB.beforeBatch=null;f.sql.prepare('INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES(?,?,?,?)').run(f.companyId,f.owner,'synthetic-concurrent-binding',Date.now());};
- await assert.rejects(f.service.sync(new Request('https://synthetic.test/api/bank/sync',{method:'POST',headers:{origin:'https://synthetic.test'}})),error=>error.status===409);assert.equal(f.read().transactions.length,0);assert.equal(f.count('bank_sync_runs'),0);assert.equal(f.count('company_bank_sync_receipts'),0);
+ const f=await fixture(t,{registered:false,bound:false});f.DB.beforeBatch=statements=>{if(!statements.some(s=>s.query.includes('INSERT INTO bank_sync_runs')))return;f.DB.beforeBatch=null;f.sql.prepare('INSERT INTO company_bank_sync_scopes(company_id,owner,evidence_id,created_at) VALUES(?,?,?,?)').run(f.companyId,f.owner,'synthetic-concurrent-binding',Date.now());};
+ await assert.rejects(f.service.sync(new Request('https://synthetic.test/api/bank/sync',{method:'POST',headers:{origin:'https://synthetic.test','content-type':'application/json'},body:'{}'})),error=>error.status===409);assert.equal(f.read().transactions.length,0);assert.equal(f.count('bank_sync_runs'),0);assert.equal(f.count('company_bank_sync_receipts'),0);
 });
 
 test('caller chosen account key cannot reset the authoritative account quota',async t=>{

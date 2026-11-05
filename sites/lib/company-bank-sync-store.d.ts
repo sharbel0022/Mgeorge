@@ -1,6 +1,6 @@
 /** Trusted server contracts; not provider wire fields or browser enrollment inputs. */
 export interface CompanySyncScope { companyId: string; owner: string; evidenceId: string; revision: number }
-export interface CompanyReferencePolicy { companyId: string; owner: string; revision: number; companyName: string; mode: 'invoice_number' | 'ocr'; evidenceId: string }
+export interface CompanyReferencePolicy { companyId: string; owner: string; revision: number; companyName: string; mode: 'invoice_number' | 'explicit_only' | 'ocr'; evidenceId: string }
 export interface CompanySyncContext {
   companyId: string; owner: string; connectionId: string; provider: string;
   /** Stable opaque identity. Never a provider UID that changes on renewal. */

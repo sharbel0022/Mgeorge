@@ -12,7 +12,8 @@ import {restoreBackupIsolated} from '../scripts/restore-backup-isolated.mjs';
 const companyTables=['company_bank_sync_scopes','company_bank_sync_jobs','company_bank_sync_requests','company_bank_sync_receipts'];
 const oldTables=['workspaces','audit_events','documents','bank_applications','bank_connections','bank_sync_runs','gmail_connections','customer_contacts','customer_messages','reconciliation_findings','customer_deliveries','gmail_sources','gmail_runs','document_automation','document_jobs','document_extractions','invoice_counterparties','document_registrations','payment_control_runs','payment_control_requests'];
 const intermediateTables=[...oldTables,'bankgiro_ingest_sources','bankgiro_ingest_jobs'];
-const allTables=[...intermediateTables,...companyTables];
+const consentTables=[...intermediateTables,'saas_bank_state'];
+const allTables=[...consentTables,...companyTables];
 const OWNER='synthetic-company-backup-owner',KEY='6'.repeat(64),AT=Date.parse('2026-11-04T12:00:00Z');
 const adapter=sql=>({
  prepare(query){return {query,args:[],bind(...args){this.args=args;return this;},async first(){return sql.prepare(query).get(...this.args)||null;},async all(){return {results:sql.prepare(query).all(...this.args)};},async run(){return this.execute();},execute(){const statement=sql.prepare(query);return statement.columns().length?{results:statement.all(...this.args),meta:{changes:0}}:{meta:{changes:Number(statement.run(...this.args).changes)}};}};},
@@ -26,6 +27,7 @@ async function fixture(t){
  const db=adapter(sql),store=createCompanyBankSyncStore(db,{now:()=>AT}),value=context(),foreign=context('B','foreign-owner');
  for(const current of [value,foreign]){
   sql.prepare('INSERT INTO workspaces(owner,revision,payload,updated_at) VALUES(?,?,?,?)').run(current.owner,1,JSON.stringify({schemaVersion:1,invoices:[],transactions:[],allocations:[],imports:[]}),new Date(AT).toISOString());
+  sql.prepare('INSERT INTO saas_bank_state(owner,revision,payload) VALUES(?,?,?)').run(current.owner,3,'synthetic-encrypted-consent-state-'+current.companyId);
   await store.bindScope({...current,evidenceId:'synthetic-binding-'+current.companyId});
   await store.setReferencePolicy({...current,companyName:'Synthetic '+current.companyId+' AB',mode:'invoice_number',evidenceId:'synthetic-reference-policy'});
   await store.register(current);
@@ -54,14 +56,14 @@ function isolatedCoordinator(t,copy,now){
  return {sql,store:createCompanyBankSyncStore(adapter(sql),{now})};
 }
 
-test('new snapshots retain all four owned company tables and never another company scope',async t=>{
+test('new snapshots retain consent and all four owned company tables and never another company scope',async t=>{
  const f=await fixture(t);assert.deepEqual(BACKUP_TABLES,allTables);
  const before=f.snapshot(),run=await completed(f),snapshot=JSON.parse(new TextDecoder().decode(await unsealBackup(f.objects.get(run.snapshot_key),KEY,OWNER,run.id,'snapshot')));
- assert.equal(snapshot.tables.length,26);for(const name of companyTables)assert.deepEqual(snapshot.tables.find(row=>row.name===name).rows,before.tables.find(row=>row.name===name).rows);
+ assert.equal(snapshot.tables.length,27);for(const name of ['saas_bank_state',...companyTables])assert.deepEqual(snapshot.tables.find(row=>row.name===name).rows,before.tables.find(row=>row.name===name).rows);
  assert.equal(JSON.stringify(snapshot).includes('company-B'),false);assert.equal(JSON.stringify(snapshot).includes('foreign-owner'),false);assert.deepEqual(f.snapshot(),before);
 });
 
-for(const names of [oldTables,intermediateTables])test('exact historical '+names.length+' table snapshot remains unchanged and creates no company authority',async t=>{
+for(const names of [oldTables,intermediateTables,consentTables])test('exact historical '+names.length+' table snapshot remains unchanged and creates no company sync authority',async t=>{
  const f=await fixture(t),value=f.snapshot();value.tables=value.tables.filter(table=>names.includes(table.name));const before=structuredClone(value);
  assert.equal(validateSnapshot(value,OWNER).tables.length,names.length);assert.deepEqual(value,before);
 });
@@ -92,7 +94,7 @@ test('partial company table census cannot masquerade as a historical snapshot',a
 
 test('isolated recovery retains policies, quota, receipts, checkpoint and 429 while invalidating captured leases',async t=>{
  const f=await fixture(t),before=f.snapshot(),copy=await restored(t,f);
- for(const name of ['company_bank_sync_scopes','company_bank_sync_requests','company_bank_sync_receipts'])assert.deepEqual(copy.sql.prepare('SELECT * FROM evidence_'+name).all().map(row=>({...row})),before.tables.find(table=>table.name===name).rows,name);
+ for(const name of ['saas_bank_state','company_bank_sync_scopes','company_bank_sync_requests','company_bank_sync_receipts'])assert.deepEqual(copy.sql.prepare('SELECT * FROM evidence_'+name).all().map(row=>({...row})),before.tables.find(table=>table.name===name).rows,name);
  const saved=before.tables.find(table=>table.name==='company_bank_sync_jobs').rows;
  for(const row of copy.sql.prepare('SELECT * FROM evidence_company_bank_sync_jobs').all()){
   const source=saved.find(item=>item.account_key===row.account_key);assert.deepEqual({...row},{...source,lease_token:'',lease_until:0,lease_deadline:0,fence_version:source.fence_version+1});

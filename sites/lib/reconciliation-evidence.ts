@@ -9,12 +9,13 @@ const missingAccount='En aktiv ägarbunden bankanslutning och ett verifierat mot
 /** Consent is current access evidence, never an assertion of original integrity. */
 function accountReader(owner:string){
  const accounts=new Map<string,Promise<string>>();
- return (account:string,reportedAccount?:string)=>{
-  const primary=canonicalBankAccount(account),key=JSON.stringify([primary,reportedAccount??null]);
-  if(!accounts.has(key))accounts.set(key,(async()=>{try{const {bankgiroAutomaticAccountIssue}=await import('./bankgiro-service');return await bankgiroAutomaticAccountIssue(owner,primary,reportedAccount);}catch{return missingAccount;}})());
+ return (account:string,reportedAccount?:string,provider:'enable_banking'|'open_payments'='enable_banking')=>{
+  const primary=canonicalBankAccount(account),key=JSON.stringify([provider,primary,reportedAccount??null]);
+  if(!accounts.has(key))accounts.set(key,(async()=>{try{const {bankgiroAutomaticAccountIssue}=await import('./bankgiro-service');return await bankgiroAutomaticAccountIssue(owner,primary,reportedAccount,provider);}catch{return missingAccount;}})());
   return accounts.get(key)!;
  };
 }
+const accountProvider=(t:Transaction):'open_payments'|'enable_banking'=>t.bankDataVersion==='openpayments-response-v1'||t.enrichmentEvidence?.provider==='openpayments'?'open_payments':'enable_banking';
 const needsAccount=(t:Transaction)=>hasBankApiOrigin(t)||['bank_file','bankgiro_file'].includes(t.evidence||'');
 // Source classification keeps a missing report identifier from bypassing consent.
 const reportedAccount=(t:Transaction)=>t.evidence==='bankgiro_file'?(typeof t.recipientAccount==='string'?t.recipientAccount:''):undefined;
@@ -97,7 +98,7 @@ async function checkedState(owner:string,initial:State,options:ReconciliationOpt
  if(pending.length){
   initial=structuredClone(initial);
   for(const row of pending){
-   const current=initial.transactions.find(item=>item.id===row.id)!,issue=await account(row.account,reportedAccount(row));
+   const current=initial.transactions.find(item=>item.id===row.id)!,issue=await account(row.account,reportedAccount(row),accountProvider(row));
    if((current.bankgiroAccountIssue||'')!==issue)accountDecisions.push({id:uid(),at:now(),kind:issue?'bankgiro_account_held':'bankgiro_account_restored',safe:false,transaction_id:row.id,reason:issue||'Det valda mottagarkontot ingår i ägarens aktiva bankmedgivande.'});
    current.bankgiroAccountIssue=issue;
   }
@@ -114,7 +115,7 @@ async function checkedState(owner:string,initial:State,options:ReconciliationOpt
    const t=state.transactions.find(t=>t.id===id)!;const issue=await read(state,t),old=t.bankOriginalIssue||'';checked.add(id);
    if(issue)t.bankOriginalIssue=issue;else delete t.bankOriginalIssue;
    if(issue!==old)decisions.push({id:uid(),at:now(),kind:issue?'bank_original_unavailable':'bank_original_restored',safe:false,transaction_id:t.id,reason:issue||'Det bevarade bankoriginalet är tillgängligt och kontrollsumman stämmer.'});
-   const accountIssue=needsAccount(t)?await account(t.account,reportedAccount(t)):'',previousAccountIssue=t.bankAccountIssue||'';
+   const accountIssue=needsAccount(t)?await account(t.account,reportedAccount(t),accountProvider(t)):'',previousAccountIssue=t.bankAccountIssue||'';
    if(accountIssue)t.bankAccountIssue=accountIssue;else delete t.bankAccountIssue;
    if(accountIssue!==previousAccountIssue)decisions.push({id:uid(),at:now(),kind:accountIssue?'bank_account_held':'bank_account_restored',safe:false,transaction_id:t.id,reason:accountIssue||'Det valda mottagarkontot ingår i ägarens aktiva bankmedgivande.'});
   }
@@ -145,7 +146,7 @@ export async function assertPaymentOriginal(owner:string,initial:State,id:string
  if(!state.transactions.some(t=>t.id===id))throw Error(missing);
  for(const relatedId of relatedTransactions(state,[id])){
   const t=state.transactions.find(t=>t.id===relatedId)!;const issue=await read(state,t);if(issue)throw Error(issue);delete t.bankOriginalIssue;
-  if(needsAccount(t)){const issue=await account(t.account,reportedAccount(t));if(issue)throw Error(issue);}
+  if(needsAccount(t)){const issue=await account(t.account,reportedAccount(t),accountProvider(t));if(issue)throw Error(issue);}
   delete t.bankAccountIssue;
  }
  return state;
@@ -202,21 +203,21 @@ export async function writePaymentState(owner:string,revision:number,before:Stat
   if(promoted||!affected.length||affected.some(a=>!options.manualAllocationIds?.has(a.id)))throw changedSource();
  }
  const reportFences=sourceFences(database,owner,revision,source.snapshot);
- const accounts=new Map<string,{primary:string;reported:string|undefined}>();
+ const accounts=new Map<string,{primary:string;reported:string|undefined;provider:'enable_banking'|'open_payments'}>();
  for(const id of financialIds){
   const source=after.transactions.find(t=>t.id===id)!;if(!needsAccount(source))continue;
-  const primary=canonicalBankAccount(source.account),reported=reportedAccount(source);
-  accounts.set(JSON.stringify([primary,reported??null]),{primary,reported});
+  const primary=canonicalBankAccount(source.account),reported=reportedAccount(source),provider=accountProvider(source);
+  accounts.set(JSON.stringify([provider,primary,reported??null]),{primary,reported,provider});
  }
  if(!accounts.size){try{return (await database.batch([...reportFences,...statements])).slice(reportFences.length);}catch(error){if(reportFences.length&&/malformed JSON/i.test(String(error)))throw changedSource();throw error;}}
- const snapshots=new Map<string,unknown[]>();
+ const snapshots=new Map<string,unknown[]>(),opSnapshots=new Map<string,{owner:string;revision:number;payload:string;validUntil:string}>();
  try{
   const {bankAccountConsentSnapshot}=await import('./bankgiro-service');
   // Validate every retained recipient alias before deduplicating equal consent snapshots.
-  for(const {primary,reported} of accounts.values()){const current=await bankAccountConsentSnapshot(owner,primary,reported),values=consentFields.map(field=>current[field]);if(values.some(value=>typeof value!=='string'||!value))throw changedConsent();snapshots.set(JSON.stringify(values),values);}
+  for(const {primary,reported,provider} of accounts.values()){const current=await bankAccountConsentSnapshot(owner,primary,reported,provider);if('provider' in current&&current.provider==='open_payments'){opSnapshots.set(JSON.stringify([current.owner,current.revision,current.payload,current.validUntil]),current);continue;}const values=consentFields.map(field=>(current as Record<string,unknown>)[field]);if(values.some(value=>typeof value!=='string'||!value))throw changedConsent();snapshots.set(JSON.stringify(values),values);}
  }catch{throw changedConsent();}
- const match=[...snapshots].map(()=>`EXISTS(SELECT 1 FROM bank_connections WHERE ${consentFields.map(field=>field+'=?').join(' AND ')} AND julianday(valid_until)>julianday('now'))`).join(' AND ');
- const fence=database.prepare(`UPDATE workspaces SET payload=NULL WHERE owner=? AND revision=? AND NOT (${match})`).bind(owner,revision,...[...snapshots.values()].flat());
+ const match=[...[...snapshots].map(()=>`EXISTS(SELECT 1 FROM bank_connections WHERE ${consentFields.map(field=>field+'=?').join(' AND ')} AND julianday(valid_until)>julianday('now'))`),...[...opSnapshots].map(()=>"EXISTS(SELECT 1 FROM saas_bank_state WHERE owner=? AND revision=? AND payload=?) AND julianday(?)>julianday('now')")].join(' AND ');
+ const fence=database.prepare(`UPDATE workspaces SET payload=NULL WHERE owner=? AND revision=? AND NOT (${match})`).bind(owner,revision,...[...snapshots.values()].flat(),...[...opSnapshots.values()].flatMap(s=>[s.owner,s.revision,s.payload,s.validUntil]));
  try{return (await database.batch([...reportFences,fence,...statements])).slice(reportFences.length+1);}
  catch(error){if(reportFences.length&&/malformed JSON/i.test(String(error)))throw changedSource();if(/NOT NULL constraint failed:\s*workspaces\.payload/i.test(String(error)))throw changedConsent();throw error;}
 }

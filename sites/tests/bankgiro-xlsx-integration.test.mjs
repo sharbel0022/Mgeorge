@@ -1,3 +1,4 @@
+import {applyCurrentMigrations} from './helpers/company-compat-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
@@ -20,7 +21,7 @@ function compiled(path,imports={}){
 const domain=url('../lib/domain.ts'),parser=url('../lib/bankgiro-parser.js');
 const auth=data('export async function getChatGPTUser(){return globalThis.xlsxIntegrationFixture.user;}');
 const envModule=data('export const env=new Proxy({}, {get:(_,key)=>globalThis.xlsxIntegrationFixture.env[key]});');
-const server=compiled('../lib/server.ts',{'cloudflare:workers':envModule,'@/app/chatgpt-auth':auth,'./domain':domain});
+const server=compiled('../lib/server.ts',{'./company-storage.js':new URL('../lib/company-storage.js',import.meta.url).href,'cloudflare:workers':envModule,'@/app/chatgpt-auth':auth,'./domain':domain});
 const service=compiled('../lib/bankgiro-service.ts',{'./server':server,'./bankgiro-parser.js':parser,'./domain':domain,'./banking/store':data('export async function connection(){return null;} export async function accounts(){return [];}'),'./banking/transactions':data('export function stableAccountKey(){return null;}')});
 const reconciliation=compiled('../lib/reconciliation.ts',{'./domain':domain,'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')});
 const evidence=compiled('../lib/reconciliation-evidence.ts',{'./server':server,'./domain':domain,'./reconciliation':reconciliation,'./reconciliation-engine.js':url('../lib/reconciliation-engine.js')});
@@ -31,9 +32,8 @@ const sha256=bytes=>createHash('sha256').update(new Uint8Array(bytes)).digest('h
 
 function fixture(t){
  const sqlite=new DatabaseSync(':memory:');t.after(()=>sqlite.close());
- retainSyntheticIngestTables(sqlite);
- sqlite.exec('CREATE TABLE workspaces(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT,updated_at TEXT);CREATE TABLE documents(id TEXT PRIMARY KEY,owner TEXT,filename TEXT,mime TEXT,size INTEGER,sha256 TEXT,created_at TEXT);CREATE TABLE audit_events(id TEXT,owner TEXT,revision INTEGER,action TEXT,detail TEXT,created_at TEXT);');
- const objects=new Map(),DB={prepare(sql){return {bind(...args){return {async first(){return sqlite.prepare(sql).get(...args)||null;},async all(){return {results:sqlite.prepare(sql).all(...args)};},async run(){return {meta:{changes:sqlite.prepare(sql).run(...args).changes}};}};}};},async batch(statements){sqlite.exec('BEGIN');try{const result=[];for(const statement of statements)result.push(await statement.run());sqlite.exec('COMMIT');return result;}catch(error){sqlite.exec('ROLLBACK');throw error;}}};
+ applyCurrentMigrations(sqlite);
+ const objects=new Map(),DB={prepare(query){return{query,values:[],bind(...values){this.values=values;return this;},async first(){return sqlite.prepare(query).get(...this.values)||null;},async all(){return{results:sqlite.prepare(query).all(...this.values)};},async run(){return{meta:{changes:sqlite.prepare(query).run(...this.values).changes}};}};},async batch(statements){sqlite.exec('BEGIN');try{const result=[];for(const statement of statements)result.push(await statement.run());sqlite.exec('COMMIT');return result;}catch(error){sqlite.exec('ROLLBACK');throw error;}}};
  const BUCKET={async put(key,bytes){objects.set(key,bytes);},async get(key){const bytes=objects.get(key);return bytes?{size:bytes.byteLength,body:bytes,arrayBuffer:async()=>bytes}:null;},async delete(key){objects.delete(key);}};
  let seed=applyCommand(emptyState(),{type:'transactions.import',trustedBankImport:true,rows:[syntheticBankRow({account:'synthetic-account',date:'2026-10-20',amount:syntheticPayment.amount,kind:'batch',description:'Bankgiro inbetalning',bankReference:'SYNTHETIC-AIS-ENTRY',party:'',payerReference:''})]}).state;
  seed=applyCommand(seed,{type:'invoice.save',invoice:{direction:'receivable',party:'En annan testkund AB',number:syntheticPayment.reference,ocr:'',total:syntheticPayment.amount,issued:'2026-10-01',due:'2026-10-31',reviewed:true}}).state;

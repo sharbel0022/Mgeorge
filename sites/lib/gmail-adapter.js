@@ -22,7 +22,11 @@ function rateLimitFailure(response){
   const wait=retryDelay(response);
   return Object.assign(fail(wait.retryBlocked?'Gmail angav en väntetid som kräver manuell kontroll. Automatisk hämtning har stoppats.':'Gmail har begränsat hämtningen. Vänta till nästa tillåtna försök.','rate_limited',429),wait);
 }
-export function gmailAccount(){return (env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com').trim().toLowerCase();}
+export function gmailAccount(expectedAccount){
+ const account=expectedAccount===undefined?(env.GMAIL_ACCOUNT||'mg.vitvaror@gmail.com'):expectedAccount;
+ if(typeof account!=='string'||account.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(account)||/[\r\n\0]/.test(account))throw fail('Företagets Gmail-konto behöver verifieras.','account_mismatch');
+ return account.trim().toLowerCase();
+}
 export function isGmailConfigured(){return !!(env.GOOGLE_CLIENT_ID?.trim()&&env.GOOGLE_CLIENT_SECRET?.trim());}
 function requireConfig(){if(!isGmailConfigured())throw fail('En administratör behöver aktivera Gmail-kopplingen först.','not_configured');}
 function callback(origin){
@@ -30,10 +34,11 @@ function callback(origin){
   if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname))))throw fail('Ogiltig returadress för Gmail.','invalid_origin',400);
   return `${url.origin}/api/gmail/callback`;
 }
-export function gmailAuthorizationUrl(state,origin,{send=false}={}){
+/** @param {string} state @param {string} origin @param {{send?:boolean,account?:string}} options */
+export function gmailAuthorizationUrl(state,origin,{send=false,account=undefined}={}){
   requireConfig();
   if(!/^[A-Za-z0-9_-]{32,200}$/.test(state||''))throw fail('Ogiltig OAuth-status.','invalid_state',400);
-  const search=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback(origin),response_type:'code',scope:send?scope+' https://www.googleapis.com/auth/gmail.send':scope,access_type:'offline',prompt:'consent select_account',login_hint:gmailAccount(),state});
+  const search=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback(origin),response_type:'code',scope:send?scope+' https://www.googleapis.com/auth/gmail.send':scope,access_type:'offline',prompt:'consent select_account',login_hint:gmailAccount(account),state});
   return `https://accounts.google.com/o/oauth2/v2/auth?${search}`;
 }
 async function requestJson(url,options={}){
@@ -98,17 +103,20 @@ async function apiRequest(path,tokens){
     return request();
   }
 }
-export async function gmailProfile(tokens){
+export async function gmailProfile(tokens,account){
+  const expected=gmailAccount(account);
   const profile=await apiRequest('/profile',tokens);
-  if(typeof profile.emailAddress!=='string'||profile.emailAddress.toLowerCase()!==gmailAccount())throw fail(`Välj företagets Gmail-konto: ${gmailAccount()}.`,'account_mismatch');
+  if(typeof profile.emailAddress!=='string'||profile.emailAddress.toLowerCase()!==expected)throw fail(`Välj företagets Gmail-konto: ${expected}.`,'account_mismatch');
   return profile;
 }
 export function hasGmailSendScope(tokens){return String(tokens?.scope||'').split(/\s+/).includes('https://www.googleapis.com/auth/gmail.send');}
 // Preflight may refresh/read. The returned sender performs exactly ONE POST, no retry.
-export async function prepareGmailSend(tokens){
+/** @param {any} tokens @param {{account?:string}} options */
+export async function prepareGmailSend(tokens,{account=undefined}={}){
+  const expected=gmailAccount(account);
   if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60000)Object.assign(tokens,await refreshGmailTokens(tokens));
   if(!hasGmailSendScope(tokens))throw fail('Koppla Gmail igen och godkänn utskicksbehörigheten gmail.send.','missing_send_scope');
-  await gmailProfile(tokens);
+  await gmailProfile(tokens,expected);
   if(!hasGmailSendScope(tokens))throw fail('Utskicksbehörigheten behöver förnyas.','missing_send_scope');
   return message=>{
     if(typeof message.recipient!=='string'||!/^[-A-Za-z0-9.!#$%&'*+/=?^_`{|}~]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(message.recipient)||message.recipient.length>240||/[\r\n\0]/.test(message.recipient)||typeof message.subject!=='string'||/[\r\n\0]/.test(message.subject)||!/^<[a-f0-9-]+@mg-fakturakoll\.local>$/.test(message.rfc_message_id))throw fail('Ogiltiga mejluppgifter.','invalid_message',400);
@@ -116,7 +124,7 @@ export async function prepareGmailSend(tokens){
     for(const char of message.subject){if(Buffer.byteLength(part+char)>42){words.push(part);part='';}part+=char;}if(part)words.push(part);
     const subject=words.map(word=>'=?UTF-8?B?'+Buffer.from(word).toString('base64')+'?=').join('\r\n ');
     const body=Buffer.from(message.body,'utf8').toString('base64').match(/.{1,76}/g)?.join('\r\n')||'';
-    const raw=Buffer.from(`From: ${gmailAccount()}\r\nTo: ${message.recipient}\r\nSubject: ${subject}\r\nMessage-ID: ${message.rfc_message_id}\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n${body}`).toString('base64url');
+    const raw=Buffer.from(`From: ${expected}\r\nTo: ${message.recipient}\r\nSubject: ${subject}\r\nMessage-ID: ${message.rfc_message_id}\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n${body}`).toString('base64url');
     return requestJson(apiBase+'/messages/send',{method:'POST',headers:{Authorization:`Bearer ${tokens.access_token}`,'Content-Type':'application/json'},body:JSON.stringify({raw})});
   };
 }
@@ -187,8 +195,9 @@ function attachmentMime(part){
 }
 // This collects potential originals for human review, never records a debt or a payment.
 // It deliberately does not claim OCR: scans and PDF fields must be reviewed in the UI.
-/** @param {any} tokens @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string}} options */
-export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken=''}={}){
+/** @param {any} tokens @param {{query?:string,after?:string,maxMessages?:number,knownIds?:string[],rejectedIds?:string[],pageToken?:string,account?:string}} options */
+export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMessages=50,knownIds=[],rejectedIds=[],pageToken='',account=undefined}={}){
+  const expected=gmailAccount(account);
   requireConfig();
   if(!Number.isInteger(maxMessages)||maxMessages<1||maxMessages>100)throw fail('Välj mellan 1 och 100 mejl per hämtning.','invalid_limit',400);
   if(typeof query!=='string'||query.length>1000)throw fail('Gmail-sökningen är för lång.','invalid_query',400);
@@ -203,7 +212,7 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
   let current=tokens;
   const deadline=Date.now()+120000;
   if(!tokens?.access_token||!tokens.expires_at||tokens.expires_at<Date.now()+60_000)Object.assign(current,await refreshGmailTokens(tokens));
-  await gmailProfile(current);
+  await gmailProfile(current,expected);
   let search=query.trim()||defaultQuery;
   // Gmail date-only search boundaries use PST. UTC seconds plus overlap prevent gaps
   // around midnight, delayed mail indexing and interrupted syncs; source IDs deduplicate.
@@ -254,7 +263,7 @@ export async function fetchGmailInvoiceDocuments(tokens,{query='',after='',maxMe
         const missing_fields=[...missingMetadata];
         if(!original_filename){missing_fields.push('original_filename');warnMetadata();}
         found=true;
-        const source_id=`gmail:${gmailAccount()}:${item.id}:${part._part}`;
+        const source_id=`gmail:${expected}:${item.id}:${part._part}`;
         if(known.has(source_id)){duplicate++;continue;}
         if(rejected.has(source_id)){skipped++;continue;}
         // Invalid parts count toward the same work budget as valid files. Persisting

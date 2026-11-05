@@ -128,6 +128,7 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   }
   addColumn('bank_transactions','provider_transaction_id',"TEXT NOT NULL DEFAULT ''");
   const identityUpgrade=!db.prepare('PRAGMA table_info(bank_transactions)').all().some(column=>column.name==='api_identity_version');
+  db.exec('CREATE TABLE IF NOT EXISTS saas_bank_state(owner TEXT PRIMARY KEY NOT NULL,revision INTEGER NOT NULL,payload TEXT NOT NULL)');
   addColumn('bank_transactions','api_identity_version','INTEGER NOT NULL DEFAULT 0');
   if(identityUpgrade)db.prepare("UPDATE bank_transactions SET api_identity_version=1 WHERE source='enablebanking' AND provider_transaction_id<>''").run();
   addColumn('bank_states','session_hash',"TEXT NOT NULL DEFAULT ''");
@@ -140,8 +141,20 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   addColumn('bank_states','owner',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','renew_connection_id',"TEXT NOT NULL DEFAULT ''");
   addColumn('bank_states','bank_name',"TEXT NOT NULL DEFAULT ''");
+  // Empty metadata marks existing rows only. Every newly initiated flow writes
+  // company-bound metadata; migrations never invent corporate authorization.
+  addColumn('bank_connections','consent_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','context_json',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','flow_id',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','status',"TEXT NOT NULL DEFAULT 'pending'");
+  addColumn('bank_states','terminal_reason',"TEXT NOT NULL DEFAULT ''");
+  addColumn('bank_states','connection_id',"TEXT NOT NULL DEFAULT ''");
+  // Existing redirects remain retained but must restart: their original
+  // actor/company authorization generation cannot be inferred by migration.
+  addColumn('bank_states','company_context_json',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','page_token',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_states','request_send','INTEGER NOT NULL DEFAULT 0');
+  addColumn('gmail_states','company_context_json',"TEXT NOT NULL DEFAULT ''");
   addColumn('gmail_connections','sync_started_at',"TEXT NOT NULL DEFAULT ''");
   addColumn('import_jobs','content','BLOB');
   addColumn('import_jobs','mime_type',"TEXT NOT NULL DEFAULT ''");
@@ -167,7 +180,8 @@ export function openDatabase(filename=process.env.DB_PATH || './data/mgeorge.sql
   return db;
 }
 export function audit(db,action,details={}) {
-  db.prepare('INSERT INTO audit_events(id,action,details) VALUES(?,?,?)').run(randomUUID(),action,JSON.stringify(details));
+  const context=db.companyContext;
+  db.prepare('INSERT INTO audit_events(id,action,details) VALUES(?,?,?)').run(randomUUID(),action,JSON.stringify(context?{...details,companyId:context.companyId,actorId:context.actorId,membershipVersion:context.membershipVersion}:details));
 }
 export function today(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Stockholm',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
 export function bankEvidenceBlocksAbsence(db){

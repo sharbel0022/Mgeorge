@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "bf0ca1c6-c194-4369-a482-8cdefc2d41a0",
+  "id": "2e34c7c6-15f7-4f5c-a884-66ddffe7a90e",
   "prevId": "20e2ce40-3de6-434b-b822-782c049380fc",
   "tables": {
     "audit_events": {
@@ -390,6 +390,34 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "company_id": {
+          "name": "company_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "company_actor_id": {
+          "name": "company_actor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "company_context_version": {
+          "name": "company_context_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "company_membership_version": {
+          "name": "company_membership_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         }
       },
@@ -1072,111 +1100,29 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "company_bank_sync_jobs": {
-      "name": "company_bank_sync_jobs",
+    "companies": {
+      "name": "companies",
       "columns": {
-        "company_id": {
-          "name": "company_id",
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "account_key": {
-          "name": "account_key",
+        "storage_owner": {
+          "name": "storage_owner",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "owner": {
-          "name": "owner",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "provider": {
-          "name": "provider",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "connection_id": {
-          "name": "connection_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "authority_hash": {
-          "name": "authority_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "generation_hash": {
-          "name": "generation_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "authority_revision": {
-          "name": "authority_revision",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "valid_until": {
-          "name": "valid_until",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "revoked": {
-          "name": "revoked",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "lease_token": {
-          "name": "lease_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "''"
-        },
-        "lease_until": {
-          "name": "lease_until",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "lease_deadline": {
-          "name": "lease_deadline",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "fence_version": {
-          "name": "fence_version",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
         },
         "status": {
           "name": "status",
@@ -1184,94 +1130,107 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'queued'"
+          "default": "'active'"
         },
-        "attempts": {
-          "name": "attempts",
+        "company_version": {
+          "name": "company_version",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": 0
+          "default": 1
         },
-        "last_attempt_at": {
-          "name": "last_attempt_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "last_success_at": {
-          "name": "last_success_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "next_attempt_at": {
-          "name": "next_attempt_at",
+        "boundary_version": {
+          "name": "boundary_version",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": 0
+          "default": 1
         },
-        "retry_blocked": {
-          "name": "retry_blocked",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "error_code": {
-          "name": "error_code",
+        "legacy_owner": {
+          "name": "legacy_owner",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "coverage": {
-          "name": "coverage",
+        "ownership_verified_by": {
+          "name": "ownership_verified_by",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "'{\"ais\":\"unknown\",\"bankgiro\":\"unknown\",\"paymentDataComplete\":false}'"
+          "autoincrement": false
         },
-        "checkpoint": {
-          "name": "checkpoint",
+        "ownership_evidence": {
+          "name": "ownership_evidence",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ownership_verified_at": {
+          "name": "ownership_verified_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {
-        "company_bank_sync_jobs_due": {
-          "name": "company_bank_sync_jobs_due",
+        "companies_storage_owner_unique": {
+          "name": "companies_storage_owner_unique",
           "columns": [
-            "status",
-            "next_attempt_at"
+            "storage_owner"
           ],
-          "isUnique": false
+          "isUnique": true
+        },
+        "companies_legacy_owner_unique": {
+          "name": "companies_legacy_owner_unique",
+          "columns": [
+            "legacy_owner"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "company_bank_sync_jobs_company_id_account_key_pk": {
-          "columns": [
-            "company_id",
-            "account_key"
-          ],
-          "name": "company_bank_sync_jobs_company_id_account_key_pk"
-        }
-      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "companies_status": {
+          "name": "companies_status",
+          "value": "\"companies\".\"status\" IN ('active','suspended')"
+        },
+        "companies_version": {
+          "name": "companies_version",
+          "value": "\"companies\".\"company_version\">0"
+        },
+        "companies_boundary": {
+          "name": "companies_boundary",
+          "value": "\"companies\".\"boundary_version\"=1"
+        },
+        "companies_legacy_owner": {
+          "name": "companies_legacy_owner",
+          "value": "\"companies\".\"legacy_owner\" IS NULL OR \"companies\".\"legacy_owner\"=\"companies\".\"storage_owner\""
+        }
+      }
     },
-    "company_bank_sync_receipts": {
-      "name": "company_bank_sync_receipts",
+    "company_memberships": {
+      "name": "company_memberships",
       "columns": {
         "company_id": {
           "name": "company_id",
@@ -1280,43 +1239,164 @@
           "notNull": true,
           "autoincrement": false
         },
-        "owner": {
-          "name": "owner",
+        "actor_id": {
+          "name": "actor_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "account_key": {
-          "name": "account_key",
+        "role": {
+          "name": "role",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "receipt_key": {
-          "name": "receipt_key",
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'active'"
+        },
+        "membership_version": {
+          "name": "membership_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "sha256": {
-          "name": "sha256",
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "company_memberships_actor": {
+          "name": "company_memberships_actor",
+          "columns": [
+            "actor_id",
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "company_memberships_company_id_companies_id_fk": {
+          "name": "company_memberships_company_id_companies_id_fk",
+          "tableFrom": "company_memberships",
+          "tableTo": "companies",
+          "columnsFrom": [
+            "company_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "company_memberships_role_company_roles_role_fk": {
+          "name": "company_memberships_role_company_roles_role_fk",
+          "tableFrom": "company_memberships",
+          "tableTo": "company_roles",
+          "columnsFrom": [
+            "role"
+          ],
+          "columnsTo": [
+            "role"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "company_memberships_company_id_actor_id_pk": {
+          "columns": [
+            "company_id",
+            "actor_id"
+          ],
+          "name": "company_memberships_company_id_actor_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "company_membership_status": {
+          "name": "company_membership_status",
+          "value": "\"company_memberships\".\"status\" IN ('active','revoked')"
+        },
+        "company_membership_version_positive": {
+          "name": "company_membership_version_positive",
+          "value": "\"company_memberships\".\"membership_version\">0"
+        }
+      }
+    },
+    "company_operation_guard": {
+      "name": "company_operation_guard",
+      "columns": {
+        "slot": {
+          "name": "slot",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "storage_owner": {
+          "name": "storage_owner",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "result": {
-          "name": "result",
+        "company_id": {
+          "name": "company_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "actor_id": {
+          "name": "actor_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "committed_at": {
-          "name": "committed_at",
+        "context_version": {
+          "name": "context_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "membership_version": {
+          "name": "membership_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "authorized": {
+          "name": "authorized",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -1325,21 +1405,101 @@
       },
       "indexes": {},
       "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "company_bank_sync_receipts_company_id_account_key_receipt_key_pk": {
-          "columns": [
-            "company_id",
-            "account_key",
-            "receipt_key"
-          ],
-          "name": "company_bank_sync_receipts_company_id_account_key_receipt_key_pk"
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "company_guard_singleton": {
+          "name": "company_guard_singleton",
+          "value": "\"company_operation_guard\".\"slot\"=1"
+        },
+        "company_guard_authorized": {
+          "name": "company_guard_authorized",
+          "value": "\"company_operation_guard\".\"authorized\"=1"
+        }
+      }
+    },
+    "company_roles": {
+      "name": "company_roles",
+      "columns": {
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
         }
       },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "company_roles_valid": {
+          "name": "company_roles_valid",
+          "value": "\"company_roles\".\"role\" IN ('owner','admin','accountant','viewer')"
+        }
+      }
     },
-    "company_bank_sync_requests": {
-      "name": "company_bank_sync_requests",
+    "company_user_contexts": {
+      "name": "company_user_contexts",
+      "columns": {
+        "actor_id": {
+          "name": "actor_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "active_company_id": {
+          "name": "active_company_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "context_version": {
+          "name": "context_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "company_user_contexts_active_company_id_companies_id_fk": {
+          "name": "company_user_contexts_active_company_id_companies_id_fk",
+          "tableFrom": "company_user_contexts",
+          "tableTo": "companies",
+          "columnsFrom": [
+            "active_company_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "company_context_version_positive": {
+          "name": "company_context_version_positive",
+          "value": "\"company_user_contexts\".\"context_version\">0"
+        }
+      }
+    },
+    "company_worker_grants": {
+      "name": "company_worker_grants",
       "columns": {
         "id": {
           "name": "id",
@@ -1355,128 +1515,133 @@
           "notNull": true,
           "autoincrement": false
         },
-        "owner": {
-          "name": "owner",
+        "actor_id": {
+          "name": "actor_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "account_key": {
-          "name": "account_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "connection_id": {
-          "name": "connection_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "provider": {
-          "name": "provider",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "reserved_at": {
-          "name": "reserved_at",
+        "membership_version": {
+          "name": "membership_version",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        }
-      },
-      "indexes": {
-        "company_bank_sync_requests_budget": {
-          "name": "company_bank_sync_requests_budget",
-          "columns": [
-            "company_id",
-            "account_key",
-            "reserved_at"
-          ],
-          "isUnique": false
         },
-        "company_bank_sync_requests_connection_budget": {
-          "name": "company_bank_sync_requests_connection_budget",
-          "columns": [
-            "company_id",
-            "provider",
-            "connection_id",
-            "reserved_at"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "company_bank_sync_scopes": {
-      "name": "company_bank_sync_scopes",
-      "columns": {
-        "company_id": {
-          "name": "company_id",
-          "type": "text",
-          "primaryKey": true,
+        "company_version": {
+          "name": "company_version",
+          "type": "integer",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "owner": {
-          "name": "owner",
+        "runner": {
+          "name": "runner",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "evidence_id": {
-          "name": "evidence_id",
+        "credential_sha256": {
+          "name": "credential_sha256",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "revision": {
-          "name": "revision",
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'active'"
+        },
+        "grant_version": {
+          "name": "grant_version",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": 1
         },
-        "reference_policy": {
-          "name": "reference_policy",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "created_at": {
           "name": "created_at",
-          "type": "integer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {
-        "company_bank_sync_scopes_owner_unique": {
-          "name": "company_bank_sync_scopes_owner_unique",
+        "company_worker_grants_company_runner": {
+          "name": "company_worker_grants_company_runner",
           "columns": [
-            "owner"
+            "company_id",
+            "runner"
+          ],
+          "isUnique": true,
+          "where": "\"company_worker_grants\".\"status\" = 'active'"
+        },
+        "company_worker_grants_credential": {
+          "name": "company_worker_grants_credential",
+          "columns": [
+            "credential_sha256"
           ],
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "company_worker_grants_company_id_companies_id_fk": {
+          "name": "company_worker_grants_company_id_companies_id_fk",
+          "tableFrom": "company_worker_grants",
+          "tableTo": "companies",
+          "columnsFrom": [
+            "company_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "company_worker_membership_version": {
+          "name": "company_worker_membership_version",
+          "value": "\"company_worker_grants\".\"membership_version\">0"
+        },
+        "company_worker_company_version": {
+          "name": "company_worker_company_version",
+          "value": "\"company_worker_grants\".\"company_version\">0"
+        },
+        "company_worker_runner": {
+          "name": "company_worker_runner",
+          "value": "\"company_worker_grants\".\"runner\" IN ('cloud','local')"
+        },
+        "company_worker_credential": {
+          "name": "company_worker_credential",
+          "value": "length(\"company_worker_grants\".\"credential_sha256\")=64"
+        },
+        "company_worker_status": {
+          "name": "company_worker_status",
+          "value": "\"company_worker_grants\".\"status\" IN ('active','revoked')"
+        },
+        "company_worker_version": {
+          "name": "company_worker_version",
+          "value": "\"company_worker_grants\".\"grant_version\">0"
+        }
+      }
     },
     "customer_contacts": {
       "name": "customer_contacts",
@@ -2347,6 +2512,34 @@
     "gmail_flows": {
       "name": "gmail_flows",
       "columns": {
+        "company_id": {
+          "name": "company_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "company_actor_id": {
+          "name": "company_actor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "company_context_version": {
+          "name": "company_context_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "company_membership_version": {
+          "name": "company_membership_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "state_hash": {
           "name": "state_hash",
           "type": "text",

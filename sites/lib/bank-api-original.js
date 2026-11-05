@@ -3,8 +3,10 @@ import {bytesToHex} from '@noble/hashes/utils.js';
 import {extractPaymentReferences,AIS_NULL_SCHEMA_VERSION} from './payment-references.js';
 import {referenceEvidenceCompatible} from './reference-evidence-compat.js';
 import {apiPayerEvidence} from './payer-evidence.js';
+import {normalizeOpenPaymentsWorkspaceRows} from './banking/openpayments-normalization.js';
 
 export const BANK_API_ORIGINAL_VERSION='bank-api-original-v1';
+export const OPENPAYMENTS_ORIGINAL_VERSION='openpayments-response-v1';
 const encoder=new TextEncoder(),cache=new WeakMap();
 const record=value=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const text=value=>typeof value==='string'?value.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,'').trim():'';
@@ -15,7 +17,7 @@ const missing='Bankoriginalet saknar ett verifierbart ankomstkvitto. Hämta bank
 const changed='Bankoriginalets kontrollsumma stämmer inte. Bevara underlaget och granska bankuppgifterna innan nya matchningar.';
 const inconsistent='Bankuppgifterna stämmer inte med det bevarade API-originalet. Granska originalet och eventuell separat manuell komplettering.';
 
-export function hasBankApiOrigin(transaction){return transaction?.evidence==='bank_api'||typeof transaction?.source==='string'&&transaction.source.startsWith('Enable Banking')||transaction?.bankDataVersion!==undefined||transaction?.bankDataSha256!==undefined;}
+export function hasBankApiOrigin(transaction){return transaction?.evidence==='bank_api'||typeof transaction?.source==='string'&&(transaction.source.startsWith('Enable Banking')||transaction.source.startsWith('Open Payments'))||transaction?.bankDataVersion!==undefined||transaction?.bankDataSha256!==undefined;}
 /** A checksum of the retained provider JSON representation, not the HTTP wire format.
  * Re-serialize before cache reuse: an in-place mutation must never inherit trust. */
 export function bankApiDataHash(raw){
@@ -41,8 +43,9 @@ export function bankApiOriginalIssue(transaction,isCollection,collectionNotice){
  if(!hasBankApiOrigin(transaction))return '';
  const raw=transaction.bankData;
  if(!record(raw))return missing;
- if(transaction.bankDataVersion!==BANK_API_ORIGINAL_VERSION||typeof transaction.bankDataSha256!=='string'||!/^[a-f0-9]{64}$/i.test(transaction.bankDataSha256))return missing;
+ if(![BANK_API_ORIGINAL_VERSION,OPENPAYMENTS_ORIGINAL_VERSION].includes(transaction.bankDataVersion)||typeof transaction.bankDataSha256!=='string'||!/^[a-f0-9]{64}$/i.test(transaction.bankDataSha256))return missing;
  if(bankApiDataHash(raw)!==transaction.bankDataSha256.toLowerCase())return changed;
+ if(transaction.bankDataVersion===OPENPAYMENTS_ORIGINAL_VERSION)return openPaymentsOriginalIssue(transaction);
  const amount=amountOf(raw),date=text(raw.booking_date)||text(raw.value_date),original=transaction.original;
  if(raw.status!=='BOOK'||amount===null||!validDate(date)||!record(original)||transaction.currency!=='SEK')return inconsistent;
  const bankParty=record(raw[amount>0?'debtor':'creditor'])?text(raw[amount>0?'debtor':'creditor'].name):'';
@@ -78,6 +81,21 @@ export function bankApiReceiptState(transaction){
  if(!hasBankApiOrigin(transaction))return 'not_api';
  if(transaction.bankDataSha256===undefined&&transaction.bankDataVersion===undefined)return 'without_receipt';
  const raw=transaction.bankData;
- if(!record(raw)||!Object.keys(raw).length||transaction.bankDataVersion!==BANK_API_ORIGINAL_VERSION||typeof transaction.bankDataSha256!=='string'||!/^[a-f0-9]{64}$/i.test(transaction.bankDataSha256)||bankApiDataHash(raw)!==transaction.bankDataSha256.toLowerCase())return 'invalid';
+ if(!record(raw)||!Object.keys(raw).length||![BANK_API_ORIGINAL_VERSION,OPENPAYMENTS_ORIGINAL_VERSION].includes(transaction.bankDataVersion)||typeof transaction.bankDataSha256!=='string'||!/^[a-f0-9]{64}$/i.test(transaction.bankDataSha256)||bankApiDataHash(raw)!==transaction.bankDataSha256.toLowerCase())return 'invalid';
  return 'checked';
+}
+
+/** Provider-specific tuple check. Receipt integrity is separate from current
+ * account authority and permission to allocate; no Enable Banking fields are
+ * invented and a bank lookup ID never becomes a stable entry reference. */
+function openPaymentsOriginalIssue(transaction){
+ const original=transaction.original;if(!record(original))return inconsistent;
+ let observed;try{observed=normalizeOpenPaymentsWorkspaceRows([transaction.bankData],{account:original.account,dateFrom:transaction.bankData.bookingDate,dateTo:transaction.bankData.bookingDate})[0];}catch{return inconsistent;}
+ for(const field of ['amount','date','description','account','bankReference'])if(original[field]!==observed[field]||transaction[field]!==observed[field])return inconsistent;
+ if(transaction.currency!=='SEK'||transaction.externalId!==observed.externalId||original.party!==observed.party||original.payerReference!==observed.payerReference||observed.kind==='batch'&&transaction.kind!=='batch'||observed.kind!=='batch'&&!['unknown','payment'].includes(transaction.kind))return inconsistent;
+ if(transaction.organizationNumber||JSON.stringify(transaction.payerEvidence)!==JSON.stringify(observed.payerEvidence)||!referenceEvidenceCompatible(transaction.referenceEvidence,observed.referenceEvidence))return inconsistent;
+ const manual=transaction.verification;
+ if(manual){if(!record(manual)||!text(manual.note)||!Number.isFinite(Date.parse(manual.at))||transaction.party!==manual.party||transaction.payerReference!==manual.payerReference)return inconsistent;}
+ else if(transaction.party!==observed.party||transaction.payerReference!==observed.payerReference)return inconsistent;
+ return '';
 }
