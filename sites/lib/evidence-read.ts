@@ -175,11 +175,12 @@ export async function readRetainedReportEvidence(input:unknown){
  if(docs.results.length>1)return response({...base,ambiguous:true,complete:false,integrity:'not_checked',documentIds:docs.results.map(d=>d.id),rows:[],outputLimited:false});
  const document=docs.results[0],historyOffset=(args.historyOffset??0) as number,historyLimit=(args.historyLimit??10) as number;
  const receipts=await reportReceiptSnapshot(user.userId,document.id,historyOffset,historyLimit);
- const fresh=await bankgiroRetainedPreview(user.userId,docs.results[0].id,targetId),rows=fresh.rows.slice(args.offset,args.offset+args.limit).map((row:any,index:number)=>({rowIndex:args.offset+index,date:row.date,amountCents:row.amount,currency:row.currency,party:row.party,payerReference:row.payerReference,bankReference:row.bankReference,parentBankReference:row.parentBankReference,referenceEvidence:row.referenceEvidence,organizationNumber:row.organizationNumber,accountIssue:row.bankgiroAccountIssue||'',accountVerified:!row.bankgiroAccountIssue,registry:registry(state,row.payerReference)})),next=args.offset+rows.length<fresh.rows.length?args.offset+rows.length:null,snapshotCurrent=await snapshotStillCurrent(user.userId,revision);
+ const fresh=await bankgiroRetainedPreview(user.userId,docs.results[0].id,targetId),rows=fresh.rows.slice(args.offset,args.offset+args.limit).map((row:any,index:number)=>({rowIndex:args.offset+index,date:row.date,amountCents:row.amount,currency:row.currency,party:row.party,payerReference:row.payerReference,bankReference:row.bankReference,parentBankReference:row.parentBankReference,referenceEvidence:row.referenceEvidence,organizationNumber:row.organizationNumber,accountIssue:row.bankgiroAccountIssue||'',accountVerified:!row.bankgiroAccountIssue,registry:registry(state,row.payerReference)})),next=args.offset+rows.length<fresh.rows.length?args.offset+rows.length:null;
  const [latestDocument,latestReceipts]=await Promise.all([
   db().prepare('SELECT id,size,sha256,created_at FROM documents WHERE owner=? AND id=?').bind(user.userId,document.id).first<ReportDocument>(),
   reportReceiptSnapshot(user.userId,document.id,historyOffset,historyLimit),
  ]);
+ const snapshotCurrent=await snapshotStillCurrent(user.userId,revision);
  const provenance=reportProvenance(state,document,receipts,historyOffset,historyLimit);
  provenance.snapshotCurrent=snapshotCurrent&&document.sha256===fresh.hash&&JSON.stringify(latestDocument)===JSON.stringify(document)&&JSON.stringify(receipts)===JSON.stringify(latestReceipts);
  provenance.complete&&=provenance.snapshotCurrent;

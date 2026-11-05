@@ -57,6 +57,35 @@ test('retained provenance marks a changed receipt snapshot incomplete while rema
  const {out}=await f.call('retained_report_evidence',{documentId:docId});assert.ok(out.provenance);assert.equal(out.provenance.snapshotCurrent,false);assert.equal(out.provenance.complete,false);assert.equal(out.complete,false);assert.equal(out.changed,false);
 });
 
+test('retained history detects a workspace change during its final receipt snapshot',async t=>{
+ const f=await fixture(t);addReportHistory(f);
+ const prepare=f.env.DB.prepare;let receiptReads=0,afterConcurrentWrite;
+ f.env.DB.prepare=statement=>{
+  const prepared=prepare(statement);
+  return {bind(...args){
+   const bound=prepared.bind(...args);
+   return {...bound,async all(){
+    const result=await bound.all();
+    if(statement.includes('FROM bankgiro_ingest_jobs')&&++receiptReads===2){
+     const next=structuredClone(f.state);
+     next.imports.push({id:'concurrent-import',hash:f.hash,account:iban,name:'Concurrent.csv',count:1,createdAt:'2026-11-05',documentId:docId});
+     f.sql.prepare('UPDATE workspaces SET revision=revision+1,payload=? WHERE owner=?').run(JSON.stringify(next),f.owner);
+     afterConcurrentWrite=f.snapshot();
+    }
+    return result;
+   }};
+  }};
+ };
+ const {out,body}=await f.call('retained_report_evidence',{documentId:docId});assert.ok(out,JSON.stringify(body));
+ const current=f.sql.prepare('SELECT revision,payload FROM workspaces WHERE owner=?').get(f.owner);
+ assert.equal(current.revision,8);assert.equal(out.revision,7);
+ assert.equal(JSON.parse(current.payload).imports.filter(row=>row.documentId===docId).length,1);
+ assert.equal(out.provenance.imports.total,0,'the retained response describes the earlier workspace');
+ assert.equal(out.snapshotCurrent,false,'the final awaited history reads must remain inside the workspace revision check');
+ assert.equal(out.provenance.snapshotCurrent,false);assert.equal(out.provenance.complete,false);assert.equal(out.complete,false);
+ assert.equal(out.changed,false);assert.equal(f.snapshot(),afterConcurrentWrite,'the reader must not add mutations beyond the simulated concurrent writer');
+});
+
 test('retained provenance preserves manual and revoked source decisions separately from bank identity',async t=>{
  const f=await fixture(t),tx=f.state.transactions[2];f.state.bankgiroLinks=[{id:'manual-history',method:'manual_review',transactionId:tx.id,specificationIds:[],documentId:docId,sha256:f.hash,note:'private-source-note',dateDifferenceNote:'private-date-note',createdAt:'2026-11-01',transactionSnapshot:'private-target-snapshot',specificationSnapshots:{},revokedAt:'2026-11-02',revocationNote:'private-revocation-note'}];f.save();
  const before=f.snapshot(),{out}=await f.call('retained_report_evidence',{documentId:docId});assert.equal(out.provenance.sourceLinks.total,1);assert.equal(out.provenance.sourceLinks.items[0].method,'manual_review');assert.equal(out.provenance.sourceLinks.items[0].revokedAt,'2026-11-02');assert.equal(out.provenance.allocations.total,0);assert.equal(out.provenance.invoiceRelationshipVerified,false);assert.equal(out.targetRelationProved,false);assert.doesNotMatch(JSON.stringify(out),/private-/);assert.equal(f.snapshot(),before);
