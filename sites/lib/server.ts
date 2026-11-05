@@ -9,6 +9,62 @@ type User=NonNullable<Awaited<ReturnType<typeof getChatGPTUser>>>;
 type RequestCompany={request:Request;scope?:CompanyScope;pending?:Promise<CompanyScope>;user?:User;catalogue?:boolean};
 const requests=new AsyncLocalStorage<RequestCompany>();
 const denied=(code:string,status=403)=>Object.assign(Error(code),{code,status});
+const bodyFailures:Record<string,{status:number;message:string}>={
+ REQUEST_BODY_TOO_LARGE:{status:413,message:'Förfrågan är för stor. Dela upp underlaget och försök igen.'},
+ REQUEST_BODY_TIMEOUT:{status:408,message:'Överföringen tog för lång tid. Försök igen.'},
+ REQUEST_BODY_INVALID:{status:400,message:'Förfrågans storlek är ogiltig.'},
+ REQUEST_BODY_UNREADABLE:{status:400,message:'Förfrågan kunde inte läsas. Försök igen.'},
+};
+const boundedRequests=new WeakSet<Request>();
+/** Bound the original stream before authorization or framework code can clone
+ * it. Pull lazily: an anonymous upload rejected by identity must not be read. */
+function boundedRequest(req:Request):Request{
+ const path=new URL(req.url).pathname;
+ if(boundedRequests.has(req)||['GET','HEAD'].includes(req.method)||!path.startsWith('/api/')&&path!=='/mcp')return req;
+ const max=path==='/api/files'?16_000_000:path==='/api/state'?1_500_000:path==='/api/ocr-worker/complete'?350_000:65_536;
+ const length=req.headers.get('content-length');
+ if(length!==null&&(!/^\d+$/.test(length)||!Number.isSafeInteger(Number(length)))){
+  throw denied('REQUEST_BODY_INVALID',400);
+ }
+ if(length!==null&&Number(length)>max)throw denied('REQUEST_BODY_TOO_LARGE',413);
+ if(!req.body)return req;
+ const reader=req.body.getReader();let total=0,finished=false,timer:ReturnType<typeof setTimeout>|undefined;
+ let controller:ReadableStreamDefaultController<Uint8Array>;
+ const timeout=max>65_536?120_000:30_000;
+ const cleanup=()=>{if(timer!==undefined)clearTimeout(timer);req.signal.removeEventListener('abort',abort);};
+ const cancelReader=()=>{void reader.cancel().catch(()=>{}).finally(()=>reader.releaseLock());};
+ const stop=(code:string)=>{if(finished)return;finished=true;cleanup();controller.error(denied(code,bodyFailures[code].status));cancelReader();};
+ const abort=()=>stop('REQUEST_BODY_UNREADABLE');
+ const body=new ReadableStream<Uint8Array>({
+  start(value){controller=value;req.signal.addEventListener('abort',abort,{once:true});if(req.signal.aborted)abort();},
+  async pull(){
+   if(finished)return;
+   timer??=setTimeout(()=>stop('REQUEST_BODY_TIMEOUT'),timeout);
+   try{
+    const next=await reader.read();if(finished)return;
+    if(next.done){finished=true;cleanup();reader.releaseLock();controller.close();return;}
+    total+=next.value.byteLength;
+    if(total>max){stop('REQUEST_BODY_TOO_LARGE');return;}
+    controller.enqueue(next.value);
+   }catch{stop('REQUEST_BODY_UNREADABLE');}
+  },
+  cancel(){
+   if(finished)return;finished=true;cleanup();
+   // Before the first pull, the platform still owns the unread incoming body.
+   // Do not start/cancel an upstream multipart encoder as a side effect of an
+   // authorization denial. Once reading starts, explicitly stop its remainder.
+   if(timer===undefined)reader.releaseLock();else cancelReader();
+  },
+ },{highWaterMark:0});
+ const result=new Request(req,{body,duplex:'half'} as RequestInit);boundedRequests.add(result);return result;
+}
+async function authorizationBody(req:Request){
+ try{return await req.clone().json();}catch(error){
+  // A size/timeout error is an admission failure, never an unclassified command.
+  if(error instanceof Error&&Object.hasOwn(bodyFailures,error.message))throw error;
+  return null;
+ }
+}
 function rawDatabase(){if(!env.DB)throw new Error("Databasen är inte tillgänglig. Försök igen om en stund.");return env.DB;}
 function sameOrigin(req:Request){if(req.method!=='GET'&&req.method!=='HEAD'){const origin=req.headers.get('origin');if(!origin||origin!==new URL(req.url).origin)throw new Error('ORIGIN_DENIED');}}
 function companyHeaders():Record<string,string>{const c=currentCompanyContext();return c?{'X-Company-Id':c.companyId,'X-Company-Context-Version':String(c.contextVersion)}:{};}
@@ -27,10 +83,10 @@ async function actionFor(req?:Request):Promise<CompanyAction>{
  if(!req)return'read';const path=new URL(req.url).pathname;
  if(/\/api\/bank\/(?:config|connect|callback|disconnect|accounts|automatic|auto-sync|sync|details|account-evidence|revalidate)$/.test(path)||/\/api\/gmail\/(?:connect|callback|disconnect|automation|trust|sync)$/.test(path)||/\/api\/bankgiro\/(?:source\/run|invoice-search)$/.test(path)||req.method==='POST'&&/^\/api\/payment-control\/(?:run|advance)$/.test(path))return'manage_integrations';
  if(path==='/api/state'&&req.method==='POST'){
-  const body=await req.clone().json().catch(()=>null) as {command?:{type?:string}}|null;if(body?.command?.type==='settings.save')return Object.hasOwn(body.command,'invoiceReferencePolicies')?'manage_reference_policy':'manage_company';
+  const body=await authorizationBody(req) as {command?:{type?:string}}|null;if(body?.command?.type==='settings.save')return Object.hasOwn(body.command,'invoiceReferencePolicies')?'manage_reference_policy':'manage_company';
  }
  if(path==='/mcp'){
-  const body=await req.clone().json().catch(()=>null) as {method?:string;params?:{name?:string}}|null,name=body?.params?.name||'';
+  const body=await authorizationBody(req) as {method?:string;params?:{name?:string}}|null,name=body?.params?.name||'';
   if(body?.method==='tools/call'&&['bank_auto_sync','bank_account_evidence','bank_revalidate_consent','bankgiro_auto_ingest','gmail_auto_sync'].includes(name))return'manage_integrations';
   return body?.method==='tools/call'&&!['payment_evidence','retained_report_evidence','backup_status','bankgiro_source_status','gmail_sync_status','bank_auto_sync_status'].includes(name)?'write':'read';
  }
@@ -79,11 +135,15 @@ async function requestScope(holder=requests.getStore()){
 /** Install before dispatch. Resolution happens inside Next's trusted-header
  * context, and the same holder follows every awaited operation and response. */
 export function withCompanyRequest<Args extends unknown[]>(handler:(req:Request,...args:Args)=>Promise<Response>){
- return async(req:Request,...args:Args):Promise<Response>=>requests.run({request:(new URL(req.url).pathname==='/mcp'?req.clone():req) as Request},async()=>{
+ return async(req:Request,...args:Args):Promise<Response>=>{
+  try{req=boundedRequest(req);}catch(error){return failure(error);}
+  return requests.run({request:(new URL(req.url).pathname==='/mcp'?req.clone():req) as Request},async()=>{
   const holder=requests.getStore()!;
   try{const result=await handler(req,...args);if(holder.pending){const scope=await holder.pending;await assertScopeCurrent(rawDatabase(),scope);for(const [key,value]of Object.entries(companyHeaders()))result.headers.set(key,value);}return result;}
   catch(error){return failure(error);}
+  finally{if(!req.bodyUsed)void req.body?.cancel().catch(()=>{});if(holder.request!==req&&!holder.request.bodyUsed)void holder.request.body?.cancel().catch(()=>{});}
  });
+ };
 }
 export async function identity(req?:Request){
  if(req)sameOrigin(req);const holder=requests.getStore(),scope=await requestScope(holder);await assertScopeCurrent(rawDatabase(),scope);
@@ -156,4 +216,4 @@ export async function readBankFileOriginal(owner:string,command:Record<string,an
  else{const parsed=parseCSV(text);mapping=command.mapping??guessMapping(parsed.headers);rows=mapCSV(parsed,mapping,doc.filename);}
  return {...command,rows:rows.map(row=>({...row,verified:false})),hash:doc.sha256,name:doc.filename,mapping,trustedBankImport:false,trustedBankFileImport:true};
 }
-export function failure(error:unknown){const message=error instanceof Error?error.message:'Åtgärden misslyckades.';if(message==='AUTH_REQUIRED')return response({error:'Logga in med ChatGPT för att öppna dina sparade uppgifter.',signIn:'/signin-with-chatgpt?return_to=%2F'},401);if(message==='ORIGIN_DENIED')return response({error:'Åtgärden måste göras från systemets egen sida.'},403);if(message.startsWith('COMPANY_')){const e=error as Error&{status?:number};const stale=['COMPANY_CONTEXT_STALE','COMPANY_CONTEXT_REQUIRED'].includes(message);const result=response({error:stale?'Företagskontexten har ändrats. Välj företag igen.':'Du saknar behörighet för den här företagsåtgärden.',code:message},e.status??(stale?409:403));if(stale)result.headers.set('X-Company-Context-Stale','1');return result;}if(message==='WORKER_AUTH')return response({error:'Åtkomst nekad.'},401);if(/SQLITE|D1_|R2_|constraint|syntax error|no such table/i.test(message))return response({error:'Uppgifterna kunde inte sparas. Försök igen, eller kontakta administratören.'},500);return response({error:message},400);}
+export function failure(error:unknown){const message=error instanceof Error?error.message:'Åtgärden misslyckades.';if(Object.hasOwn(bodyFailures,message)){const safe=bodyFailures[message];return response({error:safe.message,code:message},safe.status);}if(message==='AUTH_REQUIRED')return response({error:'Logga in med ChatGPT för att öppna dina sparade uppgifter.',signIn:'/signin-with-chatgpt?return_to=%2F'},401);if(message==='ORIGIN_DENIED')return response({error:'Åtgärden måste göras från systemets egen sida.'},403);if(message.startsWith('COMPANY_')){const e=error as Error&{status?:number};const stale=['COMPANY_CONTEXT_STALE','COMPANY_CONTEXT_REQUIRED'].includes(message);const result=response({error:stale?'Företagskontexten har ändrats. Välj företag igen.':'Du saknar behörighet för den här företagsåtgärden.',code:message},e.status??(stale?409:403));if(stale)result.headers.set('X-Company-Context-Stale','1');return result;}if(message==='WORKER_AUTH')return response({error:'Åtkomst nekad.'},401);if(/SQLITE|D1_|R2_|constraint|syntax error|no such table/i.test(message))return response({error:'Uppgifterna kunde inte sparas. Försök igen, eller kontakta administratören.'},500);return response({error:message},400);}

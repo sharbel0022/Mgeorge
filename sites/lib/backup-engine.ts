@@ -162,7 +162,7 @@ export function validateSnapshot(value:any,owner:string,expectedCompanyBoundary?
  const workspace=value.tables.find((t:Row)=>t.name==='workspaces').rows;if(workspace.length>1)throw Error('backup_snapshot_invalid');
  for(const row of workspace){const state=JSON.parse(row.payload);if(!Array.isArray(state.invoices)||!Array.isArray(state.transactions)||!Array.isArray(state.allocations))throw Error('backup_snapshot_invalid');}
  const files=value.tables.find((t:Row)=>t.name==='documents').rows;
- if(files.some((f:Row)=>!/^[a-f0-9-]{36}$/i.test(f.id)||!Number.isSafeInteger(f.size)||f.size<0||f.size>15_000_000||!/^[a-f0-9]{64}$/i.test(f.sha256))||new Set(files.map((f:Row)=>f.id)).size!==files.length)throw Error('backup_document_invalid');
+ if(files.some((f:Row)=>!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(f.id)||!Number.isSafeInteger(f.size)||f.size<0||f.size>15_000_000||!/^[a-f0-9]{64}$/i.test(f.sha256))||new Set(files.map((f:Row)=>f.id)).size!==files.length)throw Error('backup_document_invalid');
  snapshotDocumentReferences(value.tables,new Map(files.map((f:Row)=>[f.id,f])));
  snapshotCompanySync(value.tables);
  const apiEvidence=snapshotApiEvidence(value.tables);

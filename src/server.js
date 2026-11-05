@@ -11,6 +11,7 @@ import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import {createLoginRateLimiter} from './login-rate-limit.js';
 import {createCompanyRuntime,readCompanyDatabaseBoundary} from './company-runtime.js';
 import {assertCompanyContext,companyCacheKey} from '../sites/lib/company-contract.js';
 import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
@@ -52,6 +53,7 @@ function config(){
 }
 const check=config();
 const controlDb=openDatabase();
+const loginLimiter=createLoginRateLimiter(controlDb);
 const companyRuntime=createCompanyRuntime({controlDb,legacyDatabasePath:process.env.DB_PATH||'./data/mgeorge.sqlite',companyDirectory:process.env.MG_COMPANY_DIRECTORY,legacyPrincipal:check.secure?'administrator':'local-admin'});
 const db=companyRuntime.db;
 configureBankCompanyContext(()=>companyRuntime.current());
@@ -134,7 +136,6 @@ function ensureBrowserSession(req,res){
   req.browserSession=session;
   res.setHeader('Set-Cookie',sessionCookie(session,check.secure));
 }
-const loginAttempts=new Map();
 /** Kontrollerar varifrån ändringsanropet kommer för att motverka CSRF och otillåtna webbplatser. */
 function checkOrigin(req){
   const origin=req.headers.origin;
@@ -645,18 +646,17 @@ async function route(req,res){
   }
   if(req.method!=='GET')checkOrigin(req);
   if(path==='/api/login'&&req.method==='POST'&&check.secure){
+    // Refuse an exhausted account before reading another client body.
+    loginLimiter.check();
     // Login is unauthenticated and never uploads originals. Do not give it the
     // 22 MB document-import budget before the existing password/rate checks.
     const b=await readBody(req,{authenticated:false,maxBytes:8_192});
-    const now=Date.now(),address=req.socket.remoteAddress;
-    const attempt=loginAttempts.get(address);
-    if(attempt&&attempt.until>now&&attempt.count>=5)throw bad(429,'För många inloggningsförsök. Försök igen om 15 minuter.');
-    // No await between reading, checking and reserving this address's attempt.
-    loginAttempts.set(address,{count:attempt?.until>now?attempt.count+1:1,until:attempt?.until>now?attempt.until:now+900000});
+    const now=Date.now();
+    loginLimiter.reserve();
     if(typeof b.password!=='string'||b.password.length>1024||!verifyPassword(b.password,check.adminHash)){
       throw bad(401,'Felaktigt lösenord');
     }
-    loginAttempts.delete(address);controlDb.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
+    loginLimiter.clear();controlDb.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
     const value=token();controlDb.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
     return json(res,200,{authenticated:true},{'Set-Cookie':sessionCookie(value,true)});
   }

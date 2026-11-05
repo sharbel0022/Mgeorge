@@ -53,6 +53,40 @@ Slutlig integrerad kod `5f71a3c` har **2 013 Node + 3 938 Sites + 47 bridge = 5 
 
 Riktade RED/GREEN-prov och slutliga helgrindar redovisas i bankrapporten; syntetiska tester är inte produktionsacceptans. [PR #45](https://github.com/sharbel0022/Mgeorge/pull/45) går från `feature/95-bank` till main. Färsk status 18:21 UTC är fortsatt `connected=false`, senaste lyckade hämtning 08:05 UTC. Historiskt `BANK_ACCOUNT_SCOPE_INVALID` är styrkt; exakt då underkänt kontopredikat är okänt. Ingen verklig bankhämtning, betalning, ny signering, produktionsskrivning eller Sites-publicering har utförts. Bankområdenas 8,5/8,0 och totalsumman **255/330 = 7,73** behålls tills externa behörigheter och verklig acceptans kan styrkas.
 
+## Agent 7 — säkerhet och driftsäkerhet, 2026-11-05
+
+Branch `feature/95-security`, bas `4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5`.
+[Säkerhetsrapport och graderat riskregister](docs/SECURITY-95-REVIEW.md),
+[exakta lokala grindar](docs/security-95/gates.json) och
+[oberoende granskning](docs/security-95/independent-review.md).
+
+Fem avgränsade förbättringar har RED/GREEN-bevis: beständig och atomisk
+inloggningsbudget i kontrollens SQLite-databas, faktiska byte-/tidsgränser före
+Sites requestkloner, minimerade auditposter från accepterade domänuppgifter,
+enhetligt UUID-format mellan backup och recovery samt testbarn utan ärvda
+`NODE_OPTIONS`. Original, avvisade bankkonflikter och ekonomiska
+granskningsanteckningar bevaras.
+
+Slutliga lokala helsviter: **1 905 Node + 3 776 Sites + 47 brygga = 5 728
+godkända**, 0 fail/skip/cancel/TODO. 26 nya regressioner ingår. Syntax173,
+typer, exakt minimatch-mitigering, high-auditgrindar och produktionsbygge är
+godkända. Fokuserad acceptans **331 + 767 = 1 098/1 098** och oberoende
+review **81/81** överlappar helsviterna. Två upptäckta regressions-/miljöförsök
+och den avbrutna första Sites-körningen redovisas öppet i rapporten.
+
+Rootens hela beroendegraf samt Sites och bryggans produktionsgrafer har noll
+auditfynd. Sites utvecklingsgraf har åtta moderate paketposter från **en**
+minimatch-advisory; installerad befintlig backport är verifierad. Inga paket,
+lockfiler, produktionsscheman eller credentials ändras. Lokala Node24-kvitton
+och Node22-PR-CI ska hållas åtskilda.
+
+**Målet 9,5/10 är inte styrkt.** Nyckellivscykel, aktuell fullständig
+katastrofåterställning och kommersiella dataskyddsprocesser kräver operativa
+acceptansbevis. Dessa luckor är inte påståenden om demonstrerade High-angrepp.
+Inga banker/leverantörer har penetrationstestats och ingen produktionsdata har
+återställts eller raderats. Alla 33 numeriska poäng behålls:
+**255/330 = 7,73/10; 0/33 ≥9,5**. PR:n innebär kodleverans, ingen publicering.
+
 ## Agent 7 — SaaS-säkerhet och acceptans, 2026-11-04
 
 Branch `feature/saas-security-acceptance`, bas `14a042abd37fa455d08da9dfcc096ef4f603b512`. [Riskmatris, testkvitto, regulatoriskt beslutsunderlag och nio lanseringsgrindar](docs/integration/saas/security-acceptance.md).

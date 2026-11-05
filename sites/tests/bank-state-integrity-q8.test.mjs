@@ -57,9 +57,37 @@ test('Q8: a manual match undo remains undone through automatic reconciliation an
  assert.equal(available(result.body.state,result.body.state.transactions[0]),62500);
  assert.equal(result.body.state.allocations[0].active,false);
  assert.ok(result.body.state.allocations[0].reversedAt);
+ const audit=JSON.parse(f.sql.prepare('SELECT detail FROM audit_events').get().detail);
+ assert.equal(audit.command.id,previous.id);assert.equal(audit.command.note,command.note);assert.equal(audit.command.transactionId,previous.transactionId);
  const again=await f.post();assert.equal(again.response.status,200);assert.equal(again.body.state.allocations.filter(a=>a.active).length,0);
  const replay=await f.post(command,{revision:1,requestId});assert.equal(replay.response.status,200);assert.equal(replay.body.revision,3);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,2);
  assert.deepEqual(f.read().state.allocations,again.body.state.allocations);
+});
+
+test('accepted settings changes do not copy unused credential fields into audit history',async t=>{
+ const f=await fixture(t,emptyState()),result=await f.post({type:'settings.save',name:'Synthetic company',email:'synthetic@example.test',password:'synthetic-unused-password',headers:{Authorization:'Bearer synthetic-unused-token'},debug:{private:'synthetic-unused-payload'}});
+ assert.equal(result.response.status,200);assert.equal(f.read().state.company.name,'Synthetic company');
+ const row=f.sql.prepare('SELECT detail FROM audit_events').get(),detail=JSON.parse(row.detail);
+ assert.doesNotMatch(row.detail,/synthetic-unused|Authorization|password/);
+ assert.equal(detail.command.type,'settings.save');
+ assert.deepEqual(detail.command.settings,{name:'Synthetic company',email:'synthetic@example.test'});
+});
+
+test('invoice audit records the accepted invoice and excludes unused nested input fields',async t=>{
+ const f=await fixture(t,emptyState()),result=await f.post({type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic customer AB',number:'000018',total:62500,issued:'2026-10-01',due:'2026-10-30',reviewed:true,note:'Approved synthetic business note',access_token:'synthetic-unused-invoice-token',rawText:'synthetic-unused-ocr-debug'}});
+ assert.equal(result.response.status,200);const saved=f.read().state.invoices[0];
+ const row=f.sql.prepare('SELECT detail FROM audit_events').get(),detail=JSON.parse(row.detail);
+ assert.doesNotMatch(row.detail,/synthetic-unused|access_token|rawText/);
+ assert.equal(detail.command.invoice.id,saved.id);assert.equal(detail.command.invoice.total,62500);assert.equal(detail.command.invoice.number,'000018');assert.equal(detail.command.invoice.note,'Approved synthetic business note');
+});
+
+test('transaction import audit links accepted records instead of duplicating raw input rows',async t=>{
+ const f=await fixture(t,emptyState()),result=await f.post({type:'transactions.import',rows:[{date:'2026-10-26',amount:62500,currency:'SEK',account,party:'Synthetic customer AB',payerReference:'000018',bankReference:'AUDIT-1',privateTransport:{token:'synthetic-unused-row-token'}}]});
+ assert.equal(result.response.status,200);const saved=f.read().state;
+ const row=f.sql.prepare('SELECT detail FROM audit_events').get(),detail=JSON.parse(row.detail);
+ assert.equal(saved.transactions.length,1);assert.equal(saved.transactions[0].amount,62500);
+ assert.doesNotMatch(row.detail,/synthetic-unused|privateTransport/);assert.equal(detail.command.rows,undefined);
+ assert.equal(detail.command.rowCount,1);assert.equal(detail.command.imports[0].id,saved.imports[0].id);assert.equal(detail.command.imports[0].count,1);
 });
 
 test('Q8: an allocated payment cannot silently change its verified payer or reference',async t=>{
