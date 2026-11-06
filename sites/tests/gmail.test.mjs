@@ -235,9 +235,9 @@ test('Gmail automation: a lost observation receipt never reverses an accepted fe
     };
     return statement;
   };
-  const result=await(await f.api.gmailSync(undefined,true)).json();assert.equal(result.imported,1);assert.match(result.observation_warning,/körningskvitto/);
+  const result=await(await f.api.gmailSync(undefined,true)).json();assert.equal(result.imported,1);assert.match(result.observation_warning,/körningskvitto/);assert.equal(result.automation_receipt.persisted,false);assert.equal(result.automation_receipt.outcome,'completed');
   const status=await(await f.api.gmailStatus(true)).json();assert.ok(status.last_successful_fetch);assert.ok(status.schedule_observation.last_invoked_at);
-  assert.equal(status.schedule_observation.last_completed_at,null);assert.equal(status.schedule_observation.last_outcome,'running_or_interrupted');
+  assert.equal(status.schedule_observation.last_completed_at,null);assert.equal(status.schedule_observation.last_outcome,'running_or_interrupted');assert.equal(status.schedule_observation.last_run_id,result.automation_receipt.run_id);assert.equal(status.schedule_observation.last_finished_at,null);
   f.sql.prepare("UPDATE gmail_connections SET last_attempt='' ").run();await f.api.gmailSync(undefined,true);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM documents').get().n,1);
 });
@@ -988,4 +988,94 @@ test('reviewer: registered job preserves actual receipt and nonempty invoice lin
 test('reviewer: server PDF engine follows existing nonlocal route',async t=>{
  const f=await processingFixture(t);retryRow(f,{engine:'server_pdf'});
  assert.deepEqual((await retryMcp(f,{documentId:'retry-doc'})).result.structuredContent,{ok:true,requeued:true});assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'queued');
+});
+
+for(const status of ['needs_review','registered','rejected'])test('Gmail sync checks only encountered owner-scoped source IDs and preserves '+status+' deduplication',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const insert=f.sql.prepare('INSERT INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,?,?,?,?,?)');
+  for(let i=0;i<3000;i++)insert.run(f.owner,'historical-'+i,'','{}','rejected','2020-01-01');
+  insert.run(f.owner,'gmail:mg.vitvaror@gmail.com:archived:1','','{}',status,'2020-01-01');
+  const prepare=f.d1.prepare.bind(f.d1),lookups=[];
+  f.d1.prepare=query=>{
+    const statement=prepare(query);
+    if(/^SELECT source_id FROM gmail_sources/.test(query)){
+      assert.match(query,/owner=\? AND source_id IN \(/,'membership must not read the full historical source table');
+      const all=statement.all.bind(statement);
+      statement.all=async()=>{assert.equal(statement.args[0],f.owner);assert.ok(statement.args.length>1&&statement.args.length<=51);lookups.push([...statement.args]);return all();};
+    }
+    return statement;
+  };
+  const result=await(await f.api.gmailSync(post('sync'))).json();
+  assert.equal(result.imported,0);assert.equal(result.duplicates,1);assert.equal(f.attachmentCalls||0,0);
+  assert.deepEqual(lookups,[[f.owner,'gmail:mg.vitvaror@gmail.com:archived:1']]);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_sources').get().n,3001);
+});
+
+test('Gmail bounded source lookup does not let another owner suppress an original',async t=>{
+  const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  f.sql.prepare('INSERT INTO gmail_sources(owner,source_id,document_id,metadata,status,created_at) VALUES(?,?,?,?,?,?)').run('another-owner','gmail:mg.vitvaror@gmail.com:archived:1','','{}','registered','2020-01-01');
+  const result=await(await f.api.gmailSync(post('sync'))).json();
+  assert.equal(result.imported,1);assert.equal(result.duplicates,0);assert.equal(f.attachmentCalls,1);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM gmail_sources WHERE owner=?').get(f.owner).n,1);
+});
+
+test('Gmail scheduled receipt identifies exactly its persisted invocation and result, including not-due runs',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const first=await(await f.api.gmailSync(undefined,true)).json(),receipt=first.automation_receipt;
+  assert.ok(receipt);assert.equal(receipt.persisted,true);assert.equal(receipt.outcome,'completed');
+  const events=f.sql.prepare("SELECT action,detail,created_at FROM audit_events WHERE action LIKE 'gmail.automatic.%' ORDER BY rowid").all();
+  assert.equal(events.length,2);
+  assert.equal(JSON.parse(events[0].detail).run_id,receipt.run_id);assert.equal(events[0].created_at,receipt.invoked_at);
+  assert.equal(JSON.parse(events[1].detail).run_id,receipt.run_id);assert.equal(events[1].created_at,receipt.completed_at);
+  const second=await(await f.api.gmailSync(undefined,true)).json(),later=second.automation_receipt;
+  assert.equal(later.outcome,'not_due');assert.equal(later.persisted,true);assert.notEqual(later.run_id,receipt.run_id);
+  const observation=(await(await f.api.gmailStatus(true)).json()).schedule_observation;
+  assert.equal(observation.last_run_id,later.run_id);assert.equal(observation.last_invoked_at,later.invoked_at);
+  assert.equal(observation.last_finished_at,later.completed_at);assert.equal(observation.last_completed_at,receipt.completed_at);
+  assert.equal(observation.external_schedule_verified,false);
+});
+
+test('Gmail observation keeps an unfinished latest run separate from historical successful completion',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const insert=f.sql.prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,0,?,?,?)');
+  insert.run('old-invoke',f.owner,'gmail.automatic.invoked',JSON.stringify({run_id:'old-run'}),'2020-01-01T00:00:00.000Z');
+  insert.run('old-result',f.owner,'gmail.automatic.result',JSON.stringify({run_id:'old-run',outcome:'completed'}),'2020-01-01T00:01:00.000Z');
+  insert.run('latest-invoke',f.owner,'gmail.automatic.invoked',JSON.stringify({run_id:'latest-run'}),'2020-01-02T00:00:00.000Z');
+  const observation=(await(await f.api.gmailStatus(true)).json()).schedule_observation;
+  assert.equal(observation.last_run_id,'latest-run');assert.equal(observation.last_finished_at,null);
+  assert.equal(observation.last_completed_at,'2020-01-01T00:01:00.000Z');assert.equal(observation.last_outcome,'running_or_interrupted');
+  assert.equal(observation.external_schedule_verified,false);
+});
+
+test('Gmail scheduled failures retain their correlated safe receipt through the error response',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());f.retryAfter='3600';
+  let failure;
+  await assert.rejects(async()=>{try{await f.api.gmailSync(undefined,true);}catch(error){failure=error;throw error;}},error=>error.code==='rate_limited');
+  const response=f.api.gmailFailure(failure),body=await response.json(),receipt=body.automation_receipt;
+  assert.equal(response.status,429);assert.ok(receipt);assert.equal(receipt.outcome,'error');assert.equal(receipt.persisted,true);
+  const observation=(await(await f.api.gmailStatus(true)).json()).schedule_observation;
+  assert.equal(observation.last_run_id,receipt.run_id);assert.equal(observation.last_finished_at,receipt.completed_at);
+  assert.equal(observation.last_outcome,'error');assert.equal(observation.last_completed_at,null);
+  assert.doesNotMatch(JSON.stringify(body),/private-provider-secret|synthetic-access|synthetic-refresh/);
+});
+
+test('Gmail failed invocation persistence returns an unconfirmed receipt and prevents provider work',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  const prepare=f.d1.prepare.bind(f.d1),calls=f.providerCalls,before={...f.sql.prepare('SELECT * FROM gmail_connections').get()};
+  f.d1.prepare=query=>{
+    const statement=prepare(query),run=statement.run.bind(statement);
+    statement.run=async()=>{
+      if(query.startsWith('INSERT INTO audit_events')&&statement.args.includes('gmail.automatic.invoked'))throw Error('synthetic invocation storage outage');
+      return run();
+    };
+    return statement;
+  };
+  let failure;
+  await assert.rejects(async()=>{try{await f.api.gmailSync(undefined,true);}catch(error){failure=error;throw error;}});
+  const body=await f.api.gmailFailure(failure).json(),receipt=body.automation_receipt;
+  assert.ok(receipt);assert.equal(receipt.persisted,false);assert.equal(receipt.outcome,'error');
+  assert.ok(Number.isFinite(Date.parse(receipt.invoked_at)));assert.ok(Number.isFinite(Date.parse(receipt.completed_at)));
+  assert.equal(f.providerCalls,calls);assert.deepEqual({...f.sql.prepare('SELECT * FROM gmail_connections').get()},before);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM audit_events').get().n,0);
+  assert.doesNotMatch(JSON.stringify(body),/synthetic invocation storage outage/);
 });
