@@ -1,0 +1,9 @@
+{
+  "storage": "functions.store only; not a disk file or git commit",
+  "words": 3053,
+  "sourceCommit": "c5cdd0fe57d300ba40f6572cbbe39c7fce9397e7",
+  "resultSha256": "8957731b7f0f1ed9fed6bb53683b65cf352138e4b1f3f7fa0ee8f5980dfa2756",
+  "analysisCommit": null,
+  "completeGeometryVerified": false,
+  "proposedSyntheticTestsExecuted": false
+}

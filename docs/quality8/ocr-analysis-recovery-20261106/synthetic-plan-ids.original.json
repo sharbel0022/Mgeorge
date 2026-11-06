@@ -1,0 +1,11 @@
+{
+  "scope": "Synthetic fixture literals only; no registry/bank fact asserted; not parsed or used as product input",
+  "values": {
+    "organizationA": "5598042165",
+    "organizationB": "5598042173",
+    "referenceA": "00048215933",
+    "referenceB": "00048215941",
+    "bankgiroA": "81370462",
+    "bankgiroB": "82370560"
+  }
+}

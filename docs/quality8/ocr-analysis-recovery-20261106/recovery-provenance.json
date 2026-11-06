@@ -1,0 +1,192 @@
+{
+  "schema": "ocr-analysis-recovery/1",
+  "recoveryDate": "2026-11-06",
+  "recoveryKind": "Exact surviving session payloads plus new provenance; not full filesystem or Git restoration",
+  "authorization": {
+    "from": "root",
+    "scope": "New docs-only checkpoint branch; no PR/merge/deploy/product change/optics/V3",
+    "furtherInvestigationApproved": true,
+    "productChangesApproved": false
+  },
+  "githubTarget": {
+    "repository": "sharbel0022/Mgeorge",
+    "branch": "checkpoint/ocr-analysis-recovery-20261106-0532",
+    "baseCommit": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "baseTree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+    "baseMainRefReadBack": true,
+    "prefix": "docs/quality8/ocr-analysis-recovery-20261106"
+  },
+  "analysisSource": {
+    "commit": "c5cdd0fe57d300ba40f6572cbbe39c7fce9397e7",
+    "resultSha256": "8957731b7f0f1ed9fed6bb53683b65cf352138e4b1f3f7fa0ee8f5980dfa2756",
+    "localOpticalArchiveCommit": "2ca47860bd1dc587e0fec0a3dfbcedac8477a6fb",
+    "localOpticalReceiptSha256": "fe9b332ba9de45e77a74eefaabba20087fbff556ac326d8fa52d68b9fbd32bb1",
+    "sameAsGitHubBaseProduct": false,
+    "sourceOrResultBytesRestoredHere": false
+  },
+  "survivingOriginalKeys": [
+    {
+      "key": "ocr_known_wave5_readonly_report_sv_v1",
+      "present": true
+    },
+    {
+      "key": "ocr_known_wave5_readonly_evidence_checkpoint_v1",
+      "present": true
+    },
+    {
+      "key": "ocr_known_wave5_readonly_report_metadata_v1",
+      "present": true
+    },
+    {
+      "key": "ocr_known_wave5_synthetic_plan_ids_v1",
+      "present": true
+    }
+  ],
+  "preservedPayloads": [
+    {
+      "filename": "README.md",
+      "sha256": "2eb00b25582c7ccf0428d54add1e754861015106f0338017e31551b99ebadf67",
+      "utf8Bytes": 4933,
+      "sourceStoreKey": null,
+      "preservation": "New recovery explanation; original payloads not modified"
+    },
+    {
+      "filename": "analysis-report.original.sv.md",
+      "sha256": "fdbff4532afb2b8a641bc8b5199fd467950b42a9283eee5eb49e43a73e2ab1d6",
+      "utf8Bytes": 22742,
+      "sourceStoreKey": "ocr_known_wave5_readonly_report_sv_v1",
+      "preservation": "Exact stored string, no prefix/suffix/newline changes"
+    },
+    {
+      "filename": "evidence-checkpoint.original.json",
+      "sha256": "06b9d1265505c26b5af7d9b0a6377e1611e53d2bc6d908dbe8947cbc52d012f5",
+      "utf8Bytes": 12038,
+      "sourceStoreKey": "ocr_known_wave5_readonly_evidence_checkpoint_v1",
+      "preservation": "Original stored object, lossless new pretty-printed JSON serialization; no prior filesystem-byte identity claimed"
+    },
+    {
+      "filename": "analysis-metadata.original.json",
+      "sha256": "7ff8db74f1fdfe6929f45d6c282c56a7c2d1483d1d4e75c4ff8941d32f5616bc",
+      "utf8Bytes": 342,
+      "sourceStoreKey": "ocr_known_wave5_readonly_report_metadata_v1",
+      "preservation": "Original stored object, lossless new pretty-printed JSON serialization; no prior filesystem-byte identity claimed"
+    },
+    {
+      "filename": "synthetic-plan-ids.original.json",
+      "sha256": "5fb66434e17943154181781a21566ca2022474d9ff9694f756282236fc2027a4",
+      "utf8Bytes": 330,
+      "sourceStoreKey": "ocr_known_wave5_synthetic_plan_ids_v1",
+      "preservation": "Original stored object, lossless new pretty-printed JSON serialization; no prior filesystem-byte identity claimed"
+    }
+  ],
+  "unavailableOriginalArtifacts": [
+    {
+      "artifact": "Complete authorized optical result including producer observations and all outcomes",
+      "path": "/workspace/scratch/4d79ab4bea8e/ocr-qualification-wave5/docs/quality8/ocr-qualification-wave5/known-v2-psm3-c5cdd0-result.json",
+      "sha256": "8957731b7f0f1ed9fed6bb53683b65cf352138e4b1f3f7fa0ee8f5980dfa2756",
+      "localArchiveCommit": "2ca47860bd1dc587e0fec0a3dfbcedac8477a6fb",
+      "recoveredHere": false,
+      "status": "Previously locked local artifact; bytes unavailable during this recovery"
+    },
+    {
+      "artifact": "Optical evidence main receipt",
+      "path": "/workspace/scratch/4d79ab4bea8e/ocr-qualification-wave5/docs/quality8/ocr-qualification-wave5/optical-evidence/receipt.json",
+      "sha256": "fe9b332ba9de45e77a74eefaabba20087fbff556ac326d8fa52d68b9fbd32bb1",
+      "localArchiveCommit": "2ca47860bd1dc587e0fec0a3dfbcedac8477a6fb",
+      "recoveredHere": false,
+      "status": "Reviewer reported locked receipt; not newly fetched or rehashed here"
+    },
+    {
+      "artifact": "All 38 journal snapshots, exclusive claim and raw-hash archive",
+      "knownArchiveRoot": "/workspace/scratch/4d79ab4bea8e/ocr-qualification-wave5/docs/quality8/ocr-qualification-wave5/optical-evidence/",
+      "exactMemberPathsRecovered": false,
+      "originalJournalPathRecovered": false,
+      "localArchiveCommit": "2ca47860bd1dc587e0fec0a3dfbcedac8477a6fb",
+      "recoveredHere": false,
+      "status": "Reviewer previously verified archived and original journal; archive members and original journal are unavailable here, and this package does not reproduce them"
+    },
+    {
+      "artifact": "Field metrics and historical deltas",
+      "paths": [
+        "/workspace/scratch/4d79ab4bea8e/ocr-qualification-wave5/docs/quality8/ocr-qualification-wave5/optical-evidence/field-metrics.json",
+        "/workspace/scratch/4d79ab4bea8e/ocr-qualification-wave5/docs/quality8/ocr-qualification-wave5/optical-evidence/historical-deltas.json"
+      ],
+      "sha256": null,
+      "recoveredHere": false,
+      "status": "Paths supplied by independent reviewer; complete file bytes/hashes not available here"
+    },
+    {
+      "artifact": "Exact local analysis copy of result",
+      "path": "/workspace/scratch/4d79ab4bea8e/ocr-known-wave5-analysis/docs/quality8/ocr-known-wave5-missing-fields/input-result.json",
+      "sha256": "8957731b7f0f1ed9fed6bb53683b65cf352138e4b1f3f7fa0ee8f5980dfa2756",
+      "recoveredHere": false,
+      "status": "Known saved before interruption; not included as a full payload in this GitHub checkpoint"
+    },
+    {
+      "artifact": "Read-only geometry diagnostic script",
+      "path": "/workspace/scratch/4d79ab4bea8e/ocr-known-wave5-analysis/docs/quality8/ocr-known-wave5-missing-fields/geometry-diagnostics.mjs",
+      "sha256": null,
+      "recoveredHere": false,
+      "status": "Known saved before interruption; full script text and digest not recovered from memory"
+    },
+    {
+      "artifact": "Last diagnostic outputs and raw log",
+      "paths": [
+        "/workspace/scratch/4d79ab4bea8e/ocr-known-wave5-analysis/docs/quality8/ocr-known-wave5-missing-fields/raw-word-index.json",
+        "/workspace/scratch/4d79ab4bea8e/ocr-known-wave5-analysis/docs/quality8/ocr-known-wave5-missing-fields/geometry-diagnostics.json",
+        "/tmp/quality8-wave5-readonly-geometry.log"
+      ],
+      "sha256": null,
+      "recoveredHere": false,
+      "status": "Existence/completion not confirmed after interruption; no RED/GREEN or complete geometry claim"
+    },
+    {
+      "artifact": "Actual analyzed product, local Git objects, exact qualification binding, raw input images, fixtures and original runner/protocol evidence",
+      "sourceCommit": "c5cdd0fe57d300ba40f6572cbbe39c7fce9397e7",
+      "worktree": "/workspace/scratch/4d79ab4bea8e/ocr-qualification-wave5",
+      "recoveredHere": false,
+      "status": "This checkpoint carries analysis text only. GitHub base 237 is not substituted for c5. No original image, gold, product source or complete archive is restored by this task."
+    }
+  ],
+  "verificationLimits": [
+    "No full result bytes re-read during recovery",
+    "No fresh source hash audit of local c5 during recovery",
+    "No last-command outcome inferred from interruption",
+    "No complete six-name geometry or 39-field causal matrix claimed",
+    "No original Git/archive restoration claimed",
+    "No synthetic proposal has been executed as RED or GREEN",
+    "GitHub base product must not be used as retroactive source of c5 outcomes"
+  ],
+  "hashMethod": {
+    "algorithm": "SHA-256",
+    "encoding": "UTF-8",
+    "knownAnswerVectors": [
+      {
+        "input": "",
+        "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "passed": true
+      },
+      {
+        "input": "abc",
+        "digest": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+        "passed": true
+      },
+      {
+        "input": "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+        "digest": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
+        "passed": true
+      }
+    ],
+    "utf8SwedishVectorPassed": true
+  },
+  "postCommitVerificationPlanned": [
+    "Immutable raw URL readback for every file",
+    "Exact string equality and UTF-8 SHA-256 equality",
+    "Tree/compare restricted to this documentation directory",
+    "Branch head and parent/base binding"
+  ],
+  "sourceCodeChanges": 0,
+  "newOpticalCalls": 0,
+  "newParserCalls": 0,
+  "v3Reads": 0
+}

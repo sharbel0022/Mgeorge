@@ -1,0 +1,568 @@
+{
+  "scope": "READ-ONLY known-data causal analysis; no candidate acceptance claim",
+  "sourceCommit": "c5cdd0fe57d300ba40f6572cbbe39c7fce9397e7",
+  "opticalArchiveCommit": "2ca47860bd1dc587e0fec0a3dfbcedac8477a6fb",
+  "resultSha256": "8957731b7f0f1ed9fed6bb53683b65cf352138e4b1f3f7fa0ee8f5980dfa2756",
+  "archiveReceiptSha256": "fe9b332ba9de45e77a74eefaabba20087fbff556ac326d8fa52d68b9fbd32bb1",
+  "worktree": "/workspace/scratch/4d79ab4bea8e/ocr-known-wave5-analysis",
+  "branch": "analysis/quality8-known-wave5-missing-fields-20261106",
+  "analysisCommit": null,
+  "knownSavedFiles": [
+    "docs/quality8/ocr-known-wave5-missing-fields/input-result.json",
+    "docs/quality8/ocr-known-wave5-missing-fields/geometry-diagnostics.mjs"
+  ],
+  "unverifiedDiagnosticOutputs": [
+    "docs/quality8/ocr-known-wave5-missing-fields/raw-word-index.json",
+    "docs/quality8/ocr-known-wave5-missing-fields/geometry-diagnostics.json"
+  ],
+  "blockedReason": "No usable execution environment is available",
+  "sourceEdits": 0,
+  "opticalCallsByAnalysis": 0,
+  "v3Reads": 0,
+  "metrics": {
+    "normalPerEngine": {
+      "all13": {
+        "tp": 91,
+        "total": 130,
+        "fp": 0
+      },
+      "mandatory": {
+        "tp": 69,
+        "total": 100,
+        "fp": 0
+      },
+      "image9": {
+        "tp": 59,
+        "total": 90,
+        "fp": 0
+      },
+      "green": 0,
+      "review": 10
+    },
+    "stressNonGreen": 2,
+    "workers": 12,
+    "parserOutcomes": 24,
+    "workerErrors": 0,
+    "parserErrors": 0
+  },
+  "missing": [
+    {
+      "case": "01",
+      "fields": [
+        "currency",
+        "net",
+        "org",
+        "party",
+        "total",
+        "vat"
+      ],
+      "serializedLength": 13279
+    },
+    {
+      "case": "02",
+      "fields": [
+        "org",
+        "party",
+        "reference",
+        "vat"
+      ],
+      "serializedLength": 12553
+    },
+    {
+      "case": "03",
+      "fields": [
+        "org"
+      ],
+      "serializedLength": 12792
+    },
+    {
+      "case": "04",
+      "fields": [
+        "bankgiro",
+        "currency",
+        "org",
+        "party",
+        "reference"
+      ],
+      "serializedLength": 12686
+    },
+    {
+      "case": "05",
+      "fields": [
+        "bankgiro",
+        "currency",
+        "org"
+      ],
+      "serializedLength": 13741
+    },
+    {
+      "case": "06",
+      "fields": [
+        "org",
+        "party"
+      ],
+      "serializedLength": 11398
+    },
+    {
+      "case": "07",
+      "fields": [
+        "bankgiro",
+        "net",
+        "org",
+        "party",
+        "reference",
+        "total",
+        "vat"
+      ],
+      "serializedLength": 11541
+    },
+    {
+      "case": "08",
+      "fields": [
+        "bankgiro",
+        "org",
+        "party"
+      ],
+      "serializedLength": 12474
+    },
+    {
+      "case": "09",
+      "fields": [
+        "org",
+        "vat"
+      ],
+      "serializedLength": 13545
+    },
+    {
+      "case": "10",
+      "fields": [
+        "currency",
+        "net",
+        "org",
+        "reference",
+        "total",
+        "vat"
+      ],
+      "serializedLength": 13929
+    }
+  ],
+  "organizationEvidence": [
+    {
+      "case": "01",
+      "raw": "559762-3114",
+      "value": "5597623114",
+      "word": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "confidence": 91,
+      "bbox": [
+        314,
+        355,
+        591,
+        389
+      ],
+      "group": "Unlabeled supplier-like name/address/org in upper-left group; explicit recipient elsewhere",
+      "role": "unproven",
+      "censusTable": false
+    },
+    {
+      "case": "02",
+      "raw": "559762-3122",
+      "value": "5597623122",
+      "word": [
+        1,
+        12,
+        0,
+        0,
+        1
+      ],
+      "confidence": 91,
+      "bbox": [
+        604,
+        2722,
+        854,
+        2754
+      ],
+      "group": "Footer org; unlabeled name in detached header",
+      "role": "unproven",
+      "censusTable": false
+    },
+    {
+      "case": "03",
+      "raw": "559762-3130",
+      "value": "5597623130",
+      "word": [
+        1,
+        14,
+        0,
+        1,
+        1
+      ],
+      "confidence": 87,
+      "bbox": [
+        1452,
+        616,
+        1737,
+        653
+      ],
+      "group": "Explicit Leverantör/name/address block; org separated by address lines beyond current tight owner binding",
+      "role": "possible generic explicit-role-region repair",
+      "censusTable": false
+    },
+    {
+      "case": "04",
+      "raw": "559762-3148",
+      "value": "5597623148",
+      "word": [
+        1,
+        3,
+        0,
+        0,
+        1
+      ],
+      "confidence": 24,
+      "bbox": [
+        336,
+        580,
+        653,
+        615
+      ],
+      "group": "Unlabeled name/address/org group; explicit recipient elsewhere",
+      "role": "unproven; actual org word confidence 24",
+      "censusTable": false
+    },
+    {
+      "case": "05",
+      "raw": "559762-3155",
+      "value": "5597623155",
+      "word": [
+        1,
+        6,
+        0,
+        0,
+        1
+      ],
+      "confidence": 92,
+      "bbox": [
+        730,
+        2722,
+        1044,
+        2757
+      ],
+      "group": "Explicit supplier name above; detached footer org",
+      "role": "unproven",
+      "censusTable": true
+    },
+    {
+      "case": "06",
+      "raw": "559762-3163",
+      "value": "5597623163",
+      "word": [
+        1,
+        2,
+        0,
+        1,
+        1
+      ],
+      "confidence": 91,
+      "bbox": [
+        327,
+        573,
+        611,
+        609
+      ],
+      "group": "Unlabeled name/address/org group; explicit recipient elsewhere",
+      "role": "unproven",
+      "censusTable": false
+    },
+    {
+      "case": "07",
+      "raw": "559762-3171",
+      "value": "5597623171",
+      "word": [
+        1,
+        8,
+        0,
+        0,
+        1
+      ],
+      "confidence": 89,
+      "bbox": [
+        652,
+        2722,
+        929,
+        2756
+      ],
+      "group": "Unlabeled header name; detached footer org",
+      "role": "unproven",
+      "censusTable": true
+    },
+    {
+      "case": "08",
+      "raw": "559762-3189",
+      "value": "5597623189",
+      "word": [
+        1,
+        1,
+        0,
+        3,
+        1
+      ],
+      "confidence": 90,
+      "bbox": [
+        426,
+        603,
+        743,
+        638
+      ],
+      "group": "Unlabeled name/address/org group; explicit recipient elsewhere",
+      "role": "unproven",
+      "censusTable": false
+    },
+    {
+      "case": "09",
+      "raw": "559762-3197",
+      "value": "5597623197",
+      "word": [
+        1,
+        8,
+        0,
+        0,
+        1
+      ],
+      "confidence": 92,
+      "bbox": [
+        604,
+        2722,
+        855,
+        2754
+      ],
+      "group": "Explicit supplier name above; detached footer org",
+      "role": "unproven",
+      "censusTable": true
+    },
+    {
+      "case": "10",
+      "raw": "559762-3205",
+      "value": "5597623205",
+      "word": [
+        1,
+        18,
+        0,
+        0,
+        1
+      ],
+      "confidence": 91,
+      "bbox": [
+        691,
+        2722,
+        976,
+        2759
+      ],
+      "group": "Explicit supplier name above; detached footer org",
+      "role": "unproven",
+      "censusTable": false
+    }
+  ],
+  "partyEvidence": [
+    {
+      "case": "01",
+      "rawName": "Exempel Kustteknik AB",
+      "sameApparentNameOrgGroup": true,
+      "actual": null,
+      "explicitSupplierLabelObserved": false,
+      "explicitSeparateRecipientObserved": true,
+      "nameWordIdsAndBoxes": "Not fully transcribed before environment failure; do not infer IDs from consumer text",
+      "canonicalOwnerProven": false
+    },
+    {
+      "case": "02",
+      "rawName": "Fiktiva Björk Konsult AB",
+      "sameApparentNameOrgGroup": false,
+      "actual": null,
+      "explicitSupplierLabelObserved": false,
+      "explicitSeparateRecipientObserved": true,
+      "nameWordIdsAndBoxes": "Not fully transcribed before environment failure; do not infer IDs from consumer text",
+      "canonicalOwnerProven": false
+    },
+    {
+      "case": "04",
+      "rawName": "Fiktiva Lönn Kontor AB",
+      "sameApparentNameOrgGroup": true,
+      "actual": null,
+      "explicitSupplierLabelObserved": false,
+      "explicitSeparateRecipientObserved": true,
+      "nameWordIdsAndBoxes": "Not fully transcribed before environment failure; do not infer IDs from consumer text",
+      "canonicalOwnerProven": false
+    },
+    {
+      "case": "06",
+      "rawName": "Fiktiva Skärvik IT AB",
+      "sameApparentNameOrgGroup": true,
+      "actual": null,
+      "explicitSupplierLabelObserved": false,
+      "explicitSeparateRecipientObserved": true,
+      "nameWordIdsAndBoxes": "Not fully transcribed before environment failure; do not infer IDs from consumer text",
+      "canonicalOwnerProven": false
+    },
+    {
+      "case": "07",
+      "rawName": "Exempel Fräsverkstan AB",
+      "sameApparentNameOrgGroup": false,
+      "actual": null,
+      "explicitSupplierLabelObserved": false,
+      "explicitSeparateRecipientObserved": true,
+      "nameWordIdsAndBoxes": "Not fully transcribed before environment failure; do not infer IDs from consumer text",
+      "canonicalOwnerProven": false
+    },
+    {
+      "case": "08",
+      "rawName": "Fiktiva Rönn Frakt AB",
+      "sameApparentNameOrgGroup": true,
+      "actual": null,
+      "explicitSupplierLabelObserved": false,
+      "explicitSeparateRecipientObserved": true,
+      "nameWordIdsAndBoxes": "Not fully transcribed before environment failure; do not infer IDs from consumer text",
+      "canonicalOwnerProven": false
+    }
+  ],
+  "bankgiroEvidence": [
+    {
+      "case": "04",
+      "labelWord": [
+        1,
+        1,
+        0,
+        0,
+        4
+      ],
+      "labelConfidence": 96,
+      "labelBox": [
+        1579,
+        368,
+        1759,
+        408
+      ],
+      "valueWord": [
+        1,
+        1,
+        0,
+        1,
+        2
+      ],
+      "rawValue": "5736-0828",
+      "valueConfidence": 94,
+      "valueBox": [
+        1579,
+        436,
+        1850,
+        474
+      ],
+      "hold": "Dedicated consumer-row proof fails despite valid general source binding"
+    },
+    {
+      "case": "05",
+      "labelWord": [
+        1,
+        3,
+        0,
+        0,
+        0
+      ],
+      "labelConfidence": 96,
+      "labelBox": [
+        153,
+        1807,
+        343,
+        1848
+      ],
+      "valueWord": [
+        1,
+        3,
+        0,
+        1,
+        0
+      ],
+      "rawValue": "241-9562",
+      "valueConfidence": 91,
+      "valueBox": [
+        153,
+        1876,
+        415,
+        1914
+      ],
+      "hold": "Post-table mixed row; no dedicated raw-region proof"
+    },
+    {
+      "case": "07",
+      "labelWord": [
+        1,
+        6,
+        1,
+        1,
+        0
+      ],
+      "labelConfidence": 96,
+      "labelBox": [
+        153,
+        2291,
+        314,
+        2338
+      ],
+      "valueWord": [
+        1,
+        6,
+        2,
+        0,
+        0
+      ],
+      "rawValue": "619-4823",
+      "valueConfidence": 89,
+      "valueBox": [
+        153,
+        2364,
+        364,
+        2399
+      ],
+      "hold": "Actual value confidence 89 < required 90; must remain null even if geometric binding repaired"
+    },
+    {
+      "case": "08",
+      "labelWord": [
+        1,
+        1,
+        0,
+        13,
+        0
+      ],
+      "labelConfidence": 96,
+      "labelBox": [
+        244,
+        1875,
+        424,
+        1916
+      ],
+      "valueWord": [
+        1,
+        1,
+        0,
+        14,
+        0
+      ],
+      "rawValue": "3547-0186",
+      "valueConfidence": 96,
+      "valueBox": [
+        243,
+        1944,
+        543,
+        1982
+      ],
+      "hold": "Post-table mixed row; no dedicated raw-region proof"
+    }
+  ],
+  "uncertainty": "All ten organization words/IDs/boxes/confidences were transcribed from raw evidence before interruption. Full name-word boxes and full diagnostic predicate outputs were not verified; no inferred word IDs or region closure is asserted."
+}
