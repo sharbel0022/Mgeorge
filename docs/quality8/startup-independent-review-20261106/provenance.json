@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "repository": "sharbel0022/Mgeorge",
+  "pull_request": 60,
+  "checkpoint_branch": "checkpoint/startup-review-20261106",
+  "checkpoint_parent": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "checkpoint_parent_tree": "9eeed8e9a840352c48987a66314a6a22e082a60e",
+  "reviewed_head": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "reviewed_base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "preserved_at_utc": "2026-11-06 06:09:02 UTC",
+  "reviewer": "/root/startup_remote_independent_review",
+  "review_kind": "independent static code review",
+  "review_verdict": "NOT READY TO MERGE",
+  "merge_blocker": "Important P2: timeout cleanup of a hung contender",
+  "additional_finding": "Minor P3: malformed stdout can hide captured terminal diagnostics",
+  "independent_execution": false,
+  "red_or_not_ready_meaning": "A blocking static review finding, not a claim of an independently executed failing test.",
+  "preservation": {
+    "REVIEW.md": "Complete original functions.store independent_startup_review string, unchanged.",
+    "findings.json": "Complete original functions.store independent_startup_review_findings object, serialized as JSON without changing any values.",
+    "original_review_javascript_string_length": 11970,
+    "intended_diff_scope": "Only the three documentation files in this checkpoint directory.",
+    "original_review_remains_historical": true
+  },
+  "evidence_limits": [
+    "Execution environment was unavailable to the reviewer.",
+    "The reviewer did not execute the candidate or independently retrieve the reported PR workflow logs.",
+    "Unavailable raw local RED/probe logs cannot be independently reconstructed from recorded hashes and metadata.",
+    "A successful normal-path test run does not exercise the reported hung-contender timeout-cleanup path.",
+    "This checkpoint is not a PR approval, merge, deployment, or native archive."
+  ],
+  "ci_report_from_root": {
+    "source": "Parent agent /root reported that it independently retrieved and verified these PR CI logs.",
+    "independently_verified_by_this_reviewer": false,
+    "node_version": "22.23.4",
+    "ci_checkout": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+    "ci_checkout_parents": [
+      "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "8c744db37816411d8ad8b70c5b94202c74c37e62"
+    ],
+    "ci_checkout_tree": "9eeed8e9a840352c48987a66314a6a22e082a60e",
+    "primary_suites": [
+      {
+        "name": "Node",
+        "passed": 2322,
+        "total": 2322,
+        "job_id": 127735079993
+      },
+      {
+        "name": "Sites",
+        "passed": 5237,
+        "total": 5237,
+        "job_id": 127735079843
+      },
+      {
+        "name": "bridge",
+        "passed": 47,
+        "total": 47,
+        "job_id": 127735079604
+      }
+    ],
+    "primary_total_passed": 7606,
+    "primary_total_tests": 7606,
+    "primary_failures": 0,
+    "primary_cancelled": 0,
+    "primary_skipped": 0,
+    "primary_todo": 0,
+    "contention_regression_duration_ms": 5158.643886,
+    "original_two_process_test_duration_ms": 243.47559,
+    "additional_saas_report": {
+      "job_id": 127735081102,
+      "node_passed": 325,
+      "sites_passed": 929,
+      "counted_separately_due_to_overlap": true
+    },
+    "other_reported_checks": "Type/audit/build and all required PR checks successful.",
+    "effect_on_review_verdict": "None: P2 still blocks merge of the reviewed candidate."
+  },
+  "release_boundaries": {
+    "required_next_step": "Minimal test-only repair and targeted review, followed by full PR checks on the repaired head.",
+    "required_after_merge": "Required main/release gates before production.",
+    "production_site_and_archive_not_verified_by_reviewer": true
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "head": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "pr": 60,
+  "verdict": "Not ready to merge: P2 timeout-cleanup defect remains despite reported normal-path CI GREEN.",
+  "execution": false,
+  "important": [
+    {
+      "file": "test/database-startup-contention.test.js",
+      "lines": [
+        30,
+        48,
+        49,
+        69,
+        70,
+        71,
+        72,
+        73
+      ],
+      "issue": "Callback finally cannot clean a child hung at awaited terminal when runner timeout wins; register test cancellation/after hook."
+    }
+  ],
+  "minor": [
+    {
+      "file": "test/database-startup-contention.test.js",
+      "lines": [
+        63,
+        64,
+        65
+      ],
+      "issue": "JSON.parse precedes diagnostic; malformed child stdout hides stderr and terminal status."
+    }
+  ],
+  "ci_update": {
+    "source": "root report; logs not independently retrieved by this reviewer",
+    "node": "22.23.4",
+    "contention_duration_ms": 5158.643886,
+    "original_two_process_duration_ms": 243.47559,
+    "reported_checks": "Node/Sites/bridge and audit/build success"
+  }
+}
