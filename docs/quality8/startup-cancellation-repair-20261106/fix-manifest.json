@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "base": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "redCommit": "f0e845bb87ee08d15fa96cb75879849493aeb1fd",
+  "codeCommit": "82cda2ec692e1b3a976d3ee1711cd0ab2072ad01",
+  "codeTree": "0e279a2c63971f11cce269c0e93bc884f57b8189",
+  "status": "FIX_CANDIDATE_PENDING_EXECUTION_AND_REVIEW",
+  "scope": "Three test source files and repair evidence; this manifest excludes itself. Historical RED artifacts are retained unchanged.",
+  "files": [
+    {
+      "path": "test/database-startup-contention.test.js",
+      "utf8Bytes": 5262,
+      "sha256": "ee7653e3af8f411064338805ba61c2c1d593b3f11b2b7a4409d130c360a38ea7",
+      "gitBlobSha1": "7a20e4135f5c0a1b2ad7a9504a5128ec821b118e"
+    },
+    {
+      "path": "test/helpers/startup-test-resources.js",
+      "utf8Bytes": 1214,
+      "sha256": "e54af9e6548bf27907dc1c281247bcb0ddcb1fe2464326a10faa832f1d70d430",
+      "gitBlobSha1": "b6bd733d547351c7ec871605ccf05e006ccc0a60"
+    },
+    {
+      "path": "test/database-startup-cancellation.test.js",
+      "utf8Bytes": 6824,
+      "sha256": "fd40426a5c40481d7516d6840dc26d3d0572fc28c025c9b57e25f3973bad046d",
+      "gitBlobSha1": "0d337415be3689f71f217f1d5ea88cf3d688a595"
+    },
+    {
+      "path": "docs/quality8/startup-cancellation-repair-20261106/FIX.md",
+      "utf8Bytes": 4599,
+      "sha256": "93620e6cdb5517e351a1babb10360fbbaa3f9589db271b10662fd4267893c27e",
+      "gitBlobSha1": "e988ce4822bf9adba1e0427156ae65d8ceec6948"
+    },
+    {
+      "path": "docs/quality8/startup-cancellation-repair-20261106/fix.diff",
+      "utf8Bytes": 2964,
+      "sha256": "e1aebb12e7bef7f524bfd968e07459566c2e73597c04a4612e73bd3ad935b948",
+      "gitBlobSha1": "a40645091244ddf764501fa2af1c922d783edcae"
+    },
+    {
+      "path": "docs/quality8/startup-cancellation-repair-20261106/fix-evidence.json",
+      "utf8Bytes": 4365,
+      "sha256": "67f43ca0191c922ad42c87971c67e49465b65e62f8f031a621f34bf8b6610dd6",
+      "gitBlobSha1": "be4117227483e22e5238c8d52b2f4e44b1e987f4"
+    },
+    {
+      "path": "docs/quality8/startup-cancellation-repair-20261106/fix-readbacks.json",
+      "utf8Bytes": 1392,
+      "sha256": "ce6ef032c71004989ccca21dee1913038d85c72b1e825c516a62db12d2aee13b",
+      "gitBlobSha1": "2eb6e8ea5b9c6634da9a99cec1f35fae6a32297d"
+    }
+  ]
+}
