@@ -39,11 +39,31 @@ export class OpenPaymentsTokenClient {
       this.invalidate(); throw new BankProviderError('CREDENTIALS_EXPIRED', 409);
     }
   }
-  invalidate() {if(this.#identity)invalidateSharedTokenState(this.#identity,this.#key);else invalidateTokenState(this.#local);}
+  invalidate(receipt) {if(this.#identity)invalidateSharedTokenState(this.#identity,this.#key,receipt);else invalidateTokenState(this.#local,receipt);}
+  #cooldown(state){
+    const value=state.cooldown;if(!value)return;
+    if(value.blocked)throw new BankProviderError('PROVIDER_RATE_LIMIT',429,{retryBlocked:true});
+    const remaining=Math.ceil((value.until-this.#now())/1000);
+    if(remaining>0)throw new BankProviderError('PROVIDER_RATE_LIMIT',429,{retryable:true,retryAfter:remaining});
+    state.cooldown=null;
+  }
+  #rememberCooldown(state,error){
+    if(error?.code!=='PROVIDER_RATE_LIMIT'||state.retired)return;
+    this.#current(state);
+    const seconds=Number.isSafeInteger(error.retryAfter)&&error.retryAfter>0?error.retryAfter:60,until=this.#now()+seconds*1000;
+    if(error.retryBlocked===true||!Number.isSafeInteger(until)||until>8640000000000000)state.cooldown={blocked:true};
+    else if(!state.cooldown?.blocked)state.cooldown={until:Math.max(state.cooldown?.until||0,until),blocked:false};
+  }
   async accessToken() {
+    const receipt=await this.accessTokenReceipt();this.#checkCredentials();const state=this.#state();this.#current(state);
+    if(state.token!==receipt)throw new BankProviderError('INVALID_ACCESS_TOKEN',401);return receipt.value;
+  }
+  /** Internal request receipt binds a 401 to the exact issued token object. */
+  async accessTokenReceipt() {
     this.#checkCredentials();
     const state=this.#state();this.#current(state);
-    if (state.token && state.token.expiresAt > this.#now() + 30_000) return state.token.value;
+    if (state.token && state.token.expiresAt > this.#now() + 30_000) return state.token;
+    this.#cooldown(state);
     const epoch = state.epoch;
     if (state.flight?.epoch === epoch){const value=await state.flight.promise;this.#checkCredentials();this.#current(state);if(epoch!==state.epoch)throw new BankProviderError('INVALID_ACCESS_TOKEN',401);return value;}
     const flight = { epoch, promise: null };
@@ -56,9 +76,9 @@ export class OpenPaymentsTokenClient {
       if (epoch !== state.epoch) throw new BankProviderError('INVALID_ACCESS_TOKEN', 401);
       const expiresAt = Math.min(started + parsed.seconds * 1000,this.#config.credentialsValidUntil?Date.parse(this.#config.credentialsValidUntil):Infinity);
       if (expiresAt <= this.#now()) throw new BankProviderError('INVALID_OAUTH_RESULT', 502);
-      state.token = { value: parsed.value, expiresAt };
-      return parsed.value;
-    })().finally(() => { if (state.flight === flight) state.flight = null; });
+      state.token = Object.freeze({ value: parsed.value, expiresAt });
+      return state.token;
+    })().catch(error=>{this.#rememberCooldown(state,error);throw error;}).finally(() => { if (state.flight === flight) state.flight = null; });
     state.flight = flight;
     const value=await flight.promise;this.#checkCredentials();this.#current(state);
     if(epoch!==state.epoch)throw new BankProviderError('INVALID_ACCESS_TOKEN',401);
@@ -69,9 +89,11 @@ export class OpenPaymentsTokenClient {
     if (!safeText(code, 4096) || !/^[A-Za-z0-9_-]{1,200}$/.test(consentId) || !/^[A-Za-z0-9_-]{1,200}$/.test(authorisationId) || !this.#config.redirectUris.includes(redirectUri)) throw new BankProviderError('AUTHORIZATION_INVALID', 403);
     const scope = ['accountinformation', 'corporate'];
     const body = new URLSearchParams({ client_id: this.#config.clientId, client_secret: this.#config.clientSecret, code, redirect_uri: redirectUri, scope: scope.join(' '), grant_type: 'authorization_code' });
-    const response = await this.#http.send({ service: 'auth', path: '/connect/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-consentId': consentId, 'X-ConsentAuthorisationId': authorisationId }, body: body.toString() });
+    const state=this.#state();this.#current(state);this.#cooldown(state);
+    let response;try{response=await this.#http.send({ service: 'auth', path: '/connect/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-consentId': consentId, 'X-ConsentAuthorisationId': authorisationId }, body: body.toString() });}
+    catch(error){this.#rememberCooldown(state,error);throw error;}
     tokenResult(response.data, scope);
-    this.#checkCredentials();
+    this.#checkCredentials();this.#current(state);
     // The documented redirect activation token is not used for subsequent AIS calls.
     return { activated: true };
   }

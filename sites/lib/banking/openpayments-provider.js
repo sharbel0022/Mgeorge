@@ -126,7 +126,7 @@ class OpenPaymentsCompanyConnection {
     if (revokeExpired && (method !== 'DELETE' || body !== undefined || !consent || path !== `${CONSENTS}/${consent.id}`)) throw mismatch();
     const consentTime = () => { if (!revokeExpired) this.#consentTime(consent); };
     await this.#guard(); consentTime();
-    const token = await this.#tokens.accessToken();
+    const tokenReceipt = await this.#tokens.accessTokenReceipt(),token=tokenReceipt.value;
     await this.#guard(); consentTime();
     let acceptedWrite = false;
     try {
@@ -139,7 +139,7 @@ class OpenPaymentsCompanyConnection {
       await this.#guard(); consentTime();
       return result;
     } catch (error) {
-      if (error instanceof BankProviderError && error.code === 'INVALID_ACCESS_TOKEN') this.#tokens.invalidate();
+      if (error instanceof BankProviderError && error.code === 'INVALID_ACCESS_TOKEN') this.#tokens.invalidate(tokenReceipt);
       if (acceptedWrite) throw uncertainWrite(error);
       throw error;
     }
