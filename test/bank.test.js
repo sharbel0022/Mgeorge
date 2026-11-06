@@ -11,7 +11,7 @@ import { apiBase, configStatus, isConfigured, jwt, bankingRequest, assertApplica
 const folder=mkdtempSync(join(tmpdir(),'mgeorge-bank-'));
 const {privateKey,publicKey}=generateKeyPairSync('rsa',{modulusLength:2048});
 const pem=privateKey.export({type:'pkcs8',format:'pem'}),keyFile=join(folder,'test-only.key');
-writeFileSync(keyFile,pem);
+writeFileSync(keyFile,pem,{mode:0o600});
 const applicationId='7d3ca760-9c0d-460b-b211-513121427f7f';
 const names=['ENABLE_BANKING_APPLICATION_ID','ENABLEBANKING_APP_ID','ENABLE_BANKING_PRIVATE_KEY','ENABLE_BANKING_PRIVATE_KEY_FILE','ENABLEBANKING_PRIVATE_KEY_FILE','ENABLE_BANKING_ENVIRONMENT','ENABLEBANKING_ENVIRONMENT','ENABLE_BANKING_KEY_ROTATED','APP_ORIGIN'];
 const saved=Object.fromEntries(names.map(name=>[name,process.env[name]]));
