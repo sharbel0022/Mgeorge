@@ -262,7 +262,7 @@ function scopedStatement(database,entry,scope){
  if(used.length){
   const projection=/\browid\b/i.test(shape)?'rowid AS rowid,*':'*';
   const prefix=used.map(table=>`${table} AS (SELECT ${projection} FROM main.${table} WHERE owner=?)`).join(', ');
-  query=/^\s*WITH\b/i.test(query)?query.replace(/^(\s*WITH\s+(?:RECURSIVE\s+)?)/i,'$1'+prefix+', '):'WITH '+prefix+' '+query;
+  query=/^\s*WITH\b/i.test(query)?query.replace(/^(\s*WITH\b(?:\s+RECURSIVE\b)?)/i,'$1 '+prefix+', '):'WITH '+prefix+' '+query;
   args=[...used.map(()=>scope.owner),...args];
  }
  return database.prepare(query).bind(...args);
