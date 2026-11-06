@@ -119,6 +119,8 @@ Fyra tester täcker avstängd/saknad flagga, noll socketförsök vid redan avst�
 transport, permanent återkallad cacheidentitet och avstängning under ett
 pågående syntetiskt GET-anrop med verklig lokal loopback-mTLS. Det sistnämnda
 är ett TLS-integrationsprov mot en lokal testserver, inte Open Payments.
+Avstängningen sker innan det native svaret lämnas tillbaka; provet täcker inte
+varje möjlig tidpunkt under efterföljande strömmad läsning.
 
 ## Exakta externa hinder
 
@@ -129,6 +131,7 @@ pågående syntetiskt GET-anrop med verklig lokal loopback-mTLS. Det sistnämnda
 | `BANK_COMPANY_AUTHORIZATIONS` finns inte i lästa driftsvariabler. Äldre anslutning saknar consentmetadata. | Hämta och kontrollera verklig bank-/providerattest för rätt företag, lagringsägare, bank och stabila kontonycklar. Konfigurera verifierad källa med begränsad giltighet. Syntetiskt bevis eller användarens egen uppgift räcker inte. |
 | Inga Open Payments-/SaaS-bankinställningar observerades och ingen SaaS-bankrad fanns. | Verifiera godkänt produktionskonto/avtal, produktionsappens client credentials, AIS-produkt och corporate-context; konfigurera serverns generation, registreringar och verifierade bank-/PSU-/företagsuppgifter. Aktiveringsflaggan är ingen ersättning för dessa rättigheter. |
 | Faktiskt produktionscertifikat och mTLS-bindning har inte verifierats. | Node behöver godkänt certifikat med skyddad privat nyckel; Workers behöver en riktig provisionerad mTLS-bindning samt matchande certifikatreceipt. Jämför faktisk bindning, publikt certifikat/fingeravtryck, giltighet och generation. En textvariabel med ett bindningsnamn räcker inte. |
+| Swedbanks företagsbehörigheter har inte verifierats för den aktuella användaren och kontona. | Kontrollera Internetbanksavtal Företag. Företagets behörighetsadministratör ger Open Banking-behörighet per användare och konto under Användare och behörigheter; ändringen signeras med BankID. Verifiera att rätt person och rätt företagskonton omfattas innan kundflödet startas. |
 | Användarens aktuella bankbehörighet och BankID/SCA saknar nytt kvitto. | Behörig företagsrepresentant genomför bankens autentisering själv. Avbrutet/nekande svar, en lyckad retur till appen eller en app-token är inte ett giltigt kundmedgivande. |
 | Verklig kontotäckning, pagination, kvoter och import har inte provats. | Efter giltigt medgivande: begränsad läsacceptans av uttryckligen valda företagskonton, aktuell kontobehörighet, kompletta sidor, oförändrade resultat vid återspelning och säker frånkoppling/förnyelse. |
 
@@ -136,6 +139,13 @@ Frånvaro av konfiguration är verifierad i den lästa driftsrevisionen; det bev
 inte att ett avtal eller certifikat saknas hos organisationen på annan plats.
 Databasen hade tokenkontrolltabellerna, men närvaro är inte ett prov av
 produktionskoordination eller migrationens funktion.
+
+Open Payments-konfigurationen använder `SAAS_OPENPAYMENTS_CONFIG` och
+`SAAS_OPENPAYMENTS_REGISTRATIONS`. Produktions-Node kräver
+`SAAS_OPENPAYMENTS_MTLS_CONFIG`; Sites kräver
+`SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG` och den faktiska mTLS-bindningen.
+`SAAS_BANK_ENABLED=true` sätts först när dessa drifts- och behörighetskrav är
+verifierade. Följ det länkade adapter-/transportkontraktet för respektive schema.
 
 Bankgiro är en separat produkt-/källbehörighet. AIS eller
 `accountinformation corporate` etablerar inte Bankgirotäckning. Aktivera endast
@@ -172,12 +182,49 @@ beroendegranskning, Sites typkontroll och produktionsbygge, Bankgirobrygga,
 Chromium och 1/10/100-företagsprestanda. Separat säkerhetsacceptans inkluderar nu
 även de nya Node-recovery- och transporttesterna.
 
+### Fryst GREEN-kvitto för den granskade produktionskoden
+
+Källa: `090ae0a4ef9f2fe7ce6dd8b282622f93d9e21939`; testad PR-merge:
+`f2ac5612644a079c98933857bf86e87fa213dfb1`, mot basen ovan.
+[Full kvalitets-CI](https://github.com/sharbel0022/Mgeorge/actions/runs/42308985247)
+och [säkerhetsacceptans](https://github.com/sharbel0022/Mgeorge/actions/runs/42308985277)
+slutfördes utan misslyckat jobb.
+
+| Kontroll | Observerat resultat |
+| --- | --- |
+| Full Node 22.23.4 | 3 025/3 025; syntax, låst installation och båda beroendegranskningarna godkända. |
+| Full Node 24.22.1 | 3 025/3 025; samma obligatoriska kontroller godkända. |
+| Full Sites | 5 827/5 827; typkontroll, verifierade installationer, beroendegranskning och produktionsbygge godkända. |
+| Bankgiro SFTP-brygga | 47/47 syntetiska integrationstester samt syntax och beroendegranskning godkända. |
+| Chromium | Syntetisk onboardingacceptans godkänd. |
+| Företagsprestanda | Verifierad syntetisk körning för 1, 10 och 100 företag. Ingen extern bankprestanda uppmätt. |
+| Separat säkerhetsacceptans | Node 396/396 och Sites 1 232/1 232. |
+
+TAP-sviterna ovan hade noll fail/cancel/skip/TODO. Säkerhetssviterna överlappar de
+fulla sviterna och Node-versionerna kör samma tester; antalen summeras därför
+inte till ett påstått antal unika scenarier.
+
+En separat kodgranskning av samma källa fann inga Critical/Important eller
+bekräftade Minor-fynd. Den kontrollerade de tre produktionsrättningarna,
+policyfelens proveniens, bevarade lease-/sessionsspärrar, de nya testfixturerna,
+tokenidentitetens permanenta återkallelse och native svarsstädning. Den gjorde
+inga verkliga bankanrop och gav inget produktionsacceptansbesked.
+
+Den sista uppdateringen fryser dokumentation och kvitton. Exakta blob-SHA för
+samtliga ändrade kod-/testfiler finns i verifieringsfilen; de ska vara oförändrade
+mot den granskade GREEN-källan. PR-beskrivningen anger även resultat för den
+slutliga dokumentationsrevisionens egna obligatoriska kontroller.
+
 Lokalt passerade basens fyra fokuserade Node-bankfiler 49/49 före ändringarna.
 En första start utan NODE_ENV=test avvisades av isoleringsskyddet.
 Sites-fokuskörningen gav 127 godkända tester och två SIGKILL-processfel; ett
 begränsat omförsök gav fyra godkända och ett SIGKILL. Exekveringsmiljön blev sedan
 otillgänglig. Dessa lokala försök räknas inte som godkänd Sites-verifiering.
-Arbetet fortsatte genom normala GitHub-commits och isolerad CI.
+Arbetet fortsatte genom normala GitHub-commits och isolerad CI. När miljön återkom
+hämtades de två ursprungliga RED-arkiven; SHA-256 matchade Actions-kvittona och
+rå TAP bekräftade exakt de sju Sites-felen respektive fem Node-policyfall plus
+deras föräldratest och fyra transportfel. [Bevarade felutdrag](red-observed.json)
+innehåller källor, hash och faktiska diagnoser. Ingen ny lokal eftertestning påstås.
 
 Alla nya bankdata, certifikat och svar i testerna är syntetiska. CI-spärren
 tillåter lokal testtrafik och stubbar providergränserna. Godkända tester bevisar
@@ -192,6 +239,9 @@ certifikat-/miljöändring utfördes. Inga kvalitetspoäng höjs genom denna PR.
 Följande primärkällor lästes den 6 november 2026. Villkor för organisationens
 faktiska avtal och bankprodukter behöver dessutom verifieras vid aktivering.
 
+- [Swedbank: Internetbanken Företag, Open Banking-frågor](https://www.swedbank.se/foretag/digitala-tjanster/internetbanken-foretag/vanliga-fragor-och-svar.html):
+  Internetbanksavtal Företag samt administratörens Open Banking-behörighet per
+  användare och konto under Användare och behörigheter, signerad med BankID.
 - [Enable Banking API](https://enablebanking.com/docs/api/reference/):
   /auth, /sessions, aktuellt sessionsstatus, bankens maximala consenttid och
   continuation_key.

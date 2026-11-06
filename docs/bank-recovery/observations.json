@@ -21,7 +21,8 @@
     "connectionRowProjection": {
       "truncatedValues": 1,
       "limitation": "One encrypted cell was truncated by the read tool; no full row-integrity claim."
-    }
+    },
+    "statusEvidence": "stored_connection"
   },
   "configuration": {
     "revision": 10,
@@ -75,5 +76,6 @@
     "payments": 0
   },
   "realBankAcceptance": "NOT_VERIFIED",
-  "finalPR": "https://github.com/sharbel0022/Mgeorge/pull/65"
+  "finalPR": "https://github.com/sharbel0022/Mgeorge/pull/65",
+  "lastLocalStatusRecheckedAt": "2026-11-06T23:06:35Z"
 }
