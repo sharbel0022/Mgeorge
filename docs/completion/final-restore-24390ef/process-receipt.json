@@ -1,0 +1,67 @@
+{
+  "format": "MG-final-restore-process-receipt-1",
+  "sourceCommit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "sourceTree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+  "command": [
+    "node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "sites/scripts/recovery-drill.mjs",
+    "430",
+    "185567855"
+  ],
+  "commandDisplay": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types sites/scripts/recovery-drill.mjs 430 185567855",
+  "workingDirectory": "/workspace/scratch/aab0f7dc06f9/security-final-restore",
+  "startedAt": "2026-11-06T14:53:28.943591+00:00",
+  "completedAt": "2026-11-06T14:53:46.126332+00:00",
+  "elapsedMilliseconds": 17182.743,
+  "exitCode": 0,
+  "signal": null,
+  "processResources": {
+    "peakRssKiB": 774964,
+    "userCpuSeconds": 14.043943,
+    "systemCpuSeconds": 2.160386,
+    "note": "POSIX wait4 resource use for the Node drill process; no heap or test-budget overrides"
+  },
+  "environment": {
+    "NODE_ENV": "test",
+    "LANG": "C.UTF-8",
+    "TZ": "UTC",
+    "inheritedVariables": [
+      "PATH"
+    ],
+    "nodeExecutable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "productionCredentialsInherited": false
+  },
+  "resourceCoordination": {
+    "ocrAgentNotified": true,
+    "rootAuthorizedStartAfterNoHeavyProcessObservation": true,
+    "ocrAgentExclusiveWindowAcknowledged": false,
+    "globalExclusiveResourceLock": false,
+    "localTimingInformational": true
+  },
+  "sourceUnchanged": true,
+  "artifacts": [
+    {
+      "file": "restore.json",
+      "bytes": 4897,
+      "sha256": "d81553290f7eda5675584aa108bd34069d554a0ed7169f2c9f49aad9ed9f7ddb"
+    },
+    {
+      "file": "restore.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "source-before.json",
+      "bytes": 11536,
+      "sha256": "4831076b1e57506d2dbcb7897c16d25af09acd5494ee5981156597c3c74921cb"
+    },
+    {
+      "file": "source-after.json",
+      "bytes": 15717,
+      "sha256": "456eeaa555eaabe12e6eee0547bb8beb7bec431c64d6f355d2c23b78a579abf2"
+    }
+  ]
+}

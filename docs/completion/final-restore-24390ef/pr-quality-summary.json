@@ -1,0 +1,670 @@
+[
+  {
+    "status": "PASSED",
+    "passed": true,
+    "source": {
+      "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "durationMs": 287339.246,
+    "sourceChangedDuringRun": false,
+    "name": "node22",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "syntax",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "node-tests",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": {
+          "tests": 2898,
+          "pass": 2898,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "tests/receipt.json": {
+      "totals": {
+        "tests": 2898,
+        "pass": 2898,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "passed": true,
+      "status": null,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 95,
+        "records": 119,
+        "lines": {
+          "covered": 18828,
+          "total": 42180,
+          "percent": 44.64
+        },
+        "functions": {
+          "covered": 2976,
+          "total": 5247,
+          "percent": 56.72
+        },
+        "branches": {
+          "covered": 11088,
+          "total": 15373,
+          "percent": 72.13
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 13151,
+          "total": 14364,
+          "percent": 91.56
+        }
+      },
+      "durationMs": 278670.133,
+      "sourceChangedDuringRun": false,
+      "externalRequests": null,
+      "browserErrors": null,
+      "workspace": null,
+      "dashboard": null
+    }
+  },
+  {
+    "status": "PASSED",
+    "passed": true,
+    "source": {
+      "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "durationMs": 264213.762,
+    "sourceChangedDuringRun": false,
+    "name": "node24",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "syntax",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "node-tests",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": {
+          "tests": 2898,
+          "pass": 2898,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "tests/receipt.json": {
+      "totals": {
+        "tests": 2898,
+        "pass": 2898,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "passed": true,
+      "status": null,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 95,
+        "records": 119,
+        "lines": {
+          "covered": 18831,
+          "total": 42180,
+          "percent": 44.64
+        },
+        "functions": {
+          "covered": 2976,
+          "total": 5248,
+          "percent": 56.71
+        },
+        "branches": {
+          "covered": 11088,
+          "total": 15352,
+          "percent": 72.23
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 13154,
+          "total": 14364,
+          "percent": 91.58
+        }
+      },
+      "durationMs": 255828.233,
+      "sourceChangedDuringRun": false,
+      "externalRequests": null,
+      "browserErrors": null,
+      "workspace": null,
+      "dashboard": null
+    }
+  },
+  {
+    "status": "PASSED",
+    "passed": true,
+    "source": {
+      "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "durationMs": 457763.341,
+    "sourceChangedDuringRun": false,
+    "name": "sites",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "install-sites",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "install-bridge",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "minimatch-mitigation",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "typecheck",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 8,
+            "high": 0,
+            "critical": 0,
+            "total": 8
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "sites-tests",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": {
+          "tests": 5820,
+          "pass": 5820,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      },
+      {
+        "name": "production-build",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      }
+    ],
+    "tests/receipt.json": {
+      "totals": {
+        "tests": 5820,
+        "pass": 5820,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "passed": true,
+      "status": null,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 98,
+        "records": 98,
+        "lines": {
+          "covered": 10670,
+          "total": 12502,
+          "percent": 85.35
+        },
+        "functions": {
+          "covered": 2117,
+          "total": 2348,
+          "percent": 90.16
+        },
+        "branches": {
+          "covered": 10591,
+          "total": 11687,
+          "percent": 90.62
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 10670,
+          "total": 12502,
+          "percent": 85.35
+        }
+      },
+      "durationMs": 424689.256,
+      "sourceChangedDuringRun": false,
+      "externalRequests": null,
+      "browserErrors": null,
+      "workspace": null,
+      "dashboard": null
+    }
+  },
+  {
+    "status": "PASSED",
+    "passed": true,
+    "source": {
+      "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "durationMs": 7982.311,
+    "sourceChangedDuringRun": false,
+    "name": "bridge",
+    "steps": [
+      {
+        "name": "install-bridge",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "syntax",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "audit-production",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "bridge-tests",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": {
+          "tests": 47,
+          "pass": 47,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "tests/receipt.json": {
+      "totals": {
+        "tests": 47,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "passed": true,
+      "status": null,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 2,
+        "records": 2,
+        "lines": {
+          "covered": 412,
+          "total": 421,
+          "percent": 97.86
+        },
+        "functions": {
+          "covered": 69,
+          "total": 76,
+          "percent": 90.79
+        },
+        "branches": {
+          "covered": 268,
+          "total": 289,
+          "percent": 92.73
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 412,
+          "total": 421,
+          "percent": 97.86
+        }
+      },
+      "durationMs": 6042.859,
+      "sourceChangedDuringRun": false,
+      "externalRequests": null,
+      "browserErrors": null,
+      "workspace": null,
+      "dashboard": null
+    }
+  },
+  {
+    "status": "PASSED",
+    "passed": true,
+    "source": {
+      "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "durationMs": 525224.557,
+    "sourceChangedDuringRun": false,
+    "name": "browser",
+    "steps": [
+      {
+        "name": "install-sites",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "install-browser-tooling",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "install-chromium",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "audit-all",
+        "passed": true,
+        "exitCode": 0,
+        "audit": {
+          "measured": true,
+          "vulnerabilities": {
+            "info": 0,
+            "low": 0,
+            "moderate": 0,
+            "high": 0,
+            "critical": 0,
+            "total": 0
+          }
+        },
+        "totals": null
+      },
+      {
+        "name": "browser-acceptance",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": {
+          "tests": 77,
+          "pass": 77,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "browser/receipt.json": {
+      "totals": {
+        "tests": 77,
+        "pass": 77,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "passed": true,
+      "status": "PASSED",
+      "coverage": null,
+      "durationMs": null,
+      "sourceChangedDuringRun": false,
+      "externalRequests": 0,
+      "browserErrors": 0,
+      "workspace": {
+        "passed": true,
+        "tests": 5,
+        "failures": []
+      },
+      "dashboard": {
+        "passed": true,
+        "tests": 31,
+        "failures": [],
+        "runnerErrors": []
+      }
+    }
+  },
+  {
+    "status": "PASSED",
+    "passed": true,
+    "source": {
+      "commit": "4d19058628bf3ec2973be40a465c509eaf82408d",
+      "tree": "ad40b5a5ae7710939801d73e5e16eb80f3186f48",
+      "branch": "",
+      "workingTreeDirty": false,
+      "contentSha256": "90f221065d14d170a3c32acbcbc57de3cd6f056ab1d8e0571275e652396d0545",
+      "fileCount": 2443
+    },
+    "durationMs": 44403.645,
+    "sourceChangedDuringRun": false,
+    "name": "performance",
+    "steps": [
+      {
+        "name": "install-node",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      },
+      {
+        "name": "company-benchmark",
+        "passed": true,
+        "exitCode": 0,
+        "audit": null,
+        "totals": null
+      }
+    ]
+  }
+]

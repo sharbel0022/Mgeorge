@@ -1,0 +1,46 @@
+{
+  "format": "MG-main-ci-observation-1",
+  "runId": 42237265007,
+  "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42237265007",
+  "sourceCommitReportedByParent": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "queriedByRunId": true,
+  "observedAt": "2026-11-06T14:56:12.431Z",
+  "jobs": [
+    {
+      "id": 127958031956,
+      "name": "Synthetic 1, 10 and 100 company performance",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 127958032357,
+      "name": "Chromium synthetic onboarding acceptance",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 127958032390,
+      "name": "Sites types, tests and production build",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 127958032410,
+      "name": "Node 24.22.1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 127958032428,
+      "name": "Bankgiro SFTP integration",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 127958032547,
+      "name": "Node 22.23.4",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ]
+}
