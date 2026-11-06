@@ -1,0 +1,37 @@
+{
+  "schema": "bounded-scheduled-diagnostic-v1",
+  "before": {
+    "id": "Automation_6efa3aafab4081918c48001acc562f96",
+    "prompt": "Uppdatera MG Fakturakoll med den anslutna ägarens Gmail-underlag. Varje schemakörning ska göra nya verktygsanrop: börja med gmail_sync_status och använd det färska svaret, inte tidigare chattresultat, för att kontrollera anslutning, paus och väntetid. Om hämtning är aktiverad, ansluten och tillåten nu: anropa gmail_auto_sync en gång och invänta dess verkliga resultat. Verktyget hämtar nya relevanta bilagor och behåller sina egna spärrar. Vid saknad anslutning, krävd användaråtgärd, paus, busy, fel eller framtida retry_after/next_eligible_sync: respektera stoppet; försök inte kringgå det eller göra upprepade hämtningar. Om dokumentbearbetning är aktiverad och inget fel eller busy hindrar den: anropa process_invoice_documents en gång för den beständiga kön. Läs därefter gmail_sync_status separat och jämför last_successful_fetch, schedule_observation och dokumentstatus med körningens första svar. Ett no_update-resultat får endast användas efter dessa färska kontrollanrop och ett faktiskt oförändrat resultat; ett uteblivet anrop är inte en lyckad hämtning. Bekräfta aldrig offline OCR enbart för att lokal worker saknas: beakta cloud_ocr_configured, cloud_worker_recent och cloud_last_completed. Respektera verifierade motparter, original, dubbletter och alla registreringskontroller. Använd endast vanlig behörig avstämning av registrerade fakturor mot redan sparade verifierbara bankunderlag och förbered vid behov mejlförslag. Skicka aldrig mejl; användaren måste granska och godkänna. Ändra inte det separata bankschemat eller åtkomstinställningar. Var tyst vid ett verifierat oförändrat läge; uppmärksamma betydelsefulla fel, saknade verktyg eller nödvändig användaråtgärd.",
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "is_enabled": true,
+    "updated_at": "2026-11-06T06:01:23.982590+00:00",
+    "default_timezone": "Europe/Stockholm",
+    "last_run": {
+      "id": "179735cb-daf0-832f-8718-6af99d18895f",
+      "recorded_status": "no_update",
+      "scheduled_for": "2026-11-06T06:00:00Z",
+      "started_at": "2026-11-06T06:01:01.755944Z",
+      "completed_at": "2026-11-06T06:01:02.300507Z"
+    }
+  },
+  "after": {
+    "id": "Automation_6efa3aafab4081918c48001acc562f96",
+    "prompt": "Uppdatera MG Fakturakoll med den anslutna ägarens Gmail-underlag. Varje schemakörning ska göra nya verktygsanrop: börja med gmail_sync_status och använd det färska svaret, inte tidigare chattresultat, för att kontrollera anslutning, paus och väntetid. Om hämtning är aktiverad, ansluten och tillåten nu: anropa gmail_auto_sync en gång och invänta dess verkliga resultat. Verktyget hämtar nya relevanta bilagor och behåller sina egna spärrar. Vid saknad anslutning, krävd användaråtgärd, paus, busy, fel eller framtida retry_after/next_eligible_sync: respektera stoppet; försök inte kringgå det eller göra upprepade hämtningar. Om dokumentbearbetning är aktiverad och inget fel eller busy hindrar den: anropa process_invoice_documents en gång för den beständiga kön. Läs därefter gmail_sync_status separat och jämför last_successful_fetch, schedule_observation och dokumentstatus med körningens första svar. Ett no_update-resultat får endast användas efter dessa färska kontrollanrop och ett faktiskt oförändrat resultat; ett uteblivet anrop är inte en lyckad hämtning. Bekräfta aldrig offline OCR enbart för att lokal worker saknas: beakta cloud_ocr_configured, cloud_worker_recent och cloud_last_completed. Respektera verifierade motparter, original, dubbletter och alla registreringskontroller. Använd endast vanlig behörig avstämning av registrerade fakturor mot redan sparade verifierbara bankunderlag och förbered vid behov mejlförslag. Skicka aldrig mejl; användaren måste granska och godkänna. Ändra inte det separata bankschemat eller åtkomstinställningar. Var tyst vid ett verifierat oförändrat läge; uppmärksamma betydelsefulla fel, saknade verktyg eller nödvändig användaråtgärd.\n\nTillfällig diagnostik endast för schematillfället den 6 november 2026 kl. 07:00 UTC: lämna alltid ett kort körkvitto efter de vanliga färska kontrollanropen, även om inga dokument ändras. Ange om gmail_sync_status, gmail_auto_sync och process_invoice_documents faktiskt anropades eller varför respektive anrop stoppades, samt appens slutliga last_invoked_at, last_successful_fetch och dokumenträknare. Om något verktyg saknas eller inte kan användas ska det framgå uttryckligen i kvittot; använd inte no_update för denna diagnoskörning. Återge inga mejladresser, dokument-ID:n, fakturainnehåll eller autentiseringsuppgifter. Denna engångsdiagnostik ändrar inga väntetider, behörigheter eller åtgärder och ska inte starta extra hämtningar. Vid senare schematillfällen gäller den ordinarie tystnaden vid verifierat oförändrat läge.",
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "is_enabled": true,
+    "updated_at": "2026-11-06T06:11:25.841234+00:00",
+    "default_timezone": "Europe/Stockholm"
+  },
+  "diagnosticNominalRunUtc": "2026-11-06T07:00:00Z",
+  "changedFields": [
+    "prompt"
+  ],
+  "extraRunsStarted": 0,
+  "scheduleChanged": false,
+  "permissionsChanged": false,
+  "actualFetchOrFixClaimed": false,
+  "scoreChanged": false,
+  "reason": "05:00 and 06:00 task records are no_update with no corresponding new application invocation. The task platform exposes no tool trace; one normal upcoming run must return a bounded receipt even when unchanged.",
+  "precedingObservation": "https://github.com/sharbel0022/Mgeorge/tree/5cd67b18792505139234de68533516fc33067ace/docs/quality8/gmail-schedule-0600-20261106"
+}
