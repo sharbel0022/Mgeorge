@@ -1,0 +1,235 @@
+{
+  "schema": "mgeorge-organization-inline-final-v1",
+  "scope": "Synthetic text and saved-word regression; no optical execution or release",
+  "baselineCommit": "d3af7858c7cf9e170277f6fec616f592a8206c0f",
+  "preFixFreezeCommit": "69b2dd0b0a82c219f5b632ce5cec757869c4d572",
+  "productSourceSha256": {
+    "src/invoice-details.js": "8525da588b94ac7c7bc967b40b7051bea85c21ea881319dbe5d38ab9e2ca101d",
+    "sites/lib/invoice-details.js": "8525da588b94ac7c7bc967b40b7051bea85c21ea881319dbe5d38ab9e2ca101d",
+    "src/invoice-extraction.js": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+    "sites/lib/invoice-fields.js": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2"
+  },
+  "independentReproduction": {
+    "path": "sites/tests/review-organization-inline-context-independent.test.mjs",
+    "sha256": "ad1434c22d55d954e350482a9fc56cd15b8ec3d29b680c4ca280c8f6b58126d3",
+    "bytes": 2411,
+    "author": "rating8_documents/usage_diagnostic_review",
+    "beforeExecutor": "root",
+    "before": {
+      "tests": 16,
+      "passed": 8,
+      "failed": 8,
+      "skipped": 0,
+      "durationMs": 640.421589,
+      "logSha256": "d457267ee717a02f937f6de525e57809f7be9c7c63db786f28046cb0d9709fd0"
+    },
+    "afterExecutor": "rating8_recovery",
+    "after": {
+      "tests": 16,
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "includedInFinalGate": true
+    },
+    "unchanged": true
+  },
+  "contractCorrection": {
+    "priorRecord": "docs/quality8/ocr-organization-inline-contract-before.json",
+    "priorFullLog": "docs/quality8/ocr-organization-inline-draft-before.txt",
+    "authorizedByRoot": true,
+    "onlyChangedNewExpectation": "scalar suffix after the last name event",
+    "sourceUnchanged": "Faktureras till: Syntetiska Mottagaren AB Valuta: SEK\nOrganisationsnummer: 556016-0680",
+    "oldExpectedOrganization": null,
+    "newExpectedOrganization": "5560160680",
+    "reason": "Known inline scalar suffixes introduce no other party, with or without a colon. This matches the unchanged older inline Summa moms positive. Separate scalar rows and unknown explicit labels still break the section.",
+    "oldAssertionsChanged": false,
+    "original24And28SourcesPreserved": true
+  },
+  "olderPositiveRegression": {
+    "path": "sites/tests/invoice-grammar-boundaries.test.mjs",
+    "sha256": "b9084c1a6c142da0069efb0ade0cb1a14a79feede6d2bbbfa61e3fce640424bc",
+    "name": "complete inline explicit VAT has the same name and scalar boundary",
+    "originalAssertionsUnchanged": true,
+    "draftFullGate": {
+      "tests": 852,
+      "passed": 848,
+      "failed": 4,
+      "durationMs": 3688.471636
+    },
+    "finalAllFourPass": true
+  },
+  "ownMatrix": {
+    "path": "sites/tests/organization-event-context.test.mjs",
+    "sha256": "0eac8547ef7ebf68aa21e7f07bdce4c510a9abcd291c4c25e0ad16c7499c65b7",
+    "tests": 44,
+    "passed": 44,
+    "failed": 0,
+    "coverage": [
+      "unknown context before same-line organization via independent matrix",
+      "separate scalar row",
+      "registered tax-summary prefix and separate row",
+      "different explicit owner before an unqualified number",
+      "known inline scalar suffix with and without colon",
+      "recognized identity-field separators",
+      "explicit ownership after unknown field",
+      "matching owner preserves local section",
+      "name prefix is not a scalar label"
+    ]
+  },
+  "additionalDraftReds": [
+    {
+      "stage": "Known scalar colon consistency before shared colon callback",
+      "tests": 36,
+      "passed": 28,
+      "failed": 8,
+      "durationMs": 751.606608,
+      "sourceCapturedAtExecution": false,
+      "logSha256": "4b9d483f28e77924ea561beb0b67a69f390f06a022c773d1a9b71b8e493070ad",
+      "fullLog": "✔ Node pdf holds organization context at scalar prefix on the organization row (52.145443ms)\n✔ Node pdf holds organization context at a different explicit owner before an unqualified organization (4.941772ms)\n✖ Node pdf retains scalar suffix after the last name event (2.337632ms)\n✖ Node pdf retains known inline VAT with a colon (1.152818ms)\n✔ Node pdf retains known inline currency without a colon (1.761199ms)\n✔ Node pdf retains recognized adjacent identity fields separated by a pipe (0.838762ms)\n✔ Node pdf retains explicit ownership after an unknown inline field (0.841557ms)\n✔ Node pdf retains matching explicit ownership keeps its existing local section (0.808878ms)\n✔ Node pdf a name prefix is not a scalar label or a new section (0.874025ms)\n✔ Node ocr holds organization context at scalar prefix on the organization row (1.708752ms)\n✔ Node ocr holds organization context at a different explicit owner before an unqualified organization (1.190043ms)\n✖ Node ocr retains scalar suffix after the last name event (0.827456ms)\n✖ Node ocr retains known inline VAT with a colon (0.834095ms)\n✔ Node ocr retains known inline currency without a colon (0.653208ms)\n✔ Node ocr retains recognized adjacent identity fields separated by a pipe (0.572749ms)\n✔ Node ocr retains explicit ownership after an unknown inline field (0.592818ms)\n✔ Node ocr retains matching explicit ownership keeps its existing local section (0.627149ms)\n✔ Node ocr a name prefix is not a scalar label or a new section (0.596623ms)\n✔ Sites pdf holds organization context at scalar prefix on the organization row (7.84372ms)\n✔ Sites pdf holds organization context at a different explicit owner before an unqualified organization (1.125418ms)\n✖ Sites pdf retains scalar suffix after the last name event (1.003187ms)\n✖ Sites pdf retains known inline VAT with a colon (1.182662ms)\n✔ Sites pdf retains known inline currency without a colon (1.074101ms)\n✔ Sites pdf retains recognized adjacent identity fields separated by a pipe (0.843189ms)\n✔ Sites pdf retains explicit ownership after an unknown inline field (0.69491ms)\n✔ Sites pdf retains matching explicit ownership keeps its existing local section (0.761147ms)\n✔ Sites pdf a name prefix is not a scalar label or a new section (0.858922ms)\n✔ Sites ocr holds organization context at scalar prefix on the organization row (0.893884ms)\n✔ Sites ocr holds organization context at a different explicit owner before an unqualified organization (0.741068ms)\n✖ Sites ocr retains scalar suffix after the last name event (0.775439ms)\n✖ Sites ocr retains known inline VAT with a colon (0.79013ms)\n✔ Sites ocr retains known inline currency without a colon (0.677453ms)\n✔ Sites ocr retains recognized adjacent identity fields separated by a pipe (0.690594ms)\n✔ Sites ocr retains explicit ownership after an unknown inline field (0.620529ms)\n✔ Sites ocr retains matching explicit ownership keeps its existing local section (0.581471ms)\n✔ Sites ocr a name prefix is not a scalar label or a new section (0.604095ms)\nℹ tests 36\nℹ suites 0\nℹ pass 28\nℹ fail 8\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 751.606608\n\n✖ failing tests:\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Node pdf retains scalar suffix after the last name event (2.337632ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Node pdf retains known inline VAT with a colon (1.152818ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Node ocr retains scalar suffix after the last name event (0.827456ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Node ocr retains known inline VAT with a colon (0.834095ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Sites pdf retains scalar suffix after the last name event (1.003187ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Sites pdf retains known inline VAT with a colon (1.182662ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Sites ocr retains scalar suffix after the last name event (0.775439ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:32:37\n✖ Sites ocr retains known inline VAT with a colon (0.79013ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + null\n  - '5560160680'\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:34:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: null,\n    expected: '5560160680',\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n"
+    },
+    {
+      "stage": "Registered scalar row/prefix before reuse of the scalar start-boundary",
+      "tests": 44,
+      "passed": 36,
+      "failed": 8,
+      "durationMs": 634.410027,
+      "sourceCapturedAtExecution": false,
+      "logSha256": "04ead0ba77ca7212e5ba9bb359f3b5a3445b775ad6310b70906e257be7d4919e",
+      "fullLog": "✔ Node pdf holds organization context at scalar prefix on the organization row (35.465924ms)\n✖ Node pdf holds organization context at registered tax-summary prefix on the organization row (3.984401ms)\n✖ Node pdf holds organization context at separate registered tax-summary row (1.044667ms)\n✔ Node pdf holds organization context at a different explicit owner before an unqualified organization (0.829488ms)\n✔ Node pdf retains scalar suffix after the last name event (1.538978ms)\n✔ Node pdf retains known inline VAT with a colon (0.728939ms)\n✔ Node pdf retains known inline currency without a colon (0.677484ms)\n✔ Node pdf retains recognized adjacent identity fields separated by a pipe (0.70961ms)\n✔ Node pdf retains explicit ownership after an unknown inline field (0.786254ms)\n✔ Node pdf retains matching explicit ownership keeps its existing local section (0.78309ms)\n✔ Node pdf a name prefix is not a scalar label or a new section (0.670883ms)\n✔ Node ocr holds organization context at scalar prefix on the organization row (1.186106ms)\n✖ Node ocr holds organization context at registered tax-summary prefix on the organization row (1.048122ms)\n✖ Node ocr holds organization context at separate registered tax-summary row (0.656963ms)\n✔ Node ocr holds organization context at a different explicit owner before an unqualified organization (0.574691ms)\n✔ Node ocr retains scalar suffix after the last name event (0.530966ms)\n✔ Node ocr retains known inline VAT with a colon (0.568402ms)\n✔ Node ocr retains known inline currency without a colon (0.617475ms)\n✔ Node ocr retains recognized adjacent identity fields separated by a pipe (0.550515ms)\n✔ Node ocr retains explicit ownership after an unknown inline field (0.548212ms)\n✔ Node ocr retains matching explicit ownership keeps its existing local section (0.57429ms)\n✔ Node ocr a name prefix is not a scalar label or a new section (0.514172ms)\n✔ Sites pdf holds organization context at scalar prefix on the organization row (5.984314ms)\n✖ Sites pdf holds organization context at registered tax-summary prefix on the organization row (1.05368ms)\n✖ Sites pdf holds organization context at separate registered tax-summary row (0.939762ms)\n✔ Sites pdf holds organization context at a different explicit owner before an unqualified organization (0.839954ms)\n✔ Sites pdf retains scalar suffix after the last name event (0.849268ms)\n✔ Sites pdf retains known inline VAT with a colon (0.702089ms)\n✔ Sites pdf retains known inline currency without a colon (0.617374ms)\n✔ Sites pdf retains recognized adjacent identity fields separated by a pipe (0.650563ms)\n✔ Sites pdf retains explicit ownership after an unknown inline field (0.798322ms)\n✔ Sites pdf retains matching explicit ownership keeps its existing local section (0.706837ms)\n✔ Sites pdf a name prefix is not a scalar label or a new section (0.56094ms)\n✔ Sites ocr holds organization context at scalar prefix on the organization row (0.615923ms)\n✖ Sites ocr holds organization context at registered tax-summary prefix on the organization row (0.755499ms)\n✖ Sites ocr holds organization context at separate registered tax-summary row (0.656903ms)\n✔ Sites ocr holds organization context at a different explicit owner before an unqualified organization (0.66207ms)\n✔ Sites ocr retains scalar suffix after the last name event (0.629051ms)\n✔ Sites ocr retains known inline VAT with a colon (0.576284ms)\n✔ Sites ocr retains known inline currency without a colon (0.608581ms)\n✔ Sites ocr retains recognized adjacent identity fields separated by a pipe (0.545738ms)\n✔ Sites ocr retains explicit ownership after an unknown inline field (0.526189ms)\n✔ Sites ocr retains matching explicit ownership keeps its existing local section (0.60811ms)\n✔ Sites ocr a name prefix is not a scalar label or a new section (0.534772ms)\nℹ tests 44\nℹ suites 0\nℹ pass 36\nℹ fail 8\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 634.410027\n\n✖ failing tests:\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Node pdf holds organization context at registered tax-summary prefix on the organization row (3.984401ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Node pdf holds organization context at separate registered tax-summary row (1.044667ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Node ocr holds organization context at registered tax-summary prefix on the organization row (1.048122ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Node ocr holds organization context at separate registered tax-summary row (0.656963ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Sites pdf holds organization context at registered tax-summary prefix on the organization row (1.05368ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Sites pdf holds organization context at separate registered tax-summary row (0.939762ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Sites ocr holds organization context at registered tax-summary prefix on the organization row (0.755499ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\ntest at sites/tests/organization-event-context.test.mjs:28:32\n✖ Sites ocr holds organization context at separate registered tax-summary row (0.656903ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  + actual - expected\n  \n  + '5560160680'\n  - null\n  \n      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/security/sites/tests/organization-event-context.test.mjs:30:55)\n      at Test.runInAsyncScope (node:async_hooks:227:14)\n      at Test.run (node:internal/test_runner/test:1402:25)\n      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)\n      at Test.postRun (node:internal/test_runner/test:1542:19)\n      at Test.run (node:internal/test_runner/test:1467:12)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: '5560160680',\n    expected: null,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n"
+    }
+  ],
+  "finalGate": {
+    "command": "REVIEW_SOURCE_ROOT=/workspace/scratch/4d79ab4bea8e/security NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --test --test-reporter=spec test/ocr-layout.test.js test/ocr-layout-geometry-boundaries.test.js test/review-ocr-layout-boundaries.test.js test/ocr-layout-explicit-fields.test.js sites/tests/ocr-layout-integration.test.mjs sites/tests/ocr-layout-role-parity.test.mjs test/ocr-bankgiro-evidence.test.js test/ocr-bankgiro-sibling-evidence.test.js sites/tests/ocr-bankgiro-evidence.test.mjs sites/tests/invoice-grammar-boundaries.test.mjs sites/tests/invoice-v2-explicit-grammar.test.mjs /tmp/mgeorge-v2-grammar-review-fhluchnz/sites/tests/review-v2-explicit-grammar-independent.test.mjs test/invoice-evidence-ocr.test.js sites/tests/invoice-evidence-ocr.test.mjs test/invoice-scalar-layout-regression.test.js sites/tests/invoice-scalar-layout-regression.test.mjs sites/tests/ocr-parser-independent-review.test.mjs sites/tests/review-explicit-recipient-boundaries.test.mjs sites/tests/ocr-explicit-role-boundary-positive.test.mjs sites/tests/review-layout-table-census-independent.test.mjs sites/tests/ocr-layout-table-grammar-parity.test.mjs sites/tests/review-organization-owner-boundaries.test.mjs sites/tests/review-organization-source-order-independent.test.mjs sites/tests/review-organization-inline-context-independent.test.mjs sites/tests/organization-event-context.test.mjs",
+    "tests": 868,
+    "passed": 868,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "durationMs": 3767.7705,
+    "logPath": "docs/quality8/ocr-organization-inline-final-gate.txt",
+    "logSha256": "327de1b78b8d5b125c83a4232fc9d29cc678ad2fdc275d53d843d6bd076fc02b",
+    "testFiles": [
+      {
+        "path": "test/ocr-layout.test.js",
+        "sha256": "b3aeb605e4b80e9a54abd8150e04c0763f652dbdb0df1e7c80b097757c61f05e"
+      },
+      {
+        "path": "test/ocr-layout-geometry-boundaries.test.js",
+        "sha256": "b4d26c5ca18f7e5b7479af1196df08cbe562acec09dfeefb30e335dbc02f12e7"
+      },
+      {
+        "path": "test/review-ocr-layout-boundaries.test.js",
+        "sha256": "428e99102babf61f783fee2d334b403205dde1ccd1de6b31f65e05286692f0c7"
+      },
+      {
+        "path": "test/ocr-layout-explicit-fields.test.js",
+        "sha256": "463f1ffdfe3df23eed3fd44bca1849a0f5c9c7504deb9275d9fb14ae7aba73de"
+      },
+      {
+        "path": "sites/tests/ocr-layout-integration.test.mjs",
+        "sha256": "8152ce662727e0b028c1d8db960fae8daba73a0fc128d05ba6e2ce7dc64d0140"
+      },
+      {
+        "path": "sites/tests/ocr-layout-role-parity.test.mjs",
+        "sha256": "300e5bfaa4674f04740520c659f35aad69158b20ba88cf298381a52d3538095b"
+      },
+      {
+        "path": "test/ocr-bankgiro-evidence.test.js",
+        "sha256": "0e06d4cb3a68badc0748c534f56eb70581fcb1ac922d3fb1c6da889c32dc6f65"
+      },
+      {
+        "path": "test/ocr-bankgiro-sibling-evidence.test.js",
+        "sha256": "320952ebb4fe00f573ed484912a94289faa29f0daf568ec2a18be081d7ab149c"
+      },
+      {
+        "path": "sites/tests/ocr-bankgiro-evidence.test.mjs",
+        "sha256": "bb199902b2d9afe0e8653bcfe67a6521b1aac2b71ef818a3eb4ce91c9ea4e03a"
+      },
+      {
+        "path": "sites/tests/invoice-grammar-boundaries.test.mjs",
+        "sha256": "b9084c1a6c142da0069efb0ade0cb1a14a79feede6d2bbbfa61e3fce640424bc"
+      },
+      {
+        "path": "sites/tests/invoice-v2-explicit-grammar.test.mjs",
+        "sha256": "354bc84aecd95b8b3472e4580a72939897cd4b97373a02f893271daec1e9afd8"
+      },
+      {
+        "path": "/tmp/mgeorge-v2-grammar-review-fhluchnz/sites/tests/review-v2-explicit-grammar-independent.test.mjs",
+        "sha256": "135175e9990f0bbe6661e56a0f29efd3f9e05d0ce2034c22ccc168fc3cfd3f8e"
+      },
+      {
+        "path": "test/invoice-evidence-ocr.test.js",
+        "sha256": "c837d7e10659e009071d665376db13244ecaac88350617edf4a3c2490f8cdc86"
+      },
+      {
+        "path": "sites/tests/invoice-evidence-ocr.test.mjs",
+        "sha256": "c8c12691bf36fb8fbca878af980af23bc8e76b1928d2be48969d49e9d93c4ab2"
+      },
+      {
+        "path": "test/invoice-scalar-layout-regression.test.js",
+        "sha256": "559e8c9c1f00a194c8f1f4767540c4a81481bab6ed20dfb18ca160d6e50a053c"
+      },
+      {
+        "path": "sites/tests/invoice-scalar-layout-regression.test.mjs",
+        "sha256": "9ffc73161911493a729cfd3511225e72488c25ab7e1a6ac1f4dccde12c84ff1e"
+      },
+      {
+        "path": "sites/tests/ocr-parser-independent-review.test.mjs",
+        "sha256": "e82be6a7469ff101d2929c08387bd8c323d0c88165aac64d98b57b52c83d010f"
+      },
+      {
+        "path": "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+        "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545"
+      },
+      {
+        "path": "sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+        "sha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506"
+      },
+      {
+        "path": "sites/tests/review-layout-table-census-independent.test.mjs",
+        "sha256": "332ec4b13aed08ac7ec46eb870b139d52aa17e8c7e4f47654232ac0c626cbe06"
+      },
+      {
+        "path": "sites/tests/ocr-layout-table-grammar-parity.test.mjs",
+        "sha256": "90e030e87c5f6e488409a880d4ef57c9a1b1945f70e8f4c5ba7e25aa6df2a674"
+      },
+      {
+        "path": "sites/tests/review-organization-owner-boundaries.test.mjs",
+        "sha256": "76f5b9e476c19ef432978d62728b1bdc8230a3002ace831896c482243463fd20"
+      },
+      {
+        "path": "sites/tests/review-organization-source-order-independent.test.mjs",
+        "sha256": "a95bed90211b29d2996e618b7cb5b2b0fa513f7e0480f8ae01289dddc60614ea"
+      },
+      {
+        "path": "sites/tests/review-organization-inline-context-independent.test.mjs",
+        "sha256": "ad1434c22d55d954e350482a9fc56cd15b8ec3d29b680c4ca280c8f6b58126d3"
+      },
+      {
+        "path": "sites/tests/organization-event-context.test.mjs",
+        "sha256": "0eac8547ef7ebf68aa21e7f07bdce4c510a9abcd291c4c25e0ad16c7499c65b7"
+      }
+    ],
+    "externalFrozenTestSourceCommit": "8271da891e251fbd99a1ed8caf5bd005152c9c1c"
+  },
+  "validation": {
+    "nodeVersion": "v24.22.1",
+    "typecheck": {
+      "command": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node sites/node_modules/typescript/bin/tsc --noEmit -p sites/tsconfig.json",
+      "exitCode": 0
+    },
+    "detailsByteIdentical": true,
+    "gitDiffCheckExitCode": 0
+  },
+  "limits": [
+    "No new OCR calls in this task. The earlier three optical-call deviation remains separately recorded.",
+    "No V3 corpus access. No production or provider calls.",
+    "No fresh holdout result, corpus edit, score change or claimed OCR recall gain.",
+    "Independent final source review and root integration gates remain separate.",
+    "The older no-named-role direction fallback remains; this patch prevents borrowing through recognized named-party context."
+  ],
+  "opticalCalls": 0,
+  "v3Access": false,
+  "productionCalls": 0
+}

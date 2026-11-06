@@ -1,0 +1,12 @@
+{
+  "schema": "mgeorge-psm6-preflight-v1",
+  "ocrCalls": 0,
+  "checkPassed": true,
+  "parserCalls": 24,
+  "baselineFieldAndLevelParityCases": 24,
+  "baselineMandatoryRecall": 0.63,
+  "exactOneParameterDelta": true,
+  "productFilesUnchanged": true,
+  "planSha256": "64f56ec1b8e9b8441f370142e5733d10e9cc8b7b15d15e55d6b67931bf711ad6",
+  "v3Touched": false
+}

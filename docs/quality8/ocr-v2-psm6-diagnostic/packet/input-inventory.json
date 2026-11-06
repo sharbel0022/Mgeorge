@@ -1,0 +1,354 @@
+[
+  {
+    "id": "holdout-v2-normal-01",
+    "population": "normal-readable",
+    "layout": "split-header-totals-right",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-01.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 170379,
+    "sha256": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d",
+    "originalBytes": 170379,
+    "expectedRasterSha256": "26a36566f44242340c94b573c1d434dc93f44c372eb808a51ee26d577fb4e752",
+    "rasterBytes": 583755,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Moms 25 %",
+        "x": 870,
+        "y": 1319,
+        "width": 158,
+        "height": 21
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-normal-02",
+    "population": "normal-readable",
+    "layout": "formal-compact",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-02.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 146242,
+    "sha256": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604",
+    "originalBytes": 146242,
+    "expectedRasterSha256": "52ee2ae8fe4fb6e60f85ea35ef3b1b6b4cf4254d045cab298fb4074a2ce590a1",
+    "rasterBytes": 488640,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Momsbelopp (25 %)",
+        "x": 100,
+        "y": 1289,
+        "width": 248,
+        "height": 27
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-normal-03",
+    "population": "normal-readable",
+    "layout": "right-address",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-03.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 160881,
+    "sha256": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338",
+    "originalBytes": 160881,
+    "expectedRasterSha256": "de224deb2241bfd64bf60e1d2fe4eb84aaa5e92fa8d32a00be452c9d0fb977eb",
+    "rasterBytes": 562911,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [],
+    "renderedPercentCount": 0
+  },
+  {
+    "id": "holdout-v2-normal-04",
+    "population": "normal-readable",
+    "layout": "upper-payment-panel",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-04.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 151028,
+    "sha256": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b",
+    "originalBytes": 151028,
+    "expectedRasterSha256": "ea64707ba2f2f5f161f13ba1d94c810458b652a89d312868b1d5d6ebfe8bef71",
+    "rasterBytes": 537453,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Moms 25 %",
+        "x": 810,
+        "y": 1429,
+        "width": 175,
+        "height": 22
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-normal-05",
+    "population": "normal-readable",
+    "layout": "ledger-form",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-05.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 155370,
+    "sha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+    "originalBytes": 155370,
+    "expectedRasterSha256": "3c3a85f37365b6e407cd2be96ee4613893c8a06d0d63c5b0a5de5ea76ed01f5b",
+    "rasterBytes": 556734,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Moms (25 %)",
+        "x": 840,
+        "y": 1289,
+        "width": 202,
+        "height": 27
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-normal-06",
+    "population": "normal-readable",
+    "layout": "stacked-summary",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-06.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 149835,
+    "sha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+    "originalBytes": 149835,
+    "expectedRasterSha256": "bd6ad7c451ac84603460751c7d29ed599bfd3e04e22127269849c34317f7e3e3",
+    "rasterBytes": 501166,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [],
+    "renderedPercentCount": 0
+  },
+  {
+    "id": "holdout-v2-normal-07",
+    "population": "normal-readable",
+    "layout": "horizontal-summary",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-07.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 150143,
+    "sha256": "6cdc1af980952c6efacf2060bc282c086aeaac21711f5d158b7b37f669f795b7",
+    "originalBytes": 150143,
+    "expectedRasterSha256": "b1463dedb187ccb03fddf0f813e3a664016f63974d7d0d660281c54c1554aeb5",
+    "rasterBytes": 535586,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Moms 25 %",
+        "x": 610,
+        "y": 1245,
+        "width": 148,
+        "height": 19
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-normal-08",
+    "population": "normal-readable",
+    "layout": "side-rail",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-08.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 153298,
+    "sha256": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac",
+    "originalBytes": 153298,
+    "expectedRasterSha256": "00e7fcdd66035d229b09823db2e149f96f31a2ab527a3864800f7cc654e113a3",
+    "rasterBytes": 545685,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Momsbelopp (25 %)",
+        "x": 830,
+        "y": 1329,
+        "width": 301,
+        "height": 29
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-normal-09",
+    "population": "normal-readable",
+    "layout": "classic-footer",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-09.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 142671,
+    "sha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+    "originalBytes": 142671,
+    "expectedRasterSha256": "db82bf3c25768aa0ae5e297db3fd731b8e06c5abedcc986534e35414f7cbb99a",
+    "rasterBytes": 478337,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Moms 25 % beräknas på nettobeloppet.",
+        "x": 100,
+        "y": 1230,
+        "width": 475,
+        "height": 28
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-normal-10",
+    "population": "normal-readable",
+    "layout": "paired-sections",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Predetermined readable synthetic invoice; selected before any OCR or application parser run.",
+    "sourceId": null,
+    "filename": "images/holdout-v2-normal-10.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 159394,
+    "sha256": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b",
+    "originalBytes": 159394,
+    "expectedRasterSha256": "e3792322a5eaf831bddbec5fd0410d5062b81a999fc8d4997a7ae5b994128714",
+    "rasterBytes": 561383,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [
+      {
+        "text": "Moms 25 %",
+        "x": 810,
+        "y": 1339,
+        "width": 163,
+        "height": 22
+      }
+    ],
+    "renderedPercentCount": 1
+  },
+  {
+    "id": "holdout-v2-stress-lost-bottom",
+    "population": "stress",
+    "layout": "lost-bottom-scan",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Simulated incomplete scan: lower financial/payment area is physically absent; original canonical gold is retained. Must abstain from green.",
+    "sourceId": "holdout-v2-normal-09",
+    "filename": "images/holdout-v2-stress-lost-bottom.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 90522,
+    "sha256": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e",
+    "originalBytes": 90522,
+    "expectedRasterSha256": "a4379871e2dfe5e584578ca9307d7b1b7688fc635f3bbd628073939c5da12427",
+    "rasterBytes": 302154,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [],
+    "renderedPercentCount": 0
+  },
+  {
+    "id": "holdout-v2-stress-defocused-photo",
+    "population": "stress",
+    "layout": "defocused-tilted-photo",
+    "metadata": {
+      "direction": "supplier",
+      "direction_confident": true
+    },
+    "notes": "Simulated low-resolution defocused phone photograph with reduced contrast and slight rotation; original canonical gold is retained. Must abstain from green.",
+    "sourceId": "holdout-v2-normal-02",
+    "filename": "images/holdout-v2-stress-defocused-photo.png",
+    "mimeType": "image/png",
+    "width": 1600,
+    "height": 2000,
+    "bytes": 291796,
+    "sha256": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606",
+    "originalBytes": 291796,
+    "expectedRasterSha256": "b2f4313416d1a578b50b01aca059736bb9578f4553f199182ab9d5588d476877",
+    "rasterBytes": 645921,
+    "rasterWidth": 2400,
+    "rasterHeight": 3000,
+    "renderedPercentMarkers": [],
+    "renderedPercentCount": 0
+  }
+]

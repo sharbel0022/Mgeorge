@@ -1,0 +1,17 @@
+{
+  "text": "FAKTURA\nFiktiva Skärvik IT AB Faktureras till\nDatagatan 11 Testmottagaren Handel AB\n678 90 Prowvik Handelsvägen 22\nOrg.nr: 559762-3163 123 40 Teststad\nFakturanr: SR-260419 Förfallodatum\nFakturadatum: 2026-07-10 2026-08-09\nBeskrivning Antal Å-pris Belopp\nServiceabonnemang 1 1 200,00 1 200,00\nFelsökning på distans 0,5 800,00 400,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankoi Netto\nNN 1 600,00\n8627-0535\nOCR Momsbelopp\n-Nummer\n400,00\n00863025169\nA R d betal Att betala\nOCR- t vi talning.\nnge numret vid betalning 2 000,00 SEK\nTjänsterna avser månadsvis drift och support.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 89,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+    "textSha256": "f61bac84eedc8055aebe8a7ca374f0f8dc118980aad2f18423a00affb758767e",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "856a2608fcf813d965995a697770a4c1d139e5177b5b344b01b2b3565d226edb",
+        "bankgiro": []
+      }
+    ]
+  }
+}

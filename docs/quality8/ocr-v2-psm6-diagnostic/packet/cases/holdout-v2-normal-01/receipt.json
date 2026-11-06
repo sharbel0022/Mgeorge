@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-01",
+  "population": "normal-readable",
+  "layout": "split-header-totals-right",
+  "startedAt": "2026-11-06T00:23:04.495Z",
+  "completedAt": "2026-11-06T00:23:09.263Z",
+  "durationMs": 4768.142575,
+  "inputSha256": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d",
+  "expectedRasterSha256": "26a36566f44242340c94b573c1d434dc93f44c372eb808a51ee26d577fb4e752",
+  "actualRasterSha256": "26a36566f44242340c94b573c1d434dc93f44c372eb808a51ee26d577fb4e752",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 92,
+  "rawBlocks": 1,
+  "rawLines": 23,
+  "rawWords": 92,
+  "rawText": "Exempel Kustteknik AB FAKTURA\nVerkstadsgatan 7\n123 45 Exempelhamn\nOrg.nr: 559762-3114 Fakturanummer\nKS-28417\nFakturadatum\n2026-06-03\nFaktureras till -\nTestmottagaren Handel AB Förfallodatum\nHandelsvägen 22 2026-07-03\n123 40 Teststad\nKundnummer: K-5201 Er beställning: PO-83201\nBeskrivning Antal Å-pris Belopp\nService och mätning 3 795,00 2 385,00\nUtbytesdelar 2 680,40 1 360,80\nSamtliga radbelopp i SEK, exklusive moms.\nTack för ert uppdrag. Summa exkl. moms 3 745,80\nMoms 25 90 936,45\nAtt betala 4 682,25 SEK\nBankgiro OCR-nummer\n781-3421 00863025110\nAnge OCR-numret vid betalning. Valuta: SEK.\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "Exempel Kustteknik AB FAKTURA\nVerkstadsgatan 7\n123 45 Exempelhamn\nOrg.nr: 559762-3114 Fakturanummer\nKS-28417\nFakturadatum\n2026-06-03\nFaktureras till -\nTestmottagaren Handel AB Förfallodatum\nHandelsvägen 22 2026-07-03\n123 40 Teststad\nKundnummer: K-5201 Er beställning: PO-83201\nBeskrivning Antal Å-pris Belopp\nService och mätning 3 795,00 2 385,00\nUtbytesdelar 2 680,40 1 360,80\nSamtliga radbelopp i SEK, exklusive moms.\nTack för ert uppdrag. Summa exkl. moms 3 745,80\nMoms 25 90 936,45\nAtt betala 4 682,25 SEK\nBankgiro OCR-nummer\n781-3421 00863025110\nAnge OCR-numret vid betalning. Valuta: SEK.\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d",
+    "textSha256": "acc341733012e8e7c331b122613a72f7c0a14e76b11e89de30d3e56219e7ad63",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "32edfb4b502711e909eecf310222bf5e7b2b6f8025c2a317af35aaaa8c5f8a3d",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": false,
+  "percentMarkers": {
+    "rendered": 1,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "f831194454e551f837fe4270e1e09321553c813e08d5aba90bc6d1af031b557f",
+    "layout-replay.json": "31b980331d7cbed9df9cc80c11f39ee0a13f127df857255cf0531f19822af921",
+    "raw-response.json": "ec9f0360ba472e6d9fc22cca4546d2954aadcdaca74a7f9630092a00f4da52b0",
+    "raw-response.v8": "6f7645b13c5a69ba85ba4c65e418160e67e1154ac27551216cb25c20809ae9dc",
+    "recognition-finished.json": "439e1a2dda5436bba015d97ac8a20696b558ff4db053334be457d931658e7c9b",
+    "recognition-input.png": "26a36566f44242340c94b573c1d434dc93f44c372eb808a51ee26d577fb4e752",
+    "recognition-start.json": "9025091fa7f456e5133288e7e7683f50bfaf6ded89f1ca27ce528d8730ba2a4f",
+    "worker-result.json": "8986da6a29a8a1beee826b41bd1b18884e0a8c1a2b7c11ce50e3e0b1336e98a6",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

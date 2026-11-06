@@ -1,0 +1,31 @@
+{
+  "calls": 1,
+  "completedAt": "2026-11-06T00:23:30.012Z",
+  "rawResponseV8Sha256": "bd24f9aebdd95c87f560303700937040db943e08568fb2a809d943f972e2405e",
+  "globalConfidence": 90,
+  "rawTextSha256": "cc4382161605c4ea9f082f69452b59450a326c7f87d82257729ee87e82a3b4f3",
+  "topLevelKeys": [
+    "jobId",
+    "data"
+  ],
+  "dataKeys": [
+    "text",
+    "hocr",
+    "tsv",
+    "box",
+    "unlv",
+    "osd",
+    "pdf",
+    "imageColor",
+    "imageGrey",
+    "imageBinary",
+    "confidence",
+    "blocks",
+    "layoutBlocks",
+    "psm",
+    "oem",
+    "version",
+    "debug",
+    "rotateRadians"
+  ]
+}

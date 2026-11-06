@@ -1,3 +1,23 @@
+## 2026-11-06 — kompletterad produktionsverifiering: 28/33 minst 8
+
+Område 33 höjs från 7 till 8 efter [oberoende granskning av 28 och 33](docs/quality8/area28-33-independent-read-review.md) mot oförändrad PLAN. Site 65:s exakta källkedja kompletteras nu av avslutad schemalagd Gmail-körning, verklig OCR-behandling, fullständigt verifierad backup och ekonomiska före-/efterläsningar. Den säkert avvisade bankrevalideringen är ett relevant driftbevis men ingen giltig bankanslutning.
+
+Backupens frysta manifest är färdigt: **430/430 kopierade och kontrollästa original, 185 567 855 byte**, manifest_pass 00:48:58 UTC och separat slutstatus 00:49:04 UTC. Den tidigare schemakörningens otillräckliga 80-stegsbudget har rättats med manifestbaserad budget, men den nya instruktionen är inte prövad från ofärdig snapshot. Schemalagd OCR efter den aktuella publiceringen saknar fortfarande belägg.
+
+**28/33 är minst 8; 6, 10, 15, 16 och 28 återstår.** Summa 257,5/330, medel 7,80. Återköning och bankdiagnos granskas för nästa leverans; ingen betygshöjning för ännu opublicerad kod. De daterade lägesbilderna nedan är historiska.
+
+## 2026-11-06 — Site 65 publicerad, fortsatt 27/33 minst 8
+
+PR 57 är normalt mergad till main `41aadcef5fc6f65cc73979997b195c7b4f12eec1`. Exakt PR-/main-CI **6819/6819**, syntax/typer/audit/bygge godkända. Site 65 publicerades 23:48:25 UTC med identiskt Sites-träd och oförändrad miljörevision 10. [Full leveranskedja](docs/quality8/release-wave3.md).
+
+- En verklig revalidering gav sparat null-usage på enda valda kontot och aktuellt utelämnat usage. Anslutningen förblir spärrad; ingen bankfakta normaliserades.
+- Ny moln-OCR: 6 behandlade / 0 körfel, men event workflow_run; periodiskt schema fortfarande ej observerat efter uppdateringen.
+- Två kompletta skrivfria betalningsläsningar behöll revision 52, noll bokningar och samma spärrar/uppgiftsnivåer som Site 64.
+- Den nya snapshoten med 430 filer är under kopiering och stoppades från våra ytterligare steg när tjänsten visade busy; inget fullständigt verifierat resultat påstås.
+- Separat OCR-geometri/identitetsarbete är ännu inte levererat. V3 är förseglat. Kända V2-texter ger 63 % mandatory recall med levererad grammatik; första provets 60 % står kvar.
+
+Målet är fortfarande inte klart: 6 minimal manuell hantering, 10 bild-OCR, 15 bankanslutning, 16 bankhämtning, 28 schemaläggning, 33 produktion återstår under 8.
+
 # Verifierad progress
 
 ## 2026-11-05 — Site 64 publicerad,27/33 områden minst 8

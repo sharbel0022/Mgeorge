@@ -1,0 +1,162 @@
+{
+  "schema": "mgeorge-quality8-release-wave3-v1",
+  "recordedAt": "2026-11-06T00:15:49.261054+00:00",
+  "state": "published_and_bounded_postchecked_goal_not_met",
+  "repository": "sharbel0022/Mgeorge",
+  "pullRequest": {
+    "number": 57,
+    "url": "https://github.com/sharbel0022/Mgeorge/pull/57",
+    "head": "c90ed82c73bb566e54cb70eec14dae4ad9848361",
+    "merge": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+    "tree": "7152e11529b27a6affa0cc6f5a004c9408ff86f7"
+  },
+  "ci": {
+    "pullRequest": {
+      "workflow_runs": [
+        {
+          "id": 42130100542,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 40,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42130100542/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42130100542/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42130100359,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 260,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42130100359/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42130100359/logs",
+          "workflow_id": 398864112
+        }
+      ]
+    },
+    "main": {
+      "observedAt": "2026-11-05T23:47:49.695342+00:00",
+      "id": 42131115405,
+      "name": "Payment control checks",
+      "head_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T23:39:59Z",
+      "updated_at": "2026-11-05T23:47:35Z",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42131115405"
+    },
+    "mainJobs": [
+      {
+        "id": 127607676603,
+        "name": "test",
+        "tests": 2277,
+        "passed": 2277,
+        "failed": 0,
+        "skipped": 0,
+        "durationMs": 162518.60271
+      },
+      {
+        "id": 127607676196,
+        "name": "sites",
+        "tests": 4495,
+        "passed": 4495,
+        "failed": 0,
+        "skipped": 0,
+        "durationMs": 348272.139681
+      },
+      {
+        "id": 127607676694,
+        "name": "bankgiro_bridge",
+        "tests": 47,
+        "passed": 47,
+        "failed": 0,
+        "skipped": 0,
+        "durationMs": 5580.891879
+      }
+    ],
+    "total": 6819,
+    "allRequiredStepsPassed": true,
+    "syntaxTypesAuditBuildPassed": true,
+    "sitesModerateDevelopmentAuditFindings": 8,
+    "highCriticalAuditFindings": 0
+  },
+  "nativeSource": {
+    "commit": "25d68b799c6baa2f57b4dd6ad745e225bfe5bf1f",
+    "tree": "3d55730c517ae0d9c22c20c74c81762d0bd3f15a",
+    "sameAsMainSites": true,
+    "copiedTrackedFiles": 612
+  },
+  "archive": {
+    "sizeBytes": 18583793,
+    "sha256": "ccd01ebbd74fd7d1c6ceae117bc2d20efeb51aeafd05d30c951579d97919a0db"
+  },
+  "savedVersion": {
+    "id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_1b95c36721fc8191abcb8697e08fdf53",
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version_number": 65,
+    "source": {
+      "commit_sha": "25d68b799c6baa2f57b4dd6ad745e225bfe5bf1f"
+    },
+    "archive_storage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_0000000020f08246a2a3336adf81194d",
+      "content_hash": "sha256:c03e6481df3feb56c4943c14be9ed1dcabf6e13d555cb2ab42d9bc7001a85d5e",
+      "size_bytes": 48087040,
+      "file_count": 439
+    },
+    "screenshot_url": null,
+    "deployment_id": null
+  },
+  "deployment": {
+    "id": "appgdep_6aed15b74bfc819186378ec998e0bfc7",
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "title": "MG Fakturakoll",
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_1b95c36721fc8191abcb8697e08fdf53",
+    "type": "publish",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "has_mcp": true,
+    "screenshot_asset_pointer": null,
+    "provider_deployment_id": "site---6adf2f7f7e848191b64192161886b528",
+    "failure_message": null,
+    "env_set_revision": 10,
+    "updated_at": "2026-11-05T23:48:25.739259+00:00"
+  },
+  "audience": "public",
+  "audienceMutationPerformed": false,
+  "environmentRevision": 10,
+  "scheduleMutationPerformed": false,
+  "included": [
+    "Reviewed ae56 explicit invoice grammar and full competing-evidence census",
+    "Reviewed 1b208 fixed selected-account usage categories",
+    "Preserved failed first OCR trials and separately labelled development diagnostics"
+  ],
+  "excluded": [
+    "All new horizontal OCR geometry/recipient alias/org-context changes",
+    "V3 optical measurement",
+    "Null normalization or bank activation",
+    "New payment allocations or customer messages"
+  ],
+  "postpublicationEvidence": {
+    "path": "docs/quality8/wave3-postpublication-observations.json",
+    "sha256": "b17caf00bd8b48ffa17edced15197ade0ac6b854e4ef99f80ef3dcfa9807ee3e"
+  },
+  "currentAssessment": {
+    "areasAtLeast8": 27,
+    "areaCount": 33,
+    "sum": 256.5,
+    "maximum": 330,
+    "average": 7.7727272727272725,
+    "below8": [
+      6,
+      10,
+      15,
+      16,
+      28,
+      33
+    ],
+    "goalMet": false
+  }
+}

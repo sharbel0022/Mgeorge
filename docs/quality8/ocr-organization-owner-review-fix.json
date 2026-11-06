@@ -1,0 +1,870 @@
+{
+  "schema": "mgeorge-organization-owner-fix-v1",
+  "beforeEvidenceCommit": "1372c9e4a5118ddf63b080b381d8847b189071a8",
+  "beforeEvidenceSha256": "046cd7c8000f413acdf751ec59ccd09b2e6679ae5e10f75e772c1ef0e49957c4",
+  "opticalCalls": 0,
+  "productHashes": {
+    "src/invoice-details.js": "c5a1e7f585489f992e962aaf051cfdcfc9aa185ab13608a4aaf87389195389cc",
+    "sites/lib/invoice-details.js": "c5a1e7f585489f992e962aaf051cfdcfc9aa185ab13608a4aaf87389195389cc"
+  },
+  "matrices": [
+    {
+      "path": "sites/tests/review-organization-owner-boundaries.test.mjs",
+      "sha256": "76f5b9e476c19ef432978d62728b1bdc8230a3002ace831896c482243463fd20",
+      "before": {
+        "pass": 12,
+        "fail": 24
+      },
+      "after": {
+        "pass": 36,
+        "fail": 0
+      },
+      "unchanged": true
+    },
+    {
+      "path": "sites/tests/review-organization-source-order-independent.test.mjs",
+      "sha256": "a95bed90211b29d2996e618b7cb5b2b0fa513f7e0480f8ae01289dddc60614ea",
+      "before": {
+        "pass": 8,
+        "fail": 32
+      },
+      "after": {
+        "pass": 40,
+        "fail": 0
+      },
+      "unchanged": true
+    }
+  ],
+  "verification": {
+    "pass": 808,
+    "fail": 0,
+    "skip": 0,
+    "durationMs": 3388.35737,
+    "opticalCalls": 0,
+    "tscPassed": true,
+    "detailByteParity": true,
+    "diffCheckPassed": true,
+    "logSha256": "6409f6fc031aa1aecebcd2653e2602c595455159b791a18e9f4520d043afd964"
+  },
+  "examples": [
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "pdf",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "ocr",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "pdf",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "ocr",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "pdf",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "ocr",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "pdf",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "ocr",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "actual": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": null,
+        "level": "yellow",
+        "issues": [
+          "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+          "Saknade uppgifter: organisationsnummer"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": null,
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "scope": "Stop cross-boundary adoption into a named party and stop local section inheritance across unknown explicitly labelled fields. Existing metadata-direction fallback with no named role is unchanged; it cannot by itself provide the missing party name or a green result.",
+  "v3Access": false,
+  "earlierKnownReplayUnchangedSha256": "dd25d647b95e942ddf268d85322a14297acbeb5a4ee8a215dd3217118f178db0"
+}

@@ -1,0 +1,113 @@
+{
+  "schema": "mgeorge-existing-document-candidate-v1",
+  "alias": "existing-normal-candidate-1",
+  "observedAt": "2026-11-06T00:53:18.510Z",
+  "basis": "bounded stored metadata and current saved counterparty relation; not a fresh original or registration check",
+  "jobState": "needs_review",
+  "engine": "cloud",
+  "interpretationUpdatedAt": "2026-10-27T23:57:26.202Z",
+  "source": {
+    "status": "needs_review",
+    "createdAt": "2026-10-27T23:57:23.822Z",
+    "metadataParsed": true,
+    "direction": "customer",
+    "directionConfident": true,
+    "forwarded": false,
+    "sourceEmailMatchesTrust": true
+  },
+  "fields": [
+    {
+      "field": "invoice_number",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "party",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "organization_number",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "issued_at",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "due_at",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "total_cents",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "vat_cents",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "net_cents",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "reference",
+      "completeStoredFieldObject": true,
+      "present": false,
+      "confidence": 0
+    },
+    {
+      "field": "bankgiro",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "direction",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.94
+    },
+    {
+      "field": "kind",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.96
+    },
+    {
+      "field": "currency",
+      "completeStoredFieldObject": true,
+      "present": true,
+      "confidence": 0.7
+    }
+  ],
+  "currentSavedTrust": {
+    "identityMatches": true,
+    "emailMatches": true,
+    "bankgiroMatches": true,
+    "currencyMatches": true,
+    "verifiedAt": "2026-10-28T00:19:50.742Z"
+  },
+  "limitations": [
+    "Saved extraction was truncated by the database read projection; complete individual field objects were parsed but no complete issue census was read.",
+    "Source metadata was complete and direction-confident with forwarded=false.",
+    "No original bytes were read and no facts were approved.",
+    "Current processor must recheck original, interpretation, counterparty, duplicate state and register revision.",
+    "No production retry or registration has happened yet."
+  ],
+  "scoresChanged": false
+}

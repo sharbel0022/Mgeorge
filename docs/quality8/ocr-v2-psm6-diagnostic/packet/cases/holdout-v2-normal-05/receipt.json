@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-05",
+  "population": "normal-readable",
+  "layout": "ledger-form",
+  "startedAt": "2026-11-06T00:23:24.391Z",
+  "completedAt": "2026-11-06T00:23:30.057Z",
+  "durationMs": 5665.966424000002,
+  "inputSha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+  "expectedRasterSha256": "3c3a85f37365b6e407cd2be96ee4613893c8a06d0d63c5b0a5de5ea76ed01f5b",
+  "actualRasterSha256": "3c3a85f37365b6e407cd2be96ee4613893c8a06d0d63c5b0a5de5ea76ed01f5b",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 90,
+  "rawBlocks": 1,
+  "rawLines": 19,
+  "rawWords": 91,
+  "rawText": "Fakturanummer Fakturadatum Förfallodatum\n701682 2026-07-02 2026-07-22\nLeverantör Faktureras till\nExempel Pump & Värme AB Testmottagaren Handel AB\nIndustrivägen 9 Handelsvägen 22\n567 89 Testköping 123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nPumpservice 4 1 800,00 7 200,00\nReservdelssats 1 2 487,20 2 487,20\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Summa exkl. moms 9 687,20\n241-9562\nMoms (25 90) 2 421,80\nOCR\n00863025151 Att betala 12 109,00 SEK\nAnge OCR-numret vid betalning.\nBetalningsvillkor: 20 dagar. Valuta: SEK.\nOrganisationsnummer: 559762-3155 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "Fakturanummer 701682\nFakturadatum 2026-07-02\nFörfallodatum 2026-07-22\n\nLeverantör Faktureras till\nExempel Pump & Värme AB Testmottagaren Handel AB\nIndustrivägen 9 Handelsvägen 22\n567 89 Testköping 123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nPumpservice 4 1 800,00 7 200,00\nReservdelssats 1 2 487,20 2 487,20\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Summa exkl. moms 9 687,20\n241-9562\nMoms (25 90) 2 421,80\nOCR\n00863025151 Att betala 12 109,00 SEK\nAnge OCR-numret vid betalning.\nBetalningsvillkor: 20 dagar. Valuta: SEK.\nOrganisationsnummer: 559762-3155 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+    "textSha256": "a128161042b96d7ffe6bf2e8048b82d02ad20802b617d703170b001e406b47f8",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "8cb721009c12af0d8fdc42fd78d2087e36ad666c4ea87f8d09ba1a4168c24bbb",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": true,
+  "percentMarkers": {
+    "rendered": 1,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "b2f42716808ce6521c877bafc2348b8788c0b4a941ca09be89db02ca5f3320ef",
+    "layout-replay.json": "4bcf2de6f723b066be936d7d1c12c6a45eec0e9d0c7fee7d3af1ed53a34ef38b",
+    "raw-response.json": "a519558798710234d240c306a61ecb5dc6ba235a5532c01f8be150caf89d578f",
+    "raw-response.v8": "bd24f9aebdd95c87f560303700937040db943e08568fb2a809d943f972e2405e",
+    "recognition-finished.json": "f90273093e1ba9ad9ecdd631213387f2f765a3d0d33995d71b3ec3003cf8da53",
+    "recognition-input.png": "3c3a85f37365b6e407cd2be96ee4613893c8a06d0d63c5b0a5de5ea76ed01f5b",
+    "recognition-start.json": "46f25ab6806daee2b0bca51cf149eb2843f12cc344e7b52ec9f79ef82e03079d",
+    "worker-result.json": "f2417060cb0b3727137662e16cd8bc35f25433328d3ff54fd627ab9c8ed180fe",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

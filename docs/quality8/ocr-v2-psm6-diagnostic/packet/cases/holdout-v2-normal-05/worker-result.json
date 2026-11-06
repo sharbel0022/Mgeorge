@@ -1,0 +1,17 @@
+{
+  "text": "Fakturanummer 701682\nFakturadatum 2026-07-02\nFörfallodatum 2026-07-22\n\nLeverantör Faktureras till\nExempel Pump & Värme AB Testmottagaren Handel AB\nIndustrivägen 9 Handelsvägen 22\n567 89 Testköping 123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nPumpservice 4 1 800,00 7 200,00\nReservdelssats 1 2 487,20 2 487,20\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Summa exkl. moms 9 687,20\n241-9562\nMoms (25 90) 2 421,80\nOCR\n00863025151 Att betala 12 109,00 SEK\nAnge OCR-numret vid betalning.\nBetalningsvillkor: 20 dagar. Valuta: SEK.\nOrganisationsnummer: 559762-3155 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 90,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+    "textSha256": "a128161042b96d7ffe6bf2e8048b82d02ad20802b617d703170b001e406b47f8",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "8cb721009c12af0d8fdc42fd78d2087e36ad666c4ea87f8d09ba1a4168c24bbb",
+        "bankgiro": []
+      }
+    ]
+  }
+}

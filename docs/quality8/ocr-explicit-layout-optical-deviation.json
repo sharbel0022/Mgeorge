@@ -1,0 +1,51 @@
+{
+  "schema": "mgeorge-optical-test-deviation-v1",
+  "description": "Three unintended local recognition calls caused by including the existing producer regression file in a broader command. Not a holdout or acceptance measurement.",
+  "calls": 3,
+  "recognitionFixturePopulation": "Two pre-existing synthetic Bankgiro PNG fixtures; no V1, V2, V3, customer or production image.",
+  "reportedToRoot": true,
+  "sourceState": "Uncommitted geometry draft above ae56dc9; complete execution-time source inventory and full raw OCR responses were not captured.",
+  "testPath": "test/ocr-bankgiro-producer.test.js",
+  "testFileSha256": "632079696d7cace999902bc52321a4347b63898b0064ca02fbef00c3d85221f0",
+  "log": {
+    "path": "/tmp/quality8-explicit-layout-focused.log",
+    "sha256": "652b17883b16949a93db65bbc6e6d6eb6d1e84f74fa42362498b9c7af7fdb92c",
+    "availability": "Transient complete log; observed outcomes persisted below."
+  },
+  "fixtures": [
+    {
+      "path": "test/fixtures/ocr-bankgiro-low-word-confidence.png",
+      "sha256": "af5c8a80a8992192313d76f58f5f7488a7f435dc1597ee831aadf6f38ec5ac11",
+      "recognitionCalls": 1
+    },
+    {
+      "path": "test/fixtures/ocr-bankgiro-four-digit-prefix.png",
+      "sha256": "e89bed7bd850bd5dc8157e8e09644dc2e3a7ce6ea3c55576565fcb97341e9956",
+      "recognitionCalls": 2
+    }
+  ],
+  "outcomes": [
+    {
+      "test": "actual raster worker and extraction retain word evidence: ocr-bankgiro-low-word-confidence.png",
+      "passed": true,
+      "bankgiro": null,
+      "durationMs": 3773.207115
+    },
+    {
+      "test": "actual raster worker and extraction retain word evidence: ocr-bankgiro-four-digit-prefix.png",
+      "passed": true,
+      "bankgiro": "1223-4567",
+      "durationMs": 3301.156249
+    },
+    {
+      "test": "extractInvoice binds worker evidence to the original bytes, preserving a real four-digit prefix",
+      "passed": true,
+      "bankgiro": "1223-4567",
+      "durationMs": 3333.78723
+    }
+  ],
+  "timingScope": "Node test runner durations; not isolated OCR timing.",
+  "followup": "Entire producer file excluded from final word/text-only verification. Subsequent known-response replay performs no recognition.",
+  "independentHoldout": false,
+  "acceptanceMeasurement": false
+}

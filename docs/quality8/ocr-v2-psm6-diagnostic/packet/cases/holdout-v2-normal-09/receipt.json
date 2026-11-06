@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-09",
+  "population": "normal-readable",
+  "layout": "classic-footer",
+  "startedAt": "2026-11-06T00:23:46.367Z",
+  "completedAt": "2026-11-06T00:23:51.610Z",
+  "durationMs": 5242.668039999997,
+  "inputSha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+  "expectedRasterSha256": "db82bf3c25768aa0ae5e297db3fd731b8e06c5abedcc986534e35414f7cbb99a",
+  "actualRasterSha256": "db82bf3c25768aa0ae5e297db3fd731b8e06c5abedcc986534e35414f7cbb99a",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 92,
+  "rawBlocks": 1,
+  "rawLines": 18,
+  "rawWords": 85,
+  "rawText": "FAKTURA\nLeverantör Faktureras till\nExempel Styrsystem AB Testmottagaren Handel AB\nTeknikparken 21 Handelsvägen 22\n901 23 Provhamn 123 40 Teststad\nFakturanummer: 284-6119 Fakturadatum: 2026-08-04\nFörfallodatum: 2026-09-03\nBeskrivning Antal Å-pris Belopp\nInstallation av styrsystem 12 1 050,00 12 600,00\nKabelförläggning 6 454,00 2 724,00\nSamtliga radbelopp i SEK, exklusive moms.\nMoms 25 246 beräknas på nettobeloppet. Netto 15 324,00\nSumma moms 3 831,00\nAtt betala 19 155,00 SEK\nBankgiro OCR-nummer\n827-3641 00863025193\nOrganisationsnummer: 559762-3197 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "FAKTURA\nLeverantör Faktureras till\nExempel Styrsystem AB Testmottagaren Handel AB\nTeknikparken 21 Handelsvägen 22\n901 23 Provhamn 123 40 Teststad\nFakturanummer: 284-6119\nFakturadatum: 2026-08-04\nFörfallodatum: 2026-09-03\nBeskrivning Antal Å-pris Belopp\nInstallation av styrsystem 12 1 050,00 12 600,00\nKabelförläggning 6 454,00 2 724,00\nSamtliga radbelopp i SEK, exklusive moms.\nMoms 25 246 beräknas på nettobeloppet. Netto 15 324,00\nSumma moms 3 831,00\nAtt betala 19 155,00 SEK\nBankgiro OCR-nummer\n827-3641 00863025193\nOrganisationsnummer: 559762-3197 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+    "textSha256": "1eac796bcd6ca98978b70e01b3a28839a334cae883c0ca4da48d16b8f1428121",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "01b916d95b94cb9bb1143ec8bdbf3e04f3dfef90885cde05dd44cef6973c55f5",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": true,
+  "percentMarkers": {
+    "rendered": 1,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "8e5578389547cf5522662df172831c53d7bc814d68b0e90fb3179892ffe988b1",
+    "layout-replay.json": "39359c7520e2ccdac1a61302e9e5b91b630cd3a357afe3d2e6412087e57e91e8",
+    "raw-response.json": "294e195744030084f2072922421e332eeb0090bdfda9258616903d7414e032f2",
+    "raw-response.v8": "5a0f3306aa91ba274e3c4dc21b7e7955204c8cc0b52444319725d47a61c4a617",
+    "recognition-finished.json": "b87b55445858cd9a3bfa84e28825764c9bece61c667fb497aac6f0bdf3144820",
+    "recognition-input.png": "db82bf3c25768aa0ae5e297db3fd731b8e06c5abedcc986534e35414f7cbb99a",
+    "recognition-start.json": "a6078461bd23c204fac8888eb00ac8ffd1ed39d2022fe2c0e43922485b95a6d3",
+    "worker-result.json": "ae2cc00e760bb5bad4dc1e49183542f5c44d4429f559507ca4866d794dd01e31",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

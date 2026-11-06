@@ -1,0 +1,208 @@
+✖ Node pdf independent inline organization boundary: Avsändare: (51.298813ms)
+✖ Node pdf independent inline organization boundary: Utställd av: (4.384114ms)
+✔ Node pdf independent inline organization positive: same-line explicit recipient section (1.163984ms)
+✔ Node pdf independent inline organization positive: explicit owner-qualified number after an unknown field (1.073991ms)
+✖ Node ocr independent inline organization boundary: Avsändare: (2.184546ms)
+✖ Node ocr independent inline organization boundary: Utställd av: (1.497619ms)
+✔ Node ocr independent inline organization positive: same-line explicit recipient section (0.828657ms)
+✔ Node ocr independent inline organization positive: explicit owner-qualified number after an unknown field (0.853975ms)
+✖ Sites pdf independent inline organization boundary: Avsändare: (8.004428ms)
+✖ Sites pdf independent inline organization boundary: Utställd av: (1.299545ms)
+✔ Sites pdf independent inline organization positive: same-line explicit recipient section (0.983878ms)
+✔ Sites pdf independent inline organization positive: explicit owner-qualified number after an unknown field (0.903769ms)
+✖ Sites ocr independent inline organization boundary: Avsändare: (0.997187ms)
+✖ Sites ocr independent inline organization boundary: Utställd av: (0.899993ms)
+✔ Sites ocr independent inline organization positive: same-line explicit recipient section (0.716452ms)
+✔ Sites ocr independent inline organization positive: explicit owner-qualified number after an unknown field (0.85032ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 8
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 640.421589
+
+✖ failing tests:
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Node pdf independent inline organization boundary: Avsändare: (51.298813ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Node pdf independent inline organization boundary: Utställd av: (4.384114ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Node ocr independent inline organization boundary: Avsändare: (2.184546ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Node ocr independent inline organization boundary: Utställd av: (1.497619ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Sites pdf independent inline organization boundary: Avsändare: (8.004428ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Sites pdf independent inline organization boundary: Utställd av: (1.299545ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Sites ocr independent inline organization boundary: Avsändare: (0.997187ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-organization-inline-context-independent.test.mjs:11:51
+✖ Sites ocr independent inline organization boundary: Utställd av: (0.899993ms)
+  AssertionError [ERR_ASSERTION]: An unknown party field before the organization event cannot inherit the preceding recipient section
+  + actual - expected
+  
+  + '5560160680'
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/mgeorge-explicit-layout-independent-review-i0jji211/final-organization/sites/tests/review-organization-inline-context-independent.test.mjs:14:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '5560160680',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

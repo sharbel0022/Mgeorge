@@ -1,0 +1,22 @@
+{
+  "publishedSiteVersion": 65,
+  "publishedMain": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "area33": "evidence_sufficient_for_at_least_8_under_unchanged_PLAN",
+  "area28": "evidence_insufficient_for_8",
+  "scoresChanged": false,
+  "newRuntimeCalls": 0,
+  "evidenceSha256": {
+    "docs/quality8/PLAN.md": "2b7c6e2bcfdd1c0c9d4929a96d9860925d44ed92fe6569c502e8057630a63b5a",
+    "docs/quality8/release-wave3.md": "ac5a69980c00617785cd5852a2ac8ca7ec86723f9bea2dab8b147c8cefd2049f",
+    "docs/quality8/release-wave3.json": "bfc170dee4cec9d19fd233e97484221b0e2a2b8f8ba424d085c8f60b2e0f2408",
+    "docs/quality8/wave3-postpublication-observations.json": "b17caf00bd8b48ffa17edced15197ade0ac6b854e4ef99f80ef3dcfa9807ee3e",
+    "docs/quality8/schedule-runtime-observations-20261106.json": "df919288ac20e4f9a741fd7e47bb3d280416fda631bb688e65de01f9f9e0cdd2",
+    "docs/quality8/current-33-assessment.json": "de4cb2a3fcf2822c453bfdd26d2d1366545956ca0a0ee9416e3632afc5022364",
+    "docs/quality8/backup-2026-11-06-final-pass/README.md": "59c27044b2775c9e91338d4cc6cc6fb78ad4636ffec831f104697c178d965be1",
+    "docs/quality8/backup-2026-11-06-final-pass/final-status.json": "fa9c48e3803e6e86fcaec3afa62eb3be53c93cf6cf4b86f9d66d37e123689fc9",
+    "docs/quality8/backup-2026-11-06-final-pass/observations.jsonl": "52092e6837b25988b011e1b623a36ac5d731aa5e88a9e49734d4c8b32d2fd754",
+    "docs/quality8/backup-2026-11-06-final-pass/seal.json": "7ca679f11862a4c85c49a32b9b7a575806eb617355916b5f6499409d82c6b4c6",
+    "docs/quality8/backup-2026-11-06-final-pass/summary.json": "2d71845cba51923e0ea0297ea8556a068c9c2b00ba023d04ef1a8483d9a2b36e"
+  },
+  "reportSha256": "c21184cf4718210cb12ce9bfe6717acc8c14061b622de5e58c1d680970792d6c"
+}

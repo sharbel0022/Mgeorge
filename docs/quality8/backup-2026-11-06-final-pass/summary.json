@@ -1,0 +1,127 @@
+{
+  "schema": "quality8-existing-backup-completion-v1",
+  "recordedAt": "2026-11-06T00:50:44.839783+00:00",
+  "sourceBase": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "snapshotId": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+  "day": "2026-11-06",
+  "outcome": "complete",
+  "initialObservationAt": "2026-11-06T00:39:44.277Z",
+  "initial": {
+    "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+    "day": "2026-11-06",
+    "status": "running",
+    "files": 430,
+    "copied": 345,
+    "bytes": 150109791,
+    "created_at": "2026-11-05T23:03:21.104Z",
+    "verified_at": "",
+    "verified_files": 0,
+    "verified_bytes": 0,
+    "verification_started_at": "",
+    "verification_scope": "pending",
+    "api_evidence": {
+      "version": "retained-api-receipts-v1",
+      "scope": "retained_json_checksums",
+      "records_checked": 19,
+      "records_without_receipt": 112
+    },
+    "error": null,
+    "attempts": 0
+  },
+  "finalObservationAt": "2026-11-06T00:49:04.887Z",
+  "final": {
+    "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+    "day": "2026-11-06",
+    "status": "complete",
+    "files": 430,
+    "copied": 430,
+    "bytes": 185567855,
+    "created_at": "2026-11-05T23:03:21.104Z",
+    "verified_at": "2026-11-06T00:48:58.086Z",
+    "verified_files": 430,
+    "verified_bytes": 185567855,
+    "verification_started_at": "2026-11-06T00:45:07.487Z",
+    "verification_scope": "manifest_pass",
+    "api_evidence": {
+      "version": "retained-api-receipts-v1",
+      "scope": "retained_json_checksums",
+      "records_checked": 19,
+      "records_without_receipt": 112
+    },
+    "error": null,
+    "attempts": 0
+  },
+  "finalLatestEqualsLastVerified": true,
+  "operations": {
+    "backupStepCalls": 103,
+    "copySteps": 17,
+    "newlyCopiedFiles": 85,
+    "newlyCopiedBytes": 35458064,
+    "verificationSteps": 86,
+    "verifiedFilesInThisPass": 430,
+    "backupStatusCalls": 3,
+    "localContractReviewNotes": 1,
+    "overlappingCalls": 0,
+    "busyResponses": 0,
+    "serviceErrors": 0,
+    "attemptCounterFinal": 0,
+    "newSnapshotsRequested": 0,
+    "restoreCalls": 0,
+    "ocrCalls": 0,
+    "bankCalls": 0,
+    "gmailCalls": 0,
+    "financialMutationsRequested": 0
+  },
+  "guardPause": {
+    "preserved": [
+      {
+        "sequence": 17,
+        "reasons": [
+          "verification-incoherent"
+        ]
+      }
+    ],
+    "resolvedAs": "Expected transition: after final copy state=verifying while scope remains pending until first verification step. Local guard was too strict. Frozen source and fresh status confirmed the normal phase boundary; parent confirmed continuation.",
+    "productionLockOverride": false,
+    "productionConfigurationChange": false
+  },
+  "checks": {
+    "allSequencesContinuous": true,
+    "allSnapshotIdsDaysAndFileCountsUnchanged": true,
+    "allStepsMoveExactlyFiveFilesInOnePhase": true,
+    "allByteCountersMonotonic": true,
+    "allCallsSequentialByTimestamps": true,
+    "finalCopiedAndVerifiedCountsEqualManifest": true,
+    "finalCopiedAndVerifiedBytesEqual": true,
+    "finalCompleteManifestPassConfirmedBySeparateStatus": true
+  },
+  "batchPolicy": {
+    "newCallsStartWithinMs": 25000,
+    "maximumCallsPerBatch": 10,
+    "observedBatchDurationsMs": [
+      27816,
+      28146,
+      23527,
+      24109,
+      22155,
+      22959,
+      23175,
+      22870,
+      22318,
+      23233,
+      22167,
+      13662
+    ]
+  },
+  "observationsSha256": "52092e6837b25988b011e1b623a36ac5d731aa5e88a9e49734d4c8b32d2fd754",
+  "finalStatusSha256": "fa9c48e3803e6e86fcaec3afa62eb3be53c93cf6cf4b86f9d66d37e123689fc9",
+  "backupEngineSourceSha256": "b4cbd39002cc0c21b9e743d41e8e00dfa6c96769c08fc46178793257803f5d5a",
+  "limitations": [
+    "Completion covers the existing frozen 430-file snapshot, not later imports.",
+    "No new restore/disaster-recovery test was performed.",
+    "Separate manifest verification is a point-in-time file-integrity observation; it is not a continuous storage immutability claim.",
+    "Retained API JSON checksum counts do not establish bank authenticity or add missing source receipts."
+  ],
+  "ownershipReturnedToParentAfterFinalStatus": true,
+  "scoreChanged": false
+}

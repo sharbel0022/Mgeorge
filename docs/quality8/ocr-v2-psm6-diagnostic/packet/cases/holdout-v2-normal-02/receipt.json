@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-02",
+  "population": "normal-readable",
+  "layout": "formal-compact",
+  "startedAt": "2026-11-06T00:23:09.274Z",
+  "completedAt": "2026-11-06T00:23:13.654Z",
+  "durationMs": 4380.413122999999,
+  "inputSha256": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604",
+  "expectedRasterSha256": "52ee2ae8fe4fb6e60f85ea35ef3b1b6b4cf4254d045cab298fb4074a2ce590a1",
+  "actualRasterSha256": "52ee2ae8fe4fb6e60f85ea35ef3b1b6b4cf4254d045cab298fb4074a2ce590a1",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 93,
+  "rawBlocks": 1,
+  "rawLines": 19,
+  "rawWords": 91,
+  "rawText": "Fiktiva Björk Konsult AB Faktureras till\nParkallén 18 Testmottagaren Handel AB\n234 56 Provlunda Handelsvägen 22\n123 40 Teststad\nFakturanr Fakturadatum Betalas senast\n2026-4729 2026-06-11 2026-07-01\nKundnummer: K-5202\nBeskrivning Antal Å-pris Belopp\nProjektledning 8 1 350,00 10 800,00\nDokumentation och uppföljning 1 2 064,00 2 064,00\nSamtliga radbelopp i SEK, exklusive moms.\nNetto 12 864,00 Bankgiro\n4628-7314\nMomsbelopp (25 960) 3 216,00\nOCR\nSumma att betala 16 080,00 SEK 00863025128\nBetalningsvillkor enligt avtal. Ange OCR vid betalning.\nOrganisationsnummer: 559762-3122 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "Fiktiva Björk Konsult AB Faktureras till\nParkallén 18 Testmottagaren Handel AB\n234 56 Provlunda Handelsvägen 22\n123 40 Teststad\nFakturanr Fakturadatum Betalas senast\n2026-4729 2026-06-11 2026-07-01\nKundnummer: K-5202\nBeskrivning Antal Å-pris Belopp\nProjektledning 8 1 350,00 10 800,00\nDokumentation och uppföljning 1 2 064,00 2 064,00\nSamtliga radbelopp i SEK, exklusive moms.\nNetto 12 864,00 Bankgiro\n4628-7314\nMomsbelopp (25 960) 3 216,00\nOCR\nSumma att betala 16 080,00 SEK 00863025128\nBetalningsvillkor enligt avtal. Ange OCR vid betalning.\nOrganisationsnummer: 559762-3122 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604",
+    "textSha256": "a0fe9689355bdddd9ed9b6cfb1592e6991cb0ce24164fe8da09b62d5a185bc9f",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "ec4a0b65e640285ad1d6e1877d58234c433bad03fe32febb65d963bec4909352",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": false,
+  "percentMarkers": {
+    "rendered": 1,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "099805f4ae9d0601d4e518ba4e1b3dffd5443cf86b228b95fc5f4efcca84f9a5",
+    "layout-replay.json": "1e2a47d22bddb30ee5479cf561a8489f48cb76d9a24255780302c76e7fe0a326",
+    "raw-response.json": "9a001d2a0ccb4dcb43ffa3fcc437b0add93a231819b45ebfe316e417dbfe77bd",
+    "raw-response.v8": "3d00898a31c026c029a0bd2fa132ac212a40a5c7473aa17f8a6095e639e4d156",
+    "recognition-finished.json": "0899ecc60ebdfd2a7d75116d177d5bce81560325ee473ac9e6827e4676d964ab",
+    "recognition-input.png": "52ee2ae8fe4fb6e60f85ea35ef3b1b6b4cf4254d045cab298fb4074a2ce590a1",
+    "recognition-start.json": "6e013b570d893d321e8f4f836e91c09e3ad9036f530427d11c0cdd51587dd32b",
+    "worker-result.json": "235d9388976586b859ea2c9a5e2e679f0eb352f440a41f6be77e09cad2f8400e",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

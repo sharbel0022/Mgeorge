@@ -1,0 +1,13 @@
+{
+  "observedThrough": "2026-11-06T01:16:42.067691+00:00",
+  "main": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "workflowId": 399932780,
+  "workflowBlob": "7a4b3931d69c6250a3a091b52f5a12a211061578",
+  "files": {
+    "ocr-schedule-independent-public-api.json": "114759d9bc3d1aa499fdde76db68c2dbacca46745bc8f00c3f626c375902dc2c",
+    "ocr-schedule-independent-read-diagnosis.md": "09289727522941139b57b985a32e2fdd4b67a68316c9beba5cc1fc3f64dfbf6c"
+  },
+  "mutations": 0,
+  "tokensOrSecretsRead": false,
+  "rootCause": "unknown_no_concrete_configuration_defect_observed"
+}

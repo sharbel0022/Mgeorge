@@ -1,0 +1,17 @@
+{
+  "text": "Leverantör Faktureras till\nFiktiva Norrvik Ritning AB Testmottagaren Handel AB\nRitargatan 5 Handelsvägen 22\n112 34 Testlunda 123 40 Teststad\nFakturanummer NV-20735\nFakturadatum 2026-08-12\nFörfallodatum 2026-09-11\n\nBeskrivning Antal Å-pris Belopp\nTeknisk dokumentation 4 588,60 2 354,40\nLeveransutskrift 2 246,00 492,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Belopp exkl. moms 2 846,40\n4952-1875\nMoms 25 4 711,60\nAnge OCR-nummer\n00863025201 Att betala SEK 3 558,00\nAnge OCR-numret vid betalning.\nValuta: SEK. Ange OCR-numret som betalningsreferens.\nOrganisationsnummer: 559762-3205 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 92,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b",
+    "textSha256": "6fa325373af971d2af4530bde1e80f223ebaa02ee8ef9afb40596f3bf07cf3cc",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "db6eae49fc9338d17bf7da204c27013a7b1796775d3be823462231bf5b3f3bfc",
+        "bankgiro": []
+      }
+    ]
+  }
+}

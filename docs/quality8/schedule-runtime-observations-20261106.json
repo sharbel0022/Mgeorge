@@ -1,0 +1,308 @@
+{
+  "schema": "mgeorge-schedule-runtime-observation-v1",
+  "publishedSiteVersion": 65,
+  "publishedMain": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "observations": {
+    "gmailPlatform": {
+      "observedAt": "2026-11-06T00:57:59.257Z",
+      "id": "Automation_6efa3aafab4081918c48001acc562f96",
+      "title": "Hämta och tolka Gmail i MG Fakturakoll",
+      "is_enabled": true,
+      "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+      "timing_mode": "exact_schedule",
+      "last_run_time": "2026-11-06T00:08:37.309339+00:00",
+      "next_run_time": null,
+      "run_details": {
+        "last_run": {
+          "id": "f48a7c78-1cc0-832f-99ab-23b1de0dec64",
+          "recorded_status": "in_progress",
+          "scheduled_for": "2026-11-06T01:00:00Z",
+          "started_at": "2026-11-06T00:56:07.543279Z",
+          "completed_at": null,
+          "chat_ref": false
+        },
+        "latest_result": {
+          "run_id": "425c5f5d-cba0-832f-8b33-da27b5bbd411",
+          "created_at": "2026-11-06T00:08:31.827770Z",
+          "scheduled_for": "2026-11-06T00:00:00Z",
+          "completed_at": "2026-11-06T00:08:33.103289Z",
+          "content_text": "6 nya Gmail-underlag importerades och dokumentkön bearbetades. Moln-OCR:n är aktiv; OCR-kön är oförändrad på 50 dokument och 374 underlag väntar på granskning. Bankavstämningen är oförändrad med inga säkra automatiska matchningar. Inga mejl skickades och bankschemat lämnades separat.",
+          "content_truncated": false,
+          "chat_ref": true,
+          "requires_user_action": false,
+          "is_failure_message": false
+        },
+        "delivery_status": "unknown"
+      }
+    },
+    "bankBackupPlatform": [
+      {
+        "observedAt": "2026-11-06T00:58:25.904Z",
+        "id": "Automation_42c8434b303c819199621e83f4b8fec1",
+        "title": "Uppdatera Swedbank i MG Fakturakoll",
+        "is_enabled": true,
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261027T210600\nRRULE:FREQ=DAILY;BYHOUR=3,9,15,21;BYMINUTE=6;BYSECOND=0\nEND:VEVENT",
+        "timing_mode": "exact_schedule",
+        "last_run_time": "2026-11-05T20:10:45.792548+00:00",
+        "next_run_time": null,
+        "run_details": {
+          "last_run": {
+            "id": "a1fb4202-9098-8321-be3f-09800a84abf6",
+            "recorded_status": "completed",
+            "scheduled_for": "2026-11-05T20:06:00Z",
+            "started_at": "2026-11-05T20:10:00.606994Z",
+            "completed_at": "2026-11-05T20:10:44.116907Z",
+            "chat_ref": true
+          },
+          "latest_result": {
+            "run_id": "a1fb4202-9098-8321-be3f-09800a84abf6",
+            "created_at": "2026-11-05T20:10:43.935903Z",
+            "scheduled_for": "2026-11-05T20:06:00Z",
+            "completed_at": "2026-11-05T20:10:44.116907Z",
+            "content_text": "Bankmedgivandet måste förnyas. Swedbank-anslutningen är frånkopplad och bankhändelser kan inte hämtas förrän banken ansluts igen i MG Fakturakoll.",
+            "content_truncated": false,
+            "chat_ref": true,
+            "requires_user_action": false,
+            "is_failure_message": false
+          },
+          "delivery_status": "unknown"
+        }
+      },
+      {
+        "observedAt": "2026-11-06T00:58:25.881Z",
+        "id": "Automation_c8747435cd908191bc323aabc2a5704d",
+        "title": "Säkerhetskopiera MG Fakturakoll",
+        "is_enabled": true,
+        "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261029T021500\nRRULE:FREQ=DAILY;BYHOUR=2;BYMINUTE=15;BYSECOND=0\nEND:VEVENT",
+        "timing_mode": "exact_schedule",
+        "last_run_time": "2026-11-05T01:32:44.649509+00:00",
+        "next_run_time": null,
+        "run_details": {
+          "last_run": {
+            "id": "4712e879-cce4-832d-83dd-57ac3188010f",
+            "recorded_status": "completed",
+            "scheduled_for": "2026-11-05T01:15:00Z",
+            "started_at": "2026-11-05T01:16:28.502251Z",
+            "completed_at": "2026-11-05T01:32:43.318414Z",
+            "chat_ref": true
+          },
+          "latest_result": {
+            "run_id": "4712e879-cce4-832d-83dd-57ac3188010f",
+            "created_at": "2026-11-05T01:32:43.231732Z",
+            "scheduled_for": "2026-11-05T01:15:00Z",
+            "completed_at": "2026-11-05T01:32:43.318414Z",
+            "content_text": "Dagens backup kunde inte slutverifieras inom 80 anrop.\n\n- 362 av 362 original kopierades.\n- 35 av 362 filer kontrollästes.\n- Status: `verifying`.\n- Inget tekniskt fel eller lås rapporterades.\n\nÅtgärd krävs: återuppta samma backup-ID för resterande verifiering eller öka batchstorleken/anropsgränsen.",
+            "content_truncated": false,
+            "chat_ref": true,
+            "requires_user_action": false,
+            "is_failure_message": false
+          },
+          "delivery_status": "unknown"
+        }
+      }
+    ],
+    "latestAppStatus": [
+      {
+        "kind": "gmail",
+        "data": {
+          "observedAt": "2026-11-06T00:56:47.718Z",
+          "configured": true,
+          "last_successful_fetch": "2026-11-06T00:04:59.530Z",
+          "processing": {
+            "enabled": true,
+            "auto_register": true,
+            "worker_last_seen": "2026-11-03T10:48:46.890Z",
+            "worker_online": false,
+            "cloud_ocr_configured": true,
+            "cloud_worker_last_seen": "2026-11-05T23:50:40.842Z",
+            "cloud_worker_recent": false,
+            "cloud_last_completed": "2026-11-05T23:50:46.000Z",
+            "last_processed": "2026-11-06T00:07:51.858Z",
+            "counts": {
+              "needs_review": 374,
+              "registered": 2,
+              "waiting_ocr": 50
+            },
+            "registered": 5,
+            "aftercheck_pending": 0,
+            "review_reasons": {
+              "basis": "stored_extraction",
+              "total": 374,
+              "analyzed": 374,
+              "limit": 500,
+              "truncated": false,
+              "counts": {
+                "uninterpreted": 0,
+                "missing_invoice_number": 115,
+                "missing_party": 163,
+                "missing_dates": 209,
+                "missing_organization": 268,
+                "missing_amount": 137,
+                "missing_vat_or_net": 165,
+                "unverified_counterparty": 373,
+                "possible_duplicate": 0,
+                "low_confidence": 312,
+                "other_review": 0
+              }
+            },
+            "messages_waiting": 2,
+            "scheduler_configured": true,
+            "schedule_minutes": 60,
+            "ocr_mode": "cloud",
+            "limits": {
+              "file_bytes": 15000000,
+              "pdf_cloud_bytes": 5000000,
+              "pages": 10,
+              "local_concurrency": 1,
+              "cloud_concurrency": 1
+            }
+          },
+          "sync_health": {
+            "state": "recent",
+            "reason": "En lyckad Gmail-hämtning har verifierats nyligen.",
+            "interval_minutes": 60,
+            "stale_after_minutes": 120,
+            "schedule_verified": false
+          },
+          "background_health": {
+            "state": "needs_attention",
+            "reasons": [
+              "external_schedule_unverified",
+              "ocr_worker_unavailable"
+            ]
+          },
+          "background_ready": false,
+          "fetch_ready": true,
+          "schedule_observation": {
+            "last_invoked_at": "2026-11-06T00:03:58.625Z",
+            "last_completed_at": "2026-11-06T00:05:43.811Z",
+            "last_outcome": "completed",
+            "source": "system_entrypoint",
+            "external_schedule_verified": false
+          },
+          "topLevelKeys": [
+            "configured",
+            "email",
+            "send_enabled",
+            "connection",
+            "processing",
+            "last_successful_fetch",
+            "sync_health",
+            "schedule_observation",
+            "attachment_rejections",
+            "fetch_ready",
+            "background_ready",
+            "background_health",
+            "scheduler_configured",
+            "next_eligible_sync"
+          ]
+        }
+      },
+      {
+        "kind": "site",
+        "data": {
+          "observedAt": "2026-11-06T00:56:47.718Z",
+          "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+          "latest_version_number": 65,
+          "role": "owner",
+          "status": "active",
+          "access_mode": "public",
+          "automations": [
+            {
+              "id": "Automation_42c8434b303c819199621e83f4b8fec1",
+              "title": "Uppdatera Swedbank i MG Fakturakoll",
+              "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261027T210600\nRRULE:FREQ=DAILY;BYHOUR=3,9,15,21;BYMINUTE=6;BYSECOND=0\nEND:VEVENT",
+              "timezone": "Europe/Stockholm",
+              "is_enabled": true
+            },
+            {
+              "id": "Automation_6efa3aafab4081918c48001acc562f96",
+              "title": "Hämta och tolka Gmail i MG Fakturakoll",
+              "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+              "timezone": "Europe/Stockholm",
+              "is_enabled": true
+            },
+            {
+              "id": "Automation_c8747435cd908191bc323aabc2a5704d",
+              "title": "Säkerhetskopiera MG Fakturakoll",
+              "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261029T021500\nRRULE:FREQ=DAILY;BYHOUR=2;BYMINUTE=15;BYSECOND=0\nEND:VEVENT",
+              "timezone": "Europe/Stockholm",
+              "is_enabled": true
+            }
+          ]
+        }
+      }
+    ],
+    "githubOcr": {
+      "observedAt": "2026-11-06T00:56:47.489634+00:00",
+      "runs": [
+        {
+          "id": 42132076896,
+          "event": "workflow_run",
+          "head_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+          "status": "completed",
+          "conclusion": "success",
+          "created_at": "2026-11-05T23:47:38Z",
+          "updated_at": "2026-11-05T23:50:50Z"
+        },
+        {
+          "id": 42124413524,
+          "event": "workflow_run",
+          "head_sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+          "status": "completed",
+          "conclusion": "success",
+          "created_at": "2026-11-05T22:47:16Z",
+          "updated_at": "2026-11-05T22:49:04Z"
+        },
+        {
+          "id": 42083409804,
+          "event": "schedule",
+          "head_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+          "status": "completed",
+          "conclusion": "success",
+          "created_at": "2026-11-05T18:21:17Z",
+          "updated_at": "2026-11-05T18:23:36Z"
+        },
+        {
+          "id": 42081905168,
+          "event": "workflow_run",
+          "head_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+          "status": "completed",
+          "conclusion": "success",
+          "created_at": "2026-11-05T18:11:54Z",
+          "updated_at": "2026-11-05T18:13:40Z"
+        },
+        {
+          "id": 42013301104,
+          "event": "schedule",
+          "head_sha": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+          "status": "completed",
+          "conclusion": "success",
+          "created_at": "2026-11-05T10:45:08Z",
+          "updated_at": "2026-11-05T10:45:34Z"
+        }
+      ]
+    },
+    "backupPromptUpdate": {
+      "observedAt": "2026-11-06T01:00:25.927Z",
+      "success": true,
+      "message": "Automation updated.",
+      "id": "Automation_c8747435cd908191bc323aabc2a5704d",
+      "oldPrompt": "Skapa och verifiera dagens krypterade säkerhetskopia av MG Fakturakolls register och originalbilagor. Använd den anslutna Sitens backup_step och läs backup_status. Om backupverktygen inte finns, använd MG Fakturakolls process_invoice_documents och följ svarets backup-fält. Fortsätt högst 80 begränsade anrop tills status är complete; återuppta samma kopia vid avbrott och avbryt vid failed eller aktivt lås. Ingen återställning, ändring av åtkomst, kundsändning eller bankbetalning får göras. Rapportera endast fel, utebliven verifiering eller behov av en åtgärd.",
+      "newPrompt": "Skapa och verifiera dagens krypterade säkerhetskopia av MG Fakturakolls register och originalbilagor. Använd den anslutna Sitens backup_step och läs backup_status. Om backupverktygen inte finns, använd MG Fakturakolls process_invoice_documents och följ svarets backup-fält. Läs först backup_status. Om dagens kopia redan är complete och både filantal och byte är verifierade, avsluta utan nya backupsteg. Annars starta eller återuppta kopian med backup_step och bind fortsättningen till exakt det returnerade backup-ID:t. Beräkna därefter återstående anropsbudget som ceil((files-copied)/5) + ceil((files-verified_files)/5) + 4, med ett tak på 400 backupsteg per körning. Kör högst fem sekventiella steg per batch. Avbryt omedelbart vid busy=true, fel, failed eller oväntat ändrat backup-ID. Övergången running till verifying med pending verifieringsomfattning och ännu tom verification_started_at är normal; fortsätt samma kopia även över den fasgränsen. Räkna bara fullföljda steg och behåll samma ID vid återupptagning. När ett steg säger complete, läs backup_status separat och bekräfta samma ID, copied=files, verified_files=files, verified_bytes=bytes, ett verifieringsdatum och inget fel. Om budgeten eller körningen tar slut tidigare, rapportera den verkliga delstatusen och behovet av fortsatt återupptagning. Ingen återställning, ändring av åtkomst, kundsändning eller bankbetalning får göras. Rapportera endast fel, utebliven verifiering eller behov av en åtgärd.",
+      "oldSchedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261029T021500\nRRULE:FREQ=DAILY;BYHOUR=2;BYMINUTE=15;BYSECOND=0\nEND:VEVENT",
+      "newSchedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261029T021500\nRRULE:FREQ=DAILY;BYHOUR=2;BYMINUTE=15;BYSECOND=0\nEND:VEVENT",
+      "preservedEnabled": true,
+      "updatedAt": "2026-11-06T01:00:24.966769+00:00",
+      "rawErrorCode": null
+    }
+  },
+  "interpretation": {
+    "gmailCompletedResultIsForMidnightRun": true,
+    "newestGmailRunWasStillInProgress": true,
+    "taskCompletedDoesNotProveBankFetchOrBackupVerification": true,
+    "backupPromptChangeNotYetObservedInScheduledRun": true,
+    "githubPeriodicOcrAfterSite65StillUnobserved": true,
+    "scoresChanged": false
+  }
+}

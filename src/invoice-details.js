@@ -1,7 +1,8 @@
 // Source-bound invoice detail evidence. No balances, registration decisions or
 // missing amounts are computed here. A recognized but incomplete table is held.
 const supplierLabel='(?:leverantör|utställare|säljare|supplier|seller)';
-const recipientLabel='(?:kund|fakturamottagare|mottagare|företags[ \\t]*namn|customer|recipient|bill[ \\t]+to)';
+const recipientAlias='faktureras[ \\t]+till';
+const recipientLabel='(?:kund|fakturamottagare|mottagare|företags[ \\t]*namn|customer|recipient|bill[ \\t]+to|'+recipientAlias+')';
 const supplierOwner='(?:leverantörens|utställarens|säljarens|supplier(?:[’\u0027]s)?|seller(?:[’\u0027]s)?)';
 const recipientOwner='(?:kundens|mottagarens|fakturamottagarens|customer(?:[’\u0027]s)?|recipient(?:[’\u0027]s)?)';
 const orgLabel='(?:org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|org\\.?[ \\t]*number|organi[sz]ation[ \\t]+number)';
@@ -25,29 +26,30 @@ function organizations(value,validOrganization){
   const result=match?match[1]+match[2]:null;
   return result&&validOrganization(result)?result:null;
 }
-function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1},issues){
+function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,scalarLabelColons=()=>new Set()},issues){
   const records={supplier:{names:[],organizations:[]},recipient:{names:[],organizations:[]}},unassigned=[];
   const namePattern=new RegExp('(?<![\\p{L}\\p{N}/_-])('+supplierLabel+'|'+recipientLabel+')(?:[ \\t]+(?:namn|name))?[ \\t]*:[ \\t]*','giu');
   const orgPattern=new RegExp('(?<![\\p{L}\\p{N}/_-])(?:(('+supplierOwner+')|('+recipientOwner+'))[ \\t]+)?'+orgLabel+'(?=[ \\t.:#]|$)[ \\t]*[:.#]?[ \\t]*','giu');
   const headingPattern=new RegExp('^('+supplierLabel+'|'+recipientLabel+')(?:[ \\t]+(?:namn|name))?[ \\t]*:?$','iu');
-  const bareSupplierPattern=new RegExp('^('+supplierLabel+')(?:[ \\t]+(?:namn|name))?[ \\t]+(?=\\S)','iu');
-  const partyRoleSource='(?:'+entityLabel+'|faktureras[ \\t]+till)(?=[ \\t:#]|$)';
+  const barePartyPattern=new RegExp('^('+supplierLabel+'|'+recipientAlias+')(?:[ \\t]+(?:namn|name))?[ \\t]+(?=\\S)','iu');
+  const partyRoleSource=entityLabel+'(?=[ \\t:#]|$)';
   const partyRoleStart=new RegExp('^'+partyRoleSource,'iu'),competingRole=new RegExp('(?<![\\p{L}\\p{N}/_-])'+partyRoleSource,'iu');
   const isSupplier=value=>new RegExp('^'+supplierLabel+'$','iu').test(value);
   let section=null,page=0;
   for(let n=0;n<lines.length;n++){
     const source=lines[n],line=normalized(source.text);
     if(source.page!==page){page=source.page;section=null;}
+    if(!line){section=null;continue;}
     const names=[...line.matchAll(namePattern)].map(match=>({kind:'name',role:isSupplier(match[1])?'supplier':'recipient',index:match.index,end:match.index+match[0].length}));
     const orgs=[...line.matchAll(orgPattern)].map(match=>({kind:'organization',role:match[2]?'supplier':match[3]?'recipient':null,index:match.index,end:match.index+match[0].length}));
     const heading=line.match(headingPattern);
-    // Only an explicit supplier role at the beginning of a source line can
-    // omit the colon. An unlabelled name or a prose mention is not a role.
+    // Only these explicit roles at the beginning of a source line may omit
+    // the colon. An unlabelled name or a prose mention is never a role.
     // A recognized owner-qualified organization label already owns this
     // prefix; it must not also create an empty name occurrence.
     if(!heading&&![...names,...orgs].some(event=>event.index===0)){
-      const bare=line.match(bareSupplierPattern);
-      if(bare)names.push({kind:'name',role:'supplier',index:0,end:bare[0].length,bare:true});
+      const bare=line.match(barePartyPattern);
+      if(bare)names.push({kind:'name',role:isSupplier(bare[1])?'supplier':'recipient',index:0,end:bare[0].length,bare:true});
     }
     if(heading&&!names.length){
       const role=isSupplier(heading[1])?'supplier':'recipient';
@@ -59,9 +61,24 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1},
       names.push({kind:'name',role,index:0,end:line.length});
     }
     const events=[...names,...orgs].sort((a,b)=>a.index-b.index);
-    if(!events.length){if(knownField.test(line))section=null;continue;}
+    const rowRoles=new Set(names.map(event=>event.role));
+    // Use the actual scalar-label grammar to distinguish known inline fields
+    // from unknown explicit labels. Neither Summa moms nor Valuta introduces
+    // a new party merely because its supported label includes a colon.
+    const scalarColons=scalarLabelColons(line);
+    const sectionBoundary=(start,end)=>{
+      const span=line.slice(start,end).replace(/[ \t;|]+$/u,'');
+      return [...span.matchAll(/[:|]/g)].some(match=>match[0]==='|'||!scalarColons.has(start+match.index));
+    };
+    // An unsupported explicit field is a context boundary, never evidence
+    // that the preceding party owns identities in the following section.
+    if(!events.length){if(knownField.test(line)||scalarBoundary(line)===0||sectionBoundary(0,line.length))section=null;continue;}
     for(let i=0;i<events.length;i++){
       const event=events[i];
+      // A row can contain both an unknown field and a known organization.
+      // Test the full preceding source span before inheriting a party role.
+      const prefix=line.slice(i?events[i-1].end:0,event.index);
+      if(sectionBoundary(i?events[i-1].end:0,event.index)||i===0&&(knownField.test(prefix.trim())||scalarBoundary(prefix.trim())===0))section=null;
       const raw=line.slice(event.end,i+1<events.length?events[i+1].index:line.length).replace(/[ \t;|]+$/u,'').trim();
       let value=valueAfter(raw,0,scalarBoundary),evidence=[source];
       if(!raw&&events.length===1){
@@ -72,20 +89,26 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1},
       }
       if(event.kind==='name'){
         // Do not turn a second role, an unknown labelled field or unresolved
-        // columns into part of a colonless name. Keep this occurrence in the
-        // census as invalid so another supplier label cannot hide it.
-        const ambiguous=event.bare&&(competingRole.test(value)||/[:|]/.test(value));
+        // columns into a name, regardless of whether its first label has a
+        // colon. Keep the invalid occurrence in the complete role census.
+        const ambiguous=competingRole.test(value)||/[:|]/.test(value);
         section=event.role;records[event.role].names.push({value:ambiguous?null:nameValue(value),evidence});
       }else{
-        const record={value:organizations(value,validOrganization),evidence},role=event.role||section;
+        const record={value:organizations(value,validOrganization),evidence},role=event.role||(rowRoles.size>1?null:section);
         if(role)records[role].organizations.push(record);else unassigned.push(record);
+        // An explicit different owner qualifies this value, not subsequent
+        // unqualified values through the stale preceding party section.
+        if(event.role&&event.role!==section)section=null;
       }
     }
+    if(rowRoles.size>1||sectionBoundary(events.at(-1).end,line.length))section=null;
   }
   const namedRoles=Object.keys(records).filter(role=>records[role].names.length);
   if(unassigned.length){
-    if(namedRoles.length===1)records[namedRoles[0]].organizations.push(...unassigned);
-    else if(!namedRoles.length&&['supplier','customer'].includes(direction))records[direction==='customer'?'recipient':'supplier'].organizations.push(...unassigned);
+    // A single named role does not own every unassigned number elsewhere in
+    // the document. Explicit owner labels and uninterrupted local sections
+    // already assigned their evidence above; do not adopt across boundaries.
+    if(!namedRoles.length&&['supplier','customer'].includes(direction))records[direction==='customer'?'recipient':'supplier'].organizations.push(...unassigned);
     else issues.push('Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.');
   }
   const resolve=(items,label)=>{
@@ -149,6 +172,9 @@ function tableHeader(line){
   const complete=columns.every(Boolean)&&new Set(columns).size===columns.length&&['description','quantity','unit_price_cents','net_cents'].every(key=>columns.includes(key));
   return {...split,columns,complete};
 }
+// Shared read-only census: layout must not authorize a document field inside
+// any complete or incomplete table header already recognized by this parser.
+export function isInvoiceTableHeader(line){return tableHeader(line)!==null;}
 const quantityValue=value=>/^-?\d+(?:[.,]\d{1,4})?$/.test(value)&&Number.isFinite(Number(value.replace(',','.')))&&Math.abs(Number(value.replace(',','.')))<=1_000_000_000?Number(value.replace(',','.')):null;
 const rateValue=value=>{const match=value.match(/^(\d{1,3}(?:[.,]\d{1,3})?)[ \t]*%?$/);if(!match)return null;const n=Number(match[1].replace(',','.'));return n>=0&&n<=100?n:null;};
 const rowKeys=['description','quantity','unit_price_cents','net_cents','vat_rate','vat_cents','total_cents'];

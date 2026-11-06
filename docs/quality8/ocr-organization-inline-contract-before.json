@@ -1,0 +1,42 @@
+{
+  "schema": "mgeorge-organization-inline-contract-before-v1",
+  "testPath": "sites/tests/organization-event-context.test.mjs",
+  "baselineCommit": "d3af7858c7cf9e170277f6fec616f592a8206c0f",
+  "initial24": {
+    "sha256": "3d6c2ceffea3b55e5c8e241e19a4d483935d9767d5f3651f50b0bbe8fe6e871e",
+    "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {interpretInvoice as nodeParser} from '../../src/invoice-extraction.js';\nimport {loadInvoiceParser} from './helpers/invoice-module-loader.mjs';\n\nconst {interpretInvoice:sitesParser}=await loadInvoiceParser();\nconst name='Syntetiska Mottagaren AB';\nconst rest='\\nFakturanummer: EVENT-3591\\nFakturadatum: 2026-06-03\\nFörfallodatum: 2026-07-03\\nNetto: 736,00 SEK\\nMomsbelopp: 184,00 SEK\\nAtt betala: 920,00 SEK\\nValuta: SEK';\nconst held=[\n ['scalar prefix on the organization row','Faktureras till: '+name+'\\nValuta: SEK Organisationsnummer: 556016-0680'],\n ['scalar suffix after the last name event','Faktureras till: '+name+' Valuta: SEK\\nOrganisationsnummer: 556016-0680'],\n ['a different explicit owner before an unqualified organization','Faktureras till: '+name+'\\nLeverantörens organisationsnummer: 559762-3114 Organisationsnummer: 556016-0680'],\n];\nconst supported=[\n ['recognized adjacent identity fields separated by a pipe','Faktureras till: '+name+' | Organisationsnummer: 556016-0680'],\n ['explicit ownership after an unknown inline field','Faktureras till: '+name+'\\nAvsändare: Syntetiska Utställaren AB Mottagarens organisationsnummer: 556016-0680'],\n ['matching explicit ownership keeps its existing local section','Faktureras till: '+name+'\\nMottagarens organisationsnummer: 556016-0680 Organisationsnummer: 556016-0680'],\n];\nfor(const [engine,parse]of [['Node',nodeParser],['Sites',sitesParser]])for(const method of ['pdf','ocr']){\n const options={direction:'customer',direction_confident:true,method,ocrConfidence:96};\n for(const [label,body]of held)test(engine+' '+method+' holds organization context at '+label,()=>{\n  const text='FAKTURA\\n'+body+rest,result=parse(text,options);\n  assert.equal(result.fields.party.value,name);assert.equal(result.fields.organization_number.value,null);assert.equal(result.details.recipient.organization_number,null);\n  assert.notEqual(result.level,'green');assert.equal(result.text_excerpt,text);\n  if(label.startsWith('a different'))assert.equal(result.details.supplier.organization_number,'5597623114');\n });\n for(const [label,body]of supported)test(engine+' '+method+' retains '+label,()=>{\n  const text='FAKTURA\\n'+body+rest,result=parse(text,options);\n  assert.equal(result.fields.party.value,name);assert.equal(result.fields.organization_number.value,'5560160680');\n  assert.equal(result.level,method==='pdf'?'green':'yellow');assert.deepEqual(result.issues,[]);assert.equal(result.text_excerpt,text);\n });\n}\n",
+    "passed": 12,
+    "failed": 12,
+    "logSha256": "0e813fbd25f82c4c1bcd0dc19f1eb19a25133aaeafaa316a2925143139065d39"
+  },
+  "current28": {
+    "sha256": "2ba2ae998a510887f1dd2ea55ea1d5cee4dcecba5b583e1fe91a2930f5418605",
+    "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport {interpretInvoice as nodeParser} from '../../src/invoice-extraction.js';\nimport {loadInvoiceParser} from './helpers/invoice-module-loader.mjs';\n\nconst {interpretInvoice:sitesParser}=await loadInvoiceParser();\nconst name='Syntetiska Mottagaren AB';\nconst rest='\\nFakturanummer: EVENT-3591\\nFakturadatum: 2026-06-03\\nFörfallodatum: 2026-07-03\\nNetto: 736,00 SEK\\nMomsbelopp: 184,00 SEK\\nAtt betala: 920,00 SEK\\nValuta: SEK';\nconst held=[\n ['scalar prefix on the organization row','Faktureras till: '+name+'\\nValuta: SEK Organisationsnummer: 556016-0680'],\n ['scalar suffix after the last name event','Faktureras till: '+name+' Valuta: SEK\\nOrganisationsnummer: 556016-0680'],\n ['a different explicit owner before an unqualified organization','Faktureras till: '+name+'\\nLeverantörens organisationsnummer: 559762-3114 Organisationsnummer: 556016-0680'],\n];\nconst supported=[\n ['recognized adjacent identity fields separated by a pipe','Faktureras till: '+name+' | Organisationsnummer: 556016-0680'],\n ['explicit ownership after an unknown inline field','Faktureras till: '+name+'\\nAvsändare: Syntetiska Utställaren AB Mottagarens organisationsnummer: 556016-0680'],\n ['matching explicit ownership keeps its existing local section','Faktureras till: '+name+'\\nMottagarens organisationsnummer: 556016-0680 Organisationsnummer: 556016-0680'],\n];\nfor(const [engine,parse]of [['Node',nodeParser],['Sites',sitesParser]])for(const method of ['pdf','ocr']){\n const options={direction:'customer',direction_confident:true,method,ocrConfidence:96};\n for(const [label,body]of held)test(engine+' '+method+' holds organization context at '+label,()=>{\n  const text='FAKTURA\\n'+body+rest,result=parse(text,options);\n  assert.equal(result.fields.party.value,name);assert.equal(result.fields.organization_number.value,null);assert.equal(result.details.recipient.organization_number,null);\n  assert.notEqual(result.level,'green');assert.equal(result.text_excerpt,text);\n  if(label.startsWith('a different'))assert.equal(result.details.supplier.organization_number,'5597623114');\n });\n for(const [label,body]of supported)test(engine+' '+method+' retains '+label,()=>{\n  const text='FAKTURA\\n'+body+rest,result=parse(text,options);\n  assert.equal(result.fields.party.value,name);assert.equal(result.fields.organization_number.value,'5560160680');\n  assert.equal(result.level,method==='pdf'?'green':'yellow');assert.deepEqual(result.issues,[]);assert.equal(result.text_excerpt,text);\n });\n test(engine+' '+method+' a name prefix is not a scalar label or a new section',()=>{\n  const company='Momsnära Syntetiska AB',text='FAKTURA\\nFaktureras till: '+company+'\\nOrganisationsnummer: 556016-0680'+rest;\n  const result=parse(text,options);\n  assert.equal(result.fields.party.value,company);assert.equal(result.fields.organization_number.value,'5560160680');\n  assert.equal(result.level,method==='pdf'?'green':'yellow');assert.deepEqual(result.issues,[]);\n });\n}\n"
+  },
+  "existingPositiveFile": {
+    "path": "sites/tests/invoice-grammar-boundaries.test.mjs",
+    "sha256": "b9084c1a6c142da0069efb0ade0cb1a14a79feede6d2bbbfa61e3fce640424bc",
+    "unchanged": true,
+    "name": "complete inline explicit VAT has the same name and scalar boundary"
+  },
+  "fullDraftGate": {
+    "path": "docs/quality8/ocr-organization-inline-draft-before.txt",
+    "sha256": "278cdeaf74fc292ef2af15a31416ba3ebf1d7e6a414601078c56d37fd2c45349",
+    "tests": 852,
+    "passed": 848,
+    "failed": 4,
+    "skipped": 0,
+    "durationMs": 3688.471636,
+    "sourceInventoryCapturedAtExecution": false,
+    "description": "Uncommitted draft that treated every scalar label in an identity-value span as a section boundary. Four pre-existing positive cases failed; the entire original log is preserved."
+  },
+  "proposedExpectationCorrection": {
+    "onlyNewCase": "scalar suffix after the last name event",
+    "original": "Faktureras till: Syntetiska Mottagaren AB Valuta: SEK\nOrganisationsnummer: 556016-0680",
+    "from": "recipient organization null and review",
+    "to": "recipient organization 5560160680; green for the otherwise complete native fixture",
+    "reason": "A recognized inline scalar suffix does not introduce an unknown party or a new identity section, exactly as the existing inline Summa moms positive. A separate row that starts with a scalar field keeps the existing row-boundary rule. Unknown explicit party fields always break ownership."
+  },
+  "opticalCalls": 0,
+  "v3Access": false
+}

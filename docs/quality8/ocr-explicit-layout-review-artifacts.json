@@ -1,0 +1,31 @@
+{
+  "sourceCommit": "a19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77",
+  "integratedProductParity": true,
+  "artifacts": [
+    {
+      "path": "test/review-geometry-census-independent.test.js",
+      "sha256": "a7386a5b3073efb3afa3df37369b7d8a9e53df794a943699db6656f5afb38f49",
+      "bytes": 4005
+    },
+    {
+      "path": "docs/quality8/ocr-explicit-layout-independent-final.txt",
+      "sha256": "9a59cbcae8447af1873693301d847b929655ccd94f3264adb75c07a6a6b0e735",
+      "bytes": 199857
+    },
+    {
+      "path": "docs/quality8/ocr-explicit-layout-independent-final.json",
+      "sha256": "b04e15fc738db6dfd381498a79e6d5709b3f507cb5f430cfd0801d6bf33c2149",
+      "bytes": 2386
+    },
+    {
+      "path": "docs/quality8/ocr-explicit-layout-independent-inline-before.txt",
+      "sha256": "d457267ee717a02f937f6de525e57809f7be9c7c63db786f28046cb0d9709fd0",
+      "bytes": 10338
+    },
+    {
+      "path": "docs/quality8/ocr-explicit-layout-independent-not-ready.json",
+      "sha256": "4638a92656987edc0ee29c3767dbd8f27017b732d53578385a4104cbbf9171f0",
+      "bytes": 4768
+    }
+  ]
+}

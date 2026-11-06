@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-06",
+  "population": "normal-readable",
+  "layout": "stacked-summary",
+  "startedAt": "2026-11-06T00:23:30.073Z",
+  "completedAt": "2026-11-06T00:23:35.318Z",
+  "durationMs": 5245.589779000002,
+  "inputSha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+  "expectedRasterSha256": "bd6ad7c451ac84603460751c7d29ed599bfd3e04e22127269849c34317f7e3e3",
+  "actualRasterSha256": "bd6ad7c451ac84603460751c7d29ed599bfd3e04e22127269849c34317f7e3e3",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 89,
+  "rawBlocks": 1,
+  "rawLines": 23,
+  "rawWords": 93,
+  "rawText": "FAKTURA\nFiktiva Skärvik IT AB Faktureras till\nDatagatan 11 Testmottagaren Handel AB\n678 90 Prowvik Handelsvägen 22\nOrg.nr: 559762-3163 123 40 Teststad\nFakturanr: SR-260419 Förfallodatum\nFakturadatum: 2026-07-10 2026-08-09\nBeskrivning Antal Å-pris Belopp\nServiceabonnemang 1 1 200,00 1 200,00\nFelsökning på distans 0,5 800,00 400,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankoi Netto\nNN 1 600,00\n8627-0535\nOCR Momsbelopp\n-Nummer\n400,00\n00863025169\nA R d betal Att betala\nOCR- t vi talning.\nnge numret vid betalning 2 000,00 SEK\nTjänsterna avser månadsvis drift och support.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "FAKTURA\nFiktiva Skärvik IT AB Faktureras till\nDatagatan 11 Testmottagaren Handel AB\n678 90 Prowvik Handelsvägen 22\nOrg.nr: 559762-3163 123 40 Teststad\nFakturanr: SR-260419 Förfallodatum\nFakturadatum: 2026-07-10 2026-08-09\nBeskrivning Antal Å-pris Belopp\nServiceabonnemang 1 1 200,00 1 200,00\nFelsökning på distans 0,5 800,00 400,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankoi Netto\nNN 1 600,00\n8627-0535\nOCR Momsbelopp\n-Nummer\n400,00\n00863025169\nA R d betal Att betala\nOCR- t vi talning.\nnge numret vid betalning 2 000,00 SEK\nTjänsterna avser månadsvis drift och support.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+    "textSha256": "f61bac84eedc8055aebe8a7ca374f0f8dc118980aad2f18423a00affb758767e",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "856a2608fcf813d965995a697770a4c1d139e5177b5b344b01b2b3565d226edb",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": false,
+  "percentMarkers": {
+    "rendered": 0,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "12a6ed79b0195cf7134237455376a1cd4d6a09f50b263722cb3e6e69cb94079f",
+    "layout-replay.json": "d15ae5c0a412695aa82b4c6bc38547b63081df55e652f67b4fef39656a9566a5",
+    "raw-response.json": "ab3a748ef1a97456ae5e093bf3f09df748052c53d906adae2aa18d5fb2385ef8",
+    "raw-response.v8": "bae66d9c21f63f1b27e3a8da28d4eba91f26700ab4a82f879ebd7f88edb8bcac",
+    "recognition-finished.json": "1d3e5580b7b77ea1e9a5554f8a6c55565e4fdead5277a5c731ffed853f5e0f62",
+    "recognition-input.png": "bd6ad7c451ac84603460751c7d29ed599bfd3e04e22127269849c34317f7e3e3",
+    "recognition-start.json": "ed966aefa9cc2ca864e19cef954d46021179262fb276152eb328dc7c7fe451aa",
+    "worker-result.json": "26a38209f5d68845247f7ea98955fb8439f7314a1ae47f56096ad317c64d2448",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

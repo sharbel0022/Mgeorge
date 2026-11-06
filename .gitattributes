@@ -1,0 +1,2 @@
+# Preserve the exact frozen RED receipt, including reporter indentation.
+docs/quality8/ocr-explicit-layout-independent-inline-before.txt whitespace=-blank-at-eol

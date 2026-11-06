@@ -1,0 +1,36 @@
+{
+  "schema": "quality8-backup-final-pass-evidence-seal-v1",
+  "sealedAt": "2026-11-06T00:51:35.401274+00:00",
+  "sourceBase": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "snapshotId": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+  "day": "2026-11-06",
+  "outcome": "complete",
+  "filesCopied": 430,
+  "filesVerified": 430,
+  "bytesCopied": 185567855,
+  "bytesVerified": 185567855,
+  "finalStatusObservedAt": "2026-11-06T00:49:04.887Z",
+  "scoreChanged": false,
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 4665,
+      "sha256": "59c27044b2775c9e91338d4cc6cc6fb78ad4636ffec831f104697c178d965be1"
+    },
+    {
+      "path": "final-status.json",
+      "bytes": 1613,
+      "sha256": "fa9c48e3803e6e86fcaec3afa62eb3be53c93cf6cf4b86f9d66d37e123689fc9"
+    },
+    {
+      "path": "observations.jsonl",
+      "bytes": 70710,
+      "sha256": "52092e6837b25988b011e1b623a36ac5d731aa5e88a9e49734d4c8b32d2fd754"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 4144,
+      "sha256": "2d71845cba51923e0ea0297ea8556a068c9c2b00ba023d04ef1a8483d9a2b36e"
+    }
+  ]
+}

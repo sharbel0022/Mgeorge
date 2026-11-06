@@ -158,3 +158,32 @@ test('tenant Gmail adapter uses the registered mailbox for profile, import ident
  const imported=await adapter.fetchGmailInvoiceDocuments(tokens,{account});assert.equal(imported.documents.length,1);assert.match(imported.documents[0].source_id,/gmail:company-a@example.test:/);
  const send=await adapter.prepareGmailSend(tokens,{account});await send({recipient:'recipient@example.test',subject:'Synthetic',body:'Synthetic',rfc_message_id:'<00000000-0000-4000-8000-000000000001@mg-fakturakoll.local>'});assert.match(sent[0],/^From: company-a@example.test\r\n/);assert.doesNotMatch(sent[0],/legacy@example.test|mg\.vitvaror/);
 });
+
+async function retryCompanyFixture(t){
+ const f=await fixture(t);await f.seed();const {server,environment,domain}=f.moduleUrls;
+ const processing=compile('../lib/document-processing.ts',{'cloudflare:workers':environment,'./server':server,'./domain':domain,'./banking/security':url('../lib/banking/security.ts'),'./invoice-fields.js':invoiceParserUrl(),'./server-pdf':data('export async function serverPdfText(){throw Error("No original processing is permitted in a retry");}')});
+ const service=data('export async function automaticSync(){throw Error("Unexpected bank");}export async function automaticSyncStatus(){throw Error("Unexpected bank");}export function bankFailure(error){return Response.json({error:error.code||error.message},{status:error.status||409});}');
+ const rpc=await import(compile('../lib/banking/mcp.ts',{'./service':service,'../server':server,'../document-processing':processing}));
+ f.retry=f.wrap(async req=>rpc.bankRpc(await req.json()));
+ f.retryRequest=(documentId,options={})=>f.request('/mcp',{method:'POST',body:{jsonrpc:'2.0',id:1,method:'tools/call',params:{name:'retry_invoice_document',arguments:{documentId}}},...options});
+ f.ids=['00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002'];
+ for(const [scope,id]of [[f.a,f.ids[0]],[f.b,f.ids[1]]]){
+  const d=f.database(scope);await d.prepare("INSERT INTO gmail_sources(owner,source_id,document_id,metadata,status,extraction,created_at) VALUES(?,?,?,'{}','needs_review','{}','2026')").bind(scope.owner,id,id).run();
+  await d.prepare("INSERT INTO document_jobs(owner,document_id,state,engine,attempts,available_at,lease,lease_until,extraction,updated_at) VALUES(?,?,'needs_review','cloud',2,'2000','preserved-lease','2099','{}','2000')").bind(scope.owner,id).run();
+ }
+ return f;
+}
+test('retry MCP real company boundary changes only the selected company job',async t=>{
+ const f=await retryCompanyFixture(t),beforeB=f.sql.prepare('SELECT * FROM document_jobs WHERE owner=?').all(f.b.owner),financial=f.sql.prepare('SELECT * FROM workspaces').all();
+ const cross=await f.retry(f.retryRequest(f.ids[1]));assert.equal(cross.status,200);assert.deepEqual((await cross.json()).result.structuredContent,{ok:true,requeued:false});
+ const own=await f.retry(f.retryRequest(f.ids[0]));assert.equal(own.status,200);assert.deepEqual((await own.json()).result.structuredContent,{ok:true,requeued:true});
+ assert.equal(f.sql.prepare('SELECT state FROM document_jobs WHERE owner=?').get(f.a.owner).state,'queued');assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs WHERE owner=?').all(f.b.owner),beforeB);assert.deepEqual(f.sql.prepare('SELECT * FROM workspaces').all(),financial);assert.deepEqual(f.reads,[]);
+});
+test('retry MCP real company boundary denies viewer writes before queue effects',async t=>{
+ const f=await retryCompanyFixture(t);await changeCompanyMembership(f.raw,f.a,{actorId:'viewer',role:'viewer',status:'active'});f.user.userId='viewer';const before=f.sql.prepare('SELECT * FROM document_jobs').all();
+ const response=await f.retry(f.retryRequest(f.ids[0]));assert.equal(response.status,403);assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);assert.deepEqual(f.reads,[]);
+});
+test('retry MCP real company boundary denies a stale context before queue effects',async t=>{
+ const f=await retryCompanyFixture(t),before=f.sql.prepare('SELECT * FROM document_jobs').all();
+ const response=await f.retry(f.retryRequest(f.ids[0],{version:999}));assert.equal(response.status,409);assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);assert.deepEqual(f.reads,[]);
+});

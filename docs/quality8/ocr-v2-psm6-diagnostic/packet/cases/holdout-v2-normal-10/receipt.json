@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-10",
+  "population": "normal-readable",
+  "layout": "paired-sections",
+  "startedAt": "2026-11-06T00:23:51.624Z",
+  "completedAt": "2026-11-06T00:23:56.863Z",
+  "durationMs": 5238.938666999995,
+  "inputSha256": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b",
+  "expectedRasterSha256": "e3792322a5eaf831bddbec5fd0410d5062b81a999fc8d4997a7ae5b994128714",
+  "actualRasterSha256": "e3792322a5eaf831bddbec5fd0410d5062b81a999fc8d4997a7ae5b994128714",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 92,
+  "rawBlocks": 1,
+  "rawLines": 19,
+  "rawWords": 89,
+  "rawText": "Leverantör Faktureras till\nFiktiva Norrvik Ritning AB Testmottagaren Handel AB\nRitargatan 5 Handelsvägen 22\n112 34 Testlunda 123 40 Teststad\nFakturanummer Fakturadatum Förfallodatum\nNV-20735 2026-08-12 2026-09-11\nBeskrivning Antal Å-pris Belopp\nTeknisk dokumentation 4 588,60 2 354,40\nLeveransutskrift 2 246,00 492,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Belopp exkl. moms 2 846,40\n4952-1875\nMoms 25 4 711,60\nAnge OCR-nummer\n00863025201 Att betala SEK 3 558,00\nAnge OCR-numret vid betalning.\nValuta: SEK. Ange OCR-numret som betalningsreferens.\nOrganisationsnummer: 559762-3205 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "Leverantör Faktureras till\nFiktiva Norrvik Ritning AB Testmottagaren Handel AB\nRitargatan 5 Handelsvägen 22\n112 34 Testlunda 123 40 Teststad\nFakturanummer NV-20735\nFakturadatum 2026-08-12\nFörfallodatum 2026-09-11\n\nBeskrivning Antal Å-pris Belopp\nTeknisk dokumentation 4 588,60 2 354,40\nLeveransutskrift 2 246,00 492,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Belopp exkl. moms 2 846,40\n4952-1875\nMoms 25 4 711,60\nAnge OCR-nummer\n00863025201 Att betala SEK 3 558,00\nAnge OCR-numret vid betalning.\nValuta: SEK. Ange OCR-numret som betalningsreferens.\nOrganisationsnummer: 559762-3205 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b",
+    "textSha256": "6fa325373af971d2af4530bde1e80f223ebaa02ee8ef9afb40596f3bf07cf3cc",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "db6eae49fc9338d17bf7da204c27013a7b1796775d3be823462231bf5b3f3bfc",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": true,
+  "percentMarkers": {
+    "rendered": 1,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "cf7e5857b3e2a4d5a46a691c70d26bb1ef619eeaba6ba2c8ee69b0cf54d10b21",
+    "layout-replay.json": "9c4e252a4795a72ff6aaf20b1b5ebf2a3a83a8fe09b43f0f567168b8c84e1bc8",
+    "raw-response.json": "db6cc689ab60152f117c357741f0311c83c9aaf9ef0db88726edffa69327c627",
+    "raw-response.v8": "08ff53cce7a37218178c7a4ccecc99309932167e6f3dd4e8271153922cc1ead9",
+    "recognition-finished.json": "b6949274c74a3fd78228b05f03155c3fe5cd708ffa83d12bd4815a6514481e01",
+    "recognition-input.png": "e3792322a5eaf831bddbec5fd0410d5062b81a999fc8d4997a7ae5b994128714",
+    "recognition-start.json": "d4ece10db77514a4e27979bcf9ab5570919034bf75184d57b1b20d2128fd4c6a",
+    "worker-result.json": "e1d8c1a4c57508f7d6d2d9b27d1962426c2ce8e29d6a87455c71e1f775c26aab",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

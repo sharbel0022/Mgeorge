@@ -192,7 +192,8 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // Reuse the actual scalar-label grammar when bounding a party value. A new
   // accepted date/number label must never become the next-line party name.
   const scalarBoundary=value=>{let boundary=-1;for(const pattern of scalarLabels){const match=pattern.exec(value);if(match&&(boundary<0||match.index<boundary))boundary=match.index;}return boundary;};
-  const detail=extractInvoiceDetails(layout.original,{direction,validOrganization,money,scalarBoundary,currency:fields.currency.value,invoice_number:fields.invoice_number.value,reference:fields.reference.value,credit:kind==='credit',summary:Object.fromEntries(['net_cents','vat_cents','total_cents'].map(key=>[key,fields[key].value]))});
+  const scalarLabelColons=value=>{const positions=new Set();for(const pattern of scalarLabels)for(const match of value.matchAll(new RegExp(pattern.source,'giu'))){const colon=match[0].indexOf(':');if(colon>=0)positions.add(match.index+colon);}return positions;};
+  const detail=extractInvoiceDetails(layout.original,{direction,validOrganization,money,scalarBoundary,scalarLabelColons,currency:fields.currency.value,invoice_number:fields.invoice_number.value,reference:fields.reference.value,credit:kind==='credit',summary:Object.fromEntries(['net_cents','vat_cents','total_cents'].map(key=>[key,fields[key].value]))});
   issues.push(...detail.issues);
   if(detail.currency_conflict)set('currency',null,null,0);
   set('party',detail.counterparty.name,detail.counterparty.name_evidence);
