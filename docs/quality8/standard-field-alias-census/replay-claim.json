@@ -1,0 +1,35 @@
+{
+  "kind": "development replay; already consumed observations",
+  "startedAt": "2026-11-06T16:02:01.297Z",
+  "sourceCommit": "0132d4537c5fd24e6a0af7f3cadf499a73706ed0",
+  "sourceHashes": {
+    "src/invoice-extraction.js": "4419c373a90e0bfbd5ec26326e80d092047dbbac0ae9deece8cce0ded223390f",
+    "src/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+    "sites/lib/invoice-fields.js": "165ac7a7e75fddcd473b1a059427b51723b23a4c53c1282728431e645ed039f1",
+    "sites/lib/invoice-details.js": "6dc5ea343f76ffe4d1a7a4f0e001e118cf4b89aaa9771d9f0b6f19fa05642548",
+    "sites/lib/ocr-layout.js": "c6a142220f4fc8e8c7bf7b24a218f9fe59390a572d279d104364a7e927581b67",
+    "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+    "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+  },
+  "inputHashes": {
+    "first-results.json": "241a8ef5cce3cc956dd2771e75b11602e5ebccbf25e9b0418331eba6805885a4",
+    "gold.json": "04d657525107523be020033906154746f8d832cd91b7b9087dd102217c9d7e7b",
+    "freeze.json": "0fd6c4de10ad0b4e8c883b727aa9c3a5a5a7a2a9d272957cee11469b9cb44758",
+    "observations/normal-sv-01.json": "e251abd977b0b7eb020c3ae71e86b0e31a5a1a8480103ce929f848bbc8ab4bd3",
+    "observations/normal-sv-02.json": "cd0f09d1dbdb32d93e16572b8a6e18518725bd6922d1e34279b7766053e486a7",
+    "observations/normal-sv-03.json": "ec9826b8ab38750a5de0ab5ae769cc8afd67ee7e90b100308211404aacd54a7e",
+    "observations/normal-sv-04.json": "ecfc2685eec9218c4e4768230e5bc7ff3c459db9598f9d1e4eb66b2dfb790a49",
+    "observations/normal-sv-05.json": "4c962d52b6850346fe1ffcba834f544515e56147a44b2fd1dd16892e1f76182e",
+    "observations/normal-sv-06.json": "5e3c3cf18b10df151b8b8f190dc8d4f4ccdadae1af9d867fd892f13f9e9a4a20",
+    "observations/normal-en-07.json": "9a59ddaa133da34f038c6c0e81c37cd8755bbde73023dca9199910a95ef923fb",
+    "observations/normal-en-08.json": "546e3c2058a08b67a2bbc09fa0c535d836eec408aa429a62592452131cc2aec0",
+    "observations/normal-en-09.json": "a76d08ffee4b389bf65dd5d37a4c217a932a16e29ee2e5d2614d4b1e0cafe769",
+    "observations/normal-en-10.json": "3293139cb99c18e890063cac8344afa70ff1aef53202d32067e84507bce1dd81",
+    "observations/normal-en-11.json": "8314c978428f4174ab038d446257dd378e6df89c873e557cb1f30b78c11fd7fc",
+    "observations/normal-en-12.json": "6d8cd0e8f47e79a44ab8ea652f414b6afd6a12b73bbe29f1a9c5c819ca9ce370",
+    "observations/stress-sv-13.json": "d1611a8362585cfcd92e291228532ee1101dee9dd8e93a731af6985e00252f93",
+    "observations/stress-en-14.json": "261bec2758c048f2f1129b4f899a694135f0d009609c7390190bbb5b93aedbc3"
+  },
+  "scriptSha256": "78970f097e8458fbc1a8e9a836bdbe9b0b2a112f1188c87f0cceb79dd0860608",
+  "opticalCalls": 0
+}

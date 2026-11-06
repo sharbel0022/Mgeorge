@@ -1,0 +1,2796 @@
+TAP version 13
+# Subtest: a missing explicit Leverantör cannot disappear behind an earlier name
+ok 1 - a missing explicit Leverantör cannot disappear behind an earlier name
+  ---
+  duration_ms: 157.691225
+  type: 'test'
+  ...
+# Subtest: a missing explicit Supplier cannot disappear behind an earlier name
+ok 2 - a missing explicit Supplier cannot disappear behind an earlier name
+  ---
+  duration_ms: 9.029774
+  type: 'test'
+  ...
+# Subtest: a name over the supported limit cannot become a trusted 240-character prefix
+ok 3 - a name over the supported limit cannot become a trusted 240-character prefix
+  ---
+  duration_ms: 1.058002
+  type: 'test'
+  ...
+# Subtest: an empty party cannot borrow any accepted invoice scalar label as its name
+ok 4 - an empty party cannot borrow any accepted invoice scalar label as its name
+  ---
+  duration_ms: 22.849165
+  type: 'test'
+  ...
+# Subtest: a conflicting name remains unresolved even if the organization number agrees
+ok 5 - a conflicting name remains unresolved even if the organization number agrees
+  ---
+  duration_ms: 1.132635
+  type: 'test'
+  ...
+# Subtest: complete metadata suffixes cannot agree with a shorter original number
+ok 6 - complete metadata suffixes cannot agree with a shorter original number
+  ---
+  duration_ms: 7.317024
+  type: 'test'
+  ...
+# Subtest: explicit alphabetic metadata identities are compared without supplying missing fields
+ok 7 - explicit alphabetic metadata identities are compared without supplying missing fields
+  ---
+  duration_ms: 6.780606
+  type: 'test'
+  ...
+# Subtest: metadata date export and embedded words do not masquerade as invoice identities
+ok 8 - metadata date export and embedded words do not masquerade as invoice identities
+  ---
+  duration_ms: 2.5375
+  type: 'test'
+  ...
+# Subtest: ordinary explicit leading zeros remain exact across document and metadata
+ok 9 - ordinary explicit leading zeros remain exact across document and metadata
+  ---
+  duration_ms: 13.828977
+  type: 'test'
+  ...
+# Subtest: explicit foreign-currency amounts are read without enabling foreign-currency registration
+ok 10 - explicit foreign-currency amounts are read without enabling foreign-currency registration
+  ---
+  duration_ms: 0.950671
+  type: 'test'
+  ...
+# Subtest: missing printed net or VAT requires review and is never inferred from the total
+ok 11 - missing printed net or VAT requires review and is never inferred from the total
+  ---
+  duration_ms: 12.025332
+  type: 'test'
+  ...
+# Subtest: an explicitly printed zero VAT amount remains valid evidence
+ok 12 - an explicitly printed zero VAT amount remains valid evidence
+  ---
+  duration_ms: 0.800455
+  type: 'test'
+  ...
+# Subtest: explicit supplier and recipient organization labels remain in their source roles
+ok 13 - explicit supplier and recipient organization labels remain in their source roles
+  ---
+  duration_ms: 6.613175
+  type: 'test'
+  ...
+# Subtest: organization numbers inside explicit party sections never cross roles
+ok 14 - organization numbers inside explicit party sections never cross roles
+  ---
+  duration_ms: 2.121974
+  type: 'test'
+  ...
+# Subtest: a bare party section heading can precede an explicit same-role name label
+ok 15 - a bare party section heading can precede an explicit same-role name label
+  ---
+  duration_ms: 12.449069
+  type: 'test'
+  ...
+# Subtest: an explicitly empty party label cannot become a harmless section heading
+ok 16 - an explicitly empty party label cannot become a harmless section heading
+  ---
+  duration_ms: 2.096085
+  type: 'test'
+  ...
+# Subtest: an unassigned organization number with two party identities stays ambiguous
+ok 17 - an unassigned organization number with two party identities stays ambiguous
+  ---
+  duration_ms: 0.54462
+  type: 'test'
+  ...
+# Subtest: a second unreadable explicitly owned organization number invalidates that role
+ok 18 - a second unreadable explicitly owned organization number invalidates that role
+  ---
+  duration_ms: 0.556427
+  type: 'test'
+  ...
+# Subtest: OCR checksum evidence remains separate from bank verification
+ok 19 - OCR checksum evidence remains separate from bank verification
+  ---
+  duration_ms: 9.397776
+  type: 'test'
+  ...
+# Subtest: invalid OCR checksum requires review while preserving every original digit
+ok 20 - invalid OCR checksum requires review while preserving every original digit
+  ---
+  duration_ms: 1.591355
+  type: 'test'
+  ...
+# Subtest: a generic numeric payment reference is never subjected to formal OCR claims
+ok 21 - a generic numeric payment reference is never subjected to formal OCR claims
+  ---
+  duration_ms: 8.483951
+  type: 'test'
+  ...
+# Subtest: a known OCR modulus-10 example is accepted as a checksum only
+ok 22 - a known OCR modulus-10 example is accepted as a checksum only
+  ---
+  duration_ms: 0.576878
+  type: 'test'
+  ...
+# Subtest: discount prose cannot switch off a contradictory row amount
+ok 23 - discount prose cannot switch off a contradictory row amount
+  ---
+  duration_ms: 3.142651
+  type: 'test'
+  ...
+# Subtest: an explicitly printed row VAT percentage must agree with the printed VAT amount
+ok 24 - an explicitly printed row VAT percentage must agree with the printed VAT amount
+  ---
+  duration_ms: 0.802738
+  type: 'test'
+  ...
+# Subtest: a fractional quantity in a headerless row cannot be read as its integer suffix
+ok 25 - a fractional quantity in a headerless row cannot be read as its integer suffix
+  ---
+  duration_ms: 19.045299
+  type: 'test'
+  ...
+# Subtest: a correct fractional headerless row is validated using the entire quantity
+ok 26 - a correct fractional headerless row is validated using the entire quantity
+  ---
+  duration_ms: 1.137813
+  type: 'test'
+  ...
+# Subtest: a malformed quantity or extra monetary suffix in a headerless row stays unresolved
+ok 27 - a malformed quantity or extra monetary suffix in a headerless row stays unresolved
+  ---
+  duration_ms: 1.385436
+  type: 'test'
+  ...
+# Subtest: internally consistent headerless rows must also agree with the document sums
+ok 28 - internally consistent headerless rows must also agree with the document sums
+  ---
+  duration_ms: 0.548405
+  type: 'test'
+  ...
+# Subtest: all supported headerless rows participate in the sum without creating missing source fields
+ok 29 - all supported headerless rows participate in the sum without creating missing source fields
+  ---
+  duration_ms: 0.514965
+  type: 'test'
+  ...
+# Subtest: explicit Swedish mixed-rate rows preserve printed values and reconcile against totals
+ok 30 - explicit Swedish mixed-rate rows preserve printed values and reconcile against totals
+  ---
+  duration_ms: 16.962243
+  type: 'test'
+  ...
+# Subtest: explicit English quantity unit and VAT headings use the same source-bound row contract
+ok 31 - explicit English quantity unit and VAT headings use the same source-bound row contract
+  ---
+  duration_ms: 4.30494
+  type: 'test'
+  ...
+# Subtest: a four-column net table is complete without manufacturing omitted VAT and gross cells
+ok 32 - a four-column net table is complete without manufacturing omitted VAT and gross cells
+  ---
+  duration_ms: 0.680454
+  type: 'test'
+  ...
+# Subtest: a declared but empty net cell differs from an entirely omitted VAT column
+ok 33 - a declared but empty net cell differs from an entirely omitted VAT column
+  ---
+  duration_ms: 0.570408
+  type: 'test'
+  ...
+# Subtest: a five-column net and rate table must agree with the explicit document VAT
+ok 34 - a five-column net and rate table must agree with the explicit document VAT
+  ---
+  duration_ms: 0.61764
+  type: 'test'
+  ...
+# Subtest: a five-column net and rate table checks VAT without writing inferred row amounts
+ok 35 - a five-column net and rate table checks VAT without writing inferred row amounts
+  ---
+  duration_ms: 0.536678
+  type: 'test'
+  ...
+# Subtest: currency printed in monetary cells cannot disappear when document fields are isolated from rows
+ok 36 - currency printed in monetary cells cannot disappear when document fields are isolated from rows
+  ---
+  duration_ms: 0.933996
+  type: 'test'
+  ...
+# Subtest: matching explicit cell currencies are verified without treating description words as currency
+ok 37 - matching explicit cell currencies are verified without treating description words as currency
+  ---
+  duration_ms: 5.977459
+  type: 'test'
+  ...
+# Subtest: labels inside table descriptions cannot replace a document identity
+ok 38 - labels inside table descriptions cannot replace a document identity
+  ---
+  duration_ms: 0.899174
+  type: 'test'
+  ...
+# Subtest: quantity with decimal comma is checked without inventing an integer quantity
+ok 39 - quantity with decimal comma is checked without inventing an integer quantity
+  ---
+  duration_ms: 2.860756
+  type: 'test'
+  ...
+# Subtest: an explicit table with wrong unit extension stays under review
+ok 40 - an explicit table with wrong unit extension stays under review
+  ---
+  duration_ms: 0.665541
+  type: 'test'
+  ...
+# Subtest: an explicit table with wrong VAT rate stays under review
+ok 41 - an explicit table with wrong VAT rate stays under review
+  ---
+  duration_ms: 0.689037
+  type: 'test'
+  ...
+# Subtest: an explicit table with wrong gross amount stays under review
+ok 42 - an explicit table with wrong gross amount stays under review
+  ---
+  duration_ms: 0.585842
+  type: 'test'
+  ...
+# Subtest: an explicit table with missing printed VAT amount stays under review
+ok 43 - an explicit table with missing printed VAT amount stays under review
+  ---
+  duration_ms: 14.808236
+  type: 'test'
+  ...
+# Subtest: an explicit table with multiple numeric values in one cell stays under review
+ok 44 - an explicit table with multiple numeric values in one cell stays under review
+  ---
+  duration_ms: 1.338314
+  type: 'test'
+  ...
+# Subtest: line sums cannot silently disagree with otherwise self-consistent document totals
+ok 45 - line sums cannot silently disagree with otherwise self-consistent document totals
+  ---
+  duration_ms: 1.004161
+  type: 'test'
+  ...
+# Subtest: unsupported discount columns remain visible and cannot silently drop a row
+ok 46 - unsupported discount columns remain visible and cannot silently drop a row
+  ---
+  duration_ms: 0.903069
+  type: 'test'
+  ...
+# Subtest: an unknown row in a recognized table cannot be skipped to obtain a complete table
+ok 47 - an unknown row in a recognized table cannot be skipped to obtain a complete table
+  ---
+  duration_ms: 0.894666
+  type: 'test'
+  ...
+# Subtest: a recognizable table with collapsed column spacing stays incomplete instead of disappearing
+ok 48 - a recognizable table with collapsed column spacing stays incomplete instead of disappearing
+  ---
+  duration_ms: 0.75703
+  type: 'test'
+  ...
+# Subtest: a repeated table header across a declared page boundary keeps page evidence
+ok 49 - a repeated table header across a declared page boundary keeps page evidence
+  ---
+  duration_ms: 9.751639
+  type: 'test'
+  ...
+# Subtest: an explicit same-invoice continuation caption can precede the repeated table header
+ok 50 - an explicit same-invoice continuation caption can precede the repeated table header
+  ---
+  duration_ms: 0.790831
+  type: 'test'
+  ...
+# Subtest: a continuation caption carrying a different identity cannot reconnect the table
+ok 51 - a continuation caption carrying a different identity cannot reconnect the table
+  ---
+  duration_ms: 0.51759
+  type: 'test'
+  ...
+# Subtest: page continuation with a different invoice number never borrows earlier table identity
+ok 52 - page continuation with a different invoice number never borrows earlier table identity
+  ---
+  duration_ms: 0.554665
+  type: 'test'
+  ...
+# Subtest: page continuation without a repeated identity or header remains incomplete
+ok 53 - page continuation without a repeated identity or header remains incomplete
+  ---
+  duration_ms: 0.701626
+  type: 'test'
+  ...
+# Subtest: a supported description continuation retains the source lines
+ok 54 - a supported description continuation retains the source lines
+  ---
+  duration_ms: 3.92569
+  type: 'test'
+  ...
+# Subtest: credit details retain explicit negative amounts while ledger fields keep positive amounts
+ok 55 - credit details retain explicit negative amounts while ledger fields keep positive amounts
+  ---
+  duration_ms: 0.719053
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: inline unreadable explicit VAT after total
+ok 56 - Node pdf reviewed grammar boundary: inline unreadable explicit VAT after total
+  ---
+  duration_ms: 134.162227
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: inline conflicting explicit VAT after date
+ok 57 - Node pdf reviewed grammar boundary: inline conflicting explicit VAT after date
+  ---
+  duration_ms: 9.347601
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+ok 58 - Node pdf reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+  ---
+  duration_ms: 8.499054
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+ok 59 - Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+  ---
+  duration_ms: 1.196141
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+ok 60 - Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+  ---
+  duration_ms: 1.122059
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+ok 61 - Node pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+  ---
+  duration_ms: 4.071759
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+ok 62 - Node pdf reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+  ---
+  duration_ms: 1.05656
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+ok 63 - Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+  ---
+  duration_ms: 17.147222
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+ok 64 - Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+  ---
+  duration_ms: 1.445776
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+ok 65 - Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+  ---
+  duration_ms: 7.185937
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+ok 66 - Node pdf reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+  ---
+  duration_ms: 0.858151
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+ok 67 - Node pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+  ---
+  duration_ms: 0.800655
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+ok 68 - Node pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+  ---
+  duration_ms: 3.027357
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: an explicit absent name is held: saknas
+ok 69 - Node pdf reviewed grammar boundary: an explicit absent name is held: saknas
+  ---
+  duration_ms: 0.840235
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: an explicit absent name is held: ej angiven
+ok 70 - Node pdf reviewed grammar boundary: an explicit absent name is held: ej angiven
+  ---
+  duration_ms: 3.613409
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: an explicit absent name is held: inte angiven
+ok 71 - Node pdf reviewed grammar boundary: an explicit absent name is held: inte angiven
+  ---
+  duration_ms: 2.254794
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: an explicit absent name is held: not provided
+ok 72 - Node pdf reviewed grammar boundary: an explicit absent name is held: not provided
+  ---
+  duration_ms: 0.909159
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: absence words inside a real name are not substring-rejected
+ok 73 - Node pdf reviewed grammar boundary: absence words inside a real name are not substring-rejected
+  ---
+  duration_ms: 0.895208
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: a heading can still borrow an unambiguous company name
+ok 74 - Node pdf reviewed grammar boundary: a heading can still borrow an unambiguous company name
+  ---
+  duration_ms: 7.104103
+  type: 'test'
+  ...
+# Subtest: Node pdf reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+ok 75 - Node pdf reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+  ---
+  duration_ms: 6.386894
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: inline unreadable explicit VAT after total
+ok 76 - Node ocr reviewed grammar boundary: inline unreadable explicit VAT after total
+  ---
+  duration_ms: 6.17151
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: inline conflicting explicit VAT after date
+ok 77 - Node ocr reviewed grammar boundary: inline conflicting explicit VAT after date
+  ---
+  duration_ms: 1.347588
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+ok 78 - Node ocr reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+  ---
+  duration_ms: 5.304684
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+ok 79 - Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+  ---
+  duration_ms: 1.251123
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+ok 80 - Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+  ---
+  duration_ms: 0.922258
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+ok 81 - Node ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+  ---
+  duration_ms: 4.996722
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+ok 82 - Node ocr reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+  ---
+  duration_ms: 0.952414
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+ok 83 - Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+  ---
+  duration_ms: 0.85705
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+ok 84 - Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+  ---
+  duration_ms: 0.866054
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+ok 85 - Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+  ---
+  duration_ms: 0.788898
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+ok 86 - Node ocr reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+  ---
+  duration_ms: 4.986216
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+ok 87 - Node ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+  ---
+  duration_ms: 0.894497
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+ok 88 - Node ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+  ---
+  duration_ms: 7.873301
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: an explicit absent name is held: saknas
+ok 89 - Node ocr reviewed grammar boundary: an explicit absent name is held: saknas
+  ---
+  duration_ms: 0.917552
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: an explicit absent name is held: ej angiven
+ok 90 - Node ocr reviewed grammar boundary: an explicit absent name is held: ej angiven
+  ---
+  duration_ms: 0.74448
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: an explicit absent name is held: inte angiven
+ok 91 - Node ocr reviewed grammar boundary: an explicit absent name is held: inte angiven
+  ---
+  duration_ms: 3.298745
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: an explicit absent name is held: not provided
+ok 92 - Node ocr reviewed grammar boundary: an explicit absent name is held: not provided
+  ---
+  duration_ms: 0.64413
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: absence words inside a real name are not substring-rejected
+ok 93 - Node ocr reviewed grammar boundary: absence words inside a real name are not substring-rejected
+  ---
+  duration_ms: 0.768107
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: a heading can still borrow an unambiguous company name
+ok 94 - Node ocr reviewed grammar boundary: a heading can still borrow an unambiguous company name
+  ---
+  duration_ms: 3.911267
+  type: 'test'
+  ...
+# Subtest: Node ocr reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+ok 95 - Node ocr reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+  ---
+  duration_ms: 2.961498
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: inline unreadable explicit VAT after total
+ok 96 - Sites pdf reviewed grammar boundary: inline unreadable explicit VAT after total
+  ---
+  duration_ms: 19.88346
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: inline conflicting explicit VAT after date
+ok 97 - Sites pdf reviewed grammar boundary: inline conflicting explicit VAT after date
+  ---
+  duration_ms: 1.69411
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+ok 98 - Sites pdf reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+  ---
+  duration_ms: 2.386022
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+ok 99 - Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+  ---
+  duration_ms: 5.405017
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+ok 100 - Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+  ---
+  duration_ms: 2.288204
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+ok 101 - Sites pdf reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+  ---
+  duration_ms: 9.054509
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+ok 102 - Sites pdf reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+  ---
+  duration_ms: 0.981758
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+ok 103 - Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+  ---
+  duration_ms: 3.910446
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+ok 104 - Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+  ---
+  duration_ms: 1.097191
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+ok 105 - Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+  ---
+  duration_ms: 0.942188
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+ok 106 - Sites pdf reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+  ---
+  duration_ms: 3.48102
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+ok 107 - Sites pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+  ---
+  duration_ms: 5.52713
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+ok 108 - Sites pdf reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+  ---
+  duration_ms: 0.627895
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: an explicit absent name is held: saknas
+ok 109 - Sites pdf reviewed grammar boundary: an explicit absent name is held: saknas
+  ---
+  duration_ms: 0.537118
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: an explicit absent name is held: ej angiven
+ok 110 - Sites pdf reviewed grammar boundary: an explicit absent name is held: ej angiven
+  ---
+  duration_ms: 0.468335
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: an explicit absent name is held: inte angiven
+ok 111 - Sites pdf reviewed grammar boundary: an explicit absent name is held: inte angiven
+  ---
+  duration_ms: 0.506553
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: an explicit absent name is held: not provided
+ok 112 - Sites pdf reviewed grammar boundary: an explicit absent name is held: not provided
+  ---
+  duration_ms: 0.497729
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: absence words inside a real name are not substring-rejected
+ok 113 - Sites pdf reviewed grammar boundary: absence words inside a real name are not substring-rejected
+  ---
+  duration_ms: 0.486883
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: a heading can still borrow an unambiguous company name
+ok 114 - Sites pdf reviewed grammar boundary: a heading can still borrow an unambiguous company name
+  ---
+  duration_ms: 6.7234
+  type: 'test'
+  ...
+# Subtest: Sites pdf reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+ok 115 - Sites pdf reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+  ---
+  duration_ms: 4.193853
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: inline unreadable explicit VAT after total
+ok 116 - Sites ocr reviewed grammar boundary: inline unreadable explicit VAT after total
+  ---
+  duration_ms: 0.531159
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: inline conflicting explicit VAT after date
+ok 117 - Sites ocr reviewed grammar boundary: inline conflicting explicit VAT after date
+  ---
+  duration_ms: 3.248871
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+ok 118 - Sites ocr reviewed grammar boundary: complete inline explicit VAT has the same name and scalar boundary
+  ---
+  duration_ms: 2.854848
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+ok 119 - Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: moms oläsligt
+  ---
+  duration_ms: 0.695417
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+ok 120 - Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: total moms 600,00 SEK
+  ---
+  duration_ms: 2.401164
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+ok 121 - Sites ocr reviewed grammar boundary: unsupported inline VAT syntax cannot disappear at a sibling boundary: VAT oläsligt
+  ---
+  duration_ms: 1.817105
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+ok 122 - Sites ocr reviewed grammar boundary: unsupported inline net syntax cannot disappear at a sibling boundary
+  ---
+  duration_ms: 0.472071
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+ok 123 - Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn
+  ---
+  duration_ms: 0.637199
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+ok 124 - Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Leverantör namn:
+  ---
+  duration_ms: 2.79715
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+ok 125 - Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Supplier name
+  ---
+  duration_ms: 0.472681
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+ok 126 - Sites ocr reviewed grammar boundary: a next-line unknown label is never a company: Säljare namn
+  ---
+  duration_ms: 0.445651
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+ok 127 - Sites ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Supplier org.nr:
+  ---
+  duration_ms: 0.450809
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+ok 128 - Sites ocr reviewed grammar boundary: explicit organization owner does not create an empty name: Seller organization number:
+  ---
+  duration_ms: 3.815799
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: an explicit absent name is held: saknas
+ok 129 - Sites ocr reviewed grammar boundary: an explicit absent name is held: saknas
+  ---
+  duration_ms: 0.967206
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: an explicit absent name is held: ej angiven
+ok 130 - Sites ocr reviewed grammar boundary: an explicit absent name is held: ej angiven
+  ---
+  duration_ms: 0.834216
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: an explicit absent name is held: inte angiven
+ok 131 - Sites ocr reviewed grammar boundary: an explicit absent name is held: inte angiven
+  ---
+  duration_ms: 0.743398
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: an explicit absent name is held: not provided
+ok 132 - Sites ocr reviewed grammar boundary: an explicit absent name is held: not provided
+  ---
+  duration_ms: 0.730239
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: absence words inside a real name are not substring-rejected
+ok 133 - Sites ocr reviewed grammar boundary: absence words inside a real name are not substring-rejected
+  ---
+  duration_ms: 1.047227
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: a heading can still borrow an unambiguous company name
+ok 134 - Sites ocr reviewed grammar boundary: a heading can still borrow an unambiguous company name
+  ---
+  duration_ms: 0.43794
+  type: 'test'
+  ...
+# Subtest: Sites ocr reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+ok 135 - Sites ocr reviewed grammar boundary: inline VAT alias census extends beyond the display excerpt
+  ---
+  duration_ms: 2.189496
+  type: 'test'
+  ...
+# Subtest: swedish-control
+ok 136 - swedish-control
+  ---
+  duration_ms: 124.209121
+  type: 'test'
+  ...
+# Subtest: english-net-total
+ok 137 - english-net-total
+  ---
+  duration_ms: 7.799581
+  type: 'test'
+  ...
+# Subtest: english-grouped-decimals
+ok 138 - english-grouped-decimals
+  ---
+  duration_ms: 19.566794
+  type: 'test'
+  ...
+# Subtest: english-vat-amount
+ok 139 - english-vat-amount
+  ---
+  duration_ms: 0.768507
+  type: 'test'
+  ...
+# Subtest: vat-rate-prose-is-not-amount
+ok 140 - vat-rate-prose-is-not-amount
+  ---
+  duration_ms: 0.825643
+  type: 'test'
+  ...
+# Subtest: swedish-table-summary-without-colon
+ok 141 - swedish-table-summary-without-colon
+  ---
+  duration_ms: 1.99327
+  type: 'test'
+  ...
+# Subtest: english-multipage-table
+ok 142 - english-multipage-table
+  ---
+  duration_ms: 11.662855
+  type: 'test'
+  ...
+# Subtest: missing-net-is-not-derived
+ok 143 - missing-net-is-not-derived
+  ---
+  duration_ms: 6.233814
+  type: 'test'
+  ...
+# Subtest: vat-rate-does-not-supply-missing-vat
+ok 144 - vat-rate-does-not-supply-missing-vat
+  ---
+  duration_ms: 0.812593
+  type: 'test'
+  ...
+# Subtest: conflicting-english-total
+ok 145 - conflicting-english-total
+  ---
+  duration_ms: 0.688436
+  type: 'test'
+  ...
+# Subtest: malformed-english-grouping
+ok 146 - malformed-english-grouping
+  ---
+  duration_ms: 0.773975
+  type: 'test'
+  ...
+# Subtest: vat-arithmetic-mismatch
+ok 147 - vat-arithmetic-mismatch
+  ---
+  duration_ms: 4.468566
+  type: 'test'
+  ...
+# Subtest: multipage-identity-conflict
+ok 148 - multipage-identity-conflict
+  ---
+  duration_ms: 0.802277
+  type: 'test'
+  ...
+# Subtest: invoice-and-ocr-columns-ambiguous
+ok 149 - invoice-and-ocr-columns-ambiguous
+  ---
+  duration_ms: 0.557219
+  type: 'test'
+  ...
+# Subtest: ocr-remains-manual-review
+ok 150 - ocr-remains-manual-review
+  ---
+  duration_ms: 16.067046
+  type: 'test'
+  ...
+# Subtest: English OCR monetary labels preserve the Bankgiro evidence boundary: matching
+ok 151 - English OCR monetary labels preserve the Bankgiro evidence boundary: matching
+  ---
+  duration_ms: 9.70605
+  type: 'test'
+  ...
+# Subtest: English OCR monetary labels preserve the Bankgiro evidence boundary: missing
+ok 152 - English OCR monetary labels preserve the Bankgiro evidence boundary: missing
+  ---
+  duration_ms: 7.44061
+  type: 'test'
+  ...
+# Subtest: English OCR monetary labels preserve the Bankgiro evidence boundary: other-original
+ok 153 - English OCR monetary labels preserve the Bankgiro evidence boundary: other-original
+  ---
+  duration_ms: 0.745782
+  type: 'test'
+  ...
+# Subtest: Swedish tax summaries preserve grouped English amounts across blank lines
+ok 154 - Swedish tax summaries preserve grouped English amounts across blank lines
+  ---
+  duration_ms: 5.484266
+  type: 'test'
+  ...
+# Subtest: paragraph recovery cannot turn English payment terms into net money
+ok 155 - paragraph recovery cannot turn English payment terms into net money
+  ---
+  duration_ms: 0.761647
+  type: 'test'
+  ...
+# Subtest: English totals do not allow a later paragraph to supply the invoice identity
+ok 156 - English totals do not allow a later paragraph to supply the invoice identity
+  ---
+  duration_ms: 2.63069
+  type: 'test'
+  ...
+# Subtest: literal supplier name Total Consulting AB
+ok 157 - literal supplier name Total Consulting AB
+  ---
+  duration_ms: 0.621195
+  type: 'test'
+  ...
+# Subtest: literal supplier name Net Consulting AB
+ok 158 - literal supplier name Net Consulting AB
+  ---
+  duration_ms: 0.499071
+  type: 'test'
+  ...
+# Subtest: missing supplier does not borrow English Net heading
+ok 159 - missing supplier does not borrow English Net heading
+  ---
+  duration_ms: 1.397103
+  type: 'test'
+  ...
+# Subtest: missing supplier does not borrow English Total heading
+ok 160 - missing supplier does not borrow English Total heading
+  ---
+  duration_ms: 0.547925
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net 30
+ok 161 - payment terms cannot supply a net amount: Net 30
+  ---
+  duration_ms: 19.102455
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net: 30
+ok 162 - payment terms cannot supply a net amount: Net: 30
+  ---
+  duration_ms: 0.664961
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net / 30
+ok 163 - payment terms cannot supply a net amount: Net / 30
+  ---
+  duration_ms: 2.014932
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net 60
+ok 164 - payment terms cannot supply a net amount: Net 60
+  ---
+  duration_ms: 0.503328
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net 90
+ok 165 - payment terms cannot supply a net amount: Net 90
+  ---
+  duration_ms: 0.435025
+  type: 'test'
+  ...
+# Subtest: inline English amounts retain supplier and net amount boundaries
+ok 166 - inline English amounts retain supplier and net amount boundaries
+  ---
+  duration_ms: 0.530569
+  type: 'test'
+  ...
+# Subtest: table description Net remains a checked row
+ok 167 - table description Net remains a checked row
+  ---
+  duration_ms: 0.643258
+  type: 'test'
+  ...
+# Subtest: table description Total remains a checked row
+ok 168 - table description Total remains a checked row
+  ---
+  duration_ms: 4.695568
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline ISO dates keep their label boundary
+ok 169 - Sites scalar layout: inline ISO dates keep their label boundary
+  ---
+  duration_ms: 143.421281
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline Swedish dots dates keep their label boundary
+ok 170 - Sites scalar layout: inline Swedish dots dates keep their label boundary
+  ---
+  duration_ms: 2.775438
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline Swedish slashes dates keep their label boundary
+ok 171 - Sites scalar layout: inline Swedish slashes dates keep their label boundary
+  ---
+  duration_ms: 0.681015
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: inline spaced digits dates keep their label boundary
+ok 172 - Sites scalar layout: inline spaced digits dates keep their label boundary
+  ---
+  duration_ms: 1.081107
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: date suffix XYZ is not silently truncated
+ok 173 - Sites scalar layout: date suffix XYZ is not silently truncated
+  ---
+  duration_ms: 1.022259
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: date suffix  99 is not silently truncated
+ok 174 - Sites scalar layout: date suffix  99 is not silently truncated
+  ---
+  duration_ms: 0.812393
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: date suffix /17 is not silently truncated
+ok 175 - Sites scalar layout: date suffix /17 is not silently truncated
+  ---
+  duration_ms: 0.539683
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+ok 176 - Sites scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+  ---
+  duration_ms: 15.142815
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+ok 177 - Sites scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+  ---
+  duration_ms: 0.849408
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+ok 178 - Sites scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+  ---
+  duration_ms: 0.702578
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: bare monetary summaries end an incomplete table
+ok 179 - Sites scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 0.650139
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: bare monetary summaries end an incomplete table
+ok 180 - Sites scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 0.510638
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: actual invalid or conflicting net summaries remain in the full census
+ok 181 - Sites scalar layout: actual invalid or conflicting net summaries remain in the full census
+  ---
+  duration_ms: 1.163672
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+ok 182 - Sites scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+  ---
+  duration_ms: 4.381875
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Offert is not promoted by a referenced invoice number
+ok 183 - Sites scalar layout: Offert is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.632412
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Quotation is not promoted by a referenced invoice number
+ok 184 - Sites scalar layout: Quotation is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.616618
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Påminnelse is not promoted by a referenced invoice number
+ok 185 - Sites scalar layout: Påminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 1.957967
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+ok 186 - Sites scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.738221
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+ok 187 - Sites scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.559663
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Payment reminder is not promoted by a referenced invoice number
+ok 188 - Sites scalar layout: Payment reminder is not promoted by a referenced invoice number
+  ---
+  duration_ms: 2.979275
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+ok 189 - Sites scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+  ---
+  duration_ms: 1.445777
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+ok 190 - Sites scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+  ---
+  duration_ms: 1.330753
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+ok 191 - Sites scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+  ---
+  duration_ms: 2.31811
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+ok 192 - Sites scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+  ---
+  duration_ms: 2.080852
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+ok 193 - Sites scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+  ---
+  duration_ms: 2.204088
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: competing type is retained across scalar/table/display filtering
+ok 194 - Sites scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 0.649567
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: competing type is retained across scalar/table/display filtering
+ok 195 - Sites scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 0.568917
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: competing type is retained across scalar/table/display filtering
+ok 196 - Sites scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 46.722952
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 197 - Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 1.467369
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 198 - Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 1.088178
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 199 - Sites scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 0.699203
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+ok 200 - Sites scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.571841
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+ok 201 - Sites scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.386562
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+ok 202 - Sites scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.420924
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 203 - Sites scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 3.013065
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 204 - Sites scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.648106
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+ok 205 - Sites scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.435005
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+ok 206 - Sites scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+  ---
+  duration_ms: 0.832403
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: Kvitto retains precedence over invoice-number evidence
+ok 207 - Sites scalar layout: Kvitto retains precedence over invoice-number evidence
+  ---
+  duration_ms: 0.381474
+  type: 'test'
+  ...
+# Subtest: Sites scalar layout: an invalid invoice identity does not establish a missing document title
+ok 208 - Sites scalar layout: an invalid invoice identity does not establish a missing document title
+  ---
+  duration_ms: 0.629257
+  type: 'test'
+  ...
+# Subtest: sites: paragraph gaps never establish invoice identity from another line
+ok 209 - sites: paragraph gaps never establish invoice identity from another line
+  ---
+  duration_ms: 126.347529
+  type: 'test'
+  ...
+# Subtest: sites: a bare alphabetic next-line value is not a verified invoice identifier
+ok 210 - sites: a bare alphabetic next-line value is not a verified invoice identifier
+  ---
+  duration_ms: 4.780846
+  type: 'test'
+  ...
+# Subtest: sites: direct wrapped identifiers and same-line alphabetic identifiers remain readable
+ok 211 - sites: direct wrapped identifiers and same-line alphabetic identifiers remain readable
+  ---
+  duration_ms: 6.255977
+  type: 'test'
+  ...
+# Subtest: sites: paragraph gaps do not borrow a reference, account or date
+ok 212 - sites: paragraph gaps do not borrow a reference, account or date
+  ---
+  duration_ms: 5.09527
+  type: 'test'
+  ...
+# Subtest: sites: OCR paragraph gaps preserve explicit wrapped summary values
+ok 213 - sites: OCR paragraph gaps preserve explicit wrapped summary values
+  ---
+  duration_ms: 10.987259
+  type: 'test'
+  ...
+# Subtest: sites: blank lines never permit borrowing another heading or crossing a page
+ok 214 - sites: blank lines never permit borrowing another heading or crossing a page
+  ---
+  duration_ms: 11.688875
+  type: 'test'
+  ...
+# Subtest: sites: tax-summary labels terminate an item table without hiding or adding rows
+ok 215 - sites: tax-summary labels terminate an item table without hiding or adding rows
+  ---
+  duration_ms: 3.734512
+  type: 'test'
+  ...
+# Subtest: sites: explicit tax-summary label full-word-sums preserves all printed fields
+ok 216 - sites: explicit tax-summary label full-word-sums preserves all printed fields
+  ---
+  duration_ms: 1.31524
+  type: 'test'
+  ...
+# Subtest: sites: explicit tax-summary label abbreviated-sums preserves all printed fields
+ok 217 - sites: explicit tax-summary label abbreviated-sums preserves all printed fields
+  ---
+  duration_ms: 1.420208
+  type: 'test'
+  ...
+# Subtest: sites: explicit tax-summary label total-excluding-tax preserves all printed fields
+ok 218 - sites: explicit tax-summary label total-excluding-tax preserves all printed fields
+  ---
+  duration_ms: 1.632427
+  type: 'test'
+  ...
+# Subtest: sites: explicit tax-summary label amount-including-tax preserves all printed fields
+ok 219 - sites: explicit tax-summary label amount-including-tax preserves all printed fields
+  ---
+  duration_ms: 2.171809
+  type: 'test'
+  ...
+# Subtest: sites: explicit tax-summary label same-line-summaries preserves all printed fields
+ok 220 - sites: explicit tax-summary label same-line-summaries preserves all printed fields
+  ---
+  duration_ms: 1.035959
+  type: 'test'
+  ...
+# Subtest: sites: explicit tax-summary label wrapped-summaries preserves all printed fields
+ok 221 - sites: explicit tax-summary label wrapped-summaries preserves all printed fields
+  ---
+  duration_ms: 1.0101
+  type: 'test'
+  ...
+# Subtest: sites: unsafe tax-summary label conflicting-gross-alias requires review
+ok 222 - sites: unsafe tax-summary label conflicting-gross-alias requires review
+  ---
+  duration_ms: 1.16288
+  type: 'test'
+  ...
+# Subtest: sites: unsafe tax-summary label conflicting-net-alias requires review
+ok 223 - sites: unsafe tax-summary label conflicting-net-alias requires review
+  ---
+  duration_ms: 7.472939
+  type: 'test'
+  ...
+# Subtest: sites: unsafe tax-summary label invalid-gross-alias requires review
+ok 224 - sites: unsafe tax-summary label invalid-gross-alias requires review
+  ---
+  duration_ms: 2.805844
+  type: 'test'
+  ...
+# Subtest: sites: unsafe tax-summary label invalid-net-alias requires review
+ok 225 - sites: unsafe tax-summary label invalid-net-alias requires review
+  ---
+  duration_ms: 1.318515
+  type: 'test'
+  ...
+# Subtest: sites: unsafe tax-summary label bare-sum-is-not-a-gross-label requires review
+ok 226 - sites: unsafe tax-summary label bare-sum-is-not-a-gross-label requires review
+  ---
+  duration_ms: 5.764418
+  type: 'test'
+  ...
+# Subtest: sites: unsafe tax-summary label subtotal-is-not-a-gross-label requires review
+ok 227 - sites: unsafe tax-summary label subtotal-is-not-a-gross-label requires review
+  ---
+  duration_ms: 1.293257
+  type: 'test'
+  ...
+# Subtest: sites: unsafe tax-summary label gross-must-not-be-derived requires review
+ok 228 - sites: unsafe tax-summary label gross-must-not-be-derived requires review
+  ---
+  duration_ms: 1.004412
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: VAT summary alias
+ok 229 - Node V2 diagnosis: VAT summary alias
+  ---
+  duration_ms: 192.227062
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: gross invoice amount alias
+ok 230 - Node V2 diagnosis: gross invoice amount alias
+  ---
+  duration_ms: 9.264115
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: VAT alias with a colon
+ok 231 - Node V2 diagnosis: VAT alias with a colon
+  ---
+  duration_ms: 1.120317
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: gross alias over an immediate line
+ok 232 - Node V2 diagnosis: gross alias over an immediate line
+  ---
+  duration_ms: 12.380592
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census
+ok 233 - Node V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census
+  ---
+  duration_ms: 2.187923
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: additional Summa moms oläsligt remains in the complete census
+ok 234 - Node V2 diagnosis: additional Summa moms oläsligt remains in the complete census
+  ---
+  duration_ms: 0.716288
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census
+ok 235 - Node V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census
+  ---
+  duration_ms: 1.139496
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census
+ok 236 - Node V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census
+  ---
+  duration_ms: 4.184309
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: article description Summa moms 999,00 is not a document summary
+ok 237 - Node V2 diagnosis: article description Summa moms 999,00 is not a document summary
+  ---
+  duration_ms: 39.243692
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary
+ok 238 - Node V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary
+  ---
+  duration_ms: 1.409492
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: explicit colonless supplier role retains its complete name
+ok 239 - Node V2 diagnosis: explicit colonless supplier role retains its complete name
+  ---
+  duration_ms: 9.462845
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: safe geometry pairing and the actual name consumer must agree
+ok 240 - Node V2 diagnosis: safe geometry pairing and the actual name consumer must agree
+  ---
+  duration_ms: 13.893673
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB
+ok 241 - Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB
+  ---
+  duration_ms: 1.608331
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt
+ok 242 - Node V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt
+  ---
+  duration_ms: 1.403833
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB
+ok 243 - Node V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB
+  ---
+  duration_ms: 0.852404
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till
+ok 244 - Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till
+  ---
+  duration_ms: 0.821196
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB
+ok 245 - Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB
+  ---
+  duration_ms: 0.724491
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör
+ok 246 - Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör
+  ---
+  duration_ms: 2.518602
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803
+ok 247 - Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803
+  ---
+  duration_ms: 15.554304
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK
+ok 248 - Node V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK
+  ---
+  duration_ms: 1.030791
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: supplier words inside a structured article do not become party evidence
+ok 249 - Node V2 diagnosis: supplier words inside a structured article do not become party evidence
+  ---
+  duration_ms: 13.522957
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: an unlabelled prose mention does not create a competing supplier field
+ok 250 - Node V2 diagnosis: an unlabelled prose mention does not create a competing supplier field
+  ---
+  duration_ms: 0.918132
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: explicit new summaries terminate an incomplete article block
+ok 251 - Node V2 diagnosis: explicit new summaries terminate an incomplete article block
+  ---
+  duration_ms: 0.827615
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK
+ok 252 - Node V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK
+  ---
+  duration_ms: 0.917872
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB
+ok 253 - Node V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB
+  ---
+  duration_ms: 0.905753
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00
+ok 254 - Node V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00
+  ---
+  duration_ms: 27.33061
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00
+ok 255 - Node V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00
+  ---
+  duration_ms: 0.698822
+  type: 'test'
+  ...
+# Subtest: Node V2 diagnosis: text order cannot associate detached summary values
+ok 256 - Node V2 diagnosis: text order cannot associate detached summary values
+  ---
+  duration_ms: 0.960436
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: VAT summary alias
+ok 257 - Sites V2 diagnosis: VAT summary alias
+  ---
+  duration_ms: 21.024918
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: gross invoice amount alias
+ok 258 - Sites V2 diagnosis: gross invoice amount alias
+  ---
+  duration_ms: 13.61151
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: VAT alias with a colon
+ok 259 - Sites V2 diagnosis: VAT alias with a colon
+  ---
+  duration_ms: 1.383813
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: gross alias over an immediate line
+ok 260 - Sites V2 diagnosis: gross alias over an immediate line
+  ---
+  duration_ms: 0.982809
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census
+ok 261 - Sites V2 diagnosis: additional Summa moms 185,00 SEK remains in the complete census
+  ---
+  duration_ms: 1.115479
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: additional Summa moms oläsligt remains in the complete census
+ok 262 - Sites V2 diagnosis: additional Summa moms oläsligt remains in the complete census
+  ---
+  duration_ms: 2.56438
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census
+ok 263 - Sites V2 diagnosis: additional Fakturabelopp 921,00 SEK remains in the complete census
+  ---
+  duration_ms: 1.104633
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census
+ok 264 - Sites V2 diagnosis: additional Fakturabelopp oläsligt remains in the complete census
+  ---
+  duration_ms: 5.69346
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: article description Summa moms 999,00 is not a document summary
+ok 265 - Sites V2 diagnosis: article description Summa moms 999,00 is not a document summary
+  ---
+  duration_ms: 1.803825
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary
+ok 266 - Sites V2 diagnosis: article description Fakturabelopp 999,00 is not a document summary
+  ---
+  duration_ms: 0.712071
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: explicit colonless supplier role retains its complete name
+ok 267 - Sites V2 diagnosis: explicit colonless supplier role retains its complete name
+  ---
+  duration_ms: 5.602965
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: safe geometry pairing and the actual name consumer must agree
+ok 268 - Sites V2 diagnosis: safe geometry pairing and the actual name consumer must agree
+  ---
+  duration_ms: 1.003491
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB
+ok 269 - Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör Syntetiska Andra Verkstaden AB
+  ---
+  duration_ms: 0.566122
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt
+ok 270 - Sites V2 diagnosis: later colonless supplier remains authoritative: Leverantör oläsligt
+  ---
+  duration_ms: 5.929947
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB
+ok 271 - Sites V2 diagnosis: role-less or conflicting text cannot become the party: Syntetiska Textverkstaden AB
+  ---
+  duration_ms: 0.648466
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till
+ok 272 - Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Faktureras till
+  ---
+  duration_ms: 0.851782
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB
+ok 273 - Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Syntetiska Textverkstaden AB Kund Syntetiska Mottagaren AB
+  ---
+  duration_ms: 0.541255
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör
+ok 274 - Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör
+  ---
+  duration_ms: 5.328411
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803
+ok 275 - Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Avtal: SYN-803
+  ---
+  duration_ms: 0.649818
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK
+ok 276 - Sites V2 diagnosis: role-less or conflicting text cannot become the party: Leverantör Fakturabelopp 920,00 SEK
+  ---
+  duration_ms: 0.709448
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: supplier words inside a structured article do not become party evidence
+ok 277 - Sites V2 diagnosis: supplier words inside a structured article do not become party evidence
+  ---
+  duration_ms: 0.940956
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: an unlabelled prose mention does not create a competing supplier field
+ok 278 - Sites V2 diagnosis: an unlabelled prose mention does not create a competing supplier field
+  ---
+  duration_ms: 0.699503
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: explicit new summaries terminate an incomplete article block
+ok 279 - Sites V2 diagnosis: explicit new summaries terminate an incomplete article block
+  ---
+  duration_ms: 15.631841
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK
+ok 280 - Sites V2 diagnosis: a native document cannot become green while ignoring Fakturabelopp 921,00 SEK
+  ---
+  duration_ms: 0.681776
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB
+ok 281 - Sites V2 diagnosis: a native document cannot become green while ignoring Leverantör Syntetiska Andra Verkstaden AB
+  ---
+  duration_ms: 0.5713
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00
+ok 282 - Sites V2 diagnosis: damaged percentage text is not repaired: Moms 25 Yo 184,00
+  ---
+  duration_ms: 0.470318
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00
+ok 283 - Sites V2 diagnosis: damaged percentage text is not repaired: Momsbelopp (25 960) 184,00
+  ---
+  duration_ms: 0.495806
+  type: 'test'
+  ...
+# Subtest: Sites V2 diagnosis: text order cannot associate detached summary values
+ok 284 - Sites V2 diagnosis: text order cannot associate detached summary values
+  ---
+  duration_ms: 0.570478
+  type: 'test'
+  ...
+# (node:39) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: browser OCR uses AUTO, reconstructed actual words and unchanged page/word confidence
+ok 285 - browser OCR uses AUTO, reconstructed actual words and unchanged page/word confidence
+  ---
+  duration_ms: 208.030817
+  type: 'test'
+  ...
+# Subtest: browser OCR preserves a row with unknown content and its strong paragraph gaps
+ok 286 - browser OCR preserves a row with unknown content and its strong paragraph gaps
+  ---
+  duration_ms: 7.16832
+  type: 'test'
+  ...
+# Subtest: browser OCR terminates the worker after configuration failure
+ok 287 - browser OCR terminates the worker after configuration failure
+  ---
+  duration_ms: 21.41457
+  type: 'test'
+  ...
+# Subtest: browser OCR terminates the worker after recognition failure
+ok 288 - browser OCR terminates the worker after recognition failure
+  ---
+  duration_ms: 5.937448
+  type: 'test'
+  ...
+# Subtest: Node cross-axis ambiguity remains unassigned by the actual scalar consumer
+ok 289 - Node cross-axis ambiguity remains unassigned by the actual scalar consumer
+  ---
+  duration_ms: 120.001738
+  type: 'test'
+  ...
+# Subtest: Node two complete role columns preserve both explicit roles
+ok 290 - Node two complete role columns preserve both explicit roles
+  ---
+  duration_ms: 30.297687
+  type: 'test'
+  ...
+# Subtest: Node incomplete role-name row is indivisible: extra
+ok 291 - Node incomplete role-name row is indivisible: extra
+  ---
+  duration_ms: 1.156421
+  type: 'test'
+  ...
+# Subtest: Node incomplete role-name row is indivisible: missing
+ok 292 - Node incomplete role-name row is indivisible: missing
+  ---
+  duration_ms: 7.224886
+  type: 'test'
+  ...
+# Subtest: Node incomplete role-name row is indivisible: merged
+ok 293 - Node incomplete role-name row is indivisible: merged
+  ---
+  duration_ms: 1.409262
+  type: 'test'
+  ...
+# Subtest: Node the exact explicit recipient alias is understood: "Faktureras till: "
+ok 294 - Node the exact explicit recipient alias is understood: "Faktureras till: "
+  ---
+  duration_ms: 0.978062
+  type: 'test'
+  ...
+# Subtest: Node the exact explicit recipient alias is understood: "Faktureras till "
+ok 295 - Node the exact explicit recipient alias is understood: "Faktureras till "
+  ---
+  duration_ms: 0.871191
+  type: 'test'
+  ...
+# Subtest: Node the exact explicit recipient alias is understood: "Faktureras till\\n"
+ok 296 - Node the exact explicit recipient alias is understood: "Faktureras till\\n"
+  ---
+  duration_ms: 7.983337
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+ok 297 - Node ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+  ---
+  duration_ms: 3.529453
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras till
+ok 298 - Node ambiguous or absent recipient role stays unknown: Faktureras till
+  ---
+  duration_ms: 1.167348
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras till saknas
+ok 299 - Node ambiguous or absent recipient role stays unknown: Faktureras till saknas
+  ---
+  duration_ms: 0.990991
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+ok 300 - Node ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+  ---
+  duration_ms: 0.81665
+  type: 'test'
+  ...
+# Subtest: Node ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+ok 301 - Node ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+  ---
+  duration_ms: 0.865402
+  type: 'test'
+  ...
+# Subtest: Node reordered role columns cannot claim an unowned following organization by output order
+ok 302 - Node reordered role columns cannot claim an unowned following organization by output order
+  ---
+  duration_ms: 1.758567
+  type: 'test'
+  ...
+# Subtest: Node explicit owner-qualified organization survives the role-column reconstruction
+ok 303 - Node explicit owner-qualified organization survives the role-column reconstruction
+  ---
+  duration_ms: 1.385135
+  type: 'test'
+  ...
+# Subtest: Node a mixed explicit role row cannot assign a following unowned organization to its last event
+ok 304 - Node a mixed explicit role row cannot assign a following unowned organization to its last event
+  ---
+  duration_ms: 9.371247
+  type: 'test'
+  ...
+# Subtest: Sites cross-axis ambiguity remains unassigned by the actual scalar consumer
+ok 305 - Sites cross-axis ambiguity remains unassigned by the actual scalar consumer
+  ---
+  duration_ms: 10.821549
+  type: 'test'
+  ...
+# Subtest: Sites two complete role columns preserve both explicit roles
+ok 306 - Sites two complete role columns preserve both explicit roles
+  ---
+  duration_ms: 7.323764
+  type: 'test'
+  ...
+# Subtest: Sites incomplete role-name row is indivisible: extra
+ok 307 - Sites incomplete role-name row is indivisible: extra
+  ---
+  duration_ms: 0.998212
+  type: 'test'
+  ...
+# Subtest: Sites incomplete role-name row is indivisible: missing
+ok 308 - Sites incomplete role-name row is indivisible: missing
+  ---
+  duration_ms: 0.815237
+  type: 'test'
+  ...
+# Subtest: Sites incomplete role-name row is indivisible: merged
+ok 309 - Sites incomplete role-name row is indivisible: merged
+  ---
+  duration_ms: 0.935739
+  type: 'test'
+  ...
+# Subtest: Sites the exact explicit recipient alias is understood: "Faktureras till: "
+ok 310 - Sites the exact explicit recipient alias is understood: "Faktureras till: "
+  ---
+  duration_ms: 0.603378
+  type: 'test'
+  ...
+# Subtest: Sites the exact explicit recipient alias is understood: "Faktureras till "
+ok 311 - Sites the exact explicit recipient alias is understood: "Faktureras till "
+  ---
+  duration_ms: 0.53125
+  type: 'test'
+  ...
+# Subtest: Sites the exact explicit recipient alias is understood: "Faktureras till\\n"
+ok 312 - Sites the exact explicit recipient alias is understood: "Faktureras till\\n"
+  ---
+  duration_ms: 0.655316
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+ok 313 - Sites ambiguous or absent recipient role stays unknown: Faktureras tillfälle Syntetiska Ek Handel AB
+  ---
+  duration_ms: 0.535386
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras till
+ok 314 - Sites ambiguous or absent recipient role stays unknown: Faktureras till
+  ---
+  duration_ms: 0.529146
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras till saknas
+ok 315 - Sites ambiguous or absent recipient role stays unknown: Faktureras till saknas
+  ---
+  duration_ms: 0.430929
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+ok 316 - Sites ambiguous or absent recipient role stays unknown: Faktureras till Syntetiska Ek Handel AB Leverantör Syntetiska Lind Verkstad AB
+  ---
+  duration_ms: 0.466753
+  type: 'test'
+  ...
+# Subtest: Sites ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+ok 317 - Sites ambiguous or absent recipient role stays unknown: Syntetiska Ek Handel AB
+  ---
+  duration_ms: 0.467303
+  type: 'test'
+  ...
+# Subtest: Sites reordered role columns cannot claim an unowned following organization by output order
+ok 318 - Sites reordered role columns cannot claim an unowned following organization by output order
+  ---
+  duration_ms: 0.942879
+  type: 'test'
+  ...
+# Subtest: Sites explicit owner-qualified organization survives the role-column reconstruction
+ok 319 - Sites explicit owner-qualified organization survives the role-column reconstruction
+  ---
+  duration_ms: 0.834686
+  type: 'test'
+  ...
+# Subtest: Sites a mixed explicit role row cannot assign a following unowned organization to its last event
+ok 320 - Sites a mixed explicit role row cannot assign a following unowned organization to its last event
+  ---
+  duration_ms: 0.554745
+  type: 'test'
+  ...
+# Subtest: Node layout respects the existing parser header: additional description and quantity aliases
+ok 321 - Node layout respects the existing parser header: additional description and quantity aliases
+  ---
+  duration_ms: 69.367408
+  type: 'test'
+  ...
+# Subtest: Node layout respects the existing parser header: unit price instead of quantity
+ok 322 - Node layout respects the existing parser header: unit price instead of quantity
+  ---
+  duration_ms: 3.323873
+  type: 'test'
+  ...
+# Subtest: Node layout respects the existing parser header: VAT-rate column instead of quantity
+ok 323 - Node layout respects the existing parser header: VAT-rate column instead of quantity
+  ---
+  duration_ms: 1.449422
+  type: 'test'
+  ...
+# Subtest: Node layout respects the existing parser header: incomplete header without a description column
+ok 324 - Node layout respects the existing parser header: incomplete header without a description column
+  ---
+  duration_ms: 1.941703
+  type: 'test'
+  ...
+# Subtest: Sites layout respects the existing parser header: additional description and quantity aliases
+ok 325 - Sites layout respects the existing parser header: additional description and quantity aliases
+  ---
+  duration_ms: 27.192362
+  type: 'test'
+  ...
+# Subtest: Sites layout respects the existing parser header: unit price instead of quantity
+ok 326 - Sites layout respects the existing parser header: unit price instead of quantity
+  ---
+  duration_ms: 3.585847
+  type: 'test'
+  ...
+# Subtest: Sites layout respects the existing parser header: VAT-rate column instead of quantity
+ok 327 - Sites layout respects the existing parser header: VAT-rate column instead of quantity
+  ---
+  duration_ms: 5.904588
+  type: 'test'
+  ...
+# Subtest: Sites layout respects the existing parser header: incomplete header without a description column
+ok 328 - Sites layout respects the existing parser header: incomplete header without a description column
+  ---
+  duration_ms: 8.512985
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at scalar prefix on the organization row
+ok 329 - Node pdf holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 63.589011
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at registered tax-summary prefix on the organization row
+ok 330 - Node pdf holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 4.56354
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at separate registered tax-summary row
+ok 331 - Node pdf holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 1.30841
+  type: 'test'
+  ...
+# Subtest: Node pdf holds organization context at a different explicit owner before an unqualified organization
+ok 332 - Node pdf holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 2.021613
+  type: 'test'
+  ...
+# Subtest: Node pdf retains scalar suffix after the last name event
+ok 333 - Node pdf retains scalar suffix after the last name event
+  ---
+  duration_ms: 1.816454
+  type: 'test'
+  ...
+# Subtest: Node pdf retains known inline VAT with a colon
+ok 334 - Node pdf retains known inline VAT with a colon
+  ---
+  duration_ms: 1.250492
+  type: 'test'
+  ...
+# Subtest: Node pdf retains known inline currency without a colon
+ok 335 - Node pdf retains known inline currency without a colon
+  ---
+  duration_ms: 1.174578
+  type: 'test'
+  ...
+# Subtest: Node pdf retains recognized adjacent identity fields separated by a pipe
+ok 336 - Node pdf retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 1.709954
+  type: 'test'
+  ...
+# Subtest: Node pdf retains explicit ownership after an unknown inline field
+ok 337 - Node pdf retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 1.113186
+  type: 'test'
+  ...
+# Subtest: Node pdf retains matching explicit ownership keeps its existing local section
+ok 338 - Node pdf retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 1.512076
+  type: 'test'
+  ...
+# Subtest: Node pdf a name prefix is not a scalar label or a new section
+ok 339 - Node pdf a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 0.996891
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at scalar prefix on the organization row
+ok 340 - Node ocr holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 1.563664
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at registered tax-summary prefix on the organization row
+ok 341 - Node ocr holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 1.203882
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at separate registered tax-summary row
+ok 342 - Node ocr holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 0.80363
+  type: 'test'
+  ...
+# Subtest: Node ocr holds organization context at a different explicit owner before an unqualified organization
+ok 343 - Node ocr holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 0.729828
+  type: 'test'
+  ...
+# Subtest: Node ocr retains scalar suffix after the last name event
+ok 344 - Node ocr retains scalar suffix after the last name event
+  ---
+  duration_ms: 0.75737
+  type: 'test'
+  ...
+# Subtest: Node ocr retains known inline VAT with a colon
+ok 345 - Node ocr retains known inline VAT with a colon
+  ---
+  duration_ms: 0.887546
+  type: 'test'
+  ...
+# Subtest: Node ocr retains known inline currency without a colon
+ok 346 - Node ocr retains known inline currency without a colon
+  ---
+  duration_ms: 0.800024
+  type: 'test'
+  ...
+# Subtest: Node ocr retains recognized adjacent identity fields separated by a pipe
+ok 347 - Node ocr retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 0.793855
+  type: 'test'
+  ...
+# Subtest: Node ocr retains explicit ownership after an unknown inline field
+ok 348 - Node ocr retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 1.429862
+  type: 'test'
+  ...
+# Subtest: Node ocr retains matching explicit ownership keeps its existing local section
+ok 349 - Node ocr retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 0.766023
+  type: 'test'
+  ...
+# Subtest: Node ocr a name prefix is not a scalar label or a new section
+ok 350 - Node ocr a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 0.76393
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at scalar prefix on the organization row
+ok 351 - Sites pdf holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 6.527695
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at registered tax-summary prefix on the organization row
+ok 352 - Sites pdf holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 1.272094
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at separate registered tax-summary row
+ok 353 - Sites pdf holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 1.218514
+  type: 'test'
+  ...
+# Subtest: Sites pdf holds organization context at a different explicit owner before an unqualified organization
+ok 354 - Sites pdf holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 0.985003
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains scalar suffix after the last name event
+ok 355 - Sites pdf retains scalar suffix after the last name event
+  ---
+  duration_ms: 1.097502
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains known inline VAT with a colon
+ok 356 - Sites pdf retains known inline VAT with a colon
+  ---
+  duration_ms: 1.080987
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains known inline currency without a colon
+ok 357 - Sites pdf retains known inline currency without a colon
+  ---
+  duration_ms: 0.912374
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains recognized adjacent identity fields separated by a pipe
+ok 358 - Sites pdf retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 0.608276
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains explicit ownership after an unknown inline field
+ok 359 - Sites pdf retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 0.75695
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains matching explicit ownership keeps its existing local section
+ok 360 - Sites pdf retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 0.605542
+  type: 'test'
+  ...
+# Subtest: Sites pdf a name prefix is not a scalar label or a new section
+ok 361 - Sites pdf a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 0.498811
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at scalar prefix on the organization row
+ok 362 - Sites ocr holds organization context at scalar prefix on the organization row
+  ---
+  duration_ms: 0.684982
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at registered tax-summary prefix on the organization row
+ok 363 - Sites ocr holds organization context at registered tax-summary prefix on the organization row
+  ---
+  duration_ms: 1.04275
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at separate registered tax-summary row
+ok 364 - Sites ocr holds organization context at separate registered tax-summary row
+  ---
+  duration_ms: 0.814356
+  type: 'test'
+  ...
+# Subtest: Sites ocr holds organization context at a different explicit owner before an unqualified organization
+ok 365 - Sites ocr holds organization context at a different explicit owner before an unqualified organization
+  ---
+  duration_ms: 1.553038
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains scalar suffix after the last name event
+ok 366 - Sites ocr retains scalar suffix after the last name event
+  ---
+  duration_ms: 0.831611
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains known inline VAT with a colon
+ok 367 - Sites ocr retains known inline VAT with a colon
+  ---
+  duration_ms: 0.726224
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains known inline currency without a colon
+ok 368 - Sites ocr retains known inline currency without a colon
+  ---
+  duration_ms: 0.776759
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains recognized adjacent identity fields separated by a pipe
+ok 369 - Sites ocr retains recognized adjacent identity fields separated by a pipe
+  ---
+  duration_ms: 2.834697
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains explicit ownership after an unknown inline field
+ok 370 - Sites ocr retains explicit ownership after an unknown inline field
+  ---
+  duration_ms: 0.597659
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains matching explicit ownership keeps its existing local section
+ok 371 - Sites ocr retains matching explicit ownership keeps its existing local section
+  ---
+  duration_ms: 0.514174
+  type: 'test'
+  ...
+# Subtest: Sites ocr a name prefix is not a scalar label or a new section
+ok 372 - Sites ocr a name prefix is not a scalar label or a new section
+  ---
+  duration_ms: 0.820295
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization boundary: Avsändare:
+ok 373 - Node pdf independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 48.676787
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization boundary: Utställd av:
+ok 374 - Node pdf independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 3.171795
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization positive: same-line explicit recipient section
+ok 375 - Node pdf independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 0.995569
+  type: 'test'
+  ...
+# Subtest: Node pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 376 - Node pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 1.241409
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization boundary: Avsändare:
+ok 377 - Node ocr independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 1.780791
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization boundary: Utställd av:
+ok 378 - Node ocr independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 0.943701
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization positive: same-line explicit recipient section
+ok 379 - Node ocr independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 0.727675
+  type: 'test'
+  ...
+# Subtest: Node ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 380 - Node ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 0.759503
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization boundary: Avsändare:
+ok 381 - Sites pdf independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 11.444717
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization boundary: Utställd av:
+ok 382 - Sites pdf independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 1.12236
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization positive: same-line explicit recipient section
+ok 383 - Sites pdf independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 0.91009
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 384 - Sites pdf independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 0.886244
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization boundary: Avsändare:
+ok 385 - Sites ocr independent inline organization boundary: Avsändare:
+  ---
+  duration_ms: 0.878643
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization boundary: Utställd av:
+ok 386 - Sites ocr independent inline organization boundary: Utställd av:
+  ---
+  duration_ms: 1.239511
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization positive: same-line explicit recipient section
+ok 387 - Sites ocr independent inline organization positive: same-line explicit recipient section
+  ---
+  duration_ms: 2.258711
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+ok 388 - Sites ocr independent inline organization positive: explicit owner-qualified number after an unknown field
+  ---
+  duration_ms: 1.159676
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Utställd av before-recipient
+ok 389 - Node pdf cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 36.801727
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Utställd av after-recipient
+ok 390 - Node pdf cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 2.882008
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Utställd av after-paragraph
+ok 391 - Node pdf cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 0.84346
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Avsändare before-recipient
+ok 392 - Node pdf cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 0.730881
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Avsändare after-recipient
+ok 393 - Node pdf cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 0.633854
+  type: 'test'
+  ...
+# Subtest: Node pdf cannot move an organization across Avsändare after-paragraph
+ok 394 - Node pdf cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 0.624971
+  type: 'test'
+  ...
+# Subtest: Node pdf retains source-bound adjacent recipient identity
+ok 395 - Node pdf retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 1.169941
+  type: 'test'
+  ...
+# Subtest: Node pdf retains source-bound same-line recipient identity
+ok 396 - Node pdf retains source-bound same-line recipient identity
+  ---
+  duration_ms: 0.662528
+  type: 'test'
+  ...
+# Subtest: Node pdf retains source-bound explicitly owner-qualified identities
+ok 397 - Node pdf retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 0.742758
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Utställd av before-recipient
+ok 398 - Node ocr cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 1.418755
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Utställd av after-recipient
+ok 399 - Node ocr cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 5.83916
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Utställd av after-paragraph
+ok 400 - Node ocr cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 0.735076
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Avsändare before-recipient
+ok 401 - Node ocr cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 0.497259
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Avsändare after-recipient
+ok 402 - Node ocr cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 0.514114
+  type: 'test'
+  ...
+# Subtest: Node ocr cannot move an organization across Avsändare after-paragraph
+ok 403 - Node ocr cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 0.439682
+  type: 'test'
+  ...
+# Subtest: Node ocr retains source-bound adjacent recipient identity
+ok 404 - Node ocr retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 0.508135
+  type: 'test'
+  ...
+# Subtest: Node ocr retains source-bound same-line recipient identity
+ok 405 - Node ocr retains source-bound same-line recipient identity
+  ---
+  duration_ms: 0.456457
+  type: 'test'
+  ...
+# Subtest: Node ocr retains source-bound explicitly owner-qualified identities
+ok 406 - Node ocr retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 4.662077
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Utställd av before-recipient
+ok 407 - Sites pdf cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 8.413656
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Utställd av after-recipient
+ok 408 - Sites pdf cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 0.81048
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Utställd av after-paragraph
+ok 409 - Sites pdf cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 0.73732
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Avsändare before-recipient
+ok 410 - Sites pdf cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 0.906685
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Avsändare after-recipient
+ok 411 - Sites pdf cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 0.851541
+  type: 'test'
+  ...
+# Subtest: Sites pdf cannot move an organization across Avsändare after-paragraph
+ok 412 - Sites pdf cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 0.612642
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains source-bound adjacent recipient identity
+ok 413 - Sites pdf retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 0.662547
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains source-bound same-line recipient identity
+ok 414 - Sites pdf retains source-bound same-line recipient identity
+  ---
+  duration_ms: 0.686043
+  type: 'test'
+  ...
+# Subtest: Sites pdf retains source-bound explicitly owner-qualified identities
+ok 415 - Sites pdf retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 0.733054
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Utställd av before-recipient
+ok 416 - Sites ocr cannot move an organization across Utställd av before-recipient
+  ---
+  duration_ms: 0.610709
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Utställd av after-recipient
+ok 417 - Sites ocr cannot move an organization across Utställd av after-recipient
+  ---
+  duration_ms: 0.556488
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Utställd av after-paragraph
+ok 418 - Sites ocr cannot move an organization across Utställd av after-paragraph
+  ---
+  duration_ms: 0.573103
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Avsändare before-recipient
+ok 419 - Sites ocr cannot move an organization across Avsändare before-recipient
+  ---
+  duration_ms: 1.086335
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Avsändare after-recipient
+ok 420 - Sites ocr cannot move an organization across Avsändare after-recipient
+  ---
+  duration_ms: 0.538601
+  type: 'test'
+  ...
+# Subtest: Sites ocr cannot move an organization across Avsändare after-paragraph
+ok 421 - Sites ocr cannot move an organization across Avsändare after-paragraph
+  ---
+  duration_ms: 0.521365
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains source-bound adjacent recipient identity
+ok 422 - Sites ocr retains source-bound adjacent recipient identity
+  ---
+  duration_ms: 0.616618
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains source-bound same-line recipient identity
+ok 423 - Sites ocr retains source-bound same-line recipient identity
+  ---
+  duration_ms: 0.628106
+  type: 'test'
+  ...
+# Subtest: Sites ocr retains source-bound explicitly owner-qualified identities
+ok 424 - Sites ocr retains source-bound explicitly owner-qualified identities
+  ---
+  duration_ms: 0.520984
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: issuer-first gap=1
+ok 425 - Node pdf independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 32.998291
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: recipient-first gap=1
+ok 426 - Node pdf independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 2.838463
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: issuer-first gap=2
+ok 427 - Node pdf independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 0.780335
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Utställd av: recipient-first gap=2
+ok 428 - Node pdf independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 0.760935
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: issuer-first gap=1
+ok 429 - Node pdf independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 0.672102
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: recipient-first gap=1
+ok 430 - Node pdf independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 0.777511
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: issuer-first gap=2
+ok 431 - Node pdf independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 0.64439
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization provenance: Avsändare: recipient-first gap=2
+ok 432 - Node pdf independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 0.619453
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization positive: same explicit recipient section
+ok 433 - Node pdf independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 0.801346
+  type: 'test'
+  ...
+# Subtest: Node pdf independent organization positive: explicit recipient-owned organization across paragraph
+ok 434 - Node pdf independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 0.671902
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: issuer-first gap=1
+ok 435 - Node ocr independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 1.310203
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: recipient-first gap=1
+ok 436 - Node ocr independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 0.820004
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: issuer-first gap=2
+ok 437 - Node ocr independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 0.72415
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Utställd av: recipient-first gap=2
+ok 438 - Node ocr independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 0.604159
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: issuer-first gap=1
+ok 439 - Node ocr independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 0.614635
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: recipient-first gap=1
+ok 440 - Node ocr independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 0.61069
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: issuer-first gap=2
+ok 441 - Node ocr independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 0.570168
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization provenance: Avsändare: recipient-first gap=2
+ok 442 - Node ocr independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 0.546693
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization positive: same explicit recipient section
+ok 443 - Node ocr independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 0.538731
+  type: 'test'
+  ...
+# Subtest: Node ocr independent organization positive: explicit recipient-owned organization across paragraph
+ok 444 - Node ocr independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 0.667705
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: issuer-first gap=1
+ok 445 - Sites pdf independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 5.62693
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: recipient-first gap=1
+ok 446 - Sites pdf independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 0.933615
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: issuer-first gap=2
+ok 447 - Sites pdf independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 0.868617
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Utställd av: recipient-first gap=2
+ok 448 - Sites pdf independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 0.926054
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: issuer-first gap=1
+ok 449 - Sites pdf independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 0.738381
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: recipient-first gap=1
+ok 450 - Sites pdf independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 0.75715
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: issuer-first gap=2
+ok 451 - Sites pdf independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 0.614114
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization provenance: Avsändare: recipient-first gap=2
+ok 452 - Sites pdf independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 0.657379
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization positive: same explicit recipient section
+ok 453 - Sites pdf independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 0.801707
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent organization positive: explicit recipient-owned organization across paragraph
+ok 454 - Sites pdf independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 0.592902
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: issuer-first gap=1
+ok 455 - Sites ocr independent organization provenance: Utställd av: issuer-first gap=1
+  ---
+  duration_ms: 0.638522
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: recipient-first gap=1
+ok 456 - Sites ocr independent organization provenance: Utställd av: recipient-first gap=1
+  ---
+  duration_ms: 0.685051
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: issuer-first gap=2
+ok 457 - Sites ocr independent organization provenance: Utställd av: issuer-first gap=2
+  ---
+  duration_ms: 0.605111
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Utställd av: recipient-first gap=2
+ok 458 - Sites ocr independent organization provenance: Utställd av: recipient-first gap=2
+  ---
+  duration_ms: 0.655597
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: issuer-first gap=1
+ok 459 - Sites ocr independent organization provenance: Avsändare: issuer-first gap=1
+  ---
+  duration_ms: 0.632312
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: recipient-first gap=1
+ok 460 - Sites ocr independent organization provenance: Avsändare: recipient-first gap=1
+  ---
+  duration_ms: 1.815733
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: issuer-first gap=2
+ok 461 - Sites ocr independent organization provenance: Avsändare: issuer-first gap=2
+  ---
+  duration_ms: 0.54462
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization provenance: Avsändare: recipient-first gap=2
+ok 462 - Sites ocr independent organization provenance: Avsändare: recipient-first gap=2
+  ---
+  duration_ms: 0.538831
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization positive: same explicit recipient section
+ok 463 - Sites ocr independent organization positive: same explicit recipient section
+  ---
+  duration_ms: 0.493523
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent organization positive: explicit recipient-owned organization across paragraph
+ok 464 - Sites ocr independent organization positive: explicit recipient-owned organization across paragraph
+  ---
+  duration_ms: 0.623989
+  type: 'test'
+  ...
+1..464
+# tests 464
+# suites 0
+# pass 464
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2690.166024

@@ -1,0 +1,3286 @@
+TAP version 13
+# Subtest: node summary ownership survives uniform scale and translation 0.5
+ok 1 - node summary ownership survives uniform scale and translation 0.5
+  ---
+  duration_ms: 118.401083
+  type: 'test'
+  ...
+# Subtest: node summary ownership survives uniform scale and translation 1
+ok 2 - node summary ownership survives uniform scale and translation 1
+  ---
+  duration_ms: 15.159028
+  type: 'test'
+  ...
+# Subtest: node summary ownership survives uniform scale and translation 2
+ok 3 - node summary ownership survives uniform scale and translation 2
+  ---
+  duration_ms: 5.439458
+  type: 'test'
+  ...
+# Subtest: node reconstruction refuses page boundary without creating field ownership
+ok 4 - node reconstruction refuses page boundary without creating field ownership
+  ---
+  duration_ms: 0.748497
+  type: 'test'
+  ...
+# Subtest: node reconstruction refuses unmatched original word without creating field ownership
+ok 5 - node reconstruction refuses unmatched original word without creating field ownership
+  ---
+  duration_ms: 20.72663
+  type: 'test'
+  ...
+# Subtest: node reconstruction refuses overlapping source boxes without creating field ownership
+ok 6 - node reconstruction refuses overlapping source boxes without creating field ownership
+  ---
+  duration_ms: 0.714486
+  type: 'test'
+  ...
+# Subtest: node pdf an unlabelled header and explicit recipient cannot prove the issuer role
+ok 7 - node pdf an unlabelled header and explicit recipient cannot prove the issuer role
+  ---
+  duration_ms: 4.150458
+  type: 'test'
+  ...
+# Subtest: node pdf an explicit supplier owns its continuous header but not an orphaned footer
+ok 8 - node pdf an explicit supplier owns its continuous header but not an orphaned footer
+  ---
+  duration_ms: 10.625945
+  type: 'test'
+  ...
+# Subtest: node pdf a closed currency instruction cannot hide a later damaged reference
+ok 9 - node pdf a closed currency instruction cannot hide a later damaged reference
+  ---
+  duration_ms: 9.331797
+  type: 'test'
+  ...
+# Subtest: node ocr an unlabelled header and explicit recipient cannot prove the issuer role
+ok 10 - node ocr an unlabelled header and explicit recipient cannot prove the issuer role
+  ---
+  duration_ms: 5.130003
+  type: 'test'
+  ...
+# Subtest: node ocr an explicit supplier owns its continuous header but not an orphaned footer
+ok 11 - node ocr an explicit supplier owns its continuous header but not an orphaned footer
+  ---
+  duration_ms: 1.043742
+  type: 'test'
+  ...
+# Subtest: node ocr a closed currency instruction cannot hide a later damaged reference
+ok 12 - node ocr a closed currency instruction cannot hide a later damaged reference
+  ---
+  duration_ms: 0.874005
+  type: 'test'
+  ...
+# Subtest: sites summary ownership survives uniform scale and translation 0.5
+ok 13 - sites summary ownership survives uniform scale and translation 0.5
+  ---
+  duration_ms: 13.880043
+  type: 'test'
+  ...
+# Subtest: sites summary ownership survives uniform scale and translation 1
+ok 14 - sites summary ownership survives uniform scale and translation 1
+  ---
+  duration_ms: 1.621691
+  type: 'test'
+  ...
+# Subtest: sites summary ownership survives uniform scale and translation 2
+ok 15 - sites summary ownership survives uniform scale and translation 2
+  ---
+  duration_ms: 0.815026
+  type: 'test'
+  ...
+# Subtest: sites reconstruction refuses page boundary without creating field ownership
+ok 16 - sites reconstruction refuses page boundary without creating field ownership
+  ---
+  duration_ms: 1.415681
+  type: 'test'
+  ...
+# Subtest: sites reconstruction refuses unmatched original word without creating field ownership
+ok 17 - sites reconstruction refuses unmatched original word without creating field ownership
+  ---
+  duration_ms: 0.4582
+  type: 'test'
+  ...
+# Subtest: sites reconstruction refuses overlapping source boxes without creating field ownership
+ok 18 - sites reconstruction refuses overlapping source boxes without creating field ownership
+  ---
+  duration_ms: 0.463288
+  type: 'test'
+  ...
+# Subtest: sites pdf an unlabelled header and explicit recipient cannot prove the issuer role
+ok 19 - sites pdf an unlabelled header and explicit recipient cannot prove the issuer role
+  ---
+  duration_ms: 3.864658
+  type: 'test'
+  ...
+# Subtest: sites pdf an explicit supplier owns its continuous header but not an orphaned footer
+ok 20 - sites pdf an explicit supplier owns its continuous header but not an orphaned footer
+  ---
+  duration_ms: 6.668417
+  type: 'test'
+  ...
+# Subtest: sites pdf a closed currency instruction cannot hide a later damaged reference
+ok 21 - sites pdf a closed currency instruction cannot hide a later damaged reference
+  ---
+  duration_ms: 0.858512
+  type: 'test'
+  ...
+# Subtest: sites ocr an unlabelled header and explicit recipient cannot prove the issuer role
+ok 22 - sites ocr an unlabelled header and explicit recipient cannot prove the issuer role
+  ---
+  duration_ms: 0.489697
+  type: 'test'
+  ...
+# Subtest: sites ocr an explicit supplier owns its continuous header but not an orphaned footer
+ok 23 - sites ocr an explicit supplier owns its continuous header but not an orphaned footer
+  ---
+  duration_ms: 0.833815
+  type: 'test'
+  ...
+# Subtest: sites ocr a closed currency instruction cannot hide a later damaged reference
+ok 24 - sites ocr a closed currency instruction cannot hide a later damaged reference
+  ---
+  duration_ms: 0.306281
+  type: 'test'
+  ...
+# Subtest: node horizontal closed summary: three Swedish columns
+ok 25 - node horizontal closed summary: three Swedish columns
+  ---
+  duration_ms: 102.861641
+  type: 'test'
+  ...
+# Subtest: node horizontal closed summary: three English columns
+ok 26 - node horizontal closed summary: three English columns
+  ---
+  duration_ms: 2.69711
+  type: 'test'
+  ...
+# Subtest: node horizontal closed summary: damaged rate stays null
+ok 27 - node horizontal closed summary: damaged rate stays null
+  ---
+  duration_ms: 6.933948
+  type: 'test'
+  ...
+# Subtest: node horizontal closed summary: numeric rate remains a separate uncertain label cell
+ok 28 - node horizontal closed summary: numeric rate remains a separate uncertain label cell
+  ---
+  duration_ms: 4.270959
+  type: 'test'
+  ...
+# Subtest: node horizontal closed summary: low confidence is preserved without automatic approval
+ok 29 - node horizontal closed summary: low confidence is preserved without automatic approval
+  ---
+  duration_ms: 7.851398
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses one missing value
+ok 30 - node horizontal summary refuses one missing value
+  ---
+  duration_ms: 1.246015
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses a second plausible value
+ok 31 - node horizontal summary refuses a second plausible value
+  ---
+  duration_ms: 5.407329
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses an unreadable money glyph
+ok 32 - node horizontal summary refuses an unreadable money glyph
+  ---
+  duration_ms: 0.984572
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses a source-row suffix
+ok 33 - node horizontal summary refuses a source-row suffix
+  ---
+  duration_ms: 1.715983
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses a shifted value column
+ok 34 - node horizontal summary refuses a shifted value column
+  ---
+  duration_ms: 2.320363
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses remote columns
+ok 35 - node horizontal summary refuses remote columns
+  ---
+  duration_ms: 0.806725
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses an additional article heading
+ok 36 - node horizontal summary refuses an additional article heading
+  ---
+  duration_ms: 0.905163
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses a word in the cell region
+ok 37 - node horizontal summary refuses a word in the cell region
+  ---
+  duration_ms: 0.887556
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses another explicit heading in the value corridor
+ok 38 - node horizontal summary refuses another explicit heading in the value corridor
+  ---
+  duration_ms: 17.308464
+  type: 'test'
+  ...
+# Subtest: node horizontal summary refuses an excluded heading above the region still competing for a value
+ok 39 - node horizontal summary refuses an excluded heading above the region still competing for a value
+  ---
+  duration_ms: 1.596903
+  type: 'test'
+  ...
+# Subtest: node horizontal summary retains an inconsistent printed total
+ok 40 - node horizontal summary retains an inconsistent printed total
+  ---
+  duration_ms: 1.143973
+  type: 'test'
+  ...
+# Subtest: node horizontal summary does not erase a later invalid net occurrence
+ok 41 - node horizontal summary does not erase a later invalid net occurrence
+  ---
+  duration_ms: 4.930392
+  type: 'test'
+  ...
+# Subtest: sites horizontal closed summary: three Swedish columns
+ok 42 - sites horizontal closed summary: three Swedish columns
+  ---
+  duration_ms: 18.234268
+  type: 'test'
+  ...
+# Subtest: sites horizontal closed summary: three English columns
+ok 43 - sites horizontal closed summary: three English columns
+  ---
+  duration_ms: 1.853981
+  type: 'test'
+  ...
+# Subtest: sites horizontal closed summary: damaged rate stays null
+ok 44 - sites horizontal closed summary: damaged rate stays null
+  ---
+  duration_ms: 8.120925
+  type: 'test'
+  ...
+# Subtest: sites horizontal closed summary: numeric rate remains a separate uncertain label cell
+ok 45 - sites horizontal closed summary: numeric rate remains a separate uncertain label cell
+  ---
+  duration_ms: 5.481592
+  type: 'test'
+  ...
+# Subtest: sites horizontal closed summary: low confidence is preserved without automatic approval
+ok 46 - sites horizontal closed summary: low confidence is preserved without automatic approval
+  ---
+  duration_ms: 1.626879
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses one missing value
+ok 47 - sites horizontal summary refuses one missing value
+  ---
+  duration_ms: 3.597776
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses a second plausible value
+ok 48 - sites horizontal summary refuses a second plausible value
+  ---
+  duration_ms: 0.973035
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses an unreadable money glyph
+ok 49 - sites horizontal summary refuses an unreadable money glyph
+  ---
+  duration_ms: 4.60368
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses a source-row suffix
+ok 50 - sites horizontal summary refuses a source-row suffix
+  ---
+  duration_ms: 3.317894
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses a shifted value column
+ok 51 - sites horizontal summary refuses a shifted value column
+  ---
+  duration_ms: 0.906504
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses remote columns
+ok 52 - sites horizontal summary refuses remote columns
+  ---
+  duration_ms: 0.751341
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses an additional article heading
+ok 53 - sites horizontal summary refuses an additional article heading
+  ---
+  duration_ms: 0.84383
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses a word in the cell region
+ok 54 - sites horizontal summary refuses a word in the cell region
+  ---
+  duration_ms: 0.767435
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses another explicit heading in the value corridor
+ok 55 - sites horizontal summary refuses another explicit heading in the value corridor
+  ---
+  duration_ms: 12.311502
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary refuses an excluded heading above the region still competing for a value
+ok 56 - sites horizontal summary refuses an excluded heading above the region still competing for a value
+  ---
+  duration_ms: 0.699733
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary retains an inconsistent printed total
+ok 57 - sites horizontal summary retains an inconsistent printed total
+  ---
+  duration_ms: 18.817055
+  type: 'test'
+  ...
+# Subtest: sites horizontal summary does not erase a later invalid net occurrence
+ok 58 - sites horizontal summary does not erase a later invalid net occurrence
+  ---
+  duration_ms: 2.485061
+  type: 'test'
+  ...
+# Subtest: node supported date alias owns only its proved cell: Betalas senast
+ok 59 - node supported date alias owns only its proved cell: Betalas senast
+  ---
+  duration_ms: 137.815933
+  type: 'test'
+  ...
+# Subtest: node supported date alias owns only its proved cell: Oss tillhanda senast
+ok 60 - node supported date alias owns only its proved cell: Oss tillhanda senast
+  ---
+  duration_ms: 14.212814
+  type: 'test'
+  ...
+# Subtest: node supported date alias owns only its proved cell: Faktureringsdatum
+ok 61 - node supported date alias owns only its proved cell: Faktureringsdatum
+  ---
+  duration_ms: 6.068956
+  type: 'test'
+  ...
+# Subtest: node supported date alias owns only its proved cell: Due date
+ok 62 - node supported date alias owns only its proved cell: Due date
+  ---
+  duration_ms: 1.743825
+  type: 'test'
+  ...
+# Subtest: node partial date alias creates no date ownership: Betalas
+ok 63 - node partial date alias creates no date ownership: Betalas
+  ---
+  duration_ms: 0.972634
+  type: 'test'
+  ...
+# Subtest: node partial date alias creates no date ownership: Oss tillhanda
+ok 64 - node partial date alias creates no date ownership: Oss tillhanda
+  ---
+  duration_ms: 0.736568
+  type: 'test'
+  ...
+# Subtest: node partial date alias creates no date ownership: Senast
+ok 65 - node partial date alias creates no date ownership: Senast
+  ---
+  duration_ms: 3.003752
+  type: 'test'
+  ...
+# Subtest: node date alias refuses another candidate in the same column
+ok 66 - node date alias refuses another candidate in the same column
+  ---
+  duration_ms: 0.939854
+  type: 'test'
+  ...
+# Subtest: node date alias refuses a competing explicit heading
+ok 67 - node date alias refuses a competing explicit heading
+  ---
+  duration_ms: 14.421003
+  type: 'test'
+  ...
+# Subtest: node date alias refuses an unresolved suffix in the value row
+ok 68 - node date alias refuses an unresolved suffix in the value row
+  ---
+  duration_ms: 1.400378
+  type: 'test'
+  ...
+# Subtest: node date alias refuses an unknown neighboring role
+ok 69 - node date alias refuses an unknown neighboring role
+  ---
+  duration_ms: 1.292937
+  type: 'test'
+  ...
+# Subtest: node date alias refuses an invalid calendar date
+ok 70 - node date alias refuses an invalid calendar date
+  ---
+  duration_ms: 7.109041
+  type: 'test'
+  ...
+# Subtest: node date alias refuses a remote value
+ok 71 - node date alias refuses a remote value
+  ---
+  duration_ms: 0.895328
+  type: 'test'
+  ...
+# Subtest: node full date census retains a later invalid declared date
+ok 72 - node full date census retains a later invalid declared date
+  ---
+  duration_ms: 0.805582
+  type: 'test'
+  ...
+# Subtest: sites supported date alias owns only its proved cell: Betalas senast
+ok 73 - sites supported date alias owns only its proved cell: Betalas senast
+  ---
+  duration_ms: 10.641979
+  type: 'test'
+  ...
+# Subtest: sites supported date alias owns only its proved cell: Oss tillhanda senast
+ok 74 - sites supported date alias owns only its proved cell: Oss tillhanda senast
+  ---
+  duration_ms: 1.095169
+  type: 'test'
+  ...
+# Subtest: sites supported date alias owns only its proved cell: Faktureringsdatum
+ok 75 - sites supported date alias owns only its proved cell: Faktureringsdatum
+  ---
+  duration_ms: 4.839105
+  type: 'test'
+  ...
+# Subtest: sites supported date alias owns only its proved cell: Due date
+ok 76 - sites supported date alias owns only its proved cell: Due date
+  ---
+  duration_ms: 1.779088
+  type: 'test'
+  ...
+# Subtest: sites partial date alias creates no date ownership: Betalas
+ok 77 - sites partial date alias creates no date ownership: Betalas
+  ---
+  duration_ms: 0.685983
+  type: 'test'
+  ...
+# Subtest: sites partial date alias creates no date ownership: Oss tillhanda
+ok 78 - sites partial date alias creates no date ownership: Oss tillhanda
+  ---
+  duration_ms: 0.547695
+  type: 'test'
+  ...
+# Subtest: sites partial date alias creates no date ownership: Senast
+ok 79 - sites partial date alias creates no date ownership: Senast
+  ---
+  duration_ms: 0.593904
+  type: 'test'
+  ...
+# Subtest: sites date alias refuses another candidate in the same column
+ok 80 - sites date alias refuses another candidate in the same column
+  ---
+  duration_ms: 0.483969
+  type: 'test'
+  ...
+# Subtest: sites date alias refuses a competing explicit heading
+ok 81 - sites date alias refuses a competing explicit heading
+  ---
+  duration_ms: 0.569788
+  type: 'test'
+  ...
+# Subtest: sites date alias refuses an unresolved suffix in the value row
+ok 82 - sites date alias refuses an unresolved suffix in the value row
+  ---
+  duration_ms: 3.675873
+  type: 'test'
+  ...
+# Subtest: sites date alias refuses an unknown neighboring role
+ok 83 - sites date alias refuses an unknown neighboring role
+  ---
+  duration_ms: 0.598121
+  type: 'test'
+  ...
+# Subtest: sites date alias refuses an invalid calendar date
+ok 84 - sites date alias refuses an invalid calendar date
+  ---
+  duration_ms: 0.740815
+  type: 'test'
+  ...
+# Subtest: sites date alias refuses a remote value
+ok 85 - sites date alias refuses a remote value
+  ---
+  duration_ms: 0.517699
+  type: 'test'
+  ...
+# Subtest: sites full date census retains a later invalid declared date
+ok 86 - sites full date census retains a later invalid declared date
+  ---
+  duration_ms: 1.739949
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: single terminal currency period
+ok 87 - node pdf final95 census: single terminal currency period
+  ---
+  duration_ms: 152.230882
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: English currency with terminal period
+ok 88 - node pdf final95 census: English currency with terminal period
+  ---
+  duration_ms: 19.513102
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: currency remains whole-token checked: SEK..
+ok 89 - node pdf final95 census: currency remains whole-token checked: SEK..
+  ---
+  duration_ms: 1.523614
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: currency remains whole-token checked: SEK. okänt
+ok 90 - node pdf final95 census: currency remains whole-token checked: SEK. okänt
+  ---
+  duration_ms: 2.576399
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: currency remains whole-token checked: SEK.123
+ok 91 - node pdf final95 census: currency remains whole-token checked: SEK.123
+  ---
+  duration_ms: 1.231033
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: currency remains whole-token checked: SEK. EUR
+ok 92 - node pdf final95 census: currency remains whole-token checked: SEK. EUR
+  ---
+  duration_ms: 1.017212
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: currency remains whole-token checked: ???
+ok 93 - node pdf final95 census: currency remains whole-token checked: ???
+  ---
+  duration_ms: 24.429142
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: invalid currency sibling still blocks
+ok 94 - node pdf final95 census: invalid currency sibling still blocks
+  ---
+  duration_ms: 6.588368
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: different currency sibling still blocks
+ok 95 - node pdf final95 census: different currency sibling still blocks
+  ---
+  duration_ms: 1.497865
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: complete payment instruction after actual OCR
+ok 96 - node pdf final95 census: complete payment instruction after actual OCR
+  ---
+  duration_ms: 15.659672
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: complete payment instruction before actual OCR
+ok 97 - node pdf final95 census: complete payment instruction before actual OCR
+  ---
+  duration_ms: 11.810277
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: instruction in a second sentence
+ok 98 - node pdf final95 census: instruction in a second sentence
+  ---
+  duration_ms: 1.61472
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: reference noun in complete instruction
+ok 99 - node pdf final95 census: reference noun in complete instruction
+  ---
+  duration_ms: 0.792103
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: instruction never supplies a missing reference
+ok 100 - node pdf final95 census: instruction never supplies a missing reference
+  ---
+  duration_ms: 8.186174
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: real or malformed reference occurrence still blocks: OCR: ???
+ok 101 - node pdf final95 census: real or malformed reference occurrence still blocks: OCR: ???
+  ---
+  duration_ms: 0.979835
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+ok 102 - node pdf final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+  ---
+  duration_ms: 0.819774
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+ok 103 - node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+  ---
+  duration_ms: 10.517061
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+ok 104 - node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+  ---
+  duration_ms: 0.92996
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+ok 105 - node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+  ---
+  duration_ms: 0.755537
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+ok 106 - node pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+  ---
+  duration_ms: 7.349474
+  type: 'test'
+  ...
+# Subtest: node pdf final95 census: multiple recognized instructions preserve actual OCR
+ok 107 - node pdf final95 census: multiple recognized instructions preserve actual OCR
+  ---
+  duration_ms: 1.062228
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: single terminal currency period
+ok 108 - node ocr final95 census: single terminal currency period
+  ---
+  duration_ms: 21.634526
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: English currency with terminal period
+ok 109 - node ocr final95 census: English currency with terminal period
+  ---
+  duration_ms: 7.284265
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: currency remains whole-token checked: SEK..
+ok 110 - node ocr final95 census: currency remains whole-token checked: SEK..
+  ---
+  duration_ms: 0.775006
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: currency remains whole-token checked: SEK. okänt
+ok 111 - node ocr final95 census: currency remains whole-token checked: SEK. okänt
+  ---
+  duration_ms: 8.339873
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: currency remains whole-token checked: SEK.123
+ok 112 - node ocr final95 census: currency remains whole-token checked: SEK.123
+  ---
+  duration_ms: 0.656508
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: currency remains whole-token checked: SEK. EUR
+ok 113 - node ocr final95 census: currency remains whole-token checked: SEK. EUR
+  ---
+  duration_ms: 0.429016
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: currency remains whole-token checked: ???
+ok 114 - node ocr final95 census: currency remains whole-token checked: ???
+  ---
+  duration_ms: 0.395725
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: invalid currency sibling still blocks
+ok 115 - node ocr final95 census: invalid currency sibling still blocks
+  ---
+  duration_ms: 0.483428
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: different currency sibling still blocks
+ok 116 - node ocr final95 census: different currency sibling still blocks
+  ---
+  duration_ms: 0.421895
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: complete payment instruction after actual OCR
+ok 117 - node ocr final95 census: complete payment instruction after actual OCR
+  ---
+  duration_ms: 5.442733
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: complete payment instruction before actual OCR
+ok 118 - node ocr final95 census: complete payment instruction before actual OCR
+  ---
+  duration_ms: 0.686583
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: instruction in a second sentence
+ok 119 - node ocr final95 census: instruction in a second sentence
+  ---
+  duration_ms: 0.476717
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: reference noun in complete instruction
+ok 120 - node ocr final95 census: reference noun in complete instruction
+  ---
+  duration_ms: 0.496908
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: instruction never supplies a missing reference
+ok 121 - node ocr final95 census: instruction never supplies a missing reference
+  ---
+  duration_ms: 6.030727
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: real or malformed reference occurrence still blocks: OCR: ???
+ok 122 - node ocr final95 census: real or malformed reference occurrence still blocks: OCR: ???
+  ---
+  duration_ms: 0.492481
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+ok 123 - node ocr final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+  ---
+  duration_ms: 6.544621
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+ok 124 - node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+  ---
+  duration_ms: 0.701516
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+ok 125 - node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+  ---
+  duration_ms: 0.452691
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+ok 126 - node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+  ---
+  duration_ms: 0.508746
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+ok 127 - node ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+  ---
+  duration_ms: 0.442516
+  type: 'test'
+  ...
+# Subtest: node ocr final95 census: multiple recognized instructions preserve actual OCR
+ok 128 - node ocr final95 census: multiple recognized instructions preserve actual OCR
+  ---
+  duration_ms: 0.440593
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: single terminal currency period
+ok 129 - sites pdf final95 census: single terminal currency period
+  ---
+  duration_ms: 51.482106
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: English currency with terminal period
+ok 130 - sites pdf final95 census: English currency with terminal period
+  ---
+  duration_ms: 1.006124
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: currency remains whole-token checked: SEK..
+ok 131 - sites pdf final95 census: currency remains whole-token checked: SEK..
+  ---
+  duration_ms: 9.517527
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: currency remains whole-token checked: SEK. okänt
+ok 132 - sites pdf final95 census: currency remains whole-token checked: SEK. okänt
+  ---
+  duration_ms: 0.660825
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: currency remains whole-token checked: SEK.123
+ok 133 - sites pdf final95 census: currency remains whole-token checked: SEK.123
+  ---
+  duration_ms: 0.620914
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: currency remains whole-token checked: SEK. EUR
+ok 134 - sites pdf final95 census: currency remains whole-token checked: SEK. EUR
+  ---
+  duration_ms: 9.870758
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: currency remains whole-token checked: ???
+ok 135 - sites pdf final95 census: currency remains whole-token checked: ???
+  ---
+  duration_ms: 1.685878
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: invalid currency sibling still blocks
+ok 136 - sites pdf final95 census: invalid currency sibling still blocks
+  ---
+  duration_ms: 0.603679
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: different currency sibling still blocks
+ok 137 - sites pdf final95 census: different currency sibling still blocks
+  ---
+  duration_ms: 12.282199
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: complete payment instruction after actual OCR
+ok 138 - sites pdf final95 census: complete payment instruction after actual OCR
+  ---
+  duration_ms: 0.869008
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: complete payment instruction before actual OCR
+ok 139 - sites pdf final95 census: complete payment instruction before actual OCR
+  ---
+  duration_ms: 0.507003
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: instruction in a second sentence
+ok 140 - sites pdf final95 census: instruction in a second sentence
+  ---
+  duration_ms: 1.199646
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: reference noun in complete instruction
+ok 141 - sites pdf final95 census: reference noun in complete instruction
+  ---
+  duration_ms: 6.765213
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: instruction never supplies a missing reference
+ok 142 - sites pdf final95 census: instruction never supplies a missing reference
+  ---
+  duration_ms: 0.748326
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: real or malformed reference occurrence still blocks: OCR: ???
+ok 143 - sites pdf final95 census: real or malformed reference occurrence still blocks: OCR: ???
+  ---
+  duration_ms: 0.488024
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+ok 144 - sites pdf final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+  ---
+  duration_ms: 0.472281
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+ok 145 - sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+  ---
+  duration_ms: 0.510328
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+ok 146 - sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+  ---
+  duration_ms: 10.553637
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+ok 147 - sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+  ---
+  duration_ms: 0.611881
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+ok 148 - sites pdf final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+  ---
+  duration_ms: 40.246913
+  type: 'test'
+  ...
+# Subtest: sites pdf final95 census: multiple recognized instructions preserve actual OCR
+ok 149 - sites pdf final95 census: multiple recognized instructions preserve actual OCR
+  ---
+  duration_ms: 0.636328
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: single terminal currency period
+ok 150 - sites ocr final95 census: single terminal currency period
+  ---
+  duration_ms: 3.820702
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: English currency with terminal period
+ok 151 - sites ocr final95 census: English currency with terminal period
+  ---
+  duration_ms: 23.514086
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: currency remains whole-token checked: SEK..
+ok 152 - sites ocr final95 census: currency remains whole-token checked: SEK..
+  ---
+  duration_ms: 0.548816
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: currency remains whole-token checked: SEK. okänt
+ok 153 - sites ocr final95 census: currency remains whole-token checked: SEK. okänt
+  ---
+  duration_ms: 0.592942
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: currency remains whole-token checked: SEK.123
+ok 154 - sites ocr final95 census: currency remains whole-token checked: SEK.123
+  ---
+  duration_ms: 10.892435
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: currency remains whole-token checked: SEK. EUR
+ok 155 - sites ocr final95 census: currency remains whole-token checked: SEK. EUR
+  ---
+  duration_ms: 7.489895
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: currency remains whole-token checked: ???
+ok 156 - sites ocr final95 census: currency remains whole-token checked: ???
+  ---
+  duration_ms: 0.448355
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: invalid currency sibling still blocks
+ok 157 - sites ocr final95 census: invalid currency sibling still blocks
+  ---
+  duration_ms: 0.552071
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: different currency sibling still blocks
+ok 158 - sites ocr final95 census: different currency sibling still blocks
+  ---
+  duration_ms: 0.469597
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: complete payment instruction after actual OCR
+ok 159 - sites ocr final95 census: complete payment instruction after actual OCR
+  ---
+  duration_ms: 0.502206
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: complete payment instruction before actual OCR
+ok 160 - sites ocr final95 census: complete payment instruction before actual OCR
+  ---
+  duration_ms: 0.591851
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: instruction in a second sentence
+ok 161 - sites ocr final95 census: instruction in a second sentence
+  ---
+  duration_ms: 0.435085
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: reference noun in complete instruction
+ok 162 - sites ocr final95 census: reference noun in complete instruction
+  ---
+  duration_ms: 0.417509
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: instruction never supplies a missing reference
+ok 163 - sites ocr final95 census: instruction never supplies a missing reference
+  ---
+  duration_ms: 0.408365
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: real or malformed reference occurrence still blocks: OCR: ???
+ok 164 - sites ocr final95 census: real or malformed reference occurrence still blocks: OCR: ???
+  ---
+  duration_ms: 0.399762
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+ok 165 - sites ocr final95 census: real or malformed reference occurrence still blocks: OCR: 000019
+  ---
+  duration_ms: 15.753363
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+ok 166 - sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning: 000018
+  ---
+  duration_ms: 0.733344
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+ok 167 - sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning 000018
+  ---
+  duration_ms: 0.655757
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+ok 168 - sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning, okänt
+  ---
+  duration_ms: 0.52483
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+ok 169 - sites ocr final95 census: real or malformed reference occurrence still blocks: Ange OCR vid betalning. OCR: ???
+  ---
+  duration_ms: 0.493423
+  type: 'test'
+  ...
+# Subtest: sites ocr final95 census: multiple recognized instructions preserve actual OCR
+ok 170 - sites ocr final95 census: multiple recognized instructions preserve actual OCR
+  ---
+  duration_ms: 0.493083
+  type: 'test'
+  ...
+# Subtest: node pdf damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+ok 171 - node pdf damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+  ---
+  duration_ms: 134.856738
+  type: 'test'
+  ...
+# Subtest: node pdf an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+ok 172 - node pdf an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+  ---
+  duration_ms: 2.662138
+  type: 'test'
+  ...
+# Subtest: node pdf damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+ok 173 - node pdf damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+  ---
+  duration_ms: 5.340779
+  type: 'test'
+  ...
+# Subtest: node pdf an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+ok 174 - node pdf an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+  ---
+  duration_ms: 4.323297
+  type: 'test'
+  ...
+# Subtest: node pdf damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+ok 175 - node pdf damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+  ---
+  duration_ms: 0.873665
+  type: 'test'
+  ...
+# Subtest: node pdf an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+ok 176 - node pdf an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+  ---
+  duration_ms: 0.560784
+  type: 'test'
+  ...
+# Subtest: node pdf separately labelled wrapped amounts keep their own values
+ok 177 - node pdf separately labelled wrapped amounts keep their own values
+  ---
+  duration_ms: 0.784551
+  type: 'test'
+  ...
+# Subtest: node pdf a direct later VAT label cannot inherit an earlier missing net amount
+ok 178 - node pdf a direct later VAT label cannot inherit an earlier missing net amount
+  ---
+  duration_ms: 12.948772
+  type: 'test'
+  ...
+# Subtest: node ocr damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+ok 179 - node ocr damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+  ---
+  duration_ms: 1.003901
+  type: 'test'
+  ...
+# Subtest: node ocr an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+ok 180 - node ocr an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+  ---
+  duration_ms: 0.79035
+  type: 'test'
+  ...
+# Subtest: node ocr damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+ok 181 - node ocr damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+  ---
+  duration_ms: 0.699613
+  type: 'test'
+  ...
+# Subtest: node ocr an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+ok 182 - node ocr an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+  ---
+  duration_ms: 9.351086
+  type: 'test'
+  ...
+# Subtest: node ocr damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+ok 183 - node ocr damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+  ---
+  duration_ms: 0.678031
+  type: 'test'
+  ...
+# Subtest: node ocr an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+ok 184 - node ocr an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+  ---
+  duration_ms: 0.280031
+  type: 'test'
+  ...
+# Subtest: node ocr separately labelled wrapped amounts keep their own values
+ok 185 - node ocr separately labelled wrapped amounts keep their own values
+  ---
+  duration_ms: 0.319341
+  type: 'test'
+  ...
+# Subtest: node ocr a direct later VAT label cannot inherit an earlier missing net amount
+ok 186 - node ocr a direct later VAT label cannot inherit an earlier missing net amount
+  ---
+  duration_ms: 0.334403
+  type: 'test'
+  ...
+# Subtest: sites pdf damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+ok 187 - sites pdf damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+  ---
+  duration_ms: 36.439097
+  type: 'test'
+  ...
+# Subtest: sites pdf an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+ok 188 - sites pdf an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+  ---
+  duration_ms: 1.06335
+  type: 'test'
+  ...
+# Subtest: sites pdf damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+ok 189 - sites pdf damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+  ---
+  duration_ms: 0.787435
+  type: 'test'
+  ...
+# Subtest: sites pdf an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+ok 190 - sites pdf an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+  ---
+  duration_ms: 0.509918
+  type: 'test'
+  ...
+# Subtest: sites pdf damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+ok 191 - sites pdf damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+  ---
+  duration_ms: 7.33333
+  type: 'test'
+  ...
+# Subtest: sites pdf an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+ok 192 - sites pdf an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+  ---
+  duration_ms: 0.609768
+  type: 'test'
+  ...
+# Subtest: sites pdf separately labelled wrapped amounts keep their own values
+ok 193 - sites pdf separately labelled wrapped amounts keep their own values
+  ---
+  duration_ms: 0.727104
+  type: 'test'
+  ...
+# Subtest: sites pdf a direct later VAT label cannot inherit an earlier missing net amount
+ok 194 - sites pdf a direct later VAT label cannot inherit an earlier missing net amount
+  ---
+  duration_ms: 0.476948
+  type: 'test'
+  ...
+# Subtest: sites ocr damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+ok 195 - sites ocr damaged middle summary cannot transfer unowned numbers: Moms 25 Yo
+  ---
+  duration_ms: 0.696228
+  type: 'test'
+  ...
+# Subtest: sites ocr an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+ok 196 - sites ocr an explicitly bound total survives a damaged earlier summary: Moms 25 Yo
+  ---
+  duration_ms: 0.570599
+  type: 'test'
+  ...
+# Subtest: sites ocr damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+ok 197 - sites ocr damaged middle summary cannot transfer unowned numbers: VAT (25 90)
+  ---
+  duration_ms: 0.481415
+  type: 'test'
+  ...
+# Subtest: sites ocr an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+ok 198 - sites ocr an explicitly bound total survives a damaged earlier summary: VAT (25 90)
+  ---
+  duration_ms: 0.404509
+  type: 'test'
+  ...
+# Subtest: sites ocr damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+ok 199 - sites ocr damaged middle summary cannot transfer unowned numbers: Moms: unreadable
+  ---
+  duration_ms: 0.444529
+  type: 'test'
+  ...
+# Subtest: sites ocr an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+ok 200 - sites ocr an explicitly bound total survives a damaged earlier summary: Moms: unreadable
+  ---
+  duration_ms: 8.488578
+  type: 'test'
+  ...
+# Subtest: sites ocr separately labelled wrapped amounts keep their own values
+ok 201 - sites ocr separately labelled wrapped amounts keep their own values
+  ---
+  duration_ms: 0.760084
+  type: 'test'
+  ...
+# Subtest: sites ocr a direct later VAT label cannot inherit an earlier missing net amount
+ok 202 - sites ocr a direct later VAT label cannot inherit an earlier missing net amount
+  ---
+  duration_ms: 0.440724
+  type: 'test'
+  ...
+# Subtest: node plain text cannot assign the first number after a stack of empty summary headings: Netto  Momsbelopp  Att betala
+ok 203 - node plain text cannot assign the first number after a stack of empty summary headings: Netto  Momsbelopp  Att betala
+  ---
+  duration_ms: 130.705309
+  type: 'test'
+  ...
+# Subtest: node plain text cannot assign the first number after a stack of empty summary headings: Amount due  Net amount  VAT amount
+ok 204 - node plain text cannot assign the first number after a stack of empty summary headings: Amount due  Net amount  VAT amount
+  ---
+  duration_ms: 3.233217
+  type: 'test'
+  ...
+# Subtest: node typed summary cells preserve exact printed values: Swedish closed summary
+ok 205 - node typed summary cells preserve exact printed values: Swedish closed summary
+  ---
+  duration_ms: 72.27895
+  type: 'test'
+  ...
+# Subtest: node typed summary cells preserve exact printed values: English closed summary
+ok 206 - node typed summary cells preserve exact printed values: English closed summary
+  ---
+  duration_ms: 13.00117
+  type: 'test'
+  ...
+# Subtest: node typed summary cells preserve exact printed values: damaged percentage stays unresolved
+ok 207 - node typed summary cells preserve exact printed values: damaged percentage stays unresolved
+  ---
+  duration_ms: 9.10776
+  type: 'test'
+  ...
+# Subtest: node typed summary cells preserve exact printed values: numeric rate-looking tail cannot become thousands grouping
+ok 208 - node typed summary cells preserve exact printed values: numeric rate-looking tail cannot become thousands grouping
+  ---
+  duration_ms: 15.746052
+  type: 'test'
+  ...
+# Subtest: node typed summary cells preserve exact printed values: separate left prose retains its own negative VAT occurrence
+ok 209 - node typed summary cells preserve exact printed values: separate left prose retains its own negative VAT occurrence
+  ---
+  duration_ms: 2.585943
+  type: 'test'
+  ...
+# Subtest: node typed summary cells preserve exact printed values: separate explicit currency stays independent
+ok 210 - node typed summary cells preserve exact printed values: separate explicit currency stays independent
+  ---
+  duration_ms: 36.782628
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse article description column
+ok 211 - node typed summaries refuse article description column
+  ---
+  duration_ms: 1.52752
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse an untyped source-row suffix
+ok 212 - node typed summaries refuse an untyped source-row suffix
+  ---
+  duration_ms: 1.543604
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse another monetary candidate
+ok 213 - node typed summaries refuse another monetary candidate
+  ---
+  duration_ms: 0.862338
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse an article quantity in the cell corridor
+ok 214 - node typed summaries refuse an article quantity in the cell corridor
+  ---
+  duration_ms: 16.026665
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse an incompatible value baseline
+ok 215 - node typed summaries refuse an incompatible value baseline
+  ---
+  duration_ms: 13.862517
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse an unreadable monetary token
+ok 216 - node typed summaries refuse an unreadable monetary token
+  ---
+  duration_ms: 2.800566
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse untyped left content
+ok 217 - node typed summaries refuse untyped left content
+  ---
+  duration_ms: 0.878332
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse an unowned left numeric value ending in punctuation
+ok 218 - node typed summaries refuse an unowned left numeric value ending in punctuation
+  ---
+  duration_ms: 19.847926
+  type: 'test'
+  ...
+# Subtest: node typed summaries refuse a competing aligned heading
+ok 219 - node typed summaries refuse a competing aligned heading
+  ---
+  duration_ms: 0.75113
+  type: 'test'
+  ...
+# Subtest: node summary geometry does not calculate or correct inconsistent totals
+ok 220 - node summary geometry does not calculate or correct inconsistent totals
+  ---
+  duration_ms: 0.75097
+  type: 'test'
+  ...
+# Subtest: node thousands grouping within a whole printed VAT value stays valid
+ok 221 - node thousands grouping within a whole printed VAT value stays valid
+  ---
+  duration_ms: 0.715437
+  type: 'test'
+  ...
+# Subtest: node a later invalid amount still blocks the full field census
+ok 222 - node a later invalid amount still blocks the full field census
+  ---
+  duration_ms: 27.240485
+  type: 'test'
+  ...
+# Subtest: sites plain text cannot assign the first number after a stack of empty summary headings: Netto  Momsbelopp  Att betala
+ok 223 - sites plain text cannot assign the first number after a stack of empty summary headings: Netto  Momsbelopp  Att betala
+  ---
+  duration_ms: 3.903015
+  type: 'test'
+  ...
+# Subtest: sites plain text cannot assign the first number after a stack of empty summary headings: Amount due  Net amount  VAT amount
+ok 224 - sites plain text cannot assign the first number after a stack of empty summary headings: Amount due  Net amount  VAT amount
+  ---
+  duration_ms: 0.610489
+  type: 'test'
+  ...
+# Subtest: sites typed summary cells preserve exact printed values: Swedish closed summary
+ok 225 - sites typed summary cells preserve exact printed values: Swedish closed summary
+  ---
+  duration_ms: 17.981378
+  type: 'test'
+  ...
+# Subtest: sites typed summary cells preserve exact printed values: English closed summary
+ok 226 - sites typed summary cells preserve exact printed values: English closed summary
+  ---
+  duration_ms: 4.328496
+  type: 'test'
+  ...
+# Subtest: sites typed summary cells preserve exact printed values: damaged percentage stays unresolved
+ok 227 - sites typed summary cells preserve exact printed values: damaged percentage stays unresolved
+  ---
+  duration_ms: 11.409654
+  type: 'test'
+  ...
+# Subtest: sites typed summary cells preserve exact printed values: numeric rate-looking tail cannot become thousands grouping
+ok 228 - sites typed summary cells preserve exact printed values: numeric rate-looking tail cannot become thousands grouping
+  ---
+  duration_ms: 1.166196
+  type: 'test'
+  ...
+# Subtest: sites typed summary cells preserve exact printed values: separate left prose retains its own negative VAT occurrence
+ok 229 - sites typed summary cells preserve exact printed values: separate left prose retains its own negative VAT occurrence
+  ---
+  duration_ms: 1.050151
+  type: 'test'
+  ...
+# Subtest: sites typed summary cells preserve exact printed values: separate explicit currency stays independent
+ok 230 - sites typed summary cells preserve exact printed values: separate explicit currency stays independent
+  ---
+  duration_ms: 20.345707
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse article description column
+ok 231 - sites typed summaries refuse article description column
+  ---
+  duration_ms: 4.141113
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse an untyped source-row suffix
+ok 232 - sites typed summaries refuse an untyped source-row suffix
+  ---
+  duration_ms: 4.62363
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse another monetary candidate
+ok 233 - sites typed summaries refuse another monetary candidate
+  ---
+  duration_ms: 0.728307
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse an article quantity in the cell corridor
+ok 234 - sites typed summaries refuse an article quantity in the cell corridor
+  ---
+  duration_ms: 0.708336
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse an incompatible value baseline
+ok 235 - sites typed summaries refuse an incompatible value baseline
+  ---
+  duration_ms: 0.65789
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse an unreadable monetary token
+ok 236 - sites typed summaries refuse an unreadable monetary token
+  ---
+  duration_ms: 37.621992
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse untyped left content
+ok 237 - sites typed summaries refuse untyped left content
+  ---
+  duration_ms: 0.896991
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse an unowned left numeric value ending in punctuation
+ok 238 - sites typed summaries refuse an unowned left numeric value ending in punctuation
+  ---
+  duration_ms: 11.392419
+  type: 'test'
+  ...
+# Subtest: sites typed summaries refuse a competing aligned heading
+ok 239 - sites typed summaries refuse a competing aligned heading
+  ---
+  duration_ms: 0.85674
+  type: 'test'
+  ...
+# Subtest: sites summary geometry does not calculate or correct inconsistent totals
+ok 240 - sites summary geometry does not calculate or correct inconsistent totals
+  ---
+  duration_ms: 17.800094
+  type: 'test'
+  ...
+# Subtest: sites thousands grouping within a whole printed VAT value stays valid
+ok 241 - sites thousands grouping within a whole printed VAT value stays valid
+  ---
+  duration_ms: 0.900616
+  type: 'test'
+  ...
+# Subtest: sites a later invalid amount still blocks the full field census
+ok 242 - sites a later invalid amount still blocks the full field census
+  ---
+  duration_ms: 8.418403
+  type: 'test'
+  ...
+# Subtest: a missing explicit Leverantör cannot disappear behind an earlier name
+ok 243 - a missing explicit Leverantör cannot disappear behind an earlier name
+  ---
+  duration_ms: 104.051097
+  type: 'test'
+  ...
+# Subtest: a missing explicit Supplier cannot disappear behind an earlier name
+ok 244 - a missing explicit Supplier cannot disappear behind an earlier name
+  ---
+  duration_ms: 4.938864
+  type: 'test'
+  ...
+# Subtest: a name over the supported limit cannot become a trusted 240-character prefix
+ok 245 - a name over the supported limit cannot become a trusted 240-character prefix
+  ---
+  duration_ms: 1.014837
+  type: 'test'
+  ...
+# Subtest: an empty party cannot borrow any accepted invoice scalar label as its name
+ok 246 - an empty party cannot borrow any accepted invoice scalar label as its name
+  ---
+  duration_ms: 16.576333
+  type: 'test'
+  ...
+# Subtest: a conflicting name remains unresolved even if the organization number agrees
+ok 247 - a conflicting name remains unresolved even if the organization number agrees
+  ---
+  duration_ms: 4.333844
+  type: 'test'
+  ...
+# Subtest: complete metadata suffixes cannot agree with a shorter original number
+ok 248 - complete metadata suffixes cannot agree with a shorter original number
+  ---
+  duration_ms: 9.227099
+  type: 'test'
+  ...
+# Subtest: explicit alphabetic metadata identities are compared without supplying missing fields
+ok 249 - explicit alphabetic metadata identities are compared without supplying missing fields
+  ---
+  duration_ms: 2.134153
+  type: 'test'
+  ...
+# Subtest: metadata date export and embedded words do not masquerade as invoice identities
+ok 250 - metadata date export and embedded words do not masquerade as invoice identities
+  ---
+  duration_ms: 3.958219
+  type: 'test'
+  ...
+# Subtest: ordinary explicit leading zeros remain exact across document and metadata
+ok 251 - ordinary explicit leading zeros remain exact across document and metadata
+  ---
+  duration_ms: 1.78744
+  type: 'test'
+  ...
+# Subtest: explicit foreign-currency amounts are read without enabling foreign-currency registration
+ok 252 - explicit foreign-currency amounts are read without enabling foreign-currency registration
+  ---
+  duration_ms: 0.729518
+  type: 'test'
+  ...
+# Subtest: missing printed net or VAT requires review and is never inferred from the total
+ok 253 - missing printed net or VAT requires review and is never inferred from the total
+  ---
+  duration_ms: 13.549556
+  type: 'test'
+  ...
+# Subtest: an explicitly printed zero VAT amount remains valid evidence
+ok 254 - an explicitly printed zero VAT amount remains valid evidence
+  ---
+  duration_ms: 1.180798
+  type: 'test'
+  ...
+# Subtest: explicit supplier and recipient organization labels remain in their source roles
+ok 255 - explicit supplier and recipient organization labels remain in their source roles
+  ---
+  duration_ms: 7.232918
+  type: 'test'
+  ...
+# Subtest: organization numbers inside explicit party sections never cross roles
+ok 256 - organization numbers inside explicit party sections never cross roles
+  ---
+  duration_ms: 2.308445
+  type: 'test'
+  ...
+# Subtest: a bare party section heading can precede an explicit same-role name label
+ok 257 - a bare party section heading can precede an explicit same-role name label
+  ---
+  duration_ms: 6.621337
+  type: 'test'
+  ...
+# Subtest: an explicitly empty party label cannot become a harmless section heading
+ok 258 - an explicitly empty party label cannot become a harmless section heading
+  ---
+  duration_ms: 3.708943
+  type: 'test'
+  ...
+# Subtest: an unassigned organization number with two party identities stays ambiguous
+ok 259 - an unassigned organization number with two party identities stays ambiguous
+  ---
+  duration_ms: 0.765111
+  type: 'test'
+  ...
+# Subtest: a second unreadable explicitly owned organization number invalidates that role
+ok 260 - a second unreadable explicitly owned organization number invalidates that role
+  ---
+  duration_ms: 0.842208
+  type: 'test'
+  ...
+# Subtest: OCR checksum evidence remains separate from bank verification
+ok 261 - OCR checksum evidence remains separate from bank verification
+  ---
+  duration_ms: 3.928563
+  type: 'test'
+  ...
+# Subtest: invalid OCR checksum requires review while preserving every original digit
+ok 262 - invalid OCR checksum requires review while preserving every original digit
+  ---
+  duration_ms: 1.765969
+  type: 'test'
+  ...
+# Subtest: a generic numeric payment reference is never subjected to formal OCR claims
+ok 263 - a generic numeric payment reference is never subjected to formal OCR claims
+  ---
+  duration_ms: 6.007694
+  type: 'test'
+  ...
+# Subtest: a known OCR modulus-10 example is accepted as a checksum only
+ok 264 - a known OCR modulus-10 example is accepted as a checksum only
+  ---
+  duration_ms: 3.842764
+  type: 'test'
+  ...
+# Subtest: discount prose cannot switch off a contradictory row amount
+ok 265 - discount prose cannot switch off a contradictory row amount
+  ---
+  duration_ms: 5.107618
+  type: 'test'
+  ...
+# Subtest: an explicitly printed row VAT percentage must agree with the printed VAT amount
+ok 266 - an explicitly printed row VAT percentage must agree with the printed VAT amount
+  ---
+  duration_ms: 0.98992
+  type: 'test'
+  ...
+# Subtest: a fractional quantity in a headerless row cannot be read as its integer suffix
+ok 267 - a fractional quantity in a headerless row cannot be read as its integer suffix
+  ---
+  duration_ms: 8.727457
+  type: 'test'
+  ...
+# Subtest: a correct fractional headerless row is validated using the entire quantity
+ok 268 - a correct fractional headerless row is validated using the entire quantity
+  ---
+  duration_ms: 1.503073
+  type: 'test'
+  ...
+# Subtest: a malformed quantity or extra monetary suffix in a headerless row stays unresolved
+ok 269 - a malformed quantity or extra monetary suffix in a headerless row stays unresolved
+  ---
+  duration_ms: 4.163537
+  type: 'test'
+  ...
+# Subtest: internally consistent headerless rows must also agree with the document sums
+ok 270 - internally consistent headerless rows must also agree with the document sums
+  ---
+  duration_ms: 2.681957
+  type: 'test'
+  ...
+# Subtest: all supported headerless rows participate in the sum without creating missing source fields
+ok 271 - all supported headerless rows participate in the sum without creating missing source fields
+  ---
+  duration_ms: 0.94334
+  type: 'test'
+  ...
+# Subtest: explicit Swedish mixed-rate rows preserve printed values and reconcile against totals
+ok 272 - explicit Swedish mixed-rate rows preserve printed values and reconcile against totals
+  ---
+  duration_ms: 2.58394
+  type: 'test'
+  ...
+# Subtest: explicit English quantity unit and VAT headings use the same source-bound row contract
+ok 273 - explicit English quantity unit and VAT headings use the same source-bound row contract
+  ---
+  duration_ms: 0.934727
+  type: 'test'
+  ...
+# Subtest: a four-column net table is complete without manufacturing omitted VAT and gross cells
+ok 274 - a four-column net table is complete without manufacturing omitted VAT and gross cells
+  ---
+  duration_ms: 5.442773
+  type: 'test'
+  ...
+# Subtest: a declared but empty net cell differs from an entirely omitted VAT column
+ok 275 - a declared but empty net cell differs from an entirely omitted VAT column
+  ---
+  duration_ms: 0.947296
+  type: 'test'
+  ...
+# Subtest: a five-column net and rate table must agree with the explicit document VAT
+ok 276 - a five-column net and rate table must agree with the explicit document VAT
+  ---
+  duration_ms: 4.086191
+  type: 'test'
+  ...
+# Subtest: a five-column net and rate table checks VAT without writing inferred row amounts
+ok 277 - a five-column net and rate table checks VAT without writing inferred row amounts
+  ---
+  duration_ms: 1.073155
+  type: 'test'
+  ...
+# Subtest: currency printed in monetary cells cannot disappear when document fields are isolated from rows
+ok 278 - currency printed in monetary cells cannot disappear when document fields are isolated from rows
+  ---
+  duration_ms: 5.526018
+  type: 'test'
+  ...
+# Subtest: matching explicit cell currencies are verified without treating description words as currency
+ok 279 - matching explicit cell currencies are verified without treating description words as currency
+  ---
+  duration_ms: 15.196945
+  type: 'test'
+  ...
+# Subtest: labels inside table descriptions cannot replace a document identity
+ok 280 - labels inside table descriptions cannot replace a document identity
+  ---
+  duration_ms: 0.938253
+  type: 'test'
+  ...
+# Subtest: quantity with decimal comma is checked without inventing an integer quantity
+ok 281 - quantity with decimal comma is checked without inventing an integer quantity
+  ---
+  duration_ms: 0.846395
+  type: 'test'
+  ...
+# Subtest: an explicit table with wrong unit extension stays under review
+ok 282 - an explicit table with wrong unit extension stays under review
+  ---
+  duration_ms: 0.885373
+  type: 'test'
+  ...
+# Subtest: an explicit table with wrong VAT rate stays under review
+ok 283 - an explicit table with wrong VAT rate stays under review
+  ---
+  duration_ms: 0.828287
+  type: 'test'
+  ...
+# Subtest: an explicit table with wrong gross amount stays under review
+ok 284 - an explicit table with wrong gross amount stays under review
+  ---
+  duration_ms: 5.594562
+  type: 'test'
+  ...
+# Subtest: an explicit table with missing printed VAT amount stays under review
+ok 285 - an explicit table with missing printed VAT amount stays under review
+  ---
+  duration_ms: 0.964693
+  type: 'test'
+  ...
+# Subtest: an explicit table with multiple numeric values in one cell stays under review
+ok 286 - an explicit table with multiple numeric values in one cell stays under review
+  ---
+  duration_ms: 9.36068
+  type: 'test'
+  ...
+# Subtest: line sums cannot silently disagree with otherwise self-consistent document totals
+ok 287 - line sums cannot silently disagree with otherwise self-consistent document totals
+  ---
+  duration_ms: 1.401179
+  type: 'test'
+  ...
+# Subtest: unsupported discount columns remain visible and cannot silently drop a row
+ok 288 - unsupported discount columns remain visible and cannot silently drop a row
+  ---
+  duration_ms: 1.095639
+  type: 'test'
+  ...
+# Subtest: an unknown row in a recognized table cannot be skipped to obtain a complete table
+ok 289 - an unknown row in a recognized table cannot be skipped to obtain a complete table
+  ---
+  duration_ms: 0.883279
+  type: 'test'
+  ...
+# Subtest: a recognizable table with collapsed column spacing stays incomplete instead of disappearing
+ok 290 - a recognizable table with collapsed column spacing stays incomplete instead of disappearing
+  ---
+  duration_ms: 4.961027
+  type: 'test'
+  ...
+# Subtest: a repeated table header across a declared page boundary keeps page evidence
+ok 291 - a repeated table header across a declared page boundary keeps page evidence
+  ---
+  duration_ms: 1.202961
+  type: 'test'
+  ...
+# Subtest: an explicit same-invoice continuation caption can precede the repeated table header
+ok 292 - an explicit same-invoice continuation caption can precede the repeated table header
+  ---
+  duration_ms: 4.979656
+  type: 'test'
+  ...
+# Subtest: a continuation caption carrying a different identity cannot reconnect the table
+ok 293 - a continuation caption carrying a different identity cannot reconnect the table
+  ---
+  duration_ms: 1.120967
+  type: 'test'
+  ...
+# Subtest: page continuation with a different invoice number never borrows earlier table identity
+ok 294 - page continuation with a different invoice number never borrows earlier table identity
+  ---
+  duration_ms: 0.96295
+  type: 'test'
+  ...
+# Subtest: page continuation without a repeated identity or header remains incomplete
+ok 295 - page continuation without a repeated identity or header remains incomplete
+  ---
+  duration_ms: 0.862959
+  type: 'test'
+  ...
+# Subtest: a supported description continuation retains the source lines
+ok 296 - a supported description continuation retains the source lines
+  ---
+  duration_ms: 1.048488
+  type: 'test'
+  ...
+# Subtest: credit details retain explicit negative amounts while ledger fields keep positive amounts
+ok 297 - credit details retain explicit negative amounts while ledger fields keep positive amounts
+  ---
+  duration_ms: 5.385967
+  type: 'test'
+  ...
+# Subtest: swedish-control
+ok 298 - swedish-control
+  ---
+  duration_ms: 85.251328
+  type: 'test'
+  ...
+# Subtest: english-net-total
+ok 299 - english-net-total
+  ---
+  duration_ms: 4.327474
+  type: 'test'
+  ...
+# Subtest: english-grouped-decimals
+ok 300 - english-grouped-decimals
+  ---
+  duration_ms: 1.955684
+  type: 'test'
+  ...
+# Subtest: english-vat-amount
+ok 301 - english-vat-amount
+  ---
+  duration_ms: 1.08947
+  type: 'test'
+  ...
+# Subtest: vat-rate-prose-is-not-amount
+ok 302 - vat-rate-prose-is-not-amount
+  ---
+  duration_ms: 2.315145
+  type: 'test'
+  ...
+# Subtest: swedish-table-summary-without-colon
+ok 303 - swedish-table-summary-without-colon
+  ---
+  duration_ms: 4.406814
+  type: 'test'
+  ...
+# Subtest: english-multipage-table
+ok 304 - english-multipage-table
+  ---
+  duration_ms: 1.589383
+  type: 'test'
+  ...
+# Subtest: missing-net-is-not-derived
+ok 305 - missing-net-is-not-derived
+  ---
+  duration_ms: 1.435351
+  type: 'test'
+  ...
+# Subtest: vat-rate-does-not-supply-missing-vat
+ok 306 - vat-rate-does-not-supply-missing-vat
+  ---
+  duration_ms: 1.260417
+  type: 'test'
+  ...
+# Subtest: conflicting-english-total
+ok 307 - conflicting-english-total
+  ---
+  duration_ms: 1.438655
+  type: 'test'
+  ...
+# Subtest: malformed-english-grouping
+ok 308 - malformed-english-grouping
+  ---
+  duration_ms: 1.137221
+  type: 'test'
+  ...
+# Subtest: vat-arithmetic-mismatch
+ok 309 - vat-arithmetic-mismatch
+  ---
+  duration_ms: 1.560289
+  type: 'test'
+  ...
+# Subtest: multipage-identity-conflict
+ok 310 - multipage-identity-conflict
+  ---
+  duration_ms: 4.556509
+  type: 'test'
+  ...
+# Subtest: invoice-and-ocr-columns-ambiguous
+ok 311 - invoice-and-ocr-columns-ambiguous
+  ---
+  duration_ms: 0.947947
+  type: 'test'
+  ...
+# Subtest: ocr-remains-manual-review
+ok 312 - ocr-remains-manual-review
+  ---
+  duration_ms: 17.125729
+  type: 'test'
+  ...
+# Subtest: English OCR monetary labels preserve the Bankgiro evidence boundary: matching
+ok 313 - English OCR monetary labels preserve the Bankgiro evidence boundary: matching
+  ---
+  duration_ms: 1.702572
+  type: 'test'
+  ...
+# Subtest: English OCR monetary labels preserve the Bankgiro evidence boundary: missing
+ok 314 - English OCR monetary labels preserve the Bankgiro evidence boundary: missing
+  ---
+  duration_ms: 0.900706
+  type: 'test'
+  ...
+# Subtest: English OCR monetary labels preserve the Bankgiro evidence boundary: other-original
+ok 315 - English OCR monetary labels preserve the Bankgiro evidence boundary: other-original
+  ---
+  duration_ms: 0.671241
+  type: 'test'
+  ...
+# Subtest: Swedish tax summaries preserve grouped English amounts across blank lines
+ok 316 - Swedish tax summaries preserve grouped English amounts across blank lines
+  ---
+  duration_ms: 1.288429
+  type: 'test'
+  ...
+# Subtest: paragraph recovery cannot turn English payment terms into net money
+ok 317 - paragraph recovery cannot turn English payment terms into net money
+  ---
+  duration_ms: 0.660304
+  type: 'test'
+  ...
+# Subtest: English totals do not allow a later paragraph to supply the invoice identity
+ok 318 - English totals do not allow a later paragraph to supply the invoice identity
+  ---
+  duration_ms: 3.978989
+  type: 'test'
+  ...
+# Subtest: literal supplier name Total Consulting AB
+ok 319 - literal supplier name Total Consulting AB
+  ---
+  duration_ms: 0.823449
+  type: 'test'
+  ...
+# Subtest: literal supplier name Net Consulting AB
+ok 320 - literal supplier name Net Consulting AB
+  ---
+  duration_ms: 4.926206
+  type: 'test'
+  ...
+# Subtest: missing supplier does not borrow English Net heading
+ok 321 - missing supplier does not borrow English Net heading
+  ---
+  duration_ms: 0.669017
+  type: 'test'
+  ...
+# Subtest: missing supplier does not borrow English Total heading
+ok 322 - missing supplier does not borrow English Total heading
+  ---
+  duration_ms: 0.588907
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net 30
+ok 323 - payment terms cannot supply a net amount: Net 30
+  ---
+  duration_ms: 0.594676
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net: 30
+ok 324 - payment terms cannot supply a net amount: Net: 30
+  ---
+  duration_ms: 2.556969
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net / 30
+ok 325 - payment terms cannot supply a net amount: Net / 30
+  ---
+  duration_ms: 3.511065
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net 60
+ok 326 - payment terms cannot supply a net amount: Net 60
+  ---
+  duration_ms: 0.500483
+  type: 'test'
+  ...
+# Subtest: payment terms cannot supply a net amount: Net 90
+ok 327 - payment terms cannot supply a net amount: Net 90
+  ---
+  duration_ms: 0.513053
+  type: 'test'
+  ...
+# Subtest: inline English amounts retain supplier and net amount boundaries
+ok 328 - inline English amounts retain supplier and net amount boundaries
+  ---
+  duration_ms: 0.518741
+  type: 'test'
+  ...
+# Subtest: table description Net remains a checked row
+ok 329 - table description Net remains a checked row
+  ---
+  duration_ms: 0.64465
+  type: 'test'
+  ...
+# Subtest: table description Total remains a checked row
+ok 330 - table description Total remains a checked row
+  ---
+  duration_ms: 0.556398
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline ISO dates keep their label boundary
+ok 331 - Node scalar layout: inline ISO dates keep their label boundary
+  ---
+  duration_ms: 78.762431
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline Swedish dots dates keep their label boundary
+ok 332 - Node scalar layout: inline Swedish dots dates keep their label boundary
+  ---
+  duration_ms: 5.788964
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline Swedish slashes dates keep their label boundary
+ok 333 - Node scalar layout: inline Swedish slashes dates keep their label boundary
+  ---
+  duration_ms: 6.253303
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: inline spaced digits dates keep their label boundary
+ok 334 - Node scalar layout: inline spaced digits dates keep their label boundary
+  ---
+  duration_ms: 0.667766
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: date suffix XYZ is not silently truncated
+ok 335 - Node scalar layout: date suffix XYZ is not silently truncated
+  ---
+  duration_ms: 0.729388
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: date suffix  99 is not silently truncated
+ok 336 - Node scalar layout: date suffix  99 is not silently truncated
+  ---
+  duration_ms: 0.621195
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: date suffix /17 is not silently truncated
+ok 337 - Node scalar layout: date suffix /17 is not silently truncated
+  ---
+  duration_ms: 0.55791
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+ok 338 - Node scalar layout: incomplete line-item header Benämning Antal Belopp exkl. moms cannot poison a printed net summary
+  ---
+  duration_ms: 8.918115
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+ok 339 - Node scalar layout: incomplete line-item header Beskrivning Antal Belopp exklusive moms cannot poison a printed net summary
+  ---
+  duration_ms: 2.444389
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+ok 340 - Node scalar layout: incomplete line-item header Description Quantity Net amount cannot poison a printed net summary
+  ---
+  duration_ms: 4.742208
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: bare monetary summaries end an incomplete table
+ok 341 - Node scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 0.911602
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: bare monetary summaries end an incomplete table
+ok 342 - Node scalar layout: bare monetary summaries end an incomplete table
+  ---
+  duration_ms: 0.521255
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: actual invalid or conflicting net summaries remain in the full census
+ok 343 - Node scalar layout: actual invalid or conflicting net summaries remain in the full census
+  ---
+  duration_ms: 0.914938
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+ok 344 - Node scalar layout: an explicit invoice-number label can identify an OCR title without admitting a native document
+  ---
+  duration_ms: 1.625086
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Offert is not promoted by a referenced invoice number
+ok 345 - Node scalar layout: Offert is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.525381
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Quotation is not promoted by a referenced invoice number
+ok 346 - Node scalar layout: Quotation is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.455145
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Påminnelse is not promoted by a referenced invoice number
+ok 347 - Node scalar layout: Påminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.473713
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+ok 348 - Node scalar layout: Betalningspåminnelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.557879
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+ok 349 - Node scalar layout: Orderbekräftelse is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.491019
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Payment reminder is not promoted by a referenced invoice number
+ok 350 - Node scalar layout: Payment reminder is not promoted by a referenced invoice number
+  ---
+  duration_ms: 0.556147
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+ok 351 - Node scalar layout: explicit non-invoice type Dokumenttyp: Offert prevents new type inference
+  ---
+  duration_ms: 9.513681
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+ok 352 - Node scalar layout: explicit non-invoice type Dokumenttyp: Påminnelse prevents new type inference
+  ---
+  duration_ms: 1.423202
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+ok 353 - Node scalar layout: explicit non-invoice type Leveransbekräftelse prevents new type inference
+  ---
+  duration_ms: 1.80766
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+ok 354 - Node scalar layout: explicit non-invoice type Bekräftelse prevents new type inference
+  ---
+  duration_ms: 16.716052
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+ok 355 - Node scalar layout: explicit non-invoice type Offertnummer: Q-417 prevents new type inference
+  ---
+  duration_ms: 1.102871
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: competing type is retained across scalar/table/display filtering
+ok 356 - Node scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 0.618441
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: competing type is retained across scalar/table/display filtering
+ok 357 - Node scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 0.42532
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: competing type is retained across scalar/table/display filtering
+ok 358 - Node scalar layout: competing type is retained across scalar/table/display filtering
+  ---
+  duration_ms: 60.157424
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 359 - Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 6.19128
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 360 - Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 1.62097
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+ok 361 - Node scalar layout: a zero-padded OCR integer without currency is an ambiguous amount
+  ---
+  duration_ms: 8.419124
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+ok 362 - Node scalar layout: OCR amount 12345 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.598992
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+ok 363 - Node scalar layout: OCR amount 00123 SEK keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.487784
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+ok 364 - Node scalar layout: OCR amount SEK 00123 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.362976
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 365 - Node scalar layout: OCR amount 00123,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 17.409205
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+ok 366 - Node scalar layout: OCR amount 0,50 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.607695
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+ok 367 - Node scalar layout: OCR amount 0 keeps explicit currency/decimal or ordinary integer evidence
+  ---
+  duration_ms: 0.434785
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+ok 368 - Node scalar layout: Kreditfaktura retains precedence over invoice-number evidence
+  ---
+  duration_ms: 2.7168
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: Kvitto retains precedence over invoice-number evidence
+ok 369 - Node scalar layout: Kvitto retains precedence over invoice-number evidence
+  ---
+  duration_ms: 0.56432
+  type: 'test'
+  ...
+# Subtest: Node scalar layout: an invalid invoice identity does not establish a missing document title
+ok 370 - Node scalar layout: an invalid invoice identity does not establish a missing document title
+  ---
+  duration_ms: 13.526081
+  type: 'test'
+  ...
+# Subtest: node: paragraph gaps never establish invoice identity from another line
+ok 371 - node: paragraph gaps never establish invoice identity from another line
+  ---
+  duration_ms: 121.718522
+  type: 'test'
+  ...
+# Subtest: node: a bare alphabetic next-line value is not a verified invoice identifier
+ok 372 - node: a bare alphabetic next-line value is not a verified invoice identifier
+  ---
+  duration_ms: 11.677587
+  type: 'test'
+  ...
+# Subtest: node: direct wrapped identifiers and same-line alphabetic identifiers remain readable
+ok 373 - node: direct wrapped identifiers and same-line alphabetic identifiers remain readable
+  ---
+  duration_ms: 13.470227
+  type: 'test'
+  ...
+# Subtest: node: paragraph gaps do not borrow a reference, account or date
+ok 374 - node: paragraph gaps do not borrow a reference, account or date
+  ---
+  duration_ms: 6.01938
+  type: 'test'
+  ...
+# Subtest: node: OCR paragraph gaps preserve explicit wrapped summary values
+ok 375 - node: OCR paragraph gaps preserve explicit wrapped summary values
+  ---
+  duration_ms: 4.72992
+  type: 'test'
+  ...
+# Subtest: node: blank lines never permit borrowing another heading or crossing a page
+ok 376 - node: blank lines never permit borrowing another heading or crossing a page
+  ---
+  duration_ms: 5.424455
+  type: 'test'
+  ...
+# Subtest: node: tax-summary labels terminate an item table without hiding or adding rows
+ok 377 - node: tax-summary labels terminate an item table without hiding or adding rows
+  ---
+  duration_ms: 5.733661
+  type: 'test'
+  ...
+# Subtest: node: explicit tax-summary label full-word-sums preserves all printed fields
+ok 378 - node: explicit tax-summary label full-word-sums preserves all printed fields
+  ---
+  duration_ms: 0.855678
+  type: 'test'
+  ...
+# Subtest: node: explicit tax-summary label abbreviated-sums preserves all printed fields
+ok 379 - node: explicit tax-summary label abbreviated-sums preserves all printed fields
+  ---
+  duration_ms: 4.874026
+  type: 'test'
+  ...
+# Subtest: node: explicit tax-summary label total-excluding-tax preserves all printed fields
+ok 380 - node: explicit tax-summary label total-excluding-tax preserves all printed fields
+  ---
+  duration_ms: 0.680534
+  type: 'test'
+  ...
+# Subtest: node: explicit tax-summary label amount-including-tax preserves all printed fields
+ok 381 - node: explicit tax-summary label amount-including-tax preserves all printed fields
+  ---
+  duration_ms: 0.588946
+  type: 'test'
+  ...
+# Subtest: node: explicit tax-summary label same-line-summaries preserves all printed fields
+ok 382 - node: explicit tax-summary label same-line-summaries preserves all printed fields
+  ---
+  duration_ms: 0.573934
+  type: 'test'
+  ...
+# Subtest: node: explicit tax-summary label wrapped-summaries preserves all printed fields
+ok 383 - node: explicit tax-summary label wrapped-summaries preserves all printed fields
+  ---
+  duration_ms: 0.560333
+  type: 'test'
+  ...
+# Subtest: node: unsafe tax-summary label conflicting-gross-alias requires review
+ok 384 - node: unsafe tax-summary label conflicting-gross-alias requires review
+  ---
+  duration_ms: 5.060938
+  type: 'test'
+  ...
+# Subtest: node: unsafe tax-summary label conflicting-net-alias requires review
+ok 385 - node: unsafe tax-summary label conflicting-net-alias requires review
+  ---
+  duration_ms: 0.87042
+  type: 'test'
+  ...
+# Subtest: node: unsafe tax-summary label invalid-gross-alias requires review
+ok 386 - node: unsafe tax-summary label invalid-gross-alias requires review
+  ---
+  duration_ms: 0.626192
+  type: 'test'
+  ...
+# Subtest: node: unsafe tax-summary label invalid-net-alias requires review
+ok 387 - node: unsafe tax-summary label invalid-net-alias requires review
+  ---
+  duration_ms: 0.669888
+  type: 'test'
+  ...
+# Subtest: node: unsafe tax-summary label bare-sum-is-not-a-gross-label requires review
+ok 388 - node: unsafe tax-summary label bare-sum-is-not-a-gross-label requires review
+  ---
+  duration_ms: 0.515266
+  type: 'test'
+  ...
+# Subtest: node: unsafe tax-summary label subtotal-is-not-a-gross-label requires review
+ok 389 - node: unsafe tax-summary label subtotal-is-not-a-gross-label requires review
+  ---
+  duration_ms: 13.208654
+  type: 'test'
+  ...
+# Subtest: node: unsafe tax-summary label gross-must-not-be-derived requires review
+ok 390 - node: unsafe tax-summary label gross-must-not-be-derived requires review
+  ---
+  duration_ms: 0.567855
+  type: 'test'
+  ...
+# Subtest: same physical row can join independent OCR rows without choosing source order: false
+ok 391 - same physical row can join independent OCR rows without choosing source order: false
+  ---
+  duration_ms: 64.164446
+  type: 'test'
+  ...
+# Subtest: same physical row can join independent OCR rows without choosing source order: true
+ok 392 - same physical row can join independent OCR rows without choosing source order: true
+  ---
+  duration_ms: 12.324932
+  type: 'test'
+  ...
+# Subtest: two explicit inline fields are indivisible until both horizontal pairs are resolved
+ok 393 - two explicit inline fields are indivisible until both horizontal pairs are resolved
+  ---
+  duration_ms: 1.022779
+  type: 'test'
+  ...
+# Subtest: reviewed compound amount alias participates in the geometry census: Summa moms
+ok 394 - reviewed compound amount alias participates in the geometry census: Summa moms
+  ---
+  duration_ms: 0.480494
+  type: 'test'
+  ...
+# Subtest: reviewed compound amount alias participates in the geometry census: Fakturabelopp
+ok 395 - reviewed compound amount alias participates in the geometry census: Fakturabelopp
+  ---
+  duration_ms: 0.342766
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for tall value box
+ok 396 - horizontal layout preserves the complete raw source for tall value box
+  ---
+  duration_ms: 0.493603
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for tall label box
+ok 397 - horizontal layout preserves the complete raw source for tall label box
+  ---
+  duration_ms: 0.348425
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for tall multiword-label union
+ok 398 - horizontal layout preserves the complete raw source for tall multiword-label union
+  ---
+  duration_ms: 0.250657
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for two right values
+ok 399 - horizontal layout preserves the complete raw source for two right values
+  ---
+  duration_ms: 0.235785
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for one unreadable right competitor
+ok 400 - horizontal layout preserves the complete raw source for one unreadable right competitor
+  ---
+  duration_ms: 0.381354
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for unknown intervening label
+ok 401 - horizontal layout preserves the complete raw source for unknown intervening label
+  ---
+  duration_ms: 16.569322
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for unknown complete intervening field
+ok 402 - horizontal layout preserves the complete raw source for unknown complete intervening field
+  ---
+  duration_ms: 0.381153
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for competing wider vertical region
+ok 403 - horizontal layout preserves the complete raw source for competing wider vertical region
+  ---
+  duration_ms: 0.213231
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for competing wider horizontal region
+ok 404 - horizontal layout preserves the complete raw source for competing wider horizontal region
+  ---
+  duration_ms: 51.025849
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for right and below candidates
+ok 405 - horizontal layout preserves the complete raw source for right and below candidates
+  ---
+  duration_ms: 0.335725
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for one value claimed horizontally and vertically
+ok 406 - horizontal layout preserves the complete raw source for one value claimed horizontally and vertically
+  ---
+  duration_ms: 0.18625
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for large horizontal gap
+ok 407 - horizontal layout preserves the complete raw source for large horizontal gap
+  ---
+  duration_ms: 0.142494
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for only value to the left
+ok 408 - horizontal layout preserves the complete raw source for only value to the left
+  ---
+  duration_ms: 0.140671
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for incomplete source-row suffix
+ok 409 - horizontal layout preserves the complete raw source for incomplete source-row suffix
+  ---
+  duration_ms: 0.188754
+  type: 'test'
+  ...
+# Subtest: horizontal layout preserves the complete raw source for low-confidence competing label
+ok 410 - horizontal layout preserves the complete raw source for low-confidence competing label
+  ---
+  duration_ms: 0.140391
+  type: 'test'
+  ...
+# Subtest: article named Netto with quantity and row amount cannot become a document net summary at y=50
+ok 411 - article named Netto with quantity and row amount cannot become a document net summary at y=50
+  ---
+  duration_ms: 0.258449
+  type: 'test'
+  ...
+# Subtest: article named Netto with quantity and row amount cannot become a document net summary at y=100
+ok 412 - article named Netto with quantity and row amount cannot become a document net summary at y=100
+  ---
+  duration_ms: 0.196576
+  type: 'test'
+  ...
+# Subtest: an explicit table barrier remains authoritative for separate horizontal article columns
+ok 413 - an explicit table barrier remains authoritative for separate horizontal article columns
+  ---
+  duration_ms: 0.243105
+  type: 'test'
+  ...
+# Subtest: neither reordered blocks nor an unrelated complete field proves the end of a table
+ok 414 - neither reordered blocks nor an unrelated complete field proves the end of a table
+  ---
+  duration_ms: 0.384949
+  type: 'test'
+  ...
+# Subtest: an explicit rightward field above a later table remains eligible
+ok 415 - an explicit rightward field above a later table remains eligible
+  ---
+  duration_ms: 0.324869
+  type: 'test'
+  ...
+# Subtest: horizontal Bankgiro keeps the actual word confidence 89
+ok 416 - horizontal Bankgiro keeps the actual word confidence 89
+  ---
+  duration_ms: 53.050527
+  type: 'test'
+  ...
+# Subtest: horizontal Bankgiro keeps the actual word confidence 90
+ok 417 - horizontal Bankgiro keeps the actual word confidence 90
+  ---
+  duration_ms: 0.67092
+  type: 'test'
+  ...
+# Subtest: horizontal Bankgiro keeps the actual word confidence 96
+ok 418 - horizontal Bankgiro keeps the actual word confidence 96
+  ---
+  duration_ms: 0.30568
+  type: 'test'
+  ...
+# Subtest: a distant unreadable Bankgiro label remains in the full census after horizontal reconstruction
+ok 419 - a distant unreadable Bankgiro label remains in the full census after horizontal reconstruction
+  ---
+  duration_ms: 99.675651
+  type: 'test'
+  ...
+# Subtest: large value height does not widen alignment into another column: 60
+ok 420 - large value height does not widen alignment into another column: 60
+  ---
+  duration_ms: 43.172106
+  type: 'test'
+  ...
+# Subtest: large value height does not widen alignment into another column: 180
+ok 421 - large value height does not widen alignment into another column: 180
+  ---
+  duration_ms: 15.423156
+  type: 'test'
+  ...
+# Subtest: large value height cannot extend the vertical pairing range
+ok 422 - large value height cannot extend the vertical pairing range
+  ---
+  duration_ms: 1.198525
+  type: 'test'
+  ...
+# Subtest: unknown explicit label competes inside the valid label tolerance: Avtalsnr: on own OCR row
+ok 423 - unknown explicit label competes inside the valid label tolerance: Avtalsnr: on own OCR row
+  ---
+  duration_ms: 1.190402
+  type: 'test'
+  ...
+# Subtest: unknown explicit label competes inside the valid label tolerance: Kundkonto: on own OCR row
+ok 424 - unknown explicit label competes inside the valid label tolerance: Kundkonto: on own OCR row
+  ---
+  duration_ms: 0.718391
+  type: 'test'
+  ...
+# Subtest: unknown explicit label competes inside the valid label tolerance: Avtalsnr: on split OCR row
+ok 425 - unknown explicit label competes inside the valid label tolerance: Avtalsnr: on split OCR row
+  ---
+  duration_ms: 0.533373
+  type: 'test'
+  ...
+# Subtest: unknown explicit label competes inside the valid label tolerance: Kundkonto: on split OCR row
+ok 426 - unknown explicit label competes inside the valid label tolerance: Kundkonto: on split OCR row
+  ---
+  duration_ms: 1.273458
+  type: 'test'
+  ...
+# Subtest: unknown heading with several possible values still blocks ownership of the shared candidate
+ok 427 - unknown heading with several possible values still blocks ownership of the shared candidate
+  ---
+  duration_ms: 30.615867
+  type: 'test'
+  ...
+# Subtest: unknown complete column outside the label geometry does not block a legitimate pair
+ok 428 - unknown complete column outside the label geometry does not block a legitimate pair
+  ---
+  duration_ms: 8.007934
+  type: 'test'
+  ...
+# Subtest: aligned large-font value stays usable without confidence changes: 89
+ok 429 - aligned large-font value stays usable without confidence changes: 89
+  ---
+  duration_ms: 6.268415
+  type: 'test'
+  ...
+# Subtest: aligned large-font value stays usable without confidence changes: 90
+ok 430 - aligned large-font value stays usable without confidence changes: 90
+  ---
+  duration_ms: 0.371319
+  type: 'test'
+  ...
+# Subtest: aligned large-font value stays usable without confidence changes: 96
+ok 431 - aligned large-font value stays usable without confidence changes: 96
+  ---
+  duration_ms: 0.324408
+  type: 'test'
+  ...
+# Subtest: words without a shared vertical band cannot form a label: 20
+ok 432 - words without a shared vertical band cannot form a label: 20
+  ---
+  duration_ms: 0.188874
+  type: 'test'
+  ...
+# Subtest: words without a shared vertical band cannot form a label: 180
+ok 433 - words without a shared vertical band cannot form a label: 180
+  ---
+  duration_ms: 0.199771
+  type: 'test'
+  ...
+# Subtest: mixed-height label uses its shortest actual word as alignment scale
+ok 434 - mixed-height label uses its shortest actual word as alignment scale
+  ---
+  duration_ms: 0.282205
+  type: 'test'
+  ...
+# Subtest: slightly staggered words sharing a real vertical band form a legitimate label
+ok 435 - slightly staggered words sharing a real vertical band form a legitimate label
+  ---
+  duration_ms: 0.26623
+  type: 'test'
+  ...
+# Subtest: layout splits two complete labelled fields at a large word-bbox gap
+ok 436 - layout splits two complete labelled fields at a large word-bbox gap
+  ---
+  duration_ms: 39.005625
+  type: 'test'
+  ...
+# Subtest: layout pairs only unique close left-aligned values below standalone labels
+ok 437 - layout pairs only unique close left-aligned values below standalone labels
+  ---
+  duration_ms: 1.278915
+  type: 'test'
+  ...
+# Subtest: layout pairs columns by geometry even when OCR block order interleaves another label
+ok 438 - layout pairs columns by geometry even when OCR block order interleaves another label
+  ---
+  duration_ms: 25.045561
+  type: 'test'
+  ...
+# Subtest: layout holds the original when rightward and downward candidates compete across OCR and payable amount
+ok 439 - layout holds the original when rightward and downward candidates compete across OCR and payable amount
+  ---
+  duration_ms: 0.626914
+  type: 'test'
+  ...
+# Subtest: unknown unpaired content restores its entire source row and cancels dependent pairs iteratively
+ok 440 - unknown unpaired content restores its entire source row and cancels dependent pairs iteratively
+  ---
+  duration_ms: 0.488556
+  type: 'test'
+  ...
+# Subtest: layout retains original strong paragraph gaps for large vertical gap
+ok 441 - layout retains original strong paragraph gaps for large vertical gap
+  ---
+  duration_ms: 0.254343
+  type: 'test'
+  ...
+# Subtest: layout retains original strong paragraph gaps for horizontal misalignment
+ok 442 - layout retains original strong paragraph gaps for horizontal misalignment
+  ---
+  duration_ms: 0.23916
+  type: 'test'
+  ...
+# Subtest: layout retains original strong paragraph gaps for two nearby value candidates
+ok 443 - layout retains original strong paragraph gaps for two nearby value candidates
+  ---
+  duration_ms: 0.211078
+  type: 'test'
+  ...
+# Subtest: layout retains original strong paragraph gaps for intervening content
+ok 444 - layout retains original strong paragraph gaps for intervening content
+  ---
+  duration_ms: 0.263106
+  type: 'test'
+  ...
+# Subtest: layout retains original strong paragraph gaps for one value claimed by two labels
+ok 445 - layout retains original strong paragraph gaps for one value claimed by two labels
+  ---
+  duration_ms: 0.334794
+  type: 'test'
+  ...
+# Subtest: layout never resolves table headers or item rows, but can resolve a later standalone summary
+ok 446 - layout never resolves table headers or item rows, but can resolve a later standalone summary
+  ---
+  duration_ms: 29.222418
+  type: 'test'
+  ...
+# Subtest: layout cannot strip an unknown suffix from an otherwise complete split field row
+ok 447 - layout cannot strip an unknown suffix from an otherwise complete split field row
+  ---
+  duration_ms: 1.803795
+  type: 'test'
+  ...
+# Subtest: reconstructed Bankgiro uses the actual unchanged word confidence 89
+ok 448 - reconstructed Bankgiro uses the actual unchanged word confidence 89
+  ---
+  duration_ms: 12.284522
+  type: 'test'
+  ...
+# Subtest: reconstructed Bankgiro uses the actual unchanged word confidence 90
+ok 449 - reconstructed Bankgiro uses the actual unchanged word confidence 90
+  ---
+  duration_ms: 3.122681
+  type: 'test'
+  ...
+# Subtest: reconstruction preserves every Bankgiro label in the complete source census
+ok 450 - reconstruction preserves every Bankgiro label in the complete source census
+  ---
+  duration_ms: 1.182691
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on missing word bbox
+ok 451 - layout falls back to the unchanged original on missing word bbox
+  ---
+  duration_ms: 0.241704
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on NaN coordinate
+ok 452 - layout falls back to the unchanged original on NaN coordinate
+  ---
+  duration_ms: 4.47723
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on negative coordinate
+ok 453 - layout falls back to the unchanged original on negative coordinate
+  ---
+  duration_ms: 0.266601
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on reversed box
+ok 454 - layout falls back to the unchanged original on reversed box
+  ---
+  duration_ms: 0.137036
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on overlapping words
+ok 455 - layout falls back to the unchanged original on overlapping words
+  ---
+  duration_ms: 0.154763
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on invalid confidence
+ok 456 - layout falls back to the unchanged original on invalid confidence
+  ---
+  duration_ms: 0.124738
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on text/word mismatch
+ok 457 - layout falls back to the unchanged original on text/word mismatch
+  ---
+  duration_ms: 0.13254
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on Unicode-normalized but different word token
+ok 458 - layout falls back to the unchanged original on Unicode-normalized but different word token
+  ---
+  duration_ms: 0.205219
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on line/source mismatch
+ok 459 - layout falls back to the unchanged original on line/source mismatch
+  ---
+  duration_ms: 0.178259
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on unrepresented source label
+ok 460 - layout falls back to the unchanged original on unrepresented source label
+  ---
+  duration_ms: 0.166791
+  type: 'test'
+  ...
+# Subtest: layout falls back to the unchanged original on missing source line
+ok 461 - layout falls back to the unchanged original on missing source line
+  ---
+  duration_ms: 0.113141
+  type: 'test'
+  ...
+# Subtest: layout preserves uncertain spelling and punctuation instead of repairing OCR digits
+ok 462 - layout preserves uncertain spelling and punctuation instead of repairing OCR digits
+  ---
+  duration_ms: 0.712543
+  type: 'test'
+  ...
+# Subtest: unknown explicit column Avtalsnr: owns its aligned value; BG must remain unproved
+ok 463 - unknown explicit column Avtalsnr: owns its aligned value; BG must remain unproved
+  ---
+  duration_ms: 31.972919
+  type: 'test'
+  ...
+# Subtest: unknown explicit column Kundkonto: owns its aligned value; BG must remain unproved
+ok 464 - unknown explicit column Kundkonto: owns its aligned value; BG must remain unproved
+  ---
+  duration_ms: 5.759209
+  type: 'test'
+  ...
+# Subtest: words on incompatible vertical baselines cannot form a single amount label
+ok 465 - words on incompatible vertical baselines cannot form a single amount label
+  ---
+  duration_ms: 0.350298
+  type: 'test'
+  ...
+# Subtest: known competing field label also leaves the shared value unproved
+ok 466 - known competing field label also leaves the shared value unproved
+  ---
+  duration_ms: 1.465326
+  type: 'test'
+  ...
+# Subtest: a genuinely aligned large-font value retains its exact word confidence 89
+ok 467 - a genuinely aligned large-font value retains its exact word confidence 89
+  ---
+  duration_ms: 1.007556
+  type: 'test'
+  ...
+# Subtest: a genuinely aligned large-font value retains its exact word confidence 90
+ok 468 - a genuinely aligned large-font value retains its exact word confidence 90
+  ---
+  duration_ms: 0.458059
+  type: 'test'
+  ...
+# Subtest: a genuinely aligned large-font value retains its exact word confidence 96
+ok 469 - a genuinely aligned large-font value retains its exact word confidence 96
+  ---
+  duration_ms: 0.3054
+  type: 'test'
+  ...
+# Subtest: cross-row coordinate overlap cannot repair a missing raw Bankgiro value
+ok 470 - cross-row coordinate overlap cannot repair a missing raw Bankgiro value
+  ---
+  duration_ms: 0.302365
+  type: 'test'
+  ...
+# Subtest: layout retains a conflicting Bankgiro beyond the display excerpt while reconstructing an earlier valid pair
+ok 471 - layout retains a conflicting Bankgiro beyond the display excerpt while reconstructing an earlier valid pair
+  ---
+  duration_ms: 36.915119
+  type: 'test'
+  ...
+# Subtest: an unrepresented later label prevents reconstruction of all source observations
+ok 472 - an unrepresented later label prevents reconstruction of all source observations
+  ---
+  duration_ms: 0.514855
+  type: 'test'
+  ...
+# Subtest: node Issue date reads its complete printed date: 2027-02-12
+ok 473 - node Issue date reads its complete printed date: 2027-02-12
+  ---
+  duration_ms: 66.842408
+  type: 'test'
+  ...
+# Subtest: node Issue date reads its complete printed date: 12/02/2027
+ok 474 - node Issue date reads its complete printed date: 12/02/2027
+  ---
+  duration_ms: 9.171776
+  type: 'test'
+  ...
+# Subtest: node Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2
+ok 475 - node Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2
+  ---
+  duration_ms: 1.251364
+  type: 'test'
+  ...
+# Subtest: node Issue date participates in the full duplicate census: unknown
+ok 476 - node Issue date participates in the full duplicate census: unknown
+  ---
+  duration_ms: 11.476466
+  type: 'test'
+  ...
+# Subtest: node Issue date participates in the full duplicate census: 2027-02-13
+ok 477 - node Issue date participates in the full duplicate census: 2027-02-13
+  ---
+  duration_ms: 1.761372
+  type: 'test'
+  ...
+# Subtest: node Issue date participates in the full duplicate census: 2027-02-30
+ok 478 - node Issue date participates in the full duplicate census: 2027-02-30
+  ---
+  duration_ms: 1.140196
+  type: 'test'
+  ...
+# Subtest: node a longer label is not the Issue date alias: Reissue date
+ok 479 - node a longer label is not the Issue date alias: Reissue date
+  ---
+  duration_ms: 1.258243
+  type: 'test'
+  ...
+# Subtest: node a longer label is not the Issue date alias: XIssue date
+ok 480 - node a longer label is not the Issue date alias: XIssue date
+  ---
+  duration_ms: 0.941928
+  type: 'test'
+  ...
+# Subtest: node a longer label is not the Issue date alias: Ref/Issue date
+ok 481 - node a longer label is not the Issue date alias: Ref/Issue date
+  ---
+  duration_ms: 2.72419
+  type: 'test'
+  ...
+# Subtest: node a longer label is not the Issue date alias: Issue dates
+ok 482 - node a longer label is not the Issue date alias: Issue dates
+  ---
+  duration_ms: 3.940051
+  type: 'test'
+  ...
+# Subtest: node a longer label is not the Issue date alias: Issue datecode
+ok 483 - node a longer label is not the Issue date alias: Issue datecode
+  ---
+  duration_ms: 0.951222
+  type: 'test'
+  ...
+# Subtest: node Issue date retains invalid or residual value text: 2027-02-12 unknown
+ok 484 - node Issue date retains invalid or residual value text: 2027-02-12 unknown
+  ---
+  duration_ms: 0.792462
+  type: 'test'
+  ...
+# Subtest: node Issue date retains invalid or residual value text: 2027-02-12/17
+ok 485 - node Issue date retains invalid or residual value text: 2027-02-12/17
+  ---
+  duration_ms: 0.640354
+  type: 'test'
+  ...
+# Subtest: node Issue date retains invalid or residual value text: 2027-02-30
+ok 486 - node Issue date retains invalid or residual value text: 2027-02-30
+  ---
+  duration_ms: 0.691791
+  type: 'test'
+  ...
+# Subtest: node Issue date retains invalid or residual value text: 2027-02-12 2027-02-13
+ok 487 - node Issue date retains invalid or residual value text: 2027-02-12 2027-02-13
+  ---
+  duration_ms: 0.652202
+  type: 'test'
+  ...
+# Subtest: node supported organization spelling bounds an inline scalar: Organisation number
+ok 488 - node supported organization spelling bounds an inline scalar: Organisation number
+  ---
+  duration_ms: 1.442031
+  type: 'test'
+  ...
+# Subtest: node supported organization spelling bounds an inline scalar: Organization number
+ok 489 - node supported organization spelling bounds an inline scalar: Organization number
+  ---
+  duration_ms: 0.921377
+  type: 'test'
+  ...
+# Subtest: node a longer organization label cannot hide an invalid invoice suffix: Reorganization number
+ok 490 - node a longer organization label cannot hide an invalid invoice suffix: Reorganization number
+  ---
+  duration_ms: 0.796249
+  type: 'test'
+  ...
+# Subtest: node a longer organization label cannot hide an invalid invoice suffix: Organization numbercode
+ok 491 - node a longer organization label cannot hide an invalid invoice suffix: Organization numbercode
+  ---
+  duration_ms: 0.754676
+  type: 'test'
+  ...
+# Subtest: node Issue date ends the preceding explicit supplier name and organization value
+ok 492 - node Issue date ends the preceding explicit supplier name and organization value
+  ---
+  duration_ms: 2.927336
+  type: 'test'
+  ...
+# Subtest: node a standalone Issue date heading cannot become the next supplier name
+ok 493 - node a standalone Issue date heading cannot become the next supplier name
+  ---
+  duration_ms: 1.326687
+  type: 'test'
+  ...
+# Subtest: node Issue date bounds but cannot validate an invalid organization number
+ok 494 - node Issue date bounds but cannot validate an invalid organization number
+  ---
+  duration_ms: 0.90349
+  type: 'test'
+  ...
+# Subtest: node Issue date is an owned geometry cell without creating an organization owner
+ok 495 - node Issue date is an owned geometry cell without creating an organization owner
+  ---
+  duration_ms: 10.834268
+  type: 'test'
+  ...
+# Subtest: node all three explicit metadata columns must own their original values
+ok 496 - node all three explicit metadata columns must own their original values
+  ---
+  duration_ms: 1.685998
+  type: 'test'
+  ...
+# Subtest: node alias geometry keeps a competing below value
+ok 497 - node alias geometry keeps a competing below value
+  ---
+  duration_ms: 1.47466
+  type: 'test'
+  ...
+# Subtest: node alias geometry keeps an unresolved neighboring role
+ok 498 - node alias geometry keeps an unresolved neighboring role
+  ---
+  duration_ms: 1.034367
+  type: 'test'
+  ...
+# Subtest: node alias geometry keeps an incomplete label
+ok 499 - node alias geometry keeps an incomplete label
+  ---
+  duration_ms: 0.789078
+  type: 'test'
+  ...
+# Subtest: node alias geometry keeps an unreadable value suffix
+ok 500 - node alias geometry keeps an unreadable value suffix
+  ---
+  duration_ms: 0.835728
+  type: 'test'
+  ...
+# Subtest: node alias geometry keeps a competing explicit heading
+ok 501 - node alias geometry keeps a competing explicit heading
+  ---
+  duration_ms: 0.999074
+  type: 'test'
+  ...
+# Subtest: node organization geometry spelling keeps the unowned number unassigned: Organization number
+ok 502 - node organization geometry spelling keeps the unowned number unassigned: Organization number
+  ---
+  duration_ms: 0.935358
+  type: 'test'
+  ...
+# Subtest: node organization geometry spelling keeps the unowned number unassigned: Organisation number
+ok 503 - node organization geometry spelling keeps the unowned number unassigned: Organisation number
+  ---
+  duration_ms: 1.697696
+  type: 'test'
+  ...
+# Subtest: node existing recipient label participates in the complete geometry census: Bill to:
+ok 504 - node existing recipient label participates in the complete geometry census: Bill to:
+  ---
+  duration_ms: 0.995158
+  type: 'test'
+  ...
+# Subtest: node existing recipient label participates in the complete geometry census: Fakturamottagare:
+ok 505 - node existing recipient label participates in the complete geometry census: Fakturamottagare:
+  ---
+  duration_ms: 0.975217
+  type: 'test'
+  ...
+# Subtest: node unknown residual recipient text prevents the neighboring invoice assignment
+ok 506 - node unknown residual recipient text prevents the neighboring invoice assignment
+  ---
+  duration_ms: 0.718422
+  type: 'test'
+  ...
+# Subtest: node alias handling does not repair VAT or authorize an unbound payment destination
+ok 507 - node alias handling does not repair VAT or authorize an unbound payment destination
+  ---
+  duration_ms: 1.072294
+  type: 'test'
+  ...
+# Subtest: sites Issue date reads its complete printed date: 2027-02-12
+ok 508 - sites Issue date reads its complete printed date: 2027-02-12
+  ---
+  duration_ms: 6.55073
+  type: 'test'
+  ...
+# Subtest: sites Issue date reads its complete printed date: 12/02/2027
+ok 509 - sites Issue date reads its complete printed date: 12/02/2027
+  ---
+  duration_ms: 1.031292
+  type: 'test'
+  ...
+# Subtest: sites Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2
+ok 510 - sites Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2
+  ---
+  duration_ms: 0.954447
+  type: 'test'
+  ...
+# Subtest: sites Issue date participates in the full duplicate census: unknown
+ok 511 - sites Issue date participates in the full duplicate census: unknown
+  ---
+  duration_ms: 0.842658
+  type: 'test'
+  ...
+# Subtest: sites Issue date participates in the full duplicate census: 2027-02-13
+ok 512 - sites Issue date participates in the full duplicate census: 2027-02-13
+  ---
+  duration_ms: 1.118183
+  type: 'test'
+  ...
+# Subtest: sites Issue date participates in the full duplicate census: 2027-02-30
+ok 513 - sites Issue date participates in the full duplicate census: 2027-02-30
+  ---
+  duration_ms: 0.762789
+  type: 'test'
+  ...
+# Subtest: sites a longer label is not the Issue date alias: Reissue date
+ok 514 - sites a longer label is not the Issue date alias: Reissue date
+  ---
+  duration_ms: 0.805783
+  type: 'test'
+  ...
+# Subtest: sites a longer label is not the Issue date alias: XIssue date
+ok 515 - sites a longer label is not the Issue date alias: XIssue date
+  ---
+  duration_ms: 0.755267
+  type: 'test'
+  ...
+# Subtest: sites a longer label is not the Issue date alias: Ref/Issue date
+ok 516 - sites a longer label is not the Issue date alias: Ref/Issue date
+  ---
+  duration_ms: 0.834957
+  type: 'test'
+  ...
+# Subtest: sites a longer label is not the Issue date alias: Issue dates
+ok 517 - sites a longer label is not the Issue date alias: Issue dates
+  ---
+  duration_ms: 0.74395
+  type: 'test'
+  ...
+# Subtest: sites a longer label is not the Issue date alias: Issue datecode
+ok 518 - sites a longer label is not the Issue date alias: Issue datecode
+  ---
+  duration_ms: 0.566052
+  type: 'test'
+  ...
+# Subtest: sites Issue date retains invalid or residual value text: 2027-02-12 unknown
+ok 519 - sites Issue date retains invalid or residual value text: 2027-02-12 unknown
+  ---
+  duration_ms: 0.49113
+  type: 'test'
+  ...
+# Subtest: sites Issue date retains invalid or residual value text: 2027-02-12/17
+ok 520 - sites Issue date retains invalid or residual value text: 2027-02-12/17
+  ---
+  duration_ms: 0.666874
+  type: 'test'
+  ...
+# Subtest: sites Issue date retains invalid or residual value text: 2027-02-30
+ok 521 - sites Issue date retains invalid or residual value text: 2027-02-30
+  ---
+  duration_ms: 0.489767
+  type: 'test'
+  ...
+# Subtest: sites Issue date retains invalid or residual value text: 2027-02-12 2027-02-13
+ok 522 - sites Issue date retains invalid or residual value text: 2027-02-12 2027-02-13
+  ---
+  duration_ms: 0.478311
+  type: 'test'
+  ...
+# Subtest: sites supported organization spelling bounds an inline scalar: Organisation number
+ok 523 - sites supported organization spelling bounds an inline scalar: Organisation number
+  ---
+  duration_ms: 0.8037
+  type: 'test'
+  ...
+# Subtest: sites supported organization spelling bounds an inline scalar: Organization number
+ok 524 - sites supported organization spelling bounds an inline scalar: Organization number
+  ---
+  duration_ms: 0.821016
+  type: 'test'
+  ...
+# Subtest: sites a longer organization label cannot hide an invalid invoice suffix: Reorganization number
+ok 525 - sites a longer organization label cannot hide an invalid invoice suffix: Reorganization number
+  ---
+  duration_ms: 0.667324
+  type: 'test'
+  ...
+# Subtest: sites a longer organization label cannot hide an invalid invoice suffix: Organization numbercode
+ok 526 - sites a longer organization label cannot hide an invalid invoice suffix: Organization numbercode
+  ---
+  duration_ms: 0.585591
+  type: 'test'
+  ...
+# Subtest: sites Issue date ends the preceding explicit supplier name and organization value
+ok 527 - sites Issue date ends the preceding explicit supplier name and organization value
+  ---
+  duration_ms: 0.810419
+  type: 'test'
+  ...
+# Subtest: sites a standalone Issue date heading cannot become the next supplier name
+ok 528 - sites a standalone Issue date heading cannot become the next supplier name
+  ---
+  duration_ms: 0.479401
+  type: 'test'
+  ...
+# Subtest: sites Issue date bounds but cannot validate an invalid organization number
+ok 529 - sites Issue date bounds but cannot validate an invalid organization number
+  ---
+  duration_ms: 0.7371
+  type: 'test'
+  ...
+# Subtest: sites Issue date is an owned geometry cell without creating an organization owner
+ok 530 - sites Issue date is an owned geometry cell without creating an organization owner
+  ---
+  duration_ms: 2.502607
+  type: 'test'
+  ...
+# Subtest: sites all three explicit metadata columns must own their original values
+ok 531 - sites all three explicit metadata columns must own their original values
+  ---
+  duration_ms: 0.687785
+  type: 'test'
+  ...
+# Subtest: sites alias geometry keeps a competing below value
+ok 532 - sites alias geometry keeps a competing below value
+  ---
+  duration_ms: 0.815949
+  type: 'test'
+  ...
+# Subtest: sites alias geometry keeps an unresolved neighboring role
+ok 533 - sites alias geometry keeps an unresolved neighboring role
+  ---
+  duration_ms: 1.386517
+  type: 'test'
+  ...
+# Subtest: sites alias geometry keeps an incomplete label
+ok 534 - sites alias geometry keeps an incomplete label
+  ---
+  duration_ms: 0.721826
+  type: 'test'
+  ...
+# Subtest: sites alias geometry keeps an unreadable value suffix
+ok 535 - sites alias geometry keeps an unreadable value suffix
+  ---
+  duration_ms: 0.656949
+  type: 'test'
+  ...
+# Subtest: sites alias geometry keeps a competing explicit heading
+ok 536 - sites alias geometry keeps a competing explicit heading
+  ---
+  duration_ms: 0.88346
+  type: 'test'
+  ...
+# Subtest: sites organization geometry spelling keeps the unowned number unassigned: Organization number
+ok 537 - sites organization geometry spelling keeps the unowned number unassigned: Organization number
+  ---
+  duration_ms: 0.773995
+  type: 'test'
+  ...
+# Subtest: sites organization geometry spelling keeps the unowned number unassigned: Organisation number
+ok 538 - sites organization geometry spelling keeps the unowned number unassigned: Organisation number
+  ---
+  duration_ms: 0.911682
+  type: 'test'
+  ...
+# Subtest: sites existing recipient label participates in the complete geometry census: Bill to:
+ok 539 - sites existing recipient label participates in the complete geometry census: Bill to:
+  ---
+  duration_ms: 0.78343
+  type: 'test'
+  ...
+# Subtest: sites existing recipient label participates in the complete geometry census: Fakturamottagare:
+ok 540 - sites existing recipient label participates in the complete geometry census: Fakturamottagare:
+  ---
+  duration_ms: 1.192635
+  type: 'test'
+  ...
+# Subtest: sites unknown residual recipient text prevents the neighboring invoice assignment
+ok 541 - sites unknown residual recipient text prevents the neighboring invoice assignment
+  ---
+  duration_ms: 0.707676
+  type: 'test'
+  ...
+# Subtest: sites alias handling does not repair VAT or authorize an unbound payment destination
+ok 542 - sites alias handling does not repair VAT or authorize an unbound payment destination
+  ---
+  duration_ms: 0.89637
+  type: 'test'
+  ...
+# Subtest: node layout preserves the already supported separate recipient heading: Bill to
+ok 543 - node layout preserves the already supported separate recipient heading: Bill to
+  ---
+  duration_ms: 65.668355
+  type: 'test'
+  ...
+# Subtest: node layout preserves the already supported separate recipient heading: Fakturamottagare
+ok 544 - node layout preserves the already supported separate recipient heading: Fakturamottagare
+  ---
+  duration_ms: 1.081598
+  type: 'test'
+  ...
+# Subtest: sites layout preserves the already supported separate recipient heading: Bill to
+ok 545 - sites layout preserves the already supported separate recipient heading: Bill to
+  ---
+  duration_ms: 23.306273
+  type: 'test'
+  ...
+# Subtest: sites layout preserves the already supported separate recipient heading: Fakturamottagare
+ok 546 - sites layout preserves the already supported separate recipient heading: Fakturamottagare
+  ---
+  duration_ms: 2.217879
+  type: 'test'
+  ...
+1..546
+# tests 546
+# suites 0
+# pass 546
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2360.071977

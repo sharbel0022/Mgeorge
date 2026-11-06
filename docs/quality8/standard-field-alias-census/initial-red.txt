@@ -1,0 +1,744 @@
+✖ node Issue date reads its complete printed date: 2027-02-12 (45.942683ms)
+✖ node Issue date reads its complete printed date: 12/02/2027 (4.848062ms)
+✖ node Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2 (1.2156ms)
+✖ node Issue date participates in the full duplicate census: unknown (1.694222ms)
+✖ node Issue date participates in the full duplicate census: 2027-02-13 (1.283513ms)
+✖ node Issue date participates in the full duplicate census: 2027-02-30 (1.017983ms)
+✔ node a longer label is not the Issue date alias: Reissue date (1.037573ms)
+✔ node a longer label is not the Issue date alias: XIssue date (0.937803ms)
+✔ node a longer label is not the Issue date alias: Ref/Issue date (0.929991ms)
+✔ node a longer label is not the Issue date alias: Issue dates (2.110488ms)
+✔ node a longer label is not the Issue date alias: Issue datecode (0.739894ms)
+✔ node Issue date retains invalid or residual value text: 2027-02-12 unknown (0.704642ms)
+✔ node Issue date retains invalid or residual value text: 2027-02-12/17 (0.603819ms)
+✔ node Issue date retains invalid or residual value text: 2027-02-30 (0.532702ms)
+✔ node Issue date retains invalid or residual value text: 2027-02-12 2027-02-13 (0.596288ms)
+✔ node supported organization spelling bounds an inline scalar: Organisation number (1.141158ms)
+✖ node supported organization spelling bounds an inline scalar: Organization number (0.845644ms)
+✖ node Issue date ends the preceding explicit supplier name and organization value (0.784942ms)
+✖ node a standalone Issue date heading cannot become the next supplier name (1.522834ms)
+✖ node Issue date bounds but cannot validate an invalid organization number (1.031433ms)
+✖ node Issue date is an owned geometry cell without creating an organization owner (12.347877ms)
+✖ node all three explicit metadata columns must own their original values (1.418046ms)
+✔ node alias geometry keeps a competing below value (2.255096ms)
+✔ node alias geometry keeps an unresolved neighboring role (0.864472ms)
+✔ node alias geometry keeps an incomplete label (0.792314ms)
+✔ node alias geometry keeps an unreadable value suffix (0.731762ms)
+✔ node alias geometry keeps a competing explicit heading (0.632973ms)
+✖ node organization geometry spelling keeps the unowned number unassigned: Organization number (1.054428ms)
+✔ node organization geometry spelling keeps the unowned number unassigned: Organisation number (0.927256ms)
+✖ node existing recipient label participates in the complete geometry census: Bill to: (0.838744ms)
+✖ node existing recipient label participates in the complete geometry census: Fakturamottagare: (1.95224ms)
+✔ node unknown residual recipient text prevents the neighboring invoice assignment (5.081273ms)
+✔ node alias handling does not repair VAT or authorize an unbound payment destination (1.456594ms)
+✖ sites Issue date reads its complete printed date: 2027-02-12 (9.855002ms)
+✖ sites Issue date reads its complete printed date: 12/02/2027 (1.04241ms)
+✖ sites Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2 (0.716139ms)
+✖ sites Issue date participates in the full duplicate census: unknown (0.640585ms)
+✖ sites Issue date participates in the full duplicate census: 2027-02-13 (0.667436ms)
+✖ sites Issue date participates in the full duplicate census: 2027-02-30 (0.572753ms)
+✔ sites a longer label is not the Issue date alias: Reissue date (0.514906ms)
+✔ sites a longer label is not the Issue date alias: XIssue date (0.497148ms)
+✔ sites a longer label is not the Issue date alias: Ref/Issue date (0.565702ms)
+✔ sites a longer label is not the Issue date alias: Issue dates (0.477028ms)
+✔ sites a longer label is not the Issue date alias: Issue datecode (0.414324ms)
+✔ sites Issue date retains invalid or residual value text: 2027-02-12 unknown (0.393583ms)
+✔ sites Issue date retains invalid or residual value text: 2027-02-12/17 (0.375806ms)
+✔ sites Issue date retains invalid or residual value text: 2027-02-30 (0.346201ms)
+✔ sites Issue date retains invalid or residual value text: 2027-02-12 2027-02-13 (0.337779ms)
+✔ sites supported organization spelling bounds an inline scalar: Organisation number (0.711141ms)
+✖ sites supported organization spelling bounds an inline scalar: Organization number (0.785443ms)
+✖ sites Issue date ends the preceding explicit supplier name and organization value (0.785283ms)
+✖ sites a standalone Issue date heading cannot become the next supplier name (0.845163ms)
+✖ sites Issue date bounds but cannot validate an invalid organization number (0.509578ms)
+✖ sites Issue date is an owned geometry cell without creating an organization owner (0.55787ms)
+✖ sites all three explicit metadata columns must own their original values (0.467574ms)
+✔ sites alias geometry keeps a competing below value (0.926215ms)
+✔ sites alias geometry keeps an unresolved neighboring role (0.407113ms)
+✔ sites alias geometry keeps an incomplete label (0.478771ms)
+✔ sites alias geometry keeps an unreadable value suffix (0.513864ms)
+✔ sites alias geometry keeps a competing explicit heading (1.105275ms)
+✖ sites organization geometry spelling keeps the unowned number unassigned: Organization number (0.560124ms)
+✔ sites organization geometry spelling keeps the unowned number unassigned: Organisation number (0.441635ms)
+✖ sites existing recipient label participates in the complete geometry census: Bill to: (0.556498ms)
+✖ sites existing recipient label participates in the complete geometry census: Fakturamottagare: (0.514324ms)
+✔ sites unknown residual recipient text prevents the neighboring invoice assignment (0.461776ms)
+✔ sites alias handling does not repair VAT or authorize an unbound payment destination (0.988729ms)
+ℹ tests 66
+ℹ suites 0
+ℹ pass 36
+ℹ fail 30
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 417.932086
+
+✖ failing tests:
+
+test at test/standard-field-alias-census.test.js:27:72
+✖ node Issue date reads its complete printed date: 2027-02-12 (45.942683ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:29:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:27:72
+✖ node Issue date reads its complete printed date: 12/02/2027 (4.848062ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:29:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:27:72
+✖ node Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2 (1.2156ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:29:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:32:61
+✖ node Issue date participates in the full duplicate census: unknown (1.694222ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2027-02-12'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:34:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2027-02-12',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:32:61
+✖ node Issue date participates in the full duplicate census: 2027-02-13 (1.283513ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2027-02-12'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:34:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2027-02-12',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:32:61
+✖ node Issue date participates in the full duplicate census: 2027-02-30 (1.017983ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2027-02-12'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:34:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2027-02-12',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:43:68
+✖ node supported organization spelling bounds an inline scalar: Organization number (0.845644ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'ALIAS-482'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:45:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'ALIAS-482',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:47:3
+✖ node Issue date ends the preceding explicit supplier name and organization value (0.784942ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Synthetic Cobalt AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:49:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Synthetic Cobalt AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:52:3
+✖ node a standalone Issue date heading cannot become the next supplier name (1.522834ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'Issue date'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:54:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Issue date',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:56:3
+✖ node Issue date bounds but cannot validate an invalid organization number (1.031433ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:58:66)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:60:3
+✖ node Issue date is an owned geometry cell without creating an organization owner (12.347877ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:61:44)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:65:3
+✖ node all three explicit metadata columns must own their original values (1.418046ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:70:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:83:68
+✖ node organization geometry spelling keeps the unowned number unassigned: Organization number (1.054428ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:85:60)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:89:55
+✖ node existing recipient label participates in the complete geometry census: Bill to: (0.838744ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:95:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:89:55
+✖ node existing recipient label participates in the complete geometry census: Fakturamottagare: (1.95224ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:95:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:27:72
+✖ sites Issue date reads its complete printed date: 2027-02-12 (9.855002ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:29:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:27:72
+✖ sites Issue date reads its complete printed date: 12/02/2027 (1.04241ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:29:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:27:72
+✖ sites Issue date reads its complete printed date: 2 0 2 7 - 0 2 - 1 2 (0.716139ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:29:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:32:61
+✖ sites Issue date participates in the full duplicate census: unknown (0.640585ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2027-02-12'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:34:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2027-02-12',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:32:61
+✖ sites Issue date participates in the full duplicate census: 2027-02-13 (0.667436ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2027-02-12'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:34:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2027-02-12',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:32:61
+✖ sites Issue date participates in the full duplicate census: 2027-02-30 (0.572753ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2027-02-12'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:34:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2027-02-12',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:43:68
+✖ sites supported organization spelling bounds an inline scalar: Organization number (0.785443ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'ALIAS-482'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:45:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'ALIAS-482',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:47:3
+✖ sites Issue date ends the preceding explicit supplier name and organization value (0.785283ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - 'Synthetic Cobalt AB'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:49:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'Synthetic Cobalt AB',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:52:3
+✖ sites a standalone Issue date heading cannot become the next supplier name (0.845163ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'Issue date'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:54:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Issue date',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:56:3
+✖ sites Issue date bounds but cannot validate an invalid organization number (0.509578ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - '2027-02-12'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:58:66)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: '2027-02-12',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:60:3
+✖ sites Issue date is an owned geometry cell without creating an organization owner (0.55787ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:61:44)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:65:3
+✖ sites all three explicit metadata columns must own their original values (0.467574ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:70:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:83:68
+✖ sites organization geometry spelling keeps the unowned number unassigned: Organization number (0.560124ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:85:60)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:89:55
+✖ sites existing recipient label participates in the complete geometry census: Bill to: (0.556498ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:95:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/standard-field-alias-census.test.js:89:55
+✖ sites existing recipient label participates in the complete geometry census: Fakturamottagare: (0.514324ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-standard-aliases/test/standard-field-alias-census.test.js:95:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
