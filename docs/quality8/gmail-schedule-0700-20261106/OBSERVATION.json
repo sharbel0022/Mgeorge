@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-06T07:14:04.358Z",
+  "nominal_scheduled_for": "2026-11-06T07:00:00Z",
+  "run_id": "ee5e3cf2-0e54-832f-b443-b9e24ff2bc29",
+  "scheduled_for": "2026-11-06T07:00:00Z",
+  "started_at": "2026-11-06T06:55:02.233321Z",
+  "completed_at": "2026-11-06T06:55:03.035504Z",
+  "recorded_status": "no_update",
+  "timestamps_preserved_as_returned": true,
+  "started_before_nominal_scheduled_time": true,
+  "no_timestamps_normalized_to_0700": true,
+  "first_clock_read": "2026-11-06 07:05:15 UTC",
+  "first_app_read_completed_at": "2026-11-06T07:06:14.451Z",
+  "fresh_pre_run_baseline_available": false,
+  "reason_no_fresh_pre_run_baseline": "The first observation occurred after the recorded run completion at 06:55:03.035504Z. Both app samples in this checkpoint are post-run observations.",
+  "historical_reference": {
+    "observed_at": "2026-11-06 06:02:02 UTC",
+    "url": "https://github.com/sharbel0022/Mgeorge/blob/5cd67b18792505139234de68533516fc33067ace/docs/quality8/gmail-schedule-0600-20261106/observation.json",
+    "is_fresh_pre_0700_baseline": false,
+    "note": "The older observation is context only. It cannot establish fresh gates or conditions at the actual 06:55 execution."
+  },
+  "result_binding": {
+    "last_run_id": "ee5e3cf2-0e54-832f-b443-b9e24ff2bc29",
+    "latest_result_run_id": "1e1f1aff-aa30-832f-8b25-cf2e30417745",
+    "latest_result_scheduled_for": "2026-11-06T02:00:00Z",
+    "matches": false,
+    "matching_0700_receipt_available": false,
+    "matching_0700_tool_call_trace_available": false,
+    "actual_scheduled_tool_calls": "not_established",
+    "scheduled_tool_unavailability_or_gate_reason": "not_established",
+    "latest_result_content_omitted": true,
+    "inference_from_duration": false
+  },
+  "prompt_observation": {
+    "supplied_prompt_change_time": "2026-11-06 06:11:25 UTC",
+    "supplied_change_time_is_independent_readback": false,
+    "observed_task_updated_at": "2026-11-06T06:55:24.615589+00:00",
+    "observed_prompt_file": "prompt-observed.txt",
+    "sanitized_prompt_sha256": "a838123c158ededad082d3cdf2f29640152c0c4f936c6ece3159869d0969ad6b",
+    "exact_one_time_condition": "Tillfällig diagnostik endast för schematillfället den 6 november 2026 kl. 07:00 UTC:",
+    "text_references": "A named scheduled occurrence (schematillfället) at 07:00 UTC.",
+    "explicit_scheduled_for_field_comparison": false,
+    "explicit_actual_wall_clock_condition": false,
+    "execution_prompt_snapshot_available": false,
+    "causal_claim_from_0655_or_no_update": false,
+    "limitation": "The currently stored prompt contains the one-time receipt requirement. This readback does not independently prove the exact prompt snapshot used during the earlier execution or explain the no_update."
+  },
+  "post_run_app_samples": {
+    "first_file": "first-post-run-app-status.json",
+    "first_observed_at": "2026-11-06 07:06:12 UTC",
+    "after_file": "after-app-status.json",
+    "after_observed_at": "2026-11-06 07:08:48 UTC",
+    "gmail_markers_unchanged": {
+      "last_invoked_at": "2026-11-06T04:05:48.841Z",
+      "last_completed_at": "2026-11-06T04:06:04.143Z",
+      "last_successful_fetch": "2026-11-06T04:06:01.714Z",
+      "all_equal_between_post_samples": true
+    },
+    "first_document_status_counts": {
+      "needs_review": 385,
+      "registered": 2,
+      "waiting_ocr": 64
+    },
+    "after_document_status_counts": {
+      "needs_review": 389,
+      "processing": 1,
+      "registered": 2,
+      "waiting_ocr": 59
+    },
+    "numeric_deltas_for_present_fields": {
+      "needs_review": 4,
+      "waiting_ocr": -5,
+      "registered": 0
+    },
+    "processing_count_note": "The first response omitted the processing key. The second explicitly reported processing=1; no zero was inserted into the original first sample.",
+    "cloud_progress_observed": true,
+    "cloud_first": {
+      "last_seen": "2026-11-06T03:55:08.200Z",
+      "last_completed": "2026-11-06T03:55:13.630Z",
+      "recent": false,
+      "last_processed": "2026-11-06T04:52:38.516Z"
+    },
+    "cloud_after": {
+      "last_seen": "2026-11-06T07:08:48.403Z",
+      "last_completed": "2026-11-06T07:08:37.370Z",
+      "recent": true,
+      "last_processed": "2026-11-06T07:07:36.122Z"
+    },
+    "cloud_progress_attributed_to_gmail0700": false
+  },
+  "separate_ocr_context": {
+    "provenance": "Separately reported operational observation; its run metadata/logs were not fetched in this Gmail-only task.",
+    "reported_observed_at": "2026-11-06T07:09:16Z",
+    "run_id": 42178783601,
+    "event": "workflow_run",
+    "reported_head_prefix": "cde9178",
+    "reported_created_at": "2026-11-06T07:07:21Z",
+    "reported_completed_at": "2026-11-06T07:09:12Z",
+    "reported_conclusion": "success",
+    "reported_trigger": "Successful exact-main Payment CI",
+    "reported_manual_ocr_invocation": false,
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42178783601",
+    "note": "This separate normal OCR activity overlaps the 07:08 app snapshot. It is not evidence of Gmail-automation tool calls."
+  },
+  "observer_actions": {
+    "clock_reads": 3,
+    "automation_peek_reads": 1,
+    "read_only_app_status_reads": 2,
+    "auto_sync_calls": 0,
+    "process_calls": 0,
+    "retry_calls": 0,
+    "run_now_calls": 0,
+    "prompt_or_schedule_changes": 0,
+    "publication_or_product_changes": 0,
+    "no_runtime_inference_of_tool_calls": true,
+    "operational_rating_increased": false
+  },
+  "privacy": {
+    "raw_task_saved": false,
+    "recursive_redaction_before_selection": true,
+    "excluded": [
+      "chat references",
+      "conversation IDs",
+      "thread IDs",
+      "account identifiers",
+      "email addresses",
+      "owner identities",
+      "environment metadata"
+    ],
+    "only_matching_result_text_eligible_for_retention": true
+  },
+  "checkpoint_base": {
+    "read_at": "2026-11-06T07:11:46.212Z",
+    "head": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+    "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19"
+  },
+  "checkpoint_scope": "docs/quality8/gmail-schedule-0700-20261106",
+  "conclusion": "The nominal 07:00 run has terminal no_update metadata but did not provide a matching receipt in this readback. Its tool calls and stop reasons remain unverified. A separate cloud OCR progression is visible in the later app snapshot."
+}

@@ -1,0 +1,45 @@
+{
+  "kind": "sanitized_automation_readback",
+  "read_started_at": "2026-11-06T07:06:12.039Z",
+  "observed_at_clock": "2026-11-06 07:06:12 UTC",
+  "read_completed_at": "2026-11-06T07:06:14.451Z",
+  "automation": {
+    "id": "Automation_6efa3aafab4081918c48001acc562f96",
+    "is_enabled": true,
+    "updated_at": "2026-11-06T06:55:24.615589+00:00",
+    "last_run_time": "2026-11-06T06:55:03.100071+00:00",
+    "next_run_time": null,
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "timing_mode": "exact_schedule",
+    "default_timezone": "Europe/Stockholm",
+    "last_run": {
+      "id": "ee5e3cf2-0e54-832f-b443-b9e24ff2bc29",
+      "scheduled_for": "2026-11-06T07:00:00Z",
+      "started_at": "2026-11-06T06:55:02.233321Z",
+      "completed_at": "2026-11-06T06:55:03.035504Z",
+      "recorded_status": "no_update"
+    },
+    "latest_result": {
+      "run_id": "1e1f1aff-aa30-832f-8b25-cf2e30417745",
+      "scheduled_for": "2026-11-06T02:00:00Z",
+      "created_at": "2026-11-06T01:59:08.543794Z",
+      "completed_at": "2026-11-06T01:59:08.700448Z",
+      "content_truncated": false,
+      "is_failure_message": false,
+      "requires_user_action": false
+    },
+    "latest_result_matches_0700_run": false,
+    "delivery_status": "unknown",
+    "prompt_file": "prompt-observed.txt",
+    "sanitized_prompt_sha256": "a838123c158ededad082d3cdf2f29640152c0c4f936c6ece3159869d0969ad6b"
+  },
+  "latest_result_content_retained": false,
+  "reason": "The latest_result run_id belongs to the 02:00 occurrence, not this 07:00 run. It is not used as this run's receipt or tool-call evidence.",
+  "privacy": {
+    "raw_task_retained": false,
+    "recursive_key_redaction": true,
+    "known_private_values_redacted_in_text": true,
+    "email_addresses_redacted": true,
+    "result_text_retained_only_on_matching_0700_run": false
+  }
+}

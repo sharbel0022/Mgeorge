@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "prefix": "docs/quality8/gmail-schedule-0700-20261106",
+  "base_head": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "run_id": "ee5e3cf2-0e54-832f-b443-b9e24ff2bc29",
+  "scheduled_for": "2026-11-06T07:00:00Z",
+  "excludes": [
+    "file-manifest.json",
+    "SHA256SUMS"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 5234,
+      "sha256": "daffecea02e632434be4456a87f530949c9fcab60caa914a364a76ee6b4f9ae6",
+      "git_blob_sha": "3819589dbd243b98fe846b13014f321f1997616f"
+    },
+    {
+      "path": "OBSERVATION.json",
+      "bytes": 6392,
+      "sha256": "1ef116d899f5840ba14928de78f94a332782dfbe8dac451dc2041060c00f82ff",
+      "git_blob_sha": "468be1a7ec49d46ea908446b249620a6ac2093df"
+    },
+    {
+      "path": "automation-readback.json",
+      "bytes": 1911,
+      "sha256": "7ae979e4abeb523cb615e05f11807aaa2a0a22718fd4f35553c9a5255954b8e9",
+      "git_blob_sha": "55acfc6aea01afc8ec3cbf833342a8d0ea6d9a07"
+    },
+    {
+      "path": "prompt-observed.txt",
+      "bytes": 2616,
+      "sha256": "a838123c158ededad082d3cdf2f29640152c0c4f936c6ece3159869d0969ad6b",
+      "git_blob_sha": "3f109da25a472fbdfb4257e1d7f20bf9cd5ce38c"
+    },
+    {
+      "path": "first-post-run-app-status.json",
+      "bytes": 1339,
+      "sha256": "35f10b8a1b75caaf5e62ad36f7015ec153c11ff2ea238d956b7511612f8938e4",
+      "git_blob_sha": "e29d4b7b865f28985843a029054b0bfb801ff7f5"
+    },
+    {
+      "path": "after-app-status.json",
+      "bytes": 1465,
+      "sha256": "36272037b523b9f48428bc17edefbe10ec2d7169bd9bb8eb042eb7eef5a11010",
+      "git_blob_sha": "f3fc73ddff3dd31716277cc425f3f32771ab3f28"
+    }
+  ]
+}
