@@ -41,9 +41,9 @@ async function fixture(t,{responses={}}={}){
  const runtime=await import(runtimeUrl),accounts=await import(compiled('banking/openpayments-account-state.ts',{'cloudflare:workers':envUrl,'../server':serverUrl,'./security':local('banking/security.ts')}));
  const sync=await import(compiled('banking/openpayments-company-sync.ts',{'../server':serverUrl,'../domain':local('domain.ts'),'../reconciliation-evidence':data('export const reconciliationPreviewWithOriginals=async()=>[];'),'./saas-runtime':runtimeUrl,'./openpayments-company-enrichment':data('export const enrichOpenPaymentsCompany=async()=>({state:"unavailable"});')}));
  async function call(name,{body,companyId='company-a',target=runtime,args,extra=[],query={},operation}={}){
-  let value;const handler=server.withCompanyRequest(async req=>{value=operation?await operation(req):await target[name](...(args??[req,companyId,...(body===undefined?[]:[body]),...extra]));return value instanceof Response?value:server.response(value);});
+  let value,error;const handler=server.withCompanyRequest(async req=>{try{value=operation?await operation(req):await target[name](...(args??[req,companyId,...(body===undefined?[]:[body]),...extra]));return value instanceof Response?value:server.response(value);}catch(caught){error=caught;throw caught;}});
   const response=await handler(new Request(`https://app.example/api/companies/${companyId}/bank?${new URLSearchParams(query)}`,{method:body===undefined?'GET':'POST',headers:{Origin:'https://app.example','X-Company-Id':companyId,'X-Company-Context-Version':String(context.contextVersion),Cookie:'__Host-mg-onboarding='+'a'.repeat(64),'Idempotency-Key':'synthetic-'+crypto.randomUUID(),...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})}));
-  return{status:response.status,data:response.status===303?{location:response.headers.get('location')}:await response.json(),value};
+  return{status:response.status,data:response.status===303?{location:response.headers.get('location')}:await response.json(),value,error};
  }
  async function saveActiveState(){
   const expiry='2099-01-01T00:00:00.000Z',codec={seal:(o,p,v)=>seal(key,o,p,v),unseal:(o,p,v)=>unseal(key,o,p,v)},resources=scopedResourceCodec({owner,companyId:context.companyId,connectionId:'connection-a',provider:'open_payments',environment:'PRODUCTION',generation:'g1'},codec);
@@ -226,4 +226,70 @@ for(const rotate of [false,true])test('stored active consent and an empty issuer
   assert.equal(workspace.transactions.length,1);assert.equal(workspace.transactions[0].amount,62500);assert.equal(workspace.transactions[0].verified,false);assert.deepEqual(workspace.allocations,[]);
  }
  assert.equal(f.provider.calls.filter(call=>new URL(call.url).pathname==='/connect/token').length,1);assert.equal(f.plainFetches(),0);
+});
+
+// Model the deployed pre-coordinator schema, independently of the coordinator
+// implementation. Requests must never install/reset control-plane state.
+function observeLegacySchema(f){
+ const schema=()=>f.f.sql.prepare("SELECT type,name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%' ORDER BY type,name").all();
+ const business=()=>['workspaces','saas_bank_state','bank_connections'].map(table=>({table,rows:f.f.sql.prepare(`SELECT * FROM ${table} ORDER BY owner`).all()}));
+ const before={schema:schema(),schemaVersion:f.f.sql.prepare('PRAGMA schema_version').get(),business:business()},queries=[],prepare=f.f.raw.prepare;
+ f.f.raw.prepare=function(query){queries.push(query);return prepare.call(this,query);};
+ return()=>{
+  assert.deepEqual(schema(),before.schema,'runtime must not install or reset the token schema');
+  assert.deepEqual(f.f.sql.prepare('PRAGMA schema_version').get(),before.schemaVersion);
+  assert.deepEqual(business(),before.business,'blocked bank reads must preserve consent and financial state');
+  assert.ok(queries.every(query=>!/^\s*(?:CREATE|ALTER|DROP|PRAGMA|VACUUM|ATTACH)\b/i.test(query)),'no request-path DDL');
+  assert.equal(f.provider.calls.length,0);assert.equal(f.plainFetches(),0);
+ };
+}
+
+for(const mode of ['unconfigured','disabled','missing-mtls-metadata'])test('pre-token schema keeps ordinary company reads available with '+mode+' Open Payments',async t=>{
+ const f=await fixture(t);await f.saveActiveState();
+ f.f.sql.exec('DROP TABLE company_application_tokens; DROP TABLE company_application_token_control;');
+ if(mode==='unconfigured')for(const key of ['SAAS_BANK_ENABLED','SAAS_OPENPAYMENTS_CONFIG','SAAS_OPENPAYMENTS_REGISTRATIONS','SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG','OPENPAYMENTS_MTLS'])delete f.env[key];
+ else if(mode==='disabled')f.env.SAAS_BANK_ENABLED='false';
+ else delete f.env.SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG;
+ const unchanged=observeLegacySchema(f);
+ const snapshot=await f.call('saasBankSnapshot');assert.equal(snapshot.status,200,JSON.stringify(snapshot.data));
+ assert.equal(snapshot.data.sync.state,'blocked');assert.equal(snapshot.data.sync.errorCode,'configuration_required');assert.ok(Object.values(snapshot.data.actions).every(value=>value===false));
+ const configuration=await f.call('saasBankSyncConfiguration');assert.equal(configuration.status,200,JSON.stringify(configuration.data));
+ assert.equal(configuration.data.serviceEnabled,false);assert.equal(configuration.data.enabled,false);assert.equal(configuration.data.syncEnabled,false);
+ const denied=await f.call('saasBankDiscovery');assert.notEqual(denied.status,200);assert.equal(denied.error.status,409);assert.equal(denied.error.code,'SAAS_BANK_DISABLED');
+ const workspace=await f.call('workspace',{operation:()=>f.server.readWorkspace(f.owner)});assert.equal(workspace.status,200,JSON.stringify(workspace.data));
+ unchanged();
+});
+
+for(const missing of ['both-tables','control-table','token-table','control-row'])test('configured production refuses '+missing+' without issuance, schema repair or economic changes',async t=>{
+ const f=await fixture(t);await f.saveActiveState();
+ if(missing==='both-tables'||missing==='token-table')f.f.sql.exec('DROP TABLE company_application_tokens;');
+ if(missing==='both-tables'||missing==='control-table')f.f.sql.exec('DROP TABLE company_application_token_control;');
+ if(missing==='control-row')f.f.sql.exec('DELETE FROM company_application_token_control;');
+ const unchanged=observeLegacySchema(f);
+ for(const name of ['saasBankSnapshot','saasBankSyncConfiguration','saasBankDiscovery']){
+  const result=await f.call(name);assert.notEqual(result.status,200,JSON.stringify(result.data));assert.equal(result.error.status,503);assert.equal(result.error.code,'APPLICATION_TOKEN_STORAGE_UNAVAILABLE');
+ }
+ const account=await f.call('readOpenPaymentsAccountState',{target:f.accounts,args:[f.owner]});assert.notEqual(account.status,200);assert.equal(account.error.status,409);assert.equal(account.error.code,'BANK_CONSENT_CHANGED');
+ const status=await f.call('status',{operation:async req=>(await f.sync.sitesOpenPaymentsCompanySync(req,'company-a')).status('account-a')});assert.notEqual(status.status,200);assert.equal(status.error.status,503);assert.equal(status.error.code,'APPLICATION_TOKEN_STORAGE_UNAVAILABLE');
+ const workspace=await f.call('workspace',{operation:()=>f.server.readWorkspace(f.owner)});assert.equal(workspace.status,200,JSON.stringify(workspace.data));
+ unchanged();
+});
+
+test('pre-token schema preserves the legacy actor workspace and blocked bank record',async t=>{
+ const f=await fixture(t),owner='synthetic-legacy-actor';
+ f.f.sql.exec('DROP TABLE company_application_tokens; DROP TABLE company_application_token_control;');
+ const payload=f.f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(f.owner).payload;
+ f.f.sql.prepare("INSERT INTO workspaces(owner,revision,payload,updated_at) VALUES(?,7,?,'2020-01-01T00:00:00.000Z')").run(owner,payload);
+ f.f.sql.prepare("INSERT INTO bank_connections(id,owner,app_generation,environment,bank_name,country,encrypted_session,encrypted_accounts,selected_accounts,valid_until,date_from,status,created_at,updated_at) VALUES(?,?,'synthetic-generation','PRODUCTION','Synthetic legacy bank','SE','','','[]','2020-01-01T00:00:00.000Z','2020-01-01','reauth_required','2020-01-01T00:00:00.000Z','2020-01-01T00:00:00.000Z')").run('synthetic-legacy-connection',owner);
+ f.principal.user={userId:owner,displayName:'Synthetic legacy actor'};
+ const unchanged=observeLegacySchema(f);
+ const handler=f.server.withCompanyRequest(async request=>{
+  const user=await f.server.identity(request),workspace=await f.server.readWorkspace(user.userId);
+  const bank=await f.server.db().prepare('SELECT id,status FROM bank_connections WHERE owner=?').bind(user.userId).first();
+  return f.server.response({workspace,bank,company:f.server.currentCompanyContext()??null});
+ });
+ const response=await handler(new Request('https://app.example/api/state'));
+ assert.equal(response.status,200);const result=await response.json();assert.equal(result.workspace.revision,7);assert.equal(result.company,null);
+ assert.deepEqual(result.bank,{id:'synthetic-legacy-connection',status:'reauth_required'});
+ unchanged();
 });
