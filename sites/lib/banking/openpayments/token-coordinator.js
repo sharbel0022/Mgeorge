@@ -29,11 +29,12 @@ export function assertOpenPaymentsTokenCoordinator(value,configuration){
  return value;
 }
 
-export function createOpenPaymentsTokenCoordinator({database,codec,configuration,transportIdentity,now=Date.now,assertCurrent}={}){
+export function createOpenPaymentsTokenCoordinator({database,codec,configuration,transportIdentity,certificateValidUntil,now=Date.now,assertCurrent}={}){
  assertServerRuntime();
  if(typeof database?.prepare!=='function'||typeof codec?.seal!=='function'||typeof codec?.unseal!=='function'||typeof assertCurrent!=='function'||typeof now!=='function'||!hex(transportIdentity))fail('PROVIDER_CONFIGURATION_INVALID');
  const config=validateOpenPaymentsConfig(configuration,now),familyKey=hash(['openpayments-app-v1',config.environment,config.clientId,'corporate']);
- const configHash=hash(['openpayments-config-v1',...configParts(config),transportIdentity]);
+ if(certificateValidUntil!==undefined&&!integer(certificateValidUntil,1,MAX_TIME)||config.environment==='PRODUCTION'&&certificateValidUntil===undefined)fail('INVALID_CLIENT_CERTIFICATE');
+ const configHash=hash(['openpayments-config-v1',...configParts(config),transportIdentity,certificateValidUntil??null]);
  const binding=Object.freeze({familyKey,configHash});
  const prepared=(sql,args)=>database.prepare(sql).bind(...args);
  async function first(sql,...args){try{return await prepared(sql,args).first();}catch{throw storage();}}
@@ -44,6 +45,7 @@ export function createOpenPaymentsTokenCoordinator({database,codec,configuration
  async function current(){
   await assertCurrent();
   if(config.credentialsValidUntil&&Date.parse(config.credentialsValidUntil)<=now())fail('CREDENTIALS_EXPIRED');
+  if(certificateValidUntil!==undefined&&certificateValidUntil<=now())fail('CLIENT_CERTIFICATE_EXPIRED');
  }
  async function control(allowRecovery=false){
   const row=await first(`SELECT *, (SELECT count(*) FROM ${CONTROL}) AS rows FROM ${CONTROL} WHERE id=1`);
@@ -63,7 +65,11 @@ export function createOpenPaymentsTokenCoordinator({database,codec,configuration
  }
  const row=async()=>validRow(await first(`SELECT *,${SQL_NOW} AS db_now FROM ${STATE} WHERE family_key=?`,familyKey));
  function active(value){if(value&&value.config_hash!==configHash)fail('APPLICATION_TOKEN_CONFIGURATION_CHANGED');return value;}
- async function read(){await current();const gate=await control();const value=active(await row());await current();return{gate,value};}
+ async function read(){
+  await current();const gate=await control(),value=active(await row()),fresh=await control();await current();
+  if(fresh.revision!==gate.revision)fail('APPLICATION_TOKEN_RECOVERY_REQUIRED');
+  if(value)Object.defineProperty(value,'controlRevision',{value:gate.revision});return{gate,value};
+ }
  async function ensure(){
   let {value}=await read();if(value)return value;
   await run(`INSERT INTO ${STATE}(family_key,config_hash,updated_at) SELECT ?,?,${SQL_NOW} WHERE ${READY} ON CONFLICT(family_key) DO NOTHING`,familyKey,configHash);
@@ -78,32 +84,35 @@ export function createOpenPaymentsTokenCoordinator({database,codec,configuration
   try{payload=await codec.unseal(bound,value.token_ciphertext);}catch{throw storage();}
   if(!isRecord(payload)||payload.version!==1||JSON.stringify(payload.binding)!==JSON.stringify(bound)||!safeText(payload.value,16384)||payload.expiresAt!==value.expires_at||!integer(payload.issuedAt,1,MAX_TIME)||payload.expiresAt>payload.issuedAt+MAX_TOKEN_MS||payload.expiresAt<=payload.issuedAt)throw storage();
   const fresh=(await read()).value;
+  if(fresh?.controlRevision!==value.controlRevision)fail('APPLICATION_TOKEN_RECOVERY_REQUIRED');
   if(!fresh||fresh.epoch!==value.epoch||fresh.token_version!==value.token_version||fresh.token_ciphertext!==value.token_ciphertext||fresh.expires_at<=fresh.db_now+minRemaining)fail('INVALID_ACCESS_TOKEN',401);
   const result=Object.freeze({value:payload.value,expiresAt:payload.expiresAt});receipts.set(result,{...bound,owner:capability});return result;
  }
  async function saveCooldown(error,owned){
   if(error?.code!=='PROVIDER_RATE_LIMIT')return;
   const {value}=await read();if(!value)throw storage();
+  if(owned&&value.controlRevision!==owned.controlRevision)fail('APPLICATION_TOKEN_RECOVERY_REQUIRED');
   const seconds=integer(error.retryAfter,1)?error.retryAfter:60;
   const blocked=error.retryBlocked===true||!integer(value.db_now+seconds*1000,0,MAX_TIME);
   const until=blocked?0:value.db_now+seconds*1000;
   const ownedSql=owned?' AND epoch=? AND lease_token=? AND fence=?':'';
   const args=owned?[owned.epoch,owned.lease_token,owned.fence]:[];
-  const changed=await run(`UPDATE ${STATE} SET cooldown_until=MAX(cooldown_until,?),cooldown_blocked=MAX(cooldown_blocked,?),last_safe_code='PROVIDER_RATE_LIMIT',${owned?"lease_token='',lease_until=0,uncertain_until=0,":''}revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=?${ownedSql} AND ${READY}`,until,blocked?1:0,familyKey,configHash,...args);
+  const changed=await run(`UPDATE ${STATE} SET cooldown_until=MAX(cooldown_until,?),cooldown_blocked=MAX(cooldown_blocked,?),last_safe_code='PROVIDER_RATE_LIMIT',${owned?"lease_token='',lease_until=0,uncertain_until=0,":''}revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=?${ownedSql} AND ${READY} AND (SELECT revision FROM ${CONTROL} WHERE id=1)=?`,until,blocked?1:0,familyKey,configHash,...args,value.controlRevision);
   if(changed!==1)fail('APPLICATION_TOKEN_LEASE_LOST');
  }
  async function cleanFailure(owned,error,sent){
   if(error?.code==='PROVIDER_RATE_LIMIT'&&!error.mayHaveSucceeded){await saveCooldown(error,owned);return;}
   // Before the internal dispatch fence succeeds no HTTP operation was allowed.
   // Afterwards even parse/codec failures leave a bounded uncertainty embargo.
-  await run(`UPDATE ${STATE} SET lease_token='',lease_until=0,${sent?'':"uncertain_until=0,"}last_safe_code=?,revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=? AND epoch=? AND lease_token=? AND fence=? AND ${READY}`,
-   error instanceof BankProviderError&&/^[A-Z_]{1,80}$/.test(error.code)?error.code:'PROVIDER_UNAVAILABLE_NETWORK',familyKey,configHash,owned.epoch,owned.lease_token,owned.fence);
+  await run(`UPDATE ${STATE} SET lease_token='',lease_until=0,${sent?'':"uncertain_until=0,"}last_safe_code=?,revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=? AND epoch=? AND lease_token=? AND fence=? AND ${READY} AND (SELECT revision FROM ${CONTROL} WHERE id=1)=?`,
+   error instanceof BankProviderError&&/^[A-Z_]{1,80}$/.test(error.code)?error.code:'PROVIDER_UNAVAILABLE_NETWORK',familyKey,configHash,owned.epoch,owned.lease_token,owned.fence,owned.controlRevision);
  }
  async function issueOwned(owned,issue){
   let sent=false;
   const assertBeforeSend=async()=>{
    if(sent)fail('APPLICATION_TOKEN_LEASE_LOST');
    const value=(await read()).value;
+   if(value?.controlRevision!==owned.controlRevision)fail('APPLICATION_TOKEN_RECOVERY_REQUIRED');
    if(!value||value.epoch!==owned.epoch||value.lease_token!==owned.lease_token||value.fence!==owned.fence||value.lease_until<=value.db_now)fail('APPLICATION_TOKEN_LEASE_LOST');
    sent=true;
   };
@@ -112,14 +121,14 @@ export function createOpenPaymentsTokenCoordinator({database,codec,configuration
    if(!sent)fail('APPLICATION_TOKEN_LEASE_LOST');
    if(!isRecord(parsed)||!safeText(parsed.value,16384)||!integer(parsed.seconds,1,3600))fail('INVALID_OAUTH_RESULT',502);
    await current();await control();
-   const expiresAt=Math.min(owned.updated_at+parsed.seconds*1000,config.credentialsValidUntil?Date.parse(config.credentialsValidUntil):MAX_TIME);
+   const expiresAt=Math.min(owned.updated_at+parsed.seconds*1000,config.credentialsValidUntil?Date.parse(config.credentialsValidUntil):MAX_TIME,certificateValidUntil??MAX_TIME);
    const tokenVersion=crypto.randomUUID(),bound=Object.freeze({...binding,epoch:owned.epoch,tokenVersion});
    const payload={version:1,binding:bound,value:parsed.value,expiresAt,issuedAt:owned.updated_at};let encrypted;
    try{encrypted=await codec.seal(bound,payload);}catch{throw storage();}
    if(typeof encrypted!=='string'||!encrypted||encrypted.length>32768||encrypted===parsed.value)throw storage();
    await current();await control();
-   const changes=await run(`UPDATE ${STATE} SET token_ciphertext=?,token_version=?,expires_at=?,lease_token='',lease_until=0,uncertain_until=0,last_safe_code='',revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=? AND epoch=? AND lease_token=? AND fence=? AND lease_until>${SQL_NOW} AND ?>${SQL_NOW} AND ${READY}`,
-    encrypted,tokenVersion,expiresAt,familyKey,configHash,owned.epoch,owned.lease_token,owned.fence,expiresAt);
+   const changes=await run(`UPDATE ${STATE} SET token_ciphertext=?,token_version=?,expires_at=?,lease_token='',lease_until=0,uncertain_until=0,last_safe_code='',revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=? AND epoch=? AND lease_token=? AND fence=? AND lease_until>${SQL_NOW} AND ?>${SQL_NOW} AND ${READY} AND (SELECT revision FROM ${CONTROL} WHERE id=1)=?`,
+    encrypted,tokenVersion,expiresAt,familyKey,configHash,owned.epoch,owned.lease_token,owned.fence,expiresAt,owned.controlRevision);
    if(changes!==1)fail('APPLICATION_TOKEN_LEASE_LOST');
    const value=(await read()).value;
    if(!value||value.token_version!==tokenVersion)fail('INVALID_ACCESS_TOKEN',401);
@@ -135,7 +144,7 @@ export function createOpenPaymentsTokenCoordinator({database,codec,configuration
    if(value.lease_token&&value.lease_until>value.db_now){if(attempt===30)fail('APPLICATION_TOKEN_BUSY',409,{retryable:true,retryAfter:1});await sleep(25);continue;}
    if(value.uncertain_until>value.db_now)fail('APPLICATION_TOKEN_UNCERTAIN',409,{retryable:true,retryAfter:Math.ceil((value.uncertain_until-value.db_now)/1000)});
    const lease=crypto.randomUUID();
-   const changes=await run(`UPDATE ${STATE} SET lease_token=?,lease_until=${SQL_NOW}+${LEASE_MS},uncertain_until=${SQL_NOW}+${LEASE_MS+DISPATCH_MS+MAX_TOKEN_MS},fence=fence+1,revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=? AND epoch=? AND revision=? AND lease_until<=${SQL_NOW} AND uncertain_until<=${SQL_NOW} AND cooldown_blocked=0 AND cooldown_until<=${SQL_NOW} AND expires_at<=${SQL_NOW}+30000 AND ${READY}`,lease,familyKey,configHash,value.epoch,value.revision);
+   const changes=await run(`UPDATE ${STATE} SET lease_token=?,lease_until=${SQL_NOW}+${LEASE_MS},uncertain_until=${SQL_NOW}+${LEASE_MS+DISPATCH_MS+MAX_TOKEN_MS},fence=fence+1,revision=revision+1,updated_at=${SQL_NOW} WHERE family_key=? AND config_hash=? AND epoch=? AND revision=? AND lease_until<=${SQL_NOW} AND uncertain_until<=${SQL_NOW} AND cooldown_blocked=0 AND cooldown_until<=${SQL_NOW} AND expires_at<=${SQL_NOW}+30000 AND ${READY} AND (SELECT revision FROM ${CONTROL} WHERE id=1)=?`,lease,familyKey,configHash,value.epoch,value.revision,value.controlRevision);
    if(changes!==1)continue;
    const owned=(await read()).value;
    if(!owned||owned.lease_token!==lease)fail('APPLICATION_TOKEN_LEASE_LOST');
@@ -146,6 +155,7 @@ export function createOpenPaymentsTokenCoordinator({database,codec,configuration
  const capability=Object.freeze({
   binding,
   async assertCurrent(){await read();},
+  async ensureRegistered(){await ensure();},
   async captureFence(){const {gate,value}=await read();return createOpenPaymentsTokenFence({database,...binding,epoch:value?.epoch||1,controlRevision:gate.revision});},
   access,
   async invalidate(value){

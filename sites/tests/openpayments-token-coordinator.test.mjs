@@ -148,3 +148,17 @@ test('a forged coordinator or a coordinator for another credential cannot reach 
  assert.throws(()=>new OpenPaymentsTokenClient(config,http,Date.now,{identity,coordinator:{access:async()=>({value:'forged'})}}),{code:'PROVIDER_CONFIGURATION_INVALID'});
  assert.throws(()=>new OpenPaymentsTokenClient({...configuration,clientSecret:'different'},http,Date.now,{identity,coordinator:f.create()}),{code:'PROVIDER_CONFIGURATION_INVALID'});
 });
+
+test('control generation changed during decrypt or queued state read fences the old receipt',async t=>{
+ const f=fixture(t);await f.create().access(f.issue);
+ const changed=f.create({codec:{...f.codec,async unseal(binding,value){const result=await f.codec.unseal(binding,value);f.db.exec('UPDATE company_application_token_control SET revision=revision+1');return result;}}});
+ await assert.rejects(changed.access(f.issue),{code:'APPLICATION_TOKEN_RECOVERY_REQUIRED'});assert.equal(f.calls(),1);
+ const raw=createCompanySyncDatabase(f.db);let rotate=true;
+ const database={prepare(query){const stmt=raw.prepare(query);const wrap=s=>({bind(...values){return wrap(s.bind(...values));},async first(){const result=await s.first();if(rotate&&query.startsWith('SELECT *,CAST')){rotate=false;f.db.exec('UPDATE company_application_token_control SET revision=revision+1');}return result;},run:()=>s.run()});return wrap(stmt);}};
+ await assert.rejects(f.create({database}).assertCurrent(),{code:'APPLICATION_TOKEN_RECOVERY_REQUIRED'});
+});
+test('explicit metadata registration does not issue a token and certificate expiry caps persisted lifetime',async t=>{
+ const f=fixture(t),until=Date.now()+120000,coordinator=f.create({certificateValidUntil:until});
+ await coordinator.ensureRegistered();assert.equal(f.calls(),0);assert.ok(f.row());assert.equal(f.row().token_ciphertext,'');
+ const token=await coordinator.access(f.issue);assert.equal(token.expiresAt,until);assert.equal(f.row().expires_at,until);
+});

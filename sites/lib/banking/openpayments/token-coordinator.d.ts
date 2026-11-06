@@ -11,6 +11,8 @@ export interface OpenPaymentsTokenCoordinator {
  readonly binding:Readonly<{familyKey:string;configHash:string}>;
  /** Read-only readiness; no token request and no first-family insertion. */
  assertCurrent():Promise<void>;
+ /** Explicit metadata bootstrap for an already authorized server operation. No token HTTP or DDL. */
+ ensureRegistered():Promise<void>;
  captureFence():Promise<OpenPaymentsTokenFence>;
  access(issue:(input:{startedAt:number;maxExpiresAt:number;assertBeforeSend():Promise<void>})=>Promise<{value:string;seconds:number}>):Promise<OpenPaymentsIssuedReceipt>;
  invalidate(receipt:OpenPaymentsIssuedReceipt):Promise<void>;
@@ -25,6 +27,7 @@ export function createOpenPaymentsTokenCoordinator(options:{
  codec:{seal(binding:OpenPaymentsTokenBinding,value:unknown):Promise<string>;unseal(binding:OpenPaymentsTokenBinding,ciphertext:string):Promise<unknown>};
  configuration:OpenPaymentsConfig;
  transportIdentity:string;
+ certificateValidUntil?:number;
  now?:()=>number;
  assertCurrent:()=>void|Promise<void>;
 }):OpenPaymentsTokenCoordinator;
