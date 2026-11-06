@@ -104,3 +104,11 @@ Exekveringsmiljön försvann under arbetet. Källan säkrades via GitHub; efter 
 - Accepterade resultat bevaras och kan återhämtas. Ett klientavbrott före första varaktiga serveracceptans kan fortfarande kräva ny extraktion av originalet; ingen beständig klient-outbox införs. Det är en uttrycklig garantigräns.
 - Saknade uppgifter och overifierad motpart kräver bättre dokumentevidens eller mänsklig granskning. 427 granskningsunderlag görs inte automatiskt gröna av köreparationen.
 - Ingen OCR-kvalitetspoäng eller generell produktionspoäng höjs på grund av syntetisk tillförlitlighetsverifiering. Senaste konservativa totalbedömningen 258,5/330 =7,83/10 behålls tills relevanta faktiska driftbevis finns.
+
+### Full CI found an older protocol assertion
+
+The complete Sites gate for candidate 57abcd83349cb73702c2ffe0fae3a3ee1c295473 ([run 42312898102](https://github.com/sharbel0022/Mgeorge/actions/runs/42312898102), job 128218504221) passed installation, types, both audits and production build, but finished **5869/5870** tests. The sole failure was quality-regressions-ocr-recovery.test.mjs expecting every lost completion response to reject, even after the newly negotiated receipt protocol proved the result was saved.
+
+That regression is now parameterized: legacy mode must still reject and never query receipts; receipt-v2 must confirm one matching receipt without resubmission. Both retain exactly one extraction, unchanged original bytes/hash/job/history, zero invoice registrations, and zero new extraction on a subsequent client run. Focused result: **2/2 passed**. No production code was changed for this correction. Fresh complete CI for the resulting head is the final gate recorded in the PR description.
+
+The completed earlier audit measured **0 production vulnerabilities** and **8 moderate development findings**, with **0 high/critical** findings. Dependency versions were not changed by this work.

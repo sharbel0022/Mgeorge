@@ -2,6 +2,8 @@
 
 [PR 67](https://github.com/sharbel0022/Mgeorge/pull/67) bygger på verifierad main f3c80629d4856c2f8ecbb1ed81be391a13ac6be8. Kandidaten ger bounded Gmail-deduplicering och korrelerbara schemakvitton, OCR-heartbeats/receipt-protokoll, återhämtning från tidiga avbrott, separata felklasser och ändliga återförsök. [Leveransrapport](docs/automation/document-automation-reliability.md), [kontrakt och återhämtningsplan](docs/automation/recovery-runbook.md), [färska driftobservationer](docs/automation/observations-2026-11-06.json).
 
+Full CI på den föregående kandidaten 57abcd8 fann ett äldre kvittoassertionsfall: Sites 5869/5870, övriga kvalitets-/säkerhetsjobb och Sites-bygge godkända. Testet täcker nu både strikt legacy-felhantering och verifierad receipt-v2-framgång, med 2/2 fokustester och oförändrade original-/dubblettassertioner. Ingen produktionskod ändrades i den korrigeringen; slutlig full CI krävs på aktuellt PR-head.
+
 Sammanfogad lokal fokuskontroll: Node 223/223 och Sites 341/341, 0 fail/cancel/skip/TODO. Rena fullständiga kvalitets-/säkerhetsgrindar på slutlig PR-kandidat redovisas i PR:s check-kvitton; tidigare kandidatjobb ersätter inte aktuell verifiering. Oberoende granskning reproducerade och ledde till rättningar av falska klientmarkörer, transient heartbeat-förlust, förlorad recovery-CAS och strömlimit.
 
 Status 23:18 UTC: 427 granskning, 47 OCR, 4 PDF, 60 färdiga i framflyttat 24-timmarsfönster. Ett faktiskt OCR-schemajobb 22:27 gav 6/0 på main, men regelbunden kvartskörning är inte styrkt. Gmail 23:00 gav åter no_update utan nytt automatiskt appkvitto. Ingen produktion eller verkliga scheman ändrades; ingen massbearbetning eller deployment genomfördes. AI-modelladaptern är orörd.
