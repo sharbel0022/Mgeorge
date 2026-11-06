@@ -1,0 +1,14 @@
+{
+  "observed_at": "2026-11-06 22:57 UTC",
+  "table": "workspaces",
+  "rows": 1,
+  "model_projection": {
+    "truncated": true,
+    "truncated_values": 1,
+    "omitted_columns": 0,
+    "omitted_rows": 0,
+    "next_offset": null
+  },
+  "complete_financial_baseline": false,
+  "reason": "Read-only projection truncated one payload value. Cannot certify all invoices, transactions or allocations from this response. No application or financial mutations performed by integration agent."
+}
