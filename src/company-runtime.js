@@ -49,6 +49,15 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
  controlDb.exec('BEGIN IMMEDIATE');
  try{
   controlDb.exec(readFileSync(new URL('../migrations/node/0001_company_catalog.sql',import.meta.url),'utf8'));
+  // A first installation can bootstrap metadata. A previously present but
+  // damaged gate must never be silently reset by INSERT OR IGNORE on restart.
+  const tokenControl=controlDb.prepare("SELECT type FROM sqlite_master WHERE name='company_application_token_control' COLLATE NOCASE").get();
+  const tokenState=controlDb.prepare("SELECT type FROM sqlite_master WHERE name='company_application_tokens' COLLATE NOCASE").get();
+  if(tokenState&&!tokenControl||tokenControl&&tokenControl.type!=='table'||tokenState&&tokenState.type!=='table')throw fail('APPLICATION_TOKEN_STORAGE_UNAVAILABLE',503);
+  if(tokenControl){
+   const gates=controlDb.prepare('SELECT * FROM company_application_token_control').all(),gate=gates[0];
+   if(gates.length!==1||gate.id!==1||!Number.isSafeInteger(gate.revision)||gate.revision<1||![0,1].includes(gate.recovery_required)||typeof gate.restore_marker!=='string'||gate.restore_marker.length>100||typeof gate.recovery_evidence!=='string'||gate.recovery_evidence.length>200)throw fail('APPLICATION_TOKEN_STORAGE_UNAVAILABLE',503);
+  }
   controlDb.exec(readFileSync(new URL('../sites/lib/banking/openpayments/token-coordinator.schema.sql',import.meta.url),'utf8'));
   const boundary=readCompanyDatabaseBoundary(controlDb);
   if(boundary){

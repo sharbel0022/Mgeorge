@@ -50,3 +50,20 @@ test('Node startup creates only central token metadata and tenant SQL cannot rea
  });
  const tenant=new DatabaseSync(runtime.databasePath(other));t.after(()=>tenant.close());assert.equal(tenant.prepare("SELECT count(*) n FROM sqlite_master WHERE name LIKE 'company_application_token%'").get().n,0);
 });
+
+test('Node restart never recreates a missing control gate over existing application state',t=>{
+ for(const kind of ['empty-control','missing-control']){
+  const dir=mkdtempSync(join(tmpdir(),'mg-token-restart-')),path=join(dir,'legacy.sqlite'),controlDb=openDatabase(path);controlDb.exec(schema);
+  t.after(()=>{controlDb.close();rmSync(dir,{recursive:true,force:true});});
+  if(kind==='empty-control')controlDb.exec('DELETE FROM company_application_token_control');else controlDb.exec('DROP TABLE company_application_token_control');
+  assert.throws(()=>createCompanyRuntime({controlDb,legacyDatabasePath:path}),{code:'APPLICATION_TOKEN_STORAGE_UNAVAILABLE'});
+  assert.equal(controlDb.prepare("SELECT count(*) n FROM sqlite_master WHERE name='company_application_token_control'").get().n,kind==='empty-control'?1:0);
+  if(kind==='empty-control')assert.equal(controlDb.prepare('SELECT count(*) n FROM company_application_token_control').get().n,0);
+ }
+});
+test('startup preserves an explicit restored control marker when rebuilding the empty state schema',t=>{
+ const dir=mkdtempSync(join(tmpdir(),'mg-token-restore-start-')),path=join(dir,'legacy.sqlite'),controlDb=openDatabase(path);controlDb.exec(schema);
+ controlDb.exec("UPDATE company_application_token_control SET recovery_required=1,restore_marker='synthetic-restored',revision=4; DROP TABLE company_application_tokens");
+ const before=controlDb.prepare('SELECT * FROM company_application_token_control').get(),runtime=createCompanyRuntime({controlDb,legacyDatabasePath:path});t.after(()=>{runtime.close();controlDb.close();rmSync(dir,{recursive:true,force:true});});
+ assert.deepEqual(controlDb.prepare('SELECT * FROM company_application_token_control').get(),before);assert.equal(controlDb.prepare('SELECT count(*) n FROM company_application_tokens').get().n,0);
+});
