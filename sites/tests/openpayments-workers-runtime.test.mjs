@@ -7,6 +7,7 @@ import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {stripTypeScriptTypes} from 'node:module';
 import {companyFixture} from './helpers/company-storage-fixture.mjs';
+import {changeCompanyMembership} from '../lib/company-storage.js';
 import {seal,unseal,randomToken} from '../lib/banking/security.ts';
 import {scopedResourceCodec} from '../lib/banking/bank-data-provider.js';
 import {fixtureTransport,CONFIG,CONSENT_ID,AUTH_ID,ACCOUNT_ID,TX,json} from './helpers/openpayments-fixture.mjs';
@@ -120,14 +121,62 @@ test('foreign company and owner cannot read account resources or start provider 
 });
 test('membership revocation during token response stops the next provider operation',async t=>{
  const f=await fixture(t),original=f.provider.transport.request;
- f.provider.transport.request=async(url,init)=>{const response=await original(url,init);if(new URL(url).pathname==='/connect/token')f.f.sql.prepare("UPDATE company_memberships SET status='revoked',membership_version=membership_version+1 WHERE company_id='company-a'").run();return response;};
+ await changeCompanyMembership(f.f.raw,f.scope,{actorId:'retained-owner',role:'owner',status:'active'});
+ f.provider.transport.request=async(url,init)=>{const response=await original(url,init);if(new URL(url).pathname==='/connect/token')f.f.sql.prepare("UPDATE company_memberships SET status='revoked',membership_version=membership_version+1 WHERE company_id='company-a' AND actor_id=?").run(f.context.actorId);return response;};
  assert.notEqual((await f.call('saasBankDiscovery')).status,200);assert.equal(f.provider.calls.length,1);assert.equal(new URL(f.provider.calls[0].url).pathname,'/connect/token');assert.equal(f.f.sql.prepare('SELECT count(*) n FROM saas_bank_state').get().n,0);
+ assert.equal(f.f.sql.prepare("SELECT status FROM company_memberships WHERE company_id='company-a' AND actor_id=?").get(f.context.actorId).status,'revoked');
 });
 for(const action of ['configuration','account-state'])test('binding rotation during stored '+action+' read fails closed without provider traffic',async t=>{
  const f=await fixture(t);await f.saveActiveState();const prepare=f.f.raw.prepare;let rotations=0;
  t.mock.method(f.f.raw,'prepare',function(query){const statement=prepare.call(this,query),bind=statement.bind;if(/FROM (?:main\.)?saas_bank_state\b/.test(query))statement.bind=function(...args){const bound=bind.apply(this,args),first=bound.first;bound.first=async function(...values){const row=await first.apply(this,values);rotations++;f.env.OPENPAYMENTS_MTLS={fetch:f.binding.fetch};return row;};return bound;};return statement;});
  const result=action==='configuration'?await f.call('saasBankSyncConfiguration'):await f.call('readOpenPaymentsAccountState',{target:f.accounts,args:[f.owner]});
  assert.equal(rotations,1,'the injected rotation occurred during the actual scoped SQL read');assert.notEqual(result.status,200);assert.equal(f.provider.calls.length,0);assert.equal(f.plainFetches(),0);
+});
+
+for(const action of ['snapshot','configuration','account-state','status'])test('membership revoked during the final issuer-registry read cannot produce a '+action+' projection',async t=>{
+ const f=await fixture(t);await f.saveActiveState();const prepare=f.f.raw.prepare;let reads=0,revokeAt=Infinity,revocations=0;
+ await changeCompanyMembership(f.f.raw,f.scope,{actorId:'retained-owner',role:'owner',status:'active'});
+ t.mock.method(f.f.raw,'prepare',function(query){
+  const statement=prepare.call(this,query),first=statement.first;
+  if(/FROM company_application_token_control WHERE id=1/.test(query))statement.first=async function(...args){
+   const row=await first.apply(this,args);reads++;
+   if(reads===revokeAt){f.f.sql.prepare("UPDATE company_memberships SET status='revoked',membership_version=membership_version+1 WHERE company_id='company-a' AND actor_id=?").run(f.context.actorId);revocations++;}
+   return row;
+  };
+  return statement;
+ });
+ const read=()=>action==='snapshot'?f.call('saasBankSnapshot'):action==='configuration'?f.call('saasBankSyncConfiguration'):action==='account-state'?f.call('readOpenPaymentsAccountState',{target:f.accounts,args:[f.owner]}):f.call('status',{operation:async req=>(await f.sync.sitesOpenPaymentsCompanySync(req,'company-a')).status('account-a')});
+ const allowed=await read();assert.equal(allowed.status,200,JSON.stringify(allowed.data));assert.ok(allowed.value);assert.ok(reads>0);
+ revokeAt=reads;reads=0;const before=f.f.sql.prepare('SELECT * FROM saas_bank_state').all(),result=await read();
+ assert.equal(revocations,1,'the membership was revoked inside the last actual coordinator SQL read');
+ assert.equal(f.f.sql.prepare("SELECT status FROM company_memberships WHERE company_id='company-a' AND actor_id=?").get(f.context.actorId).status,'revoked');
+ assert.notEqual(result.status,200,'the HTTP response must be denied');
+ assert.equal(result.value,undefined,'the internal read must reject before returning a company projection, even before the outer HTTP boundary checks it');
+ assert.deepEqual(f.f.sql.prepare('SELECT * FROM saas_bank_state').all(),before);assert.equal(f.provider.calls.length,0);assert.equal(f.plainFetches(),0);
+});
+
+test('membership revoked during the final global lease read stops token dispatch',async t=>{
+ async function observedFixture(revokeAt=Infinity){
+  const f=await fixture(t);await changeCompanyMembership(f.f.raw,f.scope,{actorId:'retained-owner',role:'owner',status:'active'});
+  const prepare=f.f.raw.prepare,request=f.provider.transport.request;let reads=0,atDispatch=0,revocations=0;
+  t.mock.method(f.f.raw,'prepare',function(query){
+   const statement=prepare.call(this,query),first=statement.first;
+   if(/FROM company_application_token_control WHERE id=1/.test(query))statement.first=async function(...args){
+    const row=await first.apply(this,args);reads++;
+    if(reads===revokeAt){f.f.sql.prepare("UPDATE company_memberships SET status='revoked',membership_version=membership_version+1 WHERE company_id='company-a' AND actor_id=?").run(f.context.actorId);revocations++;}
+    return row;
+   };
+   return statement;
+  });
+  f.provider.transport.request=async(url,init)=>{if(new URL(url).pathname==='/connect/token')atDispatch=reads;return request(url,init);};
+  return{...f,counts:()=>({reads,atDispatch,revocations})};
+ }
+ const baseline=await observedFixture(),allowed=await baseline.call('saasBankDiscovery');
+ assert.equal(allowed.status,200,JSON.stringify(allowed.data));assert.equal(baseline.provider.calls.filter(call=>new URL(call.url).pathname==='/connect/token').length,1);
+ const point=baseline.counts().atDispatch;assert.ok(point>0);
+ const f=await observedFixture(point),result=await f.call('saasBankDiscovery');
+ assert.equal(f.counts().revocations,1);assert.equal(f.f.sql.prepare("SELECT status FROM company_memberships WHERE company_id='company-a' AND actor_id=?").get(f.context.actorId).status,'revoked');
+ assert.notEqual(result.status,200);assert.equal(f.provider.calls.length,0,'a revoked caller must not dispatch even the app-token POST after the shared lease await');assert.equal(f.plainFetches(),0);
 });
 
 test('two separate Sites requests reuse the verified binding app-token state',async t=>{

@@ -19,7 +19,8 @@ export async function readOpenPaymentsAccountState(owner:string){
  const configuration=JSON.parse(values.SAAS_OPENPAYMENTS_CONFIG||'null'),config=validateOpenPaymentsConfig(configuration);
  const mtls=configuredOpenPaymentsWorkersTransport({configuration:config,environment:()=>env as unknown as Record<string,unknown>});
  const coordinator=mtls?createSitesOpenPaymentsTokenCoordinator({configuration,mtls,environment:()=>env as unknown as Record<string,unknown>}):null;
- const guard=async()=>{const live=await companyBoundaryForOwner(owner);if(!live||live.companyId!==boundary.companyId||keys.some((k,i)=>(env as unknown as Record<string,string>)[k]!==pin[i]))throw denied();try{mtls?.assertCurrent();await coordinator?.assertCurrent();mtls?.assertCurrent();}catch{throw denied();}};
+ const assertBoundary=async()=>{const live=await companyBoundaryForOwner(owner);if(!live||live.companyId!==boundary.companyId||keys.some((k,i)=>(env as unknown as Record<string,string>)[k]!==pin[i]))throw denied();};
+ const guard=async()=>{await assertBoundary();try{mtls?.assertCurrent();await coordinator?.assertCurrent();mtls?.assertCurrent();}catch{throw denied();}await assertBoundary();try{mtls?.assertCurrent();}catch{throw denied();}};
  if(config.environment!=='SANDBOX'&&!mtls||!config.features.includes('accounts')||!config.features.includes('transactions'))throw denied();
  const registrations=JSON.parse(values.SAAS_OPENPAYMENTS_REGISTRATIONS||'null');if(!Array.isArray(registrations))throw denied();
  const row=await db().prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').bind(owner).first<{revision:number;payload:string}>();await guard();if(!row)throw denied();

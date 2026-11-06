@@ -40,6 +40,14 @@ Tidigare fel har behållits i råloggarna. De omfattar en förväntan på asynkr
 
 Huvudagentens fullständiga, källbundna releasegrind och exakta-head-CI krävs fortfarande efter integration. Dessa fokuskörningar ersätter inte den grinden.
 
+### Oberoende granskning av sista asynkrona behörighetskontrollen
+
+En efterföljande raceprobe återkallar ett verkligt syntetiskt medlemskap under den sista globala issuerläsningen. Före rättningen returnerade fyra interna läsvägar en projektion: snapshot, synkkonfiguration, kontoauktoritet och synkstatus. Den yttersta HTTP-kontrollen nekade fortfarande svaret. Sites kontrollerar nu företagsgräns/medlemskap även efter koordinatorns await och kontrollerar därefter den pinnade serverkonfigurationen synkront.
+
+En separat probe återkallar medlemskapet under den sista delade lease-läsningen före tokenPOST. Den reproducerade ett enda felaktigt skickat anrop. Den delade TokenClient-/koordinatorrättningen `2200b2a` kör därför den anropsspecifika guarden efter lease-läsningen och före markering av att anropet kan ha skickats; ingen företagsguard lagras i global tokenstat. Samma Sites-probe passerar med rättningen.
+
+Tester skapar en extra syntetisk owner och verifierar att den avsedda medlemmen faktiskt har status `revoked`; annars skulle databasskyddet för bolagets sista owner stoppa själva testmutationen. Den tidigare token-response-regressionen har stärkts på samma sätt. Fyra nya läsracefall och det stärkta tidigare fallet gav först 1/5 PASS; dispatchfallet gav 0/1 PASS. Efter båda rättningarna passerar 96/96 fokuserade tester i sex Sitesfiler, utan skip/cancel/TODO, och TypeScript med `--noEmit --incremental false` ger exit 0. De separata resultaten överlappar och får inte adderas till tidigare 163/163.
+
 ## Driftsgränser
 
 D1 samordnar Workers som använder samma databas. Node samordnar processer som delar den centrala lokala SQLite-filen. Om Node och Sites använder samma providerapp samtidigt men separata databaser krävs en utsedd utfärdare eller separata providerappar; implementationen påstår inte samordning över oberoende databaser. Byte eller återställning av en sådan kontrollplansdatabas kräver avstängd provider-egress och det dokumenterade operatörsförfarandet.

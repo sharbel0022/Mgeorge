@@ -16,7 +16,10 @@ async function runtime(request:Request,companyId:string,providerOptions?:OpenPay
  const mtls=configuredOpenPaymentsWorkersTransport({configuration:providerConfig,environment:settings});
  const coordinator=mtls?createSitesOpenPaymentsTokenCoordinator({configuration:providerConfig,mtls,environment:settings}):null;
  const pin=configurationKeys.map(key=>config[key]);
- const guard=async()=>{await identity();if(configurationKeys.some((key,index)=>settings()[key]!==pin[index]))throw new ConsentError('CONSENT_APPLICATION_CHANGED',409);mtls?.assertCurrent();await coordinator?.assertCurrent();mtls?.assertCurrent();};
+ const assertConfiguration=()=>{if(configurationKeys.some((key,index)=>settings()[key]!==pin[index]))throw new ConsentError('CONSENT_APPLICATION_CHANGED',409);mtls?.assertCurrent();};
+ // The application registry is global. Its asynchronous read cannot stand in
+ // for the caller's membership, which may change while that read is pending.
+ const guard=async()=>{await identity();assertConfiguration();await coordinator?.assertCurrent();await identity();assertConfiguration();};
  const codec={seal:(o:string,p:string,v:unknown)=>seal(key,o,p,v),unseal:(o:string,p:string,v:string)=>unseal(key,o,p,v)};
  const store={async read(){const row=await db().prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').bind(owner).first<{revision:number;payload:string}>();return row?{revision:row.revision,value:await unseal<Record<string,unknown>>(key,owner,'saas-bank-state',row.payload)}:{revision:0,value:null};},async compareAndSet(expected:number,value:unknown){const payload=await seal(key,owner,'saas-bank-state',value);await guard();const result=expected===0?await db().prepare('INSERT OR IGNORE INTO saas_bank_state(owner,revision,payload) VALUES(?,1,?)').bind(owner,payload).run():await db().prepare('UPDATE saas_bank_state SET revision=revision+1,payload=? WHERE owner=? AND revision=?').bind(payload,owner,expected).run();return result.meta.changes===1;}};
  const registration=parsed(config.SAAS_OPENPAYMENTS_REGISTRATIONS)?.find((entry:Record<string,unknown>)=>entry.companyId===companyId&&entry.actorId===context.actorId);
@@ -45,8 +48,9 @@ export async function saasBankSyncConfiguration(request:Request,companyId:string
  const values=settings(),registration=parsed(values.SAAS_OPENPAYMENTS_REGISTRATIONS)?.find((entry:Record<string,unknown>)=>entry.companyId===companyId&&entry.actorId===context.actorId),config=parsed(values.SAAS_OPENPAYMENTS_CONFIG);
  const mtls=configuredOpenPaymentsWorkersTransport({configuration:config,environment:settings}),pin=configurationKeys.map(key=>values[key]);
  const coordinator=mtls?createSitesOpenPaymentsTokenCoordinator({configuration:config,mtls,environment:settings}):null;
- const assertTransportCurrent=async()=>{mtls?.assertCurrent();await coordinator?.assertCurrent();mtls?.assertCurrent();};
- const guard=async()=>{await identity();if(configurationKeys.some((key,index)=>settings()[key]!==pin[index]))throw new ConsentError('CONSENT_APPLICATION_CHANGED',409);await assertTransportCurrent();};
+ const assertConfiguration=()=>{if(configurationKeys.some((key,index)=>settings()[key]!==pin[index]))throw new ConsentError('CONSENT_APPLICATION_CHANGED',409);mtls?.assertCurrent();};
+ const assertTransportCurrent=async()=>{await identity();assertConfiguration();await coordinator?.assertCurrent();await identity();assertConfiguration();};
+ const guard=assertTransportCurrent;
  const serviceEnabled=values.SAAS_BANK_ENABLED==='true'&&(config?.environment==='SANDBOX'||!!mtls);
  const enabled=serviceEnabled&&registration?.verified===true&&registration?.corporateAccessVerified===true&&registration?.redirectVerified===true;
  const row=await db().prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').bind(user.userId).first<{revision:number;payload:string}>();
