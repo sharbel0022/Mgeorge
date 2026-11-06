@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {DatabaseSync} from 'node:sqlite';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -322,4 +323,32 @@ test('an initialized Node runtime never treats vanished central control tables a
   }));
   assert.equal(calls,0);assert.equal(reserved(f.database),0);
   assert.equal(result.ai.status,'blocked');assert.equal(result.ai.code,'AI_RECOVERY_UNAVAILABLE');
+});
+
+test('a fresh physical company partition remains usable without a local control plane',async t=>{
+  const f=nodeFixture(t),runtime=createCompanyRuntime({
+    controlDb:f.database,legacyDatabasePath:f.path,companyDirectory:join(f.folder,'companies'),
+  });
+  try{
+    const verification={status:'verified',evidenceId:'synthetic-reviewed-binding',verifiedBy:'local-admin'};
+    const legacy=runtime.bindLegacyCompany({companyId:'synthetic-legacy-company',name:'Synthetic legacy',
+      actorId:'local-admin',storageOwner:'local-admin',verification});
+    runtime.provisionCompany({companyId:'synthetic-fresh-company',name:'Synthetic fresh',actorId:'local-admin',verification});
+    const context=runtime.selectActiveCompany({actorId:'local-admin',companyId:'synthetic-fresh-company',contextVersion:legacy.contextVersion});
+    const local=new DatabaseSync(runtime.databasePath(context),{readOnly:true});
+    try{assert.equal(local.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE name IN ('company_application_tokens','company_application_token_control')").get().n,0);}
+    finally{local.close();}
+    let calls=0;
+    const result=await runtime.run(context,async()=>{
+      assert.equal(runtime.db.invoiceAiRecoveryStatus(),null);
+      const bytes=positionedInvoicePdf(),stored=storeDocument(runtime.db,{name:'synthetic-fresh.pdf',mime_type:'application/pdf',bytes});
+      const row=runtime.db.prepare('SELECT * FROM documents WHERE id=?').get(stored.id);
+      const baseline=interpretInvoice('',{direction:'supplier'});
+      baseline.documentRead={validated:true,sha256:row.fingerprint,mime:'application/pdf',pageCount:1};
+      return enrichNodeInvoice(runtime.db,row,baseline,{
+        environment:environment(context.storageOwner),adapter:async()=>{calls++;return{status:'fallback',code:'SYNTHETIC_UNAVAILABLE'};},
+      });
+    });
+    assert.equal(calls,1);assert.equal(result.ai.code,'SYNTHETIC_UNAVAILABLE');
+  }finally{runtime.close();}
 });

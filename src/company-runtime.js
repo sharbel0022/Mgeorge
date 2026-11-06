@@ -216,7 +216,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
     return ()=>{
      if(storage.getStore()!==scope||closed)throw fail('company_context_mismatch');
      assertScope(scope,'read');
-     const control=readNodeInvoiceAiRecoveryStatus(controlDb);
+     const control=readNodeInvoiceAiRecoveryStatus(controlDb,{requireControl:true});
      const local=bundle.db===controlDb?null:readNodeInvoiceAiRecoveryStatus(bundle.db);
      assertScope(scope,'read');
      return control||local;

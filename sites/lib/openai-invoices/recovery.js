@@ -14,13 +14,13 @@ function status(rows){
   // blocked; this module deliberately provides no recovery-release operation.
   return row.recovery_required===1||row.restore_marker!==''?'AI_RECOVERY_REQUIRED':null;
 }
-export function readNodeInvoiceAiRecoveryStatus(database){
+export function readNodeInvoiceAiRecoveryStatus(database,{requireControl=false}={}){
   try{
     const tables=database.prepare("SELECT name,type FROM sqlite_master WHERE name COLLATE NOCASE IN ('company_application_token_control','company_application_tokens')").all();
     const control=tables.find(row=>row.name.toLowerCase()===CONTROL),tokens=tables.find(row=>row.name.toLowerCase()===STATE);
     // Fresh standalone/company data databases predate the optional control
     // plane. A partial or malformed control plane is never treated as fresh.
-    if(!control&&!tokens)return null;
+    if(!control&&!tokens)return requireControl?'AI_RECOVERY_UNAVAILABLE':null;
     if(control?.type!=='table'||tokens&&tokens.type!=='table')return 'AI_RECOVERY_UNAVAILABLE';
     return status(database.prepare(QUERY).all());
   }catch{return 'AI_RECOVERY_UNAVAILABLE';}
