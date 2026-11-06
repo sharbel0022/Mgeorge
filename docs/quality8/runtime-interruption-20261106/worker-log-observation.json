@@ -1,0 +1,15 @@
+{
+  "errorsQueryCount": 0,
+  "queryWindowMinutes": 20,
+  "allQueryCount": 1,
+  "events": [
+    {
+      "timestamp": 1793941789354,
+      "outcome": "ok",
+      "method": "POST",
+      "level": "info",
+      "type": "cf-worker-event"
+    }
+  ],
+  "absenceDoesNotProveNoRequests": true
+}
