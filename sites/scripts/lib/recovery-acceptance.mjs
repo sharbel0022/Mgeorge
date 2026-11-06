@@ -9,9 +9,28 @@ import {join} from 'node:path';
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const EMPTY_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs','bankgiro_ingest_leases','companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard','company_application_tokens'];
 export const sortedRecoveryRows=rows=>rows.map(row=>Object.fromEntries(Object.entries(row).sort(([a],[b])=>a.localeCompare(b)))).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)));
-export function acceptIsolatedRecovery({directory,owner,tables,originals,incidentAt,recoveryPointAt}){
+export function acceptIsolatedRecovery({directory,owner,tables,originals,incidentAt,recoveryPointAt,provenance}){
+ // These expectations must be retained from the authenticated export BEFORE
+ // restore. A receipt cannot establish its own backup identity or source hashes.
+ assert.ok(provenance&&typeof provenance==='object'&&!Array.isArray(provenance),'pre-restore provenance required');
+ assert.match(provenance.backupId,/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i);
+ assert.match(provenance.snapshotSha256,/^[a-f0-9]{64}$/);
+ const sourceFiles=['bundle.json','manifest.bin','snapshot.bin'];
+ assert.ok(provenance.sourceFiles&&typeof provenance.sourceFiles==='object'&&!Array.isArray(provenance.sourceFiles));
+ assert.deepEqual(Object.keys(provenance.sourceFiles).sort(),sourceFiles);
  const receipt=JSON.parse(readFileSync(join(directory,'receipt.json'),'utf8'));
+ assert.equal(receipt.format,'MG-Sites-evidence-restore-1');
  assert.equal(receipt.mode,'evidence-only');assert.equal(receipt.schemaPrefix,'evidence_');assert.equal(receipt.owner,owner);
+ assert.equal(receipt.backupId,provenance.backupId);
+ assert.deepEqual(receipt.companyBoundary,provenance.companyBoundary);
+ assert.equal(receipt.snapshotSha256,provenance.snapshotSha256);
+ const companyJobs=tables.find(table=>table.name==='company_bank_sync_jobs');
+ assert.deepEqual(receipt.transforms,companyJobs?[{table:'company_bank_sync_jobs',kind:'invalidate_job_leases',rows:companyJobs.rows.length}]:[]);
+ assert.deepEqual(readdirSync(join(directory,'source')).sort(),sourceFiles);
+ for(const filename of sourceFiles){
+  assert.match(provenance.sourceFiles[filename],/^[a-f0-9]{64}$/);
+  assert.equal(sha(readFileSync(join(directory,'source',filename))),provenance.sourceFiles[filename],'retained source mismatch: '+filename);
+ }
  const timestamp=value=>{assert.equal(typeof value,'string');const time=Date.parse(value);assert.ok(Number.isFinite(time));assert.equal(new Date(time).toISOString(),value);return time;};
  const rpoMilliseconds=timestamp(incidentAt)-timestamp(recoveryPointAt);assert.ok(rpoMilliseconds>=0);
  const databasePath=join(directory,'evidence.sqlite'),sql=new DatabaseSync(databasePath,{readOnly:true});
@@ -46,5 +65,5 @@ export function acceptIsolatedRecovery({directory,owner,tables,originals,inciden
  assert.deepEqual(receipt.originals,{count:originals.length,bytes});
  const sum=(rows,field)=>rows.reduce((total,row)=>{assert.ok(Number.isSafeInteger(row[field]));const next=total+row[field];assert.ok(Number.isSafeInteger(next));return next;},0);
  const ledger={invoices:state.invoices.length,invoiceCents:sum(state.invoices,'total'),transactions:state.transactions.length,transactionCents:sum(state.transactions,'amount'),allocations:state.allocations.length,allocatedCents:sum(state.allocations,'amount'),revokedCredits:state.credits.filter(row=>row.revokedAt).length,revokedBankgiroLinks:state.bankgiroLinks.filter(row=>row.revokedAt).length};
- return{tables:receipt.tables,originals:{count:originals.length,bytes,hashesChecked:originals.length},ledger,rpoMilliseconds,otherOwnerExcluded:true,authorizationAndTransientRowsAbsent:true,workerLeasesInvalidated:true,applicationTokenRecoveryBlocked:true};
+ return{tables:receipt.tables,originals:{count:originals.length,bytes,hashesChecked:originals.length},ledger,rpoMilliseconds,otherOwnerExcluded:true,authorizationAndTransientRowsAbsent:true,workerLeasesInvalidated:true,applicationTokenRecoveryBlocked:true,sourceProvenanceVerified:true};
 }

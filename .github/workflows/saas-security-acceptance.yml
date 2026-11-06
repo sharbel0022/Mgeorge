@@ -2,7 +2,7 @@ name: SaaS security acceptance
 
 on:
   push:
-    branches: ['feature/saas-*']
+    branches: ['main', 'feature/saas-*']
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -13,6 +13,12 @@ permissions:
 concurrency:
   group: saas-security-${{ github.ref }}
   cancel-in-progress: true
+
+# A PR checkout is GitHub's tested merge commit. Preserve its PR head/base
+# separately so a merge-ref receipt cannot be presented as a head-SHA receipt.
+env:
+  SAAS_EVIDENCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  SAAS_EVIDENCE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
 
 jobs:
   security_acceptance:
@@ -34,13 +40,47 @@ jobs:
       - name: Install verified Sites dependencies
         working-directory: sites
         run: npm run install:ci
-      - name: Exercise synthetic authorization, isolation and recovery boundaries
+      - name: Exercise synthetic authorization, isolation, migrations and recovery boundaries
         run: node scripts/run-saas-security-acceptance.mjs "$RUNNER_TEMP/saas-security-acceptance"
+      - name: Require fresh complete security evidence for this checkout
+        run: node scripts/verify-saas-release-evidence.mjs security "$RUNNER_TEMP/saas-security-acceptance" "$GITHUB_SHA"
       - name: Retain synthetic acceptance evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: saas-security-${{ github.sha }}
           path: ${{ runner.temp }}/saas-security-acceptance
+          if-no-files-found: error
+          retention-days: 14
+
+  full_synthetic_recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            sites/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Install verified Sites dependencies
+        working-directory: sites
+        run: npm run install:ci
+      - name: Export and restore 430 synthetic originals into a fresh isolated destination
+        run: node scripts/run-saas-recovery-acceptance.mjs "$RUNNER_TEMP/saas-recovery-acceptance"
+      - name: Require complete recovery provenance and negative controls for this checkout
+        run: node scripts/verify-saas-release-evidence.mjs recovery "$RUNNER_TEMP/saas-recovery-acceptance" "$GITHUB_SHA"
+      - name: Retain aggregate synthetic recovery evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: saas-recovery-${{ github.sha }}
+          path: ${{ runner.temp }}/saas-recovery-acceptance
           if-no-files-found: error
           retention-days: 14
