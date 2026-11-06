@@ -8,11 +8,16 @@ export function createStartupResources(t,folder){
   if(current){try{current.exec('ROLLBACK');}finally{current.close();}}
  };
  const cleanup=()=>cleanupPromise??=(async()=>{
-  if(child&&child.exitCode===null&&child.signalCode===null)child.kill();
+  if(child&&child.exitCode===null&&child.signalCode===null)child.kill('SIGKILL');
   if(closed)await closed;
   try{releaseHolder();}finally{rmSync(folder,{recursive:true,force:true});}
  })();
- // RED baseline: the caller invokes cleanup only from its own finally.
+ // The event listener starts teardown immediately; the caller and after hook
+ // await the same promise and report any cleanup error.
+ const onAbort=()=>{void cleanup().catch(()=>{});};
+ t.after(cleanup);
+ t.signal.addEventListener('abort',onAbort,{once:true});
+ if(t.signal.aborted){onAbort();throw t.signal.reason;}
  return {
   hold(value){holder=value;return value;},
   watch(value){

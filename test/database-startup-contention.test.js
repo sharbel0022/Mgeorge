@@ -49,6 +49,7 @@ test('opening a prepared WAL database uses its bounded busy wait before contenti
   for(const [stream,read,write]of [[child.stdout,()=>stdout,value=>stdout=value],[child.stderr,()=>stderr,value=>stderr=value]])stream.on('data',bytes=>{const prior=read(),room=8192-prior.length;if(bytes.length>room)truncated=true;if(room>0)write(Buffer.concat([prior,bytes.subarray(0,room)]));});
   terminal=resources.watch(child);
   const exit=await terminal;
+  if(t.signal.aborted)return;
   resources.releaseHolder();holder=undefined;
   const db=openDatabase(path);
   try{
@@ -62,7 +63,10 @@ test('opening a prepared WAL database uses its bounded busy wait before contenti
    assert.equal(db.prepare('SELECT COUNT(*) n FROM audit_events').get().n,before.audits);
    assert.deepEqual(Buffer.from(db.prepare("SELECT content FROM import_jobs WHERE name='startup-original.csv'").get().content),original);
   }finally{db.close();}
-  const details=JSON.parse(stdout.toString('utf8'));
+  const rawDiagnostic=JSON.stringify({exit,stdout:stdout.toString('utf8'),stderr:stderr.toString('utf8'),truncated});
+  let details;
+  try{details=JSON.parse(stdout.toString('utf8'));}
+  catch(cause){throw new Error('Synthetic startup contender returned invalid JSON: '+rawDiagnostic,{cause});}
   const diagnostic=JSON.stringify({exit,details,stderr:stderr.toString('utf8'),truncated});
   assert.equal(truncated,false,diagnostic);assert.equal(exit.code,1,diagnostic);assert.equal(exit.signal,null,diagnostic);
   assert.equal(details.opened,false,diagnostic);assert.equal(details.code,'ERR_SQLITE_ERROR',diagnostic);assert.equal(details.errcode,5,diagnostic);
