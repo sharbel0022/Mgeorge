@@ -1,0 +1,200 @@
+{
+  "base": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "red": "9c1078cadfbca8923213f066cef1476c612796c6",
+  "product": "92b6fefe60c31d8f862f6d93f2d422e777801390",
+  "producerDocs": "7a0d08cf0f686d975baac8bc30205e245d10aacf",
+  "reviewWorktree": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree",
+  "productDiffNumstat": {
+    "sites/lib/banking/service.ts": {
+      "added": 14,
+      "removed": 6
+    }
+  },
+  "files": {
+    "sites/lib/banking/service.ts": {
+      "sha256": {
+        "base": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+        "red": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+        "product": "cc3114a7bb7a9e4d013a50d7740d9b1f1389a47861a46c44d47e9b061d8e628d",
+        "docs": "cc3114a7bb7a9e4d013a50d7740d9b1f1389a47861a46c44d47e9b061d8e628d"
+      },
+      "redEqualsProduct": false,
+      "productEqualsDocs": true
+    },
+    "sites/lib/banking/enable-banking.ts": {
+      "sha256": {
+        "base": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+        "red": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+        "product": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+        "docs": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/lib/banking/account-read-guard.ts": {
+      "sha256": {
+        "base": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+        "red": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+        "product": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+        "docs": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/lib/banking/account-read-cooldown.ts": {
+      "sha256": {
+        "base": "b6f497a7a7e366db27913b91f2e3203439a685909a969576ef379d7bfb2aa0fb",
+        "red": "b6f497a7a7e366db27913b91f2e3203439a685909a969576ef379d7bfb2aa0fb",
+        "product": "b6f497a7a7e366db27913b91f2e3203439a685909a969576ef379d7bfb2aa0fb",
+        "docs": "b6f497a7a7e366db27913b91f2e3203439a685909a969576ef379d7bfb2aa0fb"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/lib/banking/store.ts": {
+      "sha256": {
+        "base": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+        "red": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+        "product": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+        "docs": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/lib/banking/mcp.ts": {
+      "sha256": {
+        "base": "540feddea3b884af0609af884fc3a29e928bf2f04e37addcff361630a674a0d2",
+        "red": "540feddea3b884af0609af884fc3a29e928bf2f04e37addcff361630a674a0d2",
+        "product": "540feddea3b884af0609af884fc3a29e928bf2f04e37addcff361630a674a0d2",
+        "docs": "540feddea3b884af0609af884fc3a29e928bf2f04e37addcff361630a674a0d2"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/lib/bank-consent-policy.js": {
+      "sha256": {
+        "base": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+        "red": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+        "product": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+        "docs": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/lib/bank-consent-policy.d.ts": {
+      "sha256": {
+        "base": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+        "red": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+        "product": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+        "docs": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/tests/banking-security.test.mjs": {
+      "sha256": {
+        "base": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+        "red": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+        "product": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+        "docs": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/tests/bank-sync-integrity-q8.test.mjs": {
+      "sha256": {
+        "base": "194f8f1ce1c8d55c6c5def2ead86f7ec055f8e82018841534b66bb1ed5711535",
+        "red": "a4e83822f6814e97b62ec1443b8f3adeabb1a1fdea9cffe91f5b688a08fc7dfb",
+        "product": "a4e83822f6814e97b62ec1443b8f3adeabb1a1fdea9cffe91f5b688a08fc7dfb",
+        "docs": "a4e83822f6814e97b62ec1443b8f3adeabb1a1fdea9cffe91f5b688a08fc7dfb"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/tests/company-bank-sync.test.mjs": {
+      "sha256": {
+        "base": "d1d30f9a68506087441a5e41e71eea739cd608819d2bc3d68e8487ab9544c15e",
+        "red": "460ca88c5538cfb5b48f7a7706b7e2dd67740f6b5e494e05267f86bdf10cf6fd",
+        "product": "460ca88c5538cfb5b48f7a7706b7e2dd67740f6b5e494e05267f86bdf10cf6fd",
+        "docs": "460ca88c5538cfb5b48f7a7706b7e2dd67740f6b5e494e05267f86bdf10cf6fd"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "sites/package-lock.json": {
+      "sha256": {
+        "base": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+        "red": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+        "product": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+        "docs": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    },
+    "scripts/saas-test-isolation.mjs": {
+      "sha256": {
+        "base": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+        "red": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+        "product": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80",
+        "docs": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80"
+      },
+      "redEqualsProduct": true,
+      "productEqualsDocs": true
+    }
+  },
+  "producerPreservedRuns": {
+    "red": {
+      "returncode": 1,
+      "counts": {
+        "tests": 37,
+        "suites": 0,
+        "pass": 12,
+        "fail": 25,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "7a1add3166f8c6668de3d2b6fdacd33f6e7f814832ad526a9e7924233adb4f88",
+      "logBytes": 48993,
+      "receipt": "docs/quality8/bank-details-failure-projection/red.json"
+    },
+    "green": {
+      "returncode": 0,
+      "counts": {
+        "tests": 37,
+        "suites": 0,
+        "pass": 37,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "373339110525e1ebd5fb2ad988131d929c910607642b08bc58a84d6cd00d929e",
+      "logBytes": 9497,
+      "receipt": "docs/quality8/bank-details-failure-projection/green.json"
+    },
+    "service-regressions": {
+      "returncode": 0,
+      "counts": {
+        "tests": 357,
+        "suites": 0,
+        "pass": 357,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "logSha256": "6251b4e1264af18d58883220dfcdabc625defe546af9fcc07e027c9490c42b04",
+      "logBytes": 90166,
+      "receipt": "docs/quality8/bank-details-failure-projection/service-regressions.json"
+    },
+    "typecheck": {
+      "returncode": 0,
+      "counts": {},
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logBytes": 0,
+      "receipt": "docs/quality8/bank-details-failure-projection/typecheck.json"
+    }
+  },
+  "reviewerRuntime": "v24.22.1"
+}

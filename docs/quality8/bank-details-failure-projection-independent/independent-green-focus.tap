@@ -1,0 +1,232 @@
+TAP version 13
+# Subtest: reviewer: provider failure on the fifth result withholds all partial usage
+ok 1 - reviewer: provider failure on the fifth result withholds all partial usage
+  ---
+  duration_ms: 600.941421
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP expired session remains a denied bounded diagnosis
+ok 2 - usage details failure projection: real HTTP expired session remains a denied bounded diagnosis
+  ---
+  duration_ms: 295.072107
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP account access remains a denied bounded diagnosis
+ok 3 - usage details failure projection: real HTTP account access remains a denied bounded diagnosis
+  ---
+  duration_ms: 375.798665
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis
+ok 4 - usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis
+  ---
+  duration_ms: 289.340481
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis
+ok 5 - usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis
+  ---
+  duration_ms: 288.127519
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP application access remains a denied bounded diagnosis
+ok 6 - usage details failure projection: real HTTP application access remains a denied bounded diagnosis
+  ---
+  duration_ms: 273.900119
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP user context remains a denied bounded diagnosis
+ok 7 - usage details failure projection: real HTTP user context remains a denied bounded diagnosis
+  ---
+  duration_ms: 296.495652
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP bank action remains a denied bounded diagnosis
+ok 8 - usage details failure projection: real HTTP bank action remains a denied bounded diagnosis
+  ---
+  duration_ms: 244.509317
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP timeout remains a denied bounded diagnosis
+ok 9 - usage details failure projection: real HTTP timeout remains a denied bounded diagnosis
+  ---
+  duration_ms: 252.822547
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP service failure remains a denied bounded diagnosis
+ok 10 - usage details failure projection: real HTTP service failure remains a denied bounded diagnosis
+  ---
+  duration_ms: 250.649494
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis
+ok 11 - usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis
+  ---
+  duration_ms: 285.684305
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP redirect remains a denied bounded diagnosis
+ok 12 - usage details failure projection: real HTTP redirect remains a denied bounded diagnosis
+  ---
+  duration_ms: 241.592776
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter absent currency exposes only field and kind
+ok 13 - usage details failure projection: adapter absent currency exposes only field and kind
+  ---
+  duration_ms: 210.523817
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter null account type exposes only field and kind
+ok 14 - usage details failure projection: adapter null account type exposes only field and kind
+  ---
+  duration_ms: 347.89146
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter string primary resource exposes only field and kind
+ok 15 - usage details failure projection: adapter string primary resource exposes only field and kind
+  ---
+  duration_ms: 257.173109
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter array currency exposes only field and kind
+ok 16 - usage details failure projection: adapter array currency exposes only field and kind
+  ---
+  duration_ms: 272.92109
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter object account type exposes only field and kind
+ok 17 - usage details failure projection: adapter object account type exposes only field and kind
+  ---
+  duration_ms: 226.238368
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter number currency exposes only field and kind
+ok 18 - usage details failure projection: adapter number currency exposes only field and kind
+  ---
+  duration_ms: 219.388306
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter different UID exposes only field and kind
+ok 19 - usage details failure projection: adapter different UID exposes only field and kind
+  ---
+  duration_ms: 207.70136
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter invalid alias scheme exposes only field and kind
+ok 20 - usage details failure projection: adapter invalid alias scheme exposes only field and kind
+  ---
+  duration_ms: 215.994441
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: invalid JSON has a trusted code without an invented field
+ok 21 - usage details failure projection: invalid JSON has a trusted code without an invented field
+  ---
+  duration_ms: 197.359133
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: transport failure exposes a fixed code and keeps its fixed log
+ok 22 - usage details failure projection: transport failure exposes a fixed code and keeps its fixed log
+  ---
+  duration_ms: 256.27186
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: constructor code survives hostile public getters
+ok 23 - usage details failure projection: constructor code survives hostile public getters
+  ---
+  duration_ms: 182.786978
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: plain fields cannot supply trusted provider metadata
+ok 24 - usage details failure projection: plain fields cannot supply trusted provider metadata
+  ---
+  duration_ms: 171.72867
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: borrowed prototype cannot supply trusted provider metadata
+ok 25 - usage details failure projection: borrowed prototype cannot supply trusted provider metadata
+  ---
+  duration_ms: 163.480371
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: proxy cannot supply trusted provider metadata
+ok 26 - usage details failure projection: proxy cannot supply trusted provider metadata
+  ---
+  duration_ms: 163.936947
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: revoked proxy cannot supply trusted provider metadata
+ok 27 - usage details failure projection: revoked proxy cannot supply trusted provider metadata
+  ---
+  duration_ms: 145.641513
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: unknown constructor code cannot supply trusted provider metadata
+ok 28 - usage details failure projection: unknown constructor code cannot supply trusted provider metadata
+  ---
+  duration_ms: 161.574037
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: plain Error cannot supply trusted provider metadata
+ok 29 - usage details failure projection: plain Error cannot supply trusted provider metadata
+  ---
+  duration_ms: 164.441745
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: null cannot supply trusted provider metadata
+ok 30 - usage details failure projection: null cannot supply trusted provider metadata
+  ---
+  duration_ms: 159.7873
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: contract failure after a valid detail withholds every usage count
+ok 31 - usage details failure projection: contract failure after a valid detail withholds every usage count
+  ---
+  duration_ms: 315.304238
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: audit failure suppresses even a trusted provider failure
+ok 32 - usage details failure projection: audit failure suppresses even a trusted provider failure
+  ---
+  duration_ms: 132.22081
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: context shift at audit suppresses even a trusted provider failure
+ok 33 - usage details failure projection: context shift at audit suppresses even a trusted provider failure
+  ---
+  duration_ms: 153.217657
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: context shift during read suppresses even a trusted provider failure
+ok 34 - usage details failure projection: context shift during read suppresses even a trusted provider failure
+  ---
+  duration_ms: 138.049215
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: deadline during read suppresses even a trusted provider failure
+ok 35 - usage details failure projection: deadline during read suppresses even a trusted provider failure
+  ---
+  duration_ms: 190.73319
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: unresolved read marker cannot retain a masked provider cause
+ok 36 - usage details failure projection: unresolved read marker cannot retain a masked provider cause
+  ---
+  duration_ms: 220.893126
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: the real MCP error preserves the same safe projection
+ok 37 - usage details failure projection: the real MCP error preserves the same safe projection
+  ---
+  duration_ms: 286.816755
+  type: 'test'
+  ...
+1..37
+# tests 37
+# suites 0
+# pass 37
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9435.330916

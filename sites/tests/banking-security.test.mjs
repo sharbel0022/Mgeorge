@@ -107,7 +107,7 @@ async function fixture(t, environment = 'PRODUCTION', { actualProvider = false }
   const normalizerUrl = compiledModule('../lib/banking/transactions.ts', { '../domain': domain, '../payment-references.js': new URL('../lib/payment-references.js', import.meta.url).href });
   const storeUrl = compiledModule('../lib/banking/store.ts', { 'cloudflare:workers': cloudflare, '@/lib/server': serverUrl, './security': security, './runtime-config': runtimeConfig, './transactions': normalizerUrl });
   const providerFunctions = ['getApplication', 'listBusinessBanks', 'startAuth', 'createSession', 'getSession', 'getAccountDetails', 'deleteSession', 'getTransactions'];
-  const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
+  const providerUrl = actualProvider ? new URL('../lib/banking/enable-banking.ts', import.meta.url).href : jsUrl(`export {ProviderError,providerCooldownDiagnostic,providerErrorCode,providerResponseDiagnostic} from ${JSON.stringify(new URL('../lib/banking/enable-banking.ts', import.meta.url).href)};` + providerFunctions.map(name => `export async function ${name}(...args){const f=globalThis[${JSON.stringify(key)}];f.calls.push({name:${JSON.stringify(name)},args});return f.provider[${JSON.stringify(name)}](...args);}`).join('\n'));
   const readGuardUrl = compiledModule('../lib/banking/account-read-guard.ts', { '../server': serverUrl, './store': storeUrl, './enable-banking': providerUrl });
   const openPaymentsSchedulerUrl = compiledModule('../lib/banking/openpayments-scheduler.ts', { 'cloudflare:workers': cloudflare, '../server': serverUrl });
   const serviceUrl = compiledModule('../lib/banking/service.ts', { '@/lib/server': serverUrl, '@/lib/domain': domain, './enable-banking': providerUrl, './transactions': normalizerUrl, './store': storeUrl, './security': security, './runtime-config': runtimeConfig, './account-read-guard': readGuardUrl, './openpayments-scheduler':openPaymentsSchedulerUrl, './company-sync':jsUrl('export async function dispatchCompanyAutomaticSync(){return null;}'), '../bankgiro-ingest-service':jsUrl(`export async function runBankgiroSource(owner){globalThis[${JSON.stringify(key)}].reportOwner=owner;return {enabled:false,state:'DISABLED'};}`),'../customer-messages': jsUrl(`export async function reconcileAndPrepare(){if(globalThis[${JSON.stringify(key)}].reconcileError)throw Error('synthetic postprocessing failure');}`) });
@@ -2047,7 +2047,7 @@ test('reviewer: provider failure on the fifth result withholds all partial usage
  const f=await usageDetailsFixture(t,5),before={...f.connection()};let calls=0;
  f.provider.getAccountDetails=async(_config,uid)=>{if(++calls===5)throw new ProviderError('BANK_TIMEOUT','PRIVATE_LAST_RESULT',504,true);return structuredClone(f.usageDetails.get(uid));};
  const {body}=await usageDetailsDenial(f);
- assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_PROVIDER_UNAVAILABLE',targetCount:5,attemptedCount:5,observedCount:4});
+ assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_PROVIDER_UNAVAILABLE',targetCount:5,attemptedCount:5,observedCount:4,providerFailure:{code:'BANK_TIMEOUT'}});
  assert.equal(calls,5);assert.ok(!JSON.stringify(body).includes('PRIVATE_LAST_RESULT'));
  assert.deepEqual({...f.connection()},before);assertNoFinancialEffects(f);
 });
@@ -2128,4 +2128,133 @@ test('reviewer I1 followup: conflict on the fifth actual-adapter result withhold
  assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_ACCOUNT_CONFLICT',targetCount:5,attemptedCount:5,observedCount:4});
  assert.ok(!('usage' in body.usageDetailsDiagnostic));
  for(const account of f.retainedUsageAccounts)assert.ok(!JSON.stringify(body).includes(account.uid));
+});
+
+// Site 66 returned an unavailable details attempt without a cause. Exercise the
+// real error constructors and HTTP adapter; the diagnostic must never repair
+// the original denial or reflect any upstream value, message or public getter.
+const detailsFailureSecret='PRIVATE_DETAILS_FAILURE_SECRET';
+function assertDetailsFailure(f,body,providerFailure,{size=1,attempted=1,observed=0}={}){
+ assert.equal(body.code,'BANK_ACCOUNT_SCOPE_INVALID');assert.equal(body.reason,'ACCOUNT_USAGE_INVALID');
+ assert.deepEqual(body.usageDiagnostic,usageDiagnostic({explicitNull:size},{omitted:size},size));
+ assert.deepEqual(body.usageDetailsDiagnostic,{version:usageDetailsVersion,status:'unavailable',reason:'DETAILS_PROVIDER_UNAVAILABLE',targetCount:size,attemptedCount:attempted,observedCount:observed,...(providerFailure?{providerFailure}:{})});
+ assert.ok(!('usage' in body.usageDetailsDiagnostic));
+ assert.deepEqual(f.calls.map(call=>call.name),['getSession',...Array(attempted).fill('getAccountDetails')]);
+ const serialized=JSON.stringify(body);
+ for(const value of [detailsFailureSecret,remoteSession,...f.retainedUsageAccounts.flatMap(account=>[account.uid,account.identification_hash,account.account_id.other.identification])])assert.ok(!serialized.includes(value));
+ assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n,1);
+ assertNoFinancialEffects(f);
+}
+
+for(const [name,status,providerCode,want,headers]of [
+ ['expired session',400,'EXPIRED_SESSION','BANK_RECONNECT_REQUIRED',{}],
+ ['account access',400,'ASPSP_ACCOUNT_NOT_ACCESSIBLE','BANK_ACCOUNT_UNAVAILABLE',{}],
+ ['missing resource',404,'UNRECOGNIZED','BANK_RESOURCE_UNAVAILABLE',{}],
+ ['server authorization',401,'UNAUTHORIZED_ACCESS','PROVIDER_AUTHORIZATION_FAILED',{}],
+ ['application access',403,'ACCESS_DENIED','PROVIDER_ACCESS_DENIED',{}],
+ ['user context',400,'PSU_HEADER_NOT_PROVIDED','BANK_USER_CONTEXT_REQUIRED',{}],
+ ['bank action',400,'ASPSP_PSU_ACTION_REQUIRED','BANK_ACTION_REQUIRED',{}],
+ ['timeout',408,'ASPSP_TIMEOUT','BANK_TIMEOUT',{}],
+ ['service failure',503,'UNRECOGNIZED','BANK_SERVICE_ERROR',{}],
+ ['rate limit',429,'RATE_LIMIT','BANK_RATE_LIMIT',{'Retry-After':'120'}],
+ ['redirect',302,'UNRECOGNIZED','PROVIDER_REDIRECT_DENIED',{}],
+])test('usage details failure projection: real HTTP '+name+' remains a denied bounded diagnosis',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true});
+ f.detailsResponse=()=>new Response(JSON.stringify({error:providerCode,message:detailsFailureSecret,private:detailsFailureSecret}),{status,headers});
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assertDetailsFailure(f,body,{code:want});
+ assert.deepEqual({...f.connection(),account_evidence_retry:before.account_evidence_retry},before);
+ if(want==='BANK_RATE_LIMIT')assert.ok(accountReadCooldown(f.connection().account_evidence_retry).blocked);
+ else assert.equal(f.connection().account_evidence_retry,before.account_evidence_retry);
+});
+
+for(const [name,mutate,field,kind]of [
+ ['absent currency',value=>delete value.currency,'currency','absent'],
+ ['null account type',value=>value.cash_account_type=null,'cash_account_type','null'],
+ ['string primary resource',value=>value.account_id=detailsFailureSecret,'account_id','string'],
+ ['array currency',value=>value.currency=[detailsFailureSecret],'currency','array'],
+ ['object account type',value=>value.cash_account_type={private:detailsFailureSecret},'cash_account_type','object'],
+ ['number currency',value=>value.currency=42,'currency','other'],
+ ['different UID',value=>value.uid=extraLegacyUid,'uid','string'],
+ ['invalid alias scheme',value=>value.all_account_ids=[{identification:detailsFailureSecret,scheme_name:detailsFailureSecret.toLowerCase()}],'all_account_ids[].scheme_name','string'],
+])test('usage details failure projection: adapter '+name+' exposes only field and kind',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true});mutate(f.usageDetails.get(accountUid));
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assertDetailsFailure(f,body,{code:'INVALID_PROVIDER_RESPONSE',validationIssue:{field,kind}});
+ assert.deepEqual({...f.connection()},before);assert.ok(!JSON.stringify(body).includes(extraLegacyUid));
+});
+
+test('usage details failure projection: invalid JSON has a trusted code without an invented field',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true});f.detailsResponse=()=>new Response(detailsFailureSecret,{status:200});
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assertDetailsFailure(f,body,{code:'INVALID_PROVIDER_RESPONSE'});assert.deepEqual({...f.connection()},before);
+});
+
+test('usage details failure projection: transport failure exposes a fixed code and keeps its fixed log',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true}),logs=[];t.mock.method(console,'error',(...args)=>logs.push(args));
+ f.detailsResponse=()=>{throw Error(detailsFailureSecret);};
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assertDetailsFailure(f,body,{code:'BANK_NETWORK_ERROR'});assert.deepEqual(logs,[['BANK_PROVIDER_TRANSPORT_ERROR']]);assert.deepEqual({...f.connection()},before);
+});
+
+test('usage details failure projection: constructor code survives hostile public getters',async t=>{
+ const f=await usageDetailsFixture(t),failure=new ProviderError('BANK_TIMEOUT',detailsFailureSecret,504,true);let reads=0;
+ for(const key of ['code','message','status','retryAfter','providerFailure','validationIssue'])Object.defineProperty(failure,key,{get(){reads++;throw Error(detailsFailureSecret);}});
+ f.provider.getAccountDetails=async()=>{throw failure;};
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assertDetailsFailure(f,body,{code:'BANK_TIMEOUT'});assert.equal(reads,0);assert.deepEqual({...f.connection()},before);
+});
+
+for(const name of ['plain fields','borrowed prototype','proxy','revoked proxy','unknown constructor code','plain Error','null'])test('usage details failure projection: '+name+' cannot supply trusted provider metadata',async t=>{
+ const f=await usageDetailsFixture(t);let reads=0,failure;
+ const hostile=()=>{reads++;throw Error(detailsFailureSecret);};
+ if(name==='plain fields')failure={code:'INVALID_PROVIDER_RESPONSE',message:detailsFailureSecret,validationIssue:{field:'currency',kind:'null'}};
+ if(name==='borrowed prototype')failure=Object.assign(Object.create(ProviderError.prototype),{code:'BANK_TIMEOUT',message:detailsFailureSecret});
+ if(name==='proxy')failure=new Proxy(new ProviderError('BANK_TIMEOUT',detailsFailureSecret),{get:hostile,getPrototypeOf:hostile});
+ if(name==='revoked proxy'){const proxy=Proxy.revocable(new ProviderError('BANK_TIMEOUT',detailsFailureSecret),{});proxy.revoke();failure=proxy.proxy;}
+ if(name==='unknown constructor code')failure=new ProviderError(detailsFailureSecret,detailsFailureSecret);
+ if(name==='plain Error')failure=Object.assign(Error(detailsFailureSecret),{code:'BANK_TIMEOUT'});
+ if(name==='null')failure=null;
+ f.provider.getAccountDetails=async()=>{throw failure;};
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assertDetailsFailure(f,body,undefined);assert.equal(reads,0);assert.deepEqual({...f.connection()},before);
+});
+
+test('usage details failure projection: contract failure after a valid detail withholds every usage count',async t=>{
+ const f=await usageDetailsFixture(t,3,{actualProvider:true});delete f.usageDetails.get(f.retainedUsageAccounts[1].uid).currency;
+ const before={...f.connection()},{body}=await usageDetailsDenial(f);
+ assertDetailsFailure(f,body,{code:'INVALID_PROVIDER_RESPONSE',validationIssue:{field:'currency',kind:'absent'}},{size:3,attempted:2,observed:1});assert.deepEqual({...f.connection()},before);
+});
+
+for(const name of ['audit failure','context shift at audit','context shift during read','deadline during read'])test('usage details failure projection: '+name+' suppresses even a trusted provider failure',async t=>{
+ const f=await usageDetailsFixture(t,2),batch=f.d1.batch.bind(f.d1);let clock=Date.now();t.mock.method(Date,'now',()=>clock);f.live.access.valid_until=new Date(clock+30000).toISOString();
+ f.provider.getAccountDetails=async()=>{
+  if(name==='context shift during read')f.sql.prepare("UPDATE bank_connections SET selected_accounts='[]'").run();
+  if(name==='deadline during read')clock+=31000;
+  throw new ProviderError('BANK_TIMEOUT',detailsFailureSecret,504,true);
+ };
+ f.d1.batch=async statements=>{
+  if(failedAuditBatch(statements)){
+   if(name==='audit failure')throw Error(detailsFailureSecret);
+   if(name==='context shift at audit')f.sql.prepare("UPDATE bank_connections SET selected_accounts='[]'").run();
+  }
+  return batch(statements);
+ };
+ const {body}=await usageDetailsDenial(f);
+ assert.deepEqual(f.calls.map(call=>call.name),['getSession','getAccountDetails']);assert.ok(!('usageDiagnostic' in body));assert.ok(!('usageDetailsDiagnostic' in body));assert.ok(!JSON.stringify(body).includes(detailsFailureSecret));assertNoFinancialEffects(f);
+});
+
+test('usage details failure projection: unresolved read marker cannot retain a masked provider cause',async t=>{
+ const f=await usageDetailsFixture(t),batch=f.d1.batch.bind(f.d1);let failed=false;
+ f.provider.getAccountDetails=async()=>{failed=true;throw new ProviderError('BANK_TIMEOUT',detailsFailureSecret,504,true);};
+ f.d1.batch=async statements=>{if(failed&&statements.some(s=>/UPDATE bank_connections SET account_evidence_retry=/.test(s.sql)))throw Error(detailsFailureSecret);return batch(statements);};
+ const {body}=await usageDetailsDenial(f);assertDetailsFailure(f,body,undefined);assert.ok(accountReadCooldown(f.connection().account_evidence_retry).blocked);
+});
+
+test('usage details failure projection: the real MCP error preserves the same safe projection',async t=>{
+ const f=await usageDetailsFixture(t,1,{actualProvider:true});f.usageDetails.get(accountUid).cash_account_type=null;
+ const before={...f.connection()},route=await independentScopeRoute(t,f),response=await route.POST(independentScopeRequest()),envelope=await response.json();
+ assert.equal(response.status,200);assert.equal(envelope.result.isError,true);assert.equal(response.headers.get('cache-control'),'private, no-store');
+ assertDetailsFailure(f,envelope.result.structuredContent,{code:'INVALID_PROVIDER_RESPONSE',validationIssue:{field:'cash_account_type',kind:'null'}});
+ assert.deepEqual(JSON.parse(envelope.result.content[0].text),envelope.result.structuredContent);assert.deepEqual({...f.connection()},before);
 });

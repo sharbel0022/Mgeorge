@@ -1,0 +1,32 @@
+{
+  "closed": [
+    {
+      "id": "REVIEW_HARNESS_KEY",
+      "initialFailure": "independent failure projection: actual adapter issue survives hostile public code and issue getters",
+      "classification": "reviewer fixture setup",
+      "rootCause": "Changing ENABLE_BANKING_PRIVATE_KEY after seed changes application() runtime generation and stops before the first provider read. It cannot exercise the new catch.",
+      "evidence": "baseline-harness-controls.tap: runtime-generation control, 409, zero provider calls, generationChanged=true",
+      "correction": "Pass a fresh synthetic RSA key to the mocked provider boundary only; leave seeded runtime unchanged. Existing code/issue/getter/privacy/count assertions retained.",
+      "resolvedBy": "independent-probes-v2: actual adapter issue survives hostile public code and issue getters"
+    },
+    {
+      "id": "REVIEW_HARNESS_AUTH",
+      "initialFailure": "independent failure projection: owner lost after audit commit suppresses the complete diagnostic",
+      "classification": "reviewer expectation for the wrong authorization boundary",
+      "rootCause": "The shared usageDetailsDenial helper requires an authorized ConsentError/409. Dropping authentication after the failed audit invokes the pre-existing AUTH_REQUIRED/401 boundary.",
+      "evidence": "baseline-harness-controls.tap: authentication-after-audit control, 401, two provider calls, one committed failed audit, no ConsentError",
+      "correction": "Require exact 401 response keys and signIn, no diagnostics, cache no-store and preserved state for auth loss. Authorized cases still require original 409/code/reason.",
+      "resolvedBy": "independent-probes-v2: owner lost after audit commit suppresses the complete diagnostic"
+    },
+    {
+      "id": "REVIEW_ENV_SYMLINK",
+      "classification": "reviewer dependency layout",
+      "rootCause": "The existing minimatch integrity gate correctly rejects a node_modules directory symlink before TypeScript runs.",
+      "evidence": "independent-typecheck.tap",
+      "correction": "Copy the matching producer dependencies into the isolated worktree as a physical directory; do not alter or bypass the guard.",
+      "resolvedBy": "independent-typecheck-physical.json"
+    }
+  ],
+  "initialRunsPreserved": true,
+  "productChangedToResolveHarnessIssues": false
+}

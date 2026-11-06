@@ -1,0 +1,25 @@
+{
+  "label": "independent-typecheck",
+  "startedAt": "2026-11-06T04:29:31.042570+00:00",
+  "finishedAt": "2026-11-06T04:29:31.145049+00:00",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "../scripts/saas-test-isolation.mjs",
+    "scripts/run-verified-tool.mjs",
+    "check"
+  ],
+  "environment": {
+    "NODE_ENV": "test",
+    "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+    "WRANGLER_SEND_METRICS": "false"
+  },
+  "returncode": 1,
+  "signal": null,
+  "durationSeconds": 0.102,
+  "maxRssKiB": 40568,
+  "counts": {},
+  "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-typecheck.tap",
+  "logSha256": "537ec07bbd15b84d5523739e486f163007889e8581bf7633f7802d85396b5649"
+}

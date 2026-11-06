@@ -1,0 +1,2156 @@
+TAP version 13
+# (node:12) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Q8: a rejected bank sync persists observed contradictions without new money or a successful run
+ok 1 - Q8: a rejected bank sync persists observed contradictions without new money or a successful run
+  ---
+  duration_ms: 256.191948
+  type: 'test'
+  ...
+# Subtest: Q8: evidence-only bank failure cannot overwrite a concurrent workspace revision
+ok 2 - Q8: evidence-only bank failure cannot overwrite a concurrent workspace revision
+  ---
+  duration_ms: 142.06113
+  type: 'test'
+  ...
+# Subtest: Q8: evidence-only bank failure cannot write after its lease is replaced
+ok 3 - Q8: evidence-only bank failure cannot write after its lease is replaced
+  ---
+  duration_ms: 136.272149
+  type: 'test'
+  ...
+# Subtest: Q8 review: capped bank sync retains raw conflict evidence and a bounded hold without new financial rows
+ok 4 - Q8 review: capped bank sync retains raw conflict evidence and a bounded hold without new financial rows
+  ---
+  duration_ms: 511.716848
+  type: 'test'
+  ...
+# Subtest: Q8 review: a capped sync conflict audit and hold are fenced by the workspace revision
+ok 5 - Q8 review: a capped sync conflict audit and hold are fenced by the workspace revision
+  ---
+  duration_ms: 179.390568
+  type: 'test'
+  ...
+# Subtest: Q8 review: a capped sync conflict audit and hold are fenced by a replacement lease
+ok 6 - Q8 review: a capped sync conflict audit and hold are fenced by a replacement lease
+  ---
+  duration_ms: 158.941673
+  type: 'test'
+  ...
+# Subtest: rating8: bank authorization rejects a page on another origin before contacting the provider
+ok 7 - rating8: bank authorization rejects a page on another origin before contacting the provider
+  ---
+  duration_ms: 436.898105
+  type: 'test'
+  ...
+# Subtest: rating8: a protected callback setting supports a migrated origin only after exact provider registration
+ok 8 - rating8: a protected callback setting supports a migrated origin only after exact provider registration
+  ---
+  duration_ms: 201.162403
+  type: 'test'
+  ...
+# Subtest: rating8: callback configuration cannot take a redirect target from query, credentials or another path
+ok 9 - rating8: callback configuration cannot take a redirect target from query, credentials or another path
+  ---
+  duration_ms: 168.588824
+  type: 'test'
+  ...
+# Subtest: rating8: fresh consent revalidation recovers only operational status and never imports or allocates money
+ok 10 - rating8: fresh consent revalidation recovers only operational status and never imports or allocates money
+  ---
+  duration_ms: 173.051783
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: revalidation preflight SAVED_SELECTION_EMPTY performs no bank GET
+ok 11 - scope diagnostic: revalidation preflight SAVED_SELECTION_EMPTY performs no bank GET
+  ---
+  duration_ms: 171.937553
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: revalidation preflight SAVED_SELECTION_INVALID performs no bank GET
+ok 12 - scope diagnostic: revalidation preflight SAVED_SELECTION_INVALID performs no bank GET
+  ---
+  duration_ms: 156.225711
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: fresh live inventory denial is sanitized and does not recover status
+ok 13 - scope diagnostic: fresh live inventory denial is sanitized and does not recover status
+  ---
+  duration_ms: 169.064058
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: fresh selected usage denial is sanitized and does not recover status
+ok 14 - scope diagnostic: fresh selected usage denial is sanitized and does not recover status
+  ---
+  duration_ms: 147.543258
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: fresh account identity denial is sanitized and does not recover status
+ok 15 - scope diagnostic: fresh account identity denial is sanitized and does not recover status
+  ---
+  duration_ms: 167.26971
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: serializer rejects forged reasons and never reflects supplied scope-error text
+ok 16 - scope diagnostic: serializer rejects forged reasons and never reflects supplied scope-error text
+  ---
+  duration_ms: 126.635848
+  type: 'test'
+  ...
+# Subtest: rating8: consent revalidation rejects revoked session without clearing its blocked status
+ok 17 - rating8: consent revalidation rejects revoked session without clearing its blocked status
+  ---
+  duration_ms: 177.025417
+  type: 'test'
+  ...
+# Subtest: rating8: consent revalidation rejects missing selected account without clearing its blocked status
+ok 18 - rating8: consent revalidation rejects missing selected account without clearing its blocked status
+  ---
+  duration_ms: 162.935382
+  type: 'test'
+  ...
+# Subtest: rating8: consent revalidation rejects wrong bank without clearing its blocked status
+ok 19 - rating8: consent revalidation rejects wrong bank without clearing its blocked status
+  ---
+  duration_ms: 159.442029
+  type: 'test'
+  ...
+# Subtest: rating8: consent revalidation rejects personal consent without clearing its blocked status
+ok 20 - rating8: consent revalidation rejects personal consent without clearing its blocked status
+  ---
+  duration_ms: 195.733396
+  type: 'test'
+  ...
+# Subtest: rating8: consent revalidation rejects expired remote consent without clearing its blocked status
+ok 21 - rating8: consent revalidation rejects expired remote consent without clearing its blocked status
+  ---
+  duration_ms: 140.384738
+  type: 'test'
+  ...
+# Subtest: rating8: consent revalidation obeys cooldowns, stopped retries and expired grants before provider access
+ok 22 - rating8: consent revalidation obeys cooldowns, stopped retries and expired grants before provider access
+  ---
+  duration_ms: 134.714561
+  type: 'test'
+  ...
+# Subtest: rating8: losing the bank lease during consent revalidation cannot restore the connection
+ok 23 - rating8: losing the bank lease during consent revalidation cannot restore the connection
+  ---
+  duration_ms: 145.813487
+  type: 'test'
+  ...
+# Subtest: rating8: company binding before read blocks the legacy consent recovery path
+ok 24 - rating8: company binding before read blocks the legacy consent recovery path
+  ---
+  duration_ms: 128.515813
+  type: 'test'
+  ...
+# Subtest: rating8: company binding during read blocks the legacy consent recovery path
+ok 25 - rating8: company binding during read blocks the legacy consent recovery path
+  ---
+  duration_ms: 189.530766
+  type: 'test'
+  ...
+# Subtest: rating8: changed selected accounts fences the consent recovery commit
+ok 26 - rating8: changed selected accounts fences the consent recovery commit
+  ---
+  duration_ms: 182.110506
+  type: 'test'
+  ...
+# Subtest: rating8: changed retained accounts fences the consent recovery commit
+ok 27 - rating8: changed retained accounts fences the consent recovery commit
+  ---
+  duration_ms: 133.452623
+  type: 'test'
+  ...
+# Subtest: rating8: changed bank identity fences the consent recovery commit
+ok 28 - rating8: changed bank identity fences the consent recovery commit
+  ---
+  duration_ms: 131.3844
+  type: 'test'
+  ...
+# Subtest: rating8: changed provider environment fences the consent recovery commit
+ok 29 - rating8: changed provider environment fences the consent recovery commit
+  ---
+  duration_ms: 120.540322
+  type: 'test'
+  ...
+# Subtest: rating8: changed consent metadata fences the consent recovery commit
+ok 30 - rating8: changed consent metadata fences the consent recovery commit
+  ---
+  duration_ms: 129.053799
+  type: 'test'
+  ...
+# Subtest: rating8: changed local expiry fences the consent recovery commit
+ok 31 - rating8: changed local expiry fences the consent recovery commit
+  ---
+  duration_ms: 121.718056
+  type: 'test'
+  ...
+# Subtest: rating8: changed authenticated owner fences the consent recovery commit
+ok 32 - rating8: changed authenticated owner fences the consent recovery commit
+  ---
+  duration_ms: 172.922441
+  type: 'test'
+  ...
+# Subtest: rating8: changed runtime application fences the consent recovery commit
+ok 33 - rating8: changed runtime application fences the consent recovery commit
+  ---
+  duration_ms: 141.929079
+  type: 'test'
+  ...
+# Subtest: rating8: consent recovery MCP rejects caller-supplied owner and records no financial work
+ok 34 - rating8: consent recovery MCP rejects caller-supplied owner and records no financial work
+  ---
+  duration_ms: 162.180095
+  type: 'test'
+  ...
+# Subtest: rating8 review: a lost consent commit reply remains successful
+ok 35 - rating8 review: a lost consent commit reply remains successful
+  ---
+  duration_ms: 171.150937
+  type: 'test'
+  ...
+# Subtest: rating8 review: a lost consent commit reply remains successful after lease replacement
+ok 36 - rating8 review: a lost consent commit reply remains successful after lease replacement
+  ---
+  duration_ms: 154.939711
+  type: 'test'
+  ...
+# Subtest: rating8 review: an unreadable consent receipt preserves the unknown outcome without a false failure event
+ok 37 - rating8 review: an unreadable consent receipt preserves the unknown outcome without a false failure event
+  ---
+  duration_ms: 133.555055
+  type: 'test'
+  ...
+# Subtest: rating8 review: lost consent reply plus replaced lease and unreadable receipt never claims that nothing was saved
+ok 38 - rating8 review: lost consent reply plus replaced lease and unreadable receipt never claims that nothing was saved
+  ---
+  duration_ms: 148.648295
+  type: 'test'
+  ...
+# Subtest: rating8 review: a consent receipt cannot authorize replay after connection data changes
+ok 39 - rating8 review: a consent receipt cannot authorize replay after connection data changes
+  ---
+  duration_ms: 129.026759
+  type: 'test'
+  ...
+# Subtest: rating8 review: adopted legacy storage cannot revalidate before a company sync scope exists
+ok 40 - rating8 review: adopted legacy storage cannot revalidate before a company sync scope exists
+  ---
+  duration_ms: 141.139522
+  type: 'test'
+  ...
+# Subtest: rating8 review: foundation adoption immediately before commit still fences the legacy write
+ok 41 - rating8 review: foundation adoption immediately before commit still fences the legacy write
+  ---
+  duration_ms: 130.568728
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new account_evidence_retry hold at started stops the outbound consent read
+ok 42 - rating8 review: a new account_evidence_retry hold at started stops the outbound consent read
+  ---
+  duration_ms: 156.796737
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new retry_after hold at started stops the outbound consent read
+ok 43 - rating8 review: a new retry_after hold at started stops the outbound consent read
+  ---
+  duration_ms: 150.367882
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new sync_failures hold at started stops the outbound consent read
+ok 44 - rating8 review: a new sync_failures hold at started stops the outbound consent read
+  ---
+  duration_ms: 134.074169
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new account_evidence_retry hold at reservation stops the outbound consent read
+ok 45 - rating8 review: a new account_evidence_retry hold at reservation stops the outbound consent read
+  ---
+  duration_ms: 129.510131
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new retry_after hold at reservation stops the outbound consent read
+ok 46 - rating8 review: a new retry_after hold at reservation stops the outbound consent read
+  ---
+  duration_ms: 118.750959
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new sync_failures hold at reservation stops the outbound consent read
+ok 47 - rating8 review: a new sync_failures hold at reservation stops the outbound consent read
+  ---
+  duration_ms: 133.686044
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new account_evidence_retry hold at reserved stops the outbound consent read
+ok 48 - rating8 review: a new account_evidence_retry hold at reserved stops the outbound consent read
+  ---
+  duration_ms: 141.968138
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new retry_after hold at reserved stops the outbound consent read
+ok 49 - rating8 review: a new retry_after hold at reserved stops the outbound consent read
+  ---
+  duration_ms: 136.194478
+  type: 'test'
+  ...
+# Subtest: rating8 review: a new sync_failures hold at reserved stops the outbound consent read
+ok 50 - rating8 review: a new sync_failures hold at reserved stops the outbound consent read
+  ---
+  duration_ms: 123.976487
+  type: 'test'
+  ...
+# Subtest: hash-only company accounts can be selected and synchronized without duplicates after renewed account UIDs
+ok 51 - hash-only company accounts can be selected and synchronized without duplicates after renewed account UIDs
+  ---
+  duration_ms: 256.304945
+  type: 'test'
+  ...
+# Subtest: Automatic fetching is opt-in and rejects foreign connection IDs and cross-origin changes
+ok 52 - Automatic fetching is opt-in and rejects foreign connection IDs and cross-origin changes
+  ---
+  duration_ms: 156.747905
+  type: 'test'
+  ...
+# Subtest: company reconnect preserves the disconnected same-bank connection identity and requires new account selection
+ok 53 - company reconnect preserves the disconnected same-bank connection identity and requires new account selection
+  ---
+  duration_ms: 186.478014
+  type: 'test'
+  ...
+# Subtest: company reconnect never aliases a different provider environment to the prior connection
+ok 54 - company reconnect never aliases a different provider environment to the prior connection
+  ---
+  duration_ms: 144.028695
+  type: 'test'
+  ...
+# Subtest: main control reserves a six-hour retry inside the bank lock without enabling automatic sync
+ok 55 - main control reserves a six-hour retry inside the bank lock without enabling automatic sync
+  ---
+  duration_ms: 178.519074
+  type: 'test'
+  ...
+# Subtest: main control honors an interrupted reservation and keeps real PSU headers
+ok 56 - main control honors an interrupted reservation and keeps real PSU headers
+  ---
+  duration_ms: 157.202677
+  type: 'test'
+  ...
+# Subtest: Hosted automatic sync uses no fabricated PSU context and replays cannot duplicate or refetch
+ok 57 - Hosted automatic sync uses no fabricated PSU context and replays cannot duplicate or refetch
+  ---
+  duration_ms: 159.475644
+  type: 'test'
+  ...
+# Subtest: Automatic slots stay fixed in Stockholm time across jitter, browser checks and daylight-saving changes
+ok 58 - Automatic slots stay fixed in Stockholm time across jitter, browser checks and daylight-saving changes
+  ---
+  duration_ms: 123.732665
+  type: 'test'
+  ...
+# Subtest: Automatic failure reserves its retry time, preserves data, and can be paused or disconnected
+ok 59 - Automatic failure reserves its retry time, preserves data, and can be paused or disconnected
+  ---
+  duration_ms: 151.16031
+  type: 'test'
+  ...
+# Subtest: Automatic catch-up overlaps the last successful fetch while preserving the chosen start date
+ok 60 - Automatic catch-up overlaps the last successful fetch while preserving the chosen start date
+  ---
+  duration_ms: 169.57179
+  type: 'test'
+  ...
+# Subtest: MCP supports discovery but never accepts an owner override or unauthenticated bank operation
+ok 61 - MCP supports discovery but never accepts an owner override or unauthenticated bank operation
+  ---
+  duration_ms: 109.670872
+  type: 'test'
+  ...
+# Subtest: MCP authentication selects only its caller workspace and browser auto-sync keeps genuine PSU context
+ok 62 - MCP authentication selects only its caller workspace and browser auto-sync keeps genuine PSU context
+  ---
+  duration_ms: 193.219536
+  type: 'test'
+  ...
+# Subtest: AES-GCM envelopes bind private values to the owner and purpose with fresh nonces
+ok 63 - AES-GCM envelopes bind private values to the owner and purpose with fresh nonces
+  ---
+  duration_ms: 2.854337
+  type: 'test'
+  ...
+# Subtest: Tampered ciphertext, IVs and malformed envelopes fail without exposing secrets or crypto errors
+ok 64 - Tampered ciphertext, IVs and malformed envelopes fail without exposing secrets or crypto errors
+  ---
+  duration_ms: 1.525139
+  type: 'test'
+  ...
+# Subtest: Flow tokens are 256-bit URL-safe values and ambiguous cookies are rejected
+ok 65 - Flow tokens are 256-bit URL-safe values and ambiguous cookies are rejected
+  ---
+  duration_ms: 1.013091
+  type: 'test'
+  ...
+# Subtest: Mutation services enforce real signed-in identity and exact same-origin before banking access
+ok 66 - Mutation services enforce real signed-in identity and exact same-origin before banking access
+  ---
+  duration_ms: 119.345006
+  type: 'test'
+  ...
+# Subtest: Owner locks exclude concurrent mutations, allow other owners and release after errors
+ok 67 - Owner locks exclude concurrent mutations, allow other owners and release after errors
+  ---
+  duration_ms: 139.546781
+  type: 'test'
+  ...
+# Subtest: A stale invocation cannot release a replacement lock acquired after lease expiry
+ok 68 - A stale invocation cannot release a replacement lock acquired after lease expiry
+  ---
+  duration_ms: 128.607001
+  type: 'test'
+  ...
+# Subtest: Runtime credentials never use legacy D1 keys; account lists and connection status stay owner-bound
+ok 69 - Runtime credentials never use legacy D1 keys; account lists and connection status stay owner-bound
+  ---
+  duration_ms: 158.931663
+  type: 'test'
+  ...
+# Subtest: Explicit status refresh replaces stale activation and redirect metadata while ordinary reads stay local
+ok 70 - Explicit status refresh replaces stale activation and redirect metadata while ordinary reads stay local
+  ---
+  duration_ms: 170.392792
+  type: 'test'
+  ...
+# Subtest: Authorization stores state and cookie hashes, sets secure callback-only cookie and accepts one callback only
+ok 71 - Authorization stores state and cookie hashes, sets secure callback-only cookie and accepts one callback only
+  ---
+  duration_ms: 134.316401
+  type: 'test'
+  ...
+# Subtest: Callback rejects missing or ambiguous state, wrong browser, owner, expired flow and replaced application
+ok 72 - Callback rejects missing or ambiguous state, wrong browser, owner, expired flow and replaced application
+  ---
+  duration_ms: 154.671751
+  type: 'test'
+  ...
+# Subtest: Unverified session accounts cause revocation and cannot become a local connection
+ok 73 - Unverified session accounts cause revocation and cannot become a local connection
+  ---
+  duration_ms: 160.496255
+  type: 'test'
+  ...
+# Subtest: Selections and sync cannot retrieve accounts outside the current authorized session
+ok 74 - Selections and sync cannot retrieve accounts outside the current authorized session
+  ---
+  duration_ms: 162.20768
+  type: 'test'
+  ...
+# Subtest: Sandbox sync reads test data but never touches financial workspace or financial audit
+ok 75 - Sandbox sync reads test data but never touches financial workspace or financial audit
+  ---
+  duration_ms: 143.27236
+  type: 'test'
+  ...
+# Subtest: Production import and audit commit together; repeated stable references are not imported twice
+ok 76 - Production import and audit commit together; repeated stable references are not imported twice
+  ---
+  duration_ms: 188.475569
+  type: 'test'
+  ...
+# Subtest: Missing stable transaction IDs preserve all rows and repeat imports flag review instead of discarding payments
+ok 77 - Missing stable transaction IDs preserve all rows and repeat imports flag review instead of discarding payments
+  ---
+  duration_ms: 187.28786
+  type: 'test'
+  ...
+# Subtest: A later pagination failure cannot commit earlier pages or claim a successful sync
+ok 78 - A later pagination failure cannot commit earlier pages or claim a successful sync
+  ---
+  duration_ms: 193.077169
+  type: 'test'
+  ...
+# Subtest: Optimistic revision conflict preserves a concurrent workspace edit and writes no misleading audit or run
+ok 79 - Optimistic revision conflict preserves a concurrent workspace edit and writes no misleading audit or run
+  ---
+  duration_ms: 168.475651
+  type: 'test'
+  ...
+# Subtest: A failed sync-run insert rolls back both financial data and its audit entry
+ok 80 - A failed sync-run insert rolls back both financial data and its audit entry
+  ---
+  duration_ms: 162.885905
+  type: 'test'
+  ...
+# Subtest: A terminal provider error leaves the connection requiring authorization
+ok 81 - A terminal provider error leaves the connection requiring authorization
+  ---
+  duration_ms: 158.957838
+  type: 'test'
+  ...
+# Subtest: A revoked session status cannot be overwritten as connected by failure handling
+ok 82 - A revoked session status cannot be overwritten as connected by failure handling
+  ---
+  duration_ms: 165.147879
+  type: 'test'
+  ...
+# Subtest: Disconnect retains credentials on an unconfirmed failure and clears them when session is already gone
+ok 83 - Disconnect retains credentials on an unconfirmed failure and clears them when session is already gone
+  ---
+  duration_ms: 197.784415
+  type: 'test'
+  ...
+# Subtest: Production configuration requires an explicit environment and rotation before accessing the runtime key
+ok 84 - Production configuration requires an explicit environment and rotation before accessing the runtime key
+  ---
+  duration_ms: 1.099298
+  type: 'test'
+  ...
+# Subtest: Browser credential uploads are rejected before the body is read, with no provider call or D1 key write
+ok 85 - Browser credential uploads are rejected before the body is read, with no provider call or D1 key write
+  ---
+  duration_ms: 123.326883
+  type: 'test'
+  ...
+# Subtest: Legacy D1 keys cannot authorize any provider call when runtime configuration or rotation is absent
+ok 86 - Legacy D1 keys cannot authorize any provider call when runtime configuration or rotation is absent
+  ---
+  duration_ms: 142.650058
+  type: 'test'
+  ...
+# Subtest: Runtime app readiness checks provider environment, AIS, Swedish access, exact callback and activation
+ok 87 - Runtime app readiness checks provider environment, AIS, Swedish access, exact callback and activation
+  ---
+  duration_ms: 130.946611
+  type: 'test'
+  ...
+# Subtest: Explicit disconnect of a legacy connection never uses its key and reports the manual revocation requirement
+ok 88 - Explicit disconnect of a legacy connection never uses its key and reports the manual revocation requirement
+  ---
+  duration_ms: 132.696437
+  type: 'test'
+  ...
+# Subtest: A forged connected query cannot claim bank consent without a current unexpired server connection
+ok 89 - A forged connected query cannot claim bank consent without a current unexpired server connection
+  ---
+  duration_ms: 1.185075
+  type: 'test'
+  ...
+# Subtest: delayed bank responses cannot write or release a replacement lease
+ok 90 - delayed bank responses cannot write or release a replacement lease
+  ---
+  duration_ms: 124.783089
+  type: 'test'
+  ...
+# Subtest: D1 atomically fences bank writes even when a lease changes after a valid assertion
+ok 91 - D1 atomically fences bank writes even when a lease changes after a valid assertion
+  ---
+  duration_ms: 165.619893
+  type: 'test'
+  ...
+# Subtest: expired bank leases and delayed disconnects cannot overwrite a replacement connection
+ok 92 - expired bank leases and delayed disconnects cannot overwrite a replacement connection
+  ---
+  duration_ms: 139.520043
+  type: 'test'
+  ...
+# Subtest: delayed bank OAuth cannot overwrite a replacement flow or connection
+ok 93 - delayed bank OAuth cannot overwrite a replacement flow or connection
+  ---
+  duration_ms: 150.833421
+  type: 'test'
+  ...
+# Subtest: bank Retry-After persists and blocks manual, control and automatic retries
+ok 94 - bank Retry-After persists and blocks manual, control and automatic retries
+  ---
+  duration_ms: 153.099198
+  type: 'test'
+  ...
+# Subtest: three failed or interrupted automatic bank attempts remain blocked until a manual success
+ok 95 - three failed or interrupted automatic bank attempts remain blocked until a manual success
+  ---
+  duration_ms: 239.177288
+  type: 'test'
+  ...
+# Subtest: committed bank imports stay successful if the independent after-check needs retrying
+ok 96 - committed bank imports stay successful if the independent after-check needs retrying
+  ---
+  duration_ms: 177.95548
+  type: 'test'
+  ...
+# Subtest: Swedbank period rejection is recovered with complete non-overlapping shorter windows
+ok 97 - Swedbank period rejection is recovered with complete non-overlapping shorter windows
+  ---
+  duration_ms: 231.848544
+  type: 'test'
+  ...
+# Subtest: manual updates use the successful overlap instead of repeatedly requesting old history
+ok 98 - manual updates use the successful overlap instead of repeatedly requesting old history
+  ---
+  duration_ms: 174.650155
+  type: 'test'
+  ...
+# Subtest: saving an older date or different account scope resets incremental coverage
+ok 99 - saving an older date or different account scope resets incremental coverage
+  ---
+  duration_ms: 137.286357
+  type: 'test'
+  ...
+# Subtest: invalid stored bank dates fail before any provider request or cursor change
+ok 100 - invalid stored bank dates fail before any provider request or cursor change
+  ---
+  duration_ms: 125.689153
+  type: 'test'
+  ...
+# Subtest: lost lease after session response prevents even the next bank request
+ok 101 - lost lease after session response prevents even the next bank request
+  ---
+  duration_ms: 144.017434
+  type: 'test'
+  ...
+# Subtest: Retry-After is exposed as an HTTP header as well as a safe admin message
+ok 102 - Retry-After is exposed as an HTTP header as well as a safe admin message
+  ---
+  duration_ms: 134.737486
+  type: 'test'
+  ...
+# Subtest: historical window failure preserves saved money and restarts without duplicate rows
+ok 103 - historical window failure preserves saved money and restarts without duplicate rows
+  ---
+  duration_ms: 224.228928
+  type: 'test'
+  ...
+# Subtest: an invalid historical BOOK row with malformed amount preserves success coverage for a complete retry
+ok 104 - an invalid historical BOOK row with malformed amount preserves success coverage for a complete retry
+  ---
+  duration_ms: 208.150904
+  type: 'test'
+  ...
+# Subtest: an invalid historical BOOK row with zero amount preserves success coverage for a complete retry
+ok 105 - an invalid historical BOOK row with zero amount preserves success coverage for a complete retry
+  ---
+  duration_ms: 197.567962
+  type: 'test'
+  ...
+# Subtest: an invalid historical BOOK row with invalid booking date preserves success coverage for a complete retry
+ok 106 - an invalid historical BOOK row with invalid booking date preserves success coverage for a complete retry
+  ---
+  duration_ms: 230.588094
+  type: 'test'
+  ...
+# Subtest: an invalid historical BOOK row with booking date outside the requested window preserves success coverage for a complete retry
+ok 107 - an invalid historical BOOK row with booking date outside the requested window preserves success coverage for a complete retry
+  ---
+  duration_ms: 198.578178
+  type: 'test'
+  ...
+# Subtest: documented pending and foreign-currency skips can complete a bank interval
+ok 108 - documented pending and foreign-currency skips can complete a bank interval
+  ---
+  duration_ms: 186.755481
+  type: 'test'
+  ...
+# Subtest: recovered bank history retains one financial receipt and truthful evidence in the paginated payment view
+ok 109 - recovered bank history retains one financial receipt and truthful evidence in the paginated payment view
+  ---
+  duration_ms: 430.411185
+  type: 'test'
+  ...
+# Subtest: rate limit encountered after period adjustment persists a cooldown without importing partial history
+ok 110 - rate limit encountered after period adjustment persists a cooldown without importing partial history
+  ---
+  duration_ms: 186.2695
+  type: 'test'
+  ...
+# Subtest: unavailable history has bounded attempts and retains the failed period in admin status
+ok 111 - unavailable history has bounded attempts and retains the failed period in admin status
+  ---
+  duration_ms: 166.780366
+  type: 'test'
+  ...
+# Subtest: bank date inputs use the provider UTC day while timestamps remain displayed in Sweden
+ok 112 - bank date inputs use the provider UTC day while timestamps remain displayed in Sweden
+  ---
+  duration_ms: 1.655742
+  type: 'test'
+  ...
+# Subtest: provider maintenance Retry-After blocks subsequent syncs without losing history
+ok 113 - provider maintenance Retry-After blocks subsequent syncs without losing history
+  ---
+  duration_ms: 162.97833
+  type: 'test'
+  ...
+# Subtest: consent expiring during pagination stops before another request and preserves the checkpoint
+ok 114 - consent expiring during pagination stops before another request and preserves the checkpoint
+  ---
+  duration_ms: 140.018663
+  type: 'test'
+  ...
+# Subtest: actual sync throttling retains unknown account-read advice across a later successful transaction sync
+ok 115 - actual sync throttling retains unknown account-read advice across a later successful transaction sync
+  ---
+  duration_ms: 215.352422
+  type: 'test'
+  ...
+# Subtest: actual sync throttling retains known account-read advice across a later successful transaction sync
+ok 116 - actual sync throttling retains known account-read advice across a later successful transaction sync
+  ---
+  duration_ms: 224.840428
+  type: 'test'
+  ...
+# Subtest: sync session retains a pending read guard after result save with no prior wait
+ok 117 - sync session retains a pending read guard after result save with no prior wait
+  ---
+  duration_ms: 216.508706
+  type: 'test'
+  ...
+# Subtest: sync session retains a pending read guard after result save with an older known deadline
+ok 118 - sync session retains a pending read guard after result save with an older known deadline
+  ---
+  duration_ms: 309.020447
+  type: 'test'
+  ...
+# Subtest: sync session retains a pending read guard after lease loss with no prior wait
+ok 119 - sync session retains a pending read guard after lease loss with no prior wait
+  ---
+  duration_ms: 209.374321
+  type: 'test'
+  ...
+# Subtest: sync session retains a pending read guard after lease loss with an older known deadline
+ok 120 - sync session retains a pending read guard after lease loss with an older known deadline
+  ---
+  duration_ms: 194.585933
+  type: 'test'
+  ...
+# Subtest: sync transactions retains a pending read guard after result save with no prior wait
+ok 121 - sync transactions retains a pending read guard after result save with no prior wait
+  ---
+  duration_ms: 194.446946
+  type: 'test'
+  ...
+# Subtest: sync transactions retains a pending read guard after result save with an older known deadline
+ok 122 - sync transactions retains a pending read guard after result save with an older known deadline
+  ---
+  duration_ms: 184.930865
+  type: 'test'
+  ...
+# Subtest: sync transactions retains a pending read guard after lease loss with no prior wait
+ok 123 - sync transactions retains a pending read guard after lease loss with no prior wait
+  ---
+  duration_ms: 298.230914
+  type: 'test'
+  ...
+# Subtest: sync transactions retains a pending read guard after lease loss with an older known deadline
+ok 124 - sync transactions retains a pending read guard after lease loss with an older known deadline
+  ---
+  duration_ms: 233.074117
+  type: 'test'
+  ...
+# Subtest: bank job audit records the manual attempt before provider work and completes it with the imported run
+ok 125 - bank job audit records the manual attempt before provider work and completes it with the imported run
+  ---
+  duration_ms: 158.14549
+  type: 'test'
+  ...
+# Subtest: bank job audit records the automatic attempt before provider work and completes it with the imported run
+ok 126 - bank job audit records the automatic attempt before provider work and completes it with the imported run
+  ---
+  duration_ms: 172.629858
+  type: 'test'
+  ...
+# Subtest: bank job audit records the control attempt before provider work and completes it with the imported run
+ok 127 - bank job audit records the control attempt before provider work and completes it with the imported run
+  ---
+  duration_ms: 185.763388
+  type: 'test'
+  ...
+# Subtest: failed bank job audit keeps a safe rate limit code and the previous success timestamp
+ok 128 - failed bank job audit keeps a safe rate limit code and the previous success timestamp
+  ---
+  duration_ms: 168.85014
+  type: 'test'
+  ...
+# Subtest: failed bank job audit keeps a safe timeout code and the previous success timestamp
+ok 129 - failed bank job audit keeps a safe timeout code and the previous success timestamp
+  ---
+  duration_ms: 138.031283
+  type: 'test'
+  ...
+# Subtest: failed bank job audit keeps a safe mutated public field code and the previous success timestamp
+ok 130 - failed bank job audit keeps a safe mutated public field code and the previous success timestamp
+  ---
+  duration_ms: 143.130765
+  type: 'test'
+  ...
+# Subtest: failed bank job audit keeps a safe unrecognized provider code and the previous success timestamp
+ok 131 - failed bank job audit keeps a safe unrecognized provider code and the previous success timestamp
+  ---
+  duration_ms: 163.953691
+  type: 'test'
+  ...
+# Subtest: failed bank job audit keeps a safe untrusted error code and the previous success timestamp
+ok 132 - failed bank job audit keeps a safe untrusted error code and the previous success timestamp
+  ---
+  duration_ms: 164.31821
+  type: 'test'
+  ...
+# Subtest: bank completion audit failure rolls back the import instead of leaving a false success receipt
+ok 133 - bank completion audit failure rolls back the import instead of leaving a false success receipt
+  ---
+  duration_ms: 171.880469
+  type: 'test'
+  ...
+# Subtest: bank failure audit errors cannot discard a provider cooldown or replace its original error
+ok 134 - bank failure audit errors cannot discard a provider cooldown or replace its original error
+  ---
+  duration_ms: 168.297578
+  type: 'test'
+  ...
+# Subtest: a lost production import commit reply cannot change a durable completed job into a failed attempt
+ok 135 - a lost production import commit reply cannot change a durable completed job into a failed attempt
+  ---
+  duration_ms: 169.65655
+  type: 'test'
+  ...
+# Subtest: a lost empty successful fetch commit reply cannot change a durable completed job into a failed attempt
+ok 136 - a lost empty successful fetch commit reply cannot change a durable completed job into a failed attempt
+  ---
+  duration_ms: 131.419993
+  type: 'test'
+  ...
+# Subtest: a lost sandbox fetch commit reply cannot change a durable completed job into a failed attempt
+ok 137 - a lost sandbox fetch commit reply cannot change a durable completed job into a failed attempt
+  ---
+  duration_ms: 145.313177
+  type: 'test'
+  ...
+# Subtest: a lost replacement lease commit reply cannot change a durable completed job into a failed attempt
+ok 138 - a lost replacement lease commit reply cannot change a durable completed job into a failed attempt
+  ---
+  duration_ms: 138.535
+  type: 'test'
+  ...
+# Subtest: bank job audit does not record skipped automatic attempts or append results after losing the lease
+ok 139 - bank job audit does not record skipped automatic attempts or append results after losing the lease
+  ---
+  duration_ms: 152.340103
+  type: 'test'
+  ...
+# Subtest: a committed bank job remains completed when later housekeeping loses its lease
+ok 140 - a committed bank job remains completed when later housekeeping loses its lease
+  ---
+  duration_ms: 166.991158
+  type: 'test'
+  ...
+# Subtest: bank fixtures keep UTC booking and request dates when Stockholm has entered the following day
+ok 141 - bank fixtures keep UTC booking and request dates when Stockholm has entered the following day
+  ---
+  duration_ms: 175.659746
+  type: 'test'
+  ...
+# Subtest: existing automatic bank boundary dispatches reports for its authenticated owner even with AIS paused
+ok 142 - existing automatic bank boundary dispatches reports for its authenticated owner even with AIS paused
+  ---
+  duration_ms: 135.003179
+  type: 'test'
+  ...
+# Subtest: company consent rejects a foreign company before any provider request or flow is saved
+ok 143 - company consent rejects a foreign company before any provider request or flow is saved
+  ---
+  duration_ms: 132.66803
+  type: 'test'
+  ...
+# Subtest: company consent cannot accept client-supplied authority, owner or unsupported Bankgiro scope
+ok 144 - company consent cannot accept client-supplied authority, owner or unsupported Bankgiro scope
+  ---
+  duration_ms: 131.282279
+  type: 'test'
+  ...
+# Subtest: ambiguous code and error callbacks never claim the flow or exchange its authorization code
+ok 145 - ambiguous code and error callbacks never claim the flow or exchange its authorization code
+  ---
+  duration_ms: 151.637192
+  type: 'test'
+  ...
+# Subtest: the first concurrent company callback survives a later start without accepting two connections
+ok 146 - the first concurrent company callback survives a later start without accepting two connections
+  ---
+  duration_ms: 160.174784
+  type: 'test'
+  ...
+# Subtest: approved company consent requires separate bank company/account proof and explicit confirmation
+ok 147 - approved company consent requires separate bank company/account proof and explicit confirmation
+  ---
+  duration_ms: 164.393665
+  type: 'test'
+  ...
+# Subtest: BankID business login without a company/account attestation remains unverified and cannot import
+ok 148 - BankID business login without a company/account attestation remains unverified and cannot import
+  ---
+  duration_ms: 148.47559
+  type: 'test'
+  ...
+# Subtest: company authority revocation after consent blocks confirmation and automated use
+ok 149 - company authority revocation after consent blocks confirmation and automated use
+  ---
+  duration_ms: 130.631656
+  type: 'test'
+  ...
+# Subtest: both provider expiries and the requested expiry cap the saved consent
+ok 150 - both provider expiries and the requested expiry cap the saved consent
+  ---
+  duration_ms: 159.27186
+  type: 'test'
+  ...
+# Subtest: denied and cancelled identification have distinct safe durable outcomes
+ok 151 - denied and cancelled identification have distinct safe durable outcomes
+  ---
+  duration_ms: 245.920255
+  type: 'test'
+  ...
+# Subtest: lost callback is reported expired from stored flow state without a bank request or replay
+ok 152 - lost callback is reported expired from stored flow state without a bank request or replay
+  ---
+  duration_ms: 114.279228
+  type: 'test'
+  ...
+# Subtest: renewal cancellation preserves the existing connection and accepted renewal replaces it once
+ok 153 - renewal cancellation preserves the existing connection and accepted renewal replaces it once
+  ---
+  duration_ms: 183.058017
+  type: 'test'
+  ...
+# Subtest: disconnect fences a renewal even if the callback arrives after the connection is removed
+ok 154 - disconnect fences a renewal even if the callback arrives after the connection is removed
+  ---
+  duration_ms: 132.098345
+  type: 'test'
+  ...
+# Subtest: omitting companyId cannot opt a new authorization into legacy authority bypass
+ok 155 - omitting companyId cannot opt a new authorization into legacy authority bypass
+  ---
+  duration_ms: 158.787937
+  type: 'test'
+  ...
+# Subtest: a newly revoked transaction scope blocks every subsequent transaction fetch
+ok 156 - a newly revoked transaction scope blocks every subsequent transaction fetch
+  ---
+  duration_ms: 145.382345
+  type: 'test'
+  ...
+# Subtest: company evidence expiry caps the consent saved by a successful callback
+ok 157 - company evidence expiry caps the consent saved by a successful callback
+  ---
+  duration_ms: 121.880795
+  type: 'test'
+  ...
+# Subtest: a callback that loses its lease cannot revoke a provider session owned by a newer worker
+ok 158 - a callback that loses its lease cannot revoke a provider session owned by a newer worker
+  ---
+  duration_ms: 151.058056
+  type: 'test'
+  ...
+# Subtest: later verified company evidence unlocks confirmation without automatically activating the connection
+ok 159 - later verified company evidence unlocks confirmation without automatically activating the connection
+  ---
+  duration_ms: 184.207139
+  type: 'test'
+  ...
+# Subtest: unavailable corporate bank fails before creating a redirect or persistent authorization flow
+ok 160 - unavailable corporate bank fails before creating a redirect or persistent authorization flow
+  ---
+  duration_ms: 113.257986
+  type: 'test'
+  ...
+# Subtest: company consent status cannot claim success with missing or revoked corporate authority
+ok 161 - company consent status cannot claim success with missing or revoked corporate authority
+  ---
+  duration_ms: 0.468424
+  type: 'test'
+  ...
+# Subtest: revoking company authority during a provider response prevents financial persistence
+ok 162 - revoking company authority during a provider response prevents financial persistence
+  ---
+  duration_ms: 163.491412
+  type: 'test'
+  ...
+# Subtest: simultaneous delivery of one callback exchanges its authorization code at most once
+ok 163 - simultaneous delivery of one callback exchanges its authorization code at most once
+  ---
+  duration_ms: 123.332502
+  type: 'test'
+  ...
+# Subtest: a flow revoked at the actual callback write boundary cannot activate a connection
+ok 164 - a flow revoked at the actual callback write boundary cannot activate a connection
+  ---
+  duration_ms: 162.022538
+  type: 'test'
+  ...
+# Subtest: a lost callback commit reply preserves the saved provider session with replacement lease false
+ok 165 - a lost callback commit reply preserves the saved provider session with replacement lease false
+  ---
+  duration_ms: 143.579331
+  type: 'test'
+  ...
+# Subtest: a lost callback commit reply preserves the saved provider session with replacement lease true
+ok 166 - a lost callback commit reply preserves the saved provider session with replacement lease true
+  ---
+  duration_ms: 149.108946
+  type: 'test'
+  ...
+# Subtest: an interrupted code exchange expires as unknown outcome without replay or provider polling
+ok 167 - an interrupted code exchange expires as unknown outcome without replay or provider polling
+  ---
+  duration_ms: 122.432986
+  type: 'test'
+  ...
+# Subtest: uncertain old-session revocation during renewal never leaves an apparently usable connection
+ok 168 - uncertain old-session revocation during renewal never leaves an apparently usable connection
+  ---
+  duration_ms: 178.084802
+  type: 'test'
+  ...
+# Subtest: pre-migration redirects cannot create a new legacy connection without company verification
+ok 169 - pre-migration redirects cannot create a new legacy connection without company verification
+  ---
+  duration_ms: 158.404099
+  type: 'test'
+  ...
+# Subtest: consent sync diagnostic retains canonical reason for selected account missing from current account data without resetting reauthorization
+ok 170 - consent sync diagnostic retains canonical reason for selected account missing from current account data without resetting reauthorization
+  ---
+  duration_ms: 150.883608
+  type: 'test'
+  ...
+# Subtest: consent sync diagnostic retains canonical reason for transaction permission withdrawn without resetting reauthorization
+ok 171 - consent sync diagnostic retains canonical reason for transaction permission withdrawn without resetting reauthorization
+  ---
+  duration_ms: 205.36232
+  type: 'test'
+  ...
+# Subtest: consent sync diagnostic excludes arbitrary custom message and unsafe code BANK_ACCOUNT_SCOPE_INVALID
+ok 172 - consent sync diagnostic excludes arbitrary custom message and unsafe code BANK_ACCOUNT_SCOPE_INVALID
+  ---
+  duration_ms: 151.236967
+  type: 'test'
+  ...
+# Subtest: consent sync diagnostic excludes arbitrary custom message and unsafe code SYNTHETIC_PRIVATE_TOKEN_123
+ok 173 - consent sync diagnostic excludes arbitrary custom message and unsafe code SYNTHETIC_PRIVATE_TOKEN_123
+  ---
+  duration_ms: 168.775883
+  type: 'test'
+  ...
+# Subtest: consent sync diagnostic reads a changing code once and never persists getter-supplied secrets
+ok 174 - consent sync diagnostic reads a changing code once and never persists getter-supplied secrets
+  ---
+  duration_ms: 187.769904
+  type: 'test'
+  ...
+# Subtest: consent sync diagnostic ignores duck-typed error details
+ok 175 - consent sync diagnostic ignores duck-typed error details
+  ---
+  duration_ms: 181.715148
+  type: 'test'
+  ...
+# Subtest: consent sync diagnostic ignores throwing-getter error details
+ok 176 - consent sync diagnostic ignores throwing-getter error details
+  ---
+  duration_ms: 156.542393
+  type: 'test'
+  ...
+# Subtest: legacy selected scope migration can retain A after unselected cached B leaves the live consent
+ok 177 - legacy selected scope migration can retain A after unselected cached B leaves the live consent
+  ---
+  duration_ms: 169.393658
+  type: 'test'
+  ...
+# Subtest: legacy selected scope legacy can retain A after unselected cached B leaves the live consent
+ok 178 - legacy selected scope legacy can retain A after unselected cached B leaves the live consent
+  ---
+  duration_ms: 146.672093
+  type: 'test'
+  ...
+# Subtest: legacy selected scope never imports a selected cached account absent from the live consent
+ok 179 - legacy selected scope never imports a selected cached account absent from the live consent
+  ---
+  duration_ms: 188.343188
+  type: 'test'
+  ...
+# Subtest: company selected scope retains strict full-account equality when unselected cached B leaves consent
+ok 180 - company selected scope retains strict full-account equality when unselected cached B leaves consent
+  ---
+  duration_ms: 159.789972
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP preserves empty saved selection reason and safe denial
+ok 181 - independent scope review: HTTP MCP preserves empty saved selection reason and safe denial
+  ---
+  duration_ms: 128.292191
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP preserves non-array saved selection reason and safe denial
+ok 182 - independent scope review: HTTP MCP preserves non-array saved selection reason and safe denial
+  ---
+  duration_ms: 145.826645
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP preserves live account usage reason and safe denial
+ok 183 - independent scope review: HTTP MCP preserves live account usage reason and safe denial
+  ---
+  duration_ms: 137.495309
+  type: 'test'
+  ...
+# Subtest: independent scope review: HTTP MCP suppresses forged allowed reason and private error text
+ok 184 - independent scope review: HTTP MCP suppresses forged allowed reason and private error text
+  ---
+  duration_ms: 147.444181
+  type: 'test'
+  ...
+# Subtest: independent scope review: caller-supplied reason cannot bypass the MCP argument boundary
+ok 185 - independent scope review: caller-supplied reason cannot bypass the MCP argument boundary
+  ---
+  duration_ms: 117.31803
+  type: 'test'
+  ...
+# Subtest: independent scope review: unauthenticated MCP cannot request a bank diagnostic
+ok 186 - independent scope review: unauthenticated MCP cannot request a bank diagnostic
+  ---
+  duration_ms: 143.383558
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: HTTP MCP rejects client category or owner arguments usageDiagnostic
+ok 187 - usage diagnostic: HTTP MCP rejects client category or owner arguments usageDiagnostic
+  ---
+  duration_ms: 114.685081
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: HTTP MCP rejects client category or owner arguments selectedCount
+ok 188 - usage diagnostic: HTTP MCP rejects client category or owner arguments selectedCount
+  ---
+  duration_ms: 130.053779
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: HTTP MCP rejects client category or owner arguments saved
+ok 189 - usage diagnostic: HTTP MCP rejects client category or owner arguments saved
+  ---
+  duration_ms: 131.904571
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: HTTP MCP rejects client category or owner arguments owner
+ok 190 - usage diagnostic: HTTP MCP rejects client category or owner arguments owner
+  ---
+  duration_ms: 127.510704
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: unauthenticated cannot read selected usage categories
+ok 191 - usage diagnostic: unauthenticated cannot read selected usage categories
+  ---
+  duration_ms: 151.61717
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: another owner cannot read selected usage categories
+ok 192 - usage diagnostic: another owner cannot read selected usage categories
+  ---
+  duration_ms: 152.662288
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: adopted company cannot read selected usage categories
+ok 193 - usage diagnostic: adopted company cannot read selected usage categories
+  ---
+  duration_ms: 127.634337
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: cooldown cannot read selected usage categories
+ok 194 - usage diagnostic: cooldown cannot read selected usage categories
+  ---
+  duration_ms: 160.676051
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: changed owner during GET suppresses categories without changing the denial
+ok 195 - usage diagnostic: changed owner during GET suppresses categories without changing the denial
+  ---
+  duration_ms: 150.612436
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: changed company adoption during GET suppresses categories without changing the denial
+ok 196 - usage diagnostic: changed company adoption during GET suppresses categories without changing the denial
+  ---
+  duration_ms: 125.296115
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: changed lease during GET suppresses categories without changing the denial
+ok 197 - usage diagnostic: changed lease during GET suppresses categories without changing the denial
+  ---
+  duration_ms: 174.101348
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: changed audit failure during GET suppresses categories without changing the denial
+ok 198 - usage diagnostic: changed audit failure during GET suppresses categories without changing the denial
+  ---
+  duration_ms: 129.248587
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: a new account selection never emits revalidation categories
+ok 199 - usage diagnostic: a new account selection never emits revalidation categories
+  ---
+  duration_ms: 132.50244
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: HTTP MCP never serializes forged diagnostic properties even with a genuine reason
+ok 200 - usage diagnostic: HTTP MCP never serializes forged diagnostic properties even with a genuine reason
+  ---
+  duration_ms: 134.635565
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: a provider-thrown genuine policy error is not bound to this revalidation input
+ok 201 - usage diagnostic: a provider-thrown genuine policy error is not bound to this revalidation input
+  ---
+  duration_ms: 165.095558
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: ordinary HTTP MCP revalidation distinguishes saved null and omitted live without bank or financial mutations
+ok 202 - usage diagnostic: ordinary HTTP MCP revalidation distinguishes saved null and omitted live without bank or financial mutations
+  ---
+  duration_ms: 183.122587
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: ordinary HTTP MCP revalidation distinguishes private live without bank or financial mutations
+ok 203 - usage diagnostic: ordinary HTTP MCP revalidation distinguishes private live without bank or financial mutations
+  ---
+  duration_ms: 136.882582
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: ordinary HTTP MCP revalidation distinguishes unknown saved and wrong-type live without bank or financial mutations
+ok 204 - usage diagnostic: ordinary HTTP MCP revalidation distinguishes unknown saved and wrong-type live without bank or financial mutations
+  ---
+  duration_ms: 151.153583
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: real service counts only the persisted selection on both snapshots
+ok 205 - usage diagnostic: real service counts only the persisted selection on both snapshots
+  ---
+  duration_ms: 135.697957
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: unauthenticated is rejected before any provider read
+ok 206 - usage details diagnostic: unauthenticated is rejected before any provider read
+  ---
+  duration_ms: 133.34287
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: other owner is rejected before any provider read
+ok 207 - usage details diagnostic: other owner is rejected before any provider read
+  ---
+  duration_ms: 135.692723
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: company adoption is rejected before any provider read
+ok 208 - usage details diagnostic: company adoption is rejected before any provider read
+  ---
+  duration_ms: 116.543471
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: cooldown is rejected before any provider read
+ok 209 - usage details diagnostic: cooldown is rejected before any provider read
+  ---
+  duration_ms: 135.035614
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: client accountUids cannot enable or select a detail read
+ok 210 - usage details diagnostic: client accountUids cannot enable or select a detail read
+  ---
+  duration_ms: 117.888202
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: client force cannot enable or select a detail read
+ok 211 - usage details diagnostic: client force cannot enable or select a detail read
+  ---
+  duration_ms: 135.059519
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: client usageDetailsDiagnostic cannot enable or select a detail read
+ok 212 - usage details diagnostic: client usageDetailsDiagnostic cannot enable or select a detail read
+  ---
+  duration_ms: 127.248021
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: client refreshUsage cannot enable or select a detail read
+ok 213 - usage details diagnostic: client refreshUsage cannot enable or select a detail read
+  ---
+  duration_ms: 138.448748
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: missing later primary hash prevents the first details GET for every selected resource
+ok 214 - usage details diagnostic: missing later primary hash prevents the first details GET for every selected resource
+  ---
+  duration_ms: 145.005979
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: conflicting later primary hash prevents the first details GET for every selected resource
+ok 215 - usage details diagnostic: conflicting later primary hash prevents the first details GET for every selected resource
+  ---
+  duration_ms: 147.220607
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fuzzy later primary hash overlap prevents the first details GET for every selected resource
+ok 216 - usage details diagnostic: fuzzy later primary hash overlap prevents the first details GET for every selected resource
+  ---
+  duration_ms: 176.597204
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: explicit live PRIV prevents the first details GET for every selected resource
+ok 217 - usage details diagnostic: explicit live PRIV prevents the first details GET for every selected resource
+  ---
+  duration_ms: 144.743098
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: explicit live null prevents the first details GET for every selected resource
+ok 218 - usage details diagnostic: explicit live null prevents the first details GET for every selected resource
+  ---
+  duration_ms: 156.52128
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: duplicate saved UID never reaches account details
+ok 219 - usage details diagnostic: duplicate saved UID never reaches account details
+  ---
+  duration_ms: 127.896543
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: invalid unselected UID never reaches account details
+ok 220 - usage details diagnostic: invalid unselected UID never reaches account details
+  ---
+  duration_ms: 166.851345
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: duplicate live UID never reaches account details
+ok 221 - usage details diagnostic: duplicate live UID never reaches account details
+  ---
+  duration_ms: 124.182423
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: revoked session never reaches account details
+ok 222 - usage details diagnostic: revoked session never reaches account details
+  ---
+  duration_ms: 135.112498
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: personal session never reaches account details
+ok 223 - usage details diagnostic: personal session never reaches account details
+  ---
+  duration_ms: 120.703871
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: wrong bank never reaches account details
+ok 224 - usage details diagnostic: wrong bank never reaches account details
+  ---
+  duration_ms: 139.086492
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: wrong country never reaches account details
+ok 225 - usage details diagnostic: wrong country never reaches account details
+  ---
+  duration_ms: 133.234156
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: expired live never reaches account details
+ok 226 - usage details diagnostic: expired live never reaches account details
+  ---
+  duration_ms: 129.462871
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: transactions denied never reaches account details
+ok 227 - usage details diagnostic: transactions denied never reaches account details
+  ---
+  duration_ms: 146.554595
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: 1 selected null accounts preserve the denial and the exact read limit
+ok 228 - usage details diagnostic: 1 selected null accounts preserve the denial and the exact read limit
+  ---
+  duration_ms: 143.872168
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: 5 selected null accounts preserve the denial and the exact read limit
+ok 229 - usage details diagnostic: 5 selected null accounts preserve the denial and the exact read limit
+  ---
+  duration_ms: 231.069055
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: 6 selected null accounts preserve the denial and the exact read limit
+ok 230 - usage details diagnostic: 6 selected null accounts preserve the denial and the exact read limit
+  ---
+  duration_ms: 167.50351
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: unselected accounts and already permitted selected resources are never refreshed
+ok 231 - usage details diagnostic: unselected accounts and already permitted selected resources are never refreshed
+  ---
+  duration_ms: 184.747646
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: real HTTP MCP reports fresh omitted without approving or reflecting it
+ok 232 - usage details diagnostic: real HTTP MCP reports fresh omitted without approving or reflecting it
+  ---
+  duration_ms: 168.265052
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: real HTTP MCP reports fresh null without approving or reflecting it
+ok 233 - usage details diagnostic: real HTTP MCP reports fresh null without approving or reflecting it
+  ---
+  duration_ms: 168.796205
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: real HTTP MCP reports fresh private without approving or reflecting it
+ok 234 - usage details diagnostic: real HTTP MCP reports fresh private without approving or reflecting it
+  ---
+  duration_ms: 160.123281
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: real HTTP MCP reports fresh unknown without approving or reflecting it
+ok 235 - usage details diagnostic: real HTTP MCP reports fresh unknown without approving or reflecting it
+  ---
+  duration_ms: 201.520011
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: real HTTP MCP reports fresh wrong type without approving or reflecting it
+ok 236 - usage details diagnostic: real HTTP MCP reports fresh wrong type without approving or reflecting it
+  ---
+  duration_ms: 170.084452
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh wrong UID stops the batch and withholds partial categories
+ok 237 - usage details diagnostic: fresh wrong UID stops the batch and withholds partial categories
+  ---
+  duration_ms: 185.10175
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh missing primary hash stops the batch and withholds partial categories
+ok 238 - usage details diagnostic: fresh missing primary hash stops the batch and withholds partial categories
+  ---
+  duration_ms: 185.781575
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh changed primary hash stops the batch and withholds partial categories
+ok 239 - usage details diagnostic: fresh changed primary hash stops the batch and withholds partial categories
+  ---
+  duration_ms: 193.367813
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh currency conflict stops the batch and withholds partial categories
+ok 240 - usage details diagnostic: fresh currency conflict stops the batch and withholds partial categories
+  ---
+  duration_ms: 190.299349
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh primary number conflict stops the batch and withholds partial categories
+ok 241 - usage details diagnostic: fresh primary number conflict stops the batch and withholds partial categories
+  ---
+  duration_ms: 187.164122
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed owner during a details GET cannot yield positive evidence or another read
+ok 242 - usage details diagnostic: changed owner during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 138.964713
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed adoption during a details GET cannot yield positive evidence or another read
+ok 243 - usage details diagnostic: changed adoption during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 166.219909
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed app generation during a details GET cannot yield positive evidence or another read
+ok 244 - usage details diagnostic: changed app generation during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 155.283186
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed session during a details GET cannot yield positive evidence or another read
+ok 245 - usage details diagnostic: changed session during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 173.579933
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed cache during a details GET cannot yield positive evidence or another read
+ok 246 - usage details diagnostic: changed cache during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 177.929639
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed selection during a details GET cannot yield positive evidence or another read
+ok 247 - usage details diagnostic: changed selection during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 162.779055
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed status during a details GET cannot yield positive evidence or another read
+ok 248 - usage details diagnostic: changed status during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 186.954432
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed expiry during a details GET cannot yield positive evidence or another read
+ok 249 - usage details diagnostic: changed expiry during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 187.018973
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed lease during a details GET cannot yield positive evidence or another read
+ok 250 - usage details diagnostic: changed lease during a details GET cannot yield positive evidence or another read
+  ---
+  duration_ms: 150.108884
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: failed audit after the last response suppresses the completed result
+ok 251 - usage details diagnostic: failed audit after the last response suppresses the completed result
+  ---
+  duration_ms: 148.746366
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: context shift at audit after the last response suppresses the completed result
+ok 252 - usage details diagnostic: context shift at audit after the last response suppresses the completed result
+  ---
+  duration_ms: 158.789658
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: actual provider 429 unknown cooldown persists and stops further requests
+ok 253 - usage details diagnostic: actual provider 429 unknown cooldown persists and stops further requests
+  ---
+  duration_ms: 266.134717
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: actual provider 429 known cooldown persists and stops further requests
+ok 254 - usage details diagnostic: actual provider 429 known cooldown persists and stops further requests
+  ---
+  duration_ms: 251.493999
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: failure to resolve the persistent read marker retains uncertainty
+ok 255 - usage details diagnostic: failure to resolve the persistent read marker retains uncertainty
+  ---
+  duration_ms: 154.776257
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: the actual provider adapter reports ORGA while retaining the original 409
+ok 256 - usage details diagnostic: the actual provider adapter reports ORGA while retaining the original 409
+  ---
+  duration_ms: 251.580595
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: the live deadline expiring during the first details read stops the batch
+ok 257 - usage details diagnostic: the live deadline expiring during the first details read stops the batch
+  ---
+  duration_ms: 138.854247
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed cache during the session read prevents the first details GET
+ok 258 - usage details diagnostic: changed cache during the session read prevents the first details GET
+  ---
+  duration_ms: 142.829975
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed selection during the session read prevents the first details GET
+ok 259 - usage details diagnostic: changed selection during the session read prevents the first details GET
+  ---
+  duration_ms: 128.003489
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed bank during the session read prevents the first details GET
+ok 260 - usage details diagnostic: changed bank during the session read prevents the first details GET
+  ---
+  duration_ms: 155.741935
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed application metadata during the session read prevents the first details GET
+ok 261 - usage details diagnostic: changed application metadata during the session read prevents the first details GET
+  ---
+  duration_ms: 154.186793
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed runtime generation during the session read prevents the first details GET
+ok 262 - usage details diagnostic: changed runtime generation during the session read prevents the first details GET
+  ---
+  duration_ms: 166.544095
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: a foreign privately branded usage error at the provider boundary cannot authorize reads
+ok 263 - usage details diagnostic: a foreign privately branded usage error at the provider boundary cannot authorize reads
+  ---
+  duration_ms: 149.961145
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: inactive metadata cannot attest the selected read
+ok 264 - usage details diagnostic: inactive metadata cannot attest the selected read
+  ---
+  duration_ms: 171.975369
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: wrong application metadata cannot attest the selected read
+ok 265 - usage details diagnostic: wrong application metadata cannot attest the selected read
+  ---
+  duration_ms: 137.045408
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: string services metadata cannot attest the selected read
+ok 266 - usage details diagnostic: string services metadata cannot attest the selected read
+  ---
+  duration_ms: 153.920618
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: string countries metadata cannot attest the selected read
+ok 267 - usage details diagnostic: string countries metadata cannot attest the selected read
+  ---
+  duration_ms: 157.250789
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: missing AIS metadata cannot attest the selected read
+ok 268 - usage details diagnostic: missing AIS metadata cannot attest the selected read
+  ---
+  duration_ms: 141.886547
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: a provider timeout stops the batch without exposing partial usage
+ok 269 - usage details diagnostic: a provider timeout stops the batch without exposing partial usage
+  ---
+  duration_ms: 171.630536
+  type: 'test'
+  ...
+# Subtest: reviewer: complete maximum-sized mixed batch preserves the original denial and row
+ok 270 - reviewer: complete maximum-sized mixed batch preserves the original denial and row
+  ---
+  duration_ms: 263.704708
+  type: 'test'
+  ...
+# Subtest: reviewer: provider failure on the fifth result withholds all partial usage
+ok 271 - reviewer: provider failure on the fifth result withholds all partial usage
+  ---
+  duration_ms: 221.937742
+  type: 'test'
+  ...
+# Subtest: reviewer: app metadata changes atomically at final failed audit suppress the five-result diagnosis
+ok 272 - reviewer: app metadata changes atomically at final failed audit suppress the five-result diagnosis
+  ---
+  duration_ms: 267.307044
+  type: 'test'
+  ...
+# Subtest: reviewer: a committed failed audit with lost acknowledgement cannot publish completed categories
+ok 273 - reviewer: a committed failed audit with lost acknowledgement cannot publish completed categories
+  ---
+  duration_ms: 304.254587
+  type: 'test'
+  ...
+# Subtest: reviewer: connection mutation after the failed audit commits suppresses completed categories
+ok 274 - reviewer: connection mutation after the failed audit commits suppresses completed categories
+  ---
+  duration_ms: 243.422326
+  type: 'test'
+  ...
+# Subtest: reviewer: deadline expiry after all results but before audit acknowledgement suppresses categories
+ok 275 - reviewer: deadline expiry after all results but before audit acknowledgement suppresses categories
+  ---
+  duration_ms: 244.608473
+  type: 'test'
+  ...
+# Subtest: reviewer: actual provider adapter must reject contradictory fresh primary IBAN values
+ok 276 - reviewer: actual provider adapter must reject contradictory fresh primary IBAN values
+  ---
+  duration_ms: 342.694643
+  type: 'test'
+  ...
+# Subtest: usage details identity I1: saved/live BBAN conflict survives missing fresh account_id through the actual adapter
+ok 277 - usage details identity I1: saved/live BBAN conflict survives missing fresh account_id through the actual adapter
+  ---
+  duration_ms: 200.006744
+  type: 'test'
+  ...
+# Subtest: usage details identity I1: saved internal IBAN conflict survives missing fresh account_id through the actual adapter
+ok 278 - usage details identity I1: saved internal IBAN conflict survives missing fresh account_id through the actual adapter
+  ---
+  duration_ms: 294.160492
+  type: 'test'
+  ...
+# Subtest: reviewer I1 followup: conflict on the fifth actual-adapter result withholds every usage category
+ok 279 - reviewer I1 followup: conflict on the fifth actual-adapter result withholds every usage category
+  ---
+  duration_ms: 293.565025
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP expired session remains a denied bounded diagnosis
+ok 280 - usage details failure projection: real HTTP expired session remains a denied bounded diagnosis
+  ---
+  duration_ms: 220.480279
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP account access remains a denied bounded diagnosis
+ok 281 - usage details failure projection: real HTTP account access remains a denied bounded diagnosis
+  ---
+  duration_ms: 243.588999
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis
+ok 282 - usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis
+  ---
+  duration_ms: 179.070978
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis
+ok 283 - usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis
+  ---
+  duration_ms: 292.33973
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP application access remains a denied bounded diagnosis
+ok 284 - usage details failure projection: real HTTP application access remains a denied bounded diagnosis
+  ---
+  duration_ms: 205.359274
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP user context remains a denied bounded diagnosis
+ok 285 - usage details failure projection: real HTTP user context remains a denied bounded diagnosis
+  ---
+  duration_ms: 209.200353
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP bank action remains a denied bounded diagnosis
+ok 286 - usage details failure projection: real HTTP bank action remains a denied bounded diagnosis
+  ---
+  duration_ms: 219.907406
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP timeout remains a denied bounded diagnosis
+ok 287 - usage details failure projection: real HTTP timeout remains a denied bounded diagnosis
+  ---
+  duration_ms: 185.191542
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP service failure remains a denied bounded diagnosis
+ok 288 - usage details failure projection: real HTTP service failure remains a denied bounded diagnosis
+  ---
+  duration_ms: 240.769186
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis
+ok 289 - usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis
+  ---
+  duration_ms: 315.620939
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: real HTTP redirect remains a denied bounded diagnosis
+ok 290 - usage details failure projection: real HTTP redirect remains a denied bounded diagnosis
+  ---
+  duration_ms: 246.622113
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter absent currency exposes only field and kind
+ok 291 - usage details failure projection: adapter absent currency exposes only field and kind
+  ---
+  duration_ms: 264.186563
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter null account type exposes only field and kind
+ok 292 - usage details failure projection: adapter null account type exposes only field and kind
+  ---
+  duration_ms: 171.173779
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter string primary resource exposes only field and kind
+ok 293 - usage details failure projection: adapter string primary resource exposes only field and kind
+  ---
+  duration_ms: 240.86095
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter array currency exposes only field and kind
+ok 294 - usage details failure projection: adapter array currency exposes only field and kind
+  ---
+  duration_ms: 271.396614
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter object account type exposes only field and kind
+ok 295 - usage details failure projection: adapter object account type exposes only field and kind
+  ---
+  duration_ms: 161.633387
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter number currency exposes only field and kind
+ok 296 - usage details failure projection: adapter number currency exposes only field and kind
+  ---
+  duration_ms: 262.486254
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter different UID exposes only field and kind
+ok 297 - usage details failure projection: adapter different UID exposes only field and kind
+  ---
+  duration_ms: 242.696314
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: adapter invalid alias scheme exposes only field and kind
+ok 298 - usage details failure projection: adapter invalid alias scheme exposes only field and kind
+  ---
+  duration_ms: 239.366578
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: invalid JSON has a trusted code without an invented field
+ok 299 - usage details failure projection: invalid JSON has a trusted code without an invented field
+  ---
+  duration_ms: 257.336719
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: transport failure exposes a fixed code and keeps its fixed log
+ok 300 - usage details failure projection: transport failure exposes a fixed code and keeps its fixed log
+  ---
+  duration_ms: 177.14213
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: constructor code survives hostile public getters
+ok 301 - usage details failure projection: constructor code survives hostile public getters
+  ---
+  duration_ms: 159.832464
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: plain fields cannot supply trusted provider metadata
+ok 302 - usage details failure projection: plain fields cannot supply trusted provider metadata
+  ---
+  duration_ms: 157.375474
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: borrowed prototype cannot supply trusted provider metadata
+ok 303 - usage details failure projection: borrowed prototype cannot supply trusted provider metadata
+  ---
+  duration_ms: 176.690011
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: proxy cannot supply trusted provider metadata
+ok 304 - usage details failure projection: proxy cannot supply trusted provider metadata
+  ---
+  duration_ms: 159.10065
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: revoked proxy cannot supply trusted provider metadata
+ok 305 - usage details failure projection: revoked proxy cannot supply trusted provider metadata
+  ---
+  duration_ms: 168.736294
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: unknown constructor code cannot supply trusted provider metadata
+ok 306 - usage details failure projection: unknown constructor code cannot supply trusted provider metadata
+  ---
+  duration_ms: 167.543717
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: plain Error cannot supply trusted provider metadata
+ok 307 - usage details failure projection: plain Error cannot supply trusted provider metadata
+  ---
+  duration_ms: 171.349086
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: null cannot supply trusted provider metadata
+ok 308 - usage details failure projection: null cannot supply trusted provider metadata
+  ---
+  duration_ms: 159.569219
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: contract failure after a valid detail withholds every usage count
+ok 309 - usage details failure projection: contract failure after a valid detail withholds every usage count
+  ---
+  duration_ms: 203.165746
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: audit failure suppresses even a trusted provider failure
+ok 310 - usage details failure projection: audit failure suppresses even a trusted provider failure
+  ---
+  duration_ms: 173.586655
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: context shift at audit suppresses even a trusted provider failure
+ok 311 - usage details failure projection: context shift at audit suppresses even a trusted provider failure
+  ---
+  duration_ms: 180.242031
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: context shift during read suppresses even a trusted provider failure
+ok 312 - usage details failure projection: context shift during read suppresses even a trusted provider failure
+  ---
+  duration_ms: 134.157109
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: deadline during read suppresses even a trusted provider failure
+ok 313 - usage details failure projection: deadline during read suppresses even a trusted provider failure
+  ---
+  duration_ms: 149.397225
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: unresolved read marker cannot retain a masked provider cause
+ok 314 - usage details failure projection: unresolved read marker cannot retain a masked provider cause
+  ---
+  duration_ms: 165.370348
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: the real MCP error preserves the same safe projection
+ok 315 - usage details failure projection: the real MCP error preserves the same safe projection
+  ---
+  duration_ms: 321.42351
+  type: 'test'
+  ...
+# (node:36) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: company scheduler imports with two live consent checks and one atomic durable receipt
+ok 316 - company scheduler imports with two live consent checks and one atomic durable receipt
+  ---
+  duration_ms: 371.794514
+  type: 'test'
+  ...
+# Subtest: durably bound company owner fails closed without its authorization runtime
+ok 317 - durably bound company owner fails closed without its authorization runtime
+  ---
+  duration_ms: 91.019811
+  type: 'test'
+  ...
+# Subtest: documented optional transaction flag may be omitted by a currently authorized session
+ok 318 - documented optional transaction flag may be omitted by a currently authorized session
+  ---
+  duration_ms: 217.124425
+  type: 'test'
+  ...
+# Subtest: present malformed transaction access null blocks before account data
+ok 319 - present malformed transaction access null blocks before account data
+  ---
+  duration_ms: 118.256032
+  type: 'test'
+  ...
+# Subtest: present malformed transaction access "true" blocks before account data
+ok 320 - present malformed transaction access "true" blocks before account data
+  ---
+  duration_ms: 130.839566
+  type: 'test'
+  ...
+# Subtest: present malformed transaction access 0 blocks before account data
+ok 321 - present malformed transaction access 0 blocks before account data
+  ---
+  duration_ms: 123.812401
+  type: 'test'
+  ...
+# Subtest: unbound owner retains the existing automatic sync entrypoint
+ok 322 - unbound owner retains the existing automatic sync entrypoint
+  ---
+  duration_ms: 101.929396
+  type: 'test'
+  ...
+# Subtest: remote revoked after page fetch prevents all financial writes
+ok 323 - remote revoked after page fetch prevents all financial writes
+  ---
+  duration_ms: 218.658737
+  type: 'test'
+  ...
+# Subtest: remote account after page fetch prevents all financial writes
+ok 324 - remote account after page fetch prevents all financial writes
+  ---
+  duration_ms: 203.094981
+  type: 'test'
+  ...
+# Subtest: remote permission after page fetch prevents all financial writes
+ok 325 - remote permission after page fetch prevents all financial writes
+  ---
+  duration_ms: 206.60609
+  type: 'test'
+  ...
+# Subtest: same provider response replay has one original, one financial import and one receipt
+ok 326 - same provider response replay has one original, one financial import and one receipt
+  ---
+  duration_ms: 389.336986
+  type: 'test'
+  ...
+# Subtest: atomic workspace fence rolls back import and receipt together
+ok 327 - atomic workspace fence rolls back import and receipt together
+  ---
+  duration_ms: 243.108668
+  type: 'test'
+  ...
+# Subtest: atomic owner lease fence rolls back import and receipt together
+ok 328 - atomic owner lease fence rolls back import and receipt together
+  ---
+  duration_ms: 191.491384
+  type: 'test'
+  ...
+# Subtest: atomic membership fence rolls back import and receipt together
+ok 329 - atomic membership fence rolls back import and receipt together
+  ---
+  duration_ms: 197.669046
+  type: 'test'
+  ...
+# Subtest: atomic scope fence rolls back import and receipt together
+ok 330 - atomic scope fence rolls back import and receipt together
+  ---
+  duration_ms: 187.491095
+  type: 'test'
+  ...
+# Subtest: atomic connection fence rolls back import and receipt together
+ok 331 - atomic connection fence rolls back import and receipt together
+  ---
+  duration_ms: 209.63802
+  type: 'test'
+  ...
+# Subtest: provider quota is durable and cannot be spent by the second page beyond its allowance
+ok 332 - provider quota is durable and cannot be spent by the second page beyond its allowance
+  ---
+  duration_ms: 212.387842
+  type: 'test'
+  ...
+# Subtest: enabled Bankgiro without company source adapter reports partial and never complete payments
+ok 333 - enabled Bankgiro without company source adapter reports partial and never complete payments
+  ---
+  duration_ms: 237.840201
+  type: 'test'
+  ...
+# Subtest: stale trusted consent ID cannot borrow a different encrypted provider session
+ok 334 - stale trusted consent ID cannot borrow a different encrypted provider session
+  ---
+  duration_ms: 105.59551
+  type: 'test'
+  ...
+# Subtest: lost acknowledgement recovers the committed import count from its durable receipt
+ok 335 - lost acknowledgement recovers the committed import count from its durable receipt
+  ---
+  duration_ms: 261.247037
+  type: 'test'
+  ...
+# Subtest: successful receipt replays do not accumulate interrupted legacy attempts
+ok 336 - successful receipt replays do not accumulate interrupted legacy attempts
+  ---
+  duration_ms: 754.003564
+  type: 'test'
+  ...
+# Subtest: company wrapper persists exact-policy allocation with originals and all payment fences
+ok 337 - company wrapper persists exact-policy allocation with originals and all payment fences
+  ---
+  duration_ms: 320.598788
+  type: 'test'
+  ...
+# Subtest: policy changed at allocation commit preserves accepted AIS but rolls back money and audit
+ok 338 - policy changed at allocation commit preserves accepted AIS but rolls back money and audit
+  ---
+  duration_ms: 286.243603
+  type: 'test'
+  ...
+# Subtest: 429 persists supplier cooldown and cannot be retried through another scheduler call
+ok 339 - 429 persists supplier cooldown and cannot be retried through another scheduler call
+  ---
+  duration_ms: 152.83089
+  type: 'test'
+  ...
+# Subtest: successful company sync preserves the independent unknown account-evidence wait
+ok 340 - successful company sync preserves the independent unknown account-evidence wait
+  ---
+  duration_ms: 238.165249
+  type: 'test'
+  ...
+# Subtest: ambiguous duplicate account selection is blocked before provider reads
+ok 341 - ambiguous duplicate account selection is blocked before provider reads
+  ---
+  duration_ms: 86.960151
+  type: 'test'
+  ...
+# Subtest: ambiguous duplicate account resource is blocked before provider reads
+ok 342 - ambiguous duplicate account resource is blocked before provider reads
+  ---
+  duration_ms: 93.911917
+  type: 'test'
+  ...
+# Subtest: two concurrent scheduler jobs cannot fetch or write the same owner and account
+ok 343 - two concurrent scheduler jobs cannot fetch or write the same owner and account
+  ---
+  duration_ms: 246.612028
+  type: 'test'
+  ...
+# Subtest: contradictory provider original retains evidence without new money or successful checkpoint
+ok 344 - contradictory provider original retains evidence without new money or successful checkpoint
+  ---
+  duration_ms: 353.376741
+  type: 'test'
+  ...
+# Subtest: unparseable provider retry advice remains blocked even if legacy retry fields are reset
+ok 345 - unparseable provider retry advice remains blocked even if legacy retry fields are reset
+  ---
+  duration_ms: 185.774082
+  type: 'test'
+  ...
+# Subtest: bound company cannot use legacy sync to bypass company authority
+ok 346 - bound company cannot use legacy sync to bypass company authority
+  ---
+  duration_ms: 79.31448
+  type: 'test'
+  ...
+# Subtest: bound company cannot use legacy syncControl to bypass company authority
+ok 347 - bound company cannot use legacy syncControl to bypass company authority
+  ---
+  duration_ms: 75.031568
+  type: 'test'
+  ...
+# Subtest: company binding installed at legacy commit fences the financial write atomically
+ok 348 - company binding installed at legacy commit fences the financial write atomically
+  ---
+  duration_ms: 98.666262
+  type: 'test'
+  ...
+# Subtest: caller chosen account key cannot reset the authoritative account quota
+ok 349 - caller chosen account key cannot reset the authoritative account quota
+  ---
+  duration_ms: 98.685105
+  type: 'test'
+  ...
+# Subtest: company-bound owner cannot run legacy autonomous reconciliation and draft creation
+ok 350 - company-bound owner cannot run legacy autonomous reconciliation and draft creation
+  ---
+  duration_ms: 77.507864
+  type: 'test'
+  ...
+# Subtest: legacy reconciliation remains available to unbound owners
+ok 351 - legacy reconciliation remains available to unbound owners
+  ---
+  duration_ms: 95.03545
+  type: 'test'
+  ...
+# Subtest: legacy reconciliation fences concurrent company enrollment
+ok 352 - legacy reconciliation fences concurrent company enrollment
+  ---
+  duration_ms: 85.009843
+  type: 'test'
+  ...
+# Subtest: company-bound owner cannot call the standalone legacy Bankgiro source or sink
+ok 353 - company-bound owner cannot call the standalone legacy Bankgiro source or sink
+  ---
+  duration_ms: 317.095531
+  type: 'test'
+  ...
+# Subtest: bound configured Bankgiro status and run return sanitized blocked state without provider or storage mutations
+ok 354 - bound configured Bankgiro status and run return sanitized blocked state without provider or storage mutations
+  ---
+  duration_ms: 184.129663
+  type: 'test'
+  ...
+# Subtest: legacy Bankgiro financial commit rejects concurrent company enrollment
+ok 355 - legacy Bankgiro financial commit rejects concurrent company enrollment
+  ---
+  duration_ms: 192.58014
+  type: 'test'
+  ...
+# Subtest: renewed session and account UID retain the original quota and financial receipt
+ok 356 - renewed session and account UID retain the original quota and financial receipt
+  ---
+  duration_ms: 434.579388
+  type: 'test'
+  ...
+# Subtest: an explicitly earlier configured start date reopens history beyond the prior account checkpoint
+ok 357 - an explicitly earlier configured start date reopens history beyond the prior account checkpoint
+  ---
+  duration_ms: 435.384034
+  type: 'test'
+  ...
+1..357
+# tests 357
+# suites 0
+# pass 357
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 63299.86716

@@ -1,0 +1,42 @@
+[
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-third-pr-ci-f488841/logs/bankgiro_bridge-127695719110.log",
+    "bytes": 36951,
+    "sha256": "b6b1095dc4452b614f046e41a79dad86fced9f59ea81b8ced1f63ebc0e6cd005",
+    "job_id": 127695719110,
+    "run_id": 42157715027,
+    "name": "bankgiro_bridge",
+    "receivedAt": "2026-11-06T03:41:11.008Z",
+    "source": "Full decoded connector log preserved as UTF-8"
+  },
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-third-pr-ci-f488841/logs/test-127695719068.log",
+    "bytes": 990590,
+    "sha256": "28518562d10199d12bcb3fa6393ed188efba29a63a07a350b2b07da9d27cebb3",
+    "job_id": 127695719068,
+    "run_id": 42157715027,
+    "name": "test",
+    "receivedAt": "2026-11-06T03:42:41.617Z",
+    "source": "Full decoded connector log preserved as UTF-8"
+  },
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-third-pr-ci-f488841/logs/security_acceptance-127695718932.log",
+    "bytes": 19837,
+    "sha256": "84946943afbbe9871f8edab49bb3e588e2194228c431fd59a972bd7f222177b0",
+    "job_id": 127695718932,
+    "run_id": 42157715038,
+    "name": "security_acceptance",
+    "receivedAt": "2026-11-06T03:42:40.833Z",
+    "source": "Full decoded connector log preserved as UTF-8"
+  },
+  {
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-third-pr-ci-f488841/logs/sites-127695718942.log",
+    "bytes": 2236225,
+    "sha256": "a485706db4e1a4cb6d33f87884b67dae432f41093096c92b1ae2934ebd532fd5",
+    "job_id": 127695718942,
+    "run_id": 42157715027,
+    "name": "sites",
+    "receivedAt": "2026-11-06T03:46:04.063Z",
+    "source": "Full decoded connector log preserved as UTF-8"
+  }
+]

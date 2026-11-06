@@ -1,10 +1,10 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
-## Aktuell bedömning efter kompletterad Site 65-verifiering — 2026-11-06
+## Aktuell bedömning efter Site 66 — 2026-11-06
 
-**28/33 områden har stöd för minst 8/10. Alla 33 är ännu inte klara.** Summa 257,5/330, medel 7,80. Målet gäller varje rad, inte medelvärdet. Område 33 höjs från 7 till 8 efter oberoende granskning av den kompletterade driftbevisningen; övriga betyg är oförändrade.
+**28/33 områden har stöd för minst 8/10. Alla 33 är ännu inte klara.** Summa 257,5/330, medel 7,80. Målet gäller varje rad. Samtliga numeriska betyg är oförändrade i denna leverans.
 
-Site 65 är publicerad från main `41aadcef5fc6f65cc73979997b195c7b4f12eec1`, med exakt **6819/6819** godkända obligatoriska tester. [Leveranskedja](docs/quality8/release-wave3.md), [maskinläsbara 33 rader](docs/quality8/current-33-assessment.json), [oberoende bedömning av 28 och 33](docs/quality8/area28-33-independent-read-review.md), [fullständigt verifierad backup](docs/quality8/backup-2026-11-06-final-pass/README.md).
+Site 66 är publicerad från main `0035ea89ef3cd60f0924f901503cad00d1ab1fca` efter exakt **7569/7569** godkända obligatoriska tester och genomfört bygge. [Leveranskedja](docs/quality8/release-wave4.md), [maskinläsbara 33 rader](docs/quality8/current-33-assessment.json), [verkliga efterkontroller](docs/quality8/wave4-postpublication-observations.json).
 
 | Nr | Område | Nu | Stöd / kvarstående krav |
 | --- | --- | ---: | --- |
@@ -13,16 +13,16 @@ Site 65 är publicerad från main `41aadcef5fc6f65cc73979997b195c7b4f12eec1`, me
 | 3 | Navigation | 8 | Publicerad sökning→ArrowDown/Enter→Escape återställer sökfokus. |
 | 4 | Mobil | 8 | 25/25 lokala geometrier vid fem bredder; samma CSS/Sites-träd publicerat. |
 | 5 | Sök/filter | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 6 | Minimal manuell hantering | 6,5 | Ytterligare 6 verkliga underlag behandlades utan körfel; ett godtagbart normalunderlag till registreringskvitto återstår. |
+| 6 | Minimal manuell hantering | 6,5 | Site 66: nio nya Gmail-underlag importerade; den vanliga kön flyttades till OCR. Två fullständigt lästa dokumentregistreringsrader är oförändrade; inget nytt normalt registreringskvitto. |
 | 7 | Kundfakturor | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 8 | Leverantörsfakturor | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 9 | PDF | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 10 | Bild-OCR | 6,5 | Första V2 kvar underkänt: 100% precision/60% mandatory recall. Känd omtolkning med levererad grammatik:63%; nytt oberoende prov återstår. |
+| 10 | Bild-OCR | 6,5 | Första V2 kvar underkänt: 100% precision/60% mandatory recall. Känd textreplay på levererad 96d1404: 57/100 mandatory och 79/130 All13, 0 falska fältvärden i lagrad PSM3-grupp; ingen ny optik. |
 | 11 | Gmail | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 12 | Automatisk registrering | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 13 | Dubbletter | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 14 | Dokumentgranskning | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 15 | Swedbank | 6,5 | Site65-revalidering avvisad: ett valt konto har sparat null-usage och aktuellt utelämnat usage; ingen aktivering. |
+| 15 | Swedbank | 6,5 | Site66-revalidering avvisad: sparat null-usage och aktuellt utelämnat usage. Ett detaljförsök gav DETAILS_PROVIDER_UNAVAILABLE utan verifierad usageklass; ingen aktivering. |
 | 16 | Automatisk bankhämtning | 6,5 | Ingen ny lyckad behörig bankhämtning efter 2026-11-05 08:05 UTC. |
 | 17 | Bankgiro-import | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 18 | Verklig betalare | 8 | Ägt verkligt rapportoriginal och exakt läsvy bevarar angiven betalare; saknad AIS-betalare förblir okänd. |
@@ -35,14 +35,14 @@ Site 65 är publicerad från main `41aadcef5fc6f65cc73979997b195c7b4f12eec1`, me
 | 25 | Betalstatus | 8 | Publicerad översikt/detalj behåller registrerat saldo och stoppar falskt verifierad visning. |
 | 26 | Kontrollera alla betalningar | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
 | 27 | Mejlförslag | 8 | Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto. |
-| 28 | Schemaläggning | 6,5 | [Verklig periodisk OCR](docs/quality8/ocr-periodic-20261106/README.md) på Site65: sex behandlade, noll körfel; Gmail har avslutade schemakörningar. Backupens korrigerade anropsbudget återstår att verifiera från ofärdig snapshot eller automatisk återupptagningskedja. |
+| 28 | Schemaläggning | 6,5 | Faktisk periodisk OCR-run 42153093698 gav 6 behandlade/0 fel. Gmails tidigare schemakörningar importerade underlag, men senaste no_update saknade färsk appinvokering. Prompten kräver nu färska kontrollanrop och är återläst. Backupens nya instruktion är ännu inte prövad automatiskt från ofärdig snapshot. |
 | 29 | Backup | 8 | Snapshot 768fde9a-27a2-4b85-b85a-278239ec4aea: 430/430 original kopierade och kontrollästa, 185 567 855 byte i båda stegen, manifest_pass och verifiering slutförd 2026-11-06 00:48:58 UTC; separat slutstatus 00:49:04 UTC. |
 | 30 | Säkerhet | 8,5 | Exakt full CI/audit och negativa säkerhetsgrindar godkända;8 moderate utvecklingsfynd kvarstår. |
 | 31 | Katastrofåterställning | 8 | Isolerad återställning med riktig kod; lokalRTO 3,417 s och simuleradRPO 15 min, inte produktionsåterställning. |
-| 32 | Kod/tester | 8,5 | Exakt main41aadcef-CI6819/6819,0fel/skip; normalt publicerat identiskt Sites-träd. |
-| 33 | Verklig produktionsverifiering | 8 | Exakt main 41aadcef till Site 65; verklig säkert avvisad bankrevalidering, avslutad Gmail-schemakörning, faktisk OCR 6/0, fullständigt verifierad 430-filssnapshot och två kompletta ekonomiska före-/efterläsningar med revision 52 och noll bokningar. Oberoende läsgranskning bedömer oförändrat kriterium uppfyllt. |
+| 32 | Kod/tester | 8,5 | Exakt main0035ea89: 7569/7569 obligatoriska tester, 0 fail/cancel/skip/TODO; alla 16 grindar och verkligt Sites-bygge passerade. Samma Sites-träd publicerat som Site66. |
+| 33 | Verklig produktionsverifiering | 8 | Exakt main0035ea89 till Site66; verklig avvisad bankrevalidering med bounded detaljförsök, nio nya Gmail-importer, köprogress till OCR, tidigare periodisk OCR 6/0 och verifierad 430-filssnapshot. Två kompletta ekonomiska före-/efterläsningar efter normal bearbetning behåller revision52, noll bokningar och alla uppgifter/spärrar utom kontrolltid. |
 
-Återstående under 8: **6, 10, 15, 16 och 28**. Verklig normalregistrering, OCR:s frysta hållprov, bankens giltiga anslutning/hämtning och aktuell periodisk drift bedöms enligt sina egna kriterier. Bankavvisningen är relevant produktionsverifiering men återställer ingen bankbehörighet. Backupens frysta manifest med 430 filer är nu fullständigt verifierat; ändrad schemainstruktion är ännu oprövad från ofärdig snapshot. Tidigare daterade underlag nedan behåller sin historiska omfattning.
+Återstående under 8: **6, 10, 15, 16 och 28**. Bankens faktiska usageklass är ännu okänd. Registreringskedjan behöver ett riktigt normalt slutkvitto, OCR behöver ett fryst oberoende förstaprov och de korrigerade schemainstruktionerna behöver faktisk automatisk verifiering. Dagens kompletta backup är ingen provkörning av budgeten från ett ofärdigt läge. Äldre daterade underlag nedan behåller sin historiska omfattning.
 
 ## Tidigare daterade bedömningar
 

@@ -1,0 +1,542 @@
+{
+  "producer": {
+    "logSha256": "7a1add3166f8c6668de3d2b6fdacd33f6e7f814832ad526a9e7924233adb4f88",
+    "failures": [
+      {
+        "name": "reviewer: provider failure on the fifth result withholds all partial usage",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_TIMEOUT"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP expired session remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_RECONNECT_REQUIRED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP account access remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_ACCOUNT_UNAVAILABLE"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_RESOURCE_UNAVAILABLE"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "PROVIDER_AUTHORIZATION_FAILED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP application access remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "PROVIDER_ACCESS_DENIED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP user context remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_USER_CONTEXT_REQUIRED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP bank action remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_ACTION_REQUIRED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP timeout remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_TIMEOUT"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP service failure remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_SERVICE_ERROR"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_RATE_LIMIT"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP redirect remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "PROVIDER_REDIRECT_DENIED"
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter absent currency exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "absent"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter null account type exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "cash_account_type",
+            "kind": "null"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter string primary resource exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "account_id",
+            "kind": "string"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter array currency exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "array"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter object account type exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "cash_account_type",
+            "kind": "object"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter number currency exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "other"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter different UID exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "uid",
+            "kind": "string"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter invalid alias scheme exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "all_account_ids[].scheme_name",
+            "kind": "string"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: invalid JSON has a trusted code without an invented field",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE"
+        }
+      },
+      {
+        "name": "usage details failure projection: transport failure exposes a fixed code and keeps its fixed log",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_NETWORK_ERROR"
+        }
+      },
+      {
+        "name": "usage details failure projection: constructor code survives hostile public getters",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_TIMEOUT"
+        }
+      },
+      {
+        "name": "usage details failure projection: contract failure after a valid detail withholds every usage count",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "absent"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: the real MCP error preserves the same safe projection",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "cash_account_type",
+            "kind": "null"
+          }
+        }
+      }
+    ]
+  },
+  "reviewer": {
+    "logSha256": "42d9ecafd5fe4b6dc79b8d6815ecc2b7c4d1572a69ce61d85987f3858971ca84",
+    "failures": [
+      {
+        "name": "reviewer: provider failure on the fifth result withholds all partial usage",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_TIMEOUT"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP expired session remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_RECONNECT_REQUIRED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP account access remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_ACCOUNT_UNAVAILABLE"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_RESOURCE_UNAVAILABLE"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "PROVIDER_AUTHORIZATION_FAILED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP application access remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "PROVIDER_ACCESS_DENIED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP user context remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_USER_CONTEXT_REQUIRED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP bank action remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_ACTION_REQUIRED"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP timeout remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_TIMEOUT"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP service failure remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_SERVICE_ERROR"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_RATE_LIMIT"
+        }
+      },
+      {
+        "name": "usage details failure projection: real HTTP redirect remains a denied bounded diagnosis",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "PROVIDER_REDIRECT_DENIED"
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter absent currency exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "absent"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter null account type exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "cash_account_type",
+            "kind": "null"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter string primary resource exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "account_id",
+            "kind": "string"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter array currency exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "array"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter object account type exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "cash_account_type",
+            "kind": "object"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter number currency exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "other"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter different UID exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "uid",
+            "kind": "string"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: adapter invalid alias scheme exposes only field and kind",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "all_account_ids[].scheme_name",
+            "kind": "string"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: invalid JSON has a trusted code without an invented field",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE"
+        }
+      },
+      {
+        "name": "usage details failure projection: transport failure exposes a fixed code and keeps its fixed log",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_NETWORK_ERROR"
+        }
+      },
+      {
+        "name": "usage details failure projection: constructor code survives hostile public getters",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "BANK_TIMEOUT"
+        }
+      },
+      {
+        "name": "usage details failure projection: contract failure after a valid detail withholds every usage count",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "currency",
+            "kind": "absent"
+          }
+        }
+      },
+      {
+        "name": "usage details failure projection: the real MCP error preserves the same safe projection",
+        "code": "ERR_ASSERTION",
+        "operator": "deepStrictEqual",
+        "onlyDifference": "providerFailure missing",
+        "expectedProviderFailure": {
+          "code": "INVALID_PROVIDER_RESPONSE",
+          "validationIssue": {
+            "field": "cash_account_type",
+            "kind": "null"
+          }
+        }
+      }
+    ]
+  }
+}

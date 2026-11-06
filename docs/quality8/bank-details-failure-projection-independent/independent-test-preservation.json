@@ -1,0 +1,28 @@
+{
+  "files": {
+    "sites/tests/banking-security.test.mjs": {
+      "originalAssertionsPreserved": true,
+      "baseSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+      "redSha256": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+      "reconstructionMatchesBaseByteForByte": true
+    },
+    "sites/tests/company-bank-sync.test.mjs": {
+      "originalAssertionsPreserved": true,
+      "baseSha256": "d1d30f9a68506087441a5e41e71eea739cd608819d2bc3d68e8487ab9544c15e",
+      "redSha256": "460ca88c5538cfb5b48f7a7706b7e2dd67740f6b5e494e05267f86bdf10cf6fd",
+      "reconstructionMatchesBaseByteForByte": true
+    },
+    "sites/tests/bank-sync-integrity-q8.test.mjs": {
+      "originalAssertionsPreserved": true,
+      "baseSha256": "194f8f1ce1c8d55c6c5def2ead86f7ec055f8e82018841534b66bb1ed5711535",
+      "redSha256": "a4e83822f6814e97b62ec1443b8f3adeabb1a1fdea9cffe91f5b688a08fc7dfb",
+      "reconstructionMatchesBaseByteForByte": true
+    }
+  },
+  "allowedChanges": [
+    "three providerResponseDiagnostic mock re-exports",
+    "one existing BANK_TIMEOUT expectation strengthened",
+    "36 added focused cases"
+  ],
+  "originalAssertionsUnchangedOtherwise": true
+}

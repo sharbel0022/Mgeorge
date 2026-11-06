@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: independent failure projection: registered network code defeats forged invalid-response metadata
+ok 1 - independent failure projection: registered network code defeats forged invalid-response metadata
+  ---
+  duration_ms: 571.702432
+  type: 'test'
+  ...
+# Subtest: independent failure projection: registered invalid-response without an adapter issue invents no field
+ok 2 - independent failure projection: registered invalid-response without an adapter issue invents no field
+  ---
+  duration_ms: 299.984977
+  type: 'test'
+  ...
+# Subtest: independent failure projection: unknown constructor code cannot be promoted by public code
+ok 3 - independent failure projection: unknown constructor code cannot be promoted by public code
+  ---
+  duration_ms: 238.928212
+  type: 'test'
+  ...
+# Subtest: independent failure projection: boxed constructor string does not acquire allowlist membership
+ok 4 - independent failure projection: boxed constructor string does not acquire allowlist membership
+  ---
+  duration_ms: 196.334117
+  type: 'test'
+  ...
+# Subtest: independent failure projection: registered code survives removal of the entire public prototype
+ok 5 - independent failure projection: registered code survives removal of the entire public prototype
+  ---
+  duration_ms: 216.752311
+  type: 'test'
+  ...
+# Subtest: independent failure projection: null-prototype accessors remains generic without evaluating properties
+ok 6 - independent failure projection: null-prototype accessors remains generic without evaluating properties
+  ---
+  duration_ms: 167.906495
+  type: 'test'
+  ...
+# Subtest: independent failure projection: all-traps proxy around registered error remains generic without evaluating properties
+ok 7 - independent failure projection: all-traps proxy around registered error remains generic without evaluating properties
+  ---
+  duration_ms: 184.723384
+  type: 'test'
+  ...
+# Subtest: independent failure projection: revoked callable proxy remains generic without evaluating properties
+ok 8 - independent failure projection: revoked callable proxy remains generic without evaluating properties
+  ---
+  duration_ms: 173.709918
+  type: 'test'
+  ...
+# Subtest: independent failure projection: function with borrowed provider prototype remains generic without evaluating properties
+ok 9 - independent failure projection: function with borrowed provider prototype remains generic without evaluating properties
+  ---
+  duration_ms: 188.393584
+  type: 'test'
+  ...
+# Subtest: independent failure projection: thrown undefined is safely generic
+ok 10 - independent failure projection: thrown undefined is safely generic
+  ---
+  duration_ms: 210.584859
+  type: 'test'
+  ...
+# Subtest: independent failure projection: thrown symbol is safely generic
+ok 11 - independent failure projection: thrown symbol is safely generic
+  ---
+  duration_ms: 203.158167
+  type: 'test'
+  ...
+# Subtest: independent failure projection: thrown bigint is safely generic
+ok 12 - independent failure projection: thrown bigint is safely generic
+  ---
+  duration_ms: 180.378505
+  type: 'test'
+  ...
+# Subtest: independent failure projection: actual adapter issue survives hostile public code and issue getters
+ok 13 - independent failure projection: actual adapter issue survives hostile public code and issue getters
+  ---
+  duration_ms: 256.900628
+  type: 'test'
+  ...
+# Subtest: independent failure projection: fifth actual-adapter failure hides four mixed prior observations
+ok 14 - independent failure projection: fifth actual-adapter failure hides four mixed prior observations
+  ---
+  duration_ms: 415.934406
+  type: 'test'
+  ...
+# Subtest: independent failure projection: replaced read marker masks a trusted second failure and retains the replacement
+ok 15 - independent failure projection: replaced read marker masks a trusted second failure and retains the replacement
+  ---
+  duration_ms: 226.881537
+  type: 'test'
+  ...
+# Subtest: independent failure projection: lost audit reply suppresses the complete diagnostic
+ok 16 - independent failure projection: lost audit reply suppresses the complete diagnostic
+  ---
+  duration_ms: 185.730149
+  type: 'test'
+  ...
+# Subtest: independent failure projection: owner lost after audit commit suppresses the complete diagnostic
+ok 17 - independent failure projection: owner lost after audit commit suppresses the complete diagnostic
+  ---
+  duration_ms: 143.473335
+  type: 'test'
+  ...
+# Subtest: independent failure projection: application deactivated after audit commit suppresses the complete diagnostic
+ok 18 - independent failure projection: application deactivated after audit commit suppresses the complete diagnostic
+  ---
+  duration_ms: 173.779974
+  type: 'test'
+  ...
+# Subtest: independent failure projection: real 503 cooldown remains effective and cannot trigger a retry
+ok 19 - independent failure projection: real 503 cooldown remains effective and cannot trigger a retry
+  ---
+  duration_ms: 227.106154
+  type: 'test'
+  ...
+# Subtest: independent failure projection: successful ORGA detail is still the original denied consent
+ok 20 - independent failure projection: successful ORGA detail is still the original denied consent
+  ---
+  duration_ms: 212.510065
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5228.254591

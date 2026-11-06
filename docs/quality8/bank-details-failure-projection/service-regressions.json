@@ -1,0 +1,38 @@
+{
+  "label": "service-regressions",
+  "startedAt": "2026-11-06T04:16:44.973362+00:00",
+  "finishedAt": "2026-11-06T04:17:48.363983+00:00",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/bank-details-failure-projection/sites",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "../scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "tests/banking-security.test.mjs",
+    "tests/company-bank-sync.test.mjs",
+    "tests/bank-sync-integrity-q8.test.mjs"
+  ],
+  "environment": {
+    "NODE_ENV": "test",
+    "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+    "WRANGLER_SEND_METRICS": "false"
+  },
+  "returncode": 0,
+  "signal": null,
+  "durationSeconds": 63.39,
+  "maxRssKiB": 806916,
+  "counts": {
+    "tests": 357,
+    "suites": 0,
+    "pass": 357,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-0035/service-regressions.tap",
+  "logSha256": "6251b4e1264af18d58883220dfcdabc625defe546af9fcc07e027c9490c42b04"
+}

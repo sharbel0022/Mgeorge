@@ -1,0 +1,21 @@
+{
+  "validated_at": "2026-11-06T04:01:44+00:00",
+  "result": "pass",
+  "run_and_event_identity": true,
+  "three_jobs_terminal_success": true,
+  "three_exact_checkout_shas": true,
+  "main_git_tree_and_sites_tree_match": true,
+  "main_commit_parents_match": true,
+  "two_pinned_workflow_git_blob_shas_match": true,
+  "main_saas_push_not_applicable": true,
+  "all_three_raw_log_byte_counts_and_sha256_match": true,
+  "exactly_one_tap_summary_per_job": true,
+  "7569_of_7569_pass": true,
+  "zero_fail_cancelled_skipped_todo": true,
+  "sixteen_required_gates_success": true,
+  "sites_build_actually_executed_and_completed": true,
+  "runtime_all_jobs": "v22.23.4",
+  "node_and_bridge_audit_zero_vulnerabilities": true,
+  "sites_high_threshold_audit_success_with_8_moderate": true,
+  "no_more_status_polling_after_terminal_verification": true
+}

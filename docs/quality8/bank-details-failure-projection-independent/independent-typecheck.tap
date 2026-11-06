@@ -1,0 +1,15 @@
+file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/scripts/minimatch-backport.mjs:32
+    if (entry.isSymbolicLink()) throw new Error(`Symlink/junction in backport path: ${relative}`);
+                                      ^
+
+Error: Symlink/junction in backport path: node_modules
+    at safePath (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/scripts/minimatch-backport.mjs:32:39)
+    at moduleDirectory (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/scripts/minimatch-backport.mjs:58:22)
+    at discover (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/scripts/minimatch-backport.mjs:74:3)
+    at guardMinimatchBackport (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/scripts/minimatch-backport.mjs:140:18)
+    at file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/scripts/run-verified-tool.mjs:10:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.1

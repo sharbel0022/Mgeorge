@@ -1,0 +1,18 @@
+{
+  "removed": [
+    {
+      "file": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs",
+      "sha": "5c0995d7a55cb4205ddb07f3e9aebf78ba8264cd765e1a552cf2b890e857b801"
+    },
+    {
+      "file": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-v2-tmp.test.mjs",
+      "sha": "68a3355a47c175cb21fa4c6a3bb5ea10676ec56aaaf5999b8c96614ce13bc1a8"
+    },
+    {
+      "file": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/reviewer-harness-controls-tmp.test.mjs",
+      "sha": "4fccb6b488c12c8236fd4747cbd53a21947a09efc9c08e703c85a4150301f2f9"
+    }
+  ],
+  "originalFixtureSha256": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+  "originalFixtureUnchanged": true
+}

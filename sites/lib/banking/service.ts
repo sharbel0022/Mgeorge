@@ -1,7 +1,7 @@
 import { db, identity, readWorkspace, response, currentCompanyContext } from '@/lib/server';
 import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, canonicalBankAccount, emptyState, now, uid, validDate } from '@/lib/domain';
 import {
-  ProviderError, providerErrorCode, getApplication, listBusinessBanks, startAuth, createSession,
+  ProviderError, providerErrorCode, providerResponseDiagnostic, getApplication, listBusinessBanks, startAuth, createSession,
   getSession, getAccountDetails, deleteSession, getTransactions, providerCooldownDiagnostic,
   type ProviderAccount, type ProviderApplication, type ProviderPsu,
 } from './enable-banking';
@@ -26,7 +26,10 @@ type UsageDetailsDiagnostic = Readonly<{
   version: 'selected-account-usage-details-v1'; targetCount: number; attemptedCount: number; observedCount: number;
 } & ({status: 'observed'; reason: 'EXACT_SELECTED_DETAILS_OBSERVED'; usage: BankAccountUsageCounts} |
   {status: 'not_read'; reason: AccountUsageDetailsReadReason} |
-  {status: 'unavailable'; reason: AccountUsageDetailsObservationReason | 'DETAILS_PROVIDER_UNAVAILABLE'})>;
+  {status: 'unavailable'; reason: AccountUsageDetailsObservationReason} |
+  {status: 'unavailable'; reason: 'DETAILS_PROVIDER_UNAVAILABLE'; providerFailure?: Readonly<{
+    code: string; validationIssue?: Readonly<NonNullable<ReturnType<typeof providerResponseDiagnostic>>>;
+  }>})>;
 const revalidationUsageDetailsDiagnostics = new WeakMap<ConsentError, UsageDetailsDiagnostic>();
 
 /** This lease authorizes only diagnostic reads under an unchanged retained
@@ -748,10 +751,15 @@ export async function revalidateConsent(request?: Request): Promise<Response> {
                 detailsDiagnostic=Object.freeze({...progress,status:'observed',reason:'EXACT_SELECTED_DETAILS_OBSERVED',usage:Object.freeze(counts)});
               }
             }
-          }catch{
-            // Provider text and partial usage counts never escape. A subsequent
-            // context/audit failure also suppresses this fixed unavailable result.
-            detailsDiagnostic=Object.freeze({...progress,status:'unavailable',reason:'DETAILS_PROVIDER_UNAVAILABLE'});
+          }catch(detailsError){
+            // Only constructor-bound codes and field kinds may escape; public
+            // error properties and partial usage counts are never projected.
+            // The final context/audit gate still controls this entire result.
+            const code=providerErrorCode(detailsError);
+            const issue=code==='INVALID_PROVIDER_RESPONSE'?providerResponseDiagnostic(detailsError):null;
+            const providerFailure=code!==undefined&&BANK_JOB_ERROR_CODES.has(code)
+              ?Object.freeze({code,...(issue?{validationIssue:Object.freeze(issue)}:{})}):undefined;
+            detailsDiagnostic=Object.freeze({...progress,status:'unavailable',reason:'DETAILS_PROVIDER_UNAVAILABLE',...(providerFailure?{providerFailure}:{})});
           }
         }
         throw error;

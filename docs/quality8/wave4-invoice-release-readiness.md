@@ -1,3 +1,9 @@
+## Slutförd leverans: Site 66 — 2026-11-06
+
+Den tredje kandidaten fick grön full PR-CI, normal merge till main0035ea89 och separat grön main-CI 7569/7569. Samma Sites-träd publicerades 04:01:09 UTC. [Slutligt releasekvitto](release-wave4.md) och [verkliga efterkontroller](wave4-postpublication-observations.json) ersätter kandidatuppgifterna nedan som aktuellt läge. De tidigare underkända körningarna är bevarade. Målet är fortfarande 28/33 minst8; ingen total måluppfyllelse påstås.
+
+## Historiska kandidatgrindar
+
 ## Aktuell tredje kandidat: oberoende granskad, full CI återstår — 2026-11-06
 
 Den andra fulla PR-körningens tolv recipient-regressioner har reparerats. Den första smala reparationen fick i sin tur två oberoende fynd om parenteser och oägt organisationsnummer; båda är rättade i exakt produkt `96d1404`. [Ursprunglig NOTREADY och separat READY](party-boundary-independent/README.md) bevarar alla frysta prov och råloggar. Granskaren har själv kört **340/340**, medan [rootintegrationens avgränsade grind](party-boundary-integration/receipt.json) passerar **655/655**. Populationerna överlappar och summeras inte.

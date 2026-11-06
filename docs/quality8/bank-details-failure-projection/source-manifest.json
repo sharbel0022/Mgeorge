@@ -1,0 +1,98 @@
+{
+  "base": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "redCommit": "9c1078cadfbca8923213f066cef1476c612796c6",
+  "productCommit": "92b6fefe60c31d8f862f6d93f2d422e777801390",
+  "files": {
+    "sites/lib/banking/service.ts": {
+      "baseSha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+      "redSha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+      "productSha256": "cc3114a7bb7a9e4d013a50d7740d9b1f1389a47861a46c44d47e9b061d8e628d",
+      "sameAsBase": false,
+      "sameAsRed": false
+    },
+    "sites/lib/banking/enable-banking.ts": {
+      "baseSha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+      "redSha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+      "productSha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/lib/banking/account-read-guard.ts": {
+      "baseSha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+      "redSha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+      "productSha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/lib/bank-consent-policy.js": {
+      "baseSha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "redSha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "productSha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/lib/bank-consent-policy.d.ts": {
+      "baseSha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "redSha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "productSha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/lib/banking/mcp.ts": {
+      "baseSha256": "540feddea3b884af0609af884fc3a29e928bf2f04e37addcff361630a674a0d2",
+      "redSha256": "540feddea3b884af0609af884fc3a29e928bf2f04e37addcff361630a674a0d2",
+      "productSha256": "540feddea3b884af0609af884fc3a29e928bf2f04e37addcff361630a674a0d2",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/lib/banking/store.ts": {
+      "baseSha256": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+      "redSha256": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+      "productSha256": "3fdda2b5fbefb06debaf64cf5daab43e8204b673dc208dcd394b11d4680f1105",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/lib/banking/account-evidence.ts": {
+      "baseSha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "redSha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "productSha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/lib/bank-company-authority.js": {
+      "baseSha256": "530620cfd84c964600e214ca8841d820069300a63771d07d68a356c0af8f78b0",
+      "redSha256": "530620cfd84c964600e214ca8841d820069300a63771d07d68a356c0af8f78b0",
+      "productSha256": "530620cfd84c964600e214ca8841d820069300a63771d07d68a356c0af8f78b0",
+      "sameAsBase": true,
+      "sameAsRed": true
+    },
+    "sites/tests/banking-security.test.mjs": {
+      "baseSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+      "redSha256": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+      "productSha256": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+      "sameAsBase": false,
+      "sameAsRed": true
+    },
+    "sites/tests/bank-sync-integrity-q8.test.mjs": {
+      "baseSha256": "194f8f1ce1c8d55c6c5def2ead86f7ec055f8e82018841534b66bb1ed5711535",
+      "redSha256": "a4e83822f6814e97b62ec1443b8f3adeabb1a1fdea9cffe91f5b688a08fc7dfb",
+      "productSha256": "a4e83822f6814e97b62ec1443b8f3adeabb1a1fdea9cffe91f5b688a08fc7dfb",
+      "sameAsBase": false,
+      "sameAsRed": true
+    },
+    "sites/tests/company-bank-sync.test.mjs": {
+      "baseSha256": "d1d30f9a68506087441a5e41e71eea739cd608819d2bc3d68e8487ab9544c15e",
+      "redSha256": "460ca88c5538cfb5b48f7a7706b7e2dd67740f6b5e494e05267f86bdf10cf6fd",
+      "productSha256": "460ca88c5538cfb5b48f7a7706b7e2dd67740f6b5e494e05267f86bdf10cf6fd",
+      "sameAsBase": false,
+      "sameAsRed": true
+    },
+    "sites/package-lock.json": {
+      "baseSha256": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+      "redSha256": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+      "productSha256": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0",
+      "sameAsBase": true,
+      "sameAsRed": true
+    }
+  }
+}

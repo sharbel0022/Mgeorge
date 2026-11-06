@@ -1,0 +1,159 @@
+{
+  "schema": "lossless-ci-evidence-storage-v1",
+  "sourceHead": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "entries": [
+    {
+      "originalPath": "REPORT.md",
+      "originalBytes": 8047,
+      "originalSha256": "84a4b5a79cf105f18ddc1af8f0d7926d23cd623da6da39e1e34ff48cbc07e816",
+      "storedPath": "REPORT.md",
+      "storedBytes": 8047,
+      "storedSha256": "84a4b5a79cf105f18ddc1af8f0d7926d23cd623da6da39e1e34ff48cbc07e816",
+      "gzip": false
+    },
+    {
+      "originalPath": "checkpoint.json",
+      "originalBytes": 283,
+      "originalSha256": "6d667b75cdb6db74eb363503beabdf12db7513a82167073f5fa6c7a80c7ecc20",
+      "storedPath": "checkpoint.json",
+      "storedBytes": 283,
+      "storedSha256": "6d667b75cdb6db74eb363503beabdf12db7513a82167073f5fa6c7a80c7ecc20",
+      "gzip": false
+    },
+    {
+      "originalPath": "ci-receipt.json",
+      "originalBytes": 17728,
+      "originalSha256": "18adbb3b08a1e448fb4d24bf056c3e47a2cc3ce075370d8db49cd161d269667d",
+      "storedPath": "ci-receipt.json",
+      "storedBytes": 17728,
+      "storedSha256": "18adbb3b08a1e448fb4d24bf056c3e47a2cc3ce075370d8db49cd161d269667d",
+      "gzip": false
+    },
+    {
+      "originalPath": "exact-green-confirmation.json",
+      "originalBytes": 1522,
+      "originalSha256": "4be8346b22127552ed32dca20d87439ec1d29944b376d7ac342042b4251cbbc3",
+      "storedPath": "exact-green-confirmation.json",
+      "storedBytes": 1522,
+      "storedSha256": "4be8346b22127552ed32dca20d87439ec1d29944b376d7ac342042b4251cbbc3",
+      "gzip": false
+    },
+    {
+      "originalPath": "gate-proofs.json",
+      "originalBytes": 4352,
+      "originalSha256": "54e83fe13c8158c124c33493a0d193e8f16bd04de09c2fb70d33b0a04bbb4003",
+      "storedPath": "gate-proofs.json",
+      "storedBytes": 4352,
+      "storedSha256": "54e83fe13c8158c124c33493a0d193e8f16bd04de09c2fb70d33b0a04bbb4003",
+      "gzip": false
+    },
+    {
+      "originalPath": "logs/bankgiro-bridge-127698704025.log",
+      "originalBytes": 35875,
+      "originalSha256": "d8220970d547c401ee52b6514c187b358c103ab1536b1174387e67d623f3c25d",
+      "storedPath": "logs/bankgiro-bridge-127698704025.log.gz",
+      "storedBytes": 8368,
+      "storedSha256": "bee71593ad68490876f0025f36ff452b86e57d014415a3968d26f54e71ec890a",
+      "gzip": true
+    },
+    {
+      "originalPath": "logs/node-127698704223.log",
+      "originalBytes": 989607,
+      "originalSha256": "e9f323a9917b0c9c59aa181f43a1ba5058781672a6634ea8ff34a88514c9d525",
+      "storedPath": "logs/node-127698704223.log.gz",
+      "storedBytes": 166431,
+      "storedSha256": "0ef2b20391110c8320cf01f47f55a453b5ead8b15ca9591b409698631c88fee0",
+      "gzip": true
+    },
+    {
+      "originalPath": "logs/sites-127698703819.log",
+      "originalBytes": 2233824,
+      "originalSha256": "c75d97d4701ceb952cac34d461e73bcbebe340297027daf0905e4fd3ac0e361f",
+      "storedPath": "logs/sites-127698703819.log.gz",
+      "storedBytes": 356849,
+      "storedSha256": "3b4a20f4fe88fe898d3ae08e829a1e478a2d682aadcf2782110ee4e63fd61562",
+      "gzip": true
+    },
+    {
+      "originalPath": "raw-log-receipts.json",
+      "originalBytes": 957,
+      "originalSha256": "035661fdd79062771ae1adda3ccd92b11feef535955f7b123dea5e2041281ffb",
+      "storedPath": "raw-log-receipts.json",
+      "storedBytes": 957,
+      "storedSha256": "035661fdd79062771ae1adda3ccd92b11feef535955f7b123dea5e2041281ffb",
+      "gzip": false
+    },
+    {
+      "originalPath": "sites-build-evidence.json",
+      "originalBytes": 926,
+      "originalSha256": "c58eeee1b44a67507141572012b3056ea83c1b9a5761adf26838cb16903c4346",
+      "storedPath": "sites-build-evidence.json",
+      "storedBytes": 926,
+      "storedSha256": "c58eeee1b44a67507141572012b3056ea83c1b9a5761adf26838cb16903c4346",
+      "gzip": false
+    },
+    {
+      "originalPath": "source-verification.json",
+      "originalBytes": 10458,
+      "originalSha256": "9e83b4e065e3acf871b038504ea475c3dd051f3f072ac60a1d8604f653edf830",
+      "storedPath": "source-verification.json",
+      "storedBytes": 10458,
+      "storedSha256": "9e83b4e065e3acf871b038504ea475c3dd051f3f072ac60a1d8604f653edf830",
+      "gzip": false
+    },
+    {
+      "originalPath": "status-history.json",
+      "originalBytes": 1618,
+      "originalSha256": "dd5770355af09d9b3b4792fd591fd198f299afb39cf25029c060051778f4d0d4",
+      "storedPath": "status-history.json",
+      "storedBytes": 1618,
+      "storedSha256": "dd5770355af09d9b3b4792fd591fd198f299afb39cf25029c060051778f4d0d4",
+      "gzip": false
+    },
+    {
+      "originalPath": "terminal-status.json",
+      "originalBytes": 27100,
+      "originalSha256": "6dd16000e341d388d3f14d885eb1b5b3904edc6eed73d1a73b0f8dd2e2a5cb7c",
+      "storedPath": "terminal-status.json",
+      "storedBytes": 27100,
+      "storedSha256": "6dd16000e341d388d3f14d885eb1b5b3904edc6eed73d1a73b0f8dd2e2a5cb7c",
+      "gzip": false
+    },
+    {
+      "originalPath": "validation.json",
+      "originalBytes": 838,
+      "originalSha256": "9e832a6309bdec4b6730ae2d51f822c34475ef6ad4a388d549587a861ccf79f3",
+      "storedPath": "validation.json",
+      "storedBytes": 838,
+      "storedSha256": "9e832a6309bdec4b6730ae2d51f822c34475ef6ad4a388d549587a861ccf79f3",
+      "gzip": false
+    },
+    {
+      "originalPath": "workflow-applicability.json",
+      "originalBytes": 20286,
+      "originalSha256": "17925d63600ef3c7c7a28bbc9d8e7db64e1997a96182d7b471768b0e8d0a27b0",
+      "storedPath": "workflow-applicability.json",
+      "storedBytes": 20286,
+      "storedSha256": "17925d63600ef3c7c7a28bbc9d8e7db64e1997a96182d7b471768b0e8d0a27b0",
+      "gzip": false
+    },
+    {
+      "originalPath": "workflows/payment-control-ci.yml",
+      "originalBytes": 3078,
+      "originalSha256": "fda1e1e17ace428c580124df362e6a038746b957e22be12295af56188f21d986",
+      "storedPath": "workflows/payment-control-ci.yml",
+      "storedBytes": 3078,
+      "storedSha256": "fda1e1e17ace428c580124df362e6a038746b957e22be12295af56188f21d986",
+      "gzip": false
+    },
+    {
+      "originalPath": "workflows/saas-security-acceptance.yml",
+      "originalBytes": 1429,
+      "originalSha256": "8968081569e21e722d7518e0bfa070e18fb607d37668dad3c77684463c59617b",
+      "storedPath": "workflows/saas-security-acceptance.yml",
+      "storedBytes": 1429,
+      "storedSha256": "8968081569e21e722d7518e0bfa070e18fb607d37668dad3c77684463c59617b",
+      "gzip": false
+    }
+  ]
+}

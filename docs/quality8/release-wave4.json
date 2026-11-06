@@ -1,0 +1,138 @@
+{
+  "schema": "mgeorge-quality8-release-wave4-v1",
+  "recordedAt": "2026-11-06T04:11:05.120903+00:00",
+  "state": "published_and_bounded_postchecked_goal_not_met",
+  "repository": "sharbel0022/Mgeorge",
+  "pullRequest": {
+    "number": 58,
+    "url": "https://github.com/sharbel0022/Mgeorge/pull/58",
+    "head": "f488841afccdefba17a6b584320347581f60c3f4",
+    "merge": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "tree": "2f22b5e154646507f78e9e44952513d7456905e4"
+  },
+  "ci": {
+    "pullRequest": {
+      "paymentRun": 42157715027,
+      "saasRun": 42157715038,
+      "success": true,
+      "receiptPath": "docs/quality8/wave4-final-pr-ci/ci-receipt.json",
+      "receiptSha256": "703932b19fecf3e63f3e3979e49b545caee8887edd8a51fc5178ecaa1d3627eb"
+    },
+    "main": {
+      "paymentRun": 42158636715,
+      "head": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "event": "push",
+      "branch": "main",
+      "success": true,
+      "receiptPath": "docs/quality8/wave4-main-ci/ci-receipt.json",
+      "receiptSha256": "18adbb3b08a1e448fb4d24bf056c3e47a2cc3ce075370d8db49cd161d269667d"
+    },
+    "jobs": [
+      {
+        "name": "Node",
+        "tests": 2321,
+        "pass": 2321
+      },
+      {
+        "name": "Sites",
+        "tests": 5201,
+        "pass": 5201
+      },
+      {
+        "name": "Bridge",
+        "tests": 47,
+        "pass": 47
+      }
+    ],
+    "total": 7569,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "mainRequiredSteps": 16,
+    "mainBuildRan": true,
+    "sitesModerateAuditFindings": 8,
+    "highCriticalAuditFindings": 0,
+    "saasMainPushApplicable": false,
+    "overlapAdded": false
+  },
+  "nativeSource": {
+    "commit": "0b119b8d472f70a1bfeac686c12889b618a32fb2",
+    "tree": "58c2cae56a5be177842c360ae46d5caed83fdd9b",
+    "sameAsMainSites": true,
+    "copiedTrackedFiles": 629
+  },
+  "archive": {
+    "sizeBytes": 18605800,
+    "sha256": "8cb1aace94955204027302b08acdbb9e308b57c40a1fc95f33ace1830b8fee2d"
+  },
+  "savedVersion": {
+    "id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_9f921f1d09d081918a453e34a5d1fb04",
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "version_number": 66,
+    "source": {
+      "commit_sha": "0b119b8d472f70a1bfeac686c12889b618a32fb2"
+    },
+    "archive_storage": {
+      "archive_format": "tar",
+      "sediment_file_id": "file_00000000971881f4a6f4630cf38cfb55",
+      "content_hash": "sha256:f0d4cd67165bd5e8c5781313d83a30b9c787513326f9e6e63ca8da1da6b374ca",
+      "size_bytes": 48138240,
+      "file_count": 439
+    },
+    "screenshot_url": null,
+    "deployment_id": null
+  },
+  "deployment": {
+    "id": "appgdep_6aed50f31fb48191ab1617fe42756ccb",
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "title": "MG Fakturakoll",
+    "version_id": "appgprj_6adf2f7f7e848191b64192161886b528~appgver_9f921f1d09d081918a453e34a5d1fb04",
+    "type": "publish",
+    "status": "succeeded",
+    "url": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site",
+    "has_mcp": true,
+    "screenshot_asset_pointer": null,
+    "provider_deployment_id": "site---6adf2f7f7e848191b64192161886b528",
+    "failure_message": null,
+    "env_set_revision": 10,
+    "updated_at": "2026-11-06T04:01:09.703428+00:00"
+  },
+  "audience": "public",
+  "audienceMutationPerformed": false,
+  "environmentRevision": 10,
+  "schedules": {
+    "idsPreserved": true,
+    "cadencesPreserved": true,
+    "gmailPromptUpdatedAfterPublication": true,
+    "backupPromptNotChangedThisRelease": true
+  },
+  "included": [
+    "Independently reviewed explicit-party ambiguity and organization ownership repair 96d1404",
+    "Same guarded per-document retry exposed through MCP",
+    "Read-only bounded account-usage details diagnostic with preserved denial",
+    "Memory-bounded bank test harness with unchanged fixture/assertions"
+  ],
+  "excluded": [
+    "OCR observation/field-region A and B candidate",
+    "Known V2 fresh optical run and sealed V3 measurement",
+    "Bank account normalization or activation",
+    "QA payment allocations and customer messages"
+  ],
+  "postpublicationEvidence": {
+    "path": "docs/quality8/wave4-postpublication-observations.json",
+    "sha256": "48e1508caf988af8b7e82f58d0f232567d504cb2d83f335bb23d21c3dcf382bb"
+  },
+  "currentAssessment": {
+    "areasAtLeast8": 28,
+    "areaCount": 33,
+    "below8": [
+      6,
+      10,
+      15,
+      16,
+      28
+    ],
+    "goalMet": false
+  }
+}

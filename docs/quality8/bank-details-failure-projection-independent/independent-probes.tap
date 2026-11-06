@@ -1,0 +1,164 @@
+TAP version 13
+# Subtest: independent failure projection: registered network code defeats forged invalid-response metadata
+ok 1 - independent failure projection: registered network code defeats forged invalid-response metadata
+  ---
+  duration_ms: 487.701592
+  type: 'test'
+  ...
+# Subtest: independent failure projection: registered invalid-response without an adapter issue invents no field
+ok 2 - independent failure projection: registered invalid-response without an adapter issue invents no field
+  ---
+  duration_ms: 235.111423
+  type: 'test'
+  ...
+# Subtest: independent failure projection: unknown constructor code cannot be promoted by public code
+ok 3 - independent failure projection: unknown constructor code cannot be promoted by public code
+  ---
+  duration_ms: 194.983172
+  type: 'test'
+  ...
+# Subtest: independent failure projection: boxed constructor string does not acquire allowlist membership
+ok 4 - independent failure projection: boxed constructor string does not acquire allowlist membership
+  ---
+  duration_ms: 266.397314
+  type: 'test'
+  ...
+# Subtest: independent failure projection: registered code survives removal of the entire public prototype
+ok 5 - independent failure projection: registered code survives removal of the entire public prototype
+  ---
+  duration_ms: 241.67265
+  type: 'test'
+  ...
+# Subtest: independent failure projection: null-prototype accessors remains generic without evaluating properties
+ok 6 - independent failure projection: null-prototype accessors remains generic without evaluating properties
+  ---
+  duration_ms: 193.498864
+  type: 'test'
+  ...
+# Subtest: independent failure projection: all-traps proxy around registered error remains generic without evaluating properties
+ok 7 - independent failure projection: all-traps proxy around registered error remains generic without evaluating properties
+  ---
+  duration_ms: 230.60319
+  type: 'test'
+  ...
+# Subtest: independent failure projection: revoked callable proxy remains generic without evaluating properties
+ok 8 - independent failure projection: revoked callable proxy remains generic without evaluating properties
+  ---
+  duration_ms: 201.164129
+  type: 'test'
+  ...
+# Subtest: independent failure projection: function with borrowed provider prototype remains generic without evaluating properties
+ok 9 - independent failure projection: function with borrowed provider prototype remains generic without evaluating properties
+  ---
+  duration_ms: 197.54559
+  type: 'test'
+  ...
+# Subtest: independent failure projection: thrown undefined is safely generic
+ok 10 - independent failure projection: thrown undefined is safely generic
+  ---
+  duration_ms: 189.472385
+  type: 'test'
+  ...
+# Subtest: independent failure projection: thrown symbol is safely generic
+ok 11 - independent failure projection: thrown symbol is safely generic
+  ---
+  duration_ms: 170.265021
+  type: 'test'
+  ...
+# Subtest: independent failure projection: thrown bigint is safely generic
+ok 12 - independent failure projection: thrown bigint is safely generic
+  ---
+  duration_ms: 185.132189
+  type: 'test'
+  ...
+# Subtest: independent failure projection: actual adapter issue survives hostile public code and issue getters
+not ok 13 - independent failure projection: actual adapter issue survives hostile public code and issue getters
+  ---
+  duration_ms: 241.706233
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs:2366:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof ConsentError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    usageDetailsDenial (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs:1871:142)
+    async TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs:2388:18)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent failure projection: fifth actual-adapter failure hides four mixed prior observations
+ok 14 - independent failure projection: fifth actual-adapter failure hides four mixed prior observations
+  ---
+  duration_ms: 324.196076
+  type: 'test'
+  ...
+# Subtest: independent failure projection: replaced read marker masks a trusted second failure and retains the replacement
+ok 15 - independent failure projection: replaced read marker masks a trusted second failure and retains the replacement
+  ---
+  duration_ms: 232.7975
+  type: 'test'
+  ...
+# Subtest: independent failure projection: lost audit reply suppresses the complete diagnostic
+ok 16 - independent failure projection: lost audit reply suppresses the complete diagnostic
+  ---
+  duration_ms: 194.762295
+  type: 'test'
+  ...
+# Subtest: independent failure projection: owner lost after audit commit suppresses the complete diagnostic
+not ok 17 - independent failure projection: owner lost after audit commit suppresses the complete diagnostic
+  ---
+  duration_ms: 151.988365
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs:2427:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof ConsentError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    usageDetailsDenial (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs:1871:142)
+    async TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs:2439:20)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: independent failure projection: application deactivated after audit commit suppresses the complete diagnostic
+ok 18 - independent failure projection: application deactivated after audit commit suppresses the complete diagnostic
+  ---
+  duration_ms: 202.000675
+  type: 'test'
+  ...
+# Subtest: independent failure projection: real 503 cooldown remains effective and cannot trigger a retry
+ok 19 - independent failure projection: real 503 cooldown remains effective and cannot trigger a retry
+  ---
+  duration_ms: 232.420717
+  type: 'test'
+  ...
+# Subtest: independent failure projection: successful ORGA detail is still the original denied consent
+ok 20 - independent failure projection: successful ORGA detail is still the original denied consent
+  ---
+  duration_ms: 195.355615
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 18
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5117.600179

@@ -1,0 +1,24 @@
+{
+  "job_id": 127698703819,
+  "api_step": {
+    "name": "Run npm run build",
+    "status": "completed",
+    "conclusion": "success",
+    "number": 11,
+    "started_at": "2026-11-06T03:52:24Z",
+    "completed_at": "2026-11-06T03:52:36Z"
+  },
+  "actually_executed": true,
+  "skipped": false,
+  "raw_log": "logs/sites-127698703819.log",
+  "log_evidence": [
+    "2026-11-06T03:52:24.5358452Z ##[group]Run npm run build",
+    "2026-11-06T03:52:24.6156929Z > node scripts/run-framework.mjs build",
+    "2026-11-06T03:52:29.0982621Z \u001b[32m✓ built in 2.49s\u001b[39m",
+    "2026-11-06T03:52:29.7723522Z \u001b[32m✓ built in 656ms\u001b[39m",
+    "2026-11-06T03:52:32.8390942Z \u001b[32m✓ built in 3.05s\u001b[39m",
+    "2026-11-06T03:52:34.7289823Z \u001b[32m✓ built in 1.87s\u001b[39m",
+    "2026-11-06T03:52:36.0332514Z \u001b[32m✓ built in 1.29s\u001b[39m",
+    "2026-11-06T03:52:36.0554694Z   Build complete."
+  ]
+}

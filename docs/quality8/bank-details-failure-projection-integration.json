@@ -1,0 +1,34 @@
+{
+  "base": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "entries": [
+    {
+      "original": "9c1078cadfbca8923213f066cef1476c612796c6",
+      "integrated": "963f8befe18a0636f7370e5b7de5a2923ade6853",
+      "byteIdenticalPatch": true,
+      "patchSha256": "7bd6f01aee7460384badb0ae082a892769c7230cd06d0bc37697c96f3c836446"
+    },
+    {
+      "original": "92b6fefe60c31d8f862f6d93f2d422e777801390",
+      "integrated": "6b3ee36e12c4683156b5286ac7f3cd82c984e0b2",
+      "byteIdenticalPatch": true,
+      "patchSha256": "e34bd757de0a73050249e5bcec3a845acc7eb1eecf2cca90734eb04dc5e4d38c"
+    },
+    {
+      "original": "7a0d08cf0f686d975baac8bc30205e245d10aacf",
+      "integrated": "1f43f8823fce845d137bc5a1b0844c99f0d37922",
+      "byteIdenticalPatch": true,
+      "patchSha256": "3bed3c8a57da10c189a91f49a1672edca3b97501274655ae073a3a9b41c7b11f"
+    }
+  ],
+  "serviceSha256": "cc3114a7bb7a9e4d013a50d7740d9b1f1389a47861a46c44d47e9b061d8e628d",
+  "independentReview": {
+    "verdict": "READY",
+    "source": "92b6fefe60c31d8f862f6d93f2d422e777801390",
+    "originalEvidenceCommit": "cca6a911e8b2abaeb658bb3874d1b7797a7e8f3c",
+    "integratedEvidenceCommit": "1f99575a24ba9cecc826923a35e7e710319ebdfc",
+    "receipt": "docs/quality8/bank-details-failure-projection-independent/review-evidence.json",
+    "receiptSha256": "edc325e92c453ed3451d0c41a89d8030e0fea6abbc4cef7fd57cfecbf4b15e38"
+  },
+  "fullCI": "pending",
+  "published": false
+}

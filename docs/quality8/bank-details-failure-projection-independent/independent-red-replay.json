@@ -1,0 +1,37 @@
+{
+  "label": "independent-red-replay",
+  "startedAt": "2026-11-06T04:25:42.961178+00:00",
+  "finishedAt": "2026-11-06T04:25:54.913758+00:00",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "../scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "--test-name-pattern=usage details failure projection:|reviewer: provider failure on the fifth result",
+    "tests/banking-security.test.mjs"
+  ],
+  "environment": {
+    "NODE_ENV": "test",
+    "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+    "WRANGLER_SEND_METRICS": "false"
+  },
+  "returncode": 1,
+  "signal": null,
+  "durationSeconds": 11.953,
+  "maxRssKiB": 418956,
+  "counts": {
+    "tests": 37,
+    "suites": 0,
+    "pass": 12,
+    "fail": 25,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-red-replay.tap",
+  "logSha256": "42d9ecafd5fe4b6dc79b8d6815ecc2b7c4d1572a69ce61d85987f3858971ca84"
+}

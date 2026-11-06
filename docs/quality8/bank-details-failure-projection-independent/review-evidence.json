@@ -1,0 +1,499 @@
+{
+  "schemaVersion": 1,
+  "decision": "READY",
+  "reviewedAt": "2026-11-06T04:38:42+00:00",
+  "scope": "Independent review of the bounded service-only provider failure diagnostic projection. Full integrated CI and publication remain root-owned gates.",
+  "subject": {
+    "base": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "frozenRed": "9c1078cadfbca8923213f066cef1476c612796c6",
+    "product": "92b6fefe60c31d8f862f6d93f2d422e777801390",
+    "producerDocs": "7a0d08cf0f686d975baac8bc30205e245d10aacf",
+    "productTree": "75f05809b8bbd1194304805f55940951aa8ce94d",
+    "sitesTree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+    "serviceSha256": "cc3114a7bb7a9e4d013a50d7740d9b1f1389a47861a46c44d47e9b061d8e628d",
+    "serviceGitBlob": "b0917d620760360457056817ed0a76604d63957a",
+    "productChangedFiles": [
+      "sites/lib/banking/service.ts"
+    ],
+    "productNumstat": {
+      "added": 14,
+      "removed": 6
+    }
+  },
+  "findings": [],
+  "openFindings": 0,
+  "materialChecks": [
+    {
+      "id": "SCOPE",
+      "result": "pass",
+      "evidence": "Exact one-file 14+/6- diff; adapter, read guard, cooldown, store, MCP, policy/types and locks unchanged."
+    },
+    {
+      "id": "PROVENANCE",
+      "result": "pass",
+      "evidence": "providerErrorCode uses constructor-bound WeakMap; code must be in existing BANK_JOB_ERROR_CODES. Unknown and spoofed values stay generic without property/prototype evaluation."
+    },
+    {
+      "id": "VALIDATION_ISSUE",
+      "result": "pass",
+      "evidence": "Only INVALID_PROVIDER_RESPONSE can read providerResponseDiagnostic. Its existing private map returns a copy of fixed field/kind only. Public issue/code getters and attributes are ignored."
+    },
+    {
+      "id": "PARTIAL_READ",
+      "result": "pass",
+      "evidence": "Fifth actual-adapter failure after four mixed observations emits no usage counts or values; original ACCOUNT_USAGE_INVALID 409 remains."
+    },
+    {
+      "id": "FINAL_GATE",
+      "result": "pass",
+      "evidence": "Lost audit reply, application deactivation after committed audit, lost authentication and replaced pending read marker cannot disclose a misleading trusted diagnostic."
+    },
+    {
+      "id": "AUTH",
+      "result": "pass",
+      "evidence": "Authorized denials keep original 409/code/reason. Authentication loss preserves the pre-existing 401 and suppresses both usage diagnostics, verified on unchanged RED product."
+    },
+    {
+      "id": "NO_NEW_READS",
+      "result": "pass",
+      "evidence": "Diff adds no read/retry. Exact synthetic call sequences enforced; real HTTP-mapped 503 Retry-After retains blocked cooldown and prevents a second invocation from reading."
+    },
+    {
+      "id": "PRIVACY",
+      "result": "pass",
+      "evidence": "Responses and audits exclude synthetic raw messages, session/account UID, primary hash, primary account identifiers and partial usage. Cache-Control stays private, no-store. Transport logging remains the existing fixed marker in frozen tests."
+    },
+    {
+      "id": "NO_STATE_PROMOTION",
+      "result": "pass",
+      "evidence": "Connection rows preserved except existing guard cooldown state where applicable; status remains reauth_required, no successful revalidation receipt, workspace mutation or bank sync. ORGA observation does not repair consent."
+    },
+    {
+      "id": "ASSERTIONS",
+      "result": "pass",
+      "evidence": "Three test files byte-identical RED/product/docs. Reconstruction of base tests permits only three mock exports, one strengthened expected BANK_TIMEOUT field, and 36 added cases; all other original bytes match."
+    },
+    {
+      "id": "RED_GREEN",
+      "result": "pass",
+      "evidence": "Independent RED repeats exact producer 25 failure names; parsed expected-vs-actual objects differ only by missing providerFailure. Same frozen 37 focus pass after fix; 357 full affected cases pass."
+    },
+    {
+      "id": "TYPECHECK",
+      "result": "pass",
+      "evidence": "Guarded TypeScript exits 0 from sites after local symlink is replaced by independent physical dependency copy. Initial guard refusal retained unchanged."
+    }
+  ],
+  "runs": {
+    "independent-red-replay": {
+      "label": "independent-red-replay",
+      "startedAt": "2026-11-06T04:25:42.961178+00:00",
+      "finishedAt": "2026-11-06T04:25:54.913758+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=usage details failure projection:|reviewer: provider failure on the fifth result",
+        "tests/banking-security.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 1,
+      "signal": null,
+      "durationSeconds": 11.953,
+      "maxRssKiB": 418956,
+      "counts": {
+        "tests": 37,
+        "suites": 0,
+        "pass": 12,
+        "fail": 25,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-red-replay.tap",
+      "logSha256": "42d9ecafd5fe4b6dc79b8d6815ecc2b7c4d1572a69ce61d85987f3858971ca84",
+      "logFile": "independent-red-replay.tap",
+      "receiptFile": "independent-red-replay.json",
+      "logBytes": 51437
+    },
+    "independent-green-focus": {
+      "label": "independent-green-focus",
+      "startedAt": "2026-11-06T04:29:31.048896+00:00",
+      "finishedAt": "2026-11-06T04:29:40.568002+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=usage details failure projection:|reviewer: provider failure on the fifth result",
+        "tests/banking-security.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 9.519,
+      "maxRssKiB": 420024,
+      "counts": {
+        "tests": 37,
+        "suites": 0,
+        "pass": 37,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-green-focus.tap",
+      "logSha256": "5780fbbe48c91b1a839c79e70c3fa2fb06adbd07e482ec83072d07aeb9cff84b",
+      "logFile": "independent-green-focus.tap",
+      "receiptFile": "independent-green-focus.json",
+      "logBytes": 9497
+    },
+    "independent-service-regressions": {
+      "label": "independent-service-regressions",
+      "startedAt": "2026-11-06T04:25:42.963879+00:00",
+      "finishedAt": "2026-11-06T04:26:51.599219+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "tests/banking-security.test.mjs",
+        "tests/company-bank-sync.test.mjs",
+        "tests/bank-sync-integrity-q8.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 68.635,
+      "maxRssKiB": 840592,
+      "counts": {
+        "tests": 357,
+        "suites": 0,
+        "pass": 357,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-service-regressions.tap",
+      "logSha256": "c31ebcfce9b749f643fa0126334684a6b7edd20980c94a98aa6552e24c5c8865",
+      "logFile": "independent-service-regressions.tap",
+      "receiptFile": "independent-service-regressions.json",
+      "logBytes": 90162
+    },
+    "independent-probes": {
+      "label": "independent-probes",
+      "startedAt": "2026-11-06T04:29:31.041639+00:00",
+      "finishedAt": "2026-11-06T04:29:36.248847+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=^independent failure projection:",
+        "tests/reviewer-failure-projection-tmp.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 1,
+      "signal": null,
+      "durationSeconds": 5.207,
+      "maxRssKiB": 364372,
+      "counts": {
+        "tests": 20,
+        "suites": 0,
+        "pass": 18,
+        "fail": 2,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-probes.tap",
+      "logSha256": "41ed6dcfb57a4d280b43bfdbca1a14c8777acfcdd7c31143f2161502313a773b",
+      "logFile": "independent-probes.tap",
+      "receiptFile": "independent-probes.json",
+      "logBytes": 7315
+    },
+    "independent-probes-v2": {
+      "label": "independent-probes-v2",
+      "startedAt": "2026-11-06T04:33:45.590466+00:00",
+      "finishedAt": "2026-11-06T04:33:50.898796+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=^independent failure projection:",
+        "tests/reviewer-failure-projection-v2-tmp.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 5.308,
+      "maxRssKiB": 367464,
+      "counts": {
+        "tests": 20,
+        "suites": 0,
+        "pass": 20,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-probes-v2.tap",
+      "logSha256": "5b98830016605a16660c4be30a2f6ad638b778c22034be416bdcc0048406e7d8",
+      "logFile": "independent-probes-v2.tap",
+      "receiptFile": "independent-probes-v2.json",
+      "logBytes": 5364
+    },
+    "baseline-harness-controls": {
+      "label": "baseline-harness-controls",
+      "startedAt": "2026-11-06T04:33:45.583892+00:00",
+      "finishedAt": "2026-11-06T04:33:47.205258+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=^independent harness control:",
+        "tests/reviewer-harness-controls-tmp.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 1.621,
+      "maxRssKiB": 200192,
+      "counts": {
+        "tests": 2,
+        "suites": 0,
+        "pass": 2,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/baseline-harness-controls.tap",
+      "logSha256": "6ceabcfea9283c41fdbe105e3d4d20218d2176834f8870554a98e04149628f6d",
+      "logFile": "baseline-harness-controls.tap",
+      "receiptFile": "baseline-harness-controls.json",
+      "logBytes": 879
+    },
+    "independent-typecheck": {
+      "label": "independent-typecheck",
+      "startedAt": "2026-11-06T04:29:31.042570+00:00",
+      "finishedAt": "2026-11-06T04:29:31.145049+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "scripts/run-verified-tool.mjs",
+        "check"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 1,
+      "signal": null,
+      "durationSeconds": 0.102,
+      "maxRssKiB": 40568,
+      "counts": {},
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-typecheck.tap",
+      "logSha256": "537ec07bbd15b84d5523739e486f163007889e8581bf7633f7802d85396b5649",
+      "logFile": "independent-typecheck.tap",
+      "receiptFile": "independent-typecheck.json",
+      "logBytes": 1424
+    },
+    "independent-typecheck-physical": {
+      "label": "independent-typecheck-physical",
+      "startedAt": "2026-11-06T04:32:15.345075+00:00",
+      "finishedAt": "2026-11-06T04:32:28.955892+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "scripts/run-verified-tool.mjs",
+        "check"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 13.611,
+      "maxRssKiB": 948792,
+      "counts": {},
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-typecheck-physical.tap",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logFile": "independent-typecheck-physical.tap",
+      "receiptFile": "independent-typecheck-physical.json",
+      "logBytes": 0
+    }
+  },
+  "testPopulation": {
+    "candidateAffectedServiceCases": 357,
+    "frozenFocusSubsetOf357": 37,
+    "additionalFinalIndependentCases": 20,
+    "baselineOnlyHarnessControls": 2,
+    "candidateDistinctCaseExecutions": 377,
+    "note": "Do not add the 37 focus replay to the 357 suite; the initial 18/20 is preserved but is not a passing gate."
+  },
+  "independentProbeNames": [
+    "independent failure projection: registered network code defeats forged invalid-response metadata",
+    "independent failure projection: registered invalid-response without an adapter issue invents no field",
+    "independent failure projection: unknown constructor code cannot be promoted by public code",
+    "independent failure projection: boxed constructor string does not acquire allowlist membership",
+    "independent failure projection: registered code survives removal of the entire public prototype",
+    "independent failure projection: null-prototype accessors remains generic without evaluating properties",
+    "independent failure projection: all-traps proxy around registered error remains generic without evaluating properties",
+    "independent failure projection: revoked callable proxy remains generic without evaluating properties",
+    "independent failure projection: function with borrowed provider prototype remains generic without evaluating properties",
+    "independent failure projection: thrown undefined is safely generic",
+    "independent failure projection: thrown symbol is safely generic",
+    "independent failure projection: thrown bigint is safely generic",
+    "independent failure projection: actual adapter issue survives hostile public code and issue getters",
+    "independent failure projection: fifth actual-adapter failure hides four mixed prior observations",
+    "independent failure projection: replaced read marker masks a trusted second failure and retains the replacement",
+    "independent failure projection: lost audit reply suppresses the complete diagnostic",
+    "independent failure projection: owner lost after audit commit suppresses the complete diagnostic",
+    "independent failure projection: application deactivated after audit commit suppresses the complete diagnostic",
+    "independent failure projection: real 503 cooldown remains effective and cannot trigger a retry",
+    "independent failure projection: successful ORGA detail is still the original denied consent"
+  ],
+  "closedReviewerHarnessIssues": [
+    {
+      "id": "REVIEW_HARNESS_KEY",
+      "initialFailure": "independent failure projection: actual adapter issue survives hostile public code and issue getters",
+      "classification": "reviewer fixture setup",
+      "rootCause": "Changing ENABLE_BANKING_PRIVATE_KEY after seed changes application() runtime generation and stops before the first provider read. It cannot exercise the new catch.",
+      "evidence": "baseline-harness-controls.tap: runtime-generation control, 409, zero provider calls, generationChanged=true",
+      "correction": "Pass a fresh synthetic RSA key to the mocked provider boundary only; leave seeded runtime unchanged. Existing code/issue/getter/privacy/count assertions retained.",
+      "resolvedBy": "independent-probes-v2: actual adapter issue survives hostile public code and issue getters"
+    },
+    {
+      "id": "REVIEW_HARNESS_AUTH",
+      "initialFailure": "independent failure projection: owner lost after audit commit suppresses the complete diagnostic",
+      "classification": "reviewer expectation for the wrong authorization boundary",
+      "rootCause": "The shared usageDetailsDenial helper requires an authorized ConsentError/409. Dropping authentication after the failed audit invokes the pre-existing AUTH_REQUIRED/401 boundary.",
+      "evidence": "baseline-harness-controls.tap: authentication-after-audit control, 401, two provider calls, one committed failed audit, no ConsentError",
+      "correction": "Require exact 401 response keys and signIn, no diagnostics, cache no-store and preserved state for auth loss. Authorized cases still require original 409/code/reason.",
+      "resolvedBy": "independent-probes-v2: owner lost after audit commit suppresses the complete diagnostic"
+    },
+    {
+      "id": "REVIEW_ENV_SYMLINK",
+      "classification": "reviewer dependency layout",
+      "rootCause": "The existing minimatch integrity gate correctly rejects a node_modules directory symlink before TypeScript runs.",
+      "evidence": "independent-typecheck.tap",
+      "correction": "Copy the matching producer dependencies into the isolated worktree as a physical directory; do not alter or bypass the guard.",
+      "resolvedBy": "independent-typecheck-physical.json"
+    }
+  ],
+  "preservation": {
+    "producerRawLogsUnchanged": true,
+    "producerRedSha256": "7a1add3166f8c6668de3d2b6fdacd33f6e7f814832ad526a9e7924233adb4f88",
+    "initialIndependentProbeRunRetained": true,
+    "initialProbeAppendSha256": "87493777c70a6c48ed3f09edc3fcc68aa682afd83b2b91935b4e122c9e2a642b",
+    "finalProbeAppendSha256": "f4720a6815644c4af9a5e57c545c6a6eee1329075f8e8d1a64788a78498caf23",
+    "originalTestAssertionsByteIdenticalRedToProductToDocs": true,
+    "productFilesUnchangedDuringReview": true,
+    "temporaryCopiesRemoved": true,
+    "noProductEdits": true,
+    "documentationOnlyReviewCommit": true
+  },
+  "environment": {
+    "node": "v24.22.1",
+    "NODE_ENV": "test",
+    "preload": "scripts/saas-test-isolation.mjs",
+    "testConcurrency": 1,
+    "candidateNodeModules": "private physical copy for final typecheck; matching symlink used by initial tests",
+    "externalBankAccess": "all banking HTTP boundaries synthetically mocked; test network isolation preloaded",
+    "liveBankCallsPerformed": 0
+  },
+  "productionLimits": [
+    "Site 66 observation is root-reported and was not reproduced by this review.",
+    "DETAILS_PROVIDER_UNAVAILABLE after attemptedCount=1/observedCount=0 does not prove a dispatched HTTP request or a specific provider cause.",
+    "No real account ORGA status, usable consent, BankID outcome or quality-score increase is inferred.",
+    "A successful synthetic ORGA details observation preserves the original invalid-consent denial.",
+    "No full project CI, merge, push, PR mutation, workflow dispatch, production publication or real bank call was performed."
+  ],
+  "evidenceFiles": [
+    "source-verification.json",
+    "product.diff",
+    "independent-test-preservation.json",
+    "red-failure-analysis.json",
+    "independent-probe-provenance.json",
+    "independent-probe-v2-provenance.json",
+    "harness-correction.diff",
+    "harness-boundary-controls.append.mjs",
+    "temporary-harness-cleanup.json",
+    "independent-red-replay.json",
+    "independent-green-focus.json",
+    "independent-service-regressions.json",
+    "independent-probes.json",
+    "independent-probes-v2.json",
+    "baseline-harness-controls.json",
+    "independent-typecheck.json",
+    "independent-typecheck-physical.json",
+    "independent-red-replay.tap",
+    "independent-green-focus.tap",
+    "independent-service-regressions.tap",
+    "independent-probes.tap",
+    "independent-probes-v2.tap",
+    "baseline-harness-controls.tap",
+    "independent-typecheck.tap",
+    "independent-typecheck-physical.tap"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "phase": "terminal_verified",
+  "head": "f488841afccdefba17a6b584320347581f60c3f4",
+  "tree": "2f22b5e154646507f78e9e44952513d7456905e4",
+  "receipt": "ci-receipt.json",
+  "paymentControl": {
+    "tests": 7569,
+    "pass": 7569,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "securityAcceptance": {
+    "tests": 1218,
+    "pass": 1218,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "allFourLogsPersisted": true
+}

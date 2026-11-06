@@ -1,3 +1,15 @@
+## 2026-11-06 — smal bankfelprojektion inför separat nästa grind
+
+Site66 är fortfarande live. Bankens faktiska detaljfel kunde inte skiljas åt i den tidigare generiska diagnosen. Kandidat92b6fef lägger endast till konstruktörsbunden, allowlistad felkod och vid kontraktsfel ett fast fält/typslag. Original409, behörigheter, kontosnapshot och läsgränser bevaras. [Fryst RED och357/357 berörda producergrindar](docs/quality8/bank-details-failure-projection/README.md), [byteidentisk sammanföring](docs/quality8/bank-details-failure-projection-integration.json) och [nativeförberedelse](docs/quality8/wave5-native-preparation.json). Oberoende granskning är nu READY med samma37 fokusfall,357 servicefall och20 egna motprov. Full exakt PR/main-CI krävs fortfarande före publicering. OCRförbättringen integreras och mäts separat; inga nya optiska resultat påstås.
+
+## 2026-11-06 — Site 66 publicerad, 28/33 minst 8
+
+PR58 är normalt mergad till main `0035ea89`. Exakt PR-/main-CI **7569/7569**, alla 16 huvudgrindar och Sites-bygget godkända. Samma Sites-träd publicerades som version66 04:01:09 UTC, med miljörevision10 och befintlig identitet/DB/R2/schemakadens. [Full leveranskedja](docs/quality8/release-wave4.md).
+
+Den verkliga bankkontrollen gav ett detaljförsök men ingen verifierad observation: `DETAILS_PROVIDER_UNAVAILABLE`; original409 och avstängd anslutning bevaras. Vanlig Gmail-hämtning importerade nio nya underlag, som gick vidare till OCR; samma två dokumentregistreringar kvarstår. Två fullständiga ekonomiska efterläsningar efter bearbetningen behåller revision52 och noll nya bokningar.
+
+Gmails senaste schemakvitto sade no_update utan färsk appinvokering. Samma timuppgift har nu en återläst instruktion som kräver färska kontrollanrop; dess första periodiska exekvering återstår. Backupens kompletta 430-filssnapshot kvarstår, medan nästa verkliga ofärdiga automatiska snapshot behövs för budgetbevisningen. OCR A/B och säkert run-once-protokoll granskas separat; V3 är förseglat. **Områden6,10,15,16,28 är fortfarande under8.**
+
 ## 2026-11-06 — tredje PR 58-kandidat redo för full CI
 
 Exakt parserfix 96d1404 har oberoende READY efter två stängda fynd, 340/340 egna granskarprov och 655/655 berörda integrationsprov. Alla äldre RED-/CI-fel är bevarade. Känd OCR-replay är oförändrad i 52/52 parserresultat, inga nya optiska anrop. [Aktuell leveransgrind](docs/quality8/wave4-invoice-release-readiness.md) och nytt hashbundet native-paket är klara; full PR-/main-CI och publicering återstår. Site 65 är fortfarande live och 28/33 når minst 8. OCR B är separat och ännu under reparation efter oberoende censusfynd.
