@@ -1,0 +1,45 @@
+{
+  "productSource": "0f550950b99d41d932b91370b458e9b85abf9451",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/review-party-completed-name-independent.test.mjs"
+  ],
+  "exitCode": 1,
+  "logSha256": "d290f09c5126400a2a82f4ea0b3e34ea94d172a2b0df8a227cce637e523762e0",
+  "counts": [
+    "# tests 164",
+    "# pass 144",
+    "# fail 20",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0",
+    "# duration_ms 774.046354"
+  ],
+  "failures": [
+    "not ok 11 - Node pdf independent bare-role-boundary: parenthesized legal form",
+    "not ok 34 - Node pdf independent owner-census: unowned number after recipient then supplier",
+    "not ok 35 - Node pdf independent owner-census: unowned number after supplier then recipient",
+    "not ok 36 - Node pdf independent owner-census: unowned number after repeated recipient",
+    "not ok 37 - Node pdf independent owner-census: inline unowned number after new bare role",
+    "not ok 52 - Node ocr independent bare-role-boundary: parenthesized legal form",
+    "not ok 75 - Node ocr independent owner-census: unowned number after recipient then supplier",
+    "not ok 76 - Node ocr independent owner-census: unowned number after supplier then recipient",
+    "not ok 77 - Node ocr independent owner-census: unowned number after repeated recipient",
+    "not ok 78 - Node ocr independent owner-census: inline unowned number after new bare role",
+    "not ok 93 - Sites pdf independent bare-role-boundary: parenthesized legal form",
+    "not ok 116 - Sites pdf independent owner-census: unowned number after recipient then supplier",
+    "not ok 117 - Sites pdf independent owner-census: unowned number after supplier then recipient",
+    "not ok 118 - Sites pdf independent owner-census: unowned number after repeated recipient",
+    "not ok 119 - Sites pdf independent owner-census: inline unowned number after new bare role",
+    "not ok 134 - Sites ocr independent bare-role-boundary: parenthesized legal form",
+    "not ok 157 - Sites ocr independent owner-census: unowned number after recipient then supplier",
+    "not ok 158 - Sites ocr independent owner-census: unowned number after supplier then recipient",
+    "not ok 159 - Sites ocr independent owner-census: unowned number after repeated recipient",
+    "not ok 160 - Sites ocr independent owner-census: inline unowned number after new bare role"
+  ]
+}

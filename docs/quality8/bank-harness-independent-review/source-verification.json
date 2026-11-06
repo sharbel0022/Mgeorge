@@ -1,0 +1,24 @@
+{
+  "baseline": "d294fd87b04d1bf65b124be5ad3dd1bd2654fd73",
+  "candidate": "7a5a397c6543fd762d86005369d6740448876cfe",
+  "changedPaths": [
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "oldSourceSha256": "f94dc9bfa6cb223bc5bb85da2ec334a4c639aa7f64056e87058c02e8f6826948",
+  "newSourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+  "compiledModuleByteIdentical": true,
+  "compiledModuleBytes": 921,
+  "compiledModuleSha256": "e09dae07fad2f71216071ca0bd05f0b20f87b6f51cd35c3202494bb87b6cbcbc",
+  "fixtureHelpersTestBodiesAssertionsByteIdentical": true,
+  "suffixBytes": 179425,
+  "suffixSha256": "b1ca4d15c7b28407e422fbfe445755f0633dfa69a45a05f36216134c1a3769ff",
+  "otherImportStatementsByteIdentical": true,
+  "productPathsChanged": 0,
+  "opticalCalls": 0,
+  "liveCalls": 0,
+  "suffixBoundaryMarker": "class LocalD1 { (starting at c, without preceding newline)",
+  "candidateSourceStillMatchesFrozenCommitAfterRuns": true,
+  "finalSourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+  "ownProbeAssertionLinesUnchanged": true,
+  "oldRootSignalCauseNotIndependentlyProved": true
+}

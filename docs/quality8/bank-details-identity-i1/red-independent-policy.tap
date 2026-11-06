@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: hash-bound resource with no primary identifiers remains observable
+ok 1 - hash-bound resource with no primary identifiers remains observable
+  ---
+  duration_ms: 7.985116
+  type: 'test'
+  ...
+# Subtest: contradictory IBAN fields inside fresh primary account_id must prevent an observation
+not ok 2 - contradictory IBAN fields inside fresh primary account_id must prevent an observation
+  ---
+  duration_ms: 5.360037
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/onboarding/sites/tests/bank-usage-details-identity-policy.test.mjs:26:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   category: 'orga',
+    +   status: 'observed'
+    -   reason: 'DETAILS_ACCOUNT_CONFLICT',
+    -   status: 'unavailable'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    status: 'unavailable'
+    reason: 'DETAILS_ACCOUNT_CONFLICT'
+  actual:
+    status: 'observed'
+    category: 'orga'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/onboarding/sites/tests/bank-usage-details-identity-policy.test.mjs:29:9)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: saved and live primary BBAN disagreement must survive omitted fresh account_id
+not ok 3 - saved and live primary BBAN disagreement must survive omitted fresh account_id
+  ---
+  duration_ms: 1.504869
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/onboarding/sites/tests/bank-usage-details-identity-policy.test.mjs:32:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   category: 'orga',
+    +   status: 'observed'
+    -   reason: 'DETAILS_ACCOUNT_CONFLICT',
+    -   status: 'unavailable'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    status: 'unavailable'
+    reason: 'DETAILS_ACCOUNT_CONFLICT'
+  actual:
+    status: 'observed'
+    category: 'orga'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/onboarding/sites/tests/bank-usage-details-identity-policy.test.mjs:34:9)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: contradictory cached primary IBANs cannot be erased by omitted fresh account_id
+not ok 4 - contradictory cached primary IBANs cannot be erased by omitted fresh account_id
+  ---
+  duration_ms: 1.771865
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/onboarding/sites/tests/bank-usage-details-identity-policy.test.mjs:37:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   category: 'orga',
+    +   status: 'observed'
+    -   reason: 'DETAILS_ACCOUNT_CONFLICT',
+    -   status: 'unavailable'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    status: 'unavailable'
+    reason: 'DETAILS_ACCOUNT_CONFLICT'
+  actual:
+    status: 'observed'
+    category: 'orga'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/onboarding/sites/tests/bank-usage-details-identity-policy.test.mjs:39:9)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: fresh BBAN disagreement is rejected when the same scheme is present
+ok 5 - fresh BBAN disagreement is rejected when the same scheme is present
+  ---
+  duration_ms: 1.487513
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 2
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 193.219023

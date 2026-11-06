@@ -1,0 +1,17 @@
+--- loader-risk.initial.test.mjs
++++ loader-risk.test.mjs
+@@ -59,9 +59,12 @@
+ 
+ for(const mode of ['success','failure'])test('whole-file cleanup runs after '+mode+' and does not remove modules before late awaited imports',()=>{
+  const command=['--import',join(root,'candidate/scripts/saas-test-isolation.mjs'),'--experimental-strip-types','--test','--test-reporter=tap','--test-concurrency=1',join(root,'lifecycle-'+mode+'.test.mjs')];
+- const result=spawnSync(process.execPath,command,{cwd:root,env:process.env,encoding:'utf8',timeout:30000});
++ // This is a fresh standalone test runner, not another test file in the
++ // parent's runner IPC protocol. Keep NODE_ENV and the egress guard intact.
++ const childEnvironment={...process.env};delete childEnvironment.NODE_TEST_CONTEXT;
++ const result=spawnSync(process.execPath,command,{cwd:root,env:childEnvironment,encoding:'utf8',timeout:30000});
+  const output=(result.stdout||'')+(result.stderr||'');
+- writeFileSync(join(root,'logs/lifecycle-'+mode+'.tap'),output,{flag:'wx'});
++ writeFileSync(join(root,'logs/lifecycle-'+mode+'-final.tap'),output,{flag:'wx'});
+  assert.equal(result.error,undefined);assert.equal(result.signal,null);assert.equal(result.status,mode==='failure'?1:0);
+  const match=output.match(/OWN_TEMP_DIR=([^\r\n]+)/);assert.ok(match,'child must record its own directory');
+  assert.notEqual(match[1],moduleDirectory);assert.equal(dirname(match[1]),dirname(moduleDirectory));

@@ -1,0 +1,54 @@
+{
+  "sequence": 106,
+  "operation": "backup_status_final",
+  "startedAt": "2026-11-06T00:49:04.617Z",
+  "observedAt": "2026-11-06T00:49:04.887Z",
+  "isError": false,
+  "response": {
+    "enabled": true,
+    "latest": {
+      "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+      "day": "2026-11-06",
+      "status": "complete",
+      "files": 430,
+      "copied": 430,
+      "bytes": 185567855,
+      "created_at": "2026-11-05T23:03:21.104Z",
+      "verified_at": "2026-11-06T00:48:58.086Z",
+      "verified_files": 430,
+      "verified_bytes": 185567855,
+      "verification_started_at": "2026-11-06T00:45:07.487Z",
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 19,
+        "records_without_receipt": 112
+      },
+      "error": null,
+      "attempts": 0
+    },
+    "last_verified": {
+      "id": "768fde9a-27a2-4b85-b85a-278239ec4aea",
+      "day": "2026-11-06",
+      "status": "complete",
+      "files": 430,
+      "copied": 430,
+      "bytes": 185567855,
+      "created_at": "2026-11-05T23:03:21.104Z",
+      "verified_at": "2026-11-06T00:48:58.086Z",
+      "verified_files": 430,
+      "verified_bytes": 185567855,
+      "verification_started_at": "2026-11-06T00:45:07.487Z",
+      "verification_scope": "manifest_pass",
+      "api_evidence": {
+        "version": "retained-api-receipts-v1",
+        "scope": "retained_json_checksums",
+        "records_checked": 19,
+        "records_without_receipt": 112
+      },
+      "error": null,
+      "attempts": 0
+    }
+  }
+}

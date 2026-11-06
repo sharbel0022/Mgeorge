@@ -1,0 +1,1434 @@
+TAP version 13
+# Subtest: Node pdf independent bare-role-boundary: recipient then supplier
+ok 1 - Node pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 47.821387
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: supplier then recipient
+ok 2 - Node pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 4.174223
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: recipient then customer
+ok 3 - Node pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.131716
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated English recipient
+ok 4 - Node pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 1.118277
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated supplier
+ok 5 - Node pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 1.409978
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: upper case roles
+ok 6 - Node pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 2.164987
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: lowercase legal form
+ok 7 - Node pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 1.586159
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: period after legal form
+ok 8 - Node pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 1.274968
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: comma after legal form
+ok 9 - Node pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 1.022514
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: semicolon after legal form
+ok 10 - Node pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 1.341797
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: parenthesized legal form
+not ok 11 - Node pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 2.697015
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab before new role
+ok 12 - Node pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 1.851252
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: column spaces before new role
+ok 13 - Node pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 1.667189
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab after explicit colon
+ok 14 - Node pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.754196
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: HB before new role
+ok 15 - Node pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 1.15418
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: KB before new role
+ok 16 - Node pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 1.015283
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: single-letter prefix
+ok 17 - Node pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.831512
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal supplier in name
+ok 18 - Node pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 2.236223
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal customer in name
+ok 19 - Node pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 1.138206
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Customer
+ok 20 - Node pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 1.145097
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Kund
+ok 21 - Node pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 1.259756
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Supplier
+ok 22 - Node pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 1.372724
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: uppercase literal role word
+ok 23 - Node pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 1.153178
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Customer
+ok 24 - Node pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 1.348998
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: hyphenated literal role word
+ok 25 - Node pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.976486
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: role fragment
+ok 26 - Node pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 1.180459
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: legal-form suffix fragment
+ok 27 - Node pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.948836
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab after colon with literal role
+ok 28 - Node pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.964909
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab within explicit recipient label
+ok 29 - Node pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.965821
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: wrapped explicit supplier name
+ok 30 - Node pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.98634
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: repeated Kund as literal value
+ok 31 - Node pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.696542
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: plain complete name
+ok 32 - Node pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.685685
+  type: 'test'
+  ...
+# Subtest: Node pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 33 - Node pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.89168
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after recipient then supplier
+not ok 34 - Node pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.993732
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after supplier then recipient
+not ok 35 - Node pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 3.018771
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after repeated recipient
+not ok 36 - Node pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.690342
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census: inline unowned number after new bare role
+not ok 37 - Node pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.942406
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census-control: unknown field cannot donate ownership
+ok 38 - Node pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.729
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 39 - Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 1.033762
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: different unowned number after scalar holds census
+ok 40 - Node pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 1.104446
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 41 - Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.920403
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then supplier
+ok 42 - Node ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 1.299244
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: supplier then recipient
+ok 43 - Node ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 1.029264
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then customer
+ok 44 - Node ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 0.76963
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated English recipient
+ok 45 - Node ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.629802
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated supplier
+ok 46 - Node ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.758374
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: upper case roles
+ok 47 - Node ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.597364
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: lowercase legal form
+ok 48 - Node ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.837611
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: period after legal form
+ok 49 - Node ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.806375
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: comma after legal form
+ok 50 - Node ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.576293
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: semicolon after legal form
+ok 51 - Node ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.732755
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: parenthesized legal form
+not ok 52 - Node ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.957699
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab before new role
+ok 53 - Node ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.571847
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: column spaces before new role
+ok 54 - Node ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.630394
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab after explicit colon
+ok 55 - Node ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.604966
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: HB before new role
+ok 56 - Node ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.635261
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: KB before new role
+ok 57 - Node ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 1.060651
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: single-letter prefix
+ok 58 - Node ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.663222
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal supplier in name
+ok 59 - Node ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.729711
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal customer in name
+ok 60 - Node ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.767757
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Customer
+ok 61 - Node ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.99219
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Kund
+ok 62 - Node ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 1.318933
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Supplier
+ok 63 - Node ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 1.084527
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: uppercase literal role word
+ok 64 - Node ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.715689
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Customer
+ok 65 - Node ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.895677
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: hyphenated literal role word
+ok 66 - Node ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 1.39717
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: role fragment
+ok 67 - Node ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 1.123554
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: legal-form suffix fragment
+ok 68 - Node ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 1.327767
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab after colon with literal role
+ok 69 - Node ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.891651
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab within explicit recipient label
+ok 70 - Node ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.691324
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: wrapped explicit supplier name
+ok 71 - Node ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.925531
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: repeated Kund as literal value
+ok 72 - Node ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.589013
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: plain complete name
+ok 73 - Node ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.719225
+  type: 'test'
+  ...
+# Subtest: Node ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 74 - Node ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.639677
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after recipient then supplier
+not ok 75 - Node ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.761968
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after supplier then recipient
+not ok 76 - Node ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.755509
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after repeated recipient
+not ok 77 - Node ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 1.23606
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census: inline unowned number after new bare role
+not ok 78 - Node ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 1.155771
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census-control: unknown field cannot donate ownership
+ok 79 - Node ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 1.424956
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 80 - Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.683151
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: different unowned number after scalar holds census
+ok 81 - Node ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.56704
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 82 - Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.911269
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then supplier
+ok 83 - Sites pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 8.553829
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: supplier then recipient
+ok 84 - Sites pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 1.015424
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then customer
+ok 85 - Sites pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.023426
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated English recipient
+ok 86 - Sites pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.89767
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated supplier
+ok 87 - Sites pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.829969
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: upper case roles
+ok 88 - Sites pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 1.118466
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: lowercase legal form
+ok 89 - Sites pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.713897
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: period after legal form
+ok 90 - Sites pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.777602
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: comma after legal form
+ok 91 - Sites pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.775669
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: semicolon after legal form
+ok 92 - Sites pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.650824
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: parenthesized legal form
+not ok 93 - Sites pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.945642
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab before new role
+ok 94 - Sites pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.747356
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: column spaces before new role
+ok 95 - Sites pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.502914
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab after explicit colon
+ok 96 - Sites pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.641539
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: HB before new role
+ok 97 - Sites pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.699796
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: KB before new role
+ok 98 - Sites pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.590805
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: single-letter prefix
+ok 99 - Sites pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.542794
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal supplier in name
+ok 100 - Sites pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.548382
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal customer in name
+ok 101 - Sites pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.490566
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Customer
+ok 102 - Sites pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.529063
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Kund
+ok 103 - Sites pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.566519
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Supplier
+ok 104 - Sites pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.553799
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: uppercase literal role word
+ok 105 - Sites pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.630164
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Customer
+ok 106 - Sites pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.639006
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: hyphenated literal role word
+ok 107 - Sites pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.529674
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: role fragment
+ok 108 - Sites pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.513932
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: legal-form suffix fragment
+ok 109 - Sites pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.54069
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab after colon with literal role
+ok 110 - Sites pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.461624
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab within explicit recipient label
+ok 111 - Sites pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.501763
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: wrapped explicit supplier name
+ok 112 - Sites pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.495163
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: repeated Kund as literal value
+ok 113 - Sites pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.901094
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: plain complete name
+ok 114 - Sites pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.551287
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 115 - Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.77641
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after recipient then supplier
+not ok 116 - Sites pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 1.042905
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after supplier then recipient
+not ok 117 - Sites pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.62806
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after repeated recipient
+not ok 118 - Sites pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 1.119338
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census: inline unowned number after new bare role
+not ok 119 - Sites pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.691154
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census-control: unknown field cannot donate ownership
+ok 120 - Sites pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 1.001974
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 121 - Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.718134
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: different unowned number after scalar holds census
+ok 122 - Sites pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.980812
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 123 - Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.80967
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then supplier
+ok 124 - Sites ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 0.72968
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: supplier then recipient
+ok 125 - Sites ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 0.736191
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then customer
+ok 126 - Sites ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 0.698956
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated English recipient
+ok 127 - Sites ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.802338
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated supplier
+ok 128 - Sites ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 2.027593
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: upper case roles
+ok 129 - Sites ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.7904
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: lowercase legal form
+ok 130 - Sites ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.994053
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: period after legal form
+ok 131 - Sites ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.757541
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: comma after legal form
+ok 132 - Sites ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 1.250813
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: semicolon after legal form
+ok 133 - Sites ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 1.16136
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: parenthesized legal form
+not ok 134 - Sites ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 2.839787
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab before new role
+ok 135 - Sites ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.692837
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: column spaces before new role
+ok 136 - Sites ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.483556
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab after explicit colon
+ok 137 - Sites ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.714208
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: HB before new role
+ok 138 - Sites ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.534571
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: KB before new role
+ok 139 - Sites ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.466611
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: single-letter prefix
+ok 140 - Sites ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.766666
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal supplier in name
+ok 141 - Sites ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.562833
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal customer in name
+ok 142 - Sites ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.477527
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Customer
+ok 143 - Sites ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.538748
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Kund
+ok 144 - Sites ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.535102
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Supplier
+ok 145 - Sites ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.522975
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: uppercase literal role word
+ok 146 - Sites ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.50009
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Customer
+ok 147 - Sites ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.546119
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: hyphenated literal role word
+ok 148 - Sites ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.564245
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: role fragment
+ok 149 - Sites ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.456356
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: legal-form suffix fragment
+ok 150 - Sites ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.439591
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab after colon with literal role
+ok 151 - Sites ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.627219
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab within explicit recipient label
+ok 152 - Sites ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.576794
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: wrapped explicit supplier name
+ok 153 - Sites ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.504998
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: repeated Kund as literal value
+ok 154 - Sites ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.597095
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: plain complete name
+ok 155 - Sites ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.672486
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 156 - Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.510406
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after recipient then supplier
+not ok 157 - Sites ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.734668
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after supplier then recipient
+not ok 158 - Sites ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 1.068513
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after repeated recipient
+not ok 159 - Sites ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.625747
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census: inline unowned number after new bare role
+not ok 160 - Sites ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.894165
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    An unowned identity must not cross a role boundary
+    + actual - expected
+    
+    + '5560160680'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: '5560160680'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:17:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census-control: unknown field cannot donate ownership
+ok 161 - Sites ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.865061
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 162 - Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.926372
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: different unowned number after scalar holds census
+ok 163 - Sites ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 1.24878
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 164 - Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.957377
+  type: 'test'
+  ...
+1..164
+# tests 164
+# suites 0
+# pass 144
+# fail 20
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 865.845001

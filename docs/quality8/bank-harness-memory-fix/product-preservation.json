@@ -1,0 +1,46 @@
+{
+  "base": "d294fd87b04d1bf65b124be5ad3dd1bd2654fd73",
+  "commit": "7a5a397c6543fd762d86005369d6740448876cfe",
+  "changedTrackedFiles": [
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "productTrees": [
+    {
+      "path": "src",
+      "beforeTree": "040000 tree df387010066c637ec80b92a987286046672f251d\tsrc",
+      "afterTree": "040000 tree df387010066c637ec80b92a987286046672f251d\tsrc",
+      "identical": true
+    },
+    {
+      "path": "sites/lib",
+      "beforeTree": "040000 tree 6372e4ab2b27e1f48315b411488be9193fb52abb\tsites/lib",
+      "afterTree": "040000 tree 6372e4ab2b27e1f48315b411488be9193fb52abb\tsites/lib",
+      "identical": true
+    },
+    {
+      "path": "sites/components",
+      "beforeTree": "040000 tree 3090d315f33e540d389d6a1da5ae9c0af1f4740a\tsites/components",
+      "afterTree": "040000 tree 3090d315f33e540d389d6a1da5ae9c0af1f4740a\tsites/components",
+      "identical": true
+    },
+    {
+      "path": "sites/app",
+      "beforeTree": "040000 tree b5ba68280bd1b8c993b38639972e45e1e1fbb2d0\tsites/app",
+      "afterTree": "040000 tree b5ba68280bd1b8c993b38639972e45e1e1fbb2d0\tsites/app",
+      "identical": true
+    },
+    {
+      "path": "scripts",
+      "beforeTree": "040000 tree f1e578982af02f197814a6404ce1734de37e81cc\tscripts",
+      "afterTree": "040000 tree f1e578982af02f197814a6404ce1734de37e81cc\tscripts",
+      "identical": true
+    },
+    {
+      "path": "sites/scripts",
+      "beforeTree": "040000 tree 50574e5480505ce2d6af02852cbc5728a1e9df41\tsites/scripts",
+      "afterTree": "040000 tree 50574e5480505ce2d6af02852cbc5728a1e9df41\tsites/scripts",
+      "identical": true
+    }
+  ],
+  "workingTreeClean": true
+}

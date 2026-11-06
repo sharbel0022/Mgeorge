@@ -1,0 +1,17 @@
+{
+  "text": "FAKTURA\nFaktureras till Leverantör\nTestmottagaren Handel AB Exempel Ådal Ventilation AB\nHandelsvägen 22 Kanalvägen 24\n123 40 Teststad 345 67 Testeby\nOrg.nr: 559762-3130\nFakturanummer: V104382\nFakturadatum: 2026-06-18\nFörfallodatum: 2026-07-18\nBeställningsnummer: PO-83203\nBeskrivning Antal Å-pris Belopp\nFilterpaket 12 289,00 3 468,00\nKanalkontroll 2 1 202,00 2 404,00\nSamtliga radbelopp i SEK, exklusive moms.\nBelopp exkl. moms 5 872,00 Bankgiro\n936-4175\nSumma moms 1 468,00\nOCKR-referens\nAtt betala SEK 7 340,00 00863025136\nAnge OCR-numret vid betalning.\nLeveransen avser angiven beställning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 90,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338",
+    "textSha256": "c647011d9ddbc017744211587b5608f15807e6b36eebc8d6e807d37f75911a6f",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "bdeb4fcd97a15d339259d77d5b5836deee88b7ad66955695ca7a00ca56d8c0f6",
+        "bankgiro": []
+      }
+    ]
+  }
+}

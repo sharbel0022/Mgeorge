@@ -1,0 +1,29 @@
+{
+  "redFreeze": "9f7440f7083800da59f728b87f7f2bbe85676d1b",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/review-party-completed-name-independent.test.mjs",
+    "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+    "sites/tests/party-role-name-grammar.test.mjs",
+    "sites/tests/party-completed-name-boundaries.test.mjs"
+  ],
+  "exitCode": 0,
+  "logSha256": "32ca0cb7798a670e6d70e72a1a42e4b1a143ea0d912ef7d94cccb24a0d1ef0b6",
+  "productSha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+  "nodeSitesEqual": true,
+  "counts": [
+    "# tests 308",
+    "# pass 308",
+    "# fail 0",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0",
+    "# duration_ms 2819.623262"
+  ],
+  "failures": []
+}

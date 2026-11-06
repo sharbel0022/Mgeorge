@@ -1,0 +1,16 @@
+file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites/scripts/minimatch-backport.mjs:37
+      throw new Error(`Expected an unlinked regular backport file: ${relative}`);
+            ^
+
+Error: Expected an unlinked regular backport file: node_modules/@alloc/quick-lru/package.json
+    at safePath (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites/scripts/minimatch-backport.mjs:37:13)
+    at packageDirectory (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites/scripts/minimatch-backport.mjs:52:22)
+    at moduleDirectory (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites/scripts/minimatch-backport.mjs:69:36)
+    at discover (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites/scripts/minimatch-backport.mjs:74:3)
+    at guardMinimatchBackport (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites/scripts/minimatch-backport.mjs:140:18)
+    at file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites/scripts/run-verified-tool.mjs:10:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.1

@@ -1,0 +1,2664 @@
+TAP version 13
+# Subtest: Node pdf independent bare-role-boundary: recipient then supplier
+not ok 1 - Node pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 47.122411
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.start (node:internal/test_runner/test:1262:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: supplier then recipient
+not ok 2 - Node pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 4.458113
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: recipient then customer
+not ok 3 - Node pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.087751
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated English recipient
+not ok 4 - Node pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 1.05265
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB bill to Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB bill to Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: repeated supplier
+not ok 5 - Node pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 1.143193
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: upper case roles
+not ok 6 - Node pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 1.193888
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB CUSTOMER Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB CUSTOMER Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: lowercase legal form
+not ok 7 - Node pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.842378
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder ab leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder ab leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: period after legal form
+not ok 8 - Node pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 1.125787
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB. supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB. supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: comma after legal form
+not ok 9 - Node pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 1.200527
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB, customer Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB, customer Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: semicolon after legal form
+not ok 10 - Node pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 1.441264
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB; recipient Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB; recipient Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: parenthesized legal form
+not ok 11 - Node pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 1.218375
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab before new role
+ok 12 - Node pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 1.9309
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: column spaces before new role
+ok 13 - Node pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 1.618457
+  type: 'test'
+  ...
+# Subtest: Node pdf independent bare-role-boundary: tab after explicit colon
+not ok 14 - Node pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 1.289039
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: HB before new role
+not ok 15 - Node pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 1.392572
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder HB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder HB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: KB before new role
+not ok 16 - Node pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 1.118316
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent bare-role-boundary: single-letter prefix
+not ok 17 - Node pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.877209
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'A AB Leverantör B AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'A AB Leverantör B AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal supplier in name
+ok 18 - Node pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 1.444859
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal customer in name
+ok 19 - Node pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.66762
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Customer
+ok 20 - Node pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.641589
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Kund
+ok 21 - Node pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.980782
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal middle Supplier
+ok 22 - Node pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 1.056915
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: uppercase literal role word
+ok 23 - Node pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.970027
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: literal leading Customer
+ok 24 - Node pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 1.194789
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: hyphenated literal role word
+ok 25 - Node pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.982094
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: role fragment
+ok 26 - Node pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 1.096373
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: legal-form suffix fragment
+ok 27 - Node pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 1.03308
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab after colon with literal role
+ok 28 - Node pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.738915
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: tab within explicit recipient label
+ok 29 - Node pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.802288
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: wrapped explicit supplier name
+ok 30 - Node pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.863679
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: repeated Kund as literal value
+ok 31 - Node pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 1.310892
+  type: 'test'
+  ...
+# Subtest: Node pdf independent literal-name-positive: plain complete name
+ok 32 - Node pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.871932
+  type: 'test'
+  ...
+# Subtest: Node pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 33 - Node pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 1.029564
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after recipient then supplier
+not ok 34 - Node pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 1.142754
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after supplier then recipient
+not ok 35 - Node pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 2.402087
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census: unowned number after repeated recipient
+not ok 36 - Node pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.692436
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census: inline unowned number after new bare role
+not ok 37 - Node pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.603484
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node pdf independent owner-census-control: unknown field cannot donate ownership
+ok 38 - Node pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.789028
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 39 - Node pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.790941
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: different unowned number after scalar holds census
+ok 40 - Node pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.831101
+  type: 'test'
+  ...
+# Subtest: Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 41 - Node pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 1.119918
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then supplier
+not ok 42 - Node ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 1.344491
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: supplier then recipient
+not ok 43 - Node ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 1.570396
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: recipient then customer
+not ok 44 - Node ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 1.016085
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated English recipient
+not ok 45 - Node ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.851111
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB bill to Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB bill to Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: repeated supplier
+not ok 46 - Node ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 1.28936
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: upper case roles
+not ok 47 - Node ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.683593
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB CUSTOMER Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB CUSTOMER Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: lowercase legal form
+not ok 48 - Node ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.743161
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder ab leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder ab leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: period after legal form
+not ok 49 - Node ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.595672
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB. supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB. supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: comma after legal form
+not ok 50 - Node ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.625326
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB, customer Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB, customer Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: semicolon after legal form
+not ok 51 - Node ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.623955
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB; recipient Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB; recipient Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: parenthesized legal form
+not ok 52 - Node ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.931449
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab before new role
+ok 53 - Node ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.707117
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: column spaces before new role
+ok 54 - Node ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.732685
+  type: 'test'
+  ...
+# Subtest: Node ocr independent bare-role-boundary: tab after explicit colon
+not ok 55 - Node ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.666276
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: HB before new role
+not ok 56 - Node ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.816239
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder HB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder HB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: KB before new role
+not ok 57 - Node ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.642741
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent bare-role-boundary: single-letter prefix
+not ok 58 - Node ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.862127
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'A AB Leverantör B AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'A AB Leverantör B AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal supplier in name
+ok 59 - Node ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.576313
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal customer in name
+ok 60 - Node ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.663843
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Customer
+ok 61 - Node ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.533871
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Kund
+ok 62 - Node ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.743962
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal middle Supplier
+ok 63 - Node ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.716962
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: uppercase literal role word
+ok 64 - Node ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.598386
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: literal leading Customer
+ok 65 - Node ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.706647
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: hyphenated literal role word
+ok 66 - Node ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.551667
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: role fragment
+ok 67 - Node ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.952521
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: legal-form suffix fragment
+ok 68 - Node ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.573129
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab after colon with literal role
+ok 69 - Node ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.599368
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: tab within explicit recipient label
+ok 70 - Node ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.511627
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: wrapped explicit supplier name
+ok 71 - Node ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 1.007251
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: repeated Kund as literal value
+ok 72 - Node ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.551317
+  type: 'test'
+  ...
+# Subtest: Node ocr independent literal-name-positive: plain complete name
+ok 73 - Node ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.543635
+  type: 'test'
+  ...
+# Subtest: Node ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 74 - Node ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.772334
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after recipient then supplier
+not ok 75 - Node ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.640529
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after supplier then recipient
+not ok 76 - Node ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.630474
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census: unowned number after repeated recipient
+not ok 77 - Node ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.97931
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census: inline unowned number after new bare role
+not ok 78 - Node ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.92539
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Node ocr independent owner-census-control: unknown field cannot donate ownership
+ok 79 - Node ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 3.138619
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 80 - Node ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.542774
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: different unowned number after scalar holds census
+ok 81 - Node ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.596744
+  type: 'test'
+  ...
+# Subtest: Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 82 - Node ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.553229
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then supplier
+not ok 83 - Sites pdf independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 6.439036
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: supplier then recipient
+not ok 84 - Sites pdf independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 0.998378
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: recipient then customer
+not ok 85 - Sites pdf independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 0.844911
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated English recipient
+not ok 86 - Sites pdf independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.845512
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB bill to Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB bill to Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: repeated supplier
+not ok 87 - Sites pdf independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 0.849858
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: upper case roles
+not ok 88 - Sites pdf independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.793515
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB CUSTOMER Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB CUSTOMER Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: lowercase legal form
+not ok 89 - Sites pdf independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.836358
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder ab leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder ab leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: period after legal form
+not ok 90 - Sites pdf independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.673147
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB. supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB. supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: comma after legal form
+not ok 91 - Sites pdf independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.807426
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB, customer Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB, customer Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: semicolon after legal form
+not ok 92 - Sites pdf independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.7427
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB; recipient Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB; recipient Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: parenthesized legal form
+not ok 93 - Sites pdf independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.589393
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab before new role
+ok 94 - Sites pdf independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.847235
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: column spaces before new role
+ok 95 - Sites pdf independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.618095
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: tab after explicit colon
+not ok 96 - Sites pdf independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 0.611686
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: HB before new role
+not ok 97 - Sites pdf independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.567681
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder HB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder HB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: KB before new role
+not ok 98 - Sites pdf independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.589153
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent bare-role-boundary: single-letter prefix
+not ok 99 - Sites pdf independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.700197
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'A AB Leverantör B AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'A AB Leverantör B AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal supplier in name
+ok 100 - Sites pdf independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.561081
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal customer in name
+ok 101 - Sites pdf independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.534593
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Customer
+ok 102 - Sites pdf independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.48568
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Kund
+ok 103 - Sites pdf independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.589813
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal middle Supplier
+ok 104 - Sites pdf independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.489645
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: uppercase literal role word
+ok 105 - Sites pdf independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.570435
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: literal leading Customer
+ok 106 - Sites pdf independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.545828
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: hyphenated literal role word
+ok 107 - Sites pdf independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.713467
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: role fragment
+ok 108 - Sites pdf independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.584676
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: legal-form suffix fragment
+ok 109 - Sites pdf independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.522434
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab after colon with literal role
+ok 110 - Sites pdf independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.475775
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: tab within explicit recipient label
+ok 111 - Sites pdf independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.463787
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: wrapped explicit supplier name
+ok 112 - Sites pdf independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.605116
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: repeated Kund as literal value
+ok 113 - Sites pdf independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.533991
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent literal-name-positive: plain complete name
+ok 114 - Sites pdf independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.528643
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+ok 115 - Sites pdf independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.628712
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after recipient then supplier
+not ok 116 - Sites pdf independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.685726
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after supplier then recipient
+not ok 117 - Sites pdf independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.615842
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census: unowned number after repeated recipient
+not ok 118 - Sites pdf independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.57491
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census: inline unowned number after new bare role
+not ok 119 - Sites pdf independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.505238
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites pdf independent owner-census-control: unknown field cannot donate ownership
+ok 120 - Sites pdf independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.65464
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+ok 121 - Sites pdf independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.626699
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: different unowned number after scalar holds census
+ok 122 - Sites pdf independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.572587
+  type: 'test'
+  ...
+# Subtest: Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 123 - Sites pdf independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.573359
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then supplier
+not ok 124 - Sites ocr independent bare-role-boundary: recipient then supplier
+  ---
+  duration_ms: 0.582812
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: supplier then recipient
+not ok 125 - Sites ocr independent bare-role-boundary: supplier then recipient
+  ---
+  duration_ms: 0.535943
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: recipient then customer
+not ok 126 - Sites ocr independent bare-role-boundary: recipient then customer
+  ---
+  duration_ms: 0.639187
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated English recipient
+not ok 127 - Sites ocr independent bare-role-boundary: repeated English recipient
+  ---
+  duration_ms: 0.536374
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB bill to Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB bill to Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: repeated supplier
+not ok 128 - Sites ocr independent bare-role-boundary: repeated supplier
+  ---
+  duration_ms: 1.93819
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: upper case roles
+not ok 129 - Sites ocr independent bare-role-boundary: upper case roles
+  ---
+  duration_ms: 0.642512
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB CUSTOMER Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB CUSTOMER Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: lowercase legal form
+not ok 130 - Sites ocr independent bare-role-boundary: lowercase legal form
+  ---
+  duration_ms: 0.565678
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder ab leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder ab leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: period after legal form
+not ok 131 - Sites ocr independent bare-role-boundary: period after legal form
+  ---
+  duration_ms: 0.583705
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB. supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB. supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: comma after legal form
+not ok 132 - Sites ocr independent bare-role-boundary: comma after legal form
+  ---
+  duration_ms: 0.567971
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB, customer Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB, customer Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: semicolon after legal form
+not ok 133 - Sites ocr independent bare-role-boundary: semicolon after legal form
+  ---
+  duration_ms: 0.75002
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North AB; recipient Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North AB; recipient Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: parenthesized legal form
+not ok 134 - Sites ocr independent bare-role-boundary: parenthesized legal form
+  ---
+  duration_ms: 0.643983
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Independent North (AB) supplier Independent South AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Independent North (AB) supplier Independent South AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab before new role
+ok 135 - Sites ocr independent bare-role-boundary: tab before new role
+  ---
+  duration_ms: 0.523094
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: column spaces before new role
+ok 136 - Sites ocr independent bare-role-boundary: column spaces before new role
+  ---
+  duration_ms: 0.459261
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: tab after explicit colon
+not ok 137 - Sites ocr independent bare-role-boundary: tab after explicit colon
+  ---
+  duration_ms: 1.024358
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: HB before new role
+not ok 138 - Sites ocr independent bare-role-boundary: HB before new role
+  ---
+  duration_ms: 0.622382
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder HB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder HB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: KB before new role
+not ok 139 - Sites ocr independent bare-role-boundary: KB before new role
+  ---
+  duration_ms: 0.588601
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder KB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent bare-role-boundary: single-letter prefix
+not ok 140 - Sites ocr independent bare-role-boundary: single-letter prefix
+  ---
+  duration_ms: 0.597576
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'A AB Leverantör B AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'A AB Leverantör B AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal supplier in name
+ok 141 - Sites ocr independent literal-name-positive: literal supplier in name
+  ---
+  duration_ms: 0.565988
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal customer in name
+ok 142 - Sites ocr independent literal-name-positive: literal customer in name
+  ---
+  duration_ms: 0.511708
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Customer
+ok 143 - Sites ocr independent literal-name-positive: literal middle Customer
+  ---
+  duration_ms: 0.54056
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Kund
+ok 144 - Sites ocr independent literal-name-positive: literal leading Kund
+  ---
+  duration_ms: 0.442505
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal middle Supplier
+ok 145 - Sites ocr independent literal-name-positive: literal middle Supplier
+  ---
+  duration_ms: 0.485599
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: uppercase literal role word
+ok 146 - Sites ocr independent literal-name-positive: uppercase literal role word
+  ---
+  duration_ms: 0.548472
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: literal leading Customer
+ok 147 - Sites ocr independent literal-name-positive: literal leading Customer
+  ---
+  duration_ms: 0.45197
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: hyphenated literal role word
+ok 148 - Sites ocr independent literal-name-positive: hyphenated literal role word
+  ---
+  duration_ms: 0.506961
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: role fragment
+ok 149 - Sites ocr independent literal-name-positive: role fragment
+  ---
+  duration_ms: 0.49927
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: legal-form suffix fragment
+ok 150 - Sites ocr independent literal-name-positive: legal-form suffix fragment
+  ---
+  duration_ms: 0.5135
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab after colon with literal role
+ok 151 - Sites ocr independent literal-name-positive: tab after colon with literal role
+  ---
+  duration_ms: 0.554141
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: tab within explicit recipient label
+ok 152 - Sites ocr independent literal-name-positive: tab within explicit recipient label
+  ---
+  duration_ms: 0.502064
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: wrapped explicit supplier name
+ok 153 - Sites ocr independent literal-name-positive: wrapped explicit supplier name
+  ---
+  duration_ms: 0.841726
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: repeated Kund as literal value
+ok 154 - Sites ocr independent literal-name-positive: repeated Kund as literal value
+  ---
+  duration_ms: 0.453752
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent literal-name-positive: plain complete name
+ok 155 - Sites ocr independent literal-name-positive: plain complete name
+  ---
+  duration_ms: 0.490747
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+ok 156 - Sites ocr independent explicit-roles-positive: two separately explicit colon roles
+  ---
+  duration_ms: 0.961314
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after recipient then supplier
+not ok 157 - Sites ocr independent owner-census: unowned number after recipient then supplier
+  ---
+  duration_ms: 0.634259
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after supplier then recipient
+not ok 158 - Sites ocr independent owner-census: unowned number after supplier then recipient
+  ---
+  duration_ms: 0.590374
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Faktureras till Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census: unowned number after repeated recipient
+not ok 159 - Sites ocr independent owner-census: unowned number after repeated recipient
+  ---
+  duration_ms: 0.581311
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Kund Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Kund Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census: inline unowned number after new bare role
+not ok 160 - Sites ocr independent owner-census: inline unowned number after new bare role
+  ---
+  duration_ms: 0.565167
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:12:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    A new ambiguous role must not become a composite name
+    + actual - expected
+    
+    + 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual: 'Oberoende Söder AB Leverantör Oberoende Norr AB'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/probes/independent-boundary.test.mjs:15:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: Sites ocr independent owner-census-control: unknown field cannot donate ownership
+ok 161 - Sites ocr independent owner-census-control: unknown field cannot donate ownership
+  ---
+  duration_ms: 0.535283
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+ok 162 - Sites ocr independent owner-census-control: invalid unowned number before owned number holds census
+  ---
+  duration_ms: 0.491438
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: different unowned number after scalar holds census
+ok 163 - Sites ocr independent owner-census-control: different unowned number after scalar holds census
+  ---
+  duration_ms: 0.547651
+  type: 'test'
+  ...
+# Subtest: Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+ok 164 - Sites ocr independent owner-census-control: equal unowned duplicate preserves independently owned number
+  ---
+  duration_ms: 0.679566
+  type: 'test'
+  ...
+1..164
+# tests 164
+# suites 0
+# pass 88
+# fail 76
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 833.393644

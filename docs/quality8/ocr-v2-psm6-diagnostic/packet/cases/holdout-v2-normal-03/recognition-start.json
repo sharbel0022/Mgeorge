@@ -1,0 +1,26 @@
+{
+  "calls": 1,
+  "startedAt": "2026-11-06T00:23:15.130Z",
+  "workerLanguage": "swe",
+  "workerOEM": 1,
+  "workerOptions": {
+    "langPath": "/workspace/scratch/4d79ab4bea8e/enrichment/node_modules/@tesseract.js-data/swe/4.0.0",
+    "cacheMethod": "none"
+  },
+  "parameters": [
+    [
+      {
+        "tessedit_pageseg_mode": "6"
+      }
+    ]
+  ],
+  "recognitionOptions": {},
+  "outputOptions": {
+    "text": true,
+    "blocks": true
+  },
+  "rasterSha256": "de224deb2241bfd64bf60e1d2fe4eb84aaa5e92fa8d32a00be452c9d0fb977eb",
+  "rasterBytes": 562911,
+  "rasterWidth": 2400,
+  "rasterHeight": 3000
+}

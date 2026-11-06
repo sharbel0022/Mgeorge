@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-04",
+  "population": "normal-readable",
+  "layout": "upper-payment-panel",
+  "startedAt": "2026-11-06T00:23:18.996Z",
+  "completedAt": "2026-11-06T00:23:24.379Z",
+  "durationMs": 5382.853075999999,
+  "inputSha256": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b",
+  "expectedRasterSha256": "ea64707ba2f2f5f161f13ba1d94c810458b652a89d312868b1d5d6ebfe8bef71",
+  "actualRasterSha256": "ea64707ba2f2f5f161f13ba1d94c810458b652a89d312868b1d5d6ebfe8bef71",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 91,
+  "rawBlocks": 1,
+  "rawLines": 19,
+  "rawWords": 83,
+  "rawText": "Fiktiva Lönn Kontor AB Bankgiro\nTorget 3 5736-0828\n456 78 Exempelby Ange OCR-nummer\nOrg.nr: 559762-31438 00863025144\nFakturanummer: LF-63072 Fakturadatum: 2026-06-25\nFörfallodatum: 2026-07-25\nFaktureras till\nTestmottagaren Handel AB\nHandelsvägen 22\n123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nStolsmattor 6 238,90 1 433,40\nTransport och inbärning 1 700,20 700,20\nSamtliga radbelopp i SEK, exklusive moms.\nLeveransadress enligt beställning. Netto 2 133,60\nValuta: SEK Moms 25 24 533,40\nFakturabelopp 2 667,00 SEK\nAnge fakturans OCR-nummer vid betalning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "Fiktiva Lönn Kontor AB Bankgiro\nTorget 3 5736-0828\n456 78 Exempelby Ange OCR-nummer\nOrg.nr: 559762-31438 00863025144\nFakturanummer: LF-63072\nFakturadatum: 2026-06-25\nFörfallodatum: 2026-07-25\nFaktureras till\nTestmottagaren Handel AB\nHandelsvägen 22\n123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nStolsmattor 6 238,90 1 433,40\nTransport och inbärning 1 700,20 700,20\nSamtliga radbelopp i SEK, exklusive moms.\nLeveransadress enligt beställning. Netto 2 133,60\nValuta: SEK Moms 25 24 533,40\nFakturabelopp 2 667,00 SEK\nAnge fakturans OCR-nummer vid betalning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b",
+    "textSha256": "b128d4665719c91b6093a2978b374b970c4854583e2ade3750ff945ed7ccb174",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "8fd09f8e2cb646922058da0f89122d6b630c9d37e8c2013521aba06e482dc272",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": true,
+  "percentMarkers": {
+    "rendered": 1,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "bc3b86a4d985b59ca0489336603a9a70825e15ce4b54332061d2e75509b1cdb3",
+    "layout-replay.json": "0521490c46165c6525a7bc8dde3f8fb8785340b8be23611da771ee1456e9e4a7",
+    "raw-response.json": "b20e42fcafdf75893d7040b97511feeec2059565fc97ae9167e20ea220d897a1",
+    "raw-response.v8": "9e2af043037f2048c8fc9f0fdffa0acc0599072f2906ddea5b1aa53f2cd5a712",
+    "recognition-finished.json": "9509f67666bada9d32c9593301a06695dbb1f9d86d4abd0f90d5dd87fda14c11",
+    "recognition-input.png": "ea64707ba2f2f5f161f13ba1d94c810458b652a89d312868b1d5d6ebfe8bef71",
+    "recognition-start.json": "0fc440ea5eb590a9cc82df6ff8af13277f7e5d31bb500035c01ece11c4c897ae",
+    "worker-result.json": "93de71e3f80e2a5b5846ce8f2ecfff865af48ad04ac8f588baa3c430570b4572",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

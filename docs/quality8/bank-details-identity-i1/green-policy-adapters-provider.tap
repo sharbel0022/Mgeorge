@@ -1,0 +1,1809 @@
+TAP version 13
+# Subtest: only an empty guard or an expired explicit deadline permits account reads
+ok 1 - only an empty guard or an expired explicit deadline permits account reads
+  ---
+  duration_ms: 3.244655
+  type: 'test'
+  ...
+# Subtest: missing, malformed and forged persisted diagnostics fail closed
+ok 2 - missing, malformed and forged persisted diagnostics fail closed
+  ---
+  duration_ms: 0.45304
+  type: 'test'
+  ...
+# Subtest: a later successful sync cannot erase an unknown account cooldown
+ok 3 - a later successful sync cannot erase an unknown account cooldown
+  ---
+  duration_ms: 0.298953
+  type: 'test'
+  ...
+# Subtest: merging a retry preserves the longer known wait and never weakens an unknown or manual block
+ok 4 - merging a retry preserves the longer known wait and never weakens an unknown or manual block
+  ---
+  duration_ms: 1.037727
+  type: 'test'
+  ...
+# (node:20) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: current missing connection blocks an intact AIS payment before automatic or explicit allocation
+ok 5 - current missing connection blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 132.68585
+  type: 'test'
+  ...
+# Subtest: current expired consent blocks an intact AIS payment before automatic or explicit allocation
+ok 6 - current expired consent blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 42.755559
+  type: 'test'
+  ...
+# Subtest: current disconnected consent blocks an intact AIS payment before automatic or explicit allocation
+ok 7 - current disconnected consent blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 39.567904
+  type: 'test'
+  ...
+# Subtest: current foreign owner blocks an intact AIS payment before automatic or explicit allocation
+ok 8 - current foreign owner blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 35.857128
+  type: 'test'
+  ...
+# Subtest: current foreign application blocks an intact AIS payment before automatic or explicit allocation
+ok 9 - current foreign application blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 35.591465
+  type: 'test'
+  ...
+# Subtest: current missing application blocks an intact AIS payment before automatic or explicit allocation
+ok 10 - current missing application blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 29.541847
+  type: 'test'
+  ...
+# Subtest: current wrong application generation blocks an intact AIS payment before automatic or explicit allocation
+ok 11 - current wrong application generation blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 35.307946
+  type: 'test'
+  ...
+# Subtest: current test environment blocks an intact AIS payment before automatic or explicit allocation
+ok 12 - current test environment blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 28.722043
+  type: 'test'
+  ...
+# Subtest: current deselected account blocks an intact AIS payment before automatic or explicit allocation
+ok 13 - current deselected account blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 27.265776
+  type: 'test'
+  ...
+# Subtest: current invalid selected accounts blocks an intact AIS payment before automatic or explicit allocation
+ok 14 - current invalid selected accounts blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 27.508807
+  type: 'test'
+  ...
+# Subtest: current wrong receiving account blocks an intact AIS payment before automatic or explicit allocation
+ok 15 - current wrong receiving account blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 26.346404
+  type: 'test'
+  ...
+# Subtest: current wrong account currency blocks an intact AIS payment before automatic or explicit allocation
+ok 16 - current wrong account currency blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 23.068751
+  type: 'test'
+  ...
+# Subtest: current ambiguous receiving account blocks an intact AIS payment before automatic or explicit allocation
+ok 17 - current ambiguous receiving account blocks an intact AIS payment before automatic or explicit allocation
+  ---
+  duration_ms: 30.295402
+  type: 'test'
+  ...
+# Subtest: current account check accepts one exact selected owned account and caches it only for this request
+ok 18 - current account check accepts one exact selected owned account and caches it only for this request
+  ---
+  duration_ms: 24.605837
+  type: 'test'
+  ...
+# Subtest: restored consent clears its own hold, preserves the receipt and allocates exactly once
+ok 19 - restored consent clears its own hold, preserves the receipt and allocates exactly once
+  ---
+  duration_ms: 30.106483
+  type: 'test'
+  ...
+# Subtest: a manually split payment inherits its AIS parent account prerequisite
+ok 20 - a manually split payment inherits its AIS parent account prerequisite
+  ---
+  duration_ms: 27.141311
+  type: 'test'
+  ...
+# Subtest: known loss of account consent cannot reverse a recorded allocation or retain a verified status
+ok 21 - known loss of account consent cannot reverse a recorded allocation or retain a verified status
+  ---
+  duration_ms: 64.677777
+  type: 'test'
+  ...
+# Subtest: integrity-only availability check remains separate from current consent and never writes
+ok 22 - integrity-only availability check remains separate from current consent and never writes
+  ---
+  duration_ms: 14.604657
+  type: 'test'
+  ...
+# Subtest: a learned payer relation rechecks its previous payment account: false
+ok 23 - a learned payer relation rechecks its previous payment account: false
+  ---
+  duration_ms: 24.410268
+  type: 'test'
+  ...
+# Subtest: a learned payer relation rechecks its previous payment account: true
+ok 24 - a learned payer relation rechecks its previous payment account: true
+  ---
+  duration_ms: 29.999394
+  type: 'test'
+  ...
+# Subtest: a booked organization cannot be changed to teach a third-party payer a different customer identity
+ok 25 - a booked organization cannot be changed to teach a third-party payer a different customer identity
+  ---
+  duration_ms: 34.209549
+  type: 'test'
+  ...
+# Subtest: documented account-details GET returns typed bank supplied aliases using the fixed authenticated endpoint
+ok 26 - documented account-details GET returns typed bank supplied aliases using the fixed authenticated endpoint
+  ---
+  duration_ms: 36.869918
+  type: 'test'
+  ...
+# Subtest: account-details allowlist rejects caller paths, methods, queries and invalid UUIDs before any fetch
+ok 27 - account-details allowlist rejects caller paths, methods, queries and invalid UUIDs before any fetch
+  ---
+  duration_ms: 3.762086
+  type: 'test'
+  ...
+# Subtest: malformed, cross-account and over-cap account details never pass response validation
+ok 28 - malformed, cross-account and over-cap account details never pass response validation
+  ---
+  duration_ms: 43.368377
+  type: 'test'
+  ...
+# Subtest: account-detail errors and oversized responses use existing safe bounded provider handling
+ok 29 - account-detail errors and oversized responses use existing safe bounded provider handling
+  ---
+  duration_ms: 8.195336
+  type: 'test'
+  ...
+# Subtest: a malformed typed IBAN alias cannot masquerade as a domestic identifier
+ok 30 - a malformed typed IBAN alias cannot masquerade as a domestic identifier
+  ---
+  duration_ms: 8.35998
+  type: 'test'
+  ...
+# Subtest: account schema diagnostics describe null, absent and invalid fields without returning bank values
+ok 31 - account schema diagnostics describe null, absent and invalid fields without returning bank values
+  ---
+  duration_ms: 18.714292
+  type: 'test'
+  ...
+# Subtest: untrusted error properties cannot forge a provider schema diagnostic
+ok 32 - untrusted error properties cannot forge a provider schema diagnostic
+  ---
+  duration_ms: 0.565878
+  type: 'test'
+  ...
+# Subtest: the observed null alias collection is retained as no additional aliases
+ok 33 - the observed null alias collection is retained as no additional aliases
+  ---
+  duration_ms: 4.256223
+  type: 'test'
+  ...
+# Subtest: nullable alias collection does not permit malformed lists or other null account fields
+ok 34 - nullable alias collection does not permit malformed lists or other null account fields
+  ---
+  duration_ms: 29.664723
+  type: 'test'
+  ...
+# Subtest: actual 429 responses retain only bounded explicit supplier retry advice separately from sync fallback policy
+ok 35 - actual 429 responses retain only bounded explicit supplier retry advice separately from sync fallback policy
+  ---
+  duration_ms: 55.197004
+  type: 'test'
+  ...
+# Subtest: retry advice ignores forged properties and getters and requires an actual HTTP 429 response
+ok 36 - retry advice ignores forged properties and getters and requires an actual HTTP 429 response
+  ---
+  duration_ms: 16.408308
+  type: 'test'
+  ...
+# Subtest: provider error codes come from constructor metadata without inspecting public getters or prototypes
+ok 37 - provider error codes come from constructor metadata without inspecting public getters or prototypes
+  ---
+  duration_ms: 0.541852
+  type: 'test'
+  ...
+# Subtest: a documented account resource may omit account_id without synthesizing a number
+ok 38 - a documented account resource may omit account_id without synthesizing a number
+  ---
+  duration_ms: 10.895074
+  type: 'test'
+  ...
+# Subtest: trusted operational cooldowns also cover provider-coded rate limits and 503 Retry-After
+ok 39 - trusted operational cooldowns also cover provider-coded rate limits and 503 Retry-After
+  ---
+  duration_ms: 20.912863
+  type: 'test'
+  ...
+# (node:40) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: null usage diagnosis: reauth_required cannot use the account-evidence reader even when fresh details would say ORGA
+ok 40 - null usage diagnosis: reauth_required cannot use the account-evidence reader even when fresh details would say ORGA
+  ---
+  duration_ms: 379.024708
+  type: 'test'
+  ...
+# Subtest: current bank-supplied BBAN proves only the selected account alias without any writes
+ok 41 - current bank-supplied BBAN proves only the selected account alias without any writes
+  ---
+  duration_ms: 288.010286
+  type: 'test'
+  ...
+# Subtest: missing bank-provided alias remains missing and is never calculated from IBAN
+ok 42 - missing bank-provided alias remains missing and is never calculated from IBAN
+  ---
+  duration_ms: 268.296013
+  type: 'test'
+  ...
+# Subtest: an alias shared by an unselected account remains ambiguous
+ok 43 - an alias shared by an unselected account remains ambiguous
+  ---
+  duration_ms: 274.509765
+  type: 'test'
+  ...
+# Subtest: company-scoped alias checks never read another company account in the same provider session
+ok 44 - company-scoped alias checks never read another company account in the same provider session
+  ---
+  duration_ms: 243.430691
+  type: 'test'
+  ...
+# Subtest: changed primary identity or currency cannot authorize a bank-provided alias
+ok 45 - changed primary identity or currency cannot authorize a bank-provided alias
+  ---
+  duration_ms: 496.833787
+  type: 'test'
+  ...
+# Subtest: owner, selector, original and consent security gates reject before contacting the provider
+ok 46 - owner, selector, original and consent security gates reject before contacting the provider
+  ---
+  duration_ms: 2639.716361
+  type: 'test'
+  ...
+# Subtest: MCP transport denies foreign origin and simple content types before any provider read
+ok 47 - MCP transport denies foreign origin and simple content types before any provider read
+  ---
+  duration_ms: 214.936134
+  type: 'test'
+  ...
+# Subtest: stale consent or workspace after a provider read cannot produce a positive result
+ok 48 - stale consent or workspace after a provider read cannot produce a positive result
+  ---
+  duration_ms: 720.564965
+  type: 'test'
+  ...
+# Subtest: provider errors remain bounded safe diagnostics while only operational cooldown is saved
+ok 49 - provider errors remain bounded safe diagnostics while only operational cooldown is saved
+  ---
+  duration_ms: 208.282361
+  type: 'test'
+  ...
+# Subtest: at most five existing consent resources are refreshed and omitted resources prevent uniqueness claims
+ok 50 - at most five existing consent resources are refreshed and omitted resources prevent uniqueness claims
+  ---
+  duration_ms: 342.518231
+  type: 'test'
+  ...
+# Subtest: consent revoked during the session read prevents any subsequent account-detail read
+ok 51 - consent revoked during the session read prevents any subsequent account-detail read
+  ---
+  duration_ms: 271.693742
+  type: 'test'
+  ...
+# Subtest: formatting-only alias comparison retains every account digit and requires a known scheme
+ok 52 - formatting-only alias comparison retains every account digit and requires a known scheme
+  ---
+  duration_ms: 942.636666
+  type: 'test'
+  ...
+# Subtest: a live foreign bank, expired session or missing account blocks detail calls without exposing bank resources
+ok 53 - a live foreign bank, expired session or missing account blocks detail calls without exposing bank resources
+  ---
+  duration_ms: 880.222841
+  type: 'test'
+  ...
+# Subtest: duplicate original hashes and malformed stored resource IDs are rejected before network
+ok 54 - duplicate original hashes and malformed stored resource IDs are rejected before network
+  ---
+  duration_ms: 214.998757
+  type: 'test'
+  ...
+# Subtest: a live session account superset cannot claim complete alias uniqueness or trigger reads of new accounts
+ok 55 - a live session account superset cannot claim complete alias uniqueness or trigger reads of new accounts
+  ---
+  duration_ms: 228.778211
+  type: 'test'
+  ...
+# Subtest: session schema failure identifies its boundary before account reads without disclosing values or writing
+ok 56 - session schema failure identifies its boundary before account reads without disclosing values or writing
+  ---
+  duration_ms: 193.760756
+  type: 'test'
+  ...
+# Subtest: first account schema failure identifies the attempted read while null optional fields remain rejected
+ok 57 - first account schema failure identifies the attempted read while null optional fields remain rejected
+  ---
+  duration_ms: 206.368767
+  type: 'test'
+  ...
+# Subtest: forged provider errors cannot leak codes, messages or diagnostic properties through the reader
+ok 58 - forged provider errors cannot leak codes, messages or diagnostic properties through the reader
+  ---
+  duration_ms: 435.597236
+  type: 'test'
+  ...
+# Subtest: the constructor code remains compatible without evaluating a changed provider error code getter
+ok 59 - the constructor code remains compatible without evaluating a changed provider error code getter
+  ---
+  duration_ms: 221.313057
+  type: 'test'
+  ...
+# Subtest: a null live alias collection completes the read but cannot match a domestic report to an IBAN
+ok 60 - a null live alias collection completes the read but cannot match a domestic report to an IBAN
+  ---
+  duration_ms: 216.914914
+  type: 'test'
+  ...
+# Subtest: explicit account action route is implemented
+ok 61 - explicit account action route is implemented
+  ---
+  duration_ms: 192.457423
+  type: 'test'
+  ...
+# Subtest: same-origin owner action revalidates its report target and returns only transient reader evidence with zero DB/R2 writes
+ok 62 - same-origin owner action revalidates its report target and returns only transient reader evidence with zero DB/R2 writes
+  ---
+  duration_ms: 269.112393
+  type: 'test'
+  ...
+# Subtest: account action rejects foreign origin, identity, stale revision, injected fields and arbitrary originals before provider contact
+ok 63 - account action rejects foreign origin, identity, stale revision, injected fields and arbitrary originals before provider contact
+  ---
+  duration_ms: 211.587438
+  type: 'test'
+  ...
+# Subtest: account action enforces JSON, bounded streamed body and malformed selectors before provider reads
+ok 64 - account action enforces JSON, bounded streamed body and malformed selectors before provider reads
+  ---
+  duration_ms: 186.650686
+  type: 'test'
+  ...
+# Subtest: several report originals do not authorize a client-selected bank account check
+ok 65 - several report originals do not authorize a client-selected bank account check
+  ---
+  duration_ms: 168.922088
+  type: 'test'
+  ...
+# Subtest: explicit action carries its selected owner/revision/report through a revision shift before reader reload
+ok 66 - explicit action carries its selected owner/revision/report through a revision shift before reader reload
+  ---
+  duration_ms: 164.280714
+  type: 'test'
+  ...
+# Subtest: explicit action carries its selected owner/revision/report through a membership shift before reader reload
+ok 67 - explicit action carries its selected owner/revision/report through a membership shift before reader reload
+  ---
+  duration_ms: 215.27885
+  type: 'test'
+  ...
+# Subtest: explicit action carries its selected owner/revision/report through a revision-and-membership shift before reader reload
+ok 68 - explicit action carries its selected owner/revision/report through a revision-and-membership shift before reader reload
+  ---
+  duration_ms: 197.663876
+  type: 'test'
+  ...
+# Subtest: explicit action reselects report membership again immediately before its first outbound read
+ok 69 - explicit action reselects report membership again immediately before its first outbound read
+  ---
+  duration_ms: 220.126188
+  type: 'test'
+  ...
+# Subtest: public MCP input cannot supply UI trusted context and still reads an owned report without UI membership
+ok 70 - public MCP input cannot supply UI trusted context and still reads an owned report without UI membership
+  ---
+  duration_ms: 260.199796
+  type: 'test'
+  ...
+# Subtest: account-details 429 transports retry_after_seconds while preserving financial and account facts
+ok 71 - account-details 429 transports retry_after_seconds while preserving financial and account facts
+  ---
+  duration_ms: 212.238683
+  type: 'test'
+  ...
+# Subtest: account-details 429 transports retry_after_http_date while preserving financial and account facts
+ok 72 - account-details 429 transports retry_after_http_date while preserving financial and account facts
+  ---
+  duration_ms: 257.945963
+  type: 'test'
+  ...
+# Subtest: account-details 429 transports retry_after_missing while preserving financial and account facts
+ok 73 - account-details 429 transports retry_after_missing while preserving financial and account facts
+  ---
+  duration_ms: 254.122746
+  type: 'test'
+  ...
+# Subtest: account-details 429 transports retry_after_invalid while preserving financial and account facts
+ok 74 - account-details 429 transports retry_after_invalid while preserving financial and account facts
+  ---
+  duration_ms: 247.409497
+  type: 'test'
+  ...
+# Subtest: account-details 429 transports retry_after_exceeds_limit while preserving financial and account facts
+ok 75 - account-details 429 transports retry_after_exceeds_limit while preserving financial and account facts
+  ---
+  duration_ms: 215.424546
+  type: 'test'
+  ...
+# Subtest: session 429 advice stays bound to session stage with only a durable operational wait
+ok 76 - session 429 advice stays bound to session stage with only a durable operational wait
+  ---
+  duration_ms: 185.938055
+  type: 'test'
+  ...
+# Subtest: forged rate-limit error metadata and getters cannot become trusted reader retry advice
+ok 77 - forged rate-limit error metadata and getters cannot become trusted reader retry advice
+  ---
+  duration_ms: 371.547266
+  type: 'test'
+  ...
+# Subtest: explicit action also rejects a changed authenticated owner before the reader contacts any bank
+ok 78 - explicit action also rejects a changed authenticated owner before the reader contacts any bank
+  ---
+  duration_ms: 176.982948
+  type: 'test'
+  ...
+# Subtest: a throwing provider code getter stays inside the safe mcp reader response
+ok 79 - a throwing provider code getter stays inside the safe mcp reader response
+  ---
+  duration_ms: 236.745336
+  type: 'test'
+  ...
+# Subtest: a throwing provider code getter stays inside the safe ui reader response
+ok 80 - a throwing provider code getter stays inside the safe ui reader response
+  ---
+  duration_ms: 207.004278
+  type: 'test'
+  ...
+# Subtest: unconstructed and proxied errors cannot run code or prototype traps at the reader boundary
+ok 81 - unconstructed and proxied errors cannot run code or prototype traps at the reader boundary
+  ---
+  duration_ms: 617.07834
+  type: 'test'
+  ...
+# Subtest: a stored unknown account cooldown blocks the next request before any provider call
+ok 82 - a stored unknown account cooldown blocks the next request before any provider call
+  ---
+  duration_ms: 248.590407
+  type: 'test'
+  ...
+# Subtest: a stored active account cooldown blocks the next request before any provider call
+ok 83 - a stored active account cooldown blocks the next request before any provider call
+  ---
+  duration_ms: 277.628417
+  type: 'test'
+  ...
+# Subtest: two concurrent account evidence reads share the bank owner lease
+ok 84 - two concurrent account evidence reads share the bank owner lease
+  ---
+  duration_ms: 243.303624
+  type: 'test'
+  ...
+# Subtest: a malformed persisted wait cannot silently authorize an account detail read
+ok 85 - a malformed persisted wait cannot silently authorize an account detail read
+  ---
+  duration_ms: 270.514672
+  type: 'test'
+  ...
+# Subtest: account evidence is added as a versioned identity-only contract
+ok 86 - account evidence is added as a versioned identity-only contract
+  ---
+  duration_ms: 252.774222
+  type: 'test'
+  ...
+# Subtest: unknown account wait survives expiry of the transaction-sync fallback
+ok 87 - unknown account wait survives expiry of the transaction-sync fallback
+  ---
+  duration_ms: 240.70478
+  type: 'test'
+  ...
+# Subtest: an explicit elapsed provider deadline permits one new serialized account read
+ok 88 - an explicit elapsed provider deadline permits one new serialized account read
+  ---
+  duration_ms: 292.10606
+  type: 'test'
+  ...
+# BANK_PROVIDER_TRANSPORT_ERROR
+# Subtest: aborted account requests release the lease and leave all financial originals unchanged
+ok 89 - aborted account requests release the lease and leave all financial originals unchanged
+  ---
+  duration_ms: 270.610505
+  type: 'test'
+  ...
+# Subtest: a lost bank lease cannot publish a successful alias result
+ok 90 - a lost bank lease cannot publish a successful alias result
+  ---
+  duration_ms: 280.495172
+  type: 'test'
+  ...
+# Subtest: a returned typed alias requires exact singular hash continuity when the primary number is absent: true
+ok 91 - a returned typed alias requires exact singular hash continuity when the primary number is absent: true
+  ---
+  duration_ms: 237.881309
+  type: 'test'
+  ...
+# Subtest: a returned typed alias requires exact singular hash continuity when the primary number is absent: false
+ok 92 - a returned typed alias requires exact singular hash continuity when the primary number is absent: false
+  ---
+  duration_ms: 249.448298
+  type: 'test'
+  ...
+# Subtest: an unsaved provider cooldown leaves a durable pending guard and prevents the next account read
+ok 93 - an unsaved provider cooldown leaves a durable pending guard and prevents the next account read
+  ---
+  duration_ms: 272.47109
+  type: 'test'
+  ...
+# Subtest: a lost lease after a provider throttle retains uncertainty and accurately reports provider contact
+ok 94 - a lost lease after a provider throttle retains uncertainty and accurately reports provider contact
+  ---
+  duration_ms: 311.527148
+  type: 'test'
+  ...
+# Subtest: a failure to persist pending intent prevents the first outbound bank request
+ok 95 - a failure to persist pending intent prevents the first outbound bank request
+  ---
+  duration_ms: 221.386407
+  type: 'test'
+  ...
+# Subtest: legacy owner context cannot accept another company or a client object
+ok 96 - legacy owner context cannot accept another company or a client object
+  ---
+  duration_ms: 5.700842
+  type: 'test'
+  ...
+# Subtest: server context binds active membership, actor, company and manage role
+ok 97 - server context binds active membership, actor, company and manage role
+  ---
+  duration_ms: 0.656001
+  type: 'test'
+  ...
+# Subtest: callback accepts one opaque code and maps cancellation without raw error reflection
+ok 98 - callback accepts one opaque code and maps cancellation without raw error reflection
+  ---
+  duration_ms: 1.075422
+  type: 'test'
+  ...
+# Subtest: ambiguous, duplicate, malformed and unbounded callbacks fail before code use
+ok 99 - ambiguous, duplicate, malformed and unbounded callbacks fail before code use
+  ---
+  duration_ms: 0.750651
+  type: 'test'
+  ...
+# Subtest: only explicit unique read capabilities are accepted
+ok 100 - only explicit unique read capabilities are accepted
+  ---
+  duration_ms: 0.591125
+  type: 'test'
+  ...
+# Subtest: requested scopes must include the account and transaction access the adapters request
+ok 101 - requested scopes must include the account and transaction access the adapters request
+  ---
+  duration_ms: 1.312003
+  type: 'test'
+  ...
+# Subtest: consent uses earliest requested, exchange or checked expiry without needing session_id
+ok 102 - consent uses earliest requested, exchange or checked expiry without needing session_id
+  ---
+  duration_ms: 1.159206
+  type: 'test'
+  ...
+# Subtest: consent timestamps reject impossible calendar dates and invalid clock or offset fields
+ok 103 - consent timestamps reject impossible calendar dates and invalid clock or offset fields
+  ---
+  duration_ms: 1.509666
+  type: 'test'
+  ...
+# Subtest: valid leap dates and numeric timezone offsets preserve the actual earliest instant
+ok 104 - valid leap dates and numeric timezone offsets preserve the actual earliest instant
+  ---
+  duration_ms: 0.504648
+  type: 'test'
+  ...
+# Subtest: each consent source must be current, business and the same requested bank
+ok 105 - each consent source must be current, business and the same requested bank
+  ---
+  duration_ms: 1.055653
+  type: 'test'
+  ...
+# Subtest: legacy omitted transaction flags are accepted but malformed flags cannot grant scope
+ok 106 - legacy omitted transaction flags are accepted but malformed flags cannot grant scope
+  ---
+  duration_ms: 0.83059
+  type: 'test'
+  ...
+# Subtest: fresh account data cannot downgrade an account to private or malformed usage unnoticed
+ok 107 - fresh account data cannot downgrade an account to private or malformed usage unnoticed
+  ---
+  duration_ms: 0.531417
+  type: 'test'
+  ...
+# Subtest: account approvals must be bounded, unique and agree across provider responses
+ok 108 - account approvals must be bounded, unique and agree across provider responses
+  ---
+  duration_ms: 2.927605
+  type: 'test'
+  ...
+# Subtest: matching UIDs cannot hide conflicting singular account hashes or be repaired by plural aliases
+ok 109 - matching UIDs cannot hide conflicting singular account hashes or be repaired by plural aliases
+  ---
+  duration_ms: 0.37179
+  type: 'test'
+  ...
+# Subtest: Enable Banking does not manufacture a Bankgiro read grant
+ok 110 - Enable Banking does not manufacture a Bankgiro read grant
+  ---
+  duration_ms: 0.234367
+  type: 'test'
+  ...
+# Subtest: business account usage and a person hash alone never prove company authorization
+ok 111 - business account usage and a person hash alone never prove company authorization
+  ---
+  duration_ms: 0.409937
+  type: 'test'
+  ...
+# Subtest: trusted-adapter evidence is bound to actor, company, bank, full account set and validity
+ok 112 - trusted-adapter evidence is bound to actor, company, bank, full account set and validity
+  ---
+  duration_ms: 0.594691
+  type: 'test'
+  ...
+# Subtest: corporate evidence cannot use rolled-over calendar dates for checking or expiration
+ok 113 - corporate evidence cannot use rolled-over calendar dates for checking or expiration
+  ---
+  duration_ms: 0.266164
+  type: 'test'
+  ...
+# Subtest: validators neither mutate inputs nor reflect untrusted values in default errors
+ok 114 - validators neither mutate inputs nor reflect untrusted values in default errors
+  ---
+  duration_ms: 0.526439
+  type: 'test'
+  ...
+# Subtest: foundation context retains distinct actor/storage owner and rejects client-selected companies and accountant management
+ok 115 - foundation context retains distinct actor/storage owner and rejects client-selected companies and accountant management
+  ---
+  duration_ms: 0.904249
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: empty saved selection retains denial with a closed reason
+ok 116 - scope diagnostic: empty saved selection retains denial with a closed reason
+  ---
+  duration_ms: 0.974804
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: malformed saved selection retains denial with a closed reason
+ok 117 - scope diagnostic: malformed saved selection retains denial with a closed reason
+  ---
+  duration_ms: 0.251713
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: invalid saved inventory retains denial with a closed reason
+ok 118 - scope diagnostic: invalid saved inventory retains denial with a closed reason
+  ---
+  duration_ms: 0.259254
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: invalid live IDs retains denial with a closed reason
+ok 119 - scope diagnostic: invalid live IDs retains denial with a closed reason
+  ---
+  duration_ms: 0.260436
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: invalid live resources retains denial with a closed reason
+ok 120 - scope diagnostic: invalid live resources retains denial with a closed reason
+  ---
+  duration_ms: 0.257201
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: live census mismatch retains denial with a closed reason
+ok 121 - scope diagnostic: live census mismatch retains denial with a closed reason
+  ---
+  duration_ms: 0.27002
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: selected missing live retains denial with a closed reason
+ok 122 - scope diagnostic: selected missing live retains denial with a closed reason
+  ---
+  duration_ms: 0.337069
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: selected missing saved retains denial with a closed reason
+ok 123 - scope diagnostic: selected missing saved retains denial with a closed reason
+  ---
+  duration_ms: 0.245424
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: saved business usage retains denial with a closed reason
+ok 124 - scope diagnostic: saved business usage retains denial with a closed reason
+  ---
+  duration_ms: 1.466211
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: live business usage retains denial with a closed reason
+ok 125 - scope diagnostic: live business usage retains denial with a closed reason
+  ---
+  duration_ms: 0.613328
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: invalid account identity retains denial with a closed reason
+ok 126 - scope diagnostic: invalid account identity retains denial with a closed reason
+  ---
+  duration_ms: 0.344059
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: changed account identity retains denial with a closed reason
+ok 127 - scope diagnostic: changed account identity retains denial with a closed reason
+  ---
+  duration_ms: 0.294466
+  type: 'test'
+  ...
+# Subtest: scope diagnostic: strict callback full-set validation is still strict
+ok 128 - scope diagnostic: strict callback full-set validation is still strict
+  ---
+  duration_ms: 0.273445
+  type: 'test'
+  ...
+# Subtest: legacy selection preserves the selected authorized account after an unselected cached account is withdrawn
+ok 129 - legacy selection preserves the selected authorized account after an unselected cached account is withdrawn
+  ---
+  duration_ms: 0.432841
+  type: 'test'
+  ...
+# Subtest: legacy selection does not import an unselected private account or grant newly observed accounts
+ok 130 - legacy selection does not import an unselected private account or grant newly observed accounts
+  ---
+  duration_ms: 0.335937
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects empty selection
+ok 131 - legacy selected adapter rejects empty selection
+  ---
+  duration_ms: 0.204974
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects duplicate selection
+ok 132 - legacy selected adapter rejects duplicate selection
+  ---
+  duration_ms: 0.205695
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects malformed selected UID
+ok 133 - legacy selected adapter rejects malformed selected UID
+  ---
+  duration_ms: 0.159406
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects selected absent from live
+ok 134 - legacy selected adapter rejects selected absent from live
+  ---
+  duration_ms: 0.194277
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects selected absent from saved
+ok 135 - legacy selected adapter rejects selected absent from saved
+  ---
+  duration_ms: 0.252664
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects duplicate saved unused UID
+ok 136 - legacy selected adapter rejects duplicate saved unused UID
+  ---
+  duration_ms: 0.238283
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects duplicate live UID
+ok 137 - legacy selected adapter rejects duplicate live UID
+  ---
+  duration_ms: 0.238243
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects duplicate live metadata
+ok 138 - legacy selected adapter rejects duplicate live metadata
+  ---
+  duration_ms: 0.144033
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects UID-less GET metadata
+ok 139 - legacy selected adapter rejects UID-less GET metadata
+  ---
+  duration_ms: 0.169652
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects null GET metadata
+ok 140 - legacy selected adapter rejects null GET metadata
+  ---
+  duration_ms: 0.126727
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects malformed unused GET UID
+ok 141 - legacy selected adapter rejects malformed unused GET UID
+  ---
+  duration_ms: 0.174199
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects malformed unused cached UID
+ok 142 - legacy selected adapter rejects malformed unused cached UID
+  ---
+  duration_ms: 0.128139
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects UID-less cached account
+ok 143 - legacy selected adapter rejects UID-less cached account
+  ---
+  duration_ms: 0.109292
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects GET IDs lack metadata
+ok 144 - legacy selected adapter rejects GET IDs lack metadata
+  ---
+  duration_ms: 0.099307
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects GET metadata lacks ID
+ok 145 - legacy selected adapter rejects GET metadata lacks ID
+  ---
+  duration_ms: 0.158013
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects private selected saved account
+ok 146 - legacy selected adapter rejects private selected saved account
+  ---
+  duration_ms: 0.502414
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects private selected current account
+ok 147 - legacy selected adapter rejects private selected current account
+  ---
+  duration_ms: 0.355507
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects unknown selected usage
+ok 148 - legacy selected adapter rejects unknown selected usage
+  ---
+  duration_ms: 0.331611
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects selected primary hash changed despite plural overlap
+ok 149 - legacy selected adapter rejects selected primary hash changed despite plural overlap
+  ---
+  duration_ms: 0.201088
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects overbound saved accounts
+ok 150 - legacy selected adapter rejects overbound saved accounts
+  ---
+  duration_ms: 0.332883
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects overbound GET accounts
+ok 151 - legacy selected adapter rejects overbound GET accounts
+  ---
+  duration_ms: 0.29019
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter rejects overbound selection
+ok 152 - legacy selected adapter rejects overbound selection
+  ---
+  duration_ms: 0.293836
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains revoked session denial
+ok 153 - legacy selected adapter retains revoked session denial
+  ---
+  duration_ms: 0.212435
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains different bank denial
+ok 154 - legacy selected adapter retains different bank denial
+  ---
+  duration_ms: 0.167379
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains personal PSU denial
+ok 155 - legacy selected adapter retains personal PSU denial
+  ---
+  duration_ms: 0.143643
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains withdrawn transaction scope denial
+ok 156 - legacy selected adapter retains withdrawn transaction scope denial
+  ---
+  duration_ms: 0.163743
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains write scope denial
+ok 157 - legacy selected adapter retains write scope denial
+  ---
+  duration_ms: 0.253666
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains missing transaction scope denial
+ok 158 - legacy selected adapter retains missing transaction scope denial
+  ---
+  duration_ms: 0.192966
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains Bankgiro scope denial
+ok 159 - legacy selected adapter retains Bankgiro scope denial
+  ---
+  duration_ms: 0.229099
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains expired cached access denial
+ok 160 - legacy selected adapter retains expired cached access denial
+  ---
+  duration_ms: 0.255809
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains expired current access denial
+ok 161 - legacy selected adapter retains expired current access denial
+  ---
+  duration_ms: 0.19588
+  type: 'test'
+  ...
+# Subtest: legacy selected adapter retains expired requested cap denial
+ok 162 - legacy selected adapter retains expired requested cap denial
+  ---
+  duration_ms: 0.183792
+  type: 'test'
+  ...
+# Subtest: actual details adapter to observer, internally consistent primary IBAN
+ok 163 - actual details adapter to observer, internally consistent primary IBAN
+  ---
+  duration_ms: 27.332875
+  type: 'test'
+  ...
+# Subtest: actual details adapter to observer, internally contradictory primary IBAN
+ok 164 - actual details adapter to observer, internally contradictory primary IBAN
+  ---
+  duration_ms: 7.082037
+  type: 'test'
+  ...
+# Subtest: hash-bound resource with no primary identifiers remains observable
+ok 165 - hash-bound resource with no primary identifiers remains observable
+  ---
+  duration_ms: 7.721544
+  type: 'test'
+  ...
+# Subtest: contradictory IBAN fields inside fresh primary account_id must prevent an observation
+ok 166 - contradictory IBAN fields inside fresh primary account_id must prevent an observation
+  ---
+  duration_ms: 3.553182
+  type: 'test'
+  ...
+# Subtest: saved and live primary BBAN disagreement must survive omitted fresh account_id
+ok 167 - saved and live primary BBAN disagreement must survive omitted fresh account_id
+  ---
+  duration_ms: 1.247308
+  type: 'test'
+  ...
+# Subtest: contradictory cached primary IBANs cannot be erased by omitted fresh account_id
+ok 168 - contradictory cached primary IBANs cannot be erased by omitted fresh account_id
+  ---
+  duration_ms: 1.585668
+  type: 'test'
+  ...
+# Subtest: fresh BBAN disagreement is rejected when the same scheme is present
+ok 169 - fresh BBAN disagreement is rejected when the same scheme is present
+  ---
+  duration_ms: 1.577506
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: original private error and exact original input are both required
+ok 170 - usage details diagnostic: original private error and exact original input are both required
+  ---
+  duration_ms: 10.827543
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: mutation of selected set after original validation cannot authorize a read
+ok 171 - usage details diagnostic: mutation of selected set after original validation cannot authorize a read
+  ---
+  duration_ms: 0.937478
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: mutation of primary hash after original validation cannot authorize a read
+ok 172 - usage details diagnostic: mutation of primary hash after original validation cannot authorize a read
+  ---
+  duration_ms: 0.745644
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: mutation of bank after original validation cannot authorize a read
+ok 173 - usage details diagnostic: mutation of bank after original validation cannot authorize a read
+  ---
+  duration_ms: 0.66824
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: mutation of expiry after original validation cannot authorize a read
+ok 174 - usage details diagnostic: mutation of expiry after original validation cannot authorize a read
+  ---
+  duration_ms: 0.823579
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: mutation of usage after original validation cannot authorize a read
+ok 175 - usage details diagnostic: mutation of usage after original validation cannot authorize a read
+  ---
+  duration_ms: 0.697173
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: mutation of live inventory after original validation cannot authorize a read
+ok 176 - usage details diagnostic: mutation of live inventory after original validation cannot authorize a read
+  ---
+  duration_ms: 0.805402
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: revoked session never yields a details plan
+ok 177 - usage details diagnostic: revoked session never yields a details plan
+  ---
+  duration_ms: 2.030857
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: personal PSU never yields a details plan
+ok 178 - usage details diagnostic: personal PSU never yields a details plan
+  ---
+  duration_ms: 0.391019
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: wrong bank never yields a details plan
+ok 179 - usage details diagnostic: wrong bank never yields a details plan
+  ---
+  duration_ms: 3.797113
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: wrong country never yields a details plan
+ok 180 - usage details diagnostic: wrong country never yields a details plan
+  ---
+  duration_ms: 0.305523
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: expired session never yields a details plan
+ok 181 - usage details diagnostic: expired session never yields a details plan
+  ---
+  duration_ms: 0.223321
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: transaction scope denied never yields a details plan
+ok 182 - usage details diagnostic: transaction scope denied never yields a details plan
+  ---
+  duration_ms: 0.222649
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: duplicate saved UID never yields a details plan
+ok 183 - usage details diagnostic: duplicate saved UID never yields a details plan
+  ---
+  duration_ms: 0.197302
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: duplicate live UID never yields a details plan
+ok 184 - usage details diagnostic: duplicate live UID never yields a details plan
+  ---
+  duration_ms: 0.143783
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: mismatched full live inventory never yields a details plan
+ok 185 - usage details diagnostic: mismatched full live inventory never yields a details plan
+  ---
+  duration_ms: 0.177253
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: invalid unselected UID never yields a details plan
+ok 186 - usage details diagnostic: invalid unselected UID never yields a details plan
+  ---
+  duration_ms: 0.170383
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: missing selected UID never yields a details plan
+ok 187 - usage details diagnostic: missing selected UID never yields a details plan
+  ---
+  duration_ms: 0.179605
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: client-like unknown scope never yields a details plan
+ok 188 - usage details diagnostic: client-like unknown scope never yields a details plan
+  ---
+  duration_ms: 0.169061
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: bankgiro scope cannot hide behind the earlier usage failure
+ok 189 - usage details diagnostic: bankgiro scope cannot hide behind the earlier usage failure
+  ---
+  duration_ms: 0.989125
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: saved private does not become a null refresh target
+ok 190 - usage details diagnostic: saved private does not become a null refresh target
+  ---
+  duration_ms: 0.693808
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: saved unknown does not become a null refresh target
+ok 191 - usage details diagnostic: saved unknown does not become a null refresh target
+  ---
+  duration_ms: 0.638365
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: saved wrong type does not become a null refresh target
+ok 192 - usage details diagnostic: saved wrong type does not become a null refresh target
+  ---
+  duration_ms: 0.655911
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: explicit live private prevents details reads
+ok 193 - usage details diagnostic: explicit live private prevents details reads
+  ---
+  duration_ms: 0.759976
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: explicit live null prevents details reads
+ok 194 - usage details diagnostic: explicit live null prevents details reads
+  ---
+  duration_ms: 0.674228
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: explicit live unknown prevents details reads
+ok 195 - usage details diagnostic: explicit live unknown prevents details reads
+  ---
+  duration_ms: 0.669441
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: explicit live wrong type prevents details reads
+ok 196 - usage details diagnostic: explicit live wrong type prevents details reads
+  ---
+  duration_ms: 0.804552
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: missing saved primary identity on a later selected account stops the entire plan
+ok 197 - usage details diagnostic: missing saved primary identity on a later selected account stops the entire plan
+  ---
+  duration_ms: 1.313945
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: missing live primary identity on a later selected account stops the entire plan
+ok 198 - usage details diagnostic: missing live primary identity on a later selected account stops the entire plan
+  ---
+  duration_ms: 1.351962
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: null saved primary identity on a later selected account stops the entire plan
+ok 199 - usage details diagnostic: null saved primary identity on a later selected account stops the entire plan
+  ---
+  duration_ms: 1.155982
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: empty live primary identity on a later selected account stops the entire plan
+ok 200 - usage details diagnostic: empty live primary identity on a later selected account stops the entire plan
+  ---
+  duration_ms: 1.18935
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: changed live primary identity on a later selected account stops the entire plan
+ok 201 - usage details diagnostic: changed live primary identity on a later selected account stops the entire plan
+  ---
+  duration_ms: 1.362698
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fuzzy overlap primary identity on a later selected account stops the entire plan
+ok 202 - usage details diagnostic: fuzzy overlap primary identity on a later selected account stops the entire plan
+  ---
+  duration_ms: 0.855397
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: exact byte-sensitive primary hash is required
+ok 203 - usage details diagnostic: exact byte-sensitive primary hash is required
+  ---
+  duration_ms: 0.50615
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: current deadline is rechecked after the original failure
+ok 204 - usage details diagnostic: current deadline is rechecked after the original failure
+  ---
+  duration_ms: 2.017186
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: only selected saved-null resources enter the frozen plan
+ok 205 - usage details diagnostic: only selected saved-null resources enter the frozen plan
+  ---
+  duration_ms: 1.45899
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: 5 null targets obey the five-read bound without truncation
+ok 206 - usage details diagnostic: 5 null targets obey the five-read bound without truncation
+  ---
+  duration_ms: 0.728199
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: 6 null targets obey the five-read bound without truncation
+ok 207 - usage details diagnostic: 6 null targets obey the five-read bound without truncation
+  ---
+  duration_ms: 1.091777
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: a five-target plan may coexist with a larger fully checked selection
+ok 208 - usage details diagnostic: a five-target plan may coexist with a larger fully checked selection
+  ---
+  duration_ms: 0.786284
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: unsafe accessor input is not snapshotted by executing getters
+ok 209 - usage details diagnostic: unsafe accessor input is not snapshotted by executing getters
+  ---
+  duration_ms: 0.97954
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: observation accepts only the authentic plan and its own target
+ok 210 - usage details diagnostic: observation accepts only the authentic plan and its own target
+  ---
+  duration_ms: 1.233156
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh other UID cannot supply a usage observation
+ok 211 - usage details diagnostic: fresh other UID cannot supply a usage observation
+  ---
+  duration_ms: 1.466271
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh null UID cannot supply a usage observation
+ok 212 - usage details diagnostic: fresh null UID cannot supply a usage observation
+  ---
+  duration_ms: 1.073289
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh missing primary hash cannot supply a usage observation
+ok 213 - usage details diagnostic: fresh missing primary hash cannot supply a usage observation
+  ---
+  duration_ms: 0.981963
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh changed primary hash cannot supply a usage observation
+ok 214 - usage details diagnostic: fresh changed primary hash cannot supply a usage observation
+  ---
+  duration_ms: 0.995103
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh invalid primary hash cannot supply a usage observation
+ok 215 - usage details diagnostic: fresh invalid primary hash cannot supply a usage observation
+  ---
+  duration_ms: 0.997017
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh fuzzy hash overlap cannot supply a usage observation
+ok 216 - usage details diagnostic: fresh fuzzy hash overlap cannot supply a usage observation
+  ---
+  duration_ms: 1.021683
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh currency conflict cannot supply a usage observation
+ok 217 - usage details diagnostic: fresh currency conflict cannot supply a usage observation
+  ---
+  duration_ms: 0.871431
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh same-scheme primary number conflict cannot supply a usage observation
+ok 218 - usage details diagnostic: fresh same-scheme primary number conflict cannot supply a usage observation
+  ---
+  duration_ms: 0.783401
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh null currency cannot supply a usage observation
+ok 219 - usage details diagnostic: fresh null currency cannot supply a usage observation
+  ---
+  duration_ms: 0.827916
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh missing account type cannot supply a usage observation
+ok 220 - usage details diagnostic: fresh missing account type cannot supply a usage observation
+  ---
+  duration_ms: 1.98572
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: omitted response UID is bound by endpoint and exact primary hash
+ok 221 - usage details diagnostic: omitted response UID is bound by endpoint and exact primary hash
+  ---
+  duration_ms: 0.783069
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh omitted remains a literal fixed category
+ok 222 - usage details diagnostic: fresh omitted remains a literal fixed category
+  ---
+  duration_ms: 0.899532
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh null remains a literal fixed category
+ok 223 - usage details diagnostic: fresh null remains a literal fixed category
+  ---
+  duration_ms: 0.717203
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh private remains a literal fixed category
+ok 224 - usage details diagnostic: fresh private remains a literal fixed category
+  ---
+  duration_ms: 0.765974
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh professional remains a literal fixed category
+ok 225 - usage details diagnostic: fresh professional remains a literal fixed category
+  ---
+  duration_ms: 0.694919
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh unknown remains a literal fixed category
+ok 226 - usage details diagnostic: fresh unknown remains a literal fixed category
+  ---
+  duration_ms: 0.717682
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: fresh wrong type remains a literal fixed category
+ok 227 - usage details diagnostic: fresh wrong type remains a literal fixed category
+  ---
+  duration_ms: 0.677914
+  type: 'test'
+  ...
+# Subtest: usage details diagnostic: a getter or conversion hook cannot become a response or diagnostic
+ok 228 - usage details diagnostic: a getter or conversion hook cannot become a response or diagnostic
+  ---
+  duration_ms: 0.782619
+  type: 'test'
+  ...
+# Subtest: usage details identity I1: conflicting live IBANs survive omitted fresh identifiers
+ok 229 - usage details identity I1: conflicting live IBANs survive omitted fresh identifiers
+  ---
+  duration_ms: 0.753946
+  type: 'test'
+  ...
+# Subtest: usage details identity I1: conflicting live IBANs survive different scheme fresh identifiers
+ok 230 - usage details identity I1: conflicting live IBANs survive different scheme fresh identifiers
+  ---
+  duration_ms: 0.970698
+  type: 'test'
+  ...
+# Subtest: usage details identity I1: saved/live BBAN conflict survives a noncomparable fresh IBAN
+ok 231 - usage details identity I1: saved/live BBAN conflict survives a noncomparable fresh IBAN
+  ---
+  duration_ms: 0.981674
+  type: 'test'
+  ...
+# Subtest: usage details identity I1: identical duplicate IBANs within all three resources remain observable
+ok 232 - usage details identity I1: identical duplicate IBANs within all three resources remain observable
+  ---
+  duration_ms: 0.56716
+  type: 'test'
+  ...
+# Subtest: usage details identity I1: distinct noncomparable schemes across all three resources remain observable
+ok 233 - usage details identity I1: distinct noncomparable schemes across all three resources remain observable
+  ---
+  duration_ms: 1.084275
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: public properties, allowed reason and inherited errors cannot forge provenance
+ok 234 - usage diagnostic: public properties, allowed reason and inherited errors cannot forge provenance
+  ---
+  duration_ms: 5.596186
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: empty selection blocks before any selected usage census
+ok 235 - usage diagnostic: empty selection blocks before any selected usage census
+  ---
+  duration_ms: 0.282798
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: unknown selection blocks before any selected usage census
+ok 236 - usage diagnostic: unknown selection blocks before any selected usage census
+  ---
+  duration_ms: 0.364249
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: duplicate saved inventory blocks before any selected usage census
+ok 237 - usage diagnostic: duplicate saved inventory blocks before any selected usage census
+  ---
+  duration_ms: 4.498882
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: duplicate live inventory blocks before any selected usage census
+ok 238 - usage diagnostic: duplicate live inventory blocks before any selected usage census
+  ---
+  duration_ms: 0.295197
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: unmatched live data blocks before any selected usage census
+ok 239 - usage diagnostic: unmatched live data blocks before any selected usage census
+  ---
+  duration_ms: 0.165495
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: invalid unselected UID blocks before any selected usage census
+ok 240 - usage diagnostic: invalid unselected UID blocks before any selected usage census
+  ---
+  duration_ms: 0.191804
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: revoked consent retains earlier denial without payload
+ok 241 - usage diagnostic: revoked consent retains earlier denial without payload
+  ---
+  duration_ms: 0.459851
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: wrong bank retains earlier denial without payload
+ok 242 - usage diagnostic: wrong bank retains earlier denial without payload
+  ---
+  duration_ms: 0.316439
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: personal PSU retains earlier denial without payload
+ok 243 - usage diagnostic: personal PSU retains earlier denial without payload
+  ---
+  duration_ms: 0.349407
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: expired consent retains earlier denial without payload
+ok 244 - usage diagnostic: expired consent retains earlier denial without payload
+  ---
+  duration_ms: 0.232174
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: no transaction scope retains earlier denial without payload
+ok 245 - usage diagnostic: no transaction scope retains earlier denial without payload
+  ---
+  duration_ms: 0.356308
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: strict callback errors do not acquire legacy selected metadata
+ok 246 - usage diagnostic: strict callback errors do not acquire legacy selected metadata
+  ---
+  duration_ms: 0.352682
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected saved null is separate from omitted live usage
+ok 247 - usage diagnostic: selected saved null is separate from omitted live usage
+  ---
+  duration_ms: 1.474163
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live private is a fixed category, never a repair
+ok 248 - usage diagnostic: selected live private is a fixed category, never a repair
+  ---
+  duration_ms: 1.021983
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live empty string is a fixed category, never a repair
+ok 249 - usage diagnostic: selected live empty string is a fixed category, never a repair
+  ---
+  duration_ms: 0.534301
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live lower case is a fixed category, never a repair
+ok 250 - usage diagnostic: selected live lower case is a fixed category, never a repair
+  ---
+  duration_ms: 0.336328
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live padded string is a fixed category, never a repair
+ok 251 - usage diagnostic: selected live padded string is a fixed category, never a repair
+  ---
+  duration_ms: 0.466992
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live unknown string is a fixed category, never a repair
+ok 252 - usage diagnostic: selected live unknown string is a fixed category, never a repair
+  ---
+  duration_ms: 0.293295
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live null is a fixed category, never a repair
+ok 253 - usage diagnostic: selected live null is a fixed category, never a repair
+  ---
+  duration_ms: 0.459391
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live boolean is a fixed category, never a repair
+ok 254 - usage diagnostic: selected live boolean is a fixed category, never a repair
+  ---
+  duration_ms: 0.394274
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live number is a fixed category, never a repair
+ok 255 - usage diagnostic: selected live number is a fixed category, never a repair
+  ---
+  duration_ms: 0.476265
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live array is a fixed category, never a repair
+ok 256 - usage diagnostic: selected live array is a fixed category, never a repair
+  ---
+  duration_ms: 0.374304
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: selected live object is a fixed category, never a repair
+ok 257 - usage diagnostic: selected live object is a fixed category, never a repair
+  ---
+  duration_ms: 0.456136
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: counts cover both selected sides and exclude complete unselected accounts
+ok 258 - usage diagnostic: counts cover both selected sides and exclude complete unselected accounts
+  ---
+  duration_ms: 1.811563
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: bounded full selected census includes all 100 accounts
+ok 259 - usage diagnostic: bounded full selected census includes all 100 accounts
+  ---
+  duration_ms: 3.338774
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: captured counts cannot be mutated or changed by later input edits
+ok 260 - usage diagnostic: captured counts cannot be mutated or changed by later input edits
+  ---
+  duration_ms: 1.037706
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: unknown objects are classified without invoking conversion or serialization
+ok 261 - usage diagnostic: unknown objects are classified without invoking conversion or serialization
+  ---
+  duration_ms: 0.344781
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: accessor usage cannot supply diagnostic evidence
+ok 262 - usage diagnostic: accessor usage cannot supply diagnostic evidence
+  ---
+  duration_ms: 0.302828
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: inherited usage cannot supply diagnostic evidence
+ok 263 - usage diagnostic: inherited usage cannot supply diagnostic evidence
+  ---
+  duration_ms: 0.227186
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: allowed omitted retains the exact original grant
+ok 264 - usage diagnostic: allowed omitted retains the exact original grant
+  ---
+  duration_ms: 0.914885
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: allowed explicit undefined retains the exact original grant
+ok 265 - usage diagnostic: allowed explicit undefined retains the exact original grant
+  ---
+  duration_ms: 0.274607
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: allowed ORGA retains the exact original grant
+ok 266 - usage diagnostic: allowed ORGA retains the exact original grant
+  ---
+  duration_ms: 0.24297
+  type: 'test'
+  ...
+# Subtest: usage diagnostic: allowed unselected invalid usage retains the exact original grant
+ok 267 - usage diagnostic: allowed unselected invalid usage retains the exact original grant
+  ---
+  duration_ms: 0.289288
+  type: 'test'
+  ...
+# Subtest: intact AIS original with missing account consent cannot allocate
+ok 268 - intact AIS original with missing account consent cannot allocate
+  ---
+  duration_ms: 74.895156
+  type: 'test'
+  ...
+# Subtest: intact AIS original with expired account consent cannot allocate
+ok 269 - intact AIS original with expired account consent cannot allocate
+  ---
+  duration_ms: 38.22947
+  type: 'test'
+  ...
+# Subtest: intact AIS original with ownerless account consent cannot allocate
+ok 270 - intact AIS original with ownerless account consent cannot allocate
+  ---
+  duration_ms: 36.099547
+  type: 'test'
+  ...
+# Subtest: intact AIS original with deselected account consent cannot allocate
+ok 271 - intact AIS original with deselected account consent cannot allocate
+  ---
+  duration_ms: 27.68458
+  type: 'test'
+  ...
+# Subtest: intact AIS original with disconnected account consent cannot allocate
+ok 272 - intact AIS original with disconnected account consent cannot allocate
+  ---
+  duration_ms: 37.217313
+  type: 'test'
+  ...
+# Subtest: intact AIS original with error account consent cannot allocate
+ok 273 - intact AIS original with error account consent cannot allocate
+  ---
+  duration_ms: 24.981403
+  type: 'test'
+  ...
+# Subtest: intact AIS original with other account account consent cannot allocate
+ok 274 - intact AIS original with other account account consent cannot allocate
+  ---
+  duration_ms: 34.687577
+  type: 'test'
+  ...
+# Subtest: intact AIS original with wrong currency account consent cannot allocate
+ok 275 - intact AIS original with wrong currency account consent cannot allocate
+  ---
+  duration_ms: 31.562709
+  type: 'test'
+  ...
+# Subtest: intact AIS original with ambiguous selected resource account consent cannot allocate
+ok 276 - intact AIS original with ambiguous selected resource account consent cannot allocate
+  ---
+  duration_ms: 34.740565
+  type: 'test'
+  ...
+# Subtest: intact AIS original with unreadable account evidence account consent cannot allocate
+ok 277 - intact AIS original with unreadable account evidence account consent cannot allocate
+  ---
+  duration_ms: 35.052927
+  type: 'test'
+  ...
+# Subtest: current owned selected SEK account permits one AIS allocation and preserves the original
+ok 278 - current owned selected SEK account permits one AIS allocation and preserves the original
+  ---
+  duration_ms: 37.499109
+  type: 'test'
+  ...
+# Subtest: expired consent retains booked money but does not claim verified paid status or teach a payer relation
+ok 279 - expired consent retains booked money but does not claim verified paid status or teach a payer relation
+  ---
+  duration_ms: 27.978631
+  type: 'test'
+  ...
+# Subtest: explicit administrative booking remains recorded while unavailable original is shown as unverified
+ok 280 - explicit administrative booking remains recorded while unavailable original is shown as unverified
+  ---
+  duration_ms: 26.957258
+  type: 'test'
+  ...
+# Subtest: company consent HTTP security and lifecycle
+    # Subtest: company, CSRF, unsupported bank and Bankgiro scope fail before provider calls
+    ok 1 - company, CSRF, unsupported bank and Bankgiro scope fail before provider calls
+      ---
+      duration_ms: 15.206238
+      type: 'test'
+      ...
+    # Subtest: sibling attempts survive and omitted company cannot bypass corporate proof
+    ok 2 - sibling attempts survive and omitted company cannot bypass corporate proof
+      ---
+      duration_ms: 67.135805
+      type: 'test'
+      ...
+    # Subtest: callback envelope and same-principal other browser cannot consume the state
+    ok 3 - callback envelope and same-principal other browser cannot consume the state
+      ---
+      duration_ms: 74.784097
+      type: 'test'
+      ...
+    # Subtest: changing application generation invalidates pending consent before exchange
+    ok 4 - changing application generation invalidates pending consent before exchange
+      ---
+      duration_ms: 14.381947
+      type: 'test'
+      ...
+    # Subtest: pre-migration contextless redirects require restart and cannot create legacy rows
+    ok 5 - pre-migration contextless redirects require restart and cannot create legacy rows
+      ---
+      duration_ms: 13.259395
+      type: 'test'
+      ...
+    # Subtest: current provider session, exact accounts and read scope are checked after exchange
+    ok 6 - current provider session, exact accounts and read scope are checked after exchange
+      ---
+      duration_ms: 192.798579
+      type: 'test'
+      ...
+    # Subtest: consent expiry is bounded by request, exchange and current provider response
+    ok 7 - consent expiry is bounded by request, exchange and current provider response
+      ---
+      duration_ms: 84.8787
+      type: 'test'
+      ...
+    # Subtest: terminal cancellation, denial and expiry remain visible without provider calls
+    ok 8 - terminal cancellation, denial and expiry remain visible without provider calls
+      ---
+      duration_ms: 36.933792
+      type: 'test'
+      ...
+    # Subtest: disconnect invalidates an outstanding renewal without resurrecting the connection
+    ok 9 - disconnect invalidates an outstanding renewal without resurrecting the connection
+      ---
+      duration_ms: 32.334522
+      type: 'test'
+      ...
+    # Subtest: renewal exchange holds the existing connection lease against disconnect
+    ok 10 - renewal exchange holds the existing connection lease against disconnect
+      ---
+      duration_ms: 33.091993
+      type: 'test'
+      ...
+# Serverfel 502
+    # Subtest: unverified renewal preserves the previous consent and reused remote ids are never deleted
+    ok 11 - unverified renewal preserves the previous consent and reused remote ids are never deleted
+      ---
+      duration_ms: 44.404234
+      type: 'test'
+      ...
+# Serverfel 502
+    # Subtest: a fresh connection cannot alias or clean up another persisted provider session
+    ok 12 - a fresh connection cannot alias or clean up another persisted provider session
+      ---
+      duration_ms: 16.248591
+      type: 'test'
+      ...
+# Serverfel 502
+    # Subtest: simultaneous fresh callbacks cannot commit or revoke a shared provider session
+    ok 13 - simultaneous fresh callbacks cannot commit or revoke a shared provider session
+      ---
+      duration_ms: 40.052611
+      type: 'test'
+      ...
+# Serverfel 502
+    # Subtest: uncertain replacement revocation blocks the old consent until renewed
+    ok 14 - uncertain replacement revocation blocks the old consent until renewed
+      ---
+      duration_ms: 33.902863
+      type: 'test'
+      ...
+# Serverfel 502
+    # Subtest: failed disconnect stays visibly pending and prevents any subsequent import
+    ok 15 - failed disconnect stays visibly pending and prevents any subsequent import
+      ---
+      duration_ms: 22.562532
+      type: 'test'
+      ...
+    # Subtest: authority revoked during a provider read prevents checkpoint and financial writes
+    ok 16 - authority revoked during a provider read prevents checkpoint and financial writes
+      ---
+      duration_ms: 83.564062
+      type: 'test'
+      ...
+    # Subtest: existing metadata-free connections remain usable and explicitly unverified
+    ok 17 - existing metadata-free connections remain usable and explicitly unverified
+      ---
+      duration_ms: 27.908197
+      type: 'test'
+      ...
+    1..17
+ok 281 - company consent HTTP security and lifecycle
+  ---
+  duration_ms: 923.533185
+  type: 'test'
+  ...
+1..281
+# tests 298
+# suites 0
+# pass 298
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24364.771657

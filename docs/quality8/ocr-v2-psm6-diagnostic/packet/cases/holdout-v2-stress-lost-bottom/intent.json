@@ -1,0 +1,10 @@
+{
+  "id": "holdout-v2-stress-lost-bottom",
+  "population": "stress",
+  "inputSha256": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e",
+  "expectedRasterSha256": "a4379871e2dfe5e584578ca9307d7b1b7688fc635f3bbd628073939c5da12427",
+  "rasterWidth": 2400,
+  "rasterHeight": 3000,
+  "planCommit": "f0458cfa26dcfb7eebf7edbec0e33abd7de4f028",
+  "planSha256": "64f56ec1b8e9b8441f370142e5733d10e9cc8b7b15d15e55d6b67931bf711ad6"
+}

@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "opticalCalls": 0,
+  "sourceBase": "ae56dc9a9e3d76697e38a196692a337ae0900b0d",
+  "currentProductSha256": "f7fef045f327ad0cf48b43b15fa7c7914cd29c8c4234b4fe0362b2757daf7c37",
+  "baselineProductSha256": "2336f8a054490ce984603208b9ee7ffbfa9c22f9f8ca4cff6ec7b502646f9706",
+  "helperSha256": "6d437ef9d0fa594728896a3f9ea9c50900488a297d08a4b6fcb16afae4bce0bc",
+  "oldTestPath": "test/ocr-layout.test.js",
+  "oldTestSha256": "fcf1312fb9ad2a5dbf138fd0ada5c3cc005a2484e7b66cd853172036b1a91d0e",
+  "oldAssertionUnchanged": true,
+  "original": {
+    "text": "OCR\n\nAtt betala 0065432109\n\n925,00 SEK\n\n",
+    "blocks": [
+      {
+        "paragraphs": [
+          {
+            "lines": [
+              {
+                "text": "OCR\n\n",
+                "words": [
+                  {
+                    "text": "OCR",
+                    "confidence": 96,
+                    "bbox": {
+                      "x0": 400,
+                      "y0": 0,
+                      "x1": 424,
+                      "y1": 20
+                    },
+                    "syntheticTokenId": 0
+                  }
+                ],
+                "bbox": {
+                  "x0": 400,
+                  "y0": 0,
+                  "x1": 424,
+                  "y1": 20
+                }
+              },
+              {
+                "text": "Att betala 0065432109\n\n",
+                "words": [
+                  {
+                    "text": "Att",
+                    "confidence": 96,
+                    "bbox": {
+                      "x0": 0,
+                      "y0": 30,
+                      "x1": 24,
+                      "y1": 50
+                    },
+                    "syntheticTokenId": 1
+                  },
+                  {
+                    "text": "betala",
+                    "confidence": 96,
+                    "bbox": {
+                      "x0": 40,
+                      "y0": 30,
+                      "x1": 88,
+                      "y1": 50
+                    },
+                    "syntheticTokenId": 2
+                  },
+                  {
+                    "text": "0065432109",
+                    "confidence": 96,
+                    "bbox": {
+                      "x0": 400,
+                      "y0": 30,
+                      "x1": 480,
+                      "y1": 50
+                    },
+                    "syntheticTokenId": 3
+                  }
+                ],
+                "bbox": {
+                  "x0": 0,
+                  "y0": 30,
+                  "x1": 480,
+                  "y1": 50
+                }
+              },
+              {
+                "text": "925,00 SEK\n\n",
+                "words": [
+                  {
+                    "text": "925,00",
+                    "confidence": 96,
+                    "bbox": {
+                      "x0": 0,
+                      "y0": 70,
+                      "x1": 48,
+                      "y1": 90
+                    },
+                    "syntheticTokenId": 4
+                  },
+                  {
+                    "text": "SEK",
+                    "confidence": 96,
+                    "bbox": {
+                      "x0": 65,
+                      "y0": 70,
+                      "x1": 89,
+                      "y1": 90
+                    },
+                    "syntheticTokenId": 5
+                  }
+                ],
+                "bbox": {
+                  "x0": 0,
+                  "y0": 70,
+                  "x1": 89,
+                  "y1": 90
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "oldExpectedRows": [
+    "OCR 0065432109",
+    "Att betala 925,00 SEK"
+  ],
+  "previous": {
+    "text": "OCR 0065432109\n\nAtt betala 925,00 SEK\n\n\n\n",
+    "reconstructed": true
+  },
+  "current": {
+    "text": "OCR\n\nAtt betala 0065432109\n\n925,00 SEK\n\n",
+    "reconstructed": false
+  },
+  "newAmbiguity": {
+    "label": "Att betala",
+    "labelGlyphHeight": 20,
+    "candidates": [
+      {
+        "value": "925,00 SEK",
+        "orientation": "below",
+        "verticalGap": 20
+      },
+      {
+        "value": "0065432109",
+        "orientation": "right",
+        "horizontalGap": 312,
+        "maxHorizontalGap": 320
+      }
+    ],
+    "sharedValue": "0065432109",
+    "competingOwner": "OCR",
+    "competingOwnerOrientation": "below",
+    "competingOwnerVerticalGap": 10
+  },
+  "proposedBehavior": "Keep the exact original and hold the ambiguous fields; no nearest-value or orientation preference."
+}

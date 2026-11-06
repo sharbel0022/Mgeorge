@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: reviewer: actual provider adapter must reject contradictory fresh primary IBAN values
+not ok 1 - reviewer: actual provider adapter must reject contradictory fresh primary IBAN values
+  ---
+  duration_ms: 687.644744
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot/sites/tests/reviewer-usage-details.test.mjs:241:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+    +   observedCount: 1,
+    +   reason: 'EXACT_SELECTED_DETAILS_OBSERVED',
+    +   status: 'observed',
+    -   observedCount: 0,
+    -   reason: 'DETAILS_ACCOUNT_CONFLICT',
+    -   status: 'unavailable',
+        targetCount: 1,
+    +   usage: {
+    +     explicitNull: 0,
+    +     omitted: 0,
+    +     orga: 1,
+    +     otherString: 0,
+    +     priv: 0,
+    +     wrongType: 0
+    +   },
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_ACCOUNT_CONFLICT'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 1
+    status: 'observed'
+    reason: 'EXACT_SELECTED_DETAILS_OBSERVED'
+    usage:
+      omitted: 0
+      orga: 1
+      priv: 0
+      explicitNull: 0
+      otherString: 0
+      wrongType: 0
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/snapshot/sites/tests/reviewer-usage-details.test.mjs:248:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1315.497694

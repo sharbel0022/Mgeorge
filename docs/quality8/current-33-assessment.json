@@ -1,23 +1,22 @@
 {
   "schema": "mgeorge-quality8-current-assessment-v1",
-  "assessed_at": "2026-11-05 22:58:14 UTC",
-  "published_site_version": 64,
-  "published_main": "819adee2f3848b474167eb6b15f82584caeb39af",
+  "assessed_at": "2026-11-06T03:34:52.229754+00:00",
+  "published_site_version": 65,
+  "published_main": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
   "status": "current_evidence_assessment_goal_not_yet_met",
-  "method": "PLAN är oförändrad. Halvpoäng är en konservativ ordinal bedömning, inte en formel av tester. Aktuell bedömning ersätter historiska totalsummor som nuläge; historiken bevaras.18/19följer den oberoende rubric-korrigeringen och verkliga före/efterbevis.",
+  "method": "PLAN är oförändrad. Halvpoäng är en konservativ ordinal bedömning, inte en formel av tester. Aktuell bedömning ersätter historiska totalsummor som nuläge; historiken bevaras. 18/19 följer den tidigare oberoende rubric-korrigeringen och verkliga före-/efterbevis. 33 höjs efter separat oberoende läsgranskning av den samlade aktuella driftbevisningen; 28 behåller sitt betyg.",
   "aggregate": {
-    "sum": 256.5,
+    "sum": 257.5,
     "maximum": 330,
-    "average": 7.7727272727272725,
-    "at_least_8": 27,
+    "average": 7.803030303030303,
+    "at_least_8": 28,
     "area_count": 33,
     "below_8_ids": [
       6,
       10,
       15,
       16,
-      28,
-      33
+      28
     ],
     "all_33_at_least_8": false
   },
@@ -27,7 +26,16 @@
     "docs/quality8/payer-reference-live-evidence-reassessment.md",
     "docs/quality8/release-wave2.json",
     "docs/quality8/wave2-postpublication-observations.json",
-    "docs/quality8/browser-wave2/publication64/observations.json"
+    "docs/quality8/browser-wave2/publication64/observations.json",
+    "docs/quality8/release-wave3.md",
+    "docs/quality8/wave3-postpublication-observations.json",
+    "docs/quality8/cloud-ocr-schedule-read-diagnosis.md",
+    "docs/quality8/minimal-handling-area6-read-precision.md",
+    "docs/quality8/area28-33-independent-read-review.md",
+    "docs/quality8/area28-33-independent-read-review.json",
+    "docs/quality8/backup-2026-11-06-final-pass/summary.json",
+    "docs/quality8/schedule-runtime-observations-20261106.json",
+    "docs/quality8/ocr-periodic-20261106/README.md"
   ],
   "rows": [
     {
@@ -112,7 +120,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
-      "evidence": "Sex underlag behandlades utan körfel; ett godtagbart normalunderlag genom hela den avsedda kedjan återstår att styrka.",
+      "evidence": "Ytterligare 6 verkliga underlag behandlades utan körfel; ett godtagbart normalunderlag till registreringskvitto återstår.",
       "remaining_for_8": "Verifiera ett godtagbart normalunderlag genom hela avsedda kedjan, konkret faktisk köprogress och säker återupptagning. Periodicitet bedöms separat i område28.",
       "scope_and_limitations": "Gmailframgång är inte OCR-/registreringsframgång. Ingen scoreökning enbart av felavstående eller att granskning är säker.",
       "prior_independent_evidence_refs": [
@@ -174,7 +182,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
-      "evidence": "Första V2:100% precision/60% mandatory recall;0/10 kompletta normaldokument. Fortsatt arbete ej publicerat.",
+      "evidence": "Första V2 kvar underkänt: 100% precision/60% mandatory recall. Känd omtolkning med levererad grammatik:63%; nytt oberoende prov återstår.",
       "remaining_for_8": "Nytt fryst oberoende första OCR-prov ska nå förregistrerade precision-/recallkrav utan falskt grönt.",
       "scope_and_limitations": "V2 får inte finjusteras eller beskrivas som ett nytt blint förstaprov efter omtolkning. Riktning är metadata, inte bildigenkänning.",
       "prior_independent_evidence_refs": [
@@ -252,7 +260,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Aktuell godkänd anslutning och verifierad läsning av rätt valt konto; utgångna/återkallade medgivanden stoppas.",
-      "evidence": "Publicerad revalidering avvisad:ACCOUNT_USAGE_INVALID; anslutningen förblir frånkopplad.",
+      "evidence": "Site65-revalidering avvisad: ett valt konto har sparat null-usage och aktuellt utelämnat usage; ingen aktivering.",
       "remaining_for_8": "Lös den faktiska kontoanvändningsavvisningen och verifiera bankgodkänt rätt konto.",
       "scope_and_limitations": "Ett framtida samtyckesdatum, nytt felmeddelande eller grön CI återställer inte bankbehörighet. Ingen bankuppgift antas.",
       "prior_independent_evidence_refs": [
@@ -268,7 +276,7 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Aktuell genomförd körning med befintligt samtycke, hållbara återförsök och korrekt nästa tid.",
-      "evidence": "Ingen ny lyckad behörig bankhämtning efter 08:05 UTC.",
+      "evidence": "Ingen ny lyckad behörig bankhämtning efter 2026-11-05 08:05 UTC.",
       "remaining_for_8": "Verifiera ny lyckad schemalagd bankhämtning med aktuellt medgivande.",
       "scope_and_limitations": "Syntetiska retry-/jobbkvitton eller säkert avvisad revalidering är ingen lyckad automatisk bankhämtning.",
       "prior_independent_evidence_refs": [
@@ -457,9 +465,9 @@
       "score": 6.5,
       "at_least_8": false,
       "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
-      "evidence": "CI-utlöst OCR 6/0 är aktuell; ny periodisk körning efter cronuppdatering ännu ej observerad.",
-      "remaining_for_8": "Observera aktuell faktisk periodisk OCR-körning och korrekt försenad/spärrad drift.",
-      "scope_and_limitations": "Enstaka tidigare6 + 6 OCR-jobb och konfigurationsflaggor bevisar inte ett fungerande aktuellt schema. Ingen generell schema-SLA är uppmätt.",
+      "evidence": "Gmails avslutade schemakörningar ger verkliga importer. Periodisk OCR-run 42153093698 på publicerad main 41aad slutfördes 02:54:40 UTC med 6 behandlade och 0 fel; appkö 66→60 och färsk worker stödjer samma drift. Backupens nya instruktion är ännu inte prövad automatiskt från ofärdig snapshot.",
+      "remaining_for_8": "Observera schemalagd backup med den nya instruktionen från ofärdig snapshot till separat bekräftad fullständig verifiering, eller en automatisk återupptagningskedja som når samma slutläge. OCR-delen är nu verifierad.",
+      "scope_and_limitations": "Den observerade OCR-körningen har faktiskt event=schedule och behandlar väntande jobb. Ingen generell schema-SLA är uppmätt. Dagens manuellt färdigställda backup och senare complete-no-op provar inte den korrigerade anropsbudgeten.",
       "prior_independent_evidence_refs": [
         "operations",
         "published_release",
@@ -472,9 +480,9 @@
       "score": 8,
       "at_least_8": true,
       "criterion": "Aktuell krypterad backup är fullständigt kontrolläst; filantal, originalhashar och slutförandetid redovisas.",
-      "evidence": "362/362 original och 142968213 byte verifierade; senare importer ingår inte.",
+      "evidence": "Snapshot 768fde9a-27a2-4b85-b85a-278239ec4aea: 430/430 original kopierade och kontrollästa, 185 567 855 byte i båda stegen, manifest_pass och verifiering slutförd 2026-11-06 00:48:58 UTC; separat slutstatus 00:49:04 UTC.",
       "remaining_for_8": null,
-      "scope_and_limitations": "Statusens skapandetid 01:17 är inte självständigt verifierad intern snapshot-tid. Ingen extern reservkopia eller fullständig aktuell totaldatamängd styrks.",
+      "scope_and_limitations": "Beviset gäller snapshotens frysta manifest med 430 original. Senare importer ingår inte. Slutförandet använde manuellt återupptagna normala backupsteg; den ändrade schemabudgeten och en extern reservkopia styrks inte här.",
       "prior_independent_evidence_refs": [
         "recovery",
         "published_release",
@@ -517,7 +525,7 @@
       "score": 8.5,
       "at_least_8": true,
       "criterion": "Berörda regressioner, oberoende granskning och fulla obligatoriska CI-grindar på exakt levererad kod.",
-      "evidence": "Exakt main-CI 6534/6534,0 fel/skip; normalt publicerat identiskt Sites-träd.",
+      "evidence": "Exakt main41aadcef-CI6819/6819,0fel/skip; normalt publicerat identiskt Sites-träd.",
       "remaining_for_8": null,
       "scope_and_limitations": "Betyget avser exakt main819adee/Site64 och fulla godkända grindar. Fokustestantal adderas inte dubbelt; tidigare ofullständiga lokala helkörningar räknas inte som godkända.",
       "prior_independent_evidence_refs": [
@@ -531,12 +539,12 @@
     {
       "id": 33,
       "area": "Verklig produktionsverifiering",
-      "score": 7,
-      "at_least_8": false,
+      "score": 8,
+      "at_least_8": true,
       "criterion": "Levererad version kopplas till exakt källträd; bank/Gmail/OCR/backup har relevanta aktuella observationer och ekonomiska skydd jämförs före/efter.",
-      "evidence": "Källkedja/publicering och avgränsade ekonomiska före/efterkontroller styrkta; bank/normalflöde återstår.",
-      "remaining_for_8": "Slutför relevant verklig bank-/normalflödesverifiering.",
-      "scope_and_limitations": "Publicerad demo och ägarbundna ekonomiska läskontroller är verifierade. Ingen autentiserad full bankresa, fysisk mobil eller fullständig ekonomirevision påstås.",
+      "evidence": "Exakt main 41aadcef till Site 65; verklig säkert avvisad bankrevalidering, avslutad Gmail-schemakörning, faktisk OCR 6/0, fullständigt verifierad 430-filssnapshot och två kompletta ekonomiska före-/efterläsningar med revision 52 och noll bokningar. Oberoende läsgranskning bedömer oförändrat kriterium uppfyllt.",
+      "remaining_for_8": null,
+      "scope_and_limitations": "Relevanta aktuella observationer är verifierade. Bankavvisningen är inte bevis för giltig anslutning eller lyckad hämtning (15/16). OCR-körningen är inte periodisk (28), och normalfakturans registrering kvarstår i 6. Ingen fysisk mobil, autentiserad full bankresa eller fullständig ekonomirevision påstås.",
       "prior_independent_evidence_refs": [
         "published_release",
         "browser",

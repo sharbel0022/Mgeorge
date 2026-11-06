@@ -1,0 +1,235 @@
+{
+  "schema": "byte-exact-independent-review-copy-v1",
+  "entries": [
+    {
+      "path": "REVIEW-0f550950.md",
+      "sha256": "9745d2f220c3ac5609159da8b3aeeaed9a6ea0aff9a11585d5fce07e17dc7e5d",
+      "bytes": 8074
+    },
+    {
+      "path": "source-verification-0f550950.json",
+      "sha256": "0c60733ba002167eff380ac4131333b63bac3e78d0467b260c7561ab69ad0728",
+      "bytes": 2254
+    },
+    {
+      "path": "product-0f550950.diff",
+      "sha256": "f08cf81f08887f1b4c5c423e16c8b1fe0dc55c9a7a5b79d54aeb4b40bdd3e593",
+      "bytes": 4932
+    },
+    {
+      "path": "observed-findings-0f550950.json",
+      "sha256": "450a3432078e868cdd9968fe65818751a806eec32118f204216e474bd01f02da",
+      "bytes": 27815
+    },
+    {
+      "path": "logs/independent-0f550950.tap",
+      "sha256": "930cdc356bce4793a2efddff47374bfbb4824360678910abb4e1ef0dd7f6f762",
+      "bytes": 54001
+    },
+    {
+      "path": "logs/independent-baseline-initial-bankgiro-fixture.tap",
+      "sha256": "297d43c816563ccac00f86998ba7fab888c874a7e37c02cb85cc547554bc76e5",
+      "bytes": 150489
+    },
+    {
+      "path": "logs/independent-baseline.tap",
+      "sha256": "31bda5e9236ce4598e1d9d6ec86615e1cc73d8b7ebc31d9abcca6c57cee6793b",
+      "bytes": 111417
+    },
+    {
+      "path": "logs/observed-findings-0f550950.log",
+      "sha256": "6e32b31fa57a4296a9b5d83241d4b83429b8d0512aade59393abc975fb258110",
+      "bytes": 1243
+    },
+    {
+      "path": "logs/original-recipient-baseline.tap",
+      "sha256": "88d2a557a0660ad87e21afae10254877efbc1859ceea7ae10aaf232718f262a8",
+      "bytes": 22377
+    },
+    {
+      "path": "logs/retained-regression-0f550950.tap",
+      "sha256": "8934826d9a7f25a97615aead2208e5b57af3d7a2cf581e69ee641bbb0b14f59b",
+      "bytes": 23149
+    },
+    {
+      "path": "probes/cases-initial-bankgiro-fixture.json",
+      "sha256": "2704845c6420961f145f8ccc8f731d1653a3eb0802558797f4286dda3bd8c2f0",
+      "bytes": 23639
+    },
+    {
+      "path": "probes/cases.json",
+      "sha256": "8f72fc82b369d015c60dc24d06d6803e659d7159a8c3bce86ccdb8f3d7c420f3",
+      "bytes": 22819
+    },
+    {
+      "path": "probes/create-cases-initial-bankgiro-fixture.py",
+      "sha256": "109b9a8d64d4c7568439a0f397fb684b1c233dd1e7c26fa2d61015e5e33dcb20",
+      "bytes": 6429
+    },
+    {
+      "path": "probes/create-cases.py",
+      "sha256": "fd3c6b6571f39ab1783e7df4ebda95e6fcbba7b743b2485b8be8cf9bb728ea74",
+      "bytes": 6409
+    },
+    {
+      "path": "probes/independent-boundary.test.mjs",
+      "sha256": "bc468a7bced8bd59ba8c054bb3721a2b9e384962d1e72eb4aa97960f063d1daf",
+      "bytes": 1994
+    },
+    {
+      "path": "probes/observe-findings.mjs",
+      "sha256": "7b1546b99615ef48378848e07cdf0d0212bdcf0ca201b8f1081573ee7b367970",
+      "bytes": 1639
+    },
+    {
+      "path": "baseline/src/invoice-details.js",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+      "bytes": 24567
+    },
+    {
+      "path": "baseline/sites/lib/invoice-details.js",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+      "bytes": 24567
+    },
+    {
+      "path": "baseline/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "bytes": 21922
+    },
+    {
+      "path": "baseline/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "bytes": 20283
+    },
+    {
+      "path": "baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "bytes": 2811
+    },
+    {
+      "path": "baseline/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "bytes": 3432
+    },
+    {
+      "path": "baseline/sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "sha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506",
+      "bytes": 2002
+    },
+    {
+      "path": "fix-0f550950/src/invoice-details.js",
+      "sha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5",
+      "bytes": 25216
+    },
+    {
+      "path": "fix-0f550950/sites/lib/invoice-details.js",
+      "sha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5",
+      "bytes": 25216
+    },
+    {
+      "path": "fix-0f550950/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "bytes": 21922
+    },
+    {
+      "path": "fix-0f550950/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "bytes": 20283
+    },
+    {
+      "path": "fix-0f550950/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "bytes": 2811
+    },
+    {
+      "path": "fix-0f550950/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "bytes": 3432
+    },
+    {
+      "path": "fix-0f550950/sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "sha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506",
+      "bytes": 2002
+    },
+    {
+      "path": "evidence-0f550950.json",
+      "sha256": "cb6376b290ffebfcc4c4c6ddb492d0c432ec8ccf7b9880be55316891153f5c45",
+      "bytes": 10750
+    },
+    {
+      "path": "recheck-96d1404/REVIEW.md",
+      "sha256": "aafb6d233feb2148997b403961c983515bbb9b91eb650e436589a3045c1b9843",
+      "bytes": 7172
+    },
+    {
+      "path": "recheck-96d1404/source-preservation.json",
+      "sha256": "2bcb6d100ae5f6793f3994c52f8678031c0ed1f02114232b89bc27f036fd9769",
+      "bytes": 6551
+    },
+    {
+      "path": "recheck-96d1404/product.diff",
+      "sha256": "2e88490fe1ac587e539887f6819234ddb3e5d3bb6a55a2a68bd07fac67f0b461",
+      "bytes": 4298
+    },
+    {
+      "path": "recheck-96d1404/extra-owner-punctuation.test.mjs",
+      "sha256": "669287f250236a766c8d7872b646cf9383f884623b8cfa167eaa8d61d2401942",
+      "bytes": 3441
+    },
+    {
+      "path": "recheck-96d1404/logs/extra-owner-punctuation-32.tap",
+      "sha256": "37aa0a249477bf67e72f6fadf5d019449a11827561f721da1e83c6d788d4658c",
+      "bytes": 7038
+    },
+    {
+      "path": "recheck-96d1404/logs/frozen-independent-164.tap",
+      "sha256": "9189448de7a1c07781e8dc33ae5482f16f5969c1a30f18fa30a1ca0d614ac9f8",
+      "bytes": 35092
+    },
+    {
+      "path": "recheck-96d1404/logs/retained-regression-144.tap",
+      "sha256": "667a0d7f6f0fd68bfbf6379c98867081d58e9c746cdf0868409fda995f8132e5",
+      "bytes": 33067
+    },
+    {
+      "path": "recheck-96d1404/snapshot/src/invoice-details.js",
+      "sha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+      "bytes": 25393
+    },
+    {
+      "path": "recheck-96d1404/snapshot/sites/lib/invoice-details.js",
+      "sha256": "db76b24ff1e68701f624b395588627b634767f9034289b163855dbc3b9226255",
+      "bytes": 25393
+    },
+    {
+      "path": "recheck-96d1404/snapshot/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "bytes": 21922
+    },
+    {
+      "path": "recheck-96d1404/snapshot/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "bytes": 20283
+    },
+    {
+      "path": "recheck-96d1404/snapshot/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "bytes": 2811
+    },
+    {
+      "path": "recheck-96d1404/snapshot/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "bytes": 3432
+    },
+    {
+      "path": "recheck-96d1404/snapshot/sites/tests/party-completed-name-boundaries.test.mjs",
+      "sha256": "c7c638957007f47561945e44325b1b7dd4b3232a63d21200a7d7ff927be60fd8",
+      "bytes": 2754
+    },
+    {
+      "path": "recheck-96d1404/evidence.json",
+      "sha256": "a9b402555038504326d3f14bff883eed9a697f1526ec89afb04b0a32be0df2a1",
+      "bytes": 6283
+    }
+  ]
+}

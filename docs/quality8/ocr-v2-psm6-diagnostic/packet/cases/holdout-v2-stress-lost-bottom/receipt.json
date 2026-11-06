@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-stress-lost-bottom",
+  "population": "stress",
+  "layout": "lost-bottom-scan",
+  "startedAt": "2026-11-06T00:23:56.876Z",
+  "completedAt": "2026-11-06T00:24:00.646Z",
+  "durationMs": 3769.3516020000025,
+  "inputSha256": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e",
+  "expectedRasterSha256": "a4379871e2dfe5e584578ca9307d7b1b7688fc635f3bbd628073939c5da12427",
+  "actualRasterSha256": "a4379871e2dfe5e584578ca9307d7b1b7688fc635f3bbd628073939c5da12427",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 93,
+  "rawBlocks": 1,
+  "rawLines": 11,
+  "rawWords": 49,
+  "rawText": "FAKTURA\nLeverantör Faktureras till\nExempel Styrsystem AB Testmottagaren Handel AB\nTeknikparken 21 Handelsvägen 22\n901 23 Provhamn 123 40 Teststad\nFakturanummer: 284-6119 Fakturadatum: 2026-08-04\nFörfallodatum: 2026-09-03\nBeskrivning Antal Å-pris Belopp\nInstallation av styrsystem 12 1 050,00 12 600,00\nKabelförläggning 6 454,00 2 724,00\nSamtliga radbelopp i SEK, exklusive moms.\n",
+  "observedText": "FAKTURA\nLeverantör Faktureras till\nExempel Styrsystem AB Testmottagaren Handel AB\nTeknikparken 21 Handelsvägen 22\n901 23 Provhamn 123 40 Teststad\nFakturanummer: 284-6119\nFakturadatum: 2026-08-04\nFörfallodatum: 2026-09-03\nBeskrivning Antal Å-pris Belopp\nInstallation av styrsystem 12 1 050,00 12 600,00\nKabelförläggning 6 454,00 2 724,00\nSamtliga radbelopp i SEK, exklusive moms.\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e",
+    "textSha256": "6d2eb87e4f7cdd5568a313abc024cb30ae2360e2f7c59480a90f6b58003337de",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "e39f35cbc937464b82a94b0aa9102a44f2a696c7acba8397010d033de55626f6",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": true,
+  "percentMarkers": {
+    "rendered": 0,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "31b340e4be064aca49edf5cebc9fb5b0f0e31afc27cd5b76a6e16d855b96e89f",
+    "layout-replay.json": "d2d1ca9d51c0a9d07e1ab8357588f0428faa5ca1ceff617a775b051c293f9ac0",
+    "raw-response.json": "508b7d142dda501ae61fe3157add9e9d74f073279d6a1d1e2fac864f538c5e8c",
+    "raw-response.v8": "bc369de282b6ff51931da060b194fd0c7cc14c1eabea31b14e1ecab96f1922cf",
+    "recognition-finished.json": "95d217f4cdc77561e4bdd13aec11e436569fd525739697bebc14b3db8f6e4a12",
+    "recognition-input.png": "a4379871e2dfe5e584578ca9307d7b1b7688fc635f3bbd628073939c5da12427",
+    "recognition-start.json": "37d46894b4661c44a78dcfe277daa1a504d593651e52f98f9443f09ae23ad6da",
+    "worker-result.json": "c1f0b853a4c3e1c7bfe36cac4b568ede7c48cd8fafef3bc9129f608392ebf61b",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

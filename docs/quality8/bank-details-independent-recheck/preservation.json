@@ -1,0 +1,148 @@
+{
+  "originalReviewFiles": [
+    {
+      "path": "REVIEW.md",
+      "expectedSha256": "d10c714f4871529bf2a10c7fbb14bebc1f04e759c64bfd8aa7194c3fbcc484fa",
+      "actualSha256": "d10c714f4871529bf2a10c7fbb14bebc1f04e759c64bfd8aa7194c3fbcc484fa"
+    },
+    {
+      "path": "product.diff",
+      "expectedSha256": "de77a85487f935cbaa922d6abb2343d90b20d00fe06caeecb567d5aa0269a952",
+      "actualSha256": "de77a85487f935cbaa922d6abb2343d90b20d00fe06caeecb567d5aa0269a952"
+    },
+    {
+      "path": "source-verification.json",
+      "expectedSha256": "6b992e2df9ecc63f53ecd317b32183a34c146bfb7636922d82bd139a4edae805",
+      "actualSha256": "6b992e2df9ecc63f53ecd317b32183a34c146bfb7636922d82bd139a4edae805"
+    },
+    {
+      "path": "logs/policy-59.tap",
+      "expectedSha256": "9a412529b802298ceeaac7a46e0d34ea8f4ff7b17cfcc0477ce4b73a799bb9ef",
+      "actualSha256": "9a412529b802298ceeaac7a46e0d34ea8f4ff7b17cfcc0477ce4b73a799bb9ef"
+    },
+    {
+      "path": "logs/policy-adapters-provider.tap",
+      "expectedSha256": "67ebee12d9375fb64e3fc710fa236be3a5005a06bcacc0de3ae5eaad057b4205",
+      "actualSha256": "67ebee12d9375fb64e3fc710fa236be3a5005a06bcacc0de3ae5eaad057b4205"
+    },
+    {
+      "path": "logs/reviewer-service-identity-conflict.tap",
+      "expectedSha256": "230c72ec50e45812a8ac826e2ebfd1be678640ef5c21eee13272ced48147e60a",
+      "actualSha256": "230c72ec50e45812a8ac826e2ebfd1be678640ef5c21eee13272ced48147e60a"
+    },
+    {
+      "path": "logs/reviewer-service-probes.tap",
+      "expectedSha256": "16b8552f1c87dc7e78a901fd9954ba8b927bf5e8f4e70eab8275717bf67af1a1",
+      "actualSha256": "16b8552f1c87dc7e78a901fd9954ba8b927bf5e8f4e70eab8275717bf67af1a1"
+    },
+    {
+      "path": "logs/service-regression.tap",
+      "expectedSha256": "c3bff180c9ff3dbca0551187cab693e28023ab3a074e53458203e5dac845f106",
+      "actualSha256": "c3bff180c9ff3dbca0551187cab693e28023ab3a074e53458203e5dac845f106"
+    },
+    {
+      "path": "logs/sites-typecheck-physical-deps.log",
+      "expectedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actualSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/sites-typecheck.log",
+      "expectedSha256": "37f3c36d768e1fc45d4b8611be350c1502e1e4f9e0be1f12a55ce7c93e2abf99",
+      "actualSha256": "37f3c36d768e1fc45d4b8611be350c1502e1e4f9e0be1f12a55ce7c93e2abf99"
+    },
+    {
+      "path": "policy-probes/adapter-primary-conflict.tap",
+      "expectedSha256": "c73f7a0a124359ab84d66afc95ee16312ba7fa872cdc951a5775320575ebd3d4",
+      "actualSha256": "c73f7a0a124359ab84d66afc95ee16312ba7fa872cdc951a5775320575ebd3d4"
+    },
+    {
+      "path": "policy-probes/adapter-primary-conflict.test.mjs",
+      "expectedSha256": "0f7b661d0f7e4e5738f9c3d8b840b38ddebe78e0d45781f0d5a0a5b5e45116ed",
+      "actualSha256": "0f7b661d0f7e4e5738f9c3d8b840b38ddebe78e0d45781f0d5a0a5b5e45116ed"
+    },
+    {
+      "path": "policy-probes/policy-identity-conflicts.tap",
+      "expectedSha256": "b0dff3d70c69bc630e0435fb5de1537f2baf97eab13326edc82ed2cde0a19c43",
+      "actualSha256": "b0dff3d70c69bc630e0435fb5de1537f2baf97eab13326edc82ed2cde0a19c43"
+    },
+    {
+      "path": "policy-probes/policy-identity-conflicts.test.mjs",
+      "expectedSha256": "f576fefdf22dbff194b16e856efffbd70f855f27b761e2b3d3e0621460009c23",
+      "actualSha256": "f576fefdf22dbff194b16e856efffbd70f855f27b761e2b3d3e0621460009c23"
+    },
+    {
+      "path": "policy-probes/policy-review-evidence.json",
+      "expectedSha256": "027b52723155c3379d0184d07903df52b2e446eb65f421632e8ab6b26ffdc1f1",
+      "actualSha256": "027b52723155c3379d0184d07903df52b2e446eb65f421632e8ab6b26ffdc1f1"
+    },
+    {
+      "path": "policy-probes/policy-review.md",
+      "expectedSha256": "39a21dfaae555ba531c89d829a791ab53e0bdd84590e89f3a033c1cfbc58f621",
+      "actualSha256": "39a21dfaae555ba531c89d829a791ab53e0bdd84590e89f3a033c1cfbc58f621"
+    },
+    {
+      "path": "snapshot/sites/tests/reviewer-usage-details.test.mjs",
+      "expectedSha256": "e5c8e36b4eb9ba9997e6bb5f87e3c55c8283e09e79bfae4c94640d211845c510",
+      "actualSha256": "e5c8e36b4eb9ba9997e6bb5f87e3c55c8283e09e79bfae4c94640d211845c510"
+    },
+    {
+      "path": "snapshot/sites/tests/reviewer-usage-details-six.test.mjs",
+      "expectedSha256": "239f6dcf2fa4bf555a05dfbe64cac70a55c5d07092c40e8b4eb76b94d45c1776",
+      "actualSha256": "239f6dcf2fa4bf555a05dfbe64cac70a55c5d07092c40e8b4eb76b94d45c1776"
+    },
+    {
+      "path": "snapshot/sites/lib/bank-consent-policy.js",
+      "expectedSha256": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c",
+      "actualSha256": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c"
+    },
+    {
+      "path": "snapshot/sites/lib/bank-consent-policy.d.ts",
+      "expectedSha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "actualSha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280"
+    },
+    {
+      "path": "snapshot/sites/lib/banking/service.ts",
+      "expectedSha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+      "actualSha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24"
+    },
+    {
+      "path": "snapshot/sites/lib/banking/account-evidence.ts",
+      "expectedSha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "actualSha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f"
+    },
+    {
+      "path": "snapshot/sites/lib/banking/enable-banking.ts",
+      "expectedSha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+      "actualSha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6"
+    },
+    {
+      "path": "snapshot/sites/lib/banking/account-read-guard.ts",
+      "expectedSha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+      "actualSha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837"
+    }
+  ],
+  "frozenRedTests": [
+    {
+      "path": "sites/tests/bank-usage-details-identity-policy.test.mjs",
+      "sha256": "dac97f1f5d1933f4abdb4b6e773648d16fd01cb44ea6777983f42cb388dc6db5",
+      "matchesFrozenRed": true
+    },
+    {
+      "path": "sites/tests/bank-usage-details-identity-adapter.test.mjs",
+      "sha256": "bd1fd5940d45fea7a603b5469f38dca5f15c62bcbecb1625625da94b85a2105d",
+      "matchesFrozenRed": true
+    },
+    {
+      "path": "sites/tests/bank-usage-details-policy.test.mjs",
+      "sha256": "ec02badb28e1588efcc55a0ee80e04e78ef94c79aec2d43e559edbfc1ec92f75",
+      "matchesFrozenRed": true
+    },
+    {
+      "path": "sites/tests/banking-security.test.mjs",
+      "sha256": "efcd72fc157e4a73d549c3511309599c13d689d146a36d4f40c4e3a7db825730",
+      "matchesFrozenRed": true
+    }
+  ],
+  "allOriginalMatch": true,
+  "allFrozenTestsMatch": true
+}

@@ -30,7 +30,7 @@ async function fixture(t,{realAftercheck=false,automatic=false}={}){
     customer=moduleUrl('../lib/customer-messages.ts',{'./server':server,'./domain':domainUrl,'./reconciliation':reconciliation,'./reconciliation-evidence':evidence,'./customer-message-text.js':new URL('../lib/customer-message-text.js',import.meta.url).href,'./banking/security':securityUrl,'./banking/store':store,'./gmail-adapter.js':adapter});f.customerApi=await import(customer);
   }
   const processing=moduleUrl('../lib/document-processing.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/security':securityUrl,'./invoice-fields.js':fields,'./server-pdf':pdf,'./customer-messages':customer});
-  f.processing=await import(processing);f.fields=await import(fields);
+  f.processing=await import(processing);f.fields=await import(fields);f.processingUrl=processing;f.serverUrl=server;
   f.apiUrl=moduleUrl('../lib/gmail-service.ts',{'cloudflare:workers':cf,'./server':server,'./domain':domainUrl,'./banking/store':store,'./banking/security':securityUrl,'./gmail-adapter.js':adapter,'./invoice-fields.js':fields,'./document-processing':processing,'./customer-messages':customer});
   f.api=await import(f.apiUrl);
   t.mock.method(globalThis,'fetch',async (url,options)=>{
@@ -778,4 +778,78 @@ test('Gmail status distinguishes configured scheduling from observed successful 
  result=await inspect();assert.equal(result.sync_health.state,'not_configured');assert.equal(result.background_ready,false);
  f.sql.prepare('DELETE FROM gmail_connections').run();
  result=await inspect();assert.equal(result.sync_health.state,'disconnected');assert.equal(result.background_ready,false);
+});
+
+// These cases exercise real scoped UPDATE effects through MCP, not a mocked retry.
+async function retryMcp(f,args,method='tools/call'){
+ const service=data(`export async function automaticSync(){throw Error('unexpected bank');}export async function automaticSyncStatus(){throw Error('unexpected bank');}export function bankFailure(error){return Response.json({error:error.message==='AUTH_REQUIRED'?'AUTH_REQUIRED':'operation_failed'},{status:409});}`);
+ const rpc=await import(moduleUrl('../lib/banking/mcp.ts',{'./service':service,'../server':f.serverUrl,'../document-processing':f.processingUrl,'../backups':data(`export async function runOwnerBackup(){throw Error('unexpected backup');}`)}));
+ return (await rpc.bankRpc({jsonrpc:'2.0',id:1,method,params:method==='tools/call'?{name:'retry_invoice_document',arguments:args}:{}})).json();
+}
+function retryRow(f,{id='retry-doc',state='needs_review',engine='cloud',status='needs_review'}={}){
+ f.doc(id);f.sql.prepare('UPDATE gmail_sources SET status=? WHERE owner=? AND document_id=?').run(status,f.owner,id);
+ f.sql.prepare('INSERT INTO document_jobs(owner,document_id,state,engine,attempts,available_at,lease,lease_until,extraction,error_code,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(f.owner,id,state,engine,3,'2000-01-01','retained-lease','2099-01-01','{"retained":"synthetic interpretation"}','retained-error','2000-01-01');
+}
+const retrySnapshot=f=>Object.fromEntries(['documents','gmail_sources','document_extractions','document_registrations','invoice_counterparties','workspaces','audit_events'].map(table=>[table,f.sql.prepare('SELECT * FROM '+table).all()]));
+
+test('retry MCP advertises one document selector and an explicit queue mutation',async t=>{
+ const f=await processingFixture(t),result=await retryMcp(f,{},'tools/list'),tool=result.result.tools.find(t=>t.name==='retry_invoice_document');
+ assert.ok(tool);assert.deepEqual(Object.keys(tool.inputSchema.properties),['documentId']);assert.deepEqual(tool.inputSchema.required,['documentId']);assert.equal(tool.inputSchema.additionalProperties,false);assert.equal(tool.annotations.readOnlyHint,false);assert.equal(tool.annotations.idempotentHint,false);
+});
+for(const [engine,want]of [['cloud','queued'],['local','waiting_ocr']])for(const state of ['failed','needs_review','duplicate'])test(`retry MCP returns ${state}/${engine} to ${want} without interpreting or approving it`,async t=>{
+ const f=await processingFixture(t);retryRow(f,{state,engine});const before=retrySnapshot(f),providerCalls=f.providerCalls;
+ let originalReads=0;f.env.BUCKET.get=async()=>{originalReads++;throw Error('retry must not read originals');};
+ const result=await retryMcp(f,{documentId:'retry-doc'});
+ assert.equal(result.result?.isError,undefined);assert.deepEqual(result.result?.structuredContent,{ok:true,requeued:true});
+ const row=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(row.state,want);assert.equal(row.attempts,0);assert.equal(row.lease,'');assert.equal(row.lease_until,'');assert.notEqual(row.available_at,'2000-01-01');assert.equal(row.extraction,'{"retained":"synthetic interpretation"}');assert.equal(row.error_code,'retained-error');assert.equal(row.invoice_id,'');assert.equal(row.automatic,0);
+ assert.deepEqual(retrySnapshot(f),before);assert.equal(originalReads,0);assert.equal(f.providerCalls,providerCalls);
+ const after={...row},again=await retryMcp(f,{documentId:'retry-doc'});assert.deepEqual(again.result?.structuredContent,{ok:true,requeued:false});assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},after);assert.deepEqual(retrySnapshot(f),before);
+});
+for(const state of ['processing','registered','queued','waiting_ocr'])test(`retry MCP leaves ${state} and its lease untouched`,async t=>{
+ const f=await processingFixture(t);retryRow(f,{state});const before=f.sql.prepare('SELECT * FROM document_jobs').all(),dataBefore=retrySnapshot(f);
+ const result=await retryMcp(f,{documentId:'retry-doc'});assert.deepEqual(result.result?.structuredContent,{ok:true,requeued:false});assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);assert.deepEqual(retrySnapshot(f),dataBefore);
+});
+for(const variant of ['foreign-owner','missing-job','rejected-source','registered-source','missing-source'])test(`retry MCP does not requeue ${variant} or reveal why it was unavailable`,async t=>{
+ const f=await processingFixture(t);if(variant==='foreign-owner')f.owner='other-owner';retryRow(f);if(variant==='foreign-owner')f.owner=f.user.userId;
+ if(variant==='missing-job')f.sql.prepare('DELETE FROM document_jobs').run();
+ if(variant==='missing-source')f.sql.prepare('DELETE FROM gmail_sources').run();
+ if(variant==='rejected-source'||variant==='registered-source')f.sql.prepare('UPDATE gmail_sources SET status=?').run(variant==='rejected-source'?'rejected':'registered');
+ const before=f.sql.prepare('SELECT * FROM document_jobs').all(),dataBefore=retrySnapshot(f),result=await retryMcp(f,{documentId:'retry-doc'});
+ assert.deepEqual(result.result?.structuredContent,{ok:true,requeued:false});assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);assert.deepEqual(retrySnapshot(f),dataBefore);assert.doesNotMatch(JSON.stringify(result),/other-owner|retained-lease|retained-error|synthetic interpretation/);
+});
+for(const args of [{},{documentId:''},{documentId:'../retry-doc'},{documentId:'x'.repeat(101)},{documentId:7},{documentId:['retry-doc']},{documentId:'retry-doc',owner:'other-owner'},{documentId:'retry-doc',force:true},{documentId:'retry-doc',fields:{}},[],null])test(`retry MCP rejects malformed or privileged arguments ${JSON.stringify(args).slice(0,80)}`,async t=>{
+ const f=await processingFixture(t);retryRow(f);const before=f.sql.prepare('SELECT * FROM document_jobs').all(),dataBefore=retrySnapshot(f),result=await retryMcp(f,args);
+ assert.equal(result.error?.code,-32602);assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);assert.deepEqual(retrySnapshot(f),dataBefore);
+});
+test('retry MCP requires authentication before changing a document queue',async t=>{
+ const f=await processingFixture(t);retryRow(f);const before=f.sql.prepare('SELECT * FROM document_jobs').all(),dataBefore=retrySnapshot(f);f.user=null;
+ const result=await retryMcp(f,{documentId:'retry-doc'});assert.equal(result.result?.isError,true);assert.deepEqual(result.result?.structuredContent,{error:'AUTH_REQUIRED'});assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);assert.deepEqual(retrySnapshot(f),dataBefore);
+});
+test('retry UI keeps its origin check and returns the same guarded queue result',async t=>{
+ const f=await processingFixture(t);retryRow(f);const before=f.sql.prepare('SELECT * FROM document_jobs').all();
+ const bad=new Request(origin+'/api/gmail/retry',{method:'POST',headers:{Origin:'https://foreign.example','Content-Type':'application/json'},body:JSON.stringify({document_id:'retry-doc'})});
+ await assert.rejects(f.processing.processingAction(bad,'retry'),/ORIGIN_DENIED/);assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);
+ const good=await(await f.processing.processingAction(post('retry',{document_id:'retry-doc'}),'retry')).json();assert.deepEqual(good,{ok:true,requeued:true});assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'queued');
+});
+
+test('reviewer: simultaneous retries update exactly once',async t=>{
+ const f=await processingFixture(t);retryRow(f);const before=retrySnapshot(f);
+ const results=await Promise.all([retryMcp(f,{documentId:'retry-doc'}),retryMcp(f,{documentId:'retry-doc'})]);
+ assert.deepEqual(results.map(x=>x.result.structuredContent.requeued).sort(),[false,true]);assert.deepEqual(retrySnapshot(f),before);
+});
+test('reviewer: active source of another owner cannot authorize retry',async t=>{
+ const f=await processingFixture(t);retryRow(f);f.sql.prepare('UPDATE gmail_sources SET owner=?').run('foreign-owner');
+ const before=f.sql.prepare('SELECT * FROM document_jobs').all();
+ assert.deepEqual((await retryMcp(f,{documentId:'retry-doc'})).result.structuredContent,{ok:true,requeued:false});assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),before);
+});
+test('reviewer: registered job preserves actual receipt and nonempty invoice linkage',async t=>{
+ const f=await processingFixture(t);retryRow(f,{state:'registered'});
+ f.sql.prepare("UPDATE document_jobs SET invoice_id='invoice-1',automatic=1").run();
+ f.sql.prepare("INSERT INTO document_registrations VALUES(?,?,'identity','invoice-1','attempt',12345,'2026')").run(f.owner,'retry-doc');
+ const before=retrySnapshot(f),jobs=f.sql.prepare('SELECT * FROM document_jobs').all();
+ assert.deepEqual((await retryMcp(f,{documentId:'retry-doc'})).result.structuredContent,{ok:true,requeued:false});assert.deepEqual(retrySnapshot(f),before);assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs').all(),jobs);
+});
+test('reviewer: server PDF engine follows existing nonlocal route',async t=>{
+ const f=await processingFixture(t);retryRow(f,{engine:'server_pdf'});
+ assert.deepEqual((await retryMcp(f,{documentId:'retry-doc'})).result.structuredContent,{ok:true,requeued:true});assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'queued');
 });

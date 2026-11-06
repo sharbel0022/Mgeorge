@@ -1,0 +1,24 @@
+{
+  "preparedAt": "2026-11-06 03:31:54 UTC",
+  "sourceCandidate": "e8267869dd950d52ecb0a5b0419a7e969e33a4db",
+  "sourceTree": "58c2cae56a5be177842c360ae46d5caed83fdd9b",
+  "copiedFiles": 629,
+  "opened": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "checkout_path": "/workspace/scratch/4d79ab4bea8e/site-source",
+    "commit_sha": "1fda827650ff858e9c09a6a1795a6b15966004ac"
+  },
+  "prepared": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "checkout_path": "/workspace/scratch/4d79ab4bea8e/site-source",
+    "commit_sha": "0b119b8d472f70a1bfeac686c12889b618a32fb2",
+    "archive": "/tmp/rating8-wave4-site66-third.tar.gz"
+  },
+  "publicationPerformed": false,
+  "independentAndFullCiGateStillRequired": true,
+  "archiveBytes": 18605800,
+  "archiveSha256": "8cb1aace94955204027302b08acdbb9e308b57c40a1fc95f33ace1830b8fee2d",
+  "nativeTree": "58c2cae56a5be177842c360ae46d5caed83fdd9b",
+  "nativeHead": "0b119b8d472f70a1bfeac686c12889b618a32fb2",
+  "nativeStatus": ""
+}

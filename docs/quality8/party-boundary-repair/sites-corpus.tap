@@ -1,0 +1,2122 @@
+TAP version 13
+# Subtest: document quality: consistent explicit invoice evidence retains leading zeroes
+ok 1 - document quality: consistent explicit invoice evidence retains leading zeroes
+  ---
+  duration_ms: 59.274925
+  type: 'test'
+  ...
+# Subtest: document quality: an invalid additional fakturadatum blocks automatic eligibility
+ok 2 - document quality: an invalid additional fakturadatum blocks automatic eligibility
+  ---
+  duration_ms: 5.680814
+  type: 'test'
+  ...
+# Subtest: document quality: an invalid additional förfallodatum blocks automatic eligibility
+ok 3 - document quality: an invalid additional förfallodatum blocks automatic eligibility
+  ---
+  duration_ms: 2.326677
+  type: 'test'
+  ...
+# Subtest: document quality: an invalid additional organisationsnummer blocks automatic eligibility
+ok 4 - document quality: an invalid additional organisationsnummer blocks automatic eligibility
+  ---
+  duration_ms: 2.076506
+  type: 'test'
+  ...
+# Subtest: document quality: an invalid additional fakturadatum blocks automatic eligibility
+ok 5 - document quality: an invalid additional fakturadatum blocks automatic eligibility
+  ---
+  duration_ms: 2.076184
+  type: 'test'
+  ...
+# Subtest: document quality: an invalid additional förfallodatum blocks automatic eligibility
+ok 6 - document quality: an invalid additional förfallodatum blocks automatic eligibility
+  ---
+  duration_ms: 1.814147
+  type: 'test'
+  ...
+# Subtest: document quality: an invalid additional organisationsnummer blocks automatic eligibility
+ok 7 - document quality: an invalid additional organisationsnummer blocks automatic eligibility
+  ---
+  duration_ms: 1.72194
+  type: 'test'
+  ...
+# Subtest: document quality: an invalid additional Bankgiro blocks automatic eligibility
+ok 8 - document quality: an invalid additional Bankgiro blocks automatic eligibility
+  ---
+  duration_ms: 1.657655
+  type: 'test'
+  ...
+# Subtest: document quality: malformed labelled total 1,250.00 SEK cannot be silently ignored
+ok 9 - document quality: malformed labelled total 1,250.00 SEK cannot be silently ignored
+  ---
+  duration_ms: 1.37796
+  type: 'test'
+  ...
+# Subtest: document quality: malformed labelled total 1.250,001 SEK cannot be silently ignored
+ok 10 - document quality: malformed labelled total 1.250,001 SEK cannot be silently ignored
+  ---
+  duration_ms: 1.12089
+  type: 'test'
+  ...
+# Subtest: document quality: malformed labelled total 1 250,00oops SEK cannot be silently ignored
+ok 11 - document quality: malformed labelled total 1 250,00oops SEK cannot be silently ignored
+  ---
+  duration_ms: 1.018478
+  type: 'test'
+  ...
+# Subtest: document quality: malformed labelled total okänt SEK cannot be silently ignored
+ok 12 - document quality: malformed labelled total okänt SEK cannot be silently ignored
+  ---
+  duration_ms: 1.045107
+  type: 'test'
+  ...
+# Subtest: document quality: subject label Faktura nummer NUMBER is compared exactly
+ok 13 - document quality: subject label Faktura nummer NUMBER is compared exactly
+  ---
+  duration_ms: 2.906144
+  type: 'test'
+  ...
+# Subtest: document quality: subject label FakturanrNUMBER is compared exactly
+ok 14 - document quality: subject label FakturanrNUMBER is compared exactly
+  ---
+  duration_ms: 1.881387
+  type: 'test'
+  ...
+# Subtest: document quality: filename label Invoice_no_NUMBER.pdf is compared exactly
+ok 15 - document quality: filename label Invoice_no_NUMBER.pdf is compared exactly
+  ---
+  duration_ms: 1.641762
+  type: 'test'
+  ...
+# Subtest: document quality: filename label Faktura_nummer_NUMBER.png is compared exactly
+ok 16 - document quality: filename label Faktura_nummer_NUMBER.png is compared exactly
+  ---
+  duration_ms: 1.554403
+  type: 'test'
+  ...
+# Subtest: document quality: conflicting filename and subject remain explicit when PDF number is unreadable
+ok 17 - document quality: conflicting filename and subject remain explicit when PDF number is unreadable
+  ---
+  duration_ms: 0.437107
+  type: 'test'
+  ...
+# Subtest: document quality: invoice identifier letters and separators are never eaten as label prefixes
+ok 18 - document quality: invoice identifier letters and separators are never eaten as label prefixes
+  ---
+  duration_ms: 0.200317
+  type: 'test'
+  ...
+# Subtest: document quality: terms heading with an explicit invoice number remains reviewable (1 250,00 SEK)
+ok 19 - document quality: terms heading with an explicit invoice number remains reviewable (1 250,00 SEK)
+  ---
+  duration_ms: 0.147328
+  type: 'test'
+  ...
+# Subtest: document quality: terms heading with an explicit invoice number remains reviewable (oläsligt)
+ok 20 - document quality: terms heading with an explicit invoice number remains reviewable (oläsligt)
+  ---
+  duration_ms: 0.073558
+  type: 'test'
+  ...
+# Subtest: document quality: clear terms and payroll still stay outside the invoice queue
+ok 21 - document quality: clear terms and payroll still stay outside the invoice queue
+  ---
+  duration_ms: 0.568463
+  type: 'test'
+  ...
+# Subtest: document quality: conflicting document context requires review: Betalningspåminnelse för faktura 0594
+ok 22 - document quality: conflicting document context requires review: Betalningspåminnelse för faktura 0594
+  ---
+  duration_ms: 0.955104
+  type: 'test'
+  ...
+# Subtest: document quality: conflicting document context requires review: Payment confirmation for invoice 0594
+ok 23 - document quality: conflicting document context requires review: Payment confirmation for invoice 0594
+  ---
+  duration_ms: 0.838362
+  type: 'test'
+  ...
+# Subtest: document quality: conflicting document context requires review: Receipt for invoice 0594
+ok 24 - document quality: conflicting document context requires review: Receipt for invoice 0594
+  ---
+  duration_ms: 0.805733
+  type: 'test'
+  ...
+# Subtest: document quality: conflicting document context requires review: Lön oktober
+ok 25 - document quality: conflicting document context requires review: Lön oktober
+  ---
+  duration_ms: 0.770211
+  type: 'test'
+  ...
+# Subtest: document quality: an unreadable standalone logo-named scan remains reviewable
+ok 26 - document quality: an unreadable standalone logo-named scan remains reviewable
+  ---
+  duration_ms: 0.804101
+  type: 'test'
+  ...
+# Subtest: document quality: verified Sites original can still register once
+ok 27 - document quality: verified Sites original can still register once
+  ---
+  duration_ms: 262.70565
+  type: 'test'
+  ...
+# Subtest: document quality: Sites original bytes mismatch cannot produce trusted PDF evidence
+ok 28 - document quality: Sites original bytes mismatch cannot produce trusted PDF evidence
+  ---
+  duration_ms: 107.264195
+  type: 'test'
+  ...
+# Subtest: document quality: Sites original missing hash mismatch cannot produce trusted PDF evidence
+ok 29 - document quality: Sites original missing hash mismatch cannot produce trusted PDF evidence
+  ---
+  duration_ms: 100.857827
+  type: 'test'
+  ...
+# Subtest: document quality: Sites original size mismatch cannot produce trusted PDF evidence
+ok 30 - document quality: Sites original size mismatch cannot produce trusted PDF evidence
+  ---
+  duration_ms: 86.042043
+  type: 'test'
+  ...
+# Subtest: document quality: Sites Gmail retains uncertain supported attachments and skips only inline decoration
+ok 31 - document quality: Sites Gmail retains uncertain supported attachments and skips only inline decoration
+  ---
+  duration_ms: 15.518865
+  type: 'test'
+  ...
+# Subtest: Q8: selecting a Gmail document opens its original using reads only
+ok 32 - Q8: selecting a Gmail document opens its original using reads only
+  ---
+  duration_ms: 204.382129
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: high
+ok 33 - Gmail preview preserves original-bound bankgiro words through its contextual parser: high
+  ---
+  duration_ms: 84.456385
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: low
+ok 34 - Gmail preview preserves original-bound bankgiro words through its contextual parser: low
+  ---
+  duration_ms: 69.325696
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: missing
+ok 35 - Gmail preview preserves original-bound bankgiro words through its contextual parser: missing
+  ---
+  duration_ms: 56.893304
+  type: 'test'
+  ...
+# Subtest: Gmail preview preserves original-bound bankgiro words through its contextual parser: other-original
+ok 36 - Gmail preview preserves original-bound bankgiro words through its contextual parser: other-original
+  ---
+  duration_ms: 54.755887
+  type: 'test'
+  ...
+# Subtest: Gmail preview interprets complete bounded OCR text beyond the display excerpt: supported value
+ok 37 - Gmail preview interprets complete bounded OCR text beyond the display excerpt: supported value
+  ---
+  duration_ms: 124.399414
+  type: 'test'
+  ...
+# Subtest: Gmail preview interprets complete bounded OCR text beyond the display excerpt: late conflict
+ok 38 - Gmail preview interprets complete bounded OCR text beyond the display excerpt: late conflict
+  ---
+  duration_ms: 113.920064
+  type: 'test'
+  ...
+# Subtest: Q8: explicit approval sends original extraction with the separately corrected invoice fields
+ok 39 - Q8: explicit approval sends original extraction with the separately corrected invoice fields
+  ---
+  duration_ms: 56.546239
+  type: 'test'
+  ...
+# Subtest: Q8: explicit rejection sends the displayed original extraction once
+ok 40 - Q8: explicit rejection sends the displayed original extraction once
+  ---
+  duration_ms: 58.266998
+  type: 'test'
+  ...
+# Subtest: Q8: preview uses retained first extraction when no later worker extraction exists
+ok 41 - Q8: preview uses retained first extraction when no later worker extraction exists
+  ---
+  duration_ms: 46.390819
+  type: 'test'
+  ...
+# Subtest: Q8: preview uses the latest worker extraction while retaining the prior source separately
+ok 42 - Q8: preview uses the latest worker extraction while retaining the prior source separately
+  ---
+  duration_ms: 46.527901
+  type: 'test'
+  ...
+# Subtest: Q8: registration UI keeps the committed outcome and reports a pending after-check
+ok 43 - Q8: registration UI keeps the committed outcome and reports a pending after-check
+  ---
+  duration_ms: 58.132638
+  type: 'test'
+  ...
+# Subtest: Q8: a reloaded OCR status retains the registration after-check warning
+ok 44 - Q8: a reloaded OCR status retains the registration after-check warning
+  ---
+  duration_ms: 18.176971
+  type: 'test'
+  ...
+# Subtest: Q8 review: processing UI reports a metadata warning while keeping the accepted work visible
+ok 45 - Q8 review: processing UI reports a metadata warning while keeping the accepted work visible
+  ---
+  duration_ms: 48.767508
+  type: 'test'
+  ...
+# Subtest: Q8 finalizer: Gmail sync UI retains the accepted count and uncertain final-status warning
+ok 46 - Q8 finalizer: Gmail sync UI retains the accepted count and uncertain final-status warning
+  ---
+  duration_ms: 59.346917
+  type: 'test'
+  ...
+# Subtest: Q8: review diagnostics explain overlap and coverage without presenting old extraction as a new verification
+ok 47 - Q8: review diagnostics explain overlap and coverage without presenting old extraction as a new verification
+  ---
+  duration_ms: 9.927554
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted sync updates the parent revision and retains metadata warnings
+ok 48 - Gmail workspace refresh: accepted sync updates the parent revision and retains metadata warnings
+  ---
+  duration_ms: 50.148152
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted process updates the parent revision and retains metadata warnings
+ok 49 - Gmail workspace refresh: accepted process updates the parent revision and retains metadata warnings
+  ---
+  duration_ms: 50.217115
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted retry updates the parent revision and retains metadata warnings
+ok 50 - Gmail workspace refresh: accepted retry updates the parent revision and retains metadata warnings
+  ---
+  duration_ms: 50.508135
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: approve waits for an asynchronous parent refresh before completing
+ok 51 - Gmail workspace refresh: approve waits for an asynchronous parent refresh before completing
+  ---
+  duration_ms: 52.098112
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: reject waits for an asynchronous parent refresh before completing
+ok 52 - Gmail workspace refresh: reject waits for an asynchronous parent refresh before completing
+  ---
+  duration_ms: 61.095202
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: accepted processing still updates the parent after local status fails
+ok 53 - Gmail workspace refresh: accepted processing still updates the parent after local status fails
+  ---
+  duration_ms: 48.403128
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: a rejected asynchronous parent refresh is handled after accepted registration
+ok 54 - Gmail workspace refresh: a rejected asynchronous parent refresh is handled after accepted registration
+  ---
+  duration_ms: 61.994363
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed sync (HTTP) leaves the parent revision unchanged
+ok 55 - Gmail workspace refresh: failed sync (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 45.717801
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed sync (transport) leaves the parent revision unchanged
+ok 56 - Gmail workspace refresh: failed sync (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 50.678168
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed process (HTTP) leaves the parent revision unchanged
+ok 57 - Gmail workspace refresh: failed process (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 62.899278
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed process (transport) leaves the parent revision unchanged
+ok 58 - Gmail workspace refresh: failed process (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 43.048509
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed retry (HTTP) leaves the parent revision unchanged
+ok 59 - Gmail workspace refresh: failed retry (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 37.507991
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed retry (transport) leaves the parent revision unchanged
+ok 60 - Gmail workspace refresh: failed retry (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 36.252693
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed reject (HTTP) leaves the parent revision unchanged
+ok 61 - Gmail workspace refresh: failed reject (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 39.161472
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed reject (transport) leaves the parent revision unchanged
+ok 62 - Gmail workspace refresh: failed reject (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 45.698202
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed approve (HTTP) leaves the parent revision unchanged
+ok 63 - Gmail workspace refresh: failed approve (HTTP) leaves the parent revision unchanged
+  ---
+  duration_ms: 36.600878
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: failed approve (transport) leaves the parent revision unchanged
+ok 64 - Gmail workspace refresh: failed approve (transport) leaves the parent revision unchanged
+  ---
+  duration_ms: 35.774154
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: an accepted retry refreshes its changed queue even when processing fails
+ok 65 - Gmail workspace refresh: an accepted retry refreshes its changed queue even when processing fails
+  ---
+  duration_ms: 33.422711
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: rate-limited sync retains its error while accepted document processing refreshes both workspaces
+ok 66 - Gmail workspace refresh: rate-limited sync retains its error while accepted document processing refreshes both workspaces
+  ---
+  duration_ms: 36.450446
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: cumulative processing status in a rejected sync does not fabricate accepted work
+ok 67 - Gmail workspace refresh: cumulative processing status in a rejected sync does not fabricate accepted work
+  ---
+  duration_ms: 48.807428
+  type: 'test'
+  ...
+# Subtest: Gmail workspace refresh: partial processing clears an earlier sync success and awaits the parent before retaining the sync error
+ok 68 - Gmail workspace refresh: partial processing clears an earlier sync success and awaits the parent before retaining the sync error
+  ---
+  duration_ms: 36.867033
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: explicit separately labelled invoice and OCR
+ok 69 - Q8 Sites synthetic invoice identity: explicit separately labelled invoice and OCR
+  ---
+  duration_ms: 47.417458
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: explicit inline values separate invoice and OCR headings
+ok 70 - Q8 Sites synthetic invoice identity: explicit inline values separate invoice and OCR headings
+  ---
+  duration_ms: 4.772378
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: invoice and OCR columns need spatial review
+ok 71 - Q8 Sites synthetic invoice identity: invoice and OCR columns need spatial review
+  ---
+  duration_ms: 1.290091
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: reversed OCR and invoice columns need spatial review
+ok 72 - Q8 Sites synthetic invoice identity: reversed OCR and invoice columns need spatial review
+  ---
+  duration_ms: 0.877049
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: column identifiers are never guessed from text order
+ok 73 - Q8 Sites synthetic invoice identity: column identifiers are never guessed from text order
+  ---
+  duration_ms: 0.893443
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: separate next-line invoice number
+ok 74 - Q8 Sites synthetic invoice identity: separate next-line invoice number
+  ---
+  duration_ms: 0.753296
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: legitimate OCR-prefixed invoice identity
+ok 75 - Q8 Sites synthetic invoice identity: legitimate OCR-prefixed invoice identity
+  ---
+  duration_ms: 0.757522
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: legitimate slashed invoice identity
+ok 76 - Q8 Sites synthetic invoice identity: legitimate slashed invoice identity
+  ---
+  duration_ms: 0.743501
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: legitimate slashed OCR-prefixed invoice identity
+ok 77 - Q8 Sites synthetic invoice identity: legitimate slashed OCR-prefixed invoice identity
+  ---
+  duration_ms: 0.828897
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: maximum supported identifier is complete
+ok 78 - Q8 Sites synthetic invoice identity: maximum supported identifier is complete
+  ---
+  duration_ms: 0.91129
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: missing value cannot consume the OCR label
+ok 79 - Q8 Sites synthetic invoice identity: missing value cannot consume the OCR label
+  ---
+  duration_ms: 0.689201
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: missing value cannot consume a supplier label
+ok 80 - Q8 Sites synthetic invoice identity: missing value cannot consume a supplier label
+  ---
+  duration_ms: 0.671605
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: an incomplete column pair stays unresolved
+ok 81 - Q8 Sites synthetic invoice identity: an incomplete column pair stays unresolved
+  ---
+  duration_ms: 0.694328
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: an extra column value stays unresolved
+ok 82 - Q8 Sites synthetic invoice identity: an extra column value stays unresolved
+  ---
+  duration_ms: 0.604816
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: non-numeric OCR column stays unresolved
+ok 83 - Q8 Sites synthetic invoice identity: non-numeric OCR column stays unresolved
+  ---
+  duration_ms: 0.574861
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: combined invoice/OCR heading stays unresolved
+ok 84 - Q8 Sites synthetic invoice identity: combined invoice/OCR heading stays unresolved
+  ---
+  duration_ms: 0.757913
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: long identifier cannot be truncated
+ok 85 - Q8 Sites synthetic invoice identity: long identifier cannot be truncated
+  ---
+  duration_ms: 0.623473
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: unsupported punctuation cannot create an identifier prefix
+ok 86 - Q8 Sites synthetic invoice identity: unsupported punctuation cannot create an identifier prefix
+  ---
+  duration_ms: 0.593399
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: valid occurrence cannot erase an unreadable second invoice number
+ok 87 - Q8 Sites synthetic invoice identity: valid occurrence cannot erase an unreadable second invoice number
+  ---
+  duration_ms: 0.647239
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: valid occurrence cannot erase an overlong second invoice number
+ok 88 - Q8 Sites synthetic invoice identity: valid occurrence cannot erase an overlong second invoice number
+  ---
+  duration_ms: 0.659848
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: a conflicting direct number and column number remain held
+ok 89 - Q8 Sites synthetic invoice identity: a conflicting direct number and column number remain held
+  ---
+  duration_ms: 0.635441
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: punctuated OCR and invoice columns
+ok 90 - Q8 Sites synthetic invoice identity: punctuated OCR and invoice columns
+  ---
+  duration_ms: 0.790961
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: abbreviated dotted invoice heading
+ok 91 - Q8 Sites synthetic invoice identity: abbreviated dotted invoice heading
+  ---
+  duration_ms: 0.74251
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: three column headings do not establish identity
+ok 92 - Q8 Sites synthetic invoice identity: three column headings do not establish identity
+  ---
+  duration_ms: 0.757692
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: customer heading between invoice and OCR columns
+ok 93 - Q8 Sites synthetic invoice identity: customer heading between invoice and OCR columns
+  ---
+  duration_ms: 0.55348
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: page heading between invoice and OCR columns
+ok 94 - Q8 Sites synthetic invoice identity: page heading between invoice and OCR columns
+  ---
+  duration_ms: 0.612256
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: invoice and OCR heading list across lines
+ok 95 - Q8 Sites synthetic invoice identity: invoice and OCR heading list across lines
+  ---
+  duration_ms: 0.626788
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: punctuated heading list across lines
+ok 96 - Q8 Sites synthetic invoice identity: punctuated heading list across lines
+  ---
+  duration_ms: 0.546279
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: spaced slash between OCR and invoice headings
+ok 97 - Q8 Sites synthetic invoice identity: spaced slash between OCR and invoice headings
+  ---
+  duration_ms: 0.565367
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: unspaced slash between OCR and invoice headings
+ok 98 - Q8 Sites synthetic invoice identity: unspaced slash between OCR and invoice headings
+  ---
+  duration_ms: 0.562763
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: pipe between OCR and invoice headings
+ok 99 - Q8 Sites synthetic invoice identity: pipe between OCR and invoice headings
+  ---
+  duration_ms: 0.597605
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice identity: semicolon between OCR and invoice headings
+ok 100 - Q8 Sites synthetic invoice identity: semicolon between OCR and invoice headings
+  ---
+  duration_ms: 0.583434
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: explicit Swedish hyphen dates
+ok 101 - Q8 Sites synthetic Swedish invoice date: explicit Swedish hyphen dates
+  ---
+  duration_ms: 0.732235
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: padded Swedish hyphen dates
+ok 102 - Q8 Sites synthetic Swedish invoice date: padded Swedish hyphen dates
+  ---
+  duration_ms: 0.56747
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: leap day remains a real calendar date
+ok 103 - Q8 Sites synthetic Swedish invoice date: leap day remains a real calendar date
+  ---
+  duration_ms: 0.552228
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: invalid leap day stays unknown
+ok 104 - Q8 Sites synthetic Swedish invoice date: invalid leap day stays unknown
+  ---
+  duration_ms: 0.738934
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: invalid month stays unknown
+ok 105 - Q8 Sites synthetic Swedish invoice date: invalid month stays unknown
+  ---
+  duration_ms: 0.582122
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: mixed date delimiters stay unknown
+ok 106 - Q8 Sites synthetic Swedish invoice date: mixed date delimiters stay unknown
+  ---
+  duration_ms: 0.551757
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: trailing year digits cannot be truncated
+ok 107 - Q8 Sites synthetic Swedish invoice date: trailing year digits cannot be truncated
+  ---
+  duration_ms: 0.520842
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic Swedish invoice date: a valid date cannot erase another invalid labelled date
+ok 108 - Q8 Sites synthetic Swedish invoice date: a valid date cannot erase another invalid labelled date
+  ---
+  duration_ms: 0.693617
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice money unit: spaced VAT percentage cannot masquerade as a monetary amount
+ok 109 - Q8 Sites synthetic invoice money unit: spaced VAT percentage cannot masquerade as a monetary amount
+  ---
+  duration_ms: 0.760687
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice money unit: unspaced VAT percentage remains unresolved
+ok 110 - Q8 Sites synthetic invoice money unit: unspaced VAT percentage remains unresolved
+  ---
+  duration_ms: 0.722541
+  type: 'test'
+  ...
+# Subtest: Q8 Sites synthetic invoice money unit: decimal VAT percentage cannot masquerade as a monetary amount
+ok 111 - Q8 Sites synthetic invoice money unit: decimal VAT percentage cannot masquerade as a monetary amount
+  ---
+  duration_ms: 3.90266
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix -Fakturadatum retains ambiguity
+ok 112 - exact invoice field must remain reviewable: date label census prefix -Fakturadatum retains ambiguity
+  ---
+  duration_ms: 0.707818
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix _Fakturadatum retains ambiguity
+ok 113 - exact invoice field must remain reviewable: date label census prefix _Fakturadatum retains ambiguity
+  ---
+  duration_ms: 0.54682
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix AFakturadatum retains ambiguity
+ok 114 - exact invoice field must remain reviewable: date label census prefix AFakturadatum retains ambiguity
+  ---
+  duration_ms: 0.666678
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix 1Fakturadatum retains ambiguity
+ok 115 - exact invoice field must remain reviewable: date label census prefix 1Fakturadatum retains ambiguity
+  ---
+  duration_ms: 0.582853
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix /Fakturadatum retains ambiguity
+ok 116 - exact invoice field must remain reviewable: date label census prefix /Fakturadatum retains ambiguity
+  ---
+  duration_ms: 0.489325
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix -Förfallodatum retains ambiguity
+ok 117 - exact invoice field must remain reviewable: date label census prefix -Förfallodatum retains ambiguity
+  ---
+  duration_ms: 0.658666
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix _Förfallodatum retains ambiguity
+ok 118 - exact invoice field must remain reviewable: date label census prefix _Förfallodatum retains ambiguity
+  ---
+  duration_ms: 0.591747
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix AFörfallodatum retains ambiguity
+ok 119 - exact invoice field must remain reviewable: date label census prefix AFörfallodatum retains ambiguity
+  ---
+  duration_ms: 0.649742
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix 1Förfallodatum retains ambiguity
+ok 120 - exact invoice field must remain reviewable: date label census prefix 1Förfallodatum retains ambiguity
+  ---
+  duration_ms: 0.637404
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census prefix /Förfallodatum retains ambiguity
+ok 121 - exact invoice field must remain reviewable: date label census prefix /Förfallodatum retains ambiguity
+  ---
+  duration_ms: 0.652056
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Fakturadatum retains 2026-11-09 ???
+ok 122 - exact invoice field must remain reviewable: date label census Fakturadatum retains 2026-11-09 ???
+  ---
+  duration_ms: 0.470086
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Fakturadatum retains - 2026-11-09 ???
+ok 123 - exact invoice field must remain reviewable: date label census Fakturadatum retains - 2026-11-09 ???
+  ---
+  duration_ms: 0.651425
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Fakturadatum retains ???
+ok 124 - exact invoice field must remain reviewable: date label census Fakturadatum retains ???
+  ---
+  duration_ms: 0.564746
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Invoice date retains 2026-11-09 ???
+ok 125 - exact invoice field must remain reviewable: date label census Invoice date retains 2026-11-09 ???
+  ---
+  duration_ms: 0.494212
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Invoice date retains - 2026-11-09 ???
+ok 126 - exact invoice field must remain reviewable: date label census Invoice date retains - 2026-11-09 ???
+  ---
+  duration_ms: 0.561632
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Invoice date retains ???
+ok 127 - exact invoice field must remain reviewable: date label census Invoice date retains ???
+  ---
+  duration_ms: 0.598506
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Förfallodatum retains 2026-11-09 ???
+ok 128 - exact invoice field must remain reviewable: date label census Förfallodatum retains 2026-11-09 ???
+  ---
+  duration_ms: 0.591476
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Förfallodatum retains - 2026-11-09 ???
+ok 129 - exact invoice field must remain reviewable: date label census Förfallodatum retains - 2026-11-09 ???
+  ---
+  duration_ms: 0.540671
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Förfallodatum retains ???
+ok 130 - exact invoice field must remain reviewable: date label census Förfallodatum retains ???
+  ---
+  duration_ms: 0.603925
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Due date retains 2026-11-09 ???
+ok 131 - exact invoice field must remain reviewable: date label census Due date retains 2026-11-09 ???
+  ---
+  duration_ms: 0.550325
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Due date retains - 2026-11-09 ???
+ok 132 - exact invoice field must remain reviewable: date label census Due date retains - 2026-11-09 ???
+  ---
+  duration_ms: 0.635712
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Due date retains ???
+ok 133 - exact invoice field must remain reviewable: date label census Due date retains ???
+  ---
+  duration_ms: 0.45933
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Betalas senast retains 2026-11-09 ???
+ok 134 - exact invoice field must remain reviewable: date label census Betalas senast retains 2026-11-09 ???
+  ---
+  duration_ms: 0.597434
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Betalas senast retains - 2026-11-09 ???
+ok 135 - exact invoice field must remain reviewable: date label census Betalas senast retains - 2026-11-09 ???
+  ---
+  duration_ms: 0.53291
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: date label census Betalas senast retains ???
+ok 136 - exact invoice field must remain reviewable: date label census Betalas senast retains ???
+  ---
+  duration_ms: 0.805694
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date issued_at rejects suffix ; 2026-11-09
+ok 137 - exact invoice field must remain reviewable: complete date issued_at rejects suffix ; 2026-11-09
+  ---
+  duration_ms: 0.612858
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date issued_at rejects suffix , 2026-11-09
+ok 138 - exact invoice field must remain reviewable: complete date issued_at rejects suffix , 2026-11-09
+  ---
+  duration_ms: 0.563885
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date issued_at rejects suffix  ???
+ok 139 - exact invoice field must remain reviewable: complete date issued_at rejects suffix  ???
+  ---
+  duration_ms: 0.548032
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate ; 2026-11-09
+ok 140 - exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate ; 2026-11-09
+  ---
+  duration_ms: 0.546279
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate , 2026-11-09
+ok 141 - exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate , 2026-11-09
+  ---
+  duration_ms: 0.518497
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate  ???
+ok 142 - exact invoice field must remain reviewable: complete date issued_at rejects a malformed duplicate  ???
+  ---
+  duration_ms: 0.547792
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date due_at rejects suffix ; 2026-11-09
+ok 143 - exact invoice field must remain reviewable: complete date due_at rejects suffix ; 2026-11-09
+  ---
+  duration_ms: 0.543295
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date due_at rejects suffix , 2026-11-09
+ok 144 - exact invoice field must remain reviewable: complete date due_at rejects suffix , 2026-11-09
+  ---
+  duration_ms: 0.762149
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date due_at rejects suffix  ???
+ok 145 - exact invoice field must remain reviewable: complete date due_at rejects suffix  ???
+  ---
+  duration_ms: 0.705445
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate ; 2026-11-09
+ok 146 - exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate ; 2026-11-09
+  ---
+  duration_ms: 0.679857
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate , 2026-11-09
+ok 147 - exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate , 2026-11-09
+  ---
+  duration_ms: 0.531558
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate  ???
+ok 148 - exact invoice field must remain reviewable: complete date due_at rejects a malformed duplicate  ???
+  ---
+  duration_ms: 0.549454
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence integer amount columns
+ok 149 - exact invoice field must remain reviewable: complete evidence integer amount columns
+  ---
+  duration_ms: 0.565648
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence character-spaced integer amount
+ok 150 - exact invoice field must remain reviewable: complete evidence character-spaced integer amount
+  ---
+  duration_ms: 0.542974
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence incorrect monetary thousand groups
+ok 151 - exact invoice field must remain reviewable: complete evidence incorrect monetary thousand groups
+  ---
+  duration_ms: 0.492129
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence consistent integer amount columns
+ok 152 - exact invoice field must remain reviewable: complete evidence consistent integer amount columns
+  ---
+  duration_ms: 0.569273
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence Bankgiro numeric suffix
+ok 153 - exact invoice field must remain reviewable: complete evidence Bankgiro numeric suffix
+  ---
+  duration_ms: 0.609212
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence organization numeric suffix
+ok 154 - exact invoice field must remain reviewable: complete evidence organization numeric suffix
+  ---
+  duration_ms: 0.723171
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence unreadable duplicate Bankgiro
+ok 155 - exact invoice field must remain reviewable: complete evidence unreadable duplicate Bankgiro
+  ---
+  duration_ms: 0.631686
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence unreadable duplicate organization
+ok 156 - exact invoice field must remain reviewable: complete evidence unreadable duplicate organization
+  ---
+  duration_ms: 0.61417
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: complete evidence formatted organization checksum
+ok 157 - exact invoice field must remain reviewable: complete evidence formatted organization checksum
+  ---
+  duration_ms: 12.233078
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: unreadable explicit currency label
+ok 158 - exact invoice field must remain reviewable: unreadable explicit currency label
+  ---
+  duration_ms: 0.837981
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: known explicit currency prefix with junk
+ok 159 - exact invoice field must remain reviewable: known explicit currency prefix with junk
+  ---
+  duration_ms: 1.789551
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: unreadable hyphen-delimited duplicate invoice identity
+ok 160 - exact invoice field must remain reviewable: unreadable hyphen-delimited duplicate invoice identity
+  ---
+  duration_ms: 0.582773
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: unreadable same-line explicit VAT label
+ok 161 - exact invoice field must remain reviewable: unreadable same-line explicit VAT label
+  ---
+  duration_ms: 0.552508
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: unreadable same-line explicit net label
+ok 162 - exact invoice field must remain reviewable: unreadable same-line explicit net label
+  ---
+  duration_ms: 0.523986
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: two invoice identities on one line
+ok 163 - exact invoice field must remain reviewable: two invoice identities on one line
+  ---
+  duration_ms: 0.645976
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: two invoice identities in adjacent columns
+ok 164 - exact invoice field must remain reviewable: two invoice identities in adjacent columns
+  ---
+  duration_ms: 0.558177
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: unreadable second OCR
+ok 165 - exact invoice field must remain reviewable: unreadable second OCR
+  ---
+  duration_ms: 0.605397
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: unreadable first OCR
+ok 166 - exact invoice field must remain reviewable: unreadable first OCR
+  ---
+  duration_ms: 0.584986
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: literal unreadable OCR
+ok 167 - exact invoice field must remain reviewable: literal unreadable OCR
+  ---
+  duration_ms: 0.624204
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: OCR with alphabetic suffix
+ok 168 - exact invoice field must remain reviewable: OCR with alphabetic suffix
+  ---
+  duration_ms: 0.875497
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: OCR with decimal suffix
+ok 169 - exact invoice field must remain reviewable: OCR with decimal suffix
+  ---
+  duration_ms: 0.508032
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: OCR with slash suffix
+ok 170 - exact invoice field must remain reviewable: OCR with slash suffix
+  ---
+  duration_ms: 0.440813
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: OCR with unsupported punctuation
+ok 171 - exact invoice field must remain reviewable: OCR with unsupported punctuation
+  ---
+  duration_ms: 0.876898
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: OCR exceeding complete token limit
+ok 172 - exact invoice field must remain reviewable: OCR exceeding complete token limit
+  ---
+  duration_ms: 0.61464
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: two OCR values without distinct labels
+ok 173 - exact invoice field must remain reviewable: two OCR values without distinct labels
+  ---
+  duration_ms: 0.483136
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: malformed generic reference suffix
+ok 174 - exact invoice field must remain reviewable: malformed generic reference suffix
+  ---
+  duration_ms: 1.161169
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: two totals without distinct labels
+ok 175 - exact invoice field must remain reviewable: two totals without distinct labels
+  ---
+  duration_ms: 0.460753
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: two totals in adjacent columns
+ok 176 - exact invoice field must remain reviewable: two totals in adjacent columns
+  ---
+  duration_ms: 0.491157
+  type: 'test'
+  ...
+# Subtest: exact invoice field must remain reviewable: mixed-case conflicting currency
+ok 177 - exact invoice field must remain reviewable: mixed-case conflicting currency
+  ---
+  duration_ms: 0.48596
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix -Fakturadatum retains a direct date
+ok 178 - exact invoice field preserves ordinary evidence: date label census prefix -Fakturadatum retains a direct date
+  ---
+  duration_ms: 0.692826
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix _Fakturadatum retains a direct date
+ok 179 - exact invoice field preserves ordinary evidence: date label census prefix _Fakturadatum retains a direct date
+  ---
+  duration_ms: 0.497077
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix AFakturadatum retains a direct date
+ok 180 - exact invoice field preserves ordinary evidence: date label census prefix AFakturadatum retains a direct date
+  ---
+  duration_ms: 0.460773
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix 1Fakturadatum retains a direct date
+ok 181 - exact invoice field preserves ordinary evidence: date label census prefix 1Fakturadatum retains a direct date
+  ---
+  duration_ms: 0.472109
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix /Fakturadatum retains a direct date
+ok 182 - exact invoice field preserves ordinary evidence: date label census prefix /Fakturadatum retains a direct date
+  ---
+  duration_ms: 0.446892
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix -Förfallodatum retains a direct date
+ok 183 - exact invoice field preserves ordinary evidence: date label census prefix -Förfallodatum retains a direct date
+  ---
+  duration_ms: 0.527341
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix _Förfallodatum retains a direct date
+ok 184 - exact invoice field preserves ordinary evidence: date label census prefix _Förfallodatum retains a direct date
+  ---
+  duration_ms: 0.515353
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix AFörfallodatum retains a direct date
+ok 185 - exact invoice field preserves ordinary evidence: date label census prefix AFörfallodatum retains a direct date
+  ---
+  duration_ms: 0.515834
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix 1Förfallodatum retains a direct date
+ok 186 - exact invoice field preserves ordinary evidence: date label census prefix 1Förfallodatum retains a direct date
+  ---
+  duration_ms: 0.538097
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census prefix /Förfallodatum retains a direct date
+ok 187 - exact invoice field preserves ordinary evidence: date label census prefix /Förfallodatum retains a direct date
+  ---
+  duration_ms: 0.491859
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census Fakturadatum supports a direct value
+ok 188 - exact invoice field preserves ordinary evidence: date label census Fakturadatum supports a direct value
+  ---
+  duration_ms: 0.426832
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census Invoice date supports a direct value
+ok 189 - exact invoice field preserves ordinary evidence: date label census Invoice date supports a direct value
+  ---
+  duration_ms: 0.467071
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census Förfallodatum supports a direct value
+ok 190 - exact invoice field preserves ordinary evidence: date label census Förfallodatum supports a direct value
+  ---
+  duration_ms: 0.580761
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census Due date supports a direct value
+ok 191 - exact invoice field preserves ordinary evidence: date label census Due date supports a direct value
+  ---
+  duration_ms: 0.731373
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census Betalas senast supports a direct value
+ok 192 - exact invoice field preserves ordinary evidence: date label census Betalas senast supports a direct value
+  ---
+  duration_ms: 0.843129
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: date label census supports direct dates in semicolon-separated fields
+ok 193 - exact invoice field preserves ordinary evidence: date label census supports direct dates in semicolon-separated fields
+  ---
+  duration_ms: 0.733236
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete date inline labelled fields
+ok 194 - exact invoice field preserves ordinary evidence: complete date inline labelled fields
+  ---
+  duration_ms: 0.693257
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete date values immediately below labels
+ok 195 - exact invoice field preserves ordinary evidence: complete date values immediately below labels
+  ---
+  duration_ms: 0.578086
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete date character-spaced Swedish values
+ok 196 - exact invoice field preserves ordinary evidence: complete date character-spaced Swedish values
+  ---
+  duration_ms: 0.612307
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete date Swedish dot values
+ok 197 - exact invoice field preserves ordinary evidence: complete date Swedish dot values
+  ---
+  duration_ms: 0.462194
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete date known alternate inline labels
+ok 198 - exact invoice field preserves ordinary evidence: complete date known alternate inline labels
+  ---
+  duration_ms: 0.691474
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete date invoice date and number column layout
+ok 199 - exact invoice field preserves ordinary evidence: complete date invoice date and number column layout
+  ---
+  duration_ms: 0.707808
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete evidence proper monetary integer thousand groups
+ok 200 - exact invoice field preserves ordinary evidence: complete evidence proper monetary integer thousand groups
+  ---
+  duration_ms: 0.509014
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete evidence proper monetary plain integers
+ok 201 - exact invoice field preserves ordinary evidence: complete evidence proper monetary plain integers
+  ---
+  duration_ms: 0.706367
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete evidence proper monetary decimal dots
+ok 202 - exact invoice field preserves ordinary evidence: complete evidence proper monetary decimal dots
+  ---
+  duration_ms: 0.738083
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete evidence proper monetary dotted groups
+ok 203 - exact invoice field preserves ordinary evidence: complete evidence proper monetary dotted groups
+  ---
+  duration_ms: 0.595832
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete evidence formatted identifiers preserve raw evidence
+ok 204 - exact invoice field preserves ordinary evidence: complete evidence formatted identifiers preserve raw evidence
+  ---
+  duration_ms: 0.766616
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete evidence identical identifier duplicates
+ok 205 - exact invoice field preserves ordinary evidence: complete evidence identical identifier duplicates
+  ---
+  duration_ms: 0.834686
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: complete evidence same-line known identifier labels
+ok 206 - exact invoice field preserves ordinary evidence: complete evidence same-line known identifier labels
+  ---
+  duration_ms: 0.907454
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: net label before VAT word is one field
+ok 207 - exact invoice field preserves ordinary evidence: net label before VAT word is one field
+  ---
+  duration_ms: 0.83022
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: net-exclusive label before VAT word is one field
+ok 208 - exact invoice field preserves ordinary evidence: net-exclusive label before VAT word is one field
+  ---
+  duration_ms: 0.827896
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: total label including VAT word is one field
+ok 209 - exact invoice field preserves ordinary evidence: total label including VAT word is one field
+  ---
+  duration_ms: 1.165655
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: hyphen-delimited invoice identity
+ok 210 - exact invoice field preserves ordinary evidence: hyphen-delimited invoice identity
+  ---
+  duration_ms: 2.596837
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: explicit valid currency label
+ok 211 - exact invoice field preserves ordinary evidence: explicit valid currency label
+  ---
+  duration_ms: 0.83108
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: ordinary inline VAT rates and net prose
+ok 212 - exact invoice field preserves ordinary evidence: ordinary inline VAT rates and net prose
+  ---
+  duration_ms: 0.910148
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: character-spaced invoice digits
+ok 213 - exact invoice field preserves ordinary evidence: character-spaced invoice digits
+  ---
+  duration_ms: 0.815858
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: character-spaced OCR digits
+ok 214 - exact invoice field preserves ordinary evidence: character-spaced OCR digits
+  ---
+  duration_ms: 0.851031
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: OCR before semicolon-delimited Bankgiro label
+ok 215 - exact invoice field preserves ordinary evidence: OCR before semicolon-delimited Bankgiro label
+  ---
+  duration_ms: 0.816059
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: OCR before pipe-delimited Bankgiro label
+ok 216 - exact invoice field preserves ordinary evidence: OCR before pipe-delimited Bankgiro label
+  ---
+  duration_ms: 0.635612
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: OCR before same-line Bankgiro label
+ok 217 - exact invoice field preserves ordinary evidence: OCR before same-line Bankgiro label
+  ---
+  duration_ms: 0.644194
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: generic reference preserves separators
+ok 218 - exact invoice field preserves ordinary evidence: generic reference preserves separators
+  ---
+  duration_ms: 0.895506
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: same total before same-line OCR label
+ok 219 - exact invoice field preserves ordinary evidence: same total before same-line OCR label
+  ---
+  duration_ms: 0.528273
+  type: 'test'
+  ...
+# Subtest: exact invoice field preserves ordinary evidence: lowercase SEK is the same currency
+ok 220 - exact invoice field preserves ordinary evidence: lowercase SEK is the same currency
+  ---
+  duration_ms: 0.558456
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: filename complete 82-character identifier
+ok 221 - complete metadata identifier remains exact: filename complete 82-character identifier
+  ---
+  duration_ms: 2.354067
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: filename exact 80-character identifier
+ok 222 - complete metadata identifier remains exact: filename exact 80-character identifier
+  ---
+  duration_ms: 0.544506
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: filename exact leading zeros
+ok 223 - complete metadata identifier remains exact: filename exact leading zeros
+  ---
+  duration_ms: 0.537576
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: filename missing leading zeros is a conflict
+ok 224 - complete metadata identifier remains exact: filename missing leading zeros is a conflict
+  ---
+  duration_ms: 0.47951
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: subject complete 82-character identifier
+ok 225 - complete metadata identifier remains exact: subject complete 82-character identifier
+  ---
+  duration_ms: 0.637354
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: subject exact 80-character identifier
+ok 226 - complete metadata identifier remains exact: subject exact 80-character identifier
+  ---
+  duration_ms: 0.569243
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: subject exact leading zeros
+ok 227 - complete metadata identifier remains exact: subject exact leading zeros
+  ---
+  duration_ms: 0.534972
+  type: 'test'
+  ...
+# Subtest: complete metadata identifier remains exact: subject missing leading zeros is a conflict
+ok 228 - complete metadata identifier remains exact: subject missing leading zeros is a conflict
+  ---
+  duration_ms: 0.588041
+  type: 'test'
+  ...
+# Subtest: Q8 actual Sites PDF pipeline registers exact labelled identity and Swedish dates, then quarantines a second copy
+ok 229 - Q8 actual Sites PDF pipeline registers exact labelled identity and Swedish dates, then quarantines a second copy
+  ---
+  duration_ms: 365.854766
+  type: 'test'
+  ...
+# Subtest: Q8 actual Sites PDF pipeline never assigns invoice/OCR roles from content-stream order
+ok 230 - Q8 actual Sites PDF pipeline never assigns invoice/OCR roles from content-stream order
+  ---
+  duration_ms: 205.449986
+  type: 'test'
+  ...
+# Subtest: Q8 actual Sites PDFs with punctuated or multiline heading lists remain unregistered
+ok 231 - Q8 actual Sites PDFs with punctuated or multiline heading lists remain unregistered
+  ---
+  duration_ms: 860.52039
+  type: 'test'
+  ...
+# Subtest: Q8 actual Sites PDF cannot auto-register contradictory VAT using the percentage as its amount
+ok 232 - Q8 actual Sites PDF cannot auto-register contradictory VAT using the percentage as its amount
+  ---
+  duration_ms: 102.366722
+  type: 'test'
+  ...
+# Subtest: Q8 actual Sites PDF pipeline keeps a missing invoice number out of automatic registration
+ok 233 - Q8 actual Sites PDF pipeline keeps a missing invoice number out of automatic registration
+  ---
+  duration_ms: 89.0566
+  type: 'test'
+  ...
+# Subtest: Q8 actual Sites PDF pipeline still requires an explicitly verified counterparty
+ok 234 - Q8 actual Sites PDF pipeline still requires an explicitly verified counterparty
+  ---
+  duration_ms: 68.888128
+  type: 'test'
+  ...
+# Subtest: Q8 actual Sites PDF pipeline preserves credit and inconsistent VAT review requirements
+ok 235 - Q8 actual Sites PDF pipeline preserves credit and inconsistent VAT review requirements
+  ---
+  duration_ms: 194.374482
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix -Fakturadatum retains ambiguity
+ok 236 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix -Fakturadatum retains ambiguity
+  ---
+  duration_ms: 93.210161
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix _Fakturadatum retains ambiguity
+ok 237 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix _Fakturadatum retains ambiguity
+  ---
+  duration_ms: 98.884274
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix AFakturadatum retains ambiguity
+ok 238 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix AFakturadatum retains ambiguity
+  ---
+  duration_ms: 79.880689
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix 1Fakturadatum retains ambiguity
+ok 239 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix 1Fakturadatum retains ambiguity
+  ---
+  duration_ms: 79.268373
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix /Fakturadatum retains ambiguity
+ok 240 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix /Fakturadatum retains ambiguity
+  ---
+  duration_ms: 61.212881
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix -Förfallodatum retains ambiguity
+ok 241 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix -Förfallodatum retains ambiguity
+  ---
+  duration_ms: 65.537185
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix _Förfallodatum retains ambiguity
+ok 242 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix _Förfallodatum retains ambiguity
+  ---
+  duration_ms: 86.49163
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix AFörfallodatum retains ambiguity
+ok 243 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix AFörfallodatum retains ambiguity
+  ---
+  duration_ms: 59.256973
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix 1Förfallodatum retains ambiguity
+ok 244 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix 1Förfallodatum retains ambiguity
+  ---
+  duration_ms: 64.382194
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census prefix /Förfallodatum retains ambiguity
+ok 245 - actual Sites PDF cannot auto-register uncertain full fields: date label census prefix /Förfallodatum retains ambiguity
+  ---
+  duration_ms: 60.906587
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains 2026-11-09 ???
+ok 246 - actual Sites PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains 2026-11-09 ???
+  ---
+  duration_ms: 63.279792
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains - 2026-11-09 ???
+ok 247 - actual Sites PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains - 2026-11-09 ???
+  ---
+  duration_ms: 57.624176
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains ???
+ok 248 - actual Sites PDF cannot auto-register uncertain full fields: date label census Fakturadatum retains ???
+  ---
+  duration_ms: 73.262669
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Invoice date retains 2026-11-09 ???
+ok 249 - actual Sites PDF cannot auto-register uncertain full fields: date label census Invoice date retains 2026-11-09 ???
+  ---
+  duration_ms: 56.309739
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Invoice date retains - 2026-11-09 ???
+ok 250 - actual Sites PDF cannot auto-register uncertain full fields: date label census Invoice date retains - 2026-11-09 ???
+  ---
+  duration_ms: 57.341177
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Invoice date retains ???
+ok 251 - actual Sites PDF cannot auto-register uncertain full fields: date label census Invoice date retains ???
+  ---
+  duration_ms: 57.89085
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains 2026-11-09 ???
+ok 252 - actual Sites PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains 2026-11-09 ???
+  ---
+  duration_ms: 81.407797
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains - 2026-11-09 ???
+ok 253 - actual Sites PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains - 2026-11-09 ???
+  ---
+  duration_ms: 92.278266
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains ???
+ok 254 - actual Sites PDF cannot auto-register uncertain full fields: date label census Förfallodatum retains ???
+  ---
+  duration_ms: 79.571757
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Due date retains 2026-11-09 ???
+ok 255 - actual Sites PDF cannot auto-register uncertain full fields: date label census Due date retains 2026-11-09 ???
+  ---
+  duration_ms: 72.187548
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Due date retains - 2026-11-09 ???
+ok 256 - actual Sites PDF cannot auto-register uncertain full fields: date label census Due date retains - 2026-11-09 ???
+  ---
+  duration_ms: 61.93362
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Due date retains ???
+ok 257 - actual Sites PDF cannot auto-register uncertain full fields: date label census Due date retains ???
+  ---
+  duration_ms: 59.927027
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Betalas senast retains 2026-11-09 ???
+ok 258 - actual Sites PDF cannot auto-register uncertain full fields: date label census Betalas senast retains 2026-11-09 ???
+  ---
+  duration_ms: 70.553472
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Betalas senast retains - 2026-11-09 ???
+ok 259 - actual Sites PDF cannot auto-register uncertain full fields: date label census Betalas senast retains - 2026-11-09 ???
+  ---
+  duration_ms: 93.892339
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: date label census Betalas senast retains ???
+ok 260 - actual Sites PDF cannot auto-register uncertain full fields: date label census Betalas senast retains ???
+  ---
+  duration_ms: 78.796026
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix ; 2026-11-09
+ok 261 - actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix ; 2026-11-09
+  ---
+  duration_ms: 72.468891
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix , 2026-11-09
+ok 262 - actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix , 2026-11-09
+  ---
+  duration_ms: 81.06091
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix  ???
+ok 263 - actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects suffix  ???
+  ---
+  duration_ms: 78.410305
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate ; 2026-11-09
+ok 264 - actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate ; 2026-11-09
+  ---
+  duration_ms: 96.282218
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate , 2026-11-09
+ok 265 - actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate , 2026-11-09
+  ---
+  duration_ms: 109.492135
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate  ???
+ok 266 - actual Sites PDF cannot auto-register uncertain full fields: complete date issued_at rejects a malformed duplicate  ???
+  ---
+  duration_ms: 85.983975
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix ; 2026-11-09
+ok 267 - actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix ; 2026-11-09
+  ---
+  duration_ms: 84.507197
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix , 2026-11-09
+ok 268 - actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix , 2026-11-09
+  ---
+  duration_ms: 81.583786
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix  ???
+ok 269 - actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects suffix  ???
+  ---
+  duration_ms: 72.201335
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate ; 2026-11-09
+ok 270 - actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate ; 2026-11-09
+  ---
+  duration_ms: 80.461628
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate , 2026-11-09
+ok 271 - actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate , 2026-11-09
+  ---
+  duration_ms: 96.330771
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate  ???
+ok 272 - actual Sites PDF cannot auto-register uncertain full fields: complete date due_at rejects a malformed duplicate  ???
+  ---
+  duration_ms: 78.090496
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence integer amount columns
+ok 273 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence integer amount columns
+  ---
+  duration_ms: 80.467303
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence character-spaced integer amount
+ok 274 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence character-spaced integer amount
+  ---
+  duration_ms: 79.668579
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence incorrect monetary thousand groups
+ok 275 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence incorrect monetary thousand groups
+  ---
+  duration_ms: 80.292594
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence consistent integer amount columns
+ok 276 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence consistent integer amount columns
+  ---
+  duration_ms: 97.187283
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence Bankgiro numeric suffix
+ok 277 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence Bankgiro numeric suffix
+  ---
+  duration_ms: 82.44355
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence organization numeric suffix
+ok 278 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence organization numeric suffix
+  ---
+  duration_ms: 77.066199
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence unreadable duplicate Bankgiro
+ok 279 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence unreadable duplicate Bankgiro
+  ---
+  duration_ms: 83.51296
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence unreadable duplicate organization
+ok 280 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence unreadable duplicate organization
+  ---
+  duration_ms: 79.759854
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: complete evidence formatted organization checksum
+ok 281 - actual Sites PDF cannot auto-register uncertain full fields: complete evidence formatted organization checksum
+  ---
+  duration_ms: 70.755227
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: unreadable explicit currency label
+ok 282 - actual Sites PDF cannot auto-register uncertain full fields: unreadable explicit currency label
+  ---
+  duration_ms: 75.520254
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: known explicit currency prefix with junk
+ok 283 - actual Sites PDF cannot auto-register uncertain full fields: known explicit currency prefix with junk
+  ---
+  duration_ms: 79.683437
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: unreadable hyphen-delimited duplicate invoice identity
+ok 284 - actual Sites PDF cannot auto-register uncertain full fields: unreadable hyphen-delimited duplicate invoice identity
+  ---
+  duration_ms: 79.769828
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: unreadable same-line explicit VAT label
+ok 285 - actual Sites PDF cannot auto-register uncertain full fields: unreadable same-line explicit VAT label
+  ---
+  duration_ms: 90.138424
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: unreadable same-line explicit net label
+ok 286 - actual Sites PDF cannot auto-register uncertain full fields: unreadable same-line explicit net label
+  ---
+  duration_ms: 70.108838
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: two invoice identities on one line
+ok 287 - actual Sites PDF cannot auto-register uncertain full fields: two invoice identities on one line
+  ---
+  duration_ms: 86.299381
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: two invoice identities in adjacent columns
+ok 288 - actual Sites PDF cannot auto-register uncertain full fields: two invoice identities in adjacent columns
+  ---
+  duration_ms: 72.824611
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: unreadable second OCR
+ok 289 - actual Sites PDF cannot auto-register uncertain full fields: unreadable second OCR
+  ---
+  duration_ms: 69.374412
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: unreadable first OCR
+ok 290 - actual Sites PDF cannot auto-register uncertain full fields: unreadable first OCR
+  ---
+  duration_ms: 64.542474
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: literal unreadable OCR
+ok 291 - actual Sites PDF cannot auto-register uncertain full fields: literal unreadable OCR
+  ---
+  duration_ms: 68.222474
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: OCR with alphabetic suffix
+ok 292 - actual Sites PDF cannot auto-register uncertain full fields: OCR with alphabetic suffix
+  ---
+  duration_ms: 77.808205
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: OCR with decimal suffix
+ok 293 - actual Sites PDF cannot auto-register uncertain full fields: OCR with decimal suffix
+  ---
+  duration_ms: 92.355642
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: OCR with slash suffix
+ok 294 - actual Sites PDF cannot auto-register uncertain full fields: OCR with slash suffix
+  ---
+  duration_ms: 79.059117
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: OCR with unsupported punctuation
+ok 295 - actual Sites PDF cannot auto-register uncertain full fields: OCR with unsupported punctuation
+  ---
+  duration_ms: 79.177972
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: OCR exceeding complete token limit
+ok 296 - actual Sites PDF cannot auto-register uncertain full fields: OCR exceeding complete token limit
+  ---
+  duration_ms: 79.231733
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: two OCR values without distinct labels
+ok 297 - actual Sites PDF cannot auto-register uncertain full fields: two OCR values without distinct labels
+  ---
+  duration_ms: 79.395229
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: malformed generic reference suffix
+ok 298 - actual Sites PDF cannot auto-register uncertain full fields: malformed generic reference suffix
+  ---
+  duration_ms: 84.674636
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: two totals without distinct labels
+ok 299 - actual Sites PDF cannot auto-register uncertain full fields: two totals without distinct labels
+  ---
+  duration_ms: 69.480507
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: two totals in adjacent columns
+ok 300 - actual Sites PDF cannot auto-register uncertain full fields: two totals in adjacent columns
+  ---
+  duration_ms: 67.159601
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF cannot auto-register uncertain full fields: mixed-case conflicting currency
+ok 301 - actual Sites PDF cannot auto-register uncertain full fields: mixed-case conflicting currency
+  ---
+  duration_ms: 78.555575
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix -Fakturadatum retains a direct date
+ok 302 - actual Sites PDF registers exact full fields: date label census prefix -Fakturadatum retains a direct date
+  ---
+  duration_ms: 82.474526
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix _Fakturadatum retains a direct date
+ok 303 - actual Sites PDF registers exact full fields: date label census prefix _Fakturadatum retains a direct date
+  ---
+  duration_ms: 72.750632
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix AFakturadatum retains a direct date
+ok 304 - actual Sites PDF registers exact full fields: date label census prefix AFakturadatum retains a direct date
+  ---
+  duration_ms: 97.433254
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix 1Fakturadatum retains a direct date
+ok 305 - actual Sites PDF registers exact full fields: date label census prefix 1Fakturadatum retains a direct date
+  ---
+  duration_ms: 60.95514
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix /Fakturadatum retains a direct date
+ok 306 - actual Sites PDF registers exact full fields: date label census prefix /Fakturadatum retains a direct date
+  ---
+  duration_ms: 73.654071
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix -Förfallodatum retains a direct date
+ok 307 - actual Sites PDF registers exact full fields: date label census prefix -Förfallodatum retains a direct date
+  ---
+  duration_ms: 74.317512
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix _Förfallodatum retains a direct date
+ok 308 - actual Sites PDF registers exact full fields: date label census prefix _Förfallodatum retains a direct date
+  ---
+  duration_ms: 84.370374
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix AFörfallodatum retains a direct date
+ok 309 - actual Sites PDF registers exact full fields: date label census prefix AFörfallodatum retains a direct date
+  ---
+  duration_ms: 95.551435
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix 1Förfallodatum retains a direct date
+ok 310 - actual Sites PDF registers exact full fields: date label census prefix 1Förfallodatum retains a direct date
+  ---
+  duration_ms: 77.210519
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census prefix /Förfallodatum retains a direct date
+ok 311 - actual Sites PDF registers exact full fields: date label census prefix /Förfallodatum retains a direct date
+  ---
+  duration_ms: 76.000205
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census Fakturadatum supports a direct value
+ok 312 - actual Sites PDF registers exact full fields: date label census Fakturadatum supports a direct value
+  ---
+  duration_ms: 80.540411
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census Invoice date supports a direct value
+ok 313 - actual Sites PDF registers exact full fields: date label census Invoice date supports a direct value
+  ---
+  duration_ms: 85.664405
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census Förfallodatum supports a direct value
+ok 314 - actual Sites PDF registers exact full fields: date label census Förfallodatum supports a direct value
+  ---
+  duration_ms: 82.916416
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census Due date supports a direct value
+ok 315 - actual Sites PDF registers exact full fields: date label census Due date supports a direct value
+  ---
+  duration_ms: 100.534507
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census Betalas senast supports a direct value
+ok 316 - actual Sites PDF registers exact full fields: date label census Betalas senast supports a direct value
+  ---
+  duration_ms: 79.073894
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: date label census supports direct dates in semicolon-separated fields
+ok 317 - actual Sites PDF registers exact full fields: date label census supports direct dates in semicolon-separated fields
+  ---
+  duration_ms: 70.922168
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete date inline labelled fields
+ok 318 - actual Sites PDF registers exact full fields: complete date inline labelled fields
+  ---
+  duration_ms: 83.285797
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete date values immediately below labels
+ok 319 - actual Sites PDF registers exact full fields: complete date values immediately below labels
+  ---
+  duration_ms: 78.386379
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete date character-spaced Swedish values
+ok 320 - actual Sites PDF registers exact full fields: complete date character-spaced Swedish values
+  ---
+  duration_ms: 80.740067
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete date Swedish dot values
+ok 321 - actual Sites PDF registers exact full fields: complete date Swedish dot values
+  ---
+  duration_ms: 76.955439
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete date known alternate inline labels
+ok 322 - actual Sites PDF registers exact full fields: complete date known alternate inline labels
+  ---
+  duration_ms: 74.174112
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete date invoice date and number column layout
+ok 323 - actual Sites PDF registers exact full fields: complete date invoice date and number column layout
+  ---
+  duration_ms: 73.097366
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete evidence proper monetary integer thousand groups
+ok 324 - actual Sites PDF registers exact full fields: complete evidence proper monetary integer thousand groups
+  ---
+  duration_ms: 74.620282
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete evidence proper monetary plain integers
+ok 325 - actual Sites PDF registers exact full fields: complete evidence proper monetary plain integers
+  ---
+  duration_ms: 81.261488
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete evidence proper monetary decimal dots
+ok 326 - actual Sites PDF registers exact full fields: complete evidence proper monetary decimal dots
+  ---
+  duration_ms: 96.059139
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete evidence proper monetary dotted groups
+ok 327 - actual Sites PDF registers exact full fields: complete evidence proper monetary dotted groups
+  ---
+  duration_ms: 79.809858
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete evidence formatted identifiers preserve raw evidence
+ok 328 - actual Sites PDF registers exact full fields: complete evidence formatted identifiers preserve raw evidence
+  ---
+  duration_ms: 69.855323
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete evidence identical identifier duplicates
+ok 329 - actual Sites PDF registers exact full fields: complete evidence identical identifier duplicates
+  ---
+  duration_ms: 82.090927
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: complete evidence same-line known identifier labels
+ok 330 - actual Sites PDF registers exact full fields: complete evidence same-line known identifier labels
+  ---
+  duration_ms: 74.884483
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: net label before VAT word is one field
+ok 331 - actual Sites PDF registers exact full fields: net label before VAT word is one field
+  ---
+  duration_ms: 86.822305
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: net-exclusive label before VAT word is one field
+ok 332 - actual Sites PDF registers exact full fields: net-exclusive label before VAT word is one field
+  ---
+  duration_ms: 63.167497
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: total label including VAT word is one field
+ok 333 - actual Sites PDF registers exact full fields: total label including VAT word is one field
+  ---
+  duration_ms: 71.20276
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: hyphen-delimited invoice identity
+ok 334 - actual Sites PDF registers exact full fields: hyphen-delimited invoice identity
+  ---
+  duration_ms: 74.24193
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: explicit valid currency label
+ok 335 - actual Sites PDF registers exact full fields: explicit valid currency label
+  ---
+  duration_ms: 68.358717
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: ordinary inline VAT rates and net prose
+ok 336 - actual Sites PDF registers exact full fields: ordinary inline VAT rates and net prose
+  ---
+  duration_ms: 71.111955
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: character-spaced invoice digits
+ok 337 - actual Sites PDF registers exact full fields: character-spaced invoice digits
+  ---
+  duration_ms: 87.116121
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: character-spaced OCR digits
+ok 338 - actual Sites PDF registers exact full fields: character-spaced OCR digits
+  ---
+  duration_ms: 110.14358
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: OCR before semicolon-delimited Bankgiro label
+ok 339 - actual Sites PDF registers exact full fields: OCR before semicolon-delimited Bankgiro label
+  ---
+  duration_ms: 78.771872
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: OCR before pipe-delimited Bankgiro label
+ok 340 - actual Sites PDF registers exact full fields: OCR before pipe-delimited Bankgiro label
+  ---
+  duration_ms: 77.529775
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: OCR before same-line Bankgiro label
+ok 341 - actual Sites PDF registers exact full fields: OCR before same-line Bankgiro label
+  ---
+  duration_ms: 79.697903
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: generic reference preserves separators
+ok 342 - actual Sites PDF registers exact full fields: generic reference preserves separators
+  ---
+  duration_ms: 72.465995
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: same total before same-line OCR label
+ok 343 - actual Sites PDF registers exact full fields: same total before same-line OCR label
+  ---
+  duration_ms: 71.099667
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF registers exact full fields: lowercase SEK is the same currency
+ok 344 - actual Sites PDF registers exact full fields: lowercase SEK is the same currency
+  ---
+  duration_ms: 72.54763
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: filename complete 82-character identifier
+ok 345 - actual Sites PDF checks complete metadata identity: filename complete 82-character identifier
+  ---
+  duration_ms: 58.211116
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: filename exact 80-character identifier
+ok 346 - actual Sites PDF checks complete metadata identity: filename exact 80-character identifier
+  ---
+  duration_ms: 67.043228
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: filename exact leading zeros
+ok 347 - actual Sites PDF checks complete metadata identity: filename exact leading zeros
+  ---
+  duration_ms: 81.376159
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: filename missing leading zeros is a conflict
+ok 348 - actual Sites PDF checks complete metadata identity: filename missing leading zeros is a conflict
+  ---
+  duration_ms: 72.257877
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: subject complete 82-character identifier
+ok 349 - actual Sites PDF checks complete metadata identity: subject complete 82-character identifier
+  ---
+  duration_ms: 71.709449
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: subject exact 80-character identifier
+ok 350 - actual Sites PDF checks complete metadata identity: subject exact 80-character identifier
+  ---
+  duration_ms: 59.301862
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: subject exact leading zeros
+ok 351 - actual Sites PDF checks complete metadata identity: subject exact leading zeros
+  ---
+  duration_ms: 63.148244
+  type: 'test'
+  ...
+# Subtest: actual Sites PDF checks complete metadata identity: subject missing leading zeros is a conflict
+ok 352 - actual Sites PDF checks complete metadata identity: subject missing leading zeros is a conflict
+  ---
+  duration_ms: 73.619819
+  type: 'test'
+  ...
+1..352
+# tests 352
+# suites 0
+# pass 352
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16538.972215

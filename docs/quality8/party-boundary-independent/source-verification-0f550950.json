@@ -1,0 +1,55 @@
+{
+  "baseline": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+  "fix": "0f550950b99d41d932b91370b458e9b85abf9451",
+  "files": [
+    {
+      "path": "src/invoice-details.js",
+      "baselineSha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+      "fixSha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5",
+      "matchesFrozenFix": true,
+      "unchanged": false
+    },
+    {
+      "path": "sites/lib/invoice-details.js",
+      "baselineSha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+      "fixSha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5",
+      "matchesFrozenFix": true,
+      "unchanged": false
+    },
+    {
+      "path": "src/invoice-extraction.js",
+      "baselineSha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "fixSha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "matchesFrozenFix": true,
+      "unchanged": true
+    },
+    {
+      "path": "sites/lib/invoice-fields.js",
+      "baselineSha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "fixSha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "matchesFrozenFix": true,
+      "unchanged": true
+    },
+    {
+      "path": "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "baselineSha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "fixSha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "matchesFrozenFix": true,
+      "unchanged": true
+    },
+    {
+      "path": "sites/tests/party-role-name-grammar.test.mjs",
+      "baselineSha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "fixSha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "matchesFrozenFix": true,
+      "unchanged": true
+    },
+    {
+      "path": "sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "baselineSha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506",
+      "fixSha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506",
+      "matchesFrozenFix": true,
+      "unchanged": true
+    }
+  ]
+}

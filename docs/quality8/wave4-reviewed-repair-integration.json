@@ -1,0 +1,31 @@
+{
+  "schema": "wave4-reviewed-repair-integration-v1",
+  "sourceBeforeReviewArtifacts": "18bb111e60ba45a062924190ab0bc19144babcb8",
+  "bankReviewManifestFilesVerified": 26,
+  "bankAppendedCases": 1,
+  "bankAppendedBodySha256": "aec0ee2521a1b8f8a83846d9be54e99aa7ceec2378f9a95580b91c00f8a8334a",
+  "parserAddedCases": 12,
+  "parserOnlyAdaptation": "Module-relative repository root; all assertions and synthetic data byte-preserved. Original source retained as .txt.",
+  "sourceFiles": {
+    "src/invoice-details.js": {
+      "reviewedCommit": "63edd9fa97bc0475237133021313963e402efc76",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7"
+    },
+    "sites/lib/invoice-details.js": {
+      "reviewedCommit": "63edd9fa97bc0475237133021313963e402efc76",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7"
+    },
+    "sites/lib/bank-consent-policy.js": {
+      "reviewedCommit": "e66cde6767ebd232e2b966eb2b002193ea0a0999",
+      "sha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+    },
+    "sites/lib/banking/service.ts": {
+      "reviewedCommit": "e66cde6767ebd232e2b966eb2b002193ea0a0999",
+      "sha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24"
+    }
+  },
+  "bankReviewSha256": "94c91f1a1f2fcf638479bf4b3ed5c2b1ecece81289b3c989fe0311d2bd1c8c93",
+  "parserReviewSha256": "77f12b5013a3d2be8a45780a7e5bc184473782314f7fa903f3a555a9da25fdca",
+  "fullIntegratedCI": "pending",
+  "scoresChanged": false
+}

@@ -36,10 +36,13 @@ test('layout pairs columns by geometry even when OCR block order interleaves ano
   assert.deepEqual(textRows(result.text),['Fakturanummer SYN-9802','Leverantör Syntetisk Verkstad AB']);
 });
 
-test('layout does not attach a neighbouring OCR number to the payable amount label',()=>{
-  const result=apply(totalReferenceMix());
-  assert.deepEqual(textRows(result.text),['OCR 0065432109','Att betala 925,00 SEK']);
-  assert.ok(!result.text.includes('Att betala 0065432109'));
+test('layout holds the original when rightward and downward candidates compete across OCR and payable amount',()=>{
+  const source=totalReferenceMix(),result=apply(source);
+  // With same-row candidates, Att betala has both the right-hand OCR number
+  // and the amount below; the OCR number also has its own heading above.
+  // Do not assume every label must be assigned a value to choose one pairing.
+  assert.equal(result.text,source.text);assert.equal(result.blocks,source.blocks);
+  assert.equal(result.reconstructed,false);
 });
 
 test('unknown unpaired content restores its entire source row and cancels dependent pairs iteratively',()=>{

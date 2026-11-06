@@ -1,0 +1,10 @@
+{
+  "id": "holdout-v2-normal-06",
+  "population": "normal-readable",
+  "inputSha256": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+  "expectedRasterSha256": "bd6ad7c451ac84603460751c7d29ed599bfd3e04e22127269849c34317f7e3e3",
+  "rasterWidth": 2400,
+  "rasterHeight": 3000,
+  "planCommit": "f0458cfa26dcfb7eebf7edbec0e33abd7de4f028",
+  "planSha256": "64f56ec1b8e9b8441f370142e5733d10e9cc8b7b15d15e55d6b67931bf711ad6"
+}

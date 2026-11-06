@@ -10,6 +10,7 @@ const tools = [
   {name:'bankgiro_source_status',title:'Status för automatisk Bankgiroinläsning',description:'Läser den autentiserade ägarens rapportkö, rapportstatus och nästa möjliga hämtning. En rapportkälla som inte anslutits och verifierats visas som avstängd. Kontaktar inte banken.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true,openWorldHint:false}},
   {name:'bankgiro_auto_ingest',title:'Hämta och läs in Bankgirorapporter',description:'Bearbetar en begränsad beständig rapportkö för den autentiserade ägaren. Kräver en separat ansluten och verifierad rapportkälla. Bevarar original, kontrollerar dubbletter och använder befintlig import. Ändrar inga fakturors betalningskopplingar och skickar inga mejl eller betalningar.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true,openWorldHint:true}},
   {name:'process_invoice_documents',title:'Tolka väntande fakturaunderlag',description:'Bearbetar en begränsad beständig dokumentkö för den inloggade användaren. PDF-text läses i Sites; skannade dokument sparas i en beständig kö för OCR i molnet, med ansluten lokal dator som reserv. Registrerar endast gröna fakturor från uttryckligen verifierade motparter. Skickar inga mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
+  {name:'retry_invoice_document',title:'Återköa ett fakturaunderlag',description:'Återköar ett befintligt ägt underlag som behöver granskas, har misslyckats eller markerats som dubblett. Använder samma kontroller som Tolka igen i appen. Returnerar endast om jobbet återköades. Godkänner inga sakuppgifter och kör ingen tolkning eller registrering; den ordinarie processorn måste därefter kontrollera original, motpart och dubbletter. Skickar inga mejl och kontaktar inga externa tjänster.',inputSchema:{type:'object',properties:{documentId:{type:'string',pattern:'^[a-zA-Z0-9_-]{1,100}$'}},required:['documentId'],additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false,openWorldHint:false}},
   {name:'reconcile_customer_payments',title:'Stäm av betalningar och förbered kundmeddelanden',description:'Kontrollerar den autentiserade användarens fakturor och verifierade bankunderlag, matchar endast säkra betalningar och förbereder utkast för granskning. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true}},
   {name:'gmail_auto_sync',title:'Hämta fakturabilagor från Gmail',description:'Hämtar fakturaunderlag till den autentiserade användarens arbetsyta högst var 15 minut med befintligt Google-medgivande. Förbereder underlag och avstämmer säkra betalningar mot registrerade fakturor. Skickar aldrig mejl.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:true,openWorldHint:true}},
   {name:'gmail_sync_status',title:'Status för Gmail',description:'Visar anslutning, senaste lyckade hämtning och sammanräknad dokumentstatus. Returnerar inga fakturor, mejltexter eller original och ändrar ingenting.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true}},
@@ -41,7 +42,9 @@ export async function bankRpc(body: unknown): Promise<Response> {
   // credential, request-context or force-refresh argument is accepted.
   const evidenceReader=params.name==='payment_evidence'||params.name==='retained_report_evidence';
   const currentAccountReader=params.name==='bank_account_evidence';
-  if (!evidenceReader&&!currentAccountReader&&(!object(args) || Object.keys(args).length)) return error(-32602, 'This tool accepts no arguments');
+  const documentRetry=params.name==='retry_invoice_document';
+  if(documentRetry&&(!object(args)||Object.keys(args).length!==1||!Object.hasOwn(args,'documentId')||typeof args.documentId!=='string'||!/^[a-zA-Z0-9_-]{1,100}$/.test(args.documentId)))return error(-32602,'Invalid document retry arguments');
+  if (!evidenceReader&&!currentAccountReader&&!documentRetry&&(!object(args) || Object.keys(args).length)) return error(-32602, 'This tool accepts no arguments');
   let response: Response;
   try {
     if(params.name==='bank_revalidate_consent'){
@@ -57,6 +60,9 @@ export async function bankRpc(body: unknown): Promise<Response> {
       const {identity,response:json}=await import('../server');const user=await identity();
       const reports=await import('../bankgiro-ingest-service');
       response=json(params.name==='bankgiro_auto_ingest'?await reports.runBankgiroSource(user.userId):await reports.bankgiroSourceStatus(user.userId));
+    }else if(documentRetry){
+      const {identity,response:json}=await import('../server');const user=await identity();const processing=await import('../document-processing');await processing.processingSettings(user);
+      response=json(await processing.retryInvoiceDocument(user.userId,(args as Record<string,unknown>).documentId));
     }else if(params.name==='process_invoice_documents'){
       const {identity,response:json}=await import('../server');const user=await identity();const processing=await import('../document-processing');const settings=await processing.processingSettings(user);
       const backup=await(await import('../backups')).runOwnerBackup(user.userId);

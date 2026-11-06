@@ -1,0 +1,31 @@
+{
+  "sourceCommit": "7a5a397c6543fd762d86005369d6740448876cfe",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/candidate/scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "loader-risk.test.mjs"
+  ],
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent",
+  "environmentOverrides": {
+    "NODE_ENV": "test",
+    "TMPDIR": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/probe-temp"
+  },
+  "startedAt": "2026-11-06T02:47:11.323910+00:00",
+  "completedAt": "2026-11-06T02:47:12.101039+00:00",
+  "elapsedSeconds": 0.7771300809981767,
+  "exitCode": 0,
+  "maxRssKiB": 50024,
+  "tempEntriesBefore": [],
+  "tempEntriesAfter": [],
+  "rawLog": "logs/loader-risk-final.tap",
+  "rawLogSha256": "cb2ad04983ea13f35e60feeccca355e8aa777c13a80a86ea7f5efa6d8694e3ee",
+  "rawLogBytes": 1428,
+  "failureChildIntentional": true,
+  "opticalCalls": 0,
+  "liveCalls": 0
+}

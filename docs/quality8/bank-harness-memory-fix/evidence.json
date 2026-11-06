@@ -1,0 +1,259 @@
+{
+  "schema": "bank-harness-memory-fix-v1",
+  "recordedAt": "2026-11-06T02:41:47.652849+00:00",
+  "status": "IMPLEMENTED_FULL_BANK_GREEN_PENDING_INDEPENDENT_REVIEW",
+  "base": "d294fd87b04d1bf65b124be5ad3dd1bd2654fd73",
+  "commit": "7a5a397c6543fd762d86005369d6740448876cfe",
+  "branch": "review/bank-harness-memory-d294fd8",
+  "worktree": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/worktree",
+  "changedTrackedFiles": [
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "insertions": 17,
+  "deletions": 3,
+  "productFilesUnchanged": true,
+  "allTestBodiesAndAssertionsUnchanged": true,
+  "compiledModuleUnchanged": true,
+  "preservedSuffixBytes": 179426,
+  "preservedSuffixSha256": "a270e84103371a0896d2a18fe881a2a341d5399a0f5994e39839123dc945e4d5",
+  "sourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+  "rootRed": {
+    "attribution": "root observed full-bank diagnostic",
+    "record": {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "cwd": "/workspace/scratch/4d79ab4bea8e/release-docs",
+      "startedAt": "2026-11-06T02:26:35.380825+00:00",
+      "completedAt": "2026-11-06T02:27:39.384145+00:00",
+      "exitCode": 1,
+      "maxRssKb": 3009760
+    },
+    "signal": "SIGKILL",
+    "pass": 221,
+    "fileFailures": 1,
+    "assertionFailuresBeforeAbort": 0,
+    "kernelOomKillerProven": false,
+    "cgroupMounted": false
+  },
+  "finalRuns": [
+    {
+      "label": "focused-consumers-final",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=rating8: bank authorization rejects a page|recovered bank history retains one financial receipt|independent scope review: HTTP MCP",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/worktree",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "startedAt": "2026-11-06T02:37:43.453526+00:00",
+      "completedAt": "2026-11-06T02:37:46.391071+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 2.937546,
+      "maxRssKb": 273192,
+      "counts": {
+        "tests": 6,
+        "pass": 6,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "node": "v24.22.1",
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/logs/focused-consumers-final.tap",
+      "logSha256": "17d866e4b710bd1aedbf5172a62ab3b78903dcf5ecdd670a3c5d74f4e23bcc97",
+      "testSourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+      "testSourceUnchangedDuringRun": true,
+      "newTemporaryModuleDirectoriesRemaining": [],
+      "transportDisconnection": false
+    },
+    {
+      "label": "full-bank-final",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/worktree",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "startedAt": "2026-11-06T02:37:46.780209+00:00",
+      "completedAt": "2026-11-06T02:38:42.064675+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 55.284474,
+      "maxRssKb": 783912,
+      "counts": {
+        "tests": 273,
+        "pass": 273,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "node": "v24.22.1",
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/logs/full-bank-final.tap",
+      "logSha256": "74485ea7bc223244a1fb41f8277d8e91172d468d47bbb17b4b468f0fa853d60c",
+      "testSourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+      "testSourceUnchangedDuringRun": true,
+      "newTemporaryModuleDirectoriesRemaining": [],
+      "transportDisconnection": false
+    }
+  ],
+  "peakRssDecreasePercent": 73.95433522938706,
+  "checks": {
+    "syntaxExitCode": 0,
+    "gitDiffCheckExitCode": 0,
+    "worktreeClean": true,
+    "temporaryModuleDirectoriesRemaining": 0
+  },
+  "analyses": {
+    "moduleGraph": "module-graph-measurement.json",
+    "baselineLoader": "loader-baseline-comparison.json",
+    "bytePreservation": "byte-preservation.json",
+    "productPreservation": "product-preservation.json",
+    "consumerInventory": "consumer-inventory.txt",
+    "officialNodeEsmDocs": "https://nodejs.org/api/esm.html#urls"
+  },
+  "files": [
+    {
+      "path": "DIAGNOSIS.md",
+      "bytes": 7288,
+      "sha256": "70236db61e55118a321aee75288ad5ae18d08847fb0a20f9c8d88e5e7976d1d8"
+    },
+    {
+      "path": "byte-preservation.json",
+      "bytes": 492,
+      "sha256": "b554734402c797583325947168aaf518f13b882d8d265b769fe592d8d7dd2e61"
+    },
+    {
+      "path": "consumer-inventory.txt",
+      "bytes": 3678,
+      "sha256": "5045ad5101e722b759dd11ffe8b6a6e58e10577848e594951ee01e6896b3c6a3"
+    },
+    {
+      "path": "focused-consumers-final.json",
+      "bytes": 1348,
+      "sha256": "103fbaeed95109a48e54c12655ffd0dbe70e1cca59b4b90627b65786da908648"
+    },
+    {
+      "path": "focused-consumers.json",
+      "bytes": 1336,
+      "sha256": "ef611d5638c61bb120ba0004472ee3af9255948ee75fd0e9cad669ccf85b3572"
+    },
+    {
+      "path": "full-bank-final.json",
+      "bytes": 1179,
+      "sha256": "1cfb1f898aeb1824c7d0b96d6acf8737a2323a0bd6ad0275af2f465716e35257"
+    },
+    {
+      "path": "harness.diff",
+      "bytes": 2560,
+      "sha256": "e3ddf90be63a6977685e12bddf59f5fc74a1ad0d4abb69f4fb3242b2f34ce663"
+    },
+    {
+      "path": "loader-baseline-comparison.json",
+      "bytes": 1111,
+      "sha256": "f7601f26ec2f940d900ce4200d5ab9a288596c35814fcb1ef40800118fec8f79"
+    },
+    {
+      "path": "logs/focused-consumers-final.tap",
+      "bytes": 1664,
+      "sha256": "17d866e4b710bd1aedbf5172a62ab3b78903dcf5ecdd670a3c5d74f4e23bcc97"
+    },
+    {
+      "path": "logs/focused-consumers.tap",
+      "bytes": 1664,
+      "sha256": "974fd90b941084e0a8a765bdd4e86f14114447a082b9673eddf910f01960b888"
+    },
+    {
+      "path": "logs/full-bank-final.tap",
+      "bytes": 69729,
+      "sha256": "74485ea7bc223244a1fb41f8277d8e91172d468d47bbb17b4b468f0fa853d60c"
+    },
+    {
+      "path": "logs/module-graph-measurement.log",
+      "bytes": 1365,
+      "sha256": "05fb6eff951fbb40caf14246f564b176201e318e0d9f7dbe58455372579809a2"
+    },
+    {
+      "path": "measure-module-graph.mjs",
+      "bytes": 2363,
+      "sha256": "ad3468f929d8a0312e21f8145a6b93ce980d4fff580a26929e8bdc1366a1c69b"
+    },
+    {
+      "path": "module-graph-measurement.json",
+      "bytes": 2552,
+      "sha256": "207d6e6e7d7eed376cf9e4b40b0e7f898ef34edad99b31999d926e8967267098"
+    },
+    {
+      "path": "original/banking-security.test.mjs",
+      "bytes": 181807,
+      "sha256": "f94dc9bfa6cb223bc5bb85da2ec334a4c639aa7f64056e87058c02e8f6826948"
+    },
+    {
+      "path": "original/first-loader-candidate.mjs",
+      "bytes": 182440,
+      "sha256": "ac61bed8f76ad5cb605e135ab19da350db2c031f942d1d8a5364f049726ee8cc"
+    },
+    {
+      "path": "original/rating8-wave4-bank-full-diagnostic.json",
+      "bytes": 504,
+      "sha256": "400bac40e96e5c2d11d6bc55480d53cc6f952d0dd586b8c8b5c246979481e9c8"
+    },
+    {
+      "path": "original/rating8-wave4-bank-full-diagnostic.tap",
+      "bytes": 56025,
+      "sha256": "122c24868d760099ab54242b1bd50baa877fdb3f9233de124fccea8cebbc804a"
+    },
+    {
+      "path": "original/rating8-wave4-repair-integrated.log",
+      "bytes": 45603,
+      "sha256": "5705922d7fc36956d51d9ae1ab85c6655032f2f98412d48078133a9976b80718"
+    },
+    {
+      "path": "product-preservation.json",
+      "bytes": 1672,
+      "sha256": "9980ae89663ca01697a9d141744ab8f23b48b82633708f55cd237056c64edfe5"
+    },
+    {
+      "path": "run-bank-check.py",
+      "bytes": 2119,
+      "sha256": "7731adf1d8680f6ed71f4ed0122bbbfc8d416ccb1f9e8159e636b7702afab947"
+    },
+    {
+      "path": "worktree/sites/tests/banking-security.test.mjs",
+      "bytes": 182563,
+      "sha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0"
+    }
+  ],
+  "notes": [
+    "The six focused cases are a subset of the 273 full-bank cases.",
+    "First pre-collision-check focused run is preserved but not counted as final-commit verification.",
+    "Temporary .mjs files reduce nested import URL and source expansion; after cleanup removes disk files, not ESM cache entries.",
+    "No heap limit, timeout, test bodies, assertions, scopes or product code changed.",
+    "Independent reviewer was notified after the full run ended to avoid overlapping full-memory measurements.",
+    "No real bank, production, optical or V3 operation occurred."
+  ],
+  "transportDisconnections": 0
+}

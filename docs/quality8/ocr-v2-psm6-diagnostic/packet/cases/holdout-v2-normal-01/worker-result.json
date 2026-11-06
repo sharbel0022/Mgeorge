@@ -1,0 +1,17 @@
+{
+  "text": "Exempel Kustteknik AB FAKTURA\nVerkstadsgatan 7\n123 45 Exempelhamn\nOrg.nr: 559762-3114 Fakturanummer\nKS-28417\nFakturadatum\n2026-06-03\nFaktureras till -\nTestmottagaren Handel AB Förfallodatum\nHandelsvägen 22 2026-07-03\n123 40 Teststad\nKundnummer: K-5201 Er beställning: PO-83201\nBeskrivning Antal Å-pris Belopp\nService och mätning 3 795,00 2 385,00\nUtbytesdelar 2 680,40 1 360,80\nSamtliga radbelopp i SEK, exklusive moms.\nTack för ert uppdrag. Summa exkl. moms 3 745,80\nMoms 25 90 936,45\nAtt betala 4 682,25 SEK\nBankgiro OCR-nummer\n781-3421 00863025110\nAnge OCR-numret vid betalning. Valuta: SEK.\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 92,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d",
+    "textSha256": "acc341733012e8e7c331b122613a72f7c0a14e76b11e89de30d3e56219e7ad63",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "32edfb4b502711e909eecf310222bf5e7b2b6f8025c2a317af35aaaa8c5f8a3d",
+        "bankgiro": []
+      }
+    ]
+  }
+}

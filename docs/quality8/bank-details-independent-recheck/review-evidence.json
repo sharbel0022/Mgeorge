@@ -1,0 +1,260 @@
+{
+  "schema": "independent-bank-i1-recheck-v1",
+  "recordedAt": "2026-11-06T02:14:46.893882+00:00",
+  "reviewer": "/root/bank_details_review_resume",
+  "commit": "e66cde6767ebd232e2b966eb2b002193ea0a0999",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "frozenRedCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+  "decision": "READY",
+  "closedFindings": [
+    "I1"
+  ],
+  "remainingCritical": 0,
+  "remainingImportant": 0,
+  "node": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "nodeVersion": "v24.22.1",
+  "requestedFocusedTests": {
+    "tests": 21,
+    "pass": 21,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "ownExtraRiskTests": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "frozenOriginalHarnessByteIdentical": true,
+  "frozenOriginalReviewTests": {
+    "priorOwnTests": 14,
+    "priorOwnPass": 9,
+    "priorOwnFail": 5,
+    "currentTests": 14,
+    "currentPass": 14,
+    "currentFail": 0
+  },
+  "originalManifestFilesVerified": 24,
+  "frozenRedTestFilesVerified": 4,
+  "runs": [
+    {
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./snapshot/scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test --test-reporter=tap policy-probes/policy-identity-conflicts.test.mjs policy-probes/adapter-primary-conflict.test.mjs",
+      "exitCode": 0,
+      "log": "logs/frozen-policy-adapter-7.tap",
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 469.887524
+    },
+    {
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test --test-reporter=tap sites/tests/reviewer-usage-details.test.mjs",
+      "exitCode": 0,
+      "log": "logs/frozen-service-7.tap",
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 4479.108284
+    },
+    {
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test --test-reporter=tap --test-name-pattern='^usage details identity I1:' sites/tests/bank-usage-details-policy.test.mjs sites/tests/banking-security.test.mjs",
+      "exitCode": 0,
+      "log": "logs/additional-controls-7.tap",
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 2278.120346
+    },
+    {
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test-concurrency=1 --test --test-reporter=tap --test-name-pattern='^reviewer I1 followup:' sites/tests/reviewer-i1-final-batch.test.mjs",
+      "exitCode": 0,
+      "log": "logs/fifth-result-conflict-1.tap",
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 1430.288012
+    },
+    {
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-e66cde67-recheck/snapshot/sites",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ../scripts/saas-test-isolation.mjs scripts/run-verified-tool.mjs check",
+      "exitCode": 0,
+      "log": "logs/sites-typecheck.log"
+    }
+  ],
+  "sourceVerification": "source-verification.json",
+  "preservation": "preservation.json",
+  "files": [
+    {
+      "path": "REVIEW.md",
+      "sha256": "01a0621bad7597f448326cbeaf081a64487474367403f6d8c66c639e79fce313",
+      "bytes": 8535
+    },
+    {
+      "path": "product.diff",
+      "sha256": "cf6a8aa1456aaec655f6d0f3a11959e743c7cf6f52fea929816079ab819ee438",
+      "bytes": 1436
+    },
+    {
+      "path": "source-verification.json",
+      "sha256": "2fa2e0bff13515cc92594892368184b1cf89506e6a5970c83a14b24accf5bc7e",
+      "bytes": 1537
+    },
+    {
+      "path": "preservation.json",
+      "sha256": "5cf2f22e9f456175febf5f6306ee9ef82d96dab9dd1a688d7a4aaa5ef7cfdb28",
+      "bytes": 6863
+    },
+    {
+      "path": "logs/additional-controls-7.tap",
+      "sha256": "b6a5c72c002eaf063cbc7884de0ce2e34fcb806652de55aa7099e4f566b9ef17",
+      "bytes": 1998
+    },
+    {
+      "path": "logs/fifth-result-conflict-1.tap",
+      "sha256": "e2844eb482a10e66bd6b33e9e520041c8844ac97161ad00f1d6d485c6563f71a",
+      "bytes": 385
+    },
+    {
+      "path": "logs/frozen-policy-adapter-7.tap",
+      "sha256": "ae4dc3350b3c41781ea5a977738d97fa30bf9282f2a416b50c5c27d145dba989",
+      "bytes": 1651
+    },
+    {
+      "path": "logs/frozen-service-7.tap",
+      "sha256": "ae9ec91c959152565aacb9f095e08a27bf098874162ef67be46d3ca127a84210",
+      "bytes": 1880
+    },
+    {
+      "path": "logs/sites-typecheck-initial-hardlink.log",
+      "sha256": "ee707c184d4f5d109297fb0c98ada427788a62c77d4091c8b44ff48d8baa9acc",
+      "bytes": 1437
+    },
+    {
+      "path": "logs/sites-typecheck.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "policy-probes/adapter-primary-conflict.test.mjs",
+      "sha256": "0f7b661d0f7e4e5738f9c3d8b840b38ddebe78e0d45781f0d5a0a5b5e45116ed",
+      "bytes": 2704
+    },
+    {
+      "path": "policy-probes/policy-identity-conflicts.test.mjs",
+      "sha256": "f576fefdf22dbff194b16e856efffbd70f855f27b761e2b3d3e0621460009c23",
+      "bytes": 3421
+    },
+    {
+      "path": "snapshot/sites/tests/reviewer-usage-details.test.mjs",
+      "sha256": "e5c8e36b4eb9ba9997e6bb5f87e3c55c8283e09e79bfae4c94640d211845c510",
+      "bytes": 21516
+    },
+    {
+      "path": "snapshot/sites/tests/reviewer-i1-final-batch.test.mjs",
+      "sha256": "ea302078200a4aedeb03dee9dacba52786fe7c70b18d212b5166c92e1cdc037b",
+      "bytes": 22474
+    },
+    {
+      "path": "snapshot/sites/lib/bank-consent-policy.js",
+      "sha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "bytes": 27272
+    },
+    {
+      "path": "snapshot/sites/lib/bank-consent-policy.d.ts",
+      "sha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "bytes": 8389
+    },
+    {
+      "path": "snapshot/sites/lib/banking/service.ts",
+      "sha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+      "bytes": 87400
+    },
+    {
+      "path": "snapshot/sites/lib/banking/enable-banking.ts",
+      "sha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+      "bytes": 32645
+    },
+    {
+      "path": "snapshot/sites/lib/banking/account-evidence.ts",
+      "sha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "bytes": 18700
+    },
+    {
+      "path": "snapshot/sites/lib/banking/account-read-guard.ts",
+      "sha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+      "bytes": 3409
+    },
+    {
+      "path": "snapshot/sites/tests/bank-usage-details-identity-policy.test.mjs",
+      "sha256": "dac97f1f5d1933f4abdb4b6e773648d16fd01cb44ea6777983f42cb388dc6db5",
+      "bytes": 3406
+    },
+    {
+      "path": "snapshot/sites/tests/bank-usage-details-identity-adapter.test.mjs",
+      "sha256": "bd1fd5940d45fea7a603b5469f38dca5f15c62bcbecb1625625da94b85a2105d",
+      "bytes": 2674
+    },
+    {
+      "path": "snapshot/sites/tests/bank-usage-details-policy.test.mjs",
+      "sha256": "ec02badb28e1588efcc55a0ee80e04e78ef94c79aec2d43e559edbfc1ec92f75",
+      "bytes": 13490
+    },
+    {
+      "path": "snapshot/sites/tests/banking-security.test.mjs",
+      "sha256": "efcd72fc157e4a73d549c3511309599c13d689d146a36d4f40c4e3a7db825730",
+      "bytes": 180849
+    },
+    {
+      "path": "snapshot/docs/quality8/bank-details-identity-i1/README.md",
+      "sha256": "0e42197faccd6fc0eb4aca9fa0b7d028da0b7de6908bcde7aef2458a2c2b1a9c",
+      "bytes": 4605
+    },
+    {
+      "path": "snapshot/docs/quality8/bank-details-identity-i1/evidence.json",
+      "sha256": "450d57323d34bce6435cf1a51bb1ded3e39aacf97c986cd6b10215066f474a6a",
+      "bytes": 10211
+    }
+  ],
+  "setupFailures": [
+    {
+      "stage": "initial sites guarded check",
+      "exitCode": 1,
+      "reason": "Guard rejected hardlinked dependency files in the review snapshot before tsc; replaced with standalone copied files and re-ran unchanged guard.",
+      "log": "logs/sites-typecheck-initial-hardlink.log",
+      "productFailure": false,
+      "tscExecuted": false
+    }
+  ],
+  "delegationLimit": "Previous policy sub-reviewer could not restart due agent thread limit; main independent reviewer performed this re-review.",
+  "transportDisconnections": 0,
+  "liveBankRequests": 0,
+  "productionCalls": 0,
+  "productEdits": 0,
+  "scoreChanges": 0,
+  "limits": [
+    "READY applies to this exact candidate and independent code review.",
+    "Integrated CI, merge and publishing remain with root.",
+    "Producer 427-case regression is not represented as a new independent run.",
+    "Original 638c773 review evidence is preserved; the previous lost review is not counted.",
+    "No real bank continuity or usage facts are inferred from synthetic tests."
+  ]
+}

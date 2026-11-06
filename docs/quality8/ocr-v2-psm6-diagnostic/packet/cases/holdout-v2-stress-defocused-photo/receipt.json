@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-stress-defocused-photo",
+  "population": "stress",
+  "layout": "defocused-tilted-photo",
+  "startedAt": "2026-11-06T00:24:00.657Z",
+  "completedAt": "2026-11-06T00:24:08.347Z",
+  "durationMs": 7690.292717000004,
+  "inputSha256": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606",
+  "expectedRasterSha256": "b2f4313416d1a578b50b01aca059736bb9578f4553f199182ab9d5588d476877",
+  "actualRasterSha256": "b2f4313416d1a578b50b01aca059736bb9578f4553f199182ab9d5588d476877",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 31,
+  "rawBlocks": 1,
+  "rawLines": 22,
+  "rawWords": 111,
+  "rawText": "PN VV\nFAKTURA\nfiktiva Björk Konsult AR Pahoven 5\nfaetsära IB leumottagaren Hand AR\nIM je Pon toente Hontvivvtgea 35\nPAR\nUR SEK I arter Netder « —-\nmMmIA4TI9 NUS-OB- 11 1026-07-01\nKundnummer KSV\nLera Re KYEG Apt netogy\nPr srt bad LJ I rom 10 RR\n[hh um ston se 9 uUpptalnag || Jas KO SE\nVers ags ev vagp UA erålaeasve om\nNens 12 064,00 hang\n4608 7114\nMormmstetep I NI 3 216,00\n(KR\nNessmems att betala 16 080,00 SEK GORA 3025128\nKerdmunge is ootg Atol Ange (8 OR val hetslneng\nOrganisatronwummer 599762 3122 Gadhänd fv V-<han\n SYNTE TINA T FÖL NERON AL. 0 Vg FORNE sat\nPEN VV\n",
+  "observedText": "PN VV\nFAKTURA\nfiktiva Björk Konsult AR Pahoven 5\nfaetsära IB leumottagaren Hand AR\nIM je Pon toente Hontvivvtgea 35\nPAR\nUR SEK I arter Netder « —-\nmMmIA4TI9 NUS-OB- 11 1026-07-01\nKundnummer KSV\nLera Re KYEG Apt netogy\nPr srt bad LJ I rom 10 RR\n[hh um ston se 9 uUpptalnag || Jas KO SE\nVers ags ev vagp UA erålaeasve om\nNens 12 064,00 hang\n4608 7114\nMormmstetep I NI 3 216,00\n(KR\nNessmems att betala 16 080,00 SEK GORA 3025128\nKerdmunge is ootg Atol Ange (8 OR val hetslneng\nOrganisatronwummer 599762 3122 Gadhänd fv V-<han\n SYNTE TINA T FÖL NERON AL. 0 Vg FORNE sat\nPEN VV\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606",
+    "textSha256": "946c61aae861ac7557aa88ed3e1a02b81fbdd46b799dadf024927c0898ed3414",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "517b86684e003f852c3c5e807d14045921191e84877e743f547d765a04540e9b",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": false,
+  "percentMarkers": {
+    "rendered": 0,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "e54d22d03f2f9667e9ecdf357d8b68276334c985fafdb0a115864ae81686f73a",
+    "layout-replay.json": "217169e64bd783b9c305c805df7a7636fb1a0f136f92363fc14b9eb954be7cfb",
+    "raw-response.json": "981950ce57d2956475441a34d41dd6f865f39ccc719d7c9605be29ee4cb63bba",
+    "raw-response.v8": "661177a914a91c311c992c748f01905481dfd3d2185de2e588495364f5821e39",
+    "recognition-finished.json": "f7fbbcd8b23cb03353163d06ad9d04526dc3ab1dcff828893d9c9603b5a6970a",
+    "recognition-input.png": "b2f4313416d1a578b50b01aca059736bb9578f4553f199182ab9d5588d476877",
+    "recognition-start.json": "79a440bbf8d722e7bb99e2ec4b8f87ac7cedd32b15aabbd8b15701445627e3a0",
+    "worker-result.json": "56e4c4927cff10c1f3a166c8d458e932e6550fd8f587b9554eda0eecc09ed465",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

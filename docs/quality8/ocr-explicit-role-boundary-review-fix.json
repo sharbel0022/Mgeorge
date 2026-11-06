@@ -1,0 +1,422 @@
+{
+  "schema": "mgeorge-explicit-role-boundary-review-fix-v1",
+  "beforeCommit": "6d6968dffa2eb68b8f2c217b598e3e7a9e86603f",
+  "opticalCalls": 0,
+  "independentTestPath": "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+  "independentTestSha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+  "beforeDetailSha256": "2076c33b4fb1216ab0ce682acdb33015e10c44de45dd144f0c9cfedebeaa8cd6",
+  "afterProductHashes": {
+    "src/invoice-details.js": "44e40a9419e990a5d9139c5d4d15ee5d7e0872eedc6b837479206ef29a9926e0",
+    "sites/lib/invoice-details.js": "44e40a9419e990a5d9139c5d4d15ee5d7e0872eedc6b837479206ef29a9926e0"
+  },
+  "negativeMatrix": {
+    "before": {
+      "pass": 24,
+      "fail": 16,
+      "skip": 0
+    },
+    "after": {
+      "pass": 40,
+      "fail": 0,
+      "skip": 0
+    },
+    "inputAndAssertionsUnchanged": true
+  },
+  "positiveMatrix": {
+    "before": 16,
+    "after": 16
+  },
+  "finalRegression": {
+    "pass": 712,
+    "fail": 0,
+    "skip": 0,
+    "opticalCalls": 0,
+    "logSha256": "17ccd09ec6a2bb7086d055fe410829920f99a2fdc7519c15335275911e87fc5d",
+    "tscPassed": true,
+    "detailByteParity": true
+  },
+  "examples": [
+    {
+      "id": "bare-supplier",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "d67e7d5cf79242b67d9a64c32ebcfed5f1ae24c46c72bd627845ae603a0a9815",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "recipient": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "bare-supplier",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "d67e7d5cf79242b67d9a64c32ebcfed5f1ae24c46c72bd627845ae603a0a9815",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "recipient": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "bare-supplier",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "d67e7d5cf79242b67d9a64c32ebcfed5f1ae24c46c72bd627845ae603a0a9815",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "recipient": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "bare-supplier",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "d67e7d5cf79242b67d9a64c32ebcfed5f1ae24c46c72bd627845ae603a0a9815",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "recipient": "Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "bare-customer",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Kund Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f550b9240d3d3ce5e268b17e57d2f4fd8f01ab8113347d2290ebc443e73cef4e",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "bare-customer",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Kund Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f550b9240d3d3ce5e268b17e57d2f4fd8f01ab8113347d2290ebc443e73cef4e",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "bare-customer",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Kund Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f550b9240d3d3ce5e268b17e57d2f4fd8f01ab8113347d2290ebc443e73cef4e",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "bare-customer",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Kund Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f550b9240d3d3ce5e268b17e57d2f4fd8f01ab8113347d2290ebc443e73cef4e",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Kund Syntetiska Andra AB",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "unknown-field",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Avtal: Syntetisk post\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "127881113ffe5039ff2ed0611d560a1cbcadee852f444b401cce49358da1a99b",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "recipient": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "unknown-field",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Avtal: Syntetisk post\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "127881113ffe5039ff2ed0611d560a1cbcadee852f444b401cce49358da1a99b",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "recipient": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "unknown-field",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Avtal: Syntetisk post\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "127881113ffe5039ff2ed0611d560a1cbcadee852f444b401cce49358da1a99b",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "recipient": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "unknown-field",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Avtal: Syntetisk post\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "127881113ffe5039ff2ed0611d560a1cbcadee852f444b401cce49358da1a99b",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "recipient": "Syntetiska Mottagaren AB Avtal: Syntetisk post",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "repeated-bare-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f81ebd0a4cb01e9f9fce615311a2b0ea41b415ce22a36ea7ae6e17295076920a",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "repeated-bare-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f81ebd0a4cb01e9f9fce615311a2b0ea41b415ce22a36ea7ae6e17295076920a",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "repeated-bare-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f81ebd0a4cb01e9f9fce615311a2b0ea41b415ce22a36ea7ae6e17295076920a",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "level": "green",
+        "issues": []
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    },
+    {
+      "id": "repeated-bare-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB\nMottagarens organisationsnummer: 556016-0680\nFakturanummer: RP-5279\nFakturadatum: 2026-11-01\nFörfallodatum: 2026-12-01\nNetto: 480,00 SEK\nMomsbelopp: 120,00 SEK\nAtt betala: 600,00 SEK\nValuta: SEK\nBankgiro: 482-7654\nBetalningsreferens: 537924",
+      "inputSha256": "f81ebd0a4cb01e9f9fce615311a2b0ea41b415ce22a36ea7ae6e17295076920a",
+      "before": {
+        "party": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "recipient": "Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB",
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet."
+        ]
+      },
+      "after": {
+        "party": null,
+        "recipient": null,
+        "level": "yellow",
+        "issues": [
+          "Bankgiro saknar ordunderlag som hör till detta original och denna OCR-text. Kontrollera siffrorna i originalet.",
+          "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+          "Saknade uppgifter: kund eller leverantör"
+        ]
+      }
+    }
+  ],
+  "separateOpenGeometryFinding": "Reviewer reported Article/Item table-heading coverage; not changed or represented as closed by this role-only fix.",
+  "earlierResultUnchanged": {
+    "path": "docs/quality8/ocr-explicit-layout-known-regression.json",
+    "sha256": "dd25d647b95e942ddf268d85322a14297acbeb5a4ee8a215dd3217118f178db0"
+  },
+  "v3Access": false
+}

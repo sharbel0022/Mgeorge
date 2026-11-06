@@ -1,0 +1,283 @@
+{
+  "schema": "independent-party-boundary-review-v1",
+  "recordedAt": "2026-11-06T03:24:53.366806+00:00",
+  "reviewer": "/root/bank_details_review_resume",
+  "baseline": "dd968c1fd10b4e21c2479a939df548e390f5c6d6",
+  "fix": "0f550950b99d41d932b91370b458e9b85abf9451",
+  "producerRed": "0b19269ae97d513b42a9c164b97f30d76acbbf34",
+  "decision": "NOTREADY",
+  "findings": [
+    {
+      "id": "I1",
+      "severity": "Important",
+      "title": "Unowned organization identity inherits a stale role across a new bare role",
+      "failingCombinations": 16,
+      "actualLevel": "yellow",
+      "actualWrongOrganization": "5560160680"
+    },
+    {
+      "id": "I2",
+      "severity": "Important",
+      "title": "Parenthesized legal form bypasses boundary and accepts a composite identity",
+      "failingCombinations": 4,
+      "pdfLevel": "green",
+      "pdfIssues": []
+    }
+  ],
+  "caseRows": 41,
+  "engineMethodCombinations": 4,
+  "ownTests": 164,
+  "frozenCaseSha256": "8f72fc82b369d015c60dc24d06d6803e659d7159a8c3bce86ccdb8f3d7c420f3",
+  "ownFixCounts": {
+    "pass": 144,
+    "fail": 20
+  },
+  "node": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "nodeVersion": "v24.22.1",
+  "runs": [
+    {
+      "log": "logs/original-recipient-baseline.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/baseline",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "exitCode": 1,
+      "tests": 40,
+      "pass": 28,
+      "fail": 12,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 701.736858,
+      "note": "baseline original regression"
+    },
+    {
+      "log": "logs/independent-baseline-initial-bankgiro-fixture.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./baseline/scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap probes/independent-boundary.test.mjs",
+      "exitCode": 1,
+      "tests": 164,
+      "pass": 54,
+      "fail": 110,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 964.719387,
+      "note": "initial own fixture with unrelated OCR Bankgiro warning; not final corpus"
+    },
+    {
+      "log": "logs/independent-baseline.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./baseline/scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap probes/independent-boundary.test.mjs",
+      "exitCode": 1,
+      "tests": 164,
+      "pass": 88,
+      "fail": 76,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 833.393644,
+      "note": "frozen final own corpus on baseline"
+    },
+    {
+      "log": "logs/independent-0f550950.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent",
+      "command": "PARTY_REVIEW_REPO=/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/fix-0f550950 NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./fix-0f550950/scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap probes/independent-boundary.test.mjs",
+      "exitCode": 1,
+      "tests": 164,
+      "pass": 144,
+      "fail": 20,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 865.845001,
+      "note": "same frozen own corpus on fix"
+    },
+    {
+      "log": "logs/retained-regression-0f550950.tap",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/party-boundary-independent/fix-0f550950",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/review-explicit-recipient-boundaries.test.mjs sites/tests/party-role-name-grammar.test.mjs sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "exitCode": 0,
+      "tests": 104,
+      "pass": 104,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 1855.370635,
+      "note": "unchanged retained regression"
+    }
+  ],
+  "fixtureCorrection": {
+    "initialFixtureAndRawLogPreserved": true,
+    "change": "Removed only optional Bankgiro from own synthetic inputs to avoid unrelated OCR word-evidence warning; assertions and identity cases unchanged.",
+    "initialTests": 164,
+    "initialPass": 54,
+    "initialFail": 110,
+    "unrelatedInitialFixtureFailures": 34,
+    "existingTestsChanged": false
+  },
+  "files": [
+    {
+      "path": "REVIEW-0f550950.md",
+      "sha256": "9745d2f220c3ac5609159da8b3aeeaed9a6ea0aff9a11585d5fce07e17dc7e5d",
+      "bytes": 8074
+    },
+    {
+      "path": "source-verification-0f550950.json",
+      "sha256": "0c60733ba002167eff380ac4131333b63bac3e78d0467b260c7561ab69ad0728",
+      "bytes": 2254
+    },
+    {
+      "path": "product-0f550950.diff",
+      "sha256": "f08cf81f08887f1b4c5c423e16c8b1fe0dc55c9a7a5b79d54aeb4b40bdd3e593",
+      "bytes": 4932
+    },
+    {
+      "path": "observed-findings-0f550950.json",
+      "sha256": "450a3432078e868cdd9968fe65818751a806eec32118f204216e474bd01f02da",
+      "bytes": 27815
+    },
+    {
+      "path": "logs/independent-0f550950.tap",
+      "sha256": "930cdc356bce4793a2efddff47374bfbb4824360678910abb4e1ef0dd7f6f762",
+      "bytes": 54001
+    },
+    {
+      "path": "logs/independent-baseline-initial-bankgiro-fixture.tap",
+      "sha256": "297d43c816563ccac00f86998ba7fab888c874a7e37c02cb85cc547554bc76e5",
+      "bytes": 150489
+    },
+    {
+      "path": "logs/independent-baseline.tap",
+      "sha256": "31bda5e9236ce4598e1d9d6ec86615e1cc73d8b7ebc31d9abcca6c57cee6793b",
+      "bytes": 111417
+    },
+    {
+      "path": "logs/observed-findings-0f550950.log",
+      "sha256": "6e32b31fa57a4296a9b5d83241d4b83429b8d0512aade59393abc975fb258110",
+      "bytes": 1243
+    },
+    {
+      "path": "logs/original-recipient-baseline.tap",
+      "sha256": "88d2a557a0660ad87e21afae10254877efbc1859ceea7ae10aaf232718f262a8",
+      "bytes": 22377
+    },
+    {
+      "path": "logs/retained-regression-0f550950.tap",
+      "sha256": "8934826d9a7f25a97615aead2208e5b57af3d7a2cf581e69ee641bbb0b14f59b",
+      "bytes": 23149
+    },
+    {
+      "path": "probes/cases-initial-bankgiro-fixture.json",
+      "sha256": "2704845c6420961f145f8ccc8f731d1653a3eb0802558797f4286dda3bd8c2f0",
+      "bytes": 23639
+    },
+    {
+      "path": "probes/cases.json",
+      "sha256": "8f72fc82b369d015c60dc24d06d6803e659d7159a8c3bce86ccdb8f3d7c420f3",
+      "bytes": 22819
+    },
+    {
+      "path": "probes/create-cases-initial-bankgiro-fixture.py",
+      "sha256": "109b9a8d64d4c7568439a0f397fb684b1c233dd1e7c26fa2d61015e5e33dcb20",
+      "bytes": 6429
+    },
+    {
+      "path": "probes/create-cases.py",
+      "sha256": "fd3c6b6571f39ab1783e7df4ebda95e6fcbba7b743b2485b8be8cf9bb728ea74",
+      "bytes": 6409
+    },
+    {
+      "path": "probes/independent-boundary.test.mjs",
+      "sha256": "bc468a7bced8bd59ba8c054bb3721a2b9e384962d1e72eb4aa97960f063d1daf",
+      "bytes": 1994
+    },
+    {
+      "path": "probes/observe-findings.mjs",
+      "sha256": "7b1546b99615ef48378848e07cdf0d0212bdcf0ca201b8f1081573ee7b367970",
+      "bytes": 1639
+    },
+    {
+      "path": "baseline/src/invoice-details.js",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+      "bytes": 24567
+    },
+    {
+      "path": "baseline/sites/lib/invoice-details.js",
+      "sha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+      "bytes": 24567
+    },
+    {
+      "path": "baseline/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "bytes": 21922
+    },
+    {
+      "path": "baseline/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "bytes": 20283
+    },
+    {
+      "path": "baseline/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "bytes": 2811
+    },
+    {
+      "path": "baseline/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "bytes": 3432
+    },
+    {
+      "path": "baseline/sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "sha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506",
+      "bytes": 2002
+    },
+    {
+      "path": "fix-0f550950/src/invoice-details.js",
+      "sha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5",
+      "bytes": 25216
+    },
+    {
+      "path": "fix-0f550950/sites/lib/invoice-details.js",
+      "sha256": "601845116067fe4860bf14d2f21f7f3a1d11cadcced8e73dc248dcbe7ebd48d5",
+      "bytes": 25216
+    },
+    {
+      "path": "fix-0f550950/src/invoice-extraction.js",
+      "sha256": "7da29d442cbdbee18833fae0b93f276a5a3d4d12dc7dc3b774deb9ff1dfc029e",
+      "bytes": 21922
+    },
+    {
+      "path": "fix-0f550950/sites/lib/invoice-fields.js",
+      "sha256": "e7f2ecd75e56cd82f1296234daf1bb11886f743a2ee84d233119f7588ba9b4e2",
+      "bytes": 20283
+    },
+    {
+      "path": "fix-0f550950/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545",
+      "bytes": 2811
+    },
+    {
+      "path": "fix-0f550950/sites/tests/party-role-name-grammar.test.mjs",
+      "sha256": "d7c764aa007c5e1738649d45a819e5aa15471f86f53aeef74d87712ef2e5943d",
+      "bytes": 3432
+    },
+    {
+      "path": "fix-0f550950/sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+      "sha256": "39bc1368be46c8cae8541e64b3032d0ff5554a34996f2246beafd46681668506",
+      "bytes": 2002
+    }
+  ],
+  "productEdits": 0,
+  "bankCalls": 0,
+  "opticalCalls": 0,
+  "productionCalls": 0,
+  "v3Reads": 0,
+  "scoreChanges": 0,
+  "transportDisconnections": 0,
+  "limits": [
+    "Producer 144-case run is not counted as an own run.",
+    "OCR mode means synthetic text parsing, not image OCR.",
+    "B reviewer VAT-census issue is separate.",
+    "Frozen cases and this receipt must remain unchanged for next recheck."
+  ]
+}

@@ -1,3 +1,45 @@
+## 2026-11-06 — tredje PR 58-kandidat redo för full CI
+
+Exakt parserfix 96d1404 har oberoende READY efter två stängda fynd, 340/340 egna granskarprov och 655/655 berörda integrationsprov. Alla äldre RED-/CI-fel är bevarade. Känd OCR-replay är oförändrad i 52/52 parserresultat, inga nya optiska anrop. [Aktuell leveransgrind](docs/quality8/wave4-invoice-release-readiness.md) och nytt hashbundet native-paket är klara; full PR-/main-CI och publicering återstår. Site 65 är fortfarande live och 28/33 når minst 8. OCR B är separat och ännu under reparation efter oberoende censusfynd.
+
+## 2026-11-06 — faktisk periodisk OCR verifierad
+
+GitHub-run **42153093698**, `event=schedule`, på den publicerade huvudgrenen `41aadcef` slutfördes 02:54:40 UTC: **6 behandlade, 0 fel**. Appstatus visar samma färska worker, väntande kö 66→60 och granskningskö 374→380. [Full källa, rålogg och appstatus](docs/quality8/ocr-periodic-20261106/README.md). OCR-delen av schemabevisningen är nu uppfylld. Område 28 väntar fortfarande på backupens nya instruktion från en faktiskt ofärdig dagssnapshot; dagens 430-filssnapshot är redan verifierad. Betygen förblir 28/33 minst 8. Parserfixens oberoende granskning fann två ytterligare konkreta gränsfel, som rättas före ny kandidat.
+
+## 2026-11-06 — andra fulla PR 58-körningen blockerar publicering
+
+Kandidat `364232a` har **7337/7349** godkända obligatoriska tester: tolv befintliga gränsfall för mottagarnamn underkänns. Ett kolonmärkt företagsnamn får felaktigt absorbera en senare bar partsroll på samma rad. [Fullt bevarat CI-kvitto](docs/quality8/wave4-second-ci/README.md) visar att Sites-bygget hoppades över; inget av kandidatpaketen får publiceras. Den smala parserrättningen behåller gamla assertions och granskas separat. Site 65 och **28/33 minst 8** kvarstår. OCR B har dessutom ett separat granskningsfynd om ofullständigt momscensus; ingen ny optisk körning är godkänd.
+
+## 2026-11-06 — sammansatt PR 58-kandidat klar för ny full CI
+
+Parser63, MCP-återköning, bankdiagnos e66 och testharnessens minnesrättning 7a5a397 är sammanförda med oberoende READY. Två separata fulla banksviter passerar samma 273 fall med oförändrade assertions och max-RSS 783 912 respektive 807 608 KiB. Alla tidigare underkända CI-/harnesskörningar är bevarade; [aktuell avgränsning](docs/quality8/wave4-invoice-release-readiness.md). Nytt native-paket är byggt, men full PR-/main-CI och publicering återstår. Produktionsläget är fortfarande Site 65 och 28/33 minst 8. OCR A/B och förseglad V3 är separata.
+
+## 2026-11-06 — PR 58 rättad efter full CI, omverifiering pågår
+
+Den första fulla PR-körningen gav 23 fel och blockerade publicering. [Ursprungliga fel och råloggar](docs/quality8/wave4-initial-ci/README.md) är bevarade. Exakt parserreparation 63edd9f och bankdiagnosens I1-rättning e66cde6 har nu oberoende READY och är sammanförda med den granskade MCP-återköningen. Gamla assertions är oförändrade; egna oberoende motprov tillkommer utan dubbletter. [Aktuell kandidat och avgränsningar](docs/quality8/wave4-invoice-release-readiness.md).
+
+Känd OCR-replay på reparerad kod behåller 57/100 mandatory och 79/130 All13, utan nya optiska anrop. Ny full CI, exakt main och nytt native-bygge återstår före leverans. Site 65 och 28/33 minst 8 är fortfarande aktuellt produktionsläge. OCR A/B utvecklas separat; V3 är förseglat.
+
+## 2026-11-06 — kompletterad produktionsverifiering: 28/33 minst 8
+
+Område 33 höjs från 7 till 8 efter [oberoende granskning av 28 och 33](docs/quality8/area28-33-independent-read-review.md) mot oförändrad PLAN. Site 65:s exakta källkedja kompletteras nu av avslutad schemalagd Gmail-körning, verklig OCR-behandling, fullständigt verifierad backup och ekonomiska före-/efterläsningar. Den säkert avvisade bankrevalideringen är ett relevant driftbevis men ingen giltig bankanslutning.
+
+Backupens frysta manifest är färdigt: **430/430 kopierade och kontrollästa original, 185 567 855 byte**, manifest_pass 00:48:58 UTC och separat slutstatus 00:49:04 UTC. Den tidigare schemakörningens otillräckliga 80-stegsbudget har rättats med manifestbaserad budget, men den nya instruktionen är inte prövad från ofärdig snapshot. Schemalagd OCR efter den aktuella publiceringen saknar fortfarande belägg.
+
+**28/33 är minst 8; 6, 10, 15, 16 och 28 återstår.** Summa 257,5/330, medel 7,80. Återköning och bankdiagnos granskas för nästa leverans; ingen betygshöjning för ännu opublicerad kod. De daterade lägesbilderna nedan är historiska.
+
+## 2026-11-06 — Site 65 publicerad, fortsatt 27/33 minst 8
+
+PR 57 är normalt mergad till main `41aadcef5fc6f65cc73979997b195c7b4f12eec1`. Exakt PR-/main-CI **6819/6819**, syntax/typer/audit/bygge godkända. Site 65 publicerades 23:48:25 UTC med identiskt Sites-träd och oförändrad miljörevision 10. [Full leveranskedja](docs/quality8/release-wave3.md).
+
+- En verklig revalidering gav sparat null-usage på enda valda kontot och aktuellt utelämnat usage. Anslutningen förblir spärrad; ingen bankfakta normaliserades.
+- Ny moln-OCR: 6 behandlade / 0 körfel, men event workflow_run; periodiskt schema fortfarande ej observerat efter uppdateringen.
+- Två kompletta skrivfria betalningsläsningar behöll revision 52, noll bokningar och samma spärrar/uppgiftsnivåer som Site 64.
+- Den nya snapshoten med 430 filer är under kopiering och stoppades från våra ytterligare steg när tjänsten visade busy; inget fullständigt verifierat resultat påstås.
+- Separat OCR-geometri/identitetsarbete är ännu inte levererat. V3 är förseglat. Kända V2-texter ger 63 % mandatory recall med levererad grammatik; första provets 60 % står kvar.
+
+Målet är fortfarande inte klart: 6 minimal manuell hantering, 10 bild-OCR, 15 bankanslutning, 16 bankhämtning, 28 schemaläggning, 33 produktion återstår under 8.
+
 # Verifierad progress
 
 ## 2026-11-05 — Site 64 publicerad,27/33 områden minst 8

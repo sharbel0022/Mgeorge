@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-03",
+  "population": "normal-readable",
+  "layout": "right-address",
+  "startedAt": "2026-11-06T00:23:13.667Z",
+  "completedAt": "2026-11-06T00:23:18.982Z",
+  "durationMs": 5314.771203,
+  "inputSha256": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338",
+  "expectedRasterSha256": "de224deb2241bfd64bf60e1d2fe4eb84aaa5e92fa8d32a00be452c9d0fb977eb",
+  "actualRasterSha256": "de224deb2241bfd64bf60e1d2fe4eb84aaa5e92fa8d32a00be452c9d0fb977eb",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 90,
+  "rawBlocks": 1,
+  "rawLines": 21,
+  "rawWords": 87,
+  "rawText": "FAKTURA\nFaktureras till Leverantör\nTestmottagaren Handel AB Exempel Ådal Ventilation AB\nHandelsvägen 22 Kanalvägen 24\n123 40 Teststad 345 67 Testeby\nOrg.nr: 559762-3130\nFakturanummer: V104382 Fakturadatum: 2026-06-18\nFörfallodatum: 2026-07-18\nBeställningsnummer: PO-83203\nBeskrivning Antal Å-pris Belopp\nFilterpaket 12 289,00 3 468,00\nKanalkontroll 2 1 202,00 2 404,00\nSamtliga radbelopp i SEK, exklusive moms.\nBelopp exkl. moms 5 872,00 Bankgiro\n936-4175\nSumma moms 1 468,00\nOCKR-referens\nAtt betala SEK 7 340,00 00863025136\nAnge OCR-numret vid betalning.\nLeveransen avser angiven beställning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "FAKTURA\nFaktureras till Leverantör\nTestmottagaren Handel AB Exempel Ådal Ventilation AB\nHandelsvägen 22 Kanalvägen 24\n123 40 Teststad 345 67 Testeby\nOrg.nr: 559762-3130\nFakturanummer: V104382\nFakturadatum: 2026-06-18\nFörfallodatum: 2026-07-18\nBeställningsnummer: PO-83203\nBeskrivning Antal Å-pris Belopp\nFilterpaket 12 289,00 3 468,00\nKanalkontroll 2 1 202,00 2 404,00\nSamtliga radbelopp i SEK, exklusive moms.\nBelopp exkl. moms 5 872,00 Bankgiro\n936-4175\nSumma moms 1 468,00\nOCKR-referens\nAtt betala SEK 7 340,00 00863025136\nAnge OCR-numret vid betalning.\nLeveransen avser angiven beställning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338",
+    "textSha256": "c647011d9ddbc017744211587b5608f15807e6b36eebc8d6e807d37f75911a6f",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "bdeb4fcd97a15d339259d77d5b5836deee88b7ad66955695ca7a00ca56d8c0f6",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": true,
+  "percentMarkers": {
+    "rendered": 0,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "21ad0a3fcd0bb7db119236841e66383f23e3ddb532e350654830550992735ba6",
+    "layout-replay.json": "dda65b78e02f6e051cae893b33e44ef325b211db013fed7b58c79bb33a7e91cd",
+    "raw-response.json": "26966d52d225088b15d3f433b27bd4cb5f322ebba108bd325b6378b7c10d63ce",
+    "raw-response.v8": "de5887031dd40e66b8c226b6e274ef91d6116b35f290c76205b60b048811ab7c",
+    "recognition-finished.json": "358132e603aa52854defcb7cc767856dc507195324da3f6bb05f7727fd5fb065",
+    "recognition-input.png": "de224deb2241bfd64bf60e1d2fe4eb84aaa5e92fa8d32a00be452c9d0fb977eb",
+    "recognition-start.json": "bdd4057c8649eb0d908b880bf56284c57377b2161ae26781d7b2e18622da4248",
+    "worker-result.json": "1ef44162a7183287e5572f7c4f1877239f01110c96c8e8e7fa55baddb2fe388c",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

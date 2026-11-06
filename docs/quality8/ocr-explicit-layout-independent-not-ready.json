@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "status": "NOT_READY",
+  "reviewedSource": "06ba7f0e15fa4adeb35da2b4bb60617b11bf8bfc",
+  "baselineSource": "ae56dc9a9e3d76697e38a196692a337ae0900b0d",
+  "originalCandidate": "6d6968dffa2eb68b8f2c217b598e3e7a9e86603f",
+  "runtime": "v24.22.1",
+  "opticalCallsByReviewer": 0,
+  "bankCallsByReviewer": 0,
+  "productionWritesByReviewer": 0,
+  "v3DataRead": false,
+  "sourceSha256": {
+    "sites/lib/ocr-layout.js": "b9c22df11bf317e7d0c3cb880f3c810c73b948fa6f694214c07ac80e1a066d76",
+    "sites/lib/invoice-details.js": "83c6af54a622db3afe58fcf2a2dfb4802e0d62d07ae8ba6978048475e96441d5",
+    "src/invoice-details.js": "83c6af54a622db3afe58fcf2a2dfb4802e0d62d07ae8ba6978048475e96441d5"
+  },
+  "independentInputs": {
+    "recipientBoundaries": {
+      "path": "source/sites/tests/review-explicit-recipient-boundaries.test.mjs",
+      "sha256": "36ba2a360e5b47a7d242819f90f95b4641464f32400c2caf87a5981ad88d5545"
+    },
+    "tableCensus": {
+      "path": "source/sites/tests/review-layout-table-census-independent.test.mjs",
+      "sha256": "332ec4b13aed08ac7ec46eb870b139d52aa17e8c7e4f47654232ac0c626cbe06"
+    },
+    "geometryCensus": {
+      "path": "source/test/review-geometry-census-independent.test.js",
+      "sha256": "a7386a5b3073efb3afa3df37369b7d8a9e53df794a943699db6656f5afb38f49"
+    },
+    "organizationSourceOrder": {
+      "path": "final/sites/tests/review-organization-source-order-independent.test.mjs",
+      "sha256": "a95bed90211b29d2996e618b7cb5b2b0fa513f7e0480f8ae01289dddc60614ea"
+    }
+  },
+  "runs": [
+    {
+      "source": "6d6968dffa2eb68b8f2c217b598e3e7a9e86603f",
+      "log": "recipient-boundaries-6d6968d.log",
+      "sha256": "e043d338c0eb7774f92170585018861c2e8f5f000aee7eb9ce1e060feb61c720",
+      "tests": 40,
+      "pass": 24,
+      "fail": 16,
+      "skipped": 0,
+      "durationMs": 900.698807
+    },
+    {
+      "source": "6d6968dffa2eb68b8f2c217b598e3e7a9e86603f",
+      "log": "table-census-6d6968d.log",
+      "sha256": "b265874d2a5fa615797739187fa9aeaf14160789cee156db8225f75971d43f4e",
+      "tests": 12,
+      "pass": 6,
+      "fail": 6,
+      "skipped": 0,
+      "durationMs": 681.568423
+    },
+    {
+      "source": "27caeb3fdbe206937a1004a32d58845923c21c8e",
+      "log": "role-followup-27caeb3.log",
+      "sha256": "2a642e43d739861e6b892471a89a281fedaa39419ae5f13de1e30a7f94815357",
+      "tests": 87,
+      "pass": 87,
+      "fail": 0,
+      "skipped": 0,
+      "durationMs": 912.505302
+    },
+    {
+      "source": "06ba7f0e15fa4adeb35da2b4bb60617b11bf8bfc",
+      "log": "final-06ba7f0.log",
+      "sha256": "6d4cc6e51c335c2d794ebe07bc8940f1d4f95b03815e52c119d68b450a638d5d",
+      "tests": 195,
+      "pass": 195,
+      "fail": 0,
+      "skipped": 0,
+      "durationMs": 1065.758067
+    },
+    {
+      "source": "06ba7f0e15fa4adeb35da2b4bb60617b11bf8bfc",
+      "log": "organization-order-06ba7f0.log",
+      "sha256": "11e2c391b95e7cc019c90290d06d86e11d1dd7efc41afce540875d05c0f01b38",
+      "tests": 40,
+      "pass": 8,
+      "fail": 32,
+      "skipped": 0,
+      "durationMs": 768.109698
+    }
+  ],
+  "issues": [
+    {
+      "id": "R1",
+      "severity": "Important",
+      "status": "closed",
+      "fixedBy": "27caeb3fdbe206937a1004a32d58845923c21c8e",
+      "summary": "A colon recipient label absorbed a second bare role or unknown colon field, producing a composite identity and green native PDF. Bare labels already held. The existing ambiguity guard now applies to every name event."
+    },
+    {
+      "id": "R2",
+      "severity": "Important",
+      "status": "closed",
+      "fixedBy": "06ba7f0e15fa4adeb35da2b4bb60617b11bf8bfc",
+      "summary": "Layout omitted already-supported table headers such as Artikel/Antal, Item/Quantity and Beskrivning/Kvantitet. Horizontal joining changed quantity 1 plus article amount 480,00 into document net 1480,00. The document stayed held, but the amount was wrong. Layout now uses the unchanged parser table-header predicate on raw separators."
+    },
+    {
+      "id": "R3",
+      "severity": "Important",
+      "status": "open",
+      "reportedBy": "rating8_recovery and independently confirmed",
+      "summary": "An unrecognized explicit sender region (Avsandare/Utstalld av) can donate its organization number to the explicit recipient before or after it, with or without a blank paragraph. Both the global unassigned fallback and inherited section are involved. The wrong organization fallback predates this change, but the new explicit recipient alias changes the native-PDF result from party-unknown hold to green."
+    }
+  ],
+  "readinessBoundary": "The earlier READY on 06ba7f0 was scoped to R1 and R2; whole-delivery readiness is withdrawn until R3 is fixed and independently verified. No holdout acceptance or score is claimed."
+}

@@ -1,0 +1,216 @@
+TAP version 13
+# (node:4418) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: invoice reference policy read: exact intended reference is projected as review intention: 0001
+ok 1 - invoice reference policy read: exact intended reference is projected as review intention: 0001
+  ---
+  duration_ms: 232.520027
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: exact intended reference is projected as review intention: 0599
+ok 2 - invoice reference policy read: exact intended reference is projected as review intention: 0599
+  ---
+  duration_ms: 115.09868
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: separators, omitted zeros and prefixes cannot be repaired into an exact match
+ok 3 - invoice reference policy read: separators, omitted zeros and prefixes cannot be repaired into an exact match
+  ---
+  duration_ms: 106.615025
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: a different complete bank identifier never becomes an exact invoice match
+ok 4 - invoice reference policy read: a different complete bank identifier never becomes an exact invoice match
+  ---
+  duration_ms: 89.840716
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: workspace scope stays strict when the invoice register is empty
+ok 5 - invoice reference policy read: workspace scope stays strict when the invoice register is empty
+  ---
+  duration_ms: 78.660627
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: blocked invoice is not projected as an exact registered match: 0600 / 0599
+ok 6 - invoice reference policy read: blocked invoice is not projected as an exact registered match: 0600 / 0599
+  ---
+  duration_ms: 83.611759
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: blocked invoice is not projected as an exact registered match: 0599 / 000018
+ok 7 - invoice reference policy read: blocked invoice is not projected as an exact registered match: 0599 / 000018
+  ---
+  duration_ms: 79.643453
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: booked conflicting invoice exposes intended and raw references without changing history
+ok 8 - invoice reference policy read: booked conflicting invoice exposes intended and raw references without changing history
+  ---
+  duration_ms: 88.444105
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: generic-company reference comparison and explicit OCR remain unchanged
+ok 9 - invoice reference policy read: generic-company reference comparison and explicit OCR remain unchanged
+  ---
+  duration_ms: 93.480045
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read: supplier invoices keep their separate explicit reference
+ok 10 - invoice reference policy read: supplier invoices keep their separate explicit reference
+  ---
+  duration_ms: 88.208091
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read review: outgoing supplier payments retain the legacy reference comparison
+ok 11 - invoice reference policy read review: outgoing supplier payments retain the legacy reference comparison
+  ---
+  duration_ms: 86.609888
+  type: 'test'
+  ...
+# Subtest: invoice reference policy read review: all scoped identifiers reserve ownership in the payment direction
+ok 12 - invoice reference policy read review: all scoped identifiers reserve ownership in the payment direction
+  ---
+  duration_ms: 121.371778
+  type: 'test'
+  ...
+# Subtest: owner MCP payment reader exposes existing verifier without writes or account resources
+ok 13 - owner MCP payment reader exposes existing verifier without writes or account resources
+  ---
+  duration_ms: 87.33291
+  type: 'test'
+  ...
+# Subtest: exact-reference ambiguity survives amount/date selectors and includes missing-reference AIS candidates
+ok 14 - exact-reference ambiguity survives amount/date selectors and includes missing-reference AIS candidates
+  ---
+  duration_ms: 112.322212
+  type: 'test'
+  ...
+# Subtest: foreign/missing IDs and strict arguments fail before originals are read
+ok 15 - foreign/missing IDs and strict arguments fail before originals are read
+  ---
+  duration_ms: 81.569408
+  type: 'test'
+  ...
+# Subtest: MCP evidence tools require the current Sites identity
+ok 16 - MCP evidence tools require the current Sites identity
+  ---
+  duration_ms: 61.989641
+  type: 'test'
+  ...
+# Subtest: retained original can be selected by owned SHA256 with bounded rows and explicit account verdict
+ok 17 - retained original can be selected by owned SHA256 with bounded rows and explicit account verdict
+  ---
+  duration_ms: 80.814834
+  type: 'test'
+  ...
+# Subtest: corrupt retained originals fail closed without mutations
+ok 18 - corrupt retained originals fail closed without mutations
+  ---
+  duration_ms: 71.442272
+  type: 'test'
+  ...
+# Subtest: pagination and oversized evidence are explicit and bounded
+ok 19 - pagination and oversized evidence are explicit and bounded
+  ---
+  duration_ms: 108.562318
+  type: 'test'
+  ...
+# Subtest: evidence tools are discoverable with read-only schemas and the existing MCP transport guards
+ok 20 - evidence tools are discoverable with read-only schemas and the existing MCP transport guards
+  ---
+  duration_ms: 62.491765
+  type: 'test'
+  ...
+# Subtest: foreign owner cannot select another owner original even by its exact hash
+ok 21 - foreign owner cannot select another owner original even by its exact hash
+  ---
+  duration_ms: 63.787564
+  type: 'test'
+  ...
+# Subtest: duplicate owned hashes report ambiguity without opening an arbitrarily chosen original
+ok 22 - duplicate owned hashes report ambiguity without opening an arbitrarily chosen original
+  ---
+  duration_ms: 63.973939
+  type: 'test'
+  ...
+# Subtest: stored consent expiry blocks account evidence while retained AIS integrity remains independently intact
+ok 23 - stored consent expiry blocks account evidence while retained AIS integrity remains independently intact
+  ---
+  duration_ms: 76.053392
+  type: 'test'
+  ...
+# Subtest: source suggestions match exact OCR separately from invoice number and admit incomplete historical scans
+ok 24 - source suggestions match exact OCR separately from invoice number and admit incomplete historical scans
+  ---
+  duration_ms: 86.453386
+  type: 'test'
+  ...
+# Subtest: retained report reads flag a concurrent workspace revision rather than claiming a complete snapshot
+ok 25 - retained report reads flag a concurrent workspace revision rather than claiming a complete snapshot
+  ---
+  duration_ms: 71.609593
+  type: 'test'
+  ...
+# Subtest: both preserved references from one selected AIS source find the same invoice without inventing a conflict
+ok 26 - both preserved references from one selected AIS source find the same invoice without inventing a conflict
+  ---
+  duration_ms: 120.229742
+  type: 'test'
+  ...
+# Subtest: preserved secondary reference cannot hide competing transactions or conflicting invoice identities
+ok 27 - preserved secondary reference cannot hide competing transactions or conflicting invoice identities
+  ---
+  duration_ms: 101.822611
+  type: 'test'
+  ...
+# Subtest: selected detail source never merges AIS secondary identifiers and preserves incomplete flags
+ok 28 - selected detail source never merges AIS secondary identifiers and preserves incomplete flags
+  ---
+  duration_ms: 93.103318
+  type: 'test'
+  ...
+# Subtest: actual serialized invoice parser reference is searchable from Gmail source
+ok 29 - actual serialized invoice parser reference is searchable from Gmail source
+  ---
+  duration_ms: 111.439777
+  type: 'test'
+  ...
+# Subtest: actual serialized invoice parser reference is searchable from current document job
+ok 30 - actual serialized invoice parser reference is searchable from current document job
+  ---
+  duration_ms: 86.453787
+  type: 'test'
+  ...
+# Subtest: conflicting current and legacy document references are both searchable and remain explicit
+ok 31 - conflicting current and legacy document references are both searchable and remain explicit
+  ---
+  duration_ms: 104.541158
+  type: 'test'
+  ...
+# Subtest: current parsed document reference keeps leading zeros and distinct invoice identity
+ok 32 - current parsed document reference keeps leading zeros and distinct invoice identity
+  ---
+  duration_ms: 97.750901
+  type: 'test'
+  ...
+# Subtest: MCP and the actual verification reader agree on intact current reference candidates without writes
+ok 33 - MCP and the actual verification reader agree on intact current reference candidates without writes
+  ---
+  duration_ms: 88.696879
+  type: 'test'
+  ...
+# Subtest: MCP economic membership identifies separate review evidence and existing engine exclusions
+ok 34 - MCP economic membership identifies separate review evidence and existing engine exclusions
+  ---
+  duration_ms: 158.825721
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3741.055425

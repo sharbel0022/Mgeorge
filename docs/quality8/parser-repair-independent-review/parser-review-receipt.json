@@ -1,0 +1,104 @@
+{
+  "schema": "independent-a19-parser-repair-review-v1",
+  "productCommit": "63edd9fa97bc0475237133021313963e402efc76",
+  "baselineCommit": "a19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77",
+  "redFreezeCommit": "69f13839a83c77bec1e5e2e73c194d832b5de2f9",
+  "producerEvidenceCommitRead": "ae354424e5bd1613c805e1c66283c2a437459f2d",
+  "runtime": "v24.22.1",
+  "productCopiesSha256": "a8bf7c0222dd9fc42a373de23cfe927089b69d1d05ab95a8f469cf157e1fc1d7",
+  "productCopiesIdentical": true,
+  "existingTestsChanged": false,
+  "newOpticalCalls": 0,
+  "productionCalls": 0,
+  "newDependencies": 0,
+  "checks": [
+    {
+      "file": "parser-logs/boundaries.log",
+      "sha256": "f618462f6ae2624ba1baf28db8c8d3cf401842407cb96beb093cb6343ae4a926",
+      "bytes": 29752,
+      "exitCode": 0,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/ocr-a-independent-review/parser-fix",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 sites/tests/party-role-name-grammar.test.mjs sites/tests/organization-event-context.test.mjs sites/tests/review-organization-source-order-independent.test.mjs sites/tests/review-organization-inline-context-independent.test.mjs sites/tests/review-organization-owner-boundaries.test.mjs sites/tests/ocr-explicit-role-boundary-positive.test.mjs sites/tests/ocr-layout-role-parity.test.mjs test/invoice-scalar-layout-regression.test.js sites/tests/invoice-scalar-layout-regression.test.mjs",
+      "tests": 312,
+      "pass": 312,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    {
+      "file": "parser-logs/gmail-mcp.log",
+      "sha256": "5b470c638cb432628d10bc685d1f9d3ab13735b75df0419181f4193ae73b5d22",
+      "bytes": 8107,
+      "exitCode": 0,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/ocr-a-independent-review/parser-fix",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 sites/tests/gmail-preview-q8.test.mjs sites/tests/mcp-evidence-read.test.mjs",
+      "tests": 71,
+      "pass": 71,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    {
+      "file": "parser-logs/independent-risk.log",
+      "sha256": "8c5e6f7a7c10a4a9d99ad6e5f42612a55db361ce4c8b4c11e22c0f89e6f2d8d7",
+      "bytes": 1249,
+      "exitCode": 0,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/ocr-a-independent-review/parser-fix",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 ../parser-risk.test.mjs",
+      "tests": 12,
+      "pass": 12,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    {
+      "file": "parser-logs/table-census.log",
+      "sha256": "a362a2350e68fbd396aa064a7b514adc9b009c4412d2e45d12d1bc49ec14ace6",
+      "bytes": 1468,
+      "exitCode": 0,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/ocr-a-independent-review/parser-fix",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 sites/tests/review-layout-table-census-independent.test.mjs",
+      "tests": 12,
+      "pass": 12,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    {
+      "file": "parser-logs/red-names.log",
+      "sha256": "c024a4410314d5e3db33c4c149f1f1d66dc60b9c588d6483975596490987f541",
+      "bytes": 32736,
+      "exitCode": 1,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/ocr-a-independent-review/parser-red",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 sites/tests/party-role-name-grammar.test.mjs",
+      "tests": 48,
+      "pass": 20,
+      "fail": 28,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    {
+      "file": "parser-logs/residual-census-base.jsonl",
+      "sha256": "4d14591ded01c3ea1844013518dfb85c11cecaa5ac147dbcd63a91428a6c2bc2",
+      "bytes": 563,
+      "exitCode": 0,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/ocr-a-independent-review/base",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types ../parser-residual-census.mjs"
+    },
+    {
+      "file": "parser-logs/residual-census-fix.jsonl",
+      "sha256": "7de8088d6be93cb0bbffa1e286f639646731772315fe38eb74e7d6670fba5ff9",
+      "bytes": 613,
+      "exitCode": 0,
+      "cwd": "/workspace/scratch/4d79ab4bea8e/ocr-a-independent-review/parser-fix",
+      "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types ../parser-residual-census.mjs"
+    }
+  ],
+  "verdict": "READY for the narrow a19 regression repair; retained baseline-only census limitation is documented separately",
+  "limits": [
+    "Not a full repository CI run.",
+    "Not OCR A or B approval.",
+    "Not new-document OCR accuracy or score evidence.",
+    "Unnamed second-role census limitation existed in a19 and still returns yellow/missing party."
+  ]
+}

@@ -1,0 +1,562 @@
+{
+  "schema": "mgeorge-v2-psm6-independent-arithmetic-v1",
+  "createdAt": "2026-11-06T00:26:15.372596+00:00",
+  "resultSha256": "a8f4c44973ea42eedbac1878ef5c145fad8ae823227de6ceff6dd7364f9ab9ea",
+  "opticalCallsAdded": 0,
+  "parsersCalled": 0,
+  "numericChecks": [
+    "psm3/node/normal/all13",
+    "psm3/node/normal/mandatory10",
+    "psm3/node/normal/mandatoryImage9",
+    "psm3/node/stress/all13",
+    "psm3/node/stress/mandatory10",
+    "psm3/node/stress/mandatoryImage9",
+    "psm3/sites/normal/all13",
+    "psm3/sites/normal/mandatory10",
+    "psm3/sites/normal/mandatoryImage9",
+    "psm3/sites/stress/all13",
+    "psm3/sites/stress/mandatory10",
+    "psm3/sites/stress/mandatoryImage9",
+    "psm6/node/normal/all13",
+    "psm6/node/normal/mandatory10",
+    "psm6/node/normal/mandatoryImage9",
+    "psm6/node/stress/all13",
+    "psm6/node/stress/mandatory10",
+    "psm6/node/stress/mandatoryImage9",
+    "psm6/sites/normal/all13",
+    "psm6/sites/normal/mandatory10",
+    "psm6/sites/normal/mandatoryImage9",
+    "psm6/sites/stress/all13",
+    "psm6/sites/stress/mandatory10",
+    "psm6/sites/stress/mandatoryImage9"
+  ],
+  "numericChecksPassed": 24,
+  "nodeSitesFieldAndLevelParityCases": 12,
+  "metrics": {
+    "psm3": {
+      "node": {
+        "normal": {
+          "all13": {
+            "tp": 85,
+            "fp": 0,
+            "fn": 45,
+            "precision": 1.0,
+            "recall": 0.6538461538461539,
+            "exactDocuments": 1,
+            "documents": 10
+          },
+          "mandatory10": {
+            "tp": 63,
+            "fp": 0,
+            "fn": 37,
+            "precision": 1.0,
+            "recall": 0.63,
+            "exactDocuments": 1,
+            "documents": 10
+          },
+          "mandatoryImage9": {
+            "tp": 53,
+            "fp": 0,
+            "fn": 37,
+            "precision": 1.0,
+            "recall": 0.5888888888888889,
+            "exactDocuments": 1,
+            "documents": 10
+          }
+        },
+        "stress": {
+          "all13": {
+            "tp": 9,
+            "fp": 0,
+            "fn": 17,
+            "precision": 1.0,
+            "recall": 0.34615384615384615,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatory10": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.35,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatoryImage9": {
+            "tp": 5,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.2777777777777778,
+            "exactDocuments": 0,
+            "documents": 2
+          }
+        }
+      },
+      "sites": {
+        "normal": {
+          "all13": {
+            "tp": 85,
+            "fp": 0,
+            "fn": 45,
+            "precision": 1.0,
+            "recall": 0.6538461538461539,
+            "exactDocuments": 1,
+            "documents": 10
+          },
+          "mandatory10": {
+            "tp": 63,
+            "fp": 0,
+            "fn": 37,
+            "precision": 1.0,
+            "recall": 0.63,
+            "exactDocuments": 1,
+            "documents": 10
+          },
+          "mandatoryImage9": {
+            "tp": 53,
+            "fp": 0,
+            "fn": 37,
+            "precision": 1.0,
+            "recall": 0.5888888888888889,
+            "exactDocuments": 1,
+            "documents": 10
+          }
+        },
+        "stress": {
+          "all13": {
+            "tp": 9,
+            "fp": 0,
+            "fn": 17,
+            "precision": 1.0,
+            "recall": 0.34615384615384615,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatory10": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.35,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatoryImage9": {
+            "tp": 5,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.2777777777777778,
+            "exactDocuments": 0,
+            "documents": 2
+          }
+        }
+      }
+    },
+    "psm6": {
+      "node": {
+        "normal": {
+          "all13": {
+            "tp": 63,
+            "fp": 1,
+            "fn": 67,
+            "precision": 0.984375,
+            "recall": 0.4846153846153846,
+            "exactDocuments": 0,
+            "documents": 10
+          },
+          "mandatory10": {
+            "tp": 52,
+            "fp": 0,
+            "fn": 48,
+            "precision": 1.0,
+            "recall": 0.52,
+            "exactDocuments": 0,
+            "documents": 10
+          },
+          "mandatoryImage9": {
+            "tp": 42,
+            "fp": 0,
+            "fn": 48,
+            "precision": 1.0,
+            "recall": 0.4666666666666667,
+            "exactDocuments": 0,
+            "documents": 10
+          }
+        },
+        "stress": {
+          "all13": {
+            "tp": 9,
+            "fp": 0,
+            "fn": 17,
+            "precision": 1.0,
+            "recall": 0.34615384615384615,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatory10": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.35,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatoryImage9": {
+            "tp": 5,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.2777777777777778,
+            "exactDocuments": 0,
+            "documents": 2
+          }
+        }
+      },
+      "sites": {
+        "normal": {
+          "all13": {
+            "tp": 63,
+            "fp": 1,
+            "fn": 67,
+            "precision": 0.984375,
+            "recall": 0.4846153846153846,
+            "exactDocuments": 0,
+            "documents": 10
+          },
+          "mandatory10": {
+            "tp": 52,
+            "fp": 0,
+            "fn": 48,
+            "precision": 1.0,
+            "recall": 0.52,
+            "exactDocuments": 0,
+            "documents": 10
+          },
+          "mandatoryImage9": {
+            "tp": 42,
+            "fp": 0,
+            "fn": 48,
+            "precision": 1.0,
+            "recall": 0.4666666666666667,
+            "exactDocuments": 0,
+            "documents": 10
+          }
+        },
+        "stress": {
+          "all13": {
+            "tp": 9,
+            "fp": 0,
+            "fn": 17,
+            "precision": 1.0,
+            "recall": 0.34615384615384615,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatory10": {
+            "tp": 7,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.35,
+            "exactDocuments": 0,
+            "documents": 2
+          },
+          "mandatoryImage9": {
+            "tp": 5,
+            "fp": 0,
+            "fn": 13,
+            "precision": 1.0,
+            "recall": 0.2777777777777778,
+            "exactDocuments": 0,
+            "documents": 2
+          }
+        }
+      }
+    }
+  },
+  "documentMatrix": [
+    {
+      "id": "holdout-v2-normal-01",
+      "population": "normal-readable",
+      "levelPSM3": "red",
+      "levelPSM6": "yellow",
+      "changes": {
+        "regression": 2,
+        "unchanged": 9,
+        "recovery": 2
+      },
+      "all13": {
+        "psm3": 7,
+        "psm6": 7
+      },
+      "mandatory10": {
+        "psm3": 4,
+        "psm6": 6
+      },
+      "mandatoryImage9": {
+        "psm3": 3,
+        "psm6": 5
+      }
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "population": "normal-readable",
+      "levelPSM3": "yellow",
+      "levelPSM6": "red",
+      "changes": {
+        "regression": 6,
+        "unchanged": 7
+      },
+      "all13": {
+        "psm3": 10,
+        "psm6": 4
+      },
+      "mandatory10": {
+        "psm3": 8,
+        "psm6": 3
+      },
+      "mandatoryImage9": {
+        "psm3": 7,
+        "psm6": 2
+      }
+    },
+    {
+      "id": "holdout-v2-normal-03",
+      "population": "normal-readable",
+      "levelPSM3": "yellow",
+      "levelPSM6": "red",
+      "changes": {
+        "regression": 4,
+        "unchanged": 9
+      },
+      "all13": {
+        "psm3": 13,
+        "psm6": 9
+      },
+      "mandatory10": {
+        "psm3": 10,
+        "psm6": 8
+      },
+      "mandatoryImage9": {
+        "psm3": 9,
+        "psm6": 7
+      }
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "population": "normal-readable",
+      "levelPSM3": "yellow",
+      "levelPSM6": "yellow",
+      "changes": {
+        "unchanged": 13
+      },
+      "all13": {
+        "psm3": 6,
+        "psm6": 6
+      },
+      "mandatory10": {
+        "psm3": 5,
+        "psm6": 5
+      },
+      "mandatoryImage9": {
+        "psm3": 4,
+        "psm6": 4
+      }
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "population": "normal-readable",
+      "levelPSM3": "yellow",
+      "levelPSM6": "yellow",
+      "changes": {
+        "unchanged": 13
+      },
+      "all13": {
+        "psm3": 8,
+        "psm6": 8
+      },
+      "mandatory10": {
+        "psm3": 6,
+        "psm6": 6
+      },
+      "mandatoryImage9": {
+        "psm3": 5,
+        "psm6": 5
+      }
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "population": "normal-readable",
+      "levelPSM3": "yellow",
+      "levelPSM6": "red",
+      "changes": {
+        "regression": 8,
+        "unchanged": 5
+      },
+      "all13": {
+        "psm3": 12,
+        "psm6": 4
+      },
+      "mandatory10": {
+        "psm3": 9,
+        "psm6": 3
+      },
+      "mandatoryImage9": {
+        "psm3": 8,
+        "psm6": 2
+      }
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "population": "normal-readable",
+      "levelPSM3": "red",
+      "levelPSM6": "red",
+      "changes": {
+        "unchanged": 13
+      },
+      "all13": {
+        "psm3": 6,
+        "psm6": 6
+      },
+      "mandatory10": {
+        "psm3": 5,
+        "psm6": 5
+      },
+      "mandatoryImage9": {
+        "psm3": 4,
+        "psm6": 4
+      }
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "population": "normal-readable",
+      "levelPSM3": "red",
+      "levelPSM6": "red",
+      "changes": {
+        "unchanged": 12,
+        "regression": 1
+      },
+      "all13": {
+        "psm3": 6,
+        "psm6": 5
+      },
+      "mandatory10": {
+        "psm3": 4,
+        "psm6": 4
+      },
+      "mandatoryImage9": {
+        "psm3": 3,
+        "psm6": 3
+      }
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "population": "normal-readable",
+      "levelPSM3": "red",
+      "levelPSM6": "yellow",
+      "changes": {
+        "regression": 3,
+        "unchanged": 9,
+        "recovery": 1
+      },
+      "all13": {
+        "psm3": 9,
+        "psm6": 7
+      },
+      "mandatory10": {
+        "psm3": 6,
+        "psm6": 6
+      },
+      "mandatoryImage9": {
+        "psm3": 5,
+        "psm6": 5
+      }
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "population": "normal-readable",
+      "levelPSM3": "red",
+      "levelPSM6": "yellow",
+      "changes": {
+        "regression": 3,
+        "unchanged": 8,
+        "recovery": 2
+      },
+      "all13": {
+        "psm3": 8,
+        "psm6": 7
+      },
+      "mandatory10": {
+        "psm3": 6,
+        "psm6": 6
+      },
+      "mandatoryImage9": {
+        "psm3": 5,
+        "psm6": 5
+      }
+    },
+    {
+      "id": "holdout-v2-stress-lost-bottom",
+      "population": "stress",
+      "levelPSM3": "red",
+      "levelPSM6": "red",
+      "changes": {
+        "unchanged": 13
+      },
+      "all13": {
+        "psm3": 6,
+        "psm6": 6
+      },
+      "mandatory10": {
+        "psm3": 5,
+        "psm6": 5
+      },
+      "mandatoryImage9": {
+        "psm3": 4,
+        "psm6": 4
+      }
+    },
+    {
+      "id": "holdout-v2-stress-defocused-photo",
+      "population": "stress",
+      "levelPSM3": "red",
+      "levelPSM6": "red",
+      "changes": {
+        "unchanged": 13
+      },
+      "all13": {
+        "psm3": 3,
+        "psm6": 3
+      },
+      "mandatory10": {
+        "psm3": 2,
+        "psm6": 2
+      },
+      "mandatoryImage9": {
+        "psm3": 1,
+        "psm6": 1
+      }
+    }
+  ],
+  "normalFieldChangeCounts": {
+    "regression": 27,
+    "unchanged": 98,
+    "recovery": 5
+  },
+  "normalMandatoryFieldChangeCounts": {
+    "unchanged": 79,
+    "recovery": 5,
+    "regression": 16
+  },
+  "percentCounts": {
+    "rendered": 8,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "processingTotalMs": 63703.95640499999
+}

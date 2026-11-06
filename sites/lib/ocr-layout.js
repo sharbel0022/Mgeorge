@@ -1,14 +1,16 @@
+import {isInvoiceTableHeader} from './invoice-details.js';
+
 const MAX_TEXT=150000,MAX_ROWS=2000,MAX_WORDS=6000,MAX_SEGMENTS=3000,MAX_COMPARISONS=1_000_000;
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 const spaced=value=>String(value).replace(/[ \t]+/g,' ').trim();
 const normalized=value=>String(value).normalize('NFKC').replace(/[ \t]+/g,' ').trim();
-const labelSource='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no)|fakturadatum|invoice[ \\t]+date|förfallo(?:datum|dag)|förfaller|due[ \\t]+date|leverantör|utställare|säljare|supplier|seller|kund|customer|organisations(?:nummer|nr)|org[ .]*(?:nr|nummer)|organisation[ \\t]+number|bankgirokonto|bankgiro|bg|plusgiro|postgiro|iban|bic|swift|ocr(?:[ \\t-]?(?:nummer|nr|referens))?|betalningsreferens|payment[ \\t]+reference|netto|net[ \\t]+amount|belopp[ \\t]+före[ \\t]+moms|(?:belopp|summa)[ \\t]+exkl(?:usive)?[ .]*moms|moms(?:belopp)?|total[ \\t]+moms|vat|att[ \\t]+betala|summa[ \\t]+att[ \\t]+betala|totalbelopp|totalsumma|amount[ \\t]+due|valuta|currency)';
+const labelSource='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no)|fakturadatum|invoice[ \\t]+date|förfallo(?:datum|dag)|förfaller|due[ \\t]+date|leverantör|utställare|säljare|supplier|seller|kund|customer|faktureras[ \\t]+till|organisations(?:nummer|nr)|org[ .]*(?:nr|nummer)|organisation[ \\t]+number|bankgirokonto|bankgiro|bg|plusgiro|postgiro|iban|bic|swift|ocr(?:[ \\t-]?(?:nummer|nr|referens))?|betalningsreferens|payment[ \\t]+reference|netto|net[ \\t]+amount|belopp[ \\t]+före[ \\t]+moms|(?:belopp|summa)[ \\t]+exkl(?:usive)?[ .]*moms|summa[ \\t]+moms|moms(?:belopp)?|total[ \\t]+moms|vat|att[ \\t]+betala|summa[ \\t]+att[ \\t]+betala|totalbelopp|totalsumma|fakturabelopp|amount[ \\t]+due|valuta|currency)';
 const standalone=new RegExp('^'+labelSource+'[ \\t]*[:.#]?$','iu');
 const complete=new RegExp('^'+labelSource+'[ \\t]*[:.#][ \\t]*\\S','iu');
 // Unknown explicit headings may block ownership, but never create a new
 // supported field or authorize a reconstruction of their own.
 const explicitStandalone=text=>/^(?=[^:]*\p{L})[^:\r\n]+:$/u.test(text);
-const tableHeader=text=>/\b(?:benämning|beskrivning|description|artikelbeskrivning)\b/iu.test(text)&&/\b(?:antal|quantity|qty)\b/iu.test(text);
+const tableHeader=text=>isInvoiceTableHeader(text)||/\b(?:benämning|beskrivning|description|artikelbeskrivning)\b/iu.test(text)&&/\b(?:antal|quantity|qty)\b/iu.test(text);
 const validBox=box=>object(box)&&['x0','y0','x1','y1'].every(key=>Number.isFinite(box[key])&&box[key]>=0&&box[key]<=12_000_000)&&box.x1>box.x0&&box.y1>box.y0;
 const union=words=>({x0:Math.min(...words.map(w=>w.bbox.x0)),y0:Math.min(...words.map(w=>w.bbox.y0)),x1:Math.max(...words.map(w=>w.bbox.x1)),y1:Math.max(...words.map(w=>w.bbox.y1))});
 const height=box=>box.y1-box.y0;
@@ -52,10 +54,18 @@ export function reconstructOcrLayout(text,blocks){
       if(++comparisons>MAX_COMPARISONS||intersects(byY[i].bbox,byY[j].bbox))return raw;
     }
 
+    // A table's end is not established by a blank gap, a bare field word, or
+    // an unrelated complete field. Horizontal article columns may use all of
+    // those. Do not add same-row ownership anywhere in/under an observed table;
+    // the existing conservative vertical path remains independently available.
+    // Preserve the source separators for the parser's authoritative census;
+    // normalizing its spaces first would hide an already supported table.
+    const tableRows=lines.map((row,index)=>tableHeader(chunks[index][0]));
+    const horizontalTableTop=Math.min(...lines.filter((row,index)=>tableRows[index]).map(row=>row.box.y0));
     const segments=[];let inTable=false;
     for(let index=0;index<lines.length;index++){
       const row=lines[index],value=normalized(chunks[index][0]);
-      if(tableHeader(value)){row.excluded=true;inTable=true;}
+      if(tableRows[index]){row.excluded=true;inTable=true;}
       else {if(inTable&&(standalone.test(value)||complete.test(value)))inTable=false;row.excluded=inTable;}
       row.index=index;row.segments=[];
       const heights=row.words.map(word=>height(word.bbox)).sort((a,b)=>a-b),scale=heights[Math.floor(heights.length/2)];
@@ -74,25 +84,33 @@ export function reconstructOcrLayout(text,blocks){
       const candidates=[];
       for(const value of segments){
         if(++comparisons>MAX_COMPARISONS)return raw;
-        if(value.row===label.row||value.row.excluded||value.label||value.explicitLabel||value.complete)continue;
+        if(value.row.excluded||value.label||value.explicitLabel||value.complete)continue;
         // Only the label's actual glyphs establish its reach. A value printed
         // in a larger font must not widen the search into another column.
-        const scale=label.glyphHeight,gap=value.box.y0-label.box.y1;
-        if(gap>=0&&gap<=2*scale){
-          if(Math.abs(value.box.x0-label.box.x0)<=scale/2)candidates.push(value);
-          // Ownership also remains uncertain beneath a competing heading's
-          // horizontal footprint. This wider census can only block a pair;
-          // it cannot authorize one. Count unknown/excluded headings and
-          // headings with several candidates without choosing a closest one.
-          if(value.box.x0>=label.box.x0-scale/2&&value.box.x0<=label.box.x1+scale/2)claims.set(value.id,(claims.get(value.id)||0)+1);
-        }
+        const scale=label.glyphHeight,gap=value.box.y0-label.box.y1,below=value.row!==label.row&&gap>=0&&gap<=2*scale;
+        const vertical=below&&Math.abs(value.box.x0-label.box.x0)<=scale/2;
+        const rightGap=value.box.x0-label.box.x1,right=rightGap>=0&&rightGap<=16*scale;
+        const glyph=Math.min(scale,value.glyphHeight),overlap=Math.min(label.box.y1,value.box.y1)-Math.max(label.box.y0,value.box.y0);
+        // A tall box or union cannot manufacture a physical row. Only similar
+        // actual glyph bands, close centres and a bounded rightward gap pair.
+        const horizontal=right&&Math.max(height(label.box),height(value.box))<=2*glyph&&overlap>=glyph/2&&Math.abs(label.box.y0+label.box.y1-value.box.y0-value.box.y1)<=glyph;
+        if(vertical||horizontal)candidates.push({value,horizontal});
+        // The broader census only blocks ownership. Both directions compete
+        // together, including unknown/excluded labels and labels with several
+        // candidates. One label casts at most one claim on a value.
+        const verticalClaim=below&&value.box.x0>=label.box.x0-scale/2&&value.box.x0<=label.box.x1+scale/2;
+        const horizontalClaim=right&&value.box.y0<label.box.y1+scale/2&&value.box.y1>label.box.y0-scale/2;
+        if(verticalClaim||horizontalClaim)claims.set(value.id,(claims.get(value.id)||0)+1);
       }
       // Never choose a closest/first value among plausible alternatives.
       if(!label.label||label.row.excluded||candidates.length!==1)continue;
-      const value=candidates[0],members=new Set([...label.words,...value.words]);
-      const corridor={x0:Math.min(label.box.x0,value.box.x0),x1:Math.max(label.box.x1,value.box.x1),y0:label.box.y1,y1:value.box.y0};
+      const {value,horizontal}=candidates[0],members=new Set([...label.words,...value.words]);
+      if(horizontal&&Math.max(label.box.y1,value.box.y1)>horizontalTableTop)continue;
+      const corridor=horizontal
+        ?{x0:label.box.x1,x1:value.box.x0,y0:Math.min(label.box.y0,value.box.y0),y1:Math.max(label.box.y1,value.box.y1)}
+        :{x0:Math.min(label.box.x0,value.box.x0),x1:Math.max(label.box.x1,value.box.x1),y0:label.box.y1,y1:value.box.y0};
       let intervening=false;
-      if(corridor.y1>corridor.y0)for(const word of words){
+      if(corridor.y1>corridor.y0&&corridor.x1>corridor.x0)for(const word of words){
         if(++comparisons>MAX_COMPARISONS)return raw;
         if(!members.has(word)&&intersects(word.bbox,corridor)){intervening=true;break;}
       }
@@ -123,7 +141,10 @@ export function reconstructOcrLayout(text,blocks){
         const partner=outgoing.get(segment.id),joined=partner?[...segment.words,...partner.words]:segment.words;
         const text=joined.map(word=>word.text).join(' ');parts.push(text);output.push({text:text+'\n',words:joined,bbox:union(joined)});
       }
-      rebuilt+=parts.join('\n')+gap;
+      // Reconstructed fields are independent paragraphs. Their output order
+      // must not transfer a party section to a following unowned raw field.
+      const paired=row.segments.some(segment=>outgoing.has(segment.id));
+      rebuilt+=parts.join('\n\n')+(paired&&parts.length?'\n':'')+gap;
     }
     if(rebuilt===text)return raw;
     const retained=output.flatMap(row=>row.words),originals=new Set(words);

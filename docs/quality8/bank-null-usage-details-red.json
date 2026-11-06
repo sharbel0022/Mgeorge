@@ -1,0 +1,53 @@
+{
+  "baseline": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "approvedDesign": "23b4d71ae21d745471ac60c82e8b081f25731cb9",
+  "status": "FROZEN_RED_BEFORE_PRODUCT_EDITS",
+  "syntheticOnly": true,
+  "realBankCalls": 0,
+  "testSha256": {
+    "sites/tests/bank-usage-details-policy.test.mjs": "bafd1acf5ca70737c09dc7d7d80fa970ef5a216925c3b3ab60512bda50df4228",
+    "sites/tests/banking-security.test.mjs": "6bf0f6f072c7246a23391dba0942a2bcc5de13cf640744204a07117768d989c2",
+    "sites/tests/bank-account-evidence.test.mjs": "e960340c5cb80f031292bda4691894169f4f0fb7dc25c159e8073a1d86945fd7"
+  },
+  "productSha256": {
+    "sites/lib/bank-consent-policy.js": "bc9da88933c98ba1ad11aff9c2c34d0654387fef68f10da613d534a05138aba2",
+    "sites/lib/bank-consent-policy.d.ts": "4da7f6e70627a4dff69056e8b650aa058ba7a5eeb6642a79fc46835440325d25",
+    "sites/lib/banking/service.ts": "5884ebe8db3f8b14a439f02c5b9068dd8f4d05b5a6a8e6018a904d1cc5c80bee",
+    "sites/lib/banking/account-evidence.ts": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f"
+  },
+  "runs": [
+    {
+      "logPath": "/tmp/mgeorge-null-usage-details-red-policy.tap",
+      "sha256": "e4cbcb42e5c2260150264c0dedae176f7d0ef5e47623ad42e4be4b0b6b4f2b13",
+      "tests": 59,
+      "pass": 12,
+      "fail": 47,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 277.743552
+    },
+    {
+      "logPath": "/tmp/mgeorge-null-usage-details-frozen-red-service.tap",
+      "sha256": "b450dcb57951ef815ef60de226694a519964c73ccb51faeb8d69024db852a4bd",
+      "tests": 58,
+      "pass": 23,
+      "fail": 35,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 18414.731509
+    },
+    {
+      "logPath": "/tmp/mgeorge-null-usage-details-red-existing-gate.tap",
+      "sha256": "cbdacd9737bfbd3684f13360a15b72ca66d2045098f395eb91c3afaba4201993",
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 824.455765
+    }
+  ]
+}

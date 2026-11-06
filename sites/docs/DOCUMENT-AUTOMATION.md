@@ -2,6 +2,8 @@
 
 Gmail och PDF-text behandlas i den befintliga Sites-arbetsytan, även när webbläsaren är stängd. Det länkade molnjobbet kör varje timme (Sites tillåter högst en körning per timme) och använder ägarens befintliga Gmail-medgivande. `gmail_auto_sync` begränsar Gmail-hämtningen till var 15:e minut och fortsätter dokumentkön även under väntetiden. `process_invoice_documents` bearbetar bara kön och respekterar paus. Bankhämtningens befintliga schema, medgivande och sex timmars begränsning bevaras. Inga schemalagda verktyg kan skicka kundmejl.
 
+`retry_invoice_document` gör samma återköning som **Tolka igen** för ett angivet, redan ägt underlag. Ett svar med `requeued: true` betyder att jobbet återköades; det är inget godkännande och ingen registrering. Verktyget läser inga original och kontaktar inga externa tjänster. Därefter kan den vanliga processorn bearbeta kön i ordinarie ordning och återpröva samtliga befintliga kontroller. Pågående eller redan registrerade jobb, avvisade källor och främmande ID:n återköas inte.
+
 ## Lokal OCR
 
 Användaren har valt OCR på sin Windows-dator. Node-repositoryts `scripts/install-sites-ocr.mjs` installerar `MGFakturakoll-LocalOCR`, vid inloggning och varannan minut. Datorn måste vara på, vaken och användaren inloggad. Jobbet gör utgående HTTPS-anrop; ingen port öppnas. Text skickas tillbaka till samma Sites-projekt. Inga externa AI-tjänster används.

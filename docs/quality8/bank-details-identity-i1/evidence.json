@@ -1,0 +1,299 @@
+{
+  "schema": "bank-details-identity-i1-fix-evidence-v1",
+  "status": "IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+  "node": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+  "nodeVersion": "v24.22.1",
+  "productChanges": {
+    "path": "sites/lib/bank-consent-policy.js",
+    "function": "observeAccountUsageDetails",
+    "insertions": 8,
+    "deletions": 1,
+    "sha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+  },
+  "frozenRedTotals": {
+    "tests": 21,
+    "pass": 11,
+    "fail": 10,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "greenFocusedTotals": {
+    "tests": 21,
+    "pass": 21,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "greenDistinctRegressionTotals": {
+    "tests": 427,
+    "pass": 427,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "focusedTestsAreSubsetOfRegression": true,
+  "sourceVerification": {
+    "path": "docs/quality8/bank-details-identity-i1/source-verification.json",
+    "sha256": "07593c292c70bf6ed30291fc6549f913badf7ded3e9f3dd41227ae380e7b83e9"
+  },
+  "runs": [
+    {
+      "name": "green-additional-controls",
+      "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern=^usage details identity I1:",
+        "sites/tests/bank-usage-details-policy.test.mjs",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "exitCode": 0,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [],
+      "log": "docs/quality8/bank-details-identity-i1/green-additional-controls.tap",
+      "logSha256": "da6a3cbef1b3cb445f8f6a28856a0f0be137de432a107098cd3b0b477d094e1c",
+      "elapsedSeconds": 2.407,
+      "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "testFilesMatchFrozenRed": true
+    },
+    {
+      "name": "green-independent-adapter",
+      "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "sites/tests/bank-usage-details-identity-adapter.test.mjs"
+      ],
+      "exitCode": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [],
+      "log": "docs/quality8/bank-details-identity-i1/green-independent-adapter.tap",
+      "logSha256": "2a21a1daaf8988d1f86b8c8d8fdfd69216b20caeb0ccabde37d75c61d800bffc",
+      "elapsedSeconds": 0.493,
+      "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "testFilesMatchFrozenRed": true
+    },
+    {
+      "name": "green-independent-policy",
+      "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "sites/tests/bank-usage-details-identity-policy.test.mjs"
+      ],
+      "exitCode": 0,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [],
+      "log": "docs/quality8/bank-details-identity-i1/green-independent-policy.tap",
+      "logSha256": "69afecc86cbf3607b39f93bb4423f3baba4f2d67ae6706c58b1c1aaa2b9438e8",
+      "elapsedSeconds": 0.312,
+      "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "testFilesMatchFrozenRed": true
+    },
+    {
+      "name": "green-independent-service",
+      "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern=^reviewer:",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "exitCode": 0,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [],
+      "log": "docs/quality8/bank-details-identity-i1/green-independent-service.tap",
+      "logSha256": "38a7b5b03a3ab458167e468a464e95a5c58b4c61187a8d3d605cd6bed057b37a",
+      "elapsedSeconds": 4.581,
+      "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "testFilesMatchFrozenRed": true
+    },
+    {
+      "name": "green-policy-adapters-provider",
+      "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "sites/tests/bank-consent-policy.test.mjs",
+        "sites/tests/bank-usage-diagnostic.test.mjs",
+        "sites/tests/bank-usage-details-policy.test.mjs",
+        "sites/tests/bank-usage-details-identity-policy.test.mjs",
+        "sites/tests/bank-usage-details-identity-adapter.test.mjs",
+        "sites/tests/bank-account-consent.test.mjs",
+        "sites/tests/bank-account-evidence.test.mjs",
+        "sites/tests/bank-account-evidence-provider.test.mjs",
+        "sites/tests/account-read-cooldown.test.mjs",
+        "test/bank-consent-api.test.js",
+        "test/api-account-consent.test.js"
+      ],
+      "exitCode": 0,
+      "counts": {
+        "tests": 298,
+        "pass": 298,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [],
+      "log": "docs/quality8/bank-details-identity-i1/green-policy-adapters-provider.tap",
+      "logBytes": 70548,
+      "logSha256": "9ae64d9c09aac87e18cfbaddc2284ac5dbe60ccadf049161a7acae667cf1e678",
+      "elapsedSeconds": 24.48,
+      "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+    },
+    {
+      "name": "green-service-regression",
+      "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test-concurrency=1",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern=usage details diagnostic|usage diagnostic|scope diagnostic|independent scope review|revalidation|consent recovery|consent commit reply|legacy selected scope|company selected scope|^reviewer:|^usage details identity I1:",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "exitCode": 0,
+      "counts": {
+        "tests": 129,
+        "pass": 129,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "failedTests": [],
+      "log": "docs/quality8/bank-details-identity-i1/green-service-regression.tap",
+      "logBytes": 32956,
+      "logSha256": "1fae03d613e2a1e11463200283d9a3cb93790ada5d9e49002e1af368e50baf20",
+      "elapsedSeconds": 42.063,
+      "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+    },
+    {
+      "name": "green-sites-typecheck",
+      "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding/sites",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "scripts/run-verified-tool.mjs",
+        "check"
+      ],
+      "exitCode": 0,
+      "counts": {},
+      "failedTests": [],
+      "log": "docs/quality8/bank-details-identity-i1/green-sites-typecheck.log",
+      "logBytes": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "elapsedSeconds": 7.728,
+      "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+    }
+  ],
+  "limits": [
+    "Local synthetic verification only; no full CI, production or bank calls.",
+    "Independent re-review and integration remain with root.",
+    "No READY decision is issued by this implementation."
+  ],
+  "unchanged": [
+    "validateEnableConsent",
+    "validateLegacyEnableSelection",
+    "getAccountDetails adapter",
+    "service auth and original ACCOUNT_USAGE_INVALID/409",
+    "hash binding",
+    "cooldown",
+    "cache and connection status",
+    "financial effects"
+  ],
+  "liveBankRequests": 0,
+  "productionCalls": 0,
+  "qualityScoreChanges": 0
+}

@@ -1,0 +1,8 @@
+{
+  "candidate": "7a5a397c6543fd762d86005369d6740448876cfe",
+  "helperBlockByteIdenticalToFrozenSource": true,
+  "helperBlockSha256": "384d4e7591feeb4233b2ba759d59d653db15f098fab695906137d6ba3297f416",
+  "helperBlockBytes": 529,
+  "baselineHelperSha256": "41d1516edfb8767ead9b9275515fa32d580eeaca54c0703d84bec7429ab3d56d",
+  "onlyAddedHelperTestExports": true
+}

@@ -1,0 +1,17 @@
+{
+  "text": "FAKTURA\nLeverantör Faktureras till\nExempel Styrsystem AB Testmottagaren Handel AB\nTeknikparken 21 Handelsvägen 22\n901 23 Provhamn 123 40 Teststad\nFakturanummer: 284-6119\nFakturadatum: 2026-08-04\nFörfallodatum: 2026-09-03\nBeskrivning Antal Å-pris Belopp\nInstallation av styrsystem 12 1 050,00 12 600,00\nKabelförläggning 6 454,00 2 724,00\nSamtliga radbelopp i SEK, exklusive moms.\nMoms 25 246 beräknas på nettobeloppet. Netto 15 324,00\nSumma moms 3 831,00\nAtt betala 19 155,00 SEK\nBankgiro OCR-nummer\n827-3641 00863025193\nOrganisationsnummer: 559762-3197 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 92,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+    "textSha256": "1eac796bcd6ca98978b70e01b3a28839a334cae883c0ca4da48d16b8f1428121",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "01b916d95b94cb9bb1143ec8bdbf3e04f3dfef90885cde05dd44cef6973c55f5",
+        "bankgiro": []
+      }
+    ]
+  }
+}

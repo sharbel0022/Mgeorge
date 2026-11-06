@@ -1,0 +1,96 @@
+✔ hash-bound resource with no primary identifiers remains observable (4.994627ms)
+✖ contradictory IBAN fields inside fresh primary account_id must prevent an observation (2.437821ms)
+✖ saved and live primary BBAN disagreement must survive omitted fresh account_id (1.858171ms)
+✖ contradictory cached primary IBANs cannot be erased by omitted fresh account_id (1.048393ms)
+✔ fresh BBAN disagreement is rejected when the same scheme is present (4.226478ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 2
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 138.444752
+
+✖ failing tests:
+
+test at policy-probes/policy-identity-conflicts.test.mjs:26:1
+✖ contradictory IBAN fields inside fresh primary account_id must prevent an observation (2.437821ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   category: 'orga',
+  +   status: 'observed'
+  -   reason: 'DETAILS_ACCOUNT_CONFLICT',
+  -   status: 'unavailable'
+    }
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-identity-conflicts.test.mjs:29:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { status: 'observed', category: 'orga' },
+    expected: { status: 'unavailable', reason: 'DETAILS_ACCOUNT_CONFLICT' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at policy-probes/policy-identity-conflicts.test.mjs:32:1
+✖ saved and live primary BBAN disagreement must survive omitted fresh account_id (1.858171ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   category: 'orga',
+  +   status: 'observed'
+  -   reason: 'DETAILS_ACCOUNT_CONFLICT',
+  -   status: 'unavailable'
+    }
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-identity-conflicts.test.mjs:34:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { status: 'observed', category: 'orga' },
+    expected: { status: 'unavailable', reason: 'DETAILS_ACCOUNT_CONFLICT' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at policy-probes/policy-identity-conflicts.test.mjs:37:1
+✖ contradictory cached primary IBANs cannot be erased by omitted fresh account_id (1.048393ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   category: 'orga',
+  +   status: 'observed'
+  -   reason: 'DETAILS_ACCOUNT_CONFLICT',
+  -   status: 'unavailable'
+    }
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-638c7736-resume/policy-probes/policy-identity-conflicts.test.mjs:39:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { status: 'observed', category: 'orga' },
+    expected: { status: 'unavailable', reason: 'DETAILS_ACCOUNT_CONFLICT' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

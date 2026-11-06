@@ -1,0 +1,35 @@
+{
+  "name": "red-independent-policy",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding",
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test-concurrency=1",
+    "--test",
+    "--test-reporter=tap",
+    "sites/tests/bank-usage-details-identity-policy.test.mjs"
+  ],
+  "exitCode": 1,
+  "counts": {
+    "tests": 5,
+    "pass": 2,
+    "fail": 3,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "failedTests": [
+    "contradictory IBAN fields inside fresh primary account_id must prevent an observation",
+    "saved and live primary BBAN disagreement must survive omitted fresh account_id",
+    "contradictory cached primary IBANs cannot be erased by omitted fresh account_id"
+  ],
+  "log": "docs/quality8/bank-details-identity-i1/red-independent-policy.tap",
+  "logSha256": "e82bbba4e42b7e05479aee9905a8458a4d12be800253bd883db74aac0cf8032e",
+  "elapsedSeconds": 0.307
+}

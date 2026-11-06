@@ -1,0 +1,44 @@
+(node:12) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ invoice reference policy read: exact intended reference is projected as review intention: 0001 (292.855532ms)
+✔ invoice reference policy read: exact intended reference is projected as review intention: 0599 (115.175505ms)
+✔ invoice reference policy read: separators, omitted zeros and prefixes cannot be repaired into an exact match (115.235403ms)
+✔ invoice reference policy read: a different complete bank identifier never becomes an exact invoice match (115.304666ms)
+✔ invoice reference policy read: workspace scope stays strict when the invoice register is empty (93.026083ms)
+✔ invoice reference policy read: blocked invoice is not projected as an exact registered match: 0600 / 0599 (99.816487ms)
+✔ invoice reference policy read: blocked invoice is not projected as an exact registered match: 0599 / 000018 (100.548972ms)
+✔ invoice reference policy read: booked conflicting invoice exposes intended and raw references without changing history (115.553965ms)
+✔ invoice reference policy read: generic-company reference comparison and explicit OCR remain unchanged (120.093653ms)
+✔ invoice reference policy read: supplier invoices keep their separate explicit reference (125.975711ms)
+✔ invoice reference policy read review: outgoing supplier payments retain the legacy reference comparison (109.359295ms)
+✔ invoice reference policy read review: all scoped identifiers reserve ownership in the payment direction (145.924586ms)
+✔ owner MCP payment reader exposes existing verifier without writes or account resources (89.609033ms)
+✔ exact-reference ambiguity survives amount/date selectors and includes missing-reference AIS candidates (95.050419ms)
+✔ foreign/missing IDs and strict arguments fail before originals are read (77.692614ms)
+✔ MCP evidence tools require the current Sites identity (77.328564ms)
+✔ retained original can be selected by owned SHA256 with bounded rows and explicit account verdict (80.182283ms)
+✔ corrupt retained originals fail closed without mutations (99.011574ms)
+✔ pagination and oversized evidence are explicit and bounded (122.796919ms)
+✔ evidence tools are discoverable with read-only schemas and the existing MCP transport guards (83.616483ms)
+✔ foreign owner cannot select another owner original even by its exact hash (88.44572ms)
+✔ duplicate owned hashes report ambiguity without opening an arbitrarily chosen original (85.376181ms)
+✔ stored consent expiry blocks account evidence while retained AIS integrity remains independently intact (84.97681ms)
+✔ source suggestions match exact OCR separately from invoice number and admit incomplete historical scans (97.486818ms)
+✔ retained report reads flag a concurrent workspace revision rather than claiming a complete snapshot (94.917802ms)
+✔ both preserved references from one selected AIS source find the same invoice without inventing a conflict (133.506291ms)
+✔ preserved secondary reference cannot hide competing transactions or conflicting invoice identities (100.479405ms)
+✔ selected detail source never merges AIS secondary identifiers and preserves incomplete flags (94.543136ms)
+✔ actual serialized invoice parser reference is searchable from Gmail source (139.606762ms)
+✔ actual serialized invoice parser reference is searchable from current document job (94.584753ms)
+✔ conflicting current and legacy document references are both searchable and remain explicit (93.991154ms)
+✔ current parsed document reference keeps leading zeros and distinct invoice identity (99.178616ms)
+✔ MCP and the actual verification reader agree on intact current reference candidates without writes (104.751255ms)
+✔ MCP economic membership identifies separate review evidence and existing engine exclusions (171.636897ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4327.718188

@@ -1,0 +1,30 @@
+{
+  "commit": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "baseline": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+  "files": [
+    {
+      "path": "sites/lib/bank-consent-policy.js",
+      "sha256": "612f167c21180bd4f008ee28925d01221780c13b0c5a3d224c0ee05254208d6c",
+      "matchesExactCommit": true,
+      "identicalToBaseline": false
+    },
+    {
+      "path": "sites/lib/bank-consent-policy.d.ts",
+      "sha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "matchesExactCommit": true,
+      "identicalToBaseline": false
+    },
+    {
+      "path": "sites/lib/banking/service.ts",
+      "sha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+      "matchesExactCommit": true,
+      "identicalToBaseline": false
+    },
+    {
+      "path": "sites/lib/banking/account-evidence.ts",
+      "sha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "matchesExactCommit": true,
+      "identicalToBaseline": true
+    }
+  ]
+}

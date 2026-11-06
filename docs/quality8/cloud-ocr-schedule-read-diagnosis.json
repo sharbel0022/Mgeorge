@@ -1,0 +1,521 @@
+{
+  "schema": "mgeorge-cloud-ocr-schedule-read-diagnosis-v1",
+  "recordedAt": "2026-11-05T23:46:01.265Z",
+  "observationCutoff": "2026-11-05T23:43:32.120Z",
+  "reviewer": "rating8_payments",
+  "status": "NO_CONFIRMED_CONFIGURATION_DEFECT_CAUSE_UNRESOLVED",
+  "scope": {
+    "readOnly": true,
+    "githubReads": true,
+    "primaryDocumentationReads": true,
+    "productionApplicationCalls": 0,
+    "dispatches": 0,
+    "reruns": 0,
+    "workflowChanges": 0,
+    "secretReads": 0,
+    "credentialChanges": 0,
+    "financialWrites": 0,
+    "ocrCalls": 0,
+    "applicationParserCalls": 0,
+    "v3Accessed": false,
+    "scoreChanges": false
+  },
+  "repository": {
+    "fullName": "sharbel0022/Mgeorge",
+    "defaultBranch": "main",
+    "visibility": "public",
+    "archived": false,
+    "ownerType": "User"
+  },
+  "workflow": {
+    "id": 399932780,
+    "path": ".github/workflows/sites-cloud-ocr.yml",
+    "mainAtWave2": "819adee2f3848b474167eb6b15f82584caeb39af",
+    "mainAtCutoff": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+    "gitBlobAtBothHeads": "7a4b3931d69c6250a3a091b52f5a12a211061578",
+    "remoteFileContentsIdentical": true,
+    "cron": "7/15 * * * *",
+    "equivalentPreviousCron": "7,22,37,52 * * * *",
+    "nominalMinutesUtc": [
+      7,
+      22,
+      37,
+      52
+    ],
+    "nominalSlotsAfterWave2BeforeCutoff": [
+      "2026-11-05T22:52:00Z",
+      "2026-11-05T23:07:00Z",
+      "2026-11-05T23:22:00Z",
+      "2026-11-05T23:37:00Z"
+    ],
+    "nominalSlotsAreNotGuaranteedDeliveries": true,
+    "concurrencyGroup": "sites-cloud-ocr",
+    "cancelInProgress": false,
+    "jobTimeoutMinutes": 15
+  },
+  "workflowState": {
+    "provenance": "Root supplied the preserved result of an ordinary public unauthenticated GET. This reviewer read the exact local receipt, not a new direct workflow-state API response.",
+    "localReceipt": "/tmp/rating8-workflow-state-20261105.json",
+    "receipt": {
+      "observedAt": "2026-11-05T23:41:18.822421+00:00",
+      "sourceUrl": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/workflows/399932780",
+      "publicUnauthenticatedRead": true,
+      "workflow": {
+        "id": 399932780,
+        "name": "Sites cloud OCR",
+        "path": ".github/workflows/sites-cloud-ocr.yml",
+        "state": "active",
+        "created_at": "2026-10-28T21:36:09.000Z",
+        "updated_at": "2026-10-28T21:36:09.000Z",
+        "html_url": "https://github.com/sharbel0022/Mgeorge/blob/main/.github/workflows/sites-cloud-ocr.yml"
+      }
+    },
+    "receiptSha256": "266508ad1ba018e0e2101b6b6b42c6d029f383736575c65ed15476c00c911929"
+  },
+  "queries": {
+    "scheduled_recent": {
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?event=schedule&per_page=10",
+      "startedAt": "2026-11-05T23:43:31.484Z",
+      "completedAt": "2026-11-05T23:43:32.053Z",
+      "response": {
+        "total_count": 33,
+        "returned_count": 10,
+        "workflow_runs": [
+          {
+            "id": 42083409804,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-05T18:21:17Z",
+            "updated_at": "2026-11-05T18:23:36Z",
+            "run_started_at": "2026-11-05T18:21:17Z",
+            "run_number": 36,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42083409804",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 42013301104,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-05T10:45:08Z",
+            "updated_at": "2026-11-05T10:45:34Z",
+            "run_started_at": "2026-11-05T10:45:08Z",
+            "run_number": 34,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42013301104",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41959053043,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-05T03:02:33Z",
+            "updated_at": "2026-11-05T03:02:59Z",
+            "run_started_at": "2026-11-05T03:02:33Z",
+            "run_number": 33,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41959053043",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41928863002,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-04T22:51:19Z",
+            "updated_at": "2026-11-04T22:52:20Z",
+            "run_started_at": "2026-11-04T22:51:19Z",
+            "run_number": 32,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41928863002",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41877909285,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "14a042abd37fa455d08da9dfcc096ef4f603b512",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "failure",
+            "created_at": "2026-11-04T17:29:00Z",
+            "updated_at": "2026-11-04T17:42:49Z",
+            "run_started_at": "2026-11-04T17:29:00Z",
+            "run_number": 31,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41877909285",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41807986439,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "14a042abd37fa455d08da9dfcc096ef4f603b512",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "failure",
+            "created_at": "2026-11-04T09:29:58Z",
+            "updated_at": "2026-11-04T09:30:11Z",
+            "run_started_at": "2026-11-04T09:29:58Z",
+            "run_number": 30,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41807986439",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41759438802,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "14a042abd37fa455d08da9dfcc096ef4f603b512",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "failure",
+            "created_at": "2026-11-04T02:14:35Z",
+            "updated_at": "2026-11-04T02:14:47Z",
+            "run_started_at": "2026-11-04T02:14:35Z",
+            "run_number": 29,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41759438802",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41725777620,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "14a042abd37fa455d08da9dfcc096ef4f603b512",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "failure",
+            "created_at": "2026-11-03T21:52:57Z",
+            "updated_at": "2026-11-03T21:53:19Z",
+            "run_started_at": "2026-11-03T21:52:57Z",
+            "run_number": 28,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41725777620",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41673364657,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "c367fcd94594db8aa892bc900a813177ec498d04",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "failure",
+            "created_at": "2026-11-03T16:21:31Z",
+            "updated_at": "2026-11-03T16:21:45Z",
+            "run_started_at": "2026-11-03T16:21:31Z",
+            "run_number": 27,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41673364657",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 41601980626,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "schedule",
+            "head_sha": "d91ec6c45acc07c15b82b815ffaa305d6d213656",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-03T08:15:50Z",
+            "updated_at": "2026-11-03T08:16:42Z",
+            "run_started_at": "2026-11-03T08:15:50Z",
+            "run_number": 26,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/41601980626",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          }
+        ]
+      }
+    },
+    "scheduled_since_wave2": {
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?event=schedule&created=%3E2026-11-05T22%3A39%3A48Z&per_page=100",
+      "startedAt": "2026-11-05T23:43:31.484Z",
+      "completedAt": "2026-11-05T23:43:32.120Z",
+      "response": {
+        "total_count": 0,
+        "returned_count": 0,
+        "workflow_runs": []
+      }
+    },
+    "ci_triggered_recent": {
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?event=workflow_run&per_page=10",
+      "startedAt": "2026-11-05T23:43:31.484Z",
+      "completedAt": "2026-11-05T23:43:31.938Z",
+      "response": {
+        "total_count": 2,
+        "returned_count": 2,
+        "workflow_runs": [
+          {
+            "id": 42124413524,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "workflow_run",
+            "head_sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-05T22:47:16Z",
+            "updated_at": "2026-11-05T22:49:04Z",
+            "run_started_at": "2026-11-05T22:47:16Z",
+            "run_number": 37,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42124413524",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          },
+          {
+            "id": 42081905168,
+            "name": "Sites cloud OCR",
+            "path": ".github/workflows/sites-cloud-ocr.yml",
+            "workflow_id": 399932780,
+            "event": "workflow_run",
+            "head_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+            "head_branch": "main",
+            "status": "completed",
+            "conclusion": "success",
+            "created_at": "2026-11-05T18:11:54Z",
+            "updated_at": "2026-11-05T18:13:40Z",
+            "run_started_at": "2026-11-05T18:11:54Z",
+            "run_number": 35,
+            "run_attempt": 1,
+            "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42081905168",
+            "actor": "sharbel0022",
+            "triggering_actor": "sharbel0022"
+          }
+        ]
+      }
+    },
+    "main_branch": {
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/branches/main",
+      "startedAt": "2026-11-05T23:43:31.484Z",
+      "completedAt": "2026-11-05T23:43:31.900Z",
+      "response": {
+        "name": "main",
+        "head_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+        "commit_time": "2026-11-05T23:39:56Z"
+      }
+    }
+  },
+  "activeStatusQueries": {
+    "queued": {
+      "sourceUrl": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?status=queued&per_page=100",
+      "readWindowUtc": "2026-11-05T23:40:00Z–2026-11-05T23:43:31Z",
+      "total_count": 0,
+      "returned_count": 0,
+      "workflow_runs": [],
+      "ocrRowsReturned": 0
+    },
+    "in_progress": {
+      "sourceUrl": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?status=in_progress&per_page=100",
+      "readWindowUtc": "2026-11-05T23:40:00Z–2026-11-05T23:43:31Z",
+      "total_count": 6,
+      "returned_count": 1,
+      "workflow_runs": [
+        {
+          "id": 42131115405,
+          "name": "Payment control checks",
+          "path": ".github/workflows/payment-control-ci.yml",
+          "workflow_id": 398864112,
+          "event": "push",
+          "head_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+          "head_branch": "main",
+          "status": "in_progress",
+          "conclusion": null,
+          "created_at": "2026-11-05T23:39:59Z",
+          "updated_at": "2026-11-05T23:40:09Z",
+          "run_started_at": "2026-11-05T23:39:59Z",
+          "run_number": 261,
+          "run_attempt": 1,
+          "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42131115405",
+          "actor": "sharbel0022",
+          "triggering_actor": "sharbel0022"
+        }
+      ],
+      "ocrRowsReturned": 0
+    },
+    "pending": {
+      "sourceUrl": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?status=pending&per_page=100",
+      "readWindowUtc": "2026-11-05T23:40:00Z–2026-11-05T23:43:31Z",
+      "total_count": 0,
+      "returned_count": 0,
+      "workflow_runs": [],
+      "ocrRowsReturned": 0
+    },
+    "waiting": {
+      "sourceUrl": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?status=waiting&per_page=100",
+      "readWindowUtc": "2026-11-05T23:40:00Z–2026-11-05T23:43:31Z",
+      "total_count": 0,
+      "returned_count": 0,
+      "workflow_runs": [],
+      "ocrRowsReturned": 0
+    },
+    "requested": {
+      "sourceUrl": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?status=requested&per_page=100",
+      "readWindowUtc": "2026-11-05T23:40:00Z–2026-11-05T23:43:31Z",
+      "total_count": 0,
+      "returned_count": 0,
+      "workflow_runs": [],
+      "ocrRowsReturned": 0
+    }
+  },
+  "actorEvidence": {
+    "lastScheduledActor": "sharbel0022",
+    "lastScheduledTriggeringActor": "sharbel0022",
+    "latestCronChangeCommit": "c17365187c5e97f164199e7ab070e6dacca6abec",
+    "latestCronChangeAuthorLogin": "sharbel0022",
+    "latestCronChangeCommitterLogin": "sharbel0022",
+    "currentRepositoryPermission": "admin",
+    "permissionReadThrough": "GitHub get_repo_collaborator_permission",
+    "internalSchedulerActorOrAccountLifecycleVerified": false,
+    "workflowHistory": [
+      {
+        "sha": "c17365187c5e97f164199e7ab070e6dacca6abec",
+        "authorLogin": "sharbel0022",
+        "committerLogin": "sharbel0022",
+        "authoredAt": "2026-11-05T22:17:54Z",
+        "subject": "fix: strengthen invoice evidence, manual allocation, OCR guards and mobile review"
+      },
+      {
+        "sha": "92017cbe0831245fdb220ce40a209ecda1e3fa62",
+        "authorLogin": "sharbel0022",
+        "committerLogin": "sharbel0022",
+        "authoredAt": "2026-11-05T17:39:10Z",
+        "subject": "fix: improve document, search and operational recovery safety"
+      },
+      {
+        "sha": "1beccb909feb5b930bd2c65a99647f39fd928129",
+        "authorLogin": null,
+        "committerLogin": null,
+        "authoredAt": "2026-10-28T21:21:35Z",
+        "subject": "Implement Mgeorge V3 bank evidence and scheduled cloud OCR"
+      }
+    ]
+  },
+  "primarySources": [
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule",
+      "readAtDate": "2026-11-05",
+      "supports": "Default-branch scheduling, UTC default, valid step syntax, inactivity rule, possible delayed/dropped events and scheduler-actor rules."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/how-tos/troubleshoot-workflows",
+      "readAtDate": "2026-11-05",
+      "supports": "Schedule can stop despite enabled/manual operation; account lifecycle and post-trigger execution boundaries; support path for unresolved/stuck scheduling."
+    },
+    {
+      "url": "https://www.githubstatus.com/",
+      "readAtDate": "2026-11-05",
+      "observed": "All Systems Operational; Actions Operational."
+    },
+    {
+      "url": "https://www.githubstatus.com/incidents/t89g2q1800fr",
+      "readAtDate": "2026-11-05",
+      "observed": "Actions incident investigated 16:50, mitigated 17:04 and resolved 17:42 UTC, before the 18:21 scheduled success. No causal attribution to the later gap is established."
+    }
+  ],
+  "findings": {
+    "confirmed": [
+      "The workflow is present on the actual default branch, and its exact bytes are unchanged between wave2 main and the newer PR57 main.",
+      "The explicit schedule query after wave2's 22:39:48 merge returned zero runs at 23:43:32; recent schedule results still end at 18:21:17.",
+      "The 22:47–22:49 successful OCR run has event=workflow_run. It cannot count as a periodic schedule observation.",
+      "Current nominal cron minutes are 7,22,37,52UTC; the former list has the same four minutes. Recent sparse schedule history also predates PR 56.",
+      "The root-supplied workflow-state receipt reports active. Repository metadata reports public, unarchived and default branch main.",
+      "No OCR run was returned in queued, pending, waiting, requested or in_progress status queries."
+    ],
+    "inferences": [
+      "The observed failure boundary is missing visible schedule-triggered run creation, rather than a demonstrated OCR-step failure.",
+      "The job condition and main preflight cannot explain the absence of a run record by themselves: they evaluate after a workflow run is created. The schedule branch is not conditioned on workflow_run payload fields.",
+      "Sixty-day inactivity does not fit current active state and same-day repository activity.",
+      "Neither a stuck visible concurrency predecessor nor a revoked actor permission is supported by the observed responses."
+    ],
+    "possibleButUnproved": [
+      "GitHub scheduler delay, dropped trigger, registration/dispatch issue or other provider-side state.",
+      "An internal scheduler-associated actor/account lifecycle issue not exposed by the repository permission and run-history reads.",
+      "Unobserved internal/out-of-sync concurrency state or omitted/deleted history; no such state is asserted to exist."
+    ],
+    "notEstablished": [
+      "A malformed cron, missing default-branch file, disabled workflow or new PR 56 scheduling regression.",
+      "The resolved 16:50–17:42 Actions incident as the cause of the later gap.",
+      "A functioning current periodic schedule merely from enabled state or workflow_run success."
+    ]
+  },
+  "recommendation": {
+    "codeOrConfigurationChangeNow": false,
+    "reason": "No concrete configuration defect was reproduced. The equivalent cron refresh is already on main, and another speculative refresh would not prove periodic delivery.",
+    "minimumNextRead": "After a later nominal schedule point and a documented observation margin, perform one bounded GET for event=schedule; record workflow ID, actual event, SHA, creation/completion and actual queue progress. Treat any intervening workflow_run separately. No maximum GitHub delay or SLA is inferred.",
+    "escalationIfStillAbsent": "The owner can read Actions notifications/account settings for any scheduler-actor restriction and provide this packet to GitHub Support for scheduler registration/dispatch diagnostics. Contact is a separate authorized action; no ticket or message was sent by this reviewer.",
+    "keepArea28Below8": true,
+    "preserveExistingSafety": "Retain the current reviewed-main, authorization, concurrency and bounded-worker gates. Do not replace the absent schedule evidence with a dispatch or rerun."
+  },
+  "limitations": [
+    "This is a bounded read-only observation, not GitHub internal scheduler telemetry or a complete platform/account audit.",
+    "The general run lists are retained as returned. The in_progress response reported total_count 6 but returned 1 row; that row was main CI, not OCR. No exhaustive internal-queue claim follows.",
+    "The connector rejects workflow metadata endpoints by URL allowlist; the existing public root receipt supplies active-state evidence without credentials or access-control bypass.",
+    "The latest scheduled query returns the most recent 10 of 33 repository schedule rows, not all historical rows. The since-wave2 query is explicitly empty.",
+    "The timestamped GitHub status page is aggregate provider status and cannot exclude a repository-specific problem.",
+    "No product OCR/parser code or V3 images/gold were read or executed for this diagnosis. Later observations may supersede the cutoff."
+  ],
+  "sourceSha256": {
+    "1beccb909feb5b930bd2c65a99647f39fd928129": {
+      ".github/workflows/sites-cloud-ocr.yml": "bd1da07af6bcb2051de3c66213c28f2ab6c717bb361a95ee7cf530cd75bfd05d"
+    },
+    "92017cbe0831245fdb220ce40a209ecda1e3fa62": {
+      ".github/workflows/sites-cloud-ocr.yml": "2e4a72551a119281bcd0893371202a89c9b69ef6d5bc2d57243b236cec199528"
+    },
+    "c17365187c5e97f164199e7ab070e6dacca6abec": {
+      ".github/workflows/sites-cloud-ocr.yml": "bce2b361de0bec0053a0defa460216b5db1e57f6cb639e592b6ccd549c39cfa8"
+    },
+    "819adee2f3848b474167eb6b15f82584caeb39af": {
+      ".github/workflows/sites-cloud-ocr.yml": "bce2b361de0bec0053a0defa460216b5db1e57f6cb639e592b6ccd549c39cfa8",
+      "scripts/verify-cloud-ocr-trigger.mjs": "767396043cef132e4d3d98f3d6494b433facca9b972f005539f153bc08dd12ec"
+    }
+  }
+}

@@ -252,6 +252,11 @@ export async function processDocuments(owner:string,limit=2){
   }catch(error){return finalizeProcessing(owner,processed,{error});}
   return finalizeProcessing(owner,processed);
 }
+export async function retryInvoiceDocument(owner:string,documentId:unknown):Promise<{ok:true,requeued:boolean}>{
+  if(typeof documentId!=='string'||!/^[a-zA-Z0-9_-]{1,100}$/.test(documentId))throw safe('Välj ett giltigt underlag.');
+  const result=await db().prepare(`UPDATE document_jobs SET state=CASE WHEN engine='local' THEN 'waiting_ocr' ELSE 'queued' END,attempts=0,available_at=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND state IN ('failed','needs_review','duplicate') AND ${activeSource}`).bind(now(),now(),owner,documentId).run();
+  return {ok:true,requeued:result.meta.changes===1};
+}
 export async function processingAction(req:Request,action:string){
   const user=await identity(req);await processingSettings(user);
   if(action==='process')return response(await processDocuments(user.userId));
@@ -261,7 +266,7 @@ export async function processingAction(req:Request,action:string){
     await db().prepare('UPDATE document_automation SET enabled=?,auto_register=?,updated_at=? WHERE owner=?').bind(body.enabled?1:0,body.auto_register?1:0,now(),user.userId).run();return response(await processingStatus(user.userId));
   }
   if(action==='retry'){
-    await db().prepare(`UPDATE document_jobs SET state=CASE WHEN engine='local' THEN 'waiting_ocr' ELSE 'queued' END,attempts=0,available_at=?,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND state IN ('failed','needs_review','duplicate') AND ${activeSource}`).bind(now(),now(),user.userId,body.document_id).run();return response({ok:true});
+    return response(await retryInvoiceDocument(user.userId,body.document_id));
   }
   if(action==='trust'){
     const w=await readWorkspace(user.userId),i=w.state.invoices.find(i=>i.id===body.invoice_id&&i.reviewed&&!i.voided&&i.documentId);

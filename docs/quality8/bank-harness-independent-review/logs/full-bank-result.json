@@ -1,0 +1,32 @@
+{
+  "sourceCommit": "7a5a397c6543fd762d86005369d6740448876cfe",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/candidate",
+  "environmentOverrides": {
+    "NODE_ENV": "test",
+    "TMPDIR": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/runtime-temp"
+  },
+  "nodeOptionsInherited": false,
+  "startedAt": "2026-11-06T02:42:39.828603+00:00",
+  "completedAt": "2026-11-06T02:43:40.843005+00:00",
+  "elapsedSeconds": 61.013674034009455,
+  "exitCode": 0,
+  "maxRssKiB": 807608,
+  "rssMethod": "Linux resource.getrusage(RUSAGE_CHILDREN).ru_maxrss for this single Node invocation and its reaped test process",
+  "tempEntriesBefore": [],
+  "tempEntriesAfter": [],
+  "rawLog": "logs/full-bank.tap",
+  "rawLogSha256": "1507a0a3b35bacd248f20edf7e147beeca0664664b0eb35bcdf1b7679b57d660",
+  "rawLogBytes": 69710,
+  "opticalCalls": 0,
+  "liveCalls": 0
+}

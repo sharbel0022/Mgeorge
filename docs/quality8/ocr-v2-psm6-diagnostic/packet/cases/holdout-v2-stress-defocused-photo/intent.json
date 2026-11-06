@@ -1,0 +1,10 @@
+{
+  "id": "holdout-v2-stress-defocused-photo",
+  "population": "stress",
+  "inputSha256": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606",
+  "expectedRasterSha256": "b2f4313416d1a578b50b01aca059736bb9578f4553f199182ab9d5588d476877",
+  "rasterWidth": 2400,
+  "rasterHeight": 3000,
+  "planCommit": "f0458cfa26dcfb7eebf7edbec0e33abd7de4f028",
+  "planSha256": "64f56ec1b8e9b8441f370142e5733d10e9cc8b7b15d15e55d6b67931bf711ad6"
+}

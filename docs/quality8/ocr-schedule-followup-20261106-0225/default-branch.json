@@ -1,0 +1,31 @@
+{
+  "method": "GET",
+  "url": "https://api.github.com/repos/sharbel0022/Mgeorge/branches/main",
+  "requestedAt": "2026-11-06T02:25:28.951566+00:00",
+  "authentication": "none",
+  "authorizationHeaderSent": false,
+  "kind": "branch",
+  "observedAt": "2026-11-06T02:25:31.273036+00:00",
+  "httpStatus": 200,
+  "headers": {
+    "Date": "Fri, 06 Nov 2026 02:25:31 GMT",
+    "ETag": "W/\"a512e467dd0f40996b57a0b9d2ab49cdbd879939e06ee29fb764f4c057724fdd\"",
+    "Age": null,
+    "X-GitHub-Request-Id": "ADF8:47970:2F60CC:32A528:6AED3A9B",
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": "59",
+    "X-RateLimit-Reset": "1793935531",
+    "Link": null
+  },
+  "responseBytes": 5389,
+  "responseSha256": "b34c8daafeb6728a3a3ae8d65e66068a453d071e61697abcf41dab02a4b545e9",
+  "data": {
+    "name": "main",
+    "protected": false,
+    "commit": {
+      "sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/commits/41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "committedAt": "2026-11-05T23:39:56Z"
+    }
+  }
+}

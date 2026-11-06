@@ -1,0 +1,34 @@
+[
+  {
+    "commit": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+    "testFileBytes": 153317,
+    "loaderBytes": 1092,
+    "loaderSha256": "474eedd748a07b65e4bd3b74b5088029f07dc9a7d8de2db882ff786067f516e3",
+    "loaderIdenticalToIntegrated": true,
+    "directTestCalls": 137
+  },
+  {
+    "commit": "638c77365dbf8f4c73db6b23816a37f577da5689",
+    "testFileBytes": 173715,
+    "loaderBytes": 1092,
+    "loaderSha256": "474eedd748a07b65e4bd3b74b5088029f07dc9a7d8de2db882ff786067f516e3",
+    "loaderIdenticalToIntegrated": true,
+    "directTestCalls": 155
+  },
+  {
+    "commit": "e66cde6767ebd232e2b966eb2b002193ea0a0999",
+    "testFileBytes": 180849,
+    "loaderBytes": 1092,
+    "loaderSha256": "474eedd748a07b65e4bd3b74b5088029f07dc9a7d8de2db882ff786067f516e3",
+    "loaderIdenticalToIntegrated": true,
+    "directTestCalls": 163
+  },
+  {
+    "commit": "d294fd87b04d1bf65b124be5ad3dd1bd2654fd73",
+    "testFileBytes": 181807,
+    "loaderBytes": 1092,
+    "loaderSha256": "474eedd748a07b65e4bd3b74b5088029f07dc9a7d8de2db882ff786067f516e3",
+    "loaderIdenticalToIntegrated": true,
+    "directTestCalls": 164
+  }
+]

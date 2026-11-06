@@ -1,0 +1,1530 @@
+{
+  "schema": "mgeorge-organization-owner-regression-before-v1",
+  "baselineCommit": "ae56dc9a9e3d76697e38a196692a337ae0900b0d",
+  "candidateCommit": "06ba7f0e15fa4adeb35da2b4bb60617b11bf8bfc",
+  "opticalCalls": 0,
+  "productEdited": false,
+  "testPath": "sites/tests/review-organization-owner-boundaries.test.mjs",
+  "testSha256": "76f5b9e476c19ef432978d62728b1bdc8230a3002ace831896c482243463fd20",
+  "testResult": {
+    "pass": 12,
+    "fail": 24,
+    "skip": 0
+  },
+  "examples": [
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "2b1a4ad91ff3bc66b5816cc4a973a9a9a1d4c6e998f22b4d5b9711f85550394e",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02cdbfffca32f0e32acbff0a8626a8f4587bb28d2e514e6c56a772e5018472a4",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Utställd av",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nUtställd av: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "587fd95b237848cdec21ffdc2a13c53ad0a33c7788fa18958406a88d9e38768c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "before-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\n\nFaktureras till: Syntetiska Mottagaren AB\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1850349aed312d5b4ca9b2aad1d742daab1710238267294a8be6a002a0fd918c",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 3,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-recipient",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "02d60263e896b0225d9a856ebd79ef5bebf425b4ea6d67849ebfcfdb41f8c0fd",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 4,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "node",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "pdf",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "green",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "Avsändare",
+      "placement": "after-paragraph",
+      "engine": "sites",
+      "method": "ocr",
+      "text": "FAKTURA\nFaktureras till: Syntetiska Mottagaren AB\n\nAvsändare: Syntetiska Utställaren AB\nOrganisationsnummer: 556016-0680\nFakturanummer: ROLE-7410\nFakturadatum: 2026-06-03\nFörfallodatum: 2026-07-03\nNetto: 736,00 SEK\nMomsbelopp: 184,00 SEK\nAtt betala: 920,00 SEK\nValuta: SEK",
+      "inputSha256": "1cd16a697e29ee3339640efa1d548f9a7a2d3b63d8e74cddb6079347dbe885ea",
+      "baseline": {
+        "party": null,
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [
+          "Saknade uppgifter: kund eller leverantör"
+        ],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": null,
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      },
+      "candidate": {
+        "party": "Syntetiska Mottagaren AB",
+        "organization_number": "5560160680",
+        "level": "yellow",
+        "issues": [],
+        "parties": {
+          "supplier": {
+            "name": null,
+            "organization_number": null,
+            "evidence": []
+          },
+          "recipient": {
+            "name": "Syntetiska Mottagaren AB",
+            "organization_number": "5560160680",
+            "evidence": [
+              {
+                "page": 1,
+                "line": 2,
+                "text": "Faktureras till: Syntetiska Mottagaren AB"
+              },
+              {
+                "page": 1,
+                "line": 5,
+                "text": "Organisationsnummer: 556016-0680"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "conclusion": "The unassigned organization fallback was already latent on ae56; the newly supported recipient alias turns the composite name/organization into a false-green native result.",
+  "v3Access": false
+}

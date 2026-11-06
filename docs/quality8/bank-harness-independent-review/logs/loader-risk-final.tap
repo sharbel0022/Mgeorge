@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: the same source bytes preserve old cache identity and namespace reuse, including Unicode and Buffer input
+ok 1 - the same source bytes preserve old cache identity and namespace reuse, including Unicode and Buffer input
+  ---
+  duration_ms: 4.282354
+  type: 'test'
+  ...
+# Subtest: simultaneously imported fixture graphs keep distinct identities without embedding nested source in module URLs
+ok 2 - simultaneously imported fixture graphs keep distinct identities without embedding nested source in module URLs
+  ---
+  duration_ms: 40.925815
+  type: 'test'
+  ...
+# Subtest: an existing content-addressed file containing different bytes fails closed
+ok 3 - an existing content-addressed file containing different bytes fails closed
+  ---
+  duration_ms: 3.06549
+  type: 'test'
+  ...
+# Subtest: whole-file cleanup runs after success and does not remove modules before late awaited imports
+ok 4 - whole-file cleanup runs after success and does not remove modules before late awaited imports
+  ---
+  duration_ms: 258.097587
+  type: 'test'
+  ...
+# Subtest: whole-file cleanup runs after failure and does not remove modules before late awaited imports
+ok 5 - whole-file cleanup runs after failure and does not remove modules before late awaited imports
+  ---
+  duration_ms: 233.593003
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 683.263938

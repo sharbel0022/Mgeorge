@@ -1,0 +1,76 @@
+{
+  "observed_at": "2026-11-06 01:21:15 UTC",
+  "backup": {
+    "id": "Automation_c8747435cd908191bc323aabc2a5704d",
+    "team_id": null,
+    "title": "Säkerhetskopiera MG Fakturakoll",
+    "prompt": "Skapa och verifiera dagens krypterade säkerhetskopia av MG Fakturakolls register och originalbilagor. Använd den anslutna Sitens backup_step och läs backup_status. Om backupverktygen inte finns, använd MG Fakturakolls process_invoice_documents och följ svarets backup-fält. Läs först backup_status. Om dagens kopia redan är complete och både filantal och byte är verifierade, avsluta utan nya backupsteg. Annars starta eller återuppta kopian med backup_step och bind fortsättningen till exakt det returnerade backup-ID:t. Beräkna därefter återstående anropsbudget som ceil((files-copied)/5) + ceil((files-verified_files)/5) + 4, med ett tak på 400 backupsteg per körning. Kör högst fem sekventiella steg per batch. Avbryt omedelbart vid busy=true, fel, failed eller oväntat ändrat backup-ID. Övergången running till verifying med pending verifieringsomfattning och ännu tom verification_started_at är normal; fortsätt samma kopia även över den fasgränsen. Räkna bara fullföljda steg och behåll samma ID vid återupptagning. När ett steg säger complete, läs backup_status separat och bekräfta samma ID, copied=files, verified_files=files, verified_bytes=bytes, ett verifieringsdatum och inget fel. Om budgeten eller körningen tar slut tidigare, rapportera den verkliga delstatusen och behovet av fortsatt återupptagning. Ingen återställning, ändring av åtkomst, kundsändning eller bankbetalning får göras. Rapportera endast fel, utebliven verifiering eller behov av en åtgärd.",
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261029T021500\nRRULE:FREQ=DAILY;BYHOUR=2;BYMINUTE=15;BYSECOND=0\nEND:VEVENT",
+    "timing_mode": "exact_schedule",
+    "display_schedule": null,
+    "is_enabled": true,
+    "is_self_owned_automation": false,
+    "default_timezone": "Europe/Stockholm",
+    "next_run_time": null,
+    "last_run_time": "2026-11-06T01:17:41.589734+00:00",
+    "updated_at": "2026-11-06T01:18:05.043235+00:00",
+    "run_details": {
+      "last_run": {
+        "id": "8f5fe3c2-5e3c-8325-b586-595829207e6e",
+        "recorded_status": "completed",
+        "scheduled_for": "2026-11-06T01:15:00Z",
+        "started_at": "2026-11-06T01:16:23.918812Z",
+        "completed_at": "2026-11-06T01:17:40.028638Z",
+        "chat_ref": null
+      },
+      "latest_result": null,
+      "delivery_status": "unknown"
+    },
+    "environment_selection": "inherited",
+    "environments": null
+  },
+  "gmail": {
+    "id": "Automation_6efa3aafab4081918c48001acc562f96",
+    "team_id": null,
+    "title": "Hämta och tolka Gmail i MG Fakturakoll",
+    "prompt": "Uppdatera MG Fakturakoll med den anslutna ägarens Gmail-underlag. Hämta nya relevanta bilagor med gmail_auto_sync och bearbeta den beständiga dokumentkön. Respektera paus, väntetider, verifierade motparter och alla säkerhetskontroller. Stäm av registrerade fakturor mot redan sparade verifierbara Swedbank- och Bankgiro-underlag och förbered lämpliga kundmejl. Skicka aldrig mejl: användaren måste alltid granska och godkänna. Bevara det separata bankschemat. Var tyst vid oförändrat läge; uppmärksamma bara ett betydelsefullt fel eller nödvändig användaråtgärd.",
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "timing_mode": "exact_schedule",
+    "display_schedule": null,
+    "is_enabled": true,
+    "is_self_owned_automation": false,
+    "default_timezone": "Europe/Stockholm",
+    "next_run_time": null,
+    "last_run_time": "2026-11-06T00:58:07.140407+00:00",
+    "updated_at": "2026-11-06T00:58:29.787869+00:00",
+    "run_details": {
+      "last_run": {
+        "id": "f48a7c78-1cc0-832f-99ab-23b1de0dec64",
+        "recorded_status": "completed",
+        "scheduled_for": "2026-11-06T01:00:00Z",
+        "started_at": "2026-11-06T00:56:07.543279Z",
+        "completed_at": "2026-11-06T00:58:03.806003Z",
+        "chat_ref": {
+          "present": true
+        }
+      },
+      "latest_result": {
+        "run_id": "f48a7c78-1cc0-832f-99ab-23b1de0dec64",
+        "created_at": "2026-11-06T00:58:03.483129Z",
+        "scheduled_for": "2026-11-06T01:00:00Z",
+        "completed_at": "2026-11-06T00:58:03.806003Z",
+        "content_text": "OCR-kön är blockerad på 50 dokument eftersom både lokal och molnbaserad OCR-worker är offline. Den lokala OCR-workern behöver startas.\n\nInga nya Gmail-underlag importerades. 374 underlag väntar på granskning och bankavstämningen är oförändrad utan säkra automatiska matchningar. Inga mejl skickades och bankschemat lämnades separat.",
+        "content_truncated": false,
+        "chat_ref": {
+          "present": true
+        },
+        "requires_user_action": false,
+        "is_failure_message": false
+      },
+      "delivery_status": "unknown"
+    },
+    "environment_selection": "inherited",
+    "environments": null
+  },
+  "interpretation": "Backup has a completed platform run but no latest_result, so no new backup action or budget execution is inferred. Gmail has a matching completed 01:00 run and result; it reports OCR worker unavailable. Neither observation supplies current periodic OCR or a scheduled unfinished-to-verified backup proof."
+}

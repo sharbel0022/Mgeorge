@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "cwd": "/workspace/scratch/4d79ab4bea8e/release-docs",
+  "startedAt": "2026-11-06T02:26:35.380825+00:00",
+  "completedAt": "2026-11-06T02:27:39.384145+00:00",
+  "exitCode": 1,
+  "maxRssKb": 3009760
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "mgeorge-site64-independent-read-review-v1",
+  "recordedAt": "2026-11-05T23:39:53.614484+00:00",
+  "reviewer": "rating8_payments",
+  "baseCommit": "819adee2f3848b474167eb6b15f82584caeb39af",
+  "originalReviewedCommit": "5e74af0da008cbaffd79b5593245385f23959ea6",
+  "correctedReviewedCommit": "b9b8cf2dadf64e142b30e0e78c215dfcdb7212ac",
+  "scope": "Independent read-only review of five versioned release/assessment documents; no new production, bank, Gmail, OCR or financial calls. No full code re-review or rerun of CI. V3 held-out material not accessed by this review.",
+  "originalDocumentSha256": {
+    "docs/quality8/release-wave2.json": "b84527b7d9cde20ec70e2ba1d64a1bdadf2cdd7d15ffd4757778b001556be3b0",
+    "docs/quality8/wave2-postpublication-observations.json": "7fd94d7e69aa0b43c99f6808a69a82d88a7fe1a3833e8ea92e7ab2c56b0189c5",
+    "docs/quality8/current-33-assessment.json": "5bd3177387d3516da1f1a86387cdd86d2cdcc076f4a9c7b3e9ff86a82131b65f",
+    "QUALITY-SCORECARD.md": "02a9ec41053171bc9feba5c32e3ed9d1406143709357b2e1d6ddaa71dc8560a7",
+    "PROGRESS.md": "92fa266e01578df69450d0b3a3ab89a87648f7b840b2d0d48a9e628cbaf279ca"
+  },
+  "correctedDocumentSha256": {
+    "docs/quality8/release-wave2.json": "b84527b7d9cde20ec70e2ba1d64a1bdadf2cdd7d15ffd4757778b001556be3b0",
+    "docs/quality8/wave2-postpublication-observations.json": "7fd94d7e69aa0b43c99f6808a69a82d88a7fe1a3833e8ea92e7ab2c56b0189c5",
+    "docs/quality8/current-33-assessment.json": "921c951ae833b02dc94b5844701b98cd28e167d932185ee67fdb5bd2593b5717",
+    "QUALITY-SCORECARD.md": "0f4383d5ebe61ef6258ad4b61b691832419368e5d10cc238582e4bdaa223d2a9",
+    "PROGRESS.md": "92fa266e01578df69450d0b3a3ab89a87648f7b840b2d0d48a9e628cbaf279ca"
+  },
+  "additionalSourceSha256": {
+    "docs/quality8/PLAN.md": "2b7c6e2bcfdd1c0c9d4929a96d9860925d44ed92fe6569c502e8057630a63b5a",
+    "docs/quality8/payer-reference-live-evidence-reassessment.md": "cc7ce1a50757ae3f25f3efcb67003e36448a77a396673ca39ddd484baa60ac6f",
+    "docs/quality8/assessment-independent-candidate.json": "7336e37c465b1312229bac8bf5252b19d5121da06609a664bd9cc159a01f9fdd",
+    "docs/quality8/browser-wave2/publication64/observations.json": "773c1169f60e6e1e33f2dd385f7852057b8ecd31b6448e939ad52d122faa77dd"
+  },
+  "publication": {
+    "main": "819adee2f3848b474167eb6b15f82584caeb39af",
+    "siteVersion": 64,
+    "siteSourceCommit": "e6c313e1356a0043b76d0f83dffa7bcc86a5f217",
+    "mainSitesTree": "6e024c917ba8833e516db5723f8be1ff1d1bc4dc",
+    "siteSourceTree": "6e024c917ba8833e516db5723f8be1ff1d1bc4dc",
+    "mainCiRun": 42123382389,
+    "passedTests": 6534
+  },
+  "aggregateVerified": {
+    "sum": 256.5,
+    "maximum": 330,
+    "average": 7.7727272727272725,
+    "at_least_8": 27,
+    "area_count": 33,
+    "below_8_ids": [
+      6,
+      10,
+      15,
+      16,
+      28,
+      33
+    ],
+    "all_33_at_least_8": false
+  },
+  "referencedObservationHashesVerified": {
+    "prepublication_evidence": true,
+    "postpublication_evidence": true,
+    "public_browser": true
+  },
+  "checks": {
+    "all_referenced_observation_hashes_match": true,
+    "source_tree_matches_site_tree": true,
+    "row_ids_exactly_1_through_33": true,
+    "sum_matches_rows": true,
+    "threshold_count_matches_rows": true,
+    "below_8_ids_match_rows": true,
+    "ci_counts_sum": true,
+    "revision_unchanged": true,
+    "bank_relation_still_unproved": true,
+    "no_financial_write_claimed": true,
+    "ocr_workflow_run_not_counted_as_periodic": true,
+    "minor_bank_wording_closed": true,
+    "minor_area6_periodicity_closed": true,
+    "scores_unchanged_by_minor_fixes": true,
+    "average_matches_rows": true
+  },
+  "findings": [
+    {
+      "severity": "Minor",
+      "id": "unproved-bank-relation-wording",
+      "firstSeenAtCommit": "5e74af0da008cbaffd79b5593245385f23959ea6",
+      "status": "closed",
+      "fixedAtCommit": "b9b8cf2dadf64e142b30e0e78c215dfcdb7212ac",
+      "details": "The scorecard phrase could imply that the bank relation was proved. It now explicitly says that the relation remains unproved; accountVerified and targetRelationProved remain false."
+    },
+    {
+      "severity": "Minor",
+      "id": "area6-extra-periodicity-gate",
+      "firstSeenAtCommit": "5e74af0da008cbaffd79b5593245385f23959ea6",
+      "status": "closed",
+      "fixedAtCommit": "b9b8cf2dadf64e142b30e0e78c215dfcdb7212ac",
+      "details": "Area6 previously added stable periodic progress to its normal-flow criterion. The extra periodicity wording is removed and periodicity is explicitly assessed in area28. Area6 stays below8 because the full normal flow is not yet proved."
+    }
+  ],
+  "openFindings": {
+    "Critical": 0,
+    "Important": 0,
+    "Minor": 0
+  },
+  "readiness": "READY_WITH_STATED_LIMITATIONS",
+  "assessment": {
+    "areas18And19": "The previously conditional publication and scoped after-read conditions are now documented. Real retained report payer/general reference are presented at their source level; missing AIS payer/reference stay unknown. No bank authentication, account authority, report-to-AIS relation or invoice-customer identity is inferred.",
+    "gmail": "Separate observed external scheduling receipts can support Gmail fetching; the application external_schedule_verified=false and background_ready=false remain honest.",
+    "remainingAreasBelow8": [
+      6,
+      10,
+      15,
+      16,
+      28,
+      33
+    ],
+    "noExtraRequirementsAdded": "No physical-phone certification, complete financial audit, production allocation or additional bank consent is required solely to satisfy the scoped presentation criteria18/19."
+  },
+  "limitations": [
+    "Production observations were supplied as sanitized versioned receipts by root. This reviewer did not repeat authenticated production reads or inspect private originals.",
+    "Public demo geometry/focus checks do not establish authenticated end-to-end production use or physical mobile acceptance.",
+    "The local Git source-tree comparison corroborates the recorded publication lineage; it is not an independent new deployment query.",
+    "V1/V2 remain failed independent optical first probes. OCR workflow_run success does not establish periodic scheduling or field-quality acceptance.",
+    "Backup covers the recorded362-file snapshot and excludes later imports; synthetic disaster recovery is not a production restore.",
+    "This is a review at the recordedSite64/versioned-document cutoff. Future releases and later scheduler observations require their own evidence."
+  ]
+}

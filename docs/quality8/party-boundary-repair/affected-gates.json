@@ -1,0 +1,122 @@
+{
+  "source": "0f550950b99d41d932b91370b458e9b85abf9451",
+  "checks": [
+    {
+      "name": "node-corpus",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=^(?!Q8 actual Swedish PNG OCR)",
+        "test/document-quality-cycle.test.js",
+        "test/invoice-parser-corpus-q8.test.js",
+        "test/invoice-reference-integration.test.js"
+      ],
+      "exitCode": 0,
+      "log": "node-corpus.tap",
+      "sha256": "8680da78c3b8eb9095a468c5cdc18def4a011d493cbd21884ed9511676ea4587",
+      "counts": [
+        "# tests 357",
+        "# pass 357",
+        "# fail 0",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0",
+        "# duration_ms 179038.994686"
+      ],
+      "failures": []
+    },
+    {
+      "name": "sites-corpus",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "sites/tests/document-quality-cycle.test.mjs",
+        "sites/tests/invoice-parser-corpus-q8.test.mjs",
+        "sites/tests/gmail-preview-q8.test.mjs"
+      ],
+      "exitCode": 0,
+      "log": "sites-corpus.tap",
+      "sha256": "b57c43499b52c51507c5eea99883ae246e39d385cd5280260eff593388bab30c",
+      "counts": [
+        "# tests 352",
+        "# pass 352",
+        "# fail 0",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0",
+        "# duration_ms 16538.972215"
+      ],
+      "failures": []
+    },
+    {
+      "name": "boundaries",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "sites/tests/party-role-name-grammar.test.mjs",
+        "sites/tests/organization-event-context.test.mjs",
+        "sites/tests/review-organization-source-order-independent.test.mjs",
+        "sites/tests/review-organization-inline-context-independent.test.mjs",
+        "sites/tests/review-organization-owner-boundaries.test.mjs",
+        "sites/tests/ocr-explicit-role-boundary-positive.test.mjs",
+        "sites/tests/ocr-layout-role-parity.test.mjs",
+        "test/invoice-scalar-layout-regression.test.js",
+        "sites/tests/invoice-scalar-layout-regression.test.mjs",
+        "sites/tests/review-explicit-recipient-boundaries.test.mjs",
+        "sites/tests/party-completed-name-boundaries.test.mjs"
+      ],
+      "exitCode": 0,
+      "log": "boundaries.tap",
+      "sha256": "202dae402c31f1eaccd9887a76ae61d94b4bbf154f8b47428fc8ca8602386002",
+      "counts": [
+        "# tests 408",
+        "# pass 408",
+        "# fail 0",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0",
+        "# duration_ms 6419.868435"
+      ],
+      "failures": []
+    },
+    {
+      "name": "mcp-read",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--test",
+        "--test-reporter=tap",
+        "sites/tests/mcp-evidence-read.test.mjs"
+      ],
+      "exitCode": 0,
+      "log": "mcp-read.tap",
+      "sha256": "4fd04c326aee1520214c8b5784fc86f37423905f875eef4c9fb550e5583a6414",
+      "counts": [
+        "# tests 34",
+        "# pass 34",
+        "# fail 0",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0",
+        "# duration_ms 3741.055425"
+      ],
+      "failures": []
+    }
+  ],
+  "opticalCalls": 0,
+  "fullCi": false,
+  "limits": "Affected parser and consumer gates only. Existing actual Swedish PNG test explicitly excluded, as in the previous known-data corpus gate; whole Node/Sites CI remains mandatory."
+}

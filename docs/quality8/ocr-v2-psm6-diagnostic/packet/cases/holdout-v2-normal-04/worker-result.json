@@ -1,0 +1,17 @@
+{
+  "text": "Fiktiva Lönn Kontor AB Bankgiro\nTorget 3 5736-0828\n456 78 Exempelby Ange OCR-nummer\nOrg.nr: 559762-31438 00863025144\nFakturanummer: LF-63072\nFakturadatum: 2026-06-25\nFörfallodatum: 2026-07-25\nFaktureras till\nTestmottagaren Handel AB\nHandelsvägen 22\n123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nStolsmattor 6 238,90 1 433,40\nTransport och inbärning 1 700,20 700,20\nSamtliga radbelopp i SEK, exklusive moms.\nLeveransadress enligt beställning. Netto 2 133,60\nValuta: SEK Moms 25 24 533,40\nFakturabelopp 2 667,00 SEK\nAnge fakturans OCR-nummer vid betalning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 91,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b",
+    "textSha256": "b128d4665719c91b6093a2978b374b970c4854583e2ade3750ff945ed7ccb174",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "8fd09f8e2cb646922058da0f89122d6b630c9d37e8c2013521aba06e482dc272",
+        "bankgiro": []
+      }
+    ]
+  }
+}

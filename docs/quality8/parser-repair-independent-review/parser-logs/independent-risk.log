@@ -1,0 +1,20 @@
+✔ Node independent literal opposite role inside name and independent owner (43.141222ms)
+✔ Node independent unknown inline colon cannot be hidden inside explicit name (3.960065ms)
+✔ Node independent unowned identical valid duplicate never donates an owner (1.565889ms)
+✔ Node independent equal duplicate preserves an independently owned identity (1.217644ms)
+✔ Node independent bad unowned occurrence before owned identity remains in census (0.868556ms)
+✔ Node independent different unowned occurrence after scalar boundary holds identity (0.891009ms)
+✔ Sites independent literal opposite role inside name and independent owner (7.91996ms)
+✔ Sites independent unknown inline colon cannot be hidden inside explicit name (1.296861ms)
+✔ Sites independent unowned identical valid duplicate never donates an owner (1.318293ms)
+✔ Sites independent equal duplicate preserves an independently owned identity (1.320585ms)
+✔ Sites independent bad unowned occurrence before owned identity remains in census (1.308388ms)
+✔ Sites independent different unowned occurrence after scalar boundary holds identity (0.930838ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 689.399701

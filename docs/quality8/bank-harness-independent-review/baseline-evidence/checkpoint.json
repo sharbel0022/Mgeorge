@@ -1,0 +1,74 @@
+{
+  "schema": "wave4-local-integration-checkpoint-v1",
+  "recordedAt": "2026-11-06T02:29:04.363755+00:00",
+  "combined": {
+    "tests": 421,
+    "pass": 420,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "exitCode": 1,
+    "failure": "Banking-security worker terminated at file level; no failed assertion was reported.",
+    "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 sites/tests/banking-security.test.mjs sites/tests/review-party-name-census-independent.test.mjs sites/tests/mcp-evidence-read.test.mjs sites/tests/gmail.test.mjs sites/tests/gmail-preview-q8.test.mjs sites/tests/company-mcp-permissions.test.mjs",
+    "selectionCorrection": "Last filename did not exist. Actual company-request.test.mjs was run separately, 20/20; never counted in this combined run."
+  },
+  "company": {
+    "tests": 20,
+    "pass": 20,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "exitCode": 0,
+    "command": "NODE_ENV=test /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap --test-concurrency=1 sites/tests/company-request.test.mjs"
+  },
+  "bankFullDiagnostic": {
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "--import",
+      "./scripts/saas-test-isolation.mjs",
+      "--experimental-strip-types",
+      "--test",
+      "--test-reporter=tap",
+      "--test-concurrency=1",
+      "sites/tests/banking-security.test.mjs"
+    ],
+    "cwd": "/workspace/scratch/4d79ab4bea8e/release-docs",
+    "startedAt": "2026-11-06T02:26:35.380825+00:00",
+    "completedAt": "2026-11-06T02:27:39.384145+00:00",
+    "exitCode": 1,
+    "maxRssKb": 3009760
+  },
+  "diagnosticSummary": {
+    "tests": 222,
+    "pass": 221,
+    "fail": 1,
+    "childSignal": "SIGKILL",
+    "failedAssertionObserved": false,
+    "maximumChildRssKb": 3009760
+  },
+  "conclusion": "Not GREEN. Investigate bank test module memory before final integrated CI. No product change or assertion relaxation is justified by this signal alone.",
+  "files": [
+    {
+      "file": "rating8-wave4-repair-integrated.log",
+      "bytes": 45603,
+      "sha256": "5705922d7fc36956d51d9ae1ab85c6655032f2f98412d48078133a9976b80718"
+    },
+    {
+      "file": "rating8-wave4-repair-company.log",
+      "bytes": 4988,
+      "sha256": "985a53e78bca160e1b1c784ab8f301135b44fe0334eb1992cfe4c30bd04d9166"
+    },
+    {
+      "file": "rating8-wave4-bank-full-diagnostic.tap",
+      "bytes": 56025,
+      "sha256": "122c24868d760099ab54242b1bd50baa877fdb3f9233de124fccea8cebbc804a"
+    },
+    {
+      "file": "rating8-wave4-bank-full-diagnostic.json",
+      "bytes": 504,
+      "sha256": "400bac40e96e5c2d11d6bc55480d53cc6f952d0dd586b8c8b5c246979481e9c8"
+    }
+  ]
+}

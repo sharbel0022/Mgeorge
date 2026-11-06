@@ -1,0 +1,31 @@
+{
+  "sourceSha256": "a4dace0731fb0db735a86bafbd79fca178b049fda458ce01c1dd5e2b943cefb8",
+  "sourceSnapshot": "initial-fix-source.txt",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--experimental-strip-types",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/party-completed-name-boundaries.test.mjs"
+  ],
+  "exitCode": 1,
+  "logSha256": "2114b2f36fcf66a35cb4d80a0130fc4ce398cad450fa2dcfc2a917d82737d8a1",
+  "counts": [
+    "# tests 56",
+    "# pass 52",
+    "# fail 4",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0",
+    "# duration_ms 661.405744"
+  ],
+  "failures": [
+    "not ok 8 - Node pdf holds a bare role after a completed name: Kund: A AB Supplier Second Entity",
+    "not ok 22 - Node ocr holds a bare role after a completed name: Kund: A AB Supplier Second Entity",
+    "not ok 36 - Sites pdf holds a bare role after a completed name: Kund: A AB Supplier Second Entity",
+    "not ok 50 - Sites ocr holds a bare role after a completed name: Kund: A AB Supplier Second Entity"
+  ]
+}

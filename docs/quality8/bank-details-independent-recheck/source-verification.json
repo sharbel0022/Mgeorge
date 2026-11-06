@@ -1,0 +1,46 @@
+{
+  "commit": "e66cde6767ebd232e2b966eb2b002193ea0a0999",
+  "baseline": "638c77365dbf8f4c73db6b23816a37f577da5689",
+  "onlyProductFileChanged": [
+    "sites/lib/bank-consent-policy.js"
+  ],
+  "onlyObserverChanged": true,
+  "files": [
+    {
+      "path": "sites/lib/bank-consent-policy.js",
+      "sha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43",
+      "matchesExactCommit": true,
+      "identicalTo638c773": false
+    },
+    {
+      "path": "sites/lib/bank-consent-policy.d.ts",
+      "sha256": "4e68f22bef2a9eabf5f94c9f4a8e6f3ab48c11d0a2a3e7b951fb757059add280",
+      "matchesExactCommit": true,
+      "identicalTo638c773": true
+    },
+    {
+      "path": "sites/lib/banking/service.ts",
+      "sha256": "5fb0f6883931fcefeb3be3b9df271b2f428232eaafad36c3bb8adfeafe5e5f24",
+      "matchesExactCommit": true,
+      "identicalTo638c773": true
+    },
+    {
+      "path": "sites/lib/banking/enable-banking.ts",
+      "sha256": "c28a4576d73673652a242002e174dbbf91a3f3802f731fc8ffdfdc5c39a345a6",
+      "matchesExactCommit": true,
+      "identicalTo638c773": true
+    },
+    {
+      "path": "sites/lib/banking/account-evidence.ts",
+      "sha256": "0593fd16d086dd2e3e9108a613506e098316cce5efab051e4959d86b6a2e837f",
+      "matchesExactCommit": true,
+      "identicalTo638c773": true
+    },
+    {
+      "path": "sites/lib/banking/account-read-guard.ts",
+      "sha256": "ea30ac7a716ce7e705495f0ff2a1ad64e6c2f1e392b5a3a01ca5661b70da9837",
+      "matchesExactCommit": true,
+      "identicalTo638c773": true
+    }
+  ]
+}

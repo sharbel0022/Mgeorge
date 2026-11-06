@@ -1,0 +1,17 @@
+{
+  "text": "Exempel Fräsverkstan AB FAKTURA\nSvarvargatan 6\n789 01 Teståsen\nFakturanummer F-98342\nFakturadatum 2026-07-16\nFörfallodatum 2026-08-15\n\nFaktureras till\nTestmottagaren Handel AB Er beställning: PO-83207\nHandelsvägen 22\n123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nMaterialbearbetning 6 845,80 5 074,80\nMaskinhyra 2 1 140,00 2 280,00\nSamtliga radbelopp i SEK, exklusive moms.\nNetto Moms 25 20 Att betala\n7 354,80 SEK 1 838,70 SEK 9 193,50 SEK\nBankgiro OCKR-referens\n619-4823 00863025177\nAnge OCR-numret vid betalning.\nOrganisationsnummer: 559762-3171 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 91,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "6cdc1af980952c6efacf2060bc282c086aeaac21711f5d158b7b37f669f795b7",
+    "textSha256": "e2cb297e0d37c5fd113f5411da71936a051d315a887842ee0a8ff0c6b7e40586",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "d8c968b9ae2955682f5aa1923c8b42b224a59154ea7a4d5cbd2f8f3d6b6011de",
+        "bankgiro": []
+      }
+    ]
+  }
+}

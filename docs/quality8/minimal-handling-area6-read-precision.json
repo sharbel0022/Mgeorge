@@ -1,0 +1,75 @@
+{
+  "schema": "quality8-area6-read-precision-v1",
+  "observedOn": "2026-11-06",
+  "sourceHead": "ae7721b35ec1c91ee590b57a14e36cc13f2e8e62",
+  "area": 6,
+  "scoreChanged": false,
+  "periodicityRequired": false,
+  "productionCalls": 0,
+  "privateOriginalFetches": 0,
+  "mutations": 0,
+  "ocrCalls": 0,
+  "applicationParserCalls": 0,
+  "v3Touched": false,
+  "minimumRemainingObservation": "A genuinely eligible existing normal invoice traverses the current intended queue and has one durable registration receipt and correct final status; no forced production duplicate, payment allocation or periodic run is added as a requirement.",
+  "savedReviewCounts": {
+    "total": 368,
+    "analyzed": 368,
+    "truncated": false,
+    "unverified_counterparty": 367,
+    "other_review": 0
+  },
+  "counterpartyInference": "Absence of the exact historical issue is not current verification. Every analyzed row has at least one counted review flag.",
+  "candidateIdentified": false,
+  "existingReadPaths": {
+    "mcpSummary": "aggregate only; no document IDs or current trust join",
+    "gmailStatus": "latest 200 source rows, stored metadata and extraction; no pagination or current trust join; no original bytes",
+    "sitesTableRead": "ordinary authorized overview followed by bounded pages, maximum25 rows; exact returned names and next_offset required; no arbitrary SQL; not invoked"
+  },
+  "existingResumePath": {
+    "ui": "Tolka igen",
+    "requests": [
+      "POST /api/gmail/retry {document_id}",
+      "POST /api/gmail/process {}"
+    ],
+    "executed": false,
+    "factApproval": false,
+    "queueSpecificity": "Requeues this exact job but processing claims up to two cloud jobs in available_at/document_id order; no promise this one is next.",
+    "safety": "Current source, trusted counterparty, original integrity, green complete extraction, duplicate policy and transaction guards remain authoritative."
+  },
+  "sources": [
+    {
+      "path": "docs/quality8/PLAN.md",
+      "sha256": "2b7c6e2bcfdd1c0c9d4929a96d9860925d44ed92fe6569c502e8057630a63b5a"
+    },
+    {
+      "path": "docs/quality8/wave2-postpublication-observations.json",
+      "sha256": "7fd94d7e69aa0b43c99f6808a69a82d88a7fe1a3833e8ea92e7ab2c56b0189c5"
+    },
+    {
+      "path": "sites/lib/document-processing.ts",
+      "sha256": "452662775e7e85428c9cba5d16c555e215a75f0ece81bf826db3db8040ba357e"
+    },
+    {
+      "path": "sites/lib/gmail-service.ts",
+      "sha256": "7366af9e0f3ef566d2a45dc95d8af9286e60358ebe9a0db0ccf5d2732b09022e"
+    },
+    {
+      "path": "sites/components/gmail-workspace.tsx",
+      "sha256": "33e3d995827aa724f59b2c9f0a06b241b7d74cfd8080ab0b73142c17c66a0344"
+    },
+    {
+      "path": "sites/components/document-ocr-status.tsx",
+      "sha256": "619f42ed46602680096c54c87bc733375ecd98d56d2b32e0178f7ff2aba2085e"
+    },
+    {
+      "path": "sites/app/api/gmail/[action]/route.ts",
+      "sha256": "c2b25e8ee08a0489c5706c9394f6aef690afa49139334722b492d8f4cf970e1e"
+    },
+    {
+      "path": "sites/tests/gmail.test.mjs",
+      "sha256": "1111ac83e78c8a5c8527cd9b53d08385b1fc0c83672a85a29d15456e4ea51d4d"
+    }
+  ],
+  "verification": "Read-only source and sanitized evidence inspection; no new test or production run. Historical registration dates are parent-reported, not newly read."
+}

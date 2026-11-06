@@ -1,0 +1,78 @@
+// Known stored observations only. This runner never invokes OCR or a worker.
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {resolve,dirname,join} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import {performance} from 'node:perf_hooks';
+import assert from 'node:assert/strict';
+import {projectReviewedFields,evaluateDocument,summarizeDocuments} from '../../test/helpers/ocr-quality-metrics.mjs';
+import {localGraph,mandatoryFields,criticalFields} from './ocr-holdout-provenance.mjs';
+
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..'),args=process.argv.slice(2),options={};
+for(let i=0;i<args.length;i+=2){if(!['--source-commit','--output','--compare'].includes(args[i])||!args[i+1]||options[args[i]])throw Error('Use --source-commit SHA --output NEW.json [--compare BASELINE.json]');options[args[i]]=args[i+1];}
+if(!options['--source-commit']||!options['--output'])throw Error('Missing target or output');
+const target=options['--source-commit'],output=resolve(options['--output']);if(existsSync(output))throw Error('Refusing to overwrite an earlier result');
+const hash=value=>createHash('sha256').update(value).digest('hex');
+const blob=(commit,path)=>execFileSync('git',['show',commit+':'+path],{cwd:root,maxBuffer:30_000_000});
+const firstCommit='45fd0e9d5f13071129da983996c4a6c33804f62d',psm6Commit='7a148190280cff1657fdaa2ef1af28f09c9a5597',psm3Commit='e653a8d12fc276e2d6d0ecdbc1710101fd64b3d1';
+const firstBytes=blob(firstCommit,'docs/quality8/ocr-independent-holdout-v2-result.json'),psm6Bytes=blob(psm6Commit,'docs/quality8/ocr-v2-psm6-diagnostic/packet/result.json');
+assert.equal(hash(firstBytes),'13557c3012331fa0101fbe3e6fe498fd2fbf3346b8740cfe5fe4b83e8393b6e7');
+assert.equal(hash(psm6Bytes),'a8f4c44973ea42eedbac1878ef5c145fad8ae823227de6ceff6dd7364f9ab9ea');
+const first=JSON.parse(firstBytes),psm6=JSON.parse(psm6Bytes),goldBytes=blob(firstCommit,'test/fixtures/quality8/ocr-holdout-v2/gold.json'),gold=JSON.parse(goldBytes);
+assert.equal(hash(goldBytes),'943a3f9039726d50817de5ad5e913c85aa5210f52e70db487be18e4bb5840af0');
+const corpus=JSON.parse(blob(firstCommit,'test/fixtures/quality8/ocr-holdout-v2/manifest.json'));
+const entries=['src/invoice-extraction.js','src/invoice-worker.js','src/sites-ocr-pull.js','sites/lib/invoice-fields.js','sites/lib/local-ocr.ts','sites/lib/imports.ts','sites/lib/document-processing.ts'];
+const graph=localGraph(root,entries),sourceHashes={};
+for(const path of graph){const bytes=readFileSync(join(root,path));assert.deepEqual(bytes,blob(target,path),'Source mismatch: '+path);sourceHashes[path]=hash(bytes);}
+const node=await import(pathToFileURL(join(root,'src/invoice-extraction.js')).href);
+const {loadInvoiceParser}=await import(pathToFileURL(join(root,'sites/tests/helpers/invoice-module-loader.mjs')).href),sites=await loadInvoiceParser();
+const {reconstructOcrLayout}=await import(pathToFileURL(join(root,'sites/lib/ocr-layout.js')).href);
+const {collectOcrBankgiroPage,bindOcrBankgiroEvidence}=await import(pathToFileURL(join(root,'sites/lib/ocr-bankgiro-evidence.js')).href);
+const observationPath=join(root,'sites/lib/ocr-observation.js'),observation=existsSync(observationPath)?await import(pathToFileURL(observationPath).href):null;
+const report={schema:'mgeorge-known-ocr-field-replay-v1',sourceCommit:target,sourceHashes,graph,sourceScope:'Static relative-import graph of the named producers, bridge, server/import consumers and both parsers; those services are not executed by this replay.',runnerSha256:hash(readFileSync(fileURLToPath(import.meta.url))),metricHelperSha256:hash(readFileSync(join(root,'test/helpers/ocr-quality-metrics.mjs'))),firstResultSha256:hash(firstBytes),psm6ResultSha256:hash(psm6Bytes),goldSha256:hash(goldBytes),independentHoldout:false,acceptanceMeasurement:false,opticalCalls:0,parserCalls:0,startedAt:new Date().toISOString(),runtime:{node:process.version},cases:[],details:[],limitations:['Known development inputs, no optical or production run.','Stored PSM3 first-pass text has no general word graph. Only the separate old diagnostic 05/09 raw PSM3 pages are available.','PSM6 is replayed separately, not adopted or fused.','Direction is supplied metadata; image9 excludes it.','Word confidences, spellings, hashes and original fixtures are unchanged.']};
+async function evaluate(item,sample,variant){
+ const words=sample.raw?.blocks?.flatMap(block=>block.paragraphs.flatMap(paragraph=>paragraph.lines.flatMap(line=>line.words)))||[];
+ const originalRaw=sample.raw?structuredClone(sample.raw):null;
+ const layout=sample.raw?reconstructOcrLayout(sample.raw.text,sample.raw.blocks):null;
+ const text=layout?.text??sample.text,ocrEvidence=layout?bindOcrBankgiroEvidence(sample.inputSha256,text,[collectOcrBankgiroPage(text,layout.blocks)]):sample.ocrEvidence;
+ let ocrObservation=null;
+ if(observation&&sample.raw){const page=observation.collectOcrObservationPage(sample.raw.text,sample.raw.blocks,1,sample.raster,text);ocrObservation=observation.bindOcrObservation(sample.inputSha256,text,[page]);}
+ if(sample.raw){assert.deepEqual(sample.raw,originalRaw);const retained=layout.blocks.flatMap(block=>block.paragraphs.flatMap(paragraph=>paragraph.lines.flatMap(line=>line.words)));assert.equal(retained.length,words.length);for(const word of words)assert.ok(retained.includes(word));}
+ report.cases.push({id:item.id,variant,population:item.population,inputSha256:sample.inputSha256,rawResponseSha256:sample.rawSha256||null,raster:sample.raster||null,text,textSha256:hash(text),confidence:sample.confidence,sourceWords:words.length,observationAvailable:Boolean(ocrObservation),observation:ocrObservation,ocrEvidence});
+ for(const [engine,parse]of [['node',node.interpretInvoice],['sites',sites.interpretInvoice]]){
+  const start=performance.now();report.parserCalls++;
+  const extraction=parse(text,{...item.metadata,method:'ocr',ocrConfidence:sample.confidence,ocrEvidence,ocrObservation,ocrInputSha256:sample.inputSha256});
+  const row=evaluateDocument({id:item.id,family:item.layout,subset:item.population,variant,engine,...projectReviewedFields(extraction,gold.cases[item.id]),level:extraction.level,requireReview:gold.cases[item.id].requireReview,error:null,durationMs:performance.now()-start,issues:extraction.issues,fieldEvidence:extraction.fields,parties:{supplier:extraction.details.supplier,recipient:extraction.details.recipient}});
+  row.falseGreenCritical=row.green&&Boolean(row.requireReview||row.fields.some(field=>criticalFields.includes(field.name)&&!field.correct));report.details.push(row);
+ }
+}
+for(const item of corpus.images){const sample=first.processing.find(value=>value.id===item.id);assert.ok(sample);assert.equal(sample.inputSha256,item.sha256);await evaluate(item,{inputSha256:sample.inputSha256,text:sample.observedText,confidence:sample.ocrConfidence,ocrEvidence:sample.ocrEvidence},'stored-psm3-text');}
+for(const item of corpus.images){
+ const sample=psm6.processing.find(value=>value.id===item.id);assert.ok(sample);assert.equal(sample.inputSha256,item.sha256);
+ const prefix='docs/quality8/ocr-v2-psm6-diagnostic/packet/cases/'+item.id+'/',rawBytes=blob(psm6Commit,prefix+'raw-response.json'),raster=blob(psm6Commit,prefix+'recognition-input.png');
+ assert.equal(hash(rawBytes),sample.artifactHashes['raw-response.json']);assert.equal(hash(raster),sample.actualRasterSha256);
+ const original=blob(firstCommit,'test/fixtures/quality8/ocr-holdout-v2/images/'+item.id+'.png');assert.equal(hash(original),item.sha256);
+ await evaluate(item,{inputSha256:sample.inputSha256,confidence:sample.confidence,raw:JSON.parse(rawBytes).data,rawSha256:hash(rawBytes),raster:{sha256:hash(raster),width:raster.readUInt32BE(16),height:raster.readUInt32BE(20),sourceWidth:original.readUInt32BE(16),sourceHeight:original.readUInt32BE(20),language:'swe',oem:1,psm:6}},'known-psm6-raw');
+}
+for(const id of ['holdout-v2-normal-09','holdout-v2-normal-05']){
+ const item=corpus.images.find(value=>value.id===id),prefix='docs/quality8/ocr-v2-post-holdout-diagnostic/packet/'+id+'/',receipt=JSON.parse(blob(psm3Commit,prefix+'receipt.json')),rawBytes=blob(psm3Commit,prefix+'raw-response.json'),raster=blob(psm3Commit,prefix+'recognition-input.png');
+ assert.equal(hash(rawBytes),receipt.artifactHashes['raw-response.json']);assert.equal(hash(raster),receipt.artifactHashes['recognition-input.png']);assert.equal(receipt.inputSha256,item.sha256);
+ const original=blob(firstCommit,'test/fixtures/quality8/ocr-holdout-v2/images/'+id+'.png');assert.equal(hash(original),item.sha256);
+ await evaluate(item,{inputSha256:receipt.inputSha256,confidence:receipt.globalConfidence,raw:JSON.parse(rawBytes).data,rawSha256:hash(rawBytes),raster:{sha256:hash(raster),width:raster.readUInt32BE(16),height:raster.readUInt32BE(20),sourceWidth:original.readUInt32BE(16),sourceHeight:original.readUInt32BE(20),language:'swe',oem:1,psm:3}},'known-psm3-two-raw');
+}
+const subset=(rows,fields)=>rows.map(row=>evaluateDocument({id:row.id,expected:Object.fromEntries(row.fields.filter(field=>fields.includes(field.name)).map(field=>[field.name,field.expected])),actual:Object.fromEntries(row.fields.filter(field=>fields.includes(field.name)).map(field=>[field.name,field.actual])),level:row.level,requireReview:row.requireReview,error:row.error,durationMs:row.durationMs}));
+report.summaries={};
+for(const variant of ['stored-psm3-text','known-psm6-raw','known-psm3-two-raw'])for(const engine of ['node','sites'])for(const population of ['normal-readable','stress']){
+ const rows=report.details.filter(row=>row.variant===variant&&row.engine===engine&&row.subset===population);if(!rows.length)continue;
+ report.summaries[variant+'/'+engine+'/'+population]={all13:summarizeDocuments(rows),mandatory10:summarizeDocuments(subset(rows,mandatoryFields)),image9:summarizeDocuments(subset(rows,mandatoryFields.filter(field=>field!=='direction'))),falseGreenCritical:rows.filter(row=>row.falseGreenCritical).length};
+}
+for(const row of report.details.filter(row=>row.engine==='node')){const same=report.details.find(other=>other.id===row.id&&other.variant===row.variant&&other.engine==='sites');assert.deepEqual(same.fields,row.fields);assert.deepEqual(same.fieldEvidence,row.fieldEvidence);assert.deepEqual(same.issues,row.issues);assert.equal(same.level,row.level);}
+if(options['--compare']){
+ const previousBytes=readFileSync(resolve(options['--compare'])),previous=JSON.parse(previousBytes);assert.equal(previous.details.length,report.details.length);
+ for(const row of report.details){const before=previous.details.find(value=>value.id===row.id&&value.variant===row.variant&&value.engine===row.engine);assert.ok(before);for(const key of ['fields','fieldEvidence','issues','level','parties'])assert.deepEqual(row[key],before[key],row.variant+'/'+row.engine+'/'+row.id+'/'+key);}
+ report.unchangedFieldOutcomes={againstSourceCommit:previous.sourceCommit,sha256:hash(previousBytes),cases:report.details.length,passed:true};
+}
+for(const [path,want]of Object.entries(sourceHashes))assert.equal(hash(readFileSync(join(root,path))),want,path);
+report.sourceUnchanged=true;report.completedAt=new Date().toISOString();writeFileSync(output,JSON.stringify(report,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({sourceCommit:target,opticalCalls:0,parserCalls:report.parserCalls,unchangedFieldOutcomes:report.unchangedFieldOutcomes,summaries:Object.fromEntries(Object.entries(report.summaries).map(([key,value])=>[key,{all13:value.all13.counts,mandatory10:value.mandatory10.counts,exact:value.all13.exactDocuments,falseGreenCritical:value.falseGreenCritical}]))},null,2));

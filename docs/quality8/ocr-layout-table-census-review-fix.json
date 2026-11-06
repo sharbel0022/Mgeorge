@@ -1,0 +1,424 @@
+{
+  "schema": "mgeorge-layout-table-census-fix-v1",
+  "baseCommit": "27caeb3fdbe206937a1004a32d58845923c21c8e",
+  "opticalCalls": 0,
+  "independentTest": {
+    "path": "sites/tests/review-layout-table-census-independent.test.mjs",
+    "sha256": "332ec4b13aed08ac7ec46eb870b139d52aa17e8c7e4f47654232ac0c626cbe06",
+    "before": {
+      "pass": 6,
+      "fail": 6,
+      "skip": 0
+    },
+    "after": {
+      "pass": 12,
+      "fail": 0,
+      "skip": 0
+    },
+    "inputAndAssertionsUnchanged": true
+  },
+  "supplementaryExistingGrammarCases": 8,
+  "verification": {
+    "pass": 732,
+    "fail": 0,
+    "skip": 0,
+    "durationMs": 3262.322979,
+    "tscPassed": true,
+    "detailByteParity": true,
+    "diffCheckPassed": true,
+    "logSha256": "e79d7df9eb4bbdef892c0ab15526d20bbadb528f6ac0d405bff8a8d9f2cf4652"
+  },
+  "productHashes": {
+    "sites/lib/ocr-layout.js": "b9c22df11bf317e7d0c3cb880f3c810c73b948fa6f694214c07ac80e1a066d76",
+    "src/invoice-details.js": "83c6af54a622db3afe58fcf2a2dfb4802e0d62d07ae8ba6978048475e96441d5",
+    "sites/lib/invoice-details.js": "83c6af54a622db3afe58fcf2a2dfb4802e0d62d07ae8ba6978048475e96441d5"
+  },
+  "comparison": "Before and after actual layout helpers, each passed through the same actual Node/Sites scalar/detail consumers. The detail-parser export added by this fix does not alter the parser algorithm.",
+  "examples": [
+    {
+      "description": "Artikel",
+      "quantity": "Antal",
+      "source": {
+        "text": "Artikel  Antal  Netto\n\n1 480,00\n\nNetto\n",
+        "blocks": [
+          {
+            "paragraphs": [
+              {
+                "lines": [
+                  {
+                    "text": "Artikel  Antal  Netto",
+                    "words": [
+                      {
+                        "text": "Artikel",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 0,
+                          "y0": 0,
+                          "x1": 63,
+                          "y1": 20
+                        }
+                      },
+                      {
+                        "text": "Antal",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 200,
+                          "y0": 0,
+                          "x1": 245,
+                          "y1": 20
+                        }
+                      },
+                      {
+                        "text": "Netto",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 300,
+                          "y0": 0,
+                          "x1": 345,
+                          "y1": 20
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "1 480,00",
+                    "words": [
+                      {
+                        "text": "1",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 200,
+                          "y0": 100,
+                          "x1": 209,
+                          "y1": 120
+                        }
+                      },
+                      {
+                        "text": "480,00",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 250,
+                          "y0": 100,
+                          "x1": 304,
+                          "y1": 120
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "Netto",
+                    "words": [
+                      {
+                        "text": "Netto",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 0,
+                          "y0": 100,
+                          "x1": 45,
+                          "y1": 120
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "sourceSha256": "568346eff002a511722a734dad538a097f3f990f59f64721eaf808f1bf8cfdea",
+      "before": {
+        "text": "Artikel  Antal  Netto\n\n\n\nNetto 1 480,00\n\n",
+        "reconstructed": true
+      },
+      "after": {
+        "text": "Artikel  Antal  Netto\n\n1 480,00\n\nNetto\n",
+        "reconstructed": false
+      },
+      "parsers": {
+        "node": {
+          "before": {
+            "net_cents": 148000,
+            "level": "red",
+            "table_status": "incomplete"
+          },
+          "after": {
+            "net_cents": null,
+            "level": "yellow",
+            "table_status": "incomplete"
+          }
+        },
+        "sites": {
+          "before": {
+            "net_cents": 148000,
+            "level": "red",
+            "table_status": "incomplete"
+          },
+          "after": {
+            "net_cents": null,
+            "level": "yellow",
+            "table_status": "incomplete"
+          }
+        }
+      }
+    },
+    {
+      "description": "Item",
+      "quantity": "Quantity",
+      "source": {
+        "text": "Item  Quantity  Netto\n\n1 480,00\n\nNetto\n",
+        "blocks": [
+          {
+            "paragraphs": [
+              {
+                "lines": [
+                  {
+                    "text": "Item  Quantity  Netto",
+                    "words": [
+                      {
+                        "text": "Item",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 0,
+                          "y0": 0,
+                          "x1": 36,
+                          "y1": 20
+                        }
+                      },
+                      {
+                        "text": "Quantity",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 200,
+                          "y0": 0,
+                          "x1": 272,
+                          "y1": 20
+                        }
+                      },
+                      {
+                        "text": "Netto",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 300,
+                          "y0": 0,
+                          "x1": 345,
+                          "y1": 20
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "1 480,00",
+                    "words": [
+                      {
+                        "text": "1",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 200,
+                          "y0": 100,
+                          "x1": 209,
+                          "y1": 120
+                        }
+                      },
+                      {
+                        "text": "480,00",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 250,
+                          "y0": 100,
+                          "x1": 304,
+                          "y1": 120
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "Netto",
+                    "words": [
+                      {
+                        "text": "Netto",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 0,
+                          "y0": 100,
+                          "x1": 45,
+                          "y1": 120
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "sourceSha256": "5b36316cd27716e3c8a77ae272f3e396c8bd191e4c80b317e0003006d5875ddf",
+      "before": {
+        "text": "Item  Quantity  Netto\n\n\n\nNetto 1 480,00\n\n",
+        "reconstructed": true
+      },
+      "after": {
+        "text": "Item  Quantity  Netto\n\n1 480,00\n\nNetto\n",
+        "reconstructed": false
+      },
+      "parsers": {
+        "node": {
+          "before": {
+            "net_cents": 148000,
+            "level": "red",
+            "table_status": "incomplete"
+          },
+          "after": {
+            "net_cents": null,
+            "level": "yellow",
+            "table_status": "incomplete"
+          }
+        },
+        "sites": {
+          "before": {
+            "net_cents": 148000,
+            "level": "red",
+            "table_status": "incomplete"
+          },
+          "after": {
+            "net_cents": null,
+            "level": "yellow",
+            "table_status": "incomplete"
+          }
+        }
+      }
+    },
+    {
+      "description": "Beskrivning",
+      "quantity": "Kvantitet",
+      "source": {
+        "text": "Beskrivning  Kvantitet  Netto\n\n1 480,00\n\nNetto\n",
+        "blocks": [
+          {
+            "paragraphs": [
+              {
+                "lines": [
+                  {
+                    "text": "Beskrivning  Kvantitet  Netto",
+                    "words": [
+                      {
+                        "text": "Beskrivning",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 0,
+                          "y0": 0,
+                          "x1": 99,
+                          "y1": 20
+                        }
+                      },
+                      {
+                        "text": "Kvantitet",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 200,
+                          "y0": 0,
+                          "x1": 281,
+                          "y1": 20
+                        }
+                      },
+                      {
+                        "text": "Netto",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 300,
+                          "y0": 0,
+                          "x1": 345,
+                          "y1": 20
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "1 480,00",
+                    "words": [
+                      {
+                        "text": "1",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 200,
+                          "y0": 100,
+                          "x1": 209,
+                          "y1": 120
+                        }
+                      },
+                      {
+                        "text": "480,00",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 250,
+                          "y0": 100,
+                          "x1": 304,
+                          "y1": 120
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "Netto",
+                    "words": [
+                      {
+                        "text": "Netto",
+                        "confidence": 96,
+                        "bbox": {
+                          "x0": 0,
+                          "y0": 100,
+                          "x1": 45,
+                          "y1": 120
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "sourceSha256": "28490a72b4444053992595fc0a59e08fc00b13b7528f9962a9d2c1bb10cb15c0",
+      "before": {
+        "text": "Beskrivning  Kvantitet  Netto\n\n\n\nNetto 1 480,00\n\n",
+        "reconstructed": true
+      },
+      "after": {
+        "text": "Beskrivning  Kvantitet  Netto\n\n1 480,00\n\nNetto\n",
+        "reconstructed": false
+      },
+      "parsers": {
+        "node": {
+          "before": {
+            "net_cents": 148000,
+            "level": "red",
+            "table_status": "incomplete"
+          },
+          "after": {
+            "net_cents": null,
+            "level": "yellow",
+            "table_status": "incomplete"
+          }
+        },
+        "sites": {
+          "before": {
+            "net_cents": 148000,
+            "level": "red",
+            "table_status": "incomplete"
+          },
+          "after": {
+            "net_cents": null,
+            "level": "yellow",
+            "table_status": "incomplete"
+          }
+        }
+      }
+    }
+  ],
+  "newTableEndHeuristic": false,
+  "increasedReach": false,
+  "v3Access": false,
+  "earlierKnownReplayUnchangedSha256": "dd25d647b95e942ddf268d85322a14297acbeb5a4ee8a215dd3217118f178db0"
+}

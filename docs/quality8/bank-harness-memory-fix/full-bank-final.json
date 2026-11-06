@@ -1,0 +1,37 @@
+{
+  "label": "full-bank-final",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "sites/tests/banking-security.test.mjs"
+  ],
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/worktree",
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "startedAt": "2026-11-06T02:37:46.780209+00:00",
+  "completedAt": "2026-11-06T02:38:42.064675+00:00",
+  "exitCode": 0,
+  "elapsedSeconds": 55.284474,
+  "maxRssKb": 783912,
+  "counts": {
+    "tests": 273,
+    "pass": 273,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "node": "v24.22.1",
+  "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-d294fd8/logs/full-bank-final.tap",
+  "logSha256": "74485ea7bc223244a1fb41f8277d8e91172d468d47bbb17b4b468f0fa853d60c",
+  "testSourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+  "testSourceUnchangedDuringRun": true,
+  "newTemporaryModuleDirectoriesRemaining": [],
+  "transportDisconnection": false
+}

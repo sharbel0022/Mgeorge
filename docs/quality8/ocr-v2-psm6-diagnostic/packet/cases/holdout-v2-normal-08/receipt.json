@@ -1,0 +1,51 @@
+{
+  "id": "holdout-v2-normal-08",
+  "population": "normal-readable",
+  "layout": "side-rail",
+  "startedAt": "2026-11-06T00:23:40.867Z",
+  "completedAt": "2026-11-06T00:23:46.354Z",
+  "durationMs": 5486.458897999997,
+  "inputSha256": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac",
+  "expectedRasterSha256": "00e7fcdd66035d229b09823db2e149f96f31a2ab527a3864800f7cc654e113a3",
+  "actualRasterSha256": "00e7fcdd66035d229b09823db2e149f96f31a2ab527a3864800f7cc654e113a3",
+  "recognitionCalls": 1,
+  "completedRecognitionCalls": 1,
+  "error": null,
+  "method": "ocr",
+  "confidence": 92,
+  "rawBlocks": 1,
+  "rawLines": 21,
+  "rawWords": 89,
+  "rawText": "Fiktiva Rönn Frakt AB Fakturanummer\nTerminalvägen 14 2608-117\n890 12 Exempelstad Fakturadatum\nOrg.nr: 559762-3189 2026-07-23\nBetalas senast\nFaktureras till 2026-08-22\nTestmottagaren Handel AB\nHandelsvägen 22\n123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nTransport inom regionen 2 1 649,30 3 299,60\nEmballage 3 300,00 900,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Summa exkl. moms 4 199,60\n3547-0186\nMomsbelopp (25 960) 1 049,90\nOCR\n00863025185 Summa att betala 5 249,50 SEK\nAnge OCR-numret vid betalning.\nTransporten är utförd enligt överenskommen beställning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "observedText": "Fiktiva Rönn Frakt AB Fakturanummer\nTerminalvägen 14 2608-117\n890 12 Exempelstad Fakturadatum\nOrg.nr: 559762-3189 2026-07-23\nBetalas senast\nFaktureras till 2026-08-22\nTestmottagaren Handel AB\nHandelsvägen 22\n123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nTransport inom regionen 2 1 649,30 3 299,60\nEmballage 3 300,00 900,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Summa exkl. moms 4 199,60\n3547-0186\nMomsbelopp (25 960) 1 049,90\nOCR\n00863025185 Summa att betala 5 249,50 SEK\nAnge OCR-numret vid betalning.\nTransporten är utförd enligt överenskommen beställning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac",
+    "textSha256": "1087cc1db39eff3ed3424107438a888dd0cb9295972a3c46c4634feac75b1ca4",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "0ed7433f7f018ef9c5bf09acf44e0889f7dc88aac71fd0a14ceb9f1298eec5ce",
+        "bankgiro": []
+      }
+    ]
+  },
+  "layoutReconstructed": false,
+  "percentMarkers": {
+    "rendered": 1,
+    "psm3Worker": 0,
+    "psm6Raw": 0,
+    "psm6Worker": 0
+  },
+  "artifactHashes": {
+    "intent.json": "ec866c500585321b3b7304d2566469f966af14be4349171d9ede08dc71bff84c",
+    "layout-replay.json": "7c2880cac51d3a9dc00036d8cb953e2d2b7153206c58eae52b63b9aabc2b6151",
+    "raw-response.json": "983a95d68606709b16a449577cf1a3dfcaeb88886b75da8490dd871e305ccdec",
+    "raw-response.v8": "f415e26e6fad2536d26bd9f144e1d44a001c7b470b8315c0cb31c42bca60faaf",
+    "recognition-finished.json": "05809b95cd14be2fcbed02384710078f779a8f359d4ace0aba10267d22d953a5",
+    "recognition-input.png": "00e7fcdd66035d229b09823db2e149f96f31a2ab527a3864800f7cc654e113a3",
+    "recognition-start.json": "c03a55a34b601e79765f901a856f8341c5c1e92bd1ff121e45a35536e815fe40",
+    "worker-result.json": "c6e131c3ad6e8b1a86ab9a62608430c2628da496c82323943c326ec5627bdcd4",
+    "worker-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

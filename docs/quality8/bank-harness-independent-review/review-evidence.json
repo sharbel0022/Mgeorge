@@ -1,0 +1,354 @@
+{
+  "schema": "independent-bank-harness-memory-review-v1",
+  "verdict": "READY",
+  "candidateCommit": "7a5a397c6543fd762d86005369d6740448876cfe",
+  "baselineCommit": "d294fd87b04d1bf65b124be5ad3dd1bd2654fd73",
+  "recordedAt": "2026-11-06T02:51:11.336495+00:00",
+  "runtime": "v24.22.1",
+  "scope": "Only frozen banking-security test harness imports/jsUrl/lifecycle; no product or existing assertion changes.",
+  "independentFullBank": {
+    "sourceCommit": "7a5a397c6543fd762d86005369d6740448876cfe",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "--import",
+      "./scripts/saas-test-isolation.mjs",
+      "--experimental-strip-types",
+      "--test",
+      "--test-reporter=tap",
+      "--test-concurrency=1",
+      "sites/tests/banking-security.test.mjs"
+    ],
+    "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/candidate",
+    "environmentOverrides": {
+      "NODE_ENV": "test",
+      "TMPDIR": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/runtime-temp"
+    },
+    "nodeOptionsInherited": false,
+    "startedAt": "2026-11-06T02:42:39.828603+00:00",
+    "completedAt": "2026-11-06T02:43:40.843005+00:00",
+    "elapsedSeconds": 61.013674034009455,
+    "exitCode": 0,
+    "maxRssKiB": 807608,
+    "rssMethod": "Linux resource.getrusage(RUSAGE_CHILDREN).ru_maxrss for this single Node invocation and its reaped test process",
+    "tempEntriesBefore": [],
+    "tempEntriesAfter": [],
+    "rawLog": "logs/full-bank.tap",
+    "rawLogSha256": "1507a0a3b35bacd248f20edf7e147beeca0664664b0eb35bcdf1b7679b57d660",
+    "rawLogBytes": 69710,
+    "opticalCalls": 0,
+    "liveCalls": 0,
+    "testSummary": {
+      "tests": 273,
+      "pass": 273,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "ownProbesInitialRetained": {
+    "sourceCommit": "7a5a397c6543fd762d86005369d6740448876cfe",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "--import",
+      "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/candidate/scripts/saas-test-isolation.mjs",
+      "--experimental-strip-types",
+      "--test",
+      "--test-reporter=tap",
+      "--test-concurrency=1",
+      "loader-risk.test.mjs"
+    ],
+    "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent",
+    "environmentOverrides": {
+      "NODE_ENV": "test",
+      "TMPDIR": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/probe-temp"
+    },
+    "startedAt": "2026-11-06T02:45:23.015917+00:00",
+    "completedAt": "2026-11-06T02:45:23.563765+00:00",
+    "elapsedSeconds": 0.5478333319915691,
+    "exitCode": 1,
+    "maxRssKiB": 50104,
+    "tempEntriesBefore": [],
+    "tempEntriesAfter": [],
+    "rawLog": "logs/loader-risk.tap",
+    "rawLogSha256": "a8342dc8a7254793b9a48c39be830484fd9feac4d2b42f9a934e332bf9193393",
+    "rawLogBytes": 3108,
+    "failureChildIntentional": true,
+    "opticalCalls": 0,
+    "liveCalls": 0,
+    "testSummary": {
+      "tests": 5,
+      "pass": 3,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "ownProbesFinal": {
+    "sourceCommit": "7a5a397c6543fd762d86005369d6740448876cfe",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "--import",
+      "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/candidate/scripts/saas-test-isolation.mjs",
+      "--experimental-strip-types",
+      "--test",
+      "--test-reporter=tap",
+      "--test-concurrency=1",
+      "loader-risk.test.mjs"
+    ],
+    "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent",
+    "environmentOverrides": {
+      "NODE_ENV": "test",
+      "TMPDIR": "/workspace/scratch/4d79ab4bea8e/reviews/bank-harness-memory-7a5a397-independent/probe-temp"
+    },
+    "startedAt": "2026-11-06T02:47:11.323910+00:00",
+    "completedAt": "2026-11-06T02:47:12.101039+00:00",
+    "elapsedSeconds": 0.7771300809981767,
+    "exitCode": 0,
+    "maxRssKiB": 50024,
+    "tempEntriesBefore": [],
+    "tempEntriesAfter": [],
+    "rawLog": "logs/loader-risk-final.tap",
+    "rawLogSha256": "cb2ad04983ea13f35e60feeccca355e8aa777c13a80a86ea7f5efa6d8694e3ee",
+    "rawLogBytes": 1428,
+    "failureChildIntentional": true,
+    "opticalCalls": 0,
+    "liveCalls": 0,
+    "testSummary": {
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "ownChildCleanupProbes": {
+    "success": {
+      "exitCode": 0,
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "log": "logs/lifecycle-success-final.tap"
+    },
+    "intentionalFailure": {
+      "exitCode": 1,
+      "tests": 2,
+      "pass": 1,
+      "fail": 1,
+      "expected": true,
+      "log": "logs/lifecycle-failure-final.tap"
+    },
+    "notAddedToFullBank273": true,
+    "freshStandaloneChildEnvironmentCorrection": {
+      "onlyRemoved": "NODE_TEST_CONTEXT",
+      "kept": [
+        "NODE_ENV=test",
+        "TMPDIR",
+        "--import candidate/scripts/saas-test-isolation.mjs",
+        "all other inherited environment values"
+      ],
+      "assertionsUnchanged": true
+    }
+  },
+  "baselineObservation": {
+    "source": "baseline-evidence/rating8-wave4-bank-full-diagnostic.json",
+    "rawTap": "baseline-evidence/rating8-wave4-bank-full-diagnostic.tap",
+    "completedGreenBeforeInterruption": 221,
+    "signal": "SIGKILL",
+    "maxRssKiB": 3009760,
+    "notCountedAsPass": true,
+    "signalCauseNotIndependentlyProved": true
+  },
+  "sourceVerification": {
+    "baseline": "d294fd87b04d1bf65b124be5ad3dd1bd2654fd73",
+    "candidate": "7a5a397c6543fd762d86005369d6740448876cfe",
+    "changedPaths": [
+      "sites/tests/banking-security.test.mjs"
+    ],
+    "oldSourceSha256": "f94dc9bfa6cb223bc5bb85da2ec334a4c639aa7f64056e87058c02e8f6826948",
+    "newSourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+    "compiledModuleByteIdentical": true,
+    "compiledModuleBytes": 921,
+    "compiledModuleSha256": "e09dae07fad2f71216071ca0bd05f0b20f87b6f51cd35c3202494bb87b6cbcbc",
+    "fixtureHelpersTestBodiesAssertionsByteIdentical": true,
+    "suffixBytes": 179425,
+    "suffixSha256": "b1ca4d15c7b28407e422fbfe445755f0633dfa69a45a05f36216134c1a3769ff",
+    "otherImportStatementsByteIdentical": true,
+    "productPathsChanged": 0,
+    "opticalCalls": 0,
+    "liveCalls": 0,
+    "suffixBoundaryMarker": "class LocalD1 { (starting at c, without preceding newline)",
+    "candidateSourceStillMatchesFrozenCommitAfterRuns": true,
+    "finalSourceSha256": "4bfafdbbf08c9c2eaa61c61a37b10571abf5fe23caa8cbdfcf28a43cff48efd0",
+    "ownProbeAssertionLinesUnchanged": true,
+    "oldRootSignalCauseNotIndependentlyProved": true
+  },
+  "opticalCalls": 0,
+  "liveCalls": 0,
+  "productChanges": 0,
+  "existingAssertionsChanged": 0,
+  "newDependencies": 0,
+  "fullBankRunsByThisReviewer": 1,
+  "silentTestSplitting": false,
+  "artifacts": [
+    {
+      "file": "product-free-harness.diff",
+      "sha256": "e3ddf90be63a6977685e12bddf59f5fc74a1ad0d4abb69f4fb3242b2f34ce663",
+      "bytes": 2560
+    },
+    {
+      "file": "source-verification.json",
+      "sha256": "dde7d196d2a32c8de874f84d44aacf74e1cb1304f215aac7f5b56d940810a06a",
+      "bytes": 1147
+    },
+    {
+      "file": "loader-extraction.json",
+      "sha256": "da88ac322b0d3f7cfa3bb04028236501e13b101b22571c8770db8a633dac9cf9",
+      "bytes": 362
+    },
+    {
+      "file": "loader-under-test.mjs",
+      "sha256": "ac7f16428d44d4b60be0da57d8e6ba9ebddc350bae733302b6f34d6aa78181a3",
+      "bytes": 840
+    },
+    {
+      "file": "legacy-loader-under-test.mjs",
+      "sha256": "d85efef40c7b1725a4914c37822086e82bc8b1e92cba18042372695f489f093a",
+      "bytes": 113
+    },
+    {
+      "file": "loader-risk.initial.test.mjs",
+      "sha256": "c0c76f9898f468bf997932e6789a6eb0191a32bf5dfc3aaa52bc22f225a66189",
+      "bytes": 4088
+    },
+    {
+      "file": "loader-risk.test.mjs",
+      "sha256": "2386f22bdf07bef76b7b8a8aaf46f9dcf853c5844bab1cae4f777b7161b6f0b2",
+      "bytes": 4333
+    },
+    {
+      "file": "lifecycle-success.test.mjs",
+      "sha256": "e3c312629bfcf17e4c85ca30e57355495680e6cce3292541912fa1c3092383ab",
+      "bytes": 567
+    },
+    {
+      "file": "lifecycle-failure.test.mjs",
+      "sha256": "2cd8a49da9d6587a73f938924817acd2c5e643f20125c76f6c8c58c8a72abe29",
+      "bytes": 621
+    },
+    {
+      "file": "run-full-bank.py",
+      "sha256": "3cc46fcee051ccf1b198970dfc4d97c814b3fdd52c0a9d0a73fbf0290a2f4977",
+      "bytes": 2034
+    },
+    {
+      "file": "run-probes.initial.py",
+      "sha256": "f807b1184111854325837ba84a8b4049a6952431e710834ce4f4da51f00dde56",
+      "bytes": 1676
+    },
+    {
+      "file": "run-probes.py",
+      "sha256": "b5b036a8f54ddcbaec184bde5782e3bfab34ecd2cc86e8bd0f4bebfe78463f13",
+      "bytes": 1767
+    },
+    {
+      "file": "own-harness-correction.diff",
+      "sha256": "a97ae4d0bbd7dd2ff2db15827b1fe190e1033c5e623e16c903e8f586644f8cdc",
+      "bytes": 1449
+    },
+    {
+      "file": "logs/full-bank-launch.log",
+      "sha256": "e686620281c3603f7f0d521e7b443d4d7bfcede2f5bb83f72eb370e531f1a301",
+      "bytes": 1130
+    },
+    {
+      "file": "logs/full-bank-result.json",
+      "sha256": "380652159b02b4b9a2deb7516b581938abddbb8c4402385a0af3c103352d8445",
+      "bytes": 1216
+    },
+    {
+      "file": "logs/full-bank.tap",
+      "sha256": "1507a0a3b35bacd248f20edf7e147beeca0664664b0eb35bcdf1b7679b57d660",
+      "bytes": 69710
+    },
+    {
+      "file": "logs/lifecycle-failure-final.tap",
+      "sha256": "c45047b815eeacc21540ddf7a16b051a2279b96fb5155b275b64e60cc0c99da9",
+      "bytes": 1401
+    },
+    {
+      "file": "logs/lifecycle-failure.tap",
+      "sha256": "d862417868e9402353bcd960fd3f58401f0a175e0b80194142ae398bf2485a30",
+      "bytes": 179
+    },
+    {
+      "file": "logs/lifecycle-success-final.tap",
+      "sha256": "2e3627a42d482007f9e0c804009ab3eea810ba4e55a4e9281fd45f4894e57b1b",
+      "bytes": 570
+    },
+    {
+      "file": "logs/lifecycle-success.tap",
+      "sha256": "5e310694cc227e663fde5100fb6a450fda01cb47b13bb638a2b4c5e558ec3443",
+      "bytes": 179
+    },
+    {
+      "file": "logs/loader-risk-final-launch.log",
+      "sha256": "858014a0e34ef7e2c9e840f9fef466dbbd6a6bd9b06cdf8681f70de815465fc5",
+      "bytes": 1069
+    },
+    {
+      "file": "logs/loader-risk-final-result.json",
+      "sha256": "e2ab7f9cb51d39e26f10dce62995341a05e0ea016b519bc23f6ea4e99e4da07f",
+      "bytes": 1153
+    },
+    {
+      "file": "logs/loader-risk-final.tap",
+      "sha256": "cb2ad04983ea13f35e60feeccca355e8aa777c13a80a86ea7f5efa6d8694e3ee",
+      "bytes": 1428
+    },
+    {
+      "file": "logs/loader-risk-launch.log",
+      "sha256": "f031a14787be8c09e62de35132a05f3459c0ca784ae7f580a37695e1573adc7b",
+      "bytes": 1063
+    },
+    {
+      "file": "logs/loader-risk-result.json",
+      "sha256": "95d43ebc447ca791304e9bf59947263f691692f86cc10467c7b68c1fe7f4fb77",
+      "bytes": 1147
+    },
+    {
+      "file": "logs/loader-risk.tap",
+      "sha256": "a8342dc8a7254793b9a48c39be830484fd9feac4d2b42f9a934e332bf9193393",
+      "bytes": 3108
+    },
+    {
+      "file": "baseline-evidence/README.md",
+      "sha256": "a555f6e5f6fd157a28473c1c86fb515a73586981ffa400aeed865509db943ed2",
+      "bytes": 979
+    },
+    {
+      "file": "baseline-evidence/checkpoint.json",
+      "sha256": "c4a862a3cb204aae9505f4503592a25397b22ba4e405a2bbe51ff2d41ca6e5b1",
+      "bytes": 2960
+    },
+    {
+      "file": "baseline-evidence/rating8-wave4-bank-full-diagnostic.json",
+      "sha256": "400bac40e96e5c2d11d6bc55480d53cc6f952d0dd586b8c8b5c246979481e9c8",
+      "bytes": 504
+    },
+    {
+      "file": "baseline-evidence/rating8-wave4-bank-full-diagnostic.tap",
+      "sha256": "122c24868d760099ab54242b1bd50baa877fdb3f9233de124fccea8cebbc804a",
+      "bytes": 56025
+    }
+  ],
+  "limits": [
+    "Single complete fresh full-bank run for the concrete prior SIGKILL risk; not full-repository CI.",
+    "Temporary-file cleanup is disk cleanup, not ESM-cache eviction.",
+    "Initial own nested runner errors are retained and not counted as pass.",
+    "The successful and intentional-failure child cases are components of the five risk probes, not added test totals.",
+    "No production API/provider calls, optical work, producer changes, merge or publication."
+  ]
+}

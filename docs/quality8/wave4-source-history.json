@@ -1,0 +1,25 @@
+{
+  "schema": "mgeorge-source-history-bundle-v1",
+  "createdAt": "2026-11-06T01:30:39.556053+00:00",
+  "path": "docs/quality8/wave4-source-history.bundle",
+  "bytes": 6416950,
+  "sha256": "db477d625d583e4ae0c698f5481b3ceaa5e7c96a7b6b216af735f03364709db9",
+  "refs": {
+    "refs/quality8/wave4/geometry-source": "a19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77",
+    "refs/quality8/wave4/psm6-diagnostic-source": "7a148190280cff1657fdaa2ef1af28f09c9a5597",
+    "refs/quality8/wave4/retry-source": "52e68aa5d6f0bec6a2a4bfbf9d78fe446c012ffc",
+    "refs/quality8/wave4/backup-source": "6a2d2b8fe0dbe45891913ab8f5105c866cf3cdb3",
+    "refs/quality8/wave4/known-baseline-source": "bb7eb366e86ff224ee76478487b7d6ec62989be6",
+    "refs/quality8/wave4/bank-diagnostic-producer": "638c77365dbf8f4c73db6b23816a37f577da5689",
+    "refs/quality8/wave4/pre-bank-integration": "623d370fdf0d491e1122a2f2831ce15ff9e0c1c3"
+  },
+  "exclusions": [
+    "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+    "49db400c1e4f0cead46b74974446a0cf388766c3"
+  ],
+  "prerequisiteNote": "Fetch public main 41aadcef first. The earlier local source prerequisite 49db400 is preserved in docs/quality8/wave3-source-history.bundle; import that bundle before this one if absent. git bundle verify succeeds in the source repository.",
+  "scope": "Immutable original producer/test/documentation commits for reviewed geometry and MCP retry, known negative PSM6, backup, a19 baseline, and bank diagnostic producer awaiting independent review at packaging time. This bundle does not itself certify bank readiness or publication. pre-bank-integration is a named checkpoint, not the final release tree.",
+  "sealedV3Included": false,
+  "newOcrImplementationIncluded": false,
+  "verifyOutput": "The bundle contains these 7 refs:\na19e0a8ce7a7ddedb85de1a8f9e21b617ba90b77 refs/quality8/wave4/geometry-source\n7a148190280cff1657fdaa2ef1af28f09c9a5597 refs/quality8/wave4/psm6-diagnostic-source\n52e68aa5d6f0bec6a2a4bfbf9d78fe446c012ffc refs/quality8/wave4/retry-source\n6a2d2b8fe0dbe45891913ab8f5105c866cf3cdb3 refs/quality8/wave4/backup-source\nbb7eb366e86ff224ee76478487b7d6ec62989be6 refs/quality8/wave4/known-baseline-source\n638c77365dbf8f4c73db6b23816a37f577da5689 refs/quality8/wave4/bank-diagnostic-producer\n623d370fdf0d491e1122a2f2831ce15ff9e0c1c3 refs/quality8/wave4/pre-bank-integration\nThe bundle requires these 2 refs:\nbf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee \n41aadcef5fc6f65cc73979997b195c7b4f12eec1 \nThe bundle uses this hash algorithm: sha1\n/workspace/scratch/4d79ab4bea8e/release-docs/docs/quality8/wave4-source-history.bundle is okay\n"
+}

@@ -1,0 +1,21 @@
+// Pure replay of the existing synthetic words. This script cannot invoke OCR.
+import {readFileSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {resolve,join} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+const root=resolve(fileURLToPath(new URL('../..',import.meta.url)));
+const base='ae56dc9a9e3d76697e38a196692a337ae0900b0d';
+const path='sites/lib/ocr-layout.js',helper='test/helpers/ocr-layout-fixtures.mjs';
+const digest=value=>createHash('sha256').update(value).digest('hex');
+const beforeCode=execFileSync('git',['show',base+':'+path],{cwd:root});
+const oldTestCode=execFileSync('git',['show',base+':test/ocr-layout.test.js'],{cwd:root});
+const before=await import('data:text/javascript;base64,'+beforeCode.toString('base64'));
+const after=await import(pathToFileURL(join(root,path)).href);
+const {totalReferenceMix}=await import(pathToFileURL(join(root,helper)).href);
+const original=totalReferenceMix();
+const previous=before.reconstructOcrLayout(original.text,original.blocks),current=after.reconstructOcrLayout(original.text,original.blocks);
+const testBytes=readFileSync(join(root,'test/ocr-layout.test.js'));
+const evidence={schemaVersion:1,opticalCalls:0,sourceBase:base,currentProductSha256:digest(readFileSync(join(root,path))),baselineProductSha256:digest(beforeCode),helperSha256:digest(readFileSync(join(root,helper))),oldTestPath:'test/ocr-layout.test.js',oldTestSha256:digest(oldTestCode),currentTestSha256:digest(testBytes),oldAssertionUnchanged:testBytes.equals(oldTestCode),original,oldExpectedRows:['OCR 0065432109','Att betala 925,00 SEK'],previous:{text:previous.text,reconstructed:previous.reconstructed},current:{text:current.text,reconstructed:current.reconstructed},newAmbiguity:{label:'Att betala',labelGlyphHeight:20,candidates:[{value:'925,00 SEK',orientation:'below',verticalGap:20},{value:'0065432109',orientation:'right',horizontalGap:312,maxHorizontalGap:320}],sharedValue:'0065432109',competingOwner:'OCR',competingOwnerOrientation:'below',competingOwnerVerticalGap:10},proposedBehavior:'Keep the exact original and hold the ambiguous fields; no nearest-value or orientation preference.'};
+const result=JSON.stringify(evidence,null,2)+'\n';
+if(process.argv[2])writeFileSync(resolve(process.argv[2]),result,{flag:'wx'});else process.stdout.write(result);

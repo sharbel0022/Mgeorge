@@ -1,0 +1,23 @@
+{
+  "name": "green-sites-typecheck",
+  "redCommit": "30aa6612a0d43006b9797dc5d0721fb1accd98e7",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/onboarding/sites",
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "../scripts/saas-test-isolation.mjs",
+    "scripts/run-verified-tool.mjs",
+    "check"
+  ],
+  "exitCode": 0,
+  "counts": {},
+  "failedTests": [],
+  "log": "docs/quality8/bank-details-identity-i1/green-sites-typecheck.log",
+  "logBytes": 0,
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "elapsedSeconds": 7.728,
+  "policySha256": "1937e714693702c8dd2d26fe751b5519d92bf11e3a5767ce8dfe03eb67c58c43"
+}

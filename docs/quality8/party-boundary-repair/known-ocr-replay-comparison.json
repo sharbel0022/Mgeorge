@@ -1,0 +1,232 @@
+{
+  "source": "96d1404d4b7bb4a791f0313c8cd95a29eec5a8c7",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "scripts/quality8/replay-ocr-field-observations.mjs",
+    "--source-commit",
+    "96d1404d4b7bb4a791f0313c8cd95a29eec5a8c7",
+    "--output",
+    "docs/quality8/party-boundary-repair/known-ocr-replay-96d1404.json"
+  ],
+  "runnerSha256": "92dd331faa793273feab7638091eb5e668653710d8834d318d5771b356078542",
+  "opticalCalls": 0,
+  "parserCalls": 52,
+  "sourceUnchanged": true,
+  "resultSha256": "bac3095a1a593c6fdc6df2a54f722c9a1c88998a6186ac9ccf402c19e4a30994",
+  "previousSource": "63edd9fa97bc0475237133021313963e402efc76",
+  "changes": [],
+  "summaries": {
+    "stored-psm3-text/node/normal-readable": {
+      "all13": {
+        "tp": 79,
+        "fp": 0,
+        "fn": 51,
+        "expectedNonNull": 130,
+        "returnedNonNull": 79,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 57,
+        "fp": 0,
+        "fn": 43,
+        "expectedNonNull": 100,
+        "returnedNonNull": 57,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "falseGreenCritical": 0
+    },
+    "stored-psm3-text/node/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "falseGreenCritical": 0
+    },
+    "stored-psm3-text/sites/normal-readable": {
+      "all13": {
+        "tp": 79,
+        "fp": 0,
+        "fn": 51,
+        "expectedNonNull": 130,
+        "returnedNonNull": 79,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 57,
+        "fp": 0,
+        "fn": 43,
+        "expectedNonNull": 100,
+        "returnedNonNull": 57,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "falseGreenCritical": 0
+    },
+    "stored-psm3-text/sites/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/node/normal-readable": {
+      "all13": {
+        "tp": 60,
+        "fp": 2,
+        "fn": 70,
+        "expectedNonNull": 130,
+        "returnedNonNull": 62,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 50,
+        "fp": 0,
+        "fn": 50,
+        "expectedNonNull": 100,
+        "returnedNonNull": 50,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/node/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/sites/normal-readable": {
+      "all13": {
+        "tp": 60,
+        "fp": 2,
+        "fn": 70,
+        "expectedNonNull": 130,
+        "returnedNonNull": 62,
+        "correctNull": 0,
+        "reviewedFields": 130
+      },
+      "mandatory10": {
+        "tp": 50,
+        "fp": 0,
+        "fn": 50,
+        "expectedNonNull": 100,
+        "returnedNonNull": 50,
+        "correctNull": 0,
+        "reviewedFields": 100
+      },
+      "falseGreenCritical": 0
+    },
+    "known-psm6-raw/sites/stress": {
+      "all13": {
+        "tp": 9,
+        "fp": 0,
+        "fn": 17,
+        "expectedNonNull": 26,
+        "returnedNonNull": 9,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 7,
+        "fp": 0,
+        "fn": 13,
+        "expectedNonNull": 20,
+        "returnedNonNull": 7,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "falseGreenCritical": 0
+    },
+    "known-psm3-two-raw/node/normal-readable": {
+      "all13": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 8,
+        "expectedNonNull": 26,
+        "returnedNonNull": 18,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 13,
+        "fp": 0,
+        "fn": 7,
+        "expectedNonNull": 20,
+        "returnedNonNull": 13,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "falseGreenCritical": 0
+    },
+    "known-psm3-two-raw/sites/normal-readable": {
+      "all13": {
+        "tp": 18,
+        "fp": 0,
+        "fn": 8,
+        "expectedNonNull": 26,
+        "returnedNonNull": 18,
+        "correctNull": 0,
+        "reviewedFields": 26
+      },
+      "mandatory10": {
+        "tp": 13,
+        "fp": 0,
+        "fn": 7,
+        "expectedNonNull": 20,
+        "returnedNonNull": 13,
+        "correctNull": 0,
+        "reviewedFields": 20
+      },
+      "falseGreenCritical": 0
+    }
+  }
+}

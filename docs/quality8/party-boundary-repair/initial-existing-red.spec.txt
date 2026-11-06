@@ -1,0 +1,372 @@
+✔ Node pdf a colon-labelled name keeps literal role words: Original supplier AB (51.001081ms)
+✔ Node pdf a colon-labelled name keeps literal role words: Synthetic customer AB (3.784727ms)
+✔ Node pdf a colon-labelled name keeps literal role words: Nord Customer Service AB (1.200838ms)
+✔ Node pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.035775ms)
+✔ Node pdf a colon-labelled name keeps literal role words: Original supplier AB (1.520393ms)
+✔ Node pdf a colon-labelled name keeps literal role words: Kund AB (0.990326ms)
+✔ Node pdf literal-name grammar keeps bare conflicting roles unresolved (1.868237ms)
+✔ Node pdf literal-name grammar keeps unresolved heading columns unresolved (1.549224ms)
+✔ Node pdf literal-name grammar keeps unknown explicit inline label unresolved (1.057106ms)
+✔ Node pdf literal-name grammar keeps tab-delimited bare role column unresolved (1.170144ms)
+✔ Node pdf literal-name grammar keeps space-delimited bare role column unresolved (1.151035ms)
+✔ Node pdf a second explicit colon role remains an independent party (1.03934ms)
+✔ Node ocr a colon-labelled name keeps literal role words: Original supplier AB (1.744834ms)
+✔ Node ocr a colon-labelled name keeps literal role words: Synthetic customer AB (1.385292ms)
+✔ Node ocr a colon-labelled name keeps literal role words: Nord Customer Service AB (0.916398ms)
+✔ Node ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB (0.750231ms)
+✔ Node ocr a colon-labelled name keeps literal role words: Original supplier AB (1.054292ms)
+✔ Node ocr a colon-labelled name keeps literal role words: Kund AB (0.922697ms)
+✔ Node ocr literal-name grammar keeps bare conflicting roles unresolved (0.813415ms)
+✔ Node ocr literal-name grammar keeps unresolved heading columns unresolved (0.790882ms)
+✔ Node ocr literal-name grammar keeps unknown explicit inline label unresolved (0.801246ms)
+✔ Node ocr literal-name grammar keeps tab-delimited bare role column unresolved (0.800466ms)
+✔ Node ocr literal-name grammar keeps space-delimited bare role column unresolved (0.865522ms)
+✔ Node ocr a second explicit colon role remains an independent party (0.983668ms)
+✔ Sites pdf a colon-labelled name keeps literal role words: Original supplier AB (8.092327ms)
+✔ Sites pdf a colon-labelled name keeps literal role words: Synthetic customer AB (1.314778ms)
+✔ Sites pdf a colon-labelled name keeps literal role words: Nord Customer Service AB (1.095593ms)
+✔ Sites pdf a colon-labelled name keeps literal role words: Svenska Supplier Support AB (1.011989ms)
+✔ Sites pdf a colon-labelled name keeps literal role words: Original supplier AB (1.389479ms)
+✔ Sites pdf a colon-labelled name keeps literal role words: Kund AB (1.002174ms)
+✔ Sites pdf literal-name grammar keeps bare conflicting roles unresolved (0.988314ms)
+✔ Sites pdf literal-name grammar keeps unresolved heading columns unresolved (0.965671ms)
+✔ Sites pdf literal-name grammar keeps unknown explicit inline label unresolved (1.060521ms)
+✔ Sites pdf literal-name grammar keeps tab-delimited bare role column unresolved (0.974714ms)
+✔ Sites pdf literal-name grammar keeps space-delimited bare role column unresolved (0.848897ms)
+✔ Sites pdf a second explicit colon role remains an independent party (0.968534ms)
+✔ Sites ocr a colon-labelled name keeps literal role words: Original supplier AB (0.902527ms)
+✔ Sites ocr a colon-labelled name keeps literal role words: Synthetic customer AB (0.905541ms)
+✔ Sites ocr a colon-labelled name keeps literal role words: Nord Customer Service AB (0.862858ms)
+✔ Sites ocr a colon-labelled name keeps literal role words: Svenska Supplier Support AB (0.792323ms)
+✔ Sites ocr a colon-labelled name keeps literal role words: Original supplier AB (0.838242ms)
+✔ Sites ocr a colon-labelled name keeps literal role words: Kund AB (0.838362ms)
+✔ Sites ocr literal-name grammar keeps bare conflicting roles unresolved (0.809088ms)
+✔ Sites ocr literal-name grammar keeps unresolved heading columns unresolved (0.875747ms)
+✔ Sites ocr literal-name grammar keeps unknown explicit inline label unresolved (2.34921ms)
+✔ Sites ocr literal-name grammar keeps tab-delimited bare role column unresolved (0.81003ms)
+✔ Sites ocr literal-name grammar keeps space-delimited bare role column unresolved (0.753776ms)
+✔ Sites ocr a second explicit colon role remains an independent party (1.428627ms)
+✖ Node pdf independent recipient census: colon recipient followed by bare supplier (52.363595ms)
+✖ Node pdf independent recipient census: colon recipient followed by bare customer (6.151226ms)
+✔ Node pdf independent recipient census: colon recipient followed by unknown colon field (1.600179ms)
+✖ Node pdf independent recipient census: colon recipient followed by repeated bare recipient (1.376988ms)
+✔ Node pdf independent recipient census: bare recipient followed by bare supplier (1.787096ms)
+✔ Node pdf independent recipient census: empty recipient followed by unknown colon field (1.328857ms)
+✔ Node pdf independent recipient control: single explicit colon recipient (1.241438ms)
+✔ Node pdf independent recipient control: single explicit bare recipient (3.190564ms)
+✔ Node pdf independent recipient control: two fully explicit colon roles (1.199726ms)
+✔ Node pdf independent recipient control: ordinary company name containing no competing field (1.270931ms)
+✖ Node ocr independent recipient census: colon recipient followed by bare supplier (2.355307ms)
+✖ Node ocr independent recipient census: colon recipient followed by bare customer (1.501833ms)
+✔ Node ocr independent recipient census: colon recipient followed by unknown colon field (0.940382ms)
+✖ Node ocr independent recipient census: colon recipient followed by repeated bare recipient (1.000842ms)
+✔ Node ocr independent recipient census: bare recipient followed by bare supplier (0.916006ms)
+✔ Node ocr independent recipient census: empty recipient followed by unknown colon field (1.143223ms)
+✔ Node ocr independent recipient control: single explicit colon recipient (1.03345ms)
+✔ Node ocr independent recipient control: single explicit bare recipient (1.205094ms)
+✔ Node ocr independent recipient control: two fully explicit colon roles (0.917949ms)
+✔ Node ocr independent recipient control: ordinary company name containing no competing field (1.284602ms)
+✖ Sites pdf independent recipient census: colon recipient followed by bare supplier (9.070597ms)
+✖ Sites pdf independent recipient census: colon recipient followed by bare customer (1.475014ms)
+✔ Sites pdf independent recipient census: colon recipient followed by unknown colon field (1.375396ms)
+✖ Sites pdf independent recipient census: colon recipient followed by repeated bare recipient (1.350719ms)
+✔ Sites pdf independent recipient census: bare recipient followed by bare supplier (1.21628ms)
+✔ Sites pdf independent recipient census: empty recipient followed by unknown colon field (1.217402ms)
+✔ Sites pdf independent recipient control: single explicit colon recipient (1.141721ms)
+✔ Sites pdf independent recipient control: single explicit bare recipient (1.0406ms)
+✔ Sites pdf independent recipient control: two fully explicit colon roles (1.136332ms)
+✔ Sites pdf independent recipient control: ordinary company name containing no competing field (1.165686ms)
+✖ Sites ocr independent recipient census: colon recipient followed by bare supplier (1.322428ms)
+✖ Sites ocr independent recipient census: colon recipient followed by bare customer (1.032989ms)
+✔ Sites ocr independent recipient census: colon recipient followed by unknown colon field (1.008633ms)
+✖ Sites ocr independent recipient census: colon recipient followed by repeated bare recipient (1.049844ms)
+✔ Sites ocr independent recipient census: bare recipient followed by bare supplier (1.334014ms)
+✔ Sites ocr independent recipient census: empty recipient followed by unknown colon field (0.977196ms)
+✔ Sites ocr independent recipient control: single explicit colon recipient (1.188469ms)
+✔ Sites ocr independent recipient control: single explicit bare recipient (1.036184ms)
+✔ Sites ocr independent recipient control: two fully explicit colon roles (0.966351ms)
+✔ Sites ocr independent recipient control: ordinary company name containing no competing field (3.07375ms)
+ℹ tests 88
+ℹ suites 0
+ℹ pass 76
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1507.667571
+
+✖ failing tests:
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Node pdf independent recipient census: colon recipient followed by bare supplier (52.363595ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Node pdf independent recipient census: colon recipient followed by bare customer (6.151226ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Node pdf independent recipient census: colon recipient followed by repeated bare recipient (1.376988ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Node ocr independent recipient census: colon recipient followed by bare supplier (2.355307ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Node ocr independent recipient census: colon recipient followed by bare customer (1.501833ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Node ocr independent recipient census: colon recipient followed by repeated bare recipient (1.000842ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Sites pdf independent recipient census: colon recipient followed by bare supplier (9.070597ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Sites pdf independent recipient census: colon recipient followed by bare customer (1.475014ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Sites pdf independent recipient census: colon recipient followed by repeated bare recipient (1.350719ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Sites ocr independent recipient census: colon recipient followed by bare supplier (1.322428ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Leverantör Syntetiska Säljaren AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Sites ocr independent recipient census: colon recipient followed by bare customer (1.032989ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Kund Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at sites/tests/review-explicit-recipient-boundaries.test.mjs:25:35
+✖ Sites ocr independent recipient census: colon recipient followed by repeated bare recipient (1.049844ms)
+  AssertionError [ERR_ASSERTION]: An unresolved role/field is not part of a recipient name
+  + actual - expected
+  
+  + 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB'
+  - null
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/party-boundary-repair/sites/tests/review-explicit-recipient-boundaries.test.mjs:27:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'Syntetiska Mottagaren AB Faktureras till Syntetiska Andra AB',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

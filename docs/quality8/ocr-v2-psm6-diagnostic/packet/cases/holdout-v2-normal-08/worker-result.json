@@ -1,0 +1,17 @@
+{
+  "text": "Fiktiva Rönn Frakt AB Fakturanummer\nTerminalvägen 14 2608-117\n890 12 Exempelstad Fakturadatum\nOrg.nr: 559762-3189 2026-07-23\nBetalas senast\nFaktureras till 2026-08-22\nTestmottagaren Handel AB\nHandelsvägen 22\n123 40 Teststad\nBeskrivning Antal Å-pris Belopp\nTransport inom regionen 2 1 649,30 3 299,60\nEmballage 3 300,00 900,00\nSamtliga radbelopp i SEK, exklusive moms.\nBankgiro Summa exkl. moms 4 199,60\n3547-0186\nMomsbelopp (25 960) 1 049,90\nOCR\n00863025185 Summa att betala 5 249,50 SEK\nAnge OCR-numret vid betalning.\nTransporten är utförd enligt överenskommen beställning.\nSYNTETISKT PROVUNDERLAG - ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 92,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac",
+    "textSha256": "1087cc1db39eff3ed3424107438a888dd0cb9295972a3c46c4634feac75b1ca4",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "0ed7433f7f018ef9c5bf09acf44e0889f7dc88aac71fd0a14ceb9f1298eec5ce",
+        "bankgiro": []
+      }
+    ]
+  }
+}

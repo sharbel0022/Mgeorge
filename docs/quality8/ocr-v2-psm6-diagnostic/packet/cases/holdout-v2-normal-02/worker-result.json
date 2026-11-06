@@ -1,0 +1,17 @@
+{
+  "text": "Fiktiva Björk Konsult AB Faktureras till\nParkallén 18 Testmottagaren Handel AB\n234 56 Provlunda Handelsvägen 22\n123 40 Teststad\nFakturanr Fakturadatum Betalas senast\n2026-4729 2026-06-11 2026-07-01\nKundnummer: K-5202\nBeskrivning Antal Å-pris Belopp\nProjektledning 8 1 350,00 10 800,00\nDokumentation och uppföljning 1 2 064,00 2 064,00\nSamtliga radbelopp i SEK, exklusive moms.\nNetto 12 864,00 Bankgiro\n4628-7314\nMomsbelopp (25 960) 3 216,00\nOCR\nSumma att betala 16 080,00 SEK 00863025128\nBetalningsvillkor enligt avtal. Ange OCR vid betalning.\nOrganisationsnummer: 559762-3122 Godkänd för F-skatt\nSYNTETISKT PROVUNDERLAG -— ingen verklig affärshändelse Sida 1 (1)\n",
+  "confidence": 93,
+  "method": "ocr",
+  "ocrEvidence": {
+    "version": 1,
+    "inputSha256": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604",
+    "textSha256": "a0fe9689355bdddd9ed9b6cfb1592e6991cb0ce24164fe8da09b62d5a185bc9f",
+    "pages": [
+      {
+        "page": 1,
+        "textSha256": "ec4a0b65e640285ad1d6e1877d58234c433bad03fe32febb65d963bec4909352",
+        "bankgiro": []
+      }
+    ]
+  }
+}
