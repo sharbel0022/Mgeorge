@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {DatabaseSync} from 'node:sqlite';
-import {mkdtempSync,rmSync} from 'node:fs';
+import {mkdtempSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {openDatabase,storeTransactions} from '../src/db.js';
+import {createStartupResources} from './helpers/startup-test-resources.js';
 
 // Observe the actual connection policy only after a real SQLite failure. The
 // wrapper does not rewrite SQL, change waits, release the holder, or retry.
@@ -27,8 +28,9 @@ const contenderSource=`
  }
 `;
 
-test('opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release',{timeout:15000},async()=>{
+test('opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release',{timeout:15000},async t=>{
  const folder=mkdtempSync(join(tmpdir(),'mg-startup-contention-')),path=join(folder,'synthetic.sqlite');
+ const resources=createStartupResources(t,folder);
  let holder,child,terminal;
  try{
   const setup=openDatabase(path),original=Buffer.from('Preserved synthetic startup original');
@@ -36,7 +38,7 @@ test('opening a prepared WAL database uses its bounded busy wait before contenti
   storeTransactions(setup,[],'file:startup-original.csv',{content:original,mime_type:'text/csv'});
   const before={imports:setup.prepare('SELECT COUNT(*) n FROM import_jobs').get().n,audits:setup.prepare('SELECT COUNT(*) n FROM audit_events').get().n};
   setup.close();
-  holder=new DatabaseSync(path);
+  holder=resources.hold(new DatabaseSync(path));
   assert.equal(holder.prepare('PRAGMA journal_mode').get().journal_mode,'wal');
   holder.exec('PRAGMA locking_mode=EXCLUSIVE; BEGIN EXCLUSIVE;');
   holder.prepare('UPDATE invoices SET party=? WHERE id=?').run('Synthetic uncommitted change','synthetic-startup-invoice');
@@ -45,9 +47,9 @@ test('opening a prepared WAL database uses its bounded busy wait before contenti
   child=spawn(process.execPath,['--input-type=module','--eval',contenderSource,path],{stdio:['ignore','pipe','pipe'],windowsHide:true});
   let stdout=Buffer.alloc(0),stderr=Buffer.alloc(0),truncated=false;
   for(const [stream,read,write]of [[child.stdout,()=>stdout,value=>stdout=value],[child.stderr,()=>stderr,value=>stderr=value]])stream.on('data',bytes=>{const prior=read(),room=8192-prior.length;if(bytes.length>room)truncated=true;if(room>0)write(Buffer.concat([prior,bytes.subarray(0,room)]));});
-  terminal=new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(code,signal)=>resolve({code,signal}));});
+  terminal=resources.watch(child);
   const exit=await terminal;
-  holder.exec('ROLLBACK');holder.close();holder=undefined;
+  resources.releaseHolder();holder=undefined;
   const db=openDatabase(path);
   try{
    assert.equal(db.prepare('PRAGMA integrity_check').get().integrity_check,'ok');
@@ -67,9 +69,6 @@ test('opening a prepared WAL database uses its bounded busy wait before contenti
   assert.equal(details.busyTimeout,5000,diagnostic);
   assert.ok(details.elapsedMs>=4500,'The existing five-second SQLite busy policy must cover startup: '+diagnostic);
  }finally{
-  if(child&&child.exitCode===null&&child.signalCode===null)child.kill();
-  if(terminal)await terminal.catch(()=>{});
-  if(holder){try{holder.exec('ROLLBACK');}finally{holder.close();}}
-  rmSync(folder,{recursive:true,force:true});
+  await resources.cleanup();
  }
 });
