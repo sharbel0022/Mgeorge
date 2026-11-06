@@ -180,3 +180,15 @@ test('cloud workflow confines credentials to main-only OCR step and has no docum
   assert.ok(!/pull_request:|pull_request_target:|upload-artifact|cache:|secrets: inherit/.test(workflow));
   assert.equal((workflow.match(/MG_SITES_OCR_TOKEN:/g)||[]).length,1);
 });
+
+test('server PDF after-check work remains visible with its accepted count',async()=>{
+  const f=cloudFixture({server:{processed:1,aftercheck_pending:1},jobs:0});
+  assert.deepEqual(await f.run(),{processed:1,failed:0,aftercheck_pending:true});assert.equal(f.extractCalls,0);
+});
+test('cloud CLI keeps a registered success but reports a pending after-check as needing attention',()=>{
+  const script=readFileSync(new URL('../scripts/run-sites-cloud-ocr.mjs',import.meta.url),'utf8');
+  const fake='data:text/javascript;base64,'+Buffer.from("export async function runSitesOcr(){return {processed:1,failed:0,aftercheck_pending:true,warning:'synthetic private detail'};}export function sitesOcrFailure(){return {};}").toString('base64');
+  const result=spawnSync(process.execPath,['--input-type=module'],{input:script.replace("'../src/sites-ocr-pull.js'",JSON.stringify(fake)),encoding:'utf8',env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot}});
+  assert.ifError(result.error);assert.equal(result.status,1);
+  assert.deepEqual(JSON.parse(result.stdout),{status:'needs_attention',processed:1,failed:0,aftercheck_pending:true});assert.equal(result.stderr,'');assert.doesNotMatch(result.stdout,/private|warning/);
+});

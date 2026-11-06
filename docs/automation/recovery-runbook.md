@@ -10,9 +10,9 @@ The operator must use the approved deployment process and the exact reviewed sou
 
 Keep the scheduler's run ID, scheduled time, start/end and code SHA together with the app invocation run ID and persisted result. A saved task definition, configuration flag, worker contact time or no_update result is insufficient. If the task platform returns older latest_result text, first compare its run ID and creation time with the latest run.
 
-Gmail receipts identify the actual owner-authorized app call. They cannot identify which external scheduler called it. The app must continue to show external_schedule_verified:false until an independent platform-to-app correlation exists.
+Gmail receipts identify the actual owner-authorized app call. They cannot identify which external scheduler called it. This implementation always reports external_schedule_verified:false. Independent platform-to-app correlation can supply operational evidence, but does not automatically change that application field.
 
-For OCR, a lease run ID binds owner, original and lease. An accepted receipt proves durable storage. Only its matching terminal state proves completion. accepted_pending is an interruption needing recovery; it is not a failed interpretation and not a completed or financially approved invoice.
+For OCR, a lease run ID binds owner, original and lease. An accepted receipt proves durable storage. Only its matching terminal state proves document-processing completion; a registered invoice can still have a pending after-check. accepted_pending is an interruption needing recovery; it is not a failed interpretation and not a completed or financially approved invoice.
 
 ## Failure classes
 
@@ -20,7 +20,7 @@ For OCR, a lease run ID binds owner, original and lease. An accepted receipt pro
 | --- | --- | --- |
 | 401/403, revoked consent, wrong owner/runner | Authentication or scope failure | Stop and restore authorization through the normal owner flow. |
 | 429 or Retry-After | Provider-requested delay | Do not poll or resend immediately; observe the durable retry deadline. |
-| Network/5xx or interrupted response | Transport outcome may be uncertain | Query the matching receipt; retry only the same payload while its lease remains valid and within the fixed budget. |
+| Network/5xx or interrupted response | Transport outcome may be uncertain | For OCR completion, query the matching receipt and retry only the same payload under its live lease and fixed budget. Gmail uses its status observation, durable retry deadline and import checkpoint. |
 | Original hash/size mismatch | Integrity failure | Stop automatic registration and keep the original/evidence for review. |
 | Extractor failure | OCR/PDF execution failure | Use the existing bounded attempt budget and backoff. |
 | Missing invoice fields or unverified counterparty | Insufficient document evidence | Keep needs_review; no repeated automatic attempt can substitute for missing facts. |
@@ -35,7 +35,7 @@ For OCR, a lease run ID binds owner, original and lease. An accepted receipt pro
 4. Record accepted, pending and failed outcomes independently. Stop on authentication loss, original corruption, unknown receipt state, a server retry deadline or an unexpected financial change.
 5. Read status again in a separate call. Compare actual terminal documents and receipts, not just the number of requests. Review and missing-information counts may legitimately grow when queued documents are interpreted.
 6. For an exhausted or review document, require an explicit document-scoped retry through the existing API. Preserve its source, original SHA, extraction history and all counterparty/financial guards. Do not reset the whole queue with SQL, clear registrations, raise retries indefinitely or mass-approve facts.
-7. Observe multiple actual scheduled occurrences before accepting recurring reliability. Missing dispatch remains an external operations issue even if a manual bounded worker pass succeeds.
+7. Observe multiple actual scheduled occurrences before accepting recurring reliability. An unmatched scheduled run requires platform and application investigation: a missing app audit record does not distinguish no dispatch from rejection before app auditing, even if a manual bounded pass succeeds.
 
 ## Contract with the future AI adapter
 
@@ -61,13 +61,13 @@ The client starts an authenticated heartbeat before download and then uses one n
 
 Completion has at most three sends of the same immutable result, with exponential 250/500 ms backoff plus up to 249 ms jitter and a fresh receipt/lease check before another send. A receipt that says accepted ends resubmission even when continuation is pending. Extraction runs once per client lease, not once per completion send.
 
-An expired accepted result recovers at every attempt. Each normal recovery pass examines at most two jobs; claim checks also protect an accepted candidate beyond that batch. Successful recovery goes to review and preserves history. Temporary original-read recovery is delayed at least 60 seconds, consumes no extra OCR attempt, and stops automatic retries after 24 hours from immutable acceptance time. It then stays in review with original_unavailable_review; integrity and missing-history defects are held as failed with their original evidence.
+An expired accepted result recovers at every attempt. Each normal recovery pass examines at most two active-source jobs; rejected sources cannot monopolize that batch; claim checks also protect an accepted candidate beyond that batch. Successful recovery goes to review and preserves history. Temporary original-read recovery is delayed at least 60 seconds, consumes no extra OCR attempt, and stops automatic retries after 24 hours from immutable acceptance time. It then stays in review with original_unavailable_review; integrity and missing-history defects are held as failed with their original evidence.
 
 The durability guarantee starts at the database's accepted receipt. A process killed before any successful upload can require another extraction of the retained original. There is no durable cross-run client outbox in this change. The client can stop logically on lease loss while its existing extraction subprocess continues until its finite 90-second deadline; this does not authorize a later completion. These limits must also be respected by Agent 1's future adapter.
 
 ## Gmail receipt and membership contract
 
-Scheduled Gmail responses, including safe error responses, include automation_receipt with run_id, invoked_at, completed_at, outcome and persisted. The first invocation record must persist before any provider work begins. persisted:true means both invocation and result observations were stored. With persisted:false, completed_at is only the local attempt's end time; it is not a durable completion proof. Preserve observation_warning and inspect status again.
+After identity and company-mailbox authorization succeeds, scheduled Gmail responses, including safe execution errors, include automation_receipt with run_id, invoked_at, completed_at, outcome and persisted. Authorization failures before that stage have no automation receipt. The first invocation record must persist before any provider work begins. persisted:true means both invocation and result observations were stored. With persisted:false, completed_at is only the local attempt's end time; it is not a durable completion proof. Preserve observation_warning when present and inspect status again; an error response with persisted:false need not include that separate warning field.
 
 schedule_observation.last_run_id and last_finished_at refer to the latest invocation and its matching result. last_completed_at remains historical successful completion and may belong to an older run. external_schedule_verified stays false because the application does not know which external scheduler caused an authorized call.
 
@@ -81,3 +81,7 @@ Both Gmail adapters support lookupSources(ids) returning {knownIds, rejectedIds}
 4. Inspect a bounded ordinary run and compare its receipt with app status and the original hash/registration evidence. This procedure is prepared here; it was not executed against production.
 5. Observe at least two actual scheduled occurrences with matching platform and app receipts. The existence of a cron definition is insufficient.
 6. On a new integrity, attribution, authorization or unexpected finance failure, stop the affected run through the approved operating process. Roll code back to the last verified version if required; retain all originals, accepted history and registration markers. Never roll data back merely to erase an uncertain acknowledgement.
+
+## Pending registration after-checks
+
+The process response preserves the existing numeric aftercheck_pending count when nonzero. A completion or a settled matching registered receipt can carry aftercheck_pending:true; an older accepted receipt must not borrow the current run's status. The worker aggregates an optional boolean aftercheck_pending:true and preserves it alongside accepted processed/failed counts, including partial results. The cloud CLI reports needs_attention and exits nonzero; the stdin runner also exits nonzero. No raw warning text is emitted and this observation never triggers another OCR send or invoice registration.

@@ -645,7 +645,7 @@ test('Q8: real cloud pull accepts a server-PDF committed invoice when only its a
   f.env.BUCKET.get=async()=>({size:f.bytes.length,body:f.bytes,arrayBuffer:async()=>f.bytes});
   const {runSitesOcr}=await import('../../src/sites-ocr-pull.js');
   const result=await runSitesOcr({origin:'https://synthetic.example',token:f.env.DOCUMENT_CLOUD_WORKER_TOKEN,mode:'cloud'},{maxJobs:1,extract:async()=>{throw Error('Native server PDF must not be sent to OCR');},fetchImpl:async(url,options)=>f.processing.workerAction(new Request(url,options),new URL(url).pathname.split('/').pop())});
-  assert.equal(result.processed,1);assert.equal(result.failed,0);const status=await f.processing.processingStatus(f.owner);assert.ok(status.last_processed);assert.equal(status.cloud_last_completed,'');assert.equal(status.aftercheck_pending,1);
+  assert.equal(result.processed,1);assert.equal(result.failed,0);assert.equal(result.aftercheck_pending,true);const status=await f.processing.processingStatus(f.owner);assert.ok(status.last_processed);assert.equal(status.cloud_last_completed,'');assert.equal(status.aftercheck_pending,1);
   assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'registered');assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,1);
   const extraction=JSON.parse(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction);assert.equal(extraction.method,'pdf');assert.equal(extraction.fields.invoice_number.confidence,.96);
 });

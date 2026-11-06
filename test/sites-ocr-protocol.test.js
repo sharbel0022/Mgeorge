@@ -130,3 +130,14 @@ for(const protocol of [1,2])test('protocol '+protocol+' ignores remote pending m
   const f=fixture({protocol,complete:()=>Response.json({state:'needs_review',accepted_pending:true})});
   assert.deepEqual(await f.run(),{processed:1,failed:0});
 });
+
+test('a registered completion preserves success and exposes its pending after-check',async()=>{
+  const f=fixture({complete:()=>Response.json({registered:true,aftercheck_pending:true,warning:'synthetic private aftercheck detail'})});
+  assert.deepEqual(await f.run(),{processed:1,failed:0,aftercheck_pending:true});
+  assert.equal(f.bodies.length,1);assert.equal(f.receipts,0);
+});
+test('a settled registered receipt exposes a pending after-check without resending the result',async()=>{
+  const f=fixture({complete:f=>{f.stored=true;throw Error('synthetic lost registration acknowledgement');},receipt:f=>Response.json({...f.accepted(),state:'registered',aftercheck_pending:true})});
+  assert.deepEqual(await f.run(),{processed:1,failed:0,aftercheck_pending:true});
+  assert.equal(f.bodies.length,1);assert.equal(f.receipts,1);assert.equal(f.extractions,1);
+});

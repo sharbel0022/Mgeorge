@@ -201,9 +201,10 @@ async function recoverInterruptedExtraction(owner:string,job:Row):Promise<'handl
       WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND lease=? AND extraction=?
       AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND available_at=? AND ${activeSource}
       AND (? IS NULL OR EXISTS(SELECT 1 FROM document_extractions e WHERE e.owner=document_jobs.owner AND e.document_id=document_jobs.document_id AND e.id=?))
-      AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?)
+      AND ((? IS NULL AND NOT EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id))
+        OR EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?))
       AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
-      .bind(state,code,savedExtraction,now(),owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until,job.available_at,receipt?.id??null,receipt?.id??null,job.sha256,job.size).run();
+      .bind(state,code,savedExtraction,now(),owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until,job.available_at,receipt?.id??null,receipt?.id??null,job.sha256??null,job.sha256??null,job.size??null).run();
   // A lost snapshot is not an unrecorded expired attempt. Reevaluate it on
   // the next pass; never fall through to the generic exhaustion transition.
   return 'handled';
@@ -213,7 +214,8 @@ async function recoverInterruptedExtractions(owner:string,at:string){
   // to two rows and leave unchecked receipts intact for the next pass.
   const jobs=await db().prepare(`SELECT document_jobs.*,d.size,d.sha256 FROM document_jobs LEFT JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id
     WHERE document_jobs.owner=? AND state='processing' AND lease_until<? AND available_at<=?
-    AND (attempts>=3 OR (${activeSource} AND json_extract(CASE WHEN json_valid(extraction) THEN extraction ELSE '{}' END,'$.processing.run_id') IS NOT NULL))
+    AND ${activeSource}
+    AND (attempts>=3 OR json_extract(CASE WHEN json_valid(extraction) THEN extraction ELSE '{}' END,'$.processing.run_id') IS NOT NULL)
     AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)
     ORDER BY lease_until,document_id LIMIT 2`).bind(owner,at,at).all<Row>();
   for(const job of jobs.results){
@@ -447,7 +449,7 @@ export async function workerAction(req:Request,action:string){
   if(action==='process'&&req.method==='POST'&&mode==='cloud'){
     const result=await processDocuments(owner,2);
     if(result.status_unknown)return response(result);
-    return response({processed:result.processed,waiting:Number(result.counts.waiting_ocr||0),failed:Number(result.counts.failed||0),...(result.metadata_warning?{metadata_warning:result.metadata_warning}:{})});
+    return response({processed:result.processed,waiting:Number(result.counts.waiting_ocr||0),failed:Number(result.counts.failed||0),...(result.aftercheck_pending?{aftercheck_pending:result.aftercheck_pending}:{}),...(result.metadata_warning?{metadata_warning:result.metadata_warning}:{})});
   }
   if(action==='lease'&&req.method==='POST'){
     await enqueueDocuments(owner);const job=await claim(owner,'local',mode);if(!job)return response({job:null});
@@ -469,7 +471,7 @@ export async function workerAction(req:Request,action:string){
       if(receipt){
         const current=extractionRecord(job.extraction).processing;
         const settled=current?.run_id===runId&&current.sha256===body.sha256&&current.runner===mode&&['ready','needs_review','duplicate','registered'].includes(job.state);
-        return response({accepted:true,settled,state:job.state,...identity,accepted_at:receipt.created_at});
+        return response({accepted:true,settled,state:job.state,...identity,accepted_at:receipt.created_at,...(settled&&job.state==='registered'?{aftercheck_pending:job.error_code==='registration_aftercheck_pending'}:{})});
       }
     }
     const live=await db().prepare(`SELECT updated_at,lease_until FROM document_jobs WHERE owner=? AND document_id=? AND lease_runner=? AND ${unrecordedLease}

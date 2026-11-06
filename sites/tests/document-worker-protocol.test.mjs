@@ -274,11 +274,12 @@ test('current failure counts separate transport, OCR, integrity and missing docu
   assert.deepEqual(f.sql.prepare('SELECT * FROM document_jobs ORDER BY document_id').all(),before);
 });
 
-for(const defect of ['missing receipt','changed original metadata'])test('an early accepted result with '+defect+' is held without an automatic retry loop',async t=>{
+for(const defect of ['missing receipt','changed original metadata','missing original metadata'])test('an early accepted result with '+defect+' is held without an automatic retry loop',async t=>{
   const f=await fixture(t);await f.document('held');const job=await f.lease();await f.complete(job);
   const original=f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction;
   f.sql.prepare("UPDATE document_jobs SET state='processing',lease=?,lease_until='2000-01-01'").run(job.lease);
   if(defect==='missing receipt')f.sql.prepare('DELETE FROM document_extractions').run();
+  else if(defect==='missing original metadata')f.sql.prepare('DELETE FROM documents').run();
   else f.sql.prepare('UPDATE documents SET sha256=?').run('0'.repeat(64));
   assert.equal(await f.lease(),null);
   const row=f.sql.prepare('SELECT * FROM document_jobs').get();
@@ -317,3 +318,17 @@ for(const action of ['heartbeat','receipt']){
     assert.ok(pulls<=6,'body consumption stays within the limit plus one stream chunk');assert.equal(cancelled,true);
   });
 }
+
+test('rejected accepted jobs cannot monopolize bounded recovery ahead of active review work',async t=>{
+  const f=await fixture(t),jobs=[];
+  for(const id of ['a','b','c']){await f.document(id);const job=await f.lease();await f.complete(job);jobs.push(job);}
+  for(const job of jobs)f.sql.prepare("UPDATE document_jobs SET state='processing',attempts=3,lease=?,lease_until='2000-01-01' WHERE document_id=?").run(job.lease,job.id);
+  f.sql.prepare("UPDATE gmail_sources SET status='rejected' WHERE document_id IN ('a','b')").run();
+  const rejected=f.sql.prepare("SELECT * FROM document_jobs WHERE document_id IN ('a','b') ORDER BY document_id").all();
+  const history=f.sql.prepare('SELECT * FROM document_extractions ORDER BY document_id').all();
+  await f.processing.enqueueDocuments(f.owner);await f.processing.enqueueDocuments(f.owner);
+  assert.equal(f.sql.prepare("SELECT state FROM document_jobs WHERE document_id='c'").get().state,'needs_review');
+  assert.deepEqual(f.sql.prepare("SELECT * FROM document_jobs WHERE document_id IN ('a','b') ORDER BY document_id").all(),rejected);
+  assert.deepEqual(f.sql.prepare('SELECT * FROM document_extractions ORDER BY document_id').all(),history);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});

@@ -38,7 +38,8 @@ export async function boundedBody(response,limit){
 export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentProcess,maxJobs=6}={}){
   const origin=new URL(config.origin);if(origin.protocol!=='https:'||origin.username||origin.password||origin.search||origin.hash||origin.pathname!=='/'||!config.token||!/^[A-Za-z0-9_-]{43}$/.test(config.token)||![undefined,'local','cloud'].includes(config.mode)||!Number.isInteger(maxJobs)||maxJobs<1)throw Error('configuration');
   const cloud=config.mode==='cloud';
-  let processed=0,failed=0,settled=0;
+  let processed=0,failed=0,settled=0,aftercheckPending=false;
+  const outcome=(extra={})=>({processed,failed,...(aftercheckPending?{aftercheck_pending:true}:{}),...extra});
   const request=async(path,body,extra={},timeout=25000)=>{
     const result=await fetchImpl(origin.origin+path,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+config.token,...(cloud?{'X-MG-OCR-Runner':'cloud'}:{}),...(body===undefined?{}:{'Content-Type':'application/json'}),...extra},body:body===undefined?undefined:JSON.stringify(body),redirect:'manual',signal:AbortSignal.timeout(timeout)});
     if(!result.ok){cancelBody(result.body);rejectHttp(result.status,result.headers.get('retry-after')!==null);}return result;
@@ -133,7 +134,7 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
         if(typeof receipt.settled!=='boolean'||!timestamp(receipt.accepted_at))throw protocolFailure('RESULT_RECEIPT_INVALID');
         if(!receipt.settled){const pending={};pendingReceipts.add(pending);return pending;}
         if(!terminal(receipt.state))throw protocolFailure('RESULT_RECEIPT_INVALID');
-        const accepted={state:receipt.state,registered:receipt.state==='registered'};
+        const accepted={state:receipt.state,registered:receipt.state==='registered',...(receipt.state==='registered'&&receipt.aftercheck_pending===true?{aftercheck_pending:true}:{})};
         acceptedReceipts.add(accepted);return accepted;
       }
       if(receipt.retryable!==true||attempt===2)throw failure;
@@ -153,9 +154,16 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
       if(!Number.isSafeInteger(server.processed)||server.processed<0||server.processed>2)throw Error('invalid_response');
       processed=server.processed;
     }
+    if(Object.hasOwn(server,'aftercheck_pending')){
+      if(!Number.isSafeInteger(server.aftercheck_pending)||server.aftercheck_pending<0){
+        if(processed>0)return outcome({status_unknown:true});
+        throw Error('invalid_response');
+      }
+      aftercheckPending=server.aftercheck_pending>0;
+    }
     if(server.status_unknown===true){
       if(processed===0)throw Error('invalid_response');
-      return {processed,failed,status_unknown:true};
+      return outcome({status_unknown:true});
     }
   }
   try{
@@ -185,10 +193,11 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
         // race a successful terminal transition and erase its acknowledgement.
         await heartbeat?.stop();
         const completion=await complete(job,result);
-        if(pendingReceipts.has(completion))return {processed,failed,accepted_pending:1,status_unknown:true};
+        if(pendingReceipts.has(completion))return outcome({accepted_pending:1,status_unknown:true});
         if(!acceptedReceipts.has(completion)&&!completionAccepted(result,completion))throw Error('completion_rejected');
         settled++;
         if(result.error&&!acceptedReceipts.has(completion))failed++;else processed++;
+        if(completion.registered===true&&completion.aftercheck_pending===true)aftercheckPending=true;
       }finally{
         // Cleanup cannot replace an accepted result or a more specific failure.
         if(heartbeat)await heartbeat.stop().catch(()=>{});
@@ -199,11 +208,11 @@ export async function runSitesOcr(config,{fetchImpl=fetch,extract=runDocumentPro
     // transport or queue operation stops the run. Only negotiated receipt-aware
     // completion retries are allowed; legacy POSTs are never replayed.
     if(processed===0&&settled===0)throw error;
-    return {processed,failed,status_unknown:true};
+    return outcome({status_unknown:true});
   }
-  return {processed,failed};
+  return outcome();
 }
 if(process.argv.includes('--config-stdin')){
   let raw='';for await(const chunk of process.stdin){raw+=chunk;if(raw.length>8192)throw Error('configuration');}
-  try{const result=await runSitesOcr(JSON.parse(raw));console.log(JSON.stringify(result));if(result.status_unknown)process.exitCode=1;}catch{console.log(JSON.stringify({status:'retry_later'}));process.exitCode=1;}
+  try{const result=await runSitesOcr(JSON.parse(raw));console.log(JSON.stringify(result));if(result.status_unknown||result.aftercheck_pending)process.exitCode=1;}catch{console.log(JSON.stringify({status:'retry_later'}));process.exitCode=1;}
 }

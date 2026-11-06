@@ -39,7 +39,7 @@ Automationen är aktiverad och har ett timschema i Europe/Stockholm. Följande f
 
 Appens senaste automatiska invocation/result är fortfarande 16:26:56.945 /16:27:14.016. Plattformens senaste synliga resultattext hör till en annan körning vid 02:00 och får inte tillskrivas de senare körningarna.
 
-Den sparade instruktionen kräver redan färska status-, auto-sync-, process- och efterstatusanrop, och förbjuder no_update när verktyg saknas. De tillgängliga plattformsposterna visar inte varför dispatch uteblir. Ingen autentiseringsbugg eller specifik plattformsorsak påstås vara fastställd. Applikationens nya kvitton gör nästa verkliga anrop korrelerbart; de reparerar inte i sig en extern tjänst som aldrig anropar appen.
+Den sparade instruktionen kräver redan färska status-, auto-sync-, process- och efterstatusanrop, och förbjuder no_update när verktyg saknas. De tillgängliga plattformsposterna visar varken om dispatch försöktes och avvisades före appens auditlogg eller varför ett matchande appkvitto saknas. Ingen autentiseringsbugg eller specifik plattformsorsak påstås vara fastställd. Applikationens nya kvitton gör nästa verkliga anrop korrelerbart; de reparerar inte i sig en eventuell extern dispatch- eller behörighetsstörning.
 
 ### Moln-OCR via GitHub Actions
 
@@ -59,9 +59,9 @@ Detta jobb föregick arbetets första statusläsning och startades inte av detta
 | Återhämtning | Slutförsök kunde räddas | Alla försök kan räddas; kandidater utanför tvåpostersbatch skyddas; jämförelse av lease och tolkning sker under skrivlåset |
 | Tillfällig originallagring | Kunde felklassas som integritetsfel | Branded integritetsfel skiljs från transport; temporär completion behåller lease; accepterat resultat får fördröjd återhämtning med 24-timmarstak |
 | Observerbarhet | Kontakt, köhälsa och 24-timmarsgenomströmning | Separata aktuella transport-, OCR-, integritets-, avbrotts- och granskningsmått samt accepted_pending |
-| Registrering/efterkontroll | Unika atomiska registreringsmarkörer och beständig väntande efterkontroll | Bevarade och regressionstestade; en oklar efterkontroll får inte skapa ny faktura |
+| Registrering/efterkontroll | Unika atomiska registreringsmarkörer och beständig väntande efterkontroll | Bevarade och regressionstestade; väntande efterkontroll följer med till worker/CLI som needs_attention utan ny faktura eller OCR |
 
-En oberoende granskning hittade dessutom en klientflagga som kunde kollidera med JSON från servern och en serverrace där en förlorad återhämtnings-CAS kunde falla igenom till generell lease_expired. Båda reproducerades först som felande tester och rättades. Klientens kvittobeslut är privata objektidentiteter; servern omprövar en förlorad snapshot vid nästa pass. De nya små protokollanropen läses med en verklig 4096-bytesgräns i strömmen.
+En oberoende granskning hittade dessutom en klientflagga som kunde kollidera med JSON från servern och en serverrace där en förlorad återhämtnings-CAS kunde falla igenom till generell lease_expired. Båda reproducerades först som felande tester och rättades. Klientens kvittobeslut är privata objektidentiteter; servern omprövar en förlorad snapshot vid nästa pass. Avvisade källor utesluts ur den begränsade återhämtningen så att de inte blockerar aktiva jobb, och saknad originalmetadata hålls som integritetsfel med resultatet bevarat. De nya små protokollanropen läses med en verklig 4096-bytesgräns i strömmen.
 
 ## Testbevis och utförda jobb
 
@@ -77,8 +77,10 @@ Alla tester använder syntetiska original, syntetiska konton och SQLite/D1-fixtu
 | Klientflaggekollision före rättning | 6 av 8 nya fall misslyckades |
 | Gmail före rättning | 6 nya Node-fel, 12 nya Sites-fel; ytterligare invocation-persistensfall reproducerat separat |
 | Oberoende recovery/body-limit-motprov före rättning | 5/5 misslyckades |
-| Sammanfogad lokal Node-fokusgrind | 219/219 godkända, 0 fail/cancel/skip/TODO |
-| Sammanfogad lokal Sites-fokusgrind | 339/339 godkända, 0 fail/cancel/skip/TODO |
+| Blockerande avvisade köposter och saknad originalmetadata | Båda nya progressfallen misslyckades före rättning |
+| Dold väntande efterkontroll | 4 nya Node-fall och den skärpta verkliga server-PDF-integrationstesten misslyckades före rättning |
+| Sammanfogad lokal Node-fokusgrind | 223/223 godkända, 0 fail/cancel/skip/TODO |
+| Sammanfogad lokal Sites-fokusgrind | 341/341 godkända, 0 fail/cancel/skip/TODO |
 | Syntax | 295 JavaScript-filer kontrollerade |
 | Typkontroll | Direkt TypeScript noEmit godkänd; slutlig officiell typ-/installationsgrind är CI |
 
