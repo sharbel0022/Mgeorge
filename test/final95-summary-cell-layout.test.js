@@ -8,9 +8,9 @@ const parsers = await loadInvoiceParsers();
 function row(text, x, y) {
   return text.split(' ').map(text => { const result = word(text, x, y); x += text.length * 8 + 8; return result; });
 }
-function summary({ english = false, damagedVat = false, labelX = 350, aside = '', suffix = '', competing = false, obstruction = false, wrongBaseline = false, malformedAmount = false, wrongTotal = false, extra = [] } = {}) {
-  const labels = english ? ['Net amount', 'VAT amount', 'Amount due'] : ['Summa exkl. moms', damagedVat ? 'Moms (25 ?)' : 'Momsbelopp', 'Att betala'];
-  const amounts = [malformedAmount ? '1672,8O' : '1672,80', '418,20', wrongTotal ? '2092,00 SEK' : '2091,00 SEK'];
+function summary({ english = false, damagedVat = false, numericVatTail = false, labelX = 350, aside = '', suffix = '', competing = false, obstruction = false, wrongBaseline = false, malformedAmount = false, wrongTotal = false, amounts: printedAmounts = null, extra = [] } = {}) {
+  const labels = english ? ['Net amount', 'VAT amount', 'Amount due'] : ['Summa exkl. moms', numericVatTail ? 'Moms 25' : damagedVat ? 'Moms (25 ?)' : 'Momsbelopp', 'Att betala'];
+  const amounts = printedAmounts || [malformedAmount ? '1672,8O' : '1672,80', '418,20', wrongTotal ? '2092,00 SEK' : '2091,00 SEK'];
   return observation([
     [...row('Description', 0, 10), ...row('Qty', 250, 10), ...row('Amount', 950, 10)],
     [...row('Synthetic service', 0, 80), ...row('1', 250, 80), ...row('1672,80', 950, 80)],
@@ -41,6 +41,7 @@ for (const [engine, parse] of Object.entries(parsers)) {
     ['Swedish closed summary', {}, 41820],
     ['English closed summary', { english: true }, 41820],
     ['damaged percentage stays unresolved', { damagedVat: true }, null],
+    ['numeric rate-looking tail cannot become thousands grouping', { numericVatTail: true }, null],
     ['separate left prose retains its own negative VAT occurrence', { aside: 'Moms enligt avtalet.' }, null],
     ['separate explicit currency stays independent', { aside: 'Valuta: SEK' }, 41820],
   ]) test(engine + ' typed summary cells preserve exact printed values: ' + name, () => {
@@ -76,6 +77,12 @@ for (const [engine, parse] of Object.entries(parsers)) {
     assert.equal(result.fields.total_cents.value, 209200);
     assert.ok(result.issues.some(issue => /Momsberäkningen/.test(issue)));
     assert.notEqual(result.level, 'green');
+  });
+  test(engine + ' thousands grouping within a whole printed VAT value stays valid', () => {
+    const result = read(apply(summary({ amounts: ['101 672,80', '25 418,20', '127 091,00 SEK'] })).text);
+    assert.equal(result.fields.net_cents.value, 10167280);
+    assert.equal(result.fields.vat_cents.value, 2541820);
+    assert.equal(result.fields.total_cents.value, 12709100);
   });
   test(engine + ' a later invalid amount still blocks the full field census', () => {
     const result = read(apply(summary({ extra: [row('Netto: unreadable', 0, 1000)] })).text);

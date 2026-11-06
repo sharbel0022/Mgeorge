@@ -123,6 +123,7 @@ export function reconstructOcrLayout(text,blocks){
     }
     const summary=planOcrSummaryCells(segments,words,lines.filter((row,index)=>tableRows[index]),claimOwners,()=>{if(++comparisons>MAX_COMPARISONS)throw new Error('layout budget');});
     const summaryMembers=new Set(summary.pairs.flatMap(pair=>[pair.label.id,pair.value.id]));
+    const summaryLabels=new Set(summary.pairs.map(pair=>pair.label.id));
     // A typed VAT heading (including its untouched unreadable rate) is not
     // the preceding net heading's generic downward value candidate.
     let pairs=[...proposed.filter(pair=>claims.get(pair.value.id)===1&&!summaryMembers.has(pair.label.id)&&!summaryMembers.has(pair.value.id)),...summary.pairs];
@@ -177,7 +178,11 @@ export function reconstructOcrLayout(text,blocks){
       for(const segment of row.segments){
         if(incoming.has(segment.id))continue;
         const partner=outgoing.get(segment.id),joined=partner?[...segment.words,...partner.words]:segment.words;
-        const text=joined.map(word=>word.text).join(' ');parts.push(text);output.push({text:text+'\n',words:joined,bbox:union(joined)});
+        // Keep the proved label/value cell boundary distinct from the spaces
+        // inside a printed amount. Otherwise an uncertain rate tail such as
+        // "Moms 25" plus the separate cell "533,40" becomes "25 533,40".
+        const text=partner&&summaryLabels.has(segment.id)?segment.words.map(word=>word.text).join(' ')+'\t'+partner.words.map(word=>word.text).join(' '):joined.map(word=>word.text).join(' ');
+        parts.push(text);output.push({text:text+'\n',words:joined,bbox:union(joined)});
       }
       // Reconstructed fields are independent paragraphs. Their output order
       // must not transfer a party section to a following unowned raw field.
