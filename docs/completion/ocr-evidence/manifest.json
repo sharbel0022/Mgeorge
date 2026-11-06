@@ -1,0 +1,241 @@
+{
+  "schema": "completion-ocr-evidence-manifest-v1",
+  "baseSha": "30dfaa97bb7ce2118b4756205347d4a96e8be6ab",
+  "focusedSuiteSha": "5c903fbe6dd56ec8eb9444f2ffe47ff535e29aea",
+  "finalCodeSha": "a5d8ad81f4bb0e177a119108cff89ad8c830e259",
+  "runtime": "v24.22.1",
+  "dependencyLocks": {
+    "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d",
+    "sites/package-lock.json": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+  },
+  "files": [
+    {
+      "name": "proposal-red.tap",
+      "rawBytes": 79573,
+      "rawSha256": "54570c10def280272c064e54e4f73363f35817fd10777628b81bf46731dbaa06",
+      "gzipSha256": "4f7e51cecfe307d02e00807ecd9b78636331373ed105afeacc4b0ad3dd81b551",
+      "tap": {
+        "tests": 146,
+        "pass": 92,
+        "fail": 54,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 997.484139
+    },
+    {
+      "name": "proposal-green.tap",
+      "rawBytes": 34038,
+      "rawSha256": "7380c7991ed8fa4b772d6a22b1ca8c08e840ac6f000e3fe4badba2d6deed372d",
+      "gzipSha256": "247ce7adb99f127ebf13118df62310b56451a255f40c987409529f57ea90958e",
+      "tap": {
+        "tests": 146,
+        "pass": 146,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 975.120235
+    },
+    {
+      "name": "queue-storage-red.tap",
+      "rawBytes": 18522,
+      "rawSha256": "1b2284804b499682329939a4b0bead09720a5cdb81f3ce62d15add6b1a587050",
+      "gzipSha256": "4e5eaec6e219539509a91f0ca10de004be51f2f9a59ec264951cb5f0bbfacd81",
+      "tap": {
+        "tests": 43,
+        "pass": 39,
+        "fail": 4,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 4103.615823
+    },
+    {
+      "name": "queue-storage-red-corrected-fixture.tap",
+      "rawBytes": 12192,
+      "rawSha256": "e48ca6e05cf9e325d60316926202671768b5211b816075db45c5bffa58fc5325",
+      "gzipSha256": "f6a83a732bda3301781a86e44eab34ebcbdeae37b5c1ebc9ea40926922e233b9",
+      "tap": {
+        "tests": 43,
+        "pass": 40,
+        "fail": 3,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 3908.88425
+    },
+    {
+      "name": "queue-storage-green.tap",
+      "rawBytes": 10177,
+      "rawSha256": "5ecd355d711028adcd12ad25c9e620019706496edceb1e66532e4b5232a40692",
+      "gzipSha256": "0217c28c430381376739ee163153dd06aef745cbf32c7471536695fb234a9e25",
+      "tap": {
+        "tests": 43,
+        "pass": 43,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 3753.386207
+    },
+    {
+      "name": "gmail-eligibility.tap",
+      "rawBytes": 32520,
+      "rawSha256": "f9ae4a63cbef208b989ff9a377c9f2260be271dc09103bf5b58bd6d63677460b",
+      "gzipSha256": "d86b3c99c1008bf55d05bd0836a035bc6e1a3e90d38068f713d0d9502ad2ee0f",
+      "tap": {
+        "tests": 124,
+        "pass": 121,
+        "fail": 3,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 16465.212238
+    },
+    {
+      "name": "gmail-eligibility-corrected-fixture.tap",
+      "rawBytes": 30354,
+      "rawSha256": "a8d41c846bc4f8cf53646703e12842f94d7422b430eddd7de16e63ea299a3711",
+      "gzipSha256": "dae953a02efe5602f0333695d005f2865d7f2fe645de0996fd00fdc6da5ec3bb",
+      "tap": {
+        "tests": 124,
+        "pass": 124,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 18051.750048
+    },
+    {
+      "name": "independent-boundary-probes.tap",
+      "rawBytes": 5520,
+      "rawSha256": "a6a93e9fa57c8575d438fcac367c8a66e4e3c4d0cfb7e163a66f9340ea9a8241",
+      "gzipSha256": "26a2fa12124aedd06665a3566dd3c038aa543674fe2b4a94c4f329b73b076d21",
+      "tap": {
+        "tests": 24,
+        "pass": 24,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 330.88849
+    },
+    {
+      "name": "node-focused.tap",
+      "rawBytes": 192438,
+      "rawSha256": "c76e90d0fccc75daf12e61a48f926f0b390b4e346c646ce243b8b41fcae0acdc",
+      "gzipSha256": "85d7b266c4c7aae5aec6ebb8a1d2f09d56cb03b04038ab4e3b1d70eeb097464d",
+      "tap": {
+        "tests": 848,
+        "pass": 848,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 64717.301105
+    },
+    {
+      "name": "sites-focused.tap",
+      "rawBytes": 159109,
+      "rawSha256": "20e54c3e15ea67892b85d9a9674ad70e81767e3b477f7292190529468771478e",
+      "gzipSha256": "b41eebb2d0bc87c21e0e223e72573fd22f1d21f6571b9f40aa0f6fa3725aa09d",
+      "tap": {
+        "tests": 706,
+        "pass": 706,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 64427.005722
+    },
+    {
+      "name": "gmail-lock-deadline-red.tap",
+      "rawBytes": 33362,
+      "rawSha256": "88e2be9c4649ebb3a4446961239ff2c4da4df461ddf4a142c4ecb698cfd8d09f",
+      "gzipSha256": "a4c893b0ea49f3a84c54ed1d32f654be824a09bf5d92188f312da5fe77db99a4",
+      "tap": {
+        "tests": 127,
+        "pass": 124,
+        "fail": 3,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 17404.551112
+    },
+    {
+      "name": "gmail-lock-deadline-green.tap",
+      "rawBytes": 31109,
+      "rawSha256": "c7df91f7107b5d5c46b74a36ac8ebdf6db7ab677f2d15ae7d1ce989c06358462",
+      "gzipSha256": "e17a7c44a2cc5d0a7056bd9669c4feb98a0659d4b2e730b7940105e22d40c23b",
+      "tap": {
+        "tests": 127,
+        "pass": 127,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_ms": 25884.000543
+    },
+    {
+      "name": "sites-types.log",
+      "rawBytes": 1280,
+      "rawSha256": "2684622217745761ccb02df74262139539342d364ed2444bc5f0ae778d54f1d1",
+      "gzipSha256": "972353102cf02f28fa3ef32e447f836faf39e9d67389c80d836ab612b02fec8e",
+      "tap": {}
+    },
+    {
+      "name": "sites-types-physical.log",
+      "rawBytes": 186,
+      "rawSha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c",
+      "gzipSha256": "3415e63273b761f317b320444321e428db9c9e32856426e862a7a3fac2f64600",
+      "tap": {}
+    },
+    {
+      "name": "sites-types-final.log",
+      "rawBytes": 186,
+      "rawSha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c",
+      "gzipSha256": "3415e63273b761f317b320444321e428db9c9e32856426e862a7a3fac2f64600",
+      "tap": {}
+    },
+    {
+      "name": "node-focused-resource.log",
+      "rawBytes": 60,
+      "rawSha256": "3e737f6a9117cec194b02103b357f8668fae9adb86a8a8cd0bf25efab8948548",
+      "gzipSha256": "6ce97002f260e1268efc93192cd9a463a9953d71987db775defc89ed5c261125",
+      "tap": {}
+    },
+    {
+      "name": "sites-focused-resource.log",
+      "rawBytes": 60,
+      "rawSha256": "3e737f6a9117cec194b02103b357f8668fae9adb86a8a8cd0bf25efab8948548",
+      "gzipSha256": "6ce97002f260e1268efc93192cd9a463a9953d71987db775defc89ed5c261125",
+      "tap": {}
+    },
+    {
+      "name": "replay-before.json",
+      "rawBytes": 333068,
+      "rawSha256": "914aa8f4daee2e80df3a4042324f0c89f41a008668ee0ccf6488766984fd1ad7",
+      "gzipSha256": "ef4071c8e29a96e12d74952adcf0cbbb0b6324b9b11967798bd1c36bc5c224ff"
+    },
+    {
+      "name": "replay-final.json",
+      "rawBytes": 332223,
+      "rawSha256": "4ecf53dbc91562363d97d0204ac6f60a3e4d56ba0fc596fcc61644c6bc826be0",
+      "gzipSha256": "51c37c957616aac92a94578db8fd229d35cab0eb2cabdd0388070b0b0b359ca9"
+    }
+  ],
+  "replayScriptSha256": "be3837b4c31cafdeaa1accf9a3888b7aeb86acb5e0a039dbc807b0d867792d3d"
+}
