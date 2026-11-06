@@ -317,12 +317,16 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
 }
 async function finish(owner:string,job:Row,result:{text:string,method:string,confidence:number,ocrEvidence?:any}){
   const source=await sourceFor(owner,job.document_id);if(source?.status!=='needs_review')return {ignored:true};
+  const runId=await documentRunId(owner,job);
+  // Admission precedes any AI policy/profile work. A lost acknowledgement may
+  // leave this lease live after its receipt has already been accepted.
+  const pending=await db().prepare(`SELECT document_id FROM document_jobs WHERE owner=? AND document_id=? AND ${unrecordedLease}`).bind(owner,job.document_id,job.lease,runId).first<Row>();
+  if(!pending)return {ignored:true};
   const meta=JSON.parse(source.metadata);let extraction:Row=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||'',ocrEvidence:result.ocrEvidence,ocrInputSha256:job.sha256});
   if(config.OPENAI_INVOICES_ENABLED==='true'){
     const {enrichSitesInvoice}=await import('./openai-invoices/sites.js');
     extraction=await enrichSitesInvoice({database:db(),owner,job,baseline:extraction,environment:config,loadBytes:()=>originalBytes(owner,job,5000000)});
   }
-  const runId=await documentRunId(owner,job);
   Object.assign(extraction,{processing:{runner:job.lease_runner||'local',sha256:job.sha256,version:'document-worker-v3',run_id:runId}});
   const v=Object.fromEntries(fieldNames.map((k:string)=>[k,(extraction.fields as any)[k].value]));
   const key=counterpartyKey(v.direction,v.party,v.organization_number),email=mailbox(v.direction==='customer'?meta.to:meta.from);

@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import ts from 'typescript';
 import {dataModule,invoiceParserUrl,libUrl} from './invoice-module-loader.mjs';
 import {layoutContext} from '../../../test/helpers/pdf-layout-ocr.mjs';
+import {createCompanyDatabase} from '../../lib/company-storage.js';
 
 class D1{
   constructor(sql){this.sql=sql;}
@@ -15,6 +16,8 @@ export async function documentOcrFixture(t,bytes,metadata={}){
   for(const name of readdirSync(new URL('../../drizzle',import.meta.url)).filter(name=>name.endsWith('.sql')).sort())sql.exec(readFileSync(new URL('../../drizzle/'+name,import.meta.url),'utf8'));
   const owner='synthetic-layout-owner',id=crypto.randomUUID(),key='__layout_'+id.replaceAll('-',''),sha=createHash('sha256').update(bytes).digest('hex');
   const f={sql,db:new D1(sql),owner,id,sha,bytes:Buffer.from(bytes),env:{DOCUMENT_AUTOMATION_ENABLED:'true',DOCUMENT_OWNER_EMAIL:'owner@example.test'}};
+  const recoveryDb=createCompanyDatabase(f.db,()=>({kind:'legacy',owner,actorId:owner,action:'read',context:null}));
+  f.db.invoiceAiRecoveryStatus=()=>recoveryDb.invoiceAiRecoveryStatus();
   f.env.BUCKET={get:async path=>path===owner+'/'+id?{size:f.bytes.length,arrayBuffer:async()=>Uint8Array.from(f.bytes).buffer}:null};
   globalThis[key]=f;t.after(()=>{delete globalThis[key];sql.close();});
   const ref='globalThis['+JSON.stringify(key)+']',domain=libUrl('domain.ts');
