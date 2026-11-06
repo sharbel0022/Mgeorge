@@ -3,8 +3,64 @@ import {randomBytes,createCipheriv,createDecipheriv,createHash} from 'node:crypt
 import {readFileSync,writeFileSync,mkdtempSync,rmSync,openSync,closeSync,unlinkSync,linkSync,mkdirSync,existsSync,lstatSync,fstatSync,fsyncSync,readSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname,join,resolve} from 'node:path';
+import {APPLICATION_TOKEN_CONTROL_SCHEMA} from '../sites/lib/banking/openpayments/token-control-schema.js';
 
 const header=Buffer.from('MGBAK001');
+const tokenTable='company_application_tokens',tokenControl='company_application_token_control';
+const tokenStateFailure=()=>Object.assign(Error('Backupens applikationsbehörighet kan inte återställas säkert.'),{code:'backup_application_token_state_invalid'});
+const tokenControlColumns=['id','revision','recovery_required','restore_marker','recovery_evidence'];
+function applicationTokenControl(db,{archive=false}={}){
+ const definition=db.prepare('SELECT type FROM sqlite_master WHERE name=?').get(tokenControl);
+ if(!definition)return null;
+ if(definition.type!=='table')throw tokenStateFailure();
+ const columns=db.prepare(`PRAGMA table_info(${tokenControl})`).all();
+ if(columns.length!==tokenControlColumns.length||columns.some((column,index)=>column.name!==tokenControlColumns[index]||column.type!==(index<3?'INTEGER':'TEXT')||column.notnull!==1||column.pk!==(index===0?1:0)))throw tokenStateFailure();
+ const rows=db.prepare(`SELECT * FROM ${tokenControl}`).all();
+ if(rows.length!==1)throw tokenStateFailure();
+ const row=rows[0];
+ if(row.id!==1||!Number.isSafeInteger(row.revision)||row.revision<1||![0,1].includes(row.recovery_required)||typeof row.restore_marker!=='string'||row.restore_marker.length>100||typeof row.recovery_evidence!=='string'||row.recovery_evidence.length>200)throw tokenStateFailure();
+ if(archive&&(row.recovery_required!==1||!/^[a-f0-9]{64}$/.test(row.restore_marker)||row.recovery_evidence!==''))throw tokenStateFailure();
+ return row;
+}
+function applicationTokenSchemaSafety(db){
+ const schema=db.prepare("SELECT type,name,tbl_name,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'").all();
+ const reserved=/\bcompany_application_token(?:s|_control)\b/i;
+ // SQLite resolves identifiers without case, whereas sqlite_master equality
+ // is case-sensitive. A case alias must not bypass the archive-state gate.
+ if(schema.some(item=>[tokenTable,tokenControl].includes(item.name.toLowerCase())&&(item.name!==item.name.toLowerCase()||item.type!=='table')))throw tokenStateFailure();
+ if(schema.some(item=>['trigger','view'].includes(item.type)&&reserved.test(item.sql||'')))throw tokenStateFailure();
+ for(const item of schema.filter(item=>item.type==='table')){
+  if(db.prepare(`PRAGMA foreign_key_list("${item.name.replaceAll('"','""')}")`).all().some(foreign=>[tokenTable,tokenControl].includes(String(foreign.table).toLowerCase())))throw tokenStateFailure();
+ }
+}
+function applicationTokenArchiveIntegrity(db){
+ applicationTokenSchemaSafety(db);
+ if(db.prepare('SELECT 1 FROM sqlite_master WHERE name=?').get(tokenTable))throw tokenStateFailure();
+ return{applicationTokenRecoveryRequired:!!applicationTokenControl(db,{archive:true})};
+}
+// This function may only open our private snapshot, never the operator's source
+// database or restore target. A fence is also added to legacy pre-token backups.
+function quarantineApplicationTokens(snapshot){
+ const db=new DatabaseSync(snapshot);
+ try{
+  applicationTokenSchemaSafety(db);const previous=applicationTokenControl(db);
+  if(previous?.revision===Number.MAX_SAFE_INTEGER)throw tokenStateFailure();
+  db.exec('PRAGMA foreign_keys=ON; PRAGMA secure_delete=ON; BEGIN IMMEDIATE');
+  try{
+   db.exec(`DROP TABLE IF EXISTS ${tokenTable}`);
+   db.exec(APPLICATION_TOKEN_CONTROL_SCHEMA);
+   const revision=(previous?.revision||0)+1,marker=randomBytes(32).toString('hex');
+   if(previous){
+    const result=db.prepare(`UPDATE ${tokenControl} SET revision=?,recovery_required=1,restore_marker=?,recovery_evidence='' WHERE id=1 AND revision=?`).run(revision,marker,previous.revision);
+    if(result.changes!==1)throw tokenStateFailure();
+   }else db.prepare(`INSERT INTO ${tokenControl}(id,revision,recovery_required,restore_marker,recovery_evidence) VALUES(1,?,1,?,'')`).run(revision,marker);
+   db.exec('COMMIT');
+  }catch(error){db.exec('ROLLBACK');throw error;}
+  // Removing a row/table alone can leave encrypted credentials in free pages.
+  // Repack the sanitized copy before encrypting or publishing its bytes.
+  db.exec('VACUUM');applicationTokenArchiveIntegrity(db);
+ }finally{db.close();}
+}
 function key(value){if(typeof value!=='string'||! /^[a-f0-9]{64}$/i.test(value))throw Error('MG_BACKUP_KEY måste innehålla exakt 64 hextecken.');return Buffer.from(value,'hex');}
 const originalFailure=code=>Object.assign(Error(code==='backup_original_missing'?'Backupen saknar ett registrerat original.':code==='backup_original_hash_unavailable'?'Ett original saknar en giltig tidigare kontrollsumma. Backupen kan inte verifieras.':'Ett original i backupen stämmer inte med sin sparade kontrollsumma.'),{code});
 function bankApiOriginalIntegrity(db){
@@ -125,15 +181,20 @@ function companyIntegrity(db,tables,{expectedCompanyId}={}){
  }
  return {companyId:row.company_id,companyBoundaryVersion:1};
 }
-function integrity(file,options){const db=new DatabaseSync(file,{readOnly:true});try{const checks=db.prepare('PRAGMA integrity_check').all();if(checks.length!==1||Object.values(checks[0])[0]!=='ok')throw Error('Databasens integritetskontroll misslyckades.');if(db.prepare('PRAGMA foreign_key_check').all().length)throw Object.assign(Error('Backupen innehåller brutna registerreferenser.'),{code:'backup_foreign_key_violation'});const tables=db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();if(!tables.some(t=>t.name==='invoices')||!tables.some(t=>t.name==='bank_transactions'))throw Error('Backupen saknar MG:s register.');const company=companyIntegrity(db,tables,options);originalIntegrity(db,tables);originalReferenceIntegrity(db,tables);return{tables:tables.length,...company};}finally{db.close();}}
+function integrity(file,options,sourceSnapshot=false){const db=new DatabaseSync(file,{readOnly:true});try{const checks=db.prepare('PRAGMA integrity_check').all();if(checks.length!==1||Object.values(checks[0])[0]!=='ok')throw Error('Databasens integritetskontroll misslyckades.');if(db.prepare('PRAGMA foreign_key_check').all().length)throw Object.assign(Error('Backupen innehåller brutna registerreferenser.'),{code:'backup_foreign_key_violation'});const tables=db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();if(!tables.some(t=>t.name==='invoices')||!tables.some(t=>t.name==='bank_transactions'))throw Error('Backupen saknar MG:s register.');const company=companyIntegrity(db,tables,options);originalIntegrity(db,tables);originalReferenceIntegrity(db,tables);const tokenRecovery=sourceSnapshot?{}:applicationTokenArchiveIntegrity(db);return{tables:tables.length,...company,...tokenRecovery};}finally{db.close();}}
 function unpack(archive,encryptionKey){const bytes=readFileSync(archive);if(bytes.length<36||!bytes.subarray(0,8).equals(header))throw Error('Okänt backupformat.');const decipher=createDecipheriv('aes-256-gcm',key(encryptionKey),bytes.subarray(8,20));decipher.setAAD(header);decipher.setAuthTag(bytes.subarray(20,36));return Buffer.concat([decipher.update(bytes.subarray(36)),decipher.final()]);}
 function inspect(content,options){const folder=mkdtempSync(join(tmpdir(),'mg-backup-check-'));try{const file=join(folder,'restored.sqlite');writeFileSync(file,content,{mode:0o600});return integrity(file,options);}finally{rmSync(folder,{recursive:true,force:true});}}
+function prepareLegacyRecovery(content,options){
+ const folder=mkdtempSync(join(tmpdir(),'mg-backup-fence-'));
+ try{const file=join(folder,'snapshot.sqlite');writeFileSync(file,content,{mode:0o600});quarantineApplicationTokens(file);const verified=integrity(file,options);return{content:readFileSync(file),verified};}
+ finally{rmSync(folder,{recursive:true,force:true});}
+}
 
 /** SQLite VACUUM INTO creates a consistent snapshot, including committed WAL data. */
 export function createBackup(database,archive,encryptionKey,options){
  const encryption=key(encryptionKey),folder=mkdtempSync(join(tmpdir(),'mg-backup-'));
  try{const snapshot=join(folder,'snapshot.sqlite'),db=new DatabaseSync(resolve(database),{readOnly:true});try{db.prepare('VACUUM INTO ?').run(snapshot);}finally{db.close();}
-  integrity(snapshot,options);const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',encryption,iv);cipher.setAAD(header);const encrypted=Buffer.concat([cipher.update(readFileSync(snapshot)),cipher.final()]);
+  integrity(snapshot,options,true);quarantineApplicationTokens(snapshot);integrity(snapshot,options);const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',encryption,iv);cipher.setAAD(header);const encrypted=Buffer.concat([cipher.update(readFileSync(snapshot)),cipher.final()]);
   // Stage on the archive's filesystem. A crash while writing cannot reserve the
   // daily filename with partial ciphertext; link publishes verified bytes only
   // and, unlike rename, never overwrites an existing or concurrent archive.
@@ -173,7 +234,8 @@ function verifyRestoredBytes(fd,content){
  if(fstatSync(fd).size!==content.length||hash.digest('hex')!==createHash('sha256').update(content).digest('hex'))throw restoreMismatch();
 }
 export function restoreBackup(archive,target,encryptionKey,options){
- const content=unpack(archive,encryptionKey),verified=inspect(content,options);
+ let content=unpack(archive,encryptionKey),verified=inspect(content,options);
+ if(!verified.applicationTokenRecoveryRequired)({content,verified}=prepareLegacyRecovery(content,options));
  assertRestoreDestinationAbsent(target);
  // SQLite must never open the target: a foreign WAL could replace authenticated
  // financial state. Validate privately, then verify only the bytes we publish.

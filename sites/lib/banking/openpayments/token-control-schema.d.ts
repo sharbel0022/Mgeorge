@@ -1,0 +1,1 @@
+export const APPLICATION_TOKEN_CONTROL_SCHEMA: string;
