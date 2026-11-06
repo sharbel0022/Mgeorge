@@ -78,7 +78,7 @@
     "These main receipts certify commit24390ef only; a subsequent worker patch requires its own full PR and main verification.",
     "The Node versions exercise the same test population; security is overlapping.",
     "Browser and company load acceptance use synthetic fixtures and no live provider calls.",
-    "The 100-company benchmark is one Node process with concurrency4, not distributed production capacity.",
+    "The 100-company benchmark is one Node process with four concurrent company jobs and up to eight attempts during competing claims, not distributed production capacity.",
     "Coverage instrumentation only includes loaded files; transformed source mapping was not independently verified."
   ]
 }
