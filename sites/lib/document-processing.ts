@@ -18,7 +18,7 @@ export const counterpartyKey=(direction:string,party:string,org:string)=>JSON.st
 export const documentInvoiceKey=(i:Row)=>JSON.stringify(['invoice-v2',i.direction,normalize(i.organizationNumber||i.party),String(i.number||'').normalize('NFKC').trim().toUpperCase()]);
 const sourceFor=(owner:string,id:string)=>db().prepare('SELECT * FROM gmail_sources WHERE owner=? AND document_id=? ORDER BY created_at LIMIT 1').bind(owner,id).first<Row>();
 const referenceOriginal=(extraction:Row):Invoice['referenceOriginal']=>{
-  const fields=extraction.fields||extraction.values||{},value=(key:string)=>fields[key]&&typeof fields[key]==='object'&&'value' in fields[key]?fields[key].value:fields[key];
+  const fields=extraction.fields||extraction.values||{},value=(key:string)=>fields[key]?.provenance?.kind==='openai_document_claim'?undefined:fields[key]&&typeof fields[key]==='object'&&'value' in fields[key]?fields[key].value:fields[key];
   return Object.fromEntries([['invoice_number',value('invoice_number')],['reference',value('reference')],['issuer_name',extraction.details?.supplier?.name]].filter(([,value])=>value!=null));
 };
 const activeSource="EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status='needs_review')";
@@ -269,6 +269,7 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
     // review fields. A current worker extraction supersedes older Gmail data.
     const job=await db().prepare('SELECT extraction FROM document_jobs WHERE owner=? AND document_id=?').bind(owner,documentId).first<Row>();
     const currentExtraction=JSON.parse(job?.extraction||'{}'),extraction=Object.keys(currentExtraction).length?currentExtraction:JSON.parse(source.extraction);
+    if(options.automatic&&extraction.ai?.requiresHumanReview===true)throw safe('AI-förslaget kräver granskning mot originalet före registrering.');
     if(invoiceReferenceDecision(old.state,invoice as Invoice).applies){
       invoice.referenceOriginal=referenceOriginal(extraction);
       const policy=invoiceReferenceDecision(old.state,invoice as Invoice);
@@ -316,7 +317,11 @@ export async function registerProcessedInvoice(owner:string,documentId:string,ra
 }
 async function finish(owner:string,job:Row,result:{text:string,method:string,confidence:number,ocrEvidence?:any}){
   const source=await sourceFor(owner,job.document_id);if(source?.status!=='needs_review')return {ignored:true};
-  const meta=JSON.parse(source.metadata),extraction=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||'',ocrEvidence:result.ocrEvidence,ocrInputSha256:job.sha256});
+  const meta=JSON.parse(source.metadata);let extraction:Row=interpretInvoice(result.text,{direction:meta.direction,direction_confident:meta.direction_confident&&!meta.forwarded,method:result.method,ocrConfidence:result.confidence,filename:meta.original_filename||'',subject:meta.subject||'',ocrEvidence:result.ocrEvidence,ocrInputSha256:job.sha256});
+  if(config.OPENAI_INVOICES_ENABLED==='true'){
+    const {enrichSitesInvoice}=await import('./openai-invoices/sites.js');
+    extraction=await enrichSitesInvoice({database:db(),owner,job,baseline:extraction,environment:config,loadBytes:()=>originalBytes(owner,job,5000000)});
+  }
   const runId=await documentRunId(owner,job);
   Object.assign(extraction,{processing:{runner:job.lease_runner||'local',sha256:job.sha256,version:'document-worker-v3',run_id:runId}});
   const v=Object.fromEntries(fieldNames.map((k:string)=>[k,(extraction.fields as any)[k].value]));
@@ -349,7 +354,7 @@ async function finish(owner:string,job:Row,result:{text:string,method:string,con
   ]);
   if(saved[0].meta.changes!==1)return {ignored:true};
   const settings=await db().prepare('SELECT * FROM document_automation WHERE owner=?').bind(owner).first<Row>();
-  if(!duplicate&&trust&&extraction.level==='green'&&settings?.enabled&&settings.auto_register){
+  if(!duplicate&&trust&&extraction.level==='green'&&extraction.ai?.requiresHumanReview!==true&&settings?.enabled&&settings.auto_register){
     try{return await registerProcessedInvoice(owner,job.document_id,{...invoice,issued:v.issued_at,due:v.due_at,ocr:v.reference||'',bankgiro:v.bankgiro||'',email:'',kind:v.kind},{organization_number:v.organization_number,currency:v.currency,vat_cents:v.vat_cents,net_cents:v.net_cents},{automatic:true,lease:job.lease,trust,sha256:job.sha256});}
     catch(e){extraction.level='yellow';extraction.issues.push('Automatisk registrering stoppades. Kontrollera underlaget.');}
   }
@@ -500,7 +505,7 @@ export async function workerAction(req:Request,action:string){
   }
   if(action==='complete'&&req.method==='POST'){
     const raw=await req.text();if(raw.length>350000)return response({error:'För stort resultat.'},413);const body=JSON.parse(raw);
-    const job=await db().prepare(`SELECT document_jobs.*,d.sha256,d.size FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,body.id,body.lease,mode).first<Row>();
+    const job=await db().prepare(`SELECT document_jobs.*,d.sha256,d.size,d.mime FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND lease=? AND lease_until>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND lease_runner=? AND state='processing' AND engine='local' AND ${activeSource}`).bind(owner,body.id,body.lease,mode).first<Row>();
     if(!job)return response({error:'Jobbet har ändrats eller gått ut.'},409);
     if(body.sha256!==job.sha256||typeof body.text!=='string'||body.text.length>150000||!['pdf','ocr'].includes(body.method)||!Number.isFinite(body.confidence)||body.confidence<0||body.confidence>100)return response({error:'Ogiltigt OCR-resultat.'},400);
     if(body.error===true)return response(await failJob(owner,job,mode==='cloud'?'cloud_ocr_failed':'local_ocr_failed')?{ok:true}:{ignored:true});

@@ -30,6 +30,7 @@ async function fixture(t){
     './server':server,'./domain':domainUrl,
     './banking/security':new URL('../lib/banking/security.ts',import.meta.url).href,
     './invoice-fields.js':data(fields),
+    './openai-invoices/sites.js':new URL('../lib/openai-invoices/sites.js',import.meta.url).href,
     './server-pdf':data('export async function serverPdfText(){const f='+reference+';f.pdfCalls++;await f.onPdf?.(f.pdfCalls);return {text:"Synthetic unreadable invoice",method:"pdf",confidence:100};}'),
     './customer-messages':data('export async function reconcileAndPrepare(){}'),
   };
@@ -331,4 +332,31 @@ test('rejected accepted jobs cannot monopolize bounded recovery ahead of active 
   assert.deepEqual(f.sql.prepare("SELECT * FROM document_jobs WHERE document_id IN ('a','b') ORDER BY document_id").all(),rejected);
   assert.deepEqual(f.sql.prepare('SELECT * FROM document_extractions ORDER BY document_id').all(),history);
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});
+
+test('combined AI approval guard preserves OCR receipt recovery after a lost acknowledgement',async t=>{
+  const f=await fixture(t);await f.document('ai-approval-receipt');
+  f.env.OPENAI_INVOICES_ENABLED='true';
+  let providerCalls=0,completions=0,receipts=0,extractions=0;
+  t.mock.method(globalThis,'fetch',async()=>{providerCalls++;throw Error('Unapproved provider call');});
+  const get=f.env.BUCKET.get;
+  f.env.BUCKET.get=async key=>{const object=await get(key);return object?{...object,body:new Response(f.objects.get(key)).body}:null;};
+  const fetchImpl=async(url,options)=>{
+    const action=new URL(url).pathname.split('/').pop();
+    if(action==='complete')completions++;
+    if(action==='receipt')receipts++;
+    const response=await f.processing.workerAction(new Request(url,options),action);
+    if(action==='complete'&&completions===1)throw Error('Synthetic lost accepted response');
+    return response;
+  };
+  const result=await runSitesOcr({origin:'https://synthetic.example',token:f.env.DOCUMENT_WORKER_TOKEN,mode:'local'},{fetchImpl,extract:async()=>{extractions++;return {text:'Synthetic incomplete invoice',method:'ocr',confidence:50};}});
+  assert.deepEqual(result,{processed:1,failed:0});
+  assert.equal(providerCalls,0);assert.equal(extractions,1);assert.equal(completions,1);assert.equal(receipts,1);
+  const saved=f.sql.prepare('SELECT result FROM document_extractions').all();
+  assert.equal(saved.length,1);
+  const extraction=JSON.parse(saved[0].result);
+  assert.equal(extraction.ai.code,'APPROVAL_REQUIRED');
+  assert.equal(extraction.ai.requiresHumanReview,true);assert.equal(extraction.ai.bankEvidence,false);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(f.sql.prepare("SELECT COUNT(*) n FROM audit_events WHERE action LIKE 'openai.%'").get().n,0);
 });

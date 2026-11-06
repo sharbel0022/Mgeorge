@@ -20,6 +20,16 @@ Status 23:18 UTC: 427 granskning, 47 OCR, 4 PDF, 60 färdiga i framflyttat 24-ti
 
 **Poäng oförändrade:** senaste konservativa bedömning 258,5/330 = 7,83/10. Berörda områden 6, 9–14, 24, 28, 30, 32–33 får nya syntetiska bevis, inte en automatisk höjning eller nytt produktionsgodkännande.
 
+## 2026-11-06 — OpenAI-fakturatolkning, skyddad PR-kandidat
+
+[PR 64](https://github.com/sharbel0022/Mgeorge/pull/64), `feature/95-openai-invoices`, bygger på verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. En serveradapter för Responses API, strikt schema, PDF/bild, källhänvisningar och ekonomisk validering kopplas till både Node och Sites. Original bevaras; företag, hash, aktuellt dokument och Sites-lease kontrolleras före och efter asynkron behandling. Kostnadsreservation och resultat lagras beständigt i befintlig auditjournal.
+
+AI är **avstängd som standard**. Sekretess-, säkerhets- och kostnadsgodkännande, explicit företagslista, betrodd företagsidentitet och servernyckel krävs. AI-förslag har obligatorisk granskning och kan inte automatiskt registreras eller bli bankbevis. Vid problem används befintlig OCR och manuell granskning.
+
+Ingen projekt-API-nyckel hittades i den tillgängliga lokala miljön eller Sites-konfigurationen. Projektets modellåtkomst, krediter och verkliga modelljämförelse är därför **NOT_VERIFIED / NOT_MEASURED**. Officiella modell-ID:n och priser är dokumenterade separat; de bevisar inte tillgång eller precision. Målen 85 % recall / 98 % precision är inte verifierade. Poängen höjs inte. Inga kundoriginal har skickats, ingen AI-aktivering eller produktionspublicering har gjorts.
+
+Verklig full CI på `76f4c182` gav 3 094/3 094 Node-tester på vardera versionen och 5 827/5 827 Sites-tester samt gröna bygg-/säkerhetskontroller. En efterföljande granskningsrättning stoppar AI-ifyllnad vid motstridiga parter och rader; dess fokuserade prov gick från 16/22 till 22/22. Senaste källans fulla CI och granskningsläge finns på PR:n. Det körda optiska utvecklingsprovet gav 46/52 korrekta förväntade fält, 0 felvärden, 1/4 kompletta dokument och 4/4 granskningar. AI-armarna är inte mätta. [Verifiering och bevarade rådata](docs/openai-invoices/VERIFICATION.md). Lokal körmiljö blev otillgänglig under arbetet; sådana avbrutna körningar räknas inte som godkända tester. [Plan](docs/openai-invoices/PLAN.md) · [Drift och begränsningar](docs/openai-invoices/OPERATIONS.md).
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

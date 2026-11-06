@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-06T23:16:00.659Z",
+  "networkAuthorized": true,
+  "project": null,
+  "models": {
+    "status": "NOT_VERIFIED",
+    "reason": "API_KEY_MISSING",
+    "ids": null,
+    "lunaAvailable": null,
+    "solAvailable": null
+  },
+  "usageCosts": {
+    "status": "NOT_VERIFIED",
+    "reason": "ADMIN_KEY_MISSING",
+    "period": null,
+    "amountUsd": null
+  },
+  "prepaidCredits": {
+    "status": "NOT_VERIFIED",
+    "reason": "AUTHORIZED_BILLING_DASHBOARD_REQUIRED",
+    "amount": null
+  },
+  "providerBudget": {
+    "status": "NOT_VERIFIED",
+    "reason": "AUTHORIZED_PROJECT_BUDGET_CONFIGURATION_REQUIRED",
+    "amount": null
+  },
+  "notes": [
+    "Model listing is access evidence, not an executed multimodal extraction.",
+    "Costs are historical usage, not prepaid credit or a confirmed hard budget.",
+    "No invoice, prompt, key or provider error body is retained."
+  ]
+}
