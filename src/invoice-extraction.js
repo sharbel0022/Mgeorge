@@ -2,6 +2,7 @@ import {classifyDocument,documentConflicts} from './document-triage.js';
 import {extractInvoiceDetails,invoiceScalarText,invoiceReferenceMentions} from './invoice-details.js';
 import {assessOcrBankgiro,ocrInputHash} from '../sites/lib/ocr-bankgiro-evidence.js';
 import {fork} from 'node:child_process';
+import {constants as osConstants} from 'node:os';
 import {parseMoney} from './importers.js';
 const invoiceNumberLabel='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))(?=[\\s.:#-]|\\d|$)';
 const validInvoiceIdentifier=value=>/^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,79}$/u.test(value)&&!/^(?:ocr(?:[- /]?(?:nummer|referens))?|faktura(?:nummer|nr)?|fakturadatum|förfallo(?:datum|dag)|förfaller|invoice|date|leverantör|utställare|säljare|supplier|seller|kund|customer|netto|moms|vat|bankgiro|bg|totalbelopp|total|net|att)$/iu.test(value);
@@ -298,12 +299,24 @@ export async function runDocumentProcess(bytes,mime_type,preview=false){
   active++;
   try{
     return await new Promise((resolve,reject)=>{
-      const worker=fork(new URL('./invoice-worker.js',import.meta.url),[],{serialization:'advanced',stdio:['ignore','ignore','ignore','ipc'],execArgv:['--max-old-space-size=256'],env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot,TEMP:process.env.TEMP},windowsHide:true});
-      const timer=setTimeout(()=>{worker.kill();reject(Error('timeout'));},90000);
-      worker.once('message',value=>{clearTimeout(timer);resolve(value);});
-      worker.once('error',()=>{clearTimeout(timer);reject(Error('worker'));});
-      worker.once('exit',()=>{clearTimeout(timer);reject(Error('worker'));});
-      worker.send({bytes,mime_type,preview});
+      const started=performance.now();let worker,timer,settled=false,receivedMessage=false,timedOut=false;
+      const finish=(error,value)=>{if(settled)return;settled=true;clearTimeout(timer);error?reject(error):resolve(value);};
+      // Only fixed categories and process metadata may cross this boundary.
+      // Exception messages, child output and the original document stay private.
+      const fail=(code,exitCode=null,signal=null)=>finish(Object.assign(Error(timedOut?'timeout':'worker'),{
+        code,exitCode:Number.isSafeInteger(exitCode)?exitCode:null,
+        signal:typeof signal==='string'&&Object.hasOwn(osConstants.signals,signal)?signal:null,
+        elapsedMs:Math.max(0,Math.round(performance.now()-started)),receivedMessage,timedOut,
+      }));
+      const stop=()=>{try{worker?.kill();}catch{}};
+      try{worker=fork(new URL('./invoice-worker.js',import.meta.url),[],{serialization:'advanced',stdio:['ignore','ignore','ignore','ipc'],execArgv:['--max-old-space-size=256'],env:{PATH:process.env.PATH,SystemRoot:process.env.SystemRoot,TEMP:process.env.TEMP},windowsHide:true});}
+      catch{fail('DOCUMENT_WORKER_START_FAILED');return;}
+      timer=setTimeout(()=>{timedOut=true;fail('DOCUMENT_WORKER_TIMEOUT');stop();},90000);
+      worker.once('message',value=>{receivedMessage=true;finish(null,value);});
+      worker.once('error',()=>{fail('DOCUMENT_WORKER_PROCESS_FAILED');stop();});
+      worker.once('exit',(code,signal)=>fail('DOCUMENT_WORKER_EXIT_WITHOUT_RESULT',code,signal));
+      try{worker.send({bytes,mime_type,preview},error=>{if(error){fail('DOCUMENT_WORKER_SEND_FAILED');stop();}});}
+      catch{fail('DOCUMENT_WORKER_SEND_FAILED');stop();}
     });
   }finally{active--;}
 }
