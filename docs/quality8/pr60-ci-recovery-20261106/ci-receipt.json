@@ -1,0 +1,733 @@
+{
+  "version": 1,
+  "status": "PR_CI_VERIFIED_SUCCESS",
+  "capturedAt": "2026-11-06T06:00:25.155Z",
+  "repository": "sharbel0022/Mgeorge",
+  "pr": 60,
+  "head": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "headTree": "9eeed8e9a840352c48987a66314a6a22e082a60e",
+  "actualCheckout": {
+    "sha": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+    "tree": "9eeed8e9a840352c48987a66314a6a22e082a60e",
+    "parents": [
+      "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "8c744db37816411d8ad8b70c5b94202c74c37e62"
+    ],
+    "sameTreeAsHead": true
+  },
+  "scope": "Only PR60 pull_request runs at the frozen head. No main CI, merge, deployment, live bank, document retry, or score change is claimed or performed.",
+  "runs": [
+    {
+      "id": 42169920060,
+      "name": "SaaS security acceptance",
+      "event": "pull_request",
+      "headSha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-06T05:41:40Z",
+      "startedAt": "2026-11-06T05:41:40Z",
+      "updatedAt": "2026-11-06T05:44:39Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42169920060",
+      "path": ".github/workflows/saas-security-acceptance.yml"
+    },
+    {
+      "id": 42169919988,
+      "name": "Payment control checks",
+      "event": "pull_request",
+      "headSha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-06T05:41:40Z",
+      "startedAt": "2026-11-06T05:41:40Z",
+      "updatedAt": "2026-11-06T05:48:51Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42169919988",
+      "path": ".github/workflows/payment-control-ci.yml"
+    }
+  ],
+  "jobs": [
+    {
+      "id": 127735081102,
+      "runId": 42169920060,
+      "name": "security_acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T05:41:43Z",
+      "completedAt": "2026-11-06T05:44:39Z",
+      "runAttempt": 1,
+      "reportedHeadSha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+      "actualCheckoutSha": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+      "checkoutEvidence": {
+        "line": 123,
+        "text": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287"
+      },
+      "runtime": "Node v22.23.4",
+      "testSummary": null,
+      "acceptanceSummaries": [
+        {
+          "suite": "node-security",
+          "tests": 325,
+          "pass": 325,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        {
+          "suite": "sites-security",
+          "tests": 929,
+          "pass": 929,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T05:41:43Z",
+          "completed_at": "2026-11-06T05:41:44Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T05:41:44Z",
+          "completed_at": "2026-11-06T05:41:48Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T05:41:48Z",
+          "completed_at": "2026-11-06T05:41:49Z"
+        },
+        {
+          "name": "Install locked dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T05:41:49Z",
+          "completed_at": "2026-11-06T05:41:51Z"
+        },
+        {
+          "name": "Install verified Sites dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T05:41:51Z",
+          "completed_at": "2026-11-06T05:42:12Z"
+        },
+        {
+          "name": "Exercise synthetic authorization, isolation and recovery boundaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T05:42:12Z",
+          "completed_at": "2026-11-06T05:44:33Z"
+        },
+        {
+          "name": "Retain synthetic acceptance evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T05:44:33Z",
+          "completed_at": "2026-11-06T05:44:34Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T05:44:34Z",
+          "completed_at": "2026-11-06T05:44:37Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T05:44:37Z",
+          "completed_at": "2026-11-06T05:44:37Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T05:44:37Z",
+          "completed_at": "2026-11-06T05:44:37Z"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-ci-recovery-20261106/logs/saas-security-127735081102.log",
+        "utf8Bytes": 19443,
+        "sha256": "7c2360289ea232e792930e9fd2a4f72a1c8dda4630d24ad7cb38325df062a531",
+        "gitBlobSha1": "62a4e3d94879f77944fcb8d15c1b379b50fa1086",
+        "preservedUtf8Bom": true,
+        "fetchedAt": "2026-11-06T05:55:14.299Z"
+      },
+      "auditEvidence": [
+        {
+          "line": 166,
+          "text": "found 0 vulnerabilities"
+        }
+      ]
+    },
+    {
+      "id": 127735079604,
+      "runId": 42169919988,
+      "name": "bankgiro_bridge",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T05:41:43Z",
+      "completedAt": "2026-11-06T05:42:01Z",
+      "runAttempt": 1,
+      "reportedHeadSha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+      "actualCheckoutSha": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+      "checkoutEvidence": {
+        "line": 122,
+        "text": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287"
+      },
+      "runtime": "Node v22.23.4",
+      "testSummary": {
+        "tests": 47,
+        "suites": 0,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 5725.793649
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T05:41:44Z",
+          "completed_at": "2026-11-06T05:41:44Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T05:41:44Z",
+          "completed_at": "2026-11-06T05:41:50Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T05:41:50Z",
+          "completed_at": "2026-11-06T05:41:51Z"
+        },
+        {
+          "name": "Install isolated SFTP bridge",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T05:41:51Z",
+          "completed_at": "2026-11-06T05:41:52Z"
+        },
+        {
+          "name": "Check isolated bridge syntax",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T05:41:52Z",
+          "completed_at": "2026-11-06T05:41:53Z"
+        },
+        {
+          "name": "Audit isolated bridge production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T05:41:53Z",
+          "completed_at": "2026-11-06T05:41:53Z"
+        },
+        {
+          "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T05:41:53Z",
+          "completed_at": "2026-11-06T05:41:59Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T05:41:59Z",
+          "completed_at": "2026-11-06T05:41:59Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T05:41:59Z",
+          "completed_at": "2026-11-06T05:41:59Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T05:41:59Z",
+          "completed_at": "2026-11-06T05:41:59Z"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-ci-recovery-20261106/logs/payment-bridge-127735079604.log",
+        "utf8Bytes": 36933,
+        "sha256": "f34eab60024358dd9bc367d34b8678840d520f84741f8c74824a0352398c262a",
+        "gitBlobSha1": "28255ed3ec53bddf285cf13434b4137d45097ea0",
+        "preservedUtf8Bom": true,
+        "fetchedAt": "2026-11-06T05:55:14.060Z"
+      },
+      "auditEvidence": [
+        {
+          "line": 166,
+          "text": "found 0 vulnerabilities"
+        },
+        {
+          "line": 179,
+          "text": "found 0 vulnerabilities"
+        }
+      ]
+    },
+    {
+      "id": 127735079843,
+      "runId": 42169919988,
+      "name": "sites",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T05:41:43Z",
+      "completedAt": "2026-11-06T05:48:51Z",
+      "runAttempt": 1,
+      "reportedHeadSha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+      "actualCheckoutSha": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+      "checkoutEvidence": {
+        "line": 122,
+        "text": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287"
+      },
+      "runtime": "Node v22.23.4",
+      "testSummary": {
+        "tests": 5237,
+        "suites": 0,
+        "pass": 5237,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 339802.615619
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T05:41:44Z",
+          "completed_at": "2026-11-06T05:41:44Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T05:41:44Z",
+          "completed_at": "2026-11-06T05:41:49Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T05:41:49Z",
+          "completed_at": "2026-11-06T05:41:55Z"
+        },
+        {
+          "name": "Run npm run install:ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T05:41:55Z",
+          "completed_at": "2026-11-06T05:42:10Z"
+        },
+        {
+          "name": "Verify exact installed minimatch mitigation bytes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T05:42:10Z",
+          "completed_at": "2026-11-06T05:42:10Z"
+        },
+        {
+          "name": "Install shared OCR runtime for cloud integration test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T05:42:10Z",
+          "completed_at": "2026-11-06T05:42:11Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T05:42:11Z",
+          "completed_at": "2026-11-06T05:42:23Z"
+        },
+        {
+          "name": "Audit Sites production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T05:42:23Z",
+          "completed_at": "2026-11-06T05:42:51Z"
+        },
+        {
+          "name": "Install isolated bridge for full synthetic SFTP chain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-06T05:42:51Z",
+          "completed_at": "2026-11-06T05:42:52Z"
+        },
+        {
+          "name": "Run Sites tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T05:42:52Z",
+          "completed_at": "2026-11-06T05:48:32Z"
+        },
+        {
+          "name": "Run npm run build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T05:48:32Z",
+          "completed_at": "2026-11-06T05:48:48Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2026-11-06T05:48:48Z",
+          "completed_at": "2026-11-06T05:48:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22,
+          "started_at": "2026-11-06T05:48:48Z",
+          "completed_at": "2026-11-06T05:48:48Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23,
+          "started_at": "2026-11-06T05:48:48Z",
+          "completed_at": "2026-11-06T05:48:48Z"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-ci-recovery-20261106/logs/payment-sites-127735079843.log",
+        "utf8Bytes": 2251573,
+        "sha256": "10cbdf9964740e257b08f1634adfa879aecaa43799c45eb3e6e37af446fabf5c",
+        "gitBlobSha1": "dbb25320ed3b742406f426eb567a49db74d9bd93",
+        "preservedUtf8Bom": true,
+        "fetchedAt": "2026-11-06T05:55:14.836Z"
+      },
+      "auditEvidence": [
+        {
+          "line": 195,
+          "text": "found 0 vulnerabilities"
+        },
+        {
+          "line": 244,
+          "text": "8 moderate severity vulnerabilities"
+        },
+        {
+          "line": 258,
+          "text": "found 0 vulnerabilities"
+        }
+      ]
+    },
+    {
+      "id": 127735079993,
+      "runId": 42169919988,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-06T05:41:43Z",
+      "completedAt": "2026-11-06T05:45:25Z",
+      "runAttempt": 1,
+      "reportedHeadSha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+      "actualCheckoutSha": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+      "checkoutEvidence": {
+        "line": 122,
+        "text": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287"
+      },
+      "runtime": "Node v22.23.4",
+      "testSummary": {
+        "tests": 2322,
+        "suites": 0,
+        "pass": 2322,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 201045.314212
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-06T05:41:44Z",
+          "completed_at": "2026-11-06T05:41:44Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-06T05:41:44Z",
+          "completed_at": "2026-11-06T05:41:50Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-06T05:41:50Z",
+          "completed_at": "2026-11-06T05:41:52Z"
+        },
+        {
+          "name": "Run npm ci --ignore-scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T05:41:52Z",
+          "completed_at": "2026-11-06T05:41:54Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T05:41:54Z",
+          "completed_at": "2026-11-06T05:41:59Z"
+        },
+        {
+          "name": "Audit production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T05:41:59Z",
+          "completed_at": "2026-11-06T05:42:00Z"
+        },
+        {
+          "name": "Run tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T05:42:00Z",
+          "completed_at": "2026-11-06T05:45:21Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-11-06T05:45:21Z",
+          "completed_at": "2026-11-06T05:45:21Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-06T05:45:21Z",
+          "completed_at": "2026-11-06T05:45:21Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-06T05:45:21Z",
+          "completed_at": "2026-11-06T05:45:21Z"
+        }
+      ],
+      "log": {
+        "path": "docs/quality8/pr60-ci-recovery-20261106/logs/payment-node-127735079993.log",
+        "utf8Bytes": 991405,
+        "sha256": "9a184b413e5243228474d00303815cc5c9f1882343975c37fd945eb85b451aaa",
+        "gitBlobSha1": "f1033c70221ff8fe52b3f26e3c88c5d822312663",
+        "preservedUtf8Bom": true,
+        "fetchedAt": "2026-11-06T05:55:14.709Z"
+      },
+      "auditEvidence": [
+        {
+          "line": 169,
+          "text": "found 0 vulnerabilities"
+        },
+        {
+          "line": 183,
+          "text": "found 0 vulnerabilities"
+        }
+      ]
+    }
+  ],
+  "paymentTests": {
+    "tests": 7606,
+    "pass": 7606,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "saasOverlappingTests": {
+    "tests": 1254,
+    "summaries": [
+      {
+        "suite": "node-security",
+        "tests": 325,
+        "pass": 325,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      {
+        "suite": "sites-security",
+        "tests": 929,
+        "pass": 929,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    ],
+    "addedToPaymentTotal": false
+  },
+  "focusedRegressionEvidence": [
+    {
+      "line": 4525,
+      "text": "# Subtest: opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+      "following": [
+        "ok 692 - opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+        "  ---",
+        "  duration_ms: 5158.643886",
+        "  type: 'test'"
+      ]
+    },
+    {
+      "line": 4526,
+      "text": "ok 692 - opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release",
+      "following": [
+        "  ---",
+        "  duration_ms: 5158.643886",
+        "  type: 'test'",
+        "  ..."
+      ]
+    },
+    {
+      "line": 11632,
+      "text": "# Subtest: two real processes import and reconcile one bank payment once, then replay safely after restart",
+      "following": [
+        "ok 1865 - two real processes import and reconcile one bank payment once, then replay safely after restart",
+        "  ---",
+        "  duration_ms: 243.47559",
+        "  type: 'test'"
+      ]
+    },
+    {
+      "line": 11633,
+      "text": "ok 1865 - two real processes import and reconcile one bank payment once, then replay safely after restart",
+      "following": [
+        "  ---",
+        "  duration_ms: 243.47559",
+        "  type: 'test'",
+        "  ..."
+      ]
+    }
+  ],
+  "gates": {
+    "allReportedStepsSucceeded": true,
+    "sitesTypecheck": "npm run check -> guarded TypeScript tsc --noEmit; terminal step success",
+    "actualSitesBuild": {
+      "status": "success",
+      "startedAt": "2026-11-06T05:48:32Z",
+      "completedAt": "2026-11-06T05:48:48Z",
+      "logContainsBuildComplete": true
+    },
+    "audits": {
+      "node": "success; found 0 vulnerabilities",
+      "bridge": "success; found 0 vulnerabilities",
+      "sites": "success at --audit-level=high; 8 moderate severity vulnerabilities remain"
+    },
+    "minimatchMitigationByteCheck": "success"
+  },
+  "finalPrStatus": {
+    "fetchedAt": "2026-11-06T05:58:11.596Z",
+    "url": "https://github.com/sharbel0022/Mgeorge/pull/60",
+    "number": 60,
+    "state": "open",
+    "draft": false,
+    "merged": false,
+    "mergedAt": null,
+    "head": {
+      "sha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+      "ref": "feature/rating8-sqlite-startup-20261106",
+      "repo": "sharbel0022/Mgeorge"
+    },
+    "base": {
+      "sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "ref": "main",
+      "repo": "sharbel0022/Mgeorge"
+    },
+    "mergeCommitSha": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+    "mergeable": true,
+    "mergeableState": "clean"
+  },
+  "archiveBoundary": {
+    "rawJobLogs": "Complete unmodified decoded strings returned by GitHub job-log endpoint, re-encoded as UTF-8; BOM, timestamps and line endings retained.",
+    "toolAndTransportHeadersArchived": false,
+    "credentialValuesArchived": false,
+    "githubAlreadyMaskedLogCommandsRetained": true,
+    "privateChatReferencesArchived": false,
+    "saasArtifactZipDownloaded": false,
+    "saasArtifactMetadataArchived": true,
+    "localShellUsed": false,
+    "rerunsRequested": 0
+  },
+  "failuresObserved": [],
+  "limits": [
+    "This receipt is not independent product review or a merge authorization.",
+    "Main branch CI and any publication/build outside these PR workflows are not covered.",
+    "SaaS per-suite logs inside artifact ZIP were not downloaded; its complete job stdout and artifact metadata/digest are retained.",
+    "Sites audit success does not mean zero reported vulnerabilities; 8 moderate findings remain."
+  ]
+}

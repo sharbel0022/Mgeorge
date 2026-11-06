@@ -1,0 +1,22 @@
+{
+  "fetchedAt": "2026-11-06T05:58:11.596Z",
+  "url": "https://github.com/sharbel0022/Mgeorge/pull/60",
+  "number": 60,
+  "state": "open",
+  "draft": false,
+  "merged": false,
+  "mergedAt": null,
+  "head": {
+    "sha": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+    "ref": "feature/rating8-sqlite-startup-20261106",
+    "repo": "sharbel0022/Mgeorge"
+  },
+  "base": {
+    "sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "ref": "main",
+    "repo": "sharbel0022/Mgeorge"
+  },
+  "mergeCommitSha": "3c2ffa129d7cc7c50eef06e16e405908f0c6a287",
+  "mergeable": true,
+  "mergeableState": "clean"
+}

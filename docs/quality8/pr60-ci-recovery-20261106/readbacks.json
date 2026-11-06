@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "scope": "Direct immutable Git blob content readback of all 17 CI data files before constructing the checkpoint tree. The readback report and manifest exclude themselves from this report to avoid circular evidence.",
+  "repository": "sharbel0022/Mgeorge",
+  "frozenPrHead": "8c744db37816411d8ad8b70c5b94202c74c37e62",
+  "verifiedAt": "2026-11-06T06:03:07.713Z",
+  "method": "Create each blob from original content as UTF-8; compare GitHub blob SHA to independently calculated Git object ID; fetch that immutable blob and compare its returned content exactly with the original stored string.",
+  "fullJobLogCount": 4,
+  "fullJobLogBytes": 3299354,
+  "allContentsIdentical": true,
+  "allGitBlobHashesMatched": true,
+  "files": [
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/logs/saas-security-127735081102.log",
+      "utf8Bytes": 19443,
+      "sha256": "7c2360289ea232e792930e9fd2a4f72a1c8dda4630d24ad7cb38325df062a531",
+      "gitBlobSha1": "62a4e3d94879f77944fcb8d15c1b379b50fa1086",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:02:11.698Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/logs/payment-bridge-127735079604.log",
+      "utf8Bytes": 36933,
+      "sha256": "f34eab60024358dd9bc367d34b8678840d520f84741f8c74824a0352398c262a",
+      "gitBlobSha1": "28255ed3ec53bddf285cf13434b4137d45097ea0",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.810Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/logs/payment-sites-127735079843.log",
+      "utf8Bytes": 2251573,
+      "sha256": "10cbdf9964740e257b08f1634adfa879aecaa43799c45eb3e6e37af446fabf5c",
+      "gitBlobSha1": "dbb25320ed3b742406f426eb567a49db74d9bd93",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:07.681Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/logs/payment-node-127735079993.log",
+      "utf8Bytes": 991405,
+      "sha256": "9a184b413e5243228474d00303815cc5c9f1882343975c37fd945eb85b451aaa",
+      "gitBlobSha1": "f1033c70221ff8fe52b3f26e3c88c5d822312663",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:07.325Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/run-42169920060.json",
+      "utf8Bytes": 12742,
+      "sha256": "68cdd6d83e1507d88706fe2d9b0b2268e3da2de1a50e7734827bdff77f081b4c",
+      "gitBlobSha1": "baf37a95c0ed90dfcec3732be4b5cc8115a4cf84",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:07.010Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/jobs-42169920060.json",
+      "utf8Bytes": 2828,
+      "sha256": "b1c3e218772e7f3a36910d3efb087e1c94deb88b566b056e3c452b9f20588e7a",
+      "gitBlobSha1": "0d1c465f6ed41ba8b7f1d13697264d88a232ee47",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.901Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/source/saas-security-acceptance.yml",
+      "utf8Bytes": 1429,
+      "sha256": "8968081569e21e722d7518e0bfa070e18fb607d37668dad3c77684463c59617b",
+      "gitBlobSha1": "3c8fbd5aa04c982c7c05003515bb1ee865d0c646",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.842Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/run-42169919988.json",
+      "utf8Bytes": 12735,
+      "sha256": "4a650f3b2b91bc28d4c8a9062ba60593b1681cb6b49527a99607176f634836c2",
+      "gitBlobSha1": "9097395a2da75164460cd73e88ebf865f70f726c",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:07.235Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/jobs-42169919988.json",
+      "utf8Bytes": 8997,
+      "sha256": "0dbabdbd33f939fe16b928142e316593a89abb05761fd571a71da6df5867425c",
+      "gitBlobSha1": "3129959206e46b385765d8f5a7a11901bde6d461",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.821Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/source/payment-control-ci.yml",
+      "utf8Bytes": 3078,
+      "sha256": "fda1e1e17ace428c580124df362e6a038746b957e22be12295af56188f21d986",
+      "gitBlobSha1": "093737d0fcc940b8876a179b0f5e4303dd30abc9",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:07.087Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/head-commit.json",
+      "utf8Bytes": 1203,
+      "sha256": "564cf648af753cb8e35a6f683be3d9e34ab89139e9b8b0c31582b6185740627f",
+      "gitBlobSha1": "88e7ed3d01e2715b3d7cb813b538cfce7fd2089d",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.790Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/checkout-merge-commit.json",
+      "utf8Bytes": 2668,
+      "sha256": "e782a5333b951d4feff7896c764294c16d5aeac1d7b23bba6dd2f7a85839ca1f",
+      "gitBlobSha1": "2815f970fcdef30d45ecfa76e1cd167f5a098532",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.792Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/saas-artifacts.json",
+      "utf8Bytes": 786,
+      "sha256": "5a862750c63212491c411b9abfcfe31bcb8301f52dd9a668a6a77deff5be2a2e",
+      "gitBlobSha1": "053e735ce274d9b60d0df63b396ed8f952edba1b",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.827Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/source/sites-run-verified-tool.mjs",
+      "utf8Bytes": 709,
+      "sha256": "9140270cde0cb35a6d37b9aa9b2fdb3f02dc89a9aaef784d40ebc56dd6365f8e",
+      "gitBlobSha1": "b7c6e399a3004129dee46ece301a05dbc85111a4",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.794Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/github/pr-status.json",
+      "utf8Bytes": 596,
+      "sha256": "a516a3c25199bc39c39dd59f57c30da0a5df8b5ef732fd5687683302599807c6",
+      "gitBlobSha1": "a9ef49ca2d20c4b66c5e364c2ae18dfc7e90c354",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.803Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/ci-receipt.json",
+      "utf8Bytes": 23869,
+      "sha256": "31b0617854e4596b93d38a774211f117b49f5818359e61b6ae3e66cdc52ad386",
+      "gitBlobSha1": "652c4216dc5b8d65a48a53a8d4d8dec3427811bb",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.909Z"
+    },
+    {
+      "path": "docs/quality8/pr60-ci-recovery-20261106/README.md",
+      "utf8Bytes": 5142,
+      "sha256": "6b025955d3ac7ccd2ed54676611278814106b50e5a83612da0f88e7f9c28aaf4",
+      "gitBlobSha1": "d144b685f1c144d57845868c1e744b095bf41d75",
+      "createBlobShaMatched": true,
+      "readbackContentEqual": true,
+      "readbackAt": "2026-11-06T06:03:06.817Z"
+    }
+  ]
+}
