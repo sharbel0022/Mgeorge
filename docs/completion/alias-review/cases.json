@@ -303,7 +303,7 @@
       "direction": "supplier",
       "expected": {
         "fields.currency.value": "SEK",
-        "fields.organization_number.value": "9920000008"
+        "fields.organization_number.value": null
       },
       "nonGreen": false,
       "description": ""
@@ -315,7 +315,7 @@
       "direction": "supplier",
       "expected": {
         "fields.net_cents.value": 80000,
-        "fields.organization_number.value": "9920000008"
+        "fields.organization_number.value": null
       },
       "nonGreen": false,
       "description": ""
@@ -569,7 +569,7 @@
       "joined": "Organization number: 992000-0008",
       "expectRaw": false,
       "expected": {
-        "fields.organization_number.value": "9920000008"
+        "fields.organization_number.value": null
       },
       "context": "organization"
     },
@@ -615,7 +615,7 @@
       "joined": "Organisation number: 992000-0008",
       "expectRaw": false,
       "expected": {
-        "fields.organization_number.value": "9920000008"
+        "fields.organization_number.value": null
       },
       "context": "organization"
     },

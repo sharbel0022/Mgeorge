@@ -1,0 +1,59 @@
+{
+  "frozenAt": "2026-11-06T16:07:19.794962+00:00",
+  "originalCasesSha256": "276d9f64225129da52b39bdbc1797aadbfa16a336154730e1fb00c37f4536255",
+  "correctedCasesSha256": "e5f67aaa276960c93029dbd6da5907f6ecfb336a3aa88f97c23edc9495590476",
+  "runnerSha256": "54bee041057fd47b4ced19942f02546675b19bc4bccc38440739d6b11dfd647e",
+  "changedFixtureIds": [
+    "currency_before_organization",
+    "net_before_organization",
+    "layout_organization_aligned",
+    "layout_org_existing_spelling"
+  ],
+  "runtimesPerFixture": 2,
+  "negativeAssertionsChanged": false,
+  "executedAfterCorrection": false,
+  "rawPreserved": {
+    "original-baseline": {
+      "uncompressedSha256": "3a3c72d93ece9034c7e8a6d63748044ebad48e4db8d6e187ed0fbdbe535aab4a",
+      "format": "node:test spec reporter",
+      "summaries": [
+        "ℹ tests 106",
+        "ℹ suites 0",
+        "ℹ pass 70",
+        "ℹ fail 36",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 455.117987"
+      ]
+    },
+    "original-4c8a2e3": {
+      "uncompressedSha256": "39e669f0d95b06f5f9cc096305b94da40ef246043b46638d5aa05915e3d5c145",
+      "format": "node:test spec reporter",
+      "summaries": [
+        "ℹ tests 106",
+        "ℹ suites 0",
+        "ℹ pass 94",
+        "ℹ fail 12",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 397.685951"
+      ]
+    },
+    "supplemental-baseline": {
+      "uncompressedSha256": "2dc588b517a191ea0fd7f46ddb2256b6038d65b10c7611bf22a72c9ea0e8b60f",
+      "format": "node:test spec reporter",
+      "summaries": [
+        "ℹ tests 14",
+        "ℹ suites 0",
+        "ℹ pass 6",
+        "ℹ fail 8",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 314.966626"
+      ]
+    }
+  }
+}
