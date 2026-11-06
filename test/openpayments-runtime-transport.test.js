@@ -33,6 +33,38 @@ test('ordinary Node production runtime uses configured certificate files for rea
   assert.equal(f.options.db.prepare('SELECT count(*) n FROM saas_bank_state').get().n,0,'discovery cannot create a consent');
 });
 
+test('concurrent ordinary runtimes share only the application token while keeping each request boundary',async t=>{
+  const provider=await localProvider(t,certificates,discovery),f=fixture(t),counts=[0,0,0,0];
+  const banks=counts.map((_,index)=>f.create({providerOptions:{requestBoundary:async operation=>{counts[index]++;return operation({signal:new AbortController().signal,deadline:Date.now()+20000});}}}));
+  const results=await Promise.all(banks.map(bank=>bank.discovery()));
+  assert.ok(results.every(result=>result.banks[0].id==='OPBKSE21'));
+  assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,1,'one app token can serve current runtimes for the same exact app/config/TLS identity');
+  assert.equal(counts.reduce((sum,n)=>sum+n,0),5,'one token exchange plus four independently budgeted discovery calls');
+  assert.ok(counts.every(count=>count>=1),'every caller uses its own HTTP boundary');
+});
+
+test('a shared in-flight token never bypasses a caller whose membership was revoked',async t=>{
+  let revoked=false;
+  const provider=await localProvider(t,certificates,r=>{if(r.path==='/connect/token')revoked=true;return discovery(r);}),f=fixture(t),a=f.create(),b=f.create({assertCurrent:()=>{if(revoked)throw Error('synthetic membership revoked');}});
+  const result=await Promise.allSettled([a.discovery(),b.discovery()]);
+  assert.equal(result[0].status,'fulfilled');assert.equal(result[1].status,'rejected');assert.equal(result[1].reason.code,'RESOURCE_SCOPE_MISMATCH');
+  assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,1);assert.equal(provider.requests.filter(r=>r.path!=='/connect/token').length,1,'only the still-authorized caller may read provider data');
+});
+
+test('an API token rejection invalidates all current runtime clients without retrying automatically',async t=>{
+  let apiReads=0;const provider=await localProvider(t,certificates,r=>r.path!=='/connect/token'&&++apiReads===2?{status:401,body:{error:'synthetic-token-rejected'}}:discovery(r)),f=fixture(t);
+  await f.create().discovery();await assert.rejects(f.create().discovery(),{code:'INVALID_ACCESS_TOKEN'});
+  assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,1,'a rejected API call does not replay itself');
+  await f.create().discovery();assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,2);assert.equal(apiReads,3);
+});
+
+test('restoring authorized configuration after observed rotation uses a fresh token identity',async t=>{
+  const provider=await localProvider(t,certificates,discovery),f=fixture(t),old=f.create(),original=f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG;
+  await old.discovery();f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=JSON.stringify({...certificates.configuration,certificateSha256:'0'.repeat(64)});
+  await assert.rejects(old.discovery(),{code:'CONSENT_APPLICATION_CHANGED'});f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=original;
+  await f.create().discovery();assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,2,'the invalidated old token is never revived');
+});
+
 test('missing server certificate configuration leaves production unavailable without network calls',async t=>{
   const provider=await localProvider(t,certificates,discovery),f=fixture(t,{mtls:null}),bank=f.create();
   assert.equal((await bank.snapshot()).actions.connect,false);
@@ -142,6 +174,7 @@ test('normal production consent, selected-account scheduled sync and stored stat
   assert.equal(status.state,'succeeded');assert.equal(status.automaticEnabled,true);assert.equal(provider.requests.length,calls,'stored status does not contact the provider');
   assert.ok(provider.requests.every(r=>r.clientAuthorized&&r.clientFingerprint===certificates.fingerprint));
   t.diagnostic(JSON.stringify({syntheticLocalTlsRequests:calls,verifiedClientCertificates:provider.requests.filter(r=>r.clientAuthorized&&r.clientFingerprint===certificates.fingerprint).length,applicationTokenRequests:provider.requests.filter(r=>r.path==='/connect/token'&&new URLSearchParams(r.body).get('grant_type')==='client_credentials').length,authorizationCodeRequests:provider.requests.filter(r=>r.path==='/connect/token'&&new URLSearchParams(r.body).get('grant_type')==='authorization_code').length,productionProviderRequests:0}));
+  assert.equal(provider.requests.filter(r=>r.path==='/connect/token'&&new URLSearchParams(r.body).get('grant_type')==='client_credentials').length,1,'onboarding and sync reuse the valid app token without sharing their tenant guards or request budgets');
   f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=JSON.stringify({...certificates.configuration,certificateSha256:'0'.repeat(64)});
   const blocked=await readNodeOpenPaymentsCompanySyncStatus({...f.options,accountId,automaticEnabled:true});
   assert.equal(blocked.state,'blocked');assert.equal(blocked.automaticEnabled,false);assert.equal(blocked.lastSuccessAt,status.lastSuccessAt);assert.equal(provider.requests.length,calls);

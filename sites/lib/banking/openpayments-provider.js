@@ -74,7 +74,7 @@ export class OpenPaymentsProvider {
     this.#now = options.now ?? Date.now;
     this.#config = validateOpenPaymentsConfig(configuration, this.#now);
     this.#http = createOpenPaymentsHttpClient(this.#config, options);
-    this.#tokens = new OpenPaymentsTokenClient(this.#config, this.#http, this.#now);
+    this.#tokens = new OpenPaymentsTokenClient(this.#config, this.#http, this.#now, options.applicationTokenCache);
     Object.defineProperty(this, 'id', { value: 'open_payments', enumerable: true });
     Object.freeze(this);
   }

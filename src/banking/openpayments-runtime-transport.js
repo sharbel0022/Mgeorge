@@ -2,6 +2,7 @@ import {constants,openSync,closeSync,fstatSync,lstatSync,readSync} from 'node:fs
 import {isAbsolute,parse,resolve,join,sep} from 'node:path';
 import {createHash,X509Certificate} from 'node:crypto';
 import {createOpenPaymentsNodeTransport} from './openpayments-node-transport.js';
+import {createOpenPaymentsTokenCacheIdentity,invalidateOpenPaymentsTokenCacheIdentity} from '../../sites/lib/banking/openpayments/token-cache.js';
 
 const MAX_PEM_BYTES=128*1024;
 const CONFIG_KEY='SAAS_OPENPAYMENTS_MTLS_CONFIG';
@@ -9,6 +10,8 @@ const digest=value=>createHash('sha256').update(value).digest('hex');
 const denied=()=>Object.assign(new Error('The server client certificate configuration could not be verified.'),{code:'INVALID_CLIENT_CERTIFICATE',status:409});
 const hex=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
 const plain=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+const identities=new WeakMap();
+function forgetIdentity(environment){const current=identities.get(environment);if(current)invalidateOpenPaymentsTokenCacheIdentity(current.identity);identities.delete(environment);}
 
 function credentialFile(path,privateKey=false) {
   let fd;
@@ -38,8 +41,8 @@ function credentialFile(path,privateKey=false) {
  * Missing configuration keeps production disabled. Existing injected transports
  * remain an explicit trusted composition boundary for isolated tests/adapters. */
 export function configuredOpenPaymentsNodeTransport({environment=process.env,configuration}={}) {
-  if(environment.SAAS_BANK_ENABLED!=='true'||configuration?.environment!=='PRODUCTION')return null;
-  const raw=environment[CONFIG_KEY];if(raw===undefined||raw==='')return null;
+  if(environment.SAAS_BANK_ENABLED!=='true'||configuration?.environment!=='PRODUCTION'){forgetIdentity(environment);return null;}
+  const raw=environment[CONFIG_KEY],providerRaw=environment.SAAS_OPENPAYMENTS_CONFIG;if(raw===undefined||raw===''){forgetIdentity(environment);return null;}
   let config;
   try {
     if(typeof raw!=='string'||raw.length>20000)throw denied();config=JSON.parse(raw);
@@ -48,7 +51,7 @@ export function configuredOpenPaymentsNodeTransport({environment=process.env,con
       typeof config.credentialGeneration!=='string'||!config.credentialGeneration||config.credentialGeneration!==configuration.credentialGeneration||
       !hex(config.certificateSha256)||Object.hasOwn(config,'caFile')!==Object.hasOwn(config,'caSha256')||
       Object.hasOwn(config,'caFile')&&!hex(config.caSha256))throw denied();
-  } catch {throw denied();}
+  } catch {forgetIdentity(environment);throw denied();}
   const material=()=>{
     const certificatePem=credentialFile(config.certificateFile),privateKeyPem=credentialFile(config.privateKeyFile,true);
     const caPem=Object.hasOwn(config,'caFile')?credentialFile(config.caFile):undefined;
@@ -58,13 +61,20 @@ export function configuredOpenPaymentsNodeTransport({environment=process.env,con
     } catch {throw denied();}
     return {certificatePem,privateKeyPem,...(caPem===undefined?{}:{caPem})};
   };
-  const initial=material(),fingerprint=digest(JSON.stringify(initial));
-  const native=createOpenPaymentsNodeTransport(initial);
+  let initial,native;
+  try{initial=material();native=createOpenPaymentsNodeTransport(initial);}
+  catch(error){forgetIdentity(environment);throw error;}
+  const fingerprint=digest(JSON.stringify(initial)),binding=digest(JSON.stringify([raw,providerRaw,fingerprint]));
+  let identity=identities.get(environment);
+  if(identity?.binding!==binding){forgetIdentity(environment);identity={binding,identity:createOpenPaymentsTokenCacheIdentity()};identities.set(environment,identity);}
+  const cacheIdentity=identity.identity,invalidateTokenCache=()=>{invalidateOpenPaymentsTokenCacheIdentity(cacheIdentity);if(identities.get(environment)?.identity===cacheIdentity)identities.delete(environment);};
   const validateCertificate=()=>{
-    if(environment[CONFIG_KEY]!==raw||digest(JSON.stringify(material()))!==fingerprint)throw denied();
-    native.validateCertificate();
+    try{
+      if(environment[CONFIG_KEY]!==raw||environment.SAAS_OPENPAYMENTS_CONFIG!==providerRaw||identities.get(environment)?.identity!==cacheIdentity||digest(JSON.stringify(material()))!==fingerprint)throw denied();
+      native.validateCertificate();
+    }catch(error){invalidateTokenCache();if(identities.get(environment)?.identity===cacheIdentity)identities.delete(environment);throw error;}
   };
-  return Object.freeze({kind:'mtls',validateCertificate,async request(input,init){
+  return Object.freeze({kind:'mtls',cacheIdentity,invalidateTokenCache,validateCertificate,async request(input,init){
     validateCertificate();const response=await native.request(input,init);
     try{validateCertificate();return response;}
     catch(error){try{await response.body?.cancel();}catch{}throw error;}
