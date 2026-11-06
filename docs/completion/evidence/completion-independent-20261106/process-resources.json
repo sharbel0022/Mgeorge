@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-11-06T15:09:09.748686+00:00",
+  "completed_at": "2026-11-06T15:10:48.598017+00:00",
+  "exit_code": 0,
+  "wall_seconds": 98.84933314900081,
+  "rusage_children_maxrss_kib": 394368,
+  "child_user_seconds": 75.265967,
+  "child_system_seconds": 6.779844,
+  "environment_keys": [
+    "LANG",
+    "PATH",
+    "TEMP"
+  ],
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "/workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/docs/completion/evidence/completion-independent-20261106/run-first-pass.mjs"
+  ],
+  "cwd": "/workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval"
+}

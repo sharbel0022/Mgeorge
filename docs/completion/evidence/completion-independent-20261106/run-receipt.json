@@ -1,0 +1,698 @@
+{
+  "schema": "mgeorge-independent-ocr-first-pass-v1",
+  "status": "completed",
+  "startedAt": "2026-11-06T15:09:11.631Z",
+  "completedAt": "2026-11-06T15:10:48.569Z",
+  "durationMs": 96937.797292,
+  "manifestSha256": "246ea4ac2f60d7567fddd2ee57cd7c48bc3f23a4a2b902a1f3fab30ece12781c",
+  "runtimeBindingSha256": "b2aaf99c6abb7fd2e4d544f23ea233d21d98c326e0a0033f747e7d7944caad7b",
+  "opticalCalls": 19,
+  "parserCalls": 38,
+  "attemptsPerCase": 1,
+  "optical": [
+    {
+      "id": "N01",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N01.optical.json",
+      "sha256": "a63e2219cbbe322a01e6869dbbd9beacf282d0e934142c92296b8d524a5cec79",
+      "textSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durationMs": 6843.041153,
+      "error": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "confidence": null,
+      "characters": 0
+    },
+    {
+      "id": "N02",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N02.optical.json",
+      "sha256": "f42ad2c70032299d891960e951b44f22130df9a8edee8100700a5b5e20540d0f",
+      "textSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durationMs": 2888.101751,
+      "error": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "confidence": null,
+      "characters": 0
+    },
+    {
+      "id": "N03",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N03.optical.json",
+      "sha256": "822d28753f17f0782eafd186a978e2bda1c2c80db9f26eaa170342c8fc45519d",
+      "textSha256": "c06561f8b2238773bb916d0a8d20708bd84d57916855e89db8cdebbc093dfd04",
+      "durationMs": 5836.139807,
+      "error": null,
+      "confidence": 93,
+      "characters": 498
+    },
+    {
+      "id": "N04",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N04.optical.json",
+      "sha256": "cbe987ea23e1b55ae8aa705024526405160dc5ec72ec73bbdab690bdae56790d",
+      "textSha256": "09ae870ef1a19baf6861e4bd4ffa9f6a70f3af51c44e6d959fbd3d31e8cf26f9",
+      "durationMs": 5766.986145999999,
+      "error": null,
+      "confidence": 93,
+      "characters": 464
+    },
+    {
+      "id": "N05",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N05.optical.json",
+      "sha256": "29c1c42c05618912ada73ff124abab2e5c309c1f932a29de010784d9151862e7",
+      "textSha256": "bc507c31101eacfd1b5c7c042b171151f0593dd4c974e57c9b748b641df4d5c6",
+      "durationMs": 5540.747459000002,
+      "error": null,
+      "confidence": 93,
+      "characters": 521
+    },
+    {
+      "id": "N06",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N06.optical.json",
+      "sha256": "282b7c80755bb733b6167376e0b6939c7bbb20e1ab2fd53ee2b34780ca70fa68",
+      "textSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durationMs": 3457.922690000003,
+      "error": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "confidence": null,
+      "characters": 0
+    },
+    {
+      "id": "N07",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N07.optical.json",
+      "sha256": "490625122aeef46745806e379bdfbca8af0e87f7a8f1fd444a334d9c0130cc7d",
+      "textSha256": "4a77c5e9b960dfa026cc70b059808afd240db34c2c4d8d6db14276ec4f224ac9",
+      "durationMs": 5754.934484000001,
+      "error": null,
+      "confidence": 93,
+      "characters": 501
+    },
+    {
+      "id": "N08",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N08.optical.json",
+      "sha256": "02b8f44e639cd97fbbe105ac69ebb08440e128544c9456a6d56f83e24a489976",
+      "textSha256": "e728897a9350eb8135afa4382aa728e0007f332f605ff15cf17107e8e77ee0dd",
+      "durationMs": 4180.533242999998,
+      "error": null,
+      "confidence": 94,
+      "characters": 470
+    },
+    {
+      "id": "N09",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N09.optical.json",
+      "sha256": "c1a9f4a9581f3d6581b257a4cfb904113a3e9953ccafceb9ec099a221bde5504",
+      "textSha256": "168e75c6fdfc07436e2faf7211d6c9fe3afd318a27bfdec4d403a2191e8bbea0",
+      "durationMs": 5022.153907,
+      "error": null,
+      "confidence": 88,
+      "characters": 581
+    },
+    {
+      "id": "N10",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N10.optical.json",
+      "sha256": "a9915b21ffe1ff28a81df46aeeff05ecfca3187561d4e593b06cddee2eacc643",
+      "textSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durationMs": 3876.3868440000006,
+      "error": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "confidence": null,
+      "characters": 0
+    },
+    {
+      "id": "N11",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N11.optical.json",
+      "sha256": "57ceb3a55ef2e7e4c0d7f4dfa1acf0eb58ddead270fda9049226527254d4dbeb",
+      "textSha256": "d62b1042e5ef438544c1f0f19d8d49cbeb28114f3611ca93392c8aa58556b4f6",
+      "durationMs": 4868.280860999999,
+      "error": null,
+      "confidence": 93,
+      "characters": 499
+    },
+    {
+      "id": "N12",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N12.optical.json",
+      "sha256": "ceeb2283ef915ddfd5ee759fb2213e2488378cbf968d2f6555856aa51caae6de",
+      "textSha256": "c359a371141ce234e67f9fb28749d8d1d3cdaa980504d38c39e9dda9a132a422",
+      "durationMs": 4932.989829999999,
+      "error": null,
+      "confidence": 93,
+      "characters": 471
+    },
+    {
+      "id": "N13",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N13.optical.json",
+      "sha256": "1b2a7768dbc510b5d5da447e8be22ac17164750f365f2bf44b875ab65b56ba09",
+      "textSha256": "32c70f2f96c348b55592aeae9dfee80e8a3484201b263534cadc1d16eb42e308",
+      "durationMs": 6480.267060999991,
+      "error": null,
+      "confidence": 92,
+      "characters": 526
+    },
+    {
+      "id": "N14",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N14.optical.json",
+      "sha256": "c1e0fc707b62d29548061ac769a56946cf887710b7a03b8a1a89024583b187eb",
+      "textSha256": "d633be0ee20b2b860dd11f294ddc5140cef51694534f6f0fcbb0c2b08b9442d3",
+      "durationMs": 8494.30245399999,
+      "error": null,
+      "confidence": 92,
+      "characters": 504
+    },
+    {
+      "id": "N15",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N15.optical.json",
+      "sha256": "37589a5affd5ea476bada8d9e181b5fca03e1c820ed830491fcf83f16165cce4",
+      "textSha256": "0e0018ae9a31bc75fcf29575812257adbccd125948c282424039579b179df079",
+      "durationMs": 5055.547649,
+      "error": null,
+      "confidence": 93,
+      "characters": 507
+    },
+    {
+      "id": "N16",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N16.optical.json",
+      "sha256": "13466f130c0b63090bffb0ce88a45061fb691346f9b6b6fc4506830980a7a1a3",
+      "textSha256": "7d581dd3c695a3b5d28595d5c8d42a5a18f85b6125e0de994d35c93915d3dc44",
+      "durationMs": 5016.591662999999,
+      "error": null,
+      "confidence": 93,
+      "characters": 470
+    },
+    {
+      "id": "S01",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S01.optical.json",
+      "sha256": "509fe535668ac3d6f50ab8615081acdc19c433b2ea74b45a778db86f4c671181",
+      "textSha256": "8d31a76159b47a044a662e6ca1386587194931200085355f344d5bc26794b579",
+      "durationMs": 3862.4164140000066,
+      "error": null,
+      "confidence": 90,
+      "characters": 514
+    },
+    {
+      "id": "S02",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S02.optical.json",
+      "sha256": "20fa00d965bf92b34d8234a3a74c8cb8fe4554cc67160d2caadc7713ce81546c",
+      "textSha256": "4772d033d06895501e2ca49034a01af2ffd9b4a8a5899f7d6156bfb831236d48",
+      "durationMs": 3150.8413,
+      "error": null,
+      "confidence": 93,
+      "characters": 347
+    },
+    {
+      "id": "S03",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S03.optical.json",
+      "sha256": "08c000115ff48fdbfadb3c205eea7bdae80577541b30125719e192283160bcd2",
+      "textSha256": "aec4283dd584ab0ac5a17cbc0e054f9a29c12b66a80db45713051ce93ea88302",
+      "durationMs": 4815.255066999991,
+      "error": null,
+      "confidence": 94,
+      "characters": 529
+    }
+  ],
+  "parsers": [
+    {
+      "id": "N01",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N01.node.json",
+      "sha256": "401b891fcd2fb158fd439d30b9f0520cb16cd00a2c1397d880df6d6a4ab39d9d",
+      "durationMs": 41.397633000000496,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N01",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N01.sites.json",
+      "sha256": "b4091d9940c9b569c5d99280560d524dc184d5694a36b1040fe5fe7c48480f4c",
+      "durationMs": 16.230196999998952,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N02",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N02.node.json",
+      "sha256": "a5a55418831cd61b5c34feb0e31424de312377e99d0438255171a37579254fc6",
+      "durationMs": 1.7365759999993315,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N02",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N02.sites.json",
+      "sha256": "5022a1d43f4ead27c9529ca00e654ded1b6e54c874108cbd2d4eee88ac3e3a7d",
+      "durationMs": 7.398613999999725,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N03",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N03.node.json",
+      "sha256": "4ddb66440d724f95e5995391ee1c373331c79039028185ae284c9cb929e2686b",
+      "durationMs": 42.41482499999984,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N03",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N03.sites.json",
+      "sha256": "c2a7f04b6844a7a10139591bb7a26dc31727de2d3d5482435f8d74cebd403b2f",
+      "durationMs": 10.63312600000063,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N04",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N04.node.json",
+      "sha256": "b811b3454c466baf4d3339049a41e57def752c3b00b1280d551fbd3ff28cf574",
+      "durationMs": 3.079788999999437,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N04",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N04.sites.json",
+      "sha256": "ba110ce7475efd6875b3bb7ce6552a3886c2cafacbe5b272855674de346d0a67",
+      "durationMs": 4.930566000002727,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N05",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N05.node.json",
+      "sha256": "8c86263fcec7d8920a8f1ad4ae7c860874897d62cece4a115835a626a631cb76",
+      "durationMs": 2.7605790000015986,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N05",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N05.sites.json",
+      "sha256": "18ef6f8192cd48a62ea4c565027f48d5331da9be2d574ed30c050e501942d154",
+      "durationMs": 2.3805859999993118,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N06",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N06.node.json",
+      "sha256": "8e3860e452c3b2e73afa398e137868d3227dabe10f0854a86652f27152242179",
+      "durationMs": 0.9922950000000128,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N06",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N06.sites.json",
+      "sha256": "ddc5f97784163e85628c3800fcf44a22bbaf8609957d3dac6e6d122c1b875884",
+      "durationMs": 0.921701999999641,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N07",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N07.node.json",
+      "sha256": "bb8bbbd1e815b48e7b6fabc3f8ab9c32bfb545f34e5f3f14cf3b30d65a8f5aab",
+      "durationMs": 2.9526780000014696,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "yellow",
+      "effectiveLevel": "yellow"
+    },
+    {
+      "id": "N07",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N07.sites.json",
+      "sha256": "8ee3d5131b98f46c8b36b20162913a20ecdbeda8ddb7e3df8b0e49a8070b5e38",
+      "durationMs": 1.3629330000039772,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "yellow",
+      "effectiveLevel": "yellow"
+    },
+    {
+      "id": "N08",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N08.node.json",
+      "sha256": "353cb82225b9d56a1d06567a2a02561aa9673df669229f17871a24c2ea6c393e",
+      "durationMs": 2.1866440000012517,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N08",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N08.sites.json",
+      "sha256": "b78a467a995d60ca6d646c3fc505eb9f95dedd1e6b86d2073ada30dcc42bd28c",
+      "durationMs": 1.4825229999987641,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N09",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N09.node.json",
+      "sha256": "7e7d1e6a5e56fa1684b21093e420c2e7636029a57c500330bf2407292a7161df",
+      "durationMs": 22.28265800000372,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N09",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N09.sites.json",
+      "sha256": "c56d42eefd4854e3f7af3f29d68f937678590892dddf613d5835c737a9966bf8",
+      "durationMs": 5.3501390000019455,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N10",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N10.node.json",
+      "sha256": "b66ad21f0e4946a40892cbbd24f1552454264ed875d89eaa79c8f858e99cb97a",
+      "durationMs": 1.0161599999992177,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N10",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N10.sites.json",
+      "sha256": "d1a576379aa4e7104076a7611f2c8993cc9b4cebc3d3aa4f3e856e1611407b51",
+      "durationMs": 1.1520149999996647,
+      "parserError": null,
+      "processingError": {
+        "kind": "document-process-exception",
+        "message": "Error: worker",
+        "stack": "Error: worker\n    at ChildProcess.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/src/invoice-extraction.js:305:58)\n    at ChildProcess.wrapper (node:events:639:12)\n    at ChildProcess.emit (node:events:514:28)\n    at ChildProcess._handle.onexit (node:internal/child_process:324:12)"
+      },
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N11",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N11.node.json",
+      "sha256": "fc10816a28d14ca18dd8c54463472500fc1846714c8f8f254d497c35866ef7c1",
+      "durationMs": 2.0408449999958975,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N11",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N11.sites.json",
+      "sha256": "48b69013efce0f279d137f964675e242d522878eebac90571ef4fdf4d3cdf6f7",
+      "durationMs": 1.3168940000032308,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N12",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N12.node.json",
+      "sha256": "c1388da254b2c27ffaf7f7cdc72c56e3f589244c8e68a171ec1d71555a33ce40",
+      "durationMs": 2.8681799999976647,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N12",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N12.sites.json",
+      "sha256": "22fff1b6036311cdb8dbd2862320cda7c62e0d480f5927b7da3ccaa4b9841665",
+      "durationMs": 2.7999370000034105,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N13",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N13.node.json",
+      "sha256": "5b2d293da3b618ef5e13fd6e6f7c2519eb63ec9e9b37c202a9b5ab48beee49a8",
+      "durationMs": 2.464772000006633,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N13",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N13.sites.json",
+      "sha256": "1440cf1dfa28552cd662dce32d3d605f79149382bb723cc65b926e5d709b0dc0",
+      "durationMs": 5.690921000001254,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N14",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N14.node.json",
+      "sha256": "ff162021f518305ae54755103fd65a5a651b622af5a5a062adc66913f57218d3",
+      "durationMs": 1.8654500000120606,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N14",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N14.sites.json",
+      "sha256": "691a3e545faf4fadcb987821f32ca8df4e4a066e19ccd85e4a19eeb9b798fc87",
+      "durationMs": 4.528070000000298,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N15",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N15.node.json",
+      "sha256": "dde9da2ab2871c996375337496a879320ed777a0a97c536ef831adb997e1b985",
+      "durationMs": 4.765958999996656,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "yellow",
+      "effectiveLevel": "yellow"
+    },
+    {
+      "id": "N15",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N15.sites.json",
+      "sha256": "f93e35834557879394d49fbecd66f5e4b10a38c1d34fef7644ae1cd914fef5ee",
+      "durationMs": 1.7640170000086073,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "yellow",
+      "effectiveLevel": "yellow"
+    },
+    {
+      "id": "N16",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N16.node.json",
+      "sha256": "c30005d8b6e23a2f2c496ea84f4771815576cc52919bfff56baba785055e7da1",
+      "durationMs": 1.3569229999993695,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "N16",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/N16.sites.json",
+      "sha256": "fe247687f1cde2f609cc8dbbe03af69e5f21b62c94ba841e7bdd502c61f72e38",
+      "durationMs": 1.5747709999996005,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "S01",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S01.node.json",
+      "sha256": "e9e09cb74f21a6b4d3eba0f100bf5c1dcb534b0bad2fc1cc4bb49388b704e988",
+      "durationMs": 1.5482719999999972,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "S01",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S01.sites.json",
+      "sha256": "fd3bc24870c0b2ec04c46e6eb35115eaa3317a136013bc83585b98080ba573cc",
+      "durationMs": 2.820657999996911,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "S02",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S02.node.json",
+      "sha256": "0f1c538884c7652527fc178a0e0cde27d84b3b071517cd4f87044dd6b36b22de",
+      "durationMs": 1.439698000001954,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "S02",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S02.sites.json",
+      "sha256": "98c54c041a2a929a709fb7d587ef278e3f3249769b2e3e0f2fe51eff7fd1d4eb",
+      "durationMs": 1.4734979999921052,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "S03",
+      "engine": "node",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S03.node.json",
+      "sha256": "7cbe874ea5863cf1b34541d01b51e86014829691148e6eb677cf56305ee335af",
+      "durationMs": 2.22491999999329,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    },
+    {
+      "id": "S03",
+      "engine": "sites",
+      "path": "/workspace/scratch/aab0f7dc06f9/independent-ocr-raw/completion-independent-20261106/first-pass/S03.sites.json",
+      "sha256": "419abc8419f685e1a12032a3f73b99814bd8bd8f765b52a61edf14b0f678f26f",
+      "durationMs": 1.91247999999905,
+      "parserError": null,
+      "processingError": null,
+      "originalLevel": "red",
+      "effectiveLevel": "red"
+    }
+  ],
+  "sourceStable": true,
+  "corpusStable": true,
+  "runtimeStable": true,
+  "loadAfter": [
+    18.55,
+    16.18,
+    12.12
+  ],
+  "resourceUsageParent": {
+    "userCPUTime": 871550,
+    "systemCPUTime": 727916,
+    "maxRSS": 263124,
+    "sharedMemorySize": 0,
+    "unsharedDataSize": 0,
+    "unsharedStackSize": 0,
+    "minorPageFault": 117693,
+    "majorPageFault": 0,
+    "swappedOut": 0,
+    "fsRead": 534688,
+    "fsWrite": 3640,
+    "ipcSent": 0,
+    "ipcReceived": 0,
+    "signalsCount": 0,
+    "voluntaryContextSwitches": 3116,
+    "involuntaryContextSwitches": 789
+  }
+}

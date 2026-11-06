@@ -1,0 +1,9 @@
+{
+  "frozen_at": "2026-11-06T15:02:48.030229+00:00",
+  "manifest_sha256": "246ea4ac2f60d7567fddd2ee57cd7c48bc3f23a4a2b902a1f3fab30ece12781c",
+  "file_count": 23,
+  "normal_cases": 16,
+  "stress_cases": 3,
+  "optical_calls_before_freeze": 0,
+  "parser_calls_before_freeze": 0
+}

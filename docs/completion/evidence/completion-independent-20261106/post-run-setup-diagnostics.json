@@ -1,0 +1,25 @@
+{
+  "captured_at": "2026-11-06T15:12:04.993912+00:00",
+  "scope": "Post-first-pass import and data integrity diagnostics only. No IPC message, input image, OCR or parser call is supplied.",
+  "worker_module_initialization_without_message": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "trained_data_gzip_checks": [
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/node_modules/@tesseract.js-data/swe/4.0.0_best_int/swe.traineddata.gz",
+      "compressed_sha256": "b60d9fea7e570d11d6fdf26c8d0ef1d63b49222313773ce66777ed08fa20dc5a",
+      "uncompressed_bytes": 4167074,
+      "uncompressed_sha256": "a4c33cbd23d988c84b5f9d5d5b2417fc16da061e3dc7b16acb904a4566088b14",
+      "gzip_crc_valid": true
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/Mgeorge-independent-eval/node_modules/@tesseract.js-data/swe/4.0.0/swe.traineddata.gz",
+      "compressed_sha256": "8432cbbf8c916ab80e21c00379591e696b7dfee5183242f8a137cad93ec4803b",
+      "uncompressed_bytes": 13627152,
+      "uncompressed_sha256": "24e2dd15cc0088d211c5f1bd49971e600317f201502deadbc417f0ffd6c9a6f8",
+      "gzip_crc_valid": true
+    }
+  ]
+}

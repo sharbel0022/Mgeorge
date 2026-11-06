@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-11-06T15:11:08.271124+00:00",
+  "note": "Post-start read-only diagnostics; no pre-run counter baseline, so counters cannot be attributed to this run.",
+  "readings": {
+    "/sys/fs/cgroup/memory.events": {
+      "error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/memory.events'"
+    },
+    "/sys/fs/cgroup/memory.max": {
+      "error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/memory.max'"
+    },
+    "/sys/fs/cgroup/memory.current": {
+      "error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/memory.current'"
+    },
+    "/sys/fs/cgroup/memory.peak": {
+      "error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/memory.peak'"
+    },
+    "/sys/fs/cgroup/pids.events": {
+      "error": "[Errno 2] No such file or directory: '/sys/fs/cgroup/pids.events'"
+    },
+    "/proc/pressure/memory": {
+      "error": "[Errno 2] No such file or directory: '/proc/pressure/memory'"
+    }
+  }
+}
