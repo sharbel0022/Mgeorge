@@ -1,0 +1,154 @@
+{
+  "source": {
+    "commit": "ec46787c0aab582fbe387a5e19c6ad04c59d5db8",
+    "tree": "18a33d270f062416e62102ac2ea270be0892adbb",
+    "branch": "feature/final-95-recovery",
+    "workingTreeDirty": true,
+    "contentSha256": "7b722d00f89fe63e656a652f59da22ccd5b0cf4b8d501323e85a45a2efc167e6",
+    "fileCount": 2174
+  },
+  "sourceAfter": {
+    "commit": "ec46787c0aab582fbe387a5e19c6ad04c59d5db8",
+    "tree": "18a33d270f062416e62102ac2ea270be0892adbb",
+    "branch": "feature/final-95-recovery",
+    "workingTreeDirty": true,
+    "contentSha256": "7b722d00f89fe63e656a652f59da22ccd5b0cf4b8d501323e85a45a2efc167e6",
+    "fileCount": 2174
+  },
+  "sourceChanged": false,
+  "step": {
+    "schemaVersion": 1,
+    "kind": "test-suite",
+    "name": "sites-process-reproduction",
+    "syntheticOnly": true,
+    "realBankVerification": "NOT_RUN",
+    "network": "loopback-only accidental-egress guard; synthetic provider fixtures; not a malicious-code sandbox",
+    "source": {
+      "commit": "ec46787c0aab582fbe387a5e19c6ad04c59d5db8",
+      "tree": "18a33d270f062416e62102ac2ea270be0892adbb",
+      "branch": "feature/final-95-recovery",
+      "workingTreeDirty": true,
+      "contentSha256": "7b722d00f89fe63e656a652f59da22ccd5b0cf4b8d501323e85a45a2efc167e6",
+      "fileCount": 2174
+    },
+    "sourceAfter": {
+      "commit": "ec46787c0aab582fbe387a5e19c6ad04c59d5db8",
+      "tree": "18a33d270f062416e62102ac2ea270be0892adbb",
+      "branch": "feature/final-95-recovery",
+      "workingTreeDirty": true,
+      "contentSha256": "7b722d00f89fe63e656a652f59da22ccd5b0cf4b8d501323e85a45a2efc167e6",
+      "fileCount": 2174
+    },
+    "sourceChangedDuringRun": false,
+    "runtime": {
+      "node": "v24.22.1",
+      "platform": "linux",
+      "release": "6.18.57",
+      "arch": "x64",
+      "logicalCpus": 9,
+      "cpu": "AMD EPYC 9V74 80-Core Processor"
+    },
+    "startedAt": "2026-11-06T11:52:41.610Z",
+    "finishedAt": "2026-11-06T11:53:09.401Z",
+    "durationMs": 27790.608,
+    "command": {
+      "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "args": [
+        "--import",
+        "/workspace/scratch/0005a76ddf57/Mgeorge/scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=180000",
+        "--test-reporter=tap",
+        "--test-reporter-destination=stdout",
+        "--test-reporter=junit",
+        "--test-reporter-destination=/workspace/scratch/0005a76ddf57/sites-killed-files-rerun-2/tests.junit.xml",
+        "--experimental-test-coverage",
+        "--test-reporter=lcov",
+        "--test-reporter-destination=/workspace/scratch/0005a76ddf57/sites-killed-files-rerun-2/coverage.lcov",
+        "--test-coverage-include=lib/**",
+        "--test-coverage-include=app/**",
+        "--test-coverage-include=components/**",
+        "--test-coverage-include=../src/**",
+        "--test-coverage-exclude=**/node_modules/**",
+        "--test-coverage-exclude=**/test/**",
+        "--test-coverage-exclude=**/tests/**",
+        "tests/bank-account-evidence.test.mjs",
+        "tests/manual-multiple-allocation-api.test.mjs"
+      ],
+      "cwd": "sites"
+    },
+    "files": [
+      "tests/bank-account-evidence.test.mjs",
+      "tests/manual-multiple-allocation-api.test.mjs"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "errorCode": null,
+    "totals": {
+      "tests": 78,
+      "pass": 78,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "complete": true,
+    "passed": true,
+    "failures": [],
+    "coverage": {
+      "requested": true,
+      "measured": true,
+      "scope": "loaded production files only; unimported files are not measured",
+      "aggregation": "per-lcov-record",
+      "files": 30,
+      "records": 30,
+      "lines": {
+        "covered": 2621,
+        "total": 4525,
+        "percent": 57.92
+      },
+      "functions": {
+        "covered": 453,
+        "total": 794,
+        "percent": 57.05
+      },
+      "branches": {
+        "covered": 887,
+        "total": 1685,
+        "percent": 52.64
+      },
+      "sourceLines": {
+        "measured": true,
+        "aggregation": "union-by-source-path-and-line",
+        "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+        "covered": 2621,
+        "total": 4525,
+        "percent": 57.92
+      }
+    },
+    "artifacts": [
+      {
+        "path": "tests.tap",
+        "bytes": 24993,
+        "sha256": "6db8e70ae2299bc942d0a7392f194148844846fa0ef4b21464f6458f49338f68"
+      },
+      {
+        "path": "tests.junit.xml",
+        "bytes": 18383,
+        "sha256": "a1ddbba885d9c8d2d4ad8ad39e24c688a9a4ada5b0d215aad9ed0d00fe34e466"
+      },
+      {
+        "path": "coverage.lcov",
+        "bytes": 105031,
+        "sha256": "fe1caffed9ff814e0827ce3d6b26c902f8678cbe1434ba105f8114ba3f98c208"
+      },
+      {
+        "path": "source-manifest.json",
+        "bytes": 414063,
+        "sha256": "f9a3324a7078be692438ae507e9510ddd8001a08c3ab5eaefe4683e84d7bf40a"
+      }
+    ]
+  }
+}

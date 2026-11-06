@@ -55,7 +55,7 @@ function date(value, field) {
 }
 
 function references(child, path, issues) {
-  const candidates = [], warnings = [];
+  const candidates = [], warnings = [], documentNumbers = [];
   let incomplete = false;
   const add = (value, source, structured) => {
     if (!present(value)) return;
@@ -76,11 +76,29 @@ function references(child, path, issues) {
   }
   if (present(child.remittanceInformationStructuredArray) && !(Array.isArray(child.remittanceInformationStructuredArray) && child.remittanceInformationStructuredArray.length === 0)) {
     issues.push('unsupported_structured_reference_object'); incomplete = true;
+    // The incoming schema documents this string field, but does not establish
+    // invoice/OCR semantics for every document type or the opaque creditor
+    // reference object. Retain document evidence separately, preserving the
+    // existing review hold and leaving payment-reference candidates untouched.
+    if (Array.isArray(child.remittanceInformationStructuredArray)) {
+      for (const [index, entry] of child.remittanceInformationStructuredArray.slice(0, 40).entries()) {
+        const document = object(entry) ? entry.referredDocumentInformation : undefined;
+        if (!object(document)) continue;
+        const number = document.number;
+        if (typeof number !== 'string' || !number || number.length > 300 || number !== number.trim() || /[\u0000-\u001f\u007f]/.test(number) || placeholder(number)) continue;
+        const documentSource = `${path}.remittanceInformationStructuredArray[${index}].referredDocumentInformation`;
+        const documentInformation = Object.fromEntries(['typeCode', 'typeProprietary', 'typeIssuer', 'number', 'relatedDate']
+          .filter(key => typeof document[key] === 'string' && document[key].length <= 300 && !/[\u0000-\u001f\u007f]/.test(document[key]))
+          .map(key => [key, document[key]]));
+        documentNumbers.push({ kind: 'document', value: number, rawValue: number, source: `${documentSource}.number`, documentSource, documentInformation });
+      }
+      if (documentNumbers.length) issues.push('document_reference_requires_review');
+    }
   }
   candidates.sort((a, b) => b.priority - a.priority || a.source.localeCompare(b.source));
   if (candidates.length > 40) { candidates.length = 40; incomplete = true; }
   if (incomplete) issues.push('incomplete_reference_evidence');
-  return { version: REFERENCE_VERSION, candidates, selected: candidates.find(candidate => candidate.kind !== 'message') || candidates[0] || null, incomplete, warnings: unique(warnings) };
+  return { version: REFERENCE_VERSION, candidates, selected: candidates.find(candidate => candidate.kind !== 'message') || candidates[0] || null, incomplete, warnings: unique(warnings), ...(documentNumbers.length ? { documentNumbers } : {}) };
 }
 
 /** Normalize parsed bank originals. Does not authorize, reconcile, or mutate them. */

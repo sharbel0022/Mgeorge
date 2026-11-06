@@ -7,7 +7,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
 
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
-const EMPTY_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs','bankgiro_ingest_leases','companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard'];
+const EMPTY_TABLES=['bank_auth_flows','bank_locks','gmail_flows','gmail_locks','customer_reviews','backup_runs','bankgiro_ingest_leases','companies','company_memberships','company_roles','company_user_contexts','company_worker_grants','company_operation_guard','company_application_tokens'];
 export const sortedRecoveryRows=rows=>rows.map(row=>Object.fromEntries(Object.entries(row).sort(([a],[b])=>a.localeCompare(b)))).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)));
 export function acceptIsolatedRecovery({directory,owner,tables,originals,incidentAt,recoveryPointAt}){
  const receipt=JSON.parse(readFileSync(join(directory,'receipt.json'),'utf8'));
@@ -18,7 +18,10 @@ export function acceptIsolatedRecovery({directory,owner,tables,originals,inciden
  let state;
  try{
   assert.equal(sql.prepare('PRAGMA integrity_check').get().integrity_check,'ok');assert.deepEqual(sql.prepare('PRAGMA foreign_key_check').all(),[]);
-  assert.deepEqual(sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all().map(row=>row.name).sort(),[...tables.map(table=>table.name),...EMPTY_TABLES].map(name=>'evidence_'+name).sort());
+  assert.deepEqual(sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all().map(row=>row.name).sort(),[...tables.map(table=>table.name),...EMPTY_TABLES,'company_application_token_control'].map(name=>'evidence_'+name).sort());
+  // The sole nonempty control row is a fixed recovery barrier, not restored
+  // authority. Validate it in full instead of relaxing the schema census.
+  assert.deepEqual(sql.prepare('SELECT * FROM evidence_company_application_token_control').all().map(row=>({...row})),[{id:1,revision:2,recovery_required:1,restore_marker:'isolated-evidence-restore',recovery_evidence:''}]);
   for(const table of tables){
    assert.match(table.name,/^[a-z_]+$/);
    const rows=sql.prepare(`SELECT * FROM "evidence_${table.name}"`).all();
@@ -43,5 +46,5 @@ export function acceptIsolatedRecovery({directory,owner,tables,originals,inciden
  assert.deepEqual(receipt.originals,{count:originals.length,bytes});
  const sum=(rows,field)=>rows.reduce((total,row)=>{assert.ok(Number.isSafeInteger(row[field]));const next=total+row[field];assert.ok(Number.isSafeInteger(next));return next;},0);
  const ledger={invoices:state.invoices.length,invoiceCents:sum(state.invoices,'total'),transactions:state.transactions.length,transactionCents:sum(state.transactions,'amount'),allocations:state.allocations.length,allocatedCents:sum(state.allocations,'amount'),revokedCredits:state.credits.filter(row=>row.revokedAt).length,revokedBankgiroLinks:state.bankgiroLinks.filter(row=>row.revokedAt).length};
- return{tables:receipt.tables,originals:{count:originals.length,bytes,hashesChecked:originals.length},ledger,rpoMilliseconds,otherOwnerExcluded:true,authorizationAndTransientRowsAbsent:true,workerLeasesInvalidated:true};
+ return{tables:receipt.tables,originals:{count:originals.length,bytes,hashesChecked:originals.length},ledger,rpoMilliseconds,otherOwnerExcluded:true,authorizationAndTransientRowsAbsent:true,workerLeasesInvalidated:true,applicationTokenRecoveryBlocked:true};
 }

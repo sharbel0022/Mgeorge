@@ -11,6 +11,7 @@ import http from 'node:http';
 import { readFileSync } from 'node:fs';
 import { resolve, extname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import {createLoginRateLimiter} from './login-rate-limit.js';
 import {createCompanyRuntime,readCompanyDatabaseBoundary} from './company-runtime.js';
 import {assertCompanyContext,companyCacheKey} from '../sites/lib/company-contract.js';
 import { openDatabase, bankEvidenceBlocksAbsence, assertNoLegacyBankImports, audit, listInvoices, listTransactions, invoiceStatus, storeTransactions, allocate, deleteAllocation, matchingSuggestions, getSettings, saveSettings, listImports, recordImport, listDocuments, storeDocument, documentMetadata, defaultSettings, today } from './db.js';
@@ -24,7 +25,7 @@ import {createIntegrationJobs} from './integration-jobs.js';
 import {runScheduledCompanyBankSync,isCompanyBankSyncDatabase} from './company-bank-sync.js';
 export {createNodeCompanyBankSyncRuntime,registerCompanyBankSyncRuntime,nodeCompanyBankAccountKey} from './company-bank-sync.js';
 import { isConfigured, configStatus, consentApplicationFingerprint, assertApplicationReady, validateAuthorizationUrl, bankingRequest, findSwedbank, startConsentBody, fetchBookedTransactions } from './bank.js';
-import {ConsentError,configureBankCompanyContext,bankCompanyContext,requestedBankConsent,consentMetadata,assertConsentContext,validatedLiveAccountDetails,companyAccountGrant,assertCorporateAccountAccess,publicConsent,validateCallbackParameters,validateEnableConsent} from './bank-consent.js';
+import {ConsentError,consentDiagnostic,configureBankCompanyContext,bankCompanyContext,requestedBankConsent,consentMetadata,assertConsentContext,validatedLiveAccountDetails,companyAccountGrant,assertCorporateAccountAccess,publicConsent,validateCallbackParameters,validateEnableConsent} from './bank-consent.js';
 import {bankSyncCoverage,planBankSync,completeBankSync} from './bank-sync-state.js';
 import { gmailAccount, withGmailAccount, isGmailConfigured, gmailAuthorizationUrl, exchangeGmailCode, gmailProfile, fetchGmailInvoiceDocuments, revokeGmailTokens } from './gmail.js';
 import {analyzeDocument,approveDocument} from './invoice-review.js';
@@ -53,6 +54,7 @@ function config(){
 }
 const check=config();
 const controlDb=openDatabase();
+const loginLimiter=createLoginRateLimiter(controlDb);
 const companyRuntime=createCompanyRuntime({controlDb,legacyDatabasePath:process.env.DB_PATH||'./data/mgeorge.sqlite',companyDirectory:process.env.MG_COMPANY_DIRECTORY,legacyPrincipal:check.secure?'administrator':'local-admin'});
 const db=companyRuntime.db;
 configureBankCompanyContext(()=>companyRuntime.current());
@@ -135,7 +137,6 @@ function ensureBrowserSession(req,res){
   req.browserSession=session;
   res.setHeader('Set-Cookie',sessionCookie(session,check.secure));
 }
-const loginAttempts=new Map();
 /** Kontrollerar varifrån ändringsanropet kommer för att motverka CSRF och otillåtna webbplatser. */
 function checkOrigin(req){
   const origin=req.headers.origin;
@@ -447,15 +448,16 @@ async function syncBank(connection,{account_uid,date_from,date_to,scheduled=fals
   }catch(e){
     authorize();
     if(e.code==='connection_changed'||e.status===401&&!e.providerStatus)throw e;
-    const renewal=e.code==='renewal_required';
+    const consent=consentDiagnostic(e);
+    const renewal=e.code==='renewal_required'||['BANK_CONSENT_EXPIRED','BANK_CONSENT_INVALID','BANK_ACCOUNT_SCOPE_INVALID','BANK_TRANSACTION_SCOPE_REQUIRED','CORPORATE_AUTHORIZATION_REQUIRED'].includes(consent?.code);
     const cooldown=e.status===429||e.code==='bank_unavailable'&&e.status===503&&Number.isFinite(e.retryAfter)&&e.retryAfter>0;
-    const safeBankFailure=e instanceof ConsentError||['invalid_date_range','transaction_period_unavailable','page_limit','transaction_limit','bank_timeout','incomplete_bank_response','bank_sync_window_limit','application_access_denied'].includes(e.code);
-    const message=renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.';
+    const safeBankFailure=!!consent||['invalid_date_range','transaction_period_unavailable','page_limit','transaction_limit','bank_timeout','incomplete_bank_response','bank_sync_window_limit','application_access_denied'].includes(e.code);
+    const message=consent?.message??(renewal?'Bankanslutningen behöver förnyas – koppla igen':e.status===429?'Bankens anropsgräns är nådd. Försök igen senare.':safeBankFailure||cooldown?e.message:'Det gick inte att hämta bankhändelser. Kontrollera anslutningen och försök igen.');
     lease.write(()=>{db.prepare('UPDATE bank_connections SET status=?,last_error=?,retry_after=? WHERE id=?').run(renewal?'renewal_required':'error',message,cooldown?Date.now()+Math.max(60,e.retryAfter||60)*1000:0,connection.id);
     recordImport(db,{source:'enablebanking',name:connection.bank_name,status:'error',error:message});
-    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true,e.code);
+    lease.fail(message,cooldown?Math.max(60,e.retryAfter||60)*1000:0,e.retryBlocked===true,consent?.code??e.code);
     });
-    throw Object.assign(bad(renewal?409:cooldown||safeBankFailure?e.status:502,message),{safe:true,retryAfter:e.retryAfter,...(safeBankFailure?{code:e.code}:{})});
+    throw Object.assign(bad(renewal?409:consent?.status??(cooldown||safeBankFailure?e.status:502),message),{safe:true,retryAfter:e.retryAfter,...(safeBankFailure?{code:consent?.code??e.code}:{})});
   }
   finally{if(!operationLocked)bankSyncing.delete(connection.id);}
 }
@@ -495,12 +497,12 @@ async function openPaymentsSyncRuntime(req=null,{scheduled=false}={}){
  const automatic={enabled:registration.automaticEnabled===true,operatorVerified:registration.operatorVerified===true,evidenceId:registration.operatorEvidenceId};
  if(scheduled&&!(automatic.enabled&&automatic.operatorVerified&&automatic.evidenceId))return null;
  const assertCurrent=req?()=>assertSessionStillAuthorized(req):()=>companyRuntime.assert('manage_integrations');
- const snapshot=await nodeSaasBankRuntime({db,context,assertCurrent,sessionHash:req?sessionHash(req):'internal-authorized-sync',origin:check.origin}).snapshot();
+ const snapshot=await nodeSaasBankRuntime({db,controlDb,context,assertCurrent,sessionHash:req?sessionHash(req):'internal-authorized-sync',origin:check.origin}).snapshot();
  if(snapshot.connection?.status!=='active'||!snapshot.accounts.some(account=>account.selected&&account.importable)){
   if(scheduled)return null;
   throw new ConsentError('BANK_CONSENT_INVALID',409);
  }
- return createNodeOpenPaymentsCompanySyncRuntime({db,context,assertCurrent,evidenceId:registration.syncEvidenceId||registration.ratePolicy?.evidenceId,existingDataCompanyId:readCompanyDatabaseBoundary(db)?.companyId,origin:check.origin,automatic});
+ return createNodeOpenPaymentsCompanySyncRuntime({db,controlDb,context,assertCurrent,evidenceId:registration.syncEvidenceId||registration.ratePolicy?.evidenceId,existingDataCompanyId:readCompanyDatabaseBoundary(db)?.companyId,origin:check.origin,automatic});
 }
 async function runCompanyScheduledSync(){
   const settings=getSettings(db),interval=settings.sync_interval_minutes,gmailInterval=settings.gmail_sync_interval_minutes;
@@ -645,18 +647,17 @@ async function route(req,res){
   }
   if(req.method!=='GET')checkOrigin(req);
   if(path==='/api/login'&&req.method==='POST'&&check.secure){
+    // Refuse an exhausted account before reading another client body.
+    loginLimiter.check();
     // Login is unauthenticated and never uploads originals. Do not give it the
     // 22 MB document-import budget before the existing password/rate checks.
     const b=await readBody(req,{authenticated:false,maxBytes:8_192});
-    const now=Date.now(),address=req.socket.remoteAddress;
-    const attempt=loginAttempts.get(address);
-    if(attempt&&attempt.until>now&&attempt.count>=5)throw bad(429,'För många inloggningsförsök. Försök igen om 15 minuter.');
-    // No await between reading, checking and reserving this address's attempt.
-    loginAttempts.set(address,{count:attempt?.until>now?attempt.count+1:1,until:attempt?.until>now?attempt.until:now+900000});
+    const now=Date.now();
+    loginLimiter.reserve();
     if(typeof b.password!=='string'||b.password.length>1024||!verifyPassword(b.password,check.adminHash)){
       throw bad(401,'Felaktigt lösenord');
     }
-    loginAttempts.delete(address);controlDb.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
+    loginLimiter.clear();controlDb.prepare('DELETE FROM sessions WHERE id_hash=? OR expires_at<=?').run(sessionHash(req),now);
     const value=token();controlDb.prepare('INSERT INTO sessions(id_hash,expires_at,principal) VALUES(?,?,?)').run(digest(value),now+8*3600000,'administrator');
     return json(res,200,{authenticated:true},{'Set-Cookie':sessionCookie(value,true)});
   }
@@ -682,12 +683,12 @@ async function companyRoute(req,res,url,path){
   const saas=/^\/api\/companies\/([^/]+)\/bank(?:\/(.*))?$/.exec(path);
   if(saas){
     if(!req.companyContext||decodeURIComponent(saas[1])!==req.companyContext.companyId)throw new ConsentError('COMPANY_ACCESS_DENIED',403);
-    const runtime=nodeSaasBankRuntime({db,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),sessionHash:sessionHash(req),origin:check.origin,requestKey:req.headers['idempotency-key']});
+    const runtime=nodeSaasBankRuntime({db,controlDb,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),sessionHash:sessionHash(req),origin:check.origin,requestKey:req.headers['idempotency-key']});
     const action=saas[2]||'';
     if(req.method==='GET'&&action==='')return json(res,200,await runtime.snapshot());
     if(req.method==='GET'&&action==='sync'){
       if([...url.searchParams.keys()].some(key=>!['accountId','companyId','companyContextVersion'].includes(key))||url.searchParams.getAll('accountId').length!==1)throw bad(400,'Välj ett konto.');
-      return json(res,200,await readNodeOpenPaymentsCompanySyncStatus({db,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),accountId:url.searchParams.get('accountId'),environment:process.env}));
+      return json(res,200,await readNodeOpenPaymentsCompanySyncStatus({db,controlDb,context:req.companyContext,assertCurrent:()=>assertSessionStillAuthorized(req),accountId:url.searchParams.get('accountId'),environment:process.env}));
     }
     if(req.method==='GET'&&action==='callback'){
       const body={};for(const [key,value]of url.searchParams){if(Object.hasOwn(body,key))throw new ConsentError('INVALID_CALLBACK',403);body[key]=value;}
@@ -914,7 +915,7 @@ async function companyRoute(req,res,url,path){
   if(path==='/api/audit'&&req.method==='GET')return json(res,200,{items:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC LIMIT 100').all()});
   if(path==='/api/export'&&req.method==='GET'){
     const evidence=reconciliationData(db);
-    audit(db,'data_exported',{});
+    companyRuntime.recordDataExport();
     return json(res,200,{exported_at:new Date().toISOString(),settings:getSettings(db),invoices:evidence.invoices,transactions:listTransactions(db),allocations:db.prepare('SELECT * FROM allocations').all(),imports:listImports(db),documents:listDocuments(db),customer_messages:listMessages(db),message_approvals:db.prepare('SELECT * FROM message_approvals').all(),message_deliveries:db.prepare('SELECT * FROM message_deliveries').all(),verified_contacts:db.prepare('SELECT * FROM verified_contacts').all(),payer_links:db.prepare('SELECT * FROM payer_links').all(),bank_specification_links:db.prepare('SELECT * FROM bank_specification_links').all(),reconciliation_findings:db.prepare('SELECT * FROM reconciliation_findings').all(),audit:db.prepare('SELECT * FROM audit_events ORDER BY created_at DESC').all()},{'Content-Disposition':'attachment; filename="mg-fakturakoll-export.json"'});
   }
   // AIS only: reads account data, never creates, approves or executes payments.
@@ -923,11 +924,16 @@ async function companyRoute(req,res,url,path){
     const company=bankCompanyContext(req.principal,url.searchParams.get('companyId')??undefined,'read');
     const activation=configStatus();
     const connections=db.prepare('SELECT * FROM bank_connections WHERE owner=? ORDER BY created_at DESC,rowid DESC').all(req.principal);
-    // Local status reads never call a bank. Keep terminal reasons instead of
-    // deleting expired attempts, so a lost navigation can be recovered safely.
-    db.prepare("UPDATE bank_states SET consumed=1,status='expired',terminal_reason='CONSENT_FLOW_EXPIRED' WHERE owner=? AND expires_at<=? AND status IN ('pending','consuming')").run(req.principal,Date.now());
-    db.prepare("UPDATE bank_states SET consumed=1,status='session_lost',terminal_reason='SESSION_ENDED' WHERE owner=? AND status='pending' AND NOT EXISTS (SELECT 1 FROM sessions WHERE id_hash=bank_states.session_hash AND expires_at>?)").run(req.principal,Date.now());
-    const flows=db.prepare('SELECT * FROM bank_states WHERE owner=? ORDER BY rowid DESC LIMIT 20').all(req.principal).map(flow=>({id:flow.flow_id||null,companyId:company.companyId,status:flow.status,reason:flow.terminal_reason||null,expiresAt:new Date(flow.expires_at).toISOString(),connectionId:flow.connection_id||null}));
+    // Status is a read for every company role. Project terminal reasons without
+    // changing retained flow evidence or granting viewers database writes.
+    // Browser sessions live in the control database, not a company partition.
+    const observedAt=Date.now(),liveSession=controlDb.prepare('SELECT 1 FROM sessions WHERE id_hash=? AND expires_at>?');
+    const flows=db.prepare('SELECT * FROM bank_states WHERE owner=? ORDER BY rowid DESC LIMIT 20').all(req.principal).map(flow=>{
+      let status=flow.status,reason=flow.terminal_reason||null;
+      if(flow.expires_at<=observedAt&&['pending','consuming'].includes(status)){status='expired';reason='CONSENT_FLOW_EXPIRED';}
+      else if(status==='pending'&&!liveSession.get(flow.session_hash,observedAt)){status='session_lost';reason='SESSION_ENDED';}
+      return {id:flow.flow_id||null,companyId:company.companyId,status,reason,expiresAt:new Date(flow.expires_at).toISOString(),connectionId:flow.connection_id||null};
+    });
     return json(res,200,{configured:activation.configured,activation,environment:activation.environment,company:{id:company.companyId,canManageBank:['owner','admin'].includes(company.role),membershipMode:companyRuntime.current()?'company':'legacy_workspace'},consentFlow:flows[0]??null,consentFlows:flows,connections:connections.map(x=>{
       let accounts=[],sync_coverage=null,status=x.status==='revocation_pending'?x.status:!Number.isFinite(Date.parse(x.valid_until))||Date.parse(x.valid_until)<=Date.now()?'renewal_required':x.status;
       let consent;

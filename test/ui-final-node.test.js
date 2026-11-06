@@ -171,3 +171,13 @@ test('combined Swedish amount date and reference filters the shipped invoice lis
   assert.deepEqual(plain(v.run('filteredInvoices().map(i=>i.id)')),['invoice-a'],q);
  }
 });
+
+test('the shipped invoice list preserves a decimal invoice number alongside an amount match',()=>{
+ const v=view();fixture(v,[invoice({id:'reference',invoice_number:'2026.01',total_cents:62500}),invoice({id:'amount',invoice_number:'OTHER',total_cents:202601})]);
+ const before=v.run('JSON.stringify({invoices:state.invoices,transactions:state.transactions,allocations:state.allocations})');
+ v.set('query','2026.01');v.run('state.filters.customers.q=query');
+ assert.deepEqual(plain(v.run('filteredInvoices().map(i=>i.id)')).sort(),['amount','reference']);
+ v.set('query','2026.01 SEK');v.run('state.filters.customers.q=query');
+ assert.deepEqual(plain(v.run('filteredInvoices().map(i=>i.id)')),['amount']);
+ assert.equal(v.run('JSON.stringify({invoices:state.invoices,transactions:state.transactions,allocations:state.allocations})'),before);
+});

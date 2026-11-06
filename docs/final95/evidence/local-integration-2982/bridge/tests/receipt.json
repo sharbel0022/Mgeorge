@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "kind": "test-suite",
+  "name": "bridge-tests",
+  "syntheticOnly": true,
+  "realBankVerification": "NOT_RUN",
+  "network": "loopback-only accidental-egress guard; synthetic provider fixtures; not a malicious-code sandbox",
+  "source": {
+    "commit": "2982b6c51cf2891d97b816ea1ce6c82e5f4c71a1",
+    "tree": "18a33d270f062416e62102ac2ea270be0892adbb",
+    "branch": "feature/final-95-recovery",
+    "workingTreeDirty": false,
+    "contentSha256": "42b3aa239714f8cd1328d7edf5ca3fe8c660d72235941c3722784615cabcb629",
+    "fileCount": 2174
+  },
+  "sourceAfter": {
+    "commit": "2982b6c51cf2891d97b816ea1ce6c82e5f4c71a1",
+    "tree": "18a33d270f062416e62102ac2ea270be0892adbb",
+    "branch": "feature/final-95-recovery",
+    "workingTreeDirty": false,
+    "contentSha256": "42b3aa239714f8cd1328d7edf5ca3fe8c660d72235941c3722784615cabcb629",
+    "fileCount": 2174
+  },
+  "sourceChangedDuringRun": false,
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "release": "6.18.57",
+    "arch": "x64",
+    "logicalCpus": 9,
+    "cpu": "AMD EPYC 9V74 80-Core Processor"
+  },
+  "startedAt": "2026-11-06T11:36:49.653Z",
+  "finishedAt": "2026-11-06T11:37:04.789Z",
+  "durationMs": 15136.722,
+  "command": {
+    "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "args": [
+      "--import",
+      "/workspace/scratch/0005a76ddf57/Mgeorge/scripts/saas-test-isolation.mjs",
+      "--experimental-strip-types",
+      "--test",
+      "--test-concurrency=1",
+      "--test-timeout=180000",
+      "--test-reporter=tap",
+      "--test-reporter-destination=stdout",
+      "--test-reporter=junit",
+      "--test-reporter-destination=/workspace/scratch/0005a76ddf57/quality-final95-1/bridge/tests/tests.junit.xml",
+      "--experimental-test-coverage",
+      "--test-reporter=lcov",
+      "--test-reporter-destination=/workspace/scratch/0005a76ddf57/quality-final95-1/bridge/tests/coverage.lcov",
+      "--test-coverage-include=src/**",
+      "--test-coverage-exclude=**/node_modules/**",
+      "--test-coverage-exclude=**/test/**",
+      "--test-coverage-exclude=**/tests/**",
+      "test/adapter-contract.test.js",
+      "test/bridge.test.js",
+      "test/main.test.js"
+    ],
+    "cwd": "bridge/bankgiro"
+  },
+  "files": [
+    "test/adapter-contract.test.js",
+    "test/bridge.test.js",
+    "test/main.test.js"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "errorCode": null,
+  "totals": {
+    "tests": 47,
+    "pass": 47,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "complete": true,
+  "passed": true,
+  "failures": [],
+  "coverage": {
+    "requested": true,
+    "measured": true,
+    "scope": "loaded production files only; unimported files are not measured",
+    "aggregation": "per-lcov-record",
+    "files": 2,
+    "records": 2,
+    "lines": {
+      "covered": 412,
+      "total": 421,
+      "percent": 97.86
+    },
+    "functions": {
+      "covered": 69,
+      "total": 76,
+      "percent": 90.79
+    },
+    "branches": {
+      "covered": 268,
+      "total": 289,
+      "percent": 92.73
+    },
+    "sourceLines": {
+      "measured": true,
+      "aggregation": "union-by-source-path-and-line",
+      "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+      "covered": 412,
+      "total": 421,
+      "percent": 97.86
+    }
+  },
+  "artifacts": [
+    {
+      "path": "tests.tap",
+      "bytes": 11777,
+      "sha256": "8b4b275402986724981da02a8c2123af93336eff299d8863d658b3c4d97d9881"
+    },
+    {
+      "path": "tests.junit.xml",
+      "bytes": 10361,
+      "sha256": "bc40d85a7bc74f5d27e6b9109d9cce8b357023561557ebacb11a3c36664c01fa"
+    },
+    {
+      "path": "coverage.lcov",
+      "bytes": 11613,
+      "sha256": "f5873144e0cc79a848b662e9efdc8a7ffd8e730effe03631f8150f68b2ffc8c9"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 414064,
+      "sha256": "0a023d8aca69b34f83a3d541ab3d3667cd4df81a2f1650e0ba6f7d8ed1acecd5"
+    }
+  ]
+}

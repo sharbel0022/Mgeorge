@@ -71,6 +71,19 @@ test('a manually split payment inherits its AIS parent account prerequisite',asy
  assert.equal(result.state.allocations.length,0);assert.match(result.state.transactions[0].bankAccountIssue,/konto|medgivande|bankanslutning/i);
  await assert.rejects(f.evidence.assertPaymentOriginal('synthetic-owner',state,child.id));assert.deepEqual(state,before);
 });
+for(const changed of ['payer','reference'])test('manually substituted '+changed+' retains current bank consent diagnostics without gaining automation',async t=>{
+ const f=await fixture(t),base=seed(),id=base.transactions[0].id;
+ const state=applyCommand(base,{type:'transaction.verify',id,note:'Synthetic separate manual observation',...(changed==='payer'?{party:'Manually observed alias'}:{payerReference:'0577'})}).state;
+ const before=structuredClone(state);f.connection.status='disconnected';
+ const held=await f.evidence.reconcileWithOriginals('synthetic-owner',state);
+ assert.equal(held.state.allocations.length,0);assert.match(held.state.transactions[0].bankAccountIssue,/konto|medgivande|bankanslutning/i);
+ assert.deepEqual(state,before);assert.deepEqual(held.state.transactions[0].bankData,before.transactions[0].bankData);
+ await assert.rejects(f.evidence.assertPaymentOriginal('synthetic-owner',state,id));
+ f.connection.status='connected';const restored=await f.evidence.reconcileWithOriginals('synthetic-owner',held.state);
+ assert.equal(restored.state.transactions[0].bankAccountIssue,undefined);assert.equal(restored.state.allocations.length,0);
+ assert.deepEqual(restored.state.transactions[0].bankData,before.transactions[0].bankData);
+ await f.evidence.assertPaymentOriginal('synthetic-owner',restored.state,id);
+});
 test('known loss of account consent cannot reverse a recorded allocation or retain a verified status',async t=>{
  const f=await fixture(t),connection=structuredClone(f.connection),allocated=(await f.evidence.reconcileWithOriginals('synthetic-owner',seed())).state;
  allocated.transactions[0].bankAccountIssue='Earlier known account consent issue';const before=structuredClone(allocated);f.connection=null;

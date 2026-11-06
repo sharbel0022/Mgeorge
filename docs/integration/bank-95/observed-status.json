@@ -1,0 +1,28 @@
+{
+  "observedAt": "2026-11-05T18:21:20Z",
+  "source": "existing deployed bank_auto_sync_status, read-only stored-state projection",
+  "providerRequestsPerformed": 0,
+  "productionMutationsPerformed": 0,
+  "status": {
+    "enabled": true,
+    "connected": false,
+    "intervalHours": 6,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+    "nextAttemptAt": "2026-11-05T14:06:00.000Z",
+    "lastError": "Bankhändelserna kunde inte hämtas. Försök igen.",
+    "blocked": false,
+    "failures": 1,
+    "postprocessWarning": null
+  },
+  "historicalIncident": {
+    "source": "docs/saas/evidence/2026-11-05/bank-incident.json",
+    "errorCode": "BANK_ACCOUNT_SCOPE_INVALID",
+    "connectionStatus": "reauth_required",
+    "exactFailedPredicate": "NOT_DETERMINED",
+    "providerPayloadRetained": false
+  },
+  "interpretation": "No fresh provider authorization is established. The obsolete nextAttemptAt does not prove a scheduled retry can run. Code changes on feature/95-bank have not been deployed.",
+  "previousObservedAt": "2026-11-05T17:35:53Z",
+  "unchangedSincePreviousObservation": true
+}

@@ -37,6 +37,15 @@ test('real state and original APIs expose only the authenticated selected compan
  const denied=await f.files(f.request('/api/files?id=00000000-0000-4000-8000-000000000002'));assert.equal(denied.status,404);assert.deepEqual(f.reads,[]);
  const own=await f.files(f.request('/api/files?id=00000000-0000-4000-8000-000000000001&companyId=company-a&companyContextVersion=1',{companyId:null}));assert.equal(own.status,200);assert.equal(await own.text(),'Synthetic original company-a');assert.deepEqual(f.reads,[f.a.owner+'/00000000-0000-4000-8000-000000000001']);
 });
+test('oversized state commands fail during the real authorization clone without database writes',async t=>{
+ const f=await fixture(t);await f.seed();let reads=0,cancelled=false;
+ const before=f.sql.prepare('SELECT total_changes() n').get().n;
+ const request=f.request('/api/state',{method:'POST',body:{}});
+ const body=new ReadableStream({pull(controller){reads++;if(reads===1)controller.enqueue(new TextEncoder().encode('{"command":{"type":"settings.save","name":"'+'x'.repeat(1_500_000)));else if(reads===2)controller.enqueue(new TextEncoder().encode('"}}'));else controller.close();},cancel(){cancelled=true;}},{highWaterMark:0});
+ const result=await f.statePost(new Request(request,{body,duplex:'half'}));
+ assert.equal(result.status,413);assert.equal((await result.json()).code,'REQUEST_BODY_TOO_LARGE');
+ assert.equal(f.sql.prepare('SELECT total_changes() n').get().n,before);assert.equal(reads,1);assert.equal(cancelled,true);
+});
 test('forged and conflicting request company selectors are rejected without a legacy fallback',async t=>{
  const f=await fixture(t);await f.seed();assert.equal((await f.state(f.request('/api/state',{companyId:'company-b'}))).status,403);
  const missing=await f.state(f.request('/api/state',{companyId:null}));assert.equal(missing.status,409);assert.equal((await missing.json()).code,'COMPANY_CONTEXT_REQUIRED');
@@ -63,7 +72,7 @@ test('a prepared statement or database handle captured in A cannot be invoked by
 test('roles are checked before settings or integration handlers can perform effects',async t=>{
  const f=await fixture(t);await f.seed();for(const [actorId,role]of [['viewer','viewer'],['accountant','accountant']])await changeCompanyMembership(f.raw,f.a,{actorId,role,status:'active'});
  f.user.userId='viewer';assert.equal((await f.state(f.request())).status,200);assert.equal((await f.statePost(f.request('/api/state',{method:'POST',body:{}}))).status,403);
- f.user.userId='accountant';for(const path of ['/api/state','/api/bank/connect','/api/gmail/automation']){let effect=false;const handler=f.wrap(async req=>{await f.server.identity(req);effect=true;return f.server.response({ok:true});});const r=await handler(f.request(path,{method:'POST',body:{command:{type:'settings.save',name:'spoof',email:'synthetic@example.test'}}}));assert.equal(r.status,403);assert.equal(effect,false);}
+ f.user.userId='accountant';for(const path of ['/api/state','/api/bank/connect','/api/bank/revalidate','/api/gmail/automation','/mcp']){let effect=false;const handler=f.wrap(async req=>{await f.server.identity(req);effect=true;return f.server.response({ok:true});});const body=path==='/mcp'?{method:'tools/call',params:{name:'bank_revalidate_consent'}}:{command:{type:'settings.save',name:'spoof',email:'synthetic@example.test'}};const r=await handler(f.request(path,{method:'POST',body}));assert.equal(r.status,403);assert.equal(effect,false);}
 });
 test('MCP pins request context even after its body is consumed and distinguishes read tools',async t=>{
  const f=await fixture(t);await f.seed();await changeCompanyMembership(f.raw,f.a,{actorId:'viewer',role:'viewer',status:'active'});f.user.userId='viewer';

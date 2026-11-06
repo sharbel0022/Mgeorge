@@ -1,0 +1,397 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-06",
+  "sourceCommit": "c22bd94a68144a41b3b40664225509ef89f40722",
+  "baseCommit": "30dfaa97bb7ce2118b4756205347d4a96e8be6ab",
+  "runtime": "Node v24.22.1",
+  "data": "synthetic only",
+  "productionRestoreTested": false,
+  "commercialLaunch": "NOT_APPROVED",
+  "completeIntegratedGate": "PARENT_CI_REQUIRED",
+  "localFullSecurityGate": "FAILED_SIGKILL_NOT_OVERRIDDEN",
+  "finalFocus": {
+    "sourceCommit": "c22bd94a68144a41b3b40664225509ef89f40722",
+    "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap sites/tests/company-sql-boundary-completion.test.mjs sites/tests/company-storage.test.mjs sites/tests/saas-company-acceptance.test.mjs sites/tests/company-request.test.mjs sites/tests/company-backup.test.mjs sites/tests/openpayments-token-fence.test.mjs sites/tests/openpayments-token-migration.test.mjs sites/tests/saas-onboarding-server.test.mjs sites/tests/security-request-budget.test.mjs sites/tests/openpayments-workers-runtime.test.mjs",
+    "exitCode": 0,
+    "tests": 183,
+    "pass": 183,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "durationMilliseconds": 13652.853337,
+    "log": {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/quoted-boundary-broad-green.tap",
+      "bytes": 41824,
+      "sha256": "be186ddfa36e8e179ed552404798e1c3f586bb6feea41265dc5be7b215dc1230"
+    }
+  },
+  "fullSecurityAttempt": {
+    "sourceCommit": "ee8d52186e970a6c3cde7fc116cd33f3f3e10485",
+    "command": "node scripts/run-saas-security-acceptance.mjs /workspace/scratch/aab0f7dc06f9/security-evidence/frozen-ee8d521",
+    "exitCode": 1,
+    "nodeTests": 377,
+    "nodePass": 377,
+    "sitesTests": 1084,
+    "sitesPass": 1082,
+    "sitesFail": 2,
+    "failures": [
+      "tests/banking-security.test.mjs SIGKILL",
+      "tests/seven-agent-0599-joined.test.mjs SIGKILL"
+    ],
+    "retainedReport": "acceptance-ee8d521.json",
+    "reportSha256": "f25d4a1e909d90c74029eb2fe32a4db0c9ddf6c350438a1bdbcbef0c3e14ded7"
+  },
+  "isolatedReplay": {
+    "sourceCommit": "ee8d52186e970a6c3cde7fc116cd33f3f3e10485",
+    "cwd": "sites",
+    "command": "NODE_ENV=test CLOUDFLARE_CF_FETCH_ENABLED=false WRANGLER_SEND_METRICS=false node --import ../scripts/saas-test-isolation.mjs --import /workspace/scratch/aab0f7dc06f9/security-evidence/memory-probe.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap tests/banking-security.test.mjs tests/seven-agent-0599-joined.test.mjs",
+    "exitCode": 0,
+    "tests": 360,
+    "pass": 360,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "durationMilliseconds": 72130.458966,
+    "doesNotOverrideFullGate": true,
+    "memoryCause": "NOT_ESTABLISHED"
+  },
+  "finalRestore": {
+    "sourceCommit": "c22bd94a68144a41b3b40664225509ef89f40722",
+    "command": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --import /workspace/scratch/aab0f7dc06f9/security-evidence/memory-probe.mjs --experimental-strip-types sites/scripts/recovery-drill.mjs 430 185567855",
+    "exitCode": 0,
+    "retainedReport": "restore-c22bd94.json",
+    "reportSha256": "f26362905dd0c96314b0a4d054cc5348b4df33d0fad7752d05a0fc621460a752",
+    "sourceUnchanged": true,
+    "productionRestoreTested": false,
+    "processMaxRssKiB": 769616
+  },
+  "regressionHistory": [
+    {
+      "sourceCommit": "dc2e6dd8c1c3fb13ae67d4de1bfb82ce7836b6e4",
+      "tests": 27,
+      "pass": 7,
+      "fail": 20,
+      "stage": "original comment-before-quote defect"
+    },
+    {
+      "sourceCommit": "774b511b76882239b0633535f3cae774382ab643",
+      "tests": 63,
+      "pass": 27,
+      "fail": 36,
+      "stage": "independently discovered adjacent quoted token defect"
+    },
+    {
+      "sourceCommit": "a4aec82543c9c45147fe5a574448b6d976ed2d27",
+      "tests": 63,
+      "pass": 60,
+      "fail": 3,
+      "stage": "token separators fixed; adjacent WITH prefix still failed"
+    },
+    {
+      "sourceCommit": "bc8ee145bfa3356280786282abc7cb43095daeb8",
+      "tests": 66,
+      "pass": 60,
+      "fail": 6,
+      "stage": "recursive CTE cases frozen before prefix correction"
+    },
+    {
+      "sourceCommit": "c22bd94a68144a41b3b40664225509ef89f40722",
+      "tests": 66,
+      "pass": 66,
+      "fail": 0,
+      "stage": "included in final 183-test focus"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "sites/lib/company-storage.js",
+      "sha256": "244d2f9a3cf9b943c49979844df750d9fe0a99b899cb88a7130ab91cf9ee7d90"
+    },
+    {
+      "path": "sites/lib/company-contract.js",
+      "sha256": "5da17708a61f842002c3d57650679d260bb5142821baf97700353bc467e14c8e"
+    },
+    {
+      "path": "sites/lib/server.ts",
+      "sha256": "10fdd842a722c726960c72b1b099f2d74738bf0fc915e8c2cfa6c823efe0bfe7"
+    },
+    {
+      "path": "sites/worker/index.ts",
+      "sha256": "4fecbc7dd10aab9f126d6926757b80375a3e2c3cbcba77402f1cc1814d9ce2ed"
+    },
+    {
+      "path": "sites/tests/company-sql-boundary-completion.test.mjs",
+      "sha256": "cd7a4d70c90a9f7ecd513c85147131603ed69881cfa3074ef75c4bd37476fb1d"
+    },
+    {
+      "path": "sites/tests/openpayments-workers-runtime.test.mjs",
+      "sha256": "552fcdec63331bb0ecd6b199dac38395ec5fc20a76ddbb6e86bd25dde34588f2"
+    },
+    {
+      "path": "scripts/run-saas-security-acceptance.mjs",
+      "sha256": "3869a47c27f3c02a1b8e17adab3631a9bd86f8d33a350e3cab6a93d512e4700d"
+    },
+    {
+      "path": "scripts/saas-test-isolation.mjs",
+      "sha256": "9f40b9159a1ad9f4d21c7ecdc76db31fd55d6a0efe793f3f32e7548809affb80"
+    },
+    {
+      "path": "src/backup.js",
+      "sha256": "f2104d4f4ee997cc472566e204a155b3a9fa37a461ee21d6c5c03f996553abcc"
+    },
+    {
+      "path": "src/company-runtime.js",
+      "sha256": "b69d0509cab57124a0b1900b29d18735653c3ce37a7b6e66f2dfb5b3ad53c0ea"
+    },
+    {
+      "path": "src/db.js",
+      "sha256": "7d002ddb9b8d62d9158ab7c328c4c9f73b45c51b2bbb96d9b7de829e8f7f78fe"
+    },
+    {
+      "path": "src/security.js",
+      "sha256": "7042cbd23e75442393dcd2add32b4a5eecb95f7207635e8907e6f6a0301b0687"
+    },
+    {
+      "path": "src/server.js",
+      "sha256": "d221088ca5a0398942cacbd7f0ead73c0dd8bd788a8d2ef54679ee4046410cf1"
+    },
+    {
+      "path": "sites/lib/backup-engine.ts",
+      "sha256": "16c9c727c469d7083b917087eae852a07334888748e8d0041e404aca1296fd0c"
+    },
+    {
+      "path": "sites/scripts/recovery-drill.mjs",
+      "sha256": "dddedc152b49cb08a86906719377d9666ca5a1aacf0142f0b5fd5dcedc2c8f10"
+    },
+    {
+      "path": "sites/scripts/restore-backup-isolated.mjs",
+      "sha256": "fd8bbeaa54ac6a3d07081000e7ef8fd6b2d38bf1aee0f6af1a9c42a289e5e648"
+    },
+    {
+      "path": "sites/scripts/lib/backup-recovery.mjs",
+      "sha256": "c971322d5d076726d018de1bda011855e0c01404cf17e8dda332d85601ca218d"
+    },
+    {
+      "path": "sites/scripts/lib/recovery-acceptance.mjs",
+      "sha256": "cfd917d15d6a21aed189d85b716b021618e7fb5e2c19eae7f33f29df1c3e708a"
+    },
+    {
+      "path": "sites/scripts/lib/recovery-drill-fixture.mjs",
+      "sha256": "ec7e9b7bef842abedafb601f5dd9ddcd5f42105d3056c02fc903426ad3752ede"
+    },
+    {
+      "path": "sites/lib/banking/openpayments/token-coordinator.js",
+      "sha256": "53ce4b610b1ee63b9a948f645d7a2a21042849190602ddf01b1d364204b1d1e2"
+    },
+    {
+      "path": "sites/lib/banking/openpayments/token-coordinator.schema.sql",
+      "sha256": "fd0684ddda32c31fc6c07dd6cc00f5e263269750b08c51aff12ddd03e61de343"
+    },
+    {
+      "path": "sites/lib/banking/openpayments-sites-token-coordinator.ts",
+      "sha256": "d8ca73cb707c12c7ab25a84077fab81b105ccaf8ea40eb979d7a51d19a4c1fab"
+    },
+    {
+      "path": "sites/lib/banking/saas-runtime.ts",
+      "sha256": "011a1fe642fdb68845962203be1ccb35c13da4466a8eaab0cd9112d3e28d6e08"
+    },
+    {
+      "path": "sites/lib/banking/openpayments-account-state.ts",
+      "sha256": "12333aade1f3542de7726c654907cc3b3270c94a3bd6e0c27f391ce27f6d3894"
+    },
+    {
+      "path": "sites/lib/onboarding/failure.ts",
+      "sha256": "0d2cfc8a5f9640baab8a2e4ba495609a820ec2b09e0657387c014b37d99acc40"
+    },
+    {
+      "path": "sites/lib/onboarding/bank-server.ts",
+      "sha256": "e2e0603aedc2894b3c7a34f3302010bb7bb8bc198a2611bed258429edc5c1a50"
+    },
+    {
+      "path": "sites/db/schema.ts",
+      "sha256": "a20aa31e0836da29046485447043a0af75afe1db800faca270ebe07becb36e77"
+    },
+    {
+      "path": "sites/drizzle/0025_application_tokens.sql",
+      "sha256": "fd0684ddda32c31fc6c07dd6cc00f5e263269750b08c51aff12ddd03e61de343"
+    },
+    {
+      "path": "sites/drizzle/meta/_journal.json",
+      "sha256": "a82cf4547d0c020ebeef40c81e40affb9f0f118085da3134016587f6a9546b0a"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d"
+    },
+    {
+      "path": "sites/package-lock.json",
+      "sha256": "e9270e2eb5c21a56f7573b516285d1bd0e0e8eae55a7a0ab737d198659c855b0"
+    }
+  ],
+  "rawEvidence": [
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/company-sql-boundary-red.tap",
+      "bytes": 17007,
+      "sha256": "e705a57396a630e0ee610df923bce084ad2879e111c55e3d61820a6485b5fb7d"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/company-sql-boundary-first-green.tap",
+      "bytes": 5538,
+      "sha256": "207cbc54045e6e0199565596c728a6d0b5fede5fce80ab310cf5eef36407ae80"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/company-boundary-broad-green.tap",
+      "bytes": 26181,
+      "sha256": "9e630593b08d48900afd1bdc167e7424109bde280dd0f8133c3426b5c57db9e9"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/baseline/report.json",
+      "bytes": 5512,
+      "sha256": "8074866e24d8fb37632466f8294076b93485a44cfe7667ddab3994a7b3b57bab"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/baseline/node-security.tap",
+      "bytes": 84402,
+      "sha256": "990d7663c7e7f6a48bde4126d3984a2df2a66c3afc7fe51adc9407dfeef30428"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/baseline/sites-security.tap",
+      "bytes": 273282,
+      "sha256": "f27c0267aa9dbe62d8b5630aec3a0a33626c38d7b25193677bd81c3b8da56b1d"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/d1-isolated.tap",
+      "bytes": 1379,
+      "sha256": "887ded4ecf984bf968d37396d5725265a6d5b7e610f2481197af236c00721928"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/migration-readiness-first.tap",
+      "bytes": 12203,
+      "sha256": "cc136da9d923630a27f95f429802d134ace1d2bc721669f60b88015670bf9079"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/migration-readiness-second.tap",
+      "bytes": 7565,
+      "sha256": "1a34f27b532bfa588c9920484f574f69f49aaa78cfb89b8e52732de42ae8e5ea"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/migration-readiness-third.tap",
+      "bytes": 8335,
+      "sha256": "199e01d826829725790bd33d88f09cf3bacdbce28820fcdb3a7ac1d2f49ed3f2"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/migration-readiness-green.tap",
+      "bytes": 7813,
+      "sha256": "5d88767992c3ce73780c6f903b95058c337cb1eee930764fd6ac26629a16ab3d"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/frozen-ee8d521/report.json",
+      "bytes": 5570,
+      "sha256": "f25d4a1e909d90c74029eb2fe32a4db0c9ddf6c350438a1bdbcbef0c3e14ded7"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/frozen-ee8d521/node-security.tap",
+      "bytes": 84454,
+      "sha256": "eed0f49d4c46e08100c8198a52ec88bd51dd4d63516dca5f06a4fbe110df69de"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/frozen-ee8d521/sites-security.tap",
+      "bytes": 257769,
+      "sha256": "04084a0fd619c306e8a8142ebbedac974d91f989ca66aa48563428549cf116b5"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/killed-files-isolated.tap",
+      "bytes": 91853,
+      "sha256": "5f638f863dc90773d0c16b64e3b02cdb49c6f84951f1e0865547b17741e85395"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/isolated-test-memory.jsonl",
+      "bytes": 14787,
+      "sha256": "08d99dc6b2dffdf91dd42616842ecb951eed3dac42d168f1bc61d89b2b4beaa4"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-430-initial-environment.stderr",
+      "bytes": 557,
+      "sha256": "56802fa5b73ff4fa3c67577455027623238de1b161b691964adc30009e491070"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-430.json",
+      "bytes": 4897,
+      "sha256": "9461ba0a2e86bf41bbac413102cb77aee6a04da9534e327b84d56fc9085c986b"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-430.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-ee8d521-430.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-ee8d521-430.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-ee8d521-isolated-430.json",
+      "bytes": 4897,
+      "sha256": "154477d7fa3f723ac9d86778a82a9489663c9df6dc44778d6c4d864fb87119a1"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-ee8d521-isolated-430.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/restore-ee8d521-memory.jsonl",
+      "bytes": 3915,
+      "sha256": "0977c710e0284957d4b1d387ae2fb7ec547c39ec0419dc14df0430ecc2cd05cc"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/quoted-boundary-red.tap",
+      "bytes": 37609,
+      "sha256": "70145c8ff9027e5d6cf38be6491d0b9430ea569eea122187d4263648e7ef7654"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/quoted-boundary-green.tap",
+      "bytes": 15167,
+      "sha256": "fbe0edb18e40a67df3d6dd270e7b375f30225675e618f8db5d09a0f359560679"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/quoted-cte-red.tap",
+      "bytes": 18052,
+      "sha256": "47e47ea24f38488ebff798412f41c47652fda8f0330e0b1430ceba4894af6ad4"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/quoted-boundary-broad-green.tap",
+      "bytes": 41824,
+      "sha256": "be186ddfa36e8e179ed552404798e1c3f586bb6feea41265dc5be7b215dc1230"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-final-430.json",
+      "bytes": 4896,
+      "sha256": "f26362905dd0c96314b0a4d054cc5348b4df33d0fad7752d05a0fc621460a752"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/recovery-final-430.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/restore-c22bd94-memory.jsonl",
+      "bytes": 1947,
+      "sha256": "0f970b2ab816a37e42c203c50cfe5d6aba813bec51e87449ef3523898ecb160d"
+    },
+    {
+      "path": "/workspace/scratch/aab0f7dc06f9/security-evidence/memory-probe.mjs",
+      "bytes": 474,
+      "sha256": "245e81b75646e6b6f459156b5812ce4e5ca0ded1a6f78a19b12f51b39f23a37b"
+    }
+  ],
+  "dependencyNote": "Preinstalled node_modules linked from a checkout with byte-identical lockfiles; full runner dirty flag is an untracked node_modules symlink. Parent owns clean integrated CI.",
+  "safety": "No production writes, no real provider calls, no recovery release, no activation. All test bank transports are synthetic and network guarded."
+}

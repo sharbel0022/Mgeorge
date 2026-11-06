@@ -1,0 +1,240 @@
+/* Final presentation layer for the existing workspace. Financial status and
+   evidence eligibility continue to come from the existing projections. */
+:root {
+  --bg: #f7f7f7;
+  --card: #fff;
+  --ink: #171717;
+  --muted: #575757;
+  --line: #dedede;
+  --red: #333;
+  --blue: #333;
+  --amber: #333;
+}
+
+.app-shell { color: var(--ink); font-size: 14px; }
+.app-shell .main-shell { background: var(--bg); min-height: 100dvh; }
+.app-shell main { padding-bottom: 48px; }
+.app-shell .topbar { background: #fff; border-bottom: 1px solid var(--line); min-height: 76px; }
+.app-shell .sidebar { background: #fff; border-right: 1px solid var(--line); }
+.app-shell .brand { color: #171717; gap: 9px; letter-spacing: -.7px; }
+.app-shell .brand strong { color: #171717; }
+.app-shell .workspace { min-height: 76px; color: #222; border: 1px solid #dedede; background: #f8f8f8; text-decoration: none; }
+.app-shell .workspace:hover { border-color: #777; background: #f1f1f1; }
+.app-shell .workspace > div { min-width: 0; }
+.app-shell .workspace strong { font-size: 13px; white-space: normal; overflow-wrap: anywhere; }
+.app-shell .workspace span:not(.workspace-icon) { color: #555; font-size: 11px; }
+.app-shell .workspace > svg { flex-shrink: 0; }
+.app-shell .nav-label { color: #606060; font-size: 11px; letter-spacing: .12em; }
+.app-shell .nav-item { min-height: 48px; color: #4a4a4a; font-size: 14px; border-radius: 8px; }
+.app-shell .nav-item.active { background: #171717; color: #fff; font-weight: 600; }
+.app-shell .nav-item.active > svg { color: inherit; }
+.app-shell .nav-item b { background: #ededed; color: #222; font-size: 12px; }
+.app-shell .nav-item.active b { background: #fff; color: #171717; }
+.app-shell .sidebar-help p,.app-shell .sidebar-help a,.app-shell .user-chip span { color: #555; font-size: 12px; }
+.app-shell .user-chip strong { font-size: 12px; overflow-wrap: anywhere; }
+.app-shell .eyebrow { color: #555; font-size: 11px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; overflow-wrap: anywhere; }
+.app-shell .page-heading h1,.app-shell .economy-heading h1 { color: #111; font-size: clamp(28px, 3vw, 36px); line-height: 1.2; letter-spacing: -.8px; }
+.app-shell .page-heading > div > p,.app-shell .economy-heading p { font-size: 14px; color: #555; line-height: 1.7; }
+.app-shell .page-heading { margin-bottom: 24px; }
+.app-shell .panel { border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: 0 1px 3px #00000004; }
+.app-shell .panel-heading { padding: 21px 24px; gap: 16px; }
+.app-shell .panel-heading h2 { font-size: 16px; font-weight: 650; line-height: 1.5; color: #222; }
+.app-shell .btn { min-height: 44px; padding: 10px 16px; font-size: 13px; line-height: 1.5; font-weight: 600; color: #222; border: 1px solid #888; border-radius: 8px; background: #fff; }
+.app-shell .btn.primary { background: #171717; border-color: #171717; color: #fff; }
+.app-shell .btn:not(:disabled):hover { background: #eee; border-color: #333; }
+.app-shell .btn.primary:not(:disabled):hover { background: #333; color: #fff; }
+.app-shell .btn:disabled { opacity: 1; background: #ededed; border-color: #ccc; color: #666; cursor: not-allowed; }
+.app-shell .btn svg { flex-shrink: 0; }
+.app-shell .icon-button { min-width: 44px; min-height: 44px; color: #444; flex-shrink: 0; }
+.app-shell .text-button { min-width: 44px; min-height: 44px; font-size: 13px; color: #333; font-weight: 550; line-height: 1.5; }
+.app-shell .text-button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.app-shell .banner small { color: #555; font-size: 12px; }
+.app-shell .search-field { min-height: 44px; border-color: #888; border-radius: 8px; color: #555; gap: 10px; padding: 9px 12px; }
+.app-shell .search-field input { font-size: 14px; color: #222; min-height: 24px; }
+.app-shell .search-field input::placeholder { color: #626262; opacity: 1; }
+.app-shell .workspace-search { width: min(510px, 100%); }
+.app-shell .workspace-search .search-field { width: 100%; }
+.app-shell .workspace-search input { width: 100%; }
+.app-shell .workspace-search-results { border: 1px solid #888; border-radius: 10px; box-shadow: 0 12px 35px #00000016; }
+.app-shell .workspace-search-results small { color: #555; font-size: 12px; }
+.app-shell .workspace-subnav { gap: 8px; flex-wrap: wrap; overflow: visible; }
+.app-shell .workspace-subnav :is(a,button) { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; border-color: #999; color: #333; }
+.app-shell .workspace-subnav .active { border-color: #222; background: #222; color: #fff; }
+.app-shell .filter-tabs { gap: 7px; }
+.app-shell .filter-tabs > button { min-height: 44px; padding: 9px 13px; color: #444; font-size: 12px; border: 1px solid #ccc; border-radius: 7px; }
+.app-shell .filter-tabs > button.selected { background: #222; color: #fff; border-color: #222; }
+.app-shell .table-toolbar { gap: 16px; padding: 18px 22px; }
+.app-shell .invoice-tools { flex-wrap: wrap; flex: 1 1 430px; justify-content: flex-end; }
+.app-shell .invoice-tools .search-field { flex: 1 1 240px; max-width: 380px; }
+.app-shell .invoice-tools .search-field input { width: 100%; }
+.invoice-status-select select { min-height: 44px; max-width: 100%; border: 1px solid #888; border-radius: 8px; padding: 9px 32px 9px 12px; background: #fff; color: #333; font: inherit; font-size: 13px; }
+.app-shell .invoice-table th { font-size: 11px; color: #555; font-weight: 650; }
+.app-shell .invoice-table { table-layout: auto; }
+.app-shell .invoice-table th,.app-shell .invoice-table td { padding: 18px 12px; }
+.app-shell .invoice-table td { font-size: 13px; line-height: 1.6; }
+.app-shell .invoice-table td:nth-child(4),.app-shell .invoice-table td:nth-child(5),.app-shell .invoice-table td:nth-child(6) { white-space: nowrap; overflow-wrap: normal; }
+.app-shell .invoice-table .pill { overflow-wrap: normal; word-break: normal; }
+.app-shell .invoice-table td small { font-size: 12px; color: #555; }
+.app-shell .invoice-number { display: inline-block; font-size: 17px; font-weight: 750; letter-spacing: .03em; color: #111; line-height: 1.4; }
+.app-shell .invoice-reference .mono { display: inline-block; font-size: 14px; font-weight: 650; color: #222; letter-spacing: .02em; }
+.app-shell .party-cell strong { font-size: 14px; color: #222; }
+.app-shell .table-footer { color: #555; font-size: 13px; gap: 14px; flex-wrap: wrap; align-items: center; }
+.app-shell .table-footer strong { color: #333; font-size: 13px; }
+.app-shell .pill { color: #333; background: #f4f4f4; border: 1px solid #aaa; font-size: 12px; line-height: 1.5; white-space: normal; }
+.app-shell .pill-dot { background: currentColor; }
+.app-shell .pill.green { color: #171717; background: #ededed; border-color: #777; }
+.app-shell .pill.amber { color: #333; background: #fafafa; border-style: dashed; }
+.app-shell .pill.red { color: #171717; background: #f1f1f1; border-color: #555; font-weight: 650; }
+.app-shell .empty { padding: 44px 24px; }
+.app-shell .empty h3 { font-size: 18px; color: #222; }
+.app-shell .empty p,.app-shell .panel-empty { font-size: 14px; color: #555; line-height: 1.7; }
+.app-shell .empty .btn { margin-top: 18px; }
+.app-shell .form-error,.app-shell .banner.error { background: #f6f6f6; color: #222; border-color: #555; }
+.app-shell .control-hint { font-size: 13px; color: #555; line-height: 1.7; }
+.app-shell .control-review-heading p,.app-shell .check-field span { color: #555; font-size: 13px; }
+.app-shell .inline-evidence > header p,.app-shell .check-field small { color: #555; font-size: 12px; }
+.app-shell .economy-heading { margin-top: 6px; }
+.app-shell .economy-cards { gap: 16px; margin: 26px 0; }
+.app-shell .economy-card { border: 1px solid #ccc; padding: 22px; gap: 15px; min-height: 190px; }
+.app-shell .economy-card > span { font-size: 13px; color: #444; }
+.app-shell .economy-card > strong { font-size: clamp(24px, 2.3vw, 32px); font-weight: 700; letter-spacing: -.65px; color: #111; }
+.app-shell .economy-card > small { font-size: 12px; color: #555; }
+.app-shell .economy-card:enabled:hover { background: #fafafa; border-color: #555; }
+.app-shell .economy-notice { font-size: 13px; color: #333; border: 1px solid #aaa; border-left: 3px solid #222; background: #fff; }
+.app-shell .economy-notice .btn { margin: 12px 0 0; }
+.economy-bank-notice { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 20px; border: 1px solid #777; border-radius: 10px; background: #fff; margin-bottom: 20px; }
+.economy-bank-notice > div { min-width: 0; }
+.economy-bank-notice strong { font-size: 14px; color: #222; }
+.economy-bank-notice p { font-size: 13px; color: #555; line-height: 1.7; margin: 5px 0 0; }
+.economy-bank-notice .btn { flex-shrink: 0; }
+.app-shell .economy-status-line { font-size: 12px; color: #555; }
+.app-shell .economy-row strong { font-size: 14px; }
+.app-shell .economy-row small { font-size: 12px; }
+.app-shell .control-task-copy h3 { font-size: 15px; color: #222; }
+.app-shell .control-task-copy p,.app-shell .control-task-copy small { font-size: 12px; color: #555; }
+.app-shell .control-task-action strong { font-size: 15px; color: #222; }
+.app-shell .control-empty h3 { font-size: 18px; color: #222; }
+.app-shell .control-empty p { font-size: 13px; color: #555; }
+.app-shell .review-workspace { border-radius: 12px; border-color: #ccc; }
+.app-shell .control-filter-tabs { gap: 8px; flex-wrap: wrap !important; overflow: visible; }
+.app-shell .control-filter-tabs button { min-height: 44px; padding: 10px 12px; font-size: 12px; color: #333; border: 1px solid #bbb; }
+.app-shell .control-filter-tabs button[aria-pressed="true"] { background: #222; color: #fff; border-color: #222; }
+.app-shell .control-filter-tabs button span { color: #333; background: #f3f3f3; font-size: 11px; }
+.app-shell .review-tools select { min-height: 44px; border: 1px solid #888; background: #fff; font-size: 13px; color: #333; }
+.app-shell .review-row { min-height: 100px; padding: 18px 16px; }
+.app-shell .review-row-copy > strong { font-size: 14px; color: #222; line-height: 1.5; }
+.app-shell .review-row-copy > small,.app-shell .review-row-amount small { font-size: 12px; color: #555; }
+.app-shell .review-row-amount strong { font-size: 14px; color: #222; }
+.app-shell .review-status { color: #444; background: #f7f7f7; border: 1px dashed #888; font-size: 11px; }
+.app-shell .review-list-heading { color: #555; font-size: 12px; }
+.review-read-error { padding: 28px; background: #fff; }
+.review-read-error h2 { color: #222; font-size: 20px; margin: 0 0 10px; }
+.review-read-error p { color: #555; font-size: 14px; margin-bottom: 20px; }
+.app-shell .details-grid dt { color: #555; font-size: 12px; }
+.app-shell .details-grid dd { font-size: 14px; color: #222; }
+.app-shell .details-grid dd.mono { font-size: 16px; font-weight: 650; letter-spacing: .02em; }
+.app-shell .amount-summary span { color: #555; font-size: 12px; }
+.app-shell .amount-summary strong { color: #171717; }
+.app-shell .modal { background: #fff; border: 1px solid #999; border-radius: 14px; max-height: calc(100dvh - 32px); }
+.app-shell .modal::backdrop { background: #0008; }
+.app-shell .modal-shell > header { padding: 22px 26px; border-bottom: 1px solid #ddd; }
+.app-shell .modal-shell > header h2 { font-size: 22px; color: #171717; }
+.app-shell .modal-shell > header p { color: #555; font-size: 13px; }
+.app-shell .detail-heading p,.app-shell .detail-empty { color: #555; font-size: 13px; }
+.app-shell .section-title { color: #444; font-size: 14px; }
+.app-shell .secondary-actions > summary,.app-shell .economy-diagnostics > summary,.app-shell .bank-evidence > summary { min-height: 44px; display: flex; align-items: center; width: auto; font-size: 13px; color: #333; }
+.app-shell .field > span { color: #333; font-size: 13px; }
+.app-shell .field :is(input,select,textarea) { border-color: #888; min-height: 44px; font-size: 15px; color: #222; }
+.app-shell .field small { color: #555; font-size: 12px; }
+.app-shell .bank-status,.app-shell .bank-reference-note,.app-shell .bank-field-source { font-size: 12px; color: #444; }
+.app-shell .bank-invoice-number { font-size: 17px; }
+.app-shell .bank-intended-reference .mono,.app-shell .bank-reference > .mono { font-size: 15px; }
+.app-shell .bank-payments-table td { font-size: 13px; }
+.app-shell .bank-payments-table th { color: #555; font-size: 11px; }
+.app-shell .bank-payments-table td { color: #444; }
+.app-shell .bank-payments-table td small { color: #555; font-size: 12px; }
+.app-shell .cell-note { color: #555; font-size: 12px; }
+.app-shell .transaction-hero > div > span { color: #555; font-size: 12px; }
+.app-shell .bank-raw-data { color: #444; }
+.app-shell .page-footer,.app-shell .page-footer span { color: #555; font-size: 12px; }
+.app-shell .bank-summary dt { color: #555; font-size: 12px; }
+.app-shell .bank-report-availability { border-color: #bbb; }
+.app-shell .bank-report-availability summary { min-height: 44px; }
+.app-shell :is(a,button,input,select,textarea,summary):focus-visible { outline: 3px solid #171717; outline-offset: 3px; }
+.app-shell .search-field:focus-within { outline: 3px solid #171717; outline-offset: 3px; }
+.app-shell .search-field input:focus-visible { outline: none; }
+.app-shell .nav-item.active:focus-visible { outline: 3px solid #171717; outline-offset: 3px; box-shadow: inset 0 0 0 2px #fff; }
+
+@media (min-width: 1101px) {
+  .app-shell .sidebar { width: 244px; }
+  .app-shell .main-shell { margin-left: 244px; }
+  .app-shell main { max-width: 1640px; margin-inline: auto; padding-inline: 36px; }
+  .app-shell .topbar { padding-inline: 36px; }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .app-shell .sidebar { width: 204px; }
+  .app-shell .main-shell { margin-left: 204px; }
+  .app-shell .nav-item { padding-inline: 10px; font-size: 13px; }
+  .app-shell .workspace { padding-inline: 10px; }
+}
+@media (max-width: 1100px) {
+  .app-shell .invoice-table td[data-label]::before { font-size: 11px; color: #555; letter-spacing: .04em; }
+  .app-shell .invoice-tools { flex-basis: 100%; justify-content: flex-start; }
+  .app-shell .invoice-tools .search-field { max-width: none; }
+  .economy-bank-notice { align-items: flex-start; flex-direction: column; gap: 12px; }
+}
+@media (max-width: 760px) {
+  .app-shell main { padding: 24px 16px 36px; }
+  .app-shell .topbar { min-height: 72px; padding-inline: 14px; }
+  .app-shell .topbar-search { flex: 1; min-width: 0; }
+  .app-shell .topbar-right { gap: 0; }
+  .app-shell .workspace-search .search-field { padding: 8px 10px; }
+  .app-shell .search-field input { font-size: 16px; }
+  .app-shell .heading-actions { display: flex; padding-top: 16px; gap: 10px; }
+  .app-shell .heading-actions .btn { flex: 1; white-space: normal; }
+  .app-shell .panel-heading { padding: 18px 16px; }
+  .app-shell .panel-heading h2 { font-size: 15px; }
+  .app-shell .table-toolbar { padding: 16px; }
+  .app-shell .invoice-tools { gap: 10px; }
+  .invoice-status-select { flex: 1 1 calc(100% - 60px); order: 1; min-width: 0; }
+  .invoice-status-select select { width: 100%; }
+  .app-shell .invoice-tools .search-field { flex-basis: 100%; order: 0; }
+  .app-shell .invoice-tools > .icon-button { order: 2; }
+  .app-shell .filter-tabs > button { white-space: normal; }
+  .app-shell .economy-cards { gap: 10px; }
+  .app-shell .economy-card { padding: 17px 14px; min-height: 182px; gap: 12px; }
+  .app-shell .economy-card > strong { font-size: clamp(23px, 5.9vw, 29px); }
+  .app-shell .economy-card > span { font-size: 12px; }
+  .app-shell .economy-card > small { font-size: 12px; }
+  .app-shell .economy-row { padding: 18px 16px; }
+  .app-shell .economy-safe-note { font-size: 12px; line-height: 1.7; }
+  .app-shell .economy-safe-note svg { flex-shrink: 0; margin-top: 3px; }
+  .app-shell .review-tools select { font-size: 14px; }
+  .app-shell .review-row { padding: 17px 13px; gap: 10px; }
+  .app-shell .review-row-copy > strong,.app-shell .review-row-amount strong { font-size: 13px; }
+  .app-shell .control-task { flex-wrap: wrap; gap: 12px; }
+  .app-shell .control-task-copy { min-width: 0; flex: 1 1 180px; }
+  .app-shell .control-task-action { flex-direction: row; align-items: center; justify-content: space-between; width: 100%; }
+  .app-shell .modal-shell > header { padding: 18px; }
+  .app-shell .modal-shell > header h2 { font-size: 20px; }
+  .app-shell .modal-body { padding: 18px; }
+  .app-shell .field :is(input,select,textarea) { font-size: 16px; }
+  .app-shell .details-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px 14px; }
+  .app-shell .details-grid dd { overflow-wrap: anywhere; }
+}
+@media (max-width: 380px) {
+  .app-shell main { padding-inline: 12px; }
+  .app-shell .details-grid { grid-template-columns: minmax(0,1fr); }
+  .app-shell .economy-card { padding: 14px 12px; }
+  .app-shell .economy-card > strong { font-size: 22px; }
+  .app-shell .review-row-icon { display: none; }
+  .app-shell .control-filter-tabs button { padding-inline: 9px; }
+  .app-shell .modal-body,.app-shell .modal-shell > header { padding: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *, .app-shell *::before, .app-shell *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+  .app-shell :is(.btn,.filter-tabs > button,.economy-card,.nav-item.active,.pill) { border: 1px solid ButtonText; }
+  .app-shell :is(a,button,input,select,textarea,summary):focus-visible { outline: 3px solid Highlight; }
+}

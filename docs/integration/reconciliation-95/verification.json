@@ -1,0 +1,201 @@
+{
+  "kind": "synthetic-reconciliation-local-validation",
+  "recordedAt": "2026-11-05T18:05:10.426347+00:00",
+  "baseCommit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "runtimeCommit": "32058aa6e9eeb75e601a52ffd85b5e9a381d187b",
+  "primaryRuntime": "Node v24.22.1 / npm 11.9.0",
+  "additionalRuntime": "Node v22.13.0",
+  "productionDataAccessed": false,
+  "changedSourceSha256": {
+    "scripts/measure-reconciliation-decisions.mjs": "34106cc0ecee70638aa333bfaa58bcedc318fda0de85b70ba74eede2fdb663f4",
+    "sites/lib/imports.ts": "dd8cb6afc47ac997672b1dedc3892afd34698e3346b22e4aa341b06e0e94dac6",
+    "sites/lib/reconciliation-decisions.js": "7e6dca1fcc7b6540475ca2f4285d0c2a6afd0108341b7954100037a58d793d9d",
+    "sites/lib/reconciliation-engine.js": "6f55468ed7824a54534574db8438dbc3b456dfe819ee250efaf2dbc6b1d429c2",
+    "sites/lib/reconciliation-evidence.ts": "8b605de8dd516642c2b999c7168750ac6cd5808c6a02bc59090769bae41a83bd",
+    "sites/lib/reconciliation.ts": "47523058948dd9cb3d04fbab808b0c7cb000e69616c189676d0e3f4e0cf85224",
+    "sites/tests/bank-account-consent.test.mjs": "26ff84f2acf5ff6924f1d999dddb41ba14dcc4f86f3baa2e68c78bec4e5abc94",
+    "sites/tests/bank-file-provenance.test.mjs": "8b4ae3b08fa1cad410a27388ece170946d3048998573cb5200a74d1adcaf9a51",
+    "sites/tests/bank-state-integrity-q8.test.mjs": "92d4ec7a01a7e80e2748f1e09d41ba17dc9b3d5fddbe80705a4d5f5883a72a6a",
+    "sites/tests/reconciliation-batch-integration.test.mjs": "79bd0fa61982619523f71beb5e22e855b1d3d98c4fc9b047111aa46612944f1d",
+    "sites/tests/reconciliation-csv-reference.test.mjs": "c9fc1ac553ded63eae2755bd9000343264e66474933e146d4472a399f04cfc2d",
+    "sites/tests/reconciliation-decisions.test.mjs": "ed1d60e172d4f8acc2770ed8b5b7bf47a5ff13c34efd778dd3e7fba89ff79dda",
+    "sites/tests/reconciliation-manual-provenance.test.mjs": "da5e4359c6ed8beeb3fc27c45441eb87bb45a6a742a3594ee1036fb378d30bc0",
+    "src/reconciliation.js": "1c221dde9c0054b18948a91d36b6678659bb607c46e5c950ae4d0bc35ed5e34e",
+    "test/helpers/reconciliation-decisions.mjs": "3057e38950e98301bfa94d5d952a686aabf430e35282186deb2dea45da04fb31",
+    "test/reconciliation-batch-integration.test.js": "71a49345148e55e1aa2d40d6f98e623fe8c599782fa9ff3dcbc6792e1373234c",
+    "test/reconciliation-decisions.test.js": "8d9b8bca702efdb70c89a7d70b66723aa8fb358968d98ebc26d1ed45382f1d37"
+  },
+  "tests": {
+    "nodeFull": {
+      "command": "NODE_ENV=test npm run test:isolated",
+      "exitCode": 0,
+      "tests": 1937,
+      "suites": 0,
+      "pass": 1937,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 841483.125151,
+      "logSha256": "bdc5e72d574f8099d3cefeb934134f3988e4bc775df1d887f49c6a7a8d791b12"
+    },
+    "sitesFullFailedAttempt": {
+      "command": "NODE_ENV=test CLOUDFLARE_CF_FETCH_ENABLED=false WRANGLER_SEND_METRICS=false npm --prefix sites run test:isolated",
+      "exitCode": 1,
+      "tests": 3752,
+      "suites": 0,
+      "pass": 3751,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 975934.674761,
+      "logSha256": "6ec70b54bdff68db4983058b23c264d2267e967eb15e2a3a82bd763ecdca63ab"
+    },
+    "sitesUnchangedIsolatedRetry": {
+      "command": "NODE_ENV=test node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-reporter=tap tests/banking-security.test.mjs (cwd: sites)",
+      "exitCode": 0,
+      "tests": 130,
+      "suites": 0,
+      "pass": 130,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 57351.115256,
+      "logSha256": "4b279e8591d14023a831a671eb87e0b96ff5dccd54258efe9a76bc146d22f7d9"
+    },
+    "bridgeFull": {
+      "command": "NODE_ENV=test npm --prefix bridge/bankgiro run test:isolated",
+      "exitCode": 0,
+      "tests": 47,
+      "suites": 0,
+      "pass": 47,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 14851.666516,
+      "logSha256": "ab9def6cadac7dfbeafb9181b3be70150ac5ac05ebae2bd7377bdbe9e32cb470"
+    },
+    "node22Focused": {
+      "command": "Node 22.13.0: reconciliation-decisions.test.js + reconciliation-batch-integration.test.js with the isolation preload",
+      "exitCode": 0,
+      "tests": 38,
+      "suites": 0,
+      "pass": 38,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 1148.663466,
+      "logSha256": "33edaf2488fe32a20a0585631911a21a715c9f7d5397f31305340949650aadf0"
+    },
+    "sites22Focused": {
+      "command": "Node 22.13.0: banking-security, reconciliation-decisions, reconciliation-batch-integration, reconciliation-manual-provenance, reconciliation-csv-reference, bank-account-consent with the isolation preload",
+      "exitCode": 0,
+      "tests": 206,
+      "suites": 0,
+      "pass": 206,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 73633.952715,
+      "logSha256": "2007458edb60813154235d78456a2cc1f521ce6b807753144fab3288951685c9"
+    }
+  },
+  "distinctLocalCoverage": {
+    "node": 1937,
+    "sites": 3811,
+    "bridge": 47,
+    "total": 5795,
+    "sitesRetryOverlap": 70,
+    "isSuccessfulSingleFullSitesRun": false
+  },
+  "checks": {
+    "nodeSyntax": {
+      "exitCode": 0,
+      "files": 173,
+      "logSha256": "0761d2fd9757d492967a4b39444b967f646093a4b86c96aa5c22a0f3a4fc09c9"
+    },
+    "sitesTypes": {
+      "exitCode": 0,
+      "logSha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c"
+    },
+    "bridgeSyntax": {
+      "exitCode": 0,
+      "logSha256": "4843392301f472bd2f730e36101d1b9fe29803f87b6286f8407882e6188d1340"
+    },
+    "minimatchExactBytes": {
+      "exitCode": 0,
+      "targets": 1,
+      "writes": 0,
+      "logSha256": "03436c145f530b2840b889abbdfdc8cc588772302aa0ee8e3a20bf5daf58620c"
+    },
+    "sitesSequentialBuild": {
+      "exitCode": 0,
+      "logSha256": "c594928400510ee2d813e5c95e6e1a007161f282ccb2cb277fc811f9eb1b5238"
+    },
+    "earlierParallelBuild": {
+      "exitCode": 137,
+      "logSha256": "2b51c8d51543b81551618c26ffdab3d688dfac18cca3b5589c825a6ba2278bdb"
+    }
+  },
+  "audits": {
+    "node": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "logSha256": "3a562f88d81e7f36d2e3d0d1a86abf500fdf10272f5f713a155b3602d8ebf832"
+    },
+    "sites": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 8,
+        "high": 0,
+        "critical": 0,
+        "total": 8
+      },
+      "logSha256": "cc3c964c3e51f9b56d51500896ed239fd436e085666a136c9f3611a87ace2412"
+    },
+    "sitesProduction": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "logSha256": "fb1002a0db3061e57cdda8ba78ca035b50f88f3e1c235c2ed306eacc4024bb91"
+    },
+    "bridge": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "logSha256": "74b9f06500613f856683fe87b372f7b3592c019e4cffdf8c3c63069a75dc0ec1"
+    }
+  },
+  "measurementFiles": {
+    "before.json": "176d0d348e594892dfb81bcf74b3e08d976a23760e62e82ce55b7abbf2caa841",
+    "after.json": "18e4079195d4a243b98c3404e8c103376bf71e452ca18daca96f6b2f3a014d2b"
+  },
+  "limitations": [
+    "The original local Sites full run failed at file level after 70 successful banking-security subtests. Its unchanged standalone rerun passed all 130 cases. The precise process failure cause was not established.",
+    "The 70 repeated cases are deducted; neither the failed full run nor the separate Node 22 focused runs are counted as an additional successful full Sites run.",
+    "The actual PR check status records the complete remote Node 22 acceptance. No CI success is inferred by this local receipt.",
+    "Synthetic fixtures and bounded static reviews do not establish production bank provenance, population error rates, a complete historical evidence reconstruction, or a production score of 9.5."
+  ]
+}

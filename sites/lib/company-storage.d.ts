@@ -1,4 +1,5 @@
 import type {CompanyAction,CompanyContext,CompanyDataBoundary,CompanyRole} from './company-contract.js';
+import type {OpenPaymentsTokenFence} from './banking/openpayments/token-coordinator-fence.js';
 export interface CompanyScope {readonly kind:'legacy'|'legacy-worker'|'company'|'worker';readonly owner:string;readonly actorId:string;readonly action:CompanyAction;readonly context:Readonly<CompanyContext>|null;readonly grant?:{id:string;version:number;runner:string;credentialHash:string};readonly legacyCredential?:{runner:string;credentialHash:string};}
 export interface CompanyDirectory {version:'company-context-v1';companies:Array<{id:string;name:string;role:CompanyRole;membershipVersion:number;companyVersion:number}>;activeCompanyId:string|null;contextVersion:number;context?:Readonly<CompanyContext>;legacy?:true;selectionRequired?:true;actorId?:string;}
 export const ownerTables:readonly string[];
@@ -14,3 +15,5 @@ export function resolveWorkerCredential(database:D1Database,runner:string,creden
 export function boundaryForScope(database:D1Database,scope:CompanyScope,owner:string):Promise<Readonly<CompanyDataBoundary>|null>;
 export function resolveCompanyMailbox(configuration:unknown,options:{context:CompanyContext|null;legacyOwner?:string|null;legacyAccount:string;required?:boolean}):string|null;
 export function createCompanyDatabase(database:D1Database,getScope:()=>Promise<CompanyScope>|CompanyScope):D1Database;
+/** Opaque fixed assertion; no SQL or row data is accepted or returned. */
+export function companyApplicationTokenFence(database:D1Database,capability:OpenPaymentsTokenFence):D1PreparedStatement;

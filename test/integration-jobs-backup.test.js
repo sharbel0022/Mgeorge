@@ -34,8 +34,14 @@ test('encrypted recovery preserves the complete job schema, receipts and retry b
   assert.equal(restoreBackup(archive,target,key).restored,true);
   restored=new DatabaseSync(target);
 
-  // Assert exact storage before opening a coordinator can recover expired work.
-  assert.deepEqual(census(restored),before.census);
+  // Recovery adds exactly one explicit app-token quarantine table. Every
+  // pre-existing job table/column/row still has to match without exclusions.
+  const expectedCensus=[...before.census.map(row=>({...row})),{name:'company_application_token_control'}].sort((a,b)=>a.name.localeCompare(b.name));
+  assert.deepEqual(census(restored).map(row=>({...row})),expectedCensus);
+  const gate={...restored.prepare('SELECT * FROM company_application_token_control').get()};
+  assert.match(gate.restore_marker,/^[a-f0-9]{64}$/);
+  assert.deepEqual(gate,{id:1,revision:1,recovery_required:1,restore_marker:gate.restore_marker,recovery_evidence:''});
+  assert.equal(restored.prepare('SELECT COUNT(*) n FROM company_application_token_control').get().n,1);
   assert.deepEqual(schema(restored),before.schema);
   assert.deepEqual(rows(restored),before.rows);
   assert.deepEqual(rows(db),before.rows,'creating and restoring the archive does not activate source jobs');
@@ -61,7 +67,8 @@ test('encrypted recovery preserves the complete job schema, receipts and retry b
   assert.equal(abandoned.lastSuccessAt,null);assert.equal(abandoned.attemptCount,1);assert.equal(abandoned.fenceVersion,1);
   assert.equal(recovered.running('bank:synthetic-abandoned'),false);
   assert.equal(recovered.due('bank:synthetic-abandoned',0,60_000),false);
-  assert.deepEqual(census(restored),before.census,'coordinator reopen adds no additional table');
+  assert.deepEqual(census(restored).map(row=>({...row})),expectedCensus,'coordinator reopen adds no additional table');
+  assert.deepEqual({...restored.prepare('SELECT * FROM company_application_token_control').get()},gate,'job recovery does not reactivate app tokens');
   assert.deepEqual(schema(restored),before.schema);
   assert.deepEqual(rows(db),before.rows,'recovery changes only the isolated restored database');
 });

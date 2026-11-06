@@ -70,6 +70,54 @@ async function fixture(t,view='bank'){
  f.render();await flush();assert.equal(f.reads.length,1);return f;
 }
 const noEmptyClaims=html=>{assert.doesNotMatch(html,/<dd>0<\/dd>|>0 fakturor<|0,00|Lägg till din första faktura|Inga bankhändelser ännu|Inga fakturor matchar filtret|Inga bankhändelser matchar ditt filter/);};
+
+test('95 UI loading shell does not flash the default company identity before its own read',async t=>{
+ const f=await fixture(t,'receivable');const navigation=f.find(node=>node.props?.onNavigate&&node.props?.company);
+ assert.doesNotMatch(JSON.stringify(navigation.props.company),/M\.George|mg\.vitvaror@gmail\.com/);
+ await f.respond(200,populatedState());assert.equal(f.find(node=>node.props?.onNavigate&&node.props?.company).props.company.name,'Synthetic workspace');
+});
+
+test('95 UI a failed workspace read asks for retry instead of inventing a sign-out',async t=>{
+ const f=await fixture(t,'overview');
+ await f.respond(503);
+ assert.doesNotMatch(text(f.tree),/Logga in för att spara dina uppgifter|Logga in med ChatGPT/);
+ const retry=f.refresh();await flush();await f.respond(401);await retry;
+ assert.match(text(f.tree),/Logga in för att spara dina uppgifter/);
+});
+
+for(const direction of ['receivable','payable'])test(`95 UI ${direction} no-match search recovers the existing list without a create action`,async t=>{
+ const f=await fixture(t,direction),state=populatedState(),before=JSON.stringify(state);
+ await f.respond(200,state);
+ f.find(node=>node.props?.['aria-label']==='Sök fakturor').props.onChange({target:{value:'INVOICE-DOES-NOT-EXIST'}});await flush();
+ const html=f.listHtml();assert.match(html,/Rensa sökning och filter/);assert.doesNotMatch(html,/Lägg till faktura/);
+ const empty=f.find(node=>node.type?.name==='Empty');
+ empty.props.action.props.onClick();await flush();
+ assert.match(f.listHtml(),new RegExp('Synthetic '+direction));
+ assert.equal(f.find(node=>node.props?.['aria-label']==='Sök fakturor').props.value,'');
+ assert.equal(JSON.stringify(state),before);
+ assert.equal(f.requests.some(request=>request.method!=='GET'),false);
+});
+
+for(const view of ['settings','history','connections','bank'])test(`95 UI ${view} header has no unrelated invoice-create or import action`,async t=>{
+ const f=await fixture(t,view);await f.respond(200,populatedState());
+ const heading=f.find(node=>node.props?.className==='page-heading');
+ assert.ok(heading);assert.doesNotMatch(text(heading),/Ny faktura|Importera Bankgirofil/);
+});
+
+test('95 UI signed-out review requests sign-in instead of claiming an active queue fetch',async t=>{
+ const f=await fixture(t,'review');await f.respond(401);
+ const review=f.find(node=>node.type?.name==='ControlReview');assert.ok(review);
+ assert.equal(review.props.readStatus,'signed_out');assert.equal(review.props.data,null);
+});
+test('95 UI workspace pending, failure and recovery preserve the same review component',async t=>{
+ const f=await fixture(t,'review');await f.respond(200,populatedState());
+ const review=()=>f.find(node=>node.type?.name==='ControlReview'),type=review().type;
+ assert.equal(review().props.readStatus,'ready');
+ f.refresh();await flush();assert.equal(review()?.type,type);assert.equal(review().props.readStatus,'pending');
+ await f.respond(503);assert.equal(review()?.type,type);assert.equal(review().props.readStatus,'failed');
+ void review().props.retry();await flush();await f.respond(200,populatedState());
+ assert.equal(review()?.type,type);assert.equal(review().props.readStatus,'ready');
+});
 const labels={bank:'bankhändelser',receivable:'kundfakturor',payable:'leverantörsfakturor'};
 const syntheticRow={bank:'Synthetic bank payer',receivable:'Synthetic receivable',payable:'Synthetic payable'};
 for(const view of Object.keys(labels)){

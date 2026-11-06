@@ -1,6 +1,11 @@
 import {isReadOnlySql} from './company-compat-fixture.mjs';
 import assert from 'node:assert/strict';
-import {existsSync,readFileSync,readdirSync} from 'node:fs';
+import {after} from 'node:test';
+import {createHash} from 'node:crypto';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {existsSync,mkdtempSync,readFileSync,readdirSync,rmSync,writeFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {DatabaseSync} from 'node:sqlite';
 import {emptyState,applyCommand} from '../../lib/domain.ts';
@@ -10,7 +15,18 @@ import {makeBankgiroXLSX} from './bankgiro-xlsx-fixture.mjs';
 import {syntheticCamt} from './camt-integrity.mjs';
 import {parseSpecificationBytes} from '../../lib/bankgiro-parser.js';
 
-const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
+// One private directory preserves identical module identities across this fixture
+// and the manual-allocation fixture without recursively embedding source in URLs.
+const moduleDirectory=mkdtempSync(join(tmpdir(),'mg-reconciliation-modules-'));
+after(()=>rmSync(moduleDirectory,{recursive:true,force:true}));
+export const fixtureModuleUrl=code=>{
+ const bytes=Buffer.from(code),file=join(moduleDirectory,createHash('sha256').update(bytes).digest('hex')+'.mjs');
+ if(existsSync(file)){
+  if(!readFileSync(file).equals(bytes))throw Error('Synthetic module hash collision');
+ }else writeFileSync(file,bytes,{mode:0o600,flag:'wx'});
+ return pathToFileURL(file).href;
+};
+const data=fixtureModuleUrl;
 const url=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports){
  let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});

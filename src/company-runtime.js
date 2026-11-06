@@ -49,6 +49,16 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
  controlDb.exec('BEGIN IMMEDIATE');
  try{
   controlDb.exec(readFileSync(new URL('../migrations/node/0001_company_catalog.sql',import.meta.url),'utf8'));
+  // A first installation can bootstrap metadata. A previously present but
+  // damaged gate must never be silently reset by INSERT OR IGNORE on restart.
+  const tokenControl=controlDb.prepare("SELECT type FROM sqlite_master WHERE name='company_application_token_control' COLLATE NOCASE").get();
+  const tokenState=controlDb.prepare("SELECT type FROM sqlite_master WHERE name='company_application_tokens' COLLATE NOCASE").get();
+  if(tokenState&&!tokenControl||tokenControl&&tokenControl.type!=='table'||tokenState&&tokenState.type!=='table')throw fail('APPLICATION_TOKEN_STORAGE_UNAVAILABLE',503);
+  if(tokenControl){
+   const gates=controlDb.prepare('SELECT * FROM company_application_token_control').all(),gate=gates[0];
+   if(gates.length!==1||gate.id!==1||!Number.isSafeInteger(gate.revision)||gate.revision<1||![0,1].includes(gate.recovery_required)||typeof gate.restore_marker!=='string'||gate.restore_marker.length>100||typeof gate.recovery_evidence!=='string'||gate.recovery_evidence.length>200)throw fail('APPLICATION_TOKEN_STORAGE_UNAVAILABLE',503);
+  }
+  controlDb.exec(readFileSync(new URL('../sites/lib/banking/openpayments/token-coordinator.schema.sql',import.meta.url),'utf8'));
   const boundary=readCompanyDatabaseBoundary(controlDb);
   if(boundary){
    const binding=controlDb.prepare("SELECT company_id,storage_owner FROM companies WHERE database_key='legacy'").get();
@@ -140,6 +150,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   }
  }
  function operation(scope,bundle,sql,execute,forceWrite=false){
+  denyApplicationTokenSql(scope,sql);
   const action=!forceWrite&&readOnlySql(sql)?'read':'write';
   if(!scope&&storage.getStore())throw fail('company_context_mismatch');
   if(scope?.initializing||!scope){return execute();}
@@ -150,6 +161,30 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
   catch(error){if(catalogLock)controlDb.exec('ROLLBACK');throw error;}
  }
  function capture(){const scope=storage.getStore(),bundle=scope?.bundle||legacyBundle;return {scope,bundle};}
+ function denyApplicationTokenSql(scope,sql){if(scope&&!scope.initializing&&/\bcompany_application_tokens?\b|\bcompany_application_token_control\b/i.test(String(sql)))throw fail('company_control_plane_access_denied');}
+ /** A data export is a permitted read with one fixed, append-only audit effect.
+  * This capability accepts no SQL, event name, details or tenant selector and
+  * does not confer write permission through the ordinary database proxy. */
+ function recordDataExport(){
+  const {scope,bundle}=capture();
+  if(!scope||scope.initializing||bundle.transactionScope)throw fail('company_context_mismatch');
+  assertScope(scope,'read');
+  let catalogLocked=false,dataLocked=false;
+  try{
+   if(bundle.db!==controlDb){controlDb.exec('BEGIN IMMEDIATE');catalogLocked=true;}
+   bundle.db.exec('BEGIN IMMEDIATE');dataLocked=true;
+   assertScope(scope,'read');
+   const c=scope.context,details=c?{companyId:c.companyId,actorId:c.actorId,membershipVersion:c.membershipVersion}:{};
+   bundle.db.prepare('INSERT INTO audit_events(id,action,details) VALUES(?,?,?)').run(randomUUID(),'data_exported',JSON.stringify(details));
+   assertScope(scope,'read');
+   bundle.db.exec('COMMIT');dataLocked=false;
+   if(catalogLocked){controlDb.exec('COMMIT');catalogLocked=false;}
+  }catch(error){
+   if(dataLocked)try{bundle.db.exec('ROLLBACK');}catch{}
+   if(catalogLocked)try{controlDb.exec('ROLLBACK');}catch{}
+   throw error;
+  }
+ }
  function clearTransaction(bundle){bundle.transactionScope=null;bundle.catalogTransaction=false;bundle.transactionToken=null;bundle.savepoints=[];bundle.transactionMode=null;}
  function abortTransaction(bundle){
   try{bundle.db.exec('ROLLBACK');}catch{}
@@ -190,7 +225,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
     };
    }
    if(key==='prepare')return sql=>{
-    const {scope,bundle}=capture();assertScope(scope,readOnlySql(sql)?'read':'write');
+    const {scope,bundle}=capture();denyApplicationTokenSql(scope,sql);assertScope(scope,readOnlySql(sql)?'read':'write');
     const statement=bundle.db.prepare(sql);
     const effectiveScope=()=>{
      if(!scope?.initializing||storage.getStore()===scope)return scope;
@@ -210,6 +245,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
    };
    if(key==='exec')return sql=>{
     const {scope,bundle}=capture();
+    denyApplicationTokenSql(scope,sql);
     if(!scope||scope.initializing)return bundle.db.exec(sql);
     if(/^\s*BEGIN(?:\s+IMMEDIATE|\s+DEFERRED|\s+EXCLUSIVE)?\s*;?\s*$/i.test(sql)){
      if(bundle.transactionScope)throw fail('company_transaction_nested',409);
@@ -278,7 +314,7 @@ export function createCompanyRuntime({controlDb,legacyDatabasePath,companyDirect
    has(_target,key){return key in services()[name];},
    getOwnPropertyDescriptor(_target,key){const descriptor=Reflect.getOwnPropertyDescriptor(services()[name],key);return descriptor?{...descriptor,configurable:true}:undefined;}
   });},
-  resolve:resolveContext,run,
+  resolve:resolveContext,run,recordDataExport,
   runJob(context,callback,options={}){return run(context,callback,{...options,job:true});},
   assert(action='read'){assertScope(storage.getStore(),action);},
   databasePath(context){return getBundle(context).path;},

@@ -1,0 +1,128 @@
+{
+  "scope": "banking-security test harness only; no product edits, no assertion edits, no commit",
+  "runtime": "Node v24.22.1",
+  "isolation": {
+    "nodeEnv": "test",
+    "networkGuard": "scripts/saas-test-isolation.mjs",
+    "testConcurrency": 1,
+    "environment": "same explicit allowlist as run_security_gate.py; direct node launch"
+  },
+  "originalFileProcessFailure": {
+    "exitCode": "unknown",
+    "signal": "unknown",
+    "reason": "Original spec output suppressed child error fields; subsequent instrumented bank runs did not reproduce the file failure. OOM is not established."
+  },
+  "beforeFullDiagnostic": {
+    "startedAt": "2026-11-05T18:29:59.379031+00:00",
+    "completedAt": "2026-11-05T18:37:38.745579+00:00",
+    "elapsedSeconds": 459.3665481640055,
+    "nodeExitCode": 1,
+    "summary": {
+      "success": false,
+      "counts": {
+        "tests": 3870,
+        "failed": 1,
+        "passed": 3869,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "topLevel": 3825,
+        "suites": 0
+      },
+      "duration_ms": 458533.725311
+    },
+    "oomKillBefore": 73,
+    "oomKillAfter": 73
+  },
+  "beforeBank": {
+    "summary": {
+      "success": true,
+      "counts": {
+        "tests": 168,
+        "failed": 0,
+        "passed": 168,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "topLevel": 168,
+        "suites": 0
+      },
+      "duration_ms": 56208.325962,
+      "file": "sites/tests/banking-security.test.mjs",
+      "entryFile": "sites/tests/banking-security.test.mjs"
+    },
+    "sampledPeakResidentKiB": 2508420
+  },
+  "afterBankRun": {
+    "startedAt": "2026-11-05T18:39:12.856432+00:00",
+    "completedAt": "2026-11-05T18:39:50.117859+00:00",
+    "elapsedSeconds": 37.261426253004174,
+    "nodeExitCode": 0,
+    "summary": {
+      "success": true,
+      "counts": {
+        "tests": 168,
+        "failed": 0,
+        "passed": 168,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "topLevel": 168,
+        "suites": 0
+      },
+      "duration_ms": 36359.476393
+    },
+    "oomKillBefore": 73,
+    "oomKillAfter": 73
+  },
+  "afterBank": {
+    "sampledPeakResidentKiB": 578420,
+    "rusageMaxResidentKiB": 578420
+  },
+  "rssMeasurement": "Same external once-per-second /proc/PID/status VmHWM sampling of the test-file child, in KiB",
+  "sampledRssReductionPercent": 76.9409,
+  "knownDiagnosticEnvironmentFailure": {
+    "test": "ordinary npm postinstall applies actual bytes without changing package/audit identity",
+    "file": "sites/tests/minimatch-entrypoints-final.test.mjs",
+    "failure": "Direct node launch lacked npm_execpath; existing fallback selected nonexistent npm-cli.js in the managed runtime. Exactly one test failed. This diagnostic run is not a passing full gate.",
+    "sourceChangedToAccommodate": false
+  },
+  "fixtureCleanup": {
+    "observed_dirs": 1,
+    "dir_modes": [
+      "0o700"
+    ],
+    "file_modes": [
+      "0o600"
+    ],
+    "max_files": 1775,
+    "all_observed_dirs_removed": true
+  },
+  "sourceChange": {
+    "testFile": "sites/tests/banking-security.test.mjs",
+    "beforeHead": "cc50423315ba506f4e9f2cd8e5c5ef089dbe6269",
+    "beforeSha256": "5369c3a4be25f4ac3f4bca2b0fd41e517b223250e8b7524623e7900372f16eff",
+    "afterSha256": "c19a1b2f969dd8a6394f12558a77b581073be519d05316ed97b8a07ba443f9f5",
+    "unchangedCompiledModuleAndTestsSha256": "7df52c38bb098989d1e18bebcb83f95316c233fb8dd39a9717aabf7c22f2bcfe",
+    "allOriginalTestBodiesAndAssertionsUnchanged": true,
+    "productionFilesChanged": false
+  },
+  "logSha256": {
+    "security-sites-diag-full.log": "20bc187c9101028445665388f644d33821f62ab9f6bb41e5c2c43a5df9f215d8",
+    "security-sites-diag-full-events.jsonl": "629cca8f0c4e05202f7a0093ea9a9901e167d15a04014025f02cb3e4a76e822e",
+    "security-sites-diag-full-resources.jsonl": "76593933ef9b51009ec92694472815c849eb9dee1a733e9e0e88e2b2ccbe0aff",
+    "security-bank-diag-fixed.log": "97c1e0eaf0ad23e8b99daf1bffcb041b1f3b12f4fe4354647acd33a771f42a10",
+    "security-bank-diag-fixed-events.jsonl": "c9a84d1538514ebb65bcacd44b0d8b6124632faa48312155d7ca9f832929a420",
+    "security-bank-diag-fixed-resources.jsonl": "1414faacd76f6f986059b491a9b5997cfb8a687a3587c1252dc6456dba860f18",
+    "security-bank-fixture-module-files.patch": "ed4aca71d5f5e759d77f81f6cf12de3a7e4fe12cb016e6e07a12c5e739bb845a",
+    "security-sites-diag-full-run.py": "bc115a5e29c9b1539380354e16c0db64c768b75b680bc7e6c6237359dfd5e8c1",
+    "security-bank-diag-fixed-run.py": "585a6562ba7a7a966b1c521e1a578e23195031b6faa182dac5571d2bd37db4a5"
+  },
+  "limits": [
+    "No kernel kill record was recoverable: dmesg denied and cgroup memory files unavailable.",
+    "Global oom_kill stayed 73 throughout the instrumented full run and fixed bank run; this does not identify the cause of earlier failures.",
+    "Normal-exit temporary cleanup was verified on Linux; forced SIGKILL cannot execute Node after hooks.",
+    "Final full npm-run gate, focused acceptance and exact final Node22 CI are recorded separately in the security report and PR #54."
+  ],
+  "timestampBasis": "Start sampled with time.time(); completion derived from start plus time.monotonic() elapsed."
+}

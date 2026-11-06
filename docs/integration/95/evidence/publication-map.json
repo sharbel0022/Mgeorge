@@ -1,0 +1,66 @@
+{
+  "branch": "feature/95-integration",
+  "initial_remote_head": "9a531daf4eb09a36d9212d4a38e7eef7fa251b28",
+  "published_code_head": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+  "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+  "steps": [
+    {
+      "local": "bef9b058df80a10ecc244754f46716241887c0b4",
+      "published": "6c403fd53e4f3cbf39cdd0974e00e30cc9db7168",
+      "tree": "d4000485c11b1081cba933c8d38558ccf6bff6b3"
+    },
+    {
+      "local": "c633a799f84db25c5a719a97d18352cf032bbfb9",
+      "published": "88cf8e9817bd37e84e387adf57c5490d5837f5ca",
+      "tree": "bd6ae2c3455b589138b8999ae4ce92cf1a4a0b78"
+    },
+    {
+      "local": "f15e781458aac4dcc8b6f199e1417b28accc858c",
+      "published": "17b4a893f0ca650de494dc4bf6a8ec7ccab21c5c",
+      "tree": "4f16e2aa4b0aae2a99c67d800efd59d9cde2b9b6"
+    },
+    {
+      "local": "a0c525bff9f88599f4b43208bc79d1a4a6f8cf8d",
+      "published": "ea519a206e30bade163ae6520cd7034db9c0beee",
+      "tree": "7e126ddb7c991c03124bd7d52e45becce37a0316"
+    },
+    {
+      "local": "79244fc86569e55965ea3e162f4b200cadbed949",
+      "published": "c02d2b5866148c26a5edaa458b36d8aa93386244",
+      "tree": "a1d925d770ddb6664437c76a8da9fb6152f06b83"
+    },
+    {
+      "local": "aa05764ea6fc7cc2051dbeae79d6360f259b435b",
+      "published": "4095e3de87c94ce9312e18844437dfb65e854cd5",
+      "tree": "81f349ab5f46e3ceb703677db48ed656a5163133"
+    },
+    {
+      "local": "7d9b0c52c2e05e2dd861df16d9bee021e3cc8df6",
+      "published": "88c8242dad5dce9c8722bde2561deb3a475854ad",
+      "tree": "d32c35c537df42acedfb7d61b35380ed6dbebca0"
+    },
+    {
+      "local": "5414e2269913e37c58e0e0cff1bf260c31b2a35f",
+      "published": "4ebd3994837eb248de0a18e53a9d2d4391e23419",
+      "tree": "c37b15b8b97f0c86c96bda524126a828168049bd"
+    },
+    {
+      "local": "8fa3ed8b12f1789308cfd608cbbeacbc04a685eb",
+      "published": "eac09480371cb30a08e6c6622daee9fe8de67a8c",
+      "tree": "60d1d389b492bfc2b42bfdfe113f916facba4e45"
+    },
+    {
+      "local": "1e510281ccc57b02608c9cb1a0570437c65237e9",
+      "published": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+      "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c"
+    }
+  ],
+  "method": "Each reviewed local merge was recreated as a GitHub commit with identical tree and preserved second parent; final ref used expected-head compare-and-swap without force.",
+  "documentation_successor_pr46": {
+    "head": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+    "code_predecessor": "732bfb3f16abde42c19bcef796ec1070cb3e7a09",
+    "tree": "787259588ce9d33ecb49a8859d34922e0f3033b1",
+    "changed_files": 3,
+    "runtime_and_test_changes": 0
+  }
+}

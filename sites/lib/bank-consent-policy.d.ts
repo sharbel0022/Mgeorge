@@ -97,6 +97,28 @@ export function planAccountUsageDetailsRead(error: unknown, input: unknown, now?
 export function observeAccountUsageDetails(plan: unknown, uid: string, details: unknown):
   Readonly<{status: 'observed'; category: keyof BankAccountUsageCounts}> |
   Readonly<{status: 'unavailable'; reason: AccountUsageDetailsObservationReason}>;
+/** Fixed non-sensitive predicate identifiers; no account or provider values. */
+export type ConsentDiagnosticReason = 'SAVED_ACCOUNT_DATA_INVALID' | 'CURRENT_ACCOUNT_DATA_INVALID' |
+  'SAVED_ACCOUNT_USAGE_INVALID' | 'CURRENT_ACCOUNT_USAGE_INVALID' | 'SAVED_ACCOUNT_IDS_INVALID' |
+  'CURRENT_ACCOUNT_IDS_INVALID' | 'CURRENT_ACCOUNT_DETAILS_INVALID' | 'CURRENT_ACCOUNT_INVENTORY_MISMATCH' |
+  'CONSENT_ACCOUNT_INVENTORY_CHANGED' | 'ACCOUNT_IDENTITY_CHANGED' | 'SELECTED_ACCOUNT_IDS_INVALID' |
+  'SELECTED_ACCOUNT_UNAVAILABLE';
+export type ConsentDiagnostic = Readonly<{ code: string; message: string; status: number; reason: ConsentDiagnosticReason | null }>;
+export function consentDiagnostic(error: unknown): ConsentDiagnostic | null;
+export function storedConsentDiagnostic(code: unknown, reason?: unknown): Omit<ConsentDiagnostic, 'status'> | null;
+export type StoredEnableConnectionHealth = {
+  status: 'connected' | 'disconnected' | 'configuration_required' | 'revocation_pending' | 'reauth_required' |
+    'expired' | 'corporate_authorization_required' | 'pending_account' | 'error';
+  connected: boolean; syncAllowed: boolean; requiresReauthentication: boolean;
+  blockedReason: string | null;
+  nextAction: 'connect' | 'configure_service' | 'complete_revocation' | 'reconnect' | 'verify_company_authority' |
+    'select_accounts' | 'inspect_connection' | 'none';
+  evidence: 'stored_connection';
+};
+export function storedEnableConnectionHealth(input: {
+  present: boolean; status?: string; validUntil?: unknown; applicationReady: boolean; generationMatches: boolean;
+  storageReady: boolean; companyRequired: boolean; companyAuthorized: boolean; selectedAccountUids: unknown;
+}, now?: number): StoredEnableConnectionHealth;
 export function legacyCompanyContext(actorId: string, requestedCompanyId?: unknown): CompanyBankContext;
 export function assertCompanyBankAccess(context: CompanyBankContext, input: {
   actorId: string; companyId: string; action: 'read' | 'manage';

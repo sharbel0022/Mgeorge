@@ -41,7 +41,7 @@ const command=extra=>({type:'transactions.import',documentId:'original',hash:'fo
 test('generic CSV confirmation reparses original instead of trusting browser payer, OCR, amount or provenance',async t=>{
  const f=await fixture(t),response=await route.POST(request(command({trustedBankImport:true,trustedBankFileImport:true}))),result=await response.json();
  assert.equal(response.status,200);const tx=result.state.transactions[0];assert.equal(tx.party,'Verklig kund AB');assert.equal(tx.payerReference,'000018');assert.equal(tx.amount,62500);assert.equal(tx.bankReference,'BANK-ID');assert.equal(tx.evidence,'bank_file');
- assert.equal(presentation.bankPaymentView(result.state,tx).payer,'Verklig kund AB');const shown=presentation.bankPaymentView(result.state,tx).reference;assert.equal(shown.value,'000018');assert.equal(shown.kind,'ocr');assert.equal(shown.ocr,'');assert.match(shown.ocrIssue,/motstridiga/);assert.equal(tx.verified,false);assert.equal(result.state.imports[0].name,'Bank.csv');assert.notEqual(result.state.imports[0].hash,'forged-hash');
+ assert.equal(presentation.bankPaymentView(result.state,tx).payer,'Verklig kund AB');const shown=presentation.bankPaymentView(result.state,tx).reference;assert.equal(shown.value,'000018');assert.equal(shown.kind,'ocr');assert.equal(shown.ocr,'000018');assert.equal(shown.ocrIssue,undefined);assert.equal(tx.verified,false);assert.equal(result.state.imports[0].name,'Bank.csv');assert.notEqual(result.state.imports[0].hash,'forged-hash');
  assert.doesNotMatch(JSON.stringify(tx),/Påhittad|999998|FORGED/);assert.equal(f.sql.prepare('SELECT COUNT(*) AS n FROM audit_events').get().n,1);
 });
 

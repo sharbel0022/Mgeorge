@@ -21,8 +21,9 @@ test('the synthetic drill measures a resumed, authenticated full recovery agains
  assert.equal(result.sourceUnchanged,true);
  assert.equal(result.otherOwnerExcluded,true);
  assert.equal(result.authorizationAndTransientRowsAbsent,true);
+ assert.equal(result.applicationTokenRecoveryBlocked,true);
  assert.equal(result.workerLeasesInvalidated,true);
- assert.deepEqual(result.rejectionChecks.map(check=>check.case),['wrong_key','wrong_owner','wrong_company','corrupt_original','missing_original','altered_ledger','altered_plaintext_original','foreign_owner_row']);
+ assert.deepEqual(result.rejectionChecks.map(check=>check.case),['wrong_key','wrong_owner','wrong_company','corrupt_original','missing_original','altered_ledger','altered_plaintext_original','foreign_owner_row','reactivated_application_issuer','retained_application_token']);
  assert.ok(result.rejectionChecks.every(check=>check.rejected));
  assert.ok(result.rejectionChecks.filter(check=>check.stage==='restore').every(check=>check.outputCreated===false));
 });

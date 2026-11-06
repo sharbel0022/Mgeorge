@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
-import {emptyState} from '../lib/domain.ts';
+import {applyCommand,emptyState} from '../lib/domain.ts';
 import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 
 const data=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
@@ -44,7 +44,7 @@ function fixture(t,{state=syntheticState(),available=true}={}){
  const focusable=name=>({name,focus(){f.active=this;}});
  f.inputNode=focusable('input');
  const shell={querySelector(selector){assert.equal(selector,'input');return f.inputNode;},querySelectorAll(selector){assert.equal(selector,'[data-search-result]');return f.resultNodes;}};
- f.props={state,available,open:modal=>f.opened.push(modal)};
+ f.props={state,available,open:modal=>{f.focusAtOpen=f.active;f.opened.push(modal);}};
  f.render=(changes={})=>{
   f.props={...f.props,...changes};f.cursor=0;f.tree=Search(f.props);f.tree.props.ref.current=shell;
   f.input=elements(f.tree).find(node=>node.type==='input');
@@ -97,6 +97,13 @@ test('result activation uses native buttons and leaves Enter, Space and Tab unha
  for(const key of ['Enter',' ','Tab']){assert.equal(f.press(key).prevented,false);assert.equal(f.active,f.resultNodes[0]);assert.deepEqual(f.opened,[]);}
  // Browser-native Enter/Space dispatch the button click; this harness deliberately
  // does not recreate that behavior or claim a browser keyboard acceptance test.
+});
+
+test('95 UI activating a search result leaves a stable input as the dialog return target',t=>{
+ const f=fixture(t);f.type('synthetic');f.press('ArrowDown');
+ assert.equal(f.active,f.resultNodes[0]);f.click(0);
+ assert.equal(f.focusAtOpen,f.inputNode,'The soon-to-be-removed result must not be the dialog return target');
+ assert.equal(f.active,f.inputNode);assert.equal(f.region(),undefined);
 });
 
 for(const [kind,index,id]of [['detail',2,'invoice-3'],['tx',5,'bank-2']])test(`selecting a ${kind} result opens only its exact modal and clears the search`,t=>{
@@ -164,4 +171,16 @@ test('production search displays both interpretations of an ambiguous amount and
  assert.match(text(f.results[1]),/OTHER/);assert.match(text(f.results[1]),/123\s456,00/);
  assert.deepEqual(f.opened,[]);f.press('Enter');assert.deepEqual(f.opened,[]);
  f.click(0);assert.deepEqual(f.opened,[{kind:'detail',id:'short-number'}]);
+});
+
+test('a decimal invoice number accepted by the domain remains an explicit search result',t=>{
+ let state=emptyState();
+ for(const [number,total]of [['OTHER',202601],['2026.01',62500]])state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic company',number,total,issued:'2026-11-05',due:'2026-12-05',reviewed:true}}).state;
+ const [amount,reference]=state.invoices;
+ assert.equal(reference.number,'2026.01');
+ const f=fixture(t,{state});f.type('2026.01');
+ assert.deepEqual(f.results.map(result=>result.key),[reference.id,amount.id]);
+ assert.deepEqual(f.opened,[]);f.press('Enter');assert.deepEqual(f.opened,[]);
+ f.type('2026.01 SEK');assert.deepEqual(f.results.map(result=>result.key),[amount.id]);
+ f.type('2026.01');f.click(0);assert.deepEqual(f.opened,[{kind:'detail',id:reference.id}]);
 });

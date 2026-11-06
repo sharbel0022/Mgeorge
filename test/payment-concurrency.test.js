@@ -4,6 +4,7 @@ import {spawn} from 'node:child_process';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {DatabaseSync} from 'node:sqlite';
 import {openDatabase,listInvoices,listTransactions,storeTransactions} from '../src/db.js';
 import {runReconciliation} from '../src/reconciliation.js';
 import {parseCSV} from '../src/importers.js';
@@ -27,30 +28,94 @@ process.on('message',message=>{
 process.send({ready:true});
 `;
 
-function worker(path,t){
-  const child=spawn(process.execPath,['--input-type=module','--eval',childSource,path],{stdio:['ignore','ignore','pipe','ipc'],windowsHide:true});
-  t.after(()=>{if(child.exitCode===null)child.kill();});
+function worker(path,t,script=childSource){
+  const child=spawn(process.execPath,['--input-type=module','--eval',script,path],{stdio:['ignore','ignore','pipe','ipc'],windowsHide:true});
   let stderr=Buffer.alloc(0),stderrTruncated=false;
   child.stderr.on('data',bytes=>{const room=8192-stderr.length;if(bytes.length>room)stderrTruncated=true;if(room>0)stderr=Buffer.concat([stderr,bytes.subarray(0,room)]);});
-  const failure=(stage,code,signal)=>new Error(`Synthetic concurrency worker failed${stage} (exit=${code}, signal=${signal}, stderr${stderrTruncated?' truncated':''}=${stderr.toString('utf8')})`);
-  const ready=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.ready)resolve();});child.once('error',reject);child.once('close',(code,signal)=>{if(code!==0)reject(failure(' before ready',code,signal));});});
-  const done=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.done)resolve(m);if(m.error)reject(new Error(m.error));});child.once('error',reject);child.once('close',(code,signal)=>{if(code!==0)reject(failure('',code,signal));});});
-  // Observe an early startup rejection while ready is awaited. Awaiting the
-  // original done promise below still rejects on every worker/import failure.
-  done.catch(()=>{});
-  return {child,ready,done};
+  const diagnostic=()=>`${stderrTruncated?'[truncated] ':''}${stderr.toString('utf8')}`;
+  const phase=name=>new Promise((resolve,reject)=>{
+    let received=false;
+    child.on('message',message=>{
+      if(message[name]){received=true;resolve(message);}
+      if(message.error)reject(new Error(message.error));
+    });
+    child.once('error',reject);
+    child.once('close',(code,signal)=>{
+      if(!received)reject(new Error(`Synthetic concurrency worker exited before ${name} (code=${code}, signal=${signal}): ${diagnostic()}`));
+    });
+  });
+  const ready=phase('ready'),completion=phase('done');
+  const closed=new Promise(resolve=>child.once('close',(code,signal)=>resolve({code,signal})));
+  const done=completion.then(async message=>{
+    const {code,signal}=await closed;
+    if(code!==0||signal!==null)throw new Error(`Synthetic concurrency worker exited after done (code=${code}, signal=${signal}): ${diagnostic()}`);
+    return message;
+  });
+  // Startup can reject ready before the test reaches its await of done. Mark
+  // both promises observed immediately; awaiting either still exposes failure.
+  ready.catch(()=>{});done.catch(()=>{});
+  const stop=async()=>{
+    if(child.exitCode===null&&child.signalCode===null)child.kill();
+    await closed;
+  };
+  const onAbort=()=>{void stop().catch(()=>{});};
+  t.signal.addEventListener('abort',onAbort,{once:true});
+  t.after(async()=>{t.signal.removeEventListener('abort',onAbort);await stop();});
+  if(t.signal.aborted)onAbort();
+  return {child,ready,done,stop};
 }
+
+test('database startup waits for a real SQLite lock before switching the journal to WAL',{timeout:15000},async t=>{
+  const folder=mkdtempSync(join(tmpdir(),'mg-payment-startup-lock-')),path=join(folder,'db.sqlite');
+  const locker=new DatabaseSync(path);
+  let opened,releaseTimer,released=false;
+  t.after(async()=>{
+    clearTimeout(releaseTimer);
+    await opened?.stop();
+    if(!released)locker.exec('ROLLBACK');
+    locker.close();
+    rmSync(folder,{recursive:true,force:true});
+  });
+  locker.exec("PRAGMA journal_mode=DELETE; CREATE TABLE startup_marker(value TEXT NOT NULL); INSERT INTO startup_marker VALUES('before'); BEGIN EXCLUSIVE; UPDATE startup_marker SET value='committed';");
+  const startupSource=`
+    import {openDatabase} from ${JSON.stringify(new URL('../src/db.js',import.meta.url).href)};
+    process.send({opening:true});
+    const db=openDatabase(process.argv[1]);
+    process.on('message',message=>{
+      if(message!=='go')return;
+      const marker=db.prepare('SELECT value FROM startup_marker').get().value;
+      const journal=db.prepare('PRAGMA journal_mode').get().journal_mode;
+      db.close();process.send({done:true,marker,journal});process.disconnect();
+    });
+    process.send({ready:true});
+  `;
+  opened=worker(path,t,startupSource);
+  opened.child.on('message',message=>{
+    if(message.opening){
+      // Hold a real lock across the child's first database operation. The
+      // delay models a short writer; no operation or assertion is retried.
+      releaseTimer=setTimeout(()=>{locker.exec('COMMIT');released=true;},100);
+    }
+  });
+  await opened.ready;
+  assert.equal(released,true,'startup must wait for the other connection to commit');
+  opened.child.send('go');
+  const result=await opened.done;
+  assert.equal(result.marker,'committed');
+  assert.equal(result.journal,'wal');
+});
 
 test('two real processes import and reconcile one bank payment once, then replay safely after restart',{timeout:15000},async t=>{
   const folder=mkdtempSync(join(tmpdir(),'mg-payment-concurrency-')),path=join(folder,'db.sqlite');
-  t.after(()=>rmSync(folder,{recursive:true,force:true}));
+  const workers=[];
+  t.after(async()=>{await Promise.all(workers.map(w=>w.stop()));rmSync(folder,{recursive:true,force:true});});
   const setup=openDatabase(path);
   // Reopened workers test generic distinct OCR, not the M.George number rule.
   setup.prepare("UPDATE app_settings SET data=json_set(data,'$.company_name',?) WHERE id=1").run('Synthetic Generic AB');
   setup.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents,reference,issued_at) VALUES(?,?,?,?,?,?,?)').run('synthetic-invoice','customer','001','Syntetisk Kund AB',10000,'000018','2026-10-01');
   approveSyntheticBankAccount(setup,account);
   setup.close();
-  const workers=[worker(path,t),worker(path,t)];
+  workers.push(worker(path,t),worker(path,t));
   await Promise.all(workers.map(w=>w.ready));
   for(const w of workers)w.child.send('go');
   const results=await Promise.all(workers.map(w=>w.done));

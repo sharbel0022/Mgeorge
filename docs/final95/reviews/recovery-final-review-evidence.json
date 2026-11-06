@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-11-06T11:40:12.801152+00:00",
+  "head": "2982b6c51cf2891d97b816ea1ce6c82e5f4c71a1",
+  "branch": "feature/final-95-recovery",
+  "worktree_clean": true,
+  "reference_parents": [
+    "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "03f84afd61bb1020e73c17c3cde332a1b07f55a0"
+  ],
+  "ui_reference": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+  "files": {
+    "sites/lib/bank-consent-policy.js": "ca3ab0aaffa006e13e16eac8fc73f5a2215de88b5954b8e8e3e1cf3b430b1f40",
+    "sites/lib/bank-consent-policy.d.ts": "1ea9102da46d6822d69aee5721c189ef48d4f9e83735f6f423d4a50008fd834f",
+    "sites/lib/banking/service.ts": "1458c81b742cb4d11efaacd23ba8839ae0c11c07eb561bf98869f52487e51229",
+    "src/db.js": "7d002ddb9b8d62d9158ab7c328c4c9f73b45c51b2bbb96d9b7de829e8f7f78fe",
+    "test/payment-concurrency.test.js": "659a1738b83d7aca295973f5fa8797ec70fdf7e0a1e7857c0400473498454794",
+    "sites/lib/document-processing.ts": "12ffd2a85229c1e4ae5aebf0c1efaaab20f6573b346ca600132bd89a7e6dba20",
+    "sites/tests/document-queue-recovery.test.mjs": "a078786d77701ea5fe9a8d421ca558a00fc9c1ef99ae793b37ee9e6879661376",
+    "sites/tests/banking-security.test.mjs": "ad12204eb53580306eef23d0127e0a8834d20936622aff8ee8bf9d161be6bc31",
+    "sites/tests/final95-bank-diagnostic-integration.test.mjs": "992dd0345c28b14539b36bddc20c52a47736c5c99370cd60ecbb8083d6833d85",
+    "sites/app/dashboard.tsx": "d2248858049101d9a98bc8836d99cf2707145124c284f15431102b20821c5e98",
+    "sites/components/payment-control.tsx": "f409f4468b4409ed63e4c35d6fc0fb32a73613b7a1fd995f52956132d43a3a19",
+    "sites/components/company-workspace.tsx": "fc1309b073da620b788cfbcd510a2e070b10dc2c827ed842d6be9f0baac2d0b7",
+    "sites/components/onboarding/bank-onboarding-views.tsx": "189c453299238d13b96d8612892ab21a0d356fee280cc33b6b0008f1e0b30832"
+  },
+  "independent_probes": {
+    "command": "NODE_ENV=test node --test /workspace/scratch/0005a76ddf57/recovery-review-probes.mjs",
+    "node": "v24.22.1",
+    "tests": 6,
+    "pass": 6,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "duration_ms": 181.229614,
+    "log": "/workspace/scratch/0005a76ddf57/recovery-review-probes.tap",
+    "probe_sha256": "a96bb074bf9f9a2e71f76958b69b60f23b4bab48b9c2a500512deabbbda64036"
+  }
+}

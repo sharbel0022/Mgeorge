@@ -1,0 +1,560 @@
+{
+  "schema": "final95-known-v2-remaining-fields-v1",
+  "scope": "Known synthetic development corpus; no new independent acceptance; literal presence does not prove field ownership.",
+  "source_and_inputs_stable": true,
+  "optical_calls": 12,
+  "parser_calls": 48,
+  "missing_field_counts": {
+    "due_at": 2,
+    "net_cents": 5,
+    "organization_number": 10,
+    "party": 6,
+    "total_cents": 4,
+    "vat_cents": 8,
+    "bankgiro": 4,
+    "currency": 2,
+    "reference": 3,
+    "invoice_number": 1,
+    "issued_at": 1
+  },
+  "mandatory_missing": 39,
+  "all13_missing": 46,
+  "minimum_additional_correct_fields_for_85_percent": {
+    "mandatory10": 24,
+    "all13": 27
+  },
+  "cases": [
+    {
+      "id": "holdout-v2-normal-01",
+      "missing_fields": [
+        {
+          "field": "due_at",
+          "expected_synthetic_value": "2026-07-03",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "net_cents",
+          "expected_synthetic_value": 374580,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623114",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "party",
+          "expected_synthetic_value": "Exempel Kustteknik AB",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "total_cents",
+          "expected_synthetic_value": 468225,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 93645,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+        "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+        "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+        "Saknade uppgifter: kund eller leverantör, förfallodatum, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "missing_fields": [
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623122",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "party",
+          "expected_synthetic_value": "Fiktiva Björk Konsult AB",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 321600,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+        "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+        "Saknade uppgifter: kund eller leverantör, moms, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-03",
+      "missing_fields": [
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623130",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+        "Saknade uppgifter: organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "missing_fields": [
+        {
+          "field": "bankgiro",
+          "expected_synthetic_value": "5736-0828",
+          "actual": null,
+          "mandatory": false,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "currency",
+          "expected_synthetic_value": "SEK",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "net_cents",
+          "expected_synthetic_value": 213360,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623148",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "party",
+          "expected_synthetic_value": "Fiktiva Lönn Kontor AB",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "reference",
+          "expected_synthetic_value": "00863025144",
+          "actual": null,
+          "mandatory": false,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 53340,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+        "Saknade uppgifter: kund eller leverantör, belopp exklusive moms, moms, valuta, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "missing_fields": [
+        {
+          "field": "bankgiro",
+          "expected_synthetic_value": "241-9562",
+          "actual": null,
+          "mandatory": false,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623155",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 242180,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+        "Saknade uppgifter: moms, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "missing_fields": [
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623163",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "party",
+          "expected_synthetic_value": "Fiktiva Skärvik IT AB",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+        "Saknade uppgifter: kund eller leverantör, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "missing_fields": [
+        {
+          "field": "bankgiro",
+          "expected_synthetic_value": "619-4823",
+          "actual": null,
+          "mandatory": false,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "net_cents",
+          "expected_synthetic_value": 735480,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623171",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "party",
+          "expected_synthetic_value": "Exempel Fräsverkstan AB",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "reference",
+          "expected_synthetic_value": "00863025177",
+          "actual": null,
+          "mandatory": false,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "total_cents",
+          "expected_synthetic_value": 919350,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 183870,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+        "Saknade uppgifter: kund eller leverantör, totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "missing_fields": [
+        {
+          "field": "bankgiro",
+          "expected_synthetic_value": "3547-0186",
+          "actual": null,
+          "mandatory": false,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "due_at",
+          "expected_synthetic_value": "2026-08-22",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "invoice_number",
+          "expected_synthetic_value": "2608-117",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "issued_at",
+          "expected_synthetic_value": "2026-07-23",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623189",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "party",
+          "expected_synthetic_value": "Fiktiva Rönn Frakt AB",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 104990,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för fakturanummer. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för fakturadatum. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för förfallodatum. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för Bankgiro. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt eller oläsligt organisationsnummer förekommer utan entydig partsroll. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt eller oläsligt värde för mottagarnamn. Kontrollera samtliga märkta värden i originalet.",
+        "Saknade uppgifter: fakturanummer, kund eller leverantör, fakturadatum, förfallodatum, moms, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "missing_fields": [
+        {
+          "field": "net_cents",
+          "expected_synthetic_value": 1532400,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623197",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "total_cents",
+          "expected_synthetic_value": 1915500,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 383100,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+        "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+        "Saknade uppgifter: totalbelopp, belopp exklusive moms, moms, organisationsnummer"
+      ]
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "missing_fields": [
+        {
+          "field": "currency",
+          "expected_synthetic_value": "SEK",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "net_cents",
+          "expected_synthetic_value": 284640,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "organization_number",
+          "expected_synthetic_value": "5597623205",
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": "Kräver kontroll",
+          "evidence": null
+        },
+        {
+          "field": "reference",
+          "expected_synthetic_value": "00863025201",
+          "actual": null,
+          "mandatory": false,
+          "literal_appears_in_raw_text_without_role_inference": true,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "total_cents",
+          "expected_synthetic_value": 355800,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        },
+        {
+          "field": "vat_cents",
+          "expected_synthetic_value": 71160,
+          "actual": null,
+          "mandatory": true,
+          "literal_appears_in_raw_text_without_role_inference": null,
+          "warning": null,
+          "evidence": null
+        }
+      ],
+      "issues": [
+        "Ogiltigt värde för totalbelopp. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för moms. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för belopp exklusive moms. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för OCR eller referens. Kontrollera samtliga märkta värden i originalet.",
+        "Ogiltigt värde för valuta. Kontrollera samtliga märkta värden i originalet.",
+        "Organisationsnumrets roll är oklar mellan leverantör och mottagare. Kontrollera originalets identiteter.",
+        "Saknade uppgifter: totalbelopp, belopp exklusive moms, moms, valuta, organisationsnummer"
+      ]
+    }
+  ]
+}

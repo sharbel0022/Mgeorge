@@ -1,3 +1,4 @@
+import {sitesTokenCoordinatorUrl} from './helpers/openpayments-coordinator-loader.mjs';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
@@ -12,7 +13,7 @@ import {ingestFixture,seedState,account,hash} from './helpers/bankgiro-ingest-fi
 const companyId='synthetic-company-a';
 const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const local=path=>new URL('../lib/'+path,import.meta.url).href;
-function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL('../lib/'+path,import.meta.url),'utf8'),{mode:'transform'});for(const[from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
+function compiled(path,imports){let code=stripTypeScriptTypes(readFileSync(new URL('../lib/'+path,import.meta.url),'utf8'),{mode:'transform'});imports={'./openpayments-sites-token-coordinator':sitesTokenCoordinatorUrl,'./openpayments-workers-transport.js':local('banking/openpayments-workers-transport.js'),...imports};for(const[from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
 async function withActualOpenPaymentsAuthority(t,f,company){
  const key=randomToken(),registration={companyId:company,actorId:f.owner,verified:true,corporateAccessVerified:true,redirectVerified:true,bankId:'OPBKSE21',corporateId:CONTEXT.corporateId,psuId:CONTEXT.psuId,bicFi:CONTEXT.bicFi};
  Object.assign(f.env,{SAAS_BANK_ENABLED:'true',SAAS_OPENPAYMENTS_CONFIG:JSON.stringify(CONFIG),SAAS_OPENPAYMENTS_REGISTRATIONS:JSON.stringify([registration]),BANK_DATA_ENCRYPTION_KEY:key});

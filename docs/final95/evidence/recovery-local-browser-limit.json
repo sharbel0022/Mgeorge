@@ -1,0 +1,13 @@
+{
+  "observedOn": "2026-11-06",
+  "scope": "Local headless Chromium launch for isolated dashboard fixture; no application assertions executed",
+  "sourceHead": "ec46787c0aab582fbe387a5e19c6ad04c59d5db8",
+  "frontendTree": "18a33d270f062416e62102ac2ea270be0892adbb",
+  "workingTree": "Browser runner changes under development; frontend bytes unchanged",
+  "result": "BLOCKED_BY_EXECUTION_ENVIRONMENT",
+  "error": "chrome/browser/process_singleton_posix.cc:297 socket() failed: Operation not permitted (1)",
+  "processSignal": "SIGABRT",
+  "assertionsRun": 0,
+  "nextVerification": "Run the existing authenticated GitHub Actions browser gate with retained exact-source receipts and screenshots",
+  "bypassAttempted": false
+}

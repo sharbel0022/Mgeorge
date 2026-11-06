@@ -1,0 +1,378 @@
+{
+  "builtAt": "2026-11-06T12:31:58.580Z",
+  "sourceStableDuringBuild": true,
+  "harness": "Actual production Dashboard, BankPage, CompanyWorkspace, real React and production CSS. Only the entry HTML and isolated API responses are synthetic.",
+  "toolchain": {
+    "node": "v24.22.1",
+    "react": "19.3.1",
+    "esbuild": "0.28.2",
+    "postcss": "8.5.23",
+    "tailwindPostcss": "4.2.1"
+  },
+  "inputs": [
+    {
+      "path": "sites/lib/uuid.js",
+      "sha256": "352477ae6f4696ea9095284a5d7eac186bcd06c321f7fa44b66ccc29f2fd6ca4"
+    },
+    {
+      "path": "sites/lib/workspace-location.ts",
+      "sha256": "98ae3f322ca7f7c6ec114a40fb309a17c88ba2473853d49ced8f6a8bc407bb13"
+    },
+    {
+      "path": "sites/components/workspace-navigation.tsx",
+      "sha256": "3464b75f0934a4ea2b248daac0c89c2e7c8c28f64972ea5d1f46fd89817fa1ba"
+    },
+    {
+      "path": "sites/lib/workspace-drafts.ts",
+      "sha256": "40d6d68fe42e72efc7f8f439e730d97565f127b9b9e365cee2e5d4530f4f8fb9"
+    },
+    {
+      "path": "sites/components/use-workspace-navigation.ts",
+      "sha256": "1439f561ea5898e2b32d91a1244f10cd0174f7cd28d5527e6f8fa2c6168079e7"
+    },
+    {
+      "path": "sites/lib/bankgiro-source-evidence.js",
+      "sha256": "495ea7b21d978011cfef8b3f319f1ba5b68b4d04c7df3315b30e10527efff1e7"
+    },
+    {
+      "path": "sites/lib/payment-references.js",
+      "sha256": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c"
+    },
+    {
+      "path": "sites/lib/reference-evidence-compat.js",
+      "sha256": "1f01e0e6fbc32edf8449e5972634380a3138ad7fc3adaccf35600871eb961eba"
+    },
+    {
+      "path": "sites/lib/payer-evidence.js",
+      "sha256": "6f6e5ac7f331c5fe87d8ed555cb2d908b8d000b26335efba25b8c5200a168661"
+    },
+    {
+      "path": "sites/lib/banking/openpayments-normalization.js",
+      "sha256": "13782ec9a42db954153b6bebaf35b8f795d62035d4d6259b0e8b21717ac5185b"
+    },
+    {
+      "path": "sites/lib/bank-api-original.js",
+      "sha256": "2868abc1423a942d6eed583cbc14a2ab7b68cba533f1320636d4d5692d993a27"
+    },
+    {
+      "path": "sites/lib/invoice-reference-policy.js",
+      "sha256": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e"
+    },
+    {
+      "path": "sites/lib/reconciliation-decisions.js",
+      "sha256": "7e6dca1fcc7b6540475ca2f4285d0c2a6afd0108341b7954100037a58d793d9d"
+    },
+    {
+      "path": "sites/lib/reconciliation-engine.js",
+      "sha256": "6f55468ed7824a54534574db8438dbc3b456dfe819ee250efaf2dbc6b1d429c2"
+    },
+    {
+      "path": "sites/lib/bankgiro-deposit-identity.js",
+      "sha256": "46e1135ba45750e5c06f7c6a2e662ec462dc839218a2d5d707adafc95bec7ac4"
+    },
+    {
+      "path": "sites/lib/domain.ts",
+      "sha256": "f53b35d791634cdde5cd91acc669a701751df2c8ae70cdf0f07e99daab27482a"
+    },
+    {
+      "path": "sites/lib/economy-summary.js",
+      "sha256": "318b85dd71bf43bd889ec6cd777e19f6b9c77ed76f1d6d3e7adfa28761a4373e"
+    },
+    {
+      "path": "sites/components/payment-control.tsx",
+      "sha256": "f409f4468b4409ed63e4c35d6fc0fb32a73613b7a1fd995f52956132d43a3a19"
+    },
+    {
+      "path": "sites/components/economy-overview.tsx",
+      "sha256": "e48085fa28a921cd96e2d8a01ae2b270217c4056e11c858628f2b4c9d9a08a3a"
+    },
+    {
+      "path": "sites/components/bankgiro-link-review.tsx",
+      "sha256": "b8f771f9174ca9a5090a31dfc5c5f6e5396f2229a69ed771c833dd187074f036"
+    },
+    {
+      "path": "sites/lib/payment-presentation.ts",
+      "sha256": "e09714e3726818ebde677f5fb57dc1bdc57bb5daeabbb088c4e3678395ec96af"
+    },
+    {
+      "path": "sites/components/list-pagination.tsx",
+      "sha256": "33638964bb6e47bc3b8a93f7fb0509482cfeef129cb2dd47bf48cc937a453b8e"
+    },
+    {
+      "path": "sites/components/bankgiro-availability.tsx",
+      "sha256": "b8baca6e7720c8f891cf5df39f24dc84514a5118a2543e8fef419657d617a105"
+    },
+    {
+      "path": "sites/components/bank-payments.tsx",
+      "sha256": "fd366ca6a4990bd8e60c2ed67bec8a1916e9623a94a5f208d55ac3d522ac57f3"
+    },
+    {
+      "path": "sites/components/payment-history.tsx",
+      "sha256": "92137592477ddb61dd002762a10abdf7056d72565ca7efddd304ef7b5c4899d2"
+    },
+    {
+      "path": "sites/lib/account-evidence-presentation.ts",
+      "sha256": "6d5ac960a070f1724641b9ea8ad463acaeba548f5a808a895f34555f070ea924"
+    },
+    {
+      "path": "sites/components/use-payment-verification.ts",
+      "sha256": "f2cd616ca00ab4ca3774c2f9bc49749d553a23162b5b75b3b24d4be1715fe29d"
+    },
+    {
+      "path": "sites/components/payment-verification.tsx",
+      "sha256": "eae3522dcb5cf66ef86e91d7306ea4a9906786cb6b44f5bfabbf87f11a025836"
+    },
+    {
+      "path": "sites/components/reconciliation-proposal.tsx",
+      "sha256": "ece2eae69f2907ce4fd1963dd54ee4b2143d6ee627ef0108a5f822db4c3d72e0"
+    },
+    {
+      "path": "sites/lib/manual-multiple-client.js",
+      "sha256": "25b4b8d3717e3fa29a10fe15786248396ad1e13f453def566278e3e99744bbca"
+    },
+    {
+      "path": "sites/components/manual-multiple-allocation.tsx",
+      "sha256": "cf3ed3c5a6ef5212bc4612cd1384963b87cb67c50cc02007cbbd9847b4a1626f"
+    },
+    {
+      "path": "sites/components/document-ocr-status.tsx",
+      "sha256": "70ad42ab41c98af879639822d430d76678b2d0a648e8ff5cd2ba0c7e7ee96672"
+    },
+    {
+      "path": "sites/components/gmail-summary.tsx",
+      "sha256": "a5363c97a3c179ded9b0153912dae13db9164bf03a457eea8dbc5c0ca44a436c"
+    },
+    {
+      "path": "sites/lib/reconciliation.ts",
+      "sha256": "47523058948dd9cb3d04fbab808b0c7cb000e69616c189676d0e3f4e0cf85224"
+    },
+    {
+      "path": "sites/lib/pdf-text.js",
+      "sha256": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4"
+    },
+    {
+      "path": "sites/lib/ocr-bankgiro-evidence.js",
+      "sha256": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a"
+    },
+    {
+      "path": "sites/lib/invoice-details.js",
+      "sha256": "0f46b7df4ddf9dac13d83486d040502f91d40bc7c3a292c9336062afff0bbc80"
+    },
+    {
+      "path": "sites/lib/ocr-layout.js",
+      "sha256": "b9c22df11bf317e7d0c3cb880f3c810c73b948fa6f694214c07ac80e1a066d76"
+    },
+    {
+      "path": "sites/lib/local-ocr.ts",
+      "sha256": "760b5ada21de6dbc6658ed0fd5a95f38e7d6e963ba7e6f7ded0fec268b9207c3"
+    },
+    {
+      "path": "sites/components/invoice-evidence.tsx",
+      "sha256": "f4002ec4dc1377c09b981df37219030fbf8d7e478ecb2b5734df15214edd7f90"
+    },
+    {
+      "path": "sites/components/customer-messages.tsx",
+      "sha256": "f80504495afaa29a7f52f7c8c3fe79c087d8a800f7080c5b6b2416209460ef03"
+    },
+    {
+      "path": "sites/lib/document-triage.js",
+      "sha256": "28e2e0b8bda7d3e57705f26ba269164255acfbad315f0c3a7f96c2efb58db6fb"
+    },
+    {
+      "path": "sites/lib/camt-xml.js",
+      "sha256": "a517eb363c4029a3bb9cb5870da32dfd3b32c2de722dfcb921ed81407342889e"
+    },
+    {
+      "path": "sites/lib/camt-payer.js",
+      "sha256": "4525b7fa52fd4ff8dc336d79fb8fa46d13986c0a6458840b2f0ba0c5cf472827"
+    },
+    {
+      "path": "sites/lib/bankgiro-xlsx.js",
+      "sha256": "cca184605ad533867daa1f5486e27071c3c5551894e05feb161e313d2320c384"
+    },
+    {
+      "path": "sites/lib/bankgiro-openpayments.js",
+      "sha256": "339b70620fc6418eeb392ec33eb4b29f55d84f231ef42b70428e9ffd689b1396"
+    },
+    {
+      "path": "sites/lib/bankgiro-openpayments-capture.js",
+      "sha256": "200a4b91315b3dadb6acdcc96d03e375763748515a850991630af01221f6a9d1"
+    },
+    {
+      "path": "sites/lib/bankgiro-parser.js",
+      "sha256": "f28b9d2ecaa98c28ea78679ec5f6db55fc5706a8aac05a2abfc96fc433210622"
+    },
+    {
+      "path": "sites/lib/invoice-fields.js",
+      "sha256": "b42f9f002c6f0fa33944be1a263e809a9d81d5e8aa31e21b9d04622e44c8c3ea"
+    },
+    {
+      "path": "sites/lib/imports.ts",
+      "sha256": "f98efbedc32d43721b7cc3f41e58ea506731b3fb6cbcaf31651731706634a1a7"
+    },
+    {
+      "path": "sites/components/sync-recovery-notice.tsx",
+      "sha256": "38a028d3b6021997ae67c607c69a4fb8cf6f0d331ffd98fee83a46a511175ed4"
+    },
+    {
+      "path": "sites/components/gmail-workspace.tsx",
+      "sha256": "173234263d10526a7eec7c3f56b7f16442e85a9c013dbe5fe581196668389730"
+    },
+    {
+      "path": "sites/lib/banking/status-view.ts",
+      "sha256": "a9ebc326d8aaacf789f56baf08ab7d8733ce5b2e6557bc935d9cf7b94d2b429b"
+    },
+    {
+      "path": "sites/components/use-bank-refresh.ts",
+      "sha256": "bf1becc2b2888f854a5865a5b1b81e136a4f9e77a8eefe4034eff01f9ceccdf1"
+    },
+    {
+      "path": "sites/components/bank-connection.tsx",
+      "sha256": "af29576ea06dc0358e93eb769603320c2a8eaae94e5456bf03a83a517acdb87e"
+    },
+    {
+      "path": "sites/lib/payment-overview.ts",
+      "sha256": "1026c0f0c20eeacd96228f18e21dc0609556c64ecb9c2b6df7e0d69eb6780d54"
+    },
+    {
+      "path": "sites/lib/workspace-search.js",
+      "sha256": "a16a813b8b94eb5be1da2fdf3ce1311568616e7af1edeb4c40e6c6ba4727cd6a"
+    },
+    {
+      "path": "sites/app/dashboard.tsx",
+      "sha256": "d2248858049101d9a98bc8836d99cf2707145124c284f15431102b20821c5e98"
+    },
+    {
+      "path": "sites/components/bankgiro-source-status.tsx",
+      "sha256": "e4d3e767919eb25b90899e29aac6f1d4574b8e6e5a9cde80290e7d028f6b9a1f"
+    },
+    {
+      "path": "sites/lib/onboarding/contract.ts",
+      "sha256": "5b488f9ce2987ef51d5e7b9913ef033247c5487246056a97d28ff292a8ac15bd"
+    },
+    {
+      "path": "sites/lib/onboarding/client.ts",
+      "sha256": "1213f306d4e08d9e0aec258088039323b5febefce34451ad97c3801b9c65b9d3"
+    },
+    {
+      "path": "sites/lib/company-contract.js",
+      "sha256": "5da17708a61f842002c3d57650679d260bb5142821baf97700353bc467e14c8e"
+    },
+    {
+      "path": "sites/lib/company-client.js",
+      "sha256": "cd101742c40b435271a699470c11d91cd30b985a14d003e87fe6e05d27daaf63"
+    },
+    {
+      "path": "sites/components/company-workspace.tsx",
+      "sha256": "fc1309b073da620b788cfbcd510a2e070b10dc2c827ed842d6be9f0baac2d0b7"
+    },
+    {
+      "path": "sites/lib/onboarding/request-scope.ts",
+      "sha256": "3471997c1a31503f0a45b44b0125d269cb94ff13dce03f60f424de802abbaa6a"
+    },
+    {
+      "path": "sites/components/onboarding/bank-onboarding-views.tsx",
+      "sha256": "189c453299238d13b96d8612892ab21a0d356fee280cc33b6b0008f1e0b30832"
+    },
+    {
+      "path": "sites/components/onboarding/bank-onboarding.tsx",
+      "sha256": "ed302ffb0b19aea637484ffe1b98a2854cf39af85dde07d32ccf4baf76b507bf"
+    },
+    {
+      "path": "sites/app/bank/page.tsx",
+      "sha256": "dfecc8a570b3a7a35f9c08f352afc63dfda170506b5f72b115343c4c2aca99f4"
+    },
+    {
+      "path": "sites/app/globals.css",
+      "sha256": "131033201753acce5df1a7eb211f1e72992b6eafcf7a29ae75faa5a86d0780c1"
+    },
+    {
+      "path": "sites/styles/bank-connection.css",
+      "sha256": "ea8bd05d8e9a391c61e5a99ba81b00647b33c73e4d96a8877487d886af1fa39e"
+    },
+    {
+      "path": "sites/styles/bankgiro-source.css",
+      "sha256": "32c24caffd5c836fc0bfb02153bac9a4b3fe791ce90893274020086a29ec0f0a"
+    },
+    {
+      "path": "sites/styles/saas-onboarding.css",
+      "sha256": "c68529dc2d2345d1d3a5d1301ac6b0aa795d1dfc8b71149a0ba2ced35a1f502b"
+    },
+    {
+      "path": "sites/styles/company-workspace.css",
+      "sha256": "cb6337b978f33629c12ad052b0112e7e7e4927388cfecea4a3f1afa674ab1ae1"
+    },
+    {
+      "path": "sites/styles/workspace-design.css",
+      "sha256": "6a75d943b5da77b94856183af6650f63417c41fbdda7489dbb09674562417a3c"
+    }
+  ],
+  "harnessInputs": [
+    {
+      "path": "docs/integration/95-ui-browser/build-harness.mjs",
+      "sha256": "fb39d2a9ecdc4394b38511d7be135d3f7345e1cd1813fdc6adce1e163ac9246c"
+    },
+    {
+      "path": "docs/integration/95-ui-browser/serve-harness.mjs",
+      "sha256": "5583d971788bb89c62577664fd6f502e48a236ee7e23969b91a2a10b7df5adb0"
+    },
+    {
+      "path": "docs/integration/95-ui-browser/fixtures.mjs",
+      "sha256": "193fd3b3ac1d7727254057396a9cd5193fb49496789f2e166ac2739d39533856"
+    },
+    {
+      "path": "docs/integration/agent-6-browser/fixtures.mjs",
+      "sha256": "a6d67a0f18b831108b706e11644f10dd6490b8bbd9a8e0d868d31a7c1a7d3ea3"
+    },
+    {
+      "path": "sites/tests/helpers/bank-api-fixture.mjs",
+      "sha256": "520815af14c53be00e4c887fc8bf7fbda1cee9cf92a72c2fbaf8a3aff8533414"
+    },
+    {
+      "path": "sites/tests/helpers/payment-field-source-fixture.mjs",
+      "sha256": "abad6e5e7efac8950698b0af3bd37f43555d9e4996e0b6c342358736a98d5312"
+    },
+    {
+      "path": "sites/tests/helpers/saas-onboarding-fixture.mjs",
+      "sha256": "29a93cd8240bf27e49001687a739ad2323f196fe990e6ccd4fe625d08f4b039d"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "app.js",
+      "sha256": "f335331b7ca4397e798376f3a5aa3b92335e2e56200bfdfa8d68f00ac21c8f6d"
+    },
+    {
+      "path": "chunks/src-P7D7Y64M.js",
+      "sha256": "a10f770f7d9d5ae9f3a6f211eb77410cac87ef7bfd0dd6143892935ebd039268"
+    },
+    {
+      "path": "chunks/pdf-5WF4MGGV.js",
+      "sha256": "a9edad3a9813fadd7952f9ebd1def2c6edc625bf032b786724e725cceb0edf4b"
+    },
+    {
+      "path": "chunks/local-ocr-AVAK2S2M.js",
+      "sha256": "7be994b7bc2d140dc4ae85189971ef5546aa6fdfd603fa08a03ce04d66578d43"
+    },
+    {
+      "path": "chunks/chunk-YNILNDJ2.js",
+      "sha256": "1f9a288d697b74b492691746ac51ffd8de9ede840b1a32bdea8e2d8663194879"
+    },
+    {
+      "path": "chunks/postal-mime-JGMYUF73.js",
+      "sha256": "9b465afa3b294163e1c1587bf687abcbfcd9ba112c5bff2cf878240954c33268"
+    },
+    {
+      "path": "chunks/chunk-7VZ5H7B6.js",
+      "sha256": "47e42dfbd47bb8e6ba9db884451b27f9a92888d367efe5e571c5f48e84e41c0b"
+    },
+    {
+      "path": "app.css",
+      "sha256": "d51d1476ea06cc5da25b23b3647bad923ea778085aaa348f16cc43c605a615f6"
+    },
+    {
+      "path": "index.html",
+      "sha256": "8bae23a40bbdf714394dbe76a841f540a8423fb8166aa3319b4a9bbc59ebf64e"
+    }
+  ]
+}

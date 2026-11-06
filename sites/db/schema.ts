@@ -194,3 +194,28 @@ export const companyBankSyncReceipts=sqliteTable('company_bank_sync_receipts',{
  sha256:text('sha256').notNull(),result:text('result').notNull(),committedAt:integer('committed_at').notNull(),
 },t=>[primaryKey({columns:[t.companyId,t.accountKey,t.receiptKey]})]);
 export const saasBankState = sqliteTable('saas_bank_state', {owner:text('owner').primaryKey().notNull(),revision:integer('revision').notNull(),payload:text('payload').notNull()});
+
+// Server control-plane state. These tables deliberately have no customer owner
+// and must remain outside company SQL capabilities and customer backup sets.
+export const companyApplicationTokenControl=sqliteTable('company_application_token_control',{
+ id:integer('id').primaryKey(),revision:integer('revision').notNull().default(1),recoveryRequired:integer('recovery_required').notNull().default(0),
+ restoreMarker:text('restore_marker').notNull().default(''),recoveryEvidence:text('recovery_evidence').notNull().default(''),
+},t=>[
+ check('app_token_control_singleton',sql`${t.id}=1`),check('app_token_control_revision',sql`typeof(${t.revision})='integer' AND ${t.revision} BETWEEN 1 AND 9007199254740991`),
+ check('app_token_control_recovery',sql`typeof(${t.recoveryRequired})='integer' AND ${t.recoveryRequired} IN (0,1)`),check('app_token_control_marker',sql`length(${t.restoreMarker})<=100`),check('app_token_control_evidence',sql`length(${t.recoveryEvidence})<=200`),
+]);
+export const companyApplicationTokens=sqliteTable('company_application_tokens',{
+ familyKey:text('family_key').primaryKey(),configHash:text('config_hash').notNull(),configurationEvidence:text('configuration_evidence').notNull().default(''),epoch:integer('epoch').notNull().default(1),revision:integer('revision').notNull().default(1),
+ tokenCiphertext:text('token_ciphertext').notNull().default(''),tokenVersion:text('token_version').notNull().default(''),expiresAt:integer('expires_at').notNull().default(0),
+ leaseToken:text('lease_token').notNull().default(''),leaseUntil:integer('lease_until').notNull().default(0),fence:integer('fence').notNull().default(0),uncertainUntil:integer('uncertain_until').notNull().default(0),
+ cooldownUntil:integer('cooldown_until').notNull().default(0),cooldownBlocked:integer('cooldown_blocked').notNull().default(0),lastSafeCode:text('last_safe_code').notNull().default(''),updatedAt:integer('updated_at').notNull().default(0),
+},t=>[
+ check('app_token_family',sql`length(${t.familyKey})=64 AND ${t.familyKey} NOT GLOB '*[^a-f0-9]*'`),check('app_token_configuration',sql`length(${t.configHash})=64 AND ${t.configHash} NOT GLOB '*[^a-f0-9]*'`),
+ check('app_token_configuration_evidence',sql`length(${t.configurationEvidence})<=200`),check('app_token_epoch',sql`typeof(${t.epoch})='integer' AND ${t.epoch} BETWEEN 1 AND 9007199254740991`),check('app_token_revision',sql`typeof(${t.revision})='integer' AND ${t.revision} BETWEEN 1 AND 9007199254740991`),
+ check('app_token_ciphertext',sql`length(${t.tokenCiphertext})<=32768`),check('app_token_version',sql`length(${t.tokenVersion})<=100`),
+ check('app_token_expiry',sql`typeof(${t.expiresAt})='integer' AND ${t.expiresAt} BETWEEN 0 AND 8640000000000000`),check('app_token_lease',sql`length(${t.leaseToken})<=100`),check('app_token_lease_time',sql`typeof(${t.leaseUntil})='integer' AND ${t.leaseUntil} BETWEEN 0 AND 8640000000000000`),
+ check('app_token_fence',sql`typeof(${t.fence})='integer' AND ${t.fence} BETWEEN 0 AND 9007199254740991`),check('app_token_uncertain',sql`typeof(${t.uncertainUntil})='integer' AND ${t.uncertainUntil} BETWEEN 0 AND 8640000000000000`),check('app_token_cooldown',sql`typeof(${t.cooldownUntil})='integer' AND ${t.cooldownUntil} BETWEEN 0 AND 8640000000000000`),
+ check('app_token_cooldown_blocked',sql`typeof(${t.cooldownBlocked})='integer' AND ${t.cooldownBlocked} IN (0,1)`),check('app_token_safe_code',sql`length(${t.lastSafeCode})<=80 AND ${t.lastSafeCode} NOT GLOB '*[^A-Z_]*'`),check('app_token_updated',sql`typeof(${t.updatedAt})='integer' AND ${t.updatedAt} BETWEEN 0 AND 8640000000000000`),
+ check('app_token_payload_state',sql`(${t.tokenCiphertext}='' AND ${t.tokenVersion}='' AND ${t.expiresAt}=0) OR (${t.tokenCiphertext}<>'' AND ${t.tokenVersion}<>'' AND ${t.expiresAt}>0)`),
+ check('app_token_lease_state',sql`(${t.leaseToken}='' AND ${t.leaseUntil}=0) OR (${t.leaseToken}<>'' AND ${t.leaseUntil}>0 AND ${t.uncertainUntil}>=${t.leaseUntil})`),
+]);

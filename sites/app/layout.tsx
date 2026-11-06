@@ -5,6 +5,7 @@ import "@/styles/bankgiro-source.css";
 import "@/styles/saas-onboarding.css";
 
 import "@/styles/company-workspace.css";
+import "@/styles/workspace-design.css";
 import CompanyWorkspace from '@/components/company-workspace';
 
 export const metadata: Metadata = {

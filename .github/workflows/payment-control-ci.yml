@@ -1,88 +1,149 @@
 name: Payment control checks
 on:
   push:
-    branches: [main, 'codex/**', 'fix/**']
+    branches: [main, 'codex/**', 'fix/**', 'feature/95-quality']
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
 permissions:
   contents: read
+
 concurrency:
-  group: payment-control-${{ github.ref }}
+  group: payment-control-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
+
+env:
+  TZ: UTC
+  QUALITY_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
+  QUALITY_PR_BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.23.4', '24.22.1']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Locked install, syntax, audits and complete synthetic suite with coverage
+        run: npm run quality:node -- "$RUNNER_TEMP/quality-node"
+      - name: Retain Node receipts, failure logs, JUnit and LCOV
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: quality-node-${{ matrix.node }}-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quality-node
+          if-no-files-found: error
+          retention-days: 14
+
+  sites:
+    name: Sites types, tests and production build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            sites/package-lock.json
+            bridge/bankgiro/package-lock.json
+      - name: Verified installs, types, audits, complete synthetic suite and production build
+        run: npm run quality:sites -- "$RUNNER_TEMP/quality-sites"
+      - name: Retain Sites receipts, failure logs, JUnit and LCOV
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: quality-sites-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quality-sites
+          if-no-files-found: error
+          retention-days: 14
+
+  bankgiro_bridge:
+    name: Bankgiro SFTP integration
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci --ignore-scripts
-      - run: npm run check
-      - name: Audit production dependencies
-        run: npm audit --audit-level=high
-      - name: Run tests with synthetic data
-        env:
-          NODE_ENV: test
-        run: npm run test:isolated
-  sites:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: sites
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: sites/package-lock.json
-      - run: npm run install:ci
-      - name: Verify exact installed minimatch mitigation bytes
-        run: node scripts/minimatch-backport.mjs --check --require-target
-      - name: Install shared OCR runtime for cloud integration test
-        working-directory: .
-        run: npm ci --ignore-scripts
-      - run: npm run check
-      - name: Audit Sites production dependencies
-        run: npm audit --audit-level=high
-      - name: Install isolated bridge for full synthetic SFTP chain
-        run: npm --prefix ../bridge/bankgiro ci --ignore-scripts
-      - name: Run Sites tests with synthetic data
-        env:
-          NODE_ENV: test
-          CLOUDFLARE_CF_FETCH_ENABLED: 'false'
-          WRANGLER_SEND_METRICS: 'false'
-        run: npm run test:isolated
-      - run: npm run build
-        env:
-          CLOUDFLARE_CF_FETCH_ENABLED: 'false'
-  bankgiro_bridge:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '22'
+          node-version: '24.22.1'
           cache: npm
           cache-dependency-path: bridge/bankgiro/package-lock.json
-      - name: Install isolated SFTP bridge
-        run: npm --prefix bridge/bankgiro ci --ignore-scripts
-      - name: Check isolated bridge syntax
-        run: npm --prefix bridge/bankgiro run check
-      - name: Audit isolated bridge production dependencies
-        run: npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high
-      - name: Test synthetic SSH SFTP HTTP and durable recovery
-        env:
-          NODE_ENV: test
-        run: npm --prefix bridge/bankgiro run test:isolated
+      - name: Locked install, syntax, audits and synthetic SSH SFTP HTTP recovery
+        run: npm run quality:bridge -- "$RUNNER_TEMP/quality-bridge"
+      - name: Retain bridge receipts, failure logs, JUnit and LCOV
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: quality-bridge-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quality-bridge
+          if-no-files-found: error
+          retention-days: 14
+
+  performance:
+    name: Synthetic 1, 10 and 100 company performance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Measure real SQLite work with synthetic companies
+        run: npm run quality:performance -- "$RUNNER_TEMP/quality-performance"
+      - name: Retain workload, correctness and latency evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: quality-performance-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quality-performance
+          if-no-files-found: error
+          retention-days: 14
+
+  browser:
+    name: Chromium synthetic onboarding acceptance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: |
+            sites/package-lock.json
+            qa/browser/package-lock.json
+      - name: Install locked browser tooling and run all synthetic UI scenarios
+        run: npm run quality:browser -- "$RUNNER_TEMP/quality-browser"
+      - name: Retain browser results, screenshots and source manifests
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: quality-browser-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quality-browser
+          if-no-files-found: error
+          retention-days: 14

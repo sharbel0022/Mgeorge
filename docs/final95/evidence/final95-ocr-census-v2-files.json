@@ -1,0 +1,26 @@
+{
+  "baseHead": "4a18de185a23a507e3bc69760d41496c14e3d54b",
+  "patchSha256": "64003a28a6c25f55838d12ba68c53ca6490facc1bd7ae26d25c16d65ac477fae",
+  "files": {
+    "src/invoice-extraction.js": "41bfc394ecf10d25a0df4a58c16ef938f99f80ea8264104ee24ded88f6d1324c",
+    "sites/lib/invoice-fields.js": "b42f9f002c6f0fa33944be1a263e809a9d81d5e8aa31e21b9d04622e44c8c3ea",
+    "test/final95-parser-census.test.js": "16615ac629347e030b6aca87b6c97ff68e99771bb01a156d66b09f6577d730a9"
+  },
+  "red": {
+    "tests": 84,
+    "pass": 82,
+    "fail": 2,
+    "log": "parser-census-missing-reference-red-confirmed.tap"
+  },
+  "green": {
+    "node": 254,
+    "sites": 480
+  },
+  "newOpticalCalls": 0,
+  "opticalReparseParserCalls": 24,
+  "sameFieldValuesEvidenceAndLevels": true,
+  "issueChanges": [
+    "holdout-v2-normal-07/node",
+    "holdout-v2-normal-07/sites"
+  ]
+}

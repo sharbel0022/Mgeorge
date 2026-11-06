@@ -1,5 +1,11 @@
 # QUALITY-SCORECARD — MG Fakturakoll, 33 kvalitetsområden
 
+## Pågående slutförandeverifiering — 2026-11-06 14:28 UTC
+
+Den nya integrationen har återstående fulla CI- och publiceringsgrindar. Föregående publicerade bedömning är **257,5/330 (7,80/10)**; inget nytt totalbetyg eller 9,5-anspråk följer av riktade tester. [Färsk baslinje](docs/completion/baseline.json), [OCR/Gmail-rättningar och mätgräns](docs/completion/ocr.md) och den senaste posten i [PROGRESS](PROGRESS.md) beskriver den pågående kandidaten.
+
+Känd utvecklingsreplay är nu 74/100 obligatoriska OCR-fält med 0 felvärden, men inget nytt oberoende 85/98-prov har ännu slutförts. Den aktuella verkliga bankanslutningen är fortfarande spärrad, Bankgirokälla saknas och timschemats faktiska Gmail-dispatch är inte verifierad. De 33 slutliga betygen ska omprövas efter exakt CI och produktionskontroll, med dessa begränsningar kvar synliga. Daterade bedömningar nedan bevaras som historik.
+
 ## Aktuell bedömning efter Site 66 — 2026-11-06
 
 Uppdaterad drift- och utvecklingsevidens 06:21 UTC: Site 66 är fortfarande publicerad. Huvudgren `237dd45e` underkändes i ett Node-startup-prov; PR 60:s första kandidat har 7606/7606 men stoppades av ett oberoende P2-fynd i testets avbrottsstädning. Version67 är sparad från exakt native-källa som source-only-reservväg efter att arkivuppladdningen stoppats av otillgänglig exekveringsmiljö; den är inte publicerad. Dessa utvecklingsresultat ersätter inte produktionsbetygens källbindning nedan. Se [PR 60](https://github.com/sharbel0022/Mgeorge/pull/60) och [oberoende granskning](https://github.com/sharbel0022/Mgeorge/tree/819bc206f7c21c0f6f8ce0a490c36fbfb4047579/docs/quality8/startup-independent-review-20261106).

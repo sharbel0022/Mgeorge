@@ -4,12 +4,33 @@ import {analyzeReconciliation,normalizeName,RECONCILIATION_RULE_VERSION} from '.
 export type ReconciliationOptions={account?:string;invoiceReview?:(invoice:Invoice)=>string};
 export function invoiceFacts(state:State,i:Invoice,options:ReconciliationOptions={}){let referencePolicy=invoiceReferenceDecision(state,i);const issue=options.invoiceReview?.(i);if(issue)referencePolicy={...referencePolicy,applies:true,status:'BLOCKED',issues:[...referencePolicy.issues,'company_reference_review'],reason:issue};return {...i,referencePolicy,referencePolicyDirection:i.direction==='receivable'?'customer':'supplier',referencePolicyIdentifiers:[i.number,i.ocr,i.referenceOriginal?.invoice_number,i.referenceOriginal?.reference].filter((value):value is string=>typeof value==='string'&&!!value),intendedPaymentReference:referencePolicy.intendedPaymentReference,invoice_number:i.number,reference:i.ocr,total_cents:i.total,paid_cents:paid(state,i.id),remaining_cents:balance(state,i),payment_evidence_issue:invoicePaymentEvidenceIssue(state,i.id),vat_cents:i.vat??null,net_cents:i.net??null,due_at:i.due};}
 const accountIssue=(state:State,t:State['transactions'][number],options:ReconciliationOptions)=>options.account&&canonicalBankAccount(t.account)!==canonicalBankAccount(options.account)?'Bankposten tillhör inte företagsjobbets valda konto.':paymentAccountIssue(state,t);
+// A business review may authorize an explicit manual allocation. It cannot
+// supply the bank's missing individual payer/reference for an automatic one.
+function automaticSourceIssue(t:State['transactions'][number]):string{
+  if(!['bank_api','bank_file','bankgiro_file'].includes(t.evidence||''))return 'Automatisk matchning kräver individuellt bankoriginal. Manuellt registrerade eller fördelade uppgifter behöver ett uttryckligt granskningsbeslut.';
+  if(t.verification&&(!t.original||t.party!==t.original.party||t.payerReference!==t.original.payerReference))return 'Betalare eller referens har ändrats manuellt. Bankens originaluppgifter bevaras och matchningen behöver granskas uttryckligen.';
+  return '';
+}
 export function analyze(state:State,verifiedInvoiceOriginals:ReadonlySet<string>=new Set(),sourceReviewIssues:ReadonlyMap<string,string>=new Map(),options:ReconciliationOptions={}){
   const links=state.allocations.filter(a=>a.active&&a.effect==='payment').flatMap(a=>{
     const i=state.invoices.find(i=>i.id===a.invoiceId),t=state.transactions.find(t=>t.id===a.transactionId);
-    return i&&t&&!needsBankFileReview(t)&&!paymentEvidenceConflict(state,t)&&!paymentOriginalIssue(state,t)&&!accountIssue(state,t,options)&&!automaticMatchHoldReason(t)&&!bankPaymentReviewReason(t,state)&&!sourceReviewIssues.get(t.id)&&i.direction==='receivable'&&t.amount>0?[{invoice_id:i.id,party:i.party,organization_number:i.organizationNumber||'',payer:t.party,account:t.account}]:[];
+    return i&&t&&!needsBankFileReview(t)&&!paymentEvidenceConflict(state,t)&&!paymentOriginalIssue(state,t)&&!accountIssue(state,t,options)&&!automaticMatchHoldReason(t)&&!automaticSourceIssue(t)&&!bankPaymentReviewReason(t,state)&&!sourceReviewIssues.get(t.id)&&i.direction==='receivable'&&t.amount>0?[{invoice_id:i.id,party:i.party,organization_number:i.organizationNumber||'',payer:t.party,account:t.account}]:[];
   });
-  const data={invoices:state.invoices.map(i=>({...invoiceFacts(state,i,options),invoice_original_verified:verifiedInvoiceOriginals.has(i.id),organization_number:i.organizationNumber||'',direction:i.reviewed&&!i.voided?(i.direction==='receivable'?'customer':'supplier'):'held',kind:'invoice',issued_at:i.issued})),transactions:state.transactions.map(t=>({id:t.id,account:t.account,booked_at:t.date,amount_cents:t.amount,currency:t.currency,payer:t.party,reference:t.payerReference,reference_evidence:t.verification?undefined:t.referenceEvidence,reference_policy_values:invoicePolicyPaymentReferences(t).values,reference_policy_invalid:invoicePolicyPaymentReferences(t).invalid,bank_reference:t.bankReference,payer_organization_number:t.payerEvidence?.organizationNumber||'',excluded:t.ignored||!!t.duplicateOf,is_aggregate:needsPaymentSpecification(t),available_cents:available(state,t),verified:t.verified&&!!t.evidence&&!needsBankFileReview(t)&&!accountIssue(state,t,options),evidence_conflict:paymentEvidenceConflict(state,t),original_issue:paymentOriginalIssue(state,t),review_reason:sourceReviewIssues.get(t.id)||(paymentEvidenceConflict(state,t)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(state,t)||accountIssue(state,t,options)||automaticMatchHoldReason(t)||bankPaymentReviewReason(t,state)),parent_bank_reference:t.parentId?state.transactions.find(p=>p.id===t.parentId)?.bankReference||'':''})),links,allocations:state.allocations.filter(a=>a.active).map(a=>({invoice_id:a.invoiceId,transaction_id:a.transactionId}))};
+  const data={
+    invoices:state.invoices.map(i=>({...invoiceFacts(state,i,options),invoice_original_verified:verifiedInvoiceOriginals.has(i.id),organization_number:i.organizationNumber||'',direction:i.reviewed&&!i.voided?(i.direction==='receivable'?'customer':'supplier'):'held',kind:'invoice',issued_at:i.issued})),
+    transactions:state.transactions.map(t=>({
+      id:t.id,account:t.account,booked_at:t.date,amount_cents:t.amount,currency:t.currency,
+      payer:t.party,reference:t.payerReference,reference_evidence:t.referenceEvidence,
+      reference_policy_values:invoicePolicyPaymentReferences(t).values,
+      reference_policy_invalid:invoicePolicyPaymentReferences(t).invalid,
+      bank_reference:t.bankReference,payer_organization_number:t.payerEvidence?.organizationNumber||'',
+      excluded:t.ignored||!!t.duplicateOf,is_aggregate:needsPaymentSpecification(t),available_cents:available(state,t),
+      verified:t.verified&&!automaticSourceIssue(t)&&!needsBankFileReview(t)&&!accountIssue(state,t,options),
+      evidence_conflict:paymentEvidenceConflict(state,t),original_issue:paymentOriginalIssue(state,t),
+      review_reason:sourceReviewIssues.get(t.id)||(paymentEvidenceConflict(state,t)?BANK_EVIDENCE_CONFLICT:paymentOriginalIssue(state,t)||accountIssue(state,t,options)||automaticMatchHoldReason(t)||automaticSourceIssue(t)||bankPaymentReviewReason(t,state)),
+      parent_bank_reference:t.parentId?state.transactions.find(p=>p.id===t.parentId)?.bankReference||'':'',
+    })),links,allocations:state.allocations.filter(a=>a.active).map(a=>({invoice_id:a.invoiceId,transaction_id:a.transactionId})),
+  };
   // An actual specification's parent remains as immutable evidence, but its
   // complete child set replaces it economically. Do not treat it as incomplete.
   for(const t of data.transactions)if(t.is_aggregate){const children=state.transactions.filter(c=>c.parentId===t.id&&!c.ignored);if(children.length&&children.every(c=>!c.duplicateOf&&c.specificationStatus!=='review'&&c.account===t.account)&&children.reduce((n,c)=>n+c.amount,0)===t.amount_cents)t.excluded=true;}

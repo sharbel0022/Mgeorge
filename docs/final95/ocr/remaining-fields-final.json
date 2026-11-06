@@ -1,0 +1,395 @@
+{
+  "schema": "final95-ocr-remaining-source-classification-v1",
+  "basis": "Default AUTO, captured known-V2 optical observations replayed by final repaired parser; not an independent holdout",
+  "defaultMandatory": {
+    "correct": 70,
+    "expected": 100,
+    "falsePositive": 0
+  },
+  "defaultAll13": {
+    "correct": 93,
+    "expected": 130,
+    "falsePositive": 0
+  },
+  "missingMandatory": 30,
+  "missingAll13": 37,
+  "mandatoryGroups": {
+    "geometry_contract": 5,
+    "source_ownership_not_established": 15,
+    "optical_rate_damage_and_typed_vat_contract": 8,
+    "geometry_and_label_grammar_contract": 1,
+    "grammar_contract": 1
+  },
+  "rows": [
+    {
+      "id": "holdout-v2-normal-01",
+      "field": "due_at",
+      "mandatory": true,
+      "expectedSyntheticValue": "2026-07-03",
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "Correct digits are present in mixed party/address/date columns. The current all-segments ownership rule leaves the raw row intact.",
+      "nextStep": "Prove ownership of every affected source-row segment using typed address/identity/date regions; never discard unresolved sibling content."
+    },
+    {
+      "id": "holdout-v2-normal-01",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623114",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-01",
+      "field": "party",
+      "mandatory": true,
+      "expectedSyntheticValue": "Exempel Kustteknik AB",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-01",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 93645,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623122",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "field": "party",
+      "mandatory": true,
+      "expectedSyntheticValue": "Fiktiva Björk Konsult AB",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-02",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 321600,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "field": "bankgiro",
+      "mandatory": false,
+      "expectedSyntheticValue": "5736-0828",
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "The default AUTO account token is legible, with confidence94/91/96 for cases04/05/08, but mixed raw rows and table boundaries do not prove the label/value pairing.",
+      "nextStep": "A bounded account-cell/adjacent-region contract must retain every competing account occurrence and original input/text binding; no lowering of the word-confidence threshold."
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623148",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "field": "party",
+      "mandatory": true,
+      "expectedSyntheticValue": "Fiktiva Lönn Kontor AB",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "field": "reference",
+      "mandatory": false,
+      "expectedSyntheticValue": "00863025144",
+      "actual": null,
+      "classification": "geometry_and_label_grammar_contract",
+      "reason": "The source contains an Ange OCR-nummer value field; the current strict instruction/value grammar and mixed geometry do not establish its printed value.",
+      "nextStep": "Distinguish an actual labelled payment-reference value from prose instructions with full source census and independent ambiguous/invalid controls; preserve leading zeroes."
+    },
+    {
+      "id": "holdout-v2-normal-04",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 53340,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "field": "bankgiro",
+      "mandatory": false,
+      "expectedSyntheticValue": "241-9562",
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "The default AUTO account token is legible, with confidence94/91/96 for cases04/05/08, but mixed raw rows and table boundaries do not prove the label/value pairing.",
+      "nextStep": "A bounded account-cell/adjacent-region contract must retain every competing account occurrence and original input/text binding; no lowering of the word-confidence threshold."
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623155",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-05",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 242180,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623163",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-06",
+      "field": "party",
+      "mandatory": true,
+      "expectedSyntheticValue": "Fiktiva Skärvik IT AB",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "field": "bankgiro",
+      "mandatory": false,
+      "expectedSyntheticValue": "619-4823",
+      "actual": null,
+      "classification": "insufficient_optical_confidence",
+      "reason": "The default AUTO account word is correctly recognized at actual confidence89, below the existing90 word-proof threshold.",
+      "nextStep": "Keep null under current observation. Only a separately evaluated producer with sufficient original-bound actual word confidence or authorized native evidence can supply a proposal; never raise the observed confidence."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "field": "net_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 735480,
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "Case07 has three horizontal summary columns with a damaged VAT heading; printed net/gross values are readable but the new vertical-only contract intentionally does not assign these columns.",
+      "nextStep": "A separate bounded horizontal summary-cell contract needs independent positive/negative fixtures and complete competing-label/value census."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623171",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "field": "party",
+      "mandatory": true,
+      "expectedSyntheticValue": "Exempel Fräsverkstan AB",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "field": "reference",
+      "mandatory": false,
+      "expectedSyntheticValue": "00863025177",
+      "actual": null,
+      "classification": "optical_label_damage",
+      "reason": "The default AUTO label is OCKR-referens. Its digits are present, but the supported OCR label is not correctly observed.",
+      "nextStep": "Improve the optical observation or keep a reviewed unverified candidate; never silently replace the label according to expected corpus values."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "field": "total_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 919350,
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "Case07 has three horizontal summary columns with a damaged VAT heading; printed net/gross values are readable but the new vertical-only contract intentionally does not assign these columns.",
+      "nextStep": "A separate bounded horizontal summary-cell contract needs independent positive/negative fixtures and complete competing-label/value census."
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 183870,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "field": "bankgiro",
+      "mandatory": false,
+      "expectedSyntheticValue": "3547-0186",
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "The default AUTO account token is legible, with confidence94/91/96 for cases04/05/08, but mixed raw rows and table boundaries do not prove the label/value pairing.",
+      "nextStep": "A bounded account-cell/adjacent-region contract must retain every competing account occurrence and original input/text binding; no lowering of the word-confidence threshold."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "field": "due_at",
+      "mandatory": true,
+      "expectedSyntheticValue": "2026-08-22",
+      "actual": null,
+      "classification": "geometry_and_label_grammar_contract",
+      "reason": "Case08 prints Betalas senast with the correct date. Parser supports that alias, but layout grammar and mixed-role rows do not establish the date cell.",
+      "nextStep": "Align supported layout/date-label grammar and independently test mixed adjacent party/date rows while preserving the full label census."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "field": "invoice_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "2608-117",
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "Correct digits are present in mixed party/address/date columns. The current all-segments ownership rule leaves the raw row intact.",
+      "nextStep": "Prove ownership of every affected source-row segment using typed address/identity/date regions; never discard unresolved sibling content."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "field": "issued_at",
+      "mandatory": true,
+      "expectedSyntheticValue": "2026-07-23",
+      "actual": null,
+      "classification": "geometry_contract",
+      "reason": "Correct digits are present in mixed party/address/date columns. The current all-segments ownership rule leaves the raw row intact.",
+      "nextStep": "Prove ownership of every affected source-row segment using typed address/identity/date regions; never discard unresolved sibling content."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623189",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "field": "party",
+      "mandatory": true,
+      "expectedSyntheticValue": "Fiktiva Rönn Frakt AB",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 104990,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623197",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-09",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 383100,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "field": "currency",
+      "mandatory": true,
+      "expectedSyntheticValue": "SEK",
+      "actual": null,
+      "classification": "grammar_contract",
+      "reason": "Case10 has a complete currency sentence followed by a complete payment-reference instruction on the same source line. Whole-value validation correctly rejects the unmodelled remainder.",
+      "nextStep": "A closed sentence-boundary contract may separate only a complete known instruction from a whole ISO currency; unknown suffixes and competing currencies must remain invalid."
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "field": "organization_number",
+      "mandatory": true,
+      "expectedSyntheticValue": "5597623205",
+      "actual": null,
+      "classification": "source_ownership_not_established",
+      "reason": "The words/number are present, but an explicit supplier role does not own this header/footer within the accepted source contract.",
+      "nextStep": "Define and independently test a broader issuer/recipient block contract or confirm the party from the original; never assign the first visible company or footer organization by default."
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "field": "reference",
+      "mandatory": false,
+      "expectedSyntheticValue": "00863025201",
+      "actual": null,
+      "classification": "geometry_and_label_grammar_contract",
+      "reason": "The source contains an Ange OCR-nummer value field; the current strict instruction/value grammar and mixed geometry do not establish its printed value.",
+      "nextStep": "Distinguish an actual labelled payment-reference value from prose instructions with full source census and independent ambiguous/invalid controls; preserve leading zeroes."
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "field": "vat_cents",
+      "mandatory": true,
+      "expectedSyntheticValue": 71160,
+      "actual": null,
+      "classification": "optical_rate_damage_and_typed_vat_contract",
+      "reason": "OCR percentage/rate glyphs are damaged; the complete VAT occurrence cannot be converted to a monetary value. A literal amount remains present. Case09 also has a damaged explanatory rate sentence in the full census.",
+      "nextStep": "Measure an optical/rate-cell producer improvement on independent development documents, then require a correctly observed rate/value cell boundary. Keep conflicting or uncertain rate occurrences held; do not compute VAT from net/total."
+    }
+  ]
+}

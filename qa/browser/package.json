@@ -1,0 +1,13 @@
+{
+  "name": "mgeorge-quality-browser",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "install:chromium": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

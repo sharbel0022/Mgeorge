@@ -1,0 +1,1175 @@
+[
+  {
+    "run_id": 42177971213,
+    "job_id": 127760756176,
+    "name": "bankgiro_bridge",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Install isolated SFTP bridge",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Check isolated bridge syntax",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Audit isolated bridge production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-06T07:00:12.3827061Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-06T07:00:12.3854013Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+    ],
+    "test_evidence": [
+      "2026-11-06T07:00:21.2054181Z # tests 47",
+      "2026-11-06T07:00:21.2069282Z # suites 0",
+      "2026-11-06T07:00:21.2069628Z # pass 47",
+      "2026-11-06T07:00:21.2070313Z # fail 0",
+      "2026-11-06T07:00:21.2070552Z # cancelled 0",
+      "2026-11-06T07:00:21.2070802Z # skipped 0",
+      "2026-11-06T07:00:21.2071040Z # todo 0",
+      "2026-11-06T07:00:21.2071292Z # duration_ms 5534.793138"
+    ],
+    "runner_evidence": [],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756176"
+  },
+  {
+    "run_id": 42177971213,
+    "job_id": 127760756473,
+    "name": "test",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Run npm ci --ignore-scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Run npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Audit production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Run tests with synthetic data",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-06T07:00:14.7227150Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-06T07:00:14.7253854Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+    ],
+    "test_evidence": [
+      "2026-11-06T07:03:45.1430976Z # tests 2323",
+      "2026-11-06T07:03:45.1431331Z # suites 0",
+      "2026-11-06T07:03:45.1431694Z # pass 2323",
+      "2026-11-06T07:03:45.1432060Z # fail 0",
+      "2026-11-06T07:03:45.1432435Z # cancelled 0",
+      "2026-11-06T07:03:45.1432824Z # skipped 0",
+      "2026-11-06T07:03:45.1433190Z # todo 0",
+      "2026-11-06T07:03:45.1433622Z # duration_ms 200317.13137"
+    ],
+    "runner_evidence": [],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756473"
+  },
+  {
+    "run_id": 42177971213,
+    "job_id": 127760756672,
+    "name": "sites",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Run npm run install:ci",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Verify exact installed minimatch mitigation bytes",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Install shared OCR runtime for cloud integration test",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Run npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Audit Sites production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8
+      },
+      {
+        "name": "Install isolated bridge for full synthetic SFTP chain",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Run Sites tests with synthetic data",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Run npm run build",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 21
+      },
+      {
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 22
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 23
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-06T07:00:12.7030856Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-06T07:00:12.7054871Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+    ],
+    "test_evidence": [
+      "2026-11-06T07:06:59.2067381Z # tests 5237",
+      "2026-11-06T07:06:59.2067611Z # suites 0",
+      "2026-11-06T07:06:59.2067815Z # pass 5237",
+      "2026-11-06T07:06:59.2068016Z # fail 0",
+      "2026-11-06T07:06:59.2068220Z # cancelled 0",
+      "2026-11-06T07:06:59.2068428Z # skipped 0",
+      "2026-11-06T07:06:59.2068646Z # todo 0",
+      "2026-11-06T07:06:59.2068881Z # duration_ms 338624.916659"
+    ],
+    "runner_evidence": [],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756672"
+  },
+  {
+    "run_id": 42204787537,
+    "job_id": 127848589417,
+    "name": "ocr",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Verify reviewed main before dependency installation",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Install locked OCR dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Recheck current main before OCR credential use",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Process at most six leased documents",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-06T10:43:12.9907431Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-06T10:43:12.9932515Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+    ],
+    "test_evidence": [
+      "2026-11-06T10:44:46.2805382Z {\"status\":\"complete\",\"processed\":6,\"failed\":0}"
+    ],
+    "runner_evidence": [],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42204787537/job/127848589417"
+  },
+  {
+    "run_id": 42096194807,
+    "job_id": 127486729533,
+    "name": "Node 22.23.4",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T19:41:00.4692988Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T19:41:00.4725925Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+    ],
+    "test_evidence": [],
+    "runner_evidence": [
+      "2026-11-05T19:41:03.6186301Z [quality:node] install-node",
+      "2026-11-05T19:41:05.1739147Z [quality:node] install-node: PASS (1.55 s)",
+      "2026-11-05T19:41:05.1739709Z [quality:node] syntax",
+      "2026-11-05T19:41:10.1619009Z [quality:node] syntax: PASS (4.99 s)",
+      "2026-11-05T19:41:10.1626361Z [quality:node] audit-production",
+      "2026-11-05T19:41:10.5425020Z [quality:node] audit-production: PASS (0.38 s)",
+      "2026-11-05T19:41:10.5433627Z [quality:node] audit-all",
+      "2026-11-05T19:41:10.8743813Z [quality:node] audit-all: PASS (0.33 s)",
+      "2026-11-05T19:41:10.8750518Z [quality:node] node-tests: running complete suite with TAP/JUnit/LCOV",
+      "2026-11-05T19:45:20.4783721Z [quality:node] node-tests: PASS {\"tests\":2152,\"pass\":2152,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+      "2026-11-05T19:45:20.5611329Z [quality:node] PASSED: /home/runner/work/_temp/quality-node/receipt.json"
+    ],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486729533"
+  },
+  {
+    "run_id": 42096194807,
+    "job_id": 127486729909,
+    "name": "Bankgiro SFTP integration",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Locked install, syntax, audits and synthetic SSH SFTP HTTP recovery",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Retain bridge receipts, failure logs, JUnit and LCOV",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T19:41:00.5997107Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T19:41:00.6021791Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+    ],
+    "test_evidence": [],
+    "runner_evidence": [
+      "2026-11-05T19:41:06.9916725Z [quality:bridge] install-bridge",
+      "2026-11-05T19:41:07.4713898Z [quality:bridge] install-bridge: PASS (0.48 s)",
+      "2026-11-05T19:41:07.4714529Z [quality:bridge] syntax",
+      "2026-11-05T19:41:07.7076652Z [quality:bridge] syntax: PASS (0.24 s)",
+      "2026-11-05T19:41:07.7077544Z [quality:bridge] audit-production",
+      "2026-11-05T19:41:08.0575813Z [quality:bridge] audit-production: PASS (0.35 s)",
+      "2026-11-05T19:41:08.0584659Z [quality:bridge] audit-all",
+      "2026-11-05T19:41:08.4034130Z [quality:bridge] audit-all: PASS (0.34 s)",
+      "2026-11-05T19:41:08.4040254Z [quality:bridge] bridge-tests: running complete suite with TAP/JUnit/LCOV",
+      "2026-11-05T19:41:14.2062052Z [quality:bridge] bridge-tests: PASS {\"tests\":47,\"pass\":47,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+      "2026-11-05T19:41:14.2926876Z [quality:bridge] PASSED: /home/runner/work/_temp/quality-bridge/receipt.json"
+    ],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486729909"
+  },
+  {
+    "run_id": 42096194807,
+    "job_id": 127486729912,
+    "name": "Node 24.22.1",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T19:41:00.6441788Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T19:41:00.6475630Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+    ],
+    "test_evidence": [],
+    "runner_evidence": [
+      "2026-11-05T19:41:08.3608400Z [quality:node] install-node",
+      "2026-11-05T19:41:09.4561169Z [quality:node] install-node: PASS (1.09 s)",
+      "2026-11-05T19:41:09.4570382Z [quality:node] syntax",
+      "2026-11-05T19:41:14.3059028Z [quality:node] syntax: PASS (4.85 s)",
+      "2026-11-05T19:41:14.3069702Z [quality:node] audit-production",
+      "2026-11-05T19:41:14.6286257Z [quality:node] audit-production: PASS (0.32 s)",
+      "2026-11-05T19:41:14.6295338Z [quality:node] audit-all",
+      "2026-11-05T19:41:14.9417895Z [quality:node] audit-all: PASS (0.31 s)",
+      "2026-11-05T19:41:14.9424147Z [quality:node] node-tests: running complete suite with TAP/JUnit/LCOV",
+      "2026-11-05T19:44:13.3067102Z [quality:node] node-tests: PASS {\"tests\":2152,\"pass\":2152,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+      "2026-11-05T19:44:13.3907961Z [quality:node] PASSED: /home/runner/work/_temp/quality-node/receipt.json"
+    ],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486729912"
+  },
+  {
+    "run_id": 42096194807,
+    "job_id": 127486730128,
+    "name": "Sites types, tests and production build",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Verified installs, types, audits, complete synthetic suite and production build",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Retain Sites receipts, failure logs, JUnit and LCOV",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T19:41:01.1811591Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T19:41:01.1836122Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+    ],
+    "test_evidence": [],
+    "runner_evidence": [
+      "2026-11-05T19:41:11.2985955Z [quality:sites] install-node",
+      "2026-11-05T19:41:12.5670877Z [quality:sites] install-node: PASS (1.27 s)",
+      "2026-11-05T19:41:12.5671826Z [quality:sites] install-sites",
+      "2026-11-05T19:41:28.8897437Z [quality:sites] install-sites: PASS (16.32 s)",
+      "2026-11-05T19:41:28.8898192Z [quality:sites] install-bridge",
+      "2026-11-05T19:41:29.2581595Z [quality:sites] install-bridge: PASS (0.37 s)",
+      "2026-11-05T19:41:29.2582160Z [quality:sites] minimatch-mitigation",
+      "2026-11-05T19:41:29.4744923Z [quality:sites] minimatch-mitigation: PASS (0.22 s)",
+      "2026-11-05T19:41:29.4745409Z [quality:sites] typecheck",
+      "2026-11-05T19:41:40.1252587Z [quality:sites] typecheck: PASS (10.65 s)",
+      "2026-11-05T19:41:40.1253375Z [quality:sites] audit-production",
+      "2026-11-05T19:41:40.6664611Z [quality:sites] audit-production: PASS (0.54 s)",
+      "2026-11-05T19:41:40.6672562Z [quality:sites] audit-all",
+      "2026-11-05T19:41:42.3782015Z [quality:sites] audit-all: PASS (1.71 s)",
+      "2026-11-05T19:41:42.3788297Z [quality:sites] sites-tests: running complete suite with TAP/JUnit/LCOV",
+      "2026-11-05T19:50:29.3714155Z [quality:sites] sites-tests: PASS {\"tests\":4128,\"pass\":4128,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+      "2026-11-05T19:50:29.3715917Z [quality:sites] production-build",
+      "2026-11-05T19:50:44.2369593Z [quality:sites] production-build: PASS (14.86 s)",
+      "2026-11-05T19:50:44.3243770Z [quality:sites] PASSED: /home/runner/work/_temp/quality-sites/receipt.json"
+    ],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486730128"
+  },
+  {
+    "run_id": 42096194807,
+    "job_id": 127486730221,
+    "name": "Chromium synthetic onboarding acceptance",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Install locked browser tooling and run all synthetic UI scenarios",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Retain browser results, screenshots and source manifests",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T19:41:01.3325949Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T19:41:01.3366236Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+    ],
+    "test_evidence": [],
+    "runner_evidence": [
+      "2026-11-05T19:41:12.0784268Z [quality:browser] install-sites",
+      "2026-11-05T19:41:31.5346380Z [quality:browser] install-sites: PASS (19.45 s)",
+      "2026-11-05T19:41:31.5346881Z [quality:browser] install-browser-tooling",
+      "2026-11-05T19:41:31.9917942Z [quality:browser] install-browser-tooling: PASS (0.46 s)",
+      "2026-11-05T19:41:31.9918774Z [quality:browser] install-chromium",
+      "2026-11-05T19:41:55.7428731Z [quality:browser] install-chromium: PASS (23.75 s)",
+      "2026-11-05T19:41:55.7429607Z [quality:browser] audit-all",
+      "2026-11-05T19:41:56.2486484Z [quality:browser] audit-all: PASS (0.50 s)",
+      "2026-11-05T19:41:56.2494730Z [quality:browser] browser-acceptance",
+      "2026-11-05T19:42:11.9720931Z [quality:browser] browser-acceptance: PASS (15.72 s)",
+      "2026-11-05T19:42:12.0747947Z [quality:browser] PASSED: /home/runner/work/_temp/quality-browser/receipt.json"
+    ],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486730221"
+  },
+  {
+    "run_id": 42096194807,
+    "job_id": 127486730225,
+    "name": "Synthetic 1, 10 and 100 company performance",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Measure real SQLite work with synthetic companies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Retain workload, correctness and latency evidence",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T19:41:00.7321300Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T19:41:00.7358535Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+    ],
+    "test_evidence": [],
+    "runner_evidence": [
+      "2026-11-05T19:41:08.7476678Z [quality:performance] install-node",
+      "2026-11-05T19:41:09.8215120Z [quality:performance] install-node: PASS (1.07 s)",
+      "2026-11-05T19:41:09.8215881Z [quality:performance] company-benchmark",
+      "2026-11-05T19:42:07.3310051Z [quality:performance] company-benchmark: PASS (57.51 s)",
+      "2026-11-05T19:42:07.4156667Z [quality:performance] PASSED: /home/runner/work/_temp/quality-performance/receipt.json"
+    ],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486730225"
+  },
+  {
+    "run_id": 42096194737,
+    "job_id": 127486729392,
+    "name": "security_acceptance",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Install locked dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Install verified Sites dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Exercise synthetic authorization, isolation and recovery boundaries",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Retain synthetic acceptance evidence",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T19:40:59.6515484Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T19:40:59.6547278Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+    ],
+    "test_evidence": [],
+    "runner_evidence": [
+      "2026-11-05T19:41:53.1467629Z node-security: PASS {\"tests\":332,\"pass\":332,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+      "2026-11-05T19:42:47.5307857Z sites-security: PASS {\"tests\":843,\"pass\":843,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}"
+    ],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194737/job/127486729392"
+  },
+  {
+    "run_id": 42119034842,
+    "job_id": 127566243054,
+    "name": "test",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Run npm ci --ignore-scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Run npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Audit production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Run tests with synthetic data",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T22:09:32.4143849Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T22:09:32.4167413Z 7f593c00c22b41f8ed67d08af561306d0f93f770"
+    ],
+    "test_evidence": [
+      "2026-11-05T22:11:45.2971424Z # tests 1997",
+      "2026-11-05T22:11:45.2971586Z # suites 0",
+      "2026-11-05T22:11:45.2971709Z # pass 1997",
+      "2026-11-05T22:11:45.2971828Z # fail 0",
+      "2026-11-05T22:11:45.2971939Z # cancelled 0",
+      "2026-11-05T22:11:45.2972055Z # skipped 0",
+      "2026-11-05T22:11:45.2972170Z # todo 0",
+      "2026-11-05T22:11:45.2972291Z # duration_ms 125993.262081"
+    ],
+    "runner_evidence": [],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42119034842/job/127566243054"
+  },
+  {
+    "run_id": 42119034842,
+    "job_id": 127566243670,
+    "name": "sites",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Run npm run install:ci",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Verify exact installed minimatch mitigation bytes",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Install shared OCR runtime for cloud integration test",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Run npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Audit Sites production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8
+      },
+      {
+        "name": "Install isolated bridge for full synthetic SFTP chain",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Run Sites tests with synthetic data",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Run npm run build",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 21
+      },
+      {
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 22
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 23
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T22:09:34.2398191Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T22:09:34.2420414Z 7f593c00c22b41f8ed67d08af561306d0f93f770"
+    ],
+    "test_evidence": [
+      "2026-11-05T22:14:39.9767674Z # tests 3888",
+      "2026-11-05T22:14:39.9767931Z # suites 0",
+      "2026-11-05T22:14:39.9768180Z # pass 3888",
+      "2026-11-05T22:14:39.9768422Z # fail 0",
+      "2026-11-05T22:14:39.9768662Z # cancelled 0",
+      "2026-11-05T22:14:39.9768909Z # skipped 0",
+      "2026-11-05T22:14:39.9769154Z # todo 0",
+      "2026-11-05T22:14:39.9769428Z # duration_ms 244401.023196"
+    ],
+    "runner_evidence": [],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42119034842/job/127566243670"
+  },
+  {
+    "run_id": 42119034842,
+    "job_id": 127566243723,
+    "name": "bankgiro_bridge",
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Install isolated SFTP bridge",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Check isolated bridge syntax",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Audit isolated bridge production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      }
+    ],
+    "checkout_evidence": [
+      "2026-11-05T22:09:33.6562932Z [command]/usr/bin/git log -1 --format=%H",
+      "2026-11-05T22:09:33.6588199Z 7f593c00c22b41f8ed67d08af561306d0f93f770"
+    ],
+    "test_evidence": [
+      "2026-11-05T22:09:43.0545446Z # tests 47",
+      "2026-11-05T22:09:43.0545883Z # suites 0",
+      "2026-11-05T22:09:43.0546466Z # pass 47",
+      "2026-11-05T22:09:43.0547282Z # fail 0",
+      "2026-11-05T22:09:43.0548070Z # cancelled 0",
+      "2026-11-05T22:09:43.0548417Z # skipped 0",
+      "2026-11-05T22:09:43.0550732Z # todo 0",
+      "2026-11-05T22:09:43.0551113Z # duration_ms 5787.035999"
+    ],
+    "runner_evidence": [],
+    "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42119034842/job/127566243723"
+  }
+]

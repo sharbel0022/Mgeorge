@@ -1,0 +1,393 @@
+{
+  "schema": "completion-ocr-development-summary-v1",
+  "baseSha": "30dfaa97bb7ce2118b4756205347d4a96e8be6ab",
+  "finalCodeSha": "a5d8ad81f4bb0e177a119108cff89ad8c830e259",
+  "knownDevelopment": true,
+  "independentHoldout": false,
+  "v3Accessed": false,
+  "opticalCallsThisComparison": 0,
+  "parserCallsPerCandidate": 24,
+  "originalOpticalResultSha256": "d6db21532448fb8f8bb4a103c35f1b61cc44132392ca7ba12a0ed4a98c58c1dc",
+  "before": {
+    "node/normal-readable": {
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 93,
+          "fp": 0,
+          "fn": 37,
+          "expectedNonNull": 130,
+          "returnedNonNull": 93,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.7153846153846154,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 70,
+          "fp": 0,
+          "fn": 30,
+          "expectedNonNull": 100,
+          "returnedNonNull": 70,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.7,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    },
+    "node/stress": {
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 10,
+          "fp": 0,
+          "fn": 16,
+          "expectedNonNull": 26,
+          "returnedNonNull": 10,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.38461538461538464,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 12,
+          "expectedNonNull": 20,
+          "returnedNonNull": 8,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.4,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    },
+    "sites/normal-readable": {
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 93,
+          "fp": 0,
+          "fn": 37,
+          "expectedNonNull": 130,
+          "returnedNonNull": 93,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.7153846153846154,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 70,
+          "fp": 0,
+          "fn": 30,
+          "expectedNonNull": 100,
+          "returnedNonNull": 70,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.7,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    },
+    "sites/stress": {
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 10,
+          "fp": 0,
+          "fn": 16,
+          "expectedNonNull": 26,
+          "returnedNonNull": 10,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.38461538461538464,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 12,
+          "expectedNonNull": 20,
+          "returnedNonNull": 8,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.4,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    }
+  },
+  "after": {
+    "node/normal-readable": {
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 97,
+          "fp": 0,
+          "fn": 33,
+          "expectedNonNull": 130,
+          "returnedNonNull": 97,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.7461538461538462,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 74,
+          "fp": 0,
+          "fn": 26,
+          "expectedNonNull": 100,
+          "returnedNonNull": 74,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.74,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    },
+    "node/stress": {
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 10,
+          "fp": 0,
+          "fn": 16,
+          "expectedNonNull": 26,
+          "returnedNonNull": 10,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.38461538461538464,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 12,
+          "expectedNonNull": 20,
+          "returnedNonNull": 8,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.4,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    },
+    "sites/normal-readable": {
+      "all13": {
+        "documents": 10,
+        "counts": {
+          "tp": 97,
+          "fp": 0,
+          "fn": 33,
+          "expectedNonNull": 130,
+          "returnedNonNull": 97,
+          "correctNull": 0,
+          "reviewedFields": 130
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.7461538461538462,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 10,
+        "counts": {
+          "tp": 74,
+          "fp": 0,
+          "fn": 26,
+          "expectedNonNull": 100,
+          "returnedNonNull": 74,
+          "correctNull": 0,
+          "reviewedFields": 100
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.74,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    },
+    "sites/stress": {
+      "all13": {
+        "documents": 2,
+        "counts": {
+          "tp": 10,
+          "fp": 0,
+          "fn": 16,
+          "expectedNonNull": 26,
+          "returnedNonNull": 10,
+          "correctNull": 0,
+          "reviewedFields": 26
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.38461538461538464,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      },
+      "mandatory10": {
+        "documents": 2,
+        "counts": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 12,
+          "expectedNonNull": 20,
+          "returnedNonNull": 8,
+          "correctNull": 0,
+          "reviewedFields": 20
+        },
+        "fieldPrecision": 1,
+        "fieldRecall": 0.4,
+        "falseGreenCount": 0,
+        "greenCount": 0,
+        "errorCount": 0
+      }
+    }
+  },
+  "fieldChanges": [
+    {
+      "id": "holdout-v2-normal-07",
+      "engine": "node",
+      "field": "net_cents",
+      "before": null,
+      "after": 735480,
+      "expected": 735480,
+      "regression": false
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "engine": "node",
+      "field": "total_cents",
+      "before": null,
+      "after": 919350,
+      "expected": 919350,
+      "regression": false
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "engine": "sites",
+      "field": "net_cents",
+      "before": null,
+      "after": 735480,
+      "expected": 735480,
+      "regression": false
+    },
+    {
+      "id": "holdout-v2-normal-07",
+      "engine": "sites",
+      "field": "total_cents",
+      "before": null,
+      "after": 919350,
+      "expected": 919350,
+      "regression": false
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "engine": "node",
+      "field": "due_at",
+      "before": null,
+      "after": "2026-08-22",
+      "expected": "2026-08-22",
+      "regression": false
+    },
+    {
+      "id": "holdout-v2-normal-08",
+      "engine": "sites",
+      "field": "due_at",
+      "before": null,
+      "after": "2026-08-22",
+      "expected": "2026-08-22",
+      "regression": false
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "engine": "node",
+      "field": "currency",
+      "before": null,
+      "after": "SEK",
+      "expected": "SEK",
+      "regression": false
+    },
+    {
+      "id": "holdout-v2-normal-10",
+      "engine": "sites",
+      "field": "currency",
+      "before": null,
+      "after": "SEK",
+      "expected": "SEK",
+      "regression": false
+    }
+  ],
+  "remainingNormalFields": {
+    "bankgiro": 4,
+    "due_at": 1,
+    "invoice_number": 1,
+    "issued_at": 1,
+    "organization_number": 9,
+    "party": 6,
+    "reference": 3,
+    "vat_cents": 8
+  },
+  "requirements": {
+    "mandatoryRecall": 0.85,
+    "precision": 0.98,
+    "independentAcceptanceMet": false
+  },
+  "inputsUnchanged": true
+}

@@ -160,7 +160,17 @@ test('isolated full recovery preserves committed WAL originals, revoked links an
  assert.equal(restoreBackup(archive,target,key).restored,true);
  const restored=new DatabaseSync(target,{readOnly:true});
  try{
-  assert.deepEqual(databaseContents(restored),before,'every table, schema definition and row must survive evidence recovery');
+  const recovered=databaseContents(restored),gateRows=recovered.tables.company_application_token_control;
+  assert.equal(gateRows.length,1);const gate={...gateRows[0]};
+  assert.match(gate.restore_marker,/^[a-f0-9]{64}$/);
+  assert.deepEqual(gate,{id:1,revision:1,recovery_required:1,restore_marker:gate.restore_marker,recovery_evidence:''});
+  const newSchema=recovered.schema.filter(row=>row.name==='company_application_token_control');
+  assert.equal(newSchema.length,1);assert.equal(newSchema[0].type,'table');assert.equal(newSchema[0].tbl_name,'company_application_token_control');
+  // Validate the sole new recovery barrier explicitly, then require exact
+  // equality for every original schema object and every financial/evidence row.
+  delete recovered.tables.company_application_token_control;
+  recovered.schema=recovered.schema.filter(row=>row.name!=='company_application_token_control');
+  assert.deepEqual(recovered,before,'every original table, schema definition and row must survive evidence recovery');
   assert.equal(restored.prepare('PRAGMA integrity_check').get().integrity_check,'ok');
   assert.deepEqual(restored.prepare('PRAGMA foreign_key_check').all(),[]);
   assert.equal(restored.prepare('SELECT COUNT(*) count FROM invoices').get().count,2);

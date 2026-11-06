@@ -1,0 +1,8 @@
+{
+  "libraryFileId": "libfile_a8a3dd35dce08191b6fc0631e7f5f48b",
+  "url": "https://chatgpt.com/library?file_id=libfile_a8a3dd35dce08191b6fc0631e7f5f48b&account_id=personal",
+  "archive": "final95-ocr-optical-variants-01-evidence.tar.gz",
+  "sha256": "96e954c2406fbbad580a3471910c6e7533f75f566370826d77e04f40102ce474",
+  "bytes": 770907,
+  "scope": "24 actual optical observations of 12 known synthetic V2 images under two predeclared alternatives. Same 12 recognition rasters as raw-capture-location.json; no independent V3 or production evaluation."
+}

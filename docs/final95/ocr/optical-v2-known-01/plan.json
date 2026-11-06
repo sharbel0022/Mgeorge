@@ -1,0 +1,92 @@
+{
+  "schema": "final95-known-v2-optical-development-plan-v1",
+  "createdAt": "2026-11-06T11:59:08.230Z",
+  "binding": {
+    "baseCommit": "2982b6c51cf2891d97b816ea1ce6c82e5f4c71a1",
+    "baselineSource": {
+      "src/invoice-extraction.js": "2f242812d044cd9aab1aafb6a15106ecfe16f4051f50d2226ad65f4337154579",
+      "src/invoice-details.js": "1405953897c66dc396fe01b466ac51ec53dee3d975798d40199642073d990437",
+      "src/invoice-worker.js": "e14496922f70a62038b0ff24dcc61026d0c11a85192d3abff3a9105114952fef",
+      "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+      "src/image-dimensions.js": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+      "src/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4",
+      "sites/lib/invoice-fields.js": "5b9ae3dd632d526417b7d3236eaa83777592483948b9a091ad2be42ba3d7a900",
+      "sites/lib/invoice-details.js": "1405953897c66dc396fe01b466ac51ec53dee3d975798d40199642073d990437",
+      "sites/lib/ocr-layout.js": "b9c22df11bf317e7d0c3cb880f3c810c73b948fa6f694214c07ac80e1a066d76",
+      "sites/lib/ocr-bankgiro-evidence.js": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a",
+      "test/helpers/ocr-quality-metrics.mjs": "e799e8e7b759f1cc20aeae946d479b7bae4c730fef45fd015a5c809c42cc0ada"
+    },
+    "candidateSource": {
+      "src/invoice-extraction.js": "6783d8bcbf8739d9f6b38d28dc0cba8fa38d21550be3117263809c27290b084f",
+      "src/invoice-details.js": "0f46b7df4ddf9dac13d83486d040502f91d40bc7c3a292c9336062afff0bbc80",
+      "src/invoice-worker.js": "e14496922f70a62038b0ff24dcc61026d0c11a85192d3abff3a9105114952fef",
+      "src/ocr-raster-size.js": "feeca5b3c51d0607420cbee2a23a6431a938bdf3cefcf580493464a1f32a5b8f",
+      "src/image-dimensions.js": "57e1db355914c6f30190f591a1459b4a0ca25acee5a9b88d060cba2213aa9eec",
+      "src/pdf-text.js": "110571c642b071404aae9ff02e95af162f104af345b80c6b492aded0fc9bc2e4",
+      "sites/lib/invoice-fields.js": "9613bc10d50b4fe3e907f0e3086637d2d0e4f93cf1efeac932302e5626173bd1",
+      "sites/lib/invoice-details.js": "0f46b7df4ddf9dac13d83486d040502f91d40bc7c3a292c9336062afff0bbc80",
+      "sites/lib/ocr-layout.js": "b9c22df11bf317e7d0c3cb880f3c810c73b948fa6f694214c07ac80e1a066d76",
+      "sites/lib/ocr-bankgiro-evidence.js": "d47149b163ae2c7dd4344253747938184b27714164fbb2b3a3025baf4e92198a",
+      "test/helpers/ocr-quality-metrics.mjs": "e799e8e7b759f1cc20aeae946d479b7bae4c730fef45fd015a5c809c42cc0ada"
+    },
+    "runtime": {
+      "versions": {
+        "@napi-rs/canvas": "0.1.80",
+        "@tesseract.js-data/swe": "1.0.0",
+        "tesseract.js": "6.0.1",
+        "tesseract.js-core": "6.1.2",
+        "pdfjs-dist": "5.4.149"
+      },
+      "artifacts": {
+        "swe/swe.traineddata.gz": "8432cbbf8c916ab80e21c00379591e696b7dfee5183242f8a137cad93ec4803b",
+        "tesseract-core/tesseract-core-lstm.wasm": "220e2e87551edccb85519796a170469f8ab2a8055216789e3b8b1ada18b7bc2b",
+        "tesseract-core/tesseract-core-simd-lstm.wasm": "187d76742dfc0d8929f0b49a619f145bb6370730776c7bd0d3e20c6b2098808d",
+        "tesseract-core/tesseract-core-simd.wasm": "ca11ee92a02023e4f5083eefd0966fb83b297416da54e997b9f6ce445f719c9b",
+        "tesseract-core/tesseract-core.wasm": "740f7e466a2f026e1f1e54a2e0d9957e386d8166110d1290224abd3d08986106"
+      }
+    },
+    "inputs": {
+      "manifest.json": "b29aabbeaa210434ca69688294bc88d1b6136c83380cdeb70580ed824a08a08d",
+      "gold.json": "943a3f9039726d50817de5ad5e913c85aa5210f52e70db487be18e4bb5840af0",
+      "images/holdout-v2-normal-01.png": "fcb2e8d42d874ae5e048e2bf164d15ba54d8e26291f018fc5f3f5ee9f1de776d",
+      "images/holdout-v2-normal-02.png": "4b6c7b477fbe7b2011642039c87c339e0e083885eb12cf4ddb500409f2009604",
+      "images/holdout-v2-normal-03.png": "103b9ac64c33d897e5a155c86e982bb28838b0c039021d0ad5e15db7daf75338",
+      "images/holdout-v2-normal-04.png": "11dc60c6c41ec9a5cb02ad4e8534383f5b0ed11c8c3ae45fc8de5344ca03003b",
+      "images/holdout-v2-normal-05.png": "17172aa60e58ee166edac27cb763f3a55b320390cbfc55c10c932c694f8a6bb7",
+      "images/holdout-v2-normal-06.png": "fc3637ae52779853504e80cb698103246541811fab7f9a9b5ea2161bcc13646b",
+      "images/holdout-v2-normal-07.png": "6cdc1af980952c6efacf2060bc282c086aeaac21711f5d158b7b37f669f795b7",
+      "images/holdout-v2-normal-08.png": "7fa157e335138ce094dcef99a1238adbb6c03403b288abab3c3b7308ed964aac",
+      "images/holdout-v2-normal-09.png": "121a3ba41e9577e68f502de6f2e2e3c9bc77cddc7f43abe170009d33f39892e1",
+      "images/holdout-v2-normal-10.png": "ec824b9ab34f88f7d9cd86d20ef992b4d46271d2713eee284b30604bbb4c7f6b",
+      "images/holdout-v2-stress-lost-bottom.png": "8f3e3ad1663fbcca2a2f8b11656a2aebb5d85b35eb03d941095ace9fa410085e",
+      "images/holdout-v2-stress-defocused-photo.png": "38e52c66a501b2b64f8600ebad4aae210d1d897b7d882653c3136d8f33e08606"
+    },
+    "harness": {
+      "known-optical.mjs": "f23b214f40ebc77f17fb02e9085416cae6a94505f7f081af2c40b1dc7ab565cb",
+      "capture-hook.mjs": "e7d99c9d5adeec7396a17f1487480bb7eaf21ad6c7fb5d60a5eac047e17df7d4",
+      "capture-tesseract.mjs": "6542961c3420a5c5662ddc6cfd1b7afcf72f3193c61cf9d9f0053e915bdbe9b1"
+    }
+  },
+  "orderedImages": [
+    "holdout-v2-normal-01",
+    "holdout-v2-normal-02",
+    "holdout-v2-normal-03",
+    "holdout-v2-normal-04",
+    "holdout-v2-normal-05",
+    "holdout-v2-normal-06",
+    "holdout-v2-normal-07",
+    "holdout-v2-normal-08",
+    "holdout-v2-normal-09",
+    "holdout-v2-normal-10",
+    "holdout-v2-stress-lost-bottom",
+    "holdout-v2-stress-defocused-photo"
+  ],
+  "opticalCallsMaximum": 12,
+  "parserCallsMaximum": 48,
+  "oneWorkerPerImage": true,
+  "noRetries": true,
+  "knownDevelopmentCorpus": true,
+  "independentHoldout": false,
+  "v3Accessed": false,
+  "method": "Unchanged baseline 2982 worker with observational Tesseract hook; unmodified output evaluated by baseline and candidate Node/Sites parsers. Same exact image, confidence and original-bound word evidence for every comparison. Gold, populations and existing metric helper remain fixed."
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "observedOn": "2026-11-06",
+  "scope": "Saved status and retained evidence reads only; no real provider contacted by these status calls. Private identifiers and customer content omitted.",
+  "collectedDuring": "Initial recovery inventory before PR61, with underlying component timestamps retained below. Acquisition timestamps were not separately recorded.",
+  "production": {
+    "siteVersion": 66,
+    "siteDeployment": "appgdep_6aed50f31fb48191ab1617fe42756ccb",
+    "nativeSourceCommit": "0b119b8d472f70a1bfeac686c12889b618a32fb2",
+    "status": "succeeded",
+    "failedVersion": 67,
+    "failedSourceCommit": "d30b1e2518e3765b15fba28cbd306addf142da38",
+    "failedDeployment": "appgdep_6aed7cf03554819191f58e9eda384478",
+    "failureCategory": "Dependency source rejected by source-only deployment",
+    "publicationDuringRecovery": false
+  },
+  "bank": {
+    "enabled": true,
+    "connected": false,
+    "intervalHours": 6,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+    "nextAttemptAt": "2026-11-05T14:06:00.000Z",
+    "lastError": "Bankhändelserna kunde inte hämtas. Försök igen.",
+    "blocked": false,
+    "failures": 1
+  },
+  "bankgiro": {
+    "enabled": false,
+    "mode": null,
+    "state": "DISABLED",
+    "reason": "SOURCE_NOT_CONFIGURED",
+    "authorization": {
+      "status": "UNKNOWN",
+      "verifiedAt": null,
+      "validUntil": null
+    },
+    "lastSuccessAt": null,
+    "lastFailureAt": null,
+    "lastFailureCode": null,
+    "counts": {
+      "PENDING": 0,
+      "RETRY": 0,
+      "IMPORTED": 0,
+      "REVIEW": 0,
+      "DUPLICATE": 0,
+      "BLOCKED": 0
+    }
+  },
+  "gmail": {
+    "configured": true,
+    "send_enabled": true,
+    "last_successful_fetch": "2026-11-06T04:06:01.714Z",
+    "sync_health": {
+      "state": "stale",
+      "reason": "Ingen färsk lyckad hämtning. Kontrollera det externa schemat och anslutningen.",
+      "interval_minutes": 60,
+      "stale_after_minutes": 120,
+      "schedule_verified": false
+    },
+    "schedule_observation": {
+      "last_invoked_at": "2026-11-06T04:05:48.841Z",
+      "last_completed_at": "2026-11-06T04:06:04.143Z",
+      "last_outcome": "completed",
+      "source": "system_entrypoint",
+      "external_schedule_verified": false
+    },
+    "fetch_ready": false,
+    "background_ready": false,
+    "background_health": {
+      "state": "needs_attention",
+      "reasons": [
+        "gmail_fetch_stale",
+        "external_schedule_unverified"
+      ]
+    },
+    "scheduler_configured": true,
+    "next_eligible_sync": "2026-11-06T11:25:10.907Z",
+    "connection": {
+      "last_synced": "",
+      "status": "connected",
+      "last_attempt": "2026-11-06T04:05:49.061Z",
+      "retry_after": "",
+      "sync_failures": 0,
+      "blocked": false,
+      "postprocess_warning": null
+    },
+    "processing": {
+      "enabled": true,
+      "auto_register": true,
+      "worker_last_seen": "2026-11-03T10:48:46.890Z",
+      "worker_online": false,
+      "cloud_ocr_configured": true,
+      "cloud_worker_last_seen": "2026-11-06T10:44:42.392Z",
+      "cloud_worker_recent": true,
+      "cloud_last_completed": "2026-11-06T10:44:45.768Z",
+      "last_processed": "2026-11-06T10:43:20.438Z",
+      "counts": {
+        "needs_review": 397,
+        "registered": 2,
+        "waiting_ocr": 52
+      },
+      "registered": 5,
+      "aftercheck_pending": 0,
+      "review_reasons": {
+        "basis": "stored_extraction",
+        "total": 397,
+        "analyzed": 397,
+        "limit": 500,
+        "truncated": false,
+        "counts": {
+          "uninterpreted": 0,
+          "missing_invoice_number": 134,
+          "missing_party": 184,
+          "missing_dates": 231,
+          "missing_organization": 292,
+          "missing_amount": 147,
+          "missing_vat_or_net": 189,
+          "unverified_counterparty": 396,
+          "possible_duplicate": 0,
+          "low_confidence": 333,
+          "other_review": 0
+        }
+      },
+      "messages_waiting": 2,
+      "scheduler_configured": true,
+      "schedule_minutes": 60,
+      "ocr_mode": "cloud",
+      "limits": {
+        "file_bytes": 15000000,
+        "pdf_cloud_bytes": 5000000,
+        "pages": 10,
+        "local_concurrency": 1,
+        "cloud_concurrency": 1
+      }
+    }
+  },
+  "backup": {
+    "day": "2026-11-06",
+    "status": "complete",
+    "files": 430,
+    "copied": 430,
+    "bytes": 185567855,
+    "created_at": "2026-11-05T23:03:21.104Z",
+    "verified_at": "2026-11-06T00:48:58.086Z",
+    "verified_files": 430,
+    "verified_bytes": 185567855,
+    "verification_started_at": "2026-11-06T00:45:07.487Z",
+    "verification_scope": "manifest_pass",
+    "api_evidence": {
+      "version": "retained-api-receipts-v1",
+      "scope": "retained_json_checksums",
+      "records_checked": 19,
+      "records_without_receipt": 112
+    },
+    "error": null,
+    "attempts": 0
+  },
+  "saved0599": {
+    "changed": false,
+    "revision": 52,
+    "amountCents": 62500,
+    "currency": "SEK",
+    "date": "2026-10-26",
+    "retainedReportIntegrity": "passed",
+    "retainedReportRows": 1,
+    "payerNamePresent": true,
+    "payerOrganizationIdPresent": false,
+    "reportReference": "0599",
+    "referenceKind": "generic",
+    "formalOCR": false,
+    "aisPayerPresent": false,
+    "aisReferencePresent": false,
+    "accountRelationshipVerified": false,
+    "invoiceRegistered": false,
+    "candidateDocumentNeedsReview": true,
+    "allocations": 0
+  },
+  "notes": [
+    "430/430 verifies the frozen backup manifest, not every original ingested afterward.",
+    "The saved report and AIS deposit are separate evidence records; equal amount/date does not establish the deposit linkage.",
+    "No production operational restore was performed.",
+    "Observed scheduled automation execution without matching fresh app receipt does not establish Gmail schedule reliability."
+  ]
+}

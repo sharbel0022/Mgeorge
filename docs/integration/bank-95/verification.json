@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "date": "2026-11-05",
+  "repository": "sharbel0022/Mgeorge",
+  "branch": "feature/95-bank",
+  "pullRequest": "https://github.com/sharbel0022/Mgeorge/pull/45",
+  "originalMain": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "integratedMain": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+  "verifiedCodeCommit": "5f71a3c4840739bcf0786693a00b4213ab59ceba",
+  "verifiedCodeTree": "80214932045cb75df02d54c8324f4df0a5443ee0",
+  "applicationTrees": {
+    "src": "bb99d1e95806a5af246dfaff316883e519b35ccd",
+    "test": "3fc9b8eb4626cf20105663e7f2b02ca063d1fef5",
+    "sites": "7bad5d29b13b8524b43cfb9365a34eb2b4ea48a9",
+    "bridge": "745600d2ed8dccfd9c143ff22dbd7e37bfa6be32",
+    "scripts": "748de50bc06f97f711f9c4e5f0384c2c9a9b2581",
+    "public": "95600bdd40f3e418ddc26cabe8d7958444b8690c"
+  },
+  "localRuntime": {
+    "node": "24.22.1",
+    "npm": "11.9.0"
+  },
+  "localFinalChecks": {
+    "rootSyntax": {
+      "passed": true,
+      "files": 182
+    },
+    "sitesTypes": {
+      "passed": true
+    },
+    "sitesProductionBuild": {
+      "passed": true
+    },
+    "exactMinimatch": {
+      "passed": true,
+      "targets": 1,
+      "writes": 0
+    }
+  },
+  "audits": {
+    "root": {
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "bridgeProduction": {
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "sites": {
+      "high": 0,
+      "critical": 0,
+      "moderate": 8,
+      "note": "Existing development dependency findings; no dependency or lockfile changes in this PR."
+    }
+  },
+  "focusedVerification": [
+    {
+      "scope": "Node Enable transport and existing bank routes",
+      "passed": 135
+    },
+    {
+      "scope": "Integrated bank security, revalidation, quotas and pending account selection",
+      "passed": 80,
+      "includesNewMergeCases": 16
+    },
+    {
+      "scope": "Existing account evidence, provider, details and cooldown",
+      "passed": 163
+    },
+    {
+      "scope": "Independent initial callback/status/Open Payments review runs",
+      "passed": 39
+    },
+    {
+      "scope": "Independent Node byte-budget review run",
+      "passed": 10
+    }
+  ],
+  "focusedCountsAreOverlapping": true,
+  "ci": {
+    "status": "PASSED",
+    "head": "5f71a3c4840739bcf0786693a00b4213ab59ceba",
+    "mergeCommit": "9264e1515fd1a431dbf3455e0e1c30860091c240",
+    "paymentControlRun": 42083045947,
+    "securityAcceptanceRun": 42083045911,
+    "runtime": {
+      "node": "22.23.4"
+    },
+    "securityAcceptance": {
+      "jobId": 127440816758,
+      "conclusion": "success",
+      "node": {
+        "tests": 325,
+        "pass": 325,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "sites": {
+        "tests": 823,
+        "pass": 823,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "artifactId": 13441747126
+    },
+    "bridge": {
+      "jobId": 127440816448,
+      "conclusion": "success",
+      "tests": 47,
+      "pass": 47,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "node": {
+      "jobId": 127440816445,
+      "conclusion": "success",
+      "tests": 2013,
+      "pass": 2013,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "mergeTreeMatchesCodeTree": true,
+    "sites": {
+      "jobId": 127440816333,
+      "conclusion": "success",
+      "tests": 3938,
+      "pass": 3938,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "productionBuild": "success"
+    },
+    "verifiedAt": "2026-11-05T18:27:33Z",
+    "fullSuiteTestCount": 5998,
+    "overlappingSecurityTestCount": 1148,
+    "paymentControlUrl": "https://github.com/sharbel0022/Mgeorge/actions/runs/42083045947",
+    "securityAcceptanceUrl": "https://github.com/sharbel0022/Mgeorge/actions/runs/42083045911"
+  },
+  "reviews": [
+    {
+      "scope": "Shared diagnostics, callback, status compatibility and Open Payments consumers",
+      "outcome": "No outstanding material finding in reviewed scope"
+    },
+    {
+      "scope": "Enable transport",
+      "finding": "Unbounded Node body and late body consumption",
+      "resolution": "2 MiB byte limit and post-fetch abort guard; behavioral RED/GREEN and independent review passed"
+    },
+    {
+      "scope": "Latest-main integration",
+      "finding": "Expiry/revocation before outbound legacy read, app status at revalidation/receipt",
+      "resolution": "16 RED/GREEN regressions, current-context dispatch guards and atomic appmetadata fence; independent review found no remaining material defect"
+    }
+  ],
+  "production": {
+    "providerRequestsPerformed": 0,
+    "paymentsPerformed": 0,
+    "newBankIdSignings": 0,
+    "statusResets": 0,
+    "deploymentsPerformed": 0,
+    "acceptance": "NOT_VERIFIED",
+    "observedStatusReceipt": "observed-status.json"
+  },
+  "limitations": [
+    "The historical precise BANK_ACCOUNT_SCOPE_INVALID predicate was not retained.",
+    "A full live connection and sync require external provider configuration, valid authority, consent and explicit permitted acceptance.",
+    "Internal synthetic success does not establish 9.5/10 production readiness."
+  ],
+  "verifiedCodeChangedFilesAgainstIntegratedMain": [
+    "PROGRESS.md",
+    "QUALITY-SCORECARD.md",
+    "docs/integration/bank-95/README.md",
+    "docs/integration/bank-95/observed-status.json",
+    "docs/superpowers/plans/2026-11-05-real-bank-connection.md",
+    "sites/lib/bank-consent-policy.d.ts",
+    "sites/lib/bank-consent-policy.js",
+    "sites/lib/banking/account-read-guard.ts",
+    "sites/lib/banking/bank-data-provider.js",
+    "sites/lib/banking/details-service.ts",
+    "sites/lib/banking/enable-banking.ts",
+    "sites/lib/banking/openpayments-provider.js",
+    "sites/lib/banking/openpayments/http.js",
+    "sites/lib/banking/runtime-config.ts",
+    "sites/lib/banking/service.ts",
+    "sites/lib/banking/store.ts",
+    "sites/tests/bank-diagnostics-95.test.mjs",
+    "sites/tests/bank-transport-95.test.mjs",
+    "sites/tests/banking-security.test.mjs",
+    "sites/tests/openpayments-account-access-95.test.mjs",
+    "sites/tests/openpayments-mutation-95.test.mjs",
+    "src/bank-consent.js",
+    "src/bank.js",
+    "src/server.js",
+    "test/bank-transport-95.test.js",
+    "test/consent-reconnect-95.test.js"
+  ]
+}

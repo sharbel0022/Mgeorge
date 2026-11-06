@@ -1,0 +1,734 @@
+{
+  "basis": "Changed files in each historical merge relative to its first parent; not a forecast of missing new producer heads",
+  "pullRequests": {
+    "40": {
+      "mergeSha": "f105e9cc5404d1bff3b4fe41e4e6af14d944d212",
+      "changedFiles": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/README.md",
+        "docs/integration/saas/agent-8-handoff.md",
+        "docs/integration/saas/contracts.md",
+        "docs/integration/saas/implementation-plan.md",
+        "docs/integration/saas/multitenancy.md",
+        "docs/saas/EXECUTION-LEDGER.md",
+        "docs/saas/INTEGRATION-MATRIX.md",
+        "docs/saas/producer-inventory.json",
+        "docs/superpowers/plans/2026-11-04-saas-master-integration.md",
+        "migrations/node/0001_company_catalog.sql",
+        "public/app.js",
+        "public/style.css",
+        "scripts/run-sites-cloud-ocr.mjs",
+        "sites/app/api/companies/active/route.ts",
+        "sites/app/api/companies/memberships/route.ts",
+        "sites/app/api/companies/route.ts",
+        "sites/app/layout.tsx",
+        "sites/components/bank-connection.tsx",
+        "sites/components/company-workspace.tsx",
+        "sites/components/gmail-workspace.tsx",
+        "sites/components/workspace-navigation.tsx",
+        "sites/db/schema.ts",
+        "sites/drizzle/0019_company_boundaries.sql",
+        "sites/drizzle/meta/0019_snapshot.json",
+        "sites/drizzle/meta/_journal.json",
+        "sites/lib/backup-engine.ts",
+        "sites/lib/backups.ts",
+        "sites/lib/bankgiro-ingest-service.ts",
+        "sites/lib/bankgiro-source-registry.js",
+        "sites/lib/banking/service.ts",
+        "sites/lib/company-client.d.ts",
+        "sites/lib/company-client.js",
+        "sites/lib/company-contract.d.ts",
+        "sites/lib/company-contract.js",
+        "sites/lib/company-owner-tables.json",
+        "sites/lib/company-server.ts",
+        "sites/lib/company-storage.d.ts",
+        "sites/lib/company-storage.js",
+        "sites/lib/customer-messages.ts",
+        "sites/lib/document-processing.ts",
+        "sites/lib/gmail-adapter.js",
+        "sites/lib/gmail-service.ts",
+        "sites/lib/server.ts",
+        "sites/scripts/lib/backup-recovery.mjs",
+        "sites/scripts/restore-backup-isolated.mjs",
+        "sites/styles/company-workspace.css",
+        "sites/tests/automatic-payment-eligibility.test.mjs",
+        "sites/tests/bank-account-commit.test.mjs",
+        "sites/tests/bank-account-evidence.test.mjs",
+        "sites/tests/bank-details.test.mjs",
+        "sites/tests/bank-file-provenance.test.mjs",
+        "sites/tests/bank-original-quality-cycle.test.mjs",
+        "sites/tests/bank-state-integrity-q8.test.mjs",
+        "sites/tests/bank-sync-integrity-q8.test.mjs",
+        "sites/tests/bankgiro-api.test.mjs",
+        "sites/tests/bankgiro-http-source.test.mjs",
+        "sites/tests/bankgiro-ingest-backup.test.mjs",
+        "sites/tests/bankgiro-ingest-mcp.test.mjs",
+        "sites/tests/bankgiro-links-api.test.mjs",
+        "sites/tests/bankgiro-readiness-joined.test.mjs",
+        "sites/tests/bankgiro-retained-preview.test.mjs",
+        "sites/tests/bankgiro-xlsx-integration.test.mjs",
+        "sites/tests/banking-security.test.mjs",
+        "sites/tests/cloud-ocr.test.mjs",
+        "sites/tests/company-backup.test.mjs",
+        "sites/tests/company-bankgiro.test.mjs",
+        "sites/tests/company-client.test.mjs",
+        "sites/tests/company-contract.test.mjs",
+        "sites/tests/company-fixture-contract.test.mjs",
+        "sites/tests/company-request.test.mjs",
+        "sites/tests/company-storage.test.mjs",
+        "sites/tests/company-workspace-ui.test.mjs",
+        "sites/tests/customer-messages.test.mjs",
+        "sites/tests/document-quality-cycle.test.mjs",
+        "sites/tests/document-queue-recovery.test.mjs",
+        "sites/tests/file-upload-integrity-final.test.mjs",
+        "sites/tests/gmail-pdf-cross-flow.test.mjs",
+        "sites/tests/gmail.test.mjs",
+        "sites/tests/helpers/bankgiro-ingest-fixture.mjs",
+        "sites/tests/helpers/company-compat-fixture.mjs",
+        "sites/tests/helpers/company-storage-fixture.mjs",
+        "sites/tests/helpers/document-ocr-fixture.mjs",
+        "sites/tests/helpers/file-upload-concurrency-fixture.mjs",
+        "sites/tests/helpers/invoice-module-loader.mjs",
+        "sites/tests/helpers/reconciliation-preview-fixture.mjs",
+        "sites/tests/helpers/seven-agent-joined-fixture.mjs",
+        "sites/tests/invoice-parser-corpus-q8.test.mjs",
+        "sites/tests/mcp-evidence-read.test.mjs",
+        "sites/tests/mcp-security-q8.test.mjs",
+        "sites/tests/payment-control.test.mjs",
+        "sites/tests/server-pdf-optical-fallback.test.mjs",
+        "sites/tests/seven-agent-0599-baseline.test.mjs",
+        "sites/tests/seven-agent-0599-joined.test.mjs",
+        "sites/worker/index.ts",
+        "src/backup.js",
+        "src/company-runtime.js",
+        "src/db.js",
+        "src/gmail.js",
+        "src/integration-jobs.js",
+        "src/payment-control.js",
+        "src/server.js",
+        "src/sites-ocr-pull.js",
+        "test/bank-ui.test.js",
+        "test/company-api.test.js",
+        "test/company-boundary.test.js",
+        "test/company-client.test.js",
+        "test/company-contract.test.js",
+        "test/company-ui.test.js",
+        "test/sites-ocr-pull.test.js"
+      ]
+    },
+    "36": {
+      "mergeSha": "f75a293f367980cd360eca1886a2728db9c3e1f2",
+      "changedFiles": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/agent-2-openpayments-provider.md",
+        "docs/integration/saas/openpayments-adapter.md",
+        "docs/integration/saas/provider-capabilities.md",
+        "docs/saas/COMMERCIAL-LAUNCH-GATES.md",
+        "docs/saas/EXECUTION-LEDGER.md",
+        "docs/saas/INTEGRATION-MATRIX.md",
+        "docs/superpowers/plans/2026-11-04-openpayments-provider.md",
+        "docs/superpowers/plans/2026-11-04-saas-master-integration.md",
+        "docs/superpowers/specs/2026-11-04-openpayments-provider-design.md",
+        "sites/lib/banking/bank-data-provider.d.ts",
+        "sites/lib/banking/bank-data-provider.js",
+        "sites/lib/banking/openpayments-provider.d.ts",
+        "sites/lib/banking/openpayments-provider.js",
+        "sites/lib/banking/openpayments/authorization.js",
+        "sites/lib/banking/openpayments/config.js",
+        "sites/lib/banking/openpayments/http.js",
+        "sites/lib/banking/openpayments/token.js",
+        "sites/tests/helpers/openpayments-fixture.mjs",
+        "sites/tests/openpayments-http.test.mjs",
+        "sites/tests/openpayments-policy.test.mjs",
+        "sites/tests/openpayments-provider.test.mjs",
+        "src/banking/openpayments-node-transport.js",
+        "test/openpayments-node-transport.test.js"
+      ]
+    },
+    "39": {
+      "mergeSha": "d6c2894c8cdb52669bf73bea64daac58701b182a",
+      "changedFiles": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/saas/bank-consent.md",
+        "docs/integration/saas/openpayments-consent-lifecycle.md",
+        "docs/superpowers/plans/2026-11-04-bank-consent.md",
+        "package-lock.json",
+        "package.json",
+        "public/app.js",
+        "sites/components/bank-connection.tsx",
+        "sites/db/schema.ts",
+        "sites/drizzle/0020_bank_consent_context.sql",
+        "sites/drizzle/meta/0020_snapshot.json",
+        "sites/drizzle/meta/_journal.json",
+        "sites/lib/backup-engine.ts",
+        "sites/lib/bank-company-authority.d.ts",
+        "sites/lib/bank-company-authority.js",
+        "sites/lib/bank-consent-policy.d.ts",
+        "sites/lib/bank-consent-policy.js",
+        "sites/lib/banking/account-evidence.ts",
+        "sites/lib/banking/account-read-guard.ts",
+        "sites/lib/banking/details-service.ts",
+        "sites/lib/banking/openpayments-lifecycle.js",
+        "sites/lib/banking/openpayments-provider.d.ts",
+        "sites/lib/banking/openpayments-provider.js",
+        "sites/lib/banking/saas-bank-runtime.d.ts",
+        "sites/lib/banking/saas-bank-runtime.js",
+        "sites/lib/banking/saas-runtime.ts",
+        "sites/lib/banking/service.ts",
+        "sites/lib/banking/status-view.ts",
+        "sites/lib/banking/store.ts",
+        "sites/lib/company-owner-tables.json",
+        "sites/lib/company-storage.js",
+        "sites/tests/backup-recovery.test.mjs",
+        "sites/tests/bank-account-evidence.test.mjs",
+        "sites/tests/bank-company-authority.test.mjs",
+        "sites/tests/bank-consent-policy.test.mjs",
+        "sites/tests/bank-details.test.mjs",
+        "sites/tests/bank-sync-integrity-q8.test.mjs",
+        "sites/tests/bankgiro-ingest-backup.test.mjs",
+        "sites/tests/banking-security.test.mjs",
+        "sites/tests/company-storage.test.mjs",
+        "sites/tests/openpayments-lifecycle.test.mjs",
+        "sites/tests/saas-bank-runtime.test.mjs",
+        "sites/tests/seven-agent-0599-baseline.test.mjs",
+        "src/bank-consent.js",
+        "src/bank.js",
+        "src/company-runtime.js",
+        "src/db.js",
+        "src/saas-bank-runtime.js",
+        "src/server.js",
+        "test/bank-api.test.js",
+        "test/bank-consent-api.test.js",
+        "test/bank-ui.test.js",
+        "test/company-api.test.js",
+        "test/session-mutation-fence.test.js"
+      ]
+    },
+    "41": {
+      "mergeSha": "7a535446a99f17a6f771dd8660fe2a99c6b84248",
+      "changedFiles": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/saas/bankgiro-enrichment.md",
+        "docs/integration/saas/openpayments-consent-lifecycle.md",
+        "package-lock.json",
+        "package.json",
+        "sites/components/bankgiro-source-status.tsx",
+        "sites/lib/bankgiro-http-source.d.ts",
+        "sites/lib/bankgiro-http-source.js",
+        "sites/lib/bankgiro-ingest-service.ts",
+        "sites/lib/bankgiro-ingest-store.js",
+        "sites/lib/bankgiro-ingest.js",
+        "sites/lib/bankgiro-openpayments-capture.d.ts",
+        "sites/lib/bankgiro-openpayments-capture.js",
+        "sites/lib/bankgiro-openpayments.d.ts",
+        "sites/lib/bankgiro-openpayments.js",
+        "sites/lib/bankgiro-parser.js",
+        "sites/lib/bankgiro-service.ts",
+        "sites/lib/bankgiro-source.js",
+        "sites/lib/banking/bank-data-provider.d.ts",
+        "sites/lib/banking/bank-data-provider.js",
+        "sites/lib/banking/openpayments-provider.d.ts",
+        "sites/lib/banking/openpayments-provider.js",
+        "sites/lib/banking/openpayments/http.js",
+        "sites/lib/domain.ts",
+        "sites/lib/server.ts",
+        "sites/tests/bankgiro-ingest.test.mjs",
+        "sites/tests/bankgiro-source-status.test.mjs",
+        "sites/tests/company-bankgiro.test.mjs",
+        "sites/tests/helpers/bankgiro-ingest-fixture.mjs",
+        "sites/tests/helpers/openpayments-bankgiro-fixture.mjs",
+        "sites/tests/openpayments-bankgiro.test.mjs",
+        "sites/tests/openpayments-capture.test.mjs",
+        "sites/tests/openpayments-domain.test.mjs",
+        "sites/tests/openpayments-expired-revocation.test.mjs",
+        "sites/tests/openpayments-format.test.mjs",
+        "sites/tests/openpayments-ingest.test.mjs",
+        "sites/tests/openpayments-raw-receipt.test.mjs",
+        "sites/tests/openpayments-transport.test.mjs",
+        "src/bankgiro-ingest.js",
+        "test/openpayments-bankgiro-ingest.test.js"
+      ]
+    },
+    "42": {
+      "mergeSha": "f1058371c4f68589d3f91748cf98a4ef3601e893",
+      "changedFiles": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/saas/sync-reconciliation.md",
+        "docs/superpowers/plans/2026-11-04-saas-sync-reconciliation.md",
+        "docs/superpowers/specs/2026-11-04-saas-sync-reconciliation-design.md",
+        "sites/db/schema.ts",
+        "sites/drizzle/0023_saas_bank_sync.sql",
+        "sites/drizzle/0024_company_sync_boundaries.sql",
+        "sites/drizzle/meta/0021_snapshot.json",
+        "sites/drizzle/meta/0022_snapshot.json",
+        "sites/drizzle/meta/_journal.json",
+        "sites/lib/backup-engine.ts",
+        "sites/lib/bank-api-original.js",
+        "sites/lib/bankgiro-ingest-service.ts",
+        "sites/lib/bankgiro-service.ts",
+        "sites/lib/banking/company-sync.ts",
+        "sites/lib/banking/openpayments-account-state.ts",
+        "sites/lib/banking/openpayments-company-enrichment.ts",
+        "sites/lib/banking/openpayments-company-sync.ts",
+        "sites/lib/banking/openpayments-normalization.d.ts",
+        "sites/lib/banking/openpayments-normalization.js",
+        "sites/lib/banking/openpayments-provider.d.ts",
+        "sites/lib/banking/openpayments-scheduler.ts",
+        "sites/lib/banking/openpayments/http.js",
+        "sites/lib/banking/saas-runtime.ts",
+        "sites/lib/banking/service.ts",
+        "sites/lib/company-bank-account-key.d.ts",
+        "sites/lib/company-bank-account-key.js",
+        "sites/lib/company-bank-sync-store.d.ts",
+        "sites/lib/company-bank-sync-store.js",
+        "sites/lib/company-bank-sync.d.ts",
+        "sites/lib/company-bank-sync.js",
+        "sites/lib/company-owner-tables.json",
+        "sites/lib/company-reconciliation-policy.js",
+        "sites/lib/company-reconciliation.ts",
+        "sites/lib/company-storage.js",
+        "sites/lib/customer-messages.ts",
+        "sites/lib/domain.ts",
+        "sites/lib/reconciliation-evidence.ts",
+        "sites/lib/reconciliation-preview.ts",
+        "sites/lib/reconciliation.ts",
+        "sites/scripts/restore-backup-isolated.mjs",
+        "sites/tests/backup-recovery.test.mjs",
+        "sites/tests/bankgiro-ingest-backup.test.mjs",
+        "sites/tests/banking-security.test.mjs",
+        "sites/tests/company-bank-sync-backup.test.mjs",
+        "sites/tests/company-bank-sync.test.mjs",
+        "sites/tests/company-reconciliation.test.mjs",
+        "sites/tests/company-storage.test.mjs",
+        "sites/tests/company-sync-boundary-integration.test.mjs",
+        "sites/tests/company-sync-scale.test.mjs",
+        "sites/tests/openpayments-account-state.test.mjs",
+        "sites/tests/openpayments-company-sync.test.mjs",
+        "sites/tests/openpayments-ingest.test.mjs",
+        "sites/tests/openpayments-request-boundary.test.mjs",
+        "src/bank.js",
+        "src/bankgiro-ingest.js",
+        "src/company-bank-sync.js",
+        "src/company-reconciliation.js",
+        "src/company-sync-database.js",
+        "src/db.js",
+        "src/openpayments-company-bank-sync.js",
+        "src/reconciliation.js",
+        "src/server.js",
+        "test/bank-sync-date-api.test.js",
+        "test/bank.test.js",
+        "test/company-bank-account-key.test.js",
+        "test/company-bank-sync-fairness.test.js",
+        "test/company-bank-sync-legacy-binding.test.js",
+        "test/company-bank-sync-scheduler.test.js",
+        "test/company-bank-sync-store.test.js",
+        "test/company-bank-sync.test.js",
+        "test/company-bankgiro-legacy-binding.test.js",
+        "test/company-gmail-scheduler-integration.test.js",
+        "test/company-reconciliation-gate.test.js",
+        "test/company-reconciliation.test.js",
+        "test/company-reference-policy-bridge.test.js",
+        "test/helpers/company-sync-fixture.mjs",
+        "test/node-company-bank-sync.test.js",
+        "test/openpayments-company-bank-sync-normalization.test.js",
+        "test/openpayments-company-bank-sync.test.js"
+      ]
+    },
+    "38": {
+      "mergeSha": "512aec368aa23898f352e9f1eabf786546d5969a",
+      "changedFiles": [
+        "PROGRESS.md",
+        "docs/integration/saas-customer-onboarding-ui.md",
+        "docs/integration/saas-customer-onboarding-verification.md",
+        "docs/integration/saas-onboarding-browser/README.md",
+        "docs/integration/saas-onboarding-browser/acceptance-results.json",
+        "docs/integration/saas-onboarding-browser/browser-suite.mjs",
+        "docs/integration/saas-onboarding-browser/build-harness.mjs",
+        "docs/integration/saas-onboarding-browser/integrated2026-11-05.md",
+        "docs/integration/saas-onboarding-browser/preview-fixtures.mjs",
+        "docs/integration/saas-onboarding-browser/screenshots/missing-bankgiro-reference.png",
+        "docs/integration/saas-onboarding-browser/screenshots/onboarding-1024.png",
+        "docs/integration/saas-onboarding-browser/screenshots/onboarding-1440.png",
+        "docs/integration/saas-onboarding-browser/screenshots/onboarding-320.png",
+        "docs/integration/saas-onboarding-browser/screenshots/onboarding-390.png",
+        "docs/integration/saas-onboarding-browser/screenshots/onboarding-768.png",
+        "docs/integration/saas-onboarding-browser/serve-harness.mjs",
+        "docs/integration/saas-onboarding-browser/verification-results.json",
+        "docs/superpowers/plans/2026-11-04-saas-onboarding-ui.md",
+        "sites/app/api/companies/[companyId]/bank-onboarding/route.ts",
+        "sites/app/api/companies/[companyId]/bank/accounts/route.ts",
+        "sites/app/api/companies/[companyId]/bank/authorizations/[authorizationId]/redirect/route.ts",
+        "sites/app/api/companies/[companyId]/bank/callback/route.ts",
+        "sites/app/api/companies/[companyId]/bank/connect/route.ts",
+        "sites/app/api/companies/[companyId]/bank/disconnect/route.ts",
+        "sites/app/api/companies/[companyId]/bank/renew/route.ts",
+        "sites/app/api/companies/[companyId]/bank/sync/route.ts",
+        "sites/app/api/onboarding/companies/route.ts",
+        "sites/app/bank/page.tsx",
+        "sites/app/layout.tsx",
+        "sites/components/company-workspace.tsx",
+        "sites/components/onboarding/bank-onboarding-views.tsx",
+        "sites/components/onboarding/bank-onboarding.tsx",
+        "sites/lib/banking/openpayments-account-state.ts",
+        "sites/lib/banking/saas-runtime.ts",
+        "sites/lib/onboarding/bank-server.ts",
+        "sites/lib/onboarding/client.ts",
+        "sites/lib/onboarding/contract.ts",
+        "sites/lib/onboarding/directory-adapter.ts",
+        "sites/lib/onboarding/directory-server.ts",
+        "sites/lib/onboarding/failure.ts",
+        "sites/lib/onboarding/provisioning.d.ts",
+        "sites/lib/onboarding/provisioning.js",
+        "sites/lib/onboarding/request-scope.ts",
+        "sites/lib/onboarding/snapshot-projection.ts",
+        "sites/lib/onboarding/snapshot-server.ts",
+        "sites/styles/saas-onboarding.css",
+        "sites/tests/company-workspace-ui.test.mjs",
+        "sites/tests/helpers/saas-onboarding-fixture.mjs",
+        "sites/tests/openpayments-company-sync.test.mjs",
+        "sites/tests/saas-onboarding-client.test.mjs",
+        "sites/tests/saas-onboarding-contract.test.mjs",
+        "sites/tests/saas-onboarding-projection.test.mjs",
+        "sites/tests/saas-onboarding-server.test.mjs",
+        "sites/tests/saas-onboarding-views.test.mjs"
+      ]
+    },
+    "37": {
+      "mergeSha": "672c152242add9427c8526af8dd92431c526c8c2",
+      "changedFiles": [
+        ".github/workflows/payment-control-ci.yml",
+        ".github/workflows/saas-security-acceptance.yml",
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "bridge/bankgiro/package.json",
+        "docs/integration/saas/security-acceptance-plan.md",
+        "docs/integration/saas/security-acceptance.md",
+        "docs/integration/saas/security-integrated-acceptance.md",
+        "package-lock.json",
+        "package.json",
+        "scripts/run-saas-security-acceptance.mjs",
+        "scripts/saas-test-isolation.mjs",
+        "sites/app/api/files/route.ts",
+        "sites/lib/banking/enable-banking.ts",
+        "sites/package.json",
+        "sites/tests/banking-provider.test.mjs",
+        "sites/tests/helpers/saas-owner-fixture.mjs",
+        "sites/tests/saas-company-acceptance.test.mjs",
+        "sites/tests/saas-owner-isolation.test.mjs",
+        "sites/tests/saas-transport-privacy.test.mjs",
+        "sites/tests/saas-upload-boundary.test.mjs",
+        "sites/tests/server-pdf-optical-fallback.test.mjs",
+        "sites/tests/server-pdf.test.mjs",
+        "src/server.js",
+        "test/saas-company-acceptance.test.js",
+        "test/saas-login-boundary.test.js",
+        "test/saas-test-isolation.test.js"
+      ]
+    },
+    "43": {
+      "mergeSha": "b2e7f4b23d26e9bf3aa84c6fdc21702562f3aa4f",
+      "changedFiles": [
+        "sites/lib/bank-consent-policy.d.ts",
+        "sites/lib/bank-consent-policy.js",
+        "sites/lib/banking/details-service.ts",
+        "sites/lib/banking/service.ts",
+        "sites/tests/bank-consent-policy.test.mjs",
+        "sites/tests/bank-details.test.mjs",
+        "sites/tests/banking-security.test.mjs"
+      ]
+    },
+    "44": {
+      "mergeSha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+      "changedFiles": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/SAAS-MULTITENANT-BANKID-FINAL-REPORT.md",
+        "docs/saas/EXECUTION-LEDGER.md",
+        "docs/saas/FINAL-CHANGED-FILES.txt",
+        "docs/saas/INTEGRATION-MATRIX.md",
+        "docs/saas/evidence/2026-11-05/bank-compat-gates.json",
+        "docs/saas/evidence/2026-11-05/bank-compat-independent-review.json",
+        "docs/saas/evidence/2026-11-05/bank-compat-independent-review.md",
+        "docs/saas/evidence/2026-11-05/bank-compat-release.json",
+        "docs/saas/evidence/2026-11-05/bank-incident.json",
+        "docs/saas/evidence/2026-11-05/final-ocr-observation.json",
+        "docs/saas/evidence/2026-11-05/local-gates.json",
+        "docs/saas/evidence/2026-11-05/local-log-hashes.json",
+        "docs/saas/evidence/2026-11-05/production-after.json",
+        "docs/saas/evidence/2026-11-05/production-before.json",
+        "docs/saas/evidence/2026-11-05/remote-ci.json",
+        "docs/saas/evidence/2026-11-05/review-summary.md",
+        "docs/saas/evidence/2026-11-05/security-acceptance.json",
+        "docs/saas/evidence/2026-11-05/site-deployment.json",
+        "docs/saas/evidence/2026-11-05/site-source-archive.json"
+      ]
+    }
+  },
+  "overlap": {
+    "PROGRESS.md": [
+      40,
+      36,
+      39,
+      41,
+      42,
+      38,
+      37,
+      44
+    ],
+    "QUALITY-SCORECARD.md": [
+      40,
+      36,
+      39,
+      41,
+      42,
+      37,
+      44
+    ],
+    "docs/integration/saas/openpayments-consent-lifecycle.md": [
+      39,
+      41
+    ],
+    "docs/saas/EXECUTION-LEDGER.md": [
+      40,
+      36,
+      44
+    ],
+    "docs/saas/INTEGRATION-MATRIX.md": [
+      40,
+      36,
+      44
+    ],
+    "docs/superpowers/plans/2026-11-04-saas-master-integration.md": [
+      40,
+      36
+    ],
+    "package-lock.json": [
+      39,
+      41,
+      37
+    ],
+    "package.json": [
+      39,
+      41,
+      37
+    ],
+    "public/app.js": [
+      40,
+      39
+    ],
+    "sites/app/layout.tsx": [
+      40,
+      38
+    ],
+    "sites/components/bank-connection.tsx": [
+      40,
+      39
+    ],
+    "sites/components/company-workspace.tsx": [
+      40,
+      38
+    ],
+    "sites/db/schema.ts": [
+      40,
+      39,
+      42
+    ],
+    "sites/drizzle/meta/_journal.json": [
+      40,
+      39,
+      42
+    ],
+    "sites/lib/backup-engine.ts": [
+      40,
+      39,
+      42
+    ],
+    "sites/lib/bank-consent-policy.d.ts": [
+      39,
+      43
+    ],
+    "sites/lib/bank-consent-policy.js": [
+      39,
+      43
+    ],
+    "sites/lib/bankgiro-ingest-service.ts": [
+      40,
+      41,
+      42
+    ],
+    "sites/lib/bankgiro-service.ts": [
+      41,
+      42
+    ],
+    "sites/lib/banking/bank-data-provider.d.ts": [
+      36,
+      41
+    ],
+    "sites/lib/banking/bank-data-provider.js": [
+      36,
+      41
+    ],
+    "sites/lib/banking/details-service.ts": [
+      39,
+      43
+    ],
+    "sites/lib/banking/openpayments-account-state.ts": [
+      42,
+      38
+    ],
+    "sites/lib/banking/openpayments-provider.d.ts": [
+      36,
+      39,
+      41,
+      42
+    ],
+    "sites/lib/banking/openpayments-provider.js": [
+      36,
+      39,
+      41
+    ],
+    "sites/lib/banking/openpayments/http.js": [
+      36,
+      41,
+      42
+    ],
+    "sites/lib/banking/saas-runtime.ts": [
+      39,
+      42,
+      38
+    ],
+    "sites/lib/banking/service.ts": [
+      40,
+      39,
+      42,
+      43
+    ],
+    "sites/lib/company-owner-tables.json": [
+      40,
+      39,
+      42
+    ],
+    "sites/lib/company-storage.js": [
+      40,
+      39,
+      42
+    ],
+    "sites/lib/customer-messages.ts": [
+      40,
+      42
+    ],
+    "sites/lib/domain.ts": [
+      41,
+      42
+    ],
+    "sites/lib/server.ts": [
+      40,
+      41
+    ],
+    "sites/scripts/restore-backup-isolated.mjs": [
+      40,
+      42
+    ],
+    "sites/tests/backup-recovery.test.mjs": [
+      39,
+      42
+    ],
+    "sites/tests/bank-account-evidence.test.mjs": [
+      40,
+      39
+    ],
+    "sites/tests/bank-consent-policy.test.mjs": [
+      39,
+      43
+    ],
+    "sites/tests/bank-details.test.mjs": [
+      40,
+      39,
+      43
+    ],
+    "sites/tests/bank-sync-integrity-q8.test.mjs": [
+      40,
+      39
+    ],
+    "sites/tests/bankgiro-ingest-backup.test.mjs": [
+      40,
+      39,
+      42
+    ],
+    "sites/tests/banking-security.test.mjs": [
+      40,
+      39,
+      42,
+      43
+    ],
+    "sites/tests/company-bankgiro.test.mjs": [
+      40,
+      41
+    ],
+    "sites/tests/company-storage.test.mjs": [
+      40,
+      39,
+      42
+    ],
+    "sites/tests/company-workspace-ui.test.mjs": [
+      40,
+      38
+    ],
+    "sites/tests/helpers/bankgiro-ingest-fixture.mjs": [
+      40,
+      41
+    ],
+    "sites/tests/openpayments-company-sync.test.mjs": [
+      42,
+      38
+    ],
+    "sites/tests/openpayments-ingest.test.mjs": [
+      41,
+      42
+    ],
+    "sites/tests/server-pdf-optical-fallback.test.mjs": [
+      40,
+      37
+    ],
+    "sites/tests/seven-agent-0599-baseline.test.mjs": [
+      40,
+      39
+    ],
+    "src/bank.js": [
+      39,
+      42
+    ],
+    "src/bankgiro-ingest.js": [
+      41,
+      42
+    ],
+    "src/company-runtime.js": [
+      40,
+      39
+    ],
+    "src/db.js": [
+      40,
+      39,
+      42
+    ],
+    "src/server.js": [
+      40,
+      39,
+      42,
+      37
+    ],
+    "test/bank-ui.test.js": [
+      40,
+      39
+    ],
+    "test/company-api.test.js": [
+      40,
+      39
+    ]
+  }
+}

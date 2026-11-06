@@ -69,6 +69,26 @@ test('missing receipt and malformed original block the control and preserve reco
  assert.equal(step(r,'original').status,'blocked');assert.equal(step(r,'reconciliation').status,'blocked');assert.match(step(r,'reconciliation').reason,/bevar|registrerad/i);assert.equal(balance(s,s.invoices[0]),0);assert.deepEqual(s,before);
 });
 
+for(const originalIssue of ['Bankens ankomstkvitto saknas.','Bankoriginalets kontrollsumma stämmer inte.'])test('a retained reference remains uncertain when original verification fails: '+originalIssue,()=>{
+ const s=fixture(),before=structuredClone(s),r=build(s,s.transactions[0].id,{originalIssue}),reference=step(r,'reference');
+ assert.equal(step(r,'original').status,'blocked');
+ assert.equal(reference.status,'review');
+ assert.match(reference.statusLabel,/originalkontroll/i);
+ assert.match(reference.reason,/inte.*verifier|overifier/i);
+ assert.equal(reference.facts.find(f=>f.label==='Referens').value,'0599');
+ assert.equal(step(r,'payer').status,'review');
+ assert.equal(r.automaticEligible,false);assert.deepEqual(s,before);
+ assert.equal(balance(s,s.invoices[0]),62500);assert.equal(s.allocations.length,0);
+});
+
+test('reference field distinguishes checked, missing and unverified originals without conflating account consent',()=>{
+ const checked=fixture(),missing=fixture({reference:''});
+ assert.equal(step(build(checked,checked.transactions[0].id),'reference').status,'passed');
+ assert.equal(step(build(missing,missing.transactions[0].id),'reference').status,'missing');
+ assert.equal(step(build(missing,missing.transactions[0].id,{originalIssue:'Originalet saknas.'}),'reference').status,'missing');
+ assert.equal(step(build(checked,checked.transactions[0].id,{accountIssue:'Mottagarkontot saknar aktuellt medgivande.'}),'reference').status,'passed');
+});
+
 test('register entry without an inspected original is never called an original-verified invoice',{skip:!implemented},()=>{
  const s=fixture(),r=build(s,s.transactions[0].id,{invoiceOriginalChecked:false,invoiceOriginalIssue:'Originalfakturan har inte kunnat kontrolleras.'});
  assert.equal(step(r,'invoice').status,'review');assert.doesNotMatch(step(r,'invoice').statusLabel,/intakt|verifierad/i);assert.equal(r.automaticEligible,false);

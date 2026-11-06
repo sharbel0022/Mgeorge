@@ -15,17 +15,22 @@ function BankgiroCapability({ capability }: { capability: Bank['bankgiro'] }) {
   return <p className="onboarding-muted">{labels[capability] ?? labels.unknown}</p>;
 }
 
-export function CompanyPicker({ companies, value, onChange, onCreate, canCreate }: { companies: Company[]; value: string; onChange: (id: string) => void; onCreate: () => void; canCreate: boolean }) {
+export function CompanyPicker({ companies, value, onChange, onCreate, canCreate, activeWorkspaceCompanyId }: { companies: Company[]; value: string; onChange: (id: string) => void; onCreate: () => void; canCreate: boolean; activeWorkspaceCompanyId?: string | null }) {
   const id = useId();
   const chosen = companies.find(company => company.id === value);
   return <section className="onboarding-card onboarding-company-picker" aria-label="Företagsval">
-    <div className="onboarding-field"><label className="onboarding-label" htmlFor={id}>Välj företag</label>
+    {chosen && activeWorkspaceCompanyId === chosen.id ? <div className="onboarding-field">
+      <p className="onboarding-label">Företag för bankanslutningen</p>
+      <strong>{chosen.name}</strong>
+      <p className="onboarding-muted">{chosen.organizationNumber ? 'Organisationsnummer ' + chosen.organizationNumber : 'Organisationsnummer ej verifierat'} · {roleLabels[chosen.role]}</p>
+      <p className="onboarding-muted">Byt företag i Aktivt företag högst upp.</p>
+    </div> : <div className="onboarding-field"><label className="onboarding-label" htmlFor={id}>Välj företag</label>
       <select id={id} value={value} onChange={event => onChange(event.target.value)} aria-describedby={id + '-details'} disabled={!companies.length}>
         {!value && <option value="">{companies.length ? 'Välj ett företag' : 'Inga företag att visa'}</option>}
         {companies.map(company => <option key={company.id} value={company.id}>{company.name} · {company.organizationNumber ?? 'Organisationsnummer ej verifierat'} · {roleLabels[company.role]}</option>)}
       </select>
       <p id={id + '-details'} className="onboarding-muted">{chosen ? <>{chosen.name} · {chosen.organizationNumber ? 'Organisationsnummer ' + chosen.organizationNumber : 'Organisationsnummer ej verifierat'} · {roleLabels[chosen.role]}</> : 'Bankanslutningen hör till företaget du väljer.'}</p>
-    </div>
+    </div>}
     {canCreate && <button type="button" onClick={onCreate}>Lägg till företag</button>}
   </section>;
 }
@@ -88,6 +93,7 @@ export function ConnectionSummary({ snapshot, now = Date.now() }: { snapshot: Sn
     <h2>Bankanslutningens status</h2>
     {snapshot.environment === 'sandbox' && <p className="onboarding-notice"><strong>Testläge · sandbox</strong> Anslutningen gäller en testmiljö och visar inte bekräftade produktionsuppgifter.</p>}
     <p><span className="onboarding-badge">{status}</span>{connection && <> · {connection.bankName}</>}</p>
+    {snapshot.sync.errorCode === 'consent_recovery_required' && <p className="onboarding-notice" role="status">Bankens svar saknas från ett tidigare anslutningsförsök. Kontakta administratören för att kontrollera medgivandet innan du försöker igen.</p>}
     {connection?.status === 'revoked' && <p className="onboarding-muted">{revocation === 'confirmed' ? 'Banken har bekräftat återkallelsen.' : revocation === 'pending' ? 'Bankens återkallelse väntar på bekräftelse. Kontrollera även åtkomsten hos banken.' : 'Bankens återkallelse är inte bekräftad. Kontrollera åtkomsten hos banken.'}</p>}
     <div className="onboarding-grid">
       <section className="onboarding-section"><h3>Kontodata (AIS)</h3><dl className="onboarding-facts">

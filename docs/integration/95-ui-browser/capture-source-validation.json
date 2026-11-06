@@ -1,0 +1,23 @@
+{
+  "productCommit": "495de1166292cc141030cac7803f03a5f055d646",
+  "integratedBase": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+  "browserBuildAt": "2026-11-05T21:48:27.410Z",
+  "manifestSha256": "d6c9ed762839d467b103ca8ab4607459283c9e3233e44c121efe437da5991b93",
+  "productInputsVerified": 69,
+  "harnessInputsVerified": 7,
+  "sourceMismatches": [],
+  "frameSource": {
+    "path": "docs/integration/95-ui-browser/qa-frame.mjs",
+    "sha256": "e882bf3f23cc4d449b13cd72547f54f2fb7cb160e3c5f9999dd1b382a57cb4eb"
+  },
+  "note": "The native terminal/browser runtime has a different /tmp from exec. This is the manifest exported from the actual native browser build through /workspace/shared, not the earlier exec build. Frame source is recorded separately because the bundler manifest covers app/fixture build inputs.",
+  "independentReproduction": {
+    "at": "2026-11-05T21:58:41.840Z",
+    "sourceInputsIdentical": true,
+    "outputHashesIdentical": true,
+    "testLogSha256": "a1cef7cab7aeca36daab386b4a041c6edc0c271d1d62335ebc6f379fda698ea8",
+    "tests": 8,
+    "pass": 8,
+    "fail": 0
+  }
+}

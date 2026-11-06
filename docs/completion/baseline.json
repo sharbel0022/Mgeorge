@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-11-06T14:02:03Z",
+  "repository": "sharbel0022/Mgeorge",
+  "main": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+  "integrationHead": "30dfaa97bb7ce2118b4756205347d4a96e8be6ab",
+  "pullRequests": [
+    {
+      "number": 61,
+      "head": "30dfaa97bb7ce2118b4756205347d4a96e8be6ab",
+      "state": "open",
+      "merged_at": null,
+      "title": "Recovery: integrate verified bank, OCR, SaaS and premium UI on current main",
+      "branch": "feature/final-95-recovery"
+    },
+    {
+      "number": 60,
+      "head": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "state": "closed",
+      "merged_at": "2026-11-06T07:00:00Z",
+      "title": "Set SQLite busy timeout before database startup",
+      "branch": "feature/rating8-sqlite-startup-20261106"
+    },
+    {
+      "number": 59,
+      "head": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "state": "closed",
+      "merged_at": "2026-11-06T04:50:48Z",
+      "title": "Expose safe bank failure diagnostics without changing consent",
+      "branch": "feature/rating8-bank-failure-diagnostic-20261106"
+    },
+    {
+      "number": 58,
+      "head": "f488841afccdefba17a6b584320347581f60c3f4",
+      "state": "closed",
+      "merged_at": "2026-11-06T03:47:19Z",
+      "title": "Fix invoice field ownership, guarded retry and bank usage diagnostics",
+      "branch": "feature/rating8-reviewed-geometry-retry-20261106"
+    },
+    {
+      "number": 57,
+      "head": "c90ed82c73bb566e54cb70eec14dae4ad9848361",
+      "state": "closed",
+      "merged_at": "2026-11-05T23:39:57Z",
+      "title": "Preserve invoice evidence and explain selected account usage rejections",
+      "branch": "feature/rating8-reviewed-parser-bank-diagnostics-20261105"
+    },
+    {
+      "number": 56,
+      "head": "d638f5e195711c3011816618f1899dc535c24120",
+      "state": "closed",
+      "merged_at": "2026-11-05T22:39:49Z",
+      "title": "Fix financial evidence, manual allocation, OCR guardrails and narrow-screen review",
+      "branch": "feature/rating8-release-wave2-20261105"
+    },
+    {
+      "number": 55,
+      "head": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+      "state": "open",
+      "merged_at": null,
+      "title": "UI: svartvit arbetsyta, tydliga bankbevis och bevarade granskningsutkast",
+      "branch": "feature/95-ui"
+    },
+    {
+      "number": 49,
+      "head": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+      "state": "open",
+      "merged_at": null,
+      "title": "Agent 9: integration, säkra bankmedgivanden och verifierbar releasebedömning",
+      "branch": "feature/95-integration"
+    },
+    {
+      "number": 53,
+      "head": "d9ca037a90ef9c9e629f62c4dcbf9cfcdeacb459",
+      "state": "open",
+      "merged_at": null,
+      "title": "Fix exact invoice references hidden by decimal amount search",
+      "branch": "fix/95-decimal-reference"
+    },
+    {
+      "number": 46,
+      "head": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+      "state": "open",
+      "merged_at": null,
+      "title": "Bankgiro: verifierad referensstatus och spårbar originalhistorik",
+      "branch": "feature/95-bankgiro"
+    },
+    {
+      "number": 54,
+      "head": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+      "state": "open",
+      "merged_at": null,
+      "title": "security: durable login limits, request budgets, audit privacy and recovery guards",
+      "branch": "feature/95-security"
+    },
+    {
+      "number": 47,
+      "head": "875876ae539f5ecba1fc39d4c213197806e245ce",
+      "state": "open",
+      "merged_at": null,
+      "title": "Agent 8: reproducerbar QA, CI-kvitton och syntetisk prestanda",
+      "branch": "feature/95-quality"
+    },
+    {
+      "number": 45,
+      "head": "ac1abdc5469248eba212496af4a4573864908ace",
+      "state": "open",
+      "merged_at": null,
+      "title": "Harden real bank reconnection, consent diagnostics and provider transport",
+      "branch": "feature/95-bank"
+    },
+    {
+      "number": 52,
+      "head": "eb4242f783172ac441f9092f921b04b06dc11771",
+      "state": "open",
+      "merged_at": null,
+      "title": "fix(ocr): tillförlitlig fakturatolkning och återhämtning av dokumentkö",
+      "branch": "feature/95-ocr"
+    },
+    {
+      "number": 50,
+      "head": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+      "state": "open",
+      "merged_at": null,
+      "title": "SaaS: säkra medgivanden och rätta företagens läsåtkomst",
+      "branch": "feature/95-saas"
+    },
+    {
+      "number": 51,
+      "head": "0954777f10da8be9fb15daf3878c539b51801142",
+      "state": "open",
+      "merged_at": null,
+      "title": "Agent 5: deterministisk betalningsavstämning med bankbevis",
+      "branch": "feature/95-reconciliation"
+    },
+    {
+      "number": 48,
+      "head": "e42b05a8b78e77a3210be00da0b0231454a29233",
+      "state": "closed",
+      "merged_at": "2026-11-05T18:06:11Z",
+      "title": "Improve operational recovery, document extraction and search safety",
+      "branch": "codex/rating8-reliability-20261105"
+    }
+  ],
+  "bank": {
+    "enabled": true,
+    "connected": false,
+    "intervalHours": 6,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+    "nextAttemptAt": "2026-11-05T14:06:00.000Z",
+    "lastError": "Bankhändelserna kunde inte hämtas. Försök igen.",
+    "blocked": false,
+    "failures": 1,
+    "postprocessWarning": null,
+    "liveRevalidationCode": "BANK_CONSENT_INVALID"
+  },
+  "bankgiro": {
+    "state": "DISABLED",
+    "reason": "SOURCE_NOT_CONFIGURED"
+  },
+  "gmail": {
+    "before": {
+      "last_successful_fetch": "2026-11-06T04:06:01.714Z",
+      "counts": {
+        "needs_review": 397,
+        "registered": 2,
+        "waiting_ocr": 52
+      }
+    },
+    "directRun": {
+      "imported": 7,
+      "duplicates": 0,
+      "last_successful_fetch": "2026-11-06T14:00:58.102Z",
+      "counts": {
+        "needs_review": 397,
+        "queued": 3,
+        "registered": 2,
+        "waiting_ocr": 56
+      }
+    },
+    "externalScheduleVerified": false,
+    "promptClarified": true
+  },
+  "backup": {
+    "files": 430,
+    "verifiedFiles": 430,
+    "bytes": 185567855,
+    "scope": "manifest_pass",
+    "realRestoreVerified": false
+  },
+  "sites": {
+    "deployedVersion": 66,
+    "deployedCommit": "0b119b8d472f70a1bfeac686c12889b618a32fb2",
+    "latestVersion": 67,
+    "latestStatus": "failed",
+    "latestCommit": "d30b1e2518e3765b15fba28cbd306addf142da38",
+    "failure": "Unsupported dependency source in source-only deployment"
+  },
+  "localInstall": {
+    "node": "PASS",
+    "sites": "EXIT_137",
+    "fallback": "Exact-lock dependency copy; clean install must be verified by final CI."
+  }
+}
