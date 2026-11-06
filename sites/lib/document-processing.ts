@@ -41,14 +41,23 @@ async function registeredOutcome(owner:string,documentId:string,details:Row={}){
   }catch{return {registered:true,...details,aftercheck_pending:true,warning:AFTERCHECK_WARNING};}
 }
 
+const originalIntegrityFailures=new WeakSet<object>();
+const originalIntegrity=()=>{const error=Error('original_integrity');originalIntegrityFailures.add(error);return error;};
 async function originalBytes(owner:string,job:Row,limit=15000000){
-  if(!Number.isSafeInteger(job.size)||job.size<1||job.size>limit||!/^[a-f0-9]{64}$/.test(job.sha256||''))throw Error('original_integrity');
-  const object=await env.BUCKET?.get(`${owner}/${job.document_id}`);
-  if(!object||object.size!==job.size)throw Error('original_integrity');
-  const bytes=new Uint8Array(await object.arrayBuffer());
-  const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(byte=>byte.toString(16).padStart(2,'0')).join('');
-  if(bytes.length!==job.size||sha256!==job.sha256)throw Error('original_integrity');
-  return bytes;
+  if(!Number.isSafeInteger(job.size)||job.size<1||job.size>limit||!/^[a-f0-9]{64}$/.test(job.sha256||''))throw originalIntegrity();
+  try{
+    const object=await env.BUCKET?.get(`${owner}/${job.document_id}`);
+    if(!object||object.size!==job.size)throw originalIntegrity();
+    const bytes=new Uint8Array(await object.arrayBuffer());
+    const sha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(byte=>byte.toString(16).padStart(2,'0')).join('');
+    if(bytes.length!==job.size||sha256!==job.sha256)throw originalIntegrity();
+    return bytes;
+  }catch(error){
+    if(originalIntegrityFailures.has(error as object))throw error;
+    // Do not inspect provider exceptions or confuse unavailable bytes with
+    // proven corruption. Only this function can brand an integrity failure.
+    throw Error('original_unavailable');
+  }
 }
 
 export async function processingSettings(user?:{userId:string,email:string}){
@@ -120,11 +129,17 @@ async function queueObservations(owner:string,at:number,enabled:boolean,ocrWorke
     COALESCE(SUM(CASE WHEN active_source AND state='failed' THEN 1 ELSE 0 END),0) failed,
     MIN(CASE WHEN pending AND julianday(original_created_at)<=julianday(at) THEN original_created_at END) oldest_pending_at,
     MIN(CASE WHEN active_source AND state IN ('queued','waiting_ocr') AND attempts<3 AND julianday(available_at)>julianday(at) THEN available_at END) next_retry_at,
+    COALESCE(SUM(CASE WHEN error_code IN ('original_unavailable','original_unavailable_review') THEN 1 ELSE 0 END),0) transport_failures,
+    COALESCE(SUM(CASE WHEN error_code IN ('cloud_ocr_failed','local_ocr_failed','pdf_unreadable','page_limit','text_limit') THEN 1 ELSE 0 END),0) ocr_failures,
+    COALESCE(SUM(CASE WHEN error_code='original_integrity' THEN 1 ELSE 0 END),0) integrity_failures,
+    COALESCE(SUM(CASE WHEN error_code IN ('processing_interrupted_after_extraction','lease_expired','result_receipt_missing') THEN 1 ELSE 0 END),0) interrupted_failures,
+    COALESCE(SUM(CASE WHEN state IN ('needs_review','duplicate') AND error_code='' THEN 1 ELSE 0 END),0) document_review,
     COALESCE(SUM(CASE WHEN state IN ('ready','needs_review','duplicate','registered') AND accepted_in_window THEN 1 ELSE 0 END),0) completed_documents
     FROM flags`).bind(observedAt,windowStart,owner,owner).first<Row>();
   const counts=Object.fromEntries(['pending','ready_pdf','ready_ocr','deferred','active','expired_leases','exhausted','failed'].map(key=>[key,Number(row?.[key]||0)]));
   return {
     queue_health:{basis:'current_jobs',observed_at:observedAt,...counts,oldest_pending_at:row?.oldest_pending_at||null,next_retry_at:row?.next_retry_at||null,ocr_worker_unavailable:enabled&&counts.ready_ocr>0&&!ocrWorkerRecent},
+    failure_summary:{basis:'current_jobs',transport:Number(row?.transport_failures||0),ocr:Number(row?.ocr_failures||0),integrity:Number(row?.integrity_failures||0),interrupted:Number(row?.interrupted_failures||0),document_review:Number(row?.document_review||0)},
     throughput:{basis:'accepted_extractions_with_terminal_job',window_start:windowStart,window_end:observedAt,completed_documents:Number(row?.completed_documents||0)},
   };
 }
@@ -140,47 +155,71 @@ export async function processingStatus(owner:string){
   const observations=await queueObservations(owner,at,settings?.enabled===1,!!(cloud&&recent(cloudSeen,45*60000)||recent(settings?.worker_seen||'',180000)));
   return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:recent(settings?.worker_seen||'',180000),cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&recent(cloudSeen,45*60000),cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,aftercheck_pending:pending?.count||0,review_reasons:review,...observations,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
 }
-async function recoverInterruptedExtraction(owner:string,job:Row):Promise<'deferred'|void>{
-  let extraction:Row;
-  try{extraction=JSON.parse(job.extraction);}catch{return;}
-  if(extraction?.processing?.run_id!==await documentRunId(owner,job)||extraction.processing.sha256!==job.sha256)return;
-  const receipt=await db().prepare('SELECT id FROM document_extractions WHERE owner=? AND document_id=? AND result=? LIMIT 1').bind(owner,job.document_id,job.extraction).first<Row>();
-  if(!receipt)return;
-  try{await originalBytes(owner,job);}catch(error){
-    if((error as Error)?.message==='original_integrity')return;
-    // A temporarily unavailable object/stream is not proof of a bad original.
-    // Keep the accepted receipt's lease binding and retry this read after a
-    // persisted delay. Do not consume another OCR attempt or block later jobs.
-    const at=now(),available=new Date(Date.now()+60000).toISOString();
-    await db().prepare(`UPDATE document_jobs SET error_code='original_unavailable',available_at=?,updated_at=?
-      WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND attempts>=3 AND lease=? AND extraction=?
-      AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND available_at=? AND ${activeSource}
-      AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
-      .bind(available,at,owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until,job.available_at).run();
-    return 'deferred';
+const extractionRecord=(value:string):Row=>{try{return JSON.parse(value)||{};}catch{return {};}};
+const receiptFor=(owner:string,documentId:string,runId:string,sha256:string,runner:string)=>db().prepare(`SELECT id,created_at FROM document_extractions
+  WHERE owner=? AND document_id=?
+  AND json_extract(CASE WHEN json_valid(result) THEN result ELSE '{}' END,'$.processing.run_id')=?
+  AND json_extract(CASE WHEN json_valid(result) THEN result ELSE '{}' END,'$.processing.sha256')=?
+  AND json_extract(CASE WHEN json_valid(result) THEN result ELSE '{}' END,'$.processing.runner')=?
+  ORDER BY created_at,id LIMIT 1`).bind(owner,documentId,runId,sha256,runner).first<Row>();
+const reviewExtraction=(serialized:string,reason:string)=>{
+  const extraction=extractionRecord(serialized);
+  if(extraction.level!=='green')return serialized;
+  return JSON.stringify({...extraction,level:'yellow',issues:[...(Array.isArray(extraction.issues)?extraction.issues:[]),reason]});
+};
+async function recoverInterruptedExtraction(owner:string,job:Row):Promise<'handled'|'deferred'|void>{
+  const extraction=extractionRecord(job.extraction),runId=await documentRunId(owner,job);
+  if(extraction.processing?.run_id!==runId)return;
+  const receipt=await receiptFor(owner,job.document_id,runId,extraction.processing.sha256,job.lease_runner||'local');
+  let state='needs_review',code='processing_interrupted_after_extraction',savedExtraction=reviewExtraction(job.extraction,'Bearbetningen avbröts efter sparad tolkning. Kontrollera underlaget.');
+  try{
+    if(!receipt||extraction.processing.sha256!==job.sha256)throw originalIntegrity();
+    await originalBytes(owner,job);
+  }catch(error){
+    if(originalIntegrityFailures.has(error as object)){
+      state='failed';code=receipt?'original_integrity':'result_receipt_missing';
+      savedExtraction=reviewExtraction(job.extraction,'Originalunderlagets integritet behöver kontrolleras.');
+    }else{
+      // Bound automatic storage recovery by the immutable acceptance time.
+      // Delays survive restarts; a retained result never consumes another OCR
+      // attempt. After one day it remains available for explicit human review.
+      const acceptedAt=Date.parse(receipt!.created_at),age=Date.now()-acceptedAt;
+      if(Number.isFinite(age)&&age>=0&&age<86400000){
+        const at=now(),available=new Date(Date.now()+60000).toISOString();
+        await db().prepare(`UPDATE document_jobs SET error_code='original_unavailable',available_at=?,updated_at=?
+          WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND lease=? AND extraction=?
+          AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND available_at=? AND ${activeSource}
+          AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
+          .bind(available,at,owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until,job.available_at).run();
+        return 'deferred';
+      }
+      code='original_unavailable_review';
+      savedExtraction=reviewExtraction(job.extraction,'Originalunderlaget är tillfälligt otillgängligt. Kontrollera det före registrering.');
+    }
   }
-  await db().prepare(`UPDATE document_jobs SET state='needs_review',error_code='processing_interrupted_after_extraction',lease='',lease_until='',updated_at=?
-      WHERE owner=? AND document_id=? AND state='processing' AND attempts>=3 AND lease=? AND extraction=?
-      AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${activeSource}
-      AND EXISTS(SELECT 1 FROM document_extractions e WHERE e.owner=document_jobs.owner AND e.document_id=document_jobs.document_id AND e.id=? AND e.result=document_jobs.extraction)
-      AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?)
+  await db().prepare(`UPDATE document_jobs SET state=?,error_code=?,extraction=?,lease='',lease_until='',updated_at=?
+      WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND lease=? AND extraction=?
+      AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND available_at=? AND ${activeSource}
+      AND (? IS NULL OR EXISTS(SELECT 1 FROM document_extractions e WHERE e.owner=document_jobs.owner AND e.document_id=document_jobs.document_id AND e.id=?))
+      AND ((? IS NULL AND NOT EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id))
+        OR EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?))
       AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
-      .bind(now(),owner,job.document_id,job.lease,job.extraction,receipt.id,job.sha256,job.size).run();
+      .bind(state,code,savedExtraction,now(),owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until,job.available_at,receipt?.id??null,receipt?.id??null,job.sha256??null,job.sha256??null,job.size??null).run();
+  // A lost snapshot is not an unrecorded expired attempt. Reevaluate it on
+  // the next pass; never fall through to the generic exhaustion transition.
+  return 'handled';
 }
 async function recoverInterruptedExtractions(owner:string,at:string){
-  // A final attempt can commit its receipt and then lose the continuation.
-  // Inspect at most two jobs, including abandoned/orphaned jobs. Older or
-  // restored queues can exceed today's two live engine slots. Leave every
-  // unchecked receipt intact for the next bounded pass, never bulk-fail it.
+  // Every attempt can commit before losing its continuation. Bound each pass
+  // to two rows and leave unchecked receipts intact for the next pass.
   const jobs=await db().prepare(`SELECT document_jobs.*,d.size,d.sha256 FROM document_jobs LEFT JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id
-    WHERE document_jobs.owner=? AND state='processing' AND attempts>=3 AND lease_until<? AND available_at<=?
+    WHERE document_jobs.owner=? AND state='processing' AND lease_until<? AND available_at<=?
+    AND ${activeSource}
+    AND (attempts>=3 OR json_extract(CASE WHEN json_valid(extraction) THEN extraction ELSE '{}' END,'$.processing.run_id') IS NOT NULL)
     AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)
     ORDER BY lease_until,document_id LIMIT 2`).bind(owner,at,at).all<Row>();
   for(const job of jobs.results){
-    // Only the exact leased result and unchanged original can recover to human
-    // review. The fallback also uses the selected lease/result, so concurrent
-    // renewal, manual review or a committed registration cannot be overwritten.
-    if(await recoverInterruptedExtraction(owner,job)==='deferred')continue;
+    if(await recoverInterruptedExtraction(owner,job))continue;
     await db().prepare(`UPDATE document_jobs SET state='failed',error_code='lease_expired',lease='',lease_until='',updated_at=?
       WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND attempts>=3 AND lease=? AND extraction=?
       AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now')
@@ -197,11 +236,18 @@ async function claim(owner:string,engine:string,runner='server'):Promise<Row|nul
   const at=now(),wanted=engine==='cloud'?'queued':'waiting_ocr';
   const job=await db().prepare(`SELECT document_jobs.*,d.mime,d.size,d.sha256 FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND engine=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} AND ${idleEngine} ORDER BY available_at,document_id LIMIT 1`).bind(owner,engine,at,wanted,at).first<Row>();
   if(!job)return null;
+  // The bounded recovery pass may not have reached this receipt. Never give
+  // accepted output a fresh run identity. An explicit review retry has an
+  // empty lease and therefore a different run ID.
+  if(job.state==='processing'&&extractionRecord(job.extraction).processing?.run_id===await documentRunId(owner,job)){
+    await recoverInterruptedExtraction(owner,job);
+    return null;
+  }
   const lease=randomToken(),until=new Date(Date.now()+(runner==='cloud'?300000:180000)).toISOString();
   // A per-document compare-and-swap prevents duplicate work on that original;
   // the engine guard also bounds overlapping runners on different originals.
   // Recheck it under the write lock, using the database clock for live leases.
-  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,lease_runner=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts=? AND attempts<3 AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} AND ${idleEngine}`).bind(lease,until,runner,at,owner,job.document_id,engine,job.attempts,at,wanted,at).run();
+  const r=await db().prepare(`UPDATE document_jobs SET state='processing',attempts=attempts+1,lease=?,lease_until=?,lease_runner=?,updated_at=? WHERE owner=? AND document_id=? AND engine=? AND attempts=? AND attempts<3 AND extraction=? AND lease=? AND available_at<=? AND (state=? OR (state='processing' AND lease_until<?)) AND ${activeSource} AND ${idleEngine}`).bind(lease,until,runner,at,owner,job.document_id,engine,job.attempts,job.extraction,job.lease,at,wanted,at).run();
   return r.meta.changes===1?{...job,lease,lease_until:until,lease_runner:runner,attempts:job.attempts+1}:null;
 }
 async function failJob(owner:string,job:Row,code:string){
@@ -337,7 +383,7 @@ export async function processDocuments(owner:string,limit=2){
       }catch(e){
         const code=e instanceof Error?e.message:'';
         if(['local_ocr_required','parse_timeout'].includes(code))await db().prepare(`UPDATE document_jobs SET state='waiting_ocr',engine='local',attempts=0,lease='',lease_until='',updated_at=? WHERE owner=? AND document_id=? AND ${unrecordedLease}`).bind(now(),owner,job.document_id,job.lease,await documentRunId(owner,job)).run();
-        else await failJob(owner,job,['page_limit','text_limit','original_integrity'].includes(code)?code:'pdf_unreadable');
+        else await failJob(owner,job,['page_limit','text_limit','original_integrity','original_unavailable'].includes(code)?code:'pdf_unreadable');
       }
     }
   }catch(error){return finalizeProcessing(owner,processed,{error});}
@@ -383,16 +429,67 @@ async function workerOwner(req:Request){
   const owner=rows.results[0].owner as string;
   await db().prepare(mode==='cloud'?'UPDATE document_automation SET cloud_worker_seen=? WHERE owner=?':'UPDATE document_automation SET worker_seen=? WHERE owner=?').bind(now(),owner).run();return {owner,mode};
 }
+async function workerIdentityBody(req:Request):Promise<string|null>{
+  const reader=req.body?.getReader();if(!reader)return '';
+  const bytes=new Uint8Array(4096);let size=0;
+  try{
+    for(;;){
+      const {done,value}=await reader.read();if(done)break;
+      if(size+value.byteLength>bytes.length){
+        // Cancellation is cleanup, never an unbounded provider wait.
+        void reader.cancel().catch(()=>{});return null;
+      }
+      bytes.set(value,size);size+=value.byteLength;
+    }
+  }finally{reader.releaseLock();}
+  return new TextDecoder('utf-8',{fatal:true}).decode(bytes.subarray(0,size));
+}
 export async function workerAction(req:Request,action:string){
   const {owner,mode}=await workerOwner(req);
   if(action==='process'&&req.method==='POST'&&mode==='cloud'){
     const result=await processDocuments(owner,2);
     if(result.status_unknown)return response(result);
-    return response({processed:result.processed,waiting:Number(result.counts.waiting_ocr||0),failed:Number(result.counts.failed||0),...(result.metadata_warning?{metadata_warning:result.metadata_warning}:{})});
+    return response({processed:result.processed,waiting:Number(result.counts.waiting_ocr||0),failed:Number(result.counts.failed||0),...(result.aftercheck_pending?{aftercheck_pending:result.aftercheck_pending}:{}),...(result.metadata_warning?{metadata_warning:result.metadata_warning}:{})});
   }
   if(action==='lease'&&req.method==='POST'){
     await enqueueDocuments(owner);const job=await claim(owner,'local',mode);if(!job)return response({job:null});
-    return response({job:{id:job.document_id,lease:job.lease,mime:job.mime,size:job.size,sha256:job.sha256}});
+    return response({job:{id:job.document_id,lease:job.lease,mime:job.mime,size:job.size,sha256:job.sha256,protocol:2,run_id:await documentRunId(owner,job),lease_until:job.lease_until}});
+  }
+  if((action==='heartbeat'||action==='receipt')&&req.method==='POST'){
+    let body:Row;
+    try{
+      const raw=await workerIdentityBody(req);
+      if(raw===null)return response({error:'För stor begäran.'},413);
+      body=JSON.parse(raw);
+    }catch{return response({error:'Ogiltigt jobb.'},400);}
+    if(!body||typeof body.id!=='string'||!/^[a-zA-Z0-9_-]{1,100}$/.test(body.id)||typeof body.lease!=='string'||!/^[A-Za-z0-9_-]{43}$/.test(body.lease)||typeof body.sha256!=='string'||!/^[a-f0-9]{64}$/.test(body.sha256))return response({error:'Ogiltigt jobb.'},400);
+    const job=await db().prepare(`SELECT document_jobs.*,d.sha256,d.size FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND engine='local'`).bind(owner,body.id).first<Row>();
+    if(!job||job.sha256!==body.sha256)return response({error:'Jobbet har ändrats eller gått ut.'},409);
+    const runId=await documentRunId(owner,{document_id:body.id,lease:body.lease}),identity={id:body.id,sha256:body.sha256,run_id:runId};
+    if(action==='receipt'){
+      const receipt=await receiptFor(owner,body.id,runId,body.sha256,mode);
+      if(receipt){
+        const current=extractionRecord(job.extraction).processing;
+        const settled=current?.run_id===runId&&current.sha256===body.sha256&&current.runner===mode&&['ready','needs_review','duplicate','registered'].includes(job.state);
+        return response({accepted:true,settled,state:job.state,...identity,accepted_at:receipt.created_at,...(settled&&job.state==='registered'?{aftercheck_pending:job.error_code==='registration_aftercheck_pending'}:{})});
+      }
+    }
+    const live=await db().prepare(`SELECT updated_at,lease_until FROM document_jobs WHERE owner=? AND document_id=? AND lease_runner=? AND ${unrecordedLease}
+      AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?)`)
+      .bind(owner,body.id,mode,body.lease,runId,body.sha256,job.size).first<Row>();
+    if(!live)return response({error:'Jobbet har ändrats eller gått ut.'},409);
+    if(action==='receipt')return response({accepted:false,retryable:true,...identity});
+    // updated_at is the claim time until a result is accepted. Heartbeats only
+    // change lease_until, never that anchor or the attempt count.
+    const at=Date.now(),horizon=Date.parse(live.updated_at)+600000;
+    if(!Number.isFinite(horizon)||horizon<=at)return response({error:'Jobbets tidsgräns har nåtts.'},409);
+    const until=new Date(Math.min(horizon,Math.max(Date.parse(live.lease_until),at+(mode==='cloud'?300000:180000)))).toISOString();
+    const renewed=await db().prepare(`UPDATE document_jobs SET lease_until=? WHERE owner=? AND document_id=? AND lease_runner=? AND updated_at=? AND lease_until=? AND ${unrecordedLease}
+      AND julianday(updated_at,'+10 minutes')>julianday('now')
+      AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?)`)
+      .bind(until,owner,body.id,mode,live.updated_at,live.lease_until,body.lease,runId,body.sha256,job.size).run();
+    if(renewed.meta.changes!==1)return response({error:'Jobbet har ändrats eller gått ut.'},409);
+    return response({ok:true,run_id:runId,lease_until:until});
   }
   if(action==='document'&&req.method==='GET'){
     const id=new URL(req.url).searchParams.get('id'),lease=req.headers.get('x-mg-ocr-lease');
@@ -409,7 +506,8 @@ export async function workerAction(req:Request,action:string){
     if(body.error===true)return response(await failJob(owner,job,mode==='cloud'?'cloud_ocr_failed':'local_ocr_failed')?{ok:true}:{ignored:true});
     // The worker's digest describes the bytes it read earlier. Recheck the
     // retained original before accepting its text or using it for registration.
-    try{await originalBytes(owner,job);}catch{
+    try{await originalBytes(owner,job);}catch(error){
+      if(!originalIntegrityFailures.has(error as object))return Response.json({error:'Originalunderlaget är tillfälligt otillgängligt.',code:'original_unavailable'},{status:503,headers:{'Retry-After':'60','Cache-Control':'no-store'}});
       if(!await failJob(owner,job,'original_integrity'))return response({ignored:true});
       return response({error:'Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före ny tolkning.'},409);
     }

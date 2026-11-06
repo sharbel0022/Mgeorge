@@ -345,7 +345,7 @@ test('real cloud pull runner reads a scan from Sites and saves reviewed OCR with
     return f.api.workerAction(new Request(url,options),action);
   };
   const result=await runSitesOcr({origin:'https://site.example',token:f.env.DOCUMENT_CLOUD_WORKER_TOKEN,mode:'cloud'},{fetchImpl});
-  assert.deepEqual(result,{processed:1,failed:0});assert.deepEqual(calls,['process','lease','document','complete','lease']);
+  assert.deepEqual(result,{processed:1,failed:0});assert.deepEqual(calls,['process','lease','heartbeat','document','complete','lease']);
   const job=f.sql.prepare('SELECT * FROM document_jobs WHERE owner=? AND document_id=?').get(f.owner,document.id),extraction=JSON.parse(job.extraction);
   assert.equal(job.state,'needs_review');assert.equal(job.lease,'');assert.equal(job.automatic,0);
   assert.equal(extraction.method,'ocr');assert.equal(extraction.fields.invoice_number.value,'0606');assert.equal(extraction.fields.total_cents.value,375000);assert.equal(extraction.level,'yellow');

@@ -168,7 +168,7 @@ for(const mode of ['local','cloud'])for(const phase of ['worker failure','origin
     };
     return statement;
   };
-  if(phase==='original failure')f.storageError=true;
+  if(phase==='original failure')f.objects.set(f.owner+'/'+job.id,Buffer.from('synthetic changed original'));
   const result=await f.complete(job,phase==='worker failure',mode);
   assert.equal(expired,true);assert.equal(result.status,200);assert.deepEqual(await result.json(),{ignored:true});
   assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},{...before,lease_until:'2000-01-01'});
@@ -229,7 +229,7 @@ for(const mode of ['local','cloud'])for(const replay of ['same result','conflict
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
 });
 
-test('an accepted OCR receipt survives interruption and module restart while a new lease can reprocess',async t=>{
+test('an accepted OCR receipt survives restart and only an explicit review retry permits reprocessing',async t=>{
   const f=await fixture(t);await f.document('a');const job=await f.lease(),prepare=f.d1.prepare.bind(f.d1);let interrupted=false;
   f.d1.prepare=query=>{
     const statement=prepare(query);
@@ -244,6 +244,11 @@ test('an accepted OCR receipt survives interruption and module restart while a n
   await f.restart();assert.deepEqual(await(await f.complete(job)).json(),{ignored:true});
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction,receipt);
   f.sql.prepare("UPDATE document_jobs SET lease_until='2000-01-01'").run();
+  assert.equal(await f.lease(),null,'automatic recovery preserves accepted output without repeating OCR');
+  assert.equal(f.sql.prepare('SELECT state FROM document_jobs').get().state,'needs_review');
+  assert.equal(f.sql.prepare('SELECT attempts FROM document_jobs').get().attempts,1);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
+  assert.deepEqual(await f.processing.retryInvoiceDocument(f.owner,job.id),{ok:true,requeued:true});
   const replacement=await f.lease();assert.notEqual(replacement.lease,job.lease);assert.equal((await f.complete(job)).status,409);
   assert.equal((await(await f.complete(replacement)).json()).state,'needs_review');
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,2);assert.equal(f.sql.prepare('SELECT extraction FROM gmail_sources').get().extraction,receipt);
@@ -366,7 +371,11 @@ for(const defect of ['previous lease receipt','missing history','changed origina
     const get=f.env.BUCKET.get;f.env.BUCKET.get=async key=>{f.sql.prepare("UPDATE gmail_sources SET status='rejected'").run();return get(key);};
   }
   await f.restart();assert.equal(await f.lease(),null);
-  const after=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(after.state,'failed');assert.equal(after.extraction,receipt);
+  const after=f.sql.prepare('SELECT * FROM document_jobs').get();
+  // A concurrent rejection wins; recovery must not substitute its own terminal
+  // transition after losing the active-source compare-and-swap.
+  assert.equal(after.state,defect==='rejected while reading'?'processing':'failed');assert.equal(after.extraction,receipt);
+  if(defect==='rejected while reading'){assert.equal(after.lease,job.lease);assert.equal(after.lease_until,'2000-01-01');}
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
 });
 

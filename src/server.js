@@ -266,10 +266,14 @@ async function syncGmail(req=null,{analyze=true,controlAuthorize=null,scheduled=
   const startedAt=connection.sync_started_at||new Date().toISOString();
   let currentTokens;
   try{
-    const knownIds=db.prepare('SELECT source_id FROM document_sources').all().map(x=>x.source_id);
-    const rejectedIds=db.prepare('SELECT source_id FROM gmail_rejected_sources').all().map(x=>x.source_id);
     currentTokens=decryptObject(connection.encrypted_tokens);
-    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,knownIds,rejectedIds,maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{authorize();lease.renew();}});
+    const result=await fetchGmailInvoiceDocuments(currentTokens,{after:connection.last_synced?.slice(0,10)||undefined,lookupSources:sourceIds=>{
+      // The runtime database proxy preserves the active company's boundary.
+      authorize();lease.assert();
+      const placeholders=sourceIds.map(()=>'?').join(',');
+      const rows=db.prepare(`SELECT source_id,'known' kind FROM document_sources WHERE source_id IN (${placeholders}) UNION ALL SELECT source_id,'rejected' kind FROM gmail_rejected_sources WHERE source_id IN (${placeholders})`).all(...sourceIds,...sourceIds);
+      return {knownIds:rows.filter(row=>row.kind==='known').map(row=>row.source_id),rejectedIds:rows.filter(row=>row.kind==='rejected').map(row=>row.source_id)};
+    },maxMessages:50,pageToken:connection.page_token||'',authorize:()=>{authorize();lease.renew();}});
     let imported=0,duplicate=result.duplicate||0;
     // Originals, token rotation and the checkpoint share the lease-fenced write.
     lease.write(()=>{

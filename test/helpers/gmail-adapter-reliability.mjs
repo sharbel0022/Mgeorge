@@ -230,4 +230,42 @@ export function gmailAdapterReliabilityTests(adapter){
     assert.equal(first.documents[0].source_id,'gmail:mg.vitvaror@gmail.com:one:1');assert.equal(second.duplicate,1);assert.equal(second.documents.length,0);
     assert.equal(calls.filter(call=>call.path.includes('/attachments/')).length,1);
   });
+
+  test('Gmail membership lookup batches encountered sources before downloads and preserves rejection semantics',async t=>{
+    const message=invoiceMessage();
+    message.payload.parts=Array.from({length:132},(_,index)=>({...part(String(index)),body:{attachmentId:'attachment-'+index}}));
+    const calls=provider(t,{one:message}),batches=[];
+    const result=await adapter.fetchGmailInvoiceDocuments(tokens(),{lookupSources:async ids=>{
+      batches.push([...ids]);
+      return {knownIds:ids.filter(id=>Number(id.split(':').at(-1))<100),rejectedIds:ids.filter(id=>{const index=Number(id.split(':').at(-1));return index>=100&&index<131;})};
+    }});
+    assert.deepEqual(batches.map(ids=>ids.length),[50,50,32]);
+    assert.equal(new Set(batches.flat()).size,132);
+    assert.equal(result.duplicate,100);assert.equal(result.skipped,31);
+    assert.equal(result.documents.length,1);assert.equal(result.documents[0].source_id,'gmail:mg.vitvaror@gmail.com:one:131');
+    assert.equal(calls.filter(call=>call.path.includes('/attachments/')).length,1);
+  });
+
+  test('Gmail membership lookup failure stops before downloading an unknown original',async t=>{
+    const message=invoiceMessage();message.payload.parts[0].body={attachmentId:'must-not-download'};
+    const calls=provider(t,{one:message}),failure=new Error('synthetic membership outage');
+    await assert.rejects(adapter.fetchGmailInvoiceDocuments(tokens(),{lookupSources:async()=>{throw failure;}}),error=>error===failure);
+    assert.equal(calls.filter(call=>call.path.includes('/attachments/')).length,0);
+  });
+
+  for(const response of [{knownIds:['gmail:another-account:other:1'],rejectedIds:[]},{knownIds:null,rejectedIds:[]}])test('Gmail membership lookup rejects invalid or unrelated returned references '+JSON.stringify(response),async t=>{
+    const message=invoiceMessage();message.payload.parts[0].body={attachmentId:'must-not-download'};
+    const calls=provider(t,{one:message});
+    await assert.rejects(adapter.fetchGmailInvoiceDocuments(tokens(),{lookupSources:async()=>response}),error=>error.code==='invalid_sources');
+    assert.equal(calls.filter(call=>call.path.includes('/attachments/')).length,0);
+  });
+
+  test('Gmail membership lookup cannot extend the existing work deadline or lose its resume cursor',async t=>{
+    let clock=Date.now();t.mock.method(Date,'now',()=>clock);
+    const message=invoiceMessage();message.payload.parts[0].body={attachmentId:'must-not-download'};
+    const calls=provider(t,{one:message});
+    const result=await adapter.fetchGmailInvoiceDocuments(tokens(),{pageToken:'resume-current-page',lookupSources:async()=>{clock+=120001;return {knownIds:[],rejectedIds:[]};}});
+    assert.equal(result.truncated,true);assert.equal(result.next_page_token,'resume-current-page');
+    assert.equal(result.documents.length,0);assert.equal(calls.filter(call=>call.path.includes('/attachments/')).length,0);
+  });
 }

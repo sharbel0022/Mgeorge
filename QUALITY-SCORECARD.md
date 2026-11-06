@@ -10,6 +10,16 @@ Fryst kandidat `d2cad86a`, faktiskt testad PR-merge `bad0a67b`, har 112/112 foku
 
 Det tidigare produktionsbetyget ändras inte. Publik Node-drift med en enda administratörsidentitet får inte marknadsföras som fleranvändar-SaaS. Verklig identitetsingress, branch enforcement, nyckelhantering, backup/RPO/RTO, dataskydd och kommersiella bankavtal behöver separat acceptans. [Integrationsöverlämningen](docs/saas-readiness/integration-handoff.md) anger de två serverhunkarna och övriga gemensamma gränser. Ingen produktionsrelease eller verklig dataändring ingår i denna PR.
 
+## 2026-11-06 — Agent 2: Gmail/OCR-kandidat i PR 67
+
+[PR 67](https://github.com/sharbel0022/Mgeorge/pull/67) bygger på verifierad main f3c80629d4856c2f8ecbb1ed81be391a13ac6be8. Kandidaten ger bounded Gmail-deduplicering och korrelerbara schemakvitton, OCR-heartbeats/receipt-protokoll, återhämtning från tidiga avbrott, separata felklasser och ändliga återförsök. [Leveransrapport](docs/automation/document-automation-reliability.md), [kontrakt och återhämtningsplan](docs/automation/recovery-runbook.md), [färska driftobservationer](docs/automation/observations-2026-11-06.json).
+
+Sammanfogad lokal fokuskontroll: Node 223/223 och Sites 341/341, 0 fail/cancel/skip/TODO. Rena fullständiga kvalitets-/säkerhetsgrindar på slutlig PR-kandidat redovisas i PR:s check-kvitton; tidigare kandidatjobb ersätter inte aktuell verifiering. Oberoende granskning reproducerade och ledde till rättningar av falska klientmarkörer, transient heartbeat-förlust, förlorad recovery-CAS och strömlimit.
+
+Status 23:18 UTC: 427 granskning, 47 OCR, 4 PDF, 60 färdiga i framflyttat 24-timmarsfönster. Ett faktiskt OCR-schemajobb 22:27 gav 6/0 på main, men regelbunden kvartskörning är inte styrkt. Gmail 23:00 gav åter no_update utan nytt automatiskt appkvitto. Ingen produktion eller verkliga scheman ändrades; ingen massbearbetning eller deployment genomfördes. AI-modelladaptern är orörd.
+
+**Poäng oförändrade:** senaste konservativa bedömning 258,5/330 = 7,83/10. Berörda områden 6, 9–14, 24, 28, 30, 32–33 får nya syntetiska bevis, inte en automatisk höjning eller nytt produktionsgodkännande.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).
