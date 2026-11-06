@@ -1,0 +1,58 @@
+{
+  "headCommit": "cc926f25568eaca0c740377fa8cf7f7d11dfb734",
+  "testedMergeCommit": "18c7e3d8e090b132013b56fbbdd3833674303187",
+  "tree": "9763b8ecb80cc2cfb7eebda27c31b3c1f44071f6",
+  "paymentWorkflowRun": 42218258243,
+  "securityWorkflowRun": 42218258295,
+  "result": "success",
+  "uniqueUnitIntegrationTests": 8293,
+  "node22And24SameCases": 2597,
+  "sites": 5649,
+  "bridge": 47,
+  "browser": 77,
+  "securityOverlapping": 1427,
+  "artifacts": [
+    {
+      "artifactId": "13502845852",
+      "profile": "node22",
+      "bytes": 543084,
+      "sha256": "3dcd13ce91a8df257b4964fcd42c7bab199f76ecd2dfecf2fc51ca7095731d7d"
+    },
+    {
+      "artifactId": "13502438524",
+      "profile": "sites",
+      "bytes": 693569,
+      "sha256": "75d57373db60f0d17c024e189b94eff184409a501fec75729941533fbf184961"
+    },
+    {
+      "artifactId": "13502153292",
+      "profile": "node24",
+      "bytes": 549086,
+      "sha256": "98aea256fe987156f0dea29aa769c3f8546c0bdcdda97dc854ad77cd2a049b2c"
+    },
+    {
+      "artifactId": "13501843833",
+      "profile": "bridge",
+      "bytes": 225152,
+      "sha256": "34bf79e0cef803bb916ee8f008c63fae1295326d22eb5bd3b24552fa4d66a388"
+    },
+    {
+      "artifactId": "13502088105",
+      "profile": "performance",
+      "bytes": 113863,
+      "sha256": "57c324a79b524366846fa9b1a9e4ab5942e04835e1da6a921b06ac503cac403a"
+    },
+    {
+      "artifactId": "13502930560",
+      "profile": "security",
+      "bytes": 59305,
+      "sha256": "330d688a2a9496d6a76ed95ed13004ee0ff261e76d572c542624f5aa82d0a2f4"
+    },
+    {
+      "artifactId": "13502526660",
+      "profile": "browser",
+      "bytes": 5295115,
+      "sha256": "f97efacb3dc715b044f38f3e2789431a362bd0a13bcb5bdf7833215772be3383"
+    }
+  ]
+}

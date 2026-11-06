@@ -1,0 +1,7 @@
+{
+  "src/invoice-extraction.js": "6783d8bcbf8739d9f6b38d28dc0cba8fa38d21550be3117263809c27290b084f",
+  "src/invoice-details.js": "0f46b7df4ddf9dac13d83486d040502f91d40bc7c3a292c9336062afff0bbc80",
+  "sites/lib/invoice-fields.js": "9613bc10d50b4fe3e907f0e3086637d2d0e4f93cf1efeac932302e5626173bd1",
+  "sites/lib/invoice-details.js": "0f46b7df4ddf9dac13d83486d040502f91d40bc7c3a292c9336062afff0bbc80",
+  "test/final95-parser-census.test.js": "1614736abfcad37f889f569008149e7354263f55c7d0b57a66cee667ff8c8282"
+}

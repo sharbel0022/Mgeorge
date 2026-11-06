@@ -1,0 +1,147 @@
+{
+  "recorded_at": "2026-11-06T11:37:44.330056+00:00",
+  "focus_source_commit": "2982b6c51cf2891d97b816ea1ce6c82e5f4c71a1",
+  "file_manifest": "ocr-final95-source-manifest.json",
+  "all_manifest_files_match_commit": true,
+  "scope": "Focused synthetic/parser/Gmail transport and queue tests, plus actual local OCR of established synthetic PNG originals. No live Gmail/provider calls or production mutation. Integration full gates are recorded separately.",
+  "runs": [
+    {
+      "log": "ocr-integration-node-first.tap",
+      "sha256": "95893008d61fc741069dcc160b6ad9f36a135d34b617852e96f2c7dadc9ccbb6",
+      "bytes": 7215,
+      "result": {},
+      "interpretation": "Invocation rejected before test execution: NODE_ENV=test was omitted; SAAS_TEST_ONLY guard held."
+    },
+    {
+      "log": "ocr-integration-sites-first.tap",
+      "sha256": "759cb2905b2fb6425807a2418ddf0b01acb8a07281a6b2230c2c4323826d13bd",
+      "bytes": 7295,
+      "result": {},
+      "interpretation": "Invocation rejected before test execution: NODE_ENV=test was omitted; SAAS_TEST_ONLY guard held."
+    },
+    {
+      "log": "ocr-integration-node-second.tap",
+      "sha256": "fb6f16b60a8f7d846b64cc70eac2c212aa78d1df421dacc905e0dae9799bdd71",
+      "bytes": 58973,
+      "result": {
+        "tests": 274,
+        "suites": 0,
+        "pass": 273,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 22095.524227
+      }
+    },
+    {
+      "log": "ocr-integration-sites-second.tap",
+      "sha256": "9acd2c3225255bbdcdea8dd8e76c527eb071205dd8be5820de164afe50ca650e",
+      "bytes": 107641,
+      "result": {
+        "tests": 294,
+        "suites": 0,
+        "pass": 293,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 35249.874712
+      }
+    },
+    {
+      "log": "ocr-integration-node-fixture-retest.tap",
+      "sha256": "532d21cf0a1d1bab8bc38047a60a5bc5ddb0e9e75a698349f24b6a0025e20530",
+      "bytes": 5312,
+      "result": {
+        "tests": 33,
+        "suites": 0,
+        "pass": 33,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 973.266802
+      }
+    },
+    {
+      "log": "ocr-integration-sites-fixture-retest.tap",
+      "sha256": "58a5a8f9ddbe42d201987537aa8eeb2257e393e1eb6d721f11144f98f9f56b99",
+      "bytes": 5318,
+      "result": {
+        "tests": 33,
+        "suites": 0,
+        "pass": 33,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 1056.373634
+      }
+    },
+    {
+      "log": "ocr-backlog-red.tap",
+      "sha256": "3d9cb544823c456d0f81395a3bcd6757db716e73a558e8abba4c4d22819ca0f0",
+      "bytes": 19353,
+      "result": {
+        "tests": 2,
+        "suites": 0,
+        "pass": 0,
+        "fail": 2,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 804.752723
+      }
+    },
+    {
+      "log": "ocr-backlog-green.tap",
+      "sha256": "8f270245680a282a07db237dc92ff698cdb2ca90cb462720a9493a534b87ddd0",
+      "bytes": 8966,
+      "result": {
+        "tests": 38,
+        "suites": 0,
+        "pass": 38,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 4577.03678
+      }
+    },
+    {
+      "log": "ocr-final95-node-focused.tap",
+      "sha256": "4dbd103998c4d7d8d307e758f6bcd63c5a879a4306112814e6e3d4f3aae10491",
+      "bytes": 70657,
+      "result": {
+        "tests": 336,
+        "suites": 0,
+        "pass": 336,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 31418.08549
+      }
+    },
+    {
+      "log": "ocr-final95-sites-focused.tap",
+      "sha256": "c63d1512e935353990869f0f0067e783fdb17d1db9ed49f69c0397e883bfde31",
+      "bytes": 97532,
+      "result": {
+        "tests": 446,
+        "suites": 0,
+        "pass": 446,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 67033.5284
+      }
+    }
+  ],
+  "final_commands": {
+    "node": "NODE_ENV=test node --import ./scripts/saas-test-isolation.mjs --test --test-concurrency=1 --test-reporter=tap test/invoice-reliability.test.js test/ocr-layout*.test.js test/review-ocr-layout-boundaries.test.js test/ocr-bankgiro*.test.js test/sites-ocr-pull.test.js test/sites-ocr-transport-recovery.test.js test/cloud-ocr-trigger.test.js test/gmail.test.js",
+    "sites": "NODE_ENV=test node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap tests/invoice-reliability.test.mjs tests/ocr-layout*.test.mjs tests/ocr-explicit-role-boundary-positive.test.mjs tests/ocr-parser-independent-review.test.mjs tests/ocr-bankgiro-evidence.test.mjs tests/gmail-preview-q8.test.mjs tests/document-queue-recovery.test.mjs tests/gmail.test.mjs tests/quality-regressions-ocr-recovery.test.mjs tests/cloud-ocr.test.mjs tests/gmail-operational-status-ui.test.mjs"
+  }
+}

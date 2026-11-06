@@ -1,0 +1,17 @@
+{
+  "kind": "synthetic-workerd-runtime-smoke",
+  "at": "2026-11-06T12:22:27.554Z",
+  "node": "v24.22.1",
+  "compatibilityDate": "2026-05-15",
+  "flags": [
+    "nodejs_compat"
+  ],
+  "outboundCalls": 0,
+  "calls": 1,
+  "body": {
+    "ok": true
+  },
+  "rotationCode": "INVALID_CLIENT_CERTIFICATE",
+  "certificateValidUntil": "2026-11-08T12:22:27.000Z",
+  "passed": true
+}

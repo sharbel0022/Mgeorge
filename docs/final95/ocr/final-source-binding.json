@@ -1,0 +1,40 @@
+{
+  "integratedCommit": "01595dee873d632aea9a392c8210986beb5c687b",
+  "files": [
+    {
+      "path": "src/invoice-extraction.js",
+      "sha256": "1a12c6ab11b40d83b58610a073afb1d5eb59ceb91acf9a92d92467b98f2aac05",
+      "matchesIntegratedCommit": true
+    },
+    {
+      "path": "sites/lib/invoice-fields.js",
+      "sha256": "e3b193e097cdd1565001b68adec957b66bcdee40132ea7afb48d51913f58f47a",
+      "matchesIntegratedCommit": true
+    },
+    {
+      "path": "sites/lib/ocr-layout.js",
+      "sha256": "ae9f13fdfc1a34df25b10375de8b511b85878ce7b4fd8be4e70bda7feeae3700",
+      "matchesIntegratedCommit": true
+    },
+    {
+      "path": "sites/lib/ocr-summary-layout.js",
+      "sha256": "8295d48bf10ad9713789ab7458cf852b931f8a12250ab7729567ffd5eea71eb8",
+      "matchesIntegratedCommit": true
+    },
+    {
+      "path": "test/final95-party-block-layout.test.js",
+      "sha256": "a8b5f8f7a859ec953171631c0d91193039e6ae58b730dcac6ed1a18bd1abd14f",
+      "matchesIntegratedCommit": true
+    },
+    {
+      "path": "test/final95-summary-cell-layout.test.js",
+      "sha256": "ea2c7b165604637b5abf58b5c690b61167d2249bd611f7c304a9145f579487a9",
+      "matchesIntegratedCommit": true
+    },
+    {
+      "path": "test/final95-stacked-summary-safety.test.js",
+      "sha256": "2f12540bbcf8c819206ae47d3b4b6d59e2afc93ca5d59388cfe7a4df126d9bfe",
+      "matchesIntegratedCommit": true
+    }
+  ]
+}

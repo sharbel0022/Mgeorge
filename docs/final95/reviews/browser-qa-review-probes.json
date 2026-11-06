@@ -1,0 +1,23 @@
+{
+  "schema": "final95-dashboard-review-control-flow-probe-v1",
+  "sourceCommit": "70534d737bfe79ccb180e5dae96b3781048a493a",
+  "sourcePath": "scripts/quality/dashboard-browser.mjs",
+  "sourceSha256": "83132eeea3cedf0bd3eaa58f05c7a62fcd5552f41a6079a5d7c0a0b92c97bbff",
+  "scope": "Executed exact extracted finally body with synthetic stubs; no browser, socket, production or provider operation. This is a cleanup/receipt guard probe, not UI acceptance.",
+  "results": [
+    {
+      "case": "only-html-asset-observed",
+      "serverKillCalls": 1,
+      "receiptWrites": 1,
+      "passed": true,
+      "error": null
+    },
+    {
+      "case": "browser-close-rejects",
+      "serverKillCalls": 0,
+      "receiptWrites": 0,
+      "passed": null,
+      "error": "synthetic browser close failure"
+    }
+  ]
+}

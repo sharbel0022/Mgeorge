@@ -1,0 +1,74 @@
+[
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-01/recognition-input.png",
+    "sha256": "26a36566f44242340c94b573c1d434dc93f44c372eb808a51ee26d577fb4e752",
+    "bytes": 583755,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-02/recognition-input.png",
+    "sha256": "52ee2ae8fe4fb6e60f85ea35ef3b1b6b4cf4254d045cab298fb4074a2ce590a1",
+    "bytes": 488640,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-03/recognition-input.png",
+    "sha256": "de224deb2241bfd64bf60e1d2fe4eb84aaa5e92fa8d32a00be452c9d0fb977eb",
+    "bytes": 562911,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-04/recognition-input.png",
+    "sha256": "ea64707ba2f2f5f161f13ba1d94c810458b652a89d312868b1d5d6ebfe8bef71",
+    "bytes": 537453,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-05/recognition-input.png",
+    "sha256": "3c3a85f37365b6e407cd2be96ee4613893c8a06d0d63c5b0a5de5ea76ed01f5b",
+    "bytes": 556734,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-06/recognition-input.png",
+    "sha256": "bd6ad7c451ac84603460751c7d29ed599bfd3e04e22127269849c34317f7e3e3",
+    "bytes": 501166,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-07/recognition-input.png",
+    "sha256": "b1463dedb187ccb03fddf0f813e3a664016f63974d7d0d660281c54c1554aeb5",
+    "bytes": 535586,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-08/recognition-input.png",
+    "sha256": "00e7fcdd66035d229b09823db2e149f96f31a2ab527a3864800f7cc654e113a3",
+    "bytes": 545685,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-09/recognition-input.png",
+    "sha256": "db82bf3c25768aa0ae5e297db3fd731b8e06c5abedcc986534e35414f7cbb99a",
+    "bytes": 478337,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-normal-10/recognition-input.png",
+    "sha256": "e3792322a5eaf831bddbec5fd0410d5062b81a999fc8d4997a7ae5b994128714",
+    "bytes": 561383,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-stress-defocused-photo/recognition-input.png",
+    "sha256": "b2f4313416d1a578b50b01aca059736bb9578f4553f199182ab9d5588d476877",
+    "bytes": 645921,
+    "versionedExactDuplicate": null
+  },
+  {
+    "path": "optical-v2-known-01/holdout-v2-stress-lost-bottom/recognition-input.png",
+    "sha256": "a4379871e2dfe5e584578ca9307d7b1b7688fc635f3bbd628073939c5da12427",
+    "bytes": 302154,
+    "versionedExactDuplicate": null
+  }
+]

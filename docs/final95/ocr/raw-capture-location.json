@@ -1,0 +1,8 @@
+{
+  "libraryFileId": "libfile_f7b11b30765c819196bbde6238f8d137",
+  "url": "https://chatgpt.com/library?file_id=libfile_f7b11b30765c819196bbde6238f8d137&account_id=personal",
+  "archive": "final95-ocr-development-evidence.tar.gz",
+  "sha256": "ac928abce83efff3ecfd00e6f334464d7959662c6a04b34c6ece4b77b33d8e17",
+  "bytes": 6196389,
+  "scope": "Known synthetic V2 development: 12 original-bound optical captures, actual preprocessed recognition PNGs, raw OCR, parser observations and frozen plan. Not blind V3 or production documents."
+}
