@@ -13,12 +13,12 @@ function normalizeInvoiceLayout(input){
   let text=invoiceScalarText(original);
   // Compact character-spaced digits without erasing the separator before a
   // sibling label. Trailing unknown content still goes through full validation.
-  text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date)[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/gi,(_,label,value)=>label+value.trimEnd().replace(/[ \t]/g,'')+(value.match(/[ \t]+$/)?.[0]||''));
+  text=text.replace(/((?:fakturadatum|förfallo(?:datum|dag)|förfaller|due\s*date|invoice\s*date|(?<![\p{L}\p{N}/_-])issue[ \t]+date(?=[ \t.:#]|\d|$))[ \t:.]*)([\d \t]+[/.\-][\d \t]+[/.\-][\d \t]+)/giu,(_,label,value)=>label+value.trimEnd().replace(/[ \t]/g,'')+(value.match(/[ \t]+$/)?.[0]||''));
   text=text.replace(/([,.])[ \t]+(?=\d{2}\b)/g,'$1');
   // PDF drawing order can differ from the visible column order. Text alone
   // cannot assign two numeric values to invoice/OCR headings with certainty.
   const numberColumn='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))',ocrColumn='OCR(?:[- /]?(?:nummer|referens))?';
-  const otherColumn='(?:kund[ \\t]*(?:nummer|nr)|customer[ \\t]*(?:number|no)|sida|page|fakturadatum|invoice[ \\t]*date|förfallo(?:datum|dag)|due[ \\t]*date)';
+  const otherColumn='(?:kund[ \\t]*(?:nummer|nr)|customer[ \\t]*(?:number|no)|sida|page|fakturadatum|invoice[ \\t]*date|issue[ \\t]+date|förfallo(?:datum|dag)|due[ \\t]*date)';
   const header=new RegExp('(?<![\\p{L}\\p{N}_-])(?:('+numberColumn+')|('+ocrColumn+')|'+otherColumn+')(?=[^\\p{L}\\p{N}_-]|-(?:\\s|$)|$)','giu');
   let ambiguousInvoiceColumns=false,previousEnd=-1,hasNumber=false,hasOcr=false;
   for(const label of text.matchAll(header)){
@@ -96,7 +96,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     record(key,matches.map(m=>({value:m[1],evidence:m[0]})),convert,!!labels&&[...text.matchAll(labels)].some(m=>!positions.has(m.index)));
   };
   const referenceLabel='(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)';
-  const issuedDateLabel='(?:fakturadatum|faktureringsdatum|invoice\\s*date)';
+  const issuedDateLabel='(?:fakturadatum|faktureringsdatum|invoice\\s*date|(?<![\\p{L}\\p{N}/_-])issue[ \\t]+date(?=[\\s.:#]|\\d|$))';
   const dueDateLabel='(?:förfallodatum|förfallodag|förfaller|oss\\s*tillhanda\\s*senast|betalas\\s*senast|due\\s*date)';
   // Swedish summa/totalt/belopp summaries need explicit tax qualifiers.
   // Reuse their grammar as sibling boundaries so inline fields stay separate.
@@ -112,7 +112,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // trailing content remains part of the value and must pass full validation.
   // Reuse the monetary census grammar exactly: a boundary must not discard an
   // occurrence that the field's own collector would never inspect.
-  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+totalLabel+'|'+vatLabel+'|'+netLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organisation number|leverantör|utställare|säljare|supplier|seller|kund|customer|valuta|currency)';
+  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+totalLabel+'|'+vatLabel+'|'+netLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organi[sz]ation[ \\t]+number|leverantör|utställare|säljare|supplier|seller|kund|customer|valuta|currency)';
   const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$)|'+issuedDateLabel+'|'+dueDateLabel+')','iu');
   const grabFull=(key,label,convert)=>{
     const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency',dateField=key==='issued_at'||key==='due_at';
