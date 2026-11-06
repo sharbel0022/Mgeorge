@@ -1,0 +1,30 @@
+✔ disabled mode returns the identical OCR result with no external or persistence work (1.562855ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_PRIVACY_APPROVED (0.373183ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_SECURITY_APPROVED (0.216617ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_COST_APPROVED (0.142665ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_ALLOWED_OWNERS (0.297308ms)
+✔ server approval gate blocks before original read: OPENAI_API_KEY (0.303187ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_COMPANY_ORGANIZATIONS (1.098575ms)
+✔ model candidates fill missing fields for review and cannot become bank evidence (1.87064ms)
+✔ AI disagreements preserve the original-derived value and record the conflict (0.582868ms)
+✔ model-declared economic conflicts cannot be filled into accounting fields (0.541956ms)
+✔ uncertain reservation never triggers a second provider call after failure/restart (12.80539ms)
+✔ successful candidate is reused by original hash without another provider call (2.13694ms)
+✔ original preflight failure falls back before reservation or external processing (0.925916ms)
+✔ lower-case adapter issue codes block financial prefilling for a wrong company (0.397018ms)
+✔ conflicting original total does not combine with AI tax/net amounts (0.264318ms)
+✔ parsed supplier-invoice recipient B conflicts with configured/model company A on enrichment and replay (3.541978ms)
+✔ parsed customer-invoice supplier B conflicts with configured/model company A on enrichment and replay (1.884946ms)
+✔ internally balanced AI line amounts cannot fill missing totals or reference over different parsed lines (2.208128ms)
+✔ consistent parsed company and line facts still allow review-only filling on enrichment and replay (1.836228ms)
+✔ configured company blocks matching wrong-company parser and AI facts: supplier (2.486788ms)
+✔ configured company blocks matching wrong-company parser and AI facts: customer (1.751189ms)
+✔ parsed VAT rate conflicts with AI row tax even when original tax and gross columns are absent (1.707744ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 125.784577

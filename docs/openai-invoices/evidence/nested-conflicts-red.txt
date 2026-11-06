@@ -1,0 +1,122 @@
+✔ disabled mode returns the identical OCR result with no external or persistence work (1.188361ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_PRIVACY_APPROVED (0.277949ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_SECURITY_APPROVED (0.0993ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_COST_APPROVED (0.130367ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_ALLOWED_OWNERS (0.201534ms)
+✔ server approval gate blocks before original read: OPENAI_API_KEY (0.30546ms)
+✔ server approval gate blocks before original read: OPENAI_INVOICES_COMPANY_ORGANIZATIONS (0.126701ms)
+✔ model candidates fill missing fields for review and cannot become bank evidence (2.151362ms)
+✔ AI disagreements preserve the original-derived value and record the conflict (0.425672ms)
+✔ model-declared economic conflicts cannot be filled into accounting fields (0.459032ms)
+✔ uncertain reservation never triggers a second provider call after failure/restart (10.078871ms)
+✔ successful candidate is reused by original hash without another provider call (1.957961ms)
+✔ original preflight failure falls back before reservation or external processing (0.960848ms)
+✔ lower-case adapter issue codes block financial prefilling for a wrong company (0.375606ms)
+✔ conflicting original total does not combine with AI tax/net amounts (0.156265ms)
+✖ parsed supplier-invoice recipient B conflicts with configured/model company A on enrichment and replay (3.759376ms)
+✖ parsed customer-invoice supplier B conflicts with configured/model company A on enrichment and replay (2.735173ms)
+✖ internally balanced AI line amounts cannot fill missing totals or reference over different parsed lines (2.21627ms)
+✔ consistent parsed company and line facts still allow review-only filling on enrichment and replay (2.042579ms)
+✖ configured company blocks matching wrong-company parser and AI facts: supplier (6.048996ms)
+✖ configured company blocks matching wrong-company parser and AI facts: customer (2.06987ms)
+✖ parsed VAT rate conflicts with AI row tax even when original tax and gross columns are absent (1.821365ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 16
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 114.610806
+
+✖ failing tests:
+
+test at test/openai-invoice-integration.test.js:143:1
+✖ parsed supplier-invoice recipient B conflicts with configured/model company A on enrichment and replay (3.759376ms)
+  AssertionError [ERR_ASSERTION]: missing explicit conflict for details.recipient.organization_number
+      at assertNestedConflict (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:134:10)
+      at TestContext.<anonymous> (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:148:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/openai-invoice-integration.test.js:150:1
+✖ parsed customer-invoice supplier B conflicts with configured/model company A on enrichment and replay (2.735173ms)
+  AssertionError [ERR_ASSERTION]: missing explicit conflict for details.supplier.organization_number
+      at assertNestedConflict (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:134:10)
+      at TestContext.<anonymous> (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:155:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/openai-invoice-integration.test.js:157:1
+✖ internally balanced AI line amounts cannot fill missing totals or reference over different parsed lines (2.21627ms)
+  AssertionError [ERR_ASSERTION]: missing explicit conflict for details.line_items
+      at assertNestedConflict (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:134:10)
+      at TestContext.<anonymous> (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:165:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/openai-invoice-integration.test.js:182:2
+✖ configured company blocks matching wrong-company parser and AI facts: supplier (6.048996ms)
+  AssertionError [ERR_ASSERTION]: missing explicit conflict for details.recipient.organization_number
+      at assertNestedConflict (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:134:10)
+      at TestContext.<anonymous> (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:186:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/openai-invoice-integration.test.js:182:2
+✖ configured company blocks matching wrong-company parser and AI facts: customer (2.06987ms)
+  AssertionError [ERR_ASSERTION]: missing explicit conflict for details.supplier.organization_number
+      at assertNestedConflict (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:134:10)
+      at TestContext.<anonymous> (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:186:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/openai-invoice-integration.test.js:189:1
+✖ parsed VAT rate conflicts with AI row tax even when original tax and gross columns are absent (1.821365ms)
+  AssertionError [ERR_ASSERTION]: missing explicit conflict for details.line_items
+      at assertNestedConflict (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:134:10)
+      at TestContext.<anonymous> (file:///tmp/mg-openai-guard-checks/test/openai-invoice-integration.test.js:194:2)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

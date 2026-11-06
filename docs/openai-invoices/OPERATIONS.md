@@ -9,14 +9,14 @@ Detta är driftinstruktionen för tillägget i [PR #64](https://github.com/sharb
 | Kontroll | Status vid dokumentets tillkomst |
 | --- | --- |
 | Officiella modell-ID:n, standardpriser, Responses och Structured Outputs | Kontrollerade mot källorna nedan |
-| Lokal exekveringsmiljö och lokal API-nyckel | Inte tillgängliga i arbetssessionen |
+| Exekveringsmiljö och projektets API-nyckel | Node-miljön återställd och verklig CI körd; projektets API-nyckel saknas |
 | Modellåtkomst för avsett OpenAI-projekt | `NOT_VERIFIED` |
 | Projektets betalningssätt, saldo, faktiska kostnader och leverantörsgränser | `NOT_VERIFIED` |
 | Anrop till tokenräkning och generering med projektets nyckel | `NOT_VERIFIED` |
 | Dataskyddsbedömning, biträdesavtal/DPA, lagring och eventuell EU-region | `NOT_VERIFIED`; inga godkännanden antas |
 | Träffsäkerhet på representativa verkliga fakturor | `NOT_VERIFIED` |
 
-Tester med syntetiska svar kan verifiera programbeteende men styrker inte modellens faktiska träffsäkerhet. Påståenden om 85 %, 98 % eller en viss förbättring får inte göras utan en dokumenterad, representativ utvärdering. Se PR:ens aktuella CI-resultat för kodtester; detta dokument intygar inte en viss körning.
+Tester med syntetiska svar kan verifiera programbeteende men styrker inte modellens faktiska träffsäkerhet. Påståenden om 85 %, 98 % eller en viss förbättring får inte göras utan en dokumenterad, representativ utvärdering. Se [verifieringsunderlaget](VERIFICATION.md) för körda kodtester och den faktiska optiska utvecklingsmätningen samt PR:ens aktuella CI för senare källversioner.
 
 ## Flöde och tillitsgränser
 
@@ -26,7 +26,7 @@ Servern skickar originalets PDF eller bild direkt som inline-data till OpenAI. P
 
 Tokenräkning görs med `POST /v1/responses/input_tokens` innan generering. Samma modell, instruktioner, multimodala indata, svarsschema och reasoning-inställning ska användas i båda stegen. Om räkningen saknas, är ogiltig eller överskrider gränserna ska genereringen stoppas. Generering använder `POST /v1/responses`, `store: false`, ett strikt JSON-schema och begränsat antal output-token. Ingen verktygsåtkomst, webbsökning eller agentkedja ingår. [4][5]
 
-Alla AI-resultat är granskningsförslag. Ett giltigt JSON-schema bevisar inte att de avlästa uppgifterna stämmer. Belopp, datum, företag, moms och referenser ska kontrolleras mot originalet och befintliga valideringar. Sidnummer och citerad text i modellsvaret är också modelluppgifter, inte oberoende bevis.
+Alla AI-resultat är granskningsförslag. Ett giltigt JSON-schema bevisar inte att de avlästa uppgifterna stämmer. Belopp, datum, företag, moms och referenser ska kontrolleras mot originalet och befintliga valideringar. Sidnummer och citerad text i modellsvaret är också modelluppgifter, inte oberoende bevis. Befintliga tolkade leverantörs-/mottagarorganisationer och fakturarader jämförs lokalt med kandidaten, inklusive momsberäkningar och radsummor. Motstridiga uppgifter eller en ofullständig tabell stoppar ifyllnad, även när ett tidigare AI-resultat återanvänds.
 
 AI får inte övertrumfa motstridiga uppgifter, skapa bevis för bankreferenser, fastställa att en betalning skett eller göra en faktura automatiskt bokföringsklar. Behåll `requiresHumanReview: true` och `bankEvidence: false`. Osäkra ekonomiska uppgifter får inte automatiskt fylla bokföringsfält. Avvisning, timeout, ofullständigt svar, schemafel eller saknat lagringskvitto ska lämna originaltolkningen tillgänglig för manuell granskning.
 
