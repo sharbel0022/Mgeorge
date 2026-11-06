@@ -100,7 +100,8 @@ export function createOpenPaymentsHttpClient(config, { transport, requestBoundar
   const selected = transport ?? { kind: 'sandbox', request: (url, init) => fetch(url, init) };
   if (typeof selected.request !== 'function') throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID', 409);
   if (requestBoundary !== undefined && typeof requestBoundary !== 'function') throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID', 409);
-  async function send({ path, service = 'api', method = 'GET', headers: values, body, signal }) {
+  async function send({ path, service = 'api', method = 'GET', headers: values, body, signal,assertBeforeSend }) {
+      if(assertBeforeSend!==undefined&&typeof assertBeforeSend!=='function')throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID',409);
       const url = requestUrl(config, service, path, method, body), headers = new Headers(values);
       if ([...headers.keys()].some(header => !HEADER_ALLOWLIST.has(header))) throw denied();
       headers.set('Accept', 'application/json'); headers.set('X-Request-ID', crypto.randomUUID());
@@ -121,6 +122,7 @@ export function createOpenPaymentsHttpClient(config, { transport, requestBoundar
             try { await selected.validateCertificate(); }
             catch (error) { throw new BankProviderError(error?.code === 'CLIENT_CERTIFICATE_EXPIRED' ? 'CLIENT_CERTIFICATE_EXPIRED' : 'INVALID_CLIENT_CERTIFICATE', 409); }
           }
+          if(assertBeforeSend)await assertBeforeSend();
           if (controller.signal.aborted) throw new BankProviderError('PROVIDER_ABORTED', 499);
           uncertainWrite = write;
           const response = await selected.request(url, { method, headers, body, signal: controller.signal, redirect: 'manual', cache: 'no-store' });

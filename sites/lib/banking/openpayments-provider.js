@@ -126,11 +126,12 @@ class OpenPaymentsCompanyConnection {
     if (revokeExpired && (method !== 'DELETE' || body !== undefined || !consent || path !== `${CONSENTS}/${consent.id}`)) throw mismatch();
     const consentTime = () => { if (!revokeExpired) this.#consentTime(consent); };
     await this.#guard(); consentTime();
-    const tokenReceipt = await this.#tokens.accessTokenReceipt(),token=tokenReceipt.value;
+    const beforeSend=async()=>{await this.#guard();consentTime();};
+    const tokenReceipt = await this.#tokens.accessTokenReceipt(beforeSend),token=tokenReceipt.value;
     await this.#guard(); consentTime();
     let acceptedWrite = false;
     try {
-      const result = await this.#http.send({ path, method, body: body === undefined ? undefined : JSON.stringify(body), headers: {
+      const result = await this.#http.send({ path, method,assertBeforeSend:beforeSend, body: body === undefined ? undefined : JSON.stringify(body), headers: {
         ...(discovery ? {} : this.#headers(consent)), Authorization: `Bearer ${token}`,
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
         ...(consent && path.startsWith(ACCOUNTS) ? { 'Consent-ID': consent.id } : {}),
@@ -139,7 +140,7 @@ class OpenPaymentsCompanyConnection {
       await this.#guard(); consentTime();
       return result;
     } catch (error) {
-      if (error instanceof BankProviderError && error.code === 'INVALID_ACCESS_TOKEN') this.#tokens.invalidate(tokenReceipt);
+      if (error instanceof BankProviderError && error.code === 'INVALID_ACCESS_TOKEN') await this.#tokens.invalidate(tokenReceipt);
       if (acceptedWrite) throw uncertainWrite(error);
       throw error;
     }
@@ -280,7 +281,7 @@ class OpenPaymentsCompanyConnection {
       if (typeof this.#dependencies.consumeRedirectState !== 'function' || await this.#dependencies.consumeRedirectState({ binding: this.binding, state: flow.state, flowId: flow.flowId }) !== true) throw Error();
     } catch { throw authInvalid(); }
     await this.#guard();
-    await this.#tokens.activateAuthorization({ code: callback.code, redirectUri: flow.redirectUri, consentId: flow.consent.id, authorisationId: flow.authorisationId });
+    await this.#tokens.activateAuthorization({ code: callback.code, redirectUri: flow.redirectUri, consentId: flow.consent.id, authorisationId: flow.authorisationId },async()=>{await this.#guard();this.#consentTime(flow.consent);});
     await this.#guard();
     const response = await this.#request(`${CONSENTS}/${flow.consent.id}/status`, { consent: flow.consent });
     return this.#finish({ status: consentStatus(response.data.consentStatus), original: this.#original(response, 'redirect_consent_status') });

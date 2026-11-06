@@ -3,6 +3,7 @@ import { validateOpenPaymentsConfig, validateScopes } from './config.js';
 import {sha256} from '@noble/hashes/sha2.js';
 import {bytesToHex} from '@noble/hashes/utils.js';
 import {freshTokenState,invalidateTokenState,assertOpenPaymentsTokenCacheIdentity,sharedTokenState,invalidateSharedTokenState} from './token-cache.js';
+import {assertOpenPaymentsTokenCoordinator} from './token-coordinator.js';
 
 function tokenResult(data, scopes) {
   try {
@@ -16,12 +17,13 @@ function tokenResult(data, scopes) {
 /** Server-only application token. No tenant data or per-consent activation token
  * is stored here. Keep one instance per app/environment/credential generation. */
 export class OpenPaymentsTokenClient {
-  #config; #http; #now; #local=freshTokenState(); #identity; #key;
+  #config; #http; #now; #local=freshTokenState(); #identity; #key; #coordinator;
   constructor(config, http, now = Date.now, cache) {
     this.#config = validateOpenPaymentsConfig(config, now); this.#http = http; this.#now = now;
     if(cache!==undefined){
-      if(!isRecord(cache)||Object.keys(cache).some(key=>key!=='identity'))throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID',409);
+      if(!isRecord(cache)||Object.keys(cache).some(key=>!['identity','coordinator'].includes(key)))throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID',409);
       assertOpenPaymentsTokenCacheIdentity(cache.identity);this.#identity=cache.identity;
+      if(Object.hasOwn(cache,'coordinator'))this.#coordinator=assertOpenPaymentsTokenCoordinator(cache.coordinator,this.#config);
       const c=this.#config;
       // clientSecret is deliberately non-enumerable on validated config. Hash
       // it explicitly so replacing a secret without renaming the app cannot
@@ -39,7 +41,7 @@ export class OpenPaymentsTokenClient {
       this.invalidate(); throw new BankProviderError('CREDENTIALS_EXPIRED', 409);
     }
   }
-  invalidate(receipt) {if(this.#identity)invalidateSharedTokenState(this.#identity,this.#key,receipt);else invalidateTokenState(this.#local,receipt);}
+  invalidate(receipt) {if(this.#coordinator)return receipt===undefined?undefined:this.#coordinator.invalidate(receipt);if(this.#identity)invalidateSharedTokenState(this.#identity,this.#key,receipt);else invalidateTokenState(this.#local,receipt);}
   #cooldown(state){
     const value=state.cooldown;if(!value)return;
     if(value.blocked)throw new BankProviderError('PROVIDER_RATE_LIMIT',429,{retryBlocked:true});
@@ -55,12 +57,26 @@ export class OpenPaymentsTokenClient {
     else if(!state.cooldown?.blocked)state.cooldown={until:Math.max(state.cooldown?.until||0,until),blocked:false};
   }
   async accessToken() {
-    const receipt=await this.accessTokenReceipt();this.#checkCredentials();const state=this.#state();this.#current(state);
+    const receipt=await this.accessTokenReceipt();this.#checkCredentials();
+    if(this.#coordinator){assertOpenPaymentsTokenCacheIdentity(this.#identity);await this.#coordinator.assertCurrent();return receipt.value;}
+    const state=this.#state();this.#current(state);
     if(state.token!==receipt)throw new BankProviderError('INVALID_ACCESS_TOKEN',401);return receipt.value;
   }
   /** Internal request receipt binds a 401 to the exact issued token object. */
-  async accessTokenReceipt() {
+  async accessTokenReceipt(assertCaller=async()=>{}) {
     this.#checkCredentials();
+    if(typeof assertCaller!=='function')throw new BankProviderError('PROVIDER_CONFIGURATION_INVALID',409);
+    if(this.#coordinator){
+      const guard=async()=>{this.#checkCredentials();assertOpenPaymentsTokenCacheIdentity(this.#identity);await assertCaller();};
+      await guard();
+      const receipt=await this.#coordinator.access(async({assertBeforeSend})=>{
+        await guard();
+        const body=new URLSearchParams({client_id:this.#config.clientId,client_secret:this.#config.clientSecret,grant_type:'client_credentials',scope:this.#config.scopes.join(' ')});
+        const response=await this.#http.send({service:'auth',path:'/connect/token',method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString(),assertBeforeSend:async()=>{await guard();await assertBeforeSend();}});
+        await guard();return tokenResult(response.data,this.#config.scopes);
+      });
+      await guard();return receipt;
+    }
     const state=this.#state();this.#current(state);
     if (state.token && state.token.expiresAt > this.#now() + 30_000) return state.token;
     this.#cooldown(state);
@@ -70,7 +86,7 @@ export class OpenPaymentsTokenClient {
     flight.promise = (async () => {
       const started = this.#now();
       const body = new URLSearchParams({ client_id: this.#config.clientId, client_secret: this.#config.clientSecret, grant_type: 'client_credentials', scope: this.#config.scopes.join(' ') });
-      const response = await this.#http.send({ service: 'auth', path: '/connect/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() });
+      const response = await this.#http.send({ service: 'auth', path: '/connect/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString(),assertBeforeSend:assertCaller });
       const parsed = tokenResult(response.data, this.#config.scopes);
       this.#checkCredentials();this.#current(state);
       if (epoch !== state.epoch) throw new BankProviderError('INVALID_ACCESS_TOKEN', 401);
@@ -84,13 +100,20 @@ export class OpenPaymentsTokenClient {
     if(epoch!==state.epoch)throw new BankProviderError('INVALID_ACCESS_TOKEN',401);
     return value;
   }
-  async activateAuthorization({ code, redirectUri, consentId, authorisationId }) {
+  async activateAuthorization({ code, redirectUri, consentId, authorisationId },assertCaller=async()=>{}) {
     this.#checkCredentials();
     if (!safeText(code, 4096) || !/^[A-Za-z0-9_-]{1,200}$/.test(consentId) || !/^[A-Za-z0-9_-]{1,200}$/.test(authorisationId) || !this.#config.redirectUris.includes(redirectUri)) throw new BankProviderError('AUTHORIZATION_INVALID', 403);
     const scope = ['accountinformation', 'corporate'];
     const body = new URLSearchParams({ client_id: this.#config.clientId, client_secret: this.#config.clientSecret, code, redirect_uri: redirectUri, scope: scope.join(' '), grant_type: 'authorization_code' });
+    if(this.#coordinator){
+      const guard=async()=>{this.#checkCredentials();assertOpenPaymentsTokenCacheIdentity(this.#identity);await assertCaller();await this.#coordinator.assertIssuerAvailable();};
+      await guard();let response;
+      try{response=await this.#http.send({service:'auth',path:'/connect/token',method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-consentId':consentId,'X-ConsentAuthorisationId':authorisationId},body:body.toString(),assertBeforeSend:guard});}
+      catch(error){await this.#coordinator.recordIssuerFailure(error);throw error;}
+      tokenResult(response.data,scope);this.#checkCredentials();assertOpenPaymentsTokenCacheIdentity(this.#identity);await assertCaller();await this.#coordinator.assertCurrent();return{activated:true};
+    }
     const state=this.#state();this.#current(state);this.#cooldown(state);
-    let response;try{response=await this.#http.send({ service: 'auth', path: '/connect/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-consentId': consentId, 'X-ConsentAuthorisationId': authorisationId }, body: body.toString() });}
+    let response;try{response=await this.#http.send({ service: 'auth', path: '/connect/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-consentId': consentId, 'X-ConsentAuthorisationId': authorisationId }, body: body.toString(),assertBeforeSend:assertCaller });}
     catch(error){this.#rememberCooldown(state,error);throw error;}
     tokenResult(response.data, scope);
     this.#checkCredentials();this.#current(state);

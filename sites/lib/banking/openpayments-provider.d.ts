@@ -1,5 +1,6 @@
 import type { BankDataProvider, BankDataConnection, ProviderBinding, ProviderContext, ProviderConnectionDependencies, ProviderEnvironment } from './bank-data-provider.js';
 import type {OpenPaymentsTokenCacheIdentity} from './openpayments/token-cache.js';
+import type {OpenPaymentsTokenCoordinator} from './openpayments/token-coordinator.js';
 
 export type OpenPaymentsFeature = 'bank_discovery' | 'consents' | 'accounts' | 'transactions' | 'bankgiro_enrichment';
 export type OpenPaymentsScope = 'aspspinformation' | 'accountinformation' | 'bankgiroinformation' | 'corporate';
@@ -22,7 +23,7 @@ export interface OpenPaymentsTransport {
 export interface OpenPaymentsOptions {
   transport?: OpenPaymentsTransport;
   /** Server-only app-token state; transport/config rotation must revoke identity. */
-  applicationTokenCache?: {identity: OpenPaymentsTokenCacheIdentity};
+  applicationTokenCache?: {identity: OpenPaymentsTokenCacheIdentity;coordinator?:OpenPaymentsTokenCoordinator};
   /** Trusted server coordinator; never browser-supplied. Wraps every HTTP exchange. */
   requestBoundary?: <T>(operation: (options: {signal: AbortSignal; deadline: number}) => Promise<T>) => Promise<T>;
   now?: () => number;
