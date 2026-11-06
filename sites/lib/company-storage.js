@@ -209,32 +209,52 @@ export function resolveCompanyMailbox(configuration,{context,legacyOwner,legacyA
 }
 
 function sqlShape(query){
- if(typeof query!=='string')fail('COMPANY_SQL_DENIED');
- // Business SQL is internal and parameterized. Block escapes to raw tables or
-// catalogue/guard state; quoted string contents are not SQL identifiers.
- const uncommented=query.replace(/--[^\r\n]*|\/\*[\s\S]*?\*\//g,' ');
- if(/\b(?:FROM|JOIN|UPDATE|INTO)\s*'/i.test(uncommented))fail('COMPANY_SQL_DENIED');
- for(const literal of uncommented.matchAll(/'((?:''|[^'])*)'/g)){
-  // A fixed uppercase JSON error is a transaction fence, not a quoted table.
-  // Quoted identifiers (including parenthesized FROM spellings) remain denied.
-  const fenceError=/^COMPANY_[A-Z_]+$/.test(literal[1])&&/\bjson\s*\(\s*$/i.test(uncommented.slice(0,literal.index));
-  if(!fenceError&&(ownerTables.includes(literal[1].toLowerCase())||/^(?:main|temp|companies|company_[a-z_]+|sqlite_[a-z_]+)$/i.test(literal[1])))fail('COMPANY_SQL_DENIED');
+ if(typeof query!=='string'||query.includes('\0'))fail('COMPANY_SQL_DENIED');
+ // Business SQL is internal and parameterized. Scan quotes before comments:
+ // '--' or '/*' inside a literal/identifier must not hide the following table
+ // from the owner projection or the control-plane deny list.
+ let statement='',shape='';
+ for(let index=0;index<query.length;){
+  const start=index,char=query[index];
+  if(query.startsWith('--',index)||query.startsWith('/*',index)){
+   const line=query.startsWith('--',index),end=query.indexOf(line?'\n':'*/',index+2);
+   index=end<0?query.length:end+(line?1:2);statement+=' ';shape+=' ';continue;
+  }
+  if(["'",'"','`','['].includes(char)){
+   const closing=char==='['?']':char;let value='',closed=false;index++;
+   while(index<query.length){
+    if(query[index]===closing){
+     if(char!=='['&&query[index+1]===closing){value+=closing;index+=2;continue;}
+     index++;closed=true;break;
+    }
+    value+=query[index++];
+   }
+   if(!closed)fail('COMPANY_SQL_DENIED');
+   statement+=query.slice(start,index);
+   if(char==="'"){
+    // SQLite can also treat a single-quoted name as a table identifier. Keep
+    // that escape denied; fixed JSON error literals are transaction fences.
+    if(/\b(?:FROM|JOIN|UPDATE|INTO)\s*$/i.test(shape))fail('COMPANY_SQL_DENIED');
+    const fenceError=/^COMPANY_[A-Z_]+$/.test(value)&&/\bjson\s*\(\s*$/i.test(shape);
+    if(!fenceError&&(ownerTables.includes(value.toLowerCase())||/^(?:main|temp|companies|company_[a-z_]+|sqlite_[a-z_]+)$/i.test(value)))fail('COMPANY_SQL_DENIED');
+    shape+="''";
+   }else shape+=value;
+   continue;
+  }
+  statement+=char;shape+=char;index++;
  }
- const shape=uncommented.replace(/'(?:''|[^'])*'/g,"''").replace(/[`"\[\]]/g,'');
  // REPLACE implicitly deletes conflicting rows without normal DELETE triggers.
  // Only explicit INSERT/UPSERT is supported, including for legacy namespaces.
  if(!/^\s*(SELECT|WITH|INSERT|UPDATE|DELETE)\b/i.test(shape)||/;\s*\S|\b(?:PRAGMA|ATTACH|DETACH|CREATE|DROP|ALTER|REPLACE|VACUUM|sqlite_master|sqlite_schema|companies)\b|\b(?:main|temp)\s*\./i.test(shape))fail('COMPANY_SQL_DENIED');
  const companyColumns=['company_id','company_actor_id','company_context_version','company_membership_version','company_version'];
  for(const identifier of shape.matchAll(/\bcompany_[a-z_]+\b/gi))if(!ownerTables.includes(identifier[0].toLowerCase())&&!companyColumns.includes(identifier[0].toLowerCase()))fail('COMPANY_SQL_DENIED');
- return shape;
+ return{shape,statement};
 }
 function scopedStatement(database,entry,scope){
  if(entry.applicationTokenFence)return openPaymentsTokenFenceStatement(entry.applicationTokenFence,database);
- const shape=sqlShape(entry.query);
+ const {shape,statement}=sqlShape(entry.query);
  const used=ownerTables.filter(table=>new RegExp('\\b'+table+'\\b','i').test(shape));
- let query=entry.query,args=entry.args;
- // A leading comment must not conceal an existing WITH from the CTE prefix.
- while(/^\s*(?:--[^\r\n]*(?:\r?\n|$)|\/\*[\s\S]*?\*\/)/.test(query))query=query.replace(/^\s*(?:--[^\r\n]*(?:\r?\n|$)|\/\*[\s\S]*?\*\/)/,'');
+ let query=statement,args=entry.args;
  if(used.length){
   const projection=/\browid\b/i.test(shape)?'rowid AS rowid,*':'*';
   const prefix=used.map(table=>`${table} AS (SELECT ${projection} FROM main.${table} WHERE owner=?)`).join(', ');
@@ -243,7 +263,7 @@ function scopedStatement(database,entry,scope){
  }
  return database.prepare(query).bind(...args);
 }
-const writes=query=>/\b(?:INSERT|UPDATE|DELETE)\b/i.test(sqlShape(query));
+const writes=query=>/\b(?:INSERT|UPDATE|DELETE)\b/i.test(sqlShape(query).shape);
 const scopeKey=s=>JSON.stringify([s.kind,s.owner,s.actorId,s.context,s.grant,s.legacyCredential]);
 
 /** Per-request adapter. Reads are owner-filtered even when a predicate is missed;

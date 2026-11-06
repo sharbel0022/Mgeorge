@@ -34,7 +34,7 @@ const suites = [
   {
     name: 'sites-security', cwd: join(root, 'sites'),
     files: [
-      'tests/saas-company-acceptance.test.mjs', 'tests/company-storage.test.mjs', 'tests/company-backup.test.mjs',
+      'tests/saas-company-acceptance.test.mjs', 'tests/company-storage.test.mjs', 'tests/company-sql-boundary-completion.test.mjs', 'tests/company-backup.test.mjs',
       'tests/openpayments-lifecycle.test.mjs', 'tests/openpayments-expired-revocation.test.mjs', 'tests/saas-bank-runtime.test.mjs',
       'tests/openpayments-company-sync.test.mjs', 'tests/openpayments-account-state.test.mjs',
       'tests/openpayments-request-boundary.test.mjs', 'tests/openpayments-raw-receipt.test.mjs',
