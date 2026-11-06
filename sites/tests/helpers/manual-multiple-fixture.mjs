@@ -2,9 +2,8 @@ import {readFileSync,existsSync} from 'node:fs';
 import {stripTypeScriptTypes} from 'node:module';
 import {emptyState,applyCommand} from '../../lib/domain.ts';
 import {syntheticBankRow} from './bank-api-fixture.mjs';
-import {previewFixture,owner,iban} from './reconciliation-preview-fixture.mjs';
+import {previewFixture,owner,iban,fixtureModuleUrl as data} from './reconciliation-preview-fixture.mjs';
 export {owner};
-const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
 const url=path=>new URL(path,import.meta.url).href;
 function compiled(path,imports){
  let code=stripTypeScriptTypes(readFileSync(new URL(path,import.meta.url),'utf8'),{mode:'transform'});
