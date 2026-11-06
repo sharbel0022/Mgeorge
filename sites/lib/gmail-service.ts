@@ -25,18 +25,20 @@ async function attachmentRejections(owner:string){
   const reasons=[...counts].sort(([a],[b])=>a.localeCompare(b)).map(([code,count])=>({code,count}));
   return {total:reasons.reduce((sum,row)=>sum+row.count,0),reasons};
 }
-async function automaticEvent(owner:string,runId:string,phase:'invoked'|'result',outcome=''){
+type GmailAutomationReceipt={run_id:string;invoked_at:string;completed_at:string;outcome:string;persisted:boolean};
+const automaticFailureReceipts=new WeakMap<object,GmailAutomationReceipt>();
+async function automaticEvent(owner:string,runId:string,phase:'invoked'|'result',outcome='',at=now()){
   // Append-only, owner-scoped operational evidence in the existing audit log.
   // No scheduler identity can be inferred from an invocation of this endpoint.
-  await db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?)').bind(uid(),owner,owner,`gmail.automatic.${phase}`,JSON.stringify({run_id:runId,...(outcome?{outcome}:{})}),now()).run();
+  await db().prepare('INSERT INTO audit_events(id,owner,revision,action,detail,created_at) VALUES(?,?,COALESCE((SELECT revision FROM workspaces WHERE owner=?),0),?,?,?)').bind(uid(),owner,owner,`gmail.automatic.${phase}`,JSON.stringify({run_id:runId,...(outcome?{outcome}:{})}),at).run();
 }
 async function automaticObservation(owner:string){
   const invoked=await db().prepare("SELECT detail,created_at FROM audit_events WHERE owner=? AND action='gmail.automatic.invoked' ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(owner).first<{detail:string;created_at:string}>();
   let runId='';try{runId=JSON.parse(invoked?.detail||'{}').run_id||'';}catch{}
-  const result=runId?await db().prepare("SELECT detail FROM audit_events WHERE owner=? AND action='gmail.automatic.result' AND json_extract(CASE WHEN json_valid(detail) THEN detail ELSE '{}' END,'$.run_id')=? ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(owner,runId).first<{detail:string}>():null;
+  const result=runId?await db().prepare("SELECT detail,created_at FROM audit_events WHERE owner=? AND action='gmail.automatic.result' AND json_extract(CASE WHEN json_valid(detail) THEN detail ELSE '{}' END,'$.run_id')=? ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(owner,runId).first<{detail:string;created_at:string}>():null;
   const completed=await db().prepare("SELECT created_at FROM audit_events WHERE owner=? AND action='gmail.automatic.result' AND json_extract(CASE WHEN json_valid(detail) THEN detail ELSE '{}' END,'$.outcome') IN ('completed','completed_pending') ORDER BY created_at DESC,rowid DESC LIMIT 1").bind(owner).first<{created_at:string}>();
   let outcome=invoked?'running_or_interrupted':null;try{if(result)outcome=JSON.parse(result.detail).outcome||outcome;}catch{}
-  return {last_invoked_at:invoked?.created_at||null,last_completed_at:completed?.created_at||null,last_outcome:outcome,source:'system_entrypoint',external_schedule_verified:false};
+  return {last_run_id:runId||null,last_invoked_at:invoked?.created_at||null,last_finished_at:result?.created_at||null,last_completed_at:completed?.created_at||null,last_outcome:outcome,source:'system_entrypoint',external_schedule_verified:false};
 }
 async function lock<T>(owner:string,fn:(lease:GmailLease)=>Promise<T>){
   const token=uid(),at=now(),until=new Date(Date.now()+300000).toISOString();
@@ -57,15 +59,17 @@ async function lock<T>(owner:string,fn:(lease:GmailLease)=>Promise<T>){
 }
 export function gmailFailure(error?:unknown){
   const cause=error as {message?:string,code?:string,safe?:boolean,gmailStage?:string,retryAfter?:number,retryBlocked?:boolean};
+  const receipt=error&&typeof error==='object'?automaticFailureReceipts.get(error):undefined;
+  const failureResponse=(body:Record<string,unknown>,status:number)=>response({...body,...(receipt?{automation_receipt:receipt}:{})},status);
   // Never log provider responses, request URLs, cookies or credentials.
   const codes=['account_mismatch','renewal_required','rate_limited','missing_scope','access_denied','invalid_client','provider_error','connection_error','invalid_response','invalid_tokens','unexpected_redirect','oauth_return_invalid','oauth_return_used','missing_refresh_token','gmail_lease_lost'];
   const code=codes.includes(cause?.code||'')?cause.code:'unexpected';
   if(cause?.gmailStage)console.warn('gmail_oauth_failure',JSON.stringify({stage:cause.gmailStage,code}));
-  if(cause?.message==='AUTH_REQUIRED')return response({error:'Logga in med ChatGPT för att öppna Gmail-anslutningen.',signIn:'/signin-with-chatgpt?return_to=%2Fgmail'},401);
-  if(cause?.message==='ORIGIN_DENIED')return response({error:'Åtgärden måste startas från MG Fakturakoll.'},403);
-  if(cause?.message==='COMPANY_MAILBOX_UNVERIFIED')return response({error:'Företagets Gmail-konto behöver registreras med en verifierad ägarrelation innan det kan anslutas eller hämtas.',code:'COMPANY_MAILBOX_UNVERIFIED'},409);
-  if(cause?.safe||codes.includes(cause?.code||''))return response({error:cause.message,...(cause.retryAfter?{retry_after:cause.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+cause.retryAfter*1000).toISOString()}:{} )},cause.code==='rate_limited'?429:409);
-  return response({error:'Gmail-åtgärden kunde inte slutföras. Kontrollera anslutningen och försök igen.'},409);
+  if(cause?.message==='AUTH_REQUIRED')return failureResponse({error:'Logga in med ChatGPT för att öppna Gmail-anslutningen.',signIn:'/signin-with-chatgpt?return_to=%2Fgmail'},401);
+  if(cause?.message==='ORIGIN_DENIED')return failureResponse({error:'Åtgärden måste startas från MG Fakturakoll.'},403);
+  if(cause?.message==='COMPANY_MAILBOX_UNVERIFIED')return failureResponse({error:'Företagets Gmail-konto behöver registreras med en verifierad ägarrelation innan det kan anslutas eller hämtas.',code:'COMPANY_MAILBOX_UNVERIFIED'},409);
+  if(cause?.safe||codes.includes(cause?.code||''))return failureResponse({error:cause.message,...(cause.retryAfter?{retry_after:cause.retryBlocked?'9999-12-31T23:59:59.999Z':new Date(Date.now()+cause.retryAfter*1000).toISOString()}:{} )},cause.code==='rate_limited'?429:409);
+  return failureResponse({error:'Gmail-åtgärden kunde inte slutföras. Kontrollera anslutningen och försök igen.'},409);
 }
 export async function gmailStatus(summary=false,documentId=''){
   const user=await identity();
@@ -176,15 +180,27 @@ export async function gmailCallback(req:Request){
 export async function gmailSync(req?:Request,scheduled=false,invoiceReference=''){
   if(!scheduled)return gmailSyncRequest(req,false,invoiceReference);
   const user=await identity(req),runId=uid();await companyGmailAccount(user.userId);
-  await automaticEvent(user.userId,runId,'invoked');
+  const invokedAt=now();
+  try{await automaticEvent(user.userId,runId,'invoked','',invokedAt);}
+  catch(error){
+    if(error&&typeof error==='object')automaticFailureReceipts.set(error,{run_id:runId,invoked_at:invokedAt,completed_at:now(),outcome:'error',persisted:false});
+    throw error;
+  }
   try{
     const result=await gmailSyncRequest(req,true,invoiceReference);
     const body=await result.clone().json() as Record<string,any>;
     const outcome=result.ok?(body.status|| (body.warning?'completed_pending':'completed')):'error';
-    try{await automaticEvent(user.userId,runId,'result',outcome);}
-    catch{return response({...body,observation_warning:AUTOMATION_OBSERVATION_WARNING},result.status);}
-    return result;
-  }catch(error){await automaticEvent(user.userId,runId,'result','error').catch(()=>{});throw error;}
+    const receipt:GmailAutomationReceipt={run_id:runId,invoked_at:invokedAt,completed_at:now(),outcome,persisted:true};
+    try{await automaticEvent(user.userId,runId,'result',outcome,receipt.completed_at);}
+    catch{receipt.persisted=false;}
+    return response({...body,automation_receipt:receipt,...(!receipt.persisted?{observation_warning:AUTOMATION_OBSERVATION_WARNING}:{})},result.status);
+  }catch(error){
+    const receipt:GmailAutomationReceipt={run_id:runId,invoked_at:invokedAt,completed_at:now(),outcome:'error',persisted:true};
+    try{await automaticEvent(user.userId,runId,'result','error',receipt.completed_at);}
+    catch{receipt.persisted=false;}
+    if(error&&typeof error==='object')automaticFailureReceipts.set(error,receipt);
+    throw error;
+  }
 }
 async function gmailSyncRequest(req?:Request,scheduled=false,invoiceReference=''){
   if(invoiceReference&&!/^[\p{L}\p{N} /-]{1,100}$/u.test(invoiceReference))throw Error('Ogiltig fakturareferens.');
@@ -209,11 +225,13 @@ async function gmailSyncRequest(req?:Request,scheduled=false,invoiceReference=''
     if(scheduled&&Date.now()-Date.parse(c.last_attempt||'')<900000)return syncResponse({status:'not_due',processing:settings?.enabled?await processDocuments(user.userId):await processingStatus(user.userId)});
     await lease.write([db().prepare('UPDATE gmail_connections SET last_attempt=?,sync_failures=sync_failures+? WHERE owner=?').bind(now(),scheduled?1:0,user.userId)]);
     const started=c.started_at||now();
-    const sources=await db().prepare('SELECT source_id FROM gmail_sources WHERE owner=?').bind(user.userId).all<{source_id:string}>();
     let tokens:any;
     try{
       tokens=await decrypt<any>(user.userId,'gmail-tokens',c.tokens);
-      const result=await fetchGmailInvoiceDocuments(tokens,{account,maxMessages:10,knownIds:sources.results.map(s=>s.source_id),query:invoiceReference?`in:anywhere has:attachment "${invoiceReference}"`:'',after:invoiceReference?'':c.last_synced?.slice(0,10)||'',pageToken:invoiceReference?'':c.page_token||''});
+      const result=await fetchGmailInvoiceDocuments(tokens,{account,maxMessages:10,lookupSources:async(sourceIds:string[])=>{
+        const sources=await db().prepare(`SELECT source_id FROM gmail_sources WHERE owner=? AND source_id IN (${sourceIds.map(()=>'?').join(',')})`).bind(user.userId,...sourceIds).all<{source_id:string}>();
+        return {knownIds:sources.results.map(source=>source.source_id),rejectedIds:[]};
+      },query:invoiceReference?`in:anywhere has:attachment "${invoiceReference}"`:'',after:invoiceReference?'':c.last_synced?.slice(0,10)||'',pageToken:invoiceReference?'':c.page_token||''});
       await lease.assert();
       await lease.write([db().prepare("UPDATE gmail_connections SET tokens=?,retry_after='' WHERE owner=?").bind(await encrypt(user.userId,'gmail-tokens',result.tokens),user.userId)]);
       let imported=0,duplicates=result.duplicate;
