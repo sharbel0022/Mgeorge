@@ -94,6 +94,19 @@ export async function gmailStatus(summary=false,documentId=''){
   // Only the scheduling platform can verify that; this endpoint reports observed fetches.
   const sync_health={state,reason,interval_minutes:intervalMinutes,stale_after_minutes:staleAfterMinutes,schedule_verified:false};
   const next_eligible_sync=connection&&!connection.blocked&&!permanentGmailErrors.has(connection.status)?new Date(Math.max(at,Date.parse(connection.last_attempt||'')+15*60000||0,Date.parse(connection.retry_after||'')||0)).toISOString():null;
+  // Historical freshness is not permission to attempt a new fetch. In
+  // particular, stale/not-yet-verified work can be due. This read-only snapshot
+  // does not bypass the sync entrypoint's current authorization or SQL lease.
+  const activeLock=await db().prepare("SELECT expires_at FROM gmail_locks WHERE owner=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now')").bind(user.userId).first<{expires_at:string}>();
+  const eligibilityReason=!configured?'not_configured':!connection?'disconnected'
+    :connection.email.toLowerCase()!==account?'mailbox_mismatch':!processing.enabled?'paused'
+    :permanentGmailErrors.has(connection.status)?'reconnect_required':connection.blocked?'blocked'
+    :!['connected','retry_wait','error'].includes(connection.status)?'disconnected':activeLock?'running'
+    :Date.parse(connection.retry_after||'')>at?'retry_after'
+    :Date.parse(connection.last_attempt||'')+15*60000>at?'minimum_interval':'eligible';
+  const sync_eligibility={eligible:eligibilityReason==='eligible',reason:eligibilityReason,
+    next_eligible_at:eligibilityReason==='running'?new Date(Math.max(Date.parse(activeLock!.expires_at),Date.parse(next_eligible_sync!))).toISOString()
+      :['eligible','retry_after','minimum_interval'].includes(eligibilityReason)?next_eligible_sync:null};
   const schedule_observation=await automaticObservation(user.userId);
   const attachment_rejections=await attachmentRejections(user.userId);
   // A manual fetch and an OCR heartbeat prove only their own stages. Keep a
@@ -106,7 +119,7 @@ export async function gmailStatus(summary=false,documentId=''){
     ...(pendingOcr>0&&!ocrAvailable?['ocr_worker_unavailable']:[]),
     ...(completed?.status==='completed_pending'||Number(processing.aftercheck_pending)>0?['postprocessing_pending']:[])];
   const background_health={state:backgroundReasons.length?'needs_attention':'ready',reasons:backgroundReasons};
-  const status={configured,email:account,send_enabled:!!send_enabled,connection,processing,last_successful_fetch,sync_health,schedule_observation,attachment_rejections,fetch_ready:state==='recent',background_ready:backgroundReasons.length===0,background_health,scheduler_configured:processing.scheduler_configured,next_eligible_sync};
+  const status={configured,email:account,send_enabled:!!send_enabled,connection,processing,last_successful_fetch,sync_health,schedule_observation,attachment_rejections,fetch_ready:state==='recent',sync_eligibility,background_ready:backgroundReasons.length===0,background_health,scheduler_configured:processing.scheduler_configured,next_eligible_sync};
   if(summary)return response(status);
   const focusedDocumentId=typeof documentId==='string'&&/^[A-Za-z0-9_-]{1,100}$/.test(documentId)?documentId:'';
   // Bound unique documents, not repeated message sources. A dashboard link

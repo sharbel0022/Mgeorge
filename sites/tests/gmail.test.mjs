@@ -133,6 +133,61 @@ test('Gmail automation: observations distinguish manual fetch, automatic invocat
   f.user={userId:'another-owner'};status=await(await f.api.gmailStatus(true)).json();assert.equal(status.schedule_observation.last_invoked_at,null);
 });
 
+for(const freshness of ['stale','not_verified'])test(`Gmail automatic eligibility permits a due ${freshness} connection without claiming schedule health`,async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  await f.processing.processingSettings(f.user);
+  f.sql.prepare('UPDATE gmail_connections SET last_synced=?,last_attempt=?').run(freshness==='stale'?'2000-01-01T00:00:00.000Z':'','');
+  const before={...f.sql.prepare('SELECT * FROM gmail_connections').get()},calls=f.providerCalls;
+  const status=await(await f.api.gmailStatus(true)).json();
+  assert.equal(status.sync_health.state,freshness);assert.equal(status.fetch_ready,false);
+  assert.equal(status.sync_eligibility.eligible,true);assert.equal(status.sync_eligibility.reason,'eligible');
+  assert.ok(Number.isFinite(Date.parse(status.sync_eligibility.next_eligible_at)));
+  assert.equal(status.sync_health.schedule_verified,false);assert.equal(status.schedule_observation.external_schedule_verified,false);
+  assert.equal(status.background_ready,false);assert.equal(f.providerCalls,calls,'status must not contact Gmail');
+  assert.deepEqual({...f.sql.prepare('SELECT * FROM gmail_connections').get()},before);
+  const fetched=await(await f.api.gmailSync(undefined,true)).json();assert.equal(fetched.imported,1);
+  const after=await(await f.api.gmailStatus(true)).json();
+  assert.equal(after.fetch_ready,true);assert.equal(after.sync_eligibility.eligible,false);
+  assert.equal(after.sync_eligibility.reason,'minimum_interval');assert.equal(after.background_ready,false);
+});
+
+for(const [name,change,reason] of [
+  ['pause',f=>f.sql.prepare('UPDATE document_automation SET enabled=0').run(),'paused'],
+  ['revoked grant',f=>f.sql.prepare("UPDATE gmail_connections SET status='renewal_required'").run(),'reconnect_required'],
+  ['missing scope',f=>f.sql.prepare("UPDATE gmail_connections SET status='missing_scope'").run(),'reconnect_required'],
+  ['failure limit',f=>f.sql.prepare('UPDATE gmail_connections SET sync_failures=3').run(),'blocked'],
+  ['recorded block',f=>f.sql.prepare("UPDATE gmail_connections SET status='blocked'").run(),'blocked'],
+  ['different mailbox',f=>f.sql.prepare("UPDATE gmail_connections SET email='foreign@example.test'").run(),'mailbox_mismatch'],
+  ['removed connection',f=>f.sql.prepare('DELETE FROM gmail_connections').run(),'disconnected'],
+  ['missing OAuth setup',f=>{delete f.env.GOOGLE_CLIENT_ID;},'not_configured'],
+])test(`Gmail eligibility does not turn ${name} into a stale-connection retry`,async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  await f.processing.processingSettings(f.user);change(f);const calls=f.providerCalls;
+  const status=await(await f.api.gmailStatus(true)).json();
+  assert.deepEqual(status.sync_eligibility,{eligible:false,reason,next_eligible_at:null});assert.equal(f.providerCalls,calls);
+});
+
+test('Gmail eligibility preserves provider cooldown and active-run deadlines without exposing the lease',async t=>{
+  const f=await fixture(t,{automatic:true}),flow=await connect(f);await f.api.gmailCallback(flow.callback());
+  await f.processing.processingSettings(f.user);
+  const retry=new Date(Date.now()+1200000).toISOString(),lockUntil=new Date(Date.now()+300000).toISOString();
+  f.sql.prepare('UPDATE gmail_connections SET retry_after=?').run(retry);
+  let status=await(await f.api.gmailStatus(true)).json();
+  assert.deepEqual(status.sync_eligibility,{eligible:false,reason:'retry_after',next_eligible_at:retry});
+  f.sql.prepare('INSERT INTO gmail_locks(owner,token,expires_at) VALUES(?,?,?)').run(f.owner,'synthetic-secret-lease',lockUntil);
+  status=await(await f.api.gmailStatus(true)).json();
+  assert.deepEqual(status.sync_eligibility,{eligible:false,reason:'running',next_eligible_at:retry});
+  assert.ok(!JSON.stringify(status).includes('synthetic-secret-lease'));
+  f.sql.prepare("UPDATE gmail_connections SET retry_after='' ").run();
+  status=await(await f.api.gmailStatus(true)).json();
+  assert.deepEqual(status.sync_eligibility,{eligible:false,reason:'running',next_eligible_at:lockUntil});
+  f.sql.prepare("UPDATE gmail_locks SET expires_at='2000-01-01'").run();
+  status=await(await f.api.gmailStatus(true)).json();assert.equal(status.sync_eligibility.eligible,true);
+  f.user={userId:'separate-synthetic-owner',email:'other@example.test'};
+  status=await(await f.api.gmailStatus(true)).json();assert.equal(status.sync_eligibility.eligible,false);assert.equal(status.sync_eligibility.reason,'disconnected');
+  assert.equal(status.connection,null);assert.equal(status.last_successful_fetch,'');
+});
+
 test('Gmail automation: rejected attachment reasons survive replay and are scoped without exposing message data',async t=>{
   const f=await fixture(t),flow=await connect(f);await f.api.gmailCallback(flow.callback());
   const originalFetch=globalThis.fetch;
