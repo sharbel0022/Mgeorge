@@ -1,11 +1,12 @@
-export type Processing={enabled?:boolean;cloud_ocr_configured?:boolean;cloud_worker_recent?:boolean;cloud_last_completed?:string;worker_online?:boolean;scheduler_configured?:boolean;last_processed?:string|null;registered?:number;messages_waiting?:number;counts?:Record<string,number>;aftercheck_pending?:number;review_reasons?:{basis:string;total:number;analyzed:number;limit:number;truncated:boolean;counts:Record<string,number>}};
+export type QueueHealth={basis:string;observed_at:string;pending:number;ready_pdf:number;ready_ocr:number;deferred:number;active:number;expired_leases:number;exhausted:number;failed:number;oldest_pending_at:string|null;next_retry_at:string|null;ocr_worker_unavailable:boolean};
+export type Processing={enabled?:boolean;cloud_ocr_configured?:boolean;cloud_worker_recent?:boolean;cloud_last_completed?:string;worker_online?:boolean;scheduler_configured?:boolean;last_processed?:string|null;registered?:number;messages_waiting?:number;counts?:Record<string,number>;aftercheck_pending?:number;review_reasons?:{basis:string;total:number;analyzed:number;limit:number;truncated:boolean;counts:Record<string,number>};queue_health?:QueueHealth;throughput?:{basis:string;window_start:string;window_end:string;completed_documents:number}};
 export type ScheduleObservation={last_invoked_at:string|null;last_completed_at:string|null;last_outcome:string|null;source:'system_entrypoint';external_schedule_verified:false};
 export type AttachmentRejections={total:number;reasons:{code:string;count:number}[]};
 const reconnectStatuses=new Set(['renewal_required','missing_scope','access_denied','invalid_client','account_mismatch','invalid_tokens']);
 export const gmailNeedsReconnect=(status?:string)=>reconnectStatuses.has(status||'');
 const outcomeLabels:Record<string,string>={completed:'Hämtning slutförd',completed_pending:'Hämtning slutförd – efterkontroll återstår',not_due:'Väntar till nästa tillåtna hämtning',paused:'Dokumentautomatik pausad',blocked:'Automatik stoppad',reconnect_required:'Gmail behöver anslutas igen',error:'Anropet misslyckades',running_or_interrupted:'Slutresultat saknas – pågår eller avbröts'};
 const rejectionLabels:Record<string,string>={attachment_too_large:'För stor bilaga',attachment_unreadable:'Bilagan kunde inte läsas',attachment_format_invalid:'Ogiltigt filformat',message_metadata_invalid:'Mejluppgifter saknas eller är ogiltiga',unclassified:'Orsak saknas i äldre uppgift'};
-const reviewLabels:Record<string,string>={uninterpreted:'Tolkning saknas eller kan inte sammanställas',missing_invoice_number:'Fakturanummer saknas',missing_party:'Kund eller leverantör saknas',missing_dates:'Faktura- eller förfallodatum saknas',missing_organization:'Organisationsnummer saknas',missing_amount:'Giltigt totalbelopp saknas',missing_vat_or_net:'Moms eller nettobelopp saknas',unverified_counterparty:'Motparten var inte verifierad vid tolkningen',possible_duplicate:'Möjlig dubblett',low_confidence:'Osäkra tolkade fält',other_review:'Annan kontroll eller registrering återstår'};
+const reviewLabels:Record<string,string>={uninterpreted:'Tolkning saknas eller kan inte sammanställas',missing_invoice_number:'Fakturanummer saknas',missing_party:'Kund eller leverantör saknas',missing_dates:'Faktura- eller förfallodatum saknas',missing_organization:'Organisationsnummer saknas',missing_amount:'Giltigt totalbelopp saknas',missing_vat_or_net:'Moms eller nettobelopp saknas',unverified_counterparty:'Motparten var inte verifierad vid tolkningen',possible_duplicate:'Möjlig dubblett',arithmetic_conflict:'Belopp eller moms stämmer inte',identity_conflict:'Motstridiga eller oklara identiteter',table_incomplete:'Ofullständig artikeltabell',interrupted_after_extraction:'Tolkning sparad före avbrott – kontroll återstår',low_confidence:'Osäkra tolkade fält',other_review:'Annan kontroll eller registrering återstår'};
 const date=(value?:string)=>value&&Number.isFinite(Date.parse(value))?new Intl.DateTimeFormat('sv-SE',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Stockholm'}).format(new Date(value)):'Ingen ännu';
 function StatusTime({value,empty}:{value?:string|null;empty:string}){
  if(value===undefined)return <>Status inte hämtad</>;
@@ -24,6 +25,8 @@ export function GmailFetchStatus({lastSuccessfulFetch,observation,compact=false}
 }
 export function DocumentQueueStatus({processing,compact=false}:{processing?:Processing;compact?:boolean}){
  const Row=compact?'small':'p',className=compact?'block':undefined,registered=processing?.registered;
+ const health=processing?.queue_health,throughput=processing?.throughput;
+ const quantity=(value:unknown)=>typeof value==='number'&&Number.isSafeInteger(value)&&value>=0?value:'Okänt';
  const count=(...keys:string[])=>{
   const counts=processing?.counts;if(!counts)return 'Okänt';
   const values=keys.map(key=>counts[key]??0);
@@ -33,6 +36,13 @@ export function DocumentQueueStatus({processing,compact=false}:{processing?:Proc
  return <>
   <Row className={className}>Senaste bearbetning: <StatusTime value={processing?.last_processed} empty="Ingen ännu"/></Row>
   <Row className={className}>I kö: {count('queued','waiting_ocr')} · Bearbetas: {count('processing')} · Klara för registrering: {count('ready')} · Att granska: {count('needs_review','duplicate')} · Registrerade underlag: {typeof registered==='number'&&Number.isSafeInteger(registered)&&registered>=0?registered:'Okänt'} · Misslyckade jobb: {count('failed')}</Row>
+  {health&&<>
+   <Row className={className}>Redo för texttolkning: {quantity(health.ready_pdf)} · Redo för OCR: {quantity(health.ready_ocr)} · Väntar på nytt försök: {quantity(health.deferred)}</Row>
+   <Row className={className}>Avbrutna jobb att återuppta: {quantity(health.expired_leases)} · Förbrukade försök: {quantity(health.exhausted)}</Row>
+   {!compact&&<Row>Äldsta väntande underlag: <StatusTime value={health.oldest_pending_at} empty={health.pending===0?'Inga väntande underlag':'Tidpunkt okänd'}/>. Nästa möjliga återförsök: <StatusTime value={health.next_retry_at} empty="Inga uppskjutna försök"/></Row>}
+   {health.ocr_worker_unavailable===true&&<Row className={className} role="alert">OCR-kön väntar: ingen OCR-arbetare har nyligen kontaktat tjänsten. Kontrollera molnarbetaren eller starta den anslutna OCR-datorn.</Row>}
+  </>}
+  {throughput&&<Row className={className}>Unika underlag med sparad tolkning senaste dygnet: {quantity(throughput.completed_documents)}</Row>}
  </>;
 }
 export function GmailAttachmentRejections({rejections,compact=false}:{rejections?:AttachmentRejections;compact?:boolean}){

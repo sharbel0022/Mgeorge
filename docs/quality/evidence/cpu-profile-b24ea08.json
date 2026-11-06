@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "separate-local-v8-profile-analysis",
+  "sourceCommit": "b24ea089a062e122ce240ec66ba01180efe533c9",
+  "sourceTree": "362e10cb322ca269fd73f2d8f3f60fa879d9d2ab",
+  "workingTreeDirty": false,
+  "sourceVerifiedCleanAfter": true,
+  "syntheticOnly": true,
+  "canonicalPerformanceBaseline": false,
+  "profileSha256": "7513eda09d7915a8b6bb710fb8a895114ae3642b1ce22be28aeb297469bea63b",
+  "benchmarkSha256": "eeb5b956297770f71c631e2b95733f6337bbfbe5af335497ed221b8385b2c9ad",
+  "analysisSha256": "69df2b29bcd128303339a57a72cc3f93eddfd299bca0deb0e54435dcaf58bd3f",
+  "reproduce": "NODE_ENV=test node --cpu-prof --cpu-prof-dir=/tmp/mgeorge-quality-profile --cpu-prof-name=companies-10.cpuprofile --import ./scripts/saas-test-isolation.mjs scripts/quality/benchmark-companies.mjs --output /tmp/mgeorge-quality-profile/benchmark-10.json --companies 10",
+  "sampleCount": 5807,
+  "profileDurationMs": 12266.717,
+  "sampledDurationMs": 12256.72,
+  "selfCategories": [
+    {
+      "category": "Company runtime (self time)",
+      "sampledMs": 6993.995,
+      "pct": 57.062533858976956
+    },
+    {
+      "category": "Garbage collection",
+      "sampledMs": 1968.845,
+      "pct": 16.063392163645737
+    },
+    {
+      "category": "Database schema/import helpers (self time)",
+      "sampledMs": 1152.898,
+      "pct": 9.406252243667147
+    },
+    {
+      "category": "Other Node/native/startup/idle (self time)",
+      "sampledMs": 862.423,
+      "pct": 7.036327826694254
+    },
+    {
+      "category": "Other application modules (self time)",
+      "sampledMs": 635.665,
+      "pct": 5.18625700840029
+    },
+    {
+      "category": "Security/crypto (self time)",
+      "sampledMs": 452.874,
+      "pct": 3.69490369364724
+    },
+    {
+      "category": "Benchmark and memory sampling (self time)",
+      "sampledMs": 190.02,
+      "pct": 1.5503332049683765
+    }
+  ],
+  "methodology": "V8 CPU profile: sum timeDeltas attributed to sampled leaf frames; inclusive weights count a sample once for each distinct function present in its stack. These are time-weighted samples, not an exact per-function CPU timer; native work may be charged to the enclosing JavaScript frame. Profile spans process startup, setup, sync phases, verification and cleanup. Inclusive percentages overlap.",
+  "finding": "Repeated synchronous company membership and database boundary validation dominate the observed guarded SQLite path. No production optimization was implemented.",
+  "limits": [
+    "One local 10-company run on an earlier identified source tree; not the final CI timing baseline.",
+    "Includes startup, setup, verification and cleanup; profiling overhead was not estimated.",
+    "Native SQLite work can be charged to the enclosing JavaScript frame; preparation, execution and locking are not separated.",
+    "Garbage-collection samples do not identify allocation causes."
+  ]
+}

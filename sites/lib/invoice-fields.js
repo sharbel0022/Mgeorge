@@ -3,7 +3,7 @@ import {extractInvoiceDetails,invoiceScalarText} from './invoice-details.js';
 import {assessOcrBankgiro} from './ocr-bankgiro-evidence.js';
 import {parseMoney} from './domain';
 const invoiceNumberLabel='(?:faktura[ \\t]*(?:nummer|nr|no)|invoice[ \\t]*(?:number|no))(?=[\\s.:#-]|\\d|$)';
-const validInvoiceIdentifier=value=>/^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,79}$/u.test(value)&&!/^(?:ocr(?:[- /]?(?:nummer|referens))?|faktura(?:nummer|nr)?|fakturadatum|förfallo(?:datum|dag)|förfaller|invoice|date|leverantör|utställare|säljare|supplier|seller|kund|customer|netto|moms|vat|bankgiro|bg|totalbelopp|att)$/iu.test(value);
+const validInvoiceIdentifier=value=>/^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,79}$/u.test(value)&&!/^(?:ocr(?:[- /]?(?:nummer|referens))?|faktura(?:nummer|nr)?|fakturadatum|förfallo(?:datum|dag)|förfaller|invoice|date|leverantör|utställare|säljare|supplier|seller|kund|customer|netto|moms|vat|bankgiro|bg|totalbelopp|total|net|att)$/iu.test(value);
 // Only explicitly labelled values are normalized. Original text remains evidence.
 function normalizeInvoiceLayout(input){
   const original=String(input||'').normalize('NFKC').replace(/\r/g,'').slice(0,150000);
@@ -86,16 +86,16 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const referenceLabel='(?:OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)';
   const issuedDateLabel='(?:fakturadatum|faktureringsdatum|invoice\\s*date)';
   const dueDateLabel='(?:förfallodatum|förfallodag|förfaller|oss\\s*tillhanda\\s*senast|betalas\\s*senast|due\\s*date)';
-  // Only explicitly tax-qualified summaries identify net/gross amounts.
+  // Swedish summa/totalt/belopp summaries need explicit tax qualifiers.
   // Reuse their grammar as sibling boundaries so inline fields stay separate.
   const taxSummaryPrefix='(?:summa|totalt|belopp)[ \\t]+';
   const grossTaxSummaryLabel=taxSummaryPrefix+'inkl(?:usive|\\.?)[ \\t]+moms';
   const netTaxSummaryLabel=taxSummaryPrefix+'exkl(?:usive|\\.?)[ \\t]+moms';
-  const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|fakturabelopp|amount due|'+grossTaxSummaryLabel+')';
+  const totalLabel='(?:att betala|summa att betala|totalsumma|totalbelopp|fakturabelopp|amount due|'+grossTaxSummaryLabel+'|(?<=^|\\n)[ \\t]*total(?:[ \\t]+amount)?(?![ \\t]+(?:vat|tax|net|moms)\\b)|total(?:[ \\t]+amount)?(?=[ \\t]*:))';
   // The explicit compound "Summa moms" has the same complete census inline
   // and at line start. Generic VAT/net words still need a colon inline.
-  const vatLabel='(?:summa[ \\t]+moms|(?<=^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|VAT)|(?<!(?:före|exklusive|inklusive|inkl\\.?|exkl\\.?)[ \\t]+)(?:total moms|moms(?:belopp)?|VAT)(?=[ \\t]*:))';
-  const netLabel='(?:belopp före moms|'+netTaxSummaryLabel+'|(?<=^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net amount)|(?:totalt netto|netto(?:belopp)?|net amount)(?=[ \\t]*:))';
+  const vatLabel='(?:summa[ \\t]+moms|(?<=^|\\n)[ \\t]*(?:total moms|moms(?:belopp)?|(?:total[ \\t]+)?VAT(?:[ \\t]+amount)?)(?![ \\t]*(?:rate\\b|%))|(?<!(?:före|exklusive|inklusive|inkl\\.?|exkl\\.?)[ \\t]+)(?:total moms|moms(?:belopp)?|(?:total[ \\t]+)?VAT(?:[ \\t]+amount)?)(?=[ \\t]*:))';
+  const netLabel='(?:belopp före moms|'+netTaxSummaryLabel+'|(?<=^|\\n)[ \\t]*(?:totalt netto|netto(?:belopp)?|net(?:[ \\t]+amount)?)|(?:totalt netto|netto(?:belopp)?|net(?:[ \\t]+amount)?)(?=[ \\t]*:))';
   // A following explicit field label separates values on the same line. Other
   // trailing content remains part of the value and must pass full validation.
   // Reuse the monetary census grammar exactly: a boundary must not discard an
@@ -136,7 +136,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // A percentage is a rate, never an explicitly stated monetary amount.
   // Validate lexical groups before parseMoney removes whitespace. Several
   // integer columns or character-spaced amounts must not become one number.
-  const amount='-?(?:\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|(?:\\d+|\\d{1,3}(?: \\d{3})+)(?:[.,]\\d{1,2})?)';
+  const amount='-?(?:\\d{1,3}(?:,\\d{3})+\\.\\d{1,2}|\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|(?:\\d+|\\d{1,3}(?: \\d{3})+)(?:[.,]\\d{1,2})?)';
   const monetary=new RegExp('^(?:(?:SEK|EUR|USD|GBP|NOK|DKK)[ \\t]*)?('+amount+')(?:[ \\t]*(?:SEK|EUR|USD|GBP|NOK|DKK|kr))?$','iu');
   const money=s=>{
     const match=s.match(monetary);if(!match)return null;
@@ -144,11 +144,19 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     // currency can be a neighbouring payment reference. Retain the raw text
     // for review instead of treating that ambiguous identifier as money.
     if(method==='ocr'&&/^-?0\d*[1-9]\d*$/.test(match[1].replaceAll(' ',''))&&!/[a-z]/i.test(s))return null;
-    try{return parseMoney(match[1]);}catch{return null;}
+    // A comma grouping is accepted only with an explicit decimal point and
+    // complete groups of three digits. Preserve the original field evidence.
+    const value=/^-?\d{1,3}(?:,\d{3})+\.\d{1,2}$/.test(match[1])?match[1].replace(/,/g,''):match[1];
+    try{return parseMoney(value);}catch{return null;}
   };
   grabFull('total_cents',totalLabel,money);
   grabFull('vat_cents',vatLabel,money);
-  grabFull('net_cents',netLabel,money);
+  grabFull('net_cents',netLabel,(value,label)=>{
+    // "Net 30" (also "Net: 30" or a wrapped value) may be payment terms.
+    // A bare English Net needs decimal/currency evidence; Net amount is explicit.
+    if(/^net[ \t]*[:.#]?$/iu.test(label.trim())&&/^-?\d+(?: \d{3})*$/u.test(value))return null;
+    return money(value);
+  });
   grabFull('reference',referenceLabel,(value,label)=>{
     const token=compactDigits(value);
     if(/^OCR/i.test(label))return /^\d{1,120}$/.test(token)?token:null;
@@ -191,7 +199,18 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   }
   // Reuse the actual scalar-label grammar when bounding a party value. A new
   // accepted date/number label must never become the next-line party name.
-  const scalarBoundary=value=>{let boundary=-1;for(const pattern of scalarLabels){const match=pattern.exec(value);if(match&&(boundary<0||match.index<boundary))boundary=match.index;}return boundary;};
+  const scalarBoundary=value=>{
+    let boundary=-1;
+    for(const pattern of scalarLabels){
+      const match=pattern.exec(value);
+      // The start of a party value is not the start of the source line. Bare
+      // English nouns in a name ("Total Consulting") need monetary evidence.
+      const remaining=match?value.slice(match.index+match[0].length):'';
+      if(match&&/^(?:net|total)$/iu.test(match[0].trim())&&remaining.trim()&&!/^(?:-?\d|(?:SEK|EUR|USD|GBP|NOK|DKK)\b)/iu.test(remaining))continue;
+      if(match&&(boundary<0||match.index<boundary))boundary=match.index;
+    }
+    return boundary;
+  };
   const scalarLabelColons=value=>{const positions=new Set();for(const pattern of scalarLabels)for(const match of value.matchAll(new RegExp(pattern.source,'giu'))){const colon=match[0].indexOf(':');if(colon>=0)positions.add(match.index+colon);}return positions;};
   const detail=extractInvoiceDetails(layout.original,{direction,validOrganization,money,scalarBoundary,scalarLabelColons,currency:fields.currency.value,invoice_number:fields.invoice_number.value,reference:fields.reference.value,credit:kind==='credit',summary:Object.fromEntries(['net_cents','vat_cents','total_cents'].map(key=>[key,fields[key].value]))});
   issues.push(...detail.issues);

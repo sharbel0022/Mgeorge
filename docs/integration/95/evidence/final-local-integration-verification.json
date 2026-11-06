@@ -1,0 +1,54 @@
+{
+  "scope": "Synthetic focused verification; no production mutation",
+  "producerHead": "fc6b25b8acf5fe6db2135fc6bcb111b7ca3227f2",
+  "publishedHead": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+  "publishedTree": "a79375b432095b49d7487fa3df9ad7f152d8aad1",
+  "localProducerSynthesis": "108e8f829d5587a512d9a2200dd5572183d80473",
+  "integrationBase": "8fa3ed8b12f1789308cfd608cbbeacbc04a685eb",
+  "integrationCheckCommit": "1e510281ccc57b02608c9cb1a0570437c65237e9",
+  "integrationCheckTree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+  "conflictFilesSha256": {
+    "sites/tests/banking-security.test.mjs": "40290361fe8f26260cac3c1debbb2b83c9bf430a58c582c1a9069a6362c9993c",
+    "sites/tests/document-queue-recovery.test.mjs": "07a52f3cb332eb8720cf729e00b34f11c12ee96daf4e72a99940c44f4c1806e8"
+  },
+  "node": {
+    "pass": 7,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "log": "pr54-final-combination-node22.tap"
+  },
+  "sites": {
+    "pass": 271,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "files": {
+      "banking-security": 203,
+      "company-request": 18,
+      "document-queue-recovery": 36,
+      "security-request-budget": 14
+    },
+    "log": "pr54-final-combination-sites-node22.tap"
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "log": "pr54-final-combination-typecheck-node22.log"
+  },
+  "remoteCiAtLastOwnObservation": {
+    "producerRuns": {
+      "42089522649": "success",
+      "42089522610": "success"
+    },
+    "publishedRuns": {
+      "42090903888": "in_progress",
+      "42090903867": "in_progress"
+    }
+  },
+  "limits": [
+    "Focused runs overlap prior and full suites; do not add counts.",
+    "Full integration and exact published-head CI remain root responsibility."
+  ]
+}

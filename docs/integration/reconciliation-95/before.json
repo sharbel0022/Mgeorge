@@ -1,0 +1,480 @@
+{
+  "kind": "synthetic-reconciliation-decision-corpus",
+  "sourceRevision": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "sourceHashes": {
+    "src/reconciliation.js": "94ad73f3bc729a665a14de9c11566bf1955619bf29d9d2fc847b0947a41ccf3f",
+    "src/db.js": "aac70dae716221c91930060c2a1eaf99852346946c76cff4aef044e6db3d20e2",
+    "src/bank-evidence.js": "828f4fb6a6c4fc7ffd5230d001ce29db1e0e27bf40a404a0b6853b2f686df1ed",
+    "src/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+    "sites/lib/reconciliation-engine.js": "0a77b474b124405bff188a1a2fd5e122c849ae50c2687c6c1a4cc51345104f8c",
+    "sites/lib/reconciliation-decisions.js": null,
+    "sites/lib/payment-references.js": "0ff3654f93c69d81fdcf6cef5d515849c0f46d7ee0c7f338c90239409a22723c",
+    "sites/lib/invoice-reference-policy.js": "3e3edf1942ec61a518bcef6350a09f1a3a2fabfffb56f0f1c2af9463953d5a9e"
+  },
+  "corpusSha256": "3057e38950e98301bfa94d5d952a686aabf430e35282186deb2dea45da04fb31",
+  "scope": "Pure engines with trusted synthetic adapter facts; no production/bank provenance, persistence or statistical population claim.",
+  "results": [
+    {
+      "runtime": "node",
+      "ruleVersion": "invoice-reference-policy-2026-11-02.2",
+      "engineSha256": "94ad73f3bc729a665a14de9c11566bf1955619bf29d9d2fc847b0947a41ccf3f",
+      "scenarioCount": 26,
+      "counts": {
+        "truePositiveScenarios": 2,
+        "falseNegativeScenarios": 3,
+        "trueNegativeScenarios": 21,
+        "falsePositiveScenarios": 0,
+        "expectedAllocations": 8,
+        "truePositiveAllocations": 2,
+        "falsePositiveAllocations": 0,
+        "falseNegativeAllocations": 6
+      },
+      "scenarios": [
+        {
+          "id": "exact-0599-625-sek",
+          "expected": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "actual": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "pass": true
+        },
+        {
+          "id": "same-payer-separate-exact-references",
+          "expected": [
+            [
+              "0577",
+              "pay-0577",
+              62500
+            ],
+            [
+              "0597",
+              "pay-0597",
+              62500
+            ]
+          ],
+          "actual": [],
+          "pass": false
+        },
+        {
+          "id": "different-payers-equal-amounts",
+          "expected": [
+            [
+              "0577",
+              "pay-0577",
+              62500
+            ],
+            [
+              "0597",
+              "pay-0597",
+              62500
+            ]
+          ],
+          "actual": [],
+          "pass": false
+        },
+        {
+          "id": "same-payer-separate-exact-amounts",
+          "expected": [
+            [
+              "0577",
+              "pay-0577",
+              250000
+            ],
+            [
+              "0597",
+              "pay-0597",
+              62500
+            ]
+          ],
+          "actual": [],
+          "pass": false
+        },
+        {
+          "id": "exact-reviewed-remaining-balance",
+          "expected": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "actual": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "pass": true
+        },
+        {
+          "id": "wrong-0597-cannot-pay-0577",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "leading-zero-is-identity",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "2500-is-partial-of-3125",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "one-ore-short-is-partial",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "excess-remains-review",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "duplicate-exact-payment",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "two-partials-are-not-a-full-automatic-payment",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "missing-reference-competes-with-known-payments",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "unverified-alternative-cannot-disambiguate",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "partial-alternative-cannot-disambiguate",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "excess-alternative-cannot-disambiguate",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "conflicting-bank-references-remain-review",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "invoice-derived-fallback-cannot-replace-bank-reference",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "aggregate-never-pays-individual-invoice",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "incomplete-bankgiro-group-remains-held",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "same-payment-bank-id-is-not-two-receipts",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "closed-reference-owner-cannot-be-bypassed",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "wrong-currency",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "payment-before-issue",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "refund-does-not-pay-receivable",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "conflicting-payer-organization",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        }
+      ]
+    },
+    {
+      "runtime": "sites",
+      "ruleVersion": "invoice-reference-policy-2026-11-02.2",
+      "engineSha256": "0a77b474b124405bff188a1a2fd5e122c849ae50c2687c6c1a4cc51345104f8c",
+      "scenarioCount": 26,
+      "counts": {
+        "truePositiveScenarios": 2,
+        "falseNegativeScenarios": 3,
+        "trueNegativeScenarios": 21,
+        "falsePositiveScenarios": 0,
+        "expectedAllocations": 8,
+        "truePositiveAllocations": 2,
+        "falsePositiveAllocations": 0,
+        "falseNegativeAllocations": 6
+      },
+      "scenarios": [
+        {
+          "id": "exact-0599-625-sek",
+          "expected": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "actual": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "pass": true
+        },
+        {
+          "id": "same-payer-separate-exact-references",
+          "expected": [
+            [
+              "0577",
+              "pay-0577",
+              62500
+            ],
+            [
+              "0597",
+              "pay-0597",
+              62500
+            ]
+          ],
+          "actual": [],
+          "pass": false
+        },
+        {
+          "id": "different-payers-equal-amounts",
+          "expected": [
+            [
+              "0577",
+              "pay-0577",
+              62500
+            ],
+            [
+              "0597",
+              "pay-0597",
+              62500
+            ]
+          ],
+          "actual": [],
+          "pass": false
+        },
+        {
+          "id": "same-payer-separate-exact-amounts",
+          "expected": [
+            [
+              "0577",
+              "pay-0577",
+              250000
+            ],
+            [
+              "0597",
+              "pay-0597",
+              62500
+            ]
+          ],
+          "actual": [],
+          "pass": false
+        },
+        {
+          "id": "exact-reviewed-remaining-balance",
+          "expected": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "actual": [
+            [
+              "0599",
+              "pay-0599",
+              62500
+            ]
+          ],
+          "pass": true
+        },
+        {
+          "id": "wrong-0597-cannot-pay-0577",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "leading-zero-is-identity",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "2500-is-partial-of-3125",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "one-ore-short-is-partial",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "excess-remains-review",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "duplicate-exact-payment",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "two-partials-are-not-a-full-automatic-payment",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "missing-reference-competes-with-known-payments",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "unverified-alternative-cannot-disambiguate",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "partial-alternative-cannot-disambiguate",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "excess-alternative-cannot-disambiguate",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "conflicting-bank-references-remain-review",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "invoice-derived-fallback-cannot-replace-bank-reference",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "aggregate-never-pays-individual-invoice",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "incomplete-bankgiro-group-remains-held",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "same-payment-bank-id-is-not-two-receipts",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "closed-reference-owner-cannot-be-bypassed",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "wrong-currency",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "payment-before-issue",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "refund-does-not-pay-receivable",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        },
+        {
+          "id": "conflicting-payer-organization",
+          "expected": [],
+          "actual": [],
+          "pass": true
+        }
+      ]
+    }
+  ]
+}

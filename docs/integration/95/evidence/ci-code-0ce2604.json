@@ -1,0 +1,1061 @@
+{
+  "schema_version": 1,
+  "status": "VERIFIED",
+  "repository": "sharbel0022/Mgeorge",
+  "pull_request": 49,
+  "head": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+  "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+  "checkout_commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+  "source_content_sha256": "26a872b83111f36afde95e9f7dc2f17342f8b162865728e6d31d530ee042f94e",
+  "source_files_verified_against_git": 1270,
+  "artifact_references_hash_checked": 86,
+  "artifacts": [
+    {
+      "id": 13443889896,
+      "name": "quality-performance-248bb4d1a7148e53cfbdd80aaef441dbc5efe26e-1",
+      "digest": "sha256:fb8e8fe60c9c355d881fa64c20ab3b0ac218b14b9c458e87088c5d04dc30d6d8",
+      "run_id": 42091716726,
+      "bytes": 70770,
+      "files": 8,
+      "sha256_verified": true
+    },
+    {
+      "id": 13444619309,
+      "name": "quality-browser-248bb4d1a7148e53cfbdd80aaef441dbc5efe26e-1",
+      "digest": "sha256:f9a81d6733d6b677326120aa176c4e40a5ae30cdfd8914422f6ce4bc49ce45ff",
+      "run_id": 42091716726,
+      "bytes": 1673064,
+      "files": 42,
+      "sha256_verified": true
+    },
+    {
+      "id": 13445712242,
+      "name": "saas-security-248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+      "digest": "sha256:f501df69182775d54c9d7441f09af3e4b08c7352ba4d0a1efeef869c442b9885",
+      "run_id": 42091716587,
+      "bytes": 50608,
+      "files": 3,
+      "sha256_verified": true
+    },
+    {
+      "id": 13445838913,
+      "name": "quality-sites-248bb4d1a7148e53cfbdd80aaef441dbc5efe26e-1",
+      "digest": "sha256:dec596c02d79aa2166920663c76d2764ffb6c6feb3934330ce559897437794f3",
+      "run_id": 42091716726,
+      "bytes": 515117,
+      "files": 24,
+      "sha256_verified": true
+    },
+    {
+      "id": 13445886594,
+      "name": "quality-bridge-248bb4d1a7148e53cfbdd80aaef441dbc5efe26e-1",
+      "digest": "sha256:cfab909b412d690aa34e4af734ed112e15ccb575b1fe7f54e48a5e72d8d872fc",
+      "run_id": 42091716726,
+      "bytes": 139071,
+      "files": 16,
+      "sha256_verified": true
+    },
+    {
+      "id": 13445985664,
+      "name": "quality-node-24.22.1-248bb4d1a7148e53cfbdd80aaef441dbc5efe26e-1",
+      "digest": "sha256:a4607c8795cfff4bda9f8a6a24b64a62502aefcd6f77d56bb73b97d250436c58",
+      "run_id": 42091716726,
+      "bytes": 424490,
+      "files": 16,
+      "sha256_verified": true
+    },
+    {
+      "id": 13446070490,
+      "name": "quality-node-22.23.4-248bb4d1a7148e53cfbdd80aaef441dbc5efe26e-1",
+      "digest": "sha256:99209dbdd3984a3525551b5d8dd3b7ce268fe1078248a815d62b7a827d7afb4e",
+      "run_id": 42091716726,
+      "bytes": 418118,
+      "files": 16,
+      "sha256_verified": true
+    }
+  ],
+  "jobs": [
+    {
+      "profile": "performance",
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "INTEL(R) XEON(R) PLATINUM 8573C"
+      },
+      "source": {
+        "commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "26a872b83111f36afde95e9f7dc2f17342f8b162865728e6d31d530ee042f94e",
+        "fileCount": 1270
+      },
+      "github": {
+        "runId": "42091716726",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "pullRequestHeadSha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "passed": true,
+      "install_executed": true,
+      "started_at": "2026-11-05T19:13:01.694Z",
+      "finished_at": "2026-11-05T19:13:44.189Z",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 1371.991
+        },
+        {
+          "name": "company-benchmark",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 41028.869
+        }
+      ],
+      "parameters": {
+        "companies": [
+          1,
+          10,
+          100
+        ],
+        "transactions": 10,
+        "concurrency": 4,
+        "replayRounds": 1,
+        "seed": 95
+      },
+      "batches": [
+        {
+          "companyCount": 1,
+          "metrics": {
+            "elapsedMs": 339.56646800000004,
+            "attempts": 4,
+            "successes": 3,
+            "expectedBusy": 1,
+            "errors": 0,
+            "imported": 10,
+            "duplicate": 20,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 73.353702,
+              "p95": 153.28373700000003,
+              "max": 153.28373700000003
+            },
+            "successfulLatencyMs": {
+              "p50": 112.36751500000003,
+              "p95": 153.28373700000003
+            },
+            "successfulSyncsPerSecond": 8.834794606397942,
+            "importedTransactionsPerSecond": 29.44931535465981
+          },
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 10
+          },
+          "provider": {
+            "mode": "in-process deterministic synthetic adapter",
+            "calls": 12,
+            "maximumActiveCalls": 1,
+            "networkRequests": 0
+          },
+          "totalMs": 628.305476
+        },
+        {
+          "companyCount": 10,
+          "metrics": {
+            "elapsedMs": 2810.765041,
+            "attempts": 40,
+            "successes": 30,
+            "expectedBusy": 10,
+            "errors": 0,
+            "imported": 100,
+            "duplicate": 200,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 274.42671599999994,
+              "p95": 594.6028000000001,
+              "max": 608.260812
+            },
+            "successfulLatencyMs": {
+              "p50": 299.3064690000001,
+              "p95": 604.9043930000003
+            },
+            "successfulSyncsPerSecond": 10.673250720852408,
+            "importedTransactionsPerSecond": 35.57750240284136
+          },
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 100
+          },
+          "provider": {
+            "mode": "in-process deterministic synthetic adapter",
+            "calls": 120,
+            "maximumActiveCalls": 4,
+            "networkRequests": 0
+          },
+          "totalMs": 3854.388891
+        },
+        {
+          "companyCount": 100,
+          "metrics": {
+            "elapsedMs": 28597.393014999998,
+            "attempts": 400,
+            "successes": 300,
+            "expectedBusy": 100,
+            "errors": 0,
+            "imported": 1000,
+            "duplicate": 2000,
+            "latencyMs": {
+              "unit": "one company sync attempt, including provider scheduling yield",
+              "p50": 345.56220199999734,
+              "p95": 453.47053100000085,
+              "max": 1587.9665449999993
+            },
+            "successfulLatencyMs": {
+              "p50": 369.13364600000205,
+              "p95": 495.4727490000005
+            },
+            "successfulSyncsPerSecond": 10.490466730398921,
+            "importedTransactionsPerSecond": 34.968222434663076
+          },
+          "verification": {
+            "isolation": true,
+            "replay": true,
+            "competingClaims": true,
+            "persistedTransactions": 1000
+          },
+          "provider": {
+            "mode": "in-process deterministic synthetic adapter",
+            "calls": 1200,
+            "maximumActiveCalls": 4,
+            "networkRequests": 0
+          },
+          "totalMs": 36382.060654
+        }
+      ]
+    },
+    {
+      "profile": "browser",
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "source": {
+        "commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "26a872b83111f36afde95e9f7dc2f17342f8b162865728e6d31d530ee042f94e",
+        "fileCount": 1270
+      },
+      "github": {
+        "runId": "42091716726",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "pullRequestHeadSha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "passed": true,
+      "install_executed": true,
+      "started_at": "2026-11-05T19:12:59.886Z",
+      "finished_at": "2026-11-05T19:14:09.897Z",
+      "steps": [
+        {
+          "name": "install-sites",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 20920.019
+        },
+        {
+          "name": "install-browser-tooling",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 488.935
+        },
+        {
+          "name": "install-chromium",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 33616.247
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 338.123,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "browser-acceptance",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 14443.373
+        }
+      ],
+      "totals": {
+        "tests": 46,
+        "pass": 46,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "playwright": "1.62.1",
+      "browser": "151.0.7922.34",
+      "external_requests": 0
+    },
+    {
+      "profile": "security",
+      "source_commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+      "passed": true,
+      "runtime": "v22.23.4",
+      "suites": [
+        {
+          "name": "node-security",
+          "files": [
+            "test/saas-login-boundary.test.js",
+            "test/saas-test-isolation.test.js",
+            "test/saas-security-runner.test.js",
+            "test/saas-company-acceptance.test.js",
+            "test/company-api.test.js",
+            "test/company-boundary.test.js",
+            "test/company-client.test.js",
+            "test/bank-consent-api.test.js",
+            "test/openpayments-company-bank-sync.test.js",
+            "test/openpayments-company-bank-sync-normalization.test.js",
+            "test/openpayments-bankgiro-ingest.test.js",
+            "test/openpayments-node-transport.test.js",
+            "test/company-bank-sync.test.js",
+            "test/company-bank-sync-store.test.js",
+            "test/company-bank-sync-scheduler.test.js",
+            "test/company-bank-sync-fairness.test.js",
+            "test/company-bank-sync-legacy-binding.test.js",
+            "test/node-company-bank-sync.test.js",
+            "test/security-session-allocation.test.js",
+            "test/security-login-rate-limit.test.js",
+            "test/session-mutation-fence.test.js",
+            "test/bank-api.test.js",
+            "test/integration-job-api.test.js",
+            "test/backup-disaster-recovery.test.js"
+          ],
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "tests": 332,
+          "pass": 332,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        {
+          "name": "sites-security",
+          "files": [
+            "tests/saas-company-acceptance.test.mjs",
+            "tests/company-storage.test.mjs",
+            "tests/company-backup.test.mjs",
+            "tests/openpayments-lifecycle.test.mjs",
+            "tests/openpayments-expired-revocation.test.mjs",
+            "tests/saas-bank-runtime.test.mjs",
+            "tests/openpayments-company-sync.test.mjs",
+            "tests/openpayments-account-state.test.mjs",
+            "tests/openpayments-request-boundary.test.mjs",
+            "tests/openpayments-raw-receipt.test.mjs",
+            "tests/openpayments-capture.test.mjs",
+            "tests/openpayments-ingest.test.mjs",
+            "tests/openpayments-domain.test.mjs",
+            "tests/company-bank-sync.test.mjs",
+            "tests/company-bank-sync-backup.test.mjs",
+            "tests/company-sync-boundary-integration.test.mjs",
+            "tests/company-sync-scale.test.mjs",
+            "tests/saas-onboarding-server.test.mjs",
+            "tests/saas-onboarding-projection.test.mjs",
+            "tests/saas-onboarding-contract.test.mjs",
+            "tests/saas-onboarding-client.test.mjs",
+            "tests/saas-onboarding-views.test.mjs",
+            "tests/openpayments-provider.test.mjs",
+            "tests/openpayments-policy.test.mjs",
+            "tests/openpayments-http.test.mjs",
+            "tests/saas-owner-isolation.test.mjs",
+            "tests/saas-transport-privacy.test.mjs",
+            "tests/saas-upload-boundary.test.mjs",
+            "tests/security-request-budget.test.mjs",
+            "tests/banking-security.test.mjs",
+            "tests/banking-provider.test.mjs",
+            "tests/bank-account-consent.test.mjs",
+            "tests/bank-account-commit.test.mjs",
+            "tests/bank-state-integrity-q8.test.mjs",
+            "tests/mcp-security-q8.test.mjs",
+            "tests/bankgiro-authority.test.mjs",
+            "tests/backup-recovery.test.mjs",
+            "tests/seven-agent-0599-joined.test.mjs"
+          ],
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "tests": 843,
+          "pass": 843,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      ],
+      "started_at": "2026-11-05T19:13:21.238Z",
+      "finished_at": "2026-11-05T19:15:32.039Z",
+      "real_production_acceptance": "NOT_VERIFIED"
+    },
+    {
+      "profile": "sites",
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "source": {
+        "commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "26a872b83111f36afde95e9f7dc2f17342f8b162865728e6d31d530ee042f94e",
+        "fileCount": 1270
+      },
+      "github": {
+        "runId": "42091716726",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "pullRequestHeadSha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "passed": true,
+      "install_executed": true,
+      "started_at": "2026-11-05T19:12:57.826Z",
+      "finished_at": "2026-11-05T19:21:23.012Z",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 1625.097
+        },
+        {
+          "name": "install-sites",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 18442.354
+        },
+        {
+          "name": "install-bridge",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 427.294
+        },
+        {
+          "name": "minimatch-mitigation",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 261.687
+        },
+        {
+          "name": "typecheck",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 8936.611
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 405.488,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 32549.612,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 8,
+              "high": 0,
+              "critical": 0,
+              "total": 8
+            }
+          }
+        },
+        {
+          "name": "sites-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 430426.86
+        },
+        {
+          "name": "production-build",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 11739.865
+        }
+      ],
+      "totals": {
+        "tests": 4128,
+        "pass": 4128,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "test_file_count": 174,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 88,
+        "records": 88,
+        "lines": {
+          "covered": 8488,
+          "total": 10661,
+          "percent": 79.62
+        },
+        "functions": {
+          "covered": 1694,
+          "total": 1896,
+          "percent": 89.35
+        },
+        "branches": {
+          "covered": 8740,
+          "total": 9601,
+          "percent": 91.03
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 8488,
+          "total": 10661,
+          "percent": 79.62
+        }
+      },
+      "test_duration_ms": 430426.86
+    },
+    {
+      "profile": "bridge",
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 7763 64-Core Processor"
+      },
+      "source": {
+        "commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "26a872b83111f36afde95e9f7dc2f17342f8b162865728e6d31d530ee042f94e",
+        "fileCount": 1270
+      },
+      "github": {
+        "runId": "42091716726",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "pullRequestHeadSha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "passed": true,
+      "install_executed": true,
+      "started_at": "2026-11-05T19:13:00.297Z",
+      "finished_at": "2026-11-05T19:13:07.944Z",
+      "steps": [
+        {
+          "name": "install-bridge",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 509.701
+        },
+        {
+          "name": "syntax",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 241.779
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 386.784,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 386.346,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "bridge-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 5924.711
+        }
+      ],
+      "totals": {
+        "tests": 47,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "test_file_count": 3,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 2,
+        "records": 2,
+        "lines": {
+          "covered": 412,
+          "total": 421,
+          "percent": 97.86
+        },
+        "functions": {
+          "covered": 69,
+          "total": 76,
+          "percent": 90.79
+        },
+        "branches": {
+          "covered": 268,
+          "total": 289,
+          "percent": 92.73
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 412,
+          "total": 421,
+          "percent": 97.86
+        }
+      },
+      "test_duration_ms": 5924.711
+    },
+    {
+      "profile": "node",
+      "runtime": {
+        "node": "v24.22.1",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "source": {
+        "commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "26a872b83111f36afde95e9f7dc2f17342f8b162865728e6d31d530ee042f94e",
+        "fileCount": 1270
+      },
+      "github": {
+        "runId": "42091716726",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "pullRequestHeadSha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "passed": true,
+      "install_executed": true,
+      "started_at": "2026-11-05T19:12:57.532Z",
+      "finished_at": "2026-11-05T19:16:12.655Z",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 1075.563
+        },
+        {
+          "name": "syntax",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 4722.392
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 363.52,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 309.7,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "node-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 188459.386
+        }
+      ],
+      "totals": {
+        "tests": 2152,
+        "pass": 2152,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "test_file_count": 121,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 81,
+        "records": 105,
+        "lines": {
+          "covered": 16873,
+          "total": 39629,
+          "percent": 42.58
+        },
+        "functions": {
+          "covered": 2570,
+          "total": 4767,
+          "percent": 53.91
+        },
+        "branches": {
+          "covered": 9588,
+          "total": 13605,
+          "percent": 70.47
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 11244,
+          "total": 12101,
+          "percent": 92.92
+        }
+      },
+      "test_duration_ms": 188459.386
+    },
+    {
+      "profile": "node",
+      "runtime": {
+        "node": "v22.23.4",
+        "platform": "linux",
+        "release": "7.0.0-1017-azure",
+        "arch": "x64",
+        "logicalCpus": 4,
+        "cpu": "AMD EPYC 9V74 80-Core Processor"
+      },
+      "source": {
+        "commit": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+        "branch": "",
+        "workingTreeDirty": false,
+        "contentSha256": "26a872b83111f36afde95e9f7dc2f17342f8b162865728e6d31d530ee042f94e",
+        "fileCount": 1270
+      },
+      "github": {
+        "runId": "42091716726",
+        "runAttempt": "1",
+        "event": "pull_request",
+        "checkoutSha": "248bb4d1a7148e53cfbdd80aaef441dbc5efe26e",
+        "pullRequestHeadSha": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+        "pullRequestBaseSha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+      },
+      "passed": true,
+      "install_executed": true,
+      "started_at": "2026-11-05T19:12:57.424Z",
+      "finished_at": "2026-11-05T19:17:00.894Z",
+      "steps": [
+        {
+          "name": "install-node",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 1366.843
+        },
+        {
+          "name": "syntax",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 4890.507
+        },
+        {
+          "name": "audit-production",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 278.882,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "audit-all",
+          "kind": "command",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 349.241,
+          "audit": {
+            "measured": true,
+            "vulnerabilities": {
+              "info": 0,
+              "low": 0,
+              "moderate": 0,
+              "high": 0,
+              "critical": 0,
+              "total": 0
+            }
+          }
+        },
+        {
+          "name": "node-tests",
+          "kind": "test-suite",
+          "passed": true,
+          "exitCode": 0,
+          "signal": null,
+          "errorCode": null,
+          "durationMs": 236291.333
+        }
+      ],
+      "totals": {
+        "tests": 2152,
+        "pass": 2152,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "test_file_count": 121,
+      "coverage": {
+        "requested": true,
+        "measured": true,
+        "scope": "loaded production files only; unimported files are not measured",
+        "aggregation": "per-lcov-record",
+        "files": 81,
+        "records": 105,
+        "lines": {
+          "covered": 16870,
+          "total": 39629,
+          "percent": 42.57
+        },
+        "functions": {
+          "covered": 2570,
+          "total": 4766,
+          "percent": 53.92
+        },
+        "branches": {
+          "covered": 9588,
+          "total": 13603,
+          "percent": 70.48
+        },
+        "sourceLines": {
+          "measured": true,
+          "aggregation": "union-by-source-path-and-line",
+          "scope": "loaded LCOV source paths and line numbers only; transformed source mappings are not verified",
+          "covered": 11241,
+          "total": 12101,
+          "percent": 92.89
+        }
+      },
+      "test_duration_ms": 236291.333
+    }
+  ],
+  "limitations": [
+    "Synthetic acceptance is separate from production bank permission and customer acceptance.",
+    "Node versions repeat the same suite; security suites overlap full suites.",
+    "Coverage measures loaded sources only; transformed source mappings are not independently certified.",
+    "Performance is local synthetic SQLite, not production capacity."
+  ]
+}

@@ -1,0 +1,877 @@
+{
+  "schema_version": 1,
+  "assessment_date": "2026-11-05",
+  "language": "sv",
+  "status": "VERIFIED_ON_FROZEN_INTEGRATED_CODE",
+  "repository": "https://github.com/sharbel0022/Mgeorge",
+  "branch": "feature/95-integration",
+  "verified_code_commit": "0ce2604de16b77bf96ff76ccedab115f61a3f9ac",
+  "verified_code_tree": "50d1ec1226d7ced62bb640707740244c4504ab4c",
+  "ci_evidence": "evidence/ci-code-0ce2604.json",
+  "independent_review": "reviews/CODE-REVIEW-1918.md",
+  "baseline_commit": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+  "baseline_source": "## SaaS och legacybank — evidensuppdatering utan poängändring, 2026-11-05",
+  "baseline_status": "Historical documented 255/330; current evidence is reassessed rather than automatically carried forward.",
+  "rubric": {
+    "components": [
+      "F",
+      "S",
+      "K",
+      "U",
+      "P"
+    ],
+    "component_min": 0,
+    "component_max": 2,
+    "component_step": 0.5,
+    "sum_rule": "F+S+K+U+P",
+    "without_required_authenticated_production_evidence_cap": 8.5,
+    "P_zero_when": "Necessary real outcome is missing or required automation is paused.",
+    "P_zero_arithmetic_maximum": 8,
+    "score_9_5_requires": "Critical acceptance met; no known blocking/serious defects; relevant production evidence; green final gates; correct deployed revision when applicable."
+  },
+  "criteria": [
+    {
+      "id": 1,
+      "name": "Design och färger",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 1.5,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 7.0,
+      "delta": -1.0,
+      "evidence_and_component_rationale": "Layout, tydliga ekonomifält, fel-/inloggningstillstånd och kontrastregressioner; syntetisk Chromium visar realiserad rendering. F2 avser dessa lokala vyer, S1,5 flera UI-felklasser, K1,5 renderingsgränsen. U1,5 behåller kvarstående användaracceptans.",
+      "tests": [
+        "test/payment-control-ui.test.js",
+        "test/ui-final-node.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Acceptera samtliga relevanta vyer med verklig text, kontrast, 200–400 % zoom och skärmläsare på publicerad revision.",
+      "score_change_rationale": "P sänks 1,5→0,5: ingen ny autentiserad visuell acceptans på aktuell publicerad revision. Gamla skärmbilder certifieras inte på nytt.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 2,
+      "name": "Startsida",
+      "previous_score": 8.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 7.5,
+      "delta": -1.0,
+      "evidence_and_component_rationale": "Översiktskort, list-/periodprojektion, väntande laddning och nekad åtkomst är regressionskontrollerade. K1,5 avser renderad översikt, inte en ny komplett verklig faktura-/banksession. S2 stöds av negativa och positiva status-/åtkomstfall.",
+      "tests": [
+        "test/ui-final-node.test.js",
+        "test/payment-control-ui.test.js",
+        "sites/tests/dashboard-loading-ui-q8.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Stäm av autentiserade startsidans kort, perioder och summor mot en godkänd uppsättning original och ekonomiska facit.",
+      "score_change_rationale": "P sänks 1,5→0,5. Publicerad grund finns; startsidans verkliga totalsummor har inte stämts av i en tillåten autentiserad slutresa.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 3,
+      "name": "Navigering",
+      "previous_score": 8.5,
+      "components": {
+        "F": 2,
+        "S": 1.5,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 7.5,
+      "delta": -1.0,
+      "evidence_and_component_rationale": "Verkliga komponent-/webbläsarflöden för vybyte, historik, fokus och företagsskifte; gamla svar får inte överta ny företagsvy. F2/K2 avser den lokala sammanhängande navigationskedjan. S1,5 och U1,5 lämnar full hjälpmedelsacceptans öppen.",
+      "tests": [
+        "test/payment-control-ui.test.js",
+        "test/payment-evidence-ui.test.js",
+        "sites/tests/workspace-navigation-dashboard-q8.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Dokumentera Tab, Shift+Tab, Escape, framåt/bakåt samt fokusåtergång genom alla centrala autentiserade vyer och dialoger.",
+      "score_change_rationale": "P sänks 1,5→0,5. Den nya kombinationen har ingen verifierad autentiserad produktionsresa genom alla huvudvyer.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 4,
+      "name": "Mobilanpassning",
+      "previous_score": 8.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 1.5,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 7.5,
+      "delta": -1.0,
+      "evidence_and_component_rationale": "Responsiva vyer, dialogbredd, långa uppgifter och fokusskydd testas i syntetisk Chromium. F2/S2 avser dokumenterade lokala positiva/negativa fall; K1,5 en verklig browsergräns. CSS-viewport är inte fysisk mobil.",
+      "tests": [
+        "test/payment-control-ui.test.js",
+        "test/payment-evidence-ui.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Acceptera iOS/Android, rotation, tangentbord, långa referenser och originaldialoger på aktuell publicering; komplettera relevant hjälpmedelskontroll.",
+      "score_change_rationale": "P sänks 1,5→0,5. Ny aktuell iOS-/Androidacceptans och komplett hjälpmedelskontroll saknas.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 5,
+      "name": "Sökning och filtrering",
+      "previous_score": 7.5,
+      "components": {
+        "F": 2,
+        "S": 1.5,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 7.5,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Svensk normalisering, belopp, exakta referenser och kombinerade filter prövas i delad sökmotor, verkligt Sites-domänkommando och klassisk UI. PR53 bevarar exakt referens 2026.01 parallellt med möjlig beloppstolkning; uttrycklig valuta styr beloppssökning. S1,5: flera oberoende felklasser, ingen allomfattande sökcertifiering.",
+      "tests": [
+        "test/ui-final-node.test.js",
+        "test/reconciliation-normalization-final.test.js",
+        "test/workspace-search-quality8.test.js",
+        "sites/tests/workspace-search-final.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera referensvarianter, kombinerade filter och komplett resultat mot facit på stor realistisk datamängd; mät hela data- och användarkedjan.",
+      "score_change_rationale": "Oförändrat 7,5. Reproducerad rättning och 47/47 berörda tester stärker befintlig klass utan att ersätta storskaligt användarfacit eller aktuell leveransacceptans.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 6,
+      "name": "Minimal manuell hantering",
+      "previous_score": 6.5,
+      "components": {
+        "F": 1.5,
+        "S": 2,
+        "K": 1.5,
+        "U": 1,
+        "P": 0
+      },
+      "new_score": 6.0,
+      "delta": -0.5,
+      "evidence_and_component_rationale": "Lokal kontrollkedja, förslag och stopp vid ofullständigt underlag är verifierade. F1,5/K1,5: flera centrala delar, men inget godkänt representativt arbetsmått över hela verkliga processen. S2: falskt gröna ekonomiska beslut ska stoppas.",
+      "tests": [
+        "test/payment-control.test.js",
+        "test/reconciliation-preview.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Mät en godkänd representativ arbetsperiod: korrekta avslutade ärenden, manuella beslut, tid och undantag; verifiera bank/Gmail-kedjorna.",
+      "score_change_rationale": "P sänks 0,5→0: den kompletta bank-, OCR- och registreringskedjan samt verifierad minskning av manuellt arbete saknar fortfarande tillräckligt underlag. De sex aktuella OCR-resultaten styrker inte hela denna kedja. U1 behålls eftersom verifierad minskning av handpåläggning och full driftkedja återstår.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 7,
+      "name": "Kundfakturor",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Registrering och ändring av kundfakturor, belopp/referens, bevarade PDF-original och betalningskoppling prövas mot riktig lokal HTTP/SQLite samt Sites lagringsgräns. Negativa identitets-/beloppsfall och positiva kontrollfall stödjer F2/S2/K2.",
+      "tests": [
+        "test/invoice-reference-integration.test.js",
+        "test/payment-control-api.test.js",
+        "test/quality-regressions-recovery-api.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera godkänt originalinventarium, registrering, belopp, referens, kundrelation och betalningshistorik i ett autentiserat flöde.",
+      "score_change_rationale": "Oförändrat 8. P0,5 avser publicerad grund; verkligt originalinventarium, kundrelation och ny autentiserad resa saknas.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 8,
+      "name": "Leverantörsfakturor",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Leverantörsextraktion, mottagar-/utställarseparation, summaryfält, dokumentgranskning och originalintegritet prövas med syntetiska PDF-/textfall i båda motorerna. F2/S2/K2 gäller den angivna lokala funktionens centrala gränser.",
+      "tests": [
+        "test/invoice-extraction.test.js",
+        "test/invoice-evidence-ocr.test.js",
+        "test/invoice-summary-labels.test.js",
+        "sites/tests/invoice-summary-labels.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera godkända leverantörslayouter, kredit/negativa belopp, mottagarrelation och originalbevarande mot ett märkt verkligt facit.",
+      "score_change_rationale": "Oförändrat 8. Nya parserfall ger inte automatiskt representativ produktionsprecision; godkända verkliga layouter och affärsregler återstår.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 9,
+      "name": "PDF-tolkning",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Rekonstruerad PDF-text, fakturaidentitet, stycke-/sidgränser, svensk/engelsk beloppsgrammatik och osäkra tolkningar prövas. PDF-filer går genom faktisk extraktion; syntetiska textkorpusar redovisas separat. F2/S2/K2 avser lokal kedja och kritiska negativa klasser.",
+      "tests": [
+        "test/invoice-parser-corpus-q8.test.js",
+        "test/pdf-text-reconstruction.test.js",
+        "test/invoice-summary-labels.test.js",
+        "sites/tests/invoice-summary-labels.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Utöka och frys godkänd representativ PDF-korpus med fältfacit; redovisa felaktiga gröna godkännanden, osäkerhet och fellägen.",
+      "score_change_rationale": "Oförändrat 8. En större syntetisk korpus och fler passerade tester är inte en mätning på ett representativt godkänt kundfacit.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 10,
+      "name": "Bild-OCR",
+      "previous_score": 7.0,
+      "components": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2,
+        "U": 1,
+        "P": 1
+      },
+      "new_score": 7.5,
+      "delta": 0.5,
+      "evidence_and_component_rationale": "OCR-kö, lease, bounded transport, persistens, omtag efter förlorat kvitto och granskningsstatus prövas. PR52:s cleanup får inte göra en annars begränsad begäran oändlig. F1,5/U1 avser användbar kedja med kvarvarande precision-/driftgap; S2/K2 avser testade felklasser och lokal lagring.",
+      "tests": [
+        "test/pdf-layout-ocr.test.js",
+        "test/ocr-quality-metrics.test.js",
+        "test/sites-ocr-pull.test.js",
+        "sites/tests/document-queue-recovery.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Kör godkänd rasterkorpus och aktuell cloud-worker med verkligt underlag; mät fältkvalitet, osäkerhet, fel, total tid och spårbarhet.",
+      "score_change_rationale": "Höjning 7→7,5 genom P0,5→1: en extern schemakörning på mainbf24 (42083409804) har verifierad logg processed6/failed0 och tjänsten bekräftar sparade resultat18:23:31 medan lokal worker är offline. Detta ger ett daterat konkret driftutfall. Vid sista läsningen 19:14 var molnworkern åter utan färsk heartbeat; märkt fältfacit, uthållig kadens och den nya kandidatens leveransacceptans saknas.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 11,
+      "name": "Gmail-anslutning",
+      "previous_score": 7.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 1
+      },
+      "new_score": 8.5,
+      "delta": 1.0,
+      "evidence_and_component_rationale": "OAuth-/token-/Gmailflöden, beständiga jobb, originalhantering, retry och felstatus testas. Läsande produktionsstatus visar en aktuell lyckad hämtning 2026-11-05T18:59:26.053Z. F2/S2/K2 gäller den lokala integrerade Gmailkedjan; U1,5 lämnar driftacceptans öppen.",
+      "tests": [
+        "test/integration-job-api.test.js",
+        "test/integration-jobs-orchestration.test.js",
+        "sites/tests/gmail.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera aktuell levererad Gmailkedja med godkänt originalfacit och representativ autentiserad användaracceptans. Externt schema, OCR och registrering bedöms dessutom separat.",
+      "score_change_rationale": "Höjning 7,5→8,5 enbart genom P0→1: konkret aktuellt driftutfall för anslutning/hämtning. Detta bevisar inte timschema, full OCR eller alla fakturaregistreringar.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 12,
+      "name": "Automatisk fakturaregistrering",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Automatisk registrering kräver fullständiga kritiska fält, original och företag; osäker extraktion går till granskning. Idempotens efter avbrott och lagrat resultat kontrolleras med positiva/negativa lagringsfall. F2/S2/K2 avser denna lokala kedja.",
+      "tests": [
+        "test/invoice-evidence-ocr.test.js",
+        "test/integration-jobs.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera automatisk registrering av godkända original med samtliga kritiska fält, exakt-en-gång-beteende och oförändrade äldre poster.",
+      "score_change_rationale": "Oförändrat 8. P0,5 avser den publicerade funktionen; ingen komplett ny produktionsserie med godkända original och affärsfacit certifieras.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 13,
+      "name": "Dubblettkontroll",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Samma original/transaktion över omstart, replay och samtidiga processer skapar inte dubbel ekonomi. Företag återanvänder identiska externa ID:n utan läckage. SQLite-journalgränsen repareras och krascher före commit ska rulla tillbaka. F2/S2/K2 har verkliga databasgränser.",
+      "tests": [
+        "test/integration-jobs.test.js",
+        "test/company-reconciliation.test.js",
+        "sites/tests/company-bank-sync-backup.test.mjs",
+        "test/payment-concurrency.test.js",
+        "test/quality-regressions-migration-replay.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera ägarbundet originalinventarium, godkänd återhämtning, korrigering och historiska luckor; visa att dubbla/importerade original inte skapar dubbel ekonomi.",
+      "score_change_rationale": "Oförändrat 8. P0,5: befintlig publicerad grund; ett aktuellt ägarbundet produktionsinventarium och alla historiska luckor är inte verifierade.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 14,
+      "name": "Dokumentgranskning",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Original, metadata, osäkra fält och fel/retry bevaras i granskningskedjan. Syntetiska parser-/UI-/lagringsfall stoppar tvetydiga eller saknade underlag och bevarar ekonomin. F2/S2/K2 avser dokumenterade centrala lokala flöden.",
+      "tests": [
+        "test/invoice-evidence-ocr.test.js",
+        "test/payment-evidence-ui.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Acceptera prioriterade verkliga dokument med original, versionsbyte, fel/retry och korrekt synlig osäkerhet i aktuell autentiserad UI.",
+      "score_change_rationale": "Oförändrat 8. U1,5/P0,5: aktuell verksamhetsacceptans för prioriterade verkliga dokument och publicerad granskning återstår.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 15,
+      "name": "Swedbank-anslutning",
+      "previous_score": 8.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0
+      },
+      "new_score": 7.5,
+      "delta": -1.0,
+      "evidence_and_component_rationale": "Callback, providerregistrering, aktuellt medgivande, kontoval, företagsrätt och efter-await-/commitfences har positiva och negativa syntetiska tester. PR45 och49/50 bevarar kända handtag och osäkra skrivutfall. F2/S2/K2 gäller lokal bankadapterkedja; inga tester använder verklig bankauktorisation.",
+      "tests": [
+        "test/openpayments-node-transport.test.js",
+        "test/openpayments-company-bank-sync.test.js",
+        "test/node-company-bank-sync.test.js",
+        "sites/tests/banking-security.test.mjs",
+        "sites/tests/openpayments-write-ambiguity.test.mjs",
+        "sites/tests/openpayments-lifecycle-recovery.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera att de granskade consent-/race-rättningarna finns i accepterad publicering. Styrk aktuell bankutfärdad kontorelation, behörighet, detaljer, förnyelse och tillåtna retry-fall med verkliga bankbevis.",
+      "score_change_rationale": "P sänks 1→0: aktuell produktion rapporterar connected=false. Senaste historiska lyckade hämtning och ett framtida giltighetsdatum styrker inte dagens kontobehörighet.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 16,
+      "name": "Automatisk bankhämtning",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0
+      },
+      "new_score": 7.5,
+      "delta": -0.5,
+      "evidence_and_component_rationale": "Pagination, råkvitto, beständig kvot, konto-/företagslease, checkpunkt, avbrott och dedup testas i lokala sammanhängande synkflöden. En aktuell återkallelse eller kontextändring stoppar läsning/commit. F2/S2/K2 avser dessa exekverade kedjor.",
+      "tests": [
+        "test/openpayments-company-bank-sync.test.js",
+        "sites/tests/company-sync-boundary-integration.test.mjs",
+        "sites/tests/company-sync-scale.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera ett auktoriserat komplett aktuellt bankjobb inklusive sidindelning, leases, kvitton, dedup, avbrott/återupptagning och oförändrad ekonomi vid nekad åtkomst.",
+      "score_change_rationale": "P sänks 0,5→0: ansluten och fungerande aktuell produktionsbankhämtning saknas. Ett konfigurerat schema och gamla success-tider räcker inte.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 17,
+      "name": "Bankgiroimport",
+      "previous_score": 8.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 1
+      },
+      "new_score": 8.5,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "CAMT/XLSX/CSV/Open Payments/SFTP-kedjor, exakt bevarad referens, originalhash, ägarbunden rapporthistorik och ändringsdetektion testas. En befintlig ägd manuell rapport återlästes autentiserat 18:09:39Z: komplett, intakt och oförändrad. F2/S2/K2 avser importer/evidens, inte påstådd bankauktorisation.",
+      "tests": [
+        "test/openpayments-bankgiro-ingest.test.js",
+        "test/payment-reference-sources.test.js",
+        "sites/tests/mcp-report-provenance.test.mjs",
+        "sites/tests/openpayments-document-numbers.test.mjs",
+        "sites/tests/payment-verification.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Konfigurera och godkänn faktisk bank-/företags-/kontobunden källa med profil och råkvitto; verifiera betalare, referens och samlingsinsättning före separat fakturarelation.",
+      "score_change_rationale": "Oförändrat 8,5, P1 stöds av aktuellt konkret manuellt rapportutfall. Automatisk källa är fortfarande SOURCE_NOT_CONFIGURED/UNKNOWN. Intakt import är inte styrkt aktuell bank-/kontorelation, formell OCR eller rätt faktura.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 18,
+      "name": "Identifiera verklig betalare",
+      "previous_score": 7.0,
+      "components": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0
+      },
+      "new_score": 7.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Bankpart, manuell attest, namn, organisationsidentitet och kundrelation hålls isär. Konflikter, fel original och återkallat underlag stoppas i verkliga lokala skriv-/lagringsgränser. F1,5 avser kvarvarande verklig identifieringsbredd; S2/K2 de negativa/positiva kedjorna.",
+      "tests": [
+        "test/payer-evidence.test.js",
+        "test/payer-completion-conflict.test.js",
+        "test/payer-verification-atomic.test.js",
+        "sites/tests/reconciliation-manual-provenance.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Styrk verklig betalare från bankoriginal eller godkänd redovisningsrelation; verifiera attest, konflikt och återkallande utan att interna kunduppgifter blir bankfakta.",
+      "score_change_rationale": "Oförändrat 7. P0: privat rapportnamn är inte automatiskt juridisk betalare eller godkänd kundrelation; autentiskt verifierat helfacit saknas.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 19,
+      "name": "Verklig OCR/fakturareferens",
+      "previous_score": 7.0,
+      "components": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0
+      },
+      "new_score": 7.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Ledande nollor, generisk referens, dokumentnummer och formell OCR hålls åtskilda. Referens får inte passera med trasigt original; CSV får inte fabricera banktransaktions-ID. Negativa och positiva fall når import-/avstämningsgränsen. F1,5 avser kvarvarande verklig referens-/avtalsbredd.",
+      "tests": [
+        "test/payment-reference-sources.test.js",
+        "test/invoice-reference-policy.test.js",
+        "test/reference-evidence-compat.test.js",
+        "sites/tests/reconciliation-csv-reference.test.mjs",
+        "sites/tests/openpayments-document-numbers.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera bankbunden verklig OCR/referens inklusive avtal/checksiffra där relevant, inledande nollor, frånvaro och konflikter mot ett märkt originalfacit.",
+      "score_change_rationale": "Oförändrat 7. P0: manuellt bevarad generisk referens bevisar inte formell OCR, bankens avtalade regel eller full fakturarelation.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 20,
+      "name": "Automatisk betalningsmatchning",
+      "previous_score": 7.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0
+      },
+      "new_score": 7.5,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "PR51:s delade deterministiska slutbedömning tilldelar distinkta exakt styrkta referenser utan inbördes falsk spärr, samtidigt som svaga konkurrerande underlag kvarstår för granskning. Manuella ersättningsfält blir inte bankfakta. Verklig SQLite/D1-persistens kontrollerar saldo/audit/replay. F2/S2/K2 stöds lokalt.",
+      "tests": [
+        "test/reconciliation-contract.test.js",
+        "test/reconciliation-contract-integrity.test.js",
+        "sites/tests/reconciliation-proposal.test.mjs",
+        "test/reconciliation-batch-integration.test.js",
+        "sites/tests/reconciliation-batch-integration.test.mjs",
+        "sites/tests/reconciliation-decisions.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera representativ betalningsvolym med korrekt bankpart, godkända fakturarelationer och exakt facit; mät falska positiva och bevara förslag/bokföring som separata steg.",
+      "score_change_rationale": "Oförändrat 7,5. P0: syntetiskt 8/8 mot facit och noll falska positiva i avgränsad korpus ersätter inte representativ bank-/kundacceptans.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 21,
+      "name": "Delbetalningar",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Delbetalningar bevarar tidigare tilldelningar, exakt restbelopp och audit över omstart och återimport. Samtidiga processer får inte lägga till samma betalning två gånger. F2/S2/K2 avser riktiga lokala databastransaktioner med syntetiska belopp.",
+      "tests": [
+        "test/reconciliation.test.js",
+        "test/payment-control-api.test.js",
+        "test/payment-concurrency.test.js",
+        "test/reconciliation-batch-integration.test.js",
+        "sites/tests/reconciliation-batch-integration.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera verkliga godkända delbetalningar med korrekt restbelopp, tidsordning, avstämning och obruten audit.",
+      "score_change_rationale": "Oförändrat 8. U1,5/P0,5: verksamhetens godkända verkliga delbetalningsresa på slutrevisionen återstår.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 22,
+      "name": "Överbetalningar",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Överbetalning skiljer fakturans saldo från spårbart överskott, utan falsk automatisk fakturakoppling. Retry/replay och historik har negativa och positiva lokala transaktionsfall. F2/S2/K2 gäller dessa scenarier.",
+      "tests": [
+        "test/reconciliation.test.js",
+        "test/payment-control-api.test.js",
+        "test/payment-concurrency.test.js",
+        "test/reconciliation-batch-integration.test.js",
+        "sites/tests/reconciliation-batch-integration.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera verklig överbetalning och godkänd affärshantering, saldo/status, beslut och audit utan automatisk felaktig fakturakoppling.",
+      "score_change_rationale": "Oförändrat 8. Godkänd verklig överskottshantering/återbetalningsprocess och ny driftacceptans saknas; P0,5 är publicerad grund.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 23,
+      "name": "Flera fakturor i en betalning",
+      "previous_score": 7.5,
+      "components": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 7.5,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Befintliga grupp-/fördelningsregler och spärrar mot ofullständiga referenser har lokala integrationstester. F1,5 kvarstår: PR51:s konkurrensbedömning är inte en ny fullständig atomisk flerfakturafunktion. S2/K2 avser befintliga gränser, inte outförd produktbredd.",
+      "tests": [
+        "test/reconciliation-contract.test.js",
+        "test/reconciliation.test.js",
+        "test/company-reconciliation-gate.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera kompletta original och godkända grupperingar med summerade belopp, referenser och dokumenterade beslut för flera fakturor per betalning.",
+      "score_change_rationale": "Oförändrat 7,5. Godkända kompletta grupperingar, summerade belopp, original och verksamhetsbeslut måste verifieras för full acceptans.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 24,
+      "name": "Betalningshistorik",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Bevarade original, rapportproveniens, importhistorik, manuella beslut, allokeringar och audit går genom ägarbundna läsningar och backup/restore. PR46:s sena revisionskontroll märker snapshot som ändrad efter samtidiga uppdateringar. F2/S2/K2 stöds i lokal databas-/lagringskedja.",
+      "tests": [
+        "test/payment-identity-evidence-final.test.js",
+        "test/integration-jobs-backup.test.js",
+        "sites/tests/company-backup.test.mjs",
+        "sites/tests/mcp-report-provenance.test.mjs",
+        "sites/tests/recovery-drill.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera autentiserad historik vid realistisk volym, pagination, tidsordning och audit genom migrering och återställning; eliminera relevanta obegränsade listgränser.",
+      "score_change_rationale": "Oförändrat 8. U1,5/P0,5: full autentiserad historik vid realistisk volym och eventuella listbegränsningar återstår.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 25,
+      "name": "Betalningsstatus",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Betalt/restbelopp, förslag, granskningskrav och bankmedgivandets hälsa visas separat. Sparat kvitto får inte intyga aktuell anslutning efter app-/kontoändring. Positiva och negativa integrationsfall verifierar projektion utan att ändra ekonomin. F2/S2/K2 gäller lokal kedja.",
+      "tests": [
+        "test/message-evidence-projection.test.js",
+        "test/payment-identity-evidence-final.test.js",
+        "test/node-payments-quality-cycle.test.js",
+        "sites/tests/payment-evidence-status-final.test.mjs",
+        "sites/tests/banking-security.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera aktuell betalningsstatus mot godkända original, kontorelation och aktuellt samtycke; acceptera även reauth/okänd/ofullständig status utan falsk grön signal.",
+      "score_change_rationale": "Oförändrat 8. Aktuell verklig betalningsstatus mot godkända original, kontorelation och användaracceptans saknas; P0,5 är publicerad grund.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 26,
+      "name": "Kontrollera alla betalningar",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0
+      },
+      "new_score": 7.5,
+      "delta": -0.5,
+      "evidence_and_component_rationale": "Kontrolljobb, progress, kvitton, förslag, avbrott och omtag körs med syntetiska data via riktig HTTP/lagring. Ingen ofullständig kedja får fabricera godkänd betalning. F2/S2/K2 avser lokal sammanhängande kontroll.",
+      "tests": [
+        "test/payment-control-api.test.js",
+        "test/payment-control-receipts-q8.test.js",
+        "test/payment-control.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Genomför tillåtet komplett produktionsflöde mot avgränsat godkänt underlag med audit, korrekta undantag och dokumenterad tidsåtgång.",
+      "score_change_rationale": "P sänks 0,5→0: nödvändigt komplett aktuellt verkligt kontrollutfall saknas. Ingen produktionsknapp eller jobbstart används för att skaffa poäng.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 27,
+      "name": "Automatiska mejlutkast",
+      "previous_score": 8.0,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Utkast visar rätt mottagare/underlagsstatus i testade projektioner, och osäkra bankfakta får inte förvandlas till säkra kundpåståenden. UI-/domänregressioner separerar förhandsvisning från sändning. F2/S2/K2 avser avgränsad lokal utkastkedja.",
+      "tests": [
+        "test/message-evidence-projection.test.js",
+        "test/payment-evidence-ui.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Acceptera mottagare, innehåll, osäker evidens och fel-/retry-lägen i aktuellt flöde. Verifiera att förhandsvisning aldrig sänder och att sändning kräver tillåtet separat beslut.",
+      "score_change_rationale": "Oförändrat 8. U1,5/P0,5: godkänd aktuell mottagar-/textacceptans kvarstår. Ingen riktig kundsändning är utförd eller behövs för dessa syntetiska tester.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 28,
+      "name": "Schemalagd automatisering",
+      "previous_score": 6.5,
+      "components": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2,
+        "U": 1,
+        "P": 0
+      },
+      "new_score": 6.5,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Beständiga körningar, kvot, ägar-/företagslease, återupptagning och workflowvillkor testas. PR48:s OCR-trigger kräver lyckad aktuell main och två refkontroller; den startas inte av våra PR-körningar. F1,5/U1 avser kvarvarande verklig driftbredd.",
+      "tests": [
+        "test/integration-jobs-orchestration.test.js",
+        "sites/tests/company-sync-scale.test.mjs",
+        "test/sites-ocr-pull.test.js",
+        "test/cloud-ocr-trigger.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera faktiska auktoriserade Gmail-, bank- och OCR-körningar med rätt identitet/kadens, 429/restart/leasehantering och bevarade original.",
+      "score_change_rationale": "Oförändrat 6,5. P0: konfigurerade scheman, en Gmailhämtning eller worker-kontakt bevisar inte alla nödvändiga bank-/Gmail-/OCR-körningar med rätt kadens.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 29,
+      "name": "Säkerhetskopiering",
+      "previous_score": 7.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 1
+      },
+      "new_score": 8.5,
+      "delta": 1.0,
+      "evidence_and_component_rationale": "Aktuell backupstatus: 362/362 filer, manifest_pass. Syntetisk riktig krypterad backup/export/restore har alla27 ägarbundna backuptabeller, originalhashar och oberoende ekonomifacit. Fel nyckel/ägare/företag, korrupt/saknat original, ändrad huvudbok/plaintext och främmande ägarrad avvisas; positiva kontrollfall passerar.",
+      "tests": [
+        "test/integration-jobs-backup.test.js",
+        "sites/tests/company-backup.test.mjs",
+        "sites/tests/company-bank-sync-backup.test.mjs",
+        "sites/tests/recovery-drill.test.mjs",
+        "test/security-login-rate-limit.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera aktuell komplett separat kopia av alla nödvändiga original, metadata och nycklar; kontrollera hash och genomför ägarisolerad restore utan gamla behörigheter/leaser.",
+      "score_change_rationale": "Höjning 7,5→8,5 genom S1→2 enligt oförändrad modell: åtta kritiska felklasser och positiv fullkedja är exekverade. P1 behålls för aktuell verifierad backup, inte för en oberoende katastrofåterställning.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 30,
+      "name": "Säkerhet och åtkomstkontroll",
+      "previous_score": 8.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 0.5
+      },
+      "new_score": 8.0,
+      "delta": -0.5,
+      "evidence_and_component_rationale": "Företag/roller, session/CSRF/state, medlemskapsändringar, bankhandtag, exporter, original, worker och skrivgränser har positiva/negativa HTTP-/SQLite-/Sitesacceptansfall. Oberoende review kopplas till exakta kodversioner. F2/S2/K2 gäller exekverade lokala säkerhetsgränser, inte uttömmande penetrationstest.",
+      "tests": [
+        "test/saas-company-acceptance.test.js",
+        "sites/tests/saas-company-acceptance.test.mjs",
+        "test/saas-login-boundary.test.js",
+        "test/session-mutation-fence.test.js",
+        "sites/tests/openpayments-write-ambiguity.test.mjs",
+        "sites/tests/openpayments-lifecycle-recovery.test.mjs",
+        "test/security-login-rate-limit.test.js",
+        "sites/tests/security-request-budget.test.mjs",
+        "sites/tests/company-request.test.mjs",
+        "sites/tests/bank-state-integrity-q8.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera de rättade consent- och racegränserna i accepterad driftkonfiguration. Bedöm oberoende den publicerade revisionens nycklar, sessioner, ägarbyte, callbacks, export/original och överlastskydd; stäng alla säkerhetskritiska fynd.",
+      "score_change_rationale": "P sänks 1→0,5: läsande driftstatus och publicerad grund har verifierats, men aktuell publicerad kandidat och full driftsäkerhetsacceptans har inte verifierats.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 31,
+      "name": "Katastrofåterställning",
+      "previous_score": 5.5,
+      "components": {
+        "F": 1.5,
+        "S": 2,
+        "K": 2,
+        "U": 1,
+        "P": 0
+      },
+      "new_score": 6.5,
+      "delta": 1.0,
+      "evidence_and_component_rationale": "Den syntetiska katastrofövningen använder riktig backupmotor, portabel kryptering och isolerad återställning samt oberoende före-backupförväntningar. Alla27 ägarbundna backuptabeller/original/ekonomifacit kontrolleras; gamla behörigheter och leaser återaktiveras inte. Åtta kritiska felklasser avvisas. F1,5/U1 behåller verklig operativ lucka.",
+      "tests": [
+        "sites/tests/company-backup.test.mjs",
+        "sites/tests/company-bank-sync-backup.test.mjs",
+        "test/integration-jobs-backup.test.js",
+        "sites/tests/recovery-drill.test.mjs",
+        "test/backup-disaster-recovery.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Återställ från en oberoende komplett backup i isolerad miljö med nycklar, original, ägare, behörigheter, historik och ekonomisk avstämning; mät RPO/RTO och dokumentera start/återgång.",
+      "score_change_rationale": "Höjning 5,5→6,5 genom S1→2. K2 stöds av realiserad lokal end-to-endåterställning. P0 kvarstår: ingen faktisk produktionsbackup har återställts och accepterats separat med verklig nyckeltillgång och RPO/RTO.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 32,
+      "name": "Kodkvalitet och tester",
+      "previous_score": 8.5,
+      "components": {
+        "F": 2,
+        "S": 2,
+        "K": 2,
+        "U": 1.5,
+        "P": 1
+      },
+      "new_score": 8.5,
+      "delta": 0.0,
+      "evidence_and_component_rationale": "Låsta installationer, fulla sviter på angivna Nodeversioner, syntax/typer, audit, produktionsbygge, Chromium och SQLitebelastning får hash-/SHA-bundna kvitton. Trunkerad/tom/skip/TODO/kraschad eller ändrad källa underkänns. F2/S2/K2 kräver gröna slutgrindar på exakt kombination.",
+      "tests": [
+        "test/saas-test-isolation.test.js",
+        "test/reconciliation-contract.test.js",
+        "sites/tests/company-sync-boundary-integration.test.mjs",
+        "test/quality-runner.test.js",
+        "test/payment-concurrency.test.js"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Bevara reproducerbara fulla grindar vid varje release. Slutför relevant instrumentation-/lint-/underhållsacceptans och knyt faktisk accepterad leverans till samma testade kod; den nu gröna syntetiska CI:n är redan styrkt.",
+      "score_change_rationale": "Oförändrat 8,5 är villkorat av faktisk slutlig CI, tills dess ingen slutcertifiering. U1,5: kvarvarande lint-/utvecklingsberoendeskuld och verkliga driftprov. P1 avser levererat grönt kodkvitto, inte kommersiell acceptans.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    },
+    {
+      "id": 33,
+      "name": "Verifiering i verklig produktion",
+      "previous_score": 6.5,
+      "components": {
+        "F": 1.5,
+        "S": 1,
+        "K": 1.5,
+        "U": 1,
+        "P": 0
+      },
+      "new_score": 5.0,
+      "delta": -1.5,
+      "evidence_and_component_rationale": "Native versions-/deploymentstatus och läsande bank/Gmail/Bankgiro/backup samt ett befintligt rapportoriginal har observerats. Detta är begränsade konkreta driftkontroller: F1,5/S1/K1,5/U1. Inga nya betalningar, bankmedgivanden, OCR-jobb eller kundmeddelanden skapas.",
+      "tests": [
+        "test/saas-company-acceptance.test.js",
+        "sites/tests/saas-company-acceptance.test.mjs"
+      ],
+      "execution_requirement": "Final full CI on the exact integrated code; targeted earlier runs are supplementary and not added to full-suite totals.",
+      "remaining_gap": "Verifiera exakt levererad revision, representativa autentiserade kundflöden, faktisk bank/Gmail/OCR, original-/ekonomifacit och återställningsövning; stäng kommersiella go/no-go-grindar.",
+      "score_change_rationale": "P sänks 1,5→0: den nödvändiga autentiserade produktionskedjan på rätt slutrevision, verklig bank, full OCR och oberoende återställning saknas. En lyckad separat Sitespublicering ändrar inte detta.",
+      "verified_ci": "evidence/ci-code-0ce2604.json"
+    }
+  ],
+  "summary": {
+    "criteria": 33,
+    "previous_total": 255.0,
+    "new_total": 250.0,
+    "maximum": 330,
+    "target": 314,
+    "mean": 7.575757575757576,
+    "net_delta": -5.0,
+    "remaining_points": 64.0,
+    "criteria_at_least_9_5": 0
+  },
+  "release_decision": "NOT APPROVED for commercial production launch",
+  "limitations": [
+    "The candidate is not production accepted.",
+    "A lower fresh score is an evidence reassessment, not proof of new functional regressions.",
+    "Critical release gates cannot be averaged away.",
+    "Counts do not buy quality points.",
+    "Full exact-code CI passed on0ce2604; any later documentation head receives its own verification receipt outside this immutable report."
+  ]
+}

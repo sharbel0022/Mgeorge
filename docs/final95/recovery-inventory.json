@@ -1,0 +1,3176 @@
+{
+  "retrieved_at": "2026-11-06T11:25:20.220Z",
+  "main": {
+    "sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+    "tree": "4df922a5284fd1ee040e246a8cb88ae4dfae9175",
+    "protected": false,
+    "protection": {
+      "enabled": false,
+      "required_status_checks": {
+        "enforcement_level": "off",
+        "contexts": [],
+        "checks": []
+      }
+    },
+    "url": "https://github.com/sharbel0022/Mgeorge/commit/cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+  },
+  "prs": [
+    {
+      "number": 60,
+      "title": "Set SQLite busy timeout before database startup",
+      "state": "closed",
+      "merged_at": "2026-11-06T07:00:00Z",
+      "closed_at": "2026-11-06T07:00:01Z",
+      "draft": false,
+      "head": "feature/rating8-sqlite-startup-20261106",
+      "head_sha": "520e22716c6298e4d24ccf3989e87cfe563d8d14",
+      "base": "main",
+      "base_sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "merge_sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/60",
+      "updated_at": "2026-11-06T07:00:01Z",
+      "head_ancestor_of_main": true,
+      "head_ancestor_of_pr49": false
+    },
+    {
+      "number": 59,
+      "title": "Expose safe bank failure diagnostics without changing consent",
+      "state": "closed",
+      "merged_at": "2026-11-06T04:50:48Z",
+      "closed_at": "2026-11-06T04:50:48Z",
+      "draft": false,
+      "head": "feature/rating8-bank-failure-diagnostic-20261106",
+      "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "base": "main",
+      "base_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "merge_sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/59",
+      "updated_at": "2026-11-06T04:50:48Z",
+      "head_ancestor_of_main": true,
+      "head_ancestor_of_pr49": false
+    },
+    {
+      "number": 58,
+      "title": "Fix invoice field ownership, guarded retry and bank usage diagnostics",
+      "state": "closed",
+      "merged_at": "2026-11-06T03:47:19Z",
+      "closed_at": "2026-11-06T03:47:19Z",
+      "draft": false,
+      "head": "feature/rating8-reviewed-geometry-retry-20261106",
+      "head_sha": "f488841afccdefba17a6b584320347581f60c3f4",
+      "base": "main",
+      "base_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "merge_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/58",
+      "updated_at": "2026-11-06T03:47:20Z",
+      "head_ancestor_of_main": true,
+      "head_ancestor_of_pr49": false
+    },
+    {
+      "number": 57,
+      "title": "Preserve invoice evidence and explain selected account usage rejections",
+      "state": "closed",
+      "merged_at": "2026-11-05T23:39:57Z",
+      "closed_at": "2026-11-05T23:39:57Z",
+      "draft": false,
+      "head": "feature/rating8-reviewed-parser-bank-diagnostics-20261105",
+      "head_sha": "c90ed82c73bb566e54cb70eec14dae4ad9848361",
+      "base": "main",
+      "base_sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+      "merge_sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/57",
+      "updated_at": "2026-11-05T23:39:57Z",
+      "head_ancestor_of_main": true,
+      "head_ancestor_of_pr49": false
+    },
+    {
+      "number": 56,
+      "title": "Fix financial evidence, manual allocation, OCR guardrails and narrow-screen review",
+      "state": "closed",
+      "merged_at": "2026-11-05T22:39:49Z",
+      "closed_at": "2026-11-05T22:39:49Z",
+      "draft": false,
+      "head": "feature/rating8-release-wave2-20261105",
+      "head_sha": "d638f5e195711c3011816618f1899dc535c24120",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/56",
+      "updated_at": "2026-11-05T22:39:49Z",
+      "head_ancestor_of_main": true,
+      "head_ancestor_of_pr49": false
+    },
+    {
+      "number": 55,
+      "title": "UI: svartvit arbetsyta, tydliga bankbevis och bevarade granskningsutkast",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": true,
+      "head": "feature/95-ui",
+      "head_sha": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "7f593c00c22b41f8ed67d08af561306d0f93f770",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/55",
+      "updated_at": "2026-11-05T22:16:07Z",
+      "mergeable": false,
+      "changed_files": 50,
+      "commits": 1,
+      "additions": 5201,
+      "deletions": 118,
+      "observed_workflow_runs": [
+        {
+          "id": 42119034835,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 37,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42119034835/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42119034835/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42119034842,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 256,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42119034842/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42119034842/logs",
+          "workflow_id": 398864112
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": false,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/95-ui-browser/README.md",
+        "docs/integration/95-ui-browser/browser-acceptance.md",
+        "docs/integration/95-ui-browser/browser-observations.json",
+        "docs/integration/95-ui-browser/build-harness.mjs",
+        "docs/integration/95-ui-browser/bundle-source-manifest.json",
+        "docs/integration/95-ui-browser/capture-source-validation.json",
+        "docs/integration/95-ui-browser/fixtures.mjs",
+        "docs/integration/95-ui-browser/fixtures.test.mjs",
+        "docs/integration/95-ui-browser/qa-frame.mjs",
+        "docs/integration/95-ui-browser/requests.jsonl",
+        "docs/integration/95-ui-browser/screenshots/desktop-bank-connection-1440.jpg",
+        "docs/integration/95-ui-browser/screenshots/desktop-invoices-1440.jpg",
+        "docs/integration/95-ui-browser/screenshots/desktop-overview-1440.jpg",
+        "docs/integration/95-ui-browser/screenshots/desktop-payment-detail-1440.jpg",
+        "docs/integration/95-ui-browser/screenshots/mobile-bank-onboarding-390.jpg",
+        "docs/integration/95-ui-browser/screenshots/mobile-invoice-detail-390.jpg",
+        "docs/integration/95-ui-browser/screenshots/mobile-invoices-390.jpg",
+        "docs/integration/95-ui-browser/screenshots/mobile-loading-390.jpg",
+        "docs/integration/95-ui-browser/screenshots/mobile-overview-error-390.jpg",
+        "docs/integration/95-ui-browser/screenshots/mobile-review-detail-320.jpg",
+        "docs/integration/95-ui-browser/screenshots/mobile-review-retry-390.jpg",
+        "docs/integration/95-ui-browser/screenshots/tablet-empty-invoices-768.jpg",
+        "docs/integration/95-ui-browser/screenshots/tablet-overview-768.jpg",
+        "docs/integration/95-ui-browser/serve-harness.mjs",
+        "docs/integration/95-ui-browser/server.test.mjs",
+        "docs/integration/95-ui-browser/validation-root-bridge.md",
+        "docs/integration/95-ui-browser/validation-sites.json",
+        "docs/integration/95-ui-browser/validation-sites.md",
+        "docs/integration/95-ui-inventory.md",
+        "docs/integration/agent-6-ui-95.md",
+        "docs/superpowers/plans/2026-11-05-ui-95.md",
+        "docs/superpowers/specs/2026-11-05-ui-95-design.md",
+        "sites/app/dashboard.tsx",
+        "sites/app/layout.tsx",
+        "sites/components/bank-connection.tsx",
+        "sites/components/economy-overview.tsx",
+        "sites/components/onboarding/bank-onboarding-views.tsx",
+        "sites/components/onboarding/bank-onboarding.tsx",
+        "sites/components/payment-control.tsx",
+        "sites/components/workspace-navigation.tsx",
+        "sites/styles/bank-connection.css",
+        "sites/styles/workspace-design.css",
+        "sites/tests/bank-connection-ui.test.mjs",
+        "sites/tests/company-picker-ui.test.mjs",
+        "sites/tests/control-review-focus-q8.test.mjs",
+        "sites/tests/dashboard-loading-ui-q8.test.mjs",
+        "sites/tests/payment-control-ui.test.mjs",
+        "sites/tests/workspace-search-final.test.mjs"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md",
+        "CONFLICT (content): Merge conflict in sites/app/dashboard.tsx"
+      ]
+    },
+    {
+      "number": 54,
+      "title": "security: durable login limits, request budgets, audit privacy and recovery guards",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-security",
+      "head_sha": "3db9f01305aa6830a4c2d1cc01970c06b91018c2",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "bfaf3c610cf6b37141beade28c56880c43909211",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/54",
+      "updated_at": "2026-11-05T19:13:21Z",
+      "mergeable": false,
+      "changed_files": 28,
+      "commits": 4,
+      "additions": 3408,
+      "deletions": 21,
+      "observed_workflow_runs": [
+        {
+          "id": 42090903867,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 33,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42090903867/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42090903867/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42090903888,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 252,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42090903888/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42090903888/logs",
+          "workflow_id": 398864112
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/SECURITY-95-REVIEW.md",
+        "docs/security-95/bank-harness-diagnosis.json",
+        "docs/security-95/control-recovery.json",
+        "docs/security-95/dependency-audit.json",
+        "docs/security-95/first-candidate-focused-acceptance.json",
+        "docs/security-95/first-candidate-gates.json",
+        "docs/security-95/focused-acceptance.json",
+        "docs/security-95/gates.json",
+        "docs/security-95/independent-review.md",
+        "docs/security-95/pre-harness-ci.json",
+        "docs/superpowers/plans/2026-11-05-security-95.md",
+        "docs/superpowers/specs/2026-11-05-security-95-design.md",
+        "scripts/run-saas-security-acceptance.mjs",
+        "sites/app/api/state/route.ts",
+        "sites/lib/backup-engine.ts",
+        "sites/lib/server.ts",
+        "sites/tests/backup-integrity-q8.test.mjs",
+        "sites/tests/bank-state-integrity-q8.test.mjs",
+        "sites/tests/banking-security.test.mjs",
+        "sites/tests/company-request.test.mjs",
+        "sites/tests/document-queue-recovery.test.mjs",
+        "sites/tests/security-request-budget.test.mjs",
+        "src/login-rate-limit.js",
+        "src/server.js",
+        "test/saas-security-runner.test.js",
+        "test/security-login-rate-limit.test.js"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md",
+        "CONFLICT (content): Merge conflict in sites/tests/banking-security.test.mjs"
+      ]
+    },
+    {
+      "number": 53,
+      "title": "Fix exact invoice references hidden by decimal amount search",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "fix/95-decimal-reference",
+      "head_sha": "d9ca037a90ef9c9e629f62c4dcbf9cfcdeacb459",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "c399cc80e01bcaddd5a42ce789a8d66fb7684ad8",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/53",
+      "updated_at": "2026-11-05T19:54:25Z",
+      "mergeable": false,
+      "changed_files": 6,
+      "commits": 1,
+      "additions": 57,
+      "deletions": 10,
+      "observed_workflow_runs": [
+        {
+          "id": 42082680202,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 21,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42082680202/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42082680202/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42082680240,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 238,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42082680240/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42082680240/logs",
+          "workflow_id": 398864112
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        "public/workspace-search.js",
+        "sites/lib/workspace-search.js",
+        "sites/tests/workspace-search-final.test.mjs",
+        "src/workspace-search.js",
+        "test/ui-final-node.test.js",
+        "test/workspace-search-quality8.test.js"
+      ],
+      "merge_tree_exit_code": 0,
+      "merge_tree_conflicts": []
+    },
+    {
+      "number": 52,
+      "title": "fix(ocr): tillförlitlig fakturatolkning och återhämtning av dokumentkö",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-ocr",
+      "head_sha": "eb4242f783172ac441f9092f921b04b06dc11771",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": null,
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/52",
+      "updated_at": "2026-11-05T18:40:41Z",
+      "mergeable": false,
+      "changed_files": 35,
+      "commits": 3,
+      "additions": 3812,
+      "deletions": 61,
+      "observed_workflow_runs": [
+        {
+          "id": 42086209181,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 30,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42086209181/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42086209181/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42086208019,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 248,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42086208019/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42086208019/logs",
+          "workflow_id": 398864112
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/95-ocr-reliability.md",
+        "docs/measurements/95-ocr-english-smoke.json",
+        "docs/measurements/95-ocr-extraction-after.json",
+        "docs/measurements/95-ocr-extraction-before.json",
+        "docs/measurements/95-ocr-extraction-main-before.json",
+        "docs/measurements/95-ocr-pre-integration-verification.json",
+        "docs/measurements/95-ocr-production-observations.json",
+        "docs/measurements/95-ocr-verification.json",
+        "docs/superpowers/plans/2026-11-05-95-ocr.md",
+        "scripts/measure-invoice-reliability.mjs",
+        "sites/app/api/gmail/[action]/route.ts",
+        "sites/app/gmail/page.tsx",
+        "sites/components/document-ocr-status.tsx",
+        "sites/components/gmail-workspace.tsx",
+        "sites/lib/document-processing.ts",
+        "sites/lib/gmail-service.ts",
+        "sites/lib/invoice-details.js",
+        "sites/lib/invoice-fields.js",
+        "sites/tests/document-quality-cycle.test.mjs",
+        "sites/tests/document-queue-recovery.test.mjs",
+        "sites/tests/gmail-operational-status-ui.test.mjs",
+        "sites/tests/gmail-preview-q8.test.mjs",
+        "sites/tests/gmail.test.mjs",
+        "sites/tests/invoice-reliability.test.mjs",
+        "src/invoice-details.js",
+        "src/invoice-extraction.js",
+        "src/sites-ocr-pull.js",
+        "test/document-quality-cycle.test.js",
+        "test/helpers/invoice-reliability-cases.mjs",
+        "test/helpers/load-invoice-parsers.mjs",
+        "test/invoice-reliability.test.js",
+        "test/sites-ocr-pull.test.js",
+        "test/sites-ocr-transport-recovery.test.js"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md",
+        "CONFLICT (content): Merge conflict in sites/lib/invoice-details.js",
+        "CONFLICT (content): Merge conflict in sites/lib/invoice-fields.js",
+        "CONFLICT (content): Merge conflict in sites/tests/gmail-preview-q8.test.mjs",
+        "CONFLICT (content): Merge conflict in src/invoice-details.js",
+        "CONFLICT (content): Merge conflict in src/invoice-extraction.js",
+        "CONFLICT (content): Merge conflict in src/sites-ocr-pull.js"
+      ]
+    },
+    {
+      "number": 51,
+      "title": "Agent 5: deterministisk betalningsavstämning med bankbevis",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-reconciliation",
+      "head_sha": "0954777f10da8be9fb15daf3878c539b51801142",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "912eab26957a446cd68168c65e6f76fb8d4a7f41",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/51",
+      "updated_at": "2026-11-05T18:21:50Z",
+      "mergeable": false,
+      "changed_files": 25,
+      "commits": 2,
+      "additions": 2650,
+      "deletions": 20,
+      "observed_workflow_runs": [
+        {
+          "id": 42081949245,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 232,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42081949245/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42081949245/logs",
+          "workflow_id": 398864112
+        },
+        {
+          "id": 42081949246,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 18,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42081949246/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42081949246/logs",
+          "workflow_id": 407356576
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+      "diff_paths_from_merge_base": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/reconciliation-95.md",
+        "docs/integration/reconciliation-95/after.json",
+        "docs/integration/reconciliation-95/before.json",
+        "docs/integration/reconciliation-95/verification.json",
+        "docs/superpowers/plans/2026-11-05-reconciliation-95.md",
+        "docs/superpowers/specs/2026-11-05-reconciliation-95-design.md",
+        "scripts/measure-reconciliation-decisions.mjs",
+        "sites/lib/imports.ts",
+        "sites/lib/reconciliation-decisions.js",
+        "sites/lib/reconciliation-engine.js",
+        "sites/lib/reconciliation-evidence.ts",
+        "sites/lib/reconciliation.ts",
+        "sites/tests/bank-account-consent.test.mjs",
+        "sites/tests/bank-file-provenance.test.mjs",
+        "sites/tests/bank-state-integrity-q8.test.mjs",
+        "sites/tests/reconciliation-batch-integration.test.mjs",
+        "sites/tests/reconciliation-csv-reference.test.mjs",
+        "sites/tests/reconciliation-decisions.test.mjs",
+        "sites/tests/reconciliation-manual-provenance.test.mjs",
+        "src/reconciliation.js",
+        "test/helpers/reconciliation-decisions.mjs",
+        "test/reconciliation-batch-integration.test.js",
+        "test/reconciliation-decisions.test.js"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "number": 50,
+      "title": "SaaS: säkra medgivanden och rätta företagens läsåtkomst",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-saas",
+      "head_sha": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "09e1122f5ca5c17f4f950ec82e2d02db625a358f",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/50",
+      "updated_at": "2026-11-05T18:38:07Z",
+      "mergeable": false,
+      "changed_files": 23,
+      "commits": 4,
+      "additions": 2073,
+      "deletions": 44,
+      "observed_workflow_runs": [
+        {
+          "id": 42085644255,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 29,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085644255/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085644255/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42085643991,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 247,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085643991/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085643991/logs",
+          "workflow_id": 398864112
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/saas/95-SAAS-DELIVERY.md",
+        "docs/saas/API-BOUNDARY-INVENTORY.md",
+        "docs/saas/COMMERCIAL-LAUNCH-REQUIREMENTS.md",
+        "docs/saas/NODE-API-BOUNDARY-INVENTORY.md",
+        "docs/saas/evidence/2026-11-05/95-saas-integration.json",
+        "docs/saas/evidence/2026-11-05/95-saas-verification.json",
+        "docs/superpowers/plans/2026-11-05-commercial-saas-hardening.md",
+        "docs/superpowers/specs/2026-11-05-commercial-saas-hardening-design.md",
+        "sites/components/onboarding/bank-onboarding-views.tsx",
+        "sites/lib/banking/openpayments-lifecycle.js",
+        "sites/lib/banking/openpayments-provider.js",
+        "sites/lib/banking/openpayments/http.js",
+        "sites/lib/banking/saas-bank-runtime.js",
+        "sites/tests/openpayments-lifecycle-recovery.test.mjs",
+        "sites/tests/openpayments-write-ambiguity.test.mjs",
+        "sites/tests/saas-onboarding-views.test.mjs",
+        "src/company-runtime.js",
+        "src/server.js",
+        "test/api.test.js",
+        "test/bank-consent-api.test.js",
+        "test/company-read-api.test.js"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "number": 49,
+      "title": "Agent 9: integration, säkra bankmedgivanden och verifierbar releasebedömning",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-integration",
+      "head_sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": null,
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/49",
+      "updated_at": "2026-11-05T19:56:09Z",
+      "mergeable": false,
+      "changed_files": 198,
+      "commits": 40,
+      "additions": 29746,
+      "deletions": 411,
+      "observed_workflow_runs": [
+        {
+          "id": 42096194807,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 255,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42096194807/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42096194807/logs",
+          "workflow_id": 398864112
+        },
+        {
+          "id": 42096194737,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 36,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42096194737/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42096194737/logs",
+          "workflow_id": 407356576
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        ".github/workflows/payment-control-ci.yml",
+        ".github/workflows/saas-security-acceptance.yml",
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/SECURITY-95-REVIEW.md",
+        "docs/integration/95-ocr-reliability.md",
+        "docs/integration/95/FINAL-REPORT.md",
+        "docs/integration/95/INTEGRATION-MATRIX.md",
+        "docs/integration/95/QUALITY-REASSESSMENT.json",
+        "docs/integration/95/QUALITY-REASSESSMENT.md",
+        "docs/integration/95/RELEASE-GATES.md",
+        "docs/integration/95/REMAINING-TO-95.md",
+        "docs/integration/95/REVIEW-LOG.md",
+        "docs/integration/95/SUPPLEMENTARY-5414.md",
+        "docs/integration/95/TEST-RESULTS.md",
+        "docs/integration/95/evidence/ci-code-0ce2604.json",
+        "docs/integration/95/evidence/criterion-test-bindings.json",
+        "docs/integration/95/evidence/final-local-integration-verification.json",
+        "docs/integration/95/evidence/historical-255-baseline.json",
+        "docs/integration/95/evidence/historical-overlap.json",
+        "docs/integration/95/evidence/independent-code-review.json",
+        "docs/integration/95/evidence/producer-overlap.json",
+        "docs/integration/95/evidence/producer-register.json",
+        "docs/integration/95/evidence/production-readonly-1839.json",
+        "docs/integration/95/evidence/production-readonly.json",
+        "docs/integration/95/evidence/publication-map.json",
+        "docs/integration/95/evidence/supplementary-5414-result.json",
+        "docs/integration/95/reviews/CODE-REVIEW-1918.md",
+        "docs/integration/95/reviews/QA-UPDATE-REVIEW.md",
+        "docs/integration/bank-95/README.md",
+        "docs/integration/bank-95/observed-status.json",
+        "docs/integration/bank-95/verification.json",
+        "docs/integration/bankgiro-95.md",
+        "docs/integration/reconciliation-95.md",
+        "docs/integration/reconciliation-95/after.json",
+        "docs/integration/reconciliation-95/before.json",
+        "docs/integration/reconciliation-95/verification.json",
+        "docs/integration/saas-onboarding-browser/browser-suite.mjs",
+        "docs/integration/saas-onboarding-browser/build-harness.mjs",
+        "docs/measurements/95-ocr-english-smoke.json",
+        "docs/measurements/95-ocr-extraction-after.json",
+        "docs/measurements/95-ocr-extraction-before.json",
+        "docs/measurements/95-ocr-extraction-main-before.json",
+        "docs/measurements/95-ocr-pre-integration-verification.json",
+        "docs/measurements/95-ocr-production-observations.json",
+        "docs/measurements/95-ocr-verification.json",
+        "docs/quality/AGENT-8-REPORT.md",
+        "docs/quality/README.md",
+        "docs/quality/evidence/benchmark-8a083eb.json",
+        "docs/quality/evidence/ci-42083369457.json",
+        "docs/quality/evidence/coverage-8a083eb.json",
+        "docs/quality/evidence/cpu-profile-b24ea08.json",
+        "docs/quality/test-inventory.json",
+        "docs/saas/95-SAAS-DELIVERY.md",
+        "docs/saas/API-BOUNDARY-INVENTORY.md",
+        "docs/saas/COMMERCIAL-LAUNCH-REQUIREMENTS.md",
+        "docs/saas/NODE-API-BOUNDARY-INVENTORY.md",
+        "docs/saas/evidence/2026-11-05/95-saas-integration.json",
+        "docs/saas/evidence/2026-11-05/95-saas-verification.json",
+        "docs/security-95/bank-harness-diagnosis.json",
+        "docs/security-95/control-recovery.json",
+        "docs/security-95/dependency-audit.json",
+        "docs/security-95/first-candidate-focused-acceptance.json",
+        "docs/security-95/first-candidate-gates.json",
+        "docs/security-95/focused-acceptance.json",
+        "docs/security-95/gates.json",
+        "docs/security-95/independent-review.md",
+        "docs/security-95/pre-harness-ci.json",
+        "docs/superpowers/plans/2026-11-05-95-integration.md",
+        "docs/superpowers/plans/2026-11-05-95-ocr.md",
+        "docs/superpowers/plans/2026-11-05-bankgiro-95.md",
+        "docs/superpowers/plans/2026-11-05-commercial-saas-hardening.md",
+        "docs/superpowers/plans/2026-11-05-quality-ci-performance.md",
+        "docs/superpowers/plans/2026-11-05-real-bank-connection.md",
+        "docs/superpowers/plans/2026-11-05-reconciliation-95.md",
+        "docs/superpowers/plans/2026-11-05-security-95.md",
+        "docs/superpowers/specs/2026-11-05-bankgiro-95-design.md",
+        "docs/superpowers/specs/2026-11-05-commercial-saas-hardening-design.md",
+        "docs/superpowers/specs/2026-11-05-reconciliation-95-design.md",
+        "docs/superpowers/specs/2026-11-05-security-95-design.md",
+        "package.json",
+        "public/workspace-search.js",
+        "qa/browser/package-lock.json",
+        "qa/browser/package.json",
+        "scripts/check.mjs",
+        "scripts/measure-invoice-reliability.mjs",
+        "scripts/measure-reconciliation-decisions.mjs",
+        "scripts/quality/benchmark-companies.mjs",
+        "scripts/quality/browser.mjs",
+        "scripts/quality/core.mjs",
+        "scripts/quality/run.mjs",
+        "scripts/quality/workspace-browser.mjs",
+        "scripts/run-saas-security-acceptance.mjs",
+        "sites/app/api/gmail/[action]/route.ts",
+        "sites/app/api/state/route.ts",
+        "sites/app/gmail/page.tsx",
+        "sites/components/document-ocr-status.tsx",
+        "sites/components/gmail-workspace.tsx",
+        "sites/components/onboarding/bank-onboarding-views.tsx",
+        "sites/lib/backup-engine.ts",
+        "sites/lib/bank-consent-policy.d.ts",
+        "sites/lib/bank-consent-policy.js",
+        "sites/lib/bankgiro-openpayments.d.ts",
+        "sites/lib/bankgiro-openpayments.js",
+        "sites/lib/banking/account-read-guard.ts",
+        "sites/lib/banking/bank-data-provider.js",
+        "sites/lib/banking/details-service.ts",
+        "sites/lib/banking/enable-banking.ts",
+        "sites/lib/banking/mcp.ts",
+        "sites/lib/banking/openpayments-lifecycle.js",
+        "sites/lib/banking/openpayments-provider.js",
+        "sites/lib/banking/openpayments/http.js",
+        "sites/lib/banking/runtime-config.ts",
+        "sites/lib/banking/saas-bank-runtime.js",
+        "sites/lib/banking/service.ts",
+        "sites/lib/banking/store.ts",
+        "sites/lib/document-processing.ts",
+        "sites/lib/evidence-read.ts",
+        "sites/lib/gmail-service.ts",
+        "sites/lib/imports.ts",
+        "sites/lib/invoice-details.js",
+        "sites/lib/invoice-fields.js",
+        "sites/lib/payment-verification.ts",
+        "sites/lib/reconciliation-decisions.js",
+        "sites/lib/reconciliation-engine.js",
+        "sites/lib/reconciliation-evidence.ts",
+        "sites/lib/reconciliation.ts",
+        "sites/lib/server.ts",
+        "sites/lib/workspace-search.js",
+        "sites/tests/backup-integrity-q8.test.mjs",
+        "sites/tests/bank-account-consent.test.mjs",
+        "sites/tests/bank-diagnostics-95.test.mjs",
+        "sites/tests/bank-file-provenance.test.mjs",
+        "sites/tests/bank-state-integrity-q8.test.mjs",
+        "sites/tests/bank-transport-95.test.mjs",
+        "sites/tests/banking-security.test.mjs",
+        "sites/tests/company-request.test.mjs",
+        "sites/tests/document-quality-cycle.test.mjs",
+        "sites/tests/document-queue-recovery.test.mjs",
+        "sites/tests/gmail-operational-status-ui.test.mjs",
+        "sites/tests/gmail-preview-q8.test.mjs",
+        "sites/tests/gmail.test.mjs",
+        "sites/tests/helpers/evidence-read-fixture.mjs",
+        "sites/tests/invoice-reliability.test.mjs",
+        "sites/tests/mcp-evidence-read.test.mjs",
+        "sites/tests/mcp-report-provenance.test.mjs",
+        "sites/tests/minimatch-backport-final.test.mjs",
+        "sites/tests/openpayments-account-access-95.test.mjs",
+        "sites/tests/openpayments-document-numbers.test.mjs",
+        "sites/tests/openpayments-lifecycle-recovery.test.mjs",
+        "sites/tests/openpayments-mutation-95.test.mjs",
+        "sites/tests/openpayments-write-ambiguity.test.mjs",
+        "sites/tests/payment-verification.test.mjs",
+        "sites/tests/quality-regressions-ocr-recovery.test.mjs",
+        "sites/tests/reconciliation-batch-integration.test.mjs",
+        "sites/tests/reconciliation-csv-reference.test.mjs",
+        "sites/tests/reconciliation-decisions.test.mjs",
+        "sites/tests/reconciliation-manual-provenance.test.mjs",
+        "sites/tests/saas-onboarding-views.test.mjs",
+        "sites/tests/security-request-budget.test.mjs",
+        "sites/tests/workspace-search-final.test.mjs",
+        "src/bank-consent.js",
+        "src/bank.js",
+        "src/company-runtime.js",
+        "src/db.js",
+        "src/invoice-details.js",
+        "src/invoice-extraction.js",
+        "src/login-rate-limit.js",
+        "src/reconciliation.js",
+        "src/server.js",
+        "src/sites-ocr-pull.js",
+        "src/workspace-search.js",
+        "test/api.test.js",
+        "test/bank-consent-api.test.js",
+        "test/bank-transport-95.test.js",
+        "test/company-read-api.test.js",
+        "test/consent-reconnect-95.test.js",
+        "test/document-quality-cycle.test.js",
+        "test/helpers/invoice-reliability-cases.mjs",
+        "test/helpers/load-invoice-parsers.mjs",
+        "test/helpers/quality-regressions-server.mjs",
+        "test/helpers/reconciliation-decisions.mjs",
+        "test/invoice-reliability.test.js",
+        "test/payment-concurrency.test.js",
+        "test/quality-benchmark.test.js",
+        "test/quality-regressions-contracts.test.js",
+        "test/quality-regressions-migration-replay.test.js",
+        "test/quality-regressions-recovery-api.test.js",
+        "test/quality-runner.test.js",
+        "test/quality-syntax.test.js",
+        "test/reconciliation-batch-integration.test.js",
+        "test/reconciliation-decisions.test.js",
+        "test/saas-security-runner.test.js",
+        "test/security-login-rate-limit.test.js",
+        "test/sites-ocr-pull.test.js",
+        "test/sites-ocr-transport-recovery.test.js",
+        "test/ui-final-node.test.js",
+        "test/workspace-search-quality8.test.js"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md",
+        "CONFLICT (content): Merge conflict in sites/lib/bank-consent-policy.d.ts",
+        "CONFLICT (content): Merge conflict in sites/lib/bank-consent-policy.js",
+        "CONFLICT (content): Merge conflict in sites/lib/banking/service.ts",
+        "CONFLICT (content): Merge conflict in sites/lib/invoice-details.js",
+        "CONFLICT (content): Merge conflict in sites/lib/invoice-fields.js",
+        "CONFLICT (content): Merge conflict in sites/tests/banking-security.test.mjs",
+        "CONFLICT (content): Merge conflict in sites/tests/gmail-preview-q8.test.mjs",
+        "CONFLICT (content): Merge conflict in src/db.js",
+        "CONFLICT (content): Merge conflict in src/invoice-details.js",
+        "CONFLICT (content): Merge conflict in src/invoice-extraction.js",
+        "CONFLICT (content): Merge conflict in src/sites-ocr-pull.js",
+        "CONFLICT (content): Merge conflict in test/payment-concurrency.test.js"
+      ]
+    },
+    {
+      "number": 48,
+      "title": "Improve operational recovery, document extraction and search safety",
+      "state": "closed",
+      "merged_at": "2026-11-05T18:06:11Z",
+      "closed_at": "2026-11-05T18:06:11Z",
+      "draft": false,
+      "head": "codex/rating8-reliability-20261105",
+      "head_sha": "e42b05a8b78e77a3210be00da0b0231454a29233",
+      "base": "main",
+      "base_sha": "4ad205b84d1852ec7ed33cabd70fdadbe2f9d5c5",
+      "merge_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/48",
+      "updated_at": "2026-11-05T18:06:11Z",
+      "head_ancestor_of_main": true,
+      "head_ancestor_of_pr49": true
+    },
+    {
+      "number": 47,
+      "title": "Agent 8: reproducerbar QA, CI-kvitton och syntetisk prestanda",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-quality",
+      "head_sha": "875876ae539f5ecba1fc39d4c213197806e245ce",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "fed994a0f933f047620509343c394b3924b31c50",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/47",
+      "updated_at": "2026-11-05T19:04:34Z",
+      "mergeable": false,
+      "changed_files": 34,
+      "commits": 4,
+      "additions": 7056,
+      "deletions": 85,
+      "observed_workflow_runs": [
+        {
+          "id": 42088065637,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 31,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42088065637/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42088065637/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42088065668,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 250,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42088065668/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42088065668/logs",
+          "workflow_id": 398864112
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        ".github/workflows/payment-control-ci.yml",
+        ".github/workflows/saas-security-acceptance.yml",
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/saas-onboarding-browser/browser-suite.mjs",
+        "docs/integration/saas-onboarding-browser/build-harness.mjs",
+        "docs/quality/AGENT-8-REPORT.md",
+        "docs/quality/README.md",
+        "docs/quality/evidence/benchmark-8a083eb.json",
+        "docs/quality/evidence/ci-42083369457.json",
+        "docs/quality/evidence/coverage-8a083eb.json",
+        "docs/quality/evidence/cpu-profile-b24ea08.json",
+        "docs/quality/test-inventory.json",
+        "docs/superpowers/plans/2026-11-05-quality-ci-performance.md",
+        "package.json",
+        "qa/browser/package-lock.json",
+        "qa/browser/package.json",
+        "scripts/check.mjs",
+        "scripts/quality/benchmark-companies.mjs",
+        "scripts/quality/browser.mjs",
+        "scripts/quality/core.mjs",
+        "scripts/quality/run.mjs",
+        "scripts/quality/workspace-browser.mjs",
+        "sites/tests/minimatch-backport-final.test.mjs",
+        "sites/tests/quality-regressions-ocr-recovery.test.mjs",
+        "src/db.js",
+        "test/helpers/quality-regressions-server.mjs",
+        "test/payment-concurrency.test.js",
+        "test/quality-benchmark.test.js",
+        "test/quality-regressions-contracts.test.js",
+        "test/quality-regressions-migration-replay.test.js",
+        "test/quality-regressions-recovery-api.test.js",
+        "test/quality-runner.test.js",
+        "test/quality-syntax.test.js"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in src/db.js",
+        "CONFLICT (content): Merge conflict in test/payment-concurrency.test.js"
+      ]
+    },
+    {
+      "number": 46,
+      "title": "Bankgiro: verifierad referensstatus och spårbar originalhistorik",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-bankgiro",
+      "head_sha": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "6afd78acbf609190a9d49b10e3434583fc6a3c61",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/46",
+      "updated_at": "2026-11-05T19:54:24Z",
+      "mergeable": false,
+      "changed_files": 15,
+      "commits": 4,
+      "additions": 653,
+      "deletions": 59,
+      "observed_workflow_runs": [
+        {
+          "id": 42095491161,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 254,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42095491161/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42095491161/logs",
+          "workflow_id": 398864112
+        },
+        {
+          "id": 42095490880,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 35,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42095490880/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42095490880/logs",
+          "workflow_id": 407356576
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/bankgiro-95.md",
+        "docs/superpowers/plans/2026-11-05-bankgiro-95.md",
+        "docs/superpowers/specs/2026-11-05-bankgiro-95-design.md",
+        "sites/lib/bankgiro-openpayments.d.ts",
+        "sites/lib/bankgiro-openpayments.js",
+        "sites/lib/banking/mcp.ts",
+        "sites/lib/evidence-read.ts",
+        "sites/lib/payment-verification.ts",
+        "sites/tests/helpers/evidence-read-fixture.mjs",
+        "sites/tests/mcp-evidence-read.test.mjs",
+        "sites/tests/mcp-report-provenance.test.mjs",
+        "sites/tests/openpayments-document-numbers.test.mjs",
+        "sites/tests/payment-verification.test.mjs"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "number": 45,
+      "title": "Harden real bank reconnection, consent diagnostics and provider transport",
+      "state": "open",
+      "merged_at": null,
+      "closed_at": null,
+      "draft": false,
+      "head": "feature/95-bank",
+      "head_sha": "ac1abdc5469248eba212496af4a4573864908ace",
+      "base": "main",
+      "base_sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "merge_sha": "be8f63c754f6ba927aa4c0450868994925173719",
+      "url": "https://github.com/sharbel0022/Mgeorge/pull/45",
+      "updated_at": "2026-11-05T18:45:28Z",
+      "mergeable": false,
+      "changed_files": 27,
+      "commits": 6,
+      "additions": 1813,
+      "deletions": 114,
+      "observed_workflow_runs": [
+        {
+          "id": 42085542413,
+          "name": "SaaS security acceptance",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 28,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085542413/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085542413/logs",
+          "workflow_id": 407356576
+        },
+        {
+          "id": 42085542333,
+          "name": "Payment control checks",
+          "status": "completed",
+          "conclusion": "success",
+          "run_number": 246,
+          "jobs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085542333/jobs",
+          "logs_url": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42085542333/logs",
+          "workflow_id": 398864112
+        }
+      ],
+      "observed_statuses": {
+        "statuses": []
+      },
+      "head_ancestor_of_main": false,
+      "head_ancestor_of_pr49": true,
+      "merge_base_with_main": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "diff_paths_from_merge_base": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "docs/integration/bank-95/README.md",
+        "docs/integration/bank-95/observed-status.json",
+        "docs/integration/bank-95/verification.json",
+        "docs/superpowers/plans/2026-11-05-real-bank-connection.md",
+        "sites/lib/bank-consent-policy.d.ts",
+        "sites/lib/bank-consent-policy.js",
+        "sites/lib/banking/account-read-guard.ts",
+        "sites/lib/banking/bank-data-provider.js",
+        "sites/lib/banking/details-service.ts",
+        "sites/lib/banking/enable-banking.ts",
+        "sites/lib/banking/openpayments-provider.js",
+        "sites/lib/banking/openpayments/http.js",
+        "sites/lib/banking/runtime-config.ts",
+        "sites/lib/banking/service.ts",
+        "sites/lib/banking/store.ts",
+        "sites/tests/bank-diagnostics-95.test.mjs",
+        "sites/tests/bank-transport-95.test.mjs",
+        "sites/tests/banking-security.test.mjs",
+        "sites/tests/openpayments-account-access-95.test.mjs",
+        "sites/tests/openpayments-mutation-95.test.mjs",
+        "src/bank-consent.js",
+        "src/bank.js",
+        "src/server.js",
+        "test/bank-transport-95.test.js",
+        "test/consent-reconnect-95.test.js"
+      ],
+      "merge_tree_exit_code": 1,
+      "merge_tree_conflicts": [
+        "CONFLICT (content): Merge conflict in PROGRESS.md",
+        "CONFLICT (content): Merge conflict in QUALITY-SCORECARD.md",
+        "CONFLICT (content): Merge conflict in sites/lib/bank-consent-policy.d.ts",
+        "CONFLICT (content): Merge conflict in sites/lib/bank-consent-policy.js",
+        "CONFLICT (content): Merge conflict in sites/lib/banking/service.ts",
+        "CONFLICT (content): Merge conflict in sites/tests/banking-security.test.mjs"
+      ]
+    }
+  ],
+  "main_runs": [
+    {
+      "id": 42204787537,
+      "name": "Sites cloud OCR",
+      "sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "branch": "main",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T10:43:05Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42204787537"
+    },
+    {
+      "id": 42178783601,
+      "name": "Sites cloud OCR",
+      "sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "branch": "main",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T07:07:21Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42178783601"
+    },
+    {
+      "id": 42177971213,
+      "name": "Payment control checks",
+      "sha": "cde9178c0f8e8e386329ed8feaa4201e87b5a78f",
+      "branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T07:00:03Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213"
+    },
+    {
+      "id": 42165382962,
+      "name": "Sites cloud OCR",
+      "sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "branch": "main",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-11-06T04:55:58Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42165382962"
+    },
+    {
+      "id": 42164894222,
+      "name": "Payment control checks",
+      "sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-06T04:50:51Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42164894222"
+    },
+    {
+      "id": 42159152074,
+      "name": "Sites cloud OCR",
+      "sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "branch": "main",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T03:52:42Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42159152074"
+    },
+    {
+      "id": 42158636715,
+      "name": "Payment control checks",
+      "sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T03:47:22Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42158636715"
+    },
+    {
+      "id": 42153093698,
+      "name": "Sites cloud OCR",
+      "sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "branch": "main",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-06T02:52:50Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42153093698"
+    },
+    {
+      "id": 42132076896,
+      "name": "Sites cloud OCR",
+      "sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "branch": "main",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T23:47:38Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42132076896"
+    },
+    {
+      "id": 42131115405,
+      "name": "Payment control checks",
+      "sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+      "branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T23:39:59Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42131115405"
+    },
+    {
+      "id": 42124413524,
+      "name": "Sites cloud OCR",
+      "sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+      "branch": "main",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T22:47:16Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42124413524"
+    },
+    {
+      "id": 42123382389,
+      "name": "Payment control checks",
+      "sha": "819adee2f3848b474167eb6b15f82584caeb39af",
+      "branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T22:39:51Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42123382389"
+    },
+    {
+      "id": 42083409804,
+      "name": "Sites cloud OCR",
+      "sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "branch": "main",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T18:21:17Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42083409804"
+    },
+    {
+      "id": 42081905168,
+      "name": "Sites cloud OCR",
+      "sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "branch": "main",
+      "event": "workflow_run",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T18:11:54Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42081905168"
+    },
+    {
+      "id": 42081012356,
+      "name": "Payment control checks",
+      "sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "branch": "main",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-11-05T18:06:13Z",
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42081012356"
+    }
+  ],
+  "releases": [],
+  "rulesets": [],
+  "ci_evidence": [
+    {
+      "run_id": 42177971213,
+      "job_id": 127760756176,
+      "name": "bankgiro_bridge",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install isolated SFTP bridge",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Check isolated bridge syntax",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Audit isolated bridge production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-06T07:00:12.3827061Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-06T07:00:12.3854013Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+      ],
+      "test_evidence": [
+        "2026-11-06T07:00:21.2054181Z # tests 47",
+        "2026-11-06T07:00:21.2069282Z # suites 0",
+        "2026-11-06T07:00:21.2069628Z # pass 47",
+        "2026-11-06T07:00:21.2070313Z # fail 0",
+        "2026-11-06T07:00:21.2070552Z # cancelled 0",
+        "2026-11-06T07:00:21.2070802Z # skipped 0",
+        "2026-11-06T07:00:21.2071040Z # todo 0",
+        "2026-11-06T07:00:21.2071292Z # duration_ms 5534.793138"
+      ],
+      "runner_evidence": [],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756176"
+    },
+    {
+      "run_id": 42177971213,
+      "job_id": 127760756473,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run npm ci --ignore-scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Audit production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-06T07:00:14.7227150Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-06T07:00:14.7253854Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+      ],
+      "test_evidence": [
+        "2026-11-06T07:03:45.1430976Z # tests 2323",
+        "2026-11-06T07:03:45.1431331Z # suites 0",
+        "2026-11-06T07:03:45.1431694Z # pass 2323",
+        "2026-11-06T07:03:45.1432060Z # fail 0",
+        "2026-11-06T07:03:45.1432435Z # cancelled 0",
+        "2026-11-06T07:03:45.1432824Z # skipped 0",
+        "2026-11-06T07:03:45.1433190Z # todo 0",
+        "2026-11-06T07:03:45.1433622Z # duration_ms 200317.13137"
+      ],
+      "runner_evidence": [],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756473"
+    },
+    {
+      "run_id": 42177971213,
+      "job_id": 127760756672,
+      "name": "sites",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run npm run install:ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify exact installed minimatch mitigation bytes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Install shared OCR runtime for cloud integration test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Audit Sites production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Install isolated bridge for full synthetic SFTP chain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Run Sites tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Run npm run build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-06T07:00:12.7030856Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-06T07:00:12.7054871Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+      ],
+      "test_evidence": [
+        "2026-11-06T07:06:59.2067381Z # tests 5237",
+        "2026-11-06T07:06:59.2067611Z # suites 0",
+        "2026-11-06T07:06:59.2067815Z # pass 5237",
+        "2026-11-06T07:06:59.2068016Z # fail 0",
+        "2026-11-06T07:06:59.2068220Z # cancelled 0",
+        "2026-11-06T07:06:59.2068428Z # skipped 0",
+        "2026-11-06T07:06:59.2068646Z # todo 0",
+        "2026-11-06T07:06:59.2068881Z # duration_ms 338624.916659"
+      ],
+      "runner_evidence": [],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42177971213/job/127760756672"
+    },
+    {
+      "run_id": 42204787537,
+      "job_id": 127848589417,
+      "name": "ocr",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verify reviewed main before dependency installation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install locked OCR dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Recheck current main before OCR credential use",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Process at most six leased documents",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-06T10:43:12.9907431Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-06T10:43:12.9932515Z cde9178c0f8e8e386329ed8feaa4201e87b5a78f"
+      ],
+      "test_evidence": [
+        "2026-11-06T10:44:46.2805382Z {\"status\":\"complete\",\"processed\":6,\"failed\":0}"
+      ],
+      "runner_evidence": [],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42204787537/job/127848589417"
+    },
+    {
+      "run_id": 42096194807,
+      "job_id": 127486729533,
+      "name": "Node 22.23.4",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T19:41:00.4692988Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T19:41:00.4725925Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+      ],
+      "test_evidence": [],
+      "runner_evidence": [
+        "2026-11-05T19:41:03.6186301Z [quality:node] install-node",
+        "2026-11-05T19:41:05.1739147Z [quality:node] install-node: PASS (1.55 s)",
+        "2026-11-05T19:41:05.1739709Z [quality:node] syntax",
+        "2026-11-05T19:41:10.1619009Z [quality:node] syntax: PASS (4.99 s)",
+        "2026-11-05T19:41:10.1626361Z [quality:node] audit-production",
+        "2026-11-05T19:41:10.5425020Z [quality:node] audit-production: PASS (0.38 s)",
+        "2026-11-05T19:41:10.5433627Z [quality:node] audit-all",
+        "2026-11-05T19:41:10.8743813Z [quality:node] audit-all: PASS (0.33 s)",
+        "2026-11-05T19:41:10.8750518Z [quality:node] node-tests: running complete suite with TAP/JUnit/LCOV",
+        "2026-11-05T19:45:20.4783721Z [quality:node] node-tests: PASS {\"tests\":2152,\"pass\":2152,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+        "2026-11-05T19:45:20.5611329Z [quality:node] PASSED: /home/runner/work/_temp/quality-node/receipt.json"
+      ],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486729533"
+    },
+    {
+      "run_id": 42096194807,
+      "job_id": 127486729909,
+      "name": "Bankgiro SFTP integration",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Locked install, syntax, audits and synthetic SSH SFTP HTTP recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain bridge receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T19:41:00.5997107Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T19:41:00.6021791Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+      ],
+      "test_evidence": [],
+      "runner_evidence": [
+        "2026-11-05T19:41:06.9916725Z [quality:bridge] install-bridge",
+        "2026-11-05T19:41:07.4713898Z [quality:bridge] install-bridge: PASS (0.48 s)",
+        "2026-11-05T19:41:07.4714529Z [quality:bridge] syntax",
+        "2026-11-05T19:41:07.7076652Z [quality:bridge] syntax: PASS (0.24 s)",
+        "2026-11-05T19:41:07.7077544Z [quality:bridge] audit-production",
+        "2026-11-05T19:41:08.0575813Z [quality:bridge] audit-production: PASS (0.35 s)",
+        "2026-11-05T19:41:08.0584659Z [quality:bridge] audit-all",
+        "2026-11-05T19:41:08.4034130Z [quality:bridge] audit-all: PASS (0.34 s)",
+        "2026-11-05T19:41:08.4040254Z [quality:bridge] bridge-tests: running complete suite with TAP/JUnit/LCOV",
+        "2026-11-05T19:41:14.2062052Z [quality:bridge] bridge-tests: PASS {\"tests\":47,\"pass\":47,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+        "2026-11-05T19:41:14.2926876Z [quality:bridge] PASSED: /home/runner/work/_temp/quality-bridge/receipt.json"
+      ],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486729909"
+    },
+    {
+      "run_id": 42096194807,
+      "job_id": 127486729912,
+      "name": "Node 24.22.1",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Locked install, syntax, audits and complete synthetic suite with coverage",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain Node receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T19:41:00.6441788Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T19:41:00.6475630Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+      ],
+      "test_evidence": [],
+      "runner_evidence": [
+        "2026-11-05T19:41:08.3608400Z [quality:node] install-node",
+        "2026-11-05T19:41:09.4561169Z [quality:node] install-node: PASS (1.09 s)",
+        "2026-11-05T19:41:09.4570382Z [quality:node] syntax",
+        "2026-11-05T19:41:14.3059028Z [quality:node] syntax: PASS (4.85 s)",
+        "2026-11-05T19:41:14.3069702Z [quality:node] audit-production",
+        "2026-11-05T19:41:14.6286257Z [quality:node] audit-production: PASS (0.32 s)",
+        "2026-11-05T19:41:14.6295338Z [quality:node] audit-all",
+        "2026-11-05T19:41:14.9417895Z [quality:node] audit-all: PASS (0.31 s)",
+        "2026-11-05T19:41:14.9424147Z [quality:node] node-tests: running complete suite with TAP/JUnit/LCOV",
+        "2026-11-05T19:44:13.3067102Z [quality:node] node-tests: PASS {\"tests\":2152,\"pass\":2152,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+        "2026-11-05T19:44:13.3907961Z [quality:node] PASSED: /home/runner/work/_temp/quality-node/receipt.json"
+      ],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486729912"
+    },
+    {
+      "run_id": 42096194807,
+      "job_id": 127486730128,
+      "name": "Sites types, tests and production build",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verified installs, types, audits, complete synthetic suite and production build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain Sites receipts, failure logs, JUnit and LCOV",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T19:41:01.1811591Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T19:41:01.1836122Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+      ],
+      "test_evidence": [],
+      "runner_evidence": [
+        "2026-11-05T19:41:11.2985955Z [quality:sites] install-node",
+        "2026-11-05T19:41:12.5670877Z [quality:sites] install-node: PASS (1.27 s)",
+        "2026-11-05T19:41:12.5671826Z [quality:sites] install-sites",
+        "2026-11-05T19:41:28.8897437Z [quality:sites] install-sites: PASS (16.32 s)",
+        "2026-11-05T19:41:28.8898192Z [quality:sites] install-bridge",
+        "2026-11-05T19:41:29.2581595Z [quality:sites] install-bridge: PASS (0.37 s)",
+        "2026-11-05T19:41:29.2582160Z [quality:sites] minimatch-mitigation",
+        "2026-11-05T19:41:29.4744923Z [quality:sites] minimatch-mitigation: PASS (0.22 s)",
+        "2026-11-05T19:41:29.4745409Z [quality:sites] typecheck",
+        "2026-11-05T19:41:40.1252587Z [quality:sites] typecheck: PASS (10.65 s)",
+        "2026-11-05T19:41:40.1253375Z [quality:sites] audit-production",
+        "2026-11-05T19:41:40.6664611Z [quality:sites] audit-production: PASS (0.54 s)",
+        "2026-11-05T19:41:40.6672562Z [quality:sites] audit-all",
+        "2026-11-05T19:41:42.3782015Z [quality:sites] audit-all: PASS (1.71 s)",
+        "2026-11-05T19:41:42.3788297Z [quality:sites] sites-tests: running complete suite with TAP/JUnit/LCOV",
+        "2026-11-05T19:50:29.3714155Z [quality:sites] sites-tests: PASS {\"tests\":4128,\"pass\":4128,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+        "2026-11-05T19:50:29.3715917Z [quality:sites] production-build",
+        "2026-11-05T19:50:44.2369593Z [quality:sites] production-build: PASS (14.86 s)",
+        "2026-11-05T19:50:44.3243770Z [quality:sites] PASSED: /home/runner/work/_temp/quality-sites/receipt.json"
+      ],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486730128"
+    },
+    {
+      "run_id": 42096194807,
+      "job_id": 127486730221,
+      "name": "Chromium synthetic onboarding acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install locked browser tooling and run all synthetic UI scenarios",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain browser results, screenshots and source manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T19:41:01.3325949Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T19:41:01.3366236Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+      ],
+      "test_evidence": [],
+      "runner_evidence": [
+        "2026-11-05T19:41:12.0784268Z [quality:browser] install-sites",
+        "2026-11-05T19:41:31.5346380Z [quality:browser] install-sites: PASS (19.45 s)",
+        "2026-11-05T19:41:31.5346881Z [quality:browser] install-browser-tooling",
+        "2026-11-05T19:41:31.9917942Z [quality:browser] install-browser-tooling: PASS (0.46 s)",
+        "2026-11-05T19:41:31.9918774Z [quality:browser] install-chromium",
+        "2026-11-05T19:41:55.7428731Z [quality:browser] install-chromium: PASS (23.75 s)",
+        "2026-11-05T19:41:55.7429607Z [quality:browser] audit-all",
+        "2026-11-05T19:41:56.2486484Z [quality:browser] audit-all: PASS (0.50 s)",
+        "2026-11-05T19:41:56.2494730Z [quality:browser] browser-acceptance",
+        "2026-11-05T19:42:11.9720931Z [quality:browser] browser-acceptance: PASS (15.72 s)",
+        "2026-11-05T19:42:12.0747947Z [quality:browser] PASSED: /home/runner/work/_temp/quality-browser/receipt.json"
+      ],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486730221"
+    },
+    {
+      "run_id": 42096194807,
+      "job_id": 127486730225,
+      "name": "Synthetic 1, 10 and 100 company performance",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Measure real SQLite work with synthetic companies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Retain workload, correctness and latency evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T19:41:00.7321300Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T19:41:00.7358535Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+      ],
+      "test_evidence": [],
+      "runner_evidence": [
+        "2026-11-05T19:41:08.7476678Z [quality:performance] install-node",
+        "2026-11-05T19:41:09.8215120Z [quality:performance] install-node: PASS (1.07 s)",
+        "2026-11-05T19:41:09.8215881Z [quality:performance] company-benchmark",
+        "2026-11-05T19:42:07.3310051Z [quality:performance] company-benchmark: PASS (57.51 s)",
+        "2026-11-05T19:42:07.4156667Z [quality:performance] PASSED: /home/runner/work/_temp/quality-performance/receipt.json"
+      ],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194807/job/127486730225"
+    },
+    {
+      "run_id": 42096194737,
+      "job_id": 127486729392,
+      "name": "security_acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install locked dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install verified Sites dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Exercise synthetic authorization, isolation and recovery boundaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Retain synthetic acceptance evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T19:40:59.6515484Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T19:40:59.6547278Z 7c13b47789d3a02c26adafbc7909ee30e25b7a5c"
+      ],
+      "test_evidence": [],
+      "runner_evidence": [
+        "2026-11-05T19:41:53.1467629Z node-security: PASS {\"tests\":332,\"pass\":332,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}",
+        "2026-11-05T19:42:47.5307857Z sites-security: PASS {\"tests\":843,\"pass\":843,\"fail\":0,\"cancelled\":0,\"skipped\":0,\"todo\":0}"
+      ],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42096194737/job/127486729392"
+    },
+    {
+      "run_id": 42119034842,
+      "job_id": 127566243054,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run npm ci --ignore-scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Audit production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T22:09:32.4143849Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T22:09:32.4167413Z 7f593c00c22b41f8ed67d08af561306d0f93f770"
+      ],
+      "test_evidence": [
+        "2026-11-05T22:11:45.2971424Z # tests 1997",
+        "2026-11-05T22:11:45.2971586Z # suites 0",
+        "2026-11-05T22:11:45.2971709Z # pass 1997",
+        "2026-11-05T22:11:45.2971828Z # fail 0",
+        "2026-11-05T22:11:45.2971939Z # cancelled 0",
+        "2026-11-05T22:11:45.2972055Z # skipped 0",
+        "2026-11-05T22:11:45.2972170Z # todo 0",
+        "2026-11-05T22:11:45.2972291Z # duration_ms 125993.262081"
+      ],
+      "runner_evidence": [],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42119034842/job/127566243054"
+    },
+    {
+      "run_id": 42119034842,
+      "job_id": 127566243670,
+      "name": "sites",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run npm run install:ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify exact installed minimatch mitigation bytes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Install shared OCR runtime for cloud integration test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Audit Sites production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Install isolated bridge for full synthetic SFTP chain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Run Sites tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Run npm run build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 22
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 23
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T22:09:34.2398191Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T22:09:34.2420414Z 7f593c00c22b41f8ed67d08af561306d0f93f770"
+      ],
+      "test_evidence": [
+        "2026-11-05T22:14:39.9767674Z # tests 3888",
+        "2026-11-05T22:14:39.9767931Z # suites 0",
+        "2026-11-05T22:14:39.9768180Z # pass 3888",
+        "2026-11-05T22:14:39.9768422Z # fail 0",
+        "2026-11-05T22:14:39.9768662Z # cancelled 0",
+        "2026-11-05T22:14:39.9768909Z # skipped 0",
+        "2026-11-05T22:14:39.9769154Z # todo 0",
+        "2026-11-05T22:14:39.9769428Z # duration_ms 244401.023196"
+      ],
+      "runner_evidence": [],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42119034842/job/127566243670"
+    },
+    {
+      "run_id": 42119034842,
+      "job_id": 127566243723,
+      "name": "bankgiro_bridge",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Install isolated SFTP bridge",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Check isolated bridge syntax",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Audit isolated bridge production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        }
+      ],
+      "checkout_evidence": [
+        "2026-11-05T22:09:33.6562932Z [command]/usr/bin/git log -1 --format=%H",
+        "2026-11-05T22:09:33.6588199Z 7f593c00c22b41f8ed67d08af561306d0f93f770"
+      ],
+      "test_evidence": [
+        "2026-11-05T22:09:43.0545446Z # tests 47",
+        "2026-11-05T22:09:43.0545883Z # suites 0",
+        "2026-11-05T22:09:43.0546466Z # pass 47",
+        "2026-11-05T22:09:43.0547282Z # fail 0",
+        "2026-11-05T22:09:43.0548070Z # cancelled 0",
+        "2026-11-05T22:09:43.0548417Z # skipped 0",
+        "2026-11-05T22:09:43.0550732Z # todo 0",
+        "2026-11-05T22:09:43.0551113Z # duration_ms 5787.035999"
+      ],
+      "runner_evidence": [],
+      "url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42119034842/job/127566243723"
+    }
+  ],
+  "documented_quality_baseline": {
+    "schema": "mgeorge-quality8-current-assessment-v1",
+    "assessed_at": "2026-11-06T06:21:26Z",
+    "published_site_version": 66,
+    "published_main": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "status": "current_evidence_assessment_goal_not_yet_met",
+    "method": "PLAN är oförändrad. Halvpoäng är en konservativ ordinal bedömning, inte en formel av tester. Aktuell bedömning ersätter historiska totalsummor som nuläge; historiken bevaras. 18/19 följer den tidigare oberoende rubric-korrigeringen och verkliga före-/efterbevis. 33 höjs efter separat oberoende läsgranskning av den samlade aktuella driftbevisningen; 28 behåller sitt betyg.",
+    "aggregate": {
+      "sum": 257.5,
+      "maximum": 330,
+      "average": 7.803030303030303,
+      "at_least_8": 28,
+      "area_count": 33,
+      "below_8_ids": [
+        6,
+        10,
+        15,
+        16,
+        28
+      ],
+      "all_33_at_least_8": false
+    },
+    "evidence": [
+      "docs/quality8/PLAN.md",
+      "docs/quality8/assessment-independent-candidate.json",
+      "docs/quality8/payer-reference-live-evidence-reassessment.md",
+      "docs/quality8/release-wave2.json",
+      "docs/quality8/wave2-postpublication-observations.json",
+      "docs/quality8/browser-wave2/publication64/observations.json",
+      "docs/quality8/release-wave3.md",
+      "docs/quality8/wave3-postpublication-observations.json",
+      "docs/quality8/cloud-ocr-schedule-read-diagnosis.md",
+      "docs/quality8/minimal-handling-area6-read-precision.md",
+      "docs/quality8/area28-33-independent-read-review.md",
+      "docs/quality8/area28-33-independent-read-review.json",
+      "docs/quality8/backup-2026-11-06-final-pass/summary.json",
+      "docs/quality8/schedule-runtime-observations-20261106.json",
+      "docs/quality8/ocr-periodic-20261106/README.md",
+      "docs/quality8/release-wave4.json",
+      "docs/quality8/wave4-postpublication-observations.json",
+      "docs/quality8/wave4-main-ci/ci-receipt.json",
+      "docs/quality8/party-boundary-repair/known-ocr-replay-comparison.json",
+      "https://github.com/sharbel0022/Mgeorge/tree/3a2184929aaf65bfa67ac7426cf8045f2cbda8a9/docs/quality8/runtime-interruption-20261106",
+      "https://github.com/sharbel0022/Mgeorge/tree/6848bdc1fdb98c98405caca67fafd2e3a203d752/docs/quality8/remote-recovery-wave5-20261106",
+      "https://github.com/sharbel0022/Mgeorge/tree/93b39c641a542cf8add015b63b253de2926059e5/docs/quality8/pr60-ci-recovery-20261106",
+      "https://github.com/sharbel0022/Mgeorge/tree/819bc206f7c21c0f6f8ce0a490c36fbfb4047579/docs/quality8/startup-independent-review-20261106",
+      "https://github.com/sharbel0022/Mgeorge/tree/d5e9451ceff439ff7ae60799de58e8ff00971eb8/docs/quality8/ocr-analysis-recovery-20261106",
+      "https://github.com/sharbel0022/Mgeorge/tree/5cd67b18792505139234de68533516fc33067ace/docs/quality8/gmail-schedule-0600-20261106",
+      "https://github.com/sharbel0022/Mgeorge/tree/fe7195ae1d6ffeb6ac52c37131c6b062f7c9f24d/docs/quality8/gmail-schedule-diagnostic-20261106"
+    ],
+    "rows": [
+      {
+        "id": 1,
+        "area": "Design",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Läsbara huvudvyer, tydlig informationshierarki och fungerande fel-/tomlägen; visuell kontroll av berörda vyer.",
+        "evidence": "Berörda vyer kontrollerade lokalt och publicerat i separat demo.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "25 geometrier och 3 interaktioner är lokal demoacceptans; ingen fysisk mobil- eller skärmläsarcertifiering.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "browser",
+          "historical_33"
+        ]
+      },
+      {
+        "id": 2,
+        "area": "Startsida",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Sammanfattningar motsvarar källdata; okänd och föråldrad status visas korrekt.",
+        "evidence": "Levererad källpolicy; preliminär översikt och noll verifierat vid saknat underlag observerat.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Lokala syntetiska projektioner är inte en fullständig revision av hela produktionsregistret.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "overview_review",
+          "browser"
+        ]
+      },
+      {
+        "id": 3,
+        "area": "Navigation",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Centrala arbetsflöden kan nås och lämnas med tangentbord och tydliga länkar.",
+        "evidence": "Publicerad sökning→ArrowDown/Enter→Escape återställer sökfokus.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Ett extra Tab-cykelprov avbröts; det räknas inte som godkänt. Ingen grund för att ärva8,5 från äldre rapport.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "search_focus",
+          "browser"
+        ]
+      },
+      {
+        "id": 4,
+        "area": "Mobil",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Berörda huvudflöden fungerar vid 320, 390, 768, 1024 och 1440 px utan blockerande överlapp.",
+        "evidence": "25/25 lokala geometrier vid fem bredder; samma CSS/Sites-träd publicerat.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Iframe-vybredder är riktiga CSS-vybredder, men detta är inte fysisk telefon eller autentiserad produktionsresa. PLAN kräver inte fysisk mobil för 8.",
+        "prior_independent_evidence_refs": [
+          "browser",
+          "browser_receipt",
+          "published_release"
+        ]
+      },
+      {
+        "id": 5,
+        "area": "Sök/filter",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Kombinerade filter, svenska belopp/datum, referenser och tomträffar fungerar på båda implementationerna; relevanta prestandamätningar.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "10k syntetiska poster mäter lokal CPU, inte produktionens nätverk/rendering. Sökning skapar inga ekonomiska kopplingar.",
+        "prior_independent_evidence_refs": [
+          "payments",
+          "payments_followup",
+          "published_release",
+          "browser"
+        ]
+      },
+      {
+        "id": 6,
+        "area": "Minimal manuell hantering",
+        "score": 6.5,
+        "at_least_8": false,
+        "criterion": "Säkra normalfall går igenom den avsedda kön; avvikelser har konkreta granskningsskäl och återupptagning; verklig köprogress observeras.",
+        "evidence": "Site 66: ett ägt normalunderlag återköades en gång genom den vanliga spärrade övergången och väntar på OCR. Två fullständigt lästa registreringsrader är oförändrade; inget nytt registreringskvitto. Ekonomiska läsningar behåller revision 52 och noll nya bokningar.",
+        "remaining_for_8": "Verifiera ett godtagbart normalunderlag genom hela avsedda kedjan, konkret faktisk köprogress och säker återupptagning. Periodicitet bedöms separat i område28.",
+        "scope_and_limitations": "Gmailframgång är inte OCR-/registreringsframgång. Ingen scoreökning enbart av felavstående eller att granskning är säker.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "ocr_v2",
+          "root_handoff"
+        ]
+      },
+      {
+        "id": 7,
+        "area": "Kundfakturor",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Skapa, kontrollera och visa fakturor utan felaktiga betalstatusar eller ägarblandning.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Avser kodflödet och bevarade saldon, inte en ny verksamhetsattest eller kundfaktura skapad som QA.",
+        "prior_independent_evidence_refs": [
+          "historical_33",
+          "saas",
+          "published_release",
+          "overview_review"
+        ]
+      },
+      {
+        "id": 8,
+        "area": "Leverantörsfakturor",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Belopp, datum, motpart och original bevaras med samma gränser och kontroller som kundflödet.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "8 avser bevarande och registerflöde; det betyder inte att V2:s leverantörsnamn eller belopp återfinns automatiskt.",
+        "prior_independent_evidence_refs": [
+          "historical_33",
+          "documents",
+          "saas",
+          "published_release"
+        ]
+      },
+      {
+        "id": 9,
+        "area": "PDF",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Text- och bild-PDF hanteras, sid-/storleksgränser gäller och trasiga dokument stoppas begripligt.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Ingen generell korrekthetsgaranti för bild-PDF eller representativ fälttäckning följer av denna8. Rasterkvaliteten i 10 är underkänd och delas av optiska PDF-flöden.",
+        "prior_independent_evidence_refs": [
+          "documents",
+          "word_confidence",
+          "published_release"
+        ]
+      },
+      {
+        "id": 10,
+        "area": "Bild-OCR",
+        "score": 6.5,
+        "at_least_8": false,
+        "criterion": "Fryst representativ rasterkorpus samt separata hållna fall; minst 85 % återfunna obligatoriska fält och minst 98 % fältprecision, utan felaktigt grönt ekonomiskt kritiskt fall. Redovisa även dokumentnivå och svåra fall.",
+        "evidence": "Första V2 är fortsatt underkänt. Levererad parser har känd lagrad PSM3-replay 57/100 mandatory, 79/130 All13. Separat opublicerad c5-kandidat fick i en auktoriserad känd optisk utvecklingsrunda 69/100 mandatory och 91/130 All13, 0 FP, 12 worker- och 24 parseranrop utan körfel. Recallkravet 85% nås inte; V3 är fortfarande förseglad.",
+        "remaining_for_8": "Nytt fryst oberoende första OCR-prov ska nå förregistrerade precision-/recallkrav utan falskt grönt.",
+        "scope_and_limitations": "V2 får inte finjusteras eller beskrivas som ett nytt blint förstaprov efter omtolkning. Riktning är metadata, inte bildigenkänning.",
+        "prior_independent_evidence_refs": [
+          "ocr_v1",
+          "ocr_v2",
+          "ocr_v2_raw"
+        ]
+      },
+      {
+        "id": 11,
+        "area": "Gmail",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Aktuell lyckad hämtning, återförsök/dubblettskydd och synligt genomfört schema; inga mejl skickas av bakgrundsflödet.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "21Z-uppgiften kommer från root, inte min nya produktionsläsning. waiting_ocr41 gör inte hela bakgrundskedjan grön.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "operations",
+          "root_handoff"
+        ]
+      },
+      {
+        "id": 12,
+        "area": "Automatisk registrering",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Endast verifierad motpart och grön tolkning; atomär idempotens och återhämtning efter förlorat svar.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Detta bedömer registreringsvillkor och transaktionssäkerhet, inte hur stor del av verklig OCR som registreras automatiskt. Nya ekonomiska QA-skrivningar krävs inte.",
+        "prior_independent_evidence_refs": [
+          "documents",
+          "saas",
+          "historical_33",
+          "published_release"
+        ]
+      },
+      {
+        "id": 13,
+        "area": "Dubbletter",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Samma original eller betalning kan inte dubbelräknas vid omkörning eller samtidighet.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Historiskt saknade originalkvitton återskapas inte. Ingen ny totalinventering av kundregistret är gjord.",
+        "prior_independent_evidence_refs": [
+          "saas",
+          "payments",
+          "manual_review",
+          "published_release"
+        ]
+      },
+      {
+        "id": 14,
+        "area": "Dokumentgranskning",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Original och osäkerhet kan granskas; korrigering påverkar rätt dokument och lämnar spår.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Ingen faktisk massgodkänning av kundunderlag ingår; säker manuell granskning är en avsiktlig gräns.",
+        "prior_independent_evidence_refs": [
+          "historical_33",
+          "word_confidence",
+          "manual_review",
+          "published_release"
+        ]
+      },
+      {
+        "id": 15,
+        "area": "Swedbank",
+        "score": 6.5,
+        "at_least_8": false,
+        "criterion": "Aktuell godkänd anslutning och verifierad läsning av rätt valt konto; utgångna/återkallade medgivanden stoppas.",
+        "evidence": "Site66-revalidering avvisad: sparat null-usage och aktuellt utelämnat usage. Ett detaljförsök gav DETAILS_PROVIDER_UNAVAILABLE utan verifierad usageklass; ingen aktivering.",
+        "remaining_for_8": "Lös den faktiska kontoanvändningsavvisningen och verifiera bankgodkänt rätt konto.",
+        "scope_and_limitations": "Ett framtida samtyckesdatum, nytt felmeddelande eller grön CI återställer inte bankbehörighet. Ingen bankuppgift antas.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "operations",
+          "bank_diagnostic_review",
+          "root_handoff"
+        ]
+      },
+      {
+        "id": 16,
+        "area": "Automatisk bankhämtning",
+        "score": 6.5,
+        "at_least_8": false,
+        "criterion": "Aktuell genomförd körning med befintligt samtycke, hållbara återförsök och korrekt nästa tid.",
+        "evidence": "Ingen ny lyckad behörig bankhämtning efter 2026-11-05 08:05 UTC.",
+        "remaining_for_8": "Verifiera ny lyckad schemalagd bankhämtning med aktuellt medgivande.",
+        "scope_and_limitations": "Syntetiska retry-/jobbkvitton eller säkert avvisad revalidering är ingen lyckad automatisk bankhämtning.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "operations",
+          "saas",
+          "root_handoff"
+        ]
+      },
+      {
+        "id": 17,
+        "area": "Bankgiro-import",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Stödda originalformat bevaras och tolkas spårbart; manuell import och automatisk källa redovisas separat.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "8 gäller stödd manuell import. SOURCE_NOT_CONFIGURED får aldrig beskrivas som fungerande automatisk Bankgirotjänst.",
+        "prior_independent_evidence_refs": [
+          "saas",
+          "payments",
+          "published_release"
+        ]
+      },
+      {
+        "id": 18,
+        "area": "Verklig betalare",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Källtyp och bevisnivå syns, korrekt betalare visas när bankunderlaget har den, saknad uppgift hålls okänd; verkligt underlag verifieras utan antaganden.",
+        "evidence": "Ägt verkligt rapportoriginal och exakt läsvy bevarar angiven betalare; saknad AIS-betalare förblir okänd.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Uppgiften styrks som observation i det ägda rapportoriginalet. Ingen bankautenticitet, aktuell kontobehörighet, rapport–AIS-relation eller fakturakund härleds.",
+        "prior_independent_evidence_refs": [
+          "payments",
+          "overview_review",
+          "published_release",
+          "root_handoff"
+        ]
+      },
+      {
+        "id": 19,
+        "area": "Verklig OCR/referens",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Bankens explicit angivna referens bevaras skild från förslag och fakturanummer; verkligt original verifieras.",
+        "evidence": "Verklig explicit rapportreferens bevaras som generell referens; ingen formell OCR eller AIS-referens hittas på.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Uppgiften styrks som observation i det ägda rapportoriginalet. Ingen bankautenticitet, aktuell kontobehörighet, rapport–AIS-relation eller fakturakund härleds.",
+        "prior_independent_evidence_refs": [
+          "payments",
+          "overview_review",
+          "published_release"
+        ]
+      },
+      {
+        "id": 20,
+        "area": "Automatisk matchning",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Representativ separat acceptanskorpus med noll falskt säkra kopplingar, tydliga orsaker till avstående och atomärt idempotent resultat.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "8 gäller matchningspolicy under giltiga verifierade indata; 21 syntetiska fall uppskattar ingen verklig falskmatchningsfrekvens och bevisar inte fungerande bankdrift.",
+        "prior_independent_evidence_refs": [
+          "payments",
+          "payments_followup",
+          "published_release",
+          "manual_review"
+        ]
+      },
+      {
+        "id": 21,
+        "area": "Delbetalning",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Exakta heltalsören, korrekt restbelopp, återtag och samtidighetskontroller.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Ingen riktig delbetalning bokförs som kvalitetstest; ny manuell vektor stöder inte godtyckliga top-ups av befintliga par.",
+        "prior_independent_evidence_refs": [
+          "historical_33",
+          "payments",
+          "manual_multiple",
+          "manual_review",
+          "published_release"
+        ]
+      },
+      {
+        "id": 22,
+        "area": "Överbetalning",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Överskott särskiljs och kan inte automatiskt fördelas utan giltig grund.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Ingen återbetalning utförs, och ingen fri allokering av återstående bankmedel antas.",
+        "prior_independent_evidence_refs": [
+          "historical_33",
+          "manual_multiple",
+          "manual_review",
+          "published_release"
+        ]
+      },
+      {
+        "id": 23,
+        "area": "Flera fakturor per betalning",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Verifierade explicita fördelningar fungerar; tvetydiga delmängdssummor avstår; summor och samtidighet är säkra.",
+        "evidence": "Granskad explicit vektor publicerad; ingång/demo-spärr observerad; inga QA-allokeringar.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "C4 REVIEW blir inte automatiskt VERIFIED. D1-batch och R2-byteobjekt är inte en gemensam atomär transaktion; dokumenterade versions-/immutabilitetsgränser består.",
+        "prior_independent_evidence_refs": [
+          "multiple_baseline",
+          "manual_multiple",
+          "manual_review",
+          "integration_wave2"
+        ]
+      },
+      {
+        "id": 24,
+        "area": "Historik",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Källor och ändringar kan följas utan att förväxla tidigare och aktuella fakta.",
+        "evidence": "Historisk registrering skiljs från aktuell verifiering i publicerad detalj.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Historiskt receipt bevisar inte aktuellt samtycke eller saknade original.112 äldre API-poster saknar fortsatt kvitto.",
+        "prior_independent_evidence_refs": [
+          "historical_33",
+          "saas",
+          "manual_review",
+          "published_release"
+        ]
+      },
+      {
+        "id": 25,
+        "area": "Betalstatus",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Status beräknas från giltiga allokeringar och tillgängliga bankfakta; inaktuella resultat markeras.",
+        "evidence": "Publicerad översikt/detalj behåller registrerat saldo och stoppar falskt verifierad visning.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Registrerad koppling och verifierad bankfakta är olika statusar. Ingen generell full omverifiering av gamla kunddata ingår.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "overview_review",
+          "browser",
+          "manual_review"
+        ]
+      },
+      {
+        "id": 26,
+        "area": "Kontrollera alla betalningar",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Begränsad, återupptagbar körning med korrekt sammanfattning och felhantering.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "En betalningskontroll avslutar inte automatiskt Gmailrun; den återstående separata efterkontrollen får inte döljas.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "historical_33",
+          "saas"
+        ]
+      },
+      {
+        "id": 27,
+        "area": "Mejlförslag",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Korrekt underlag och förhandsgranskning; uttryckligt godkännande krävs före sändning.",
+        "evidence": "Befintliga relevanta regressionsgrindar bevarade och godkända på exakt levererad main; se oberoende bedömning och releasekvitto.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Inga kundmejl skickas som QA. Syntetisk godkännandekontroll är inte leveransbevis för verklig e-post.",
+        "prior_independent_evidence_refs": [
+          "historical_33",
+          "saas",
+          "published_release"
+        ]
+      },
+      {
+        "id": 28,
+        "area": "Schemaläggning",
+        "score": 6.5,
+        "at_least_8": false,
+        "criterion": "Befintliga scheman fungerar och minst en faktisk körning observeras; överlapp, paus och sen körning hanteras; ingen grön status från enbart konfiguration.",
+        "evidence": "Tidigare periodisk OCR-körningen 42153093698 gav 6 behandlade och 0 fel. Gmail-schematillfällena 05:00 och06:00 gav no_update utan ny verifierad appinvokering; senaste lyckade hämtning är 04:06. Ordinarie 07:00-körning har en återläst engångsinstruktion om körkvitto. Backupens nya budget är fortfarande inte prövad automatiskt från ofärdig snapshot.",
+        "remaining_for_8": "Bekräfta en faktisk Gmail-schemakörning med den korrigerade instruktionen. Observera automatisk backup från ofärdig snapshot till separat bekräftad fullständig verifiering, eller en verklig automatisk återupptagningskedja som når samma slutläge. Periodisk OCR är redan verifierad.",
+        "scope_and_limitations": "Den observerade OCR-körningen har faktiskt event=schedule och behandlar väntande jobb. Ingen generell schema-SLA är uppmätt. Dagens manuellt färdigställda backup och senare complete-no-op provar inte den korrigerade anropsbudgeten.",
+        "prior_independent_evidence_refs": [
+          "operations",
+          "published_release",
+          "root_handoff"
+        ]
+      },
+      {
+        "id": 29,
+        "area": "Backup",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Aktuell krypterad backup är fullständigt kontrolläst; filantal, originalhashar och slutförandetid redovisas.",
+        "evidence": "Snapshot 768fde9a-27a2-4b85-b85a-278239ec4aea: 430/430 original kopierade och kontrollästa, 185 567 855 byte i båda stegen, manifest_pass och verifiering slutförd 2026-11-06 00:48:58 UTC; separat slutstatus 00:49:04 UTC.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Beviset gäller snapshotens frysta manifest med 430 original. Senare importer ingår inte. Slutförandet använde manuellt återupptagna normala backupsteg; den ändrade schemabudgeten och en extern reservkopia styrks inte här.",
+        "prior_independent_evidence_refs": [
+          "recovery",
+          "published_release",
+          "root_handoff"
+        ]
+      },
+      {
+        "id": 30,
+        "area": "Säkerhet",
+        "score": 8.5,
+        "at_least_8": true,
+        "criterion": "Ägar-/företagsgränser, sekretess, godkännanden och ekonomisk integritet bevaras; relevanta negativa tester och beroendegranskning.",
+        "evidence": "Exakt full CI/audit och negativa säkerhetsgrindar godkända;8 moderate utvecklingsfynd kvarstår.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Exakt main-audit: 0 produktionsfynd, 8 moderate utvecklingsfynd, 0 high/critical. Inte en full penetrationstest eller avtalsacceptans.",
+        "prior_independent_evidence_refs": [
+          "saas",
+          "published_release",
+          "manual_review",
+          "bank_diagnostic_review"
+        ]
+      },
+      {
+        "id": 31,
+        "area": "Katastrofåterställning",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Isolerad återställningsövning med faktisk backup-/restore-kod, mätt RPO/RTO och kontroller av original, register, betalningar, korruption och fel ägare. Ingen återställning över produktion.",
+        "evidence": "Isolerad återställning med riktig kod; lokalRTO 3,417 s och simuleradRPO 15 min, inte produktionsåterställning.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "3,417 s gäller lokal restore+acceptans med paket redan tillgängligt.15 min RPO är simulerat. Extern nyckel/kopia, molnnedladdning och tjänsteaktivering är inte verifierade.",
+        "prior_independent_evidence_refs": [
+          "recovery",
+          "recovery_integrated"
+        ]
+      },
+      {
+        "id": 32,
+        "area": "Kod/tester",
+        "score": 8.5,
+        "at_least_8": true,
+        "criterion": "Berörda regressioner, oberoende granskning och fulla obligatoriska CI-grindar på exakt levererad kod.",
+        "evidence": "Exakt main0035ea89: 7569/7569 obligatoriska tester, 0 fail/cancel/skip/TODO; alla 16 grindar och verkligt Sites-bygge passerade. Samma Sites-träd publicerat som Site66.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Betyget avser exakt main0035ea89/Site66. Fokustester och separat överlappande SaaS-acceptans adderas inte dubbelt. Sites audit har kvar 8 moderate-fynd.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "integration_wave2",
+          "manual_review",
+          "overview_review",
+          "bank_diagnostic_review"
+        ]
+      },
+      {
+        "id": 33,
+        "area": "Verklig produktionsverifiering",
+        "score": 8,
+        "at_least_8": true,
+        "criterion": "Levererad version kopplas till exakt källträd; bank/Gmail/OCR/backup har relevanta aktuella observationer och ekonomiska skydd jämförs före/efter.",
+        "evidence": "Exakt main0035ea89 till Site66; verklig avvisad bankrevalidering med bounded detaljförsök, nio nya Gmail-importer, köprogress till OCR, tidigare periodisk OCR 6/0 och verifierad 430-filssnapshot. Två kompletta ekonomiska före-/efterläsningar efter normal bearbetning behåller revision52, noll bokningar och alla uppgifter/spärrar utom kontrolltid.",
+        "remaining_for_8": null,
+        "scope_and_limitations": "Bankavvisningen är inte giltig anslutning eller lyckad hämtning (15/16). Det äldre faktiskt periodiska OCR-beviset hör till område28; nya manuellt startade Gmail-anrop är inte periodiska bevis. Normalfakturans registrering kvarstår i6. Ingen fysisk mobil, autentiserad full bankresa eller fullständig ekonomirevision påstås.",
+        "prior_independent_evidence_refs": [
+          "published_release",
+          "browser",
+          "root_handoff",
+          "ocr_v2",
+          "recovery"
+        ]
+      }
+    ]
+  },
+  "source_verification": {
+    "checked_at": "2026-11-06T11:30:52.655Z",
+    "pr49_checkout": {
+      "sha": "7c13b47789d3a02c26adafbc7909ee30e25b7a5c",
+      "node_id": "C_kwDOVYRLZNoAKDdjMTNiNDc3ODlkM2EwMmMyNmFkYWZiYzc5MDllZTMwZTI1YjdhNWM",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/7c13b47789d3a02c26adafbc7909ee30e25b7a5c",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/commit/7c13b47789d3a02c26adafbc7909ee30e25b7a5c",
+      "author": {
+        "name": "sharbel0022",
+        "email": "49398736+sharbel0022@users.noreply.github.com",
+        "date": "2026-11-05T19:40:51Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-11-05T19:40:51Z"
+      },
+      "tree": {
+        "sha": "7f1809e37e3feedb8cc728d2208caf016eebcda3",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/7f1809e37e3feedb8cc728d2208caf016eebcda3"
+      },
+      "message": "Merge 03f84afd61bb1020e73c17c3cde332a1b07f55a0 into bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "parents": [
+        {
+          "sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+          "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+          "html_url": "https://github.com/sharbel0022/Mgeorge/commit/bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+        },
+        {
+          "sha": "03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+          "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/03f84afd61bb1020e73c17c3cde332a1b07f55a0",
+          "html_url": "https://github.com/sharbel0022/Mgeorge/commit/03f84afd61bb1020e73c17c3cde332a1b07f55a0"
+        }
+      ],
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJq7NvDCRC1aQ7uu5UhlAAAyVkQAI/JFAkmXTAf4SQby4+MSaSb\n/MisIrvXhwBd7s4HEAC6vo5gSrVsK4G0Ao/MHWIV99buzPYwY4X+WnUnFZgBcdcZ\nn1hymjpfSW7rGUdvXaplOlJTztFH6A2AlbHSlzvundNLM87Wleop4c5fXrg8SjUk\na+e9w7+1461S0UZig3wfOutXsTJGJBO7ijFDKuhBp92Mj+OZnXPLsVYvOMtB2jrT\n6MQqpm3p6CjrFrtcEwCkj/Nn/YYZFdpZbslrroXsem17RU+TX/Ldwyd0o94nMwFE\ni9FCHIp6O03YvgYzQVVAgt7DzcdNiM8ibB11sfDiA6LWCjJOuJMbfDWCjsjGc4ZS\nte6jtlnILuVmE2H2gRkyIqTyBDsnia+yeCMxcaYZJLI+/WhV+PcATGBiyn7qO+Lt\nLbNOffs/XHc4X5V6vn/6xMAoLJ3CO2RWhfPEgQlQFtr8ZptnuDNABJAWcSJwglhu\nYpkrEE66nSvgm2WnrNyoDmYd8DD4Zk9kZQ85cr7naHpMIGlm5ATRW0XaHgBN4AEE\nz9tddD2RsvYF1hDlLHZQVsKx4FMGAh/Rq1tEa3R6udJmlcuzThpzdg4v1ljwGK4p\nM2zKn3ASixdpxCcd3e8g50i7AX4LgOMJZtHqdkdIEFbq1+jOo/b9DRYTTf8kHUWJ\ns6in3h5zvOS4PZO92spp\n=dq/s\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree 7f1809e37e3feedb8cc728d2208caf016eebcda3\nparent bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee\nparent 03f84afd61bb1020e73c17c3cde332a1b07f55a0\nauthor sharbel0022 <49398736+sharbel0022@users.noreply.github.com> 1793907651 +0000\ncommitter GitHub <noreply@github.com> 1793907651 +0000\n\nMerge 03f84afd61bb1020e73c17c3cde332a1b07f55a0 into bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee\n",
+        "verified_at": "2026-11-05T19:40:52Z"
+      }
+    },
+    "pr55_checkout": {
+      "sha": "7f593c00c22b41f8ed67d08af561306d0f93f770",
+      "node_id": "C_kwDOVYRLZNoAKDdmNTkzYzAwYzIyYjQxZjhlZDY3ZDA4YWY1NjEzMDZkMGY5M2Y3NzA",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/7f593c00c22b41f8ed67d08af561306d0f93f770",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/commit/7f593c00c22b41f8ed67d08af561306d0f93f770",
+      "author": {
+        "name": "sharbel0022",
+        "email": "49398736+sharbel0022@users.noreply.github.com",
+        "date": "2026-11-05T22:09:24Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-11-05T22:09:24Z"
+      },
+      "tree": {
+        "sha": "f1d506d6184483e9d1ec6e3e76265497d4d9f112",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/f1d506d6184483e9d1ec6e3e76265497d4d9f112"
+      },
+      "message": "Merge d6646dd0971650878738f81215d0cfc5c04a1da3 into bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+      "parents": [
+        {
+          "sha": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+          "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+          "html_url": "https://github.com/sharbel0022/Mgeorge/commit/bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee"
+        },
+        {
+          "sha": "d6646dd0971650878738f81215d0cfc5c04a1da3",
+          "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/d6646dd0971650878738f81215d0cfc5c04a1da3",
+          "html_url": "https://github.com/sharbel0022/Mgeorge/commit/d6646dd0971650878738f81215d0cfc5c04a1da3"
+        }
+      ],
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJq7P6UCRC1aQ7uu5UhlAAAoXEQACwna9nZCkBx8toDcWVo0pf4\nNl7Y2/Kj5yZWmQkql26VcDYMO+0y65tEUlK8c6e5f2TzzGRGYhCefN+RqCPqfnHc\nRO7Qde3y41GpA52Z/2/IXC8fXcMVkSfTcqS7GjAq52PggG+4pMGi//XgDPOM/PwQ\n4SH+00iuJZNzPJsH+bzpNZZ/GM+XMuSJgQAWGq25UNnWtYl54uUmcGn2z3sk75AG\nrNFEA50Ymz+7wtWq8mWm48Li3kZoawXMd7rLNIoe4IRj1cBRdHg8yryN6MkK74CN\nm24IW14fVbnD2yW6sbzD5oYx8ZMD6DkKCbp+ws5hxdvhg+to8nFE83bTY1U29CIB\n0NRWwsuA5u2yNT6KKaTZcZInAA4nrC9LCWddSDYcOKgfRlJIGfyIfKJygHBmu32W\nkFMvM3hwMAyuYmuybNrIKuq9R7aJ+rRRm1pkaqiZCbHm3/kJeQtgnVgNCz20koSe\nk0QN1CqLcNwzGmPYQkPSXKmZGheXcZXeHN7KIJgH6driu6bJ3SD9u8cnEttr2o6s\nkW1fa0T7s3yF0vnSDZ0789fVLUgTdW+rypPh4+pFiJ7sVcpR2alRc6du5umf9p20\nVztdQzURqiNzetcq7lxjars4SbANBTygLI/E9DV5EmbpeN4WbWPQMD0hY+IQWw/2\n+laAFRwjdO6svLI7/AzO\n=KNZl\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree f1d506d6184483e9d1ec6e3e76265497d4d9f112\nparent bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee\nparent d6646dd0971650878738f81215d0cfc5c04a1da3\nauthor sharbel0022 <49398736+sharbel0022@users.noreply.github.com> 1793916564 +0100\ncommitter GitHub <noreply@github.com> 1793916564 +0100\n\nMerge d6646dd0971650878738f81215d0cfc5c04a1da3 into bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee\n",
+        "verified_at": "2026-11-05T22:09:25Z"
+      }
+    },
+    "formal_reviews": {
+      "pr49": [],
+      "pr55": []
+    },
+    "action_pins": [
+      {
+        "status": "fulfilled",
+        "value": {
+          "repo": "actions/checkout",
+          "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "url": "https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "date": "2026-07-17T18:45:11Z",
+          "message": "prep v7.0.1 release (#2531)",
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      },
+      {
+        "status": "fulfilled",
+        "value": {
+          "repo": "actions/setup-node",
+          "sha": "949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "url": "https://github.com/actions/setup-node/commit/949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "date": "2026-10-08T02:43:26Z",
+          "message": "Bump eslint from 10.5.0 to 10.11.0 and package.json from 7.0.0 to 7.1.0 (#1635)",
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      },
+      {
+        "status": "fulfilled",
+        "value": {
+          "repo": "actions/upload-artifact",
+          "sha": "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "url": "https://github.com/actions/upload-artifact/commit/cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "date": "2026-10-07T10:00:52Z",
+          "message": "Merge pull request #822 from actions/tunc-d-prepare-upload-v7-0-2",
+          "verification": {
+            "verified": true,
+            "reason": "valid"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,234 @@
+{
+  "base": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+  "heads": {
+    "45": "ac1abdc5469248eba212496af4a4573864908ace",
+    "46": "7d3bcb5ef533c39c9e23714e61709c924384ffb8",
+    "47": "875876ae539f5ecba1fc39d4c213197806e245ce",
+    "50": "1619c0e3a63b922c75a7f46d493d39e68075952f",
+    "51": "0954777f10da8be9fb15daf3878c539b51801142",
+    "52": "eb4242f783172ac441f9092f921b04b06dc11771",
+    "53": "d9ca037a90ef9c9e629f62c4dcbf9cfcdeacb459",
+    "54": "3db9f01305aa6830a4c2d1cc01970c06b91018c2"
+  },
+  "method": "Each PR diff from its own merge-base with current main; semantic conflicts also reviewed independently.",
+  "pairs": [
+    {
+      "prs": [
+        45,
+        46
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        45,
+        47
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        45,
+        50
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "sites/lib/banking/openpayments-provider.js",
+        "sites/lib/banking/openpayments/http.js",
+        "src/server.js"
+      ]
+    },
+    {
+      "prs": [
+        45,
+        51
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        45,
+        52
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        45,
+        54
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "sites/tests/banking-security.test.mjs",
+        "src/server.js"
+      ]
+    },
+    {
+      "prs": [
+        46,
+        47
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        46,
+        50
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        46,
+        51
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        46,
+        52
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        46,
+        54
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        47,
+        50
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        47,
+        51
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        47,
+        52
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        47,
+        54
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        50,
+        51
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        50,
+        52
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        50,
+        54
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "src/server.js"
+      ]
+    },
+    {
+      "prs": [
+        51,
+        52
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md"
+      ]
+    },
+    {
+      "prs": [
+        51,
+        54
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "sites/tests/bank-state-integrity-q8.test.mjs"
+      ]
+    },
+    {
+      "prs": [
+        52,
+        54
+      ],
+      "shared_paths": [
+        "PROGRESS.md",
+        "QUALITY-SCORECARD.md",
+        "sites/tests/document-queue-recovery.test.mjs"
+      ]
+    }
+  ]
+}

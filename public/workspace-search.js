@@ -36,14 +36,15 @@ function queryParts(value) {
   if (!query) return null;
   const amountGroups = [];
   let amountTerms = 0;
-  // Decimal punctuation makes the amount explicit, so a bare numeric reference
-  // (including leading zeroes) is never silently interpreted as money.
+  // Decimal punctuation permits an amount interpretation. Without a currency
+  // suffix, retain the exact saved reference too, including leading zeroes.
   // Start at a token boundary; an invoice suffix such as SYN-001 must not
   // become the first thousands group of the amount that follows it.
   const rest = query.replace(/(?<!\S)([+-]?(?:[1-9]\d{0,2}(?: \d{3})+|\d+))[,.](\d{1,2})(?![\p{L}\p{N},./])(?:\s*(?:kr|sek)\b)?/gu, (_match, major, minor) => {
     const groups = major.split(' ');
     amountTerms += groups.length;
     const alternatives = [];
+    if (!/(?:kr|sek)$/u.test(_match)) alternatives.push({ reference: _match });
     // "123 456,00" can mean 123,456 kronor or reference 123 plus 456 kronor.
     // Keep both readings. A recovered prefix must be an exact saved reference;
     // do not turn a thousands group into an arbitrary text substring match.
@@ -81,7 +82,8 @@ function searchWorkspaceIndex(index, query, { limitPerType = 4 } = {}) {
     for (const group of parts.amountGroups) {
       let groupScore = -1;
       for (const option of group) {
-        if (entry.amount === option.amount && (!option.reference || entry.references.includes(option.reference))) groupScore = Math.max(groupScore, option.reference ? 100 : 0);
+        const referenceMatch = option.reference && entry.references.includes(option.reference);
+        if (option.amount === undefined ? referenceMatch : entry.amount === option.amount && (!option.reference || referenceMatch)) groupScore = Math.max(groupScore, option.reference ? 100 : 0);
       }
       if (groupScore < 0) { amountScore = -1; break; }
       amountScore += groupScore;

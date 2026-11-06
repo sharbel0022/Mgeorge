@@ -105,7 +105,9 @@ export function createOpenPaymentsHttpClient(config, { transport, requestBoundar
       if ([...headers.keys()].some(header => !HEADER_ALLOWLIST.has(header))) throw denied();
       headers.set('Accept', 'application/json'); headers.set('X-Request-ID', crypto.randomUUID());
       if (signal?.aborted) throw new BankProviderError('PROVIDER_ABORTED', 499);
-      const controller = new AbortController(), write = method === 'POST' || method === 'PUT';
+      // Revocation also changes remote consent. A lost DELETE response cannot
+      // establish whether the bank applied it, even though DELETE is idempotent.
+      const controller = new AbortController(), write = method !== 'GET';
       let timer, onAbort, timedOut = false;
       const interrupted = new Promise((_, reject) => {
         onAbort = () => { controller.abort(); reject(new BankProviderError('PROVIDER_ABORTED', 499, { mayHaveSucceeded: write })); };
@@ -113,16 +115,21 @@ export function createOpenPaymentsHttpClient(config, { transport, requestBoundar
         timer = setTimeout(() => { timedOut = true; controller.abort(); reject(new BankProviderError('PROVIDER_TIMEOUT', 504, { retryable: !write, mayHaveSucceeded: write })); }, timeoutMs);
       });
       const run = async () => {
+        let uncertainWrite = false;
         try {
           if (config.environment === 'PRODUCTION') {
             try { await selected.validateCertificate(); }
             catch (error) { throw new BankProviderError(error?.code === 'CLIENT_CERTIFICATE_EXPIRED' ? 'CLIENT_CERTIFICATE_EXPIRED' : 'INVALID_CLIENT_CERTIFICATE', 409); }
           }
           if (controller.signal.aborted) throw new BankProviderError('PROVIDER_ABORTED', 499);
+          uncertainWrite = write;
           const response = await selected.request(url, { method, headers, body, signal: controller.signal, redirect: 'manual', cache: 'no-store' });
           if (!(response instanceof Response)) throw new BankProviderError('PROVIDER_RESPONSE_INVALID');
           if (controller.signal.aborted) { cancelBody(response); throw new BankProviderError(timedOut ? 'PROVIDER_TIMEOUT' : 'PROVIDER_ABORTED', 504); }
           const status = response.status;
+          // A definite HTTP rejection is different from an accepted write whose
+          // receipt cannot be read. Redirects and server failures remain unknown.
+          uncertainWrite = write && (response.ok || status >= 500 || status >= 300 && status < 400);
           if (status >= 300 && status < 400) { cancelBody(response); throw new BankProviderError('PROVIDER_RESPONSE_INVALID'); }
           if (status === 401 || status === 403 || status === 429 || status >= 500) {
             cancelBody(response);
@@ -141,7 +148,10 @@ export function createOpenPaymentsHttpClient(config, { transport, requestBoundar
           return { data, headers: response.headers, requestId: headers.get('X-Request-ID'),
             rawResponse: Object.freeze({ body: receipt.body, sha256: receipt.sha256, requestPath: path, requestId: headers.get('X-Request-ID'), receivedAt: new Date(now()).toISOString() }) };
         } catch (error) {
-          if (error instanceof BankProviderError) throw error;
+          if (error instanceof BankProviderError) {
+            if (uncertainWrite) throw new BankProviderError(error.code, error.status, { mayHaveSucceeded: true, retryAfter: error.retryAfter, retryBlocked: error.retryBlocked });
+            throw error;
+          }
           if (['INVALID_CLIENT_CERTIFICATE', 'CLIENT_CERTIFICATE_EXPIRED'].includes(error?.code)) throw new BankProviderError(error.code, 409);
           throw new BankProviderError('PROVIDER_UNAVAILABLE_NETWORK', 502, { retryable: !write, mayHaveSucceeded: write });
         }

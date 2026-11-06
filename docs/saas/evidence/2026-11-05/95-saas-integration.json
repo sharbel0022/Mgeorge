@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-05T18:17:34.562756+00:00",
+  "repository": "sharbel0022/Mgeorge",
+  "branch": "feature/95-saas",
+  "pullRequest": "https://github.com/sharbel0022/Mgeorge/pull/50",
+  "source": {
+    "phase": "combined code after integrating concurrent main; generated before the merge commit",
+    "reviewedSaasParent": "59e6f8f76617ba64903ff9afeeb8837248d3b653",
+    "incomingMainParent": "bf24a3c52ffc637d1e7bbc4d4f64a1732dcd9fee",
+    "incomingPullRequest": "https://github.com/sharbel0022/Mgeorge/pull/48",
+    "inputSha256": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+    "hashScope": "tracked and untracked nonignored files excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+    "hashAlgorithm": "SHA-256 over sorted unique relative UTF-8 path + NUL + file bytes + NUL",
+    "changedCodeFileSha256": {
+      "sites/components/onboarding/bank-onboarding-views.tsx": "3de8ffb3a3beb13125530148c00a0dfae286adfc2d6c35f0ee675e8104a4fc1f",
+      "sites/lib/banking/openpayments-lifecycle.js": "c577b74e5518544917a3616ce2107b2d3bde93d30b0f4217fdf19f2a7550688d",
+      "sites/lib/banking/saas-bank-runtime.js": "73a27d9fd3c41dc3d62ce90d4767c54671249b638a23225f385e9797a6758452",
+      "sites/tests/openpayments-lifecycle-recovery.test.mjs": "fc09585b3754df1a77878d63288bc7b995db670d2f1b5c67aa851fca95dd1ba2",
+      "sites/tests/saas-onboarding-views.test.mjs": "e6510bd202b3ca0e511568d814c2b4dff8e9868764bc5df7bb08b5b16b5f1c6a",
+      "src/company-runtime.js": "c37c60c5cff6dd6b32988ae1ba7f4d72e87ec133d5eeba2889d43ab11dab1f64",
+      "src/server.js": "86fc839f9034e72564950f688be37ca3b09342fa181809956d05f6b56e3f8077",
+      "test/api.test.js": "e7fd725eeb61fdd6c909a5689873beff41ec53777ce4f9c7c82db25be5101c99",
+      "test/bank-consent-api.test.js": "a0b46829a875c039a22d648d7df0d713865e0f17977089b83e1b4f628012babe",
+      "test/company-read-api.test.js": "ac34b8cd994fb730c7012cf78327655fc0e8d5942259a06d1a37c28b5290c0ab"
+    }
+  },
+  "gates": {
+    "integration-node-targeted": {
+      "label": "integration-node-targeted",
+      "command": [
+        "node",
+        "--import",
+        "./scripts/saas-test-isolation.mjs",
+        "--test",
+        "--test-concurrency=1",
+        "test/company-read-api.test.js",
+        "test/company-api.test.js",
+        "test/company-boundary.test.js",
+        "test/bank-consent-api.test.js",
+        "test/api.test.js",
+        "test/bank-api.test.js",
+        "test/security-session-allocation.test.js",
+        "test/saas-login-boundary.test.js",
+        "test/cloud-ocr-trigger.test.js"
+      ],
+      "cwd": ".",
+      "startedAt": "2026-11-05T18:12:55.146871+00:00",
+      "inputHashBefore": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T18:13:09.056576+00:00",
+      "inputHashAfter": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "inputsUnchanged": true,
+      "logSha256": "cd71029243783f062c008fad2e806ddd52b188054689472e756775e71e6f5aca",
+      "summary": {
+        "tests": 155,
+        "suites": 0,
+        "pass": 155,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 13672.81977
+      }
+    },
+    "integration-sites-targeted": {
+      "label": "integration-sites-targeted",
+      "command": [
+        "node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-concurrency=1",
+        "tests/company-request.test.mjs",
+        "tests/company-storage.test.mjs",
+        "tests/saas-company-acceptance.test.mjs",
+        "tests/bank-company-authority.test.mjs",
+        "tests/banking-security.test.mjs",
+        "tests/saas-bank-runtime.test.mjs",
+        "tests/openpayments-lifecycle-recovery.test.mjs",
+        "tests/openpayments-expired-revocation.test.mjs",
+        "tests/saas-onboarding-client.test.mjs",
+        "tests/saas-onboarding-views.test.mjs",
+        "tests/mcp-security-q8.test.mjs",
+        "tests/gmail.test.mjs"
+      ],
+      "cwd": "sites",
+      "startedAt": "2026-11-05T18:12:55.146847+00:00",
+      "inputHashBefore": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T18:14:21.964324+00:00",
+      "inputHashAfter": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "inputsUnchanged": true,
+      "logSha256": "2def98161c709532432ad682c9c738b7735b09312ed7a223e98a5b4627606c3f",
+      "summary": {
+        "tests": 419,
+        "suites": 0,
+        "pass": 419,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 86587.872789
+      }
+    },
+    "integration-node-syntax": {
+      "label": "integration-node-syntax",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": ".",
+      "startedAt": "2026-11-05T18:12:55.145671+00:00",
+      "inputHashBefore": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T18:13:13.954742+00:00",
+      "inputHashAfter": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "inputsUnchanged": true,
+      "logSha256": "4d3325b0395cba88a753403c38a9dc0a618d9411012bc3c4e05379b92fe664a3",
+      "summary": {}
+    },
+    "integration-sites-types": {
+      "label": "integration-sites-types",
+      "command": [
+        "npm",
+        "run",
+        "check"
+      ],
+      "cwd": "sites",
+      "startedAt": "2026-11-05T18:14:40.331638+00:00",
+      "inputHashBefore": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T18:14:53.332342+00:00",
+      "inputHashAfter": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "inputsUnchanged": true,
+      "logSha256": "de3f553dc64c9cb80274a231dd42a62d946c447d2b17e0ee76d6b6f386f3cd3c",
+      "summary": {}
+    },
+    "integration-sites-build": {
+      "label": "integration-sites-build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "sites",
+      "startedAt": "2026-11-05T18:15:07.547738+00:00",
+      "inputHashBefore": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "hashScope": "tracked and untracked nonignored files, excluding docs/, PROGRESS.md and QUALITY-SCORECARD.md",
+      "nodeVersion": "v24.22.1",
+      "exitCode": 0,
+      "finishedAt": "2026-11-05T18:15:31.682660+00:00",
+      "inputHashAfter": "7c3a293ffcc9f50ceb4f9292572e313c90ce208c880f334e7c2681562a862d80",
+      "inputsUnchanged": true,
+      "logSha256": "06ebc589a96f060210c8f9e3dade4ed2f033c348337353d9530419c3e7907dc6",
+      "summary": {}
+    }
+  },
+  "targetedTotal": 574,
+  "fullSuiteEvidence": {
+    "earlierLocalReceipt": "95-saas-verification.json",
+    "earlierLocalTotal": 5721,
+    "earlierScope": "SaaS changes on 4ad205b before incoming PR48 changes; these counts are not relabeled as the combined-tree full suite",
+    "finalNode22Checks": "https://github.com/sharbel0022/Mgeorge/pull/50/checks",
+    "authority": "GitHub run/job status for the final pushed PR head, reported in the PR description; targeted local counts are not added to full-suite counts"
+  },
+  "integrationReview": {
+    "automaticMerge": "clean; overlapping src/server.js change adds only a public static workspace-search asset",
+    "sitesRouteFiles": 43,
+    "apiRouteFiles": 42,
+    "mcpRouteFiles": 1,
+    "incomingBoundaryReview": "independent source inspection of banking/service, account-read-guard, server authorization dispatch, MCP, Gmail and new revalidate route; no concrete tenant-boundary regression identified",
+    "newRevalidationRestriction": "manage_integrations dispatch plus eligible unbound legacy workspace only; a company context or sync binding is rejected",
+    "nodeAuditAndStatusRepair": "retained unchanged by incoming Node asset-list change",
+    "cloudOcr": "incoming main-only workflow guard is covered by targeted tests; this PR changes no workflow relative to incoming main and invokes no production dispatch"
+  },
+  "migration": {
+    "schemaChangesInThisPr": false,
+    "dependencyChangesInThisPr": false,
+    "productionMigrationPerformed": false,
+    "consentPayload": "additive encrypted metadata; previous unknown attempts require verified recovery"
+  },
+  "commercialLaunch": "NOT_APPROVED",
+  "realBankAcceptance": "NOT_APPROVED",
+  "productionActionsPerformed": false
+}

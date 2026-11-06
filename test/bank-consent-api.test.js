@@ -107,7 +107,10 @@ test('company consent HTTP security and lifecycle',async t=>{
       const stored=db.prepare('SELECT status FROM bank_states WHERE state_hash=?').get(digest(flow.state));assert.equal(stored.status,outcome);
     }
     const flow=await start();db.prepare('UPDATE bank_states SET expires_at=? WHERE state_hash=?').run(Date.now()-1,digest(flow.state));
-    const before=calls,status=await call('/api/bank/status');assert.equal(calls,before);assert.equal(status.json.consentFlow.id,flow.flowId);assert.equal(status.json.consentFlow.status,'expired');assert.equal((await callback(flow.state)).status,403);
+    const storedBefore=db.prepare('SELECT * FROM bank_states WHERE state_hash=?').get(digest(flow.state)),before=calls,status=await call('/api/bank/status');
+    assert.equal(calls,before);assert.equal(status.json.consentFlow.id,flow.flowId);assert.equal(status.json.consentFlow.status,'expired');
+    assert.deepEqual(db.prepare('SELECT * FROM bank_states WHERE state_hash=?').get(digest(flow.state)),storedBefore,'a status read must not consume or rewrite the retained attempt');
+    assert.equal((await callback(flow.state)).status,403);assert.equal(calls,before,'expiry is rejected before provider exchange');
   });
   await t.test('disconnect invalidates an outstanding renewal without resurrecting the connection',async()=>{
     const connection=db.prepare('SELECT * FROM bank_connections ORDER BY rowid DESC LIMIT 1').get(),renewal=await start({renew_connection_id:connection.id});

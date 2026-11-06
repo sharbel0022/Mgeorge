@@ -18,7 +18,7 @@ export default function GmailWorkspace({initialDocumentId='',embedded=false,focu
   const [data,setData]=useState<any>(null),[error,setError]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[review,setReview]=useState<any>(null),[values,setValues]=useState<Record<string,string>>({}),[confirmed,setConfirmed]=useState(false);
   const [statusState,setStatusState]=useState<'loading'|'loaded'|'error'>('loading');
   const statusLoaded=statusState==='loaded'&&data!==null;
-  async function load(){setStatusState('loading');setError('');try{const result=await api('status');if(!result||!Array.isArray(result.candidates))throw Error('Gmail-status kunde inte hämtas. Försök igen.');setData(result);setStatusState('loaded');}catch(e){setStatusState('error');setError((e as Error).message);}}
+  async function load(){setStatusState('loading');setError('');try{const result=await api('status'+(initialDocumentId?'?document='+encodeURIComponent(initialDocumentId):''));if(!result||!Array.isArray(result.candidates))throw Error('Gmail-status kunde inte hämtas. Försök igen.');setData(result);setStatusState('loaded');}catch(e){setStatusState('error');setError((e as Error).message);}}
   async function changed(){await load();await onChanged?.();}
   useEffect(()=>{void load();},[]);
   useEffect(()=>()=>{if(review?.url)URL.revokeObjectURL(review.url);},[review]);

@@ -76,15 +76,57 @@ async function reviewReasons(owner:string,total:number){
     missing_vat_or_net:`${hasFields} AND (${missing('vat_cents')} OR ${missing('net_cents')})`,
     unverified_counterparty:issue('Motparten behöver verifieras för automatisk registrering.'),
     possible_duplicate:`state='duplicate' OR ${issue('Fakturan verkar redan registrerad. Ingen ny skuld skapas.')}`,
+    arithmetic_conflict:"EXISTS(SELECT 1 FROM json_each(extraction,'$.issues') WHERE type='text' AND (value LIKE 'Momsberäkningen%' OR value LIKE 'Radpris, moms%' OR value LIKE 'Radens momssats%' OR value LIKE 'Motstridiga artikelrader%'))",
+    identity_conflict:"EXISTS(SELECT 1 FROM json_each(extraction,'$.issues') WHERE type='text' AND (value LIKE '%originalets identiteter.%' OR value LIKE 'Motstridiga värden för organisationsnummer;%' OR value LIKE 'Motstridiga värden för kund eller leverantör;%'))",
+    table_incomplete:"json_extract(extraction,'$.details.table_status')='incomplete'",
+    interrupted_after_extraction:"error_code='processing_interrupted_after_extraction'",
     low_confidence:`${hasFields} AND (`+['invoice_number','party','organization_number','issued_at','due_at','total_cents','direction','currency'].map(key=>`${value(key)} IS NOT NULL AND COALESCE(json_extract(extraction,'$.fields.${key}.confidence'),0)<0.9`).map(term=>`(${term})`).join(' OR ')+')',
   };
   const keys=Object.keys(conditions);
   const row=await db().prepare(`WITH scoped AS (
-    SELECT state,CASE WHEN length(extraction)<=50000 AND json_valid(extraction) THEN extraction ELSE '{}' END extraction
+    SELECT state,error_code,CASE WHEN length(extraction)<=50000 AND json_valid(extraction) THEN extraction ELSE '{}' END extraction
     FROM document_jobs WHERE owner=? AND state IN ('needs_review','duplicate','failed') AND EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=document_jobs.owner AND s.document_id=document_jobs.document_id AND s.status<>'rejected') ORDER BY document_id LIMIT ?
   ), flags AS (SELECT ${keys.map(key=>`CASE WHEN ${conditions[key]} THEN 1 ELSE 0 END ${key}`).join(',')} FROM scoped)
   SELECT COUNT(*) analyzed,${keys.map(key=>`COALESCE(SUM(${key}),0) ${key}`).join(',')},COALESCE(SUM(CASE WHEN ${keys.join('+')}=0 THEN 1 ELSE 0 END),0) other_review FROM flags`).bind(owner,limit).first<Row>();
   return {basis:'stored_extraction',total,analyzed:Number(row?.analyzed||0),limit,truncated:total>Number(row?.analyzed||0),counts:Object.fromEntries([...keys,'other_review'].map(key=>[key,Number(row?.[key]||0)]))};
+}
+async function queueObservations(owner:string,at:number,enabled:boolean,ocrWorkerRecent:boolean){
+  const observedAt=new Date(at).toISOString(),windowStart=new Date(at-86400000).toISOString();
+  // EXISTS keeps repeated Gmail observations from multiplying work. These are
+  // due jobs, not a claim that a worker or an external scheduler is running.
+  // A completed document needs both a durable extraction and a terminal job;
+  // retries/history rows and accepted-but-interrupted continuations count once
+  // or not at all, never as additional throughput.
+  const row=await db().prepare(`WITH clock AS (SELECT ? at,? window_start), completed AS (
+    SELECT DISTINCT e.document_id FROM document_extractions e CROSS JOIN clock
+    WHERE e.owner=? AND julianday(e.created_at)>=julianday(clock.window_start) AND julianday(e.created_at)<=julianday(clock.at)
+  ), scoped AS (
+    SELECT j.*,d.created_at original_created_at,c.document_id IS NOT NULL accepted_in_window,EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=j.owner AND s.document_id=j.document_id AND s.status='needs_review') active_source
+    FROM document_jobs j JOIN documents d ON d.owner=j.owner AND d.id=j.document_id
+    LEFT JOIN completed c ON c.document_id=j.document_id
+    WHERE j.owner=? AND EXISTS(SELECT 1 FROM gmail_sources s WHERE s.owner=j.owner AND s.document_id=j.document_id AND s.status<>'rejected')
+  ), flags AS (
+    SELECT scoped.*,clock.*,state IN ('queued','waiting_ocr','processing') AND active_source pending,
+      state='processing' AND julianday(lease_until)>julianday(clock.at) live_lease
+    FROM scoped CROSS JOIN clock
+  ) SELECT
+    COALESCE(SUM(pending),0) pending,
+    COALESCE(SUM(CASE WHEN active_source AND state='queued' AND engine='cloud' AND attempts<3 AND julianday(available_at)<=julianday(at) THEN 1 ELSE 0 END),0) ready_pdf,
+    COALESCE(SUM(CASE WHEN active_source AND state='waiting_ocr' AND engine='local' AND attempts<3 AND julianday(available_at)<=julianday(at) THEN 1 ELSE 0 END),0) ready_ocr,
+    COALESCE(SUM(CASE WHEN active_source AND state IN ('queued','waiting_ocr') AND attempts<3 AND julianday(available_at)>julianday(at) THEN 1 ELSE 0 END),0) deferred,
+    COALESCE(SUM(CASE WHEN pending AND live_lease THEN 1 ELSE 0 END),0) active,
+    COALESCE(SUM(CASE WHEN pending AND state='processing' AND attempts<3 AND julianday(lease_until)<=julianday(at) THEN 1 ELSE 0 END),0) expired_leases,
+    COALESCE(SUM(CASE WHEN active_source AND (pending OR state='failed') AND attempts>=3 AND NOT COALESCE(live_lease,0) THEN 1 ELSE 0 END),0) exhausted,
+    COALESCE(SUM(CASE WHEN active_source AND state='failed' THEN 1 ELSE 0 END),0) failed,
+    MIN(CASE WHEN pending AND julianday(original_created_at)<=julianday(at) THEN original_created_at END) oldest_pending_at,
+    MIN(CASE WHEN active_source AND state IN ('queued','waiting_ocr') AND attempts<3 AND julianday(available_at)>julianday(at) THEN available_at END) next_retry_at,
+    COALESCE(SUM(CASE WHEN state IN ('ready','needs_review','duplicate','registered') AND accepted_in_window THEN 1 ELSE 0 END),0) completed_documents
+    FROM flags`).bind(observedAt,windowStart,owner,owner).first<Row>();
+  const counts=Object.fromEntries(['pending','ready_pdf','ready_ocr','deferred','active','expired_leases','exhausted','failed'].map(key=>[key,Number(row?.[key]||0)]));
+  return {
+    queue_health:{basis:'current_jobs',observed_at:observedAt,...counts,oldest_pending_at:row?.oldest_pending_at||null,next_retry_at:row?.next_retry_at||null,ocr_worker_unavailable:enabled&&counts.ready_ocr>0&&!ocrWorkerRecent},
+    throughput:{basis:'accepted_extractions_with_terminal_job',window_start:windowStart,window_end:observedAt,completed_documents:Number(row?.completed_documents||0)},
+  };
 }
 export async function processingStatus(owner:string){
   const settings=await db().prepare('SELECT enabled,auto_register,worker_seen,cloud_worker_seen,cloud_worker_completed,last_cloud_run FROM document_automation WHERE owner=?').bind(owner).first<Row>();
@@ -95,11 +137,48 @@ export async function processingStatus(owner:string){
   const cloud=(await companyWorkerConfigured(owner))??cloudOcrConfigured(),cloudSeen=settings?.cloud_worker_seen||'',at=Date.now();
   const recent=(seen:string,window:number)=>{const age=at-Date.parse(seen);return Number.isFinite(age)&&age>=0&&age<window;};
   const review=await reviewReasons(owner,counts.results.filter(r=>['needs_review','duplicate','failed'].includes(r.state)).reduce((sum,r)=>sum+Number(r.count),0));
-  return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:recent(settings?.worker_seen||'',180000),cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&recent(cloudSeen,45*60000),cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,aftercheck_pending:pending?.count||0,review_reasons:review,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
+  const observations=await queueObservations(owner,at,settings?.enabled===1,!!(cloud&&recent(cloudSeen,45*60000)||recent(settings?.worker_seen||'',180000)));
+  return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:recent(settings?.worker_seen||'',180000),cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&recent(cloudSeen,45*60000),cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,aftercheck_pending:pending?.count||0,review_reasons:review,...observations,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
+}
+async function recoverInterruptedExtraction(owner:string,job:Row){
+  let extraction:Row;
+  try{extraction=JSON.parse(job.extraction);}catch{return;}
+  if(extraction?.processing?.run_id!==await documentRunId(owner,job)||extraction.processing.sha256!==job.sha256)return;
+  const receipt=await db().prepare('SELECT id FROM document_extractions WHERE owner=? AND document_id=? AND result=? LIMIT 1').bind(owner,job.document_id,job.extraction).first<Row>();
+  if(!receipt)return;
+  try{await originalBytes(owner,job);}catch{return;}
+  await db().prepare(`UPDATE document_jobs SET state='needs_review',error_code='processing_interrupted_after_extraction',lease='',lease_until='',updated_at=?
+      WHERE owner=? AND document_id=? AND state='processing' AND attempts>=3 AND lease=? AND extraction=?
+      AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${activeSource}
+      AND EXISTS(SELECT 1 FROM document_extractions e WHERE e.owner=document_jobs.owner AND e.document_id=document_jobs.document_id AND e.id=? AND e.result=document_jobs.extraction)
+      AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?)
+      AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
+      .bind(now(),owner,job.document_id,job.lease,job.extraction,receipt.id,job.sha256,job.size).run();
+}
+async function recoverInterruptedExtractions(owner:string,at:string){
+  // A final attempt can commit its receipt and then lose the continuation.
+  // Inspect at most two jobs, including abandoned/orphaned jobs. Older or
+  // restored queues can exceed today's two live engine slots. Leave every
+  // unchecked receipt intact for the next bounded pass, never bulk-fail it.
+  const jobs=await db().prepare(`SELECT document_jobs.*,d.size,d.sha256 FROM document_jobs LEFT JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id
+    WHERE document_jobs.owner=? AND state='processing' AND attempts>=3 AND lease_until<?
+    AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)
+    ORDER BY lease_until,document_id LIMIT 2`).bind(owner,at).all<Row>();
+  for(const job of jobs.results){
+    // Only the exact leased result and unchanged original can recover to human
+    // review. The fallback also uses the selected lease/result, so concurrent
+    // renewal, manual review or a committed registration cannot be overwritten.
+    await recoverInterruptedExtraction(owner,job);
+    await db().prepare(`UPDATE document_jobs SET state='failed',error_code='lease_expired',lease='',lease_until='',updated_at=?
+      WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND attempts>=3 AND lease=? AND extraction=?
+      AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now')
+      AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
+      .bind(now(),owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until).run();
+  }
 }
 export async function enqueueDocuments(owner:string){
   const at=now();
-  await db().prepare("UPDATE document_jobs SET state='failed',error_code='lease_expired',lease='',lease_until='',updated_at=? WHERE owner=? AND state='processing' AND attempts>=3 AND lease_until<?").bind(at,owner,at).run();
+  await recoverInterruptedExtractions(owner,at);
   await db().prepare(`INSERT OR IGNORE INTO document_jobs(owner,document_id,state,engine,available_at,updated_at) SELECT DISTINCT d.owner,d.id,CASE WHEN d.mime='application/pdf' AND d.size<=5000000 THEN 'queued' ELSE 'waiting_ocr' END,CASE WHEN d.mime='application/pdf' AND d.size<=5000000 THEN 'cloud' ELSE 'local' END,?,? FROM documents d JOIN gmail_sources s ON s.owner=d.owner AND s.document_id=d.id WHERE d.owner=? AND s.status='needs_review' AND NOT EXISTS(SELECT 1 FROM gmail_sources x WHERE x.owner=d.owner AND x.document_id=d.id AND x.status='registered')`).bind(at,at,owner).run();
 }
 async function claim(owner:string,engine:string,runner='server'):Promise<Row|null>{

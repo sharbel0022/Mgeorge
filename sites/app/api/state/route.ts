@@ -1,10 +1,52 @@
 import {reconcileWithOriginals,assertPaymentOriginal,writePaymentState} from '@/lib/reconciliation-evidence';
 import {reconcileAndPrepare} from '@/lib/customer-messages';
 import { db, identity, readWorkspace, readBankFileOriginal, response, failure } from "@/lib/server";
-import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, emptyState, now, uid } from "@/lib/domain";
+import { applyCommand, BankImportEvidenceError, bankImportEvidenceError, prepareBankImportFailure, emptyState, now, uid, type Command, type State } from "@/lib/domain";
 import {readBankgiroOriginal} from '@/lib/bankgiro-service';
 import {searchBankgiroInvoice} from '@/lib/bankgiro-invoice-search';
 export const dynamic='force-dynamic';
+
+// Audit accepted business changes, never the arbitrary client envelope. Original
+// documents and rejected bank-conflict evidence have their own retained records.
+function acceptedAuditCommand(command:Command,before:State,after:State){
+ const type=command.type;
+ const added=<T extends {id:string}>(previous:T[],current:T[])=>{const ids=new Set(previous.map(item=>item.id));return current.filter(item=>!ids.has(item.id));};
+ switch(type){
+  case'invoice.save':return{type,invoice:after.invoices.find(item=>item.id===command.invoice?.id)||added(before.invoices,after.invoices)[0]};
+  case'settings.save':return{type,settings:{name:after.company.name,email:after.company.email,...(Object.hasOwn(command,'invoiceReferencePolicies')?{invoiceReferencePolicies:after.company.invoiceReferencePolicies}:{})}};
+  case'transactions.import':case'bankgiro.import':{
+   const previous=new Set(before.imports.map(item=>item.id));
+   return{type,rowCount:Array.isArray(command.rows)?command.rows.length:0,
+    imports:after.imports.filter(item=>!previous.has(item.id)||command.hash&&item.hash===command.hash).map(({id,hash,documentId,count})=>({id,hash,documentId,count})),
+    ...(after.transactions.some(item=>item.id===command.targetId)?{targetId:command.targetId}:{})};
+  }
+  case'transaction.split':{const rows=added(before.transactions,after.transactions);return{type,id:command.id,rowCount:rows.length,transactionIds:rows.map(item=>item.id)};}
+  case'transaction.verify':{
+   const item=after.transactions.find(item=>item.id===command.id);
+   return{type,id:item?.id,verification:item?.verification,confirmDistinct:command.confirmDistinct===true};
+  }
+  case'transaction.ignore':case'transaction.unverify':case'transaction.unsplit':{
+   const item=after.transactions.find(item=>item.id===command.id);
+   return{type,id:item?.id,ignored:item?.ignored,verified:item?.verified,...(type==='transaction.unsplit'?{transactionIds:after.transactions.filter(row=>row.parentId===item?.id&&row.ignored).map(row=>row.id)}:{})};
+  }
+  case'match.create':return{type,allocation:added(before.allocations,after.allocations).find(item=>item.invoiceId===command.invoiceId&&item.transactionId===command.transactionId),referenceCorrection:command.referenceCorrection===true};
+  case'match.undo':{
+   const item=after.allocations.find(item=>item.id===command.id);
+   return{type,id:item?.id,invoiceId:item?.invoiceId,transactionId:item?.transactionId,note:after.transactions.find(row=>row.id===item?.transactionId)?.automaticMatchHold?.reason,reversedAt:item?.reversedAt};
+  }
+  case'credit.add':return{type,credit:added(before.credits,after.credits)[0]};
+  case'credit.undo':{const item=after.credits.find(item=>item.id===command.id);return{type,id:item?.id,active:item?.active};}
+  case'invoice.reconcile':{const item=after.invoices.find(item=>item.id===command.id);return{type,id:item?.id,reconciledAt:item?.reconciledAt,reconciliationNote:item?.reconciliationNote};}
+  case'invoice.void':{const item=after.invoices.find(item=>item.id===command.id);return{type,id:item?.id,voided:item?.voided};}
+  case'bankgiro.link':{
+   const item=after.bankgiroLinks?.find(item=>!item.revokedAt&&item.transactionId===command.transactionId&&item.specificationIds.includes(command.specificationId));
+   return{type,...(item?{id:item.id,transactionId:item.transactionId,specificationIds:item.specificationIds,note:item.note,dateDifferenceNote:item.dateDifferenceNote,createdAt:item.createdAt}:{})};
+  }
+  case'bankgiro.unlink':{const item=after.bankgiroLinks?.find(item=>item.id===command.id);return{type,id:item?.id,note:item?.revocationNote,revokedAt:item?.revokedAt};}
+  default:return{type};
+ }
+}
+
 export async function GET(){try{const user=await identity();const data=await readWorkspace(user.userId);const audit=await db().prepare('SELECT id, revision, action, detail, created_at FROM audit_events WHERE owner = ? ORDER BY revision DESC LIMIT 100').bind(user.userId).all();return response({...data,audit:audit.results,user:{displayName:user.displayName}});}catch(e){return failure(e);}}
 export async function POST(req:Request){try{
  const user=await identity(req),text=await req.text();if(text.length>1_500_000)return response({error:'Importen är för stor. Dela upp filen.'},413);
@@ -38,7 +80,7 @@ export async function POST(req:Request){try{
   return response({error:error.message,state:prepared.state,revision:old.revision+1,evidenceRetained:true},400);
  }
  const at=now();await db().prepare('INSERT OR IGNORE INTO workspaces (owner, revision, payload, updated_at) VALUES (?, 0, ?, ?)').bind(user.userId,JSON.stringify(emptyState()),at).run();
- const detail=JSON.stringify({message:result.message,command,automatic:automatic.decisions,requestId:body.requestId});
+ const detail=JSON.stringify({message:result.message,command:acceptedAuditCommand(command,old.state,result.state),automatic:automatic.decisions,requestId:body.requestId});
  const batch=await writePaymentState(user.userId,old.revision,old.state,result.state,db(),[
   db().prepare('INSERT INTO audit_events (id, owner, revision, action, detail, created_at) SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM workspaces WHERE owner=? AND revision=?)').bind(uid(),user.userId,old.revision+1,command.type,detail,at,user.userId,old.revision),
   db().prepare('UPDATE workspaces SET payload=?, revision=revision+1, updated_at=? WHERE owner=? AND revision=?').bind(payload,at,user.userId,old.revision)

@@ -126,3 +126,24 @@ for(const connectionStatus of ['renewal_required','missing_scope','access_denied
     await button.props.onClick();assert.deepEqual(f.requests,[{path:'/api/gmail/status',method:'GET'},{path:'/api/gmail/connect',method:'POST'}]);
   });
 }
+
+test('document status shows actionable worker inactivity and separate queue recovery counts',async()=>{
+  const {DocumentOcrStatus}=await import(compile('../components/document-ocr-status.tsx'));
+  const processing={...status().processing,cloud_worker_recent:false,worker_online:false,
+    queue_health:{basis:'current_jobs',observed_at:'2026-11-05T12:00:00Z',pending:8,ready_pdf:2,ready_ocr:3,deferred:1,active:1,expired_leases:1,exhausted:2,failed:2,oldest_pending_at:'2026-11-05T10:00:00Z',next_retry_at:'2026-11-05T12:05:00Z',ocr_worker_unavailable:true},
+    throughput:{basis:'accepted_extractions_with_terminal_job',window_start:'2026-11-04T12:00:00Z',window_end:'2026-11-05T12:00:00Z',completed_documents:7}};
+  const html=renderToStaticMarkup(React.createElement(DocumentOcrStatus,{processing}));
+  assert.match(html,/OCR-kön väntar: ingen OCR-arbetare har nyligen kontaktat tjänsten/);
+  assert.match(html,/Redo för texttolkning: 2/);assert.match(html,/Redo för OCR: 3/);assert.match(html,/Väntar på nytt försök: 1/);
+  assert.match(html,/Avbrutna jobb att återuppta: 1/);assert.match(html,/Förbrukade försök: 2/);
+  assert.match(html,/Unika underlag med sparad tolkning senaste dygnet: 7/);
+  assert.ok(row(html,'Äldsta väntande underlag:').includes('2026-11-05T10:00:00Z'));
+  assert.doesNotMatch(html,/Schema verifierat|7 verifierade fakturor/);
+});
+
+test('document queue observations remain unknown when metrics are malformed or unavailable',async()=>{
+  const {DocumentQueueStatus}=await import(compile('../components/document-ocr-status.tsx'));
+  const html=renderToStaticMarkup(React.createElement(DocumentQueueStatus,{processing:{queue_health:{ready_pdf:-1,ready_ocr:NaN,deferred:0.5},throughput:{completed_documents:-1}}}));
+  assert.match(html,/Redo för texttolkning: Okänt/);assert.match(html,/Redo för OCR: Okänt/);assert.match(html,/Väntar på nytt försök: Okänt/);
+  assert.match(html,/Unika underlag med sparad tolkning senaste dygnet: Okänt/);
+});

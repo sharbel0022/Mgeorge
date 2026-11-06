@@ -1,0 +1,41 @@
+{
+  "scope": "Synthetic encrypted control-database restore; no provider access or production data",
+  "startedAt": "2026-11-05T18:47:19.752256+00:00",
+  "finishedAt": "2026-11-05T18:47:22.230415+00:00",
+  "command": [
+    "node",
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--test",
+    "--test-concurrency=1",
+    "--test-reporter=tap",
+    "test/security-login-rate-limit.test.js"
+  ],
+  "cwd": ".",
+  "environmentKeys": [
+    "CLOUDFLARE_CF_FETCH_ENABLED",
+    "LANG",
+    "LC_ALL",
+    "NODE_ENV",
+    "NO_COLOR",
+    "PATH",
+    "TMPDIR",
+    "WRANGLER_SEND_METRICS"
+  ],
+  "exitCode": 0,
+  "counts": {
+    "tests": 6,
+    "pass": 6,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "sha256": {
+    "test/security-login-rate-limit.test.js": "44852dfff3095331363caec92e3563419aa6692f133de480b6359ea0b57f986e",
+    "src/login-rate-limit.js": "b99d802e8b221697f16df0a58a07b49c88172561729ed248392dbf6702d35ddb",
+    "src/backup.js": "68fcf28489d40b1acd107f404969b4188e225ee3dd554a5d4892fb4975dd03fa"
+  },
+  "logSha256": "000bdb1e37274403ccdcb17ed565aa418e90e9b7f39910402a3960968d75baff",
+  "coverageLimit": "Explicitly backed-up control database. A company snapshot does not prove control database backup coverage."
+}

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
-import {emptyState} from '../lib/domain.ts';
+import {applyCommand,emptyState} from '../lib/domain.ts';
 import {syntheticBankTransaction} from './helpers/bank-api-fixture.mjs';
 
 const data=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
@@ -164,4 +164,16 @@ test('production search displays both interpretations of an ambiguous amount and
  assert.match(text(f.results[1]),/OTHER/);assert.match(text(f.results[1]),/123\s456,00/);
  assert.deepEqual(f.opened,[]);f.press('Enter');assert.deepEqual(f.opened,[]);
  f.click(0);assert.deepEqual(f.opened,[{kind:'detail',id:'short-number'}]);
+});
+
+test('a decimal invoice number accepted by the domain remains an explicit search result',t=>{
+ let state=emptyState();
+ for(const [number,total]of [['OTHER',202601],['2026.01',62500]])state=applyCommand(state,{type:'invoice.save',invoice:{direction:'receivable',party:'Synthetic company',number,total,issued:'2026-11-05',due:'2026-12-05',reviewed:true}}).state;
+ const [amount,reference]=state.invoices;
+ assert.equal(reference.number,'2026.01');
+ const f=fixture(t,{state});f.type('2026.01');
+ assert.deepEqual(f.results.map(result=>result.key),[reference.id,amount.id]);
+ assert.deepEqual(f.opened,[]);f.press('Enter');assert.deepEqual(f.opened,[]);
+ f.type('2026.01 SEK');assert.deepEqual(f.results.map(result=>result.key),[amount.id]);
+ f.type('2026.01');f.click(0);assert.deepEqual(f.opened,[{kind:'detail',id:reference.id}]);
 });

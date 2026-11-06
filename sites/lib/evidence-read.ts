@@ -1,5 +1,5 @@
 import {identity,db,readWorkspace,response} from './server';
-import {balance,validDate,invoiceReferenceDecision,invoiceReferenceMatches,type State,type Transaction,type Invoice} from './domain';
+import {balance,economicTransactions,validDate,invoiceReferenceDecision,invoiceReferenceMatches,type State,type Transaction,type Invoice} from './domain';
 import {bankPaymentView,bankPaymentInvoiceAssessment,bankPaymentFieldSources} from './payment-presentation';
 import {readPaymentVerification} from './payment-verification';
 import {bankgiroRetainedPreview} from './bankgiro-service';
@@ -17,7 +17,7 @@ const validId=(v:unknown):v is string=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,10
 const reference=(v:unknown):v is string=>typeof v==='string'&&v.length<=100&&!!v.trim()&&!/[\x00-\x1f\x7f]/.test(v);
 function argumentsFor(value:unknown,kind:'payment'|'report'):Args&{offset:number;limit:number}{
  if(!object(value))throw Error('Ogiltiga läsargument.');
- const allowed=kind==='payment'?['transactionId','reference','amountCents','date','offset','limit']:['documentId','sha256','transactionId','offset','limit'];
+ const allowed=kind==='payment'?['transactionId','reference','amountCents','date','offset','limit']:['documentId','sha256','transactionId','offset','limit','historyOffset','historyLimit'];
  if(Object.keys(value).some(k=>!allowed.includes(k)))throw Error('Okänt läsargument. Ägare och konton kan inte väljas av anroparen.');
  if(kind==='payment'){
   if((value.transactionId!==undefined)===(value.reference!==undefined))throw Error('Välj exakt ett bankhändelse-ID eller en exakt referens.');
@@ -33,6 +33,7 @@ function argumentsFor(value:unknown,kind:'payment'|'report'):Args&{offset:number
  if(value.transactionId!==undefined&&!validId(value.transactionId))throw Error('Ogiltigt bankhändelse-ID.');
  const limit=value.limit??(kind==='payment'?1:20),offset=value.offset??0,max=kind==='payment'?5:100;
  if(!Number.isSafeInteger(limit)||(limit as number)<1||(limit as number)>max||!Number.isSafeInteger(offset)||(offset as number)<0||(offset as number)>100_000)throw Error('Ogiltig sidindelning.');
+ if(kind==='report')for(const [key,min,max,fallback]of [['historyOffset',0,100000,0],['historyLimit',1,20,10]] as const){const n=value[key]??fallback;if(!Number.isSafeInteger(n)||(n as number)<min||(n as number)>max)throw Error('Ogiltig sidindelning för importhistorik.');}
  if(kind==='payment'&&value.transactionId!==undefined&&(offset!==0||limit!==1))throw Error('Ett bankhändelse-ID läses en gång utan sidindelning.');
  return {...value,offset:offset as number,limit:limit as number};
 }
@@ -99,8 +100,39 @@ function bounded(data:any,key:'payments'|'rows'){
   data[key]=[];data.nextOffset=data.offset;data.detailOmitted='Underlaget överskrider svarets storleksgräns. Granska originalet i den privata arbetsytan.';
   if(data.registry)data.registry={matchCount:data.registry.matchCount,ambiguous:data.registry.ambiguous,complete:false,invoices:[]};
   if(data.sourceCandidates)data.sourceCandidates=[];
+  if(data.provenance){
+   for(const key of ['imports','sourceReceipts','observations','allocations','sourceLinks'])data.provenance[key].items=[];
+   data.provenance.complete=false;data.provenance.nextOffset=data.provenance.offset;
+   data.provenance.detailOmitted='Historiken överskrider svarets storleksgräns. Begär färre historikposter.';
+  }
  }
  return data;
+}
+
+type ReportDocument={id:string;size:number;sha256:string;created_at:string};
+type ReportReceipt={id:string;source_id:string;report_id:string;sha256:string;status:string;attempts:number;available_at:string|null;import_id:string|null;created_at:number;updated_at:number};
+/** Project only retained bookkeeping. Source scope/generation/bindings and raw
+ * provider payloads never leave the private storage boundary through history. */
+async function reportReceiptSnapshot(owner:string,documentId:string,offset:number,limit:number){
+ const database=db(),[count,rows]=await Promise.all([
+  database.prepare('SELECT COUNT(*) total FROM bankgiro_ingest_jobs WHERE owner=? AND document_id=?').bind(owner,documentId).first<{total:number}>(),
+  database.prepare('SELECT id,source_id,report_id,sha256,status,attempts,available_at,import_id,created_at,updated_at FROM bankgiro_ingest_jobs WHERE owner=? AND document_id=? ORDER BY created_at,id LIMIT ? OFFSET ?').bind(owner,documentId,limit,offset).all<ReportReceipt>(),
+ ]);
+ return {total:count?.total??0,items:rows.results};
+}
+function reportProvenance(state:State,document:ReportDocument,receipts:Awaited<ReturnType<typeof reportReceiptSnapshot>>,offset:number,limit:number){
+ const byId=<T extends {id:string}>(items:T[])=>items.sort((a,b)=>a.id.localeCompare(b.id));
+ const page=<T,>(items:T[])=>({total:items.length,items:items.slice(offset,offset+limit)});
+ const instant=(value:number)=>Number.isSafeInteger(value)&&Number.isFinite(new Date(value).getTime())?new Date(value).toISOString():null;
+ const rows=byId(state.transactions.filter(row=>row.bankFileProof?.documentId===document.id)),ids=new Set(rows.map(row=>row.id));
+ const economic=new Set(economicTransactions(state).map(row=>row.id));
+ const imports=page(byId(state.imports.filter(record=>record.documentId===document.id)).map(record=>({importId:record.id,name:record.name,createdAt:record.createdAt,paymentCount:record.count,sha256:record.hash,originalHashMatches:record.hash===document.sha256})));
+ const sourceReceipts={total:receipts.total,items:receipts.items.map(row=>({receiptId:row.id,sourceId:row.source_id,reportId:row.report_id,status:row.status,attempts:row.attempts,availableAt:row.available_at,receivedAt:instant(row.created_at),updatedAt:instant(row.updated_at),importId:row.import_id,sha256:row.sha256,originalHashMatches:row.sha256===document.sha256}))};
+ const observations=page(rows.map(row=>({transactionId:row.id,importId:row.importId||null,originalHashMatches:row.bankFileProof?.sha256===document.sha256,parentTransactionId:row.parentId||null,specificationStatus:row.specificationStatus||null,countedEconomically:economic.has(row.id)})));
+ const allocations=page(byId(state.allocations.filter(row=>ids.has(row.transactionId))).map(row=>{const invoice=state.invoices.find(invoice=>invoice.id===row.invoiceId);return {allocationId:row.id,transactionId:row.transactionId,invoiceId:row.invoiceId,invoicePresent:!!invoice,invoiceNumber:invoice?.number??null,amountCents:row.amount,effect:row.effect,active:row.active,createdAt:row.createdAt,reversedAt:row.reversedAt||null};}));
+ const sourceLinks=page(byId((state.bankgiroLinks||[]).filter(link=>link.documentId===document.id)).map(link=>({linkId:link.id,transactionId:link.transactionId,method:link.method,originalHashMatches:link.sha256===document.sha256,createdAt:link.createdAt,revokedAt:link.revokedAt||null})));
+ const more=[imports,sourceReceipts,observations,allocations,sourceLinks].some(part=>offset+limit<part.total);
+ return {verificationScope:'retained_history_only',bankAuthenticityVerified:false,invoiceRelationshipVerified:false,original:{sizeBytes:document.size,retainedAt:document.created_at},offset,limit,imports,sourceReceipts,observations,allocations,sourceLinks,nextOffset:more?offset+limit:null,complete:!more,snapshotCurrent:true};
 }
 async function snapshotStillCurrent(owner:string,revision:number){
  const row=await db().prepare('SELECT revision FROM workspaces WHERE owner=?').bind(owner).first<{revision:number}>();
@@ -137,10 +169,20 @@ export async function readRetainedReportEvidence(input:unknown){
  const args=argumentsFor(input,'report'),{user,state,revision,base}=await context(),targetId=typeof args.transactionId==='string'?args.transactionId:'';
  if(targetId&&!state.transactions.some(t=>t.id===targetId))throw Error('Bankhändelsen finns inte för ditt konto.');
  const docs=typeof args.documentId==='string'
-  ?await db().prepare('SELECT id FROM documents WHERE owner=? AND id=? LIMIT 2').bind(user.userId,args.documentId).all<{id:string}>()
-  :await db().prepare('SELECT id FROM documents WHERE owner=? AND sha256=? ORDER BY id LIMIT 2').bind(user.userId,args.sha256).all<{id:string}>();
+  ?await db().prepare('SELECT id,size,sha256,created_at FROM documents WHERE owner=? AND id=? LIMIT 2').bind(user.userId,args.documentId).all<ReportDocument>()
+  :await db().prepare('SELECT id,size,sha256,created_at FROM documents WHERE owner=? AND sha256=? ORDER BY id LIMIT 2').bind(user.userId,args.sha256).all<ReportDocument>();
  if(!docs.results.length)throw Error('Originalet finns inte för ditt konto.');
  if(docs.results.length>1)return response({...base,ambiguous:true,complete:false,integrity:'not_checked',documentIds:docs.results.map(d=>d.id),rows:[],outputLimited:false});
- const fresh=await bankgiroRetainedPreview(user.userId,docs.results[0].id,targetId),rows=fresh.rows.slice(args.offset,args.offset+args.limit).map((row:any,index:number)=>({rowIndex:args.offset+index,date:row.date,amountCents:row.amount,currency:row.currency,party:row.party,payerReference:row.payerReference,bankReference:row.bankReference,parentBankReference:row.parentBankReference,referenceEvidence:row.referenceEvidence,organizationNumber:row.organizationNumber,accountIssue:row.bankgiroAccountIssue||'',accountVerified:!row.bankgiroAccountIssue,registry:registry(state,row.payerReference)})),next=args.offset+rows.length<fresh.rows.length?args.offset+rows.length:null,snapshotCurrent=await snapshotStillCurrent(user.userId,revision);
- return response(bounded(privateProjection({...base,documentId:fresh.documentId,name:fresh.name,sha256:fresh.hash,integrity:'passed',integrityMeaning:'Det ägda originalets storlek och kontrollsumma stämmer; detta bevisar inte bankens autenticitet.',ambiguous:false,targetTransactionId:targetId||null,targetRelationProved:false,offset:args.offset,limit:args.limit,total:fresh.rows.length,rows,nextOffset:next,snapshotCurrent,complete:next===null&&rows.every((r:any)=>r.registry.complete)&&snapshotCurrent},state,fresh.rows.flatMap((r:any)=>[r.account,r.recipientAccount,r.payerAccount].filter(Boolean))),'rows'));
+ const document=docs.results[0],historyOffset=(args.historyOffset??0) as number,historyLimit=(args.historyLimit??10) as number;
+ const receipts=await reportReceiptSnapshot(user.userId,document.id,historyOffset,historyLimit);
+ const fresh=await bankgiroRetainedPreview(user.userId,docs.results[0].id,targetId),rows=fresh.rows.slice(args.offset,args.offset+args.limit).map((row:any,index:number)=>({rowIndex:args.offset+index,date:row.date,amountCents:row.amount,currency:row.currency,party:row.party,payerReference:row.payerReference,bankReference:row.bankReference,parentBankReference:row.parentBankReference,referenceEvidence:row.referenceEvidence,organizationNumber:row.organizationNumber,accountIssue:row.bankgiroAccountIssue||'',accountVerified:!row.bankgiroAccountIssue,registry:registry(state,row.payerReference)})),next=args.offset+rows.length<fresh.rows.length?args.offset+rows.length:null;
+ const [latestDocument,latestReceipts]=await Promise.all([
+  db().prepare('SELECT id,size,sha256,created_at FROM documents WHERE owner=? AND id=?').bind(user.userId,document.id).first<ReportDocument>(),
+  reportReceiptSnapshot(user.userId,document.id,historyOffset,historyLimit),
+ ]);
+ const snapshotCurrent=await snapshotStillCurrent(user.userId,revision);
+ const provenance=reportProvenance(state,document,receipts,historyOffset,historyLimit);
+ provenance.snapshotCurrent=snapshotCurrent&&document.sha256===fresh.hash&&JSON.stringify(latestDocument)===JSON.stringify(document)&&JSON.stringify(receipts)===JSON.stringify(latestReceipts);
+ provenance.complete&&=provenance.snapshotCurrent;
+ return response(bounded(privateProjection({...base,documentId:fresh.documentId,name:fresh.name,sha256:fresh.hash,integrity:'passed',integrityMeaning:'Det ägda originalets storlek och kontrollsumma stämmer; detta bevisar inte bankens autenticitet.',ambiguous:false,targetTransactionId:targetId||null,targetRelationProved:false,offset:args.offset,limit:args.limit,total:fresh.rows.length,rows,nextOffset:next,snapshotCurrent,provenance,complete:next===null&&rows.every((r:any)=>r.registry.complete)&&snapshotCurrent&&provenance.complete},state,fresh.rows.flatMap((r:any)=>[r.account,r.recipientAccount,r.payerAccount].filter(Boolean))),'rows'));
 }

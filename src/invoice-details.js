@@ -8,7 +8,7 @@ const recipientOwner='(?:kundens|mottagarens|fakturamottagarens|customer(?:[’\
 const orgLabel='(?:org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|org\\.?[ \\t]*number|organi[sz]ation[ \\t]+number)';
 const entityLabel='(?:'+supplierLabel+'|'+recipientLabel+')';
 const knownField=/^(?:faktura(?:nummer|nr|datum|belopp)|invoice(?:\s*(?:number|no|date))?|förfallo(?:datum|dag)|förfaller|due\s*date|betalningsuppgifter|tilläggsinformation|payment details|netto|net amount|summa[ \t]+moms|moms|vat|att betala|amount due|totalbelopp|bankgiro|bg\b|ocr\b|betalningsreferens|payment reference|valuta|currency)/iu;
-const boundaryLabel=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?=(?:'+entityLabel+'|(?:'+supplierOwner+'|'+recipientOwner+')[ \\t]+'+orgLabel+'|'+orgLabel+'|fakturanummer|fakturanr|invoice number|fakturadatum|invoice date|förfallodatum|due date|netto|net amount|moms|vat|att betala|amount due|bankgiro|ocr|betalningsreferens|payment reference|valuta|currency)[ \\t]*[:#])','iu');
+const boundaryLabel=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?=(?:'+entityLabel+'|(?:'+supplierOwner+'|'+recipientOwner+')[ \\t]+'+orgLabel+'|'+orgLabel+'|fakturabelopp|fakturanummer|fakturanr|invoice number|fakturadatum|invoice date|förfallodatum|due date|netto|net(?:[ \\t]+amount)?|total(?:[ \\t]+amount)?|summa[ \\t]+moms|moms|(?:total[ \\t]+)?vat(?:[ \\t]+amount)?|att betala|amount due|bankgiro|ocr|betalningsreferens|payment reference|valuta|currency)[ \\t]*[:#])','iu');
 const nameValue=value=>value.length>=2&&value.length<=240&&/\p{L}/u.test(value)&&!/[?\uFFFD]/u.test(value)&&!/^(?:oläslig[ta]?|okän[dt]|unknown|unreadable|n\/?a|null|saknas|(?:ej|inte)[ \t]+angiv(?:en|et|na)|not[ \t]+(?:provided|specified)|missing)$/iu.test(value)?value:null;
 const dedupeEvidence=items=>[...new Map(items.map(item=>[`${item.page}:${item.line}`,item])).values()];
 
@@ -199,7 +199,10 @@ export function isInvoiceTableHeader(line){return tableHeader(line)!==null;}
 const quantityValue=value=>/^-?\d+(?:[.,]\d{1,4})?$/.test(value)&&Number.isFinite(Number(value.replace(',','.')))&&Math.abs(Number(value.replace(',','.')))<=1_000_000_000?Number(value.replace(',','.')):null;
 const rateValue=value=>{const match=value.match(/^(\d{1,3}(?:[.,]\d{1,3})?)[ \t]*%?$/);if(!match)return null;const n=Number(match[1].replace(',','.'));return n>=0&&n<=100?n:null;};
 const rowKeys=['description','quantity','unit_price_cents','net_cents','vat_rate','vat_cents','total_cents'];
-const tableSummary=/^(?:netto(?:belopp)?|totalt netto|net amount|belopp före moms|(?:summa|totalt|belopp)[ \t]+(?:inkl|exkl)(?:usive|\.?)[ \t]+moms|summa[ \t]+moms|moms(?:belopp)?|total moms|vat|att betala|summa att betala|totalbelopp|totalsumma|fakturabelopp|amount due)(?=[ \t]*[:.#]|[ \t]*$|[ \t]+(?:-?\d|SEK\b|EUR\b|USD\b|GBP\b|NOK\b|DKK\b))/iu;
+// Unpunctuated summaries must contain one complete monetary value; a table
+// description beginning with Net/Total must not terminate and hide item rows.
+const summaryMoney='-?(?:\\d{1,3}(?:,\\d{3})+\\.\\d{1,2}|\\d{1,3}(?:\\.\\d{3})+,\\d{1,2}|(?:\\d+|\\d{1,3}(?: \\d{3})+)(?:[.,]\\d{1,2})?)';
+const tableSummary=new RegExp('^(?:netto(?:belopp)?|totalt netto|net(?:[ \\t]+amount)?|belopp före moms|(?:summa|totalt|belopp)[ \\t]+(?:inkl|exkl)(?:usive|\\.?)[ \\t]+moms|summa[ \\t]+moms|moms(?:belopp)?|total moms|(?:total[ \\t]+)?vat(?:[ \\t]+amount)?|att betala|summa att betala|totalbelopp|totalsumma|fakturabelopp|amount due|total(?:[ \\t]+amount)?)(?:[ \\t]*[:.#]|[ \\t]*$|[ \\t]+(?:(?:SEK|EUR|USD|GBP|NOK|DKK)[ \\t]*)?'+summaryMoney+'(?:[ \\t]*(?:SEK|EUR|USD|GBP|NOK|DKK|kr))?[ \\t]*$)','iu');
 const pageCaption=/^(?:sida|page)[ \t]+\d+(?:[ \t]*(?:av|of|\/)[ \t]*\d+)?$/iu;
 const invoiceIdentity=/^(?:faktura[ \t]*(?:nummer|nr|no)|invoice[ \t]*(?:number|no))[ \t]*[:.#-]?[ \t]*([\p{L}\p{N}][\p{L}\p{N}/_-]*)$/iu;
 const continuationIdentity=/^(?:faktura|invoice)[ \t]+([\p{L}\p{N}][\p{L}\p{N}/_-]*)[ \t]*[,;:]?[ \t]*(?:fortsättning|continued|continuation)[ \t]+(?:sida|page)[ \t]+\d+(?:[ \t]+(?:av|of)[ \t]+\d+|[ \t]*\/[ \t]*\d+)?$/iu;

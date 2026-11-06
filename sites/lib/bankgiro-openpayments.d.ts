@@ -10,6 +10,10 @@ export interface OpenPaymentsEnrichmentEvidence {
  sourcePaths:string[]; accountSource:string; fieldEvidence:Record<string,unknown>;
  parentEntryReference:string; parentSource:string; groupComplete:boolean;
 }
+export interface OpenPaymentsDocumentNumberEvidence {
+ kind:'document'; value:string; rawValue:string; source:string;
+ documentSource:string; documentInformation:{number:string;typeCode?:string;typeProprietary?:string;typeIssuer?:string;relatedDate?:string};
+}
 export interface OpenPaymentsBankgiroRow {
  kind:'payment'; specification:true; verified:false;
  key:string; externalId:string; parentKey:string;
@@ -18,7 +22,7 @@ export interface OpenPaymentsBankgiroRow {
  recipientBankgiro:string; account:string; source:string; format:string;
  organizationNumber:string; payerAccount:string; remittanceMessage:string; description:string;
  payerEvidence:ReturnType<typeof import('./payer-evidence.js').normalizePayerEvidence>;
- referenceEvidence:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>;
+ referenceEvidence:ReturnType<typeof import('./payment-references.js').extractPaymentReferences>&{documentNumbers?:OpenPaymentsDocumentNumberEvidence[]};
  reportEvidence:Record<string,string>;
  bankgiroEnrichmentIssue:string; enrichmentEvidence:OpenPaymentsEnrichmentEvidence;
  rawBankData:Record<string,unknown>; rawAccount:Record<string,unknown>|null;

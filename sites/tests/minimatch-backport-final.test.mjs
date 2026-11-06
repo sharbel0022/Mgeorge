@@ -130,6 +130,10 @@ test('a hard-linked guarded file is rejected without changing its outside origin
 
 test('a real mid-write OS failure is not certified and the known partial state repairs safely', { timeout: 30_000 }, async t => {
   const run = await guard(), f = fixture(t); copyScripts(f.root);
+  // This deliberately resource-limited fault child is uninstrumented: its
+  // 64KiB file cap also truncates inherited V8 coverage JSON, invalidating the
+  // entire suite's report. Parent preflight/repair assertions remain covered.
+  const faultEnvironment = { ...process.env, NODE_V8_COVERAGE: '' };
   let holder;
   let result;
   if (process.platform === 'win32') {
@@ -138,12 +142,12 @@ test('a real mid-write OS failure is not certified and the known partial state r
       env: { ...process.env, MINIMATCH_LOCK_FILE: path.join(f.targets[0], 'dist/commonjs/index.js.map') }, stdio: ['pipe', 'pipe', 'pipe'],
     });
     const ready = await once(holder.stdout, 'data'); assert.match(String(ready[0]), /ready/);
-    try { result = spawnSync(process.execPath, [path.join(f.root, 'scripts/minimatch-backport.mjs'), '--require-target'], { encoding: 'utf8', timeout: 10_000 }); }
+    try { result = spawnSync(process.execPath, [path.join(f.root, 'scripts/minimatch-backport.mjs'), '--require-target'], { env: faultEnvironment, encoding: 'utf8', timeout: 10_000 }); }
     finally { holder.stdin.end('\n'); await once(holder, 'close'); }
   } else {
     // A 64KiB file-size limit accepts the first runtime then rejects the map.
     result = spawnSync('bash', ['-c', 'ulimit -f 64; exec "$@"', 'minimatch-limited', process.execPath, path.join(f.root, 'scripts/minimatch-backport.mjs'), '--require-target'], {
-      encoding: 'utf8', timeout: 10_000,
+      env: faultEnvironment, encoding: 'utf8', timeout: 10_000,
     });
   }
   assert.notEqual(result.status, 0);

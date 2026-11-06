@@ -108,7 +108,12 @@ async function checkedState(owner:string,initial:State,options:ReconciliationOpt
  const state=structuredClone(initial),read=originalReader(owner),decisions:any[]=[...accountDecisions],checked=new Set<string>();
  for(let pass=0;pass<=state.transactions.length;pass++){
   const ids=requiredEvidence(pass===0?probe:state,verifiedInvoiceOriginals,sourceReviewIssues,options);
-  if(pass===0)for(const t of initial.transactions)if(paymentOriginalIssue(initial,t)||t.bankAccountIssue)ids.add(t.id);
+  if(pass===0)for(const t of initial.transactions){
+   // Manual bank-backed reviews still need current original/account diagnostics,
+   // even when their substituted facts cannot authorize automatic allocation.
+   const manualBankReview=(t.verification||t.evidence==='verified_specification')&&paymentLineage(initial,t).ancestors.some(needsAccount);
+   if(paymentOriginalIssue(initial,t)||t.bankAccountIssue||manualBankReview)ids.add(t.id);
+  }
   const pending=[...relatedTransactions(state,ids)].filter(id=>!checked.has(id));
   if(!pending.length)return {state,decisions,verifiedInvoiceOriginals,sourceReviewIssues};
   for(const id of pending){
