@@ -1,5 +1,5 @@
 import {classifyDocument,documentConflicts} from './document-triage.js';
-import {extractInvoiceDetails,invoiceScalarText} from './invoice-details.js';
+import {extractInvoiceDetails,invoiceScalarText,invoiceReferenceMentions} from './invoice-details.js';
 import {assessOcrBankgiro,ocrInputHash} from '../sites/lib/ocr-bankgiro-evidence.js';
 import {fork} from 'node:child_process';
 import {parseMoney} from './importers.js';
@@ -67,7 +67,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   const originalInput=String(text||''),layout=normalizeInvoiceLayout(text);text=layout.text;
   text=text.replace(/Fakturadatum[ \t]+Fakturanummer[ \t]*\n[ \t]*(\d{4}-\d{2}-\d{2})[ \t]+([A-Za-z0-9/_-]+)/gi,(_,date,number)=>`Fakturadatum: ${date}\nFakturanummer: ${number}`);
   const fields=Object.fromEntries(fieldNames.map(k=>[k,{value:null,confidence:0,evidence:null,warning:null}])),issues=[...layout.warnings];
-  const scalarLabels=[];
+  const scalarLabels=[],referenceMentions=invoiceReferenceMentions(text);
   const confidence=method==='ocr'?Math.min(.85,Math.max(0,ocrConfidence/100)):.96;
   const set=(key,value,evidence,score=confidence)=>{fields[key]={value,confidence:value==null?0:score,evidence:evidence?.slice(0,300)||null,warning:score<.9?'Kräver kontroll':null};};
   const record=(key,matches,convert=s=>s.trim(),invalid=false)=>{
@@ -110,7 +110,12 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     const suffix=invoiceLabel||dateField?'':currencyLabel?'(?=[\\s.:#-]|$)':'(?=[\\s.:#]|$)',separator=invoiceLabel||currencyLabel?'[:.#-]':'[:.#]';
     const re=new RegExp((dateField?'':'(?<![\\p{L}\\p{N}/_-])')+label+suffix+'[ \\t]*'+separator+'?[ \\t]*','giu'),matches=[];
     scalarLabels.push(new RegExp(re.source,'iu'));
+    let mentionIndex=0;
     for(const match of text.matchAll(re)){
+      if(key==='reference'){
+        while(referenceMentions[mentionIndex]?.end<=match.index)mentionIndex++;
+        if(referenceMentions[mentionIndex]?.start<=match.index)continue;
+      }
       let start=match.index+match[0].length;
       // Paragraph-gap recovery is only justified for explicit monetary
       // summaries. An identity, reference, account or date must stay on its
@@ -188,7 +193,9 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   set('kind',kind,typeEvidence?.[0]);
   // Explicit currency labels are a separate census. A valid inline SEK
   // token cannot erase an unreadable label or a known prefix followed by junk.
-  const explicitCurrency=grabFull('currency','(?:valuta|currency)',value=>/^(?:SEK|EUR|USD|GBP|NOK|DKK)$/i.test(value)?value.toUpperCase():null);
+  // One terminal sentence period does not change a complete ISO value. Never
+  // accept a prefix followed by another token, punctuation or unreadable data.
+  const explicitCurrency=grabFull('currency','(?:valuta|currency)',value=>/^(?:SEK|EUR|USD|GBP|NOK|DKK)\.?$/i.test(value)?value.replace(/\.$/,'').toUpperCase():null);
   const currencies=[...new Set((text.match(/\b(?:SEK|EUR|USD|GBP|NOK|DKK)\b/gi)||[]).map(value=>value.toUpperCase()))];
   if(!explicitCurrency&&currencies.length===1)set('currency',currencies[0],currencies[0]);
   else if(!explicitCurrency&&!currencies.length&&/\bkr\b/i.test(text))set('currency','SEK','kr',.7);

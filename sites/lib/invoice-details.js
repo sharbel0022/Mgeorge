@@ -12,6 +12,14 @@ const boundaryLabel=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?=(?:'+entityLabe
 const nameValue=value=>value.length>=2&&value.length<=240&&/\p{L}/u.test(value)&&!/[?\uFFFD]/u.test(value)&&!/^(?:oläslig[ta]?|okän[dt]|unknown|unreadable|n\/?a|null|saknas|(?:ej|inte)[ \t]+angiv(?:en|et|na)|not[ \t]+(?:provided|specified)|missing)$/iu.test(value)?value:null;
 const dedupeEvidence=items=>[...new Map(items.map(item=>[`${item.page}:${item.line}`,item])).values()];
 
+// A complete instruction mentions a reference type without supplying a value.
+// Recognize only closed sentences with no colon, identifier or unknown tail;
+// actual/invalid value-bearing occurrences remain in the full field census.
+export function invoiceReferenceMentions(text){
+  const instruction=/(?:^|(?<=[.!?])[ \t]+)(?:ange|uppge|använd)[ \t]+(?:fakturans[ \t]+)?OCR(?:-(?:numret|nummer|referensen|referens))?[ \t]+(?:vid[ \t]+betalning|som[ \t]+betalningsreferens)(?=[.!?](?:[ \t]|$)|$)/gimu;
+  return [...String(text).matchAll(instruction)].map(match=>({start:match.index,end:match.index+match[0].length}));
+}
+
 function linesOf(input){
   return String(input||'').slice(0,150000).replace(/\r\n?/g,'\n').split('\f').flatMap((page,p)=>page.split('\n').map((text,n)=>({page:p+1,line:n+1,text})));
 }
@@ -153,7 +161,13 @@ function parseParties(lines,{direction,validOrganization,scalarBoundary=()=>-1,s
 
 function referenceDetails(lines,value,issues){
   const referencePattern=/(?<![\p{L}\p{N}/_-])(OCR(?:[- /]?(?:nummer|referens))?|betalningsreferens|payment reference)(?=[ \t.:#]|$)/giu;
-  const occurrences=lines.flatMap(source=>[...normalized(source.text).matchAll(referencePattern)].map(match=>({kind:/^OCR/i.test(match[1])?'ocr':'payment_reference',source})));
+  const occurrences=lines.flatMap(source=>{
+    const text=normalized(source.text),mentions=invoiceReferenceMentions(text);let mentionIndex=0;
+    return [...text.matchAll(referencePattern)].filter(match=>{
+      while(mentions[mentionIndex]?.end<=match.index)mentionIndex++;
+      return !(mentions[mentionIndex]?.start<=match.index);
+    }).map(match=>({kind:/^OCR/i.test(match[1])?'ocr':'payment_reference',source}));
+  });
   const kind=value!==null&&occurrences.length?(occurrences.some(item=>item.kind==='ocr')?'ocr':'payment_reference'):null;
   let checksum_valid=null;
   if(kind==='ocr'){
