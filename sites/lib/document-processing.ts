@@ -197,14 +197,16 @@ async function recoverInterruptedExtraction(owner:string,job:Row):Promise<'handl
       savedExtraction=reviewExtraction(job.extraction,'Originalunderlaget är tillfälligt otillgängligt. Kontrollera det före registrering.');
     }
   }
-  const recovered=await db().prepare(`UPDATE document_jobs SET state=?,error_code=?,extraction=?,lease='',lease_until='',updated_at=?
+  await db().prepare(`UPDATE document_jobs SET state=?,error_code=?,extraction=?,lease='',lease_until='',updated_at=?
       WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND lease=? AND extraction=?
       AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND available_at=? AND ${activeSource}
       AND (? IS NULL OR EXISTS(SELECT 1 FROM document_extractions e WHERE e.owner=document_jobs.owner AND e.document_id=document_jobs.document_id AND e.id=?))
       AND EXISTS(SELECT 1 FROM documents d WHERE d.owner=document_jobs.owner AND d.id=document_jobs.document_id AND d.sha256=? AND d.size=?)
       AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
       .bind(state,code,savedExtraction,now(),owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until,job.available_at,receipt?.id??null,receipt?.id??null,job.sha256,job.size).run();
-  if(recovered.meta.changes===1)return 'handled';
+  // A lost snapshot is not an unrecorded expired attempt. Reevaluate it on
+  // the next pass; never fall through to the generic exhaustion transition.
+  return 'handled';
 }
 async function recoverInterruptedExtractions(owner:string,at:string){
   // Every attempt can commit before losing its continuation. Bound each pass
@@ -425,6 +427,21 @@ async function workerOwner(req:Request){
   const owner=rows.results[0].owner as string;
   await db().prepare(mode==='cloud'?'UPDATE document_automation SET cloud_worker_seen=? WHERE owner=?':'UPDATE document_automation SET worker_seen=? WHERE owner=?').bind(now(),owner).run();return {owner,mode};
 }
+async function workerIdentityBody(req:Request):Promise<string|null>{
+  const reader=req.body?.getReader();if(!reader)return '';
+  const bytes=new Uint8Array(4096);let size=0;
+  try{
+    for(;;){
+      const {done,value}=await reader.read();if(done)break;
+      if(size+value.byteLength>bytes.length){
+        // Cancellation is cleanup, never an unbounded provider wait.
+        void reader.cancel().catch(()=>{});return null;
+      }
+      bytes.set(value,size);size+=value.byteLength;
+    }
+  }finally{reader.releaseLock();}
+  return new TextDecoder('utf-8',{fatal:true}).decode(bytes.subarray(0,size));
+}
 export async function workerAction(req:Request,action:string){
   const {owner,mode}=await workerOwner(req);
   if(action==='process'&&req.method==='POST'&&mode==='cloud'){
@@ -437,8 +454,12 @@ export async function workerAction(req:Request,action:string){
     return response({job:{id:job.document_id,lease:job.lease,mime:job.mime,size:job.size,sha256:job.sha256,protocol:2,run_id:await documentRunId(owner,job),lease_until:job.lease_until}});
   }
   if((action==='heartbeat'||action==='receipt')&&req.method==='POST'){
-    const raw=await req.text();if(raw.length>4096)return response({error:'För stor begäran.'},413);
-    let body:Row;try{body=JSON.parse(raw);}catch{return response({error:'Ogiltigt jobb.'},400);}
+    let body:Row;
+    try{
+      const raw=await workerIdentityBody(req);
+      if(raw===null)return response({error:'För stor begäran.'},413);
+      body=JSON.parse(raw);
+    }catch{return response({error:'Ogiltigt jobb.'},400);}
     if(!body||typeof body.id!=='string'||!/^[a-zA-Z0-9_-]{1,100}$/.test(body.id)||typeof body.lease!=='string'||!/^[A-Za-z0-9_-]{43}$/.test(body.lease)||typeof body.sha256!=='string'||!/^[a-f0-9]{64}$/.test(body.sha256))return response({error:'Ogiltigt jobb.'},400);
     const job=await db().prepare(`SELECT document_jobs.*,d.sha256,d.size FROM document_jobs JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id WHERE document_jobs.owner=? AND document_id=? AND engine='local'`).bind(owner,body.id).first<Row>();
     if(!job||job.sha256!==body.sha256)return response({error:'Jobbet har ändrats eller gått ut.'},409);

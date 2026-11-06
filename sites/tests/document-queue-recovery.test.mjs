@@ -371,7 +371,11 @@ for(const defect of ['previous lease receipt','missing history','changed origina
     const get=f.env.BUCKET.get;f.env.BUCKET.get=async key=>{f.sql.prepare("UPDATE gmail_sources SET status='rejected'").run();return get(key);};
   }
   await f.restart();assert.equal(await f.lease(),null);
-  const after=f.sql.prepare('SELECT * FROM document_jobs').get();assert.equal(after.state,'failed');assert.equal(after.extraction,receipt);
+  const after=f.sql.prepare('SELECT * FROM document_jobs').get();
+  // A concurrent rejection wins; recovery must not substitute its own terminal
+  // transition after losing the active-source compare-and-swap.
+  assert.equal(after.state,defect==='rejected while reading'?'processing':'failed');assert.equal(after.extraction,receipt);
+  if(defect==='rejected while reading'){assert.equal(after.lease,job.lease);assert.equal(after.lease_until,'2000-01-01');}
   assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
 });
 

@@ -286,3 +286,34 @@ for(const defect of ['missing receipt','changed original metadata'])test('an ear
   assert.equal(row.error_code,defect==='missing receipt'?'result_receipt_missing':'original_integrity');
   assert.equal(await f.lease(),null);
 });
+
+test('accepted recovery losing its original snapshot never falls through to generic lease expiry',async t=>{
+  const f=await fixture(t);await f.document('metadata-race');const job=await f.lease();await f.complete(job);
+  const extraction=JSON.parse(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction);extraction.level='green';
+  f.sql.prepare("UPDATE document_jobs SET state='processing',attempts=3,lease=?,lease_until='2000-01-01',extraction=?").run(job.lease,JSON.stringify(extraction));
+  const before={...f.sql.prepare('SELECT * FROM document_jobs').get()},history=f.sql.prepare('SELECT * FROM document_extractions').all(),get=f.env.BUCKET.get;
+  f.env.BUCKET.get=async key=>{f.sql.prepare('UPDATE documents SET sha256=?').run('0'.repeat(64));return get(key);};
+  await f.processing.enqueueDocuments(f.owner);
+  assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},before);
+  f.env.BUCKET.get=get;await f.processing.enqueueDocuments(f.owner);
+  const after=f.sql.prepare('SELECT * FROM document_jobs').get();
+  assert.equal(after.state,'failed');assert.equal(after.error_code,'original_integrity');assert.equal(after.attempts,3);
+  assert.equal(JSON.parse(after.extraction).level,'yellow');
+  assert.deepEqual(f.sql.prepare('SELECT * FROM document_extractions').all(),history);
+});
+for(const action of ['heartbeat','receipt']){
+  test(action+' enforces its body limit in bytes before decoding',async t=>{
+    const f=await fixture(t);await f.document('body-bytes');const job=await f.lease();
+    const body={...identityOf(job),padding:'ö'.repeat(2500)},before={...f.sql.prepare('SELECT * FROM document_jobs').get()};
+    assert.ok(JSON.stringify(body).length<4096);
+    assert.equal((await f.worker(action,body)).status,413);
+    assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},before);
+  });
+  test(action+' stops an oversized stream without consuming its entire body',async t=>{
+    const f=await fixture(t);let pulls=0,cancelled=false;
+    const stream=new ReadableStream({pull(controller){pulls++;controller.enqueue(new Uint8Array(1024).fill(32));if(pulls===50)controller.close();},cancel(){cancelled=true;}});
+    const request=new Request('https://synthetic.example/api/ocr-worker/'+action,{method:'POST',headers:{Authorization:'Bearer '+f.env.DOCUMENT_WORKER_TOKEN,'X-MG-OCR-Runner':'local'},body:stream,duplex:'half'});
+    assert.equal((await f.processing.workerAction(request,action)).status,413);
+    assert.ok(pulls<=6,'body consumption stays within the limit plus one stream chunk');assert.equal(cancelled,true);
+  });
+}

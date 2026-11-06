@@ -15,11 +15,11 @@ Gmail runs return correlation receipts for the actual app invocation. A task pla
 
 ## Tasks
 
-- [ ] Reproduce worker result acknowledgement loss and verify a receipt-aware client with at most three completion sends. Never re-extract an already accepted result. Respect authentication failures, rate limits and Retry-After.
-- [ ] Preserve accepted extraction receipts after interruption on every attempt; add bounded heartbeats, receipt lookup and transport/integrity separation without weakening original or registration checks.
-- [ ] Return and expose correlated Gmail invocation receipts, and replace unbounded historical source-ID materialization with bounded, owner-scoped membership lookups in both runtimes.
-- [ ] Verify restart, timeout, competing workers, stale leases, rejected originals, acknowledgement loss and non-green outcomes with synthetic tests, then independently review the combined branch.
-- [ ] Document the adapter contract, operator recovery procedure, exact CI jobs and remaining external scheduler evidence. Open PR to main.
+- [x] Reproduce worker result acknowledgement loss and verify a receipt-aware client with at most three completion sends. Never re-extract an already accepted result. Respect authentication failures, rate limits and Retry-After.
+- [x] Preserve accepted extraction receipts after interruption on every attempt; add bounded heartbeats, receipt lookup and transport/integrity separation without weakening original or registration checks.
+- [x] Return and expose correlated Gmail invocation receipts, and replace unbounded historical source-ID materialization with bounded, owner-scoped membership lookups in both runtimes.
+- [x] Verify restart, timeout, competing workers, stale leases, rejected originals, acknowledgement loss and non-green outcomes with synthetic tests, then independently review the combined branch (final CI review tracked on PR 67).
+- [x] Document the adapter contract, operator recovery procedure, exact CI jobs and remaining external scheduler evidence. Open PR to main.
 
 ## Protocol contract
 
@@ -44,3 +44,7 @@ Temporary storage or transport failure is not evidence of original corruption or
 Initial unmodified worker baseline: 112/112 passed locally (Node 24.22.1).
 The local Sites baseline was interrupted at the process/environment level and is not a pass.
 The execution environment subsequently became unavailable. GitHub CI on the PR will be the authoritative fresh verification for the candidate. No customer documents, tokens or production processing are used in tests.
+
+## Execution evidence
+
+The execution environment returned and the combined synthetic focus suites passed: Node 219/219 and Sites 339/339. Independent review findings received dedicated failing tests and repairs. The actual original protocol run ID is a 43-character base64url, preserving existing receipt identity. Production observations, explicit durability limits and the controlled rollout/recovery gates are recorded in ../../automation/document-automation-reliability.md and ../../automation/recovery-runbook.md. The exact candidate's complete CI and approval state are tracked in PR 67; a completed implementation checklist does not claim production deployment or verified external scheduling.
