@@ -1,3 +1,13 @@
+## 2026-11-06 — PR 65: säker återanslutning, verklig bank fortsatt spärrad
+
+Branch `feature/95-bank-recovery` utgår från verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. [PR 65](https://github.com/sharbel0022/Mgeorge/pull/65) rättar tre reproducerbara fel: historisk flowkontext som blockerade Sites-status, saknad beständig återanslutningsspärr vid Node-kontoval och en fångad Node-mTLS-transport som inte kontrollerade senare avstängning.
+
+[Bankrapport](docs/bank-recovery/README.md), [sanerade driftobservationer](docs/bank-recovery/observations.json) och [källbundna utvecklingskvitton](docs/bank-recovery/verification.json) skiljer kodtester från verklig åtkomst. Sites-regressionens RED gav 1 225/1 232; efter rättningen passerade samma säkerhetssvit 1 232/1 232. De följande Node-regressionerna gav 3 015/3 025 på både Node 22 och 24 före sina rättningar. Slutkandidatens samlade jobbutfall och exakta källor redovisas i PR-beskrivningen efter dess CI, utan att tidigare grönt överförs till ny kod.
+
+Färsk lokal driftstatus i Site 69 är fortfarande `connected=false`, `reauth_required`, `BANK_RECONNECT_REQUIRED`. Cachad Enable-registrering innehåller äldre callback medan nuvarande konfiguration har ny adress; aktuell leverantörsregistrering är inte verifierad. Betrodd företagsattest och Open Payments-konfiguration observerades inte. Verkligt avtal, mTLS-certifikat/bindning, kundbehörighet och användarens BankID/SCA är separata aktiveringskrav.
+
+Inga bank-/provideranrop, betalningar, produktionsskrivningar, publiceringar eller statusåterställningar utfördes. Inga numeriska kvalitetsbetyg höjs; bankacceptans och kommersiell aktivering är fortfarande inte styrkta.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

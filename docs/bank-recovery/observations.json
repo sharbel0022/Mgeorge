@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "observedOn": "2026-11-06",
+  "scope": "Read-only application status, environment key presence and bounded database projections; no live provider request",
+  "sourceBase": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "publishedSiteVersion": 69,
+  "bank": {
+    "connected": false,
+    "connectionStatus": "reauth_required",
+    "requiresReauthentication": true,
+    "syncAllowed": false,
+    "blockedReason": "BANK_RECONNECT_REQUIRED",
+    "nextAction": "reconnect",
+    "diagnostic": null,
+    "lastSyncedAt": "2026-11-05T08:05:14.646Z",
+    "lastAttemptAt": "2026-11-05T14:04:35.832Z",
+    "nextAttemptAt": null,
+    "storedConsentValidUntil": "2027-01-25T19:45:06.954Z",
+    "storedConsentMetadataPresent": false,
+    "selectedAccountCount": 1,
+    "connectionRowProjection": {
+      "truncatedValues": 1,
+      "limitation": "One encrypted cell was truncated by the read tool; no full row-integrity claim."
+    }
+  },
+  "configuration": {
+    "revision": 10,
+    "updatedAt": "2026-11-05T17:57:48.138258+00:00",
+    "enableBankingSecretKeysPresent": [
+      "BANK_DATA_ENCRYPTION_KEY",
+      "ENABLE_BANKING_APPLICATION_ID",
+      "ENABLE_BANKING_ENVIRONMENT",
+      "ENABLE_BANKING_KEY_ROTATED",
+      "ENABLE_BANKING_PRIVATE_KEY"
+    ],
+    "configuredRedirect": "https://mg-fakturakoll-sharbel.sharbelrasho.chatgpt.site/api/bank/callback",
+    "cachedProviderRegistration": {
+      "cachedAt": "2026-11-05T17:12:25.255Z",
+      "environment": "PRODUCTION",
+      "active": true,
+      "services": [
+        "AIS"
+      ],
+      "redirectUrls": [
+        "https://mg-fakturakoll-sharbel.asdasdsa213.chatgpt.site/api/bank/callback"
+      ],
+      "currentProviderRegistrationVerified": false
+    },
+    "bankCompanyAuthorizationsPresent": false,
+    "saasBankEnabledPresent": false,
+    "openPaymentsConfigurationKeysPresent": [],
+    "actualMTLSBindingOrCertificateVerified": false,
+    "limitation": "Absent keys are an observed deployment configuration gap, not proof that no organization agreement or certificate exists elsewhere."
+  },
+  "saasBankStateRowsObserved": 0,
+  "schema": {
+    "tokenControlTablesPresent": true,
+    "limitation": "Presence only; no production distributed token or migration acceptance was performed."
+  },
+  "historicalIncident": {
+    "source": "../saas/evidence/2026-11-05/bank-incident.json",
+    "failureAt": "2026-11-05T14:04:35.832Z",
+    "savedScheduledError": "BANK_ACCOUNT_SCOPE_INVALID",
+    "exactFailedPredicate": "NOT_DETERMINED",
+    "originalProviderResponseRetained": false,
+    "laterRevalidationReported": "BANK_CONSENT_INVALID",
+    "laterRevalidationPerformedByThisTask": false
+  },
+  "taskActions": {
+    "liveProviderRequests": 0,
+    "customerBankIDSessions": 0,
+    "productionDataMutations": 0,
+    "environmentMutations": 0,
+    "deployments": 0,
+    "payments": 0
+  },
+  "realBankAcceptance": "NOT_VERIFIED",
+  "finalPR": "https://github.com/sharbel0022/Mgeorge/pull/65"
+}
