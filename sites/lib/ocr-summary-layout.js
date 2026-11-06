@@ -16,9 +16,46 @@ const band=(a,b)=>{
     && Math.abs(a.box.y0+a.box.y1-b.box.y0-b.box.y1)<=scale;
 };
 
-/** Three vertically stacked, right-column summary cells. A complete geometric
- * region permits a long label/value gap below a table, while article quantity
- * columns, suffixes, missing values and competing headings still block it. */
+function closedGroup(pairs,words,tableRows,spend,vertical){
+  const members=pairs.flatMap(pair=>[pair.label,pair.value]),ids=new Set(members.map(item=>item.id));
+  if(pairs.length!==3||ids.size!==6)return null;
+  const scale=Math.min(...members.map(item=>item.glyphHeight));
+  if(vertical&&Math.max(...pairs.map(pair=>pair.value.box.x1))-Math.min(...pairs.map(pair=>pair.value.box.x1))>2*scale)return null;
+  const region={x0:Math.min(...members.map(item=>item.box.x0)),x1:Math.max(...members.map(item=>item.box.x1)),y0:Math.min(...members.map(item=>item.box.y0)),y1:Math.max(...members.map(item=>item.box.y1))};
+  // Stacked labels must be outside the article-description column. The other
+  // shape requires a complete net/VAT/payable header row and three owned
+  // values beneath it; no article heading or quantity may share that region.
+  if(vertical&&tableRows.some(row=>row.box.y0<=region.y1&&row.words.some(word=>description.test(normalize(word.text))&&region.x0<=word.bbox.x1+3*scale)))return null;
+  const originalWords=new Set(members.flatMap(item=>item.words));
+  if(words.some(word=>{spend();return !originalWords.has(word)&&intersects(word.bbox,region);}))return null;
+  const rows=new Set(members.map(item=>item.row)),asides=new Set();
+  for(const row of rows)for(const segment of row.segments){
+    spend();if(ids.has(segment.id))continue;
+    // Every affected source row remains indivisible unless all remaining
+    // segments are independently complete fields or closed left-hand prose.
+    const prose=/^\p{L}/u.test(segment.text)&&/[.!?]$/.test(segment.text)&&(segment.text.match(/\p{L}+/gu)||[]).length>=2;
+    if(segment.box.x1<=region.x0-scale&&(segment.complete||prose)){asides.add(segment.id);continue;}
+    return null;
+  }
+  return {pairs,rows,asides,ids};
+}
+
+function otherHeadingClaims(value,label,segments,spend){
+  return segments.some(other=>{
+    spend();
+    if(other===label||!(other.label||other.explicitLabel||vatOccurrence.test(normalize(other.text))))return false;
+    // Include excluded/table rows as negative evidence. Such a heading must
+    // never become invisible just because it cannot create a positive pair.
+    const scale=other.glyphHeight,gap=value.box.y0-other.box.y1,right=value.box.x0-other.box.x1;
+    const below=other.row!==value.row&&gap>=0&&gap<=2*scale&&value.box.x0>=other.box.x0-scale/2&&value.box.x0<=other.box.x1+scale/2;
+    const beside=right>=0&&right<=16*scale&&value.box.y0<other.box.y1+scale/2&&value.box.y1>other.box.y0-scale/2;
+    return below||beside;
+  });
+}
+
+/** Closed summaries: three stacked right-column cells, or three net/VAT/payable
+ * columns with one aligned value row. Every word and competing heading remains
+ * part of the census; this never repairs a damaged rate or computes a value. */
 export function planOcrSummaryCells(segments,words,tableRows,claimOwners,spend){
   const nets=segments.filter(item=>netLabel.test(normalize(item.text)));
   const vats=segments.filter(item=>vatOccurrence.test(normalize(item.text)));
@@ -54,25 +91,32 @@ export function planOcrSummaryCells(segments,words,tableRows,claimOwners,spend){
       pairs.push({label,value});
     }
     if(pairs.length!==3)continue;
-    const members=pairs.flatMap(pair=>[pair.label,pair.value]),ids=new Set(members.map(item=>item.id));
-    if(ids.size!==6)continue;
-    const scale=Math.min(...members.map(item=>item.glyphHeight));
-    if(Math.max(...pairs.map(pair=>pair.value.box.x1))-Math.min(...pairs.map(pair=>pair.value.box.x1))>2*scale)continue;
-    const region={x0:Math.min(...members.map(item=>item.box.x0)),x1:Math.max(...members.map(item=>item.box.x1)),y0:Math.min(...members.map(item=>item.box.y0)),y1:Math.max(...members.map(item=>item.box.y1))};
-    // A summary cannot be manufactured in the article-description column.
-    if(tableRows.some(row=>row.box.y0<=region.y1&&row.words.some(word=>description.test(normalize(word.text))&&region.x0<=word.bbox.x1+3*scale)))continue;
-    const originalWords=new Set(members.flatMap(item=>item.words));
-    if(words.some(word=>{spend();return !originalWords.has(word)&&intersects(word.bbox,region);}))continue;
-    const rows=new Set(members.map(item=>item.row)),asides=new Set();let unresolved=false;
-    for(const row of rows)for(const segment of row.segments){
-      spend();if(ids.has(segment.id))continue;
-      // Only a distinct, complete field or closed prose to the left may be
-      // isolated from a raw mixed OCR row. Unknown value suffixes remain raw.
-      const prose=/^\p{L}/u.test(segment.text)&&/[.!?]$/.test(segment.text)&&(segment.text.match(/\p{L}+/gu)||[]).length>=2;
-      if(segment.box.x1<=region.x0-scale&&(segment.complete||prose)){asides.add(segment.id);continue;}
-      unresolved=true;
+    const group=closedGroup(pairs,words,tableRows,spend,true);if(group)groups.push(group);
+  }
+  for(const net of nets){
+    const next=(item,previous)=>{
+      spend();const gap=item.box.x0-previous.box.x1;
+      return gap>=0&&gap<=32*Math.min(item.glyphHeight,previous.glyphHeight)&&band(previous,item);
+    };
+    const possibleVats=vats.filter(vat=>next(vat,net));if(possibleVats.length!==1)continue;
+    const vat=possibleVats[0],possibleTotals=totals.filter(total=>next(total,vat));if(possibleTotals.length!==1)continue;
+    const labels=[net,vat,possibleTotals[0]],pairs=[];
+    for(const label of labels){
+      const candidates=segments.filter(value=>{
+        spend();const gap=value.box.y0-label.box.y1;
+        return value!==label&&gap>=0&&gap<=2*label.glyphHeight&&Math.abs(value.box.x0-label.box.x0)<=label.glyphHeight/2;
+      });
+      if(candidates.length!==1||!printedMoney.test(normalize(candidates[0].text)))break;
+      const value=candidates[0];
+      if([...claimOwners.get(value.id)||[]].some(owner=>owner!==label.id)||otherHeadingClaims(value,label,segments,spend))break;
+      pairs.push({label,value});
     }
-    if(!unresolved)groups.push({pairs,rows,asides,ids});
+    if(pairs.length!==3||pairs.slice(1).some(pair=>!band(pairs[0].value,pair.value)))continue;
+    if(pairs.slice(1).some((pair,index)=>{
+      const previous=pairs[index],scale=Math.min(pair.label.glyphHeight,pair.value.glyphHeight,previous.label.glyphHeight,previous.value.glyphHeight);
+      return Math.max(previous.label.box.x1,previous.value.box.x1)+scale>Math.min(pair.label.box.x0,pair.value.box.x0);
+    }))continue;
+    const group=closedGroup(pairs,words,tableRows,spend,false);if(group)groups.push(group);
   }
   // No first/closest selection between overlapping proposed summary groups.
   const counts=new Map();for(const group of groups)for(const id of group.ids)counts.set(id,(counts.get(id)||0)+1);
