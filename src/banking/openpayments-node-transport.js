@@ -80,11 +80,12 @@ function checkedRequest(input, init) {
 }
 
 /** A server-only, production mTLS connection with a bounded streaming response. */
-export function createOpenPaymentsNodeTransport({ certificatePem, privateKeyPem, now = Date.now } = {}) {
+export function createOpenPaymentsNodeTransport({ certificatePem, privateKeyPem, caPem, now = Date.now } = {}) {
   let certificate;
   let privateKey;
   let validFrom;
   let validTo;
+  let authorities = [];
   try {
     if (typeof certificatePem !== 'string' || typeof privateKeyPem !== 'string' || typeof now !== 'function') {
       throw new Error();
@@ -94,6 +95,13 @@ export function createOpenPaymentsNodeTransport({ certificatePem, privateKeyPem,
     validFrom = Date.parse(certificate.validFrom);
     validTo = Date.parse(certificate.validTo);
     if (!Number.isFinite(validFrom) || !Number.isFinite(validTo)) throw new Error();
+    if (caPem !== undefined) {
+      if (typeof caPem !== 'string' || !caPem || caPem.length > 128 * 1024) throw new Error();
+      const blocks = caPem.match(/-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/g);
+      if (!blocks?.length || blocks.length > 20 || caPem.replace(/-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/g, '').trim()) throw new Error();
+      authorities = blocks.map(block => new X509Certificate(block));
+      if (authorities.some(ca => !ca.ca || !Number.isFinite(Date.parse(ca.validFrom)) || !Number.isFinite(Date.parse(ca.validTo)))) throw new Error();
+    }
   } catch {
     throw failure('INVALID_CLIENT_CERTIFICATE');
   }
@@ -102,13 +110,13 @@ export function createOpenPaymentsNodeTransport({ certificatePem, privateKeyPem,
     let timestamp;
     try {
       timestamp = now();
-      if (!Number.isFinite(timestamp) || !certificate.checkPrivateKey(privateKey) || timestamp < validFrom) {
+      if (!Number.isFinite(timestamp) || !certificate.checkPrivateKey(privateKey) || timestamp < validFrom || authorities.some(ca => timestamp < Date.parse(ca.validFrom))) {
         throw new Error();
       }
     } catch {
       throw failure('INVALID_CLIENT_CERTIFICATE');
     }
-    if (timestamp >= validTo) throw failure('CLIENT_CERTIFICATE_EXPIRED');
+    if (timestamp >= validTo || authorities.some(ca => timestamp >= Date.parse(ca.validTo))) throw failure('CLIENT_CERTIFICATE_EXPIRED');
   }
   validateCertificate();
 
@@ -157,6 +165,7 @@ export function createOpenPaymentsNodeTransport({ certificatePem, privateKeyPem,
           headers: Object.fromEntries(init.headers),
           cert: certificatePem,
           key: privateKeyPem,
+          ...(caPem === undefined ? {} : { ca: caPem }),
           rejectUnauthorized: true,
           minVersion: 'TLSv1.2',
           agent: false

@@ -13,10 +13,11 @@ import {normalizeOpenPaymentsBooked,openPaymentsAccountIdentity} from '../sites/
 import {storeTransactions,recordImport,audit} from './db.js';
 import {analyzeReconciliation,reconciliationData} from './reconciliation.js';
 import {digest,decryptObject} from './security.js';
+import {configuredOpenPaymentsNodeTransport} from './banking/openpayments-runtime-transport.js';
 const fail=code=>{throw companySyncError(code);};
 const text=value=>typeof value==='string'&&value.trim()===value&&value.length>0&&value.length<=300;
 const sync=value=>{if(value?.then){Promise.resolve(value).catch(()=>{});fail('AUTHORIZATION_UNVERIFIED');}if(value===false)fail('AUTHORIZATION_CHANGED');};
-const configKeys=['SAAS_BANK_ENABLED','SAAS_OPENPAYMENTS_CONFIG','SAAS_OPENPAYMENTS_REGISTRATIONS'];
+const configKeys=['SAAS_BANK_ENABLED','SAAS_OPENPAYMENTS_CONFIG','SAAS_OPENPAYMENTS_REGISTRATIONS','SAAS_OPENPAYMENTS_MTLS_CONFIG'];
 const failure=(companyId,connectionId,code)=>({companyId,connectionId:connectionId||null,status:'blocked',code,imported:0,duplicate:0,nextAttemptAt:null,coverage:{ais:'unknown',bankgiro:'unknown',paymentDataComplete:false}});
 
 /** Trusted server composition only: db and actor context may never come from
@@ -40,6 +41,7 @@ export async function createNodeOpenPaymentsCompanySyncRuntime({db,context,asser
   if(binding.length!==1||binding[0].company_id!==companyId||binding[0].owner!==owner)fail('COMPANY_SCOPE_MISMATCH');
   if(!current||current.revision!==snapshot.revision||current.payload!==snapshot.statePayload||configKeys.some(key=>environment[key]!==snapshot.configuration[key]))fail('AUTHORIZATION_CHANGED');
   if(Date.parse(snapshot.validUntil)<=now())fail('CONSENT_EXPIRED');
+  if(!providerOptions.transport)configuredOpenPaymentsNodeTransport({environment,configuration:JSON.parse(environment.SAAS_OPENPAYMENTS_CONFIG||'null')})?.validateCertificate();
  }
  function facade(dispatch){
   guard();return nodeSaasBankRuntime({db,context:fixed,assertCurrent:guard,sessionHash:'internal-authorized-sync',origin,environment,providerOptions:{...providerOptions,requestBoundary:operation=>{if(typeof dispatch!=='function')fail('AUTHORIZATION_UNVERIFIED');return dispatch(operation);}}});
@@ -130,7 +132,9 @@ export async function readNodeOpenPaymentsCompanySyncStatus({db,context,assertCu
  const table=db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='company_bank_sync_jobs'").get();
  let result=null,authority=null;if(table){authority=db.prepare('SELECT connection_id,authority_revision FROM company_bank_sync_jobs WHERE company_id=? AND owner=? AND account_key=?').get(context.companyId,context.storageOwner,accountKey);const store=createCompanyBankSyncStore(createCompanySyncDatabase(db),{now});result=await store.status({companyId:context.companyId,owner:context.storageOwner,accountKey});}
  check();const latest=db.prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').get(context.storageOwner);if(!latest||latest.revision!==row.revision||latest.payload!==row.payload||configKeys.some(key=>environment[key]!==configuration[key]))fail('AUTHORIZATION_CHANGED');
- const serviceEnabled=configuration.SAAS_BANK_ENABLED==='true'&&(config?.environment==='SANDBOX'||config?.environment==='PRODUCTION'&&providerOptions.transport?.kind==='mtls'&&typeof providerOptions.transport.validateCertificate==='function'),generationCurrent=text(config?.credentialGeneration)&&value.generation===config.credentialGeneration;
+ let transportReady=false;
+ if(config?.environment==='PRODUCTION')try{const transport=providerOptions.transport??configuredOpenPaymentsNodeTransport({environment,configuration:config});if(transport?.kind==='mtls'&&typeof transport.validateCertificate==='function'){transport.validateCertificate();transportReady=true;}}catch{/* Stored status never exposes certificate paths or secret material. */}
+ const serviceEnabled=configuration.SAAS_BANK_ENABLED==='true'&&(config?.environment==='SANDBOX'||config?.environment==='PRODUCTION'&&transportReady),generationCurrent=text(config?.credentialGeneration)&&value.generation===config.credentialGeneration;
  const active=serviceEnabled&&generationCurrent&&value.status==='active'&&Date.parse(value.validUntil)>now(),currentAuthority=!!authority&&authority.connection_id===value.id&&authority.authority_revision===row.revision;
  return{companyId:context.companyId,connectionId:value.id,accountId,accountKey,automaticEnabled:active&&automaticEnabled===true,state:!active?'blocked':!currentAuthority?'never':result?.status==='running'?'running':result?.status==='success'?'succeeded':result?.status==='blocked'?'blocked':result?'failed':'never',lastSuccessAt:result?.lastSuccessAt?new Date(result.lastSuccessAt).toISOString():null,nextAllowedAt:result?.nextAttemptAt?new Date(result.nextAttemptAt).toISOString():null,errorCode:!serviceEnabled?'configuration_required':!generationCurrent?'configuration_changed':!active?'consent_expired':!currentAuthority?null:result?.code?.toLowerCase()||null,coverage:active&&currentAuthority&&result?.coverage?result.coverage:{ais:'unknown',bankgiro:'unknown',paymentDataComplete:false}};
 }
