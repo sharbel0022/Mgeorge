@@ -4,6 +4,7 @@ import {seal,unseal} from './security';
 import {scopedResourceCodec} from './bank-data-provider.js';
 import {validateOpenPaymentsConfig} from './openpayments/config.js';
 import {openPaymentsAccountIdentity} from './openpayments-normalization.js';
+import {configuredOpenPaymentsWorkersTransport} from './openpayments-workers-transport.js';
 export type OpenPaymentsConsentSnapshot={provider:'open_payments';owner:string;revision:number;payload:string;validUntil:string};
 const denied=()=>Object.assign(Error('Open Payments-kontot saknar ett aktuellt företagsbundet medgivande.'),{code:'BANK_CONSENT_CHANGED',status:409,safe:true});
 const alias=(v:unknown)=>typeof v==='string'?v.replace(/^(iban|bban):/i,'').replace(/[\s-]/g,'').toUpperCase():'';
@@ -12,12 +13,12 @@ const fields=['currency','iban','bban','clearingNumber','accountNumber','bankgir
  * The foundation scope (including worker grant) is rechecked after every await. */
 export async function readOpenPaymentsAccountState(owner:string){
  const boundary=await companyBoundaryForOwner(owner);if(!boundary)throw denied();
- const values=env as unknown as Record<string,string>,keys=['SAAS_BANK_ENABLED','SAAS_OPENPAYMENTS_CONFIG','SAAS_OPENPAYMENTS_REGISTRATIONS','BANK_DATA_ENCRYPTION_KEY'],pin=keys.map(k=>values[k]);
- const guard=async()=>{const live=await companyBoundaryForOwner(owner);if(!live||live.companyId!==boundary.companyId||keys.some((k,i)=>(env as unknown as Record<string,string>)[k]!==pin[i]))throw denied();};
+ const values=env as unknown as Record<string,string>,keys=['SAAS_BANK_ENABLED','SAAS_OPENPAYMENTS_CONFIG','SAAS_OPENPAYMENTS_REGISTRATIONS','SAAS_OPENPAYMENTS_MTLS_BINDING_CONFIG','BANK_DATA_ENCRYPTION_KEY'],pin=keys.map(k=>values[k]);
  if(values.SAAS_BANK_ENABLED!=='true')throw denied();
  const config=validateOpenPaymentsConfig(JSON.parse(values.SAAS_OPENPAYMENTS_CONFIG||'null'));
- // Sites currently has no configured production mTLS transport.
- if(config.environment!=='SANDBOX'||!config.features.includes('accounts')||!config.features.includes('transactions'))throw denied();
+ const mtls=configuredOpenPaymentsWorkersTransport({configuration:config,environment:()=>env as unknown as Record<string,unknown>});
+ const guard=async()=>{const live=await companyBoundaryForOwner(owner);if(!live||live.companyId!==boundary.companyId||keys.some((k,i)=>(env as unknown as Record<string,string>)[k]!==pin[i]))throw denied();try{mtls?.assertCurrent();}catch{throw denied();}};
+ if(config.environment!=='SANDBOX'&&!mtls||!config.features.includes('accounts')||!config.features.includes('transactions'))throw denied();
  const registrations=JSON.parse(values.SAAS_OPENPAYMENTS_REGISTRATIONS||'null');if(!Array.isArray(registrations))throw denied();
  const row=await db().prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').bind(owner).first<{revision:number;payload:string}>();await guard();if(!row)throw denied();
  const value=await unseal<Record<string,any>>(values.BANK_DATA_ENCRYPTION_KEY,owner,'saas-bank-state',row.payload);await guard();
@@ -39,7 +40,7 @@ export async function readOpenPaymentsAccountState(owner:string){
  }
  if(value.selected.some((id:string)=>!available.some(a=>a.id===id&&a.identity.currency==='SEK')))throw denied();
  const current=await db().prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').bind(owner).first<{revision:number;payload:string}>();await guard();
- const validUntil=new Date(Math.min(Date.parse(value.validUntil),accountExpiry,Date.parse(consent.validUntil+'T23:59:59.999Z'),config.credentialsValidUntil?Date.parse(config.credentialsValidUntil):Infinity)).toISOString();
+ const validUntil=new Date(Math.min(Date.parse(value.validUntil),accountExpiry,Date.parse(consent.validUntil+'T23:59:59.999Z'),config.credentialsValidUntil?Date.parse(config.credentialsValidUntil):Infinity,mtls?Date.parse(mtls.certificateValidUntil):Infinity)).toISOString();
  if(!current||current.revision!==row.revision||current.payload!==row.payload||Date.parse(validUntil)<=Date.now())throw denied();
  const registration=matches[0],automaticEnabled=registration.automaticEnabled===true&&registration.operatorVerified===true&&typeof registration.operatorEvidenceId==='string'&&!!registration.operatorEvidenceId;
  return {automaticEnabled,bankgiroRegistration:registration.bankgiroRegistration??null,snapshot:{provider:'open_payments',owner,revision:row.revision,payload:row.payload,validUntil} as OpenPaymentsConsentSnapshot,available,selected:value.selected as string[]};

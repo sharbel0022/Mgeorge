@@ -12,7 +12,7 @@ import {enrichOpenPaymentsCompany} from './openpayments-company-enrichment';
 import {normalizeOpenPaymentsWorkspaceRows,openPaymentsAccountIdentity} from './openpayments-normalization.js';
 function fail(code:string):never{throw companySyncError(code);}
 const hash=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),n=>n.toString(16).padStart(2,'0')).join('');
-type Configuration={enabled:boolean;credentialGeneration:string;serviceEnabled?:boolean;companyId:string;owner:string;bankId:string;evidenceId:string;dateFrom:string;automaticEnabled:boolean;configurationHash:string;bankgiroRegistration:unknown;stored:Record<string,any>|null};
+type Configuration={enabled:boolean;credentialGeneration:string;serviceEnabled?:boolean;companyId:string;owner:string;bankId:string;evidenceId:string;dateFrom:string;automaticEnabled:boolean;configurationHash:string;assertTransportCurrent?:()=>void;bankgiroRegistration:unknown;stored:Record<string,any>|null};
 type ScopedContext=CompanySyncContext&{statePayload:string;configurationHash:string};
 type Resolution={context:CompanySyncContext;account:{id?:string;handle:string;identity:Record<string,string>};provider:any;verifyConsent():Promise<void>;assertCurrent():Promise<void>};
 export type OpenPaymentsSyncDependencies={database:D1Database;context:Readonly<CompanyContext>;assertCurrent():Promise<void>;configuration():Promise<Configuration>;snapshot():Promise<Record<string,any>>;resolve(accountId:string,options:OpenPaymentsOptions):Promise<Resolution>;readWorkspace(owner:string):Promise<{revision:number;state:State}>;preview(owner:string,state:State):Promise<unknown>;enrich?(stage:CompanySyncStage<ScopedContext>,input:{resolved:Resolution;transactions:any;acquisitionId:string;registration:unknown}):Promise<{state:'verified'|'partial'|'unavailable'}>;now?:()=>number};
@@ -23,7 +23,7 @@ export function createSitesOpenPaymentsCompanySync(deps:OpenPaymentsSyncDependen
  const store=createCompanyBankSyncStore(database,{now:clock});
  const state=()=>database.prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').bind(owner).first<{revision:number;payload:string}>();
  const cas=(revision:number)=>database.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM workspaces WHERE owner=? AND revision=?) THEN 1 ELSE json('WORKSPACE_CHANGED') END").bind(owner,revision);
- async function configuration(){await deps.assertCurrent();const c=await deps.configuration();if(c.owner!==owner||c.companyId!==companyId)fail('COMPANY_SCOPE_MISMATCH');return c;}
+ async function configuration(){await deps.assertCurrent();const c=await deps.configuration();if(c.owner!==owner||c.companyId!==companyId)fail('COMPANY_SCOPE_MISMATCH');c.assertTransportCurrent?.();return c;}
  async function readStatus(accountId:string){
   const c=await configuration(),before=await state(),snapshot=await deps.snapshot(),account=c.stored?.accounts?.find((item:{id:string})=>item.id===accountId);
   if(!before||!account||!c.stored?.selected?.includes(accountId))fail('ACCOUNT_MISMATCH');
@@ -32,7 +32,7 @@ export function createSitesOpenPaymentsCompanySync(deps:OpenPaymentsSyncDependen
   if(binding&&binding.company_id!==companyId)fail('COMPANY_SCOPE_MISMATCH');
   const saved=binding?await store.status({companyId,owner,accountKey:key}):null;
   const authority=binding?await database.prepare('SELECT connection_id,authority_revision FROM company_bank_sync_jobs WHERE company_id=? AND owner=? AND account_key=?').bind(companyId,owner,key).first<{connection_id:string;authority_revision:number}>():null,currentAuthority=!!authority&&authority.connection_id===snapshot.connection?.id&&authority.authority_revision===before.revision;
-  const after=await state();await deps.assertCurrent();if(!after||after.revision!==before.revision||after.payload!==before.payload||(await configuration()).configurationHash!==c.configurationHash)fail('AUTHORIZATION_CHANGED');
+  const after=await state();await deps.assertCurrent();if(!after||after.revision!==before.revision||after.payload!==before.payload||(await configuration()).configurationHash!==c.configurationHash)fail('AUTHORIZATION_CHANGED');c.assertTransportCurrent?.();
   const serviceEnabled=c.serviceEnabled??c.enabled,generationCurrent=!!c.credentialGeneration&&c.stored?.generation===c.credentialGeneration,active=serviceEnabled&&generationCurrent&&snapshot.connection?.status==='active'&&Date.parse(snapshot.connection.validUntil)>clock();
   return{companyId,connectionId:snapshot.connection?.id??null,accountId,accountKey:key,state:!active?'blocked':!currentAuthority?'never':saved?.status==='running'?'running':saved?.status==='success'?'succeeded':saved?.status==='blocked'?'blocked':saved?'failed':'never',automaticEnabled:active&&c.automaticEnabled,lastSuccessAt:saved?.lastSuccessAt?new Date(saved.lastSuccessAt).toISOString():null,nextAllowedAt:saved?.nextAttemptAt?new Date(saved.nextAttemptAt).toISOString():null,errorCode:!serviceEnabled?'configuration_required':!generationCurrent?'configuration_changed':!active?'consent_expired':!currentAuthority?null:saved?.code?.toLowerCase()??null,coverage:active&&currentAuthority&&saved?.coverage?saved.coverage:{ais:'unknown',bankgiro:'unknown',paymentDataComplete:false}};
  }
@@ -44,10 +44,10 @@ export function createSitesOpenPaymentsCompanySync(deps:OpenPaymentsSyncDependen
   let activeStage:CompanySyncStage<ScopedContext>|undefined;
   const providerOptions:OpenPaymentsOptions={requestBoundary:operation=>{if(!activeStage)return Promise.reject(companySyncError('AUTHORIZATION_UNVERIFIED'));return activeStage.request(operation);}};
   const resolve=async():Promise<{resolved:Resolution;context:ScopedContext}>=>{
-   const before=await state();if(!before)fail('AUTHORIZATION_UNVERIFIED');const currentConfig=await configuration();if(currentConfig.configurationHash!==c.configurationHash)fail('AUTHORIZATION_CHANGED');
+   const before=await state();if(!before)fail('AUTHORIZATION_UNVERIFIED');const currentConfig=await configuration();if(currentConfig.configurationHash!==c.configurationHash)fail('AUTHORIZATION_CHANGED');c.assertTransportCurrent?.();
    const resolved=await deps.resolve(accountId,providerOptions),key=companyBankAccountKey({provider:'open_payments',bank:c.bankId,country:'SE',accountIdentity:openPaymentsAccountIdentity(resolved.account.identity)});
    if(resolved.context.companyId!==companyId||resolved.context.owner!==owner||resolved.context.provider!=='open_payments'||resolved.context.revision!==before.revision)fail('COMPANY_SCOPE_MISMATCH');
-   const after=await state();if(!after||after.revision!==before.revision||after.payload!==before.payload)fail('AUTHORIZATION_CHANGED');
+   const after=await state();if(!after||after.revision!==before.revision||after.payload!==before.payload)fail('AUTHORIZATION_CHANGED');c.assertTransportCurrent?.();
    return{resolved,context:{...resolved.context,accountKey:key,statePayload:before.payload,configurationHash:c.configurationHash}};
   };
   const first=await resolve();
@@ -55,7 +55,7 @@ export function createSitesOpenPaymentsCompanySync(deps:OpenPaymentsSyncDependen
   const selector:CompanySyncSelector={companyId,connectionId:first.context.connectionId,accountKey:first.context.accountKey,...(expected.expectedRevision===undefined?{}:{expectedRevision:expected.expectedRevision})};
   let fetched:any,resolved:Resolution|undefined,acquisitionId='';
   const runner=createCompanyBankSyncRunner<ScopedContext>({store,now:clock,resolveContext:async()=> (await resolve()).context,currentGuard:current=>({
-   async assert(){await deps.assertCurrent();const row=await state();if(!row||row.revision!==current.revision||row.payload!==current.statePayload||(await configuration()).configurationHash!==current.configurationHash||Date.parse(current.validUntil)<=clock())fail('AUTHORIZATION_CHANGED');},
+   async assert(){await deps.assertCurrent();const row=await state();if(!row||row.revision!==current.revision||row.payload!==current.statePayload||(await configuration()).configurationHash!==current.configurationHash||Date.parse(current.validUntil)<=clock())fail('AUTHORIZATION_CHANGED');c.assertTransportCurrent?.();},
    fence(){return database.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM saas_bank_state WHERE owner=? AND revision=? AND payload=?) AND julianday(?)>julianday('now') THEN 1 ELSE json('AUTHORIZATION_CHANGED') END").bind(owner,current.revision,current.statePayload,current.validUntil);},
   }),async sync(stage){
    activeStage=stage;resolved=(await resolve()).resolved;await resolved.verifyConsent();await stage.assertCurrent();
