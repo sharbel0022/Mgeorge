@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "observed_at_clock": "2026-11-06 06:02:02 UTC",
+  "read_completed_at": "2026-11-06T06:02:05.222Z",
+  "sources": [
+    "clock.curr_time",
+    "automations.peek",
+    "mg_fakturakoll.gmail_sync_status"
+  ],
+  "task": {
+    "id": "Automation_6efa3aafab4081918c48001acc562f96",
+    "is_enabled": true,
+    "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Europe/Stockholm:20261028T010000\nRRULE:FREQ=HOURLY;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+    "timing_mode": "exact_schedule",
+    "default_timezone": "Europe/Stockholm",
+    "updated_at": "2026-11-06T06:01:23.982590+00:00",
+    "last_run_time": "2026-11-06T06:01:02.377361+00:00",
+    "next_run_time": null,
+    "last_run": {
+      "id": "179735cb-daf0-832f-8718-6af99d18895f",
+      "scheduled_for": "2026-11-06T06:00:00Z",
+      "started_at": "2026-11-06T06:01:01.755944Z",
+      "completed_at": "2026-11-06T06:01:02.300507Z",
+      "recorded_status": "no_update"
+    },
+    "latest_result": {
+      "run_id": "1e1f1aff-aa30-832f-8b25-cf2e30417745",
+      "scheduled_for": "2026-11-06T02:00:00Z",
+      "created_at": "2026-11-06T01:59:08.543794Z",
+      "completed_at": "2026-11-06T01:59:08.700448Z",
+      "content_truncated": false,
+      "is_failure_message": false
+    }
+  },
+  "app": {
+    "configured": true,
+    "connection_status": "connected",
+    "connection_last_attempt": "2026-11-06T04:05:49.061Z",
+    "last_invoked_at": "2026-11-06T04:05:48.841Z",
+    "last_completed_at": "2026-11-06T04:06:04.143Z",
+    "last_outcome": "completed",
+    "last_successful_fetch": "2026-11-06T04:06:01.714Z",
+    "document_status_counts": {
+      "needs_review": 385,
+      "waiting_ocr": 64,
+      "registered": 2
+    },
+    "worker_last_seen": "2026-11-03T10:48:46.890Z",
+    "cloud_worker_last_seen": "2026-11-06T03:55:08.200Z",
+    "cloud_last_completed": "2026-11-06T03:55:13.630Z",
+    "cloud_worker_recent": false,
+    "cloud_ocr_configured": true,
+    "last_processed": "2026-11-06T04:52:38.516Z",
+    "scheduler_configured": true,
+    "messages_waiting": 2,
+    "processing_registered_field": 5
+  },
+  "comparison_baseline": {
+    "provenance": "Previously supplied operational baseline; this observation did not collect a new pre-06:00 sample.",
+    "pre_0600_observation_collected": false,
+    "date": "2026-11-06",
+    "last_invoked_utc": "04:05:48",
+    "last_successful_fetch_utc": "04:06:01",
+    "last_completed_utc": "04:06:04",
+    "cloud_last_completed_utc": "03:55:13",
+    "document_status_counts": {
+      "needs_review": 385,
+      "waiting_ocr": 64,
+      "registered": 2
+    },
+    "schedule_update_reported_utc": "04:05:34",
+    "previous_0500_result_reported": "no_update without a newer app observation",
+    "timestamp_comparison_precision": "seconds"
+  },
+  "conclusions": {
+    "scheduled_0600_run_observed": true,
+    "scheduled_run_terminal": true,
+    "scheduled_run_recorded_status": "no_update",
+    "newer_app_invocation_timestamp_observed": false,
+    "newer_successful_fetch_timestamp_observed": false,
+    "newer_app_completion_timestamp_observed": false,
+    "document_status_counts_changed": false,
+    "cloud_heartbeat_advanced_from_supplied_baseline": false,
+    "schedule_to_new_app_invocation_binding": "not_verified",
+    "reason": "The automation has a terminal run scheduled for 06:00 UTC, but the app's last_invoked, last_completed and last_successful_fetch remain at the supplied 04:05–04:06 baseline. no_update alone is not proof of an app invocation.",
+    "limits": [
+      "The automation result content and chat references were not retained.",
+      "The latest_result metadata is for the 02:00 run and is not evidence of the 06:00 run's tool calls.",
+      "The app's last_processed timestamp is a separate processing field and does not establish a fresh Gmail fetch or bind it to this scheduled run.",
+      "No tool-call trace for the scheduled run is available in this observation.",
+      "next_run_time is null while is_enabled is true; this does not establish that the schedule is disabled.",
+      "No operational rating or release readiness was raised."
+    ]
+  },
+  "privacy": {
+    "task_metadata_recursively_redacted_before_selection": true,
+    "retained_task_fields": "Automation ID, schedule, timestamps, run IDs and status flags only.",
+    "excluded": [
+      "chat references",
+      "conversation and thread IDs",
+      "email addresses",
+      "owner identities",
+      "task prompt",
+      "result content",
+      "environment metadata"
+    ],
+    "raw_task_saved": false
+  },
+  "actions": {
+    "automation_peek_calls": 1,
+    "app_status_calls": 1,
+    "polling_stopped_after_terminal_observation": true,
+    "automation_updated": false,
+    "run_now": false,
+    "new_automation": false,
+    "import": false,
+    "process": false,
+    "database_mutation": false,
+    "production_mutation": false,
+    "docs_checkpoint_only": true
+  },
+  "supplied_source_context": {
+    "reported_live_site": "Site 66",
+    "reported_site67_state": "source-only saved; not published",
+    "independently_read_or_changed_in_this_observation": false
+  },
+  "checkpoint_base": {
+    "read_at": "2026-11-06T06:03:28.818Z",
+    "head": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "tree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+    "parents": [
+      "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "501de72c079a6b41593356f027990bc24b0aac8c"
+    ],
+    "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19"
+  },
+  "checkpoint_scope": "docs/quality8/gmail-schedule-0600-20261106"
+}

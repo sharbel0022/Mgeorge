@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "scope": "docs/quality8/gmail-schedule-0600-20261106",
+  "base": {
+    "read_at": "2026-11-06T06:03:28.818Z",
+    "head": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "tree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+    "parents": [
+      "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "501de72c079a6b41593356f027990bc24b0aac8c"
+    ],
+    "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19"
+  },
+  "excludes": [
+    "file-manifest.json",
+    "SHA256SUMS"
+  ],
+  "files": [
+    {
+      "path": "observation.json",
+      "bytes": 5513,
+      "sha256": "82adc603c10e95f537b996589c5a7a944ebd0cd2780d40258b089bd77aaaec5a",
+      "git_blob_sha": "665c84c1e05ae6ab71d3a686f3c5b3ccfe196ff4"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3441,
+      "sha256": "8064cbc16f9261a76c2a84be3771b0d50832d45b4fc0c7a843a9fd4e8189f827",
+      "git_blob_sha": "1241696df48eb22ef98c5267def2622dad062583"
+    }
+  ]
+}
