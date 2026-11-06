@@ -163,11 +163,12 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
     if(/^net[ \t]*[:.#]?$/iu.test(label.trim())&&/^-?\d+(?: \d{3})*$/u.test(value))return null;
     return money(value);
   });
-  grabFull('reference',referenceLabel,(value,label)=>{
+  const hasReference=grabFull('reference',referenceLabel,(value,label)=>{
     const token=compactDigits(value);
     if(/^OCR/i.test(label))return /^\d{1,120}$/.test(token)?token:null;
     return /^[\p{L}\p{N}][\p{L}\p{N}/_-]{0,119}$/u.test(token)?token:null;
   });
+  if(!hasReference&&referenceMentions.length)issues.push('Betalningsinstruktionen hänvisar till OCR, men ett märkt referensvärde saknas. Kontrollera originalet.');
   if(layout.ambiguousInvoiceColumns){set('invoice_number',null,null,0);set('reference',null,null,0);}
   grabFull('bankgiro','(?:bankgirokonto|bankgiro|bg)',value=>{
     const match=value.match(/^(\d{3,4})(?:[ \t]*[-\u2010-\u2015\u2212][ \t]*|[ \t]+)(\d{4})$/u);

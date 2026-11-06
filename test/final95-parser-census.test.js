@@ -34,6 +34,6 @@ for(const [engine,parse] of Object.entries(parsers))for(const method of ['pdf','
  assert.equal(result.text_excerpt,text,'the original text remains available for review');
  assert.equal(result.fields.total_cents.value,273050);
  if(field==='reference'&&expected!==null)assert.ok(result.details.reference.evidence.every(row=>!row.text.includes('vid betalning')&&!row.text.includes('som betalningsreferens')),'prose is not reference-value evidence');
- if(expected===null&&field==='currency')assert.notEqual(result.level,'green');
+ if(expected===null)assert.notEqual(result.level,'green','a missing declared payment reference remains review work');
  if(method==='ocr')assert.notEqual(result.level,'green','OCR review cap remains enforced');
 });
