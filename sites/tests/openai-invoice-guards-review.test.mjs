@@ -308,3 +308,18 @@ test('acceptance during token counting prevents a further Sites generation reque
   assert.equal(reserved(f.sql),1);
   assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs WHERE owner=? AND document_id=?').get(f.owner,f.id).extraction,accepted);
 });
+
+test('an initialized Node runtime never treats vanished central control tables as a fresh database',async t=>{
+  const f=nodeFixture(t),runtime=createCompanyRuntime({controlDb:f.database,legacyDatabasePath:f.path});
+  t.after(()=>runtime.close());
+  // Runtime initialization has established this control plane. Losing both
+  // tables is storage damage, unlike a fresh standalone data database.
+  assert.equal(f.database.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE name IN ('company_application_tokens','company_application_token_control')").get().n,2);
+  f.database.exec('DROP TABLE company_application_tokens; DROP TABLE company_application_token_control;');
+  let calls=0;
+  const result=await runtime.run(null,()=>enrichNodeInvoice(runtime.db,f.row,f.baseline,{
+    environment:environment('node:legacy'),adapter:async()=>{calls++;return{status:'fallback',code:'SYNTHETIC_UNAVAILABLE'};},
+  }));
+  assert.equal(calls,0);assert.equal(reserved(f.database),0);
+  assert.equal(result.ai.status,'blocked');assert.equal(result.ai.code,'AI_RECOVERY_UNAVAILABLE');
+});
