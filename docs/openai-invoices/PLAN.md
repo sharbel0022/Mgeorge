@@ -1,27 +1,35 @@
 # OpenAI invoice intelligence — implementation and acceptance plan
 
 Base: `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. Branch: `feature/95-openai-invoices`.
+PR: https://github.com/sharbel0022/Mgeorge/pull/64
 
 ## Design
 
-Retain deterministic PDF/Tesseract extraction as the first stage. A shared server adapter calls OpenAI Responses with strict structured output and produces untrusted invoice suggestions with page/quote provenance. Both Node and Sites enforce local schema/financial validation and keep all AI-assisted results in human review. Original files and bank evidence remain unchanged.
-
-The alternative of replacing OCR would remove a working local fallback and expose every document to an external service. The alternative of client-side calls would expose API credentials. The chosen server-side hybrid limits external processing and preserves existing data boundaries.
+Retain deterministic PDF/Tesseract extraction as the first stage. The shared server adapter calls OpenAI Responses with strict structured output and produces untrusted invoice suggestions with page/quote provenance. Node and Sites validate financial values and keep every AI-assisted result in human review. Original bytes and independently sourced bank evidence remain intact.
 
 ## Implementation
 
-- [ ] Shared bounded adapter, explicit versioned profiles, strict schema and independent output validation.
-- [ ] Atomic durable audit reservations and receipt reuse, per-document and per-owner daily caps, no automatic replay of an uncertain request.
-- [ ] Node/Sites hooks behind server-only flags and owner allowlist, preserving original and registration checks.
-- [ ] Four-arm benchmark tooling with frozen corpus provenance, independent acceptance separated from development material, actual cost/latency/coverage and unavailable-arm statuses.
-- [ ] Full affected CI, independent code review, safety regressions and PR delivery.
+- [x] Shared bounded adapter, explicit versioned profiles, strict schema and independent output validation.
+- [x] Atomic durable audit reservations and receipt reuse, document/day budgets, no automatic replay of uncertain requests.
+- [x] Node/Sites hooks behind server-only approvals and owner allowlists, with original, lease and registration guards.
+- [x] Four-arm benchmark tooling with frozen provenance, a separate persistent live-budget journal, unavailable-arm statuses, and development/independent eligibility.
+- [x] Read-only project model/cost inventory with explicit unknown credit and provider-budget statuses.
+- [x] Independent safety review; fix cache-write pricing, ambiguous retries, mid-request authorization and oversized-response cleanup.
+- [ ] Final full CI for the final combined revision (current result is attached to PR checks).
+- [ ] Real model comparison and independent optical acceptance — blocked by missing project credentials and a qualified independent corpus.
 
-## Review focus
+## Verification recorded before the final combined CI
 
-Cross-owner cache/budget reuse; revocation while awaiting the API; API failure after billing but before a receipt; incomplete PDF or table output; conflicts with existing original-derived values; nullable/zero metric denominators; test fixtures accidentally counted as independent acceptance.
+The first implementation commit `3fc3370a5292fc83095d379cb865ccb95af7dbd9` passed all eight checks: 3,067 Node tests on each supported Node version, 5,827 Sites tests, types, production build, audits, security acceptance, browser, bank integration and synthetic company performance. These results do not substitute for testing later changes.
 
-## Acceptance limits observed before implementation
+The restored minimal Node 24 runtime executed the updated adapter/audit/integration/inventory tests: 63 passed. Its oversized-body cleanup regression first failed, then passed after the request error path was corrected. The benchmark metric/ledger suite executed 14 tests: 14 passed. Full CI on the final source remains the release gate.
 
-No OpenAI API key or admin billing key exists in the execution environment. The linked Site environment revision 10 has no OpenAI key. Account model inventory, credit balance and live model benchmark are therefore NOT_VERIFIED. The local execution environment became unavailable during dependency installation; interrupted commands are not test passes. Existing main CI is a baseline, not evidence for this branch. GitHub CI will provide actual final execution evidence if available.
+## Acceptance limits
 
-Real customer processing stays disabled. No claim of 85% recall / 98% precision or reduced review workload is permitted without a fresh independent optical test.
+No OpenAI API key, admin billing key or project ID exists in the checked execution environment; the inspected Site environment revision 10 also had no OpenAI key. See [the actual access report](project-access-report.json). Model listing, billed costs, credits and provider budget remain NOT_VERIFIED.
+
+No paid model evaluation or customer processing has occurred. The initial local dependency installation failed when the original executor became unavailable; it is not a passing test run. A later restored runtime permitted isolated Node tests, while GitHub CI runs the complete locked suites.
+
+The default benchmark executes four generated optical development documents through existing OCR. Missing AI runs remain null. Its primary rubric covers thirteen legacy register fields, not complete recipient and line-item accuracy. Development replay cannot prove the independent 85% recall / 98% precision goal, and this PR makes no measured-improvement claim.
+
+Real customer processing remains disabled. All live data, scope, privacy, security and spending decisions require the server approval gates described in [OPERATIONS.md](OPERATIONS.md).

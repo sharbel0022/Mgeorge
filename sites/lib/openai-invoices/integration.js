@@ -1,3 +1,6 @@
+import {getInvoiceAiProfile} from './profiles.js';
+import {INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS} from './schema.js';
+
 const PROFILE_VERSION='invoice-ai-integration-2026-11-06.v1';
 const PROFILES=Object.freeze({'luna-v1':Object.freeze({model:'gpt-6-luna',reasoningEffort:'low'}),'sol-v1':Object.freeze({model:'gpt-6.1-sol',reasoningEffort:'low'})});
 const REVIEW='AI-förslag behöver kontrolleras mot originalet före registrering.';
@@ -92,7 +95,7 @@ export async function enrichInvoiceForReview({baseline,owner,documentId,sha256,m
  if(typeof documentId!=='string'||!documentId||typeof sha256!=='string'||!/^[a-f0-9]{64}$/.test(sha256)||!store||typeof loadOriginal!=='function')return note(baseline,'AI_CONTEXT_INVALID','blocked');
  await authorize();
  const companyRole=baseline.fields?.direction?.value==='customer'?'supplier':'recipient';
- const key=await hash(JSON.stringify([PROFILE_VERSION,owner,sha256,mime,policy.profileId,policy.model,policy.reasoningEffort,policy.expectedCompanyOrganization,companyRole]));
+ const key=await hash(JSON.stringify([PROFILE_VERSION,INVOICE_AI_SCHEMA,INVOICE_AI_INSTRUCTIONS,getInvoiceAiProfile(policy.profileId),owner,sha256,mime,policy.expectedCompanyOrganization,companyRole]));
  let previous;
  try{previous=await store.load(key);}catch{return note(baseline,'AI_STORE_UNAVAILABLE');}
  await authorize();
@@ -115,7 +118,7 @@ export async function enrichInvoiceForReview({baseline,owner,documentId,sha256,m
  let result;
  try{
   if(typeof adapter!=='function')throw Error('Adapter unavailable');
-  result=await adapter({bytes:original.bytes,mime,pageCount:original.pageCount,sha256,owner,documentId,inputValidated:true,policy,companyRole,documentText:baseline.text_excerpt||'',deterministic:baseline.fields,apiKey:environment.OPENAI_API_KEY});
+  result=await adapter({bytes:original.bytes,mime,pageCount:original.pageCount,sha256,owner,documentId,inputValidated:true,authorize,policy,companyRole,documentText:baseline.text_excerpt||'',deterministic:baseline.fields,apiKey:environment.OPENAI_API_KEY});
  }catch{result={status:'fallback',code:'AI_REQUEST_FAILED'};}
  await authorize();
  try{if(!await store.record(key,result))return note(baseline,'AI_RECEIPT_NOT_SAVED');}
