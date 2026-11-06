@@ -1,3 +1,9 @@
+## 2026-11-06 — OpenAI-kandidaten ger inga nya kvalitetspoäng utan oberoende mätning
+
+[PR 64](https://github.com/sharbel0022/Mgeorge/pull/64) tillför skyddad AI-tolkning och reproducerbar modellutvärdering. Den konservativa poängbedömningen **258,5/330 = 7,83/10** ändras inte. Enhets-/integrationstester för schema, ekonomi, företagsspärrar, kostnad och återförsök visar andra egenskaper än verklig optisk extraktionsprecision.
+
+Projektets API-modelltillgång, faktureringskrediter, OpenAI-latens/kostnad per faktura och oberoende fyrarmsjämförelse är **NOT_VERIFIED / NOT_MEASURED**. Ingen förbättring i recall, precision, kompletta fakturor eller granskningsbehov tillgodoräknas. Historiska oberoende OCR-prov och utvecklingsreplayer nedan behåller sina ursprungliga populationer och begränsningar. AI för kunddokument förblir avstängd och alla AI-förslag kräver granskning.
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

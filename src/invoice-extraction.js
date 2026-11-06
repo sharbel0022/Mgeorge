@@ -324,7 +324,8 @@ export async function extractInvoice(bytes,mime_type,metadata={}){
   try{
     const result=await runDocumentProcess(bytes,mime_type);
     if(result.error)throw Error('unreadable');
-    return interpretInvoice(result.text,{...metadata,filename:metadata.original_filename||metadata.filename||'',method:result.method,ocrConfidence:result.confidence,ocrEvidence:result.ocrEvidence,ocrInputSha256:ocrInputHash(bytes)});
+    const sha256=ocrInputHash(bytes);
+    return {...interpretInvoice(result.text,{...metadata,filename:metadata.original_filename||metadata.filename||'',method:result.method,ocrConfidence:result.confidence,ocrEvidence:result.ocrEvidence,ocrInputSha256:sha256}),documentRead:{validated:true,sha256,mime:mime_type,pageCount:result.pageCount}};
   }catch(e){
     if(e.status===429)throw e;
     return {...interpretInvoice('',metadata),level:'red',issues:['Dokumentet kunde inte läsas. Kontrollera originalet och fyll i uppgifterna manuellt.']};

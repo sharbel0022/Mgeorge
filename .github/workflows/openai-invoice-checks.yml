@@ -1,0 +1,58 @@
+name: OpenAI invoice guard checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/openai-invoice-checks.yml'
+      - 'sites/lib/openai-invoices/**'
+      - 'sites/lib/document-processing.ts'
+      - 'sites/tests/openai-invoice*'
+      - 'sites/tests/helpers/document-ocr-fixture.mjs'
+      - 'src/invoice-*.js'
+      - 'src/openai-invoice*.js'
+      - 'src/db.js'
+      - 'scripts/openai-invoices*'
+      - 'test/openai-invoice*'
+      - 'docs/openai-invoices/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openai-invoice-guards-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic:
+    name: AI invoice adapter and integration (no external API)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TZ: UTC
+      NODE_ENV: test
+      OPENAI_API_KEY: ''
+      OPENAI_INVOICES_ENABLED: 'false'
+      CLOUDFLARE_CF_FETCH_ENABLED: 'false'
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            sites/package-lock.json
+      - name: Install locked Node dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install locked Sites dependencies
+        run: npm --prefix sites run install:ci
+      - name: Guarded adapter, budget, original and registration tests
+        run: node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 test/openai-invoice*.test.js
+      - name: Sites original, lease and registration tests
+        working-directory: sites
+        run: node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 tests/openai-invoice*.test.mjs

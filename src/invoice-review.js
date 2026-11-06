@@ -41,6 +41,11 @@ export async function analyzeDocument(db,id,{extract=extractInvoice,authorize=()
   if(!intactOriginal(doc)||!intactOriginal(current)||current.fingerprint!==doc.fingerprint){
     extraction={...interpretInvoice('',metadata),level:'red',issues:['Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före ny tolkning.']};
   }else extraction.processing={...extraction.processing,sha256:doc.fingerprint};
+  if(process.env.OPENAI_INVOICES_ENABLED==='true'&&intactOriginal(current)&&current.fingerprint===doc.fingerprint){
+    const {enrichNodeInvoice}=await import('./openai-invoice-integration.js');
+    extraction=await enrichNodeInvoice(db,current,extraction,{authorize});
+    authorize();
+  }
   const v=Object.fromEntries(fieldNames.map(k=>[k,extraction.fields[k].value]));
   const duplicates=duplicateCandidates(db,v);extraction.duplicate_invoice_ids=duplicates.map(i=>i.id);
   if(duplicates.length){extraction.level='yellow';extraction.issues.push('Fakturan verkar redan registrerad. Kontrollera och komplettera originalposten.');}
@@ -53,7 +58,7 @@ export async function analyzeDocument(db,id,{extract=extractInvoice,authorize=()
   }
   db.prepare('UPDATE documents SET extraction=? WHERE id=?').run(JSON.stringify(extraction),id);
   audit(db,'document_extracted',{id,level:extraction.level,method:extraction.method,extraction});
-  if(extraction.level==='green'&&getSettings(db).auto_register_known===true)approveDocument(db,id,{},true);
+  if(extraction.level==='green'&&extraction.ai?.requiresHumanReview!==true&&getSettings(db).auto_register_known===true)approveDocument(db,id,{},true);
   return extraction;
 }
 export function approveDocument(db,id,body={},automatic=false){
@@ -67,7 +72,7 @@ export function approveDocument(db,id,body={},automatic=false){
     if(doc.status==='dismissed')throw failure('Återställ underlaget före registrering.');
     if(!intactOriginal(doc))throw failure('Originalunderlaget kunde inte integritetskontrolleras. Kontrollera originalet före registrering.');
     const extraction=JSON.parse(doc.extraction),original=extraction.fields||{};
-    if(automatic&&extraction.level!=='green')throw failure('Underlaget kräver granskning.');
+    if(automatic&&(extraction.level!=='green'||extraction.ai?.requiresHumanReview===true))throw failure('Underlaget kräver granskning.');
     const values={};
     for(const k of fieldNames){const value=body.values&&Object.hasOwn(body.values,k)?body.values[k]:original[k]?.value??null;values[k]=value===''?null:value;}
     for(const k of ['invoice_number','party','organization_number','issued_at','due_at','reference','bankgiro','direction','kind','currency'])if(values[k]!=null&&(typeof values[k]!=='string'||values[k].length>240))throw failure('Ogiltigt fakturafält: '+k,400);

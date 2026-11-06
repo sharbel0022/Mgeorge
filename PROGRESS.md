@@ -1,3 +1,13 @@
+## 2026-11-06 — OpenAI-fakturatolkning, skyddad PR-kandidat
+
+[PR 64](https://github.com/sharbel0022/Mgeorge/pull/64), `feature/95-openai-invoices`, bygger på verifierad main `f3c80629d4856c2f8ecbb1ed81be391a13ac6be8`. En serveradapter för Responses API, strikt schema, PDF/bild, källhänvisningar och ekonomisk validering kopplas till både Node och Sites. Original bevaras; företag, hash, aktuellt dokument och Sites-lease kontrolleras före och efter asynkron behandling. Kostnadsreservation och resultat lagras beständigt i befintlig auditjournal.
+
+AI är **avstängd som standard**. Sekretess-, säkerhets- och kostnadsgodkännande, explicit företagslista, betrodd företagsidentitet och servernyckel krävs. AI-förslag har obligatorisk granskning och kan inte automatiskt registreras eller bli bankbevis. Vid problem används befintlig OCR och manuell granskning.
+
+Ingen projekt-API-nyckel hittades i den tillgängliga lokala miljön eller Sites-konfigurationen. Projektets modellåtkomst, krediter och verkliga modelljämförelse är därför **NOT_VERIFIED / NOT_MEASURED**. Officiella modell-ID:n och priser är dokumenterade separat; de bevisar inte tillgång eller precision. Målen 85 % recall / 98 % precision är inte verifierade. Poängen höjs inte. Inga kundoriginal har skickats, ingen AI-aktivering eller produktionspublicering har gjorts.
+
+Fullständiga CI-kvitton och aktuellt granskningsläge finns på PR:n. Lokal körmiljö blev otillgänglig under arbetet; sådana avbrutna körningar räknas inte som godkända tester. [Plan](docs/openai-invoices/PLAN.md) · [Drift och begränsningar](docs/openai-invoices/OPERATIONS.md).
+
 ## 2026-11-06 16:20 UTC — Site 68 verifierad, separat kombinerad slutkandidat
 
 PR 61 är normalt mergad till `24390ef7e8cf6b2274c57804dc9c2d74d362ab12`. Full PR-kvalitet, separat säkerhetsacceptans och separat main-CI är gröna för samma källträd. Site **68** publicerades från exakt motsvarande Sites-träd och är avgränsat kontrollerad efter release. [Releasekvitto](docs/completion/release-site68.md).

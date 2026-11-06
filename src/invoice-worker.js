@@ -39,7 +39,7 @@ async function run(workerData){
     if(image.width*image.height>12_000_000)throw Error('pixels');
     const canvas=createCanvas(image.width,image.height);canvas.getContext('2d').drawImage(image,0,0);
     const result=await recognize(canvas);
-    return {text:result.text,confidence:result.confidence,method:'ocr',ocrEvidence:bindOcrBankgiroEvidence(inputSha256,result.text,[result.pageEvidence])};
+    return {pageCount:1,text:result.text,confidence:result.confidence,method:'ocr',ocrEvidence:bindOcrBankgiroEvidence(inputSha256,result.text,[result.pageEvidence])};
   }
   const loading=getDocument({data:bytes,isEvalSupported:false,useSystemFonts:true,disableFontFace:true,verbosity:0});
   const pdf=await loading.promise;
@@ -71,7 +71,7 @@ async function run(workerData){
       text+=(n>1?'\f\n':'')+pageText+'\n';if(text.length>150000)throw Error('text');
       page.cleanup();
     }
-    return {text,method,confidence,...(method==='ocr'?{ocrEvidence:bindOcrBankgiroEvidence(inputSha256,text,wordPages)}:{})};
+    return {pageCount:pdf.numPages,text,method,confidence,...(method==='ocr'?{ocrEvidence:bindOcrBankgiroEvidence(inputSha256,text,wordPages)}:{})};
   }finally{await pdf.destroy();}
 }
 process.once('message',async data=>{
