@@ -41,6 +41,8 @@ Detta är dokumenterade standardpriser, kontrollerade 2026-11-06, för inputkont
 
 De öppnade modellsidornas snapshot-avsnitt listade inga daterade modell-ID:n. De bokstavliga ID:na ovan är därför explicita val, men dokumentet påstår inte att de är oföränderliga snapshots. Hitta inte på datumändelser. Logga vald och returnerad modell samt profil-, prompt-, schema- och prisversion. Modell- eller profilbyte kräver ny utvärdering.
 
+Genereringsanropet ska uttryckligen ha `prompt_cache_options: { mode: 'explicit' }` och inga `prompt_cache_breakpoint` i innehållet. Den dokumenterade kombinationen stänger av promptcache och cache-skrivningar. Standardläget kan annars skapa cache-skrivningar som kostar 1,25 gånger ordinarie inputpris för 30 minuter. Lägg inte ett odokumenterat cachefält i tokenräkningsanropet. Välj standardnivån för generering och kontrollera returnerad användning och tjänstenivå. [9]
+
 Luna är utgångspunkten för en kostnadsbegränsad utvärdering. Sol är ett separat profilval som måste motiveras med mätningar. Ett fel på Luna får inte automatiskt starta ett dyrare Sol-anrop.
 
 ## Kostnad, reservation och återförsök
@@ -105,6 +107,18 @@ Inga steg som skickar data, använder en nyckel, ändrar projektinställningar e
 
 Sätt `OPENAI_INVOICES_ENABLED=false` på servern och stoppa nya AI-jobb. Vid misstänkt nyckelkompromettering ska nyckeln återkallas i projektet. En avstängning kan inte återkalla data som redan sänts eller säkert avbryta leverantörens pågående behandling. Behåll reservationer och kvitton för felsökning och kostnadsavstämning; originaltolkning och manuell granskning är återgången.
 
+## Läsbar projektinventering
+
+Verktyget `scripts/openai-invoices-inventory.mjs` gör endast läsanrop. Utan `--network` görs inga nätanrop. Med en separat, betrodd servernyckel kan modellistan hämtas:
+
+```sh
+node scripts/openai-invoices-inventory.mjs --network --output /skyddad/sokvag/modeller.json
+```
+
+Flaggan `--costs` begär dessutom historiska kostnader för exakt `OPENAI_PROJECT_ID`, med en separat `OPENAI_ADMIN_KEY`. Administrationsnyckeln hör endast hemma i en skyddad körning av inventeringsverktyget. Ingen adminnyckel behövs för fakturatolkning. Verktyget summerar ett avgränsat historiskt intervall; det verifierar inte förbetalt saldo eller projektets hårda utgiftsgräns. Saknade nycklar och otillgängliga svar ger `NOT_VERIFIED`, aldrig ett påhittat nollsaldo.
+
+[Projektåtkomstrapporten](project-access-report.json) skapades genom faktisk körning utan tillgängliga nycklar. Se [benchmarkprotokollet](benchmark-protocol.md) för fyrarmsjämförelse, fryst facit och den separata beständiga budgetjournalen vid betalda tester. Den enkla utvecklingsrubriken omfattar tretton registerfält och bevisar inte precision för alla mottagaruppgifter eller fakturarader.
+
 ## Officiella källor
 
 Dessa dokumentationssidor öppnades och kontrollerades 2026-11-06. Produktpriser och villkor kan ändras; granska dem igen före aktivering. Hänvisningarna fastställer inte projektets behörigheter eller avtal.
@@ -117,5 +131,6 @@ Dessa dokumentationssidor öppnades och kontrollerades 2026-11-06. Produktpriser
 6. [Your data – lagring, datakontroller och regioner](https://developers.openai.com/api/docs/guides/your-data)
 7. [Images and vision](https://developers.openai.com/api/docs/guides/images-vision)
 8. [Separat fakturering för ChatGPT och API](https://help.openai.com/en/articles/9039756-managing-billing-for-chatgpt-and-the-api-platform)
+9. [Prompt caching – explicit läge utan brytpunkter och cache-skrivningspriser](https://developers.openai.com/api/docs/guides/prompt-caching)
 
 Modellspecifik bildkostnadsformel för de två valda profilerna har inte verifierats tillräckligt för en egen exakt kalkyl. Använd den officiella tokenräkningen och observerad användning; anta inte att en äldre modells bildformel gäller. [7]

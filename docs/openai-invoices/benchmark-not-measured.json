@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "kind": "implementation_time_status_not_benchmark_result",
+  "date": "2026-11-06",
+  "sourceBase": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "execution": "not_run",
+  "reason": "EXECUTOR_UNAVAILABLE",
+  "tests": {
+    "status": "not_run",
+    "reason": "EXECUTOR_UNAVAILABLE"
+  },
+  "liveInference": {
+    "status": "not_run",
+    "reason": "MISSING_API_KEY"
+  },
+  "independentOpticalCorpus": {
+    "status": "not_available"
+  },
+  "arms": [
+    {
+      "id": "existing_ocr",
+      "status": "unavailable",
+      "reason": "EXECUTOR_UNAVAILABLE",
+      "metrics": null,
+      "observations": []
+    },
+    {
+      "id": "openai_low",
+      "status": "unavailable",
+      "reason": "MISSING_API_KEY",
+      "metrics": null,
+      "observations": []
+    },
+    {
+      "id": "openai_strong",
+      "status": "unavailable",
+      "reason": "MISSING_API_KEY",
+      "metrics": null,
+      "observations": []
+    },
+    {
+      "id": "hybrid",
+      "status": "unavailable",
+      "reason": "MISSING_API_KEY",
+      "metrics": null,
+      "observations": []
+    }
+  ],
+  "acceptance": {
+    "eligible": false,
+    "passed": false,
+    "reason": "NO_INDEPENDENT_OPTICAL_MEASUREMENTS"
+  },
+  "note": "This file records authoring-time blockers only. A subsequent CI report is a separate actual measurement and must identify its frozen corpus and source. No improvement, precision, recall, cost, latency, review-rate or credit-balance result is asserted here."
+}

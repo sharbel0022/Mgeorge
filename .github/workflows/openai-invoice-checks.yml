@@ -33,6 +33,8 @@ jobs:
       TZ: UTC
       NODE_ENV: test
       OPENAI_API_KEY: ''
+      OPENAI_ADMIN_KEY: ''
+      OPENAI_PROJECT_ID: ''
       OPENAI_INVOICES_ENABLED: 'false'
       CLOUDFLARE_CF_FETCH_ENABLED: 'false'
       WRANGLER_SEND_METRICS: 'false'
@@ -56,3 +58,19 @@ jobs:
       - name: Sites original, lease and registration tests
         working-directory: sites
         run: node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 tests/openai-invoice*.test.mjs
+      - name: Record model and billing access without credentials
+        run: node scripts/openai-invoices-inventory.mjs --network --costs --output "$RUNNER_TEMP/openai-invoice-benchmark/project-access.json"
+      - name: Generate optical development corpus
+        run: node --import ./scripts/saas-test-isolation.mjs scripts/openai-invoices-benchmark.mjs synthetic --directory "$RUNNER_TEMP/openai-invoice-benchmark/corpus"
+      - name: Freeze corpus and implementation before observations
+        run: node --import ./scripts/saas-test-isolation.mjs scripts/openai-invoices-benchmark.mjs freeze --manifest "$RUNNER_TEMP/openai-invoice-benchmark/corpus/manifest.json" --freeze "$RUNNER_TEMP/openai-invoice-benchmark/frozen.json"
+      - name: Measure current optical OCR and explicitly unavailable AI arms
+        run: node --import ./scripts/saas-test-isolation.mjs scripts/openai-invoices-benchmark.mjs run --manifest "$RUNNER_TEMP/openai-invoice-benchmark/corpus/manifest.json" --freeze "$RUNNER_TEMP/openai-invoice-benchmark/frozen.json" --output "$RUNNER_TEMP/openai-invoice-benchmark/report.json"
+      - name: Retain reproducible synthetic benchmark and access report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: openai-invoice-benchmark-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/openai-invoice-benchmark
+          if-no-files-found: warn
+          retention-days: 14

@@ -21,6 +21,7 @@ const plain = value => value !== null && typeof value === 'object' && !Array.isA
 const normalized = value => value.normalize('NFKC').replace(/\s+/gu, ' ').trim();
 const identifier = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9/_-]{0,99}$/.test(value);
 const safeText = (value, max) => typeof value === 'string' && value.length > 0 && value.length <= max && normalized(value).length > 0 && !CONTROL.test(value);
+const suspicious = value => INJECTION.test(value.normalize('NFKC').replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/gu, ''));
 const sameKeys = (value, keys) => plain(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
 const unique = values => [...new Set(values)];
 const codeOf = (error, otherwise) => error instanceof AdapterError ? error.code : otherwise;
@@ -96,6 +97,10 @@ async function prepare(args = {}) {
   if (args.mime !== 'application/pdf' && args.pageCount !== 1) fail('image_page_count_invalid');
   if (typeof args.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(args.sha256)) fail('source_hash_invalid');
   if (args.documentId !== undefined && !safeText(args.documentId, 200)) fail('document_id_invalid');
+  if (args.documentText !== undefined) {
+    if (typeof args.documentText !== 'string' || args.documentText.length > profile.limits.maxDocumentTextChars) fail('source_text_invalid');
+    if (suspicious(args.documentText)) fail('suspicious_source_instructions');
+  }
   const textPages = [];
   if (args.textPages !== undefined) {
     if (!Array.isArray(args.textPages) || args.textPages.length > args.pageCount) fail('source_text_invalid');
@@ -105,7 +110,7 @@ async function prepare(args = {}) {
       if (!plain(page) || !integer(page.page, 1, args.pageCount) || seen.has(page.page) || typeof page.text !== 'string') fail('source_text_invalid');
       chars += page.text.length;
       if (chars > profile.limits.maxDocumentTextChars) fail('source_text_too_large');
-      if (INJECTION.test(page.text.normalize('NFKC'))) fail('suspicious_source_instructions');
+      if (suspicious(page.text)) fail('suspicious_source_instructions');
       seen.add(page.page);
       textPages.push({ page: page.page, text: page.text });
     }
@@ -139,6 +144,15 @@ async function prepare(args = {}) {
 export async function prepareOpenAiInvoice(args = {}) {
   try { return publicPreparation(await prepare(args)); }
   catch (error) { return { status: 'fallback', issues: [codeOf(error, 'preflight_failed')], idempotencyKey: null, configDigest: null, reservationMicroUsd: 0 }; }
+}
+
+async function checkAuthorization(authorize) {
+  // The trusted host supplies the current owner/lease check. Standalone synthetic
+  // benchmarking may omit it; document metadata must never supply this callback.
+  if (authorize === undefined) return;
+  try {
+    if (typeof authorize !== 'function' || await authorize() === false) fail('authorization_revoked');
+  } catch { fail('authorization_revoked'); }
 }
 
 function base64(bytes) {
@@ -269,8 +283,10 @@ async function request(url, body, key, fetchImpl, timeoutMs, maxBytes, requestId
   })();
   try { return await Promise.race([operation, timeout]); }
   catch (error) {
+    const timedOut = controller.signal.aborted;
+    controller.abort(); // Release a rejected/oversized response before returning fallback.
     if (error instanceof AdapterError) throw error;
-    fail(controller.signal.aborted ? 'api_timeout' : 'api_network_error');
+    fail(timedOut ? 'api_timeout' : 'api_network_error');
   } finally { clearTimeout(timer); }
 }
 
@@ -281,7 +297,7 @@ function httpFailure(status, body) {
   if (status === 401) return { issue: 'api_authentication_failed', retry: false, ambiguous: false };
   if (status === 403) return { issue: 'api_access_denied', retry: false, ambiguous: false };
   if (status === 429) return { issue: 'api_rate_limited', retry: code === 'rate_limit_exceeded', ambiguous: false };
-  if ([500, 502, 503, 504].includes(status)) return { issue: 'api_server_error', retry: true, ambiguous: true };
+  if ([500, 502, 503, 504].includes(status)) return { issue: 'api_server_error', retry: false, ambiguous: true };
   return { issue: 'api_request_rejected', retry: false, ambiguous: status >= 500 };
 }
 
@@ -291,6 +307,8 @@ function readUsage(body, state) {
   if (raw.total_tokens !== undefined && raw.total_tokens !== raw.input_tokens + raw.output_tokens) fail('usage_invalid');
   if (raw.input_tokens_details?.cached_tokens !== undefined && !integer(raw.input_tokens_details.cached_tokens, 0, raw.input_tokens)) fail('usage_invalid');
   if (raw.output_tokens_details?.reasoning_tokens !== undefined && !integer(raw.output_tokens_details.reasoning_tokens, 0, raw.output_tokens)) fail('usage_invalid');
+  if ((raw.input_tokens_details?.cache_write_tokens !== undefined && raw.input_tokens_details.cache_write_tokens !== 0)
+    || (raw.input_tokens_details?.cached_tokens !== undefined && raw.input_tokens_details.cached_tokens !== 0)) fail('unexpected_cache_usage');
   const usage = { inputTokens: raw.input_tokens, outputTokens: raw.output_tokens };
   const cost = invoiceAiCostMicroUsd(usage, state.profile.pricing);
   return { usage, cost };
@@ -366,6 +384,18 @@ function quotedDate(quote, value, issues) {
     && new RegExp('\\b' + year + '\\b').test(text) && new RegExp('\\b0?' + Number(day) + '\\b').test(text);
 }
 
+function quotedIdentifier(quote, value) {
+  // value has already passed the restricted identifier grammar, so it cannot inject regex syntax.
+  return new RegExp('(?:^|[^\\p{L}\\p{N}_/-])' + value + '(?=$|[^\\p{L}\\p{N}_/-])', 'u').test(normalized(quote));
+}
+function quotedOrganization(quote, value) {
+  const digits = value.slice(0, 6) + '[ -]?' + value.slice(6);
+  return new RegExp('(?:^|[^\\p{L}\\p{N}])(?:' + digits + '|SE' + digits + '01)(?=$|[^\\p{L}\\p{N}])', 'iu').test(normalized(quote));
+}
+function quotedCurrency(quote, value) {
+  return new RegExp('(?:^|[^A-Z])' + value + '(?=$|[^A-Z])').test(normalized(quote).toUpperCase());
+}
+
 function validateOutput(output, state) {
   if (!sameKeys(output, ['documentType', 'suspiciousInstructions', ...INVOICE_AI_FIELD_NAMES, 'lineItems', 'conflicts'])
     || !['invoice', 'credit_note', 'other', 'unknown'].includes(output.documentType)
@@ -378,7 +408,7 @@ function validateOutput(output, state) {
   const pageText = new Map(state.textPages.map(page => [page.page, normalized(page.text)]));
   const checkEvidence = evidence => {
     if (!sameKeys(evidence, ['page', 'quote']) || !integer(evidence.page, 1, state.source.pageCount) || !safeText(evidence.quote, 1200)) fail('malformed_output');
-    if (INJECTION.test(evidence.quote.normalize('NFKC'))) fail('suspicious_source_instructions');
+    if (suspicious(evidence.quote)) fail('suspicious_source_instructions');
     evidenceCount++;
     if (pageText.has(evidence.page)) {
       if (!pageText.get(evidence.page).includes(normalized(evidence.quote))) fail('evidence_not_in_source');
@@ -400,15 +430,15 @@ function validateOutput(output, state) {
       normalizedValue = money(value);
       if (!quotedMoney(evidence.quote, normalizedValue)) fail('malformed_output');
     } else if (name === 'invoiceNumber' || name === 'paymentReference') {
-      if (!identifier(value) || !normalized(evidence.quote).includes(value)) fail('malformed_output');
+      if (!identifier(value) || !quotedIdentifier(evidence.quote, value)) fail('malformed_output');
     } else if (ORGANIZATION_FIELDS.has(name)) {
-      if (!/^\d{10}$/.test(value) || !evidence.quote.replace(/[ -]/g, '').includes(value)) fail('malformed_output');
+      if (!/^\d{10}$/.test(value) || !quotedOrganization(evidence.quote, value)) fail('malformed_output');
       if (!validOrganization(value)) issues.push('invalid_organization_number:' + name);
     } else if (name === 'invoiceDate' || name === 'dueDate') {
       if (!validDate(value) || !quotedDate(evidence.quote, value, issues)) fail('malformed_output');
     } else if (name === 'currency') {
       if (!TWO_DECIMAL_CURRENCIES.has(value)) fail('currency_unsupported');
-      if (!normalized(evidence.quote).toUpperCase().includes(value)) fail('malformed_output');
+      if (!quotedCurrency(evidence.quote, value)) fail('malformed_output');
     } else if (name === 'quantity') {
       if (!/^-?(?:0|[1-9]\d{0,8})(?:\.\d{1,6})?$/.test(value)
         || !normalized(evidence.quote).replace(/,/g, '.').includes(value)) fail('malformed_output');
@@ -502,6 +532,7 @@ function snapshotDeterministic(raw, role) {
  * It never uploads persistent Files, stores Responses, logs payloads, or executes tools.
  */
 export async function extractOpenAiInvoice(args = {}, options = {}) {
+  const authorize = args?.authorize; // Capture once, before any await or caller mutation.
   let state;
   let result = resultBase();
   try {
@@ -520,6 +551,7 @@ export async function extractOpenAiInvoice(args = {}, options = {}) {
     const deadline = Date.now() + timeoutMs;
     const common = payload(state);
     let counted;
+    await checkAuthorization(authorize);
     try {
       counted = await request(ENDPOINT + '/input_tokens', common, apiKey, fetchImpl,
         deadline - Date.now(), 16384, state.idempotencyKey + '-count');
@@ -536,8 +568,13 @@ export async function extractOpenAiInvoice(args = {}, options = {}) {
     const body = {
       ...common, max_output_tokens: state.profile.limits.maxOutputTokens,
       store: false, background: false, stream: false, service_tier: 'default',
+      // Explicit mode with no breakpoints disables cache reads/writes; generation-only field.
+      // https://developers.openai.com/api/docs/guides/prompt-caching
+      prompt_cache_options: { mode: 'explicit' },
     };
     for (let attempt = 1; attempt <= state.profile.limits.maxAttempts; attempt++) {
+      if (deadline <= Date.now()) fail('api_timeout');
+      await checkAuthorization(authorize);
       if (deadline <= Date.now()) fail('api_timeout');
       result.attempts = attempt;
       let received;
