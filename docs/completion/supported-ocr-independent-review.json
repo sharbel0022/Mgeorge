@@ -1,0 +1,79 @@
+{
+  "schema": "mgeorge-supported-ocr-independent-method-review-v1",
+  "review_date": "2026-11-06",
+  "reviewer": "bank_completion",
+  "verdict": "PASS_METHOD_ARITHMETIC_AND_RECORDED_PROVENANCE",
+  "quality_target_met": false,
+  "scope": "Independent read-only audit of the preserved first outcome. This receipt records the already completed audit; no additional evaluation was run when writing it.",
+  "source": {
+    "artifact_directory": "docs/quality8/independent-supported-20261106",
+    "approved_product_commit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+    "executed_preregistration_commit": "cb83472359927adadf99cb50b54f9e9aeaded19a",
+    "freeze_at": "2026-11-06T15:43:21.883995+00:00",
+    "claim_at": "2026-11-06T15:43:30.523Z",
+    "first_results_finished_at": "2026-11-06T15:44:12.622Z",
+    "sha256": {
+      "freeze.json": "0fd6c4de10ad0b4e8c883b727aa9c3a5a5a7a2a9d272957cee11469b9cb44758",
+      "first-results.json": "241a8ef5cce3cc956dd2771e75b11602e5ebccbf25e9b0418331eba6805885a4",
+      "REPORT.md": "e92ba18a7c6492432b385f99bc83020e392a9a044709cc5492bad58d4c1f55e2",
+      "protocol.md": "598552248a9365169592d713b811810337850f5bf87c656e92eef84cf961db86",
+      "run-first-pass.mjs": "c6e83ca25562c14bcec2845abc610325bf4cc084b9dcc8f2fb3af0287ff44df5"
+    },
+    "product_sha256": {
+      "src/invoice-extraction.js": "4ef7393f53ff1a850c26f76dbb4d908ba99620d859949236fbe0b844ead9aa13",
+      "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146",
+      "sites/lib/invoice-fields.js": "de8c04cb0032df723070f853cc917b276dc2620670443957247d91881a02d78d",
+      "package-lock.json": "cef4d785d401b705d27a408eb732f1552fa3836b48da4f25460ef121a19e7b8d"
+    }
+  },
+  "audit_method": [
+    "Read the preregistered protocol, runner, generator, freeze, run claim, saved observations, saved parser outputs and first results; did not import or execute any product parser or optical worker.",
+    "Recomputed mandatory-field classifications independently in Python from saved parser values against frozen gold, using the preregistered exact normalization rules. Checked each field, each case, both engines and every reported population.",
+    "Verified all 19 frozen file hashes both on disk and in the preregistration Git commit, plus all 54 hashes in the completed artifact manifest.",
+    "Verified freeze before preregistration commit before run claim before result; checked approved-source Git differences, recorded source/model hashes and the reused installation's matching lockfile.",
+    "Checked the 84 recorded call events: one sequential worker attempt and one Node plus one Sites parser call for each of the 14 images. Checked actual image hashes against saved observation input hashes.",
+    "Independently checked organization-number format/checksum, SEK currency, exact integer monetary arithmetic and 30-day due dates for all 14 gold records. Checked six Swedish and six English normal documents with two of each of three layouts per language.",
+    "Compared saved Node/Sites results: all fields, issues, confidence and levels agree; only extracted_at differs. Checked explicit direction metadata separately from image fields."
+  ],
+  "checks": {
+    "frozen_inputs_hash_verified": 19,
+    "completed_artifact_hashes_verified": 54,
+    "recorded_call_events": 84,
+    "recorded_worker_attempts": 14,
+    "completed_workers": 14,
+    "worker_errors": 0,
+    "node_parser_calls": 14,
+    "sites_parser_calls": 14,
+    "parser_errors": 0,
+    "all_worker_methods": "ocr",
+    "source_and_model_hashes_match": true,
+    "reused_installation_lockfile_matches": true,
+    "valid_format_luhn_sek_arithmetic_dates": 14,
+    "node_sites_outputs_equal_except_extracted_at": true
+  },
+  "recomputed_results_per_engine": {
+    "applies_separately_to": ["node", "sites"],
+    "normal": {"documents": 12, "TP": 62, "FP": 0, "FN": 46, "denominator": 108, "recall": 0.5740740740740741, "precision_among_returned": 1, "fully_correct": 0, "red": 8, "yellow": 4, "green": 0, "false_green": 0, "direction_metadata_correct": 12},
+    "normal_swedish": {"documents": 6, "TP": 34, "FP": 0, "FN": 20, "denominator": 54},
+    "normal_english": {"documents": 6, "TP": 28, "FP": 0, "FN": 26, "denominator": 54},
+    "completed_only_normal": {"documents": 12, "excluded_documents": 0, "TP": 62, "FP": 0, "FN": 46, "denominator": 108},
+    "stress_separate": {"documents": 2, "TP": 10, "FP": 0, "FN": 8, "denominator": 18, "recall": 0.5555555555555556, "precision_among_returned": 1, "fully_correct": 0, "red": 2, "yellow": 0, "green": 0, "false_green": 0, "direction_metadata_correct": 2},
+    "normal_field_TP": {"invoice_number": 4, "party": 2, "organization_number": 8, "issued_at": 6, "due_at": 6, "total_cents": 12, "net_cents": 12, "vat_cents": 0, "currency": 12},
+    "normal_field_denominator_each": 12,
+    "normal_field_FP_each": 0,
+    "all_reported_case_field_and_population_counts_match": true
+  },
+  "limitations": [
+    "Fourteen optical observations feed twenty-eight parser calls; the two engines are not independent optical populations and are not pooled.",
+    "Direction is explicitly supplied metadata, not an image-recognized field. The primary normal denominator is 12 times nine, not ten, fields.",
+    "Observed mandatory-field precision 62/62 does not establish population precision of at least 98 percent or complete extraction. Recall fails the joint 85/98 target.",
+    "Zero false greens with zero green documents supplies no positive sample from which to estimate green-result correctness.",
+    "Twelve normal synthetic invoices, three layout families, one recipient and one VAT rate are a narrow controlled cohort; correlated templates are not independent population sampling.",
+    "Valid organization-number syntax/checksum is not registry verification. No real business identity or banking authorization follows.",
+    "Artifact integrity and recorded chronology are checked. The evaluator's claimed prior blindness and absence of all unrecorded executions cannot be independently established from artifacts alone.",
+    "This review did not perform a new visual readability certification. It inspected the frozen generator and gold and verified exact image hashes; the original evaluator's visual QA remains separately attributed.",
+    "The earlier independent cohort remains a separate preserved first outcome. Different cohorts do not establish that the later worker change caused the difference in worker failures or recall."
+  ],
+  "changes_and_calls_during_review": {"product_changes": 0, "corpus_or_original_result_changes": 0, "optical_calls": 0, "product_parser_calls": 0, "production_calls": 0, "score_changes": 0},
+  "finding": "No concrete method, arithmetic or recorded-provenance error found within this scope. The first outcome is preserved and the joint quality target remains unmet."
+}
