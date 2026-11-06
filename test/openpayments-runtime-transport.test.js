@@ -1,6 +1,6 @@
 import test, {before,after} from 'node:test';
 import assert from 'node:assert/strict';
-import {createHash} from 'node:crypto';
+import {createHash,X509Certificate} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {chmodSync,copyFileSync,symlinkSync,writeFileSync,readFileSync} from 'node:fs';
 import {nodeSaasBankRuntime} from '../src/saas-bank-runtime.js';
@@ -71,6 +71,15 @@ test('restoring authorized configuration after observed rotation uses a fresh to
   await old.discovery();f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=JSON.stringify({...certificates.configuration,certificateSha256:'0'.repeat(64)});
   await assert.rejects(old.discovery(),{code:'CONSENT_APPLICATION_CHANGED'});f.environment.SAAS_OPENPAYMENTS_MTLS_CONFIG=original;
   await f.create().discovery();assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,2,'the invalidated old token is never revived');
+});
+
+test('repeated validation preserves the exact expiry cause after retiring the token cache',t=>{
+  const leaf=new X509Certificate(certificates.read('client.pem'));
+  t.mock.timers.enable({apis:['Date'],now:Date.parse(leaf.validFrom)+1000});
+  const f=fixture(t),transport=configuredOpenPaymentsNodeTransport({environment:f.environment,configuration:JSON.parse(f.environment.SAAS_OPENPAYMENTS_CONFIG)});
+  t.mock.timers.setTime(Date.parse(leaf.validTo));
+  assert.throws(transport.validateCertificate,{code:'CLIENT_CERTIFICATE_EXPIRED'});
+  assert.throws(transport.validateCertificate,{code:'CLIENT_CERTIFICATE_EXPIRED'});
 });
 
 test('missing server certificate configuration leaves production unavailable without network calls',async t=>{

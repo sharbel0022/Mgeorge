@@ -70,8 +70,9 @@ export function configuredOpenPaymentsNodeTransport({environment=process.env,con
   const cacheIdentity=identity.identity,invalidateTokenCache=()=>{invalidateOpenPaymentsTokenCacheIdentity(cacheIdentity);if(identities.get(environment)?.identity===cacheIdentity)identities.delete(environment);};
   const validateCertificate=()=>{
     try{
-      if(environment[CONFIG_KEY]!==raw||environment.SAAS_OPENPAYMENTS_CONFIG!==providerRaw||identities.get(environment)?.identity!==cacheIdentity||digest(JSON.stringify(material()))!==fingerprint)throw denied();
+      if(environment[CONFIG_KEY]!==raw||environment.SAAS_OPENPAYMENTS_CONFIG!==providerRaw||digest(JSON.stringify(material()))!==fingerprint)throw denied();
       native.validateCertificate();
+      if(identities.get(environment)?.identity!==cacheIdentity)throw denied();
     }catch(error){invalidateTokenCache();if(identities.get(environment)?.identity===cacheIdentity)identities.delete(environment);throw error;}
   };
   return Object.freeze({kind:'mtls',cacheIdentity,invalidateTokenCache,validateCertificate,async request(input,init){
