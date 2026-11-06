@@ -140,13 +140,25 @@ export async function processingStatus(owner:string){
   const observations=await queueObservations(owner,at,settings?.enabled===1,!!(cloud&&recent(cloudSeen,45*60000)||recent(settings?.worker_seen||'',180000)));
   return {enabled:settings?.enabled===1,auto_register:settings?.auto_register===1,worker_last_seen:settings?.worker_seen||'',worker_online:recent(settings?.worker_seen||'',180000),cloud_ocr_configured:cloud,cloud_worker_last_seen:cloudSeen,cloud_worker_recent:cloud&&recent(cloudSeen,45*60000),cloud_last_completed:settings?.cloud_worker_completed||'',last_processed:settings?.last_cloud_run||'',counts:Object.fromEntries(counts.results.map(r=>[r.state,r.count])),registered:registered?.count||0,aftercheck_pending:pending?.count||0,review_reasons:review,...observations,messages_waiting:messages?.count||0,scheduler_configured:config.DOCUMENT_SCHEDULER_CONFIGURED==='true',schedule_minutes:Number(config.DOCUMENT_SCHEDULE_MINUTES)||60,ocr_mode:cloud?'cloud':'local_computer',limits:{file_bytes:15000000,pdf_cloud_bytes:5000000,pages:10,local_concurrency:1,cloud_concurrency:1}};
 }
-async function recoverInterruptedExtraction(owner:string,job:Row){
+async function recoverInterruptedExtraction(owner:string,job:Row):Promise<'deferred'|void>{
   let extraction:Row;
   try{extraction=JSON.parse(job.extraction);}catch{return;}
   if(extraction?.processing?.run_id!==await documentRunId(owner,job)||extraction.processing.sha256!==job.sha256)return;
   const receipt=await db().prepare('SELECT id FROM document_extractions WHERE owner=? AND document_id=? AND result=? LIMIT 1').bind(owner,job.document_id,job.extraction).first<Row>();
   if(!receipt)return;
-  try{await originalBytes(owner,job);}catch{return;}
+  try{await originalBytes(owner,job);}catch(error){
+    if((error as Error)?.message==='original_integrity')return;
+    // A temporarily unavailable object/stream is not proof of a bad original.
+    // Keep the accepted receipt's lease binding and retry this read after a
+    // persisted delay. Do not consume another OCR attempt or block later jobs.
+    const at=now(),available=new Date(Date.now()+60000).toISOString();
+    await db().prepare(`UPDATE document_jobs SET error_code='original_unavailable',available_at=?,updated_at=?
+      WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND attempts>=3 AND lease=? AND extraction=?
+      AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND available_at=? AND ${activeSource}
+      AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)`)
+      .bind(available,at,owner,job.document_id,job.attempts,job.lease,job.extraction,job.lease_until,job.available_at).run();
+    return 'deferred';
+  }
   await db().prepare(`UPDATE document_jobs SET state='needs_review',error_code='processing_interrupted_after_extraction',lease='',lease_until='',updated_at=?
       WHERE owner=? AND document_id=? AND state='processing' AND attempts>=3 AND lease=? AND extraction=?
       AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now') AND ${activeSource}
@@ -161,14 +173,14 @@ async function recoverInterruptedExtractions(owner:string,at:string){
   // restored queues can exceed today's two live engine slots. Leave every
   // unchecked receipt intact for the next bounded pass, never bulk-fail it.
   const jobs=await db().prepare(`SELECT document_jobs.*,d.size,d.sha256 FROM document_jobs LEFT JOIN documents d ON d.owner=document_jobs.owner AND d.id=document_jobs.document_id
-    WHERE document_jobs.owner=? AND state='processing' AND attempts>=3 AND lease_until<?
+    WHERE document_jobs.owner=? AND state='processing' AND attempts>=3 AND lease_until<? AND available_at<=?
     AND NOT EXISTS(SELECT 1 FROM document_registrations r WHERE r.owner=document_jobs.owner AND r.document_id=document_jobs.document_id)
-    ORDER BY lease_until,document_id LIMIT 2`).bind(owner,at).all<Row>();
+    ORDER BY lease_until,document_id LIMIT 2`).bind(owner,at,at).all<Row>();
   for(const job of jobs.results){
     // Only the exact leased result and unchanged original can recover to human
     // review. The fallback also uses the selected lease/result, so concurrent
     // renewal, manual review or a committed registration cannot be overwritten.
-    await recoverInterruptedExtraction(owner,job);
+    if(await recoverInterruptedExtraction(owner,job)==='deferred')continue;
     await db().prepare(`UPDATE document_jobs SET state='failed',error_code='lease_expired',lease='',lease_until='',updated_at=?
       WHERE owner=? AND document_id=? AND state='processing' AND attempts=? AND attempts>=3 AND lease=? AND extraction=?
       AND lease_until=? AND lease_until<strftime('%Y-%m-%dT%H:%M:%fZ','now')

@@ -401,6 +401,88 @@ for(const brokenFirstReceipt of [false,true])test(`restored final-attempt backlo
 });
 
 
+async function retainedFinalAttempt(f,id){
+  await f.document(id);await f.processing.enqueueDocuments(f.owner);
+  f.sql.prepare('UPDATE document_jobs SET attempts=2 WHERE document_id=?').run(id);
+  const job=await f.lease();assert.equal(job.id,id);
+  assert.equal((await f.complete(job)).status,200);
+  // Restore a genuinely accepted result whose final state write was lost.
+  f.sql.prepare("UPDATE document_jobs SET state='processing',lease=?,lease_until='2000-01-01',updated_at='2000-01-01' WHERE document_id=?").run(job.lease,id);
+  return {...f.sql.prepare('SELECT * FROM document_jobs WHERE document_id=?').get(id)};
+}
+
+for(const outage of ['object lookup','object stream'])test(`a transient ${outage} failure preserves an accepted final-attempt receipt until bounded recovery`,async t=>{
+  const f=await fixture(t),before=await retainedFinalAttempt(f,'retained');
+  const history=f.sql.prepare('SELECT * FROM document_extractions').all(),original=Buffer.from(f.objects.get(f.owner+'/retained'));
+  const get=f.env.BUCKET.get;let reads=0;
+  f.env.BUCKET.get=async key=>{
+    reads++;
+    if(outage==='object lookup')throw Error('synthetic private provider exception');
+    const object=await get(key);return {...object,arrayBuffer:async()=>{throw Error('synthetic private truncated stream');}};
+  };
+  const started=Date.now();await f.processing.enqueueDocuments(f.owner);
+  const deferred={...f.sql.prepare('SELECT * FROM document_jobs').get()};
+  assert.equal(deferred.state,'processing');assert.equal(deferred.attempts,3);
+  assert.equal(deferred.lease,before.lease);assert.equal(deferred.lease_until,before.lease_until);
+  assert.equal(deferred.extraction,before.extraction);assert.equal(deferred.error_code,'original_unavailable');
+  assert.ok(Date.parse(deferred.available_at)>=started+60000);assert.ok(Date.parse(deferred.available_at)<=Date.now()+60000);
+  assert.ok(!JSON.stringify(deferred).includes('private provider'));assert.ok(!JSON.stringify(deferred).includes('truncated stream'));
+  await f.restart();await f.processing.enqueueDocuments(f.owner);
+  assert.equal(reads,1,'the persisted recovery delay prevents another immediate storage attempt');
+  assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},deferred);
+  f.env.BUCKET.get=get;f.sql.prepare("UPDATE document_jobs SET available_at='2000-01-01'").run();
+  await f.processing.enqueueDocuments(f.owner);
+  const recovered=f.sql.prepare('SELECT * FROM document_jobs').get();
+  assert.equal(recovered.state,'needs_review');assert.equal(recovered.error_code,'processing_interrupted_after_extraction');
+  assert.equal(recovered.attempts,3);assert.equal(recovered.extraction,before.extraction);assert.equal(recovered.lease,'');
+  assert.deepEqual(f.sql.prepare('SELECT * FROM document_extractions').all(),history);
+  assert.deepEqual(f.objects.get(f.owner+'/retained'),original);
+  assert.equal(await f.lease(),null);assert.equal(f.pdfCalls,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM workspaces').get().n,0);
+});
+
+test('two unavailable accepted originals do not starve a later recoverable receipt',async t=>{
+  const f=await fixture(t),retained=[];
+  // Create the three receipts before making all their state writes unavailable.
+  for(const id of ['a','b','c']){
+    const row=await retainedFinalAttempt(f,id);retained.push(row);
+    f.sql.prepare("UPDATE document_jobs SET state='needs_review',lease='',lease_until='' WHERE document_id=?").run(id);
+  }
+  for(const row of retained)f.sql.prepare("UPDATE document_jobs SET state='processing',lease=?,lease_until='2000-01-01' WHERE document_id=?").run(row.lease,row.document_id);
+  const get=f.env.BUCKET.get,reads=[];
+  f.env.BUCKET.get=async key=>{reads.push(key);if(!key.endsWith('/c'))throw Error('synthetic object outage');return get(key);};
+  await f.processing.enqueueDocuments(f.owner);
+  assert.equal(reads.length,2);assert.equal(f.sql.prepare("SELECT state FROM document_jobs WHERE document_id='c'").get().state,'processing');
+  await f.processing.enqueueDocuments(f.owner);
+  assert.deepEqual(reads,[f.owner+'/a',f.owner+'/b',f.owner+'/c']);
+  assert.equal(f.sql.prepare("SELECT state FROM document_jobs WHERE document_id='c'").get().state,'needs_review');
+  for(const row of retained.slice(0,2)){
+    const deferred=f.sql.prepare('SELECT * FROM document_jobs WHERE document_id=?').get(row.document_id);
+    assert.equal(deferred.state,'processing');assert.equal(deferred.lease,row.lease);assert.equal(deferred.extraction,row.extraction);
+  }
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,3);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_registrations').get().n,0);
+});
+
+for(const concurrent of ['lease replacement','manual registration'])test(`unavailable-original recovery cannot overwrite concurrent ${concurrent}`,async t=>{
+  const f=await fixture(t),before=await retainedFinalAttempt(f,'raced');let concurrentRow;
+  f.env.BUCKET.get=async()=>{
+    if(concurrent==='lease replacement')f.sql.prepare("UPDATE document_jobs SET lease='new-synthetic-lease' WHERE document_id='raced'").run();
+    else {
+      f.sql.prepare("INSERT INTO document_registrations(owner,document_id,identity,invoice_id,attempt,total,created_at) VALUES(?,?,'synthetic-manual-identity','synthetic-manual-invoice','synthetic-manual-attempt',62500,?)").run(f.owner,'raced',new Date().toISOString());
+      f.sql.prepare("UPDATE document_jobs SET state='registered',invoice_id='synthetic-manual-invoice',lease='',lease_until='' WHERE document_id='raced'").run();
+    }
+    concurrentRow={...f.sql.prepare('SELECT * FROM document_jobs').get()};
+    throw Error('synthetic private object outage');
+  };
+  await f.processing.enqueueDocuments(f.owner);
+  assert.ok(concurrentRow,'the intended concurrent transition completed before the storage error');
+  assert.deepEqual({...f.sql.prepare('SELECT * FROM document_jobs').get()},concurrentRow);
+  assert.equal(f.sql.prepare('SELECT extraction FROM document_jobs').get().extraction,before.extraction);
+  assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM document_extractions').get().n,1);
+});
+
 async function realIngressWorker(t,f){
   const key='__ocr_ingress_'+crypto.randomUUID().replaceAll('-','');
   globalThis[key]=f;t.after(()=>{delete globalThis[key];});
