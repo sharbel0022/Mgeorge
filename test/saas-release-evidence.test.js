@@ -3,6 +3,8 @@ import test from 'node:test';
 import { SECURITY_SCOPE, SECURITY_SUITES, RECOVERY_SCOPE, RECOVERY_COMMAND, RECOVERY_REJECTIONS } from '../scripts/lib/saas-security-scope.mjs';
 import { sha256, tapTotals, verifySecurityEvidence, verifyRecoveryEvidence, isolatedTestEnvironment } from '../scripts/lib/saas-release-evidence.mjs';
 
+// Independent literal restore contract; do not derive this from the receipt under test.
+const recoveryTables = ["workspaces","audit_events","documents","bank_applications","bank_connections","bank_sync_runs","gmail_connections","customer_contacts","customer_messages","reconciliation_findings","customer_deliveries","gmail_sources","gmail_runs","document_automation","document_jobs","document_extractions","invoice_counterparties","document_registrations","payment_control_runs","payment_control_requests","bankgiro_ingest_sources","bankgiro_ingest_jobs","saas_bank_state","company_bank_sync_scopes","company_bank_sync_jobs","company_bank_sync_requests","company_bank_sync_receipts"];
 const now = Date.parse('2026-11-06T15:00:00.000Z');
 const startedAt = '2026-11-06T14:58:00.000Z', finishedAt = '2026-11-06T14:59:00.000Z';
 const source = () => ({
@@ -35,11 +37,12 @@ function recovery() {
     format: 'MG-Sites-synthetic-recovery-drill-1', scope: 'synthetic-isolated-evidence-only',
     productionRestoreTested: false, accepted: true, startedAt, completedAt: finishedAt,
     runtime: { node: 'v24.22.1' }, originals: { count: 430, bytes: 185567855, hashesChecked: 430 },
-    tables: Array.from({ length: 27 }, (_, i) => ({ name: 'fixture_' + 'a'.repeat(i + 1), rows: 1 })),
-    ledger: { invoices: 2, invoiceCents: 75000, allocatedCents: 62500 },
+    tables: recoveryTables.map(name => ({ name, rows: 1 })),
+    ledger: { invoices: 2, invoiceCents: 75000, transactions: 2, transactionCents: 75000,
+      allocations: 1, allocatedCents: 62500, revokedCredits: 1, revokedBankgiroLinks: 1 },
     sourceUnchanged: true, otherOwnerExcluded: true, authorizationAndTransientRowsAbsent: true,
     workerLeasesInvalidated: true, applicationTokenRecoveryBlocked: true, sourceProvenanceVerified: true,
-    provenance: { backupId: 'synthetic-backup', companyBoundary: { version: 'company-data-boundary-v1', companyId: 'synthetic-company', storageOwner: 'synthetic-isolated-recovery-owner', boundaryVersion: 1 }, snapshotSha256: 'a'.repeat(64), tableCensusSha256: 'b'.repeat(64),
+    provenance: { backupId: '12345678-1234-4123-8123-123456789abc', companyBoundary: { version: 'company-data-boundary-v1', companyId: 'synthetic-company', storageOwner: 'synthetic-isolated-recovery-owner', boundaryVersion: 1 }, snapshotSha256: 'a'.repeat(64), tableCensusSha256: 'b'.repeat(64),
       originalCensusSha256: 'c'.repeat(64), sourceFiles: { 'bundle.json': 'd'.repeat(64), 'manifest.bin': 'e'.repeat(64), 'snapshot.bin': 'f'.repeat(64) } },
     rejectionChecks: RECOVERY_REJECTIONS.map((name, index) => ({ case: name, rejected: true,
       stage: index < 5 ? 'restore' : 'acceptance', ...(index < 5 ? { outputCreated: false } : {}) })),
@@ -129,6 +132,14 @@ for (const [label, change] of [
   ['missing hash readbacks', f => { f.restored.originals.hashesChecked = 429; }],
   ['an omitted durable table', f => { f.restored.tables.pop(); }],
   ['a duplicate durable table', f => { f.restored.tables[1] = f.restored.tables[0]; }],
+  ['a renamed durable table', f => { f.restored.tables[0].name = 'unrelated'; }],
+  ['a changed transaction count', f => { f.restored.ledger.transactions++; }],
+  ['a changed transaction total', f => { f.restored.ledger.transactionCents++; }],
+  ['a changed allocation count', f => { f.restored.ledger.allocations++; }],
+  ['a missing revoked credit', f => { f.restored.ledger.revokedCredits = 0; }],
+  ['a missing revoked Bankgiro link', f => { f.restored.ledger.revokedBankgiroLinks = 0; }],
+  ['a negative control at the wrong stage', f => { f.restored.rejectionChecks[5].stage = 'restore'; }],
+  ['a noncanonical backup identity', f => { f.restored.provenance.backupId = 'arbitrary-unbound-identity'; }],
   ['a changed ledger', f => { f.restored.ledger.allocatedCents++; }],
   ['missing provenance', f => { delete f.restored.provenance; }],
   ['another company provenance', f => { f.restored.provenance.companyBoundary.companyId = 'another-company'; }],
