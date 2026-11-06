@@ -1,0 +1,155 @@
+[
+  {
+    "job": "sites",
+    "jobId": 127698703819,
+    "runtime": [
+      "node: v22.23.4"
+    ],
+    "audit": [
+      "found 0 vulnerabilities",
+      "Severity: moderate",
+      "8 moderate severity vulnerabilities",
+      "found 0 vulnerabilities"
+    ],
+    "gates": [
+      {
+        "name": "Run npm run install:ci",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:37Z",
+        "completed_at": "2026-11-06T03:47:50Z"
+      },
+      {
+        "name": "Verify exact installed minimatch mitigation bytes",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:50Z",
+        "completed_at": "2026-11-06T03:47:50Z"
+      },
+      {
+        "name": "Install shared OCR runtime for cloud integration test",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:50Z",
+        "completed_at": "2026-11-06T03:47:51Z"
+      },
+      {
+        "name": "Run npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:51Z",
+        "completed_at": "2026-11-06T03:48:00Z"
+      },
+      {
+        "name": "Audit Sites production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:48:00Z",
+        "completed_at": "2026-11-06T03:48:22Z"
+      },
+      {
+        "name": "Install isolated bridge for full synthetic SFTP chain",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:48:22Z",
+        "completed_at": "2026-11-06T03:48:22Z"
+      },
+      {
+        "name": "Run Sites tests with synthetic data",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:48:22Z",
+        "completed_at": "2026-11-06T03:52:24Z"
+      },
+      {
+        "name": "Run npm run build",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:52:24Z",
+        "completed_at": "2026-11-06T03:52:36Z"
+      }
+    ]
+  },
+  {
+    "job": "bankgiro_bridge",
+    "jobId": 127698704025,
+    "runtime": [
+      "node: v22.23.4"
+    ],
+    "audit": [
+      "found 0 vulnerabilities",
+      "found 0 vulnerabilities"
+    ],
+    "gates": [
+      {
+        "name": "Install isolated SFTP bridge",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:33Z",
+        "completed_at": "2026-11-06T03:47:33Z"
+      },
+      {
+        "name": "Check isolated bridge syntax",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:33Z",
+        "completed_at": "2026-11-06T03:47:34Z"
+      },
+      {
+        "name": "Audit isolated bridge production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:34Z",
+        "completed_at": "2026-11-06T03:47:34Z"
+      },
+      {
+        "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:34Z",
+        "completed_at": "2026-11-06T03:47:40Z"
+      }
+    ]
+  },
+  {
+    "job": "test",
+    "jobId": 127698704223,
+    "runtime": [
+      "node: v22.23.4"
+    ],
+    "audit": [
+      "found 0 vulnerabilities",
+      "found 0 vulnerabilities"
+    ],
+    "gates": [
+      {
+        "name": "Run npm ci --ignore-scripts",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:39Z",
+        "completed_at": "2026-11-06T03:47:41Z"
+      },
+      {
+        "name": "Run npm run check",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:41Z",
+        "completed_at": "2026-11-06T03:47:46Z"
+      },
+      {
+        "name": "Audit production dependencies",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:46Z",
+        "completed_at": "2026-11-06T03:47:47Z"
+      },
+      {
+        "name": "Run tests with synthetic data",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:47Z",
+        "completed_at": "2026-11-06T03:51:00Z"
+      }
+    ]
+  }
+]

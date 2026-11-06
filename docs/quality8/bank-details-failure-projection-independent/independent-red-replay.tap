@@ -1,0 +1,1351 @@
+TAP version 13
+# Subtest: reviewer: provider failure on the fifth result withholds all partial usage
+not ok 1 - reviewer: provider failure on the fifth result withholds all partial usage
+  ---
+  duration_ms: 723.946389
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2046:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 5,
+        observedCount: 4,
+    -   providerFailure: {
+    -     code: 'BANK_TIMEOUT'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 5,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 5
+    attemptedCount: 5
+    observedCount: 4
+    providerFailure:
+      code: 'BANK_TIMEOUT'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 5
+    attemptedCount: 5
+    observedCount: 4
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2050:9)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: usage details failure projection: real HTTP expired session remains a denied bounded diagnosis
+not ok 2 - usage details failure projection: real HTTP expired session remains a denied bounded diagnosis
+  ---
+  duration_ms: 410.514338
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_RECONNECT_REQUIRED'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_RECONNECT_REQUIRED'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP account access remains a denied bounded diagnosis
+not ok 3 - usage details failure projection: real HTTP account access remains a denied bounded diagnosis
+  ---
+  duration_ms: 340.526644
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_ACCOUNT_UNAVAILABLE'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_ACCOUNT_UNAVAILABLE'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis
+not ok 4 - usage details failure projection: real HTTP missing resource remains a denied bounded diagnosis
+  ---
+  duration_ms: 415.341798
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_RESOURCE_UNAVAILABLE'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_RESOURCE_UNAVAILABLE'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis
+not ok 5 - usage details failure projection: real HTTP server authorization remains a denied bounded diagnosis
+  ---
+  duration_ms: 342.572658
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'PROVIDER_AUTHORIZATION_FAILED'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'PROVIDER_AUTHORIZATION_FAILED'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP application access remains a denied bounded diagnosis
+not ok 6 - usage details failure projection: real HTTP application access remains a denied bounded diagnosis
+  ---
+  duration_ms: 297.528535
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'PROVIDER_ACCESS_DENIED'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'PROVIDER_ACCESS_DENIED'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP user context remains a denied bounded diagnosis
+not ok 7 - usage details failure projection: real HTTP user context remains a denied bounded diagnosis
+  ---
+  duration_ms: 334.875897
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_USER_CONTEXT_REQUIRED'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_USER_CONTEXT_REQUIRED'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP bank action remains a denied bounded diagnosis
+not ok 8 - usage details failure projection: real HTTP bank action remains a denied bounded diagnosis
+  ---
+  duration_ms: 302.606714
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_ACTION_REQUIRED'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_ACTION_REQUIRED'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP timeout remains a denied bounded diagnosis
+not ok 9 - usage details failure projection: real HTTP timeout remains a denied bounded diagnosis
+  ---
+  duration_ms: 280.751715
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_TIMEOUT'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_TIMEOUT'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP service failure remains a denied bounded diagnosis
+not ok 10 - usage details failure projection: real HTTP service failure remains a denied bounded diagnosis
+  ---
+  duration_ms: 321.578974
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_SERVICE_ERROR'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_SERVICE_ERROR'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis
+not ok 11 - usage details failure projection: real HTTP rate limit remains a denied bounded diagnosis
+  ---
+  duration_ms: 278.54155
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_RATE_LIMIT'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_RATE_LIMIT'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: real HTTP redirect remains a denied bounded diagnosis
+not ok 12 - usage details failure projection: real HTTP redirect remains a denied bounded diagnosis
+  ---
+  duration_ms: 345.663051
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2161:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'PROVIDER_REDIRECT_DENIED'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'PROVIDER_REDIRECT_DENIED'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2165:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter absent currency exposes only field and kind
+not ok 13 - usage details failure projection: adapter absent currency exposes only field and kind
+  ---
+  duration_ms: 299.059474
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'currency',
+    -       kind: 'absent'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'currency'
+        kind: 'absent'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter null account type exposes only field and kind
+not ok 14 - usage details failure projection: adapter null account type exposes only field and kind
+  ---
+  duration_ms: 387.924433
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'cash_account_type',
+    -       kind: 'null'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'cash_account_type'
+        kind: 'null'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter string primary resource exposes only field and kind
+not ok 15 - usage details failure projection: adapter string primary resource exposes only field and kind
+  ---
+  duration_ms: 380.012248
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'account_id',
+    -       kind: 'string'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'account_id'
+        kind: 'string'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter array currency exposes only field and kind
+not ok 16 - usage details failure projection: adapter array currency exposes only field and kind
+  ---
+  duration_ms: 456.929787
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'currency',
+    -       kind: 'array'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'currency'
+        kind: 'array'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter object account type exposes only field and kind
+not ok 17 - usage details failure projection: adapter object account type exposes only field and kind
+  ---
+  duration_ms: 282.162002
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'cash_account_type',
+    -       kind: 'object'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'cash_account_type'
+        kind: 'object'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter number currency exposes only field and kind
+not ok 18 - usage details failure projection: adapter number currency exposes only field and kind
+  ---
+  duration_ms: 295.523497
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'currency',
+    -       kind: 'other'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'currency'
+        kind: 'other'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter different UID exposes only field and kind
+not ok 19 - usage details failure projection: adapter different UID exposes only field and kind
+  ---
+  duration_ms: 247.789447
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'uid',
+    -       kind: 'string'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'uid'
+        kind: 'string'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: adapter invalid alias scheme exposes only field and kind
+not ok 20 - usage details failure projection: adapter invalid alias scheme exposes only field and kind
+  ---
+  duration_ms: 366.646939
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2180:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'all_account_ids[].scheme_name',
+    -       kind: 'string'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'all_account_ids[].scheme_name'
+        kind: 'string'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2183:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: invalid JSON has a trusted code without an invented field
+not ok 21 - usage details failure projection: invalid JSON has a trusted code without an invented field
+  ---
+  duration_ms: 313.647025
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2187:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2190:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: transport failure exposes a fixed code and keeps its fixed log
+not ok 22 - usage details failure projection: transport failure exposes a fixed code and keeps its fixed log
+  ---
+  duration_ms: 370.823949
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2193:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_NETWORK_ERROR'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_NETWORK_ERROR'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2197:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: constructor code survives hostile public getters
+not ok 23 - usage details failure projection: constructor code survives hostile public getters
+  ---
+  duration_ms: 221.63675
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2200:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'BANK_TIMEOUT'
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'BANK_TIMEOUT'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2205:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: plain fields cannot supply trusted provider metadata
+ok 24 - usage details failure projection: plain fields cannot supply trusted provider metadata
+  ---
+  duration_ms: 233.49823
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: borrowed prototype cannot supply trusted provider metadata
+ok 25 - usage details failure projection: borrowed prototype cannot supply trusted provider metadata
+  ---
+  duration_ms: 210.445794
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: proxy cannot supply trusted provider metadata
+ok 26 - usage details failure projection: proxy cannot supply trusted provider metadata
+  ---
+  duration_ms: 213.023896
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: revoked proxy cannot supply trusted provider metadata
+ok 27 - usage details failure projection: revoked proxy cannot supply trusted provider metadata
+  ---
+  duration_ms: 190.56838
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: unknown constructor code cannot supply trusted provider metadata
+ok 28 - usage details failure projection: unknown constructor code cannot supply trusted provider metadata
+  ---
+  duration_ms: 185.043899
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: plain Error cannot supply trusted provider metadata
+ok 29 - usage details failure projection: plain Error cannot supply trusted provider metadata
+  ---
+  duration_ms: 224.518461
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: null cannot supply trusted provider metadata
+ok 30 - usage details failure projection: null cannot supply trusted provider metadata
+  ---
+  duration_ms: 213.542572
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: contract failure after a valid detail withholds every usage count
+not ok 31 - usage details failure projection: contract failure after a valid detail withholds every usage count
+  ---
+  duration_ms: 288.081205
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2223:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 2,
+        observedCount: 1,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'currency',
+    -       kind: 'absent'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 3,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 3
+    attemptedCount: 2
+    observedCount: 1
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'currency'
+        kind: 'absent'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 3
+    attemptedCount: 2
+    observedCount: 1
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2226:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: usage details failure projection: audit failure suppresses even a trusted provider failure
+ok 32 - usage details failure projection: audit failure suppresses even a trusted provider failure
+  ---
+  duration_ms: 186.507399
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: context shift at audit suppresses even a trusted provider failure
+ok 33 - usage details failure projection: context shift at audit suppresses even a trusted provider failure
+  ---
+  duration_ms: 189.580283
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: context shift during read suppresses even a trusted provider failure
+ok 34 - usage details failure projection: context shift during read suppresses even a trusted provider failure
+  ---
+  duration_ms: 168.441772
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: deadline during read suppresses even a trusted provider failure
+ok 35 - usage details failure projection: deadline during read suppresses even a trusted provider failure
+  ---
+  duration_ms: 153.845037
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: unresolved read marker cannot retain a masked provider cause
+ok 36 - usage details failure projection: unresolved read marker cannot retain a masked provider cause
+  ---
+  duration_ms: 201.479413
+  type: 'test'
+  ...
+# Subtest: usage details failure projection: the real MCP error preserves the same safe projection
+not ok 37 - usage details failure projection: the real MCP error preserves the same safe projection
+  ---
+  duration_ms: 243.511457
+  type: 'test'
+  location: '/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2254:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+        attemptedCount: 1,
+        observedCount: 0,
+    -   providerFailure: {
+    -     code: 'INVALID_PROVIDER_RESPONSE',
+    -     validationIssue: {
+    -       field: 'cash_account_type',
+    -       kind: 'null'
+    -     }
+    -   },
+        reason: 'DETAILS_PROVIDER_UNAVAILABLE',
+        status: 'unavailable',
+        targetCount: 1,
+        version: 'selected-account-usage-details-v1'
+      }
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 'selected-account-usage-details-v1'
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    providerFailure:
+      code: 'INVALID_PROVIDER_RESPONSE'
+      validationIssue:
+        field: 'cash_account_type'
+        kind: 'null'
+  actual:
+    version: 'selected-account-usage-details-v1'
+    targetCount: 1
+    attemptedCount: 1
+    observedCount: 0
+    status: 'unavailable'
+    reason: 'DETAILS_PROVIDER_UNAVAILABLE'
+  operator: 'deepStrictEqual'
+  stack: |-
+    assertDetailsFailure (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2140:9)
+    TestContext.<anonymous> (file:///workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/banking-security.test.mjs:2258:2)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+1..37
+# tests 37
+# suites 0
+# pass 12
+# fail 25
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11847.81553

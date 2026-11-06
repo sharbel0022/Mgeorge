@@ -1,0 +1,13 @@
+{
+  "baseFixture": "sites/tests/banking-security.test.mjs",
+  "baseSha256": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+  "basePrefixBytes": 193277,
+  "appendFile": "independent-probes.append.mjs",
+  "appendSha256": "87493777c70a6c48ed3f09edc3fcc68aa682afd83b2b91935b4e122c9e2a642b",
+  "temporaryTestFile": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-tmp.test.mjs",
+  "temporarySha256": "5c0995d7a55cb4205ddb07f3e9aebf78ba8264cd765e1a552cf2b890e857b801",
+  "byteIdenticalOriginalPrefix": true,
+  "selection": "^independent failure projection:",
+  "originalTestsNotExecutedInProbeRun": true,
+  "temporaryFileWillBeRemovedBeforeCommit": true
+}

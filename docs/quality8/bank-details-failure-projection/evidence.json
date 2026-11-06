@@ -1,0 +1,163 @@
+{
+  "preparedAt": "2026-11-06T04:19:20.988082+00:00",
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "base": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "redCommit": "9c1078cadfbca8923213f066cef1476c612796c6",
+  "productCommit": "92b6fefe60c31d8f862f6d93f2d422e777801390",
+  "runtime": "v24.22.1",
+  "productionChanges": [
+    "sites/lib/banking/service.ts"
+  ],
+  "serviceSha256": "cc3114a7bb7a9e4d013a50d7740d9b1f1389a47861a46c44d47e9b061d8e628d",
+  "frozenTestsUnchanged": true,
+  "otherRecordedProductionUnchanged": true,
+  "runs": {
+    "red": {
+      "label": "red",
+      "startedAt": "2026-11-06T04:13:38.153888+00:00",
+      "finishedAt": "2026-11-06T04:13:47.345252+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/bank-details-failure-projection/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=usage details failure projection:|reviewer: provider failure on the fifth result",
+        "tests/banking-security.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 1,
+      "signal": null,
+      "durationSeconds": 9.191,
+      "maxRssKiB": 418696,
+      "counts": {
+        "tests": 37,
+        "suites": 0,
+        "pass": 12,
+        "fail": 25,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-0035/red.tap",
+      "logSha256": "7a1add3166f8c6668de3d2b6fdacd33f6e7f814832ad526a9e7924233adb4f88"
+    },
+    "focusedGreen": {
+      "label": "green",
+      "startedAt": "2026-11-06T04:15:44.717814+00:00",
+      "finishedAt": "2026-11-06T04:15:54.744096+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/bank-details-failure-projection/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "--test-name-pattern=usage details failure projection:|reviewer: provider failure on the fifth result",
+        "tests/banking-security.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 10.026,
+      "maxRssKiB": 421108,
+      "counts": {
+        "tests": 37,
+        "suites": 0,
+        "pass": 37,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-0035/green.tap",
+      "logSha256": "373339110525e1ebd5fb2ad988131d929c910607642b08bc58a84d6cd00d929e"
+    },
+    "serviceRegressions": {
+      "label": "service-regressions",
+      "startedAt": "2026-11-06T04:16:44.973362+00:00",
+      "finishedAt": "2026-11-06T04:17:48.363983+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/bank-details-failure-projection/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "--experimental-strip-types",
+        "--test",
+        "--test-reporter=tap",
+        "--test-concurrency=1",
+        "tests/banking-security.test.mjs",
+        "tests/company-bank-sync.test.mjs",
+        "tests/bank-sync-integrity-q8.test.mjs"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 63.39,
+      "maxRssKiB": 806916,
+      "counts": {
+        "tests": 357,
+        "suites": 0,
+        "pass": 357,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-0035/service-regressions.tap",
+      "logSha256": "6251b4e1264af18d58883220dfcdabc625defe546af9fcc07e027c9490c42b04"
+    },
+    "sitesTypecheck": {
+      "label": "typecheck",
+      "startedAt": "2026-11-06T04:15:44.722940+00:00",
+      "finishedAt": "2026-11-06T04:15:58.292990+00:00",
+      "cwd": "/workspace/scratch/4d79ab4bea8e/bank-details-failure-projection/sites",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--import",
+        "../scripts/saas-test-isolation.mjs",
+        "scripts/run-verified-tool.mjs",
+        "check"
+      ],
+      "environment": {
+        "NODE_ENV": "test",
+        "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+        "WRANGLER_SEND_METRICS": "false"
+      },
+      "returncode": 0,
+      "signal": null,
+      "durationSeconds": 13.57,
+      "maxRssKiB": 938360,
+      "counts": {},
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-0035/typecheck.tap",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "uniqueFinalTests": 357,
+  "focusedTestsIncludedInFinal": true,
+  "sourceFiles": "source-manifest.json",
+  "priorTestPreservation": "test-preservation.json",
+  "limits": [
+    "The Site 66 production result and limited Worker-log result are parent-reported; no bank read was repeated here.",
+    "The actual details usage and cause of the Site 66 generic failure remain unknown.",
+    "No full-project CI or independent approval is claimed.",
+    "No scores, production state, provider permissions, snapshots, consent or financial state were changed."
+  ]
+}

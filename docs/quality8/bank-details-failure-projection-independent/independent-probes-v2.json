@@ -1,0 +1,37 @@
+{
+  "label": "independent-probes-v2",
+  "startedAt": "2026-11-06T04:33:45.590466+00:00",
+  "finishedAt": "2026-11-06T04:33:50.898796+00:00",
+  "cwd": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "--import",
+    "../scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "--test-name-pattern=^independent failure projection:",
+    "tests/reviewer-failure-projection-v2-tmp.test.mjs"
+  ],
+  "environment": {
+    "NODE_ENV": "test",
+    "CLOUDFLARE_CF_FETCH_ENABLED": "false",
+    "WRANGLER_SEND_METRICS": "false"
+  },
+  "returncode": 0,
+  "signal": null,
+  "durationSeconds": 5.308,
+  "maxRssKiB": 367464,
+  "counts": {
+    "tests": 20,
+    "suites": 0,
+    "pass": 20,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "log": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/docs/quality8/bank-details-failure-projection-independent/independent-probes-v2.tap",
+  "logSha256": "5b98830016605a16660c4be30a2f6ad638b778c22034be416bdcc0048406e7d8"
+}

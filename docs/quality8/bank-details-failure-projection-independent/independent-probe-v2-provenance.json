@@ -1,0 +1,26 @@
+{
+  "runs": [
+    {
+      "baseFixtureSha256": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+      "appendSha256": "f4720a6815644c4af9a5e57c545c6a6eee1329075f8e8d1a64788a78498caf23",
+      "materializedSha256": "68a3355a47c175cb21fa4c6a3bb5ea10676ec56aaaf5999b8c96614ce13bc1a8",
+      "temporaryFile": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/worktree/sites/tests/reviewer-failure-projection-v2-tmp.test.mjs",
+      "selection": "^independent failure projection:",
+      "originalPrefixByteIdentical": true
+    },
+    {
+      "baseFixtureSha256": "398c569728e9c4137c094c2c1c44c3a9ce8213a8ac7ad79e06fd4d31dca9fc1c",
+      "appendSha256": "9d3b6d0c9417bc43701ca709b959ad20937150b97f65abf9e08b1b4883508491",
+      "materializedSha256": "4fccb6b488c12c8236fd4747cbd53a21947a09efc9c08e703c85a4150301f2f9",
+      "temporaryFile": "/workspace/scratch/4d79ab4bea8e/reviews/bank-details-failure-projection-independent-92b6fefe/red/sites/tests/reviewer-harness-controls-tmp.test.mjs",
+      "selection": "^independent harness control:",
+      "originalPrefixByteIdentical": true
+    }
+  ],
+  "originalFixtureAssertionsUnchanged": true,
+  "initialFailedRunPreserved": true,
+  "corrections": [
+    "Avoid a fixture runtime key rotation; pass the synthetic RSA key only into the mocked provider boundary. All issue/code/privacy assertions retained.",
+    "Authentication loss requires the existing strict 401 response, not the helper intended for authorized ACCOUNT_USAGE_INVALID 409 responses. Both boundaries are replayed on the unchanged RED product."
+  ]
+}

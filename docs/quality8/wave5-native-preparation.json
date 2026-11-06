@@ -1,0 +1,21 @@
+{
+  "source": "1f43f8823fce845d137bc5a1b0844c99f0d37922",
+  "siteTree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+  "native": {
+    "project_id": "appgprj_6adf2f7f7e848191b64192161886b528",
+    "checkout_path": "/workspace/scratch/4d79ab4bea8e/site-source",
+    "commit_sha": "d30b1e2518e3765b15fba28cbd306addf142da38",
+    "archive": "/tmp/rating8-wave5-site67-bank-diagnostic.tar.gz"
+  },
+  "archive": {
+    "path": "/tmp/rating8-wave5-site67-bank-diagnostic.tar.gz",
+    "bytes": 18607635,
+    "sha256": "0edf980d1d397decd171164d4d867463486c0e968acd0282a620d28609842e00"
+  },
+  "copiedTrackedFiles": 629,
+  "projectIdPreserved": true,
+  "publishOnPushAccepted": false,
+  "savedVersion": false,
+  "deployed": false,
+  "reviewAndFullCI": "independent_READY_full_CI_pending"
+}

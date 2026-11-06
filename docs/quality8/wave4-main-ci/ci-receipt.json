@@ -1,0 +1,532 @@
+{
+  "schema_version": 1,
+  "validated_at": "2026-11-06T04:01:44+00:00",
+  "outcome": "success",
+  "scope": "Exact terminal main push CI; read-only GitHub reads and review artifacts only. No dispatch, rerun, ref, PR, product, workflow, or production mutations.",
+  "repository": "sharbel0022/Mgeorge",
+  "branch": "main",
+  "event": "push",
+  "head_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "tree_sha": "2f22b5e154646507f78e9e44952513d7456905e4",
+  "sites_tree_sha": "58c2cae56a5be177842c360ae46d5caed83fdd9b",
+  "parents": [
+    "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+    "f488841afccdefba17a6b584320347581f60c3f4"
+  ],
+  "run": {
+    "id": 42158636715,
+    "name": "Payment control checks",
+    "number": 265,
+    "attempt": 1,
+    "workflow_id": 398864112,
+    "path": ".github/workflows/payment-control-ci.yml",
+    "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42158636715",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-11-06T03:47:22Z",
+    "started_at": "2026-11-06T03:47:22Z",
+    "updated_at": "2026-11-06T03:52:39Z",
+    "terminal_run_observed_at": "2026-11-06T03:54:07.582Z",
+    "terminal_jobs_observed_at": "2026-11-06T03:52:51.972Z"
+  },
+  "jobs": [
+    {
+      "label": "Node",
+      "job_name": "test",
+      "job_id": 127698704223,
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42158636715/job/127698704223",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T03:47:25Z",
+      "completed_at": "2026-11-06T03:51:04Z",
+      "checkout_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "node_runtime": "v22.23.4",
+      "tap": {
+        "tests": 2321,
+        "suites": 0,
+        "pass": 2321,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 193048.266173
+      },
+      "required_gates": [
+        {
+          "name": "Run npm ci --ignore-scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T03:47:39Z",
+          "completed_at": "2026-11-06T03:47:41Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T03:47:41Z",
+          "completed_at": "2026-11-06T03:47:46Z"
+        },
+        {
+          "name": "Audit production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T03:47:46Z",
+          "completed_at": "2026-11-06T03:47:47Z"
+        },
+        {
+          "name": "Run tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T03:47:47Z",
+          "completed_at": "2026-11-06T03:51:00Z"
+        }
+      ],
+      "audit": {
+        "command": "npm audit --audit-level=high",
+        "api_step": {
+          "name": "Audit production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T03:47:46Z",
+          "completed_at": "2026-11-06T03:47:47Z"
+        },
+        "summary": {
+          "total": 0,
+          "gate": "success",
+          "zero_vulnerability_claim": true
+        },
+        "log_evidence": [
+          "found 0 vulnerabilities"
+        ]
+      },
+      "raw_log": "logs/node-127698704223.log",
+      "raw_log_bytes": 989607,
+      "raw_log_sha256": "e9f323a9917b0c9c59aa181f43a1ba5058781672a6634ea8ff34a88514c9d525",
+      "full_log_tail_present": true
+    },
+    {
+      "label": "Sites",
+      "job_name": "sites",
+      "job_id": 127698703819,
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42158636715/job/127698703819",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T03:47:25Z",
+      "completed_at": "2026-11-06T03:52:39Z",
+      "checkout_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "node_runtime": "v22.23.4",
+      "tap": {
+        "tests": 5201,
+        "suites": 0,
+        "pass": 5201,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 241615.286957
+      },
+      "required_gates": [
+        {
+          "name": "Run npm run install:ci",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T03:47:37Z",
+          "completed_at": "2026-11-06T03:47:50Z"
+        },
+        {
+          "name": "Verify exact installed minimatch mitigation bytes",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T03:47:50Z",
+          "completed_at": "2026-11-06T03:47:50Z"
+        },
+        {
+          "name": "Install shared OCR runtime for cloud integration test",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T03:47:50Z",
+          "completed_at": "2026-11-06T03:47:51Z"
+        },
+        {
+          "name": "Run npm run check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T03:47:51Z",
+          "completed_at": "2026-11-06T03:48:00Z"
+        },
+        {
+          "name": "Audit Sites production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T03:48:00Z",
+          "completed_at": "2026-11-06T03:48:22Z"
+        },
+        {
+          "name": "Install isolated bridge for full synthetic SFTP chain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-06T03:48:22Z",
+          "completed_at": "2026-11-06T03:48:22Z"
+        },
+        {
+          "name": "Run Sites tests with synthetic data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-11-06T03:48:22Z",
+          "completed_at": "2026-11-06T03:52:24Z"
+        },
+        {
+          "name": "Run npm run build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-11-06T03:52:24Z",
+          "completed_at": "2026-11-06T03:52:36Z"
+        }
+      ],
+      "audit": {
+        "command": "npm audit --audit-level=high",
+        "api_step": {
+          "name": "Audit Sites production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-06T03:48:00Z",
+          "completed_at": "2026-11-06T03:48:22Z"
+        },
+        "summary": {
+          "moderate": 8,
+          "high_or_critical_reported": false,
+          "gate": "success",
+          "zero_vulnerability_claim": false
+        },
+        "log_evidence": [
+          "# npm audit report",
+          "Severity: moderate",
+          "8 moderate severity vulnerabilities"
+        ]
+      },
+      "raw_log": "logs/sites-127698703819.log",
+      "raw_log_bytes": 2233824,
+      "raw_log_sha256": "c75d97d4701ceb952cac34d461e73bcbebe340297027daf0905e4fd3ac0e361f",
+      "full_log_tail_present": true
+    },
+    {
+      "label": "Bridge",
+      "job_name": "bankgiro_bridge",
+      "job_id": 127698704025,
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42158636715/job/127698704025",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T03:47:25Z",
+      "completed_at": "2026-11-06T03:47:42Z",
+      "checkout_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "node_runtime": "v22.23.4",
+      "tap": {
+        "tests": 47,
+        "suites": 0,
+        "pass": 47,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 5731.656965
+      },
+      "required_gates": [
+        {
+          "name": "Install isolated SFTP bridge",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-06T03:47:33Z",
+          "completed_at": "2026-11-06T03:47:33Z"
+        },
+        {
+          "name": "Check isolated bridge syntax",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-06T03:47:33Z",
+          "completed_at": "2026-11-06T03:47:34Z"
+        },
+        {
+          "name": "Audit isolated bridge production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T03:47:34Z",
+          "completed_at": "2026-11-06T03:47:34Z"
+        },
+        {
+          "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-06T03:47:34Z",
+          "completed_at": "2026-11-06T03:47:40Z"
+        }
+      ],
+      "audit": {
+        "command": "npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high",
+        "api_step": {
+          "name": "Audit isolated bridge production dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-06T03:47:34Z",
+          "completed_at": "2026-11-06T03:47:34Z"
+        },
+        "summary": {
+          "total": 0,
+          "gate": "success",
+          "zero_vulnerability_claim": true
+        },
+        "log_evidence": [
+          "found 0 vulnerabilities"
+        ]
+      },
+      "raw_log": "logs/bankgiro-bridge-127698704025.log",
+      "raw_log_bytes": 35875,
+      "raw_log_sha256": "d8220970d547c401ee52b6514c187b358c103ab1536b1174387e67d623f3c25d",
+      "full_log_tail_present": true
+    }
+  ],
+  "payment_totals": {
+    "tests": 7569,
+    "pass": 7569,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "interpretation": "Sum of test executions in the three Payment jobs; no SaaS counts added."
+  },
+  "required_gate_count": 16,
+  "required_gates": [
+    {
+      "job": "test",
+      "name": "Run npm ci --ignore-scripts",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4,
+      "started_at": "2026-11-06T03:47:39Z",
+      "completed_at": "2026-11-06T03:47:41Z"
+    },
+    {
+      "job": "test",
+      "name": "Run npm run check",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5,
+      "started_at": "2026-11-06T03:47:41Z",
+      "completed_at": "2026-11-06T03:47:46Z"
+    },
+    {
+      "job": "test",
+      "name": "Audit production dependencies",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6,
+      "started_at": "2026-11-06T03:47:46Z",
+      "completed_at": "2026-11-06T03:47:47Z"
+    },
+    {
+      "job": "test",
+      "name": "Run tests with synthetic data",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 7,
+      "started_at": "2026-11-06T03:47:47Z",
+      "completed_at": "2026-11-06T03:51:00Z"
+    },
+    {
+      "job": "sites",
+      "name": "Run npm run install:ci",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4,
+      "started_at": "2026-11-06T03:47:37Z",
+      "completed_at": "2026-11-06T03:47:50Z"
+    },
+    {
+      "job": "sites",
+      "name": "Verify exact installed minimatch mitigation bytes",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5,
+      "started_at": "2026-11-06T03:47:50Z",
+      "completed_at": "2026-11-06T03:47:50Z"
+    },
+    {
+      "job": "sites",
+      "name": "Install shared OCR runtime for cloud integration test",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6,
+      "started_at": "2026-11-06T03:47:50Z",
+      "completed_at": "2026-11-06T03:47:51Z"
+    },
+    {
+      "job": "sites",
+      "name": "Run npm run check",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 7,
+      "started_at": "2026-11-06T03:47:51Z",
+      "completed_at": "2026-11-06T03:48:00Z"
+    },
+    {
+      "job": "sites",
+      "name": "Audit Sites production dependencies",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 8,
+      "started_at": "2026-11-06T03:48:00Z",
+      "completed_at": "2026-11-06T03:48:22Z"
+    },
+    {
+      "job": "sites",
+      "name": "Install isolated bridge for full synthetic SFTP chain",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 9,
+      "started_at": "2026-11-06T03:48:22Z",
+      "completed_at": "2026-11-06T03:48:22Z"
+    },
+    {
+      "job": "sites",
+      "name": "Run Sites tests with synthetic data",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 10,
+      "started_at": "2026-11-06T03:48:22Z",
+      "completed_at": "2026-11-06T03:52:24Z"
+    },
+    {
+      "job": "sites",
+      "name": "Run npm run build",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 11,
+      "started_at": "2026-11-06T03:52:24Z",
+      "completed_at": "2026-11-06T03:52:36Z"
+    },
+    {
+      "job": "bankgiro_bridge",
+      "name": "Install isolated SFTP bridge",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4,
+      "started_at": "2026-11-06T03:47:33Z",
+      "completed_at": "2026-11-06T03:47:33Z"
+    },
+    {
+      "job": "bankgiro_bridge",
+      "name": "Check isolated bridge syntax",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5,
+      "started_at": "2026-11-06T03:47:33Z",
+      "completed_at": "2026-11-06T03:47:34Z"
+    },
+    {
+      "job": "bankgiro_bridge",
+      "name": "Audit isolated bridge production dependencies",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6,
+      "started_at": "2026-11-06T03:47:34Z",
+      "completed_at": "2026-11-06T03:47:34Z"
+    },
+    {
+      "job": "bankgiro_bridge",
+      "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 7,
+      "started_at": "2026-11-06T03:47:34Z",
+      "completed_at": "2026-11-06T03:47:40Z"
+    }
+  ],
+  "sites_build": {
+    "job_id": 127698703819,
+    "api_step": {
+      "name": "Run npm run build",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 11,
+      "started_at": "2026-11-06T03:52:24Z",
+      "completed_at": "2026-11-06T03:52:36Z"
+    },
+    "actually_executed": true,
+    "skipped": false,
+    "raw_log": "logs/sites-127698703819.log",
+    "log_evidence": [
+      "2026-11-06T03:52:24.5358452Z ##[group]Run npm run build",
+      "2026-11-06T03:52:24.6156929Z > node scripts/run-framework.mjs build",
+      "2026-11-06T03:52:29.0982621Z \u001b[32m✓ built in 2.49s\u001b[39m",
+      "2026-11-06T03:52:29.7723522Z \u001b[32m✓ built in 656ms\u001b[39m",
+      "2026-11-06T03:52:32.8390942Z \u001b[32m✓ built in 3.05s\u001b[39m",
+      "2026-11-06T03:52:34.7289823Z \u001b[32m✓ built in 1.87s\u001b[39m",
+      "2026-11-06T03:52:36.0332514Z \u001b[32m✓ built in 1.29s\u001b[39m",
+      "2026-11-06T03:52:36.0554694Z   Build complete."
+    ]
+  },
+  "workflow_blob_verification": [
+    {
+      "file": "workflows/payment-control-ci.yml",
+      "bytes": 3078,
+      "git_blob_sha": "093737d0fcc940b8876a179b0f5e4303dd30abc9",
+      "sha256": "fda1e1e17ace428c580124df362e6a038746b957e22be12295af56188f21d986"
+    },
+    {
+      "file": "workflows/saas-security-acceptance.yml",
+      "bytes": 1429,
+      "git_blob_sha": "3c8fbd5aa04c982c7c05003515bb1ee865d0c646",
+      "sha256": "8968081569e21e722d7518e0bfa070e18fb607d37668dad3c77684463c59617b"
+    }
+  ],
+  "saas": {
+    "main_push_applicable": false,
+    "reason": "Pinned workflow push branch pattern is feature/saas-*. It also runs on pull_request to main and workflow_dispatch, but not push to main.",
+    "main_run_claimed": false,
+    "included_in_payment_total": false,
+    "prior_pr_receipt": "../wave4-third-pr-ci-f488841/ci-receipt.json",
+    "prior_pr_run_id": 42157715038,
+    "prior_pr_counts_not_recounted": true
+  },
+  "raw_log_preservation": "Full connector-returned log strings were encoded to UTF-8 without content or line-ending normalization. BOM and ANSI sequences are retained. Each bounded write was read back before final file byte-count and SHA-256 verification. Parsing only used in-memory normalized copies.",
+  "api_sources": {
+    "run": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42158636715",
+    "jobs": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42158636715/jobs?filter=latest&per_page=100",
+    "commit": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "tree": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/2f22b5e154646507f78e9e44952513d7456905e4",
+    "head_push_run_discovery": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs?head_sha=0035ea89ef3cd60f0924f901503cad00d1ab1fca&event=push&per_page=100"
+  },
+  "evidence_files": [
+    "terminal-status.json",
+    "source-verification.json",
+    "workflow-applicability.json",
+    "status-history.json",
+    "exact-green-confirmation.json",
+    "gate-proofs.json",
+    "raw-log-receipts.json",
+    "sites-build-evidence.json",
+    "logs/node-127698704223.log",
+    "logs/sites-127698703819.log",
+    "logs/bankgiro-bridge-127698704025.log",
+    "workflows/payment-control-ci.yml",
+    "workflows/saas-security-acceptance.yml"
+  ]
+}

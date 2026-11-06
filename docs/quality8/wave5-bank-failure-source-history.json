@@ -1,0 +1,11 @@
+{
+  "schema": "mgeorge-quality8-source-history-v1",
+  "ref": "fix/bank-details-failure-projection-20261106",
+  "head": "7a0d08cf0f686d975baac8bc30205e245d10aacf",
+  "prerequisite": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "commits": 3,
+  "path": "docs/quality8/wave5-bank-failure-source-history.bundle",
+  "bytes": 35659,
+  "sha256": "00aa86e0928f73320e5609dd834dc9dc3d684598e8936ede9b4be46eab44659d",
+  "scope": "Original bank projection RED, product and evidence commits only; no root operational ancestry."
+}

@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "repository": "sharbel0022/Mgeorge",
+  "branch": "main",
+  "head_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+  "commit": {
+    "sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "node_id": "C_kwDOVYRLZNoAKDAwMzVlYTg5ZWYzY2Q2MGYwOTI0ZjkwMTUwM2NhZDAwZDFhYjFmY2E",
+    "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "html_url": "https://github.com/sharbel0022/Mgeorge/commit/0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "author": {
+      "name": "sharbel0022",
+      "email": "49398736+sharbel0022@users.noreply.github.com",
+      "date": "2026-11-06T03:47:19Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-11-06T03:47:19Z"
+    },
+    "tree": {
+      "sha": "2f22b5e154646507f78e9e44952513d7456905e4",
+      "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/2f22b5e154646507f78e9e44952513d7456905e4"
+    },
+    "message": "Merge pull request #58 from sharbel0022/feature/rating8-reviewed-geometry-retry-20261106\n\nFix invoice field ownership, guarded retry and bank usage diagnostics",
+    "parents": [
+      {
+        "sha": "41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/41aadcef5fc6f65cc73979997b195c7b4f12eec1",
+        "html_url": "https://github.com/sharbel0022/Mgeorge/commit/41aadcef5fc6f65cc73979997b195c7b4f12eec1"
+      },
+      {
+        "sha": "f488841afccdefba17a6b584320347581f60c3f4",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/f488841afccdefba17a6b584320347581f60c3f4",
+        "html_url": "https://github.com/sharbel0022/Mgeorge/commit/f488841afccdefba17a6b584320347581f60c3f4"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJq7U3HCRC1aQ7uu5UhlAAAdUQQAIeaylR3hHJNyjArgtSYUlNI\nFER1Ib8tVCRylAomWtF3/JUwt+abxhsRbX6s6hcNqz08IGqN72NYn7Lnebdf5VBy\ncUhmrGVHYXTlhf6vEEfUX/mBqecVHF/MvLbXA8LjCTXfjXK7SN2y+irNMMdqLUQ/\n71ubOaqPkgEX7dTyjGhE0aji6+BCiYuGZeIuoqesj6pG45NVIPxeOCX4gDP5jFIf\n2B4cEsTkuY+n3oIJXNwNJWbdTheifD8b6LyoAWarj30nnQ7kamfxWbXceVMmhLnk\nNqLvYcTfZmXxoYPOwh41lAipmf8CsHKNgeHbWvX4UQXGwzcGMdigkWnINyO3Pf0+\nAyi8gVNkJ9wpH3wMDpdaraTmCzfItvnsCiRBaVJtNZ66FJb7kcVsQDip7YjsYcGg\n8l/+EZKG+XJCK6UVcEZrAnK0SoOg7XFCbhZxoaxO7G2Ma3PnzNcm+ZrNZOIweLf/\novXPbG/4WX8TItARP56R4cp/zcIcqNGoWz1Yf2J4HltPpEtcY77g5WBJpzwG5+z+\nd7wz3l5MqrDP0Evs18djfx1smO5DITR5k5CzJgvI5xjyUz94zhL5k3o7JhTi7bF/\nfEdz3cXzV5PUDLX36dBue9rlply2jYL/WwUkeqowThD9MMgikDrIWflznzoakmH/\nMhaE5Ef2O0lPMEhmkCiR\n=BphD\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 2f22b5e154646507f78e9e44952513d7456905e4\nparent 41aadcef5fc6f65cc73979997b195c7b4f12eec1\nparent f488841afccdefba17a6b584320347581f60c3f4\nauthor sharbel0022 <49398736+sharbel0022@users.noreply.github.com> 1793936839 +0100\ncommitter GitHub <noreply@github.com> 1793936839 +0100\n\nMerge pull request #58 from sharbel0022/feature/rating8-reviewed-geometry-retry-20261106\n\nFix invoice field ownership, guarded retry and bank usage diagnostics",
+      "verified_at": "2026-11-06T03:47:19Z"
+    }
+  },
+  "commit_observed_at": "2026-11-06T03:51:48.761Z",
+  "top_level_tree": {
+    "sha": "2f22b5e154646507f78e9e44952513d7456905e4",
+    "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/2f22b5e154646507f78e9e44952513d7456905e4",
+    "tree": [
+      {
+        "path": ".env.example",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2975eeb79f243c212b23652a6d08dc8301abb5db",
+        "size": 1924,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/2975eeb79f243c212b23652a6d08dc8301abb5db"
+      },
+      {
+        "path": ".gitattributes",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1cf5bee602729e726cbcd587393e08bd80e3bddf",
+        "size": 162,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/1cf5bee602729e726cbcd587393e08bd80e3bddf"
+      },
+      {
+        "path": ".github",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "964c9f961938bd9ee3d1181c70ea1a94e4c41038",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/964c9f961938bd9ee3d1181c70ea1a94e4c41038"
+      },
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "dac3e884d8de1de38ae507b01fbd7cb38bd298f5",
+        "size": 183,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/dac3e884d8de1de38ae507b01fbd7cb38bd298f5"
+      },
+      {
+        "path": "AGENTS.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2603939c9aa4c2ce05ab7af895a499527988bd21",
+        "size": 1707,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/2603939c9aa4c2ce05ab7af895a499527988bd21"
+      },
+      {
+        "path": "PLAN.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b46dbc1799131d2defb6624247a8b30a81c0026a",
+        "size": 7014,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/b46dbc1799131d2defb6624247a8b30a81c0026a"
+      },
+      {
+        "path": "PROGRESS.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7ebc65853ca86bb9106462248dad9f35fcb7a0a4",
+        "size": 141363,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/7ebc65853ca86bb9106462248dad9f35fcb7a0a4"
+      },
+      {
+        "path": "QUALITY-SCORECARD.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "644ae331495fdc13f0e57d9896a0468c1edc2e05",
+        "size": 236446,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/644ae331495fdc13f0e57d9896a0468c1edc2e05"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7d5eec5523b04589031f5354f44b74f88c57fca4",
+        "size": 17664,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/7d5eec5523b04589031f5354f44b74f88c57fca4"
+      },
+      {
+        "path": "bridge",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "745600d2ed8dccfd9c143ff22dbd7e37bfa6be32",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/745600d2ed8dccfd9c143ff22dbd7e37bfa6be32"
+      },
+      {
+        "path": "docs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "2866f50a4e7c268237b907097a8707950dd295df",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/2866f50a4e7c268237b907097a8707950dd295df"
+      },
+      {
+        "path": "migrations",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "9e71a352806e32ba9303041a9e8b3400e936fe8e",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/9e71a352806e32ba9303041a9e8b3400e936fe8e"
+      },
+      {
+        "path": "package-lock.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "37952e5226e223208e74d365e94e53c8cd06e8a7",
+        "size": 13133,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/37952e5226e223208e74d365e94e53c8cd06e8a7"
+      },
+      {
+        "path": "package.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8ce9b05f66186016b791cb6d4b859deae59b54cc",
+        "size": 859,
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/blobs/8ce9b05f66186016b791cb6d4b859deae59b54cc"
+      },
+      {
+        "path": "public",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "cd4c67f481c5befe8ff8077e796eae6c6c0fe152",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/cd4c67f481c5befe8ff8077e796eae6c6c0fe152"
+      },
+      {
+        "path": "scripts",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "f1e578982af02f197814a6404ce1734de37e81cc",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/f1e578982af02f197814a6404ce1734de37e81cc"
+      },
+      {
+        "path": "sites",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "58c2cae56a5be177842c360ae46d5caed83fdd9b",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/58c2cae56a5be177842c360ae46d5caed83fdd9b"
+      },
+      {
+        "path": "source",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "7817580269eb9d901c8ae7bd413dfae103cef5e4",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/7817580269eb9d901c8ae7bd413dfae103cef5e4"
+      },
+      {
+        "path": "src",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "d13485cf70a4a81b33a2919b1d60db691f14d5dc",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/d13485cf70a4a81b33a2919b1d60db691f14d5dc"
+      },
+      {
+        "path": "test",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "574e54da440c7a34740f16db4040bb1034e30cb5",
+        "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/574e54da440c7a34740f16db4040bb1034e30cb5"
+      }
+    ],
+    "truncated": false
+  },
+  "tree_observed_at": "2026-11-06T03:57:07.709Z",
+  "sites_tree": {
+    "path": "sites",
+    "mode": "040000",
+    "type": "tree",
+    "sha": "58c2cae56a5be177842c360ae46d5caed83fdd9b",
+    "url": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/58c2cae56a5be177842c360ae46d5caed83fdd9b"
+  },
+  "checkout_by_job": [
+    {
+      "id": 127698703819,
+      "name": "sites",
+      "checkout_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "evidence": "logs/sites-127698703819.log; line immediately after git log -1 --format"
+    },
+    {
+      "id": 127698704025,
+      "name": "bankgiro_bridge",
+      "checkout_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "evidence": "logs/bankgiro-bridge-127698704025.log; line immediately after git log -1 --format"
+    },
+    {
+      "id": 127698704223,
+      "name": "test",
+      "checkout_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "evidence": "logs/node-127698704223.log; line immediately after git log -1 --format"
+    }
+  ],
+  "endpoints": {
+    "commit": "https://api.github.com/repos/sharbel0022/Mgeorge/git/commits/0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "tree": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/2f22b5e154646507f78e9e44952513d7456905e4"
+  }
+}

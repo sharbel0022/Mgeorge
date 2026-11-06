@@ -1,0 +1,83 @@
+{
+  "decision": "READY",
+  "subject": {
+    "base": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+    "frozenRed": "9c1078cadfbca8923213f066cef1476c612796c6",
+    "product": "92b6fefe60c31d8f862f6d93f2d422e777801390",
+    "producerDocs": "7a0d08cf0f686d975baac8bc30205e245d10aacf",
+    "productTree": "75f05809b8bbd1194304805f55940951aa8ce94d",
+    "sitesTree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+    "serviceSha256": "cc3114a7bb7a9e4d013a50d7740d9b1f1389a47861a46c44d47e9b061d8e628d",
+    "serviceGitBlob": "b0917d620760360457056817ed0a76604d63957a",
+    "productChangedFiles": [
+      "sites/lib/banking/service.ts"
+    ],
+    "productNumstat": {
+      "added": 14,
+      "removed": 6
+    }
+  },
+  "checks": [
+    {
+      "id": "SCOPE",
+      "result": "pass",
+      "evidence": "Exact one-file 14+/6- diff; adapter, read guard, cooldown, store, MCP, policy/types and locks unchanged."
+    },
+    {
+      "id": "PROVENANCE",
+      "result": "pass",
+      "evidence": "providerErrorCode uses constructor-bound WeakMap; code must be in existing BANK_JOB_ERROR_CODES. Unknown and spoofed values stay generic without property/prototype evaluation."
+    },
+    {
+      "id": "VALIDATION_ISSUE",
+      "result": "pass",
+      "evidence": "Only INVALID_PROVIDER_RESPONSE can read providerResponseDiagnostic. Its existing private map returns a copy of fixed field/kind only. Public issue/code getters and attributes are ignored."
+    },
+    {
+      "id": "PARTIAL_READ",
+      "result": "pass",
+      "evidence": "Fifth actual-adapter failure after four mixed observations emits no usage counts or values; original ACCOUNT_USAGE_INVALID 409 remains."
+    },
+    {
+      "id": "FINAL_GATE",
+      "result": "pass",
+      "evidence": "Lost audit reply, application deactivation after committed audit, lost authentication and replaced pending read marker cannot disclose a misleading trusted diagnostic."
+    },
+    {
+      "id": "AUTH",
+      "result": "pass",
+      "evidence": "Authorized denials keep original 409/code/reason. Authentication loss preserves the pre-existing 401 and suppresses both usage diagnostics, verified on unchanged RED product."
+    },
+    {
+      "id": "NO_NEW_READS",
+      "result": "pass",
+      "evidence": "Diff adds no read/retry. Exact synthetic call sequences enforced; real HTTP-mapped 503 Retry-After retains blocked cooldown and prevents a second invocation from reading."
+    },
+    {
+      "id": "PRIVACY",
+      "result": "pass",
+      "evidence": "Responses and audits exclude synthetic raw messages, session/account UID, primary hash, primary account identifiers and partial usage. Cache-Control stays private, no-store. Transport logging remains the existing fixed marker in frozen tests."
+    },
+    {
+      "id": "NO_STATE_PROMOTION",
+      "result": "pass",
+      "evidence": "Connection rows preserved except existing guard cooldown state where applicable; status remains reauth_required, no successful revalidation receipt, workspace mutation or bank sync. ORGA observation does not repair consent."
+    },
+    {
+      "id": "ASSERTIONS",
+      "result": "pass",
+      "evidence": "Three test files byte-identical RED/product/docs. Reconstruction of base tests permits only three mock exports, one strengthened expected BANK_TIMEOUT field, and 36 added cases; all other original bytes match."
+    },
+    {
+      "id": "RED_GREEN",
+      "result": "pass",
+      "evidence": "Independent RED repeats exact producer 25 failure names; parsed expected-vs-actual objects differ only by missing providerFailure. Same frozen 37 focus pass after fix; 357 full affected cases pass."
+    },
+    {
+      "id": "TYPECHECK",
+      "result": "pass",
+      "evidence": "Guarded TypeScript exits 0 from sites after local symlink is replaced by independent physical dependency copy. Initial guard refusal retained unchanged."
+    }
+  ],
+  "openFindings": []
+}

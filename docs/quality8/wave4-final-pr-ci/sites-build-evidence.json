@@ -1,0 +1,46 @@
+{
+  "job_id": 127695718942,
+  "step": {
+    "name": "Run npm run build",
+    "status": "completed",
+    "conclusion": "success",
+    "number": 11,
+    "started_at": "2026-11-06T03:44:51Z",
+    "completed_at": "2026-11-06T03:45:08Z"
+  },
+  "rawLog": "logs/sites-127695718942.log",
+  "evidence": [
+    {
+      "line": 31719,
+      "text": "##[group]Run npm run build"
+    },
+    {
+      "line": 31727,
+      "text": "> node scripts/run-framework.mjs build"
+    },
+    {
+      "line": 31743,
+      "text": "✓ built in 3.58s"
+    },
+    {
+      "line": 31762,
+      "text": "✓ built in 1.16s"
+    },
+    {
+      "line": 31930,
+      "text": "✓ built in 4.28s"
+    },
+    {
+      "line": 31974,
+      "text": "✓ built in 2.64s"
+    },
+    {
+      "line": 32010,
+      "text": "✓ built in 2.16s"
+    },
+    {
+      "line": 32074,
+      "text": "  Build complete."
+    }
+  ]
+}

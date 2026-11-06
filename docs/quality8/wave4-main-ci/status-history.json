@@ -1,0 +1,62 @@
+[
+  {
+    "observed_at": "2026-11-06T03:51:48.738Z",
+    "kind": "head_sha_push_run_discovery",
+    "runs": [
+      {
+        "id": 42158636715,
+        "name": "Payment control checks",
+        "head_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+        "head_branch": "main",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-11-06T03:47:22Z",
+        "updated_at": "2026-11-06T03:47:34Z"
+      }
+    ]
+  },
+  {
+    "observed_at": "2026-11-06T03:52:51.972Z",
+    "kind": "terminal_jobs",
+    "jobs": [
+      {
+        "id": 127698703819,
+        "name": "sites",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:25Z",
+        "completed_at": "2026-11-06T03:52:39Z"
+      },
+      {
+        "id": 127698704025,
+        "name": "bankgiro_bridge",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:25Z",
+        "completed_at": "2026-11-06T03:47:42Z"
+      },
+      {
+        "id": 127698704223,
+        "name": "test",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-11-06T03:47:25Z",
+        "completed_at": "2026-11-06T03:51:04Z"
+      }
+    ]
+  },
+  {
+    "observed_at": "2026-11-06T03:54:07.582Z",
+    "kind": "terminal_run",
+    "run": {
+      "id": 42158636715,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "0035ea89ef3cd60f0924f901503cad00d1ab1fca",
+      "head_branch": "main",
+      "event": "push",
+      "updated_at": "2026-11-06T03:52:39Z"
+    }
+  }
+]

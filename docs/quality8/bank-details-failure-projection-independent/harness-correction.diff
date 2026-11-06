@@ -1,0 +1,65 @@
+--- independent-probes.append.mjs
++++ independent-probes-v2.append.mjs
+@@ -4,13 +4,19 @@
+ const independentProjectionSecret = 'INDEPENDENT_SYNTHETIC_PRIVATE_92B6FEFE';
+ const independentProjectionPrefix = 'independent failure projection: ';
+ 
+-function independentProjectionPrivacy(f, result, logs = []) {
++function independentProjectionPrivacy(f, result, logs = [], expectedStatus = 409) {
+   const { error, body } = result;
+   const response = f.service.bankFailure(error);
+-  assert.equal(response.status, 409);
++  assert.equal(response.status, expectedStatus);
+   assert.equal(response.headers.get('cache-control'), 'private, no-store');
+-  assert.equal(body.code, 'BANK_ACCOUNT_SCOPE_INVALID');
+-  assert.equal(body.reason, 'ACCOUNT_USAGE_INVALID');
++  if (expectedStatus === 409) {
++    assert.equal(body.code, 'BANK_ACCOUNT_SCOPE_INVALID');
++    assert.equal(body.reason, 'ACCOUNT_USAGE_INVALID');
++  } else {
++    assert.equal(expectedStatus, 401);
++    assert.deepEqual(Object.keys(body).sort(), ['error', 'signIn']);
++    assert.equal(body.signIn, '/signin-with-chatgpt?return_to=%2Fbank');
++  }
+   const audit = f.sql.prepare('SELECT action,detail FROM audit_events').all();
+   const visible = JSON.stringify([body, audit, logs]);
+   const secrets = [independentProjectionSecret, remoteSession,
+@@ -105,7 +111,7 @@
+ test(independentProjectionPrefix + 'actual adapter issue survives hostile public code and issue getters', async t => {
+   const f = await usageDetailsFixture(t), before = { ...f.connection() }, logs = [];
+   const actual = await import('../lib/banking/enable-banking.ts');
+-  f.env.ENABLE_BANKING_PRIVATE_KEY = generateKeyPairSync('rsa', { modulusLength: 2048,
++  const privateKeyPem = generateKeyPairSync('rsa', { modulusLength: 2048,
+     privateKeyEncoding: { format: 'pem', type: 'pkcs8' }, publicKeyEncoding: { format: 'pem', type: 'spki' } }).privateKey;
+   let reads = 0, httpCalls = 0;
+   t.mock.method(console, 'error', (...args) => logs.push(args));
+@@ -115,7 +121,7 @@
+     return Response.json({ currency: 'SEK', cash_account_type: null, raw: independentProjectionSecret });
+   });
+   f.provider.getAccountDetails = async (config, uid) => {
+-    try { return await actual.getAccountDetails(config, uid); }
++    try { return await actual.getAccountDetails({ applicationId: appId, privateKeyPem }, uid); }
+     catch (error) {
+       assert.equal(actual.providerErrorCode(error), 'INVALID_PROVIDER_RESPONSE');
+       for (const key of ['code', 'message', 'status', 'validationIssue', 'providerFailure', 'toJSON']) {
+@@ -175,12 +181,18 @@
+       }
+       return result;
+     };
+-    const result = await usageDetailsDenial(f);
++    let result;
++    if (mode === 'owner lost after audit commit') {
++      let error; try { await f.service.revalidateConsent(post('revalidate')); } catch (caught) { error = caught; }
++      const response = f.service.bankFailure(error);
++      assert.equal(response.status, 401);
++      result = { error, body: await response.json() };
++    } else result = await usageDetailsDenial(f);
+     assert.deepEqual(f.calls.map(c => c.name), ['getSession', 'getAccountDetails']);
+     assert.ok(!('usageDiagnostic' in result.body));
+     assert.ok(!('usageDetailsDiagnostic' in result.body));
+     assert.equal(f.sql.prepare("SELECT count(*) n FROM audit_events WHERE action='bank.consent.revalidation.failed'").get().n, 1);
+-    independentProjectionPrivacy(f, result);
++    independentProjectionPrivacy(f, result, [], mode === 'owner lost after audit commit' ? 401 : 409);
+     assert.deepEqual({ ...f.connection() }, before);
+   });
+ }

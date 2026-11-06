@@ -1,0 +1,26 @@
+[
+  {
+    "job_id": 127698704025,
+    "job": "bankgiro-bridge",
+    "received_at": "2026-11-06T03:54:08.311Z",
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-main-ci-0035ea89/logs/bankgiro-bridge-127698704025.log",
+    "bytes": 35875,
+    "sha256": "d8220970d547c401ee52b6514c187b358c103ab1536b1174387e67d623f3c25d"
+  },
+  {
+    "job_id": 127698704223,
+    "job": "node",
+    "received_at": "2026-11-06T03:54:08.985Z",
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-main-ci-0035ea89/logs/node-127698704223.log",
+    "bytes": 989607,
+    "sha256": "e9f323a9917b0c9c59aa181f43a1ba5058781672a6634ea8ff34a88514c9d525"
+  },
+  {
+    "job_id": 127698703819,
+    "job": "sites",
+    "received_at": "2026-11-06T03:54:08.924Z",
+    "path": "/workspace/scratch/4d79ab4bea8e/reviews/wave4-main-ci-0035ea89/logs/sites-127698703819.log",
+    "bytes": 2233824,
+    "sha256": "c75d97d4701ceb952cac34d461e73bcbebe340297027daf0905e4fd3ac0e361f"
+  }
+]
