@@ -1,0 +1,108 @@
+{
+  "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "worktree": "/workspace/scratch/4d79ab4bea8e/payment-startup-repair",
+  "branch": "fix/payment-startup-contention-20261106",
+  "reviewDirectory": "/workspace/scratch/4d79ab4bea8e/reviews/payment-startup-237dd45e",
+  "newCommits": [],
+  "productChanged": false,
+  "productFixApplied": false,
+  "greenRunPerformed": false,
+  "originalAssertionsAndChildSourceUntouched": true,
+  "harnessPatch": "*** Begin Patch\n*** Update File: /workspace/scratch/4d79ab4bea8e/payment-startup-repair/test/payment-concurrency.test.js\n@@\n function worker(path,t){\n   const child=spawn(process.execPath,['--input-type=module','--eval',childSource,path],{stdio:['ignore','ignore','pipe','ipc'],windowsHide:true});\n   t.after(()=>{if(child.exitCode===null)child.kill();});\n-  const ready=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.ready)resolve();});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed before ready'));});});\n-  const done=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.done)resolve(m);if(m.error)reject(new Error(m.error));});child.once('error',reject);child.once('exit',code=>{if(code)reject(new Error('Synthetic concurrency worker failed'));});});\n+  let stderr=Buffer.alloc(0),stderrTruncated=false;\n+  child.stderr.on('data',bytes=>{const room=8192-stderr.length;if(bytes.length>room)stderrTruncated=true;if(room>0)stderr=Buffer.concat([stderr,bytes.subarray(0,room)]);});\n+  const failure=(stage,code,signal)=>new Error(`Synthetic concurrency worker failed${stage} (exit=${code}, signal=${signal}, stderr${stderrTruncated?' truncated':''}=${stderr.toString('utf8')})`);\n+  const ready=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.ready)resolve();});child.once('error',reject);child.once('close',(code,signal)=>{if(code!==0)reject(failure(' before ready',code,signal));});});\n+  const done=new Promise((resolve,reject)=>{child.on('message',m=>{if(m.done)resolve(m);if(m.error)reject(new Error(m.error));});child.once('error',reject);child.once('close',(code,signal)=>{if(code!==0)reject(failure('',code,signal));});});\n+  // Observe an early startup rejection while ready is awaited. Awaiting the\n+  // original done promise below still rejects on every worker/import failure.\n+  done.catch(()=>{});\n   return {child,ready,done};\n }\n*** End Patch",
+  "regressionPatch": "*** Begin Patch\n*** Add File: /workspace/scratch/4d79ab4bea8e/payment-startup-repair/test/database-startup-contention.test.js\n+import test from 'node:test';\n+import assert from 'node:assert/strict';\n+import {spawn} from 'node:child_process';\n+import {DatabaseSync} from 'node:sqlite';\n+import {mkdtempSync,rmSync} from 'node:fs';\n+import {tmpdir} from 'node:os';\n+import {join} from 'node:path';\n+import {openDatabase,storeTransactions} from '../src/db.js';\n+\n+// Observe the actual connection policy only after a real SQLite failure. The\n+// wrapper does not rewrite SQL, change waits, release the holder, or retry.\n+const contenderSource=`\n+ import {DatabaseSync} from 'node:sqlite';\n+ import {openDatabase} from ${JSON.stringify(new URL('../src/db.js',import.meta.url).href)};\n+ const execute=DatabaseSync.prototype.exec;\n+ let failedConnection,busyTimeout;\n+ DatabaseSync.prototype.exec=function(sql){\n+  try{return execute.call(this,sql);}\n+  catch(error){failedConnection=this;busyTimeout=this.prepare('PRAGMA busy_timeout').get().timeout;throw error;}\n+ };\n+ const started=performance.now();\n+ try{const db=openDatabase(process.argv[1]);db.close();process.stdout.write(JSON.stringify({opened:true,elapsedMs:performance.now()-started}));}\n+ catch(error){\n+  const result={opened:false,elapsedMs:performance.now()-started,busyTimeout,code:error.code,errcode:error.errcode,errstr:error.errstr};\n+  process.stderr.write(String(error.stack)+'\\\\n');\n+  failedConnection?.close();process.stdout.write(JSON.stringify(result));process.exitCode=1;\n+ }\n+`;\n+\n+test('opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release',{timeout:15000},async()=>{\n+ const folder=mkdtempSync(join(tmpdir(),'mg-startup-contention-')),path=join(folder,'synthetic.sqlite');\n+ let holder,child,terminal;\n+ try{\n+  const setup=openDatabase(path),original=Buffer.from('Preserved synthetic startup original');\n+  setup.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('synthetic-startup-invoice','customer','001','Synthetic original party',10000);\n+  storeTransactions(setup,[],'file:startup-original.csv',{content:original,mime_type:'text/csv'});\n+  const before={imports:setup.prepare('SELECT COUNT(*) n FROM import_jobs').get().n,audits:setup.prepare('SELECT COUNT(*) n FROM audit_events').get().n};\n+  setup.close();\n+  holder=new DatabaseSync(path);\n+  assert.equal(holder.prepare('PRAGMA journal_mode').get().journal_mode,'wal');\n+  holder.exec('PRAGMA locking_mode=EXCLUSIVE; BEGIN EXCLUSIVE;');\n+  holder.prepare('UPDATE invoices SET party=? WHERE id=?').run('Synthetic uncommitted change','synthetic-startup-invoice');\n+  // The lock is already held before spawn, and remains held until the child\n+  // has closed. No sleep, release timer, scheduler race or retry loop is used.\n+  child=spawn(process.execPath,['--input-type=module','--eval',contenderSource,path],{stdio:['ignore','pipe','pipe'],windowsHide:true});\n+  let stdout=Buffer.alloc(0),stderr=Buffer.alloc(0),truncated=false;\n+  for(const [stream,read,write]of [[child.stdout,()=>stdout,value=>stdout=value],[child.stderr,()=>stderr,value=>stderr=value]])stream.on('data',bytes=>{const prior=read(),room=8192-prior.length;if(bytes.length>room)truncated=true;if(room>0)write(Buffer.concat([prior,bytes.subarray(0,room)]));});\n+  terminal=new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(code,signal)=>resolve({code,signal}));});\n+  const exit=await terminal;\n+  holder.exec('ROLLBACK');holder.close();holder=undefined;\n+  const db=openDatabase(path);\n+  try{\n+   assert.equal(db.prepare('PRAGMA integrity_check').get().integrity_check,'ok');\n+   assert.equal(db.prepare('PRAGMA journal_mode').get().journal_mode,'wal');\n+   assert.equal(db.prepare('PRAGMA foreign_keys').get().foreign_keys,1);\n+   assert.equal(db.prepare('SELECT party FROM invoices WHERE id=?').get('synthetic-startup-invoice').party,'Synthetic original party');\n+   assert.equal(db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,0);\n+   assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);\n+   assert.equal(db.prepare('SELECT COUNT(*) n FROM import_jobs').get().n,before.imports);\n+   assert.equal(db.prepare('SELECT COUNT(*) n FROM audit_events').get().n,before.audits);\n+   assert.deepEqual(Buffer.from(db.prepare(\"SELECT content FROM import_jobs WHERE name='startup-original.csv'\").get().content),original);\n+  }finally{db.close();}\n+  const details=JSON.parse(stdout.toString('utf8'));\n+  const diagnostic=JSON.stringify({exit,details,stderr:stderr.toString('utf8'),truncated});\n+  assert.equal(truncated,false,diagnostic);assert.equal(exit.code,1,diagnostic);assert.equal(exit.signal,null,diagnostic);\n+  assert.equal(details.opened,false,diagnostic);assert.equal(details.code,'ERR_SQLITE_ERROR',diagnostic);assert.equal(details.errcode,5,diagnostic);\n+  assert.equal(details.busyTimeout,5000,diagnostic);\n+  assert.ok(details.elapsedMs>=4500,'The existing five-second SQLite busy policy must cover startup: '+diagnostic);\n+ }finally{\n+  if(child&&child.exitCode===null&&child.signalCode===null)child.kill();\n+  if(terminal)await terminal.catch(()=>{});\n+  if(holder){try{holder.exec('ROLLBACK');}finally{holder.close();}}\n+  rmSync(folder,{recursive:true,force:true});\n+ }\n+});\n*** End Patch",
+  "intendedProductPatch": "*** Begin Patch\n*** Update File: /workspace/scratch/4d79ab4bea8e/payment-startup-repair/src/db.js\n@@\n-  db.exec('PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;');\n+  db.exec('PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL;');\n*** End Patch",
+  "receipts": {
+    "originalCI": {
+      "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "run": 42164894222,
+      "nodeJob": 127718950721,
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/wave5-main-ci-237dd45e/logs/node-127718950721.log",
+      "sha256": "d74130255608a0ee26ffe7876a3fc49255b0a1013b8ae7f68ee6b2fc6baaabf2",
+      "tests": 2321,
+      "pass": 2320,
+      "fail": 1,
+      "error": "Synthetic concurrency worker failed before ready",
+      "durationMs": 124.716605,
+      "underlyingCIChildStderr": "not available"
+    },
+    "runtime": {
+      "ci": "v22.23.4",
+      "local": "v24.22.1",
+      "localSqlite": "3.53.4",
+      "node22Found": false
+    },
+    "environmentAttempts": [
+      {
+        "label": "original-two-process-diagnostic",
+        "returncode": 1,
+        "reason": "ERR_MODULE_NOT_FOUND xlsx before test body",
+        "sha256": "61198b07e08a2ea1115dc2171bce3b4e685d317592dacd29f5ca394781b3f207"
+      },
+      {
+        "label": "original-two-process-ready",
+        "returncode": 1,
+        "reason": "ERR_MODULE_NOT_FOUND @noble/hashes before test body",
+        "sha256": "5cd8a235548a2f87afd395972b559e97cd19b571ef67d3ce52e4aa8029d3b4c6"
+      }
+    ],
+    "originalBaseline": {
+      "label": "original-two-process-baseline",
+      "returncode": 0,
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationSeconds": 0.691,
+      "maxRssKiB": 64512,
+      "sha256": "86a6c63df261f23472d506ebf077c79bc0f5070499325d5d5bbad885deda8e53"
+    },
+    "heldLockProbe": {
+      "label": "held-lock-baseline",
+      "outerReturncode": 0,
+      "childExit": 1,
+      "childSignal": null,
+      "opened": false,
+      "code": "ERR_SQLITE_ERROR",
+      "errcode": 5,
+      "errstr": "database is locked",
+      "elapsedMs": 1.777040999999997,
+      "location": "src/db.js:23:6",
+      "sha256": "eb2292efe2e92a89c52e4a4d1a315802ffa0153ad25c30c5f5b41a24456b11be"
+    },
+    "contentionRed": {
+      "label": "contention-red",
+      "returncode": 1,
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationSeconds": 0.514,
+      "maxRssKiB": 59208,
+      "assertion": "0 !== 5000",
+      "expectedBusyTimeout": 5000,
+      "actualBusyTimeout": 0,
+      "childExit": 1,
+      "childSignal": null,
+      "elapsedMs": 1.1625209999999981,
+      "sqliteCode": 5,
+      "sha256": "5cd36fb791a359db8e5998d8bc2b067e7762ce4058ea52e34883390b1727d827"
+    }
+  },
+  "lastCell": {
+    "id": "g22:17",
+    "state": "terminated after environment became unavailable",
+    "operation": "README apply_patch then evidence copying",
+    "writeOutcome": "unconfirmed; no commit or product edit in the cell"
+  },
+  "nextSteps": [
+    "Once environment returns verify existing files and preserve original artifacts without overwriting.",
+    "Freeze the current RED/tests/evidence in git before applying the product patch.",
+    "Apply only the intended pragma order change.",
+    "Run same RED test unchanged plus payment-concurrency, db, payment-control receipts/idempotency and syntax checks; no sleeps, skip or increased timeout.",
+    "Freeze product/evidence and hand to independent reviewer; no push/deploy."
+  ]
+}

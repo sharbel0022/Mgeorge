@@ -1,0 +1,6 @@
+*** Begin Patch
+*** Update File: /workspace/scratch/4d79ab4bea8e/payment-startup-repair/src/db.js
+@@
+-  db.exec('PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;');
++  db.exec('PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL;');
+*** End Patch

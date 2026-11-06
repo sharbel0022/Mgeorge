@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "status": "DOCUMENTATION_CHECKPOINT_ONLY",
+  "baseCommit": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "baseTree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+  "encoding": "utf-8",
+  "verification": "Each Git blob object ID calculated from exact recovered UTF-8 content and matched to the GitHub create_blob result.",
+  "scope": "Manifest covers the six data files; its own Git blob ID is retained in the final remote receipt.",
+  "rawLocalLogBytesRecovered": false,
+  "localFilesystemReadbackAfterInterruption": false,
+  "productPatchApplied": false,
+  "postFixTestsRun": false,
+  "files": [
+    {
+      "path": "docs/quality8/startup-recovery-20261106/README.md",
+      "gitBlobSha1": "9473ccb769404bf6d1badd2039ddf238692d4816",
+      "utf8Bytes": 6054
+    },
+    {
+      "path": "docs/quality8/startup-recovery-20261106/payment-concurrency-worker-diagnostics.patch",
+      "gitBlobSha1": "9d4483d9b88003c648025756ad589f04679b909a",
+      "utf8Bytes": 1954
+    },
+    {
+      "path": "docs/quality8/startup-recovery-20261106/database-startup-contention.patch",
+      "gitBlobSha1": "e15b9ec35d189ba9863c4cf76feab982441f8df7",
+      "utf8Bytes": 5379
+    },
+    {
+      "path": "docs/quality8/startup-recovery-20261106/product-order.NOT_APPLIED.patch",
+      "gitBlobSha1": "81d96e8525c36fee2d46b471d74f40aefdaa1a31",
+      "utf8Bytes": 294
+    },
+    {
+      "path": "docs/quality8/startup-recovery-20261106/checkpoint.json",
+      "gitBlobSha1": "17825073c603d478001dfb913bb1a28ad6380411",
+      "utf8Bytes": 11522
+    },
+    {
+      "path": "docs/quality8/startup-recovery-20261106/results.json",
+      "gitBlobSha1": "2826095f902fa53912066312deb630c04e4368a3",
+      "utf8Bytes": 2618
+    }
+  ]
+}

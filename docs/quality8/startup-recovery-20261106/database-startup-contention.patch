@@ -1,0 +1,78 @@
+*** Begin Patch
+*** Add File: /workspace/scratch/4d79ab4bea8e/payment-startup-repair/test/database-startup-contention.test.js
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {spawn} from 'node:child_process';
++import {DatabaseSync} from 'node:sqlite';
++import {mkdtempSync,rmSync} from 'node:fs';
++import {tmpdir} from 'node:os';
++import {join} from 'node:path';
++import {openDatabase,storeTransactions} from '../src/db.js';
++
++// Observe the actual connection policy only after a real SQLite failure. The
++// wrapper does not rewrite SQL, change waits, release the holder, or retry.
++const contenderSource=`
++ import {DatabaseSync} from 'node:sqlite';
++ import {openDatabase} from ${JSON.stringify(new URL('../src/db.js',import.meta.url).href)};
++ const execute=DatabaseSync.prototype.exec;
++ let failedConnection,busyTimeout;
++ DatabaseSync.prototype.exec=function(sql){
++  try{return execute.call(this,sql);}
++  catch(error){failedConnection=this;busyTimeout=this.prepare('PRAGMA busy_timeout').get().timeout;throw error;}
++ };
++ const started=performance.now();
++ try{const db=openDatabase(process.argv[1]);db.close();process.stdout.write(JSON.stringify({opened:true,elapsedMs:performance.now()-started}));}
++ catch(error){
++  const result={opened:false,elapsedMs:performance.now()-started,busyTimeout,code:error.code,errcode:error.errcode,errstr:error.errstr};
++  process.stderr.write(String(error.stack)+'\\n');
++  failedConnection?.close();process.stdout.write(JSON.stringify(result));process.exitCode=1;
++ }
++`;
++
++test('opening a prepared WAL database uses its bounded busy wait before contention failure and recovers after release',{timeout:15000},async()=>{
++ const folder=mkdtempSync(join(tmpdir(),'mg-startup-contention-')),path=join(folder,'synthetic.sqlite');
++ let holder,child,terminal;
++ try{
++  const setup=openDatabase(path),original=Buffer.from('Preserved synthetic startup original');
++  setup.prepare('INSERT INTO invoices(id,direction,invoice_number,party,total_cents) VALUES(?,?,?,?,?)').run('synthetic-startup-invoice','customer','001','Synthetic original party',10000);
++  storeTransactions(setup,[],'file:startup-original.csv',{content:original,mime_type:'text/csv'});
++  const before={imports:setup.prepare('SELECT COUNT(*) n FROM import_jobs').get().n,audits:setup.prepare('SELECT COUNT(*) n FROM audit_events').get().n};
++  setup.close();
++  holder=new DatabaseSync(path);
++  assert.equal(holder.prepare('PRAGMA journal_mode').get().journal_mode,'wal');
++  holder.exec('PRAGMA locking_mode=EXCLUSIVE; BEGIN EXCLUSIVE;');
++  holder.prepare('UPDATE invoices SET party=? WHERE id=?').run('Synthetic uncommitted change','synthetic-startup-invoice');
++  // The lock is already held before spawn, and remains held until the child
++  // has closed. No sleep, release timer, scheduler race or retry loop is used.
++  child=spawn(process.execPath,['--input-type=module','--eval',contenderSource,path],{stdio:['ignore','pipe','pipe'],windowsHide:true});
++  let stdout=Buffer.alloc(0),stderr=Buffer.alloc(0),truncated=false;
++  for(const [stream,read,write]of [[child.stdout,()=>stdout,value=>stdout=value],[child.stderr,()=>stderr,value=>stderr=value]])stream.on('data',bytes=>{const prior=read(),room=8192-prior.length;if(bytes.length>room)truncated=true;if(room>0)write(Buffer.concat([prior,bytes.subarray(0,room)]));});
++  terminal=new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(code,signal)=>resolve({code,signal}));});
++  const exit=await terminal;
++  holder.exec('ROLLBACK');holder.close();holder=undefined;
++  const db=openDatabase(path);
++  try{
++   assert.equal(db.prepare('PRAGMA integrity_check').get().integrity_check,'ok');
++   assert.equal(db.prepare('PRAGMA journal_mode').get().journal_mode,'wal');
++   assert.equal(db.prepare('PRAGMA foreign_keys').get().foreign_keys,1);
++   assert.equal(db.prepare('SELECT party FROM invoices WHERE id=?').get('synthetic-startup-invoice').party,'Synthetic original party');
++   assert.equal(db.prepare('SELECT COUNT(*) n FROM bank_transactions').get().n,0);
++   assert.equal(db.prepare('SELECT COUNT(*) n FROM allocations').get().n,0);
++   assert.equal(db.prepare('SELECT COUNT(*) n FROM import_jobs').get().n,before.imports);
++   assert.equal(db.prepare('SELECT COUNT(*) n FROM audit_events').get().n,before.audits);
++   assert.deepEqual(Buffer.from(db.prepare("SELECT content FROM import_jobs WHERE name='startup-original.csv'").get().content),original);
++  }finally{db.close();}
++  const details=JSON.parse(stdout.toString('utf8'));
++  const diagnostic=JSON.stringify({exit,details,stderr:stderr.toString('utf8'),truncated});
++  assert.equal(truncated,false,diagnostic);assert.equal(exit.code,1,diagnostic);assert.equal(exit.signal,null,diagnostic);
++  assert.equal(details.opened,false,diagnostic);assert.equal(details.code,'ERR_SQLITE_ERROR',diagnostic);assert.equal(details.errcode,5,diagnostic);
++  assert.equal(details.busyTimeout,5000,diagnostic);
++  assert.ok(details.elapsedMs>=4500,'The existing five-second SQLite busy policy must cover startup: '+diagnostic);
++ }finally{
++  if(child&&child.exitCode===null&&child.signalCode===null)child.kill();
++  if(terminal)await terminal.catch(()=>{});
++  if(holder){try{holder.exec('ROLLBACK');}finally{holder.close();}}
++  rmSync(folder,{recursive:true,force:true});
++ }
++});
+*** End Patch

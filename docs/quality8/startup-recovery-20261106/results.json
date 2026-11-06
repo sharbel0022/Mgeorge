@@ -1,0 +1,85 @@
+{
+  "status": "RECOVERED_METADATA_ONLY",
+  "rawLogBytesRecovered": false,
+  "recordedReceipts": {
+    "originalCI": {
+      "base": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "run": 42164894222,
+      "nodeJob": 127718950721,
+      "log": "/workspace/scratch/4d79ab4bea8e/reviews/wave5-main-ci-237dd45e/logs/node-127718950721.log",
+      "sha256": "d74130255608a0ee26ffe7876a3fc49255b0a1013b8ae7f68ee6b2fc6baaabf2",
+      "tests": 2321,
+      "pass": 2320,
+      "fail": 1,
+      "error": "Synthetic concurrency worker failed before ready",
+      "durationMs": 124.716605,
+      "underlyingCIChildStderr": "not available"
+    },
+    "runtime": {
+      "ci": "v22.23.4",
+      "local": "v24.22.1",
+      "localSqlite": "3.53.4",
+      "node22Found": false
+    },
+    "environmentAttempts": [
+      {
+        "label": "original-two-process-diagnostic",
+        "returncode": 1,
+        "reason": "ERR_MODULE_NOT_FOUND xlsx before test body",
+        "sha256": "61198b07e08a2ea1115dc2171bce3b4e685d317592dacd29f5ca394781b3f207"
+      },
+      {
+        "label": "original-two-process-ready",
+        "returncode": 1,
+        "reason": "ERR_MODULE_NOT_FOUND @noble/hashes before test body",
+        "sha256": "5cd8a235548a2f87afd395972b559e97cd19b571ef67d3ce52e4aa8029d3b4c6"
+      }
+    ],
+    "originalBaseline": {
+      "label": "original-two-process-baseline",
+      "returncode": 0,
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationSeconds": 0.691,
+      "maxRssKiB": 64512,
+      "sha256": "86a6c63df261f23472d506ebf077c79bc0f5070499325d5d5bbad885deda8e53"
+    },
+    "heldLockProbe": {
+      "label": "held-lock-baseline",
+      "outerReturncode": 0,
+      "childExit": 1,
+      "childSignal": null,
+      "opened": false,
+      "code": "ERR_SQLITE_ERROR",
+      "errcode": 5,
+      "errstr": "database is locked",
+      "elapsedMs": 1.777040999999997,
+      "location": "src/db.js:23:6",
+      "sha256": "eb2292efe2e92a89c52e4a4d1a315802ffa0153ad25c30c5f5b41a24456b11be"
+    },
+    "contentionRed": {
+      "label": "contention-red",
+      "returncode": 1,
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationSeconds": 0.514,
+      "maxRssKiB": 59208,
+      "assertion": "0 !== 5000",
+      "expectedBusyTimeout": 5000,
+      "actualBusyTimeout": 0,
+      "childExit": 1,
+      "childSignal": null,
+      "elapsedMs": 1.1625209999999981,
+      "sqliteCode": 5,
+      "sha256": "5cd36fb791a359db8e5998d8bc2b067e7762ce4058ea52e34883390b1727d827"
+    }
+  }
+}
