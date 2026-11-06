@@ -1,0 +1,805 @@
+TAP version 13
+# Subtest: real tenant database and durable runner scale: 1 synthetic companies
+ok 1 - real tenant database and durable runner scale: 1 synthetic companies
+  ---
+  duration_ms: 83.882504
+  type: 'test'
+  ...
+# {"kind":"synthetic_tenant_database_and_scheduler","companies":1,"concurrency":5,"observedPeakConcurrency":1,"replayObservedPeakConcurrency":1,"provisionMs":10.95,"firstRunMs":30.01,"replayMs":14.24,"receipts":1,"providerNetwork":false,"financialWrites":0}
+# Subtest: real tenant database and durable runner scale: 10 synthetic companies
+ok 2 - real tenant database and durable runner scale: 10 synthetic companies
+  ---
+  duration_ms: 237.684089
+  type: 'test'
+  ...
+# {"kind":"synthetic_tenant_database_and_scheduler","companies":10,"concurrency":5,"observedPeakConcurrency":5,"replayObservedPeakConcurrency":5,"provisionMs":15.85,"firstRunMs":111.07,"replayMs":83.15,"receipts":10,"providerNetwork":false,"financialWrites":0}
+# Subtest: real tenant database and durable runner scale: 100 synthetic companies
+ok 3 - real tenant database and durable runner scale: 100 synthetic companies
+  ---
+  duration_ms: 1988.605953
+  type: 'test'
+  ...
+# {"kind":"synthetic_tenant_database_and_scheduler","companies":100,"concurrency":5,"observedPeakConcurrency":5,"replayObservedPeakConcurrency":5,"provisionMs":133.68,"firstRunMs":1010.42,"replayMs":801.32,"receipts":100,"providerNetwork":false,"financialWrites":0}
+# Subtest: independent acceptance accepts the authentic small fixture before any mutation
+ok 4 - independent acceptance accepts the authentic small fixture before any mutation
+  ---
+  duration_ms: 375.883145
+  type: 'test'
+  ...
+# Subtest: independent acceptance requires provenance captured before restore
+ok 5 - independent acceptance requires provenance captured before restore
+  ---
+  duration_ms: 312.613862
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed backup identity with unchanged ledger and originals
+ok 6 - independent acceptance rejects changed backup identity with unchanged ledger and originals
+  ---
+  duration_ms: 301.389452
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed company binding with unchanged ledger and originals
+ok 7 - independent acceptance rejects changed company binding with unchanged ledger and originals
+  ---
+  duration_ms: 293.605509
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed snapshot checksum with unchanged ledger and originals
+ok 8 - independent acceptance rejects changed snapshot checksum with unchanged ledger and originals
+  ---
+  duration_ms: 293.40886
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed restore format with unchanged ledger and originals
+ok 9 - independent acceptance rejects changed restore format with unchanged ledger and originals
+  ---
+  duration_ms: 291.199665
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed claimed worker transform with unchanged ledger and originals
+ok 10 - independent acceptance rejects changed claimed worker transform with unchanged ledger and originals
+  ---
+  duration_ms: 295.151002
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed retained source bundle.json
+ok 11 - independent acceptance rejects changed retained source bundle.json
+  ---
+  duration_ms: 292.398807
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed retained source manifest.bin
+ok 12 - independent acceptance rejects changed retained source manifest.bin
+  ---
+  duration_ms: 298.562402
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed retained source snapshot.bin
+ok 13 - independent acceptance rejects changed retained source snapshot.bin
+  ---
+  duration_ms: 288.684859
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects a missing retained snapshot
+ok 14 - independent acceptance rejects a missing retained snapshot
+  ---
+  duration_ms: 292.676344
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects an unlisted retained source file
+ok 15 - independent acceptance rejects an unlisted retained source file
+  ---
+  duration_ms: 292.467627
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed allocation transaction reference even with identical totals and refreshed receipt checksum
+ok 16 - independent acceptance rejects changed allocation transaction reference even with identical totals and refreshed receipt checksum
+  ---
+  duration_ms: 300.673511
+  type: 'test'
+  ...
+# Subtest: independent acceptance rejects changed revoked Bankgiro original reference even with identical totals and refreshed receipt checksum
+ok 17 - independent acceptance rejects changed revoked Bankgiro original reference even with identical totals and refreshed receipt checksum
+  ---
+  duration_ms: 300.362806
+  type: 'test'
+  ...
+# Subtest: the synthetic drill measures a resumed, authenticated full recovery against independently retained expectations
+ok 18 - the synthetic drill measures a resumed, authenticated full recovery against independently retained expectations
+  ---
+  duration_ms: 561.06295
+  type: 'test'
+  ...
+# Subtest: the drill refuses unbounded or non-synthetic configuration before any recovery work
+ok 19 - the drill refuses unbounded or non-synthetic configuration before any recovery work
+  ---
+  duration_ms: 0.734748
+  type: 'test'
+  ...
+# Subtest: the release migration journal includes every SQL file exactly once in execution order
+ok 20 - the release migration journal includes every SQL file exactly once in execution order
+  ---
+  duration_ms: 27.834817
+  type: 'test'
+  ...
+# Subtest: persisted upgrade preserves originals and rejects pre-tenant writes after adoption and reopen
+ok 21 - persisted upgrade preserves originals and rejects pre-tenant writes after adoption and reopen
+  ---
+  duration_ms: 283.131893
+  type: 'test'
+  ...
+# Subtest: HTTP company selection rejects an invalid expected context version: missing
+ok 22 - HTTP company selection rejects an invalid expected context version: missing
+  ---
+  duration_ms: 38.895408
+  type: 'test'
+  ...
+# Subtest: HTTP company selection rejects an invalid expected context version: null
+ok 23 - HTTP company selection rejects an invalid expected context version: null
+  ---
+  duration_ms: 13.525794
+  type: 'test'
+  ...
+# Subtest: HTTP company selection rejects an invalid expected context version: numeric string
+ok 24 - HTTP company selection rejects an invalid expected context version: numeric string
+  ---
+  duration_ms: 14.439207
+  type: 'test'
+  ...
+# Subtest: HTTP company selection rejects an invalid expected context version: zero
+ok 25 - HTTP company selection rejects an invalid expected context version: zero
+  ---
+  duration_ms: 13.734225
+  type: 'test'
+  ...
+# Subtest: HTTP company selection rejects an invalid expected context version: negative
+ok 26 - HTTP company selection rejects an invalid expected context version: negative
+  ---
+  duration_ms: 13.374249
+  type: 'test'
+  ...
+# Subtest: HTTP company selection rejects an invalid expected context version: fraction
+ok 27 - HTTP company selection rejects an invalid expected context version: fraction
+  ---
+  duration_ms: 12.775978
+  type: 'test'
+  ...
+# Subtest: HTTP company selection rejects an invalid expected context version: unsafe integer
+ok 28 - HTTP company selection rejects an invalid expected context version: unsafe integer
+  ---
+  duration_ms: 13.147134
+  type: 'test'
+  ...
+# Subtest: a replayed selection cannot switch back with an old context version
+ok 29 - a replayed selection cannot switch back with an old context version
+  ---
+  duration_ms: 13.494235
+  type: 'test'
+  ...
+# Subtest: simultaneous selections consume one expected version and fence the old tab
+ok 30 - simultaneous selections consume one expected version and fence the old tab
+  ---
+  duration_ms: 16.026373
+  type: 'test'
+  ...
+# Subtest: a complete fresh security receipt remains internal evidence without commercial approval
+ok 31 - a complete fresh security receipt remains internal evidence without commercial approval
+  ---
+  duration_ms: 4.516479
+  type: 'test'
+  ...
+# Subtest: a GitHub merge checkout is bound separately from PR head and base commits
+ok 32 - a GitHub merge checkout is bound separately from PR head and base commits
+  ---
+  duration_ms: 0.947447
+  type: 'test'
+  ...
+# Subtest: security receipt rejects another commit
+ok 33 - security receipt rejects another commit
+  ---
+  duration_ms: 0.292929
+  type: 'test'
+  ...
+# Subtest: security receipt rejects another tree
+ok 34 - security receipt rejects another tree
+  ---
+  duration_ms: 0.316314
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a dirty recorded tree
+ok 35 - security receipt rejects a dirty recorded tree
+  ---
+  duration_ms: 0.398898
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a dirty current tree
+ok 36 - security receipt rejects a dirty current tree
+  ---
+  duration_ms: 0.260668
+  type: 'test'
+  ...
+# Subtest: security receipt rejects source changed during execution
+ok 37 - security receipt rejects source changed during execution
+  ---
+  duration_ms: 0.238347
+  type: 'test'
+  ...
+# Subtest: security receipt rejects stale evidence
+ok 38 - security receipt rejects stale evidence
+  ---
+  duration_ms: 0.346159
+  type: 'test'
+  ...
+# Subtest: security receipt rejects future evidence
+ok 39 - security receipt rejects future evidence
+  ---
+  duration_ms: 0.307356
+  type: 'test'
+  ...
+# Subtest: security receipt rejects reversed timestamps
+ok 40 - security receipt rejects reversed timestamps
+  ---
+  duration_ms: 0.451647
+  type: 'test'
+  ...
+# Subtest: security receipt rejects unsupported runtime
+ok 41 - security receipt rejects unsupported runtime
+  ---
+  duration_ms: 0.30412
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a missing scope
+ok 42 - security receipt rejects a missing scope
+  ---
+  duration_ms: 0.238737
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a mismatched scope hash
+ok 43 - security receipt rejects a mismatched scope hash
+  ---
+  duration_ms: 0.2775
+  type: 'test'
+  ...
+# Subtest: security receipt rejects missing suite
+ok 44 - security receipt rejects missing suite
+  ---
+  duration_ms: 0.234861
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a duplicate suite
+ok 45 - security receipt rejects a duplicate suite
+  ---
+  duration_ms: 0.305884
+  type: 'test'
+  ...
+# Subtest: security receipt rejects an omitted test file
+ok 46 - security receipt rejects an omitted test file
+  ---
+  duration_ms: 0.350978
+  type: 'test'
+  ...
+# Subtest: security receipt rejects an extra test file
+ok 47 - security receipt rejects an extra test file
+  ---
+  duration_ms: 0.260238
+  type: 'test'
+  ...
+# Subtest: security receipt rejects missing log
+ok 48 - security receipt rejects missing log
+  ---
+  duration_ms: 0.305933
+  type: 'test'
+  ...
+# Subtest: security receipt rejects modified saved log
+ok 49 - security receipt rejects modified saved log
+  ---
+  duration_ms: 0.327955
+  type: 'test'
+  ...
+# Subtest: security receipt rejects an unexpected log path
+ok 50 - security receipt rejects an unexpected log path
+  ---
+  duration_ms: 0.240912
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a nonzero exit
+ok 51 - security receipt rejects a nonzero exit
+  ---
+  duration_ms: 0.241283
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a killed process
+ok 52 - security receipt rejects a killed process
+  ---
+  duration_ms: 0.248276
+  type: 'test'
+  ...
+# Subtest: security receipt rejects contradictory totals
+ok 53 - security receipt rejects contradictory totals
+  ---
+  duration_ms: 0.27759
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a missing TAP summary
+ok 54 - security receipt rejects a missing TAP summary
+  ---
+  duration_ms: 0.371286
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a duplicate TAP summary
+ok 55 - security receipt rejects a duplicate TAP summary
+  ---
+  duration_ms: 0.296676
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a hidden failing TAP assertion
+ok 56 - security receipt rejects a hidden failing TAP assertion
+  ---
+  duration_ms: 0.985718
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a skipped test
+ok 57 - security receipt rejects a skipped test
+  ---
+  duration_ms: 0.358122
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a cancelled test
+ok 58 - security receipt rejects a cancelled test
+  ---
+  duration_ms: 0.253045
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a TODO test
+ok 59 - security receipt rejects a TODO test
+  ---
+  duration_ms: 0.310092
+  type: 'test'
+  ...
+# Subtest: security receipt rejects zero tests
+ok 60 - security receipt rejects zero tests
+  ---
+  duration_ms: 0.275657
+  type: 'test'
+  ...
+# Subtest: security receipt rejects an incomplete one-test subset
+ok 61 - security receipt rejects an incomplete one-test subset
+  ---
+  duration_ms: 0.284884
+  type: 'test'
+  ...
+# Subtest: security receipt rejects unmeasured concurrency
+ok 62 - security receipt rejects unmeasured concurrency
+  ---
+  duration_ms: 0.360586
+  type: 'test'
+  ...
+# Subtest: security receipt rejects serialized tenant work
+ok 63 - security receipt rejects serialized tenant work
+  ---
+  duration_ms: 0.299852
+  type: 'test'
+  ...
+# Subtest: security receipt rejects excess tenant concurrency
+ok 64 - security receipt rejects excess tenant concurrency
+  ---
+  duration_ms: 0.275407
+  type: 'test'
+  ...
+# Subtest: security receipt rejects a commercial approval claim
+ok 65 - security receipt rejects a commercial approval claim
+  ---
+  duration_ms: 0.174156
+  type: 'test'
+  ...
+# Subtest: fresh full-size restore receipt verifies independent provenance and all rejection checks
+ok 66 - fresh full-size restore receipt verifies independent provenance and all rejection checks
+  ---
+  duration_ms: 0.89086
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects only the small smoke fixture even with a refreshed JSON hash
+ok 67 - recovery receipt rejects only the small smoke fixture even with a refreshed JSON hash
+  ---
+  duration_ms: 0.345427
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects missing hash readbacks even with a refreshed JSON hash
+ok 68 - recovery receipt rejects missing hash readbacks even with a refreshed JSON hash
+  ---
+  duration_ms: 0.310763
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects an omitted durable table even with a refreshed JSON hash
+ok 69 - recovery receipt rejects an omitted durable table even with a refreshed JSON hash
+  ---
+  duration_ms: 0.306164
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects a duplicate durable table even with a refreshed JSON hash
+ok 70 - recovery receipt rejects a duplicate durable table even with a refreshed JSON hash
+  ---
+  duration_ms: 0.314981
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects a renamed durable table even with a refreshed JSON hash
+not ok 71 - recovery receipt rejects a renamed durable table even with a refreshed JSON hash
+  ---
+  duration_ms: 0.994495
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a changed transaction count even with a refreshed JSON hash
+not ok 72 - recovery receipt rejects a changed transaction count even with a refreshed JSON hash
+  ---
+  duration_ms: 0.49582
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a changed transaction total even with a refreshed JSON hash
+not ok 73 - recovery receipt rejects a changed transaction total even with a refreshed JSON hash
+  ---
+  duration_ms: 0.498415
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a changed allocation count even with a refreshed JSON hash
+not ok 74 - recovery receipt rejects a changed allocation count even with a refreshed JSON hash
+  ---
+  duration_ms: 0.392235
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a missing revoked credit even with a refreshed JSON hash
+not ok 75 - recovery receipt rejects a missing revoked credit even with a refreshed JSON hash
+  ---
+  duration_ms: 0.5013
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a missing revoked Bankgiro link even with a refreshed JSON hash
+not ok 76 - recovery receipt rejects a missing revoked Bankgiro link even with a refreshed JSON hash
+  ---
+  duration_ms: 0.361228
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a negative control at the wrong stage even with a refreshed JSON hash
+not ok 77 - recovery receipt rejects a negative control at the wrong stage even with a refreshed JSON hash
+  ---
+  duration_ms: 0.371015
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a noncanonical backup identity even with a refreshed JSON hash
+not ok 78 - recovery receipt rejects a noncanonical backup identity even with a refreshed JSON hash
+  ---
+  duration_ms: 0.327624
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:160:4'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/saas-release-evidence.test.js:162:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: recovery receipt rejects a changed ledger even with a refreshed JSON hash
+ok 79 - recovery receipt rejects a changed ledger even with a refreshed JSON hash
+  ---
+  duration_ms: 0.288792
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects missing provenance even with a refreshed JSON hash
+ok 80 - recovery receipt rejects missing provenance even with a refreshed JSON hash
+  ---
+  duration_ms: 0.327094
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects another company provenance even with a refreshed JSON hash
+ok 81 - recovery receipt rejects another company provenance even with a refreshed JSON hash
+  ---
+  duration_ms: 0.354965
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects missing source manifest hash even with a refreshed JSON hash
+ok 82 - recovery receipt rejects missing source manifest hash even with a refreshed JSON hash
+  ---
+  duration_ms: 0.317966
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects unverified source provenance even with a refreshed JSON hash
+ok 83 - recovery receipt rejects unverified source provenance even with a refreshed JSON hash
+  ---
+  duration_ms: 0.331652
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects a production-restore claim even with a refreshed JSON hash
+ok 84 - recovery receipt rejects a production-restore claim even with a refreshed JSON hash
+  ---
+  duration_ms: 0.337693
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects an unexpected provider-enabled command even with a refreshed JSON hash
+ok 85 - recovery receipt rejects an unexpected provider-enabled command even with a refreshed JSON hash
+  ---
+  duration_ms: 0.707377
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects missing required negative control even with a refreshed JSON hash
+ok 86 - recovery receipt rejects missing required negative control even with a refreshed JSON hash
+  ---
+  duration_ms: 0.298149
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects a negative control which did not reject even with a refreshed JSON hash
+ok 87 - recovery receipt rejects a negative control which did not reject even with a refreshed JSON hash
+  ---
+  duration_ms: 0.28768
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects partial output on rejected restore even with a refreshed JSON hash
+ok 88 - recovery receipt rejects partial output on rejected restore even with a refreshed JSON hash
+  ---
+  duration_ms: 0.250019
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects revived worker leases even with a refreshed JSON hash
+ok 89 - recovery receipt rejects revived worker leases even with a refreshed JSON hash
+  ---
+  duration_ms: 0.312486
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects retained token authority even with a refreshed JSON hash
+ok 90 - recovery receipt rejects retained token authority even with a refreshed JSON hash
+  ---
+  duration_ms: 0.246332
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects an unobserved interruption even with a refreshed JSON hash
+ok 91 - recovery receipt rejects an unobserved interruption even with a refreshed JSON hash
+  ---
+  duration_ms: 0.313368
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects an RTO objective miss even with a refreshed JSON hash
+ok 92 - recovery receipt rejects an RTO objective miss even with a refreshed JSON hash
+  ---
+  duration_ms: 0.244188
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects an inflated RTO objective even with a refreshed JSON hash
+ok 93 - recovery receipt rejects an inflated RTO objective even with a refreshed JSON hash
+  ---
+  duration_ms: 0.238608
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects an inconsistent RPO scenario even with a refreshed JSON hash
+ok 94 - recovery receipt rejects an inconsistent RPO scenario even with a refreshed JSON hash
+  ---
+  duration_ms: 0.285966
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects a post-cutoff write included in recovery even with a refreshed JSON hash
+ok 95 - recovery receipt rejects a post-cutoff write included in recovery even with a refreshed JSON hash
+  ---
+  duration_ms: 0.252143
+  type: 'test'
+  ...
+# Subtest: recovery receipt rejects byte tampering before reading its claims
+ok 96 - recovery receipt rejects byte tampering before reading its claims
+  ---
+  duration_ms: 0.257844
+  type: 'test'
+  ...
+# Subtest: recovery child environment excludes operator preloads and provider secrets
+ok 97 - recovery child environment excludes operator preloads and provider secrets
+  ---
+  duration_ms: 0.199364
+  type: 'test'
+  ...
+# Subtest: HTTPS anonymous and invalid-cookie reads do not allocate persistent sessions
+ok 98 - HTTPS anonymous and invalid-cookie reads do not allocate persistent sessions
+  ---
+  duration_ms: 26.031144
+  type: 'test'
+  ...
+# Subtest: HTTPS expired cookies cannot mint replacement sessions before authentication
+ok 99 - HTTPS expired cookies cannot mint replacement sessions before authentication
+  ---
+  duration_ms: 5.76256
+  type: 'test'
+  ...
+# Subtest: successful HTTPS login rotates a legacy browser token and cleans expired sessions
+ok 100 - successful HTTPS login rotates a legacy browser token and cleans expired sessions
+  ---
+  duration_ms: 57.294731
+  type: 'test'
+  ...
+# Subtest: failed and rate-limited HTTPS logins do not allocate persistent sessions
+ok 101 - failed and rate-limited HTTPS logins do not allocate persistent sessions
+  ---
+  duration_ms: 178.103614
+  type: 'test'
+  ...
+# Subtest: single session cookies keep simultaneous company reads isolated
+ok 102 - single session cookies keep simultaneous company reads isolated
+  ---
+  duration_ms: 43.736887
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: unknown before valid
+ok 103 - ambiguous session cookies cannot read a tenant or revoke a session: unknown before valid
+  ---
+  duration_ms: 6.768543
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: valid before unknown
+ok 104 - ambiguous session cookies cannot read a tenant or revoke a session: valid before unknown
+  ---
+  duration_ms: 5.205582
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: two valid principals
+ok 105 - ambiguous session cookies cannot read a tenant or revoke a session: two valid principals
+  ---
+  duration_ms: 4.286942
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: two valid principals reversed
+ok 106 - ambiguous session cookies cannot read a tenant or revoke a session: two valid principals reversed
+  ---
+  duration_ms: 3.745193
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: the same valid token twice
+ok 107 - ambiguous session cookies cannot read a tenant or revoke a session: the same valid token twice
+  ---
+  duration_ms: 4.073308
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: empty before valid
+ok 108 - ambiguous session cookies cannot read a tenant or revoke a session: empty before valid
+  ---
+  duration_ms: 3.85022
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: malformed encoding before valid
+ok 109 - ambiguous session cookies cannot read a tenant or revoke a session: malformed encoding before valid
+  ---
+  duration_ms: 4.13281
+  type: 'test'
+  ...
+# Subtest: ambiguous session cookies cannot read a tenant or revoke a session: encoded alias of the same token
+ok 110 - ambiguous session cookies cannot read a tenant or revoke a session: encoded alias of the same token
+  ---
+  duration_ms: 3.724905
+  type: 'test'
+  ...
+# Subtest: a single encoded session cookie still resolves the authenticated principal
+ok 111 - a single encoded session cookie still resolves the authenticated principal
+  ---
+  duration_ms: 9.066251
+  type: 'test'
+  ...
+# Subtest: unambiguous logout revokes only its session and replay stays unauthorized
+ok 112 - unambiguous logout revokes only its session and replay stays unauthorized
+  ---
+  duration_ms: 11.92907
+  type: 'test'
+  ...
+1..112
+# tests 112
+# suites 0
+# pass 104
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9533.803685

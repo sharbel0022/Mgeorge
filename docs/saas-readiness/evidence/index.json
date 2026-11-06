@@ -1,0 +1,120 @@
+{
+  "format": "mgeorge-saas-readiness-evidence-index-1",
+  "baseCommit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+  "records": [
+    {
+      "scope": "private-key-red",
+      "head": "47d9359228b9b8610f7a58166787bdfe3d039a37",
+      "checkout": "47d9359228b9b8610f7a58166787bdfe3d039a37",
+      "run": 42307283132,
+      "job": 128199701361,
+      "node": "22.23.4",
+      "tests": 14,
+      "pass": 4,
+      "fail": 10,
+      "file": "private-key-red-node22.tap",
+      "note": "Job completed failed; enclosing push workflow was subsequently cancelled."
+    },
+    {
+      "scope": "private-key-green",
+      "head": "1eba5060ef6ec01c0361c0cd0f966b5528ad22ea",
+      "checkout": "6013a689e8892654c82cda4d0e6d4832cf582f37",
+      "run": 42307532599,
+      "job": 128200554569,
+      "node": "22.23.4",
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "file": "private-key-green-node22.tap"
+    },
+    {
+      "scope": "private-key-green",
+      "head": "1eba5060ef6ec01c0361c0cd0f966b5528ad22ea",
+      "checkout": "6013a689e8892654c82cda4d0e6d4832cf582f37",
+      "run": 42307532599,
+      "job": 128200554197,
+      "node": "24.22.1",
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "file": "private-key-green-node24.log",
+      "note": "Actual spec reporter output, not TAP."
+    },
+    {
+      "scope": "session-recovery-red",
+      "head": "7ae959fb1760fa1fa0e639c08dc2ac1a19a1ad7d",
+      "checkout": "6cfb5cd7312cedc0ec9a9cda1a7aca8579ad087d",
+      "run": 42308462021,
+      "job": 128203695537,
+      "node": "24.22.1",
+      "tests": 25,
+      "pass": 7,
+      "fail": 18,
+      "file": "session-recovery-red-node24.tap"
+    },
+    {
+      "scope": "company-selection-red",
+      "head": "34466a0e91bec3f2cc9224431311236a4f00e6fc",
+      "checkout": "2513031677027c6a6472064126e1262176e7d3b5",
+      "run": 42308595454,
+      "job": 128204157754,
+      "node": "24.22.1",
+      "tests": 34,
+      "pass": 9,
+      "fail": 25,
+      "file": "company-selection-red-node24.tap"
+    },
+    {
+      "scope": "boundaries-green",
+      "head": "4f703b3fb2304936a2deb9deef6fadefc272f99f",
+      "checkout": "383a25e8f7883a4c121a188d597691f61fcb778c",
+      "run": 42308964853,
+      "job": 128205377402,
+      "node": "24.22.1",
+      "tests": 104,
+      "pass": 104,
+      "fail": 0,
+      "file": "security-recovery-green-node24.tap"
+    },
+    {
+      "scope": "release-receipt-red",
+      "head": "ee1e71402b4fda0fb57ecbadda74a5013bd83193",
+      "checkout": "e69dd6176c9f28158fb460f10a3353fdd11fc115",
+      "run": 42309256114,
+      "job": 128206341547,
+      "node": "24.22.1",
+      "tests": 112,
+      "pass": 104,
+      "fail": 8,
+      "file": "release-receipt-red-node24.tap"
+    },
+    {
+      "scope": "release-receipt-green",
+      "head": "d2cad86a65237ae7a7bbaf2e1d8bc72de847d111",
+      "checkout": "bad0a67b1e61c562c420f4e53f391c136c07e662",
+      "run": 42309880334,
+      "job": 128208396473,
+      "node": "24.22.1",
+      "tests": 112,
+      "pass": 112,
+      "fail": 0,
+      "file": "release-receipt-green-node24.tap"
+    },
+    {
+      "scope": "full-synthetic-recovery-and-formats",
+      "head": "d2cad86a65237ae7a7bbaf2e1d8bc72de847d111",
+      "checkout": "bad0a67b1e61c562c420f4e53f391c136c07e662",
+      "run": 42309880196,
+      "job": 128208396548,
+      "node": "24.22.1",
+      "receipt": "recovery-d2cad86-receipt.json",
+      "result": "recovery-d2cad86-result.json",
+      "formats": "recovery-format-fidelity.json",
+      "artifactId": 13548361593,
+      "artifactSha256": "2a752aeb26b3184be7a45f16301d72db321889263d0f5a820c9553047b5a9fe1"
+    }
+  ],
+  "normalization": "GitHub timestamp prefixes removed from test logs; original test text retained. JSON aggregates preserve reported values.",
+  "productionAcceptance": "NOT_VERIFIED",
+  "commercialLaunch": "NOT_APPROVED"
+}

@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "sourceCommit": "bad0a67b1e61c562c420f4e53f391c136c07e662",
+  "sourceTree": "235fb2d55ffeabeb735882fa59db40e0aab157f5",
+  "workingTreeDirty": false,
+  "sourceContext": {
+    "event": "pull_request",
+    "checkoutCommit": "bad0a67b1e61c562c420f4e53f391c136c07e662",
+    "headCommit": "d2cad86a65237ae7a7bbaf2e1d8bc72de847d111",
+    "baseCommit": "f3c80629d4856c2f8ecbb1ed81be391a13ac6be8",
+    "runId": "42309880196",
+    "runAttempt": "1"
+  },
+  "scopeId": "synthetic-saas-recovery-v1",
+  "scopeManifestSha256": "a095b43040f1905e6465d2d69436b76ba41de51b020371fc5c203bd2278deccf",
+  "node": "v24.22.1",
+  "startedAt": "2026-11-06T23:09:34.071Z",
+  "command": [
+    "--import",
+    "./scripts/saas-test-isolation.mjs",
+    "--experimental-strip-types",
+    "sites/scripts/recovery-drill.mjs",
+    "430",
+    "185567855"
+  ],
+  "outputFile": "recovery-drill.json",
+  "productionAcceptance": "NOT_VERIFIED",
+  "commercialLaunch": "NOT_APPROVED",
+  "finishedAt": "2026-11-06T23:09:45.843Z",
+  "sourceChangedDuringRun": false,
+  "outputSha256": "5e3751aa82ebf551087e82d45f852dffba1dc32aede929c12c633db63591d087",
+  "exitCode": 0,
+  "signal": null,
+  "recoveryPassed": true
+}

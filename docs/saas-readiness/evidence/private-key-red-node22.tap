@@ -1,0 +1,274 @@
+TAP version 13
+# Subtest: a verified private regular file signs and reports only non-secret readiness
+ok 1 - a verified private regular file signs and reports only non-secret readiness
+  ---
+  duration_ms: 8.083569
+  type: 'test'
+  ...
+# Subtest: a key shared with another OS principal (644) is rejected
+not ok 2 - a key shared with another OS principal (644) is rejected
+  ---
+  duration_ms: 2.11094
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:61:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:63:5)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a key shared with another OS principal (640) is rejected
+not ok 3 - a key shared with another OS principal (640) is rejected
+  ---
+  duration_ms: 0.730217
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:61:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:63:5)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a key shared with another OS principal (620) is rejected
+not ok 4 - a key shared with another OS principal (620) is rejected
+  ---
+  duration_ms: 0.542263
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:61:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:63:5)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a key shared with another OS principal (604) is rejected
+not ok 5 - a key shared with another OS principal (604) is rejected
+  ---
+  duration_ms: 0.828412
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:61:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:63:5)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a key shared with another OS principal (666) is rejected
+not ok 6 - a key shared with another OS principal (666) is rejected
+  ---
+  duration_ms: 0.727431
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:61:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:63:5)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a key selected through a symbolic link is rejected
+not ok 7 - a key selected through a symbolic link is rejected
+  ---
+  duration_ms: 1.021165
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:67:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:71:3)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a symbolic-link parent cannot hide the key-file location
+not ok 8 - a symbolic-link parent cannot hide the key-file location
+  ---
+  duration_ms: 0.696714
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:74:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:80:3)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: oversized PEM data is rejected even when its initial private key is valid
+not ok 9 - oversized PEM data is rejected even when its initial private key is valid
+  ---
+  duration_ms: 1.415128
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:83:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:85:3)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: invalid UTF-8 cannot be discarded after an otherwise valid PEM
+not ok 10 - invalid UTF-8 cannot be discarded after an otherwise valid PEM
+  ---
+  duration_ms: 0.893664
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:88:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:90:3)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a directory is not a private-key file
+ok 11 - a directory is not a private-key file
+  ---
+  duration_ms: 0.71109
+  type: 'test'
+  ...
+# Subtest: changing permissions during the descriptor read invalidates the key
+not ok 12 - changing permissions during the descriptor read invalidates the key
+  ---
+  duration_ms: 1.102588
+  type: 'test'
+  location: '/home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:98:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Unsafe key material must never become a configured signing identity
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    denied (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:44:10)
+    TestContext.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/security-private-key-file.test.js:109:9)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a replacement key changes the consent generation and leaves the old file unchanged
+ok 13 - a replacement key changes the consent generation and leaves the old file unchanged
+  ---
+  duration_ms: 28.639653
+  type: 'test'
+  ...
+# Subtest: protected runtime PEM remains available without any file-based ACL claim
+ok 14 - protected runtime PEM remains available without any file-based ACL claim
+  ---
+  duration_ms: 1.593975
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 4
+# fail 10
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 156.548656
