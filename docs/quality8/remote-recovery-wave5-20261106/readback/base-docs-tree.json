@@ -1,0 +1,755 @@
+{
+  "retrievedAt": "2026-11-06T05:39:17.226Z",
+  "source": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/6c7534378d4e0a1f7afbb95abc72dd5acc86ebc5",
+  "sha": "6c7534378d4e0a1f7afbb95abc72dd5acc86ebc5",
+  "tree": [
+    {
+      "path": "ARCHITECTURE.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "bba3795f8f29cba4407960975d3e3efd9bbb4c1e",
+      "size": 19425
+    },
+    {
+      "path": "AUTOMATION-BACKUP.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "f2e63b187f5bc096693914f7c858daff374833f1",
+      "size": 7395
+    },
+    {
+      "path": "BANK-EVIDENCE-SAFETY-DELIVERY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "de7f0e8d7c9620c3914a89bb93f616f524fb39d8",
+      "size": 15574
+    },
+    {
+      "path": "BANK-EVIDENCE-SAFETY-PUBLICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "84af18c334cebb6d6a9501653059c70619abb756",
+      "size": 1040
+    },
+    {
+      "path": "BANK-PAYER-OCR-CHANNELS.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "11a530b15a6e9e59c13eb3f35b2f97d4c8869309",
+      "size": 8157
+    },
+    {
+      "path": "BANK-PAYER-OCR-IMPROVEMENT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "4c5244f0fa4865f9355c56256756710c8ba42158",
+      "size": 19580
+    },
+    {
+      "path": "BANK-PAYER-OCR-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "346fa8a9e1c1a5c06eabdb8a01bd7d917345c6cb",
+      "size": 4647
+    },
+    {
+      "path": "BANKGIRO-AIS-LINKING-IMPROVEMENT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "fbf919e29442f073a45135d6d074bbb3a006c364",
+      "size": 18063
+    },
+    {
+      "path": "BANKGIRO-AIS-LINKING-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "db21f21d737898d02117a087b34898a4200fd342",
+      "size": 5905
+    },
+    {
+      "path": "BANKGIRO-AUTOMATIC-SOURCE-READINESS.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "3628c7b07d2adc668375cea700f8cbb3f1215170",
+      "size": 19988
+    },
+    {
+      "path": "BANKGIRO-DELIVERY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "67d9772bffd48f17eb3e64b68a3c15919cd07932",
+      "size": 7172
+    },
+    {
+      "path": "BANKGIRO-ORIGINAL-VERIFICATION-DELIVERY.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "0566c9bc639375c6fe7eec904fc0b7f3cb6ecec3",
+      "size": 3376
+    },
+    {
+      "path": "BANKGIRO-ORIGINAL-VERIFICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "22831aeb6c4fa4938674754d69e5e4f585105707",
+      "size": 6013
+    },
+    {
+      "path": "BANKGIRO-PAYMENT-REFERENCE-FIX.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b39f3c59ea41e5783b024e869c553bc5da528a50",
+      "size": 2852
+    },
+    {
+      "path": "BANKGIRO-REFERENCE-FOLLOWUP.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5661082bc2989afd62c35c00b366fe586e0348eb",
+      "size": 4659
+    },
+    {
+      "path": "BANKGIRO-XLSX-IMPLEMENTATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "a5e1957f026b50a5d2f3d7edd17b013c43847985",
+      "size": 10970
+    },
+    {
+      "path": "BANKGIRO-XLSX-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "bbdfee8ff457657b8b4950210b05c5c5c10eda38",
+      "size": 4373
+    },
+    {
+      "path": "COMPLETE-OCR-EVIDENCE-DELIVERY.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5b023d150affaf44399fc86229c5bbac3281d8b4",
+      "size": 4267
+    },
+    {
+      "path": "COMPLETE-OCR-EVIDENCE-VERIFICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "4a25297e7d963ed65bc13345cc93a965b49b0dff",
+      "size": 8345
+    },
+    {
+      "path": "DEPENDENCY-COMPATIBILITY-FOLLOWUP.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c31044b316ff7133aac55f23b7a326e8ad52016a",
+      "size": 6861
+    },
+    {
+      "path": "DISASTER-RECOVERY-VERIFICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5e1d2e31e197b2ab3de293f40e9084add19c725d",
+      "size": 28928
+    },
+    {
+      "path": "ECONOMY-OVERVIEW-IMPLEMENTATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5f6ca35ef51d867736887b303b4d556795b756bf",
+      "size": 5405
+    },
+    {
+      "path": "END-TO-END-PAYMENT-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "985b2ee54542de5a8a5900234706a95b06cdc4ca",
+      "size": 6898
+    },
+    {
+      "path": "END-TO-END-PAYMENT-VERIFICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "61523b7828b08ee90b4360d5ee15e8668042043c",
+      "size": 20098
+    },
+    {
+      "path": "FINAL-33-AREA-QUALITY-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "bebfd55902a1e8d49801dca88b851b92edff5e34",
+      "size": 35977
+    },
+    {
+      "path": "FINAL-BRANCH-CLEANUP.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ef2f9890b03aac149644de7039947bd95ae1ca1b",
+      "size": 5380
+    },
+    {
+      "path": "FINAL-GITHUB-AND-BANK-VERIFICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "110b0481cb34a43ce5869275ad98ae492a90c239",
+      "size": 13168
+    },
+    {
+      "path": "FINAL-MAIN-CLEANUP-DELIVERY.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8e7e6575dd7a202330c2bbff3703e32c533baf85",
+      "size": 6212
+    },
+    {
+      "path": "FINAL-MAIN-CLEANUP-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "edf67d7fb63c3808c0a3099c11d5a6a7fdc92d1b",
+      "size": 12788
+    },
+    {
+      "path": "FRESH-AIS-RECEIPT-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b0f2b41ca66df65bdb7813738f948d5186435c4f",
+      "size": 2406
+    },
+    {
+      "path": "FRESH-AIS-RECEIPT-VERIFICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "64038ca17483146fbeb354d4685f08787286beaa",
+      "size": 5535
+    },
+    {
+      "path": "GMAIL-AUTOMATION-FIX-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7681aa45ed830fe4c2f156923a465e1e533e4942",
+      "size": 20167
+    },
+    {
+      "path": "GMAIL-IMPLEMENTATION-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c3c661eea621e9aca94e64d8783b39a15a6e6133",
+      "size": 8594
+    },
+    {
+      "path": "GMAIL.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "1d09849cc2de6dc416970cc6270f9e90f83cd60a",
+      "size": 7010
+    },
+    {
+      "path": "INVOICE-EXTRACTION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "835232b83b8b33b37a3c5db680a1837f2f43e8ee",
+      "size": 4768
+    },
+    {
+      "path": "KODGUIDE.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7ad743dd93d2904c34e68ba8ef61c371bf8a03da",
+      "size": 6037
+    },
+    {
+      "path": "MAINTAINED-RUNTIME-DELIVERY-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8a48da46c1522654f8668516aaf5149e097b20a6",
+      "size": 5619
+    },
+    {
+      "path": "MG-FAKTURAKOLL-2-LEVERANS.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "db4f629fdb3c6472455a0c8d6674329dee143f5b",
+      "size": 9692
+    },
+    {
+      "path": "MGEORGE-FINAL-ENGINEERING-DELIVERY.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "808ca712242656f7d09b38d397846ac9cb866af3",
+      "size": 7477
+    },
+    {
+      "path": "MGEORGE-FINAL-ENGINEERING-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "d68d22cc3778ef724399aefa29baf81229477c26",
+      "size": 19941
+    },
+    {
+      "path": "MGEORGE-SEVEN-AGENT-FINAL-DELIVERY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e3c4c725f934ac14aec84127b0c8495c4f990e29",
+      "size": 16687
+    },
+    {
+      "path": "OCR-QUALITY-IMPROVEMENT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "376faa7240c6d57178830f6743db1cc5c2002507",
+      "size": 29497
+    },
+    {
+      "path": "ONE-CLICK-PAYMENT-CONTROL.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b1dbc8aabd412e4a0946c2a1ea941ad44b59d401",
+      "size": 7695
+    },
+    {
+      "path": "ORIGINAL-REFERENCE-INTEGRITY-DELIVERY.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ddb62412db7823633c6d3e0d0d1148b00774604b",
+      "size": 7489
+    },
+    {
+      "path": "ORIGINAL-REFERENCE-INTEGRITY-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7c1d43c3fc93cbdb4516b4d4a99b94286c7e8a19",
+      "size": 11171
+    },
+    {
+      "path": "PAYMENT-0599-VERIFICATION-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "4123ef6de0377d81b07c1f64a05cb89a73ff30af",
+      "size": 21816
+    },
+    {
+      "path": "PAYMENT-EVIDENCE-SOURCES-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "0c71a38c2294cb1be7f74a26aa71a3143625d280",
+      "size": 6707
+    },
+    {
+      "path": "PAYMENT-EVIDENCE-SOURCES-VERIFICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "94d985a60ce4c5f5fa182d73fcd563dfa97681d6",
+      "size": 10203
+    },
+    {
+      "path": "PAYMENT-VERIFICATION-ACCEPTANCE.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ce22ff99d7e8771f213e6fef4d8163c74a8df923",
+      "size": 7144
+    },
+    {
+      "path": "PAYMENT-VERIFICATION-ARCHITECTURE.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "9b9530c8f9cfa8ac474711b60b61ed21a2757bec",
+      "size": 12700
+    },
+    {
+      "path": "QUALITY-33-DELIVERY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c0399f3cdd8235f77164d6a69e8e10fa44d32051",
+      "size": 20343
+    },
+    {
+      "path": "QUALITY-33-PLAN.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "bac352887ecfd3953f697adf89ad1cfe16593531",
+      "size": 9984
+    },
+    {
+      "path": "QUALITY-33-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c52dd6008791943dfecb44bc6bd5fcd04612d79d",
+      "size": 3119
+    },
+    {
+      "path": "QUALITY-8H-CYCLE2.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "3d906b0da5a8d42d8d4df0eda84c68097d13e95f",
+      "size": 12772
+    },
+    {
+      "path": "QUALITY-8H-CYCLE2.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e7c7142330cf28af065d112e21cdddb4b62d8725",
+      "size": 8194
+    },
+    {
+      "path": "QUALITY-8H-CYCLE3.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e9d7b3b753f69fe4e03551bb51acf8a56fb6762c",
+      "size": 11799
+    },
+    {
+      "path": "QUALITY-8H-CYCLE3.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5319f7aa7b6079dea3e0aa42588a1b00a72d1c80",
+      "size": 6376
+    },
+    {
+      "path": "QUALITY-8H-CYCLE4.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b07f870a8cf4085f05b64bd0e304aa01c1cd3df0",
+      "size": 59306
+    },
+    {
+      "path": "QUALITY-8H-CYCLE4.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "55b0b134870621c8af9a4530ad1d4dc5e2b76320",
+      "size": 29742
+    },
+    {
+      "path": "QUALITY-8H-NODE-CYCLE1.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e5ac3c280598a8e393f8e87aae0d9c4f169af674",
+      "size": 1522
+    },
+    {
+      "path": "QUALITY-8H-NODE-CYCLE1.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "95f4a121e54c59361f67a3082b9baf8d3619ab1a",
+      "size": 5288
+    },
+    {
+      "path": "QUALITY-8H-PLAN.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "48d8600577157913698dee32962e08ab970fe4d3",
+      "size": 10070
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE1-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "316f8dea8a07edecd33b0cacc5cae4951a72745b",
+      "size": 3096
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE1-PUBLICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "aac9e351bc039eec6d0fb8cdf16c6e8fa2081511",
+      "size": 3350
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE1.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b70f69e33d2419c243de85607eb48c7a13c0344e",
+      "size": 2883
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE1.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "6e56e69e2cb5e9e221465d67bff216bd72ed756c",
+      "size": 6188
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE2-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e0056a84cffdf7d2351ca0e1443f25000703ba1a",
+      "size": 4081
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE2-PUBLICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "58d9b6831deeefff011fad63489b79752b1b97e4",
+      "size": 4544
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE3-PUBLICATION.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "fab1765f9edeb36ba6522a18cbeffcab83a2f4b4",
+      "size": 3701
+    },
+    {
+      "path": "QUALITY-8H-SITES-CYCLE3-PUBLICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "92f74ce06c6b8a2a44a02b3ab13308382df60d02",
+      "size": 4041
+    },
+    {
+      "path": "REAL-PAYMENT-0599-DELIVERY.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8e8f71004666a88d499e747e94516f94117892e0",
+      "size": 5658
+    },
+    {
+      "path": "REAL-PAYMENT-0599-FINAL-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c6c48478e1fdf9e332acd506e7795b0b40bc859f",
+      "size": 14634
+    },
+    {
+      "path": "RECONCILIATION-CUSTOMER-MESSAGES.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "49f8b6ed10dffdd5316d20c8b8c2e9b5b9eb5a52",
+      "size": 13110
+    },
+    {
+      "path": "SAAS-MULTITENANT-BANKID-FINAL-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c3cdc2c0fffb8a20a20daa73b1bbd1f7009843c0",
+      "size": 63712
+    },
+    {
+      "path": "SEVEN-AGENT-INTEGRATION-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "d10d0ef8f8f0ea2fca8d07770a89bae9cc0e6f31",
+      "size": 23905
+    },
+    {
+      "path": "SITES-CUSTOMER-MESSAGES.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "f3990398a6d665eafe1e466d5e4003a525d41b03",
+      "size": 13931
+    },
+    {
+      "path": "SITES-DOCUMENT-AUTOMATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "03773b6581161d6560e373b02f611f113a3059f9",
+      "size": 7279
+    },
+    {
+      "path": "SITES-LEGAL.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "dbba1f4255821f3cbedcf8fd6ffeeb5309cc8bf5",
+      "size": 1896
+    },
+    {
+      "path": "SITES-MONOCHROME-REVIEW.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e81f13b05e080ca5d3e4376d40bc94d0e095168e",
+      "size": 4777
+    },
+    {
+      "path": "SIX-PR-INTEGRATION-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "f6f50b5428d7b8551c93b48b7a9ddaa0ac5b214a",
+      "size": 29065
+    },
+    {
+      "path": "SWEDBANK-AUTOMATIC.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8778e5142e7261999bb75b9a0fd5f5df0bcf0bc5",
+      "size": 3937
+    },
+    {
+      "path": "SWEDBANK-PRODUCTION-STATUS.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e3db4f2a848131e1cc18f0ede74279ae599d75b9",
+      "size": 4709
+    },
+    {
+      "path": "SWEDBANK-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e303a8493eaa0a4c8dec929aa98e62e157fc849e",
+      "size": 12676
+    },
+    {
+      "path": "SWEDBANK-SITES-COMPARISON.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "fe65c9d0abcfc9810cb4ac8027140a3006ef9a08",
+      "size": 12847
+    },
+    {
+      "path": "SWEDBANK-SYNC-FIX-REPORT.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "bcd4c0af8a164b0288303c23ebc8a6b1a0a23627",
+      "size": 16350
+    },
+    {
+      "path": "SWEDBANK.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8352009ef25d8bd3b0b0305d27a23e9b0e08d1a5",
+      "size": 9498
+    },
+    {
+      "path": "UI-COMPONENT-INVENTORY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "cf346ee359b88c54a189e2af2aa9e0b50b29e4a5",
+      "size": 18874
+    },
+    {
+      "path": "V2-ARCHITECTURE.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "943ad497ac5292ceb7dcf6bceab301d37aa70bb0",
+      "size": 5080
+    },
+    {
+      "path": "V2-DELIVERY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b3ca9a22ca092809ac550e639fd571c3b642b47f",
+      "size": 10018
+    },
+    {
+      "path": "V2-OPERATIONS.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "54a7471b67117eb02b2424c87b11d8b7c0f4285d",
+      "size": 6356
+    },
+    {
+      "path": "V2-PUBLICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "15c606b6315fd94c8eebc44a2fe07f9939e649ea",
+      "size": 2635
+    },
+    {
+      "path": "V3-BANK-EVIDENCE.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "2f6cb3a7f117e9756089010251ac70e072259e10",
+      "size": 9102
+    },
+    {
+      "path": "V3-CLOUD-OCR-RUNNER.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "2adff5424d2540ba465ab65044752bfe12864114",
+      "size": 6858
+    },
+    {
+      "path": "V3-DELIVERY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c4f6a33ac91dc60d93990bc8387f9e6911bf52eb",
+      "size": 7952
+    },
+    {
+      "path": "V3-PUBLICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "144cc080181a4729c54487bcfc70826324207b62",
+      "size": 2702
+    },
+    {
+      "path": "V4-BANK-EVIDENCE-REVIEW.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b8a5a93389807e41faeaac7a17fbb9fc2b35ce94",
+      "size": 10573
+    },
+    {
+      "path": "V4-DELIVERY.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e3563ad864f13ab937025eef321af5ee840ce0bf",
+      "size": 14315
+    },
+    {
+      "path": "V4-OPERATIONS-REVIEW.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "4c2d2eab0532aafb884ed7c9442cf2c835863eae",
+      "size": 11269
+    },
+    {
+      "path": "V4-PUBLICATION.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "6066ade39cec8b3d0dae7e3e440f62111b9e03ca",
+      "size": 4209
+    },
+    {
+      "path": "V4-SWEDBANK-CHANNELS.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "21317a6b353cb45fd5d5c9efeff8852b65e4d035",
+      "size": 15479
+    },
+    {
+      "path": "integration",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "0072deb60ea21ed9486842527f4eaaf3cf442e64"
+    },
+    {
+      "path": "measurements",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "c26a29156beb38e8d6404b0681c176cf896abe2b"
+    },
+    {
+      "path": "quality8",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "8863fc76cd9cf291ecc8648a9b6bf22f7127a4d1"
+    },
+    {
+      "path": "saas",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "4a1bf4a315cb3bd83147861adccff9899e20b4ba"
+    },
+    {
+      "path": "screenshots",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "7d4fe2ff02b3411b12f051309fc43d6269bc142c"
+    },
+    {
+      "path": "sites",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "7dbb58e6a1ad50efeab7ab3e95cc6ab46908b775"
+    },
+    {
+      "path": "superpowers",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "f0f36e0a68a699b34aa38bc021e16cf87eadb5cf"
+    },
+    {
+      "path": "v2",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "3e25b7c9d2156f0648215cfe135e90142dde74eb"
+    }
+  ]
+}

@@ -1,0 +1,322 @@
+{
+  "kind": "later_sanitized_API_readback_not_original_receipt",
+  "retrievedAt": "2026-11-06T05:39:17.399Z",
+  "source": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42163947263/attempts/1/jobs?per_page=100",
+  "total_count": 3,
+  "jobs": [
+    {
+      "id": 127715892162,
+      "run_id": 42163947263,
+      "run_attempt": 1,
+      "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "name": "bankgiro_bridge",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T04:41:05Z",
+      "completed_at": "2026-11-06T04:41:22Z",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42163947263/job/127715892162",
+      "steps": [
+        {
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:06Z",
+          "completed_at": "2026-11-06T04:41:06Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:06Z",
+          "completed_at": "2026-11-06T04:41:11Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "number": 3,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:11Z",
+          "completed_at": "2026-11-06T04:41:12Z"
+        },
+        {
+          "name": "Install isolated SFTP bridge",
+          "number": 4,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:12Z",
+          "completed_at": "2026-11-06T04:41:13Z"
+        },
+        {
+          "name": "Check isolated bridge syntax",
+          "number": 5,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:13Z",
+          "completed_at": "2026-11-06T04:41:13Z"
+        },
+        {
+          "name": "Audit isolated bridge production dependencies",
+          "number": 6,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:13Z",
+          "completed_at": "2026-11-06T04:41:14Z"
+        },
+        {
+          "name": "Test synthetic SSH SFTP HTTP and durable recovery",
+          "number": 7,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:14Z",
+          "completed_at": "2026-11-06T04:41:20Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "number": 13,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:20Z",
+          "completed_at": "2026-11-06T04:41:20Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 14,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:20Z",
+          "completed_at": "2026-11-06T04:41:20Z"
+        },
+        {
+          "name": "Complete job",
+          "number": 15,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:20Z",
+          "completed_at": "2026-11-06T04:41:20Z"
+        }
+      ]
+    },
+    {
+      "id": 127715892273,
+      "run_id": 42163947263,
+      "run_attempt": 1,
+      "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T04:41:05Z",
+      "completed_at": "2026-11-06T04:44:19Z",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42163947263/job/127715892273",
+      "steps": [
+        {
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:06Z",
+          "completed_at": "2026-11-06T04:41:06Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:06Z",
+          "completed_at": "2026-11-06T04:41:11Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "number": 3,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:11Z",
+          "completed_at": "2026-11-06T04:41:13Z"
+        },
+        {
+          "name": "Run npm ci --ignore-scripts",
+          "number": 4,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:13Z",
+          "completed_at": "2026-11-06T04:41:16Z"
+        },
+        {
+          "name": "Run npm run check",
+          "number": 5,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:16Z",
+          "completed_at": "2026-11-06T04:41:20Z"
+        },
+        {
+          "name": "Audit production dependencies",
+          "number": 6,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:20Z",
+          "completed_at": "2026-11-06T04:41:21Z"
+        },
+        {
+          "name": "Run tests with synthetic data",
+          "number": 7,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:21Z",
+          "completed_at": "2026-11-06T04:44:17Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "number": 13,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:44:17Z",
+          "completed_at": "2026-11-06T04:44:17Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 14,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:44:17Z",
+          "completed_at": "2026-11-06T04:44:17Z"
+        },
+        {
+          "name": "Complete job",
+          "number": 15,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:44:17Z",
+          "completed_at": "2026-11-06T04:44:17Z"
+        }
+      ]
+    },
+    {
+      "id": 127715892368,
+      "run_id": 42163947263,
+      "run_attempt": 1,
+      "head_sha": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "name": "sites",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-11-06T04:41:05Z",
+      "completed_at": "2026-11-06T04:48:44Z",
+      "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42163947263/job/127715892368",
+      "steps": [
+        {
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:06Z",
+          "completed_at": "2026-11-06T04:41:06Z"
+        },
+        {
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:06Z",
+          "completed_at": "2026-11-06T04:41:11Z"
+        },
+        {
+          "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "number": 3,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:11Z",
+          "completed_at": "2026-11-06T04:41:18Z"
+        },
+        {
+          "name": "Run npm run install:ci",
+          "number": 4,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:18Z",
+          "completed_at": "2026-11-06T04:41:36Z"
+        },
+        {
+          "name": "Verify exact installed minimatch mitigation bytes",
+          "number": 5,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:36Z",
+          "completed_at": "2026-11-06T04:41:36Z"
+        },
+        {
+          "name": "Install shared OCR runtime for cloud integration test",
+          "number": 6,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:36Z",
+          "completed_at": "2026-11-06T04:41:38Z"
+        },
+        {
+          "name": "Run npm run check",
+          "number": 7,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:38Z",
+          "completed_at": "2026-11-06T04:41:51Z"
+        },
+        {
+          "name": "Audit Sites production dependencies",
+          "number": 8,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:41:51Z",
+          "completed_at": "2026-11-06T04:42:26Z"
+        },
+        {
+          "name": "Install isolated bridge for full synthetic SFTP chain",
+          "number": 9,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:42:26Z",
+          "completed_at": "2026-11-06T04:42:26Z"
+        },
+        {
+          "name": "Run Sites tests with synthetic data",
+          "number": 10,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:42:26Z",
+          "completed_at": "2026-11-06T04:48:24Z"
+        },
+        {
+          "name": "Run npm run build",
+          "number": 11,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:48:24Z",
+          "completed_at": "2026-11-06T04:48:41Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+          "number": 21,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:48:41Z",
+          "completed_at": "2026-11-06T04:48:41Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 22,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:48:41Z",
+          "completed_at": "2026-11-06T04:48:41Z"
+        },
+        {
+          "name": "Complete job",
+          "number": 23,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-06T04:48:41Z",
+          "completed_at": "2026-11-06T04:48:41Z"
+        }
+      ]
+    }
+  ]
+}

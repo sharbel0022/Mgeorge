@@ -1,0 +1,171 @@
+{
+  "kind": "new_recovery_inventory_not_original_manifest",
+  "generatedAt": "2026-11-06T05:47:41.891Z",
+  "scope": "Only historical PR59 and original failed main237 CI evidence under docs/quality8/remote-recovery-wave5-20261106.",
+  "base_commit": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "base_tree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+  "recovered_original_files": [
+    {
+      "path": "pr59/logs/saas-127715891963.log",
+      "bytes": 19435,
+      "sha256": "b38278deb4a29af3eb1ac129a871b34f6827b51050e873f03868ee69ad91ee9d",
+      "blobSha": "76fc9468ac9bdf814de543674700845c740f2fdc",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:01.869Z",
+      "sourceJob": 127715891963
+    },
+    {
+      "path": "pr59/logs/node-127715892273.log",
+      "bytes": 990595,
+      "sha256": "79125785a2536e045299b8a865da3c443818b6904a8e4f038bab35aaf3b3c030",
+      "blobSha": "be984fe8b40d16876d21f389e9adbd8d7a7d2952",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:07.901Z",
+      "sourceJob": 127715892273
+    },
+    {
+      "path": "pr59/logs/sites-127715892368.log",
+      "bytes": 2252256,
+      "sha256": "6bf776e089ad6a8ae6f5a4dee6779879ceb97b0e36b537ce2c288fb49d4d42d3",
+      "blobSha": "3499055093c66951bd4381afc597f6b0b96d51a2",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:17.630Z",
+      "sourceJob": 127715892368
+    },
+    {
+      "path": "pr59/logs/bankgiro-bridge-127715892162.log",
+      "bytes": 36942,
+      "sha256": "7b4e701d1b0ab649880b6b02b21c87a8e533a7b445a68e6e23b151f115597609",
+      "blobSha": "de1ec1c8d5cb0adbbbae6c14fd95109b0121a5bf",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:38.409Z",
+      "sourceJob": 127715892162
+    },
+    {
+      "path": "main237/logs/bankgiro-bridge-127718950439.log",
+      "bytes": 35874,
+      "sha256": "0076554ed7436e097c394c3786b7baee4e366aedb68f3e09ec5eaed66f7510bf",
+      "blobSha": "0ec471310e8c96e2c6cce24079bd8d56a78b3d61",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:39.590Z",
+      "sourceJob": 127718950439
+    },
+    {
+      "path": "main237/logs/node-127718950721.log",
+      "bytes": 990392,
+      "sha256": "d74130255608a0ee26ffe7876a3fc49255b0a1013b8ae7f68ee6b2fc6baaabf2",
+      "blobSha": "69f075ce5fa058be03a17f0ee97ebec19351f6ff",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:44.805Z",
+      "sourceJob": 127718950721
+    },
+    {
+      "path": "main237/logs/sites-127718950716.log",
+      "bytes": 2248221,
+      "sha256": "15a567a7e40045c3e516cc471a6bc30db0939526e611e3660410af208c6aa281",
+      "blobSha": "414fdabf6e36e55b5b0b808cac620829d73a2312",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:54.397Z",
+      "sourceJob": 127718950716
+    },
+    {
+      "path": "main237/failure-blocks.log",
+      "bytes": 1055,
+      "sha256": "41e3e819aab3a361966786b391b51e59e991eb49eef92b9c0703ed4e059cfde5",
+      "blobSha": "a6e4e1ab12131c3c2cddd8fb4b4b381cf26875a7",
+      "kind": "recovered_original_failure_block",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:55.284Z",
+      "sourceJob": 127718950721
+    }
+  ],
+  "original_raw_log_count": 7,
+  "original_raw_log_bytes": 6573715,
+  "original_failure_block_bytes": 1055,
+  "original_byte_verification": "UTF-8 byte count and SHA-256 match preserved earlier anchors; SHA-1 Git blob identity and full GitHub blob content readback also match.",
+  "fresh_readbacks": "The sanitized run, job, commit and tree JSON were fetched later. They are not byte-identical replacements for the earlier JSON receipts.",
+  "unavailable_originals": [
+    {
+      "artifact": "PR59 original receipt JSON",
+      "sha256": "f421182b6612385b5a2a369ddad0f1b4d93387f26d24cf3ae9f6c4110cadb562",
+      "status": "content_unavailable"
+    },
+    {
+      "artifact": "PR59 original SHA manifest",
+      "sha256": "8bd7fbc62251707a5b37d3adb5a790774114fe82f0274b066e00acb34a97345b",
+      "reported_entries": 21,
+      "status": "content_and_full_original_file_inventory_unavailable"
+    },
+    {
+      "artifact": "main237 original receipt JSON",
+      "sha256": "055f3d6c6c4c58f81e4f6a6011b57b112bffaf17f66cb93921469b517fb74f8f",
+      "status": "content_unavailable"
+    },
+    {
+      "artifact": "main237 original SHA manifest",
+      "sha256": "b42487002f233ea31c2f280cdad6c1b45e7db804aee51682228737b915e8b531",
+      "reported_entries": 20,
+      "status": "content_and_full_original_file_inventory_unavailable"
+    },
+    {
+      "artifact": "main237 original failure analysis JSON",
+      "bytes": 1426,
+      "sha256": "451755d82fa7f5c320d1e15f3e5be3c3eaea2f901c3f2aca6c3000d83fff93d1",
+      "status": "content_unavailable"
+    },
+    {
+      "artifact": "Original PR59/main237 gzip archives",
+      "status": "compressed_bytes_and_original_archive_hashes_unavailable; full_uncompressed_logs_restored"
+    },
+    {
+      "artifact": "Local unpushed documentation commit a01767a",
+      "reported_files": 52,
+      "status": "exact_commit_id_tree_and_complete_file_inventory_unavailable; no_byte_identity_claim"
+    },
+    {
+      "artifact": "Other a01767a documentation beyond these CI logs",
+      "status": "not_recovered_by_this_checkpoint"
+    },
+    {
+      "artifact": "Original pre-merge PR mergeability JSON",
+      "status": "content_unavailable; current_merged_PR_not_substituted"
+    }
+  ],
+  "old_store_inventory": {
+    "checked_keys": 40,
+    "present_keys": 0
+  },
+  "recovery_method": "Connected GitHub reads of the seven already-terminal original job IDs; pure JavaScript hashing; new immutable blobs and a docs-only checkpoint commit/branch.",
+  "recovery_actions_excluded": [
+    "workflow reruns",
+    "workflow dispatch",
+    "main/ref replacement",
+    "PR creation or merge",
+    "product changes",
+    "production calls or publication"
+  ],
+  "hash_manifest_policy": "file-manifest.json covers payload files, excluding itself and SHA256SUMS. SHA256SUMS additionally covers file-manifest.json. The Git tree binds all files including SHA256SUMS."
+}

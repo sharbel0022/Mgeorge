@@ -1,0 +1,14 @@
+2026-11-06T04:53:43.3286638Z not ok 1864 - two real processes import and reconcile one bank payment once, then replay safely after restart
+2026-11-06T04:53:43.3287545Z   ---
+2026-11-06T04:53:43.3287832Z   duration_ms: 124.716605
+2026-11-06T04:53:43.3288153Z   type: 'test'
+2026-11-06T04:53:43.3288726Z   location: '/home/runner/work/Mgeorge/Mgeorge/test/payment-concurrency.test.js:38:1'
+2026-11-06T04:53:43.3289720Z   failureType: 'testCodeFailure'
+2026-11-06T04:53:43.3290157Z   error: 'Synthetic concurrency worker failed before ready'
+2026-11-06T04:53:43.3290557Z   code: 'ERR_TEST_FAILURE'
+2026-11-06T04:53:43.3291043Z   stack: |-
+2026-11-06T04:53:43.3291683Z     ChildProcess.<anonymous> (file:///home/runner/work/Mgeorge/Mgeorge/test/payment-concurrency.test.js:33:160)
+2026-11-06T04:53:43.3292393Z     Object.onceWrapper (node:events:634:26)
+2026-11-06T04:53:43.3292814Z     ChildProcess.emit (node:events:531:35)
+2026-11-06T04:53:43.3293340Z     ChildProcess._handle.onexit (node:internal/child_process:293:12)
+2026-11-06T04:53:43.3293786Z   ...

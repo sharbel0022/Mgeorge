@@ -1,0 +1,489 @@
+﻿2026-11-06T04:50:54.4235282Z Current runner version: '2.338.2'
+2026-11-06T04:50:54.4256578Z ##[group]Runner Image Provisioner
+2026-11-06T04:50:54.4257295Z Hosted Compute Agent
+2026-11-06T04:50:54.4257874Z Version: 20261028.624
+2026-11-06T04:50:54.4258398Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-06T04:50:54.4259025Z Build Date: 2026-10-28T21:51:42Z
+2026-11-06T04:50:54.4259608Z Worker ID: {f28a58ea-482b-4dd6-94ca-419ca0406553}
+2026-11-06T04:50:54.4260223Z Region: westus3
+2026-11-06T04:50:54.4260721Z Cloud: Azure
+2026-11-06T04:50:54.4261171Z ##[endgroup]
+2026-11-06T04:50:54.4262305Z ##[group]Operating System
+2026-11-06T04:50:54.4262828Z Ubuntu
+2026-11-06T04:50:54.4263296Z 26.04.1
+2026-11-06T04:50:54.4263775Z LTS
+2026-11-06T04:50:54.4264207Z ##[endgroup]
+2026-11-06T04:50:54.4264656Z ##[group]Runner Image
+2026-11-06T04:50:54.4265216Z Image: ubuntu-26.04
+2026-11-06T04:50:54.4265727Z Version: 20261101.186.1
+2026-11-06T04:50:54.4267147Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-06T04:50:54.4268685Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+2026-11-06T04:50:54.4269531Z ##[endgroup]
+2026-11-06T04:50:54.4270467Z ##[group]GITHUB_TOKEN Permissions
+2026-11-06T04:50:54.4272081Z Contents: read
+2026-11-06T04:50:54.4272565Z Metadata: read
+2026-11-06T04:50:54.4273138Z ##[endgroup]
+2026-11-06T04:50:54.4274938Z Secret source: Actions
+2026-11-06T04:50:54.4275740Z Cache mode: write
+2026-11-06T04:50:54.4276655Z Prepare workflow directory
+2026-11-06T04:50:54.4558138Z Prepare all required actions
+2026-11-06T04:50:54.4611992Z Getting action download info
+2026-11-06T04:50:54.7378353Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-06T04:50:54.8133536Z Download action repository 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-11-06T04:50:54.9937558Z Complete job name: bankgiro_bridge
+2026-11-06T04:50:55.0632884Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-11-06T04:50:55.0633704Z with:
+2026-11-06T04:50:55.0634061Z   persist-credentials: false
+2026-11-06T04:50:55.0634497Z   repository: sharbel0022/Mgeorge
+2026-11-06T04:50:55.0637682Z   token: ***
+2026-11-06T04:50:55.0638036Z   ssh-strict: true
+2026-11-06T04:50:55.0638386Z   ssh-user: git
+2026-11-06T04:50:55.0638725Z   clean: true
+2026-11-06T04:50:55.0639080Z   sparse-checkout-cone-mode: true
+2026-11-06T04:50:55.0639498Z   fetch-depth: 1
+2026-11-06T04:50:55.0639842Z   fetch-tags: false
+2026-11-06T04:50:55.0640198Z   show-progress: true
+2026-11-06T04:50:55.0640555Z   lfs: false
+2026-11-06T04:50:55.0640891Z   submodules: false
+2026-11-06T04:50:55.0641247Z   set-safe-directory: true
+2026-11-06T04:50:55.0641646Z   allow-unsafe-pr-checkout: false
+2026-11-06T04:50:55.0642213Z ##[endgroup]
+2026-11-06T04:50:55.2441072Z Syncing repository: sharbel0022/Mgeorge
+2026-11-06T04:50:55.2443340Z ##[group]Getting Git version info
+2026-11-06T04:50:55.2443940Z Working directory is '/home/runner/work/Mgeorge/Mgeorge'
+2026-11-06T04:50:55.2444896Z [command]/usr/bin/git version
+2026-11-06T04:50:55.2445620Z git version 2.56.0
+2026-11-06T04:50:55.2463813Z ##[endgroup]
+2026-11-06T04:50:55.2479174Z Temporarily overriding HOME='/home/runner/work/_temp/c6aad721-0019-4131-93b4-4b80cbe47a91' before making global git config changes
+2026-11-06T04:50:55.2480939Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-06T04:50:55.2483194Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Mgeorge/Mgeorge
+2026-11-06T04:50:55.2538658Z Deleting the contents of '/home/runner/work/Mgeorge/Mgeorge'
+2026-11-06T04:50:55.2541982Z ##[group]Initializing the repository
+2026-11-06T04:50:55.2546219Z [command]/usr/bin/git init /home/runner/work/Mgeorge/Mgeorge
+2026-11-06T04:50:55.2629863Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-06T04:50:55.2631102Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-06T04:50:55.2631824Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-06T04:50:55.2632436Z hint: call:
+2026-11-06T04:50:55.2632823Z hint:
+2026-11-06T04:50:55.2633457Z hint: 	git config --global init.defaultBranch <name>
+2026-11-06T04:50:55.2634213Z hint:
+2026-11-06T04:50:55.2634936Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-06T04:50:55.2636044Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-06T04:50:55.2636924Z hint:
+2026-11-06T04:50:55.2637439Z hint: 	git branch -m <name>
+2026-11-06T04:50:55.2638020Z hint:
+2026-11-06T04:50:55.2638773Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-06T04:50:55.2639945Z Initialized empty Git repository in /home/runner/work/Mgeorge/Mgeorge/.git/
+2026-11-06T04:50:55.2646504Z [command]/usr/bin/git remote add origin https://github.com/sharbel0022/Mgeorge
+2026-11-06T04:50:55.2692506Z ##[endgroup]
+2026-11-06T04:50:55.2693497Z ##[group]Disabling automatic garbage collection
+2026-11-06T04:50:55.2695324Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-06T04:50:55.2727688Z ##[endgroup]
+2026-11-06T04:50:55.2728669Z ##[group]Setting up auth
+2026-11-06T04:50:55.2734299Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T04:50:55.2765733Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T04:50:55.3134664Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T04:50:55.3168963Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T04:50:55.3419432Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T04:50:55.3449953Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T04:50:55.3687570Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-06T04:50:55.3725426Z ##[endgroup]
+2026-11-06T04:50:55.3726302Z ##[group]Fetching the repository
+2026-11-06T04:50:55.3732845Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +237dd45e7e1b40513d2dd25ccff59bb08f023264:refs/remotes/origin/main
+2026-11-06T04:50:59.1169054Z From https://github.com/sharbel0022/Mgeorge
+2026-11-06T04:50:59.1171586Z  * [new ref]         237dd45e7e1b40513d2dd25ccff59bb08f023264 -> origin/main
+2026-11-06T04:50:59.1176160Z ##[endgroup]
+2026-11-06T04:50:59.1177752Z ##[group]Determining the checkout info
+2026-11-06T04:50:59.1179857Z ##[endgroup]
+2026-11-06T04:50:59.1180820Z [command]/usr/bin/git sparse-checkout disable
+2026-11-06T04:50:59.1217943Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-06T04:50:59.1246889Z ##[group]Checking out the ref
+2026-11-06T04:50:59.1250954Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-06T04:50:59.4499358Z Switched to a new branch 'main'
+2026-11-06T04:50:59.4504108Z branch 'main' set up to track 'origin/main'.
+2026-11-06T04:50:59.4530733Z ##[endgroup]
+2026-11-06T04:50:59.4571986Z [command]/usr/bin/git log -1 --format=%H
+2026-11-06T04:50:59.4594337Z 237dd45e7e1b40513d2dd25ccff59bb08f023264
+2026-11-06T04:50:59.4602842Z ##[group]Removing auth
+2026-11-06T04:50:59.4606391Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T04:50:59.4633988Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T04:50:59.4876507Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T04:50:59.4898478Z http.https://github.com/.extraheader
+2026-11-06T04:50:59.4904907Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-06T04:50:59.4934485Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T04:50:59.5175399Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T04:50:59.5202514Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T04:50:59.5440271Z ##[endgroup]
+2026-11-06T04:50:59.5660412Z ##[group]Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+2026-11-06T04:50:59.5660819Z with:
+2026-11-06T04:50:59.5661028Z   node-version: 22
+2026-11-06T04:50:59.5661242Z   cache: npm
+2026-11-06T04:50:59.5661515Z   cache-dependency-path: bridge/bankgiro/package-lock.json
+2026-11-06T04:50:59.5661841Z   always-auth: false
+2026-11-06T04:50:59.5662089Z   check-latest: false
+2026-11-06T04:50:59.5664110Z   token: ***
+2026-11-06T04:50:59.5664330Z ##[endgroup]
+2026-11-06T04:50:59.6871875Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
+2026-11-06T04:50:59.6876252Z (node:2327) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-06T04:50:59.6877151Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-06T04:50:59.6878456Z ##[group]Environment details
+2026-11-06T04:50:59.9855039Z node: v22.23.4
+2026-11-06T04:50:59.9855342Z npm: 10.9.9
+2026-11-06T04:50:59.9855655Z yarn: 1.22.22
+2026-11-06T04:50:59.9856825Z ##[endgroup]
+2026-11-06T04:50:59.9871238Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
+2026-11-06T04:51:00.0752993Z /home/runner/.npm
+2026-11-06T04:51:00.3013747Z Cache hit for: node-cache-Linux-x64-npm-29e8df1000e51945714e041d6645ab76ddbc76f09a37106f0d05fa371aa7b5e8
+2026-11-06T04:51:00.3103251Z (node:2327) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-06T04:51:00.8480692Z Received 552815 of 552815 (100.0%), 1.6 MBs/sec
+2026-11-06T04:51:00.8481177Z Cache Size: ~1 MB (552815 B)
+2026-11-06T04:51:00.8501059Z [command]/usr/bin/tar -xf /home/runner/work/_temp/1409c632-ad7e-4ea3-a003-98897235a7ef/cache.tzst -P -C /home/runner/work/Mgeorge/Mgeorge --use-compress-program unzstd
+2026-11-06T04:51:00.8580258Z Cache restored successfully
+2026-11-06T04:51:00.8584803Z Cache restored from key: node-cache-Linux-x64-npm-29e8df1000e51945714e041d6645ab76ddbc76f09a37106f0d05fa371aa7b5e8
+2026-11-06T04:51:00.8728406Z ##[group]Run npm --prefix bridge/bankgiro ci --ignore-scripts
+2026-11-06T04:51:00.8728869Z [36;1mnpm --prefix bridge/bankgiro ci --ignore-scripts[0m
+2026-11-06T04:51:00.8782299Z shell: /usr/bin/bash -e {0}
+2026-11-06T04:51:00.8782588Z ##[endgroup]
+2026-11-06T04:51:01.4464042Z 
+2026-11-06T04:51:01.4470848Z added 8 packages, and audited 9 packages in 516ms
+2026-11-06T04:51:01.4471283Z 
+2026-11-06T04:51:01.4471494Z found 0 vulnerabilities
+2026-11-06T04:51:01.4812360Z ##[group]Run npm --prefix bridge/bankgiro run check
+2026-11-06T04:51:01.4812706Z [36;1mnpm --prefix bridge/bankgiro run check[0m
+2026-11-06T04:51:01.4859830Z shell: /usr/bin/bash -e {0}
+2026-11-06T04:51:01.4860085Z ##[endgroup]
+2026-11-06T04:51:01.5703408Z 
+2026-11-06T04:51:01.5704169Z > @mgeorge/bankgiro-sftp-bridge@0.1.0 check
+2026-11-06T04:51:01.5705734Z > node --check src/bridge.js && node --check src/main.js && node --check test/bridge.test.js && node --check test/sftp-server.js && node --check test/main.test.js && node --check test/adapter-contract.test.js
+2026-11-06T04:51:01.5707292Z 
+2026-11-06T04:51:01.7096146Z ##[group]Run npm --prefix bridge/bankgiro audit --omit=dev --audit-level=high
+2026-11-06T04:51:01.7096821Z [36;1mnpm --prefix bridge/bankgiro audit --omit=dev --audit-level=high[0m
+2026-11-06T04:51:01.7143257Z shell: /usr/bin/bash -e {0}
+2026-11-06T04:51:01.7143492Z ##[endgroup]
+2026-11-06T04:51:02.0382486Z found 0 vulnerabilities
+2026-11-06T04:51:02.0487673Z ##[group]Run npm --prefix bridge/bankgiro run test:isolated
+2026-11-06T04:51:02.0488058Z [36;1mnpm --prefix bridge/bankgiro run test:isolated[0m
+2026-11-06T04:51:02.0533959Z shell: /usr/bin/bash -e {0}
+2026-11-06T04:51:02.0534183Z env:
+2026-11-06T04:51:02.0534351Z   NODE_ENV: test
+2026-11-06T04:51:02.0534524Z ##[endgroup]
+2026-11-06T04:51:02.1347549Z 
+2026-11-06T04:51:02.1348236Z > @mgeorge/bankgiro-sftp-bridge@0.1.0 test:isolated
+2026-11-06T04:51:02.1348860Z > node --import ../../scripts/saas-test-isolation.mjs --test --test-concurrency=1 test/*.test.js
+2026-11-06T04:51:02.1349211Z 
+2026-11-06T04:51:02.1737155Z TAP version 13
+2026-11-06T04:51:02.3018997Z # (node:2476) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+2026-11-06T04:51:02.3020280Z # (Use `node --trace-warnings ...` to show where the warning was created)
+2026-11-06T04:51:02.4467663Z # Subtest: actual shared HTTPS adapter accepts bridge authorization, sequence pages and exact retained SFTP bytes
+2026-11-06T04:51:02.4471821Z ok 1 - actual shared HTTPS adapter accepts bridge authorization, sequence pages and exact retained SFTP bytes
+2026-11-06T04:51:02.4472839Z   ---
+2026-11-06T04:51:02.4473053Z   duration_ms: 148.075349
+2026-11-06T04:51:02.4473280Z   type: 'test'
+2026-11-06T04:51:02.4473457Z   ...
+2026-11-06T04:51:02.5859974Z # (node:2488) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+2026-11-06T04:51:02.5860591Z # (Use `node --trace-warnings ...` to show where the warning was created)
+2026-11-06T04:51:02.7066411Z # Subtest: authenticated real SFTP delivery is retained and exposed through the scoped normalized HTTP contract
+2026-11-06T04:51:02.7067837Z ok 2 - authenticated real SFTP delivery is retained and exposed through the scoped normalized HTTP contract
+2026-11-06T04:51:02.7068586Z   ---
+2026-11-06T04:51:02.7068967Z   duration_ms: 123.133388
+2026-11-06T04:51:02.7069422Z   type: 'test'
+2026-11-06T04:51:02.7069672Z   ...
+2026-11-06T04:51:02.7750701Z # Subtest: host identity mismatch and upstream authentication failure never publish a report
+2026-11-06T04:51:02.7751662Z ok 3 - host identity mismatch and upstream authentication failure never publish a report
+2026-11-06T04:51:02.7752149Z   ---
+2026-11-06T04:51:02.7752399Z   duration_ms: 69.122413
+2026-11-06T04:51:02.7752609Z   type: 'test'
+2026-11-06T04:51:02.7752836Z   ...
+2026-11-06T04:51:02.8539414Z # Subtest: HTTP *** covers authorization, listing and content; errors never echo secrets
+2026-11-06T04:51:02.8540354Z ok 4 - HTTP *** covers authorization, listing and content; errors never echo secrets
+2026-11-06T04:51:02.8540928Z   ---
+2026-11-06T04:51:02.8541240Z   duration_ms: 78.745924
+2026-11-06T04:51:02.8541524Z   type: 'test'
+2026-11-06T04:51:02.8541775Z   ...
+2026-11-06T04:51:03.0276812Z # Subtest: sequence cursors discover late old-dated deliveries and replay survives restart
+2026-11-06T04:51:03.0277750Z ok 5 - sequence cursors discover late old-dated deliveries and replay survives restart
+2026-11-06T04:51:03.0278130Z   ---
+2026-11-06T04:51:03.0278320Z   duration_ms: 173.842818
+2026-11-06T04:51:03.0278528Z   type: 'test'
+2026-11-06T04:51:03.0278697Z   ...
+2026-11-06T04:51:03.1477596Z # Subtest: changed bytes under one delivery ID preserve both originals and surface conflict
+2026-11-06T04:51:03.1478922Z ok 6 - changed bytes under one delivery ID preserve both originals and surface conflict
+2026-11-06T04:51:03.1479636Z   ---
+2026-11-06T04:51:03.1479947Z   duration_ms: 120.132621
+2026-11-06T04:51:03.1480268Z   type: 'test'
+2026-11-06T04:51:03.1480508Z   ...
+2026-11-06T04:51:03.2001139Z # Subtest: symlink cannot publish an incomplete original
+2026-11-06T04:51:03.2002120Z ok 7 - symlink cannot publish an incomplete original
+2026-11-06T04:51:03.2002493Z   ---
+2026-11-06T04:51:03.2002742Z   duration_ms: 52.392726
+2026-11-06T04:51:03.2003032Z   type: 'test'
+2026-11-06T04:51:03.2003286Z   ...
+2026-11-06T04:51:03.2547186Z # Subtest: path traversal cannot publish an incomplete original
+2026-11-06T04:51:03.2548437Z ok 8 - path traversal cannot publish an incomplete original
+2026-11-06T04:51:03.2548843Z   ---
+2026-11-06T04:51:03.2549215Z   duration_ms: 54.453982
+2026-11-06T04:51:03.2549574Z   type: 'test'
+2026-11-06T04:51:03.2549879Z   ...
+2026-11-06T04:51:03.3072097Z # Subtest: changing metadata cannot publish an incomplete original
+2026-11-06T04:51:03.3072847Z ok 9 - changing metadata cannot publish an incomplete original
+2026-11-06T04:51:03.3073990Z   ---
+2026-11-06T04:51:03.3074731Z   duration_ms: 52.469632
+2026-11-06T04:51:03.3075004Z   type: 'test'
+2026-11-06T04:51:03.3075254Z   ...
+2026-11-06T04:51:03.3587761Z # Subtest: canonical path swap cannot publish an incomplete original
+2026-11-06T04:51:03.3588303Z ok 10 - canonical path swap cannot publish an incomplete original
+2026-11-06T04:51:03.3588604Z   ---
+2026-11-06T04:51:03.3588791Z   duration_ms: 51.346836
+2026-11-06T04:51:03.3588986Z   type: 'test'
+2026-11-06T04:51:03.3589200Z   ...
+2026-11-06T04:51:03.4104934Z # Subtest: partial stream cannot publish an incomplete original
+2026-11-06T04:51:03.4105687Z ok 11 - partial stream cannot publish an incomplete original
+2026-11-06T04:51:03.4106498Z   ---
+2026-11-06T04:51:03.4106765Z   duration_ms: 51.767626
+2026-11-06T04:51:03.4107102Z   type: 'test'
+2026-11-06T04:51:03.4107472Z   ...
+2026-11-06T04:51:03.4624876Z # Subtest: disconnect cannot publish an incomplete original
+2026-11-06T04:51:03.4626030Z ok 12 - disconnect cannot publish an incomplete original
+2026-11-06T04:51:03.4626422Z   ---
+2026-11-06T04:51:03.4626656Z   duration_ms: 51.957984
+2026-11-06T04:51:03.4626915Z   type: 'test'
+2026-11-06T04:51:03.4627215Z   ...
+2026-11-06T04:51:03.5124294Z # Subtest: unbounded enumeration cannot publish an incomplete original
+2026-11-06T04:51:03.5125034Z ok 13 - unbounded enumeration cannot publish an incomplete original
+2026-11-06T04:51:03.5125392Z   ---
+2026-11-06T04:51:03.5125568Z   duration_ms: 49.919452
+2026-11-06T04:51:03.5125759Z   type: 'test'
+2026-11-06T04:51:03.5126107Z   ...
+2026-11-06T04:51:04.2685336Z # Subtest: stalled protocol cannot publish an incomplete original
+2026-11-06T04:51:04.2686038Z ok 14 - stalled protocol cannot publish an incomplete original
+2026-11-06T04:51:04.2686326Z   ---
+2026-11-06T04:51:04.2686516Z   duration_ms: 755.943937
+2026-11-06T04:51:04.2686711Z   type: 'test'
+2026-11-06T04:51:04.2686944Z   ...
+2026-11-06T04:51:04.3260763Z # Subtest: oversize, insecure spool, missing pin and disabled or expired entitlement fail closed
+2026-11-06T04:51:04.3261498Z ok 15 - oversize, insecure spool, missing pin and disabled or expired entitlement fail closed
+2026-11-06T04:51:04.3261857Z   ---
+2026-11-06T04:51:04.3262077Z   duration_ms: 57.506256
+2026-11-06T04:51:04.3262273Z   type: 'test'
+2026-11-06T04:51:04.3262438Z   ...
+2026-11-06T04:51:04.3849347Z # Subtest: journal ownership is exclusive and a differently scoped restart is rejected
+2026-11-06T04:51:04.3850168Z ok 16 - journal ownership is exclusive and a differently scoped restart is rejected
+2026-11-06T04:51:04.3850499Z   ---
+2026-11-06T04:51:04.3850716Z   duration_ms: 58.621813
+2026-11-06T04:51:04.3850930Z   type: 'test'
+2026-11-06T04:51:04.3851102Z   ...
+2026-11-06T04:51:04.5766775Z # Subtest: real process kill releases exclusive journal ownership and restart replays committed originals
+2026-11-06T04:51:04.5768471Z ok 17 - real process kill releases exclusive journal ownership and restart replays committed originals
+2026-11-06T04:51:04.5769043Z   ---
+2026-11-06T04:51:04.5769289Z   duration_ms: 191.860787
+2026-11-06T04:51:04.5769586Z   type: 'test'
+2026-11-06T04:51:04.5769765Z   ...
+2026-11-06T04:51:04.6340558Z # Subtest: empty pages retain the discovery checkpoint rather than resetting late-file discovery
+2026-11-06T04:51:04.6341932Z ok 18 - empty pages retain the discovery checkpoint rather than resetting late-file discovery
+2026-11-06T04:51:04.6342427Z   ---
+2026-11-06T04:51:04.6342693Z   duration_ms: 57.335658
+2026-11-06T04:51:04.6342994Z   type: 'test'
+2026-11-06T04:51:04.6343277Z   ...
+2026-11-06T04:51:04.6383190Z # Subtest: private spool permissions and local symlink substitutions are refused
+2026-11-06T04:51:04.6384183Z ok 19 - private spool permissions and local symlink substitutions are refused
+2026-11-06T04:51:04.6384591Z   ---
+2026-11-06T04:51:04.6384863Z   duration_ms: 4.523354
+2026-11-06T04:51:04.6385099Z   type: 'test'
+2026-11-06T04:51:04.6385283Z   ...
+2026-11-06T04:51:04.7016612Z # Subtest: tampered retained bytes are blocked at HTTP readback and restart
+2026-11-06T04:51:04.7017372Z ok 20 - tampered retained bytes are blocked at HTTP readback and restart
+2026-11-06T04:51:04.7017819Z   ---
+2026-11-06T04:51:04.7018065Z   duration_ms: 62.862259
+2026-11-06T04:51:04.7018384Z   type: 'test'
+2026-11-06T04:51:04.7018623Z   ...
+2026-11-06T04:51:04.8095313Z # Subtest: source authorization needs a fresh successful scan and fails again after upstream rejection
+2026-11-06T04:51:04.8096592Z ok 21 - source authorization needs a fresh successful scan and fails again after upstream rejection
+2026-11-06T04:51:04.8097109Z   ---
+2026-11-06T04:51:04.8097381Z   duration_ms: 107.766201
+2026-11-06T04:51:04.8097623Z   type: 'test'
+2026-11-06T04:51:04.8097884Z   ...
+2026-11-06T04:51:04.8594696Z # Subtest: directory entry count is bounded before any report publication
+2026-11-06T04:51:04.8595430Z ok 22 - directory entry count is bounded before any report publication
+2026-11-06T04:51:04.8596230Z   ---
+2026-11-06T04:51:04.8596479Z   duration_ms: 49.958129
+2026-11-06T04:51:04.8596696Z   type: 'test'
+2026-11-06T04:51:04.8596873Z   ...
+2026-11-06T04:51:04.9667067Z # Subtest: upstream rename retains exact bytes with a new delivery ID for downstream hash deduplication
+2026-11-06T04:51:04.9668361Z ok 23 - upstream rename retains exact bytes with a new delivery ID for downstream hash deduplication
+2026-11-06T04:51:04.9668989Z   ---
+2026-11-06T04:51:04.9669287Z   duration_ms: 107.066167
+2026-11-06T04:51:04.9669547Z   type: 'test'
+2026-11-06T04:51:04.9669812Z   ...
+2026-11-06T04:51:05.0208487Z # Subtest: entitlement expiry during an upstream transfer prevents journal publication
+2026-11-06T04:51:05.0209628Z ok 24 - entitlement expiry during an upstream transfer prevents journal publication
+2026-11-06T04:51:05.0210456Z   ---
+2026-11-06T04:51:05.0210836Z   duration_ms: 54.254143
+2026-11-06T04:51:05.0211124Z   type: 'test'
+2026-11-06T04:51:05.0211359Z   ...
+2026-11-06T04:51:05.0789289Z # Subtest: authorization projection never returns undeclared trusted-config fields
+2026-11-06T04:51:05.0790172Z ok 25 - authorization projection never returns undeclared trusted-config fields
+2026-11-06T04:51:05.0790657Z   ---
+2026-11-06T04:51:05.0790919Z   duration_ms: 58.048811
+2026-11-06T04:51:05.0791250Z   type: 'test'
+2026-11-06T04:51:05.0791416Z   ...
+2026-11-06T04:51:05.4125770Z # Subtest: SIGKILL during a real stalled SFTP read publishes nothing partial and restart resumes discovery
+2026-11-06T04:51:05.4126995Z ok 26 - SIGKILL during a real stalled SFTP read publishes nothing partial and restart resumes discovery
+2026-11-06T04:51:05.4127553Z   ---
+2026-11-06T04:51:05.4127843Z   duration_ms: 333.248171
+2026-11-06T04:51:05.4128149Z   type: 'test'
+2026-11-06T04:51:05.4128380Z   ...
+2026-11-06T04:51:05.5188029Z # Subtest: aborted transfer cannot publish and a later complete retry retains the original
+2026-11-06T04:51:05.5189038Z ok 27 - aborted transfer cannot publish and a later complete retry retains the original
+2026-11-06T04:51:05.5189550Z   ---
+2026-11-06T04:51:05.5189815Z   duration_ms: 106.535451
+2026-11-06T04:51:05.5190106Z   type: 'test'
+2026-11-06T04:51:05.5190345Z   ...
+2026-11-06T04:51:05.5921456Z # Subtest: anonymous-only upstream cannot replace the configured authentication method
+2026-11-06T04:51:05.5922746Z ok 28 - anonymous-only upstream cannot replace the configured authentication method
+2026-11-06T04:51:05.5923247Z   ---
+2026-11-06T04:51:05.5923510Z   duration_ms: 47.878646
+2026-11-06T04:51:05.5923788Z   type: 'test'
+2026-11-06T04:51:05.5924025Z   ...
+2026-11-06T04:51:05.6931657Z # Subtest: configured upstream private-key authentication completes a signed real SSH exchange
+2026-11-06T04:51:05.6933187Z ok 29 - configured upstream private-key authentication completes a signed real SSH exchange
+2026-11-06T04:51:05.6933748Z   ---
+2026-11-06T04:51:05.6934018Z   duration_ms: 126.385142
+2026-11-06T04:51:05.6934309Z   type: 'test'
+2026-11-06T04:51:05.6934549Z   ...
+2026-11-06T04:51:05.7491198Z # Subtest: clock rollback and stale scan receipts cannot claim current authorization
+2026-11-06T04:51:05.7492139Z ok 30 - clock rollback and stale scan receipts cannot claim current authorization
+2026-11-06T04:51:05.7492918Z   ---
+2026-11-06T04:51:05.7493165Z   duration_ms: 55.948138
+2026-11-06T04:51:05.7493483Z   type: 'test'
+2026-11-06T04:51:05.8079108Z   ...
+2026-11-06T04:51:05.8079651Z # Subtest: abort during durable blob publication cannot publish a journal event or fresh authorization
+2026-11-06T04:51:05.8080288Z ok 31 - abort during durable blob publication cannot publish a journal event or fresh authorization
+2026-11-06T04:51:05.8080660Z   ---
+2026-11-06T04:51:05.8080844Z   duration_ms: 58.636387
+2026-11-06T04:51:05.8081074Z   type: 'test'
+2026-11-06T04:51:05.8081241Z   ...
+2026-11-06T04:51:05.8623015Z # Subtest: a scan deadline reached during blob publication cannot publish or refresh authority
+2026-11-06T04:51:05.8623876Z ok 32 - a scan deadline reached during blob publication cannot publish or refresh authority
+2026-11-06T04:51:05.8624366Z   ---
+2026-11-06T04:51:05.8624680Z   duration_ms: 54.446786
+2026-11-06T04:51:05.8625036Z   type: 'test'
+2026-11-06T04:51:05.8625340Z   ...
+2026-11-06T04:51:05.8779782Z # Subtest: generation is an opaque bounded string and malformed wire types are rejected
+2026-11-06T04:51:05.8786728Z ok 33 - generation is an opaque bounded string and malformed wire types are rejected
+2026-11-06T04:51:05.8787228Z   ---
+2026-11-06T04:51:05.8787448Z   duration_ms: 15.675344
+2026-11-06T04:51:05.8787735Z   type: 'test'
+2026-11-06T04:51:05.8787904Z   ...
+2026-11-06T04:51:05.8823450Z # Subtest: explicit synthetic source or entitlement markers cannot produce bridge production authority
+2026-11-06T04:51:05.8824605Z ok 34 - explicit synthetic source or entitlement markers cannot produce bridge production authority
+2026-11-06T04:51:05.8825228Z   ---
+2026-11-06T04:51:05.8825656Z   duration_ms: 4.593669
+2026-11-06T04:51:05.8826082Z   type: 'test'
+2026-11-06T04:51:05.8826375Z   ...
+2026-11-06T04:51:05.9883416Z # Subtest: abort after atomic journal publication preserves a complete original without refreshing authority
+2026-11-06T04:51:05.9884455Z ok 35 - abort after atomic journal publication preserves a complete original without refreshing authority
+2026-11-06T04:51:05.9885001Z   ---
+2026-11-06T04:51:05.9885327Z   duration_ms: 105.63655
+2026-11-06T04:51:05.9885602Z   type: 'test'
+2026-11-06T04:51:05.9885769Z   ...
+2026-11-06T04:51:06.0926200Z # Subtest: an empty real SFTP directory completes authorization and later delivery advances the initial checkpoint
+2026-11-06T04:51:06.0927239Z ok 36 - an empty real SFTP directory completes authorization and later delivery advances the initial checkpoint
+2026-11-06T04:51:06.0927880Z   ---
+2026-11-06T04:51:06.0928128Z   duration_ms: 104.226353
+2026-11-06T04:51:06.0928367Z   type: 'test'
+2026-11-06T04:51:06.0928634Z   ...
+2026-11-06T04:51:06.1504546Z # Subtest: a dot-only READDIR page filtered by ssh2 is followed through to actual report bytes
+2026-11-06T04:51:06.1506227Z ok 37 - a dot-only READDIR page filtered by ssh2 is followed through to actual report bytes
+2026-11-06T04:51:06.1506652Z   ---
+2026-11-06T04:51:06.1506835Z   duration_ms: 57.791479
+2026-11-06T04:51:06.1507035Z   type: 'test'
+2026-11-06T04:51:06.1507203Z   ...
+2026-11-06T04:51:06.2069036Z # Subtest: infinite empty non-EOF SFTP pages hit the finite page budget without authorizing or publishing
+2026-11-06T04:51:06.2070751Z ok 38 - infinite empty non-EOF SFTP pages hit the finite page budget without authorizing or publishing
+2026-11-06T04:51:06.2071552Z   ---
+2026-11-06T04:51:06.2071994Z   duration_ms: 56.241032
+2026-11-06T04:51:06.2072458Z   type: 'test'
+2026-11-06T04:51:06.2072866Z   ...
+2026-11-06T04:51:06.2593540Z # Subtest: infinite dot-only non-EOF SFTP pages hit the finite page budget without authorizing or publishing
+2026-11-06T04:51:06.2594531Z ok 39 - infinite dot-only non-EOF SFTP pages hit the finite page budget without authorizing or publishing
+2026-11-06T04:51:06.2595049Z   ---
+2026-11-06T04:51:06.2595312Z   duration_ms: 52.489396
+2026-11-06T04:51:06.2595600Z   type: 'test'
+2026-11-06T04:51:06.2596004Z   ...
+2026-11-06T04:51:06.3695163Z # Subtest: same-scope generation renewal preserves delivery ID with identical SFTP bytes
+2026-11-06T04:51:06.3696197Z ok 40 - same-scope generation renewal preserves delivery ID with identical SFTP bytes
+2026-11-06T04:51:06.3696741Z   ---
+2026-11-06T04:51:06.3696996Z   duration_ms: 110.298653
+2026-11-06T04:51:06.3697269Z   type: 'test'
+2026-11-06T04:51:06.3697466Z   ...
+2026-11-06T04:51:06.4821577Z # Subtest: same-scope generation renewal preserves delivery ID with changed SFTP bytes
+2026-11-06T04:51:06.4822526Z ok 41 - same-scope generation renewal preserves delivery ID with changed SFTP bytes
+2026-11-06T04:51:06.4823033Z   ---
+2026-11-06T04:51:06.4823295Z   duration_ms: 112.509474
+2026-11-06T04:51:06.4823585Z   type: 'test'
+2026-11-06T04:51:06.4823819Z   ...
+2026-11-06T04:51:06.8049114Z # Subtest: delivery namespace separates canonical owner, source, scope, company and Bankgiro identities
+2026-11-06T04:51:06.8050166Z ok 42 - delivery namespace separates canonical owner, source, scope, company and Bankgiro identities
+2026-11-06T04:51:06.8050732Z   ---
+2026-11-06T04:51:06.8050981Z   duration_ms: 322.68652
+2026-11-06T04:51:06.8051253Z   type: 'test'
+2026-11-06T04:51:06.8051541Z   ...
+2026-11-06T04:51:06.8685300Z # Subtest: generation, profile, host, host key and formats still cannot reuse an existing spool
+2026-11-06T04:51:06.8686225Z ok 43 - generation, profile, host, host key and formats still cannot reuse an existing spool
+2026-11-06T04:51:06.8686591Z   ---
+2026-11-06T04:51:06.8686764Z   duration_ms: 63.573884
+2026-11-06T04:51:06.8686957Z   type: 'test'
+2026-11-06T04:51:06.8687154Z   ...
+2026-11-06T04:51:06.9251071Z # Subtest: pre-namespace spool metadata fails closed without rewriting retained originals
+2026-11-06T04:51:06.9251997Z ok 44 - pre-namespace spool metadata fails closed without rewriting retained originals
+2026-11-06T04:51:06.9252500Z   ---
+2026-11-06T04:51:06.9252755Z   duration_ms: 56.909645
+2026-11-06T04:51:06.9253035Z   type: 'test'
+2026-11-06T04:51:06.9253264Z   ...
+2026-11-06T04:51:07.0332546Z # (node:2525) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+2026-11-06T04:51:07.0333298Z # (Use `node --trace-warnings ...` to show where the warning was created)
+2026-11-06T04:51:07.0489367Z # Subtest: entrypoint loads private config/secret files and never takes raw credentials from config
+2026-11-06T04:51:07.0490786Z ok 45 - entrypoint loads private config/secret files and never takes raw credentials from config
+2026-11-06T04:51:07.0491845Z   ---
+2026-11-06T04:51:07.0492245Z   duration_ms: 16.09907
+2026-11-06T04:51:07.0492560Z   type: 'test'
+2026-11-06T04:51:07.0492808Z   ...
+2026-11-06T04:51:07.0537326Z # Subtest: entrypoint rejects public secret permissions and missing config
+2026-11-06T04:51:07.0547980Z ok 46 - entrypoint rejects public secret permissions and missing config
+2026-11-06T04:51:07.0548676Z   ---
+2026-11-06T04:51:07.0549077Z   duration_ms: 4.699499
+2026-11-06T04:51:07.0549491Z   type: 'test'
+2026-11-06T04:51:07.0549747Z   ...
+2026-11-06T04:51:07.2792244Z # Subtest: entrypoint serves actual SFTP reports over a loopback-only HTTP listener and terminates cleanly
+2026-11-06T04:51:07.2793612Z ok 47 - entrypoint serves actual SFTP reports over a loopback-only HTTP listener and terminates cleanly
+2026-11-06T04:51:07.2794729Z   ---
+2026-11-06T04:51:07.2795033Z   duration_ms: 225.462424
+2026-11-06T04:51:07.2795349Z   type: 'test'
+2026-11-06T04:51:07.2875399Z   ...
+2026-11-06T04:51:07.2875600Z 1..47
+2026-11-06T04:51:07.2875770Z # tests 47
+2026-11-06T04:51:07.2886311Z # suites 0
+2026-11-06T04:51:07.2886564Z # pass 47
+2026-11-06T04:51:07.2887149Z # fail 0
+2026-11-06T04:51:07.2887419Z # cancelled 0
+2026-11-06T04:51:07.2887600Z # skipped 0
+2026-11-06T04:51:07.2887786Z # todo 0
+2026-11-06T04:51:07.2887964Z # duration_ms 5124.581897
+2026-11-06T04:51:07.3061512Z Post job cleanup.
+2026-11-06T04:51:07.4068640Z (node:2549) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-06T04:51:07.4069634Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-06T04:51:07.4072604Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-29e8df1000e51945714e041d6645ab76ddbc76f09a37106f0d05fa371aa7b5e8, not saving cache.
+2026-11-06T04:51:07.4212922Z Post job cleanup.
+2026-11-06T04:51:07.4955977Z [command]/usr/bin/git version
+2026-11-06T04:51:07.4996620Z git version 2.56.0
+2026-11-06T04:51:07.5026982Z Temporarily overriding HOME='/home/runner/work/_temp/bf8436e4-0688-48b1-97fb-a92c3ce53507' before making global git config changes
+2026-11-06T04:51:07.5028293Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-06T04:51:07.5032037Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Mgeorge/Mgeorge
+2026-11-06T04:51:07.5072736Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T04:51:07.5108639Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T04:51:07.5381807Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T04:51:07.5428999Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T04:51:07.5702732Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T04:51:07.5732001Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T04:51:07.6100517Z Cleaning up orphan processes
+2026-11-06T04:51:07.6420771Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

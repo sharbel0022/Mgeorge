@@ -1,0 +1,1148 @@
+{
+  "kind": "later_sanitized_API_readback_not_original_receipt",
+  "retrievedAt": "2026-11-06T05:41:50.068Z",
+  "source": "https://api.github.com/repos/sharbel0022/Mgeorge/git/trees/8863fc76cd9cf291ecc8648a9b6bf22f7127a4d1",
+  "sha": "8863fc76cd9cf291ecc8648a9b6bf22f7127a4d1",
+  "truncated": false,
+  "tree": [
+    {
+      "path": "PLAN.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "f88ccacc78e822e752678e32ad68fc34cc1b615a",
+      "size": 8662
+    },
+    {
+      "path": "a19-parser-regression",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "6d4b2c04fdd4506bde64f1ff9bf43fd7e8103801"
+    },
+    {
+      "path": "area28-33-independent-read-review.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "67c7587e26be02aa14769f1529b764faf653ba66",
+      "size": 1721
+    },
+    {
+      "path": "area28-33-independent-read-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5dc2ca7554258bd5297daa03ac046414c0fbf2ad",
+      "size": 5491
+    },
+    {
+      "path": "assessment-independent-candidate.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "1e35665c09c87da677289696c08d892c34ab1d59",
+      "size": 48218
+    },
+    {
+      "path": "assessment-independent-candidate.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "06062864de77fec50c7df073adf92bc56f3e0d73",
+      "size": 12432
+    },
+    {
+      "path": "backup-2026-11-06-final-pass",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "119372dedbc924d0d9030a3644d9d675bc10a851"
+    },
+    {
+      "path": "backup-2026-11-06-resume-observations.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7438b377376f9adba3c2a49da66d821b873a24ad",
+      "size": 15877
+    },
+    {
+      "path": "backup-2026-11-06-resume-report.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "65fa920f87252e6aee5ca58e128e07bb5e5a53af",
+      "size": 2463
+    },
+    {
+      "path": "bank-account-usage-diagnosis.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "a1af154eae4051553b2f83ba5e206a03b3e0649d",
+      "size": 13096
+    },
+    {
+      "path": "bank-account-usage-diagnosis.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b65865c022c90ee2fa64f22d189a79b5d2ab6f0c",
+      "size": 10318
+    },
+    {
+      "path": "bank-details-failure-projection-independent",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "f75acddb53675953e524b978aaab837c7fb76da9"
+    },
+    {
+      "path": "bank-details-failure-projection-integration.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "eb8f981404821de243e10f87ca2e51684842bee9",
+      "size": 1438
+    },
+    {
+      "path": "bank-details-failure-projection",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "da492163f777d95de7a9c6a13159c9c208a518d9"
+    },
+    {
+      "path": "bank-details-identity-i1",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "2b4a68806c7c995d74003ccac824a4eed241e92e"
+    },
+    {
+      "path": "bank-details-independent-recheck",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "ffe50553daf215c00b573e1e0bca68272a345fb2"
+    },
+    {
+      "path": "bank-harness-independent-review",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "0725b0cb05ac0d6e65baa2fb7d135e83c4264eb7"
+    },
+    {
+      "path": "bank-harness-memory-fix",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "0c4de872a9056cc7b4a6d6c87849fc4a780fdd28"
+    },
+    {
+      "path": "bank-null-usage-details-design.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "9c6599d543176762fa6f5a0da821f70a0f4ed362",
+      "size": 9638
+    },
+    {
+      "path": "bank-null-usage-details-evidence.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "630590480d1e8db40107e8bf24209f3c44785237",
+      "size": 41752
+    },
+    {
+      "path": "bank-null-usage-details-evidence.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "587d6d517db164b471328bf2f4bff89114777ab4",
+      "size": 9211
+    },
+    {
+      "path": "bank-null-usage-details-ledger.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "36584f6625d9028d9e2e956aef5576d1d3f02453",
+      "size": 2481
+    },
+    {
+      "path": "bank-null-usage-details-plan.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "f2cae65760ee9d87c109309490ea03d581f6503d",
+      "size": 5995
+    },
+    {
+      "path": "bank-null-usage-details-red.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5d5d1c0649a2dada740bd661117e634e61a17374",
+      "size": 2014
+    },
+    {
+      "path": "bank-scope-diagnostic-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "1a25f8142c17da578e695abfb763e4846de11243",
+      "size": 5616
+    },
+    {
+      "path": "bank-usage-diagnostic-implementation.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ea751238e70dd873e59724109a8a52d873de452e",
+      "size": 33985
+    },
+    {
+      "path": "bank-usage-diagnostic-implementation.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "92224f57b8e742469591fcab934aecf191aea4fe",
+      "size": 7973
+    },
+    {
+      "path": "bank-usage-diagnostic-review",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "7b08d364556067df69989a34b455612e316bf2ad"
+    },
+    {
+      "path": "browser-wave2",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "6fc0ec03f068895e62826eb1b5b25d553559836d"
+    },
+    {
+      "path": "cloud-ocr-schedule-read-diagnosis.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ba169ec19298d2a7da76b103f7bb21f8f79f063d",
+      "size": 23432
+    },
+    {
+      "path": "cloud-ocr-schedule-read-diagnosis.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "aaf26c284ceaeaa146a936deddd1eee28ddf50fd",
+      "size": 5907
+    },
+    {
+      "path": "current-33-assessment.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e56623f3ae44215dcfaf97ae5c90b4e6a9eb0881",
+      "size": 27441
+    },
+    {
+      "path": "document-retry-mcp-before.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "d3eda962134ba732811d90fac1a09ed9e10aa827",
+      "size": 19915
+    },
+    {
+      "path": "document-retry-mcp-independent-review.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "a1461b263cb53416beb6bb893b7c7e5577c053a4",
+      "size": 17258
+    },
+    {
+      "path": "document-retry-mcp-verification.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c5dbb2c9f33305111638dce99f2c7f1190d12ce0",
+      "size": 36167
+    },
+    {
+      "path": "document-retry-wave4-integration.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "855ca99166ac63c7a7ab6fdd51b7566bcc63e51f",
+      "size": 33250
+    },
+    {
+      "path": "documents-evidence.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "0098ef613a29a4e8172a69917dd491b66aab2c25",
+      "size": 11970
+    },
+    {
+      "path": "documents-identity-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "545ae6a875eafada907b8ca19330f0b3ff6c0139",
+      "size": 5817
+    },
+    {
+      "path": "documents-measurements.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "9576f075ea65e62f576ee89a41dbe5e8931c43c2",
+      "size": 114234
+    },
+    {
+      "path": "documents-word-confidence-followup.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "f1d2d395ab1a282d473757fbbe5303c8bf0a3dbe",
+      "size": 1797
+    },
+    {
+      "path": "documents-word-confidence-measurements.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "086dda79dc1f91d3e27e587b12ae5076680c8112",
+      "size": 676466
+    },
+    {
+      "path": "documents-word-confidence.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c7ff980d63f7b5670228ff49a6af771510fc3c36",
+      "size": 14614
+    },
+    {
+      "path": "existing-document-candidate-observation.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "57f88cb75da6fc5f0c919cd237e608a030c44e9c",
+      "size": 3040
+    },
+    {
+      "path": "integration-review-wave1.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "895a864ff2f840d8a21041d58d4c3757d122aee4",
+      "size": 7161
+    },
+    {
+      "path": "integration-review-wave2.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "95d9372a80c1d1cae6b0bae6f87df7b02f437743",
+      "size": 14243
+    },
+    {
+      "path": "integration-review-wave3.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "2889129f94adcc5b8ac46be35590176ab31460df",
+      "size": 5765
+    },
+    {
+      "path": "invoice-candidates-ci-fixture-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "03a9c27192811c84cd34cfd4f5c7e62ef7aaf40b",
+      "size": 5156
+    },
+    {
+      "path": "manual-multiple-design.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7d5d4ce20f1361ea8852c4c9fbeb116443f62893",
+      "size": 5017
+    },
+    {
+      "path": "manual-multiple-evidence.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8420316afca1657413aeb0f16bc94629fccc90f6",
+      "size": 14044
+    },
+    {
+      "path": "manual-multiple-independent-review.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "a397a049247c7c56d60732ecb83669650de09b08",
+      "size": 2353
+    },
+    {
+      "path": "manual-multiple-independent-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "4589f39695c25134ce3b194a075cc7e568cdad5d",
+      "size": 7206
+    },
+    {
+      "path": "manual-multiple-measurement.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "55cfb5671a4beffe17233aab0e446622ea2426ba",
+      "size": 1480
+    },
+    {
+      "path": "minimal-handling-area6-read-precision.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5c5ba654a31be9d8942cd3ff97c67ac2b051ee31",
+      "size": 3285
+    },
+    {
+      "path": "minimal-handling-area6-read-precision.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "980848a649895045e9d7be6f2a2234653259ba74",
+      "size": 6340
+    },
+    {
+      "path": "multiple-invoice-existing-path-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "728b0e8c46bd1ceb498a6ead2981c5dce9253dc3",
+      "size": 10912
+    },
+    {
+      "path": "ocr-bankgiro-frozen-probe.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "35691e3e569c78c914555a6a479ff1163c882b9c",
+      "size": 45548
+    },
+    {
+      "path": "ocr-explicit-layout-design.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ba608025a0ed8043d4e7632c30676700fb946c73",
+      "size": 6974
+    },
+    {
+      "path": "ocr-explicit-layout-independent-final.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "3389514ba4319c8307506c3a57bfc686f5d29c1b",
+      "size": 2386
+    },
+    {
+      "path": "ocr-explicit-layout-independent-final.txt",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5f0456819fca9b18e46743d772018a887b1edce1",
+      "size": 199857
+    },
+    {
+      "path": "ocr-explicit-layout-independent-inline-before.txt",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c42686f9edcfca3e23f388f775dc8ed14db9d881",
+      "size": 10338
+    },
+    {
+      "path": "ocr-explicit-layout-independent-not-ready.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8417f349f5e14d3567d73cf4a364641de7f8092b",
+      "size": 4768
+    },
+    {
+      "path": "ocr-explicit-layout-independent-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "8d4dcdba13638bda7d4c61640c9c5b3ebc5626ec",
+      "size": 9707
+    },
+    {
+      "path": "ocr-explicit-layout-known-regression-report.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "00c522f3d66653ededbfb1cb6e650e7548f5bb61",
+      "size": 8372
+    },
+    {
+      "path": "ocr-explicit-layout-known-regression.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "a336f12ce39c67406eb303335575b28291e0ac40",
+      "size": 227057
+    },
+    {
+      "path": "ocr-explicit-layout-optical-deviation.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "93c045c6bf69c854a948b1d3903cbcff287d5df9",
+      "size": 2259
+    },
+    {
+      "path": "ocr-explicit-layout-review-artifacts.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "4a41a962141ac497b6a3b44d44348ee1514d5284",
+      "size": 1080
+    },
+    {
+      "path": "ocr-explicit-layout-validation.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e21cad06492f1b1e82b6cbfa964f4bc068eca81c",
+      "size": 5416
+    },
+    {
+      "path": "ocr-explicit-role-boundary-review-fix.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "cbd82d4b3b7d741851f2cdd3218aadc17db7dde4",
+      "size": 20577
+    },
+    {
+      "path": "ocr-explicit-role-boundary-review-fix.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5a8e0d36c87246fda6cdaef7377604794223bec8",
+      "size": 3096
+    },
+    {
+      "path": "ocr-field-a19-baseline-note.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "14668f74f5741af8733c4085503d0bfaadd12f9c",
+      "size": 1646
+    },
+    {
+      "path": "ocr-field-a19-baseline.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "821b0100ddbbd8f736e0190992f748efc2c01074",
+      "size": 885528
+    },
+    {
+      "path": "ocr-independent-code-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "efd06b81b7a56bec012982adebd84d2bf6c70757",
+      "size": 10124
+    },
+    {
+      "path": "ocr-independent-holdout-report.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "2a33ea9bae292b6460e7b2d9d9a43934dff6527b",
+      "size": 13606
+    },
+    {
+      "path": "ocr-independent-holdout-result.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ee396fd5b7e6971bb0f6d2ab1c06db3f515b64be",
+      "size": 372192
+    },
+    {
+      "path": "ocr-independent-holdout-v2-report.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b22e08f287d7d9f607a838283a02f4c0bd506f83",
+      "size": 15636
+    },
+    {
+      "path": "ocr-independent-holdout-v2-result.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "dd31aa57c989ea97a3ac273037d94890bfe4612e",
+      "size": 428576
+    },
+    {
+      "path": "ocr-independent-holdout-v2-source-binding.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7fccdccf33f86256605ba106b278c269bfddfaef",
+      "size": 25712
+    },
+    {
+      "path": "ocr-independent-review-arithmetic.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "d2c390b11a29a6104fb41d19811b10d15fe4c479",
+      "size": 2220
+    },
+    {
+      "path": "ocr-layout-cross-axis-review.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "25faf39bae2a9f8f106eb4f6c4e401564664f8e3",
+      "size": 4534
+    },
+    {
+      "path": "ocr-layout-regression-report.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b576bacd266fa2a9ba35779cb7ed37ca9fc6452c",
+      "size": 10963
+    },
+    {
+      "path": "ocr-layout-regression-result.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "061c2d8d218417514e29640a720dd6e9cc353143",
+      "size": 362103
+    },
+    {
+      "path": "ocr-layout-reparse-report.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "3a62801829eed0445dfab89099f376add8185cdf",
+      "size": 5792
+    },
+    {
+      "path": "ocr-layout-reparse-result.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "02b84b0c0d1f41634d70f560f6794567c14ca4dd",
+      "size": 365403
+    },
+    {
+      "path": "ocr-layout-table-census-review-fix.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "45723f078d8d0fc95b1665e0fec235d5e3526138",
+      "size": 12793
+    },
+    {
+      "path": "ocr-layout-table-census-review-fix.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e8ca5b94effcd465693edeb479e2a0550e7a32b3",
+      "size": 3595
+    },
+    {
+      "path": "ocr-main-ref-review-fix.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "cefe6b07f6aa2e1d1e4139199b9a878c558cbd79",
+      "size": 4013
+    },
+    {
+      "path": "ocr-organization-inline-contract-before.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7d5c0ad59765c910400c71e76d2bde0926b5cca1",
+      "size": 7742
+    },
+    {
+      "path": "ocr-organization-inline-draft-before.txt",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "a36e7b287130f143ff34d5c623f563def2478447",
+      "size": 85512
+    },
+    {
+      "path": "ocr-organization-inline-final-gate.txt",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "dd6b703dcd500dee5c0957e7f95bff095e17a925",
+      "size": 82300
+    },
+    {
+      "path": "ocr-organization-inline-final.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ff80ef630c4c86798901c54af599216af4daafdd",
+      "size": 34295
+    },
+    {
+      "path": "ocr-organization-inline-final.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "94c89c59174509827ed95ad6a8e0773b15a9ca2b",
+      "size": 4772
+    },
+    {
+      "path": "ocr-organization-owner-before.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b25a41041c3a9a478fc2a1a8421b062eefc2eef7",
+      "size": 48551
+    },
+    {
+      "path": "ocr-organization-owner-review-fix.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e6dfe728edee63707b858dd23034149494a023e6",
+      "size": 26746
+    },
+    {
+      "path": "ocr-organization-owner-review-fix.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ffb836f8614551fa009cc921a4f363efee35ac63",
+      "size": 4139
+    },
+    {
+      "path": "ocr-periodic-20261106",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "97783e49af8203ff603df782ad9e918860dd4049"
+    },
+    {
+      "path": "ocr-schedule-followup-20261106-0225",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "f5378f432870ec9d2cd14cfc509f801edf933f91"
+    },
+    {
+      "path": "ocr-schedule-independent-public-api.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "ef4b47ce6049543aae7171fd2485332df9feda86",
+      "size": 479844
+    },
+    {
+      "path": "ocr-schedule-independent-read-diagnosis.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "108edb38914c717666bafbe42c0a431044dd62e7",
+      "size": 5552
+    },
+    {
+      "path": "ocr-schedule-independent-read-seal.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "bb31d294118b136724bfa452764d32ca9cfb2e84",
+      "size": 572
+    },
+    {
+      "path": "ocr-v2-explicit-grammar-diagnosis.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "53478d8dd54ce453973c14cb7b03810c3044c48d",
+      "size": 7238
+    },
+    {
+      "path": "ocr-v2-grammar-followup-independent-review.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "9fc8fc0128164720028388a14461f856f8e19219",
+      "size": 43435
+    },
+    {
+      "path": "ocr-v2-grammar-followup-independent-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "959af31f658b482dc20119a5fc3d44949c178547",
+      "size": 4864
+    },
+    {
+      "path": "ocr-v2-grammar-independent-review.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "70f7272d7b475f3b734abc07c4edb89809e3cd20",
+      "size": 42018
+    },
+    {
+      "path": "ocr-v2-grammar-independent-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "70f75ab4811e17a337cfc86f903f8d9b4ba751cd",
+      "size": 7470
+    },
+    {
+      "path": "ocr-v2-grammar-review-fix.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e1cfc19a66b0875d8e61a1baaf3f9c8604644b7d",
+      "size": 14990
+    },
+    {
+      "path": "ocr-v2-grammar-review-fix.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "0c172da977c717495dc6e1960c876ccc0c43dfb6",
+      "size": 5866
+    },
+    {
+      "path": "ocr-v2-post-holdout-diagnostic",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "1672273979cf03409d4295e262934ab5db0d9c28"
+    },
+    {
+      "path": "ocr-v2-psm6-diagnostic",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "8fa2ab56e5697ade2f36b1b1ac2a222e4f85bf97"
+    },
+    {
+      "path": "ocr-v2-stored-text-reparse-report.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7d172dd01dffbf72e335df892c54e0da3bddd4d5",
+      "size": 1562
+    },
+    {
+      "path": "ocr-v2-stored-text-reparse-result.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "089cf948e54edc14cfafeb4379a35a9890f529b6",
+      "size": 390738
+    },
+    {
+      "path": "operations-evidence.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7b963018fbeb358338200c40443e190d0b964a32",
+      "size": 7964
+    },
+    {
+      "path": "overview-evidence-independent-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "72b58809f98e046319d7bed3fd1ca52d40ea2c6c",
+      "size": 9827
+    },
+    {
+      "path": "overview-projection-independent-performance.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "99f3cae76fa8aa2ddbd8f3e8ec706e44db6af19a",
+      "size": 7712
+    },
+    {
+      "path": "parser-repair-independent-review",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "273e906b0e2ce2a83539902d5a96197c676cd4ba"
+    },
+    {
+      "path": "party-boundary-independent",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "1100e0577981b3ef93600a49d4dc8489a140ea17"
+    },
+    {
+      "path": "party-boundary-integration",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "f552994c5f9eadf34961b8c84eb2e3ba2ad16338"
+    },
+    {
+      "path": "party-boundary-repair",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "23af1b732e4b1c6e14ca49dfdfea32af239896a7"
+    },
+    {
+      "path": "payer-reference-live-evidence-reassessment.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "5fbd11f1e741780f7a6a5ce0825d61e152e11805",
+      "size": 4678
+    },
+    {
+      "path": "payment-acceptance-measurement.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "117a696a778dbff2dd12b5bb4919bb7b011a769f",
+      "size": 10120
+    },
+    {
+      "path": "payment-presentation-review-22dc.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "6f55ae8c8ec380067dcf6dbe37ac55afa75f2096",
+      "size": 4174
+    },
+    {
+      "path": "payment-presentation-review-d59.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e9a8b20593cdb75bac10248866fad6fa21895b8d",
+      "size": 4686
+    },
+    {
+      "path": "payments-evidence.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "abc34ff088cb754c325824b5677885b0f329de14",
+      "size": 10769
+    },
+    {
+      "path": "payments-review-followup.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "a9075712f2ce9e05eb50618bd7475d24cf93be8d",
+      "size": 4308
+    },
+    {
+      "path": "recovery-evidence.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "994c7bee279c79d70661a87c21c9130d0c6e6353",
+      "size": 14617
+    },
+    {
+      "path": "recovery-evidence.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "31b371c2b37f8417bd9eae3c22fd69dafb758905",
+      "size": 11376
+    },
+    {
+      "path": "recovery-integration-rerun.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "687056b94c9ed25175b3efbefd33da8674448fe4",
+      "size": 6674
+    },
+    {
+      "path": "release-wave1.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "835b1161f8968855cfbe0b3e4a4c62118fc27a2b",
+      "size": 8157
+    },
+    {
+      "path": "release-wave1.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "83c22d57018d522dd67dec2f676f01ca2f5518d4",
+      "size": 10754
+    },
+    {
+      "path": "release-wave2.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "312607bd00217a5fa3320233548323b2bd24ae5a",
+      "size": 5248
+    },
+    {
+      "path": "release-wave2.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "d21bee83123a3cd842ba1ec0ba414c8c5ad79a74",
+      "size": 6747
+    },
+    {
+      "path": "release-wave3.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "d15ba7eaa480b684b4d96144728cd03b9999e0e7",
+      "size": 5302
+    },
+    {
+      "path": "release-wave3.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "50e613a3706debf5e114ff1343bce31857fd52ab",
+      "size": 5791
+    },
+    {
+      "path": "release-wave4.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "167f56d792e6a1861e56e093dfa94649aff50dcc",
+      "size": 4431
+    },
+    {
+      "path": "release-wave4.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e5282952715661161b1f1582ec32f613b09635d0",
+      "size": 6821
+    },
+    {
+      "path": "schedule-runtime-followup-20261106-0119.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "67d93b2122ac88634e7da42d27d98bd1c328c194",
+      "size": 5440
+    },
+    {
+      "path": "schedule-runtime-followup-20261106-0232.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "2d139b3197330d42193dd6a95b080ed3945fe7f2",
+      "size": 8739
+    },
+    {
+      "path": "schedule-runtime-observations-20261106.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "0f7ece7bd2575c41da3a755f530261cf3cbf6287",
+      "size": 14567
+    },
+    {
+      "path": "search-focus-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "462bdcf177e5adc4aeec45f682f3b941f5ed7e1d",
+      "size": 1953
+    },
+    {
+      "path": "search-measurement.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "03398bd1b100c74c5a2c7c28c8a4849615dac989",
+      "size": 6684
+    },
+    {
+      "path": "search-review-followup-measurement.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "b7e2958e387f6c80b2934ef7efcba2ab79b91825",
+      "size": 8183
+    },
+    {
+      "path": "site64-independent-read-review.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "9087547d49d9c076267704ba1119716e2850bb2a",
+      "size": 6512
+    },
+    {
+      "path": "site64-independent-read-review.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c61793d1930756779ed801ccf92c7d6dcde80765",
+      "size": 4468
+    },
+    {
+      "path": "wave2-postpublication-observations.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "eb3068efb6bef67d8ab3b51da9aef5995125e046",
+      "size": 11136
+    },
+    {
+      "path": "wave2-prepublication-observations.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "33cee0914379cdc9877b2eccf7b5ea38803925a2",
+      "size": 3627
+    },
+    {
+      "path": "wave3-postpublication-observations.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "31d2c0bb3fdfd7cae06dd34688acddef667f6e3f",
+      "size": 12183
+    },
+    {
+      "path": "wave3-source-history.bundle",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "dcd4d1f5973e4a9d407b93fbcdea9917ae9c1fb6",
+      "size": 1327011
+    },
+    {
+      "path": "wave3-source-history.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "22f65a0d563bc4b7e0a655f0a041ae710beaaa3f",
+      "size": 1638
+    },
+    {
+      "path": "wave4-final-pr-ci",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "a42b594f78996fa42a41d5282141fabac7ace904"
+    },
+    {
+      "path": "wave4-initial-ci",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "059fcfff4ef4d3c46aaa5445251b0a1575cc7d33"
+    },
+    {
+      "path": "wave4-invoice-release-readiness.md",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e1ada6a608c7933b72b25655658c9d187bc6812d",
+      "size": 9812
+    },
+    {
+      "path": "wave4-main-ci",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "db5b4dbf570e36bff944ad1ccdf29a79b81af8ae"
+    },
+    {
+      "path": "wave4-party-boundary-source-history.bundle",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e2115ccacd91db0ec81b69d3e7181b4c6fb4c1ab",
+      "size": 72836
+    },
+    {
+      "path": "wave4-party-boundary-source-history.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "000afc4f16181786014ac2979ee9b8a78d9b4115",
+      "size": 624
+    },
+    {
+      "path": "wave4-postpublication-observations.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "e2957fe012ed05cc21ff28550ae367214d1e3580",
+      "size": 28351
+    },
+    {
+      "path": "wave4-repair-local-checks",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "5b6c0e46e9bc5d0f518378a8fd470544ad5cd3eb"
+    },
+    {
+      "path": "wave4-repair-source-history.bundle",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "c5e3d97ca0bf0d8a9c11b12c9b0ea1dc88d685cc",
+      "size": 7159759
+    },
+    {
+      "path": "wave4-repair-source-history.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "079e6c51e24ef5bd56992d2b1679ab2d1548b761",
+      "size": 1833
+    },
+    {
+      "path": "wave4-review-assembly-audit.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "25d842254c8b2e7fb0b22785df4d8303f9d5ba33",
+      "size": 2471
+    },
+    {
+      "path": "wave4-reviewed-repair-integration.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "0cc9259053ad36b215f7daa09c82e68f14dd1729",
+      "size": 1513
+    },
+    {
+      "path": "wave4-second-ci",
+      "type": "tree",
+      "mode": "040000",
+      "sha": "93b05760f05659ddb24ac7241ead481593ed8b12"
+    },
+    {
+      "path": "wave4-source-history.bundle",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "1b3a3153ed5333307c21a6fdc46a8282d8845e32",
+      "size": 6416950
+    },
+    {
+      "path": "wave4-source-history.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "083c8abe716a8ee013911c717c7ee6596d68fdbc",
+      "size": 2604
+    },
+    {
+      "path": "wave4-third-native-preparation.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "7d9a20d5832ad53a481165844b832dd56a63293b",
+      "size": 1011
+    },
+    {
+      "path": "wave5-bank-failure-source-history.bundle",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "1f68c904cc12045f068a8221b083291eb0e79b80",
+      "size": 35659
+    },
+    {
+      "path": "wave5-bank-failure-source-history.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "628e944a0430983311cb652b472a9d5100903084",
+      "size": 517
+    },
+    {
+      "path": "wave5-native-preparation.json",
+      "type": "blob",
+      "mode": "100644",
+      "sha": "64d95bfe2f46e730029c3c775d45cee45b34438a",
+      "size": 779
+    }
+  ]
+}

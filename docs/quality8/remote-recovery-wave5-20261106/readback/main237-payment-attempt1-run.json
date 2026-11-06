@@ -1,0 +1,22 @@
+{
+  "kind": "later_sanitized_API_readback_not_original_receipt",
+  "retrievedAt": "2026-11-06T05:38:31.416Z",
+  "source": "https://api.github.com/repos/sharbel0022/Mgeorge/actions/runs/42164894222/attempts/1",
+  "run": {
+    "id": 42164894222,
+    "name": "Payment control checks",
+    "path": ".github/workflows/payment-control-ci.yml",
+    "workflow_id": 398864112,
+    "run_number": 267,
+    "run_attempt": 1,
+    "head_branch": "main",
+    "head_sha": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "failure",
+    "created_at": "2026-11-06T04:50:51Z",
+    "run_started_at": "2026-11-06T04:50:51Z",
+    "updated_at": "2026-11-06T04:55:55Z",
+    "html_url": "https://github.com/sharbel0022/Mgeorge/actions/runs/42164894222"
+  }
+}

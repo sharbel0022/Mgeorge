@@ -1,0 +1,238 @@
+{
+  "schema": 1,
+  "kind": "new_recovery_file_manifest_not_original_archive_manifest",
+  "generatedAt": "2026-11-06T05:48:19.544Z",
+  "repository": "sharbel0022/Mgeorge",
+  "prefix": "docs/quality8/remote-recovery-wave5-20261106",
+  "base_commit": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+  "excludes": [
+    "file-manifest.json",
+    "SHA256SUMS"
+  ],
+  "files": [
+    {
+      "path": "ci-summary.json",
+      "bytes": 52177,
+      "sha256": "15359812b6a655230e527a67b730d50333e05fe63a848b6b232109e56298a22f",
+      "git_blob_sha": "cf0a5b5f02f85ddc8cc3bdde9245521e5d77ad04",
+      "kind": "new_recovery_metadata",
+      "original_hash_matched": false
+    },
+    {
+      "path": "hash-verification.json",
+      "bytes": 4823,
+      "sha256": "cdf619725578a0e8a32d406bb9d12e00f9e3369f8d07f7defa90919da1806746",
+      "git_blob_sha": "254411f2d10a8946484c5a56616ad322c4ebf711",
+      "kind": "new_recovery_metadata",
+      "original_hash_matched": false
+    },
+    {
+      "path": "main237/failure-blocks.log",
+      "bytes": 1055,
+      "sha256": "41e3e819aab3a361966786b391b51e59e991eb49eef92b9c0703ed4e059cfde5",
+      "git_blob_sha": "a6e4e1ab12131c3c2cddd8fb4b4b381cf26875a7",
+      "kind": "recovered_original_failure_block",
+      "original_hash_matched": true
+    },
+    {
+      "path": "main237/logs/bankgiro-bridge-127718950439.log",
+      "bytes": 35874,
+      "sha256": "0076554ed7436e097c394c3786b7baee4e366aedb68f3e09ec5eaed66f7510bf",
+      "git_blob_sha": "0ec471310e8c96e2c6cce24079bd8d56a78b3d61",
+      "kind": "recovered_original_raw_log",
+      "original_hash_matched": true
+    },
+    {
+      "path": "main237/logs/node-127718950721.log",
+      "bytes": 990392,
+      "sha256": "d74130255608a0ee26ffe7876a3fc49255b0a1013b8ae7f68ee6b2fc6baaabf2",
+      "git_blob_sha": "69f075ce5fa058be03a17f0ee97ebec19351f6ff",
+      "kind": "recovered_original_raw_log",
+      "original_hash_matched": true
+    },
+    {
+      "path": "main237/logs/sites-127718950716.log",
+      "bytes": 2248221,
+      "sha256": "15a567a7e40045c3e516cc471a6bc30db0939526e611e3660410af208c6aa281",
+      "git_blob_sha": "414fdabf6e36e55b5b0b808cac620829d73a2312",
+      "kind": "recovered_original_raw_log",
+      "original_hash_matched": true
+    },
+    {
+      "path": "original-reference-hashes.json",
+      "bytes": 1830,
+      "sha256": "75a54b356ea38dcd8eeacf3046f376ad911447f5ebb12d8d74621dee29d8d4f7",
+      "git_blob_sha": "a208afcaae1cf3b762f02d5ac7078446c956e88b",
+      "kind": "new_recovery_metadata",
+      "original_hash_matched": false
+    },
+    {
+      "path": "pinned-source/payment-control-ci.yml",
+      "bytes": 3078,
+      "sha256": "fda1e1e17ace428c580124df362e6a038746b957e22be12295af56188f21d986",
+      "git_blob_sha": "093737d0fcc940b8876a179b0f5e4303dd30abc9",
+      "kind": "pinned_workflow_source",
+      "original_hash_matched": false
+    },
+    {
+      "path": "pinned-source/saas-security-acceptance.yml",
+      "bytes": 1429,
+      "sha256": "8968081569e21e722d7518e0bfa070e18fb607d37668dad3c77684463c59617b",
+      "git_blob_sha": "3c8fbd5aa04c982c7c05003515bb1ee865d0c646",
+      "kind": "pinned_workflow_source",
+      "original_hash_matched": false
+    },
+    {
+      "path": "pr59/logs/bankgiro-bridge-127715892162.log",
+      "bytes": 36942,
+      "sha256": "7b4e701d1b0ab649880b6b02b21c87a8e533a7b445a68e6e23b151f115597609",
+      "git_blob_sha": "de1ec1c8d5cb0adbbbae6c14fd95109b0121a5bf",
+      "kind": "recovered_original_raw_log",
+      "original_hash_matched": true
+    },
+    {
+      "path": "pr59/logs/node-127715892273.log",
+      "bytes": 990595,
+      "sha256": "79125785a2536e045299b8a865da3c443818b6904a8e4f038bab35aaf3b3c030",
+      "git_blob_sha": "be984fe8b40d16876d21f389e9adbd8d7a7d2952",
+      "kind": "recovered_original_raw_log",
+      "original_hash_matched": true
+    },
+    {
+      "path": "pr59/logs/saas-127715891963.log",
+      "bytes": 19435,
+      "sha256": "b38278deb4a29af3eb1ac129a871b34f6827b51050e873f03868ee69ad91ee9d",
+      "git_blob_sha": "76fc9468ac9bdf814de543674700845c740f2fdc",
+      "kind": "recovered_original_raw_log",
+      "original_hash_matched": true
+    },
+    {
+      "path": "pr59/logs/sites-127715892368.log",
+      "bytes": 2252256,
+      "sha256": "6bf776e089ad6a8ae6f5a4dee6779879ceb97b0e36b537ce2c288fb49d4d42d3",
+      "git_blob_sha": "3499055093c66951bd4381afc597f6b0b96d51a2",
+      "kind": "recovered_original_raw_log",
+      "original_hash_matched": true
+    },
+    {
+      "path": "readback/base-docs-tree.json",
+      "bytes": 19520,
+      "sha256": "b3ba8be52b240a1bf547ccbbc56b71f0c335c1d3c5a829bce892064606b5eb38",
+      "git_blob_sha": "bee1c99371c347a07a3f5f840a161efce4c0aa4e",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/base-main237-commit.json",
+      "bytes": 450,
+      "sha256": "5b158d2324d65853198a23d6456670fc281dae0f2af8a93ea94ddf7aed61ac38",
+      "git_blob_sha": "697d8549cd56698380c22700b33c0428ee785eba",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/base-quality8-tree.json",
+      "bytes": 30765,
+      "sha256": "600380967c2bb86174a8dde45bc990c0da69e3e0c43d17e8732110816c95ba16",
+      "git_blob_sha": "e8cddc0f2b90b4cf0f68591a3bbbe331219cb66e",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/base-root-tree.json",
+      "bytes": 3359,
+      "sha256": "3af4d9f780cfb69e6ed07cbac311a2ad5350a615eb4c32ba034ea19fa0489986",
+      "git_blob_sha": "dc02f0d8c25b7d5133b6a2f82adb8391ed02d502",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/main237-payment-attempt1-jobs.json",
+      "bytes": 10871,
+      "sha256": "1c70ef6e5afcc5d5fbb4670250f85005dd643f026ea7aab7ed04bfa365810b52",
+      "git_blob_sha": "05d3d83b249099a517c849b3421d9934beea7546",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/main237-payment-attempt1-run.json",
+      "bytes": 795,
+      "sha256": "e8981dfb03a5a4b2748fcdc2ffa33f41c03f3f4058630c887ef9a5eaf1bad139",
+      "git_blob_sha": "79bd3a9b7da3a3ad2f9d0eb5867fbdc67e2eee75",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/pinned-workflows.json",
+      "bytes": 827,
+      "sha256": "1a3b3d5397ffe2a11c1fa3de322e0b044e5ed8b84261832f63aa3cadbe6ce45e",
+      "git_blob_sha": "75c6970b5f27687c500ee182919abe48f6314018",
+      "kind": "later_pinned_source_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/pr59-checkout-commit.json",
+      "bytes": 450,
+      "sha256": "174a228766682a4b62e80d8af7cb171d5bebe0c61fd451c8216998dd57b77618",
+      "git_blob_sha": "2f7da2cbdbd60e78c0452d6c85d50b3e4e1d2c88",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/pr59-head-commit.json",
+      "bytes": 402,
+      "sha256": "1741bc7a235bbd0e62af06b482842c895182420d2750d7b8ec55d2e30437aeaf",
+      "git_blob_sha": "4028ea804fb393a5b60bb6bb8b274273f32d592b",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/pr59-payment-attempt1-jobs.json",
+      "bytes": 10871,
+      "sha256": "0dbfb97c71a77bc0e94d858668e6e11da2076b71cb010dd7f51f6f5c3d85cefc",
+      "git_blob_sha": "5cf32e3540afeb6685e72ae87353992da3756673",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/pr59-payment-attempt1-run.json",
+      "bytes": 847,
+      "sha256": "5645150ebe7a3736238c4b360b5bed21f00ffa57fe164affb88bf4b2c23c114e",
+      "git_blob_sha": "4285bcf2ba099c299e34acd6cddfc3c39bd73819",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/pr59-saas-attempt1-jobs.json",
+      "bytes": 3490,
+      "sha256": "03283c85b8d907227985a57ac996614cd9ee8ee869e1869216976d4b71f34aef",
+      "git_blob_sha": "f5c339e55aeee02c29c308618801581a6a550cbf",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "readback/pr59-saas-attempt1-run.json",
+      "bytes": 854,
+      "sha256": "7cd7104214b2f49b42cc075f4616f430d2b136a76aaaef3b9941c7a09f83b4d6",
+      "git_blob_sha": "8605b3abceb2fcd747aa2e4fba06dba9e9b1c338",
+      "kind": "later_sanitized_API_readback",
+      "original_hash_matched": false
+    },
+    {
+      "path": "README.md",
+      "bytes": 5126,
+      "sha256": "696662bd1f23993bc15d1437f7e2e0dc9893d168c1e562186eeb60c20e788921",
+      "git_blob_sha": "fce598758f3d3baadfe5cc93e18d74fce4fb09d5",
+      "kind": "new_recovery_report",
+      "original_hash_matched": false
+    },
+    {
+      "path": "recovery-inventory.json",
+      "bytes": 6989,
+      "sha256": "2485cf333d2207c0c3344070f809c30f1df2af1c49b6b24be533dbbff12fab43",
+      "git_blob_sha": "44b736d58ac7d881983d90e7be54399f1d0c3ca0",
+      "kind": "new_recovery_metadata",
+      "original_hash_matched": false
+    }
+  ]
+}

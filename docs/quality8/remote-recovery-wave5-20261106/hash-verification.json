@@ -1,0 +1,124 @@
+{
+  "kind": "new_recovery_integrity_evidence",
+  "generatedAt": "2026-11-06T05:47:41.891Z",
+  "methods": [
+    "Strict UTF-8 encoding",
+    "SHA-256 original anchor comparison",
+    "Git blob SHA-1 (blob <byte-length> followed by NUL and raw bytes)",
+    "Full GitHub blob readback with exact byte comparison"
+  ],
+  "pure_js_validation": {
+    "validatedAt": "2026-11-06T05:34:45.273Z",
+    "knownVectorsPassed": 11,
+    "unicodeVectorPassed": true,
+    "roundtripsPassed": 7
+  },
+  "original_file_readbacks": [
+    {
+      "path": "pr59/logs/saas-127715891963.log",
+      "bytes": 19435,
+      "sha256": "b38278deb4a29af3eb1ac129a871b34f6827b51050e873f03868ee69ad91ee9d",
+      "blobSha": "76fc9468ac9bdf814de543674700845c740f2fdc",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:01.869Z",
+      "sourceJob": 127715891963
+    },
+    {
+      "path": "pr59/logs/node-127715892273.log",
+      "bytes": 990595,
+      "sha256": "79125785a2536e045299b8a865da3c443818b6904a8e4f038bab35aaf3b3c030",
+      "blobSha": "be984fe8b40d16876d21f389e9adbd8d7a7d2952",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:07.901Z",
+      "sourceJob": 127715892273
+    },
+    {
+      "path": "pr59/logs/sites-127715892368.log",
+      "bytes": 2252256,
+      "sha256": "6bf776e089ad6a8ae6f5a4dee6779879ceb97b0e36b537ce2c288fb49d4d42d3",
+      "blobSha": "3499055093c66951bd4381afc597f6b0b96d51a2",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:17.630Z",
+      "sourceJob": 127715892368
+    },
+    {
+      "path": "pr59/logs/bankgiro-bridge-127715892162.log",
+      "bytes": 36942,
+      "sha256": "7b4e701d1b0ab649880b6b02b21c87a8e533a7b445a68e6e23b151f115597609",
+      "blobSha": "de1ec1c8d5cb0adbbbae6c14fd95109b0121a5bf",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:38.409Z",
+      "sourceJob": 127715892162
+    },
+    {
+      "path": "main237/logs/bankgiro-bridge-127718950439.log",
+      "bytes": 35874,
+      "sha256": "0076554ed7436e097c394c3786b7baee4e366aedb68f3e09ec5eaed66f7510bf",
+      "blobSha": "0ec471310e8c96e2c6cce24079bd8d56a78b3d61",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:39.590Z",
+      "sourceJob": 127718950439
+    },
+    {
+      "path": "main237/logs/node-127718950721.log",
+      "bytes": 990392,
+      "sha256": "d74130255608a0ee26ffe7876a3fc49255b0a1013b8ae7f68ee6b2fc6baaabf2",
+      "blobSha": "69f075ce5fa058be03a17f0ee97ebec19351f6ff",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:44.805Z",
+      "sourceJob": 127718950721
+    },
+    {
+      "path": "main237/logs/sites-127718950716.log",
+      "bytes": 2248221,
+      "sha256": "15a567a7e40045c3e516cc471a6bc30db0939526e611e3660410af208c6aa281",
+      "blobSha": "414fdabf6e36e55b5b0b808cac620829d73a2312",
+      "kind": "recovered_original_raw_log",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:54.397Z",
+      "sourceJob": 127718950716
+    },
+    {
+      "path": "main237/failure-blocks.log",
+      "bytes": 1055,
+      "sha256": "41e3e819aab3a361966786b391b51e59e991eb49eef92b9c0703ed4e059cfde5",
+      "blobSha": "a6e4e1ab12131c3c2cddd8fb4b4b381cf26875a7",
+      "kind": "recovered_original_failure_block",
+      "originalHashMatched": true,
+      "createdShaVerified": true,
+      "readbackBytesVerified": true,
+      "verifiedAt": "2026-11-06T05:43:55.284Z",
+      "sourceJob": 127718950721
+    }
+  ],
+  "note": "These records cover original restored files already read back from GitHub before this metadata was generated. Every remaining checkpoint file is also uploaded and read back by exact bytes before branch creation. Final tree/ref identity is reported separately.",
+  "secret_pattern_scan": {
+    "patterns": [
+      "GitHub classic tokens",
+      "GitHub fine-grained tokens",
+      "private key delimiters"
+    ],
+    "findings": [],
+    "limitation": "A narrow pattern check is not a comprehensive secret audit. Only original public CI logs and sanitized metadata are included."
+  }
+}

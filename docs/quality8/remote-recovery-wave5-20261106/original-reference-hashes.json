@@ -1,0 +1,41 @@
+{
+  "kind": "historical_hash_anchors_only_not_reconstructed_original_receipts",
+  "recordedReferences": {
+    "pr59": {
+      "head": "501de72c079a6b41593356f027990bc24b0aac8c",
+      "tree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+      "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+      "checkout": "643c1bedf37bc05e50e98999f4131f993bb71cd2",
+      "receipt_sha256": "f421182b6612385b5a2a369ddad0f1b4d93387f26d24cf3ae9f6c4110cadb562",
+      "manifest_sha256": "8bd7fbc62251707a5b37d3adb5a790774114fe82f0274b066e00acb34a97345b",
+      "manifest_entries": 21,
+      "raw_log_bytes": 3299228
+    },
+    "main237": {
+      "head": "237dd45e7e1b40513d2dd25ccff59bb08f023264",
+      "tree": "2fcd7736a029663e7519d31ed91be1e2db24cf17",
+      "sites_tree": "4feabc128c5f677103232d1cad1e4406083e8f19",
+      "receipt_sha256": "055f3d6c6c4c58f81e4f6a6011b57b112bffaf17f66cb93921469b517fb74f8f",
+      "manifest_sha256": "b42487002f233ea31c2f280cdad6c1b45e7db804aee51682228737b915e8b531",
+      "manifest_entries": 20,
+      "raw_log_bytes": 3274487,
+      "failure_block": {
+        "bytes": 1055,
+        "sha256": "41e3e819aab3a361966786b391b51e59e991eb49eef92b9c0703ed4e059cfde5"
+      },
+      "failure_analysis": {
+        "bytes": 1426,
+        "sha256": "451755d82fa7f5c320d1e15f3e5be3c3eaea2f901c3f2aca6c3000d83fff93d1"
+      }
+    },
+    "unavailable_local_commit_prefix": "a01767a",
+    "unavailable_local_files_reported": 52,
+    "unavailable_local_tree": true,
+    "original_receipt_and_manifest_bytes_available": false,
+    "cache_inventory": {
+      "checked_keys": 40,
+      "present_keys": 0
+    }
+  },
+  "caution": "The original receipt JSON, original manifest bytes, original gzip archives and full a01767a tree are unavailable. These anchors do not assert reconstruction of those unavailable files."
+}
