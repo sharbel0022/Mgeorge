@@ -14,8 +14,7 @@ export function createSaasBankRuntime({context,config,registration,enabled,store
   const providerContext={binding,corporateId:registration.corporateId,psuId:registration.psuId,bicFi:registration.bicFi,corporateIdType:registration.corporateIdType,psu:registration.psu};
   // Only app-token state may cross request instances. Every provider keeps its
   // own HTTP budget and live company/consent guards, including cache hits.
-  const applicationTokenCache=providerOptions?.tokenCacheIdentity?{identity:providerOptions.tokenCacheIdentity}:undefined;
-  const provider=new OpenPaymentsProvider(config,{...providerOptions,applicationTokenCache});
+  const provider=new OpenPaymentsProvider(config,providerOptions);
   const lifecycle=createOpenPaymentsLifecycle({provider,context:providerContext,codec,store,assertCurrent:async()=>{await guard();if(row.value&&row.value.generation!==binding.generation)fail('CONSENT_APPLICATION_CHANGED');},enabled:true,redirectUri,actorPin,sessionHash,bankName:registration.bankName,authenticationMethodId:registration.authenticationMethodId,bankgiroAllowed:registration.bankgiroVerified===true});
   return {row,binding,provider,providerContext,lifecycle};
  }

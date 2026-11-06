@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {chmodSync,copyFileSync,symlinkSync,writeFileSync,readFileSync} from 'node:fs';
 import {nodeSaasBankRuntime} from '../src/saas-bank-runtime.js';
+import {configuredOpenPaymentsNodeTransport} from '../src/banking/openpayments-runtime-transport.js';
 import {openDatabase} from '../src/db.js';
 import {createNodeOpenPaymentsCompanySyncRuntime,readNodeOpenPaymentsCompanySyncStatus} from '../src/openpayments-company-bank-sync.js';
 import {certificateFixture,localProvider} from './helpers/openpayments-local-tls.mjs';
@@ -41,6 +42,13 @@ test('concurrent ordinary runtimes share only the application token while keepin
   assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,1,'one app token can serve current runtimes for the same exact app/config/TLS identity');
   assert.equal(counts.reduce((sum,n)=>sum+n,0),5,'one token exchange plus four independently budgeted discovery calls');
   assert.ok(counts.every(count=>count>=1),'every caller uses its own HTTP boundary');
+});
+
+test('the declared applicationTokenCache option is honored by trusted runtime adapters',async t=>{
+  const provider=await localProvider(t,certificates,discovery),f=fixture(t),transport=configuredOpenPaymentsNodeTransport({environment:f.environment,configuration:JSON.parse(f.environment.SAAS_OPENPAYMENTS_CONFIG)});
+  const providerOptions={transport,applicationTokenCache:{identity:transport.cacheIdentity}};
+  await Promise.all([f.create({providerOptions}).discovery(),f.create({providerOptions}).discovery()]);
+  assert.equal(provider.requests.filter(r=>r.path==='/connect/token').length,1,'the typed cache option must reach each fresh provider unchanged');
 });
 
 test('a shared in-flight token never bypasses a caller whose membership was revoked',async t=>{

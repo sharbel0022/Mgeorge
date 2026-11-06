@@ -10,7 +10,7 @@ export function nodeSaasBankRuntime({db,context,assertCurrent,sessionHash,origin
  const config=parse(environment.SAAS_OPENPAYMENTS_CONFIG);
  assertCurrent();
  const serverTransport=providerOptions?.transport?null:configuredOpenPaymentsNodeTransport({environment,configuration:config});
- const selectedOptions=serverTransport?{...providerOptions,transport:serverTransport,tokenCacheIdentity:serverTransport.cacheIdentity}:providerOptions;
+ const selectedOptions=serverTransport?{...providerOptions,transport:serverTransport,applicationTokenCache:{identity:serverTransport.cacheIdentity}}:providerOptions;
  const guard=()=>{assertCurrent();if(keys.some((key,index)=>environment[key]!==pin[index])){serverTransport?.invalidateTokenCache();throw new ConsentError('CONSENT_APPLICATION_CHANGED',409);}serverTransport?.validateCertificate();};
  const codec={async seal(o,p,v){return encryptObject({owner:o,purpose:p,value:v});},async unseal(o,p,v){const data=decryptObject(v);if(data.owner!==o||data.purpose!==p)throw new ConsentError('COMPANY_ACCESS_DENIED',403);return data.value;}};
  const store={async read(){guard();const row=db.prepare('SELECT revision,payload FROM saas_bank_state WHERE owner=?').get(owner);return row?{revision:row.revision,value:await codec.unseal(owner,'saas-bank-state',row.payload)}:{revision:0,value:null};},async compareAndSet(expected,value){const payload=await codec.seal(owner,'saas-bank-state',value);guard();const result=expected===0?db.prepare('INSERT OR IGNORE INTO saas_bank_state(owner,revision,payload) VALUES(?,1,?)').run(owner,payload):db.prepare('UPDATE saas_bank_state SET revision=revision+1,payload=? WHERE owner=? AND revision=?').run(payload,owner,expected);return result.changes===1;}};

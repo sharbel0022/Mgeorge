@@ -1,3 +1,4 @@
-export function createSaasBankRuntime(options: {context: any;config: any;registration: any;enabled: boolean;store: any;codec: any;assertCurrent: ()=>Promise<void>;sessionHash: string;redirectUri:string;providerOptions?:any;requestKey?:string|null}): {
+import type {OpenPaymentsOptions} from './openpayments-provider.js';
+export function createSaasBankRuntime(options: {context: any;config: any;registration: any;enabled: boolean;store: any;codec: any;assertCurrent: ()=>Promise<void>;sessionHash: string;redirectUri:string;providerOptions?:OpenPaymentsOptions;requestKey?:string|null}): {
  snapshot():Promise<Record<string,any>>;start(body:Record<string,unknown>):Promise<Record<string,any>>;renew(body:Record<string,unknown>):Promise<Record<string,any>>;select(body:Record<string,unknown>):Promise<Record<string,any>>;revoke(body:Record<string,unknown>):Promise<Record<string,any>>;redirect(id:string):Promise<string>;callback(body:Record<string,unknown>):Promise<Record<string,any>>;discovery():Promise<any>;syncContext(accountId:string):Promise<any>;
 };
