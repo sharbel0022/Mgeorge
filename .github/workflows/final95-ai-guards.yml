@@ -15,6 +15,8 @@ env:
   TZ: UTC
   NODE_ENV: test
   OPENAI_API_KEY: ''
+  OPENAI_ADMIN_KEY: ''
+  OPENAI_PROJECT_ID: ''
   OPENAI_INVOICES_ENABLED: 'false'
 
 jobs:
@@ -50,6 +52,22 @@ jobs:
           cat "$RUNNER_TEMP/ai-guards/regressions.tap"
           echo "$result" > "$RUNNER_TEMP/ai-guards/exit-code.txt"
           exit "$result"
+      - name: Existing Node AI and company boundary contracts
+        shell: bash
+        run: |
+          set -o pipefail
+          node --import ./scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap test/openai-invoice*.test.js test/company-boundary.test.js | tee "$RUNNER_TEMP/ai-guards/node-related.tap"
+      - name: Existing Sites AI and company storage contracts
+        shell: bash
+        working-directory: sites
+        run: |
+          set -o pipefail
+          node --import ../scripts/saas-test-isolation.mjs --experimental-strip-types --test --test-concurrency=1 --test-reporter=tap tests/openai-invoice-preflight.test.mjs tests/openai-invoice-processing.test.mjs tests/company-storage.test.mjs | tee "$RUNNER_TEMP/ai-guards/sites-related.tap"
+      - name: Sites type contracts
+        shell: bash
+        run: |
+          set -o pipefail
+          npm --prefix sites run check | tee "$RUNNER_TEMP/ai-guards/sites-types.log"
       - name: Retain exact-source RED or GREEN evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

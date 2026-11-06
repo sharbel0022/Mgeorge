@@ -305,10 +305,19 @@ function readUsage(body, state) {
   const raw = body?.usage;
   if (!plain(raw) || !integer(raw.input_tokens, 0, 10000000) || !integer(raw.output_tokens, 0, 10000000)) fail('usage_missing');
   if (raw.total_tokens !== undefined && raw.total_tokens !== raw.input_tokens + raw.output_tokens) fail('usage_invalid');
+  if (raw.input_tokens_details !== undefined && !plain(raw.input_tokens_details)) fail('usage_invalid');
   if (raw.input_tokens_details?.cached_tokens !== undefined && !integer(raw.input_tokens_details.cached_tokens, 0, raw.input_tokens)) fail('usage_invalid');
   if (raw.output_tokens_details?.reasoning_tokens !== undefined && !integer(raw.output_tokens_details.reasoning_tokens, 0, raw.output_tokens)) fail('usage_invalid');
   if ((raw.input_tokens_details?.cache_write_tokens !== undefined && raw.input_tokens_details.cache_write_tokens !== 0)
     || (raw.input_tokens_details?.cached_tokens !== undefined && raw.input_tokens_details.cached_tokens !== 0)) fail('unexpected_cache_usage');
+  const writes = raw.input_tokens_details?.cache_write_tokens_details;
+  if (writes !== undefined) {
+    if (!plain(writes)) fail('usage_invalid');
+    for (const name of ['ttl_30m_tokens', 'ttl_12h_tokens']) {
+      if (!integer(writes[name], 0, raw.input_tokens)) fail('usage_invalid');
+      if (writes[name] > 0) fail('unexpected_cache_usage');
+    }
+  }
   const usage = { inputTokens: raw.input_tokens, outputTokens: raw.output_tokens };
   const cost = invoiceAiCostMicroUsd(usage, state.profile.pricing);
   return { usage, cost };

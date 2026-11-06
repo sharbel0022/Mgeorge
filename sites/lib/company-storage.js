@@ -1,5 +1,6 @@
 import {assertCompanyContext,assertCompanyPermission,companyDataBoundary,COMPANY_ROLES} from './company-contract.js';
 import {openPaymentsTokenFenceStatement} from './banking/openpayments/token-coordinator-fence.js';
+import {readD1InvoiceAiRecoveryStatus} from './openai-invoices/recovery.js';
 
 // Every financial/automation table with an owner column. A migration regression
 // compares this manifest with the actual SQLite schema and its write triggers.
@@ -292,7 +293,13 @@ export function createCompanyDatabase(database,getScope){
   const statement={bind(...values){return prepare(query,values);},first(column){return perform(entry,'first',column);},all(){return perform(entry,'all');},run(){return perform(entry,'run');},raw(options){return perform(entry,'raw',options);}};
   statements.set(statement,entry);return statement;
  }
- const result=Object.freeze({prepare,async batch(items){
+ const result=Object.freeze({prepare,async invoiceAiRecoveryStatus(){
+  // Fixed read-only status through the captured tenant boundary. Ordinary SQL
+  // still cannot name either global control table or access token material.
+  const pinned=await scope();await assertScopeCurrent(database,pinned,'read');
+  const status=await readD1InvoiceAiRecoveryStatus(database);
+  await assertScopeCurrent(database,pinned,'read');return status;
+ },async batch(items){
   const pinned=await scope();await assertScopeCurrent(database,pinned);
   const entries=[];
   for(const item of items){const entry=statements.get(item);if(!entry||scopeKey(await entry.scope())!==scopeKey(pinned))fail('COMPANY_BOUNDARY_MISMATCH');entries.push(entry);}

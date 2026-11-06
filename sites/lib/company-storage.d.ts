@@ -14,6 +14,7 @@ export function resolveWorkerScope(database:D1Database,owner:string,runner:strin
 export function resolveWorkerCredential(database:D1Database,runner:string,credentialHash:string):Promise<CompanyScope|null>;
 export function boundaryForScope(database:D1Database,scope:CompanyScope,owner:string):Promise<Readonly<CompanyDataBoundary>|null>;
 export function resolveCompanyMailbox(configuration:unknown,options:{context:CompanyContext|null;legacyOwner?:string|null;legacyAccount:string;required?:boolean}):string|null;
-export function createCompanyDatabase(database:D1Database,getScope:()=>Promise<CompanyScope>|CompanyScope):D1Database;
+export type CompanyDatabase=D1Database&{invoiceAiRecoveryStatus():Promise<null|'AI_RECOVERY_REQUIRED'|'AI_RECOVERY_UNAVAILABLE'>};
+export function createCompanyDatabase(database:D1Database,getScope:()=>Promise<CompanyScope>|CompanyScope):CompanyDatabase;
 /** Opaque fixed assertion; no SQL or row data is accepted or returned. */
 export function companyApplicationTokenFence(database:D1Database,capability:OpenPaymentsTokenFence):D1PreparedStatement;
