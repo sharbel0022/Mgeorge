@@ -7,7 +7,8 @@ import {tmpdir} from 'node:os';
 import {createNodeOpenPaymentsTokenCoordinator} from '../src/banking/openpayments-token-coordinator.js';
 import {createCompanyRuntime} from '../src/company-runtime.js';
 import {openDatabase} from '../src/db.js';
-import {decryptObject} from '../src/security.js';
+import {decryptObject,encryptObject} from '../src/security.js';
+import {readNodeOpenPaymentsCompanySyncStatus} from '../src/openpayments-company-bank-sync.js';
 process.env.BANK_DATA_KEY='b'.repeat(64);delete process.env.ENCRYPTION_KEY;
 const schema=readFileSync(new URL('../sites/lib/banking/openpayments/token-coordinator.schema.sql',import.meta.url),'utf8');
 const configuration={environment:'PRODUCTION',clientId:'synthetic-node-app',clientSecret:'synthetic-node-secret',credentialGeneration:'synthetic-g1',features:['bank_discovery']};
@@ -66,4 +67,13 @@ test('startup preserves an explicit restored control marker when rebuilding the 
  controlDb.exec("UPDATE company_application_token_control SET recovery_required=1,restore_marker='synthetic-restored',revision=4; DROP TABLE company_application_tokens");
  const before=controlDb.prepare('SELECT * FROM company_application_token_control').get(),runtime=createCompanyRuntime({controlDb,legacyDatabasePath:path});t.after(()=>{runtime.close();controlDb.close();rmSync(dir,{recursive:true,force:true});});
  assert.deepEqual(controlDb.prepare('SELECT * FROM company_application_token_control').get(),before);assert.equal(controlDb.prepare('SELECT count(*) n FROM company_application_tokens').get().n,0);
+});
+
+for(const kind of ['membership','consent'])test('stored Node sync status rejects '+kind+' changes during asynchronous global token readiness',async t=>{
+ const f=fixture(t),db=new DatabaseSync(':memory:');t.after(()=>db.close());db.exec('CREATE TABLE saas_bank_state(owner TEXT PRIMARY KEY,revision INTEGER,payload TEXT)');
+ const context={companyId:'synthetic-company',storageOwner:'synthetic-owner'},value={id:'synthetic-connection',status:'active',generation:configuration.credentialGeneration,bankId:'OPBKSE21',validUntil:new Date(Date.now()+86400000).toISOString(),selected:['synthetic-account'],accounts:[{id:'synthetic-account',identity:{iban:'SE4550000000058398257466',currency:'SEK'}}]};
+ db.prepare('INSERT INTO saas_bank_state VALUES(?,1,?)').run(context.storageOwner,encryptObject({owner:context.storageOwner,purpose:'saas-bank-state',value}));
+ let active=true,changed=false;const controlDb={exec:sql=>f.controlDb.exec(sql),prepare(query){const statement=f.controlDb.prepare(query);return new Proxy(statement,{get(target,key){const method=Reflect.get(target,key,target);if(key!=='get')return typeof method==='function'?method.bind(target):method;return(...args)=>{const result=method.apply(target,args);if(!changed&&query.startsWith('SELECT *,CAST')){changed=true;if(kind==='membership')active=false;else db.exec('UPDATE saas_bank_state SET revision=revision+1');}return result;};}});}};
+ await assert.rejects(readNodeOpenPaymentsCompanySyncStatus({db,controlDb,context,accountId:'synthetic-account',environment:f.environment,providerOptions:{transport:f.transport},assertCurrent:()=>{if(!active)throw Object.assign(Error('synthetic membership revoked'),{code:'AUTHORIZATION_CHANGED'});}}),{code:'AUTHORIZATION_CHANGED'});
+ assert.equal(changed,true,'the actual asynchronous coordinator DB read must trigger the race');
 });
