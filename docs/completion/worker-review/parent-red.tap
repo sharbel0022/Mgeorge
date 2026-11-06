@@ -1,0 +1,298 @@
+TAP version 13
+# Subtest: false send return is backpressure, and the exact complete result is preserved
+ok 1 - false send return is backpressure, and the exact complete result is preserved
+  ---
+  duration_ms: 19.017406
+  type: 'test'
+  ...
+# Subtest: message success remains stable after a subsequent process error or exit
+ok 2 - message success remains stable after a subsequent process error or exit
+  ---
+  duration_ms: 3.136362
+  type: 'test'
+  ...
+# Subtest: process error exposes no private exception fields or getters
+not ok 3 - process error exposes no private exception fields or getters
+  ---
+  duration_ms: 1.627845
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:52:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_PROCESS_FAILED'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_PROCESS_FAILED'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:54:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: input send failure beats a later claimed receipt
+not ok 4 - input send failure beats a later claimed receipt
+  ---
+  duration_ms: 3.070302
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:56:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_SEND_FAILED'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_SEND_FAILED'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:58:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: synchronous send throw stays private and stops the child
+not ok 5 - synchronous send throw stays private and stops the child
+  ---
+  duration_ms: 1.044339
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:60:1'
+  failureType: 'testCodeFailure'
+  error: 'MUST_NOT_READ_GETTER'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Error.get (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:34:137)
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:22)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:61:40)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: normal exit without result
+not ok 6 - normal exit without result
+  ---
+  duration_ms: 0.37256
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:69:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:71:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: nonzero exit without result
+not ok 7 - nonzero exit without result
+  ---
+  duration_ms: 0.244818
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:69:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:71:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: known signal
+not ok 8 - known signal
+  ---
+  duration_ms: 0.279139
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:69:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:71:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: untrusted exit fields
+not ok 9 - untrusted exit fields
+  ---
+  duration_ms: 1.107524
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:69:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:71:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: objects without coercion
+not ok 10 - objects without coercion
+  ---
+  duration_ms: 0.590638
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:69:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:100)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async rejects (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:42:38)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:71:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: 90-second timeout rejects before a late result and the slot is released
+not ok 11 - 90-second timeout rejects before a late result and the slot is released
+  ---
+  duration_ms: 0.785911
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:73:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_TIMEOUT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_TIMEOUT'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    Object.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:75:74)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:75:42)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: the two-job boundary remains 429 and both failed slots can be reused
+not ok 12 - the two-job boundary remains 429 and both failed slots can be reused
+  ---
+  duration_ms: 0.947343
+  type: 'test'
+  location: '/workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:79:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DOCUMENT_WORKER_EXIT_WITHOUT_RESULT'
+  operator: 'strictEqual'
+  stack: |-
+    checkFailure (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:36:10)
+    TestContext.<anonymous> (file:///workspace/scratch/aab0f7dc06f9/completion-bank/docs/completion/worker-review/independent-parent-probes.mjs:84:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 2
+# fail 10
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 294.852227

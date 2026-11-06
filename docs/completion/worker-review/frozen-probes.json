@@ -1,0 +1,17 @@
+{
+  "baseline": "/tmp/worker-review-base-zpuxjr76",
+  "candidate": "/workspace/scratch/aab0f7dc06f9/security-worker-fix",
+  "baselineCommit": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "candidateCommit": "f5d178ea816d276457685fbc0421cf144f7cf655",
+  "probeSha256": "e087dd1a186eb83dfd6f3de3d63fd6a65c77b8a3e512d3a0789a49571c10868c",
+  "sources": {
+    "24390ef7e8cf6b2274c57804dc9c2d74d362ab12": {
+      "src/invoice-extraction.js": "3cd67fe4bf7babe46dd3d84fbc0324003b61e121495b685a8b5b0259e32338ae",
+      "src/invoice-worker.js": "e14496922f70a62038b0ff24dcc61026d0c11a85192d3abff3a9105114952fef"
+    },
+    "f5d178ea816d276457685fbc0421cf144f7cf655": {
+      "src/invoice-extraction.js": "4ef7393f53ff1a850c26f76dbb4d908ba99620d859949236fbe0b844ead9aa13",
+      "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146"
+    }
+  }
+}

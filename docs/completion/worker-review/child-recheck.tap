@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: completed actual-worker receipt keeps text, confidence and evidence when cleanup fails
+ok 1 - completed actual-worker receipt keeps text, confidence and evidence when cleanup fails
+  ---
+  duration_ms: 2000.969549
+  type: 'test'
+  ...
+# Subtest: actual worker retains its unreadable error receipt through a second cleanup failure
+ok 2 - actual worker retains its unreadable error receipt through a second cleanup failure
+  ---
+  duration_ms: 738.299724
+  type: 'test'
+  ...
+# Subtest: actual child exit0 is safely classified without inventing a result
+ok 3 - actual child exit0 is safely classified without inventing a result
+  ---
+  duration_ms: 77.006853
+  type: 'test'
+  ...
+# Subtest: actual child exit7 is safely classified without inventing a result
+ok 4 - actual child exit7 is safely classified without inventing a result
+  ---
+  duration_ms: 105.75454
+  type: 'test'
+  ...
+# Subtest: actual child signal is safely classified without inventing a result
+ok 5 - actual child signal is safely classified without inventing a result
+  ---
+  duration_ms: 56.385203
+  type: 'test'
+  ...
+# Subtest: actual worker send-callback-error exits unsuccessfully without leaking its exception
+ok 6 - actual worker send-callback-error exits unsuccessfully without leaking its exception
+  ---
+  duration_ms: 858.440645
+  type: 'test'
+  ...
+# Subtest: actual worker send-throw exits unsuccessfully without leaking its exception
+ok 7 - actual worker send-throw exits unsuccessfully without leaking its exception
+  ---
+  duration_ms: 671.139026
+  type: 'test'
+  ...
+# Subtest: parent spawn-error retains only bounded failure metadata
+ok 8 - parent spawn-error retains only bounded failure metadata
+  ---
+  duration_ms: 5.687157
+  type: 'test'
+  ...
+# Subtest: parent parent-send-error retains only bounded failure metadata
+ok 9 - parent parent-send-error retains only bounded failure metadata
+  ---
+  duration_ms: 6.792711
+  type: 'test'
+  ...
+# Subtest: parent parent-send-throw retains only bounded failure metadata
+ok 10 - parent parent-send-throw retains only bounded failure metadata
+  ---
+  duration_ms: 5.368418
+  type: 'test'
+  ...
+# Subtest: the existing 90-second timeout terminates the actual hanging child and releases the slot
+ok 11 - the existing 90-second timeout terminates the actual hanging child and releases the slot
+  ---
+  duration_ms: 840.275151
+  type: 'test'
+  ...
+# Subtest: two pending jobs still reject a third with 429 and cancellation releases both slots
+ok 12 - two pending jobs still reject a third with 429 and cancellation releases both slots
+  ---
+  duration_ms: 856.119138
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7503.037963

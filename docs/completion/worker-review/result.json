@@ -1,0 +1,74 @@
+{
+  "schema": "document-worker-independent-review-v1",
+  "reviewedAt": "2026-11-06T15:30:32.437258+00:00",
+  "reviewer": "bank_completion",
+  "verdict": "PASS_BOUNDED_DIFF_NO_BLOCKERS_IDENTIFIED",
+  "baseline": "24390ef7e8cf6b2274c57804dc9c2d74d362ab12",
+  "product": "f5d178ea816d276457685fbc0421cf144f7cf655",
+  "sources": {
+    "24390ef7e8cf6b2274c57804dc9c2d74d362ab12": {
+      "src/invoice-extraction.js": "3cd67fe4bf7babe46dd3d84fbc0324003b61e121495b685a8b5b0259e32338ae",
+      "src/invoice-worker.js": "e14496922f70a62038b0ff24dcc61026d0c11a85192d3abff3a9105114952fef"
+    },
+    "f5d178ea816d276457685fbc0421cf144f7cf655": {
+      "src/invoice-extraction.js": "4ef7393f53ff1a850c26f76dbb4d908ba99620d859949236fbe0b844ead9aa13",
+      "src/invoice-worker.js": "4f7d992e8fbe81eb44d350763c7ef6e58db217f2a24be8d18041e7a546db3146"
+    }
+  },
+  "probeSha256": "e087dd1a186eb83dfd6f3de3d63fd6a65c77b8a3e512d3a0789a49571c10868c",
+  "runs": [
+    {
+      "path": "parent-red.tap",
+      "sha256": "e5e6a7b01bb64a6c8854b06d6d14e0cae4a1e06260ab9f2ca98f1358f10fb4f4",
+      "bytes": 14309,
+      "exitCode": 1,
+      "totals": {
+        "tests": 12,
+        "pass": 2,
+        "fail": 10,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "path": "parent-green.tap",
+      "sha256": "25cd01125b8b01a521d2d58c1586aea8fa70772fcfe70740068ca6b7e87fb26f",
+      "bytes": 2098,
+      "exitCode": 0,
+      "totals": {
+        "tests": 12,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "path": "child-recheck.tap",
+      "sha256": "458fb448453e10d8fb52a1dcef0c146be186ed62ac2d0f21ec4c34fda9e85421",
+      "bytes": 2750,
+      "exitCode": 0,
+      "totals": {
+        "tests": 12,
+        "pass": 12,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    }
+  ],
+  "noHoldoutAccess": true,
+  "opticalCalls": 0,
+  "realProviderCalls": 0,
+  "productionWrites": 0,
+  "productChanged": false,
+  "previousBlindFailuresCause": "NOT_ESTABLISHED",
+  "sourceAndProbeUnchangedAfterRun": true,
+  "producerTests": {
+    "test/document-worker-boundary.test.js": "64693ecf95eb0b033177f18c01e82cbaaf5ed552804d79173b480547a5a8dc9a",
+    "test/helpers/document-worker-boundary-child.mjs": "31771eaf0672289efa96ed08eaa60db0218e1677c9010c7dd2c69f9d659f6ba5"
+  }
+}
