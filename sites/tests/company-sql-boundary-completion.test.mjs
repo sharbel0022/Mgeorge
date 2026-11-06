@@ -13,6 +13,14 @@ async function fixture(t){
  return{f,a,b,database:f.database(a)};
 }
 
+for(const [kind,left,right]of [['double quote','"','"'],['bracket','[',']'],['backtick','`','`']])test(`adjacent recursive ${kind} CTE retains owner projection`,async t=>{
+ const {f,a,database}=await fixture(t),table=left+'workspaces'+right,cte=left+'visible'+right;
+ const query=`WITH RECURSIVE${cte}AS(SELECT owner,payload FROM${table})SELECT*FROM${cte}`;
+ assert.equal(f.sql.prepare(query).all().length,2,'the independent recursive SQL form must be valid');
+ const rows=(await database.prepare(query).all()).results;
+ assert.equal(rows.length,1);assert.equal(rows[0].owner,a.owner);assert.equal(rows[0].payload,JSON.stringify({private:'company-a'}));
+});
+
 for(const [name,query]of [
  ['line-comment marker',"SELECT '--' AS marker, owner, payload FROM workspaces"],
  ['escaped quote before marker',"SELECT 'it''s -- data' AS marker, owner, payload FROM workspaces"],
