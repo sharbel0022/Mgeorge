@@ -3,8 +3,8 @@ import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { once } from 'node:events';
 import { cleanTestEnvironment, repositoryRoot as root, sha256, writeJson } from './core.mjs';
+import { browserAssetsComplete, closeBrowserResources } from './browser-lifecycle.mjs';
 
 // Exercise the actual merged Dashboard, CompanyWorkspace and production CSS.
 // The existing isolated server owns only synthetic, in-memory API fixtures.
@@ -47,7 +47,7 @@ try {
   async function run(name, width, action, { view = 'overview', scenario = 'standard', path = '/', ready = true } = {}) {
     const started = performance.now();
     const context = await browser.newContext({ viewport: { width, height: 900 }, locale: 'sv-SE', reducedMotion: 'reduce', hasTouch: width < 760, serviceWorkers: 'block' });
-    const page = await context.newPage(), pendingAssets = [];
+    const page = await context.newPage(), pendingAssets = [], scenarioAssets = [];
     page.setDefaultTimeout(10_000);
     page.on('pageerror', error => receipt.browserErrors.push(error.message));
     await context.route('**/*', route => {
@@ -68,7 +68,13 @@ try {
       const pathname = new URL(response.url()).pathname;
       const assetPath = ['/', '/bank'].includes(pathname) ? 'index.html' : pathname.slice(1);
       const asset = manifest.outputs.find(item => item.path === assetPath);
-      if (asset) pendingAssets.push(response.body().then(bytes => receipt.assetChecks.push({ path: assetPath, match: sha256(bytes) === asset.sha256 })).catch(() => receipt.assetChecks.push({ path: assetPath, match: false })));
+      if (asset) {
+        const record = match => {
+          const check = { scenario: name, path: assetPath, match };
+          scenarioAssets.push(check); receipt.assetChecks.push(check);
+        };
+        pendingAssets.push(response.body().then(bytes => record(sha256(bytes) === asset.sha256)).catch(() => record(false)));
+      }
     });
     try {
       await page.goto(`${origin}${path}?scenario=${scenario}&view=${view}`);
@@ -79,7 +85,9 @@ try {
       await action(page);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, 'Page overflows the real viewport');
       await page.screenshot({ path: join(output, `dashboard-${receipt.results.length + 1}-${width}.png`), animations: 'disabled' });
-      receipt.results.push({ name, passed: true, width, durationMs: performance.now() - started });
+      await Promise.all(pendingAssets);
+      assert.equal(browserAssetsComplete(scenarioAssets), true, 'Scenario must load matching production HTML, JavaScript and CSS');
+      receipt.results.push({ name, passed: true, assetsVerified: true, width, durationMs: performance.now() - started });
     } catch (error) {
       receipt.results.push({ name, passed: false, width, error: String(error).slice(0, 2000), durationMs: performance.now() - started });
       await page.screenshot({ path: join(output, `failure-${receipt.results.length}-${width}.png`), animations: 'disabled' }).catch(() => {});
@@ -195,9 +203,8 @@ try {
 } catch (error) {
   receipt.runnerErrors.push(String(error).slice(0, 2000));
 } finally {
-  if (browser) await browser.close();
-  if (server && server.exitCode === null && server.signalCode === null) { const closed = once(server, 'exit'); server.kill('SIGTERM'); await closed; }
-  receipt.passed = receipt.results.length === 31 && receipt.results.every(item => item.passed) && receipt.runnerErrors.length === 0 && receipt.browserErrors.length === 0 && receipt.externalRequests.length === 0 && receipt.forbiddenRequests.length === 0 && receipt.assetChecks.length > 0 && receipt.assetChecks.every(item => item.match);
+  receipt.runnerErrors.push(...await closeBrowserResources({ browser, server }));
+  receipt.passed = receipt.results.length === 31 && receipt.results.every(item => item.passed && item.assetsVerified === true) && receipt.runnerErrors.length === 0 && receipt.browserErrors.length === 0 && receipt.externalRequests.length === 0 && receipt.forbiddenRequests.length === 0 && browserAssetsComplete(receipt.assetChecks);
   writeJson(join(output, 'dashboard-results.json'), receipt);
   console.log(JSON.stringify({ passed: receipt.passed, tests: receipt.results.length, failures: receipt.results.filter(item => !item.passed).map(item => item.name) }));
 }
