@@ -1,9 +1,20 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
+import test,{after} from 'node:test';import assert from 'node:assert/strict';
+import {existsSync,mkdtempSync,readFileSync,rmSync,writeFileSync} from 'node:fs';import {DatabaseSync} from 'node:sqlite';import ts from 'typescript';
+import {createHash} from 'node:crypto';import {tmpdir} from 'node:os';import {join} from 'node:path';import {pathToFileURL} from 'node:url';
 import * as domain from '../lib/domain.ts';
 import {seal,unseal,randomToken} from '../lib/banking/security.ts';
 const source=p=>readFileSync(new URL(p,import.meta.url),'utf8');
-const data=code=>'data:text/javascript;base64,'+Buffer.from(code).toString('base64');
+// Keep dependent source out of each ESM cache key. Identical module text keeps
+// one identity, while every fixture still has its own environment and state.
+const moduleDirectory=mkdtempSync(join(tmpdir(),'mg-gmail-modules-'));
+after(()=>rmSync(moduleDirectory,{recursive:true,force:true}));
+const data=code=>{
+  const bytes=Buffer.from(code),file=join(moduleDirectory,createHash('sha256').update(bytes).digest('hex')+'.mjs');
+  if(existsSync(file)){
+    if(!readFileSync(file).equals(bytes))throw Error('Synthetic module hash collision');
+  }else writeFileSync(file,bytes,{mode:0o600,flag:'wx'});
+  return pathToFileURL(file).href;
+};
 function moduleUrl(path,imports){imports={...Object.fromEntries(['document-triage','economy-summary','invoice-details','ocr-bankgiro-evidence'].map(n=>['./'+n+'.js',new URL('../lib/'+n+'.js',import.meta.url).href])),...imports};let code=ts.transpileModule(source(path),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;for(const [from,to]of Object.entries(imports))for(const q of ['"',"'"])code=code.replaceAll(q+from+q,JSON.stringify(to));return data(code);}
 class D1{
   constructor(sql){this.sql=sql;}
