@@ -1,0 +1,31 @@
+{
+  "schema": "completion-independent-security-review-v1",
+  "scope": "Quoted SQL token boundaries and owner CTE rewriting; synthetic SQLite only. No production actions.",
+  "reviewerRole": "OCR implementer, not author of security fix",
+  "runtime": "v24.22.1",
+  "scriptSha256": "2a35f3a365eba080ed49f2f8809aa0a19a934d37b31b4d85323b779a3fc71b60",
+  "evidence": [
+    {
+      "name": "security-review-quote-red.json",
+      "rawSha256": "6e588171ae9f99e676b88db2a9bb419b28d08c44e93cfd96b4fb91a9b6671c74",
+      "gzipSha256": "0add47704b8227186cfe648123b73d9a9e35e64e0c91c16483c153767ae2789e",
+      "rawBytes": 5718,
+      "head": "37c618366d0ba5243d56e594d58a62cf8dcec951",
+      "sourceSha256": "63f776a5d8a5d29f9a2f5de7fb1f9ca407e5fad99a4b0af3c374ec4d821fbe85",
+      "tests": 28,
+      "pass": 1,
+      "fail": 27
+    },
+    {
+      "name": "security-review-quote-green.json",
+      "rawSha256": "472ff8becdda3d612596b60c6c0904caf163e5daa4eb6326161331ac5306a007",
+      "gzipSha256": "3ac92a064003879f66d89e8e587a4c39c7a63adb526989f6bc045627fa33f1cb",
+      "rawBytes": 3093,
+      "head": "c22bd94a68144a41b3b40664225509ef89f40722",
+      "sourceSha256": "244d2f9a3cf9b943c49979844df750d9fe0a99b899cb88a7130ab91cf9ee7d90",
+      "tests": 28,
+      "pass": 28,
+      "fail": 0
+    }
+  ]
+}
