@@ -1,0 +1,154 @@
+{
+  "baseline.txt": {
+    "storedPath": "baseline.txt.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "ade7e298ef077b664d26027e671e596c415b9ede22eb78ba18469ff5fd29bdaf",
+    "sha256": "3ecde96bdb4a38970e53c5bc7f4ad31e716a76e3c052ee5b42856b05cd22d176",
+    "uncompressedBytes": 6428,
+    "storedBytes": 1531
+  },
+  "green.tap": {
+    "storedPath": "green.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "5c48869923773dc8e3a69e78a3873303e358cce3ff03f3ded1b76a85f075a0bf",
+    "sha256": "bf78b67865f2f3d60217492895a0b11a408c8299d1bcfa05423af537abe5562a",
+    "uncompressedBytes": 15176,
+    "storedBytes": 1874
+  },
+  "initial-red.txt": {
+    "storedPath": "initial-red.txt.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "619f69dabb739bc1c8f4071354e536ceedd3a84a2b62c89a27aa2b2c53fa75aa",
+    "sha256": "2330526cf8697640345c48150e4cb2e34445eba178e0955b18b2b21ec95f13f7",
+    "uncompressedBytes": 34619,
+    "storedBytes": 2276
+  },
+  "newline-boundary-intermediate.tap": {
+    "storedPath": "newline-boundary-intermediate.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "ab28e488222088283e42e164c83623f57d45864b74410c98cfff985e76c0aaa7",
+    "sha256": "e44dbeeb3c4125e23fe705bf46907312fc6ae13c9996e76d955329c92e1cd5f0",
+    "uncompressedBytes": 16980,
+    "storedBytes": 2274
+  },
+  "node-final-focus.tap": {
+    "storedPath": "node-final-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "bf5b8464e5e2cbcbe25974058c3530e271d381b2bc480e395816be27b26b3c13",
+    "sha256": "f16b2ea44637763ce1dba0bf8ff95f8a7a9e0c3bb1a774c209fd0ae1669b94e7",
+    "uncompressedBytes": 126088,
+    "storedBytes": 15700
+  },
+  "node-focus.tap": {
+    "storedPath": "node-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "9d591d6ad113df38a6dbbc3afba572ce90286df44170ec9997a10d7e0fb0a3e7",
+    "sha256": "4d19050001d4b114bbfc0af280c4b5caaf1ef653f6245fa75c82ea0b2fa549a9",
+    "uncompressedBytes": 118758,
+    "storedBytes": 15117
+  },
+  "node-precommit-focus.tap": {
+    "storedPath": "node-precommit-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "fc5fd2c5619af57ff14ec869563ca092c540714f511288f163cd166d54efd118",
+    "sha256": "4030968786b36820422b6e56c91483ab91747199ba33b3f961f1c3523f8e0c8e",
+    "uncompressedBytes": 119711,
+    "storedBytes": 15158
+  },
+  "node-recipient-guard-focus.tap": {
+    "storedPath": "node-recipient-guard-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "2d4996413d0110063356c373d11d8f8ea2a8ea75f51de791b71b4b4423dc5951",
+    "sha256": "424174bb4b7db84def8620cba298a1d40d40fcb967bd636af7365ddf3b0c0d08",
+    "uncompressedBytes": 119710,
+    "storedBytes": 15162
+  },
+  "recipient-boundary-red.tap": {
+    "storedPath": "recipient-boundary-red.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "a82f6bca0dd0b4a990b664148e6af78d27fe515857f954a5e0e55e15c5f80b7d",
+    "sha256": "4a80492fcfc739d172a58529f49ab70829ef8f098c93457548a06d84b4b7a088",
+    "uncompressedBytes": 4675,
+    "storedBytes": 726
+  },
+  "recipient-sibling-green.tap": {
+    "storedPath": "recipient-sibling-green.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "288e77d9ce8604be2407c03a4a0e340b6d68b8b147a46f8973fcf9370b457849",
+    "sha256": "c8476bfb23e2f21893b88eabccbbc5dd6c4ec84d5e1afc9389a30a8f1d5286ee",
+    "uncompressedBytes": 6492,
+    "storedBytes": 790
+  },
+  "recipient-sibling-red.tap": {
+    "storedPath": "recipient-sibling-red.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "6dc5603420cda37019e0606c5abc067d841ca1de1a7401375f31f2b96a7f7741",
+    "sha256": "aa9aa94eb17dfce9138b8353af62cdafaf983bd1810ee86577a596695ec2fc52",
+    "uncompressedBytes": 9862,
+    "storedBytes": 1236
+  },
+  "red.tap": {
+    "storedPath": "red.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "404eecc4a426832e2becf271ab7c5e370c6a3ae889dc6ed46da70a2342431d05",
+    "sha256": "eb1f4b824d88ba751248f9fa29d5483c288cb4528ee5433ea02677afae029c80",
+    "uncompressedBytes": 41799,
+    "storedBytes": 2801
+  },
+  "replay-output.txt": {
+    "storedPath": "replay-output.txt.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "b179a5efe7f9d8e04ff92f8b6383a7c1a248f87262f132e58e4c311ae6e2121a",
+    "sha256": "e029d5b84c3524b74cdc62eada59a6f83352f8b6dade23c35153426e9096689b",
+    "uncompressedBytes": 1805,
+    "storedBytes": 327
+  },
+  "scalar-only-intermediate.tap": {
+    "storedPath": "scalar-only-intermediate.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "bacd33da13c56c72de6a1cf1250d082cdaf6ad354c66b49906421b736a854b71",
+    "sha256": "fadb7c87bf4929e7a0bf497ef8d5a274f07293688b03ceb1a0d24db896f16402",
+    "uncompressedBytes": 25629,
+    "storedBytes": 2446
+  },
+  "sites-final-focus.tap": {
+    "storedPath": "sites-final-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "9346cef1f32db2b7c09d193da73711d89e592b3c5d1f48dfc265bc3391a18808",
+    "sha256": "db77731e1031ab7b218a3cbdb71dd02cc4a2d4898b681baa3d08b60cc16d063d",
+    "uncompressedBytes": 107495,
+    "storedBytes": 12310
+  },
+  "sites-focus.tap": {
+    "storedPath": "sites-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "c0f2865f76500ee0d2d0af91ee54fcade25c3f2d751ba4ef39a771d1c75191c4",
+    "sha256": "e243bce67141d05bb851e8ada44bbd5596a9dd229b0c2e9121b8d73bb4ffa2e2",
+    "uncompressedBytes": 107465,
+    "storedBytes": 12322
+  },
+  "sites-precommit-focus.tap": {
+    "storedPath": "sites-precommit-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "6d2451e4eb6ce292c4878c0b2c248a237dbeac88e29a0b8ca6f60e33921c72fd",
+    "sha256": "93e262565c165f9bc5c0022233ff4b6a2a59b243fe72b7eb524dc0bb964834e2",
+    "uncompressedBytes": 107462,
+    "storedBytes": 12305
+  },
+  "sites-recipient-guard-focus.tap": {
+    "storedPath": "sites-recipient-guard-focus.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "6ac0c1ff7b26bc5cc035f5202bffdfc4e3bb951c4424ba720af432aed546f73e",
+    "sha256": "813671d48d1967b549a097c882ca1f3d8064431109eb92399eb6b620c1c597ff",
+    "uncompressedBytes": 107482,
+    "storedBytes": 12299
+  },
+  "unchanged-source-red.tap": {
+    "storedPath": "unchanged-source-red.tap.gz",
+    "compression": "gzip",
+    "uncompressedSha256": "48810b07d2a306aef2a5745681b692ddf754e5901234090e0505ea54133d49b0",
+    "sha256": "f5c7e1c7d4be7d71ac0bd89ead80b51d342b7c5324ab670444627b648066ad56",
+    "uncompressedBytes": 41804,
+    "storedBytes": 2812
+  }
+}

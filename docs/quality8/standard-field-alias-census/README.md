@@ -26,18 +26,18 @@ The layout tests preserve every original word object, bounding box and confidenc
 
 | Step | Commit / evidence | Observed result |
 | --- | --- | --- |
-| Existing focused baseline | `baseline.txt` | 68/68 |
-| Initial 70-test RED freeze | `20c5969d0b6906aae1d18963ef810b064c393724`; `red.tap`, `red-receipt.json` | 40 pass, 30 expected assertion failures |
-| Initial alias product | `0132d4537c5fd24e6a0af7f3cadf499a73706ed0`; `green.tap` | Same 70/70 |
-| Recipient regression RED freeze | `fdf954df916d3ef700c529631a1291608aca2af4`; `recipient-boundary-red.tap` | 0/4, four demonstrated name-loss failures |
+| Existing focused baseline | `baseline.txt.gz` | 68/68 |
+| Initial 70-test RED freeze | `20c5969d0b6906aae1d18963ef810b064c393724`; `red.tap.gz`, `red-receipt.json` | 40 pass, 30 expected assertion failures |
+| Initial alias product | `0132d4537c5fd24e6a0af7f3cadf499a73706ed0`; `green.tap.gz` | Same 70/70 |
+| Recipient regression RED freeze | `fdf954df916d3ef700c529631a1291608aca2af4`; `recipient-boundary-red.tap.gz` | 0/4, four demonstrated name-loss failures |
 | Recipient guard product | `4c8a2e3f69c6b88b4b8d0bae299c6d30fc7d82ee` | 74 new synthetic cases pass |
-| Explicit sibling RED freeze | `8f97b00`; `recipient-sibling-red.tap` | 24/28, four expected failures |
-| Final product | `100f9c3015da34f772ea0cba53d9871e978ebeab`; `recipient-sibling-green.tap` | Same 28/28; 102 new cases in total |
-| Final Node/parser/layout focus | `node-final-focus.tap` | 574/574; zero failures, cancellations, skips or TODOs |
-| Final Sites/parser/layout focus | `sites-final-focus.tap` | 464/464; zero failures, cancellations, skips or TODOs |
-| One stored-observation replay | `replay-claim.json`, `development-replay.json`, `replay-output.txt` | Exactly 14 Node + 14 Sites parser calls, zero OCR calls |
+| Explicit sibling RED freeze | `8f97b00`; `recipient-sibling-red.tap.gz` | 24/28, four expected failures |
+| Final product | `100f9c3015da34f772ea0cba53d9871e978ebeab`; `recipient-sibling-green.tap.gz` | Same 28/28; 102 new cases in total |
+| Final Node/parser/layout focus | `node-final-focus.tap.gz` | 574/574; zero failures, cancellations, skips or TODOs |
+| Final Sites/parser/layout focus | `sites-final-focus.tap.gz` | 464/464; zero failures, cancellations, skips or TODOs |
+| One stored-observation replay | `replay-claim.json`, `development-replay.json`, `replay-output.txt.gz` | Exactly 14 Node + 14 Sites parser calls, zero OCR calls |
 
-`verification.json` records exact commands, runtime, source hashes, commit chain, counts and log hashes. `artifact-sha256.json` binds the evidence files. Initial and intermediate failed attempts remain available; they are not recounted as independent observations or added to the final passing population. The Node-focused suite itself also exercises both parsers through the shared synthetic harness, so its count overlaps the separate Sites coverage.
+`verification.json` records exact commands, runtime, source hashes, commit chain, counts and log hashes. `artifact-sha256.json` binds the evidence files. Raw logs are stored as byte-exact gzip files; `raw-log-storage.json` maps their original filenames and SHA-256 values to compressed storage. Decompression reproduces every original byte, including test-runner whitespace. Frozen RED receipts retain their original uncompressed hashes. Initial and intermediate failed attempts remain available; they are not recounted as independent observations or added to the final passing population. The Node-focused suite itself also exercises both parsers through the shared synthetic harness, so its count overlaps the separate Sites coverage.
 
 ## Replay limitations and remaining gaps
 

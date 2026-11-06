@@ -29,7 +29,12 @@
       "cancelled": 0,
       "skipped": 0,
       "todo": 0,
-      "sha256": "bf5b8464e5e2cbcbe25974058c3530e271d381b2bc480e395816be27b26b3c13"
+      "sha256": "f16b2ea44637763ce1dba0bf8ff95f8a7a9e0c3bb1a774c209fd0ae1669b94e7",
+      "storedPath": "node-final-focus.tap.gz",
+      "compression": "gzip",
+      "uncompressedSha256": "bf5b8464e5e2cbcbe25974058c3530e271d381b2bc480e395816be27b26b3c13",
+      "uncompressedBytes": 126088,
+      "storedBytes": 15700
     },
     "sites-final-focus.tap": {
       "command": "node --experimental-strip-types --test --test-reporter=tap tests/invoice-grammar-boundaries.test.mjs tests/invoice-v2-explicit-grammar.test.mjs tests/invoice-scalar-layout-regression.test.mjs tests/invoice-reliability.test.mjs tests/invoice-evidence-ocr.test.mjs tests/invoice-summary-labels.test.mjs tests/ocr-layout*.test.mjs tests/organization-event-context.test.mjs tests/review-organization*.test.mjs",
@@ -41,7 +46,12 @@
       "cancelled": 0,
       "skipped": 0,
       "todo": 0,
-      "sha256": "9346cef1f32db2b7c09d193da73711d89e592b3c5d1f48dfc265bc3391a18808"
+      "sha256": "db77731e1031ab7b218a3cbdb71dd02cc4a2d4898b681baa3d08b60cc16d063d",
+      "storedPath": "sites-final-focus.tap.gz",
+      "compression": "gzip",
+      "uncompressedSha256": "9346cef1f32db2b7c09d193da73711d89e592b3c5d1f48dfc265bc3391a18808",
+      "uncompressedBytes": 107495,
+      "storedBytes": 12310
     }
   },
   "newFrozenTests": {
@@ -99,5 +109,7 @@
     "Self-review found colonless recipient reconstruction could lose an existing next-line name. Separate 0/4 RED and restricted printed-colon alias closed it.",
     "The one stored-observation development replay remains bound to 0132, preceding the final layout-only guard.",
     "Independent review identified the existing scalar recipient-boundary gap. Separate 24/28 RED and a two-line mandatory-colon sibling update gave the same 28/28; orphan organization abstention remains unchanged."
-  ]
+  ],
+  "rawLogStorage": "raw-log-storage.json",
+  "documentationNote": "The initial documentation-only diff check reported raw test-runner whitespace. Logs were gzip-compressed without changing their uncompressed bytes; product checks remain separate."
 }
