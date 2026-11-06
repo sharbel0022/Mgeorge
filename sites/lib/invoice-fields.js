@@ -110,7 +110,7 @@ export function interpretInvoice(text,{direction=null,direction_confident=false,
   // trailing content remains part of the value and must pass full validation.
   // Reuse the monetary census grammar exactly: a boundary must not discard an
   // occurrence that the field's own collector would never inspect.
-  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+totalLabel+'|'+vatLabel+'|'+netLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organi[sz]ation[ \\t]+number|leverantör|utställare|säljare|supplier|seller|kund|customer|valuta|currency)';
+  const siblingLabel='(?:'+invoiceNumberLabel+'|'+referenceLabel+'|'+issuedDateLabel+'|'+dueDateLabel+'|'+totalLabel+'|'+vatLabel+'|'+netLabel+'|bankgirokonto|bankgiro|bg|org(?:anisations)?\\.?[ \\t]*(?:nr|nummer)|organi[sz]ation[ \\t]+number|leverantör|utställare|säljare|supplier|seller|kund|customer|(?:fakturamottagare|bill[ \\t]+to)(?=[ \\t]*:)|valuta|currency)';
   const sibling=new RegExp('(?:[ \\t]*[;|][ \\t]*|[ \\t]+)(?='+siblingLabel+'(?=[ \\t.:#]|$)|'+issuedDateLabel+'|'+dueDateLabel+')','iu');
   const grabFull=(key,label,convert)=>{
     const invoiceLabel=key==='invoice_number',currencyLabel=key==='currency',dateField=key==='issued_at'||key==='due_at';
