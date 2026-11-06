@@ -1,3 +1,15 @@
+## 2026-11-06 14:28 UTC — slutförandekandidat inför full exakt CI
+
+Arbetsbranch `feature/final-95-completion` utgår från verifierad PR 61 `30dfaa97bb7ce2118b4756205347d4a96e8be6ab` och senaste main `cde9178c0f8e8e386329ed8feaa4201e87b5a78f`. PR 45–61 och de tidigare Actions-körningarna har lästs på nytt. [Färsk baslinje](docs/completion/baseline.json) skiljer dessa historiska gröna körningar från den nya kandidatens ännu återstående slutgrindar. Site 66 är fortfarande live; version 67:s tidigare deployment är verifierat misslyckad på en beroendekälla.
+
+Nya separata rättningar bevarar företagsgränsen vid SQL-kommentarer/citerade token, inklusive ett ytterligare oberoende reproducerat gränsfall. Samma oberoende 28 motprov går från 1/28 till 28/28. Avbrutna OCR-resultat överlever nu tillfällig originallagringsotillgänglighet. Gmail skiljer historisk hämtningshälsa från aktuell försökstillåtlighet och håller korrupta låsdeadlines spärrade. [OCR-rapport](docs/completion/ocr.md): känd utvecklingsreplay 70→74/100 obligatoriska fält, 0 falska och 0 förlorade korrekta fält; inga nya optiska anrop eller oberoende 85/98-anspråk.
+
+Verklig normal Gmail-hämtning importerade sju dokument. En manuellt startad ordinarie moln-OCR-körning [42231420966](https://github.com/sharbel0022/Mgeorge/actions/runs/42231420966) behandlade sex dokument utan körfel och appen bekräftade köprogress till granskning. Det bevisar inte den externa timdispatchen. Bankrevalidering gav `BANK_CONSENT_INVALID`; Bankgiro står `SOURCE_NOT_CONFIGURED`. Inga bankmedgivanden, produktionstokens eller finansiella allokeringar ändrades.
+
+Den riktiga backupens frysta manifest har 430 verifierade original; senare Gmail-importer ingår inte. En ny isolerad syntetisk återställning på security-källan `c22bd94a68144a41b3b40664225509ef89f40722` återställde 430 original/185 567 855 byte och 27 tabeller, med tio negativa avvisningar. Lokal full säkerhetskörning har bevarade SIGKILL-fel och räknas inte som godkänd; de berörda filernas isolerade omkörning passerade 360/360. Ren full CI, slutlig integration, native-bygge och produktionskontroller krävs före release.
+
+**9,5-målet är inte styrkt.** Alla poäng från den föregående publicerade bedömningen är historiska tills slutrapporten binder varje område till aktuell test- och driftbevisning. Säker kodrelease och kommersiell bank-/flerföretagsacceptans är separata beslut.
+
 ## 2026-11-06 06:21 UTC — miljöavbrott säkrat, publicering fortsatt spärrad
 
 **28/33 områden når minst 8; 6,10,15,16,28 kvarstår under 8.** Site 66/main `0035ea89` är fortsatt produktionskälla. PR 59 mergades normalt till main `237dd45e`, men dess separata huvudgrens-CI gav 7604/7605. Samtliga 7 ursprungliga PR 59/main-jobbloggar är [återhämtade och hashverifierade](https://github.com/sharbel0022/Mgeorge/tree/6848bdc1fdb98c98405caca67fafd2e3a203d752/docs/quality8/remote-recovery-wave5-20261106).
