@@ -101,7 +101,7 @@ try {
       ...(process.env.PLAYWRIGHT_BROWSERS_PATH ? { PLAYWRIGHT_BROWSERS_PATH: process.env.PLAYWRIGHT_BROWSERS_PATH } : {}),
     });
     const receipt = join(output, 'browser/receipt.json');
-    if (existsSync(receipt)) { step.browser = JSON.parse(readFileSync(receipt, 'utf8')); step.totals = step.browser.totals; step.failures = [...(step.browser.failures ?? []).map(item => item.name), ...(step.browser.workspace?.failures ?? []).map(item => item.name)]; step.passed &&= step.browser.passed === true; }
+    if (existsSync(receipt)) { step.browser = JSON.parse(readFileSync(receipt, 'utf8')); step.totals = step.browser.totals; step.failures = [...(step.browser.failures ?? []).map(item => item.name), ...(step.browser.workspace?.failures ?? []).map(item => item.name), ...(step.browser.dashboard?.failures ?? []).map(item => item.name), ...(step.browser.dashboard?.runnerErrors ?? [])]; step.passed &&= step.browser.passed === true; }
     else step.passed = false;
     save();
   }

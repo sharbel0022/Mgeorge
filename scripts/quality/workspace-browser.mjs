@@ -88,7 +88,10 @@ try {
     await page.screenshot({ path: join(output, `workspace-${width}.png`) });
   });
   await run('integrated company switch uses previous context then reloads only the new company', 390, async ({ page, state }) => {
-    await page.getByRole('combobox', { name: 'Välj företag', exact: true }).selectOption('company-beta');
+    const companySelector = page.getByRole('combobox', { name: 'Aktivt företag', exact: true });
+    assert.equal(await companySelector.count(), 1);
+    assert.equal(await page.getByRole('combobox', { name: 'Välj företag', exact: true }).count(), 0);
+    await companySelector.selectOption('company-beta');
     await page.waitForURL('**/bank?company=company-beta');
     await page.getByRole('heading', { name: 'Konton för Exempel Beta AB' }).waitFor();
     assert.equal(state.posts.length, 1);

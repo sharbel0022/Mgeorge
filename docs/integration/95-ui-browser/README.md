@@ -74,7 +74,19 @@ The first file checks fixture integrity using the actual payment presentation, c
 
 ## Browser acceptance and source hashes
 
-Use [browser-acceptance.md](browser-acceptance.md) to record actual viewport sizes, actions, screenshots, and observed results. Do not mark a browser assertion passed from the fixture or HTTP tests alone. Browser actions are intentionally performed by the connected browser tool or a human; no Playwright launch is part of this harness.
+Use [browser-acceptance.md](browser-acceptance.md) to record manual viewport sizes, actions, screenshots, and observed results. Do not mark a browser assertion passed from the fixture or HTTP tests alone.
+
+The recovery integration additionally runs this same product bundle through
+`scripts/quality/dashboard-browser.mjs` as part of `npm run quality:browser`.
+Its 31 Chromium cases cover four views at five real viewport widths, exact
+reference search, invoice navigation, payer/evidence separation, mobile review,
+loading/empty/error/retry states, touch/keyboard focus, and unknown/expired
+legacy consent. It retains actual screenshots, received-asset hashes and
+request metadata under the quality output directory. These are synthetic UI
+acceptance tests, not real login, backend, BankID or provider verification.
+Unlisted mutations and external requests fail the browser receipt. Existing
+manual observations above remain historical and are not relabeled as results
+from a later candidate.
 
 The build writes `bundle-source-manifest.json` under the output directory. It records SHA256 hashes for every bundled product source, all six stylesheets, harness and fixture source files, and each generated asset, plus toolchain versions. A build fails if a product input or harness source changes during compilation. Rebuild after the final product edits, then retain the exact manifest for the browser run:
 

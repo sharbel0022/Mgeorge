@@ -10,12 +10,12 @@ const before = captureSource(root);
 const report = {
   schemaVersion: 1, kind: 'browser-acceptance', passed: false, status: 'RUNNING',
   syntheticOnly: true, realBankVerification: 'NOT_RUN',
-  scope: 'Actual bundled onboarding UI in Chromium; API responses are intercepted synthetic fixtures. Backend and provider end-to-end coverage is not claimed.',
+  scope: 'Actual bundled onboarding, company workspace and Dashboard UI in Chromium; APIs use isolated synthetic fixtures. Backend, authentication and provider end-to-end coverage is not claimed.',
   source: sourceSummary(before), runtime: runtimeInfo(), startedAt: new Date().toISOString(), steps: [],
 };
 writeJson(join(output, 'receipt.json'), report);
 writeJson(join(output, 'source-manifest.json'), before);
-for (const result of ['harness/results/acceptance-results.json', 'workspace/workspace-results.json']) {
+for (const result of ['harness/results/acceptance-results.json', 'workspace/workspace-results.json', 'dashboard/dashboard-results.json']) {
   const path = join(output, result); if (existsSync(path)) unlinkSync(path);
 }
 try {
@@ -66,6 +66,23 @@ try {
     }
     report.passed = isolatedPassed && workspace.passed === true && report.steps.length === 4 && report.steps.every(step => step.passed);
   }
+  const dashboardEnv = { ...env, MGEORGE_95_UI_QA: join(output, 'dashboard') };
+  for (const [name, path] of [['dashboard-bundle', 'docs/integration/95-ui-browser/build-harness.mjs'], ['dashboard-chromium', 'scripts/quality/dashboard-browser.mjs']]) {
+    const step = runCommand({ name, executable: process.execPath, args: [path], cwd: root, output, env: dashboardEnv, timeoutMs: 8 * 60_000 });
+    report.steps.push(step); writeJson(join(output, 'receipt.json'), report);
+    if (!step.passed) break;
+  }
+  const dashboardPath = join(output, 'dashboard/dashboard-results.json');
+  if (existsSync(dashboardPath)) {
+    const dashboard = JSON.parse(readFileSync(dashboardPath, 'utf8'));
+    report.dashboard = { passed: dashboard.passed, tests: dashboard.results.length, failures: dashboard.results.filter(item => !item.passed), runnerErrors: dashboard.runnerErrors };
+    if (report.totals) {
+      report.totals.tests += dashboard.results.length;
+      report.totals.pass += dashboard.results.filter(item => item.passed).length;
+      report.totals.fail += dashboard.results.filter(item => !item.passed).length;
+    }
+    report.passed &&= dashboard.passed === true && report.steps.length === 6 && report.steps.every(step => step.passed);
+  } else report.passed = false;
 } catch (error) {
   report.errorCode = error.code ?? error.name;
   report.error = String(error.message).slice(0, 1000);
