@@ -64,3 +64,36 @@ test('leading comments and the existing fixed JSON authorization fence remain us
  const query="/* ' -- */ --\n WITH row AS (SELECT * FROM workspaces) SELECT CASE WHEN COUNT(*)=1 THEN 1 ELSE json('COMPANY_BOUNDARY_MISMATCH') END AS allowed FROM row";
  assert.equal((await database.prepare(query).first()).allowed,1);
 });
+
+// Independent review found SQLite accepts a quoted token immediately beside a
+// keyword. Removing its delimiters must not join FROM and the table into one
+// inspection token. Raw execution first establishes each SQL form is valid.
+for(const [kind,left,right]of [['double quote','"','"'],['bracket','[',']'],['backtick','`','`']]){
+ const quoted=value=>left+value+right,table=quoted('workspaces'),alias=quoted('w'),cte=quoted('visible');
+ for(const [name,query,copies]of [
+  ['FROM boundary',`SELECT owner,payload FROM${table}`,1],
+  ['SELECT boundary',`SELECT${quoted('owner')},payload FROM${table}`,1],
+  ['AS boundary',`SELECT w.owner,w.payload FROM${table}AS${alias}`,1],
+  ['WHERE boundary',`SELECT owner,payload FROM${table}WHERE 1=1`,1],
+  ['JOIN boundary',`SELECT w.owner,w.payload FROM(SELECT 1) AS seed JOIN${table}AS${alias}ON 1=1`,1],
+  ['UNION boundary',`SELECT owner,payload FROM${table}UNION ALL SELECT owner,payload FROM${table}`,2],
+  ['WITH boundary',`WITH${cte}AS(SELECT owner,payload FROM${table})SELECT*FROM${cte}`,1],
+ ])test(`adjacent ${kind} identifier stays tenant-scoped at ${name}`,async t=>{
+  const {f,a,database}=await fixture(t);
+  assert.equal(f.sql.prepare(query).all().length,2*copies,'the independent two-company SQL form must be valid');
+  const rows=(await database.prepare(query).all()).results;
+  assert.equal(rows.length,copies,'quoted token boundaries must not expose another company');
+  assert.ok(rows.every(row=>row.owner===a.owner&&row.payload===JSON.stringify({private:'company-a'})));
+ });
+ for(const name of ['company_application_tokens','company_application_token_control','companies','company_memberships'])test(`adjacent ${kind} identifier cannot read ${name}`,async t=>{
+  const {f,database}=await fixture(t),query=`SELECT*FROM${quoted(name)}`;
+  assert.doesNotThrow(()=>f.sql.prepare(query).all(),'the reserved-table query is valid SQLite');
+  assert.throws(()=>database.prepare(query),{code:'COMPANY_SQL_DENIED'});
+ });
+ test(`adjacent ${kind} UPDATE preserves a legitimate owner-bound write`,async t=>{
+  const {f,a,b,database}=await fixture(t),before=f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(b.owner);
+  await database.prepare(`UPDATE${table}SET payload=? WHERE owner=?`).bind('synthetic-own-update',a.owner).run();
+  assert.equal(f.sql.prepare('SELECT payload FROM workspaces WHERE owner=?').get(a.owner).payload,'synthetic-own-update');
+  assert.deepEqual(f.sql.prepare('SELECT * FROM workspaces WHERE owner=?').get(b.owner),before);
+ });
+}
